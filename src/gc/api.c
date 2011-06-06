@@ -560,7 +560,7 @@ flag set.
 
 PARROT_EXPORT
 void
-Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
     interp->gc_sys->free_pmc_attributes(interp, pmc);
