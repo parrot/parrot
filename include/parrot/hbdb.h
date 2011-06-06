@@ -10,9 +10,6 @@
 #ifndef PARROT_HBDB_H_GUARD
 #define PARROT_HBDB_H_GUARD
 
-/*#include <stdio.h>*/
-/*#include "parrot/parrot.h"*/
-
 /* Type: hbdb_breakpoint_t
  *
  * Fields:

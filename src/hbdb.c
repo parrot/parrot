@@ -18,24 +18,13 @@ This file contains functions and types used by the C<hbdb> debugger.
 
 */
 
-/* TODO Remove unnecessary header files */
 /* TODO Perldoc section for types       */
 
 #include <stdio.h>
 
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
-/*
-#include "parrot/runcore_api.h"
-#include "parrot/extend.h"
-#include "parrot/embed.h"
-#include "parrot/runcore_profiling.h"
-#include "parrot/oplib/core_ops.h"
 
-#include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
-#include "pmc/pmc_namespace.h"
-*/
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
 typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
