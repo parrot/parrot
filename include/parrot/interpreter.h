@@ -201,7 +201,7 @@ struct parrot_interp_t {
 
     /* TODO Remove PDB_t? */
     PDB_t *pdb;                               /* debug /trace system */
-    hbdb_t hbdb;                              /* hbdb debugger */
+    hbdb_t *hbdb;                             /* hbdb debugger */
 
     void  *lo_var_ptr;                        /* Pointer to memory on runops
                                                * system stack */
