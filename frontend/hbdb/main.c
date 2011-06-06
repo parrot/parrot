@@ -37,6 +37,7 @@ static void fail         (Parrot_PMC interp);
 static void license      (void);
 static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc);
 static void usage        (void);
+static void welcome      (void);
 
 static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--help"    } },
@@ -244,6 +245,23 @@ usage(void)
     puts("    Must be either a bytecode file (.pbc) or PIR file (.pir)");
 
     exit(EXIT_SUCCESS);
+}
+
+/*
+
+=item C<static void welcome(void)>
+
+Displays welcome message.
+
+=cut
+
+*/
+
+static void
+welcome(void)
+{
+    puts("HBDB: The Honey Bee Debugger");
+    puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information");
 }
 
 /*
