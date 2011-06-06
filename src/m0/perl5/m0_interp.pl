@@ -434,6 +434,13 @@ sub m0_opfunc_deref {
     $cf->[$a1] = $cf->[$a2][ $cf->[$a3] ];
 }
 
+sub m0_opfunc_set_ref {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "set_ref $a1, $a2, $a3";
+
+    $cf->[$a1][ $cf->[$a2] ] = $cf->[$a3];
+}
+
 sub m0_opfunc_csym {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "csym $a1, $a2, $a3";
