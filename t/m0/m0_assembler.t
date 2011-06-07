@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 26;
+plan tests => 27;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
@@ -135,6 +135,11 @@ output_like(
 
 ok(!-e "${file}b", "invalid bytecode file ${file}b was not generated");
 
+output_like(
+    catfile(qw/t m0 invalid invalid_register_name.m0/),
+    qr/Invalid register 'SPILLCOFFEE'/,
+    'detect invalid register names',
+);
 
 output_like(
     catfile(qw/t m0 invalid invalid_register_number.m0/),
