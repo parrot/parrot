@@ -206,9 +206,9 @@ address is calculated as 256 * C<*$1> + C<*$2>.
 
 =item * goto_chunk - go to an offset in another chunk
 
-Unconditionally transfer control flow to a fixed offset within another chunk's
-bytecode segment.  The target address is calculated as 256 * C<$1> + C<$*2>.
-C<*$3> is the name of the target chunk.
+Unconditionally transfer control flow to an offset within another chunk's
+bytecode segment.  C<*$1> is used as the target address and C<$*2> is the name
+of the target chunk.
 
 =back
 
@@ -336,20 +336,27 @@ Segfaults may result.  Be careful.
 
 =back
 
-=head3 Register ops (3)
+=head3 Register ops (4)
+
+=over
 
 =item * set - set a register to a value
 
 Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
 
-=item * set_imm - set a register to a hard-coded value from the bytecode stream
+=item * set_imm - set a register to a hard-coded value
 
-Set C<*$1> to C<$2> * 256 +  C<$3>.
+Set C<*$1> to C<$2> * 256 + C<$3>.
 
 =item * deref - dereference a register
 
-Treat C<*$3> as index and C<*$2> as a register set.  Set C<*$1> to the value at
-address C<*$2> + C<*$3>.
+Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
+whatever's at C<*$2[ *$3 ]>.
+
+=item * set_ref - change the value of a referenced register
+
+Treat C<*$1> as an array and C<*$2> as an offset into that array.  Set
+C<*$1[ *$2 ]> to C<*$3>.
 
 =back
 
@@ -721,16 +728,17 @@ are not require to have any defined semantics.
     0x1A set
     0x1B set_imm
     0x1C deref
-    0x1D csym
-    0x1E ccall_arg
-    0x1F ccall_ret
-    0x20 ccall
-    0x21 print_s
-    0x22 print_i
-    0x23 print_n
-    0x24 alloc
-    0x25 free
-    0x26 exit
+    0x1D set_ref
+    0x1E csym
+    0x1F ccall_arg
+    0x20 ccall_ret
+    0x21 ccall
+    0x22 print_s
+    0x23 print_i
+    0x24 print_n
+    0x25 alloc
+    0x26 free
+    0x27 exit
 
 =head2 Execution
 
@@ -881,17 +889,17 @@ first 8 registers for information specific to the call frame and has 60 of each 
 type:
 
     number  type
-    0       INTERP - global interpreter data (see C<Interpreter Data>)
-    1       PC  - current instruction within the current bytecode segment
-    2       EH  - current exception handler
-    3       PCF - parent call frame
-    4       CHUNK - the name of the currently-executing chunk
-    5       CONSTS - pointer to constants segment
-    6       MDS - pointer to metadata segment
-    7       BCS - pointer to bytecode segment
-    8       REGSZ - number of bytes in a register (hard-coded)
-    9       RETPC - return PC
-    10      SPC4RNT - this space for rent
+    0       CF - pointer to the current call frame
+    1       PCF - parent call frame
+    2       PC - current instruction within the current bytecode segment
+    3       RETPC - return PC
+    4       EH  - current exception handler
+    5       CHUNK - the name of the currently-executing chunk
+    6       RETCHUNK - name of chunk to return to when invoking this cf
+    7       CONSTS - pointer to constants segment
+    8       MDS - pointer to metadata segment
+    9       BCS - pointer to bytecode segment
+    10      INTERP - global interpreter data (see C<Interpreter Data>)
     11      SPILLCF - overflow call frame (see C<Register Spilling>)
     12-72   I0 - I60
     73-133  N0 - N60
@@ -901,6 +909,10 @@ type:
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current call frame.
 
+The inclusion of CF is necessary for M0 interpreters written in high-level
+languages where the first element of an array is not equivalent to the array
+itself.
+
 =head2 Interpreter Data
 
 While most of the interesting parts of runtime data will live in a call frame,
@@ -908,12 +920,26 @@ it still make sense to store some data in a global interpreter data structure.
 This will include the following items, stored in the same way as call frame
 data.
 
-    number  name        description
-    0       OP_FUNCS    array of functions that implement ops
-    1       CHUNKS      array of all loaded chunks
-    2       CHUNK_INFO  array of chunk metadata (currently just names)
-    3       CALL_FRAMES array of all initial call frames
-    4       CONFIG      static global config data
+    number  name         description
+    0       OP_FUNCS     array of functions that implement ops
+    1       CHUNKS       array of all loaded chunks
+    2       CHUNK_INFO   array of chunk metadata (currently just names)
+    3       CALL_FRAMES  array of all initial call frames
+    4       CONFIG       static global config data
+    5       ARGC         number of elements in ARGV
+    6       ARGV         array of command-line arguments passed to the m0 program
+
+C<CONFIG> should have at least the following values:
+
+    number  name            description
+    0       CFG_M0V         m0b version implemented by the running interpreter
+    1       CFG_REGSZ       size of a register in bytes
+    2       CFG_CFSZ        size of a call frame in bytes
+    3       CFG_IREGSZ      number of significant bytes in an I register
+    4       CFG_NREGSZ      number of significant bytes in an N register
+    5       CFG_OPCODESZ    number of bytes in an opcode
+    6       CFG_PTRSZ       number of bytes in a pointer
+    7       CFG_ENDIANNESS  host endianness (1 - big, 0 - little)
 
 =head2 MOP interaction
 
