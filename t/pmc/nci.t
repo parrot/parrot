@@ -32,6 +32,9 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 $ENV{TEST_PROG_ARGS} ||= '';
 
 SKIP: {
+    unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI}) {
+        plan skip_all => "Parrot built without libffi or extra NCI thunks";
+    }
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
