@@ -67,12 +67,12 @@ hbdb_get_command(PARROT_INTERP)
     STRING *prompt;
 
     /* DEBUG */
-    PMC    *stdoutput = Parrot_io_stdhandle(interp, stdout, NULL);
+    PMC    *stdoutput = Parrot_io_stdhandle(interp, STDOUT_FILENO, NULL);
     STRING *say       = Parrot_str_new_constant(interp, "say");
     /* DEBUG */
 
     /* Create FileHandle PMC */
-    stdinput = Parrot_io_stdhandle(interp, stdin, NULL);
+    stdinput = Parrot_io_stdhandle(interp, STDIN_FILENO, NULL);
 
     /* Create string constants */
     readline = Parrot_str_new_constant(interp, "readline_interactive");
