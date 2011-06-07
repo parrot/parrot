@@ -62,35 +62,25 @@ hbdb_get_command(PARROT_INTERP)
 
     char *cmd;
 
-    Interp *hbdb_interp;
-
     PMC    *stdinput;
     STRING *readline;
     STRING *prompt;
 
     /* DEBUG */
-    PMC    *stdoutput;
-    STRING *say;
-    /* DEBUG */
-
-    /* Debugger process */
-    hbdb_interp = interp->hbdb->debugger;
-
-    /* DEBUG */
-    stdoutput = Parrot_io_stdhandle(hbdb_interp, stdout, NULL);
-    say       = Parrot_str_new_constant(hbdb_interp, "say");
+    PMC    *stdoutput = Parrot_io_stdhandle(interp, stdout, NULL);
+    STRING *say       = Parrot_str_new_constant(interp, "say");
     /* DEBUG */
 
     /* Create FileHandle PMC */
-    stdinput = Parrot_io_stdhandle(hbdb_interp, stdin, NULL);
+    stdinput = Parrot_io_stdhandle(interp, stdin, NULL);
 
     /* Create string constants */
-    readline = Parrot_str_new_constant(hbdb_interp, "readline_interactive");
-    prompt   = Parrot_str_new_constant(hbdb_interp, "(hbdb) ");
+    readline = Parrot_str_new_constant(interp, "readline_interactive");
+    prompt   = Parrot_str_new_constant(interp, "(hbdb) ");
 
     while (1) {
-        Parrot_pcc_invoke_method_from_c_args(hbdb_interp, stdinput, readline, "S->S", prompt, &cmd);
-        Parrot_pcc_invoke_method_from_c_args(hbdb_interp, stdoutput, say, "->", cmd);
+        Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &cmd);
+        Parrot_pcc_invoke_method_from_c_args(interp, stdoutput, say, "->", cmd);
     }
 }
 
