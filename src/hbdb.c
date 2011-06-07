@@ -68,10 +68,11 @@ hbdb_get_command(PARROT_INTERP)
 
     /* DEBUG */
     PMC    *stdoutput = Parrot_io_stdhandle(interp, STDOUT_FILENO, NULL);
-    STRING *say       = Parrot_str_new_constant(interp, "say");
+    STRING *print     = Parrot_str_new_constant(interp, "print");
+    STRING *cmd_out;
     /* DEBUG */
 
-    /* Create FileHandle PMC */
+    /* Create FileHandle PMC for stdin */
     stdinput = Parrot_io_stdhandle(interp, STDIN_FILENO, NULL);
 
     /* Create string constants */
@@ -80,7 +81,16 @@ hbdb_get_command(PARROT_INTERP)
 
     while (1) {
         Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &cmd);
-        Parrot_pcc_invoke_method_from_c_args(interp, stdoutput, say, "->", cmd);
+
+        /* cotto:
+         * When I comment out strcat(), I get "Invalid character in ASCII string"
+         * but when I leave it there, it loops and outputs nothing
+         */
+
+        strcat(cmd, "\n");
+        cmd_out = Parrot_str_new(interp, cmd, sizeof (cmd));
+
+        Parrot_pcc_invoke_method_from_c_args(interp, stdoutput, print, "S->", cmd_out);
     }
 }
 
