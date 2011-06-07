@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2010, Parrot Foundation. */
+/* Copyright (C) 2001-2011, Parrot Foundation. */
 
 /*
 
@@ -57,6 +57,9 @@ void
 hbdb_get_command(void)
 {
     fflush(stdout);
+
+    while (1) {
+    }
 }
 
 /*

@@ -1,10 +1,14 @@
+/* Copyright (C) 2001-2011, Parrot Foundation. */
+
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
- *
  * hbdb.h
  *
  * Overview:
- *    Honey bee debugger (hbdb) types and function declarations
+ *    Honey bee debugger (hbdb) types and function declarations.
+ *
+ * History:
+ *    The initial version was written by Kevin Polulak (soh_cah_toa) as
+ *    part of Google Summer of Code 2011.
  */
 
 #ifndef PARROT_HBDB_H_GUARD
