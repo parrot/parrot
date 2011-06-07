@@ -148,6 +148,12 @@ output_like(
 );
 
 output_like(
+    catfile(qw/t m0 invalid invalid_register_number2.m0/),
+    qr/Invalid register 'S'/,
+    'detect invalid registers',
+);
+
+output_like(
     catfile(qw/t m0 invalid invalid_chunk_names_collide.m0/),
     qr/Invalid M0/ms,
     'detect colliding chunk names',
