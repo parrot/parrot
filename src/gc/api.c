@@ -624,9 +624,9 @@ size)>
 Parrot_gc_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void
 *data, size_t newsize, size_t oldsize)>
 
-=cut
-
 TODO Write docu.
+
+=cut
 
 */
 
