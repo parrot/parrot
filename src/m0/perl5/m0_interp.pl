@@ -35,16 +35,18 @@ use constant {
 
 # call frame mnemonics
 use constant {
-    INTERP  => 0,
-    PC      => 1,
-    EH      => 2,
-    PCF     => 3,
-    CHUNK   => 4,
-    CONSTS  => 5,
-    MDS     => 6,
-    BCS     => 7,
-    REGSZ   => 8,
-    SPILLCF => 11,
+    CF       => 0,
+    PCF      => 1,
+    PC       => 2,
+    RETPC    => 3,
+    EH       => 4,
+    CHUNK    => 5,
+    RETCHUNK => 6,
+    CONSTS   => 7,
+    MDS      => 8,
+    BCS      => 9,
+    INTERP   => 10,
+    SPILLCF  => 11,
 };
 
 # interp mnemonics
@@ -128,6 +130,7 @@ sub new_interp {
         \&m0_opfunc_set,
         \&m0_opfunc_set_imm,
         \&m0_opfunc_deref,
+        \&m0_opfunc_set_ref,
         \&m0_opfunc_csym,
         \&m0_opfunc_ccall_arg,
         \&m0_opfunc_ccall_ret,
@@ -158,16 +161,18 @@ sub new_call_frame{
 
     $cf->[$_] = 0 for (0 .. 255);
 
-    $cf->[INTERP]  = $interp;
-    $cf->[PC]      = 0;
-    $cf->[EH]      = {};
-    $cf->[PCF]     = {};
-    $cf->[CHUNK]   = $interp->[CHUNKS][0]{name};
-    $cf->[CONSTS]  = $interp->[CHUNKS][0]{consts};
-    $cf->[MDS]     = $interp->[CHUNKS][0]{meta};
-    $cf->[BCS]     = $interp->[CHUNKS][0]{bc};
-    $cf->[REGSZ]   = 4;
-    $cf->[SPILLCF] = {};
+    $cf->[CF]       = $cf;
+    $cf->[PCF]      = {};
+    $cf->[PC]       = 0;
+    $cf->[RETPC]    = 0;
+    $cf->[EH]       = {};
+    $cf->[CHUNK]    = $interp->[CHUNKS][0]{name};
+    $cf->[RETCHUNK] = 0;
+    $cf->[CONSTS]   = $interp->[CHUNKS][0]{consts};
+    $cf->[MDS]      = $interp->[CHUNKS][0]{meta};
+    $cf->[BCS]      = $interp->[CHUNKS][0]{bc};
+    $cf->[INTERP]   = $interp;
+    $cf->[SPILLCF]  = {};
 
     return $cf;
 }
@@ -245,8 +250,8 @@ sub m0_opfunc_goto_if {
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
-    my $new_pc      = 256 * $a1 + $a2;
-    my $chunk_name  = $cf->[$a3];
+    my $new_pc      = $cf->[$a1];
+    my $chunk_name  = $cf->[$a2];
     my $interp      = $cf->[INTERP];
 
     m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
@@ -254,13 +259,12 @@ sub m0_opfunc_goto_chunk {
     die "invalid chunk name '$chunk_name' in goto_chunk"
       unless exists $interp->[CHUNK_MAP]{$chunk_name};
 
-    my $chunk_num  = $interp->[CHUNK_MAP]{$chunk_name};
+    my $chunk_num = $interp->[CHUNK_MAP]{$chunk_name};
     $cf->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
     $cf->[CONSTS] = $interp->[CHUNKS][$chunk_num]{consts};
     $cf->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
     $cf->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
     $cf->[PC]     = $new_pc;
-    $cf->[CHUNK]  = $chunk_name;
 }
 
 sub m0_opfunc_add_i {
@@ -396,6 +400,13 @@ sub m0_opfunc_xor {
 sub m0_opfunc_gc_alloc {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "gc_alloc $a1, $a2, $a3";
+
+    # "allocate" a gc-able array of the requested size
+    my $a = ();
+    for my $i (0 .. $cf->[$a2]) {
+        $a->[$i] = 0;
+    }
+    $cf->[$a1] = $a;
 }
 
 sub m0_opfunc_sys_alloc {

@@ -32,7 +32,7 @@ my $M0_CONST_SEG    = 0x02;
 my $M0_META_SEG     = 0x03;
 my $M0_BC_SEG       = 0x04;
 
-use constant M0_REG_RX => qr/^(([INSP]\d+)|INTERP|PC|EH|PCF|CONSTS|MDS|BCS|REGSZ|SPILLCF|x)/;
+use constant M0_REG_RX => qr/^(([INSP]\d+)|CF|PCF|PC|RETPC|EH|CHUNK|RETCHUNK|CONSTS|MDS|BCS|INTERP|SPILLCF|x)/;
 
 assemble($file);
 
@@ -109,16 +109,18 @@ sub register_name_to_num {
 
     my $symbols = { 
         # call frame values
-        INTERP  => 0,
-        PC      => 1, 
-        EH      => 2, 
-        PCF     => 3, 
-        CHUNK   => 4, 
-        CONSTS  => 5,  
-        MDS     => 6,  
-        BCS     => 7, 
-        REGSZ   => 8, 
-        SPILLCF => 11,
+        CF       => 0,
+        PCF      => 1,
+        PC       => 2,
+        RETPC    => 3,
+        EH       => 4,
+        CHUNK    => 5,
+        RETCHUNK => 6,
+        CONSTS   => 7,
+        MDS      => 8,
+        BCS      => 9,
+        INTERP   => 10,
+        SPILLCF  => 11,
 
         # global interp values
         OP_FUNCS    => 0,
@@ -315,6 +317,7 @@ sub m0b_constants_seg {
         my $const_length = length($_);
         $bytecode .= pack("L", $const_length);
         $bytecode .= $_;
+        say "adding constant '$_' to constants segment";
     }
 
     return $bytecode;
@@ -457,6 +460,7 @@ sub m0b_meta_seg_length {
 sub opname_to_num {
     my ($ops, $opname) = @_;
 
+    $opname =~ s/-/_/g;
     die "Invalid M0: unknown op '$opname'" if (! exists $ops->{$opname});
 
     return oct $ops->{$opname};
@@ -601,13 +605,14 @@ __DATA__
 0x1A set
 0x1B set_imm
 0x1C deref
-0x1D csym
-0x1E ccall_arg
-0x1F ccall_ret
-0x20 ccall
-0x21 print_s
-0x22 print_i
-0x23 print_n
-0x24 alloc
-0x25 free
-0x26 exit
+0x1D set_ref
+0x1E csym
+0x1F ccall_arg
+0x20 ccall_ret
+0x21 ccall
+0x22 print_s
+0x23 print_i
+0x24 print_n
+0x25 alloc
+0x26 free
+0x27 exit

@@ -4,112 +4,105 @@
 0 "caller at start"
 1 "value of I23 is "
 2 "callee"
-3 "caller at end
+3 "caller at end"
 .metadata
 .bytecode
 
-
-    ##################
-    ####   NOTE   ####
-    ##################
-
-    # This is not runnable code, and I'm not even entirely sure if it should
-    # be.  I'm using this file to figure out what additions M0 needs to support
-    # some basic calling conventions that involve creating a new call frame,
-    # making it active and allowing a child call frame to poke around in a
-    # parent.  Once I can show that M0 is powerful enough to implment the
-    # above, I'll update the spec.
-    # The code refers to registers that don't yet exist and uses the set-ref
-    # op, which hasn't been defined.  This file will eventually work as a
-    # minimal calling conventions demonstration, but for now it's more of an
-    # M0 laboratory.
-
-    set-imm S0, 0, 0
+    # print "caller at start"
+    set_imm S0, 0, 0
     deref   S0, CONSTS, S0
-    set-imm I0, 0, 1
-    print-s I0, S0, x
+    set_imm I0, 0, 1
+    print_s I0, S0, x
 
-    set-imm I23, 39, 15
-    set-imm S1, 0, 1
-    print-s I0, S1, x
-    print-i I0, I23, x
+    # print "value of I23 is " ...
+    set_imm I23, 39, 15
+    set_imm S1, 0, 1
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    print_i I0, I23, x
 
-    set-imm S2, 0, 2
-    add_i   RETPC, PC, 4
-    goto_chunk 0, 0, S2
-
-    set-imm S3, 0, 3
-    print-s I0, S3, x
-    set-imm S4, 0, 1
-    print-s I0, S4, x
-    print-i I0, I23
-    
-    # now, create a new call frame
+    # create a new call frame
 
     # point P1 at the current call frame
-    # this will work because cf[CF][CF] == cf
-    set-imm  I12, 0,  CF
+    set_imm  I12, 0,  CF
     deref    P1,  CF, I12
 
     # allocate a new call frame from the gc
-    set-imm  I10, 8, 0
-    set-imm  I11, 0, 0
-    gc-alloc P0, I10, I11
+    set_imm  I10, 8, 0
+    set_imm  I11, 0, 0
+    gc_alloc P0, I10, I11
 
-    # intialize P0 (the new call frame)
-
-    # P0[INTERP] = P1[INTERP]
+    # intialize P0 (the new call frame) - INTERP
     deref    P2, P1, INTERP
-    set-ref  P0, INTERP, P2
+    set_ref  P0, INTERP, P2
+    # set new cf's PCF to the current cf (P1)
+    set_ref  P0, PCF, P1
+    # initialize some values to zero
+    set_imm  P2, 0, 0
+    set_ref  P0, EH,       P2
+    set_ref  P0, RETPC,    P2
+    set_ref  P0, RETCHUNK, P2
+    set_ref  P0, SPILLCF,  P2
 
-    # P0[PCF] = P1
-    set-ref  P0, PCF, P1
+    # set the return PC for the current cf
+    add_i   RETPC, PC, 6
+    set     RETCHUNK, CHUNK, x
 
-    # P0[SPILLCF] = 0
-    # P0[RETPC]   = 0
-    # P0[EH]      = 0
-    set-imm  P2, 0, 0
-    set-ref  P0, SPILLCF,  P2
-    set-ref  P0, RETPC,    P2
-    set-ref  P0, EH,       P2
-    set-ref  P0, RETCHUNK, P2
-
-    #make the new call frame active and goto the callee chunk
+    # activate the new call frame and goto the callee chunk
     set     CF, P1, x
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
-    goto_chunk 0, 0, S0
+    set_imm I0, 0, 0
+    goto_chunk I0, S0, x
 
+    # we're back, so activate the parent call frame
+    set CF, PCF, x
+
+    # print "caller at end "
+    set_imm S3, 0, 3
+    print_s I0, S3, x
+
+    # print "value of I23 is " ...
+    set_imm S4, 0, 1
+    print_s I0, S4, x
+    print_i I0, I23, x
+    
 .chunk "callee"
 .constants
-0 "ok 2 control flow hits second chunk
+0 "in callee chunk"
+1 "value of I23 is "
+2 "parent call frame's value of I23 is "
+3 "OH NOES!  Contol flow misflowed!"
 .metadata
 .bytecode
 
-    # calculate the size of the new call frame
-    # allocate space for the new call frame from the gc
-    # initialize the new call frame (XXX: how?  Is this something the VM should support?)
-#The key to untangling this is to figure out what values need to go into the new
-#cf and where they need to come from.  The very first call frame probably needs
-#to be created by the interp as a bootstrapping measure, but once it exists
-#there should be enough data to create new call frames.
-    
-# a call frame has the following:
-#PC       - copied from CF
+    # print "in callee chunk"
+    set_imm I0, 0, 1
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
 
-# Will it be necessary to store the return chunk as well as the return PC?  If
-# the parent call frame is responsible for calling into the child chunk, the
-# parent's CHUNK will be pointing at the child chunk instead of the chunk where
-# the parent jumped from.
+    #print "value of I23 is "...
+    set_imm S1, 0, 1
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    set_imm I23, 99, 99
+    print_i I0, I23, x
 
+    # poke into the parent call frame
+    deref I1, PCF, I23
+    set_imm S2, 0, 2
+    deref S2, CONSTS, S2
+    print_s I0, S2, x
+    print_i I0, I1, x
 
+    # figure out return PC and chunk
+    deref   P0, CF, PCF
+    deref   P1, P0, RETPC
+    deref   S1, P0, RETCHUNK
+    goto_chunk P1, S1, x
 
-
-
-
-
-
-
-
-
-
+    # should be unreachable
+    set_imm S0, 0, 3
+    set_imm I0, 0, 1
+    print_s I0, S0, x

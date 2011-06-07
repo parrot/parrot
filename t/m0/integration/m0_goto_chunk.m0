@@ -22,7 +22,8 @@
     # goto_chunk "goto_chunk_helper"
     set_imm S1, 0, 2
     deref   S1, CONSTS, S1
-    goto_chunk 0, 0, S1
+    set_imm I1, 0, 0
+    goto_chunk I1, S1, x
 
     # print "nok 2"....
     set_imm S1, 0, 3
