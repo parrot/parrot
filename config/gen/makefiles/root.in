@@ -1734,6 +1734,7 @@ src/embed/api$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/runcore_api.h \
     src/embed/api.c \
+    src/hbdb.c \
     src/embed/embed_private.h \
     include/pmc/pmc_parrotinterpreter.h
 

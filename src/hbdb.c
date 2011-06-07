@@ -69,12 +69,17 @@ hbdb_get_command(PARROT_INTERP)
     STRING *prompt;
 
     /* DEBUG */
-    PMC    *stdoutput = Parrot_io_stdhandle(hbdb_interp, stdout, NULL);
-    STRING *say       = Parrot_str_new_constant(hbdb_interp, "say");
+    PMC    *stdoutput;
+    STRING *say;
     /* DEBUG */
 
     /* Debugger process */
     hbdb_interp = interp->hbdb->debugger;
+
+    /* DEBUG */
+    stdoutput = Parrot_io_stdhandle(hbdb_interp, stdout, NULL);
+    say       = Parrot_str_new_constant(hbdb_interp, "say");
+    /* DEBUG */
 
     /* Create FileHandle PMC */
     stdinput = Parrot_io_stdhandle(hbdb_interp, stdin, NULL);
