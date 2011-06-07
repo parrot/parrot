@@ -24,8 +24,7 @@
     # create a new call frame
 
     # point P1 at the current call frame
-    set_imm  I12, 0,  CF
-    deref    P1,  CF, I12
+    set       P1,  CF, x
 
     # allocate a new call frame from the gc
     set_imm  I10, 8, 0
@@ -33,10 +32,11 @@
     gc_alloc P0, I10, I11
 
     # intialize P0 (the new call frame) - INTERP
-    deref    P2, P1, INTERP
-    set_ref  P0, INTERP, P2
     # set new cf's PCF to the current cf (P1)
-    set_ref  P0, PCF, P1
+    set_ref  P0, INTERP, INTERP
+    set_ref  P0, PCF, CF
+    set_ref  P0, CF, P0
+
     # initialize some values to zero
     set_imm  P2, 0, 0
     set_ref  P0, EH,       P2
@@ -49,7 +49,7 @@
     set     RETCHUNK, CHUNK, x
 
     # activate the new call frame and goto the callee chunk
-    set     CF, P1, x
+    set     CF, P0, x
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     set_imm I0, 0, 0
@@ -86,14 +86,15 @@
     set_imm S1, 0, 1
     deref   S1, CONSTS, S1
     print_s I0, S1, x
+    print_n CF,x,x
     set_imm I23, 99, 99
     print_i I0, I23, x
 
     # poke into the parent call frame
-    deref I1, PCF, I23
     set_imm S2, 0, 2
-    deref S2, CONSTS, S2
+    deref   S2, CONSTS, S2
     print_s I0, S2, x
+    deref   I1, PCF, I23
     print_i I0, I1, x
 
     # figure out return PC and chunk

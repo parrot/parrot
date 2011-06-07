@@ -16,7 +16,7 @@ Run M0 bytecode assembled by the M0 assembler.
 =cut
 
 use strict;
-use warnings;
+use warnings FATAL => qw(all);
 use feature 'say';
 use autodie qw/:all/;
 use File::Slurp qw/slurp/;
@@ -399,14 +399,16 @@ sub m0_opfunc_xor {
 
 sub m0_opfunc_gc_alloc {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "gc_alloc $a1, $a2, $a3";
+    m0_say "gc_alloc $a1, $a2, $a3 ($cf->[$a2] bytes, flags = $cf->[$a3])";
 
     # "allocate" a gc-able array of the requested size
-    my $a = ();
-    for my $i (0 .. $cf->[$a2]) {
-        $a->[$i] = 0;
+    # this isn't quite right because the requested size is in bytes, but it'll
+    # work for now
+    my $word_count = $cf->[$a2] / 8;
+    $cf->[$a1] = ();
+    for my $i (0 .. $word_count) {
+        $cf->[$a1][$i] = 0;
     }
-    $cf->[$a1] = $a;
 }
 
 sub m0_opfunc_sys_alloc {
@@ -449,7 +451,9 @@ sub m0_opfunc_set_ref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_ref $a1, $a2, $a3";
 
-    $cf->[$a1][ $cf->[$a2] ] = $cf->[$a3];
+    # XXX: revisit the asymmetry between this op and deref and decide whether
+    # to make them consistent
+    $cf->[$a1][ $a2 ] = $cf->[$a3];
 }
 
 sub m0_opfunc_csym {
@@ -496,20 +500,11 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
+    die Dumper $cf->[$a1];
     my $handle = $cf->[$a1];
     my $var    = $cf->[$a2];
     # TODO: print to $handle instead of stdout
     say $var;
-}
-
-sub m0_opfunc_alloc {
-    my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "alloc $a1, $a2, $a3";
-}
-
-sub m0_opfunc_free {
-    my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "free $a1, $a2, $a3";
 }
 
 sub m0_opfunc_exit {
