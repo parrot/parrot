@@ -24,6 +24,8 @@ This file contains functions and types used by the C<hbdb> debugger.
 
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
+#include "parrot/string_funcs.h"
+#include "parrot/sub.h"
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
@@ -47,18 +49,43 @@ struct cmd_list {
 
 /*
 
-=item C<void hbdb_get_command(void)>
+=item C<void hbdb_get_command(PARROT_INTERP)>
 
 Displays the user prompt.
 
 */
 
 void
-hbdb_get_command(void)
+hbdb_get_command(PARROT_INTERP)
 {
-    fflush(stdout);
+    ASSERT_ARGS(hbdb_get_command)
+
+    char *cmd;
+
+    Interp *hbdb_interp;
+
+    PMC    *stdinput;
+    STRING *readline;
+    STRING *prompt;
+
+    /* DEBUG */
+    PMC    *stdoutput = Parrot_io_stdhandle(hbdb_interp, stdout, NULL);
+    STRING *say       = Parrot_str_new_constant(hbdb_interp, "say");
+    /* DEBUG */
+
+    /* Debugger process */
+    hbdb_interp = interp->hbdb->debugger;
+
+    /* Create FileHandle PMC */
+    stdinput = Parrot_io_stdhandle(hbdb_interp, stdin, NULL);
+
+    /* Create string constants */
+    readline = Parrot_str_new_constant(hbdb_interp, "readline_interactive");
+    prompt   = Parrot_str_new_constant(hbdb_interp, "(hbdb) ");
 
     while (1) {
+        Parrot_pcc_invoke_method_from_c_args(hbdb_interp, stdinput, readline, "S->S", prompt, &cmd);
+        Parrot_pcc_invoke_method_from_c_args(hbdb_interp, stdoutput, say, "->", cmd);
     }
 }
 
@@ -80,9 +107,9 @@ hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
     INTVAL line_num;
     Parrot_Context * const context = PMC_data_typed(context_pmc, Parrot_Context *);
 
-    line_num = Parrot_sub_get_line_from_pc(interp,
+    /*line_num = Parrot_sub_get_line_from_pc(interp,
                                            Parrot_pcc_get_sub(interp, context_pmc),
-                                           context->current_pc);
+                                           context->current_pc);*/
 
     return line_num;
 }

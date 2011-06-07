@@ -1049,6 +1049,7 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 frontend/hbdb/main$(O) : \
     $(PARROT_H_HEADERS) \
     frontend/hbdb/main.c \
+    src/hbdb.c \
     $(INC_DIR)/hbdb.h \
     $(INC_DIR)/api.h \
     $(INC_DIR)/longopt.h \
@@ -1057,6 +1058,7 @@ frontend/hbdb/main$(O) : \
 $(HBDB) : frontend/hbdb/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     frontend/hbdb/main$(O) \
+    src/hbdb$(O) \
     src/longopt$(O) \
     src/parrot_config$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
@@ -1443,6 +1445,10 @@ src/runcore/trace$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h
+
+src/hbdb$(O) : \
+    $(PARROT_H_HEADERS) \
+    src/hbdb.c
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
 	$(PARROT_H_HEADERS) src/debug.c \

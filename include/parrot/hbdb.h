@@ -62,27 +62,30 @@ typedef struct {
     /*hbdb_file_t       *file;*/
     hbdb_breakpoint_t *breakpoint;
     /*hbdb_condition_t  *watchpoint;*/
-    unsigned long     breakpoint_skip;
+    unsigned long      breakpoint_skip;
     char              *current_command;
     char              *last_command;
     opcode_t          *current_opcode;
-    int               state;
-    /*Interp            *debugee;*/
-    /*Interp            *debugger;*/
-    unsigned long     tracing;
+    int                state;
+    Interp            *debugee;
+    Interp            *debugger;
+    unsigned long      tracing;
     FILE              *script_file;
-    unsigned long     script_line;
+    unsigned long      script_line;
 } hbdb_t;
 
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void hbdb_get_command(void);
+void hbdb_get_command(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(context_pmc))
