@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 18;
+plan tests => 20;
 
 =head1 NAME
 
@@ -30,9 +30,59 @@ Tests the extension API.
 
 =cut
 
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    pmcnull;
+
+    /* Interpreter set-up */
+    if (interp) {
+        pmcnull  = Parrot_PMC_null();
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+OUTPUT
+
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)register_(pmc|string)' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    ns;
+    Parrot_String string;
+
+    /* Interpreter set-up */
+    if (interp) {
+        ns  = Parrot_get_root_namespace(interp);
+        Parrot_register_pmc(interp, ns);
+        Parrot_unregister_pmc(interp, ns);
+
+        Parrot_register_string(interp, string);
+        Parrot_unregister_string(interp, string);
+
+        Parrot_printf(interp,"%P\n", ns);
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+
+OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
-
 #include <stdio.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
