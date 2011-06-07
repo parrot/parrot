@@ -27,13 +27,13 @@
 typedef struct hbdb_breakpoint hbdb_breakpoint;
 
 typedef struct hbdb_breakpoint {
-    unsigned long           id;
-    opcode_t                *pc;
-    unsigned long           line;
-    long                    skip;
-    /*hbdb_condition_t         *condition;*/
-    hbdb_breakpoint         *prev;
-    hbdb_breakpoint         *next;
+    unsigned long     id;
+    opcode_t         *pc;
+    unsigned long     line;
+    long              skip;
+    /*hbdb_condition_t *condition;*/
+    hbdb_breakpoint  *prev;
+    hbdb_breakpoint  *next;
 } hbdb_breakpoint_t;
 
 /* Type: hbdb_t

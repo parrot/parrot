@@ -58,7 +58,7 @@ Entry point of C<hbdb>.
 int
 main(int argc, const char *argv[])
 {
-    char                   *file;
+    const char             *file;
     int                     status;
     struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
@@ -96,8 +96,11 @@ main(int argc, const char *argv[])
         fail(interp);
     }
 
+    /* FIXME Make this assignment "const-correct" */
     /* Get filename */
     file = argv[argc - 1];
+
+    welcome();
 
     /* Load bytecode */
     if (file) {
@@ -261,6 +264,7 @@ static void
 welcome(void)
 {
     puts("HBDB: The Honey Bee Debugger");
+    puts("Copyright (C) 2001-2010, Parrot Foundation.\n");
     puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information");
 }
 
