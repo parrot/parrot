@@ -132,7 +132,8 @@ output_like(
     qr/Invalid register/,
     'detect invalid register types',
 );
-    ok(!-e "${file}b", "invalid bytecode file was not generated");
+
+ok(!-e "${file}b", "invalid bytecode file ${file}b was not generated");
 
 
 output_like(
