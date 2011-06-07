@@ -8,12 +8,26 @@ hbdb - The Honey Bee Debugger
 
 =head1 SYNOPSIS
 
-hbdb program
+hbdb [options] [file]
 
 =head1 DESCRIPTION
 
 The Honey Bee Debugger (hbdb) is the standard debugger for the Parrot virtual
 machine.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Displays help information.
+
+=item B<-l>, B<--license>
+
+Displays license information.
+
+=back
 
 =head1 STATIC FUNCTIONS
 
