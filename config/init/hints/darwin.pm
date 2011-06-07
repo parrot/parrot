@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 package init::hints::darwin;
 
@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use lib qw( lib );
-use File::Spec ();
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
 
