@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 25;
+plan tests => 26;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
@@ -149,6 +149,9 @@ output_like(
 );
 
 ok(!-e catfile(qw/t m0 invalid invalid_bytecode.m0b/), 'invalid_bytecode.m0b was not created');
+
+# TODO: check return code
+output_like('',qr/Usage:/, 'given a Usage hint when assembler is given no arguments');
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
