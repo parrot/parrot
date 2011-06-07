@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 27;
+plan tests => 29;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
@@ -151,6 +151,12 @@ output_like(
     catfile(qw/t m0 invalid invalid_register_number2.m0/),
     qr/Invalid register 'S'/,
     'detect invalid registers',
+);
+
+output_like(
+    catfile(qw/t m0 invalid invalid_goto.m0/),
+    qr/Invalid M0 - attempt to use undefined label lumiferous_aether/,
+    'detect gotos with invalid labels',
 );
 
 output_like(
