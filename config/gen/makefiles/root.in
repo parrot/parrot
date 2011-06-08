@@ -447,6 +447,7 @@ INTERP_O_FILES = \
     src/embed$(O) \
     src/embed/api$(O) \
     src/embed/bytecode$(O) \
+    src/embed/hbdb$(O) \
     src/embed/strings$(O) \
     src/embed/pmc$(O) \
     src/string/encoding$(O) \
@@ -1734,9 +1735,15 @@ src/embed/api$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/runcore_api.h \
     src/embed/api.c \
-    src/hbdb.c \
     src/embed/embed_private.h \
     include/pmc/pmc_parrotinterpreter.h
+
+src/embed/hbdb$(O) : \
+    $(PARROT_H_HEADERS) \
+    $(INC_DIR)/api.h \
+    $(INC_DIR)/embed.h \
+    src/embed/hbdb.c \
+    src/embed/embed_private.h
 
 src/embed/bytecode$(O) : \
     $(PARROT_H_HEADERS) \

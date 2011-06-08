@@ -146,9 +146,6 @@ Parrot_Int Parrot_api_get_runtime_path(
         FUNC_MODIFIES(*runtime);
 
 PARROT_API
-Parrot_Int Parrot_api_hbdb_get_command(Parrot_PMC interp_pmc);
-
-PARROT_API
 Parrot_Int Parrot_api_load_language(
     Parrot_PMC interp_pmc,
     Parrot_String lang);
@@ -242,7 +239,6 @@ Parrot_Int Parrot_api_wrap_pointer(
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
-#define ASSERT_ARGS_Parrot_api_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -342,6 +338,25 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/embed/bytecode.c */
+
+/* HEADERIZER BEGIN: src/embed/hbdb.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+Parrot_Int Parrot_api_hbdb_get_command(Parrot_PMC interp_pmc);
+
+PARROT_API
+Parrot_Int Parrot_api_hbdb_get_line_number(
+    Parrot_PMC interp_pmc,
+    ARGIN(Parrot_PMC *context_pmc))
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_Parrot_api_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_hbdb_get_line_number \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(context_pmc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/embed/hbdb.c */
 
 /* HEADERIZER BEGIN: src/embed/strings.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

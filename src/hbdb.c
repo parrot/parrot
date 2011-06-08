@@ -51,7 +51,7 @@ struct cmd_list {
 
 =item C<void hbdb_get_command(PARROT_INTERP)>
 
-Displays the user prompt.
+Prompts the user to enter a command.
 
 */
 

@@ -42,7 +42,6 @@ Displays license information.
 #include <stdlib.h>
 
 #include "parrot/parrot.h"
-#include "parrot/hbdb.h"
 #include "parrot/api.h"
 #include "parrot/longopt.h"
 #include "imcc/api.h"
