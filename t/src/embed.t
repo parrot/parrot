@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 15;
+plan tests => 16;
 
 =head1 NAME
 
@@ -171,6 +171,29 @@ int main(int argc, const char **argv)
 CODE
 Done
 Really done
+OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, string;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    string = createstring(interp, "PIR");
+    str    = Parrot_str_to_cstring(interp, string);
+
+    Parrot_free_cstring(str);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
 OUTPUT
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments', todo => "Must explicitly set a PIR compreg");
