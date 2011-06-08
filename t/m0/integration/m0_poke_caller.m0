@@ -45,12 +45,11 @@
     set_imm  P2, 0, 0
     set_ref  P0, EH,       P2
     set_ref  P0, RETPC,    P2
-    set_ref  P0, RETCHUNK, P2
     set_ref  P0, SPILLCF,  P2
 
     # set the return PC and chunk for the current cf
-    add_i   RETPC, PC, 6
-    set     RETCHUNK, CHUNK, x
+    set_imm I13, 0, 9
+    add_i   RETPC, PC, I13
 
     # set the new call frame's PC to be post_set so that when it's # activated,
     # control flow will continue as normal
@@ -66,10 +65,21 @@ post_set:
     set_imm I0, 0, 0
     goto_chunk I0, S0, x
 
-    # we're back, so activate the parent call frame
-    set CF, PCF, x
+    # we're back, so fix the parent call frame's PC and activate it
+retpc:
+    set_imm I1, 0, 4
+    add_i   I1, PC, I1
+    set_ref PCF, PC, I1
+    print_n CF,x,x
+
+    #############################################################################
+    # TODO: control flow gets back here but the call frame's constants table is #
+    # wacky.  I suspect that something's preventing it from being restored      #
+    # properly.                                                                 #
+    #############################################################################
 
     # print "caller at end "
+    set CF, PCF, x
     set_imm S3, 0, 3
     print_s I0, S3, x
 
@@ -104,14 +114,21 @@ post_set:
     set_imm S2, 0, 2
     deref   S2, CONSTS, S2
     print_s I0, S2, x
-    deref   I1, PCF, I23
+    set_imm I2, 0, I23
+    deref   I1, PCF, I2
     print_i I0, I1, x
 
     # figure out return PC and chunk
-    deref   P0, CF, PCF
-    deref   P1, P0, RETPC
-    deref   S1, P0, RETCHUNK
-    goto_chunk P1, S1, x
+    # P0 is the parent call frame
+    set_imm I3, 0,  PCF
+    deref   P0, CF, I3
+    # I4 is the parent call frame's RETPC
+    set_imm I4, 0,  RETPC
+    deref   I4, P0, I4
+    # P1 is the parent call frame's CHUNK
+    set_imm I3, 0,  CHUNK
+    deref   S3, P0, I3
+    goto_chunk I4, S3, x
 
     # should be unreachable
     set_imm S0, 0, 3
