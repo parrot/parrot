@@ -27,6 +27,8 @@ my $file_metadata = {
     total_chunks => 0,
 };
 
+my $debugging = exists $ENV{M0DEBUG} ? 1 : 0;
+
 my $M0_DIR_SEG      = 0x01;
 my $M0_CONST_SEG    = 0x02;
 my $M0_META_SEG     = 0x03;
@@ -48,6 +50,10 @@ sub assemble {
     my $header   = m0b_header();
     my $bytecode = $header . generate_bytecode_for_chunks($ops, $chunks);
     write_bytecode($file, $bytecode);
+}
+
+sub m0_say {
+    say @_ if $debugging;
 }
 
 =item C<write_bytecode($file, $bytecode)>
@@ -255,12 +261,12 @@ sub m0b_bytecode_seg {
 
     for my $line (@lines) {
         if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
-            say "adding op $+{opname} to bytecode seg";
+            m0_say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%+);
         }
         # special case for goto with a label
         elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto\s+(?<target_label>\w+)\s*(,\s*\w+\s*)?$/) {
-            say "adding op goto to bytecode seg";
+            m0_say "adding op goto to bytecode seg";
             if (!exists $label_map{ $+{target_label} } ) {
                 die "Invalid M0 - attempt to use undefined label $+{target_label}";
             }
@@ -269,14 +275,14 @@ sub m0b_bytecode_seg {
             $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = 'x';
             $x{opname} = 'goto';
-            say "goto arg1 is ".$x{arg1};
-            say "goto arg2 is ".$x{arg2};
+            m0_say "goto arg1 is ".$x{arg1};
+            m0_say "goto arg2 is ".$x{arg2};
             $x{target_label} = $+{target_label};
-            say "adding op goto to bytecode seg";
+            m0_say "adding op goto to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
         }
         elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto_if\s+(?<target_label>[a-zA-Z][a-zA-Z0-9_]*)\s*,\s*(?<arg3>\w+)\s*$/) {
-            say "adding op goto_if to bytecode seg";
+            m0_say "adding op goto_if to bytecode seg";
             if (!exists $label_map{ $+{target_label} } ) {
                 die "Invalid M0 - attempt to use undefined label $+{target_label}";
             }
@@ -285,14 +291,13 @@ sub m0b_bytecode_seg {
             $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = $+{arg3};
             $x{opname} = 'goto_if';
-            say "adding op $+{opname} to bytecode seg";
+            m0_say "adding op $+{opname} to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
         } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
             # ignore
         } elsif ($line =~ m/^\s*#/) {
         } else {
-            say "Invalid M0 bytecode line: '$line'";
-            exit 1;
+            die "Invalid M0 bytecode line: '$line'";
         }
     }
     return $bytecode;
@@ -317,7 +322,7 @@ sub m0b_constants_seg {
         my $const_length = length($_);
         $bytecode .= pack("L", $const_length);
         $bytecode .= $_;
-        say "adding constant '$_' to constants segment";
+        m0_say "adding constant '$_' to constants segment";
     }
 
     return $bytecode;
@@ -345,7 +350,7 @@ sub m0b_dir_seg {
         $seg_bytes .= pack('L', length($_->{name}));
         $seg_bytes .= $_->{name};
         $offset    += m0b_chunk_length($_);
-        #say "offset of next chunk is $offset";
+        m0_say "offset of next chunk is $offset";
     }
 
     return $seg_bytes;
@@ -384,7 +389,7 @@ sub m0b_chunk_length {
            m0b_bc_seg_length($chunk->{bytecode})
          + m0b_const_seg_length($chunk->{constants})
          + m0b_meta_seg_length($chunk->{metadata});
-    say "chunk length is $chunk_length";
+    m0_say "chunk length is $chunk_length";
     return $chunk_length;
 }
 
@@ -409,7 +414,7 @@ sub m0b_bc_seg_length {
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
     $seg_length += $op_count * 4;
 
-    say "bytecode seg length is $seg_length";
+    m0_say "bytecode seg length is $seg_length";
     return $seg_length;
 }
 
@@ -429,10 +434,10 @@ sub m0b_const_seg_length {
         my $const_length = length($_);
         $seg_length += 4; # storage of size of constant
         $seg_length += length($_);
-        #say "after adding constant '$_', length is $seg_length";
+        m0_say "after adding constant '$_', length is $seg_length";
     }
 
-    say "consts seg length is $seg_length";
+    m0_say "consts seg length is $seg_length";
     return $seg_length;
 }
 
@@ -453,7 +458,7 @@ sub m0b_meta_seg_length {
     #    }
     #}
 
-    say "metadata seg length is $seg_length";
+    m0_say "metadata seg length is $seg_length";
     return $seg_length;
 }
 
@@ -470,10 +475,9 @@ sub parse_version {
     my ($lines, $cursor) = @_;
     $$cursor++ while ($lines->[$$cursor] =~ /^\s*#/ || $lines->[$$cursor] =~ /^\s*$/);
     if ($lines->[$$cursor] !~ /\.version\s+(?<version>\d+)/) {
-        say "Invalid M0: No version";
-        exit 1;
+        die "Invalid M0: No version";
     }
-    say "Parsing M0 v" . $+{version};
+    m0_say "Parsing M0 v" . $+{version};
     $$cursor++;
 
     return $+{version};
@@ -497,7 +501,7 @@ sub parse_chunks {
             if ($line =~ /^\.chunk\s+"(?<name>\w*?)"$/) {
                 $chunk{name} = $+{name}; 
                 $state = 'chunk start';
-                say "Parsing chunk #".scalar @$chunks;
+                m0_say "Parsing chunk #".scalar @$chunks;
             }
             else {
                 die "Invalid M0: expected chunk name, got '$line' at line $$cursor";
