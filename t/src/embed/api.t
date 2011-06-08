@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 3;
+plan tests => 4;
 
 =head1 NAME
 
@@ -190,6 +190,23 @@ print $PIR_FILE <<'PIR_CODE';
 .end
 PIR_CODE
 
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_runcore: invalid runcore");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    Parrot_api_set_runcore(interp, "junk", 0);
+    return 0;
+}
+CODE
+OUTPUT
+
 c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_call_signature" );
 #include <stdio.h>
 #include <stdlib.h>
@@ -213,6 +230,7 @@ int main(void) {
     char *ptr;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
     Parrot_api_string_import(interp, "$temp_pir", &filename);
     Parrot_api_toggle_gc(interp, 0);
     imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
