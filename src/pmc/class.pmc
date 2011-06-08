@@ -907,20 +907,6 @@ Adds the given sub PMC as a vtable override with the given name.
 */
     VTABLE void add_vtable_override(STRING *name, PMC *sub) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        PMC                     * const vtable =
-            VTABLE_get_pmc_keyed_str(INTERP, _class->vtable_overrides, name);
-
-        /* If we have already added a vtable override with this name... */
-        if (!PMC_IS_NULL(vtable)) {
-            if (vtable == sub)
-                return;
-
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "A vtable override named '%S' already exists in class '%S'. "
-                "It may have been supplied by a role.",
-                name, VTABLE_get_string(INTERP, SELF));
-        }
 
         /* Check that the name is actually valid as a vtable override */
         if (Parrot_get_vtable_index(INTERP, name) == -1)
