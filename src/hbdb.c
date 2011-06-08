@@ -78,7 +78,7 @@ hbdb_get_command(PARROT_INTERP)
     /* Create string constants */
     readline = Parrot_str_new_constant(interp, "readline_interactive");
     prompt   = Parrot_str_new_constant(interp, "(hbdb) ");
-    /* */
+
     while (1) {
         Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &cmd);
 
