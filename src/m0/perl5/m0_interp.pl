@@ -201,9 +201,12 @@ sub run_ops {
         &$op_func($cf, $a1, $a2, $a3);
         my $final_pc = $cf->[PC];
 
-        # allow ops to change control flow
+        # allow ops to change control flow and call frame
         if ($init_pc == $final_pc) {
             $cf->[PC]++;
+        }
+        if ($cf != $cf->[CF]) {
+            $cf = $cf->[CF];
         }
     }
 }
@@ -405,10 +408,11 @@ sub m0_opfunc_gc_alloc {
     # this isn't quite right because the requested size is in bytes, but it'll
     # work for now
     my $word_count = $cf->[$a2] / 8;
-    $cf->[$a1] = ();
+    my $a = [];
     for my $i (0 .. $word_count) {
-        $cf->[$a1][$i] = 0;
+        $a->[$i] = 0;
     }
+    $cf->[$a1] = $a;
 }
 
 sub m0_opfunc_sys_alloc {
@@ -500,7 +504,8 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
-    die Dumper $cf->[$a1];
+    say Dumper $cf;
+    die;
     my $handle = $cf->[$a1];
     my $var    = $cf->[$a2];
     # TODO: print to $handle instead of stdout
@@ -514,6 +519,17 @@ sub m0_opfunc_exit {
     exit($cf->[$a1]);
 }
 
+
+=item C<dump_cf>
+
+Print a reasonably compact representation of a call frame to stdout.
+
+=cut
+
+sub dump_cf {
+    my ($cf) = @_;
+
+}
 
 =item C<parse_m0b_header>
 

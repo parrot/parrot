@@ -34,6 +34,10 @@
     # intialize P0 (the new call frame) - INTERP
     # set new cf's PCF to the current cf (P1)
     set_ref  P0, INTERP, INTERP
+    set_ref  P0, CHUNK, CHUNK
+    set_ref  P0, CONSTS, CONSTS 
+    set_ref  P0, MDS, MDS
+    set_ref  P0, BCS, BCS
     set_ref  P0, PCF, CF
     set_ref  P0, CF, P0
 
@@ -44,12 +48,19 @@
     set_ref  P0, RETCHUNK, P2
     set_ref  P0, SPILLCF,  P2
 
-    # set the return PC for the current cf
+    # set the return PC and chunk for the current cf
     add_i   RETPC, PC, 6
     set     RETCHUNK, CHUNK, x
 
+    # set the new call frame's PC to be post_set so that when it's # activated,
+    # control flow will continue as normal
+    set_imm I12, 0, 3
+    add_i   I12, I12, PC
+    set_ref P0, PC, I12
+
     # activate the new call frame and goto the callee chunk
-    set     CF, P0, x
+    set     CF, P0, 99
+post_set:
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     set_imm I0, 0, 0
@@ -86,7 +97,6 @@
     set_imm S1, 0, 1
     deref   S1, CONSTS, S1
     print_s I0, S1, x
-    print_n CF,x,x
     set_imm I23, 99, 99
     print_i I0, I23, x
 
