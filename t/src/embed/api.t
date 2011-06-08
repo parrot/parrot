@@ -208,6 +208,9 @@ int main(void) {
     Parrot_PMC callcontext_sp, myobject_sp;
     Parrot_PMC callcontext_class, myobject_class;
     Parrot_PMC callcontext, myobject, mymethod;
+    Parrot_PMC ptrbuf;
+    Parrot_Int wrap;
+    char *ptr;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
     Parrot_api_string_import(interp, "$temp_pir", &filename);
@@ -241,6 +244,10 @@ int main(void) {
         Parrot_api_pmc_invoke(interp, mymethod, callcontext);
         Parrot_api_reset_call_signature(interp, callcontext);
     }
+    wrap = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
+    /* Need a Ptr or PtrBuf for this
+    wrap = Parrot_api_unwrap_pointer(interp, pir_compiler, ptr, 0);
+    */
     return 0;
 }
 CODE
