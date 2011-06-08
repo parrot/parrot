@@ -18,8 +18,6 @@ This file contains functions and types used by the C<hbdb> debugger.
 
 */
 
-/* TODO Perldoc section for types       */
-
 #include <stdio.h>
 
 #include "parrot/parrot.h"
@@ -34,10 +32,35 @@ typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
 typedef struct cmd      cmd;
 typedef struct cmd_list cmd_list;
 
+/*
+ * Type:
+ *     cmd
+ *
+ * Fields:
+ *     c_func - points to the function that executes the command
+ *     c_help - the help message associated with the command
+ * 
+ * Overview:
+ *     Contains information about the implementation of a particular command.
+ */
+
 struct cmd {
     cmd_func_t         c_func;
     const char * const c_help;
 };
+
+/*
+ * Type:
+ *     cmd_list
+ *
+ * Fields:
+ *     cl_name  - command name
+ *     cl_short - command name abberviation
+ *     cl_cmd   - "cmd" type for storing implementation details
+ *
+ * Overview:
+ *     Contains general information about a particular command.
+ */
 
 struct cmd_list {
     const char * const cl_name;
@@ -45,7 +68,11 @@ struct cmd_list {
     const cmd  * const cl_cmd;        
 };
 
-/* TODO Insert command list definition here */
+/* Entire list of commands */
+const cmd_list commands[] = {
+    { "break", 'b', },
+    { "help",  'h', },
+};
 
 /*
 

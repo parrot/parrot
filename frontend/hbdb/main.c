@@ -109,7 +109,6 @@ main(int argc, const char *argv[])
         fail(interp);
     }
 
-    /* FIXME Make this assignment "const-correct" */
     /* Get filename */
     file = argv[argc - 1];
 

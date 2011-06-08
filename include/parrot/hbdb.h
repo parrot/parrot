@@ -14,7 +14,8 @@
 #ifndef PARROT_HBDB_H_GUARD
 #define PARROT_HBDB_H_GUARD
 
-/* Type: hbdb_breakpoint_t
+/* Type:
+ *     hbdb_breakpoint_t
  *
  * Fields:
  *     id        - identification number
@@ -25,7 +26,9 @@
  *     prev      - previous breakpoint in the list
  *     next      - next breakpoint in the list
  *
- * Node type in linked list of breakpoints.
+ * Overview:
+ *     Contains details about a particular breakpoint. Node type in linked
+ *     list of breakpoints.
  */
 
 typedef struct hbdb_breakpoint hbdb_breakpoint;
@@ -40,7 +43,8 @@ typedef struct hbdb_breakpoint {
     hbdb_breakpoint  *next;
 } hbdb_breakpoint_t;
 
-/* Type: hbdb_t
+/* Type:
+ *     hbdb_t
  *
  * Fields:
  *     file            - source code file
@@ -54,8 +58,9 @@ typedef struct hbdb_breakpoint {
  *     debugee         - interpreter we are debugging
  *     debugger        - debugger interpreter
  *
- * The debugger's core type. Contains information that's used by the hbdb
- * runcore.
+ * Overview:
+ *     The debugger's core type. Contains information that's used by the hbdb
+ *     runcore.
  */
 
 typedef struct {
