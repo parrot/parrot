@@ -27,10 +27,13 @@ This file contains functions and types used by the C<hbdb> debugger.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
-typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
+typedef void (*cmd_func_t)(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const cmd));
 
 typedef struct cmd      cmd;
 typedef struct cmd_list cmd_list;
+
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 /*
  * Type:
@@ -68,11 +71,53 @@ struct cmd_list {
     const cmd  * const cl_cmd;        
 };
 
+/* Help message displayed for each command */
+const char * const cmd_break_help = "Sets a breakpoint at the specified location.\n\n"
+                                    "break LOCATION\n\n"
+                                    "If LOCATION is an address, breaks at the exact address.";
+
+const char * const cmd_help_help  = "List of commands:\n\n"
+                                    "break\n"
+                                    "\nType \"help\" followed by a command name.";
+
 /* Entire list of commands */
 const cmd_list commands[] = {
-    { "break", 'b', },
-    { "help",  'h', },
+    { "break", 'b', { &hbdb_cmd_break, cmd_break_help } },
+    { "help",  'h', { &hbdb_cmd_help,  cmd_help_help  } }
 };
+
+/*
+
+=item C<void hbdb_cmd_break(hbdb_t *hbdb, const char * const command)>
+
+Sets a breakpoint at the address in C<pc>.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_break(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+{
+    ASSERT_ARGS(hbdb_cmd_break)
+}
+
+/*
+
+=item C<void hbdb_cmd_help(hbdb_t *hbdb, const char * const command)>
+
+If C<command> is non-NULL, displays help message for C<command>. Otherwise, a
+general help message is displayed.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_help(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+{
+    ASSERT_ARGS(hbdb_cmd_help)
+}
 
 /*
 

@@ -282,7 +282,7 @@ welcome(void)
 {
     puts("HBDB: The Honey Bee Debugger");
     puts("Copyright (C) 2001-2011, Parrot Foundation.\n");
-    puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information\n");
+    puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information.\n");
 }
 
 /*

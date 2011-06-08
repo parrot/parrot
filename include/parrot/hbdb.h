@@ -82,6 +82,16 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void hbdb_cmd_break(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hbdb);
+
+void hbdb_cmd_help(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*hbdb);
+
 void hbdb_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -89,6 +99,12 @@ INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(hbdb) \
+    , PARROT_ASSERT_ARG(command))
+#define ASSERT_ARGS_hbdb_cmd_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(hbdb) \
+    , PARROT_ASSERT_ARG(command))
 #define ASSERT_ARGS_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
