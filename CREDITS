@@ -663,6 +663,11 @@ D: languages/json, languages/squaak
 U: kj, kjs
 E: parrotcode@gmail.com
 
+N: Klāvs Priedītis
+U: klavs
+E: klavs.pr@gmail.com
+D: M0 bytecode disassembler
+
 N: Larry Wall
 E: larry@wall.org
 U: larry
