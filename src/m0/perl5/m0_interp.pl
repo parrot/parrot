@@ -425,7 +425,7 @@ sub m0_opfunc_sys_free {
     m0_say "sys_free $a1, $a2, $a3";
 }
 
-sub m0_opfunc_copy_mem{
+sub m0_opfunc_copy_mem {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "copy_mem $a1, $a2, $a3";
 }
@@ -504,7 +504,7 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
-    say Dumper $cf;
+    say Dumper $cf->[$a1];
     die;
     my $handle = $cf->[$a1];
     my $var    = $cf->[$a2];
@@ -595,7 +595,7 @@ sub parse_m0b_chunks {
         $chunk->{consts} = m0b_parse_const_seg($interp, $m0b, $cursor);
         $chunk->{meta}   = m0b_parse_meta_seg($interp, $m0b, $cursor);
         $chunk->{bc}     = m0b_parse_bc_seg(  $interp, $m0b, $cursor);
-        $chunk->{name}   = $chunk_name;
+        $chunk->{name}   = $chunk_name->{name};
         push @{$interp->[CHUNKS]}, $chunk;
     }
 }
