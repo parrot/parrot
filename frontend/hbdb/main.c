@@ -118,6 +118,7 @@ main(int argc, const char *argv[])
     /* Get filename */
     file = argv[argc - 1];
 
+    /* Display welcome message */
     welcome();
 
     if (!Parrot_api_hbdb_get_command(interp)) {

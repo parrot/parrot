@@ -18,7 +18,7 @@
  *     hbdb_state_t
  *
  * Fields:
- *     HBDB_SRC_LOADED - source code for debuggee is loaded
+ *     HBDB_SRC_LOADED - source code for debugee is loaded
  *     HBDB_STOPPED    - debugger is stopped/paused
  *     HBDB_RUNNING    - debugger is running
  *     HBDB_EXIT       - debugger is about to exit
