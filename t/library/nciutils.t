@@ -38,7 +38,7 @@ Testing Perl 6 objects.
 
   have_enough_nci:
     ##  set our plan
-    plan(13)
+    plan(14)
 
     ##  make sure we can load the NCI::Utils library
     push_eh load_fail
@@ -70,6 +70,11 @@ Testing Perl 6 objects.
     $P0 = ncifunc(null_pmc, 'strcmp', 'itt')
     ( $I0 ) = $P0('hello', 'hello')
     is($I0, 0, 'strcmp == 0')
+
+    $P0 = ncifunc(null_pmc, 'strstr', 'ttt')
+    ( $S0 ) = $P0('hello', 'e')
+    is($S0, 'ello', 'strstr("hello", "e")')
+
 
     ##  load a library
     .local pmc libnci_test
