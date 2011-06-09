@@ -736,9 +736,7 @@ are not require to have any defined semantics.
     0x22 print_s
     0x23 print_i
     0x24 print_n
-    0x25 alloc
-    0x26 free
-    0x27 exit
+    0x25 exit
 
 =head2 Execution
 
