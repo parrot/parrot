@@ -7,6 +7,7 @@ use lib qw( t . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Test tests => 2;
+use Parrot::Config qw(%PConfig);
 
 =head1 NAME
 
@@ -43,6 +44,11 @@ if ($has_pcre && ($^O !~ /MSWin32/)) {
 SKIP: {
     skip( 'no pcre-config', Test::Builder->new()->expected_tests() )
         unless $has_pcre;
+
+    unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI}) {
+        skip( 'Parrot built without libffi or extra NCI thunks',
+              Test::Builder->new()->expected_tests() );
+    }
 
 ## 1
 ## Check that the library can be loaded and initialized,
