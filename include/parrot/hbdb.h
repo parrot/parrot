@@ -38,6 +38,30 @@ typedef enum {
 } hbdb_state_t;
 
 /* Type:
+ *     hbdb_file_t
+ *
+ * Fields:
+ *     filename  - name of source file
+ *     source    - source code in "filename"
+ *     size      - size of file in bytes
+ *     next_line - next line to list
+ *     line      - first line of source code
+ *     label     - first label
+ *
+ * Overview:
+ *     Contains details about the source file being debugged.
+ */
+
+typedef struct {
+    char         *filename;
+    char         *source;
+    size_t        size;
+    unsigned long next_line;
+    /*hbdb_line_t  *line;*/
+    /*hbdb_label_t *label;*/
+} hbdb_file_t;
+
+/* Type:
  *     hbdb_breakpoint_t
  *
  * Fields:
@@ -87,7 +111,7 @@ typedef struct hbdb_breakpoint {
  */
 
 typedef struct {
-    /*hbdb_file_t       *file;*/
+    hbdb_file_t       *file;
     hbdb_breakpoint_t *breakpoint;
     /*hbdb_condition_t  *watchpoint;*/
     unsigned long      breakpoint_skip;
@@ -105,15 +129,13 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void hbdb_cmd_break(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+void hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*hbdb);
+        __attribute__nonnull__(2);
 
-void hbdb_cmd_help(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+void hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*hbdb);
+        __attribute__nonnull__(2);
 
 void hbdb_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -121,6 +143,9 @@ void hbdb_get_command(PARROT_INTERP)
 INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void hbdb_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
@@ -133,6 +158,8 @@ INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
 #define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(context_pmc))
+#define ASSERT_ARGS_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hbdb.c */
 
