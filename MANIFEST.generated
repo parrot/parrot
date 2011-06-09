@@ -153,6 +153,8 @@ installable_pbc_merge                            [main]bin
 installable_pbc_merge.exe                        [main]bin
 installable_pbc_to_exe                           [main]bin
 installable_pbc_to_exe.exe                       [main]bin
+installable_winxed                               [main]bin
+installable_winxed.exe                           [main]bin
 lib/Parrot/Config/Generated.pm                   [devel]lib
 lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
@@ -248,6 +250,7 @@ runtime/parrot/include/tm.pasm                   [main]
 runtime/parrot/include/vtable_methods.pasm       [main]
 runtime/parrot/include/warnings.pasm             [main]
 runtime/parrot/languages/JSON/JSON.pir           [data_json]
+runtime/parrot/languages/winxed/winxed.pbc       [winxed]
 runtime/parrot/library/Archive/Tar.pbc           [main]
 runtime/parrot/library/Archive/Zip.pbc           [main]
 runtime/parrot/library/CGI/QueryHash.pbc         [main]
