@@ -4,7 +4,7 @@
 0 "caller at start"
 1 "value of I23 is "
 2 "callee"
-3 "caller at end"
+3 "caller back from goto_chunk"
 .metadata
 .bytecode
 
@@ -65,28 +65,38 @@ post_set:
     set_imm I0, 0, 0
     goto_chunk I0, S0, x
 
-    # we're back, so fix the parent call frame's PC and activate it
+    # We're back, so fix the parent call frame's PC and activate it.
+    # The current CF's CHUNK, CONSTS, etc are updated by goto_chunk, so use
+    # those values to update PCF.
+    # TODO: Rethink if goto_chunk should update these, or if it should be the M0
+    # code's responsibility.
 retpc:
+
+    set_ref  PCF, CHUNK, CHUNK
+    set_ref  PCF, CONSTS, CONSTS
+    set_ref  PCF, MDS, MDS
+    set_ref  PCF, BCS, BCS
+
     set_imm I1, 0, 4
     add_i   I1, PC, I1
     set_ref PCF, PC, I1
-    print_n CF,x,x
 
-    #############################################################################
-    # TODO: control flow gets back here but the call frame's constants table is #
-    # wacky.  I suspect that something's preventing it from being restored      #
-    # properly.                                                                 #
-    #############################################################################
+activate_cf:
+    set     CF, PCF, x
 
     # print "caller at end "
-    set CF, PCF, x
     set_imm S3, 0, 3
-    print_s I0, S3, x
+    deref   S3, CONSTS, S3
+    print_s I0, S3, 98
 
     # print "value of I23 is " ...
     set_imm S4, 0, 1
-    print_s I0, S4, x
+    deref   S4, CONSTS, S4
+    print_s I0, S4, 99
     print_i I0, I23, x
+
+    set_imm I1, 0, 0
+    exit    I1, x, x
     
 .chunk "callee"
 .constants
@@ -134,3 +144,9 @@ retpc:
     set_imm S0, 0, 3
     set_imm I0, 0, 1
     print_s I0, S0, x
+
+
+
+
+# it's not really PASM, but the highlighting works well
+# vim: expandtab shiftwidth=4 ft=pasm:    

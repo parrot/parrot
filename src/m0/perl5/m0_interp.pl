@@ -188,6 +188,7 @@ sub run_ops {
     my ($cf) = @_;
     
     while (1) {
+        m0_say "PC is $cf->[PC], chunk is '$cf->[CHUNK]'";
         my $init_pc = $cf->[PC];
         my $instr_count = scalar(@{$cf->[BCS]});
         if ($cf->[PC] >= $instr_count){
@@ -204,6 +205,9 @@ sub run_ops {
         # allow ops to change control flow and call frame
         if ($init_pc == $final_pc) {
             $cf->[PC]++;
+        }
+        else {
+            m0_say "PC manipulated by M0";
         }
         if ($cf != $cf->[CF]) {
             $cf = $cf->[CF];
@@ -504,7 +508,7 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
-    say Dumper $cf->[$a1];
+    say Dumper $cf->[$a1][CONSTS];
     die;
     my $handle = $cf->[$a1];
     my $var    = $cf->[$a2];
