@@ -27,6 +27,7 @@ function.
 
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
+#include "parrot/embed.h"
 #include "parrot/string_funcs.h"
 #include "parrot/sub.h"
 
@@ -35,7 +36,7 @@ function.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
-typedef void (*cmd_func_t)(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const cmd));
+typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
 
 typedef struct cmd      cmd;
 typedef struct cmd_list cmd_list;
@@ -105,7 +106,7 @@ Sets a breakpoint at a specific location.
 */
 
 void
-hbdb_cmd_break(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
 {
     ASSERT_ARGS(hbdb_cmd_break)
 }
@@ -122,7 +123,7 @@ general help message is displayed.
 */
 
 void
-hbdb_cmd_help(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
+hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
 {
     ASSERT_ARGS(hbdb_cmd_help)
 }
@@ -229,8 +230,8 @@ hbdb_init(PARROT_INTERP)
 
     /* Check that debugger is not already initialized */
     if (!interp->hbdb) {
-        hbdb_t        hbdb;
-        Parrot_Interp debugger;
+        hbdb_t        *hbdb;
+        Parrot_Interp  debugger;
 
         /* Allocate memory for debugger  */
         hbdb = mem_gc_allocate_zeroed_typed(interp, hbdb_t);
@@ -252,9 +253,9 @@ hbdb_init(PARROT_INTERP)
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
     }
 
-    /* Set HBDB_RUNNING and HBDB_ENTER status flags */
+    /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
     interp->hbdb->state |= HBDB_RUNNING;
-    interp->hbdb->state |= HBDB_ENTER;
+    interp->hbdb->state |= HBDB_ENTERED;
 }
 
 /*
