@@ -30,6 +30,9 @@ function.
 #include "parrot/string_funcs.h"
 #include "parrot/sub.h"
 
+/* Size of command-line buffer */
+#define HBDB_CMD_BUFFER_LENGTH 128
+
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
 typedef void (*cmd_func_t)(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const cmd));
@@ -207,6 +210,51 @@ hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
                                            context->current_pc);*/
 
     return line_num;
+}
+
+/*
+
+=item C<void hbdb_init(PARROT_INTERP)>
+
+Performs general initialization operations.
+
+=cut
+
+*/
+
+void
+hbdb_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(hbdb_init)
+
+    /* Check that debugger is not already initialized */
+    if (!interp->hbdb) {
+        hbdb_t        hbdb;
+        Parrot_Interp debugger;
+
+        /* Allocate memory for debugger  */
+        hbdb = mem_gc_allocate_zeroed_typed(interp, hbdb_t);
+
+        /* Create debugger interpreter */
+        debugger = Parrot_new(interp);
+
+        /* Assign global "hbdb_t" structures */
+        interp->hbdb   = hbdb;
+        debugger->hbdb = hbdb;
+
+        /* Assign debugee and debugger interpreters */
+        hbdb->debugee  = interp;
+        hbdb->debugger = debugger;
+
+        /* Allocate memory for command-line buffers, NUL terminated c strings */
+        hbdb->current_command  = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
+        hbdb->last_command     = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
+        hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
+    }
+
+    /* Set HBDB_RUNNING and HBDB_ENTER status flags */
+    interp->hbdb->state |= HBDB_RUNNING;
+    interp->hbdb->state |= HBDB_ENTER;
 }
 
 /*
