@@ -10,7 +10,12 @@ src/hbdb.c - The Honey Bee Debugger
 
 This file contains functions and types used by the C<hbdb> debugger.
 
-=head1 FUNCTIONS
+=head1 COMMAND FUNCTIONS
+
+Each of the following functions serve as the implementation for a particular
+command. They are of the form C<hbdb_cmd_*>. For instance, if you are looking
+for the code for the C<break> command, it will be the C<hbdb_cmd_break()>
+function.
 
 =over 4
 
@@ -90,7 +95,7 @@ const cmd_list commands[] = {
 
 =item C<void hbdb_cmd_break(hbdb_t *hbdb, const char * const command)>
 
-Sets a breakpoint at the address in C<pc>.
+Sets a breakpoint at a specific location.
 
 =cut
 
@@ -121,9 +126,26 @@ hbdb_cmd_help(ARGMOD(hbdb_t *hbdb), ARGIN(const char * const command))
 
 /*
 
+=back
+
+=head1 GLOBAL FUNCTIONS
+
+The remaining functions define some of the general behavior of the debugger.
+They do not follow a particular pattern.
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
 =item C<void hbdb_get_command(PARROT_INTERP)>
 
 Prompts the user to enter a command.
+
+=cut
 
 */
 
