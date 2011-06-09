@@ -15,6 +15,29 @@
 #define PARROT_HBDB_H_GUARD
 
 /* Type:
+ *     hbdb_state_t
+ *
+ * Fields:
+ *     HBDB_SRC_LOADED - source code for debuggee is loaded
+ *     HBDB_STOPPED    - debugger is stopped/paused
+ *     HBDB_RUNNING    - debugger is running
+ *     HBDB_EXIT       - debugger is about to exit
+ *     HBDB_ENTERED    - debugger has been started
+ *
+ * Overview:
+ *     These flags are used to alter and identify the current state of the
+ *     debugger.
+ */
+
+typedef enum {
+    HBDB_SRC_LOADED = 0x0001,
+    HBDB_STOPPED    = 0x0002,
+    HBDB_RUNNING    = 0x0004,
+    HBDB_EXIT       = 0x0008,
+    HBDB_ENTERED    = 0x0016
+} hbdb_state_t;
+
+/* Type:
  *     hbdb_breakpoint_t
  *
  * Fields:
@@ -71,7 +94,7 @@ typedef struct {
     char              *current_command;
     char              *last_command;
     opcode_t          *current_opcode;
-    int                state;
+    hbdb_state_t       state;
     Interp            *debugee;
     Interp            *debugger;
     unsigned long      tracing;
