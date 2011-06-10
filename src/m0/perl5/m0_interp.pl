@@ -41,11 +41,10 @@ use constant {
     RETPC    => 3,
     EH       => 4,
     CHUNK    => 5,
-    RETCHUNK => 6,
-    CONSTS   => 7,
-    MDS      => 8,
-    BCS      => 9,
-    INTERP   => 10,
+    CONSTS   => 6,
+    MDS      => 7,
+    BCS      => 8,
+    INTERP   => 9,
     SPILLCF  => 11,
 };
 
@@ -167,7 +166,6 @@ sub new_call_frame{
     $cf->[RETPC]    = 0;
     $cf->[EH]       = {};
     $cf->[CHUNK]    = $interp->[CHUNKS][0]{name};
-    $cf->[RETCHUNK] = 0;
     $cf->[CONSTS]   = $interp->[CHUNKS][0]{consts};
     $cf->[MDS]      = $interp->[CHUNKS][0]{meta};
     $cf->[BCS]      = $interp->[CHUNKS][0]{bc};
