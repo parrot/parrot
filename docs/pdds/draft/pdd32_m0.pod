@@ -893,11 +893,11 @@ type:
     3       RETPC - return PC
     4       EH  - current exception handler
     5       CHUNK - the name of the currently-executing chunk
-    6       RETCHUNK - name of chunk to return to when invoking this cf
-    7       CONSTS - pointer to constants segment
-    8       MDS - pointer to metadata segment
-    9       BCS - pointer to bytecode segment
-    10      INTERP - global interpreter data (see C<Interpreter Data>)
+    6       CONSTS - pointer to constants segment
+    7       MDS - pointer to metadata segment
+    8       BCS - pointer to bytecode segment
+    9       INTERP - global interpreter data (see C<Interpreter Data>)
+    10      SPC4RENT - This register for rent.  No pets or smokers, please.
     11      SPILLCF - overflow call frame (see C<Register Spilling>)
     12-72   I0 - I60
     73-133  N0 - N60
