@@ -875,59 +875,50 @@ Return the POST representation of a C<PAST::Op> node with
 a 'pasttype' of 'pirop'.
 
 multi method pirop(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-
-        .local string pirop, signature
-        pirop = node.'pirop'()
-        ##  see if pirop is of form "pirop signature"
-        $I0 = index pirop, ' '
-        if $I0 < 0 goto pirop_0
-        $I1 = $I0 + 1
-        signature = substr pirop, $I1
-        pirop = substr pirop, 0, $I0
-        goto have_signature
-      pirop_0:
-        ##  see if pirop is of form "pirop__signature"
-        $I0 = index pirop, '__'
-        if $I0 < 0 goto pirop_1
-        $I1 = $I0 + 2
-        signature = substr pirop, $I1
-        pirop = substr pirop, 0, $I0
-        goto have_signature
-      pirop_1:
-        $P0 = get_global '%piropsig'
-        signature = $P0[pirop]
-        if signature goto have_signature
-        signature = 'vP'
-      have_signature:
-
-        .local pmc ops, posargs
-        (ops, posargs) = self.'post_children'(node, 'signature'=>signature)
-
-        .local pmc arglist
-        arglist = ops.'list'()
-
-        $S0 = substr signature, 0, 1
-        if $S0 == 'v' goto pirop_void
-        $I0 = index '0123456789', $S0
-        if $I0 < 0 goto pirop_reg
-        $S0 = arglist[$I0]
-        ops.'result'($S0)
-        goto pirop_void
-      pirop_reg:
-        .local string result
-        result = self.'uniquereg'($S0)
-        ops.'result'(result)
-        ops.'push_pirop'(pirop, result, posargs :flat)
-        .return (ops)
-      pirop_void:
-        ops.'push_pirop'(pirop, posargs :flat)
-        .return (ops)
+    my $pirop := $node.pirop();
+    my $signature;
+    my $I0;
+    if ($I0 := pir::index($pirop, ' ')) >= 0 { 
+        ##  pirop is of form "pirop signature"
+        $signature := pir::substr($pirop, $I0 + 1);
+        $pirop := pir::substr($pirop, 0, $I0);
+    } elsif ($I0 := pir::index($pirop, '__')) >= 0 {
+        ##  pirop is of form "pirop__signature"
+        $signature := pir::substr($pirop, $I0 + 2);
+        $pirop := pir::substr($pirop, 0, $I0);
+    } else {
+        $signature := %piropsig{$pirop};
+        $signature := 'vP' unless $signature;
     }
+
+    my $ops;
+    my @posargs;
+    # ($ops, @posargs) := self.post_children($node, :signature($signature));
+	Q:PIR {
+		$P0 = find_lex '$node'
+		$P1 = find_lex '$signature'
+		($P0, $P1) = self.'post_children'($P0, 'signature' => $P1)
+		store_lex '$ops', $P0
+		store_lex '@posargs', $P1
+	};
+
+    my @arglist := $ops.list();
+
+    my $S0 := pir::substr($signature, 0, 1);
+    if $S0 eq 'v' {
+        $ops.push_pirop($pirop, |@posargs);
+        return $ops;
+    }
+    $I0 := pir::index('0123456789', $S0);
+    if $I0 >= 0 {
+        $ops.result(@arglist[$I0]);
+        $ops.push_pirop($pirop, |@posargs);
+        return $ops;
+    }
+    my $result := self.uniquereg($S0);
+    $ops.result($result);
+    $ops.push_pirop($pirop, $result, |@posargs);
+    return $ops;
 }
 
 
