@@ -23,6 +23,8 @@ function.
 
 */
 
+/* TODO Change hbdb_init() to accept an hbdb_t to avoid assignment after call */
+
 #include <stdio.h>
 
 #include "parrot/parrot.h"

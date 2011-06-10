@@ -75,6 +75,8 @@ main(int argc, const char *argv[])
     int                     status;
     struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
+    hbdb_t                 *hbdb;
+
     Parrot_PMC              interp   = NULL,
                             pbc      = NULL,
                             main_sub = NULL;
@@ -120,6 +122,9 @@ main(int argc, const char *argv[])
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
+
+    /* Get global debugger structure */
+    hbdb = interp->hbdb;
 
     /* Get filename */
     file = argv[argc - 1];
