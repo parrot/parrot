@@ -67,8 +67,7 @@ typedef struct pbc_merge_input {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_DOES_NOT_RETURN
-static void help(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void help()
 
 static void pbc_fixup_bytecode(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
@@ -181,7 +180,7 @@ static void pbc_merge_write(PARROT_INTERP,
 
 /*
 
-=item C<static void help(PARROT_INTERP)>
+=item C<static void help()>
 
 Print out the user help info.
 
@@ -191,12 +190,12 @@ Print out the user help info.
 
 PARROT_DOES_NOT_RETURN
 static void
-help(PARROT_INTERP)
+help()
 {
     printf("pbc_merge - merge multiple parrot bytecode files into one\n");
     printf("Usage:\n");
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
-    Parrot_x_exit(interp, 0);
+    exit(0);
 }
 
 /*
@@ -916,27 +915,27 @@ main(int argc, const char **argv)
 
     /* Get options, ensuring we have at least one input
        file and an output file. */
-    if (argc < 4) {
-        help(interp);
-    }
+    if (argc < 4)
+        help();
+
     while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'o':
                 if (output_file == NULL)
                     output_file = opt.opt_arg;
                 else
-                    help(interp);
+                    help();
                 break;
             case '?':
-                help(interp);
+                help();
                 break;
             default:
                 break;
         }
     }
-    if (status == -1 || !output_file) {
-        help(interp);
-    }
+    if (status == -1 || !output_file)
+        help();
+
     argc -= opt.opt_index;    /* Now the number of input files. */
     argv += opt.opt_index;    /* Now at first input filename. */
 
