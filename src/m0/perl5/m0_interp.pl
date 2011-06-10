@@ -453,7 +453,7 @@ sub m0_opfunc_set_ref {
 
     # XXX: revisit the asymmetry between this op and deref and decide whether
     # to make them consistent
-    $$cf->[$a1][ $a2 ] = $$cf->[$a3];
+    $$cf->[$a1][ $$cf->[$a2] ] = $$cf->[$a3];
 }
 
 sub m0_opfunc_csym {

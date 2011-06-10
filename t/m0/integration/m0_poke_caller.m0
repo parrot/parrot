@@ -56,29 +56,40 @@
 
     # intialize P0 (the new call frame) - INTERP
     # set new cf's PCF to the current cf (P1)
-    set_ref  P0, INTERP, INTERP
-    set_ref  P0, CHUNK, CHUNK
-    set_ref  P0, CONSTS, CONSTS 
-    set_ref  P0, MDS, MDS
-    set_ref  P0, BCS, BCS
-    set_ref  P0, PCF, CF
-    set_ref  P0, CF, P0
+    set_imm  I9, 0,  INTERP
+    set_ref  P0, I9, INTERP
+    set_imm  I9, 0,  CHUNK
+    set_ref  P0, I9, CHUNK
+    set_imm  I9, 0,  CONSTS
+    set_ref  P0, I9, CONSTS 
+    set_imm  I9, 0,  MDS
+    set_ref  P0, I9, MDS
+    set_imm  I9, 0,  BCS
+    set_ref  P0, I9, BCS
+    set_imm  I9, 0,  PCF
+    set_ref  P0, I9, CF
+    set_imm  I9, 0,  CF
+    set_ref  P0, I9, P0
 
     # initialize some values to zero
-    set_imm  P2, 0, 0
-    set_ref  P0, EH,       P2
-    set_ref  P0, RETPC,    P2
-    set_ref  P0, SPILLCF,  P2
+    set_imm  P2, 0,  0
+    set_imm  I9, 0,  EH
+    set_ref  P0, I9, P2
+    set_imm  I9, 0,  RETPC
+    set_ref  P0, I9, P2
+    set_imm  I9, 0,  SPILLCF
+    set_ref  P0, I9, P2
 
     # set the return PC and chunk for the current cf
-    set_imm I13, 0, 9
+    set_imm I13, 0, 10
     add_i   RETPC, PC, I13
 
     # set the new call frame's PC to be post_set so that when it's # activated,
     # control flow will continue as normal
-    set_imm I12, 0, 3
+    set_imm I12, 0,   4
     add_i   I12, I12, PC
-    set_ref P0, PC, I12
+    set_imm I9,  0,   PC
+    set_ref P0,  I9,  I12
 
     # activate the new call frame and goto the callee chunk
     set     CF, P0, 99
@@ -95,14 +106,19 @@ post_set:
     # code's responsibility.
 retpc:
 
-    set_ref  PCF, CHUNK, CHUNK
-    set_ref  PCF, CONSTS, CONSTS
-    set_ref  PCF, MDS, MDS
-    set_ref  PCF, BCS, BCS
+    set_imm  I9,  0,  CHUNK
+    set_ref  PCF, I9, CHUNK
+    set_imm  I9,  0,  CONSTS 
+    set_ref  PCF, I9, CONSTS
+    set_imm  I9,  0,  MDS
+    set_ref  PCF, I9, MDS
+    set_imm  I9,  0,  BCS
+    set_ref  PCF, I9, BCS
 
-    set_imm I1, 0, 2
-    add_i   I1, PC, I1
-    set_ref PCF, PC, I1
+    set_imm I1,  0,  3
+    add_i   I1,  PC, I1
+    set_imm I9,  0,  PC
+    set_ref PCF, I9, I1
 
 activate_cf:
     set     CF, PCF, x
