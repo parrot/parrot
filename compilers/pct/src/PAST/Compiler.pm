@@ -166,7 +166,7 @@ method to_post($past, *%options) {
     }
 
     my @*BLOCKPAST := @?BLOCK;
-    my $*SUB := pir::null__P;
+    my $*SUB;
 
     self.as_post($past, rtype => 'v');
 }
@@ -650,245 +650,189 @@ method wrap_handlers($child, $ehs, *%options) {
 Return the POST representation of a C<PAST::Block>.
 
 multi method as_post(PAST::Block $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    ##  add current block node to @*BLOCKPAST
+    pir::unshift(@*BLOCKPAST, $node);
 
-        ##  add current block node to @*BLOCKPAST
-        .local pmc blockpast
-        blockpast = find_dynamic_lex '@*BLOCKPAST'
-        unshift blockpast, node
+    my $name      := $node.name();
+    my $pirflags  := $node.pirflags();
+    my $blocktype := $node.blocktype();
+    my $nsentry   := $node.nsentry();
+    my $subid     := $node.subid();
+    my $ns        := $node.namespace();
+    my $hll       := $node.hll();
+    my $multi     := $node.multi();
+    my $loadlibs  := $node.loadlibs();
 
-        .local string name, pirflags, blocktype
-        .local pmc nsentry, subid, ns, hll, multi, loadlibs
-        name = node.'name'()
-        pirflags = node.'pirflags'()
-        blocktype = node.'blocktype'()
-        nsentry = node.'nsentry'()
-        subid = node.'subid'()
-        ns = node.'namespace'()
-        hll = node.'hll'()
-        multi = node.'multi'()
-        loadlibs = node.'loadlibs'()
+	# We want '' or null, not undef
+    $name      := '' unless pir::defined($name);
+    $pirflags  := '' unless pir::defined($pirflags);
+    $blocktype := '' unless pir::defined($blocktype);
 
-        ##  handle nsentry attribute
-        $I0 = defined nsentry
-        unless $I0 goto nsentry_done
-        unless nsentry goto nsentry_anon
-        $S0 = self.'escape'(nsentry)
-        pirflags = concat pirflags, ' :nsentry('
-        pirflags = concat pirflags, $S0
-        pirflags = concat pirflags, ')'
-        goto nsentry_done
-      nsentry_anon:
-        pirflags = concat pirflags, ' :anon'
-      nsentry_done:
-
-        ##  handle anonymous blocks
-        if name goto have_name
-        name = self.'unique'('_block')
-        if ns goto have_name
-        if nsentry goto have_name
-        pirflags = concat pirflags, ' :anon'
-      have_name:
-
-        ##  create a POST::Sub node for this block
-        .local pmc bpost
-        $P0 = get_hll_global ['POST'], 'Sub'
-        bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid, 'multi'=>multi, 'loadlibs'=>loadlibs)
-        unless pirflags goto pirflags_done
-        bpost.'pirflags'(pirflags)
-      pirflags_done:
-
-        ##  pir-encode name and namespace
-        .local string blockreg, blockref
-        blockreg = self.'uniquereg'('P')
-        blockref = concat ".const 'Sub' ", blockreg
-        blockref = concat blockref, ' = '
-        $P0 = bpost.'subid'()
-        $S0 = self.'escape'($P0)
-        blockref = concat blockref, $S0
-
-        ##  determine the outer POST::Sub for the new one
-        .local pmc outerpost
-        outerpost = find_dynamic_lex '$*SUB'
-        .lex '$*SUB', bpost
-
-        .local int islexical
-        islexical = node.'lexical'()
-        unless islexical goto outer_done
-        bpost.'outer'(outerpost)
-
-        ##  add block setup code (cpost) to outer block if needed
-        if null outerpost goto outer_done
-        .local pmc cpost
-        $P0 = get_hll_global ['POST'], 'Ops'
-        cpost = $P0.'new'( 'result'=>blockreg )
-        cpost.'push_pirop'(blockref)
-        cpost.'push_pirop'('capture_lex', blockreg)
-        outerpost.'unshift'(cpost)
-      outer_done:
-
-        ##  merge the node's symtable with the master
-        .local pmc outersym, symtable
-        outersym = getattribute self, '%!symtable'
-        symtable = outersym
-        ##  if the Block doesn't have a symtable, re-use the existing one
-        $P0 = node.'symtable'()
-        unless $P0 goto have_symtable
-        ##  if the Block has a default ('') entry, use the Block's symtable as-is
-        symtable = $P0
-        $I0 = defined symtable['']
-        if $I0 goto have_symtable
-        ##  merge the Block's symtable with outersym
-        symtable = clone symtable
-      symtable_merge:
-        .local pmc it
-        it = iter outersym
-      symtable_merge_loop:
-        unless it goto have_symtable
-        $S0 = shift it
-        $I0 = exists symtable[$S0]
-        if $I0 goto symtable_merge_loop
-        $P0 = it[$S0]
-        symtable[$S0] = $P0
-        goto symtable_merge_loop
-      have_symtable:
-        setattribute self, '%!symtable', symtable
-
-        .local pmc compiler
-        compiler = node.'compiler'()
-        if compiler goto children_compiler
-
-        ##  control exception handler
-        .local pmc ctrlpast, ctrllabel
-        ctrlpast = node.'control'()
-        unless ctrlpast goto children_past
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('control_')
-        ctrllabel = $P0.'new'('result'=>$S0)
-        $S0 = self.'uniquereg'('P')
-        bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
-        bpost.'push_pirop'('set_label', $S0, ctrllabel)
-        bpost.'push_pirop'('push_eh', $S0)
-        bpost.'add_directive'('.include "except_types.pasm"')
-
-      children_past:
-        ##  all children but last are void context, last returns anything
-        $P0 = node.'list'()
-        $I0 = elements $P0
-        $S0 = repeat 'v', $I0
-        $S0 = concat $S0, '*'
-        ##  convert children to post
-        .local pmc ops, retval
-        ops = self.'post_children'(node, 'signature'=>$S0)
-        ##  wrap the child with appropriate exception handlers, if any
-        .local pmc eh
-        eh = node.'handlers'()
-        unless eh, no_eh
-        $S0 = options['rtype']
-        retval = ops[-1]
-        ops = self.'wrap_handlers'(ops, eh, 'rtype'=>$S0)
-        goto had_eh
-      no_eh:
-        ##  result of last child is return from block
-        retval = ops[-1]
-      had_eh:
-        bpost.'push'(ops)
-        bpost.'push_pirop'('return', retval)
-
-        unless ctrlpast goto sub_done
-        bpost.'push'(ctrllabel)
-        bpost.'push_pirop'('.local pmc exception')
-        bpost.'push_pirop'('.get_results (exception)')
-        $I0 = isa ctrlpast, ['PAST';'Node']
-        if $I0 goto control_past
-        if ctrlpast == 'return_pir' goto control_return
-        self.'panic'("Unrecognized control handler '", ctrlpast, "'")
-      control_return:
-        ##  handle 'return' exceptions
-        $S0 = self.'uniquereg'('P')
-        bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
-        bpost.'push_pirop'('return', $S0)
-        goto sub_done
-      control_past:
-        $P0 = self.'as_post'(ctrlpast, 'rtype'=>'*')
-        bpost.'push'($P0)
-        goto sub_done
-
-      children_compiler:
-        ##  set the compiler to use for the POST::Sub node, pass on
-        ##  and compiler arguments and add this block's child to it.
-        bpost.'compiler'(compiler)
-        $P0 = node.'compiler_args'()
-        bpost.'compiler_args'($P0)
-        $P0 = node[0]
-        bpost.'push'($P0)
-
-      sub_done:
-        ##  generate any loadinit code for the sub
-        $I0 = exists node['loadinit']
-        unless $I0 goto loadinit_done
-        .local pmc lisub
-        $P0 = get_hll_global ['POST'], 'Sub'
-        lisub = $P0.'new'('outer'=>bpost, 'pirflags'=>':load :init')
-        lisub.'push_pirop'(blockref)
-        lisub.'push_pirop'('.local pmc', 'block')
-        lisub.'push_pirop'('set', 'block', blockreg)
-        .local pmc lipast, lipost
-        lipast = node.'loadinit'()
-        lipost = self.'as_post'(lipast, 'rtype'=>'v')
-        lisub.'push'(lipost)
-        bpost['loadinit'] = lisub
-      loadinit_done:
-
-        ##  restore previous outer scope and symtable
-        setattribute self, '%!symtable', outersym
-
-        ##  return block or block result
-        .local string rtype, result
-        rtype = options['rtype']
-
-        if blocktype == 'immediate' goto block_immediate
-        if rtype == 'v' goto block_done
-        $P0 = get_hll_global ['POST'], 'Ops'
-        bpost = $P0.'new'( bpost, 'node'=>node, 'result'=>blockreg)
-        bpost.'push_pirop'( blockref, 'result'=>blockreg )
-        unless islexical goto block_done
-        $I0 = node.'closure'()
-        if $I0 goto block_closure
-        bpost.'push_pirop'('capture_lex', blockreg)
-        goto block_done
-
-      block_closure:
-        ##  return a reference to a clone of the block with captured outer context
-        result = self.'uniquereg'('P')
-        bpost.'push_pirop'('newclosure', result, blockreg)
-        bpost.'result'(result)
-        goto block_done
-
-      block_immediate:
-        .local pmc arglist
-        arglist = options['arglist']
-        unless null arglist goto have_arglist
-        arglist = new 'ResizablePMCArray'
-      have_arglist:
-        result = self.'uniquereg'(rtype)
-        $P0 = get_hll_global ['POST'], 'Ops'
-        bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
-        bpost.'push_pirop'(blockref)
-        unless islexical goto block_immediate_capture_skip
-        bpost.'push_pirop'('capture_lex', blockreg)
-      block_immediate_capture_skip:
-        bpost.'push_pirop'('call', blockreg, arglist :flat, 'result'=>result)
-
-      block_done:
-        ##  remove current block from @*BLOCKPAST
-        $P99 = shift blockpast
-        .return (bpost)
+    ##  handle nsentry attribute
+    if pir::defined($nsentry) {
+        if $nsentry {
+            $pirflags := $pirflags
+                ~ ' :nsentry(' ~ self.escape($nsentry) ~ ')';
+        } else {
+            $pirflags := $pirflags ~ ' :anon';
+        }
     }
+
+    ##  handle anonymous blocks
+    unless $name {
+        $name := self.unique('_block');
+        $pirflags := $pirflags ~ ' :anon' unless $ns || $nsentry;
+    }
+
+    ##  create a POST::Sub node for this block
+    my $bpost := POST::Sub.new(
+        :node($node),    :name($name), :blocktype($blocktype),
+        :namespace($ns), :hll($hll),   :subid($subid),
+        :multi($multi),  :loadlibs($loadlibs)
+    );
+    $bpost.pirflags($pirflags) if $pirflags;
+
+    ##  pir-encode name and namespace
+    my $blockreg := self.uniquereg('P');
+    my $blockref := ".const 'Sub' $blockreg = " ~ self.escape($bpost.subid());
+
+    ##  determine the outer POST::Sub for the new one
+	# It would be easier to use $*CALLER::SUB and skip the big block below,
+	# but that doesn't work in NQP, so a big block is what we get.
+    my $outerpost := $*SUB;
+	{
+		my $*SUB := $bpost;
+
+		my $islexical := $node.lexical();
+		if $islexical {
+			$bpost.outer($outerpost);
+
+			##  add block setup code (cpost) to outer block if needed
+			if pir::defined($outerpost) {
+				my $cpost := POST::Ops.new(:result($blockreg));
+				$cpost.push_pirop($blockref);
+				$cpost.push_pirop('capture_lex', $blockreg);
+				$outerpost.unshift($cpost);
+			}
+		}
+
+		##  merge the node's symtable with the master
+		my %outersym := %!symtable;
+		my %symtable := %outersym;
+		##  if the Block doesn't have a symtable, re-use the existing one
+		if $node.symtable() {
+			##  if the Block has a default ('') entry, use the Block's
+			##  symtable as-is
+			%symtable := $node.symtable();
+			unless pir::defined(%symtable<>) {
+				##  merge the Block's symtable with outersym
+				%symtable := pir::clone(%symtable);
+				for %outersym {
+					next if pir::exists(%symtable, $_);
+					%symtable{$_} := %outersym{$_};
+				}
+			}
+		}
+		%!symtable := %symtable;
+
+		my $compiler := $node.compiler();
+		if $compiler {
+			##  set the compiler to use for the POST::Sub node, pass on
+			##  and compiler arguments and add this block's child to it.
+			$bpost.compiler($compiler);
+			$bpost.compiler_args($node.compiler_args());
+			$bpost.push($node[0]);
+		} else {
+			##  control exception handler
+			my $ctrlpast := $node.control();
+			my $ctrllabel;
+
+			if $ctrlpast {
+				$ctrllabel := POST::Label.new(:result(self.unique('control_')));
+				my $reg := self.uniquereg('P');
+				$bpost.push_pirop('new', $reg, "['ExceptionHandler']",
+					'.CONTROL_RETURN');
+				$bpost.push_pirop('set_label', $reg, $ctrllabel);
+				$bpost.push_pirop('push_eh', $reg);
+				$bpost.add_directive('.include "except_types.pasm"');
+			}
+
+			##  all children but last are void context, last returns anything
+			my $sig := pir::repeat('v', pir::elements($node.list())) ~ '*';
+			##  convert children to post
+			my $ops := self.post_children($node, :signature($sig));
+			##  result of last child is return from block
+			my $retval := $ops[-1];
+			##  wrap the child with appropriate exception handlers, if any
+			my $eh := $node.handlers();
+			if $eh {
+				$ops := self.wrap_handlers($ops, $eh, :rtype(%options<rtype>));
+			}
+			$bpost.push($ops);
+			$bpost.push_pirop('return', $retval);
+
+			if $ctrlpast {
+				$bpost.push($ctrllabel);
+				$bpost.push_pirop('.local pmc exception');
+				$bpost.push_pirop('.get_results (exception)');
+				if $ctrlpast eq 'return_pir' {
+					##  handle 'return' exceptions
+					my $reg := self.uniquereg('P');
+					$bpost.push_pirop('getattribute', $reg,
+						'exception', '"payload"');
+					$bpost.push_pirop('return', $reg);
+				} elsif $ctrlpast.isa(PAST::Node) {
+					$bpost.push(self.as_post($ctrlpast, :rtype('*')));
+				} else {
+					self.panic("Unrecognized control handler '$ctrlpast'");
+				}
+			}
+		}
+
+		##  generate any loadinit code for the sub
+		if pir::exists($node, 'loadinit') {
+			my $lisub := POST::Sub.new(:outer($bpost), :pirflags(':load :init'));
+			$lisub.push_pirop($blockref);
+			$lisub.push_pirop('.local pmc', 'block');
+			$lisub.push_pirop('set', 'block', $blockreg);
+			$lisub.push(self.as_post($node.loadinit(), :rtype('v')));
+			$bpost<loadinit> := $lisub;
+		}
+
+		##  restore previous outer scope and symtable
+		%!symtable := %outersym;
+
+		##  return block or block result
+		my $rtype := %options<rtype>;
+
+		if $blocktype eq 'immediate' {
+			my @arglist := %options<arglist>;
+			@arglist := [] unless pir::defined(@arglist);
+			my $result := self.uniquereg($rtype);
+			$bpost := POST::Ops.new($bpost, :node($node), :result($result));
+			$bpost.push_pirop($blockref);
+			$bpost.push_pirop('capture_lex', $blockreg) if $islexical;
+			$bpost.push_pirop('call', $blockreg, |@arglist, :result($result));
+		} elsif $rtype ne 'v' {
+			$bpost := POST::Ops.new($bpost, :node($node), :result($blockreg));
+			$bpost.push_pirop($blockref, :result($blockreg));
+			if $islexical {
+				if $node.closure() {
+					##  return a reference to a clone of the block with
+					##  captured outer context
+					my $result := self.uniquereg('P');
+					$bpost.push_pirop('newclosure', $result, $blockreg);
+					$bpost.result($result);
+				} else {
+					$bpost.push_pirop('capture_lex', $blockreg);
+				}
+			}
+		}
+	} # Restore old $*SUB
+
+	##  remove current block from @*BLOCKPAST
+	pir::shift(@*BLOCKPAST);
+    $bpost;
 }
 
 
