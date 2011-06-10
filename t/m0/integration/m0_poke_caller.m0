@@ -1,27 +1,31 @@
 .version 0
 .chunk "caller"
 .constants
-0 "caller at start\n"
-1 "value of I23 is "
-2 "callee"
-3 "caller back from goto_chunk\n"
-4 "\n"
+0 "1..1\n"
+1 "ok 1 control flow in 'caller' at start\n"
+2 "value of I23 is "
+3 "callee"
+4 "caller back from goto_chunk\n"
+5 "\n"
 .metadata
 .bytecode
 
-    # print "caller at start"
+    set_imm I0, 0, 1
     set_imm S0, 0, 0
     deref   S0, CONSTS, S0
-    set_imm I0, 0, 1
+    print_s I0, S0, x
+    # print "ok 1 control flow in 'caller' at start"
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
     print_s I0, S0, x
 
     # print "value of I23 is " ...
     set_imm I23, 39, 15
-    set_imm S1, 0, 1
+    set_imm S1, 0, 2
     deref   S1, CONSTS, S1
     print_s I0, S1, x
     print_i I0, I23, x
-    set_imm S2, 0, 4
+    set_imm S2, 0, 5
     deref   S2, CONSTS, S2
     print_s I0, S2, x
 
@@ -64,9 +68,9 @@
     # activate the new call frame and goto the callee chunk
     set     CF, P0, 99
 post_set:
-    set_imm S0, 0, 2
+    set_imm S0, 0, 3
     deref   S0, CONSTS, S0
-    set_imm I0, 0, 0
+    set_imm I0, 0, 1
     goto_chunk I0, S0, x
 
     # We're back, so fix the parent call frame's PC and activate it.
@@ -89,12 +93,12 @@ activate_cf:
     set     CF, PCF, x
 
     # print "caller at end "
-    set_imm S3, 0, 3
+    set_imm S3, 0, 4
     deref   S3, CONSTS, S3
     print_s I0, S3, 98
 
     # print "value of I23 is " ...
-    set_imm S4, 0, 1
+    set_imm S4, 0, 2
     deref   S4, CONSTS, S4
     print_s I0, S4, 99
     print_i I0, I23, x
