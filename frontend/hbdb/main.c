@@ -157,10 +157,6 @@ main(int argc, const char *argv[])
         fail(interp);
     }
 
-    /* DEBUG */
-    printf("Reached line %d\n", __LINE__);
-    /* DEBUG */
-
     Parrot_api_destroy_interpreter(interp);
     return (0);
 }
