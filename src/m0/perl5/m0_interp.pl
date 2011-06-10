@@ -483,7 +483,7 @@ sub m0_opfunc_print_s {
     my $handle = $$cf->[$a1];
     my $var    = $$cf->[$a2];
     # TODO: print to $handle instead of stdout
-    say $var;
+    print $var;
 }
 
 sub m0_opfunc_print_i {
@@ -493,7 +493,7 @@ sub m0_opfunc_print_i {
     my $handle = $$cf->[$a1];
     my $var    = $$cf->[$a2];
     # TODO: print to $handle instead of stdout
-    say $var;
+    print $var;
 }
 
 sub m0_opfunc_print_n {

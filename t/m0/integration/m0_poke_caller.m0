@@ -1,10 +1,11 @@
 .version 0
 .chunk "caller"
 .constants
-0 "caller at start"
+0 "caller at start\n"
 1 "value of I23 is "
 2 "callee"
-3 "caller back from goto_chunk"
+3 "caller back from goto_chunk\n"
+4 "\n"
 .metadata
 .bytecode
 
@@ -20,6 +21,9 @@
     deref   S1, CONSTS, S1
     print_s I0, S1, x
     print_i I0, I23, x
+    set_imm S2, 0, 4
+    deref   S2, CONSTS, S2
+    print_s I0, S2, x
 
     # create a new call frame
 
@@ -77,7 +81,7 @@ retpc:
     set_ref  PCF, MDS, MDS
     set_ref  PCF, BCS, BCS
 
-    set_imm I1, 0, 3
+    set_imm I1, 0, 2
     add_i   I1, PC, I1
     set_ref PCF, PC, I1
 
@@ -94,16 +98,18 @@ activate_cf:
     deref   S4, CONSTS, S4
     print_s I0, S4, 99
     print_i I0, I23, x
+    print_s I0, S2, x
 
     set_imm I1, 0, 0
     exit    I1, x, x
     
 .chunk "callee"
 .constants
-0 "in callee chunk"
+0 "in callee chunk\n"
 1 "value of I23 is "
 2 "parent call frame's value of I23 is "
-3 "OH NOES!  Contol flow misflowed!"
+3 "OH NOES!  Contol flow misflowed!\n"
+4 "\n"
 .metadata
 .bytecode
 
@@ -119,6 +125,9 @@ activate_cf:
     print_s I0, S1, x
     set_imm I23, 99, 99
     print_i I0, I23, x
+    set_imm S3, 0, 4
+    deref   S3, CONSTS, S3
+    print_s I0, S3, x
 
     # poke into the parent call frame
     set_imm S2, 0, 2
@@ -127,6 +136,7 @@ activate_cf:
     set_imm I2, 0, I23
     deref   I1, PCF, I2
     print_i I0, I1, x
+    print_s I0, S3, x
 
     # figure out return PC and chunk
     # P0 is the parent call frame

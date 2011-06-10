@@ -523,6 +523,7 @@ sub parse_chunks {
                 my $c = $1;
                 # remove leading and trailing double quotes which are used to represent strings
                 $c =~ s/(^"|"$)//g;
+                $c =~ s?\\n?\n?g;
                 
                 # replace escaped double quotes with actual double quotes
                 $c =~ s/\\"/"/g;
