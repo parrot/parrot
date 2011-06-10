@@ -927,54 +927,45 @@ Return the POST representation of a C<PAST::Op> node
 for calling a sub.
 
 multi method call(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .local string pasttype
-        pasttype = node.'pasttype'()
-        if pasttype goto have_pasttype
-        pasttype = 'call'
-      have_pasttype:
+	my $pasttype := $node.pasttype();
+	$pasttype := 'call' unless $pasttype;
 
-        .local string signature
-        signature = 'v:'
-        ## for callmethod, the invocant (child) must be a PMC
-        if pasttype != 'callmethod' goto have_signature
-        signature = 'vP:'
-      have_signature:
+    my $signature := 'v:';
+	## for callmethod, the invocant (child) must be a PMC
+	$signature := 'vP:' if $pasttype eq 'callmethod';
 
-        .local pmc name, ops, posargs, namedargs
-        name = node.'name'()
-        if name goto call_by_name
-        ##  our first child is the thing to be invoked, so make sure it's a PMC
-        signature = replace signature, 1, 0, 'P'
-        (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
-        goto children_done
-      call_by_name:
-        (ops, posargs, namedargs) = self.'post_children'(node, 'signature'=>signature)
-        $I0 = isa name, ['PAST';'Node']
-        if $I0 goto call_by_name_past
-        $S0 = self.'escape'(name)
-        unshift posargs, $S0
-        goto children_done
-      call_by_name_past:
-        .local pmc name_post
-        name_post = self.'as_post'(name, 'rtype'=>'s')
-        name_post = self.'coerce'(name_post, 's')
-        ops.'push'(name_post)
-        unshift posargs, name_post
-      children_done:
+	my $name := $node.name();
+	my $ops;
+	my @posargs;
+	my %namedargs;
+	##  our first child is the thing to be invoked, so make sure it's a PMC
+	$signature := pir::replace($signature, 1, 0, 'P') unless $name;
+	# ($ops, @posargs, %namedargs) := self.'post_children'($node, :signature($signature));
+	Q:PIR {
+		$P0 = find_lex '$node'
+		$P1 = find_lex '$signature'
+        ($P0, $P1, $P2) = self.'post_children'($P0, 'signature'=>$P1)
+        store_lex '$ops', $P0
+        store_lex '@posargs', $P1
+        store_lex '%%namedargs', $P2
+	};
+	if $name {
+		if pir::isa($name, PAST::Node) {
+			my $name_post := self.as_post($name, :rtype('s'));
+			$name_post := self.coerce($name_post, 's');
+			$ops.push($name_post);
+			pir::unshift(@posargs, $name_post);
+		} else {
+			pir::unshift(@posargs, self.escape($name));
+		}
+	}
 
-        ##  generate the call itself
-        .local string result, rtype
-        rtype = options['rtype']
-        result = self.'uniquereg'(rtype)
-        ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
-        ops.'result'(result)
-        .return (ops)
-    }
+	##  generate the call itself
+	my $rtype := %options<rtype>;
+	my $result := self.uniquereg($rtype);
+	$ops.push_pirop($pasttype, |@posargs, |%namedargs, :result($result));
+	$ops.result($result);
+	$ops;
 }
 
 
