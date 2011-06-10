@@ -77,7 +77,7 @@ retpc:
     set_ref  PCF, MDS, MDS
     set_ref  PCF, BCS, BCS
 
-    set_imm I1, 0, 4
+    set_imm I1, 0, 3
     add_i   I1, PC, I1
     set_ref PCF, PC, I1
 

@@ -199,18 +199,14 @@ sub run_ops {
         my $a1 = $cf->[BCS][$init_pc][1];
         my $a2 = $cf->[BCS][$init_pc][2];
         my $a3 = $cf->[BCS][$init_pc][3];
-        &$op_func($cf, $a1, $a2, $a3);
-        my $final_pc = $cf->[PC];
+        &$op_func(\$cf, $a1, $a2, $a3);
 
         # allow ops to change control flow and call frame
-        if ($init_pc == $final_pc) {
+        if ($init_pc == $cf->[PC]) {
             $cf->[PC]++;
         }
         else {
             m0_say "PC manipulated by M0";
-        }
-        if ($cf != $cf->[CF]) {
-            $cf = $cf->[CF];
         }
     }
 }
@@ -242,7 +238,7 @@ sub m0_opfunc_goto {
     m0_say "goto $a1, $a2, $a3";
 
     my $offset = 256 * $a1 + $a2;
-    $cf->[PC] = $offset;
+    $$cf->[PC] = $offset;
 }
 
 sub m0_opfunc_goto_if {
@@ -250,16 +246,16 @@ sub m0_opfunc_goto_if {
     m0_say "goto_if $a1, $a2, $a3";
 
     my $offset = 256 * $a1 + $a2;
-    my $cond   = $cf->[$a3];
-    $cf->[PC] = $offset if ($cond);
+    my $cond   = $$cf->[$a3];
+    $$cf->[PC] = $offset if ($cond);
 }
 
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
-    my $new_pc      = $cf->[$a1];
-    my $chunk_name  = $cf->[$a2];
-    my $interp      = $cf->[INTERP];
+    my $new_pc      = $$cf->[$a1];
+    my $chunk_name  = $$cf->[$a2];
+    my $interp      = $$cf->[INTERP];
 
     m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
 
@@ -267,95 +263,95 @@ sub m0_opfunc_goto_chunk {
       unless exists $interp->[CHUNK_MAP]{$chunk_name};
 
     my $chunk_num = $interp->[CHUNK_MAP]{$chunk_name};
-    $cf->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
-    $cf->[CONSTS] = $interp->[CHUNKS][$chunk_num]{consts};
-    $cf->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
-    $cf->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
-    $cf->[PC]     = $new_pc;
+    $$cf->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
+    $$cf->[CONSTS] = $interp->[CHUNKS][$chunk_num]{consts};
+    $$cf->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
+    $$cf->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
+    $$cf->[PC]     = $new_pc;
 }
 
 sub m0_opfunc_add_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "add_i $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] + $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
 }
 
 sub m0_opfunc_add_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "add_n $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] + $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
 }
 
 sub m0_opfunc_sub_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "sub_i $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] - $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
 }
 
 sub m0_opfunc_sub_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "sub_n $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] - $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
 }
 
 sub m0_opfunc_mult_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "mult_i $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] * $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
 }
 
 sub m0_opfunc_mult_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "mult_n $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] * $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
 }
 
 sub m0_opfunc_div_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "div_i $a1, $a2, $a3";
 
-    $cf->[$a1] = int($cf->[$a2] / $cf->[$a3]);
+    $$cf->[$a1] = int($$cf->[$a2] / $$cf->[$a3]);
 }
 
 sub m0_opfunc_div_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "div_n $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] / $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] / $$cf->[$a3];
 }
 
 sub m0_opfunc_mod_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "mod_i $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] % $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
 }
 
 sub m0_opfunc_mod_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "mod_n $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] % $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
 }
 
 sub m0_opfunc_iton {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "iton $a1, $a2, $a3";
 
-    $cf->[$a2] = int($cf->[$a1]);
+    $$cf->[$a2] = int($$cf->[$a1]);
 }
 
 sub m0_opfunc_ntoi {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "ntoi $a1, $a2, $a3";
 
-    $cf->[$a2] = $cf->[$a1];
+    $$cf->[$a2] = $$cf->[$a1];
 }
 
 sub m0_opfunc_ashr {
@@ -365,7 +361,7 @@ sub m0_opfunc_ashr {
     {
         # shift right with sign extension
         use integer;
-        $cf->[$a1] = $cf->[$a2] >> $cf->[$a3];
+        $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
     }
 }
 
@@ -373,50 +369,50 @@ sub m0_opfunc_lshr {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "lshr $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] >> $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
 }
 
 sub m0_opfunc_shl {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "shl $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] << $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] << $$cf->[$a3];
 }
 
 sub m0_opfunc_and {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "and $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] & $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] & $$cf->[$a3];
 }
 
 sub m0_opfunc_or {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "or $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] | $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] | $$cf->[$a3];
 }
 
 sub m0_opfunc_xor {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "xor $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2] ^ $cf->[$a3];
+    $$cf->[$a1] = $$cf->[$a2] ^ $$cf->[$a3];
 }
 
 sub m0_opfunc_gc_alloc {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "gc_alloc $a1, $a2, $a3 ($cf->[$a2] bytes, flags = $cf->[$a3])";
+    m0_say "gc_alloc $a1, $a2, $a3 ($$cf->[$a2] bytes, flags = $$cf->[$a3])";
 
     # "allocate" a gc-able array of the requested size
     # this isn't quite right because the requested size is in bytes, but it'll
     # work for now
-    my $word_count = $cf->[$a2] / 8;
+    my $word_count = $$cf->[$a2] / 8;
     my $a = [];
     for my $i (0 .. $word_count) {
         $a->[$i] = 0;
     }
-    $cf->[$a1] = $a;
+    $$cf->[$a1] = $a;
 }
 
 sub m0_opfunc_sys_alloc {
@@ -438,21 +434,22 @@ sub m0_opfunc_set {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set $a1, $a2, $a3";
     
-    $cf->[$a1] = $cf->[$a2];
+    $$cf->[$a1] = $$cf->[$a2];
+    $$cf = $$cf->[CF];
 }
 
 sub m0_opfunc_set_imm {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_imm $a1, $a2, $a3";
 
-    $cf->[$a1] = $a2 * 256 + $a3;
+    $$cf->[$a1] = $a2 * 256 + $a3;
 }
 
 sub m0_opfunc_deref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "deref $a1, $a2, $a3";
 
-    $cf->[$a1] = $cf->[$a2][ $cf->[$a3] ];
+    $$cf->[$a1] = $$cf->[$a2][ $$cf->[$a3] ];
 }
 
 sub m0_opfunc_set_ref {
@@ -461,7 +458,7 @@ sub m0_opfunc_set_ref {
 
     # XXX: revisit the asymmetry between this op and deref and decide whether
     # to make them consistent
-    $cf->[$a1][ $a2 ] = $cf->[$a3];
+    $$cf->[$a1][ $a2 ] = $$cf->[$a3];
 }
 
 sub m0_opfunc_csym {
@@ -488,8 +485,8 @@ sub m0_opfunc_print_s {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_s $a1, $a2, $a3";
 
-    my $handle = $cf->[$a1];
-    my $var    = $cf->[$a2];
+    my $handle = $$cf->[$a1];
+    my $var    = $$cf->[$a2];
     # TODO: print to $handle instead of stdout
     say $var;
 }
@@ -498,8 +495,8 @@ sub m0_opfunc_print_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_i $a1, $a2, $a3";
 
-    my $handle = $cf->[$a1];
-    my $var    = $cf->[$a2];
+    my $handle = $$cf->[$a1];
+    my $var    = $$cf->[$a2];
     # TODO: print to $handle instead of stdout
     say $var;
 }
@@ -508,10 +505,10 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
-    say Dumper $cf->[$a1][CONSTS];
+    say Dumper $$cf->[$a1];
     die;
-    my $handle = $cf->[$a1];
-    my $var    = $cf->[$a2];
+    my $handle = $$cf->[$a1];
+    my $var    = $$cf->[$a2];
     # TODO: print to $handle instead of stdout
     say $var;
 }
@@ -520,7 +517,7 @@ sub m0_opfunc_exit {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "exit $a1, $a2, $a3";
 
-    exit($cf->[$a1]);
+    exit($$cf->[$a1]);
 }
 
 
