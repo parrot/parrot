@@ -7,7 +7,7 @@
 # This defines our constants table
 # The space at the end of the next line is important!
 .constants 
-0 "hello world"
+0 "hello world\n"
 
 # This defines our metadata.
 # The space at the end of the next line is important!

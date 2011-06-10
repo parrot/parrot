@@ -1,10 +1,10 @@
 .version 0
 .chunk "goto_chunk_main"
 .constants
-0 "1..2"
-1 "ok 1 control flow hits first chunk
+0 "1..2\n"
+1 "ok 1 control flow hits first chunk\n"
 2 "goto_chunk_helper"
-3 "nok 2 control flow goes past goto_chunk"
+3 "nok 2 control flow goes past goto_chunk\n"
 .metadata
 .bytecode
 
@@ -32,7 +32,7 @@
 
 .chunk "goto_chunk_helper"
 .constants
-0 "ok 2 control flow hits second chunk
+0 "ok 2 control flow hits second chunk\n"
 .metadata
 .bytecode
     set_imm S0, 0, 0

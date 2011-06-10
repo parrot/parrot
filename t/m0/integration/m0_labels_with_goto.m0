@@ -1,8 +1,8 @@
 .version 0
 .chunk "label_with_goto_after"
 .constants
-0 "1..1"
-1 "ok 1 goto works with a label defined after its use"
+0 "1..1\n"
+1 "ok 1 goto works with a label defined after its use\n"
 2 "n"
 .metadata
 .bytecode

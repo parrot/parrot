@@ -1,8 +1,8 @@
 .version 0
 .chunk "label_without_goto"
 .constants
-0 "1..1"
-1 "ok 1 labels are parsed ok"
+0 "1..1\n"
+1 "ok 1 labels are parsed ok\n"
 .metadata
 .bytecode
 # test that the assembler can parse labels

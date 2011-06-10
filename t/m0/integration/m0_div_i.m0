@@ -1,9 +1,9 @@
 .version 0
 .chunk "noop"
 .constants
-0 "1..1"
+0 "1..1\n"
 1 "n"
-2 "ok 1 div_i: 9 / 99 = 11"
+2 "ok 1 div_i: 9 / 99 = 11\n"
 .metadata
 .bytecode
 
@@ -13,9 +13,9 @@
     print_s I0, S0, x
 
     set_imm I1, 0,  9
-    set_imm I2, 0,  9
+    set_imm I2, 0,  99
     div_i   I2, I2, I1
-    set_imm I3, 0,  9
+    set_imm I3, 0,  11
     sub_i   I3, I3, I2
        
     goto_if divi_nok, I3   

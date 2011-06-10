@@ -1,12 +1,12 @@
 .version 0
 .chunk "truffleshuffle"
 .constants
-0 "1..2"
+0 "1..2\n"
 1 "n"
-2 "ok 1 iton converts 99 to 99.0
+2 "ok 1 iton converts 99 to 99.0\n"
 3 99.0
 4 -23.0
-5 "ok 2 iton converts -23 to -23.0
+5 "ok 2 iton converts -23 to -23.0\n"
 .metadata
 .bytecode
 

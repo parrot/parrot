@@ -1,9 +1,9 @@
 .version 0
 .chunk "truffleshuffle"
 .constants
-0 "1..1"
+0 "1..1\n"
 1 "n"
-2 "ok 1 mod_n: 42.0 % 5.0 = 2.0
+2 "ok 1 mod_n: 42.0 % 5.0 = 2.0\n"
 3 42.0
 4 5.0
 5 2.0

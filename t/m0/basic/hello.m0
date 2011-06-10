@@ -6,7 +6,7 @@
 
 # This defines our constants table
 .constants
-0 "hello world"
+0 "hello world\n"
 
 # This defines our metadata.
 .metadata

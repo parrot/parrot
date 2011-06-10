@@ -1,9 +1,9 @@
 .version 0
 .chunk "truffleshuffle"
 .constants
-0 "1..1"
+0 "1..1\n"
 1 "n"
-2 "ok 1 div_n: 99.0 / 11.0 = 9.0
+2 "ok 1 div_n: 99.0 / 11.0 = 9.0\n"
 3 99.0
 4 11.0
 5 9.0

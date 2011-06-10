@@ -1,9 +1,9 @@
 .version 0
 .chunk "noop"
 .constants
-0 "1..1"
+0 "1..1\n"
 1 "n"
-2 "ok 1 mult_i: 9 * 11 = 99"
+2 "ok 1 mult_i: 9 * 11 = 99\n"
 .metadata
 .bytecode
 

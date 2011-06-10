@@ -1,8 +1,8 @@
 .version 0
 .chunk "noop"
 .constants
-0 "1..1"
-1 "ok 1 noop doesn't do anything"
+0 "1..1\n"
+1 "ok 1 noop doesn't do anything\n"
 .metadata
 .bytecode
 noop    x, x, x

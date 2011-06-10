@@ -291,7 +291,7 @@ sub m0b_bytecode_seg {
             $x{arg2} = int($label_map{ $+{target_label} } % 255);
             $x{arg3} = $+{arg3};
             $x{opname} = 'goto_if';
-            m0_say "adding op $+{opname} to bytecode seg";
+            m0_say "adding op goto_if to bytecode seg";
             $bytecode .= to_bytecode($ops,\%x);
         } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
             # ignore
