@@ -74,7 +74,7 @@ output_like(
 
 output_like(
     $hello_m0,
-    qr/Parsed data for 39 ops/,
+    qr/Parsed data for 38 ops/,
     'Parse data for the correct number of ops'
 );
 
@@ -179,6 +179,7 @@ output_like('',qr/Usage:/, 'given a Usage hint when assembler is given no argume
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
 
+    local $ENV{M0DEBUG} = 1;
     my $out = `$^X $exefile $options 2>&1`;
 
     like( $out, $snippet, $desc );
