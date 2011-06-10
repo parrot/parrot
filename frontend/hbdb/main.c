@@ -103,14 +103,14 @@ main(int argc, const char *argv[])
         fail(NULL);
     }
 
-    /* Set executable name to "hbdb" */
-    if (!Parrot_api_set_executable_name(interp, argv[0])) {
+    /* Register hbdb runcore */
+    if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
 
-    /* Register hbdb runcore */
-    if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
+    /* Set executable name to "hbdb" */
+    if (!Parrot_api_set_executable_name(interp, argv[0])) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
