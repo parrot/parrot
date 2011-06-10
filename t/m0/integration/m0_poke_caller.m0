@@ -10,6 +10,21 @@
 .metadata
 .bytecode
 
+    # What this test does:
+    #
+    # This is a test to demonstrate how M0's calling conventions work in
+    # practice.  The "caller" chunk sets I23 in its call frame and verifies
+    # that it's been set.  It then creates and initializes a new call frame,
+    # activates it and jumps to the "callee" chunk.  The callee chunk then sets
+    # I23 in its own call frame, prints it and fetches I23 from the parent call
+    # frame, also printing it.  Control flow then jumps back to "caller", where
+    # the parent call frame (the one "caller" started with) is activated and
+    # its value of I23 is printed to verify that nothing's changed.
+    #
+    # This example has the caller do the work of creating a new call frame,
+    # though future M0 calling conventions will probably have the callee do the
+    # work.
+
     set_imm I0, 0, 1
     set_imm S0, 0, 0
     deref   S0, CONSTS, S0
