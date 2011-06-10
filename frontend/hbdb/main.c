@@ -115,6 +115,12 @@ main(int argc, const char *argv[])
         fail(interp);
     }
 
+    /* Initialize debugger */
+    if (!Parrot_api_hbdb_init(interp)) {
+        Parrot_api_destroy_interpreter(interp);
+        fail(interp);
+    }
+
     /* Get filename */
     file = argv[argc - 1];
 
