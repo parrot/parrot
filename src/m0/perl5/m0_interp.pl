@@ -191,7 +191,7 @@ sub run_ops {
         m0_say "PC is $cf->[PC], chunk is '$cf->[CHUNK]'";
         my $init_pc = $cf->[PC];
         my $instr_count = scalar(@{$cf->[BCS]});
-        if ($cf->[PC] >= $instr_count){
+        if ($init_pc >= $instr_count){
             exit;
         }
         my $op_num  = $cf->[BCS][$init_pc][0];
@@ -201,13 +201,8 @@ sub run_ops {
         my $a3 = $cf->[BCS][$init_pc][3];
         &$op_func(\$cf, $a1, $a2, $a3);
 
-        # allow ops to change control flow and call frame
-        if ($init_pc == $cf->[PC]) {
-            $cf->[PC]++;
-        }
-        else {
-            m0_say "PC manipulated by M0";
-        }
+        # If an op hasn't changed the PC, increment it.
+        $cf->[PC]++ if ($init_pc == $cf->[PC]);
     }
 }
 
