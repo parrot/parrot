@@ -625,7 +625,7 @@ PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 Parrot_PackFile PackFile_read_pbc(PARROT_INTERP,
     ARGIN(STRING *fullname),
     const int debug)
@@ -770,10 +770,14 @@ PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile pfpmc)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+PMC * Parrot_pf_read_pbc_file(PARROT_INTERP,
+    ARGIN_NULLOK(STRING * const fullname))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
@@ -971,9 +975,11 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_Parrot_pf_prepare_loaded_packfile \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_read_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_set_current_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

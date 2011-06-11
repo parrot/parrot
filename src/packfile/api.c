@@ -315,6 +315,27 @@ static void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
 static void push_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+static char * read_pbc_file_bytes_handle(PARROT_INTERP,
+    PIOHANDLE io,
+    INTVAL program_size)
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static PackFile * read_pbc_file_packfile(PARROT_INTERP,
+    ARGIN(STRING * const fullname),
+    INTVAL program_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
+    ARGIN(STRING * const fullname),
+    PIOHANDLE io,
+    INTVAL program_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
@@ -465,6 +486,14 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_push_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_read_pbc_file_bytes_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_read_pbc_file_packfile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(fullname))
+#define ASSERT_ARGS_read_pbc_file_packfile_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_run_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -4418,34 +4447,41 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 Parrot_PackFile
 PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
     UNUSED(debug);
-    return (Parrot_PackFile)Parrot_pf_read_pbc_file(interp, fullname);
+    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
+    Parrot_pf_prepare_loaded_packfile(interp, pfpmc);
+    return (Parrot_PackFile)pfpmc;
+}
+
+PARROT_EXPORT
+void
+Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile pfpmc)
+{
+    /* Set :main routine */
+    PackFile * const pf = VTABLE_get_pointer(interp, pfpmc);
+    if (!(pf->options & PFOPT_HEADERONLY))
+        do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
 }
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
+Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
 {
     ASSERT_ARGS(Parrot_pf_read_pbc_file)
-    PackFile  *pf;
-    PMC       *pfpmc;
-    char      *program_code;
-    PIOHANDLE  io             = PIO_INVALID_HANDLE;
-    INTVAL     is_mapped      = 0;
-    INTVAL     program_size;
+    PackFile *pf;
+    PMC      *pfpmc;
+    INTVAL    program_size;
 
-    if (STRING_length(fullname) == 0) {
-        /* read from STDIN */
-        io = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
-
-        /* read 1k at a time */
-        program_size = 0;
+    if (fullname == NULL || STRING_length(fullname) == 0) {
+        PIOHANDLE stdin_h = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        STRING * const hname = CONST_STRING(interp, "standard input");
+        pf = read_pbc_file_packfile_handle(interp, hname, stdin_h, 0);
     }
     else {
         /* can't read a file that doesn't exist */
@@ -4458,118 +4494,113 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "'%Ss', is not a regular file %i.\n", fullname, errno);
 
-        program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
-
-#ifndef PARROT_HAS_HEADER_SYSMMAN
-        io = PIO_OPEN(interp, fullname, PIO_F_READ);
-
-        if (io == PIO_INVALID_HANDLE)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
-                    "Can't open %Ss, code %i.\n", fullname, errno);
-#endif  /* PARROT_HAS_HEADER_SYSMMAN */
-
-    }
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-again:
-#endif
-    /* if we've opened a file (or stdin) with PIO, read it in */
-    if (io != PIO_INVALID_HANDLE) {
-        char  *cursor;
-        size_t chunk_size = program_size > 0 ? program_size : 1024;
-        INTVAL wanted     = program_size;
-        size_t read_result;
-
-        program_code = mem_gc_allocate_n_typed(interp, chunk_size, char);
-        cursor       = program_code;
-        program_size = 0;
-
-        while ((read_result = PIO_READ(interp, io, cursor, chunk_size)) > 0) {
-            program_size += read_result;
-
-            if (program_size == wanted)
-                break;
-
-            chunk_size   = 1024;
-            program_code = mem_gc_realloc_n_typed(interp, program_code,
-                    program_size + chunk_size, char);
-
-            if (!program_code) {
-                PIO_CLOSE(interp, io);
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                        "Could not reallocate buffer while reading packfile from PIO.\n");
-            }
-
-            cursor = (char *)(program_code + program_size);
-        }
-
-        PIO_CLOSE(interp, io);
-    }
-    else {
-        /* if we've gotten here, we opted not to use PIO to read the file.
-         * use mmap */
-
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-
         /* check that fullname isn't NULL, just in case */
         if (!fullname)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to open a NULL filename");
 
-        io = PIO_OPEN(interp, fullname, PIO_F_READ);
-
-        if (io == PIO_INVALID_HANDLE)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Can't open %Ss, code %i.\n", fullname, errno);
-
-        program_code = (char *)mmap(NULL, (size_t)program_size,
-                        PROT_READ, MAP_SHARED, io, (off_t)0);
-
-        if (program_code == (void *)MAP_FAILED) {
-            Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
-                    "Can't mmap file %s, code %i.\n",
-                    fullname, errno);
-
-            goto again;
-        }
-
-        is_mapped = 1;
-
-#else   /* PARROT_HAS_HEADER_SYSMMAN */
-
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "uncaught error occurred reading file or mmap not available.\n");
-
-#endif  /* PARROT_HAS_HEADER_SYSMMAN */
-
+        program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
+        pf = read_pbc_file_packfile(interp, fullname, program_size);
     }
 
-    /* Now that we have the bytecode, let's unpack it. */
+    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+
+    return pfpmc;
+}
+
+PARROT_CANNOT_RETURN_NULL
+static PackFile*
+read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
+        PIOHANDLE io, INTVAL program_size)
+{
+    char * const program_code = read_pbc_file_bytes_handle(interp, io, program_size);
+    PackFile * const pf = PackFile_new(interp, 0);
+    pf->options = 0;
+
+    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't unpack packfile %Ss.\n", fullname);
+    return pf;
+}
+
+PARROT_CAN_RETURN_NULL
+static char *
+read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
+{
+    size_t chunk_size   = program_size > 0 ? program_size : 1024;
+    INTVAL wanted       = program_size;
+    size_t read_result;
+    char  *program_code = mem_gc_allocate_n_typed(interp, chunk_size, char);
+    char  *cursor       = program_code;
+    program_size        = 0;
+
+    while ((read_result = PIO_READ(interp, io, cursor, chunk_size)) > 0) {
+        program_size += read_result;
+
+        if (program_size == wanted)
+            break;
+
+        chunk_size   = 1024;
+        program_code = mem_gc_realloc_n_typed(interp, program_code,
+                program_size + chunk_size, char);
+
+        if (!program_code) {
+            PIO_CLOSE(interp, io);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Could not reallocate buffer while reading packfile from PIO.\n");
+        }
+
+        cursor = (char *)(program_code + program_size);
+    }
+
+    return program_code;
+}
+
+PARROT_CAN_RETURN_NULL
+static PackFile *
+read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
+        INTVAL program_size)
+{
+    char * program_code = NULL;
+    PackFile * pf;
+    PIOHANDLE io = PIO_OPEN(interp, fullname, PIO_F_READ);
+    INTVAL is_mapped = 0;
+
+    if (io == PIO_INVALID_HANDLE)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't open %Ss, code %i.\n", fullname, errno);
+
+#ifndef PARROT_HAS_HEADER_SYSMAN
+
+    program_code = read_pbc_file_bytes_handle(interp, io, program_size);
+
+#else
+
+    program_code = (char *)mmap(NULL, (size_t)program_size,
+                    PROT_READ, MAP_SHARED, io, (off_t)0);
+
+    /* If mmap fails, fall back and try to read the file from the handle
+       directly.
+    */
+    if (program_code == (void *)MAP_FAILED) {
+        Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
+                "Can't mmap file %s, code %i.\n", fullname, errno);
+        program_code = read_pbc_file_bytes_handle(interp, fullname, io, program_size);
+    }
+    else
+        is_mapped = 1;
+
+#endif
 
     pf = PackFile_new(interp, is_mapped);
-
-    /* Make the cmdline option available to the unpackers */
     pf->options = 0;
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss.\n", fullname);
 
-    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-
-    /* Set :main routine */
-    if (!(pf->options & PFOPT_HEADERONLY))
-        do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
-
-    /* Prederefing the sub/the bytecode is done in switch_to_cs before
-     * actual usage of the segment */
-
-#ifdef PARROT_HAS_HEADER_SYSMMAN
-    /* the man page states that it's ok to close a mmaped file */
-    if (is_mapped)
-        PIO_CLOSE(interp, io);
-#endif
-
-    return pfpmc;
+    PIO_CLOSE(interp, io);
+    return pf;
 }
 
 /*
