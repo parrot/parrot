@@ -277,6 +277,8 @@ hbdb_run_code(PARROT_INTERP, int argc, const char *argv[])
 
     /* Main loop */
     do {
+        Parrot_runcode(interp, argc, argv);
+
         interp->hbdb->state |= HBDB_STOPPED;
     } while (!(interp->hbdb->state & HBDB_EXIT))
 }
