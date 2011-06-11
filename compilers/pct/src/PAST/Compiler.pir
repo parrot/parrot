@@ -307,7 +307,7 @@ forced into that register (with conversions as needed).
     $S0 = substr source, 0, 1
     if $S0 == '$' goto source_reg
     if $S0 == '"' goto source_str
-    if $S0 == '.' goto source_int_or_num
+    if $S0 == '.' goto source_int_num_or_const
     if $S0 == '-' goto source_int_or_num
     $I0 = is_cclass .CCLASS_NUMERIC, source, 0
     if $I0 goto source_int_or_num
@@ -343,6 +343,14 @@ forced into that register (with conversions as needed).
     if rtype == 's' goto end
     rrtype = 'S'
     pmctype = "'String'"
+    goto coerce_reg
+
+  source_int_num_or_const:
+    $I0 = is_cclass .CCLASS_ALPHABETIC, source, 1
+    unless $I0 goto source_int_or_num
+    $I0 = index 'ins+~', rtype
+    if $I0 >= 0 goto end
+    rrtype = 'P'
     goto coerce_reg
 
   source_int_or_num:
