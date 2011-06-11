@@ -271,7 +271,7 @@ Begins the main runloop by executing the code in the file specified on the comma
 */
 
 void
-hbdb_run_code(PARROT_INTERP, int argc, const char *argv[])
+hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(hbdb_run_code)
 

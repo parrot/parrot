@@ -100,6 +100,29 @@ Parrot_api_hbdb_init(Parrot_PMC interp_pmc)
 
 /*
 
+=item C<Parrot_Int Parrot_api_hbdb_run_code(Parrot_PMC interp_pmc, int argc,
+const char *argv[])>
+
+Wrapper function for C<hbdb_run_code()>. Begins the main runloop by executing the code in the
+file specified on the command-line.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_hbdb_run_code(Parrot_PMC interp_pmc, int argc, ARGIN(const char *argv[]))
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+
+    hbdb_run_code(interp, argc, argv);
+
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
