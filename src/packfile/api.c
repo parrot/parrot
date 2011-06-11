@@ -4458,15 +4458,38 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     return (Parrot_PackFile)pfpmc;
 }
 
+/*
+
+=item C<void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile
+pfpmc)>
+
+Ready a PackFile which has just been loaded in to Parrot. Sort out the
+C<:main> function and trigger C<:load> functions.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
 Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile pfpmc)
 {
+    ASSERT_ARGS(Parrot_pf_prepare_loaded_packfile)
     /* Set :main routine */
     PackFile * const pf = VTABLE_get_pointer(interp, pfpmc);
     if (!(pf->options & PFOPT_HEADERONLY))
         do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
 }
+
+/*
+
+=item C<PMC * Parrot_pf_read_pbc_file(PARROT_INTERP, STRING * const fullname)>
+
+Read a .pbc file with the given C<fullname> into a PackFile structure.
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -4508,11 +4531,23 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
     return pfpmc;
 }
 
+/*
+
+=item C<static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP, STRING *
+const fullname, PIOHANDLE io, INTVAL program_size)>
+
+Read a PackFile in from an open PIOHANDLE.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static PackFile*
 read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
         PIOHANDLE io, INTVAL program_size)
 {
+    ASSERT_ARGS(read_pbc_file_packfile_handle)
     char * const program_code = read_pbc_file_bytes_handle(interp, io, program_size);
     PackFile * const pf = PackFile_new(interp, 0);
     pf->options = 0;
@@ -4523,10 +4558,23 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
     return pf;
 }
 
+/*
+
+=item C<static char * read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io,
+INTVAL program_size)>
+
+Read in the raw bytes of the packfile into a buffer. The buffer is allocated
+with C<mem_gc_realloc_n_typed>, so needs to be freed by the caller.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 static char *
 read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
 {
+    ASSERT_ARGS(read_pbc_file_bytes_handle)
     size_t chunk_size   = program_size > 0 ? program_size : 1024;
     INTVAL wanted       = program_size;
     size_t read_result;
@@ -4556,11 +4604,24 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
     return program_code;
 }
 
+/*
+
+=item C<static PackFile * read_pbc_file_packfile(PARROT_INTERP, STRING * const
+fullname, INTVAL program_size)>
+
+Read a pbc file into a PackFile*. May use mmap if available or direct reads
+from the file.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 static PackFile *
 read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
         INTVAL program_size)
 {
+    ASSERT_ARGS(read_pbc_file_packfile)
     char * program_code = NULL;
     PackFile * pf;
     PIOHANDLE io = PIO_OPEN(interp, fullname, PIO_F_READ);
@@ -4569,6 +4630,11 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
     if (io == PIO_INVALID_HANDLE)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't open %Ss, code %i.\n", fullname, errno);
+
+    /* TODO: Who frees program_code? We don't do it here (And don't need to
+             if we've mmapped it. Figure out where this is handled and
+             document it here.
+    */
 
 #ifndef PARROT_HAS_HEADER_SYSMAN
 
