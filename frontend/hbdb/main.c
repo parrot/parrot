@@ -124,7 +124,7 @@ main(int argc, const char *argv[])
     }
 
     /* Get global debugger structure */
-    hbdb = interp->hbdb;
+    hbdb = INTERP_ATTR(interp)->hbdb;
 
     /* Get filename */
     file = argv[argc - 1];

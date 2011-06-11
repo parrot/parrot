@@ -14,6 +14,12 @@
 #ifndef PARROT_HBDB_H_GUARD
 #define PARROT_HBDB_H_GUARD
 
+#include "parrot/pobj.h"
+#include "pmc/pmc_parrotinterpreter.h"
+
+/* Abstract access to fields in Parrot_Interp */
+#define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+
 /* Type:
  *     hbdb_state_t
  *

@@ -32,9 +32,14 @@ function.
 #include "parrot/embed.h"
 #include "parrot/string_funcs.h"
 #include "parrot/sub.h"
+#include "parrot/pobj.h"
+#include "pmc/pmc_parrotinterpreter.h"
 
 /* Size of command-line buffer */
 #define HBDB_CMD_BUFFER_LENGTH 128
+
+/* Abstract access to fields in Parrot_Interp */
+#define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
