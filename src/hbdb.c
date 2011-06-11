@@ -262,6 +262,27 @@ hbdb_init(PARROT_INTERP)
 
 /*
 
+=item C<void hbdb_run_code(PARROT_INTERP, int argc, const char *argv[])>
+
+Begins the main runloop by executing the code in the file specified on the command-line.
+
+=cut
+
+*/
+
+void
+hbdb_run_code(PARROT_INTERP, int argc, const char *argv[])
+{
+    ASSERT_ARGS(hbdb_run_code)
+
+    /* Main loop */
+    do {
+        interp->hbdb->state |= HBDB_STOPPED;
+    } while (!(interp->hbdb->state & HBDB_EXIT))
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
