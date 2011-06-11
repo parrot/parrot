@@ -4423,10 +4423,19 @@ Parrot_PackFile
 PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
+    UNUSED(debug);
+    return (Parrot_PackFile)Parrot_pf_read_pbc_file(interp, fullname);
+}
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
+{
+    ASSERT_ARGS(Parrot_pf_read_pbc_file)
     PackFile  *pf;
     PMC       *pfpmc;
     char      *program_code;
-    STRING    * const stdin_filename = CONST_STRING(interp, "-");
     PIOHANDLE  io             = PIO_INVALID_HANDLE;
     INTVAL     is_mapped      = 0;
     INTVAL     program_size;
@@ -4441,30 +4450,23 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     }
     else {
         /* can't read a file that doesn't exist */
-        if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS)) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't stat %Ss, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
+        if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
+                    "Can't stat %Ss, code %i.\n", fullname, errno);
 
         /* we may need to relax this if we want to read bytecode from pipes */
-        if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG)) {
-            Parrot_io_eprintf(interp,
-                "Parrot VM: '%Ss', is not a regular file %i.\n",
-                fullname, errno);
-            return NULL;
-        }
+        if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
+                    "'%Ss', is not a regular file %i.\n", fullname, errno);
 
         program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
 
 #ifndef PARROT_HAS_HEADER_SYSMMAN
         io = PIO_OPEN(interp, fullname, PIO_F_READ);
 
-        if (io == PIO_INVALID_HANDLE) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %Ss, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
+        if (io == PIO_INVALID_HANDLE)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
+                    "Can't open %Ss, code %i.\n", fullname, errno);
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
     }
@@ -4493,24 +4495,13 @@ again:
                     program_size + chunk_size, char);
 
             if (!program_code) {
-                Parrot_io_eprintf(interp,
-                            "Parrot VM: Could not reallocate buffer "
-                            "while reading packfile from PIO.\n");
                 PIO_CLOSE(interp, io);
-                return NULL;
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Could not reallocate buffer while reading packfile from PIO.\n");
             }
 
             cursor = (char *)(program_code + program_size);
         }
-
-        /*if (ferror(io)) {
-            Parrot_io_eprintf(interp,
-             "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
-                        ferror(io));
-            fclose(io);
-            mem_gc_free(interp, program_code);
-            return NULL;
-        }*/
 
         PIO_CLOSE(interp, io);
     }
@@ -4522,23 +4513,21 @@ again:
 
         /* check that fullname isn't NULL, just in case */
         if (!fullname)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Trying to open a NULL filename");
 
         io = PIO_OPEN(interp, fullname, PIO_F_READ);
 
-        if (io == PIO_INVALID_HANDLE) {
-            Parrot_io_eprintf(interp, "Parrot VM: Can't open %Ss, code %i.\n",
-                    fullname, errno);
-            return NULL;
-        }
+        if (io == PIO_INVALID_HANDLE)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Can't open %Ss, code %i.\n", fullname, errno);
 
         program_code = (char *)mmap(NULL, (size_t)program_size,
                         PROT_READ, MAP_SHARED, io, (off_t)0);
 
         if (program_code == (void *)MAP_FAILED) {
             Parrot_warn(interp, PARROT_WARNINGS_IO_FLAG,
-                    "Parrot VM: Can't mmap file %s, code %i.\n",
+                    "Can't mmap file %s, code %i.\n",
                     fullname, errno);
 
             goto again;
@@ -4548,9 +4537,8 @@ again:
 
 #else   /* PARROT_HAS_HEADER_SYSMMAN */
 
-        Parrot_io_eprintf(interp, "Parrot VM: uncaught error occurred reading "
-                    "file or mmap not available.\n");
-        return NULL;
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "uncaught error occurred reading file or mmap not available.\n");
 
 #endif  /* PARROT_HAS_HEADER_SYSMMAN */
 
@@ -4563,12 +4551,9 @@ again:
     /* Make the cmdline option available to the unpackers */
     pf->options = debug;
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
-            (size_t)program_size)) {
-        Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %Ss.\n",
-                fullname);
-        return NULL;
-    }
+    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't unpack packfile %Ss.\n", fullname);
 
     pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
 
