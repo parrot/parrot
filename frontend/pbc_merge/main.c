@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -863,7 +863,7 @@ main(int argc, const char **argv)
         pbcpmc = Parrot_pf_read_pbc_file(interp, pbcname);
 
         /* Load the packfile and unpack it. */
-        input_files[i]->pf = VTABLE_get_pointer(interp, pbcpmc);
+        input_files[i]->pf = (PackFile *)VTABLE_get_pointer(interp, pbcpmc);
         if (input_files[i]->pf == NULL) {
             Parrot_io_eprintf(interp,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
