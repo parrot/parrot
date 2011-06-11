@@ -4452,8 +4452,8 @@ Parrot_PackFile
 PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
-    UNUSED(debug);
     PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
+    UNUSED(debug);
     Parrot_pf_prepare_loaded_packfile(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
 }
