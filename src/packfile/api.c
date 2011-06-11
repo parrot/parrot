@@ -4472,13 +4472,17 @@ C<:main> function and trigger C<:load> functions.
 
 PARROT_EXPORT
 void
-Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile pfpmc)
+Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
     ASSERT_ARGS(Parrot_pf_prepare_loaded_packfile)
-    /* Set :main routine */
-    PackFile * const pf = VTABLE_get_pointer(interp, pfpmc);
-    if (!(pf->options & PFOPT_HEADERONLY))
-        do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
+    if (PMC_IS_NULL(pfpmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "Could not load packfile");
+    else {
+        PackFile * const pf = VTABLE_get_pointer(interp, pfpmc);
+        if (!(pf->options & PFOPT_HEADERONLY))
+            do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
+    }
 }
 
 /*
