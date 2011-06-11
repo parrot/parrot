@@ -4460,7 +4460,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 
 /*
 
-=item C<void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile
+=item C<void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, PMC * const
 pfpmc)>
 
 Ready a PackFile which has just been loaded in to Parrot. Sort out the
