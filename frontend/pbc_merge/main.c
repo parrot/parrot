@@ -129,13 +129,6 @@ static void pbc_merge_debugs(PARROT_INTERP,
         FUNC_MODIFIES(*inputs)
         FUNC_MODIFIES(*bc);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile* pbc_merge_loadpbc(PARROT_INTERP,
-    ARGIN(const char *fullname))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void pbc_merge_write(PARROT_INTERP,
     ARGMOD(PackFile *pf),
     ARGIN(const char *filename))
@@ -196,92 +189,6 @@ help(void)
     printf("   pbc_merge -o out.pbc file1.pbc file2.pbc ...\n\n");
     exit(0);
 }
-
-/*
-
-=item C<static PackFile* pbc_merge_loadpbc(PARROT_INTERP, const char *fullname)>
-
-This function loads a PBC file and unpacks it. We can't
-use Parrot_pbc_read because that is specified to also
-fixup the segments, which we don't want.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile*
-pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
-{
-    ASSERT_ARGS(pbc_merge_loadpbc)
-    INTVAL program_size, wanted;
-    char *program_code;
-    PackFile *pf;
-    FILE * io = NULL;
-    INTVAL is_mapped = 0;
-    size_t chunk_size;
-    char *cursor;
-    INTVAL read_result;
-
-    /* Check the file exists. */
-    STRING * const fs = Parrot_str_new_init(interp, fullname,
-            strlen(fullname), Parrot_default_encoding_ptr, 0);
-    if (!Parrot_file_stat_intval(interp, fs, STAT_EXISTS)) {
-        Parrot_io_eprintf(interp, "PBC Merge: Can't stat %s, code %i.\n",
-                fullname, errno);
-        Parrot_x_exit(interp, 1);
-    }
-
-    /* Get program size. */
-    program_size = Parrot_file_stat_intval(interp, fs, STAT_FILESIZE);
-
-    /* Attempt to open file and handle any errors. */
-    io = fopen(fullname, "rb");
-    if (!io) {
-        Parrot_io_eprintf(interp, "PBC Merge: Can't open %s, code %i.\n",
-                fullname, errno);
-        Parrot_x_exit(interp, 1);
-    }
-
-    /* Read in program. Nabbed from Parrot_pbc_read. */
-    chunk_size   = program_size > 0 ? program_size : 1024;
-    program_code = mem_gc_allocate_n_typed(interp, chunk_size, char);
-    wanted       = program_size;
-    program_size = 0;
-    cursor       = (char *)program_code;
-
-    while ((read_result = fread(cursor, 1, chunk_size, io)) > 0) {
-        program_size += read_result;
-        if (program_size == wanted)
-            break;
-        chunk_size   = 1024;
-        program_code = mem_gc_realloc_n_typed(interp, program_code,
-                program_size + chunk_size, char);
-
-        cursor = (char *)program_code + program_size;
-    }
-
-    if (read_result < 0) {
-        Parrot_io_eprintf(interp,
-                "PBC Merge: Problem reading packfile from PIO.\n");
-        Parrot_x_exit(interp, 1);
-    }
-    fclose(io);
-
-    /* Now that we have the bytecode, let's unpack it. */
-    pf = PackFile_new(interp, is_mapped);
-    if (!PackFile_unpack(interp,
-                pf, (opcode_t *)program_code, program_size)) {
-        Parrot_io_eprintf(interp, "PBC Merge: Can't unpack packfile %s.\n",
-                fullname);
-        Parrot_x_exit(interp, 1);
-    }
-
-    /* Return the packfile. */
-    return pf;
-}
-
 
 static void
 ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib) {
@@ -902,6 +809,8 @@ main(int argc, const char **argv)
     const char *output_file     = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     Interp * const interp = Parrot_new(NULL);
+    STRING * pbcname = NULL;
+    PMC * pbcpmc = NULL;
 
     {
         const int config_length = Parrot_get_config_hash_length();
@@ -949,9 +858,12 @@ main(int argc, const char **argv)
         /* Set filename */
         input_files[i]->filename = *argv;
 
+        pbcname = Parrot_str_new(interp, input_files[i]->filename,
+                strlen(input_files[i]->filename));
+        pbcpmc = Parrot_pf_read_pbc_file(interp, pbcname);
+
         /* Load the packfile and unpack it. */
-        input_files[i]->pf = pbc_merge_loadpbc(interp,
-            input_files[i]->filename);
+        input_files[i]->pf = VTABLE_get_pointer(interp, pbcpmc);
         if (input_files[i]->pf == NULL) {
             Parrot_io_eprintf(interp,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
