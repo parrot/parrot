@@ -4428,7 +4428,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 }
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
 {
@@ -4440,8 +4440,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
     INTVAL     is_mapped      = 0;
     INTVAL     program_size;
 
-    if (STRING_length(fullname) == 0
-    ||  STRING_equal(interp, fullname, stdin_filename)) {
+    if (STRING_length(fullname) == 0) {
         /* read from STDIN */
         io = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
 
@@ -4451,12 +4450,12 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN(STRING *fullname))
     else {
         /* can't read a file that doesn't exist */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "Can't stat %Ss, code %i.\n", fullname, errno);
 
         /* we may need to relax this if we want to read bytecode from pipes */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OPERATION_INVALID,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "'%Ss', is not a regular file %i.\n", fullname, errno);
 
         program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
@@ -4549,7 +4548,7 @@ again:
     pf = PackFile_new(interp, is_mapped);
 
     /* Make the cmdline option available to the unpackers */
-    pf->options = debug;
+    pf->options = 0;
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,

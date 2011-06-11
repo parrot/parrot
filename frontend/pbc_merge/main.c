@@ -67,7 +67,7 @@ typedef struct pbc_merge_input {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_DOES_NOT_RETURN
-static void help()
+static void help(void);
 
 static void pbc_fixup_bytecode(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
@@ -144,8 +144,7 @@ static void pbc_merge_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pf);
 
-#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
@@ -180,7 +179,7 @@ static void pbc_merge_write(PARROT_INTERP,
 
 /*
 
-=item C<static void help()>
+=item C<static void help(void)>
 
 Print out the user help info.
 
@@ -190,7 +189,7 @@ Print out the user help info.
 
 PARROT_DOES_NOT_RETURN
 static void
-help()
+help(void)
 {
     printf("pbc_merge - merge multiple parrot bytecode files into one\n");
     printf("Usage:\n");
