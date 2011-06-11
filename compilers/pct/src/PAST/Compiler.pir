@@ -137,6 +137,7 @@ any value type.
     valflags['String']   = 's~*:e'
     valflags['Integer']  = 'i+*:'
     valflags['Float']    = 'n+*:'
+    valflags['!macro_const']     = 'i+*:c'
     valflags['!cclass']          = 'i+*:c'
     valflags['!except_severity'] = 'i+*:c'
     valflags['!except_types']    = 'i+*:c'
@@ -2518,10 +2519,12 @@ to have a PMC generated containing the constant value.
     if $I0 < 0 goto const_done
     # Add the directive for the appropriate .include statement.
     $S0 = returns
+    if $S0 == '!macro_const' goto include_done
     $S0 = replace $S0, 0, 1, '.include "'
     $S0 = concat $S0, '.pasm"'
     $P0 = find_dynamic_lex '$*SUB'
     $P0.'add_directive'($S0)
+  include_done:
     # Add a leading dot to the value if one isn't already there.
     $S0 = substr value, 0, 1
     if $S0 == '.' goto const_done
