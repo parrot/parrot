@@ -137,7 +137,7 @@ any value type.
     valflags['String']   = 's~*:e'
     valflags['Integer']  = 'i+*:'
     valflags['Float']    = 'n+*:'
-    valflags['!cconst']          = 'i+*:c'
+    valflags['!cclass']          = 'i+*:c'
     valflags['!except_severity'] = 'i+*:c'
     valflags['!except_types']    = 'i+*:c'
     valflags['!iterator']        = 'i+*:c'
