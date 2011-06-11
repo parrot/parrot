@@ -504,7 +504,6 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     cur_cs->annotations = bc_ann;
 
     for (i = 0; i < num_inputs; i++)  {
-        opcode_t * const cur_cs_start = inputs[i]->code_start;
         PackFile_Annotations * const in_ann = inputs[i]->pf->cur_cs->annotations;
         opcode_t num_keys;
         size_t data_cursor;
