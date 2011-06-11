@@ -71,7 +71,7 @@ static void help(void);
 
 static INTVAL map_ann_constant_idx(PARROT_INTERP,
     pbc_merge_input * input,
-    INTVAL old_idx,
+    opcode_t old_idx,
     pf_ann_key_type_t type)
         __attribute__nonnull__(1);
 
@@ -100,12 +100,15 @@ static void pbc_fixup_constants(PARROT_INTERP,
 static void pbc_merge_annotations(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
-    ARGMOD(PackFile *pf))
+    ARGMOD(PackFile *pf),
+    ARGMOD(PackFile_ByteCode * cur_cs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf);
+        FUNC_MODIFIES(*pf)
+        FUNC_MODIFIES(* cur_cs);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -173,7 +176,8 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_merge_annotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf))
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(cur_cs))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -488,16 +492,16 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
 static void
 pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
-        int num_inputs, ARGMOD(PackFile *pf))
+        int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode * cur_cs))
 {
     int i, j;
-    STRING * const name = Parrot_sprintf_c(interp, "%Ss_ANN", pf->cur_cs->base.name);
+    STRING * const name = Parrot_sprintf_c(interp, "%Ss_ANN", cur_cs->base.name);
     PackFile_Annotations * const bc_ann = (PackFile_Annotations *)
             PackFile_Segment_new_seg(interp, &pf->directory, PF_ANNOTATIONS_SEG, name, 1);
     PackFile_Annotations_Key * last_key = NULL;
 
-    bc_ann->code = pf->cur_cs;
-    pf->cur_cs->annotations = bc_ann;
+    bc_ann->code = cur_cs;
+    cur_cs->annotations = bc_ann;
 
     for (i = 0; i < num_inputs; i++)  {
         opcode_t * const cur_cs_start = inputs[i]->code_start;
@@ -510,29 +514,15 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
         bc_ann->base.data = mem_gc_realloc_n_typed(interp, bc_ann->base.data, bc_ann->base.size, opcode_t);
         data_cursor = 0;
-        for (j = 0; j < num_keys; j++) {
+        for (j = 1; j < num_keys; j++) {
             PackFile_Annotations_Key * const cur_key = &in_ann->keys[j];
-            PackFile_Annotations_Key * to_key;
 
-            bc_ann->num_keys++;
-            bc_ann->keys = mem_gc_realloc_n_typed(interp, bc_ann->keys,
-                    bc_ann->num_keys, PackFile_Annotations_Key);
-            to_key = &bc_ann->keys[bc_ann->num_keys - 1];
-            to_key->name = map_ann_constant_idx(interp, inputs[i], cur_key->name, PF_ANNOTATION_KEY_TYPE_STR);
-            to_key->type = cur_key->type;
-            to_key->start = last_key == NULL ? 0 : last_key->start + last_key->len;
-            to_key->len = cur_key->len;
-            last_key = to_key;
-
-            /* Copy over the offset */
-            bc_ann->base.data[data_cursor + bc_ann->base.size] =
-                    map_ann_offset(interp, inputs[i], in_ann->base.data[data_cursor]);
-            data_cursor++;
-
-            /* Copy over the value */
-            bc_ann->base.data[data_cursor + bc_ann->base.size] =
-                    map_ann_constant_idx(interp, inputs[i], in_ann->base.data[data_cursor], cur_key->type);
-            data_cursor++;
+            PackFile_Annotations_add_entry(interp, bc_ann,
+                map_ann_offset(interp, inputs[i], in_ann->base.data[data_cursor++]),
+                cur_key->name,
+                cur_key->type,
+                map_ann_constant_idx(interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type)
+            );
         }
     }
 }
@@ -545,8 +535,10 @@ map_ann_offset(PARROT_INTERP, pbc_merge_input * input, opcode_t in_offset)
 }
 
 static INTVAL
-map_ann_constant_idx(PARROT_INTERP, pbc_merge_input * input, INTVAL old_idx, pf_ann_key_type_t type)
+map_ann_constant_idx(PARROT_INTERP, pbc_merge_input * input, opcode_t old_idx, pf_ann_key_type_t type)
 {
+    if (old_idx == NULL)
+        return old_idx;
     switch (type) {
         case PF_ANNOTATION_KEY_TYPE_INT:
             return old_idx;
@@ -838,7 +830,10 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     pbc_fixup_constants(interp, inputs, num_inputs);
 
     /* Merge all the annotations */
-    pbc_merge_annotations(interp, inputs, num_inputs, merged);
+    /* TODO: Uncomment this when it's ready
+
+    pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
+    */
 
     for (i = 0; i < num_inputs; ++i) {
         mem_gc_free(interp, inputs[i]->num.const_map);
