@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2010, Parrot Foundation.
+ * Copyright (C) 2001-2011, Parrot Foundation.
  */
 
 /* packfile.h
@@ -770,8 +770,10 @@ PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, Parrot_PackFile pfpmc)
-        __attribute__nonnull__(1);
+void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP,
+    ARGIN(PMC * const pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -977,7 +979,8 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
     , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_pf_prepare_loaded_packfile \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_read_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_set_current_packfile \
