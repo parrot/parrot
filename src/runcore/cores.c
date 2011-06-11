@@ -802,19 +802,6 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
 
     while (pc) {
-        Parrot_Context *context;
-        INTVAL          line_num;
-        PMC            *context_pmc;
-
-        context_pmc         = CURRENT_CONTEXT(interp);
-        context             = PMC_data_typed(context_pmc, Parrot_Context *);
-        context->current_pc = pc;
-        /*preop_pc              = pc;*/
-        /*preop_opname          = interp->code->op_info_table[*pc]->name;*/
-        line_num            = hbdb_get_line_number(interp, context_pmc);
-
-        printf("%d\n", line_num);
-
         DO_OP(pc, interp);
     }
 
