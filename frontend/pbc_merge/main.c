@@ -70,15 +70,17 @@ PARROT_DOES_NOT_RETURN
 static void help(void);
 
 static INTVAL map_ann_constant_idx(PARROT_INTERP,
-    pbc_merge_input * input,
+    ARGIN(const pbc_merge_input *input),
     opcode_t old_idx,
     pf_ann_key_type_t type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static opcode_t map_ann_offset(PARROT_INTERP,
-    pbc_merge_input * input,
+    ARGIN(const pbc_merge_input *input),
     opcode_t in_offset)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void pbc_fixup_bytecode(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
@@ -163,9 +165,11 @@ static void pbc_merge_write(PARROT_INTERP,
 
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_map_ann_constant_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_map_ann_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
@@ -527,17 +531,18 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 }
 
 static opcode_t
-map_ann_offset(PARROT_INTERP, pbc_merge_input * input, opcode_t in_offset)
+map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_offset)
 {
     /* TODO: is this correct? */
     return in_offset + input->code_start;
 }
 
 static INTVAL
-map_ann_constant_idx(PARROT_INTERP, pbc_merge_input * input, opcode_t old_idx, pf_ann_key_type_t type)
+map_ann_constant_idx(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t old_idx, pf_ann_key_type_t type)
 {
-    if (old_idx == NULL)
+    if (old_idx == 0)
         return old_idx;
+
     switch (type) {
         case PF_ANNOTATION_KEY_TYPE_INT:
             return old_idx;
