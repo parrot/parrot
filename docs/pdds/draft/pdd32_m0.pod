@@ -1094,19 +1094,22 @@ synchronization between call frames.
 The Actor model of concurrency currently looks promising http://en.wikipedia.org/wiki/Actor_model .
 One implementation of the Actor model on the JVM is Akka : http://akka.io/
 
-=head2 Security
+=head2 Bytecode Checksum
 
-M0 will have security mechanisms such that an optional cryptographic hash of
-the bytecode will be stored in a dedicated chunk in the bytecode file.  This
-will not be tied to any one crypto algorithm, and crypto algorithms which are
-portable and run on all platforms that Parrot supports are likely candidates
-for a default. This part of the spec is still in flux. One option we have is to
-specify a textual string such as "SHA1" and store the accompanying hash. Then
-the M0 interpreter will verify the SHA1 sum matches and give a loud error and
-bomb out if it doesn't.
+NOTE: IN FLUX
 
-If implemented, hashes will only be stored in bytecode and will be generated as
-an optional post-processing step on the m0b file.
+To ensure that bytecode is not mangled in some way and to prevent running
+mangled bytecode, the M0 bytecode format stores a SHA256 checksum internally.
+Since a file cannot store its own checksum, the M0 bytecode format stores a
+SHA256 (32 byte) checksum directly after the magic number, which represents the
+checksum of all bytes in m0b file after the checksum.
+
+The bytecode checksum is used by the M0 interpreter, just after reading the
+magic byte. It verifies that the SHA256 sum in the header matches the
+calculated SHA256 of the rest of the file, and if it doesn't, throws an
+exception.
+
+TODO: How do we handle lazy bytecode loading?
 
 =head1 Lorito
 
