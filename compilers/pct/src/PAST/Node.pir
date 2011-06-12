@@ -124,6 +124,21 @@ variable is being used in an lvalue context.
 .end
 
 
+=item childorder([order])
+
+Get/set the order in which children nodes should be evaluated
+(via Compiler::post_children).  If C<order> is 'right' then
+children are evaluated last-to-first, otherwise they're 
+evaluated first-to-last.
+
+=cut
+
+.sub 'childorder' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('childorder', value, has_value)
+.end
+
 =back
 
 =head2 PAST::Val
