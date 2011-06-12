@@ -984,109 +984,65 @@ Return the POST representation of C<PAST::Op> nodes with
 a 'pasttype' of if/unless.
 
 multi method if(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(:node($node));
 
-        .local pmc opsclass, ops
-        opsclass = get_hll_global ['POST'], 'Ops'
-        ops = opsclass.'new'('node'=>node)
+    my $rtype := %options<rtype>;
+    my $result := self.uniquereg($rtype);
+    $ops.result($result);
 
-        .local string rtype, result
-        rtype = options['rtype']
-        result = self.'uniquereg'(rtype)
-        ops.'result'(result)
+    my $pasttype := $node.pasttype();
 
-        .local string pasttype
-        pasttype = node.'pasttype'()
+    my $exprpast := $node[0];
+    my $thenpast := $node[1];
+    my $elsepast := $node[2];
 
-        .local pmc exprpast, thenpast, elsepast, childpast
-        .local pmc exprpost, thenpost, elsepost, childpost
-        exprpast = node[0]
-        thenpast = node[1]
-        elsepast = node[2]
+	my $S0 := self.unique($pasttype ~ '_');
+	my $thenlabel := POST::Label.new(:result($S0));
+	my $endlabel :=  POST::Label.new(:result($S0 ~ '_end'));
 
-        .local pmc thenlabel, endlabel
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = concat pasttype, '_'
-        $S0 = self.'unique'($S0)
-        thenlabel = $P0.'new'('result'=>$S0)
-        $S0 = concat $S0, '_end'
-        endlabel = $P0.'new'('result'=>$S0)
+	my $exprrtype := 'r';
+	$exprrtype := '*' if $rtype eq 'v';
+	my $childrtype := $rtype;
+	$childrtype := 'P' if pir::index('*:', $rtype) >= 0;
 
-        .local string exprrtype, childrtype
-        exprrtype = 'r'
-        if rtype != 'v' goto have_exprrtype
-        exprrtype = '*'
-      have_exprrtype:
-        childrtype = rtype
-        $I0 = index '*:', rtype
-        if $I0 < 0 goto have_childrtype
-        childrtype = 'P'
-      have_childrtype:
+	my $exprpost := self.as_post($exprpast, :rtype($exprrtype));
 
-        exprpost = self.'as_post'(exprpast, 'rtype'=>exprrtype)
+	my $thenpost := make_childpost($thenpast);
+	my $elsepost := make_childpost($elsepast);
 
-        .local pmc jmpstack
-        jmpstack = new 'ResizableIntegerArray'
-        childpast = thenpast
-        local_branch jmpstack, make_childpost
-        thenpost = childpost
-        childpast = elsepast
-        local_branch jmpstack, make_childpost
-        elsepost = childpost
+	if pir::defined($elsepost) {
+		$ops.push($exprpost);
+		$ops.push_pirop($pasttype, $exprpost, $thenlabel);
+		$ops.push($elsepost) if pir::defined($elsepost);
+		$ops.push_pirop('goto', $endlabel);
+		$ops.push($thenlabel);
+		$ops.push($thenpost) if pir::defined($thenpost);
+		$ops.push($endlabel);
+		return $ops;
+	} else {
+		my $S0 := 'if';
+		$S0 := 'unless' if $pasttype eq $S0;
+		$ops.push($exprpost);
+		$ops.push_pirop($S0, $exprpost, $endlabel);
+		$ops.push($thenpost) if pir::defined($thenpost);
+		$ops.push($endlabel);
+		return $ops;
+	}
 
-        if null elsepost goto no_elsepost
-
-        ops.'push'(exprpost)
-        ops.'push_pirop'(pasttype, exprpost, thenlabel)
-        if null elsepost goto else_done
-        ops.'push'(elsepost)
-      else_done:
-        ops.'push_pirop'('goto', endlabel)
-        ops.'push'(thenlabel)
-        if null thenpost goto then_done
-        ops.'push'(thenpost)
-      then_done:
-        ops.'push'(endlabel)
-        .return (ops)
-
-      no_elsepost:
-        $S0 = 'if'
-        unless pasttype == $S0 goto no_elsepost_1
-        $S0 = 'unless'
-      no_elsepost_1:
-        ops.'push'(exprpost)
-        ops.'push_pirop'($S0, exprpost, endlabel)
-        if null thenpost goto no_elsepost_2
-        ops.'push'(thenpost)
-      no_elsepost_2:
-        ops.'push'(endlabel)
-        .return (ops)
-
-      make_childpost:
-        null childpost
-        $I0 = defined childpast
-        unless $I0 goto no_childpast
-        .local pmc arglist
-        arglist = new 'ResizablePMCArray'
-        $I0 = childpast.'arity'()
-        unless $I0 > 0 goto have_arglist
-        push arglist, exprpost
-      have_arglist:
-        childpost = self.'as_post'(childpast, 'rtype'=>childrtype, 'arglist'=>arglist)
-        goto childpost_coerce
-      no_childpast:
-        if rtype == 'v' goto ret_childpost
-        childpost = opsclass.'new'('result'=>exprpost)
-      childpost_coerce:
-        unless result goto ret_childpost
-        childpost = self.'coerce'(childpost, result)
-      ret_childpost:
-        local_return jmpstack
-    }
+	sub make_childpost($childpast?) {
+		my $childpost;
+		if pir::defined($childpast) {
+			my @arglist := [];
+			pir::push(@arglist, $exprpost) if $childpast.arity() > 0;
+			$childpost := self.as_post($childpast,
+				:rtype($childrtype), :arglist(@arglist));
+		} else {
+			return $childpost if $rtype eq 'v';
+			$childpost := POST::Ops.new(:result($exprpost));
+		}
+		$childpost := self.coerce($childpost, $result) if $result;
+		$childpost;
+	}
 }
 
 multi method unless(PAST::Op $node, *%options) {
