@@ -20,14 +20,42 @@
 /* Abstract access to fields in Parrot_Interp */
 #define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
-/* Flags used to alter and identify the current state of the debugger */
+/* Flags used to alter and identify the current state of the debugger   */
 typedef enum {
-    HBDB_SRC_LOADED = 0x0001,    /* Source code for debugge is loaded */
-    HBDB_STOPPED    = 0x0002,    /* Debugger is stopped/paused        */
-    HBDB_RUNNING    = 0x0004,    /* Debugger is running               */
-    HBDB_EXIT       = 0x0008,    /* Debugger is about to exit         */
-    HBDB_ENTERED    = 0x0016     /* Debugger has been started         */
+    HBDB_SRC_LOADED   = 0x0001,    /* Source code for debugge is loaded */
+    HBDB_STOPPED      = 0x0002,    /* Debugger is stopped/paused        */
+    HBDB_RUNNING      = 0x0004,    /* Debugger is running               */
+    HBDB_EXIT         = 0x0008,    /* Debugger is about to exit         */
+    HBDB_ENTERED      = 0x0016     /* Debugger has been started         */
 } hbdb_state_t;
+
+/* Flags used to associate a condition with a breakpoint or watchpoint  */
+typedef enum {
+    HBDB_COND_INT     = 0x0001,    /* Integer                           */
+    HBDB_COND_NUM     = 0x0002,    /* Number                            */
+    HBDB_COND_STR     = 0x0004,    /* String                            */
+    HBDB_COND_PMC     = 0x0008,    /* PMC                               */
+
+    HBDB_COND_GT      = 0x0016,    /* Greater than                      */
+    HBDB_COND_GE      = 0x0032,    /* Greater than or equal to          */
+    HBDB_COND_LT      = 0x0064,    /* Less than                         */
+    HBDB_COND_LE      = 0x0128,    /* Less than or equal to             */
+    HBDB_COND_EQ      = 0x0256,    /* Equal to                          */
+    HBDB_COND_NE      = 0x0512,    /* Not equal to                      */
+
+    HBDB_COND_CONST   = 0x1024,    /* Constant                          */
+    HBDB_COND_NOTNULL = 0x2048     /* Not null                          */
+} hbdb_condition_flag;
+
+/* Conditions that can be associated with a breakpoint or watchpoint    */
+typedef struct hbdb_condition hbdb_condition;
+
+typedef struct hbdb_condition {
+    hbdb_condition_flag type;    /* Type of condition                   */
+    unsigned char       reg;     /* Register involved                   */
+    void               *value;   /* Actual value given by user          */
+    hbdb_condition     *next;    /* Next condition (watchpoints only)   */
+} hbdb_condition_t;
 
 /* Contains details about the source file being debugged     */
 typedef struct {
@@ -39,24 +67,24 @@ typedef struct {
     /*hbdb_label_t *label;*/    /* First label               */
 } hbdb_file_t;
 
-/* Linked list that contains details about each individual breakpoint         */
+/* Linked list that contains details about each individual breakpoint          */
 typedef struct hbdb_breakpoint hbdb_breakpoint;
 
 typedef struct hbdb_breakpoint {
-    unsigned long     id;               /* ID number                          */
-    opcode_t         *pc;               /* Address of opcode to break at      */
-    unsigned long     line;             /* Line number in source file         */
-    long              skip;             /* Number of times to skip breakpoint */
-    /*hbdb_condition_t *condition;*/    /* Condition attached to breakpoint   */
-    hbdb_breakpoint  *prev;             /* Previous breakpoint in the list    */
-    hbdb_breakpoint  *next;             /* Next breakpoint in the list        */
+    unsigned long          id;           /* ID number                          */
+    opcode_t              *pc;           /* Address of opcode to break at      */
+    unsigned long          line;         /* Line number in source file         */
+    long                   skip;         /* Number of times to skip breakpoint */
+    hbdb_condition_flag   *condition;    /* Condition attached to breakpoint   */
+    hbdb_breakpoint       *prev;         /* Previous breakpoint in the list    */
+    hbdb_breakpoint       *next;         /* Next breakpoint in the list        */
 } hbdb_breakpoint_t;
 
 /* The debugger's core type. Contains information that's used by the hbdb runcore  */
 typedef struct {
     hbdb_file_t       *file;               /* Source file                          */
     hbdb_breakpoint_t *breakpoint;         /* First breakpoint in list             */
-    /*hbdb_condition_t  *watchpoint;*/     /* First watchpoint                     */
+    hbdb_condition    *watchpoint;         /* First watchpoint                     */
     unsigned long      breakpoint_skip;    /* Number of breakpoints to skip        */
     char              *current_command;    /* Command being executed               */
     char              *last_command;       /* Last command executed                */
