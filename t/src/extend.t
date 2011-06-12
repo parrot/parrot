@@ -14,7 +14,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 21;
+plan tests => 22;
 
 =head1 NAME
 
@@ -102,6 +102,31 @@ main(int argc, const char *argv[])
 
         printf("%d\n", (int)new_value);
         Parrot_destroy(interp);
+    }
+    return 0;
+}
+
+CODE
+42
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_fprintf');
+#include <stdio.h>
+// This is to get Parrot_io_STDOUT, is there a better way?
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_PMC pio;
+    Parrot_Interp interp  = Parrot_new(NULL);
+    pio = Parrot_io_STDOUT(interp);
+
+    /* Interpreter set-up */
+    if (interp) {
+        Parrot_fprintf(interp, pio,"42\n");
     }
     return 0;
 }
