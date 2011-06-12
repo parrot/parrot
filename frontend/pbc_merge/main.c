@@ -534,7 +534,9 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 static opcode_t
 map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_offset)
 {
-    /* TODO: is this correct? */
+    /* TODO: is this correct?
+     * Generates warning: operation on 'data_cursor' may be undefined
+     */
     return in_offset + input->code_start;
 }
 
