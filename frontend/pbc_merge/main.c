@@ -515,7 +515,8 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         if (in_ann == NULL)
             continue;
 
-        bc_ann->base.data = mem_gc_realloc_n_typed(interp, bc_ann->base.data, bc_ann->base.size, opcode_t);
+        bc_ann->base.data =
+            mem_gc_realloc_n_typed(interp, bc_ann->base.data, bc_ann->base.size, opcode_t);
         data_cursor = 0;
         for (j = 1; j < num_keys; j++) {
             PackFile_Annotations_Key * const cur_key = &in_ann->keys[j];
@@ -524,7 +525,8 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 map_ann_offset(interp, inputs[i], in_ann->base.data[data_cursor++]),
                 cur_key->name,
                 cur_key->type,
-                map_ann_constant_idx(interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type)
+                map_ann_constant_idx(
+                    interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type)
             );
         }
     }
@@ -538,7 +540,8 @@ map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_o
 }
 
 static INTVAL
-map_ann_constant_idx(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t old_idx, pf_ann_key_type_t type)
+map_ann_constant_idx(PARROT_INTERP, ARGIN(const pbc_merge_input *input),
+        opcode_t old_idx, pf_ann_key_type_t type)
 {
     if (old_idx == 0)
         return old_idx;
