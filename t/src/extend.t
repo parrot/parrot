@@ -135,7 +135,7 @@ CODE
 42
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf with no interp');
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf/Parrot_eprintf with no interp');
 #include <stdio.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
@@ -144,10 +144,12 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_printf(NULL,"42\n");
+    Parrot_eprintf(NULL,"42\n");
     return 0;
 }
 
 CODE
+42
 42
 OUTPUT
 
