@@ -509,6 +509,8 @@ static void
 pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode * cur_cs))
 {
+    ASSERT_ARGS(pbc_merge_annotations)
+
     int i, j;
     STRING * const name = Parrot_sprintf_c(interp, "%Ss_ANN", cur_cs->base.name);
     PackFile_Annotations * const bc_ann = (PackFile_Annotations *)
@@ -559,6 +561,8 @@ map the offset to the annotation and constant idx
 static opcode_t
 map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_offset)
 {
+    ASSERT_ARGS(map_ann_offset)
+
     /* TODO: is this correct?
      * Generates warning: operation on 'data_cursor' may be undefined
      */
@@ -569,6 +573,8 @@ static INTVAL
 map_ann_constant_idx(PARROT_INTERP, ARGIN(const pbc_merge_input *input),
         opcode_t old_idx, pf_ann_key_type_t type)
 {
+    ASSERT_ARGS(map_ann_constant_idx)
+
     if (old_idx == 0)
         return old_idx;
 
