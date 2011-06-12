@@ -14,7 +14,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 20;
+plan tests => 21;
 
 =head1 NAME
 
@@ -110,6 +110,22 @@ CODE
 42
 OUTPUT
 
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf with no interp');
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_printf(NULL,"42\n");
+    return 0;
+}
+
+CODE
+42
+OUTPUT
+
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_numreg' );
 
 #include <stdio.h>
@@ -150,7 +166,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_String output;
+    Parrot_String output, output2;
 
     /* Interpreter set-up */
     if (interp) {
