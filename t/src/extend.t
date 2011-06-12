@@ -14,7 +14,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 22;
+plan tests => 23;
 
 =head1 NAME
 
@@ -29,6 +29,14 @@ t/src/extend.t - Parrot Extension API
 Tests the extension API.
 
 =cut
+
+sub linedirective
+{
+    # Provide a #line directive for the C code in the heredoc
+    # starting immediately after where this sub is called.
+    my $linenum = shift() + 1;
+    return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
+}
 
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
 #include <stdio.h>
@@ -269,6 +277,56 @@ main(int argc, const char *argv[])
 }
 CODE
 101010
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, string;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = new_interp();
+
+    string = createstring(interp, "PIR");
+    str    = Parrot_str_to_cstring(interp, string);
+
+    Parrot_free_cstring(str);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
