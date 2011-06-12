@@ -302,7 +302,7 @@ NB: this method will destroy all old data!
         It will create STRING* keys hash.
         */
 
-        if (old_hash && old_hash->entry_type == type)
+        if (old_hash && old_hash->entry_type == (Hash_key_type)type)
             return;
 
         switch (type) {

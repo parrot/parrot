@@ -1065,7 +1065,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
             pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
             PMC              *pmc  = &(item->pmc);
 
-            PARROT_ASSERT(PObj_constant_TEST(pmc) || POBJ2GEN(pmc) == i);
+            PARROT_ASSERT(PObj_constant_TEST(pmc) || (int)POBJ2GEN(pmc) == i);
 
             /* Paint live objects white */
             if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc)) {

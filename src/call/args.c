@@ -1117,7 +1117,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             return;
         }
 
-        if (named_used_list == NULL || h->entries > named_count)
+        if (named_used_list == NULL || (int)h->entries > named_count)
             named_argument_arity_error(interp, h->entries,
                                        named_used_list, h);
     }
