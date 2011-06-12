@@ -69,32 +69,6 @@ extern op_lib_t core_op_lib;
 
 
 
-PARROT_WARN_UNUSED_RESULT
-PMC *
-parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
-{
-    PMC *pmc;
-    PMC *const classobj = Parrot_oo_get_class(interp, key);
-
-    if (!PMC_IS_NULL(classobj))
-        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
-    else {
-        const INTVAL type = Parrot_pmc_get_type(interp, key);
-
-        if (type <= 0) {
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
-                VTABLE_get_repr(interp, key));
-        }
-
-        pmc = Parrot_pmc_new(interp, type);
-    }
-
-    return pmc;
-}
-
-
-
 INTVAL core_numops = 1072;
 
 /*
@@ -22253,7 +22227,7 @@ opcode_t *
 Parrot_fetch_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22264,7 +22238,7 @@ opcode_t *
 Parrot_fetch_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22275,7 +22249,7 @@ opcode_t *
 Parrot_fetch_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22286,7 +22260,7 @@ opcode_t *
 Parrot_fetch_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22297,7 +22271,7 @@ opcode_t *
 Parrot_fetch_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22308,7 +22282,7 @@ opcode_t *
 Parrot_fetch_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22319,7 +22293,7 @@ opcode_t *
 Parrot_fetch_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22330,7 +22304,7 @@ opcode_t *
 Parrot_fetch_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22341,7 +22315,7 @@ opcode_t *
 Parrot_fetch_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22352,7 +22326,7 @@ opcode_t *
 Parrot_fetch_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22363,7 +22337,7 @@ opcode_t *
 Parrot_fetch_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22374,7 +22348,7 @@ opcode_t *
 Parrot_fetch_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22385,7 +22359,7 @@ opcode_t *
 Parrot_fetch_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22396,7 +22370,7 @@ opcode_t *
 Parrot_fetch_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22407,7 +22381,7 @@ opcode_t *
 Parrot_fetch_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22418,7 +22392,7 @@ opcode_t *
 Parrot_fetch_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22429,7 +22403,7 @@ opcode_t *
 Parrot_fetch_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22440,7 +22414,7 @@ opcode_t *
 Parrot_fetch_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22451,7 +22425,7 @@ opcode_t *
 Parrot_fetch_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22462,7 +22436,7 @@ opcode_t *
 Parrot_fetch_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22473,7 +22447,7 @@ opcode_t *
 Parrot_fetch_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22484,7 +22458,7 @@ opcode_t *
 Parrot_fetch_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22495,7 +22469,7 @@ opcode_t *
 Parrot_fetch_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22506,7 +22480,7 @@ opcode_t *
 Parrot_fetch_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
     }
 
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22517,7 +22491,7 @@ opcode_t *
 Parrot_vivify_p_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed(interp, PREG(2), PREG(3), PREG(1));
     }
 
@@ -22529,7 +22503,7 @@ opcode_t *
 Parrot_vivify_p_pc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed(interp, PCONST(2), PREG(3), PREG(1));
     }
 
@@ -22541,7 +22515,7 @@ opcode_t *
 Parrot_vivify_p_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed(interp, PREG(2), PCONST(3), PREG(1));
     }
 
@@ -22553,7 +22527,7 @@ opcode_t *
 Parrot_vivify_p_pc_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed(interp, PCONST(2), PCONST(3), PREG(1));
     }
 
@@ -22565,7 +22539,7 @@ opcode_t *
 Parrot_vivify_p_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed(interp, PREG(2), PREG(3), PREG(1));
     }
 
@@ -22577,7 +22551,7 @@ opcode_t *
 Parrot_vivify_p_pc_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed(interp, PCONST(2), PREG(3), PREG(1));
     }
 
@@ -22589,7 +22563,7 @@ opcode_t *
 Parrot_vivify_p_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PREG(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed(interp, PREG(2), PCONST(3), PREG(1));
     }
 
@@ -22601,7 +22575,7 @@ opcode_t *
 Parrot_vivify_p_pc_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed(interp, PCONST(2), PCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed(interp, PCONST(2), PCONST(3), PREG(1));
     }
 
@@ -22613,7 +22587,7 @@ opcode_t *
 Parrot_vivify_p_p_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_int(interp, PREG(2), IREG(3), PREG(1));
     }
 
@@ -22625,7 +22599,7 @@ opcode_t *
 Parrot_vivify_p_pc_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_int(interp, PCONST(2), IREG(3), PREG(1));
     }
 
@@ -22637,7 +22611,7 @@ opcode_t *
 Parrot_vivify_p_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_int(interp, PREG(2), ICONST(3), PREG(1));
     }
 
@@ -22649,7 +22623,7 @@ opcode_t *
 Parrot_vivify_p_pc_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_int(interp, PCONST(2), ICONST(3), PREG(1));
     }
 
@@ -22661,7 +22635,7 @@ opcode_t *
 Parrot_vivify_p_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_int(interp, PREG(2), IREG(3), PREG(1));
     }
 
@@ -22673,7 +22647,7 @@ opcode_t *
 Parrot_vivify_p_pc_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), IREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_int(interp, PCONST(2), IREG(3), PREG(1));
     }
 
@@ -22685,7 +22659,7 @@ opcode_t *
 Parrot_vivify_p_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PREG(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_int(interp, PREG(2), ICONST(3), PREG(1));
     }
 
@@ -22697,7 +22671,7 @@ opcode_t *
 Parrot_vivify_p_pc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_int(interp, PCONST(2), ICONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_int(interp, PCONST(2), ICONST(3), PREG(1));
     }
 
@@ -22709,7 +22683,7 @@ opcode_t *
 Parrot_vivify_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_str(interp, PREG(2), SREG(3), PREG(1));
     }
 
@@ -22721,7 +22695,7 @@ opcode_t *
 Parrot_vivify_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_str(interp, PCONST(2), SREG(3), PREG(1));
     }
 
@@ -22733,7 +22707,7 @@ opcode_t *
 Parrot_vivify_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_str(interp, PREG(2), SCONST(3), PREG(1));
     }
 
@@ -22745,7 +22719,7 @@ opcode_t *
 Parrot_vivify_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PREG(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PREG(4));
         VTABLE_set_pmc_keyed_str(interp, PCONST(2), SCONST(3), PREG(1));
     }
 
@@ -22757,7 +22731,7 @@ opcode_t *
 Parrot_vivify_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_str(interp, PREG(2), SREG(3), PREG(1));
     }
 
@@ -22769,7 +22743,7 @@ opcode_t *
 Parrot_vivify_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SREG(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_str(interp, PCONST(2), SREG(3), PREG(1));
     }
 
@@ -22781,7 +22755,7 @@ opcode_t *
 Parrot_vivify_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PREG(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_str(interp, PREG(2), SCONST(3), PREG(1));
     }
 
@@ -22793,7 +22767,7 @@ opcode_t *
 Parrot_vivify_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = VTABLE_get_pmc_keyed_str(interp, PCONST(2), SCONST(3));
     if (PMC_IS_NULL(PREG(1))) {
-        PREG(1) = parrot_pmc_new_from_type(interp, PCONST(4));
+        PREG(1) = Parrot_pmc_new_from_type(interp, PCONST(4));
         VTABLE_set_pmc_keyed_str(interp, PCONST(2), SCONST(3), PREG(1));
     }
 

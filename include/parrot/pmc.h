@@ -115,6 +115,13 @@ PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_init(PARROT_INTERP,
     INTVAL base_type,
     ARGOUT(PMC *init))
@@ -229,6 +236,9 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pmc_new_constant_noinit \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_new_from_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(init))
