@@ -494,6 +494,17 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     debug_seg->num_mappings = num_mappings;
 }
 
+/*
+
+=item C<static void pbc_merge_annotations(PARROT_INTERP, pbc_merge_input
+**inputs, int num_inputs, PackFile *pf, PackFile_ByteCode * cur_cs)>
+
+merge annotations
+
+=cut
+
+*/
+
 static void
 pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode * cur_cs))
@@ -530,6 +541,20 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
     }
 }
+
+/*
+
+=item C<static opcode_t map_ann_offset(PARROT_INTERP, const pbc_merge_input
+*input, opcode_t in_offset)>
+
+=item C<static INTVAL map_ann_constant_idx(PARROT_INTERP, const pbc_merge_input
+*input, opcode_t old_idx, pf_ann_key_type_t type)>
+
+map the offset to the annotation and constant idx
+
+=cut
+
+*/
 
 static opcode_t
 map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_offset)
