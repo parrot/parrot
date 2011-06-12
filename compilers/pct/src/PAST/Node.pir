@@ -128,7 +128,7 @@ variable is being used in an lvalue context.
 
 Get/set the order in which children nodes should be evaluated
 (via Compiler::post_children).  If C<order> is 'right' then
-children are evaluated last-to-first, otherwise they're 
+children are evaluated last-to-first, otherwise they're
 evaluated first-to-last.
 
 =cut
@@ -845,7 +845,7 @@ Perl 6 compilers mailing lists.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, Parrot Foundation.
+Copyright (C) 2006-2011, Parrot Foundation.
 
 =cut
 
