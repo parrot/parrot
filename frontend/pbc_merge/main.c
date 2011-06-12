@@ -526,8 +526,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 cur_key->name,
                 cur_key->type,
                 map_ann_constant_idx(
-                    interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type)
-            );
+                    interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type));
         }
     }
 }
