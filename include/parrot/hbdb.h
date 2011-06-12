@@ -20,116 +20,52 @@
 /* Abstract access to fields in Parrot_Interp */
 #define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
-/* Type:
- *     hbdb_state_t
- *
- * Fields:
- *     HBDB_SRC_LOADED - source code for debugee is loaded
- *     HBDB_STOPPED    - debugger is stopped/paused
- *     HBDB_RUNNING    - debugger is running
- *     HBDB_EXIT       - debugger is about to exit
- *     HBDB_ENTERED    - debugger has been started
- *
- * Overview:
- *     These flags are used to alter and identify the current state of the
- *     debugger.
- */
-
+/* Flags used to alter and identify the current state of the debugger */
 typedef enum {
-    HBDB_SRC_LOADED = 0x0001,
-    HBDB_STOPPED    = 0x0002,
-    HBDB_RUNNING    = 0x0004,
-    HBDB_EXIT       = 0x0008,
-    HBDB_ENTERED    = 0x0016
+    HBDB_SRC_LOADED = 0x0001,    /* Source code for debugge is loaded */
+    HBDB_STOPPED    = 0x0002,    /* Debugger is stopped/paused        */
+    HBDB_RUNNING    = 0x0004,    /* Debugger is running               */
+    HBDB_EXIT       = 0x0008,    /* Debugger is about to exit         */
+    HBDB_ENTERED    = 0x0016     /* Debugger has been started         */
 } hbdb_state_t;
 
-/* Type:
- *     hbdb_file_t
- *
- * Fields:
- *     filename  - name of source file
- *     source    - source code in "filename"
- *     size      - size of file in bytes
- *     next_line - next line to list
- *     line      - first line of source code
- *     label     - first label
- *
- * Overview:
- *     Contains details about the source file being debugged.
- */
-
+/* Contains details about the source file being debugged     */
 typedef struct {
-    char         *filename;
-    char         *source;
-    size_t        size;
-    unsigned long next_line;
-    /*hbdb_line_t  *line;*/
-    /*hbdb_label_t *label;*/
+    char         *filename;     /* Name of source file       */
+    char         *source;       /* Source code in "filename" */
+    size_t        size;         /* Size of file in bytes     */
+    unsigned long next_line;    /* Next line to list         */
+    /*hbdb_line_t  *line;*/     /* First line of source code */
+    /*hbdb_label_t *label;*/    /* First label               */
 } hbdb_file_t;
 
-/* Type:
- *     hbdb_breakpoint_t
- *
- * Fields:
- *     id        - identification number
- *     pc        - address of opcode to break at
- *     line      - line number in source file
- *     skip      - number of times to skip breakpoint
- *     condition - condition attached to breakpoint
- *     prev      - previous breakpoint in the list
- *     next      - next breakpoint in the list
- *
- * Overview:
- *     Contains details about a particular breakpoint. Node type in linked
- *     list of breakpoints.
- */
-
+/* Linked list that contains details about each individual breakpoint         */
 typedef struct hbdb_breakpoint hbdb_breakpoint;
 
 typedef struct hbdb_breakpoint {
-    unsigned long     id;
-    opcode_t         *pc;
-    unsigned long     line;
-    long              skip;
-    /*hbdb_condition_t *condition;*/
-    hbdb_breakpoint  *prev;
-    hbdb_breakpoint  *next;
+    unsigned long     id;               /* ID number                          */
+    opcode_t         *pc;               /* Address of opcode to break at      */
+    unsigned long     line;             /* Line number in source file         */
+    long              skip;             /* Number of times to skip breakpoint */
+    /*hbdb_condition_t *condition;*/    /* Condition attached to breakpoint   */
+    hbdb_breakpoint  *prev;             /* Previous breakpoint in the list    */
+    hbdb_breakpoint  *next;             /* Next breakpoint in the list        */
 } hbdb_breakpoint_t;
 
-/* Type:
- *     hbdb_t
- *
- * Fields:
- *     file            - source code file
- *     breakpoint      - first breakpoint in list
- *     watchpoint      - first watchpoint
- *     breakpoint_skip - number of breakpoints to skip
- *     current_command - command being executed
- *     last_command    - last command executed
- *     current_opcode  - current opcode
- *     state           - status of the program being debugged
- *     debugee         - interpreter we are debugging
- *     debugger        - debugger interpreter
- *
- * Overview:
- *     The debugger's core type. Contains information that's used by the hbdb
- *     runcore.
- */
-
+/* The debugger's core type. Contains information that's used by the hbdb runcore  */
 typedef struct {
-    hbdb_file_t       *file;
-    hbdb_breakpoint_t *breakpoint;
-    /*hbdb_condition_t  *watchpoint;*/
-    unsigned long      breakpoint_skip;
-    char              *current_command;
-    char              *last_command;
-    opcode_t          *current_opcode;
-    hbdb_state_t       state;
-    Interp            *debugee;
-    Interp            *debugger;
-    unsigned long      tracing;
-    FILE              *script_file;
-    unsigned long      script_line;
+    hbdb_file_t       *file;               /* Source file                          */
+    hbdb_breakpoint_t *breakpoint;         /* First breakpoint in list             */
+    /*hbdb_condition_t  *watchpoint;*/     /* First watchpoint                     */
+    unsigned long      breakpoint_skip;    /* Number of breakpoints to skip        */
+    char              *current_command;    /* Command being executed               */
+    char              *last_command;       /* Last command executed                */
+    opcode_t          *current_opcode;     /* Current opcode                       */
+    hbdb_state_t       state;              /* Status of debugger                   */
+    Interp            *debugee;            /* Debugee interpreter                  */
+    Interp            *debugger;           /* Debugger interpreter                 */
+    /*FILE              *script_file;*/    /* Script file                          */
+    /*unsigned long      script_line;*/    /* Line in "script_file" being executed */
 } hbdb_t;
 
 /* HEADERIZER BEGIN: src/hbdb.c */
