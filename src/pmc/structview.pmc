@@ -61,7 +61,7 @@ END_PMC_HEADER_PREAMBLE
     (k)     = Parrot_key_next((interp), (k));                      \
     i       = Parrot_key_integer((interp), (k));                   \
     (k)     = orig_k;                                              \
-    if (i < 0 || n_elts <= i)                                      \
+    if (i < 0 || n_elts <= (size_t)i)                              \
         Parrot_ex_throw_from_c_args((interp), NULL, 0,             \
                 "Struct index out of bounds (%d)",                 \
                 i);                                                \
@@ -507,7 +507,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
               default:
                   break;
             }
-            break;
+            /* should not get here - inserted to avoid compiler warnings */
+            return 0;
           case unaligned_access:
             {
                 INTVAL           acc      = 0;
@@ -541,7 +542,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
 
                 return acc;
             }
-            break;
+            /* should not get here - inserted to avoid compiler warnings */
+            return 0;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Not a valid integer type (`%Ss')",
@@ -609,7 +611,7 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 /* write hi bits of first byte */
                 n        = 8 - elts[i].bit_offset;
                 *cptr   &= (1 << elts[i].bit_offset) - 1;
-                *cptr++ |= (ux & (1 << n) - 1) << elts[i].bit_offset;
+                *cptr++ |= (ux & ((1 << n) - 1)) << elts[i].bit_offset;
 
                 /* write whole bytes until complete */
                 while (n < bits) {
@@ -779,11 +781,13 @@ any other type of element.
                     VTABLE_set_integer_native(INTERP, ret, elts[i].size);
                     return ret;
                   default:
-                      break;
+                      /* should never get here - put in to quiet compiler warnings */
+                      return NULL;
                 }
             }
           default:
-              break;
+              /* should never get here - put in to quiet compiler warnings */
+              return NULL;
         }
     }
 
@@ -944,7 +948,7 @@ Return a C<Ptr> to the C<n>th element of an array of structs.
         if (!p)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Attempt to dereference null pointer");
-        if (array_size && array_size < size * n)
+        if (array_size && array_size < (int)size * n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Buffer length too small for struct array "
                         "(at least %d required, got %d)",
@@ -980,7 +984,7 @@ Return a C<Ptr> to the C<n>th element of a struct.
         GET_ATTR_elts(INTERP, SELF, elts);
 
         /* sanity checks */
-        if (n < 0 || n_elts <= n)
+        if (n < 0 || n_elts <= (size_t)n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Struct index out of bounds (%d)", n);
         if (!p)
@@ -1060,7 +1064,7 @@ The returned array is of the same format as the one used for C<StructView.init_p
               break;
         }
 
-        for (i = 1, j = 1; i <= n; i++) {
+        for (i = 1, j = 1; i <= (int)n; i++) {
             switch (pack_type) {
               case enum_type_struct:
               case enum_type_union:
