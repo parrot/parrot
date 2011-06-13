@@ -60,8 +60,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-extern int Parrot_exec_run;
-
 /*
 
 =item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
