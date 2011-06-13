@@ -164,6 +164,45 @@ Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
+=item C<PMC * Parrot_pmc_new_from_type(PARROT_INTERP, PMC *key)>
+
+Creates a new PMC of type C<key>. You probably do not want this function as
+it is only used by a few experimental opcodes. See C<Parrot_pmc_new()> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
+{
+    ASSERT_ARGS(Parrot_pmc_new_from_type)
+
+    PMC *pmc;
+    PMC *const classobj = Parrot_oo_get_class(interp, key);
+
+    if (!PMC_IS_NULL(classobj))
+        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, key);
+
+        if (type <= 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
+                VTABLE_get_repr(interp, key));
+        }
+
+        pmc = Parrot_pmc_new(interp, type);
+    }
+
+    return pmc;
+}
+
+/*
+
 =item C<PMC * Parrot_pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL
 flags)>
 

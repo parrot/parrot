@@ -10,6 +10,8 @@ use Fatal qw(open);
 use File::Find;
 use File::Spec;
 use Test::More;
+use lib qw( lib );
+use Parrot::Config;
 
 =head1 NAME
 
@@ -57,6 +59,10 @@ our %deps;
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # skip pmcs - we don't handle inheritance correctly
     next if $file =~ m{^src/(?:dyn)?pmc/};
+    next if ($file eq 'src/nci/core_thunks.c' and
+        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_CORE_NCI_THUNKS});
+    next if ($file eq 'src/nci/extra_thunks.c' and
+        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_EXTRA_NCI_THUNKS});
 
     open my $fh, '<', $file;
     my $guts;

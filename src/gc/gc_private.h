@@ -158,7 +158,7 @@ typedef struct GC_Subsystem {
     void (*mark_pmc_header)(PARROT_INTERP, ARGMOD(PMC *));
 
     void* (*allocate_pmc_attributes)(PARROT_INTERP, ARGMOD(PMC *));
-    void (*free_pmc_attributes)(PARROT_INTERP, ARGMOD(PMC *));
+    void (*free_pmc_attributes)(PARROT_INTERP, ARGFREE(PMC *));
 
     void (*allocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
     void (*reallocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
@@ -167,7 +167,7 @@ typedef struct GC_Subsystem {
     void (*reallocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize);
 
     void* (*allocate_fixed_size_storage)(PARROT_INTERP, size_t size);
-    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, ARGMOD(void *));
+    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, ARGFREE(void *));
 
     void* (*allocate_memory_chunk)(PARROT_INTERP, size_t size);
     void* (*reallocate_memory_chunk)(PARROT_INTERP, ARGFREE(void *data), size_t newsize);

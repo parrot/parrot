@@ -131,6 +131,7 @@ include compilers/pct/Defines.mak
 include compilers/opsc/Defines.mak
 include ext/nqp-rx/Defines.mak
 include compilers/data_json/Defines.mak
+include ext/winxed/Defines.mak
 
 ###############################################################################
 #
@@ -530,6 +531,7 @@ NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PROVE               = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
+WINXED              = .@slash@winxed$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
@@ -543,6 +545,7 @@ INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 INSTALLABLEPROVE     = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
+INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -624,6 +627,8 @@ all : \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
     $(NQP_LIB_PBCS) \
+    $(WINXED_LANG) \
+    $(WINXED) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
@@ -662,7 +667,7 @@ $(LIBRARY_DIR)/Test/More.pbc:
 
 $(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/math_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
@@ -834,7 +839,7 @@ world : parrot_utils
 
 parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
@@ -2250,6 +2255,7 @@ clean : \
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
+	$(RM_F) $(WINXED_CLEANUPS)
 	$(RM_RF) blib
 
 prog-clean :
@@ -2269,11 +2275,13 @@ prog-clean :
     $(INSTALLABLENQP) \
     $(INSTALLABLENCITHUNKGEN) \
     $(INSTALLABLEPROVE) \
+    $(INSTALLABLEWINXED) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     $(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
     ops2c.pbc ops2c.c ops2c$(O) ops2c$(EXE) ops2c.pir \
     parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
+    winxed.pbc winxed.c winxed$(O) $(WINXED) \
     compilers/imcc/main$(O) \
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
@@ -3053,6 +3061,7 @@ include compilers/opsc/Rules.mak
 include compilers/tge/Rules.mak
 include compilers/data_json/Rules.mak
 include ext/nqp-rx/Rules.mak
+include ext/winxed/Rules.mak
 
 # Local variables:
 #   mode: makefile

@@ -7,14 +7,16 @@ src/extend.c - Parrot extension interface
 
 =head1 DESCRIPTION
 
-These are the functions that parrot extensions (i.e. parrot subroutines
-written in C, or some other compiled language, rather than in parrot
-bytecode) may access.
+These are utility functions which extension code may use, but which are
+typically not used by Parrot internally. These functions are for EXTENDING
+use only, not for EMBEDDING. Embedding should be handed through the embedding
+API in src/embed/*.c.
 
-There is a deliberate distancing from the internals here. Don't go
-peeking inside -- you've as much access as bytecode does, but no more,
-so we can provide backwards compatibility for as long as we possibly
-can.
+Extending situations are things like NCI function libraries, dyn-pmc and
+dyn-op libraries which are loaded into Parrot and called from Parrot (as
+opposed to embedding, where an external program calls into Parrot). These
+functions assume the existance of an interpreter, memory management through
+GC and stackwalking, and the presence of an exception-handling infrastructure.
 
 =head2 Functions
 
@@ -24,11 +26,30 @@ can.
 
 */
 
-/* Some internal notes. Parrot will die a horrible and bizarre death
-   if the stack start pointer's not set and a GC run is
-   triggered. The pointer *will* be set by the interpreter if the
-   interpreter calls code which calls these functions, so most
-   extension code is safe, no problem.
+/* DO NOT CALL THESE FUNCTIONS WITHOUT LIBPARROT, OR FROM OUTSIDE LIBPARROT!!
+
+   These functions presume that GC is available and is properly configured
+   (setting the stacktop for stack walking, etc) and that there is an active
+   exception-handling infrastructure. Calling these functions when there is
+   no exception handlers available, including a default top-level handler, or
+   when the GC is not properly initialized can lead to big problems. Be sure
+   to understand the difference between an embedding and an extending
+   situation. Using the wrong kind of function in the wrong situation, or
+   combining some functions from the Embedding API with functions from the
+   extending API is a recipe for disaster. We (Parrot developers) will not be
+   held responsible if you insist on making these kinds of mistakes.
+
+   If there are utility functions that *YOU* as a user of parrot need from
+   either the extending or the embedding API, please request them or attempt
+   to write them yourself. Blindly mixing things from the wrong API, or
+   calling a function in the wrong context will cause you problems.
+
+   You have been warned.
+
+   Notice that the "Extending API" is a loosely-defined concept which is
+   currently understood to mean the sum of public APIs for various subsystems.
+   This definition may change in the future, but this is what we mean by the
+   phrase right now.
 
    The problem comes in if these routines are called from *outside*
    an interpreter. This happens when an embedding application calls

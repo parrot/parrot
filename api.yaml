@@ -2,7 +2,7 @@
 -
   name:     '"Advanced" NCI parameter types'
   eligible: '3.1'
-  ticket:   'http://trac.parrot.org/parrot/ticket/1931' 
+  ticket:   'http://trac.parrot.org/parrot/ticket/1931'
   tags:
     - 'deprecated'
     - 'completed'
@@ -476,3 +476,8 @@
     - 'api'
     - 'library'
   ticket:  ''
+-
+  name :  'Old Embed API Functions'
+  tags:
+    - 'deprecated'
+  ticket: 'http://trac.parrot.org/parrot/ticket/1910'

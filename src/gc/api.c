@@ -554,11 +554,13 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 Deallocates an attibutes structure from a PMC if it has the auto_attrs
 flag set.
 
+=cut
+
 */
 
 PARROT_EXPORT
 void
-Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_free_pmc_attributes)
     interp->gc_sys->free_pmc_attributes(interp, pmc);
@@ -571,6 +573,8 @@ size)>
 
 Allocates a fixed-size chunk of memory for use. This memory is not manually
 managed and needs to be freed with C<Parrot_gc_free_fixed_size_storage>
+
+=cut
 
 */
 
@@ -590,6 +594,8 @@ Parrot_gc_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 Manually deallocates fixed size storage allocated with
 C<Parrot_gc_allocate_fixed_size_storage>
+
+=cut
 
 */
 
@@ -619,6 +625,8 @@ Parrot_gc_reallocate_memory_chunk_with_interior_pointers(PARROT_INTERP, void
 *data, size_t newsize, size_t oldsize)>
 
 TODO Write docu.
+
+=cut
 
 */
 
@@ -840,6 +848,8 @@ Return the number of memory allocations made since the last collection run.
 =item C<UINTVAL Parrot_gc_impatient_pmcs(PARROT_INTERP)>
 
 Returns the number of PMCs that are marked as needing timely destruction.
+
+=cut
 
 */
 

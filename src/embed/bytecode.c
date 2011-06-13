@@ -48,11 +48,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *pbc = PackFile_read_pbc(interp, filename, 0);
-    if (PMC_IS_NULL(*pbc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "Could not load packfile");
-    do_sub_pragmas(interp, *pbc, PBC_PBC, NULL);
+    *pbc = Parrot_pf_read_pbc_file(interp, filename);
+    Parrot_pf_prepare_packfile_init(interp, *pbc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

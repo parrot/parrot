@@ -254,6 +254,7 @@
 /runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
+/runtime/parrot/languages/winxed
 /runtime/parrot/library/*.pbc
 /runtime/parrot/library/OpenGL_funcs.pir
 /runtime/parrot/library/PAST
@@ -357,7 +358,6 @@
 /src/nci/*.o
 /src/nci/*.obj
 /src/nci/*.str
-/src/ops/*.c
 /src/ops/*.o
 /src/ops/*.obj
 /src/packfile/*.o
@@ -522,6 +522,8 @@
 /src/string/encoding/*.gcda
 /src/string/encoding/*.gcno
 /src/string/encoding/*.gcov
+/winxed
+/winxed.*
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

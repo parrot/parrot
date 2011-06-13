@@ -516,6 +516,8 @@
 ^/runtime/parrot/languages/JSON/JSON\.pir/
 ^/runtime/parrot/languages/data_json$
 ^/runtime/parrot/languages/data_json/
+^/runtime/parrot/languages/winxed$
+^/runtime/parrot/languages/winxed/
 ^/runtime/parrot/library/.*\.pbc$
 ^/runtime/parrot/library/.*\.pbc/
 ^/runtime/parrot/library/Archive/.*\.pbc$
@@ -762,8 +764,6 @@
 ^/src/nci/.*\.str/
 ^/src/null_config\.c$
 ^/src/null_config\.c/
-^/src/ops/.*\.c$
-^/src/ops/.*\.c/
 ^/src/ops/.*\.gcda$
 ^/src/ops/.*\.gcda/
 ^/src/ops/.*\.gcno$
@@ -1042,6 +1042,10 @@
 ^/vc70\.pdb/
 ^/vtable\.dump$
 ^/vtable\.dump/
+^/winxed$
+^/winxed/
+^/winxed\..*$
+^/winxed\..*/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

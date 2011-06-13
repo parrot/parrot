@@ -30,7 +30,6 @@ package Parrot::Revision;
 
 use strict;
 use warnings;
-use File::Spec;
 use lib qw( lib );
 use Parrot::Configure::Utils qw( :cache );
 

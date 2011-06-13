@@ -40,8 +40,7 @@ or using the object oriented interface:
 
 =head1 DESCRIPTION
 
-This is a pure Parrot sha256 hash routine. You should run it with the JIT
-core if possible.
+This is a pure Parrot sha256 hash routine.
 
 =head1 SUBROUTINES
 

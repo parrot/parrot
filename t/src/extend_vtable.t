@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 139;
+plan tests => 140;
 
 =head1 NAME
 
@@ -157,8 +157,16 @@ CODE
     );
 
 }
-
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_ext_try coverage");
+    type         = Parrot_PMC_typenum(interp, "Object");
+    klass        = Parrot_PMC_new(interp, type);
+CODE
+Failed!
+Exception is: type 20 severity 2 message 'Object must be created by a class.'
+OUTPUT
+
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_instantiate");
     Parrot_PMC_instantiate(interp, pmc, pmc2);

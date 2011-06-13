@@ -60,340 +60,15 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-extern int Parrot_exec_run;
-
-/*
-
-=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
-
-Returns a new Parrot interpreter.
-
-The first created interpreter (C<parent> is C<NULL>) is the last one
-to get destroyed.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-Parrot_Interp
-Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
-{
-    ASSERT_ARGS(Parrot_new)
-    /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
-    return make_interpreter(parent, PARROT_NO_FLAGS);
-}
-
-
-/*
-
-=item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
-
-Initializes the new interpreter when it hasn't been initialized before.
-
-Additionally sets the stack top, so that Parrot objects created
-in inner stack frames will be visible during GC stack walking code.
-B<stack_top> should be the address of an automatic variable in the caller's
-stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
-frames so that they are not destroyed during GC runs.
-
-Use this function when you call into Parrot before entering a run loop.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
-{
-    ASSERT_ARGS(Parrot_init_stacktop)
-    interp->lo_var_ptr = stack_top;
-    Parrot_gbl_init_world_once(interp);
-}
-
-
-/*
-
-=item C<void Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)>
-
-Sets on any of the following flags, specified by C<flag>, in the interpreter:
-
-Flag                    Effect
-C<PARROT_BOUNDS_FLAG>   enable bounds checking
-C<PARROT_PROFILE_FLAG>  enable profiling,
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)
-{
-    ASSERT_ARGS(Parrot_set_flag)
-    /* These two macros (from interpreter.h) do exactly what they look like. */
-
-    Interp_flags_SET(interp, flag);
-    switch (flag) {
-      case PARROT_BOUNDS_FLAG:
-      case PARROT_PROFILE_FLAG:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        break;
-      default:
-        break;
-    }
-}
-
-
-/*
-
-=item C<void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)>
-
-Set a debug flag: C<PARROT_DEBUG_FLAG>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_set_debug)
-    interp->debug_flags |= flag;
-}
-
-
-/*
-
-=item C<void Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)>
-
-Sets the name of the executable launching Parrot (see C<pbc_to_exe> and the
-C<parrot> binary).
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
-{
-    ASSERT_ARGS(Parrot_set_executable_name)
-    PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, name_pmc, name);
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
-        name_pmc);
-}
-
-
-/*
-
-=item C<void Parrot_set_trace(PARROT_INTERP, Parrot_UInt flag)>
-
-Set a trace flag: C<PARROT_TRACE_FLAG>
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_trace(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_set_trace)
-    Parrot_pcc_trace_flags_on(interp, interp->ctx, flag);
-    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-}
-
-
-/*
-
-=item C<void Parrot_clear_flag(PARROT_INTERP, Parrot_Int flag)>
-
-Clears a flag in the interpreter.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_flag(PARROT_INTERP, Parrot_Int flag)
-{
-    ASSERT_ARGS(Parrot_clear_flag)
-    Interp_flags_CLEAR(interp, flag);
-}
-
-
-/*
-
-=item C<void Parrot_clear_debug(PARROT_INTERP, Parrot_UInt flag)>
-
-Clears a flag in the interpreter.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_debug(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_clear_debug)
-    interp->debug_flags &= ~flag;
-}
-
-
-/*
-
-=item C<void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)>
-
-Clears a flag in the interpreter.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_clear_trace)
-    Parrot_pcc_trace_flags_off(interp, interp->ctx, flag);
-}
-
-
-/*
-
-=item C<Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)>
-
-Test the interpreter flags specified in C<flag>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_Int
-Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)
-{
-    ASSERT_ARGS(Parrot_test_flag)
-    return Interp_flags_TEST(interp, flag);
-}
-
-
-/*
-
-=item C<Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)>
-
-Test the interpreter flags specified in C<flag>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_UInt
-Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_test_debug)
-    return interp->debug_flags & flag;
-}
-
-
-/*
-
-=item C<Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)>
-
-Test the interpreter flags specified in C<flag>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-Parrot_UInt
-Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
-{
-    ASSERT_ARGS(Parrot_test_trace)
-    return Parrot_pcc_trace_flags_test(interp, interp->ctx, flag);
-}
-
-
-/*
-
-=item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
-
-Sets the specified run core.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
-{
-    ASSERT_ARGS(Parrot_set_run_core)
-    switch (core) {
-      case PARROT_SLOW_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        break;
-      case PARROT_FAST_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
-        break;
-      case PARROT_EXEC_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
-        break;
-      case PARROT_GC_DEBUG_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gc_debug"));
-        break;
-      case PARROT_DEBUGGER_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
-        break;
-      case PARROT_PROFILING_CORE:
-        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
-        break;
-      default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Invalid runcore requested\n");
-    }
-}
-
-
-/*
-
-=item C<void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)>
-
-Activates the given warnings.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
-{
-    ASSERT_ARGS(Parrot_setwarnings)
-    /* Activates the given warnings.  (Macro from warnings.h.) */
-    PARROT_WARNINGS_on(interp, wc);
-}
-
-
 /*
 
 =item C<Parrot_PackFile Parrot_pbc_read(PARROT_INTERP, const char *fullname,
 const int debug)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
+
+DEPRECATED: Use Parrot_pf_read_pbc_file and Parrot_pf_prepare_packfile_init
+functions instead.
 
 =cut
 
@@ -405,9 +80,11 @@ Parrot_PackFile
 Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
 {
     ASSERT_ARGS(Parrot_pbc_read)
-    STRING *str = Parrot_str_new(interp, fullname, 0);
-
-    return PackFile_read_pbc(interp, str, debug);
+    STRING * const str = Parrot_str_new(interp, fullname, 0);
+    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, str);
+    UNUSED(debug);
+    Parrot_pf_prepare_packfile_init(interp, pfpmc);
+    return (Parrot_PackFile)pfpmc;
 }
 
 /*
@@ -416,8 +93,7 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
-TODO: We don't do any error or sanity checking here. The packfile pointer
-should be a valid packfile, not simply a non-null pointer
+DEPRECATED: Use Parrot_pf_set_current_packfile instead.
 
 =cut
 
@@ -433,41 +109,11 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
 /*
 
-=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
-
-Load a bytecode file into the interpreter by name. Returns C<0> on failure,
-Success otherwise. Writes error information to the interpreter's error file
-stream.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-int
-Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
-{
-    ASSERT_ARGS(Parrot_load_bytecode_file)
-#if 0
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
-
-    Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
-    if (!pf)
-        return 0;
-    Parrot_pf_set_current_packfile(interp, pf);
-    return 1;
-#else
-    UNUSED(interp);
-    UNUSED(filename);
-#endif
-    return 0;
-}
-
-/*
-
 =item C<void Parrot_pbc_fixup_loaded(PARROT_INTERP)>
 
 Fixups after pbc loading
+
+DEPRECATED: Don't use this.
 
 =cut
 
