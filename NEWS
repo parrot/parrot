@@ -1,6 +1,7 @@
 New in 3.5.0
 - Core
   + Parrot_PMC_destroy and Parrot_PMC_mark were removed from the public extension API
+  + PAST now has PAST::Stmt node types, supports reusable temporary registers
 - Languages
   + Winxed
     - A Winxed snapshot is now included in the parrot build.
