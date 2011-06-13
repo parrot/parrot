@@ -10,6 +10,7 @@
 #ifndef PARROT_EMBED_H_GUARD
 #define PARROT_EMBED_H_GUARD
 
+#include "parrot/parrot.h"
 #include "parrot/core_types.h"  /* types used */
 #include "parrot/compiler.h"    /* compiler capabilities */
 #include "parrot/config.h"      /* PARROT_VERSION... */
