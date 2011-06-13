@@ -290,6 +290,47 @@ hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
 /*
 
+=item C<void hbdb_start(PARROT_INTERP, opcode_t *pc)>
+
+Starts the "active" process of accepting commands and executing code.
+
+=cut
+
+*/
+
+void
+hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
+{
+    hbdb_t hbdb = interp->hbdb;
+
+    /* Check that HBDB has been initialized properly */
+    if(!hbdb)
+        Parrot_ex_throw_from_c_args(interp,
+                                    NULL,
+                                    0,
+                                    "FATAL ERROR: The debugger has not been initialized!");
+
+    /* Make sure the HBDB_ENTERED flag is not set */
+    if (HBDB_FLAG_TEST(interp, HBDB_ENTERED)) {
+        HBDB_FLAG_CLEAR(interp, HBDB_ENTERED);
+    }
+
+    /* Get the current opcode */
+    hbdb->current_opcode = pc;
+
+    /* Set HBDB_STOPPED flag */
+    HBDB_FLAG_SET(interp, HBDB_STOPPED);
+
+    /* TODO Start command-line here */
+
+    /* Check if HBDB_EXIT has been set */
+    if (HBDB_FLAG_TEST(interp, HBDB_EXIT)) {
+        Parrot_x_exit(interp, 0);
+    }
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

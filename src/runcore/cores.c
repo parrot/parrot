@@ -801,6 +801,9 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
     /* disable pc */
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
 
+    if (HBDB_FLAG_TEST(interp, HBDB_ENTERED))
+        hbdb_start(interp, pc);
+
     while (pc) {
         DO_OP(pc, interp);
     }
