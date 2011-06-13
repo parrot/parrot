@@ -713,7 +713,7 @@ is typically invoked by the various vivification methods below
 
     .local string result
     $P0 = get_hll_global ['POST'], 'Op'
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     $S0 = self.'escape'(node)
     .tailcall $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
 .end
@@ -2240,7 +2240,7 @@ attribute.
     .local string result
     result = vivipost.'result'()
     unless result == '' goto have_result
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
   have_result:
     ops.'result'(result)
     ops.'push'(fetchop)
@@ -2360,18 +2360,17 @@ attribute.
     .param pmc bindpost
 
     .local string name
-    $P0 = get_hll_global ['POST'], 'Ops'
     name = node.'name'()
     name = self.'escape'(name)
 
     .local int isdecl
     isdecl = node.'isdecl'()
 
-    if bindpost goto lexical_bind
-
   lexical_post:
     if isdecl goto lexical_decl
+    if bindpost goto lexical_bind
     .local pmc ops, fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, name, 'pirop'=>'find_lex')
@@ -2379,21 +2378,27 @@ attribute.
     .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
   lexical_decl:
+    .local string lexreg
+    # lexical registers cannot be temporaries
+    lexreg = self.'uniquereg'('P')
+    $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    .local pmc viviself, vivipost
+    if bindpost goto have_bindpost
+    .local pmc viviself
     viviself = node.'viviself'()
-    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-    ops.'push'(vivipost)
-    ops.'push_pirop'('.lex', name, vivipost)
-    ops.'result'(vivipost)
+    unless viviself goto have_lexreg
+    bindpost = self.'as_vivipost'(viviself, 'rtype'=>'P')
+    ops.'push'(bindpost)
+  have_bindpost:
+    ops.'push_pirop'('set', lexreg, bindpost)
+  have_lexreg:
+    ops.'push_pirop'('.lex', name, lexreg)
+    ops.'result'(lexreg)
     .return (ops)
 
   lexical_bind:
     $P0 = get_hll_global ['POST'], 'Op'
-    if isdecl goto lexical_bind_decl
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
-  lexical_bind_decl:
-    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
 .end
 
 
