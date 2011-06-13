@@ -179,7 +179,8 @@ method escape($str) {
     my $estr := pir::escape__SS($str);
     if pir::index($estr, '\x') >= 0 || pir::index($estr, '\u') > 0 {
         $estr := 'unicode:"' ~ $estr;
-    } else {
+    }
+    else {
         $estr := '"' ~ $estr;
     }
     $estr := $estr ~ '"';
@@ -499,7 +500,8 @@ multi method as_post($node, *%options) {
 
     if pir::isnull($node) {
         $what := 'a null node';
-    } else {
+    }
+    else {
         $what := 'node of type ' ~ pir::typeof($node);
     }
 
@@ -692,7 +694,8 @@ multi method as_post(PAST::Block $node, *%options) {
         if $nsentry {
             $pirflags := $pirflags
                 ~ ' :nsentry(' ~ self.escape($nsentry) ~ ')';
-        } else {
+        }
+        else {
             $pirflags := $pirflags ~ ' :anon';
         }
     }
@@ -761,7 +764,8 @@ multi method as_post(PAST::Block $node, *%options) {
 			$bpost.compiler($compiler);
 			$bpost.compiler_args($node.compiler_args());
 			$bpost.push($node[0]);
-		} else {
+		}
+		else {
 			##  control exception handler
 			my $ctrlpast := $node.control();
 			my $ctrllabel;
@@ -800,9 +804,11 @@ multi method as_post(PAST::Block $node, *%options) {
 					$bpost.push_pirop('getattribute', $reg,
 						'exception', '"payload"');
 					$bpost.push_pirop('return', $reg);
-				} elsif $ctrlpast.isa(PAST::Node) {
+				}
+				elsif $ctrlpast.isa(PAST::Node) {
 					$bpost.push(self.as_post($ctrlpast, :rtype('*')));
-				} else {
+				}
+				else {
 					self.panic("Unrecognized control handler '$ctrlpast'");
 				}
 			}
@@ -832,7 +838,8 @@ multi method as_post(PAST::Block $node, *%options) {
 			$bpost.push_pirop($blockref);
 			$bpost.push_pirop('capture_lex', $blockreg) if $islexical;
 			$bpost.push_pirop('call', $blockreg, |@arglist, :result($result));
-		} elsif $rtype ne 'v' {
+		}
+		elsif $rtype ne 'v' {
 			$bpost := POST::Ops.new($bpost, :node($node), :result($blockreg));
 			$bpost.push_pirop($blockref, :result($blockreg));
 			if $islexical {
@@ -842,7 +849,8 @@ multi method as_post(PAST::Block $node, *%options) {
 					my $result := self.uniquereg('P');
 					$bpost.push_pirop('newclosure', $result, $blockreg);
 					$bpost.result($result);
-				} else {
+				}
+				else {
 					$bpost.push_pirop('capture_lex', $blockreg);
 				}
 			}
@@ -897,15 +905,17 @@ multi method pirop(PAST::Op $node, *%options) {
     my $pirop := $node.pirop();
     my $signature;
     my $I0;
-    if ($I0 := pir::index($pirop, ' ')) >= 0 { 
+    if ($I0 := pir::index($pirop, ' ')) >= 0 {
         ##  pirop is of form "pirop signature"
         $signature := pir::substr($pirop, $I0 + 1);
         $pirop := pir::substr($pirop, 0, $I0);
-    } elsif ($I0 := pir::index($pirop, '__')) >= 0 {
+    }
+    elsif ($I0 := pir::index($pirop, '__')) >= 0 {
         ##  pirop is of form "pirop__signature"
         $signature := pir::substr($pirop, $I0 + 2);
         $pirop := pir::substr($pirop, 0, $I0);
-    } else {
+    }
+    else {
         $signature := %piropsig{$pirop};
         $signature := 'vP' unless $signature;
     }
@@ -974,7 +984,8 @@ multi method call(PAST::Op $node, *%options) {
 			$name_post := self.coerce($name_post, 's');
 			$ops.push($name_post);
 			pir::unshift(@posargs, $name_post);
-		} else {
+		}
+		else {
 			pir::unshift(@posargs, self.escape($name));
 		}
 	}
@@ -1038,7 +1049,8 @@ multi method if(PAST::Op $node, *%options) {
 		$ops.push($thenpost) if pir::defined($thenpost);
 		$ops.push($endlabel);
 		return $ops;
-	} else {
+	}
+	else {
 		my $S0 := 'if';
 		$S0 := 'unless' if $pasttype eq $S0;
 		$ops.push($exprpost);
@@ -1055,7 +1067,8 @@ multi method if(PAST::Op $node, *%options) {
 			pir::push(@arglist, $exprpost) if $childpast.arity() > 0;
 			$childpost := self.as_post($childpast,
 				:rtype($childrtype), :arglist(@arglist));
-		} else {
+		}
+		else {
 			return $childpost if $rtype eq 'v';
 			$childpost := POST::Ops.new(:result($exprpost));
 		}
@@ -1849,7 +1862,8 @@ multi method lexical(PAST::Var $node, $bindpost) {
         $ops.push_pirop('.lex', $name, $vivipost);
         $ops.result($vivipost);
         return $ops;
-    } else {
+    }
+    else {
         my $fetchop := POST::Op.new($ops, $name, pirop => 'find_lex');
         my $storeop := POST::Op.new($name, $ops, pirop => 'store_lex');
         return self.vivify($node, $ops, $fetchop, $storeop);
@@ -1879,7 +1893,7 @@ multi method contextual(PAST::Var $node, $bindpost) {
     return self.lexical($node, $bindpost) if $node.isdecl();
 
     $name := self.escape($name);
-    
+
     if $bindpost {
         return POST::Op.new($name, $bindpost,
             pirop  => 'store_dynamic_lex',
@@ -2042,14 +2056,15 @@ multi method register(PAST::Var $node, $bindpost) {
         $name := self.uniquereg('P');
         $node.name($name);
     }
-    
+
     my $ops := POST::Ops.new(result => $name, node => $node);
 
     $ops.push_pirop('.local pmc', $ops) if $node.isdecl();
 
     if $bindpost {
         $ops.push_pirop('set', $ops, $bindpost);
-    } else {
+    }
+    else {
         my $viviself := $node.viviself();
         if $viviself {
             my $vivipost := self.as_vivipost($viviself, rtype => 'P');
