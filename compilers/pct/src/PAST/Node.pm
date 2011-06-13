@@ -70,6 +70,16 @@ method lvalue($value?) {
     self.attr('lvalue', $value, pir::defined($value));
 }
 
+=item childorder([order])
+Get/set the order in which children nodes should be evaluated
+(via Compiler::post_children).  If C<order> is 'right' then
+children are evaluated last-to-first, otherwise they're
+evaluated first-to-last.
+
+method childorder($value?) {
+	self.attr('childorder', $value, pir::defined($value));
+}
+
 =begin head1
 AUTHOR
 

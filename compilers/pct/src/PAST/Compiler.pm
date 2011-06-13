@@ -368,6 +368,13 @@ method post_children($node, *%options) {
         $P0 = get_hll_global ['POST'], 'Ops'
         ops = $P0.'new'('node'=>node)
 
+        .local string pushop
+        pushop = 'push'
+        $S0 = node.'childorder'()
+        if $S0 != 'right' goto have_pushop
+        pushop = 'unshift'
+      have_pushop:
+
         ##  get any conversion types
         .local string signature
         signature = options['signature']
@@ -400,7 +407,6 @@ method post_children($node, *%options) {
         cpast = shift iter
         cpost = self.'as_post'(cpast, 'rtype'=>rtype)
         cpost = self.'coerce'(cpost, rtype)
-        ops.'push'(cpost)
         $I0 = isa cpast, ['PAST';'Node']
         unless $I0 goto cpost_pos
         .local pmc isflat
@@ -412,8 +418,9 @@ method post_children($node, *%options) {
         $S0 = cpost
         if isflat goto flat_named
         npost = self.'as_post'(npast, 'rtype'=>'~')
+        cpost = ops.'new'(cpost)
+        cpost.'push'(npost)
         $S1 = npost
-        ops.'push'(npost)
         $S0 = concat $S0, ' :named('
         $S0 = concat $S0, $S1
         $S0 = concat $S0, ')'
@@ -421,16 +428,19 @@ method post_children($node, *%options) {
       flat_named:
         $S0 = concat $S0, ' :named :flat'
       named_done:
+        ops.pushop(cpost)
         push namedargs, $S0
         goto iter_rtype
       iter_pos:
         if isflat goto flat_pos
       cpost_pos:
+        ops.pushop(cpost)
         push posargs, cpost
         goto iter_rtype
       flat_pos:
         $S0 = cpost
         $S0 = concat $S0, ' :flat'
+        ops.pushop(cpost)
         push posargs, $S0
       iter_rtype:
         unless sigidx < sigmax goto iter_loop
@@ -452,14 +462,15 @@ method post_children($node, *%options) {
         rtype = substr signature, sigidx, 1
         kpost = self.'as_post'(kpast, 'rtype'=>rtype)
         kpost = self.'coerce'(kpost, rtype)
-        ops.'push'(kpost)
-        ops.'push'(cpost)
         # now construct the keyed PMC
         $S0 = cpost
         $S0 = concat $S0, '['
         $S1 = kpost
         $S0 = concat $S0, $S1
         $S0 = concat $S0, ']'
+        kpost = ops.'new'(kpost)
+        kpost.'push'(cpost)
+        ops.pushop(kpost)
         push posargs, $S0
         goto iter_rtype
       iter_end:
