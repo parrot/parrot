@@ -69,19 +69,6 @@ typedef struct pbc_merge_input {
 PARROT_DOES_NOT_RETURN
 static void help(void);
 
-static INTVAL map_ann_constant_idx(PARROT_INTERP,
-    ARGIN(const pbc_merge_input *input),
-    opcode_t old_idx,
-    pf_ann_key_type_t type)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static opcode_t map_ann_offset(PARROT_INTERP,
-    ARGIN(const pbc_merge_input *input),
-    opcode_t in_offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void pbc_fixup_bytecode(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs,
@@ -98,19 +85,6 @@ static void pbc_fixup_constants(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*inputs);
-
-static void pbc_merge_annotations(PARROT_INTERP,
-    ARGMOD(pbc_merge_input **inputs),
-    int num_inputs,
-    ARGMOD(PackFile *pf),
-    ARGMOD(PackFile_ByteCode * cur_cs))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*inputs)
-        FUNC_MODIFIES(*pf)
-        FUNC_MODIFIES(* cur_cs);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -164,12 +138,6 @@ static void pbc_merge_write(PARROT_INTERP,
         FUNC_MODIFIES(*pf);
 
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_map_ann_constant_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(input))
-#define ASSERT_ARGS_map_ann_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(input))
 #define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs) \
@@ -177,11 +145,6 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_fixup_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
-#define ASSERT_ARGS_pbc_merge_annotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(inputs) \
-    , PARROT_ASSERT_ARG(pf) \
-    , PARROT_ASSERT_ARG(cur_cs))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -494,108 +457,6 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     debug_seg->num_mappings = num_mappings;
 }
 
-/*
-
-=item C<static void pbc_merge_annotations(PARROT_INTERP, pbc_merge_input
-**inputs, int num_inputs, PackFile *pf, PackFile_ByteCode * cur_cs)>
-
-merge annotations
-
-=cut
-
-*/
-
-static void
-pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
-        int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode * cur_cs))
-{
-    ASSERT_ARGS(pbc_merge_annotations)
-
-    int i, j;
-    STRING * const name = Parrot_sprintf_c(interp, "%Ss_ANN", cur_cs->base.name);
-    PackFile_Annotations * const bc_ann = (PackFile_Annotations *)
-            PackFile_Segment_new_seg(interp, &pf->directory, PF_ANNOTATIONS_SEG, name, 1);
-    PackFile_Annotations_Key * last_key = NULL;
-
-    bc_ann->code = cur_cs;
-    cur_cs->annotations = bc_ann;
-
-    for (i = 0; i < num_inputs; i++)  {
-        PackFile_Annotations * const in_ann = inputs[i]->pf->cur_cs->annotations;
-        opcode_t num_keys;
-        size_t data_cursor;
-
-        if (in_ann == NULL)
-            continue;
-
-        bc_ann->base.data =
-            mem_gc_realloc_n_typed(interp, bc_ann->base.data, bc_ann->base.size, opcode_t);
-        data_cursor = 0;
-        for (j = 1; j < num_keys; j++) {
-            PackFile_Annotations_Key * const cur_key = &in_ann->keys[j];
-
-            PackFile_Annotations_add_entry(interp, bc_ann,
-                map_ann_offset(interp, inputs[i], in_ann->base.data[data_cursor++]),
-                cur_key->name,
-                cur_key->type,
-                map_ann_constant_idx(
-                    interp, inputs[i], in_ann->base.data[data_cursor++], cur_key->type));
-        }
-    }
-}
-
-/*
-
-=item C<static opcode_t map_ann_offset(PARROT_INTERP, const pbc_merge_input
-*input, opcode_t in_offset)>
-
-=item C<static INTVAL map_ann_constant_idx(PARROT_INTERP, const pbc_merge_input
-*input, opcode_t old_idx, pf_ann_key_type_t type)>
-
-map the offset to the annotation and constant idx
-
-=cut
-
-*/
-
-static opcode_t
-map_ann_offset(PARROT_INTERP, ARGIN(const pbc_merge_input *input), opcode_t in_offset)
-{
-    ASSERT_ARGS(map_ann_offset)
-
-    /* TODO: is this correct?
-     * Generates warning: operation on 'data_cursor' may be undefined
-     */
-    return in_offset + input->code_start;
-}
-
-static INTVAL
-map_ann_constant_idx(PARROT_INTERP, ARGIN(const pbc_merge_input *input),
-        opcode_t old_idx, pf_ann_key_type_t type)
-{
-    ASSERT_ARGS(map_ann_constant_idx)
-
-    if (old_idx == 0)
-        return old_idx;
-
-    switch (type) {
-        case PF_ANNOTATION_KEY_TYPE_INT:
-            return old_idx;
-
-        case PF_ANNOTATION_KEY_TYPE_STR:
-            return input->str.const_map[ old_idx ];
-
-        case PF_ANNOTATION_KEY_TYPE_PMC:
-            return input->pmc.const_map[ old_idx ];
-
-        default:
-            /* FAIL */
-            break;
-    }
-}
-
-
-
 static opcode_t
 bytecode_remap_op(PARROT_INTERP, PackFile *pf, opcode_t op) {
     int i;
@@ -867,12 +728,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 
     /* Walk constants and fix references into bytecode. */
     pbc_fixup_constants(interp, inputs, num_inputs);
-
-    /* Merge all the annotations */
-    /* TODO: Uncomment this when it's ready
-
-    pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
-    */
 
     for (i = 0; i < num_inputs; ++i) {
         mem_gc_free(interp, inputs[i]->num.const_map);
