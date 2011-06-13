@@ -324,6 +324,38 @@ Unarchives the code.
         return n;
     }
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<get_main()>
+
+Return the main sub, if any, null PMC otherwise.
+
+=cut
+
+*/
+
+    METHOD get_main()
+    {
+        Parrot_Sub_attributes *sub;
+        PackFile_ByteCode     *seg;
+        PMC *mainsub = PMCNULL;
+
+        PMC_get_sub(INTERP, SELF, sub);
+        seg = sub->seg;
+
+        if (seg) {
+            PackFile_ConstTable *const ct = seg->const_table;
+            mainsub = ct->pmc.constants[seg->main_sub];
+        }
+        RETURN(PMC * mainsub);
+    }
+
 }
 
 /*
