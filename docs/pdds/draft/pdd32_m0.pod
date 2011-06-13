@@ -252,17 +252,17 @@ Treat C<*$2> and C<*$3> as integer or floating-point values, divide C<*$1> by
 C<*$3> and store the remainder in C<*$1>.  Division by zero will make the the
 M0 interpreter sad.
 
-=item * nfromi - convert to numeric from integer
+=item * convert_n_i - convert to numeric from integer
 
 Assume that C<*$2> is an integer value, convert it to a floating-point value
 and store the result in C<*$1>.  C<$3> is ignored.
 
 {{{
-    TODO: Define the semantics of C<nfromi> and C<ifromn> more completely.
-    They're pretty underdefined as it stands now.
+    TODO: Define the semantics of C<convert_n_i> and C<convert_i_n> more
+    completely.  They're pretty underdefined as it stands now.
 }}}
 
-=item * ifromn - convert to integer from numeric
+=item * convert_i_n - convert to integer from numeric
 
 Assume that C<*$2> is a floating-point value, convert it to an integer value
 and store the result in C<*$1>.  C<$3> is ignored.
@@ -713,8 +713,8 @@ are not require to have any defined semantics.
     0x0B div_n
     0x0C mod_i
     0x0D mod_n
-    0x0E iton
-    0x0F ntoi
+    0x0E convert_n_i
+    0x0F convert_i_n
     0x10 ashr
     0x11 lshr
     0x12 shl
