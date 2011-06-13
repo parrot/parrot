@@ -49,7 +49,7 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
     *pbc = Parrot_pf_read_pbc_file(interp, filename);
-    Parrot_pf_prepare_loaded_packfile(interp, *pbc);
+    Parrot_pf_prepare_packfile_init(interp, *pbc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

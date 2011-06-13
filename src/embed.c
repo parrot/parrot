@@ -67,6 +67,9 @@ const int debug)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
+DEPRECATED: Use Parrot_pf_read_pbc_file and Parrot_pf_prepare_packfile_init
+functions instead.
+
 =cut
 
 */
@@ -77,9 +80,11 @@ Parrot_PackFile
 Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
 {
     ASSERT_ARGS(Parrot_pbc_read)
-    STRING *str = Parrot_str_new(interp, fullname, 0);
-
-    return PackFile_read_pbc(interp, str, debug);
+    STRING * const str = Parrot_str_new(interp, fullname, 0);
+    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
+    UNUSED(debug);
+    Parrot_pf_prepare_packfile_init(interp, pfpmc);
+    return (Parrot_PackFile)pfpmc;
 }
 
 /*
@@ -88,8 +93,7 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
-TODO: We don't do any error or sanity checking here. The packfile pointer
-should be a valid packfile, not simply a non-null pointer
+DEPRECATED: Use Parrot_pf_set_current_packfile instead.
 
 =cut
 
@@ -105,41 +109,11 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
 /*
 
-=item C<int Parrot_load_bytecode_file(PARROT_INTERP, const char *filename)>
-
-Load a bytecode file into the interpreter by name. Returns C<0> on failure,
-Success otherwise. Writes error information to the interpreter's error file
-stream.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-int
-Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
-{
-    ASSERT_ARGS(Parrot_load_bytecode_file)
-#if 0
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
-
-    Parrot_warn_experimental(interp, "Parrot_load_bytecode_file is experimental");
-    if (!pf)
-        return 0;
-    Parrot_pf_set_current_packfile(interp, pf);
-    return 1;
-#else
-    UNUSED(interp);
-    UNUSED(filename);
-#endif
-    return 0;
-}
-
-/*
-
 =item C<void Parrot_pbc_fixup_loaded(PARROT_INTERP)>
 
 Fixups after pbc loading
+
+DEPRECATED: Don't use this.
 
 =cut
 

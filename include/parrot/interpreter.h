@@ -454,15 +454,15 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_clear_debug(PARROT_INTERP, Parrot_UInt flag)
+void Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_clear_flag(PARROT_INTERP, Parrot_Int flag)
+void Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)
+void Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -509,15 +509,16 @@ void Parrot_set_compiler(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)
+void Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
-        __attribute__nonnull__(1);
+void Parrot_set_executable_name(PARROT_INTERP, ARGIN(STRING * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)
+void Parrot_set_flag(PARROT_INTERP, INTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -525,7 +526,7 @@ void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_set_trace(PARROT_INTERP, Parrot_UInt flag)
+void Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -534,17 +535,17 @@ void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)
+Parrot_UInt Parrot_test_debug(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)
+Parrot_Int Parrot_test_flag(PARROT_INTERP, INTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)
+Parrot_UInt Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -604,7 +605,8 @@ void register_nci_method(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_set_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_executable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_set_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_run_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

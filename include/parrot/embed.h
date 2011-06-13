@@ -63,11 +63,6 @@ void Parrot_disassemble(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-int Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_pbc_fixup_loaded(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -109,9 +104,6 @@ PMC* set_current_sub(PARROT_INTERP)
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_Parrot_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filename))
 #define ASSERT_ARGS_Parrot_pbc_fixup_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pbc_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

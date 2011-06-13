@@ -4454,17 +4454,17 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     ASSERT_ARGS(PackFile_read_pbc)
     PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
     UNUSED(debug);
-    Parrot_pf_prepare_loaded_packfile(interp, pfpmc);
+    Parrot_pf_prepare_packfile_init(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
 }
 
 /*
 
-=item C<void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, PMC * const
-pfpmc)>
+=item C<void Parrot_pf_prepare_packfile_init(PARROT_INTERP, PMC * const pfpmc)>
 
 Ready a PackFile which has just been loaded in to Parrot. Sort out the
-C<:main> function and trigger C<:load> functions.
+C<:main> function and trigger C<:init> functions. This is for packfiles which
+are intended to be executed as a program.
 
 =cut
 
@@ -4472,16 +4472,48 @@ C<:main> function and trigger C<:load> functions.
 
 PARROT_EXPORT
 void
-Parrot_pf_prepare_loaded_packfile(PARROT_INTERP, ARGIN(PMC * const pfpmc))
+Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
-    ASSERT_ARGS(Parrot_pf_prepare_loaded_packfile)
+    ASSERT_ARGS(Parrot_pf_prepare_packfile_init)
     if (PMC_IS_NULL(pfpmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "Could not load packfile");
+            "Could not load packfile: Invalid PMC");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pfpmc);
+        if (!pf)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "Could not load packfile: Invalid Pointer");
         if (!(pf->options & PFOPT_HEADERONLY))
             do_sub_pragmas(interp, pfpmc, PBC_PBC, NULL);
+    }
+}
+
+/*
+
+=item C<void Parrot_pf_prepare_packfile_load(PARROT_INTERP, PMC * const pfpmc)>
+
+Ready a PackFile which has just been loaded in to Parrot. Trigger any C<:load>
+functions. This is for packfiles which are intended to be used as libraries.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_prepare_packfile_load)
+    if (PMC_IS_NULL(pfpmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            "Could not load packfile: Invalid PMC");
+    else {
+        PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pfpmc);
+        if (!pf)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                "Could not load packfile: Invalid Pointer");
+        if (!(pf->options & PFOPT_HEADERONLY))
+            do_sub_pragmas(interp, pfpmc, PBC_LOADED, NULL);
     }
 }
 

@@ -456,7 +456,7 @@ Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
 
 /*
 
-=item C<void Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)>
+=item C<void Parrot_set_flag(PARROT_INTERP, INTVAL flag)>
 
 Sets on any of the following flags, specified by C<flag>, in the interpreter:
 
@@ -489,7 +489,7 @@ Parrot_set_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)>
+=item C<void Parrot_set_debug(PARROT_INTERP, UINTVAL flag)>
 
 Set a debug flag: C<PARROT_DEBUG_FLAG>.
 
@@ -508,7 +508,7 @@ Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)>
+=item C<void Parrot_set_executable_name(PARROT_INTERP, STRING * const name)>
 
 Sets the name of the executable launching Parrot (see C<pbc_to_exe> and the
 C<parrot> binary).
@@ -531,7 +531,7 @@ Parrot_set_executable_name(PARROT_INTERP, ARGIN(STRING * const name))
 
 /*
 
-=item C<void Parrot_set_trace(PARROT_INTERP, Parrot_UInt flag)>
+=item C<void Parrot_set_trace(PARROT_INTERP, UINTVAL flag)>
 
 Set a trace flag: C<PARROT_TRACE_FLAG>
 
@@ -551,7 +551,7 @@ Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_flag(PARROT_INTERP, Parrot_Int flag)>
+=item C<void Parrot_clear_flag(PARROT_INTERP, INTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -570,7 +570,7 @@ Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_debug(PARROT_INTERP, Parrot_UInt flag)>
+=item C<void Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -589,7 +589,7 @@ Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)>
+=item C<void Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -608,7 +608,7 @@ Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)>
+=item C<Parrot_Int Parrot_test_flag(PARROT_INTERP, INTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 
@@ -628,7 +628,7 @@ Parrot_test_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)>
+=item C<Parrot_UInt Parrot_test_debug(PARROT_INTERP, UINTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 
@@ -648,7 +648,7 @@ Parrot_test_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)>
+=item C<Parrot_UInt Parrot_test_trace(PARROT_INTERP, UINTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 

@@ -770,7 +770,13 @@ PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pf_prepare_loaded_packfile(PARROT_INTERP,
+void Parrot_pf_prepare_packfile_init(PARROT_INTERP,
+    ARGIN(PMC * const pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_pf_prepare_packfile_load(PARROT_INTERP,
     ARGIN(PMC * const pfpmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -977,7 +983,11 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
-#define ASSERT_ARGS_Parrot_pf_prepare_loaded_packfile \
+#define ASSERT_ARGS_Parrot_pf_prepare_packfile_init \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
+#define ASSERT_ARGS_Parrot_pf_prepare_packfile_load \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pfpmc))
