@@ -716,89 +716,117 @@
     exit 0
 # }
   __label_41: # endif
-.annotate 'line', 227
+.annotate 'line', 228
 # var sub: $P16
     null $P16
-# for loop
-.annotate 'line', 228
-# i: $I6
-    null $I6
-  __label_49: # for condition
-# {
 .annotate 'line', 229
-    $P16 = $P10[$I6]
-.annotate 'line', 230
-    unless_null $P16, __label_50
-    goto __label_48 # break
-  __label_50: # endif
-.annotate 'line', 231
-# predefined string
-    set $S10, $P16
-    ne $S10, 'main', __label_51
-    goto __label_48 # break
-  __label_51: # endif
-# }
-  __label_47: # for iteration
-.annotate 'line', 228
-    inc $I6
-    goto __label_49
-  __label_48: # for end
-.annotate 'line', 234
-# retval: $I7
-    null $I7
-.annotate 'line', 235
 # try: create handler
     new $P19, 'ExceptionHandler'
-    set_label $P19, __label_52
+    set_label $P19, __label_47
+    push_eh $P19
+# try: begin
+# {
+.annotate 'line', 230
+    $P16 = $P10.'get_main'()
+# }
+# try: end
+    pop_eh
+    goto __label_48
+.annotate 'line', 229
+# catch
+  __label_47:
+    .get_results($P20)
+    finalize $P20
+    pop_eh
+# {
+# for loop
+.annotate 'line', 233
+# i: $I6
+    null $I6
+  __label_51: # for condition
+# {
+.annotate 'line', 234
+    $P16 = $P10[$I6]
+.annotate 'line', 235
+    unless_null $P16, __label_52
+    goto __label_50 # break
+  __label_52: # endif
+.annotate 'line', 236
+# predefined string
+    set $S10, $P16
+    ne $S10, 'main', __label_53
+    goto __label_50 # break
+  __label_53: # endif
+# }
+  __label_49: # for iteration
+.annotate 'line', 233
+    inc $I6
+    goto __label_51
+  __label_50: # for end
+.annotate 'line', 239
+    unless_null $P16, __label_54
+.annotate 'line', 240
+    $P16 = $P10[0]
+  __label_54: # endif
+# }
+# catch end
+  __label_48:
+.annotate 'line', 243
+# retval: $I7
+    null $I7
+.annotate 'line', 244
+# try: create handler
+    new $P19, 'ExceptionHandler'
+    set_label $P19, __label_55
     $P19.'handle_types_except'(64)
     push_eh $P19
 # try: begin
 # {
-.annotate 'line', 236
+.annotate 'line', 245
 # var retvalp: $P17
     $P17 = $P16(__ARG_1)
-.annotate 'line', 237
-    if_null $P17, __label_54
-.annotate 'line', 238
+.annotate 'line', 246
+    if_null $P17, __label_57
+.annotate 'line', 247
     set $I7, $P17
-  __label_54: # endif
+  __label_57: # endif
 # }
 # try: end
     pop_eh
-    goto __label_53
-.annotate 'line', 235
+    goto __label_56
+.annotate 'line', 244
 # catch
-  __label_52:
+  __label_55:
     .get_results($P18)
     finalize $P18
     pop_eh
 # {
-.annotate 'line', 241
+.annotate 'line', 250
 # msg: $S9
     $S9 = $P18['message']
-.annotate 'line', 242
+.annotate 'line', 251
     isnull $I8, $S9
     not $I8
-    unless $I8 goto __label_56
+    unless $I8 goto __label_59
     isne $I8, $S9, ''
-  __label_56:
-    unless $I8 goto __label_55
-.annotate 'line', 243
+  __label_59:
+    unless $I8 goto __label_58
+.annotate 'line', 252
 # predefined cry
     getstderr $P0
     print $P0, $S9
     print $P0, "\n"
-  __label_55: # endif
-.annotate 'line', 244
+  __label_58: # endif
+.annotate 'line', 253
     set $I7, 1
 # }
 # catch end
-  __label_53:
-.annotate 'line', 246
+  __label_56:
+.annotate 'line', 255
 # predefined exit
     exit $I7
 # }
-.annotate 'line', 247
+.annotate 'line', 256
 
 .end # main
 
