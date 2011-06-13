@@ -213,6 +213,10 @@ is_pasm)>
 
 Compile code file.
 
+TODO: This should take a PMC* option for the compiler to use. Do not assume
+we have PIR/PASM compilers installed, and do not assume that the user is
+going to want to use either of these. TT #2135.
+
 =cut
 
 */

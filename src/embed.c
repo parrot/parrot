@@ -43,20 +43,12 @@ static void print_debug(PARROT_INTERP, int status, ARGIN(void *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
-static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(p_unused))
-#define ASSERT_ARGS_setup_argv __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -125,49 +117,6 @@ Parrot_pbc_fixup_loaded(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pbc_fixup_loaded)
     PackFile_fixup_subs(interp, PBC_LOADED, NULL);
-}
-
-
-/*
-
-=item C<static PMC* setup_argv(PARROT_INTERP, int argc, const char **argv)>
-
-Creates and returns C<ARGS> array PMC.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC*
-setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
-{
-    ASSERT_ARGS(setup_argv)
-    PMC   * const userargv = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    INTVAL i;
-
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-        Parrot_io_eprintf(interp,
-            "*** Parrot VM: Setting up ARGV array.  Current argc: %d ***\n",
-            argc);
-    }
-
-    /* immediately anchor pmc to root set */
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals,
-            (INTVAL)IGLOBALS_ARGV_LIST, userargv);
-
-    for (i = 0; i < argc; ++i) {
-        /* Run through argv, adding everything to @ARGS. */
-        STRING * const arg = Parrot_str_new_init(interp, argv[i], strlen(argv[i]),
-                Parrot_utf8_encoding_ptr, PObj_external_FLAG);
-
-        if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG))
-            Parrot_io_eprintf(interp, "\t%vd: %s\n", i, argv[i]);
-
-        VTABLE_push_string(interp, userargv, arg);
-    }
-
-    return userargv;
 }
 
 
@@ -262,6 +211,8 @@ set_current_sub(PARROT_INTERP)
 
 Sets up C<ARGV> and runs the ops.
 
+DEPRECATED: Use Parrot_pf_execute_bytecode_program instead
+
 =cut
 
 */
@@ -288,7 +239,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
     }
 
     /* Set up @ARGS (or whatever this language calls it) in userargv. */
-    userargv = setup_argv(interp, argc, argv);
+    userargv = Parrot_pmc_box_c_string_array(interp, argc, argv);
 
     /*
      * If any profile information was gathered, print it out
@@ -317,6 +268,8 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
 Parrot_Opcode *pc)>
 
 Runs the interpreter's bytecode in debugging mode.
+
+DEPRECATED: Do not use.
 
 =cut
 
@@ -441,6 +394,8 @@ Disassembles and prints out the interpreter's bytecode.
 
 This is used by the Parrot disassembler.
 
+TODO: Move this to a dedicated file, or some place more related to disassembly.
+
 =cut
 
 */
@@ -545,6 +500,8 @@ const char *code, Parrot_String *error)>
 
 Compiles a code string.
 
+DEPRECATED: Use Parrot_compile_file (or whatever replaces it, TT #2135).
+
 =cut
 
 */
@@ -592,6 +549,8 @@ length, const unsigned char *bytes)>
 Legacy function for setting the configuration hash as an array of bytes for
 the old API. New programs should not use this. They should use the new API and
 C<Parrot_api_set_configuration_hash>
+
+DEPRECATED: Use Parrot_set_config_hash_pmc instead.
 
 =cut
 
