@@ -179,6 +179,8 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
 {
+    ASSERT_ARGS(Parrot_pmc_new_from_type)
+
     PMC *pmc;
     PMC *const classobj = Parrot_oo_get_class(interp, key);
 
