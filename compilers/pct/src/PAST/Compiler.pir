@@ -202,7 +202,20 @@ Compile the abstract syntax tree given by C<past> into POST.
     .lex '@*BLOCKPAST', blockpast
     null $P99
     .lex '$*SUB', $P99
+
+    .local pmc tempregs
+    tempregs = find_dynamic_lex '%*TEMPREGS'
+    unless null tempregs goto have_tempregs
+    tempregs = new ['Hash']
+    tempregs['I'] = TEMPREG_BASE
+    tempregs['N'] = TEMPREG_BASE
+    tempregs['S'] = TEMPREG_BASE
+    tempregs['P'] = TEMPREG_BASE
+  have_tempregs:
+    .lex '%*TEMPREGS', tempregs
+
     $P1 = self.'as_post'(past, 'rtype'=>'v')
+
     .return ($P1)
 .end
 
@@ -263,18 +276,67 @@ is one of the signature flags described above.
     unless rtype goto err_nortype
     if rtype == 'v' goto reg_void
     .local string reg
-    reg = 'P'
     $I0 = index 'Ss~Nn+Ii', rtype
-    if $I0 < 0 goto reg_psin
-    reg = substr 'SSSNNNII', $I0, 1
-  reg_psin:
-    reg = concat '$', reg
+    rtype = 'P'
+    if $I0 < 0 goto have_rtype
+    rtype = substr 'SSSNNNII', $I0, 1
+  have_rtype:
+    reg = concat '$', rtype
     .tailcall self.'unique'(reg)
   reg_void:
     .return ('')
   err_nortype:
     self.'panic'('rtype not set')
 .end
+
+
+=item tempreg(rtype)
+
+Generate a unique register by allocating from the temporary
+register pool frame in %*TEMPREGS.  %*TEMPREGS is a hash that
+has the next register identifier to be used for I, N, S, and
+P registers.  It also contains the names of any registers
+that have been "reserved" in the current frame (e.g. because
+they hold the return value from a PAST::Stmt node).
+
+If there are no temporary registers available, allocate and
+return a permanent one instead (similar to C<uniquereg> above).
+
+=cut
+
+.sub 'tempreg' :method
+    .param string rtype
+    unless rtype goto err_nortype
+    if rtype == 'v' goto reg_void
+    .local string reg
+    $I0 = index 'Ss~Nn+Ii', rtype
+    rtype = 'P'
+    if $I0 < 0 goto have_rtype
+    rtype = substr 'SSSNNNII', $I0, 1
+  have_rtype:
+    .local pmc tempregs
+    tempregs = find_dynamic_lex '%*TEMPREGS'
+    .local int rnum
+    rnum = tempregs[rtype]
+  make_reg:
+    if rnum >= UNIQUE_BASE goto reg_unique
+    $S0 = rnum
+    inc rnum
+    tempregs[rtype] = rnum
+    reg = concat '$', rtype
+    reg = concat reg, $S0
+    $I0 = tempregs[reg]
+    if $I0 goto make_reg
+    .return (reg)
+  reg_unique:
+    reg = concat '$', rtype
+    .tailcall self.'unique'(reg)
+  reg_void:
+    .return ('')
+  err_nortype:
+    self.'panic'('rtype not set')
+.end
+
 
 =item coerce(post, rtype)
 
@@ -712,9 +774,22 @@ defines the boundaries of temporary register allocations.
     .param pmc node
     .param pmc options         :slurpy :named
 
+    .local pmc outerregs, tempregs
+    outerregs = find_dynamic_lex '%*TEMPREGS'
+    tempregs = clone outerregs
+    .lex '%*TEMPREGS', tempregs
+   
+
     .const 'Sub' node_as_post = 'Node.as_post'
     .local pmc post
     post = self.node_as_post(node, options :flat :named)
+
+    .local string result
+    result = post.'result'()
+    $S0 = substr result, 0, 1
+    if $S0 != '$' goto reserve_done
+    outerregs[result] = 1
+  reserve_done:
 
     .return (post)
 .end
