@@ -206,11 +206,7 @@ Compile the abstract syntax tree given by C<past> into POST.
     .local pmc tempregs
     tempregs = find_dynamic_lex '%*TEMPREGS'
     unless null tempregs goto have_tempregs
-    tempregs = new ['Hash']
-    tempregs['I'] = TEMPREG_BASE
-    tempregs['N'] = TEMPREG_BASE
-    tempregs['S'] = TEMPREG_BASE
-    tempregs['P'] = TEMPREG_BASE
+    tempregs = self.'tempreg_frame'()
   have_tempregs:
     .lex '%*TEMPREGS', tempregs
 
@@ -287,6 +283,24 @@ is one of the signature flags described above.
     .return ('')
   err_nortype:
     self.'panic'('rtype not set')
+.end
+
+
+=item tempreg_frame()
+
+Create a new temporary register frame, using register
+identifiers TEMPREG_BASE up to UNIQUE_BASE.
+
+=cut
+
+.sub 'tempreg_frame' :method
+    .local pmc tempregs
+    tempregs = new ['Hash']
+    tempregs['I'] = TEMPREG_BASE
+    tempregs['N'] = TEMPREG_BASE
+    tempregs['S'] = TEMPREG_BASE
+    tempregs['P'] = TEMPREG_BASE
+    .return (tempregs)
 .end
 
 
@@ -1055,6 +1069,16 @@ Return the POST representation of a C<PAST::Block>.
     compiler = node.'compiler'()
     if compiler goto children_compiler
 
+    # if tempregs flag is set, then create a new bank of temporary registers
+    .local pmc tempregs, outerregs
+    outerregs = find_dynamic_lex '%*TEMPREGS'
+    tempregs = outerregs
+    $I0 = node.'tempregs'()
+    unless $I0 goto have_tempregs
+    tempregs = self.'tempreg_frame'()
+  have_tempregs:
+    .lex '%*TEMPREGS', tempregs
+
     ##  control exception handler
     .local pmc ctrlpast, ctrllabel
     ctrlpast = node.'control'()
@@ -1136,6 +1160,9 @@ Return the POST representation of a C<PAST::Block>.
     lisub.'push'(lipost)
     bpost['loadinit'] = lisub
   loadinit_done:
+
+    ## restore the outer temporary register bank
+    store_lex '%*TEMPREGS', outerregs
 
     ##  restore previous outer scope and symtable
     setattribute self, '%!symtable', outersym
