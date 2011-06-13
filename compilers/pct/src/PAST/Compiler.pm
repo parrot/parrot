@@ -1316,51 +1316,32 @@ the second child (if any) is the code to process the
 handler.
 
 multi method try(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(:node($node));
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
+    my $S0 := self.unique('catch_');
+    my $catchlabel := POST::Label.new(:result($S0));
+    my $endlabel   := POST::Lable.new(:result($S0 ~ '_end'));
 
-        .local pmc catchlabel, endlabel
-        $P0 = get_hll_global ['POST'], 'Label'
-        $S0 = self.'unique'('catch_')
-        catchlabel = $P0.'new'('result'=>$S0)
-        $S0 = concat $S0, '_end'
-        endlabel = $P0.'new'('result'=>$S0)
+    my $rtype := %options<rtype>;
 
-        .local string rtype
-        rtype = options['rtype']
-
-        .local pmc trypast, trypost
-        trypast = node[0]
-        trypost = self.'as_post'(trypast, 'rtype'=>rtype)
-        ops.'push_pirop'('push_eh', catchlabel)
-        ops.'push'(trypost)
-        ops.'push_pirop'('pop_eh')
-        .local pmc elsepast, elsepost
-        elsepast = node[2]
-        if null elsepast goto else_done
-        elsepost = self.'as_post'(elsepast, 'rtype'=>'v')
-        ops.'push'(elsepost)
-      else_done:
-        ops.'push_pirop'('goto', endlabel)
-        ops.'push'(catchlabel)
-        .local pmc catchpast, catchpost
-        catchpast = node[1]
-        if null catchpast goto catch_done
-        catchpost = self.'as_post'(catchpast, 'rtype'=>'v')
-        ops.'push'(catchpost)
-        ops.'push_pirop'('pop_eh')         # FIXME: should be before catchpost
-      catch_done:
-        ops.'push'(endlabel)
-        ops.'result'(trypost)
-        .return (ops)
+    my $trypost := self.as_post($node[0], :rtype($rtype));
+    $ops.push_pirop('push_eh', $catchlabel);
+    $ops.push($trypost);
+    $ops.push_pirop('pop_eh');
+    my $elsepast := $node[2];
+    if $elsepast {
+        $ops.push(self.as_post($elsepast, :rtype('v')));
     }
+    $ops.push_pirop('goto', $endlabel);
+    $ops.push($catchlabel);
+    my $catchpast := $node[1];
+    if $catchpast {
+        $ops.push(self.as_post($catchpast, :rtype('v')));
+        $ops.push_pirop('pop_eh') # FIXME: should be before catchpost
+    }
+    $ops.push($endlabel);
+    $ops.result($trypost);
+    $ops;
 }
 
 
