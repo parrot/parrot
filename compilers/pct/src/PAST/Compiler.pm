@@ -1420,58 +1420,41 @@ otherwise return Undef.  Short-circuits with Undef as soon as
 a second child is found that evaluates as true.
 
 multi method xor(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(:node($node));
+    $ops.result(self.unique('$P'));
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        $S0 = self.'unique'('$P')
-        ops.'result'($S0)
+    my $falselabel := POST::Label.new(:name('xor_false'));
+    my $endlabel   := POST::Label.new(:name('xor_end'));
 
-        .local pmc labelproto, endlabel, falselabel
-        labelproto = get_hll_global ['POST'], 'Label'
-        falselabel = labelproto.'new'('name'=>'xor_false')
-        endlabel = labelproto.'new'('name'=>'xor_end')
-
-        .local pmc iter, apast, apost, i, t, u
-        i = self.'unique'('$I')
-        t = self.'unique'('$I')
-        u = self.'unique'('$I')
-        iter = node.'iterator'()
-        apast = shift iter
-        apost = self.'as_post'(apast, 'rtype'=>'P')
-        ops.'push'(apost)
-        ops.'push_pirop'('set', ops, apost)
-        ops.'push_pirop'('istrue', t, apost)
-      middle_child:
-        .local pmc bpast, bpost
-        bpast = shift iter
-        bpost = self.'as_post'(bpast, 'rtype'=>'P')
-        ops.'push'(bpost)
-        ops.'push_pirop'('istrue', u, bpost)
-        ops.'push_pirop'('and', i, t, u)
-        ops.'push_pirop'('if', i, falselabel)
-        unless iter goto last_child
-        .local pmc truelabel
-        truelabel = labelproto.'new'('name'=>'xor_true')
-        ops.'push_pirop'('if', t, truelabel)
-        ops.'push_pirop'('set', ops, bpost)
-        ops.'push_pirop'('set', t, u)
-        ops.'push'(truelabel)
-        goto middle_child
-      last_child:
-        ops.'push_pirop'('if', t, endlabel)
-        ops.'push_pirop'('set', ops, bpost)
-        ops.'push_pirop'('goto', endlabel)
-        ops.'push'(falselabel)
-        ops.'push_pirop'('new', ops, '"Undef"')
-        ops.'push'(endlabel)
-        .return (ops)
+    my $i := self.unique('$I');
+    my $t := self.unique('$i');
+    my $u := self.unique('$i');
+    my $iter := node.iterator();
+    my $apost := self.as_post(pir::shift($iter), :rtype('P'));
+    my $bpost;
+    $ops.push($apost);
+    $ops.push_pirop('set', $ops, $apost);
+    $ops.push_pirop('istrue', $t, $apost);
+    while 1 {
+        $bpost := self.as_post(pir::shift($iter), :rtype('P'));
+        $ops.push($bpost);
+        $ops.push_pirop('istrue', $u, $bpost);
+        $ops.push_pirop('and', $i, $t, $u);
+        $ops.push_pirop('if', $i, $falselabel);
+        last unless $iter;
+        my $truelabel := POST::Label.new(:name('xor_true'));
+        $ops.push_pirop('if', $t, $truelabel);
+        $ops.push_pirop('set', $ops, $bpost);
+        $ops.push_pirop('set', $t, $u);
+        $ops.push($truelabel);
     }
+    $ops.push_pirop('if', $t, $endlabel);
+    $ops.push_pirop('set', $ops, $bpost);
+    $ops.push_pirop('goto', $endlabel);
+    $ops.push($falselabel);
+    $ops.push_pirop('new', $ops, '"Undef"');
+    $ops.push($endlabel);
+    $ops;
 }
 
 
