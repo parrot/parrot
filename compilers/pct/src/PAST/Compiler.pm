@@ -1242,34 +1242,24 @@ is determined by the C<returns> attribute, which defaults
 to C<ResizablePMCArray> if not set.
 
 multi method list(PAST::Op $node, *%options) {
+    # my ($ops, @posargs) := self.post_children($node, :signature('v*'));
+    my $ops;
+    my @posargs;
     Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+        $P0 = find_lex '$node'
+        ($P0, $P1) = self.'post_children'($P0, 'signature'=>'v*')
+        store_lex '$ops', $P0
+        store_lex '@posargs', $P1
+    };
 
-        .local pmc ops, posargs
-        (ops, posargs) = self.'post_children'(node, 'signature'=>'v*')
+    my $returns := $node.returns();
+    $returns := 'ResizablePMCArray' unless $returns;
 
-        .local pmc returns
-        returns = node.'returns'()
-        if returns goto have_returns
-        returns = box 'ResizablePMCArray'
-      have_returns:
-
-        .local pmc listpost, it
-        listpost = self.'as_vivipost'(returns, 'rtype'=>'P')
-        ops.'result'(listpost)
-        ops.'push'(listpost)
-        it = iter posargs
-      iter_loop:
-        unless it goto iter_end
-        $S0 = shift it
-        ops.'push_pirop'('push', listpost, $S0)
-        goto iter_loop
-      iter_end:
-        .return (ops)
-    }
+    my $listpost := self.as_vivipost($returns, :rtype('P'));
+    $ops.result($listpost);
+    $ops.push($listpost);
+    $ops.push_pirop('push', $listpost, $_) for @posargs;
+    $ops;
 }
 
 
