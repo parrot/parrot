@@ -261,8 +261,8 @@ hbdb_init(PARROT_INTERP)
     }
 
     /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
-    interp->hbdb->state |= HBDB_RUNNING;
-    interp->hbdb->state |= HBDB_ENTERED;
+    HBDB_FLAG_SET(interp, HBDB_RUNNING);
+    HBDB_FLAG_SET(interp, HBDB_ENTERED);
 }
 
 /*
@@ -284,8 +284,8 @@ hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
     do {
         Parrot_runcode(interp, argc, argv);
 
-        interp->hbdb->state |= HBDB_STOPPED;
-    } while (!(interp->hbdb->state & HBDB_EXIT));
+        HBDB_FLAG_SET(interp, HBDB_STOPPED);
+    } while (!(HBDB_FLAG_TEST(interp, HBDB_EXIT)));
 }
 
 /*

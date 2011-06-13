@@ -20,6 +20,11 @@
 /* Abstract access to fields in Parrot_Interp */
 #define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
+/* Convience macros for manipulating the HBDB bitmask in Parrot_Interp */
+#define HBDB_FLAG_SET(interp, flag)   ((interp)->hbdb->state |= (flag))
+#define HBDB_FLAG_CLEAR(interp, flag) ((interp)->hbdb->state &= ~(flag))
+#define HBDB_FLAG_TEST(interp, flag)  ((interp)->hbdb->state &= (flag))
+
 /* Flags used to alter and identify the current state of the debugger   */
 typedef enum {
     HBDB_SRC_LOADED   = 0x0001,    /* Source code for debugge is loaded */
