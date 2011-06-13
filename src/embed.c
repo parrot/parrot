@@ -153,6 +153,8 @@ set up the appropriate context.
 If no match, set up a dummy PMC entry.  In either case, return a
 pointer to the PMC.
 
+DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
+
 =cut
 
 */
