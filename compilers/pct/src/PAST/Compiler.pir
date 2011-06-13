@@ -445,12 +445,12 @@ forced into that register (with conversions as needed).
     ##  If we just need the value in a register (rtype == 'r'),
     ##  then create result based on the preferred register type (rrtype).
     if rtype != 'r' goto coerce_reg_1
-    result = self.'uniquereg'(rrtype)
+    result = self.'tempreg'(rrtype)
   coerce_reg_1:
     ##  if we haven't set the result target yet, then generate one
     ##  based on rtype.  (The case of rtype == 'r' was handled above.)
     if result goto coerce_reg_2
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
   coerce_reg_2:
     ##  create a new ops node to hold the coercion, put C<post> in it.
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -648,7 +648,7 @@ Return an empty POST node that can be used to hold a (PMC) result.
     .param pmc options         :slurpy :named
     .local string result
     $P0 = get_hll_global ['POST'], 'Ops'
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     .tailcall $P0.'new'('result'=>result)
 .end
 
@@ -1267,7 +1267,7 @@ a 'pasttype' of 'pirop'.
     goto pirop_void
   pirop_reg:
     .local string result
-    result = self.'uniquereg'($S0)
+    result = self.'tempreg'($S0)
     ops.'result'(result)
     ops.'push_pirop'(pirop, result, posargs :flat)
     .return (ops)
@@ -2675,7 +2675,7 @@ to have a PMC generated containing the constant value.
 
   result_pmc:
     .local string result
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     returns = self.'escape'(returns)
     ops.'push_pirop'('new', result, returns)
     ops.'push_pirop'('assign', result, value)
