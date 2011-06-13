@@ -1534,83 +1534,50 @@ redispatch to an appropriate handler based on the node's 'scope'
 attribute.
 
 multi method as_post(PAST::Var $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    ##  set 'bindpost'
+    my $bindpost := %options<bindpost>;
+    $bindpost := pir::new('Undef') unless $bindpost;
 
-        ##  set 'bindpost'
-        .local pmc bindpost
-        bindpost = options['bindpost']
-        unless null bindpost goto have_bindpost
-        bindpost = new 'Undef'
-      have_bindpost:
-
-        ## determine the node's scope.  First, check the node itself
-        .local string scope
-        scope = node.'scope'()
-        if scope goto have_scope
+    ## determine the node's scope.  First, check the node itself
+    my $scope := $node.scope();
+    my $name  := $node.name();
+    unless $scope {
         ## otherwise, check the current symbol table under the variable's name
-        .local string name
-        name = node.'name'()
-        .local pmc symtable
-        symtable = getattribute self, '%!symtable'
-        $P0 = symtable[name]
-        if null $P0 goto default_scope
-        scope = $P0['scope']
-        if scope goto have_scope
-      default_scope:
-        ##  see if an outer block has set a default scope
-        $P0 = symtable['']
-        if null $P0 goto scope_error
-        scope = $P0['scope']
-        unless scope goto scope_error
-      have_scope:
-        push_eh scope_error_ex
-        $P0 = find_method self, scope
-        .tailcall self.$P0(node, bindpost)
-      scope_error_ex:
-        pop_eh
-      scope_error:
-        unless scope goto scope_error_1
-        scope = concat " in '", scope
-        scope = concat scope, "' scope"
-      scope_error_1:
-        # Find the nearest named block
-        .local string blockname
-        blockname = ''
-        .local pmc it
-        $P0 = find_dynamic_lex '@*BLOCKPAST'
-        it = iter $P0
-      scope_error_block_loop:
-        unless it goto scope_error_2
-        $P0 = shift it
-        blockname = $P0.'name'()
-        unless blockname goto scope_error_block_loop
-      scope_error_2:
-        if blockname goto have_blockname
-        blockname = '<anonymous>'
-      have_blockname:
+        my $P0 := %!symtable{$name};
+        $scope := $P0<scope> if $P0;
+        unless $scope {
+            ##  see if an outer block has set a default scope
+            $P0 := %!symtable<>;
+            scope_error() unless $P0;
+            $scope := $P0<scope>;
+            scope_error() unless $scope;
+        }
+    }
+
+    try {
+        return self."$scope"($node, $bindpost);
+        CATCH { scope_error(); }
+    }
+
+    my sub scope_error() {
+        $scope := " in '$scope' scope" if $scope;
+        my $blockname := '';
+        for @*BLOCKPAST {
+            $blockname := $_.name();
+            last if $blockname;
+        }
+        $blockname := '<anonymous>' unless $blockname;
         # Find the source location, if available
-        .local string sourceline
-        .local pmc source, pos, files
-        sourceline = ''
-        source = node['source']
-        pos = node['pos']
-        if null source goto scope_error_3
-        files = find_caller_lex '$?FILES'
-        if null files goto scope_error_3
-        $S0 = files
-        sourceline = concat ' (', $S0
-        sourceline = concat sourceline, ':'
-        $I0 = self.'lineof'(source, pos)
-        inc $I0
-        $S0 = $I0
-        sourceline = concat sourceline, $S0
-        sourceline = concat sourceline, ')'
-      scope_error_3:
-        .tailcall self.'panic'("Symbol '", name, "' not predeclared", scope, " in ", blockname, sourceline)
+        my $sourceline := '';
+        my $source := $node<source>;
+        my $pos    := $node<pos>;
+        my $files  := pir::find_caller_lex__Ps('$?FILES');
+        unless $source && $files {
+            $sourceline := ' (' ~ $files ~ ':' ~
+            (self.lineof($source, $pos) + 1) ~ ')';
+        }
+        self.panic("Symbol '$name' not predeclared", $scope, " in ",
+            $blockname, $sourceline);
     }
 }
 
