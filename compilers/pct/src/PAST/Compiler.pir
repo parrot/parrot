@@ -316,9 +316,13 @@ return a permanent one instead (similar to C<uniquereg> above).
   have_rtype:
     .local pmc tempregs
     tempregs = find_dynamic_lex '%*TEMPREGS'
+    # if we don't have a temporary register pool, just make a unique one
+    if null tempregs goto reg_unique
+    unless tempregs goto reg_unique
     .local int rnum
     rnum = tempregs[rtype]
   make_reg:
+    # if we've run out of temporary registers, just make a unique one
     if rnum >= UNIQUE_BASE goto reg_unique
     $S0 = rnum
     inc rnum
@@ -329,6 +333,7 @@ return a permanent one instead (similar to C<uniquereg> above).
     if $I0 goto make_reg
     .return (reg)
   reg_unique:
+    # fall back to returning a globally allocated register
     reg = concat '$', rtype
     .tailcall self.'unique'(reg)
   reg_void:
@@ -775,15 +780,18 @@ defines the boundaries of temporary register allocations.
     .param pmc options         :slurpy :named
 
     .local pmc outerregs, tempregs
+    null tempregs
     outerregs = find_dynamic_lex '%*TEMPREGS'
+    if null outerregs goto have_tempregs
     tempregs = clone outerregs
+  have_tempregs:
     .lex '%*TEMPREGS', tempregs
-   
 
     .const 'Sub' node_as_post = 'Node.as_post'
     .local pmc post
     post = self.node_as_post(node, options :flat :named)
 
+    if null outerregs goto reserve_done
     .local string result
     result = post.'result'()
     $S0 = substr result, 0, 1
@@ -809,6 +817,11 @@ Return the POST representation of a C<PAST::Control>.
 .sub 'as_post' :method :multi(_, ['PAST';'Control'])
     .param pmc node
     .param pmc options         :slurpy :named
+
+     # Probably not safe to use tempregs in an exception handler
+     .local pmc tempregs
+     null tempregs
+    .lex '%*TEMPREGS', tempregs
 
     .local pmc ops, children, ishandled, nothandled
     .local string handled
@@ -846,6 +859,11 @@ Return the POST representation of a C<PAST::Control>.
 
     .local string rtype
     rtype = options['rtype']
+
+     # Probably not safe to use tempregs in an exception handler
+     .local pmc tempregs
+     null tempregs
+    .lex '%*TEMPREGS', tempregs
 
     .local pmc it, node, ops, pops, tail, skip
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1084,7 +1102,7 @@ Return the POST representation of a C<PAST::Block>.
     self.'panic'("Unrecognized control handler '", ctrlpast, "'")
   control_return:
     ##  handle 'return' exceptions
-    $S0 = self.'uniquereg'('P')
+    $S0 = self.'tempreg'('P')
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
     goto sub_done
@@ -1510,7 +1528,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     $P0.'add_directive'('.include "except_types.pasm"')
 
     .local string handreg
-    handreg = self.'uniquereg'('P')
+    handreg = self.'tempreg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_label', handreg, handlabel)
     ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
@@ -1539,7 +1557,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push'(handlabel)
     ops.'push_pirop'('.local pmc exception')
     ops.'push_pirop'('.get_results (exception)')
-    $S0 = self.'uniquereg'('P')
+    $S0 = self.'tempreg'('P')
     ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
     ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)
     ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_REDO', redolabel)
