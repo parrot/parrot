@@ -87,11 +87,6 @@ int Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-Parrot_Interp Parrot_new(ARGIN_NULLOK(Parrot_Interp parent));
-
-PARROT_EXPORT
 void Parrot_pbc_fixup_loaded(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -184,7 +179,6 @@ PMC* set_current_sub(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filename))
-#define ASSERT_ARGS_Parrot_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pbc_fixup_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pbc_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

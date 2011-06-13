@@ -64,31 +64,6 @@ extern int Parrot_exec_run;
 
 /*
 
-=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
-
-Returns a new Parrot interpreter.
-
-The first created interpreter (C<parent> is C<NULL>) is the last one
-to get destroyed.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_MALLOC
-Parrot_Interp
-Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
-{
-    ASSERT_ARGS(Parrot_new)
-    /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
-    return make_interpreter(parent, PARROT_NO_FLAGS);
-}
-
-
-/*
-
 =item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
 
 Initializes the new interpreter when it hasn't been initialized before.

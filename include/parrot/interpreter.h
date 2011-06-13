@@ -344,6 +344,11 @@ PARROT_EXPORT
 void Parrot_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+Parrot_Interp Parrot_new(ARGIN_NULLOK(Parrot_Interp parent));
+
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_get_emergency_interp(void);
 
@@ -357,6 +362,7 @@ void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)
 #define ASSERT_ARGS_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_get_emergency_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
