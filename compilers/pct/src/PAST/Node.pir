@@ -20,6 +20,7 @@ for compiling programs in Parrot.
 
     p6meta.'new_class'('PAST::Op', 'parent'=>base)
     p6meta.'new_class'('PAST::Stmts', 'parent'=>base)
+    p6meta.'new_class'('PAST::Stmt', 'parent'=>base)
     p6meta.'new_class'('PAST::Val', 'parent'=>base)
     p6meta.'new_class'('PAST::Var', 'parent'=>base)
     p6meta.'new_class'('PAST::Block', 'parent'=>base)
@@ -478,6 +479,11 @@ to traits in the grammar.
 
 
 =back
+
+=head2 PAST::Stmt
+
+C<PAST::Stmt> encapsulates sequence points within a program, particularly
+with respect to allocation and use of temporary registers.
 
 =head2 PAST::Stmts
 

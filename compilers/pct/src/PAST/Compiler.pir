@@ -45,6 +45,12 @@ any value type.
 
 .namespace [ 'PAST';'Compiler' ]
 
+# TEMPREG_BASE and UNIQUE_BASE identify the base location for
+# the temporary register set and unique registers
+.const int TEMPREG_BASE = 100
+.const int UNIQUE_BASE  = 1000
+
+
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
     .local pmc p6meta, cproto
@@ -163,7 +169,7 @@ any value type.
     controltypes['REDO']     = '.CONTROL_REDO'
     set_global '%!controltypes', controltypes
 
-    $P0 = box 11
+    $P0 = box UNIQUE_BASE
     set_global '$!serno', $P0
 
     .return ()
@@ -686,6 +692,31 @@ nodes of type C<PAST::Stmts>.
     ops = self.'wrap_handlers'(ops, eh, 'rtype'=>rtype)
   no_eh:
     .return (ops)
+.end
+
+=back
+
+=head3 C<PAST::Stmt>
+
+=over 4
+
+=item as_post(PAST::Stmt node)
+
+Return the POST representation of a C<PAST::Stmt>.  This is
+essentially the same as for C<PAST::Node> above, but also
+defines the boundaries of temporary register allocations.
+
+=cut
+
+.sub 'as_post' :method :multi(_, ['PAST';'Stmt'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .const 'Sub' node_as_post = 'Node.as_post'
+    .local pmc post
+    post = self.node_as_post(node, options :flat :named)
+
+    .return (post)
 .end
 
 =back
