@@ -301,7 +301,9 @@ Starts the "active" process of accepting commands and executing code.
 void
 hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
-    hbdb_t hbdb = interp->hbdb;
+    ASSERT_ARGS(hbdb_start)
+
+    hbdb_t *hbdb = interp->hbdb;
 
     /* Check that HBDB has been initialized properly */
     if(!hbdb)

@@ -126,6 +126,10 @@ void hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
     , PARROT_ASSERT_ARG(command))
@@ -142,6 +146,9 @@ void hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 #define ASSERT_ARGS_hbdb_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
+#define ASSERT_ARGS_hbdb_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hbdb.c */
 
