@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ src/extend.c - Parrot extension interface
 These are utility functions which extension code may use, but which are
 typically not used by Parrot internally. These functions are for EXTENDING
 use only, not for EMBEDDING. Embedding should be handed through the embedding
-API in src/embed/*.c.
+API with c files in directory src/embed/.
 
 Extending situations are things like NCI function libraries, dyn-pmc and
 dyn-op libraries which are loaded into Parrot and called from Parrot (as
