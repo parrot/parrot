@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 4;
+plan tests => 6;
 
 =head1 NAME
 
@@ -201,7 +201,52 @@ int main(void) {
     Parrot_PMC interp;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    /* This should throw an exception */
     Parrot_api_set_runcore(interp, "junk", 0);
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_runcore");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_Int wrap;
+    Parrot_PMC interp;
+    Parrot_PMC pir_compiler;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
+    Parrot_api_set_runcore(interp, "exec", 0);
+
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_(un)wrap_pointer");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_Int wrap;
+    Parrot_PMC interp;
+    Parrot_PMC pir_compiler;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    wrap = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
+    /* Need a Ptr or PtrBuf for this
+    wrap = Parrot_api_unwrap_pointer(interp, pir_compiler, ptr, 0);
+    */
     return 0;
 }
 CODE
@@ -262,10 +307,6 @@ int main(void) {
         Parrot_api_pmc_invoke(interp, mymethod, callcontext);
         Parrot_api_reset_call_signature(interp, callcontext);
     }
-    wrap = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
-    /* Need a Ptr or PtrBuf for this
-    wrap = Parrot_api_unwrap_pointer(interp, pir_compiler, ptr, 0);
-    */
     return 0;
 }
 CODE
