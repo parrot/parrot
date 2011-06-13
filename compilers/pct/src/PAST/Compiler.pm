@@ -595,36 +595,35 @@ multi method as_post(PAST::Control $node, *%options) {
 method wrap_handlers($child, $ehs, *%options) {
     my $rtype := %options<rtype>;
 
-    my $node;
-    my $ops  := POST::Ops.new(node => $node);
-    my $pops := POST::Ops.new(node => $node);
-    my $tail := POST::Ops.new(node => $node);
+    my $ops  := POST::Ops.new();
+    my $pops := POST::Ops.new();
+    my $tail := POST::Ops.new();
     my $skip := POST::Label.new(result => self.unique('skip_handler_'));
 
     for $ehs {
-        $node := $_;
-        my $label   := POST::Label.new(self.unique('control_'));
+        my $node := $_;
+        my $label   := POST::Label.new(result=>self.unique('control_'));
         my $ehreg   := self.uniquereg('P');
 
         $ops.push_pirop('new', $ehreg, "'ExceptionHandler'");
         $ops.push_pirop('set_label', $ehreg, $label);
 
         my $type := $node.handle_types();
-        if $type && %controltypes{$type} {
+        if $type && ($type := %controltypes{$type}) {
             my @types := pir::split(',', $type);
             $ops.push_pirop('callmethod', '"handle_types"', $ehreg, |@types);
             $*SUB.add_directive('.include "except_types.pasm"');
         }
 
         $type := $node.handle_types_except();
-        if $type && %controltypes{$type} {
+        if $type && ($type := %controltypes{$type}) {
             my @types := pir::split(',', $type);
             $ops.push_pirop('callmethod', '"handle_types_except"',
                 $ehreg, |@types);
             $*SUB.add_directive('.include "except_types.pasm"');
         }
 
-        $ops.push_pirop('push_eh', ehreg);
+        $ops.push_pirop('push_eh', $ehreg);
 
         # Add one pop_eh for every handler we push_eh
         $pops.push_pirop('pop_eh');
@@ -637,7 +636,7 @@ method wrap_handlers($child, $ehs, *%options) {
     $ops.push($child);
 
     $ops.push($pops);
-    $ops.push_pirop('gogo', $skip);
+    $ops.push_pirop('goto', $skip);
     $ops.push($tail);
     $ops.push($skip);
 
