@@ -1073,84 +1073,55 @@ multi method unless(PAST::Op $node, *%options) {
 Generate a standard loop with NEXT/LAST/REDO exception handling.
 
 method loop_gen(*%options) {
-    Q:PIR {
-        .local pmc options
-        options = find_lex '%options'
+    my $loopname  := self.unique('loop');
+    my $testlabel := POST::Label.new(:result($loopname ~ '_test'));
+    my $redolabel := POST::Label.new(:result($loopname ~ '_redo'));
+    my $nextlabel := POST::Label.new(:result($loopname ~ '_next'));
+    my $donelabel := POST::Label.new(:result($loopname ~ '_done'));
+    my $handlabel := POST::Label.new(:result($loopname ~ '_handler'));
 
-        .local pmc testlabel, prelabel, redolabel, nextlabel, donelabel, handlabel
-        $P0 = get_hll_global ['POST'], 'Label'
-        .local string loopname
-        loopname = self.'unique'('loop')
-        $S0 = concat loopname, '_test'
-        testlabel = $P0.'new'('result'=>$S0)
-        $S0 = concat loopname, '_redo'
-        redolabel = $P0.'new'('result'=>$S0)
-        $S0 = concat loopname, '_next'
-        nextlabel = $P0.'new'('result'=>$S0)
-        $S0 = concat loopname, '_done'
-        donelabel = $P0.'new'('result'=>$S0)
-        $S0 = concat loopname, '_handler'
-        handlabel = $P0.'new'('result'=>$S0)
+    my $testop    := %options<testop>;
+    my $testpost  := %options<test>;
+    my $prepost   := %options<pre>;
+    my $bodypost  := %options<body>;
+    my $nextpost  := %options<next>;
+    my $bodyfirst := %options<bodyfirst>;
 
-        .local pmc testpost, prepost, bodypost, nextpost
-        .local string testop
-        .local int bodyfirst
-        testop = options['testop']
-        testpost = options['test']
-        prepost  = options['pre']
-        bodypost = options['body']
-        nextpost = options['next']
-        bodyfirst = options['bodyfirst']
+    $testop := 'unless' unless $testop;
 
-        if testop goto have_testop
-        testop = 'unless'
-      have_testop:
+    my $ops := POST::Ops.new();
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'()
+    $*SUB.add_directive('.include "except_types.pasm"');
 
-        $P0 = find_dynamic_lex '$*SUB'
-        $P0.'add_directive'('.include "except_types.pasm"')
+    my $handreg := self.uniquereg('P');
+    $ops.push_pirop('new', $handreg, "'ExceptionHandler'");
+    $ops.push_pirop('set_label', $handreg, $handlabel);
+    $ops.push_pirop('callmethod', '"handle_types"', $handreg,
+        '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST');
+    $ops.push_pirop('push_eh', $handreg);
 
-        .local string handreg
-        handreg = self.'uniquereg'('P')
-        ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
-        ops.'push_pirop'('set_label', handreg, handlabel)
-        ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
-        ops.'push_pirop'('push_eh', handreg)
-
-        unless bodyfirst goto bodyfirst_done
-        ops.'push_pirop'('goto', redolabel)
-      bodyfirst_done:
-        ops.'push'(testlabel)
-        if null testpost goto test_done
-        ops.'push'(testpost)
-        ops.'push_pirop'(testop, testpost, donelabel)
-      test_done:
-        if null prepost goto pre_done
-        ops.'push'(prepost)
-      pre_done:
-        ops.'push'(redolabel)
-        if null bodypost goto body_done
-        ops.'push'(bodypost)
-      body_done:
-        ops.'push'(nextlabel)
-        if null nextpost goto next_done
-        ops.'push'(nextpost)
-      next_done:
-        ops.'push_pirop'('goto', testlabel)
-        ops.'push'(handlabel)
-        ops.'push_pirop'('.local pmc exception')
-        ops.'push_pirop'('.get_results (exception)')
-        $S0 = self.'uniquereg'('P')
-        ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
-        ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)
-        ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_REDO', redolabel)
-        ops.'push'(donelabel)
-        ops.'push_pirop'('pop_eh')
-        .return (ops)
+    $ops.push_pirop('goto', $redolabel) if $bodyfirst;
+    $ops.push($testlabel);
+    if $testpost {
+        $ops.push($testpost);
+        $ops.push_pirop($testop, $testpost, $donelabel);
     }
+    $ops.push($prepost) if $prepost;
+    $ops.push($redolabel);
+    $ops.push($bodypost) if $bodypost;
+    $ops.push($nextlabel);
+    $ops.push($nextpost) if $nextpost;
+    $ops.push_pirop('goto', $testlabel);
+    $ops.push($handlabel);
+    $ops.push_pirop('.local pmc exception');
+    $ops.push_pirop('.get_results (exception)');
+    my $S0 := self.uniquereg('P');
+    $ops.push_pirop('getattribute', $S0, 'exception', "'type'");
+    $ops.push_pirop('eq', $S0, '.CONTROL_LOOP_NEXT', $nextlabel);
+    $ops.push_pirop('eq', $S0, '.CONTROL_LOOP_REDO', $redolabel);
+    $ops.push($donelabel);
+    $ops.push_pirop('pop_eh');
+    $ops;
 }
 
 
