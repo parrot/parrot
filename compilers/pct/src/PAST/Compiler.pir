@@ -1150,7 +1150,7 @@ Return the POST representation of a C<PAST::Block>.
     unless null arglist goto have_arglist
     arglist = new 'ResizablePMCArray'
   have_arglist:
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     bpost.'push_pirop'(blockref)
@@ -1325,7 +1325,7 @@ for calling a sub.
     ##  generate the call itself
     .local string result, rtype
     rtype = options['rtype']
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
     ops.'result'(result)
     .return (ops)
@@ -1365,7 +1365,7 @@ a 'pasttype' of if/unless.
 
     .local string rtype, result
     rtype = options['rtype']
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     ops.'result'(result)
 
     .local string pasttype
@@ -1631,7 +1631,7 @@ by C<node>.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops      = $P0.'new'('node'=>node)
     prepost  = $P0.'new'()
-    $S0      = self.'uniquereg'('P')
+    $S0      = self.'tempreg'('P')
     testpost = $P0.'new'('result'=>$S0)
 
     .local pmc collpast, bodypast
@@ -1646,7 +1646,7 @@ by C<node>.
     .local pmc undeflabel
     $P0 = get_hll_global ['POST'], 'Label'
     undeflabel = $P0.'new'('name'=>'for_undef_')
-    $S0 = self.'uniquereg'('I')
+    $S0 = self.'tempreg'('I')
     ops.'push_pirop'('defined', $S0, collpost)
     ops.'push_pirop'('unless', $S0, undeflabel)
 
@@ -1673,7 +1673,7 @@ by C<node>.
     arglist = new 'ResizablePMCArray'
   arity_loop:
     .local string nextarg
-    nextarg = self.'uniquereg'('P')
+    nextarg = self.'tempreg'('P')
     prepost.'push_pirop'('shift', nextarg, testpost)
     if arity < 1 goto arity_end
     push arglist, nextarg
@@ -1777,7 +1777,7 @@ a return value.
     ops = $P0.'new'('node'=>node)
 
     .local string exreg, extype
-    exreg = self.'uniquereg'('P')
+    exreg = self.'tempreg'('P')
     extype = concat exreg, "['type']"
     ops.'push_pirop'('new', exreg, '"Exception"')
     ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
