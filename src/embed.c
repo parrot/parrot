@@ -81,7 +81,7 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
 {
     ASSERT_ARGS(Parrot_pbc_read)
     STRING * const str = Parrot_str_new(interp, fullname, 0);
-    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
+    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, str);
     UNUSED(debug);
     Parrot_pf_prepare_packfile_init(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
