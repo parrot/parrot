@@ -1186,77 +1186,53 @@ Return the POST representation of the C<for> loop given
 by C<node>.
 
 multi method for(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops      := POST::Ops.new(:node($node));
+    my $prepost  := POST::Ops.new();
+    my $testpost := POST::Ops.new(:result(self.uniquereg('P')));
 
-        .local pmc ops, prepost, testpost
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops      = $P0.'new'('node'=>node)
-        prepost  = $P0.'new'()
-        $S0      = self.'uniquereg'('P')
-        testpost = $P0.'new'('result'=>$S0)
+    my $collpast := $node[0];
+    my $bodypast := $node[1];
 
-        .local pmc collpast, bodypast
-        collpast = node[0]
-        bodypast = node[1]
+    my $collpost := self.as_post($collpast, :rtype('P'));
+    $ops.push($collpost);
 
-        .local pmc collpost
-        collpost = self.'as_post'(collpast, 'rtype'=>'P')
-        ops.'push'(collpost)
+    ##  don't try to iterate undefined values
+    my $undeflabel := POST::Label.new(:name('for_undef_'));
+    my $S0 := self.uniquereg('I');
+    $ops.push_pirop('defined', $S0, $collpost);
+    $ops.push_pirop('unless', $S0, $undeflabel);
 
-        ##  don't try to iterate undefined values
-        .local pmc undeflabel
-        $P0 = get_hll_global ['POST'], 'Label'
-        undeflabel = $P0.'new'('name'=>'for_undef_')
-        $S0 = self.'uniquereg'('I')
-        ops.'push_pirop'('defined', $S0, collpost)
-        ops.'push_pirop'('unless', $S0, undeflabel)
+    $ops.push_pirop('iter', $testpost, $collpost);
 
-        ops.'push_pirop'('iter', testpost, collpost)
-
-        ##  determine the arity of the loop.  We check arity of the 'for'
-        ##  node itself, and if not set we use the arity of the body.
-        .local int arity
-        arity = 1
-        $P0 = node.'arity'()
-        $I0 = defined $P0
-        unless $I0 goto arity_child
-        arity = $P0
-        goto have_arity
-      arity_child:
-        $P0 = bodypast.'arity'()
-        $I0 = defined $P0
-        unless $I0 goto have_arity
-        arity = $P0
-      have_arity:
-
-        ##  build the argument list to pass to the body
-        .local pmc arglist
-        arglist = new 'ResizablePMCArray'
-      arity_loop:
-        .local string nextarg
-        nextarg = self.'uniquereg'('P')
-        prepost.'push_pirop'('shift', nextarg, testpost)
-        if arity < 1 goto arity_end
-        push arglist, nextarg
-        dec arity
-        if arity > 0 goto arity_loop
-      arity_end:
-
-        ##  now build the body itself
-        .local pmc bodypost
-        bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
-
-        ##  generate the loop and return
-        $P0 = self.'loop_gen'('test'=>testpost, 'pre'=>prepost, 'body'=>bodypost)
-        ops.'push'($P0)
-        ops.'push'(undeflabel)
-        ops.'result'(testpost)
-        .return (ops)
+    ##  determine the arity of the loop.  We check arity of the 'for'
+    ##  node itself, and if not set we use the arity of the body.
+    my $arity := 1;
+    if pir::defined($node.arity()) {
+        $arity := $node.arity();
     }
+    elsif pir::defined($bodypast.arity()) {
+        $arity := $bodypast.arity();
+    }
+
+    ##  build the argument list to pass to the body
+    my @arglist := [];
+    repeat while $arity > 0 {
+        my $nextarg := self.uniquereg('P');
+        $prepost.push_pirop('shift', $nextarg, $testpost);
+        last if $arity < 1;
+        pir::push(@arglist, $nextarg);
+        $arity--;
+    }
+
+    ##  now build the body itself
+    my $bodypost := self.as_post($bodypast, :rtype('v'), :arglist(@arglist));
+
+    ##  generate the loop and return
+    $ops.push(self.loop_gen(:test($testpost), :pre($prepost),
+        :body($bodypost)));
+    $ops.push($undeflabel);
+    $ops.result($testpost);
+    $ops;
 }
 
 
