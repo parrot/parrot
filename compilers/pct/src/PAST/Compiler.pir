@@ -45,6 +45,12 @@ any value type.
 
 .namespace [ 'PAST';'Compiler' ]
 
+# TEMPREG_BASE and UNIQUE_BASE identify the base location for
+# the temporary register set and unique registers
+.const int TEMPREG_BASE = 100
+.const int UNIQUE_BASE  = 1000
+
+
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT/HLLCompiler.pbc'
     .local pmc p6meta, cproto
@@ -163,7 +169,7 @@ any value type.
     controltypes['REDO']     = '.CONTROL_REDO'
     set_global '%!controltypes', controltypes
 
-    $P0 = box 11
+    $P0 = box UNIQUE_BASE
     set_global '$!serno', $P0
 
     .return ()
@@ -196,7 +202,16 @@ Compile the abstract syntax tree given by C<past> into POST.
     .lex '@*BLOCKPAST', blockpast
     null $P99
     .lex '$*SUB', $P99
+
+    .local pmc tempregs
+    tempregs = find_dynamic_lex '%*TEMPREGS'
+    unless null tempregs goto have_tempregs
+    tempregs = self.'tempreg_frame'()
+  have_tempregs:
+    .lex '%*TEMPREGS', tempregs
+
     $P1 = self.'as_post'(past, 'rtype'=>'v')
+
     .return ($P1)
 .end
 
@@ -257,18 +272,90 @@ is one of the signature flags described above.
     unless rtype goto err_nortype
     if rtype == 'v' goto reg_void
     .local string reg
-    reg = 'P'
     $I0 = index 'Ss~Nn+Ii', rtype
-    if $I0 < 0 goto reg_psin
-    reg = substr 'SSSNNNII', $I0, 1
-  reg_psin:
-    reg = concat '$', reg
+    rtype = 'P'
+    if $I0 < 0 goto have_rtype
+    rtype = substr 'SSSNNNII', $I0, 1
+  have_rtype:
+    reg = concat '$', rtype
     .tailcall self.'unique'(reg)
   reg_void:
     .return ('')
   err_nortype:
     self.'panic'('rtype not set')
 .end
+
+
+=item tempreg_frame()
+
+Create a new temporary register frame, using register
+identifiers TEMPREG_BASE up to UNIQUE_BASE.
+
+=cut
+
+.sub 'tempreg_frame' :method
+    .local pmc tempregs
+    tempregs = new ['Hash']
+    tempregs['I'] = TEMPREG_BASE
+    tempregs['N'] = TEMPREG_BASE
+    tempregs['S'] = TEMPREG_BASE
+    tempregs['P'] = TEMPREG_BASE
+    .return (tempregs)
+.end
+
+
+=item tempreg(rtype)
+
+Generate a unique register by allocating from the temporary
+register pool frame in %*TEMPREGS.  %*TEMPREGS is a hash that
+has the next register identifier to be used for I, N, S, and
+P registers.  It also contains the names of any registers
+that have been "reserved" in the current frame (e.g. because
+they hold the return value from a PAST::Stmt node).
+
+If there are no temporary registers available, allocate and
+return a permanent one instead (similar to C<uniquereg> above).
+
+=cut
+
+.sub 'tempreg' :method
+    .param string rtype
+    unless rtype goto err_nortype
+    if rtype == 'v' goto reg_void
+    .local string reg
+    $I0 = index 'Ss~Nn+Ii', rtype
+    rtype = 'P'
+    if $I0 < 0 goto have_rtype
+    rtype = substr 'SSSNNNII', $I0, 1
+  have_rtype:
+    .local pmc tempregs
+    tempregs = find_dynamic_lex '%*TEMPREGS'
+    # if we don't have a temporary register pool, just make a unique one
+    if null tempregs goto reg_unique
+    unless tempregs goto reg_unique
+    .local int rnum
+    rnum = tempregs[rtype]
+  make_reg:
+    # if we've run out of temporary registers, just make a unique one
+    if rnum >= UNIQUE_BASE goto reg_unique
+    $S0 = rnum
+    inc rnum
+    tempregs[rtype] = rnum
+    reg = concat '$', rtype
+    reg = concat reg, $S0
+    $I0 = tempregs[reg]
+    if $I0 goto make_reg
+    .return (reg)
+  reg_unique:
+    # fall back to returning a globally allocated register
+    reg = concat '$', rtype
+    .tailcall self.'unique'(reg)
+  reg_void:
+    .return ('')
+  err_nortype:
+    self.'panic'('rtype not set')
+.end
+
 
 =item coerce(post, rtype)
 
@@ -377,12 +464,12 @@ forced into that register (with conversions as needed).
     ##  If we just need the value in a register (rtype == 'r'),
     ##  then create result based on the preferred register type (rrtype).
     if rtype != 'r' goto coerce_reg_1
-    result = self.'uniquereg'(rrtype)
+    result = self.'tempreg'(rrtype)
   coerce_reg_1:
     ##  if we haven't set the result target yet, then generate one
     ##  based on rtype.  (The case of rtype == 'r' was handled above.)
     if result goto coerce_reg_2
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
   coerce_reg_2:
     ##  create a new ops node to hold the coercion, put C<post> in it.
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -580,7 +667,7 @@ Return an empty POST node that can be used to hold a (PMC) result.
     .param pmc options         :slurpy :named
     .local string result
     $P0 = get_hll_global ['POST'], 'Ops'
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     .tailcall $P0.'new'('result'=>result)
 .end
 
@@ -640,7 +727,7 @@ is typically invoked by the various vivification methods below
 
     .local string result
     $P0 = get_hll_global ['POST'], 'Op'
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     $S0 = self.'escape'(node)
     .tailcall $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
 .end
@@ -690,6 +777,47 @@ nodes of type C<PAST::Stmts>.
 
 =back
 
+=head3 C<PAST::Stmt>
+
+=over 4
+
+=item as_post(PAST::Stmt node)
+
+Return the POST representation of a C<PAST::Stmt>.  This is
+essentially the same as for C<PAST::Node> above, but also
+defines the boundaries of temporary register allocations.
+
+=cut
+
+.sub 'as_post' :method :multi(_, ['PAST';'Stmt'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .local pmc outerregs, tempregs
+    null tempregs
+    outerregs = find_dynamic_lex '%*TEMPREGS'
+    if null outerregs goto have_tempregs
+    tempregs = clone outerregs
+  have_tempregs:
+    .lex '%*TEMPREGS', tempregs
+
+    .const 'Sub' node_as_post = 'Node.as_post'
+    .local pmc post
+    post = self.node_as_post(node, options :flat :named)
+
+    if null outerregs goto reserve_done
+    .local string result
+    result = post.'result'()
+    $S0 = substr result, 0, 1
+    if $S0 != '$' goto reserve_done
+    outerregs[result] = 1
+  reserve_done:
+
+    .return (post)
+.end
+
+=back
+
 =head3 C<PAST::Control>
 
 =over 4
@@ -703,6 +831,11 @@ Return the POST representation of a C<PAST::Control>.
 .sub 'as_post' :method :multi(_, ['PAST';'Control'])
     .param pmc node
     .param pmc options         :slurpy :named
+
+     # Probably not safe to use tempregs in an exception handler
+     .local pmc tempregs
+     null tempregs
+    .lex '%*TEMPREGS', tempregs
 
     .local pmc ops, children, ishandled, nothandled
     .local string handled
@@ -740,6 +873,11 @@ Return the POST representation of a C<PAST::Control>.
 
     .local string rtype
     rtype = options['rtype']
+
+     # Probably not safe to use tempregs in an exception handler
+     .local pmc tempregs
+     null tempregs
+    .lex '%*TEMPREGS', tempregs
 
     .local pmc it, node, ops, pops, tail, skip
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -931,6 +1069,16 @@ Return the POST representation of a C<PAST::Block>.
     compiler = node.'compiler'()
     if compiler goto children_compiler
 
+    # if tempregs flag is set, then create a new bank of temporary registers
+    .local pmc tempregs, outerregs
+    outerregs = find_dynamic_lex '%*TEMPREGS'
+    tempregs = outerregs
+    $I0 = node.'tempregs'()
+    unless $I0 goto have_tempregs
+    tempregs = self.'tempreg_frame'()
+  have_tempregs:
+    .lex '%*TEMPREGS', tempregs
+
     ##  control exception handler
     .local pmc ctrlpast, ctrllabel
     ctrlpast = node.'control'()
@@ -978,7 +1126,7 @@ Return the POST representation of a C<PAST::Block>.
     self.'panic'("Unrecognized control handler '", ctrlpast, "'")
   control_return:
     ##  handle 'return' exceptions
-    $S0 = self.'uniquereg'('P')
+    $S0 = self.'tempreg'('P')
     bpost.'push_pirop'('getattribute', $S0, 'exception', '"payload"')
     bpost.'push_pirop'('return', $S0)
     goto sub_done
@@ -1013,6 +1161,9 @@ Return the POST representation of a C<PAST::Block>.
     bpost['loadinit'] = lisub
   loadinit_done:
 
+    ## restore the outer temporary register bank
+    store_lex '%*TEMPREGS', outerregs
+
     ##  restore previous outer scope and symtable
     setattribute self, '%!symtable', outersym
 
@@ -1044,7 +1195,7 @@ Return the POST representation of a C<PAST::Block>.
     unless null arglist goto have_arglist
     arglist = new 'ResizablePMCArray'
   have_arglist:
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     $P0 = get_hll_global ['POST'], 'Ops'
     bpost = $P0.'new'(bpost, 'node'=>node, 'result'=>result)
     bpost.'push_pirop'(blockref)
@@ -1161,7 +1312,7 @@ a 'pasttype' of 'pirop'.
     goto pirop_void
   pirop_reg:
     .local string result
-    result = self.'uniquereg'($S0)
+    result = self.'tempreg'($S0)
     ops.'result'(result)
     ops.'push_pirop'(pirop, result, posargs :flat)
     .return (ops)
@@ -1219,7 +1370,7 @@ for calling a sub.
     ##  generate the call itself
     .local string result, rtype
     rtype = options['rtype']
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     ops.'push_pirop'(pasttype, posargs :flat, namedargs :flat, 'result'=>result)
     ops.'result'(result)
     .return (ops)
@@ -1259,7 +1410,7 @@ a 'pasttype' of if/unless.
 
     .local string rtype, result
     rtype = options['rtype']
-    result = self.'uniquereg'(rtype)
+    result = self.'tempreg'(rtype)
     ops.'result'(result)
 
     .local string pasttype
@@ -1404,7 +1555,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     $P0.'add_directive'('.include "except_types.pasm"')
 
     .local string handreg
-    handreg = self.'uniquereg'('P')
+    handreg = self.'tempreg'('P')
     ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
     ops.'push_pirop'('set_label', handreg, handlabel)
     ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
@@ -1433,7 +1584,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push'(handlabel)
     ops.'push_pirop'('.local pmc exception')
     ops.'push_pirop'('.get_results (exception)')
-    $S0 = self.'uniquereg'('P')
+    $S0 = self.'tempreg'('P')
     ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
     ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)
     ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_REDO', redolabel)
@@ -1525,7 +1676,7 @@ by C<node>.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops      = $P0.'new'('node'=>node)
     prepost  = $P0.'new'()
-    $S0      = self.'uniquereg'('P')
+    $S0      = self.'tempreg'('P')
     testpost = $P0.'new'('result'=>$S0)
 
     .local pmc collpast, bodypast
@@ -1540,7 +1691,7 @@ by C<node>.
     .local pmc undeflabel
     $P0 = get_hll_global ['POST'], 'Label'
     undeflabel = $P0.'new'('name'=>'for_undef_')
-    $S0 = self.'uniquereg'('I')
+    $S0 = self.'tempreg'('I')
     ops.'push_pirop'('defined', $S0, collpost)
     ops.'push_pirop'('unless', $S0, undeflabel)
 
@@ -1567,7 +1718,7 @@ by C<node>.
     arglist = new 'ResizablePMCArray'
   arity_loop:
     .local string nextarg
-    nextarg = self.'uniquereg'('P')
+    nextarg = self.'tempreg'('P')
     prepost.'push_pirop'('shift', nextarg, testpost)
     if arity < 1 goto arity_end
     push arglist, nextarg
@@ -1671,7 +1822,7 @@ a return value.
     ops = $P0.'new'('node'=>node)
 
     .local string exreg, extype
-    exreg = self.'uniquereg'('P')
+    exreg = self.'tempreg'('P')
     extype = concat exreg, "['type']"
     ops.'push_pirop'('new', exreg, '"Exception"')
     ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
@@ -2116,7 +2267,7 @@ attribute.
     .local string result
     result = vivipost.'result'()
     unless result == '' goto have_result
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
   have_result:
     ops.'result'(result)
     ops.'push'(fetchop)
@@ -2236,18 +2387,17 @@ attribute.
     .param pmc bindpost
 
     .local string name
-    $P0 = get_hll_global ['POST'], 'Ops'
     name = node.'name'()
     name = self.'escape'(name)
 
     .local int isdecl
     isdecl = node.'isdecl'()
 
-    if bindpost goto lexical_bind
-
   lexical_post:
     if isdecl goto lexical_decl
+    if bindpost goto lexical_bind
     .local pmc ops, fetchop, storeop
+    $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, name, 'pirop'=>'find_lex')
@@ -2255,21 +2405,27 @@ attribute.
     .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
   lexical_decl:
+    .local string lexreg
+    # lexical registers cannot be temporaries
+    lexreg = self.'uniquereg'('P')
+    $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    .local pmc viviself, vivipost
+    if bindpost goto have_bindpost
+    .local pmc viviself
     viviself = node.'viviself'()
-    vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-    ops.'push'(vivipost)
-    ops.'push_pirop'('.lex', name, vivipost)
-    ops.'result'(vivipost)
+    unless viviself goto have_lexreg
+    bindpost = self.'as_vivipost'(viviself, 'rtype'=>'P')
+    ops.'push'(bindpost)
+  have_bindpost:
+    ops.'push_pirop'('set', lexreg, bindpost)
+  have_lexreg:
+    ops.'push_pirop'('.lex', name, lexreg)
+    ops.'result'(lexreg)
     .return (ops)
 
   lexical_bind:
     $P0 = get_hll_global ['POST'], 'Op'
-    if isdecl goto lexical_bind_decl
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
-  lexical_bind_decl:
-    .tailcall $P0.'new'(name, bindpost, 'pirop'=>'.lex', 'result'=>bindpost)
 .end
 
 
@@ -2569,7 +2725,7 @@ to have a PMC generated containing the constant value.
 
   result_pmc:
     .local string result
-    result = self.'uniquereg'('P')
+    result = self.'tempreg'('P')
     returns = self.'escape'(returns)
     ops.'push_pirop'('new', result, returns)
     ops.'push_pirop'('assign', result, value)

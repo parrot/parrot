@@ -20,6 +20,7 @@ for compiling programs in Parrot.
 
     p6meta.'new_class'('PAST::Op', 'parent'=>base)
     p6meta.'new_class'('PAST::Stmts', 'parent'=>base)
+    p6meta.'new_class'('PAST::Stmt', 'parent'=>base)
     p6meta.'new_class'('PAST::Val', 'parent'=>base)
     p6meta.'new_class'('PAST::Var', 'parent'=>base)
     p6meta.'new_class'('PAST::Block', 'parent'=>base)
@@ -479,6 +480,11 @@ to traits in the grammar.
 
 =back
 
+=head2 PAST::Stmt
+
+C<PAST::Stmt> encapsulates sequence points within a program, particularly
+with respect to allocation and use of temporary registers.  
+
 =head2 PAST::Stmts
 
 C<PAST::Stmts> is a container of C<PAST::Node> without any specific methods.
@@ -803,6 +809,22 @@ Get/set any pirflags for this block.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('pirflags', value, has_value)
+.end
+
+
+=item tempregs([tempregs])
+
+Get/set whether this block is allowed to create a fresh
+bank of temporary registers.  Default is disabled -- i.e.,
+the block uses the same temporary register bank as its 
+outer statement.
+
+=cut
+
+.sub 'tempregs' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('tempregs', value, has_value)
 .end
 
 
