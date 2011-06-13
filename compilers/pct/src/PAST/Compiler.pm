@@ -1288,35 +1288,23 @@ Generate a return exception, using the first child (if any) as
 a return value.
 
 multi method return(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(:node($node));
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
+    my $exreg := self.uniquereg('P');
+    my $extype := $exreg ~ "['type']";
+    $ops.push_pirop('new', $exreg, '"Exception"');
+    $ops.push_pirop('set', $extype, '.CONTROL_RETURN');
+    $*SUB.add_directive('.include "except_types.pasm"');
 
-        .local string exreg, extype
-        exreg = self.'uniquereg'('P')
-        extype = concat exreg, "['type']"
-        ops.'push_pirop'('new', exreg, '"Exception"')
-        ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
-        $P0 = find_dynamic_lex '$*SUB'
-        $P0.'add_directive'('.include "except_types.pasm"')
-
-        .local pmc cpast, cpost
-        cpast = node[0]
-        unless cpast goto cpast_done
-        cpost = self.'as_post'(cpast, 'rtype'=>'P')
-        cpost = self.'coerce'(cpost, 'P')
-        ops.'push'(cpost)
-        ops.'push_pirop'('setattribute', exreg, "'payload'", cpost)
-      cpast_done:
-        ops.'push_pirop'('throw', exreg)
-        .return (ops)
+    my $cpast := $node[0];
+    if $cpast {
+        my $cpost := self.as_post($cpast, :rtype('P'));
+        $cpost := self.coerce($cpost, 'P');
+        $ops.push($cpost);
+        $ops.push_pirop('setattribute', $exreg, "'payload'", $cpost);
     }
+    $ops.push_pirop('throw', $exreg);
+    $ops;
 }
 
 
