@@ -77,11 +77,6 @@ void Parrot_disassemble(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 int Parrot_load_bytecode_file(PARROT_INTERP, ARGIN(const char *filename))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -173,9 +168,6 @@ PMC* set_current_sub(PARROT_INTERP)
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_Parrot_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stack_top))
 #define ASSERT_ARGS_Parrot_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(filename))

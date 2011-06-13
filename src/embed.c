@@ -62,34 +62,6 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(const char **argv))
 
 /*
 
-=item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
-
-Initializes the new interpreter when it hasn't been initialized before.
-
-Additionally sets the stack top, so that Parrot objects created
-in inner stack frames will be visible during GC stack walking code.
-B<stack_top> should be the address of an automatic variable in the caller's
-stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
-frames so that they are not destroyed during GC runs.
-
-Use this function when you call into Parrot before entering a run loop.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
-{
-    ASSERT_ARGS(Parrot_init_stacktop)
-    interp->lo_var_ptr = stack_top;
-    Parrot_gbl_init_world_once(interp);
-}
-
-
-/*
-
 =item C<void Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)>
 
 Sets on any of the following flags, specified by C<flag>, in the interpreter:
