@@ -1132,43 +1132,27 @@ method loop_gen(*%options) {
 Return the POST representation of a C<while> or C<until> loop.
 
 multi method while(PAST::Op $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
-        .local pmc exprpast, bodypast, nextpast
-        exprpast = node[0]
-        bodypast = node[1]
-        nextpast = node[2]
+    my $exprpast := $node[0];
+    my $bodypast := $node[1];
+    my $nextpast := $node[2];
 
-        .local pmc exprpost, bodypost, nextpost
-        exprpost = self.'as_post'(exprpast, 'rtype'=>'r')
+    my $exprpost := self.as_post($exprpast, :rtype('r'));
 
-        .local pmc arglist
-        arglist = new 'ResizablePMCArray'
-        $I0 = bodypast.'arity'()
-        if $I0 < 1 goto have_arglist
-        push arglist, exprpost
-      have_arglist:
-        bodypost = self.'as_post'(bodypast, 'rtype'=>'v', 'arglist'=>arglist)
+    my @arglist := [];
+    pir::push(@arglist, $exprpost) unless $bodypast.arity() < 1;
+    my $bodypost := self.as_post($bodypast, :rtype('v'), :arglist(@arglist));
 
-        null nextpost
-        if null nextpast goto have_nextpost
-        nextpost = self.'as_post'(nextpast, 'rtype'=>'v')
-      have_nextpost:
+    my $nextpost := null__P;
+    $nextpost := self.as_post($nextpast, :rtype('v')) if $nextpast;
 
-        .local string testop
-        testop = options['testop']
-        .local int bodyfirst
-        bodyfirst = options['bodyfirst']
+    my $testop    := %options<testop>;
+    my $bodyfirst := %options<bodyfirst>;
 
-        .local pmc ops
-        ops = self.'loop_gen'('testop'=>testop, 'test'=>exprpost, 'body'=>bodypost, 'bodyfirst'=>bodyfirst, 'next'=>nextpost)
-        ops.'result'(exprpost)
-        ops.'node'(node)
-        .return (ops)
-    }
+    my $ops := self.loop_gen(:testop($testop), :test($exprpost),
+        :body($bodypost), :bodyfirst($bodyfirst), :next($nextpost));
+    $ops.result($exprpost);
+    $ops.node($node);
+    $ops;
 }
 
 multi method until(PAST::Op $node, *%options) {
