@@ -454,6 +454,285 @@ Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
     return ((Parrot_ParrotInterpreter_attributes*)interp_pmc->data)->interp;
 }
 
+/*
+
+=item C<void Parrot_set_flag(PARROT_INTERP, Parrot_Int flag)>
+
+Sets on any of the following flags, specified by C<flag>, in the interpreter:
+
+Flag                    Effect
+C<PARROT_BOUNDS_FLAG>   enable bounds checking
+C<PARROT_PROFILE_FLAG>  enable profiling,
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_flag(PARROT_INTERP, INTVAL flag)
+{
+    ASSERT_ARGS(Parrot_set_flag)
+    /* These two macros (from interpreter.h) do exactly what they look like. */
+
+    Interp_flags_SET(interp, flag);
+    switch (flag) {
+      case PARROT_BOUNDS_FLAG:
+      case PARROT_PROFILE_FLAG:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+        break;
+      default:
+        break;
+    }
+}
+
+
+/*
+
+=item C<void Parrot_set_debug(PARROT_INTERP, Parrot_UInt flag)>
+
+Set a debug flag: C<PARROT_DEBUG_FLAG>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_set_debug)
+    interp->debug_flags |= flag;
+}
+
+
+/*
+
+=item C<void Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)>
+
+Sets the name of the executable launching Parrot (see C<pbc_to_exe> and the
+C<parrot> binary).
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_executable_name(PARROT_INTERP, ARGIN(STRING * const name))
+{
+    ASSERT_ARGS(Parrot_set_executable_name)
+    PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
+    VTABLE_set_string_native(interp, name_pmc, name);
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
+        name_pmc);
+}
+
+
+/*
+
+=item C<void Parrot_set_trace(PARROT_INTERP, Parrot_UInt flag)>
+
+Set a trace flag: C<PARROT_TRACE_FLAG>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_set_trace)
+    Parrot_pcc_trace_flags_on(interp, interp->ctx, flag);
+    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+}
+
+
+/*
+
+=item C<void Parrot_clear_flag(PARROT_INTERP, Parrot_Int flag)>
+
+Clears a flag in the interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
+{
+    ASSERT_ARGS(Parrot_clear_flag)
+    Interp_flags_CLEAR(interp, flag);
+}
+
+
+/*
+
+=item C<void Parrot_clear_debug(PARROT_INTERP, Parrot_UInt flag)>
+
+Clears a flag in the interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_clear_debug)
+    interp->debug_flags &= ~flag;
+}
+
+
+/*
+
+=item C<void Parrot_clear_trace(PARROT_INTERP, Parrot_UInt flag)>
+
+Clears a flag in the interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_clear_trace)
+    Parrot_pcc_trace_flags_off(interp, interp->ctx, flag);
+}
+
+
+/*
+
+=item C<Parrot_Int Parrot_test_flag(PARROT_INTERP, Parrot_Int flag)>
+
+Test the interpreter flags specified in C<flag>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_Int
+Parrot_test_flag(PARROT_INTERP, INTVAL flag)
+{
+    ASSERT_ARGS(Parrot_test_flag)
+    return Interp_flags_TEST(interp, flag);
+}
+
+
+/*
+
+=item C<Parrot_UInt Parrot_test_debug(PARROT_INTERP, Parrot_UInt flag)>
+
+Test the interpreter flags specified in C<flag>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_UInt
+Parrot_test_debug(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_test_debug)
+    return interp->debug_flags & flag;
+}
+
+
+/*
+
+=item C<Parrot_UInt Parrot_test_trace(PARROT_INTERP, Parrot_UInt flag)>
+
+Test the interpreter flags specified in C<flag>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_UInt
+Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
+{
+    ASSERT_ARGS(Parrot_test_trace)
+    return Parrot_pcc_trace_flags_test(interp, interp->ctx, flag);
+}
+
+
+/*
+
+=item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
+
+Sets the specified run core.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
+{
+    ASSERT_ARGS(Parrot_set_run_core)
+    switch (core) {
+      case PARROT_SLOW_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+        break;
+      case PARROT_FAST_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
+        break;
+      case PARROT_EXEC_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
+        break;
+      case PARROT_GC_DEBUG_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gc_debug"));
+        break;
+      case PARROT_DEBUGGER_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "debugger"));
+        break;
+      case PARROT_PROFILING_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
+        break;
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "Invalid runcore requested\n");
+    }
+}
+
+
+/*
+
+=item C<void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)>
+
+Activates the given warnings.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
+{
+    ASSERT_ARGS(Parrot_setwarnings)
+    /* Activates the given warnings.  (Macro from warnings.h.) */
+    PARROT_WARNINGS_on(interp, wc);
+}
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
