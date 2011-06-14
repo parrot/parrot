@@ -1,8 +1,8 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1308013478.83486")
+.sub "_block11"  :anon :subid("10_1308074670.15743")
 .annotate 'line', 0
-    .const 'Sub' $P14 = "11_1308013478.83486" 
+    .const 'Sub' $P14 = "11_1308074670.15743" 
     capture_lex $P14
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -12,20 +12,20 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 4
-    .const 'Sub' $P14 = "11_1308013478.83486" 
+    .const 'Sub' $P14 = "11_1308074670.15743" 
     capture_lex $P14
     $P19 = $P14()
 .annotate 'line', 1
     .return ($P19)
-    .const 'Sub' $P21 = "13_1308013478.83486" 
+    .const 'Sub' $P21 = "13_1308074670.15743" 
     .return ($P21)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post14") :outer("10_1308013478.83486")
+.sub "" :load :init :subid("post14") :outer("10_1308074670.15743")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1308013478.83486" 
+    .const 'Sub' $P12 = "10_1308074670.15743" 
     .local pmc block
     set block, $P12
     $P24 = get_root_global ["parrot"], "P6metaclass"
@@ -34,7 +34,7 @@
 
 
 .namespace ["POST";"Ops"]
-.sub "_block13"  :subid("11_1308013478.83486") :outer("10_1308013478.83486")
+.sub "_block13"  :subid("11_1308074670.15743") :outer("10_1308074670.15743")
 .annotate 'line', 4
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -43,24 +43,24 @@
     $P0."ctxsave"()
   ctxsave_done:
     .return ()
-    .const 'Sub' $P16 = "12_1308013478.83486" 
+    .const 'Sub' $P16 = "12_1308074670.15743" 
     .return ($P16)
 .end
 
 
 .namespace ["POST";"Ops"]
-.sub "_block15" :load :anon :subid("12_1308013478.83486")
+.sub "_block15" :load :anon :subid("12_1308074670.15743")
 .annotate 'line', 4
-    .const 'Sub' $P17 = "11_1308013478.83486" 
+    .const 'Sub' $P17 = "11_1308074670.15743" 
     $P18 = $P17()
     .return ($P18)
 .end
 
 
 .namespace []
-.sub "_block20" :load :anon :subid("13_1308013478.83486")
+.sub "_block20" :load :anon :subid("13_1308074670.15743")
 .annotate 'line', 1
-    .const 'Sub' $P22 = "10_1308013478.83486" 
+    .const 'Sub' $P22 = "10_1308074670.15743" 
     $P23 = $P22()
     .return ($P23)
 .end
