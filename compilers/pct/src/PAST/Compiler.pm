@@ -262,10 +262,15 @@ method tempreg($rtype) {
     $rtype := 'P';
     $rtype := pir::substr('SSSNNNII', $I0, 1) unless $I0 < 0;
 
+    # if we don't have a temporary register pool, just make a unique one
+    return self.unique('$' ~ $rtype) unless %*TEMPREGS;
+
     my $reg;
     my $rnum := %*TEMPREGS{$rtype};
     repeat while %*TEMPREGS{$reg} {
+        # if we've run out of temporary registers, just make a unique one
         return self.unique('$' ~ $rtype) if $rnum >= $UNIQUE_BASE;
+
         $rnum++;
         %*TEMPREGS{$rtype} := $rnum;
         $reg := '$' ~ $rtype ~ $rnum;
@@ -659,12 +664,15 @@ multi method as_post(PAST::Stmt $node, *%options) {
     my $post;
 
     {
-        my %*TEMPREGS := pir::clone(%outerregs);
+        my %*TEMPREGS;
+        %*TEMPREGS := pir::clone(%outerregs) if %outerregs;
         $post := self.node_as_post($node, %options);
     }
 
     my $result := $post.result();
-    %outerregs{$result} := 1 if pir::substr($result, 0, 1) eq '$';
+    if %outerregs && pir::substr($result, 0, 1) eq '$' {
+        %outerregs{$result} := 1
+    }
 
     $post;
 }
@@ -676,6 +684,9 @@ multi method as_post(PAST::Stmt $node, *%options) {
 Return the POST representation of a C<PAST::Control>.
 
 multi method as_post(PAST::Control $node, *%options) {
+    # Probably not safe to use tempregs in an exception handler
+    my %*TEMPREGS;
+
     my  $ishandled := POST::Label.new(result=>self.unique(   'handled_'));
     my $nothandled := POST::Label.new(result=>self.unique('nothandled_'));
 
@@ -701,6 +712,9 @@ multi method as_post(PAST::Control $node, *%options) {
 
 method wrap_handlers($child, $ehs, *%options) {
     my $rtype := %options<rtype>;
+
+    # Probably not safe to use tempregs in an exception handler
+    my %*TEMPREGS;
 
     my $ops  := POST::Ops.new();
     my $pops := POST::Ops.new();
@@ -885,7 +899,7 @@ multi method as_post(PAST::Block $node, *%options) {
                 $bpost.push_pirop('.get_results (exception)');
                 if $ctrlpast eq 'return_pir' {
                     ##  handle 'return' exceptions
-                    my $reg := self.uniquereg('P');
+                    my $reg := self.tempreg('P');
                     $bpost.push_pirop('getattribute', $reg,
                         'exception', '"payload"');
                     $bpost.push_pirop('return', $reg);
@@ -1191,7 +1205,7 @@ method loop_gen(*%options) {
 
     $*SUB.add_directive('.include "except_types.pasm"');
 
-    my $handreg := self.uniquereg('P');
+    my $handreg := self.tempreg('P');
     $ops.push_pirop('new', $handreg, "'ExceptionHandler'");
     $ops.push_pirop('set_label', $handreg, $handlabel);
     $ops.push_pirop('callmethod', '"handle_types"', $handreg,
@@ -1213,7 +1227,7 @@ method loop_gen(*%options) {
     $ops.push($handlabel);
     $ops.push_pirop('.local pmc exception');
     $ops.push_pirop('.get_results (exception)');
-    my $S0 := self.uniquereg('P');
+    my $S0 := self.tempreg('P');
     $ops.push_pirop('getattribute', $S0, 'exception', "'type'");
     $ops.push_pirop('eq', $S0, '.CONTROL_LOOP_NEXT', $nextlabel);
     $ops.push_pirop('eq', $S0, '.CONTROL_LOOP_REDO', $redolabel);
