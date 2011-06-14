@@ -14,7 +14,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 23;
+plan tests => 24;
 
 =head1 NAME
 
@@ -190,7 +190,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+	#include "parrot/embed.h"
 #include "parrot/extend.h"
 
 int
@@ -211,6 +211,36 @@ main(int argc, const char *argv[])
 
 CODE
 Test
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string/Parrot_(un)register_string' );
+
+#include <stdio.h>
+	#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_String output, output2;
+
+    /* Interpreter set-up */
+    if (interp) {
+        output = Parrot_new_string(interp, "Test_reg_unreg", 14, "iso-8859-1", 0);
+
+        Parrot_register_string(interp, output);
+        Parrot_unregister_string(interp, output);
+
+        Parrot_eprintf(interp, "%S\n", output);
+
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+
+CODE
+Test_reg_unreg
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
