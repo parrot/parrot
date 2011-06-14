@@ -622,6 +622,9 @@ NOTE: We should design the binary format of M0 in a way that allows it to be mma
 by an interpreter. Which considerations does this imply?
 }}}
 
+All values stored in M0's binary representation will be stored using
+little-endian byte order.
+
 The header has the following structure:
 
   "\376M0B\r\n\032\n" : 8-byte magic number (copied/modified from pbc)
@@ -629,8 +632,7 @@ The header has the following structure:
   0x?        : 1 byte number of bytes in an I registers
   0x?        : 1 byte number of bytes in an N register
   0x?        : 1 byte number of bytes in a pointer
-  0x?        : 1 byte for endianness (1 for big, 0 for little)
-  xxxxx      : padding
+  xxxxx      : padding to 8-byte boundary
 
 The directory segment will be a list of offsets to the starts of chunks within
 the file.  It will have the following structure:
