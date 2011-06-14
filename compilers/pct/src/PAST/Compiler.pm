@@ -1764,7 +1764,7 @@ multi method contextual(PAST::Var $node, $bindpost) {
 
     my $ops     := POST::Ops.new(node => $node);
     my $fetchop := POST::Op.new($ops, $name, pirop => 'find_dynamic_lex');
-    my $storeop := POST::Op.new($ops, $name, pirop => 'store_dynamic_lex');
+    my $storeop := POST::Op.new($name, $ops, pirop => 'store_dynamic_lex');
     self.vivify($node, $ops, $fetchop, $storeop);
 }
 
