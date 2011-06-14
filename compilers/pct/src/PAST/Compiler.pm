@@ -918,7 +918,7 @@ multi method as_post(PAST::Block $node, *%options) {
         if $blocktype eq 'immediate' {
             my @arglist := %options<arglist>;
             @arglist := [] unless pir::defined(@arglist);
-            my $result := self.uniquereg($rtype);
+            my $result := self.tempreg($rtype);
             $bpost := POST::Ops.new($bpost, :node($node), :result($result));
             $bpost.push_pirop($blockref);
             $bpost.push_pirop('capture_lex', $blockreg) if $islexical;
@@ -1077,7 +1077,7 @@ multi method call(PAST::Op $node, *%options) {
 
     ##  generate the call itself
     my $rtype := %options<rtype>;
-    my $result := self.uniquereg($rtype);
+    my $result := self.tempreg($rtype);
     $ops.push_pirop($pasttype, |@posargs, |%namedargs, :result($result));
     $ops.result($result);
     $ops;
@@ -1102,7 +1102,7 @@ multi method if(PAST::Op $node, *%options) {
     my $ops := POST::Ops.new(:node($node));
 
     my $rtype := %options<rtype>;
-    my $result := self.uniquereg($rtype);
+    my $result := self.tempreg($rtype);
     $ops.result($result);
 
     my $pasttype := $node.pasttype();
@@ -1273,7 +1273,7 @@ by C<node>.
 multi method for(PAST::Op $node, *%options) {
     my $ops      := POST::Ops.new(:node($node));
     my $prepost  := POST::Ops.new();
-    my $testpost := POST::Ops.new(:result(self.uniquereg('P')));
+    my $testpost := POST::Ops.new(:result(self.tempreg('P')));
 
     my $collpast := $node[0];
     my $bodypast := $node[1];
@@ -1283,7 +1283,7 @@ multi method for(PAST::Op $node, *%options) {
 
     ##  don't try to iterate undefined values
     my $undeflabel := POST::Label.new(:name('for_undef_'));
-    my $S0 := self.uniquereg('I');
+    my $S0 := self.tempreg('I');
     $ops.push_pirop('defined', $S0, $collpost);
     $ops.push_pirop('unless', $S0, $undeflabel);
 
@@ -1302,7 +1302,7 @@ multi method for(PAST::Op $node, *%options) {
     ##  build the argument list to pass to the body
     my @arglist := [];
     repeat while $arity > 0 {
-        my $nextarg := self.uniquereg('P');
+        my $nextarg := self.tempreg('P');
         $prepost.push_pirop('shift', $nextarg, $testpost);
         last if $arity < 1;
         pir::push(@arglist, $nextarg);
@@ -1375,7 +1375,7 @@ a return value.
 multi method return(PAST::Op $node, *%options) {
     my $ops := POST::Ops.new(:node($node));
 
-    my $exreg := self.uniquereg('P');
+    my $exreg := self.tempreg('P');
     my $extype := $exreg ~ "['type']";
     $ops.push_pirop('new', $exreg, '"Exception"');
     $ops.push_pirop('set', $extype, '.CONTROL_RETURN');
