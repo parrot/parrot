@@ -609,7 +609,7 @@ is typically invoked by the various vivification methods below
 (e.g., in a PAST::Var node to default a variable to a given type).
 
 multi method as_vivipost(String $node, *%options) {
-    my $result := self.uniquereg('P');
+    my $result := self.tempreg('P');
     my $s := self.escape($node);
     POST::Op.new($result, $s, pirop => 'new', result => $result);
 }
@@ -1685,7 +1685,7 @@ method vivify($node, $ops, $fetchop, $storeop) {
     my $viviself := $node.viviself();
     my $vivipost := self.as_vivipost($viviself, rtype => 'P');
     my $result   := $vivipost.result();
-    $result := self.uniquereg('P') if $result eq '';
+    $result := self.tempreg('P') if $result eq '';
 
     $ops.result($result);
     $ops.push($fetchop);
@@ -1805,26 +1805,33 @@ multi method package(PAST::Var $node, $bindpost) {
 
 
 multi method lexical(PAST::Var $node, $bindpost) {
-    my $name := self.escape($node.name());
+    my $name   := self.escape($node.name());
     my $isdecl := $node.isdecl();
 
-    if $bindpost {
-        my $pirop := $isdecl ?? '.lex' !! 'store_lex';
-        return POST::Op.new($name, $bindpost,
-            pirop => $pirop, result => $bindpost);
-    }
-
-    my $ops := POST::Ops.new(node => $node);
-
     if $isdecl {
+        # lexical registers cannot be temporaries
+        my $lexreg   := self.uniquereg('P');
+        my $ops      := POST::Ops.new(node => $node);
         my $viviself := $node.viviself();
-        my $vivipost := self.as_vivipost($viviself, rtype => 'P');
-        $ops.push($vivipost);
-        $ops.push_pirop('.lex', $name, $vivipost);
-        $ops.result($vivipost);
+
+        if !$bindpost && $viviself {
+            $bindpost := self.as_vivipost($viviself, rtype => 'P');
+            $ops.push($bindpost);
+        }
+
+        $ops.push_pirop('set', $lexreg, $bindpost) if $bindpost;
+
+        $ops.push_pirop('.lex', $name, $lexreg);
+        $ops.result($lexreg);
         return $ops;
     }
     else {
+        if $bindpost {
+            return POST::Op.new($name, $bindpost,
+                    :pirop('store_lex'), :result($bindpost));
+        }
+
+        my $ops     := POST::Ops.new(node => $node);
         my $fetchop := POST::Op.new($ops, $name, pirop => 'find_lex');
         my $storeop := POST::Op.new($name, $ops, pirop => 'store_lex');
         return self.vivify($node, $ops, $fetchop, $storeop);
