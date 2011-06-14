@@ -806,6 +806,9 @@ defines the boundaries of temporary register allocations.
     post = self.node_as_post(node, options :flat :named)
 
     if null outerregs goto reserve_done
+    .local string rtype
+    rtype = options['rtype']
+    if rtype == 'v' goto reserve_done
     .local string result
     result = post.'result'()
     $S0 = substr result, 0, 1
