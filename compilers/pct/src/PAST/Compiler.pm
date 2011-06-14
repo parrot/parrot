@@ -383,12 +383,12 @@ method coerce($post, $rtype) {
         ##  If we just need the value in a register (rtype == 'r'),
         ##  then create result based on the preferred register type (rrtype).
         if rtype != 'r' goto coerce_reg_1
-        result = self.'uniquereg'(rrtype)
+        result = self.'tempreg'(rrtype)
       coerce_reg_1:
         ##  if we haven't set the result target yet, then generate one
         ##  based on rtype.  (The case of rtype == 'r' was handled above.)
         if result goto coerce_reg_2
-        result = self.'uniquereg'(rtype)
+        result = self.'tempreg'(rtype)
       coerce_reg_2:
         ##  create a new ops node to hold the coercion, put C<post> in it.
         $P0 = get_hll_global ['POST'], 'Ops'
@@ -574,7 +574,7 @@ multi method as_post($node, *%options) {
 Return an empty POST node that can be used to hold a (PMC) result.
 
 multi method as_post(Undef $node, *%options) {
-    POST::Ops.new(result => self.uniquereg('P'));
+    POST::Ops.new(result => self.tempreg('P'));
 }
 
 
@@ -1029,7 +1029,7 @@ multi method pirop(PAST::Op $node, *%options) {
         $ops.push_pirop($pirop, |@posargs);
         return $ops;
     }
-    my $result := self.uniquereg($S0);
+    my $result := self.tempreg($S0);
     $ops.result($result);
     $ops.push_pirop($pirop, $result, |@posargs);
     return $ops;
@@ -2099,7 +2099,7 @@ multi method as_post(PAST::Val $node, *%options) {
 
       result_pmc:
         .local string result
-        result = self.'uniquereg'('P')
+        result = self.'tempreg'('P')
         returns = self.'escape'(returns)
         ops.'push_pirop'('new', result, returns)
         ops.'push_pirop'('assign', result, value)
