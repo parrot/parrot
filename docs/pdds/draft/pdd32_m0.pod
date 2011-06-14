@@ -207,8 +207,10 @@ address is calculated as 256 * C<*$1> + C<*$2>.
 =item * goto_chunk - go to an offset in another chunk
 
 Unconditionally transfer control flow to an offset within another chunk's
-bytecode segment.  C<*$1> is used as the target address and C<$*2> is the name
-of the target chunk.
+bytecode segment, updating the current call frame's C<CHUNK>, C<CONSTS>, C<MDS>
+and C<BCS> members to point at the new chunk's name and segments, respectively.
+C<*$1> is used as the target address and C<$*2> is the name of the target
+chunk.
 
 =back
 
