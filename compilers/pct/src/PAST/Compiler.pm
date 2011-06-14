@@ -684,7 +684,7 @@ multi method as_post(PAST::Block $node, *%options) {
     my $multi     := $node.multi();
     my $loadlibs  := $node.loadlibs();
 
-	# We want '' or null, not undef
+    # We want '' or null, not undef
     $name      := '' unless pir::defined($name);
     $pirflags  := '' unless pir::defined($pirflags);
     $blocktype := '' unless pir::defined($blocktype);
@@ -719,146 +719,146 @@ multi method as_post(PAST::Block $node, *%options) {
     my $blockref := ".const 'Sub' $blockreg = " ~ self.escape($bpost.subid());
 
     ##  determine the outer POST::Sub for the new one
-	# It would be easier to use $*CALLER::SUB and skip the big block below,
-	# but that doesn't work in NQP, so a big block is what we get.
+    # It would be easier to use $*CALLER::SUB and skip the big block below,
+    # but that doesn't work in NQP, so a big block is what we get.
     my $outerpost := $*SUB;
-	{
-		my $*SUB := $bpost;
+    {
+        my $*SUB := $bpost;
 
-		my $islexical := $node.lexical();
-		if $islexical {
-			$bpost.outer($outerpost);
+        my $islexical := $node.lexical();
+        if $islexical {
+            $bpost.outer($outerpost);
 
-			##  add block setup code (cpost) to outer block if needed
-			if pir::defined($outerpost) {
-				my $cpost := POST::Ops.new(:result($blockreg));
-				$cpost.push_pirop($blockref);
-				$cpost.push_pirop('capture_lex', $blockreg);
-				$outerpost.unshift($cpost);
-			}
-		}
+            ##  add block setup code (cpost) to outer block if needed
+            if pir::defined($outerpost) {
+                my $cpost := POST::Ops.new(:result($blockreg));
+                $cpost.push_pirop($blockref);
+                $cpost.push_pirop('capture_lex', $blockreg);
+                $outerpost.unshift($cpost);
+            }
+        }
 
-		##  merge the node's symtable with the master
-		my %outersym := %!symtable;
-		my %symtable := %outersym;
-		##  if the Block doesn't have a symtable, re-use the existing one
-		if $node.symtable() {
-			##  if the Block has a default ('') entry, use the Block's
-			##  symtable as-is
-			%symtable := $node.symtable();
-			unless pir::defined(%symtable<>) {
-				##  merge the Block's symtable with outersym
-				%symtable := pir::clone(%symtable);
-				for %outersym {
-					next if pir::exists(%symtable, $_);
-					%symtable{$_} := %outersym{$_};
-				}
-			}
-		}
-		%!symtable := %symtable;
+        ##  merge the node's symtable with the master
+        my %outersym := %!symtable;
+        my %symtable := %outersym;
+        ##  if the Block doesn't have a symtable, re-use the existing one
+        if $node.symtable() {
+            ##  if the Block has a default ('') entry, use the Block's
+            ##  symtable as-is
+            %symtable := $node.symtable();
+            unless pir::defined(%symtable<>) {
+                ##  merge the Block's symtable with outersym
+                %symtable := pir::clone(%symtable);
+                for %outersym {
+                    next if pir::exists(%symtable, $_);
+                    %symtable{$_} := %outersym{$_};
+                }
+            }
+        }
+        %!symtable := %symtable;
 
-		my $compiler := $node.compiler();
-		if $compiler {
-			##  set the compiler to use for the POST::Sub node, pass on
-			##  and compiler arguments and add this block's child to it.
-			$bpost.compiler($compiler);
-			$bpost.compiler_args($node.compiler_args());
-			$bpost.push($node[0]);
-		}
-		else {
-			##  control exception handler
-			my $ctrlpast := $node.control();
-			my $ctrllabel;
+        my $compiler := $node.compiler();
+        if $compiler {
+            ##  set the compiler to use for the POST::Sub node, pass on
+            ##  and compiler arguments and add this block's child to it.
+            $bpost.compiler($compiler);
+            $bpost.compiler_args($node.compiler_args());
+            $bpost.push($node[0]);
+        }
+        else {
+            ##  control exception handler
+            my $ctrlpast := $node.control();
+            my $ctrllabel;
 
-			if $ctrlpast {
-				$ctrllabel := POST::Label.new(:result(self.unique('control_')));
-				my $reg := self.uniquereg('P');
-				$bpost.push_pirop('new', $reg, "['ExceptionHandler']",
-					'.CONTROL_RETURN');
-				$bpost.push_pirop('set_label', $reg, $ctrllabel);
-				$bpost.push_pirop('push_eh', $reg);
-				$bpost.add_directive('.include "except_types.pasm"');
-			}
+            if $ctrlpast {
+                $ctrllabel := POST::Label.new(:result(self.unique('control_')));
+                my $reg := self.uniquereg('P');
+                $bpost.push_pirop('new', $reg, "['ExceptionHandler']",
+                    '.CONTROL_RETURN');
+                $bpost.push_pirop('set_label', $reg, $ctrllabel);
+                $bpost.push_pirop('push_eh', $reg);
+                $bpost.add_directive('.include "except_types.pasm"');
+            }
 
-			##  all children but last are void context, last returns anything
-			my $sig := pir::repeat('v', pir::elements($node.list())) ~ '*';
-			##  convert children to post
-			my $ops := self.post_children($node, :signature($sig));
-			##  result of last child is return from block
-			my $retval := $ops[-1];
-			##  wrap the child with appropriate exception handlers, if any
-			my $eh := $node.handlers();
-			if $eh {
-				$ops := self.wrap_handlers($ops, $eh, :rtype(%options<rtype>));
-			}
-			$bpost.push($ops);
-			$bpost.push_pirop('return', $retval);
+            ##  all children but last are void context, last returns anything
+            my $sig := pir::repeat('v', pir::elements($node.list())) ~ '*';
+            ##  convert children to post
+            my $ops := self.post_children($node, :signature($sig));
+            ##  result of last child is return from block
+            my $retval := $ops[-1];
+            ##  wrap the child with appropriate exception handlers, if any
+            my $eh := $node.handlers();
+            if $eh {
+                $ops := self.wrap_handlers($ops, $eh, :rtype(%options<rtype>));
+            }
+            $bpost.push($ops);
+            $bpost.push_pirop('return', $retval);
 
-			if $ctrlpast {
-				$bpost.push($ctrllabel);
-				$bpost.push_pirop('.local pmc exception');
-				$bpost.push_pirop('.get_results (exception)');
-				if $ctrlpast eq 'return_pir' {
-					##  handle 'return' exceptions
-					my $reg := self.uniquereg('P');
-					$bpost.push_pirop('getattribute', $reg,
-						'exception', '"payload"');
-					$bpost.push_pirop('return', $reg);
-				}
-				elsif $ctrlpast.isa(PAST::Node) {
-					$bpost.push(self.as_post($ctrlpast, :rtype('*')));
-				}
-				else {
-					self.panic("Unrecognized control handler '$ctrlpast'");
-				}
-			}
-		}
+            if $ctrlpast {
+                $bpost.push($ctrllabel);
+                $bpost.push_pirop('.local pmc exception');
+                $bpost.push_pirop('.get_results (exception)');
+                if $ctrlpast eq 'return_pir' {
+                    ##  handle 'return' exceptions
+                    my $reg := self.uniquereg('P');
+                    $bpost.push_pirop('getattribute', $reg,
+                        'exception', '"payload"');
+                    $bpost.push_pirop('return', $reg);
+                }
+                elsif $ctrlpast.isa(PAST::Node) {
+                    $bpost.push(self.as_post($ctrlpast, :rtype('*')));
+                }
+                else {
+                    self.panic("Unrecognized control handler '$ctrlpast'");
+                }
+            }
+        }
 
-		##  generate any loadinit code for the sub
-		if pir::exists($node, 'loadinit') {
-			my $lisub := POST::Sub.new(:outer($bpost), :pirflags(':load :init'));
-			$lisub.push_pirop($blockref);
-			$lisub.push_pirop('.local pmc', 'block');
-			$lisub.push_pirop('set', 'block', $blockreg);
-			$lisub.push(self.as_post($node.loadinit(), :rtype('v')));
-			$bpost<loadinit> := $lisub;
-		}
+        ##  generate any loadinit code for the sub
+        if pir::exists($node, 'loadinit') {
+            my $lisub := POST::Sub.new(:outer($bpost), :pirflags(':load :init'));
+            $lisub.push_pirop($blockref);
+            $lisub.push_pirop('.local pmc', 'block');
+            $lisub.push_pirop('set', 'block', $blockreg);
+            $lisub.push(self.as_post($node.loadinit(), :rtype('v')));
+            $bpost<loadinit> := $lisub;
+        }
 
-		##  restore previous outer scope and symtable
-		%!symtable := %outersym;
+        ##  restore previous outer scope and symtable
+        %!symtable := %outersym;
 
-		##  return block or block result
-		my $rtype := %options<rtype>;
+        ##  return block or block result
+        my $rtype := %options<rtype>;
 
-		if $blocktype eq 'immediate' {
-			my @arglist := %options<arglist>;
-			@arglist := [] unless pir::defined(@arglist);
-			my $result := self.uniquereg($rtype);
-			$bpost := POST::Ops.new($bpost, :node($node), :result($result));
-			$bpost.push_pirop($blockref);
-			$bpost.push_pirop('capture_lex', $blockreg) if $islexical;
-			$bpost.push_pirop('call', $blockreg, |@arglist, :result($result));
-		}
-		elsif $rtype ne 'v' {
-			$bpost := POST::Ops.new($bpost, :node($node), :result($blockreg));
-			$bpost.push_pirop($blockref, :result($blockreg));
-			if $islexical {
-				if $node.closure() {
-					##  return a reference to a clone of the block with
-					##  captured outer context
-					my $result := self.uniquereg('P');
-					$bpost.push_pirop('newclosure', $result, $blockreg);
-					$bpost.result($result);
-				}
-				else {
-					$bpost.push_pirop('capture_lex', $blockreg);
-				}
-			}
-		}
-	} # Restore old $*SUB
+        if $blocktype eq 'immediate' {
+            my @arglist := %options<arglist>;
+            @arglist := [] unless pir::defined(@arglist);
+            my $result := self.uniquereg($rtype);
+            $bpost := POST::Ops.new($bpost, :node($node), :result($result));
+            $bpost.push_pirop($blockref);
+            $bpost.push_pirop('capture_lex', $blockreg) if $islexical;
+            $bpost.push_pirop('call', $blockreg, |@arglist, :result($result));
+        }
+        elsif $rtype ne 'v' {
+            $bpost := POST::Ops.new($bpost, :node($node), :result($blockreg));
+            $bpost.push_pirop($blockref, :result($blockreg));
+            if $islexical {
+                if $node.closure() {
+                    ##  return a reference to a clone of the block with
+                    ##  captured outer context
+                    my $result := self.uniquereg('P');
+                    $bpost.push_pirop('newclosure', $result, $blockreg);
+                    $bpost.result($result);
+                }
+                else {
+                    $bpost.push_pirop('capture_lex', $blockreg);
+                }
+            }
+        }
+    } # Restore old $*SUB
 
-	##  remove current block from @*BLOCKPAST
-	pir::shift(@*BLOCKPAST);
+    ##  remove current block from @*BLOCKPAST
+    pir::shift(@*BLOCKPAST);
     $bpost;
 }
 
@@ -923,13 +923,13 @@ multi method pirop(PAST::Op $node, *%options) {
     my $ops;
     my @posargs;
     # ($ops, @posargs) := self.post_children($node, :signature($signature));
-	Q:PIR {
-		$P0 = find_lex '$node'
-		$P1 = find_lex '$signature'
-		($P0, $P1) = self.'post_children'($P0, 'signature' => $P1)
-		store_lex '$ops', $P0
-		store_lex '@posargs', $P1
-	};
+    Q:PIR {
+        $P0 = find_lex '$node'
+        $P1 = find_lex '$signature'
+        ($P0, $P1) = self.'post_children'($P0, 'signature' => $P1)
+        store_lex '$ops', $P0
+        store_lex '@posargs', $P1
+    };
 
     my @arglist := $ops.list();
 
@@ -956,46 +956,46 @@ Return the POST representation of a C<PAST::Op> node
 for calling a sub.
 
 multi method call(PAST::Op $node, *%options) {
-	my $pasttype := $node.pasttype();
-	$pasttype := 'call' unless $pasttype;
+    my $pasttype := $node.pasttype();
+    $pasttype := 'call' unless $pasttype;
 
     my $signature := 'v:';
-	## for callmethod, the invocant (child) must be a PMC
-	$signature := 'vP:' if $pasttype eq 'callmethod';
+    ## for callmethod, the invocant (child) must be a PMC
+    $signature := 'vP:' if $pasttype eq 'callmethod';
 
-	my $name := $node.name();
-	my $ops;
-	my @posargs;
-	my %namedargs;
-	##  our first child is the thing to be invoked, so make sure it's a PMC
-	$signature := pir::replace($signature, 1, 0, 'P') unless $name;
-	# ($ops, @posargs, %namedargs) := self.'post_children'($node, :signature($signature));
-	Q:PIR {
-		$P0 = find_lex '$node'
-		$P1 = find_lex '$signature'
+    my $name := $node.name();
+    my $ops;
+    my @posargs;
+    my %namedargs;
+    ##  our first child is the thing to be invoked, so make sure it's a PMC
+    $signature := pir::replace($signature, 1, 0, 'P') unless $name;
+    # ($ops, @posargs, %namedargs) := self.'post_children'($node, :signature($signature));
+    Q:PIR {
+        $P0 = find_lex '$node'
+        $P1 = find_lex '$signature'
         ($P0, $P1, $P2) = self.'post_children'($P0, 'signature'=>$P1)
         store_lex '$ops', $P0
         store_lex '@posargs', $P1
         store_lex '%%namedargs', $P2
-	};
-	if $name {
-		if pir::isa($name, 'P6object') && $name.isa(PAST::Node) {
-			my $name_post := self.as_post($name, :rtype('s'));
-			$name_post := self.coerce($name_post, 's');
-			$ops.push($name_post);
-			pir::unshift(@posargs, $name_post);
-		}
-		else {
-			pir::unshift(@posargs, self.escape($name));
-		}
-	}
+    };
+    if $name {
+        if pir::isa($name, 'P6object') && $name.isa(PAST::Node) {
+            my $name_post := self.as_post($name, :rtype('s'));
+            $name_post := self.coerce($name_post, 's');
+            $ops.push($name_post);
+            pir::unshift(@posargs, $name_post);
+        }
+        else {
+            pir::unshift(@posargs, self.escape($name));
+        }
+    }
 
-	##  generate the call itself
-	my $rtype := %options<rtype>;
-	my $result := self.uniquereg($rtype);
-	$ops.push_pirop($pasttype, |@posargs, |%namedargs, :result($result));
-	$ops.result($result);
-	$ops;
+    ##  generate the call itself
+    my $rtype := %options<rtype>;
+    my $result := self.uniquereg($rtype);
+    $ops.push_pirop($pasttype, |@posargs, |%namedargs, :result($result));
+    $ops.result($result);
+    $ops;
 }
 
 
@@ -1026,55 +1026,55 @@ multi method if(PAST::Op $node, *%options) {
     my $thenpast := $node[1];
     my $elsepast := $node[2];
 
-	my $S0 := self.unique($pasttype ~ '_');
-	my $thenlabel := POST::Label.new(:result($S0));
-	my $endlabel :=  POST::Label.new(:result($S0 ~ '_end'));
+    my $S0 := self.unique($pasttype ~ '_');
+    my $thenlabel := POST::Label.new(:result($S0));
+    my $endlabel :=  POST::Label.new(:result($S0 ~ '_end'));
 
-	my $exprrtype := 'r';
-	$exprrtype := '*' if $rtype eq 'v';
-	my $childrtype := $rtype;
-	$childrtype := 'P' if pir::index('*:', $rtype) >= 0;
+    my $exprrtype := 'r';
+    $exprrtype := '*' if $rtype eq 'v';
+    my $childrtype := $rtype;
+    $childrtype := 'P' if pir::index('*:', $rtype) >= 0;
 
-	my $exprpost := self.as_post($exprpast, :rtype($exprrtype));
+    my $exprpost := self.as_post($exprpast, :rtype($exprrtype));
 
-	my $thenpost := make_childpost($thenpast);
-	my $elsepost := make_childpost($elsepast);
+    my $thenpost := make_childpost($thenpast);
+    my $elsepost := make_childpost($elsepast);
 
-	if pir::defined($elsepost) {
-		$ops.push($exprpost);
-		$ops.push_pirop($pasttype, $exprpost, $thenlabel);
-		$ops.push($elsepost) if pir::defined($elsepost);
-		$ops.push_pirop('goto', $endlabel);
-		$ops.push($thenlabel);
-		$ops.push($thenpost) if pir::defined($thenpost);
-		$ops.push($endlabel);
-		return $ops;
-	}
-	else {
-		my $S0 := 'if';
-		$S0 := 'unless' if $pasttype eq $S0;
-		$ops.push($exprpost);
-		$ops.push_pirop($S0, $exprpost, $endlabel);
-		$ops.push($thenpost) if pir::defined($thenpost);
-		$ops.push($endlabel);
-		return $ops;
-	}
+    if pir::defined($elsepost) {
+        $ops.push($exprpost);
+        $ops.push_pirop($pasttype, $exprpost, $thenlabel);
+        $ops.push($elsepost) if pir::defined($elsepost);
+        $ops.push_pirop('goto', $endlabel);
+        $ops.push($thenlabel);
+        $ops.push($thenpost) if pir::defined($thenpost);
+        $ops.push($endlabel);
+        return $ops;
+    }
+    else {
+        my $S0 := 'if';
+        $S0 := 'unless' if $pasttype eq $S0;
+        $ops.push($exprpost);
+        $ops.push_pirop($S0, $exprpost, $endlabel);
+        $ops.push($thenpost) if pir::defined($thenpost);
+        $ops.push($endlabel);
+        return $ops;
+    }
 
-	sub make_childpost($childpast?) {
-		my $childpost;
-		if pir::defined($childpast) {
-			my @arglist := [];
-			pir::push(@arglist, $exprpost) if $childpast.arity() > 0;
-			$childpost := self.as_post($childpast,
-				:rtype($childrtype), :arglist(@arglist));
-		}
-		else {
-			return $childpost if $rtype eq 'v';
-			$childpost := POST::Ops.new(:result($exprpost));
-		}
-		$childpost := self.coerce($childpost, $result) if $result;
-		$childpost;
-	}
+    sub make_childpost($childpast?) {
+        my $childpost;
+        if pir::defined($childpast) {
+            my @arglist := [];
+            pir::push(@arglist, $exprpost) if $childpast.arity() > 0;
+            $childpost := self.as_post($childpast,
+                :rtype($childrtype), :arglist(@arglist));
+        }
+        else {
+            return $childpost if $rtype eq 'v';
+            $childpost := POST::Ops.new(:result($exprpost));
+        }
+        $childpost := self.coerce($childpost, $result) if $result;
+        $childpost;
+    }
 }
 
 multi method unless(PAST::Op $node, *%options) {
