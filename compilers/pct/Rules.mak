@@ -71,6 +71,7 @@ compilers/pct/src/PAST/Nodes.pbc : $(PARROT) \
 		compilers/pct/src/PAST/Control.pir \
 		compilers/pct/src/PAST/Node.pir \
 		compilers/pct/src/PAST/Op.pir \
+		compilers/pct/src/PAST/Stmt.pir \
 		compilers/pct/src/PAST/Stmts.pir \
 		compilers/pct/src/PAST/Val.pir \
 		compilers/pct/src/PAST/Var.pir \
@@ -101,6 +102,7 @@ bootstrap-pct: $(NQP_RX)
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Control.pir compilers/pct/src/PAST/Control.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Node.pir compilers/pct/src/PAST/Node.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Op.pir compilers/pct/src/PAST/Op.pm
+	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Stmt.pir compilers/pct/src/PAST/Stmt.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Stmts.pir compilers/pct/src/PAST/Stmts.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Val.pir compilers/pct/src/PAST/Val.pm
 	$(NQP_RX) --target=pir -o compilers/pct/src/PAST/Var.pir compilers/pct/src/PAST/Var.pm

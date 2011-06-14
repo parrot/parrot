@@ -45,6 +45,11 @@ our %valflags;
 our %controltypes;
 our $serno;
 
+# XXX: These are supposed to be constant
+our $TEMPREG_BASE;
+our $UNIQUE_BASE;
+
+
 INIT {
     PAST::Compiler.language('PAST');
     PAST::Compiler.stages(<post pir evalpmc>);
@@ -149,7 +154,14 @@ INIT {
     %controltypes<LAST>     := '.CONTROL_LAST';
     %controltypes<REDO>     := '.CONTROL_REDO';
 
-    $serno := 11;
+    # TEMPREG_BASE and UNIQUE_BASE identify the base location for
+    # the temporary register set and unique registers
+    # XXX: These are supposed to be constants.
+    $TEMPREG_BASE := 100;
+    $UNIQUE_BASE  := 1000;
+
+	# XXX: clone protects the "constant" from the var incrementing
+    $serno := pir::clone($UNIQUE_BASE);
 }
 
 =head2 Compiler methods
@@ -584,6 +596,18 @@ method node_as_post($node, %options) {
 
     $ops;
 }
+
+=head3 C<PAST::Stmt>
+
+=item as_post(PAST::Stmt node)
+Return the POST representation of a C<PAST::Stmt>.  This is
+essentially the same as for C<PAST::Node> above, but also
+defines the boundaries of temporary register allocations.
+
+multi method as_post(PAST::Stmt $node, *%options) {
+    self.node_as_post($node, %options);
+}
+
 
 =head3 C<PAST::Control>
 
