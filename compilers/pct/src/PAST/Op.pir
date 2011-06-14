@@ -1,8 +1,8 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1307980074.55314")
+.sub "_block11"  :anon :subid("10_1308013491.84981")
 .annotate 'line', 0
-    .const 'Sub' $P14 = "11_1307980074.55314" 
+    .const 'Sub' $P14 = "11_1308013491.84981" 
     capture_lex $P14
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -12,37 +12,37 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 79
-    .const 'Sub' $P14 = "11_1307980074.55314" 
+    .const 'Sub' $P14 = "11_1308013491.84981" 
     capture_lex $P14
-    $P81 = $P14()
+    $P80 = $P14()
 .annotate 'line', 1
-    .return ($P81)
-    .const 'Sub' $P83 = "18_1307980074.55314" 
-    .return ($P83)
+    .return ($P80)
+    .const 'Sub' $P82 = "18_1308013491.84981" 
+    .return ($P82)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post19") :outer("10_1307980074.55314")
+.sub "" :load :init :subid("post19") :outer("10_1308013491.84981")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1307980074.55314" 
+    .const 'Sub' $P12 = "10_1308013491.84981" 
     .local pmc block
     set block, $P12
-    $P86 = get_root_global ["parrot"], "P6metaclass"
-    $P86."new_class"("PAST::Op", "PAST::Node" :named("parent"))
+    $P85 = get_root_global ["parrot"], "P6metaclass"
+    $P85."new_class"("PAST::Op", "PAST::Node" :named("parent"))
 .end
 
 
 .namespace ["PAST";"Op"]
-.sub "_block13"  :subid("11_1307980074.55314") :outer("10_1307980074.55314")
+.sub "_block13"  :subid("11_1308013491.84981") :outer("10_1308013491.84981")
 .annotate 'line', 79
-    .const 'Sub' $P48 = "15_1307980074.55314" 
+    .const 'Sub' $P48 = "15_1308013491.84981" 
     capture_lex $P48
-    .const 'Sub' $P37 = "14_1307980074.55314" 
+    .const 'Sub' $P37 = "14_1308013491.84981" 
     capture_lex $P37
-    .const 'Sub' $P26 = "13_1307980074.55314" 
+    .const 'Sub' $P26 = "13_1308013491.84981" 
     capture_lex $P26
-    .const 'Sub' $P15 = "12_1307980074.55314" 
+    .const 'Sub' $P15 = "12_1308013491.84981" 
     capture_lex $P15
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -51,18 +51,18 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 138
-    .const 'Sub' $P48 = "15_1307980074.55314" 
-    newclosure $P76, $P48
+    .const 'Sub' $P48 = "15_1308013491.84981" 
+    newclosure $P75, $P48
 .annotate 'line', 79
-    .return ($P76)
-    .const 'Sub' $P78 = "17_1307980074.55314" 
-    .return ($P78)
+    .return ($P75)
+    .const 'Sub' $P77 = "17_1308013491.84981" 
+    .return ($P77)
 .end
 
 
 .namespace ["PAST";"Op"]
 .include "except_types.pasm"
-.sub "pasttype"  :subid("12_1307980074.55314") :method :outer("11_1307980074.55314")
+.sub "pasttype"  :subid("12_1308013491.84981") :method :outer("11_1308013491.84981")
     .param pmc param_18 :optional
     .param int has_param_18 :opt_flag
 .annotate 'line', 79
@@ -93,7 +93,7 @@
 
 .namespace ["PAST";"Op"]
 .include "except_types.pasm"
-.sub "pirop"  :subid("13_1307980074.55314") :method :outer("11_1307980074.55314")
+.sub "pirop"  :subid("13_1308013491.84981") :method :outer("11_1308013491.84981")
     .param pmc param_29 :optional
     .param int has_param_29 :opt_flag
 .annotate 'line', 93
@@ -124,7 +124,7 @@
 
 .namespace ["PAST";"Op"]
 .include "except_types.pasm"
-.sub "inline"  :subid("14_1307980074.55314") :method :outer("11_1307980074.55314")
+.sub "inline"  :subid("14_1308013491.84981") :method :outer("11_1308013491.84981")
     .param pmc param_40 :optional
     .param int has_param_40 :opt_flag
 .annotate 'line', 127
@@ -155,10 +155,10 @@
 
 .namespace ["PAST";"Op"]
 .include "except_types.pasm"
-.sub "opattr"  :subid("15_1307980074.55314") :method :outer("11_1307980074.55314")
+.sub "opattr"  :subid("15_1308013491.84981") :method :outer("11_1308013491.84981")
     .param pmc param_51
 .annotate 'line', 138
-    .const 'Sub' $P57 = "16_1307980074.55314" 
+    .const 'Sub' $P57 = "16_1308013491.84981" 
     capture_lex $P57
     new $P50, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P50, control_49
@@ -174,26 +174,26 @@
     defined $I54, $P53
     unless $I54, for_undef_23
     iter $P52, $P53
-    new $P73, 'ExceptionHandler'
-    set_label $P73, loop72_handler
-    $P73."handle_types"(.CONTROL_LOOP_NEXT, .CONTROL_LOOP_REDO, .CONTROL_LOOP_LAST)
-    push_eh $P73
-  loop72_test:
-    unless $P52, loop72_done
+    new $P72, 'ExceptionHandler'
+    set_label $P72, loop71_handler
+    $P72."handle_types"(.CONTROL_LOOP_NEXT, .CONTROL_LOOP_REDO, .CONTROL_LOOP_LAST)
+    push_eh $P72
+  loop71_test:
+    unless $P52, loop71_done
     shift $P55, $P52
-  loop72_redo:
-    .const 'Sub' $P57 = "16_1307980074.55314" 
+  loop71_redo:
+    .const 'Sub' $P57 = "16_1308013491.84981" 
     capture_lex $P57
     $P57($P55)
-  loop72_next:
-    goto loop72_test
-  loop72_handler:
+  loop71_next:
+    goto loop71_test
+  loop71_handler:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P74, exception, 'type'
-    eq $P74, .CONTROL_LOOP_NEXT, loop72_next
-    eq $P74, .CONTROL_LOOP_REDO, loop72_redo
-  loop72_done:
+    getattribute $P73, exception, 'type'
+    eq $P73, .CONTROL_LOOP_NEXT, loop71_next
+    eq $P73, .CONTROL_LOOP_REDO, loop71_redo
+  loop71_done:
     pop_eh 
   for_undef_23:
 .annotate 'line', 138
@@ -201,14 +201,14 @@
   control_49:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P75, exception, "payload"
-    .return ($P75)
+    getattribute $P74, exception, "payload"
+    .return ($P74)
 .end
 
 
 .namespace ["PAST";"Op"]
 .include "except_types.pasm"
-.sub "_block56"  :anon :subid("16_1307980074.55314") :outer("15_1307980074.55314")
+.sub "_block56"  :anon :subid("16_1308013491.84981") :outer("15_1308013491.84981")
     .param pmc param_59
 .annotate 'line', 140
     new $P58, "Undef"
@@ -228,34 +228,33 @@
     find_lex $P64, "$arg"
     defined $I65, $P64
     if $I65, unless_63_end
-    set $I66, .CONTROL_LOOP_NEXT
-    die 0, $I66
+    die 0, .CONTROL_LOOP_NEXT
   unless_63_end:
 .annotate 'line', 142
-    find_lex $P67, "self"
-    find_lex $P68, "$arg"
-    find_lex $P69, "$_"
-    set $S70, $P69
-    $P71 = $P67.$S70($P68)
+    find_lex $P66, "self"
+    find_lex $P67, "$arg"
+    find_lex $P68, "$_"
+    set $S69, $P68
+    $P70 = $P66.$S69($P67)
 .annotate 'line', 139
-    .return ($P71)
+    .return ($P70)
 .end
 
 
 .namespace ["PAST";"Op"]
-.sub "_block77" :load :anon :subid("17_1307980074.55314")
+.sub "_block76" :load :anon :subid("17_1308013491.84981")
 .annotate 'line', 79
-    .const 'Sub' $P79 = "11_1307980074.55314" 
-    $P80 = $P79()
-    .return ($P80)
+    .const 'Sub' $P78 = "11_1308013491.84981" 
+    $P79 = $P78()
+    .return ($P79)
 .end
 
 
 .namespace []
-.sub "_block82" :load :anon :subid("18_1307980074.55314")
+.sub "_block81" :load :anon :subid("18_1308013491.84981")
 .annotate 'line', 1
-    .const 'Sub' $P84 = "10_1307980074.55314" 
-    $P85 = $P84()
-    .return ($P85)
+    .const 'Sub' $P83 = "10_1308013491.84981" 
+    $P84 = $P83()
+    .return ($P84)
 .end
 
