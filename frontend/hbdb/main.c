@@ -101,18 +101,14 @@ main(int argc, const char *argv[])
     GET_INIT_STRUCT(initargs);
 
     /* Create new interpreter */
-    if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
+    if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp)
+        && Parrot_api_set_executable_name(interp, argv[0]))) {
+
         fail(NULL);
     }
 
     /* Register hbdb runcore */
     if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
-        Parrot_api_destroy_interpreter(interp);
-        fail(interp);
-    }
-
-    /* Set executable name to "hbdb" */
-    if (!Parrot_api_set_executable_name(interp, argv[0])) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
