@@ -603,9 +603,9 @@ The following should be a working "hello world" program in M0.
 
 =head2 Binary Representation
 
-M0's binary representation will be composed of a fixed header, a single
-directory segment and a number of chunks.  Chunks correspond roughly to
-functions and have the following segments:
+M0's binary representation will be stored in .m0b files (M0 binary) and will be
+composed of a fixed header, a single directory segment and a number of chunks.
+Chunks correspond roughly to functions and have the following segments:
 
 =over 4
 
@@ -623,15 +623,23 @@ by an interpreter. Which considerations does this imply?
 }}}
 
 All values stored in M0's binary representation will be stored using
-little-endian byte order.
+little-endian byte order.  INSP values may be either 4 or 8 bytes, depending on
+what the underlying platform supports.  N registers always be 8 bytes long.
+Converting between M0 bytecode files of differing type sizes will be supported
+implicitly through the disassembly and reassembly of .m0b files.
+
+The size of a register type refers to both the number of bytes needed to store
+it in a .m0b file and the runtime size.  This means that it is possible for
+textual M0 to contain a constant integer or numeric value which requires
+greater precision than the target implementation is capable of supporting.  In
+this case, the assembler should fail with an appropriate error message.
 
 The header has the following structure:
 
   "\376M0B\r\n\032\n" : 8-byte magic number (copied/modified from pbc)
   0x00       : 1 byte version number (currently 0)
-  0x?        : 1 byte number of bytes in an I registers
-  0x?        : 1 byte number of bytes in an N register
-  0x?        : 1 byte number of bytes in a pointer
+  0x?        : 1 byte number of bytes in I registers (4 or 8)
+  0x?        : 1 byte number of bytes in P and S registers (same as sizeof(void*)) (4 or 8)
   xxxxx      : padding to 8-byte boundary
 
 The directory segment will be a list of offsets to the starts of chunks within
