@@ -969,7 +969,7 @@ multi method call(PAST::Op $node, *%options) {
         store_lex '%%namedargs', $P2
 	};
 	if $name {
-		if pir::isa($name, PAST::Node) {
+		if pir::isa($name, 'P6object') && $name.isa(PAST::Node) {
 			my $name_post := self.as_post($name, :rtype('s'));
 			$name_post := self.coerce($name_post, 's');
 			$ops.push($name_post);
