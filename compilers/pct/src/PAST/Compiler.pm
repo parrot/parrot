@@ -180,8 +180,22 @@ method to_post($past, *%options) {
 
     my @*BLOCKPAST := @?BLOCK;
     my $*SUB;
+    my %tempregs := pir::find_dynamic_lex('%*TEMPREGS');
 
-    self.as_post($past, rtype => 'v');
+    {
+        my %*TEMPREGS;
+        if pir::defined(%tempregs) {
+            %*TEMPREGS := %tempregs;
+        }
+        else {
+            %*TEMPREGS<I> := $TEMPREG_BASE;
+            %*TEMPREGS<N> := $TEMPREG_BASE;
+            %*TEMPREGS<S> := $TEMPREG_BASE;
+            %*TEMPREGS<P> := $TEMPREG_BASE;
+        }
+
+        self.as_post($past, rtype => 'v');
+    }
 }
 
 =item escape(str)
@@ -217,11 +231,47 @@ method uniquereg($rtype) {
 
     return '' if $rtype eq 'v';
 
-    my $reg := 'P';
     my $i := pir::index('Ss~Nn+Ii', $rtype);
-    $reg := pir::substr('SSSNNNII', $i, 1) unless $i < 0;
-    $reg := '$' ~ $reg;
-    self.unique($reg);
+    $rtype := 'P';
+    $rtype := pir::substr('SSSNNNII', $i, 1) unless $i < 0;
+    $rtype := '$' ~ $rtype ;
+
+    self.unique($rtype);
+}
+
+=begin item
+tempreg(rtype)
+
+Generate a unique register by allocating from the temporary
+register pool frame in %*TEMPREGS.  %*TEMPREGS is a hash that
+has the next register identifier to be used for I, N, S, and
+P registers.  It also contains the names of any registers
+that have been "reserved" in the current frame (e.g. because
+they hold the return value from a PAST::Stmt node).
+
+If there are no temporary registers available, allocate and
+return a permanent one instead (similar to C<uniquereg> above).
+=end item
+
+method tempreg($rtype) {
+    self.panic('rtype not set') unless $rtype;
+
+    return '' if $rtype eq 'v';
+
+    my $I0 := pir::index('Ss~Nn+Ii', $rtype);
+    $rtype := 'P';
+    $rtype := pir::substr('SSSNNNII', $I0, 1) unless $I0 < 0;
+
+    my $reg;
+    my $rnum := %*TEMPREGS{$rtype};
+    repeat while %*TEMPREGS{$reg} {
+        return self.unique('$' ~ $rtype) if $rnum >= $UNIQUE_BASE;
+        $rnum++;
+        %*TEMPREGS{$rtype} := $rnum;
+        $reg := '$' ~ $rtype ~ $rnum;
+    }
+
+    $reg;
 }
 
 =item coerce(post, rtype)
@@ -605,7 +655,18 @@ essentially the same as for C<PAST::Node> above, but also
 defines the boundaries of temporary register allocations.
 
 multi method as_post(PAST::Stmt $node, *%options) {
-    self.node_as_post($node, %options);
+    my %outerregs := %*TEMPREGS;
+    my $post;
+
+    {
+        my %*TEMPREGS := pir::clone(%outerregs);
+        $post := self.node_as_post($node, %options);
+    }
+
+    my $result := $post.result();
+    %outerregs{$result} := 1 if pir::substr($result, 0, 1) eq '$';
+
+    $post;
 }
 
 
