@@ -681,7 +681,10 @@ multi method as_post(PAST::Stmt $node, *%options) {
     }
 
     my $result := $post.result();
-    if %outerregs && pir::substr($result, 0, 1) eq '$' {
+    if %outerregs
+        && %options<rtype> ne 'v'
+        && pir::substr($result, 0, 1) eq '$'
+	{
         %outerregs{$result} := 1
     }
 
