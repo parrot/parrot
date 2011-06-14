@@ -241,6 +241,18 @@ method pirflags($value?) {
     self.attr('pirflags', $value, pir::defined($value));
 }
 
+
+=item tempregs([tempregs])
+Get/set whether this block is allowed to create a fresh
+bank of temporary registers.  Default is disabled -- i.e.,
+the block uses the same temporary register bank as its
+outer statement.
+
+method tempregs($value?) {
+	self.attr('tempregs', $value, pir::defined($value));
+}
+
+
 =begin head1
 AUTHOR
 

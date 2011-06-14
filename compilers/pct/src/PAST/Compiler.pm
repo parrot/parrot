@@ -188,10 +188,7 @@ method to_post($past, *%options) {
             %*TEMPREGS := %tempregs;
         }
         else {
-            %*TEMPREGS<I> := $TEMPREG_BASE;
-            %*TEMPREGS<N> := $TEMPREG_BASE;
-            %*TEMPREGS<S> := $TEMPREG_BASE;
-            %*TEMPREGS<P> := $TEMPREG_BASE;
+            %*TEMPREGS := self.tempreg_frame();
         }
 
         self.as_post($past, rtype => 'v');
@@ -237,6 +234,20 @@ method uniquereg($rtype) {
     $rtype := '$' ~ $rtype ;
 
     self.unique($rtype);
+}
+
+=item tempreg_frame()
+Create a new temporary register frame, using register
+identifiers TEMPREG_BASE up to UNIQUE_BASE.
+
+method tempreg_frame() {
+    my %tempregs;
+    %tempregs<I> := $TEMPREG_BASE;
+    %tempregs<N> := $TEMPREG_BASE;
+    %tempregs<S> := $TEMPREG_BASE;
+    %tempregs<P> := $TEMPREG_BASE;
+
+    %tempregs;
 }
 
 =begin item
@@ -856,6 +867,9 @@ multi method as_post(PAST::Block $node, *%options) {
         }
         %!symtable := %symtable;
 
+        # For tempregs flag
+        my %outerregs := %*TEMPREGS;
+
         my $compiler := $node.compiler();
         if $compiler {
             ##  set the compiler to use for the POST::Sub node, pass on
@@ -865,6 +879,16 @@ multi method as_post(PAST::Block $node, *%options) {
             $bpost.push($node[0]);
         }
         else {
+            # if tempregs flag is set, then create a new bank
+            # of temporary registers
+            my %*TEMPREGS;
+            if $node.tempregs() {
+                %*TEMPREGS := self.tempreg_frame();
+            }
+            else {
+                %*TEMPREGS := %outerregs;
+            }
+
             ##  control exception handler
             my $ctrlpast := $node.control();
             my $ctrllabel;
