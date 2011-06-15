@@ -128,10 +128,10 @@ main(int argc, const char *argv[])
     /* Display welcome message */
     welcome();
 
-    if (!Parrot_api_hbdb_get_command(interp)) {
+    /*if (!Parrot_api_hbdb_get_command(interp)) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
-    }
+    }*/
 
     /* Load bytecode */
     if (file) {
