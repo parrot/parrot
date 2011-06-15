@@ -194,6 +194,32 @@ hbdb_command_line(PARROT_INTERP)
 
 /*
 
+=item C<void hbdb_destroy(PARROT_INTERP)>
+
+Destroys the current instance of the debugger by freeing the memory allocated
+for it's interpreter.
+
+=cut
+
+*/
+
+void
+hbdb_destroy(PARROT_INTERP)
+{
+    ASSERT_ARGS(hbdb_destroy)
+
+    hbdb_t *hbdb = interp->hbdb;
+
+    /* TODO Do I need to free these? */
+    mem_gc_free(interp, hbdb->last_command);
+    mem_gc_free(interp, hbdb->current_command);
+
+    mem_gc_free(interp, hbdb);
+    interp->hbdb = NULL;
+}
+
+/*
+
 =item C<void hbdb_get_command(PARROT_INTERP)>
 
 Prompts the user to enter a command.

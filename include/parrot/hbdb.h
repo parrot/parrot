@@ -112,6 +112,9 @@ void hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void hbdb_destroy(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void hbdb_get_command(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -136,6 +139,8 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
 #define ASSERT_ARGS_hbdb_cmd_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
     , PARROT_ASSERT_ARG(command))
+#define ASSERT_ARGS_hbdb_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_get_line_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
