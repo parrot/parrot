@@ -147,7 +147,7 @@ hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
 
 =back
 
-=head1 GLOBAL FUNCTIONS
+=head1 GENERAL FUNCTIONS
 
 The remaining functions define some of the general behavior of the debugger.
 They do not follow a particular pattern.
@@ -197,6 +197,11 @@ hbdb_command_line(PARROT_INTERP)
 =item C<void hbdb_get_command(PARROT_INTERP)>
 
 Prompts the user to enter a command.
+
+The command entered is stored in C<< interp->hbdb->current_command >>. The
+previous command is stored in C<< interp->hbdb->last_command >>.
+
+It also prints the next line that will be executed.
 
 =cut
 
@@ -311,7 +316,7 @@ hbdb_init(PARROT_INTERP)
 
 =item C<void hbdb_runloop(PARROT_INTERP, int argc, const char *argv[])>
 
-Begins the main runloop by executing the code in the file specified on the command-line.
+Begins the main runloop by executing the debugee's source code.
 
 =cut
 
