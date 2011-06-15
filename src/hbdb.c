@@ -267,7 +267,7 @@ hbdb_init(PARROT_INTERP)
 
 /*
 
-=item C<void hbdb_run_code(PARROT_INTERP, int argc, const char *argv[])>
+=item C<void hbdb_runloop(PARROT_INTERP, int argc, const char *argv[])>
 
 Begins the main runloop by executing the code in the file specified on the command-line.
 
@@ -276,9 +276,9 @@ Begins the main runloop by executing the code in the file specified on the comma
 */
 
 void
-hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
-    ASSERT_ARGS(hbdb_run_code)
+    ASSERT_ARGS(hbdb_runloop)
 
     /* Main loop */
     do {
