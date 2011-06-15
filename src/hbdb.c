@@ -238,17 +238,23 @@ hbdb_get_command(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_get_command)
 
-    STRING *cmd;
+    char   *cmd;
+    hbdb_t *hbdb;
+
+    STRING *input;
 
     PMC    *stdinput;
     STRING *readline;
     STRING *prompt;
 
-    /* DEBUG */
-    PMC    *stdoutput = Parrot_io_stdhandle(interp, STDOUT_FILENO, NULL);
-    STRING *print     = Parrot_str_new_constant(interp, "print");
-    STRING *newline   = Parrot_str_new_constant(interp, "\n");
-    /* DEBUG */
+    hbdb = interp->hbdb;
+
+    /* Flush stdout buffer */
+    fflush(stdout);
+
+    /* Update last command */
+    if (hbdb->current_command != '\0')
+        strcpy(hbdb->last_command, hbdb->current_command);
 
     /* Create FileHandle PMC for stdin */
     stdinput = Parrot_io_stdhandle(interp, STDIN_FILENO, NULL);
@@ -257,15 +263,11 @@ hbdb_get_command(PARROT_INTERP)
     readline = Parrot_str_new_constant(interp, "readline_interactive");
     prompt   = Parrot_str_new_constant(interp, "(hbdb) ");
 
-    while (1) {
-        Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &cmd);
+    /* Invoke readline_interactive() */
+    Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &input);
 
-        Parrot_pcc_invoke_method_from_c_args(interp,
-                                             stdoutput,
-                                             print,
-                                             "S->",
-                                             Parrot_str_concat(interp, cmd, newline));
-    }
+    /* Store command */
+    hbdb->current_command = Parrot_str_to_cstring(interp, input);
 }
 
 /*
