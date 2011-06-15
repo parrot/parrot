@@ -49,6 +49,14 @@ typedef struct cmd      cmd;
 typedef struct cmd_list cmd_list;
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void hbdb_command_line(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_hbdb_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -149,6 +157,40 @@ They do not follow a particular pattern.
 =cut
 
 */
+
+/*
+
+=item C<static void hbdb_command_line(PARROT_INTERP)>
+
+Begins the command-line interface. Fetches and executes commands in a
+continuous loop.
+
+=cut
+
+*/
+
+static void
+hbdb_command_line(PARROT_INTERP)
+{
+    ASSERT_ARGS(hbdb_command_line)
+
+    const hbdb_t * const hbdb = interp->hbdb;
+
+    while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
+        const char *cmd;
+
+        /* Prompt user for command */
+        hbdb_get_command(interp);
+
+        /* Get command set by hbdb_get_command() */
+        cmd = hbdb->current_command;
+
+        if (cmd == '\0')
+            cmd = hbdb->last_command;
+
+        /*hbdb_run_command(interp, cmd);*/
+    }
+}
 
 /*
 
