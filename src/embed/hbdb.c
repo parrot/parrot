@@ -112,11 +112,11 @@ file specified on the command-line.
 
 PARROT_API
 Parrot_Int
-Parrot_api_hbdb_run_code(Parrot_PMC interp_pmc, int argc, ARGIN(const char *argv[]))
+Parrot_api_hbdb_runloop(Parrot_PMC interp_pmc, int argc, ARGIN(const char *argv[]))
 {
     EMBED_API_CALLIN(interp_pmc, interp)
 
-    hbdb_run_code(interp, argc, argv);
+    hbdb_runloop(interp, argc, argv);
 
     EMBED_API_CALLOUT(interp_pmc, interp)
 }

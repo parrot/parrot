@@ -122,7 +122,7 @@ INTVAL hbdb_get_line_number(PARROT_INTERP, ARGIN(PMC *context_pmc))
 void hbdb_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void hbdb_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+void hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -143,7 +143,7 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
     , PARROT_ASSERT_ARG(context_pmc))
 #define ASSERT_ARGS_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_hbdb_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_hbdb_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_hbdb_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -148,7 +148,7 @@ main(int argc, const char *argv[])
     }
 
     /* Run bytecode */
-    if (!Parrot_api_hbdb_run_code(interp, argc, argv)) {
+    if (!Parrot_api_hbdb_runloop(interp, argc, argv)) {
         Parrot_api_destroy_interpreter(interp);
         fail(interp);
     }
