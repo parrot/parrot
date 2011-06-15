@@ -798,13 +798,13 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
 {
     ASSERT_ARGS(runops_hbdb_core)
 
-    /* disable pc */
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
-
     if (HBDB_FLAG_TEST(interp, HBDB_ENTERED))
         hbdb_start(interp, pc);
 
     while (pc) {
+        /* Disable pc */
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
+
         DO_OP(pc, interp);
     }
 
