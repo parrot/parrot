@@ -100,11 +100,11 @@ Parrot_api_hbdb_init(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<Parrot_Int Parrot_api_hbdb_run_code(Parrot_PMC interp_pmc, int argc,
+=item C<Parrot_Int Parrot_api_hbdb_runloop(Parrot_PMC interp_pmc, int argc,
 const char *argv[])>
 
-Wrapper function for C<hbdb_run_code()>. Begins the main runloop by executing the code in the
-file specified on the command-line.
+Wrapper function for C<hbdb_runloop()>. Begins the main runloop by executing
+the debugee's source code.
 
 =cut
 
