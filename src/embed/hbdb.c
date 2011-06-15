@@ -53,30 +53,6 @@ Parrot_api_hbdb_get_command(Parrot_PMC interp_pmc)
 
 /*
 
-=item C<Parrot_Int Parrot_api_hbdb_get_line_number(Parrot_PMC interp_pmc,
-Parrot_PMC *context_pmc)>
-
-Wrapper function for C<hbdb_get_line_number()>. Returns the line number for the current context.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_hbdb_get_line_number(Parrot_PMC interp_pmc, ARGIN(Parrot_PMC *context_pmc))
-{
-    ASSERT_ARGS(Parrot_api_hbdb_get_line_number)
-
-    EMBED_API_CALLIN(interp_pmc, interp)
-
-    hbdb_get_line_number(interp, context_pmc);
-
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
 =item C<Parrot_Int Parrot_api_hbdb_init(Parrot_PMC interp_pmc)>
 
 Wrapper function for C<hbdb_init()>. Performs general initialization operations.
