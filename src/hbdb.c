@@ -185,6 +185,10 @@ hbdb_command_line(PARROT_INTERP)
         /* Get command set by hbdb_get_command() */
         cmd = hbdb->current_command;
 
+        /* STUB */
+        printf("%s\n", cmd);
+        /* STUB */
+
         if (cmd == '\0')
             cmd = hbdb->last_command;
 
