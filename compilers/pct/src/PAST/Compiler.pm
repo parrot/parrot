@@ -1728,57 +1728,35 @@ method vivify($node, $ops, $fetchop, $storeop) {
 
 
 multi method parameter(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
+    ##  determine lexical, register, and parameter names
+    my $name  := $node.name();
+    my $named := $node.named();
+    my $pname := self.unique('param_');
 
-        ##  get the current sub
-        .local pmc subpost
-        subpost = find_dynamic_lex '$*SUB'
+    ##  returned post node
+    my $ops := POST::Ops.new(:node($node), :result($pname));
 
-        ##  determine lexical, register, and parameter names
-        .local string named, pname, has_pname
-        .local pmc name
-        name = node.'name'()
-        named = node.'named'()
-        pname = self.'unique'('param_')
-        has_pname = concat 'has_', pname
-
-        ##  returned post node
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node, 'result'=>pname)
-
+    my $viviself := $node.viviself();
+    if $viviself {
         ##  handle optional params
-        .local pmc viviself, vivipost, vivilabel
-        viviself = node.'viviself'()
-        unless viviself goto param_required
-        vivipost = self.'as_vivipost'(viviself, 'rtype'=>'P')
-        $P0 = get_hll_global ['POST'], 'Label'
-        vivilabel = $P0.'new'('name'=>'optparam_')
-        subpost.'add_param'(pname, 'named'=>named, 'optional'=>1)
-        ops.'push_pirop'('if', has_pname, vivilabel)
-        ops.'push'(vivipost)
-        ops.'push_pirop'('set', ops, vivipost)
-        ops.'push'(vivilabel)
-        goto param_done
-
-      param_required:
-        .local int call_sig, slurpy
-        call_sig = node.'call_sig'()
-        slurpy = node.'slurpy'()
-        subpost.'add_param'(pname, 'named'=>named, 'slurpy'=>slurpy, 'call_sig'=>call_sig)
-
-      param_done:
-        $I0 = defined name
-        unless $I0 goto param_lex_done
-        name = self.'escape'(name)
-        ops.'push_pirop'('.lex', name, ops)
-      param_lex_done:
-        .return (ops)
+        my $vivipost  := self.as_vivipost($viviself, :rtype('P'));
+        my $vivilabel := POST::Label.new(:name('optparam_'));
+        $*SUB.add_param($pname, :named($named), :optional(1));
+        $ops.push_pirop('if', "has_$pname", $vivilabel);
+        $ops.push($vivipost);
+        $ops.push_pirop('set', $ops, $vivipost);
+        $ops.push($vivilabel);
     }
+    else {
+        $*SUB.add_param($pname, :named($named),
+            :slurpy($node.slurpy()), :call_sig($node.call_sig()));
+    }
+
+    if pir::defined($name) {
+        $ops.push_pirop('.lex', self.escape($name), $ops);
+    }
+
+    $ops;
 }
 
 
