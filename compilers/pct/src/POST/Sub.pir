@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1308074671.44201")
+.sub "_block1000"  :anon :subid("10_1308206297.03251")
 .annotate 'line', 0
-    .const 'Sub' $P14 = "11_1308074671.44201" 
-    capture_lex $P14
+    .const 'Sub' $P1003 = "11_1308206297.03251" 
+    capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -12,136 +12,136 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 3
-    .const 'Sub' $P14 = "11_1308074671.44201" 
-    capture_lex $P14
-    $P510 = $P14()
+    .const 'Sub' $P1003 = "11_1308206297.03251" 
+    capture_lex $P1003
+    $P297 = $P1003()
 .annotate 'line', 1
-    .return ($P510)
-    .const 'Sub' $P512 = "64_1308074671.44201" 
-    .return ($P512)
+    .return ($P297)
+    .const 'Sub' $P1309 = "64_1308206297.03251" 
+    .return ($P1309)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post65") :outer("10_1308074671.44201")
+.sub "" :load :init :subid("post65") :outer("10_1308206297.03251")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1308074671.44201" 
+    .const 'Sub' $P1001 = "10_1308206297.03251" 
     .local pmc block
-    set block, $P12
-    $P515 = get_root_global ["parrot"], "P6metaclass"
-    $P515."new_class"("POST::Sub", "POST::Node" :named("parent"))
+    set block, $P1001
+    $P1311 = get_root_global ["parrot"], "P6metaclass"
+    $P1311."new_class"("POST::Sub", "POST::Node" :named("parent"))
 .end
 
 
 .namespace ["POST";"Sub"]
-.sub "_block13"  :subid("11_1308074671.44201") :outer("10_1308074671.44201")
+.sub "_block1002"  :subid("11_1308206297.03251") :outer("10_1308206297.03251")
 .annotate 'line', 3
-    .const 'Sub' $P482 = "62_1308074671.44201" 
-    capture_lex $P482
-    .const 'Sub' $P457 = "61_1308074671.44201" 
-    capture_lex $P457
-    .const 'Sub' $P441 = "60_1308074671.44201" 
-    capture_lex $P441
-    .const 'Sub' $P431 = "59_1308074671.44201" 
-    capture_lex $P431
-    .const 'Sub' $P416 = "58_1308074671.44201" 
-    capture_lex $P416
-    .const 'Sub' $P409 = "57_1308074671.44201" 
-    capture_lex $P409
-    .const 'Sub' $P402 = "56_1308074671.44201" 
-    capture_lex $P402
-    .const 'Sub' $P396 = "55_1308074671.44201" 
-    capture_lex $P396
-    .const 'Sub' $P389 = "54_1308074671.44201" 
-    capture_lex $P389
-    .const 'Sub' $P383 = "53_1308074671.44201" 
-    capture_lex $P383
-    .const 'Sub' $P376 = "52_1308074671.44201" 
-    capture_lex $P376
-    .const 'Sub' $P370 = "51_1308074671.44201" 
-    capture_lex $P370
-    .const 'Sub' $P363 = "50_1308074671.44201" 
-    capture_lex $P363
-    .const 'Sub' $P357 = "49_1308074671.44201" 
-    capture_lex $P357
-    .const 'Sub' $P350 = "48_1308074671.44201" 
-    capture_lex $P350
-    .const 'Sub' $P344 = "47_1308074671.44201" 
-    capture_lex $P344
-    .const 'Sub' $P337 = "46_1308074671.44201" 
-    capture_lex $P337
-    .const 'Sub' $P331 = "45_1308074671.44201" 
-    capture_lex $P331
-    .const 'Sub' $P324 = "44_1308074671.44201" 
-    capture_lex $P324
-    .const 'Sub' $P318 = "43_1308074671.44201" 
-    capture_lex $P318
-    .const 'Sub' $P311 = "42_1308074671.44201" 
-    capture_lex $P311
-    .const 'Sub' $P305 = "41_1308074671.44201" 
-    capture_lex $P305
-    .const 'Sub' $P298 = "40_1308074671.44201" 
-    capture_lex $P298
-    .const 'Sub' $P292 = "39_1308074671.44201" 
-    capture_lex $P292
-    .const 'Sub' $P284 = "38_1308074671.44201" 
-    capture_lex $P284
-    .const 'Sub' $P274 = "37_1308074671.44201" 
-    capture_lex $P274
-    .const 'Sub' $P267 = "36_1308074671.44201" 
-    capture_lex $P267
-    .const 'Sub' $P261 = "35_1308074671.44201" 
-    capture_lex $P261
-    .const 'Sub' $P252 = "34_1308074671.44201" 
-    capture_lex $P252
-    .const 'Sub' $P242 = "33_1308074671.44201" 
-    capture_lex $P242
-    .const 'Sub' $P233 = "32_1308074671.44201" 
-    capture_lex $P233
-    .const 'Sub' $P223 = "31_1308074671.44201" 
-    capture_lex $P223
-    .const 'Sub' $P214 = "30_1308074671.44201" 
-    capture_lex $P214
-    .const 'Sub' $P204 = "29_1308074671.44201" 
-    capture_lex $P204
-    .const 'Sub' $P195 = "28_1308074671.44201" 
-    capture_lex $P195
-    .const 'Sub' $P185 = "27_1308074671.44201" 
-    capture_lex $P185
-    .const 'Sub' $P176 = "26_1308074671.44201" 
-    capture_lex $P176
-    .const 'Sub' $P166 = "25_1308074671.44201" 
-    capture_lex $P166
-    .const 'Sub' $P157 = "24_1308074671.44201" 
-    capture_lex $P157
-    .const 'Sub' $P147 = "23_1308074671.44201" 
-    capture_lex $P147
-    .const 'Sub' $P138 = "22_1308074671.44201" 
-    capture_lex $P138
-    .const 'Sub' $P128 = "21_1308074671.44201" 
-    capture_lex $P128
-    .const 'Sub' $P119 = "20_1308074671.44201" 
-    capture_lex $P119
-    .const 'Sub' $P109 = "19_1308074671.44201" 
-    capture_lex $P109
-    .const 'Sub' $P101 = "18_1308074671.44201" 
-    capture_lex $P101
-    .const 'Sub' $P95 = "17_1308074671.44201" 
-    capture_lex $P95
-    .const 'Sub' $P77 = "16_1308074671.44201" 
-    capture_lex $P77
-    .const 'Sub' $P53 = "15_1308074671.44201" 
-    capture_lex $P53
-    .const 'Sub' $P47 = "14_1308074671.44201" 
-    capture_lex $P47
-    .const 'Sub' $P23 = "13_1308074671.44201" 
-    capture_lex $P23
-    .const 'Sub' $P17 = "12_1308074671.44201" 
-    capture_lex $P17
-    get_global $P15, "@paramfmt"
-    unless_null $P15, vivify_76
-    $P15 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P15
+    .const 'Sub' $P1291 = "62_1308206297.03251" 
+    capture_lex $P1291
+    .const 'Sub' $P1283 = "61_1308206297.03251" 
+    capture_lex $P1283
+    .const 'Sub' $P1277 = "60_1308206297.03251" 
+    capture_lex $P1277
+    .const 'Sub' $P1271 = "59_1308206297.03251" 
+    capture_lex $P1271
+    .const 'Sub' $P1264 = "58_1308206297.03251" 
+    capture_lex $P1264
+    .const 'Sub' $P1259 = "57_1308206297.03251" 
+    capture_lex $P1259
+    .const 'Sub' $P1254 = "56_1308206297.03251" 
+    capture_lex $P1254
+    .const 'Sub' $P1250 = "55_1308206297.03251" 
+    capture_lex $P1250
+    .const 'Sub' $P1245 = "54_1308206297.03251" 
+    capture_lex $P1245
+    .const 'Sub' $P1241 = "53_1308206297.03251" 
+    capture_lex $P1241
+    .const 'Sub' $P1236 = "52_1308206297.03251" 
+    capture_lex $P1236
+    .const 'Sub' $P1232 = "51_1308206297.03251" 
+    capture_lex $P1232
+    .const 'Sub' $P1227 = "50_1308206297.03251" 
+    capture_lex $P1227
+    .const 'Sub' $P1223 = "49_1308206297.03251" 
+    capture_lex $P1223
+    .const 'Sub' $P1218 = "48_1308206297.03251" 
+    capture_lex $P1218
+    .const 'Sub' $P1214 = "47_1308206297.03251" 
+    capture_lex $P1214
+    .const 'Sub' $P1209 = "46_1308206297.03251" 
+    capture_lex $P1209
+    .const 'Sub' $P1205 = "45_1308206297.03251" 
+    capture_lex $P1205
+    .const 'Sub' $P1200 = "44_1308206297.03251" 
+    capture_lex $P1200
+    .const 'Sub' $P1196 = "43_1308206297.03251" 
+    capture_lex $P1196
+    .const 'Sub' $P1191 = "42_1308206297.03251" 
+    capture_lex $P1191
+    .const 'Sub' $P1187 = "41_1308206297.03251" 
+    capture_lex $P1187
+    .const 'Sub' $P1182 = "40_1308206297.03251" 
+    capture_lex $P1182
+    .const 'Sub' $P1178 = "39_1308206297.03251" 
+    capture_lex $P1178
+    .const 'Sub' $P1173 = "38_1308206297.03251" 
+    capture_lex $P1173
+    .const 'Sub' $P1166 = "37_1308206297.03251" 
+    capture_lex $P1166
+    .const 'Sub' $P1161 = "36_1308206297.03251" 
+    capture_lex $P1161
+    .const 'Sub' $P1157 = "35_1308206297.03251" 
+    capture_lex $P1157
+    .const 'Sub' $P1152 = "34_1308206297.03251" 
+    capture_lex $P1152
+    .const 'Sub' $P1145 = "33_1308206297.03251" 
+    capture_lex $P1145
+    .const 'Sub' $P1140 = "32_1308206297.03251" 
+    capture_lex $P1140
+    .const 'Sub' $P1133 = "31_1308206297.03251" 
+    capture_lex $P1133
+    .const 'Sub' $P1128 = "30_1308206297.03251" 
+    capture_lex $P1128
+    .const 'Sub' $P1121 = "29_1308206297.03251" 
+    capture_lex $P1121
+    .const 'Sub' $P1116 = "28_1308206297.03251" 
+    capture_lex $P1116
+    .const 'Sub' $P1109 = "27_1308206297.03251" 
+    capture_lex $P1109
+    .const 'Sub' $P1104 = "26_1308206297.03251" 
+    capture_lex $P1104
+    .const 'Sub' $P1097 = "25_1308206297.03251" 
+    capture_lex $P1097
+    .const 'Sub' $P1092 = "24_1308206297.03251" 
+    capture_lex $P1092
+    .const 'Sub' $P1085 = "23_1308206297.03251" 
+    capture_lex $P1085
+    .const 'Sub' $P1080 = "22_1308206297.03251" 
+    capture_lex $P1080
+    .const 'Sub' $P1073 = "21_1308206297.03251" 
+    capture_lex $P1073
+    .const 'Sub' $P1068 = "20_1308206297.03251" 
+    capture_lex $P1068
+    .const 'Sub' $P1061 = "19_1308206297.03251" 
+    capture_lex $P1061
+    .const 'Sub' $P1056 = "18_1308206297.03251" 
+    capture_lex $P1056
+    .const 'Sub' $P1052 = "17_1308206297.03251" 
+    capture_lex $P1052
+    .const 'Sub' $P1041 = "16_1308206297.03251" 
+    capture_lex $P1041
+    .const 'Sub' $P1027 = "15_1308206297.03251" 
+    capture_lex $P1027
+    .const 'Sub' $P1023 = "14_1308206297.03251" 
+    capture_lex $P1023
+    .const 'Sub' $P1009 = "13_1308206297.03251" 
+    capture_lex $P1009
+    .const 'Sub' $P1005 = "12_1308206297.03251" 
+    capture_lex $P1005
+    get_global $P1004, "@paramfmt"
+    unless_null $P1004, vivify_76
+    $P1004 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1004
   vivify_76:
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -149,100 +149,100 @@
     unless $I0 goto ctxsave_done
     $P0."ctxsave"()
   ctxsave_done:
-    get_global $P16, "@paramfmt"
+    get_global $P101, "@paramfmt"
     .return ()
-    .const 'Sub' $P489 = "63_1308074671.44201" 
-    .return ($P489)
+    .const 'Sub' $P1297 = "63_1308206297.03251" 
+    .return ($P1297)
 .end
 
 
 .namespace ["POST";"Sub"]
-.sub "" :load :init :subid("post66") :outer("11_1308074671.44201")
+.sub "" :load :init :subid("post66") :outer("11_1308206297.03251")
 .annotate 'line', 3
-    .const 'Sub' $P14 = "11_1308074671.44201" 
+    .const 'Sub' $P1003 = "11_1308206297.03251" 
     .local pmc block
-    set block, $P14
+    set block, $P1003
 .annotate 'line', 5
-    new $P492, "String"
-    assign $P492, "    .param pmc %0\n"
-    get_global $P493, "@paramfmt"
-    unless_null $P493, vivify_67
-    $P493 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P493
+    new $P288, "String"
+    assign $P288, "    .param pmc %0\n"
+    get_global $P1299, "@paramfmt"
+    unless_null $P1299, vivify_67
+    $P1299 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1299
   vivify_67:
-    set $P493[0], $P492
+    set $P1299[0], $P288
 .annotate 'line', 6
-    new $P494, "String"
-    assign $P494, "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
-    get_global $P495, "@paramfmt"
-    unless_null $P495, vivify_68
-    $P495 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P495
+    new $P289, "String"
+    assign $P289, "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n"
+    get_global $P1300, "@paramfmt"
+    unless_null $P1300, vivify_68
+    $P1300 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1300
   vivify_68:
-    set $P495[1], $P494
+    set $P1300[1], $P289
 .annotate 'line', 7
-    new $P496, "String"
-    assign $P496, "    .param pmc %0 :slurpy\n"
-    get_global $P497, "@paramfmt"
-    unless_null $P497, vivify_69
-    $P497 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P497
+    new $P290, "String"
+    assign $P290, "    .param pmc %0 :slurpy\n"
+    get_global $P1301, "@paramfmt"
+    unless_null $P1301, vivify_69
+    $P1301 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1301
   vivify_69:
-    set $P497[2], $P496
+    set $P1301[2], $P290
 .annotate 'line', 8
-    new $P498, "String"
-    assign $P498, "    .param pmc %0 :slurpy\n"
-    get_global $P499, "@paramfmt"
-    unless_null $P499, vivify_70
-    $P499 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P499
+    new $P291, "String"
+    assign $P291, "    .param pmc %0 :slurpy\n"
+    get_global $P1302, "@paramfmt"
+    unless_null $P1302, vivify_70
+    $P1302 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1302
   vivify_70:
-    set $P499[3], $P498
+    set $P1302[3], $P291
 .annotate 'line', 9
-    new $P500, "String"
-    assign $P500, "    .param pmc %0 :named(%1)\n"
-    get_global $P501, "@paramfmt"
-    unless_null $P501, vivify_71
-    $P501 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P501
+    new $P292, "String"
+    assign $P292, "    .param pmc %0 :named(%1)\n"
+    get_global $P1303, "@paramfmt"
+    unless_null $P1303, vivify_71
+    $P1303 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1303
   vivify_71:
-    set $P501[4], $P500
+    set $P1303[4], $P292
 .annotate 'line', 10
-    new $P502, "String"
-    assign $P502, "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
-    get_global $P503, "@paramfmt"
-    unless_null $P503, vivify_72
-    $P503 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P503
+    new $P293, "String"
+    assign $P293, "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n"
+    get_global $P1304, "@paramfmt"
+    unless_null $P1304, vivify_72
+    $P1304 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1304
   vivify_72:
-    set $P503[5], $P502
+    set $P1304[5], $P293
 .annotate 'line', 11
-    new $P504, "String"
-    assign $P504, "    .param pmc %0 :slurpy :named\n"
-    get_global $P505, "@paramfmt"
-    unless_null $P505, vivify_73
-    $P505 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P505
+    new $P294, "String"
+    assign $P294, "    .param pmc %0 :slurpy :named\n"
+    get_global $P1305, "@paramfmt"
+    unless_null $P1305, vivify_73
+    $P1305 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1305
   vivify_73:
-    set $P505[6], $P504
+    set $P1305[6], $P294
 .annotate 'line', 12
-    new $P506, "String"
-    assign $P506, "    .param pmc %0 :slurpy :named\n"
-    get_global $P507, "@paramfmt"
-    unless_null $P507, vivify_74
-    $P507 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P507
+    new $P295, "String"
+    assign $P295, "    .param pmc %0 :slurpy :named\n"
+    get_global $P1306, "@paramfmt"
+    unless_null $P1306, vivify_74
+    $P1306 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1306
   vivify_74:
-    set $P507[7], $P506
+    set $P1306[7], $P295
 .annotate 'line', 13
-    new $P508, "String"
-    assign $P508, "    .param pmc %0 :call_sig\n"
-    get_global $P509, "@paramfmt"
-    unless_null $P509, vivify_75
-    $P509 = root_new ['parrot';'ResizablePMCArray']
-    set_global "@paramfmt", $P509
+    new $P296, "String"
+    assign $P296, "    .param pmc %0 :call_sig\n"
+    get_global $P1307, "@paramfmt"
+    unless_null $P1307, vivify_75
+    $P1307 = root_new ['parrot';'ResizablePMCArray']
+    set_global "@paramfmt", $P1307
   vivify_75:
-    set $P509[8], $P508
+    set $P1307[8], $P296
 .annotate 'line', 231
     load_bytecode "nqp-setting.pbc"
 .end
@@ -250,388 +250,217 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "symtable"  :subid("12_1308074671.44201") :method :outer("11_1308074671.44201")
+.sub "symtable"  :subid("12_1308206297.03251") :method :outer("11_1308206297.03251")
 .annotate 'line', 19
-    new $P19, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P19, control_18
-    push_eh $P19
+    new $P1007, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1007, control_1006
+    push_eh $P1007
     .lex "self", self
-    find_lex $P20, "self"
-    unless_null $P20, vivify_77
-    $P20 = root_new ['parrot';'Hash']
+    find_lex $P1008, "self"
+    unless_null $P1008, vivify_77
+    $P1008 = root_new ['parrot';'Hash']
   vivify_77:
-    set $P21, $P20["symtable"]
-    unless_null $P21, vivify_78
-    new $P21, "Undef"
+    set $P102, $P1008["symtable"]
+    unless_null $P102, vivify_78
+    new $P102, "Undef"
   vivify_78:
-    .return ($P21)
-  control_18:
+    .return ($P102)
+  control_1006:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P22, exception, "payload"
-    .return ($P22)
+    getattribute $P103, exception, "payload"
+    .return ($P103)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "symbol"  :subid("13_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_26
-    .param pmc param_27 :optional
-    .param int has_param_27 :opt_flag
+.sub "symbol"  :subid("13_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1012
+    .param pmc param_1013 :optional
+    .param int has_param_1013 :opt_flag
 .annotate 'line', 26
-    new $P25, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P25, control_24
-    push_eh $P25
+    new $P1011, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1011, control_1010
+    push_eh $P1011
     .lex "self", self
-    .lex "$name", param_26
-    if has_param_27, optparam_79
-    new $P28, "Undef"
-    set param_27, $P28
+    .lex "$name", param_1012
+    if has_param_1013, optparam_79
+    new $P104, "Undef"
+    set param_1013, $P104
   optparam_79:
-    .lex "$value", param_27
+    .lex "$value", param_1013
 .annotate 'line', 27
-    $P29 = root_new ['parrot';'Hash']
-    .lex "%symtable", $P29
-    find_lex $P30, "self"
-    unless_null $P30, vivify_80
-    $P30 = root_new ['parrot';'Hash']
+    $P1015 = root_new ['parrot';'Hash']
+    set $P1014, $P1015
+    .lex "%symtable", $P1014
+    find_lex $P1016, "self"
+    unless_null $P1016, vivify_80
+    $P1016 = root_new ['parrot';'Hash']
   vivify_80:
-    set $P31, $P30["symtable"]
-    unless_null $P31, vivify_81
-    new $P31, "Undef"
+    set $P105, $P1016["symtable"]
+    unless_null $P105, vivify_81
+    new $P105, "Undef"
   vivify_81:
-    store_lex "%symtable", $P31
+    store_lex "%symtable", $P105
 .annotate 'line', 28
-    find_lex $P33, "%symtable"
-    if $P33, unless_32_end
+    find_lex $P106, "%symtable"
+    if $P106, unless_1017_end
 .annotate 'line', 29
-    $P34 = "hash"()
-    find_lex $P35, "self"
-    unless_null $P35, vivify_82
-    $P35 = root_new ['parrot';'Hash']
-    store_lex "self", $P35
+    $P107 = "hash"()
+    find_lex $P1018, "self"
+    unless_null $P1018, vivify_82
+    $P1018 = root_new ['parrot';'Hash']
+    store_lex "self", $P1018
   vivify_82:
-    set $P35["symtable"], $P34
+    set $P1018["symtable"], $P107
 .annotate 'line', 30
-    find_lex $P36, "self"
-    unless_null $P36, vivify_83
-    $P36 = root_new ['parrot';'Hash']
+    find_lex $P1019, "self"
+    unless_null $P1019, vivify_83
+    $P1019 = root_new ['parrot';'Hash']
   vivify_83:
-    set $P37, $P36["symtable"]
-    unless_null $P37, vivify_84
-    new $P37, "Undef"
+    set $P108, $P1019["symtable"]
+    unless_null $P108, vivify_84
+    new $P108, "Undef"
   vivify_84:
-    store_lex "%symtable", $P37
-  unless_32_end:
+    store_lex "%symtable", $P108
+  unless_1017_end:
 .annotate 'line', 33
-    find_lex $P39, "$value"
-    unless $P39, if_38_end
+    find_lex $P109, "$value"
+    unless $P109, if_1020_end
 .annotate 'line', 34
-    find_lex $P40, "$value"
-    find_lex $P41, "$name"
-    find_lex $P42, "%symtable"
-    unless_null $P42, vivify_85
-    $P42 = root_new ['parrot';'Hash']
-    store_lex "%symtable", $P42
+    find_lex $P110, "$value"
+    find_lex $P111, "$name"
+    find_lex $P1021, "%symtable"
+    unless_null $P1021, vivify_85
+    $P1021 = root_new ['parrot';'Hash']
+    store_lex "%symtable", $P1021
   vivify_85:
-    set $P42[$P41], $P40
-  if_38_end:
+    set $P1021[$P111], $P110
+  if_1020_end:
 .annotate 'line', 33
-    find_lex $P43, "$name"
-    find_lex $P44, "%symtable"
-    unless_null $P44, vivify_86
-    $P44 = root_new ['parrot';'Hash']
+    find_lex $P112, "$name"
+    find_lex $P1022, "%symtable"
+    unless_null $P1022, vivify_86
+    $P1022 = root_new ['parrot';'Hash']
   vivify_86:
-    set $P45, $P44[$P43]
-    unless_null $P45, vivify_87
-    new $P45, "Undef"
+    set $P113, $P1022[$P112]
+    unless_null $P113, vivify_87
+    new $P113, "Undef"
   vivify_87:
 .annotate 'line', 26
-    .return ($P45)
-  control_24:
+    .return ($P113)
+  control_1010:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P46, exception, "payload"
-    .return ($P46)
+    getattribute $P114, exception, "payload"
+    .return ($P114)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "labels"  :subid("14_1308074671.44201") :method :outer("11_1308074671.44201")
+.sub "labels"  :subid("14_1308206297.03251") :method :outer("11_1308206297.03251")
 .annotate 'line', 43
-    new $P49, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P49, control_48
-    push_eh $P49
+    new $P1025, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1025, control_1024
+    push_eh $P1025
     .lex "self", self
-    find_lex $P50, "self"
-    unless_null $P50, vivify_88
-    $P50 = root_new ['parrot';'Hash']
+    find_lex $P1026, "self"
+    unless_null $P1026, vivify_88
+    $P1026 = root_new ['parrot';'Hash']
   vivify_88:
-    set $P51, $P50["labels"]
-    unless_null $P51, vivify_89
-    new $P51, "Undef"
+    set $P115, $P1026["labels"]
+    unless_null $P115, vivify_89
+    new $P115, "Undef"
   vivify_89:
-    .return ($P51)
-  control_48:
+    .return ($P115)
+  control_1024:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P52, exception, "payload"
-    .return ($P52)
+    getattribute $P116, exception, "payload"
+    .return ($P116)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "label"  :subid("15_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_56
-    .param pmc param_57 :optional
-    .param int has_param_57 :opt_flag
+.sub "label"  :subid("15_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1030
+    .param pmc param_1031 :optional
+    .param int has_param_1031 :opt_flag
 .annotate 'line', 50
-    new $P55, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P55, control_54
-    push_eh $P55
+    new $P1029, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1029, control_1028
+    push_eh $P1029
     .lex "self", self
-    .lex "$name", param_56
-    if has_param_57, optparam_90
-    new $P58, "Undef"
-    set param_57, $P58
+    .lex "$name", param_1030
+    if has_param_1031, optparam_90
+    new $P117, "Undef"
+    set param_1031, $P117
   optparam_90:
-    .lex "$value", param_57
+    .lex "$value", param_1031
 .annotate 'line', 51
-    $P59 = root_new ['parrot';'Hash']
-    .lex "%labels", $P59
-    find_lex $P60, "self"
-    unless_null $P60, vivify_91
-    $P60 = root_new ['parrot';'Hash']
+    $P1033 = root_new ['parrot';'Hash']
+    set $P1032, $P1033
+    .lex "%labels", $P1032
+    find_lex $P1034, "self"
+    unless_null $P1034, vivify_91
+    $P1034 = root_new ['parrot';'Hash']
   vivify_91:
-    set $P61, $P60["labels"]
-    unless_null $P61, vivify_92
-    new $P61, "Undef"
+    set $P118, $P1034["labels"]
+    unless_null $P118, vivify_92
+    new $P118, "Undef"
   vivify_92:
-    store_lex "%labels", $P61
+    store_lex "%labels", $P118
 .annotate 'line', 52
-    find_lex $P63, "%labels"
-    if $P63, unless_62_end
+    find_lex $P119, "%labels"
+    if $P119, unless_1035_end
 .annotate 'line', 53
-    $P64 = "hash"()
-    find_lex $P65, "self"
-    unless_null $P65, vivify_93
-    $P65 = root_new ['parrot';'Hash']
-    store_lex "self", $P65
+    $P120 = "hash"()
+    find_lex $P1036, "self"
+    unless_null $P1036, vivify_93
+    $P1036 = root_new ['parrot';'Hash']
+    store_lex "self", $P1036
   vivify_93:
-    set $P65["labels"], $P64
+    set $P1036["labels"], $P120
 .annotate 'line', 54
-    find_lex $P66, "self"
-    unless_null $P66, vivify_94
-    $P66 = root_new ['parrot';'Hash']
+    find_lex $P1037, "self"
+    unless_null $P1037, vivify_94
+    $P1037 = root_new ['parrot';'Hash']
   vivify_94:
-    set $P67, $P66["labels"]
-    unless_null $P67, vivify_95
-    new $P67, "Undef"
+    set $P121, $P1037["labels"]
+    unless_null $P121, vivify_95
+    new $P121, "Undef"
   vivify_95:
-    store_lex "%labels", $P67
-  unless_62_end:
+    store_lex "%labels", $P121
+  unless_1035_end:
 .annotate 'line', 57
-    find_lex $P69, "$value"
-    unless $P69, if_68_end
+    find_lex $P122, "$value"
+    unless $P122, if_1038_end
 .annotate 'line', 58
-    find_lex $P70, "$value"
-    find_lex $P71, "$name"
-    find_lex $P72, "%labels"
-    unless_null $P72, vivify_96
-    $P72 = root_new ['parrot';'Hash']
-    store_lex "%labels", $P72
+    find_lex $P123, "$value"
+    find_lex $P124, "$name"
+    find_lex $P1039, "%labels"
+    unless_null $P1039, vivify_96
+    $P1039 = root_new ['parrot';'Hash']
+    store_lex "%labels", $P1039
   vivify_96:
-    set $P72[$P71], $P70
-  if_68_end:
+    set $P1039[$P124], $P123
+  if_1038_end:
 .annotate 'line', 57
-    find_lex $P73, "$name"
-    find_lex $P74, "%labels"
-    unless_null $P74, vivify_97
-    $P74 = root_new ['parrot';'Hash']
+    find_lex $P125, "$name"
+    find_lex $P1040, "%labels"
+    unless_null $P1040, vivify_97
+    $P1040 = root_new ['parrot';'Hash']
   vivify_97:
-    set $P75, $P74[$P73]
-    unless_null $P75, vivify_98
-    new $P75, "Undef"
+    set $P126, $P1040[$P125]
+    unless_null $P126, vivify_98
+    new $P126, "Undef"
   vivify_98:
 .annotate 'line', 50
-    .return ($P75)
-  control_54:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P76, exception, "payload"
-    .return ($P76)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "param"  :subid("16_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_80
-    .param pmc param_81
-.annotate 'line', 68
-    new $P79, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P79, control_78
-    push_eh $P79
-    .lex "self", self
-    .lex "$name", param_80
-    .lex "$param", param_81
-.annotate 'line', 69
-    $P82 = root_new ['parrot';'ResizablePMCArray']
-    .lex "@params", $P82
-    find_lex $P83, "self"
-    unless_null $P83, vivify_99
-    $P83 = root_new ['parrot';'Hash']
-  vivify_99:
-    set $P84, $P83["params"]
-    unless_null $P84, vivify_100
-    new $P84, "Undef"
-  vivify_100:
-    store_lex "@params", $P84
-.annotate 'line', 70
-    find_lex $P86, "@params"
-    if $P86, unless_85_end
-.annotate 'line', 71
-    $P87 = "list"()
-    find_lex $P88, "self"
-    unless_null $P88, vivify_101
-    $P88 = root_new ['parrot';'Hash']
-    store_lex "self", $P88
-  vivify_101:
-    set $P88["params"], $P87
-.annotate 'line', 72
-    find_lex $P89, "self"
-    unless_null $P89, vivify_102
-    $P89 = root_new ['parrot';'Hash']
-  vivify_102:
-    set $P90, $P89["params"]
-    unless_null $P90, vivify_103
-    new $P90, "Undef"
-  vivify_103:
-    store_lex "@params", $P90
-  unless_85_end:
-.annotate 'line', 77
-    find_lex $P91, "@params"
-    find_lex $P92, "$param"
-    $P93 = $P91."push"($P92)
-.annotate 'line', 68
-    .return ($P93)
-  control_78:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P94, exception, "payload"
-    .return ($P94)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "constant_index"  :subid("17_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 84
-    new $P97, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P97, control_96
-    push_eh $P97
-    .lex "self", self
-    find_lex $P98, "self"
-    unless_null $P98, vivify_104
-    $P98 = root_new ['parrot';'Hash']
-  vivify_104:
-    set $P99, $P98["constant_index"]
-    unless_null $P99, vivify_105
-    new $P99, "Undef"
-  vivify_105:
-    .return ($P99)
-  control_96:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P100, exception, "payload"
-    .return ($P100)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "constant_index"  :subid("18_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_104
-.annotate 'line', 85
-    new $P103, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P103, control_102
-    push_eh $P103
-    .lex "self", self
-    .lex "$idx", param_104
-    find_lex $P105, "$idx"
-    find_lex $P106, "self"
-    unless_null $P106, vivify_106
-    $P106 = root_new ['parrot';'Hash']
-    store_lex "self", $P106
-  vivify_106:
-    set $P106["constant_index"], $P105
-    find_lex $P107, "$idx"
-    .return ($P107)
-  control_102:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P108, exception, "payload"
-    .return ($P108)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "main"  :subid("19_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 90
-    new $P111, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P111, control_110
-    push_eh $P111
-    .lex "self", self
-    find_lex $P113, "self"
-    unless_null $P113, vivify_107
-    $P113 = root_new ['parrot';'Hash']
-  vivify_107:
-    set $P114, $P113["main"]
-    unless_null $P114, vivify_108
-    new $P114, "Undef"
-  vivify_108:
-    set $P112, $P114
-    defined $I116, $P112
-    if $I116, default_115
-    new $P117, "Integer"
-    assign $P117, 0
-    set $P112, $P117
-  default_115:
-    .return ($P112)
-  control_110:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P118, exception, "payload"
-    .return ($P118)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "main"  :subid("20_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_122
-.annotate 'line', 91
-    new $P121, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P121, control_120
-    push_eh $P121
-    .lex "self", self
-    .lex "$val", param_122
-    find_lex $P123, "$val"
-    istrue $I124, $P123
-    new $P125, 'Integer'
-    set $P125, $I124
-    find_lex $P126, "self"
-    unless_null $P126, vivify_109
-    $P126 = root_new ['parrot';'Hash']
-    store_lex "self", $P126
-  vivify_109:
-    set $P126["main"], $P125
-    .return ($P125)
-  control_120:
+    .return ($P126)
+  control_1028:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P127, exception, "payload"
@@ -641,29 +470,83 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_init"  :subid("21_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 94
-    new $P130, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P130, control_129
-    push_eh $P130
+.sub "param"  :subid("16_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1044
+    .param pmc param_1045
+.annotate 'line', 68
+    new $P1043, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1043, control_1042
+    push_eh $P1043
     .lex "self", self
-    find_lex $P132, "self"
-    unless_null $P132, vivify_110
-    $P132 = root_new ['parrot';'Hash']
-  vivify_110:
-    set $P133, $P132["init"]
-    unless_null $P133, vivify_111
-    new $P133, "Undef"
-  vivify_111:
-    set $P131, $P133
-    defined $I135, $P131
-    if $I135, default_134
-    new $P136, "Integer"
-    assign $P136, 0
-    set $P131, $P136
-  default_134:
-    .return ($P131)
-  control_129:
+    .lex "$name", param_1044
+    .lex "$param", param_1045
+.annotate 'line', 69
+    $P1047 = root_new ['parrot';'ResizablePMCArray']
+    set $P1046, $P1047
+    .lex "@params", $P1046
+    find_lex $P1048, "self"
+    unless_null $P1048, vivify_99
+    $P1048 = root_new ['parrot';'Hash']
+  vivify_99:
+    set $P128, $P1048["params"]
+    unless_null $P128, vivify_100
+    new $P128, "Undef"
+  vivify_100:
+    store_lex "@params", $P128
+.annotate 'line', 70
+    find_lex $P129, "@params"
+    if $P129, unless_1049_end
+.annotate 'line', 71
+    $P130 = "list"()
+    find_lex $P1050, "self"
+    unless_null $P1050, vivify_101
+    $P1050 = root_new ['parrot';'Hash']
+    store_lex "self", $P1050
+  vivify_101:
+    set $P1050["params"], $P130
+.annotate 'line', 72
+    find_lex $P1051, "self"
+    unless_null $P1051, vivify_102
+    $P1051 = root_new ['parrot';'Hash']
+  vivify_102:
+    set $P131, $P1051["params"]
+    unless_null $P131, vivify_103
+    new $P131, "Undef"
+  vivify_103:
+    store_lex "@params", $P131
+  unless_1049_end:
+.annotate 'line', 77
+    find_lex $P132, "@params"
+    find_lex $P133, "$param"
+    $P134 = $P132."push"($P133)
+.annotate 'line', 68
+    .return ($P134)
+  control_1042:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P135, exception, "payload"
+    .return ($P135)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "constant_index"  :subid("17_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 84
+    new $P1054, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1054, control_1053
+    push_eh $P1054
+    .lex "self", self
+    find_lex $P1055, "self"
+    unless_null $P1055, vivify_104
+    $P1055 = root_new ['parrot';'Hash']
+  vivify_104:
+    set $P136, $P1055["constant_index"]
+    unless_null $P136, vivify_105
+    new $P136, "Undef"
+  vivify_105:
+    .return ($P136)
+  control_1053:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P137, exception, "payload"
@@ -673,119 +556,329 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_init"  :subid("22_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_141
-.annotate 'line', 95
-    new $P140, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P140, control_139
-    push_eh $P140
+.sub "constant_index"  :subid("18_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1059
+.annotate 'line', 85
+    new $P1058, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1058, control_1057
+    push_eh $P1058
     .lex "self", self
-    .lex "$val", param_141
-    find_lex $P142, "$val"
-    istrue $I143, $P142
-    new $P144, 'Integer'
-    set $P144, $I143
-    find_lex $P145, "self"
-    unless_null $P145, vivify_112
-    $P145 = root_new ['parrot';'Hash']
-    store_lex "self", $P145
-  vivify_112:
-    set $P145["init"], $P144
-    .return ($P144)
-  control_139:
+    .lex "$idx", param_1059
+    find_lex $P138, "$idx"
+    find_lex $P1060, "self"
+    unless_null $P1060, vivify_106
+    $P1060 = root_new ['parrot';'Hash']
+    store_lex "self", $P1060
+  vivify_106:
+    set $P1060["constant_index"], $P138
+    find_lex $P139, "$idx"
+    .return ($P139)
+  control_1057:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P146, exception, "payload"
+    getattribute $P140, exception, "payload"
+    .return ($P140)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "main"  :subid("19_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 90
+    new $P1063, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1063, control_1062
+    push_eh $P1063
+    .lex "self", self
+    find_lex $P1065, "self"
+    unless_null $P1065, vivify_107
+    $P1065 = root_new ['parrot';'Hash']
+  vivify_107:
+    set $P141, $P1065["main"]
+    unless_null $P141, vivify_108
+    new $P141, "Undef"
+  vivify_108:
+    set $P1064, $P141
+    defined $I1067, $P1064
+    if $I1067, default_1066
+    new $P142, "Integer"
+    assign $P142, 0
+    set $P1064, $P142
+  default_1066:
+    .return ($P1064)
+  control_1062:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P143, exception, "payload"
+    .return ($P143)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "main"  :subid("20_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1071
+.annotate 'line', 91
+    new $P1070, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1070, control_1069
+    push_eh $P1070
+    .lex "self", self
+    .lex "$val", param_1071
+    find_lex $P144, "$val"
+    istrue $I145, $P144
+    new $P146, 'Integer'
+    set $P146, $I145
+    find_lex $P1072, "self"
+    unless_null $P1072, vivify_109
+    $P1072 = root_new ['parrot';'Hash']
+    store_lex "self", $P1072
+  vivify_109:
+    set $P1072["main"], $P146
     .return ($P146)
+  control_1069:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P147, exception, "payload"
+    .return ($P147)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "load"  :subid("23_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 97
-    new $P149, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P149, control_148
-    push_eh $P149
+.sub "is_init"  :subid("21_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 94
+    new $P1075, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1075, control_1074
+    push_eh $P1075
     .lex "self", self
-    find_lex $P151, "self"
-    unless_null $P151, vivify_113
-    $P151 = root_new ['parrot';'Hash']
-  vivify_113:
-    set $P152, $P151["load"]
-    unless_null $P152, vivify_114
-    new $P152, "Undef"
-  vivify_114:
-    set $P150, $P152
-    defined $I154, $P150
-    if $I154, default_153
-    new $P155, "Integer"
-    assign $P155, 0
-    set $P150, $P155
-  default_153:
+    find_lex $P1077, "self"
+    unless_null $P1077, vivify_110
+    $P1077 = root_new ['parrot';'Hash']
+  vivify_110:
+    set $P148, $P1077["init"]
+    unless_null $P148, vivify_111
+    new $P148, "Undef"
+  vivify_111:
+    set $P1076, $P148
+    defined $I1079, $P1076
+    if $I1079, default_1078
+    new $P149, "Integer"
+    assign $P149, 0
+    set $P1076, $P149
+  default_1078:
+    .return ($P1076)
+  control_1074:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P150, exception, "payload"
     .return ($P150)
-  control_148:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P156, exception, "payload"
-    .return ($P156)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "load"  :subid("24_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_160
+.sub "is_init"  :subid("22_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1083
+.annotate 'line', 95
+    new $P1082, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1082, control_1081
+    push_eh $P1082
+    .lex "self", self
+    .lex "$val", param_1083
+    find_lex $P151, "$val"
+    istrue $I152, $P151
+    new $P153, 'Integer'
+    set $P153, $I152
+    find_lex $P1084, "self"
+    unless_null $P1084, vivify_112
+    $P1084 = root_new ['parrot';'Hash']
+    store_lex "self", $P1084
+  vivify_112:
+    set $P1084["init"], $P153
+    .return ($P153)
+  control_1081:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P154, exception, "payload"
+    .return ($P154)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "load"  :subid("23_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 97
+    new $P1087, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1087, control_1086
+    push_eh $P1087
+    .lex "self", self
+    find_lex $P1089, "self"
+    unless_null $P1089, vivify_113
+    $P1089 = root_new ['parrot';'Hash']
+  vivify_113:
+    set $P155, $P1089["load"]
+    unless_null $P155, vivify_114
+    new $P155, "Undef"
+  vivify_114:
+    set $P1088, $P155
+    defined $I1091, $P1088
+    if $I1091, default_1090
+    new $P156, "Integer"
+    assign $P156, 0
+    set $P1088, $P156
+  default_1090:
+    .return ($P1088)
+  control_1086:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P157, exception, "payload"
+    .return ($P157)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "load"  :subid("24_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1095
 .annotate 'line', 98
-    new $P159, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P159, control_158
-    push_eh $P159
+    new $P1094, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1094, control_1093
+    push_eh $P1094
     .lex "self", self
-    .lex "$val", param_160
-    find_lex $P161, "$val"
-    istrue $I162, $P161
-    new $P163, 'Integer'
-    set $P163, $I162
-    find_lex $P164, "self"
-    unless_null $P164, vivify_115
-    $P164 = root_new ['parrot';'Hash']
-    store_lex "self", $P164
+    .lex "$val", param_1095
+    find_lex $P158, "$val"
+    istrue $I159, $P158
+    new $P160, 'Integer'
+    set $P160, $I159
+    find_lex $P1096, "self"
+    unless_null $P1096, vivify_115
+    $P1096 = root_new ['parrot';'Hash']
+    store_lex "self", $P1096
   vivify_115:
-    set $P164["load"], $P163
-    .return ($P163)
-  control_158:
+    set $P1096["load"], $P160
+    .return ($P160)
+  control_1093:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P165, exception, "payload"
-    .return ($P165)
+    getattribute $P161, exception, "payload"
+    .return ($P161)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "immediate"  :subid("25_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
+.sub "immediate"  :subid("25_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
 .annotate 'line', 100
-    new $P168, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P168, control_167
-    push_eh $P168
+    new $P1099, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1099, control_1098
+    push_eh $P1099
     .lex "self", self
-    find_lex $P170, "self"
-    unless_null $P170, vivify_116
-    $P170 = root_new ['parrot';'Hash']
+    find_lex $P1101, "self"
+    unless_null $P1101, vivify_116
+    $P1101 = root_new ['parrot';'Hash']
   vivify_116:
-    set $P171, $P170["immediate"]
-    unless_null $P171, vivify_117
-    new $P171, "Undef"
+    set $P162, $P1101["immediate"]
+    unless_null $P162, vivify_117
+    new $P162, "Undef"
   vivify_117:
-    set $P169, $P171
-    defined $I173, $P169
-    if $I173, default_172
-    new $P174, "Integer"
-    assign $P174, 0
-    set $P169, $P174
-  default_172:
-    .return ($P169)
-  control_167:
+    set $P1100, $P162
+    defined $I1103, $P1100
+    if $I1103, default_1102
+    new $P163, "Integer"
+    assign $P163, 0
+    set $P1100, $P163
+  default_1102:
+    .return ($P1100)
+  control_1098:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P164, exception, "payload"
+    .return ($P164)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "immediate"  :subid("26_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1107
+.annotate 'line', 101
+    new $P1106, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1106, control_1105
+    push_eh $P1106
+    .lex "self", self
+    .lex "$val", param_1107
+    find_lex $P165, "$val"
+    istrue $I166, $P165
+    new $P167, 'Integer'
+    set $P167, $I166
+    find_lex $P1108, "self"
+    unless_null $P1108, vivify_118
+    $P1108 = root_new ['parrot';'Hash']
+    store_lex "self", $P1108
+  vivify_118:
+    set $P1108["immediate"], $P167
+    .return ($P167)
+  control_1105:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P168, exception, "payload"
+    .return ($P168)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "postcomp"  :subid("27_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 103
+    new $P1111, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1111, control_1110
+    push_eh $P1111
+    .lex "self", self
+    find_lex $P1113, "self"
+    unless_null $P1113, vivify_119
+    $P1113 = root_new ['parrot';'Hash']
+  vivify_119:
+    set $P169, $P1113["postcomp"]
+    unless_null $P169, vivify_120
+    new $P169, "Undef"
+  vivify_120:
+    set $P1112, $P169
+    defined $I1115, $P1112
+    if $I1115, default_1114
+    new $P170, "Integer"
+    assign $P170, 0
+    set $P1112, $P170
+  default_1114:
+    .return ($P1112)
+  control_1110:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P171, exception, "payload"
+    .return ($P171)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "postcomp"  :subid("28_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1119
+.annotate 'line', 104
+    new $P1118, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1118, control_1117
+    push_eh $P1118
+    .lex "self", self
+    .lex "$val", param_1119
+    find_lex $P172, "$val"
+    istrue $I173, $P172
+    new $P174, 'Integer'
+    set $P174, $I173
+    find_lex $P1120, "self"
+    unless_null $P1120, vivify_121
+    $P1120 = root_new ['parrot';'Hash']
+    store_lex "self", $P1120
+  vivify_121:
+    set $P1120["postcomp"], $P174
+    .return ($P174)
+  control_1117:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P175, exception, "payload"
@@ -795,87 +888,263 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "immediate"  :subid("26_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_179
-.annotate 'line', 101
-    new $P178, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P178, control_177
-    push_eh $P178
+.sub "anon"  :subid("29_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 106
+    new $P1123, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1123, control_1122
+    push_eh $P1123
     .lex "self", self
-    .lex "$val", param_179
-    find_lex $P180, "$val"
-    istrue $I181, $P180
-    new $P182, 'Integer'
-    set $P182, $I181
-    find_lex $P183, "self"
-    unless_null $P183, vivify_118
-    $P183 = root_new ['parrot';'Hash']
-    store_lex "self", $P183
-  vivify_118:
-    set $P183["immediate"], $P182
+    find_lex $P1125, "self"
+    unless_null $P1125, vivify_122
+    $P1125 = root_new ['parrot';'Hash']
+  vivify_122:
+    set $P176, $P1125["anon"]
+    unless_null $P176, vivify_123
+    new $P176, "Undef"
+  vivify_123:
+    set $P1124, $P176
+    defined $I1127, $P1124
+    if $I1127, default_1126
+    new $P177, "Integer"
+    assign $P177, 0
+    set $P1124, $P177
+  default_1126:
+    .return ($P1124)
+  control_1122:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P178, exception, "payload"
+    .return ($P178)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "anon"  :subid("30_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1131
+.annotate 'line', 107
+    new $P1130, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1130, control_1129
+    push_eh $P1130
+    .lex "self", self
+    .lex "$val", param_1131
+    find_lex $P179, "$val"
+    istrue $I180, $P179
+    new $P181, 'Integer'
+    set $P181, $I180
+    find_lex $P1132, "self"
+    unless_null $P1132, vivify_124
+    $P1132 = root_new ['parrot';'Hash']
+    store_lex "self", $P1132
+  vivify_124:
+    set $P1132["anon"], $P181
+    .return ($P181)
+  control_1129:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P182, exception, "payload"
     .return ($P182)
-  control_177:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P184, exception, "payload"
-    .return ($P184)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "postcomp"  :subid("27_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 103
-    new $P187, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P187, control_186
-    push_eh $P187
+.sub "is_method"  :subid("31_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 109
+    new $P1135, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1135, control_1134
+    push_eh $P1135
     .lex "self", self
-    find_lex $P189, "self"
-    unless_null $P189, vivify_119
-    $P189 = root_new ['parrot';'Hash']
-  vivify_119:
-    set $P190, $P189["postcomp"]
-    unless_null $P190, vivify_120
-    new $P190, "Undef"
-  vivify_120:
-    set $P188, $P190
-    defined $I192, $P188
-    if $I192, default_191
-    new $P193, "Integer"
-    assign $P193, 0
-    set $P188, $P193
-  default_191:
+    find_lex $P1137, "self"
+    unless_null $P1137, vivify_125
+    $P1137 = root_new ['parrot';'Hash']
+  vivify_125:
+    set $P183, $P1137["method"]
+    unless_null $P183, vivify_126
+    new $P183, "Undef"
+  vivify_126:
+    set $P1136, $P183
+    defined $I1139, $P1136
+    if $I1139, default_1138
+    new $P184, "Integer"
+    assign $P184, 0
+    set $P1136, $P184
+  default_1138:
+    .return ($P1136)
+  control_1134:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P185, exception, "payload"
+    .return ($P185)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "is_method"  :subid("32_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1143
+.annotate 'line', 110
+    new $P1142, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1142, control_1141
+    push_eh $P1142
+    .lex "self", self
+    .lex "$val", param_1143
+    find_lex $P186, "$val"
+    istrue $I187, $P186
+    new $P188, 'Integer'
+    set $P188, $I187
+    find_lex $P1144, "self"
+    unless_null $P1144, vivify_127
+    $P1144 = root_new ['parrot';'Hash']
+    store_lex "self", $P1144
+  vivify_127:
+    set $P1144["method"], $P188
     .return ($P188)
-  control_186:
+  control_1141:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P194, exception, "payload"
-    .return ($P194)
+    getattribute $P189, exception, "payload"
+    .return ($P189)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "postcomp"  :subid("28_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_198
-.annotate 'line', 104
-    new $P197, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P197, control_196
-    push_eh $P197
+.sub "lex"  :subid("33_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 112
+    new $P1147, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1147, control_1146
+    push_eh $P1147
     .lex "self", self
-    .lex "$val", param_198
+    find_lex $P1149, "self"
+    unless_null $P1149, vivify_128
+    $P1149 = root_new ['parrot';'Hash']
+  vivify_128:
+    set $P190, $P1149["lex"]
+    unless_null $P190, vivify_129
+    new $P190, "Undef"
+  vivify_129:
+    set $P1148, $P190
+    defined $I1151, $P1148
+    if $I1151, default_1150
+    new $P191, "Integer"
+    assign $P191, 0
+    set $P1148, $P191
+  default_1150:
+    .return ($P1148)
+  control_1146:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P192, exception, "payload"
+    .return ($P192)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "lex"  :subid("34_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1155
+.annotate 'line', 113
+    new $P1154, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1154, control_1153
+    push_eh $P1154
+    .lex "self", self
+    .lex "$val", param_1155
+    find_lex $P193, "$val"
+    istrue $I194, $P193
+    new $P195, 'Integer'
+    set $P195, $I194
+    find_lex $P1156, "self"
+    unless_null $P1156, vivify_130
+    $P1156 = root_new ['parrot';'Hash']
+    store_lex "self", $P1156
+  vivify_130:
+    set $P1156["lex"], $P195
+    .return ($P195)
+  control_1153:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P196, exception, "payload"
+    .return ($P196)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "nsentry"  :subid("35_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 115
+    new $P1159, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1159, control_1158
+    push_eh $P1159
+    .lex "self", self
+    find_lex $P1160, "self"
+    unless_null $P1160, vivify_131
+    $P1160 = root_new ['parrot';'Hash']
+  vivify_131:
+    set $P197, $P1160["nsentry"]
+    unless_null $P197, vivify_132
+    new $P197, "Undef"
+  vivify_132:
+    .return ($P197)
+  control_1158:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P198, exception, "payload"
+    .return ($P198)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "nsentry"  :subid("36_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1164
+.annotate 'line', 116
+    new $P1163, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1163, control_1162
+    push_eh $P1163
+    .lex "self", self
+    .lex "$val", param_1164
     find_lex $P199, "$val"
-    istrue $I200, $P199
-    new $P201, 'Integer'
-    set $P201, $I200
-    find_lex $P202, "self"
-    unless_null $P202, vivify_121
-    $P202 = root_new ['parrot';'Hash']
-    store_lex "self", $P202
-  vivify_121:
-    set $P202["postcomp"], $P201
-    .return ($P201)
-  control_196:
+    find_lex $P1165, "self"
+    unless_null $P1165, vivify_133
+    $P1165 = root_new ['parrot';'Hash']
+    store_lex "self", $P1165
+  vivify_133:
+    set $P1165["nsentry"], $P199
+    .return ($P199)
+  control_1162:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P200, exception, "payload"
+    .return ($P200)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "vtable"  :subid("37_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 118
+    new $P1168, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1168, control_1167
+    push_eh $P1168
+    .lex "self", self
+    find_lex $P1170, "self"
+    unless_null $P1170, vivify_134
+    $P1170 = root_new ['parrot';'Hash']
+  vivify_134:
+    set $P201, $P1170["vtable"]
+    unless_null $P201, vivify_135
+    new $P201, "Undef"
+  vivify_135:
+    set $P1169, $P201
+    defined $I1172, $P1169
+    if $I1172, default_1171
+    new $P202, "Integer"
+    assign $P202, -1
+    set $P1169, $P202
+  default_1171:
+    .return ($P1169)
+  control_1167:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P203, exception, "payload"
@@ -885,58 +1154,228 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "anon"  :subid("29_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 106
-    new $P206, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P206, control_205
-    push_eh $P206
+.sub "vtable"  :subid("38_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1176
+.annotate 'line', 119
+    new $P1175, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1175, control_1174
+    push_eh $P1175
     .lex "self", self
-    find_lex $P208, "self"
-    unless_null $P208, vivify_122
-    $P208 = root_new ['parrot';'Hash']
-  vivify_122:
-    set $P209, $P208["anon"]
-    unless_null $P209, vivify_123
-    new $P209, "Undef"
-  vivify_123:
-    set $P207, $P209
-    defined $I211, $P207
-    if $I211, default_210
-    new $P212, "Integer"
-    assign $P212, 0
-    set $P207, $P212
-  default_210:
-    .return ($P207)
-  control_205:
+    .lex "$val", param_1176
+    find_lex $P204, "$val"
+    find_lex $P1177, "self"
+    unless_null $P1177, vivify_136
+    $P1177 = root_new ['parrot';'Hash']
+    store_lex "self", $P1177
+  vivify_136:
+    set $P1177["vtable"], $P204
+    find_lex $P205, "$val"
+    .return ($P205)
+  control_1174:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P213, exception, "payload"
-    .return ($P213)
+    getattribute $P206, exception, "payload"
+    .return ($P206)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "anon"  :subid("30_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_217
-.annotate 'line', 107
-    new $P216, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P216, control_215
-    push_eh $P216
+.sub "blocktype"  :subid("39_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 121
+    new $P1180, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1180, control_1179
+    push_eh $P1180
     .lex "self", self
-    .lex "$val", param_217
-    find_lex $P218, "$val"
-    istrue $I219, $P218
-    new $P220, 'Integer'
-    set $P220, $I219
-    find_lex $P221, "self"
-    unless_null $P221, vivify_124
-    $P221 = root_new ['parrot';'Hash']
-    store_lex "self", $P221
-  vivify_124:
-    set $P221["anon"], $P220
+    find_lex $P1181, "self"
+    unless_null $P1181, vivify_137
+    $P1181 = root_new ['parrot';'Hash']
+  vivify_137:
+    set $P207, $P1181["blocktype"]
+    unless_null $P207, vivify_138
+    new $P207, "Undef"
+  vivify_138:
+    .return ($P207)
+  control_1179:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P208, exception, "payload"
+    .return ($P208)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "blocktype"  :subid("40_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1185
+.annotate 'line', 122
+    new $P1184, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1184, control_1183
+    push_eh $P1184
+    .lex "self", self
+    .lex "$val", param_1185
+    find_lex $P209, "$val"
+    find_lex $P1186, "self"
+    unless_null $P1186, vivify_139
+    $P1186 = root_new ['parrot';'Hash']
+    store_lex "self", $P1186
+  vivify_139:
+    set $P1186["blocktype"], $P209
+    .return ($P209)
+  control_1183:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P210, exception, "payload"
+    .return ($P210)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "namespace"  :subid("41_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 124
+    new $P1189, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1189, control_1188
+    push_eh $P1189
+    .lex "self", self
+    find_lex $P1190, "self"
+    unless_null $P1190, vivify_140
+    $P1190 = root_new ['parrot';'Hash']
+  vivify_140:
+    set $P211, $P1190["namespace"]
+    unless_null $P211, vivify_141
+    new $P211, "Undef"
+  vivify_141:
+    .return ($P211)
+  control_1188:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P212, exception, "payload"
+    .return ($P212)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "namespace"  :subid("42_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1194
+.annotate 'line', 125
+    new $P1193, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1193, control_1192
+    push_eh $P1193
+    .lex "self", self
+    .lex "$val", param_1194
+    find_lex $P213, "$val"
+    find_lex $P1195, "self"
+    unless_null $P1195, vivify_142
+    $P1195 = root_new ['parrot';'Hash']
+    store_lex "self", $P1195
+  vivify_142:
+    set $P1195["namespace"], $P213
+    .return ($P213)
+  control_1192:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P214, exception, "payload"
+    .return ($P214)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "hll"  :subid("43_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 127
+    new $P1198, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1198, control_1197
+    push_eh $P1198
+    .lex "self", self
+    find_lex $P1199, "self"
+    unless_null $P1199, vivify_143
+    $P1199 = root_new ['parrot';'Hash']
+  vivify_143:
+    set $P215, $P1199["hll"]
+    unless_null $P215, vivify_144
+    new $P215, "Undef"
+  vivify_144:
+    .return ($P215)
+  control_1197:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P216, exception, "payload"
+    .return ($P216)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "hll"  :subid("44_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1203
+.annotate 'line', 128
+    new $P1202, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1202, control_1201
+    push_eh $P1202
+    .lex "self", self
+    .lex "$val", param_1203
+    find_lex $P217, "$val"
+    find_lex $P1204, "self"
+    unless_null $P1204, vivify_145
+    $P1204 = root_new ['parrot';'Hash']
+    store_lex "self", $P1204
+  vivify_145:
+    set $P1204["hll"], $P217
+    .return ($P217)
+  control_1201:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P218, exception, "payload"
+    .return ($P218)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "loadlibs"  :subid("45_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 130
+    new $P1207, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1207, control_1206
+    push_eh $P1207
+    .lex "self", self
+    find_lex $P1208, "self"
+    unless_null $P1208, vivify_146
+    $P1208 = root_new ['parrot';'Hash']
+  vivify_146:
+    set $P219, $P1208["loadlibs"]
+    unless_null $P219, vivify_147
+    new $P219, "Undef"
+  vivify_147:
+    .return ($P219)
+  control_1206:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P220, exception, "payload"
     .return ($P220)
-  control_215:
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "loadlibs"  :subid("46_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1212
+.annotate 'line', 131
+    new $P1211, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1211, control_1210
+    push_eh $P1211
+    .lex "self", self
+    .lex "$val", param_1212
+    find_lex $P221, "$val"
+    find_lex $P1213, "self"
+    unless_null $P1213, vivify_148
+    $P1213 = root_new ['parrot';'Hash']
+    store_lex "self", $P1213
+  vivify_148:
+    set $P1213["loadlibs"], $P221
+    .return ($P221)
+  control_1210:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P222, exception, "payload"
@@ -946,29 +1385,124 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_method"  :subid("31_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 109
-    new $P225, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P225, control_224
-    push_eh $P225
+.sub "outer"  :subid("47_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 133
+    new $P1216, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1216, control_1215
+    push_eh $P1216
     .lex "self", self
-    find_lex $P227, "self"
-    unless_null $P227, vivify_125
-    $P227 = root_new ['parrot';'Hash']
-  vivify_125:
-    set $P228, $P227["method"]
-    unless_null $P228, vivify_126
-    new $P228, "Undef"
-  vivify_126:
-    set $P226, $P228
-    defined $I230, $P226
-    if $I230, default_229
-    new $P231, "Integer"
-    assign $P231, 0
-    set $P226, $P231
-  default_229:
+    find_lex $P1217, "self"
+    unless_null $P1217, vivify_149
+    $P1217 = root_new ['parrot';'Hash']
+  vivify_149:
+    set $P223, $P1217["outer"]
+    unless_null $P223, vivify_150
+    new $P223, "Undef"
+  vivify_150:
+    .return ($P223)
+  control_1215:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P224, exception, "payload"
+    .return ($P224)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "outer"  :subid("48_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1221
+.annotate 'line', 134
+    new $P1220, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1220, control_1219
+    push_eh $P1220
+    .lex "self", self
+    .lex "$val", param_1221
+    find_lex $P225, "$val"
+    find_lex $P1222, "self"
+    unless_null $P1222, vivify_151
+    $P1222 = root_new ['parrot';'Hash']
+    store_lex "self", $P1222
+  vivify_151:
+    set $P1222["outer"], $P225
+    .return ($P225)
+  control_1219:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P226, exception, "payload"
     .return ($P226)
-  control_224:
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "multi"  :subid("49_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 136
+    new $P1225, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1225, control_1224
+    push_eh $P1225
+    .lex "self", self
+    find_lex $P1226, "self"
+    unless_null $P1226, vivify_152
+    $P1226 = root_new ['parrot';'Hash']
+  vivify_152:
+    set $P227, $P1226["multi"]
+    unless_null $P227, vivify_153
+    new $P227, "Undef"
+  vivify_153:
+    .return ($P227)
+  control_1224:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P228, exception, "payload"
+    .return ($P228)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "multi"  :subid("50_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1230
+.annotate 'line', 137
+    new $P1229, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1229, control_1228
+    push_eh $P1229
+    .lex "self", self
+    .lex "$val", param_1230
+    find_lex $P229, "$val"
+    find_lex $P1231, "self"
+    unless_null $P1231, vivify_154
+    $P1231 = root_new ['parrot';'Hash']
+    store_lex "self", $P1231
+  vivify_154:
+    set $P1231["multi"], $P229
+    .return ($P229)
+  control_1228:
+    .local pmc exception 
+    .get_results (exception) 
+    getattribute $P230, exception, "payload"
+    .return ($P230)
+.end
+
+
+.namespace ["POST";"Sub"]
+.include "except_types.pasm"
+.sub "pirflags"  :subid("51_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
+.annotate 'line', 139
+    new $P1234, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1234, control_1233
+    push_eh $P1234
+    .lex "self", self
+    find_lex $P1235, "self"
+    unless_null $P1235, vivify_155
+    $P1235 = root_new ['parrot';'Hash']
+  vivify_155:
+    set $P231, $P1235["pirflags"]
+    unless_null $P231, vivify_156
+    new $P231, "Undef"
+  vivify_156:
+    .return ($P231)
+  control_1233:
     .local pmc exception 
     .get_results (exception) 
     getattribute $P232, exception, "payload"
@@ -978,895 +1512,366 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_method"  :subid("32_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_236
-.annotate 'line', 110
-    new $P235, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P235, control_234
-    push_eh $P235
-    .lex "self", self
-    .lex "$val", param_236
-    find_lex $P237, "$val"
-    istrue $I238, $P237
-    new $P239, 'Integer'
-    set $P239, $I238
-    find_lex $P240, "self"
-    unless_null $P240, vivify_127
-    $P240 = root_new ['parrot';'Hash']
-    store_lex "self", $P240
-  vivify_127:
-    set $P240["method"], $P239
-    .return ($P239)
-  control_234:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P241, exception, "payload"
-    .return ($P241)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "lex"  :subid("33_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 112
-    new $P244, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P244, control_243
-    push_eh $P244
-    .lex "self", self
-    find_lex $P246, "self"
-    unless_null $P246, vivify_128
-    $P246 = root_new ['parrot';'Hash']
-  vivify_128:
-    set $P247, $P246["lex"]
-    unless_null $P247, vivify_129
-    new $P247, "Undef"
-  vivify_129:
-    set $P245, $P247
-    defined $I249, $P245
-    if $I249, default_248
-    new $P250, "Integer"
-    assign $P250, 0
-    set $P245, $P250
-  default_248:
-    .return ($P245)
-  control_243:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P251, exception, "payload"
-    .return ($P251)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "lex"  :subid("34_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_255
-.annotate 'line', 113
-    new $P254, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P254, control_253
-    push_eh $P254
-    .lex "self", self
-    .lex "$val", param_255
-    find_lex $P256, "$val"
-    istrue $I257, $P256
-    new $P258, 'Integer'
-    set $P258, $I257
-    find_lex $P259, "self"
-    unless_null $P259, vivify_130
-    $P259 = root_new ['parrot';'Hash']
-    store_lex "self", $P259
-  vivify_130:
-    set $P259["lex"], $P258
-    .return ($P258)
-  control_253:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P260, exception, "payload"
-    .return ($P260)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "nsentry"  :subid("35_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 115
-    new $P263, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P263, control_262
-    push_eh $P263
-    .lex "self", self
-    find_lex $P264, "self"
-    unless_null $P264, vivify_131
-    $P264 = root_new ['parrot';'Hash']
-  vivify_131:
-    set $P265, $P264["nsentry"]
-    unless_null $P265, vivify_132
-    new $P265, "Undef"
-  vivify_132:
-    .return ($P265)
-  control_262:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P266, exception, "payload"
-    .return ($P266)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "nsentry"  :subid("36_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_270
-.annotate 'line', 116
-    new $P269, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P269, control_268
-    push_eh $P269
-    .lex "self", self
-    .lex "$val", param_270
-    find_lex $P271, "$val"
-    find_lex $P272, "self"
-    unless_null $P272, vivify_133
-    $P272 = root_new ['parrot';'Hash']
-    store_lex "self", $P272
-  vivify_133:
-    set $P272["nsentry"], $P271
-    .return ($P271)
-  control_268:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P273, exception, "payload"
-    .return ($P273)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "vtable"  :subid("37_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 118
-    new $P276, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P276, control_275
-    push_eh $P276
-    .lex "self", self
-    find_lex $P278, "self"
-    unless_null $P278, vivify_134
-    $P278 = root_new ['parrot';'Hash']
-  vivify_134:
-    set $P279, $P278["vtable"]
-    unless_null $P279, vivify_135
-    new $P279, "Undef"
-  vivify_135:
-    set $P277, $P279
-    defined $I281, $P277
-    if $I281, default_280
-    new $P282, "Integer"
-    assign $P282, -1
-    set $P277, $P282
-  default_280:
-    .return ($P277)
-  control_275:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P283, exception, "payload"
-    .return ($P283)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "vtable"  :subid("38_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_287
-.annotate 'line', 119
-    new $P286, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P286, control_285
-    push_eh $P286
-    .lex "self", self
-    .lex "$val", param_287
-    find_lex $P288, "$val"
-    find_lex $P289, "self"
-    unless_null $P289, vivify_136
-    $P289 = root_new ['parrot';'Hash']
-    store_lex "self", $P289
-  vivify_136:
-    set $P289["vtable"], $P288
-    find_lex $P290, "$val"
-    .return ($P290)
-  control_285:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P291, exception, "payload"
-    .return ($P291)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "blocktype"  :subid("39_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 121
-    new $P294, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P294, control_293
-    push_eh $P294
-    .lex "self", self
-    find_lex $P295, "self"
-    unless_null $P295, vivify_137
-    $P295 = root_new ['parrot';'Hash']
-  vivify_137:
-    set $P296, $P295["blocktype"]
-    unless_null $P296, vivify_138
-    new $P296, "Undef"
-  vivify_138:
-    .return ($P296)
-  control_293:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P297, exception, "payload"
-    .return ($P297)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "blocktype"  :subid("40_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_301
-.annotate 'line', 122
-    new $P300, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P300, control_299
-    push_eh $P300
-    .lex "self", self
-    .lex "$val", param_301
-    find_lex $P302, "$val"
-    find_lex $P303, "self"
-    unless_null $P303, vivify_139
-    $P303 = root_new ['parrot';'Hash']
-    store_lex "self", $P303
-  vivify_139:
-    set $P303["blocktype"], $P302
-    .return ($P302)
-  control_299:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P304, exception, "payload"
-    .return ($P304)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "namespace"  :subid("41_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 124
-    new $P307, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P307, control_306
-    push_eh $P307
-    .lex "self", self
-    find_lex $P308, "self"
-    unless_null $P308, vivify_140
-    $P308 = root_new ['parrot';'Hash']
-  vivify_140:
-    set $P309, $P308["namespace"]
-    unless_null $P309, vivify_141
-    new $P309, "Undef"
-  vivify_141:
-    .return ($P309)
-  control_306:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P310, exception, "payload"
-    .return ($P310)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "namespace"  :subid("42_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_314
-.annotate 'line', 125
-    new $P313, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P313, control_312
-    push_eh $P313
-    .lex "self", self
-    .lex "$val", param_314
-    find_lex $P315, "$val"
-    find_lex $P316, "self"
-    unless_null $P316, vivify_142
-    $P316 = root_new ['parrot';'Hash']
-    store_lex "self", $P316
-  vivify_142:
-    set $P316["namespace"], $P315
-    .return ($P315)
-  control_312:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P317, exception, "payload"
-    .return ($P317)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "hll"  :subid("43_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 127
-    new $P320, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P320, control_319
-    push_eh $P320
-    .lex "self", self
-    find_lex $P321, "self"
-    unless_null $P321, vivify_143
-    $P321 = root_new ['parrot';'Hash']
-  vivify_143:
-    set $P322, $P321["hll"]
-    unless_null $P322, vivify_144
-    new $P322, "Undef"
-  vivify_144:
-    .return ($P322)
-  control_319:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P323, exception, "payload"
-    .return ($P323)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "hll"  :subid("44_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_327
-.annotate 'line', 128
-    new $P326, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P326, control_325
-    push_eh $P326
-    .lex "self", self
-    .lex "$val", param_327
-    find_lex $P328, "$val"
-    find_lex $P329, "self"
-    unless_null $P329, vivify_145
-    $P329 = root_new ['parrot';'Hash']
-    store_lex "self", $P329
-  vivify_145:
-    set $P329["hll"], $P328
-    .return ($P328)
-  control_325:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P330, exception, "payload"
-    .return ($P330)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "loadlibs"  :subid("45_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 130
-    new $P333, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P333, control_332
-    push_eh $P333
-    .lex "self", self
-    find_lex $P334, "self"
-    unless_null $P334, vivify_146
-    $P334 = root_new ['parrot';'Hash']
-  vivify_146:
-    set $P335, $P334["loadlibs"]
-    unless_null $P335, vivify_147
-    new $P335, "Undef"
-  vivify_147:
-    .return ($P335)
-  control_332:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P336, exception, "payload"
-    .return ($P336)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "loadlibs"  :subid("46_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_340
-.annotate 'line', 131
-    new $P339, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P339, control_338
-    push_eh $P339
-    .lex "self", self
-    .lex "$val", param_340
-    find_lex $P341, "$val"
-    find_lex $P342, "self"
-    unless_null $P342, vivify_148
-    $P342 = root_new ['parrot';'Hash']
-    store_lex "self", $P342
-  vivify_148:
-    set $P342["loadlibs"], $P341
-    .return ($P341)
-  control_338:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P343, exception, "payload"
-    .return ($P343)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "outer"  :subid("47_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 133
-    new $P346, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P346, control_345
-    push_eh $P346
-    .lex "self", self
-    find_lex $P347, "self"
-    unless_null $P347, vivify_149
-    $P347 = root_new ['parrot';'Hash']
-  vivify_149:
-    set $P348, $P347["outer"]
-    unless_null $P348, vivify_150
-    new $P348, "Undef"
-  vivify_150:
-    .return ($P348)
-  control_345:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P349, exception, "payload"
-    .return ($P349)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "outer"  :subid("48_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_353
-.annotate 'line', 134
-    new $P352, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P352, control_351
-    push_eh $P352
-    .lex "self", self
-    .lex "$val", param_353
-    find_lex $P354, "$val"
-    find_lex $P355, "self"
-    unless_null $P355, vivify_151
-    $P355 = root_new ['parrot';'Hash']
-    store_lex "self", $P355
-  vivify_151:
-    set $P355["outer"], $P354
-    .return ($P354)
-  control_351:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P356, exception, "payload"
-    .return ($P356)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "multi"  :subid("49_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 136
-    new $P359, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P359, control_358
-    push_eh $P359
-    .lex "self", self
-    find_lex $P360, "self"
-    unless_null $P360, vivify_152
-    $P360 = root_new ['parrot';'Hash']
-  vivify_152:
-    set $P361, $P360["multi"]
-    unless_null $P361, vivify_153
-    new $P361, "Undef"
-  vivify_153:
-    .return ($P361)
-  control_358:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P362, exception, "payload"
-    .return ($P362)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "multi"  :subid("50_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_366
-.annotate 'line', 137
-    new $P365, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P365, control_364
-    push_eh $P365
-    .lex "self", self
-    .lex "$val", param_366
-    find_lex $P367, "$val"
-    find_lex $P368, "self"
-    unless_null $P368, vivify_154
-    $P368 = root_new ['parrot';'Hash']
-    store_lex "self", $P368
-  vivify_154:
-    set $P368["multi"], $P367
-    .return ($P367)
-  control_364:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P369, exception, "payload"
-    .return ($P369)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "pirflags"  :subid("51_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
-.annotate 'line', 139
-    new $P372, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P372, control_371
-    push_eh $P372
-    .lex "self", self
-    find_lex $P373, "self"
-    unless_null $P373, vivify_155
-    $P373 = root_new ['parrot';'Hash']
-  vivify_155:
-    set $P374, $P373["pirflags"]
-    unless_null $P374, vivify_156
-    new $P374, "Undef"
-  vivify_156:
-    .return ($P374)
-  control_371:
-    .local pmc exception 
-    .get_results (exception) 
-    getattribute $P375, exception, "payload"
-    .return ($P375)
-.end
-
-
-.namespace ["POST";"Sub"]
-.include "except_types.pasm"
-.sub "pirflags"  :subid("52_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_379
+.sub "pirflags"  :subid("52_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1239
 .annotate 'line', 140
-    new $P378, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P378, control_377
-    push_eh $P378
+    new $P1238, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1238, control_1237
+    push_eh $P1238
     .lex "self", self
-    .lex "$val", param_379
-    find_lex $P380, "$val"
-    find_lex $P381, "self"
-    unless_null $P381, vivify_157
-    $P381 = root_new ['parrot';'Hash']
-    store_lex "self", $P381
+    .lex "$val", param_1239
+    find_lex $P233, "$val"
+    find_lex $P1240, "self"
+    unless_null $P1240, vivify_157
+    $P1240 = root_new ['parrot';'Hash']
+    store_lex "self", $P1240
   vivify_157:
-    set $P381["pirflags"], $P380
-    .return ($P380)
-  control_377:
+    set $P1240["pirflags"], $P233
+    .return ($P233)
+  control_1237:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P382, exception, "payload"
-    .return ($P382)
+    getattribute $P234, exception, "payload"
+    .return ($P234)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler"  :subid("53_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
+.sub "compiler"  :subid("53_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
 .annotate 'line', 142
-    new $P385, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P385, control_384
-    push_eh $P385
+    new $P1243, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1243, control_1242
+    push_eh $P1243
     .lex "self", self
-    find_lex $P386, "self"
-    unless_null $P386, vivify_158
-    $P386 = root_new ['parrot';'Hash']
+    find_lex $P1244, "self"
+    unless_null $P1244, vivify_158
+    $P1244 = root_new ['parrot';'Hash']
   vivify_158:
-    set $P387, $P386["compiler"]
-    unless_null $P387, vivify_159
-    new $P387, "Undef"
+    set $P235, $P1244["compiler"]
+    unless_null $P235, vivify_159
+    new $P235, "Undef"
   vivify_159:
-    .return ($P387)
-  control_384:
+    .return ($P235)
+  control_1242:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P388, exception, "payload"
-    .return ($P388)
+    getattribute $P236, exception, "payload"
+    .return ($P236)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler"  :subid("54_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_392
+.sub "compiler"  :subid("54_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1248
 .annotate 'line', 143
-    new $P391, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P391, control_390
-    push_eh $P391
+    new $P1247, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1247, control_1246
+    push_eh $P1247
     .lex "self", self
-    .lex "$val", param_392
-    find_lex $P393, "$val"
-    find_lex $P394, "self"
-    unless_null $P394, vivify_160
-    $P394 = root_new ['parrot';'Hash']
-    store_lex "self", $P394
+    .lex "$val", param_1248
+    find_lex $P237, "$val"
+    find_lex $P1249, "self"
+    unless_null $P1249, vivify_160
+    $P1249 = root_new ['parrot';'Hash']
+    store_lex "self", $P1249
   vivify_160:
-    set $P394["compiler"], $P393
-    .return ($P393)
-  control_390:
+    set $P1249["compiler"], $P237
+    .return ($P237)
+  control_1246:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P395, exception, "payload"
-    .return ($P395)
+    getattribute $P238, exception, "payload"
+    .return ($P238)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler_args"  :subid("55_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
+.sub "compiler_args"  :subid("55_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
 .annotate 'line', 145
-    new $P398, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P398, control_397
-    push_eh $P398
+    new $P1252, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1252, control_1251
+    push_eh $P1252
     .lex "self", self
-    find_lex $P399, "self"
-    unless_null $P399, vivify_161
-    $P399 = root_new ['parrot';'Hash']
+    find_lex $P1253, "self"
+    unless_null $P1253, vivify_161
+    $P1253 = root_new ['parrot';'Hash']
   vivify_161:
-    set $P400, $P399["compiler_args"]
-    unless_null $P400, vivify_162
-    new $P400, "Undef"
+    set $P239, $P1253["compiler_args"]
+    unless_null $P239, vivify_162
+    new $P239, "Undef"
   vivify_162:
-    .return ($P400)
-  control_397:
+    .return ($P239)
+  control_1251:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P401, exception, "payload"
-    .return ($P401)
+    getattribute $P240, exception, "payload"
+    .return ($P240)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler_args"  :subid("56_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_405
+.sub "compiler_args"  :subid("56_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1257
 .annotate 'line', 146
-    new $P404, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P404, control_403
-    push_eh $P404
+    new $P1256, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1256, control_1255
+    push_eh $P1256
     .lex "self", self
-    .lex "$val", param_405
-    find_lex $P406, "$val"
-    find_lex $P407, "self"
-    unless_null $P407, vivify_163
-    $P407 = root_new ['parrot';'Hash']
-    store_lex "self", $P407
+    .lex "$val", param_1257
+    find_lex $P241, "$val"
+    find_lex $P1258, "self"
+    unless_null $P1258, vivify_163
+    $P1258 = root_new ['parrot';'Hash']
+    store_lex "self", $P1258
   vivify_163:
-    set $P407["compiler_args"], $P406
-    .return ($P406)
-  control_403:
+    set $P1258["compiler_args"], $P241
+    .return ($P241)
+  control_1255:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P408, exception, "payload"
-    .return ($P408)
+    getattribute $P242, exception, "payload"
+    .return ($P242)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "subid"  :subid("57_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_,_)
-    .param pmc param_412
+.sub "subid"  :subid("57_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_,_)
+    .param pmc param_1262
 .annotate 'line', 148
-    new $P411, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P411, control_410
-    push_eh $P411
+    new $P1261, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1261, control_1260
+    push_eh $P1261
     .lex "self", self
-    .lex "$value", param_412
-    find_lex $P413, "$value"
-    find_lex $P414, "self"
-    unless_null $P414, vivify_164
-    $P414 = root_new ['parrot';'Hash']
-    store_lex "self", $P414
+    .lex "$value", param_1262
+    find_lex $P243, "$value"
+    find_lex $P1263, "self"
+    unless_null $P1263, vivify_164
+    $P1263 = root_new ['parrot';'Hash']
+    store_lex "self", $P1263
   vivify_164:
-    set $P414["subid"], $P413
-    .return ($P413)
-  control_410:
+    set $P1263["subid"], $P243
+    .return ($P243)
+  control_1260:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P415, exception, "payload"
-    .return ($P415)
+    getattribute $P244, exception, "payload"
+    .return ($P244)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "subid"  :subid("58_1308074671.44201") :method :outer("11_1308074671.44201") :multi(_)
+.sub "subid"  :subid("58_1308206297.03251") :method :outer("11_1308206297.03251") :multi(_)
 .annotate 'line', 149
-    new $P418, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P418, control_417
-    push_eh $P418
+    new $P1266, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1266, control_1265
+    push_eh $P1266
     .lex "self", self
 .annotate 'line', 150
-    new $P419, "Undef"
-    .lex "$value", $P419
-    find_lex $P420, "self"
-    unless_null $P420, vivify_165
-    $P420 = root_new ['parrot';'Hash']
+    new $P245, "Undef"
+    set $P1267, $P245
+    .lex "$value", $P1267
+    find_lex $P1268, "self"
+    unless_null $P1268, vivify_165
+    $P1268 = root_new ['parrot';'Hash']
   vivify_165:
-    set $P421, $P420["subid"]
-    unless_null $P421, vivify_166
-    new $P421, "Undef"
+    set $P246, $P1268["subid"]
+    unless_null $P246, vivify_166
+    new $P246, "Undef"
   vivify_166:
-    store_lex "$value", $P421
+    store_lex "$value", $P246
 .annotate 'line', 151
-    find_lex $P423, "$value"
-    defined $I424, $P423
-    if $I424, unless_422_end
+    find_lex $P247, "$value"
+    defined $I248, $P247
+    if $I248, unless_1269_end
 .annotate 'line', 152
-    find_lex $P425, "self"
-    $P426 = $P425."unique"("post")
-    store_lex "$value", $P426
+    find_lex $P249, "self"
+    $P250 = $P249."unique"("post")
+    store_lex "$value", $P250
 .annotate 'line', 153
-    find_lex $P427, "$value"
-    find_lex $P428, "self"
-    unless_null $P428, vivify_167
-    $P428 = root_new ['parrot';'Hash']
-    store_lex "self", $P428
+    find_lex $P251, "$value"
+    find_lex $P1270, "self"
+    unless_null $P1270, vivify_167
+    $P1270 = root_new ['parrot';'Hash']
+    store_lex "self", $P1270
   vivify_167:
-    set $P428["subid"], $P427
-  unless_422_end:
+    set $P1270["subid"], $P251
+  unless_1269_end:
 .annotate 'line', 151
-    find_lex $P429, "$value"
+    find_lex $P252, "$value"
 .annotate 'line', 149
-    .return ($P429)
-  control_417:
+    .return ($P252)
+  control_1265:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P430, exception, "payload"
-    .return ($P430)
+    getattribute $P253, exception, "payload"
+    .return ($P253)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "set_flag"  :subid("59_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_434
-    .param pmc param_435
+.sub "set_flag"  :subid("59_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1274
+    .param pmc param_1275
 .annotate 'line', 158
-    new $P433, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P433, control_432
-    push_eh $P433
+    new $P1273, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1273, control_1272
+    push_eh $P1273
     .lex "self", self
-    .lex "$name", param_434
-    .lex "$val", param_435
-    find_lex $P436, "$val"
-    find_lex $P437, "$name"
-    find_lex $P438, "self"
-    unless_null $P438, vivify_168
-    $P438 = root_new ['parrot';'Hash']
-    store_lex "self", $P438
+    .lex "$name", param_1274
+    .lex "$val", param_1275
+    find_lex $P254, "$val"
+    find_lex $P255, "$name"
+    find_lex $P1276, "self"
+    unless_null $P1276, vivify_168
+    $P1276 = root_new ['parrot';'Hash']
+    store_lex "self", $P1276
   vivify_168:
-    set $P438[$P437], $P436
-    find_lex $P439, "$val"
-    .return ($P439)
-  control_432:
+    set $P1276[$P255], $P254
+    find_lex $P256, "$val"
+    .return ($P256)
+  control_1272:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P440, exception, "payload"
-    .return ($P440)
+    getattribute $P257, exception, "payload"
+    .return ($P257)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "full_name"  :subid("60_1308074671.44201") :method :outer("11_1308074671.44201")
+.sub "full_name"  :subid("60_1308206297.03251") :method :outer("11_1308206297.03251")
 .annotate 'line', 162
-    new $P443, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P443, control_442
-    push_eh $P443
+    new $P1279, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1279, control_1278
+    push_eh $P1279
     .lex "self", self
 .annotate 'line', 163
-    find_lex $P446, "self"
-    unless_null $P446, vivify_169
-    $P446 = root_new ['parrot';'Hash']
+    find_lex $P1281, "self"
+    unless_null $P1281, vivify_169
+    $P1281 = root_new ['parrot';'Hash']
   vivify_169:
-    set $P447, $P446["namespace"]
-    unless_null $P447, vivify_170
-    new $P447, "Undef"
+    set $P259, $P1281["namespace"]
+    unless_null $P259, vivify_170
+    new $P259, "Undef"
   vivify_170:
-    if $P447, if_445
+    if $P259, if_1280
 .annotate 'line', 167
-    find_lex $P454, "self"
-    $P455 = $P454."name"()
+    find_lex $P265, "self"
+    $P266 = $P265."name"()
 .annotate 'line', 166
-    set $P444, $P455
+    set $P258, $P266
 .annotate 'line', 163
-    goto if_445_end
-  if_445:
+    goto if_1280_end
+  if_1280:
 .annotate 'line', 164
-    find_lex $P448, "self"
-    unless_null $P448, vivify_171
-    $P448 = root_new ['parrot';'Hash']
+    find_lex $P1282, "self"
+    unless_null $P1282, vivify_171
+    $P1282 = root_new ['parrot';'Hash']
   vivify_171:
-    set $P449, $P448["namespace"]
-    unless_null $P449, vivify_172
-    new $P449, "Undef"
+    set $P260, $P1282["namespace"]
+    unless_null $P260, vivify_172
+    new $P260, "Undef"
   vivify_172:
-    $P450 = $P449."Str"()
-    find_lex $P451, "self"
-    $S452 = $P451."name"()
-    concat $P453, $P450, $S452
+    $P261 = $P260."Str"()
+    find_lex $P262, "self"
+    $S263 = $P262."name"()
+    concat $P264, $P261, $S263
 .annotate 'line', 163
-    set $P444, $P453
-  if_445_end:
+    set $P258, $P264
+  if_1280_end:
 .annotate 'line', 162
-    .return ($P444)
-  control_442:
+    .return ($P258)
+  control_1278:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P456, exception, "payload"
-    .return ($P456)
+    getattribute $P267, exception, "payload"
+    .return ($P267)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "add_directive"  :subid("61_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_460
+.sub "add_directive"  :subid("61_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1286
 .annotate 'line', 171
-    new $P459, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P459, control_458
-    push_eh $P459
+    new $P1285, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1285, control_1284
+    push_eh $P1285
     .lex "self", self
-    .lex "$line", param_460
+    .lex "$line", param_1286
 .annotate 'line', 172
-    new $P461, "Undef"
-    .lex "$dlist", $P461
-    find_lex $P462, "self"
-    unless_null $P462, vivify_173
-    $P462 = root_new ['parrot';'Hash']
+    new $P268, "Undef"
+    set $P1287, $P268
+    .lex "$dlist", $P1287
+    find_lex $P1288, "self"
+    unless_null $P1288, vivify_173
+    $P1288 = root_new ['parrot';'Hash']
   vivify_173:
-    set $P463, $P462["directives"]
-    unless_null $P463, vivify_174
-    new $P463, "Undef"
+    set $P269, $P1288["directives"]
+    unless_null $P269, vivify_174
+    new $P269, "Undef"
   vivify_174:
-    store_lex "$dlist", $P463
+    store_lex "$dlist", $P269
 .annotate 'line', 173
-    find_lex $P466, "$dlist"
-    set $S467, $P466
-    find_lex $P468, "$line"
-    set $S469, $P468
-    index $I470, $S467, $S469
-    set $N471, $I470
-    islt $I472, $N471, 0.0
-    if $I472, if_465
-    new $P464, 'Integer'
-    set $P464, $I472
-    goto if_465_end
-  if_465:
+    find_lex $P271, "$dlist"
+    set $S272, $P271
+    find_lex $P273, "$line"
+    set $S274, $P273
+    index $I275, $S272, $S274
+    set $N276, $I275
+    islt $I277, $N276, 0.0
+    if $I277, if_1289
+    new $P270, 'Integer'
+    set $P270, $I277
+    goto if_1289_end
+  if_1289:
 .annotate 'line', 174
-    find_lex $P473, "$dlist"
-    set $S474, $P473
-    new $P475, 'String'
-    set $P475, $S474
-    find_lex $P476, "$line"
-    set $S477, $P476
-    concat $P478, $P475, $S477
-    concat $P479, $P478, "\n"
-    find_lex $P480, "self"
-    unless_null $P480, vivify_175
-    $P480 = root_new ['parrot';'Hash']
-    store_lex "self", $P480
+    find_lex $P278, "$dlist"
+    set $S279, $P278
+    new $P280, 'String'
+    set $P280, $S279
+    find_lex $P281, "$line"
+    set $S282, $P281
+    concat $P283, $P280, $S282
+    concat $P284, $P283, "\n"
+    find_lex $P1290, "self"
+    unless_null $P1290, vivify_175
+    $P1290 = root_new ['parrot';'Hash']
+    store_lex "self", $P1290
   vivify_175:
-    set $P480["directives"], $P479
+    set $P1290["directives"], $P284
 .annotate 'line', 173
-    set $P464, $P479
-  if_465_end:
+    set $P270, $P284
+  if_1289_end:
 .annotate 'line', 171
-    .return ($P464)
-  control_458:
+    .return ($P270)
+  control_1284:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P481, exception, "payload"
-    .return ($P481)
+    getattribute $P285, exception, "payload"
+    .return ($P285)
 .end
 
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "add_param"  :subid("62_1308074671.44201") :method :outer("11_1308074671.44201")
-    .param pmc param_485
-    .param pmc param_486 :slurpy :named
+.sub "add_param"  :subid("62_1308206297.03251") :method :outer("11_1308206297.03251")
+    .param pmc param_1294
+    .param pmc param_1295 :slurpy :named
 .annotate 'line', 179
-    new $P484, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P484, control_483
-    push_eh $P484
+    new $P1293, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1293, control_1292
+    push_eh $P1293
     .lex "self", self
-    .lex "$pname", param_485
-    .lex "%adverbs", param_486
+    .lex "$pname", param_1294
+    .lex "%adverbs", param_1295
 .annotate 'line', 180
 
     .local pmc pname
@@ -1918,28 +1923,28 @@
     
 .annotate 'line', 179
     .return ()
-  control_483:
+  control_1292:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P487, exception, "payload"
-    .return ($P487)
+    getattribute $P286, exception, "payload"
+    .return ($P286)
 .end
 
 
 .namespace ["POST";"Sub"]
-.sub "_block488" :load :anon :subid("63_1308074671.44201")
+.sub "_block1296" :load :anon :subid("63_1308206297.03251")
 .annotate 'line', 3
-    .const 'Sub' $P490 = "11_1308074671.44201" 
-    $P491 = $P490()
-    .return ($P491)
+    .const 'Sub' $P1298 = "11_1308206297.03251" 
+    $P287 = $P1298()
+    .return ($P287)
 .end
 
 
 .namespace []
-.sub "_block511" :load :anon :subid("64_1308074671.44201")
+.sub "_block1308" :load :anon :subid("64_1308206297.03251")
 .annotate 'line', 1
-    .const 'Sub' $P513 = "10_1308074671.44201" 
-    $P514 = $P513()
-    .return ($P514)
+    .const 'Sub' $P1310 = "10_1308206297.03251" 
+    $P298 = $P1310()
+    .return ($P298)
 .end
 

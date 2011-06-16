@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1308074668.86086")
+.sub "_block1000"  :anon :subid("10_1308206293.88332")
 .annotate 'line', 0
-    .const 'Sub' $P14 = "11_1308074668.86086" 
-    capture_lex $P14
+    .const 'Sub' $P1003 = "11_1308206293.88332" 
+    capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -12,50 +12,50 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 9
-    .const 'Sub' $P14 = "11_1308074668.86086" 
-    capture_lex $P14
-    $P95 = $P14()
+    .const 'Sub' $P1003 = "11_1308206293.88332" 
+    capture_lex $P1003
+    $P142 = $P1003()
 .annotate 'line', 1
-    .return ($P95)
-    .const 'Sub' $P97 = "23_1308074668.86086" 
-    .return ($P97)
+    .return ($P142)
+    .const 'Sub' $P1044 = "23_1308206293.88332" 
+    .return ($P1044)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post24") :outer("10_1308074668.86086")
+.sub "" :load :init :subid("post24") :outer("10_1308206293.88332")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1308074668.86086" 
+    .const 'Sub' $P1001 = "10_1308206293.88332" 
     .local pmc block
-    set block, $P12
-    $P100 = get_root_global ["parrot"], "P6metaclass"
-    $P100."new_class"("POST::Call", "POST::Node" :named("parent"))
+    set block, $P1001
+    $P1046 = get_root_global ["parrot"], "P6metaclass"
+    $P1046."new_class"("POST::Call", "POST::Node" :named("parent"))
 .end
 
 
 .namespace ["POST";"Call"]
-.sub "_block13"  :subid("11_1308074668.86086") :outer("10_1308074668.86086")
+.sub "_block1002"  :subid("11_1308206293.88332") :outer("10_1308206293.88332")
 .annotate 'line', 9
-    .const 'Sub' $P83 = "21_1308074668.86086" 
-    capture_lex $P83
-    .const 'Sub' $P75 = "20_1308074668.86086" 
-    capture_lex $P75
-    .const 'Sub' $P68 = "19_1308074668.86086" 
-    capture_lex $P68
-    .const 'Sub' $P60 = "18_1308074668.86086" 
-    capture_lex $P60
-    .const 'Sub' $P53 = "17_1308074668.86086" 
-    capture_lex $P53
-    .const 'Sub' $P45 = "16_1308074668.86086" 
-    capture_lex $P45
-    .const 'Sub' $P38 = "15_1308074668.86086" 
-    capture_lex $P38
-    .const 'Sub' $P30 = "14_1308074668.86086" 
-    capture_lex $P30
-    .const 'Sub' $P23 = "13_1308074668.86086" 
-    capture_lex $P23
-    .const 'Sub' $P15 = "12_1308074668.86086" 
-    capture_lex $P15
+    .const 'Sub' $P1036 = "21_1308206293.88332" 
+    capture_lex $P1036
+    .const 'Sub' $P1032 = "20_1308206293.88332" 
+    capture_lex $P1032
+    .const 'Sub' $P1029 = "19_1308206293.88332" 
+    capture_lex $P1029
+    .const 'Sub' $P1025 = "18_1308206293.88332" 
+    capture_lex $P1025
+    .const 'Sub' $P1022 = "17_1308206293.88332" 
+    capture_lex $P1022
+    .const 'Sub' $P1018 = "16_1308206293.88332" 
+    capture_lex $P1018
+    .const 'Sub' $P1015 = "15_1308206293.88332" 
+    capture_lex $P1015
+    .const 'Sub' $P1011 = "14_1308206293.88332" 
+    capture_lex $P1011
+    .const 'Sub' $P1008 = "13_1308206293.88332" 
+    capture_lex $P1008
+    .const 'Sub' $P1004 = "12_1308206293.88332" 
+    capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
     $I0 = can $P0, "ctxsave"
@@ -63,239 +63,239 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 25
-    .const 'Sub' $P83 = "21_1308074668.86086" 
-    newclosure $P90, $P83
+    .const 'Sub' $P1036 = "21_1308206293.88332" 
+    newclosure $P1039, $P1036
 .annotate 'line', 9
-    .return ($P90)
-    .const 'Sub' $P92 = "22_1308074668.86086" 
-    .return ($P92)
+    .return ($P1039)
+    .const 'Sub' $P1041 = "22_1308206293.88332" 
+    .return ($P1041)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "name"  :subid("12_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_,_)
-    .param pmc param_18
+.sub "name"  :subid("12_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_,_)
+    .param pmc param_1007
 .annotate 'line', 9
-    new $P17, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P17, control_16
-    push_eh $P17
+    new $P1006, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1006, control_1005
+    push_eh $P1006
     .lex "self", self
-    .lex "$param", param_18
-    find_lex $P19, "self"
-    find_lex $P20, "$param"
-    $P21 = $P19."attr"("name", $P20, 1)
-    .return ($P21)
-  control_16:
+    .lex "$param", param_1007
+    find_lex $P101, "self"
+    find_lex $P102, "$param"
+    $P103 = $P101."attr"("name", $P102, 1)
+    .return ($P103)
+  control_1005:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P22, exception, "payload"
-    .return ($P22)
+    getattribute $P104, exception, "payload"
+    .return ($P104)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "name"  :subid("13_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_)
+.sub "name"  :subid("13_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_)
 .annotate 'line', 10
-    new $P25, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P25, control_24
-    push_eh $P25
+    new $P1010, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1010, control_1009
+    push_eh $P1010
     .lex "self", self
-    find_lex $P26, "self"
-    get_hll_global $P27, "undef"
-    $P28 = $P26."attr"("name", $P27, 0)
-    .return ($P28)
-  control_24:
+    find_lex $P105, "self"
+    get_hll_global $P106, "undef"
+    $P107 = $P105."attr"("name", $P106, 0)
+    .return ($P107)
+  control_1009:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P29, exception, "payload"
-    .return ($P29)
+    getattribute $P108, exception, "payload"
+    .return ($P108)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "params"  :subid("14_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_,_)
-    .param pmc param_33
+.sub "params"  :subid("14_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_,_)
+    .param pmc param_1014
 .annotate 'line', 12
-    new $P32, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P32, control_31
-    push_eh $P32
+    new $P1013, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1013, control_1012
+    push_eh $P1013
     .lex "self", self
-    .lex "$param", param_33
-    find_lex $P34, "self"
-    find_lex $P35, "$param"
-    $P36 = $P34."attr"("params", $P35, 1)
-    .return ($P36)
-  control_31:
+    .lex "$param", param_1014
+    find_lex $P109, "self"
+    find_lex $P110, "$param"
+    $P111 = $P109."attr"("params", $P110, 1)
+    .return ($P111)
+  control_1012:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P37, exception, "payload"
-    .return ($P37)
+    getattribute $P112, exception, "payload"
+    .return ($P112)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "params"  :subid("15_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_)
+.sub "params"  :subid("15_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_)
 .annotate 'line', 13
-    new $P40, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P40, control_39
-    push_eh $P40
+    new $P1017, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1017, control_1016
+    push_eh $P1017
     .lex "self", self
-    find_lex $P41, "self"
-    get_hll_global $P42, "undef"
-    $P43 = $P41."attr"("params", $P42, 0)
-    .return ($P43)
-  control_39:
+    find_lex $P113, "self"
+    get_hll_global $P114, "undef"
+    $P115 = $P113."attr"("params", $P114, 0)
+    .return ($P115)
+  control_1016:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P44, exception, "payload"
-    .return ($P44)
+    getattribute $P116, exception, "payload"
+    .return ($P116)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "results"  :subid("16_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_,_)
-    .param pmc param_48
+.sub "results"  :subid("16_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_,_)
+    .param pmc param_1021
 .annotate 'line', 15
-    new $P47, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P47, control_46
-    push_eh $P47
+    new $P1020, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1020, control_1019
+    push_eh $P1020
     .lex "self", self
-    .lex "$param", param_48
-    find_lex $P49, "self"
-    find_lex $P50, "$param"
-    $P51 = $P49."attr"("results", $P50, 1)
-    .return ($P51)
-  control_46:
+    .lex "$param", param_1021
+    find_lex $P117, "self"
+    find_lex $P118, "$param"
+    $P119 = $P117."attr"("results", $P118, 1)
+    .return ($P119)
+  control_1019:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P52, exception, "payload"
-    .return ($P52)
+    getattribute $P120, exception, "payload"
+    .return ($P120)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "results"  :subid("17_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_)
+.sub "results"  :subid("17_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_)
 .annotate 'line', 16
-    new $P55, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P55, control_54
-    push_eh $P55
+    new $P1024, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1024, control_1023
+    push_eh $P1024
     .lex "self", self
-    find_lex $P56, "self"
-    get_hll_global $P57, "undef"
-    $P58 = $P56."attr"("results", $P57, 0)
-    .return ($P58)
-  control_54:
+    find_lex $P121, "self"
+    get_hll_global $P122, "undef"
+    $P123 = $P121."attr"("results", $P122, 0)
+    .return ($P123)
+  control_1023:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P59, exception, "payload"
-    .return ($P59)
+    getattribute $P124, exception, "payload"
+    .return ($P124)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "invocant"  :subid("18_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_,_)
-    .param pmc param_63
+.sub "invocant"  :subid("18_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_,_)
+    .param pmc param_1028
 .annotate 'line', 18
-    new $P62, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P62, control_61
-    push_eh $P62
+    new $P1027, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1027, control_1026
+    push_eh $P1027
     .lex "self", self
-    .lex "$param", param_63
-    find_lex $P64, "self"
-    find_lex $P65, "$param"
-    $P66 = $P64."attr"("invocant", $P65, 1)
-    .return ($P66)
-  control_61:
+    .lex "$param", param_1028
+    find_lex $P125, "self"
+    find_lex $P126, "$param"
+    $P127 = $P125."attr"("invocant", $P126, 1)
+    .return ($P127)
+  control_1026:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P67, exception, "payload"
-    .return ($P67)
+    getattribute $P128, exception, "payload"
+    .return ($P128)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "invocant"  :subid("19_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_)
+.sub "invocant"  :subid("19_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_)
 .annotate 'line', 19
-    new $P70, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P70, control_69
-    push_eh $P70
+    new $P1031, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1031, control_1030
+    push_eh $P1031
     .lex "self", self
-    find_lex $P71, "self"
-    get_hll_global $P72, "undef"
-    $P73 = $P71."attr"("invocant", $P72, 0)
-    .return ($P73)
-  control_69:
+    find_lex $P129, "self"
+    get_hll_global $P130, "undef"
+    $P131 = $P129."attr"("invocant", $P130, 0)
+    .return ($P131)
+  control_1030:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P74, exception, "payload"
-    .return ($P74)
+    getattribute $P132, exception, "payload"
+    .return ($P132)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "calltype"  :subid("20_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_,_)
-    .param pmc param_78
+.sub "calltype"  :subid("20_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_,_)
+    .param pmc param_1035
 .annotate 'line', 24
-    new $P77, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P77, control_76
-    push_eh $P77
+    new $P1034, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1034, control_1033
+    push_eh $P1034
     .lex "self", self
-    .lex "$param", param_78
-    find_lex $P79, "self"
-    find_lex $P80, "$param"
-    $P81 = $P79."attr"("calltype", $P80, 1)
-    .return ($P81)
-  control_76:
+    .lex "$param", param_1035
+    find_lex $P133, "self"
+    find_lex $P134, "$param"
+    $P135 = $P133."attr"("calltype", $P134, 1)
+    .return ($P135)
+  control_1033:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P82, exception, "payload"
-    .return ($P82)
+    getattribute $P136, exception, "payload"
+    .return ($P136)
 .end
 
 
 .namespace ["POST";"Call"]
 .include "except_types.pasm"
-.sub "calltype"  :subid("21_1308074668.86086") :method :outer("11_1308074668.86086") :multi(_)
+.sub "calltype"  :subid("21_1308206293.88332") :method :outer("11_1308206293.88332") :multi(_)
 .annotate 'line', 25
-    new $P85, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P85, control_84
-    push_eh $P85
+    new $P1038, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1038, control_1037
+    push_eh $P1038
     .lex "self", self
-    find_lex $P86, "self"
-    get_hll_global $P87, "undef"
-    $P88 = $P86."attr"("calltype", $P87, 0)
-    .return ($P88)
-  control_84:
+    find_lex $P137, "self"
+    get_hll_global $P138, "undef"
+    $P139 = $P137."attr"("calltype", $P138, 0)
+    .return ($P139)
+  control_1037:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P89, exception, "payload"
-    .return ($P89)
+    getattribute $P140, exception, "payload"
+    .return ($P140)
 .end
 
 
 .namespace ["POST";"Call"]
-.sub "_block91" :load :anon :subid("22_1308074668.86086")
+.sub "_block1040" :load :anon :subid("22_1308206293.88332")
 .annotate 'line', 9
-    .const 'Sub' $P93 = "11_1308074668.86086" 
-    $P94 = $P93()
-    .return ($P94)
+    .const 'Sub' $P1042 = "11_1308206293.88332" 
+    $P141 = $P1042()
+    .return ($P141)
 .end
 
 
 .namespace []
-.sub "_block96" :load :anon :subid("23_1308074668.86086")
+.sub "_block1043" :load :anon :subid("23_1308206293.88332")
 .annotate 'line', 1
-    .const 'Sub' $P98 = "10_1308074668.86086" 
-    $P99 = $P98()
-    .return ($P99)
+    .const 'Sub' $P1045 = "10_1308206293.88332" 
+    $P143 = $P1045()
+    .return ($P143)
 .end
 

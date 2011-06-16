@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block11"  :anon :subid("10_1308074683.5252")
+.sub "_block1000"  :anon :subid("10_1308206310.2109")
 .annotate 'line', 0
-    .const 'Sub' $P14 = "11_1308074683.5252" 
-    capture_lex $P14
+    .const 'Sub' $P1003 = "11_1308206310.2109" 
+    capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -12,44 +12,44 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 28
-    .const 'Sub' $P14 = "11_1308074683.5252" 
-    capture_lex $P14
-    $P97 = $P14()
+    .const 'Sub' $P1003 = "11_1308206310.2109" 
+    capture_lex $P1003
+    $P151 = $P1003()
 .annotate 'line', 1
-    .return ($P97)
-    .const 'Sub' $P99 = "20_1308074683.5252" 
-    .return ($P99)
+    .return ($P151)
+    .const 'Sub' $P1037 = "20_1308206310.2109" 
+    .return ($P1037)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post21") :outer("10_1308074683.5252")
+.sub "" :load :init :subid("post21") :outer("10_1308206310.2109")
 .annotate 'line', 0
-    .const 'Sub' $P12 = "10_1308074683.5252" 
+    .const 'Sub' $P1001 = "10_1308206310.2109" 
     .local pmc block
-    set block, $P12
-    $P102 = get_root_global ["parrot"], "P6metaclass"
-    $P102."new_class"("PAST::Node", "PCT::Node" :named("parent"))
+    set block, $P1001
+    $P1039 = get_root_global ["parrot"], "P6metaclass"
+    $P1039."new_class"("PAST::Node", "PCT::Node" :named("parent"))
 .end
 
 
 .namespace ["PAST";"Node"]
-.sub "_block13"  :subid("11_1308074683.5252") :outer("10_1308074683.5252")
+.sub "_block1002"  :subid("11_1308206310.2109") :outer("10_1308206310.2109")
 .annotate 'line', 28
-    .const 'Sub' $P81 = "18_1308074683.5252" 
-    capture_lex $P81
-    .const 'Sub' $P70 = "17_1308074683.5252" 
-    capture_lex $P70
-    .const 'Sub' $P59 = "16_1308074683.5252" 
-    capture_lex $P59
-    .const 'Sub' $P48 = "15_1308074683.5252" 
-    capture_lex $P48
-    .const 'Sub' $P37 = "14_1308074683.5252" 
-    capture_lex $P37
-    .const 'Sub' $P26 = "13_1308074683.5252" 
-    capture_lex $P26
-    .const 'Sub' $P15 = "12_1308074683.5252" 
-    capture_lex $P15
+    .const 'Sub' $P1028 = "18_1308206310.2109" 
+    capture_lex $P1028
+    .const 'Sub' $P1024 = "17_1308206310.2109" 
+    capture_lex $P1024
+    .const 'Sub' $P1020 = "16_1308206310.2109" 
+    capture_lex $P1020
+    .const 'Sub' $P1016 = "15_1308206310.2109" 
+    capture_lex $P1016
+    .const 'Sub' $P1012 = "14_1308206310.2109" 
+    capture_lex $P1012
+    .const 'Sub' $P1008 = "13_1308206310.2109" 
+    capture_lex $P1008
+    .const 'Sub' $P1004 = "12_1308206310.2109" 
+    capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
     $I0 = can $P0, "ctxsave"
@@ -57,246 +57,246 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 79
-    .const 'Sub' $P81 = "18_1308074683.5252" 
-    newclosure $P92, $P81
+    .const 'Sub' $P1028 = "18_1308206310.2109" 
+    newclosure $P1032, $P1028
 .annotate 'line', 28
-    .return ($P92)
-    .const 'Sub' $P94 = "19_1308074683.5252" 
-    .return ($P94)
+    .return ($P1032)
+    .const 'Sub' $P1034 = "19_1308206310.2109" 
+    .return ($P1034)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "returns"  :subid("12_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_18 :optional
-    .param int has_param_18 :opt_flag
+.sub "returns"  :subid("12_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1007 :optional
+    .param int has_param_1007 :opt_flag
 .annotate 'line', 28
-    new $P17, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P17, control_16
-    push_eh $P17
+    new $P1006, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1006, control_1005
+    push_eh $P1006
     .lex "self", self
-    if has_param_18, optparam_22
-    new $P19, "Undef"
-    set param_18, $P19
+    if has_param_1007, optparam_22
+    new $P101, "Undef"
+    set param_1007, $P101
   optparam_22:
-    .lex "$value", param_18
+    .lex "$value", param_1007
 .annotate 'line', 29
-    find_lex $P20, "self"
-    find_lex $P21, "$value"
-    find_lex $P22, "$value"
-    defined $I23, $P22
-    $P24 = $P20."attr"("returns", $P21, $I23)
+    find_lex $P102, "self"
+    find_lex $P103, "$value"
+    find_lex $P104, "$value"
+    defined $I105, $P104
+    $P106 = $P102."attr"("returns", $P103, $I105)
 .annotate 'line', 28
-    .return ($P24)
-  control_16:
+    .return ($P106)
+  control_1005:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P25, exception, "payload"
-    .return ($P25)
+    getattribute $P107, exception, "payload"
+    .return ($P107)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "arity"  :subid("13_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_29 :optional
-    .param int has_param_29 :opt_flag
+.sub "arity"  :subid("13_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1011 :optional
+    .param int has_param_1011 :opt_flag
 .annotate 'line', 36
-    new $P28, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P28, control_27
-    push_eh $P28
+    new $P1010, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1010, control_1009
+    push_eh $P1010
     .lex "self", self
-    if has_param_29, optparam_23
-    new $P30, "Undef"
-    set param_29, $P30
+    if has_param_1011, optparam_23
+    new $P108, "Undef"
+    set param_1011, $P108
   optparam_23:
-    .lex "$value", param_29
+    .lex "$value", param_1011
 .annotate 'line', 37
-    find_lex $P31, "self"
-    find_lex $P32, "$value"
-    find_lex $P33, "$value"
-    defined $I34, $P33
-    $P35 = $P31."attr"("arity", $P32, $I34)
+    find_lex $P109, "self"
+    find_lex $P110, "$value"
+    find_lex $P111, "$value"
+    defined $I112, $P111
+    $P113 = $P109."attr"("arity", $P110, $I112)
 .annotate 'line', 36
-    .return ($P35)
-  control_27:
+    .return ($P113)
+  control_1009:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P36, exception, "payload"
-    .return ($P36)
+    getattribute $P114, exception, "payload"
+    .return ($P114)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "named"  :subid("14_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_40 :optional
-    .param int has_param_40 :opt_flag
+.sub "named"  :subid("14_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1015 :optional
+    .param int has_param_1015 :opt_flag
 .annotate 'line', 44
-    new $P39, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P39, control_38
-    push_eh $P39
+    new $P1014, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1014, control_1013
+    push_eh $P1014
     .lex "self", self
-    if has_param_40, optparam_24
-    new $P41, "Undef"
-    set param_40, $P41
+    if has_param_1015, optparam_24
+    new $P115, "Undef"
+    set param_1015, $P115
   optparam_24:
-    .lex "$value", param_40
+    .lex "$value", param_1015
 .annotate 'line', 45
-    find_lex $P42, "self"
-    find_lex $P43, "$value"
-    find_lex $P44, "$value"
-    defined $I45, $P44
-    $P46 = $P42."attr"("named", $P43, $I45)
+    find_lex $P116, "self"
+    find_lex $P117, "$value"
+    find_lex $P118, "$value"
+    defined $I119, $P118
+    $P120 = $P116."attr"("named", $P117, $I119)
 .annotate 'line', 44
-    .return ($P46)
-  control_38:
+    .return ($P120)
+  control_1013:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P47, exception, "payload"
-    .return ($P47)
+    getattribute $P121, exception, "payload"
+    .return ($P121)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "flat"  :subid("15_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_51 :optional
-    .param int has_param_51 :opt_flag
+.sub "flat"  :subid("15_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1019 :optional
+    .param int has_param_1019 :opt_flag
 .annotate 'line', 51
-    new $P50, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P50, control_49
-    push_eh $P50
+    new $P1018, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1018, control_1017
+    push_eh $P1018
     .lex "self", self
-    if has_param_51, optparam_25
-    new $P52, "Undef"
-    set param_51, $P52
+    if has_param_1019, optparam_25
+    new $P122, "Undef"
+    set param_1019, $P122
   optparam_25:
-    .lex "$value", param_51
+    .lex "$value", param_1019
 .annotate 'line', 52
-    find_lex $P53, "self"
-    find_lex $P54, "$value"
-    find_lex $P55, "$value"
-    defined $I56, $P55
-    $P57 = $P53."attr"("flat", $P54, $I56)
+    find_lex $P123, "self"
+    find_lex $P124, "$value"
+    find_lex $P125, "$value"
+    defined $I126, $P125
+    $P127 = $P123."attr"("flat", $P124, $I126)
 .annotate 'line', 51
-    .return ($P57)
-  control_49:
+    .return ($P127)
+  control_1017:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P58, exception, "payload"
-    .return ($P58)
+    getattribute $P128, exception, "payload"
+    .return ($P128)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "handlers"  :subid("16_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_62 :optional
-    .param int has_param_62 :opt_flag
+.sub "handlers"  :subid("16_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1023 :optional
+    .param int has_param_1023 :opt_flag
 .annotate 'line', 60
-    new $P61, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P61, control_60
-    push_eh $P61
+    new $P1022, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1022, control_1021
+    push_eh $P1022
     .lex "self", self
-    if has_param_62, optparam_26
-    new $P63, "Undef"
-    set param_62, $P63
+    if has_param_1023, optparam_26
+    new $P129, "Undef"
+    set param_1023, $P129
   optparam_26:
-    .lex "$value", param_62
+    .lex "$value", param_1023
 .annotate 'line', 61
-    find_lex $P64, "self"
-    find_lex $P65, "$value"
-    find_lex $P66, "$value"
-    defined $I67, $P66
-    $P68 = $P64."attr"("handlers", $P65, $I67)
+    find_lex $P130, "self"
+    find_lex $P131, "$value"
+    find_lex $P132, "$value"
+    defined $I133, $P132
+    $P134 = $P130."attr"("handlers", $P131, $I133)
 .annotate 'line', 60
-    .return ($P68)
-  control_60:
+    .return ($P134)
+  control_1021:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P69, exception, "payload"
-    .return ($P69)
+    getattribute $P135, exception, "payload"
+    .return ($P135)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "lvalue"  :subid("17_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_73 :optional
-    .param int has_param_73 :opt_flag
+.sub "lvalue"  :subid("17_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1027 :optional
+    .param int has_param_1027 :opt_flag
 .annotate 'line', 69
-    new $P72, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P72, control_71
-    push_eh $P72
+    new $P1026, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1026, control_1025
+    push_eh $P1026
     .lex "self", self
-    if has_param_73, optparam_27
-    new $P74, "Undef"
-    set param_73, $P74
+    if has_param_1027, optparam_27
+    new $P136, "Undef"
+    set param_1027, $P136
   optparam_27:
-    .lex "$value", param_73
+    .lex "$value", param_1027
 .annotate 'line', 70
-    find_lex $P75, "self"
-    find_lex $P76, "$value"
-    find_lex $P77, "$value"
-    defined $I78, $P77
-    $P79 = $P75."attr"("lvalue", $P76, $I78)
+    find_lex $P137, "self"
+    find_lex $P138, "$value"
+    find_lex $P139, "$value"
+    defined $I140, $P139
+    $P141 = $P137."attr"("lvalue", $P138, $I140)
 .annotate 'line', 69
-    .return ($P79)
-  control_71:
+    .return ($P141)
+  control_1025:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P80, exception, "payload"
-    .return ($P80)
+    getattribute $P142, exception, "payload"
+    .return ($P142)
 .end
 
 
 .namespace ["PAST";"Node"]
 .include "except_types.pasm"
-.sub "childorder"  :subid("18_1308074683.5252") :method :outer("11_1308074683.5252")
-    .param pmc param_84 :optional
-    .param int has_param_84 :opt_flag
+.sub "childorder"  :subid("18_1308206310.2109") :method :outer("11_1308206310.2109")
+    .param pmc param_1031 :optional
+    .param int has_param_1031 :opt_flag
 .annotate 'line', 79
-    new $P83, ['ExceptionHandler'], .CONTROL_RETURN
-    set_label $P83, control_82
-    push_eh $P83
+    new $P1030, ['ExceptionHandler'], .CONTROL_RETURN
+    set_label $P1030, control_1029
+    push_eh $P1030
     .lex "self", self
-    if has_param_84, optparam_28
-    new $P85, "Undef"
-    set param_84, $P85
+    if has_param_1031, optparam_28
+    new $P143, "Undef"
+    set param_1031, $P143
   optparam_28:
-    .lex "$value", param_84
+    .lex "$value", param_1031
 .annotate 'line', 80
-    find_lex $P86, "self"
-    find_lex $P87, "$value"
-    find_lex $P88, "$value"
-    defined $I89, $P88
-    $P90 = $P86."attr"("childorder", $P87, $I89)
+    find_lex $P144, "self"
+    find_lex $P145, "$value"
+    find_lex $P146, "$value"
+    defined $I147, $P146
+    $P148 = $P144."attr"("childorder", $P145, $I147)
 .annotate 'line', 79
-    .return ($P90)
-  control_82:
+    .return ($P148)
+  control_1029:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P91, exception, "payload"
-    .return ($P91)
+    getattribute $P149, exception, "payload"
+    .return ($P149)
 .end
 
 
 .namespace ["PAST";"Node"]
-.sub "_block93" :load :anon :subid("19_1308074683.5252")
+.sub "_block1033" :load :anon :subid("19_1308206310.2109")
 .annotate 'line', 28
-    .const 'Sub' $P95 = "11_1308074683.5252" 
-    $P96 = $P95()
-    .return ($P96)
+    .const 'Sub' $P1035 = "11_1308206310.2109" 
+    $P150 = $P1035()
+    .return ($P150)
 .end
 
 
 .namespace []
-.sub "_block98" :load :anon :subid("20_1308074683.5252")
+.sub "_block1036" :load :anon :subid("20_1308206310.2109")
 .annotate 'line', 1
-    .const 'Sub' $P100 = "10_1308074683.5252" 
-    $P101 = $P100()
-    .return ($P101)
+    .const 'Sub' $P1038 = "10_1308206310.2109" 
+    $P152 = $P1038()
+    .return ($P152)
 .end
 
