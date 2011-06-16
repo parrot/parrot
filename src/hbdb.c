@@ -43,10 +43,10 @@ function.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
-typedef void (*cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
+typedef void (*hbdb_cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
 
-typedef struct cmd      cmd;
-typedef struct cmd_list cmd_list;
+typedef struct hbdb_cmd      hbdb_cmd;
+typedef struct hbdb_cmd_list hbdb_cmd_list;
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -61,38 +61,38 @@ static void hbdb_command_line(PARROT_INTERP)
 
 /*
  * Type:
- *     cmd
+ *     hbdb_cmd
  *
  * Fields:
- *     c_func - points to the function that executes the command
- *     c_help - the help message associated with the command
+ *     function - points to the function that executes the command
+ *     help     - the help message associated with the command
  * 
  * Overview:
  *     Contains information about the implementation of a particular command.
  */
 
-struct cmd {
-    cmd_func_t         c_func;
-    const char * const c_help;
+struct hbdb_cmd {
+    hbdb_cmd_func_t    function;
+    const char * const help;
 };
 
 /*
  * Type:
- *     cmd_list
+ *     hbdb_cmd_list
  *
  * Fields:
- *     cl_name  - command name
- *     cl_short - command name abberviation
- *     cl_cmd   - "cmd" type for storing implementation details
+ *     name  - command name
+ *     short - command name abberviation
+ *     cmd   - "cmd" type for storing implementation details
  *
  * Overview:
  *     Contains general information about a particular command.
  */
 
-struct cmd_list {
-    const char * const cl_name;
-    const char * const cl_short;
-    const cmd  * const cl_cmd;        
+struct hbdb_cmd_list {
+    const char     * const name;
+    const char     * const short_name;
+    const hbdb_cmd * const cmd;        
 };
 
 /* Help message displayed for each command */
@@ -105,7 +105,7 @@ const char * const cmd_help_help  = "List of commands:\n\n"
                                     "\nType \"help\" followed by a command name.";
 
 /* Entire list of commands */
-const cmd_list commands[] = {
+const hbdb_cmd_list commands[] = {
     { "break", 'b', { &hbdb_cmd_break, cmd_break_help } },
     { "help",  'h', { &hbdb_cmd_help,  cmd_help_help  } }
 };
