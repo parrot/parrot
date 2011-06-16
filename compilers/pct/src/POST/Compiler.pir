@@ -397,6 +397,14 @@ the sub.
     goto param_loop
   paramlist_done:
 
+    ## Add a file annotation
+    .local pmc files
+    files = find_caller_lex '$?FILES'
+    if null files goto no_files
+    unless files goto no_files
+    subpir.'append_format'(".annotate 'file', '%0'\n", files)
+  no_files:
+
     self.'pir_children'(node)
     subpir.'append_format'(".end\n\n")
 
