@@ -1761,50 +1761,44 @@ multi method parameter(PAST::Var $node, $bindpost) {
 
 
 multi method package(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
+    my $ops  := POST::Ops.new(:node($node));
+    my $name := self.escape($node.name());
+    my $ns   := $node.namespace();
 
-        .local pmc ops, fetchop, storeop
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
+    my $fetchop;
+    my $storeop;
 
-        .local string name
-        name = node.'name'()
-        name = self.'escape'(name)
-
-        $P0 = get_hll_global ['POST'], 'Op'
-        .local pmc ns
-        ns = node.'namespace'()
-        $I0 = defined ns
-        if $I0 goto package_hll
-        if bindpost goto package_bind
-        fetchop = $P0.'new'(ops, name, 'pirop'=>'get_global')
-        storeop = $P0.'new'(name, ops, 'pirop'=>'set_global')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-      package_bind:
-        .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_global', 'result'=>bindpost)
-
-      package_hll:
-        if ns goto package_ns
-        if bindpost goto package_hll_bind
-        fetchop = $P0.'new'(ops, name, 'pirop'=>'get_hll_global')
-        storeop = $P0.'new'(name, ops, 'pirop'=>'set_hll_global')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-      package_hll_bind:
-        .tailcall $P0.'new'(name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
-
-      package_ns:
-        $P1 = get_hll_global ['POST'], 'Compiler'
-        ns = $P1.'key_pir'(ns)
-        if bindpost goto package_ns_bind
-        fetchop = $P0.'new'(ops, ns, name, 'pirop'=>'get_hll_global')
-        storeop = $P0.'new'(ns, name, ops, 'pirop'=>'set_hll_global')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-      package_ns_bind:
-        .tailcall $P0.'new'(ns, name, bindpost, 'pirop'=>'set_hll_global', 'result'=>bindpost)
+    if pir::defined($ns) {
+        if $ns {
+            $ns := POST::Compiler.key_pir($ns);
+            if $bindpost {
+                return POST::Op.new($ns, $name, $bindpost,
+                    :pirop('set_hll_global'), :result($bindpost));
+            } else {
+                $fetchop := POST::Op.new($ops, $ns, $name,
+                    :pirop('get_hll_global'));
+                $storeop := POST::Op.new($ns, $name, $ops,
+                    :pirop('set_hll_global'));
+                return self.vivify($node, $ops, $fetchop, $storeop);
+            }
+        }
+        elsif $bindpost {
+            return POST::Op.new($name, $bindpost,
+                :pirop('set_hll_global'), :result($bindpost));
+        } else {
+            $fetchop := POST::Op.new($ops, $name, :pirop('get_hll_global'));
+            $storeop := POST::Op.new($name, $ops, :pirop('set_hll_global'));
+            return self.vivify($node, $ops, $fetchop, $storeop);
+        }
+    }
+    elsif $bindpost {
+        return POST::Op.new($name, $bindpost,
+            :pirop('set_global'), :result($bindpost));
+    }
+    else {
+        $fetchop := POST::Op.new($ops, $name, :pirop('get_global'));
+        $storeop := POST::Op.new($name, $ops, :pirop('set_global'));
+        return self.vivify($node, $ops, $fetchop, $storeop);
     }
 }
 
