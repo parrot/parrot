@@ -1765,41 +1765,28 @@ multi method package(PAST::Var $node, $bindpost) {
     my $name := self.escape($node.name());
     my $ns   := $node.namespace();
 
-    my $fetchop;
-    my $storeop;
+    my $fetchop := 'get_global';
+    my $storeop := 'set_global';
+    my @name    := [$name];
 
     if pir::defined($ns) {
+        $fetchop := 'get_hll_global';
+        $storeop := 'set_hll_global';
+
         if $ns {
-            $ns := POST::Compiler.key_pir($ns);
-            if $bindpost {
-                return POST::Op.new($ns, $name, $bindpost,
-                    :pirop('set_hll_global'), :result($bindpost));
-            } else {
-                $fetchop := POST::Op.new($ops, $ns, $name,
-                    :pirop('get_hll_global'));
-                $storeop := POST::Op.new($ns, $name, $ops,
-                    :pirop('set_hll_global'));
-                return self.vivify($node, $ops, $fetchop, $storeop);
-            }
-        }
-        elsif $bindpost {
-            return POST::Op.new($name, $bindpost,
-                :pirop('set_hll_global'), :result($bindpost));
-        } else {
-            $fetchop := POST::Op.new($ops, $name, :pirop('get_hll_global'));
-            $storeop := POST::Op.new($name, $ops, :pirop('set_hll_global'));
-            return self.vivify($node, $ops, $fetchop, $storeop);
+            $ns   := POST::Compiler.key_pir($ns);
+            @name.unshift($ns);
         }
     }
-    elsif $bindpost {
-        return POST::Op.new($name, $bindpost,
-            :pirop('set_global'), :result($bindpost));
+
+    if $bindpost {
+        return POST::Op.new(|@name, $bindpost,
+            :pirop($storeop), :result($bindpost));
     }
-    else {
-        $fetchop := POST::Op.new($ops, $name, :pirop('get_global'));
-        $storeop := POST::Op.new($name, $ops, :pirop('set_global'));
-        return self.vivify($node, $ops, $fetchop, $storeop);
-    }
+
+    $fetchop := POST::Op.new($ops, |@name, :pirop($fetchop));
+    $storeop := POST::Op.new(|@name, $ops, :pirop($storeop));
+    return self.vivify($node, $ops, $fetchop, $storeop);
 }
 
 
