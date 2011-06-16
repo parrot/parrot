@@ -30,29 +30,6 @@ This file contains the embedding API wrapper functions and types used by the C<h
 
 /*
 
-=item C<Parrot_Int Parrot_api_hbdb_get_command(Parrot_PMC interp_pmc)>
-
-Wrapper function for C<hbdb_get_command()>. Prompts the user to enter a command.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_hbdb_get_command(Parrot_PMC interp_pmc)
-{
-    ASSERT_ARGS(Parrot_api_hbdb_get_command)
-
-    EMBED_API_CALLIN(interp_pmc, interp)
-
-    hbdb_get_command(interp);
-
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
 =item C<Parrot_Int Parrot_api_hbdb_init(Parrot_PMC interp_pmc)>
 
 Wrapper function for C<hbdb_init()>. Performs general initialization operations.
