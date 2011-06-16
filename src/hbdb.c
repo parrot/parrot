@@ -377,7 +377,8 @@ hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
     /* Set HBDB_STOPPED flag */
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
 
-    /* TODO Start command-line here */
+    /* Start command-line interface */
+    hbdb_command_line(interp);
 
     /* Check if HBDB_EXIT has been set */
     if (HBDB_FLAG_TEST(interp, HBDB_EXIT)) {
