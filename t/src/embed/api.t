@@ -216,7 +216,6 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_ru
 #include "imcc/api.h"
 
 int main(void) {
-    Parrot_Int wrap;
     Parrot_PMC interp;
     Parrot_PMC pir_compiler;
 
@@ -270,9 +269,6 @@ int main(void) {
     Parrot_PMC callcontext_sp, myobject_sp;
     Parrot_PMC callcontext_class, myobject_class;
     Parrot_PMC callcontext, myobject, mymethod;
-    Parrot_PMC ptrbuf;
-    Parrot_Int wrap;
-    char *ptr;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
     Parrot_api_set_runcore(interp, "gcdebug", 0);
