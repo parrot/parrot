@@ -26,6 +26,7 @@ function.
 /* TODO Change hbdb_init() to accept an hbdb_t to avoid assignment after call */
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
@@ -58,9 +59,17 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const hbdb_cmd * parse_command(ARGIN_NULLOK(const char **cmd));
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
+static const char * skip_whitespace(ARGIN(const char *cmd))
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -388,7 +397,8 @@ command_line(PARROT_INTERP)
 
 =item C<static const hbdb_cmd * parse_command(const char **cmd)>
 
-Parses the command in C<cmd>
+Parses the command in C<cmd>. If it contains a valid command, a pointer to its
+respective C<hbdb_cmd> structure is returned. Otherwise, it returns NULL.
 
 =cut
 
@@ -400,6 +410,63 @@ static const hbdb_cmd *
 parse_command(ARGIN_NULLOK(const char **cmd))
 {
     ASSERT_ARGS(parse_command)
+
+    /* Check that "cmd" points to something */
+    if (cmd && *cmd) {
+        const char  *start;
+        const char  *next;
+        char         c;
+        int          found = -1;
+        unsigned int hits  =  0,
+                     length,
+                     i;
+
+        /* Skip whitespace */
+        start = skip_whitespace(*cmd);
+        next  = start;
+
+        *cmd  = start;
+
+        /* Get command name */
+        for (i = 0; (c = *next) != '\0' && !isspace((unsigned char) c); next++)
+            continue;
+
+        /* Find the length */
+        length = next - start;
+
+        /* Return NULL if there is no command */
+        if (length == 0)
+            return NULL;
+
+        for (i = 0; i < (sizeof (commands) / sizeof (hbdb_cmd_list)); i++) {
+        }
+    }
+
+    return NULL;
+}
+
+/*
+
+=item C<static const char * skip_whitespace(const char *cmd)>
+
+Returns a pointer to the first non-whitespace character in C<cmd>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
+static const char *
+skip_whitespace(ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(skip_whitespace)
+
+    while (*cmd && isspace(*cmd))
+        cmd++;
+
+    return cmd;
 }
 
 /*
