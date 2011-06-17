@@ -850,7 +850,7 @@ PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
 {
     ASSERT_ARGS(Parrot_pmc_box_string)
-    PMC * ret = Parrot_pmc_new(interp,
+    PMC * const ret = Parrot_pmc_new(interp,
                         Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, ret, string);
 
