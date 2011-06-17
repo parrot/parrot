@@ -51,11 +51,16 @@ typedef struct hbdb_cmd_list hbdb_cmd_list;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void hbdb_command_line(PARROT_INTERP)
+static void command_line(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_hbdb_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const hbdb_cmd * parse_command(ARGIN_NULLOK(const char **cmd));
+
+#define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -126,52 +131,14 @@ hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
 
 =head1 GENERAL FUNCTIONS
 
-The remaining functions define some of the general behavior of the debugger.
-They do not follow a particular pattern.
+The following functions define some of the general behavior of the debugger.
+Note that they all have the I<hbdb> prefix.
 
 =over 4
 
 =cut
 
 */
-
-/*
-
-=item C<static void hbdb_command_line(PARROT_INTERP)>
-
-Begins the command-line interface. Fetches and executes commands in a
-continuous loop.
-
-=cut
-
-*/
-
-static void
-hbdb_command_line(PARROT_INTERP)
-{
-    ASSERT_ARGS(hbdb_command_line)
-
-    const hbdb_t * const hbdb = interp->hbdb;
-
-    while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
-        const char *cmd;
-
-        /* Prompt user for command */
-        hbdb_get_command(interp);
-
-        /* Get command set by hbdb_get_command() */
-        cmd = hbdb->current_command;
-
-        /* STUB */
-        printf("%s\n", cmd);
-        /* STUB */
-
-        if (cmd == '\0')
-            cmd = hbdb->last_command;
-
-        /*hbdb_run_command(interp, cmd);*/
-    }
-}
 
 /*
 
@@ -355,12 +322,84 @@ hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
 
     /* Start command-line interface */
-    hbdb_command_line(interp);
+    command_line(interp);
 
     /* Check if HBDB_EXIT has been set */
     if (HBDB_FLAG_TEST(interp, HBDB_EXIT)) {
         Parrot_x_exit(interp, 0);
     }
+}
+
+/*
+
+=back
+
+=head2 STATIC FUNCTIONS
+
+The remaining functions are all static. As such, they will not appear
+anywhere outisde this file. They are identified by their lack of the
+I<hbdb> prefix.
+
+=over 4
+
+=cut
+
+*/
+
+/*
+
+=item C<static void command_line(PARROT_INTERP)>
+
+Begins the command-line interface. Fetches and executes commands in a
+continuous loop.
+
+=cut
+
+*/
+
+static void
+command_line(PARROT_INTERP)
+{
+    ASSERT_ARGS(command_line)
+
+    const hbdb_t * const hbdb = interp->hbdb;
+
+    while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
+        const char *cmd;
+
+        /* Prompt user for command */
+        hbdb_get_command(interp);
+
+        /* Get command set by hbdb_get_command() */
+        cmd = hbdb->current_command;
+
+        /* STUB */
+        printf("%s\n", cmd);
+        /* STUB */
+
+        if (cmd == '\0')
+            cmd = hbdb->last_command;
+
+        /*hbdb_run_command(interp, cmd);*/
+    }
+}
+
+/*
+
+=item C<static const hbdb_cmd * parse_command(const char **cmd)>
+
+Parses the command in C<cmd>
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const hbdb_cmd *
+parse_command(ARGIN_NULLOK(const char **cmd))
+{
+    ASSERT_ARGS(parse_command)
 }
 
 /*
