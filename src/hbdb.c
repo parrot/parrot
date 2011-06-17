@@ -59,40 +59,17 @@ static void hbdb_command_line(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
- * Type:
- *     hbdb_cmd
- *
- * Fields:
- *     function - points to the function that executes the command
- *     help     - the help message associated with the command
- * 
- * Overview:
- *     Contains information about the implementation of a particular command.
- */
-
+/* Contains information about the implementation of a particular command               */
 struct hbdb_cmd {
-    hbdb_cmd_func_t    function;
-    const char * const help;
+    hbdb_cmd_func_t    function;    /* Points to the function the executes the command */
+    const char * const help;        /* Help message associated with the command        */
 };
 
-/*
- * Type:
- *     hbdb_cmd_list
- *
- * Fields:
- *     name  - command name
- *     short - command name abberviation
- *     cmd   - "cmd" type for storing implementation details
- *
- * Overview:
- *     Contains general information about a particular command.
- */
-
+/* Contains general information about a particular command                             */
 struct hbdb_cmd_list {
-    const char     * const name;
-    const char     * const short_name;
-    const hbdb_cmd * const cmd;        
+    const char     * const name;          /* Command name                              */
+    const char     * const short_name;    /* Command name abbreviation                 */
+    const hbdb_cmd * const cmd;           /* Details about a command's implementation  */
 };
 
 /* Help message displayed for each command */
