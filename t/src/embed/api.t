@@ -220,6 +220,10 @@ int main(void) {
     Parrot_PMC pir_compiler;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_debug_flag(interp, 0x01, 0);
+    Parrot_api_flag(interp, 0x01, 0);
+
     Parrot_api_set_runcore(interp, "gcdebug", 0);
     Parrot_api_set_runcore(interp, "exec", 0);
 
@@ -236,13 +240,15 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_(un)wr
 #include "imcc/api.h"
 
 int main(void) {
-    Parrot_Int wrap;
+    Parrot_Int wrap1, wrap2;
     Parrot_PMC interp;
     Parrot_PMC pir_compiler;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
-    wrap = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
+    wrap1 = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
+    wrap2 = Parrot_api_wrap_pointer(interp, NULL, 1, &pir_compiler);
+
     /* Need a Ptr or PtrBuf for this
     wrap = Parrot_api_unwrap_pointer(interp, pir_compiler, ptr, 0);
     */
