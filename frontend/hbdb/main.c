@@ -303,7 +303,7 @@ welcome(void)
 
 =head1 SEE ALSO
 
-F<src/hbdb.c>, F<include/parrot/hbdb.h>
+F<src/hbdb.c>, F<src/embed/hbdb.c>, F<include/parrot/hbdb.h>
 
 =head1 HISTORY
 

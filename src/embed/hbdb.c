@@ -18,8 +18,6 @@ This file contains the embedding API wrapper functions and types used by the C<h
 
 */
 
-/* TODO Perldoc section for types */
-
 #include "parrot/parrot.h"
 #include "parrot/hbdb.h"
 #include "parrot/embed.h"

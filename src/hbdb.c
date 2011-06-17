@@ -408,7 +408,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
 
 =head1 SEE ALSO
 
-F<frontend/hbdb/main.c>, F<include/parrot/hbdb.h>
+F<frontend/hbdb/main.c>, F<src/embed/hbdb.c>, F<include/parrot/hbdb.h>
 
 =head1 HISTORY
 
