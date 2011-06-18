@@ -46,8 +46,8 @@ function.
 
 typedef void (*hbdb_cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
 
-typedef struct hbdb_cmd      hbdb_cmd;
-typedef struct hbdb_cmd_list hbdb_cmd_list;
+typedef struct hbdb_cmd_t       hbdb_cmd_t;
+typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -57,7 +57,7 @@ static void command_line(PARROT_INTERP)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const hbdb_cmd * parse_command(ARGIN_NULLOK(const char **cmd));
+static const hbdb_cmd_t * parse_command(ARGIN_NULLOK(const char **cmd));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -74,16 +74,16 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* HEADERIZER END: static */
 
 /* Contains information about the implementation of a particular command               */
-struct hbdb_cmd {
+struct hbdb_cmd_t {
     hbdb_cmd_func_t    function;    /* Points to the function the executes the command */
     const char * const help;        /* Help message associated with the command        */
 };
 
 /* Contains general information about a particular command                             */
-struct hbdb_cmd_list {
-    const char     * const name;          /* Command name                              */
-    const char     * const short_name;    /* Command name abbreviation                 */
-    const hbdb_cmd * const cmd;           /* Details about a command's implementation  */
+struct hbdb_cmd_table_t {
+    const char       * const name;          /* Command name                            */
+    const char       * const short_name;    /* Command name abbreviation               */
+    const hbdb_cmd_t * const cmd;           /* Command function and help message       */
 };
 
 /* Help message displayed for each command */
@@ -95,8 +95,8 @@ const char * const cmd_help_help  = "List of commands:\n\n"
                                     "break\n"
                                     "\nType \"help\" followed by a command name.";
 
-/* Entire list of commands */
-const hbdb_cmd_list commands[] = {
+/* Global command table */
+const hbdb_cmd_table_t command_table[] = {
     { "break", 'b', { &hbdb_cmd_break, cmd_break_help } },
     { "help",  'h', { &hbdb_cmd_help,  cmd_help_help  } }
 };
@@ -395,7 +395,7 @@ command_line(PARROT_INTERP)
 
 /*
 
-=item C<static const hbdb_cmd * parse_command(const char **cmd)>
+=item C<static const hbdb_cmd_t * parse_command(const char **cmd)>
 
 Parses the command in C<cmd>. If it contains a valid command, a pointer to its
 respective C<hbdb_cmd> structure is returned. Otherwise, it returns NULL.
@@ -406,7 +406,7 @@ respective C<hbdb_cmd> structure is returned. Otherwise, it returns NULL.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const hbdb_cmd *
+static const hbdb_cmd_t *
 parse_command(ARGIN_NULLOK(const char **cmd))
 {
     ASSERT_ARGS(parse_command)
@@ -418,7 +418,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         char         c;
         int          found = -1;
         unsigned int hits  =  0,
-                     length,
+                     len,
                      i;
 
         /* Skip whitespace */
@@ -432,13 +432,14 @@ parse_command(ARGIN_NULLOK(const char **cmd))
             continue;
 
         /* Find the length */
-        length = next - start;
+        len = next - start;
 
         /* Return NULL if there is no command */
-        if (length == 0)
+        if (len == 0)
             return NULL;
 
-        for (i = 0; i < (sizeof (commands) / sizeof (hbdb_cmd_list)); i++) {
+        /* Iterate through global command table, checking for matches */
+        for (i = 0; i < (sizeof (command_table) / sizeof (hbdb_cmd_table_t)); i++) {
         }
     }
 
