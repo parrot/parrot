@@ -123,7 +123,7 @@ output_like(
 output_like(
     catfile(qw/t m0 invalid invalid_register.m0/),
     qr/Invalid register name: S999/,
-    'detect invalid registers',
+    'detect invalid registers name (S999)',
 );
 
 output_like(
@@ -143,8 +143,8 @@ ok(!-e "${file}b", "invalid bytecode file ${file}b was not generated");
 
 output_like(
     catfile(qw/t m0 invalid invalid_register_name.m0/),
-    qr/Invalid register 'SPILLCOFFEE'/,
-    'detect invalid register names',
+    qr/Invalid register name: SPILLCOFFEE/,
+    'detect invalid register name (SPILLCOFFEE)',
 );
 
 output_like(
@@ -155,8 +155,8 @@ output_like(
 
 output_like(
     catfile(qw/t m0 invalid invalid_register_number2.m0/),
-    qr/Invalid register 'S'/,
-    'detect invalid registers',
+    qr/Invalid register name: S/,
+    'detect invalid registers (S)',
 );
 
 output_like(
