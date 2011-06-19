@@ -15,3 +15,6 @@ label2:   set_imm S1, 0, 1
           set_imm I0, 0, 1
 label_99: print_s I0, S0, 42
 label:    print_s I0, S1, 42
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

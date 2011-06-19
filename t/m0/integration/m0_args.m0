@@ -64,3 +64,6 @@ argv_ok:
 end:
     set_imm I0, 0, 0
     exit    I0, x, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

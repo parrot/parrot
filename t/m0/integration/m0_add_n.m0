@@ -36,3 +36,6 @@ addn_ok:
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

@@ -21,3 +21,6 @@ print_s I0, S0, 42
 noop    x, x, x
 print_s I0, S1, 42
 noop    x, x, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

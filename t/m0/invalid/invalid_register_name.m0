@@ -13,3 +13,6 @@
 .bytecode
 
 set_imm I9, SPILLCOFFEE, 1
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

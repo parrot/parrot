@@ -7,3 +7,6 @@
 .metadata
 .bytecode
 deref S0, 0, 1, 42, 42, A, JUNK
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  
