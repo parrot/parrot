@@ -313,6 +313,8 @@
 /src/parrot_config.c
 /src/parrot_config.h
 /src/platform/*/*.o
+/src/platform/*/*.gcda
+/src/platform/*/*.gcno
 /src/revision.c
 /src/atomic/*.o
 /src/call/*.o
