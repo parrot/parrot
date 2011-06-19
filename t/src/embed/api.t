@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 7;
+plan tests => 8;
 
 =head1 NAME
 
@@ -261,6 +261,30 @@ int main(void) {
     Parrot_api_set_runcore(interp, "exec", 0);
 
     return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_get_exception_backtrace");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp, exception;
+    Parrot_String errmsg, backtrace;
+    Parrot_Int exit_code, is_error;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
+
+    Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg);
+
+    Parrot_api_get_exception_backtrace(interp, exception, &backtrace);
+    printf("%s",backtrace);
 }
 CODE
 OUTPUT
