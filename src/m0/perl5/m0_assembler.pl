@@ -133,12 +133,18 @@ sub register_name_to_num {
         CHUNK_INFO  => 2,
         CALL_FRAMES => 3,
         CONFIG      => 4,
+        ARGC        => 5,
+        ARGV        => 6,
 
         # convenience
         x => 0,
     };
 
-    if($register !~ /\d+/){
+    if ($register =~ /^\d+/ && $register < 255) {
+        return $register;
+    }
+
+    if($register !~ /^[INSP]\d+$/){
         my $number = $symbols->{$register};
         die "Invalid register name: $register" unless exists $symbols->{$register};
         return $number;
@@ -178,7 +184,7 @@ sub to_bytecode {
     # as described in "Register Types and Context Structure" in the M0 spec
 
     map {
-        my $reg = $_ =~ M0_REG_RX ? register_name_to_num($_) : $_;
+        my $reg = register_name_to_num($_);
         die "Invalid register '$reg'" if ($reg !~ /^\d+$/);
         $bytecode .= pack('C', $reg );
     } ($a1, $a2, $a3);
