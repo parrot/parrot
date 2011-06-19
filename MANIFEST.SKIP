@@ -792,6 +792,10 @@
 ^/src/parrot_config\.c/
 ^/src/parrot_config\.h$
 ^/src/parrot_config\.h/
+^/src/platform/.*/.*\.gcda$
+^/src/platform/.*/.*\.gcda/
+^/src/platform/.*/.*\.gcno$
+^/src/platform/.*/.*\.gcno/
 ^/src/platform/.*/.*\.o$
 ^/src/platform/.*/.*\.o/
 ^/src/pmc/.*\.c$
