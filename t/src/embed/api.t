@@ -287,7 +287,7 @@ int main(void) {
 
     wrap2 = Parrot_api_wrap_pointer(interp, pir_compiler, 1, &ptr);
 
-    unwrap = Parrot_api_unwrap_pointer(interp, pir_compiler, &p, &size);
+    unwrap = Parrot_api_unwrap_pointer(interp, pir_compiler, (void**) &p, &size);
     return 0;
 }
 CODE
