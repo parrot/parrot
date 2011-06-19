@@ -375,14 +375,14 @@ If the function throws, the provided handler function is invoked
 
 */
 
-#define POP_CONTEXT(interp, curctx, intialctx)              \
-        Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,      \
-                "popping context in Parrot_ext_try");       \
-        do {                                                \
-            if (curctx == NULL)                             \
-                do_panic(interp, "cannot restore context",  \
-                    __FILE__, __LINE__);                    \
-        } while ((curctx = CONTEXT(interp)) != initialctx); \
+#define POP_CONTEXT(interp, curctx, intialctx)                \
+        Parrot_warn((interp), PARROT_WARNINGS_NONE_FLAG,      \
+                "popping context in Parrot_ext_try");         \
+        do {                                                  \
+            if ((curctx) == NULL)                             \
+                do_panic((interp), "cannot restore context",  \
+                    __FILE__, __LINE__);                      \
+        } while (((curctx) = CONTEXT(interp)) != initialctx); \
 
 
 PARROT_EXPORT
