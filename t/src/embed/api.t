@@ -215,6 +215,8 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_ru
 #include "parrot/api.h"
 #include "imcc/api.h"
 
+#define PARROT_PROFILE_FLAG 0x08
+
 int main(void) {
     Parrot_PMC interp;
     Parrot_PMC pir_compiler;
@@ -222,7 +224,7 @@ int main(void) {
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
     Parrot_api_debug_flag(interp, 0x01, 0);
-    Parrot_api_flag(interp, 0x01, 0);
+    Parrot_api_flag(interp, 0x01, PARROT_PROFILE_FLAG);
 
     Parrot_api_set_runcore(interp, "gcdebug", 0);
     Parrot_api_set_runcore(interp, "exec", 0);
