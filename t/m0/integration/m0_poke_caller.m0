@@ -57,7 +57,7 @@ alloc_cf:
 init_cf_copy:
     # 2 registers needed
     # intialize P0 (the new call frame) - INTERP
-    # set P0[INTER] to the current call frame's INTERP
+    # set P0[INTERP] to the current call frame's INTERP
     set_imm  I9, 0,  INTERP
     set_ref  P0, I9, INTERP
     # set P0[CHUNK] to the current call frame's CHUNK
