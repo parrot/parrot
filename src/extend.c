@@ -715,10 +715,14 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
         ARGIN(void (*func)(void)), ARGIN(const char * signature))
 {
     ASSERT_ARGS(Parrot_sub_new_from_c_func)
+    PARROT_CALLIN_START(interp);
+
     Parrot_String sig = Parrot_new_string(interp, signature, strlen(signature),
         (char *) NULL, 0);
     Parrot_PMC sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
+
+    PARROT_CALLIN_END(interp);
     return sub;
 }
 
