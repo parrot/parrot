@@ -1,8 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1308206294.0529")
+.sub "_block1000"  :anon :subid("10_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1308206294.0529" 
+    .const 'Sub' $P1003 = "11_1308507540.13094" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -12,20 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 9
-    .const 'Sub' $P1003 = "11_1308206294.0529" 
+    .const 'Sub' $P1003 = "11_1308507540.13094" 
     capture_lex $P1003
-    $P111 = $P1003()
+    $P102 = $P1003()
 .annotate 'line', 1
-    .return ($P111)
-    .const 'Sub' $P1019 = "16_1308206294.0529" 
+    .return ($P102)
+    .const 'Sub' $P1019 = "16_1308507540.13094" 
     .return ($P1019)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post17") :outer("10_1308206294.0529")
+.sub "" :load :init :subid("post17") :outer("10_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1308206294.0529" 
+    .const 'Sub' $P1001 = "10_1308507540.13094" 
     .local pmc block
     set block, $P1001
     $P1021 = get_root_global ["parrot"], "P6metaclass"
@@ -34,13 +36,14 @@
 
 
 .namespace ["POST";"Constant"]
-.sub "_block1002"  :subid("11_1308206294.0529") :outer("10_1308206294.0529")
+.sub "_block1002"  :subid("11_1308507540.13094") :outer("10_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 9
-    .const 'Sub' $P1011 = "14_1308206294.0529" 
+    .const 'Sub' $P1011 = "14_1308507540.13094" 
     capture_lex $P1011
-    .const 'Sub' $P1008 = "13_1308206294.0529" 
+    .const 'Sub' $P1008 = "13_1308507540.13094" 
     capture_lex $P1008
-    .const 'Sub' $P1004 = "12_1308206294.0529" 
+    .const 'Sub' $P1004 = "12_1308507540.13094" 
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -49,19 +52,20 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 12
-    .const 'Sub' $P1011 = "14_1308206294.0529" 
+    .const 'Sub' $P1011 = "14_1308507540.13094" 
     newclosure $P1014, $P1011
 .annotate 'line', 9
     .return ($P1014)
-    .const 'Sub' $P1016 = "15_1308206294.0529" 
+    .const 'Sub' $P1016 = "15_1308507540.13094" 
     .return ($P1016)
 .end
 
 
 .namespace ["POST";"Constant"]
 .include "except_types.pasm"
-.sub "value"  :subid("12_1308206294.0529") :method :outer("11_1308206294.0529") :multi(_,_)
+.sub "value"  :subid("12_1308507540.13094") :method :outer("11_1308507540.13094") :multi(_,_)
     .param pmc param_1007
+.annotate 'file', ''
 .annotate 'line', 9
     new $P1006, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1006, control_1005
@@ -75,34 +79,36 @@
   control_1005:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P104, exception, "payload"
-    .return ($P104)
+    getattribute $P101, exception, "payload"
+    .return ($P101)
 .end
 
 
 .namespace ["POST";"Constant"]
 .include "except_types.pasm"
-.sub "value"  :subid("13_1308206294.0529") :method :outer("11_1308206294.0529") :multi(_)
+.sub "value"  :subid("13_1308507540.13094") :method :outer("11_1308507540.13094") :multi(_)
+.annotate 'file', ''
 .annotate 'line', 10
     new $P1010, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1010, control_1009
     push_eh $P1010
     .lex "self", self
-    find_lex $P105, "self"
-    get_hll_global $P106, "undef"
-    $P107 = $P105."attr"("value", $P106, 0)
-    .return ($P107)
+    find_lex $P101, "self"
+    get_hll_global $P102, "undef"
+    $P103 = $P101."attr"("value", $P102, 0)
+    .return ($P103)
   control_1009:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P108, exception, "payload"
-    .return ($P108)
+    getattribute $P101, exception, "payload"
+    .return ($P101)
 .end
 
 
 .namespace ["POST";"Constant"]
 .include "except_types.pasm"
-.sub "declared"  :subid("14_1308206294.0529") :method :outer("11_1308206294.0529")
+.sub "declared"  :subid("14_1308507540.13094") :method :outer("11_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 12
     new $P1013, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1013, control_1012
@@ -112,25 +118,27 @@
   control_1012:
     .local pmc exception 
     .get_results (exception) 
-    getattribute $P109, exception, "payload"
-    .return ($P109)
+    getattribute $P101, exception, "payload"
+    .return ($P101)
 .end
 
 
 .namespace ["POST";"Constant"]
-.sub "_block1015" :load :anon :subid("15_1308206294.0529")
+.sub "_block1015" :load :anon :subid("15_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 9
-    .const 'Sub' $P1017 = "11_1308206294.0529" 
-    $P110 = $P1017()
-    .return ($P110)
+    .const 'Sub' $P1017 = "11_1308507540.13094" 
+    $P101 = $P1017()
+    .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1018" :load :anon :subid("16_1308206294.0529")
+.sub "_block1018" :load :anon :subid("16_1308507540.13094")
+.annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1020 = "10_1308206294.0529" 
-    $P112 = $P1020()
-    .return ($P112)
+    .const 'Sub' $P1020 = "10_1308507540.13094" 
+    $P101 = $P1020()
+    .return ($P101)
 .end
 
