@@ -11,7 +11,7 @@ use Parrot::Test::Util 'create_tempfile';
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 6;
+plan tests => 7;
 
 =head1 NAME
 
@@ -203,6 +203,35 @@ int main(void) {
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
     /* This should throw an exception */
     Parrot_api_set_runcore(interp, "junk", 0);
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_call_signature");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+
+    Parrot_String callcontext_s;
+    Parrot_PMC callcontext_sp;
+    Parrot_PMC callcontext_class;
+    Parrot_PMC callcontext;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
+    Parrot_api_pmc_box_string(interp, callcontext_s, &callcontext_sp);
+    Parrot_api_pmc_get_class(interp, callcontext_sp, &callcontext_class);
+    Parrot_api_pmc_new_from_class(interp, callcontext_class, NULL, &callcontext);
+
+    Parrot_api_reset_call_signature(interp, callcontext);
+
     return 0;
 }
 CODE
