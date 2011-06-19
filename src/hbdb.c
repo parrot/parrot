@@ -59,6 +59,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const hbdb_cmd_t * parse_command(ARGIN_NULLOK(const char **cmd));
 
+PARROT_IGNORABLE_RESULT
+static int /*@alt void@*/
+run_command(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
@@ -68,6 +74,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_run_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -103,7 +112,7 @@ const hbdb_cmd_table_t command_table[] = {
 
 /*
 
-=item C<void hbdb_cmd_break(hbdb_t *hbdb, const char * const command)>
+=item C<void hbdb_cmd_break(hbdb_t *hbdb, const char * const cmd)>
 
 Sets a breakpoint at a specific location.
 
@@ -112,14 +121,16 @@ Sets a breakpoint at a specific location.
 */
 
 void
-hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
+hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_break)
+
+    printf("Hello world!\n");
 }
 
 /*
 
-=item C<void hbdb_cmd_help(hbdb_t *hbdb, const char * const command)>
+=item C<void hbdb_cmd_help(hbdb_t *hbdb, const char * const cmd)>
 
 If C<command> is non-NULL, displays help message for C<command>. Otherwise, a
 general help message is displayed.
@@ -129,7 +140,7 @@ general help message is displayed.
 */
 
 void
-hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const command))
+hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_help)
 }
@@ -371,7 +382,7 @@ command_line(PARROT_INTERP)
 {
     ASSERT_ARGS(command_line)
 
-    const hbdb_t * const hbdb = interp->hbdb;
+    hbdb_t *hbdb = interp->hbdb;
 
     while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
         const char *cmd;
@@ -382,14 +393,11 @@ command_line(PARROT_INTERP)
         /* Get command set by hbdb_get_command() */
         cmd = hbdb->current_command;
 
-        /* STUB */
-        printf("%s\n", cmd);
-        /* STUB */
-
         if (cmd == '\0')
             cmd = hbdb->last_command;
 
-        /*hbdb_run_command(interp, cmd);*/
+        /* Execute command */
+        run_command(interp, cmd);
     }
 }
 
@@ -398,7 +406,7 @@ command_line(PARROT_INTERP)
 =item C<static const hbdb_cmd_t * parse_command(const char **cmd)>
 
 Parses the command in C<cmd>. If it contains a valid command, a pointer to its
-respective C<hbdb_cmd> structure is returned. Otherwise, it returns NULL.
+respective C<hbdb_cmd_t> structure is returned. Otherwise, it returns NULL.
 
 =cut
 
@@ -438,12 +446,91 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         if (len == 0)
             return NULL;
 
-        /* Iterate through global command table, checking for matches */
+        /* Iterate through global command table */
         for (i = 0; i < (sizeof (command_table) / sizeof (hbdb_cmd_table_t)); i++) {
+            const hbdb_cmd_table_t * const tbl = command_table + i;
+
+            /* Check if user entered command's abbreviation */
+            if ((len == 1) && (tbl->short_name == (*cmd)[0])) {
+                hits  = 1;
+                found = i;
+                break;
+            }
+
+            /* Check if input matches current entry */
+            if (strncmp(*cmd, tbl->name, len) == 0) {
+                /* Check that input matches length of command's name */
+                if (strlen(tbl->name) == len) {
+                    hits  = 1;
+                    found = i;
+                    break;
+                }
+                else {
+                    hits++;
+                    found = i;
+                }
+            }
+        }
+
+        /* Check if a match was found */
+        if (hits == 1) {
+            *cmd = skip_whitespace(next);
+
+            return command_table[found].cmd;
         }
     }
 
     return NULL;
+}
+
+/*
+
+=item C<static int run_command(PARROT_INTERP, const char *cmd)>
+
+Executes the command in C<cmd> by calling it's associated C<hbdb_cmd_*>
+function.
+
+=cut
+
+*/
+
+PARROT_IGNORABLE_RESULT
+static int
+run_command(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(run_command)
+
+    const char       *orig_cmd;
+
+    hbdb_t           *hbdb;
+    const hbdb_cmd_t *c;
+
+    /* Get global structure */
+    hbdb = interp->hbdb;
+
+    /* Preseve original command in case of error */
+    orig_cmd = cmd;
+
+    /* Get command's hbdb_cmd_t structure */
+    c = parse_command(&orig_cmd);
+
+    /* Check if a match was found */
+    if (c) {
+        /* Call command's function */
+        (*c->function)(hbdb, orig_cmd);
+        return 0;
+    }
+    else {
+        /* Check if nothing was entered at all */
+        if (*orig_cmd == '\0') {
+            return 0;
+        }
+        else {
+            Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n");
+            /* TODO Error message if script file */
+            return 1;
+        }
+    }
 }
 
 /*
