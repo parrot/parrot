@@ -1,0 +1,66 @@
+.version 0
+.chunk "args_test"
+.constants
+0 "1..2\n"
+1 "\n"
+2 "ok 1 - arg count: got 6 arguments!\n"
+3 "not ok 1 -  arg count: didn't get 6 arguments\n"
+4 "ok 2 - arg contents: first argument was 'kittens'\n"
+5 "not ok 2 - arg contents: first argument was 'kittens' # TODO M0 doesn't support this yet \n"
+.metadata
+.bytecode
+
+    set_imm I0, 0, 0
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # I1 is the arg count 
+    set_imm I1, 0, ARGC
+    deref   I1, INTERP, I1
+
+    # I2 is the expected arg count
+    set_imm I2, 0, 6
+    sub_i   I1, I2, I1
+    
+    goto_if argc_nok, I1   
+    goto    argc_ok, x
+
+argc_nok:
+    set_imm S0, 0, 3
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    goto    argv_test, x
+
+argc_ok:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    goto    argv_test, x
+
+argv_test:
+
+    # S0 is the first arg
+    set_imm I0, 0, 0
+    set_imm I1, 0, 1
+    set_imm S0, 0, ARGV
+    deref   S0, INTERP, S0
+    deref   S0, S0, I1
+
+    # TODO: test S0 eq 'kittens'
+
+argv_nok:
+    set_imm S0, 0, 5
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    goto    end, x
+
+argv_ok:
+    set_imm S0, 0, 4
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    goto    end, x
+
+end:
+    set_imm I0, 0, 0
+    exit    I0, x, x

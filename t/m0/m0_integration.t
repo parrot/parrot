@@ -26,22 +26,29 @@ use File::Spec::Functions;
 use TAP::Parser;
 use Data::Dumper;
 
-my @m0_files = grep {$_ !~ /poke_caller/ }
+my @m0_files = grep {$_ !~ /poke_caller/ && $_ !~ /cps_factorial/ }
     glob catfile( '.', qw/t m0 integration *.m0/);
 
 plan tests => 2 * scalar @m0_files;
 
 for my $file (@m0_files) {
-    test_m0_file($file);
+    if ($file =~ /m0_args/) {
+        test_m0_file($file, "kittens", "2", "3", "4", "5");
+    }
+    else {
+        test_m0_file($file);
+    }
 }
 
 sub test_m0_file {
-    my ($file)  = @_;
+    my $file  = shift;
 
     assemble($file);
     my $interp    = catfile( ".", qw/src m0 perl5 m0_interp.pl/ );
+    my $args = join(' ', @_);
 
-    my $tap = `$^X $interp ${file}b 2>&1`;
+    print "$^X $interp ${file}b $args 2>&1\n";
+    my $tap = `$^X $interp ${file}b $args 2>&1`;
     my $parser = TAP::Parser->new( {tap => $tap} );
     $parser->run;
     is($parser->has_problems, 0, "$file passes");

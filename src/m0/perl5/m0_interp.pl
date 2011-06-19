@@ -22,7 +22,7 @@ use autodie qw/:all/;
 use File::Slurp qw/slurp/;
 use Data::Dumper;
 
-my $file = shift || die "Usage: $0 foo.m0b";
+my $file = $ARGV[0] || die "Usage: $0 foo.m0b";
 
 my $debugging = exists $ENV{M0DEBUG} ? 1 : 0;
 
@@ -57,6 +57,8 @@ use constant {
   CHUNK_MAP   => 3,
   CALL_FRAMES => 4,
   CONFIG      => 5,
+  M0_ARGC     => 6,
+  M0_ARGV     => 7,
 };
 
 
@@ -144,6 +146,11 @@ sub new_interp {
     $interp->[CHUNK_INFO] = [];
     $interp->[CHUNK_MAP] = {};
     $interp->[CHUNKS] = [];
+
+    # make cli arguments accessible to M0 code
+    $interp->[M0_ARGC] = $#ARGV + 1;
+    $interp->[M0_ARGV] = \@ARGV;
+
     return $interp;
 }
 

@@ -131,10 +131,11 @@ sub register_name_to_num {
         OP_FUNCS    => 0,
         CHUNKS      => 1,
         CHUNK_INFO  => 2,
-        CALL_FRAMES => 3,
-        CONFIG      => 4,
-        ARGC        => 5,
-        ARGV        => 6,
+        CHUNK_MAP   => 3,
+        CALL_FRAMES => 4,
+        CONFIG      => 5,
+        ARGC        => 6,
+        ARGV        => 7,
 
         # convenience
         x => 0,
