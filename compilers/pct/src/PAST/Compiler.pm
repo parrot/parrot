@@ -1936,70 +1936,51 @@ multi method keyed_int(PAST::Var $node, $bindpost) {
 
 
 multi method attribute(PAST::Var $node, $bindpost) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc bindpost
-        bindpost = find_lex '$bindpost'
+    my $ops  := POST::Ops.new(:node($node));
+    my $name := self.escape($node.name());
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-        .local string name
-        name = node.'name'()
-        name = self.'escape'(name)
-
-        # We have three cases here.
-        #   0 children = use self
-        #   1 child    = object to look up on
-        #   2 children = object to look up on + class handle
-        # In the last case, we need to generate a different form of the op that
-        # has the extra argument.
-        .local pmc call_on
-        $I0 = elements node
-        if $I0 == 0 goto use_self
-        call_on = node[0]
-        call_on = self.'as_post'(call_on, 'rtype'=>'P')
-        ops.'push'(call_on)
-        if $I0 == 2 goto have_class_handle
-        goto invocant_done
-      use_self:
-        call_on = box 'self'
-      invocant_done:
-
-        if bindpost goto attribute_bind
-
-      attribute_post:
-        .local pmc fetchop, storeop
-        $P0 = get_hll_global ['POST'], 'Op'
-        fetchop = $P0.'new'(ops, call_on, name, 'pirop'=>'getattribute')
-        storeop = $P0.'new'(call_on, name, ops, 'pirop'=>'setattribute')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-
-      attribute_bind:
-        ops.'push_pirop'('setattribute', call_on, name, bindpost)
-        ops.'result'(bindpost)
-        .return (ops)
-
-      have_class_handle:
-        .local pmc handle
-        handle = node[1]
-        handle = self.'as_post'(handle, 'rtype'=>'P')
-        ops.'push'(handle)
-
-        if bindpost goto attribute_bind_handle
-
-        .local pmc fetchop, storeop
-        $P0 = get_hll_global ['POST'], 'Op'
-        fetchop = $P0.'new'(ops, call_on, handle, name, 'pirop'=>'getattribute')
-        storeop = $P0.'new'(call_on, handle, name, ops, 'pirop'=>'setattribute')
-        .tailcall self.'vivify'(node, ops, fetchop, storeop)
-
-      attribute_bind_handle:
-        ops.'push_pirop'('setattribute', call_on, handle, name, bindpost)
-        ops.'result'(bindpost)
-        .return (ops)
+    # We have three cases here.
+    #   0 children = use self
+    #   1 child    = object to look up on
+    #   2 children = object to look up on + class handle
+    # In the last case, we need to generate a different form of the op that
+    # has the extra argument.
+    my $call_on;
+    my $elements := pir::elements($node);
+    if $elements == 0 {
+        $call_on := 'self';
     }
+    else {
+        $call_on := self.as_post($node[0], :rtype('P'));
+        $ops.push($call_on);
+        if $elements == 2 {
+            my $handle := self.as_post($node[1], :rtype('P'));
+            $ops.push($handle);
+
+            if $bindpost {
+                $ops.push_pirop('setattribute', $call_on, $handle, $name,
+                    $bindpost);
+                $ops.result($bindpost);
+                return $ops;
+            }
+
+            my $fetchop := POST::Op.new($ops, $call_on, $handle, $name,
+                                        :pirop('getattribute'));
+            my $storeop := POST::Op.new($call_on, $handle, $name, $ops,
+                                        :pirop('setattribute'));
+            return self.vivify($node, $ops, $fetchop, $storeop);
+        }
+    }
+
+    if $bindpost {
+        $ops.push_pirop('setattribute', $call_on, $name, $bindpost);
+        $ops.result($bindpost);
+        return $ops;
+    }
+
+    my $fetchop := POST::Op.new($ops, $call_on, $name, :pirop('getattribute'));
+    my $storeop := POST::Op.new($call_on, $name, $ops, :pirop('setattribute'));
+    self.vivify($node, $ops, $fetchop, $storeop);
 }
 
 
