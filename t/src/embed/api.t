@@ -242,18 +242,21 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_(un)wr
 #include "imcc/api.h"
 
 int main(void) {
-    Parrot_Int wrap1, wrap2;
+    Parrot_Int wrap1, wrap2, unwrap, size;
     Parrot_PMC interp;
     Parrot_PMC pir_compiler;
+    Parrot_PMC ptr;
+    char *p;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
-    wrap1 = Parrot_api_wrap_pointer(interp, NULL, 0, &pir_compiler);
-    wrap2 = Parrot_api_wrap_pointer(interp, NULL, 1, &pir_compiler);
+    imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
 
-    /* Need a Ptr or PtrBuf for this
-    wrap = Parrot_api_unwrap_pointer(interp, pir_compiler, ptr, 0);
-    */
+    wrap1 = Parrot_api_wrap_pointer(interp, pir_compiler, 0, &ptr);
+
+    wrap2 = Parrot_api_wrap_pointer(interp, pir_compiler, 1, &ptr);
+
+    unwrap = Parrot_api_unwrap_pointer(interp, pir_compiler, &p, &size);
     return 0;
 }
 CODE
