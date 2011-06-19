@@ -1946,6 +1946,7 @@ multi method attribute(PAST::Var $node, $bindpost) {
     # In the last case, we need to generate a different form of the op that
     # has the extra argument.
     my $call_on;
+    my @attribute := [$name];
     my $elements := pir::elements($node);
     if $elements == 0 {
         $call_on := 'self';
@@ -1956,30 +1957,19 @@ multi method attribute(PAST::Var $node, $bindpost) {
         if $elements == 2 {
             my $handle := self.as_post($node[1], :rtype('P'));
             $ops.push($handle);
-
-            if $bindpost {
-                $ops.push_pirop('setattribute', $call_on, $handle, $name,
-                    $bindpost);
-                $ops.result($bindpost);
-                return $ops;
-            }
-
-            my $fetchop := POST::Op.new($ops, $call_on, $handle, $name,
-                                        :pirop('getattribute'));
-            my $storeop := POST::Op.new($call_on, $handle, $name, $ops,
-                                        :pirop('setattribute'));
-            return self.vivify($node, $ops, $fetchop, $storeop);
+            @attribute.unshift($handle);
         }
     }
+    @attribute.unshift($call_on);
 
     if $bindpost {
-        $ops.push_pirop('setattribute', $call_on, $name, $bindpost);
+        $ops.push_pirop('setattribute', |@attribute, $bindpost);
         $ops.result($bindpost);
         return $ops;
     }
 
-    my $fetchop := POST::Op.new($ops, $call_on, $name, :pirop('getattribute'));
-    my $storeop := POST::Op.new($call_on, $name, $ops, :pirop('setattribute'));
+    my $fetchop := POST::Op.new($ops, |@attribute, :pirop('getattribute'));
+    my $storeop := POST::Op.new(|@attribute, $ops, :pirop('setattribute'));
     self.vivify($node, $ops, $fetchop, $storeop);
 }
 
