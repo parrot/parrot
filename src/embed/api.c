@@ -524,7 +524,7 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_language(Parrot_PMC interp_pmc, Parrot_String lang)
+Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang))
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -546,7 +546,7 @@ value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_compiler(Parrot_PMC interp_pmc, Parrot_String type,
+Parrot_api_get_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
     ARGOUT(Parrot_PMC *compiler))
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
@@ -569,8 +569,8 @@ value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
-    Parrot_PMC compiler)
+Parrot_api_set_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
+    ARGIN(Parrot_PMC compiler))
 {
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -618,7 +618,7 @@ Reset the call signature
 
 PARROT_API
 Parrot_Int
-Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, Parrot_PMC ctx)
+Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, ARGMOD(Parrot_PMC ctx))
 {
     ASSERT_ARGS(Parrot_api_reset_call_signature)
     EMBED_API_CALLIN(interp_pmc, interp)
