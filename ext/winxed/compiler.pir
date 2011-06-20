@@ -8664,15 +8664,20 @@
     push $P5, $P1
     $P4 = self.'findsymbol'($P5)
 .annotate 'line', 2986
-    if_null $P4, __label_9
+    isnull $I2, $P4
+    not $I2
+    unless $I2 goto __label_10
+    isa $I2, $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+  __label_10:
+    unless $I2 goto __label_9
 # {
 .annotate 'line', 2987
 # id: $S1
     $P5 = $P4.'makesubid'()
     null $S1
-    if_null $P5, __label_10
+    if_null $P5, __label_11
     set $S1, $P5
-  __label_10:
+  __label_11:
 .annotate 'line', 2988
     box $P5, $S1
     setattribute self, 'subid', $P5
