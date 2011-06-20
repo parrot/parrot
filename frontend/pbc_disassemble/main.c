@@ -51,7 +51,6 @@ Writes output to C<filename>.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 #include "parrot/parrot.h"
 #include "parrot/api.h"
