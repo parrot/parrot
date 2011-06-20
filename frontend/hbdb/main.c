@@ -97,6 +97,10 @@ main(int argc, const char *argv[])
         }
     }
 
+    /* Check for unrecognized options */
+    if (status == -1)
+        usage();
+
     /* Setup default initialization parameters */
     GET_INIT_STRUCT(initargs);
 
@@ -205,7 +209,7 @@ Displays a message about licensing information and resources.
 static void
 license(void)
 {
-    const char *info = "Copyright (C) 2001-2010, Parrot Foundation.\n"
+    const char *info = "Copyright (C) 2001-2011, Parrot Foundation.\n"
                        "This program is distributed under the terms of the "
                        "Artistic License 2.0\n\n"
                        "For further information, please see LICENSE or visit "
@@ -274,7 +278,7 @@ usage(void)
     puts("    -h, --help      Displays help information");
     puts("    -l, --license   Displays license information\n");
     puts("File:");
-    puts("    Must be either a bytecode file (.pbc) or PIR file (.pir)");
+    puts("    May be either a bytecode file (.pbc) or PIR file (.pir)");
 
     exit(EXIT_SUCCESS);
 }
