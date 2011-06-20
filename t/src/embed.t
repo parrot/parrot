@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 15;
+plan tests => 16;
 
 =head1 NAME
 
@@ -566,6 +566,7 @@ CODE
 42.0 is the answer. What is the question?
 OUTPUT
 
+
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
@@ -1118,6 +1119,34 @@ Pir compiler returned no prog
 OUTPUT
 
 }
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
+INTVAL test(INTVAL x)
+{
+    return x + 5;
+}
+
+void main()
+{
+    Parrot_Interp interp;
+    int x,y;
+
+    /* Create the interpreter */
+    interp = new_interp();
+
+    x = 10;
+
+    Parrot_PMC test_pmc = Parrot_sub_new_from_c_func(interp, test, "ii");
+    Parrot_ext_call(interp, test_pmc, "I->I", x, &y);
+    printf("%d\n", y);
+
+    Parrot_x_exit(interp, 0);
+}
+CODE
+15
+OUTPUT
+
+
 
 # Local Variables:
 #   mode: cperl
