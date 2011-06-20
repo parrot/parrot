@@ -1348,8 +1348,8 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 =head1 SEE ALSO
 
 F<include/parrot/multidispatch.h>,
-F<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
-F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
+L<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
+L<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
 
 =cut
 

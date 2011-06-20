@@ -303,6 +303,8 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const vo
 Compare two strings. Returns 0 if they are identical. Considers differing
 encodings to be distinct.
 
+=cut
+
 */
 
 PARROT_WARN_UNUSED_RESULT
@@ -2215,7 +2217,7 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd08_keys.pod>.
+F<docs/pdds/draft/pdd08_keys.pod>, F<include/parrot/hash.h>
 
 =head1 TODO
 

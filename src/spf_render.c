@@ -948,7 +948,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>.
+F<include/parrot/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>
 
 =cut
 

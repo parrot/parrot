@@ -628,7 +628,7 @@ SPRINTF_OBJ pmc_core = {
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/misc.c>, F<src/spf_render.c>.
+F<include/parrot/misc.h>, F<src/misc.c>, F<src/spf_render.c>
 
 =head1 HISTORY
 

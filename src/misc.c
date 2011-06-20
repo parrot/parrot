@@ -278,7 +278,7 @@ Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(size_t len), ARGIN(const char 
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
+F<src/spf_vtable.c>, F<src/spf_render.c>, F<include/parrot/misc.h>
 
 =head1 HISTORY
 

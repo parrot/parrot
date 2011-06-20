@@ -1171,10 +1171,8 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 
 =head1 SEE ALSO
 
-F<include/parrot/vtable.h>.
-
-C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
-(http://www.nntp.perl.org/group/perl.perl6.internals/5516).
+F<include/parrot/pmc.h>, F<include/parrot/vtable.h>,
+L<http://www.nntp.perl.org/group/perl.perl6.internals/2001/10/msg5516.html>
 
 =cut
 
