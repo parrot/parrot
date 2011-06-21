@@ -107,7 +107,7 @@ F<Contacts.pg>:
 
 Then compile the grammar:
 
-  $ B<parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg>
+  $ parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg
 
 =for author
 
@@ -119,8 +119,8 @@ tree should be able to mangle paths appropriately.
 The path to F<parrot> and to the F<Perl6Grammar.pbc> file will vary on
 different systems. If you compiled Parrot from source, it will be:
 
-  $ B<./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \>
-        B<--output=Contacts.pir Contacts.pg>
+  $ ./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \
+        --output=Contacts.pir Contacts.pg
 
 Next, create a small PIR script to run your grammar. Save it as
 F<grammar_test.pir>:
@@ -149,7 +149,7 @@ F<grammar_test.pir>:
 
 Run the test script:
 
-  $ B<parrot grammar_test.pir>
+  $ parrot grammar_test.pir
 
 It will print out a text representation of the raw parse tree stored in the
 C<match> variable:
