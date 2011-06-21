@@ -1,3 +1,7 @@
+New in 3.6.0
+- Core
+  + Class.add_vtable_override now allows you to overwrite an override
+
 New in 3.5.0
 - Core
   + Parrot_PMC_destroy, Parrot_PMC_mark and Parrot_PMC_invoke were removed from
