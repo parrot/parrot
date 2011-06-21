@@ -1,14 +1,15 @@
 New in 3.5.0
 - Core
-  + Parrot_PMC_destroy and Parrot_PMC_mark were removed from the public extension API
-  + PAST now has PAST::Stmt node types, supports reusable temporary registers
+  + Parrot_PMC_destroy and Parrot_PMC_mark were removed from the public extension API.
+  + PAST now has PAST::Stmt node types, supports reusable temporary registers.
+  + Test coverage of the embedding and extending interface is now at least 95%.
 - Languages
   + Winxed
     - A Winxed snapshot is now included in the parrot build.
 - Tests
   + The Parrot test suite harness now understands the HARNESS_TIMER environment
     variable. Setting it to a true value will show timing results for a test run.
-  + IPv6 tests are now parallel testing friendly
+  + IPv6 tests are now parallel testing friendly.
 
 New in 3.4.0
 - Core
