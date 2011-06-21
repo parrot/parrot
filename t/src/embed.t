@@ -1121,12 +1121,15 @@ OUTPUT
 }
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
-INTVAL test(INTVAL x)
+
+void test(int x);
+
+void test(int x)
 {
-    return x + 5;
+    printf("Hello!\n", x);
 }
 
-void main()
+int main()
 {
     Parrot_Interp interp;
     Parrot_PMC test_pmc;
@@ -1137,17 +1140,14 @@ void main()
 
     x = 10;
 
-    test_pmc = Parrot_sub_new_from_c_func(interp, test, "ii");
-    Parrot_ext_call(interp, test_pmc, "I->I", x, &y);
-    printf("%d\n", y);
+    test_pmc = Parrot_sub_new_from_c_func(interp, (void (*)())& test, "i");
+    Parrot_ext_call(interp, test_pmc, "I->", x, &y);
 
     Parrot_x_exit(interp, 0);
 }
 CODE
-15
+Hello!
 OUTPUT
-
-
 
 # Local Variables:
 #   mode: cperl
