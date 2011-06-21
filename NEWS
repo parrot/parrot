@@ -5,6 +5,9 @@ New in 3.5.0
   + Test coverage of the embedding and extending interface is now at least 95%.
 - Languages
   + Winxed
+    - Improved compile time scope search.
+    - Added 'using namespace' statement.
+    - Compiler classes and functions now live in the Winxed;Compiler namespace.
     - A Winxed snapshot is now included in the parrot build.
 - Tests
   + The Parrot test suite harness now understands the HARNESS_TIMER environment
