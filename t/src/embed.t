@@ -42,6 +42,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include "parrot/embed.h"
 #include "parrot/extend.h"
 #include "parrot/extend_vtable.h"
+#include "imcc/api.h"
 
 static void fail(const char *msg);
 static Parrot_String createstring(Parrot_Interp interp, const char * value);
@@ -580,12 +581,13 @@ int main(void)
     Parrot_String compiler;
     Parrot_String errstr;
     Parrot_PMC code;
-    Parrot_PMC hellosub;
+    Parrot_PMC hellosub, pir_compiler, pasm_compiler, interp_pmc;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    interp = new_interp();
+
+    imcc_get_pir_compreg_api(interp_pmc, 1, &pir_compiler);
+    imcc_get_pir_compreg_api(interp_pmc, 1, &pasm_compiler);
 
     /* Compile pir */
     compiler = createstring(interp, "PIR");
@@ -620,7 +622,7 @@ void hello(Parrot_Interp interp)
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
+    Parrot_String compiler, pir_compiler;
     Parrot_String errstr;
     Parrot_PMC code;
     Parrot_PMC hellosub;
@@ -634,6 +636,7 @@ int main(void)
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
+
 
     /* Compile pir */
     compiler = createstring(interp, "PIR");

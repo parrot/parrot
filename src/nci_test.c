@@ -1071,11 +1071,9 @@ main(void)
 
 =back
 
-=head1 SEE ALSO:
+=head1 SEE ALSO
 
-  F<docs/pdds/pdd16_native_call.pod>
-  F<config/gen/makefiles/root.in>
-  F<t/pmc/nci.t>
+F<docs/pdds/draft/pdd16_native_call.pod>, F<config/gen/makefiles/root.in>, F<t/pmc/nci.t>
 
 =cut
 

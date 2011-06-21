@@ -1017,6 +1017,7 @@ Validates a C<PackFile_Header>, ensuring that the magic number is valid and
 that Parrot can read this bytecode version.
 
 Raises an exception if the header doesn't validate.
+
 =cut
 
 */

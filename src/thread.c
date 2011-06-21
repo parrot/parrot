@@ -1655,6 +1655,18 @@ Parrot_shared_gc_unblock(SHIM_INTERP)
 }
 
 /*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/thread.h>
+
+=cut
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:

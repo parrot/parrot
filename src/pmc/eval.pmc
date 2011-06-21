@@ -143,6 +143,27 @@ Mark this Eval.
 
 /*
 
+=item C<void *get_pointer()>
+
+Returns the address of the associated packfile.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+        if (sub) {
+            PackFile_ByteCode *seg = sub->seg;
+            if (seg)
+                return seg->base.pf;
+        }
+        return NULL;
+    }
+
+/*
+
 =item C<opcode_t *invoke(void *next)>
 
 Invokes the first subroutine in the eval code.
@@ -342,17 +363,7 @@ Return the main sub, if any, null PMC otherwise.
 
     METHOD get_main()
     {
-        Parrot_Sub_attributes *sub;
-        PackFile_ByteCode     *seg;
-        PMC *mainsub = PMCNULL;
-
-        PMC_get_sub(INTERP, SELF, sub);
-        seg = sub->seg;
-
-        if (seg) {
-            PackFile_ConstTable *const ct = seg->const_table;
-            mainsub = ct->pmc.constants[seg->main_sub];
-        }
+        PMC *mainsub = Parrot_pf_get_packfile_main_sub(INTERP, SELF);
         RETURN(PMC * mainsub);
     }
 

@@ -133,11 +133,13 @@ Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
     ASSERT_ARGS(Parrot_fprintf)
     va_list args;
     INTVAL retval;
+    PARROT_CALLIN_START(interp);
 
     va_start(args, s);
     retval = Parrot_vfprintf(interp, pio, s, args);
     va_end(args);
 
+    PARROT_CALLIN_END(interp);
     return retval;
 }
 
@@ -149,6 +151,9 @@ Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
     va_list args;
     INTVAL retval;
     va_start(args, s);
+
+    /* Since a NULL interp can be passed in, we don't use
+    the PARROT_CALLIN_(START|END) macros */
 
     if (interp) {
         retval = Parrot_vfprintf(interp, Parrot_io_STDOUT(interp), s, args);
@@ -171,6 +176,8 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
     ASSERT_ARGS(Parrot_eprintf)
     va_list args;
     INTVAL retval;
+    /* Since a NULL interp can be passed in, we don't use
+    the PARROT_CALLIN_(START|END) macros */
 
     va_start(args, s);
 
@@ -205,6 +212,11 @@ Parrot_PMC
 Parrot_get_root_namespace(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_root_namespace)
+
+    PARROT_CALLIN_START(interp);
+
+    PARROT_CALLIN_END(interp);
+
     return interp->root_namespace;
 }
 
@@ -331,9 +343,10 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     va_list args;
     PMC  *call_obj;
     const char *arg_sig, *ret_sig;
+    PMC  * old_call_obj;
+    PARROT_CALLIN_START(interp);
 
-    PMC  * const old_call_obj = Parrot_pcc_get_signature(interp,
-        CURRENT_CONTEXT(interp));
+    old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
@@ -346,6 +359,8 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
+
+    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -359,6 +374,16 @@ If the function throws, the provided handler function is invoked
 =cut
 
 */
+
+#define POP_CONTEXT(interp, curctx, intialctx)                \
+        Parrot_warn((interp), PARROT_WARNINGS_NONE_FLAG,      \
+                "popping context in Parrot_ext_try");         \
+        do {                                                  \
+            if ((curctx) == NULL)                             \
+                do_panic((interp), "cannot restore context",  \
+                    __FILE__, __LINE__);                      \
+        } while (((curctx) = CONTEXT(interp)) != initialctx); \
+
 
 PARROT_EXPORT
 void
@@ -379,13 +404,7 @@ Parrot_ext_try(PARROT_INTERP,
             (*cfunction)(interp, data);
             curctx = CONTEXT(interp);
             if (curctx != initialctx) {
-                Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
-                        "popping context in Parrot_ext_try");
-                do {
-                    if (curctx == NULL)
-                        do_panic(interp,
-                                "cannot restore context", __FILE__, __LINE__);
-                } while ((curctx = CONTEXT(interp)) != initialctx);
+                POP_CONTEXT(interp, curctx, initialctx);
             }
             Parrot_cx_delete_handler_local(interp, STRINGNULL);
             break;
@@ -394,13 +413,7 @@ Parrot_ext_try(PARROT_INTERP,
                 PMC *exception = jmp.exception;
                 curctx = CONTEXT(interp);
                 if (curctx != initialctx) {
-                    Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
-                            "popping context in Parrot_ext_try");
-                    do {
-                        if (curctx == NULL)
-                            do_panic(interp,
-                                    "cannot restore context", __FILE__, __LINE__);
-                    } while ((curctx = CONTEXT(interp)) != initialctx);
+                    POP_CONTEXT(interp, curctx, initialctx);
                 }
                 Parrot_cx_delete_handler_local(interp, STRINGNULL);
                 if (chandler)
@@ -427,6 +440,9 @@ Parrot_Int
 Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_intreg)
+    PARROT_CALLIN_START(interp);
+
+    PARROT_CALLIN_END(interp);
     return REG_INT(interp, regnum);
 }
 
@@ -446,6 +462,9 @@ Parrot_Float
 Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_numreg)
+    PARROT_CALLIN_START(interp);
+
+    PARROT_CALLIN_END(interp);
     return REG_NUM(interp, regnum);
 }
 
@@ -465,6 +484,9 @@ Parrot_String
 Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_strreg)
+    PARROT_CALLIN_START(interp);
+
+    PARROT_CALLIN_END(interp);
     return REG_STR(interp, regnum);
 }
 
@@ -484,6 +506,9 @@ Parrot_PMC
 Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_pmcreg)
+    PARROT_CALLIN_START(interp);
+
+    PARROT_CALLIN_END(interp);
     return REG_PMC(interp, regnum);
 }
 
@@ -504,7 +529,11 @@ Parrot_set_intreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Int value)
 {
     ASSERT_ARGS(Parrot_set_intreg)
+    PARROT_CALLIN_START(interp);
+
     REG_INT(interp, regnum) = value;
+
+    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -524,7 +553,11 @@ Parrot_set_numreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Float value)
 {
     ASSERT_ARGS(Parrot_set_numreg)
+    PARROT_CALLIN_START(interp);
+
     REG_NUM(interp, regnum) = value;
+
+    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -544,8 +577,12 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_String value)
 {
     ASSERT_ARGS(Parrot_set_strreg)
+    PARROT_CALLIN_START(interp);
+
     REG_STR(interp, regnum) = value;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+
+    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -565,8 +602,13 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_PMC value)
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
+
+    PARROT_CALLIN_START(interp);
+
     REG_PMC(interp, regnum) = value;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+
+    PARROT_CALLIN_END(interp);
 }
 
 /*=for api extend Parrot_new_string
@@ -717,10 +759,18 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
         ARGIN(void (*func)(void)), ARGIN(const char * signature))
 {
     ASSERT_ARGS(Parrot_sub_new_from_c_func)
-    Parrot_String sig = Parrot_new_string(interp, signature, strlen(signature),
+
+    Parrot_String sig;
+    Parrot_PMC sub;
+    PARROT_CALLIN_START(interp);
+
+    sig = Parrot_new_string(interp, signature, strlen(signature),
         (char *) NULL, 0);
-    Parrot_PMC sub = Parrot_pmc_new(interp, enum_class_NCI);
+
+    sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
+
+    PARROT_CALLIN_END(interp);
     return sub;
 }
 
