@@ -31,7 +31,7 @@ typedef enum {
     HBDB_STOPPED      = 0x0002,    /* Debugger is stopped/paused        */
     HBDB_RUNNING      = 0x0004,    /* Debugger is running               */
     HBDB_EXIT         = 0x0008,    /* Debugger is about to exit         */
-    HBDB_ENTERED      = 0x0016     /* Debugger has been started         */
+    HBDB_ENTERED      = 0x0010     /* Debugger has been started         */
 } hbdb_state_t;
 
 /* Flags used to associate a condition with a breakpoint or watchpoint  */
@@ -41,15 +41,15 @@ typedef enum {
     HBDB_COND_STR     = 0x0004,    /* String                            */
     HBDB_COND_PMC     = 0x0008,    /* PMC                               */
 
-    HBDB_COND_GT      = 0x0016,    /* Greater than                      */
-    HBDB_COND_GE      = 0x0032,    /* Greater than or equal to          */
-    HBDB_COND_LT      = 0x0064,    /* Less than                         */
-    HBDB_COND_LE      = 0x0128,    /* Less than or equal to             */
-    HBDB_COND_EQ      = 0x0256,    /* Equal to                          */
-    HBDB_COND_NE      = 0x0512,    /* Not equal to                      */
+    HBDB_COND_GT      = 0x0010,    /* Greater than                      */
+    HBDB_COND_GE      = 0x0020,    /* Greater than or equal to          */
+    HBDB_COND_LT      = 0x0040,    /* Less than                         */
+    HBDB_COND_LE      = 0x0080,    /* Less than or equal to             */
+    HBDB_COND_EQ      = 0x0100,    /* Equal to                          */
+    HBDB_COND_NE      = 0x0200,    /* Not equal to                      */
 
-    HBDB_COND_CONST   = 0x1024,    /* Constant                          */
-    HBDB_COND_NOTNULL = 0x2048     /* Not null                          */
+    HBDB_COND_CONST   = 0x0400,    /* Constant                          */
+    HBDB_COND_NOTNULL = 0x0800     /* Not null                          */
 } hbdb_condition_flag;
 
 /* Conditions that can be associated with a breakpoint or watchpoint    */
