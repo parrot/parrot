@@ -255,6 +255,54 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 
 /*
 
+=item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
+const char *code, Parrot_String *error)>
+
+Compiles a code string.
+
+DEPRECATED: Use Parrot_compile_file (or whatever replaces it, TT #2135).
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+Parrot_PMC
+Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
+        ARGOUT(Parrot_String *error))
+{
+    ASSERT_ARGS(Parrot_compile_string)
+    PMC * const compiler = Parrot_get_compiler(interp, type);
+
+    /* XXX error is not being set */
+    if (PMC_IS_NULL(compiler)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not find compiler %Ss", type);
+    }
+    else {
+        PMC *result;
+        STRING * const code_s = Parrot_str_new(interp, code, 0);
+        imc_info_t * imcc     = (imc_info_t*) VTABLE_get_pointer(interp, compiler);
+        const INTVAL is_pasm  = VTABLE_get_integer(interp, compiler);
+
+        Parrot_block_GC_mark(interp);
+        result = imcc_compile_string(imcc, code_s, is_pasm);
+        if (PMC_IS_NULL(result)) {
+            STRING * const msg = imcc_last_error_message(imcc);
+            const INTVAL code  = imcc_last_error_code(imcc);
+
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+        }
+        Parrot_unblock_GC_mark(interp);
+        return result;
+    }
+}
+
+/*
+
 =item C<INTVAL interpinfo(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the interpreter.
