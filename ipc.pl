@@ -2,10 +2,16 @@
 
 use strict;
 use warnings;
+use lib qw(lib);
 
-use IPC::Open3;
 use IO::Select;
+use IPC::Open3;
 use Symbol;
+use Test::More;
+
+use Parrot::Test::HBDB;
+
+# TODO Signal handler for SIGPIPE
 
 my $pid;
 
@@ -15,42 +21,38 @@ my $pid;
     #print "Received SIG$sig\n" if waitpid($pid, 0) > 0;
 #};
 
-my ($stdin, $stdout, $stderr);
 my $hbdb = "./hbdb hello.pbc";
-
-# IPC::Open3 is stupid
-$stderr = gensym();
 
 # Not used yet
 my $bad_cmd = qr/Undefined command: "\w+". Try "help"./;
 
 # Run hbdb
-$pid = open3($stdin, $stdout, $stderr, $hbdb);
-
-#waitpid($pid, 0);
+$pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, $hbdb);
 
 # Enter fake command
-print $stdin "this_is_not_a_command";
-close $stdin;
+print HBDB_STDIN "this_is_not_a_command\n";
+close HBDB_STDIN;
+
+#waitpid($pid, 0);
 
 my $select = IO::Select->new();
 
 # Add STDOUT/STDERR to IO::Select object
-$select->add($stdout, $stderr);
+$select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
 
 # Wait until STDOUT/STDERR can be read
-my (@fd_ready) = $select->can_read();
+my @fd_ready = $select->can_read();
 
 # Iterate through filehandles ready to be read
 foreach my $fd (@fd_ready) {
     next unless defined $fd;
 
     # Check whether it's STDOUT or STDERR
-    if (fileno($fd) == fileno($stderr)) {
-        print "STDERR: $_" while <$stderr>;
+    if (fileno($fd) == fileno(\*HBDB_STDERR)) {
+        print "HBDB_STDERR: $_" while <HBDB_STDERR>;
     }
     else {
-        print "STDOUT: $_" while <$stdout>;
+        print "HBDB_STDOUT: $_" while <HBDB_STDOUT>;
     }
 
     # Remove filehandle from list if reached EOF

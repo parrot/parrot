@@ -43,10 +43,10 @@ File:
 OUTPUT
 
 # Test that command-line switches are recognized
-hbdb_output_like("-h", $help_regex, "HBDB: Help message");
+hbdb_help_output_like("-h", $help_regex, "HBDB: Help message");
 
 # Test that unknown switches fail correctly
-hbdb_output_like("--foobar", $help_regex, "HBDB: Unknown options");
+hbdb_help_output_like("--foobar", $help_regex, "HBDB: Unknown options");
 
 # Local Variables:
 #   mode: cperl

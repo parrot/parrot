@@ -184,11 +184,20 @@ fail(Parrot_PMC interp)
     Parrot_String errmsg;
     Parrot_PMC    exception;
 
+    /* Get result of last API function call */
     if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
         exit(EXIT_FAILURE);
 
+    /* Check if an unhandled exception was thrown */
     if (is_error) {
         Parrot_api_string_export_ascii(interp, errmsg, &msg);
+
+        /* Exit quietly with status of 0 if the error was EOF-related */
+        if (strcmp(msg, "Null PMC access in get_string()") == 0) {
+            printf("quit\n");
+            exit(0);
+        }
+
         fprintf(stderr, "ERROR: %s\n", msg);
         Parrot_api_string_free_exported_ascii(interp, msg);
     }

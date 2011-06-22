@@ -40,7 +40,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT = qw(hbdb_output_like);
+our @EXPORT = qw(hbdb_help_output_like);
 
 my $exec;
 
@@ -70,16 +70,20 @@ sub import {
 
 Similar to C<Test::More::like()>. C<$opt> is the command-line switch to pass
 to hbdb, C<$rx> is a regular expression to match, and C<$desc> is a short
-description. Passes the test if the output matches the given regular
+description. Passes the test if the help message matches the given regular
 expression.
 
 =cut
 
-sub hbdb_output_like {
+sub hbdb_help_output_like {
     my ($opt, $rx, $desc) = @_;
     my $out = `$exec $opt`;
 
     Test::More::like($out, $rx, $desc);
+}
+
+sub hbdb_output_like {
+
 }
 
 1;
