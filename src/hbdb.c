@@ -234,6 +234,14 @@ hbdb_get_command(PARROT_INTERP)
     /* Invoke readline_interactive() */
     Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &input);
 
+    /* STUB */
+    if (Parrot_io_eof(interp, stdinput)) {
+        printf("onoes! das bad!\n");
+        Parrot_x_exit(interp, 0);
+        exit(0);
+    }
+    /* STUB */
+
     /* Store command */
     hbdb->current_command = Parrot_str_to_cstring(interp, input);
 }
@@ -517,7 +525,12 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
     /* Check if a match was found */
     if (c) {
         /* Call command's function */
-        (*c->function)(hbdb, orig_cmd);
+
+        /* STUB */
+        printf("You entered the \"%s\" command\n", cmd);
+        /* STUB */
+
+        /*(*c->function)(hbdb, orig_cmd);*/
         return 0;
     }
     else {
@@ -526,7 +539,7 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
             return 0;
         }
         else {
-            Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n");
+            Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n", cmd);
             /* TODO Error message if script file */
             return 1;
         }

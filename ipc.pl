@@ -31,9 +31,10 @@ $pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, $hbdb);
 
 # Enter fake command
 print HBDB_STDIN "this_is_not_a_command\n";
+#print HBDB_STDIN "^D";
 close HBDB_STDIN;
 
-#waitpid($pid, 0);
+waitpid($pid, 0);
 
 my $select = IO::Select->new();
 
