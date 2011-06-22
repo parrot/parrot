@@ -9,7 +9,7 @@ use IPC::Open3;
 use Symbol;
 use Test::More;
 
-use Parrot::Test::HBDB;
+use Parrot::Test::HBDB tests => 1;
 
 # TODO Signal handler for SIGPIPE
 
@@ -24,7 +24,7 @@ my $pid;
 my $hbdb = "./hbdb hello.pbc";
 
 # Not used yet
-my $bad_cmd = qr/Undefined command: "\w+". Try "help"./;
+my $bad_cmd = qr/(hbdb) Undefined command: "\w+". Try "help"./;
 
 # Run hbdb
 $pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, $hbdb);
@@ -50,10 +50,9 @@ foreach my $fd (@fd_ready) {
 
     # Check whether it's STDOUT or STDERR
     if (fileno($fd) == fileno(\*HBDB_STDERR)) {
-        print "HBDB_STDERR: $_" while <HBDB_STDERR>;
-    }
-    else {
-        print "HBDB_STDOUT: $_" while <HBDB_STDOUT>;
+        my @lines = <HBDB_STDERR>;
+
+        like($lines[0], $bad_cmd, "Test bad command");
     }
 
     # Remove filehandle from list if reached EOF
