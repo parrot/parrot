@@ -155,15 +155,10 @@ Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
     /* Since a NULL interp can be passed in, we don't use
     the PARROT_CALLIN_(START|END) macros */
 
-    if (interp) {
+    if (interp)
         retval = Parrot_vfprintf(interp, Parrot_io_STDOUT(interp), s, args);
-    }
-    else {
-        /* Be nice about this...
-         **   XXX BD Should this use the default Parrot_io_STDOUT or something?
-         */
+    else
         retval = vfprintf(stdout, s, args);
-    }
     va_end(args);
 
     return retval;
@@ -181,15 +176,10 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
 
     va_start(args, s);
 
-    if (interp) {
+    if (interp)
         retval = Parrot_vfprintf(interp, Parrot_io_STDERR(interp), s, args);
-    }
-    else {
-        /* Be nice about this...
-         **   XXX BD Should this use the default Parrot_io_STDOUT or something?
-         */
-        retval=vfprintf(stderr, s, args);
-    }
+    else
+        retval = vfprintf(stderr, s, args);
 
     va_end(args);
 
@@ -212,10 +202,6 @@ Parrot_PMC
 Parrot_get_root_namespace(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_get_root_namespace)
-
-    PARROT_CALLIN_START(interp);
-
-    PARROT_CALLIN_END(interp);
 
     return interp->root_namespace;
 }
@@ -440,9 +426,6 @@ Parrot_Int
 Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_intreg)
-    PARROT_CALLIN_START(interp);
-
-    PARROT_CALLIN_END(interp);
     return REG_INT(interp, regnum);
 }
 
@@ -462,9 +445,7 @@ Parrot_Float
 Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_numreg)
-    PARROT_CALLIN_START(interp);
 
-    PARROT_CALLIN_END(interp);
     return REG_NUM(interp, regnum);
 }
 
@@ -484,9 +465,6 @@ Parrot_String
 Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_strreg)
-    PARROT_CALLIN_START(interp);
-
-    PARROT_CALLIN_END(interp);
     return REG_STR(interp, regnum);
 }
 
@@ -506,9 +484,6 @@ Parrot_PMC
 Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
 {
     ASSERT_ARGS(Parrot_get_pmcreg)
-    PARROT_CALLIN_START(interp);
-
-    PARROT_CALLIN_END(interp);
     return REG_PMC(interp, regnum);
 }
 
@@ -624,6 +599,8 @@ flags for right now.
 
 A copy of the buffer is made.
 
+DEPRECATED: Use Parrot_str_new or Parrot_str_new_init instead. See TT #2133
+
 =cut
 
 */
@@ -664,6 +641,8 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 Add a reference of the PMC to the interpreter's GC registry. This prevents PMCs
 only known to extension from getting destroyed during GC runs.
 
+DEPRECATED: Use Parrot_pmc_gc_register instead
+
 =cut
 
 */
@@ -685,6 +664,8 @@ Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
 Remove a reference of the PMC from the interpreter's GC registry. If the
 reference count reaches zero, the PMC will be destroyed during the next GC run.
 
+DEPRECATED: Use Parrot_pmc_gc_unregister instead
+
 =cut
 
 */
@@ -705,6 +686,8 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 
 Add a reference of the string to the interpreter's GC registry. This prevents
 strings only known to extension from getting destroyed during GC runs.
+
+DEPRECATED: Use Parrot_str_gc_register instead
 
 =cut
 
@@ -728,6 +711,8 @@ Remove a reference of the string from the interpreter's GC registry. If the
 reference count reaches zero, the string will be destroyed during the next GC
 run.
 
+DEPRECATED: Use Parrot_str_gc_unregister instead
+
 =cut
 
 */
@@ -748,6 +733,8 @@ Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
 const char * signature)>
 
 Returns a PMC sub wrapper for a c function.
+
+TODO: Clean this up, move it some place more appropriate
 
 =cut
 
@@ -779,6 +766,8 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
 =item C<Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)>
 
 Create a class with the type given
+
+TODO: Clean this up, move this to src/oo.c
 
 =cut
 
