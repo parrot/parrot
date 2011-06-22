@@ -4430,9 +4430,7 @@ void
 PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
 {
     ASSERT_ARGS(PackFile_fixup_subs)
-    PARROT_CALLIN_START(interp);
     do_sub_pragmas(interp, interp->current_pf, what, eval);
-    PARROT_CALLIN_END(interp);
 }
 
 

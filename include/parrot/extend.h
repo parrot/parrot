@@ -26,21 +26,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-/* Macro to save off the original stack pointer for GC scanning. If
-   the stacktop was NULL, then set it to the address of the cached
-   pointer, which is on the stack and as good a thing as any to use as
-   an anchor */
-#define PARROT_CALLIN_START(x) void *oldtop = (x)->lo_var_ptr; \
-                               if (oldtop) {} else (x)->lo_var_ptr = &oldtop
-/* Put the stack top back, if what we cached was NULL. Otherwise we
-   leave it alone and assume it's OK */
-#define PARROT_CALLIN_END(x)   do {\
-                if (!oldtop) {\
-                    PARROT_ASSERT((x)->lo_var_ptr == &oldtop);\
-                    (x)->lo_var_ptr = NULL;\
-                }\
-            } while (0)
-
 #else
 
 typedef Parrot_Int Parrot_Language;
