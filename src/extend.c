@@ -30,13 +30,13 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
 
    These functions presume that GC is available and is properly configured
    (setting the stacktop for stack walking, etc) and that there is an active
-   exception-handling infrastructure. Calling these functions when there is
+   exception-handling infrastructure. Calling these functions when there are
    no exception handlers available, including a default top-level handler, or
    when the GC is not properly initialized can lead to big problems. Be sure
    to understand the difference between an embedding and an extending
    situation. Using the wrong kind of function in the wrong situation, or
    combining some functions from the Embedding API with functions from the
-   extending API is a recipe for disaster. We (Parrot developers) will not be
+   Extending API is a recipe for disaster. We (Parrot developers) will not be
    held responsible if you insist on making these kinds of mistakes.
 
    If there are utility functions that *YOU* as a user of parrot need from
@@ -49,32 +49,19 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
    Notice that the "Extending API" is a loosely-defined concept which is
    currently understood to mean the sum of public APIs for various subsystems.
    This definition may change in the future, but this is what we mean by the
-   phrase right now.
+   phrase right now. The functions in this file do not belong to any
+   particular subsystem, and are always part of the extending API. Functions
+   named "Parrot_xxx_..." where "xxx" is a 2- or 3-letter subsystem
+   abbreviation and which are marked with "PARROT_EXPORT" can generally be
+   considered to be part of the public API. Subsystems which are properly
+   arranged will typically have a folder src/xxx/, and an "api.c" file
+   therein for holding API functions from that subsystem. Many of the bigger
+   systems are arranged in this way (and the rest of the systems will be
+   eventually). If so, that is the canonical source of information regarding
+   API functions for that subsystem.
 
-   The problem comes in if these routines are called from *outside*
-   an interpreter. This happens when an embedding application calls
-   them to do stuff with PMCs, STRINGS, interpreter contents, and
-   suchlike things. This is perfectly legal -- in fact it's what
-   we've documented should be done -- but the problem is that the
-   stack base pointer will be NULL. This is Very Bad.
-
-   To deal with this there are two macros that are defined to handle
-   the problem.
-
-   PARROT_CALLIN_START(interp) will figure out if the stack
-   anchor needs setting and, if so, will set it. It must *always*
-   come immediately after the last variable declared in the block
-   making the calls into the interpreter, as it declares a variable
-   and has some code.
-
-   PARROT_CALLIN_END(interp) will put the stack anchor back to
-   the way it was, and should always be the last statement before a
-   return. (If you have multiple returns have it in multiple times)
-
-   Not doing this is a good way to introduce bizarre heisenbugs, so
-   just do it. This is the only place they ought to have to be put
-   in, and most of the functions are already written, so it's not
-   like it's an onerous requirement.
+   Other documentation sources, such as the PDDs or other files in the
+   docs/ directory may include other information about the extending API.
 
 */
 
@@ -117,10 +104,8 @@ Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
     STRING * str;
     INTVAL retval;
 
-    PARROT_CALLIN_START(interp);
     str = Parrot_vsprintf_c(interp, s, args);
     retval = Parrot_io_putps(interp, pio, str);
-    PARROT_CALLIN_END(interp);
 
     return retval;
 }
@@ -133,13 +118,11 @@ Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
     ASSERT_ARGS(Parrot_fprintf)
     va_list args;
     INTVAL retval;
-    PARROT_CALLIN_START(interp);
 
     va_start(args, s);
     retval = Parrot_vfprintf(interp, pio, s, args);
     va_end(args);
 
-    PARROT_CALLIN_END(interp);
     return retval;
 }
 
@@ -151,9 +134,6 @@ Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
     va_list args;
     INTVAL retval;
     va_start(args, s);
-
-    /* Since a NULL interp can be passed in, we don't use
-    the PARROT_CALLIN_(START|END) macros */
 
     if (interp)
         retval = Parrot_vfprintf(interp, Parrot_io_STDOUT(interp), s, args);
@@ -171,8 +151,6 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
     ASSERT_ARGS(Parrot_eprintf)
     va_list args;
     INTVAL retval;
-    /* Since a NULL interp can be passed in, we don't use
-    the PARROT_CALLIN_(START|END) macros */
 
     va_start(args, s);
 
@@ -221,11 +199,8 @@ Parrot_PMC
 Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
 {
     ASSERT_ARGS(Parrot_PMC_new)
-    Parrot_PMC newpmc;
-    PARROT_CALLIN_START(interp);
-    newpmc = Parrot_pmc_new_noinit(interp, type);
+    Parrot_PMC newpmc = Parrot_pmc_new_noinit(interp, type);
     VTABLE_init(interp, newpmc);
-    PARROT_CALLIN_END(interp);
     return newpmc;
 }
 
@@ -244,10 +219,7 @@ Parrot_Int
 Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
 {
     ASSERT_ARGS(Parrot_PMC_typenum)
-    Parrot_Int retval;
-    PARROT_CALLIN_START(interp);
-    retval = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, _class, 0));
-    PARROT_CALLIN_END(interp);
+    Parrot_Int retval = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, _class, 0));
     return retval;
 }
 
@@ -329,10 +301,7 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     va_list args;
     PMC  *call_obj;
     const char *arg_sig, *ret_sig;
-    PMC  * old_call_obj;
-    PARROT_CALLIN_START(interp);
-
-    old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC * old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
 
     va_start(args, signature);
@@ -345,8 +314,6 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
-
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -382,7 +349,6 @@ Parrot_ext_try(PARROT_INTERP,
     if (cfunction) {
         Parrot_runloop jmp;
         Parrot_Context *initialctx, *curctx;
-        PARROT_CALLIN_START(interp);
         initialctx = CONTEXT(interp);
         switch (setjmp(jmp.resume)) {
           case 0: /* try */
@@ -406,7 +372,6 @@ Parrot_ext_try(PARROT_INTERP,
                     (*chandler)(interp, exception, data);
             }
         }
-        PARROT_CALLIN_END(interp);
     }
 }
 
@@ -415,6 +380,8 @@ Parrot_ext_try(PARROT_INTERP,
 =item C<Parrot_Int Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)>
 
 Return the value of an integer register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -434,6 +401,8 @@ Parrot_get_intreg(PARROT_INTERP, Parrot_Int regnum)
 =item C<Parrot_Float Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)>
 
 Return the value of a numeric register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -455,6 +424,8 @@ Parrot_get_numreg(PARROT_INTERP, Parrot_Int regnum)
 
 Return the value of a string register.
 
+DEPRECATED: Do not use. See TT #2133
+
 =cut
 
 */
@@ -473,6 +444,8 @@ Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
 =item C<Parrot_PMC Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)>
 
 Return the value of a PMC register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -494,6 +467,8 @@ value)>
 
 Set the value of an I register.
 
+DEPRECATED: Do not use. See TT #2133
+
 =cut
 
 */
@@ -504,11 +479,7 @@ Parrot_set_intreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Int value)
 {
     ASSERT_ARGS(Parrot_set_intreg)
-    PARROT_CALLIN_START(interp);
-
     REG_INT(interp, regnum) = value;
-
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -517,6 +488,8 @@ Parrot_set_intreg(PARROT_INTERP, Parrot_Int regnum,
 value)>
 
 Set the value of an N register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -528,11 +501,7 @@ Parrot_set_numreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_Float value)
 {
     ASSERT_ARGS(Parrot_set_numreg)
-    PARROT_CALLIN_START(interp);
-
     REG_NUM(interp, regnum) = value;
-
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -541,6 +510,8 @@ Parrot_set_numreg(PARROT_INTERP, Parrot_Int regnum,
 value)>
 
 Set the value of an S register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -552,12 +523,9 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
                   Parrot_String value)
 {
     ASSERT_ARGS(Parrot_set_strreg)
-    PARROT_CALLIN_START(interp);
 
     REG_STR(interp, regnum) = value;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
-
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -566,6 +534,8 @@ Parrot_set_strreg(PARROT_INTERP, Parrot_Int regnum,
 value)>
 
 Set the value of a P register.
+
+DEPRECATED: Do not use. See TT #2133
 
 =cut
 
@@ -578,12 +548,8 @@ Parrot_set_pmcreg(PARROT_INTERP, Parrot_Int regnum,
 {
     ASSERT_ARGS(Parrot_set_pmcreg)
 
-    PARROT_CALLIN_START(interp);
-
     REG_PMC(interp, regnum) = value;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
-
-    PARROT_CALLIN_END(interp);
 }
 
 /*=for api extend Parrot_new_string
@@ -617,8 +583,6 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
     Parrot_String retval;
     const STR_VTABLE *encoding;
 
-    PARROT_CALLIN_START(interp);
-
     if (encoding_name) {
         encoding = Parrot_find_encoding(interp, encoding_name);
         if (!encoding)
@@ -630,7 +594,6 @@ Parrot_new_string(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
 
     retval = Parrot_str_new_init(interp, buffer, length, encoding, flags);
 
-    PARROT_CALLIN_END(interp);
     return retval;
 }
 
@@ -652,9 +615,7 @@ void
 Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
     ASSERT_ARGS(Parrot_register_pmc)
-    PARROT_CALLIN_START(interp);
     Parrot_pmc_gc_register(interp, pmc);
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -675,9 +636,7 @@ void
 Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
     ASSERT_ARGS(Parrot_unregister_pmc)
-    PARROT_CALLIN_START(interp);
     Parrot_pmc_gc_unregister(interp, pmc);
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -698,9 +657,7 @@ void
 Parrot_register_string(PARROT_INTERP, Parrot_String s)
 {
     ASSERT_ARGS(Parrot_register_string)
-    PARROT_CALLIN_START(interp);
     Parrot_str_gc_register(interp, s);
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -722,9 +679,7 @@ void
 Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
 {
     ASSERT_ARGS(Parrot_unregister_string)
-    PARROT_CALLIN_START(interp);
     Parrot_str_gc_unregister(interp, s);
-    PARROT_CALLIN_END(interp);
 }
 
 /*
@@ -749,15 +704,12 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
 
     Parrot_String sig;
     Parrot_PMC sub;
-    PARROT_CALLIN_START(interp);
 
     sig = Parrot_new_string(interp, signature, strlen(signature),
         (char *) NULL, 0);
 
     sub = Parrot_pmc_new(interp, enum_class_NCI);
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
-
-    PARROT_CALLIN_END(interp);
     return sub;
 }
 
@@ -778,13 +730,7 @@ Parrot_PMC
 Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
 {
     ASSERT_ARGS(Parrot_PMC_newclass)
-    Parrot_PMC result;
-    PARROT_CALLIN_START(interp);
-
-    result = Parrot_pmc_new_init(interp, enum_class_Class, classtype);
-
-    PARROT_CALLIN_END(interp);
-    return result;
+    return Parrot_pmc_new_init(interp, enum_class_Class, classtype);
 }
 
 /*
