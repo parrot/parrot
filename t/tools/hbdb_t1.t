@@ -25,7 +25,7 @@ requirement has not been met, all tests will be skipped.
 
 use strict;
 use warnings;
-use lib qw/lib/;
+use lib qw(lib);
 
 use Test::More;
 use Parrot::Test::HBDB tests => 2;

@@ -40,14 +40,14 @@ $SIG{'CHLD'} = sub {
     close HBDB_STDIN if fileno HBDB_STDIN;
 };
 
-my $pbc     = generate_pbc("t/tools/testlib/hello.pir");
-my $hbdb    = "./hbdb $pbc";
+my $pir     = "t$PConfig{'slash'}tools$PConfig{'slash'}testlib$PConfig{'slash'}hello.pir";
+my $pbc     = generate_pbc($pir);
 
 my $bad_cmd = "this_is_not_a_command";
 my $err_msg = qr|\(hbdb\) Undefined command: "\w+". Try "help".|;
 
 # Start HBDB
-my $pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, $hbdb);
+my $pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, "$HBDB $pbc");
 
 # Enter fake command
 print HBDB_STDIN "$bad_cmd\n";
@@ -70,7 +70,7 @@ foreach my $fh (@fh_ready) {
     if (fileno $fh  == fileno \*HBDB_STDERR) {
         my @lines = <HBDB_STDERR>;
 
-        like($lines[0], $err_msg, "Test bad command");
+        like($lines[0], $err_msg, "HBDB: Bad command");
     }
 
     # Remove filehandle from list if reached EOF
@@ -84,11 +84,9 @@ sub generate_pbc {
     my $pir = shift;
     my $pbc = $pir;
 
-    my $parrot  = ".$PConfig{slash}$PConfig{test_prog}";
-
     $pbc =~ s|\.pir|\.pbc|i;
 
-    eval { system "$parrot -o $pbc $pir" };
+    eval { system "$PARROT -o $pbc $pir" };
     diag("Failed to generate $pbc") if $@;
 
     return $pbc;
