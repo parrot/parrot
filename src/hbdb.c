@@ -125,7 +125,9 @@ hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_break)
 
-    printf("Hello world!\n");
+    /* STUB */
+    printf("Look at me cotto! No hands!\n");
+    /* STUB */
 }
 
 /*
@@ -484,7 +486,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         if (hits == 1) {
             *cmd = skip_whitespace(next);
 
-            return command_table[found].cmd;
+            return &(command_table[found].cmd);
         }
     }
 
@@ -525,12 +527,7 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
     /* Check if a match was found */
     if (c) {
         /* Call command's function */
-
-        /* STUB */
-        printf("You entered the \"%s\" command\n", cmd);
-        /* STUB */
-
-        /*(*c->function)(hbdb, orig_cmd);*/
+        (*c->function)(hbdb, orig_cmd);
         return 0;
     }
     else {
