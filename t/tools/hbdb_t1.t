@@ -4,16 +4,17 @@
 
 =head1 NAME
 
-t/tools/hbdb.t - tests for the HBDB debugger
+t/tools/hbdb_t1.t - tests for the HBDB debugger
 
 =head1 SYNOPSIS
 
-    prove t/tools/hbdb.t
+    prove t/tools/hbdb_t1.t
 
 =head1 DESCRIPTION
 
-Tests the HBDB debugger by providing it with a number of source
-files and running through it with various commands.
+Tests that the HBDB debugger processes command-line switches properly.
+This is simply done by providing HBDB with both real and fake switches and
+then comparing the resulting output with the expected output.
 
 =head1 REQUIREMENTS
 
@@ -22,9 +23,8 @@ requirement has not been met, all tests will be skipped.
 
 =cut
 
-use warnings;
 use strict;
-
+use warnings;
 use lib qw/lib/;
 
 use Test::More;

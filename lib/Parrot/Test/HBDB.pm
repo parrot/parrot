@@ -43,20 +43,21 @@ use base qw(Exporter);
 our @EXPORT = qw(hbdb_help_output_like);
 
 my $exec;
+my $builder;
 
 # Check that HBDB has been built first
 BEGIN {
+    $builder = Test::Builder->new();
+
     my $path = File::Spec->join(".", "hbdb");
-    $exec = $path . $PConfig{'exe'};
+    $exec    = $path . $PConfig{'exe'};
 
     # Skip tests if executable doesn't exist
-    unless (-f $exec) {
-        Test::Builder->plan(skip_all => "HBDB hasn't been built. Please run \"make hbdb\"");
+    unless (-e $exec) {
+        $builder->plan(skip_all => "HBDB hasn't been built. Please run \"make hbdb\"");
         exit(0);
     }
 }
-
-my $builder = Test::Builder->new();
 
 sub import {
     my ($self, $plan, $args) = @_;
