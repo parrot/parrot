@@ -621,7 +621,7 @@ Note that the C<from> PMC can be of any of the various array types.
         INTVAL i;
 
         /* start from end? */
-        if (offset < 0) 
+        if (offset < 0)
             offset += elems0;
 
         if (offset < 0)
@@ -652,7 +652,7 @@ Note that the C<from> PMC can be of any of the various array types.
         /* now copy C<from>'s elements into SELF */
         if (elems1 > 0) {
             PMC *iter = VTABLE_get_iter(INTERP, from);
-            for (i = 0; i < elems1; i++) 
+            for (i = 0; i < elems1; i++)
                 item[offset + i] = VTABLE_shift_pmc(INTERP, iter);
         }
     }
