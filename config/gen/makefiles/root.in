@@ -966,7 +966,8 @@ src/pointer_array$(O) : \
     $(INC_DIR)/pointer_array.h
 
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
-    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
+    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
+    include/pmc/pmc_namespace.h
 
 src/scheduler$(O) : \
     $(PARROT_H_HEADERS) \

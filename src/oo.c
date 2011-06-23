@@ -21,6 +21,7 @@ Handles class and object manipulation.
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_object.h"
+#include "pmc/pmc_namespace.h"
 
 #include "oo.str"
 
@@ -153,14 +154,19 @@ void
 Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(Parrot_oo_extract_methods_from_namespace)
+    Parrot_NameSpace_attributes * nsattrs;
     PMC *methods, *vtable_overrides;
 
     /* Pull in methods from the namespace, if any. */
     if (PMC_IS_NULL(ns))
         return;
 
+    nsattrs = PARROT_NAMESPACE(ns);
+
     /* Import any methods. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);*/
+    methods = nsattrs->methods;
+    nsattrs->methods = PMCNULL;
 
     if (!PMC_IS_NULL(methods)) {
         PMC * const iter = VTABLE_get_iter(interp, methods);
@@ -174,7 +180,9 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
     }
 
     /* Import any vtables. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);*/
+    vtable_overrides = nsattrs->vtable;
+    nsattrs->vtable = PMCNULL;
 
     if (!PMC_IS_NULL(vtable_overrides)) {
         PMC * const iter = VTABLE_get_iter(interp, vtable_overrides);
