@@ -346,6 +346,8 @@
 ^/frontend/parrot_debugger/.*\.gcov/
 ^/frontend/parrot_debugger/main\.o$
 ^/frontend/parrot_debugger/main\.o/
+^/frontend/pbc_disassemble/main\.o$
+^/frontend/pbc_disassemble/main\.o/
 ^/frontend/pbc_dump/.*\.gcda$
 ^/frontend/pbc_dump/.*\.gcda/
 ^/frontend/pbc_dump/.*\.gcno$
