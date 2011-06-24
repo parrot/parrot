@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, TT #1171' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 50 );
+plan( tests => 54 );
 
 =head1 NAME
 
@@ -1550,6 +1550,98 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex two levels deep' );
 .end
 CODE
 main
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'I-register lexicals' );
+.sub main :main
+    'il'()
+.end
+.sub 'il'
+    .lex '$i', $I0
+    store_lex '$i', 42
+    $I1 = find_lex '$i'
+    say $I1
+    'il_fetch'()
+.end
+.sub 'il_fetch' :outer('il')
+    $I0 = find_lex '$i'
+    say $I0
+.end
+CODE
+42
+42
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'N-register lexicals' );
+.sub main :main
+    'nl'()
+.end
+.sub 'nl'
+    .lex '$n', $N0
+    store_lex '$n', 6.9
+    $N1 = find_lex '$n'
+    say $N1
+    'nl_fetch'()
+.end
+.sub 'nl_fetch' :outer('nl')
+    $N0 = find_lex '$n'
+    say $N0
+.end
+CODE
+6.9
+6.9
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'S-register lexicals' );
+.sub main :main
+    'sl'()
+.end
+.sub 'sl'
+    .lex '$s', $S0
+    store_lex '$s', 'Staropramen'
+    $S1 = find_lex '$s'
+    say $S1
+    'sl_fetch'()
+.end
+.sub 'sl_fetch' :outer('sl')
+    $S0 = find_lex '$s'
+    say $S0
+.end
+CODE
+Staropramen
+Staropramen
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'all register lexicals' );
+.sub main :main
+    .lex 'i', $I0
+    .lex 'n', $N0
+    .lex 's', $S0
+    .lex 'p', $P0
+    
+    store_lex 'i', 101
+    store_lex 'n', 4.2
+    store_lex 's', 'Starobrno'
+    $P1 = box 'Pilsner Urquell'
+    store_lex 'p', $P1
+    
+    'czech'()
+.end
+.sub 'czech' :outer('main')
+    $I0 = find_lex 'i'
+    say $I0
+    $N0 = find_lex 'n'
+    say $N0
+    $S0 = find_lex 's'
+    say $S0
+    $P0 = find_lex 'p'
+    say $P0
+.end
+CODE
+101
+4.2
+Starobrno
+Pilsner Urquell
 OUTPUT
 
 # Local Variables:
