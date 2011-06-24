@@ -1,6 +1,8 @@
 New in 3.6.0
 - Core
   + Class.add_vtable_override now allows you to overwrite an override
+  + Integers, floats and strings can now be stored in lexical variables.
+    Previously, only PMCs could be stored in lexicals.
 
 New in 3.5.0
 - Core
