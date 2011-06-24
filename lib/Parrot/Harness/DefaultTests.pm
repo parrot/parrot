@@ -90,6 +90,7 @@ our @EXPORT_OK = qw(
     t/dynpmc/*.t
     t/library/*.t
     t/tools/*.t
+    t/tools/hbdb/*.t
     t/profiling/*.t
 );
 
