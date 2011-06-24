@@ -818,13 +818,9 @@ Exception handlers must be chainable.  When a handler cannot handle an
 exception, it must invoke its parent handler (preferably tailcalling).  If it
 has no parent handler, it must look through previous call frames until it finds
 one.  There must be a default top-level exception handler that handles all
-exceptions.  The top-level exception handler should  print some debugging
-information to stderr and exit with a non-zero exit code.
-
-{{{
-Does it make sense to require M0 interpreter implementations to install the
-default exception handler?
-}}}
+exceptions.  This handler should print some debugging information to stderr and
+exit with a non-zero exit code.  It is the M0 code's responsibility to create
+and install the top-level default exception handler.
 
 An exception is a chunk that knows how to do a few things.  It needs to look
 through the call chain for the first exception handler and invoke it, passing
