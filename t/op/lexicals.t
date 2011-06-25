@@ -1618,13 +1618,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'all register lexicals' );
     .lex 'n', $N0
     .lex 's', $S0
     .lex 'p', $P0
-    
+
     store_lex 'i', 101
     store_lex 'n', 4.2
     store_lex 's', 'Starobrno'
     $P1 = box 'Pilsner Urquell'
     store_lex 'p', $P1
-    
+
     'czech'()
 .end
 .sub 'czech' :outer('main')
