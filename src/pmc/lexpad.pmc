@@ -67,8 +67,19 @@ static INTVAL register_number_for_set(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* Locates the register number for getting the specified name
- * and type of lexical. */
+
+/*
+
+=item C<static INTVAL register_number_for_get(PARROT_INTERP, PMC *self, PMC
+*info, STRING *name, INTVAL reg_type)>
+
+Locates the register number for getting the specified name
+and type of lexical.
+
+=cut
+
+*/
+
 static INTVAL
 register_number_for_get(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
         ARGIN(STRING *name), INTVAL reg_type)
@@ -92,8 +103,18 @@ register_number_for_get(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
     return ((INTVAL)b->value) >> 2;
 }
 
-/* Locates the register number for setting the specified name
- * and type of lexical. */
+/*
+
+=item C<static INTVAL register_number_for_set(PARROT_INTERP, PMC *self, PMC
+*info, STRING *name, INTVAL reg_type)>
+
+Locates the register number for setting the specified name
+and type of lexical.
+
+=cut
+
+*/
+
 static INTVAL
 register_number_for_set(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
         ARGMOD(STRING *name), INTVAL reg_type)
