@@ -537,9 +537,13 @@ static int sub_pragma(PARROT_INTERP,
 
 /*
 
-=item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
+=item C<void Parrot_pf_destroy(PARROT_INTERP, PackFile *pf)>
 
 Deletes a C<PackFile>.
+
+=item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
+
+Deprecated. Same as C<Parrot_pf_destroy>. Use Parrot_pf_destroy instead.
 
 =cut
 
@@ -547,9 +551,9 @@ Deletes a C<PackFile>.
 
 PARROT_EXPORT
 void
-PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
+Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
-    ASSERT_ARGS(PackFile_destroy)
+    ASSERT_ARGS(Parrot_pf_destroy)
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped) {
@@ -567,6 +571,65 @@ PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
     pf->dirp   = NULL;
     PackFile_Segment_destroy(interp, &pf->directory.base);
     return;
+}
+
+PARROT_EXPORT
+void
+PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
+{
+    ASSERT_ARGS(PackFile_destroy)
+    Parrot_pf_destroy(interp, pf);
+}
+
+/*
+
+=item C<STRING * Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile *pf)>
+
+Serialize a PackFile * into a STRING buffer
+
+=cut
+
+*/
+
+PARROT_EXPORT
+STRING *
+Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile *pf)
+{
+    STRING      *str;
+    /* Calculate required memory */
+    const opcode_t length = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
+    opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(INTERP, length);
+
+    /* Copy related attributes to header */
+    pf->header->major     = attrs->version_major;
+    pf->header->minor     = attrs->version_minor;
+    pf->header->patch     = attrs->version_patch;
+    pf->header->uuid_type = attrs->uuid_type;
+
+    /* And pack it! */
+    PackFile_pack(INTERP, pf, ptr);
+
+    str = Parrot_str_new_init(INTERP, (const char*)ptr, length,
+            Parrot_binary_encoding_ptr, 0);
+    Parrot_gc_free_memory_chunk(INTERP, ptr);
+    return str;
+}
+
+PARROT_EXPORT
+PackFile *
+Parrot_pf_deserialize_from_string(PARROT_INTERP, ARGIN(STRING *str))
+{
+    PackFile       * const pf  = PackFile_new(INTERP, 0);
+    const opcode_t * const ptr =
+            (const opcode_t *)Parrot_str_cstring(INTERP, str);
+    const int length           = Parrot_str_byte_length(INTERP, str);
+
+    if (!PackFile_unpack(INTERP, pf, ptr, length)) {
+        PackFile_destroy(INTERP, pf);
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
+            EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile.");
+    }
+    return pf;
 }
 
 
@@ -1400,7 +1463,7 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
 
 /*
 
-=item C<PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
+=item C<PackFile * Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)>
 
 Allocates a new empty C<PackFile> and sets up the directory.
 
@@ -1442,6 +1505,10 @@ A Segment Header has these entries:
  - size         size of following op array, 0 if none
  * data         possibly empty data, or e.g. byte code
 
+=item C<PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
+
+Same as C<Parrot_pf_new>. Deprecated. Use Parrot_pf_new instead.
+
 =cut
 
 */
@@ -1450,9 +1517,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile *
-PackFile_new(PARROT_INTERP, INTVAL is_mapped)
+Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 {
-    ASSERT_ARGS(PackFile_new)
+    ASSERT_ARGS(Parrot_pf_new)
     PackFile * const pf = mem_gc_allocate_zeroed_typed(interp, PackFile);
     pf->header          = mem_gc_allocate_zeroed_typed(interp, PackFile_Header);
     pf->is_mmap_ped     = is_mapped;
@@ -1479,6 +1546,16 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     return pf;
 }
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PackFile *
+PackFile_new(PARROT_INTERP, INTVAL is_mapped)
+{
+    ASSERT_ARGS(PackFile_new)
+    return Parrot_pf_new(interp, is_mapped);
+}
+
 /*
 
 =item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
@@ -1489,11 +1566,6 @@ being returned. The only guarantees which are made by this interface are that:
 
 1) The PackFile* structure can be retrieved by VTABLE_get_pointer
 2) The PackFile* structure is marked for GC when the PMC is marked for GC
-
-=item C<static void mark_packfile_pmc(PARROT_INTERP, PMC *ptr_pmc, void
-*ptr_raw)>
-
-Mark the PackFile PMC for GC
 
 =cut
 
@@ -1512,9 +1584,8 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     /* XXX But it require a lot of effort to cleanup codebase */
     Parrot_block_GC_mark(interp);
 
-    ptr = Parrot_pmc_new(interp, enum_class_PtrObj);
+    ptr = Parrot_pmc_new(interp, enum_class_PackfileWrapper);
     VTABLE_set_pointer(interp, ptr, pf);
-    PTROBJ_SET_MARK(interp, ptr, mark_packfile_pmc);
 
     Parrot_unblock_GC_mark(interp);
 
@@ -1522,16 +1593,6 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
              fix to make sure packfiles aren't getting collected prematurely */
     Parrot_pmc_gc_register(interp, ptr);
     return ptr;
-}
-
-static void
-mark_packfile_pmc(PARROT_INTERP, ARGIN(PMC *ptr_pmc), ARGIN(void *ptr_raw))
-{
-    ASSERT_ARGS(mark_packfile_pmc)
-    PackFile * const pf = (PackFile*) ptr_raw;
-    UNUSED(ptr_pmc);
-
-    Parrot_pf_mark_packfile(interp, pf);
 }
 
 /*

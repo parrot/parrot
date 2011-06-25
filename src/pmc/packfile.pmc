@@ -165,24 +165,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
         PackFile                   * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
 
-        STRING      *str;
-
-        /* Calculate required memory */
-        const opcode_t length = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
-        opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(INTERP, length);
-
-        /* Copy related attributes to header */
-        pf->header->major     = attrs->version_major;
-        pf->header->minor     = attrs->version_minor;
-        pf->header->patch     = attrs->version_patch;
-        pf->header->uuid_type = attrs->uuid_type;
-
-        /* And pack it! */
-        PackFile_pack(INTERP, pf, ptr);
-
-        str = Parrot_str_new_init(INTERP, (const char*)ptr, length,
-                Parrot_binary_encoding_ptr, 0);
-        Parrot_gc_free_memory_chunk(INTERP, ptr);
+        STRING * const str = Parrot_pf_serialize_to_string(INTERP, pf);
 
         PackFile_destroy(INTERP, pf);
         return str;
@@ -202,28 +185,15 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
 
     VTABLE void set_string_native(STRING *str) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
-        PackFile                   * const pf    = PackFile_new(INTERP, 0);
-        const opcode_t             * const ptr   =
-                (const opcode_t *)Parrot_str_cstring(INTERP, str);
-
-        const int length = Parrot_str_byte_length(INTERP, str);
-
-        if (!PackFile_unpack(INTERP, pf, ptr, length)) {
-            PackFile_destroy(INTERP, pf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile.");
-        }
+        PackFile * const pf = Parrot_deserialize_from_string(INTERP, str);
 
         /* Disable GC during copy data into internal structures. */
         Parrot_block_GC_mark(INTERP);
 
         /* Copy values from PackFile header to own attributes */
         copy_packfile_header(INTERP, SELF, pf);
-
         VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
-
         Parrot_unblock_GC_mark(INTERP);
-
         PackFile_destroy(INTERP, pf);
     }
 

@@ -1,0 +1,22 @@
+pmclass PackfileManager auto_attrs {
+    METHOD current_packfile() {
+        PMC * const curr_pf = Parrot_pf_get_current_packfile(INTERP);
+        RETURN (PMC *curr_pf);
+    }
+
+    METHOD read_from_file(STRING * filename) {
+        PMC * const new_pf_pmc = Parrot_pf_read_pbc_file(INTERP, filename);
+        RETURN (PMC *new_pf_pmc);
+    }
+
+    METHOD write_to_file(PMC * pf) {
+        /* TODO */
+    }
+
+    METHOD deserialize(STRING *pbc) {
+        PackFile * const pf = Parrot_pf_deserialize_from_string(INTERP, pbc);
+        PMC * const pf_pmc = Parrot_pmc_new(INTERP, enum_class_PackfileWrapper);
+        VTABLE_set_pointer(INTERP, pf_pmc, pf);
+        RETURN (PMC *pf_pmc);
+    }
+}
