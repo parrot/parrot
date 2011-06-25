@@ -27,12 +27,35 @@ These are the vtable functions for the lexpad PMC.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static INTVAL register_number_for_get(PARROT_INTERP,
+    PMC *self,
+    PMC *info,
+    STRING *name,
+    INTVAL reg_type)
+        __attribute__nonnull__(1);
+
+static INTVAL register_number_for_set(PARROT_INTERP,
+    PMC *self,
+    PMC *info,
+    STRING *name,
+    INTVAL reg_type)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_register_number_for_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_register_number_for_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Locates the register number for getting the specified name
  * and type of lexical. */
-static INTVAL register_number_for_get(PARROT_INTERP, PMC *self,
-        PMC *info, STRING *name, INTVAL reg_type) {
+static INTVAL
+register_number_for_get(PARROT_INTERP, PMC *self, PMC *info, STRING *name,
+        INTVAL reg_type)
+{
     const Hash *hash;
     HashBucket *b;
 
@@ -52,8 +75,10 @@ static INTVAL register_number_for_get(PARROT_INTERP, PMC *self,
 
 /* Locates the register number for setting the specified name
  * and type of lexical. */
-static INTVAL register_number_for_set(PARROT_INTERP, PMC *self,
-        PMC *info, STRING *name, INTVAL reg_type) {
+static INTVAL
+register_number_for_set(PARROT_INTERP, PMC *self, PMC *info, STRING *name,
+        INTVAL reg_type)
+{
     const Hash       * hash;
     HashBucket       * b;
 
@@ -157,7 +182,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_get(INTERP, SELF, info, name, REGNO_PMC);
         if (reg < 0)
@@ -171,7 +196,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_get(INTERP, SELF, info, name, REGNO_INT);
         if (reg < 0)
@@ -186,7 +211,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_get(INTERP, SELF, info, name, REGNO_NUM);
         if (reg < 0)
@@ -201,7 +226,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_get(INTERP, SELF, info, name, REGNO_STR);
         if (reg < 0)
@@ -221,7 +246,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_integer_keyed_str(s);
     }
-    
+
     VTABLE FLOATVAL get_number_keyed(PMC *name) {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_number_keyed_str(s);
@@ -236,7 +261,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_set(INTERP, SELF, info, name, REGNO_PMC);
 
@@ -244,36 +269,36 @@ Return the LexInfo PMC, if any or a Null PMC.
         CTX_REG_PMC(INTERP, ctx, reg) = value;
         PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
-    
+
     VTABLE void set_integer_keyed_str(STRING *name, INTVAL value) {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_set(INTERP, SELF, info, name, REGNO_INT);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_INT(INTERP, ctx, reg) = value;
     }
-    
+
     VTABLE void set_number_keyed_str(STRING *name, FLOATVAL value) {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_set(INTERP, SELF, info, name, REGNO_NUM);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_NUM(INTERP, ctx, reg) = value;
     }
-    
+
     VTABLE void set_string_keyed_str(STRING *name, STRING *value) {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
-        
+
         GET_ATTR_lexinfo(interp, SELF, info);
         reg = register_number_for_set(INTERP, SELF, info, name, REGNO_STR);
 

@@ -227,6 +227,25 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
         PackFile_destroy(INTERP, pf);
     }
 
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Set a raw PackFile* pointer to this Packfile PMC
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void * ptr) {
+        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        PackFile * const pf = (PackFile *)ptr;
+        Parrot_block_GC_mark(INTERP);
+        copy_packfile_header(INTERP, SELF, pf);
+        VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
+        Parrot_unblock_GC_mark(INTERP);
+    }
+
 
 /*
 

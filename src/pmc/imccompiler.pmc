@@ -30,9 +30,18 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC * get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
+#define ASSERT_ARGS_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf_ptr_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -69,6 +78,19 @@ get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
     sub_data->name = Parrot_sprintf_c(interp, "EVAL_%d", current_eval);
     PackFile_fixup_subs(interp, PBC_MAIN, eval_pmc);
     return eval_pmc;
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC *
+get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
+{
+    ASSERT_ARGS(get_packfile_pmc)
+
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_ptr_pmc);
+    PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_Packfile);
+    VTABLE_set_pointer(interp, pf_pmc, pf);
+    return pf_pmc;
 }
 
 /* HEADERIZER HFILE: none */
@@ -195,6 +217,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
         eval_pmc = get_packfile_eval_pmc(interp, pf, attrs->current_eval++);
+        /*eval_pmc = get_packfile_pmc(INTERP, pf);*/
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
@@ -213,6 +236,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
         PMC * const old_pf = Parrot_pf_get_current_packfile(interp);
+        PMC * pf_pmc;
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -229,6 +253,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             const INTVAL code = imcc_last_error_code(imcc);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
+        /*pf_pmc = get_packfile_pmc(INTERP, pf);*/
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
