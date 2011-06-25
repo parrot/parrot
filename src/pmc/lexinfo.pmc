@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2010, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -78,7 +78,7 @@ compiler calls this method in response to a ".lex STRING, PREG" directive.
 */
 
     METHOD declare_lex_preg(STRING *name, INTVAL preg) {
-        VTABLE_set_integer_keyed_str(INTERP, SELF, name, 
+        VTABLE_set_integer_keyed_str(INTERP, SELF, name,
             (preg << 2) | REGNO_PMC);
     }
 
