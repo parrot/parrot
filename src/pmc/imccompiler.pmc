@@ -216,8 +216,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             INTVAL code = imcc_last_error_code(imcc);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
-        eval_pmc = get_packfile_eval_pmc(interp, pf, attrs->current_eval++);
-        /*eval_pmc = get_packfile_pmc(INTERP, pf);*/
+        eval_pmc = get_packfile_pmc(INTERP, pf);
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
@@ -253,6 +252,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             const INTVAL code = imcc_last_error_code(imcc);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
+        /* This causes errors during the build */
         /*pf_pmc = get_packfile_pmc(INTERP, pf);*/
 
         Parrot_pop_context(interp);
