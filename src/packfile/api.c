@@ -235,13 +235,6 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
 
-static void mark_packfile_pmc(PARROT_INTERP,
-    ARGIN(PMC *ptr_pmc),
-    ARGIN(void *ptr_raw))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PackFile * PackFile_append_pmc(PARROT_INTERP,
@@ -448,10 +441,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_mark_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ptr_pmc) \
-    , PARROT_ASSERT_ARG(ptr_raw))
 #define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
@@ -597,21 +586,15 @@ Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile *pf)
 {
     STRING      *str;
     /* Calculate required memory */
-    const opcode_t length = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
-    opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(INTERP, length);
-
-    /* Copy related attributes to header */
-    pf->header->major     = attrs->version_major;
-    pf->header->minor     = attrs->version_minor;
-    pf->header->patch     = attrs->version_patch;
-    pf->header->uuid_type = attrs->uuid_type;
+    const opcode_t length = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+    opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(interp, length);
 
     /* And pack it! */
-    PackFile_pack(INTERP, pf, ptr);
+    PackFile_pack(interp, pf, ptr);
 
-    str = Parrot_str_new_init(INTERP, (const char*)ptr, length,
+    str = Parrot_str_new_init(interp, (const char*)ptr, length,
             Parrot_binary_encoding_ptr, 0);
-    Parrot_gc_free_memory_chunk(INTERP, ptr);
+    Parrot_gc_free_memory_chunk(interp, ptr);
     return str;
 }
 
@@ -619,14 +602,14 @@ PARROT_EXPORT
 PackFile *
 Parrot_pf_deserialize_from_string(PARROT_INTERP, ARGIN(STRING *str))
 {
-    PackFile       * const pf  = PackFile_new(INTERP, 0);
+    PackFile       * const pf  = PackFile_new(interp, 0);
     const opcode_t * const ptr =
-            (const opcode_t *)Parrot_str_cstring(INTERP, str);
-    const int length           = Parrot_str_byte_length(INTERP, str);
+            (const opcode_t *)Parrot_str_cstring(interp, str);
+    const int length           = Parrot_str_byte_length(interp, str);
 
-    if (!PackFile_unpack(INTERP, pf, ptr, length)) {
-        PackFile_destroy(INTERP, pf);
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
+    if (!PackFile_unpack(interp, pf, ptr, length)) {
+        PackFile_destroy(interp, pf);
+        Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile.");
     }
     return pf;
@@ -1584,7 +1567,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     /* XXX But it require a lot of effort to cleanup codebase */
     Parrot_block_GC_mark(interp);
 
-    ptr = Parrot_pmc_new(interp, enum_class_PackfileWrapper);
+    ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
 
     Parrot_unblock_GC_mark(interp);
@@ -4368,7 +4351,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 =item C<static PackFile * PackFile_append_pmc(PARROT_INTERP, PMC * const
 pf_pmc)>
 
-Reads and appends a PBC it to the current directory.  Fixes up sub addresses in
+Reads and appends a PBC to the current directory.  Fixes up sub addresses in
 newly loaded bytecode and runs C<:load> subs.
 
 =cut

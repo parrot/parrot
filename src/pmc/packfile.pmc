@@ -165,6 +165,12 @@ Implementation note: all hard stuff done by PackfileDirectory.
         PackFile                   * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
 
+        /* Copy related attributes to header */
+        pf->header->major     = attrs->version_major;
+        pf->header->minor     = attrs->version_minor;
+        pf->header->patch     = attrs->version_patch;
+        pf->header->uuid_type = attrs->uuid_type;
+
         STRING * const str = Parrot_pf_serialize_to_string(INTERP, pf);
 
         PackFile_destroy(INTERP, pf);
@@ -185,7 +191,7 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
 
     VTABLE void set_string_native(STRING *str) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
-        PackFile * const pf = Parrot_deserialize_from_string(INTERP, str);
+        PackFile * const pf = Parrot_pf_deserialize_from_string(INTERP, str);
 
         /* Disable GC during copy data into internal structures. */
         Parrot_block_GC_mark(INTERP);

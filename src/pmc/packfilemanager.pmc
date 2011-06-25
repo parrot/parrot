@@ -1,3 +1,7 @@
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass PackfileManager auto_attrs {
     METHOD current_packfile() {
         PMC * const curr_pf = Parrot_pf_get_current_packfile(INTERP);
@@ -15,7 +19,7 @@ pmclass PackfileManager auto_attrs {
 
     METHOD deserialize(STRING *pbc) {
         PackFile * const pf = Parrot_pf_deserialize_from_string(INTERP, pbc);
-        PMC * const pf_pmc = Parrot_pmc_new(INTERP, enum_class_PackfileWrapper);
+        PMC * const pf_pmc = Parrot_pmc_new(INTERP, enum_class_PackfileView);
         VTABLE_set_pointer(INTERP, pf_pmc, pf);
         RETURN (PMC *pf_pmc);
     }
