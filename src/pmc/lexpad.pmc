@@ -30,31 +30,48 @@ These are the vtable functions for the lexpad PMC.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL register_number_for_get(PARROT_INTERP,
-    PMC *self,
-    PMC *info,
-    STRING *name,
+    ARGMOD(PMC *self),
+    ARGMOD(PMC *info),
+    ARGIN(STRING *name),
     INTVAL reg_type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*info);
 
 static INTVAL register_number_for_set(PARROT_INTERP,
-    PMC *self,
-    PMC *info,
-    STRING *name,
+    ARGMOD(PMC *self),
+    ARGMOD(PMC *info),
+    ARGMOD(STRING *name),
     INTVAL reg_type)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*info)
+        FUNC_MODIFIES(*name);
 
 #define ASSERT_ARGS_register_number_for_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_register_number_for_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Locates the register number for getting the specified name
  * and type of lexical. */
 static INTVAL
-register_number_for_get(PARROT_INTERP, PMC *self, PMC *info, STRING *name,
-        INTVAL reg_type)
+register_number_for_get(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
+        ARGIN(STRING *name), INTVAL reg_type)
 {
     const Hash *hash;
     HashBucket *b;
@@ -76,8 +93,8 @@ register_number_for_get(PARROT_INTERP, PMC *self, PMC *info, STRING *name,
 /* Locates the register number for setting the specified name
  * and type of lexical. */
 static INTVAL
-register_number_for_set(PARROT_INTERP, PMC *self, PMC *info, STRING *name,
-        INTVAL reg_type)
+register_number_for_set(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
+        ARGMOD(STRING *name), INTVAL reg_type)
 {
     const Hash       * hash;
     HashBucket       * b;
