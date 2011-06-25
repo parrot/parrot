@@ -54,8 +54,6 @@ current_eval)>
 
 get eval_pmc info from packfile
 
-=back
-
 =cut
 
 */
@@ -79,6 +77,18 @@ get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
     PackFile_fixup_subs(interp, PBC_MAIN, eval_pmc);
     return eval_pmc;
 }
+
+/*
+
+=item C<static PMC * get_packfile_pmc(PARROT_INTERP, PMC *pf_ptr_pmc)>
+
+Get a PMC pointer to a passed packfile pointer
+
+=back
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
