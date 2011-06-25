@@ -13,8 +13,8 @@ pmclass PackfileManager auto_attrs {
         RETURN (PMC *new_pf_pmc);
     }
 
-    METHOD write_to_file(PMC * pf) {
-        /* TODO */
+    METHOD write_to_file(PMC * pf, STRING *filename) {
+        Parrot_pf_write_pbc_file(INTERP, pf, filename);
     }
 
     METHOD deserialize(STRING *pbc) {

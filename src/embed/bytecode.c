@@ -246,29 +246,7 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_write_bytecode_to_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    else {
-        PIOHANDLE fp;
-        Parrot_block_GC_mark(interp);
-        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
-        if (fp == PIO_INVALID_HANDLE) {
-            Parrot_unblock_GC_mark(interp);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot open output file %Ss", filename);
-        }
-        else {
-            const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-            opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
-            PackFile_pack(interp, pf, packed);
-            PIO_WRITE(interp, fp, (char *)packed, size);
-        }
-        PIO_CLOSE(interp, fp);
-        Parrot_unblock_GC_mark(interp);
-    }
-
+    Parrot_pf_write_pbc_file(interp, pbc, filename);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

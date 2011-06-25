@@ -4562,6 +4562,11 @@ Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 
 /*
 
+=item C<void Parrot_pf_write_pbc_file(PARROT_INTERP, PMC *pf_pmc, STRING
+*filename)>
+
+Take a Packfile or PackfileView PMC and write its contents out as a .pbc file
+
 =item C<PMC * Parrot_pf_read_pbc_file(PARROT_INTERP, STRING * const fullname)>
 
 Read a .pbc file with the given C<fullname> into a PackFile structure.
@@ -4569,6 +4574,35 @@ Read a .pbc file with the given C<fullname> into a PackFile structure.
 =cut
 
 */
+
+PARROT_EXPORT
+void
+Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filename))
+{
+    ASSERT_ARGS(Parrot_pf_write_pbc_file)
+    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pf_pmc);
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not get packfile.");
+    else {
+        PIOHANDLE fp;
+        Parrot_block_GC_mark(interp);
+        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        if (fp == PIO_INVALID_HANDLE) {
+            Parrot_unblock_GC_mark(interp);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot open output file %Ss", filename);
+        }
+        else {
+            const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+            opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
+            PackFile_pack(interp, pf, packed);
+            PIO_WRITE(interp, fp, (char *)packed, size);
+        }
+        PIO_CLOSE(interp, fp);
+        Parrot_unblock_GC_mark(interp);
+    }
+}
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -4609,6 +4643,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
 
     return pfpmc;
 }
+
 
 /*
 

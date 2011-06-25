@@ -146,10 +146,6 @@ pmclass PackfileView auto_attrs {
         Parrot_pf_prepare_packfile_load(INTERP, SELF);
     }
 
-    METHOD execute(PMC * mainargs) {
-        Parrot_pf_execute_bytecode_program(INTERP, SELF, mainargs);
-    }
-
     METHOD serialize() {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
