@@ -80,18 +80,6 @@ foreach my $fh (@fh_ready) {
 # Remove generated .pbc file
 unlink $pbc;
 
-sub generate_pbc {
-    my $pir = shift;
-    my $pbc = $pir;
-
-    $pbc =~ s|\.pir|\.pbc|i;
-
-    eval { system "$PARROT -o $pbc $pir" };
-    diag("Failed to generate $pbc") if $@;
-
-    return $pbc;
-}
-
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
