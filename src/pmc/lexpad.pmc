@@ -73,6 +73,8 @@ static INTVAL
 register_number_for_get(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
         ARGIN(STRING *name), INTVAL reg_type)
 {
+    ASSERT_ARGS(register_number_for_get)
+
     const Hash *hash;
     HashBucket *b;
 
@@ -96,6 +98,8 @@ static INTVAL
 register_number_for_set(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
         ARGMOD(STRING *name), INTVAL reg_type)
 {
+    ASSERT_ARGS(register_number_for_set)
+
     const Hash       * hash;
     HashBucket       * b;
 
