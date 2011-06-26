@@ -1107,9 +1107,6 @@ Used to unarchive the hash.
         /* Thawed Hash was created from pmc_new_noinit */
         PObj_custom_mark_destroy_SETALL(SELF);
     }
-    METHOD set_key_type(INTVAL type) {
-        SELF.set_integer_native(type);
-    }
 
 /*
 
@@ -1118,6 +1115,10 @@ Used to unarchive the hash.
 =head1 Methods
 
 =over 4
+
+=item C<METHOD set_key_type(INTVAL)>
+
+Set the type of key in the hash.
 
 =item C<METHOD get_key_type()>
 
@@ -1137,6 +1138,10 @@ Return type of values in Hash.
 =cut
 
 */
+
+    METHOD set_key_type(INTVAL type) {
+        SELF.set_integer_native(type);
+    }
 
     METHOD get_key_type() {
         const INTVAL ret = ((Hash *)SELF.get_pointer())->key_type;
