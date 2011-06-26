@@ -572,18 +572,37 @@ PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 
 /*
 
-=item C<STRING * Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile *pf)>
+=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile * pf)>
+
+Returns the size, in bytes, that a packfile will be if serialized
+
+=item C<STRING * Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile * const
+pf)>
 
 Serialize a PackFile * into a STRING buffer
+
+=item C<PackFile * Parrot_pf_deserialize_from_string(PARROT_INTERP, STRING
+*str)>
+
+Deserialize a packfile which is stored in a STRING buffer
 
 =cut
 
 */
 
 PARROT_EXPORT
-STRING *
-Parrot_pf_serialize_to_string(PARROT_INTERP, PackFile *pf)
+INTVAL
+Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
 {
+    ASSERT_ARGS(Parrot_pf_serialized_size)
+    return PackFile_pack_size(interp, pf);
+}
+
+PARROT_EXPORT
+STRING *
+Parrot_pf_serialize_to_string(PARROT_INTERP, ARGIN(PackFile * const pf))
+{
+    ASSERT_ARGS(Parrot_pf_serialize_to_string)
     STRING      *str;
     /* Calculate required memory */
     const opcode_t length = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
@@ -602,6 +621,7 @@ PARROT_EXPORT
 PackFile *
 Parrot_pf_deserialize_from_string(PARROT_INTERP, ARGIN(STRING *str))
 {
+    ASSERT_ARGS(Parrot_pf_deserialize_from_string)
     PackFile       * const pf  = PackFile_new(interp, 0);
     const opcode_t * const ptr =
             (const opcode_t *)Parrot_str_cstring(interp, str);
@@ -4365,7 +4385,6 @@ static PackFile *
 PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
 {
     ASSERT_ARGS(PackFile_append_pmc)
-
     PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
     PARROT_ASSERT(!PMC_IS_NULL(interp->current_pf));
 

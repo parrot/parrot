@@ -84,7 +84,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
             "Could not unpack packfile");
     }
     *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    do_sub_pragmas(interp, *pbcpmc, PBC_PBC, *pbcpmc);
+    Parrot_pf_prepare_packfile_init(interp, *pbcpmc);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -190,7 +190,7 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
-    /* TODO: Break up the dependency with emebed.c */
+    /* TODO: Break up the dependency with embed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -218,13 +218,7 @@ Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
-    else {
-        const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-        opcode_t * const packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp, pf, packed);
-        *bc = Parrot_str_new_init(interp, (const char *)packed, size,
-                Parrot_binary_encoding_ptr, 0);
-    }
+    *bc = Parrot_pf_serialize_to_string(interp, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
