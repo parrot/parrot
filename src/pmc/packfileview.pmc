@@ -160,7 +160,7 @@ pmclass PackfileView auto_attrs {
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
             RETURN (STRING *STRINGNULL);
-        STRING * const str = Parrot_pf_serialize_to_string(INTERP, attrs->pf);
+        STRING * const str = Parrot_pf_serialize(INTERP, attrs->pf);
         RETURN (STRING *str);
     }
 

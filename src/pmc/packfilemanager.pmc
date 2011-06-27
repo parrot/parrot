@@ -18,7 +18,7 @@ pmclass PackfileManager auto_attrs {
     }
 
     METHOD deserialize(STRING *pbc) {
-        PackFile * const pf = Parrot_pf_deserialize_from_string(INTERP, pbc);
+        PackFile * const pf = Parrot_pf_deserialize(INTERP, pbc);
         PMC * const pf_pmc = Parrot_pmc_new(INTERP, enum_class_PackfileView);
         VTABLE_set_pointer(INTERP, pf_pmc, pf);
         RETURN (PMC *pf_pmc);

@@ -171,7 +171,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
         pf->header->patch     = attrs->version_patch;
         pf->header->uuid_type = attrs->uuid_type;
 
-        STRING * const str = Parrot_pf_serialize_to_string(INTERP, pf);
+        STRING * const str = Parrot_pf_serialize(INTERP, pf);
 
         PackFile_destroy(INTERP, pf);
         return str;
@@ -191,7 +191,7 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
 
     VTABLE void set_string_native(STRING *str) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
-        PackFile * const pf = Parrot_pf_deserialize_from_string(INTERP, str);
+        PackFile * const pf = Parrot_pf_deserialize(INTERP, str);
 
         /* Disable GC during copy data into internal structures. */
         Parrot_block_GC_mark(INTERP);

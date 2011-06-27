@@ -754,8 +754,7 @@ PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PackFile * Parrot_pf_deserialize_from_string(PARROT_INTERP,
-    ARGIN(STRING *str))
+PackFile * Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -806,8 +805,7 @@ PMC * Parrot_pf_read_pbc_file(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-STRING * Parrot_pf_serialize_to_string(PARROT_INTERP,
-    ARGIN(PackFile * const pf))
+STRING * Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -1012,8 +1010,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc) \
     , PARROT_ASSERT_ARG(file_name))
-#define ASSERT_ARGS_Parrot_pf_deserialize_from_string \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pf_deserialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_pf_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1039,7 +1036,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
     , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_read_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pf_serialize_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pf_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_pf_serialized_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -218,7 +218,7 @@ Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
-    *bc = Parrot_pf_serialize_to_string(interp, pf);
+    *bc = Parrot_pf_serialize(interp, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
