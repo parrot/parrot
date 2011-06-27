@@ -138,12 +138,14 @@ pmclass PackfileView auto_attrs {
         }
     }
 
-    METHOD trigger_init() {
-        Parrot_pf_prepare_packfile_init(INTERP, SELF);
-    }
-
-    METHOD trigger_load() {
-        Parrot_pf_prepare_packfile_load(INTERP, SELF);
+    METHOD trigger(STRING * flag) {
+        if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
+            Parrot_pf_prepare_packfile_load(INTERP, SELF);
+        else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
+            Parrot_pf_prepare_packfile_init(INTERP, SELF);
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "%S is not a valid packfile trigger", flag);
     }
 
     METHOD serialized_size() {
