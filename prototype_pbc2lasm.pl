@@ -104,7 +104,7 @@ foreach my $stmt (split m/\n/xms, $pasm)
     {
       # Reserve register 0-9 for the ops themselves
       my $num = $2 + 10;
-      $arg = "$1$num";
+      $arg = "\$$1$num";
     }
 
     $copy =~ s/\$O [INSP] $arg_cnt /$arg/xms;
