@@ -1379,8 +1379,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_substr>
 
-=item C<Parrot_PMC_substr_str>
-
 =item C<Parrot_PMC_subtract>
 
 =item C<Parrot_PMC_subtract_float>

@@ -309,13 +309,13 @@ For testing purpose only?
 
 /*
 
-=item C<VTABLE substr_str()>
+=item C<VTABLE substr()>
 
 =cut
 
 */
 
-    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We must clone here becase we can reallocate buffer behind the scene... */
