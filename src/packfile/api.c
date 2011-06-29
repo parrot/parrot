@@ -4512,7 +4512,8 @@ Parrot_PackFile
 PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
-    PMC * const pfpmc = Parrot_pf_read_pbc_file(interp, fullname);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
+    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
     UNUSED(debug);
     Parrot_pf_prepare_packfile_init(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
@@ -4584,7 +4585,8 @@ Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 
 Take a Packfile or PackfileView PMC and write its contents out as a .pbc file
 
-=item C<PMC * Parrot_pf_read_pbc_file(PARROT_INTERP, STRING * const fullname)>
+=item C<PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP, STRING * const
+fullname)>
 
 Read a .pbc file with the given C<fullname> into a PackFile structure.
 
@@ -4623,12 +4625,11 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC *
+PackFile *
 Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
 {
     ASSERT_ARGS(Parrot_pf_read_pbc_file)
     PackFile *pf;
-    PMC      *pfpmc;
     INTVAL    program_size;
 
     if (fullname == NULL || STRING_length(fullname) == 0) {
@@ -4656,9 +4657,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
         pf = read_pbc_file_packfile(interp, fullname, program_size);
     }
 
-    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-
-    return pfpmc;
+    return pf;
 }
 
 

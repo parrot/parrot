@@ -800,7 +800,7 @@ void Parrot_pf_prepare_packfile_load(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pf_read_pbc_file(PARROT_INTERP,
+PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP,
     ARGIN_NULLOK(STRING * const fullname))
         __attribute__nonnull__(1);
 

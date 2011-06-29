@@ -72,6 +72,9 @@ pmclass PackfileView auto_attrs {
     VTABLE void set_pointer(void * ptr) {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
+        if (attrs->pf != NULL)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Cannot overwrite existing pointer in PackfileView");
         attrs->pf = (PackFile*)ptr;
     }
 
@@ -179,5 +182,19 @@ pmclass PackfileView auto_attrs {
             }
         }
         RETURN (PMC *array);
+    }
+
+    METHOD read_from_file(STRING * filename) {
+        PackFile * const pf = Parrot_pf_read_pbc_file(INTERP, filename);
+        VTABLE_set_pointer(INTERP, SELF, pf);
+    }
+
+    METHOD write_to_file(STRING *filename) {
+        Parrot_pf_write_pbc_file(INTERP, SELF, filename);
+    }
+
+    METHOD deserialize(STRING *pbc) {
+        PackFile * const pf = Parrot_pf_deserialize(INTERP, pbc);
+        VTABLE_set_pointer(INTERP, SELF, pf);
     }
 }

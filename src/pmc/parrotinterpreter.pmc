@@ -556,6 +556,9 @@ Introspection interface. C<key> can be:
             return Parrot_pmc_new(INTERP, enum_class_Hash);
         }
 
+        if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "packfile")))
+            return Parrot_pf_get_current_packfile(INTERP);
+
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such item %Ss", item);
     }
