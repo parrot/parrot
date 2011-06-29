@@ -76,6 +76,8 @@ pmclass PackfileView auto_attrs {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Cannot overwrite existing pointer in PackfileView");
         attrs->pf = (PackFile*)ptr;
+        if (ptr != NULL)
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
     VTABLE void *get_pointer() {
