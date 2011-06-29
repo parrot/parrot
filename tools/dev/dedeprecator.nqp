@@ -10,18 +10,18 @@ for a deprecations and warn you about them.
 Usage:
 
 # scan the current directory for deprecations
-$ dedeprecator
+$ dedeprecator.nqp
 
 # scan test.pir for deprecations, using api.yaml
-$ dedeprecator test.pir
+$ dedeprecator.nqp test.pir
 
 # scan bar.pir and baz.pir using the alternate api.yaml file
-$ dedeprecator --apiyaml /somewhere/else/foo.yaml bar.pir baz.pir
+$ dedeprecator.nqp --apiyaml /somewhere/else/foo.yaml bar.pir baz.pir
 
 # in case you forgot everything
-$ dedeprecator -h
+$ dedeprecator.nqp -h
 # or
-$ dedeprecator --help
+$ dedeprecator.nqp --help
 =end README
 
 INIT {
