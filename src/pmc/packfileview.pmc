@@ -130,6 +130,21 @@ pmclass PackfileView auto_attrs {
         return ct->num.constants[idx];
     }
 
+    METHOD constant_counts() {
+        PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
+        if (!ct)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNEXPECTED_NULL,
+                "NULL or Malformed Packfile");
+        else {
+            PMC * const cnts = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+            VTABLE_set_integer_native(INTERP, cnts, 3);
+            VTABLE_set_integer_keyed_int(INTERP, cnts, 0, ct->num.const_count);
+            VTABLE_set_integer_keyed_int(INTERP, cnts, 1, ct->str.const_count);
+            VTABLE_set_integer_keyed_int(INTERP, cnts, 2, ct->pmc.const_count);
+            RETURN (PMC *cnts);
+        }
+    }
+
     METHOD main_sub() {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
