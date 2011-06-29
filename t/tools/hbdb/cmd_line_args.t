@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/tools/hbdb_t1.t - tests for the HBDB debugger
+t/tools/cmd_line_args.t - tests for the HBDB debugger
 
 =head1 SYNOPSIS
 
-    prove t/tools/hbdb_t1.t
+    prove t/tools/cmd_line_args.t
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,9 @@ use warnings;
 use lib qw(lib);
 
 use Test::More;
-use Parrot::Test::HBDB tests => 1;
+
+use Parrot::Config;
+use Parrot::Test::HBDB tests => 2;
 
 # Output to match
 my $help_regex = <<OUTPUT;
@@ -42,17 +44,14 @@ File:
 /m
 OUTPUT
 
+my $pir  = join $PConfig{slash}, qw(t tools hbdb testlib hello.pir);
 my $hbdb = Parrot::Test::HBDB->new();
 
-$hbdb->start();
-
-is(1, 1, "Foobar");
-
 # Test that command-line switches are recognized
-#hbdb_help_output_like("-h", $help_regex, "HBDB: Help message");
+$hbdb->arg_output_like('-h', $help_regex, 'HBDB: Help message');
 
 # Test that unknown switches fail correctly
-#hbdb_help_output_like("--foobar", $help_regex, "HBDB: Unknown options");
+$hbdb->arg_output_like('--foobar', $help_regex, 'HBDB: Unknown options');
 
 # Local Variables:
 #   mode: cperl

@@ -2045,7 +2045,7 @@ PBC_TEST_FILES = \
     t/op/testlib/test_strings.pbc \
     t/pmc/testlib/annotations.pbc \
     t/pmc/testlib/number.pbc \
-    t/tools/testlib/hello.pbc
+    t/tools/hbdb/testlib/hello.pbc
 PERL_TEST_FILES = \
     t/perl/*.t
 PIR_TEST_FILES = $(PIR_TESTS_DIR)/*.t
