@@ -24,7 +24,7 @@ This file implements various functions for creating and writing packfiles.
 #include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: include/parrot/packfile.h */
+/* HEADERIZER HFILE: src/packfile/pf_private.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
