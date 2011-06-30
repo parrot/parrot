@@ -108,6 +108,8 @@ const char * const cmd_help_help  = "List of commands:\n\n"
                                     "break\n"
                                     "\nType \"help\" followed by a command name.";
 
+const char * const cmd_quit_help  = "Exits hbdb.";
+
 /* Global command table */
 /*const hbdb_cmd_table_t command_table[] = {*/
     /*{ "break", "b", { &hbdb_cmd_break, cmd_break_help } },*/
@@ -243,11 +245,9 @@ hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_quit)
 
-    puts("TEST");
+    hbdb_destroy(interp);
 
-    /*Parrot_x_exit(interp, 0);*/
-
-    exit(0);
+    Parrot_x_exit(interp, 0);
 
     HBDB_FLAG_SET(interp, HBDB_EXIT);
     HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
