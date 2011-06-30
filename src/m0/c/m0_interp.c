@@ -18,6 +18,14 @@ int parse_mob_header( M0_Interp *interp, FILE *stream );
 
 void * read_from_stream( FILE *stream, size_t bytes );
 
+int    read_int_from_stream( FILE *stream );
+
+static int
+verify_mob_magic_number( M0_Interp *interp, FILE *stream );
+
+static int
+validate_mob_version( M0_Interp *interp, FILE *stream );
+
 int main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
 
@@ -59,13 +67,15 @@ new_call_frame(M0_Interp *interp) {
 int
 load_m0b(M0_Interp *interp, const char *filename) {
     FILE *mob = fopen( filename, "r" );
+    int   status;
 
     if (!mob)
         return 0;
 
-    parse_mob_header( interp, mob );
+    status = parse_mob_header( interp, mob );
 
-    return fclose( mob );
+    fclose( mob );
+    return status;
 }
 
 int run_ops(M0_Interp *interp, M0_CallFrame *cf) {
@@ -82,24 +92,48 @@ void interp_free( M0_Interp *interp ) {
 
 int
 parse_mob_header( M0_Interp *interp, FILE *stream ) {
+    if (!verify_mob_magic_number( interp, stream ))
+        return 0;
+
+    if (!validate_mob_version( interp, stream ))
+        return 0;
+
+    return 1;
+}
+
+int
+verify_mob_magic_number( M0_Interp *interp, FILE *stream ) {
     char      *magic     = (char *)read_from_stream( stream, 8 );
     const char header[8] = { 254, 77, 48, 66, 13, 10, 26, 10 };
 
     if (strncmp( magic, header, 8 ) != 0) {
         fprintf( stderr, "Invalid M0B header\n" );
         free( magic );
-        return( 0 );
+        return 0;
     }
 
     free( magic );
+
+    return 1;
+}
+
+int
+validate_mob_version( M0_Interp *interp, FILE *stream ) {
+    int version = read_int_from_stream( stream );
+
+    if (version == 0)
+        return 1;
+
+    fprintf( stderr, "Can't read m0b version %d\n", version );
+    return 0;
 }
 
 void *
 read_from_stream( FILE *stream, size_t bytes ) {
-    if (feof(stream))
+    if (feof( stream ))
         return NULL;
     else {
-        char *data = malloc( bytes );
+        void *data = malloc( bytes );
 
         if (fread(data, 1, bytes, stream) != bytes) {
             free( data );
@@ -107,5 +141,19 @@ read_from_stream( FILE *stream, size_t bytes ) {
         }
 
         return data;
+    }
+}
+
+int
+read_int_from_stream( FILE *stream ) {
+    if (feof( stream ))
+        return 0;
+    else {
+        int value = 0;
+
+        if (fread( &value, 1, 1, stream) != 1)
+            return 0;
+
+        return value;
     }
 }
