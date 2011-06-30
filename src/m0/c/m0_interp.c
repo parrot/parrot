@@ -14,15 +14,14 @@ void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
 
 void interp_free( M0_Interp *interp );
 
-int parse_mob_header( M0_Interp *interp, FILE *stream );
+int parse_mob_header(    M0_Interp *interp, FILE *stream );
 int parse_header_config( M0_Interp *interp, FILE *stream );
-int parse_mob_dirseg( M0_Interp *interp, FILE *stream );
+int parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
 
-void * read_from_stream( FILE *stream, size_t bytes );
-
-int   read_int_from_stream( FILE *stream );
-unsigned long read_long_from_stream( FILE *stream );
-int   read_padding_from_stream( FILE *stream, size_t bytes );
+void *        read_from_stream(         FILE *stream, size_t bytes );
+unsigned int  read_int_from_stream(     FILE *stream );
+unsigned long read_long_from_stream(    FILE *stream );
+unsigned int  read_padding_from_stream( FILE *stream, size_t bytes );
 
 static int
 verify_mob_magic_number( M0_Interp *interp, FILE *stream );
@@ -189,7 +188,7 @@ read_from_stream( FILE *stream, size_t bytes ) {
     }
 }
 
-int
+unsigned int
 read_int_from_stream( FILE *stream ) {
     if (feof( stream ))
         return 0;
@@ -217,7 +216,7 @@ read_long_from_stream( FILE *stream ) {
     }
 }
 
-int
+unsigned int
 read_padding_from_stream( FILE *stream, size_t bytes ) {
     int value[2] = {0, 0};
 
