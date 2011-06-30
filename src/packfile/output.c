@@ -21,6 +21,7 @@ This file implements various functions for creating and writing packfiles.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include "pf_private.h"
 #include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
