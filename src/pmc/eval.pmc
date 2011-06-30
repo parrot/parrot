@@ -299,6 +299,7 @@ Unarchives the code.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "couldn't unpack packfile");
 
+        /* Parrot_pf_prepare_packfile_init(INTERP, pfpmc); */
         do_sub_pragmas(INTERP, pfpmc, PBC_PBC, SELF);
 
         for (i = 0; i < pf->directory.num_segments; ++i) {
