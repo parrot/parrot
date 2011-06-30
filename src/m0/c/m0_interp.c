@@ -19,7 +19,8 @@ int parse_header_config( M0_Interp *interp, FILE *stream );
 
 void * read_from_stream( FILE *stream, size_t bytes );
 
-int    read_int_from_stream( FILE *stream );
+int   read_int_from_stream( FILE *stream );
+int   read_padding_from_stream( FILE *stream, size_t bytes );
 
 static int
 verify_mob_magic_number( M0_Interp *interp, FILE *stream );
@@ -102,7 +103,7 @@ parse_mob_header( M0_Interp *interp, FILE *stream ) {
     if (!parse_header_config( interp, stream ))
         return 0;
 
-    return 1;
+    return read_padding_from_stream( stream, 2 );
 }
 
 int
@@ -173,4 +174,14 @@ read_int_from_stream( FILE *stream ) {
 
         return value;
     }
+}
+
+int
+read_padding_from_stream( FILE *stream, size_t bytes ) {
+    int value[2] = {0, 0};
+
+    if (feof( stream ))
+        return 0;
+
+    return fread( &value, 1, bytes, stream ) == bytes;
 }
