@@ -18,6 +18,11 @@ int parse_mob_header(    M0_Interp *interp, FILE *stream );
 int parse_header_config( M0_Interp *interp, FILE *stream );
 int parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
 
+void add_chunk( M0_Interp     *interp,
+                const    char *name,
+                unsigned long  chunk_id,
+                unsigned long  name_length );
+
 void *        read_from_stream(         FILE *stream, size_t bytes );
 unsigned int  read_int_from_stream(     FILE *stream );
 unsigned long read_long_from_stream(    FILE *stream );
@@ -62,7 +67,7 @@ int main( int argc, const char *argv[]) {
 
 M0_Interp *
 new_interp() {
-    return malloc( sizeof (M0_Interp) );
+    return calloc( 1, sizeof (M0_Interp) );
 }
 
 M0_CallFrame *
@@ -73,7 +78,6 @@ new_call_frame(M0_Interp *interp) {
 int
 load_m0b(M0_Interp *interp, const char *filename) {
     FILE *mob = fopen( filename, "r" );
-    int   status;
 
     if (!mob)
         return 0;
@@ -88,8 +92,7 @@ load_m0b(M0_Interp *interp, const char *filename) {
         return 0;
     }
 
-    fclose( mob );
-    return status;
+    return fclose( mob ) == 0;
 }
 
 int run_ops(M0_Interp *interp, M0_CallFrame *cf) {
@@ -101,6 +104,15 @@ void call_frame_free( M0_Interp *interp, M0_CallFrame *cf) {
 }
 
 void interp_free( M0_Interp *interp ) {
+    M0_Chunk *chunk = interp->first_chunk;
+
+    while (chunk) {
+        M0_Chunk *next = chunk->next;
+        free( (char *)chunk->name );
+        free( chunk );
+        chunk = next;
+    }
+
     free( interp );
 }
 
@@ -158,12 +170,41 @@ parse_header_config( M0_Interp *interp, FILE *stream ) {
     return 1;
 }
 
-int parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
+int
+parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
     if (!validate_segment_identifier( interp, stream, M0_DIR_SEG ))
         return 0;
     else {
-        unsigned long seg_entry_count = read_long_from_stream( stream );
-        unsigned long seg_byte_count  = read_long_from_stream( stream );
+        const unsigned long seg_entry_count = read_long_from_stream( stream );
+        const unsigned long seg_byte_count  = read_long_from_stream( stream );
+        unsigned long       chunks_found    = 0;
+
+        for (chunks_found; chunks_found < seg_entry_count; chunks_found++) {
+            const unsigned long seg_offset  = read_long_from_stream( stream );
+            const unsigned long name_length = read_long_from_stream( stream ); 
+            const char         *name        =
+                                read_from_stream( stream, name_length );
+            add_chunk( interp, name, chunks_found, name_length);
+        }
+    }
+
+    /* XXX: is m0b invalid if it has no chunks? */
+    return 1;
+}
+
+void
+add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
+                                                unsigned long name_length) {
+    M0_Chunk *chunk    = malloc( sizeof (M0_Chunk) );
+    chunk->id          = chunk_id;
+    chunk->name        = name;
+    chunk->name_length = name_length;
+
+    if (!interp->first_chunk)
+        interp->first_chunk = chunk;
+    else {
+        interp->last_chunk->next = chunk;
+        interp->last_chunk       = chunk;
     }
 }
 
