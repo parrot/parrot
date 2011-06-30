@@ -2106,6 +2106,10 @@ smoke : smolder_test
 coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
 
+# temporary (?) target for hbdb testing
+hbdb_tests : corevm hbdb $(GEN_LIBRARY)
+	$(PROVE) t/tools/hbdb/*t
+
 # automake compatibility
 check : test
 
