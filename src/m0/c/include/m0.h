@@ -1,3 +1,5 @@
+#include "m0_constants.h"
+
 typedef struct {
     unsigned short mob_version;
     unsigned short ireg_size;

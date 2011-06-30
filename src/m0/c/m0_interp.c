@@ -16,10 +16,12 @@ void interp_free( M0_Interp *interp );
 
 int parse_mob_header( M0_Interp *interp, FILE *stream );
 int parse_header_config( M0_Interp *interp, FILE *stream );
+int parse_mob_dirseg( M0_Interp *interp, FILE *stream );
 
 void * read_from_stream( FILE *stream, size_t bytes );
 
 int   read_int_from_stream( FILE *stream );
+unsigned long read_long_from_stream( FILE *stream );
 int   read_padding_from_stream( FILE *stream, size_t bytes );
 
 static int
@@ -27,6 +29,9 @@ verify_mob_magic_number( M0_Interp *interp, FILE *stream );
 
 static int
 validate_mob_version( M0_Interp *interp, FILE *stream );
+
+static int
+validate_segment_identifier( M0_Interp *interp, FILE *stream, int seg_id );
 
 int main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
@@ -74,7 +79,15 @@ load_m0b(M0_Interp *interp, const char *filename) {
     if (!mob)
         return 0;
 
-    status = parse_mob_header( interp, mob );
+    if (!parse_mob_header( interp, mob )) {
+        fclose( mob );
+        return 0;
+    }
+
+    if (!parse_mob_dirseg( interp, mob )) {
+        fclose( mob );
+        return 0;
+    }
 
     fclose( mob );
     return status;
@@ -146,6 +159,20 @@ parse_header_config( M0_Interp *interp, FILE *stream ) {
     return 1;
 }
 
+int parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
+    if (!validate_segment_identifier( interp, stream, M0_DIR_SEG ))
+        return 0;
+    else {
+        unsigned long seg_entry_count = read_long_from_stream( stream );
+        unsigned long seg_byte_count  = read_long_from_stream( stream );
+    }
+}
+
+int
+validate_segment_identifier( M0_Interp *interp, FILE *stream, int seg_id ) {
+    return read_long_from_stream( stream ) == seg_id;
+}
+
 void *
 read_from_stream( FILE *stream, size_t bytes ) {
     if (feof( stream ))
@@ -170,6 +197,20 @@ read_int_from_stream( FILE *stream ) {
         int value = 0;
 
         if (fread( &value, 1, 1, stream) != 1)
+            return 0;
+
+        return value;
+    }
+}
+
+unsigned long
+read_long_from_stream( FILE *stream ) {
+    if (feof( stream ))
+        return 0;
+    else {
+        long value = 0;
+
+        if (fread( &value, 4, 1, stream) != 1)
             return 0;
 
         return value;
