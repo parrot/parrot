@@ -138,12 +138,12 @@ pmclass PackfileView auto_attrs {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNEXPECTED_NULL,
                 "NULL or Malformed Packfile");
         else {
-            PMC * const cnts = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
-            VTABLE_set_integer_native(INTERP, cnts, 3);
-            VTABLE_set_integer_keyed_int(INTERP, cnts, 0, ct->num.const_count);
-            VTABLE_set_integer_keyed_int(INTERP, cnts, 1, ct->str.const_count);
-            VTABLE_set_integer_keyed_int(INTERP, cnts, 2, ct->pmc.const_count);
-            RETURN (PMC *cnts);
+            PMC * const counts = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+            VTABLE_set_integer_native(INTERP, counts, 3);
+            VTABLE_set_integer_keyed_int(INTERP, counts, 0, ct->num.const_count);
+            VTABLE_set_integer_keyed_int(INTERP, counts, 1, ct->str.const_count);
+            VTABLE_set_integer_keyed_int(INTERP, counts, 2, ct->pmc.const_count);
+            RETURN (PMC *counts);
         }
     }
 
