@@ -33,7 +33,7 @@ use Parrot::Test::HBDB tests => 1;
 my $pir     = join $PConfig{slash}, qw(t tools hbdb testlib hello.pir);
 
 my $bad_cmd = 'this_is_not_a_command';
-my $err_msg = qr|\(hbdb\) Undefined command: "\w+". Try "help".|;
+my $err_msg = qr|Undefined command: "\w+". Try "help".|;
 
 my $hbdb    = Parrot::Test::HBDB->new();
 
