@@ -44,7 +44,7 @@ function.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
-typedef void (*hbdb_cmd_func_t)(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd));
+typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char * const cmd));
 
 typedef struct hbdb_cmd_t       hbdb_cmd_t;
 typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
@@ -100,19 +100,21 @@ const char * const cmd_break_help = "Sets a breakpoint at the specified location
                                     "break LOCATION\n\n"
                                     "If LOCATION is an address, breaks at the exact address.";
 
+/* TODO Do I need this string anymore? */
 const char * const cmd_help_help  = "List of commands:\n\n"
                                     "break\n"
                                     "\nType \"help\" followed by a command name.";
 
 /* Global command table */
 const hbdb_cmd_table_t command_table[] = {
-    { "break", 'b', { &hbdb_cmd_break, cmd_break_help } },
-    { "help",  'h', { &hbdb_cmd_help,  cmd_help_help  } }
+    { "break", "b", { &hbdb_cmd_break, cmd_break_help } },
+    { "help",  "h", { &hbdb_cmd_help,  cmd_help_help  } },
+    { "quit",  "q", { &hbdb_cmd_quit,  cmd_quit_help  } }
 };
 
 /*
 
-=item C<void hbdb_cmd_break(hbdb_t *hbdb, const char * const cmd)>
+=item C<void hbdb_cmd_break(PARROT_INTERP, const char * const cmd)>
 
 Sets a breakpoint at a specific location.
 
@@ -121,9 +123,40 @@ Sets a breakpoint at a specific location.
 */
 
 void
-hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
+hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_break)
+
+    hbdb_t            *hbdb;
+    hbdb_breakpoint_t *bp;
+    opcode_t           pos;
+
+    /* Get global structure */
+    hbdb = interp->hbdb;
+
+    /* Verify that an actual command was passed */
+    if (!cmd)
+        /* TODO Use an appropriate exception_type_enum */
+        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Null value passed to hbdb_cmd_break()");
+
+    /* Allocated memory for breakpoint */
+    bp = mem_gc_allocate_zeroed_typed(interp, hbdb_breakpoint_t);
+
+    /* Break at line number if debugging file, otherwise at program counter */
+    if (hbdb->file && hbdb->file->size) {
+        /* Do nothing thanks to IMCC */
+    }
+    else {
+        pos = interp->code->base.data;
+    }
+
+    /* TODO Logic for parsing conditionals goes here */
+
+    bp->pc = pos;
+    /*bp->line = line->number;*/
+
+    /* Don't skip, yet */
+    bp->skip = 0;
 
     /* STUB */
     printf("Look at me cotto! No hands!\n");
@@ -132,7 +165,7 @@ hbdb_cmd_break(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
 
 /*
 
-=item C<void hbdb_cmd_help(hbdb_t *hbdb, const char * const cmd)>
+=item C<void hbdb_cmd_help(PARROT_INTERP, const char * const cmd)>
 
 If C<command> is non-NULL, displays help message for C<command>. Otherwise, a
 general help message is displayed.
@@ -142,9 +175,77 @@ general help message is displayed.
 */
 
 void
-hbdb_cmd_help(ARGIN(hbdb_t *hbdb), ARGIN(const char * const cmd))
+hbdb_cmd_help(PARROT_INTERP, ARGIN(const char * const cmd))
 {
     ASSERT_ARGS(hbdb_cmd_help)
+
+    const hbdb_t           *hbdb;
+    const hbdb_cmd_t const *c;
+    
+    /* Get global structure */
+    hbdb = interp->hbdb;
+
+    /* Get command name */
+    c = parse_command(&cmd);
+
+    /* Verify that an actual command was passed */
+    if (cmd)  {
+        if (*cmd == '\0') {
+            unsigned int i;
+
+            Parrot_io_printf(hbdb->debugger, "List of commands:\n\n");
+
+            /* Iterate through global command table */
+            for (i = 0; i < (sizeof (command_table) / sizeof (hbdb_cmd_table_t)); i++) {
+                const hbdb_cmd_table_t * const tbl = command_table + i;
+
+                /* Display name and short message about each command */
+                Parrot_io_printf(hbdb->debugger,
+                                 "   %-12s  %s\n",
+                                 tbl->name,
+                                 "foo");
+                                 /*tbl->cmd->help);*/
+            }
+
+            Parrot_io_printf(hbdb->debugger,
+                             "\nType \"help\" followed by a command name for full documentation.\n");
+            Parrot_io_printf(hbdb->debugger,
+                             "Command name abbreviations are allowed if it's unambiguous.\n");
+        }
+        else {
+            Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n", cmd);
+        }
+    }
+    else {
+        /*Parrot_io_printf(interp, "%s\n", cmd->help);*/
+        /*printf("%s\n", c->help);*/
+        /*Parrot_io_printf(hbdb->debugger, "%s\n", c->help);*/
+    }
+}
+
+/*
+
+=item C<void hbdb_cmd_quit(PARROT_INTERP, const char * const cmd)>
+
+Exits HBDB.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char * const cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_quit)
+
+    puts("TEST");
+
+    /*Parrot_x_exit(interp, 0);*/
+
+    exit(0);
+
+    HBDB_FLAG_SET(interp, HBDB_EXIT);
+    HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
 }
 
 /*
@@ -178,9 +279,9 @@ hbdb_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_destroy)
 
+    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
-    /* TODO Do I need to free these? */
     mem_gc_free(interp, hbdb->last_command);
     mem_gc_free(interp, hbdb->current_command);
 
@@ -217,6 +318,7 @@ hbdb_get_command(PARROT_INTERP)
     STRING *readline;
     STRING *prompt;
 
+    /* Get global structure */
     hbdb = interp->hbdb;
 
     /* Flush stdout buffer */
@@ -331,6 +433,7 @@ hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(hbdb_start)
 
+    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
     /* Check that HBDB has been initialized properly */
@@ -392,6 +495,7 @@ command_line(PARROT_INTERP)
 {
     ASSERT_ARGS(command_line)
 
+    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
     while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
@@ -527,7 +631,7 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
     /* Check if a match was found */
     if (c) {
         /* Call command's function */
-        (*c->function)(hbdb, orig_cmd);
+        (*c->function)(interp, orig_cmd);
         return 0;
     }
     else {
