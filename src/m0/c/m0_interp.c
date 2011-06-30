@@ -15,6 +15,7 @@ void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
 void interp_free( M0_Interp *interp );
 
 int parse_mob_header( M0_Interp *interp, FILE *stream );
+int parse_header_config( M0_Interp *interp, FILE *stream );
 
 void * read_from_stream( FILE *stream, size_t bytes );
 
@@ -98,6 +99,9 @@ parse_mob_header( M0_Interp *interp, FILE *stream ) {
     if (!validate_mob_version( interp, stream ))
         return 0;
 
+    if (!parse_header_config( interp, stream ))
+        return 0;
+
     return 1;
 }
 
@@ -121,11 +125,24 @@ int
 validate_mob_version( M0_Interp *interp, FILE *stream ) {
     int version = read_int_from_stream( stream );
 
-    if (version == 0)
+    if (version == 0) {
+        interp->mob_version = 0;
         return 1;
+    }
 
     fprintf( stderr, "Can't read m0b version %d\n", version );
     return 0;
+}
+
+int
+parse_header_config( M0_Interp *interp, FILE *stream ) {
+    interp->ireg_size     = read_int_from_stream( stream );
+    interp->nreg_size     = read_int_from_stream( stream );
+    interp->opcode_t_size = read_int_from_stream( stream );
+    interp->pointer_size  = read_int_from_stream( stream );
+    interp->endianness    = read_int_from_stream( stream );
+
+    return 1;
 }
 
 void *
