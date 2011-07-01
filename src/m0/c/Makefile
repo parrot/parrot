@@ -1,9 +1,18 @@
 all: m0
 
-include/m0.h: include/m0_constants.h include/m0_compiler_defines.h
+include/m0.h: include/m0_constants.h include/m0_compiler_defines.h \
+	          include/m0_interp.h include/m0_mob.h
 
-m0 : include/m0.h m0_interp.c
-	$(CC) -W -Wall -g -Iinclude -o m0 m0_interp.c
+include/m0_interp.h: include/m0_interp_structures.h
+
+include/m0_interp_structures.h: include/m0_mob_structures.h
+
+include/m0_mob.h: include/m0_interp_structures.h include/m0_mob_structures.h
+
+m0_mob.c: include/m0_mob.h include/m0_constants.h include/m0_compiler_defines.h
+
+m0 : include/m0.h m0_interp.c m0_mob.c
+	$(CC) -W -Wall -g -Iinclude -o m0 m0_mob.c m0_interp.c
 
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
