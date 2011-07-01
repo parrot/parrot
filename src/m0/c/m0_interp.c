@@ -17,11 +17,21 @@ void interp_free( M0_Interp *interp );
 int parse_mob_header(    M0_Interp *interp, FILE *stream );
 int parse_header_config( M0_Interp *interp, FILE *stream );
 int parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
+int parse_mob_chunks(    M0_Interp *interp, FILE *stream );
 
 void add_chunk( M0_Interp     *interp,
                 const    char *name,
                 unsigned long  chunk_id,
                 unsigned long  name_length );
+
+M0_Constants_Segment *
+parse_mob_constants_segment( M0_Interp *interp, FILE *stream );
+
+M0_Metadata_Segment *
+parse_mob_metadata_segment( M0_Interp *interp, FILE *stream );
+
+M0_Bytecode_Segment *
+parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream );
 
 void *        read_from_stream(         FILE *stream, size_t bytes );
 unsigned int  read_int_from_stream(     FILE *stream );
@@ -88,6 +98,12 @@ load_m0b(M0_Interp *interp, const char *filename) {
     }
 
     if (!parse_mob_dirseg( interp, mob )) {
+        fclose( mob );
+        return 0;
+    }
+
+    if (!parse_mob_chunks( interp, mob ))
+    {
         fclose( mob );
         return 0;
     }
@@ -211,6 +227,36 @@ add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
 int
 validate_segment_identifier( M0_Interp *interp, FILE *stream, int seg_id ) {
     return read_long_from_stream( stream ) == seg_id;
+}
+
+int
+parse_mob_chunks( M0_Interp *interp, FILE *stream ) {
+    M0_Chunk *chunk = interp->first_chunk;
+
+    while (chunk) {
+        chunk->constants = parse_mob_constants_segment( interp, stream );
+        chunk->metadata  = parse_mob_metadata_segment(  interp, stream );
+        chunk->bytecode  = parse_mob_bytecode_segment(  interp, stream );
+
+        chunk            = chunk->next;
+    }
+
+    return 1;
+}
+
+M0_Constants_Segment *
+parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
+    return NULL;
+}
+
+M0_Metadata_Segment *
+parse_mob_metadata_segment( M0_Interp *interp, FILE *stream ) {
+    return NULL;
+}
+
+M0_Bytecode_Segment *
+parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream ) {
+    return NULL;
 }
 
 void *
