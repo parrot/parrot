@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "include/m0.h"
 
 M0_Interp * new_interp();
 
 M0_CallFrame * new_call_frame( M0_Interp *interp );
 
-int load_mob( M0_Interp *interp, const char *filename );
+int load_mob_file( M0_Interp *interp, const char *filename );
 
 int run_ops( M0_Interp *interp, M0_CallFrame *cf );
 
@@ -45,7 +46,8 @@ static int
 validate_mob_version( M0_Interp *interp, FILE *stream );
 
 static int
-validate_segment_identifier( M0_Interp *interp, FILE *stream, int seg_id );
+validate_segment_identifier( M0_Interp *interp, FILE *stream,
+                             unsigned int seg_id );
 
 int main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
@@ -59,7 +61,7 @@ int main( int argc, const char *argv[]) {
         exit(1);
     }
 
-    if (!load_m0b( interp, argv[1] )) {
+    if (!load_mob_file( interp, argv[1] )) {
         fprintf( stderr, "Could not load m0b file: '%s'\n", argv[1] );
         interp_free( interp );
         exit( 1 );
@@ -82,11 +84,12 @@ new_interp() {
 
 M0_CallFrame *
 new_call_frame(M0_Interp *interp) {
+    UNUSED(interp);
     return malloc( sizeof (M0_CallFrame) );
 }
 
 int
-load_m0b(M0_Interp *interp, const char *filename) {
+load_mob_file(M0_Interp *interp, const char *filename) {
     FILE *mob = fopen( filename, "r" );
 
     if (!mob)
@@ -112,10 +115,13 @@ load_m0b(M0_Interp *interp, const char *filename) {
 }
 
 int run_ops(M0_Interp *interp, M0_CallFrame *cf) {
-
+    UNUSED(interp);
+    UNUSED(cf);
+    return 0;
 }
 
 void call_frame_free( M0_Interp *interp, M0_CallFrame *cf) {
+    UNUSED(interp);
     free( cf );
 }
 
@@ -150,6 +156,8 @@ int
 verify_mob_magic_number( M0_Interp *interp, FILE *stream ) {
     char      *magic     = (char *)read_from_stream( stream, 8 );
     const char header[8] = { 254, 77, 48, 66, 13, 10, 26, 10 };
+
+    UNUSED(interp);
 
     if (strncmp( magic, header, 8 ) != 0) {
         fprintf( stderr, "Invalid M0B header\n" );
@@ -194,12 +202,16 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
         const unsigned long seg_entry_count = read_long_from_stream( stream );
         const unsigned long seg_byte_count  = read_long_from_stream( stream );
         unsigned long       chunks_found    = 0;
+        UNUSED(seg_byte_count);
 
-        for (chunks_found; chunks_found < seg_entry_count; chunks_found++) {
+        for (; chunks_found < seg_entry_count; chunks_found++) {
             const unsigned long seg_offset  = read_long_from_stream( stream );
             const unsigned long name_length = read_long_from_stream( stream ); 
             const char         *name        =
                                 read_from_stream( stream, name_length );
+
+            UNUSED(seg_offset);
+
             add_chunk( interp, name, chunks_found, name_length);
         }
     }
@@ -225,7 +237,9 @@ add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
 }
 
 int
-validate_segment_identifier( M0_Interp *interp, FILE *stream, int seg_id ) {
+validate_segment_identifier( M0_Interp *interp, FILE *stream,
+                             unsigned int seg_id ) {
+    UNUSED(interp);
     return read_long_from_stream( stream ) == seg_id;
 }
 
@@ -246,16 +260,22 @@ parse_mob_chunks( M0_Interp *interp, FILE *stream ) {
 
 M0_Constants_Segment *
 parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
+    UNUSED(interp);
+    UNUSED(stream);
     return NULL;
 }
 
 M0_Metadata_Segment *
 parse_mob_metadata_segment( M0_Interp *interp, FILE *stream ) {
+    UNUSED(interp);
+    UNUSED(stream);
     return NULL;
 }
 
 M0_Bytecode_Segment *
 parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream ) {
+    UNUSED(interp);
+    UNUSED(stream);
     return NULL;
 }
 

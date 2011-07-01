@@ -1,4 +1,5 @@
 #include "m0_constants.h"
+#include "m0_compiler_defines.h"
 
 typedef struct M0_Constants_Segment {
 

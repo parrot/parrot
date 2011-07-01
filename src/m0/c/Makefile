@@ -1,9 +1,9 @@
 all: m0
 
-include/m0.h: include/m0_constants.h
+include/m0.h: include/m0_constants.h include/m0_compiler_defines.h
 
 m0 : include/m0.h m0_interp.c
-	$(CC) -g -Iinclude -o m0 m0_interp.c
+	$(CC) -W -Wall -g -Iinclude -o m0 m0_interp.c
 
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
