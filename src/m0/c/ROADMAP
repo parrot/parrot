@@ -1,0 +1,26 @@
+Contributors welcome.
+
+* Run "Hello, world!" in the M0 interpreter
+
+* Improve the C code
+    * #define M0 types for unsigned long and other values stored in m0b files
+    * add nice malloc/calloc wrappers
+    * use a few well-chosen macros to reduce boilerplate
+
+* Implement remaining M0 ops
+
+* Add M0 string type
+
+* Verify all error paths for file handling
+    * Add tests for all combinations of missing/invalid M0 files
+    * Add Valgrind tests that no combination leaks memory or has invalid access
+
+* Reduce memory use of the M0 interpreter
+    * Change fopen/fread/fclose to use mmap
+    * Replace pointers in internal structs with offsets into m0b files
+    * Allow fallback when mmap is not available?
+    * Reduce use of structs declared in C
+
+* Integrate Makefile into Parrot's existing structure
+    * Allow the sane use of headerizer
+    * Probe for necessary system capabilities (mmap, valgrind?)
