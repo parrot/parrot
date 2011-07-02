@@ -17,7 +17,8 @@ typedef struct M0_Metadata_Segment {
 } M0_Metadata_Segment;
 
 typedef struct M0_Bytecode_Segment {
-
+    unsigned long  op_count;
+    unsigned int  *ops;
 } M0_Bytecode_Segment;
 
 typedef struct M0_Chunk {

@@ -264,8 +264,19 @@ parse_mob_metadata_segment( M0_Interp *interp, FILE *stream ) {
 
 M0_Bytecode_Segment *
 parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream ) {
-    UNUSED(interp);
-    UNUSED(stream);
+    if (!validate_segment_identifier( interp, stream, M0_BC_SEG ))
+        return 0;
+    else {
+        M0_Bytecode_Segment *bytecode = malloc( sizeof (M0_Bytecode_Segment) );
+        bytecode->op_count            = read_long_from_stream( stream );
+
+        /* the order of these operations is important */
+        bytecode->ops                 = (unsigned int *)
+            read_from_stream( stream, read_long_from_stream( stream ) );
+
+        return bytecode;
+    }
+
     return NULL;
 }
 

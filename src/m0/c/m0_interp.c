@@ -31,6 +31,9 @@ m0_chunk_free_constants( M0_Constants_Segment *constants );
 void
 m0_chunk_free_metadata( M0_Metadata_Segment *metadata );
 
+void
+m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode );
+
 int
 main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
@@ -105,6 +108,9 @@ m0_chunk_free( M0_Chunk *chunk ) {
     if (chunk->metadata)
         m0_chunk_free_metadata( chunk->metadata );
 
+    if (chunk->bytecode)
+        m0_chunk_free_bytecode( chunk->bytecode );
+
     free( (char *)chunk->name );
     free( chunk );
 }
@@ -137,4 +143,13 @@ m0_chunk_free_metadata( M0_Metadata_Segment *metadata )
 
     free( metadata->entries );
     free( metadata );
+}
+
+void
+m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode )
+{
+    if (bytecode->ops)
+        free( bytecode->ops );
+
+    free( bytecode );
 }
