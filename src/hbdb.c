@@ -88,13 +88,13 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* Contains information about the implementation of a particular command               */
 struct hbdb_cmd_t {
     hbdb_cmd_func_t    function;    /* Points to the function the executes the command */
-    char *help;        /* Help message associated with the command        */
+    const char *help;        /* Help message associated with the command        */
 };
 
 /* Contains general information about a particular command                             */
 struct hbdb_cmd_table_t {
-    char       *name;          /* Command name                            */
-    char       *short_name;    /* Command name abbreviation               */
+    const char       *name;          /* Command name                            */
+    const char       *short_name;    /* Command name abbreviation               */
     hbdb_cmd_t *cmd;           /* Command function and help message       */
 };
 
