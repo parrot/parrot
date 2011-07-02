@@ -404,6 +404,8 @@ hbdb_init(PARROT_INTERP)
         command_table[1].cmd->function = &hbdb_cmd_help;
         command_table[1].cmd->help     = cmd_help_help;
 
+        /* TEST */
+
         /*command_table[2].name          = "quit";*/
         /*command_table[2].short_name    = "q";*/
         /*command_table[2].cmd->function = &hbdb_cmd_quit;*/
