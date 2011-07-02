@@ -115,9 +115,6 @@ use Test::More ();
 
 use Parrot::Config;
 
-# TODO Do I need this if I "use base"?
-require Exporter;
-
 use base qw(Exporter);
 
 my $builder;
