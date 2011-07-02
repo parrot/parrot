@@ -5,8 +5,15 @@ typedef struct M0_Constants_Segment {
     unsigned long   count;
 } M0_Constants_Segment;
 
-typedef struct M0_Metadata_Segment {
+typedef struct M0_Metadata_Entry {
+    unsigned long offset;
+    unsigned long name_index;
+    unsigned long value_index;
+} M0_Metadata_Entry;
 
+typedef struct M0_Metadata_Segment {
+    const M0_Metadata_Entry **entries;
+    unsigned long             count;
 } M0_Metadata_Segment;
 
 typedef struct M0_Bytecode_Segment {

@@ -25,6 +25,12 @@ interp_free( M0_Interp *interp );
 static void
 m0_chunk_free( M0_Chunk *chunk );
 
+void
+m0_chunk_free_constants( M0_Constants_Segment *constants );
+
+void
+m0_chunk_free_metadata( M0_Metadata_Segment *metadata );
+
 int
 main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
@@ -93,17 +99,42 @@ interp_free( M0_Interp *interp ) {
 
 void
 m0_chunk_free( M0_Chunk *chunk ) {
-    if (chunk->constants) {
-        unsigned long count = chunk->constants->count;
-        unsigned long i     = 0;
-        for (i = 0; i < count; i++) {
-            if( chunk->constants->consts[i] )
-                free( (char *)chunk->constants->consts[i] );
-        }
+    if (chunk->constants)
+        m0_chunk_free_constants( chunk->constants );
 
-        free( chunk->constants->consts );
-        free( chunk->constants );
-    }
+    if (chunk->metadata)
+        m0_chunk_free_metadata( chunk->metadata );
+
     free( (char *)chunk->name );
     free( chunk );
+}
+
+void
+m0_chunk_free_constants( M0_Constants_Segment *constants )
+{
+    const unsigned long count = constants->count;
+    unsigned       long i     = 0;
+
+    for (i = 0; i < count; i++) {
+        if ( constants->consts[i] )
+            free( (void *)constants->consts[i] );
+    }
+
+    free( constants->consts );
+    free( constants );
+}
+
+void
+m0_chunk_free_metadata( M0_Metadata_Segment *metadata )
+{
+    const unsigned long count = metadata->count;
+    unsigned       long i     = 0;
+
+    for (i = 0; i < count; i++) {
+        if ( metadata->entries[i] )
+            free( (void *)metadata->entries[i] );
+    }
+
+    free( metadata->entries );
+    free( metadata );
 }

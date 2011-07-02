@@ -232,8 +232,33 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
 
 M0_Metadata_Segment *
 parse_mob_metadata_segment( M0_Interp *interp, FILE *stream ) {
-    UNUSED(interp);
-    UNUSED(stream);
+    if (!validate_segment_identifier( interp, stream, M0_META_SEG ))
+        return 0;
+    else {
+        const unsigned long  entry_count = read_long_from_stream( stream );
+        const unsigned long  byte_count  = read_long_from_stream( stream );
+        unsigned long        i           = 0;
+        M0_Metadata_Segment *segment     =
+            malloc( sizeof( M0_Metadata_Segment) );
+        segment->entries =
+            malloc( sizeof( M0_Metadata_Entry * ) * entry_count );
+        segment->count   = entry_count;
+
+        UNUSED( byte_count );
+
+        for (i = 0; i < entry_count; i++) {
+            M0_Metadata_Entry *entry = malloc( sizeof( M0_Metadata_Entry ) );
+
+            entry->offset            = read_long_from_stream( stream );
+            entry->name_index        = read_long_from_stream( stream );
+            entry->value_index       = read_long_from_stream( stream );
+
+            segment->entries[i]      = entry;
+        }
+
+        return segment;
+    }
+
     return NULL;
 }
 
