@@ -267,12 +267,16 @@ parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream ) {
     if (!validate_segment_identifier( interp, stream, M0_BC_SEG ))
         return 0;
     else {
-        M0_Bytecode_Segment *bytecode = malloc( sizeof (M0_Bytecode_Segment) );
-        bytecode->op_count            = read_long_from_stream( stream );
+        M0_Bytecode_Segment *bytecode  = malloc( sizeof (M0_Bytecode_Segment) );
+        const unsigned long  op_count  = read_long_from_stream( stream );
+        const unsigned long  num_bytes = read_long_from_stream( stream );
+        UNUSED(num_bytes);
 
-        /* the order of these operations is important */
-        bytecode->ops                 = (unsigned int *)
-            read_from_stream( stream, read_long_from_stream( stream ) );
+        /* XXX: num_bytes can be zero. Sigh. */
+
+        bytecode->op_count             = op_count;
+        bytecode->ops                  = (unsigned char *)
+            read_from_stream( stream, op_count * 4 );
 
         return bytecode;
     }

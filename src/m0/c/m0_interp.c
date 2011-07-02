@@ -68,8 +68,13 @@ new_interp() {
 
 M0_CallFrame *
 new_call_frame( M0_Interp *interp ) {
-    UNUSED(interp);
-    return malloc( sizeof (M0_CallFrame) );
+    M0_CallFrame *frame = malloc( sizeof (M0_CallFrame) );
+
+    /* this is a silly minimal hack for now */
+    frame->active_chunk = interp->first_chunk;
+    frame->pc           = 0;
+
+    return frame;
 }
 
 void

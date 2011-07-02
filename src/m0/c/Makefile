@@ -16,7 +16,7 @@ m0_interp.c: include/m0.h include/m0_mob.h include/m0_constants.h \
 
 m0_mob.c: include/m0_mob.h include/m0_constants.h include/m0_compiler_defines.h
 
-m0_ops.c: include/m0_ops.h include/m0_compiler_defines.h
+m0_ops.c: include/m0_ops.h include/m0_mob_structures.h
 
 m0 : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 	$(CC) -O3 -W -Wall -g -Iinclude -o m0 m0_mob.c m0_interp.c m0_ops.c

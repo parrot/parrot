@@ -13,7 +13,8 @@ typedef struct {
 } M0_Interp;
 
 typedef struct {
-
+    M0_Chunk     *active_chunk;
+    unsigned long pc;
 } M0_CallFrame;
 
 #   define M0_INTERP_STRUCTURES_H 1
