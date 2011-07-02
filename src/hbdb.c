@@ -85,17 +85,17 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* Contains information about the implementation of a particular command               */
+/* Contains information about the implementation of a particular command            */
 struct hbdb_cmd_t {
-    hbdb_cmd_func_t    function;    /* Points to the function the executes the command */
-    const char *help;        /* Help message associated with the command        */
+    hbdb_cmd_func_t function;    /* Points to the function the executes the command */
+    const char     *help;        /* Help message associated with the command        */
 };
 
-/* Contains general information about a particular command                             */
+/* Contains general information about a particular command                */
 struct hbdb_cmd_table_t {
-    const char       *name;          /* Command name                            */
-    const char       *short_name;    /* Command name abbreviation               */
-    hbdb_cmd_t *cmd;           /* Command function and help message       */
+    const char       *name;          /* Command name                      */
+    const char       *short_name;    /* Command name abbreviation         */
+    hbdb_cmd_t       *cmd;           /* Command function and help message */
 };
 
 /* Help message displayed for each command */
@@ -394,17 +394,15 @@ hbdb_init(PARROT_INTERP)
         hbdb->last_command     = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
 
-        command_table[0].name          = "break";
-        command_table[0].short_name    = "b";
-        command_table[0].cmd->function = &hbdb_cmd_break;
-        command_table[0].cmd->help     = cmd_break_help;
+        /*command_table[0].name          = "break";*/
+        /*command_table[0].short_name    = "b";*/
+        /*command_table[0].cmd->function = &hbdb_cmd_break;*/
+        /*command_table[0].cmd->help     = cmd_break_help;*/
 
-        command_table[1].name          = "help";
-        command_table[1].short_name    = "h";
-        command_table[1].cmd->function = &hbdb_cmd_help;
-        command_table[1].cmd->help     = cmd_help_help;
-
-        /* TEST */
+        /*command_table[1].name          = "help";*/
+        /*command_table[1].short_name    = "h";*/
+        /*command_table[1].cmd->function = &hbdb_cmd_help;*/
+        /*command_table[1].cmd->help     = cmd_help_help;*/
 
         /*command_table[2].name          = "quit";*/
         /*command_table[2].short_name    = "q";*/
