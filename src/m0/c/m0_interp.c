@@ -4,6 +4,7 @@
 
 #include "include/m0.h"
 #include "include/m0_mob.h"
+#include "include/m0_ops.h"
 #include "include/m0_constants.h"
 #include "include/m0_compiler_defines.h"
 
@@ -12,9 +13,6 @@ new_interp();
 
 static M0_CallFrame *
 new_call_frame( M0_Interp *interp );
-
-static int
-run_ops( M0_Interp *interp, M0_CallFrame *cf );
 
 static void
 call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
@@ -72,13 +70,6 @@ M0_CallFrame *
 new_call_frame( M0_Interp *interp ) {
     UNUSED(interp);
     return malloc( sizeof (M0_CallFrame) );
-}
-
-int
-run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
-    UNUSED(interp);
-    UNUSED(cf);
-    return 0;
 }
 
 void
