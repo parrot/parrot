@@ -108,7 +108,7 @@ void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void hbdb_cmd_help(PARROT_INTERP, ARGIN(const char * const cmd))
+void hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
