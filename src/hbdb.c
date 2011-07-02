@@ -172,7 +172,7 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
 
 /*
 
-=item C<void hbdb_cmd_help(PARROT_INTERP, const char * const cmd)>
+=item C<void hbdb_cmd_help(PARROT_INTERP, const char *cmd)>
 
 If C<command> is non-NULL, displays help message for C<command>. Otherwise, a
 general help message is displayed.
@@ -182,12 +182,12 @@ general help message is displayed.
 */
 
 void
-hbdb_cmd_help(PARROT_INTERP, ARGIN(const char * const cmd))
+hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_help)
 
-    const hbdb_t           *hbdb;
-    const hbdb_cmd_t const *c;
+    const hbdb_t     *hbdb;
+    const hbdb_cmd_t *c;
     
     /* Get global structure */
     hbdb = interp->hbdb;
@@ -397,12 +397,12 @@ hbdb_init(PARROT_INTERP)
         command_table[0].name          = "break";
         command_table[0].short_name    = "b";
         command_table[0].cmd->function = &hbdb_cmd_break;
-        command_table[0].cmd->help    = &cmd_break_help;
+        command_table[0].cmd->help     = cmd_break_help;
 
         command_table[1].name          = "help";
         command_table[1].short_name    = "h";
         command_table[1].cmd->function = &hbdb_cmd_help;
-        command_table[1].cmd->help    = &cmd_help_help;
+        command_table[1].cmd->help     = cmd_help_help;
 
         command_table[2].name          = "quit";
         command_table[2].short_name    = "q";
