@@ -91,11 +91,11 @@ struct hbdb_cmd_t {
     const char     *help;        /* Help message associated with the command        */
 };
 
-/* Contains general information about a particular command                */
+/* Contains general information about a particular command          */
 struct hbdb_cmd_table_t {
-    const char       *name;          /* Command name                      */
-    const char       *short_name;    /* Command name abbreviation         */
-    hbdb_cmd_t       *cmd;           /* Command function and help message */
+    const char *name;          /* Command name                      */
+    const char *short_name;    /* Command name abbreviation         */
+    hbdb_cmd_t *cmd;           /* Command function and help message */
 };
 
 /* Help message displayed for each command */
@@ -588,7 +588,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
             const hbdb_cmd_table_t * const tbl = command_table + i;
 
             /* Check if user entered command's abbreviation */
-            if ((len == 1) && (tbl->short_name == (*cmd)[0])) {
+            if ((len == 1) && (tbl->short_name == *cmd)) {
                 hits  = 1;
                 found = i;
                 break;
