@@ -805,7 +805,22 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
         /* Disable pc */
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
 
+        /* Execute next opcode */
         DO_OP(pc, interp);
+
+        /* Store current opcode */
+        interp->hbdb->current_opcode = pc;
+
+        if (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
+            hbdb_start(interp, pc);
+        }
+        else {
+            /*if (hbdb_check_bp()) {*/
+            if ("REMOVE ME") {
+                hbdb_start(interp, pc);
+                continue;
+            }
+        }
     }
 
     return pc;

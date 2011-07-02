@@ -154,12 +154,12 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
         /* Do nothing thanks to IMCC */
     }
     else {
-        /*pos = interp->code->base.data;*/
+        pos = interp->code->base.data;
     }
 
     /* TODO Logic for parsing conditionals goes here */
 
-    /*bp->pc = pos;*/
+    bp->pc = pos;
     /*bp->line = line->number;*/
 
     /* Don't skip, yet */
@@ -438,6 +438,8 @@ hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         HBDB_FLAG_SET(interp, HBDB_STOPPED);
     } while (!(HBDB_FLAG_TEST(interp, HBDB_EXIT)));
 }
+
+/* TODO Does hbdb_start() need pc arg? interp->hbdb->current_opcode instead? */
 
 /*
 
