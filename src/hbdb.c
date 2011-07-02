@@ -87,8 +87,8 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 
 /* Contains information about the implementation of a particular command               */
 struct hbdb_cmd_t {
-    hbdb_cmd_func_t    function;    /* Points to the function the executes the command */
-    char *help;        /* Help message associated with the command        */
+    hbdb_cmd_func_t function;    /* Points to the function the executes the command */
+    char           *help;        /* Help message associated with the command        */
 };
 
 /* Contains general information about a particular command                             */
@@ -111,13 +111,13 @@ const char * const cmd_help_help  = "List of commands:\n\n"
 const char * const cmd_quit_help  = "Exits hbdb.";
 
 /* Global command table */
-/*const hbdb_cmd_table_t command_table[] = {*/
-    /*{ "break", "b", { &hbdb_cmd_break, cmd_break_help } },*/
-    /*{ "help",  "h", { &hbdb_cmd_help,  cmd_help_help  } },*/
-    /*{ "quit",  "q", { &hbdb_cmd_quit,  cmd_quit_help  } }*/
-/*};*/
+const hbdb_cmd_table_t command_table[] = {
+    { "break", "b", { &hbdb_cmd_break, cmd_break_help } },
+    { "help",  "h", { &hbdb_cmd_help,  cmd_help_help  } },
+    { "quit",  "q", { &hbdb_cmd_quit,  cmd_quit_help  } }
+};
 
-hbdb_cmd_table_t command_table[NUM_CMDS];
+/*hbdb_cmd_table_t command_table[NUM_CMDS];*/
 
 /*
 
@@ -394,21 +394,21 @@ hbdb_init(PARROT_INTERP)
         hbdb->last_command     = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
 
-        command_table[0].name          = "break";
-        command_table[0].short_name    = "b";
-        command_table[0].cmd->function = &hbdb_cmd_break;
-        command_table[0].cmd->help    = &cmd_break_help;
+        /*command_table[0].name          = "break";*/
+        /*command_table[0].short_name    = "b";*/
+        /*command_table[0].cmd->function = &hbdb_cmd_break;*/
+        /*command_table[0].cmd->help    = &cmd_break_help;*/
 
-        command_table[1].name          = "help";
-        command_table[1].short_name    = "h";
-        command_table[1].cmd->function = &hbdb_cmd_help;
-        command_table[1].cmd->help    = &cmd_help_help;
+        /*command_table[1].name          = "help";*/
+        /*command_table[1].short_name    = "h";*/
+        /*command_table[1].cmd->function = &hbdb_cmd_help;*/
+        /*command_table[1].cmd->help    = &cmd_help_help;*/
 
-        command_table[2].name          = "quit";
-        command_table[2].short_name    = "q";
-        command_table[2].cmd->function = &hbdb_cmd_quit;
+        /*command_table[2].name          = "quit";*/
+        /*command_table[2].short_name    = "q";*/
+        /*command_table[2].cmd->function = &hbdb_cmd_quit;*/
         /*command_table[2].cmd->help    = &cmd_help_quit;*/
-        command_table[2].cmd->help    = "FIXME";
+        /*command_table[2].cmd->help    = "FIXME";*/
     }
 
     /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
@@ -613,7 +613,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         if (hits == 1) {
             *cmd = skip_whitespace(next);
 
-            return &(command_table[found].cmd);
+            return (const hbdb_cmd_t *) &(command_table[found].cmd);
         }
     }
 
