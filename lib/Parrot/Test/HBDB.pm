@@ -196,7 +196,7 @@ sub cmd_output_is {
 
         # Only read from HBDB_STDERR for bad commands
         if (fileno $fh  == fileno \*HBDB_STDERR) {
-            my @lines = <HBDB_STDERR>;
+            my @lines = <HBDB_STDERR> || '';
 
             Test::More::is($lines[0], $expected, $desc);
         }
@@ -235,7 +235,7 @@ sub cmd_output_like {
 
         # Only read from HBDB_STDERR for bad commands
         if (fileno $fh  == fileno \*HBDB_STDERR) {
-            my @lines = <HBDB_STDERR>;
+            my @lines = <HBDB_STDERR> || '';
 
             Test::More::like($lines[0], $expected, $desc);
         }
