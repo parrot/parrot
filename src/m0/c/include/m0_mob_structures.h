@@ -1,7 +1,8 @@
 #ifndef M0_MOB_STRUCTURES_H
 
 typedef struct M0_Constants_Segment {
-
+    const char    **consts;
+    unsigned long   count;
 } M0_Constants_Segment;
 
 typedef struct M0_Metadata_Segment {

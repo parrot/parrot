@@ -3,32 +3,46 @@
 #include <string.h>
 
 #include "include/m0_mob.h"
+#include "include/m0_mob_structures.h"
 #include "include/m0_constants.h"
 #include "include/m0_compiler_defines.h"
 
-int parse_mob_header(    M0_Interp *interp, FILE *stream );
-int parse_header_config( M0_Interp *interp, FILE *stream );
-int parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
-int parse_mob_chunks(    M0_Interp *interp, FILE *stream );
+static int
+parse_mob_header(    M0_Interp *interp, FILE *stream );
 
-void add_chunk( M0_Interp     *interp,
-                const    char *name,
-                unsigned long  chunk_id,
-                unsigned long  name_length );
+static int
+parse_header_config( M0_Interp *interp, FILE *stream );
 
-M0_Constants_Segment *
+static int
+parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
+
+static int
+parse_mob_chunks(    M0_Interp *interp, FILE *stream );
+
+static void
+add_chunk( M0_Interp     *interp,   const    char *name,
+           unsigned long  chunk_id, unsigned long  name_length );
+
+static M0_Constants_Segment *
 parse_mob_constants_segment( M0_Interp *interp, FILE *stream );
 
-M0_Metadata_Segment *
+static M0_Metadata_Segment *
 parse_mob_metadata_segment( M0_Interp *interp, FILE *stream );
 
-M0_Bytecode_Segment *
+static M0_Bytecode_Segment *
 parse_mob_bytecode_segment( M0_Interp *interp, FILE *stream );
 
-void *        read_from_stream(         FILE *stream, size_t bytes );
-unsigned int  read_int_from_stream(     FILE *stream );
-unsigned long read_long_from_stream(    FILE *stream );
-unsigned int  read_padding_from_stream( FILE *stream, size_t bytes );
+static void *
+read_from_stream(         FILE *stream, size_t bytes );
+
+static unsigned int
+read_int_from_stream(     FILE *stream );
+
+static unsigned long
+read_long_from_stream(    FILE *stream );
+
+static unsigned int
+read_padding_from_stream( FILE *stream, size_t bytes );
 
 static int
 verify_mob_magic_number( M0_Interp *interp, FILE *stream );
@@ -188,8 +202,31 @@ parse_mob_chunks( M0_Interp *interp, FILE *stream ) {
 
 M0_Constants_Segment *
 parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
-    UNUSED(interp);
-    UNUSED(stream);
+    if (!validate_segment_identifier( interp, stream, M0_CONST_SEG ))
+        return 0;
+    else {
+        const unsigned long   const_count = read_long_from_stream( stream );
+        const unsigned long   byte_count  = read_long_from_stream( stream );
+        unsigned long         i           = 0;
+        M0_Constants_Segment *segment     =
+                malloc( sizeof( M0_Constants_Segment ) );
+        segment->consts = malloc( sizeof ( char * ) * const_count );
+        segment->count  = const_count;
+
+        UNUSED( byte_count );
+
+        for (i = 0; i < const_count; i++) {
+            const unsigned long length   = read_long_from_stream( stream );
+            const char         *constant =
+                         (const char *)read_from_stream( stream, length );
+
+            if (constant)
+                segment->consts[i] = constant;
+        }
+
+        return segment;
+    }
+
     return NULL;
 }
 

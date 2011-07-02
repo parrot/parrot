@@ -7,17 +7,26 @@
 #include "include/m0_constants.h"
 #include "include/m0_compiler_defines.h"
 
-M0_Interp * new_interp();
+static M0_Interp *
+new_interp();
 
-M0_CallFrame * new_call_frame( M0_Interp *interp );
+static M0_CallFrame *
+new_call_frame( M0_Interp *interp );
 
-int run_ops( M0_Interp *interp, M0_CallFrame *cf );
+static int
+run_ops( M0_Interp *interp, M0_CallFrame *cf );
 
-void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
+static void
+call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
 
-void interp_free( M0_Interp *interp );
+static void
+interp_free( M0_Interp *interp );
 
-int main( int argc, const char *argv[]) {
+static void
+m0_chunk_free( M0_Chunk *chunk );
+
+int
+main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
 
     if (!interp)
@@ -51,31 +60,50 @@ new_interp() {
 }
 
 M0_CallFrame *
-new_call_frame(M0_Interp *interp) {
+new_call_frame( M0_Interp *interp ) {
     UNUSED(interp);
     return malloc( sizeof (M0_CallFrame) );
 }
 
-int run_ops(M0_Interp *interp, M0_CallFrame *cf) {
+int
+run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
     UNUSED(cf);
     return 0;
 }
 
-void call_frame_free( M0_Interp *interp, M0_CallFrame *cf) {
+void
+call_frame_free( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
     free( cf );
 }
 
-void interp_free( M0_Interp *interp ) {
+void
+interp_free( M0_Interp *interp ) {
     M0_Chunk *chunk = interp->first_chunk;
 
     while (chunk) {
         M0_Chunk *next = chunk->next;
-        free( (char *)chunk->name );
-        free( chunk );
+        m0_chunk_free( chunk );
         chunk = next;
     }
 
     free( interp );
+}
+
+void
+m0_chunk_free( M0_Chunk *chunk ) {
+    if (chunk->constants) {
+        unsigned long count = chunk->constants->count;
+        unsigned long i     = 0;
+        for (i = 0; i < count; i++) {
+            if( chunk->constants->consts[i] )
+                free( (char *)chunk->constants->consts[i] );
+        }
+
+        free( chunk->constants->consts );
+        free( chunk->constants );
+    }
+    free( (char *)chunk->name );
+    free( chunk );
 }
