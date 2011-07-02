@@ -154,12 +154,12 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
         /* Do nothing thanks to IMCC */
     }
     else {
-        pos = interp->code->base.data;
+        pos = (opcode_t) interp->code->base.data;
     }
 
     /* TODO Logic for parsing conditionals goes here */
 
-    bp->pc = pos;
+    bp->pc = &pos;
     /*bp->line = line->number;*/
 
     /* Don't skip, yet */
