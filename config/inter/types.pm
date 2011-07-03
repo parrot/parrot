@@ -34,12 +34,11 @@ sub runstep {
 
     my $intval   = $conf->options->get('intval')   || 'long';
     my $floatval = $conf->options->get('floatval') || 'double';
-    my $opcode   = $conf->options->get('opcode')   || 'long';
+    my $opcode   = $intval;
 
     if ( $conf->options->get('ask') ) {
         $intval   = prompt( "\n\nHow big would you like your integers to be?", $intval );
         $floatval = prompt( "And your floats?",                                $floatval );
-        $opcode   = prompt( "What's your native opcode type?",                 $opcode );
         print "\n";
     }
 

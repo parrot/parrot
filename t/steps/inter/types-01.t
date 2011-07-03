@@ -55,8 +55,7 @@ my ( @prompts, $object );
 
 $conf->options->set('intval' => 'alpha');
 $conf->options->set('floatval' => 'beta');
-$conf->options->set('opcode' => 'gamma');
-@prompts = qw( delta epsilon zeta );
+@prompts = qw( delta epsilon );
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );
