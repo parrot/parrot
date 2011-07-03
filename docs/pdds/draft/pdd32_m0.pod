@@ -46,6 +46,8 @@ Incomplete milestones:
 
 =item * disassemble binary M0 bytecode into an M0 assembly listing
 
+=item * implement and verify crc32c
+
 =back
 
 =head2 Definitions
