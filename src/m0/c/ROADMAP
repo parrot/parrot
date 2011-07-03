@@ -1,13 +1,18 @@
 Contributors welcome.
 
 * Improve the C code
-    * #define M0 types for unsigned long and other values stored in m0b files
+    * use fixed-width C99 types as mandated by M0 spec
     * add nice malloc/calloc wrappers
     * use a few well-chosen macros to reduce boilerplate
+
+* Fixup C data structures to follow "big blob of memory" M0 spec
+    * in particular, M0_CallFrame is reasonably correct, while segments are not
+    * the constant segment is particularly troublesome
 
 * Implement remaining M0 ops
 
 * Add M0 string type
+    * this probably needs spec work
 
 * Verify all error paths for file handling
     * Add tests for all combinations of missing/invalid M0 files
