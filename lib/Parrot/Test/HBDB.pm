@@ -176,9 +176,11 @@ sub arg_output_like {
 
 # Compares output of commands
 sub cmd_output_is {
-    my ($self, $arg, $expected, $desc) = @_;
+    my ($self, $cmd, $expected, $desc) = @_;
 
-    # TODO What did I delete here?
+    $self->{cmd} = $cmd if defined $cmd;
+
+    _enter_cmd($self->{cmd});
 
     # Wait for HBDB to terminate
     waitpid $pid, 0;
@@ -205,8 +207,7 @@ sub cmd_output_is {
         $select->remove($fh) if eof $fh;
     }
 
-    close HBDB_STDOUT;
-    close HBDB_STDERR;
+    _close_fh();
 }
 
 # Compares output of commands (with regex)
@@ -215,9 +216,7 @@ sub cmd_output_like {
 
     $self->{cmd} = $cmd if defined $cmd;
 
-    # Enter command
-    print HBDB_STDIN "$cmd\n";
-    close HBDB_STDIN;
+    _enter_cmd($self->{cmd});
 
     # Wait for HBDB to terminate
     waitpid $pid, 0;
@@ -244,8 +243,7 @@ sub cmd_output_like {
         $select->remove($fh) if eof $fh;
     }
 
-    close HBDB_STDOUT;
-    close HBDB_STDERR;
+    _close_fh();
 }
 
 # Starts HBDB
@@ -267,6 +265,20 @@ sub start {
 #######################
 # Private subroutines #
 #######################
+
+# Closes filehandles connected to stdout/stderr
+sub _close_fh {
+    close HBDB_STDOUT;
+    close HBDB_STDERR;
+}
+
+# Enters a command
+sub _enter_cmd {
+    my $cmd = shift || '';
+
+    print HBDB_STDIN "$cmd\n";
+    close HBDB_STDIN;
+}
 
 sub _generate_pbc {
     my $pir = shift;
