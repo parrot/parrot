@@ -99,17 +99,18 @@ struct hbdb_cmd_table_t {
 };
 
 /* Help message displayed for each command */
-const char * const cmd_break_help = "Sets a breakpoint at the specified location.\n\n"
-                                    "break LOCATION\n\n"
-                                    "If LOCATION is an address, breaks at the exact address.";
+const char cmd_break_help[] = "Sets a breakpoint at the specified location.\n\n"
+                              "break LOCATION\n\n"
+                              "If LOCATION is an address, breaks at the exact address.";
 
 /* TODO Do I need this string anymore? */
-const char * const cmd_help_help  = "List of commands:\n\n"
-                                    "break\n"
-                                    "\nType \"help\" followed by a command name.";
+const char cmd_help_help[]  = "List of commands:\n\n"
+                              "break\n"
+                              "\nType \"help\" followed by a command name.";
 
-const char * const cmd_quit_help  = "Exits hbdb.";
+const char cmd_quit_help[]  = "Exits hbdb.";
 
+/* FIXME Get a better name for these identifiers */
 hbdb_cmd_t hbdb_cmd_break_x = { &hbdb_cmd_break, cmd_break_help };
 hbdb_cmd_t hbdb_cmd_help_x  = { &hbdb_cmd_help,  cmd_help_help  };
 hbdb_cmd_t hbdb_cmd_quit_x  = { &hbdb_cmd_quit,  cmd_quit_help  };
