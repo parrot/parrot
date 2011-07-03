@@ -182,9 +182,6 @@ sub cmd_output_is {
 
     _enter_cmd($self->{cmd});
 
-    # Wait for HBDB to terminate
-    waitpid $pid, 0;
-
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
     my $select = IO::Select->new();
     $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
@@ -217,9 +214,6 @@ sub cmd_output_like {
     $self->{cmd} = $cmd if defined $cmd;
 
     _enter_cmd($self->{cmd});
-
-    # Wait for HBDB to terminate
-    waitpid $pid, 0;
 
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
     my $select = IO::Select->new();
@@ -276,8 +270,12 @@ sub _close_fh {
 sub _enter_cmd {
     my $cmd = shift || '';
 
+    # Write command then send EOF so HBDB quits
     print HBDB_STDIN "$cmd\n";
     close HBDB_STDIN;
+
+    # Wait for HBDB to terminate
+    waitpid $pid, 0;
 }
 
 sub _generate_pbc {
