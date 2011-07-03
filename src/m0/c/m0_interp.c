@@ -71,8 +71,9 @@ new_call_frame( M0_Interp *interp ) {
     M0_CallFrame *frame = malloc( sizeof (M0_CallFrame) );
 
     /* this is a silly minimal hack for now */
-    frame->active_chunk = interp->first_chunk;
-    frame->pc           = 0;
+    frame->registers[CHUNK]  = (uint64_t)interp->first_chunk;
+    frame->registers[PC]     = (uint64_t)0;
+    frame->registers[CONSTS] = (uint64_t)interp->first_chunk->constants;
 
     return frame;
 }

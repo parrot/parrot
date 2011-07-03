@@ -1,7 +1,5 @@
 Contributors welcome.
 
-* Run "Hello, world!" in the M0 interpreter
-
 * Improve the C code
     * #define M0 types for unsigned long and other values stored in m0b files
     * add nice malloc/calloc wrappers

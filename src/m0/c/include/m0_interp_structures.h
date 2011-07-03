@@ -1,5 +1,6 @@
 #ifndef M0_INTERP_STRUCTURES_H
 #   include "m0_mob_structures.h"
+#   include <stdint.h>
 
 typedef struct {
     unsigned short  mob_version;
@@ -13,9 +14,23 @@ typedef struct {
 } M0_Interp;
 
 typedef struct {
-    M0_Chunk     *active_chunk;
-    unsigned long pc;
+    uint64_t registers[256];
 } M0_CallFrame;
+
+enum CF_NAMED_REGS {
+    CF,
+    PCF,
+    PC,
+    RETPC,
+    EH,
+    CHUNK,
+    CONSTS,
+    MDS,
+    BCS,
+    INTERP,
+    SPC4RENT,
+    SPILLCF
+};
 
 #   define M0_INTERP_STRUCTURES_H 1
 #endif
