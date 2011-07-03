@@ -110,16 +110,16 @@ const char * const cmd_help_help  = "List of commands:\n\n"
 
 const char * const cmd_quit_help  = "Exits hbdb.";
 
+hbdb_cmd_t hbdb_cmd_break_x = { &hbdb_cmd_break, cmd_break_help };
+hbdb_cmd_t hbdb_cmd_help_x  = { &hbdb_cmd_help,  cmd_help_help  };
+hbdb_cmd_t hbdb_cmd_quit_x  = { &hbdb_cmd_quit,  cmd_quit_help  };
+
 /* Global command table */
 const hbdb_cmd_table_t command_table[] = {
-    { "break", "b", (hbdb_cmd_t *)  &hbdb_cmd_break },
-    { "help",  "h", (hbdb_cmd_t *)  &hbdb_cmd_help  },
-    { "quit",  "q", (hbdb_cmd_t *)  &hbdb_cmd_quit  }
+    { "break", "b", &hbdb_cmd_break_x },
+    { "help",  "h", &hbdb_cmd_help_x  },
+    { "quit",  "q", &hbdb_cmd_quit_x  }
 };
-
-/*command_table[0].cmd.help = cmd_break_help;*/
-/*command_table[1].cmd.help = cmd_help_help;*/
-/*command_table[2].cmd.help = cmd_quit_help;*/
 
 /*hbdb_cmd_table_t command_table[NUM_CMDS];*/
 
