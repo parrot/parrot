@@ -118,8 +118,6 @@ use Parrot::Config;
 use base qw(Exporter);
 
 my $builder;
-my $parrot = ".$PConfig{slash}$PConfig{test_prog}";
-
 my $pid;
 
 # Check that HBDB has been built first
@@ -278,9 +276,11 @@ sub _enter_cmd {
     waitpid $pid, 0;
 }
 
+# Compiles .pir file into .pbc
 sub _generate_pbc {
-    my $pir = shift;
-    my $pbc = $pir;
+    my $pir    = shift;
+    my $pbc    = $pir;
+    my $parrot = ".$PConfig{slash}$PConfig{test_prog}";
 
     # Substitute file extension
     $pbc =~ s|\.pir|\.pbc|i;
