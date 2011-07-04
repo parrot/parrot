@@ -3043,16 +3043,18 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         length   = Parrot_str_byte_length(interp, first);
         j_length = Parrot_str_byte_length(interp, j);
 
-        /* it's an approximiation, but it doesn't hurt */
+        /* it's an approximation, but it doesn't hurt */
         sb       = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
                     (length + j_length) * count);
 
         VTABLE_push_string(interp, sb, first);
 
         for (i = 1; i < count; ++i) {
+            const STRING *part = VTABLE_get_string_keyed_int(interp, ar, i);
             VTABLE_push_string(interp, sb, j);
-            VTABLE_push_string(interp, sb,
-                VTABLE_get_string_keyed_int(interp, ar, i));
+
+            if (part->strlen)
+                VTABLE_push_string(interp, sb, part);
         }
 
         return VTABLE_get_string(interp, sb);
