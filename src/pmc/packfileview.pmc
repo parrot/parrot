@@ -12,7 +12,7 @@ used internally by Parrot. It is essentially an interface for the user to call
 Packfile subsystem API calls, and work with the PackFile* structures output
 from utilities which generate them.
 
-=head2 Methods
+=head2 VTABLES
 
 =over 4
 
@@ -55,6 +55,31 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
 pmclass PackfileView auto_attrs {
     ATTR PackFile * pf;
 
+/*
+
+=item C<VTABLE void init()>
+
+Create the new PMC and set flags
+
+=item C<VTABLE void destroy()>
+
+Destroy the PMC *AND* the underlying PackFile*
+
+=item C<VTABLE void mark()>
+
+Mark the PMC and the PackFile* contents
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileView_attributes * const attrs =
+                PARROT_PACKFILEVIEW(SELF);
+        if (attrs->pf != NULL)
+            Parrot_pf_mark_packfile(INTERP, attrs->pf);
+    }
+
     VTABLE void init() {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
@@ -68,6 +93,30 @@ pmclass PackfileView auto_attrs {
         if (attrs->pf != NULL)
             Parrot_pf_destroy(INTERP, attrs->pf);
     }
+
+/*
+
+=item C<VTABLE void set_pointer(void *ptr)>
+
+Set a pointer to a PackFile* structure. This can only be done once. Attempting
+to set a new pointer will throw an exception. This rule is in place because
+the lifetime of the PackFile* is tied to the lifetime of the PMC wrapping it,
+and the PMC provides access to the PackFile* by the GC. Overwriting a pointer
+to an old PackFile* structure will cause memory leaks, prematurely collected
+Subs, and other creepy behaviors.
+
+=item C<VTABLE void *get_pointer()>
+
+Get a pointer to the underlying PackFile* structure
+
+=item C<VTABLE INTVAL get_bool()>
+
+Return 1 (true) if this PMC is currently pointing to a PackFile*. 0 (false)
+otherwise.
+
+=cut
+
+*/
 
     VTABLE void set_pointer(void * ptr) {
         Parrot_PackfileView_attributes * const attrs =
@@ -92,12 +141,23 @@ pmclass PackfileView auto_attrs {
         return (attrs->pf != NULL);
     }
 
-    VTABLE void mark() {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        if (attrs->pf != NULL)
-            Parrot_pf_mark_packfile(INTERP, attrs->pf);
-    }
+/*
+
+=item C<VTABLE PMC *get_pmc_keyed_int(INTVAL idx)>
+
+Get a PMC from the constants table, by index
+
+=item C<VTABLE STRING *get_string_keyed_int(INTVAL idx)>
+
+Get a STRING from the constants table, by index
+
+=item C<VTABLE FLOATVAL get_number_keyed_int(INTVAL idx)>
+
+Get a FLOATVAL from the constants table, by index
+
+=cut
+
+*/
 
     VTABLE PMC * get_pmc_keyed_int(INTVAL idx) {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
@@ -132,6 +192,23 @@ pmclass PackfileView auto_attrs {
         return ct->num.constants[idx];
     }
 
+/*
+
+=back
+
+=head2 METHODS
+
+=over 4
+
+=item C<METHOD constant_counts()>
+
+Return a 3-element FixedIntegerArray with the total number of FLOATVAL, STRING
+and PMC constants in the respective constant tables.
+
+=cut
+
+*/
+
     METHOD constant_counts() {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
@@ -146,6 +223,25 @@ pmclass PackfileView auto_attrs {
             RETURN (PMC *counts);
         }
     }
+
+/*
+
+=item C<METHOD main_sub()>
+
+Get the :main sub from the packfile, if any.
+
+=item C<METHOD trigger(STRING *flag)>
+
+Trigger subs with the given flag. Currently supported values are "load" and
+"init".
+
+=item C<METHOD all_subs()>
+
+Return a ResizablePMCArray with all Sub constants from the constant table.
+
+=cut
+
+*/
 
     METHOD main_sub() {
         Parrot_PackfileView_attributes * const attrs =
@@ -168,6 +264,40 @@ pmclass PackfileView auto_attrs {
                     "%S is not a valid packfile trigger", flag);
     }
 
+    METHOD all_subs() {
+        PMC * const array = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
+        if (ct) {
+            INTVAL i;
+            STRING * const SUB = CONST_STRING(interp, "Sub");
+            for (i = 0; i < ct->pmc.const_count; ++i) {
+                PMC * const x = ct->pmc.constants[i];
+                if (VTABLE_isa(interp, x, SUB))
+                    VTABLE_push_pmc(INTERP, array, x);
+            }
+        }
+        RETURN (PMC *array);
+    }
+
+/*
+
+=item C<METHOD serialized_size()>
+
+Return the size, in bytes, for how large this packfile will be if serialized.
+
+=item C<METHOD serialize()>
+
+Serialize the packfile into a STRING buffer
+
+=item C<METHOD deserialize(STRING *pbc)>
+
+Read a PackFile* in from a STRING buffer and set it as the current PackFile*
+ptr in this PMC. Subject to the normal set_pointer restrictions.
+
+=cut
+
+*/
+
     METHOD serialized_size() {
         INTVAL size;
         Parrot_PackfileView_attributes * const attrs =
@@ -188,20 +318,26 @@ pmclass PackfileView auto_attrs {
         RETURN (STRING *str);
     }
 
-    METHOD all_subs() {
-        PMC * const array = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
-        if (ct) {
-            INTVAL i;
-            STRING * const SUB = CONST_STRING(interp, "Sub");
-            for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC * const x = ct->pmc.constants[i];
-                if (VTABLE_isa(interp, x, SUB))
-                    VTABLE_push_pmc(INTERP, array, x);
-            }
-        }
-        RETURN (PMC *array);
+    METHOD deserialize(STRING *pbc) {
+        PackFile * const pf = Parrot_pf_deserialize(INTERP, pbc);
+        VTABLE_set_pointer(INTERP, SELF, pf);
     }
+
+/*
+
+=item C<METHOD read_from_file(STRING *filename)>
+
+Read a PackFile* from the given .pbc file and set it as the current PackFile*
+pointer in this PMC. Subject to the same restrictions as set_pointer.
+
+=item C<METHOD write_to_file(STRING *filename)>
+
+Serialize the contents of the PackFile in this PMC and write them out to the
+given .pbc bytecode file.
+
+=cut
+
+*/
 
     METHOD read_from_file(STRING * filename) {
         PackFile * const pf = Parrot_pf_read_pbc_file(INTERP, filename);
@@ -211,9 +347,19 @@ pmclass PackfileView auto_attrs {
     METHOD write_to_file(STRING *filename) {
         Parrot_pf_write_pbc_file(INTERP, SELF, filename);
     }
-
-    METHOD deserialize(STRING *pbc) {
-        PackFile * const pf = Parrot_pf_deserialize(INTERP, pbc);
-        VTABLE_set_pointer(INTERP, SELF, pf);
-    }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

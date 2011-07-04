@@ -45,6 +45,11 @@
 .end
 
 .sub 'test_vtable_get_pmc_keyed_int'
+    $P0 = getinterp
+    $P1 = $P0["packfile"]
+    $P2 = $P1[0]
+    $S0 = typeof $P2
+    say $S0
     # TODO
 .end
 
