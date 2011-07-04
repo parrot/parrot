@@ -411,7 +411,8 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
-	include/pmc/pmc_callcontext.h
+	include/pmc/pmc_callcontext.h \
+	include/pmc/pmc_parrotinterpreter.h
 
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
@@ -1056,8 +1057,6 @@ $(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 frontend/hbdb/main$(O) : \
     $(PARROT_H_HEADERS) \
     frontend/hbdb/main.c \
-    src/hbdb.c \
-    $(INC_DIR)/hbdb.h \
     $(INC_DIR)/api.h \
     $(INC_DIR)/longopt.h \
     include/imcc/api.h
@@ -1455,6 +1454,7 @@ src/runcore/trace$(O) : \
 
 src/hbdb$(O) : \
     $(PARROT_H_HEADERS) \
+    include/parrot/embed.h \
     src/hbdb.c
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
@@ -1498,7 +1498,6 @@ src/thread$(O) : \
     $(INC_DIR)/extend_vtable.h \
     src/thread.c \
     include/pmc/pmc_sub.h \
-    include/pmc/pmc_parrotinterpreter.h \
     $(INC_DIR)/runcore_api.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
@@ -1546,18 +1545,16 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 	include/pmc/pmc_sub.h src/call/context.c
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
-	include/pmc/pmc_parrotinterpreter.h \
-        $(INC_DIR)/extend.h \
-        $(INC_DIR)/extend_vtable.h \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
 	include/imcc/embed.h \
-        include/imcc/yyscanner.h \
-	$(INC_DIR)/runcore_api.h \
-        include/pmc/pmc_parrotinterpreter.h
+	include/imcc/yyscanner.h \
+	$(INC_DIR)/runcore_api.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
@@ -1565,7 +1562,7 @@ src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_create.c \
 	src/interp/inter_create.str \
 	$(INC_DIR)/runcore_api.h \
-        src/gc/variable_size_pool.h
+	src/gc/variable_size_pool.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h \
@@ -1741,8 +1738,7 @@ src/embed/api$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/runcore_api.h \
     src/embed/api.c \
-    src/embed/embed_private.h \
-    include/pmc/pmc_parrotinterpreter.h
+    src/embed/embed_private.h
 
 src/embed/hbdb$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1757,22 +1753,19 @@ src/embed/bytecode$(O) : \
     $(INC_DIR)/embed.h \
     $(INC_DIR)/runcore_api.h \
     src/embed/bytecode.c \
-    src/embed/embed_private.h \
-    include/pmc/pmc_parrotinterpreter.h
+    src/embed/embed_private.h
 
 src/embed/strings$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
     src/embed/strings.c \
-    src/embed/embed_private.h \
-    include/pmc/pmc_parrotinterpreter.h
+    src/embed/embed_private.h
 
 src/embed/pmc$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
     src/embed/pmc.c \
-    src/embed/embed_private.h \
-    include/pmc/pmc_parrotinterpreter.h
+    src/embed/embed_private.h
 
 src/dataypes$(O) : $(GEN_HEADERS) src/dataypes.c
 
@@ -2423,8 +2416,7 @@ test-clean :
      "t/src/embed/*.manifest"
 	$(RM_F) \
      "t/tools/pmc2c.t_*" \
-     "t/tools/pmc2c.pmc_t_*" \
-     "t/tools/parrot_debugger.t.*"
+     "t/tools/pmc2c.pmc_t_*"
 	$(RM_F) \
      "test$(EXE)" \
      "test.*"
