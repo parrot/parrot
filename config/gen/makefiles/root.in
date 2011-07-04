@@ -1340,7 +1340,7 @@ src/global_setup$(O) : $(PARROT_H_HEADERS) \
 src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 	include/pmc/pmc_sub.h
 
-src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
+src/pmc$(O) : include/pmc/pmc_class.h include/pmc/pmc_integer.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
 src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
