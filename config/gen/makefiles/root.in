@@ -1612,7 +1612,17 @@ src/packfile/api$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
 
-src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
+src/packfile/output$(O) : \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_key.h \
+    include/parrot/dynext.h \
+    include/parrot/extend_vtable.h \
+    include/parrot/extend.h \
+    include/parrot/runcore_api.h \
+    src/packfile/pf_private.h \
+    include/parrot/embed.h \
+    include/parrot/oplib/core_ops.h \
+    src/packfile/output.c
 
 src/packfile/pf_items$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1630,6 +1640,7 @@ src/packfile/segments$(O) : \
     $(PARROT_H_HEADERS) \
     src/packfile/pf_private.h \
     include/pmc/pmc_parrotlibrary.h \
+    include/parrot/runcore_api.h \
     src/packfile/segments.c
 
 src/parrot$(O) : $(GEN_HEADERS)
