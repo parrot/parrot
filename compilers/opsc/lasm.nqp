@@ -358,6 +358,8 @@ method handle_op($op)
       self<fh>.print("  INT GOTO :l$false;\n");
       self<fh>.print("  l$true: INT NOOP;\n");
 
+      self.dealloc($cond);
+
       my $node_ret := self.handle_node($op[1]);
       self.dealloc($node_ret);
 
@@ -373,7 +375,7 @@ method handle_op($op)
       }
       else
       {
-        self<fh>.print("  $false: INT NOOP;\n");
+        self<fh>.print("  l$false: INT NOOP;\n");
       }
 
       return "";
