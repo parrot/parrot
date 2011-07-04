@@ -169,7 +169,10 @@ Append string to current buffer.
             buffer->encoding = s->encoding;
         }
         else {
-            const STR_VTABLE * const enc = Parrot_str_rep_compatible(interp, buffer, s);
+            const STR_VTABLE * const enc =
+                  buffer->encoding == s->encoding
+                ? buffer->encoding
+                : Parrot_str_rep_compatible(interp, buffer, s);
 
             if (enc) {
                 buffer->encoding = enc;
