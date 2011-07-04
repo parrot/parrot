@@ -275,6 +275,18 @@ method handle_op($op)
       return $dest;
     }
 
+    if ($op<pirop> eq '~')
+    {
+      my $dest := self.alloc('I');
+      my $src1 := self.handle_node($op[0]);
+
+      self<fh>.print("  $dest = INT NOT $src1;\n");
+
+      self.dealloc($src1);
+
+      return $dest;
+    }
+
     if ($op<pirop> eq '&=')
     {
       my $dest := self.handle_node($op[0]);
