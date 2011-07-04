@@ -43,7 +43,7 @@ STRING *STRINGNULL;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static INTVAL string_max_bytes(SHIM_INTERP,
+static INTVAL string_max_bytes(PARROT_INTERP,
     ARGIN(const STRING *s),
     UINTVAL nchars)
         __attribute__nonnull__(2);
@@ -2393,7 +2393,6 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     UINTVAL      i, len, charlen;
     String_iter  iter;
     char         hex_buf[16];
-    int          hex_len;
     char        *dp;
 
     if (STRING_IS_NULL(src))
@@ -2420,6 +2419,8 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
     for (i = 0; len > 0; --len) {
         unsigned c = STRING_iter_get_and_advance(interp, src, &iter);
+        int hex_len;
+
         if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {

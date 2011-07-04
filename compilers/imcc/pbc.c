@@ -200,9 +200,7 @@ static int get_old_size(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(SHIM_INTERP,
-    SHIM(int ex),
-    ARGMOD(void *param))
+static void imcc_globals_destroy(PARROT_INTERP, int ex, ARGMOD(void *param))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*param);
 
@@ -1271,7 +1269,7 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         SymReg *r;
 
         for (r = hsh->data[i]; r; r = r->next) {
-            if (r->set == 'P' && r->usage & U_LEXICAL) {
+            if (r->usage & U_LEXICAL) {
                 SymReg *n;
                 if (!lex_info) {
                     lex_info = Parrot_pmc_new_noinit(imcc->interp, lex_info_id);
@@ -1284,6 +1282,7 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
                 while (n) {
                     STRING     *lex_name;
+                    INTVAL      reg_type;
                     const int   k = n->color;
                     Parrot_Sub_attributes *sub;
                     PARROT_ASSERT(k >= 0);
@@ -1300,8 +1299,12 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
                         IMCC_fataly(imcc, EXCEPTION_INVALID_OPERATION,
                             "Multiple declarations of lexical '%S'\n", lex_name);
 
+                    reg_type = r->set == 'I' ? REGNO_INT :
+                               r->set == 'N' ? REGNO_NUM :
+                               r->set == 'S' ? REGNO_STR :
+                                               REGNO_PMC;
                     VTABLE_set_integer_keyed_str(imcc->interp, lex_info,
-                            lex_name, r->color);
+                            lex_name, (r->color << 2) | reg_type);
 
                     /* next possible name */
                     n = n->reg;

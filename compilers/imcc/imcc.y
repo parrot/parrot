@@ -1886,33 +1886,19 @@ labeled_inst:
          }
    | LEXICAL STRINGC COMMA target
          {
-            if ($4->set != 'P') {
-                mem_sys_free($2);
-                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
-                    "Cannot use %c register with .lex", $4->set);
-            }
-            else {
-               SymReg *n;
-               char   *name = mem_sys_strdup($2 + 1);
-               name[strlen(name) - 1] = 0;
-               n = mk_const(imcc, name, 'S');
-               set_lexical(imcc, $4, n); $$ = 0;
-               mem_sys_free($2);
-               mem_sys_free(name);
-            }
+           SymReg *n;
+           char   *name = mem_sys_strdup($2 + 1);
+           name[strlen(name) - 1] = 0;
+           n = mk_const(imcc, name, 'S');
+           set_lexical(imcc, $4, n); $$ = 0;
+           mem_sys_free($2);
+           mem_sys_free(name);
          }
    | LEXICAL USTRINGC COMMA target
          {
-            if ($4->set != 'P') {
-                mem_sys_free($2);
-                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
-                    "Cannot use %c register with .lex", $4->set);
-            }
-            else {
-               SymReg *n = mk_const(imcc, $2, 'U');
-               set_lexical(imcc, $4, n); $$ = 0;
-               mem_sys_free($2);
-            }
+           SymReg *n = mk_const(imcc, $2, 'U');
+           set_lexical(imcc, $4, n); $$ = 0;
+           mem_sys_free($2);
          }
    | CONST { imcc->is_def = 1; } type IDENTIFIER '=' const
          {

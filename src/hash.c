@@ -62,7 +62,7 @@ static int hash_compare(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static int hash_compare_cstring(SHIM_INTERP,
+static int hash_compare_cstring(PARROT_INTERP,
     ARGIN(const char *a),
     ARGIN(const char *b))
         __attribute__nonnull__(2)
@@ -71,7 +71,7 @@ static int hash_compare_cstring(SHIM_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static int hash_compare_int(SHIM_INTERP,
+static int hash_compare_int(PARROT_INTERP,
     ARGIN_NULLOK(const void *a),
     ARGIN_NULLOK(const void *b));
 
@@ -86,7 +86,7 @@ static int hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static int hash_compare_pointer(SHIM_INTERP,
+static int hash_compare_pointer(PARROT_INTERP,
     ARGIN_NULLOK(const void *a),
     ARGIN_NULLOK(const void *b));
 
@@ -119,7 +119,7 @@ static size_t key_hash(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static size_t key_hash_cstring(SHIM_INTERP,
+static size_t key_hash_cstring(PARROT_INTERP,
     ARGIN(const void *value),
     size_t seed)
         __attribute__nonnull__(2);
@@ -302,6 +302,8 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const vo
 
 Compare two strings. Returns 0 if they are identical. Considers differing
 encodings to be distinct.
+
+=cut
 
 */
 
@@ -543,7 +545,7 @@ this.
 
 PARROT_EXPORT
 void
-Parrot_hash_dump(SHIM_INTERP, SHIM(const Hash *hash))
+Parrot_hash_dump(SHIM_INTERP, ARGIN(SHIM(const Hash *hash)))
 {
     ASSERT_ARGS(Parrot_hash_dump)
 }
@@ -1183,7 +1185,7 @@ Parrot_hash_create_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type
 {
     ASSERT_ARGS(Parrot_hash_create_sized)
 
-    Hash *hash = Parrot_hash_create(interp, val_type, hkey_type);
+    Hash * const hash = Parrot_hash_create(interp, val_type, hkey_type);
     allocate_buckets(interp, hash, size);
     return hash;
 }
@@ -2215,7 +2217,7 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd08_keys.pod>.
+F<docs/pdds/draft/pdd08_keys.pod>, F<include/parrot/hash.h>
 
 =head1 TODO
 

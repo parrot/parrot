@@ -131,6 +131,7 @@ include compilers/pct/Defines.mak
 include compilers/opsc/Defines.mak
 include ext/nqp-rx/Defines.mak
 include compilers/data_json/Defines.mak
+include ext/winxed/Defines.mak
 
 ###############################################################################
 #
@@ -533,6 +534,7 @@ NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PROVE               = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
+WINXED              = .@slash@winxed$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
@@ -546,6 +548,7 @@ INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 INSTALLABLEPROVE     = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
+INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -627,6 +630,8 @@ all : \
     $(DATA_JSON_LIB_PBCS) \
     $(JSON_LANG) \
     $(NQP_LIB_PBCS) \
+    $(WINXED_LANG) \
+    $(WINXED) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
     $(GEN_LIBRARY) \
@@ -665,7 +670,7 @@ $(LIBRARY_DIR)/Test/More.pbc:
 
 $(LIBRARY_DIR)/Archive/Tar.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/osutils.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/math_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
 
@@ -837,7 +842,7 @@ world : parrot_utils
 
 parrot_utils : all $(PDUMP) $(DIS) $(HBDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEHBDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEHBDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
@@ -964,7 +969,8 @@ src/pointer_array$(O) : \
     $(INC_DIR)/pointer_array.h
 
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
-    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
+    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
+    include/pmc/pmc_namespace.h
 
 src/scheduler$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1077,23 +1083,23 @@ $(INSTALLABLEHBDB) : frontend/hbdb/main$(O) $(LIBPARROT) src/parrot_config$(O)
 # Parrot Disassembler
 #
 
-src/pbc_disassemble$(O) : \
+frontend/pbc_disassemble/main$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
     $(INC_DIR)/longopt.h \
-    src/pbc_disassemble.c \
+    frontend/pbc_disassemble/main.c
 
-$(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
+$(DIS) : frontend/pbc_disassemble/main$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    src/pbc_disassemble$(O) \
+    frontend/pbc_disassemble/main$(O) \
     src/longopt$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
+$(INSTALLABLEDIS) : frontend/pbc_disassemble/main$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    src/pbc_disassemble$(O) \
+    frontend/pbc_disassemble/main$(O) \
     src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
@@ -2275,6 +2281,7 @@ clean : \
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
 	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
+	$(RM_F) $(WINXED_CLEANUPS)
 	$(RM_RF) blib
 
 prog-clean :
@@ -2294,16 +2301,18 @@ prog-clean :
     $(INSTALLABLENQP) \
     $(INSTALLABLENCITHUNKGEN) \
     $(INSTALLABLEPROVE) \
+    $(INSTALLABLEWINXED) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     $(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
     ops2c.pbc ops2c.c ops2c$(O) ops2c$(EXE) ops2c.pir \
     parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
     parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
+    winxed.pbc winxed.c winxed$(O) $(WINXED) \
     compilers/imcc/main$(O) \
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(HBDB) frontend/hbdb/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
-    $(DIS) src/pbc_disassemble$(O)
+    $(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
     frontend/parrot/main$(O) \
     src/null_config$(O) \
@@ -2340,7 +2349,7 @@ archclean: dynext-clean
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(HBDB) frontend/hbdb/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
-    $(DIS) src/pbc_disassemble$(O) \
+    $(DIS) frontend/pbc_disassemble/main$(O) \
     $(PARROT_CONFIG) parrot_config$(O) parrot_config.c \
     src/parrot_config$(O) parrot_config.pbc \
     pbc_to_exe$(EXE) pbc_to_exe$(O) pbc_to_exe.pbc \
@@ -2536,50 +2545,6 @@ SPLINT = splint
 # kept in there after completion.
 SPLINT_TMP = $(TEMPDIR)/splint
 
-# Transfer errors (-mem-trans) are too tough for us right now
-OLD_SPLINTFLAGS_MEMORY_SAFETY = \
-    -mem-trans \
-    -memchecks \
-    +bufferoverflow \
-    +bufferoverflowhigh \
-    +read-only-strings \
-    +read-only-trans \
-    -strict-destroy \
-    -strict-use-released \
-    +use-released \
-    -must-free \
-    -mustfreefresh \
-    -mustfreeonly \
-    +null \
-    +nullptrarith \
-    +nullret \
-    -ptr-arith \
-    +ptr-negate \
-
-# Watch for unsafe comparisons
-OLD_SPLINTFLAGS_UNSAFE_COMPARISONS = \
-    +bool-compare \
-    +ptr-compare \
-    +real-compare \
-    +unsigned-compare
-
-# const and other qualifiers
-# Report qualifier mismatches only if dangerous (+relax-quals)
-OLD_SPLINTFLAGS_QUALIFIERS = \
-    +relax-quals
-
-# Symbol definitions
-OLD_SPLINTFLAGS_SYMBOL_DEFINITIONS = \
-    +decl-undef \
-    +incon-defs \
-    +incon-defs-lib \
-
-# Problems with evaluation and control structions
-OLD_SPLINTFLAGS_EVALUATION = \
-    +controlnestdepth 15 \
-    +duplicate-quals \
-
-
 # Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
@@ -2704,9 +2669,8 @@ SPLINTFLAGS = \
 	$(SPLINTFLAGS_COMPLETENESS) \
 	$(SPLINTFLAGS_MISCELLANEOUS) \
 
-#SPLINT_SOURCE = `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@ | sort`
 SPLINT_SOURCE = \
-	$$(find src/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
+	$$(find src/*.c src/call/*.c src/gc/*.c src/io/*.c src/packfile/*.c src/string/*.c -type f | \
 	grep -v src/gc/malloc.c | \
 	grep -v src/gc/malloc_trace.c | \
 	grep -v extend_vtable.c | \
@@ -2932,7 +2896,6 @@ install-bin: installable
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
     --versiondir=$(VERSION_DIR) \
-    --pkgconfigdir=@PKGCONFIG_DIR@ \
     MANIFEST MANIFEST.generated
 
 install-dev-only: installable
@@ -3124,6 +3087,7 @@ include compilers/opsc/Rules.mak
 include compilers/tge/Rules.mak
 include compilers/data_json/Rules.mak
 include ext/nqp-rx/Rules.mak
+include ext/winxed/Rules.mak
 
 # Local variables:
 #   mode: makefile

@@ -37,7 +37,7 @@ The runcore API handles running the operations.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
+static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 

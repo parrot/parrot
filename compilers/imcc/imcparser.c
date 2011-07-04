@@ -4527,20 +4527,13 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1888 "compilers/imcc/imcc.y"
     {
-            if ((yyvsp[(4) - (4)].sr)->set != 'P') {
-                mem_sys_free((yyvsp[(2) - (4)].s));
-                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
-                    "Cannot use %c register with .lex", (yyvsp[(4) - (4)].sr)->set);
-            }
-            else {
-               SymReg *n;
-               char   *name = mem_sys_strdup((yyvsp[(2) - (4)].s) + 1);
-               name[strlen(name) - 1] = 0;
-               n = mk_const(imcc, name, 'S');
-               set_lexical(imcc, (yyvsp[(4) - (4)].sr), n); (yyval.i) = 0;
-               mem_sys_free((yyvsp[(2) - (4)].s));
-               mem_sys_free(name);
-            }
+           SymReg *n;
+           char   *name = mem_sys_strdup((yyvsp[(2) - (4)].s) + 1);
+           name[strlen(name) - 1] = 0;
+           n = mk_const(imcc, name, 'S');
+           set_lexical(imcc, (yyvsp[(4) - (4)].sr), n); (yyval.i) = 0;
+           mem_sys_free((yyvsp[(2) - (4)].s));
+           mem_sys_free(name);
          }
     break;
 
@@ -4549,16 +4542,9 @@ yyreduce:
 /* Line 1464 of yacc.c  */
 #line 1905 "compilers/imcc/imcc.y"
     {
-            if ((yyvsp[(4) - (4)].sr)->set != 'P') {
-                mem_sys_free((yyvsp[(2) - (4)].s));
-                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
-                    "Cannot use %c register with .lex", (yyvsp[(4) - (4)].sr)->set);
-            }
-            else {
-               SymReg *n = mk_const(imcc, (yyvsp[(2) - (4)].s), 'U');
-               set_lexical(imcc, (yyvsp[(4) - (4)].sr), n); (yyval.i) = 0;
-               mem_sys_free((yyvsp[(2) - (4)].s));
-            }
+           SymReg *n = mk_const(imcc, (yyvsp[(2) - (4)].s), 'U');
+           set_lexical(imcc, (yyvsp[(4) - (4)].sr), n); (yyval.i) = 0;
+           mem_sys_free((yyvsp[(2) - (4)].s));
          }
     break;
 

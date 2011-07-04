@@ -200,6 +200,11 @@ D: Early contributions under the name Brent Dax.
 E: brent@brentdax.com
 W: http://www.brentdax.com/
 
+N: Brian Gernhardt
+E: brian.gernhardt@mail.rit.edu
+D: GSoC Student, PCT
+U: benabik
+
 U: bdwheele
 N: Brian Wheeler
 E: bdwheele@indiana.edu
@@ -637,6 +642,12 @@ D: yield and other PIR improvements
 
 N: Kevin Falcone
 
+N: Kevin Polulak
+U: soh_cah_toa
+E: kpolulak@gmail.com
+D: HBDB debugger
+S: New Jersey, USA
+
 N: Kevin Tew
 U: tewk
 E: tewk@tewk.com
@@ -651,6 +662,11 @@ D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json, languages/squaak
 U: kj, kjs
 E: parrotcode@gmail.com
+
+N: Klāvs Priedītis
+U: klavs
+E: klavs.pr@gmail.com
+D: M0 bytecode disassembler
 
 N: Larry Wall
 E: larry@wall.org
@@ -718,6 +734,10 @@ D: httpd.imc, bugfixes
 N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
+
+N: Matt Boyle
+U: ligne
+D: Fixes to docs and test-suite.
 
 N: Matt Diephouse
 U: mdiep

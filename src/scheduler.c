@@ -732,7 +732,7 @@ Send a message to a scheduler in a different interpreter/thread.
 
 PARROT_EXPORT
 void
-Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), SHIM(PMC *payload))
+Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC *payload)))
 {
     ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {
@@ -999,7 +999,6 @@ opcode_t* to allow for changing the code flow.
 
 =over 4
 
-
 =item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time,
 opcode_t *next)>
 
@@ -1108,8 +1107,6 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=over 4
-
 =item C<static void scheduler_process_messages(PARROT_INTERP, PMC *scheduler)>
 
 Scheduler maintenance, scan the list of messages sent from other schedulers and
@@ -1157,6 +1154,10 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 /*
 
 =back
+
+=head1 SEE ALSO
+
+F<include/parrot/scheduler.h>
 
 =cut
 

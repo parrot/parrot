@@ -420,7 +420,7 @@ is_all_hex_digits(ARGIN(const char *s))
 {
     ASSERT_ARGS(is_all_hex_digits)
     for (; *s; ++s)
-        if (!isxdigit(*s))
+        if (!isxdigit((unsigned char)*s))
             return 0;
     return 1;
 }

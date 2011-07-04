@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.4.0.dylib                   [main]lib
+blib/lib/libparrot.3.5.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.4.0                      [main]lib
+blib/lib/libparrot.so.3.5.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -153,6 +153,8 @@ installable_pbc_merge                            [main]bin
 installable_pbc_merge.exe                        [main]bin
 installable_pbc_to_exe                           [main]bin
 installable_pbc_to_exe.exe                       [main]bin
+installable_winxed                               [main]bin
+installable_winxed.exe                           [main]bin
 lib/Parrot/Config/Generated.pm                   [devel]lib
 lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
@@ -248,6 +250,7 @@ runtime/parrot/include/tm.pasm                   [main]
 runtime/parrot/include/vtable_methods.pasm       [main]
 runtime/parrot/include/warnings.pasm             [main]
 runtime/parrot/languages/JSON/JSON.pir           [data_json]
+runtime/parrot/languages/winxed/winxed.pbc       [winxed]
 runtime/parrot/library/Archive/Tar.pbc           [main]
 runtime/parrot/library/Archive/Zip.pbc           [main]
 runtime/parrot/library/CGI/QueryHash.pbc         [main]

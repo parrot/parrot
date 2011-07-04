@@ -124,7 +124,7 @@ void runops_int(PARROT_INTERP, size_t offset)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-oplib_init_f get_core_op_lib_init(SHIM_INTERP,
+oplib_init_f get_core_op_lib_init(PARROT_INTERP,
     ARGIN(Parrot_runcore_t *runcore))
         __attribute__nonnull__(2);
 

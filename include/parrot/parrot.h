@@ -8,9 +8,16 @@
  *  References:
  */
 
-/* Only parrot core files should include this file.
-   Extensions should include <parrot/extend.h>.
-   Programs embedding parrot should include <parrot/embed.h>.
+/*
+    This file contains definitions for functions and data structures used by
+    Parrot. This file is currently included in almost all Parrot source files
+    and is typically required in add-in extensions. This file is *not* used
+    when embedding Parrot. For embedding, use <parrot/api.h>. For extensions,
+    you probably also need <parrot/extend.h> in addition to <parrot/parrot.h>.
+
+    In the future, <parrot/parrot.h> might not be required for extensions. For
+    now, it is required for most purposes because the extending API is not
+    stable or mature enough to be used without parrot.h.
 */
 
 #ifndef PARROT_PARROT_H_GUARD

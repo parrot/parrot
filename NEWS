@@ -1,3 +1,31 @@
+New in 3.6.0
+- Core
+  + Class.add_vtable_override now allows you to overwrite an override
+  + Integers, floats and strings can now be stored in lexical variables.
+    Previously, only PMCs could be stored in lexicals.
+  + VTABLE_substr has been removed. VTABLE_substr_str has been renamed to
+    VTABLE_substr
+- Languages
+  + Winxed has migrated to Github: https://github.com/NotFound/winxed
+
+New in 3.5.0
+- Core
+  + Parrot_PMC_destroy, Parrot_PMC_mark and Parrot_PMC_invoke were removed from
+    the public extension API.
+  + PAST now has PAST::Stmt node types, supports reusable temporary registers.
+  + Test coverage of the embedding and extending interface is now at least 95%.
+  + A snapshot of Winxed is now included in Parrot core to facilitate writing
+    core Parrot tools from a higher level language than PIR.
+- Languages
+  + Winxed
+    - Improved compile time scope search.
+    - Added 'using namespace' statement.
+    - Compiler classes and functions now live in the Winxed;Compiler namespace.
+- Tests
+  + The Parrot test suite harness now understands the HARNESS_TIMER environment
+    variable. Setting it to a true value will show timing results for a test run.
+  + IPv6 tests are now parallel testing friendly.
+
 New in 3.4.0
 - Core
   + The Generational Mark and Sweep garbage collector is the new default.

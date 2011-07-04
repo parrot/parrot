@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.4.0",
-    "release.name"     : "Pacific Parakeet",
+    "release.version"  : "3.5.0",
+    "release.name"     : "Menelaus",
     "release.day"      : "Tuesday",
-    "release.date"     : "17 May 2011",
-    "release.nextdate" : "21 June 2011",
+    "release.date"     : "21 June 2011",
+    "release.nextdate" : "19 July 2011",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "19 June 2011",
+    "bugday.date"      : "16 July 2011",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2011_06_19",
+    "wiki.bugday"      : "bug_day_2011_07_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.4.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.5.0/"
 }

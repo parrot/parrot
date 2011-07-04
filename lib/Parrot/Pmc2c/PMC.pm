@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2011, Parrot Foundation.
-#
 
 =head1 NAME
 
@@ -25,7 +24,7 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Storable ();
-use Parrot::PMC;
+use Parrot::PMC ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw(
@@ -34,7 +33,6 @@ use Parrot::Pmc2c::UtilFunctions qw(
     c_code_coda
     gen_multi_name
 );
-use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PMC::RO ();
 
 sub create {
