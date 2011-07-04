@@ -157,7 +157,7 @@ Append string to current buffer.
         size_t            total_size;
 
         /* Early return on NULL strings */
-        if (STRING_IS_NULL(s))
+        if (STRING_IS_NULL(s) || s->strlen == 0)
             return;
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
