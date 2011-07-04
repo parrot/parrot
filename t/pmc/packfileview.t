@@ -1,3 +1,5 @@
+#!./parrot
+
 .sub 'main' :main
     .include 'test_more.pir'
 
@@ -59,9 +61,9 @@
     $P1 = $P0["packfile"]
     $P2 = $P1.'constant_counts'()
     $I0 = isa $P2, 'FixedIntegerArray'
-    ok($I0)
+    ok($I0, "packfileview.constant_counts returns a FixedIntegerArray")
     $I2 = elements $P2
-    is($I2, 3)
+    is($I2, 3, "packfileview.constant_counts returns 3 types of constants")
 .end
 
 .sub 'test_method_main_sub'
@@ -69,7 +71,7 @@
     $P1 = $P0["packfile"]
     $P2 = $P1.'main_sub'()
     .const 'Sub' main_sub = 'main'
-    is($P2, main_sub)
+    is($P2, main_sub,"packfileview.main_sub returns the actual main sub")
 .end
 
 .sub 'test_method_trigger'
@@ -100,3 +102,8 @@
     # TODO
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
