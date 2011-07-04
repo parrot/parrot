@@ -222,8 +222,8 @@ Append string to current buffer.
         /* Update buffer */
         buffer->bufused += s->bufused;
         buffer->strstart = (char *)buffer->_bufstart;
-        buffer->strlen  += Parrot_str_length(INTERP, s);
-        buffer->hashval = 0; /* hash is invalid */
+        buffer->strlen  += s->strlen;
+        buffer->hashval  = 0; /* hash is invalid */
 
         PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
     }
