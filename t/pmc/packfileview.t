@@ -3,7 +3,7 @@
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(5)
+    plan(8)
 
     test_create()
     test_vtable_get_bool()
@@ -45,11 +45,6 @@
 .end
 
 .sub 'test_vtable_get_pmc_keyed_int'
-    $P0 = getinterp
-    $P1 = $P0["packfile"]
-    $P2 = $P1[0]
-    $S0 = typeof $P2
-    say $S0
     # TODO
 .end
 
@@ -79,15 +74,33 @@
     is($P2, main_sub,"packfileview.main_sub returns the actual main sub")
 .end
 
+.sub '__onload' :load
+    ok(1, "loaded")
+.end
+
 .sub 'test_method_trigger'
-    # TODO
+    $P0 = getinterp
+    $P1 = $P0["packfile"]
+    $P1.'trigger'("load")
+    # TODO: .trigger("init")
 .end
 
 .sub 'test_method_serialized_size'
-    # TODO
+    $P0 = new ['PackfileView']
+    $I0 = $P0.'serialized_size'()
+    is($I0, 0, "Empty PackfileView has serialized_size 0")
+
+    $P0 = getinterp
+    $P1 = $P0["packfile"]
+    $I0 = $P1.'serialized_size'()
+    isnt($I0, 0, "non-empty PackfileView has serialized_size != 0")
 .end
 
 .sub 'test_method_serialize'
+    # TODO
+.end
+
+.sub 'test_method_deserialize'
     # TODO
 .end
 
@@ -100,10 +113,6 @@
 .end
 
 .sub 'test_method_write_to_file'
-    # TODO
-.end
-
-.sub 'test_method_deserialize'
     # TODO
 .end
 
