@@ -54,15 +54,32 @@ method outputOp($op)
 
   $fh.print(".op '" ~ $op_name ~ "'\n");
 
+  self.show_alloc();
+
   for $op.iterator() -> $node
   {
     my $node_ret := self.handle_node($node);
     self.dealloc($node_ret);
   }
 
+  self.show_alloc();
+
+  my @all;
+
+  for self<alloc>
+  {
+    @all.push($_);
+  }
   for self<decl>
   {
-    self.dealloc($_, 1);
+    @all.push($_);
+  }
+
+  for @all -> $r
+  {
+    $fh.print("  # Dealloc $r\n");
+    self.dealloc($r);
+    self.dealloc($r, 1);
   }
 
   $fh.print(".end\n\n");
@@ -116,6 +133,7 @@ method alloc($type, $decl?)
   if (self<free> == 0)
   {
     say("No more free registers");
+    self.show_alloc();
     return "\$$type-1";
   }
   my $reg := self<free>.pop;
