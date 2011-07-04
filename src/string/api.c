@@ -3051,7 +3051,8 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
         for (i = 1; i < count; ++i) {
             const STRING *part = VTABLE_get_string_keyed_int(interp, ar, i);
-            VTABLE_push_string(interp, sb, j);
+            if (j_length)
+                VTABLE_push_string(interp, sb, j);
 
             if (part->strlen)
                 VTABLE_push_string(interp, sb, part);
