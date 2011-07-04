@@ -502,10 +502,12 @@ trace_mem_block(PARROT_INTERP,
              * free headers... */
             if ((pmc_min <= ptr)
             &&  (ptr < pmc_max)
+            &&  (PObj_is_PMC_TEST((PObj *)ptr))
             &&  interp->gc_sys->is_pmc_ptr(interp, (void *)ptr)) {
                 Parrot_gc_mark_PMC_alive(interp, (PMC *)ptr);
             }
             else if ((buffer_min <= ptr) && (ptr < buffer_max)
+            &&       (PObj_is_string_TEST((PObj *)ptr))
             &&        interp->gc_sys->is_string_ptr(interp, (void *)ptr)) {
                 if (PObj_is_string_TEST((PObj *)ptr))
                     Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
