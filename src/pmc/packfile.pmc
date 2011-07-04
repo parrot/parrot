@@ -161,6 +161,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
 */
     VTABLE STRING *get_string() {
+        STRING *str;
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile                   * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
@@ -171,7 +172,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
         pf->header->patch     = attrs->version_patch;
         pf->header->uuid_type = attrs->uuid_type;
 
-        STRING * const str = Parrot_pf_serialize(INTERP, pf);
+        str = Parrot_pf_serialize(INTERP, pf);
 
         PackFile_destroy(INTERP, pf);
         return str;

@@ -169,20 +169,22 @@ pmclass PackfileView auto_attrs {
     }
 
     METHOD serialized_size() {
+        INTVAL size;
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
             RETURN (INTVAL 0);
-        const INTVAL size = Parrot_pf_serialized_size(INTERP, attrs->pf);
+        size = Parrot_pf_serialized_size(INTERP, attrs->pf);
         RETURN (INTVAL size);
     }
 
     METHOD serialize() {
+        STRING *str;
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
             RETURN (STRING *STRINGNULL);
-        STRING * const str = Parrot_pf_serialize(INTERP, attrs->pf);
+        str = Parrot_pf_serialize(INTERP, attrs->pf);
         RETURN (STRING *str);
     }
 
