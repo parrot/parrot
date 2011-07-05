@@ -766,8 +766,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
 
-    UNUSED(flags);
-
     /* GC is blocked */
     if (self->gc_mark_block_level)
         return;
@@ -790,8 +788,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_check_sanity(interp);
     /*
-    2. Choose K - how many collections we want to collect. Collections [0..K] will
-    be collected. Remember K in C<self->gen_to_collect>.
+    2. Choose K - how many collections we want to collect. Collections [0..K]
+    will be collected. Remember K in C<self->gen_to_collect>.
     */
     self->gen_to_collect = gen = gc_gms_select_generation_to_collect(interp);
 
@@ -810,9 +808,10 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     */
     gc_gms_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
-    if (interp->pdb && interp->pdb->debugger) {
+
+    if (interp->pdb && interp->pdb->debugger)
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, GC_TRACE_FULL);
-    }
+
     gc_gms_print_stats(interp, "After trace_roots");
     gc_gms_check_sanity(interp);
 
@@ -839,7 +838,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     */
     gc_gms_sweep_pools(interp, self);
     gc_gms_check_sanity(interp);
-
 
     /* Update some stats */
     interp->gc_sys->stats.header_allocs_since_last_collect  = 0;
@@ -1502,11 +1500,12 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->string_allocator;
     string_alloc_struct *item;
-    STRING           *ret;
+    STRING              *ret;
 
     gc_gms_maybe_mark_and_sweep(interp);
 
-    /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
+    /* Increase used memory.
+     * Not precisely accurate due to Pool_Allocator paging.  */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
     interp->gc_sys->stats.memory_used           += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
@@ -1915,9 +1914,8 @@ gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     /* Collect every gc_threshold. */
-    if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
+    if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold)
         gc_gms_mark_and_sweep(interp, 0);
-    }
 }
 
 /*
