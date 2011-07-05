@@ -439,6 +439,21 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 
 PARROT_CANNOT_RETURN_NULL
 static void *
+pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(pool_allocate)
+
+    if (pool->free_list)
+        return get_free_list_item(pool);
+
+    if (!pool->newfree)
+        allocate_new_pool_arena(interp, pool);
+
+    return get_newfree_list_item(pool);
+}
+
+PARROT_CANNOT_RETURN_NULL
+static void *
 get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(get_newfree_list_item)
@@ -452,21 +467,6 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
 
     --pool->num_free_objects;
     return item;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static void *
-pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
-{
-    ASSERT_ARGS(pool_allocate)
-
-    if (pool->free_list)
-        return get_free_list_item(pool);
-
-    if (!pool->newfree)
-        allocate_new_pool_arena(interp, pool);
-
-    return get_newfree_list_item(pool);
 }
 
 static void
