@@ -1121,6 +1121,9 @@ OUTPUT
 
 }
 
+SKIP: {
+skip 'Need extra NCI thunks',1 unless $PConfig{HAS_EXTRA_NCI_THUNKS};
+
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
 
 void test(int x);
@@ -1149,6 +1152,7 @@ int main()
 CODE
 Hello!
 OUTPUT
+}
 
 # Local Variables:
 #   mode: cperl
