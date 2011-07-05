@@ -255,20 +255,8 @@ Returns the hashed value of the key C<value>.  See also string.c.
 */
 
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_STRING(PARROT_INTERP, ARGIN(const STRING *s), size_t seed)
-{
-    ASSERT_ARGS(key_hash_STRING)
-
-    if (s->hashval)
-        return s->hashval;
-
-    return STRING_hash(interp, s, seed);
-}
-
+#define key_hash_STRING(i, s, seed) \
+    (s)->hashval ? (s)->hashval : STRING_hash((i), (s), (seed))
 
 /*
 
@@ -1356,7 +1344,21 @@ void *
 Parrot_hash_get(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
     ASSERT_ARGS(Parrot_hash_get)
-    const HashBucket * const bucket = Parrot_hash_get_bucket(interp, hash, key);
+    HashBucket *bucket = NULL;
+
+    if (hash->entries <= 0)
+        return NULL;
+
+    if (hash->key_type == Hash_key_type_STRING) {
+        const STRING * const     s         = (const STRING *)key;
+        const INTVAL             seed       = hash->seed;
+        const size_t             hashval    = key_hash_STRING(interp, s, seed);
+
+        bucket = parrot_hash_get_bucket_string(interp, hash, s, hashval);
+    }
+    else
+        bucket = Parrot_hash_get_bucket(interp, hash, key);
+
     return bucket ? bucket->value : NULL;
 }
 
