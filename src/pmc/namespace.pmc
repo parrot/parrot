@@ -619,17 +619,17 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 */
 
     VTABLE void *get_pointer_keyed_str(STRING *key) {
-        PMC *ns = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *ns, *hash;
+        GETATTR_NameSpace_hash(INTERP, SELF, hash);
+
+        ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
+
+        if (ns && (PObj_get_FLAGS(ns) & FPA_is_ns_ext)
+        &&   ns->vtable->base_type == enum_class_FixedPMCArray)
+            ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
 
         /* Be extra careful about returning PMCNULL */
-        if (! PMC_IS_NULL(ns)) {
-            if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
-                    ns->vtable->base_type == enum_class_FixedPMCArray)
-                ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
-        }
-        if (PMC_IS_NULL(ns))
-            ns = PMCNULL;
-        return ns;
+        return ns ? ns : PMCNULL;
     }
 
     VTABLE void *get_pointer_keyed(PMC *key) {
