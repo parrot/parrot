@@ -619,7 +619,8 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 */
 
     VTABLE void *get_pointer_keyed_str(STRING *key) {
-        PMC *ns, *hash;
+        PMC  *ns;
+        Hash *hash;
         GETATTR_NameSpace_hash(INTERP, SELF, hash);
 
         ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
