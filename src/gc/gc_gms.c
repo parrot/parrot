@@ -1390,7 +1390,7 @@ and phase of the Moon.
         if (!self->gc_mark_block_level \
         &&  (i)->gc_sys->stats.mem_used_last_collect > self->gc_threshold) \
             gc_gms_mark_and_sweep(interp, 0); \
-    } while(0)
+    } while (0)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
