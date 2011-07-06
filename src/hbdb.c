@@ -24,6 +24,7 @@ function.
 */
 
 /* TODO Change hbdb_init() to accept an hbdb_t to avoid assignment after call */
+/* TODO Rewrite struct's to use STRING's instead */
 
 #include <stdio.h>
 #include <ctype.h>
@@ -85,44 +86,39 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* Contains information about the implementation of a particular command            */
+/* Contains information about the implementation of a particular command                  */
 struct hbdb_cmd_t {
-    hbdb_cmd_func_t function;    /* Points to the function the executes the command */
-    const char     *help;        /* Help message associated with the command        */
+    const hbdb_cmd_func_t function;    /* Points to the function the executes the command */
+    const char    * const help;        /* Help message associated with the command        */
 };
 
-/* Contains general information about a particular command          */
+/* Contains general information about a particular command                       */
 struct hbdb_cmd_table_t {
-    const char *name;          /* Command name                      */
-    const char *short_name;    /* Command name abbreviation         */
-    hbdb_cmd_t *cmd;           /* Command function and help message */
+    const char * const name;                /* Command name                      */
+    const char * const short_name;          /* Command name abbreviation         */
+    const hbdb_cmd_t * const cmd;           /* Command function and help message */
 };
 
-/* Help message displayed for each command */
-const char cmd_break_help[] = "Sets a breakpoint at the specified location.\n\n"
-                              "break LOCATION\n\n"
-                              "If LOCATION is an address, breaks at the exact address.";
+/* Define a 'hbdb_cmd_t' structure for each command */
+hbdb_cmd_t cmd_break = { &hbdb_cmd_break,
+                         "Sets a breakpoint at the specified location.\n\n"
+                         "break LOCATION\n\n"
+                         "If LOCATION is an address, breaks at the exact address." },
 
-/* TODO Do I need this string anymore? */
-const char cmd_help_help[]  = "List of commands:\n\n"
-                              "break\n"
-                              "\nType \"help\" followed by a command name.";
+           cmd_help  = { &hbdb_cmd_help,
+                         "List of commands:\n\n"
+                         "break\n"
+                         "\nType \"help\" followed by a command name."             },
 
-const char cmd_quit_help[]  = "Exits hbdb.";
-
-/* FIXME Get a better name for these identifiers */
-hbdb_cmd_t hbdb_cmd_break_x = { &hbdb_cmd_break, cmd_break_help };
-hbdb_cmd_t hbdb_cmd_help_x  = { &hbdb_cmd_help,  cmd_help_help  };
-hbdb_cmd_t hbdb_cmd_quit_x  = { &hbdb_cmd_quit,  cmd_quit_help  };
+           cmd_quit  = { &hbdb_cmd_quit,
+                         "Exits HBDB."                                             };
 
 /* Global command table */
-const hbdb_cmd_table_t command_table[] = {
-    { "break", "b", &hbdb_cmd_break_x },
-    { "help",  "h", &hbdb_cmd_help_x  },
-    { "quit",  "q", &hbdb_cmd_quit_x  }
+hbdb_cmd_table_t command_table[] = {
+    { "break", "b",  &cmd_break },
+    { "help",  "h",  &cmd_help  },
+    { "quit",  "q",  &cmd_quit  }
 };
-
-/*hbdb_cmd_table_t command_table[NUM_CMDS];*/
 
 /*
 
@@ -618,7 +614,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         if (hits == 1) {
             *cmd = skip_whitespace(next);
 
-            return (const hbdb_cmd_t *) &(command_table[found].cmd);
+            return (const hbdb_cmd_t *) command_table[found].cmd;
         }
     }
 
