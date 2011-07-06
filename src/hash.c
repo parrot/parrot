@@ -124,15 +124,6 @@ static size_t key_hash_cstring(PARROT_INTERP,
     size_t seed)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_STRING(PARROT_INTERP,
-    ARGIN(const STRING *s),
-    size_t seed)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
     ARGIN(const Hash *hash),
@@ -195,9 +186,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_parrot_hash_get_bucket_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
