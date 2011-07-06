@@ -447,7 +447,7 @@ hash_compare_int(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const vo
 
 =item C<static size_t key_hash(PARROT_INTERP, const Hash *hash, void *key)>
 
-Generic function to get the hashvalue of a given key. It may dispatches to
+Generic function to get the hashvalue of a given key. It may dispatch to
 key_hash_STRING, key_hash_cstring, etc. depending on hash->key_type.
 
 =cut
