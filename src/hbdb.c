@@ -37,9 +37,6 @@ function.
 #include "parrot/pobj.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
-/* Number of commands */
-#define NUM_CMDS 3
-
 /* Size of command-line buffer */
 #define HBDB_CMD_BUFFER_LENGTH 128
 
@@ -394,22 +391,6 @@ hbdb_init(PARROT_INTERP)
         hbdb->current_command  = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->last_command     = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
-
-        /*command_table[0].name          = "break";*/
-        /*command_table[0].short_name    = "b";*/
-        /*command_table[0].cmd->function = &hbdb_cmd_break;*/
-        /*command_table[0].cmd->help     = cmd_break_help;*/
-
-        /*command_table[1].name          = "help";*/
-        /*command_table[1].short_name    = "h";*/
-        /*command_table[1].cmd->function = &hbdb_cmd_help;*/
-        /*command_table[1].cmd->help     = cmd_help_help;*/
-
-        /*command_table[2].name          = "quit";*/
-        /*command_table[2].short_name    = "q";*/
-        /*command_table[2].cmd->function = &hbdb_cmd_quit;*/
-        /*command_table[2].cmd->help    = &cmd_help_quit;*/
-        /*command_table[2].cmd->help    = "FIXME";*/
     }
 
     /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
