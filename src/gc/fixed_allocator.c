@@ -516,8 +516,8 @@ pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
         while (arena) {
             const ptrdiff_t arena_item = (ptrdiff_t)(arena + 1);
 
-            if (arena_item <= ptr) {
-                const ptrdiff_t ptr_diff = ptr - arena_item;
+            if (arena_item <= ptritem) {
+                const ptrdiff_t ptr_diff = ptritem - arena_item;
 
                 if (ptr_diff < a_size
                 &&  ptr_diff % pool->object_size == 0)
