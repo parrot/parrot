@@ -36,6 +36,16 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static PackFile_ConstTable * get_const_table(PARROT_INTERP, PMC * self)>
+
+Get the constant table for the PackFile*. Return NULL if there's a problem.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
 get_const_table(PARROT_INTERP, ARGIN(PMC * self))
