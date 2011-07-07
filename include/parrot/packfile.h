@@ -293,7 +293,6 @@ typedef struct PackFile {
 typedef enum {
     PBC_MAIN   = 1,
     PBC_LOADED = 2,
-    PBC_PBC    = 4,
     PBC_IMMEDIATE = 8,
     PBC_POSTCOMP  = 16,
     PBC_INIT  = 32

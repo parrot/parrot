@@ -355,7 +355,6 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
         return 0;
 
     switch (action) {
-      case PBC_PBC:
       case PBC_MAIN:
         /* denote MAIN entry in first loaded PASM */
         if (interp->resume_flag & RESUME_INITIAL)
@@ -648,12 +647,12 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 =item C<void do_sub_pragmas(PARROT_INTERP, PMC *pfpmc, pbc_action_enum_t action,
 PMC *eval_pmc)>
 
-C<action> is one of C<PBC_PBC>, C<PBC_LOADED>, C<PBC_INIT>, or C<PBC_MAIN>.
+C<action> is one of C<PBC_LOADED>, C<PBC_INIT>, or C<PBC_MAIN>.
 These determine which subs get executed at this point. Some rules:
 
  :immediate subs always execute immediately
  :postcomp subs always execute immediately
- :main subs execute when we have the PBC_MAIN or PBC_PBC actions
+ :main subs execute when we have the PBC_MAIN action
  :init subs execute when :main does
  :load subs execute on PBC_LOAD
 
@@ -702,8 +701,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
     }
 
     if (interp->resume_flag & RESUME_INITIAL) {
-        if (action == PBC_PBC
-        ||  action == PBC_MAIN) {
+        if (action == PBC_MAIN) {
             if (self->main_sub < 0)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
@@ -2291,8 +2289,8 @@ Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
-        if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_PBC, pfpmc);
+        /*if (!(pf->options & PFOPT_HEADERONLY))
+            do_sub_pragmas(interp, pfpmc, PBC_PBC, pfpmc);*/
     }
 }
 
