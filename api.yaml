@@ -486,3 +486,8 @@
   tags:
     - 'deprecated'
   ticket: 'http://trac.parrot.org/parrot/ticket/1969'
+-
+  name :  'PackFile_* API functions'
+  tags :
+    - 'deprecated'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2140'
