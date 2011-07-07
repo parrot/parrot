@@ -50,7 +50,6 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, filename);
     *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
-    Parrot_pf_prepare_packfile_init(interp, *pbc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -85,7 +84,6 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
             "Could not unpack packfile");
     }
     *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    Parrot_pf_prepare_packfile_init(interp, *pbcpmc);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }

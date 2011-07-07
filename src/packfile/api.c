@@ -2260,7 +2260,6 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
     PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
     UNUSED(debug);
-    Parrot_pf_prepare_packfile_init(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
 }
 
@@ -2289,8 +2288,8 @@ Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
-        /*if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_PBC, pfpmc);*/
+        if (!(pf->options & PFOPT_HEADERONLY))
+            do_sub_pragmas(interp, pfpmc, PBC_MAIN, pfpmc);
     }
 }
 
