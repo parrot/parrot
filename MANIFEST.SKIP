@@ -330,6 +330,8 @@
 ^/ext/Parrot-Embed/t/.*\.pbc/
 ^/ext/nqp-rx/src/stage0/nqp-setting\.pir$
 ^/ext/nqp-rx/src/stage0/nqp-setting\.pir/
+^/frontend/hbdb/main\.o$
+^/frontend/hbdb/main\.o/
 ^/frontend/parrot/.*\.gcda$
 ^/frontend/parrot/.*\.gcda/
 ^/frontend/parrot/.*\.gcno$
@@ -344,8 +346,6 @@
 ^/frontend/parrot_debugger/.*\.gcno/
 ^/frontend/parrot_debugger/.*\.gcov$
 ^/frontend/parrot_debugger/.*\.gcov/
-^/frontend/parrot_debugger/main\.o$
-^/frontend/parrot_debugger/main\.o/
 ^/frontend/pbc_disassemble/main\.o$
 ^/frontend/pbc_disassemble/main\.o/
 ^/frontend/pbc_dump/.*\.gcda$

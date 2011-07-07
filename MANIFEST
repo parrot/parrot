@@ -867,8 +867,9 @@ ext/winxed/README                                           []doc
 ext/winxed/Rules.mak                                        []
 ext/winxed/compiler.pir                                     []
 ext/winxed/driver.pir                                       []
+frontend/hbdb/main.c                                        []
 frontend/parrot/main.c                                      []
-frontend/parrot_debugger/main.c                             []
+frontend/parrot_debugger/main.c.REMOVEME                    []
 frontend/pbc_disassemble/main.c                             []
 frontend/pbc_dump/main.c                                    []
 frontend/pbc_dump/packdump.c                                []
@@ -900,6 +901,7 @@ include/parrot/extend.h                                     [main]include
 include/parrot/gc_api.h                                     [main]include
 include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
+include/parrot/hbdb.h                                       [main]include
 include/parrot/hll.h                                        [main]include
 include/parrot/imageio.h                                    [main]include
 include/parrot/interpreter.h                                [main]include
@@ -1026,6 +1028,7 @@ lib/Parrot/Revision.pm                                      [devel]lib
 lib/Parrot/SHA1.pm                                          [devel]lib
 lib/Parrot/SearchOps.pm                                     [devel]lib
 lib/Parrot/Test.pm                                          [devel]lib
+lib/Parrot/Test/HBDB.pm                                     [devel]lib
 lib/Parrot/Test/Harness.pm                                  [devel]lib
 lib/Parrot/Test/PGE.pm                                      [devel]lib
 lib/Parrot/Test/PIR_PGE.pm                                  [devel]lib
@@ -1216,6 +1219,7 @@ src/embed.c                                                 []
 src/embed/api.c                                             []
 src/embed/bytecode.c                                        []
 src/embed/embed_private.h                                   []
+src/embed/hbdb.c                                            []
 src/embed/pmc.c                                             []
 src/embed/strings.c                                         []
 src/exceptions.c                                            []
@@ -1240,6 +1244,7 @@ src/gc/variable_size_pool.c                                 []
 src/gc/variable_size_pool.h                                 []
 src/global_setup.c                                          []
 src/hash.c                                                  []
+src/hbdb.c                                                  []
 src/hll.c                                                   []
 src/interp/inter_cb.c                                       []
 src/interp/inter_create.c                                   []
@@ -2065,6 +2070,9 @@ t/tools/dev/pmctree.t                                       [test]
 t/tools/dev/searchops.t                                     [test]
 t/tools/dev/searchops/samples.pm                            [test]
 t/tools/dump_pbc.t                                          [test]
+t/tools/hbdb/cmd_line_args.t                                [test]
+t/tools/hbdb/cmds.t                                         [test]
+t/tools/hbdb/testlib/hello.pir                              [test]
 t/tools/install/01-create_directories.t                     [test]
 t/tools/install/02-install_files.t                          [test]
 t/tools/install/03-lines_to_files.t                         [test]
