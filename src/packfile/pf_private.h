@@ -1,3 +1,9 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+This program is free software. It is subject to the same license as
+Parrot itself.
+*/
+
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 #include "parrot/embed.h"

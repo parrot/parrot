@@ -1,3 +1,9 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+This program is free software. It is subject to the same license as
+Parrot itself.
+*/
+
 /* HEADERIZER HFILE: src/packfile/pf_private.h */
 
 #include "parrot/parrot.h"
