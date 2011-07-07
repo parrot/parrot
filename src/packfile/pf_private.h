@@ -330,3 +330,10 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     , PARROT_ASSERT_ARG(pf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/segments.c */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

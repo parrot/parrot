@@ -2202,3 +2202,10 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
         break;
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
