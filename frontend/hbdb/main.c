@@ -249,7 +249,7 @@ load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
     }
 
     /* Compile file if it's not already bytecode */
-    if (!strcmp(strrchr(file, '.'), "pbc")) {
+    if (strcmp(strrchr(file, '.'), "pbc") != 0) {
         Parrot_PMC pir_compreg = NULL;
 
         /* Create and register a PIR IMCCompiler PMC */
