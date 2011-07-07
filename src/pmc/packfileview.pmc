@@ -40,7 +40,6 @@ PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
 get_const_table(PARROT_INTERP, ARGIN(PMC * self))
 {
-    ASSERT_ARGS(get_const_table);
     Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(self);
     PackFile * const pf = attrs->pf;
