@@ -56,6 +56,12 @@ typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
 static void command_line(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void display_breakpoint(
+    ARGIN(hbdb_t *hbdb),
+    ARGIN(hbdb_breakpoint_t *bp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static const hbdb_cmd_t * parse_command(ARGIN_NULLOK(const char **cmd));
@@ -74,6 +80,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_display_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(hbdb) \
+    , PARROT_ASSERT_ARG(bp))
 #define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_run_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -163,17 +172,34 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
     /* Don't skip, yet */
     bp->skip = 0;
 
-    /* STUB */
-    printf("Look at me cotto! No hands!\n");
-    /* STUB */
+    /* Check if this is the first breakpoint being added */
+    if (!hbdb->breakpoint) {
+        bp->id           = 1;
+        hbdb->breakpoint = bp;
+    }
+    else {
+        hbdb_breakpoint_t *old_bp;
+
+        /* Iterate through breakpoint list to reach last node */
+        for (old_bp = hbdb->breakpoint; old_bp->next; old_bp = old_bp->next );
+
+        /* TODO Try using increment operator */
+        bp->id       = old_bp->id + 1;
+
+        old_bp->next = bp;
+        bp->prev     = old_bp;
+    }
+
+    /* Show breakpoint position */
+    display_breakpoint(hbdb, bp);
 }
 
 /*
 
 =item C<void hbdb_cmd_help(PARROT_INTERP, const char *cmd)>
 
-If C<command> is non-NULL, displays help message for C<command>. Otherwise, a
-general help message is displayed.
+If C<cmd> is non-NULL, displays help message for C<cmd>. Otherwise, a general
+help message is displayed.
 
 =cut
 
@@ -518,6 +544,40 @@ command_line(PARROT_INTERP)
         /* Execute command */
         run_command(interp, cmd);
     }
+}
+
+/*
+
+=item C<static void display_breakpoint(hbdb_t *hbdb, hbdb_breakpoint_t *bp)>
+
+Displays information about the breakpoint pointed to by C<bp> including its ID,
+address, and line number. If the breakpoint is disabled, that will be displayed
+as well. Note that not all of the later information will be displayed if it is
+unknown at that time.
+
+=cut
+
+*/
+
+static void
+display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp)) {
+    ASSERT_ARGS(display_breakpoint)
+
+    Parrot_io_printf(hbdb->debugger,
+                      "Breakpoint %d at %04d: ",
+                      bp->id,
+                      bp->pc - hbdb->debugee->code->base.data);
+
+    if (hbdb->file)
+        Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file);
+
+    if (bp->line)
+        Parrot_io_printf(hbdb->debugger, ", line %d", bp->line);
+
+    if (bp->skip < 0)
+        Parrot_io_printf(hbdb->debugger, "  (DISABLED)");
+
+    Parrot_io_printf(hbdb->debugger, "\n");
 }
 
 /*
