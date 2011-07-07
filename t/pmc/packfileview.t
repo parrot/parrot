@@ -82,7 +82,12 @@
     $P0 = getinterp
     $P1 = $P0["packfile"]
     $P1.'trigger'("load")
-    # TODO: .trigger("init")
+
+    # TODO: This does nothing, the init sub is not triggered. I do not know why
+    $P2 = compreg "PIR"
+    $S0 = ".sub __init :init\nsay 'HELLO'\n.end"
+    $P1 = $P2.'compile'($S0)
+    $P1.'trigger'("init")
 .end
 
 .sub 'test_method_serialized_size'
