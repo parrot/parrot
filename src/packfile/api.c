@@ -143,12 +143,6 @@ static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static int sub_pragma(PARROT_INTERP,
     pbc_action_enum_t action,
     ARGIN(const PMC *sub_pmc))
@@ -204,9 +198,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_read_pbc_file_packfile_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
-#define ASSERT_ARGS_run_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sub_pmc))
 #define ASSERT_ARGS_sub_pragma __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -381,36 +372,6 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
     return todo;
 }
 
-
-/*
-
-=item C<static PMC* run_sub(PARROT_INTERP, PMC *sub_pmc)>
-
-Runs the B<sub_pmc> due to its B<:load>, B<:immediate>, ... pragma
-
-=cut
-
-*/
-
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-run_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
-{
-    ASSERT_ARGS(run_sub)
-    Parrot_runcore_t * const old_core = interp->run_core;
-    PMC              *retval   = PMCNULL;
-
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
-            interp->code->const_table);
-
-    Parrot_ext_call(interp, sub_pmc, "->P", &retval);
-    interp->run_core = old_core;
-
-    return retval;
-}
-
-
 /*
 
 =item C<static PMC* do_1_sub_pragma(PARROT_INTERP, PMC *sub_pmc,
@@ -436,10 +397,10 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
         /* run IMMEDIATE sub */
         if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
             void * const lo_var_ptr = interp->lo_var_ptr;
-            PMC  *result;
+            PMC  *result = PMCNULL;
 
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
-            result     = run_sub(interp, sub_pmc);
+            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->P", &result);
 
             /* reset initial flag so MAIN detection works
              * and reset lo_var_ptr to prev */
@@ -452,7 +413,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
         /* run POSTCOMP sub */
         if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_POSTCOMP) {
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_POSTCOMP;
-            run_sub(interp, sub_pmc);
+            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
 
             /* reset initial flag so MAIN detection works */
             interp->resume_flag = RESUME_INITIAL;
@@ -466,7 +427,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             Sub_comp_INIT_CLEAR(sub);
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
-            run_sub(interp, sub_pmc);
+            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
         }
         break;
 
@@ -477,7 +438,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             Sub_comp_INIT_CLEAR(sub);
             PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
-            run_sub(interp, sub_pmc);
+            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
             interp->resume_flag = RESUME_INITIAL;
         }
         break;
@@ -711,7 +672,6 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
                 Parrot_Sub_attributes *main_attrs;
                 PMC_get_sub(interp, mainsub, main_attrs);
                 interp->resume_offset = (ptr - main_attrs->seg->base.data);
-                Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), mainsub);
             }
         }
     }
@@ -2577,9 +2537,6 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
 
     if (!main_sub)
         main_sub = set_current_sub(interp);
-
-    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
     Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
