@@ -1,8 +1,18 @@
 /*
 Copyright (C) 2011, Parrot Foundation.
-This program is free software. It is subject to the same license as
-Parrot itself.
+
+=head1 NAME
+
+src/packfile/segments.c - Segment Handling Routines
+
+=head1 DESCRIPTION
+
+Functions in this file represent behaviors for different PackFile segments.
+
+=cut
+
 */
+
 
 /* HEADERIZER HFILE: src/packfile/pf_private.h */
 
@@ -290,8 +300,6 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
 
 
 /*
-
-=back
 
 =head2 PackFile ConstTable Structure Functions
 
@@ -2202,6 +2210,14 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
         break;
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
