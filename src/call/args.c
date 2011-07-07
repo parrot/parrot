@@ -948,7 +948,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     if (err_check && arg_index < positional_args) {
         /* We have extra positional args left over. */
         if (named_used_list != NULL)
-            parrot_hash_destroy(interp, named_used_list);
+            Parrot_hash_destroy(interp, named_used_list);
 
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION,
@@ -1156,7 +1156,7 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
     parrot_hash_iterate(named_arg_list,
         STRING * const name = (STRING *)_bucket->key;
 
-        if (!parrot_hash_exists(interp, named_used_list, name)) {
+        if (!Parrot_hash_exists(interp, named_used_list, name)) {
             Parrot_hash_destroy(interp, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,

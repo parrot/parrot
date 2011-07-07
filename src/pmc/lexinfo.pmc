@@ -32,12 +32,6 @@ pmclass LexInfo extends Hash  provides hash no_ro auto_attrs {
 
 /*
 
-=item C<void class_init()>
-
-Manipulate vtable->flags so that constant PMCs are created.
-If your inherited LexInfo is not so constant, then don't
-do that and provide a mark() method and set the custom_mark flag.
-
 =item C<init_pmc(PMC *sub)>
 
 Initialize the LexInfo PMC and remember the associate
@@ -47,23 +41,14 @@ subroutine.
 
 */
 
-    void class_init() {
-
-        /* there is no pmclass const_pmc flag yet */
-        INTERP->vtables[entry]->flags |= VTABLE_IS_CONST_PMC_FLAG;
-
-    }
-
     VTABLE void init() {
-        SELF.init_pmc(PMCNULL);
+        /* Set value type to INTVAL */
+        SELF.init_int((INTVAL)enum_type_INTVAL);
     }
 
     VTABLE void init_pmc(PMC *sub) {
-        PARROT_ASSERT(PObj_constant_TEST(SELF));
-
         /* Set value type to INTVAL */
         SELF.init_int((INTVAL)enum_type_INTVAL);
-        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*

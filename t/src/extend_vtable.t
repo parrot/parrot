@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
 
-plan tests => 140;
+plan tests => 139;
 
 =head1 NAME
 
@@ -460,25 +460,12 @@ OUTPUT
 #Done!
 #OUTPUT
 
-
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_substr" );
      string  = createstring(interp, "FOO");
 
      Parrot_PMC_assign_string_native(interp, pmc_string, string);
 
-     Parrot_PMC_substr(interp, pmc_string, 0, 2, pmc_string2);
-     Parrot_printf(interp, "%P\n", pmc_string2);
-CODE
-FO
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_substr_str" );
-     string  = createstring(interp, "FOO");
-
-     Parrot_PMC_assign_string_native(interp, pmc_string, string);
-
-     string2 = Parrot_PMC_substr_str(interp, pmc_string, 0, 1);
+     string2 = Parrot_PMC_substr(interp, pmc_string, 0, 1);
      Parrot_printf(interp, "%S\n", string2);
 CODE
 F

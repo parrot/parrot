@@ -214,6 +214,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('build', _build_pir_tge)
     .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
     register_step_after('build', _build_pir_nqp_rx)
+    .const 'Sub' _build_pir_winxed = '_build_pir_winxed'
+    register_step_after('build', _build_pir_winxed)
     .const 'Sub' _build_inc_pir = '_build_inc_pir'
     register_step_after('build', _build_inc_pir)
     .const 'Sub' _build_pir_pir = '_build_pir_pir'
@@ -241,6 +243,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_pir_tge)
     .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
     register_step_after('clean', _clean_pir_nqp_rx)
+    .const 'Sub' _clean_pir_winxed = '_clean_pir_winxed'
+    register_step_after('clean', _clean_pir_winxed)
     .const 'Sub' _clean_inc_pir = '_clean_inc_pir'
     register_step_after('clean', _clean_inc_pir)
     .const 'Sub' _clean_pir_pir = '_clean_pir_pir'
@@ -816,6 +820,51 @@ the value is an array of PIR pathname
     spew(inc, $S0, 1 :named('verbose'))
     goto L1
   L2:
+.end
+
+=item pir_winxed
+
+hash
+
+the key is the PIR pathname
+
+the value is the Winxed pathname
+
+=cut
+
+.sub '_build_pir_winxed' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_winxed']
+    unless $I0 goto L1
+    $P0 = kv['pir_winxed']
+    build_pir_winxed($P0)
+  L1:
+.end
+
+.sub 'build_pir_winxed'
+    .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, winxed
+    pir = shift $P0
+    winxed = hash[pir]
+    $I0 = newer(pir, winxed)
+    if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
+    .local string cmd
+    cmd = get_winxed()
+    cmd .= " -c -o"
+    cmd .= pir
+    cmd .= " "
+    cmd .= winxed
+    push jobs, cmd
+    goto L1
+  L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_pir (concat)
@@ -1657,6 +1706,19 @@ the value is the POD pathname
     $P0 = kv['pir_nqp']
     clean_key($P0)
   L3:
+.end
+
+=item pir_winxed
+
+=cut
+
+.sub '_clean_pir_winxed' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_winxed']
+    unless $I0 goto L1
+    $P0 = kv['pir_winxed']
+    clean_key($P0)
+  L1:
 .end
 
 =item pbc_pbc
@@ -4401,6 +4463,18 @@ Return the whole config
 
 .sub 'get_nqp_rx'
     .tailcall get_executable('parrot-nqp')
+.end
+
+=item get_srcdir
+
+=cut
+
+=item get_winxed
+
+=cut
+
+.sub 'get_winxed'
+    .tailcall get_executable('winxed')
 .end
 
 =item get_srcdir
