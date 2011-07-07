@@ -911,9 +911,9 @@ type:
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current call frame.
 
-The inclusion of CF is necessary for M0 interpreters written in high-level
-languages where the first element of an array is not equivalent to the array
-itself.
+The first 12 registers must only be modified by the register and gc/memory ops.
+Using other ops to modify these registers is invalid.  Implementations are free
+to assume that it does not happen and may fail when it does.
 
 =head2 Interpreter Data
 
