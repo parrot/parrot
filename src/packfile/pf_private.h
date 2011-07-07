@@ -4,6 +4,9 @@ This program is free software. It is subject to the same license as
 Parrot itself.
 */
 
+#ifndef PARROT_PR_PRIVATE_H_GUARD
+#define PARROT_PR_PRIVATE_H_GUARD
+
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 #include "parrot/embed.h"
@@ -330,6 +333,8 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     , PARROT_ASSERT_ARG(pf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/segments.c */
+
+#endif /* PARROT_PR_PRIVATE_H_GUARD */
 
 /*
  * Local variables:
