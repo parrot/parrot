@@ -46,11 +46,32 @@ Displays license information.
 #include "parrot/longopt.h"
 #include "imcc/api.h"
 
-static void fail         (Parrot_PMC interp);
-static void license      (void);
-static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc);
-static void usage        (void);
-static void welcome      (void);
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void fail(Parrot_PMC interp);
+static void license(void);
+static void load_bytecode(
+    Parrot_PMC interp,
+    ARGIN(const char * const file),
+    ARGOUT(Parrot_PMC *pbc))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pbc);
+
+static void usage(void);
+static void welcome(void);
+#define ASSERT_ARGS_fail __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_license __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(file) \
+    , PARROT_ASSERT_ARG(pbc))
+#define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_welcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--help"    } },
@@ -60,7 +81,7 @@ static struct longopt_opt_decl options[] = {
 
 /*
 
-=item C<int main(int argc, char *argv[])>
+=item C<int main(int argc, const char *argv[])>
 
 Entry point of C<hbdb>.
 
@@ -123,6 +144,7 @@ main(int argc, const char *argv[])
         fail(interp);
     }
 
+    /* TODO Do I need this? */
     /* Get global debugger structure */
     hbdb = INTERP_ATTR(interp)->hbdb;
 
@@ -177,6 +199,8 @@ the status code C<EXIT_FAILURE>.
 static void
 fail(Parrot_PMC interp)
 {
+    ASSERT_ARGS(fail)
+
     char          *msg;
 
     Parrot_Int    is_error,
@@ -229,7 +253,8 @@ license(void)
 
 /*
 
-=item C<static void load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)>
+=item C<static void load_bytecode(Parrot_PMC interp, const char * const file,
+Parrot_PMC *pbc)>
 
 If C<file> is a C<.pbc> file, the bytecode is loaded and stored in C<pbc>. Otherwise, it must
 be compiled first and then loaded into C<pbc>.
@@ -239,8 +264,10 @@ be compiled first and then loaded into C<pbc>.
 */
 
 static void
-load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
+load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_PMC *pbc))
 {
+    ASSERT_ARGS(load_bytecode)
+
     Parrot_String ps_file;
 
     /* Convert file's type to Parrot_String */
@@ -249,8 +276,10 @@ load_bytecode(Parrot_PMC interp, const char * const file, Parrot_PMC *pbc)
     }
 
     /* Compile file if it's not already bytecode */
-    if (strcmp(strrchr(file, '.'), "pbc") != 0) {
+    if (!strcmp(strrchr(file, '.'), "pbc")) {
         Parrot_PMC pir_compreg = NULL;
+
+        printf("FOOBAR!\n");
 
         /* Create and register a PIR IMCCompiler PMC */
         if (!imcc_get_pir_compreg_api(interp, 1, &pir_compreg))
