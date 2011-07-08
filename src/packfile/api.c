@@ -313,6 +313,52 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+{
+    ASSERT_ARGS(Parrot_pf_subs_by_flag)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    int mode = 0;
+    if (!pf)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL packfile");
+
+    if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
+        mode = 1;
+    else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
+        mode = 2;
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "%S is not a valid packfile trigger", flag);
+
+    {
+        PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PackFile_ByteCode   * const self = pf->cur_cs;
+        PackFile_ConstTable * const ct = self->const_table;
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        opcode_t i;
+
+        for (i = 0; i < ct->pmc.const_count; ++i) {
+            PMC * const sub_pmc = ct->pmc.constants[i];
+            Parrot_Sub_attributes *sub;
+            int pragmas;
+
+            if (!VTABLE_isa(interp, sub_pmc, SUB))
+                continue;
+            PMC_get_sub(interp, sub_pmc, sub);
+            pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK & ~SUB_FLAG_IS_OUTER;
+
+            if (mode == 1 && (pragmas & SUB_FLAG_PF_LOAD))
+                VTABLE_push_pmc(interp, subs, sub_pmc);
+            else if (mode == 2 && Sub_comp_INIT_TEST(sub))
+                VTABLE_push_pmc(interp, subs, sub_pmc);
+        }
+        return subs;
+    }
+}
+
 /*
 
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
