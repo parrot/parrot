@@ -255,8 +255,8 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
     if (flags->preprocess_only) {
-        imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
-        exit(EXIT_SUCCESS);
+        Parrot_Int r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
+        exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     else {
         const Parrot_Int pasm_mode = flags->have_pasm_file;
