@@ -13,7 +13,6 @@ Functions in this file represent behaviors for different PackFile segments.
 
 */
 
-
 /* HEADERIZER HFILE: src/packfile/pf_private.h */
 
 #include "parrot/parrot.h"
