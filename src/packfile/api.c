@@ -2585,7 +2585,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
             "Could not get packfile.");
 
     Parrot_pf_set_current_packfile(interp, pbc);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+    Parrot_pf_prepare_packfile_init(interp, pbc);
     main_sub = packfile_main(pf->cur_cs);
 
     /* if no sub was marked being :main, we create a dummy sub with offset 0 */
