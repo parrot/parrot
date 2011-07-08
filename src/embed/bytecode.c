@@ -48,7 +48,8 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *pbc = Parrot_pf_read_pbc_file(interp, filename);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, filename);
+    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
     Parrot_pf_prepare_packfile_init(interp, *pbc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -84,7 +85,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
             "Could not unpack packfile");
     }
     *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    do_sub_pragmas(interp, *pbcpmc, PBC_PBC, *pbcpmc);
+    Parrot_pf_prepare_packfile_init(interp, *pbcpmc);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -190,7 +191,7 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
-    /* TODO: Break up the dependency with emebed.c */
+    /* TODO: Break up the dependency with embed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -218,13 +219,7 @@ Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
-    else {
-        const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-        opcode_t * const packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp, pf, packed);
-        *bc = Parrot_str_new_init(interp, (const char *)packed, size,
-                Parrot_binary_encoding_ptr, 0);
-    }
+    *bc = Parrot_pf_serialize(interp, pf);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -246,29 +241,7 @@ Parrot_api_write_bytecode_to_file(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 {
     ASSERT_ARGS(Parrot_api_write_bytecode_to_file)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    else {
-        PIOHANDLE fp;
-        Parrot_block_GC_mark(interp);
-        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
-        if (fp == PIO_INVALID_HANDLE) {
-            Parrot_unblock_GC_mark(interp);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot open output file %Ss", filename);
-        }
-        else {
-            const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-            opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
-            PackFile_pack(interp, pf, packed);
-            PIO_WRITE(interp, fp, (char *)packed, size);
-        }
-        PIO_CLOSE(interp, fp);
-        Parrot_unblock_GC_mark(interp);
-    }
-
+    Parrot_pf_write_pbc_file(interp, pbc, filename);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

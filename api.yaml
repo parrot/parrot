@@ -482,6 +482,11 @@
     - 'deprecated'
   ticket: 'http://trac.parrot.org/parrot/ticket/1910'
 -
+  name :  'PackfileView PMC'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2145'
+-
   name :  'Eval PMC'
   tags:
     - 'deprecated'

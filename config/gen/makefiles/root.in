@@ -506,6 +506,7 @@ INTERP_O_FILES = \
     src/packfile/api$(O) \
     src/packfile/output$(O) \
     src/packfile/pf_items$(O) \
+    src/packfile/segments$(O) \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
@@ -698,6 +699,7 @@ STR_FILES = \
 #IF(has_extra_nci_thunks):    src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
+    src/packfile/segments.str \
     src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -1597,6 +1599,7 @@ src/multidispatch$(O) : \
 src/packfile/api$(O) : \
     src/packfile/api.str \
     src/packfile/api.c \
+    src/packfile/pf_private.h \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1609,13 +1612,36 @@ src/packfile/api$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
 
-src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
+src/packfile/output$(O) : \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_key.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/runcore_api.h \
+    src/packfile/pf_private.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    src/packfile/output.c
 
 src/packfile/pf_items$(O) : \
     $(PARROT_H_HEADERS) \
     src/packfile/byteorder.h \
     src/packfile/pf_items.str \
     src/packfile/pf_items.c
+
+src/packfile/segments$(O) : \
+    src/packfile/segments.str \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(PARROT_H_HEADERS) \
+    src/packfile/pf_private.h \
+    include/pmc/pmc_parrotlibrary.h \
+    $(INC_DIR)/runcore_api.h \
+    src/packfile/segments.c
 
 src/parrot$(O) : $(GEN_HEADERS)
 
@@ -1909,10 +1935,10 @@ src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
     $(PARROT_H_HEADERS) \
-    include/parrot/dynext.h \
-    include/parrot/embed.h \
-    include/parrot/oplib/core_ops.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
