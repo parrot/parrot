@@ -125,6 +125,20 @@ variable is being used in an lvalue context.
 .end
 
 
+=item signature([signature])
+
+Get/set the signature to be used for evaluating any
+children nodes.
+
+=cut
+
+.sub 'signature' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('signature', value, has_value)
+.end
+
+
 =item childorder([order])
 
 Get/set the order in which children nodes should be evaluated

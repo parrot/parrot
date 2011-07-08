@@ -115,6 +115,7 @@ Mark this Eval.
         }
         #endif
 
+        #if 0
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
@@ -131,6 +132,7 @@ Mark this Eval.
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
 
+        #endif
         sub_data->seg = NULL;
 
         SUPER();

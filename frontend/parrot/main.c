@@ -736,7 +736,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int result = 1;
     const char *sourcefile;
 
-    args->run_core_name = "slow";
+    args->run_core_name = "fast";
     args->write_packfile = 0;
     args->execute_packfile = 1;
     args->have_pbc_file = 0;

@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -149,6 +149,7 @@ sub _init {
         -Wunknown-pragmas
         -Wvariadic-macros
         -Wwrite-strings
+        -Wstack-usage=500
     );
 
     $gcc->{'basic'} = [ @gcc_or_gpp ];

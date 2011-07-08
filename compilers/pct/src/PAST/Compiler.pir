@@ -758,15 +758,28 @@ nodes of type C<PAST::Stmts>.
     .param pmc options         :slurpy :named
 
     .local pmc ops
-    .local string rtype
+    .local string rtype, signature
     rtype = options['rtype']
+
+    signature = node.'signature'()
+    if signature goto have_signature
     $P0 = node.'list'()
     $I0 = elements $P0
-    $S0 = repeat 'v', $I0
-    $S0 = concat $S0, rtype
-    ops = self.'post_children'(node, 'signature'=>$S0)
-    $P0 = ops[-1]
-    ops.'result'($P0)
+    signature = repeat 'v', $I0
+    signature = concat signature, rtype
+  have_signature:
+    ops = self.'post_children'(node, 'signature'=>signature)
+    .local pmc result
+    result = ops[-1]
+    $S0 = substr signature, 0, 1
+    $I0 = index '0123456789', $S0
+    if $I0 < 0 goto have_result
+    result = ops[$I0]
+  have_result:
+    ops.'result'(result)
+    unless rtype goto rtype_done
+    ops = self.'coerce'(ops, rtype)
+  rtype_done:
     .local pmc eh
     eh = node.'handlers'()
     unless eh, no_eh

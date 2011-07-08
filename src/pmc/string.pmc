@@ -345,24 +345,7 @@ is smaller.
 
 /*
 
-=item C<void substr(INTVAL offset, INTVAL length, PMC *dest)>
-
-Extracts the substring starting at C<offset>, with size
-C<length>, and places it in C<dest>.
-
-=cut
-
-*/
-    VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
-        STRING *str_val, *s2;
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = STRING_substr(INTERP, str_val, offset, length);
-        VTABLE_set_string_native(INTERP, dest, s2);
-    }
-
-/*
-
-=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
+=item C<STRING *substr(INTVAL offset, INTVAL length)>
 
 Extracts the substring starting at C<offset>, with size
 C<length>, and returns it.
@@ -370,7 +353,7 @@ C<length>, and returns it.
 =cut
 
 */
-    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
         return STRING_substr(INTERP, str_val, offset, length);

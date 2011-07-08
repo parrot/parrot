@@ -1342,7 +1342,7 @@ src/global_setup$(O) : $(PARROT_H_HEADERS) \
 src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 	include/pmc/pmc_sub.h
 
-src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
+src/pmc$(O) : include/pmc/pmc_class.h include/pmc/pmc_integer.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
 src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
@@ -1615,13 +1615,13 @@ src/packfile/api$(O) : \
 src/packfile/output$(O) : \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_key.h \
-    include/parrot/dynext.h \
-    include/parrot/extend_vtable.h \
-    include/parrot/extend.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/runcore_api.h \
     src/packfile/pf_private.h \
-    include/parrot/embed.h \
-    include/parrot/oplib/core_ops.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
     src/packfile/output.c
 
 src/packfile/pf_items$(O) : \
@@ -1640,7 +1640,7 @@ src/packfile/segments$(O) : \
     $(PARROT_H_HEADERS) \
     src/packfile/pf_private.h \
     include/pmc/pmc_parrotlibrary.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/runcore_api.h \
     src/packfile/segments.c
 
 src/parrot$(O) : $(GEN_HEADERS)
@@ -1935,10 +1935,10 @@ src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
     $(PARROT_H_HEADERS) \
-    include/parrot/dynext.h \
-    include/parrot/embed.h \
-    include/parrot/oplib/core_ops.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \

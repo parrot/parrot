@@ -20587,28 +20587,28 @@ Parrot_substr_s_sc_ic_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_substr_s_p_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    SREG(1) = VTABLE_substr_str(interp, PREG(2), IREG(3), IREG(4));
+    SREG(1) = VTABLE_substr(interp, PREG(2), IREG(3), IREG(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
 }
 
 opcode_t *
 Parrot_substr_s_p_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    SREG(1) = VTABLE_substr_str(interp, PREG(2), ICONST(3), IREG(4));
+    SREG(1) = VTABLE_substr(interp, PREG(2), ICONST(3), IREG(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
 }
 
 opcode_t *
 Parrot_substr_s_p_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    SREG(1) = VTABLE_substr_str(interp, PREG(2), IREG(3), ICONST(4));
+    SREG(1) = VTABLE_substr(interp, PREG(2), IREG(3), ICONST(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
 }
 
 opcode_t *
 Parrot_substr_s_p_ic_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    SREG(1) = VTABLE_substr_str(interp, PREG(2), ICONST(3), ICONST(4));
+    SREG(1) = VTABLE_substr(interp, PREG(2), ICONST(3), ICONST(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
 }

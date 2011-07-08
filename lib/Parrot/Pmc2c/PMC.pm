@@ -935,7 +935,7 @@ sub vtable_decl {
     my $methlist = join( ",\n        ", @vt_methods );
 
     my $cout = <<ENDOFCODE;
-    const VTABLE $temp_struct_name = {
+    static const VTABLE $temp_struct_name = {
         NULL,       /* namespace */
         $enum_name, /* base_type */
         NULL,       /* whoami */

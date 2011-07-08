@@ -3,6 +3,12 @@ New in 3.6.0
   + Class.add_vtable_override now allows you to overwrite an override
   + Integers, floats and strings can now be stored in lexical variables.
     Previously, only PMCs could be stored in lexicals.
+  + VTABLE_substr has been removed. VTABLE_substr_str has been renamed to
+    VTABLE_substr
+  + Added a new PackfileView PMC type, an intended replacement for the deprecated
+    Eval PMC.
+- Languages
+  + Winxed has migrated to Github: https://github.com/NotFound/winxed
 
 New in 3.5.0
 - Core

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -393,10 +393,12 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
         /* Create proxy if not found */
         if (PMC_IS_NULL(proxy)) {
-            Parrot_NameSpace_attributes * const nsattrs = PARROT_NAMESPACE(pmc_ns);
+            /* TODO: doing direct register access is faster, but Lua (at least) seems to depend
+                     on this method call */
+            /*Parrot_NameSpace_attributes * const nsattrs = PARROT_NAMESPACE(pmc_ns); */
             proxy = Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
-            /*Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);*/
-            nsattrs->_class = proxy;
+            Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
+            /*nsattrs->_class = proxy;*/
         }
         return proxy;
     }

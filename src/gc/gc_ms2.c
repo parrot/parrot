@@ -1116,7 +1116,8 @@ Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     ASSERT_ARGS(Parrot_gc_maybe_mark_and_sweep)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    if (interp->gc_sys->stats.memory_used > self->gc_threshold)
+    if (!self->gc_mark_block_level
+    &&   interp->gc_sys->stats.memory_used > self->gc_threshold)
         gc_ms2_mark_and_sweep(interp, flags);
 }
 

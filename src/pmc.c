@@ -20,6 +20,7 @@ The base vtable calling functions
 #include "parrot/parrot.h"
 #include "pmc.str"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_integer.h"
 #include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
@@ -825,7 +826,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
             if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;
             else
-                return VTABLE_get_integer(interp, item);
+                return PARROT_INTEGER(item)->iv;
         }
         else
             return -Parrot_dt_get_datatype_enum(interp, name);

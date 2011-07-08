@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,10 +36,21 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static PackFile_ConstTable * get_const_table(PARROT_INTERP, PMC * self)>
+
+Get the constant table for the PackFile*. Return NULL if there's a problem.
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
 get_const_table(PARROT_INTERP, ARGIN(PMC * self))
 {
+    ASSERT_ARGS(get_const_table)
     Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(self);
     PackFile * const pf = attrs->pf;
@@ -220,7 +231,7 @@ and PMC constants in the respective constant tables.
             VTABLE_set_integer_keyed_int(INTERP, counts, 0, ct->num.const_count);
             VTABLE_set_integer_keyed_int(INTERP, counts, 1, ct->str.const_count);
             VTABLE_set_integer_keyed_int(INTERP, counts, 2, ct->pmc.const_count);
-            RETURN (PMC *counts);
+            RETURN(PMC *counts);
         }
     }
 
@@ -247,10 +258,10 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
-            RETURN (PMC *PMCNULL);
+            RETURN(PMC *PMCNULL);
         else {
             PMC * const main_sub = Parrot_pf_get_packfile_main_sub(INTERP, SELF);
-            RETURN (PMC *main_sub);
+            RETURN(PMC *main_sub);
         }
     }
 
@@ -271,7 +282,7 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
                     VTABLE_push_pmc(INTERP, array, x);
             }
         }
-        RETURN (PMC *array);
+        RETURN(PMC *array);
     }
 
 /*
@@ -298,9 +309,9 @@ ptr in this PMC. Subject to the normal set_pointer restrictions.
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
-            RETURN (INTVAL 0);
+            RETURN(INTVAL 0);
         size = Parrot_pf_serialized_size(INTERP, attrs->pf);
-        RETURN (INTVAL size);
+        RETURN(INTVAL size);
     }
 
     METHOD serialize() {
@@ -308,9 +319,9 @@ ptr in this PMC. Subject to the normal set_pointer restrictions.
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
-            RETURN (STRING *STRINGNULL);
+            RETURN(STRING *STRINGNULL);
         str = Parrot_pf_serialize(INTERP, attrs->pf);
-        RETURN (STRING *str);
+        RETURN(STRING *str);
     }
 
     METHOD deserialize(STRING *pbc) {
