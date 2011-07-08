@@ -151,6 +151,7 @@ main(int argc, const char *argv[])
     /* Get filename */
     file = argv[argc - 1];
 
+    /* TODO Move call somewhere else to just before entering main runloop */
     /* Display welcome message */
     welcome();
 
@@ -276,7 +277,7 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
     }
 
     /* Compile file if it's not already bytecode */
-    if (!strcmp(strrchr(file, '.'), "pbc")) {
+    if (strcmp(strrchr(file, '.'), ".pbc") != 0) {
         Parrot_PMC pir_compreg = NULL;
 
         printf("FOOBAR!\n");
@@ -289,11 +290,12 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
         if (!imcc_compile_file_api(interp, pir_compreg, ps_file, pbc))
             fail(interp);
     }
-
-    /* Load bytecode */
-    if (!Parrot_api_load_bytecode_file(interp, ps_file, pbc)) {
-        Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+    else {
+        /* Load bytecode */
+        if (!Parrot_api_load_bytecode_file(interp, ps_file, pbc)) {
+            Parrot_api_destroy_interpreter(interp);
+            fail(interp);
+        }
     }
 }
 
