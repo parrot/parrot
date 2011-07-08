@@ -169,8 +169,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             next = VTABLE_invoke(INTERP, cont, next);
         }
 
-        /* TODO: What do we do with this return value? Can we ignore it? */
-        Parrot_pcc_build_call_from_c_args(INTERP, call_object, "P", eval_pmc);
+        Parrot_pcc_set_call_from_c_args(INTERP, call_object, "P", eval_pmc);
         interp->code = cur_code;
         return (opcode_t*)next;
     }
