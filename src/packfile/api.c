@@ -2223,6 +2223,15 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     Parrot_pop_context(interp);
 }
 
+PARROT_EXPORT
+PMC *
+Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
+{
+    const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
+    STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+    return Parrot_pf_get_packfile_pmc(interp, pf);
+}
 
 /*
 
