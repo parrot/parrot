@@ -94,6 +94,7 @@
 .annotate 'line', 32
     setattribute self, 'options', $P1
 .annotate 'line', 33
+    if_null $P1, __label_2
     iter $P22, $P1
     set $P22, 0
   __label_1: # for iteration
@@ -183,6 +184,7 @@
     null $P1
 .annotate 'line', 59
     getattribute $P2, self, 'options'
+    if_null $P2, __label_2
     iter $P3, $P2
     set $P3, 0
   __label_1: # for iteration
@@ -204,6 +206,7 @@
   __label_2: # endfor
 .annotate 'line', 63
     getattribute $P2, self, 'options'
+    if_null $P2, __label_5
     iter $P5, $P2
     set $P5, 0
   __label_4: # for iteration
@@ -224,13 +227,11 @@
   __label_8:
     unless $I3 goto __label_6
 .annotate 'line', 66
-    concat $S0, '--', $S1
-    set $S1, $S0
+    concat $S1, '--', $S1
     goto __label_7
   __label_6: # else
 .annotate 'line', 68
-    concat $S0, '-', $S1
-    set $S1, $S0
+    concat $S1, '-', $S1
   __label_7: # endif
 .annotate 'line', 69
 # predefined length
@@ -291,13 +292,11 @@
     sub $I3, $I1, 7
 # predefined substr
     substr $S3, __ARG_1, 0, $I3
-    concat $S0, $S3, __ARG_2
-    set $S1, $S0
+    concat $S1, $S3, __ARG_2
     goto __label_2
   __label_1: # else
 .annotate 'line', 85
-    concat $S0, __ARG_1, __ARG_2
-    set $S1, $S0
+    concat $S1, __ARG_1, __ARG_2
   __label_2: # endif
 .annotate 'line', 86
     .return($S1)
