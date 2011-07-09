@@ -116,8 +116,8 @@ sub new_interp {
         \&m0_opfunc_div_n,
         \&m0_opfunc_mod_i,
         \&m0_opfunc_mod_n,
-        \&m0_opfunc_iton,
-        \&m0_opfunc_ntoi,
+        \&m0_opfunc_convert_i_n,
+        \&m0_opfunc_convert_n_i,
         \&m0_opfunc_ashr,
         \&m0_opfunc_lshr,
         \&m0_opfunc_shl,
@@ -340,18 +340,18 @@ sub m0_opfunc_mod_n {
     $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
 }
 
-sub m0_opfunc_iton {
+sub m0_opfunc_convert_i_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "iton $a1, $a2, $a3";
+    m0_say "convert_i_n $a1, $a2, $a3";
 
-    $$cf->[$a2] = int($$cf->[$a1]);
+    $$cf->[$a1] = int($$cf->[$a2]);
 }
 
-sub m0_opfunc_ntoi {
+sub m0_opfunc_convert_n_i{
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "ntoi $a1, $a2, $a3";
+    m0_say "convert_n_i $a1, $a2, $a3";
 
-    $$cf->[$a2] = $$cf->[$a1];
+    $$cf->[$a1] = $$cf->[$a2];
 }
 
 sub m0_opfunc_ashr {
