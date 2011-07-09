@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 #
 
 eval 'exec perl -w -S $0 ${1+"$@"}'
@@ -121,19 +121,19 @@ sub init {
     # Get parrot version.
     # There will always be an up-to-date $parrot/VERSION
     my $filename = File::Spec->catfile($parrotdir, "VERSION");
-    open(VERSION, "<$filename") or die "Cannot open '$filename': $!";
-    $parrot{version} = <VERSION>;
+    open my $VERSION, '<', $filename or die "Cannot open '$filename': $!";
+    $parrot{version} = <$VERSION>;
     chomp $parrot{version};
-    close(VERSION) or die "Cannot close '$filename': $!";
+    close $VERSION or die "Cannot close '$filename': $!";
 
     # Get parrot configuration, stored in $parrot/myconfig
     $filename = File::Spec->catfile($parrotdir, "myconfig");
-    open(MYCONFIG, "<$filename") or die "Cannot open '$filename': $!";
+    open my $MYCONFIG, '<', $filename or die "Cannot open '$filename': $!";
     {
         local $/;
-        $parrot{myconfig} = <MYCONFIG>;
+        $parrot{myconfig} = <$MYCONFIG>;
     }
-    close(MYCONFIG) or die "Cannot close '$filename': $!";
+    close $MYCONFIG or die "Cannot close '$filename': $!";
 
 
     ##
@@ -170,10 +170,10 @@ sub init {
         # a body.
         if ( $opts{input} ) {
             # Report was pre-written, slurp it.
-            open BODY, "<$opts{input}" or die "Can't open '$opts{input}': $!";
+            open my $BODY, '<', $opts{input} or die "Can't open '$opts{input}': $!";
             local $/;
-            $report{body} = <BODY>;
-            close BODY or  die "Can't close '$opts{input}': $!";
+            $report{body} = <$BODY>;
+            close $BODY or  die "Can't close '$opts{input}': $!";
         }
         else {
             # No file provided...
@@ -459,12 +459,12 @@ EOT
     do {
         edit_bug_report( $tmpfile );
         # Slurp bug report.
-        open BODY, "<$tmpfile" or die "Can't open '$tmpfile': $!";
+        open my $BODY, '<', $tmpfile or die "Can't open '$tmpfile': $!";
         {
             local $/;
-            $body = <BODY>;
+            $body = <$BODY>;
         }
-        close BODY or die "Can't close '$tmpfile': $!";
+        close $BODY or die "Can't close '$tmpfile': $!";
         unless ( $body ) {
             print "\nYou provided an empty bug report!\n";
             print "Press 'Enter' to continue...\n";
@@ -475,7 +475,6 @@ EOT
 
     $report{body} = $body;
 }
-
 
 # Format the message with everything collected and return it.
 sub format_message {
@@ -570,21 +569,25 @@ EOT
     exit;
 }
 
-
 # Save message to file.
 sub save_report {
     print "\n==> Saving message to file...\n";
     if ( ! $opts{output} ) {
         print "Enter filename to save bug report: ";
-        $opts{output} = <STDIN>;
+        chomp($opts{output} = <STDIN>);
     }
 
-    open OUTPUT, ">$opts{output}" or die "Cannot open '$opts{output}': $!";
-    print OUTPUT format_message();
-    close OUTPUT or die "Cannot open '$opts{output}': $!";
+    open my $OUTPUT, ">", $opts{output}
+        or die "Cannot open '$opts{output}': $!";
+    print $OUTPUT format_message();
+    close $OUTPUT or die "Cannot open '$opts{output}': $!";
 
-    print "Message saved. Please submit a ticket and attach this file at
-    https://trac.parrot.org/parrot/newticket\n";
+    print <<TRAC;
+Message saved. Please go to
+  https://trac.parrot.org/parrot/newticket
+  and either paste content of saved file into 'Description'
+  or attach file to ticket.
+TRAC
 }
 
 
@@ -605,10 +608,10 @@ EOT
 sub what_next {
     dump_report() if $opts{dump};
     save_report() if $opts{save};
-
     return if $opts{dump} || $opts{save};
 
     # No actions provided on command-line, prompt for action.
+    print describe_actions();
 
     my $action;
     do {
@@ -623,7 +626,32 @@ sub what_next {
     } until ( $action =~ /^q/i );
 }
 
+sub describe_actions {
+    my $str = <<ACTION;
 
+Please choose among the following Actions:
+
+display:
+  Displays on STDOUT your bug report summary, bug description, 
+  operating system information, bug report flags, summary of 
+  your Parrot configuration and environment.  Returns you to 
+  a new Action prompt.
+
+edit:
+  Opens your editor and permits you to edit the bug description.
+  Returns you to a new Action prompt.
+
+save:
+  Prompts you to enter a filename to save the bug report.  Once
+  the file has been saved, displays filing instructions, then
+  returns you to a new Action prompt.
+
+quit:
+  Quits; returns you to your terminal's command prompt.
+
+ACTION
+    return $str;
+}
 __END__
 
 =head1 NAME
