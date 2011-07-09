@@ -357,6 +357,12 @@ PARROT_API
 Parrot_Int Parrot_api_hbdb_init(Parrot_PMC interp_pmc);
 
 PARROT_API
+Parrot_Int Parrot_api_hbdb_load_source(
+    Parrot_PMC interp_pmc,
+    ARGIN(const char *file))
+        __attribute__nonnull__(2);
+
+PARROT_API
 Parrot_Int Parrot_api_hbdb_runloop(
     Parrot_PMC interp_pmc,
     int argc,
@@ -364,6 +370,8 @@ Parrot_Int Parrot_api_hbdb_runloop(
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_api_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_hbdb_load_source __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_api_hbdb_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

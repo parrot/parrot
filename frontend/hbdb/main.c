@@ -280,8 +280,6 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
     if (strcmp(strrchr(file, '.'), ".pbc") != 0) {
         Parrot_PMC pir_compreg = NULL;
 
-        printf("FOOBAR!\n");
-
         /* Create and register a PIR IMCCompiler PMC */
         if (!imcc_get_pir_compreg_api(interp, 1, &pir_compreg))
             fail(interp);
@@ -289,6 +287,9 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
         /* Compile file */
         if (!imcc_compile_file_api(interp, pir_compreg, ps_file, pbc))
             fail(interp);
+
+        /* Load source code */
+        Parrot_api_hbdb_load_source(interp, file);
     }
     else {
         /* Load bytecode */

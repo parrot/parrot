@@ -62,13 +62,24 @@ typedef struct hbdb_condition {
     hbdb_condition     *next;    /* Next condition (watchpoints only)   */
 } hbdb_condition_t;
 
+typedef struct hbdb_line hbdb_line;
+
+/* Contains details about a specific line in the source file                            */
+typedef struct hbdb_line {
+    opcode_t        *opcode;        /* Opcode in bytecode corresponding to current line */
+    ptrdiff_t        offset;        /* Offset from beginning of file                    */
+    unsigned long    number;        /* Line number                                      */
+    /*hbdb_label_t    *label;*/     /* Label (if any)                                   */
+    hbdb_line       *next;          /* Next line (if any)                               */
+} hbdb_line_t;
+
 /* Contains details about the source file being debugged     */
 typedef struct {
     char         *filename;     /* Name of source file       */
     char         *source;       /* Source code in "filename" */
     size_t        size;         /* Size of file in bytes     */
     unsigned long next_line;    /* Next line to list         */
-    /*hbdb_line_t  *line;*/     /* First line of source code */
+    hbdb_line_t  *line;         /* First line of source code */
     /*hbdb_label_t *label;*/    /* First label               */
 } hbdb_file_t;
 
@@ -125,6 +136,10 @@ void hbdb_get_command(PARROT_INTERP)
 void hbdb_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -148,6 +163,9 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_hbdb_load_source __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_hbdb_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))

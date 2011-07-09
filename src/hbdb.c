@@ -40,6 +40,9 @@ function.
 /* Size of command-line buffer */
 #define HBDB_CMD_BUFFER_LENGTH 128
 
+/* Size of buffer allocated for source code */
+#define HBDB_SOURCE_BUFFER_LENGTH 1024
+
 /* Abstract access to fields in Parrot_Interp */
 #define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 
@@ -422,6 +425,114 @@ hbdb_init(PARROT_INTERP)
     /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
     HBDB_FLAG_SET(interp, HBDB_RUNNING);
     HBDB_FLAG_SET(interp, HBDB_ENTERED);
+}
+
+/*
+
+=item C<void hbdb_load_source(PARROT_INTERP, const char *file)>
+
+Loads source file into memory.
+
+=cut
+
+*/
+
+void
+hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
+{
+    ASSERT_ARGS(hbdb_load_source)
+
+    int       line;
+    int       i, j, ch;
+    size_t    buf_size;
+    ptrdiff_t start_offset;
+    FILE     *fd;
+
+    hbdb_t      *hbdb;
+    hbdb_file_t *dbg_file;
+    hbdb_line_t *dbg_line,
+                *prev_dbg_line = NULL;
+
+    opcode_t *PC = interp->code->base.data;
+
+    hbdb = interp->hbdb;
+    line = 0;
+
+    /* Free previous source file (if any) */
+    /*if (hbdb->file) {*/
+        /*hbdb_free_file(hbdb->debugee, hbdb->debugee->hbdb->file);*/
+        /*hbdb->debugee->hbdb->file = NULL;*/
+    /*}*/
+
+    /* Open file for reading */
+    if (!(fd = fopen(file, "r"))) {
+        Parrot_io_eprintf(hbdb->debugger, "%s: No such file or directory.\n", file);
+
+        return;
+    }
+
+    /* Allocate memory for source code buffer */
+    dbg_file         = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
+    dbg_file->source = mem_gc_allocate_n_typed(interp, HBDB_SOURCE_BUFFER_LENGTH, char);
+    buf_size         = HBDB_SOURCE_BUFFER_LENGTH;
+
+    /* Load source code */
+    do {
+        /* Iterate through characters until a newline is reached */
+        start_offset = dbg_file->size;
+
+        do {
+            ch = fgetc(fd);
+
+            /* Stop if EOF was found */
+            if (ch == EOF)
+                break;
+
+            /* Store character */
+            dbg_file->source[dbg_file->size] = (char) ch;
+
+            /* Extend buffer size if it's full */
+            if (++dbg_file->size >= buf_size) {
+                buf_size        += HBDB_SOURCE_BUFFER_LENGTH;
+                dbg_file->source = mem_gc_realloc_n_typed(interp, dbg_file->source, buf_size, char);
+            }
+        } while (ch != '\n');
+
+        /* Stop unless the last line didn't end with a newline */
+        if (ch == EOF && (dbg_file->size == 0 || dbg_file->source[dbg_file->size - 1] == '\n'))
+            break;
+
+        if (ch == EOF) {
+            dbg_file->source[dbg_file->size++] = '\n';
+            /* TODO Do I really need to print this? */
+            Parrot_io_eprintf(hbdb->debugger, "(Newline appended to last line of file)\n");
+        }
+
+        /* Allocate memory for 'hbdb_line_t' structure */
+        dbg_line = mem_gc_allocate_zeroed_typed(interp, hbdb_line_t);
+
+        /* Store info about current line */
+        dbg_line->offset = start_offset;
+        dbg_line->number = ++line;
+
+        /* Add line to list */
+        if (prev_dbg_line)
+            prev_dbg_line->next = dbg_line;
+        else
+            dbg_file->line      = dbg_line;
+
+        /* Set previous line of next iteration to current line of current iteration */
+        prev_dbg_line           = dbg_line;
+    } while (ch != EOF);
+
+    /* Close file descripter */
+    fclose(fd);
+
+    /* Globally set file structure */
+    hbdb->file = dbg_file;
+
+    /* Set flag to indicate that source file has been loaded */
+    HBDB_FLAG_SET(interp, HBDB_SRC_LOADED);
 }
 
 /*
