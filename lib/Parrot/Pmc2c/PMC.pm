@@ -1,5 +1,4 @@
 # Copyright (C) 2004-2011, Parrot Foundation.
-#
 
 =head1 NAME
 
@@ -25,7 +24,7 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw();
 use Storable ();
-use Parrot::PMC;
+use Parrot::PMC ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw(
@@ -34,7 +33,6 @@ use Parrot::Pmc2c::UtilFunctions qw(
     c_code_coda
     gen_multi_name
 );
-use Text::Balanced 'extract_bracketed';
 use Parrot::Pmc2c::PMC::RO ();
 
 sub create {
@@ -789,15 +787,7 @@ sub post_method_gen {
 
         # pcc return
         $body .= <<EOC if $need_result;
-{
-    /*
-     * Use the result of Parrot_pcc_build_call_from_c_args because it is marked
-     * PARROT_WARN_UNUSED_RESULT. Then explicitly don't use the result.
-     * This apparently makes sense.
-     */
-    PMC *unused = Parrot_pcc_build_call_from_c_args(interp, _call_obj, "$pcc_ret", _result);
-    UNUSED(unused);
-}
+    Parrot_pcc_set_call_from_c_args(interp, _call_obj, "$pcc_ret", _result);
 EOC
 
         $new_method->body(Parrot::Pmc2c::Emitter->text($body));
@@ -937,7 +927,7 @@ sub vtable_decl {
     my $methlist = join( ",\n        ", @vt_methods );
 
     my $cout = <<ENDOFCODE;
-    const VTABLE $temp_struct_name = {
+    static const VTABLE $temp_struct_name = {
         NULL,       /* namespace */
         $enum_name, /* base_type */
         NULL,       /* whoami */

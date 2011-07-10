@@ -911,6 +911,8 @@ Returns whether the two C<struct>s are equivalent.
 
 /*
 
+=item C<INTVAL get_bool()>
+
 =item C<INTVAL defined()>
 
 Returns whether the C<struct> is defined.
@@ -918,6 +920,10 @@ Returns whether the C<struct> is defined.
 =cut
 
 */
+
+    VTABLE INTVAL get_bool() {
+        return SELF.get_pointer() != NULL;
+    }
 
     VTABLE INTVAL defined() {
         return SELF.get_pointer() != NULL;

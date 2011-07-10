@@ -506,6 +506,7 @@ INTERP_O_FILES = \
     src/packfile/api$(O) \
     src/packfile/output$(O) \
     src/packfile/pf_items$(O) \
+    src/packfile/segments$(O) \
     src/longopt$(O) \
     @TEMP_platform_o@ \
     @TEMP_atomic_o@ \
@@ -698,6 +699,7 @@ STR_FILES = \
 #IF(has_extra_nci_thunks):    src/nci/extra_thunks.str \
     src/nci/signatures.str \
     src/packfile/api.str \
+    src/packfile/segments.str \
     src/packfile/object_serialization.str \
     src/packfile/pf_items.str \
     src/pmc.str \
@@ -966,7 +968,8 @@ src/pointer_array$(O) : \
     $(INC_DIR)/pointer_array.h
 
 src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
-    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h
+    include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
+    include/pmc/pmc_namespace.h
 
 src/scheduler$(O) : \
     $(PARROT_H_HEADERS) \
@@ -1073,23 +1076,23 @@ $(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_co
 # Parrot Disassembler
 #
 
-src/pbc_disassemble$(O) : \
+frontend/pbc_disassemble/main$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/api.h \
     $(INC_DIR)/longopt.h \
-    src/pbc_disassemble.c \
+    frontend/pbc_disassemble/main.c
 
-$(DIS) : src/pbc_disassemble$(O) $(LIBPARROT)
+$(DIS) : frontend/pbc_disassemble/main$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    src/pbc_disassemble$(O) \
+    frontend/pbc_disassemble/main$(O) \
     src/longopt$(O) \
     $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEDIS) : src/pbc_disassemble$(O) \
+$(INSTALLABLEDIS) : frontend/pbc_disassemble/main$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    src/pbc_disassemble$(O) \
+    frontend/pbc_disassemble/main$(O) \
     src/longopt$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
@@ -1339,7 +1342,7 @@ src/global_setup$(O) : $(PARROT_H_HEADERS) \
 src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
 	include/pmc/pmc_sub.h
 
-src/pmc$(O) : include/pmc/pmc_class.h src/pmc.c \
+src/pmc$(O) : include/pmc/pmc_class.h include/pmc/pmc_integer.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
 src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
@@ -1596,6 +1599,7 @@ src/multidispatch$(O) : \
 src/packfile/api$(O) : \
     src/packfile/api.str \
     src/packfile/api.c \
+    src/packfile/pf_private.h \
     include/pmc/pmc_sub.h \
     include/pmc/pmc_key.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -1608,13 +1612,36 @@ src/packfile/api$(O) : \
     $(PARROT_H_HEADERS) \
     $(INC_DIR)/runcore_api.h
 
-src/packfile/output$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_key.h src/packfile/output.c
+src/packfile/output$(O) : \
+    $(PARROT_H_HEADERS) \
+    include/pmc/pmc_key.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/runcore_api.h \
+    src/packfile/pf_private.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    src/packfile/output.c
 
 src/packfile/pf_items$(O) : \
     $(PARROT_H_HEADERS) \
     src/packfile/byteorder.h \
     src/packfile/pf_items.str \
     src/packfile/pf_items.c
+
+src/packfile/segments$(O) : \
+    src/packfile/segments.str \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/extend.h \
+    $(INC_DIR)/extend_vtable.h \
+    $(PARROT_H_HEADERS) \
+    src/packfile/pf_private.h \
+    include/pmc/pmc_parrotlibrary.h \
+    $(INC_DIR)/runcore_api.h \
+    src/packfile/segments.c
 
 src/parrot$(O) : $(GEN_HEADERS)
 
@@ -1908,10 +1935,10 @@ src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
     $(PARROT_H_HEADERS) \
-    include/parrot/dynext.h \
-    include/parrot/embed.h \
-    include/parrot/oplib/core_ops.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
@@ -2286,7 +2313,7 @@ prog-clean :
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
-    $(DIS) src/pbc_disassemble$(O)
+    $(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
     frontend/parrot/main$(O) \
     src/null_config$(O) \
@@ -2323,7 +2350,7 @@ archclean: dynext-clean
     $(PDUMP) frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
     $(PDB) frontend/parrot_debugger/main$(O) \
     $(PBC_MERGE) frontend/pbc_merge/main$(O) \
-    $(DIS) src/pbc_disassemble$(O) \
+    $(DIS) frontend/pbc_disassemble/main$(O) \
     $(PARROT_CONFIG) parrot_config$(O) parrot_config.c \
     src/parrot_config$(O) parrot_config.pbc \
     pbc_to_exe$(EXE) pbc_to_exe$(O) pbc_to_exe.pbc \

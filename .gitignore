@@ -210,6 +210,7 @@
 /ext/Parrot-Embed/t/*.pbc
 /frontend/parrot/main.o
 /frontend/parrot_debugger/main.o
+/frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o
 /frontend/pbc_dump/packdump.o
 /frontend/pbc_merge/main.o
@@ -312,6 +313,8 @@
 /src/parrot_config.c
 /src/parrot_config.h
 /src/platform/*/*.o
+/src/platform/*/*.gcda
+/src/platform/*/*.gcno
 /src/revision.c
 /src/atomic/*.o
 /src/call/*.o

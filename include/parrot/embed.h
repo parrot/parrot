@@ -38,18 +38,6 @@ void Parrot_destroy(PARROT_INTERP)
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Parrot_PMC Parrot_compile_string(PARROT_INTERP,
-    Parrot_String type,
-    ARGIN(const char *code),
-    ARGOUT(Parrot_String *error))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
 Parrot_Opcode * Parrot_debug(PARROT_INTERP,
     ARGIN(Parrot_Interp debugger),
     ARGIN(Parrot_Opcode *pc))
@@ -95,10 +83,6 @@ PARROT_CANNOT_RETURN_NULL
 PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(code) \
-    , PARROT_ASSERT_ARG(error))
 #define ASSERT_ARGS_Parrot_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(debugger) \

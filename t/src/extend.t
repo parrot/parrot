@@ -190,7 +190,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string' );
 
 #include <stdio.h>
-	#include "parrot/embed.h"
+#include "parrot/embed.h"
 #include "parrot/extend.h"
 
 int

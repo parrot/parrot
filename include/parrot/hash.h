@@ -120,42 +120,6 @@ enum ORDERED_HASH_ITEM_PART {
     ORDERED_HASH_ITEM_MAX   = 4
 };
 
-/* Macros to help ease the deprecation of these function names.
-   We can remove these after the migration, sometime after 3.0 */
-
-#define parrot_dump_hash Parrot_hash_dump
-#define parrot_hash_clone Parrot_hash_clone
-#define parrot_hash_delete Parrot_hash_delete
-#define parrot_hash_destroy Parrot_hash_destroy
-#define parrot_hash_exists Parrot_hash_exists
-#define parrot_hash_get Parrot_hash_get
-#define parrot_hash_get_bucket Parrot_hash_get_bucket
-#define parrot_hash_put Parrot_hash_put
-#define parrot_hash_size Parrot_hash_size
-#define parrot_mark_hash Parrot_hash_mark
-#define parrot_new_cstring_hash Parrot_hash_new_cstring_hash
-#define parrot_new_hash Parrot_hash_new
-#define parrot_new_intval_hash Parrot_hash_new_intval_hash
-#define parrot_new_pointer_hash Parrot_hash_new_pointer_hash
-#define hash_key_from_int Parrot_hash_key_from_int
-#define hash_key_from_pmc Parrot_hash_key_from_pmc
-#define hash_key_from_string Parrot_hash_key_from_string
-#define hash_key_to_int Parrot_hash_key_to_int
-#define hash_key_to_pmc Parrot_hash_key_to_pmc
-#define hash_key_to_string Parrot_hash_key_to_string
-#define hash_value_from_int Parrot_hash_value_from_int
-#define hash_value_from_number Parrot_hash_value_from_number
-#define hash_value_from_pmc Parrot_hash_value_from_pmc
-#define hash_value_from_string Parrot_hash_value_from_string
-#define hash_value_to_int Parrot_hash_value_to_int
-#define hash_value_to_number Parrot_hash_value_to_number
-#define hash_value_to_pmc Parrot_hash_value_to_pmc
-#define hash_value_to_string Parrot_hash_value_to_string
-#define parrot_chash_destroy Parrot_hash_chash_destroy
-#define parrot_chash_destroy_values Parrot_hash_chash_destroy_values
-#define parrot_create_hash Parrot_hash_create
-#define parrot_hash_clone_prunable Parrot_hash_clone_prunable
-
 /* HEADERIZER BEGIN: src/hash.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

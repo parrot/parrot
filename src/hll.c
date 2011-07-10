@@ -477,8 +477,11 @@ Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
 
 Leopold Toetsch
 
-=cut
+=head1 SEE ALSO
 
+F<include/parrot/hll.h>
+
+=cut
 
 */
 

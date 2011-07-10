@@ -344,6 +344,8 @@
 ^/frontend/parrot_debugger/.*\.gcov/
 ^/frontend/parrot_debugger/main\.o$
 ^/frontend/parrot_debugger/main\.o/
+^/frontend/pbc_disassemble/main\.o$
+^/frontend/pbc_disassemble/main\.o/
 ^/frontend/pbc_dump/.*\.gcda$
 ^/frontend/pbc_dump/.*\.gcda/
 ^/frontend/pbc_dump/.*\.gcno$
@@ -790,6 +792,10 @@
 ^/src/parrot_config\.c/
 ^/src/parrot_config\.h$
 ^/src/parrot_config\.h/
+^/src/platform/.*/.*\.gcda$
+^/src/platform/.*/.*\.gcda/
+^/src/platform/.*/.*\.gcno$
+^/src/platform/.*/.*\.gcno/
 ^/src/platform/.*/.*\.o$
 ^/src/platform/.*/.*\.o/
 ^/src/pmc/.*\.c$

@@ -856,7 +856,10 @@ main(int argc, const char **argv)
 
         pbcname = Parrot_str_new(interp, input_files[i]->filename,
                 strlen(input_files[i]->filename));
-        pbcpmc = Parrot_pf_read_pbc_file(interp, pbcname);
+        {
+            PackFile * const pf = Parrot_pf_read_pbc_file(interp, pbcname);
+            pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+        }
 
         /* Load the packfile and unpack it. */
         input_files[i]->pf = (PackFile *)VTABLE_get_pointer(interp, pbcpmc);

@@ -735,6 +735,11 @@ N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
 
+N: Martin Olsen
+D: M0 tests
+U: mro
+E: github.com@martinolsen.net
+
 N: Matt Boyle
 U: ligne
 D: Fixes to docs and test-suite.

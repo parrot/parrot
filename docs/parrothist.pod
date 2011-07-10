@@ -127,5 +127,6 @@ Starred release numbers indicate supported releases.
 
  Whiteknight 3.3.0 *        2011-Apr-19     "Fire in the Sky"
  Gerd        3.4.0          2011-May-17     "Pacific Parakeet"
+ cotto       3.5.0          2011-Jun-21     "Menelaus"
 
 =cut

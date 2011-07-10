@@ -20,6 +20,7 @@ The base vtable calling functions
 #include "parrot/parrot.h"
 #include "pmc.str"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_integer.h"
 #include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
@@ -825,7 +826,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
             if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;
             else
-                return VTABLE_get_integer(interp, item);
+                return PARROT_INTEGER(item)->iv;
         }
         else
             return -Parrot_dt_get_datatype_enum(interp, name);
@@ -850,7 +851,7 @@ PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
 {
     ASSERT_ARGS(Parrot_pmc_box_string)
-    PMC * ret = Parrot_pmc_new(interp,
+    PMC * const ret = Parrot_pmc_new(interp,
                         Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, ret, string);
 
@@ -1171,10 +1172,8 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 
 =head1 SEE ALSO
 
-F<include/parrot/vtable.h>.
-
-C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
-(http://www.nntp.perl.org/group/perl.perl6.internals/5516).
+F<include/parrot/pmc.h>, F<include/parrot/vtable.h>,
+L<http://www.nntp.perl.org/group/perl.perl6.internals/2001/10/msg5516.html>
 
 =cut
 

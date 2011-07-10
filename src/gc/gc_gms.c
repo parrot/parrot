@@ -360,9 +360,6 @@ static void gc_gms_mark_str_header(PARROT_INTERP, ARGMOD(STRING *str))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
-static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static void gc_gms_pmc_get_youngest_generation(PARROT_INTERP,
     ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
@@ -548,8 +545,6 @@ static int gen2flags(int gen);
 #define ASSERT_ARGS_gc_gms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_gc_gms_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_pmc_get_youngest_generation \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -766,8 +761,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
 
-    UNUSED(flags);
-
     /* GC is blocked */
     if (self->gc_mark_block_level)
         return;
@@ -790,8 +783,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_check_sanity(interp);
     /*
-    2. Choose K - how many collections we want to collect. Collections [0..K] will
-    be collected. Remember K in C<self->gen_to_collect>.
+    2. Choose K - how many collections we want to collect. Collections [0..K]
+    will be collected. Remember K in C<self->gen_to_collect>.
     */
     self->gen_to_collect = gen = gc_gms_select_generation_to_collect(interp);
 
@@ -810,9 +803,10 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     */
     gc_gms_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
-    if (interp->pdb && interp->pdb->debugger) {
+
+    if (interp->pdb && interp->pdb->debugger)
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, GC_TRACE_FULL);
-    }
+
     gc_gms_print_stats(interp, "After trace_roots");
     gc_gms_check_sanity(interp);
 
@@ -839,7 +833,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     */
     gc_gms_sweep_pools(interp, self);
     gc_gms_check_sanity(interp);
-
 
     /* Update some stats */
     interp->gc_sys->stats.header_allocs_since_last_collect  = 0;
@@ -1378,6 +1371,27 @@ gc_gms_finalize(PARROT_INTERP)
     Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
 }
 
+/*
+
+=item C<gc_gms_maybe_mark_and_sweep(PARROT_INTERP)>
+
+Maybe M&S. Depends on total allocated memory, memory allocated since last alloc
+and phase of the Moon.
+
+=cut
+
+*/
+
+#define gc_gms_maybe_mark_and_sweep(i) \
+    do { \
+        MarkSweep_GC * const self = (MarkSweep_GC *)(i)->gc_sys->gc_private; \
+    \
+        /* Collect every gc_threshold. */ \
+        if (!self->gc_mark_block_level \
+        &&  (i)->gc_sys->stats.mem_used_last_collect > self->gc_threshold) \
+            gc_gms_mark_and_sweep(interp, 0); \
+    } while (0)
+
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
@@ -1502,11 +1516,12 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->string_allocator;
     string_alloc_struct *item;
-    STRING           *ret;
+    STRING              *ret;
 
     gc_gms_maybe_mark_and_sweep(interp);
 
-    /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
+    /* Increase used memory.
+     * Not precisely accurate due to Pool_Allocator paging.  */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
     interp->gc_sys->stats.memory_used           += sizeof (STRING);
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
@@ -1895,29 +1910,6 @@ gc_gms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_gms_pmc_needs_early_collection)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
-}
-
-/*
-
-=item C<static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP)>
-
-Maybe M&S. Depends on total allocated memory, memory allocated since last alloc
-and phase of the Moon.
-
-=cut
-
-*/
-static void
-gc_gms_maybe_mark_and_sweep(PARROT_INTERP)
-{
-    ASSERT_ARGS(gc_gms_maybe_mark_and_sweep)
-
-    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-
-    /* Collect every gc_threshold. */
-    if (interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold) {
-        gc_gms_mark_and_sweep(interp, 0);
-    }
 }
 
 /*

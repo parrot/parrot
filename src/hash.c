@@ -124,15 +124,6 @@ static size_t key_hash_cstring(PARROT_INTERP,
     size_t seed)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t key_hash_STRING(PARROT_INTERP,
-    ARGIN(const STRING *s),
-    size_t seed)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CAN_RETURN_NULL
 static HashBucket * parrot_hash_get_bucket_string(PARROT_INTERP,
     ARGIN(const Hash *hash),
@@ -195,9 +186,6 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_key_hash_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_key_hash_STRING __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_parrot_hash_get_bucket_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
@@ -255,20 +243,8 @@ Returns the hashed value of the key C<value>.  See also string.c.
 */
 
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static size_t
-key_hash_STRING(PARROT_INTERP, ARGIN(const STRING *s), size_t seed)
-{
-    ASSERT_ARGS(key_hash_STRING)
-
-    if (s->hashval)
-        return s->hashval;
-
-    return STRING_hash(interp, s, seed);
-}
-
+#define key_hash_STRING(i, s, seed) \
+    (s)->hashval ? (s)->hashval : STRING_hash((i), (s), (seed))
 
 /*
 
@@ -302,6 +278,8 @@ hash_compare_string(PARROT_INTERP, ARGIN(const void *search_key), ARGIN(const vo
 
 Compare two strings. Returns 0 if they are identical. Considers differing
 encodings to be distinct.
+
+=cut
 
 */
 
@@ -457,7 +435,7 @@ hash_compare_int(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const vo
 
 =item C<static size_t key_hash(PARROT_INTERP, const Hash *hash, void *key)>
 
-Generic function to get the hashvalue of a given key. It may dispatches to
+Generic function to get the hashvalue of a given key. It may dispatch to
 key_hash_STRING, key_hash_cstring, etc. depending on hash->key_type.
 
 =cut
@@ -1354,7 +1332,21 @@ void *
 Parrot_hash_get(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
     ASSERT_ARGS(Parrot_hash_get)
-    const HashBucket * const bucket = Parrot_hash_get_bucket(interp, hash, key);
+    HashBucket *bucket = NULL;
+
+    if (hash->entries <= 0)
+        return NULL;
+
+    if (hash->key_type == Hash_key_type_STRING) {
+        const STRING * const     s         = (const STRING *)key;
+        const INTVAL             seed       = hash->seed;
+        const size_t             hashval    = key_hash_STRING(interp, s, seed);
+
+        bucket = parrot_hash_get_bucket_string(interp, hash, s, hashval);
+    }
+    else
+        bucket = Parrot_hash_get_bucket(interp, hash, key);
+
     return bucket ? bucket->value : NULL;
 }
 
@@ -2215,7 +2207,7 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd08_keys.pod>.
+F<docs/pdds/draft/pdd08_keys.pod>, F<include/parrot/hash.h>
 
 =head1 TODO
 
