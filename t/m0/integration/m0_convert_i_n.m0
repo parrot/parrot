@@ -3,10 +3,10 @@
 .constants
 0 "1..2\n"
 1 "n"
-2 "ok 1 iton converts 99 to 99.0\n"
+2 "ok 1 convert_i_n: 99 = 99.0\n"
 3 99.0
 4 -23.0
-5 "ok 2 iton converts -23 to -23.0\n"
+5 "ok 2 convert_i_n: -23 = -23.0\n"
 .metadata
 .bytecode
 
@@ -19,18 +19,18 @@
     set_imm N0, 0, 3
     deref   N0, CONSTS, N0
 
-    iton    I2, N0, x
-    sub_n   N1, N0, N1
+    convert_i_n N1, I1, x
+    sub_n   N0, N0, N1
 
-    goto_if iton_nok1, N1
-    goto    iton_ok1, x
+    goto_if convertin_nok1, N0
+    goto    convertin_ok1, x
 
-iton_nok1:
+convertin_nok1:
     set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-iton_ok1:
+convertin_ok1:
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
@@ -39,21 +39,21 @@ iton_ok1:
     set_imm I2, 0, 0
     sub_i   I1, I2, I1
 
-    set_imm N1, 0, 4
-    deref   N1, CONSTS, N1
+    set_imm N0, 0, 4
+    deref   N0, CONSTS, N0
 
-    iton    I1, N0, x
-    sub_n   N1, N0, N1
+    convert_i_n N1, I1, x
+    sub_n   N0, N0, N1
 
-    goto_if iton_nok2, N1
-    goto    iton_ok2, x
+    goto_if convertin_nok2, N0
+    goto    convertin_ok2, x
 
-iton_nok2:
+convertin_nok2:
     set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-iton_ok2:
+convertin_ok2:
     set_imm S0, 0, 5
     deref   S0, CONSTS, S0
     print_s I0, S0, x
