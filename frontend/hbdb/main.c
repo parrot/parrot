@@ -4,16 +4,19 @@
 
 =head1 NAME
 
-hbdb - The Honey Bee Debugger
+HBDB - The Honey Bee Debugger
 
 =head1 SYNOPSIS
 
-hbdb [options] [file]
+    hbdb [options] [file]
 
 =head1 DESCRIPTION
 
-The Honey Bee Debugger (hbdb) is the standard debugger for the Parrot virtual
+The Honey Bee Debugger (HBDB) is the standard debugger for the Parrot virtual
 machine.
+
+Note that this file is merely the frontend. If you are looking for a tutorial on
+how to use HBDB, please see F<docs/hbdb.pod>.
 
 =head1 OPTIONS
 
@@ -30,6 +33,9 @@ Displays license information.
 =back
 
 =head1 STATIC FUNCTIONS
+
+The following functions are all static. As such, they will not appear
+anywhere outisde this file.
 
 =over 4
 
@@ -175,59 +181,12 @@ main(int argc, const char *argv[])
         show_last_error_and_exit(interp);
     }
 
-    /*
-    if (!Parrot_api_run_bytecode(interp, pbc, NULL)) {
-        Parrot_api_destroy_interpreter(interp);
+    /* Destroy interpreter */
+    if (!Parrot_api_destroy_interpreter(interp)) {
         show_last_error_and_exit(interp);
     }
-    */
 
-    Parrot_api_destroy_interpreter(interp);
     return (0);
-}
-
-/*
-
-=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
-
-Called when an API function fails. Displays a warning about the interpreter's
-last error and exits with a non-zero exit code.
-
-=cut
-
-*/
-
-static void
-show_last_error_and_exit(Parrot_PMC interp)
-{
-    ASSERT_ARGS(show_last_error_and_exit)
-
-    char          *msg;
-
-    Parrot_Int    is_error,
-                  exit_code;
-    Parrot_String errmsg;
-    Parrot_PMC    exception;
-
-    /* Get result of last API function call */
-    if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
-        exit(EXIT_FAILURE);
-
-    /* Check if an unhandled exception was thrown */
-    if (is_error) {
-        Parrot_api_string_export_ascii(interp, errmsg, &msg);
-
-        /* Exit quietly with status of 0 if the error was EOF-related */
-        if (strcmp(msg, "Null PMC access in get_string()") == 0) {
-            printf("quit\n");
-            exit(0);
-        }
-
-        fprintf(stderr, "ERROR: %s\n", msg);
-        Parrot_api_string_free_exported_ascii(interp, msg);
-    }
-
-    exit(exit_code);
 }
 
 /*
@@ -302,6 +261,50 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
 
 /*
 
+=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
+
+Called when an API function fails. Displays a warning about the interpreter's
+last error and exits with a non-zero exit code.
+
+=cut
+
+*/
+
+static void
+show_last_error_and_exit(Parrot_PMC interp)
+{
+    ASSERT_ARGS(show_last_error_and_exit)
+
+    char          *msg;
+
+    Parrot_Int    is_error,
+                  exit_code;
+    Parrot_String errmsg;
+    Parrot_PMC    exception;
+
+    /* Get result of last API function call */
+    if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
+        exit(EXIT_FAILURE);
+
+    /* Check if an unhandled exception was thrown */
+    if (is_error) {
+        Parrot_api_string_export_ascii(interp, errmsg, &msg);
+
+        /* Exit quietly with status of 0 if the error was EOF-related */
+        if (strcmp(msg, "Null PMC access in get_string()") == 0) {
+            printf("quit\n");
+            exit(0);
+        }
+
+        fprintf(stderr, "ERROR: %s\n", msg);
+        Parrot_api_string_free_exported_ascii(interp, msg);
+    }
+
+    exit(exit_code);
+}
+
+/*
+
 =item C<static void usage(void)>
 
 Displays a helpful message about standard usage and an explanation of all
@@ -348,7 +351,7 @@ welcome(void)
 
 =head1 SEE ALSO
 
-F<src/hbdb.c>, F<src/embed/hbdb.c>, F<include/parrot/hbdb.h>
+F<docs/hbdb.pod>, F<src/hbdb.c>, F<src/embed/hbdb.c>, F<include/parrot/hbdb.h>
 
 =head1 HISTORY
 
