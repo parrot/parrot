@@ -580,7 +580,7 @@ sub save_report {
     open my $OUTPUT, ">", $opts{output}
         or die "Cannot open '$opts{output}': $!";
     print $OUTPUT format_message();
-    close $OUTPUT or die "Cannot open '$opts{output}': $!";
+    close $OUTPUT or die "Cannot close '$opts{output}': $!";
 
     print <<TRAC;
 Message saved. Please go to
