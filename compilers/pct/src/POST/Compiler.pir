@@ -791,7 +791,8 @@
     files = find_caller_lex '$?FILES'
     if null files goto no_files
     unless files goto no_files
-    subpir.'append_format'(".annotate 'file', ''\n", files)
+	$S0 = self.'escape'(files)
+    subpir.'append_format'(".annotate 'file', ''\n", $S0)
   no_files:
 
     self.'pir_children'(node)
