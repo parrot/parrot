@@ -51,7 +51,6 @@ Displays license information.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void fail(Parrot_PMC interp);
 static void license(void);
 static void load_bytecode(
     Parrot_PMC interp,
@@ -61,13 +60,14 @@ static void load_bytecode(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pbc);
 
+static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(void);
 static void welcome(void);
-#define ASSERT_ARGS_fail __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_license __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(file) \
     , PARROT_ASSERT_ARG(pbc))
+#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_welcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -129,19 +129,19 @@ main(int argc, const char *argv[])
     if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp)
         && Parrot_api_set_executable_name(interp, argv[0]))) {
 
-        fail(NULL);
+        show_last_error_and_exit(NULL);
     }
 
     /* Register hbdb runcore */
     if (!Parrot_api_set_runcore(interp, "hbdb", 0)) {
         Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
 
     /* Initialize debugger */
     if (!Parrot_api_hbdb_init(interp)) {
         Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
 
     /* TODO Do I need this? */
@@ -166,19 +166,19 @@ main(int argc, const char *argv[])
     /* Ready bytecode */
     if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
         Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
 
     /* Run bytecode */
     if (!Parrot_api_hbdb_runloop(interp, argc, argv)) {
         Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
 
     /*
     if (!Parrot_api_run_bytecode(interp, pbc, NULL)) {
         Parrot_api_destroy_interpreter(interp);
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
     */
 
@@ -188,19 +188,19 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static void fail(Parrot_PMC interp)>
+=item C<static void show_last_error_and_exit(Parrot_PMC interp)>
 
-Called when an API function fails. Prints an error message and exits with
-the status code C<EXIT_FAILURE>.
+Called when an API function fails. Displays a warning about the interpreter's
+last error and exits with a non-zero exit code.
 
 =cut
 
 */
 
 static void
-fail(Parrot_PMC interp)
+show_last_error_and_exit(Parrot_PMC interp)
 {
-    ASSERT_ARGS(fail)
+    ASSERT_ARGS(show_last_error_and_exit)
 
     char          *msg;
 
@@ -273,7 +273,7 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
 
     /* Convert file's type to Parrot_String */
     if (!Parrot_api_string_import_ascii(interp, file, &ps_file)) {
-        fail(interp);
+        show_last_error_and_exit(interp);
     }
 
     /* Compile file if it's not already bytecode */
@@ -282,11 +282,11 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
 
         /* Create and register a PIR IMCCompiler PMC */
         if (!imcc_get_pir_compreg_api(interp, 1, &pir_compreg))
-            fail(interp);
+            show_last_error_and_exit(interp);
 
         /* Compile file */
         if (!imcc_compile_file_api(interp, pir_compreg, ps_file, pbc))
-            fail(interp);
+            show_last_error_and_exit(interp);
 
         /* Load source code */
         Parrot_api_hbdb_load_source(interp, file);
@@ -295,7 +295,7 @@ load_bytecode(Parrot_PMC interp, ARGIN(const char * const file), ARGOUT(Parrot_P
         /* Load bytecode */
         if (!Parrot_api_load_bytecode_file(interp, ps_file, pbc)) {
             Parrot_api_destroy_interpreter(interp);
-            fail(interp);
+            show_last_error_and_exit(interp);
         }
     }
 }
