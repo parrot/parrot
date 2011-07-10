@@ -286,6 +286,7 @@ Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
 }
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
 {
@@ -305,6 +306,7 @@ Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
 }
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PackFile *
 Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 {

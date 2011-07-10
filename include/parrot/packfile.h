@@ -666,6 +666,7 @@ PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -717,6 +718,7 @@ PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
