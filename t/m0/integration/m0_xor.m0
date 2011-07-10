@@ -2,7 +2,7 @@
 .chunk "noop"
 .constants
 0 "1..1\n"
-1 "n\n"
+1 "n"
 2 "ok 1 xor: 9 xor 90 = 83\n"
 .metadata
 .bytecode

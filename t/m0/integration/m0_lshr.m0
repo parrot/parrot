@@ -2,7 +2,7 @@
 .chunk "noop"
 .constants
 0 "1..1\n"
-1 "n\n"
+1 "n"
 2 "ok 1 lshr: 90 >> 2 = 22\n"
 .metadata
 .bytecode
