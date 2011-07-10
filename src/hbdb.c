@@ -48,7 +48,7 @@ function.
 
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
-typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char * const cmd));
+typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char *cmd));
 
 typedef struct hbdb_cmd_t       hbdb_cmd_t;
 typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
@@ -64,6 +64,13 @@ static void display_breakpoint(
     ARGIN(hbdb_breakpoint_t *bp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static unsigned long get_cmd_argument(
+    ARGMOD(const char **cmd),
+    unsigned long def_val)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*cmd);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -86,6 +93,8 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_display_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
     , PARROT_ASSERT_ARG(bp))
+#define ASSERT_ARGS_get_cmd_argument __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_run_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -98,14 +107,14 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* Contains information about the implementation of a particular command                  */
 struct hbdb_cmd_t {
     const hbdb_cmd_func_t function;    /* Points to the function the executes the command */
-    const char    * const help;        /* Help message associated with the command        */
+    const char           *help;        /* Help message associated with the command        */
 };
 
-/* Contains general information about a particular command                       */
+/* Contains general information about a particular command                */
 struct hbdb_cmd_table_t {
-    const char * const name;                /* Command name                      */
-    const char * const short_name;          /* Command name abbreviation         */
-    const hbdb_cmd_t * const cmd;           /* Command function and help message */
+    const char       *name;          /* Command name                      */
+    const char       *short_name;    /* Command name abbreviation         */
+    const hbdb_cmd_t *cmd;           /* Command function and help message */
 };
 
 /* Define a 'hbdb_cmd_t' structure for each command */
@@ -113,6 +122,12 @@ hbdb_cmd_t cmd_break = { &hbdb_cmd_break,
                          "Sets a breakpoint at the specified location.\n\n"
                          "break LOCATION\n\n"
                          "If LOCATION is an address, breaks at the exact address." },
+
+           cmd_list  = { &hbdb_cmd_list,
+                         "List specified line(s).\n\n"
+                         "With no argument, lists 10 lines.\n"
+                         "One argument specifies a line, and ten lines are listed around that line.\n"
+                         "Two arguments with comma between specify starting and ending lines to list."},
 
            cmd_help  = { &hbdb_cmd_help,
                          "List of commands:\n\n"
@@ -125,13 +140,14 @@ hbdb_cmd_t cmd_break = { &hbdb_cmd_break,
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
     { "break", "b",  &cmd_break },
+    { "list",  "l",  &cmd_list  },
     { "help",  "h",  &cmd_help  },
     { "quit",  "q",  &cmd_quit  }
 };
 
 /*
 
-=item C<void hbdb_cmd_break(PARROT_INTERP, const char * const cmd)>
+=item C<void hbdb_cmd_break(PARROT_INTERP, const char *cmd)>
 
 Sets a breakpoint at a specific location.
 
@@ -140,7 +156,7 @@ Sets a breakpoint at a specific location.
 */
 
 void
-hbdb_cmd_break(PARROT_INTERP, ARGIN(const char * const cmd))
+hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_break)
 
@@ -259,7 +275,85 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
 
 /*
 
-=item C<void hbdb_cmd_quit(PARROT_INTERP, const char * const cmd)>
+=item C<void hbdb_cmd_list(PARROT_INTERP, const char *cmd)>
+
+Display lines from the source file being debugged.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_list)
+
+    char          *ch;
+    unsigned long start,
+                  count,
+                  i;
+
+    hbdb_t      *hbdb;
+    hbdb_line_t *line;
+
+    /* Get global structure */
+    hbdb = interp->hbdb;
+
+    /* Verify that the source file has already been loaded */
+    if (!(hbdb->file && hbdb->file->line)) {
+        Parrot_io_eprintf(hbdb->debugger, "No symbol table is loaded. Use the \"file\" command.\n");
+        return;
+    }
+
+    /* Get the range of lines to display */
+    hbdb->file->next_line = start = get_cmd_argument(&cmd, 1);
+    count                         = get_cmd_argument(&cmd, 10);
+
+    /* Return if the user entered a number that was too large */
+    if (count == ULONG_MAX || hbdb->file->next_line == ULONG_MAX) {
+        Parrot_io_eprintf(hbdb->debugger, "Numerical result out of range.\n");
+        return;
+    }
+
+    /* Iterate through source code until starting line is reached */
+    for (i = 1, line = hbdb->file->line; (i < hbdb->file->next_line) && (line->next); i++)
+        line = line->next;
+
+    /* Check if requested line number is too large */
+    if (i < start) {
+        Parrot_io_eprintf(hbdb->debugger, "No line %d in file \"%s\".\n", start, hbdb->file);
+        return;
+    }
+
+    /* Iterate through source code until end line is reached */
+    for (i = 0; i < count; i++) {
+        /* Display corresponding opcode (if any) */
+        if (line->opcode)
+            Parrot_io_printf(hbdb->debugger,
+                             "(%-04d) ",
+                             line->opcode - hbdb->debugee->code->base.data);
+
+        /* Display line number */
+        Parrot_io_printf(hbdb->debugger, "%-6ld", line->number);
+
+        /* Display source code from line */
+        for (ch = hbdb->file->source + line->offset; *ch != '\n'; ch++)
+            Parrot_io_printf(hbdb->debugger, "%c", *ch);
+
+        /* End code with a newline */
+        Parrot_io_printf(hbdb->debugger, "\n");
+
+        /* Get next line */
+        line = line->next;
+
+        /* Return if no more lines exist */
+        if (!line) return;
+    }
+}
+
+/*
+
+=item C<void hbdb_cmd_quit(PARROT_INTERP, const char *cmd)>
 
 Exits HBDB.
 
@@ -268,7 +362,7 @@ Exits HBDB.
 */
 
 void
-hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char * const cmd))
+hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_quit)
 
@@ -451,12 +545,14 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     hbdb_t      *hbdb;
     hbdb_file_t *dbg_file;
     hbdb_line_t *dbg_line,
-                *prev_dbg_line = NULL;
+                *prev_dbg_line;
 
-    opcode_t *PC = interp->code->base.data;
-
+    /* Get global structure */
     hbdb = interp->hbdb;
-    line = 0;
+
+    /* Set default values for 'line' and 'prev-dbg_line' */
+    line          = 0;
+    prev_dbg_line = NULL;
 
     /* Free previous source file (if any) */
     /*if (hbdb->file) {*/
@@ -482,10 +578,8 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
         start_offset = dbg_file->size;
 
         do {
-            ch = fgetc(fd);
-
-            /* Stop if EOF was found */
-            if (ch == EOF)
+            /* Read a character from source file, stop of EOF was found */
+            if ((ch = fgetc(fd)) == EOF)
                 break;
 
             /* Store character */
@@ -493,20 +587,21 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
 
             /* Extend buffer size if it's full */
             if (++dbg_file->size >= buf_size) {
-                buf_size        += HBDB_SOURCE_BUFFER_LENGTH;
-                dbg_file->source = mem_gc_realloc_n_typed(interp, dbg_file->source, buf_size, char);
+                buf_size         += HBDB_SOURCE_BUFFER_LENGTH;
+                dbg_file->source  = mem_gc_realloc_n_typed(interp,
+                                                           dbg_file->source,
+                                                           buf_size,
+                                                           char);
             }
         } while (ch != '\n');
 
-        /* Stop unless the last line didn't end with a newline */
+        /* Stop if the file is empty */
         if (ch == EOF && (dbg_file->size == 0 || dbg_file->source[dbg_file->size - 1] == '\n'))
             break;
 
-        if (ch == EOF) {
+        /* Append a newline to end of file */
+        if (ch == EOF)
             dbg_file->source[dbg_file->size++] = '\n';
-            /* TODO Do I really need to print this? */
-            Parrot_io_eprintf(hbdb->debugger, "(Newline appended to last line of file)\n");
-        }
 
         /* Allocate memory for 'hbdb_line_t' structure */
         dbg_line = mem_gc_allocate_zeroed_typed(interp, hbdb_line_t);
@@ -655,6 +750,52 @@ command_line(PARROT_INTERP)
         /* Execute command */
         run_command(interp, cmd);
     }
+}
+
+/*
+
+=item C<static unsigned long get_cmd_argument(const char **cmd, unsigned long
+def_val)>
+
+Returns the argument given to the command in C<cmd> as an <unsigned long>
+value. If no arguments were given, the value in C<def_val> is returned instead.
+
+If the argument given is too large to fit into an C<unsigned long> - that is,
+the value is larger than C<ULONG_MAX> - then C<ULONG_MAX> is returned. It is
+a good idea to check the return value for this situation when calling
+C<get_cmd_argument()>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static unsigned long
+get_cmd_argument(ARGMOD(const char **cmd), unsigned long def_val)
+{
+    ASSERT_ARGS(get_cmd_argument)
+
+    char         *next;
+    unsigned long result;
+
+    /* Set errno to 0 since strtoul() can legitimately return 0 or ULONG_MAX */
+    errno  = 0;
+
+    /* Convert argument from a string to unsigned long integer */
+    result = strtoul(*cmd, &next, 0);
+
+    /* Check for possible errors */
+    if ((errno == ERANGE && result == ULONG_MAX) || (errno != 0 && result == 0)) {
+        return ULONG_MAX;
+    }
+
+    /* Check if a digit was found, otherwise use 'def_val' */
+    if (next != *cmd)
+        *cmd   = next;
+    else
+        result = def_val;
+
+    return result;
 }
 
 /*
