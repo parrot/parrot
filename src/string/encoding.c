@@ -28,11 +28,26 @@ static STRING      *platform_str;
 static STRING      *unicode_str;
 static STRING      *fixed_8_str;
 
+#define ENC_NAME_PLATFORM "platform"
+#define ENC_NAME_UNICODE  "unicode"
+#define ENC_NAME_FIXED8   "fixed_8"
+
 /* HEADERIZER HFILE: include/parrot/encoding.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const STR_VTABLE * find_encoding(PARROT_INTERP,
+    ARGIN(const STRING *encodingname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_find_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(encodingname))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -79,6 +94,44 @@ Parrot_new_encoding(PARROT_INTERP)
 
 /*
 
+=item C<static const STR_VTABLE * find_encoding(PARROT_INTERP, const STRING
+*encodingname)>
+
+Finds an encoding with the STRING name C<encodingname>. Returns the encoding
+if it is successfully found, returns NULL otherwise.
+
+=cut
+
+*/
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static const STR_VTABLE *
+find_encoding(PARROT_INTERP, ARGIN(const STRING *encodingname))
+{
+    ASSERT_ARGS(find_encoding)
+    const int n = n_encodings;
+    int i;
+
+    for (i = 0; i < n; ++i)
+        if (STRING_equal(interp, encodings[i]->name_str, encodingname))
+            return encodings[i];
+
+    /* backwards compatibility */
+    if (STRING_equal(interp, encodingname, unicode_str))
+        return Parrot_utf8_encoding_ptr;
+
+    if (STRING_equal(interp, encodingname, platform_str))
+        return Parrot_platform_encoding_ptr;
+
+    if (STRING_equal(interp, encodingname, fixed_8_str))
+        return Parrot_ascii_encoding_ptr;
+
+    return NULL;
+}
+
+/*
+
 =item C<const STR_VTABLE * Parrot_find_encoding(PARROT_INTERP, const char
 *encodingname)>
 
@@ -105,11 +158,14 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
             return encodings[i];
 
     /* backwards compatibility */
-    if (strcmp(encodingname, "unicode") == 0)
+    if (strcmp(encodingname, ENC_NAME_UNICODE) == 0)
         return Parrot_utf8_encoding_ptr;
 
-    if (strcmp(encodingname, "platform") == 0)
+    if (strcmp(encodingname, ENC_NAME_PLATFORM) == 0)
         return Parrot_platform_encoding_ptr;
+
+    if (strcmp(encodingname, ENC_NAME_FIXED8) == 0)
+        return Parrot_ascii_encoding_ptr;
 
     return NULL;
 }
@@ -136,23 +192,14 @@ const STR_VTABLE *
 Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
 {
     ASSERT_ARGS(Parrot_find_encoding_by_string)
-    const int n = n_encodings;
-    int i;
 
     if (STRING_IS_NULL(encodingname))
         return Parrot_default_encoding_ptr;
-
-    for (i = 0; i < n; ++i)
-        if (STRING_equal(interp, encodings[i]->name_str, encodingname))
-            return encodings[i];
-
-    /* backwards compatibility */
-    if (STRING_equal(interp, encodingname, CONST_STRING(interp, "unicode")))
-        return Parrot_utf8_encoding_ptr;
-
-    if (STRING_equal(interp, encodingname, CONST_STRING(interp, "platform")))
-        return Parrot_platform_encoding_ptr;
-
+    else {
+        const STR_VTABLE * const result = find_encoding(interp, encodingname);
+        if (result)
+            return result;
+    }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "invalid encoding '%Ss'", encodingname);
 }
@@ -208,35 +255,8 @@ INTVAL
 Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
 {
     ASSERT_ARGS(Parrot_encoding_number)
-    const int n = n_encodings;
-    int i;
-
-    for (i = 0; i < n; ++i) {
-        if (STRING_equal(interp, encodings[i]->name_str, encodingname))
-            return i;
-    }
-
-    /* backwards compatibility */
-    if (STRING_equal(interp, encodingname, unicode_str)) {
-        for (i = 0; i < n; ++i) {
-            if (STREQ(encodings[i]->name, "utf8"))
-                return i;
-        }
-    }
-    else if (STRING_equal(interp, encodingname, fixed_8_str)) {
-        for (i = 0; i < n; ++i) {
-            if (STREQ(encodings[i]->name, "ascii"))
-                return i;
-        }
-    }
-    else if (STRING_equal(interp, encodingname, platform_str)) {
-        for (i = 0; i < n; ++i) {
-            if (encodings[i] == Parrot_platform_encoding_ptr)
-                return i;
-        }
-    }
-
-    return -1;
+    const STR_VTABLE * const result = find_encoding(interp, encodingname);
+    return result ? result->num : -1;
 }
 
 /*
@@ -362,9 +382,9 @@ Parrot_str_internal_register_encoding_names(PARROT_INTERP)
         encodings[n]->name_str =
             Parrot_str_new_constant(interp, encodings[n]->name);
     /* Can't use CONST_STRING here, not setup yet */
-    unicode_str  = Parrot_str_new_constant(interp, "unicode");
-    fixed_8_str  = Parrot_str_new_constant(interp, "fixed_8");
-    platform_str = Parrot_str_new_constant(interp, "platform");
+    unicode_str  = Parrot_str_new_constant(interp, ENC_NAME_UNICODE);
+    fixed_8_str  = Parrot_str_new_constant(interp, ENC_NAME_FIXED8);
+    platform_str = Parrot_str_new_constant(interp, ENC_NAME_PLATFORM);
 }
 
 /*
