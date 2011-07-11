@@ -368,6 +368,8 @@
 ^/frontend/pbc_merge/main\.o/
 ^/generated_hello\.pbc$
 ^/generated_hello\.pbc/
+^/hbdb$
+^/hbdb/
 ^/include/parrot/.*\.tmp$
 ^/include/parrot/.*\.tmp/
 ^/include/parrot/config\.h$

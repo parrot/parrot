@@ -1,0 +1,98 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/hbdb.pod - The Honey Bee Debugger
+
+=head1 SYNOPSIS
+
+    hbdb [options] [file]    
+
+=head1 DESCRIPTION
+
+The Honey Bee Debugger (HBDB) is the standard debugger for the Parrot virtual
+machine.
+
+The purpose of a debugger is to allow programmer's to examine and modify what
+is happening as their program executes from within an interactive environment.
+This introduces some pretty convenient operations such as:
+
+=over 4
+
+=item *
+
+Forcing a program to stop at a specific point or under certain conditions.
+
+=item *
+
+Inspecting variables and registers during a specific state.
+
+=item *
+
+Stepping through source code line by line.
+
+=item *
+
+Performing a backtrace to track a sequence of function calls.
+
+=back
+
+Already, it is easy to see just how valuable a debugger really is during
+software development.
+
+In its current state, HBDB is only capable of debugging programs written in
+PIR. In the near future, any high level language using the Parrot Compiler
+Tools (PCT) will be supported.
+
+You will notice a lot of similarities with the GNU Project's GDB. This was done
+intentionally to make users of HBDB more comfortable.
+
+=head1 OPTIONS
+
+Command-line switches come in two flavors: short and long. Like many other
+GNU/Linux utilities, the short form uses a hyphen and single letter (e.g. C<-a>)
+while the long form uses a double hyphen and a keyword (e.g. C<--foobar>).
+However, switches I<can not> be grouped together. For instance, if you wish to
+use both the C<-a> and C<-b> switches, you can not type C<-ab>. In this case,
+only the first switch is applied and the second is ignored.
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Displays help information.
+
+=item B<-l>, B<--license>
+
+Displays license information.
+
+=back
+
+=head1 COMMANDS
+
+HBDB understands the following commands:
+
+=over 4
+
+=item B<help>, B<h>
+
+Displays a summary help message.
+
+=item B<list>, B<l>
+
+Display lines from the source file being debugged.
+
+=item B<quit>, B<q>
+
+Exits HBDB.
+
+=back
+
+=head1 AUTHOR
+
+Kevin Polulak (soh_cah_toa) <kpolulak@gmail.com>
+
+=head1 SEE ALSO
+
+F<frontend/hbdb/main.c>, F<src/hbdb.c>, F<src/embed/hbdb.c>, F<include/parrot/hbdb.h>
+

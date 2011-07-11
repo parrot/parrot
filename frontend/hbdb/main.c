@@ -18,20 +18,6 @@ machine.
 Note that this file is merely the frontend. If you are looking for a tutorial on
 how to use HBDB, please see F<docs/hbdb.pod>.
 
-=head1 OPTIONS
-
-=over 4
-
-=item B<-h>, B<--help>
-
-Displays help information.
-
-=item B<-l>, B<--license>
-
-Displays license information.
-
-=back
-
 =head1 STATIC FUNCTIONS
 
 The following functions are all static. As such, they will not appear
