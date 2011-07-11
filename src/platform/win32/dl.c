@@ -83,6 +83,8 @@ you would write something similar to:
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
+    if (handle == NULL)
+        handle = (void*)GetModuleHandle("libparrot");
     return (void *)GetProcAddress((HINSTANCE)handle, symbol);
 }
 
