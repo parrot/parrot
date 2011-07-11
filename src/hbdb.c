@@ -104,10 +104,11 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* Contains information about the implementation of a particular command                  */
+/* Contains information about the implementation of a particular command               */
 struct hbdb_cmd_t {
-    const hbdb_cmd_func_t function;    /* Points to the function the executes the command */
-    const char           *help;        /* Help message associated with the command        */
+    const hbdb_cmd_func_t function;      /* Points to function that executes command   */
+    const char           *short_help;    /* Short help message associated with command */
+    const char           *help;          /* Help message associated with command       */
 };
 
 /* Contains general information about a particular command                */
@@ -119,29 +120,35 @@ struct hbdb_cmd_table_t {
 
 /* Define a 'hbdb_cmd_t' structure for each command */
 hbdb_cmd_t cmd_break = { &hbdb_cmd_break,
+
+                         "Sets a breakpoint at the specified location.",
+
                          "Sets a breakpoint at the specified location.\n\n"
                          "break LOCATION\n\n"
                          "If LOCATION is an address, breaks at the exact address." },
 
            cmd_list  = { &hbdb_cmd_list,
-                         "List specified line(s).\n\n"
+
+                         "Lists specified line(s).",
+
+                         "Lists specified line(s).\n\n"
                          "With no argument, lists 10 lines.\n"
                          "One argument specifies a line, and ten lines are listed around that line.\n"
                          "Two arguments with comma between specify starting and ending lines to list."},
 
            cmd_help  = { &hbdb_cmd_help,
-                         "List of commands:\n\n"
-                         "break\n"
-                         "\nType \"help\" followed by a command name."             },
+                         "Displays a summary help message.",
+                         "Displays a summary help message." },
 
            cmd_quit  = { &hbdb_cmd_quit,
+                         "Exits HBDB.",
                          "Exits HBDB."                                             };
 
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
     { "break", "b",  &cmd_break },
-    { "list",  "l",  &cmd_list  },
     { "help",  "h",  &cmd_help  },
+    { "list",  "l",  &cmd_list  },
     { "quit",  "q",  &cmd_quit  }
 };
 
@@ -253,8 +260,7 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
                 Parrot_io_printf(hbdb->debugger,
                                  "   %-12s  %s\n",
                                  tbl->name,
-                                 "foo");
-                                 /*tbl->cmd->help);*/
+                                 tbl->cmd->short_help);
             }
 
             Parrot_io_printf(hbdb->debugger,
