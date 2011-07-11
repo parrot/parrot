@@ -408,11 +408,29 @@ hbdb_destroy(PARROT_INTERP)
     /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
+    /* Free memory used for storing last command */
     mem_gc_free(interp, hbdb->last_command);
-    mem_gc_free(interp, hbdb->current_command);
+    interp->hbdb->last_command    = NULL;
 
+    /* Free memory used for storing current command */
+    mem_gc_free(interp, hbdb->current_command);
+    interp->hbdb->current_command = NULL;
+
+    /* Free memory used for source code */
+    mem_gc_free(interp, hbdb->file->source);
+    interp->hbdb->file->source    = NULL;
+
+    /* Free memory used for source file */
+    mem_gc_free(interp, hbdb->file);
+    interp->hbdb->file            = NULL;
+
+    /* Free memory used for breakpoints list */
+    mem_gc_free(interp, hbdb->breakpoint);
+    interp->hbdb->breakpoint      = NULL;
+
+    /* Free memory used for global structure */
     mem_gc_free(interp, hbdb);
-    interp->hbdb = NULL;
+    interp->hbdb                  = NULL;
 }
 
 /*
