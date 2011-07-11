@@ -140,7 +140,7 @@ INTVAL
 Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
     ASSERT_ARGS(Parrot_hll_register_HLL)
-    PMC   *entry, *name, *type_hash, *ns_hash, *hll_info;
+    PMC   *entry, *name, *ns_hash, *hll_info;
     INTVAL idx;
 
     /* TODO LOCK or disallow in threads */
@@ -176,9 +176,7 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     VTABLE_set_pmc_keyed_int(interp, interp->HLL_namespace, idx, ns_hash);
 
     /* create HLL typemap hash */
-    type_hash = Parrot_pmc_new_constant(interp, enum_class_Hash);
-    VTABLE_set_pointer(interp, type_hash, Parrot_hash_new_intval_hash(interp));
-    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
+    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, PMCNULL);
 
     return idx;
 }
@@ -296,8 +294,14 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
             PMC * const entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
             PARROT_ASSERT(!PMC_IS_NULL(entry));
             type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
-            PARROT_ASSERT(!PMC_IS_NULL(type_hash));
-
+            if (PMC_IS_NULL(type_hash)) {
+                int i;
+                type_hash = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
+                VTABLE_set_integer_native(interp, type_hash, PARROT_MAX_CLASSES);
+                for (i = 0; i < PARROT_MAX_CLASSES; ++i)
+                    VTABLE_set_integer_keyed_int(interp, type_hash, i, i);
+                VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
+            }
             VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
         }
     }
@@ -330,7 +334,6 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             "no such HLL ID (%vd)", hll_id);
     else {
         PMC * const hll_info = interp->HLL_info;
-        INTVAL  id;
         PMC    *entry, *type_hash;
 
         START_READ_HLL_INFO(interp, hll_info);
@@ -346,9 +349,7 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
         if (PMC_IS_NULL(type_hash))
             return core_type;
 
-        id = VTABLE_get_integer_keyed_int(interp, type_hash, core_type);
-
-        return id ? id : core_type;
+        return VTABLE_get_integer_keyed_int(interp, type_hash, core_type);
     }
 }
 
