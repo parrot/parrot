@@ -246,7 +246,10 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
     c = parse_command(&cmd);
 
     /* Verify that an actual command was passed */
-    if (cmd)  {
+    if (c)  {
+        Parrot_io_printf(hbdb->debugger, "%s\n", c->help);
+    }
+    else {
         if (*cmd == '\0') {
             unsigned int i;
 
@@ -271,11 +274,6 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
         else {
             Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n", cmd);
         }
-    }
-    else {
-        /*Parrot_io_printf(interp, "%s\n", cmd->help);*/
-        /*printf("%s\n", c->help);*/
-        /*Parrot_io_printf(hbdb->debugger, "%s\n", c->help);*/
     }
 }
 
