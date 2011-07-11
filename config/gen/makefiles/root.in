@@ -1433,7 +1433,12 @@ src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 src/gc/string_gc$(O) : $(PARROT_H_HEADERS) \
 	src/gc/gc_private.h src/gc/string_gc.c
 
-src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
+src/hll$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/hll.str \
+	$(INC_DIR)/dynext.h \
+    include/pmc/pmc_fixedintegerarray.h \
+	src/hll.c
 
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 

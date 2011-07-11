@@ -31,6 +31,7 @@ feature.
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "hll.str"
 
 /* HEADERIZER HFILE: include/parrot/hll.h */
@@ -335,6 +336,7 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
     else {
         PMC * const hll_info = interp->HLL_info;
         PMC    *entry, *type_hash;
+        Parrot_FixedIntegerArray_attributes *type_hash_attrs;
 
         START_READ_HLL_INFO(interp, hll_info);
         entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
@@ -349,7 +351,13 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
         if (PMC_IS_NULL(type_hash))
             return core_type;
 
-        return VTABLE_get_integer_keyed_int(interp, type_hash, core_type);
+        if (core_type >= PARROT_MAX_CLASSES || core_type < 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "FixedIntegerArray: index out of bounds!");
+        }
+
+        type_hash_attrs = PARROT_FIXEDINTEGERARRAY(type_hash);
+        return type_hash_attrs->int_array[core_type];
     }
 }
 
