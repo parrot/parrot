@@ -44,17 +44,34 @@ In its current state, HBDB is only capable of debugging programs written in
 PIR. In the near future, any high level language using the Parrot Compiler
 Tools (PCT) will be supported.
 
+HBDB can be invoked with or without any arguments although the traditional
+way is to at least specify the program to debug. Any of the following arguments
+will not be treated as arguments for the debugger but instead for the debugee.
+
+Any arguments following the program name will be given to the debugee, not the
+debugger. As such, all HBDB switches must precede the program name.
+
+    hbdb foobar.pir
+
+    hbdb foobar.pir --baz --qux
+
+    hbdb --ham foobar.pir --eggs --cheese
+
+Note that if you do not specifiy a program on the command-line, you must load
+it using the C<file> command (described below).
+
 You will notice a lot of similarities with the GNU Project's GDB. This was done
-intentionally to make users of HBDB more comfortable.
+intentionally to make users who traditionally use GDB feel right at home when
+debugging with HBDB.
 
 =head1 OPTIONS
 
-Command-line switches come in two flavors: short and long. Like many other
-GNU/Linux utilities, the short form uses a hyphen and single letter (e.g. C<-a>)
-while the long form uses a double hyphen and a keyword (e.g. C<--foobar>).
-However, switches I<can not> be grouped together. For instance, if you wish to
-use both the C<-a> and C<-b> switches, you can not type C<-ab>. In this case,
-only the first switch is applied and the second is ignored.
+HBDB uses both the classic UNIX and GNU style command-line switches. However,
+there is one exception: switches I<can not> be grouped together. For instance,
+if you wish to use both the C<-a> and C<-b> switches, you can not type C<-ab>.
+In this case, only the first switch is applied and the second is ignored.
+
+B<TODO> Can the debugee's arguments be grouped together?
 
 =over 4
 
@@ -74,19 +91,53 @@ HBDB understands the following commands:
 
 =over 4
 
-=item B<help>, B<h>
+=item B<h>
 
-Displays a summary help message.
+=item B<help> [I<name>]
 
-=item B<list>, B<l>
+Displays a summary help message about the command I<name>. Without an argument,
+it displays a short description of each command.
 
-Display lines from the source file being debugged.
+=item B<l>
 
-=item B<quit>, B<q>
+=item B<list> [I<start,end>] | [I<line>] | [I<function>]
 
-Exits HBDB.
+Display lines from the source file being debugged. In the first form, it
+lists the lines from I<start> through I<end>. In the second form, it lists a
+single line. In the third form, it displays the line containg the definition of
+I<function>. Without any arguments, it lists 10 lines around the next line
+that will be executed.
+
+=item B<q>
+
+=item B<quit>
+
+Exits HBDB. If you want to be different, you can also quit by sending the EOF
+character (ASCII 04) which is usually ^D.
 
 =back
+
+You can find more information about the above commands by running HBDB and
+typing C<help>.
+
+=head1 EXAMPLES
+
+In this section, we will run through a sample session of HBDB, looking at some
+of the most frequently used commands.
+
+B<TODO> Example output and commands
+
+=head1 TRIVIA
+
+Can you guess why it's called the I<Honey Bee> Debugger? "Honey Bee" is
+actually a silly nickname the original author - Kevin Polulak - gave to one of
+his cats, Sophie. She looks like this:
+
+    \    /\  meow!
+     )  ( ')
+    (  /  )   _
+     \(__)|  (_)_.-.
+                   '-'
 
 =head1 AUTHOR
 
