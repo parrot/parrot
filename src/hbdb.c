@@ -8,7 +8,7 @@ src/hbdb.c - The Honey Bee Debugger
 
 =head1 DESCRIPTION
 
-This file contains functions and types used by the C<hbdb> debugger.
+This file contains functions and types used by the HBDB debugger.
 
 =head1 COMMAND FUNCTIONS
 
@@ -56,6 +56,11 @@ typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static unsigned int check_file_exists(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void command_line(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -85,12 +90,14 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_check_file_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_continue_running __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -151,19 +158,22 @@ hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
                             "Two arguments with comma between specify starting and ending lines to list."},
 
            cmd_help     = { &hbdb_cmd_help,
+
                             "Displays a summary help message.",
 
                             "Displays a summary help message." },
 
-           cmd_run      = { &hbdb_cmd_run,
-                            "Start debugged program. You may specify arguments to give it.",
-
-                            "Start debugged program. You may specify arguments to give it." },
-
            cmd_quit     = { &hbdb_cmd_quit,
+
                             "Exits HBDB.",
 
-                            "Exits HBDB."                                             };
+                            "Exits HBDB." },
+
+           cmd_run      = { &hbdb_cmd_run,
+
+                            "Start debugged program. You may specify arguments to give it.",
+
+                            "Start debugged program. You may specify arguments to give it." };
 
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
@@ -171,8 +181,8 @@ hbdb_cmd_table_t command_table[] = {
     { "continue", "c", &cmd_continue },
     { "help",     "h", &cmd_help     },
     { "list",     "l", &cmd_list     },
-    { "run",      "r", &cmd_run      },
-    { "quit",     "q", &cmd_quit     }
+    { "quit",     "q", &cmd_quit     },
+    { "run",      "r", &cmd_run      }
 };
 
 /*
@@ -267,7 +277,7 @@ hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb = interp->hbdb;
 
     /* Verify that the source file has already been loaded */
-    if (!(hbdb->file && hbdb->file->line)) {
+    if (!check_file_exists(interp)) {
         Parrot_io_eprintf(hbdb->debugger, "The program is not being run.\n");
         return;
     }
@@ -374,7 +384,7 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb = interp->hbdb;
 
     /* Verify that the source file has already been loaded */
-    if (!(hbdb->file && hbdb->file->line)) {
+    if (!check_file_exists(interp)) {
         Parrot_io_eprintf(hbdb->debugger, "No symbol table is loaded. Use the \"file\" command.\n");
         return;
     }
@@ -427,24 +437,6 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
 
 /*
 
-=item C<void hbdb_cmd_run(PARROT_INTERP, const char *cmd)>
-
-Begins execution of the debugee process.
-
-=cut
-
-*/
-
-void
-hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
-{
-    ASSERT_ARGS(hbdb_cmd_run)
-
-    continue_running(interp);
-}
-
-/*
-
 =item C<void hbdb_cmd_quit(PARROT_INTERP, const char *cmd)>
 
 Exits HBDB.
@@ -464,6 +456,24 @@ hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
 
     HBDB_FLAG_SET(interp, HBDB_EXIT);
     HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
+}
+
+/*
+
+=item C<void hbdb_cmd_run(PARROT_INTERP, const char *cmd)>
+
+Begins execution of the debugee process.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_run)
+
+    continue_running(interp);
 }
 
 /*
@@ -820,6 +830,34 @@ I<hbdb> prefix.
 
 /*
 
+=item C<static unsigned int check_file_exists(PARROT_INTERP)>
+
+Checks if a file has been loaded into memory. Returns 1 if it has and 0 if it
+hasn't.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+static unsigned int
+check_file_exists(PARROT_INTERP)
+{
+    ASSERT_ARGS(check_file_exists)
+
+    hbdb_t *hbdb = interp->hbdb;
+
+    if (!(hbdb->file && hbdb->file->line)) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+/*
+
 =item C<static void command_line(PARROT_INTERP)>
 
 Begins the command-line interface. Fetches and executes commands in a
@@ -859,7 +897,8 @@ command_line(PARROT_INTERP)
 =item C<static void continue_running(PARROT_INTERP)>
 
 Manipulates a few status flags to indicate that the debugger should continue
-running.
+running. Its usefulness it mainly limited to the C<run> and C<continue>
+commands.
 
 =cut
 
@@ -876,6 +915,40 @@ continue_running(PARROT_INTERP)
 
     /* Clear status flag to indicate the debugger shouldn't break */
     HBDB_FLAG_CLEAR(interp, HBDB_BREAK);
+}
+
+/*
+
+=item C<static void display_breakpoint(hbdb_t *hbdb, hbdb_breakpoint_t *bp)>
+
+Displays information about the breakpoint pointed to by C<bp> including its ID,
+address, and line number. If the breakpoint is disabled, that will be displayed
+as well. Note that not all of the later information will be displayed if it is
+unknown at that time.
+
+=cut
+
+*/
+
+static void
+display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp)) {
+    ASSERT_ARGS(display_breakpoint)
+
+    Parrot_io_printf(hbdb->debugger,
+                      "Breakpoint %d at %04d: ",
+                      bp->id,
+                      bp->pc - hbdb->debugee->code->base.data);
+
+    if (hbdb->file)
+        Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file);
+
+    if (bp->line)
+        Parrot_io_printf(hbdb->debugger, ", line %d", bp->line);
+
+    if (bp->skip < 0)
+        Parrot_io_printf(hbdb->debugger, "  (DISABLED)");
+
+    Parrot_io_printf(hbdb->debugger, "\n");
 }
 
 /*
@@ -922,40 +995,6 @@ get_cmd_argument(ARGMOD(const char **cmd), unsigned long def_val)
         result = def_val;
 
     return result;
-}
-
-/*
-
-=item C<static void display_breakpoint(hbdb_t *hbdb, hbdb_breakpoint_t *bp)>
-
-Displays information about the breakpoint pointed to by C<bp> including its ID,
-address, and line number. If the breakpoint is disabled, that will be displayed
-as well. Note that not all of the later information will be displayed if it is
-unknown at that time.
-
-=cut
-
-*/
-
-static void
-display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp)) {
-    ASSERT_ARGS(display_breakpoint)
-
-    Parrot_io_printf(hbdb->debugger,
-                      "Breakpoint %d at %04d: ",
-                      bp->id,
-                      bp->pc - hbdb->debugee->code->base.data);
-
-    if (hbdb->file)
-        Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file);
-
-    if (bp->line)
-        Parrot_io_printf(hbdb->debugger, ", line %d", bp->line);
-
-    if (bp->skip < 0)
-        Parrot_io_printf(hbdb->debugger, "  (DISABLED)");
-
-    Parrot_io_printf(hbdb->debugger, "\n");
 }
 
 /*
@@ -1100,9 +1139,9 @@ Returns a pointer to the first non-whitespace character in C<cmd>.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {
