@@ -569,14 +569,6 @@ hbdb_get_command(PARROT_INTERP)
     /* Invoke readline_interactive() */
     Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &input);
 
-    /* STUB */
-    if (Parrot_io_eof(interp, stdinput)) {
-        printf("onoes! das bad!\n");
-        Parrot_x_exit(interp, 0);
-        exit(0);
-    }
-    /* STUB */
-
     /* Store command */
     hbdb->current_command = Parrot_str_to_cstring(interp, input);
 }
