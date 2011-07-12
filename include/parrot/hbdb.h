@@ -116,9 +116,6 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void continue_running(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -164,8 +161,6 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_continue_running __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))

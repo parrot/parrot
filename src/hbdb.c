@@ -59,6 +59,9 @@ typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
 static void command_line(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void continue_running(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void display_breakpoint(
     ARGIN(hbdb_t *hbdb),
     ARGIN(hbdb_breakpoint_t *bp))
@@ -89,6 +92,8 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_continue_running __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_display_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
@@ -851,7 +856,7 @@ command_line(PARROT_INTERP)
 
 /*
 
-=item C<void continue_running(PARROT_INTERP)>
+=item C<static void continue_running(PARROT_INTERP)>
 
 Manipulates a few status flags to indicate that the debugger should continue
 running.
@@ -860,7 +865,7 @@ running.
 
 */
 
-void
+static void
 continue_running(PARROT_INTERP)
 {
     /* Change status flags to indicate that debugger is running, not stopped */
