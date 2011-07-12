@@ -291,6 +291,7 @@ int main(void) {
     /* Covers code for a null backtrace pmc being passed in */
     Parrot_api_pmc_get_string(interp, pmc, &pmc_s);
     Parrot_api_get_exception_backtrace(interp, exception, &pmc_s);
+    return 0;
 }
 CODE
 OUTPUT
