@@ -116,12 +116,16 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void continue_running(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void hbdb_cmd_continue(PARROT_INTERP, ARGIN_NULLOK(const char *cmd))
-        __attribute__nonnull__(1);
+void hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
@@ -132,6 +136,10 @@ void hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(2);
 
 void hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -156,11 +164,14 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_continue_running __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
@@ -168,6 +179,9 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_quit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_hbdb_cmd_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

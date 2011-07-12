@@ -119,37 +119,55 @@ struct hbdb_cmd_table_t {
 };
 
 /* Define a 'hbdb_cmd_t' structure for each command */
-hbdb_cmd_t cmd_break = { &hbdb_cmd_break,
+hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
 
-                         "Sets a breakpoint at the specified location.",
+                            "Sets a breakpoint at the specified location.",
 
-                         "Sets a breakpoint at the specified location.\n\n"
-                         "break LOCATION\n\n"
-                         "If LOCATION is an address, breaks at the exact address." },
+                            "Sets a breakpoint at the specified location.\n\n"
+                            "break LOCATION\n\n"
+                            "If LOCATION is an address, breaks at the exact address." },
 
-           cmd_list  = { &hbdb_cmd_list,
+           cmd_continue = { &hbdb_cmd_continue,
 
-                         "Lists specified line(s).",
+                            "Continue program being debugged after a breakpoint.",
 
-                         "Lists specified line(s).\n\n"
-                         "With no argument, lists 10 lines.\n"
-                         "One argument specifies a line, and ten lines are listed around that line.\n"
-                         "Two arguments with comma between specify starting and ending lines to list."},
+                            "Continue program being debugged after a breakpoint.\n\n"
+                            "A number N may be used as an argument, which means to set the ignore"
+                            "count of that breakpoint to N - 1 (so that the breakpoint won't"
+                            "break until the Nth time is reached)." },
 
-           cmd_help  = { &hbdb_cmd_help,
-                         "Displays a summary help message.",
-                         "Displays a summary help message." },
+           cmd_list     = { &hbdb_cmd_list,
 
-           cmd_quit  = { &hbdb_cmd_quit,
-                         "Exits HBDB.",
-                         "Exits HBDB."                                             };
+                            "Lists specified line(s).",
+
+                            "Lists specified line(s).\n\n"
+                            "With no argument, lists 10 lines.\n"
+                            "One argument specifies a line, and ten lines are listed around that line.\n"
+                            "Two arguments with comma between specify starting and ending lines to list."},
+
+           cmd_help     = { &hbdb_cmd_help,
+                            "Displays a summary help message.",
+
+                            "Displays a summary help message." },
+
+           cmd_run      = { &hbdb_cmd_run,
+                            "Start debugged program. You may specify arguments to give it.",
+
+                            "Start debugged program. You may specify arguments to give it." },
+
+           cmd_quit     = { &hbdb_cmd_quit,
+                            "Exits HBDB.",
+
+                            "Exits HBDB."                                             };
 
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
-    { "break", "b",  &cmd_break },
-    { "help",  "h",  &cmd_help  },
-    { "list",  "l",  &cmd_list  },
-    { "quit",  "q",  &cmd_quit  }
+    { "break",    "b", &cmd_break    },
+    { "continue", "c", &cmd_continue },
+    { "help",     "h", &cmd_help     },
+    { "list",     "l", &cmd_list     },
+    { "run",      "r", &cmd_run      },
+    { "quit",     "q", &cmd_quit     }
 };
 
 /*
@@ -218,6 +236,53 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
 
     /* Show breakpoint position */
     display_breakpoint(hbdb, bp);
+}
+
+/*
+
+=item C<void hbdb_cmd_continue(PARROT_INTERP, const char *cmd)>
+
+Continues running the program being debugged.
+
+TODO Describe what a numeric argument does once it works
+
+=cut
+
+*/
+
+void
+hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_continue)
+
+    unsigned long skip;
+    hbdb_t       *hbdb;
+
+    /* Get global structure */
+    hbdb = interp->hbdb;
+
+    /* Verify that the source file has already been loaded */
+    if (!(hbdb->file && hbdb->file->line)) {
+        Parrot_io_eprintf(hbdb->debugger, "The program is not being run.\n");
+        return;
+    }
+
+    /* TODO Come back here as soon as breakpoints start working */
+
+    /* Get argument (if any) */
+    skip = get_cmd_argument(&cmd, 0);
+
+    /* Check if a "skip" argument was given */
+    if (skip != 0) {
+        if (!hbdb->breakpoint) {
+            Parrot_io_printf(hbdb->debugger, "No breakpoints to skip\n");
+            return;
+        }
+
+    /* TODO Ignore this breakpoint "skip" times */
+    }
+
+    continue_running(interp);
 }
 
 /*
@@ -353,6 +418,24 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
         /* Return if no more lines exist */
         if (!line) return;
     }
+}
+
+/*
+
+=item C<void hbdb_cmd_run(PARROT_INTERP, const char *cmd)>
+
+Begins execution of the debugee process.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_run)
+
+    continue_running(interp);
 }
 
 /*
@@ -772,6 +855,28 @@ command_line(PARROT_INTERP)
         /* Execute command */
         run_command(interp, cmd);
     }
+}
+
+/*
+
+=item C<void continue_running(PARROT_INTERP)>
+
+Manipulates a few status flags to indicate that the debugger should continue
+running.
+
+=cut
+
+*/
+
+void
+continue_running(PARROT_INTERP)
+{
+    /* Change status flags to indicate that debugger is running, not stopped */
+    HBDB_FLAG_SET(interp, HBDB_RUNNING);
+    HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
+
+    /* Clear status flag to indicate the debugger shouldn't break */
+    HBDB_FLAG_CLEAR(interp, HBDB_BREAK);
 }
 
 /*
