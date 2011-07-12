@@ -197,7 +197,7 @@ Explicitly do nothing.  C<$1>, C<$2> and C<$3> are ignored.
 =item * goto - go to a fixed offset in the current bytecode segment
 
 Unconditionally transfer control flow to a fixed offset within the current
-bytecode segment.  The target address is calculated as 256 * C<*$1> + C<$*2>.
+bytecode segment.  The target address is calculated as 256 * C<*$1> + C<*$2>.
 C<$3> is ignored.
 
 =item * goto_if - conditionally go to a fixed offset in the current bytecode segment
@@ -211,7 +211,7 @@ address is calculated as 256 * C<*$1> + C<*$2>.
 Unconditionally transfer control flow to an offset within another chunk's
 bytecode segment, updating the current call frame's C<CHUNK>, C<CONSTS>, C<MDS>
 and C<BCS> members to point at the new chunk's name and segments, respectively.
-C<*$1> is used as the target address and C<$*2> is the name of the target
+C<*$1> is used as the target address and C<*$2> is the name of the target
 chunk.
 
 =back
@@ -245,8 +245,8 @@ C<*$3> and store the result in C<*$1>.
 
 =item * div_n - divide two numeric registers
 
-Treat C<*$2> and C<$*2> as integer or floating-point values, divide C<$*1> by
-C<$*2> and store the result in C<$*0>.
+Treat C<*$2> and C<*$3> as integer or floating-point values, divide C<*$1> by
+C<*$2> and store the result in C<*$1>.
 
 =item * mod_i - remainder of of $3/$2 (integer)
 
@@ -284,8 +284,8 @@ extension, and store the result in C<*$1>.
 
 =item * lshr - right bitshift without sign extension
 
-Shift the value in C<*$2> right by the number of bits in C<$*2>, without sign
-extension, and store the result in C<$*0>.
+Shift the value in C<*$2> right by the number of bits in C<*$2>, without sign
+extension, and store the result in C<*$1>.
 
 =item * shl - left bitshift
 
