@@ -184,7 +184,7 @@ register's value C<*$1> refers to what a register points at.
 
 Ops tend to be consistent in the way they use registers.  When applicable,
 C<*$1> is used as the destination, C<*$2> is used as the first argument and
-C<*$2> is used as the second argument or modifier.
+C<*$3> is used as the second argument or modifier.
 
 =head3 Control Flow (4 ops)
 
@@ -197,7 +197,7 @@ Explicitly do nothing.  C<$1>, C<$2> and C<$3> are ignored.
 =item * goto - go to a fixed offset in the current bytecode segment
 
 Unconditionally transfer control flow to a fixed offset within the current
-bytecode segment.  The target address is calculated as 256 * C<$1> + C<$*2>.
+bytecode segment.  The target address is calculated as 256 * C<*$1> + C<$*2>.
 C<$3> is ignored.
 
 =item * goto_if - conditionally go to a fixed offset in the current bytecode segment
@@ -551,8 +551,8 @@ alternative to specifying the bytecode offset explicitly.  Use of labels with
 any other ops is invalid.
 
   .bytecode
-  set_var I0, 0, 0
-  set_var I1, 0, 1
+  set_imm I0, 0, 0
+  set_imm I1, 0, 1
   loop: add_i I0, I0, I1
   goto  loop, x
 
@@ -562,9 +562,9 @@ would translate to:
 
   .bytecode
   # offset 0, 0
-  set_var I0,  0, 0
+  set_imm I0,  0, 0
   # offset 1, 0
-  set_var I1,  0, 1
+  set_imm I1,  0, 1
   # offset 2, 0
   add_i   I0, I0, 1
 
@@ -589,13 +589,21 @@ The following should be a working "hello world" program in M0.
     .metadata
     .bytecode
     #I0 is 0
-    set_var I0, 0, 0
+    set_imm I0, 0, 0
+    deref   I0, CONSTS, I0
+
     #I1 is "hello"
-    set_var I1, 0, 1
+    set_imm I1, 0, 1
+    deref   I1, CONSTS, I1
+
     #I2 is "\n"
-    set_var I2, 0, 2
+    set_imm I2, 0, 2
+    deref   I2, CONSTS, I2
+
     #I3 is 0
-    set_var I3, 0, 3
+    set_imm I3, 0, 3
+    deref   I3, CONSTS, I3
+
     #print "hello" to stdout
     # x is arbitrary
     print_s I0, I1, x
