@@ -28,10 +28,11 @@
 /* Flags used to alter and identify the current state of the debugger   */
 typedef enum {
     HBDB_SRC_LOADED   = 0x0001,    /* Source code for debugge is loaded */
-    HBDB_STOPPED      = 0x0002,    /* Debugger is stopped/paused        */
-    HBDB_RUNNING      = 0x0004,    /* Debugger is running               */
-    HBDB_EXIT         = 0x0008,    /* Debugger is about to exit         */
-    HBDB_ENTERED      = 0x0010     /* Debugger has been started         */
+    HBDB_RUNNING      = 0x0002,    /* Debugger is running               */
+    HBDB_STOPPED      = 0x0004,    /* Debugger is stopped/paused        */
+    HBDB_BREAK        = 0x0008,    /* Halt at next breakpoint           */
+    HBDB_EXIT         = 0x0010,    /* Debugger is about to exit         */
+    HBDB_ENTERED      = 0x0020     /* Debugger has been started         */
 } hbdb_state_t;
 
 /* Flags used to associate a condition with a breakpoint or watchpoint  */
@@ -119,6 +120,9 @@ void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void hbdb_cmd_continue(PARROT_INTERP, ARGIN_NULLOK(const char *cmd))
+        __attribute__nonnull__(1);
+
 void hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -155,6 +159,8 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_hbdb_cmd_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_cmd_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
