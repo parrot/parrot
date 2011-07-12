@@ -433,7 +433,7 @@ Parrot_dyn_dlsym_str(PARROT_INTERP,
         ARGIN_NULLOK(void *handle), ARGIN_NULLOK(const STRING *symbol))
 {
     ASSERT_ARGS(Parrot_dyn_dlsym_str)
-    
+
     if (STRING_IS_NULL(symbol))
         return NULL;
 
