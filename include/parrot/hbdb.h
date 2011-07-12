@@ -91,7 +91,7 @@ typedef struct hbdb_breakpoint {
     unsigned long          id;           /* ID number                          */
     opcode_t              *pc;           /* Address of opcode to break at      */
     unsigned long          line;         /* Line number in source file         */
-    unsigned long          skip;         /* Number of times to skip breakpoint */
+    long                   skip;         /* Number of times to skip breakpoint */
     hbdb_condition_flag   *condition;    /* Condition attached to breakpoint   */
     hbdb_breakpoint       *prev;         /* Previous breakpoint in the list    */
     hbdb_breakpoint       *next;         /* Next breakpoint in the list        */
