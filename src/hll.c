@@ -291,19 +291,19 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                 "no such HLL ID (%vd)", hll_id);
         else {
-            PMC  *type_hash;
+            PMC  *type_array;
             PMC * const entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
             PARROT_ASSERT(!PMC_IS_NULL(entry));
-            type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
-            if (PMC_IS_NULL(type_hash)) {
+            type_array = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
+            if (PMC_IS_NULL(type_array)) {
                 int i;
-                type_hash = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
-                VTABLE_set_integer_native(interp, type_hash, PARROT_MAX_CLASSES);
+                type_array = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
+                VTABLE_set_integer_native(interp, type_array, PARROT_MAX_CLASSES);
                 for (i = 0; i < PARROT_MAX_CLASSES; ++i)
-                    VTABLE_set_integer_keyed_int(interp, type_hash, i, i);
-                VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
+                    VTABLE_set_integer_keyed_int(interp, type_array, i, i);
+                VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_array);
             }
-            VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
+            VTABLE_set_integer_keyed_int(interp, type_array, core_type, hll_type);
         }
     }
 }
@@ -335,8 +335,8 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             "no such HLL ID (%vd)", hll_id);
     else {
         PMC * const hll_info = interp->HLL_info;
-        PMC    *entry, *type_hash;
-        Parrot_FixedIntegerArray_attributes *type_hash_attrs;
+        PMC    *entry, *type_array;
+        Parrot_FixedIntegerArray_attributes *type_array_attrs;
 
         START_READ_HLL_INFO(interp, hll_info);
         entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
@@ -346,9 +346,9 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_GLOBAL_NOT_FOUND, "no such HLL ID (%vd)", hll_id);
 
-        type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
+        type_array = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
 
-        if (PMC_IS_NULL(type_hash))
+        if (PMC_IS_NULL(type_array))
             return core_type;
 
         if (core_type >= PARROT_MAX_CLASSES || core_type < 0) {
@@ -356,8 +356,8 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
                     "FixedIntegerArray: index out of bounds!");
         }
 
-        type_hash_attrs = PARROT_FIXEDINTEGERARRAY(type_hash);
-        return type_hash_attrs->int_array[core_type];
+        type_array_attrs = PARROT_FIXEDINTEGERARRAY(type_array);
+        return type_array_attrs->int_array[core_type];
     }
 }
 
