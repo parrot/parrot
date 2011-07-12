@@ -868,6 +868,8 @@ running.
 static void
 continue_running(PARROT_INTERP)
 {
+    ASSERT_ARGS(continue_running)
+
     /* Change status flags to indicate that debugger is running, not stopped */
     HBDB_FLAG_SET(interp, HBDB_RUNNING);
     HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
