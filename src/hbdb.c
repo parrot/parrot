@@ -452,10 +452,17 @@ hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
 
     hbdb_destroy(interp);
 
-    Parrot_x_exit(interp, 0);
+    /* FIXME With exit() quickfix, changing these flags actually isn't
+     * necessary but I will leave it for now because it's supposed to work
+     * without exit() but currently segfaults. See hbdb_runloop() +770 to see
+     * why
+     */
 
+    /* Set status flags to indicate debugger isn't running and about to exit */
     HBDB_FLAG_SET(interp, HBDB_EXIT);
     HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
+
+    exit(0);
 }
 
 /*
