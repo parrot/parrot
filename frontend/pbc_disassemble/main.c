@@ -188,7 +188,7 @@ help(void)
     puts("    -?, --help                   Displays help information");
     puts("    -b, --bare                   Displays bare PASM without header and left column");
     puts("    -h, --header-only            Dumps only the constants table header");
-    puts("    -o, --output \"filename\"    Writes output to \"filename\"");
+    puts("    -o, --output \"filename\"      Writes output to \"filename\"");
 
     exit(EXIT_SUCCESS);
 }
