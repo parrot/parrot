@@ -502,6 +502,10 @@ D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
 
+N: Jay Emmerson
+E: john.emerson@yale.edu
+U: jay
+
 N: Jeff Clites
 D: PPC JIT patches, ICU support, string handling
 
