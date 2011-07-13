@@ -73,6 +73,10 @@ static void display_breakpoint(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void free_file(PARROT_INTERP, ARGIN(hbdb_file_t *file))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_WARN_UNUSED_RESULT
 static unsigned long get_cmd_argument(
     ARGMOD(const char **cmd),
@@ -105,6 +109,9 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
 #define ASSERT_ARGS_display_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hbdb) \
     , PARROT_ASSERT_ARG(bp))
+#define ASSERT_ARGS_free_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_get_cmd_argument __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -526,12 +533,7 @@ hbdb_destroy(PARROT_INTERP)
     interp->hbdb->current_command = NULL;
 
     /* Free memory used for source code */
-    mem_gc_free(interp, hbdb->file->source);
-    interp->hbdb->file->source    = NULL;
-
-    /* Free memory used for source file */
-    mem_gc_free(interp, hbdb->file);
-    interp->hbdb->file            = NULL;
+    free_file(interp, hbdb->file);
 
     /* Free memory used for breakpoints list */
     mem_gc_free(interp, hbdb->breakpoint);
@@ -674,10 +676,10 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     prev_dbg_line = NULL;
 
     /* Free previous source file (if any) */
-    /*if (hbdb->file) {*/
-        /*hbdb_free_file(hbdb->debugee, hbdb->debugee->hbdb->file);*/
-        /*hbdb->debugee->hbdb->file = NULL;*/
-    /*}*/
+    if (hbdb->file) {
+        free_file(hbdb->debugee, hbdb->debugee->hbdb->file);
+        hbdb->debugee->hbdb->file = NULL;
+    }
 
     /* Open file for reading */
     if (!(fd = fopen(file, "r"))) {
@@ -956,6 +958,66 @@ display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp)) {
         Parrot_io_printf(hbdb->debugger, "  (DISABLED)");
 
     Parrot_io_printf(hbdb->debugger, "\n");
+}
+
+/*
+
+=item C<static void free_file(PARROT_INTERP, hbdb_file_t *file)>
+
+Frees the memory allocated for the debugee's source file.
+
+=cut
+
+*/
+
+static void
+free_file(PARROT_INTERP, ARGIN(hbdb_file_t *file))
+{
+    ASSERT_ARGS(free_file)
+
+    hbdb_line_t  *line;
+    hbdb_label_t *label;
+
+    /* Get first line in source file */
+    line = file->line;
+
+    /* Loop through list of lines */
+    while (line) {
+        /* Set pointer to next line */
+        hbdb_line_t *next_line = line->next;
+
+        /* Free memory for current line */
+        mem_gc_free(interp, line);
+
+        /* Get next line */
+        line = next_line;
+    }
+
+    /* Get first label in source file */
+    label = file->label;
+
+    /* Loop through list of labels */
+    while (label) {
+        /* Set pointer to next label */
+        hbdb_label_t *next_label = label->next;
+
+        /* Free memory for current label */
+        mem_gc_free(interp, label);
+
+        /* Get next label */
+        label = next_label;
+    }
+
+    /* Free memory allocated for storing filename */
+    if (file->filename)
+        mem_gc_free(interp, file->filename);
+
+    /* Free memory allocated for storing rest of source code */
+    if (file->source)
+        mem_gc_free(interp, file->source);
+
+    /* Free memory for current file */
+    mem_gc_free(interp, file);
 }
 
 /*

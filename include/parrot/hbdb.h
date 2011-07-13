@@ -63,6 +63,15 @@ typedef struct hbdb_condition {
     hbdb_condition     *next;    /* Next condition (watchpoints only)   */
 } hbdb_condition_t;
 
+typedef struct hbdb_label hbdb_label;
+
+/* Represents a label in the debugee's source file                             */
+typedef struct hbdb_label {
+    opcode_t      *opcode;    /* Points to place in bytecode where label lives */
+    long           id;        /* ID number                                     */
+    hbdb_label    *next;      /* Next label (if any)                           */
+} hbdb_label_t;
+
 typedef struct hbdb_line hbdb_line;
 
 /* Contains details about a specific line in the source file                            */
@@ -70,7 +79,7 @@ typedef struct hbdb_line {
     opcode_t        *opcode;        /* Opcode in bytecode corresponding to current line */
     ptrdiff_t        offset;        /* Offset from beginning of file                    */
     unsigned long    number;        /* Line number                                      */
-    /*hbdb_label_t    *label;*/     /* Label (if any)                                   */
+    hbdb_label_t    *label;         /* Label (if any)                                   */
     hbdb_line       *next;          /* Next line (if any)                               */
 } hbdb_line_t;
 
@@ -81,7 +90,7 @@ typedef struct {
     size_t        size;         /* Size of file in bytes     */
     unsigned long next_line;    /* Next line to list         */
     hbdb_line_t  *line;         /* First line of source code */
-    /*hbdb_label_t *label;*/    /* First label               */
+    hbdb_label_t *label;        /* First label               */
 } hbdb_file_t;
 
 /* Linked list that contains details about each individual breakpoint          */
