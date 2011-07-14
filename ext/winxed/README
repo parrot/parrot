@@ -17,7 +17,7 @@ directory.
 
 How to choose and tag the release used:
 
-Releases are tagged like this: RELASE_1_0_0
+Releases are tagged like this: RELEASE_1_0_0
 
 To tag a new releease switch to the appropiate branch, like version_1_0,
 verify is updated with the appropiate changes and the pir generated files
