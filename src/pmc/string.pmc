@@ -716,11 +716,9 @@ characters, other digit representations aren't allowed.
             INTVAL i = 0;
             STRING_ITER_INIT(interp, &iter);
             c = STRING_iter_get_and_advance(interp, src, &iter);
-            if (c == '-') {
-                if (len < 2)
+            if ((c == '-' && len < 2) || c < '0' || c > '9')
                     RETURN(INTVAL 0);
-                ++i;
-            }
+            ++i;
             for (; i < len; ++i) {
                 c = STRING_iter_get_and_advance(interp, src, &iter);
                 if (c < '0' || c > '9')
