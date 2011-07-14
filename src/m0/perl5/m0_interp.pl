@@ -132,6 +132,8 @@ sub new_interp {
         \&m0_opfunc_set_imm,
         \&m0_opfunc_deref,
         \&m0_opfunc_set_ref,
+        \&m0_opfunc_set_byte,
+        \&m0_opfunc_get_byte,
         \&m0_opfunc_csym,
         \&m0_opfunc_ccall_arg,
         \&m0_opfunc_ccall_ret,
@@ -459,6 +461,22 @@ sub m0_opfunc_set_ref {
     # XXX: revisit the asymmetry between this op and deref and decide whether
     # to make them consistent
     $$cf->[$a1][ $$cf->[$a2] ] = $$cf->[$a3];
+}
+
+sub m0_opfunc_set_byte {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "set_byte $a1, $a2, $a3";
+    
+    $$cf->[$a1] = bytes::substr($$cf->[$a2], $$cf->[$a3]);
+    my $new_byte = bytes::chr($$cf->[$a3] & 255);
+    bytes::substr($$cf->[$a2], $$cf->[$a3], $new_byte);
+}
+
+sub m0_opfunc_get_byte {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "get_byte $a1, $a2, $a3";
+    
+    $$cf->[$a1] = bytes::substr($$cf->[$a2], $$cf->[$a3], 1);
 }
 
 sub m0_opfunc_csym {
