@@ -10,13 +10,15 @@ $(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) $(PBC_MERGE) 
     compilers/pct/src/PAST/Nodes.pbc \
     compilers/pct/src/PAST/Compiler.pbc \
     compilers/pct/src/POST/Nodes.pbc \
-    compilers/pct/src/POST/Compiler.pbc
+    compilers/pct/src/POST/Compiler.pbc \
+    compilers/pct/src/POST/VanillaAllocator.pbc
 	$(PBC_MERGE) -o $@ \
 	compilers/pct/src/PCT/Node.pbc \
 	compilers/pct/src/PAST/Nodes.pbc \
 	compilers/pct/src/PAST/Compiler.pbc \
 	compilers/pct/src/POST/Nodes.pbc \
-	compilers/pct/src/POST/Compiler.pbc
+	compilers/pct/src/POST/Compiler.pbc \
+	compilers/pct/src/POST/VanillaAllocator.pbc
 
 $(LIBRARY_DIR)/PCT/Grammar.pbc : compilers/pct/src/PCT/Grammar.pir $(PARROT) \
     $(LIBRARY_DIR)/PGE.pbc $(LIBRARY_DIR)/PGE/Util.pbc
