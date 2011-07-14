@@ -1351,8 +1351,8 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
 {
     if (is_file)
         PIO_CLOSE(imcc->interp, file);
-    else
-        Parrot_str_free_cstring(source_c);
+
+    Parrot_str_free_cstring(source_c);
 }
 
 INTVAL
