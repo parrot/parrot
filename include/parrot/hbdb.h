@@ -125,6 +125,15 @@ typedef struct {
 /* HEADERIZER BEGIN: src/hbdb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+long add_label(PARROT_INTERP,
+    ARGMOD(hbdb_file_t *file),
+    ARGIN(opcode_t *cur_opcode),
+    opcode_t offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*file);
+
 void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -132,6 +141,9 @@ void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
 void hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void hbdb_cmd_disassemble(PARROT_INTERP, ARGIN_NULLOK(const char *cmd))
+        __attribute__nonnull__(1);
 
 void hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
@@ -170,12 +182,18 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(file) \
+    , PARROT_ASSERT_ARG(cur_opcode))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_hbdb_cmd_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_cmd_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
