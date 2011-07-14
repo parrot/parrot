@@ -176,7 +176,7 @@ of M0 ops.
 In descriptions, C<$1> refers to the value of the first argument to an op,
 C<$2> to the second and C<$3> to the third.  Any op can operate on any
 register; types are only by convention.  As far as an M0 VM is conerned, the
-256 ops are nothing more than an array of 256 opcode_t-sized chunks of data.
+256 ops are nothing more than an array of 256 uint32-sized chunks of data.
 
 Note that this documentation uses a C-like syntax to differentiate between a
 register's number and the value pointed to by the regster. C<$1> refers to a
@@ -340,7 +340,7 @@ Segfaults may result.  Be careful.
 
 =back
 
-=head3 Register ops (4)
+=head3 Register ops (6)
 
 =over
 
@@ -361,6 +361,22 @@ whatever's at C<*$2[ *$3 ]>.
 
 Treat C<*$1> as an array and C<*$2> as an offset into that array.  Set
 C<*$1[ *$2 ]> to C<*$3>.
+
+=item * set_byte - manipulate individual bytes in an array
+
+NOTE: This op is not finalized.  It may be omitted or changed significantly
+before being considered final.
+
+Treat C<*$1> as an array and C<*$2> a byte offset into that array.  Set byte
+number C<*$2> of C<*$1> to the least significant byte of C<*$3>.
+
+=item * get_byte - read individual bytes in an array
+
+NOTE: This op is not finalized.  It may be omitted or changed significantly
+before being considered final.
+
+Treat C<*$2> as an array and C<*$3> a byte offset into that array.  Set C<*$1>
+to byte C<*3> of C<*$2>.  After this op, C<*$1> can never be more than 255.
 
 =back
 
@@ -588,7 +604,7 @@ The following should be a working "hello world" program in M0.
     3 0
     .metadata
     .bytecode
-    #I0 is 0
+    #I0 is 1
     set_imm I0, 0, 0
     deref   I0, CONSTS, I0
 
@@ -751,14 +767,16 @@ are not require to have any defined semantics.
     0x1B set_imm
     0x1C deref
     0x1D set_ref
-    0x1E csym
-    0x1F ccall_arg
-    0x20 ccall_ret
-    0x21 ccall
-    0x22 print_s
-    0x23 print_i
-    0x24 print_n
-    0x25 exit
+    0x1E set_byte
+    0x1F get_byte
+    0x20 csym
+    0x21 ccall_arg
+    0x22 ccall_ret
+    0x23 ccall
+    0x24 print_s
+    0x25 print_i
+    0x25 print_n
+    0x26 exit
 
 =head2 Execution
 
