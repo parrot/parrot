@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1308507539.6771")
+.sub "_block1000"  :anon :subid("10_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1308507539.6771" 
+    .const 'Sub' $P1003 = "11_1310682740.01781" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -13,21 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 9
-    .const 'Sub' $P1003 = "11_1308507539.6771" 
+    .const 'Sub' $P1003 = "11_1310682740.01781" 
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1026 = "15_1308507539.6771" 
+    .const 'Sub' $P1026 = "15_1310682740.01781" 
     .return ($P1026)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post16") :outer("10_1308507539.6771")
+.sub "" :load :init :subid("post16") :outer("10_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1308507539.6771" 
+    .const 'Sub' $P1001 = "10_1310682740.01781" 
     .local pmc block
     set block, $P1001
     $P1028 = get_root_global ["parrot"], "P6metaclass"
@@ -36,10 +36,10 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block1002"  :subid("11_1308507539.6771") :outer("10_1308507539.6771")
+.sub "_block1002"  :subid("11_1310682740.01781") :outer("10_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 9
-    .const 'Sub' $P1005 = "12_1308507539.6771" 
+    .const 'Sub' $P1005 = "12_1310682740.01781" 
     capture_lex $P1005
     get_global $P1004, "%type2idx"
     unless_null $P1004, vivify_18
@@ -54,20 +54,20 @@
   ctxsave_done:
     get_global $P101, "%type2idx"
 .annotate 'line', 23
-    .const 'Sub' $P1005 = "12_1308507539.6771" 
+    .const 'Sub' $P1005 = "12_1310682740.01781" 
     newclosure $P1021, $P1005
 .annotate 'line', 9
     .return ($P1021)
-    .const 'Sub' $P1023 = "14_1308507539.6771" 
+    .const 'Sub' $P1023 = "14_1310682740.01781" 
     .return ($P1023)
 .end
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "" :load :init :subid("post17") :outer("11_1308507539.6771")
+.sub "" :load :init :subid("post17") :outer("11_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 9
-    .const 'Sub' $P1003 = "11_1308507539.6771" 
+    .const 'Sub' $P1003 = "11_1310682740.01781" 
     .local pmc block
     set block, $P1003
 .annotate 'line', 12
@@ -78,11 +78,11 @@
 
 .namespace ["POST";"VanillaAllocator"]
 .include "except_types.pasm"
-.sub "process"  :subid("12_1308507539.6771") :method :outer("11_1308507539.6771")
+.sub "process"  :subid("12_1310682740.01781") :method :outer("11_1310682740.01781")
     .param pmc param_1008
 .annotate 'file', ''
 .annotate 'line', 23
-    .const 'Sub' $P1012 = "13_1308507539.6771" 
+    .const 'Sub' $P1012 = "13_1310682740.01781" 
     capture_lex $P1012
     new $P1007, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1007, control_1006
@@ -113,7 +113,7 @@
     unless $P101, loop1020_done
     shift $P104, $P101
   loop1020_redo:
-    .const 'Sub' $P1012 = "13_1308507539.6771" 
+    .const 'Sub' $P1012 = "13_1310682740.01781" 
     capture_lex $P1012
     $P1012($P104)
   loop1020_next:
@@ -139,7 +139,7 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block1011"  :anon :subid("13_1308507539.6771") :outer("12_1308507539.6771")
+.sub "_block1011"  :anon :subid("13_1310682740.01781") :outer("12_1310682740.01781")
     .param pmc param_1014
 .annotate 'file', ''
 .annotate 'line', 27
@@ -198,20 +198,20 @@
 
 
 .namespace ["POST";"VanillaAllocator"]
-.sub "_block1022" :load :anon :subid("14_1308507539.6771")
+.sub "_block1022" :load :anon :subid("14_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 9
-    .const 'Sub' $P1024 = "11_1308507539.6771" 
+    .const 'Sub' $P1024 = "11_1310682740.01781" 
     $P101 = $P1024()
     .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1025" :load :anon :subid("15_1308507539.6771")
+.sub "_block1025" :load :anon :subid("15_1310682740.01781")
 .annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1027 = "10_1308507539.6771" 
+    .const 'Sub' $P1027 = "10_1310682740.01781" 
     $P101 = $P1027()
     .return ($P101)
 .end
