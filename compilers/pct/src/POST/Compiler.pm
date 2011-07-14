@@ -966,23 +966,23 @@ method create_context($past, %adverbs) {
 
     %context<compiler> := self;
 
-    %context<packfile> := new("Packfile");
+    %context<packfile> := pir::new("Packfile");
 
     # Scaffolding
     # Packfile will be created with fresh directory
     my $pfdir := %context<packfile>.get_directory;
 
     # We need some constants
-    %context<constants> := new('PackfileConstantTable');
+    %context<constants> := pir::new('PackfileConstantTable');
 
     # Empty FIA for handling returns from "hello"
-    %context<constants>[0] := new('FixedIntegerArray');
+    %context<constants>[0] := pir::new('FixedIntegerArray');
 
     # Add PackfileConstantTable into directory.
     $pfdir<CONSTANTS_hello.pir> := %context<constants>;
 
     # Generate bytecode
-    %context<bytecode> := new('PackfileBytecodeSegment');
+    %context<bytecode> := pir::new('PackfileBytecodeSegment');
     %context<bytecode>.main_sub(-1);
     # Did we see real :main sub
     %context<got_main_sub> := 0;
