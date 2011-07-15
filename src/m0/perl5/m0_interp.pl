@@ -634,7 +634,8 @@ sub m0b_parse_const_seg {
     my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $const        = unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
+        my $header       = pack("LL", $const_length, 0);
+        my $const        = $header . unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
         m0_say "found constant of length $const_length: '$const'";
         push @$consts, $const;
     }
