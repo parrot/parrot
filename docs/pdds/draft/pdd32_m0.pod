@@ -378,6 +378,23 @@ before being considered final.
 Treat C<*$2> as an array and C<*$3> a byte offset into that array.  Set C<*$1>
 to byte C<*3> of C<*$2>.  After this op, C<*$1> can never be more than 255.
 
+=item * set_word - manipulate individual word in an array
+
+NOTE: This op is not finalized.  It may be omitted or changed significantly
+before being considered final.
+
+Treat C<*$1> as an array of words and C<*$2> a word offset into that array.
+Set word number C<*$2> of C<*$1> to the word in C<*$3>.
+
+=item * get_word - read individual word in an array
+
+NOTE: This op is not finalized.  It may be omitted or changed significantly
+before being considered final.
+
+Treat C<*$2> as an array of words and C<*$3> a word offset into that array.
+Set C<*$1> to word number C<*3> of C<*$2>.
+
+
 =back
 
 =head3 FFI ops (4 ops)
