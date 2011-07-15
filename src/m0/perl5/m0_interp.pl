@@ -134,6 +134,8 @@ sub new_interp {
         \&m0_opfunc_set_ref,
         \&m0_opfunc_set_byte,
         \&m0_opfunc_get_byte,
+        \&m0_opfunc_set_word,
+        \&m0_opfunc_get_word,
         \&m0_opfunc_csym,
         \&m0_opfunc_ccall_arg,
         \&m0_opfunc_ccall_ret,
@@ -476,7 +478,25 @@ sub m0_opfunc_get_byte {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "get_byte $a1, $a2, $a3";
     
-    $$cf->[$a1] = bytes::substr($$cf->[$a2], $$cf->[$a3], 1);
+    $$cf->[$a1] = bytes::ord(bytes::substr($$cf->[$a2], $$cf->[$a3], 1));
+}
+
+sub m0_opfunc_set_word {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "set_word $a1, $a2, $a3";
+    
+    #turn *$3 into 4 bytes
+    my $word = pack('L', $$cf->[$a3] );
+    bytes::substr($$cf->[$a1], 4 * $$cf->[$a2], 4, $word);
+}
+
+sub m0_opfunc_get_word {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "get_word $a1, $a2, $a3";
+    
+    #$$cf->[$a1] = unpack("L", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
+    my $word = bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4);
+    $$cf->[$a1] = unpack('L', $word);
 }
 
 sub m0_opfunc_csym {
@@ -504,7 +524,8 @@ sub m0_opfunc_print_s {
     m0_say "print_s $a1, $a2, $a3";
 
     my $handle = $$cf->[$a1];
-    my $var    = $$cf->[$a2];
+    # don't print the header
+    my $var    = bytes::substr($$cf->[$a2], 8);
     # TODO: print to $handle instead of stdout
     print $var;
 }
@@ -634,8 +655,8 @@ sub m0b_parse_const_seg {
     my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $header       = pack("LL", $const_length, 0);
-        my $const        = $header . unpack("a[$const_length]", get_bytes($m0b, $cursor, $const_length));
+        my $header       = pack("LL", $const_length+1, 0);
+        my $const        = $header . unpack("a[$const_length]x", get_bytes($m0b, $cursor, $const_length));
         m0_say "found constant of length $const_length: '$const'";
         push @$consts, $const;
     }
