@@ -993,8 +993,13 @@ hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
     /* Main loop */
     do {
-        Parrot_runcode(interp, argc, argv);
+        /* Enter runcore if source file has been loaded, otherwise start command-line directly */
+        if (HBDB_FLAG_TEST(interp, HBDB_SRC_LOADED))
+            Parrot_runcode(interp, argc, argv);
+        else
+            command_line(interp);
 
+        /* Set status flag to indicate that debugger has stopped/paused */
         HBDB_FLAG_SET(interp, HBDB_STOPPED);
     } while (!(HBDB_FLAG_TEST(interp, HBDB_EXIT)));
 }

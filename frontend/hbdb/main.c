@@ -84,7 +84,6 @@ Entry point of C<hbdb>.
 int
 main(int argc, const char *argv[])
 {
-    const char             *file;
     int                     status;
     struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
@@ -140,25 +139,19 @@ main(int argc, const char *argv[])
     /* Get global debugger structure */
     hbdb = INTERP_ATTR(interp)->hbdb;
 
-    /* Get filename */
-    file = argv[argc - 1];
-
     /* TODO Move call somewhere else to just before entering main runloop */
     /* Display welcome message */
     welcome();
 
-    /* Load bytecode */
-    if (file) {
-        load_bytecode(interp, file, &pbc);
-    }
-    else { /* No file specified */
-        /* TODO Use parrot_debugger's technique for faking bytecode */
-    }
+    /* Load bytecode only if a file was given on command-line */
+    if (argc != 1) {
+        load_bytecode(interp, argv[argc - 1], &pbc);
 
-    /* Ready bytecode */
-    if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
-        Parrot_api_destroy_interpreter(interp);
-        show_last_error_and_exit(interp);
+        /* Ready bytecode */
+        if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
+            Parrot_api_destroy_interpreter(interp);
+            show_last_error_and_exit(interp);
+        }
     }
 
     /* Run bytecode */
@@ -172,7 +165,7 @@ main(int argc, const char *argv[])
         show_last_error_and_exit(interp);
     }
 
-    return (0);
+    return 0;
 }
 
 /*
