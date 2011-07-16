@@ -85,8 +85,6 @@ main(int argc, const char *argv[])
     int                     status;
     struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
-    hbdb_t                 *hbdb;
-
     Parrot_PMC              interp   = NULL,
                             pbc      = NULL,
                             main_sub = NULL;
@@ -132,10 +130,6 @@ main(int argc, const char *argv[])
         Parrot_api_destroy_interpreter(interp);
         show_last_error_and_exit(interp);
     }
-
-    /* TODO Do I need this? */
-    /* Get global debugger structure */
-    hbdb = INTERP_ATTR(interp)->hbdb;
 
     /* Load bytecode only if a file was given on command-line */
     if (argc != 1) {

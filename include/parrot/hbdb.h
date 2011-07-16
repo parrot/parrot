@@ -17,9 +17,6 @@
 #include "parrot/pobj.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
-/* Abstract access to fields in Parrot_Interp */
-#define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
-
 /* Convenience macros for manipulating the HBDB bitmask in Parrot_Interp */
 #define HBDB_FLAG_SET(interp, flag)   ((interp)->hbdb->state = (hbdb_state_t)((interp)->hbdb->state | (flag)))
 #define HBDB_FLAG_CLEAR(interp, flag) ((interp)->hbdb->state = (hbdb_state_t)((interp)->hbdb->state & ~(flag)))
