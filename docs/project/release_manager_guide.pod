@@ -274,10 +274,11 @@ Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
 
 =item 8.
 
-SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
-get it from one of the previous release managers.)
+SSH to ftp-osl.osuosl.org.  Note that your ssh public key must be added to list
+of authorized keys before you can log in.  Contact a previous release manager
+to get your key added.
 
-    ssh -l <USERNAME> ftp-osl.osuosl.org
+    ssh parrot@ftp-osl.osuosl.org
 
 If the release is a monthly development release, create a new directory under
 F<~/ftp/releases/devel>.
@@ -294,9 +295,9 @@ your machine into the new directory.
 
  scp parrot-a.b.c.tar.gz parrot-a.b.c.tar.bz2 \
        parrot-a.b.c.tar.gz.sha256 parrot-a.b.c.tar.bz2.sha256 \
-   <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
+   parrot@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
-(Or using C<wget> or whatever tool you prefer.)
+(Or use whatever tool you prefer.)
 
 When you're finished making changes, run the trigger script to push the changes
 out to the FTP mirrors.
