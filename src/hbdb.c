@@ -128,6 +128,7 @@ PARROT_WARN_UNUSED_RESULT
 static const char * skip_whitespace(ARGIN(const char *cmd))
         __attribute__nonnull__(1);
 
+static void welcome(void);
 #define ASSERT_ARGS_check_file_exists __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_command_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -156,6 +157,7 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_skip_whitespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_welcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -990,6 +992,9 @@ void
 hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(hbdb_runloop)
+
+    /* Display welcome message */
+    welcome();
 
     /* Main loop */
     do {
@@ -1933,6 +1938,24 @@ skip_whitespace(ARGIN(const char *cmd))
         cmd++;
 
     return cmd;
+}
+
+/*
+
+=item C<static void welcome(void)>
+
+Displays welcome message.
+
+=cut
+
+*/
+
+static void
+welcome(void)
+{
+    puts("HBDB: The Honey Bee Debugger");
+    puts("Copyright (C) 2001-2011, Parrot Foundation.\n");
+    puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information.\n");
 }
 
 /*

@@ -54,14 +54,12 @@ static void load_bytecode(
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(void);
-static void welcome(void);
 #define ASSERT_ARGS_license __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(file) \
     , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_welcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -138,10 +136,6 @@ main(int argc, const char *argv[])
     /* TODO Do I need this? */
     /* Get global debugger structure */
     hbdb = INTERP_ATTR(interp)->hbdb;
-
-    /* TODO Move call somewhere else to just before entering main runloop */
-    /* Display welcome message */
-    welcome();
 
     /* Load bytecode only if a file was given on command-line */
     if (argc != 1) {
@@ -304,24 +298,6 @@ usage(void)
     puts("    May be either a bytecode file (.pbc) or PIR file (.pir)");
 
     exit(EXIT_SUCCESS);
-}
-
-/*
-
-=item C<static void welcome(void)>
-
-Displays welcome message.
-
-=cut
-
-*/
-
-static void
-welcome(void)
-{
-    puts("HBDB: The Honey Bee Debugger");
-    puts("Copyright (C) 2001-2011, Parrot Foundation.\n");
-    puts("Enter \"h\" or \"help\" for help or see docs/hbdb.pod for further information.\n");
 }
 
 /*
