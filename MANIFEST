@@ -2200,6 +2200,7 @@ tools/release/inc_ver.pir                                   []
 tools/release/release.json                                  []
 tools/release/releasecheck.pl                               []
 tools/release/templates.json                                []
+tools/release/update_version.pl                             []
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
