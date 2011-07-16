@@ -32,7 +32,8 @@ typedef enum {
     HBDB_STOPPED      = 0x0004,    /* Debugger is stopped/paused        */
     HBDB_BREAK        = 0x0008,    /* Halt at next breakpoint           */
     HBDB_EXIT         = 0x0010,    /* Debugger is about to exit         */
-    HBDB_ENTERED      = 0x0020     /* Debugger has been started         */
+    HBDB_STARTED      = 0x0020,    /* Debugger has been started         */
+    HBDB_CMD_ENTERED  = 0x0040     /* At least one command was entered  */
 } hbdb_state_t;
 
 /* Flags used to associate a condition with a breakpoint or watchpoint  */
@@ -153,11 +154,19 @@ void hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void hbdb_cmd_nop(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void hbdb_cmd_step(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -200,10 +209,16 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
 #define ASSERT_ARGS_hbdb_cmd_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_hbdb_cmd_nop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_quit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
+#define ASSERT_ARGS_hbdb_cmd_step __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

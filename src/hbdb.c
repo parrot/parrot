@@ -212,6 +212,12 @@ hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
 
                             "Displays a summary help message." },
 
+           cmd_nop      = { &hbdb_cmd_nop,
+
+                            "",
+
+                            "" },
+
            cmd_quit     = { &hbdb_cmd_quit,
 
                             "Exits HBDB.",
@@ -222,7 +228,15 @@ hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
 
                             "Start debugged program. You may specify arguments to give it.",
 
-                            "Start debugged program. You may specify arguments to give it." };
+                            "Start debugged program. You may specify arguments to give it." },
+
+           cmd_step     = { &hbdb_cmd_step,
+
+                            "Step program until it reaches a different source line.",
+
+                            "Step program until it reaches a different source line.\n\n"
+                            "Argument N means do this N times (or till program stops for "
+                            "another reason." };
 
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
@@ -231,8 +245,10 @@ hbdb_cmd_table_t command_table[] = {
     { "disassemble", "d", &cmd_disassemble },
     { "help",        "h", &cmd_help        },
     { "list",        "l", &cmd_list        },
+    { "nop",         "",  &cmd_nop         },
     { "quit",        "q", &cmd_quit        },
-    { "run",         "r", &cmd_run         }
+    { "run",         "r", &cmd_run         },
+    { "step",        "s", &cmd_step        }
 };
 
 /*
@@ -611,6 +627,25 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
 
 /*
 
+=item C<void hbdb_cmd_nop(PARROT_INTERP, const char *cmd)>
+
+Unlike some of the other C<hbdb_cmd_*> functions, this is not a "nop" command.
+This function effectively does nothing at all.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_nop(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_nop)
+
+    /* Do nothing */
+}
+
+/*
+
 =item C<void hbdb_cmd_quit(PARROT_INTERP, const char *cmd)>
 
 Exits HBDB.
@@ -636,7 +671,7 @@ hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
     HBDB_FLAG_SET(interp, HBDB_EXIT);
     HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
 
-    exit(0);
+    /*exit(0);*/
 }
 
 /*
@@ -653,6 +688,24 @@ void
 hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_run)
+
+    continue_running(interp);
+}
+
+/*
+
+=item C<void hbdb_cmd_step(PARROT_INTERP, const char *cmd)>
+
+Step program until it reaches a different source line.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_step(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_step)
 
     continue_running(interp);
 }
@@ -731,7 +784,6 @@ hbdb_get_command(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_get_command)
 
-    char   *cmd;
     hbdb_t *hbdb;
 
     STRING *input;
@@ -746,10 +798,6 @@ hbdb_get_command(PARROT_INTERP)
     /* Flush stdout buffer */
     fflush(stdout);
 
-    /* Update last command */
-    if (hbdb->current_command != '\0')
-        strcpy(hbdb->last_command, hbdb->current_command);
-
     /* Create FileHandle PMC for stdin */
     stdinput = Parrot_io_stdhandle(interp, STDIN_FILENO, NULL);
 
@@ -760,8 +808,18 @@ hbdb_get_command(PARROT_INTERP)
     /* Invoke readline_interactive() */
     Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &input);
 
-    /* Store command */
-    hbdb->current_command = Parrot_str_to_cstring(interp, input);
+    /* Check if nothing was entered, otherwise just store command */
+    if (Parrot_str_byte_length(interp, input) == 0) {
+        /* Check if this is the first time anything was entered */
+        if (!HBDB_FLAG_TEST(interp, HBDB_CMD_ENTERED)) {
+            size_t len = sizeof (hbdb->current_command);
+
+            /* Store "nop" command to do nothing */
+            strncpy(hbdb->current_command, "nop", len);
+        }
+    }
+    else
+        hbdb->current_command = Parrot_str_to_cstring(interp, input);
 }
 
 /*
@@ -804,9 +862,9 @@ hbdb_init(PARROT_INTERP)
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
     }
 
-    /* Set HBDB_RUNNING and HBDB_ENTERED status flags */
+    /* Set status flags to indicate that debugger has started running */
     HBDB_FLAG_SET(interp, HBDB_RUNNING);
-    HBDB_FLAG_SET(interp, HBDB_ENTERED);
+    HBDB_FLAG_SET(interp, HBDB_STARTED);
 }
 
 /*
@@ -914,7 +972,7 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     /* Globally set file structure */
     hbdb->file = dbg_file;
 
-    /* Set flag to indicate that source file has been loaded */
+    /* Set status flag to indicate that source file has been loaded */
     HBDB_FLAG_SET(interp, HBDB_SRC_LOADED);
 }
 
@@ -968,9 +1026,9 @@ hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
                                     0,
                                     "FATAL ERROR: The debugger has not been initialized!");
 
-    /* Make sure the HBDB_ENTERED flag is not set */
-    if (HBDB_FLAG_TEST(interp, HBDB_ENTERED)) {
-        HBDB_FLAG_CLEAR(interp, HBDB_ENTERED);
+    /* Make sure the HBDB_STARTED flag is not set */
+    if (HBDB_FLAG_TEST(interp, HBDB_STARTED)) {
+        HBDB_FLAG_CLEAR(interp, HBDB_STARTED);
     }
 
     /* Get the current opcode */
@@ -1113,8 +1171,13 @@ command_line(PARROT_INTERP)
         /* Get command set by hbdb_get_command() */
         cmd = hbdb->current_command;
 
-        if (cmd == '\0')
-            cmd = hbdb->last_command;
+        /* Check if this is the first real (non-nop) command */
+        if (!HBDB_FLAG_TEST(interp, HBDB_CMD_ENTERED)
+             && strcmp(cmd, "nop") != 0) {
+
+            /* Set status flag to indicate that a real command has been entered */
+            HBDB_FLAG_SET(interp, HBDB_CMD_ENTERED);
+        }
 
         /* Execute command */
         run_command(interp, cmd);
@@ -1890,4 +1953,3 @@ part of Google Summer of Code 2011.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
