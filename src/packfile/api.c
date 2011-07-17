@@ -9,11 +9,14 @@ src/packfile.c - Parrot PackFile API
 
 =head1 DESCRIPTION
 
-This file contains all the functions required for the processing of the
-structure of a PackFile. It is not intended to understand the byte code
-stream itself, but merely to dissect and reconstruct data from the
-various segments. See F<docs/pdds/pdd13_bytecode.pod> for information
-about the structure of the frozen bytecode.
+This file represents the public API for the packfile subsystem. It provides
+several routines for working with PackFile* structures, and various
+packfile-related PMC types. Any PMC type for which VTABLE_get_pointer returns
+a PackFile* structure, and VTABLE_set_pointer takes a PackFile* can be used
+with this system to represent a PackFile*.
+
+See F<docs/pdds/pdd13_bytecode.pod> for details about the subsystem and the
+format of bytecode.
 
 =head2 PackFile Manipulation Functions
 
@@ -26,10 +29,6 @@ about the structure of the frozen bytecode.
 #include "pf_private.h"
 #include "api.str"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_key.h"
-#include "pmc/pmc_callcontext.h"
-#include "pmc/pmc_parrotlibrary.h"
-#include "pmc/pmc_ptrobj.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -1612,7 +1611,7 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
     for (i = 0; i < debug->num_mappings; ++i) {
         /* If this is the last mapping or the current position is
            between this mapping and the next one, return a filename. */
-       if (i + 1                          == debug->num_mappings
+       if (i + 1 == debug->num_mappings
        || (debug->mappings[i].offset     <= pc
        &&  debug->mappings[i + 1].offset >  pc))
             return debug->code->const_table->str.constants[debug->mappings[i].filename];
