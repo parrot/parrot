@@ -2147,9 +2147,7 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (!(pragma & P_ANON))
-        return;
-
+#if 0
     if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
@@ -2168,6 +2166,7 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         imcc->globals  = g;
         memmove(&imcc->ghash, &ghash, sizeof (SymHash));
     }
+#endif
 }
 
 
