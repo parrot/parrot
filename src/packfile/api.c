@@ -244,7 +244,13 @@ static int sub_pragma(PARROT_INTERP,
 
 =item C<void Parrot_pf_destroy(PARROT_INTERP, PackFile *pf)>
 
-Deletes a C<PackFile>.
+Destroys a C<PackFile>, and frees resources. This does not automatically free
+garbage collectable objects contained in that packfile (STRING and PMC) if
+they are referenced from other places.
+
+Notice that this can cause problems, if a Packfile is destroyed, but some of
+its contents are not destroyed, but those contents contain indirect references
+to other things in the packfile which are destroyed. Use with caution.
 
 =item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
 
@@ -574,7 +580,6 @@ Mark gcables in bytecode header.
 =cut
 
 */
-
 
 static void
 mark_1_bc_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *bc))
