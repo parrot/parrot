@@ -72,7 +72,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
 
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
-      if (valp) (valp)->s = mem_sys_strdup(yytext); \
+      if (valp) (valp)->s = mem_sys_strndup(yytext, yyleng); \
       return (token);                        \
   } while (0)
 
@@ -80,7 +80,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   do {                                       \
       if (valp) {                            \
           mem_sys_free((valp)->s);           \
-          (valp)->s = mem_sys_strdup(yytext);       \
+          (valp)->s = mem_sys_strndup(yytext, yyleng);       \
           return (token);                    \
       }                                      \
   } while (0)
@@ -152,7 +152,7 @@ SP              [ ]
 
 <heredoc1>.*{EOL} {
             SET_LINE_NUMBER;
-            imcc->frames->heredoc_rest = mem_sys_strdup(yytext);
+            imcc->frames->heredoc_rest = mem_sys_strndup(yytext, yyleng);
             BEGIN(heredoc2);
     }
 
@@ -494,13 +494,13 @@ SP              [ ]
         YYCHOP();
 
         if (valp)
-            valp->s = mem_sys_strdup(yytext);
+            valp->s = mem_sys_strndup(yytext, yyleng);
 
         return LABEL;
     }
 
 <emit,INITIAL>{DOT}{LETTER}{LETTERDIGIT}* {
-        char   * const macro_name = mem_sys_strdup(yytext + 1);
+        char   * const macro_name = mem_sys_strndup(yytext + 1, yyleng - 1);
         int failed = expand_macro(imcc, macro_name, yyscanner);
         mem_sys_free(macro_name);
         if (!failed) {
@@ -518,7 +518,7 @@ SP              [ ]
 <*>{OCT}              DUP_AND_RET(valp, INTC);
 
 <*>{STRINGCONSTANT} {
-        valp->s = mem_sys_strdup(yytext);
+        valp->s = mem_sys_strndup(yytext, yyleng);
 
         return STRINGC;
     }
@@ -530,7 +530,7 @@ SP              [ ]
            off newline and quote. */
         if (imcc->frames->heredoc_rest)
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "nested heredoc not supported");
-        imcc->heredoc_end = mem_sys_strdup(yytext + 3);
+        imcc->heredoc_end = mem_sys_strndup(yytext + 3, yyleng - 3);
         imcc->heredoc_end[strlen(imcc->heredoc_end) - 1] = 0;
 
         if (!strlen(imcc->heredoc_end))
@@ -553,7 +553,7 @@ SP              [ ]
 
 <*>{UNICODE} {
         /* charset:"..." */
-        valp->s = mem_sys_strdup(yytext);
+        valp->s = mem_sys_strndup(yytext, yyleng);
 
         /* this is actually not unicode but a string with a charset */
         return USTRINGC;
@@ -605,7 +605,7 @@ SP              [ ]
             "'%s' is only a valid register name in PASM mode", yytext);
 
         if (valp)
-            valp->s = mem_sys_strdup(yytext);
+            valp->s = mem_sys_strndup(yytext, yyleng);
 
         return REG;
     }
@@ -875,7 +875,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
 {
     YYSTYPE  val;
     size_t   len      = 0;
-    char    *current  = mem_sys_strdup("");
+    char    *current  = mem_sys_strndup("", 0);
     yyguts_t *yyg     = (yyguts_t *)yyscanner;
     int      c        = yylex_skip(&val, imcc, " \n", yyscanner);
 
@@ -897,7 +897,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
                             MAX_PARAM, macro_name);
 
             params->name[params->num_param++] = current;
-            current                           = mem_sys_strdup("");
+            current                           = mem_sys_strndup("", 0);
             len                               = 0;
 
             if (val.s)
@@ -1139,7 +1139,7 @@ expand_macro(ARGMOD(imc_info_t *imcc), ARGIN(const char *name), void *yyscanner)
         BEGIN(start_cond);
 
         if (frame->expansion.num_param == 0 && m->params.num_param == 1) {
-            frame->expansion.name[0] = mem_sys_strdup("");
+            frame->expansion.name[0] = mem_sys_strndup("", 0);
             frame->expansion.num_param = 1;
         }
 
