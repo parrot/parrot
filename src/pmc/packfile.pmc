@@ -497,6 +497,14 @@ start of the packfile.
         RETURN(PMC *dir);
     }
 
+    METHOD view() {
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        PackFile * const pf =
+                (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
+        PMC * const view = Parrot_pf_get_packfile_pmc(INTERP, pf);
+        RETURN(PMC * view);
+    }
+
 }
 
 
