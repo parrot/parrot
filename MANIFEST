@@ -26,6 +26,7 @@ RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [devel]doc
 VERSION                                                     [devel]
 api.yaml                                                    []
+compilers/README.pod                                        []doc
 compilers/data_json/Defines.mak                             [data_json]
 compilers/data_json/JSON.nqp                                [data_json]
 compilers/data_json/JSON_README.pod                         []doc
