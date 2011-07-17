@@ -592,6 +592,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
 
+    /* TODO: Do not use this function, it is deprecated (TT #2140). Find a
+       better way to handle :immediate and :postcomp subs instead. */
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 

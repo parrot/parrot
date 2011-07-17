@@ -104,7 +104,7 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
 Fixups after pbc loading
 
-DEPRECATED: Don't use this.
+DEPRECATED: Don't use this. Use Parrot_pf_prepare_packfile_load instead.
 
 =cut
 
