@@ -514,10 +514,6 @@ start of the packfile.
 
 =cut
 
-*/
-
-/*
-
 =head2 Auxliary functions
 
 =over 4
