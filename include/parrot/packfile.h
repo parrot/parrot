@@ -572,13 +572,6 @@ int PackFile_Header_unpack(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Header_validate(PARROT_INTERP,
-    ARGIN(const PackFile_Header *self),
-    INTVAL pf_options)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 INTVAL PackFile_map_segments(PARROT_INTERP,
     ARGIN(const PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
@@ -688,6 +681,11 @@ void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -820,9 +818,6 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(packed))
-#define ASSERT_ARGS_PackFile_Header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_map_segments __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir))
@@ -870,6 +865,10 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_Parrot_pf_load_bytecode_search \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_pf_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_prepare_packfile_init \

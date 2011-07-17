@@ -111,6 +111,12 @@ static PackFile * PackFile_append_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void PackFile_Header_validate(PARROT_INTERP,
+    ARGIN(const PackFile_Header *self),
+    INTVAL pf_options)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 static PMC * packfile_main(ARGIN(PackFile_ByteCode *bc))
         __attribute__nonnull__(1);
@@ -184,6 +190,9 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
+#define ASSERT_ARGS_PackFile_Header_validate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_packfile_main __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -501,8 +510,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 
 =item C<static void mark_1_ct_seg(PARROT_INTERP, PackFile_ConstTable *ct)>
 
-While the PMCs should be constant, their possible contents such as
-properties aren't constructed const, so we have to mark them.
+Mark one ConstTable segment for GC.
 
 =cut
 
@@ -666,6 +674,9 @@ These determine which subs get executed at this point. Some rules:
 Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
 alive by living subs.
 
+This function and the entire underlying mechanism should be deprecated and
+removed. See TT #2144 for details.
+
 =cut
 
 */
@@ -725,8 +736,8 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
 
 /*
 
-=item C<void PackFile_Header_validate(PARROT_INTERP, const PackFile_Header
-*self, INTVAL pf_options)>
+=item C<static void PackFile_Header_validate(PARROT_INTERP, const
+PackFile_Header *self, INTVAL pf_options)>
 
 Validates a C<PackFile_Header>, ensuring that the magic number is valid and
 that Parrot can read this bytecode version.
@@ -737,8 +748,7 @@ Raises an exception if the header doesn't validate.
 
 */
 
-PARROT_EXPORT
-void
+static void
 PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
                 INTVAL pf_options)
 {
