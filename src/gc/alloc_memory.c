@@ -219,9 +219,9 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char *
-mem_sys_strndup(ARGIN(const char *src), ARGIN(size_t size))
+mem_sys_strndup(ARGIN(const char *src), size_t size)
 {
-    ASSERT_ARGS(mem_sys_strdup)
+    ASSERT_ARGS(mem_sys_strndup)
 
     char * const result = (char *)mem_sys_allocate(size + 1);
     memcpy(result, src, size);
