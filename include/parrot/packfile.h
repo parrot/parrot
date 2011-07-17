@@ -550,28 +550,6 @@ void PackFile_fixup_subs(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void PackFile_Header_read_uuid(PARROT_INTERP,
-    ARGMOD(PackFile_Header *self),
-    ARGIN(const opcode_t *packed),
-    size_t packed_size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-int PackFile_Header_unpack(PARROT_INTERP,
-    ARGMOD(PackFile_Header *self),
-    ARGIN(const opcode_t *packed),
-    size_t packed_size,
-    INTVAL pf_options)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
 INTVAL PackFile_map_segments(PARROT_INTERP,
     ARGIN(const PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
@@ -658,6 +636,7 @@ PackFile_ByteCode * Parrot_pf_create_default_segments(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -685,6 +664,7 @@ PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -714,6 +694,7 @@ PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -810,14 +791,6 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_PackFile_fixup_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_Header_read_uuid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(packed))
-#define ASSERT_ARGS_PackFile_Header_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(packed))
 #define ASSERT_ARGS_PackFile_map_segments __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir))
