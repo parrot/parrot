@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Carp;
+use autodie;
 
 =head1 NAME
 
@@ -10,16 +11,18 @@ tools/release/update_version.pl - Update version numbers in a few files
 
 =head1 SYNOPSIS
 
-    perl tools/release/update_version.pl <old_version> <new_version>
+    perl tools/release/update_version.pl <new_version>
 
 =head1 DESCRIPTION
 
 This program is meant to be used by the Parrot release manager.  It will
-change the version numbers found in B<these 3 files only>:
+change the version numbers found in B<these 5 files only>:
 
     VERSION
     MANIFEST.generated
     README
+    include/parrot/oplib/core_ops.h
+    src/ops/core_ops.c
 
 During the release process, the Parrot version number must be updated in
 several files, but this program only operates on the three files above.  You
@@ -38,14 +41,17 @@ James E Keenan
 
 =cut
 
-croak "Must supply two version numbers as command-line arguments"
-    unless @ARGV == 2;
+croak "Must supply a version number as a command-line argument"
+    unless @ARGV == 1;
 
-my @versions = @ARGV;
-foreach my $ver ( @versions ) {
-    croak "'$ver' is not a proper version number; must be n.n.n"
-        unless $ver =~ m/^\d+\.\d+\.\d+$/;
-}
+my $new_version = $ARGV[0];
+open my $version_fh, '<', 'VERSION';
+my $old_version = <$version_fh>;
+chomp $old_version;
+close $version_fh;
+
+croak "'$new_version' is not a proper version number; must be n.n.n"
+    unless $new_version =~ m/^\d+\.\d+\.\d+$/;
 
 my @simple_files = (
     'VERSION',
@@ -59,7 +65,7 @@ foreach my $f ( @simple_files ) {
     open my $OUT, '>', $new or croak "Unable to open $new for writing";
     while (<$IN>) {
         chomp;
-        s/$versions[0]/$versions[1]/g;
+        s/$old_version/$new_version/g;
         print $OUT "$_\n";
     }
     close $OUT or croak "Unable to close $new after writing";
@@ -67,4 +73,34 @@ foreach my $f ( @simple_files ) {
     rename $new => $f or croak "Unable to rename $new to $f";
 }
 
-system(qq{git diff});
+
+my $filename = "include/parrot/oplib/core_ops.h";
+bump_gen_code_version($filename, $old_version, $new_version);
+$filename = "src/ops/core_ops.c";
+bump_gen_code_version($filename, $old_version, $new_version);
+
+
+
+sub bump_gen_code_version {
+
+    my ($filename, $old_version, $new_version) = @_;
+    my $old_h_version = join("_", split(/\./, $old_version));
+    print $old_h_version . "\n";
+    my @new_version   = split(/\./, $new_version);
+    my $new_h_version = join("_", @new_version);
+    print $new_h_version . "\n";
+
+    open my $gen_c_in, '<', "$filename";
+    open my $gen_c_out, '>', "$filename.tmp";
+    while(<$gen_c_in>) {
+        s/$old_h_version/$new_h_version/g;
+        s?\d+,    /\* major_version \*/?$new_version[0],    /* major_version */?;
+        s?\d+,    /\* minor_version \*/?$new_version[1],    /* minor_version */?;
+        s?\d+,    /\* patch_version \*/?$new_version[2],    /* patch_version */?;
+        print $gen_c_out $_;
+    }
+    close $gen_c_in;
+    close $gen_c_out;
+    rename "$filename.tmp", $filename;
+}
+
