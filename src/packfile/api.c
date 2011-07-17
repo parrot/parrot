@@ -1094,24 +1094,26 @@ PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
     ARGIN(const STRING *name), int sub_dir)
 {
     ASSERT_ARGS(PackFile_find_segment)
-    if (dir) {
-        size_t i;
+    size_t i;
 
-        for (i = 0; i < dir->num_segments; ++i) {
-            PackFile_Segment *seg = dir->segments[i];
+    if (!dir)
+        return NULL;
 
-            if (seg) {
-                if (STRING_equal(interp, seg->name, name))
-                    return seg;
+    for (i = 0; i < dir->num_segments; ++i) {
+        PackFile_Segment *seg = dir->segments[i];
 
-                if (sub_dir && seg->type == PF_DIR_SEG) {
-                    seg = PackFile_find_segment(interp,
-                            (PackFile_Directory *)seg, name, sub_dir);
+        if (!seg)
+            continue;
 
-                    if (seg)
-                        return seg;
-                }
-            }
+        if (STRING_equal(interp, seg->name, name))
+            return seg;
+
+        if (sub_dir && seg->type == PF_DIR_SEG) {
+            seg = PackFile_find_segment(interp,
+                    (PackFile_Directory *)seg, name, sub_dir);
+
+            if (seg)
+                return seg;
         }
     }
 
