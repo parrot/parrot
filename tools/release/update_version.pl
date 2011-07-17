@@ -85,10 +85,8 @@ sub bump_gen_code_version {
 
     my ($filename, $old_version, $new_version) = @_;
     my $old_h_version = join("_", split(/\./, $old_version));
-    print $old_h_version . "\n";
     my @new_version   = split(/\./, $new_version);
     my $new_h_version = join("_", @new_version);
-    print $new_h_version . "\n";
 
     open my $gen_c_in, '<', "$filename";
     open my $gen_c_out, '>', "$filename.tmp";
