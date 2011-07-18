@@ -102,3 +102,10 @@ sub bump_gen_code_version {
     rename "$filename.tmp", $filename;
 }
 
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
