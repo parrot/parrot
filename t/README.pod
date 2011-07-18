@@ -7,9 +7,9 @@ t/ - The Parrot Virtual Machine Test Suite
 This directory contains the official Parrot Virtual Machine test suite.
 
 For details on how tests are written see the documentation in
-[docs/tests.pod](https://github.com/parrot/parrot/blob/master/docs/tests.pod).
-For status of the testing effort, see
-[t/TESTS.STATUS.pod](https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod).
+docs/tests.pod L<https://github.com/parrot/parrot/blob/master/docs/tests.pod>.
+For status of the testing effort, see t/TESTS.STATUS.pod
+L<https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod>.
 
 The script 'harness' actually runs the test suite.
 
