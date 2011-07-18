@@ -168,17 +168,13 @@ cause Parrot to exit.
 
 */
 
-/* TODO: Don't print this out to stderr. Store a list of warning messages
-         in the imcc structure, and be able to read them back out again
-         later through the API */
-
 void
 IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
     va_start(ap, fmt);
-    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
+    imcc->error_message = Parrot_str_concat(imcc->interp, imcc->error_message, Parrot_vsprintf_c(imcc->interp, fmt, ap));
     va_end(ap);
 }
 

@@ -1383,10 +1383,7 @@ imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     /* TODO: Kill this stuff and use Parrot exceptions exclusively */
     IMCC_TRY(imcc->jump_buf, imcc->error_code) {
         if (yyparse(yyscanner, imcc)) {
-            imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
-            /* TODO: Be slightly less unhelpful */
-            imcc->error_message = string_from_literal(imcc->interp,
-                    "syntax error ... somewhere");
+            imcc->error_code = IMCC_PARSEFAIL_EXCEPTION;
             return 0;
         }
 
