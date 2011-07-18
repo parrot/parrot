@@ -13,56 +13,145 @@ L<https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod>.
 
 The script 'harness' actually runs the test suite.
 
+To run the normal Parrot test suite tests:
+
+    make test
+
+To run only the core test suite (intented to be used after C<make corevm>):
+
+    make coretest
+
+The run the full test suite, which is equivalent to "make test" under various
+runcores as well as coding standard tests:
+
+    make fulltest
+
+To run just the coding standard tests:
+
+    make codingstd_tests
+
+To create code coverage reports from the Parrot test suite:
+
+    make cover
+
+which requires the Devel::Cover Perl 5 module.
+
 Below is a list of subdirs along with a short description
 of what is tested in there.
 
 =over 4
 
-=item benchmark:      Run benchmarks.
+=item benchmark
 
-=item codingstd:      Conventions and guidelines for Parrot source code.
+Benchmark tests.
 
-=item compilers:      Mini languages distributed with Parrot.
+=item codingstd
 
-=item configure:      Perl modules of configuration subsystem.
+Tests the coding conventions for Parrot source code.
 
-=item distro:         Tests that run before a distribution is released.
+=item compilers
 
-=item doc:            Completeness and sanity of the documentation.
+Tests for compilers in Parrot.
 
-=item dynoplibs:      Dynamic opcode libraries.
+=item configure
 
-=item dynpmc:         Dynamic PMCs.
+Tests for the Perl modules in our configuration subsystem.
 
-=item examples:       Check whether the examples are still working.
+=item distro
 
-=item library:        Parrot modules.
+Tests that run before a distribution is released. Can be run with:
 
-=item manifest:       Functionality supporting the creation of MANIFEST and related files.
+    make distro_tests
 
-=item native_pbc:     Parrot Byte Code.
+=item doc
 
-=item oo:             Object oriented features of Parrot.
+Tests for the completeness and sanity of the documentation.
 
-=item op:             Try to cover all core operators.
+=item dynoplibs
 
-=item perl:           Test Perl 5 modules used for configuration, building and testing of Parrot.
+Tests for dynamic (loadable at run-time) opcode libraries.
 
-=item pharness:       Functionality supporting Parrot's test harnesses.
+=item dynpmc
 
-=item pmc:            Try to cover all builtin PMCs.
+Tests for dynamic PMCs.
 
-=item postconfigure:  Tests of configuration system which cannot be run until configuration has completed.
+=item examples
 
-=item run:            Mostly command line options of the 'parrot' executable.
+Tests to check whether the examples are still working. Can be run with:
 
-=item src:            Tests written in C.
+    make examples_tests
 
-=item steps:          Steps in the Parrot configuration process.
+=item library
 
-=item stress:         Stress testing. Make Parrot sweat.
+Test Parrot modules that ship with core. Can be run with:
 
-=item tools:          Tools useful to Parrot core and HLL developers
+    make library_tests
+
+=item manifest
+
+Tests for the functionality supporting the creation of MANIFEST and related files. Can be run with:
+
+    make manifest_tests
+
+=item native_pbc
+
+Tests Parrot Byte Code.
+
+=item oo
+
+Tests for object oriented features of Parrot. Can be run with
+
+    make oo_tests
+
+=item op
+
+Tests for Parrot opcodes. Can be run with
+
+    make op_tests
+
+=item perl
+
+Tests for the Perl 5 modules used for configuration, building and testing of Parrot. Can be run with:
+
+    make perl_tests
+
+=item pharness
+
+Tests for the functionality supporting Parrot's test harnesses.
+
+=item pmc
+
+Tests for Parrot PMCs. Can be run with
+
+    make pmc_tests
+
+=item postconfigure
+
+Tests of configuration system which cannot be run until configuration has completed.
+
+=item run
+
+Tests for the command line options of the 'parrot' executable. Can be run with:
+
+    make run_tests
+
+=item src
+
+Tests written in C, mostly for the Embed/Extend subsystems. Can be run with
+
+    make src_tests
+
+=item steps
+
+Tests for the steps in the Parrot configuration process.
+
+=item stress
+
+Stress testing. Make Parrot sweat.
+
+=item tools
+
+Tests for tools useful to Parrot core and HLL developers
 
 =back
 
