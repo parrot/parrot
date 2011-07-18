@@ -14,7 +14,8 @@ Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
 --------------------------------------------------------------------------------
 linux-sparc64-gcc-4.3.2      ?                       Y    Y        20110114
 linux-x86-gcc4.5.2                Y    ?     Y   Y   Y    Y     ?  20110710
-win32-x86-msvc_10.0               -    -     ?   -   Y    Y/3   Y  20110718
+win32-x86-msvc_10.0               -    -     ?   -   Y    Y*1   Y  20110718
+
 
 
 Extra Platforms:
@@ -30,6 +31,7 @@ linux-arm-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
 linux-x86-icc_11.1            4   Y    ?     Y   Y   Y    Y     Y  20100209
 linux-amd64-icc_11.1          8   Y    ?     Y   Y   Y    Y     Y  20100209
 netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20110418
+win-x64-msvc_16.0             8              ?   ?   Y    Y     ?  20110718
 
 
 Legend:
@@ -57,7 +59,10 @@ Inst  ... "make install" is ok
 YYYYMMDD  The date tested.
 
 Remarks:
-*None at this time.
+* Parrot tests on windows may be sensitive to certain git configuration settings,
+  especially newline settings. Certain tests may fail that expect certain newline
+  settings from git.
+
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
