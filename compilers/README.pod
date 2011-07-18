@@ -13,31 +13,31 @@ listed below.
 
 =over 4
 
-=item C><data_json>
+=item F<data_json>
 
 Source files for the JavaScript Object Notation (JSON) compiler. Used when
 generating a JSON representation of a PMC.
 
-=item C><imcc>
+=item F<imcc>
 
 Source files for the Intermediate Code Compiler (IMCC). Translates PIR files
 into Parrot bytecode.
 
-=item C><opsc>
+=item F<opsc>
 
 Source files for the opcode compiler (a.k.a. ops2c). Converts opcode definition
 files into C code.
 
-=item C><pct>
+=item F<pct>
 
 Source files for the compiler used by the Parrot Compiler Toolkit (PCT).
 
-=item C><pge>
+=item F<pge>
 
 Source files for the compiler used by the Parrot Grammar Engine (PGE). This is
 an implementation of Perl 6 regexes.
 
-=item C><tge>
+=item F<tge>
 
 Source files for the compiler used by the Tree Grammer Engine (TGE). This is the
 tool used to transform the trees output by the PGE into a Parrot Abstract
