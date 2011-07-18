@@ -124,6 +124,7 @@ sub new_interp {
         \&m0_opfunc_and,
         \&m0_opfunc_or,
         \&m0_opfunc_xor,
+        \&m0_opfunc_not,
         \&m0_opfunc_gc_alloc,
         \&m0_opfunc_sys_alloc,
         \&m0_opfunc_sys_free,
@@ -239,17 +240,17 @@ sub m0_opfunc_noop {
 
 sub m0_opfunc_goto {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "goto $a1, $a2, $a3";
-
     my $offset = 256 * $a1 + $a2;
+    m0_say "goto $a1, $a2, $a3 ($offset, x)";
+
     $$cf->[PC] = $offset;
 }
 
 sub m0_opfunc_goto_if {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "goto_if $a1, $a2, $a3";
-
     my $offset = 256 * $a1 + $a2;
+    m0_say "goto_if $a1, $a2, $a3 ($offset, $$cf->[$a3])";
+
     my $cond   = $$cf->[$a3];
     $$cf->[PC] = $offset if ($cond);
 }
@@ -276,132 +277,146 @@ sub m0_opfunc_goto_chunk {
 
 sub m0_opfunc_add_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "add_i $a1, $a2, $a3";
+    m0_say "add_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
 }
 
 sub m0_opfunc_add_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "add_n $a1, $a2, $a3";
+    m0_say "add_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
 }
 
 sub m0_opfunc_sub_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "sub_i $a1, $a2, $a3";
+    m0_say "sub_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
 }
 
 sub m0_opfunc_sub_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "sub_n $a1, $a2, $a3";
+    m0_say "sub_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
 }
 
 sub m0_opfunc_mult_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mult_i $a1, $a2, $a3";
+    m0_say "mult_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
 }
 
 sub m0_opfunc_mult_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mult_n $a1, $a2, $a3";
+    m0_say "mult_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
 }
 
 sub m0_opfunc_div_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "div_i $a1, $a2, $a3";
+    m0_say "div_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = int($$cf->[$a2] / $$cf->[$a3]);
 }
 
 sub m0_opfunc_div_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "div_n $a1, $a2, $a3";
+    m0_say "div_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] / $$cf->[$a3];
 }
 
 sub m0_opfunc_mod_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mod_i $a1, $a2, $a3";
+    m0_say "mod_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
 }
 
 sub m0_opfunc_mod_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mod_n $a1, $a2, $a3";
+    m0_say "mod_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
 }
 
 sub m0_opfunc_convert_i_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "convert_i_n $a1, $a2, $a3";
+    m0_say "convert_i_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = int($$cf->[$a2]);
 }
 
 sub m0_opfunc_convert_n_i{
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "convert_n_i $a1, $a2, $a3";
+    m0_say "convert_n_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2];
 }
 
 sub m0_opfunc_ashr {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "ashr $a1, $a2, $a3";
+    m0_say "ashr $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     {
         # shift right with sign extension
         use integer;
         $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
+        $$cf->[$a1] &= 0xFFFFFFFF;
     }
 }
 
 sub m0_opfunc_lshr {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "lshr $a1, $a2, $a3";
+    m0_say "lshr $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
+    $$cf->[$a1] &= 0xFFFFFFFF;
 }
 
 sub m0_opfunc_shl {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "shl $a1, $a2, $a3";
+    m0_say "shl $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] << $$cf->[$a3];
+    $$cf->[$a1] &= 0xFFFFFFFF;
 }
 
 sub m0_opfunc_and {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "and $a1, $a2, $a3";
+    m0_say "and $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] & $$cf->[$a3];
+    $$cf->[$a1] &= 0xFFFFFFFF;
 }
 
 sub m0_opfunc_or {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "or $a1, $a2, $a3";
+    m0_say "or $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] | $$cf->[$a3];
+    $$cf->[$a1] &= 0xFFFFFFFF;
 }
 
 sub m0_opfunc_xor {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "xor $a1, $a2, $a3";
+    m0_say "xor $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     $$cf->[$a1] = $$cf->[$a2] ^ $$cf->[$a3];
+    $$cf->[$a1] &= 0xFFFFFFFF;
+}
+
+sub m0_opfunc_not {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "not $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], x)";
+
+    $$cf->[$a1] = !$$cf->[$a2];
+    $$cf->[$a1] &= 0xFFFFFFFF;
 }
 
 sub m0_opfunc_gc_alloc {
@@ -431,12 +446,12 @@ sub m0_opfunc_sys_free {
 
 sub m0_opfunc_copy_mem {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "copy_mem $a1, $a2, $a3";
+    m0_say "copy_mem $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 }
 
 sub m0_opfunc_set {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set $a1, $a2, $a3";
+    m0_say "set $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
     
     $$cf->[$a1] = $$cf->[$a2];
     $$cf = $$cf->[CF];
@@ -467,7 +482,7 @@ sub m0_opfunc_set_ref {
 
 sub m0_opfunc_set_byte {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set_byte $a1, $a2, $a3";
+    m0_say "set_byte $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
     
     $$cf->[$a1] = bytes::substr($$cf->[$a2], $$cf->[$a3]);
     my $new_byte = bytes::chr($$cf->[$a3] & 255);
@@ -476,14 +491,14 @@ sub m0_opfunc_set_byte {
 
 sub m0_opfunc_get_byte {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "get_byte $a1, $a2, $a3";
+    m0_say "get_byte $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
     
     $$cf->[$a1] = bytes::ord(bytes::substr($$cf->[$a2], $$cf->[$a3], 1));
 }
 
 sub m0_opfunc_set_word {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set_word $a1, $a2, $a3";
+    m0_say "set_word $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
     
     #turn *$3 into 4 bytes
     my $word = pack('L', $$cf->[$a3] );
@@ -492,7 +507,7 @@ sub m0_opfunc_set_word {
 
 sub m0_opfunc_get_word {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "get_word $a1, $a2, $a3";
+    m0_say "get_word $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
     
     #$$cf->[$a1] = unpack("L", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
     my $word = bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4);
@@ -521,7 +536,7 @@ sub m0_opfunc_ccall {
 
 sub m0_opfunc_print_s {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_s $a1, $a2, $a3";
+    m0_say "print_s $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     my $handle = $$cf->[$a1];
     # don't print the header
@@ -532,7 +547,7 @@ sub m0_opfunc_print_s {
 
 sub m0_opfunc_print_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_i $a1, $a2, $a3";
+    m0_say "print_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2])";
 
     my $handle = $$cf->[$a1];
     my $var    = $$cf->[$a2];
@@ -542,7 +557,7 @@ sub m0_opfunc_print_i {
 
 sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_n $a1, $a2, $a3";
+    m0_say "print_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
     say Dumper $$cf->[$a1];
     die;
