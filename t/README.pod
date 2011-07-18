@@ -128,7 +128,7 @@ Tests for Parrot PMCs. Can be run with
 
 =item postconfigure
 
-Tests of configuration system which cannot be run until configuration has completed.
+Tests of configuration system run after configuration has completed.
 
 =item run
 
