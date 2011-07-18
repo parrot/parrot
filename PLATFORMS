@@ -9,30 +9,30 @@ docs/parrot.pod) and "Extra".
 
 
 Supported platforms:
-Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
-                                CGoto EXEC   Thr Sig
---------------------------------------------------------------------------------
-darwin10.7.0-x86-gcc4.2.1         -    -     ?   ?   Y    Y     Y  20110718
-linux-sparc64-gcc-4.3.2      ?                       Y    Y        20110114
-linux-x86-gcc4.5.2                Y    ?     Y   Y   Y    Y     ?  20110710
-win32-x86-msvc_10.0               -    -     ?   -   Y    Y*1   Y  20110718
+Platform                     B8 Feature Comp Test Inst YYYYMMDD
+                                Thr Sig
+--------------------------------------------------------------------
+linux-sparc64-gcc-4.3.2      ?           Y    Y        20110114
+linux-x86-gcc4.5.2               Y   Y   Y    Y     ?  20110710
+win32-x86-msvc_10.0              ?   -   Y    Y*1   Y  20110718
 
 
 
 Extra Platforms:
 
-Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
-                                CGoto EXEC   Thr Sig
---------------------------------------------------------------------------------
-darwin9.8.0-x86-gcc4.0.1          Y    ?     Y   ?   Y    Y     Y  20100215
-linux-amd64-gcc4.4.1          8   Y    ?     Y   ?   Y    Y     Y  20100215
-linux-ppc-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
-linux-ppc64-gcc_4.4.2             Y    Y     Y   Y   Y    Y     Y  20100118
-linux-arm-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
-linux-x86-icc_11.1            4   Y    ?     Y   Y   Y    Y     Y  20100209
-linux-amd64-icc_11.1          8   Y    ?     Y   Y   Y    Y     Y  20100209
-netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20110418
-win-x64-msvc_16.0             8              ?   ?   Y    Y     ?  20110718
+Platform                     B8 Feature Comp Test Inst YYYYMMDD
+                                Thr Sig
+--------------------------------------------------------------------
+darwin9.8.0-x86-gcc4.0.1         Y   ?   Y    Y     Y  20100215
+linux-amd64-gcc4.4.1          8  Y   ?   Y    Y     Y  20100215
+linux-ppc-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
+linux-ppc64-gcc_4.4.2            Y   Y   Y    Y     Y  20100118
+linux-arm-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
+linux-x86-icc_11.1            4  Y   Y   Y    Y     Y  20100209
+linux-amd64-icc_11.1          8  Y   Y   Y    Y     Y  20100209
+netbsd4.0-x86_64-gcc-4.1.2    8  Y   Y   Y    Y     ?  20110418
+win-x64-msvc_16.0             8  ?   ?   Y    Y     ?  20110718
+linux-amd64-clang2.8          8  ?   ?   Y    Y     Y  20110718
 
 
 Legend:
@@ -49,8 +49,6 @@ B   ... Processor is big endian
 8   ... opcode_t is 8 byte, i.e. a 64 bit machine
 4   ... opcode_t is 4 byte, --m=32 on a 64 bit machine
 
-CGoto ... CGoto runloop is supported
-EXEC  ... compiling to native executables is supported
 Thr   ... Parrot is multi-threaded
 Sig   ... Parrot catches a SIGHUP signal
 Comp  ... Compiles ok
