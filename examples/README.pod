@@ -4,118 +4,118 @@
 
 =head1 DESCRIPTION
 
-The C<examples> directory provides examples of some of the more common - and
+The F<examples> directory provides examples of some of the more common - and
 sometimes hillarious - uses of the Parrot virtual machine. If you are new to
 the world of Parrot, browsing through some of these examples can be incredibly
-helpful. Most of these examples are tested by the test files in C<t/examples>.
+helpful. Most of these examples are tested by the test files in F<t/examples>.
 
 =head1 SUBDIRECTORIES
 
 =over 4
 
-=item C<benchmarks>
+=item F<benchmarks>
 
 Benchmark test examples. They can be run with C<make benchmark_tests>.
      
-=item C<c>
+=item F<c>
 
 Examples in C that demonstrate the embedding API and how the Parrot frontend
 interprets bytecode.
 
-=item C<compilers>
+=item F<compilers>
 
 Example of a compiler called C<JAPH>.
 
-=item C<config>
+=item F<config>
 
-An example demonstrating how C<Configure.pl> works.
+An example demonstrating how F<Configure.pl> works.
 
-=item C<embed>
+=item F<embed>
 
 An example of how the embedding API can be used.
 
-=item C<io>
+=item F<io>
 
 Examples of Parrot's IO subsystem in PIR.
 
-=item C<json>
+=item F<json>
 
 Examples demonstrating how to generate a JSON representation of a PMC.
 
-=item C<languages>
+=item F<languages>
 
 Contains the source files for the demo languages C<abc> and C<Squaak>.
 Demonstrates how to use the Parrot Compiler Toolkit (PCT).
 
-=item C<library>
+=item F<library>
 
 Examples demonstrating how to use Parrot's runtime libraries in PIR.
 
-=item C<mops>
+=item F<mops>
 
 Contains an example called I<million ops per second> in various languages which
 calculates a value for M ops/s using integer arithmetic.
 
-=item C<namespace>
+=item F<namespace>
 
 Examples demonstrating how to use namespaces in PIR.
 
-=item C<nci>
+=item F<nci>
 
 Examples demonstrating Parrot's Native Call Interface (NCI).
 
-=item C<opengl>
+=item F<opengl>
 
 Examples demonstrating how to use the OpenGL library in PIR and Perl 6.
 
-=item C<pasm>
+=item F<pasm>
 
 Examples of common tasks in Parrot Assembly Language (PASM).
 
-=item C<past>
+=item F<past>
 
 Examples of a PAST to PIR translation.
 
-=item C<pge>
+=item F<pge>
 
 Contains an example PIR generated file using the Parrot Grammar Engine (PGE).
 
-=item C<pir>
+=item F<pir>
 
 Examples of common tasks in Parrot Intermediate Representation (PIR).
 
-=item C<sdl>
+=item F<sdl>
 
 Examples demonstrating how to use the Simple DirectMedia Layer (SDL) library in
 PIR.
 
-=item C<shootout>
+=item F<shootout>
 
 Contains the PIR files used for The Computer Language Benchmark Game or The
 Great Computer Languages Shootout.
 
-=item C<streams>
+=item F<streams>
 
 Examples demonstrating how to use the Stream library.
 
-=item C<subs>
+=item F<subs>
 
 Examples demonstrating how to call subroutines in PIR and PASM.
 
-=item C<tcl>
+=item F<tcl>
 
 Examples demonstrating how to create a Tcl/Tk GUI using the NCI.
 
-=item C<tge>
+=item F<tge>
 
 Examples demonstrating the Tree Grammer Engine (TGE).
 
-=item C<tools>
+=item F<tools>
 
 Examples of miscellaneous tools such as a bytecode checker and a grep-like
 utility.
 
-=item C<tutorial>
+=item F<tutorial>
 
 A PIR tutorial by example.
 
