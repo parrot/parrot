@@ -111,7 +111,8 @@ Tests for Parrot opcodes. Can be run with
 
 =item perl
 
-Tests for the Perl 5 modules used for configuration, building and testing of Parrot. Can be run with:
+Tests for the Perl 5 modules used for configuration, building and testing of
+Parrot. Can be run with:
 
     make perl_tests
 
