@@ -325,10 +325,19 @@ sub m0b_constants_seg {
 
     #for each constant
     for (@$constants) {
-        my $const_length = length($_);
-        #XXX: This doesn't dtrt for int constants.  They'll get stored as strings.
-        $bytecode .= pack("L", $const_length);
-        $bytecode .= $_;
+        my ($type, $value) = /([INS]):(.*)/;
+        if ($type eq 'I') {
+            $bytecode .= pack("LL", 4, $value);
+        }
+        elsif ($type eq 'S') {
+            my $const_length = length($value);
+            $bytecode .= pack("L", $const_length);
+            $bytecode .= $value;
+        }
+        elsif ($type eq 'N') {
+            $bytecode .= pack("L", 4);
+            die "don't know how to add N constants: m0 assembler needs love";
+        }
         m0_say "adding constant '$_' to constants segment";
     }
 
@@ -439,8 +448,20 @@ sub m0b_const_seg_length {
     #TODO: Make this work
     for (@$consts) {
         my $const_length = length($_);
-        $seg_length += 4; # storage of size of constant
-        $seg_length += length($_);
+        my ($type, $value) = /([INS]):(.*)/;
+        if ($type eq 'I') {
+            $seg_length += 8; # storage of size of constant
+        }
+        elsif ($type eq 'N') {
+            $seg_length += 8; # storage of size of constant
+        }
+        elsif ($type eq 'S') {
+            $seg_length += 4; # storage of size of constant
+            $seg_length += length($_);
+        }
+        else {
+            die "unknown type '$type'.  I don't know how this happened.";
+        }
         m0_say "after adding constant '$_', length is $seg_length";
     }
 
@@ -529,11 +550,19 @@ sub parse_chunks {
             elsif ($line =~ /^\d+\s+(.*)$/) {
                 my $c = $1;
                 # remove leading and trailing double quotes which are used to represent strings
-                $c =~ s/(^"|"$)//g;
-                $c =~ s?\\n?\n?g;
-                
-                # replace escaped double quotes with actual double quotes
-                $c =~ s/\\"/"/g;
+                if ($c =~ /^"/) {
+                    $c =~ s/(^"|"$)//g;
+                    $c =~ s?\\n?\n?g;
+                    # replace escaped double quotes with actual double quotes
+                    $c =~ s/\\"/"/g;
+                    $c = "S:$c";
+                }
+                elsif ($c =~ /^\d+$/) {
+                    $c = "I:$c";
+                }
+                else {
+                    die "unhandled constant type: '$c' at line $$cursor";
+                }
                 push @constants, $c;
             }
             else {
