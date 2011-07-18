@@ -12,9 +12,10 @@ Supported platforms:
 Platform                     B8 Feature Comp Test Inst YYYYMMDD
                                 Thr Sig
 --------------------------------------------------------------------
+darwin10.7.0-x86-gcc4.2.1        ?   ?   Y    Y     Y  20110718
 linux-sparc64-gcc-4.3.2      ?           Y    Y        20110114
 linux-x86-gcc4.5.2               Y   Y   Y    Y     ?  20110710
-win32-x86-msvc_10.0              ?   -   Y    Y*1   Y  20110718
+win32-x86-msvc_10.0              ?   -   Y    Y     Y  20110718
 
 
 
@@ -58,10 +59,7 @@ Inst  ... "make install" is ok
 YYYYMMDD  The date tested.
 
 Remarks:
-* Parrot tests on windows may be sensitive to certain git configuration settings,
-  especially newline settings. Certain tests may fail that expect certain newline
-  settings from git.
-
+*n/a
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
