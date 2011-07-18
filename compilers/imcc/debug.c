@@ -85,11 +85,15 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
     va_list ap;
 
     va_start(ap, fmt);
-    imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
-    va_end(ap);
     location = IMCC_get_err_location(imcc);
+    imcc->error_message = Parrot_str_concat(imcc->interp,
+        imcc->error_message,
+        Parrot_sprintf_c(imcc->interp, "error:imcc:%Ss\n\t%Ss",
+        Parrot_vsprintf_c(imcc->interp, fmt, ap),
+        location));
+    va_end(ap);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATALY_EXCEPTION,
-        "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
+        "%Ss", imcc->error_message);
 }
 
 /*
