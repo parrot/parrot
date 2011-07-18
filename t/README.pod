@@ -1,0 +1,71 @@
+=head1 NAME
+
+t/ - The Parrot Virtual Machine Test Suite
+
+=head1 DESCRIPTION
+
+This directory contains the official Parrot Virtual Machine test suite.
+
+For details on how tests are written see the documentation in
+[/docs/tests.pod](https://github.com/parrot/parrot/blob/master/docs/tests.pod).
+For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
+The script 'harness' actually runs the test suite.
+
+Below is a list of subdirs along with a short description
+of what is tested in there.
+
+=over 4
+
+=item benchmark:      Run benchmarks.
+
+=item codingstd:      Conventions and guidelines for Parrot source code.
+
+=item compilers:      Mini languages distributed with Parrot.
+
+=item configure:      Perl modules of configuration subsystem.
+
+=item distro:         Tests that run before a distribution is released.
+
+=item doc:            Completeness and sanity of the documentation.
+
+=item dynoplibs:      Dynamic opcode libraries.
+
+=item dynpmc:         Dynamic PMCs.
+
+=item examples:       Check whether the examples are still working.
+
+=item library:        Parrot modules.
+
+=item manifest:       Functionality supporting the creation of MANIFEST and related files.
+
+=item native_pbc:     Parrot Byte Code.
+
+=item oo:             Object oriented features of Parrot.
+
+=item op:             Try to cover all core operators.
+
+=item perl:           Test Perl 5 modules used for configuration, building and testing of Parrot.
+
+=item pharness:       Functionality supporting Parrot's test harnesses.
+
+=item pmc:            Try to cover all builtin PMCs.
+
+=item postconfigure:  Tests of configuration system which cannot be run until configuration has completed.
+
+=item run:            Mostly command line options of the 'parrot' executable.
+
+=item src:            Tests written in C.
+
+=item steps:          Steps in the Parrot configuration process.
+
+=item stress:         Stress testing. Make Parrot sweat.
+
+=item tools:          Tools useful to Parrot core and HLL developers
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2011, Parrot Foundation.
+
+=cut

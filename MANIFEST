@@ -1454,7 +1454,7 @@ src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []
 src/warnings.c                                              []
-t/README                                                    []doc
+t/README.pod                                                []doc
 t/TESTS_STATUS.pod                                          [test]
 t/benchmark/benchmarks.t                                    [test]
 t/codingstd/c_arg_assert.t                                  [test]
