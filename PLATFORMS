@@ -24,8 +24,7 @@ linux-x86-g++4.4.1                Y    ?     Y   Y   Y    Y     Y  20091116
 linux-x86-llvm-gcc-4.2            Y    ?     ?   ?   Y    Y     ?  20091021
 sol10-sparc-cc_5.9           B4   Y    -     Y   Y   Y    Y     ?  20090720
 sol10-sparc-cc_5.9           B8   Y    -     Y   Y   Y    Y     ?  20090720
-win32-x86-mingw_gcc3.4.5          Y    -     -   -   Y    N/1   ?  20091116
-win32-x86-msvc_9.0                -    -     Y   -   Y    Y     Y  20091215
+win32-x86-msvc_10.0               -    -     ?   -   Y    Y/3   Y  20110718
 
 
 Extra Platforms:
