@@ -326,6 +326,7 @@ sub m0b_constants_seg {
     #for each constant
     for (@$constants) {
         my $const_length = length($_);
+        #XXX: This doesn't dtrt for int constants.  They'll get stored as strings.
         $bytecode .= pack("L", $const_length);
         $bytecode .= $_;
         m0_say "adding constant '$_' to constants segment";
