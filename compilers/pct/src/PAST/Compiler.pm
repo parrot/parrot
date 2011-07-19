@@ -2011,94 +2011,58 @@ the value may be returned directly as a PIR constant or needs
 to have a PMC generated containing the constant value.
 
 multi method as_post(PAST::Val $node, *%options) {
-    Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+    my $ops := POST::Ops.new(:node($node));
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-
-        .local pmc value, returns
-        value = node['value']
-        if null value goto err_novalue
-        $I0 = isa value, ['PAST';'Block']
-        if $I0 goto value_block
-        returns = node.'returns'()
-        if returns goto have_returns
-        $S0 = typeof value
-        returns = $S0
-      have_returns:
-
-        .local string valflags
-        $P0 = get_global '%valflags'
-        valflags = $P0[returns]
-
-        $I0 = index valflags, 'e'
-        if $I0 < 0 goto escape_done
-        value = self.'escape'(value)
-      escape_done:
-
-        # See if this is a pasm constant type
-        $I0 = index valflags, 'c'
-        if $I0 < 0 goto const_done
-        # Add the directive for the appropriate .include statement.
-        $S0 = returns
-        if $S0 == '!macro_const' goto include_done
-        $S0 = replace $S0, 0, 1, '.include "'
-        $S0 = concat $S0, '.pasm"'
-        $P0 = find_dynamic_lex '$*SUB'
-        $P0.'add_directive'($S0)
-      include_done:
-        # Add a leading dot to the value if one isn't already there.
-        $S0 = substr value, 0, 1
-        if $S0 == '.' goto const_done
-        $P0 = box '.'
-        value = concat $P0, value
-      const_done:
-
-        .local string rtype
-        rtype = options['rtype']
-        $I0 = index valflags, rtype
-        if $I0 < 0 goto result_convert
-        ops.'result'(value)
-        .return (ops)
-
-      result_convert:
-        # handle int-to-num conversion here
-        if rtype != 'n' goto result_pmc
-        $I0 = index valflags, 'i'
-        if $I0 < 0 goto result_pmc
-        value = concat value, '.0'
-        ops.'result'(value)
-        .return (ops)
-
-      result_pmc:
-        .local string result
-        result = self.'tempreg'('P')
-        returns = self.'escape'(returns)
-        ops.'push_pirop'('new', result, returns)
-        ops.'push_pirop'('assign', result, value)
-        ops.'result'(result)
-        .return (ops)
-
-      value_block:
-        .local string blockreg, blockref
-        blockreg = self.'uniquereg'('P')
-        blockref = concat ".const 'Sub' ", blockreg
-        blockref = concat blockref, ' = '
-        $P0 = value.'subid'()
-        $S0 = self.'escape'($P0)
-        blockref = concat blockref, $S0
-        ops.'push_pirop'(blockref)
-        ops.'result'(blockreg)
-        .return (ops)
-
-      err_novalue:
-        self.'panic'('PAST::Val node missing :value attribute')
+    my $value := $node<value>;
+    unless pir::defined($value) {
+        self.panic('PAST::Val node missing :value attribute');
     }
+    if $value ~~ PAST::Block {
+        my $blockreg := self.uniquereg('P');
+        my $blockref := ".const 'Sub' $blockreg = ";
+        $blockref := $blockref ~ self.escape(~$value.subid());
+        $ops.push_pirop($blockref);
+        $ops.result($blockreg);
+        return $ops;
+    }
+
+    my $returns := $node<returns>;
+    $returns := pir::typeof($value) unless $returns;
+
+    my $valflags := %valflags{$returns};
+    $value := self.escape($value) if pir::index($valflags, 'e') >= 0;
+
+    # See if this is a PASM constant type
+    if pir::index($valflags, 'c') >= 0 {
+        # Add the directive for the appropriate .include statement.
+        if $returns ne '!macro_const' {
+            $*SUB.add_directive(
+                pir::replace($returns, 0, 1, '.include "') ~ '.pasm"'
+            );
+        }
+        # Add a leading dot to the value if one isn't already there.
+        $value := '.' ~ $value unless pir::substr($value, 0, 1) eq '.';
+    }
+
+    my $rtype := %options<rtype>;
+    if pir::index($valflags, $rtype) >= 0 {
+        $ops.result($value);
+        return $ops;
+    }
+
+    # Handle int-to-num conversion here
+    if $rtype eq 'n' && pir::index($valflags, 'i') >= 0 {
+        $value := $value ~ '.0';
+        $ops.result($value);
+        return $ops;
+    }
+
+    my $result := self.tempreg('P');
+    $returns := self.escape($returns);
+    $ops.push_pirop('new', $result, $returns);
+    $ops.push_pirop('assign', $result, $value);
+    $ops.result($result);
+    $ops;
 }
 
 
