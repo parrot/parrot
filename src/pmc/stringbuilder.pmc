@@ -157,7 +157,7 @@ Append string to current buffer.
         size_t            total_size;
 
         /* Early return on NULL strings */
-        if (STRING_IS_NULL(s))
+        if (STRING_IS_NULL(s) || s->strlen == 0)
             return;
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
@@ -169,7 +169,10 @@ Append string to current buffer.
             buffer->encoding = s->encoding;
         }
         else {
-            const STR_VTABLE * const enc = Parrot_str_rep_compatible(interp, buffer, s);
+            const STR_VTABLE * const enc =
+                  buffer->encoding == s->encoding
+                ? buffer->encoding
+                : Parrot_str_rep_compatible(interp, buffer, s);
 
             if (enc) {
                 buffer->encoding = enc;
@@ -219,8 +222,8 @@ Append string to current buffer.
         /* Update buffer */
         buffer->bufused += s->bufused;
         buffer->strstart = (char *)buffer->_bufstart;
-        buffer->strlen  += Parrot_str_length(INTERP, s);
-        buffer->hashval = 0; /* hash is invalid */
+        buffer->strlen  += s->strlen;
+        buffer->hashval  = 0; /* hash is invalid */
 
         PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
     }

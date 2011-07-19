@@ -588,7 +588,8 @@ sub _pir_stdin_output_slurp {
         my $string = shift;
 
         my (undef, $file) = create_tempfile(UNLINK => 1);
-        open(my $out, '>', $file) or die "bug";
+        open(my $out, '>', $file)
+            or die "Unable to open tempfile for writing: $!";
         binmode $out;
         print $out $string;
         return $file;
@@ -603,7 +604,7 @@ sub _pir_stdin_output_slurp {
     my $result = do {
         local $/;
         open(my $in, '-|', "$parrot $code_file 2>&1 < $input_file")
-            or die "bug";
+            or die "Unable to pipe output to us: $!";
         <$in>;
     };
 

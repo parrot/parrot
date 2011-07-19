@@ -376,9 +376,13 @@ C<signature> are:
     # look up the nci function and save as lexical
     .local pmc func
     func = dlfunc library, name, dlsig
+    .local int isdef
+    isdef = defined func
+    unless isdef goto ret
 
     # if no transformations needed, no need to wrap!
     if dlsig != signature goto do_nciwrap
+  ret:
     .return (func)
 
   do_nciwrap:

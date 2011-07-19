@@ -140,63 +140,6 @@ static void resize_symhash(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void push_namespace(imc_info_t * imcc, const char *name)>
-
-Begins a new namespace in PASM/PIR, named after the given C<name>.
-
-=cut
-
-*/
-
-void
-push_namespace(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
-{
-    ASSERT_ARGS(push_namespace)
-    Namespace * const ns = mem_gc_allocate_zeroed_typed(imcc->interp, Namespace);
-
-    ns->parent = imcc->namespace_stack;
-    ns->name   = mem_sys_strdup(name);
-    imcc->namespace_stack = ns;
-}
-
-
-/*
-
-=item C<void pop_namespace(imc_info_t * imcc, const char *name)>
-
-Ends the current namespace, popping back to the previous.  If the namespace
-stack is empty, throws a syntax error.
-
-=cut
-
-*/
-
-void
-pop_namespace(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
-{
-    ASSERT_ARGS(pop_namespace)
-    Namespace * const ns = imcc->namespace_stack;
-
-    if (!ns)
-        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
-
-    if (name && !STREQ(name, ns->name))
-        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "tried to pop namespace(%s), "
-                "but top of stack is namespace(%s)\n", name, ns->name);
-
-    while (ns->idents) {
-        Identifier * const ident = ns->idents;
-        ns->idents               = ident->next;
-        mem_sys_free(ident);
-    }
-
-    imcc->namespace_stack = ns->parent;
-    mem_sys_free(ns);
-}
-
-
-/*
-
 =item C<static SymReg * _get_sym_typed(const SymHash *hsh, const char *name, int
 t)>
 
@@ -658,24 +601,13 @@ SymReg *
 mk_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t, INTVAL type)
 {
     ASSERT_ARGS(mk_ident)
-    char   * const fullname = _mk_fullname(imcc, imcc->namespace_stack, name);
     SymReg *r = get_sym_by_name(&imcc->cur_unit->hash, name);
     if (r && (r->set != t || r->type != type))
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
-                "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
+                "syntax error, duplicated IDENTIFIER '%s'\n", name);
 
-    r = mk_symreg(imcc, fullname, t);
+    r = mk_symreg(imcc, name, t);
     r->type = type;
-
-    if (imcc->namespace_stack) {
-        Identifier * const ident = mem_gc_allocate_zeroed_typed(imcc->interp, Identifier);
-
-        ident->name        = fullname;
-        ident->next        = imcc->namespace_stack->idents;
-        imcc->namespace_stack->idents = ident;
-    }
-    else
-        mem_sys_free(fullname);
 
     return r;
 }
@@ -1169,7 +1101,8 @@ dup_sym(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
     ASSERT_ARGS(dup_sym)
     SymReg * const new_sym = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
     STRUCT_COPY(new_sym, r);
-    new_sym->name = mem_sys_strdup(r->name);
+    if (r->name)
+        new_sym->name = mem_sys_strdup(r->name);
 
     if (r->nextkey)
         new_sym->nextkey = dup_sym(imcc, r->nextkey);
@@ -1564,7 +1497,7 @@ find_sym(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(find_sym)
     if (imcc->cur_unit)
-        return _find_sym(imcc, imcc->namespace_stack, &imcc->cur_unit->hash,
+        return _find_sym(imcc, NULL, &imcc->cur_unit->hash,
                 name);
 
     return NULL;

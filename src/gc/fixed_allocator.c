@@ -439,6 +439,21 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 
 PARROT_CANNOT_RETURN_NULL
 static void *
+pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
+{
+    ASSERT_ARGS(pool_allocate)
+
+    if (pool->free_list)
+        return get_free_list_item(pool);
+
+    if (!pool->newfree)
+        allocate_new_pool_arena(interp, pool);
+
+    return get_newfree_list_item(pool);
+}
+
+PARROT_CANNOT_RETURN_NULL
+static void *
 get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(get_newfree_list_item)
@@ -452,21 +467,6 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
 
     --pool->num_free_objects;
     return item;
-}
-
-PARROT_CANNOT_RETURN_NULL
-static void *
-pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
-{
-    ASSERT_ARGS(pool_allocate)
-
-    if (pool->free_list)
-        return get_free_list_item(pool);
-
-    if (!pool->newfree)
-        allocate_new_pool_arena(interp, pool);
-
-    return get_newfree_list_item(pool);
 }
 
 static void
@@ -506,17 +506,23 @@ pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
     ASSERT_ARGS(pool_is_owned)
 
     if (ptr >= pool->lo_arena_ptr && ptr <= pool->hi_arena_ptr) {
-        /* We can cache this value. All arenas are same size */
-        const ptrdiff_t a_size = arena_size(pool);
-        const Pool_Allocator_Arena *arena = pool->top_arena;
-        while (arena) {
-            const ptrdiff_t ptr_diff =
-                (ptrdiff_t)ptr - (ptrdiff_t)(arena + 1);
+        const Pool_Allocator_Arena *arena   = pool->top_arena;
 
-            if (0 <= ptr_diff
-                  && ptr_diff < a_size
-                  && ptr_diff % pool->object_size == 0)
-                return 1;
+        /* We can cache these values. All arenas are same size */
+        const ptrdiff_t             a_size  = arena_size(pool);
+        const ptrdiff_t             ptritem = (ptrdiff_t)ptr;
+        const ptrdiff_t             objsize = pool->object_size;
+
+        while (arena) {
+            const ptrdiff_t arena_item = (ptrdiff_t)(arena + 1);
+
+            if (arena_item <= ptritem) {
+                const ptrdiff_t ptr_diff = ptritem - arena_item;
+
+                if (ptr_diff < a_size
+                &&  ptr_diff % pool->object_size == 0)
+                    return 1;
+            }
 
             arena = arena->next;
         }

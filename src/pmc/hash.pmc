@@ -1157,7 +1157,7 @@ Return type of values in Hash.
         It will create STRING* keys hash.
         */
 
-        if (old_hash && old_hash->entry_type == (Hash_key_type)type)
+        if (old_hash && old_hash->entry_type == (PARROT_DATA_TYPE)type)
             return;
 
         switch (type) {

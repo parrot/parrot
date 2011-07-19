@@ -697,13 +697,13 @@ loop:
 
   push_eh THROWN
   $I0 = 1
-  $P0.'is_integer'(unicode:"123")
+  $P0.'is_integer'(utf8:"123")
   goto TEST
 THROWN:
   $I0 = 0
 TEST:
   pop_eh
-  todo( $I0, 'is_integer works with unicode' )
+  ok( $I0, 'is_integer works with utf8' )
 .end
 
 .sub instantiate_str

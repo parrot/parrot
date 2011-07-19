@@ -89,6 +89,7 @@ our @EXPORT_OK = qw(
     t/dynoplibs/*.t
     t/dynpmc/*.t
     t/library/*.t
+    t/ext/winxed/*.t
     t/tools/*.t
     t/profiling/*.t
 );

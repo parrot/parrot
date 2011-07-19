@@ -5,7 +5,13 @@ New in 3.6.0
     Previously, only PMCs could be stored in lexicals.
   + VTABLE_substr has been removed. VTABLE_substr_str has been renamed to
     VTABLE_substr
+  + Added a new PackfileView PMC type, an intended replacement for the deprecated
+    Eval PMC.
+  + The is_integer vtable on the String PMC now works for all string encodings.
+  + Unicode error messages on Win32 now work correctly.
+  + A memory leak in IMCC was fixed.
 - Languages
+  + The snaphost of Winxed included with Parrot was updated to version 1.0.0
   + Winxed has migrated to Github: https://github.com/NotFound/winxed
 
 New in 3.5.0

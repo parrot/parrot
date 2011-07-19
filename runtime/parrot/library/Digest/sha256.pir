@@ -13,7 +13,7 @@
 # NIST = National Institute of Standards and Technology
 # FIPS = Federal Information Processing Standards
 
-# This is the start of the implemation and sha224 is not done yet!
+# This is the start of the implementation and sha224 is not done yet!
 
 =head1 NAME
 

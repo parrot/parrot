@@ -207,9 +207,8 @@ END
     /*BEGIN RETURN $returns */
 END
         $e->emit( <<"END", __FILE__, __LINE__ + 1 );
-    _ret_object = Parrot_pcc_build_call_from_c_args(interp, _call_object,
+    Parrot_pcc_set_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
-    UNUSED(_ret_object);
     $wb
     return;
     /*END RETURN $returns */
@@ -359,7 +358,6 @@ sub rewrite_pccmethod {
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
-    PMC * _ret_object;
 
     { /* BEGIN PARMS SCOPE */
 END
