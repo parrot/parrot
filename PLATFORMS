@@ -34,6 +34,9 @@ linux-amd64-icc_11.1          8  Y   Y   Y    Y     Y  20100209
 netbsd4.0-x86_64-gcc-4.1.2    8  Y   Y   Y    Y     ?  20110418
 win-x64-msvc_16.0             8  ?   ?   Y    Y     ?  20110718
 linux-amd64-clang2.8          8  ?   ?   Y    Y     Y  20110718
+darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y     Y  20110718
+darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y*/1  Y  20110718
+
 
 
 Legend:
@@ -65,3 +68,5 @@ The following configurations are also working on x86/linux (and possibly
 other platforms):
 optimized build: perl Configure.pl --optimize
 system malloc:   perl Configure.pl --gc=libc
+
+darwin8.11.0-ppc-4.0 passes all tests without --optimize but fails one test with --optimize
