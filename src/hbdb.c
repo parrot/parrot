@@ -517,7 +517,7 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
     /* Get command name */
     c = parse_command(&cmd);
 
-    /* Verify that an actual command was passed */
+    /* Display help for one command if there's one argument, otherwise display all */
     if (c)  {
         Parrot_io_printf(hbdb->debugger, "%s\n", c->help);
     }
@@ -531,6 +531,8 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
             for (i = 0; i < (sizeof (command_table) / sizeof (hbdb_cmd_table_t)); i++) {
                 const hbdb_cmd_table_t * const tbl = command_table + i;
 
+            /* FIXME Is there a better way not to print "nop" command? */
+            if (strcmp(tbl->name, "nop") != 0)
                 /* Display name and short message about each command */
                 Parrot_io_printf(hbdb->debugger,
                                  "   %-12s  %s\n",
