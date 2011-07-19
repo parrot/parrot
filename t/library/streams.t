@@ -340,7 +340,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     .local pmc combiner
     .local string name
 
-    name = "t/library/perlhist.txt"
+    name = "t/library/perlhistory.txt"
 
     load_bytecode 'Stream/ParrotIO.pbc'
     load_bytecode 'Stream/Lines.pbc'
@@ -947,7 +947,7 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     stream = new ['Stream'; 'ParrotIO']
 
     # open this file
-    stream."open"( "t/library/perlhist.txt", 'r' )
+    stream."open"( "t/library/perlhistory.txt", 'r' )
 
     # you can specify a custom block size with
     # stream."blockSize"( 10 )

@@ -58,21 +58,34 @@ Testing Perl 6 objects.
 
     ## try some builtin stdlib funcs
     $P0 = ncifunc(null_pmc, 'atoi', 'it')
+    $I0 = defined $P0
+    unless $I0 goto check_atoi
     $S0 = "2468"
     ( $I0 ) = $P0($S0)
+  check_atoi:
     is($I0, 2468, 'atoi("2468")')
 
     $P0 = ncifunc(null_pmc, 'atol', 'lt')
+    $I0 = defined $P0
+    unless $I0 goto check_atol
     $S0 = "7654321"
     ( $I0 ) = $P0($S0)
+  check_atol:
     is($I0, 7654321, 'atol("7654321")')
 
     $P0 = ncifunc(null_pmc, 'strcmp', 'itt')
+    $I0 = 42
+    $I1 = defined $P0
+    unless $I1 goto check_strcmp
     ( $I0 ) = $P0('hello', 'hello')
+  check_strcmp:
     is($I0, 0, 'strcmp == 0')
 
     $P0 = ncifunc(null_pmc, 'strstr', 'ttt')
+    $I0 = defined $P0
+    unless $I0 goto check_strstr
     ( $S0 ) = $P0('hello', 'e')
+  check_strstr:
     is($S0, 'ello', 'strstr("hello", "e")')
 
 

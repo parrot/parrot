@@ -290,6 +290,22 @@ Extends the buffer by adding a byte of value C<value> to the end.
 
 /*
 
+=item C<PMC *get_pointer()>
+
+Return a pointer to the content. Use with care.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        unsigned char *content;
+        GET_ATTR_content(INTERP, SELF, content);
+        return (void *)content;
+    }
+
+/*
+
 =item C<PMC *get_iter()>
 
 Return a new Iterator for this PMC.

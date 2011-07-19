@@ -135,14 +135,11 @@ Free all resources used.
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
             STRING * const name = VTABLE_get_string(INTERP, init);
-        #  ifdef MAPW32
-        #  else
             mapping = mapfromfilename(interp, name, &length, CAN_READ);
             if (mapping == 0 || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "mmap failed: %s", strerror(errno));
-        #  endif
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
