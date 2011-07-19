@@ -88,7 +88,7 @@ that was invalidated by the version change.  Note that this script takes care
 of modifying generated code, so C<make bootstrap-ops> is no longer necessary
 for the release process.
 
-  perl tools/relesae/update_version.pl 1.4.1
+  perl tools/release/update_version.pl 1.4.1
 
 =item ii
 
