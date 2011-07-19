@@ -786,7 +786,9 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
 =item C<static opcode_t * runops_hbdb_core(PARROT_INTERP, Parrot_runcore_t
 *runcore, opcode_t *pc)>
 
-Used by hbdb.
+Used by the HBDB debugger. Acts just like the fast core except with some
+additional behaviors that are unique to HBDB. Does not perform any bounds
+checking, profiling, or tracing.
 
 =cut
 
