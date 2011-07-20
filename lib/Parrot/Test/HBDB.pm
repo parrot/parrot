@@ -114,6 +114,10 @@ use IPC::Open3;
 
 use Parrot::Config;
 
+########################
+# File-scope variables #
+########################
+
 my $test;   # Represents current state of test
 my $pid;    # PID of HBDB process being tested
 
@@ -132,6 +136,10 @@ BEGIN {
     }
 }
 
+###########
+# Methods #
+###########
+
 # Custom import() method that's called when package is used
 sub import {
     my ($self, $plan, $args) = @_;
@@ -149,26 +157,31 @@ sub new {
         exe => ".$PConfig{slash}hbdb$PConfig{exe}"
     };
 
-    return bless $obj, $class;
+    # Return $obj as a blessed hashref in $class
+    bless $obj, $class;
 }
 
-# Compare output of command-line switches
+# Compares output of command-line switches
 sub arg_output_is {
     my ($self, $arg, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
+    # Capture output of running HBDB with $arg argument
     my $output                         = `$self->{exe} $arg`;
 
+    # Compare $output with $expected
     $builder->is($output, $expected, $desc);
 }
 
-# Compares output of command-line switches (with regex)
+# Matches output of command-line switches with regex
 sub arg_output_like {
     my ($self, $arg, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
+    # Capture output of running HBDB with $arg argument
     my $output                         = `$self->{exe} $arg`;
 
+    # Match $output against the regex $expected
     $builder->like($output, $expected, $desc);
 }
 
@@ -177,8 +190,10 @@ sub cmd_output_is {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
+    # Create 'cmd' entry in hashref if a command name was passed
     $self->{cmd} = $cmd if defined $cmd;
 
+    # Enter command into pseudo-prompt
     _enter_cmd($self->{cmd});
 
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
@@ -196,6 +211,7 @@ sub cmd_output_is {
         if (fileno $fh  == fileno \*HBDB_STDERR) {
             my @lines = <HBDB_STDERR> || '';
 
+            # Compare $lines[0] with $expected
             $builder->is($lines[0], $expected, $desc);
         }
 
@@ -203,6 +219,7 @@ sub cmd_output_is {
         $select->remove($fh) if eof $fh;
     }
 
+    # Close filehandles
     _close_fh();
 }
 
@@ -211,8 +228,10 @@ sub cmd_output_like {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
+    # Create 'cmd' entry in hashref if a command name was passed
     $self->{cmd} = $cmd if defined $cmd;
 
+    # Enter command into pseudo-prompt
     _enter_cmd($self->{cmd});
 
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
@@ -230,6 +249,7 @@ sub cmd_output_like {
         if (fileno $fh  == fileno \*HBDB_STDERR) {
             my @lines = <HBDB_STDERR> || '';
 
+            # Match $lines[0] against the regex $expected
             $builder->like($lines[0], $expected, $desc);
         }
 
@@ -237,6 +257,7 @@ sub cmd_output_like {
         $select->remove($fh) if eof $fh;
     }
 
+    # Close filehandles
     _close_fh();
 }
 
@@ -244,10 +265,13 @@ sub cmd_output_like {
 sub start {
     my ($self, $file, $args) = @_;
 
+    # TODO Add handling for PIR files
+
+    # Create 'file' and 'args' entry in hashref if a file and argument(s) were passed
     $self->{file} = _generate_pbc($file) if defined $file;
     $self->{args} = $args                if defined $args;
 
-    # Don't write to "HBDB_STDIN" anymore when child has exited
+    # Don't write to `HBDB_STDIN` anymore when child has exited
     $SIG{CHLD} = sub {
         close HBDB_STDIN if fileno HBDB_STDIN;
     };
