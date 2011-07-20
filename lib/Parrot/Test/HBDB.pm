@@ -104,32 +104,30 @@ package Parrot::Test::HBDB;
 
 use strict;
 use warnings;
-use lib qw(lib);
+use lib  'lib';
+use base 'Test::Builder::Module';
 
 use Carp;
 use File::Spec;
 use IO::Select;
 use IPC::Open3;
-use Test::Builder;
-use Test::More ();
 
 use Parrot::Config;
 
-use base qw(Exporter);
-
-my $builder;
-my $pid;
+my $test;   # Represents current state of test
+my $pid;    # PID of HBDB process being tested
 
 # Check that HBDB has been built first
 BEGIN {
-    $builder = Test::Builder->new();
+    # Set global representation of tests
+    $test    = Test::Builder->new();
 
     # Get path to HBDB executable
     my $hbdb = File::Spec->join('.', 'hbdb') . $PConfig{exe};
 
     # Skip tests if executable doesn't exist
     unless (-e $hbdb) {
-        $builder->plan(skip_all => 'HBDB hasn\'t been built. Please run \"make hbdb\"');
+        $test->plan(skip_all => 'HBDB hasn\'t been built. Please run \"make hbdb\"');
         exit(0);
     }
 }
@@ -139,7 +137,7 @@ sub import {
     my ($self, $plan, $args) = @_;
 
     # Plan number of tests
-    $builder->plan($plan, $args);
+    $test->plan($plan, $args);
 }
 
 # Constructor
@@ -157,24 +155,27 @@ sub new {
 # Compare output of command-line switches
 sub arg_output_is {
     my ($self, $arg, $expected, $desc) = @_;
+    my $builder                        = __PACKAGE__->builder;
 
-    my $output = `$self->{exe} $arg`;
+    my $output                         = `$self->{exe} $arg`;
 
-    Test::More::is($output, $expected, $desc);
+    $builder->is($output, $expected, $desc);
 }
 
 # Compares output of command-line switches (with regex)
 sub arg_output_like {
     my ($self, $arg, $expected, $desc) = @_;
+    my $builder                        = __PACKAGE__->builder;
 
-    my $output = `$self->{exe} $arg`;
+    my $output                         = `$self->{exe} $arg`;
 
-    Test::More::like($output, $expected, $desc);
+    $builder->like($output, $expected, $desc);
 }
 
 # Compares output of commands
 sub cmd_output_is {
     my ($self, $cmd, $expected, $desc) = @_;
+    my $builder                        = __PACKAGE__->builder;
 
     $self->{cmd} = $cmd if defined $cmd;
 
@@ -195,7 +196,7 @@ sub cmd_output_is {
         if (fileno $fh  == fileno \*HBDB_STDERR) {
             my @lines = <HBDB_STDERR> || '';
 
-            Test::More::is($lines[0], $expected, $desc);
+            $builder->is($lines[0], $expected, $desc);
         }
 
         # Remove filehandle from list if reached EOF
@@ -208,6 +209,7 @@ sub cmd_output_is {
 # Compares output of commands (with regex)
 sub cmd_output_like {
     my ($self, $cmd, $expected, $desc) = @_;
+    my $builder                        = __PACKAGE__->builder;
 
     $self->{cmd} = $cmd if defined $cmd;
 
@@ -228,7 +230,7 @@ sub cmd_output_like {
         if (fileno $fh  == fileno \*HBDB_STDERR) {
             my @lines = <HBDB_STDERR> || '';
 
-            Test::More::like($lines[0], $expected, $desc);
+            $builder->like($lines[0], $expected, $desc);
         }
 
         # Remove filehandle from list if reached EOF
@@ -287,7 +289,7 @@ sub _generate_pbc {
 
     # Compile to bytecode
     eval { system "$parrot -o $pbc $pir" };
-    $builder->diag("Failed to generate $pbc") if $@;
+    $test->diag("Failed to generate $pbc") if $@;
 
     return $pbc;
 }
