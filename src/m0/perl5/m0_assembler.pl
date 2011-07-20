@@ -325,20 +325,22 @@ sub m0b_constants_seg {
 
     #for each constant
     for (@$constants) {
-        my ($type, $value) = /([INS]):(.*)/;
+        my ($type, $value) = /^([INS]):(.*)$/s;
         if ($type eq 'I') {
             $bytecode .= pack("LL", 4, $value);
+            m0_say "adding I constant $value to constants segment";
         }
         elsif ($type eq 'S') {
             my $const_length = length($value);
             $bytecode .= pack("L", $const_length);
             $bytecode .= $value;
+            m0_say "adding S constant '$value' to constants segment";
         }
         elsif ($type eq 'N') {
             $bytecode .= pack("L", 4);
             die "don't know how to add N constants: m0 assembler needs love";
+            m0_say "adding N constant $value to constants segment";
         }
-        m0_say "adding constant '$_' to constants segment";
     }
 
     return $bytecode;
@@ -445,24 +447,24 @@ sub m0b_const_seg_length {
 
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
-    #TODO: Make this work
     for (@$consts) {
-        my $const_length = length($_);
-        my ($type, $value) = /([INS]):(.*)/;
+        my ($type, $value) = /^([INS]):(.*)$/s;
         if ($type eq 'I') {
             $seg_length += 8; # storage of size of constant
+            m0_say "after adding I constant $value, length is $seg_length (+8)";
         }
         elsif ($type eq 'N') {
             $seg_length += 8; # storage of size of constant
+            m0_say "after adding N constant $value, length is $seg_length (+8)";
         }
         elsif ($type eq 'S') {
-            $seg_length += 4; # storage of size of constant
-            $seg_length += length($_);
+            my $const_length = 4 + length($value);
+            $seg_length += $const_length;
+            m0_say "after adding S constant '$value', length is $seg_length (+$const_length)";
         }
         else {
             die "unknown type '$type'.  I don't know how this happened.";
         }
-        m0_say "after adding constant '$_', length is $seg_length";
     }
 
     m0_say "consts seg length is $seg_length";
