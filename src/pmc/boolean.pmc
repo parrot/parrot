@@ -165,6 +165,20 @@ C<FALSE>.
 
 /*
 
+=item C<INTVAL is_equal(PMC *value)>
+
+The C<==> operation.
+
+=cut
+
+*/
+
+    VTABLE INTVAL is_equal(PMC *value) {
+        return (INTVAL)(get_boolean_FLAG(SELF) == VTABLE_get_bool(INTERP, value));
+    }
+
+/*
+
 =item C<void freeze(PMC *info)>
 
 Used to archive the C<Boolean>.

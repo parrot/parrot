@@ -345,24 +345,7 @@ is smaller.
 
 /*
 
-=item C<void substr(INTVAL offset, INTVAL length, PMC *dest)>
-
-Extracts the substring starting at C<offset>, with size
-C<length>, and places it in C<dest>.
-
-=cut
-
-*/
-    VTABLE void substr(INTVAL offset, INTVAL length, PMC *dest) {
-        STRING *str_val, *s2;
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        s2 = STRING_substr(INTERP, str_val, offset, length);
-        VTABLE_set_string_native(INTERP, dest, s2);
-    }
-
-/*
-
-=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
+=item C<STRING *substr(INTVAL offset, INTVAL length)>
 
 Extracts the substring starting at C<offset>, with size
 C<length>, and returns it.
@@ -370,7 +353,7 @@ C<length>, and returns it.
 =cut
 
 */
-    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         STRING *str_val;
         GET_ATTR_str_val(INTERP, SELF, str_val);
         return STRING_substr(INTERP, str_val, offset, length);
@@ -701,7 +684,8 @@ if present.
 
 =item C<INTEGER is_integer(STRING *src)>
 
-Checks if the ascii STRING C<str> is just an integer.
+Checks if the STRING C<str> is just an integer. Accepts only '0'-'9'
+characters, other digit representations aren't allowed.
 
 =cut
 
@@ -709,26 +693,39 @@ Checks if the ascii STRING C<str> is just an integer.
 
     METHOD is_integer(STRING *src) {
         const INTVAL   len = Parrot_str_length(INTERP, src);
-        const char *p;
 
         if (!len)
             RETURN(INTVAL 0);
 
-        if (STRING_max_bytes_per_codepoint(src) != 1)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
-                "Can't is_integer non fixed_8");
+        if (STRING_max_bytes_per_codepoint(src) == 1) {
+            const char *p = src->strstart;
+            if (p[0] == '-' || p[0] == '+' || (p[0] >= '0' && p[0] <= '9')) {
+                int i;
+                for (i = 1; i < len; ++i)
+                    if (p[i] < '0' || p[i] > '9')
+                        RETURN(INTVAL 0);
 
-        p = src->strstart;
-        if (p[0] == '-' || p[0] == '+' || (p[0] >= '0' && p[0] <= '9')) {
-            int i;
-            for (i = 1; i < len; ++i)
-                if (p[i] < '0' || p[i] > '9')
+                RETURN(INTVAL 1);
+            }
+            else
+                RETURN(INTVAL 0);
+        }
+        else {
+            String_iter iter;
+            UINTVAL c;
+            INTVAL i = 0;
+            STRING_ITER_INIT(interp, &iter);
+            c = STRING_iter_get_and_advance(interp, src, &iter);
+            if ((c == '-' && len < 2) || c < '0' || c > '9')
                     RETURN(INTVAL 0);
-
+            ++i;
+            for (; i < len; ++i) {
+                c = STRING_iter_get_and_advance(interp, src, &iter);
+                if (c < '0' || c > '9')
+                    RETURN(INTVAL 0);
+            }
             RETURN(INTVAL 1);
         }
-        else
-            RETURN(INTVAL 0);
     }
 
     VTABLE PMC *share_ro() {

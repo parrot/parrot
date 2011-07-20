@@ -36,6 +36,7 @@
 typedef struct _Parrot_GC_Init_Args {
     void *stacktop;
     const char *system;
+    Parrot_Float4 nursery_size;
     Parrot_Int dynamic_threshold;
     Parrot_Int min_threshold;
 } Parrot_GC_Init_Args;
@@ -229,10 +230,8 @@ void Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGFREE(PMC *pmc))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -443,8 +442,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

@@ -81,16 +81,16 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 static int sweep_cb_buf(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGFREE(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -151,7 +151,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-    UINTVAL i;
+    int i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);

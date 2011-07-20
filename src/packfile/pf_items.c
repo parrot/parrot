@@ -1002,7 +1002,7 @@ PF_size_opcode(void)
 Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
-C<INTVAL> size in the PackFile header.
+C<INTVAL> size in the PackFile header.  See TT #1047 or RT #56810.
 
 =cut
 

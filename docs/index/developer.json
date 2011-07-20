@@ -35,6 +35,18 @@
       },
       {
          "source" : [
+            "docs/deprecations/deprecations.pod",
+            "docs/deprecations/deprecations_3_6.pod",
+            "docs/deprecations/deprecations_3_3.pod",
+            "docs/deprecations/deprecations_3_0.pod",
+            "docs/deprecations/deprecations_2_9.pod",
+            "docs/deprecations/deprecations_2_6.pod",
+            "docs/deprecations/how_to_deprecate.pod"
+         ],
+         "title" : "Deprecations"
+      },
+      {
+         "source" : [
             "docs/user/pir/*",
             "docs/pmc/array.pod",
             "docs/pmc/struct.pod",

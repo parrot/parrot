@@ -43,9 +43,8 @@ Parrot_api_pmc_new_from_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC cla
 {
     ASSERT_ARGS(Parrot_api_pmc_new_from_class)
     EMBED_API_CALLIN(interp_pmc, interp)
-    if (init == NULL)
-        init = PMCNULL;
-    *pmc = VTABLE_instantiate(interp, class_pmc, init);
+    Parrot_PMC initializer = init ? init : PMCNULL;
+    *pmc = VTABLE_instantiate(interp, class_pmc, initializer);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -114,7 +113,7 @@ successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGMOD(Parrot_PMC *pmctonull))
+Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGOUT(Parrot_PMC *pmctonull))
 {
     ASSERT_ARGS(Parrot_api_pmc_null)
     EMBED_API_CALLIN(interp_pmc, interp)

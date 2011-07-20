@@ -24,14 +24,14 @@ This file implements encoding functions for the null string.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL null_compare(SHIM_INTERP,
-    SHIM(const STRING *lhs),
+static INTVAL null_compare(PARROT_INTERP,
+    const STRING *lhs,
     ARGIN(const STRING *rhs))
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static INTVAL null_equal(SHIM_INTERP,
-    SHIM(const STRING *lhs),
+static INTVAL null_equal(PARROT_INTERP,
+    const STRING *lhs,
     ARGIN(const STRING *rhs))
         __attribute__nonnull__(3);
 
@@ -39,7 +39,7 @@ static void null_error(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
-static size_t null_hash(SHIM_INTERP, SHIM(const STRING *s), size_t hashval);
+static size_t null_hash(PARROT_INTERP, const STRING *s, size_t hashval);
 
 #define ASSERT_ARGS_null_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(rhs))

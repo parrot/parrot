@@ -17,13 +17,13 @@
 
 /* &gen_from_enum(datatypes.pasm) subst(s/enum_type_(\w+)/uc("DATATYPE_$1")/e) */
 typedef enum {
-    enum_type_undef,            /* illegal */
-    enum_first_type = -100,
+    enum_type_undef = 0,        /* illegal */
+    enum_first_type = 1,
 
-    enum_type_INTVAL = -100,    /* parrot types */
+    enum_type_INTVAL = 1,       /* parrot types */
     enum_type_FLOATVAL,
     enum_type_STRING,
-    enum_type_PMC,              /* actual PMCs have positive class numbers */
+    enum_type_PMC,
 
     enum_type_char,             /* native integer types */
     enum_type_short,
@@ -54,6 +54,8 @@ typedef enum {
     enum_type_uint32,
     enum_type_uint64,
 
+    enum_type_void,
+
     enum_type_ptr,              /* native pointer */
     enum_type_cstr,             /* c string */
     enum_type_struct_ptr,       /* pointer to another struct */
@@ -62,8 +64,10 @@ typedef enum {
     enum_type_func_ptr,         /* a function pointer */
 
     enum_type_sized,
-    enum_last_type              /* + one */
 
+    enum_last_type,             /* + one */
+
+    enum_type_ref_flag = 0x40   /* call-by-reference */
 } PARROT_DATA_TYPE;
 
 /* &end_gen */
@@ -133,6 +137,8 @@ const struct _data_types data_types[] = {
     { "uint64",     0,                           0 },
 #  endif
 
+    { "void",       0,                          0 },
+
     { "ptr",        sizeof (void *),             ALIGNOF(void *) },
     { "cstr",       sizeof (char *),             ALIGNOF(char *) },
     { "struct_ptr", sizeof (void *),             ALIGNOF(void *) },
@@ -172,12 +178,11 @@ const struct _data_types data_types[] = {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-FLOATVAL Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num);
+FLOATVAL Parrot_dt_divide_floatval_by_zero(PARROT_INTERP, FLOATVAL num);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP,
-    ARGIN(const STRING *type_name))
+INTVAL Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

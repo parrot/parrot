@@ -246,8 +246,8 @@ Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 
 /*
 
-=item C<int Parrot_secret_snprintf(char *buffer, const size_t len, const char
-*format, ...)>
+=item C<int Parrot_secret_snprintf(char *buffer, size_t len, const char *format,
+...)>
 
 A simulation of C<snprintf> for systems that do not support it.
 
@@ -259,8 +259,7 @@ A simulation of C<snprintf> for systems that do not support it.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 int
-Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(const size_t len),
-        ARGIN(const char *format), ...)
+Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(size_t len), ARGIN(const char *format), ...)
 {
     ASSERT_ARGS(Parrot_secret_snprintf)
     int retval;
@@ -279,7 +278,7 @@ Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(const size_t len),
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
+F<src/spf_vtable.c>, F<src/spf_render.c>, F<include/parrot/misc.h>
 
 =head1 HISTORY
 

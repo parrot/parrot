@@ -1,5 +1,12 @@
 ---
 -
+  name:     '"Advanced" NCI parameter types'
+  eligible: '3.1'
+  ticket:   'http://trac.parrot.org/parrot/ticket/1931'
+  tags:
+    - 'deprecated'
+    - 'completed'
+-
   name:     'Pointer, UnManagedStruct, and ManagedStruct'
   eligible: '3.4'
   ticket:   'http://trac.parrot.org/parrot/ticket/2035'
@@ -469,3 +476,28 @@
     - 'api'
     - 'library'
   ticket:  ''
+-
+  name :  'Old Embed API Functions'
+  tags:
+    - 'deprecated'
+  ticket: 'http://trac.parrot.org/parrot/ticket/1910'
+-
+  name :  'PackfileView PMC'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2145'
+-
+  name :  'Eval PMC'
+  tags:
+    - 'deprecated'
+  ticket: 'http://trac.parrot.org/parrot/ticket/1969'
+-
+  name :  'PackFile_* API functions'
+  tags :
+    - 'deprecated'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2140'
+-
+  name :  'Parrot_compreg function'
+  tags :
+    - 'deprecated'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1879'

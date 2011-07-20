@@ -24,6 +24,17 @@ signatures.
 
 /* HEADERIZER HFILE: include/parrot/nci.h */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static char ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_ncidt_to_pcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<PMC * Parrot_nci_parse_signature(PARROT_INTERP, STRING *sig_str)>
@@ -41,95 +52,64 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 {
     ASSERT_ARGS(Parrot_nci_parse_signature)
 
-    const size_t sig_length = Parrot_str_byte_length(interp, sig_str);
-
+    const size_t  sig_length = Parrot_str_byte_length(interp, sig_str);
+    PMC          *sig_pmc    = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray,
+                                                                sig_length);
     size_t i;
 
-    PMC * const sig_pmc = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+    if (!sig_length) {
+        sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 1);
+        VTABLE_set_integer_keyed_int(interp, sig_pmc, 0, enum_type_void);
+        return sig_pmc;
+    }
 
     for (i = 0; i < sig_length; ++i) {
         const INTVAL c = Parrot_str_indexed(interp, sig_str, i);
-        nci_sig_elem_t e;
+        PARROT_DATA_TYPE e;
 
         PARROT_ASSERT(c == (char)c);
 
         switch ((char)c) {
-          case '0':    /* null ptr or such - doesn't consume a reg */
-            e = enum_nci_sig_null;
-            break;
-
           case 'f':
-            e = enum_nci_sig_float;
+            e = enum_type_float;
             break;
           case 'd':
-            e = enum_nci_sig_double;
+            e = enum_type_double;
             break;
           case 'N':
-            e = enum_nci_sig_numval;
+            e = enum_type_FLOATVAL;
             break;
 
           case 'c':   /* char */
-            e = enum_nci_sig_char;
+            e = enum_type_char;
             break;
           case 's':   /* short */
-            e = enum_nci_sig_short;
+            e = enum_type_short;
             break;
           case 'i':   /* int */
-            e = enum_nci_sig_int;
+            e = enum_type_int;
             break;
           case 'l':   /* long */
-            e = enum_nci_sig_long;
+            e = enum_type_long;
             break;
           case 'I':   /* INTVAL */
-            e = enum_nci_sig_intval;
+            e = enum_type_INTVAL;
             break;
 
           case 'S':
-            e = enum_nci_sig_string;
-            break;
-          case 't':   /* string, pass a cstring */
-            e = enum_nci_sig_cstring;
-            break;
-
-          case 'J':   /* interpreter */
-            e = enum_nci_sig_interp;
+            e = enum_type_STRING;
             break;
 
           case 'p':   /* push pmc->data */
-            e = enum_nci_sig_ptr;
+            e = enum_type_ptr;
             break;
+          case 'O':   /* PMC invocant */
           case 'P':   /* push PMC * */
-            e = enum_nci_sig_pmc;
-            break;
-          case 'V':   /* push PMC * */
-            e = enum_nci_sig_ptrref;
-            break;
-          case '2':
-            e = enum_nci_sig_shortref;
-            break;
-          case '3':
-            e = enum_nci_sig_intref;
-            break;
-          case '4':
-            e = enum_nci_sig_longref;
-            break;
-
-          case 'O':   /* push PMC * invocant */
-            e = enum_nci_sig_pmcinv;
-            break;
-          case '@':   /* push PMC * slurpy */
-            e = enum_nci_sig_pmcslurp;
-            break;
-
-          case 'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
-            e = enum_nci_sig_cstringref;
-            break;
-          case 'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
-            e = enum_nci_sig_bufref;
+            e = enum_type_PMC;
             break;
 
           case 'v':
-            e = enum_nci_sig_void;
+            e = enum_type_void;
             break;
           default:
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -138,13 +118,51 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
             break;
         }
 
-        VTABLE_push_integer(interp, sig_pmc, e);
+        VTABLE_set_integer_keyed_int(interp, sig_pmc, i, e);
     }
 
-    if (VTABLE_elements(interp, sig_pmc) < 1)
-        VTABLE_push_integer(interp, sig_pmc, enum_nci_sig_void);
-
     return sig_pmc;
+}
+
+/*
+
+=item C<static char ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)>
+
+Lookup the appropriate PCC signature item to use for a given NCI type.
+
+=cut
+
+*/
+
+static char
+ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
+{
+    ASSERT_ARGS(ncidt_to_pcc)
+
+    switch (t) {
+      case enum_type_float:
+      case enum_type_double:
+      case enum_type_FLOATVAL:
+        return 'N';
+
+      case enum_type_char:
+      case enum_type_short:
+      case enum_type_int:
+      case enum_type_long:
+      case enum_type_INTVAL:
+        return 'I';
+
+      case enum_type_STRING:
+        return 'S';
+
+      case enum_type_ptr:
+      case enum_type_PMC:
+        return 'P';
+
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "Unhandled NCI type: `%Ss'",
+                Parrot_dt_get_datatype_name(interp, t));
+    }
 }
 
 
@@ -167,81 +185,91 @@ Parrot_nci_sig_to_pcc(PARROT_INTERP, ARGIN(PMC *sig_pmc), ARGOUT(STRING **params
 
     const size_t sig_len = VTABLE_elements(interp, sig_pmc);
 
-    /* PCC sigs are 1 char long except for array slurpy, named slurpy (not possible with NCI),
-       and invocant */
-    const size_t buf_len = sig_len + 2 + 1;
+    const size_t argc = sig_len - 1;
+    size_t retc = 0;
 
     /* avoid malloc churn on common signatures */
-    char         static_buf[16];
-    char * const sig_buf = sig_len <= sizeof static_buf ?
-                            static_buf :
-                            (char *)mem_sys_allocate(buf_len);
+    char  static_buf[16];
+    char *sig_buf;
 
     size_t i, j;
+    PARROT_DATA_TYPE t;
 
-    for (i = 0, j = 0; i < sig_len; i++) {
-        const nci_sig_elem_t e = (nci_sig_elem_t)VTABLE_get_integer_keyed_int(interp, sig_pmc, i);
+    /* process NCI arguments */
+    sig_buf = argc < sizeof static_buf ?  static_buf : (char *)mem_sys_allocate(argc);
 
-        PARROT_ASSERT(j < buf_len - 1);
-
-        switch (e) {
-          case enum_nci_sig_void:
-            /* null return */
-            if (j == 0)
-                sig_buf[j++] = '\0';
-            break;
-          case enum_nci_sig_null:
-          case enum_nci_sig_interp:
-            break;
-          case enum_nci_sig_float:
-          case enum_nci_sig_double:
-          case enum_nci_sig_numval:
-            sig_buf[j++] = 'N';
-            break;
-          case enum_nci_sig_char:
-          case enum_nci_sig_short:
-          case enum_nci_sig_int:
-          case enum_nci_sig_long:
-          case enum_nci_sig_intval:
-            sig_buf[j++] = 'I';
-            break;
-          case enum_nci_sig_string:
-          case enum_nci_sig_cstring:
-          case enum_nci_sig_cstringref:
-          case enum_nci_sig_bufref:
-            sig_buf[j++] = 'S';
-            break;
-          case enum_nci_sig_ptr:
-          case enum_nci_sig_pmc:
-          case enum_nci_sig_ptrref:
-          case enum_nci_sig_shortref:
-          case enum_nci_sig_intref:
-          case enum_nci_sig_longref:
-            sig_buf[j++] = 'P';
-            break;
-          case enum_nci_sig_pmcinv:
-            sig_buf[j++] = 'P';
-            sig_buf[j++] = 'i';
-            break;
-          case enum_nci_sig_pmcslurp:
-            sig_buf[j++] = 'P';
-            sig_buf[j++] = 's';
-            break;
-          default:
-            break;
-        }
+    for (i = 0; i < argc; i++) {
+        t          = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, i + 1);
+        sig_buf[i] = ncidt_to_pcc(interp, (PARROT_DATA_TYPE)(t & ~enum_type_ref_flag));
+        if (t & enum_type_ref_flag)
+            retc++;
     }
 
-    PARROT_ASSERT(j < buf_len);
-    sig_buf[j + 1] = '\0';
-
-    *ret_sig    = Parrot_str_new(interp, sig_buf, 1);
-    *params_sig = j - 1 ?
-                Parrot_str_new(interp, &sig_buf[1], j - 1) :
-                CONST_STRING(interp, "");
-
+    *params_sig = argc ? Parrot_str_new(interp, sig_buf, argc) : CONST_STRING(interp, "");
     if (sig_buf != static_buf)
         mem_sys_free(sig_buf);
+
+    if (enum_type_void !=
+        (t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, 0)))
+        retc++;
+
+    /* process NCI returns */
+    sig_buf = retc < sizeof static_buf ? static_buf : (char *)mem_sys_allocate(retc);
+
+    if (enum_type_void == t) {
+        j = 0;
+    }
+    else {
+        sig_buf[0] = ncidt_to_pcc(interp, t);
+        j = 1;
+    }
+
+    for (i = 0; j < retc; i++) {
+        t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig_pmc, i + 1);
+        if (t & enum_type_ref_flag)
+            sig_buf[j++] = ncidt_to_pcc(interp, (PARROT_DATA_TYPE)(t & ~enum_type_ref_flag));
+    }
+
+    *ret_sig = retc ? Parrot_str_new(interp, sig_buf, retc) : CONST_STRING(interp, "");
+    if (sig_buf != static_buf)
+        mem_sys_free(sig_buf);
+}
+
+/*
+
+=item C<STRING * Parrot_nci_describe_sig(PARROT_INTERP, PMC *sig)>
+
+Provide a descriptive string for a signature.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_nci_describe_sig(PARROT_INTERP, ARGIN(PMC *sig))
+{
+    ASSERT_ARGS(Parrot_nci_describe_sig)
+
+    STRING *s;
+    size_t  n = VTABLE_elements(interp, sig);
+    size_t  i;
+
+    /* return value */
+    s = Parrot_dt_get_datatype_name(interp, VTABLE_get_integer_keyed_int(interp, sig, 0));
+
+    /* arguments */
+    s = Parrot_str_concat(interp, s, CONST_STRING(interp, " ("));
+    for (i = 1; i < n; i++) {
+        s = Parrot_str_concat(interp, s, Parrot_dt_get_datatype_name(interp,
+                                            VTABLE_get_integer_keyed_int(interp, sig, i)));
+        if (i < n - 1)
+            s = Parrot_str_concat(interp, s, CONST_STRING(interp, ", "));
+    }
+    s = Parrot_str_concat(interp, s, CONST_STRING(interp, ")"));
+
+    return s;
 }
 
 /*

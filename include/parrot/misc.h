@@ -39,7 +39,7 @@ typedef int (*reg_move_func)(PARROT_INTERP, unsigned char d, unsigned char s, vo
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_util_byte_index(SHIM_INTERP,
+INTVAL Parrot_util_byte_index(PARROT_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
     UINTVAL start_offset)
@@ -49,7 +49,7 @@ INTVAL Parrot_util_byte_index(SHIM_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_util_byte_rindex(SHIM_INTERP,
+INTVAL Parrot_util_byte_rindex(PARROT_INTERP,
     ARGIN(const STRING *base),
     ARGIN(const STRING *search),
     UINTVAL start_offset)
@@ -145,7 +145,7 @@ PARROT_IGNORABLE_RESULT
 int /*@alt void@*/
 Parrot_secret_snprintf(
     ARGOUT(char *buffer),
-    NULLOK(const size_t len),
+    size_t len,
     ARGIN(const char *format),
     ...)
         __attribute__nonnull__(1)

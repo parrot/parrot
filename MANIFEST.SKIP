@@ -62,8 +62,6 @@
 ^/.*\.sto/
 ^/.*\.suo$
 ^/.*\.suo/
-^/.*\.sw?$
-^/.*\.sw?/
 ^/.*\.tmp$
 ^/.*\.tmp/
 ^/.*\.vcproj.*$
@@ -86,6 +84,8 @@
 ^/\.parrot_current_sha1/
 ^/\B\.svn\b$
 ^/\B\.svn\b/
+^/\\..*sw?$
+^/\\..*sw?/
 ^/all_cstring\.str$
 ^/all_cstring\.str/
 ^/blib$
@@ -346,6 +346,8 @@
 ^/frontend/parrot_debugger/.*\.gcov/
 ^/frontend/parrot_debugger/main\.o$
 ^/frontend/parrot_debugger/main\.o/
+^/frontend/pbc_disassemble/main\.o$
+^/frontend/pbc_disassemble/main\.o/
 ^/frontend/pbc_dump/.*\.gcda$
 ^/frontend/pbc_dump/.*\.gcda/
 ^/frontend/pbc_dump/.*\.gcno$
@@ -512,10 +514,14 @@
 ^/runtime/parrot/include/.*\.pasm/
 ^/runtime/parrot/include/.*\.pbc$
 ^/runtime/parrot/include/.*\.pbc/
+^/runtime/parrot/include/.*\.pir$
+^/runtime/parrot/include/.*\.pir/
 ^/runtime/parrot/languages/JSON/JSON\.pir$
 ^/runtime/parrot/languages/JSON/JSON\.pir/
 ^/runtime/parrot/languages/data_json$
 ^/runtime/parrot/languages/data_json/
+^/runtime/parrot/languages/winxed$
+^/runtime/parrot/languages/winxed/
 ^/runtime/parrot/library/.*\.pbc$
 ^/runtime/parrot/library/.*\.pbc/
 ^/runtime/parrot/library/Archive/.*\.pbc$
@@ -762,8 +768,6 @@
 ^/src/nci/.*\.str/
 ^/src/null_config\.c$
 ^/src/null_config\.c/
-^/src/ops/.*\.c$
-^/src/ops/.*\.c/
 ^/src/ops/.*\.gcda$
 ^/src/ops/.*\.gcda/
 ^/src/ops/.*\.gcno$
@@ -790,6 +794,10 @@
 ^/src/parrot_config\.c/
 ^/src/parrot_config\.h$
 ^/src/parrot_config\.h/
+^/src/platform/.*/.*\.gcda$
+^/src/platform/.*/.*\.gcda/
+^/src/platform/.*/.*\.gcno$
+^/src/platform/.*/.*\.gcno/
 ^/src/platform/.*/.*\.o$
 ^/src/platform/.*/.*\.o/
 ^/src/pmc/.*\.c$
@@ -1042,6 +1050,10 @@
 ^/vc70\.pdb/
 ^/vtable\.dump$
 ^/vtable\.dump/
+^/winxed$
+^/winxed/
+^/winxed\..*$
+^/winxed\..*/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

@@ -41,6 +41,11 @@ typedef struct Pcc_cell
 #define FREE_CELL(i, c) \
     Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
 
+#define CLONE_CELL(i, c, c_new) do { \
+    (c_new)  = ALLOC_CELL(i); \
+    *(c_new) = *(c); \
+} while (0)
+
 #define CELL_TYPE_MASK(c) (c)->type
 
 #define CELL_INT(c)     (c)->u.i
@@ -824,12 +829,12 @@ CallContext.
                 INTVAL type;
 
                 switch (c[i].type) {
-                    case INTCELL:    type = enum_type_INTVAL;   break;
-                    case FLOATCELL:  type = enum_type_FLOATVAL; break;
-                    case STRINGCELL: type = enum_type_STRING;   break;
+                    case INTCELL:    type = -enum_type_INTVAL;   break;
+                    case FLOATCELL:  type = -enum_type_FLOATVAL; break;
+                    case STRINGCELL: type = -enum_type_STRING;   break;
                     case PMCCELL:
                         type = PMC_IS_NULL(c[i].u.p)
-                             ? (INTVAL) enum_type_PMC
+                             ? (INTVAL)-enum_type_PMC
                              : VTABLE_type(INTERP, c[i].u.p);
                         break;
                     default:
@@ -1547,8 +1552,14 @@ Creates and returns a clone of the signature.
         if (!PMC_IS_NULL(return_flags))
             SET_ATTR_return_flags(INTERP, dest, VTABLE_clone(INTERP, return_flags));
 
-        if (hash)
-            Parrot_hash_clone(INTERP, hash, get_hash(INTERP, dest));
+        if (hash) {
+            Hash *dest_hash = get_hash(INTERP, dest);
+            Parrot_hash_clone(INTERP, hash, dest_hash);
+            parrot_hash_iterate(dest_hash,
+                Pcc_cell *tmp;
+                CLONE_CELL(INTERP, (Pcc_cell *)_bucket->value, tmp);
+                _bucket->value = tmp;);
+        }
 
         return dest;
     }

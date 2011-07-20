@@ -25,7 +25,7 @@ TODO: Add description here.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-static size_t calculate_capacity(SHIM_INTERP, size_t needed);
+static size_t calculate_capacity(PARROT_INTERP, size_t needed);
 
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -157,7 +157,7 @@ Append string to current buffer.
         size_t            total_size;
 
         /* Early return on NULL strings */
-        if (STRING_IS_NULL(s))
+        if (STRING_IS_NULL(s) || s->strlen == 0)
             return;
 
         GET_ATTR_buffer(INTERP, SELF, buffer);
@@ -169,7 +169,10 @@ Append string to current buffer.
             buffer->encoding = s->encoding;
         }
         else {
-            const STR_VTABLE * const enc = Parrot_str_rep_compatible(interp, buffer, s);
+            const STR_VTABLE * const enc =
+                  buffer->encoding == s->encoding
+                ? buffer->encoding
+                : Parrot_str_rep_compatible(interp, buffer, s);
 
             if (enc) {
                 buffer->encoding = enc;
@@ -219,8 +222,8 @@ Append string to current buffer.
         /* Update buffer */
         buffer->bufused += s->bufused;
         buffer->strstart = (char *)buffer->_bufstart;
-        buffer->strlen  += Parrot_str_length(INTERP, s);
-        buffer->hashval = 0; /* hash is invalid */
+        buffer->strlen  += s->strlen;
+        buffer->hashval  = 0; /* hash is invalid */
 
         PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
     }
@@ -309,13 +312,13 @@ For testing purpose only?
 
 /*
 
-=item C<VTABLE substr_str()>
+=item C<VTABLE substr()>
 
 =cut
 
 */
 
-    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We must clone here becase we can reallocate buffer behind the scene... */

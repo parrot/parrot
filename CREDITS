@@ -200,6 +200,11 @@ D: Early contributions under the name Brent Dax.
 E: brent@brentdax.com
 W: http://www.brentdax.com/
 
+N: Brian Gernhardt
+E: brian.gernhardt@mail.rit.edu
+D: GSoC Student, PCT
+U: benabik
+
 U: bdwheele
 N: Brian Wheeler
 E: bdwheele@indiana.edu
@@ -379,6 +384,12 @@ D: makefile fixes
 E: eric@lubow.org
 W: http://eric.lubow.org/
 
+N: Felipe Pena
+D: Bug fixes
+E: felipensp@gmail.com
+U: Felipe
+S: Rio de Janeiro, Brazil
+
 N: Felix Gallo
 D: delegate.pmc patch
 
@@ -434,7 +445,7 @@ D: Miscellaneous codingstd fixes
 N: Gerd Pokorra
 A: gerd
 E: pokorra@uni-siegen.de
-D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0 and 3.2.0
+D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
 N: Goplat
 D: Win98 and other fixes.
@@ -485,7 +496,7 @@ D: various Pynie patches
 N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
-D: Testing of configuration and build tools
+D: Testing of configuration and build tools; release manager
 W: http://thenceforward.net/parrot/
 S: Brooklyn, NY, USA
 
@@ -496,6 +507,10 @@ D: packfile and Tru64 fixes
 D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
+
+N: Jay Emmerson
+E: john.emerson@yale.edu
+U: jay
 
 N: Jeff Clites
 D: PPC JIT patches, ICU support, string handling
@@ -637,6 +652,12 @@ D: yield and other PIR improvements
 
 N: Kevin Falcone
 
+N: Kevin Polulak
+U: soh_cah_toa
+E: kpolulak@gmail.com
+D: HBDB debugger
+S: New Jersey, USA
+
 N: Kevin Tew
 U: tewk
 E: tewk@tewk.com
@@ -651,6 +672,11 @@ D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json, languages/squaak
 U: kj, kjs
 E: parrotcode@gmail.com
+
+N: Klāvs Priedītis
+U: klavs
+E: klavs.pr@gmail.com
+D: M0 bytecode disassembler
 
 N: Larry Wall
 E: larry@wall.org
@@ -718,6 +744,15 @@ D: httpd.imc, bugfixes
 N: Markus Mayr
 D: Implementation of the Rational PMC
 D: Fixing SDL-bindings and examples
+
+N: Martin Olsen
+D: M0 tests
+U: mro
+E: github.com@martinolsen.net
+
+N: Matt Boyle
+U: ligne
+D: Fixes to docs and test-suite.
 
 N: Matt Diephouse
 U: mdiep
@@ -1124,6 +1159,10 @@ N: Zach Lipton
 N: Zach Morgan
 E: zpmorgan@gmail.com
 D: Rakudo patch
+
+N: Anthony Parsons
+E: flussence@gmail.com
+U: flussence
 
 N: cvsdummy
 U: cvsdummy

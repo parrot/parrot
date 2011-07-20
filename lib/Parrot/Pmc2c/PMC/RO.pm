@@ -1,4 +1,5 @@
 # Copyright (C) 2004-2011, Parrot Foundation.
+
 package Parrot::Pmc2c::PMC::RO;
 use strict;
 use warnings;
@@ -6,7 +7,6 @@ use base qw( Parrot::Pmc2c::PMC );
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::UtilFunctions qw( return_statement );
-use Text::Balanced 'extract_bracketed';
 
 sub new {
     my ( $class, $parent ) = @_;

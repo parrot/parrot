@@ -58,6 +58,7 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 typedef struct _Parrot_Init_Args {
     void *stacktop;
     const char *gc_system;
+    Parrot_Float4 gc_nursery_size;
     Parrot_Int gc_dynamic_threshold;
     Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
@@ -108,8 +109,9 @@ Parrot_Int Parrot_api_flag(
 PARROT_API
 Parrot_Int Parrot_api_get_compiler(
     Parrot_PMC interp_pmc,
-    Parrot_String type,
+    ARGIN(Parrot_String type),
     ARGOUT(Parrot_PMC *compiler))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*compiler);
 
@@ -147,7 +149,8 @@ Parrot_Int Parrot_api_get_runtime_path(
 PARROT_API
 Parrot_Int Parrot_api_load_language(
     Parrot_PMC interp_pmc,
-    Parrot_String lang);
+    ARGIN(Parrot_String lang))
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
@@ -161,13 +164,17 @@ Parrot_Int Parrot_api_make_interpreter(
 PARROT_API
 Parrot_Int Parrot_api_reset_call_signature(
     Parrot_PMC interp_pmc,
-    Parrot_PMC ctx);
+    ARGMOD(Parrot_PMC ctx))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(ctx);
 
 PARROT_API
 Parrot_Int Parrot_api_set_compiler(
     Parrot_PMC interp_pmc,
-    Parrot_String type,
-    Parrot_PMC compiler);
+    ARGIN(Parrot_String type),
+    ARGIN(Parrot_PMC compiler))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Int Parrot_api_set_configuration_hash(
@@ -227,7 +234,8 @@ Parrot_Int Parrot_api_wrap_pointer(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(compiler))
+       PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_api_get_exception_backtrace \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bt))
@@ -238,12 +246,16 @@ Parrot_Int Parrot_api_wrap_pointer(
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
-#define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lang))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_reset_call_signature \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_api_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_api_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_api_set_configuration_hash \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_executable_name \
@@ -621,7 +633,7 @@ Parrot_Int Parrot_api_pmc_new_from_class(
 PARROT_API
 Parrot_Int Parrot_api_pmc_null(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGMOD(Parrot_PMC *pmctonull))
+    ARGOUT(Parrot_PMC *pmctonull))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmctonull);

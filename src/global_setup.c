@@ -268,6 +268,18 @@ Parrot_gbl_setup_2(PARROT_INTERP)
 }
 
 /*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/global_setup.h>
+
+=cut
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:

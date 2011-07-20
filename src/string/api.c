@@ -43,7 +43,7 @@ STRING *STRINGNULL;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-static INTVAL string_max_bytes(SHIM_INTERP,
+static INTVAL string_max_bytes(PARROT_INTERP,
     ARGIN(const STRING *s),
     UINTVAL nchars)
         __attribute__nonnull__(2);
@@ -127,8 +127,7 @@ Parrot_str_init(PARROT_INTERP)
 
     /* interp is initialized from zeroed memory, so this is fine */
     else if (interp->hash_seed == 0) {
-        /* TT #64 - use an entropy source once available */
-        interp->hash_seed = Parrot_intval_time();
+        interp->hash_seed = Parrot_get_entropy(interp);
     }
 
     /* initialize the constant string table */
@@ -2394,7 +2393,6 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     UINTVAL      i, len, charlen;
     String_iter  iter;
     char         hex_buf[16];
-    int          hex_len;
     char        *dp;
 
     if (STRING_IS_NULL(src))
@@ -2421,6 +2419,8 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
     for (i = 0; len > 0; --len) {
         unsigned c = STRING_iter_get_and_advance(interp, src, &iter);
+        int hex_len;
+
         if (c < 0x7f) {
             /* process ASCII chars */
             if (i >= charlen - 2) {
@@ -3043,16 +3043,19 @@ Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
         length   = Parrot_str_byte_length(interp, first);
         j_length = Parrot_str_byte_length(interp, j);
 
-        /* it's an approximiation, but it doesn't hurt */
+        /* it's an approximation, but it doesn't hurt */
         sb       = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
                     (length + j_length) * count);
 
         VTABLE_push_string(interp, sb, first);
 
         for (i = 1; i < count; ++i) {
-            VTABLE_push_string(interp, sb, j);
-            VTABLE_push_string(interp, sb,
-                VTABLE_get_string_keyed_int(interp, ar, i));
+            STRING *part = VTABLE_get_string_keyed_int(interp, ar, i);
+            if (j_length)
+                VTABLE_push_string(interp, sb, j);
+
+            if (part->strlen)
+                VTABLE_push_string(interp, sb, part);
         }
 
         return VTABLE_get_string(interp, sb);

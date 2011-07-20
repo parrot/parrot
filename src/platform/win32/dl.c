@@ -83,6 +83,18 @@ you would write something similar to:
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
+    /* This is a horrible hack. We shouldn't be hard-coding library names
+       in the lookup list, and we should have better semantics to fall back
+       on. See TT #2150 for more insults about this code. */
+    if (handle == NULL) {
+        void * proc = NULL;
+        handle = (void*)GetModuleHandle("libparrot");
+        proc = (void *)GetProcAddress((HINSTANCE)handle, symbol);
+        if (proc)
+            return proc;
+        handle = (void*)GetModuleHandle("msvcrt");
+        return (void *)GetProcAddress((HINSTANCE)handle, symbol);
+    }
     return (void *)GetProcAddress((HINSTANCE)handle, symbol);
 }
 

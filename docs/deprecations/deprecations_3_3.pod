@@ -1,0 +1,28 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations_3_3.pod - Parrot Deprecations for 3.3
+
+=head1 Parrot Deprecations for 3.3
+
+=head2 pkg-config Support
+
+parrot.pc will no longer be generated or installed.
+
+=head3 Rationale
+
+pkg-config conflicts with Parrot's installation guidelines which support
+multiple simultaneous installed versions (PDD30).
+
+As it stands, Parrot's pkg-config information has been unusable for several
+years, but no one has complained, indicating that this is unused.
+
+=head3 Replacement
+
+Use parrot_config, which is installed with the parrot system.
+
+The keys 'embed-cflags' and 'embed-ldflags' replace the pkg-config values of
+'CFlags' and 'Libs'.
+
+=cut

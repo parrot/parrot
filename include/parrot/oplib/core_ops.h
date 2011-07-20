@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_3_3_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_3_6_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -972,10 +972,28 @@ op_lib_t *Parrot_DynOp_core_3_3_0(PARROT_INTERP, long init);
  opcode_t * Parrot_sleep_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_store_lex_s_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_store_lex_sc_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_s_nc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_store_lex_sc_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_store_dynamic_lex_s_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_store_dynamic_lex_sc_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_find_lex_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_find_lex_p_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_s_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_s_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_i_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_i_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_n_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_find_lex_n_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_find_dynamic_lex_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_find_dynamic_lex_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_find_caller_lex_p_s(opcode_t *, PARROT_INTERP);
