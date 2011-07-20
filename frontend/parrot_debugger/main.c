@@ -63,7 +63,7 @@ Disable a breakpoint.
 
 =item C<enable>
 
-Reenable a disabled breakpoint.
+Re-enable a disabled breakpoint.
 
 =item C<continue> or C<c>
 
