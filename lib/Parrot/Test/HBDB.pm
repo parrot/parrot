@@ -25,7 +25,8 @@ requirement has not been met, all tests will be skipped.
 
 =item B<new()>
 
-Returns a new C<Parrot::Test::HBDB> object.
+Returns a new C<Parrot::Test::HBDB> object. Note that this does note actually
+start a HBDB process. For that you must invoke C<start()>.
 
     my $hbdb = Parrot::Test::HBDB->new();
 
@@ -37,8 +38,8 @@ Returns a new C<Parrot::Test::HBDB> object.
 
 =item B<start($file, $args)>
 
-Creates a new HBDB process. C<$file> is the name of the C<.pir> file to debug
-and C<$args> contains the command-line switches.
+Creates a new HBDB process. C<$file> is the name of the file to debug and
+C<$args> contains the command-line switches.
 
     $hbdb->start('foo.pir', '--bar');
 
@@ -166,7 +167,6 @@ sub arg_output_is {
     my ($self, $arg, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
-    # Capture output of running HBDB with $arg argument
     my $output                         = `$self->{exe} $arg`;
 
     # Compare $output with $expected
@@ -190,10 +190,8 @@ sub cmd_output_is {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
-    # Create 'cmd' entry in hashref if a command name was passed
     $self->{cmd} = $cmd if defined $cmd;
 
-    # Enter command into pseudo-prompt
     _enter_cmd($self->{cmd});
 
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
@@ -215,11 +213,9 @@ sub cmd_output_is {
             $builder->is($lines[0], $expected, $desc);
         }
 
-        # Remove filehandle from list if reached EOF
         $select->remove($fh) if eof $fh;
     }
 
-    # Close filehandles
     _close_fh();
 }
 
@@ -228,10 +224,8 @@ sub cmd_output_like {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
-    # Create 'cmd' entry in hashref if a command name was passed
     $self->{cmd} = $cmd if defined $cmd;
 
-    # Enter command into pseudo-prompt
     _enter_cmd($self->{cmd});
 
     # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
@@ -253,11 +247,9 @@ sub cmd_output_like {
             $builder->like($lines[0], $expected, $desc);
         }
 
-        # Remove filehandle from list if reached EOF
         $select->remove($fh) if eof $fh;
     }
 
-    # Close filehandles
     _close_fh();
 }
 
@@ -267,7 +259,6 @@ sub start {
 
     # TODO Add handling for PIR files
 
-    # Create 'file' and 'args' entry in hashref if a file and argument(s) were passed
     $self->{file} = _generate_pbc($file) if defined $file;
     $self->{args} = $args                if defined $args;
 
@@ -320,7 +311,6 @@ sub _generate_pbc {
 
 END {
     # TODO How can I get rid of this hard-coded string?
-    # Remove generated .pbc file
     unlink "t/tools/hbdb/testlib/hello.pbc";
 }
 
