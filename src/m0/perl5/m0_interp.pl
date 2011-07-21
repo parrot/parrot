@@ -675,10 +675,17 @@ sub m0b_parse_const_seg {
     my $const_count = unpack("L", get_bytes($m0b, $cursor, 4));
     my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
     while (scalar(@$consts < $const_count)) {
+        # XXX: the assembler needs to encode exactly the bytes that will be needed by the interp.
+        # The interp can't know which constants are I, N or S, so it can only
+        # expand bytes into slots.
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $header       = pack("LL", $const_length+1, 0);
+        my $header       = pack("LL", $const_length, 0);
         my $const        = $header . get_bytes($m0b, $cursor, $const_length);
-        m0_say "found constant of length $const_length: '$const'";
+        m0_say "found constant of length $const_length";
+        m0_say 'byte 0 is '.ord(bytes::substr($const, 0, 1));
+        m0_say 'byte 1 is '.ord(bytes::substr($const, 1, 1));
+        m0_say 'byte 2 is '.ord(bytes::substr($const, 2, 1));
+        m0_say 'byte 3 is '.ord(bytes::substr($const, 3, 1));
         push @$consts, $const;
     }
     return $consts;

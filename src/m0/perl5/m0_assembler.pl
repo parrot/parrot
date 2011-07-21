@@ -328,6 +328,15 @@ sub m0b_constants_seg {
         my ($type, $value) = /^([INS]):(.*)$/s;
         if ($type eq 'I') {
             $bytecode .= pack("LL", 4, $value);
+            my $s = pack("LL", 4, $value);
+            m0_say 'byte 0 is '.ord(bytes::substr($s, 0, 1));
+            m0_say 'byte 1 is '.ord(bytes::substr($s, 1, 1));
+            m0_say 'byte 2 is '.ord(bytes::substr($s, 2, 1));
+            m0_say 'byte 3 is '.ord(bytes::substr($s, 3, 1));
+            m0_say 'byte 4 is '.ord(bytes::substr($s, 4, 1));
+            m0_say 'byte 5 is '.ord(bytes::substr($s, 5, 1));
+            m0_say 'byte 6 is '.ord(bytes::substr($s, 6, 1));
+            m0_say 'byte 7 is '.ord(bytes::substr($s, 7, 1));
             m0_say "adding I constant $value to constants segment";
         }
         elsif ($type eq 'S') {
