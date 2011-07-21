@@ -25,6 +25,7 @@ function.
 
 /* TODO Change hbdb_init() to accept an hbdb_t to avoid assignment after call */
 /* TODO Rewrite struct's to use STRING's instead */
+/* TODO Take it easy on the comments, remove some of the blatantly obvious ones */
 
 #include <stdio.h>
 #include <ctype.h>
@@ -490,6 +491,8 @@ hbdb_cmd_disassemble(PARROT_INTERP, ARGIN_NULLOK(SHIM(const char *cmd)))
 
     HBDB_FLAG_SET(interp, HBDB_SRC_LOADED);
     hbdb->file   = file;
+
+    HBDB_FLAG_SET(interp, HBDB_STOPPED);
 }
 
 /*
@@ -549,6 +552,8 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
             Parrot_io_eprintf(hbdb->debugger, "Undefined command: \"%s\". Try \"help\".\n", cmd);
         }
     }
+
+    HBDB_FLAG_SET(interp, HBDB_STOPPED);
 }
 
 /*
@@ -627,6 +632,8 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
         /* Return if no more lines exist */
         if (!line) return;
     }
+
+    HBDB_FLAG_SET(interp, HBDB_STOPPED);
 }
 
 /*
@@ -646,6 +653,8 @@ hbdb_cmd_nop(PARROT_INTERP, ARGIN(const char *cmd))
     ASSERT_ARGS(hbdb_cmd_nop)
 
     /* Do nothing */
+
+    HBDB_FLAG_SET(interp, HBDB_STOPPED);
 }
 
 /*
@@ -700,7 +709,7 @@ hbdb_cmd_run(PARROT_INTERP, ARGIN(const char *cmd))
 
 =item C<void hbdb_cmd_step(PARROT_INTERP, const char *cmd)>
 
-Step program until it reaches a different source line.
+Step program until it reaches the next source line.
 
 =cut
 
@@ -711,7 +720,11 @@ hbdb_cmd_step(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_step)
 
-    continue_running(interp);
+    /* Clear status flag to indicate that debugger is stopped, only executing one instruction */
+    /*HBDB_FLAG_SET(interp, HBDB_RUNNING);*/
+    HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
+
+    /*HBDB_FLAG_CLEAR(interp, HBDB_BREAK);*/
 }
 
 /*
@@ -728,6 +741,84 @@ Note that they all have the I<hbdb> prefix.
 =cut
 
 */
+
+/*
+
+=item C<unsigned int hbdb_check_breakpoint(PARROT_INTERP)>
+
+Checks if the the debugee process should halt because of a breakpoint set at
+the current program counter. Returns 1 if execution should halt and returns 0
+if execution should continue.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+unsigned int
+hbdb_check_breakpoint(PARROT_INTERP)
+{
+    ASSERT_ARGS(hbdb_check_breakpoint)
+
+    hbdb_t            *hbdb;
+    hbdb_breakpoint_t *bp;
+
+    hbdb = interp->hbdb;
+    bp   = hbdb->breakpoint;
+
+    /* TODO Come back here when implementing watchpoints */
+
+    /* Check if the debugee has reached the end */
+    if (!hbdb->current_opcode) {
+        HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
+
+        Parrot_io_printf(hbdb->debugger, "\nProgram exited normally.\n");
+        return 1;
+    }
+
+    /* Clear status flag to indicate that debugger is not stopped and can continue */
+    if (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
+        HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
+
+        return 0;
+    }
+
+    /* Cycle through list of breakpoints */
+    while (bp) {
+        /* Stop if a breakpoint is set at current opcode */
+        if (hbdb->current_opcode == bp->pc)
+            break;
+
+        bp = bp->next;
+    }
+
+    if (bp) {
+        /* Continue execution if user said to skip all breakpoints */
+        if (hbdb->breakpoint_skip) {
+            hbdb->breakpoint_skip--;
+            return 0;
+        }
+
+        /* Continue execution if user said to skip this breakpoint */
+        if (bp->skip == -1)
+            return 0;
+
+        /* Check for conditions associatied with this breakpoint */
+        /*if ((bp->condition) && (!hbdb_check_condition(interp, bp->condition)))*/
+            /*return 0;*/
+
+        /* Re-enable status flag so execution enters command-line */
+        HBDB_FLAG_SET(interp, HBDB_STOPPED);
+
+        /* TODO Make output similar to GDB's when encountering breakpoints */
+
+        display_breakpoint(hbdb, bp);
+
+        return 1;
+    }
+
+    return 0;
+}
 
 /*
 
@@ -867,7 +958,7 @@ hbdb_init(PARROT_INTERP)
     }
 
     /* Set status flags to indicate that debugger has started running */
-    HBDB_FLAG_SET(interp, HBDB_RUNNING);
+    /*HBDB_FLAG_SET(interp, HBDB_RUNNING);*/
     HBDB_FLAG_SET(interp, HBDB_STARTED);
 }
 
@@ -1007,7 +1098,8 @@ hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
             command_line(interp);
 
         /* Set status flag to indicate that debugger has stopped/paused */
-        HBDB_FLAG_SET(interp, HBDB_STOPPED);
+        if (!HBDB_FLAG_TEST(interp, HBDB_RUNNING))
+            HBDB_FLAG_SET(interp, HBDB_STOPPED);
     } while (!(HBDB_FLAG_TEST(interp, HBDB_EXIT)));
 }
 
@@ -1024,7 +1116,7 @@ Starts the "active" process of accepting commands and executing code.
 */
 
 void
-hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
+hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(hbdb_start)
 
@@ -1217,8 +1309,7 @@ continue_running(PARROT_INTERP)
     HBDB_FLAG_SET(interp, HBDB_RUNNING);
     HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
 
-    /* Clear status flag to indicate the debugger shouldn't break */
-    HBDB_FLAG_CLEAR(interp, HBDB_BREAK);
+    /*HBDB_FLAG_CLEAR(interp, HBDB_BREAK);*/
 }
 
 /* FIXME Find a more logical order for the arguments to disassemble_op()   */
@@ -1577,6 +1668,8 @@ display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp))
 {
     ASSERT_ARGS(display_breakpoint)
 
+    /* TODO Add check if we're in a function and if so, display value of arguments */
+
     Parrot_io_printf(hbdb->debugger,
                       "Breakpoint %d at %04d: ",
                       bp->id,
@@ -1588,7 +1681,7 @@ display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp))
     if (bp->line)
         Parrot_io_printf(hbdb->debugger, ", line %d", bp->line);
 
-    if (bp->skip < 0)
+    if (bp->skip == -1)
         Parrot_io_printf(hbdb->debugger, "  (DISABLED)");
 
     Parrot_io_printf(hbdb->debugger, "\n");
@@ -1983,3 +2076,4 @@ part of Google Summer of Code 2011.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
+

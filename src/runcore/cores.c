@@ -813,12 +813,13 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
         /* Store current opcode */
         interp->hbdb->current_opcode = pc;
 
+        /* Check whether a command has indicated that execution should pause or continue */
         if (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
             hbdb_start(interp, pc);
         }
         else {
-            /*if (hbdb_check_bp()) {*/
-            if ("REMOVE ME") {
+            /* Execution should continue but check for active breakpoints first */
+            if (hbdb_check_breakpoint(interp)) {
                 hbdb_start(interp, pc);
                 continue;
             }

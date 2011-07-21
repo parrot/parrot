@@ -132,6 +132,10 @@ long add_label(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*file);
 
+PARROT_WARN_UNUSED_RESULT
+unsigned int hbdb_check_breakpoint(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -184,14 +188,15 @@ void hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file) \
     , PARROT_ASSERT_ARG(cur_opcode))
+#define ASSERT_ARGS_hbdb_check_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
@@ -231,8 +236,7 @@ void hbdb_start(PARROT_INTERP, ARGIN(opcode_t *pc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_hbdb_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pc))
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/hbdb.c */
 
