@@ -198,7 +198,6 @@ sub run_ops {
     my ($cf) = @_;
     
     while (1) {
-        m0_say "PC is $cf->[PC], chunk is '$cf->[CHUNK]'";
         my $init_pc = $cf->[PC];
         my $instr_count = scalar(@{$cf->[BCS]});
         if ($init_pc >= $instr_count){
@@ -233,6 +232,23 @@ sub load_m0b {
     parse_m0b_chunks($interp, $m0b, \$cursor);
 }
 
+
+=item C<i>
+
+helper function to convert Perl ints to/from M0 ints and to reduce visual
+noise, probably pubishable in some countries
+
+=cut
+
+sub i {
+    if (scalar(@_) == 2) {
+        my ($cf, $reg) = @_;
+        return unpack('L', $cf->[$reg]);
+    }
+    return pack('L', $_[0] & 0xFFFFFFFF);
+}
+
+
 sub m0_opfunc_noop {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "noop $a1, $a2, $a3";
@@ -251,15 +267,15 @@ sub m0_opfunc_goto_if {
     my $offset = 256 * $a1 + $a2;
     m0_say "goto_if $a1, $a2, $a3 ($offset, $$cf->[$a3])";
 
-    my $cond   = $$cf->[$a3];
+    my $cond   = i($$cf,$a3);
     $$cf->[PC] = $offset if ($cond);
 }
 
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
-    my $new_pc      = $$cf->[$a1];
-    my $chunk_name  = $$cf->[$a2];
+    my $new_pc      = unpack('L', $$cf->[$a1]);
+    my $chunk_name  = unpack('a', bytes::substr($$cf->[$a2], 2));
     my $interp      = $$cf->[INTERP];
 
     m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
@@ -277,9 +293,9 @@ sub m0_opfunc_goto_chunk {
 
 sub m0_opfunc_add_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "add_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "add_i $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
+    $$cf->[$a1] = i( i($$cf,$a2) + i($$cf,$a3) );
 }
 
 sub m0_opfunc_add_n {
@@ -291,9 +307,9 @@ sub m0_opfunc_add_n {
 
 sub m0_opfunc_sub_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "sub_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "sub_i $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
+    $$cf->[$a1] = i( i($$cf,$a2) - i($$cf,$a3) );
 }
 
 sub m0_opfunc_sub_n {
@@ -305,9 +321,9 @@ sub m0_opfunc_sub_n {
 
 sub m0_opfunc_mult_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mult_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "mult_i $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
+    $$cf->[$a1] = i( i($$cf,$a2) * i($$cf,$a3) );
 }
 
 sub m0_opfunc_mult_n {
@@ -321,7 +337,7 @@ sub m0_opfunc_div_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "div_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
-    $$cf->[$a1] = int($$cf->[$a2] / $$cf->[$a3]);
+    $$cf->[$a1] = i(int( i($$cf,$a2) / i($$cf,$a3) ));
 }
 
 sub m0_opfunc_div_n {
@@ -335,7 +351,7 @@ sub m0_opfunc_mod_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "mod_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
 
-    $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
+    $$cf->[$a1] = i( i($$cf,$a2) % i($$cf,$a3) );
 }
 
 sub m0_opfunc_mod_n {
@@ -347,86 +363,79 @@ sub m0_opfunc_mod_n {
 
 sub m0_opfunc_convert_i_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "convert_i_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "convert_i_n $a1, $a2, $a3";
 
     $$cf->[$a1] = int($$cf->[$a2]);
 }
 
 sub m0_opfunc_convert_n_i{
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "convert_n_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "convert_n_i $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2];
+    $$cf->[$a1] = i($$cf,$a2);
 }
 
 sub m0_opfunc_ashr {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "ashr $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "ashr $a1, $a2, $a3";
 
     {
         # shift right with sign extension
         use integer;
-        $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
-        $$cf->[$a1] &= 0xFFFFFFFF;
+        $$cf->[$a1] = i( i($$cf,$a2) >> i($$cf,$a3) );
     }
 }
 
 sub m0_opfunc_lshr {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "lshr $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "lshr $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] >> $$cf->[$a3];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) >> i($$cf,$a3) );
 }
 
 sub m0_opfunc_shl {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "shl $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "shl $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] << $$cf->[$a3];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) << i($$cf,$a3) );
 }
 
 sub m0_opfunc_and {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "and $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "and $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] & $$cf->[$a3];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) & i($$cf,$a3) );
 }
 
 sub m0_opfunc_or {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "or $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "or $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] | $$cf->[$a3];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) | i($$cf,$a3) );
 }
 
 sub m0_opfunc_xor {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "xor $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "xor $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] ^ $$cf->[$a3];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) ^ i($$cf,$a3) );
 }
 
 sub m0_opfunc_not {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "not $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], x)";
+    m0_say "not $a1, $a2, $a3";
 
-    $$cf->[$a1] = !$$cf->[$a2];
-    $$cf->[$a1] &= 0xFFFFFFFF;
+    $$cf->[$a1] = i( i($$cf,$a2) ^ 0xFFFFFFFF);
 }
 
 sub m0_opfunc_gc_alloc {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "gc_alloc $a1, $a2, $a3 ($$cf->[$a2] bytes, flags = $$cf->[$a3])";
+    m0_say "gc_alloc $a1, $a2, $a3";
 
     # "allocate" a gc-able array of the requested size
     # this isn't quite right because the requested size is in bytes, but it'll
     # work for now
-    my $word_count = $$cf->[$a2] / 8;
+    my $word_count = i($$cf,$a2) / 8;
     my $a = [];
     for my $i (0 .. $word_count) {
         $a->[$i] = 0;
@@ -446,12 +455,12 @@ sub m0_opfunc_sys_free {
 
 sub m0_opfunc_copy_mem {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "copy_mem $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "copy_mem $a1, $a2, $a3";
 }
 
 sub m0_opfunc_set {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "set $a1, $a2, $a3";
     
     $$cf->[$a1] = $$cf->[$a2];
     $$cf = $$cf->[CF];
@@ -461,57 +470,54 @@ sub m0_opfunc_set_imm {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_imm $a1, $a2, $a3";
 
-    $$cf->[$a1] = $a2 * 256 + $a3;
+    $$cf->[$a1] = i($a2 * 256 + $a3);
 }
 
 sub m0_opfunc_deref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "deref $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2][ $$cf->[$a3] ];
+    $$cf->[$a1] = $$cf->[$a2][ i($$cf,$a3) ];
 }
 
 sub m0_opfunc_set_ref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_ref $a1, $a2, $a3";
 
-    # XXX: revisit the asymmetry between this op and deref and decide whether
-    # to make them consistent
-    $$cf->[$a1][ $$cf->[$a2] ] = $$cf->[$a3];
+    $$cf->[$a1][ i($$cf,$a2) ] = $$cf->[$a3];
 }
 
 sub m0_opfunc_set_byte {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set_byte $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "set_byte $a1, $a2, $a3";
     
-    $$cf->[$a1] = bytes::substr($$cf->[$a2], $$cf->[$a3]);
+    $$cf->[$a1] = bytes::substr($$cf->[$a2], i($$cf,$a3));
     my $new_byte = bytes::chr($$cf->[$a3] & 255);
-    bytes::substr($$cf->[$a2], $$cf->[$a3], $new_byte);
+    bytes::substr($$cf->[$a2], i($$cf,$a3), $new_byte);
 }
 
 sub m0_opfunc_get_byte {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "get_byte $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "get_byte $a1, $a2, $a3";
     
-    $$cf->[$a1] = bytes::ord(bytes::substr($$cf->[$a2], $$cf->[$a3], 1));
+    $$cf->[$a1] = bytes::ord(bytes::substr($$cf->[$a2], i($$cf,$a3), 1));
 }
 
 sub m0_opfunc_set_word {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "set_word $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "set_word $a1, $a2, $a3";
     
     #turn *$3 into 4 bytes
-    my $word = pack('L', $$cf->[$a3] );
-    bytes::substr($$cf->[$a1], 4 * $$cf->[$a2], 4, $word);
+    my $word = i($$cf,$a3);
+    bytes::substr($$cf->[$a1], 4 * i($$cf,$a2), 4, $word);
 }
 
 sub m0_opfunc_get_word {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "get_word $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "get_word $a1, $a2, $a3";
     
     #$$cf->[$a1] = unpack("L", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
-    my $word = bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4);
-    $$cf->[$a1] = unpack('L', $word);
+    $$cf->[$a1] = bytes::substr($$cf->[$a2], 4 * i($$cf,$a3), 4);
 }
 
 sub m0_opfunc_csym {
@@ -536,7 +542,7 @@ sub m0_opfunc_ccall {
 
 sub m0_opfunc_print_s {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_s $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "print_s $a1, $a2, $a3";
 
     my $handle = $$cf->[$a1];
     # don't print the header
@@ -547,17 +553,17 @@ sub m0_opfunc_print_s {
 
 sub m0_opfunc_print_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2])";
+    m0_say "print_i $a1, $a2, $a3";
 
     my $handle = $$cf->[$a1];
-    my $var    = $$cf->[$a2];
+    my $var    = i($$cf,$a2);
     # TODO: print to $handle instead of stdout
     print $var;
 }
 
 sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "print_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "print_n $a1, $a2, $a3";
 
     say Dumper $$cf->[$a1];
     die;
@@ -671,7 +677,7 @@ sub m0b_parse_const_seg {
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $header       = pack("LL", $const_length+1, 0);
-        my $const        = $header . unpack("a[$const_length]x", get_bytes($m0b, $cursor, $const_length));
+        my $const        = $header . get_bytes($m0b, $cursor, $const_length);
         m0_say "found constant of length $const_length: '$const'";
         push @$consts, $const;
     }

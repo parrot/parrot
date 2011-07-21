@@ -332,8 +332,7 @@ sub m0b_constants_seg {
         }
         elsif ($type eq 'S') {
             my $const_length = length($value);
-            $bytecode .= pack("L", $const_length);
-            $bytecode .= $value;
+            $bytecode .= pack("La", $const_length, $value);
             m0_say "adding S constant '$value' to constants segment";
         }
         elsif ($type eq 'N') {
@@ -458,7 +457,7 @@ sub m0b_const_seg_length {
             m0_say "after adding N constant $value, length is $seg_length (+8)";
         }
         elsif ($type eq 'S') {
-            my $const_length = 4 + length($value);
+            my $const_length = 4 + length($value) + 1; # +1 for terminal null
             $seg_length += $const_length;
             m0_say "after adding S constant '$value', length is $seg_length (+$const_length)";
         }
