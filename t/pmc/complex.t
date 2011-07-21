@@ -1446,7 +1446,7 @@ todo:
     has_negative_zero = config_hash["has_negative_zero"]
 
     .complex_op_is("-2+0i", "1.316958+3.141593i", 'acosh' )
-    .complex_op_is("2+0i", "-1.316958+0.000000i", 'acosh' )
+    .complex_op_is("2+0i", "1.316958+0.000000i", 'acosh' )
     .complex_op_is("0-2i", "1.443635-1.570796i", 'acosh')
     .complex_op_is("0-1i", "0.881374-1.570796i", 'acosh')
     .complex_op_is("0-0.5i", "0.481212-1.570796i", 'acosh')
