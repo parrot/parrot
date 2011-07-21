@@ -1762,7 +1762,6 @@ asinh z = -ln(sqrt(1+zz) - z)
 asinh z = ln(sqrt(zz + 1) + z)
 
 asinh = i asin(-ix)
-acosh = i acos(x)
 atanh = i atan(-ix)
 
 */
@@ -1786,16 +1785,39 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
+/*
+    Unlike asinh and atanh, we cannot simply use a sign-changed variation of acos.
+    acosh is either [A] i*acos(z), or [B] -i*acos(z), depending on z.
+    The calculations to determine whether to use formula A or B
+    are more complex than just calculating acosh by itself, so we use:
+        acosh(z) == complex::ln( z + complex::sqrt[z-1] * complex::sqrt[z+1] )
+    When z is Real and > 1, the formula simplifies to only need Real calculations:
+        acosh(x) == log( x + sqrt(x*x - 1) );
+*/
     METHOD acosh() {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        GET_ATTR_re(INTERP, SELF, re);
+        GET_ATTR_im(INTERP, SELF, im);
 
-        (PMC *d) = PCCINVOKE(INTERP, SELF, "acos");
-        GET_ATTR_re(INTERP, d, re);
-        GET_ATTR_im(INTERP, d, im);
-        SET_ATTR_re(INTERP, e, -im);
-        SET_ATTR_im(INTERP, e,  re);
+        if ( FLOAT_IS_ZERO(im) && re > 1 ) {
+            SET_ATTR_re(INTERP, e, log(re + sqrt(re*re - 1)));
+            SET_ATTR_im(INTERP, e, 0);
+        }
+        else {
+            SET_ATTR_re(INTERP, d,  re+1);
+            SET_ATTR_im(INTERP, d,  im);
+            SET_ATTR_re(INTERP, e,  re-1);
+            SET_ATTR_im(INTERP, e,  im);
+
+            (PMC *d) = PCCINVOKE(INTERP, d, "sqrt");
+            (PMC *e) = PCCINVOKE(INTERP, e, "sqrt");
+
+            Parrot_Complex_multi_i_multiply_Complex(INTERP, e, d);
+            Parrot_Complex_multi_i_add_Complex(INTERP, e, SELF);
+            (PMC *e) = PCCINVOKE(INTERP, e, "ln");
+        }
 
         RETURN(PMC *e);
     }
