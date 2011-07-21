@@ -25,7 +25,7 @@ requirement has not been met, all tests will be skipped.
 
 =item B<new()>
 
-Returns a new C<Parrot::Test::HBDB> object. Note that this does note actually
+Returns a new C<Parrot::Test::HBDB> object. Note that this does not actually
 start a HBDB process. For that you must invoke C<start()>.
 
     my $hbdb = Parrot::Test::HBDB->new();
