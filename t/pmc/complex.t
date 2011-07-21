@@ -1447,16 +1447,16 @@ todo:
 
     .complex_op_is("-2+0i", "1.316958+3.141593i", 'acosh' )
     .complex_op_is("2+0i", "-1.316958+0.000000i", 'acosh' )
-    .complex_op_todo("0-2i", "1.443635-1.570796i", 'acosh', "TT #1891" )
-    .complex_op_todo("0-1i", "0.881374-1.570796i", 'acosh', "TT #1891" )
-    .complex_op_todo("0-0.5i", "0.481212-1.570796i", 'acosh', "TT #1891" )
+    .complex_op_is("0-2i", "1.443635-1.570796i", 'acosh')
+    .complex_op_is("0-1i", "0.881374-1.570796i", 'acosh')
+    .complex_op_is("0-0.5i", "0.481212-1.570796i", 'acosh')
     .complex_op_is("0+0.5i", "0.481212+1.570796i", 'acosh' )
     .complex_op_is("0+1i", "0.881374+1.570796i", 'acosh' )
     .complex_op_is("0+2i", "1.443635+1.570796i", 'acosh' )
     .complex_op_is("2+3i", "1.983387+1.000144i", 'acosh' )
-    .complex_op_todo("2-3i", "1.983387-1.000144i", 'acosh', "TT #1891" )
+    .complex_op_is("2-3i", "1.983387-1.000144i", 'acosh')
     .complex_op_is("-2+3i", "1.983387+2.141449i", 'acosh' )
-    .complex_op_todo("-2-3i", "1.983387-2.141449i", 'acosh', "TT #1891" )
+    .complex_op_is("-2-3i", "1.983387-2.141449i", 'acosh')
 
     unless has_negative_zero goto todo
     .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
@@ -1588,16 +1588,16 @@ todo:
     has_negative_zero = config_hash["has_negative_zero"]
 
     .complex_op_is("-0.5+0i", "1.316958+3.141593i", 'asech' )
-    .complex_op_todo("0.5+0i", "1.316958+0.000000i", 'asech', "TT #1891" )
+    .complex_op_is("0.5+0i", "1.316958+0.000000i", 'asech')
     .complex_op_is("0-2i", "0.481212+1.570796i", 'asech' )
     .complex_op_is("0-1i", "0.881374+1.570796i", 'asech' )
     .complex_op_is("0-0.5i", "1.443635+1.570796i", 'asech' )
-    .complex_op_todo("0+0.5i", "1.443635-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("0+1i", "0.881374-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("0+2i", "0.481212-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("2+3i", "0.231335-1.420411i", 'asech', "TT #1891" )
+    .complex_op_is("0+0.5i", "1.443635-1.570796i", 'asech')
+    .complex_op_is("0+1i", "0.881374-1.570796i", 'asech')
+    .complex_op_is("0+2i", "0.481212-1.570796i", 'asech')
+    .complex_op_is("2+3i", "0.231335-1.420411i", 'asech')
     .complex_op_is("2-3i", "0.231335+1.420411i", 'asech' )
-    .complex_op_todo("-2+3i", "0.231335-1.721182i", 'asech', "TT #1891" )
+    .complex_op_is("-2+3i", "0.231335-1.721182i", 'asech')
     .complex_op_is("-2-3i", "0.231335+1.721182i", 'asech' )
 
     unless has_negative_zero goto todo
