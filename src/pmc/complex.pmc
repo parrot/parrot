@@ -1773,12 +1773,12 @@ atanh = i atan(-ix)
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         SET_ATTR_re(INTERP, d,  im);
-        SET_ATTR_im(INTERP, d, -re);
+        SET_ATTR_im(INTERP, d, FLOAT_IS_ZERO(re) ? 0.0 : -re);
 
         (PMC *d) = PCCINVOKE(INTERP, d, "asin");
         GET_ATTR_re(INTERP, d, re);
         GET_ATTR_im(INTERP, d, im);
-        SET_ATTR_re(INTERP, d, -im);
+        SET_ATTR_re(INTERP, d, FLOAT_IS_ZERO(im) ? 0.0 : -im);
         SET_ATTR_im(INTERP, d,  re);
 
         RETURN(PMC *d);
@@ -1828,12 +1828,12 @@ atanh = i atan(-ix)
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         SET_ATTR_re(INTERP, d,  im);
-        SET_ATTR_im(INTERP, d, -re);
+        SET_ATTR_im(INTERP, d, FLOAT_IS_ZERO(re) ? 0.0 : -re);
 
         (PMC *d) = PCCINVOKE(INTERP, d, "atan");
         GET_ATTR_re(INTERP, d, re);
         GET_ATTR_im(INTERP, d, im);
-        SET_ATTR_re(INTERP, d, -im);
+        SET_ATTR_re(INTERP, d, FLOAT_IS_ZERO(im) ? 0.0 : -im);
         SET_ATTR_im(INTERP, d,  re);
 
         RETURN(PMC *d);
