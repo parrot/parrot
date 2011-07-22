@@ -2327,6 +2327,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
 {
+    ASSERT_ARGS(Parrot_pf_load_bytecode_search)
     const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
     STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
