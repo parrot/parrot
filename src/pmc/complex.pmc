@@ -1769,7 +1769,6 @@ atanh = i atan(-ix)
     METHOD asinh() {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1779,10 +1778,10 @@ atanh = i atan(-ix)
         (PMC *d) = PCCINVOKE(INTERP, d, "asin");
         GET_ATTR_re(INTERP, d, re);
         GET_ATTR_im(INTERP, d, im);
-        SET_ATTR_re(INTERP, e, -im);
-        SET_ATTR_im(INTERP, e,  re);
+        SET_ATTR_re(INTERP, d, -im);
+        SET_ATTR_im(INTERP, d,  re);
 
-        RETURN(PMC *e);
+        RETURN(PMC *d);
     }
 
 /*
@@ -1825,7 +1824,6 @@ atanh = i atan(-ix)
     METHOD atanh() {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1835,10 +1833,10 @@ atanh = i atan(-ix)
         (PMC *d) = PCCINVOKE(INTERP, d, "atan");
         GET_ATTR_re(INTERP, d, re);
         GET_ATTR_im(INTERP, d, im);
-        SET_ATTR_re(INTERP, e, -im);
-        SET_ATTR_im(INTERP, e,  re);
+        SET_ATTR_re(INTERP, d, -im);
+        SET_ATTR_im(INTERP, d,  re);
 
-        RETURN(PMC *e);
+        RETURN(PMC *d);
     }
 
     METHOD acoth() {
