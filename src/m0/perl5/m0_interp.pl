@@ -546,7 +546,8 @@ sub m0_opfunc_print_s {
 
     my $handle = $$cf->[$a1];
     # don't print the header
-    my $var    = bytes::substr($$cf->[$a2], 8);
+    my $byte_count = unpack('L', bytes::substr($$cf->[$a2], 0, 4));
+    my $var    = bytes::substr($$cf->[$a2], 8, $byte_count-1);
     # TODO: print to $handle instead of stdout
     print $var;
 }
