@@ -1457,19 +1457,17 @@ todo:
     .complex_op_is("2-3i", "1.983387-1.000144i", 'acosh')
     .complex_op_is("-2+3i", "1.983387+2.141449i", 'acosh' )
     .complex_op_is("-2-3i", "1.983387-2.141449i", 'acosh')
+    .complex_op_is("-1+0i", "0.000000+3.141593i", 'acosh' )
+    .complex_op_is("1+0i", "0.000000+0.000000i", 'acosh' )
 
     unless has_negative_zero goto todo
-    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
     .complex_op_is("-0.5+0i", "-0.000000+2.094395i", 'acosh' )
     .complex_op_is("0.5+0i", "-0.000000+1.047198i", 'acosh' )
-    .complex_op_is("1+0i", "-0.000000+0.000000i", 'acosh' )
     .return()
 
 todo:
-    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'acosh', 'TT #313' )
     .complex_op_todo("-0.5+0i", "-0.000000+2.094395i", 'acosh', 'TT #313' )
     .complex_op_todo("0.5+0i", "-0.000000+1.047198i", 'acosh', 'TT #313' )
-    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'acosh', 'TT #313' )
     .return()
 .end
 
@@ -1599,18 +1597,16 @@ todo:
     .complex_op_is("2-3i", "0.231335+1.420411i", 'asech' )
     .complex_op_is("-2+3i", "0.231335-1.721182i", 'asech')
     .complex_op_is("-2-3i", "0.231335+1.721182i", 'asech' )
+    .complex_op_is("-1+0i", "0.000000+3.141593i", 'asech' )
+    .complex_op_is("1+0i", "0.000000+0.000000i", 'asech' )
 
     unless has_negative_zero goto todo
     .complex_op_is("-2+0i", "-0.000000+2.094395i", 'asech' )
-    .complex_op_is("-1+0i", "-0.000000+3.141593i", 'asech' )
-    .complex_op_is("1+0i", "-0.000000+0.000000i", 'asech' )
     .complex_op_is("2+0i", "-0.000000+1.047198i", 'asech' )
     .return()
 
 todo:
     .complex_op_todo("-2+0i", "-0.000000+2.094395i", 'asech', 'TT #313' )
-    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'asech', 'TT #313' )
-    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'asech', 'TT #313' )
     .complex_op_todo("2+0i", "-0.000000+1.047198i", 'asech', 'TT #313' )
     .return()
 .end
