@@ -591,13 +591,13 @@ CODA
     $S2 = join ', ', pcc_retv
     $S3 = 'sprintf'(<<'TEMPLATE', $S0, $S1, $S2)
     %s;
-    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "%s", %s);
+    Parrot_pcc_set_call_from_c_args(interp, call_object, "%s", %s);
 TEMPLATE
     .return ($S3)
 
   empty_ret:
     $S0 = <<'RET'
-    ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "");
+    Parrot_pcc_set_call_from_c_args(interp, call_object, "");
 RET
     .return ($S0)
 .end
@@ -718,9 +718,7 @@ TEMPLATE
     void *orig_func;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
-    PMC *       ret_object  = PMCNULL;
     %s;
-    UNUSED(ret_object);
 TEMPLATE
 
     .return (var_decls)
@@ -1066,7 +1064,7 @@ JSON
     $I1 = !$I1
     $I0 = $I0 || $I1 # not (not exists v[ret_assign] and exists v[sig_char])
     if $I0 goto has_ret_assign
-        $S0 = 'ret_object = Parrot_pcc_build_call_from_c_args(interp, call_object, "'
+        $S0 = 'Parrot_pcc_set_call_from_c_args(interp, call_object, "'
         $S1 = v['sig_char']
         $S0 = concat $S0, $S1
         $S0 = concat $S0, '", return_data);'

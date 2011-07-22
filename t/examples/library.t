@@ -49,7 +49,7 @@ my $PARROT = File::Spec->catfile( File::Spec->curdir(), $PConfig{test_prog} );
 # For testing md5sum.pir we need to pass a filename
 {
     my $md5sum_fn = File::Spec->catfile(qw( examples library md5sum.pir ));
-    my $sample_fn = File::Spec->catfile(qw( t library perlhist.txt ));
+    my $sample_fn = File::Spec->catfile(qw( t library perlhistory.txt ));
     my $sum       = `$PARROT $md5sum_fn $sample_fn`;
     is( $sum, "fb171bd1a17bf6cd08d73105ad738a35\t$sample_fn\n", $md5sum_fn );
 }

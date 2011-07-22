@@ -1440,12 +1440,14 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             /* Unfortunately, there is no strrstr, then iterate until last */
             char *aux = strstr(real_name + 3, ns_sep);
 
-            while (aux) {
-                real_name = aux;
-                aux       = strstr(real_name + 3, ns_sep);
-            }
+            if (aux) {
+                while (aux) {
+                    real_name = aux;
+                    aux       = strstr(real_name + 3, ns_sep);
+                }
 
-            real_name += 3;
+                real_name += 3;
+            }
         }
 
         IMCC_debug(imcc, DEBUG_PBC_CONST,

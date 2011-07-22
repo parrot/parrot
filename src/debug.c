@@ -754,7 +754,7 @@ In echo mode the script commands are written to stderr before executing."
     },
     cmd_enable = {
         & dbg_enable,
-        "reenable a disabled breakpoint",
+        "re-enable a disabled breakpoint",
 "Re-enable a disabled breakpoint."
     },
     cmd_eval = {

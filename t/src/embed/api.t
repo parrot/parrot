@@ -273,8 +273,8 @@ c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_get_ex
 #include "imcc/api.h"
 
 int main(void) {
-    Parrot_PMC interp, exception;
-    Parrot_String errmsg, backtrace;
+    Parrot_PMC interp, exception, pmc;
+    Parrot_String errmsg, backtrace, pmc_s;
     Parrot_Int exit_code, is_error;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
@@ -284,7 +284,14 @@ int main(void) {
     Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg);
 
     Parrot_api_get_exception_backtrace(interp, exception, &backtrace);
-    printf("%s",backtrace);
+
+    /* Covers code for a null exception pmc being passed in */
+    Parrot_api_get_result(interp, &is_error, &pmc, &exit_code, &errmsg);
+
+    /* Covers code for a null backtrace pmc being passed in */
+    Parrot_api_pmc_get_string(interp, pmc, &pmc_s);
+    Parrot_api_get_exception_backtrace(interp, exception, &pmc_s);
+    return 0;
 }
 CODE
 OUTPUT

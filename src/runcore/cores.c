@@ -791,6 +791,8 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
 
 =back
 
+=cut
+
 */
 
 /*

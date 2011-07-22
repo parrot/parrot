@@ -422,9 +422,11 @@ Returns the PMC global value for C<key>.
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         Interp * const new_interp = PMC_interp(SELF);
 
-        if (key >= 0 && key < IGLOBALS_SIZE)
-            return VTABLE_get_pmc_keyed_int(new_interp,
-                new_interp->iglobals, key);
+        if (key >= 0 && key < IGLOBALS_SIZE) {
+            PMC * const val = VTABLE_get_pmc_keyed_int(new_interp,
+                    new_interp->iglobals, key);
+            return val == NULL ? PMCNULL : val;
+        }
 
         /* quick hack to get the global stash */
         if (key == -1)
