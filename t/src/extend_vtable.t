@@ -951,7 +951,7 @@ extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
 
     integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
     Parrot_printf(interp,"pointer = %d\n", integer);
-    if (integer > 0)
+    if (integer != NULL)
         Parrot_printf(interp,"Got pointer!n");
 CODE
 
@@ -965,7 +965,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
     ns = Parrot_PMC_get_namespace(interp, rpa);
 
     integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed(interp, ns, key_int);
-    if (integer > 0)
+    if (integer != NULL)
         Parrot_printf(interp,"Got pointer_keyed!\n", integer);
 CODE
 Got pointer_keyed!
