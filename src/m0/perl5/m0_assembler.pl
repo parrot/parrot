@@ -340,8 +340,7 @@ sub m0b_constants_seg {
             m0_say "adding S constant '$value' to constants segment ($string_length bytes)";
         }
         elsif ($type eq 'N') {
-            die "don't know how to add N constants: m0 assembler needs love";
-            $bytecode .= pack("L", 4);
+            $bytecode .= pack("Lf", 4, $value + 0.0);
             m0_say "adding N constant $value to constants segment";
         }
     }
@@ -565,6 +564,10 @@ sub parse_chunks {
                 }
                 elsif ($c =~ /^\d+$/) {
                     $c = "I:$c";
+                }
+                # XXX: way too simplistic; should be able to parse real floats
+                elsif ($c =~ /^\d+\.\d+$/) {
+                    $c = "N:$c";
                 }
                 else {
                     die "unhandled constant type: '$c' at line $$cursor";
