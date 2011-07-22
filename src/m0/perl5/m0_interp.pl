@@ -248,6 +248,14 @@ sub i {
     return pack('L', $_[0] & 0xFFFFFFFF);
 }
 
+sub n {
+    if (scalar(@_) == 2) {
+        my ($cf, $reg) = @_;
+        return unpack('f', $cf->[$reg]);
+    }
+    return pack('f', $_[0] & 0xFFFFFFFF);
+}
+
 
 sub m0_opfunc_noop {
     my ($cf, $a1, $a2, $a3) = @_;
@@ -300,9 +308,9 @@ sub m0_opfunc_add_i {
 
 sub m0_opfunc_add_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "add_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "add_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] + $$cf->[$a3];
+    $$cf->[$a1] = n( n($$cf,$a2) + n($$cf,$a3) );
 }
 
 sub m0_opfunc_sub_i {
@@ -314,9 +322,9 @@ sub m0_opfunc_sub_i {
 
 sub m0_opfunc_sub_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "sub_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "sub_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] - $$cf->[$a3];
+    $$cf->[$a1] = n( n($$cf,$a2) - n($$cf,$a3) );
 }
 
 sub m0_opfunc_mult_i {
@@ -328,37 +336,37 @@ sub m0_opfunc_mult_i {
 
 sub m0_opfunc_mult_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mult_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "mult_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] * $$cf->[$a3];
+    $$cf->[$a1] = n( n($$cf,$a2) * n($$cf,$a3) );
 }
 
 sub m0_opfunc_div_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "div_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "div_i $a1, $a2, $a3";
 
     $$cf->[$a1] = i(int( i($$cf,$a2) / i($$cf,$a3) ));
 }
 
 sub m0_opfunc_div_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "div_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "div_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] / $$cf->[$a3];
+    $$cf->[$a1] = n( n($$cf,$a2) / n($$cf,$a3) );
 }
 
 sub m0_opfunc_mod_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mod_i $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "mod_i $a1, $a2, $a3";
 
     $$cf->[$a1] = i( i($$cf,$a2) % i($$cf,$a3) );
 }
 
 sub m0_opfunc_mod_n {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mod_n $a1, $a2, $a3 ($$cf->[$a1], $$cf->[$a2], $$cf->[$a3])";
+    m0_say "mod_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = $$cf->[$a2] % $$cf->[$a3];
+    $$cf->[$a1] = n( n($$cf,$a2) % n($$cf,$a3) );
 }
 
 sub m0_opfunc_convert_i_n {
@@ -566,10 +574,8 @@ sub m0_opfunc_print_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "print_n $a1, $a2, $a3";
 
-    say Dumper $$cf->[$a1];
-    die;
     my $handle = $$cf->[$a1];
-    my $var    = $$cf->[$a2];
+    my $var    = n($$cf,$a2);
     # TODO: print to $handle instead of stdout
     say $var;
 }
