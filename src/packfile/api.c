@@ -357,6 +357,18 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+/*
+
+=item C<PMC * Parrot_pf_subs_by_flag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
+
+Get an array of Subs in the packfile by named flag.
+
+Currently accepted values are "load" and "init".
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -2321,6 +2333,17 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     Parrot_pop_context(interp);
 }
+
+/*
+
+=item C<PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, STRING *file)>
+
+Load a .pbc bytecode by short name, looking in standard search paths. Return
+a PackfileView PMC
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL

@@ -76,7 +76,7 @@ you would write something similar to:
         Foo_ptr = Parrot_dlsym(lib, "Foo");
     }
 
-=item C<void* find_hmodule_from_func(void *func)>
+=item C<static void* find_hmodule_from_func(void * func)>
 
 Attempt a lookup of an owning HMODULE with nothing but the address of an
 exported function pointer from that HMODULE. This relies on a trick where the
