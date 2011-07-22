@@ -329,31 +329,26 @@ sub m0b_constants_seg {
         if ($type eq 'I') {
             $bytecode .= pack("LL", 4, $value);
             my $s = pack("LL", 4, $value);
-            m0_say 'byte 0 is '.ord(bytes::substr($s, 0, 1));
-            m0_say 'byte 1 is '.ord(bytes::substr($s, 1, 1));
-            m0_say 'byte 2 is '.ord(bytes::substr($s, 2, 1));
-            m0_say 'byte 3 is '.ord(bytes::substr($s, 3, 1));
-            m0_say 'byte 4 is '.ord(bytes::substr($s, 4, 1));
-            m0_say 'byte 5 is '.ord(bytes::substr($s, 5, 1));
-            m0_say 'byte 6 is '.ord(bytes::substr($s, 6, 1));
-            m0_say 'byte 7 is '.ord(bytes::substr($s, 7, 1));
             m0_say "adding I constant $value to constants segment";
         }
         elsif ($type eq 'S') {
-            my $const_length = length($value);
-            $bytecode .= pack("La", $const_length, $value);
+            #TODO: pad all strings to word length
+            my $const_length = bytes::length($value) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
+            my $string_length = bytes::length($value) + 1; # byte count + terminal null
+            my $encoding = 0;
+            $bytecode .= pack("LLLax", $const_length, $string_length, $encoding, $value);
             m0_say "adding S constant '$value' to constants segment";
         }
         elsif ($type eq 'N') {
-            $bytecode .= pack("L", 4);
             die "don't know how to add N constants: m0 assembler needs love";
+            $bytecode .= pack("L", 4);
             m0_say "adding N constant $value to constants segment";
         }
     }
 
     return $bytecode;
 }
-                  
+
 
 =item C<m0b_dir_seg>
 
@@ -466,7 +461,8 @@ sub m0b_const_seg_length {
             m0_say "after adding N constant $value, length is $seg_length (+8)";
         }
         elsif ($type eq 'S') {
-            my $const_length = 4 + length($value) + 1; # +1 for terminal null
+            # const size + byte count + encoding + string bytes + terminal null
+            my $const_length = 4 + bytes::length($value) + 4 + 4 + 1;
             $seg_length += $const_length;
             m0_say "after adding S constant '$value', length is $seg_length (+$const_length)";
         }
