@@ -59,8 +59,7 @@ const int debug)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
-DEPRECATED: Use Parrot_pf_read_pbc_file and Parrot_pf_prepare_packfile_init
-functions instead.
+DEPRECATED: Use Parrot_pf_read_pbc_file instead.
 
 =cut
 
@@ -76,7 +75,6 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, str);
     PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
     UNUSED(debug);
-    Parrot_pf_prepare_packfile_init(interp, pfpmc);
     return (Parrot_PackFile)pfpmc;
 }
 
@@ -106,7 +104,7 @@ Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 
 Fixups after pbc loading
 
-DEPRECATED: Don't use this.
+DEPRECATED: Don't use this. Use Parrot_pf_prepare_packfile_load instead.
 
 =cut
 

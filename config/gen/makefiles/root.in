@@ -1606,9 +1606,6 @@ src/packfile/api$(O) : \
     src/packfile/api.c \
     src/packfile/pf_private.h \
     include/pmc/pmc_sub.h \
-    include/pmc/pmc_key.h \
-    include/pmc/pmc_parrotlibrary.h \
-    include/pmc/pmc_ptrobj.h \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/embed.h \

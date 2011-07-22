@@ -265,14 +265,9 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
         }
     }
 
-    METHOD trigger(STRING * flag) {
-        if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
-            Parrot_pf_prepare_packfile_load(INTERP, SELF);
-        else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
-            Parrot_pf_prepare_packfile_init(INTERP, SELF);
-        else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "%S is not a valid packfile trigger", flag);
+    METHOD subs_by_flag(STRING *flag) {
+        PMC * const subs = Parrot_pf_subs_by_flag(INTERP, SELF, flag);
+        RETURN(PMC *subs);
     }
 
     METHOD all_subs() {

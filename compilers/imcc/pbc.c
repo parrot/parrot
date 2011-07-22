@@ -2149,9 +2149,6 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (!(pragma & P_ANON))
-        return;
-
     if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
@@ -2163,6 +2160,8 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         memset(&imcc->ghash, 0, sizeof (SymHash));
 
         IMCC_debug(imcc, DEBUG_PBC, "immediate sub '%s'", ins->symregs[0]->name);
+        /* TODO: Don't use this function, it is deprecated (TT #2140). We need
+           to find a better mechanism to do this. */
         PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
 
         imcc->globals  = g;
