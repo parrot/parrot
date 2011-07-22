@@ -100,7 +100,7 @@ static void*
 find_hmodule_from_func(void * func)
 {
     MEMORY_BASIC_INFORMATION mbi;
-    if (VirtualQuery(func, &mbi, sizeof(mbi)))
+    if (VirtualQuery(func, &mbi, sizeof (mbi)))
         return mbi.AllocationBase;
     return NULL;
 }
