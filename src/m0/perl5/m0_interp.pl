@@ -674,12 +674,14 @@ sub m0b_parse_const_seg {
 
     my $const_count = unpack("L", get_bytes($m0b, $cursor, 4));
     my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $const_num   = 0;
     m0_say "found $const_count constants occupying $byte_count bytes";
 
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
         my $const        = get_bytes($m0b, $cursor, $const_length);
-        m0_say "found constant of length $const_length";
+        m0_say "found constant #$const_num of length $const_length";
+        $const_num++;
         for (my $i = 0; $i < bytes::length($const); $i++) {
             m0_say "byte $i is ".ord(bytes::substr($const, $i, 1));
         }

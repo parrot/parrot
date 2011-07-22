@@ -336,8 +336,8 @@ sub m0b_constants_seg {
             my $const_length = bytes::length($value) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
             my $string_length = bytes::length($value) + 1; # byte count + terminal null
             my $encoding = 0;
-            $bytecode .= pack("LLLax", $const_length, $string_length, $encoding, $value);
-            m0_say "adding S constant '$value' to constants segment";
+            $bytecode .= pack("LLLa[$string_length]", $const_length, $string_length, $encoding, $value);
+            m0_say "adding S constant '$value' to constants segment ($string_length bytes)";
         }
         elsif ($type eq 'N') {
             die "don't know how to add N constants: m0 assembler needs love";
