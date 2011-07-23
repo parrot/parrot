@@ -153,7 +153,7 @@ sub new_interp {
     $interp->[CHUNKS] = [];
 
     # make cli arguments accessible to M0 code
-    $interp->[M0_ARGC] = $#ARGV + 1;
+    $interp->[M0_ARGC] = i($#ARGV + 1);
     $interp->[M0_ARGV] = \@ARGV;
 
     return $interp;
@@ -584,7 +584,7 @@ sub m0_opfunc_exit {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "exit $a1, $a2, $a3";
 
-    exit($$cf->[$a1]);
+    exit(i($$cf,$a1));
 }
 
 
