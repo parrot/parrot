@@ -176,7 +176,7 @@ of M0 ops.
 In descriptions, C<$1> refers to the value of the first argument to an op,
 C<$2> to the second and C<$3> to the third.  Any op can operate on any
 register; types are only by convention.  As far as an M0 VM is conerned, the
-256 ops are nothing more than an array of 256 uint32-sized chunks of data.
+256 ops are nothing more than an array of 256 int32-sized chunks of data.
 
 Note that this documentation uses a C-like syntax to differentiate between a
 register's number and the value pointed to by the regster. C<$1> refers to a
@@ -690,12 +690,12 @@ The header has the following structure:
 The directory segment will be a list of offsets to the starts of chunks within
 the file.  It will have the following structure:
 
-  uint32 : M0_DIR_SEG
-  uint32 : number of chunks in this segment
-  uint32 : number of bytes in this segment (including this header)
+  int32 : M0_DIR_SEG
+  int32 : number of chunks in this segment
+  int32 : number of bytes in this segment (including this header)
   [
-    uint32 : offset of a constants segment
-    uint32 : size of chunk name in bytes
+    int32 : offset of a constants segment
+    int32 : size of chunk name in bytes
     [
       char : chunk name
     ]
@@ -704,11 +704,11 @@ the file.  It will have the following structure:
 The constants segment will contain any data needed to execute the bytecode.
 Data in constants table must be explictly loaded into registers as needed.
 
-  uint32 : M0_CONST_SEG
-  uint32 : number of constants in this segment
-  uint32 : number of bytes in this segment (including this header)
+  int32 : M0_CONST_SEG
+  int32 : number of constants in this segment
+  int32 : number of bytes in this segment (including this header)
   [
-    uint32 : number of bytes in constant data
+    int32 : number of bytes in constant data
     ...    : constant data
   ]
 
@@ -716,13 +716,13 @@ The metadata segment contains any data about the bytecode that might come in
 handy.  The actual data will live in the constants table; this segment just
 provides a way to map values to names and bytecode offsets.
 
-  uint32 : M0_META_SEG
-  uint32 : number of entries in this segment
-  uint32 : number of bytes in this segment (including this header)
+  int32 : M0_META_SEG
+  int32 : number of entries in this segment
+  int32 : number of bytes in this segment (including this header)
   [
-    uint32 : bytecode offset relative to the start of the current bc seg where this data becomes effective
-    uint32 : offset into constants table for the name of this piece of metadata
-    uint32 : offset into constants table for the value of this piece of metadata
+    int32 : bytecode offset relative to the start of the current bc seg where this data becomes effective
+    int32 : offset into constants table for the name of this piece of metadata
+    int32 : offset into constants table for the value of this piece of metadata
   ]
 
 The bytecode segment contains a series of executable ops.  A pointer (or its
@@ -730,9 +730,9 @@ equivalent for a non-C language) to the current call frame will be passed as
 the first argument to every op, but this pointer will not be stored in
 bytecode.
 
-  uint32 : M0_BC_SEG
-  uint32 : number of ops in this segment
-  uint32 : number of bytes in this segment (including this header)
+  int32 : M0_BC_SEG
+  int32 : number of ops in this segment
+  int32 : number of bytes in this segment (including this header)
   [
     char : opcode
     char : arg1
