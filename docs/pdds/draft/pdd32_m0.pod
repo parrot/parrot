@@ -32,13 +32,13 @@ Completed milestones:
 
 =item * add two integer registers, store the result
 
+=item * calculate the hash of a hard-coded string (any non-trivial algorithm)
+
 =back
 
 Incomplete milestones:
 
 =over
-
-=item * calculate the hash of a hard-coded string (any non-trivial algorithm)
 
 =item * call a function with an argument, return a value
 
