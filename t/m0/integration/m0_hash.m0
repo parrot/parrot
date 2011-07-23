@@ -7,6 +7,9 @@
 3 "I wish I were a jellyfish that cannot fall down stairs."
 # XXX: the assembler isn't smart enough to properly store ints in m0b.
 4 67827064
+5 "step "
+6 ": tmp = "
+7 "\n"
 .metadata
 .bytecode
 
@@ -23,6 +26,14 @@
     # calculate the hash of string 3 #
     ##################################
 hash_calc_init:
+
+    # set up some constants for debugging output
+    set_imm S10, 0, 5
+    deref   S10, CONSTS, S10
+    set_imm S11, 0, 6
+    deref   S11, CONSTS, S11
+    set_imm S12, 0, 7
+    deref   S12, CONSTS, S12
 
     set_imm S0, 0, 3
     deref   S0, CONSTS, S0
@@ -50,18 +61,50 @@ hash_loop_start:
     add_i   I3, I3, I2
     get_byte I3, S0, I3
 
+    # debugging output
+#    print_s I0, S10, x
+#    set_imm I10, 0, 1
+#    print_i I0, I10, x
+#    print_s I0, S11, x
+#    print_i I0, I3, x
+#    print_s I0, S12, x
+
     # tmp += (hash << 6);
     set_imm I5, 0, 6
     shl     I5, I4, I5
     add_i   I3, I3, I5
+
+    # debugging output
+#    print_s I0, S10, x
+#    set_imm I10, 0, 2
+#    print_i I0, I10, x
+#    print_s I0, S11, x
+#    print_i I0, I3, x
+#    print_s I0, S12, x
 
     # tmp += (hash << 16);
     set_imm I5, 0, 16
     shl     I5, I4, I5
     add_i   I3, I3, I5    
 
+    # debugging output
+#    print_s I0, S10, x
+#    set_imm I10, 0, 3
+#    print_i I0, I10, x
+#    print_s I0, S11, x
+#    print_i I0, I3, x
+#    print_s I0, S12, x
+
     # hash = tmp - hash;
     sub_i   I4, I3, I4
+
+    # debugging output
+#    print_s I0, S10, x
+#    set_imm I10, 0, 4
+#    print_i I0, I10, x
+#    print_s I0, S11, x
+#    print_i I0, I3, x
+#    print_s I0, S12, x
 
     # increment the index into the string
     set_imm I5, 0, 1
@@ -69,21 +112,15 @@ hash_loop_start:
 
     # if we're at the end of the string, break
     sub_i I5, I2, I1
-    not I5, I5, x
-    goto_if hash_loop_end, I5
-    goto    hash_loop_start, x
+    goto_if hash_loop_start, I5
+    goto    hash_loop_end, x
 
 hash_loop_end:
     
     # I4 contains the calculated hash
     # store known-good hash in I1
-    # The m0 assembler can't currently deal with large int constants, so
-    # calculate a known-good hash manually.  It should add up to 67827064.
-    set_imm I1, 4, 10
-    set_imm I2, 245, 120
-    set_imm I3, 0, 16
-    shl     I1, I1, I3
-    add_i   I1, I1, I2
+    set_imm I1, 0, 4
+    deref   I1, CONSTS, I1
 
     sub_i   I1, I1, I4
 
@@ -92,6 +129,7 @@ hash_loop_end:
 
 hash_test_fail:
     set_imm S0, 0, 2
+    print_i I0, I4, x
     goto print_result, x
 
 hash_test_ok:
