@@ -1687,7 +1687,7 @@ store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_
         SymReg * const flag = sub->flags[i];
         STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
                     strlen(flag->name) - 2);
-        const int tag_idx = add_const_str(imcc, tag, ct);
+        const int tag_idx = add_const_str(imcc, tag, ct->code);
         const int x = (n + i) * 2;
         ct->tag_map[x] = sub_idx;
         ct->tag_map[x + 1] = tag_idx;

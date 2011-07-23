@@ -369,6 +369,8 @@ Currently accepted values are "load" and "init".
 
 */
 
+#define USE_TAGMAP 1
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
@@ -381,6 +383,25 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "NULL packfile");
 
+#if USE_TAGMAP
+    else {
+        PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        const opcode_t nmaps = ct->ntags;
+        opcode_t flag_idx = -1;
+        opcode_t i;
+        for (i = 0; i < nmaps; i++) {
+            const opcode_t pmc_idx = ct->tag_map[i * 2];
+            const opcode_t str_idx = ct->tag_map[i * 2 + 1];
+            if (flag_idx == -1 && STRING_equal(interp, flag, ct->str.constants[str_idx]))
+                flag_idx = str_idx;
+            if (flag_idx == -1 || str_idx != flag_idx)
+                continue;
+            VTABLE_push_pmc(interp, subs, ct->pmc.constants[pmc_idx]);
+        }
+        return subs;
+    }
+#else
     if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
         mode = 1;
     else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
@@ -413,6 +434,7 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         }
         return subs;
     }
+#endif
 }
 
 /*

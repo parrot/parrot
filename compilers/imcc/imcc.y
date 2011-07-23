@@ -1461,15 +1461,20 @@ subtag:
 subtags:
    subtags COMMA STRINGC
          {
-           $$ = 0;
-           add_pcc_flag_str(imcc, imcc->cur_call, $3);
+           SymReg * const r = mk_const(imcc, $3, 'S');
+           add_pcc_flag_str(imcc, imcc->cur_call, r);
+           mem_sys_free($3);
+           $$ = r;
          }
    | STRINGC
          {
-           $$ = 0;
-           add_pcc_flag_str(imcc, imcc->cur_call, $1);
+           SymReg * const r = mk_const(imcc, $1, 'S');
+           add_pcc_flag_str(imcc, imcc->cur_call, r);
+           mem_sys_free($1);
+           $$ = r;
          }
    ;
+
 
 outer:
      OUTER '(' STRINGC ')'
