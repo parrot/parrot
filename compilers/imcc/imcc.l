@@ -308,6 +308,7 @@ SP              [ ]
 <emit,INITIAL>":init"      return INIT;
 <emit,INITIAL>":immediate" return IMMEDIATE;
 <emit,INITIAL>":postcomp"  return POSTCOMP;
+<emit,INITIAL>":tag"       return SUBTAG;
 <emit,INITIAL>":anon"      return ANON;
 <emit,INITIAL>":outer"     return OUTER;
 <emit,INITIAL>":lex"       return NEED_LEX;
