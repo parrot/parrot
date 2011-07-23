@@ -124,7 +124,6 @@ sub new_interp {
         \&m0_opfunc_and,
         \&m0_opfunc_or,
         \&m0_opfunc_xor,
-        \&m0_opfunc_not,
         \&m0_opfunc_gc_alloc,
         \&m0_opfunc_sys_alloc,
         \&m0_opfunc_sys_free,
@@ -430,13 +429,6 @@ sub m0_opfunc_xor {
     m0_say "xor $a1, $a2, $a3";
 
     $$cf->[$a1] = i( i($$cf,$a2) ^ i($$cf,$a3) );
-}
-
-sub m0_opfunc_not {
-    my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "not $a1, $a2, $a3";
-
-    $$cf->[$a1] = i( ~i($$cf,$a2));
 }
 
 sub m0_opfunc_gc_alloc {
