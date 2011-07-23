@@ -978,6 +978,8 @@ init_null_output(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 
 =back
 
+=cut
+
 */
 
 /*

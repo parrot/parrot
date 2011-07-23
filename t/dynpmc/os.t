@@ -670,7 +670,7 @@ SKIP: {
 .end
 CODE
 /\/
-chroot failed
+chroot failed(: Too many levels of symbolic links)*
 /
 OUT
     rmtree("my-super-chroot", 0, 1);

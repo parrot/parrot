@@ -486,14 +486,6 @@ Parrot_PMC Parrot_compile_string(PARROT_INTERP,
         FUNC_MODIFIES(*error);
 
 PARROT_EXPORT
-void Parrot_compreg(PARROT_INTERP,
-    ARGIN(STRING *type),
-    ARGIN(Parrot_compiler_func_t func))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
@@ -601,10 +593,6 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(code) \
     , PARROT_ASSERT_ARG(error))
-#define ASSERT_ARGS_Parrot_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(type) \
-    , PARROT_ASSERT_ARG(func))
 #define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))

@@ -42,7 +42,7 @@ releases. The developer releases:
 
 =over 4
 
-=item * Track the latest monthly feature additions and removals from trunk.
+=item * Track the latest monthly feature additions and removals from master
 
 =item * Do not receive bug/security releases. (Fixes appear in the next
 developer or supported release).
@@ -193,7 +193,7 @@ Parrot will work on all supported platforms.
 Other platforms and compilers will also be supported, but we can't
 commit to supporting a platform without at least one champion who has
 the skills to make portability fixes, and is willing to test the monthly
-developer releases, or preferably a regular checkout of trunk.  We might
+developer releases, or preferably a regular checkout of master.  We might
 not include a platform in our official support list (even with a
 champion) if supporting that platform would create an undesirable
 support burden for the other major platforms.

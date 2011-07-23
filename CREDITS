@@ -384,6 +384,12 @@ D: makefile fixes
 E: eric@lubow.org
 W: http://eric.lubow.org/
 
+N: Felipe Pena
+D: Bug fixes
+E: felipensp@gmail.com
+U: Felipe
+S: Rio de Janeiro, Brazil
+
 N: Felix Gallo
 D: delegate.pmc patch
 
@@ -490,7 +496,7 @@ D: various Pynie patches
 N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
-D: Testing of configuration and build tools
+D: Testing of configuration and build tools; release manager
 W: http://thenceforward.net/parrot/
 S: Brooklyn, NY, USA
 

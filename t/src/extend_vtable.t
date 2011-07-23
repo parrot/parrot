@@ -85,15 +85,6 @@ static void handler(Parrot_Interp interp, Parrot_PMC exception, void *unused)
                 type, severity, message);
     }
 }
-
-CODE
-
-sub extend_vtable_output_is
-{
-    my ($code, $expected_output, $msg, @opts) = @_;
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
-    c_output_is(
-        $common . linedirective(__LINE__) . <<CODE,
 PMC* PMCNULL;
 
 #define NOT_NULL(pmc)  (!((pmc) == PMCNULL || (pmc) == NULL))
@@ -139,6 +130,40 @@ void dotest(Parrot_Interp interp, void *unused)
 
     object       = Parrot_PMC_newclass(interp, pmc_string);
 
+
+CODE
+
+sub extend_vtable_output_like
+{
+    my ($code, $expected_output, $msg, @opts) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    c_output_like(
+        $common . linedirective(__LINE__) . <<CODE,
+$code
+
+    Parrot_destroy(interp);
+    printf("Done!\\n");
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    interp = new_interp();
+    Parrot_ext_try(interp, &dotest, &handler, NULL);
+    return 0;
+}
+CODE
+        $expected_output, $msg, @opts
+    );
+
+}
+
+sub extend_vtable_output_is
+{
+    my ($code, $expected_output, $msg, @opts) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    c_output_is(
+        $common . linedirective(__LINE__) . <<CODE,
 $code
 
     Parrot_destroy(interp);
@@ -915,22 +940,20 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_hashvalue");
 
     integer = Parrot_PMC_hashvalue(interp, pmc);
     if (integer != 0)
-        Parrot_printf(interp,"Got hash!\n", integer);
+        Parrot_printf(interp,"Got non-zero hash value!\n");
 CODE
-Got hash!
+Got non-zero hash value!
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
+extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
     Parrot_PMC_set_integer_native(interp, pmc, 42);
 
     integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
-    if (integer > 0)
-        Parrot_printf(interp,"Got pointer!\n", integer);
+    Parrot_printf(interp,"pointer = %d\n", integer);
+    if (integer != NULL)
+        Parrot_printf(interp,"Got pointer!n");
 CODE
-Got pointer!
-Done!
-OUTPUT
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
@@ -942,7 +965,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
     ns = Parrot_PMC_get_namespace(interp, rpa);
 
     integer = (Parrot_Int) Parrot_PMC_get_pointer_keyed(interp, ns, key_int);
-    if (integer > 0)
+    if (integer != NULL)
         Parrot_printf(interp,"Got pointer_keyed!\n", integer);
 CODE
 Got pointer_keyed!

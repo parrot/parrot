@@ -1,0 +1,174 @@
+=head1 NAME
+
+t/ - The Parrot Virtual Machine Test Suite
+
+=head1 DESCRIPTION
+
+This directory contains the official Parrot Virtual Machine test suite.
+
+For details on how tests are written see the documentation in
+docs/tests.pod L<https://github.com/parrot/parrot/blob/master/docs/tests.pod>.
+For status of the testing effort, see t/TESTS_STATUS.pod
+L<https://github.com/parrot/parrot/blob/master/t/TESTS_STATUS.pod>.
+
+The script 'harness' actually runs the test suite.
+
+To run the normal Parrot test suite tests:
+
+    make test
+
+To run only the core test suite (intented to be used after C<make corevm>):
+
+    make coretest
+
+The run the full test suite, which is equivalent to "make test" under various
+runcores as well as coding standard tests:
+
+    make fulltest
+
+To run just the coding standard tests:
+
+    make codingstd_tests
+
+To create code coverage reports from the Parrot test suite:
+
+    make cover
+
+which requires the Devel::Cover Perl 5 module.
+
+To submit "smoke" reports, you will need to install the TAP::Harness::Archive
+and LWP::UserAgent CPAN modules, and then type:
+
+    make smoke
+
+The report will then be visible on Smolder: L<http://smolder.parrot.org/app/projects/smoke_reports/1>
+
+If you only want to submit results of the core test suite to Smolder:
+
+    make smolder_coretest
+
+Below is a list of subdirs along with a short description
+of what is tested in there.
+
+=over 4
+
+=item benchmark
+
+Benchmark tests.
+
+=item codingstd
+
+Tests the coding conventions for Parrot source code.
+
+=item compilers
+
+Tests for compilers in Parrot.
+
+=item configure
+
+Tests for the Perl modules in our configuration subsystem.
+
+=item distro
+
+Tests that run before a distribution is released. Can be run with:
+
+    make distro_tests
+
+=item doc
+
+Tests for the completeness and sanity of the documentation.
+
+=item dynoplibs
+
+Tests for dynamic (loadable at run-time) opcode libraries.
+
+=item dynpmc
+
+Tests for dynamic PMCs.
+
+=item examples
+
+Tests to check whether the examples are still working. Can be run with:
+
+    make examples_tests
+
+=item library
+
+Test Parrot modules that ship with core. Can be run with:
+
+    make library_tests
+
+=item manifest
+
+Tests for the functionality supporting the creation of MANIFEST and related files. Can be run with:
+
+    make manifest_tests
+
+=item native_pbc
+
+Tests Parrot Byte Code.
+
+=item oo
+
+Tests for object oriented features of Parrot. Can be run with
+
+    make oo_tests
+
+=item op
+
+Tests for Parrot opcodes. Can be run with
+
+    make op_tests
+
+=item perl
+
+Tests for the Perl 5 modules used for configuration, building and testing of
+Parrot. Can be run with:
+
+    make perl_tests
+
+=item pharness
+
+Tests for the functionality supporting Parrot's test harnesses.
+
+=item pmc
+
+Tests for Parrot PMCs. Can be run with
+
+    make pmc_tests
+
+=item postconfigure
+
+Tests of configuration system run after configuration has completed.
+
+=item run
+
+Tests for the command line options of the 'parrot' executable. Can be run with:
+
+    make run_tests
+
+=item src
+
+Tests written in C, mostly for the Embed/Extend subsystems. Can be run with
+
+    make src_tests
+
+=item steps
+
+Tests for the steps in the Parrot configuration process.
+
+=item stress
+
+Stress testing. Make Parrot sweat.
+
+=item tools
+
+Tests for tools useful to Parrot core and HLL developers
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2011, Parrot Foundation.
+
+=cut

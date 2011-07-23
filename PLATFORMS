@@ -9,65 +9,34 @@ docs/parrot.pod) and "Extra".
 
 
 Supported platforms:
-Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
-                                CGoto EXEC   Thr Sig
---------------------------------------------------------------------------------
-linux-sparc64-gcc-4.3.2      ?                       Y    Y        20110114
-cygwin1.5.25-x86-gcc3.4.4     4   Y    -     -   -   Y    Y     Y  20090315
-darwin8.11.1-x86-gcc4.0.1    ??   Y    ?     ?   ?   Y    Y     N  20091020
-linux-x86-gcc4.1.2                Y    ?     Y   Y   Y    Y     ?  20090419
-linux-x86-gcc4.2.4                Y    ?     Y   Y   Y    Y     ?  20081023
-linux-x86-gcc4.3.2                Y    ?     Y   Y   Y    Y     ?  20081030
-linux-x86-gcc4.4.1                Y    ?     Y   Y   Y    Y     ?  20091103
-linux-x86-gcc4.5.2                Y    ?     Y   Y   Y    Y     ?  20110710
-linux-x86-g++4.4.1                Y    ?     Y   Y   Y    Y     Y  20091116
-linux-x86-llvm-gcc-4.2            Y    ?     ?   ?   Y    Y     ?  20091021
-sol10-sparc-cc_5.9           B4   Y    -     Y   Y   Y    Y     ?  20090720
-sol10-sparc-cc_5.9           B8   Y    -     Y   Y   Y    Y     ?  20090720
-win32-x86-mingw_gcc3.4.5          Y    -     -   -   Y    N/1   ?  20091116
-win32-x86-msvc_9.0                -    -     Y   -   Y    Y     Y  20091215
+Platform                     B8 Feature Comp Test Inst YYYYMMDD
+                                Thr Sig
+--------------------------------------------------------------------
+darwin10.7.0-x86-gcc4.2.1        ?   ?   Y    Y     Y  20110718
+linux-sparc64-gcc-4.3.2      ?           Y    Y        20110114
+linux-x86-gcc4.5.2               Y   Y   Y    Y     ?  20110710
+win32-x86-msvc_10.0              ?   -   Y    Y     Y  20110718
+
 
 
 Extra Platforms:
 
-Platform                     B8  Runloops   Feature Comp Test Inst YYYYMMDD
-                                CGoto EXEC   Thr Sig
---------------------------------------------------------------------------------
-cygwin1.7.0-x86-gcc4.3.2      4   Y    -     -   -   Y    Y     Y  20090315
-darwin9.8.0-x86-gcc4.0.1          Y    ?     Y   ?   Y    Y     Y  20100215
-dragonfly2.2.0-i386-gcc-4.1.2 4   Y    -     Y   Y   Y    Y     ?  20090427
-freebsd-x86-gcc-4.2.1         4   Y    Y     ?   ?   Y    Y     Y  20090415
-freebsd-amd64-gcc-4.2.1       8   Y    -     ?   ?   Y    Y     Y  20090720
-linux-amd64-clang-r73854      8   ?    =     Y   Y   Y/4  Y/1   ?  20090622
-linux-amd64-clang-r75433      8   Y    ?     ?   ?   Y    Y*2   ?  20090913
-linux-amd64-gcc4.3.2          8   Y    -     Y   Y   Y    Y/1   Y  20091020
-linux-amd64-gcc4.3.3          8   Y    ?     Y   Y   Y    Y     ?  20090712
-linux-amd64-gcc4.4.1          8   Y    ?     Y   ?   Y    Y     Y  20100215
-linux-amd64-g++4.4.1          8   Y    ?     Y   Y   Y    Y     Y  20091116
-linux-ppc-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
-linux-ppc64-gcc_4.4.2             Y    Y     Y   Y   Y    Y     Y  20100118
-linux-arm-gcc_4.4.2               Y    Y     Y   Y   Y    Y     Y  20100118
-linux-x86-icc_11.1            4   Y    ?     Y   Y   Y    Y     Y  20100209
-linux-amd64-icc_11.1          8   Y    ?     Y   Y   Y    Y     Y  20100209
-netbsd3.1-ppc-gcc-3.3.3       B   Y    ?     Y   Y   Y    Y     ?  20090419
-netbsd4.0-alpha-gcc-4.1.2     8   Y    ?     Y   Y   Y    Y     ?  20090518
-netbsd4.0-arm-gcc-4.1.2           Y    ?     Y   Y   Y    Y     ?  20090518
-netbsd4.0-i386-gcc-4.1.2          Y    ?     Y   Y   Y    Y     ?  20090517
-netbsd4.0-ppc-gcc-4.1.2       B   Y    ?     Y   Y   Y    Y     ?  20090519
-netbsd4.0-sparc64-gcc-4.1.2  B8   Y    -     Y   Y   Y    Y     ?  20090519
-netbsd4.0-x86_64-gcc-4.1.2    8   Y    ?     Y   Y   Y    Y     ?  20110418
-netbsd5.0-i386-gcc-4.1.3          Y    ?     Y   Y   Y    Y     ?  20090519
-netbsd5.0-ppc-gcc-4.1.3       B   Y    ?     Y   Y   Y    Y     ?  20090517
-netbsd5.0-mipseb32-gcc-4.1.3  B   Y    ?     Y   Y   Y    Y     ?  20090518
-netbsd5.0-sparc-gcc-4.1.3     B   Y    -     Y   Y   Y    Y     ?  20090519
-netbsd5.0-sparc64-gcc-4.1.3  B8   Y    -     Y   Y   Y    Y/1   ?  20090519
-netbsd5.0-x86_64-gcc-4.1.3    8   Y    -     Y   Y   Y    Y     ?  20090419
-opensol2009.06-x86-gcc3.4.3   4   ?    ?     ?   ?   Y    Y/2   Y  20091215
-win32-x86-mingw_gcc4.3.0          Y    -     -   -   Y    Y/88  ?  20081203
-win32-x86-msvc_6.0            4   -    -     -   -   Y    Y/8   ?  20090315
-win32-x64-msvc_9.0            8   -    -     -   -   Y    Y/17  ?  20091020
-win32-x64-mingw_gcc3.4.5      8   Y    ?     ?   ?   Y    Y     ?  20090210
-win64-amd64-msvc_9.0          8   N    N     ?   ?   Y*1  N     ?  20090720
+Platform                     B8 Feature Comp Test Inst YYYYMMDD
+                                Thr Sig
+--------------------------------------------------------------------
+darwin9.8.0-x86-gcc4.0.1         Y   ?   Y    Y     Y  20100215
+linux-amd64-gcc4.4.1          8  Y   ?   Y    Y     Y  20100215
+linux-ppc-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
+linux-ppc64-gcc_4.4.2            Y   Y   Y    Y     Y  20100118
+linux-arm-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
+linux-x86-icc_11.1            4  Y   Y   Y    Y     Y  20100209
+linux-amd64-icc_11.1          8  Y   Y   Y    Y     Y  20100209
+netbsd4.0-x86_64-gcc-4.1.2    8  Y   Y   Y    Y     ?  20110418
+win-x64-msvc_16.0             8  ?   ?   Y    Y     ?  20110718
+linux-amd64-clang2.8          8  ?   ?   Y    Y     Y  20110718
+darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y     Y  20110718
+darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y*/1  Y  20110718
+
 
 
 Legend:
@@ -84,8 +53,6 @@ B   ... Processor is big endian
 8   ... opcode_t is 8 byte, i.e. a 64 bit machine
 4   ... opcode_t is 4 byte, --m=32 on a 64 bit machine
 
-CGoto ... CGoto runloop is supported
-EXEC  ... compiling to native executables is supported
 Thr   ... Parrot is multi-threaded
 Sig   ... Parrot catches a SIGHUP signal
 Comp  ... Compiles ok
@@ -95,11 +62,11 @@ Inst  ... "make install" is ok
 YYYYMMDD  The date tested.
 
 Remarks:
-*1 64-bit MSVC uses 32-bit int and long values. For 64-bit use
-   --ccflags="-GS- -MD" --intval="long long" --opcode="long long"
-*2 only builds when configured --without-gmp. See TT #1006
+*n/a
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):
 optimized build: perl Configure.pl --optimize
 system malloc:   perl Configure.pl --gc=libc
+
+darwin8.11.0-ppc-4.0 passes all tests without --optimize but fails one test with --optimize
