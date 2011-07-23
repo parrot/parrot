@@ -5581,11 +5581,7 @@ imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     /* TODO: Kill this stuff and use Parrot exceptions exclusively */
     IMCC_TRY(imcc->jump_buf, imcc->error_code) {
         if (yyparse(yyscanner, imcc)) {
-<<<<<<< HEAD
             imcc->error_code = IMCC_PARSEFAIL_EXCEPTION;
-=======
-            do_a_better_error_message(imcc, yyscanner);
->>>>>>> upstream/master
             return 0;
         }
 
