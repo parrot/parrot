@@ -3,7 +3,7 @@
 .constants
 0 "1..1\n"
 1 "n"
-2 "ok 1 ashr: -90 >> 2 = -23\n"
+2 "ok 1 ashr: -90 >> 2 == -23\n"
 .metadata
 .bytecode
 
@@ -24,13 +24,13 @@
     goto_if ashr_nok, I3
     goto    ashr_ok,   x
 
-ashr_ok:
-    set_imm S0, 0, 2
+ashr_nok:
+    set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-ashr_nok:
-    set_imm S0, 0, 1
+ashr_ok:
+    set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
