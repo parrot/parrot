@@ -562,11 +562,11 @@ sub parse_chunks {
                     $c =~ s/\\"/"/g;
                     $c = "S:$c";
                 }
-                elsif ($c =~ /^\d+$/) {
+                elsif ($c =~ /^-?\d+$/) {
                     $c = "I:$c";
                 }
                 # XXX: way too simplistic; should be able to parse real floats
-                elsif ($c =~ /^\d+\.\d+$/) {
+                elsif ($c =~ /^-?\d+\.\d+$/) {
                     $c = "N:$c";
                 }
                 else {
