@@ -243,9 +243,9 @@ noise, probably pubishable in some countries
 sub i {
     if (scalar(@_) == 2) {
         my ($cf, $reg) = @_;
-        return unpack('L', $cf->[$reg]);
+        return unpack('l', $cf->[$reg]);
     }
-    return pack('L', $_[0] & 0xFFFFFFFF);
+    return pack('l', $_[0] );
 }
 
 sub n {
@@ -253,7 +253,7 @@ sub n {
         my ($cf, $reg) = @_;
         return unpack('f', $cf->[$reg]);
     }
-    return pack('f', $_[0] & 0xFFFFFFFF);
+    return pack('f', $_[0] );
 }
 
 
@@ -282,7 +282,7 @@ sub m0_opfunc_goto_if {
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
-    my $new_pc      = unpack('L', $$cf->[$a1]);
+    my $new_pc      = unpack('l', $$cf->[$a1]);
     my $chunk_name  = unpack('a', bytes::substr($$cf->[$a2], 2));
     my $interp      = $$cf->[INTERP];
 
@@ -524,7 +524,7 @@ sub m0_opfunc_get_word {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "get_word $a1, $a2, $a3";
     
-    #$$cf->[$a1] = unpack("L", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
+    #$$cf->[$a1] = unpack("l", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
     $$cf->[$a1] = bytes::substr($$cf->[$a2], 4 * i($$cf,$a3), 4);
 }
 
@@ -554,7 +554,7 @@ sub m0_opfunc_print_s {
 
     my $handle = $$cf->[$a1];
     # don't print the header
-    my $byte_count = unpack('L', bytes::substr($$cf->[$a2], 0, 4));
+    my $byte_count = unpack('l', bytes::substr($$cf->[$a2], 0, 4));
     my $var    = bytes::substr($$cf->[$a2], 8, $byte_count-1);
     # TODO: print to $handle instead of stdout
     print $var;
@@ -637,17 +637,17 @@ sub parse_m0b_dirseg {
     my ($interp, $m0b, $cursor) = @_;
 
     # verify the segment identifier
-    my $seg_ident = unpack("L",get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("l",get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_DIR_SEG) {
         die "didn't find M0 directory segment";
     }
 
-    my $seg_entry_count = unpack("L", get_bytes($m0b, $cursor, 4));
-    my $seg_byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $seg_entry_count = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $seg_byte_count  = unpack("l", get_bytes($m0b, $cursor, 4));
     my $chunks_found = 0;
     while ($chunks_found < $seg_entry_count) {
-        my $consts_seg_offset   = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $chunk_name_length = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $consts_seg_offset   = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $chunk_name_length = unpack("l", get_bytes($m0b, $cursor, 4));
         my $chunk_name        = unpack("a[$chunk_name_length]", get_bytes($m0b, $cursor, $chunk_name_length));
         $interp->[CHUNK_INFO][$chunks_found]{name} = $chunk_name;
         $interp->[CHUNK_MAP]{$chunk_name} = $chunks_found;
@@ -674,18 +674,18 @@ sub m0b_parse_const_seg {
 
     my $consts = [];
     # verify the segment identifier
-    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_CONST_SEG) {
         die "didn't find M0 constants segment";
     }
 
-    my $const_count = unpack("L", get_bytes($m0b, $cursor, 4));
-    my $byte_count  = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $const_count = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $byte_count  = unpack("l", get_bytes($m0b, $cursor, 4));
     my $const_num   = 0;
     m0_say "found $const_count constants occupying $byte_count bytes";
 
     while (scalar(@$consts < $const_count)) {
-        my $const_length = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $const_length = unpack("l", get_bytes($m0b, $cursor, 4));
         my $const        = get_bytes($m0b, $cursor, $const_length);
         m0_say "found constant #$const_num of length $const_length";
         $const_num++;
@@ -703,18 +703,18 @@ sub m0b_parse_meta_seg {
 
     my $metadata = {};
     # verify the segment identifier
-    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_META_SEG) {
         die "didn't find M0 metadata segment";
     }
 
-    my $entry_count   = unpack("L", get_bytes($m0b, $cursor, 4));
-    my $byte_count    = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $entry_count   = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $byte_count    = unpack("l", get_bytes($m0b, $cursor, 4));
     my $entries_found = 0;
     while ($entries_found < $entry_count) {
-        my $offset   = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $name_idx = unpack("L", get_bytes($m0b, $cursor, 4));
-        my $val_idx  = unpack("L", get_bytes($m0b, $cursor, 4));
+        my $offset   = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $name_idx = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $val_idx  = unpack("l", get_bytes($m0b, $cursor, 4));
         $metadata->{$offset}{$name_idx} = $val_idx;
         $entries_found++;
     }
@@ -727,13 +727,13 @@ sub m0b_parse_bc_seg {
 
     my $ops = [];
     # verify the segment identifier
-    my $seg_ident = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_BC_SEG) {
         die "didn't find M0 bytecode segment";
     }
 
-    my $op_count   = unpack("L", get_bytes($m0b, $cursor, 4));
-    my $byte_count = unpack("L", get_bytes($m0b, $cursor, 4));
+    my $op_count   = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $byte_count = unpack("l", get_bytes($m0b, $cursor, 4));
     while (scalar(@$ops) < $op_count) {
         my $op = ord get_bytes($m0b, $cursor, 1);
         my $a1 = ord get_bytes($m0b, $cursor, 1);
