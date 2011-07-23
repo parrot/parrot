@@ -726,7 +726,6 @@ int yywrap(void* yyscanner) {
 
     /* pop old frame */
     if (imcc->frames->s.next) {
-        /* TODO: Double-check this */
         pop_parser_state(imcc, yyscanner);
         if (YYSTATE == INITIAL || YYSTATE == emit)
             BEGIN(imcc->frames->s.pasm_file ? emit : INITIAL);
@@ -1378,15 +1377,29 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     return success;
 }
 
+static void
+do_a_better_error_message(imc_info_t * imcc, void * yyscanner)
+{
+    STRING * loc;
+    imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
+    if (imcc->frames && imcc->frames->is_macro)
+        loc = Parrot_sprintf_c(imcc->interp, "in macro '.%Ss' line %d",
+                imcc->frames->s.file, imcc->line);
+    else
+        loc = Parrot_sprintf_c(imcc->interp, "in file '%Ss' line %d",
+                imcc->frames->s.file, imcc->line);
+    imcc->error_message = Parrot_sprintf_c(imcc->interp,
+        "Unexpected parser exit. Unknown syntax error.\n"
+        "\tLast line reported is %d\n"
+        "\tLast file reported is %S", imcc->line, loc);
+}
+
 INTVAL
 imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     /* TODO: Kill this stuff and use Parrot exceptions exclusively */
     IMCC_TRY(imcc->jump_buf, imcc->error_code) {
         if (yyparse(yyscanner, imcc)) {
-            imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
-            /* TODO: Be slightly less unhelpful */
-            imcc->error_message = string_from_literal(imcc->interp,
-                    "syntax error ... somewhere");
+            do_a_better_error_message(imcc, yyscanner);
             return 0;
         }
 
