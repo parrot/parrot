@@ -283,7 +283,10 @@ sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
     my $new_pc      = unpack('l', $$cf->[$a1]);
-    my $chunk_name  = unpack('a', bytes::substr($$cf->[$a2], 2));
+    my $name_len    = unpack('l', bytes::substr($$cf->[$a2], 0, 4));
+    my $encoding    = unpack('l', bytes::substr($$cf->[$a2], 4, 4));
+    my $chunk_name  = unpack("a[$name_len]", bytes::substr($$cf->[$a2], 8));
+    chop($chunk_name); #remove trailing null
     my $interp      = $$cf->[INTERP];
 
     m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
