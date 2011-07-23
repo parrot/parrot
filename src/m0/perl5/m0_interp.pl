@@ -436,7 +436,7 @@ sub m0_opfunc_not {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "not $a1, $a2, $a3";
 
-    $$cf->[$a1] = i( i($$cf,$a2) ^ 0xFFFFFFFF);
+    $$cf->[$a1] = i( ~i($$cf,$a2));
 }
 
 sub m0_opfunc_gc_alloc {
@@ -511,7 +511,7 @@ sub m0_opfunc_get_byte {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "get_byte $a1, $a2, $a3";
     
-    $$cf->[$a1] = bytes::ord(bytes::substr($$cf->[$a2], i($$cf,$a3), 1));
+    $$cf->[$a1] = i(bytes::ord(bytes::substr($$cf->[$a2], i($$cf,$a3), 1)))
 }
 
 sub m0_opfunc_set_word {
