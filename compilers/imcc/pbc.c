@@ -1033,7 +1033,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         buf++;
         return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
     }
-    else if (*buf == '\'') {   /* TODO handle python raw strings */
+    else if (*buf == '\'') {
         buf++;
         return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
@@ -1486,7 +1486,6 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         const INTVAL type = r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub;
         const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(imcc->interp, type);
 
-        /* TODO create constant - see also src/packfile.c */
         sub_pmc = Parrot_pmc_new(imcc->interp, hlltype);
     }
 
