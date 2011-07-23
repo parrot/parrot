@@ -260,6 +260,17 @@ static void store_sub_size(
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
+static void store_sub_tags(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(pcc_sub_t * sub),
+    const int sub_idx,
+    ARGMOD(PackFile_ConstTable * ct))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(* ct);
+
 static void verify_signature(
     ARGMOD(imc_info_t * imcc),
     ARGIN(const Instruction *ins),
@@ -350,6 +361,10 @@ static void verify_signature(
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_store_sub_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_store_sub_tags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_verify_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(ins) \
@@ -1423,8 +1438,8 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
     PMC                   *ns_pmc;
     PMC                   *sub_pmc;
     Parrot_Sub_attributes *sub;
-    PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(imcc->interp);
-    PackFile_ConstTable * const ct    = interp_code->const_table;
+    PackFile_ByteCode   * const interp_code = Parrot_pf_get_current_code_segment(imcc->interp);
+    PackFile_ConstTable * const ct          = interp_code->const_table;
     IMC_Unit * const unit = imcc->globals->cs->subs->unit;
 
     int i;
@@ -1649,10 +1664,36 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             }
         }
 
+        store_sub_tags(imcc, r->pcc_sub, k, ct);
+
         return k;
     }
 }
 
+static void
+store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx, ARGMOD(PackFile_ConstTable * ct))
+{
+    const opcode_t n = ct->ntags;
+    const opcode_t s = sub->nflags;
+    opcode_t i;
+    if (s == 0)
+        return;
+    if (ct->tag_map == NULL)
+        ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s * 2, opcode_t);
+    else
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, (n + s) * 2, n * 2, opcode_t);
+
+    for (i = 0; i < s; i++) {
+        SymReg * const flag = sub->flags[i];
+        STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
+                    strlen(flag->name) - 2);
+        const int tag_idx = add_const_str(imcc, tag, ct);
+        const int x = (n + i) * 2;
+        ct->tag_map[x] = sub_idx;
+        ct->tag_map[x + 1] = tag_idx;
+    }
+    ct->ntags += s;
+}
 
 /*
 

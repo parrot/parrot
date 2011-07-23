@@ -185,6 +185,8 @@ typedef struct PackFile_ConstTable {
     PackFile_ByteCode  *code;        /* where this segment belongs to */
     Hash               *string_hash; /* Hash for lookup of string indices */
     Hash               *pmc_hash;    /* Hash for lookup of pmc indices */
+    opcode_t           *tag_map;     /* n-m Mapping pmc constants to string tags */
+    opcode_t            ntags;       /* Number of tags */
 } PackFile_ConstTable;
 
 typedef struct PackFile_ByteCode_OpMappingEntry {
