@@ -1588,9 +1588,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             sub->method_name = sub->name;
     }
     else
-        /* TODO: Any reason why we need to have a new empty GCable here for a
-                 value which we don't use? Can we use STRINGNULL? */
-        sub->method_name = Parrot_str_new(imcc->interp, "", 0);
+        sub->method_name = STRINGNULL;
 
     if (unit->has_ns_entry_name == 1) {
         /* Work out the name of the ns entry. */
