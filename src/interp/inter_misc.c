@@ -114,43 +114,6 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 
 /*
 
-=item C<void Parrot_compreg(PARROT_INTERP, STRING *type, Parrot_compiler_func_t
-func)>
-
-Register a parser/compiler function.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type), ARGIN(Parrot_compiler_func_t func))
-{
-    ASSERT_ARGS(Parrot_compreg)
-    PMC    * const iglobals = interp->iglobals;
-    PMC    * const nci      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const sc       = CONST_STRING(interp, "PJS");
-    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                              IGLOBALS_COMPREG_HASH);
-
-    if (PMC_IS_NULL(hash)) {
-        hash = Parrot_pmc_new_noinit(interp, enum_class_Hash);
-        VTABLE_init(interp, hash);
-        VTABLE_set_pmc_keyed_int(interp, iglobals,
-                (INTVAL)IGLOBALS_COMPREG_HASH, hash);
-    }
-
-    VTABLE_set_pmc_keyed_str(interp, hash, type, nci);
-
-    /* build native call interface for the C sub in "func" */
-    VTABLE_set_pointer_keyed_str(interp, nci, sc, (void *)func);
-}
-
-
-
-/*
-
 =item C<PMC * Parrot_get_compiler(PARROT_INTERP, STRING *type)>
 
 Get a compiler PMC.
