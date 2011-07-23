@@ -339,6 +339,11 @@ PackFile_ConstTable_clear(PARROT_INTERP, ARGMOD(PackFile_ConstTable *self))
         self->string_hash = NULL;
     }
 
+    if (self->tag_map) {
+        mem_gc_free(interp, self->tag_map);
+        self->ntags = 0;
+    }
+
     return;
 }
 
@@ -418,6 +423,12 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
          * XXX make this explicit with :load subs in PBC */
         if (VTABLE_isa(interp, pmc, sub_str))
             Parrot_ns_store_sub(interp, pmc);
+    }
+
+    self->ntags = PF_fetch_opcode(pf, &cursor);
+    for (i = 0; i < self->ntags; i++) {
+        self->tag_map[i * 2] = PF_fetch_opcode(pf, &cursor);
+        self->tag_map[i * 2 + 1] = PF_fetch_opcode(pf, &cursor);
     }
 
     return cursor;
