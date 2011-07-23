@@ -39,108 +39,11 @@ static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void print_debug(PARROT_INTERP, int status, ARGIN(void *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
-#define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p_unused))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-/*
-
-=item C<Parrot_PackFile Parrot_pbc_read(PARROT_INTERP, const char *fullname,
-const int debug)>
-
-Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
-
-DEPRECATED: Use Parrot_pf_read_pbc_file instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-Parrot_PackFile
-Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
-{
-    ASSERT_ARGS(Parrot_pbc_read)
-    STRING * const str = Parrot_str_new(interp, fullname, 0);
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, str);
-    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    UNUSED(debug);
-    return (Parrot_PackFile)pfpmc;
-}
-
-/*
-
-=item C<void Parrot_pbc_load(PARROT_INTERP, Parrot_PackFile pf)>
-
-Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
-
-DEPRECATED: Use Parrot_pf_set_current_packfile instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
-{
-    ASSERT_ARGS(Parrot_pbc_load)
-    Parrot_pf_set_current_packfile(interp, pf);
-}
-
-/*
-
-=item C<void Parrot_pbc_fixup_loaded(PARROT_INTERP)>
-
-Fixups after pbc loading
-
-DEPRECATED: Don't use this. Use Parrot_pf_prepare_packfile_load instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pbc_fixup_loaded(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_pbc_fixup_loaded)
-    PackFile_fixup_subs(interp, PBC_LOADED, NULL);
-}
-
-
-/*
-
-=item C<static void print_debug(PARROT_INTERP, int status, void *p)>
-
-Prints GC info.
-
-=cut
-
-*/
-
-static void
-print_debug(PARROT_INTERP, SHIM(int status), ARGIN(SHIM(void *p)))
-{
-    ASSERT_ARGS(print_debug)
-    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
-        /* Give souls brave enough to activate debugging an earful about GC. */
-
-        Parrot_io_eprintf(interp, "*** Parrot VM: Dumping GC info ***\n");
-        PDB_info(interp);
-    }
-}
-
 
 /*
 
@@ -204,110 +107,6 @@ set_current_sub(PARROT_INTERP)
 
     return new_sub_pmc;
 }
-
-
-/*
-
-=item C<void Parrot_runcode(PARROT_INTERP, int argc, const char **argv)>
-
-Sets up C<ARGV> and runs the ops.
-
-DEPRECATED: Use Parrot_pf_execute_bytecode_program instead
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
-{
-    ASSERT_ARGS(Parrot_runcode)
-    PMC *userargv, *main_sub;
-
-    /* Debugging mode nonsense. */
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-        if (Interp_flags_TEST(interp, PARROT_BOUNDS_FLAG)) {
-            Parrot_io_eprintf(interp,
-                    "*** Parrot VM: Bounds checking enabled. ***\n");
-        }
-
-        if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
-            Parrot_io_eprintf(interp, "*** Parrot VM: Tracing enabled. ***\n");
-
-        Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
-                interp->run_core->name);
-    }
-
-    /* Set up @ARGS (or whatever this language calls it) in userargv. */
-    userargv = Parrot_pmc_box_c_string_array(interp, argc, argv);
-
-    /*
-     * If any profile information was gathered, print it out
-     * before exiting, then print debug infos if turned on.
-     */
-    Parrot_x_on_exit(interp, print_debug,   NULL);
-
-    /* Let's kick the tires and light the fires--call interpreter.c:runops. */
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-
-    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
-
-    if (!main_sub)
-        main_sub = set_current_sub(interp);
-
-    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    Parrot_ext_call(interp, main_sub, "P->", userargv);
-}
-
-
-/*
-
-=item C<Parrot_Opcode * Parrot_debug(PARROT_INTERP, Parrot_Interp debugger,
-Parrot_Opcode *pc)>
-
-Runs the interpreter's bytecode in debugging mode.
-
-DEPRECATED: Do not use.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-Parrot_Opcode *
-Parrot_debug(PARROT_INTERP, ARGIN(Parrot_Interp debugger), ARGIN(Parrot_Opcode *pc))
-{
-    ASSERT_ARGS(Parrot_debug)
-    PDB_t      * const pdb = debugger->pdb;
-
-    pdb->cur_opcode        = pc;
-
-    PDB_init(debugger, NULL);
-
-    /* disassemble needs this for now */
-    /*
-    interp               = pdb->debugee;
-    interp->pdb          = pdb;
-    */
-    debugger->lo_var_ptr = interp->lo_var_ptr;
-
-    PDB_disassemble(interp, NULL);
-
-    while (!(pdb->state & PDB_EXIT)) {
-        const char *command;
-
-        PDB_get_command(debugger);
-        command = pdb->cur_command;
-        PDB_run_command(debugger, command);
-    }
-
-    return NULL;
-}
-
 
 /*
 
@@ -384,6 +183,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
 
     Parrot_io_fprintf(interp, output, "\n=cut\n\n");
 }
+
 
 
 /*
@@ -493,33 +293,6 @@ Parrot_disassemble(PARROT_INTERP,
     return;
 }
 
-/*
-
-=item C<void Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int
-length, const unsigned char *bytes)>
-
-Legacy function for setting the configuration hash as an array of bytes for
-the old API. New programs should not use this. They should use the new API and
-C<Parrot_api_set_configuration_hash>
-
-DEPRECATED: Use Parrot_set_config_hash_pmc instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_set_configuration_hash_legacy(PARROT_INTERP, const int length,
-        ARGIN(const unsigned char *bytes))
-{
-    ASSERT_ARGS(Parrot_set_configuration_hash_legacy)
-    STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)bytes,
-        length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
-    PMC * const pmc = Parrot_thaw(interp, fpmc_str);
-    Parrot_set_config_hash_pmc(interp, pmc);
-    Parrot_lib_update_paths_from_config_hash(interp);
-}
 
 /*
 
