@@ -491,7 +491,7 @@ add_pcc_flag_str(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg * r), ARGIN(SymReg * a
     const int n = sub->nflags;
     sub->flags = mem_gc_realloc_n_typed(imcc->interp, sub->flags, n + 1, SymReg*);
     sub->flags[n] = arg;
-    sub->nmulti++;
+    sub->nflags++;
 }
 
 /*
