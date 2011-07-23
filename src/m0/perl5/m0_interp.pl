@@ -273,7 +273,7 @@ sub m0_opfunc_goto {
 sub m0_opfunc_goto_if {
     my ($cf, $a1, $a2, $a3) = @_;
     my $offset = 256 * $a1 + $a2;
-    m0_say "goto_if $a1, $a2, $a3 ($offset, $$cf->[$a3])";
+    m0_say "goto_if $a1, $a2, $a3 ($offset)";
 
     my $cond   = i($$cf,$a3);
     $$cf->[PC] = $offset if ($cond);
@@ -373,14 +373,14 @@ sub m0_opfunc_convert_i_n {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "convert_i_n $a1, $a2, $a3";
 
-    $$cf->[$a1] = int($$cf->[$a2]);
+    $$cf->[$a1] = i(int(n($$cf,$a2)));
 }
 
 sub m0_opfunc_convert_n_i{
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "convert_n_i $a1, $a2, $a3";
 
-    $$cf->[$a1] = i($$cf,$a2);
+    $$cf->[$a1] = n(i($$cf,$a2));
 }
 
 sub m0_opfunc_ashr {
@@ -577,7 +577,7 @@ sub m0_opfunc_print_n {
     my $handle = $$cf->[$a1];
     my $var    = n($$cf,$a2);
     # TODO: print to $handle instead of stdout
-    say $var;
+    print $var;
 }
 
 sub m0_opfunc_exit {
