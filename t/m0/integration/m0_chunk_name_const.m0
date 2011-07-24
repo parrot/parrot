@@ -1,0 +1,41 @@
+.version 0
+.chunk "chunk_the_first"
+.constants
+0 &chunk_the_first
+1 &the_second_chunk
+2 &chunk3
+3 &4thchunk
+4 "1..1\n"
+5 "ok 1 chunk name constants seem to parse\n"
+.metadata
+.bytecode
+    set_imm I0, 0, 1
+    set_imm I1, 0, 0
+    set_imm S0, 0, 4
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    set_imm S1, 0, 5
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    exit    I1, x, x
+
+
+.chunk "the_second_chunk"
+.constants
+.metadata
+.bytecode
+
+.chunk "chunk3"
+.constants
+.metadata
+.bytecode
+
+.chunk "4thchunk"
+.constants
+.metadata
+.bytecode
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  
