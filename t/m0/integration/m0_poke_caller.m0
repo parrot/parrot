@@ -36,6 +36,8 @@
     print_s I0, S0, x
 
     # print "value of I23 is " ...
+    # TODO: add TAP output that verifies that I23 == 9999
+    # example "ok 2 before invocation, caller's I23 is 9999\n"
     set_imm I23, 39, 15
     set_imm S1, 0, 2
     deref   S1, CONSTS, S1
@@ -155,6 +157,8 @@ invoke_cf:
     print_s I0, S3, x
 
     # print "value of I23 is " ...
+    # TODO: add TAP output that verifies that I23 == 9999
+    # example "ok 5 after invocation, caller's I23 is 9999\n"
     set_imm S4, 0, 2
     deref   S4, CONSTS, S4
     print_s I0, S4, 99
@@ -182,6 +186,8 @@ invoke_cf:
     print_s I0, S0, x
 
     #print "value of I23 is "...
+    # TODO: add TAP output that verifies that current call frame's I23 == 25443
+    # example "ok 3 in callee, callee's cf's I23 is 25443\n"
     set_imm S1, 0, 1
     deref   S1, CONSTS, S1
     print_s I0, S1, x
@@ -192,6 +198,8 @@ invoke_cf:
     print_s I0, S3, x
 
     # poke into the parent call frame
+    # TODO: add TAP output that verifies that parent call frame's I23 == 9999
+    # example "ok 4 in callee, callee's parent's cf's I23 is 9999\n"
     set_imm S2, 0, 2
     deref   S2, CONSTS, S2
     print_s I0, S2, x
