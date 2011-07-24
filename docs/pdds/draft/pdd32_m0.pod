@@ -967,7 +967,7 @@ type:
     2       PC - current instruction within the current bytecode segment
     3       RETPC - return PC
     4       EH  - current exception handler
-    5       CHUNK - the name of the currently-executing chunk
+    5       CHUNK - the index of the currently-executing chunk
     6       CONSTS - pointer to constants segment
     7       MDS - pointer to metadata segment
     8       BCS - pointer to bytecode segment
