@@ -26,7 +26,7 @@ use File::Spec::Functions;
 use TAP::Parser;
 use Data::Dumper;
 
-my @m0_files = grep {$_ !~ /poke_caller/ && $_ !~ /cps_factorial/ }
+my @m0_files = grep { $_ !~ /cps_factorial/ }
     glob catfile( '.', qw/t m0 integration *.m0/);
 
 plan tests => 2 * scalar @m0_files;

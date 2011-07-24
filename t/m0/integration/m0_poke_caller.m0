@@ -1,11 +1,11 @@
 .version 0
 .chunk "caller"
 .constants
-0 "1..1\n"
+0 "1..7\n"
 1 "ok 1 control flow in 'caller' at start\n"
-2 "value of I23 is "
+2 "ok 7 value of I23 is restored to 9999 (got "
 3 &callee
-4 "caller back from goto_chunk\n"
+4 "ok 6 caller back from goto_chunk\n"
 5 "\n"
 6 "n"
 7 "ok 2 before invocation, caller's I23 is 9999 (got "
@@ -39,9 +39,7 @@
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-    # print "value of I23 is " ...
-    # TODO: add TAP output that verifies that I23 == 9999
-    # example "ok 2 before invocation, caller's I23 is 9999\n"
+    # print value of I23
     set_imm I23, 39, 15
 
     # check that I23 == 9999
@@ -176,9 +174,7 @@ invoke_cf:
     deref   S3, CONSTS, S3
     print_s I0, S3, x
 
-    # print "value of I23 is " ...
-    # TODO: add TAP output that verifies that I23 == 9999
-    # example "ok 5 after invocation, caller's I23 is 9999\n"
+    # print value I23
     set_imm S4, 0, 2
     deref   S4, CONSTS, S4
     print_s I0, S4, 99
@@ -200,6 +196,8 @@ invoke_cf:
 7 ")\n"
 8 25443
 9 "n"
+10 "ok 5 in callee, callee's parent's cf's I23 is 9999 (got "
+11 9999
 .metadata
 .bytecode
 
@@ -209,9 +207,7 @@ invoke_cf:
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-    #print "value of I23 is "...
-    # TODO: add TAP output that verifies that current call frame's I23 == 25443
-    # example "ok 3 in callee, callee's cf's I23 is 25443\n"
+    #print value I23
     set_imm I23, 99, 99
     set_imm I1,  0, 8
     deref   I1, CONSTS, I1
@@ -239,15 +235,29 @@ callee_i23_ok:
     deref   S3, CONSTS, S3
 
     # poke into the parent call frame
-    # TODO: add TAP output that verifies that parent call frame's I23 == 9999
-    # example "ok 4 in callee, callee's parent's cf's I23 is 9999\n"
-    set_imm S2, 0, 2
-    deref   S2, CONSTS, S2
-    print_s I0, S2, x
     set_imm I2, 0, I23
-    deref   I1, PCF, I2
-    print_i I0, I1, x
-    print_s I0, S3, x
+    deref   I2, PCF, I2
+
+    set_imm I1, 0, 11
+    deref   I1, CONSTS, I1
+    sub_i   I1, I1, I2
+
+    goto_if caller_i23_nok, I1
+    goto    caller_i23_ok, x
+
+caller_i23_nok:
+    set_imm S1, 0, 9
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+caller_i23_ok:
+    set_imm S1, 0, 10
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    print_i I0, I2, x
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
 
     # figure out return PC and chunk
     # P0 is the parent call frame
