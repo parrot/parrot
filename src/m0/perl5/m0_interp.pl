@@ -281,23 +281,16 @@ sub m0_opfunc_goto_if {
 sub m0_opfunc_goto_chunk {
     my ($cf, $a1, $a2, $a3) = @_;
 
-    my $new_pc      = unpack('l', $$cf->[$a1]);
-    my $name_len    = unpack('l', bytes::substr($$cf->[$a2], 0, 4));
-    my $encoding    = unpack('l', bytes::substr($$cf->[$a2], 4, 4));
-    my $chunk_name  = unpack("a[$name_len]", bytes::substr($$cf->[$a2], 8));
-    chop($chunk_name); #remove trailing null
+    my $chunk_idx   = i($$cf,$a1);
+    my $new_pc      = i($$cf,$a2);
     my $interp      = $$cf->[INTERP];
 
-    m0_say "goto_chunk $a1, $a2, $a3 (chunk = '$chunk_name')";
+    m0_say "goto_chunk $a1, $a2, $a3";
 
-    die "invalid chunk name '$chunk_name' in goto_chunk"
-      unless exists $interp->[CHUNK_MAP]{$chunk_name};
-
-    my $chunk_num = $interp->[CHUNK_MAP]{$chunk_name};
-    $$cf->[CHUNK]  = $interp->[CHUNKS][$chunk_num]{name};
-    $$cf->[CONSTS] = $interp->[CHUNKS][$chunk_num]{consts};
-    $$cf->[MDS]    = $interp->[CHUNKS][$chunk_num]{meta};
-    $$cf->[BCS]    = $interp->[CHUNKS][$chunk_num]{bc};
+    $$cf->[CHUNK]  = $interp->[CHUNKS][$chunk_idx]{name};
+    $$cf->[CONSTS] = $interp->[CHUNKS][$chunk_idx]{consts};
+    $$cf->[MDS]    = $interp->[CHUNKS][$chunk_idx]{meta};
+    $$cf->[BCS]    = $interp->[CHUNKS][$chunk_idx]{bc};
     $$cf->[PC]     = $new_pc;
 }
 

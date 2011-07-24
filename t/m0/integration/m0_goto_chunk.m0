@@ -3,7 +3,7 @@
 .constants
 0 "1..2\n"
 1 "ok 1 control flow hits first chunk\n"
-2 "goto_chunk_helper"
+2 &goto_chunk_helper
 3 "nok 2 control flow goes past goto_chunk\n"
 .metadata
 .bytecode
@@ -23,7 +23,9 @@
     set_imm S1, 0, 2
     deref   S1, CONSTS, S1
     set_imm I1, 0, 0
-    goto_chunk I1, S1, x
+    set_imm P0, 0, 2
+    deref   P0, CONSTS, P0
+    goto_chunk P0, I1, x
 
     # print "nok 2"....
     set_imm S1, 0, 3
@@ -39,6 +41,9 @@
     deref   S0, CONSTS, S0
     set_imm I0, 0, 1
     print_s I0, S0, x
+
+    set_imm I1, 0, 0
+    exit    I1, x, x
 
 # This code isn't really PASM, but the highlighting works well.
 # vim: expandtab shiftwidth=4 ft=pasm: 
