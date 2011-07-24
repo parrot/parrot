@@ -209,6 +209,7 @@ invoke_cf:
     deref   I4, P0, I4
     # S3 is the parent call frame's CHUNK
     set_imm I3, 0,  CHUNK
+    deref   I3, CONSTS, I3
     goto_chunk I3, I4, x
 
     # This code should be unreachable.
