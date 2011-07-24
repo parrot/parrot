@@ -702,7 +702,7 @@ sub m0b_parse_const_seg {
         m0_say "found constant #$const_num of length $const_length";
         $const_num++;
         for (my $i = 0; $i < bytes::length($const); $i++) {
-            m0_say "byte $i is ".ord(bytes::substr($const, $i, 1));
+            m0_say "byte $i is ".chr(ord(bytes::substr($const, $i, 1)));
         }
         push @$consts, $const;
     }
