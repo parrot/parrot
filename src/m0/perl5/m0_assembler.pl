@@ -553,26 +553,32 @@ sub parse_chunks {
                 $state = 'metadata';
             }
             elsif ($line =~ /^\d+\s+(.*)$/) {
-                my $c = $1;
+                my $const = $1;
                 # remove leading and trailing double quotes which are used to represent strings
-                if ($c =~ /^"/) {
-                    $c =~ s/(^"|"$)//g;
-                    $c =~ s?\\n?\n?g;
+                if ($const =~ /^"/) {
+                    $const =~ s/(^"|"$)//g;
+                    $const =~ s?\\n?\n?g;
                     # replace escaped double quotes with actual double quotes
-                    $c =~ s/\\"/"/g;
-                    $c = "S:$c";
+                    $const =~ s/\\"/"/g;
+                    $const = "S:$const";
                 }
-                elsif ($c =~ /^-?\d+$/) {
-                    $c = "I:$c";
+                elsif ($const =~ /^-?\d+$/) {
+                    $const = "I:$const";
                 }
                 # XXX: way too simplistic; should be able to parse real floats
-                elsif ($c =~ /^-?\d+\.\d+$/) {
-                    $c = "N:$c";
+                elsif ($const =~ /^-?\d+\.\d+$/) {
+                    $const = "N:$const";
+                }
+                elsif ($const =~ /^&(\w+)$/) {
+                    if (!exists $chunk_map->{$1}) {
+                        die "invalid chunk name '$1' used as constant at line $$cursor";
+                    }
+                    $const =~ s/&/&:/;
                 }
                 else {
-                    die "unhandled constant type: '$c' at line $$cursor";
+                    die "unhandled constant type: '$const' at line $$cursor";
                 }
-                push @constants, $c;
+                push @constants, $const;
             }
             else {
                 die "Invalid M0: expected constants segment data or metadata segment start, got '$line' at line $$cursor";
