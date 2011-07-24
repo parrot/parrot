@@ -692,7 +692,7 @@ sub m0b_parse_const_seg {
                 if (exists $interp->[CHUNK_MAP]{$chunk_name}) {
                     my $chunk_idx = $interp->[CHUNK_MAP]{$chunk_name};
                     m0_say "mapping chunk name '$chunk_name' to slot #$chunk_idx";
-                    $const = pack('ll', 4, $chunk_idx);
+                    $const = i($chunk_idx);
                 }
                 else {
                     die "attempt to use invalid chunk name '$chunk_name'";
