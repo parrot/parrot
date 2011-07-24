@@ -513,11 +513,14 @@ analogous to a function's name in an HLL.
 =head3 Constants Segment
 
 The constants segment contains a numbered list of chunks of data.  Data can be
-either an integer, a floating point number, a quote-delimited utf-8 string or
-arbitrary data in hex notation.  For simplicity's sake, strings will only
-support escaping double-quotes.  Any other data should be stored as a hex
-string.  This data is accessible through the C<load_const> op.  Any constant
-data used by the metadata segment and the bytecode segment will be stored here.
+either an integer, a floating point number, a quote-delimited utf-8 string, 
+arbitrary data in hex notation or the name of a chunk.  For simplicity's sake,
+strings will only support escaping double-quotes and newlines.  Any other data
+should be stored as a hex string.  This data is accessible through the
+C<load_const> op.  Any constant data used by the metadata segment and the
+bytecode segment will be stored here.  Constants denoted by ampersand followed
+by the name of a chunk can be used at runtime to find the index of a chunk.
+see also L<Chunk Name Constants and Bytecode Loading>
 
   .constants
   0 1234
@@ -527,6 +530,7 @@ data used by the metadata segment and the bytecode segment will be stored here.
   4 0x00ffbeef
   5 "line"
   6 23
+  7 &chunk_name
 
 =head3 Metadata Segment
 
@@ -794,6 +798,29 @@ are not require to have any defined semantics.
     0x25 print_i
     0x25 print_n
     0x26 exit
+
+=head2 Chunk Name Constants and Bytecode Loading
+
+Note: Currently there is no facility for loading M0 libraries apart from
+loading and running a single .m0b file.  This will change, at which point it
+will be necessary to have an efficient way to refer to a specific chunk without
+performing a runtime lookup of that chunk's name.
+
+Placing C<&chunk_name> in the constants segment provides an efficient way to
+transfer control flow to a specific chunk while avoiding a runtime translation
+of the chunk's name to its index.  Unfortunately, this can't be a strictly
+compile-time construct because it is not guaranteed that m0b files will always
+be loaded in the same order.  For example, if a hypothetical libfoo.m0b is
+loaded first and then loads a hypothetical libbar.m0b, libfoo's first chunk
+will be at index 0.  Any M0 code in libbar which assumes that libbar's chunks
+start at 0 will break.  
+
+To accomodate this, chunk names in the constants segment must not be translated
+into integer indicies until a .m0b file is loaded into a running interpreter.
+In serialized bytecode, chunk name constants are stored as strings with the
+special encoding of 0.  When an m0b library is loaded, the interpreter must
+store the index of the named chunk in the constants segment slot for that
+constant.
 
 =head2 Execution
 
