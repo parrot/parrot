@@ -41,14 +41,18 @@ assemble($file);
 sub assemble {
     my ($file) = @_;
 
-    my $ops      = parse_op_data();
-    my $source   = slurp($file);
-    my $lines    = [ split(/\n/, $source) ];
-    my $cursor   = 0;
-    my $version  = parse_version($lines, \$cursor);
-    my $chunks   = parse_chunks($lines, \$cursor);
-    my $header   = m0b_header();
-    my $bytecode = $header . generate_bytecode_for_chunks($ops, $chunks);
+    my $ops       = parse_op_data();
+    my $source    = slurp($file);
+    my $lines     = [ split(/\n/, $source) ];
+    # build a hash that maps chunk names to their offset within the bytecode file
+    my $chunk_map = { 
+        map  { my $x = $_; $x =~ s/^\.chunk\s+"(\w+)"$/$1/; $_ => our $i++; } 
+        grep { m/^\.chunk\s+"(\w+)"$/ } @$lines };
+    my $cursor    = 0;
+    my $version   = parse_version($lines, \$cursor);
+    my $chunks    = parse_chunks($lines, \$cursor, $chunk_map);
+    my $header    = m0b_header();
+    my $bytecode  = $header . generate_bytecode_for_chunks($ops, $chunks);
     write_bytecode($file, $bytecode);
 }
 
@@ -517,7 +521,7 @@ sub parse_version {
 }
 
 sub parse_chunks {
-    my ($lines, $cursor) = @_;
+    my ($lines, $cursor, $chunk_map) = @_;
 
     my $chunks = [];
     my %chunk;
