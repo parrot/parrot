@@ -682,6 +682,23 @@ sub m0b_parse_const_seg {
     while (scalar(@$consts < $const_count)) {
         my $const_length = unpack("l", get_bytes($m0b, $cursor, 4));
         my $const        = get_bytes($m0b, $cursor, $const_length);
+
+        # if this is a string constant that contains a chunk name, add the
+        # chunk's index as the constant instead of the chunk name
+        if ($const_length > 8) {
+            my ($string_length, $encoding) = unpack('ll', $const);
+            if ($encoding == 0) {
+                my $chunk_name = unpack("A[$string_length]", bytes::substr($const, 8));
+                if (exists $interp->[CHUNK_MAP]{$chunk_name}) {
+                    my $chunk_idx = $interp->[CHUNK_MAP]{$chunk_name};
+                    m0_say "mapping chunk name '$chunk_name' to slot #$chunk_idx";
+                    $const = pack('ll', 4, $chunk_idx);
+                }
+                else {
+                    die "attempt to use invalid chunk name '$chunk_name'";
+                }
+            }
+        }
         m0_say "found constant #$const_num of length $const_length";
         $const_num++;
         for (my $i = 0; $i < bytes::length($const); $i++) {

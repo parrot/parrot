@@ -46,7 +46,7 @@ sub assemble {
     my $lines     = [ split(/\n/, $source) ];
     # build a hash that maps chunk names to their offset within the bytecode file
     my $chunk_map = { 
-        map  { my $x = $_; $x =~ s/^\.chunk\s+"(\w+)"$/$1/; $_ => our $i++; } 
+        map  { my $x = $_; $x =~ s/^\.chunk\s+"(\w+)"$/$1/; $x => our $i++; } 
         grep { m/^\.chunk\s+"(\w+)"$/ } @$lines };
     my $cursor    = 0;
     my $version   = parse_version($lines, \$cursor);
@@ -329,23 +329,23 @@ sub m0b_constants_seg {
 
     #for each constant
     for (@$constants) {
-        my ($type, $value) = /^([INS]):(.*)$/s;
+        my ($type, $value) = /^([INS&]):(.*)$/s;
         if ($type eq 'I') {
             $bytecode .= pack("ll", 4, $value);
             my $s = pack("ll", 4, $value);
             m0_say "adding I constant $value to constants segment";
         }
-        elsif ($type eq 'S') {
-            #TODO: pad all strings to word length
-            my $const_length = bytes::length($value) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
-            my $string_length = bytes::length($value) + 1; # byte count + terminal null
-            my $encoding = 0;
-            $bytecode .= pack("llla[$string_length]", $const_length, $string_length, $encoding, $value);
-            m0_say "adding S constant '$value' to constants segment ($string_length bytes)";
-        }
         elsif ($type eq 'N') {
             $bytecode .= pack("lf", 4, $value + 0.0);
             m0_say "adding N constant $value to constants segment";
+        }
+        elsif ($type eq 'S' || $type eq '&') {
+            #TODO: pad all strings to word length
+            my $const_length = bytes::length($value) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
+            my $string_length = bytes::length($value) + 1; # byte count + terminal null
+            my $encoding = $type eq '&' ? 0 : 1;
+            $bytecode .= pack("llla[$string_length]", $const_length, $string_length, $encoding, $value);
+            m0_say "adding S constant '$value' to constants segment ($string_length bytes)";
         }
     }
 
@@ -454,7 +454,7 @@ sub m0b_const_seg_length {
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     for (@$consts) {
-        my ($type, $value) = /^([INS]):(.*)$/s;
+        my ($type, $value) = /^([INS&]):(.*)$/s;
         if ($type eq 'I') {
             $seg_length += 8; # storage of size of constant
             m0_say "after adding I constant $value, length is $seg_length (+8)";
@@ -463,11 +463,11 @@ sub m0b_const_seg_length {
             $seg_length += 8; # storage of size of constant
             m0_say "after adding N constant $value, length is $seg_length (+8)";
         }
-        elsif ($type eq 'S') {
+        elsif ($type eq 'S' || $type eq '&') {
             # const size + byte count + encoding + string bytes + terminal null
             my $const_length = 4 + bytes::length($value) + 4 + 4 + 1;
             $seg_length += $const_length;
-            m0_say "after adding S constant '$value', length is $seg_length (+$const_length)";
+            m0_say "after adding $type constant '$value', length is $seg_length (+$const_length)";
         }
         else {
             die "unknown type '$type'.  I don't know how this happened.";
