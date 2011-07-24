@@ -4,7 +4,7 @@
 0 "1..1\n"
 1 "ok 1 control flow in 'caller' at start\n"
 2 "value of I23 is "
-3 "callee"
+3 &callee
 4 "caller back from goto_chunk\n"
 5 "\n"
 .metadata
@@ -113,11 +113,11 @@ init_cf_pc:
 
 post_set:
     # put the name of the target chunk into S0
-    set_imm S0, 0, 3
-    deref   S0, CONSTS, S0
+    set_imm P0, 0, 3
+    deref   P0, CONSTS, P0
     # put the target PC into I0
     set_imm I0, 0, 0
-    goto_chunk I0, S0, x
+    goto_chunk P0, I0, x
 
     # We're back, so fix the parent call frame's PC and activate it.
     # The current CF's CHUNK, CONSTS, etc are updated by goto_chunk, so use
@@ -171,6 +171,7 @@ invoke_cf:
 2 "parent call frame's value of I23 is "
 3 "OH NOES!  Contol flow misflowed!\n"
 4 "\n"
+5 &caller
 .metadata
 .bytecode
 
@@ -208,8 +209,7 @@ invoke_cf:
     deref   I4, P0, I4
     # S3 is the parent call frame's CHUNK
     set_imm I3, 0,  CHUNK
-    deref   S3, P0, I3
-    goto_chunk I4, S3, x
+    goto_chunk I3, I4, x
 
     # This code should be unreachable.
     set_imm S0, 0, 3

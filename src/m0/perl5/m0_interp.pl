@@ -173,10 +173,10 @@ sub new_call_frame{
 
     $cf->[CF]       = $cf;
     $cf->[PCF]      = {};
-    $cf->[PC]       = 0;
-    $cf->[RETPC]    = 0;
+    $cf->[PC]       = i(0);
+    $cf->[RETPC]    = i(0);
     $cf->[EH]       = {};
-    $cf->[CHUNK]    = $interp->[CHUNKS][0]{name};
+    $cf->[CHUNK]    = i(0);
     $cf->[CONSTS]   = $interp->[CHUNKS][0]{consts};
     $cf->[MDS]      = $interp->[CHUNKS][0]{meta};
     $cf->[BCS]      = $interp->[CHUNKS][0]{bc};
@@ -197,7 +197,7 @@ sub run_ops {
     my ($cf) = @_;
     
     while (1) {
-        my $init_pc = $cf->[PC];
+        my $init_pc = i($cf,PC);
         my $instr_count = scalar(@{$cf->[BCS]});
         if ($init_pc >= $instr_count){
             exit;
@@ -210,7 +210,7 @@ sub run_ops {
         &$op_func(\$cf, $a1, $a2, $a3);
 
         # If an op hasn't changed the PC, increment it.
-        $cf->[PC]++ if ($init_pc == $cf->[PC]);
+        $cf->[PC] = i($init_pc + 1) if ($init_pc == i($cf,PC));
     }
 }
 
@@ -266,7 +266,7 @@ sub m0_opfunc_goto {
     my $offset = 256 * $a1 + $a2;
     m0_say "goto $a1, $a2, $a3 ($offset, x)";
 
-    $$cf->[PC] = $offset;
+    $$cf->[PC] = i($offset);
 }
 
 sub m0_opfunc_goto_if {
@@ -275,7 +275,7 @@ sub m0_opfunc_goto_if {
     m0_say "goto_if $a1, $a2, $a3 ($offset)";
 
     my $cond   = i($$cf,$a3);
-    $$cf->[PC] = $offset if ($cond);
+    $$cf->[PC] = i($offset) if ($cond);
 }
 
 sub m0_opfunc_goto_chunk {
@@ -287,11 +287,11 @@ sub m0_opfunc_goto_chunk {
 
     m0_say "goto_chunk $a1, $a2, $a3";
 
-    $$cf->[CHUNK]  = $interp->[CHUNKS][$chunk_idx]{name};
+    $$cf->[CHUNK]  = i($chunk_idx);
     $$cf->[CONSTS] = $interp->[CHUNKS][$chunk_idx]{consts};
     $$cf->[MDS]    = $interp->[CHUNKS][$chunk_idx]{meta};
     $$cf->[BCS]    = $interp->[CHUNKS][$chunk_idx]{bc};
-    $$cf->[PC]     = $new_pc;
+    $$cf->[PC]     = i($new_pc);
 }
 
 sub m0_opfunc_add_i {
