@@ -212,6 +212,8 @@ Unconditionally transfer control flow to an offset within another chunk's
 bytecode segment, updating the current call frame's C<CHUNK>, C<CONSTS>, C<MDS>
 and C<BCS> members to point at the new chunk's name and segments, respectively.
 C<*$1> is the index of the target chunk and C<*$2> is the PC within that chunk.
+Chunk indicies can be retrieved using chunk name constants.
+see also L<Chunk Name Constants and Bytecode Loading>
 
 =back
 
