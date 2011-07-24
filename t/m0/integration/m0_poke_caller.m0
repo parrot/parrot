@@ -7,6 +7,10 @@
 3 &callee
 4 "caller back from goto_chunk\n"
 5 "\n"
+6 "n"
+7 "ok 2 before invocation, caller's I23 is 9999 (got "
+8 9999
+9 ")\n"
 .metadata
 .bytecode
 
@@ -39,11 +43,27 @@
     # TODO: add TAP output that verifies that I23 == 9999
     # example "ok 2 before invocation, caller's I23 is 9999\n"
     set_imm I23, 39, 15
-    set_imm S1, 0, 2
+
+    # check that I23 == 9999
+    set_imm I1, 0, 8
+    deref   I1, CONSTS, I1
+    
+    sub_i   I1, I1, I23
+    goto_if preinvoke_nok, I1
+    goto    preinvoke_ok, x
+
+preinvoke_nok:
+    set_imm S1, 0, 6
     deref   S1, CONSTS, S1
     print_s I0, S1, x
+
+preinvoke_ok:
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    
     print_i I0, I23, x
-    set_imm S2, 0, 5
+    set_imm S2, 0, 9
     deref   S2, CONSTS, S2
     print_s I0, S2, x
 
@@ -170,16 +190,20 @@ invoke_cf:
     
 .chunk "callee"
 .constants
-0 "in callee chunk\n"
+0 "ok 3 got to callee chunk\n"
 1 "value of I23 is "
 2 "parent call frame's value of I23 is "
 3 "OH NOES!  Contol flow misflowed!\n"
 4 "\n"
 5 &caller
+6 "ok 4 callee's I23 is 25443 (got "
+7 ")\n"
+8 25443
+9 "n"
 .metadata
 .bytecode
 
-    # print "in callee chunk"
+    # print "ok 3 "...
     set_imm I0, 0, 1
     set_imm S0, 0, 0
     deref   S0, CONSTS, S0
@@ -188,14 +212,31 @@ invoke_cf:
     #print "value of I23 is "...
     # TODO: add TAP output that verifies that current call frame's I23 == 25443
     # example "ok 3 in callee, callee's cf's I23 is 25443\n"
-    set_imm S1, 0, 1
+    set_imm I23, 99, 99
+    set_imm I1,  0, 8
+    deref   I1, CONSTS, I1
+    sub_i   I1, I1, I23
+
+    goto_if callee_i23_nok, I1
+    goto    callee_i23_ok, x
+
+callee_i23_nok:
+    set_imm  S1, 0, 9
+    deref    S1, CONSTS, S1
+    print_s  I0, S1, x
+
+callee_i23_ok:
+    set_imm  S1, 0, 6
+    deref    S1, CONSTS, S1
+    print_s  I0, S1, x
+    print_i  I0, I23, x
+
+    set_imm S1, 0, 7
     deref   S1, CONSTS, S1
     print_s I0, S1, x
-    set_imm I23, 99, 99
-    print_i I0, I23, x
+
     set_imm S3, 0, 4
     deref   S3, CONSTS, S3
-    print_s I0, S3, x
 
     # poke into the parent call frame
     # TODO: add TAP output that verifies that parent call frame's I23 == 9999
