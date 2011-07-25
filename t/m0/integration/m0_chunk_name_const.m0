@@ -1,41 +1,62 @@
 .version 0
 .chunk "chunk_the_first"
 .constants
-0 &chunk_the_first
-1 &the_second_chunk
-2 &chunk3
-3 &4thchunk
-4 "1..1\n"
-5 "ok 1 chunk name constants seem to parse\n"
+0 &the_second_chunk
+1 "1..4\n"
+2 "ok 1 chunk name constants seem to parse\n"
 .metadata
 .bytecode
     set_imm I0, 0, 1
     set_imm I1, 0, 0
-    set_imm S0, 0, 4
+    set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-    set_imm S1, 0, 5
+    set_imm S1, 0, 2
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    set_imm P0, 0, 0
+    deref   P0, CONSTS, P0
+    goto_chunk P0, I1, x
+
+.chunk "the_second_chunk"
+.constants
+0 &chunk3
+1 "ok 2 can use chunk name constant with goto_chunk\n"
+.metadata
+.bytecode
+    set_imm S1, 0, 1
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    set_imm P0, 0, 0
+    deref   P0, CONSTS, P0
+    goto_chunk P0, I1, x
+
+.chunk "chunk3"
+.constants
+0 &4thchunk
+1 "ok 3 can still use chunk name constant with goto_chunk\n"
+.metadata
+.bytecode
+    set_imm S1, 0, 1
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    set_imm P0, 0, 0
+    deref   P0, CONSTS, P0
+    goto_chunk P0, I1, x
+
+.chunk "4thchunk"
+.constants
+0 "ok 4 can use chunk name constant with goto_chunk yet again\n"
+.metadata
+.bytecode
+    set_imm S1, 0, 0
     deref   S1, CONSTS, S1
     print_s I0, S1, x
 
     exit    I1, x, x
-
-
-.chunk "the_second_chunk"
-.constants
-.metadata
-.bytecode
-
-.chunk "chunk3"
-.constants
-.metadata
-.bytecode
-
-.chunk "4thchunk"
-.constants
-.metadata
-.bytecode
-
 # This code isn't really PASM, but the highlighting works well.
 # vim: expandtab shiftwidth=4 ft=pasm:  
