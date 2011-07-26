@@ -4,12 +4,13 @@
 0 "1..1\n"
 1 "ok 1 hash of jellyfish string is correct\n"
 2 "nok 1 hash of jellyfish string is not correct\n"
-3 "I wish I were a jellyfish that cannot fall down stairs."
-# XXX: the assembler isn't smart enough to properly store ints in m0b.
+#3 "I wish I were a jellyfish that cannot fall down stairs."
+3 "jellyfish"
 4 67827064
 5 "step "
 6 ": tmp = "
 7 "\n"
+8 ": hash = "
 .metadata
 .bytecode
 
@@ -52,6 +53,10 @@ hash_calc_init:
     # I5 = temporary register for hash calculations
     set_imm I5, 0, 0
 
+
+    #enable debugging output
+    set_imm I25, 0, 0
+
     # algorithm:
     # while (ch = *str++)
         # hash = ch + (hash << 6) + (hash << 16) - hash;
@@ -62,12 +67,16 @@ hash_loop_start:
     get_byte I3, S0, I3
 
     # debugging output
-#    print_s I0, S10, x
-#    set_imm I10, 0, 1
-#    print_i I0, I10, x
-#    print_s I0, S11, x
-#    print_i I0, I3, x
-#    print_s I0, S12, x
+    goto_if end_debug_1, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 1
+    print_i I0, I10, x
+    set_imm S11, 0, 6
+    deref   S11, CONSTS, S11
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_1:
 
     # tmp += (hash << 6);
     set_imm I5, 0, 6
@@ -75,12 +84,14 @@ hash_loop_start:
     add_i   I3, I3, I5
 
     # debugging output
-#    print_s I0, S10, x
-#    set_imm I10, 0, 2
-#    print_i I0, I10, x
-#    print_s I0, S11, x
-#    print_i I0, I3, x
-#    print_s I0, S12, x
+    goto_if end_debug_2, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 2
+    print_i I0, I10, x
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_2:
 
     # tmp += (hash << 16);
     set_imm I5, 0, 16
@@ -88,23 +99,29 @@ hash_loop_start:
     add_i   I3, I3, I5    
 
     # debugging output
-#    print_s I0, S10, x
-#    set_imm I10, 0, 3
-#    print_i I0, I10, x
-#    print_s I0, S11, x
-#    print_i I0, I3, x
-#    print_s I0, S12, x
+    goto_if end_debug_3, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 3
+    print_i I0, I10, x
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_3:
 
     # hash = tmp - hash;
     sub_i   I4, I3, I4
 
     # debugging output
-#    print_s I0, S10, x
-#    set_imm I10, 0, 4
-#    print_i I0, I10, x
-#    print_s I0, S11, x
-#    print_i I0, I3, x
-#    print_s I0, S12, x
+    goto_if end_debug_4, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 4
+    print_i I0, I10, x
+    set_imm S11, 0, 8
+    deref   S11, CONSTS, S11
+    print_s I0, S11, x
+    print_i I0, I4, x
+    print_s I0, S12, x
+end_debug_4:
 
     # increment the index into the string
     set_imm I5, 0, 1
