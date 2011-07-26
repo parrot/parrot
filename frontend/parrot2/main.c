@@ -3,11 +3,11 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot2/main.c - The alternate PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
-Start Parrot
+Start Parrot, bootstrapping to PIR as early as possible.
 
 =head2 Functions
 
