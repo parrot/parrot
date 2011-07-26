@@ -38,7 +38,7 @@ utilities. Think of it as a watered down version of GNU coreutils for Parrot.
 
 =item B<system(string cmd, int :verbose(), int :ignore_error())>
 
-Executes a shell command. 
+Executes a shell command.
 
 The first argument is a string that specifies which command to execute. The
 C<:verbose()> argument is an optional integer indicating whether or not to be
@@ -86,7 +86,7 @@ Returns the exit status of the C<cmd> command.
 
 =item B<file_exists(string filename)>
 
-Returns a boolean value indicating whether or not the file in C<filename>
+Returns an integer value indicating whether or not the file in C<filename>
 exists. A value of 1 means that it does exist while a value of 0 means that it
 does not.
 
@@ -436,9 +436,9 @@ Removes a link to the file given in C<filename>.
 The C<:verbose()> argument is an optional integer indicating whether or not to
 be verbose. If given, the string I<unlink C<filename>> will be displayed.
 
-If the file's link count becomes 0, its contents will be removed. If one or
-more processes currently have the file open, it is not actually removed until
-the processes have been terminated.
+If the file's link count becomes 0, its contents will be removed. Note that if
+one or more processes currently have the file open, it is not actually removed
+until those processes have been terminated.
 
 If C<pathname> is a symbolic link, then only the link itself is removed and
 will not affect the file that it points to.
@@ -800,8 +800,8 @@ pathnames.
 
 Searches the environment list for the environment variable given in C<name>.
 
-Returns a string representing the value of the C<name>. If the C<name>
-environment variable is not defined, an empty string will be returned.
+Returns a string representing the value of C<name>. If the C<name> environment
+variable is not defined, an empty string will be returned.
 
 =cut
 
@@ -898,7 +898,7 @@ it. If C<filename> already exists, its contents will be truncated to length 0
 before writing.
 
 The C<:verbose()> argument is an optional integer indicating whether or not to
-be verbose. If given, the string I<create C<filename>> will be displayed.
+be verbose. If given, the string I<spew C<filename>> will be displayed.
 
 =cut
 
@@ -911,7 +911,7 @@ be verbose. If given, the string I<create C<filename>> will be displayed.
     unless has_verbose goto L1
     unless verbose     goto L1
 
-    print "create "
+    print "spew "
     say filename
   L1:
     $P0 = new 'FileHandle'
@@ -943,7 +943,8 @@ be verbose. If given, the string I<create C<filename>> will be displayed.
 =item B<append(string filename, string content, int :verbose())>
 
 Appends the contents of C<content> to the file given in C<filename>. If
-C<filename> does not exist, it will automatically be created.
+C<filename> does not exist, it will be created under the same conditions as
+C<spew()>.
 
 The C<:verbose()> argument is an optional integer indicating whether or not to
 be verbose. If given, the string I<append C<filename>> will be displayed.
@@ -988,7 +989,7 @@ be verbose. If given, the string I<append C<filename>> will be displayed.
     rethrow e
 .end
 
-=item B<tempdir(string :suffix())>
+=item B<tempdir(string :SUFFIX())>
 
 Returns a string representing a unique filename that can be used for
 creating a temporary file.
@@ -996,7 +997,7 @@ creating a temporary file.
 The format of the filename is C<TEMPXXX> where C<XXX> represents 3 random
 characters.
 
-Optionally, the C<:suffix()> argument may be given which will append the
+Optionally, the C<:SUFFIX()> argument may be given which will append the
 string to the filename. For example, the call
 C<tempdir("foobar" :named('SUFFIX'))> could create a filename like
 C<TEMP48tfoobar>.
