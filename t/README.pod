@@ -36,6 +36,17 @@ To create code coverage reports from the Parrot test suite:
 
 which requires the Devel::Cover Perl 5 module.
 
+To submit "smoke" reports, you will need to install the TAP::Harness::Archive
+and LWP::UserAgent CPAN modules, and then type:
+
+    make smoke
+
+The report will then be visible on Smolder: L<http://smolder.parrot.org/app/projects/smoke_reports/1>
+
+If you only want to submit results of the core test suite to Smolder:
+
+    make smolder_coretest
+
 Below is a list of subdirs along with a short description
 of what is tested in there.
 

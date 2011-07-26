@@ -1,0 +1,23 @@
+Description: This patch fixes a couple of spelling errors found by lintian
+--- a/frontend/parrot_debugger/main.c
++++ b/frontend/parrot_debugger/main.c
+@@ -63,7 +63,7 @@
+ 
+ =item C<enable>
+ 
+-Reenable a disabled breakpoint.
++Re-enable a disabled breakpoint.
+ 
+ =item C<continue> or C<c>
+ 
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -731,7 +731,7 @@
+     },
+     cmd_enable = {
+         & dbg_enable,
+-        "reenable a disabled breakpoint",
++        "re-enable a disabled breakpoint",
+ "Re-enable a disabled breakpoint."
+     },
+     cmd_eval = {

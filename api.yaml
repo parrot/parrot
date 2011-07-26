@@ -500,4 +500,10 @@
   name :  'Parrot_compreg function'
   tags :
     - 'deprecated'
+    - 'completed'
   ticket : 'http://trac.parrot.org/parrot/ticket/1879'
+-
+  name : 'load_bytecode_p_s opcode'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2146'

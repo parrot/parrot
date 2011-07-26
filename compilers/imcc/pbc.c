@@ -1033,7 +1033,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         buf++;
         return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
     }
-    else if (*buf == '\'') {   /* TODO handle python raw strings */
+    else if (*buf == '\'') {
         buf++;
         return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
@@ -1440,12 +1440,14 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             /* Unfortunately, there is no strrstr, then iterate until last */
             char *aux = strstr(real_name + 3, ns_sep);
 
-            while (aux) {
-                real_name = aux;
-                aux       = strstr(real_name + 3, ns_sep);
-            }
+            if (aux) {
+                while (aux) {
+                    real_name = aux;
+                    aux       = strstr(real_name + 3, ns_sep);
+                }
 
-            real_name += 3;
+                real_name += 3;
+            }
         }
 
         IMCC_debug(imcc, DEBUG_PBC_CONST,
@@ -1484,7 +1486,6 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         const INTVAL type = r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub;
         const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(imcc->interp, type);
 
-        /* TODO create constant - see also src/packfile.c */
         sub_pmc = Parrot_pmc_new(imcc->interp, hlltype);
     }
 
@@ -1586,9 +1587,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             sub->method_name = sub->name;
     }
     else
-        /* TODO: Any reason why we need to have a new empty GCable here for a
-                 value which we don't use? Can we use STRINGNULL? */
-        sub->method_name = Parrot_str_new(imcc->interp, "", 0);
+        sub->method_name = STRINGNULL;
 
     if (unit->has_ns_entry_name == 1) {
         /* Work out the name of the ns entry. */
@@ -2147,9 +2146,6 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (!(pragma & P_ANON))
-        return;
-
     if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
@@ -2161,6 +2157,8 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         memset(&imcc->ghash, 0, sizeof (SymHash));
 
         IMCC_debug(imcc, DEBUG_PBC, "immediate sub '%s'", ins->symregs[0]->name);
+        /* TODO: Don't use this function, it is deprecated (TT #2140). We need
+           to find a better mechanism to do this. */
         PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
 
         imcc->globals  = g;
