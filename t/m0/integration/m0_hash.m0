@@ -4,8 +4,8 @@
 0 "1..1\n"
 1 "ok 1 hash of jellyfish string is correct\n"
 2 "nok 1 hash of jellyfish string is not correct\n"
-#3 "I wish I were a jellyfish that cannot fall down stairs."
-3 "jellyfish"
+3 "I wish I were a jellyfish that cannot fall down stairs."
+#3 "jellyfish"
 4 67827064
 5 "step "
 6 ": tmp = "
