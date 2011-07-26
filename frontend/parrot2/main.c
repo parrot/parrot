@@ -197,6 +197,9 @@ main(int argc, const char *argv[])
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
 
+    /* TODO: Get bytecode* reference to prt0.pir and execute it. Pass in all
+             arguments we can. */
+
     if (parsed_flags.execute_packfile) {
         if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
             show_last_error_and_exit(interp);
@@ -209,7 +212,7 @@ main(int argc, const char *argv[])
     }
     else {
         Parrot_api_toggle_gc(interp, 0);
-        bytecodepmc = run_imcc(interp, source_str, &parsed_flags);
+        setup_imcc(interp, source_str, &parsed_flags);
         if (!parsed_flags.turn_gc_off)
             Parrot_api_toggle_gc(interp, 1);
     }
@@ -245,7 +248,7 @@ Call into IMCC to either compile or preprocess the input.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
+setup_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
 {
     ASSERT_ARGS(run_imcc)
     Parrot_PMC pir_compiler = NULL;
@@ -254,19 +257,12 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
     if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
+
+    /* TODO: Do preprocessing in prt0.pir */
     if (flags->preprocess_only) {
         Parrot_Int r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
         exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
-    }
-    else {
-        const Parrot_Int pasm_mode = flags->have_pasm_file;
-        const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
-        Parrot_PMC pbc;
-
-        if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
-            show_last_error_and_exit(interp);
-        return pbc;
-    }
+    }*/
 }
 
 /*
