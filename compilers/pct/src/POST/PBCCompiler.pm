@@ -33,7 +33,7 @@ Iterate over todolist and replace labels with offset of Sub start.
 
 =end Labels
 
-method pbc($post, %adverbs) {
+method packfile($post, *%adverbs) {
     #pir::trace(1);
 
     # Emitting context. Contains consts, etc.
@@ -55,10 +55,17 @@ method pbc($post, %adverbs) {
 };
 
 
-method mainpmc($packfile, %adverbs) {
+sub trigger($view, $flag) {
+	$_() for $view.subs_by_flag($flag);
+}
+
+method mainpmc($packfile, *%adverbs) {
     my $view := $packfile.view();
-    $view.trigger('load');
-    $view.trigger('init');
+
+	# TODO: figure out why these segfault
+	# trigger($view, 'load');
+	# trigger($view, 'init');
+
     $view.main_sub();
 }
 

@@ -559,6 +559,53 @@ Transform PAST C<source> into POST.
 .end
 
 
+=item newpost(past [, adverbs :slurpy :named])
+
+Convert PAST source into newPOST.  This is preparation for
+the pbc stage.  This will no longer be needed as a separate
+stage if/when newPOST compiles to PIR properly.
+
+=cut
+
+.sub 'newpost' :method
+    .param pmc past
+    .param pmc adverbs :slurpy :named
+
+    $P0 = get_hll_global ['PAST'], 'NewCompiler'
+    .tailcall $P0.'to_post'(past, adverbs :flat :named)
+.end
+
+
+=item pbc(post [, adverbs :slurpy :named])
+
+Emit PBC file.
+
+=cut
+
+.sub 'pbc' :method
+    .param pmc post
+    .param pmc adverbs :slurpy :named
+
+    .local pmc packfile
+    $P0 = get_hll_global ['POST'], 'PBCCompiler'
+	packfile = $P0.'packfile'(post, adverbs :flat :named)
+
+    .local string filename
+    filename = adverbs['output']
+    unless filename goto packfile_written
+
+    .local pmc handle
+    handle = new 'FileHandle'
+    handle.'open'(filename, 'w')
+    $S0 = packfile
+    handle.'print'($S0)
+    handle.'close'()
+
+  packfile_written:
+
+	.tailcall $P0.'mainpmc'(packfile, adverbs :flat :named)
+.end
+
 
 =item eval(code [, "option" => value, ...])
 
