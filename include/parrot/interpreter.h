@@ -280,6 +280,7 @@ typedef enum {
     IGLOBALS_LIB_PATHS,         /* LoL of search paths and dynamic ext */
     IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */
     IGLOBALS_EXECUTABLE,        /* How Parrot was invoked (from argv[0]) */
+    IGLOBALS_LOADED_PBCS,       /* Hash of .pbc file -> PackfileView */
 
     IGLOBALS_SIZE
 } iglobals_enum;

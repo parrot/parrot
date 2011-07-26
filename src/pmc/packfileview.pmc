@@ -65,6 +65,7 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
 
 pmclass PackfileView auto_attrs {
     ATTR PackFile * pf;
+    ATTR STRING * path;
 
 /*
 
@@ -89,6 +90,8 @@ Mark the PMC and the PackFile* contents
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)
             Parrot_pf_mark_packfile(INTERP, attrs->pf);
+        if (!STRING_IS_NULL(attrs->path))
+            Parrot_gc_mark_STRING_alive(INTERP, attrs->path);
     }
 
     VTABLE void init() {
@@ -150,6 +153,28 @@ otherwise.
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         return (attrs->pf != NULL);
+    }
+
+/*
+
+=item C<VTABLE void set_string_native(STRING *path)>
+
+=item C<VTABLE STRING *get_string_native(STRING *path)>
+
+=cut
+
+*/
+
+    VTABLE void set_string_native(STRING * path) {
+        Parrot_PackfileView_attributes * const attrs =
+                PARROT_PACKFILEVIEW(SELF);
+        attrs->path = path;
+    }
+
+    VTABLE STRING * get_string() {
+        Parrot_PackfileView_attributes * const attrs =
+                PARROT_PACKFILEVIEW(SELF);
+        return attrs->path ? attrs->path : STRINGNULL;
     }
 
 /*
