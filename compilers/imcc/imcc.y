@@ -1612,8 +1612,22 @@ sub_proto_list:
    ;
 
 proto:
-     LOAD      { $$ = P_LOAD; }
-   | INIT      { $$ = P_INIT; }
+     LOAD   {
+                $$ = P_LOAD;
+                /*
+                SymReg * const r = mk_const(imcc, "load", 'S');
+                add_pcc_flag_str(imcc, imcc->cur_call, r);
+                $$ = r;
+                */
+            }
+   | INIT   {
+                $$ = P_INIT;
+                /*
+                SymReg * const r = mk_const(imcc, "load", 'S');
+                add_pcc_flag_str(imcc, imcc->cur_call, r);
+                $$ = r;
+                */
+            }
    | MAIN      { $$ = P_MAIN; }
    | IMMEDIATE { $$ = P_IMMEDIATE; }
    | POSTCOMP  { $$ = P_POSTCOMP; }

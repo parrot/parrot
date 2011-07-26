@@ -363,13 +363,9 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 
 Get an array of Subs in the packfile by named flag.
 
-Currently accepted values are "load" and "init".
-
 =cut
 
 */
-
-#define USE_TAGMAP 1
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -379,13 +375,16 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     ASSERT_ARGS(Parrot_pf_subs_by_flag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
+    PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     if (!pf)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "NULL packfile");
 
-#if USE_TAGMAP
-    else {
-        PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
+        mode = 1;
+    else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
+        mode = 2;
+    {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
         const opcode_t nmaps = ct->ntags;
         opcode_t flag_idx = -1;
@@ -399,19 +398,9 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
                 continue;
             VTABLE_push_pmc(interp, subs, ct->pmc.constants[pmc_idx]);
         }
-        return subs;
     }
-#else
-    if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
-        mode = 1;
-    else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
-        mode = 2;
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "%S is not a valid packfile trigger", flag);
 
-    {
-        PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    if (mode == 1 || mode == 2) {
         PackFile_ByteCode   * const self = pf->cur_cs;
         PackFile_ConstTable * const ct = self->const_table;
         STRING * const SUB = CONST_STRING(interp, "Sub");
@@ -432,9 +421,8 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
             else if (mode == 2 && Sub_comp_INIT_TEST(sub))
                 VTABLE_push_pmc(interp, subs, sub_pmc);
         }
-        return subs;
     }
-#endif
+    return subs;
 }
 
 /*
