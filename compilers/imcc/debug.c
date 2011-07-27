@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2011, Parrot Foundation.
  */
 
 /*
@@ -66,7 +66,7 @@ IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ..
         "error:imcc:%Ss\n\t%Ss",
         Parrot_vsprintf_c(imcc->interp, fmt, ap),
         location));
-    va_end(ap);    
+    va_end(ap);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATAL_EXCEPTION,
          "%Ss", imcc->error_message);
 }
@@ -183,7 +183,9 @@ IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
     va_start(ap, fmt);
-    imcc->error_message = Parrot_str_concat(imcc->interp, imcc->error_message, Parrot_vsprintf_c(imcc->interp, fmt, ap));
+    imcc->error_message = Parrot_str_concat(imcc->interp,
+                                            imcc->error_message,
+                                            Parrot_vsprintf_c(imcc->interp, fmt, ap));
     va_end(ap);
 }
 

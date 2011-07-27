@@ -1,5 +1,5 @@
 /* memory.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     This is the API header for the memory subsystem
  *  Data Structure and Algorithms:
@@ -103,7 +103,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * mem_sys_strdup(ARGIN(const char *src))
         __attribute__nonnull__(1);
-        
+
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
