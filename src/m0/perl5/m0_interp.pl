@@ -246,8 +246,8 @@ sub i {
     }
     my $i = $_[0];
     # ensure that result is within the range of an int32
-    $i = $i > (2**31 - 1) ?  $_[0] - 2**32: $i;
-    $i = $i < (2**31)     ?  $_[0] + 2**32: $i;
+    $i = $i >  (2**31 - 1) ?  $_[0] - 2**32: $i;
+    $i = $i < -(2**31)     ?  $_[0] + 2**32: $i;
     return pack('i', $i );
 }
 
