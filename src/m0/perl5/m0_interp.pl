@@ -315,12 +315,6 @@ sub m0_opfunc_add_n {
 sub m0_opfunc_sub_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "sub_i $a1, $a2, $a3";
-    my $i2 = i($$cf,$a2);
-    my $i3 = i($$cf,$a3);
-    my $res = $i2 - $i3;
-    say "subtracting $i3 from $i2, getting $res";
-    $res = unpack('i', pack('i', $res));
-    say "roundtripped value is $res";
 
     $$cf->[$a1] = i( i($$cf,$a2) - i($$cf,$a3) );
 }
