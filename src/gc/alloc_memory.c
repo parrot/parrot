@@ -208,7 +208,7 @@ mem_sys_free(ARGFREE(void *from))
 
 =item C<char * mem_sys_strndup(const char *src, size_t size)>
 
-Copy a C string with supplied size to a new block of memory allocated with 
+Copy a C string with supplied size to a new block of memory allocated with
 mem_sys_allocate, that can be later deallocated with mem_sys_free.
 
 =cut
