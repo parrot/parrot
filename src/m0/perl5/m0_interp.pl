@@ -242,9 +242,13 @@ noise, probably pubishable in some countries
 sub i {
     if (scalar(@_) == 2) {
         my ($cf, $reg) = @_;
-        return unpack('l', $cf->[$reg]);
+        return unpack('i', $cf->[$reg]);
     }
-    return pack('l', $_[0] );
+    my $i = $_[0];
+    # ensure that result is within the range of an int32
+    $i = $i > (2**31 - 1) ?  $_[0] - 2**32: $i;
+    $i = $i < (2**31)     ?  $_[0] + 2**32: $i;
+    return pack('i', $i );
 }
 
 sub n {
@@ -311,6 +315,12 @@ sub m0_opfunc_add_n {
 sub m0_opfunc_sub_i {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "sub_i $a1, $a2, $a3";
+    my $i2 = i($$cf,$a2);
+    my $i3 = i($$cf,$a3);
+    my $res = $i2 - $i3;
+    say "subtracting $i3 from $i2, getting $res";
+    $res = unpack('i', pack('i', $res));
+    say "roundtripped value is $res";
 
     $$cf->[$a1] = i( i($$cf,$a2) - i($$cf,$a3) );
 }
@@ -542,7 +552,7 @@ sub m0_opfunc_print_s {
 
     my $handle = $$cf->[$a1];
     # don't print the header
-    my $byte_count = unpack('l', bytes::substr($$cf->[$a2], 0, 4));
+    my $byte_count = unpack('i', bytes::substr($$cf->[$a2], 0, 4));
     my $var    = bytes::substr($$cf->[$a2], 8, $byte_count-1);
     # TODO: print to $handle instead of stdout
     print $var;
@@ -625,17 +635,17 @@ sub parse_m0b_dirseg {
     my ($interp, $m0b, $cursor) = @_;
 
     # verify the segment identifier
-    my $seg_ident = unpack("l",get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("i",get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_DIR_SEG) {
         die "didn't find M0 directory segment";
     }
 
-    my $seg_entry_count = unpack("l", get_bytes($m0b, $cursor, 4));
-    my $seg_byte_count  = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $seg_entry_count = unpack("i", get_bytes($m0b, $cursor, 4));
+    my $seg_byte_count  = unpack("i", get_bytes($m0b, $cursor, 4));
     my $chunks_found = 0;
     while ($chunks_found < $seg_entry_count) {
-        my $consts_seg_offset   = unpack("l", get_bytes($m0b, $cursor, 4));
-        my $chunk_name_length = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $consts_seg_offset   = unpack("i", get_bytes($m0b, $cursor, 4));
+        my $chunk_name_length = unpack("i", get_bytes($m0b, $cursor, 4));
         my $chunk_name        = unpack("a[$chunk_name_length]", get_bytes($m0b, $cursor, $chunk_name_length));
         $interp->[CHUNK_INFO][$chunks_found]{name} = $chunk_name;
         $interp->[CHUNK_MAP]{$chunk_name} = $chunks_found;
@@ -662,24 +672,24 @@ sub m0b_parse_const_seg {
 
     my $consts = [];
     # verify the segment identifier
-    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("i", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_CONST_SEG) {
         die "didn't find M0 constants segment";
     }
 
-    my $const_count = unpack("l", get_bytes($m0b, $cursor, 4));
-    my $byte_count  = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $const_count = unpack("i", get_bytes($m0b, $cursor, 4));
+    my $byte_count  = unpack("i", get_bytes($m0b, $cursor, 4));
     my $const_num   = 0;
     m0_say "found $const_count constants occupying $byte_count bytes";
 
     while (scalar(@$consts < $const_count)) {
-        my $const_length = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $const_length = unpack("i", get_bytes($m0b, $cursor, 4));
         my $const        = get_bytes($m0b, $cursor, $const_length);
 
         # if this is a string constant that contains a chunk name, add the
         # chunk's index as the constant instead of the chunk name
         if ($const_length > 8) {
-            my ($string_length, $encoding) = unpack('ll', $const);
+            my ($string_length, $encoding) = unpack('ii', $const);
             if ($encoding == 0) {
                 my $chunk_name = unpack("A[$string_length]", bytes::substr($const, 8));
                 if (exists $interp->[CHUNK_MAP]{$chunk_name}) {
@@ -708,18 +718,18 @@ sub m0b_parse_meta_seg {
 
     my $metadata = {};
     # verify the segment identifier
-    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("i", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_META_SEG) {
         die "didn't find M0 metadata segment";
     }
 
-    my $entry_count   = unpack("l", get_bytes($m0b, $cursor, 4));
-    my $byte_count    = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $entry_count   = unpack("i", get_bytes($m0b, $cursor, 4));
+    my $byte_count    = unpack("i", get_bytes($m0b, $cursor, 4));
     my $entries_found = 0;
     while ($entries_found < $entry_count) {
-        my $offset   = unpack("l", get_bytes($m0b, $cursor, 4));
-        my $name_idx = unpack("l", get_bytes($m0b, $cursor, 4));
-        my $val_idx  = unpack("l", get_bytes($m0b, $cursor, 4));
+        my $offset   = unpack("i", get_bytes($m0b, $cursor, 4));
+        my $name_idx = unpack("i", get_bytes($m0b, $cursor, 4));
+        my $val_idx  = unpack("i", get_bytes($m0b, $cursor, 4));
         $metadata->{$offset}{$name_idx} = $val_idx;
         $entries_found++;
     }
@@ -732,13 +742,13 @@ sub m0b_parse_bc_seg {
 
     my $ops = [];
     # verify the segment identifier
-    my $seg_ident = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $seg_ident = unpack("i", get_bytes($m0b, $cursor, 4));
     if ($seg_ident != M0_BC_SEG) {
         die "didn't find M0 bytecode segment";
     }
 
-    my $op_count   = unpack("l", get_bytes($m0b, $cursor, 4));
-    my $byte_count = unpack("l", get_bytes($m0b, $cursor, 4));
+    my $op_count   = unpack("i", get_bytes($m0b, $cursor, 4));
+    my $byte_count = unpack("i", get_bytes($m0b, $cursor, 4));
     while (scalar(@$ops) < $op_count) {
         my $op = ord get_bytes($m0b, $cursor, 1);
         my $a1 = ord get_bytes($m0b, $cursor, 1);
@@ -753,8 +763,10 @@ sub m0b_parse_bc_seg {
 
 sub get_bytes {
     my ($data, $cursor, $count) = @_;
-    my $s = substr($data, $$cursor, $count);
+    my $s = bytes::substr($data, $$cursor, $count);
     $$cursor += $count;
-    m0_say "getting $count bytes";
+    m0_say "tried to get $count bytes, got ".bytes::length($s);
+    m0_say "bytes are: 0x".unpack('H*', $s);
+
     return $s;
 }

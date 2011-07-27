@@ -220,9 +220,9 @@ sub m0b_metadata_seg {
     my $metadata  = $chunk->{metadata};
     my $constants = $chunk->{constants};
 
-    my $bytecode  = pack("l", $M0_META_SEG);
-    $bytecode    .= pack("l", $entry_count);
-    $bytecode    .= pack("l", m0b_meta_seg_length($metadata));
+    my $bytecode  = pack("i", $M0_META_SEG);
+    $bytecode    .= pack("i", $entry_count);
+    $bytecode    .= pack("i", m0b_meta_seg_length($metadata));
 
     # TODO: make this work for a non-empty metadata segment
     #for each entry
@@ -265,9 +265,9 @@ sub m0b_bytecode_seg {
         }
     }
 
-    $bytecode  = pack('l', $M0_BC_SEG);
-    $bytecode .= pack('l', $op_count);
-    $bytecode .= pack('l', $word_count);
+    $bytecode  = pack('i', $M0_BC_SEG);
+    $bytecode .= pack('i', $op_count);
+    $bytecode .= pack('i', $word_count);
 
     for my $line (@lines) {
         if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
@@ -323,20 +323,20 @@ sub m0b_constants_seg {
     my ($chunk) = @_;
 
     my $constants = $chunk->{constants};
-    my $bytecode  = pack("l", $M0_CONST_SEG);
-    $bytecode    .= pack("l", scalar @$constants);
-    $bytecode    .= pack("l", m0b_const_seg_length($constants));
+    my $bytecode  = pack("i", $M0_CONST_SEG);
+    $bytecode    .= pack("i", scalar @$constants);
+    $bytecode    .= pack("i", m0b_const_seg_length($constants));
 
     #for each constant
     for (@$constants) {
         my ($type, $value) = /^([INS&]):(.*)$/s;
         if ($type eq 'I') {
-            $bytecode .= pack("ll", 4, $value);
-            my $s = pack("ll", 4, $value);
+            $bytecode .= pack("ii", 4, $value);
+            my $s = pack("ii", 4, $value);
             m0_say "adding I constant $value to constants segment";
         }
         elsif ($type eq 'N') {
-            $bytecode .= pack("lf", 4, $value + 0.0);
+            $bytecode .= pack("if", 4, $value + 0.0);
             m0_say "adding N constant $value to constants segment";
         }
         elsif ($type eq 'S' || $type eq '&') {
@@ -344,7 +344,7 @@ sub m0b_constants_seg {
             my $const_length = bytes::length($value) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
             my $string_length = bytes::length($value) + 1; # byte count + terminal null
             my $encoding = $type eq '&' ? 0 : 1;
-            $bytecode .= pack("llla[$string_length]", $const_length, $string_length, $encoding, $value);
+            $bytecode .= pack("iiia[$string_length]", $const_length, $string_length, $encoding, $value);
             m0_say "adding S constant '$value' to constants segment ($string_length bytes)";
         }
     }
@@ -364,14 +364,14 @@ sub m0b_dir_seg {
     my ($chunks) = @_;
 
     my $offset     = m0b_header_length();
-    my $seg_bytes  = pack('l', $M0_DIR_SEG);
-    $seg_bytes    .= pack('l', scalar @$chunks);
-    $seg_bytes    .= pack('l', m0b_dir_seg_length($chunks));
+    my $seg_bytes  = pack('i', $M0_DIR_SEG);
+    $seg_bytes    .= pack('i', scalar @$chunks);
+    $seg_bytes    .= pack('i', m0b_dir_seg_length($chunks));
     $offset       += m0b_dir_seg_length($chunks);
 
     for (@$chunks) {
-        $seg_bytes .= pack('l', $offset);
-        $seg_bytes .= pack('l', length($_->{name}));
+        $seg_bytes .= pack('i', $offset);
+        $seg_bytes .= pack('i', length($_->{name}));
         $seg_bytes .= $_->{name};
         $offset    += m0b_chunk_length($_);
         m0_say "offset of next chunk is $offset";
