@@ -103,6 +103,12 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char * mem_sys_strdup(ARGIN(const char *src))
         __attribute__nonnull__(1);
+        
+PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * mem_sys_strndup(ARGIN(const char *src), size_t size)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_mem_sys_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_allocate_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -110,6 +116,8 @@ char * mem_sys_strdup(ARGIN(const char *src))
 #define ASSERT_ARGS_mem_sys_realloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_realloc_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_strdup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_mem_sys_strndup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/alloc_memory.c */

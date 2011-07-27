@@ -206,6 +206,31 @@ mem_sys_free(ARGFREE(void *from))
 
 /*
 
+=item C<char * mem_sys_strndup(const char *src, size_t size)>
+
+Copy a C string with supplied size to a new block of memory allocated with 
+mem_sys_allocate, that can be later deallocated with mem_sys_free.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char *
+mem_sys_strndup(ARGIN(const char *src), size_t size)
+{
+    ASSERT_ARGS(mem_sys_strndup)
+
+    char * const result = (char *)mem_sys_allocate(size + 1);
+    memcpy(result, src, size);
+    result[size] = '\0';
+    return result;
+}
+
+/*
+
 =item C<char * mem_sys_strdup(const char *src)>
 
 Copy a C string to a new block of memory allocated with mem_sys_allocate,
