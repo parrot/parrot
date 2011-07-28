@@ -20,7 +20,7 @@ Test the osutils library
 
     load_bytecode 'osutils.pir'
 
-    plan(21)
+    plan(22)
     test_basename()
     test_dirname()
     test_catfile()
@@ -28,6 +28,7 @@ Test the osutils library
     test_newer()
     test_rindex()
     test_file_exists()
+    test_slurp()
 .end
 
 .sub 'test_basename'
@@ -94,6 +95,11 @@ Test the osutils library
 
     $I0 = file_exists('foobar')
     nok($I0, "file_exists('foobar')")
+.end
+
+.sub 'test_slurp'
+    $S0 = slurp('t/library/osutils.t')
+    ok($S0, "slurp('t/library/osutils.t')")
 .end
 
 # Local Variables:
