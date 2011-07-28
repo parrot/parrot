@@ -410,6 +410,9 @@ Changes the file mode bits for C<filename> according to C<mode>. The second
 argument, C<mode>, is an octal number representing the bit pattern for the new
 mode bits.
 
+The C<:verbose()> argument is an optional integer which indicates whether or
+not to be verbose. If given, the string I<chmod C<filename> C<mode>> will be displayed.
+
 A full discussion of file permissions and mode bits is outside the scope of this
 reference. For a more in-depth explanation, see the L<chmod(1)> man page.
 
@@ -420,9 +423,23 @@ alternatively be a symbolic string representation of the changes to make.
 
 .sub 'chmod'
     .param string filename
-    .param int    mode
-    .param int    verbose :named('verbose') :optional
+    .param int mode
+    .param int verbose     :named('verbose') :optional
+    .param int has_verbose :opt_flag
 
+    unless has_verbose goto L1
+    unless verbose     goto L1
+
+    $P0 = new 'ResizablePMCArray'
+    push $P0, mode
+
+    $S0 = sprintf '%o', $P0
+
+    print "chmod "
+    print filename
+    print " 0o"
+    say   $S0
+  L1:
     $P0 = new 'OS'
     $P0.'chmod'(filename, mode)
 .end
