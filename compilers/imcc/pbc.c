@@ -1673,6 +1673,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
 static void
 store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx, ARGMOD(PackFile_ConstTable * ct))
 {
+    ASSERT_ARGS(store_sub_tags)
     const opcode_t n = ct->ntags;
     const opcode_t s = sub->nflags;
     opcode_t i;
