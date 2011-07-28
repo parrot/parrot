@@ -426,10 +426,10 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     }
 
     self->ntags = PF_fetch_opcode(pf, &cursor);
-    self->tag_map = mem_gc_allocate_n_zeroed_typed(interp, self->ntags * 2, opcode_t);
+    self->tag_map = mem_gc_allocate_n_zeroed_typed(interp, self->ntags, PackFile_ConstTagPair);
     for (i = 0; i < self->ntags; i++) {
-        self->tag_map[i * 2] = PF_fetch_opcode(pf, &cursor);
-        self->tag_map[i * 2 + 1] = PF_fetch_opcode(pf, &cursor);
+        self->tag_map[i].tag_idx   = PF_fetch_opcode(pf, &cursor);
+        self->tag_map[i].const_idx = PF_fetch_opcode(pf, &cursor);
     }
 
     return cursor;

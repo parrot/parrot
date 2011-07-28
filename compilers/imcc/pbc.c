@@ -1693,19 +1693,18 @@ store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_
     if (s == 0)
         return;
     if (ct->tag_map == NULL)
-        ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s * 2, opcode_t);
+        ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s, PackFile_ConstTagPair);
     else
-        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, (n + s) * 2, n * 2,
-                                                    opcode_t);
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, n + s, n,
+                                                    PackFile_ConstTagPair);
 
     for (i = 0; i < s; i++) {
         SymReg * const flag = sub->flags[i];
         STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
                     strlen(flag->name) - 2);
         const int tag_idx = add_const_str(imcc, tag, ct->code);
-        const int x = (n + i) * 2;
-        ct->tag_map[x] = sub_idx;
-        ct->tag_map[x + 1] = tag_idx;
+        ct->tag_map[n + i].tag_idx   = tag_idx;
+        ct->tag_map[n + i].const_idx = sub_idx;
     }
     ct->ntags += s;
 }

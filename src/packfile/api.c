@@ -390,8 +390,8 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         opcode_t flag_idx = -1;
         opcode_t i;
         for (i = 0; i < nmaps; i++) {
-            const opcode_t pmc_idx = ct->tag_map[i * 2];
-            const opcode_t str_idx = ct->tag_map[i * 2 + 1];
+            const opcode_t str_idx = ct->tag_map[i].tag_idx;
+            const opcode_t pmc_idx = ct->tag_map[i].const_idx;
             if (flag_idx == -1 && STRING_equal(interp, flag, ct->str.constants[str_idx]))
                 flag_idx = str_idx;
             if (flag_idx == -1 || str_idx != flag_idx)

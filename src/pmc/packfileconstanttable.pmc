@@ -114,8 +114,8 @@ Set pointer to underlying PackFile_ConstTable
 
         for (i = 0; i < table->ntags; i++) {
             const INTVAL ptr = i * 2;
-            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr, table->tag_map[ptr]);
-            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr + 1, table->tag_map[ptr + 1]);
+            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr, table->tag_map[i].tag_idx);
+            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr, table->tag_map[i].const_idx);
         }
     }
 
@@ -147,7 +147,7 @@ Set pointer to underlying PackFile_ConstTable
         pftable->pmc.constants   = mem_gc_allocate_n_typed(INTERP,
                                     pftable->pmc.const_count, PMC *);
         pftable->tag_map         = mem_gc_allocate_n_typed(INTERP,
-                                    pftable->ntags * 2, opcode_t);
+                                    pftable->ntags, PackFile_ConstTagPair);
 
         for (i = 0; i < pftable->num.const_count; i++)
             pftable->num.constants[i] =
@@ -163,8 +163,10 @@ Set pointer to underlying PackFile_ConstTable
 
         for (i = 0; i < pftable->ntags; i++) {
             const int ptr = i * 2;
-            pftable->tag_map[ptr] = VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, ptr);
-            pftable->tag_map[ptr+1] = VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, ptr+1);
+            pftable->tag_map[i].tag_idx   = VTABLE_get_integer_keyed_int(INTERP,
+                                                attrs->tag_map, ptr);
+            pftable->tag_map[i].const_idx = VTABLE_get_integer_keyed_int(INTERP,
+                                                attrs->tag_map, ptr + 1);
         }
 
         return pftable;
