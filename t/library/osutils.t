@@ -15,12 +15,15 @@ Test the osutils library
 
 =cut
 
+.loadlib 'io_ops'
+
 .sub 'main' :main
     .include 'test_more.pir'
+    .include 'stat.pasm'
 
     load_bytecode 'osutils.pir'
 
-    plan(22)
+    plan(24)
     test_basename()
     test_dirname()
     test_catfile()
@@ -28,6 +31,8 @@ Test the osutils library
     test_newer()
     test_rindex()
     test_file_exists()
+    test_mkpath()
+    test_rmtree()
     test_slurp()
 .end
 
@@ -95,6 +100,20 @@ Test the osutils library
 
     $I0 = file_exists('foobar')
     nok($I0, "file_exists('foobar')")
+.end
+
+.sub 'test_mkpath'
+    $S0 = 'foo'
+    mkpath($S0)
+    $I0 = stat $S0, .STAT_EXISTS
+    ok($I0, "mkpath('foo')")
+.end
+
+.sub 'test_rmtree'
+    $S0 = 'foo'
+    rmtree($S0)
+    $I0 = stat $S0, .STAT_EXISTS
+    nok($I0, "rmtree('foo')")
 .end
 
 .sub 'test_slurp'
