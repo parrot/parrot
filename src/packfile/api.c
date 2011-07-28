@@ -357,6 +357,50 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+
+void
+Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), const int tag_idx,
+                        const int const_idx) {
+    int lo, hi, cur;
+    const STRING *tag = ct->str.constants[tag_idx];
+
+    /* allocate space */
+    if (ct->tag_map == NULL) {
+        ct->tag_map = mem_gc_allocate_n_zeroed_typed(interp, 1, PackFile_ConstTagPair);
+        ct->ntags   = 1;
+    }
+    else {
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(interp, ct->tag_map, ct->ntags + 1, ct->ntags,
+                                                    PackFile_ConstTagPair);
+        ct->ntags++;
+    }
+
+    /* find the slot to insert into */
+    lo  = 0;
+    cur = 0;
+    hi  = ct->ntags - 1;
+    while (lo < hi) {
+        cur = (lo + hi)/2;
+
+        switch (STRING_compare(interp, tag, ct->str.constants[ct->tag_map[cur].tag_idx])) {
+          case -1:
+            lo = ++cur;
+            break;
+          case 0:
+            lo = hi = cur;
+            break;
+          case 1:
+            hi = cur;
+            break;
+        }
+    }
+
+    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+                    ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
+    ct->tag_map[cur].tag_idx   = tag_idx;
+    ct->tag_map[cur].const_idx = const_idx;
+}
+
 /*
 
 =item C<PMC * Parrot_pf_subs_by_flag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>

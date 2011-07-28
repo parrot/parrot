@@ -131,6 +131,7 @@ Set pointer to underlying PackFile_ConstTable
         PackFile_ConstTable * const pftable =
                 mem_gc_allocate_zeroed_typed(INTERP, PackFile_ConstTable);
         opcode_t              i;
+        const int tag_elts = VTABLE_elements(INTERP, attrs->tag_map);
 
         pftable->base.type = PF_CONST_SEG;
 
@@ -138,7 +139,6 @@ Set pointer to underlying PackFile_ConstTable
         pftable->num.const_count = VTABLE_get_integer(INTERP, attrs->num_constants);
         pftable->str.const_count = VTABLE_get_integer(INTERP, attrs->str_constants);
         pftable->pmc.const_count = VTABLE_get_integer(INTERP, attrs->pmc_constants);
-        pftable->ntags = VTABLE_elements(INTERP, attrs->tag_map);
 
         pftable->num.constants   = mem_gc_allocate_n_typed(INTERP,
                                     pftable->num.const_count, FLOATVAL);
@@ -146,8 +146,6 @@ Set pointer to underlying PackFile_ConstTable
                                     pftable->str.const_count, STRING *);
         pftable->pmc.constants   = mem_gc_allocate_n_typed(INTERP,
                                     pftable->pmc.const_count, PMC *);
-        pftable->tag_map         = mem_gc_allocate_n_typed(INTERP,
-                                    pftable->ntags, PackFile_ConstTagPair);
 
         for (i = 0; i < pftable->num.const_count; i++)
             pftable->num.constants[i] =
@@ -161,12 +159,10 @@ Set pointer to underlying PackFile_ConstTable
             pftable->pmc.constants[i] =
                 VTABLE_get_pmc_keyed_int(INTERP, attrs->pmc_constants, i);
 
-        for (i = 0; i < pftable->ntags; i++) {
-            const int ptr = i * 2;
-            pftable->tag_map[i].tag_idx   = VTABLE_get_integer_keyed_int(INTERP,
-                                                attrs->tag_map, ptr);
-            pftable->tag_map[i].const_idx = VTABLE_get_integer_keyed_int(INTERP,
-                                                attrs->tag_map, ptr + 1);
+        for (i = 0; i < tag_elts; i += 2) {
+            Parrot_pf_tag_constant(interp, pftable, 
+                                    VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i),
+                                    VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i + 1));
         }
 
         return pftable;

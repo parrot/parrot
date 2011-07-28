@@ -1687,26 +1687,14 @@ store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_
                 ARGMOD(PackFile_ConstTable * ct))
 {
     ASSERT_ARGS(store_sub_tags)
-    const opcode_t n = ct->ntags;
-    const opcode_t s = sub->nflags;
     opcode_t i;
-    if (s == 0)
-        return;
-    if (ct->tag_map == NULL)
-        ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s, PackFile_ConstTagPair);
-    else
-        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, n + s, n,
-                                                    PackFile_ConstTagPair);
-
-    for (i = 0; i < s; i++) {
+    for (i = 0; i < sub->nflags; i++) {
         SymReg * const flag = sub->flags[i];
         STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
                     strlen(flag->name) - 2);
         const int tag_idx = add_const_str(imcc, tag, ct->code);
-        ct->tag_map[n + i].tag_idx   = tag_idx;
-        ct->tag_map[n + i].const_idx = sub_idx;
+        Parrot_pf_tag_constant(imcc->interp, ct, tag_idx, sub_idx);
     }
-    ct->ntags += s;
 }
 
 /*
