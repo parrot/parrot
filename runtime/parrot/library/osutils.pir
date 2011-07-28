@@ -278,7 +278,14 @@ C<foo/bar> (in that order), before C<foo/bar/baz> can be created.
 
 =item B<install(string src, string dst, int :exe(), int :verbose())>
 
-TODO: I have no idea what this thing does
+Copies the file given in C<src> to C<dst> and sets attributes.
+
+The C<:exe()> argument is an optional integer which indicates whether or not to
+set the executable mode bit for all users for the file given in C<dst>.
+
+The C<:verbose()> argument is an optional integer which indicates whether or
+not to be verbose. If given, each step during the installation process will be
+displayed.
 
 =cut
 
