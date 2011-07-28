@@ -216,12 +216,12 @@ sub generate_bytecode_for_chunks {
 sub m0b_metadata_seg {
     my ($chunk) = @_;
 
-    my $entry_count = 0;
+    my $entry_count = scalar(split /\n/, $chunk->{metadata});
     my $metadata  = $chunk->{metadata};
 
     my $bytecode  = pack("i", $M0_META_SEG);
     $bytecode    .= pack("i", $entry_count);
-    $bytecode    .= pack("i", m0b_meta_seg_length($metadata));
+    $bytecode    .= pack("i", $entry_count * 12);
 
     #for each entry
     for (split /\n/, $metadata) {
