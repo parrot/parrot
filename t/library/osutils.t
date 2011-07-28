@@ -20,13 +20,14 @@ Test the osutils library
 
     load_bytecode 'osutils.pir'
 
-    plan(19)
+    plan(21)
     test_basename()
     test_dirname()
     test_catfile()
     test_splitpath()
     test_newer()
     test_rindex()
+    test_file_exists()
 .end
 
 .sub 'test_basename'
@@ -87,6 +88,13 @@ Test the osutils library
     is($I0, 7, "rindex('abc.def.ghi', '.')")
 .end
 
+.sub 'test_file_exists'
+    $I0 = file_exists('t/library/osutils.t')
+    ok($I0, "file_exists('t/library/osutils.t')")
+
+    $I0 = file_exists('foobar')
+    nok($I0, "file_exists('foobar')")
+.end
 
 # Local Variables:
 #   mode: pir
