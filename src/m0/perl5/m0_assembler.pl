@@ -218,23 +218,16 @@ sub m0b_metadata_seg {
 
     my $entry_count = 0;
     my $metadata  = $chunk->{metadata};
-    my $constants = $chunk->{constants};
 
     my $bytecode  = pack("i", $M0_META_SEG);
     $bytecode    .= pack("i", $entry_count);
     $bytecode    .= pack("i", m0b_meta_seg_length($metadata));
 
-    # TODO: make this work for a non-empty metadata segment
     #for each entry
-    #for my $offset (keys %$metadata) {
-        #for my $key (keys %{$metadata->{$offset}}) {
-            #my $key_idx = m0b_get_val_idx($key, $constants);
-            #my $val_idx = m0b_get_val_idx($metadata->{$offset}{$key}, $constants);
-            #$bytecode .= pack('l', $offset);
-            #$bytecode .= pack('l', $key_idx);
-            #$bytecode .= pack('l', $val_idx);
-        #}
-    #}
+    for (split /\n/, $metadata) {
+        my ($addr, $name_idx, $value_idx) = split /\s+/, $_;
+        $bytecode .= pack('iii', $addr, $name_idx, $value_idx);
+    }
 
     return $bytecode;
 }
@@ -487,13 +480,7 @@ Calculate the number of bytes that a metadata segment will occupy.
 sub m0b_meta_seg_length {
     my ($metadata) = @_;
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
-
-    #TODO
-    #for my $offset (keys %$metadata) {
-    #    for (keys %{$metadata->{$offset}}) {
-    #        $seg_length += 12;
-    #    }
-    #}
+    $seg_length += 12 * scalar(split /\n/, $metadata);
 
     m0_say "metadata seg length is $seg_length";
     return $seg_length;
