@@ -483,6 +483,17 @@ add_pcc_multi(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg 
     sub->nmulti++;
 }
 
+
+/*
+
+=item C<void add_pcc_flag_str(imc_info_t * imcc, SymReg * r, SymReg * arg)>
+
+Associate a tag with a sub.
+
+=cut
+
+*/
+
 void
 add_pcc_flag_str(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg * r), ARGIN(SymReg * arg))
 {

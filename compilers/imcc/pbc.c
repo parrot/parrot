@@ -1670,6 +1670,18 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
     }
 }
 
+
+/*
+
+=item C<static void store_sub_tags(imc_info_t * imcc, pcc_sub_t * sub, const int
+sub_idx, PackFile_ConstTable * ct)>
+
+Store the tags associated with a sub in the provided constant table.
+
+=cut
+
+*/
+
 static void
 store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx,
                 ARGMOD(PackFile_ConstTable * ct))
