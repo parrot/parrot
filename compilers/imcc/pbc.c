@@ -1671,7 +1671,8 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
 }
 
 static void
-store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx, ARGMOD(PackFile_ConstTable * ct))
+store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx,
+                ARGMOD(PackFile_ConstTable * ct))
 {
     ASSERT_ARGS(store_sub_tags)
     const opcode_t n = ct->ntags;
@@ -1682,7 +1683,8 @@ store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_
     if (ct->tag_map == NULL)
         ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s * 2, opcode_t);
     else
-        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, (n + s) * 2, n * 2, opcode_t);
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, (n + s) * 2, n * 2,
+                                                    opcode_t);
 
     for (i = 0; i < s; i++) {
         SymReg * const flag = sub->flags[i];
