@@ -7,7 +7,7 @@ t/library/osutils.t
 
 =head1 DESCRIPTION
 
-Test the osutils library
+Tests the C<osutils> runtime library.
 
 =head1 SYNOPSIS
 
@@ -39,50 +39,57 @@ Test the osutils library
 .sub 'test_basename'
     $S0 = 'foo/bar/baz.txt'
     $S0 = basename($S0)
-    is( $S0, 'baz.txt', "basename" )
+    is($S0, 'baz.txt', "basename('foo/bar/baz.txt')")
 .end
 
 .sub 'test_dirname'
     $S0 = 'foo/bar/baz.txt'
     $S0 = dirname($S0)
-    is( $S0, 'foo/bar', "dirname" )
+    is($S0, 'foo/bar', "dirname('foo/bar')")
+
     $S0 = dirname($S0)
-    is( $S0, 'foo', "dirname" )
+    is($S0, 'foo', "dirname('foo')")
+
     $S0 = dirname($S0)
-    is( $S0, '.', "dirname" )
+    is($S0, '.', "dirname('.')")
 .end
 
 .sub 'test_catfile'
     $S0 = catfile('abc', 'def', 'ghi')
-    is($S0, 'abc/def/ghi', "catfile")
+    is($S0, 'abc/def/ghi', "catfile('abc', 'def', 'ghi')")
 .end
 
 .sub 'test_splitpath'
     .local string volume, directories, file
+
     (volume, directories, file) = splitpath('abc/def/ghi.txt')
-    is(volume, '', "splitpath vol")
-    is(directories, 'abc/def', "splitpath dirs")
-    is(file, 'ghi.txt', "splitpath file")
+    is(volume,      '',        "splitpath('')")
+    is(directories, 'abc/def', "splitpath('abc/def')")
+    is(file,        'ghi.txt', "splitpath('ghi.txt')")
 
     (volume, directories, file) = splitpath('c:/abc/def/ghi.txt')
-    is(volume, 'c:', "splitpath vol")
-    is(directories, '/abc/def', "splitpath dirs")
-    is(file, 'ghi.txt', "splitpath file")
+    is(volume,      'c:',       "splitpath('c:')")
+    is(directories, '/abc/def', "splitpath('/abc/def')")
+    is(file,        'ghi.txt',  "splitpath('ghi.txt')")
 .end
 
 .sub 'test_newer'
     $I0 = newer('runtime/parrot/library/osutils.pbc', 'runtime/parrot/library/osutils.pir')
     ok($I0, "newer('osutils.pbc', 'osutils.pir')")
+
     $I0 = newer('runtime/parrot/library/osutils.no_file', 'runtime/parrot/library/osutils.pir')
     nok($I0, "newer('osutils.no_file', 'osutils.pir')")
+
     $I0 = newer('runtime/parrot/library/osutils.pir', 'runtime/parrot/library/osutils.pir')
     nok($I0, "newer('osutils.pir', 'osutils.pir')")
 
     $P0 = split ' ', 'runtime/parrot/library/osutils.pir runtime/parrot/include/stat.pasm'
     $I0 = newer('runtime/parrot/library/osutils.pbc', $P0)
     ok($I0, "newer('osutils.pbc', ['osutils.pir', 'stat.pasm'])")
+
     $I0 = newer('runtime/parrot/library/osutils.no_file', $P0)
     nok($I0, "newer('osutils.no_file', ['osutils.pir', 'stat.pasm'])")
+
     $I0 = newer('runtime/parrot/library/osutils.pir', $P0)
     nok($I0, "newer('osutils.pir', ['osutils.pir', 'stat.pasm'])")
 .end
@@ -90,6 +97,7 @@ Test the osutils library
 .sub 'test_rindex'
     $I0 = rindex('abc', '.')
     is($I0, -1, "rindex('abc', '.')")
+
     $I0 = rindex('abc.def.ghi', '.')
     is($I0, 7, "rindex('abc.def.ghi', '.')")
 .end
