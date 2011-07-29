@@ -25,11 +25,11 @@ Tests the C<osutils> runtime library.
 
     ######################################################################
     # NOTE: Do not change the order in which these functions are called! #
-    ####### Some of them rely of the presence of resources created by    #
-    ####### functions called before them!                                #
+    #       Some of them rely of the presence of resources created by    #
+    #       functions called before them!                                #
     ######################################################################
 
-    plan(25)
+    plan(28)
     test_basename()
     test_dirname()
     test_catfile()
@@ -39,6 +39,8 @@ Tests the C<osutils> runtime library.
     test_file_exists()
     test_mkpath()
     test_cp()
+    test_install()
+    test_unlink()
     test_rmtree()
     test_slurp()
 .end
@@ -132,6 +134,31 @@ Tests the C<osutils> runtime library.
     cp($S0, $S1)
     $I0 = stat $S1, .STAT_EXISTS
     ok($I0, "cp('testlib/foo.txt', 'testlib/foo/bar/baz/foo.txt')")
+.end
+
+.sub 'test_install'
+    $S0 = 't/library/testlib/foo.txt'
+    $S1 = 't/library/testlib/foo/bar/baz/bar.txt'
+
+    install($S0, $S1)
+    $I0 = stat $S1, .STAT_EXISTS
+    ok($I0, "install('testlib/foo.txt', 'testlib/foo/bar/baz/bar.txt')")
+.end
+
+.sub 'test_unlink'
+    $S0 = 't/library/testlib/foo/bar/baz/foo.txt'
+    $S1 = 't/library/testlib/foo/bar/baz/bar.txt'
+
+    unlink($S0)
+    $I0 = stat $S0, .STAT_EXISTS
+    nok($I0, "unlink('testlib/foo/bar/baz/foo.txt')")
+
+    $P0 = new 'ResizableStringArray'
+    push $P0, $S1
+
+    unlink($P0)
+    $I0 = stat $S1, .STAT_EXISTS
+    nok($I0, "unlink('testlib/foo/bar/baz/bar.txt')")
 .end
 
 .sub 'test_rmtree'
