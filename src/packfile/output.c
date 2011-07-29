@@ -280,8 +280,8 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
     *cursor++ = self->ntags;
     for (i = 0; i < self->ntags; i++) {
-        *cursor++ = self->tag_map[i * 2];
-        *cursor++ = self->tag_map[i * 2 + 1];
+        *cursor++ = self->tag_map[i].tag_idx;
+        *cursor++ = self->tag_map[i].const_idx;
     }
 
     return cursor;

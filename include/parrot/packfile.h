@@ -168,6 +168,11 @@ typedef struct PackFile_Segment {
 
 typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void *user_data));
 
+typedef struct PackFile_ConstTagPair {
+    opcode_t tag_idx;
+    opcode_t const_idx;
+} PackFile_ConstTagPair;
+
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     struct {
@@ -182,11 +187,11 @@ typedef struct PackFile_ConstTable {
         opcode_t        const_count;
         PMC           **constants;
     } pmc;
-    PackFile_ByteCode  *code;        /* where this segment belongs to */
-    Hash               *string_hash; /* Hash for lookup of string indices */
-    Hash               *pmc_hash;    /* Hash for lookup of pmc indices */
-    opcode_t           *tag_map;     /* n-m Mapping pmc constants to string tags */
-    opcode_t            ntags;       /* Number of tags */
+    PackFile_ByteCode     *code;        /* where this segment belongs to */
+    Hash                  *string_hash; /* Hash for lookup of string indices */
+    Hash                  *pmc_hash;    /* Hash for lookup of pmc indices */
+    PackFile_ConstTagPair *tag_map;     /* n-m Mapping pmc constants to string tags */
+    opcode_t               ntags;       /* Number of tags */
 } PackFile_ConstTable;
 
 typedef struct PackFile_ByteCode_OpMappingEntry {

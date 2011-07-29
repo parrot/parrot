@@ -1670,30 +1670,32 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
     }
 }
 
-static void
-store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx, ARGMOD(PackFile_ConstTable * ct))
-{
-    const opcode_t n = ct->ntags;
-    const opcode_t s = sub->nflags;
-    opcode_t i;
-    if (s == 0)
-        return;
-    if (ct->tag_map == NULL)
-        ct->tag_map = mem_gc_allocate_n_zeroed_typed(imcc->interp, s * 2, opcode_t);
-    else
-        ct->tag_map = mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->tag_map, (n + s) * 2, n * 2, opcode_t);
 
-    for (i = 0; i < s; i++) {
+/*
+
+=item C<static void store_sub_tags(imc_info_t * imcc, pcc_sub_t * sub, const int
+sub_idx, PackFile_ConstTable * ct)>
+
+Store the tags associated with a sub in the provided constant table.
+
+=cut
+
+*/
+
+static void
+store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx,
+                ARGMOD(PackFile_ConstTable * ct))
+{
+    ASSERT_ARGS(store_sub_tags)
+    opcode_t i;
+    for (i = 0; i < sub->nflags; i++) {
         SymReg * const flag = sub->flags[i];
 
         STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
                     strlen(flag->name) - 2);
         const int tag_idx = add_const_str(imcc, tag, ct->code);
-        const int x = (n + i) * 2;
-        ct->tag_map[x] = sub_idx;
-        ct->tag_map[x + 1] = tag_idx;
+        Parrot_pf_tag_constant(imcc->interp, ct, tag_idx, sub_idx);
     }
-    ct->ntags += s;
 }
 
 /*

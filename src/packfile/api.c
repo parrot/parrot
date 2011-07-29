@@ -357,6 +357,50 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+
+void
+Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), const int tag_idx,
+                        const int const_idx) {
+    int lo, hi, cur;
+    const STRING *tag = ct->str.constants[tag_idx];
+
+    /* allocate space */
+    if (ct->tag_map == NULL) {
+        ct->tag_map = mem_gc_allocate_n_zeroed_typed(interp, 1, PackFile_ConstTagPair);
+        ct->ntags   = 1;
+    }
+    else {
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(interp, ct->tag_map, ct->ntags + 1, ct->ntags,
+                                                    PackFile_ConstTagPair);
+        ct->ntags++;
+    }
+
+    /* find the slot to insert into */
+    lo  = 0;
+    cur = 0;
+    hi  = ct->ntags - 1;
+    while (lo < hi) {
+        cur = (lo + hi)/2;
+
+        switch (STRING_compare(interp, tag, ct->str.constants[ct->tag_map[cur].tag_idx])) {
+          case -1:
+            lo = ++cur;
+            break;
+          case 0:
+            lo = hi = cur;
+            break;
+          case 1:
+            hi = cur;
+            break;
+        }
+    }
+
+    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+                    ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
+    ct->tag_map[cur].tag_idx   = tag_idx;
+    ct->tag_map[cur].const_idx = const_idx;
+}
+
 /*
 
 =item C<PMC * Parrot_pf_subs_by_flag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
@@ -386,18 +430,59 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         mode = 2;
     {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
-        const opcode_t nmaps = ct->ntags;
         opcode_t flag_idx = -1;
-        opcode_t i;
-        for (i = 0; i < nmaps; i++) {
-            const opcode_t pmc_idx = ct->tag_map[i * 2];
-            const opcode_t str_idx = ct->tag_map[i * 2 + 1];
-            if (flag_idx == -1 && STRING_equal(interp, flag, ct->str.constants[str_idx]))
-                flag_idx = str_idx;
-            if (flag_idx == -1 || str_idx != flag_idx)
-                continue;
-            VTABLE_push_pmc(interp, subs, ct->pmc.constants[pmc_idx]);
+
+        int bottom_lo, bottom_hi, top_lo, top_hi, cur;
+        int i;
+
+        bottom_lo = top_lo = cur = 0;
+        bottom_hi = top_hi = ct->ntags;
+
+        /* find the first match (if any) */
+        while (flag_idx < 0) {
+            if (bottom_lo == top_hi) {
+                /* tag not present */
+                goto done_find_bounds;
+            }
+
+            cur = (bottom_lo + top_hi)/2;
+
+            switch (STRING_compare(interp, flag, ct->str.constants[ct->tag_map[cur].tag_idx])) {
+              case -1:
+                bottom_lo = cur + 1;
+                break;
+              case 0:
+                flag_idx  = ct->tag_map[cur].tag_idx;
+                bottom_hi = cur;
+                top_lo    = cur + 1;
+                break;
+              case 1:
+                top_hi = cur;
+                break;
+            }
         }
+
+        /* find the bottom of the map's range with this tag */
+        while (bottom_lo < bottom_hi) {
+            cur = (bottom_lo + bottom_hi)/2;
+            if (ct->tag_map[cur].tag_idx == flag_idx)
+                bottom_hi = cur;
+            else
+                bottom_lo = cur + 1;
+        }
+
+        /* find the top */
+        while (top_lo < top_hi) {
+            cur = (top_lo + top_hi)/2;
+            if (ct->tag_map[cur].tag_idx == flag_idx)
+                top_lo = cur + 1;
+            else
+                top_hi = cur;
+        }
+
+      done_find_bounds:
+        for (i = bottom_lo; i < top_hi; i++)
+            VTABLE_push_pmc(interp, subs, ct->pmc.constants[ct->tag_map[i].const_idx]);
     }
 
     if (mode == 1 || mode == 2) {
