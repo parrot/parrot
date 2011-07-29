@@ -69,7 +69,9 @@ static int pool_is_maybe_owned(
         FUNC_MODIFIES(*pool);
 
 PARROT_WARN_UNUSED_RESULT
-static int pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
+static int pool_is_owned(
+    ARGMOD(Pool_Allocator *pool),
+    ARGIN(const void *ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -415,7 +417,7 @@ Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
 
 =item C<static void pool_free(PARROT_INTERP, Pool_Allocator *pool, void *data)>
 
-=item C<static int pool_is_owned(Pool_Allocator *pool, void *ptr)>
+=item C<static int pool_is_owned(Pool_Allocator *pool, const void *ptr)>
 
 =item C<static int pool_is_maybe_owned(Pool_Allocator *pool, void *ptr)>
 
@@ -501,7 +503,7 @@ pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 
 PARROT_WARN_UNUSED_RESULT
 static int
-pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
+pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(pool_is_owned)
 
@@ -510,11 +512,10 @@ pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 
         /* We can cache these values. All arenas are same size */
         const ptrdiff_t             a_size  = arena_size(pool);
-        const ptrdiff_t             objsize = pool->object_size;
 
         while (arena) {
-            const Pool_Allocator_Arena *arena_item   = arena + 1;
-            const ptrdiff_t ptr_diff = (char *) ptr - (const char *) arena_item;
+            const Pool_Allocator_Arena * const arena_item = arena + 1;
+            const ptrdiff_t ptr_diff = (const char *) ptr - (const char *) arena_item;
 
             if (ptr_diff >= 0 && ptr_diff < a_size
                 &&  ptr_diff % pool->object_size == 0)
