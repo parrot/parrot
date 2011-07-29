@@ -1359,56 +1359,56 @@ src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
 	include/pmc/pmc_key.h
 
 src/gc/mark_sweep$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/mark_sweep.c \
-    src/gc/variable_size_pool.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/mark_sweep.c \
+	src/gc/variable_size_pool.h
 
 src/gc/gc_ms$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/gc_ms.c \
-    src/gc/variable_size_pool.h \
-    $(INC_DIR)/list.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/gc_ms.c \
+	src/gc/variable_size_pool.h \
+	$(INC_DIR)/list.h
 
 src/gc/gc_inf$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/gc_inf.c \
-    src/gc/variable_size_pool.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/gc_inf.c \
+	src/gc/variable_size_pool.h
 
 src/gc/gc_ms2$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/fixed_allocator.h \
-    src/gc/gc_ms2.c \
-    $(INC_DIR)/pointer_array.h \
-    src/gc/variable_size_pool.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/fixed_allocator.h \
+	src/gc/gc_ms2.c \
+	$(INC_DIR)/pointer_array.h \
+	src/gc/variable_size_pool.h
 
 src/gc/api$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/api.c \
-    src/gc/variable_size_pool.h \
-    src/gc/fixed_allocator.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/api.c \
+	src/gc/variable_size_pool.h \
+	src/gc/fixed_allocator.h
 
 src/gc/alloc_resources$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/variable_size_pool.h \
-    src/gc/gc_private.h \
-    src/gc/alloc_resources.c
+	$(PARROT_H_HEADERS) \
+	src/gc/variable_size_pool.h \
+	src/gc/gc_private.h \
+	src/gc/alloc_resources.c
 
 src/gc/fixed_allocator$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/variable_size_pool.h \
-    src/gc/fixed_allocator.h \
-    src/gc/fixed_allocator.c
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/variable_size_pool.h \
+	src/gc/fixed_allocator.h \
+	src/gc/fixed_allocator.c
 
 src/gc/gc_gms$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/gc/gc_gms.c \
-    $(INC_DIR)/pointer_array.h \
+	$(INC_DIR)/pointer_array.h \
 	src/gc/gc_private.h \
 	src/gc/fixed_allocator.h \
 	src/gc/variable_size_pool.h
@@ -1419,10 +1419,10 @@ src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
 src/gc/string_gc$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/string_gc.c \
-    src/gc/variable_size_pool.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/string_gc.c \
+	src/gc/variable_size_pool.h
 
 src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
 	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
@@ -1443,13 +1443,13 @@ src/hll$(O) : \
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
 src/runcore/trace$(O) : \
-    include/pmc/pmc_sub.h \
-    src/runcore/trace.c \
-    $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/runcore_trace.h \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/oplib/core_ops.h \
-    $(INC_DIR)/runcore_api.h
+	include/pmc/pmc_sub.h \
+	src/runcore/trace.c \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/runcore_trace.h \
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
 	$(PARROT_H_HEADERS) src/debug.c \
@@ -1461,23 +1461,23 @@ src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
 	$(INC_DIR)/extend_vtable.h
 
 src/sub$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/oplib/core_ops.h \
-    $(INC_DIR)/runcore_api.h \
-    src/sub.str \
-    src/sub.c \
-    include/pmc/pmc_sub.h \
-    include/pmc/pmc_continuation.h
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h \
+	src/sub.str \
+	src/sub.c \
+	include/pmc/pmc_sub.h \
+	include/pmc/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 	src/string/private_cstring.h src/string/api.c
 
 src/longopt$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/api.h \
-    $(INC_DIR)/longopt.h \
-    src/longopt.c
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/longopt.h \
+	src/longopt.c
 
 src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
 	src/dynext.str include/pmc/pmc_parrotlibrary.h src/dynext.c
@@ -1487,17 +1487,17 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	include/pmc/pmc_continuation.h
 
 src/thread$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/extend.h \
-    $(INC_DIR)/extend_vtable.h \
-    src/thread.c \
-    include/pmc/pmc_sub.h \
-    include/pmc/pmc_parrotinterpreter.h \
-    $(INC_DIR)/runcore_api.h
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h \
+	src/thread.c \
+	include/pmc/pmc_sub.h \
+	include/pmc/pmc_parrotinterpreter.h \
+	$(INC_DIR)/runcore_api.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
-    include/pmc/pmc_sub.h $(INC_DIR)/extend_vtable.h src/extend.c
+	include/pmc/pmc_sub.h $(INC_DIR)/extend_vtable.h src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
