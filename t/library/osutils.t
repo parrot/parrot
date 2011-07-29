@@ -23,7 +23,13 @@ Tests the C<osutils> runtime library.
 
     load_bytecode 'osutils.pir'
 
-    plan(24)
+    ######################################################################
+    # NOTE: Do not change the order in which these functions are called! #
+    ####### Some of them rely of the presence of resources created by    #
+    ####### functions called before them!                                #
+    ######################################################################
+
+    plan(25)
     test_basename()
     test_dirname()
     test_catfile()
@@ -32,6 +38,7 @@ Tests the C<osutils> runtime library.
     test_rindex()
     test_file_exists()
     test_mkpath()
+    test_cp()
     test_rmtree()
     test_slurp()
 .end
@@ -103,30 +110,41 @@ Tests the C<osutils> runtime library.
 .end
 
 .sub 'test_file_exists'
-    $I0 = file_exists('t/library/osutils.t')
-    ok($I0, "file_exists('t/library/osutils.t')")
+    $I0 = file_exists('t/library/testlib/foo.txt')
+    ok($I0, "file_exists('testlib/foo.txt')")
 
     $I0 = file_exists('foobar')
     nok($I0, "file_exists('foobar')")
 .end
 
 .sub 'test_mkpath'
-    $S0 = 'foo'
+    $S0 = 't/library/testlib/foo/bar/baz'
+
     mkpath($S0)
     $I0 = stat $S0, .STAT_EXISTS
-    ok($I0, "mkpath('foo')")
+    ok($I0, "mkpath('testlib/foo/bar/baz')")
+.end
+
+.sub 'test_cp'
+    $S0 = 't/library/testlib/foo.txt'
+    $S1 = 't/library/testlib/foo/bar/baz/foo.txt'
+
+    cp($S0, $S1)
+    $I0 = stat $S1, .STAT_EXISTS
+    ok($I0, "cp('testlib/foo.txt', 'testlib/foo/bar/baz/foo.txt')")
 .end
 
 .sub 'test_rmtree'
-    $S0 = 'foo'
+    $S0 = 't/library/testlib/foo'
+
     rmtree($S0)
     $I0 = stat $S0, .STAT_EXISTS
-    nok($I0, "rmtree('foo')")
+    nok($I0, "rmtree('testlib/foo')")
 .end
 
 .sub 'test_slurp'
-    $S0 = slurp('t/library/osutils.t')
-    ok($S0, "slurp('t/library/osutils.t')")
+    $S0 = slurp('t/library/testlib/foo.txt')
+    ok($S0, "slurp('testlib/foo.txt')")
 .end
 
 # Local Variables:
