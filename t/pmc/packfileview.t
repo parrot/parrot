@@ -4,7 +4,7 @@
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(15)
+    plan(19)
 
     test_create()
     test_vtable_get_bool()
@@ -14,6 +14,7 @@
     test_method_constant_counts()
     test_method_main_sub()
     test_method_subs_by_flag()
+    test_method_subs_by_flag_tag_syntax()
     test_method_serialized_size()
     test_method_serialize()
     test_method_all_subs()
@@ -92,12 +93,51 @@
 
     $P2 = compreg "PIR"
     $S0 = ".sub __init :init\nok(1, 'init function executed on demand')\n.end"
-    $P1 = $P2.'compile'($S0)
-    $P3 = $P1.'subs_by_flag'("init")
+    $P5 = $P2.'compile'($S0)
+    $P3 = $P5.'subs_by_flag'("init")
     $I0 = elements $P3
     is($I0, 1)
     $P4 = $P3[0]
     $P4()
+.end
+
+.sub 'test_method_subs_by_flag_tag_syntax'
+    $P0 = getinterp
+    $P1 = $P0["packfile"]
+
+    $P2 = $P1.'subs_by_flag'("tag-a")
+    $I0 = elements $P2
+    is($I0, 1, "Can get subs marked 'tag-a'")
+
+    $P2 = $P1.'subs_by_flag'("tag-b")
+    $I0 = elements $P2
+    is($I0, 2, "Can get subs marked 'tag-b'")
+
+    $P2 = $P1.'subs_by_flag'("tag-c")
+    $I0 = elements $P2
+    is($I0, 2, "Can get subs marked 'tag-c'")
+
+    # For upgrade, verify that :init is the same as :tag("init")
+    $P2 = compreg "PIR"
+    $S0 = <<'__EOCODE__'
+
+.sub __init_old :init
+    .return("init_old")
+.end
+
+.sub __init_tag :tag("init")
+    .return("init_tag")
+.end
+
+.sub __not_init :tag("something-else")
+    .return("not_init")
+.end
+__EOCODE__
+
+    $P1 = $P2.'compile'($S0)
+    $P3 = $P1.'subs_by_flag'("init")
+    $I0 = elements $P3
+    is($I0, 2)
 .end
 
 .sub 'test_method_serialized_size'
@@ -145,6 +185,23 @@
 
 .sub 'test_method_write_to_file'
     # TODO: Would really like temporary files for this. TT #955
+.end
+
+# Subs with :tag syntax
+.sub 'tag1' :tag("tag-a")
+    .return('tag1')
+.end
+
+.sub 'tag2' :tag("tag-b")
+    .return('tag2')
+.end
+
+.sub 'tag3' :tag("tag-c")
+    .return('tag3')
+.end
+
+.sub 'tag4' :tag("tag-c", "tag-b")
+    .return('tag4')
 .end
 
 # Local Variables:

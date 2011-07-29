@@ -553,7 +553,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
-    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
+    PMC      * const old_packfilepmc = Parrot_pf_get_current_packfile(imcc->interp);
+    PMC      * const packfilepmc     = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
     INTVAL           success     = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
@@ -583,7 +584,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
         /* XXX Parrot_pf_get_packfile_pmc registers PMC */
         Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
-
+        if (!PMC_IS_NULL(old_packfilepmc))
+            Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
         return PMCNULL;
     }
 
@@ -597,6 +599,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
+    if (!PMC_IS_NULL(old_packfilepmc))
+        Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
     return packfilepmc;
 }
 
