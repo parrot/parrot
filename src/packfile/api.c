@@ -2125,19 +2125,8 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     else {
         PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_LOADED_PBCS);
-        //PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-
-        //if (!pf)
-        //  Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        //            "Unable to append PBC to the current directory");
-
-        //mem_gc_free(interp, pf->header);
-        //pf->header = NULL;
-        //mem_gc_free(interp, pf->dirp);
-        //pf->dirp   = NULL;
-        /* no need to free pf here, as directory_destroy will get it */
     }
 }
 
