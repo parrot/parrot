@@ -4,9 +4,10 @@
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(19)
+    plan(20)
 
     test_create()
+    test_interp_same_after_compile()
     test_vtable_get_bool()
     test_vtable_get_pmc_keyed_int()
     test_vtable_get_string_keyed_int()
@@ -25,6 +26,15 @@
 
 .sub 'test_create'
     $P0 = new ['PackfileView']
+.end
+
+.sub 'test_interp_same_after_compile'
+    $P0 = getinterp
+    $P2 = compreg "PIR"
+    $S0 = ".sub __init :anon :init\nok(1, 'init function executed on demand')\n.end"
+    $P5 = $P2.'compile'($S0)
+    $P1 = getinterp
+    is_same($P0, $P1, "interp['packfile'] does not change over IMCC invocation")
 .end
 
 .sub 'test_vtable_get_bool'
@@ -92,7 +102,7 @@
     $P4()
 
     $P2 = compreg "PIR"
-    $S0 = ".sub __init :init\nok(1, 'init function executed on demand')\n.end"
+    $S0 = ".sub __init :anon :init\nok(1, 'init function executed on demand')\n.end"
     $P5 = $P2.'compile'($S0)
     $P3 = $P5.'subs_by_flag'("init")
     $I0 = elements $P3
@@ -202,6 +212,15 @@ __EOCODE__
 
 .sub 'tag4' :tag("tag-c", "tag-b")
     .return('tag4')
+.end
+
+# Helper method
+.sub 'is_same'
+    .param pmc x
+    .param pmc y
+    .param string msg
+    $I0 = issame x, y
+    'ok'($I0, msg)
 .end
 
 # Local Variables:
