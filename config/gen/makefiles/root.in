@@ -1425,10 +1425,10 @@ src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
 src/gc/string_gc$(O) : \
-    $(PARROT_H_HEADERS) \
-    src/gc/gc_private.h \
-    src/gc/string_gc.c \
-    src/gc/variable_size_pool.h
+	$(PARROT_H_HEADERS) \
+	src/gc/gc_private.h \
+	src/gc/string_gc.c \
+	src/gc/variable_size_pool.h
 
 src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
 	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
@@ -1444,46 +1444,50 @@ src/hll$(O) : $(PARROT_H_HEADERS) src/hll.str $(INC_DIR)/dynext.h src/hll.c
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
 src/runcore/trace$(O) : \
-    include/pmc/pmc_sub.h \
-    src/runcore/trace.c \
-    $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/runcore_trace.h \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/oplib/core_ops.h \
-    $(INC_DIR)/runcore_api.h
+	include/pmc/pmc_sub.h \
+	src/runcore/trace.c \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/runcore_trace.h \
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h
 
 src/hbdb$(O) : \
-    $(PARROT_H_HEADERS) \
-    include/parrot/embed.h \
-    src/hbdb.c
+	$(PARROT_H_HEADERS) \
+	include/parrot/embed.h \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h \
+	src/hbdb.c
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
 	$(PARROT_H_HEADERS) src/debug.c \
 	$(INC_DIR)/oplib/ops.h \
-        $(INC_DIR)/oplib/core_ops.h \
-	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_trace.h \
 	src/debug.str include/pmc/pmc_key.h \
 	include/pmc/pmc_continuation.h \
 	$(INC_DIR)/extend_vtable.h
 
 src/sub$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/oplib/ops.h \
-    $(INC_DIR)/oplib/core_ops.h \
-    $(INC_DIR)/runcore_api.h \
-    src/sub.str \
-    src/sub.c \
-    include/pmc/pmc_sub.h \
-    include/pmc/pmc_continuation.h
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/runcore_api.h \
+	src/sub.str \
+	src/sub.c \
+	include/pmc/pmc_sub.h \
+	include/pmc/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 	src/string/private_cstring.h src/string/api.c
 
 src/longopt$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/api.h \
-    $(INC_DIR)/longopt.h \
-    src/longopt.c
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/longopt.h \
+	src/longopt.c
 
 src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
 	src/dynext.str include/pmc/pmc_parrotlibrary.h src/dynext.c
@@ -1493,12 +1497,12 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	include/pmc/pmc_continuation.h
 
 src/thread$(O) : \
-    $(PARROT_H_HEADERS) \
-    $(INC_DIR)/extend.h \
-    $(INC_DIR)/extend_vtable.h \
-    src/thread.c \
-    include/pmc/pmc_sub.h \
-    $(INC_DIR)/runcore_api.h
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h \
+	src/thread.c \
+	include/pmc/pmc_sub.h \
+	$(INC_DIR)/runcore_api.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
