@@ -99,6 +99,10 @@ Typical invocations are:
 
 core module Pod-Html
 
+=item pod2man
+
+core module Pod-Man
+
 =back
 
 =head2 PARROT DEPENDENCIES
@@ -234,6 +238,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('build', _build_installable_pbc)
     .const 'Sub' _build_html_pod = '_build_html_pod'
     register_step_after('build', _build_html_pod)
+    .const 'Sub' _build_man_pod = '_build_man_pod'
+    register_step_after('build', _build_man_pod)
 
     .const 'Sub' _clean_dynpmc = '_clean_dynpmc'
     register_step('clean', _clean_dynpmc)
@@ -261,6 +267,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_installable_pbc)
     .const 'Sub' _clean_html_pod = '_clean_html_pod'
     register_step_after('clean', _clean_html_pod)
+    .const 'Sub' _clean_man_pod = '_clean_man_pod'
+    register_step_after('clean', _clean_man_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
     .const 'Sub' _clean_zip = '_clean_zip'
@@ -1607,6 +1615,47 @@ the value is the POD pathname
   L2:
 .end
 
+=item man_pod
+
+hash
+
+the key is the manpage pathname
+
+the value is the POD pathname
+
+=cut
+
+.sub '_build_man_pod' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['man_pod']
+    unless $I0 goto L1
+    $P0 = kv['man_pod']
+    build_man_pod($P0)
+  L1:
+.end
+
+.sub 'build_man_pod'
+    .param pmc hash
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string man, pod
+    man = shift $P0
+    pod = hash[man]
+    $I0 = newer(man, pod)
+    if $I0 goto L1
+    $S0 = dirname(man)
+    mkpath($S0, 1 :named('verbose'))
+    .local string cmd
+    cmd = "pod2man "
+    cmd .= pod
+    cmd .= " > "
+    cmd .= man
+    system(cmd, 1 :named('verbose'))
+    goto L1
+  L2:
+.end
+
 =back
 
 =head3 Step clean
@@ -1920,6 +1969,19 @@ the value is the POD pathname
     $I0 = exists kv['html_pod']
     unless $I0 goto L1
     $P0 = kv['html_pod']
+    clean_key($P0)
+  L1:
+.end
+
+=item man_pod
+
+=cut
+
+.sub '_clean_man_pod' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['man_pod']
+    unless $I0 goto L1
+    $P0 = kv['man_pod']
     clean_key($P0)
   L1:
 .end
