@@ -162,15 +162,17 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
 L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/bf/trunk/setup.pir>
+L<https://github.com/parrot/bf/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/chitchat/trunk/setup.pir>
+L<https://github.com/parrot/chitchat/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/forth/trunk/setup.pir>
+L<https://github.com/parrot/forth/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/lolcode/trunk/setup.pir>
+L<https://github.com/parrot/lolcode/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/pheme/trunk/setup.pir>
+L<https://github.com/parrot/plumage/blob/master/setup.pir>
+
+L<https://github.com/parrot/pheme/blob/master/setup.pir>
 
 L<http://github.com/leto/kea/blob/master/setup.pir>
 
