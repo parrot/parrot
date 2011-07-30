@@ -267,6 +267,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
     register_step_after('clean', _clean_smoke)
+    .const 'Sub' _clean_gzman = '_clean_gzman'
+    register_step_after('clean', _clean_gzman)
 
     .const 'Sub' _update = '_update'
     register_step('update', _update)
@@ -1922,6 +1924,28 @@ the value is the POD pathname
   L1:
 .end
 
+=item man_dir
+
+=cut
+
+.sub '_clean_gzman' :anon
+    .param pmc kv :slurpy :named
+    .local int has_zlib
+    $P0 = get_config()
+    $I0 = $P0['has_zlib']
+    unless $I0 goto L1
+    $P0 = get_install_gzfiles(kv :flat :named)
+    $P1 = iter $P0
+  L2:
+    unless $P1 goto L1
+    $S0 = shift $P1
+    $S1 = $P0[$S0]
+    $S1 .= '.gz'
+    unlink($S1, 1 :named('verbose'))
+    goto L2
+  L1:
+.end
+
 =back
 
 =head3 Step update
@@ -2339,6 +2363,10 @@ array of pathname or a single pathname
 
 =item root
 
+=item man_dir
+
+the default value is man
+
 =cut
 
 .sub '_install' :anon
@@ -2367,6 +2395,30 @@ array of pathname or a single pathname
     install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
     goto L3
   L4:
+
+    .local int has_zlib
+    $P0 = get_config()
+    has_zlib = $P0['has_zlib']
+    $P0 = get_install_gzfiles(kv :flat :named)
+    $P1 = iter $P0
+  L5:
+    unless $P1 goto L6
+    $S0 = shift $P1
+    $S1 = $P0[$S0]
+    $S2 = root . $S0
+    unless has_zlib goto L7
+    $S3 = $S1 . '.gz'
+    $I0 = newer($S3, $S1)
+    if $I0 goto L8
+    gzip($S1, 0 :named('remove'), 1 :named('verbose'))
+  L8:
+    $S2 .= '.gz'
+    install($S3, $S2, 1 :named('verbose'))
+    goto L5
+  L7:
+    install($S1, $S2, 1 :named('verbose'))
+    goto L5
+  L6:
 .end
 
 .sub 'get_install_files' :anon
@@ -2563,6 +2615,36 @@ array of pathname or a single pathname
   L2:
 .end
 
+.sub 'get_install_gzfiles' :anon
+    .param pmc kv :slurpy :named
+    .local pmc files
+    files = new 'Hash'
+    .local string man
+    man = get_value('man_dir', "man" :named('default'), kv :flat :named)
+    get_install_man(files, man)
+    .return (files)
+.end
+
+.sub 'get_install_man' :anon
+    .param pmc files
+    .param string man_dir
+    $I0 = length man_dir
+    $S0 = man_dir . '/man*/*.?'
+    $P0 = glob($S0)
+    $S1 = get_datadir()
+    $S1 .= "/man"
+  L1:
+    $P1 = iter $P0
+  L3:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $S2 = substr $S0, $I0
+    $S2 = $S1 . $S2
+    files[$S2] = $S0
+    goto L3
+  L2:
+.end
+
 =back
 
 =head3 Step uninstall
@@ -2595,6 +2677,18 @@ Same options as install.
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
+
+    $P0 = get_install_gzfiles(kv :flat :named)
+    $P1 = iter $P0
+  L5:
+    unless $P1 goto L6
+    $S0 = shift $P1
+    $S0 = root . $S0
+    unlink($S0, 1 :named('verbose'))
+    $S0 .= '.gz'
+    unlink($S0, 1 :named('verbose'))
+    goto L5
+  L6:
 .end
 
 =head3 Step plumage

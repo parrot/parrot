@@ -1135,7 +1135,7 @@ C<TEMP48tfoobar>.
   L7:
 .end
 
-=item B<gzip(string filename)>
+=item B<gzip(string filename, int :verbose(), int :remove())>
 
 Compresses the file given in C<filename> using the Lempel-Ziv algorithm.
 This replaces the file with one with the C<.gz> extension.
@@ -1148,6 +1148,17 @@ For more information, see the C<gzip(1)> man page.
 
 .sub 'gzip'
     .param string filename
+    .param int    verbose          :named('verbose') :optional
+    .param int    has_verbose      :opt_flag
+    .param int    remove      :named('remove') :optional
+    .param int    has_remove  :opt_flag
+
+    unless has_verbose goto L1
+    unless verbose     goto L1
+
+    print "gzip "
+    say filename
+  L1:
 
     .local pmc fh, gh
     fh = new 'FileHandle'
@@ -1167,7 +1178,12 @@ For more information, see the C<gzip(1)> man page.
     gh.'open'($S1, 'wb')
     gh.'puts'($S0)
     gh.'close'()
+
+    unless has_remove goto L2
+    unless remove goto L3
+  L2:
     unlink(filename)
+  L3:
 
     .return ()
   _handler1:
