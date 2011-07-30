@@ -3046,7 +3046,7 @@ the default value is setup.pir
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod man_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
@@ -3056,6 +3056,9 @@ the default value is setup.pir
     _manifest_add_hash(needed, generated, $P1)
     goto L1
   L2:
+
+    $P1 = get_install_gzfiles(kv :flat :named)
+    _manifest_add_hash(needed, generated, $P1)
 
     $P0 = split ' ', 'inst_bin inst_data inst_dynext inst_inc inst_lang inst_lib doc_files'
   L3:
@@ -3988,6 +3991,14 @@ TEMPLATE
     push $P0, $S0
     goto L3
   L4:
+    $P1 = get_install_gzfiles(kv :flat :named)
+    $P2 = iter $P1
+  L5:
+    unless $P2 goto L6
+    $S0 = shift $P2
+    push $P0, $S0
+    goto L5
+  L6:
     $P0.'sort'()
     $S0 = join "\n", $P0
     $S0 .= "\n"
@@ -4285,6 +4296,17 @@ TEMPLATE
     script .= $S0
     goto L31
   L32:
+
+    $P1 = get_install_gzfiles(kv :flat :named)
+    $P2 = iter $P1
+  L33:
+    unless $P2 goto L34
+    $S0 = shift $P2
+    $S1 = $P1[$S0]
+    $S0 = _mk_inno_line($S1, $S0)
+    script .= $S0
+    goto L33
+  L34:
 
     $I0 = exists kv['doc_files']
     unless $I0 goto L41
