@@ -169,9 +169,12 @@ add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
     chunk->id          = chunk_id;
     chunk->name        = name;
     chunk->name_length = name_length;
+    chunk->next        = NULL;
 
-    if (!interp->first_chunk)
+    if (!interp->first_chunk) {
         interp->first_chunk = chunk;
+        interp->last_chunk  = chunk;
+    }
     else {
         interp->last_chunk->next = chunk;
         interp->last_chunk       = chunk;
