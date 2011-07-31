@@ -275,8 +275,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
     register_step_after('clean', _clean_smoke)
-    .const 'Sub' _clean_gzman = '_clean_gzman'
-    register_step_after('clean', _clean_gzman)
 
     .const 'Sub' _update = '_update'
     register_step('update', _update)
@@ -1986,28 +1984,6 @@ the value is the POD pathname
   L1:
 .end
 
-=item man_dir
-
-=cut
-
-.sub '_clean_gzman' :anon
-    .param pmc kv :slurpy :named
-    .local int has_zlib
-    $P0 = get_config()
-    $I0 = $P0['has_zlib']
-    unless $I0 goto L1
-    $P0 = get_install_gzfiles(kv :flat :named)
-    $P1 = iter $P0
-  L2:
-    unless $P1 goto L1
-    $S0 = shift $P1
-    $S1 = $P0[$S0]
-    $S1 .= '.gz'
-    unlink($S1, 1 :named('verbose'))
-    goto L2
-  L1:
-.end
-
 =back
 
 =head3 Step update
@@ -2469,13 +2445,11 @@ the default value is man
     $S1 = $P0[$S0]
     $S2 = root . $S0
     unless has_zlib goto L7
-    $S3 = $S1 . '.gz'
+    $S3 = $S2 . '.gz'
     $I0 = newer($S3, $S1)
-    if $I0 goto L8
-    gzip($S1, 0 :named('remove'), 1 :named('verbose'))
-  L8:
-    $S2 .= '.gz'
-    install($S3, $S2, 1 :named('verbose'))
+    if $I0 goto L5
+    install($S1, $S2, 1 :named('verbose'))
+    gzip($S2, 1 :named('verbose'))
     goto L5
   L7:
     install($S1, $S2, 1 :named('verbose'))
