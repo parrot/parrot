@@ -1634,6 +1634,12 @@ the value is the POD pathname
 
 .sub 'build_man_pod'
     .param pmc hash
+    .local pmc config
+    config = get_config()
+    .local string version
+    version = config['VERSION']
+    $S0 = config['DEVEL']
+    version .= $S0
     $P0 = iter hash
   L1:
     unless $P0 goto L2
@@ -1645,7 +1651,9 @@ the value is the POD pathname
     $S0 = dirname(man)
     mkpath($S0, 1 :named('verbose'))
     .local string cmd
-    cmd = "pod2man "
+    cmd = "pod2man --center=\"User Contributed Parrot Documentation\" --release=\"parrot "
+    cmd .= version
+    cmd .= "\" "
     cmd .= pod
     cmd .= " > "
     cmd .= man
