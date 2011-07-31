@@ -28,9 +28,10 @@ typedef enum {
     HBDB_RUNNING      = 0x0002,    /* Debugger is running               */
     HBDB_STOPPED      = 0x0004,    /* Debugger is stopped/paused        */
     HBDB_BREAK        = 0x0008,    /* Halt at next breakpoint           */
-    HBDB_EXIT         = 0x0010,    /* Debugger is about to exit         */
-    HBDB_STARTED      = 0x0020,    /* Debugger has been started         */
-    HBDB_CMD_ENTERED  = 0x0040     /* At least one command was entered  */
+    HBDB_STEP         = 0x0010,    /* Step execution one instruction    */
+    HBDB_EXIT         = 0x0020,    /* Debugger is about to exit         */
+    HBDB_STARTED      = 0x0040,    /* Debugger has been started         */
+    HBDB_CMD_ENTERED  = 0x0080     /* At least one command was entered  */
 } hbdb_state_t;
 
 /* Flags used to associate a condition with a breakpoint or watchpoint  */

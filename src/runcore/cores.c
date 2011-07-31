@@ -300,7 +300,7 @@ static opcode_t * runops_gc_debug_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_hbdb_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -804,6 +804,10 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
         hbdb_start(interp, pc);
 
     while (pc) {
+        /* Cease execution if 'quit' was entered */
+        if (HBDB_FLAG_TEST(interp, HBDB_EXIT))
+            return 0;
+
         /* Disable pc */
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
 

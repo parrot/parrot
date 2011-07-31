@@ -98,6 +98,32 @@ Parrot_api_hbdb_runloop(Parrot_PMC interp_pmc, int argc, ARGIN(const char *argv[
 
 /*
 
+=item C<Parrot_Int Parrot_api_hbdb_destroy(Parrot_PMC interp_pmc)>
+
+Wrapper function for C<hbdb_destroy()>. Destroys the current instance of the
+debugger by freeing the memory allocated for it's interpreter.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_hbdb_destroy(Parrot_PMC interp_pmc)
+{
+    ASSERT_ARGS(Parrot_api_hbdb_destroy)
+
+    EMBED_API_CALLIN(interp_pmc, interp)
+
+    hbdb_destroy(interp);
+
+    EMBED_API_CALLOUT(interp_pmc, interp)
+
+    Parrot_api_destroy_interpreter(interp_pmc);
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

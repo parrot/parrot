@@ -287,6 +287,7 @@ sub _enter_cmd {
 
     # Write command then send EOF so HBDB quits
     print HBDB_STDIN "$cmd\n";
+    print HBDB_STDIN "quit\n";
     close HBDB_STDIN;
 
     # Wait for HBDB to terminate

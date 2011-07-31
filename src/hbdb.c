@@ -289,13 +289,18 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         /* Do nothing thanks to IMCC */
     }
     else {
-        pos = (opcode_t) interp->code->base.data;
+        /*pos = (opcode_t) interp->code->base.data;*/
     }
 
     /* TODO Logic for parsing conditionals goes here */
 
-    bp->pc = &pos;
-    /*bp->line = line->number;*/
+    {
+        long pos;
+        pos = get_cmd_argument(&cmd, 0);
+
+        bp->pc = &pos;
+        /*bp->line = line->number;*/
+    }
 
     /* Don't skip, yet */
     bp->skip = 0;
@@ -672,19 +677,10 @@ hbdb_cmd_quit(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_quit)
 
-    hbdb_destroy(interp);
-
-    /* FIXME With exit() quickfix, changing these flags actually isn't
-     * necessary but I will leave it for now because it's supposed to work
-     * without exit() but currently segfaults. See hbdb_runloop() +770 to see
-     * why
-     */
-
-    /* Set status flags to indicate debugger isn't running and about to exit */
+    /* Set status flags to indicate debugger isn't running and is about to exit */
     HBDB_FLAG_SET(interp, HBDB_EXIT);
     HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
-
-    /*exit(0);*/
+    HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
 }
 
 /*
@@ -721,10 +717,10 @@ hbdb_cmd_step(PARROT_INTERP, ARGIN(const char *cmd))
     ASSERT_ARGS(hbdb_cmd_step)
 
     /* Clear status flag to indicate that debugger is stopped, only executing one instruction */
-    /*HBDB_FLAG_SET(interp, HBDB_RUNNING);*/
+    HBDB_FLAG_SET(interp, HBDB_RUNNING);
     HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
 
-    /*HBDB_FLAG_CLEAR(interp, HBDB_BREAK);*/
+    HBDB_FLAG_SET(interp, HBDB_STEP);
 }
 
 /*
@@ -781,6 +777,12 @@ hbdb_check_breakpoint(PARROT_INTERP)
         HBDB_FLAG_CLEAR(interp, HBDB_STOPPED);
 
         return 0;
+    }
+
+    if (HBDB_FLAG_TEST(interp, HBDB_STEP)) {
+        HBDB_FLAG_CLEAR(interp, HBDB_STEP);
+
+        return 1;
     }
 
     /* Cycle through list of breakpoints */
@@ -1009,9 +1011,12 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     }
 
     /* Allocate memory for source code buffer */
-    dbg_file         = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
-    dbg_file->source = mem_gc_allocate_n_typed(interp, HBDB_SOURCE_BUFFER_LENGTH, char);
-    buf_size         = HBDB_SOURCE_BUFFER_LENGTH;
+    dbg_file           = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
+    dbg_file->source   = mem_gc_allocate_n_typed(interp, HBDB_SOURCE_BUFFER_LENGTH, char);
+    dbg_file->filename = mem_gc_allocate_n_typed(interp, sizeof (file), char);
+    buf_size           = HBDB_SOURCE_BUFFER_LENGTH;
+
+    dbg_file->filename = file;
 
     /* Load source code */
     do {
@@ -1124,7 +1129,7 @@ hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
     hbdb_t *hbdb = interp->hbdb;
 
     /* Check that HBDB has been initialized properly */
-    if(!hbdb)
+    if (!hbdb)
         Parrot_ex_throw_from_c_args(interp,
                                     NULL,
                                     0,
@@ -1143,11 +1148,6 @@ hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
 
     /* Start command-line interface */
     command_line(interp);
-
-    /* Check if HBDB_EXIT has been set */
-    if (HBDB_FLAG_TEST(interp, HBDB_EXIT)) {
-        Parrot_x_exit(interp, 0);
-    }
 }
 
 /*
@@ -1673,10 +1673,11 @@ display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp))
     Parrot_io_printf(hbdb->debugger,
                       "Breakpoint %d at %04d: ",
                       bp->id,
-                      bp->pc - hbdb->debugee->code->base.data);
+                      bp->pc);
+                      /*bp->pc - hbdb->debugee->code->base.data);*/
 
     if (hbdb->file)
-        Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file);
+        Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file->filename);
 
     if (bp->line)
         Parrot_io_printf(hbdb->debugger, ", line %d", bp->line);
@@ -1822,8 +1823,8 @@ free_file(PARROT_INTERP, ARGIN(hbdb_file_t *file))
     }
 
     /* Free memory allocated for storing filename */
-    if (file->filename)
-        mem_gc_free(interp, file->filename);
+    /*if (file->filename)*/
+        /*mem_gc_free(interp, file->filename);*/
 
     /* Free memory allocated for storing rest of source code */
     if (file->source)

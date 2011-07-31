@@ -148,8 +148,9 @@ main(int argc, const char *argv[])
         show_last_error_and_exit(interp);
     }
 
-    /* Destroy interpreter */
-    if (!Parrot_api_destroy_interpreter(interp)) {
+    /* Free memory used by interpreter */
+    if (!Parrot_api_hbdb_destroy(interp)) {
+        Parrot_api_destroy_interpreter(interp);
         show_last_error_and_exit(interp);
     }
 

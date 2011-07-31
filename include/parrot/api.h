@@ -354,6 +354,9 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_API
+Parrot_Int Parrot_api_hbdb_destroy(Parrot_PMC interp_pmc);
+
+PARROT_API
 Parrot_Int Parrot_api_hbdb_init(Parrot_PMC interp_pmc);
 
 PARROT_API
@@ -369,6 +372,7 @@ Parrot_Int Parrot_api_hbdb_runloop(
     ARGIN(const char *argv[]))
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_api_hbdb_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_hbdb_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_hbdb_load_source __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(file))
