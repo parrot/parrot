@@ -1650,8 +1650,20 @@ the value is the POD pathname
     if $I0 goto L1
     $S0 = dirname(man)
     mkpath($S0, 1 :named('verbose'))
+    $S0 = basename(man)
+    $I0 = index $S0, '.'
+    .local string name
+    name = substr $S0, 0, $I0
+    name = upcase name
+    .local string section
+    inc $I0
+    section = substr $S0, $I0
     .local string cmd
-    cmd = "pod2man --center=\"User Contributed Parrot Documentation\" --release=\"parrot "
+    cmd = "pod2man --name="
+    cmd .= name
+    cmd .= " --section="
+    cmd .= section
+    cmd .= " --center=\"User Contributed Parrot Documentation\" --release=\"parrot "
     cmd .= version
     cmd .= "\" "
     cmd .= pod
