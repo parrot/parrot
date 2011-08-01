@@ -1,0 +1,74 @@
+== NAME ==
+
+docs - Parrot documentation
+
+== DESCRIPTION ==
+
+The 'docs' directory houses the documentation related to all the different
+areas of Parrot. They are all written in POD format.
+
+== SUBDIRECTORIES ==
+
+* book
+
+The 'Parrot Developer's Guide: PIR' book. Contains both the published edition
+and a rough draft.
+
+* deprecations
+
+Records all the deprecations since the 2.6 supported release. Also contains
+documentation explaining Parrot's deprecation policy.
+
+* dev
+
+Developer documentation. Includes topics such as calling conventions,
+long option parsing, function decorations, etc.
+
+* imcc
+
+Documents describing the operations of the Intermediate Code Compiler (IMCC).
+
+* index
+
+JSON files that catalogue all the files in the 'docs' directory.
+
+* pct
+
+Introductory documentation on the Parrot Compiler Toolkit (PCT).
+
+* pdds
+
+Parrot Design Documents (PDDS). These documents describe the inner architecture
+of the virtual machine. Includes topics such as PMC's, multiple dispatch, 
+garbage collection, etc.
+
+* pmc
+
+Polymorphic Container (PMC) documentation.
+
+* project
+
+Tips and guidelines for Parrot contributers. Includes topics such as release
+management, cage cleaning, using Git, etc.
+
+* req
+
+Mock "requests" that give Parrot a design direction.
+
+* resources
+
+Resources used by the Parrot website including images, stylesheets, etc.
+
+* translations
+
+Translations of the main README. Includes languages such as Spanish, French,
+Polish, and more.
+
+* user
+
+User documentation for PIR.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
