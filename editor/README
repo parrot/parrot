@@ -1,0 +1,99 @@
+== NAME ==
+
+editor - text editor plugins
+
+== DESCRIPTION ==
+
+The 'editor' directory contains plugins and add-ons for several popular text
+editors. They include syntax-highlighting, automatic indenting, Ctags, etc.
+
+A summary of available plugins can be found by running:
+    `cd editor && make help`
+
++ Vim +
+
+By default, calling `make vim-install` in the 'editor' directory will install
+several files into ~/.vim. You can use the 'VIM_DIR' variable on the command
+line when calling `make` to choose a different target directory for the vim
+files. For example:
+
+   `make vim-install [VIM_DIR=/vim_files_target_directory]`
+
+All these files have the .vim extension: pir.vim (generated from pir_vim.in),
+pasm.vim, and pmc.vim are syntax files; indent_pir.vim is an indent plugin;
+and filetype_parrot.vim is a filetype script that tells vim to associate the
+extensions .pir, .pasm, and .pmc with the right syntax. The syntax files are
+installed to ~/.vim/syntax; filetype_parrot.vim is installed to
+~/.vim/parrot.vim; and indent_pir.vim is copied to ~/.vim/indent/pir.vim. If
+you want indenting, you should also place "filetype indent on" somewhere in
+your ~/.vimrc file.
+
++ Kate +
+
+There is a syntax file for the KDE editor Kate, but it is not built by default.
+You must run:
+
+   `make imc.kate`
+
+in the 'editor' directory to build it.
+
+Copy the imcc.xml file to ~/.kde/share/apps/katepart/syntax.
+
++ Emacs +
+
+The parrot.el file describes the changes to 'c-mode' and 'cperl-mode' required
+to edit Parrot source code.  Copy parrot.el to a directory where Emacs looks
+for external packages and add the following to your ~/.emacs file:
+
+    (load "parrot")
+
+Alternatively, to automatically track future changes, you may wish to add this
+to ~/.emacs instead:
+
+    (load-file "/<path-to-parrot>/editor/parrot.el")
+
+Also included is pasm.pl for editing PASM source files. Copy pasm.el to a
+directory where Emacs looks for external packages and add the following to your
+~/.emacs file:
+
+    (load "pasm")
+
+To associate .pasm files with this major mode, add the following to your
+~/.emacs file:
+
+    (add-to-list 'auto-mode-alist (cons "\\.pasm\\'" 'pasm-mode))
+
+Alternatively, you may type 'M-x pasm-mode' for every file that you want to use
+the major mode in.
+
+Additionally, you might also want to add the following to your ~/.emacs file:
+
+    (add-hook 'pasm-mode-hook
+              (function (lambda ()
+                          (setq indent-tabs-mode nil))))
+
+This prevents the odd behavior that has been noted when using tabs in the
+PASM mode.
+
++ Ctags +
+
+The main Makefile (not the one in 'editor'), includes several targets for
+generating a tags file. The Exuberant Ctags package must be installed first.
+
+For Vim-compatible tags, run:
+
+  `make tags-vi`
+
+For Emacs-compatible tags, run:
+
+  `make tags-emacs`
+
+There is also the 'tags-xemacs' target which will work with the older XEmacs
+etags (21.5*). Run:
+
+  `make tags-xemacs`
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
