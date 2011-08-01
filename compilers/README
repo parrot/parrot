@@ -1,51 +1,47 @@
-=head1 NAME
+== NAME ==
 
-    compilers/ - various compilers used by Parrot
+compilers - various compilers used by Parrot
 
-=head1 DESCRIPTION
+== DESCRIPTION ==
 
-The F<compilers> directory contains the source files for several compilers that
+The 'compilers' directory contains the source files for several compilers that
 are used by Parrot such as IMCC and PGE. For more detailed information on
-these, please see their respective F<README.pod> files in the subdirectories
-listed below.
+these, please see their respective README files in the subdirectories listed
+below.
 
-=head1 SUBDIRECTORIES
+== SUBDIRECTORIES ==
 
-=over 4
-
-=item F<data_json>
+* data_json
 
 Source files for the JavaScript Object Notation (JSON) compiler. Used when
 generating a JSON representation of a PMC.
 
-=item F<imcc>
+* imcc
 
 Source files for the Intermediate Code Compiler (IMCC). Translates PIR files
 into Parrot bytecode.
 
-=item F<opsc>
+* opsc
 
 Source files for the opcode compiler (a.k.a. ops2c). Converts opcode definition
 files into C code.
 
-=item F<pct>
+* pct
 
 Source files for the compiler used by the Parrot Compiler Toolkit (PCT).
 
-=item F<pge>
+* pge
 
 Source files for the compiler used by the Parrot Grammar Engine (PGE). This is
 an implementation of Perl 6 regexes.
 
-=item F<tge>
+* tge
 
 Source files for the compiler used by the Tree Grammer Engine (TGE). This is the
 tool used to transform the trees output by the PGE into a Parrot Abstract
 Syntax Tree (PAST).
 
-=back
-
-=head1 COPYRIGHT
+== COPYRIGHT ==
 
 Copyright (C) 2001-2011, Parrot Foundation.
 
