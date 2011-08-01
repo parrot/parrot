@@ -54,6 +54,15 @@ method pbc($post, %adverbs) {
     %context<packfile>;
 };
 
+
+method mainpmc($packfile, %adverbs) {
+    my $view := $packfile.view();
+    $view.trigger('load');
+    $view.trigger('init');
+    $view.main_sub();
+}
+
+
 ##########################################
 # Emiting pbc
 
