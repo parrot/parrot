@@ -15,6 +15,7 @@ to build the PAST.pbc module.
 .include 'compilers/pct/src/PAST/Node.pir'
 
 .include 'compilers/pct/src/PAST/Compiler.pir'
+.include 'compilers/pct/src/PAST/NewCompiler.pir'
 
 .include 'compilers/pct/src/POST/Node.pir'
 
