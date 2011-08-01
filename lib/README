@@ -1,0 +1,40 @@
+== NAME ==
+
+lib - modules used by Perl 5 code
+
+== DESCRIPTION ==
+
+The 'lib' directory contains the Perl modules used by all the scripts written
+in Perl 5. This mostly means unit tests, Configure.pl, and developer tools.
+
+== SUBDIRECTORIES ==
+
+* File
+
+The File::Which module. A portable implementation of the which(1) shell utility.
+
+* IO
+
+The IO::CaptureOutput module. Captures output to STDOUT, STDERR, subprocesses,
+and XS.
+
+* Parrot
+
+Modules specific to Parrot. Includes modules such as Parrot::Test::More,
+Parrot::Config, Parrot::Headerizer, and more.
+
+* Perl
+
+The Perl::Critic::Policy::* modules. These modules are used by several tests
+to check that all source files follow the coding standard described in PDD07.
+
+* Pod
+
+Modules for parsing POD documentation such as Pod::Simple and Pod::Escapes.
+These are mostly used by the `html` make target to convert POD documentation
+to HTML.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
