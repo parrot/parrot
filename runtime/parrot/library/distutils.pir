@@ -1617,9 +1617,9 @@ the value is the POD pathname
 
 hash
 
-the key is the manpage pathname
+the key is the manpage pathname with usual conventions, for example 'man/man1/prog.1'
 
-the value is the POD pathname
+the value is the POD pathname, for example 'src/prog.pir'
 
 =cut
 
