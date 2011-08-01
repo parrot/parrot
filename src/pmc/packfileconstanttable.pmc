@@ -160,9 +160,9 @@ Set pointer to underlying PackFile_ConstTable
                 VTABLE_get_pmc_keyed_int(INTERP, attrs->pmc_constants, i);
 
         for (i = 0; i < tag_elts; i += 2) {
-            Parrot_pf_tag_constant(interp, pftable, 
-                                    VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i),
-                                    VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i + 1));
+            Parrot_pf_tag_constant(interp, pftable,
+                VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i),
+                VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i + 1));
         }
 
         return pftable;

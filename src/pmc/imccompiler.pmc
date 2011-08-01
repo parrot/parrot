@@ -30,18 +30,9 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC * get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
-#define ASSERT_ARGS_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf_ptr_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -61,7 +52,7 @@ static PMC * get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
         (i)->code = __old_bc; \
         if (!PMC_IS_NULL(__old_cur_pf)) \
             Parrot_pf_set_current_packfile((i), __old_cur_pf); \
-    } while(0)
+    } while (0)
 
 #define ERROR_IMCC_COMPILE(i) \
     Parrot_pop_context((i)); \
