@@ -1,0 +1,31 @@
+== NAME ==
+
+ext - extensions to Parrot
+
+== DESCRIPTION ==
+
+The 'ext' directory contains Parrot extensions that are not necessarily
+essential to the functioning of Parrot but, nonetheless, are used frequently
+and extensively by the Parrot developers.
+
+== SUBDIRECTORIES ==
+
+* nqp-rx
+
+Source files for the Not Quite Perl (NQP) compiler with regex support. NQP is a
+very small Perl6-like language designed to be a high level way of creating
+transformers for Parrot.
+
+* Parrot-Embed
+
+Source files for Parrot's embedding interface for Perl 5.
+
+* winxed
+
+Source files for the Winxed compiler. Winxed is a JavaScript-like language for
+easily creating Parrot extensions.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
