@@ -20,6 +20,7 @@ to build the PAST.pbc module.
 .include 'compilers/pct/src/POST/Node.pir'
 
 .include 'compilers/pct/src/POST/Compiler.pir'
+.include 'compilers/pct/src/POST/PBCCompiler.pir'
 
 =head1 AUTHOR
 
