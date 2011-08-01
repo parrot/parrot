@@ -1,0 +1,39 @@
+== NAME ==
+
+config - modules used by the configuration process
+
+== DESCRIPTION ==
+
+The 'config' directory contains all the Perl 5 modules that are used by
+Configure.pl during the configuration process. They are split into
+several subdirectories (listed below) based upon their package name.
+
+== SUBDIRECTORIES ==
+
+* auto
+
+Modules that perform system probes for determining CPU architecture, OS, C
+compiler, installed packages, etc.
+
+* gen
+
+Modules for generating files based on the platform-specific data collected by
+the auto::* modules. This includes the Makefile, header files, core PMC's,
+etc.
+
+* init
+
+Modules for setting up the install path, platform hints, manifest checking,
+optimizations, etc.
+
+* inter
+
+Modules for "interrupting" the user (if --ask was given to Configure.pl)
+to set certain configurations by hand such as what compiler, linker, C
+libraries, lexer/parser should be used, whether debugging should be enabled,
+what flavor of make is installed, etc.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
