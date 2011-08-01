@@ -82,6 +82,7 @@ Entry point of C<hbdb>.
 int
 main(int argc, const char *argv[])
 {
+    const char const       *file;
     int                     status;
     struct longopt_opt_info opt      = LONGOPT_OPT_INFO_INIT;
 
@@ -103,6 +104,11 @@ main(int argc, const char *argv[])
                 usage();
                 break;
         }
+    }
+
+    /* Parse any remaining arguments for debugee */
+    if (opt.opt_index < argc) {
+        file = argv[opt.opt_index];
     }
 
     /* Check for unrecognized options */
@@ -133,7 +139,7 @@ main(int argc, const char *argv[])
 
     /* Load bytecode only if a file was given on command-line */
     if (argc != 1) {
-        load_bytecode(interp, argv[argc - 1], &pbc);
+        load_bytecode(interp, file, &pbc);
 
         /* Ready bytecode */
         if (!Parrot_api_ready_bytecode(interp, pbc, &main_sub)) {
