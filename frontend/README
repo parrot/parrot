@@ -1,0 +1,40 @@
+== NAME ==
+
+frontend - compiler frontend applications
+
+== DESCRIPTION ==
+
+The 'frontend' directory contains the source files for the compiler frontend and
+other programs that use the embedding API.
+
+== SUBDIRECTORIES ==
+
+* hbdb
+
+The Honey Bee Debugger (HBDB). Parrot's new debugger.
+
+* parrot
+
+The Parrot frontend. The PIR/PASM compiler for libparrot.
+
+* parrot_debugger
+
+The old Parrot debugger.
+
+* pbc_disassemble
+
+Bytecode disassembler. Translates Parrot bytecode (PBC) into Parrot assembly
+language (PASM).
+
+* pbc_dump
+
+Bytecode dumper. Dumps or converts .pbc files into human-readable form.
+
+* pbc_merge
+
+Bytecode merger. Merges multiple .pbc files into a single .pbc file.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
