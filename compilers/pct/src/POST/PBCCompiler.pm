@@ -149,8 +149,8 @@ multi method to_pbc(POST::Sub $sub, %context) {
     %context<labels_todo> := hash();
 
     # Packfile poop his pants...
-    my $sb := new('StringBuilder');
-    $sb.push(~$sub.name);
+    my $sb := pir::new('StringBuilder');
+	pir::push($sb, ~$sub.name);
     my $subname := ~$sb;
 
     self.debug("Emitting $subname") if %context<DEBUG>;
@@ -176,12 +176,12 @@ multi method to_pbc(POST::Sub $sub, %context) {
 
     # Default .return(). XXX We don't need it (probably)
     self.debug("Emitting default return") if %context<DEBUG>;
-    $bc.push([
+	pir::push($bc, [
         'set_returns_pc',
         0x000                      # id of FIA
     ]);
 
-    $bc.push([
+	pir::push($bc, [
         'returncc'
     ]);
 
@@ -209,7 +209,7 @@ multi method to_pbc(POST::Sub $sub, %context) {
         :comp_flags(self.create_sub_comp_flags($sub, %context)),
     );
 
-    if defined($sub.namespace) {
+    if pir::defined($sub.namespace) {
         my $nskey := $sub.namespace.to_pmc(%context)[0];
         if pir::typeof__sp($nskey) eq 'Key' {
             %sub<namespace_name>  := $nskey;
@@ -220,12 +220,13 @@ multi method to_pbc(POST::Sub $sub, %context) {
     # We can have pre-allocated constant for this sub already.
     # XXX Use .namespace for generating full name!
     my $idx := $sub.constant_index;
-    if defined($idx) {
+    if pir::defined($idx) {
         self.debug("Reusing old constant $idx") if %context<DEBUG>;
-        %context<constants>[$idx] := new('Sub', %sub);
+        %context<constants>[$idx] := pir::new('Sub', %sub);
     }
     else {
-        $idx := %context<constants>.push(new('Sub', %sub));
+        pir::push(%context<constants>, pir::new('Sub', %sub));
+        $idx := %context<constants>.pmc_count;
         $sub.constant_index($idx);
         self.debug("Allocate new constant $idx") if %context<DEBUG>;
     }
@@ -271,7 +272,7 @@ multi method to_pbc(POST::Op $op, %context) {
         @op.push(self.to_op($_, %context));
     }
     self.debug("Op size { +@op }") if %context<DEBUG>;
-    %context<bytecode>.push(@op);
+	pir::push(%context<bytecode>, @op);
 }
 
 # Some PIR sugar produces nested Nodes.
@@ -310,7 +311,7 @@ multi method to_pbc(POST::Call $call, %context) {
 
         if $call.invocant {
             if $call.name.isa(POST::Constant) {
-                $bc.push([
+				pir::push($bc, [
                     $is_tailcall
                         ?? 'tailcallmethod_p_sc'
                         !! 'callmethodcc_p_sc',
@@ -335,15 +336,15 @@ multi method to_pbc(POST::Call $call, %context) {
                 self.debug("invocable_sub '$full_name'") if %context<DEBUG>;
                 if $invocable_sub {
                     my $idx := $invocable_sub.constant_index;
-                    unless defined($idx) {
+                    unless pir::defined($idx) {
                         # Allocate new space in constant table. We'll reuse it later.
-                        $idx := %context<constants>.push(new("Integer"));
+                        $idx := pir::push(%context<constants>, pir::new("Integer"));
                         $invocable_sub.constant_index($idx);
                         self.debug("Allocate constant for it $idx") if %context<DEBUG>;
                     }
 
                     $SUB := %context<sub>.symbol("!SUB");
-                    $bc.push([
+					pir::push($bc, [
                         'set_p_pc',
                         self.to_op($SUB, %context),
                         $idx,
@@ -356,7 +357,7 @@ multi method to_pbc(POST::Call $call, %context) {
             unless $processed {
                 if $call.name.isa(POST::Constant) {
                     $SUB := %context<sub>.symbol("!SUB");
-                    $bc.push([
+					pir::push($bc, [
                         'find_sub_not_null_p_sc',
                         self.to_op($SUB, %context),
                         self.to_op($call<name>, %context),
@@ -371,7 +372,7 @@ multi method to_pbc(POST::Call $call, %context) {
             my $o := $is_tailcall ?? "tailcall_p" !! "invokecc_p";
 
             self.debug($o) if %context<DEBUG>;
-            $bc.push([ $o, self.to_op($SUB, %context) ]);
+			pir::push($bc, [ $o, self.to_op($SUB, %context) ]);
         }
 
         unless $is_tailcall {
@@ -380,7 +381,7 @@ multi method to_pbc(POST::Call $call, %context) {
     }
     elsif $calltype eq 'return' {
         self.build_pcc_call("set_returns_pc", $call<params>, %context);
-        $bc.push(['returncc']);
+		pir::push($bc, ['returncc']);
     }
     elsif $calltype eq 'results' {
         # This is generated in eceptions handling
@@ -449,7 +450,7 @@ multi method to_op(POST::String $str, %context) {
     }
     else {
         #create a ByteBuffer and convert it to a string with the given encoding/charset
-        my $bb := new('ByteBuffer');
+        my $bb := pir::new('ByteBuffer');
         my $str_val := $str.value;
         Q:PIR{
             .local pmc str_val, bb
@@ -524,7 +525,7 @@ method build_pcc_call($opname, @args, %context) {
         @op.push(self.to_op($arg, %context));
     }
 
-    $bc.push(@op);
+	pir::push($bc, @op);
 }
 
 method build_args_signature(@args, %context) {
@@ -708,7 +709,7 @@ method create_context($past, %adverbs) {
 
     # TODO pbc_disassemble crashes without proper debug.
     # Add a debug segment.
-    # %context<DEBUG> := new('PackfileDebug');
+    # %context<DEBUG> := pir::new('PackfileDebug');
 
     # Store the debug segment in bytecode
     #$pfdir<BYTECODE_hello.pir_DB> := %context<DEBUG>;
