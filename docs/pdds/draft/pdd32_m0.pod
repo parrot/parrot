@@ -262,15 +262,11 @@ M0 interpreter sad.
 Assume that C<*$2> is an integer value, convert it to a floating-point value
 and store the result in C<*$1>.  C<$3> is ignored.
 
-{{{
-    TODO: Define the semantics of C<convert_n_i> and C<convert_i_n> more
-    completely.  They're pretty underdefined as it stands now.
-}}}
-
 =item * convert_i_n - convert to integer from numeric
 
-Assume that C<*$2> is a floating-point value, convert it to an integer value
-and store the result in C<*$1>.  C<$3> is ignored.
+Assume that C<*$2> is a floating-point value and that C<*$1> is an integer.
+Discard the fractional part of C<*$2> and store the result in C<*$1>.  C<$3> is
+ignored.
 
 =back
 
