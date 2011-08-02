@@ -809,7 +809,7 @@ pmclass UnManagedStruct auto_attrs no_ro {
 
 =back
 
-=head2 Methods
+=head2 Vtable Functions
 
 =over 4
 
@@ -1213,6 +1213,28 @@ Sets the value of the element associated with key C<*key> to C<*value>.
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname) {
+        /* TODO: all */
+        RETURN(STRING STRINGNULL);
     }
 
 }
