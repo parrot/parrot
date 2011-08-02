@@ -673,16 +673,19 @@ by an interpreter. Which considerations does this imply?
 }}}
 
 All values stored in M0's binary representation will be stored using
-little-endian byte order.  INSP values may be either 4 or 8 bytes, depending on
-what the underlying platform supports.  N registers always be 8 bytes long.
-Converting between M0 bytecode files of differing type sizes will be supported
-implicitly through the disassembly and reassembly of .m0b files.
+little-endian byte order.  INSP values are either 4 or 8 bytes.  N registers
+are always 8 bytes long, I regsters may be 4 or 8 bytes, depending on platform
+support.  S and P registers have the same size as the underlying platform's
+pointers.  Converting between M0 bytecode files of differing register sizes
+will be supported implicitly through the disassembly and reassembly of .m0b
+files.  See also I<Runtime Layout of Primitives>.
 
 The size of a register type refers to both the number of bytes needed to store
 it in a .m0b file and the runtime size.  This means that it is possible for
 textual M0 to contain a constant integer or numeric value which requires
-greater precision than the target implementation is capable of supporting.  In
-this case, the assembler should fail with an appropriate error message.
+greater precision than the target implementation is capable of supporting.
+When this happens, the assembler and interpreter should fail with an
+appropriate error message.
 
 The header has the following structure:
 
@@ -822,6 +825,52 @@ In serialized bytecode, chunk name constants are stored as strings with the
 special encoding of 0.  When an m0b library is loaded, the interpreter must
 store the index of the named chunk in the constants segment slot for that
 constant.
+
+=head2 Runtime Layout of Primitives
+
+The runtime layout of INSP registers is as follows.
+
+=head3 I registers
+
+I registers are 4 or 8 bytes wide, depending on platform and interpreter
+support.  By default, instructions which work with integer values will assume
+that I registers are unsigned.
+
+=head3 N registers
+
+N registers are 8 bytes wide.  By default, instructions which work with N
+registers will assume IEEE 754 64-bit semantics.
+
+=head3 S and P registers
+
+S and P registers are meant to contain pointers to objects.  They have the same
+width as a pointer of the underlying platform, if applicable.  If the
+underlying platform doesn't have pointers (e.g. JavaScript), S and P registers
+should be able to store the platform's equivalent of a pointer, providing
+appropriate semantics.
+
+=head3 Primitive String Layout
+
+In addition to object strings, M0 supports primitive strings.  These are the
+low-level strings used when interacting directly with external code.  The
+layout of a primitive string in M0 is as follows:
+
+  int32  - number of bytes in the string body int32  - encoding char.. - string
+body
+
+=head4 Primitive String Encoding
+
+The encoding field of a primitive string can have the following values:
+* primitive string layout:
+
+ 0 - special 1 - utf-8
+
+In this context, "special" means that the value is used as chunk name constant.
+When a .m0b file is loaded, these constants are translated into chunk indicies.
+A primitive string with encoding 0 should never appear at runtime, only in
+bytecode.  This string body is assumed to be utf-8 encoded.
+
+The default encoding is utf-8.  Other values have not yet been defined.
 
 =head2 Execution
 
