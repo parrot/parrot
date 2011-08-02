@@ -297,7 +297,7 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         long pos;
         pos = get_cmd_argument(&cmd, 0);
 
-        bp->pc = &pos;
+        bp->pc = pos;
         /*bp->line = line->number;*/
     }
 
@@ -764,7 +764,7 @@ hbdb_check_breakpoint(PARROT_INTERP)
     /* TODO Come back here when implementing watchpoints */
 
     /* Check if the debugee has reached the end */
-    if (!hbdb->current_opcode) {
+    if (hbdb->current_opcode < 0) {
         HBDB_FLAG_CLEAR(interp, HBDB_RUNNING);
 
         Parrot_io_printf(hbdb->debugger, "\nProgram exited normally.\n");
@@ -1111,7 +1111,7 @@ hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
 /*
 
-=item C<void hbdb_start(PARROT_INTERP, opcode_t *pc)>
+=item C<void hbdb_start(PARROT_INTERP)>
 
 Starts the "active" process of accepting commands and executing code.
 
@@ -1120,7 +1120,7 @@ Starts the "active" process of accepting commands and executing code.
 */
 
 void
-hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
+hbdb_start(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_start)
 
@@ -1138,9 +1138,6 @@ hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
     if (HBDB_FLAG_TEST(interp, HBDB_STARTED)) {
         HBDB_FLAG_CLEAR(interp, HBDB_STARTED);
     }
-
-    /* Get the current opcode */
-    hbdb->current_opcode = pc;
 
     /* Set HBDB_STOPPED flag */
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
@@ -1670,10 +1667,10 @@ display_breakpoint(ARGIN(hbdb_t *hbdb), ARGIN(hbdb_breakpoint_t *bp))
     /* TODO Add check if we're in a function and if so, display value of arguments */
 
     Parrot_io_printf(hbdb->debugger,
-                      "Breakpoint %d at %04d: ",
-                      bp->id,
-                      bp->pc);
-                      /*bp->pc - hbdb->debugee->code->base.data);*/
+                     "Breakpoint %d at PC %04ld: ",
+                     bp->id,
+                     bp->pc);
+                     /*bp->pc - hbdb->debugee->code->base.data);*/
 
     if (hbdb->file)
         Parrot_io_printf(hbdb->debugger, "file %s", hbdb->file->filename);

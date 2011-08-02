@@ -801,7 +801,7 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
     ASSERT_ARGS(runops_hbdb_core)
 
     if (HBDB_FLAG_TEST(interp, HBDB_STARTED))
-        hbdb_start(interp, pc);
+        hbdb_start(interp);
 
     while (pc) {
         /* Cease execution if 'quit' was entered */
@@ -815,16 +815,18 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
         DO_OP(pc, interp);
 
         /* Store current opcode */
-        interp->hbdb->current_opcode = pc;
+        interp->hbdb->current_opcode = pc - interp->hbdb->debugee->code->base.data;
+
+        /*Parrot_io_printf(interp->hbdb->debugger, "PC %ld\n", interp->hbdb->current_opcode);*/
 
         /* Check whether a command has indicated that execution should pause or continue */
         if (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
-            hbdb_start(interp, pc);
+            hbdb_start(interp);
         }
         else {
             /* Execution should continue but check for active breakpoints first */
             if (hbdb_check_breakpoint(interp)) {
-                hbdb_start(interp, pc);
+                hbdb_start(interp);
                 continue;
             }
         }

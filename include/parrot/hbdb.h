@@ -99,7 +99,7 @@ typedef struct hbdb_breakpoint hbdb_breakpoint;
 
 typedef struct hbdb_breakpoint {
     unsigned long          id;           /* ID number                          */
-    opcode_t              *pc;           /* Address of opcode to break at      */
+    opcode_t               pc;           /* Opcode number to break at          */
     unsigned long          line;         /* Line number in source file         */
     long                   skip;         /* Number of times to skip breakpoint */
     hbdb_condition_flag   *condition;    /* Condition attached to breakpoint   */
@@ -117,7 +117,7 @@ typedef struct hbdb {
     unsigned long      breakpoint_skip;    /* Number of breakpoints to skip        */
     char              *current_command;    /* Command being executed               */
     char              *last_command;       /* Last command executed                */
-    opcode_t          *current_opcode;     /* Current opcode                       */
+    opcode_t           current_opcode;     /* Current opcode number                */
     hbdb_state_t       state;              /* Status of debugger                   */
     Interp            *debugee;            /* Debugee interpreter                  */
     Interp            *debugger;           /* Debugger interpreter                 */
@@ -193,7 +193,7 @@ void hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void hbdb_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t *pc))
+void hbdb_start(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

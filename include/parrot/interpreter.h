@@ -198,7 +198,6 @@ struct parrot_interp_t {
 
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
-    /* TODO Remove PDB_t? */
     PDB_t *pdb;                               /* debug /trace system */
     hbdb_t *hbdb;                             /* hbdb debugger */
 
