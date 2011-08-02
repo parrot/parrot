@@ -38,7 +38,7 @@ method packfile($post, *%adverbs) {
 
     # Emitting context. Contains consts, etc.
     my %context := self.create_context($post, %adverbs);
-    %context<DEBUG> := 0;
+    %context<DEBUG> := %adverbs<DEBUG> // 0;
 
     %context<pir_file> := $post;
 
