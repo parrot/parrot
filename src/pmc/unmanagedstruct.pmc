@@ -1233,8 +1233,21 @@ specified.
 */
 
     METHOD as_string(STRING *encodingname) {
-        /* TODO: all */
-        RETURN(STRING STRINGNULL);
+        STRING *result = STRINGNULL;
+        const char * content = (const char *)SELF.get_pointer();
+        if (content) {
+            const STR_VTABLE *encoding =
+                    Parrot_find_encoding_by_string(INTERP, encodingname);
+            if (encoding == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_ENCODING,
+                        "Invalid encoding");
+            else {
+                int size = strlen(content);
+                result = Parrot_str_new_init(INTERP, content, size, encoding, 0);
+            }
+        }
+        RETURN(STRING result);
     }
 
 }

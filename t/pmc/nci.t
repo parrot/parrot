@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 58;
+    plan tests => 59;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -2540,6 +2540,31 @@ CODE
 1
 1
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_tt
+    nci_tt = dlfunc libnci_test, "nci_tt", "pp"
+    .local string s, r
+    .local pmc arg, result
+    # Note: the nci_tt function does not need a zero terminated string,
+    # just uses the two first characters.
+    s = "AB"
+    arg = new ["ByteBuffer"]
+    arg = s
+    result = nci_tt(arg)
+    r = result.'as_string'("ascii")
+    say r
+.end
+CODE
+BA worked
+
 OUTPUT
 
 # Local Variables:
