@@ -154,7 +154,16 @@ multi method to_pbc(POST::Sub $sub, %context) {
     my $subname := ~$sb;
 
     self.debug("Emitting $subname") if %context<DEBUG>;
-    %context<constants>.get_or_create_string($subname);
+
+	#%context<constants>.get_or_create_constant($subname);
+	# Need to pass a string into this sub, not a PMC
+    my $constants := %context<constants>;
+	Q:PIR {
+		$P0 = find_lex '$constants'
+		$P1 = find_lex '$subname'
+		$S1 = $P1
+		$P0.'get_or_create_constant'($S1)
+	};
 
     my $start_offset := +$bc;
     self.debug("From $start_offset") if %context<DEBUG>;
