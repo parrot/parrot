@@ -346,7 +346,7 @@ get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
 
     /* And on cygwin replace a leading "lib" by "cyg". */
 #ifdef __CYGWIN__
-    if (!STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
+    if (STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
         path = Parrot_str_concat(interp, CONST_STRING(interp, "cyg"),
             STRING_substr(interp, lib, 3, lib->strlen - 3));
 
@@ -357,7 +357,7 @@ get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
     }
 #endif
 
-    if (!STRING_length(lib)) {
+    if (STRING_length(lib)) {
         *handle = dlopen_string(interp, flags, lib);
         if (*handle)
             return lib;
