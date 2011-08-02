@@ -266,7 +266,9 @@ and store the result in C<*$1>.  C<$3> is ignored.
 
 Assume that C<*$2> is a floating-point value and that C<*$1> is an integer.
 Discard the fractional part of C<*$2> and store the result in C<*$1>.  C<$3> is
-ignored.
+ignored.  If the integer part of C<*2> is larger than the interpreter's I
+registers are capable of storing, the largest supported positive or negative
+integer is stored in C<*1>, corresponding to the sign of C<*$2>.
 
 =back
 
