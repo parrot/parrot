@@ -446,15 +446,13 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb_breakpoint_t *bp;
     opcode_t           pos;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Verify that an actual command was passed */
     if (!cmd)
         /* TODO Use an appropriate exception_type_enum */
         Parrot_ex_throw_from_c_args(interp, NULL, 1, "Null value passed to hbdb_cmd_break()");
 
-    /* Allocated memory for breakpoint */
+    /* Allocate memory for breakpoint */
     bp = mem_gc_allocate_zeroed_typed(interp, hbdb_breakpoint_t);
 
     /* Break at line number if debugging file, otherwise at program counter */
@@ -475,7 +473,6 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         /*bp->line = line->number;*/
     }
 
-    /* Don't skip, yet */
     bp->skip = 0;
 
     /* Check if this is the first breakpoint being added */
@@ -496,7 +493,6 @@ hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         bp->prev     = old_bp;
     }
 
-    /* Show breakpoint position */
     display_breakpoint(hbdb, bp);
 }
 
@@ -520,10 +516,8 @@ hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
     unsigned long skip;
     hbdb_t       *hbdb;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Verify that the source file has already been loaded */
     if (!check_file_exists(interp)) {
         Parrot_io_eprintf(hbdb->debugger, "The program is not being run.\n");
         return;
@@ -531,7 +525,6 @@ hbdb_cmd_continue(PARROT_INTERP, ARGIN(const char *cmd))
 
     /* TODO Come back here as soon as breakpoints start working */
 
-    /* Get argument (if any) */
     skip = get_cmd_argument(&cmd, 0);
 
     /* Check if a "skip" argument was given */
@@ -576,7 +569,6 @@ hbdb_cmd_disassemble(PARROT_INTERP, ARGIN_NULLOK(SHIM(const char *cmd)))
 
     const unsigned int default_size = 32768;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
     /* Free previous source file (if any) */
@@ -692,11 +684,9 @@ hbdb_cmd_help(PARROT_INTERP, ARGIN(const char *cmd))
     const hbdb_t     *hbdb;
     const hbdb_cmd_t *c;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Get command name */
-    c = parse_command(&cmd);
+    c    = parse_command(&cmd);
 
     /* Display help for one command if there's one argument, otherwise display all */
     if (c)  {
@@ -757,10 +747,8 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb_t      *hbdb;
     hbdb_line_t *line;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Verify that the source file has already been loaded */
     if (!check_file_exists(interp)) {
         Parrot_io_eprintf(hbdb->debugger, "No symbol table is loaded. Use the \"file\" command.\n");
         return;
@@ -770,7 +758,6 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb->file->next_line = start = get_cmd_argument(&cmd, 1);
     count                         = get_cmd_argument(&cmd, 10);
 
-    /* Return if the user entered a number that was too large */
     if (count == ULONG_MAX || hbdb->file->next_line == ULONG_MAX) {
         Parrot_io_eprintf(hbdb->debugger, "Numerical result out of range.\n");
         return;
@@ -794,21 +781,16 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
                              "(%-04d) ",
                              line->opcode - hbdb->debugee->code->base.data);
 
-        /* Display line number */
         Parrot_io_printf(hbdb->debugger, "%-6ld", line->number);
 
         /* Display source code from line */
         for (ch = hbdb->file->source + line->offset; *ch != '\n'; ch++)
             Parrot_io_printf(hbdb->debugger, "%c", *ch);
 
-        /* End code with a newline */
         Parrot_io_printf(hbdb->debugger, "\n");
 
-        /* Get next line */
-        line = line->next;
-
-        /* Return if no more lines exist */
-        if (!line) return;
+        if (!(line = line->next))
+            return;
     }
 
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
@@ -1011,25 +993,19 @@ hbdb_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_destroy)
 
-    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
-    /* Free memory used for storing last command */
     mem_gc_free(interp, hbdb->last_command);
     interp->hbdb->last_command    = NULL;
 
-    /* Free memory used for storing current command */
     mem_gc_free(interp, hbdb->current_command);
     interp->hbdb->current_command = NULL;
 
-    /* Free memory used for source code */
     free_file(interp, hbdb->file);
 
-    /* Free memory used for breakpoints list */
     mem_gc_free(interp, hbdb->breakpoint);
     interp->hbdb->breakpoint      = NULL;
 
-    /* Free memory used for global structure */
     mem_gc_free(interp, hbdb);
     interp->hbdb                  = NULL;
 }
@@ -1062,20 +1038,15 @@ hbdb_get_command(PARROT_INTERP)
     STRING *readline;
     STRING *prompt;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Flush stdout buffer */
     fflush(stdout);
 
-    /* Create FileHandle PMC for stdin */
     stdinput = Parrot_io_stdhandle(interp, STDIN_FILENO, NULL);
 
-    /* Create string constants */
     readline = Parrot_str_new_constant(interp, "readline_interactive");
     prompt   = Parrot_str_new_constant(interp, "(hbdb) ");
 
-    /* Invoke readline_interactive() */
     Parrot_pcc_invoke_method_from_c_args(interp, stdinput, readline, "S->S", prompt, &input);
 
     /* Check if nothing was entered, otherwise just store command */
@@ -1084,7 +1055,6 @@ hbdb_get_command(PARROT_INTERP)
         if (!HBDB_FLAG_TEST(interp, HBDB_CMD_ENTERED)) {
             size_t len = sizeof (hbdb->current_command);
 
-            /* Store "nop" command to do nothing */
             strncpy(hbdb->current_command, "nop", len);
         }
     }
@@ -1112,21 +1082,16 @@ hbdb_init(PARROT_INTERP)
         hbdb_t        *hbdb;
         Parrot_Interp  debugger;
 
-        /* Allocate memory for debugger  */
         hbdb = mem_gc_allocate_zeroed_typed(interp, hbdb_t);
 
-        /* Create debugger interpreter */
         debugger = Parrot_new(interp);
 
-        /* Assign global "hbdb_t" structures */
         interp->hbdb   = hbdb;
         debugger->hbdb = hbdb;
 
-        /* Assign debugee and debugger interpreters */
         hbdb->debugee  = interp;
         hbdb->debugger = debugger;
 
-        /* Allocate memory for command-line buffers, NULL terminated c strings */
         hbdb->current_command  = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->last_command     = mem_gc_allocate_n_typed(interp, HBDB_CMD_BUFFER_LENGTH + 1, char);
         hbdb->file             = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
@@ -1163,10 +1128,8 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     hbdb_line_t *dbg_line,
                 *prev_dbg_line;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
-    /* Set default values for 'line' and 'prev-dbg_line' */
     line          = 0;
     prev_dbg_line = NULL;
 
@@ -1176,14 +1139,12 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
         hbdb->debugee->hbdb->file = NULL;
     }
 
-    /* Open file for reading */
     if (!(fd = fopen(file, "r"))) {
         Parrot_io_eprintf(hbdb->debugger, "%s: No such file or directory.\n", file);
 
         return;
     }
 
-    /* Allocate memory for source code buffer */
     dbg_file           = mem_gc_allocate_zeroed_typed(interp, hbdb_file_t);
     dbg_file->source   = mem_gc_allocate_n_typed(interp, HBDB_SOURCE_BUFFER_LENGTH, char);
     dbg_file->filename = mem_gc_allocate_n_typed(interp, sizeof (file), char);
@@ -1197,11 +1158,9 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
         start_offset = dbg_file->size;
 
         do {
-            /* Read a character from source file, stop of EOF was found */
             if ((ch = fgetc(fd)) == EOF)
                 break;
 
-            /* Store character */
             dbg_file->source[dbg_file->size] = (char) ch;
 
             /* Extend buffer size if it's full */
@@ -1218,14 +1177,11 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
         if (ch == EOF && (dbg_file->size == 0 || dbg_file->source[dbg_file->size - 1] == '\n'))
             break;
 
-        /* Append a newline to end of file */
         if (ch == EOF)
             dbg_file->source[dbg_file->size++] = '\n';
 
-        /* Allocate memory for 'hbdb_line_t' structure */
         dbg_line = mem_gc_allocate_zeroed_typed(interp, hbdb_line_t);
 
-        /* Store info about current line */
         dbg_line->offset = start_offset;
         dbg_line->number = ++line;
 
@@ -1235,14 +1191,11 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
         else
             dbg_file->line      = dbg_line;
 
-        /* Set previous line of next iteration to current line of current iteration */
         prev_dbg_line           = dbg_line;
     } while (ch != EOF);
 
-    /* Close file descripter */
     fclose(fd);
 
-    /* Globally set file structure */
     hbdb->file = dbg_file;
 
     /* Set status flag to indicate that source file has been loaded */
@@ -1264,7 +1217,6 @@ hbdb_runloop(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(hbdb_runloop)
 
-    /* Display welcome message */
     welcome();
 
     /* Main loop */
@@ -1298,25 +1250,20 @@ hbdb_start(PARROT_INTERP)
 {
     ASSERT_ARGS(hbdb_start)
 
-    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
-    /* Check that HBDB has been initialized properly */
     if (!hbdb)
         Parrot_ex_throw_from_c_args(interp,
                                     NULL,
                                     0,
                                     "FATAL ERROR: The debugger has not been initialized!");
 
-    /* Make sure the HBDB_STARTED flag is not set */
     if (HBDB_FLAG_TEST(interp, HBDB_STARTED)) {
         HBDB_FLAG_CLEAR(interp, HBDB_STARTED);
     }
 
-    /* Set HBDB_STOPPED flag */
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
 
-    /* Start command-line interface */
     command_line(interp);
 }
 
@@ -1355,20 +1302,16 @@ add_label(PARROT_INTERP, ARGMOD(hbdb_file_t *file), ARGIN(opcode_t *cur_opcode),
     hbdb_label_t *_new;
     hbdb_label_t *label;
 
-    /* Get first label */
     label = file->label;
 
     /* Loop through list of labels */
     while (label) {
-        /* */
         if (label->opcode == cur_opcode + offset)
             return label->id;
 
-        /* Get next label */
         label = label->next;
     }
 
-    /* Allocate memory for new label */
     label        = file->label;
     _new         = mem_gc_allocate_zeroed_typed(interp, hbdb_label_t);
     _new->opcode = cur_opcode + offset;
@@ -1433,16 +1376,13 @@ command_line(PARROT_INTERP)
 {
     ASSERT_ARGS(command_line)
 
-    /* Get global structure */
     hbdb_t *hbdb = interp->hbdb;
 
     while (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
         const char *cmd;
 
-        /* Prompt user for command */
         hbdb_get_command(interp);
 
-        /* Get command set by hbdb_get_command() */
         cmd = hbdb->current_command;
 
         /* Check if this is the first real (non-nop) command */
@@ -1453,7 +1393,6 @@ command_line(PARROT_INTERP)
             HBDB_FLAG_SET(interp, HBDB_CMD_ENTERED);
         }
 
-        /* Execute command */
         run_command(interp, cmd);
     }
 }
@@ -1528,23 +1467,19 @@ disassemble_op(PARROT_INTERP,
     size_t      size;
     op_lib_t   *core_ops;
 
-    /* Default 'size' and 'specialop' to 0 */
     size = specialop = 0;
 
     /* Get core opcode library */
     core_ops = PARROT_GET_CORE_OPLIB(interp);
 
-    /* Get the opcode name */
     op_name = full_name ? info->full_name : info->name;
 
-    /* Set 'op_name' to unknown if a name wasn't found */
     if (!op_name)
         op_name = "**UNKNOWN**";
 
     strcpy(dest, op_name);
     size += strlen(op_name);
 
-    /* Add space */
     dest[size++] = ' ';
 
     /* Concatenate the arguments */
@@ -1882,14 +1817,11 @@ escape_char(PARROT_INTERP, ARGIN(char *string), UINTVAL length)
          *fill,
          *end;
 
-    /* Return if there's no string to escape */
     if (!string)
         return NULL;
 
-    /* Chomp length to 20 if it's larger than 20 */
     length = (length > 20) ? 20 : length;
 
-    /* Allocate memory for new escaped string */
     fill = new_str = mem_gc_allocate_n_typed(interp, (length * 2) + 1, char);
 
     /* Iterate through each character in 'string' */
@@ -1962,45 +1894,34 @@ free_file(PARROT_INTERP, ARGIN(hbdb_file_t *file))
     hbdb_line_t  *line;
     hbdb_label_t *label;
 
-    /* Get first line in source file */
     line = file->line;
 
     /* Loop through list of lines */
     while (line) {
-        /* Set pointer to next line */
         hbdb_line_t *next_line = line->next;
 
-        /* Free memory for current line */
         mem_gc_free(interp, line);
 
-        /* Get next line */
         line = next_line;
     }
 
-    /* Get first label in source file */
     label = file->label;
 
     /* Loop through list of labels */
     while (label) {
-        /* Set pointer to next label */
         hbdb_label_t *next_label = label->next;
 
-        /* Free memory for current label */
         mem_gc_free(interp, label);
 
-        /* Get next label */
         label = next_label;
     }
 
-    /* Free memory allocated for storing filename */
     /*if (file->filename)*/
         /*mem_gc_free(interp, file->filename);*/
 
-    /* Free memory allocated for storing rest of source code */
     if (file->source)
         mem_gc_free(interp, file->source);
 
-    /* Free memory for current file */
     mem_gc_free(interp, file);
 }
 
@@ -2033,15 +1954,12 @@ get_cmd_argument(ARGMOD(const char **cmd), unsigned long def_val)
     /* Set errno to 0 since strtoul() can legitimately return 0 or ULONG_MAX */
     errno  = 0;
 
-    /* Convert argument from a string to unsigned long integer */
     result = strtoul(*cmd, &next, 0);
 
-    /* Check for possible errors */
     if ((errno == ERANGE && result == ULONG_MAX) || (errno != 0 && result == 0)) {
         return ULONG_MAX;
     }
 
-    /* Check if a digit was found, otherwise use 'def_val' */
     if (next != *cmd)
         *cmd   = next;
     else
@@ -2068,7 +1986,6 @@ parse_command(ARGIN_NULLOK(const char **cmd))
 {
     ASSERT_ARGS(parse_command)
 
-    /* Check that "cmd" points to something */
     if (cmd && *cmd) {
         const char  *start;
         const char  *next;
@@ -2078,7 +1995,6 @@ parse_command(ARGIN_NULLOK(const char **cmd))
                      len,
                      i;
 
-        /* Skip whitespace */
         start = skip_whitespace(*cmd);
         next  = start;
 
@@ -2088,10 +2004,8 @@ parse_command(ARGIN_NULLOK(const char **cmd))
         for (i = 0; (c = *next) != '\0' && !isspace((unsigned char) c); next++)
             continue;
 
-        /* Find the length */
         len = next - start;
 
-        /* Return NULL if there is no command */
         if (len == 0)
             return NULL;
 
@@ -2108,7 +2022,6 @@ parse_command(ARGIN_NULLOK(const char **cmd))
 
             /* Check if input matches current entry */
             if (strncmp(*cmd, tbl->name, len) == 0) {
-                /* Check that input matches length of command's name */
                 if (strlen(tbl->name) == len) {
                     hits  = 1;
                     found = i;
@@ -2154,7 +2067,6 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb_t           *hbdb;
     const hbdb_cmd_t *c;
 
-    /* Get global structure */
     hbdb = interp->hbdb;
 
     /* Preseve original command in case of error */
@@ -2163,14 +2075,12 @@ run_command(PARROT_INTERP, ARGIN(const char *cmd))
     /* Get command's hbdb_cmd_t structure */
     c = parse_command(&orig_cmd);
 
-    /* Check if a match was found */
+    /* Call command's function if match was found */
     if (c) {
-        /* Call command's function */
         (*c->function)(interp, orig_cmd);
         return 0;
     }
     else {
-        /* Check if nothing was entered at all */
         if (*orig_cmd == '\0') {
             return 0;
         }
