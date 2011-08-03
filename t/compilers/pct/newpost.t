@@ -24,9 +24,9 @@ Tests compiling some basic POST structures to PBC
     # plan(?)
 
     empty_main()
+    return_values()
 .end
 
-# Note: Runs two tests
 .sub compile
     .param pmc node
     .local pmc compiler
@@ -35,26 +35,54 @@ Tests compiling some basic POST structures to PBC
     # New compiler method:
     # TODO: Fix segfaults
     # $P0 = compiler.'packfile'(node)
-    # isa_ok( $P0, 'Packfile', 'compiled code' )
-    # $P0 = compiler.'mainpmc'($P0)
-    # isa_ok( $P0, 'Sub', 'main sub' )
-    # .return ($P0)
+    # .tailcall compiler.'mainpmc'($P0)
 
     .tailcall compiler.'pbc'(node)
 .end
 
-.sub empty_main
+.sub wrap_tree
+    .param pmc nodes :slurpy
+
     .local pmc main
     $P0 = get_hll_global ['POST'], 'Sub'
-    main = $P0.'new'('name' => 'main', 'main' => 1)
+    main = $P0.'new'(nodes :flat, 'name' => 'main', 'main' => 1)
 
     .local pmc file
     $P0 = get_hll_global ['POST'], 'File'
     file = $P0.'new'(main)
 
-    $P0 = compile(file)
+    .return (file)
+.end
+
+.sub empty_main
+    $P0 = wrap_tree()
+    $P0 = compile($P0)
+    isa_ok( $P0, 'Sub', 'compiled code' )
     $P0()
     ok( 1, 'Sub seemed to run' )
+.end
+
+.sub return_values
+    .local pmc foo
+    $P0 = get_hll_global ['POST'], 'String'
+    foo = $P0.'new'('type' => 'sc', 'value' => 'foo', 'encoding' => 'binary', 'charset' => 'ascii')
+
+    .local pmc return
+    $P0 = get_hll_global ['POST'], 'Call'
+    return = $P0.'new'('calltype' => 'return')
+    $P0 = new 'ResizablePMCArray'
+    push $P0, foo
+    return.'params'($P0)
+
+    .local pmc op
+    $P0 = get_hll_global ['POST'], 'Op'
+    op = $P0.'new'(foo, 'pirop' => 'say')
+
+    $P0 = wrap_tree(op, return)
+    $P0.'push_pirop'('say', foo)
+    $P0 = compile($P0)
+    $S0 = $P0()
+    is( $S0, 'foo', 'string return value', 'todo' => 1 )
 .end
 
 
