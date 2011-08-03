@@ -38,7 +38,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 59;
+    plan tests => 60;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -2565,6 +2565,31 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
 CODE
 BA worked
 
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and ByteBuffer" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+
+    .local pmc nci_cstring_cstring
+    nci_cstring_cstring = dlfunc libnci_test, "nci_cstring_cstring", "pp"
+    .local string s, r
+    .local int l
+    .local pmc arg, result
+    s = "Hello, world!"
+    l = bytelength s
+    arg = new ["ByteBuffer"]
+    arg = s
+    arg[l] = 0
+    result = nci_cstring_cstring(arg)
+    r = result.'as_string'("ascii")
+    say r
+.end
+CODE
+HeLLo, worLd!
 OUTPUT
 
 # Local Variables:
