@@ -62,9 +62,8 @@ sub trigger($view, $flag) {
 method mainpmc($packfile, *%adverbs) {
     my $view := $packfile.view();
 
-	# TODO: figure out why these segfault
-	# trigger($view, 'load');
-	# trigger($view, 'init');
+	trigger($view, 'load');
+	trigger($view, 'init');
 
     $view.main_sub();
 }
@@ -108,22 +107,12 @@ method pbc($post, *%adverbs) {
     $handle.print(~$packfile);
     $handle.close();
 
-    return sub() {
-        #pir::trace(1);
-        pir::load_bytecode($filename);
+    my $view := pir::load_bytecode__ps($filename);
 
-        #if $unlink {
-        #    my $os := pir::new__PS("OS");
-        #    $os.rm($filename);
-        #}
+    trigger($view, 'load');
+    trigger($view, 'init');
 
-        Q:PIR<
-            %r = find_lex '$main_sub'
-            $S99 = %r
-            %r = find_sub_not_null $S99
-            %r()
-        >;
-    };
+    $view.main_sub();
 }
 
 
