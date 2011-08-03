@@ -2128,10 +2128,11 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
             interp->iglobals, IGLOBALS_LOADED_PBCS);
         STRING * const method = CONST_STRING(interp, "mark_initialized");
         STRING * const load_str = CONST_STRING(interp, "load");
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
         Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
                 load_str);
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
+        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
+
     }
 }
 
@@ -2358,14 +2359,15 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
     const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
     PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_LOADED_PBCS);
-    if (VTABLE_exists_keyed_str(interp, pbc_cache, file))
-        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, file);
+    STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
+
+    if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
+        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
     else {
-        STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
         PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf);
         VTABLE_set_string_native(interp, pfview, path);
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, file, pfview);
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         return pfview;
     }
 }
