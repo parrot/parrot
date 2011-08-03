@@ -378,9 +378,9 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     ASSERT_ARGS(Parrot_pf_subs_by_flag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
-    if (!pf)
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "NULL packfile");
+            "NULL or invalid packfile");
 
     if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
         mode = 1;
@@ -2132,7 +2132,6 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
         Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
                 load_str);
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
-
     }
 }
 
