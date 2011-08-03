@@ -38,6 +38,9 @@ function.
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/pobj.h"
+
+#include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_continuation.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
 /* Size of command-line buffer */
@@ -176,13 +179,20 @@ struct hbdb_cmd_table_t {
 };
 
 /* Define a 'hbdb_cmd_t' structure for each command */
-hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
+hbdb_cmd_t
+   cmd_backtrace   = { &hbdb_cmd_backtrace,
 
-                    "Sets a breakpoint at the specified location.",
+                       "Print backtrace of current continuation chain.",
 
-                    "Sets a breakpoint at the specified location.\n\n"
-                    "break LOCATION\n\n"
-                    "If LOCATION is an address, breaks at the exact address." },
+                       "Print backtrace of current continuation chain." },
+
+   cmd_break       = { &hbdb_cmd_break,
+
+                       "Sets a breakpoint at the specified location.",
+
+                       "Sets a breakpoint at the specified location.\n\n"
+                       "break LOCATION\n\n"
+                       "If LOCATION is an address, breaks at the exact address." },
 
    cmd_continue = { &hbdb_cmd_continue,
 
@@ -242,16 +252,180 @@ hbdb_cmd_t cmd_break    = { &hbdb_cmd_break,
 
 /* Global command table */
 hbdb_cmd_table_t command_table[] = {
+    { "backtrace",   "t", &cmd_backtrace   },
     { "break",       "b", &cmd_break       },
     { "continue",    "c", &cmd_continue    },
     { "disassemble", "d", &cmd_disassemble },
     { "help",        "h", &cmd_help        },
     { "list",        "l", &cmd_list        },
-    { "nop",         "",  &cmd_nop         },
     { "quit",        "q", &cmd_quit        },
     { "run",         "r", &cmd_run         },
-    { "step",        "s", &cmd_step        }
+    { "step",        "s", &cmd_step        },
+    { "nop",         "",  &cmd_nop         }
 };
+
+/*
+
+=item C<void hbdb_cmd_backtrace(PARROT_INTERP, const char *cmd)>
+
+Displays a backtrace of the current continuation chain.
+
+=cut
+
+*/
+
+void
+hbdb_cmd_backtrace(PARROT_INTERP, ARGIN(const char *cmd))
+{
+    ASSERT_ARGS(hbdb_cmd_backtrace)
+
+    int     rec_cnt = 0,
+            rec_lvl = 0;
+
+    STRING *infostr;
+    PMC    *ctx,
+           *old,
+           *output,
+           *sub;
+
+    ctx    = interpinfo_p(interp, CURRENT_CTX);
+    sub    = interpinfo_p(interp, CURRENT_SUB);
+
+    old    = PMCNULL;
+    output = Parrot_pmc_new(interp, enum_class_StringBuilder);
+
+    /* Get context information about current subroutine first */
+    if (!PMC_IS_NULL(sub)) {
+        if ((infostr = Parrot_sub_Context_infostr(interp, ctx))) {
+            VTABLE_push_string(interp, output, infostr);
+
+            /* Get hash representation of annotations in effect (if any) */
+            if (interp->code->annotations) {
+                opcode_t offset = Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1;
+                PMC     *annot  = PackFile_Annotations_lookup(interp,
+                                                              interp->code->annotations,
+                                                              offset,
+                                                              NULL);
+
+                /* Get 'file' and 'line' annotations */
+                if (!PMC_IS_NULL(annot)) {
+                    PMC *file_annot = VTABLE_get_pmc_keyed_str(interp,
+                                                               annot,
+                                                               Parrot_str_new_constant(interp,
+                                                                                       "file"));
+                    PMC *line_annot = VTABLE_get_pmc_keyed_str(interp,
+                                                               annot,
+                                                               Parrot_str_new_constant(interp,
+                                                                                       "line"));
+
+                    /* Add format string for 'file' and 'line' annotations to output */
+                    if (!(PMC_IS_NULL(file_annot) || PMC_IS_NULL(line_annot))) {
+                        INTVAL  line = VTABLE_get_integer(interp, line_annot);
+                        STRING *file = VTABLE_get_string(interp,  file_annot);
+                        STRING *fmt  = Parrot_sprintf_c(interp,   " (%Ss:%li)", file, (long) line);
+
+                        VTABLE_push_string(interp, output, fmt);
+                    }
+                }
+            }
+
+            VTABLE_push_string(interp, output, Parrot_str_new_constant(interp, "\n"));
+        }
+    }
+
+    /* Loop through the continuation chain */
+    while (1) {
+        Parrot_Continuation_attributes *ctx_attr;
+
+        if (++rec_cnt > RECURSION_LIMIT)
+            break;
+
+        /* Get return continuation */
+        sub = Parrot_pcc_get_continuation(interp, ctx);
+
+        if (PMC_IS_NULL(sub))
+            break;
+
+        if (!(ctx_attr = PARROT_CONTINUATION(sub)))
+            break;
+
+        /* Format caller's context information to display */
+        if (!(infostr = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx))))
+            break;
+
+        /* Check if current subroutine is recursive */
+        if (ctx == ctx_attr->to_ctx) {
+            rec_lvl++;
+        }
+        else if (!PMC_IS_NULL(old)
+                 && PARROT_CONTINUATION(old)
+                 && Parrot_pcc_get_pc(interp,      PARROT_CONTINUATION(old)->to_ctx)
+                     == Parrot_pcc_get_pc(interp,  PARROT_CONTINUATION(sub)->to_ctx)
+                 && Parrot_pcc_get_sub(interp,     PARROT_CONTINUATION(old)->to_ctx)
+                     == Parrot_pcc_get_sub(interp, PARROT_CONTINUATION(sub)->to_ctx)) {
+
+                rec_lvl++;
+        }
+        else if (rec_lvl != 0) {
+            STRING *fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_lvl);
+
+            VTABLE_push_string(interp, output, fmt);
+            rec_lvl = 0;
+        }
+
+        if (rec_lvl == 0) {
+            PackFile_ByteCode *seg = ctx_attr->seg;
+
+            VTABLE_push_string(interp, output, infostr);
+
+            /* Get hash representation of annotations in effect (if any) */
+            if (seg->annotations) {
+                opcode_t offset = Parrot_pcc_get_pc(interp, ctx_attr->to_ctx) - seg->base.data;
+                PMC     *annot  = PackFile_Annotations_lookup(interp,
+                                                              seg->annotations,
+                                                              offset,
+                                                              NULL);
+
+                if (!PMC_IS_NULL(annot)) {
+                    PMC *file_annot = VTABLE_get_pmc_keyed_str(interp,
+                                                               annot,
+                                                               Parrot_str_new_constant(interp,
+                                                                                       "file"));
+                    PMC *line_annot = VTABLE_get_pmc_keyed_str(interp,
+                                                               annot,
+                                                               Parrot_str_new_constant(interp,
+                                                                                       "line"));
+
+                    /* Get 'file' and 'line' annotations */
+                    if (!(PMC_IS_NULL(file_annot) || PMC_IS_NULL(line_annot))) {
+                        INTVAL  line = VTABLE_get_integer(interp, line_annot);
+                        STRING *file = VTABLE_get_string(interp,  file_annot);
+                        STRING *fmt  = Parrot_sprintf_c(interp,   " (%Ss:%li)", file, (long) line);
+
+                        VTABLE_push_string(interp, output, fmt);
+                    }
+                }
+            }
+
+            VTABLE_push_string(interp, output, Parrot_str_new_constant(interp, "\n"));
+        }
+
+        old = sub;
+
+        /* Get previous caller in chain and repeat */
+        if (!(ctx = Parrot_pcc_get_caller_ctx(interp, ctx)))
+            break;
+    }
+
+    /* Don't display recursive calls, display level of recursion instead */
+    if (rec_lvl != 0) {
+        STRING *fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_lvl);
+
+        VTABLE_push_string(interp, output, fmt);
+    }
+
+    Parrot_io_printf(interp->hbdb->debugger, "%Ss", VTABLE_get_string(interp, output));
+}
 
 /*
 
@@ -1926,7 +2100,7 @@ parse_command(ARGIN_NULLOK(const char **cmd))
             const hbdb_cmd_table_t * const tbl = command_table + i;
 
             /* Check if user entered command's abbreviation */
-            if ((len == 1) && (tbl->short_name == *cmd)) {
+            if ((len == 1) && (strncmp(*cmd, tbl->short_name, len) == 0)) {
                 hits  = 1;
                 found = i;
                 break;

@@ -4074,6 +4074,7 @@ force, an empty hash will be returned.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),

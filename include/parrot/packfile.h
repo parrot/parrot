@@ -530,6 +530,15 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PMC * PackFile_Annotations_lookup(PARROT_INTERP,
+    ARGIN(PackFile_Annotations *self),
+    opcode_t offset,
+    ARGIN_NULLOK(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -826,14 +835,6 @@ void PackFile_Annotations_dump(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PMC * PackFile_Annotations_lookup(PARROT_INTERP,
-    ARGIN(PackFile_Annotations *self),
-    opcode_t offset,
-    ARGIN_NULLOK(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
@@ -887,6 +888,9 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_PackFile_Annotations_add_entry \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1012,9 +1016,6 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_PackFile_Annotations_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_Annotations_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))

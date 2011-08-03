@@ -141,6 +141,10 @@ PARROT_WARN_UNUSED_RESULT
 unsigned int hbdb_check_breakpoint(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void hbdb_cmd_backtrace(PARROT_INTERP, ARGIN(const char *cmd))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void hbdb_cmd_break(PARROT_INTERP, ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -202,6 +206,9 @@ void hbdb_start(PARROT_INTERP)
     , PARROT_ASSERT_ARG(cur_opcode))
 #define ASSERT_ARGS_hbdb_check_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_hbdb_cmd_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_hbdb_cmd_break __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cmd))
