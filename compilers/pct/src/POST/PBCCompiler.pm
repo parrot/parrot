@@ -128,6 +128,43 @@ method pbc($post, *%adverbs) {
 
 
 ##########################################
+# Generating constants
+
+# These require dropping down to PIR in order to use the correct
+# register types.
+
+sub get_or_create_number($num) {
+	Q:PIR {
+		$P0 = find_caller_lex '%context'
+		$P0 = $P0['constants']
+		$P1 = find_lex '$num'
+		$N1 = $P1
+		%r = $P0.'get_or_create_constant'($N1)
+	}
+}
+
+# this is included for symmetry, but doesn't need the PIR
+sub get_or_create_pmc($pmc) {
+	my %context := pir::find_caller_lex__ps('%context');
+	%context<constants>.get_or_create_constant($pmc);
+}
+
+sub get_or_create_string($str) {
+	Q:PIR {
+		$P0 = find_caller_lex '%context'
+		$P0 = $P0['constants']
+		$P1 = find_lex '$str'
+		$S1 = $P1
+		%r = $P0.'get_or_create_constant'($S1)
+	}
+}
+
+
+# /Generating constants
+##########################################
+
+
+##########################################
 # Emiting pbc
 
 multi method to_pbc(Undef $what, %context) {
@@ -155,15 +192,7 @@ multi method to_pbc(POST::Sub $sub, %context) {
 
     self.debug("Emitting $subname") if %context<DEBUG>;
 
-	#%context<constants>.get_or_create_constant($subname);
-	# Need to pass a string into this sub, not a PMC
-    my $constants := %context<constants>;
-	Q:PIR {
-		$P0 = find_lex '$constants'
-		$P1 = find_lex '$subname'
-		$S1 = $P1
-		$P0.'get_or_create_constant'($S1)
-	};
+	get_or_create_string($subname);
 
     my $start_offset := +$bc;
     self.debug("From $start_offset") if %context<DEBUG>;
@@ -438,7 +467,7 @@ multi method to_op(POST::Constant $op, %context) {
         $idx := $op.value;
     }
     elsif $type eq 'nc' {
-        $idx := %context<constants>.get_or_create_number($op.value);
+        $idx := get_or_create_number($op.value);
     }
     else {
         self.panic("NYI");
@@ -455,7 +484,7 @@ multi method to_op(POST::String $str, %context) {
         self.panic("attempt to pass a non-sc value off as a string");
     }
     if $str.encoding eq 'fixed_8' && $str.charset eq 'ascii' {
-        $idx := %context<constants>.get_or_create_string($str.value);
+        $idx := get_or_create_string($str.value);
     }
     else {
         #create a ByteBuffer and convert it to a string with the given encoding/charset
@@ -469,7 +498,7 @@ multi method to_op(POST::String $str, %context) {
             s = str_val
             bb = s
         };
-        $idx := %context<constants>.get_or_create_string($bb.get_string(
+        $idx := get_or_create_string($bb.get_string(
             $str.encoding,
         ));
     }
@@ -514,7 +543,7 @@ multi method to_op(POST::Label $l, %context) {
 method build_pcc_call($opname, @args, %context) {
     my $bc        := %context<bytecode>;
     my $signature := self.build_args_signature(@args, %context);
-    my $sig_idx   := %context<constants>.get_or_create_pmc($signature);
+    my $sig_idx   := get_or_create_pmc($signature);
 
     self.debug("Sig: $sig_idx") if %context<DEBUG>;
 
@@ -528,7 +557,7 @@ method build_pcc_call($opname, @args, %context) {
         if pir::isa__ips($arg.modifier, "Hash") {
             my $name := $arg.modifier<named> // $arg.name;
             @op.push(
-                 %context<constants>.get_or_create_string($name)
+                 get_or_create_string($name)
             );
         }
         @op.push(self.to_op($arg, %context));
