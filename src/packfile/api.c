@@ -29,6 +29,7 @@ format of bytecode.
 #include "pf_private.h"
 #include "api.str"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_packfileview.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -2125,7 +2126,11 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     else {
         PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_LOADED_PBCS);
+        STRING * const method = CONST_STRING(interp, "mark_initialized");
+        STRING * const load_str = CONST_STRING(interp, "load");
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
+        Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
+                load_str);
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
     }
 }
