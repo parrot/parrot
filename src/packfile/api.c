@@ -377,9 +377,9 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     ASSERT_ARGS(Parrot_pf_subs_by_flag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
-    if (!pf)
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "NULL packfile");
+            "NULL or invalid packfile");
 
     if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
         mode = 1;
@@ -2084,11 +2084,14 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
     ASSERT_ARGS(compile_file)
     PackFile_ByteCode * const cur_code = interp->code;
     PMC * const pf_pmc = Parrot_compile_file(interp, path, is_pasm);
+    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+        interp->iglobals, IGLOBALS_LOADED_PBCS);
     PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
     PackFile_ByteCode * const cs = pf->cur_cs;
 
     if (cs) {
         interp->code = cur_code;
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
     }
     else {
@@ -2114,22 +2117,16 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PMC * pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PMC * const pf_pmc = PackFile_read_pbc(interp, path, 0);
+
     if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Unable to load PBC file %Ss", path);
     else {
-        PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
-
-        if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unable to append PBC to the current directory");
-
-        mem_gc_free(interp, pf->header);
-        pf->header = NULL;
-        mem_gc_free(interp, pf->dirp);
-        pf->dirp   = NULL;
-        /* no need to free pf here, as directory_destroy will get it */
+        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_LOADED_PBCS);
+        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
     }
 }
 
@@ -2300,6 +2297,8 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
+
+
 
     pbc = CONST_STRING(interp, "pbc");
 

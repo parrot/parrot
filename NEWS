@@ -1,3 +1,10 @@
+New in 3.7.0
+- Core
+- Languages
+- Documentation
+    + The Archive::Tar and Archive::Zip libraries now have POD docs
+- Tests
+
 New in 3.6.0
 - Core
   + Class.add_vtable_override now allows you to overwrite an override
