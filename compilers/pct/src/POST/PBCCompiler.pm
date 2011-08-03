@@ -235,7 +235,7 @@ multi method to_pbc(POST::Sub $sub, %context) {
     }
     else {
         pir::push(%context<constants>, pir::new('Sub', %sub));
-        $idx := %context<constants>.pmc_count;
+        $idx := %context<constants>.pmc_count - 1;
         $sub.constant_index($idx);
         self.debug("Allocate new constant $idx") if %context<DEBUG>;
     }
