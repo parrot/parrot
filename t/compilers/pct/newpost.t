@@ -24,7 +24,7 @@ Tests compiling some basic POST structures to PBC
     # plan(?) TODO: Add numer of tests
 
     basic_tests()
-    return_values()
+    test_return()
 .end
 
 # Compile a tree and return the main sub
@@ -84,27 +84,52 @@ Tests compiling some basic POST structures to PBC
     #ok( 1, 'mainpmc Sub seemed to run' )
 .end
 
-# Test returning values
+# Create a file that returns some values
 .sub return_values
-    .local pmc foo
-    $P0 = get_hll_global ['POST'], 'String'
-    foo = $P0.'new'('type' => 'sc', 'value' => 'foo', 'encoding' => 'binary', 'charset' => 'ascii')
+	.param pmc nodes :slurpy
 
     .local pmc return
     $P0 = get_hll_global ['POST'], 'Call'
     return = $P0.'new'('calltype' => 'return')
-    $P0 = new 'ResizablePMCArray'
-    push $P0, foo
-    return.'params'($P0)
+    return.'params'(nodes)
 
-    .local pmc op
-    $P0 = get_hll_global ['POST'], 'Op'
-    op = $P0.'new'(foo, 'pirop' => 'say')
+	# Run the nodes before we try to return them.
+	.tailcall wrap_main(nodes :flat, return)
+.end
 
-    $P0 = wrap_main(op, return)
+# Test returning values
+.sub test_return
+    .local pmc foo
+    $P0 = get_hll_global ['POST'], 'String'
+    foo = $P0.'new'('type' => 'sc', 'value' => 'foo', 'encoding' => 'binary', 'charset' => 'ascii')
+    $P0 = return_values(foo)
     $P0 = compile($P0)
     $S0 = $P0()
     is( $S0, 'foo', 'string return value' )
+
+	.local pmc const
+	const = get_hll_global ['POST'], 'Constant'
+
+	.local pmc answer
+	answer = const.'new'('type' => 'ic', 'value' => 42)
+	$P0 = return_values(answer)
+	$P0 = compile($P0)
+	$I0 = $P0()
+	is( $I0, 42, 'integer return value' )
+
+	.local pmc pi
+	pi = const.'new'('type' => 'nc', 'value' => 3.14)
+	$P0 = return_values(pi)
+	$P0 = compile($P0)
+	$N0 = $P0()
+	is( $N0, 3.14, 'num return value' )
+
+	$P0 = return_values(answer, pi, foo)
+	$P0 = compile($P0)
+	($I1, $N1, $S1) = $P0()
+	is( $I0, 42, 'integer multiple return value' )
+	is( $N0, 3.14, 'num multiple return value' )
+	is( $S0, 'foo', 'string multiple return value' )
 .end
 
 
