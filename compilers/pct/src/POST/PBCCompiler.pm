@@ -265,8 +265,20 @@ multi method to_pbc(POST::Sub $sub, %context) {
 }
 
 multi method to_pbc(POST::Op $op, %context) {
-    # Generate full name
+	# Check for things that should have been calls
     my $fullname := $op.pirop;
+    my @calls := <call callmethod return yield tailcall>;
+    for @calls {
+    	if $fullname eq $_ {
+    		my $newpost := POST::Call.new(:calltype($_));
+    		my @args := [];
+			@args.push($_) for @($op);
+    		$newpost.params(@args);
+    		return self.to_pbc($newpost, %context);
+		}
+	}
+
+    # Generate full name
     self.debug("Short name $fullname") if %context<DEBUG>;
 
     for @($op) {
