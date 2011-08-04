@@ -30,7 +30,7 @@ Tests compiling some basic POST structures to PBC
 # Compile a tree and return the main sub
 .sub compile
     .param pmc node
-	.param pmc adverbs :named :slurpy
+    .param pmc adverbs :named :slurpy
 
     .local pmc compiler
     compiler = new ['POST';'PBCCompiler']
@@ -86,15 +86,15 @@ Tests compiling some basic POST structures to PBC
 
 # Create a file that returns some values
 .sub return_values
-	.param pmc nodes :slurpy
+    .param pmc nodes :slurpy
 
     .local pmc return
     $P0 = get_hll_global ['POST'], 'Call'
     return = $P0.'new'('calltype' => 'return')
     return.'params'(nodes)
 
-	# Run the nodes before we try to return them.
-	.tailcall wrap_main(nodes :flat, return)
+    # Run the nodes before we try to return them.
+    .tailcall wrap_main(nodes :flat, return)
 .end
 
 # Test returning values
@@ -107,29 +107,29 @@ Tests compiling some basic POST structures to PBC
     $S0 = $P0()
     is( $S0, 'foo', 'string return value' )
 
-	.local pmc const
-	const = get_hll_global ['POST'], 'Constant'
+    .local pmc const
+    const = get_hll_global ['POST'], 'Constant'
 
-	.local pmc answer
-	answer = const.'new'('type' => 'ic', 'value' => 42)
-	$P0 = return_values(answer)
-	$P0 = compile($P0)
-	$I0 = $P0()
-	is( $I0, 42, 'integer return value' )
+    .local pmc answer
+    answer = const.'new'('type' => 'ic', 'value' => 42)
+    $P0 = return_values(answer)
+    $P0 = compile($P0)
+    $I0 = $P0()
+    is( $I0, 42, 'integer return value' )
 
-	.local pmc pi
-	pi = const.'new'('type' => 'nc', 'value' => 3.14)
-	$P0 = return_values(pi)
-	$P0 = compile($P0)
-	$N0 = $P0()
-	is( $N0, 3.14, 'num return value' )
+    .local pmc pi
+    pi = const.'new'('type' => 'nc', 'value' => 3.14)
+    $P0 = return_values(pi)
+    $P0 = compile($P0)
+    $N0 = $P0()
+    is( $N0, 3.14, 'num return value' )
 
-	$P0 = return_values(answer, pi, foo)
-	$P0 = compile($P0)
-	($I1, $N1, $S1) = $P0()
-	is( $I0, 42, 'integer multiple return value' )
-	is( $N0, 3.14, 'num multiple return value' )
-	is( $S0, 'foo', 'string multiple return value' )
+    $P0 = return_values(answer, pi, foo)
+    $P0 = compile($P0)
+    ($I1, $N1, $S1) = $P0()
+    is( $I0, 42, 'integer multiple return value' )
+    is( $N0, 3.14, 'num multiple return value' )
+    is( $S0, 'foo', 'string multiple return value' )
 .end
 
 
