@@ -21,12 +21,13 @@ Tests compiling some basic POST structures to PBC
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
 
-    # plan(?)
+    # plan(?) TODO: Add numer of tests
 
-    empty_main()
+    basic_tests()
     return_values()
 .end
 
+# Compile a tree and return the main sub
 .sub compile
     .param pmc node
     .local pmc compiler
@@ -42,7 +43,9 @@ Tests compiling some basic POST structures to PBC
     .tailcall compiler.'pbc'($P0)
 .end
 
-.sub wrap_tree
+# Put arguments into a main sub inside a file
+# Helps when testing fragments
+.sub wrap_main
     .param pmc nodes :slurpy
 
     .local pmc main
@@ -56,14 +59,16 @@ Tests compiling some basic POST structures to PBC
     .return (file)
 .end
 
-.sub empty_main
-    $P0 = wrap_tree()
+# Some basic tests like running an empty sub
+.sub basic_tests
+    $P0 = wrap_main()
     $P0 = compile($P0)
     isa_ok( $P0, 'Sub', 'compiled code' )
     $P0()
     ok( 1, 'Sub seemed to run' )
 .end
 
+# Test returning values
 .sub return_values
     .local pmc foo
     $P0 = get_hll_global ['POST'], 'String'
@@ -80,11 +85,10 @@ Tests compiling some basic POST structures to PBC
     $P0 = get_hll_global ['POST'], 'Op'
     op = $P0.'new'(foo, 'pirop' => 'say')
 
-    $P0 = wrap_tree(op, return)
-    $P0.'push_pirop'('say', foo)
+    $P0 = wrap_main(op, return)
     $P0 = compile($P0)
     $S0 = $P0()
-    is( $S0, 'foo', 'string return value', 'todo' => 1 )
+    is( $S0, 'foo', 'string return value', 'todo' => "sub doesn't run?" )
 .end
 
 
