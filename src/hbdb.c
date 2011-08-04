@@ -43,18 +43,7 @@ function.
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
-/* Size of command-line buffer */
-#define HBDB_CMD_BUFFER_LENGTH 128
-
-/* Size of buffer allocated for source code */
-#define HBDB_SOURCE_BUFFER_LENGTH 1024
-
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
-
-typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char *cmd));
-
-typedef struct hbdb_cmd_t       hbdb_cmd_t;
-typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -160,20 +149,6 @@ static void welcome(void);
 #define ASSERT_ARGS_welcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-/* Contains information about the implementation of a particular command               */
-struct hbdb_cmd_t {
-    const hbdb_cmd_func_t function;      /* Points to function that executes command   */
-    const char           *short_help;    /* Short help message associated with command */
-    const char           *help;          /* Help message associated with command       */
-};
-
-/* Contains general information about a particular command                */
-struct hbdb_cmd_table_t {
-    const char       *name;          /* Command name                      */
-    const char       *short_name;    /* Command name abbreviation         */
-    const hbdb_cmd_t *cmd;           /* Command function and help message */
-};
 
 /* Define a 'hbdb_cmd_t' structure for each command */
 hbdb_cmd_t

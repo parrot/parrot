@@ -17,6 +17,12 @@ Copyright (C) 2001-2011, Parrot Foundation.
 #include "parrot/pobj.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
+/* Size of command-line buffer */
+#define HBDB_CMD_BUFFER_LENGTH 128
+
+/* Size of buffer allocated for source code */
+#define HBDB_SOURCE_BUFFER_LENGTH 1024
+
 /* Convenience macros for manipulating the HBDB bitmask in Parrot_Interp */
 #define HBDB_FLAG_SET(interp, flag)   ((interp)->hbdb->state = (hbdb_state_t)((interp)->hbdb->state | (flag)))
 #define HBDB_FLAG_CLEAR(interp, flag) ((interp)->hbdb->state = (hbdb_state_t)((interp)->hbdb->state & ~(flag)))
@@ -51,6 +57,25 @@ typedef enum {
     HBDB_COND_CONST   = 0x0400,    /* Constant                          */
     HBDB_COND_NOTNULL = 0x0800     /* Not null                          */
 } hbdb_condition_flag;
+
+typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char *cmd));
+
+typedef struct hbdb_cmd_t       hbdb_cmd_t;
+typedef struct hbdb_cmd_table_t hbdb_cmd_table_t;
+
+/* Contains information about the implementation of a particular command               */
+struct hbdb_cmd_t {
+    const hbdb_cmd_func_t function;      /* Points to function that executes command   */
+    const char           *short_help;    /* Short help message associated with command */
+    const char           *help;          /* Help message associated with command       */
+};
+
+/* Contains general information about a particular command                */
+struct hbdb_cmd_table_t {
+    const char       *name;          /* Command name                      */
+    const char       *short_name;    /* Command name abbreviation         */
+    const hbdb_cmd_t *cmd;           /* Command function and help message */
+};
 
 /* Conditions that can be associated with a breakpoint or watchpoint    */
 typedef struct hbdb_condition hbdb_condition;
