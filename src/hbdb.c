@@ -49,9 +49,6 @@ function.
 /* Size of buffer allocated for source code */
 #define HBDB_SOURCE_BUFFER_LENGTH 1024
 
-/* Abstract access to fields in Parrot_Interp */
-#define INTERP_ATTR(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
-
 /* HEADERIZER HFILE: include/parrot/hbdb.h */
 
 typedef void (*hbdb_cmd_func_t)(PARROT_INTERP, ARGIN(const char *cmd));
