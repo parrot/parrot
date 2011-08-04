@@ -2359,6 +2359,9 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
     PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_LOADED_PBCS);
     STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
+    if (STRING_IS_NULL(path))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "Cannot find library %Ss", file);
 
     if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
         return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
