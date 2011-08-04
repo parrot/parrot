@@ -102,7 +102,7 @@ Tests compiling some basic POST structures to PBC
     $P0 = wrap_main(op, return)
     $P0 = compile($P0)
     $S0 = $P0()
-    is( $S0, 'foo', 'string return value', 'todo' => "sub doesn't run?" )
+    is( $S0, 'foo', 'string return value' )
 .end
 
 

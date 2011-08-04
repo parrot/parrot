@@ -77,12 +77,14 @@ and returns the main sub from the PBC.
 =end
 
 method pbc($packfile, *%adverbs) {
+	pir::load_bytecode('osutils.pbc'); # for tempdir and unlink
+
     my $unlink;
     my $filename := ~%adverbs<output>;
     if !$filename {
-        # TODO Add mkstemp into OS PMC.
-        $filename := "/tmp/temp.pbc";
-        $unlink   := 1;
+		# XXX: Use mktemp instead, if we get one
+        $filename := tempdir(:SUFFIX('.pbc'));
+        $unlink   := %adverbs<cleanup> // 1;
     }
 
     my $handle := pir::new__Ps('FileHandle');
@@ -92,7 +94,7 @@ method pbc($packfile, *%adverbs) {
 
     my $view := pir::load_bytecode__ps($filename);
 
-	# TODO: unlink($filename) if $unlink
+	unlink($filename) if $unlink;
 
     trigger($view, 'load');
     trigger($view, 'init');
