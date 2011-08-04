@@ -32,12 +32,14 @@ Tests compiling some basic POST structures to PBC
     .local pmc compiler
     compiler = new ['POST';'PBCCompiler']
 
-    # New compiler method:
+    $P0 = compiler.'packfile'(node)
+
+    # New method: Generate view directly
     # TODO: Fix segfaults
-    # $P0 = compiler.'packfile'(node)
     # .tailcall compiler.'mainpmc'($P0)
 
-    .tailcall compiler.'pbc'(node)
+    # Old method: Write to file, load from file
+    .tailcall compiler.'pbc'($P0)
 .end
 
 .sub wrap_tree
