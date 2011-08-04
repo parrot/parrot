@@ -30,17 +30,19 @@ Tests compiling some basic POST structures to PBC
 # Compile a tree and return the main sub
 .sub compile
     .param pmc node
+	.param pmc adverbs :named :slurpy
+
     .local pmc compiler
     compiler = new ['POST';'PBCCompiler']
 
-    $P0 = compiler.'packfile'(node)
+    $P0 = compiler.'packfile'(node, adverbs :flat)
 
     # New method: Generate view directly
     # TODO: Fix segfaults
-    # .tailcall compiler.'mainpmc'($P0)
+    # .tailcall compiler.'mainpmc'($P0, adverbs :flat)
 
     # Old method: Write to file, load from file
-    .tailcall compiler.'pbc'($P0)
+    .tailcall compiler.'pbc'($P0, adverbs :flat)
 .end
 
 # Put arguments into a main sub inside a file
