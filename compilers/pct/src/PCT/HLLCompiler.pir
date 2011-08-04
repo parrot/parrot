@@ -590,20 +590,23 @@ Emit PBC file.
     $P0 = get_hll_global ['POST'], 'PBCCompiler'
 	packfile = $P0.'packfile'(post, adverbs :flat :named)
 
-    .local string filename
-    filename = adverbs['output']
-    unless filename goto packfile_written
+	# Writing file handled by pbc function
+	# XXX: This will be needed again if we use mainpmc below
 
-    .local pmc handle
-    handle = new 'FileHandle'
-    handle.'open'(filename, 'w')
-    $S0 = packfile
-    handle.'print'($S0)
-    handle.'close'()
+	#.local string filename
+	#filename = adverbs['output']
+	#unless filename goto packfile_written
 
-  packfile_written:
+	#.local pmc handle
+	#handle = new 'FileHandle'
+	#handle.'open'(filename, 'w')
+	#$S0 = packfile
+	#handle.'print'($S0)
+	#handle.'close'()
 
-	.tailcall $P0.'mainpmc'(packfile, adverbs :flat :named)
+	#packfile_written:
+
+	.tailcall $P0.'pbc'(packfile, adverbs :flat :named)
 .end
 
 
