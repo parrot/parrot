@@ -59,13 +59,27 @@ Tests compiling some basic POST structures to PBC
     .return (file)
 .end
 
-# Some basic tests like running an empty sub
+# Some basic tests like typechecking and running an empty sub
 .sub basic_tests
     $P0 = wrap_main()
-    $P0 = compile($P0)
-    isa_ok( $P0, 'Sub', 'compiled code' )
+
+    .local pmc compiler
+    compiler = get_hll_global ['POST'], 'PBCCompiler'
+
+    .local pmc packfile
+    packfile = compiler.'packfile'($P0)
+    isa_ok( packfile, 'Packfile', 'compiled code' )
+
+    $P0 = compiler.'pbc'(packfile)
+    isa_ok( $P0, 'Sub', 'pbc return' )
     $P0()
-    ok( 1, 'Sub seemed to run' )
+    ok( 1, 'pbc Sub seemed to run' )
+
+    # TODO: Fix segfaults
+    #$P0 = compiler.'mainpmc'(packfile)
+    #isa_ok( $P0, 'Sub', 'mainpmc return' )
+    #$P0()
+    #ok( 1, 'mainpmc Sub seemed to run' )
 .end
 
 # Test returning values
