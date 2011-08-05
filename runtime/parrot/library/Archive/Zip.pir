@@ -151,6 +151,8 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 .end
 
 .sub 'init' :vtable :method
+    $P0 = box 0
+    setattribute self, 'compressedSize', $P0
     $P0 = box FA_UNIX
     setattribute self, 'fileAttributeFormat', $P0
     $P0 = box 0
@@ -636,9 +638,8 @@ to something different than the given 'fileName'.
 
 .sub '_newFromFileNamed'
     .param string fileName
-    .param string newName       :optional
-    .param int has_newName      :opt_flag
-    if has_newName goto L1
+    .param string newName
+    unless null newName goto L1
     newName = fileName
   L1:
     $I0 = stat fileName, .STAT_EXISTS
@@ -713,8 +714,10 @@ Append a member.
 
 .sub 'addMember' :method
     .param pmc member
+    if null member goto L1
     $P0 = getattribute self, 'members'
     push $P0, member
+  L1:
 .end
 
 =item zip.'addFile' ( fileName [, newName ] )
