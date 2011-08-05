@@ -1,6 +1,6 @@
-/* Copyright (C) 2001-2011, Parrot Foundation. */
-
 /*
+Copyright (C) 2001-2011, Parrot Foundation.
+
  * hbdb.h
  *
  * Overview:
@@ -83,7 +83,9 @@ typedef struct hbdb_line {
 } hbdb_line_t;
 
 /* Contains details about the source file being debugged     */
-typedef struct {
+typedef struct hbdb_file hbdb_file;
+
+typedef struct hbdb_file {
     char         *filename;     /* Name of source file       */
     char         *source;       /* Source code in "filename" */
     size_t        size;         /* Size of file in bytes     */
@@ -105,8 +107,10 @@ typedef struct hbdb_breakpoint {
     hbdb_breakpoint       *next;         /* Next breakpoint in the list        */
 } hbdb_breakpoint_t;
 
+typedef struct hbdb hbdb;
+
 /* The debugger's core type. Contains information that's used by the hbdb runcore  */
-typedef struct {
+typedef struct hbdb {
     hbdb_file_t       *file;               /* Source file                          */
     hbdb_breakpoint_t *breakpoint;         /* First breakpoint in list             */
     hbdb_condition    *watchpoint;         /* First watchpoint                     */

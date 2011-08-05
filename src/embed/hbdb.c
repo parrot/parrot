@@ -1,6 +1,5 @@
-/* Copyright (C) 2001-2011, Parrot Foundation. */
-
 /*
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -89,6 +88,8 @@ PARROT_API
 Parrot_Int
 Parrot_api_hbdb_runloop(Parrot_PMC interp_pmc, int argc, ARGIN(const char *argv[]))
 {
+    ASSERT_ARGS(Parrot_api_hbdb_runloop)
+
     EMBED_API_CALLIN(interp_pmc, interp)
 
     hbdb_runloop(interp, argc, argv);

@@ -1,6 +1,5 @@
-/* Copyright (C) 2001-2011, Parrot Foundation. */
-
 /*
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -93,7 +92,7 @@ main(int argc, const char *argv[])
 
     /* Parse command-line arguments */
     while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
-        switch(opt.opt_id) {
+        switch (opt.opt_id) {
             case 'l':
                 license();
                 exit(EXIT_SUCCESS);
@@ -176,6 +175,7 @@ Displays a message about licensing information and resources.
 static void
 license(void)
 {
+    ASSERT_ARGS(license)
     const char *info = "Copyright (C) 2001-2011, Parrot Foundation.\n"
                        "This program is distributed under the terms of the "
                        "Artistic License 2.0\n\n"

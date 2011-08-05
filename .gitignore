@@ -466,6 +466,7 @@
 /t/tools/pmc2c.*.dump
 /t/tools/pmc2c.*.h
 /t/tools/pmc2c.*.pmc
+t/tools/hbdb/testlib/*.pbc
 /tools/dev/mk_language_shell.pl
 /*.gcda
 /*.gcno
