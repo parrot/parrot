@@ -68,10 +68,8 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 .sub '_printError'
     .param pmc args :slurpy
     $S0 = join '', args
-    $P0 = getinterp
-    $P1 = $P0.'stderr_handle'()
-    $P1.'print'($S0)
-    $P1.'print'("\n")
+    printerr $S0
+    printerr "\n"
 .end
 
 .sub '_ioError' :method
@@ -419,11 +417,11 @@ to something different than the given 'fileName'.
 .sub '_refreshLocalFileHeader' :method
     .param pmc fh
     .local int here
-    here = fh.'tell'()
+    here = tell fh
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $I0 = $P0
     $I0 += SIGNATURE_LENGTH
-    fh.'seek'($I0, 0)
+    seek fh, $I0, 0
     .local string header, fileName, localExtraField
     .const string VERSION = 20
     header = self.'pack_v'(VERSION)
@@ -459,7 +457,7 @@ to something different than the given 'fileName'.
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
-    fh.'seek'(here, 0)
+    seek fh, here, 0
     .return (AZ_OK)
 .end
 
@@ -628,7 +626,7 @@ to something different than the given 'fileName'.
     .return ('', AZ_OK)
   L1:
     $P0 = self.'fh'()
-    $S0 = $P0.'read'(chunkSize)
+    $S0 = read $P0, chunkSize
     unless $S0 == '' goto L2
     $I0 = self.'_ioError'("reading data")
     .return ($S0, $I0)
@@ -678,7 +676,7 @@ to something different than the given 'fileName'.
     .return ($I0)
   L1:
     $P0 = self.'fh'()
-    $P0.'seek'(0, 0)
+    seek $P0, 0, 0
     .return (AZ_OK)
 .end
 
