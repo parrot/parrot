@@ -89,6 +89,7 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
 static INTVAL
 find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
 {
+    ASSERT_ARGS(find_called_tag)
     Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);
     PMC *  const called_tags = attrs->called_tags;
     if (!PMC_IS_NULL(called_tags)) {
@@ -106,6 +107,7 @@ find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
 static void
 add_called_tag(PARROT_INTERP, ARGMOD(PMC * self), ARGIN(STRING * tag))
 {
+    ASSERT_ARGS(add_called_tag)
     const int has_it = find_called_tag(interp, self, tag);
     if (!has_it) {
         Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);
