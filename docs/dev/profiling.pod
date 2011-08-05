@@ -60,12 +60,12 @@ profiling output the stdout or stderr.
 =item C<PARROT_PROFILING_OUTPUT>
 
 This determines the type of output which will contain the profile.  Current
-options are C<pprof> and C<none>.  C<pprof> is the default and is a ascii-based
-human-readable format.  It can be post-processed into a Callgrind-compatible
-format by tools/dev/pprof2cg.pl.  C<none> writes nothing to the output file.
-It is most useful for testing and optimizing the profiling runcore itself.  It
-is expected to be of little interest to users wishing to profile PIR and HLL
-code.
+options are C<pprof> and C<none>.  C<pprof> is the default and is an
+ascii-based human-readable format.  It can be post-processed into a
+Callgrind-compatible format by tools/dev/pprof2cg.pl.  C<none> writes nothing
+to the output file.  It is most useful for testing and optimizing the
+profiling runcore itself.  It is expected to be of little interest to users
+wishing to profile PIR and HLL code.
 
 =item C<PARROT_PROFILING_ANNOTATIONS>
 
