@@ -27,6 +27,7 @@ use Fatal qw/open close/;
 
 use File::Basename qw/basename dirname/;
 use File::Path;
+use File::Copy;
 use File::Spec;
 use Getopt::Long;
 use JSON;
@@ -85,6 +86,7 @@ foreach my $index_file (@json_index_files) {
 
     foreach my $chunk (@{$section->{content}}) {
         my @sources_list = canonicalize_files($chunk->{source});
+        my @resources_list = canonicalize_files($chunk->{resource});
 
         my %sources;
         foreach my $file (@sources_list) {
@@ -105,6 +107,7 @@ foreach my $index_file (@json_index_files) {
         }
         $chunk->{input_files} = [keys %sources];
         $chunk->{sorted_list} = \@sources_list;
+        $chunk->{resources} = \@resources_list;
     }
     $pages{lc $section->{page}} = $section;
 }
@@ -125,6 +128,11 @@ foreach my $page (keys %pages) {
             else {
                 transform_input($source, $page->{page}, $page->{title});
             }
+        }
+        foreach my $resource (@{$section->{resources}}) {
+            my $outfile = File::Spec->catfile($target_dir, $resource);
+            File::Path::mkpath(File::Basename::dirname($outfile));
+            File::Copy::copy($resource, $outfile);
         }
     }
 }
