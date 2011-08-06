@@ -729,6 +729,7 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
         return;
     }
 
+    /* Check if user requested a range */
     if ((comma = strchr(cmd, ','))) {
         unsigned long stop;
         comma += 1;
@@ -790,7 +791,19 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
             return;
         }
 
-        hbdb->file->next_line -= 5;
+        /* This is a bit hacky but is needed so numbers < 5 don't underflow */
+        {
+            unsigned long max       = ULONG_MAX,
+                          min       = ULONG_MAX             - 4,
+                          next_line = hbdb->file->next_line - 5;
+
+            if (next_line <= max && next_line >= min) {
+                hbdb->file->next_line  = 1;
+            }
+            else {
+                hbdb->file->next_line -= 5;
+            }
+        }
 
         /* Iterate through source code until starting line is reached */
         for (i = 1, line = hbdb->file->line; (i < hbdb->file->next_line) && (line->next); i++)
