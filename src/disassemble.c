@@ -3,12 +3,12 @@ Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
-src/embed.c - The Parrot embedding interface
+src/disassemble.c - The Parrot Disassembler
 
 =head1 DESCRIPTION
 
-This file implements the old Parrot embedding interface.  Its days are
-numbered.  You probably want src/embed/api.c
+This file implements some logic for the parrot disassembler, and related
+routines.
 
 =head2 Functions
 
@@ -19,18 +19,12 @@ numbered.  You probably want src/embed/api.c
 */
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
-#include "parrot/extend.h"
+#include "parrot/disassemble.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
-#include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-#include "imcc/embed.h"
 
-#include "embed.str"
-
-/* HEADERIZER HFILE: include/parrot/embed.h */
+/* HEADERIZER HFILE: include/parrot/disassemble.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -236,9 +230,6 @@ Parrot_disassemble(PARROT_INTERP,
 
 =back
 
-=head1 SEE ALSO
-
-F<include/parrot/embed.h> and F<docs/embed.pod>.
 
 =cut
 

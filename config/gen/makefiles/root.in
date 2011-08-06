@@ -442,8 +442,8 @@ INTERP_O_FILES = \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
+	src/disassemble$(O) \
 	src/dynext$(O) \
-	src/embed$(O) \
 	src/embed/api$(O) \
 	src/embed/bytecode$(O) \
 	src/embed/strings$(O) \
@@ -713,7 +713,6 @@ STR_FILES = \
 	src/string/api.str \
 	src/string/encoding.str \
 	src/sub.str \
-	src/embed.str \
 	$(CLASS_STR_FILES)
 
 src/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
@@ -1736,19 +1735,15 @@ src/runcore/cores$(O) : src/runcore/cores.str \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
 	$(PARROT_H_HEADERS)
 
-src/embed$(O) : \
+src/diassemble$(O) : \
 	$(PARROT_H_HEADERS) \
-	src/embed.c \
-	src/embed.str \
+	src/disassemble.c \
 	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/extend_vtable.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	include/pmc/pmc_sub.h \
-	include/imcc/embed.h \
-	include/imcc/yyscanner.h \
+	include/pmc/pmc_callcontext.h
 
 src/embed/api$(O) : \
 	$(PARROT_H_HEADERS) \

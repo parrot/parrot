@@ -2709,6 +2709,70 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 /*
 
+=item C<PMC* set_current_sub(PARROT_INTERP)>
+
+Search the fixup table for a PMC matching the argument.  On a match,
+set up the appropriate context.
+
+If no match, set up a dummy PMC entry.  In either case, return a
+pointer to the PMC.
+
+DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC*
+set_current_sub(PARROT_INTERP)
+{
+    ASSERT_ARGS(set_current_sub)
+    PMC *new_sub_pmc;
+
+    PackFile_ByteCode   * const cur_cs = interp->code;
+    PackFile_ConstTable * const ct     = cur_cs->const_table;
+    STRING * const SUB = CONST_STRING(interp, "Sub");
+
+    opcode_t    i;
+
+    /*
+     * Walk the fixup table.  The first Sub-like entry should be our
+     * entry point with the address at our resume_offset.
+     */
+
+    for (i = 0; i < ct->pmc.const_count; i++) {
+        PMC * const sub_pmc = ct->pmc.constants[i];
+        if (VTABLE_isa(interp, sub_pmc, SUB)) {
+            Parrot_Sub_attributes *sub;
+
+            PMC_get_sub(interp, sub_pmc, sub);
+            if (sub->seg == cur_cs) {
+                const size_t offs = sub->start_offs;
+
+                if (offs == interp->resume_offset) {
+                    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
+                    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
+                    return sub_pmc;
+                }
+
+                break;
+            }
+        }
+    }
+
+    /* If we didn't find anything, put a dummy PMC into current_sub.
+       The default values set by SUb.init are appropriate for the
+       dummy, don't need additional settings. */
+    new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
+    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);
+
+    return new_sub_pmc;
+}
+
+
+/*
+
 =item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC
 *args)>
 
