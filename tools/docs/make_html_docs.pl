@@ -43,28 +43,6 @@ my $resource_dir = '../resources';
 
 my $json = JSON->new();
 
-sub canonicalize_files {
-    my ($file_chunk) = @_;
-
-    my @raw_files;
-    if (ref $file_chunk eq "ARRAY" ) {
-        @raw_files = @{$file_chunk};
-    }
-    elsif ($file_chunk) {
-        push @raw_files, $file_chunk;
-    };
-
-    my @files_list;
-
-    foreach my $file_elem (@raw_files) {
-        foreach my $file (sort glob($file_elem)) {
-            push @files_list, ($file)
-        }
-    }
-
-    return @files_list;
-}
-
 # Transform the json
 my %pages;
 my @json_index_files = glob 'docs/index/*.json';
@@ -180,6 +158,30 @@ foreach my $page (keys %pages) {
     print $out_fh Parrot::Docs::HTMLPage->footer('', $resource_dir, $version);
 }
 
+exit 0;
+
+sub canonicalize_files {
+    my ($file_chunk) = @_;
+
+    my @raw_files;
+    if (ref $file_chunk eq "ARRAY" ) {
+        @raw_files = @{$file_chunk};
+    }
+    elsif ($file_chunk) {
+        push @raw_files, $file_chunk;
+    };
+
+    my @files_list;
+
+    foreach my $file_elem (@raw_files) {
+        foreach my $file (sort glob($file_elem)) {
+            push @files_list, ($file)
+        }
+    }
+
+    return @files_list;
+}
+
 #
 # transform individual files from .pod to .html
 #
@@ -215,8 +217,6 @@ sub transform_input {
 
     $file_titles{$input} = $page_title;
 }
-
-exit 0;
 
 # Local Variables:
 #   mode: cperl
