@@ -85,11 +85,16 @@ sub do_beginning {
     my $title = esc($self->get_title());
     if (not $title) {
         # Since we couldn't find a title, we'll fake one using the filename.
+        # Missing titles can occur if the underlying PullParser doesn't find
+        # a suitable candidate. This omission can occur if the =head1 is all
+        # caps, for example.
         $title = esc($self->{source_filename});
         $title =~ s/^.+\///;
         $title =~ s/\.\w+$//;
         $title =~ s/[=-_ ]+/ /g;
         $title = ucfirst $title;
+        # These regexes make a filename relatively pretty, for example:
+        # "docs/project/release_manager_guide.pod" -> "Release manager guide"
     }
 
     # If the name of the document is IN the document title (a common pod
