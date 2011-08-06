@@ -83,6 +83,14 @@ sub do_beginning {
     my $self = shift;
 
     my $title = esc($self->get_title());
+    if (not $title) {
+        # Since we couldn't find a title, we'll fake one using the filename.
+        $title = esc($self->{source_filename});
+        $title =~ s/^.+\///;
+        $title =~ s/\.\w+$//;
+        $title =~ s/[=-_ ]+/ /g;
+        $title = ucfirst $title;
+    }
 
     # If the name of the document is IN the document title (a common pod
     # idiom), strip it out. We assume anything with a dot is the filename.
