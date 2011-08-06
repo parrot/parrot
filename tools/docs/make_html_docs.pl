@@ -42,6 +42,28 @@ my $resource_dir = '../resources';
 
 my $json = JSON->new();
 
+sub canonicalize_files {
+    my ($file_chunk) = @_;
+
+    my @raw_files;
+    if (ref $file_chunk eq "ARRAY" ) {
+        @raw_files = @{$file_chunk};
+    }
+    elsif ($file_chunk) {
+        push @raw_files, $file_chunk;
+    };
+
+    my @files_list;
+
+    foreach my $file_elem (@raw_files) {
+        foreach my $file (sort glob($file_elem)) {
+            push @files_list, ($file)
+        }
+    }
+
+    return @files_list;
+}
+
 # Transform the json
 my %pages;
 my @json_index_files = glob 'docs/index/*.json';
@@ -62,22 +84,11 @@ foreach my $index_file (@json_index_files) {
     my $title   = $section->{title};
 
     foreach my $chunk (@{$section->{content}}) {
-        my @raw_sources;
-        if (ref $chunk->{source} eq "ARRAY" ) {
-            @raw_sources = @{$chunk->{source}};
-        }
-        else {
-            push @raw_sources, $chunk->{source};
-        };
+        my @sources_list = canonicalize_files($chunk->{source});
 
         my %sources;
-        my @sources_list;
-
-        foreach my $source_elem (@raw_sources) {
-            foreach my $file (sort glob($source_elem)) {
-                $sources{$file} = 1;
-                push @sources_list, ($file)
-            }
+        foreach my $file (@sources_list) {
+            $sources{$file} = 1;
         }
 
         # These are only literals, no globs (for now?)
