@@ -107,16 +107,17 @@ typedef struct hbdb_line {
     hbdb_line       *next;          /* Next line (if any)                               */
 } hbdb_line_t;
 
-/* Contains details about the source file being debugged     */
 typedef struct hbdb_file hbdb_file;
 
+/* Contains details about the source file being debugged       */
 typedef struct hbdb_file {
-    char         *filename;     /* Name of source file       */
-    char         *source;       /* Source code in "filename" */
-    size_t        size;         /* Size of file in bytes     */
-    unsigned long next_line;    /* Next line to list         */
-    hbdb_line_t  *line;         /* First line of source code */
-    hbdb_label_t *label;        /* First label               */
+    char         *filename;       /* Name of source file       */
+    char         *source;         /* Source code in "filename" */
+    size_t        size;           /* Size of file in bytes     */
+    unsigned long next_line;      /* Next line to list         */
+    unsigned long total_lines;    /* Total lines in file       */
+    hbdb_line_t  *line;           /* First line of source code */
+    hbdb_label_t *label;          /* First label               */
 } hbdb_file_t;
 
 /* Linked list that contains details about each individual breakpoint          */

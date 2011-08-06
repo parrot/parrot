@@ -711,7 +711,8 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
 {
     ASSERT_ARGS(hbdb_cmd_list)
 
-    char          *ch;
+    const char   *comma;
+    char         *ch;
     unsigned long start,
                   count,
                   i;
@@ -719,50 +720,100 @@ hbdb_cmd_list(PARROT_INTERP, ARGIN(const char *cmd))
     hbdb_t      *hbdb;
     hbdb_line_t *line;
 
-    hbdb = interp->hbdb;
+    hbdb  = interp->hbdb;
+    count = 10;
 
     if (!check_file_exists(interp)) {
         Parrot_io_eprintf(hbdb->debugger, "No symbol table is loaded. Use the \"file\" command.\n");
         return;
     }
 
-    /* Get the range of lines to display */
-    hbdb->file->next_line = start = get_cmd_argument(&cmd, 1);
-    count                         = get_cmd_argument(&cmd, 10);
+    if ((comma = strchr(cmd, ','))) {
+        unsigned long stop;
+        comma += 1;
 
-    if (count == ULONG_MAX || hbdb->file->next_line == ULONG_MAX) {
-        Parrot_io_eprintf(hbdb->debugger, "Numerical result out of range.\n");
-        return;
-    }
+        hbdb->file->next_line = start = get_cmd_argument(&cmd,   1);
+        stop                          = get_cmd_argument(&comma, 10);
 
-    /* Iterate through source code until starting line is reached */
-    for (i = 1, line = hbdb->file->line; (i < hbdb->file->next_line) && (line->next); i++)
-        line = line->next;
-
-    /* Check if requested line number is too large */
-    if (i < start) {
-        Parrot_io_eprintf(hbdb->debugger, "No line %d in file \"%s\".\n", start, hbdb->file);
-        return;
-    }
-
-    /* Iterate through source code until end line is reached */
-    for (i = 0; i < count; i++) {
-        /* Display corresponding opcode (if any) */
-        if (line->opcode)
-            Parrot_io_printf(hbdb->debugger,
-                             "(%-04d) ",
-                             line->opcode - hbdb->debugee->code->base.data);
-
-        Parrot_io_printf(hbdb->debugger, "%-6ld", line->number);
-
-        /* Display source code from line */
-        for (ch = hbdb->file->source + line->offset; *ch != '\n'; ch++)
-            Parrot_io_printf(hbdb->debugger, "%c", *ch);
-
-        Parrot_io_printf(hbdb->debugger, "\n");
-
-        if (!(line = line->next))
+        if (start == ULONG_MAX || stop == ULONG_MAX) {
+            Parrot_io_eprintf(hbdb->debugger,
+                              "Line number %lu out of range; %s has %lu lines.\n",
+                              ULONG_MAX, hbdb->file->filename, hbdb->file->total_lines);
             return;
+        }
+
+        /* Iterate through source code until starting line is reached */
+        for (i = 1, line = hbdb->file->line; (i < hbdb->file->next_line) && (line->next); i++)
+            line = line->next;
+
+        /* Check if requested line number is too large */
+        if (i < start) {
+            Parrot_io_eprintf(hbdb->debugger, "No line %d in file \"%s\".\n", start, hbdb->file);
+            return;
+        }
+
+        for (i = 0; i <= (stop - start); i++) {
+            /* Display corresponding opcode (if any) */
+            if (line->opcode)
+                Parrot_io_printf(hbdb->debugger,
+                                 "(%-04d) ",
+                                 line->opcode - hbdb->debugee->code->base.data);
+
+            Parrot_io_printf(hbdb->debugger, "%-6ld", line->number);
+
+            /* Display source code from line */
+            for (ch = hbdb->file->source + line->offset; *ch != '\n'; ch++)
+                Parrot_io_printf(hbdb->debugger, "%c", *ch);
+
+            Parrot_io_printf(hbdb->debugger, "\n");
+
+            if (!(line = line->next))
+                return;
+        }
+    }
+    else {
+        hbdb->file->next_line = get_cmd_argument(&cmd, 6);
+
+        if (hbdb->file->next_line == ULONG_MAX) {
+            Parrot_io_eprintf(hbdb->debugger,
+                              "Line number %lu out of range; %s has %lu lines.\n",
+                              ULONG_MAX, hbdb->file->filename, hbdb->file->total_lines);
+            return;
+        }
+
+        if (hbdb->file->next_line > hbdb->file->total_lines) {
+            Parrot_io_eprintf(hbdb->debugger,
+                              "No line %d in file \"%s\".\n",
+                              hbdb->file->next_line,
+                              hbdb->file->filename);
+            return;
+        }
+
+        hbdb->file->next_line -= 5;
+
+        /* Iterate through source code until starting line is reached */
+        for (i = 1, line = hbdb->file->line; (i < hbdb->file->next_line) && (line->next); i++)
+            line = line->next;
+
+        /* Iterate through source code until end line is reached */
+        for (i = 0; i < count; i++) {
+            /* Display corresponding opcode (if any) */
+            if (line->opcode)
+                Parrot_io_printf(hbdb->debugger,
+                                 "(%-04d) ",
+                                 line->opcode - hbdb->debugee->code->base.data);
+
+            Parrot_io_printf(hbdb->debugger, "%-6ld", line->number);
+
+            /* Display source code from line */
+            for (ch = hbdb->file->source + line->offset; *ch != '\n'; ch++)
+                Parrot_io_printf(hbdb->debugger, "%c", *ch);
+
+            Parrot_io_printf(hbdb->debugger, "\n");
+
+            if (!(line = line->next))
+                return;
+        }
     }
 
     HBDB_FLAG_SET(interp, HBDB_STOPPED);
@@ -1089,11 +1140,11 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
 {
     ASSERT_ARGS(hbdb_load_source)
 
-    int       line;
-    int       i, j, ch;
-    size_t    buf_size;
-    ptrdiff_t start_offset;
-    FILE     *fd;
+    int           i, j, ch;
+    unsigned long line;
+    size_t        buf_size;
+    ptrdiff_t     offset;
+    FILE         *fd;
 
     hbdb_t      *hbdb;
     hbdb_file_t *dbg_file;
@@ -1127,7 +1178,7 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
     /* Load source code */
     do {
         /* Iterate through characters until a newline is reached */
-        start_offset = dbg_file->size;
+        offset = dbg_file->size;
 
         do {
             if ((ch = fgetc(fd)) == EOF)
@@ -1154,7 +1205,7 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
 
         dbg_line = mem_gc_allocate_zeroed_typed(interp, hbdb_line_t);
 
-        dbg_line->offset = start_offset;
+        dbg_line->offset = offset;
         dbg_line->number = ++line;
 
         /* Add line to list */
@@ -1168,7 +1219,8 @@ hbdb_load_source(PARROT_INTERP, ARGIN(const char *file))
 
     fclose(fd);
 
-    hbdb->file = dbg_file;
+    hbdb->file              = dbg_file;
+    hbdb->file->total_lines = line;
 
     /* Set status flag to indicate that source file has been loaded */
     HBDB_FLAG_SET(interp, HBDB_SRC_LOADED);
@@ -1928,9 +1980,8 @@ get_cmd_argument(ARGMOD(const char **cmd), unsigned long def_val)
 
     result = strtoul(*cmd, &next, 0);
 
-    if ((errno == ERANGE && result == ULONG_MAX) || (errno != 0 && result == 0)) {
+    if ((errno == ERANGE && result == ULONG_MAX) || (errno != 0 && result == 0))
         return ULONG_MAX;
-    }
 
     if (next != *cmd)
         *cmd   = next;
