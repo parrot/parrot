@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -57,19 +57,6 @@ static size_t get_min_pmc_address(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-static int is_buffer_ptr(
-    ARGIN_NULLOK(const Memory_Pools *mem_pools),
-    ARGIN(const void *ptr))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-static int is_pmc_ptr(
-    ARGIN(const Memory_Pools *mem_pools),
-    ARGIN(const void *ptr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void trace_mem_block(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools),
     size_t lo_var_ptr,
@@ -91,11 +78,6 @@ static void trace_system_stack(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_get_min_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_is_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ptr))
-#define ASSERT_ARGS_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(mem_pools) \
-    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_trace_mem_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -517,58 +499,6 @@ trace_mem_block(PARROT_INTERP,
 
     return;
 }
-
-/*
-
-=item C<static int is_buffer_ptr(const Memory_Pools *mem_pools, const void
-*ptr)>
-
-Checks whether the given C<ptr> is located within one of the sized
-header pools. Returns C<1> if it is, and C<0> if not.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-is_buffer_ptr(ARGIN_NULLOK(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
-{
-    ASSERT_ARGS(is_buffer_ptr)
-    UINTVAL        i;
-
-    if (!mem_pools)
-        return 0;
-
-    for (i = 0; i < mem_pools->num_sized; ++i) {
-        if (mem_pools->sized_header_pools[i]
-            &&  contained_in_pool(mem_pools->sized_header_pools[i], ptr))
-            return 1;
-    }
-
-    return 0;
-}
-
-/*
-
-=item C<static int is_pmc_ptr(const Memory_Pools *mem_pools, const void *ptr)>
-
-Checks that C<ptr> is actually a PMC pointer. Returns C<1> if it is, C<0>
-otherwise.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-is_pmc_ptr(ARGIN(const Memory_Pools *mem_pools), ARGIN(const void *ptr))
-{
-    ASSERT_ARGS(is_pmc_ptr)
-    return contained_in_pool(mem_pools->pmc_pool, ptr)
-           && PObj_is_PMC_TEST((const PObj *)ptr);
-}
-
 
 #endif
 
