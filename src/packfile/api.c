@@ -29,6 +29,7 @@ format of bytecode.
 #include "pf_private.h"
 #include "api.str"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_packfileview.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -420,9 +421,9 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
     PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-    if (!pf)
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "NULL packfile");
+            "NULL or invalid packfile");
 
     if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
         mode = 1;
@@ -2179,11 +2180,14 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
     ASSERT_ARGS(compile_file)
     PackFile_ByteCode * const cur_code = interp->code;
     PMC * const pf_pmc = Parrot_compile_file(interp, path, is_pasm);
+    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+        interp->iglobals, IGLOBALS_LOADED_PBCS);
     PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
     PackFile_ByteCode * const cs = pf->cur_cs;
 
     if (cs) {
         interp->code = cur_code;
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
     }
     else {
@@ -2209,22 +2213,20 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PMC * pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PMC * const pf_pmc = PackFile_read_pbc(interp, path, 0);
+
     if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Unable to load PBC file %Ss", path);
     else {
-        PackFile *pf = PackFile_append_pmc(interp, pf_pmc);
-
-        if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "Unable to append PBC to the current directory");
-
-        mem_gc_free(interp, pf->header);
-        pf->header = NULL;
-        mem_gc_free(interp, pf->dirp);
-        pf->dirp   = NULL;
-        /* no need to free pf here, as directory_destroy will get it */
+        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_LOADED_PBCS);
+        STRING * const method = CONST_STRING(interp, "mark_initialized");
+        STRING * const load_str = CONST_STRING(interp, "load");
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
+        Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
+                load_str);
+        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
     }
 }
 
@@ -2396,6 +2398,8 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
 
+
+
     pbc = CONST_STRING(interp, "pbc");
 
     if (STRING_equal(interp, ext, pbc))
@@ -2447,9 +2451,22 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
 {
     ASSERT_ARGS(Parrot_pf_load_bytecode_search)
     const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
+    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_LOADED_PBCS);
     STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-    return Parrot_pf_get_packfile_pmc(interp, pf);
+    if (STRING_IS_NULL(path))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "Cannot find library %Ss", file);
+
+    if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
+        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+    else {
+        PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf);
+        VTABLE_set_string_native(interp, pfview, path);
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
+        return pfview;
+    }
 }
 
 /*

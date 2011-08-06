@@ -19,6 +19,26 @@ determined by environment variables as documented below.  If the profiling
 runcore does not detect any relevant environment variables, it will use the
 defaults described below.
 
+=head2 Running Code Under the Profiler
+
+<add something here>
+
+=head2 Profile Post-processing Tools
+
+<add something here>
+
+=head3 Interpreting Post-processed Output
+
+<add something here>
+
+=head2 Bugs and Surprises
+
+<add something here>
+
+=head2 Manually Post-processing
+
+<add something here>
+
 =head2 Environment Variables
 
 =over 4

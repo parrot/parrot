@@ -2202,7 +2202,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
 
 #define DUP_AND_RET(valp, token)             \
   do {                                       \
-      if (valp) (valp)->s = mem_sys_strdup(yytext); \
+      if (valp) (valp)->s = mem_sys_strndup(yytext, yyleng); \
       return (token);                        \
   } while (0)
 
@@ -2210,7 +2210,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   do {                                       \
       if (valp) {                            \
           mem_sys_free((valp)->s);           \
-          (valp)->s = mem_sys_strdup(yytext);       \
+          (valp)->s = mem_sys_strndup(yytext, yyleng);       \
           return (token);                    \
       }                                      \
   } while (0)
@@ -2595,7 +2595,7 @@ YY_RULE_SETUP
 #line 153 "compilers/imcc/imcc.l"
 {
             SET_LINE_NUMBER;
-            imcc->frames->heredoc_rest = mem_sys_strdup(yytext);
+            imcc->frames->heredoc_rest = mem_sys_strndup(yytext, yyleng);
             BEGIN(heredoc2);
     }
 	YY_BREAK
@@ -3366,7 +3366,7 @@ YY_RULE_SETUP
         YYCHOP();
 
         if (valp)
-            valp->s = mem_sys_strdup(yytext);
+            valp->s = mem_sys_strndup(yytext, yyleng);
 
         return LABEL;
     }
@@ -3375,7 +3375,7 @@ case 116:
 YY_RULE_SETUP
 #line 503 "compilers/imcc/imcc.l"
 {
-        char   * const macro_name = mem_sys_strdup(yytext + 1);
+        char   * const macro_name = mem_sys_strndup(yytext + 1, yyleng - 1);
         int failed = expand_macro(imcc, macro_name, yyscanner);
         mem_sys_free(macro_name);
         if (!failed) {
@@ -3413,7 +3413,7 @@ case 122:
 YY_RULE_SETUP
 #line 521 "compilers/imcc/imcc.l"
 {
-        valp->s = mem_sys_strdup(yytext);
+        valp->s = mem_sys_strndup(yytext, yyleng);
 
         return STRINGC;
     }
@@ -3428,7 +3428,7 @@ YY_RULE_SETUP
            off newline and quote. */
         if (imcc->frames->heredoc_rest)
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "nested heredoc not supported");
-        imcc->heredoc_end = mem_sys_strdup(yytext + 3);
+        imcc->heredoc_end = mem_sys_strndup(yytext + 3, yyleng - 3);
         imcc->heredoc_end[strlen(imcc->heredoc_end) - 1] = 0;
 
         if (!strlen(imcc->heredoc_end))
@@ -3454,7 +3454,7 @@ YY_RULE_SETUP
 #line 555 "compilers/imcc/imcc.l"
 {
         /* charset:"..." */
-        valp->s = mem_sys_strdup(yytext);
+        valp->s = mem_sys_strndup(yytext, yyleng);
 
         /* this is actually not unicode but a string with a charset */
         return USTRINGC;
@@ -3524,7 +3524,7 @@ YY_RULE_SETUP
             "'%s' is only a valid register name in PASM mode", yytext);
 
         if (valp)
-            valp->s = mem_sys_strdup(yytext);
+            valp->s = mem_sys_strndup(yytext, yyleng);
 
         return REG;
     }
@@ -4918,7 +4918,6 @@ int yywrap(void* yyscanner) {
 
     /* pop old frame */
     if (imcc->frames->s.next) {
-        /* TODO: Double-check this */
         pop_parser_state(imcc, yyscanner);
         if (YYSTATE == INITIAL || YYSTATE == emit)
             BEGIN(imcc->frames->s.pasm_file ? emit : INITIAL);
@@ -5067,7 +5066,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
 {
     YYSTYPE  val;
     size_t   len      = 0;
-    char    *current  = mem_sys_strdup("");
+    char    *current  = mem_sys_strndup("", 0);
     yyguts_t *yyg     = (yyguts_t *)yyscanner;
     int      c        = yylex_skip(&val, imcc, " \n", yyscanner);
 
@@ -5089,7 +5088,7 @@ read_params(YYSTYPE *valp, ARGMOD(imc_info_t *imcc), params_t *params,
                             MAX_PARAM, macro_name);
 
             params->name[params->num_param++] = current;
-            current                           = mem_sys_strdup("");
+            current                           = mem_sys_strndup("", 0);
             len                               = 0;
 
             if (val.s)
@@ -5331,7 +5330,7 @@ expand_macro(ARGMOD(imc_info_t *imcc), ARGIN(const char *name), void *yyscanner)
         BEGIN(start_cond);
 
         if (frame->expansion.num_param == 0 && m->params.num_param == 1) {
-            frame->expansion.name[0] = mem_sys_strdup("");
+            frame->expansion.name[0] = mem_sys_strndup("", 0);
             frame->expansion.num_param = 1;
         }
 
@@ -5567,15 +5566,29 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     return success;
 }
 
+static void
+do_a_better_error_message(imc_info_t * imcc, void * yyscanner)
+{
+    STRING * loc;
+    imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
+    if (imcc->frames && imcc->frames->is_macro)
+        loc = Parrot_sprintf_c(imcc->interp, "in macro '.%Ss' line %d",
+                imcc->frames->s.file, imcc->line);
+    else
+        loc = Parrot_sprintf_c(imcc->interp, "in file '%Ss' line %d",
+                imcc->frames->s.file, imcc->line);
+    imcc->error_message = Parrot_sprintf_c(imcc->interp,
+        "Unexpected parser exit. Unknown syntax error.\n"
+        "\tLast line reported is %d\n"
+        "\tLast file reported is %S", imcc->line, loc);
+}
+
 INTVAL
 imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {
     /* TODO: Kill this stuff and use Parrot exceptions exclusively */
     IMCC_TRY(imcc->jump_buf, imcc->error_code) {
         if (yyparse(yyscanner, imcc)) {
-            imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
-            /* TODO: Be slightly less unhelpful */
-            imcc->error_message = string_from_literal(imcc->interp,
-                    "syntax error ... somewhere");
+            imcc->error_code = IMCC_PARSEFAIL_EXCEPTION;
             return 0;
         }
 
