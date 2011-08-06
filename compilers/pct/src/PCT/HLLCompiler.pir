@@ -588,25 +588,25 @@ Emit PBC file.
 
     .local pmc packfile
     $P0 = get_hll_global ['POST'], 'PBCCompiler'
-	packfile = $P0.'packfile'(post, adverbs :flat :named)
+    packfile = $P0.'packfile'(post, adverbs :flat :named)
 
-	# Writing file handled by pbc function
-	# XXX: This will be needed again if we use mainpmc below
+    # Writing file handled by pbc function
+    # XXX: This will be needed again if we use mainpmc below
 
-	#.local string filename
-	#filename = adverbs['output']
-	#unless filename goto packfile_written
+    #.local string filename
+    #filename = adverbs['output']
+    #unless filename goto packfile_written
 
-	#.local pmc handle
-	#handle = new 'FileHandle'
-	#handle.'open'(filename, 'w')
-	#$S0 = packfile
-	#handle.'print'($S0)
-	#handle.'close'()
+    #.local pmc handle
+    #handle = new 'FileHandle'
+    #handle.'open'(filename, 'w')
+    #$S0 = packfile
+    #handle.'print'($S0)
+    #handle.'close'()
 
-	#packfile_written:
+    #packfile_written:
 
-	.tailcall $P0.'pbc'(packfile, adverbs :flat :named)
+    .tailcall $P0.'pbc'(packfile, adverbs :flat :named)
 .end
 
 
