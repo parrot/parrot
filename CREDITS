@@ -18,6 +18,13 @@
         PPPS: To turn this file into a author map for git-svn, see tools/dev/mk_author_map.pl
 
 ----------
+N: Aaron Faanes
+E: dafrito@gmail.com
+W: http://www.dafrito.com
+D: make_html_docs revisions
+U: dafrito
+S: Richardson, TX
+
 N: Aaron Sherman
 U: ajs
 E: ajs@ajs.com
