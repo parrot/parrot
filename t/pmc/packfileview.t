@@ -14,8 +14,8 @@
     test_vtable_get_number_keyed_int()
     test_method_constant_counts()
     test_method_main_sub()
-    test_method_subs_by_flag()
-    test_method_subs_by_flag_tag_syntax()
+    test_method_subs_by_tag()
+    test_method_subs_by_tag_tag_syntax()
     test_method_serialized_size()
     test_method_serialize()
     test_method_all_subs()
@@ -87,15 +87,15 @@
 .end
 
 # We are executing this file as a program, so :load functions shouldn't be
-# triggered automatically. In the 'test_method_subs_by_flag' test, we do it
+# triggered automatically. In the 'test_method_subs_by_tag' test, we do it
 # manually.
 .sub '__onload' :load
     ok(1, "can manually trigger :load")
 .end
-.sub 'test_method_subs_by_flag'
+.sub 'test_method_subs_by_tag'
     $P0 = getinterp
     $P1 = $P0["packfile"]
-    $P3 = $P1.'subs_by_flag'("load")
+    $P3 = $P1.'subs_by_tag'("load")
     $I0 = elements $P3
     is($I0, 1)
     $P4 = $P3[0]
@@ -104,26 +104,26 @@
     $P2 = compreg "PIR"
     $S0 = ".sub __init :anon :init\nok(1, 'init function executed on demand')\n.end"
     $P5 = $P2.'compile'($S0)
-    $P3 = $P5.'subs_by_flag'("init")
+    $P3 = $P5.'subs_by_tag'("init")
     $I0 = elements $P3
     is($I0, 1)
     $P4 = $P3[0]
     $P4()
 .end
 
-.sub 'test_method_subs_by_flag_tag_syntax'
+.sub 'test_method_subs_by_tag_tag_syntax'
     $P0 = getinterp
     $P1 = $P0["packfile"]
 
-    $P2 = $P1.'subs_by_flag'("tag-a")
+    $P2 = $P1.'subs_by_tag'("tag-a")
     $I0 = elements $P2
     is($I0, 1, "Can get subs marked 'tag-a'")
 
-    $P2 = $P1.'subs_by_flag'("tag-b")
+    $P2 = $P1.'subs_by_tag'("tag-b")
     $I0 = elements $P2
     is($I0, 2, "Can get subs marked 'tag-b'")
 
-    $P2 = $P1.'subs_by_flag'("tag-c")
+    $P2 = $P1.'subs_by_tag'("tag-c")
     $I0 = elements $P2
     is($I0, 2, "Can get subs marked 'tag-c'")
 
@@ -145,7 +145,7 @@
 __EOCODE__
 
     $P1 = $P2.'compile'($S0)
-    $P3 = $P1.'subs_by_flag'("init")
+    $P3 = $P1.'subs_by_tag'("init")
     $I0 = elements $P3
     is($I0, 2)
 .end

@@ -404,7 +404,7 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), const int 
 
 /*
 
-=item C<PMC * Parrot_pf_subs_by_flag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
+=item C<PMC * Parrot_pf_subs_by_tag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
 
 Get an array of Subs in the packfile by named flag.
 
@@ -415,9 +415,9 @@ Get an array of Subs in the packfile by named flag.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 {
-    ASSERT_ARGS(Parrot_pf_subs_by_flag)
+    ASSERT_ARGS(Parrot_pf_subs_by_tag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
     PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
