@@ -86,8 +86,23 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
     return bt->const_table;
 }
 
+/*
+
+=item C<static INTVAL find_called_tag(PARROT_INTERP, PMC * self, STRING * tag)>
+
+Find a called tag in the cache. Return 1 if it exists, 0 otherwise.
+
+=item C<static void add_called_tag(PARROT_INTERP, PMC * self, STRING * tag)>
+
+Add a called tag to the cache, if it doesn't exist already. Do nothing
+otherwise.
+
+=cut
+
+*/
+
 static INTVAL
-find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
+find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING * tag))
 {
     ASSERT_ARGS(find_called_tag)
     Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);

@@ -486,6 +486,8 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
             VTABLE_push_pmc(interp, subs, ct->pmc.constants[ct->tag_map[i].const_idx]);
     }
 
+    /* Backwards compatibility. :load is equivalent to "load" tag. :init is
+       equivalent to "init" tag */
     if (mode == 1 || mode == 2) {
         PackFile_ByteCode   * const self = pf->cur_cs;
         PackFile_ConstTable * const ct = self->const_table;
