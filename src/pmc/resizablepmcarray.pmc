@@ -306,17 +306,29 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         SUPER(key, src);
     }
 
+/*
+
+=item C<void delete_pmc_keyed_int(INTVAL key)>
+
+=item C<void delete_pmc_keyed(PMC *key)>
+
+Delete the element at index C<key>.
+
+=cut
+
+*/
+
     VTABLE void delete_keyed(PMC *key) {
         const INTVAL idx  = VTABLE_get_integer(INTERP, key);
         SELF.delete_keyed_int(idx);
     }
 
-    VTABLE void delete_keyed_int(INTVAL idx) {
+    VTABLE void delete_keyed_int(INTVAL key) {
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
 
-        for (i = idx; i < n - 1; ++i)
+        for (i = key; i < n - 1; ++i)
             data[i] = data[i + 1];
 
         --PMC_size(SELF);

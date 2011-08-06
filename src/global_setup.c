@@ -206,6 +206,9 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_PBC_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_LOADED_PBCS, pmc);
+
+    pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
