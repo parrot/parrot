@@ -92,6 +92,9 @@ sub _initial_pass {
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
         }
+        if ( $key eq 'prefix' and $value !~ m[^/] ) {
+            die qq/Relative path given to --prefix, please pass an absolute path\n/;
+        }
         if ( $options_components->{short_circuits}{$key} ) {
             push @short_circuits_seen, $key;
         }
