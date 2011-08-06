@@ -27,15 +27,12 @@ Start Parrot, bootstrapping to PIR as early as possible.
 
 struct init_args_t {
     const char *run_core_name;
-    Parrot_String sourcefile;
-    Parrot_String outfile;
     Parrot_Int trace;
-    Parrot_Int execute_packfile;
-    Parrot_Int write_packfile;
-    Parrot_Int have_pbc_file;
-    Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
-    Parrot_Int preprocess_only;
+    char ** sysargv;
+    int sysargc;
+    char ** progargv;
+    int progargc;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -722,31 +719,24 @@ Parse Parrot's command line for options and set appropriate flags.
 
 static void
 parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
-        ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(struct init_args_t * args))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    const char * outfile = NULL;
     int status;
     int result = 1;
-    const char *sourcefile;
-
-    args->run_core_name = "fast";
-    args->write_packfile = 0;
-    args->execute_packfile = 1;
-    args->have_pbc_file = 0;
-    args->have_pasm_file = 0;
-    args->trace = 0;
-    args->turn_gc_off = 0;
-    args->outfile = NULL;
-    args->sourcefile = NULL;
-    args->preprocess_only = 0;
+    int nsysargs = 0;
+    const char **sysargs = (char**)calloc(argc, sizeof(char*));
 
     if (argc == 1) {
         usage(stderr);
         exit(EXIT_SUCCESS);
     }
+
+    args->run_core_name = "fast"
+    args->trace = 0;
+    args->turn_gc_off = 0;
+    sysargs[nsysargs++] = argv[argc];
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
@@ -798,6 +788,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case OPT_RUNTIME_PREFIX:
             {
+                /* TODO Can we do this in prt0.pir? */
                 Parrot_String runtimepath;
                 char * runtimepath_c;
                 Parrot_api_get_runtime_path(interp, &runtimepath);
@@ -807,24 +798,19 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 exit(EXIT_SUCCESS);
             }
           case 'V':
+            /* TODO Can we do this in prt0.pir? */
             Parrot_version();
             break;
           case OPT_PBC_OUTPUT:
           case 'o':
-            args->write_packfile = 1;
-            args->execute_packfile = 0;
-            outfile = opt.opt_arg;
-            if (!Parrot_api_string_import(interp, opt.opt_arg, &args->outfile))
-                show_last_error_and_exit(interp);
+            sysgargs[nsysargs++] = "-o";
+            sysgargs[nsysargs++] = opt.opt_arg;
             break;
           case 'r':
-            args->write_packfile = 1;
-            args->execute_packfile = 1;
-            /* TODO: What else do we need to do for -r? We need to write the
-                     packfile out to a file first, then open and execute it? */
+            sysargs[nsysargs++] = "-r";
             break;
           case 'c':
-            args->have_pbc_file = 1;
+            sysargs[nsysargs++] = "-c";
             break;
           case OPT_GC_DEBUG:
           /*
@@ -842,6 +828,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             /* Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1); */
             result = Parrot_api_flag(interp, 0x200, 1);
             break;
+
+            /* TODO: Can we do these in prt0.pir? */
           case 'I':
             result = Parrot_api_add_include_search_path(interp, opt.opt_arg);
             break;
@@ -855,19 +843,21 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
+
           case 'E':
-            args->preprocess_only = 1;
+            sysargs[nsysargs++] = "-E";
+            break;
           default:
             /* languages handle their arguments later (after being initialized) */
             break;
         }
+        if (!result) {
+            fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
+            usage(stderr);
+            exit(EXIT_FAILURE);
+        }
     }
 
-    if (!result) {
-        fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
-        usage(stderr);
-        exit(EXIT_FAILURE);
-    }
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
@@ -876,50 +866,18 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 
     /* reached the end of the option list and consumed all of argv */
     if (argc == opt.opt_index) {
-        /* We are not looking at an option, so it must be a program name */
         fprintf(stderr, "Missing program name\n");
         usage(stderr);
         exit(EXIT_FAILURE);
     }
 
-    *pgm_argc = argc - opt.opt_index;
-    *pgm_argv = argv + opt.opt_index;
+    for (nprogargs = 0; nprogargs < argc - opt.opt_index; nprogargs++)
+        progargs[nprogargs] = arg
 
-    sourcefile = (*pgm_argv)[0];
-    if (sourcefile) {
-        const char * const ext = strrchr(sourcefile, '.');
-        if (ext) {
-            if (strcmp(ext, ".pbc") == 0)
-                args->have_pbc_file = 1;
-            else if (strcmp(ext, ".pasm") == 0)
-                args->have_pasm_file = 1;
-        }
-    }
-    verify_file_names(sourcefile, outfile);
-    if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
-        show_last_error_and_exit(interp);
-}
-
-/*
-
-=item C<static void verify_file_names(const char * input, const char * output)>
-
-Verify that the input and output filenames are sane and are not the same.
-
-=cut
-
-*/
-
-static void
-verify_file_names(ARGIN_NULLOK(const char * input), ARGIN_NULLOK(const char * output))
-{
-    ASSERT_ARGS(verify_file_names)
-    const char is_stdin = (input == NULL);
-    const char is_stdout = (output == NULL);
-    if (!is_stdin && !is_stdout && (strcmp(input, output)==0)) {
-        fprintf(stderr, "Input and output files are the same");
-        exit(EXIT_FAILURE);
-    }
+    args->progargv = progargs;
+    args->progargc = nprogargs;
+    args->sysargv = argv + opt.opt_index;
+    args->sysargc = argc - opt.opt_index;
 }
 
 /*
