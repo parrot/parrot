@@ -56,7 +56,7 @@ validate_segment_identifier( M0_Interp *interp, FILE *stream,
 
 int
 load_mob_file(M0_Interp *interp, const char *filename) {
-    FILE *mob = fopen( filename, "r" );
+    FILE *mob = fopen( filename, "rb" );
 
     if (!mob)
         return 0;
