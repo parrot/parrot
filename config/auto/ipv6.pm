@@ -41,6 +41,9 @@ sub runstep {
         if (!$@ && $output =~ /OK/) {
             $ipv6_status = 1;
         }
+        else {
+            $conf->debug("ipv6 not detected: <$@> <$output>");
+        }
     }
     $conf->cc_clean();
     $self->_handle_ipv6_status($conf, $ipv6_status);
@@ -50,7 +53,7 @@ sub runstep {
 
 sub _handle_ipv6_status {
     my ($self, $conf, $ipv6_status) = @_;
-    $conf->data->set( HAS_IPV6 => $ipv6_status );
+    $conf->data->set( HAS_IPV6 => 1) if $ipv6_status;
     $ipv6_status
         ? $self->set_result('yes')
         : $self->set_result('no');

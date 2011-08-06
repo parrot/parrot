@@ -13,7 +13,6 @@
 #define PARROT_ATOMIC_H_GUARD
 
 #  include "parrot/has_header.h"
-#  include "parrot/thread.h"
 
 #ifdef PARROT_HAS_THREADS
 #  if defined(PARROT_HAS_I386_GCC_CMPXCHG)

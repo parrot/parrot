@@ -155,7 +155,7 @@ will look something like this:
 
 It is possible that a number of tests may fail. If this is a small number, then
 it is probably little to worry about, especially if you have the latest Parrot
-sources from the SVN repository. However, please do not let this discourage you
+sources from the Git repository. However, please do not let this discourage you
 from reporting test failures, using the same method as described for reporting
 build problems.
 

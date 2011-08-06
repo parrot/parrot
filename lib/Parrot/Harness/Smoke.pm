@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Parrot::Harness::Smoke - Subroutines used by harness-scripts to generate smoke reports
+Parrot::Harness::Smoke - Generate smoke reports
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ The module currently exports three subroutines on demand.
 
     %env_data = collect_test_environment_data();
 
-Subroutine collects environmental data via:
+It collects environmental data via:
 
 =over 4
 
@@ -25,7 +25,7 @@ Subroutine collects environmental data via:
 
 =item * Environmental variables
 
-=item * Analysis of C<.svn> metadata
+=item * Analysis of C<git> metadata
 
 =item * Application of CPAN modules.  F<Mail::Util> and F<Sys::Hostname> are
 used, if available.
@@ -82,6 +82,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Config qw/%PConfig/;
+use Parrot::Git::Describe;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     generate_html_smoke_report
@@ -131,7 +132,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
-            revision     => $PConfig{git_describe},
+            revision     => $Parrot::Git::Describe::current || '',
         ]
     );
 
@@ -158,7 +159,7 @@ sub collect_test_environment_data {
     my $arch = $PConfig{cpuarch} eq 'sun4' ? 'sparc' : $PConfig{cpuarch};
     # add the 32/64 bit suffix to the cpuarch
     if ($arch !~ /\d$/) {
-      $arch .= 8 * $PConfig{opcode_t_size};
+      $arch .= 8 * $PConfig{opcodesize};
     }
     my $devel = $PConfig{DEVEL};
     # check for local-modifications if -d .git and query to continue
@@ -169,7 +170,7 @@ sub collect_test_environment_data {
             $devel .= (" ".@mods." mods");
         }
         my $out = `git branch`;
-        ($branch) = $out =~ m{\* (\w+)$}m;
+        ($branch) = $out =~ m{\* ([-/\w]+)$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
            : $ENV{'LOGNAME'} || eval { getpwuid($<) };

@@ -31,15 +31,6 @@ Dump the bytecode header only.
 
 Terse output.
 
-=item C<-D> C--debug> 1-7
-
-Display detailed packfile reader debugging information if
-F<include/parrot/packfile.h> enables TRACE_PACKFILE.
-
-  1  print general debug info
-  2  print alignment info
-  4  print values
-
 =item C<-o converted.pbc>
 
 Repacks a PBC file into the platform's native binary format for better
@@ -287,13 +278,6 @@ static void help(void)
     printf("\t-t ... terse output\n");
     printf("\t-n ... show ops and line numbers only\n");
 
-#if TRACE_PACKFILE
-    printf("\t-D<1-7> --debug debug output\n");
-    printf("\t   1 general info\n");
-    printf("\t   2 alignment\n");
-    printf("\t   4 values\n");
-#endif
-
     printf("\t-o converted.pbc ... repacks a PBC file into "
            "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
@@ -309,10 +293,6 @@ static struct longopt_opt_decl opt_options[] = {
     { 'n', 'n', OPTION_optional_FLAG, { "--line-nums"   } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output"      } },
-
-#if TRACE_PACKFILE
-    { 'D', 'D', OPTION_required_FLAG, { "--debug"       } },
-#endif
     { 0,    0,  OPTION_optional_FLAG, { NULL            } }
 };
 
@@ -330,8 +310,9 @@ The run loop. Process the command-line arguments and dump accordingly.
 int
 main(int argc, const char **argv)
 {
-    PackFile   *pf;
-    Interp     *interp;
+    Parrot_PackFile  pfpmc;
+    PackFile        *pf;
+    Interp          *interp;
 
     const char *file            = NULL;
     int         terse           = 0;
@@ -354,11 +335,6 @@ main(int argc, const char **argv)
 
     while ((status = longopt_get(argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
-#if TRACE_PACKFILE
-          case 'D':
-            options += atoi(opt.opt_arg) << 2;
-            break;
-#endif
           case 'h':
             options += PFOPT_HEADERONLY;
             break;
@@ -388,14 +364,16 @@ main(int argc, const char **argv)
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pf = Parrot_pbc_read(interp, *argv, options);
+    pfpmc = Parrot_pbc_read(interp, *argv, options);
 
-    if (!pf) {
+    if (pfpmc == NULL) {
         printf("Can't read PBC\n");
         return 1;
     }
 
-    Parrot_pbc_load(interp, pf);
+    Parrot_pbc_load(interp, pfpmc);
+    pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+
 
     if (convert) {
         size_t   size  = PackFile_pack_size(interp,

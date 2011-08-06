@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2005-2006, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 2;
 use Parrot::Config;
 
 =head1 NAME
@@ -20,10 +20,6 @@ t/examples/pasm.t - Test examples in F<examples/pasm>
 
 Test the examples in F<examples/pasm>.
 
-=head1 TODO
-
-Put expected output into the example files.
-
 =head1 SEE ALSO
 
 F<t/examples/pir.t>
@@ -36,20 +32,6 @@ my %expected = (
     'hello.pasm' => << 'END_EXPECTED',
 Hello World
 END_EXPECTED
-
-#    'xml_parser.pasm' => << 'END_EXPECTED',
-#Start xml version=1.0
-#Start top
-#Start inner foo=bar narf=poit
-#Start junk
-#Data Hello
-#Close junk
-#Start empty
-#Close empty
-#Close inner
-#Close top
-#END_EXPECTED
-
 );
 
 SKIP: {
@@ -92,12 +74,6 @@ END_EXPECTED
 
 while ( my ( $example, $expected ) = each %expected ) {
     example_output_is( "examples/pasm/$example", $expected );
-}
-
-TODO:
-{
-    local $TODO = 'nanoforth2.pasm not testable yet';
-    fail('nanoforth2.pasm');
 }
 
 # Local Variables:

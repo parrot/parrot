@@ -6,9 +6,9 @@
 
 This PDD describes the security infrastructure of Parrot.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

@@ -7,9 +7,9 @@
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
@@ -100,6 +100,21 @@ otherwise parrot will create a new UnManagedStruct PMC type, which
 is just a generic "pointer to something" PMC type which Parrot does
 I<no> management of.
 
+=item U
+
+This parameter is used for passing user data to a callback creation. More
+explanation in the L<callbacks> section.
+
+=back
+
+Note that not all types are valid as return types.
+
+=head3 Deprecated Symbols
+
+The following symbols have been deprecated:
+
+=over 4
+
 =item 2
 
 A pointer to a short, taken from an P register of an int-like PMC.
@@ -114,17 +129,9 @@ A pointer to a long, taken from an P register of an int-like PMC.
 
 =item t
 
-string pointer. Taken from, or stuck into, a string register. (Converted to a
-null-terminated C string before passing in)
-
-=item U
-
-This parameter is used for passing user data to a callback creation. More
-explanation in the L<callbacks> section.
+string pointer. 
 
 =back
-
-Note that not all types are valid as return types.
 
 =head3 Example NCI call
 
@@ -279,7 +286,7 @@ it call back into Parrot.
     fun = dlfunc lib, "sayhello", "vpP"
 
     # do the NCI call, foo_callback is invoked from C
-    fun()
+    fun(callback_sub, userdata)
 
   .end
 

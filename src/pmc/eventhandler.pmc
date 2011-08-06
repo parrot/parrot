@@ -236,7 +236,6 @@ Runs the contained code, if any; this is what handles the event.
     VTABLE opcode_t *invoke(void *next) {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         Interp * target_interp = NULL;
-        opcode_t * real_next = NULL;
 
         if (!e)
             return (opcode_t *)next;

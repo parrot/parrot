@@ -28,19 +28,17 @@ static STRING * binary_chr(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* binary_error(PARROT_INTERP, SHIM(const STRING *src))
+static STRING* binary_error(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 static INTVAL binary_partial_scan(PARROT_INTERP,
     ARGIN(const char *buf),
     ARGMOD(Parrot_String_Bounds *bounds))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*bounds);
 
 static void binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*src);
 
@@ -54,12 +52,10 @@ static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_binary_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_binary_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buf) \
+       PARROT_ASSERT_ARG(buf) \
     , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_binary_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_binary_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -147,7 +143,7 @@ for fixed encodings.
 */
 
 static void
-binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
+binary_scan(SHIM_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(binary_scan)
 
@@ -168,8 +164,7 @@ C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
 */
 
 static INTVAL
-binary_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
-        ARGMOD(Parrot_String_Bounds *bounds))
+binary_partial_scan(SHIM_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds))
 {
     ASSERT_ARGS(binary_partial_scan)
     UINTVAL       i;

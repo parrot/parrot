@@ -29,6 +29,7 @@ our @shared_valid_options = qw{
     fatal
     fatal-step
     floatval
+    gc
     help
     hintsfile
     icu-config
@@ -38,7 +39,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    buildframes
     ld
     ldflags
     lex
@@ -59,7 +59,6 @@ our @shared_valid_options = qw{
     ops
     optimize
     parrot_is_shared
-    pkgconfigdir
     prefix
     profile
     sbindir
@@ -70,6 +69,7 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
+    with-llvm
     without-crypto
     without-core-nci-thunks
     without-extra-nci-thunks

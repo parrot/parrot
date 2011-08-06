@@ -1,6 +1,6 @@
 =pod
 
-=head3 Use the source
+=head1 Use the source
 
 X<Parrot;source code>
 The second step to participating in Parrot development is to get a

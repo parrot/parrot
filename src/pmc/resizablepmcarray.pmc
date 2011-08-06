@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ do_shift(ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
     INTVAL    size = PMC_size(arr);
-    PMC     **item = PMC_array(arr);
+    PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
     mem_sys_memmove(item, item + 1, size * sizeof (PMC *));
@@ -87,6 +87,25 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
+
+/*
+
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        if (size < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    _("ResizeblePMCArray: Cannot set array size to a negative number (%d)"), size);
+        SUPER(size);
+        if (size > 0)
+            PMC_threshold(SELF) = size;
+    }
 
 /*
 
@@ -127,12 +146,12 @@ Resizes the array to C<size> elements.
             return;
         }
         else {
-            INTVAL i, cur, needed;
+            INTVAL i, cur;
             i = cur = PMC_threshold(SELF);
             if (cur < 8192)
                 cur = (size < 2 * cur) ? (2 * cur) : size;
             else {
-                needed = size - cur;
+                const INTVAL needed = size - cur;
                 cur   += needed + 4096;
                 cur   &= ~0xfff;
             }
@@ -172,7 +191,7 @@ TODO: Check whether there is already an element that can be shifted
 */
 
     VTABLE FLOATVAL shift_float() {
-        INTVAL   size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         FLOATVAL value;
 
         if (0 == size)
@@ -184,7 +203,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE INTVAL shift_integer() {
-        INTVAL size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         INTVAL value;
 
         if (0 == size)
@@ -196,7 +215,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE PMC *shift_pmc() {
-        INTVAL size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         PMC   *data;
 
         if (0 == size)
@@ -208,7 +227,7 @@ TODO: Check whether there is already an element that can be shifted
     }
 
     VTABLE STRING *shift_string() {
-        INTVAL   size = PMC_size(SELF);
+        const INTVAL size = PMC_size(SELF);
         STRING  *value;
 
         if (0 == size)
@@ -287,17 +306,29 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         SUPER(key, src);
     }
 
+/*
+
+=item C<void delete_pmc_keyed_int(INTVAL key)>
+
+=item C<void delete_pmc_keyed(PMC *key)>
+
+Delete the element at index C<key>.
+
+=cut
+
+*/
+
     VTABLE void delete_keyed(PMC *key) {
         const INTVAL idx  = VTABLE_get_integer(INTERP, key);
         SELF.delete_keyed_int(idx);
     }
 
-    VTABLE void delete_keyed_int(INTVAL idx) {
+    VTABLE void delete_keyed_int(INTVAL key) {
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
 
-        for (i = idx; i < n - 1; ++i)
+        for (i = key; i < n - 1; ++i)
             data[i] = data[i + 1];
 
         --PMC_size(SELF);
@@ -583,66 +614,66 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
 /*
 
-=item C<void splice(PMC *value, INTVAL offset, INTVAL count)>
+=item C<void splice(PMC *from, INTVAL offset, INTVAL count)>
 
 Replaces C<count> elements starting at C<offset> with the elements in
-C<value>.
+C<from>.
 
-Note that the C<value> PMC can be of any of the various array types.
-
-Note that this implementation can be *VERY *inefficient as it manipulates
-everything via the VTABLE api.
+Note that the C<from> PMC can be of any of the various array types.
 
 =cut
 
 */
 
-    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
-
-        const INTVAL length = VTABLE_elements(INTERP, SELF);
-        const INTVAL elems  = VTABLE_elements(INTERP, value);
-        const INTVAL shift  = elems - count;
-        INTVAL       i;
+    VTABLE void splice(PMC *from, INTVAL offset, INTVAL count) {
+        const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
+        const INTVAL elems1 = VTABLE_elements(INTERP, from);
+        PMC **item = 0;
+        INTVAL tail;
+        INTVAL i;
 
         /* start from end? */
         if (offset < 0)
-            offset += length;
+            offset += elems0;
 
         if (offset < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "illegal splice offset\n");
 
-        /* shrink the array */
-        if (shift < 0) {
-            /* start at offset so we don't overwrite values we'll need */
-            for (i = offset + count; i < length; ++i)
-                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
-                    VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
+        /* number of elements to the right of the splice (the "tail") */
+        tail = elems0 - offset - count;
+        if (tail < 0) tail = 0;
 
-            SELF.set_integer_native(length + shift);
-        }
-        /* grow the array */
-        else if (shift > 0) {
-            SELF.set_integer_native(length + shift);
-
-            /* move the existing values */
-            /* start at length-1 so we don't overwrite values we'll need */
-            for (i = length - 1; i >= offset; --i)
-                VTABLE_set_pmc_keyed_int(INTERP, SELF, i + shift,
-                    VTABLE_get_pmc_keyed_int(INTERP, SELF, i));
+        item = PMC_array(SELF);
+        if (tail > 0 && count > elems1) {
+            /* we're shrinking the array, so first move the tail left */
+            mem_sys_memmove(item + offset + elems1, item + offset + count,
+                 tail * sizeof (PMC *));
         }
 
-        /* copy the new values */
-        for (i = 0; i < elems; ++i)
-            VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
-                VTABLE_get_pmc_keyed_int(INTERP, value, i));
+        /* now resize the array */
+        SELF.set_integer_native(offset + elems1 + tail);
+
+        item = PMC_array(SELF);
+        if (tail > 0 && count < elems1) {
+            /* the array grew, so move the tail to the right */
+            mem_sys_memmove(item + offset + elems1, item + offset + count,
+                 tail * sizeof (PMC *));
+        }
+
+        /* now copy C<from>'s elements into SELF */
+        if (elems1 > 0) {
+            PMC *iter = VTABLE_get_iter(INTERP, from);
+            for (i = 0; i < elems1; i++)
+                item[offset + i] = VTABLE_shift_pmc(INTERP, iter);
+        }
     }
 
 /*
 
 =back
 
-=head2 Methdos
+=head2 Methods
 
 =over 4
 

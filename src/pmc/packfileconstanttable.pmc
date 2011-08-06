@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -166,19 +166,19 @@ Get the number of constants.
 */
 
     METHOD INTVAL num_count() {
-        INTVAL ret = VTABLE_elements(INTERP,
+        const INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->num_constants);
         RETURN(INTVAL ret);
     }
 
     METHOD INTVAL str_count() {
-        INTVAL ret = VTABLE_elements(INTERP,
+        const INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->str_constants);
         RETURN(INTVAL ret);
     }
 
     METHOD INTVAL pmc_count() {
-        INTVAL ret = VTABLE_elements(INTERP,
+        const INTVAL ret = VTABLE_elements(INTERP,
                 PARROT_PACKFILECONSTANTTABLE(SELF)->pmc_constants);
         RETURN(INTVAL ret);
     }
@@ -317,7 +317,7 @@ If something goes wrong, blame NotFound.
 
 */
     METHOD set_main(INTVAL index) {
-        PMC *mainsub = SELF.get_pmc_keyed_int(index);
+        PMC * const mainsub = SELF.get_pmc_keyed_int(index);
         if (mainsub->vtable->base_type != enum_class_Sub)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,

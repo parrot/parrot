@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ package Parrot::Pmc2c::Library;
 use strict;
 use warnings;
 use File::Basename qw(basename);
-use Parrot::Pmc2c::PMCEmitter ();
+use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew);
 
 =item C<generate_library($library_name, $pmcs)>

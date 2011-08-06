@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,6 +34,12 @@ static int do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_INLINE
+PARROT_WARN_UNUSED_RESULT
+static int is_invokable(PARROT_INTERP, ARGIN(PMC *sub_obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void Parrot_pcc_add_invocant(PARROT_INTERP,
     ARGIN(PMC *call_obj),
     ARGIN(PMC *pmc))
@@ -42,6 +48,9 @@ static void Parrot_pcc_add_invocant(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_do_run_ops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub_obj))
+#define ASSERT_ARGS_is_invokable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_obj))
 #define ASSERT_ARGS_Parrot_pcc_add_invocant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -144,6 +153,8 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
 Adds the given PMC as an invocant to the given CallContext PMC.  You should
 never have to use this, and it should go away with interp->current_object.
 
+=cut
+
 */
 
 static void
@@ -224,9 +235,12 @@ Check if the PMC is a Sub or does invokable. Helper for do_run_ops.
 */
 
 PARROT_INLINE
+PARROT_WARN_UNUSED_RESULT
 static int
-is_invokable(PARROT_INTERP, ARGIN(PMC*sub_obj)) /* HEADERIZER SKIP */
+is_invokable(PARROT_INTERP, ARGIN(PMC *sub_obj))
 {
+    ASSERT_ARGS(is_invokable)
+
     if (VTABLE_isa(interp, sub_obj, CONST_STRING(interp, "Sub")))
         return 1;
     else
@@ -302,7 +316,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
     opcode_t    *dest;
-    UINTVAL      n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    const UINTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
     PMC * const  ret_cont = pmc_new(interp, enum_class_Continuation);
 
@@ -317,7 +331,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* PIR Subs need runops to run their opcodes. Methods and NCI subs
      * don't. */
     if (dest && do_run_ops(interp, sub_obj)) {
-        Parrot_runcore_t *old_core = interp->run_core;
+        Parrot_runcore_t * const old_core = interp->run_core;
         const opcode_t offset = dest - interp->code->base.data;
 
         runops(interp, offset);

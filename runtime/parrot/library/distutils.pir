@@ -99,6 +99,10 @@ Typical invocations are:
 
 core module Pod-Html
 
+=item pod2man
+
+core module Pod-Man
+
 =back
 
 =head2 PARROT DEPENDENCIES
@@ -108,10 +112,6 @@ core module Pod-Html
 =item glob (in step 'manifest' & 'sdist')
 
 PGE/Glob.pbc
-
-=item tempdir (in step 'smoke')
-
-Math/Rand.pbc
 
 =back
 
@@ -166,15 +166,17 @@ L<http://github.com/fperrad/wmlscript/blob/master/setup.pir>
 
 L<http://github.com/fperrad/lua-batteries/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/bf/trunk/setup.pir>
+L<https://github.com/parrot/bf/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/chitchat/trunk/setup.pir>
+L<https://github.com/parrot/chitchat/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/forth/trunk/setup.pir>
+L<https://github.com/parrot/forth/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/lolcode/trunk/setup.pir>
+L<https://github.com/parrot/lolcode/blob/master/setup.pir>
 
-L<https://trac.parrot.org/languages/browser/pheme/trunk/setup.pir>
+L<https://github.com/parrot/plumage/blob/master/setup.pir>
+
+L<https://github.com/parrot/pheme/blob/master/setup.pir>
 
 L<http://github.com/leto/kea/blob/master/setup.pir>
 
@@ -218,6 +220,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('build', _build_pir_tge)
     .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
     register_step_after('build', _build_pir_nqp_rx)
+    .const 'Sub' _build_pir_winxed = '_build_pir_winxed'
+    register_step_after('build', _build_pir_winxed)
     .const 'Sub' _build_inc_pir = '_build_inc_pir'
     register_step_after('build', _build_inc_pir)
     .const 'Sub' _build_pir_pir = '_build_pir_pir'
@@ -234,6 +238,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('build', _build_installable_pbc)
     .const 'Sub' _build_html_pod = '_build_html_pod'
     register_step_after('build', _build_html_pod)
+    .const 'Sub' _build_man_pod = '_build_man_pod'
+    register_step_after('build', _build_man_pod)
 
     .const 'Sub' _clean_dynpmc = '_clean_dynpmc'
     register_step('clean', _clean_dynpmc)
@@ -245,6 +251,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_pir_tge)
     .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
     register_step_after('clean', _clean_pir_nqp_rx)
+    .const 'Sub' _clean_pir_winxed = '_clean_pir_winxed'
+    register_step_after('clean', _clean_pir_winxed)
     .const 'Sub' _clean_inc_pir = '_clean_inc_pir'
     register_step_after('clean', _clean_inc_pir)
     .const 'Sub' _clean_pir_pir = '_clean_pir_pir'
@@ -259,6 +267,8 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_installable_pbc)
     .const 'Sub' _clean_html_pod = '_clean_html_pod'
     register_step_after('clean', _clean_html_pod)
+    .const 'Sub' _clean_man_pod = '_clean_man_pod'
+    register_step_after('clean', _clean_man_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
     .const 'Sub' _clean_zip = '_clean_zip'
@@ -768,7 +778,7 @@ the value is the NQP pathname
     $S0 = dirname(pir)
     mkpath($S0, 1 :named('verbose'))
     .local string cmd
-    cmd = get_nqp()
+    cmd = get_nqp_rx()
     cmd .= " --target=pir --output="
     cmd .= pir
     cmd .= " "
@@ -820,6 +830,51 @@ the value is an array of PIR pathname
     spew(inc, $S0, 1 :named('verbose'))
     goto L1
   L2:
+.end
+
+=item pir_winxed
+
+hash
+
+the key is the PIR pathname
+
+the value is the Winxed pathname
+
+=cut
+
+.sub '_build_pir_winxed' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_winxed']
+    unless $I0 goto L1
+    $P0 = kv['pir_winxed']
+    build_pir_winxed($P0)
+  L1:
+.end
+
+.sub 'build_pir_winxed'
+    .param pmc hash
+    .local pmc jobs
+    jobs = new 'ResizableStringArray'
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string pir, winxed
+    pir = shift $P0
+    winxed = hash[pir]
+    $I0 = newer(pir, winxed)
+    if $I0 goto L1
+    $S0 = dirname(pir)
+    mkpath($S0, 1 :named('verbose'))
+    .local string cmd
+    cmd = get_winxed()
+    cmd .= " -c -o"
+    cmd .= pir
+    cmd .= " "
+    cmd .= winxed
+    push jobs, cmd
+    goto L1
+  L2:
+    .tailcall run_jobs(jobs)
 .end
 
 =item pir_pir (concat)
@@ -961,11 +1016,14 @@ the value is the PBC pathname
     .local string bin, pbc
     bin = shift $P0
     pbc = hash[bin]
-    $S1 = _mk_path_exe(pbc, exe)
-    $I0 = newer($S1, pbc)
+    $I0 = newer(bin, pbc)
     if $I0 goto L1
     .local string cmd
     cmd = get_executable('pbc_to_exe')
+    cmd .= " --output="
+    cmd .= bin
+    $S0 = get_exe()
+    cmd .= $S0
     cmd .= " "
     cmd .= pbc
     push jobs, cmd
@@ -1555,6 +1613,67 @@ the value is the POD pathname
   L2:
 .end
 
+=item man_pod
+
+hash
+
+the key is the manpage pathname with usual conventions, for example 'man/man1/prog.1'
+
+the value is the POD pathname, for example 'src/prog.pir'
+
+=cut
+
+.sub '_build_man_pod' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['man_pod']
+    unless $I0 goto L1
+    $P0 = kv['man_pod']
+    build_man_pod($P0)
+  L1:
+.end
+
+.sub 'build_man_pod'
+    .param pmc hash
+    .local pmc config
+    config = get_config()
+    .local string version
+    version = config['VERSION']
+    $S0 = config['DEVEL']
+    version .= $S0
+    $P0 = iter hash
+  L1:
+    unless $P0 goto L2
+    .local string man, pod
+    man = shift $P0
+    pod = hash[man]
+    $I0 = newer(man, pod)
+    if $I0 goto L1
+    $S0 = dirname(man)
+    mkpath($S0, 1 :named('verbose'))
+    $S0 = basename(man)
+    $I0 = index $S0, '.'
+    .local string name
+    name = substr $S0, 0, $I0
+    name = upcase name
+    .local string section
+    inc $I0
+    section = substr $S0, $I0
+    .local string cmd
+    cmd = "pod2man --name="
+    cmd .= name
+    cmd .= " --section="
+    cmd .= section
+    cmd .= " --center=\"User Contributed Parrot Documentation\" --release=\"parrot "
+    cmd .= version
+    cmd .= "\" "
+    cmd .= pod
+    cmd .= " > "
+    cmd .= man
+    system(cmd, 1 :named('verbose'))
+    goto L1
+  L2:
+.end
+
 =back
 
 =head3 Step clean
@@ -1658,6 +1777,19 @@ the value is the POD pathname
     $P0 = kv['pir_nqp']
     clean_key($P0)
   L3:
+.end
+
+=item pir_winxed
+
+=cut
+
+.sub '_clean_pir_winxed' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['pir_winxed']
+    unless $I0 goto L1
+    $P0 = kv['pir_winxed']
+    clean_key($P0)
+  L1:
 .end
 
 =item pbc_pbc
@@ -1855,6 +1987,19 @@ the value is the POD pathname
     $I0 = exists kv['html_pod']
     unless $I0 goto L1
     $P0 = kv['html_pod']
+    clean_key($P0)
+  L1:
+.end
+
+=item man_pod
+
+=cut
+
+.sub '_clean_man_pod' :anon
+    .param pmc kv :slurpy :named
+    $I0 = exists kv['man_pod']
+    unless $I0 goto L1
+    $P0 = kv['man_pod']
     clean_key($P0)
   L1:
 .end
@@ -2276,6 +2421,10 @@ array of pathname or a single pathname
 
 =item root
 
+=item man_dir
+
+the default value is man
+
 =cut
 
 .sub '_install' :anon
@@ -2304,6 +2453,28 @@ array of pathname or a single pathname
     install($S1, $S2, 1 :named('exe'), 1 :named('verbose'))
     goto L3
   L4:
+
+    .local int has_zlib
+    $P0 = get_config()
+    has_zlib = $P0['has_zlib']
+    $P0 = get_install_gzfiles(kv :flat :named)
+    $P1 = iter $P0
+  L5:
+    unless $P1 goto L6
+    $S0 = shift $P1
+    $S1 = $P0[$S0]
+    $S2 = root . $S0
+    unless has_zlib goto L7
+    $S3 = $S2 . '.gz'
+    $I0 = newer($S3, $S1)
+    if $I0 goto L5
+    install($S1, $S2, 1 :named('verbose'))
+    gzip($S2, 1 :named('verbose'))
+    goto L5
+  L7:
+    install($S1, $S2, 1 :named('verbose'))
+    goto L5
+  L6:
 .end
 
 .sub 'get_install_files' :anon
@@ -2500,6 +2671,36 @@ array of pathname or a single pathname
   L2:
 .end
 
+.sub 'get_install_gzfiles' :anon
+    .param pmc kv :slurpy :named
+    .local pmc files
+    files = new 'Hash'
+    .local string man
+    man = get_value('man_dir', "man" :named('default'), kv :flat :named)
+    get_install_man(files, man)
+    .return (files)
+.end
+
+.sub 'get_install_man' :anon
+    .param pmc files
+    .param string man_dir
+    $I0 = length man_dir
+    $S0 = man_dir . '/man*/*.?'
+    $P0 = glob($S0)
+    $S1 = get_datadir()
+    $S1 .= "/man"
+  L1:
+    $P1 = iter $P0
+  L3:
+    unless $P1 goto L2
+    $S0 = shift $P1
+    $S2 = substr $S0, $I0
+    $S2 = $S1 . $S2
+    files[$S2] = $S0
+    goto L3
+  L2:
+.end
+
 =back
 
 =head3 Step uninstall
@@ -2532,6 +2733,18 @@ Same options as install.
     unlink($S0, 1 :named('verbose'))
     goto L3
   L4:
+
+    $P0 = get_install_gzfiles(kv :flat :named)
+    $P1 = iter $P0
+  L5:
+    unless $P1 goto L6
+    $S0 = shift $P1
+    $S0 = root . $S0
+    unlink($S0, 1 :named('verbose'))
+    $S0 .= '.gz'
+    unlink($S0, 1 :named('verbose'))
+    goto L5
+  L6:
 .end
 
 =head3 Step plumage
@@ -2827,7 +3040,7 @@ the default value is setup.pir
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod man_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0
@@ -2837,6 +3050,9 @@ the default value is setup.pir
     _manifest_add_hash(needed, generated, $P1)
     goto L1
   L2:
+
+    $P1 = get_install_gzfiles(kv :flat :named)
+    _manifest_add_hash(needed, generated, $P1)
 
     $P0 = split ' ', 'inst_bin inst_data inst_dynext inst_inc inst_lang inst_lib doc_files'
   L3:
@@ -3769,6 +3985,14 @@ TEMPLATE
     push $P0, $S0
     goto L3
   L4:
+    $P1 = get_install_gzfiles(kv :flat :named)
+    $P2 = iter $P1
+  L5:
+    unless $P2 goto L6
+    $S0 = shift $P2
+    push $P0, $S0
+    goto L5
+  L6:
     $P0.'sort'()
     $S0 = join "\n", $P0
     $S0 .= "\n"
@@ -4066,6 +4290,17 @@ TEMPLATE
     script .= $S0
     goto L31
   L32:
+
+    $P1 = get_install_gzfiles(kv :flat :named)
+    $P2 = iter $P1
+  L33:
+    unless $P2 goto L34
+    $S0 = shift $P2
+    $S1 = $P1[$S0]
+    $S0 = _mk_inno_line($S1, $S0)
+    script .= $S0
+    goto L33
+  L34:
 
     $I0 = exists kv['doc_files']
     unless $I0 goto L41
@@ -4394,6 +4629,26 @@ Return the whole config
 
 .sub 'get_nqp'
     .tailcall get_executable('parrot-nqp')
+.end
+
+=item get_nqp_rx
+
+=cut
+
+.sub 'get_nqp_rx'
+    .tailcall get_executable('parrot-nqp')
+.end
+
+=item get_srcdir
+
+=cut
+
+=item get_winxed
+
+=cut
+
+.sub 'get_winxed'
+    .tailcall get_executable('winxed')
 .end
 
 =item get_srcdir

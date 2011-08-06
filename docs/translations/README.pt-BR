@@ -103,7 +103,7 @@ você deseja usar. Por exemplo, para compilar os arquivos em C com o "cc",
 os arquivos em C++ com o "CC" e ligar tudo com o "CC", basta executar o 
 script da seguinte forma:
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 Consulte "perl Configure.pl --help" para mais informações e 
 docs/configuration.pod para mais detalhes.

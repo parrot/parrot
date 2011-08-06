@@ -1,14 +1,37 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
-Archive/Tar
+Archive/Tar - module for manipulations of tar archives
+
+head2 SYNOPSIS
+
+    load_bytecode 'Archive/Tar.pbc'
+
+    .local pmc archive
+    archive = new ['Archive';'Tar']
+
+    archive.'add_data'('file/baz.txt', "This is the contents now", 1000 :named('uid'))
+    archive.'add_files'('file/foo.pir', 'docs/README')
+
+    .local pmc fh
+    fh = new 'FileHandle'
+    fh.'open'('files.tar', 'wb')
+    archive.'write'(fh)                         # plain tar
+    fh.'close'()
+
+    $P0 = loadlib 'gziphandle'
+    .local pmc fh
+    fh = new 'GzipHandle'
+    fh.'open'('files.tgz', 'wb')
+    archive.'write'(fh)                         # gzip compressed
+    fh.'close'()
 
 =head2 DESCRIPTION
 
 Partial port of Archive::Tar (version 1.60)
 
-See L<http://search.cpan.org/~bingos/Archive-Tar/>
+See L<http://search.cpan.org/dist/Archive-Tar/>
 
 =cut
 
@@ -49,7 +72,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .globalconst int BLOCK = 512
 .end
 
-=item data
+=item $S0 = file.'data' ()
+
+Returns the current content for the in-memory file.
 
 =cut
 
@@ -58,23 +83,37 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return ($P0)
 .end
 
-=item new_from_file
+=item $P0 = new_from_file ( path )
+
+Returns a new ['Archive';'Tar';'File'] object from an existing file.
 
 =cut
+
+.include 'iglobals.pasm'
 
 .sub 'new_from_file'
     .param string path
     .local string data
     $P0 = new 'FileHandle'
+    $P0.'encoding'('binary')
     push_eh _handler
     .local string data
     data = $P0.'readall'(path)
     pop_eh
+    $P0 = getinterp
+    $P0 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P0['win32']
     .local int mode, uid, gid, mtime
     mode = stat path, .STAT_PLATFORM_MODE
     mode &= 0o777
+    unless $I0 goto L1
+    uid = 0
+    gid = 0
+    goto L2
+  L1:
     uid = stat path, .STAT_UID
     gid = stat path, .STAT_GID
+  L2:
     mtime = stat path, .STAT_MODIFYTIME
     .tailcall new_from_data(path, data, mode :named('mode'), uid :named('uid'), gid :named('gid'), mtime :named('mtime'))
   _handler:
@@ -82,7 +121,12 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return ($P0)
 .end
 
-=item new_from_data
+=item $P0 = new_from_data (path, data, opt :flat :named)
+
+Returns a new ['Archive';'Tar';'File'] object from data.
+
+'path' defines the file name (which need not exist), 'data' the file contents,
+and 'opt' is a hash of attributes which may be used to override the default attributes.
 
 =cut
 
@@ -186,7 +230,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return (directories, file)
 .end
 
-=item full_path
+=item $S0 = file.'full_path' ()
+
+Returns the full path from the tar header; this is basically a concatenation of the prefix and name fields.
 
 =cut
 
@@ -203,7 +249,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return ($S0)
 .end
 
-=item rename
+=item file.'rename' ( path )
+
+Rename the current file to 'path'.
 
 =cut
 
@@ -217,12 +265,8 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     setattribute self, 'prefix', $P0
 .end
 
-=item _format_tar_entry
-
-=cut
-
 .sub '_format_tar_entry' :method
-    $P0 = new 'ResizableStringArray'
+    $P0 = new 'StringBuilder'
     $P1 = new 'FixedPMCArray'
     set $P1, 1
     .const string f1 = '%06o'
@@ -287,7 +331,7 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     $P2 = getattribute self, 'prefix'
     $S0 = pad_string_with_null($P2, 155)
     push $P0, $S0
-    $S0 = join '', $P0
+    $S0 = $P0
     $I0 = compute_checksum($S0)
     $P1[0] = $I0
     $S1 = sprintf "%6o\0\0", $P1
@@ -330,6 +374,10 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
 
 =over 4
 
+=item tar = new ['Archive';'Tar']
+
+Returns a new ['Archive';'Tar'] object.
+
 =cut
 
 .namespace ['Archive';'Tar']
@@ -344,7 +392,11 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     setattribute self, 'data', $P0
 .end
 
-=item add_files
+=item tar.'add_files' ( filenamelist :flat )
+
+Takes a list of filenames and adds them to the in-memory archive.
+
+Returns a list of ['Archive';'Tar';'File'] objects that were just added.
 
 =cut
 
@@ -383,7 +435,12 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return (rv)
 .end
 
-=item add_data
+=item tar.'add_data' ( filename, data, opt :flat :named )
+
+Add a file to the in-memory archive, with name 'filename' and content 'data'
+and 'opt' is a hash of attributes which may be used to override the default attributes.
+
+Returns the ['Archive';'Tar';'File'] object that was just added.
 
 =cut
 
@@ -399,7 +456,9 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     .return (obj)
 .end
 
-=item write
+=item tar.'write' ( fh )
+
+Write the in-memory archive to disk. The argument is already opened filehandle.
 
 =cut
 
@@ -426,14 +485,10 @@ See L<http://search.cpan.org/~bingos/Archive-Tar/>
     goto L1
   L2:
     .local string TAR_END
-    TAR_END = repeat "\0", BLOCK
-    $S0 = repeat TAR_END, 2
-    fh.'puts'($S0)
+    $I0 = 2 * BLOCK
+    TAR_END = repeat "\0", $I0
+    fh.'puts'(TAR_END)
 .end
-
-=item _error
-
-=cut
 
 .sub '_error' :method
     .param pmc args :slurpy

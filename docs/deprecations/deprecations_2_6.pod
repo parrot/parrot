@@ -1,0 +1,73 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations_2_6.pod - Parrot Deprecations for 2.6
+
+=head1 Parrot Deprecations for 2.6
+
+=head2 Remove sizeof op
+
+=head3 Description
+
+The PIR op C<sizeof> was removed.
+
+See TT #633
+
+=head3 Rational
+
+This op was used to determine the size of a PMC's C-level struct given a
+numerical PMC type id.  This op was deprecated because numerical PMC id values
+should not be exposed to PIR-level code.
+
+=head3 Replacment
+
+No replacement currently exists because no core, library or HLL code was found
+to rely on this op.  If this functionality is needed, a string-based version
+could easily be implemented.
+
+=head2 Replace STRING_is_null with Parrot_str_is_null
+
+=head3 Description
+
+The C-level macro STRING_is_null was replaced with Parrot_str_is_null.
+
+See TT #1585
+
+=head3 Rational
+
+Make string null checks look like a Parrot API function.
+
+=head3 Replacment
+
+Replace uses of the C function STRING_is_null with Parrot_str_is_null.
+Parrot_str_is_null is a drop-in replacement for STRING_is_null.
+
+=head2 Remove in-place substr op variants
+
+=head3 Description
+
+All variants of the PIR op C<substr> which mutate an argument in-place were
+removed.
+
+See TT #1450
+
+=head3 Rational
+
+Parrot moved to immutable strings for performance reasons.  With immutable
+strings, a PIR-level string is never changed once it's been created.  This
+means that ops that work on a string in-place no longer make sense.
+
+=head3 Replacment
+
+PIR code should be changed as follows:
+
+    #old version
+    substr $S0, $I0, $I1, $S1
+
+    #new version
+    $S0 = replace $S0, $I0, $I1, $S1
+
+See also r46055 for more examples.
+
+=cut

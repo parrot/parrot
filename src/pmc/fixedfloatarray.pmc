@@ -292,6 +292,24 @@ Returns the PMC value of the element at index C<*key>.
 
 /*
 
+=item C<void * get_pointer()>
+
+Return a pointer to the underlying data buffer. This is a C C<FLOATVAL*> array
+and can be treated like any other array. This array should not be resized or
+freed.
+
+=cut
+
+*/
+
+    VTABLE void * get_pointer() {
+        FLOATVAL *float_array;
+        GET_ATTR_float_array(INTERP, SELF, float_array);
+        return float_array;
+    }
+
+/*
+
 =item C<void set_integer_native(INTVAL size)>
 
 Resizes the array to C<size> elements.

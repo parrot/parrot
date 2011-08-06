@@ -50,9 +50,6 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/hll.h \
     include/parrot/interpreter.h \
     include/parrot/io.h \
-    include/parrot/io_portable.h \
-    include/parrot/io_unix.h \
-    include/parrot/io_win32.h \
     include/parrot/key.h \
     include/parrot/library.h \
     include/parrot/memory.h \
@@ -66,19 +63,18 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/packfile.h \
     include/parrot/parrot.h \
     include/parrot/pbcversion.h \
-    include/parrot/platform.h \
     include/parrot/platform_interface.h \
-    include/parrot/platform_limits.h \
     include/parrot/pmc.h \
     include/parrot/pmc_freeze.h \
     include/parrot/pobj.h \
     include/parrot/scheduler.h \
     include/parrot/settings.h \
-    include/parrot/stat.h \
     include/parrot/string.h \
     include/parrot/string_funcs.h \
     include/parrot/sub.h \
     include/parrot/thread.h \
+    include/parrot/thr_pthread.h \
+    include/parrot/thr_windows.h \
     include/parrot/vtable.h \
     include/parrot/vtables.h \
     include/parrot/warnings.h \

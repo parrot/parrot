@@ -2,9 +2,9 @@
 
 =head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Abstract
 

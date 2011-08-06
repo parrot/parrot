@@ -129,13 +129,15 @@ enum uniq_t {
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-SymReg * _find_sym(PARROT_INTERP,
+SymReg * _find_sym(
+    ARGMOD(imc_info_t * imcc),
     ARGIN_NULLOK(const Namespace *nspace),
     ARGIN(const SymHash *hsh),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -145,42 +147,55 @@ SymReg * _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * _mk_address(PARROT_INTERP,
+SymReg * _mk_address(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(SymHash *hsh),
     ARGIN(const char *name),
     int uniq)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * _mk_const(PARROT_INTERP,
+SymReg * _mk_const(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(SymHash *hsh),
     ARGIN(const char *name),
     int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
-void _store_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
+void _store_symreg(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(SymHash *hsh),
+    ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh)
         FUNC_MODIFIES(*r);
 
-void add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+void add_namespace(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-void add_pcc_arg(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
+void add_pcc_arg(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(SymReg *r),
+    ARGMOD(SymReg *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*r)
         FUNC_MODIFIES(*arg);
 
@@ -189,17 +204,23 @@ void add_pcc_cc(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-void add_pcc_multi(PARROT_INTERP,
+void add_pcc_multi(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(SymReg *r),
     ARGIN_NULLOK(SymReg *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*r);
 
-void add_pcc_result(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
+void add_pcc_result(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(SymReg *r),
+    ARGMOD(SymReg *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*r)
         FUNC_MODIFIES(*arg);
 
@@ -208,30 +229,34 @@ void add_pcc_sub(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-void clear_globals(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void clear_globals(ARGMOD(imc_info_t * imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc);
 
 void clear_locals(ARGIN_NULLOK(IMC_Unit *unit));
 void clear_sym_hash(ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*hsh);
 
-void create_symhash(PARROT_INTERP, ARGOUT(SymHash *hash))
+void create_symhash(ARGMOD(imc_info_t * imcc), ARGOUT(SymHash *hash))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hash);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-SymReg * dup_sym(PARROT_INTERP, ARGIN(const SymReg *r))
+SymReg * dup_sym(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-SymReg * find_sym(PARROT_INTERP, ARGIN(const char *name))
+SymReg * find_sym(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 void free_pcc_sub(ARGMOD(pcc_sub_t *sub))
         __attribute__nonnull__(1)
@@ -243,9 +268,10 @@ void free_sym(ARGMOD(SymReg *r))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-SymReg * get_sym(PARROT_INTERP, ARGIN(const char *name))
+SymReg * get_sym(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_PURE_FUNCTION
 unsigned int hash_str(ARGIN(const char *str))
@@ -253,23 +279,27 @@ unsigned int hash_str(ARGIN(const char *str))
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-SymReg * link_keys(PARROT_INTERP,
+SymReg * link_keys(
+    ARGMOD(imc_info_t * imcc),
     int nargs,
     ARGMOD(SymReg **keys),
     int force)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*keys);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
+SymReg * mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-SymReg * mk_const_ident(PARROT_INTERP,
+SymReg * mk_const_ident(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(const char *name),
     int t,
     ARGMOD(SymReg *val),
@@ -277,75 +307,87 @@ SymReg * mk_const_ident(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*val);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-SymReg * mk_ident(PARROT_INTERP,
+SymReg * mk_ident(
+    ARGMOD(imc_info_t * imcc),
     ARGIN(const char *name),
     int t,
     INTVAL type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-SymReg * mk_label_address(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_local_label(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-SymReg * mk_temp_reg(PARROT_INTERP, int t)
-        __attribute__nonnull__(1);
-
-void pop_namespace(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void push_namespace(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
+SymReg * mk_label_address(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_local_label(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_pcc_sub(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(const char *name),
+    int proto)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_sub_address(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_sub_label(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_symreg(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(const char *name),
+    int t)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+SymReg * mk_temp_reg(ARGMOD(imc_info_t * imcc), int t)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc);
+
+void store_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*r);
 
 PARROT_MALLOC
@@ -355,111 +397,105 @@ char * symreg_to_str(ARGIN(const SymReg *s))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS__find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_add_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_add_pcc_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_add_pcc_cc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_add_pcc_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_add_pcc_result __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_add_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_clear_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_clear_locals __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_clear_sym_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hsh))
 #define ASSERT_ARGS_create_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_dup_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_find_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_free_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_free_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_get_sym __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_hash_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_link_keys __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(keys))
 #define ASSERT_ARGS_mk_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_const_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(val))
 #define ASSERT_ARGS_mk_ident __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_label_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_local_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_pasm_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_sub_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_sub_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_temp_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_pop_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_push_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_symreg_to_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))

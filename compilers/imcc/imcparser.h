@@ -10,6 +10,8 @@
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
 
+/* A Bison parser, made by GNU Bison 2.4.1.  */
+
 /* Skeleton interface for Bison's Yacc-like parsers in C
    
       Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
@@ -288,7 +290,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 993 "compilers/imcc/imcc.y"
+#line 1026 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;

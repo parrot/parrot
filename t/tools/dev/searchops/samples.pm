@@ -82,12 +82,6 @@ inline op check_events__() :internal :flow {
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
-inline op wrapper__() :internal :flow {
-    opcode_t *pc = CUR_OPCODE;
-    DO_OP(pc, interp);
-    goto ADDRESS(pc);
-}
-
 inline op prederef__() :internal :flow {
     opcode_t *_this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {

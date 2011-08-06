@@ -7,9 +7,9 @@
 This PDD describes the internal structure and behavior of the Polymorphic
 Container (PMC) data type.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
@@ -1356,8 +1356,7 @@ modifying the value of I<self>.
 
 =item substr
 
-  void substr(INTERP, PMC *self, INTVAL offset, INTVAL length, PMC *dest)
-  STRING* substr_str(INTERP, PMC *self, INTVAL offset, INTVAL length)
+  STRING* substr(INTERP, PMC *self, INTVAL offset, INTVAL length)
 
 Extracts the string starting at I<offset> with size I<length> and return
 it as a PMC in I<dest> or as a string return value.

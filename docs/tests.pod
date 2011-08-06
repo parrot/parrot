@@ -99,8 +99,6 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     #include "parrot/parrot.h"
     #include "parrot/embed.h"
 
-    static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
-
     int main(int argc, char* argv[]) {
         Parrot_Interp interp;
         interpreter = Parrot_new(NULL);
@@ -108,20 +106,13 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
         if (!interpreter)
             return 1;
 
-        Parrot_run_native(interp, the_test);
+        /* Your test goes here. */
+
         printf("done\n");
         fflush(stdout);
         return 0;
     }
 
-    static opcode_t*
-    the_test(PARROT_INTERP,
-        opcode_t *cur_op, opcode_t *start)
-    {
-        /* Your test goes here. */
-
-        return NULL;  /* always return NULL */
-    }
     CODE
     # Anything that might be output prior to "done".
     done
@@ -192,7 +183,7 @@ tests are intended to be run after someone has made changes in modules such as
 F<lib/Parrot/Pmc2cUtils/>.  They're set up to be run after F<Configure.pl> has
 completed but before make has been invoked.  (In fact, they will generate
 errors if make has completed.)  You can run them with any of the following:
- 
+
      perl Configure.pl --test
      perl Configure.pl --test=build
      make buildtools_tests  (following Configure.pl)
@@ -247,7 +238,7 @@ See L<Test::More> on how to do that.
 L<http://qa.perl.org/>
 L<http://testanything.org/>
 L<http://en.wikipedia.org/wiki/Test_Anything_Protocol>
-F<t/TESTS.STATUS.pod>
-F<t/README>
+L<https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod>
+L<https://github.com/parrot/parrot/blob/master/t/README.pod>
 
 =cut

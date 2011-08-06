@@ -1,5 +1,5 @@
 /* memory.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *     This is the API header for the memory subsystem
  *  Data Structure and Algorithms:
@@ -74,12 +74,12 @@
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 void * mem_sys_allocate(size_t size);
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 void * mem_sys_allocate_zeroed(size_t size);
 
 PARROT_EXPORT
@@ -87,12 +87,12 @@ void mem_sys_free(ARGFREE(void *from));
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 void * mem_sys_realloc(ARGFREE(void *from), size_t size);
 
 PARROT_EXPORT
 PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 void * mem_sys_realloc_zeroed(
     ARGFREE(void *from),
     size_t size,
@@ -104,12 +104,20 @@ PARROT_CANNOT_RETURN_NULL
 char * mem_sys_strdup(ARGIN(const char *src))
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * mem_sys_strndup(ARGIN(const char *src), size_t size)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_mem_sys_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_allocate_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_realloc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_realloc_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_mem_sys_strdup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_mem_sys_strndup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/alloc_memory.c */

@@ -1,3 +1,165 @@
+New in 3.7.0
+- Core
+- Languages
+- Documentation
+    + The Archive::Tar and Archive::Zip libraries now have POD docs
+- Tests
+
+New in 3.6.0
+- Core
+  + Class.add_vtable_override now allows you to overwrite an override
+  + Integers, floats and strings can now be stored in lexical variables.
+    Previously, only PMCs could be stored in lexicals.
+  + VTABLE_substr has been removed. VTABLE_substr_str has been renamed to
+    VTABLE_substr
+  + Added a new PackfileView PMC type, an intended replacement for the deprecated
+    Eval PMC.
+  + The is_integer vtable on the String PMC now works for all string encodings.
+  + Unicode error messages on Win32 now work correctly.
+  + A memory leak in IMCC was fixed.
+- Languages
+  + The snaphost of Winxed included with Parrot was updated to version 1.0.0
+  + Winxed has migrated to Github: https://github.com/NotFound/winxed
+
+New in 3.5.0
+- Core
+  + Parrot_PMC_destroy, Parrot_PMC_mark and Parrot_PMC_invoke were removed from
+    the public extension API.
+  + PAST now has PAST::Stmt node types, supports reusable temporary registers.
+  + Test coverage of the embedding and extending interface is now at least 95%.
+  + A snapshot of Winxed is now included in Parrot core to facilitate writing
+    core Parrot tools from a higher level language than PIR.
+- Languages
+  + Winxed
+    - Improved compile time scope search.
+    - Added 'using namespace' statement.
+    - Compiler classes and functions now live in the Winxed;Compiler namespace.
+- Tests
+  + The Parrot test suite harness now understands the HARNESS_TIMER environment
+    variable. Setting it to a true value will show timing results for a test run.
+  + IPv6 tests are now parallel testing friendly.
+
+New in 3.4.0
+- Core
+  + The Generational Mark and Sweep garbage collector is the new default.
+  + The --gc-nursery-size command line argument was added.
+  + Parrot now gets entropy from the underlying OS.
+  + The NCI subsystem now supports 8, 16, 32 and 64 bit integers.
+  + The NCI subsystem now supports "long long" and "long double" signatures.
+    Not all platforms/compilers support these non-standard types, so developers
+    are cautioned to take note that using them reduces portability.
+  + Many more OpenGL functions in the Parrot OpenGL bindings are available,
+    which required the above-mentioned signatures.
+  + Bytecode-related embedding api functions moved to src/embed/bytecode.c.
+- Languages
+  + Winxed
+    - Use 'using extern' for module imports.
+    - Improved stage 0 prefix ++ and -- operators.
+    - Allow 'null' in conditional operator.
+    - Several examples are updated.
+- Community
+  + Google Summer of Code Bonding period is going well. Students are mostly done
+    with their classes and much code will flow soon.
+- Documentation
+  + More PCT introductions are available at: http://github.com/benabik/cish
+
+New in 3.3.0
+- Core
+  + The isa and isa_pmc vtables can now be overridden from PIR
+  + IMCC has a new improved external interface
+  + A new IMCCompiler PMC adds prototype PDD31-alike functionality for the PIR and PASM compilers
+  + New --with-llvm option to Configure.pl, which will link to LLVM if it is available
+- Community
+  + Parrot Virtual Machine was accepted into Google Summer of Code 2011
+- Ecosystem
+  + Rosella adds a stable "Event" library to implement a publish/subscribe mechanism
+- Tests
+  + The test coverage of the extend_vtable subsystem was greatly increased
+
+New in 3.2.0
+- Core
+  + Full support for Unicode filenames on Linux and Win32
+  + The configuration option --cxx is gone
+  + New Generational GC implemented. To enable it run Configure.pl --gc=gms
+  + Now op definitions are semantically parsed. It opens possibilities for
+    future optimizations of parrot core.
+  + A statement convert the '.param' PIR systax
+  + A PMC is implemented for low-level buffer access which separate the
+    representation from the pointers
+  + Support added for 'long double', 'long long', and 64-bit to StructView
+  + In math.h are tools available for Inf/NaN
+  + Signature PMCs are used pervasively
+- Languages
+  + A few tests in Cardinal are fixed
+  + A binary .dmg is created of Rakudo Star for OS X
+  + Winxed
+    - Minor fixes, refactors and cleaning
+    - New predefs replace, push and provide a way to access multiple return
+      values
+    - Operators exits, class and .* (indirect method call) added
+    - $loadlib directive
+    - -o option to installable driver added
+    - Indent generated PIR is added to improve clarity and avoid imcc pitfalls
+      with non indented sub bodys
+- Community
+  + M0 roadmap is in progress
+- Documentation
+  + 'make docs' target, which was serving only to generate superfluous POD
+    files, has been removed.
+  + Svn remnants from PDDs are removed
+- Tests
+  + Added 'make release_check' target so that Release Manager can double-check
+    tarball
+  + Probes added for 'long long' and 64-bit C types
+- Rosella (https://github.com/Whiteknight/Rosella)
+  Rosella is a collection of tools and building blocks for Parrot
+  + A working proxy library is created, that make mostly-transparent custom
+    proxies for many types of Parrot PMCs
+  + A mockobject testing library is created, using the new proxy library
+  + The PLA test suite is updated to use the new Rosella testing tools,
+    including the new mockobjects to test callbacks
+
+New in 3.1.0
+- Core
+  + Exception PMCs are now subclassable from PIR
+  + IPv6 is now supported and tested
+  + Added Parrot_ext_try function to extend API (experimental), to allow
+    implementation of try .. catch construct in C extensions.
+  + We now have a YAML library called YAML::Tiny, a port of YAML::Tiny from Perl 5
+  + Deprecated/experimental features are now stored in api.yaml in an easy-to-parse
+    format, which will allow automated tools easy access to this data. This replaces
+    DEPRECATED.pod, which no longer exists.
+  + Improved GC latency
+  + Improved GC performance on low-memory systems
+  + Improved packfile annotation lookup complexity
+  + Removal of unused code and SVN based code
+- NQP
+  + A repository for a new NQP version which has a new object model is
+    created at http://github.com/perl6/nqp
+- Languages
+  + Cardinal (Ruby on Parrot) now compiles and passes it's test suite on master
+    and is looking for developers : https://github.com/parrot/cardinal
+  + Cardinal can send smoke reports with "rake smoke" or "parrot setup.pir smoke"
+  + Jaspers, an implementation of Javascript on Parrot, now has a Github repo
+    and is looking for developers: https://github.com/leto/jaspers
+- Community
+  + The following Parrot Google Code-In students were grand prize winners:
+    Fernando Brito, Brazil       David Czech, Canada
+    Nolan Lum, United States     Matt Rajca, United States
+    Tony Young, New Zealand      Daniel Kang, United States
+    We are very proud of them for their fine work and congratulate
+    them for achieving top finalist status! For more info, see:
+    http://google-opensource.blogspot.com/2011/02/google-code-in-grand-prize-winners.html
+- Documentation
+  + Many new Parrot-related terms were added to docs/glossary.pod
+  + Removal of most remaining references to SVN
+  + Internal project documentation is included in html output
+- Tests
+  + Test suite now passes on NetBSD 5.1
+  + Test coverage increased greatly for the Embed/Extend subsystem,
+    thanks to a TPF grant:
+    http://leto.net/dukeleto.pl/2011/01/parrot-embed-grant-update-2.html
+
 New in 3.0.0
 - Core
   + A new embedding API is available in "parrot/api.h" and documented in

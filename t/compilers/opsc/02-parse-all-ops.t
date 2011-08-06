@@ -1,4 +1,4 @@
-#! parrot
+#! ./parrot
 # Copyright (C) 2010, Parrot Foundation.
 
 .include 't/compilers/opsc/common.pir'
@@ -6,6 +6,9 @@
 .sub 'main' :main
     .include 'test_more.pir'
     load_bytecode 'opsc.pbc'
+
+    $P0 = getstdout
+    $P0.'encoding'('ascii')
 
     .local int total
     .local pmc os, all_files, ops_files, dynops_files

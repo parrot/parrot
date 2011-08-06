@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -43,13 +43,7 @@ Initializes the exception handler.
 */
 
     VTABLE void init() {
-        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
         SUPER();
-        attrs->invoked              = 0;
-        attrs->min_severity         = 0;
-        attrs->max_severity         = 0;
-        attrs->handled_types        = PMCNULL;
-        attrs->handled_types_except = PMCNULL;
 
         /* an exception handler has no separate context; it's only a snapshot
          * of an "earlier" context, which is contained in the interpreter's
@@ -217,8 +211,6 @@ Report whether the exception handler can handle a particular type of exception.
             PMC *handled_types;
             PMC *handled_types_except;
             INTVAL min_severity, max_severity;
-            GET_ATTR_handled_types(INTERP, SELF, handled_types);
-            GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
             GET_ATTR_max_severity(INTERP, SELF, max_severity);
             GET_ATTR_min_severity(INTERP, SELF, min_severity);
 
@@ -228,21 +220,23 @@ Report whether the exception handler can handle a particular type of exception.
             if (max_severity > 0 &&  severity > max_severity) {
                 RETURN(INTVAL 0);
             }
+            GET_ATTR_handled_types(INTERP, SELF, handled_types);
             if (! PMC_IS_NULL(handled_types)) {
                 const INTVAL elems = VTABLE_elements(INTERP, handled_types);
                 const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; ++i) {
-                    INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
-                            handled_types, i);
+                    const INTVAL handled_type =
+                        VTABLE_get_integer_keyed_int(INTERP, handled_types, i);
                     if (handled_type == type)
                         RETURN(INTVAL 1);
                 }
 
                 RETURN(INTVAL 0);
             }
-            if (handled_types_except != PMCNULL) {
+            GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
+            if (! PMC_IS_NULL(handled_types_except)) {
                 const INTVAL elems = VTABLE_elements(INTERP, handled_types_except);
                 const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
                 INTVAL i;
@@ -253,11 +247,6 @@ Report whether the exception handler can handle a particular type of exception.
                     if (handled_type == type)
                         RETURN(INTVAL 0);
                 }
-
-                RETURN(INTVAL 1);
-            }
-            else if (max_severity > 0 || min_severity > 0) {
-                RETURN(INTVAL 1);
             }
 
             RETURN(INTVAL 1);

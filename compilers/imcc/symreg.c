@@ -47,29 +47,34 @@ static SymReg * _get_sym_typed(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static char * _mk_fullname(PARROT_INTERP,
+static char * _mk_fullname(
+    ARGMOD(imc_info_t * imcc),
     ARGIN_NULLOK(const Namespace *ns),
     ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static SymReg * _mk_symreg(PARROT_INTERP,
+static SymReg * _mk_symreg(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(SymHash *hsh),
     ARGIN(const char *name),
     int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-static char * add_ns(PARROT_INTERP, ARGIN(const char *name))
+static char * add_ns(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -85,7 +90,8 @@ static int int_overflows(ARGIN(const SymReg *r))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static SymReg * mk_pmc_const_2(PARROT_INTERP,
+static SymReg * mk_pmc_const_2(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGIN(SymReg *left),
     ARGMOD(SymReg *rhs))
@@ -93,26 +99,28 @@ static SymReg * mk_pmc_const_2(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*rhs);
 
-static void resize_symhash(PARROT_INTERP, ARGMOD(SymHash *hsh))
+static void resize_symhash(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
 #define ASSERT_ARGS__get_sym_typed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_fullname __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_add_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_get_sym_by_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hsh) \
@@ -120,72 +128,15 @@ static void resize_symhash(PARROT_INTERP, ARGMOD(SymHash *hsh))
 #define ASSERT_ARGS_int_overflows __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_mk_pmc_const_2 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(left) \
     , PARROT_ASSERT_ARG(rhs))
 #define ASSERT_ARGS_resize_symhash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-/*
-
-=item C<void push_namespace(PARROT_INTERP, const char *name)>
-
-Begins a new namespace in PASM/PIR, named after the given C<name>.
-
-=cut
-
-*/
-
-void
-push_namespace(PARROT_INTERP, ARGIN(const char *name))
-{
-    ASSERT_ARGS(push_namespace)
-    Namespace * const ns = mem_gc_allocate_zeroed_typed(interp, Namespace);
-
-    ns->parent = IMCC_INFO(interp)->namespace_stack;
-    ns->name   = mem_sys_strdup(name);
-    IMCC_INFO(interp)->namespace_stack = ns;
-}
-
-
-/*
-
-=item C<void pop_namespace(PARROT_INTERP, const char *name)>
-
-Ends the current namespace, popping back to the previous.  If the namespace
-stack is empty, throws a syntax error.
-
-=cut
-
-*/
-
-void
-pop_namespace(PARROT_INTERP, ARGIN(const char *name))
-{
-    ASSERT_ARGS(pop_namespace)
-    Namespace * const ns = IMCC_INFO(interp)->namespace_stack;
-
-    if (!ns)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
-
-    if (name && !STREQ(name, ns->name))
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "tried to pop namespace(%s), "
-                "but top of stack is namespace(%s)\n", name, ns->name);
-
-    while (ns->idents) {
-        Identifier * const ident = ns->idents;
-        ns->idents               = ident->next;
-        mem_sys_free(ident);
-    }
-
-    IMCC_INFO(interp)->namespace_stack = ns->parent;
-    mem_sys_free(ns);
-}
-
 
 /*
 
@@ -249,7 +200,7 @@ get_sym_by_name(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 
 /*
 
-=item C<static SymReg * _mk_symreg(PARROT_INTERP, SymHash *hsh, const char
+=item C<static SymReg * _mk_symreg(imc_info_t * imcc, SymHash *hsh, const char
 *name, int t)>
 
 Makes a new SymReg in the given SymHash from a varname and type.
@@ -261,20 +212,21 @@ Makes a new SymReg in the given SymHash from a varname and type.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
-_mk_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
+_mk_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
+        ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(_mk_symreg)
     SymReg * r = _get_sym_typed(hsh, name, t);
 
     if (!r) {
-        r             = mem_gc_allocate_zeroed_typed(interp, SymReg);
+        r             = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
         r->set        = t;
         r->type       = VTREG;
         r->name       = mem_sys_strdup(name);
         r->color      = -1;
         r->want_regno = -1;
 
-        _store_symreg(interp, hsh, r);
+        _store_symreg(imcc, hsh, r);
     }
 
     return r;
@@ -283,7 +235,7 @@ _mk_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 /*
 
-=item C<SymReg * mk_symreg(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_symreg(imc_info_t * imcc, const char *name, int t)>
 
 Makes a new SymReg in the current unit, given a varname and type.
 
@@ -294,15 +246,15 @@ Makes a new SymReg in the current unit, given a varname and type.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
+mk_symreg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_symreg)
-    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
+    IMC_Unit * const unit = imcc->cur_unit;
 
     /* Check for the condition that fires up a segfault in TT #162 */
     PARROT_ASSERT(unit != NULL);
 
-    return _mk_symreg(interp, &unit->hash, name, t);
+    return _mk_symreg(imcc, &unit->hash, name, t);
 }
 
 
@@ -352,7 +304,7 @@ symreg_to_str(ARGIN(const SymReg *s))
 
 /*
 
-=item C<SymReg * mk_temp_reg(PARROT_INTERP, int t)>
+=item C<SymReg * mk_temp_reg(imc_info_t * imcc, int t)>
 
 Makes a new unique and temporary SymReg of the specified type C<t>.
 
@@ -363,21 +315,22 @@ Makes a new unique and temporary SymReg of the specified type C<t>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_temp_reg(PARROT_INTERP, int t)
+mk_temp_reg(ARGMOD(imc_info_t * imcc), int t)
 {
     ASSERT_ARGS(mk_temp_reg)
     char       buf[30];
     /* XXX non-reentrant */
+    /* TODO: Fix this */
     static int temp;
 
     snprintf(buf, sizeof (buf), "__imcc_temp_%d", ++temp);
-    return mk_symreg(interp, buf, t);
+    return mk_symreg(imcc, buf, t);
 }
 
 
 /*
 
-=item C<SymReg * mk_pcc_sub(PARROT_INTERP, const char *name, int proto)>
+=item C<SymReg * mk_pcc_sub(imc_info_t * imcc, const char *name, int proto)>
 
 Makes a SymReg representing a PCC sub of the given C<name> with the specified
 type.
@@ -389,14 +342,14 @@ type.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
+mk_pcc_sub(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int proto)
 {
     ASSERT_ARGS(mk_pcc_sub)
-    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
-    SymReg   * const r    = _mk_symreg(interp, &unit->hash, name, proto);
+    IMC_Unit * const unit = imcc->cur_unit;
+    SymReg   * const r    = _mk_symreg(imcc, &unit->hash, name, proto);
 
     r->type    = VT_PCC_SUB;
-    r->pcc_sub = mem_gc_allocate_zeroed_typed(interp, pcc_sub_t);
+    r->pcc_sub = mem_gc_allocate_zeroed_typed(imcc->interp, pcc_sub_t);
 
     return r;
 }
@@ -404,7 +357,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 
 /*
 
-=item C<void add_namespace(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void add_namespace(imc_info_t * imcc, IMC_Unit *unit)>
 
 Add the current namespace (and HLL id) to a sub declaration.
 
@@ -413,12 +366,12 @@ Add the current namespace (and HLL id) to a sub declaration.
 */
 
 void
-add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
+add_namespace(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
 {
     ASSERT_ARGS(add_namespace)
-    SymReg * const ns = IMCC_INFO(interp)->cur_namespace;
+    SymReg * const ns = imcc->cur_namespace;
 
-    unit->hll_id = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+    unit->hll_id = Parrot_pcc_get_HLL(imcc->interp, CURRENT_CONTEXT(imcc->interp));
 
     if (!ns)
         return;
@@ -429,8 +382,8 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     if (unit->prev && unit->prev->_namespace == ns)
         unit->_namespace = ns;
     else {
-        SymReg * const g = dup_sym(interp, ns);
-        SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, g->name);
+        SymReg * const g = dup_sym(imcc, ns);
+        SymReg * const r = _get_sym(&imcc->ghash, g->name);
 
         unit->_namespace     = g;
         g->reg               = ns;
@@ -439,7 +392,7 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         /* this unit should free its namespace only if it's the only thing
          * holding onto it */
         if (!r || r->type != VT_CONSTP) {
-            _store_symreg(interp, &IMCC_INFO(interp)->ghash, g);
+            _store_symreg(imcc, &imcc->ghash, g);
             unit->owns_namespace = 0;
         }
         else
@@ -450,7 +403,7 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void add_pcc_arg(PARROT_INTERP, SymReg *r, SymReg *arg)>
+=item C<void add_pcc_arg(imc_info_t * imcc, SymReg *r, SymReg *arg)>
 
 Adds a register or constant to the function arg list.
 
@@ -459,14 +412,14 @@ Adds a register or constant to the function arg list.
 */
 
 void
-add_pcc_arg(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
+add_pcc_arg(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     ASSERT_ARGS(add_pcc_arg)
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nargs;
 
-    sub->args       = mem_gc_realloc_n_typed(interp, sub->args,      n + 1, SymReg *);
-    sub->arg_flags  = mem_gc_realloc_n_typed(interp, sub->arg_flags, n + 1, int);
+    sub->args      = mem_gc_realloc_n_typed(imcc->interp, sub->args, n + 1, SymReg *);
+    sub->arg_flags = mem_gc_realloc_n_typed(imcc->interp, sub->arg_flags, n + 1, int);
 
     sub->args[n]      = arg;
     sub->arg_flags[n] = arg->type;
@@ -479,7 +432,7 @@ add_pcc_arg(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_result(PARROT_INTERP, SymReg *r, SymReg *arg)>
+=item C<void add_pcc_result(imc_info_t * imcc, SymReg *r, SymReg *arg)>
 
 Adds a register or constant to the function's return list.
 
@@ -488,14 +441,14 @@ Adds a register or constant to the function's return list.
 */
 
 void
-add_pcc_result(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
+add_pcc_result(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 {
     ASSERT_ARGS(add_pcc_result)
     pcc_sub_t * const sub = r->pcc_sub;
     const int         n   = sub->nret;
 
-    sub->ret        = mem_gc_realloc_n_typed(interp, sub->ret,       n + 1, SymReg *);
-    sub->ret_flags  = mem_gc_realloc_n_typed(interp, sub->ret_flags, n + 1, int);
+    sub->ret       = mem_gc_realloc_n_typed(imcc->interp, sub->ret, n + 1, SymReg *);
+    sub->ret_flags = mem_gc_realloc_n_typed(imcc->interp, sub->ret_flags, n + 1, int);
 
     /* we can't keep the flags in the SymReg as the SymReg
      * maybe used with different flags for different calls */
@@ -510,7 +463,7 @@ add_pcc_result(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_multi(PARROT_INTERP, SymReg *r, SymReg *arg)>
+=item C<void add_pcc_multi(imc_info_t * imcc, SymReg *r, SymReg *arg)>
 
 Adds a :multi signature to the sub.
 
@@ -519,13 +472,13 @@ Adds a :multi signature to the sub.
 */
 
 void
-add_pcc_multi(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
+add_pcc_multi(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 {
     ASSERT_ARGS(add_pcc_multi)
     pcc_sub_t * const sub = r->pcc_sub;
     const int n           = sub->nmulti;
 
-    sub->multi = mem_gc_realloc_n_typed(interp, sub->multi, n + 1, SymReg *);
+    sub->multi = mem_gc_realloc_n_typed(imcc->interp, sub->multi, n + 1, SymReg *);
     sub->multi[n] = arg;
     sub->nmulti++;
 }
@@ -569,7 +522,7 @@ add_pcc_cc(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
 
 /*
 
-=item C<SymReg * mk_pasm_reg(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_pasm_reg(imc_info_t * imcc, const char *name)>
 
 Makes a SymReg representing a PASM register.
 
@@ -580,18 +533,18 @@ Makes a SymReg representing a PASM register.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
+mk_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_pasm_reg)
-    SymReg *r    = _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
+    SymReg *r    = _get_sym(&imcc->cur_unit->hash, name);
 
     if (!r) {
-        r        = mk_symreg(interp, name, *name);
+        r        = mk_symreg(imcc, name, *name);
         r->type  = VTPASM;
         r->color = atoi(name + 1);
 
         if (r->color < 0)
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                 "register number out of range '%s'\n", name);
     }
 
@@ -601,7 +554,7 @@ mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static char * _mk_fullname(PARROT_INTERP, const Namespace *ns, const
+=item C<static char * _mk_fullname(imc_info_t * imcc, const Namespace *ns, const
 char *name)>
 
 Combines the namespace and name together, separated by a C<::>.  If there's no
@@ -617,12 +570,12 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static char *
-_mk_fullname(PARROT_INTERP, ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
+_mk_fullname(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 {
     ASSERT_ARGS(_mk_fullname)
     if (ns) {
         const size_t len = strlen(name) + strlen(ns->name) + 3;
-        char *result = mem_gc_allocate_n_typed(interp, len, char);
+        char *result = mem_gc_allocate_n_typed(imcc->interp, len, char);
         snprintf(result, len, "%s::%s", ns->name, name);
         return result;
     }
@@ -633,7 +586,8 @@ _mk_fullname(PARROT_INTERP, ARGIN_NULLOK(const Namespace *ns), ARGIN(const char 
 
 /*
 
-=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t, INTVAL type)>
+=item C<SymReg * mk_ident(imc_info_t * imcc, const char *name, int t, INTVAL
+type)>
 
 Makes a new identifier.
 
@@ -644,27 +598,16 @@ Makes a new identifier.
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 SymReg *
-mk_ident(PARROT_INTERP, ARGIN(const char *name), int t, INTVAL type)
+mk_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t, INTVAL type)
 {
     ASSERT_ARGS(mk_ident)
-    char   * const fullname = _mk_fullname(interp, IMCC_INFO(interp)->namespace_stack, name);
-    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->cur_unit->hash), name);
+    SymReg *r = get_sym_by_name(&imcc->cur_unit->hash, name);
     if (r && (r->set != t || r->type != type))
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-                "syntax error, duplicated IDENTIFIER '%s'\n", fullname);
+        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
+                "syntax error, duplicated IDENTIFIER '%s'\n", name);
 
-    r = mk_symreg(interp, fullname, t);
+    r = mk_symreg(imcc, name, t);
     r->type = type;
-
-    if (IMCC_INFO(interp)->namespace_stack) {
-        Identifier * const ident = mem_gc_allocate_zeroed_typed(interp, Identifier);
-
-        ident->name        = fullname;
-        ident->next        = IMCC_INFO(interp)->namespace_stack->idents;
-        IMCC_INFO(interp)->namespace_stack->idents = ident;
-    }
-    else
-        mem_sys_free(fullname);
 
     return r;
 }
@@ -672,7 +615,7 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t, INTVAL type)
 
 /*
 
-=item C<static SymReg * mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit, SymReg
+=item C<static SymReg * mk_pmc_const_2(imc_info_t * imcc, IMC_Unit *unit, SymReg
 *left, SymReg *rhs)>
 
 Makes a constant PMC and inserts instructions to access it.
@@ -684,8 +627,8 @@ Makes a constant PMC and inserts instructions to access it.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static SymReg *
-mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
-        ARGMOD(SymReg *rhs))
+mk_pmc_const_2(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
+        ARGIN(SymReg *left), ARGMOD(SymReg *rhs))
 {
     ASSERT_ARGS(mk_pmc_const_2)
     /* XXX This always returns NULL.  Probably shouldn't return anything then. */
@@ -693,8 +636,8 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     char   *name;
     int     len;
 
-    if (IMCC_INFO(interp)->state->pasm_file)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+    if (imcc->state->pasm_file)
+        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
             "Ident as PMC constant %s\n", left->name);
 
     r[0] = left;
@@ -715,14 +658,14 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
       case enum_class_Coroutine:
         r[1]        = rhs;
         rhs->usage |= U_FIXUP;
-        INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+        INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
         return NULL;
       default:
         break;
     }
 
     r[1] = rhs;
-    INS(interp, unit, "set_p_pc", "", r, 2, 0, 1);
+    INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
 
     return NULL;
 }
@@ -730,8 +673,8 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
 
 /*
 
-=item C<SymReg * mk_const_ident(PARROT_INTERP, const char *name, int t, SymReg
-*val, int global)>
+=item C<SymReg * mk_const_ident(imc_info_t * imcc, const char *name, int t,
+SymReg *val, int global)>
 
 Makes a new identifier constant with value val.
 
@@ -742,7 +685,7 @@ Makes a new identifier constant with value val.
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 SymReg *
-mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
+mk_const_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t,
         ARGMOD(SymReg *val), int global)
 {
     ASSERT_ARGS(mk_const_ident)
@@ -754,7 +697,7 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
      */
     if (t == 'N' || t == 'I') {
         if (val->set == 'S')
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "bad const initialisation");
+            IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "bad const initialisation");
 
         /* Cast value to const type */
         val->set = t;
@@ -762,18 +705,18 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
 
     if (global) {
         if (t == 'P')
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "global PMC constant not allowed");
 
-        r = _mk_symreg(interp, &IMCC_INFO(interp)->ghash, name, t);
+        r = _mk_symreg(imcc, &imcc->ghash, name, t);
 
         r->type = VT_CONSTP;
     }
     else {
-        r = mk_ident(interp, name, t, VT_CONSTP);
+        r = mk_ident(imcc, name, t, VT_CONSTP);
 
         if (t == 'P')
-            return mk_pmc_const_2(interp, IMCC_INFO(interp)->cur_unit, r, val);
+            return mk_pmc_const_2(imcc, imcc->cur_unit, r, val);
     }
 
     r->reg = val;
@@ -784,8 +727,8 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
 
 /*
 
-=item C<SymReg * _mk_const(PARROT_INTERP, SymHash *hsh, const char *name, int
-t)>
+=item C<SymReg * _mk_const(imc_info_t * imcc, SymHash *hsh, const char *name,
+int t)>
 
 Makes a new constant (internal use only).
 
@@ -796,10 +739,11 @@ Makes a new constant (internal use only).
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-_mk_const(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
+_mk_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
+        ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(_mk_const)
-    SymReg * const r = _mk_symreg(interp, hsh, name, t);
+    SymReg * const r = _mk_symreg(imcc, hsh, name, t);
     r->type          = VTCONST;
 
     if (t == 'U') {
@@ -808,9 +752,8 @@ _mk_const(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
         r->type |= VT_ENCODED;
     }
 
-    /* autopromote big ints to floats; fallout from
-     * http://rt.perl.org/rt3/Ticket/Display.html?id=53908
-     * */
+    /* autopromote big ints to floats
+     */
     if (t == 'I') {
         if (int_overflows(r))
             r->set = 'N';
@@ -873,7 +816,7 @@ int_overflows(ARGIN(const SymReg *r))
 
 /*
 
-=item C<SymReg * mk_const(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_const(imc_info_t * imcc, const char *name, int t)>
 
 Makes a new constant (and populates the cache of global symbols).
 
@@ -884,21 +827,21 @@ Makes a new constant (and populates the cache of global symbols).
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
+mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_const)
-    SymHash * const h = &IMCC_INFO(interp)->ghash;
+    SymHash * const h = &imcc->ghash;
 
     if (!h->data)
-        create_symhash(interp, h);
+        create_symhash(imcc, h);
 
-    return _mk_const(interp, h, name, t);
+    return _mk_const(imcc, h, name, t);
 }
 
 
 /*
 
-=item C<static char * add_ns(PARROT_INTERP, const char *name)>
+=item C<static char * add_ns(imc_info_t * imcc, const char *name)>
 
 Adds a namespace to the current sub.
 
@@ -910,21 +853,21 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 static char *
-add_ns(PARROT_INTERP, ARGIN(const char *name))
+add_ns(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(add_ns)
     size_t len, l;
     char *ns_name, *p;
 
-    if (!IMCC_INFO(interp)->cur_namespace
-    || (l = strlen(IMCC_INFO(interp)->cur_namespace->name)) <= 2)
+    if (!imcc->cur_namespace
+    || (l = strlen(imcc->cur_namespace->name)) <= 2)
         return mem_sys_strdup(name);
 
     /* TODO keyed syntax */
     len     = strlen(name) + l  + 4;
     ns_name = (char*)mem_sys_allocate(len);
 
-    strcpy(ns_name, IMCC_INFO(interp)->cur_namespace->name);
+    strcpy(ns_name, imcc->cur_namespace->name);
     *ns_name       = '_';
     ns_name[l - 1] = '\0';
     strcat(ns_name, "@@@");
@@ -945,8 +888,8 @@ add_ns(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * _mk_address(PARROT_INTERP, SymHash *hsh, const char *name, int
-uniq)>
+=item C<SymReg * _mk_address(imc_info_t * imcc, SymHash *hsh, const char *name,
+int uniq)>
 
 Makes a new address (internal use only).
 
@@ -957,22 +900,23 @@ Makes a new address (internal use only).
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-_mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int uniq)
+_mk_address(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
+        ARGIN(const char *name), int uniq)
 {
     ASSERT_ARGS(_mk_address)
     SymReg *r;
 
     if (uniq == U_add_all) {
         int is_lexical = 0;
-        r = get_sym_by_name(&IMCC_INFO(interp)->ghash, name);
+        r = get_sym_by_name(&imcc->ghash, name);
 
         if (r && r->usage & U_LEXICAL)
             is_lexical = 1;
 
-        r       = mem_gc_allocate_zeroed_typed(interp, SymReg);
+        r       = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
         r->type = VTADDRESS;
         r->name = mem_sys_strdup(name);
-        _store_symreg(interp, hsh, r);
+        _store_symreg(imcc, hsh, r);
 
         if (is_lexical)
             r->usage |= U_LEXICAL;
@@ -982,7 +926,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         char *aux_name = NULL;
         const char * const sub_name = (uniq == U_add_uniq_sub)
                        /* remember to free this name; add_ns malloc()s it */
-                       ? (aux_name = add_ns(interp, name))
+                       ? (aux_name = add_ns(imcc, name))
                        : name;
 
         r = _get_sym(hsh, sub_name);
@@ -990,16 +934,16 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         /* we use this for labels/subs */
         if (uniq && r && r->type == VTADDRESS && r->lhs_use_count) {
             if (uniq == U_add_uniq_label)
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "Label '%s' already defined\n", sub_name);
             else if (uniq == U_add_uniq_sub) {
                 mem_sys_free(aux_name);
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                         "Subroutine '%s' already defined\n", name);
             }
         }
 
-        r       = _mk_symreg(interp, hsh, sub_name, 0);
+        r       = _mk_symreg(imcc, hsh, sub_name, 0);
         r->type = VTADDRESS;
 
         if (uniq) {
@@ -1015,7 +959,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
 
 /*
 
-=item C<SymReg * mk_sub_label(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_sub_label(imc_info_t * imcc, const char *name)>
 
 Makes and stores a new address label for a sub.  The label gets a fixup entry.
 
@@ -1026,10 +970,10 @@ Makes and stores a new address label for a sub.  The label gets a fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
+mk_sub_label(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_sub_label)
-    SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
+    SymReg * const s = _mk_address(imcc, &imcc->ghash,
             name, U_add_uniq_sub);
 
     s->usage |= U_FIXUP;
@@ -1040,7 +984,7 @@ mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_sub_address(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_sub_address(imc_info_t * imcc, const char *name)>
 
 Makes a symbol for a label.  The symbol gets a fixup entry.
 
@@ -1051,10 +995,10 @@ Makes a symbol for a label.  The symbol gets a fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
+mk_sub_address(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_sub_address)
-    SymReg * const s = _mk_address(interp, &IMCC_INFO(interp)->ghash,
+    SymReg * const s = _mk_address(imcc, &imcc->ghash,
             name, U_add_all);
 
     s->usage |= U_FIXUP;
@@ -1065,7 +1009,7 @@ mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_local_label(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_local_label(imc_info_t * imcc, const char *name)>
 
 Makes a local symbol, giving it I<no> fixup entry.
 
@@ -1076,17 +1020,17 @@ Makes a local symbol, giving it I<no> fixup entry.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_local_label(PARROT_INTERP, ARGIN(const char *name))
+mk_local_label(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_local_label)
-    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
-    return _mk_address(interp, &unit->hash, name, U_add_uniq_label);
+    IMC_Unit * const unit = imcc->cur_unit;
+    return _mk_address(imcc, &unit->hash, name, U_add_uniq_label);
 }
 
 
 /*
 
-=item C<SymReg * mk_label_address(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_label_address(imc_info_t * imcc, const char *name)>
 
 Makes a new label address.
 
@@ -1097,17 +1041,17 @@ Makes a new label address.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-mk_label_address(PARROT_INTERP, ARGIN(const char *name))
+mk_label_address(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(mk_label_address)
-    IMC_Unit * const unit = IMCC_INFO(interp)->cur_unit;
-    return _mk_address(interp, &unit->hash, name, U_add_once);
+    IMC_Unit * const unit = imcc->cur_unit;
+    return _mk_address(imcc, &unit->hash, name, U_add_once);
 }
 
 
 /*
 
-=item C<SymReg * dup_sym(PARROT_INTERP, const SymReg *r)>
+=item C<SymReg * dup_sym(imc_info_t * imcc, const SymReg *r)>
 
 Links keys to a keys structure = SymReg
 
@@ -1152,15 +1096,16 @@ what         op      type        pbc.c:build_key()
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-dup_sym(PARROT_INTERP, ARGIN(const SymReg *r))
+dup_sym(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(dup_sym)
-    SymReg * const new_sym = mem_gc_allocate_zeroed_typed(interp, SymReg);
+    SymReg * const new_sym = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
     STRUCT_COPY(new_sym, r);
-    new_sym->name = mem_sys_strdup(r->name);
+    if (r->name)
+        new_sym->name = mem_sys_strdup(r->name);
 
     if (r->nextkey)
-        new_sym->nextkey = dup_sym(interp, r->nextkey);
+        new_sym->nextkey = dup_sym(imcc, r->nextkey);
 
     return new_sym;
 }
@@ -1168,7 +1113,8 @@ dup_sym(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<SymReg * link_keys(PARROT_INTERP, int nargs, SymReg **keys, int force)>
+=item C<SymReg * link_keys(imc_info_t * imcc, int nargs, SymReg **keys, int
+force)>
 
 Links keys together in a keychain.
 
@@ -1179,7 +1125,7 @@ Links keys together in a keychain.
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
+link_keys(ARGMOD(imc_info_t * imcc), int nargs, ARGMOD(SymReg **keys), int force)
 {
     ASSERT_ARGS(link_keys)
     char   *key_str;
@@ -1189,12 +1135,10 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     size_t  len       = 0;
 
     /* namespace keys are global consts - no cur_unit */
-    SymHash * const h = IMCC_INFO(interp)->cur_unit
-                      ? &IMCC_INFO(interp)->cur_unit->hash
-                      : &IMCC_INFO(interp)->ghash;
+    SymHash * const h = imcc->cur_unit ? &imcc->cur_unit->hash : &imcc->ghash;
 
     if (nargs == 0)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "link_keys: huh? no keys\n");
+        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR, "link_keys: huh? no keys\n");
 
     /* short-circuit simple key unless we've been told not to */
     if (nargs == 1 && !force)
@@ -1224,7 +1168,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     }
 
     /* no, need a new one */
-    keychain       = mem_gc_allocate_zeroed_typed(interp, SymReg);
+    keychain       = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
     keychain->type = VTCONST;
 
     ++keychain->use_count;
@@ -1237,7 +1181,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
         if (REG_NEEDS_ALLOC(keys[i]))
             keychain->type |= VTREGKEY;
 
-        key->nextkey = dup_sym(interp, keys[i]);
+        key->nextkey = dup_sym(imcc, keys[i]);
         key          = key->nextkey;
 
         /* for registers, point ->reg to the original, needed by
@@ -1250,7 +1194,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
     keychain->set   = 'K';
     keychain->color = -1;
 
-    _store_symreg(interp, h, keychain);
+    _store_symreg(imcc, h, keychain);
 
     return keychain;
 }
@@ -1321,7 +1265,7 @@ free_sym(ARGMOD(SymReg *r))
 
 /*
 
-=item C<void create_symhash(PARROT_INTERP, SymHash *hash)>
+=item C<void create_symhash(imc_info_t * imcc, SymHash *hash)>
 
 Creates a symbol hash table with space for 16 entries.
 
@@ -1330,10 +1274,10 @@ Creates a symbol hash table with space for 16 entries.
 */
 
 void
-create_symhash(PARROT_INTERP, ARGOUT(SymHash *hash))
+create_symhash(ARGMOD(imc_info_t * imcc), ARGOUT(SymHash *hash))
 {
     ASSERT_ARGS(create_symhash)
-    hash->data    = mem_gc_allocate_n_zeroed_typed(interp, 16, SymReg *);
+    hash->data    = mem_gc_allocate_n_zeroed_typed(imcc->interp, 16, SymReg *);
     hash->size    = 16;
     hash->entries = 0;
 }
@@ -1341,7 +1285,7 @@ create_symhash(PARROT_INTERP, ARGOUT(SymHash *hash))
 
 /*
 
-=item C<static void resize_symhash(PARROT_INTERP, SymHash *hsh)>
+=item C<static void resize_symhash(imc_info_t * imcc, SymHash *hsh)>
 
 Resizes a symbol hash table.
 
@@ -1350,16 +1294,16 @@ Resizes a symbol hash table.
 */
 
 static void
-resize_symhash(PARROT_INTERP, ARGMOD(SymHash *hsh))
+resize_symhash(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh))
 {
     ASSERT_ARGS(resize_symhash)
     const int    new_size = hsh->size << 1; /* new size is twice as large */
     int          n_next   = 16;
-    SymReg     **next_r   = mem_gc_allocate_n_zeroed_typed(interp, n_next, SymReg *);
+    SymReg **next_r = mem_gc_allocate_n_zeroed_typed(imcc->interp, n_next, SymReg *);
     SymHash      nh;                        /* new symbol table */
     unsigned int i;
 
-    nh.data = mem_gc_allocate_n_zeroed_typed(interp, new_size, SymReg *);
+    nh.data = mem_gc_allocate_n_zeroed_typed(imcc->interp, new_size, SymReg *);
 
     for (i = 0; i < hsh->size; i++) {
         SymReg *r, *next;
@@ -1372,7 +1316,7 @@ resize_symhash(PARROT_INTERP, ARGMOD(SymHash *hsh))
             /* remember all the chained next pointers and clear r->next */
             if (j >= n_next) {
                 n_next <<= 1;
-                next_r = mem_gc_realloc_n_typed(interp, next_r, n_next, SymReg *);
+                next_r = mem_gc_realloc_n_typed(imcc->interp, next_r, n_next, SymReg *);
             }
 
             r->next     = NULL;
@@ -1401,7 +1345,7 @@ resize_symhash(PARROT_INTERP, ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void _store_symreg(PARROT_INTERP, SymHash *hsh, SymReg *r)>
+=item C<void _store_symreg(imc_info_t * imcc, SymHash *hsh, SymReg *r)>
 
 Stores a symbol in the hash (internal use only).
 
@@ -1410,7 +1354,8 @@ Stores a symbol in the hash (internal use only).
 */
 
 void
-_store_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
+_store_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
+        ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(_store_symreg)
     const int i = hash_str(r->name) % hsh->size;
@@ -1420,13 +1365,13 @@ _store_symreg(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
     hsh->entries++;
 
     if (hsh->entries >= hsh->size)
-        resize_symhash(interp, hsh);
+        resize_symhash(imcc, hsh);
 }
 
 
 /*
 
-=item C<void store_symreg(PARROT_INTERP, SymReg *r)>
+=item C<void store_symreg(imc_info_t * imcc, SymReg *r)>
 
 Stores a symbol in the hash.
 
@@ -1435,10 +1380,10 @@ Stores a symbol in the hash.
 */
 
 void
-store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
+store_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(store_symreg)
-    _store_symreg(interp, &IMCC_INFO(interp)->cur_unit->hash, r);
+    _store_symreg(imcc, &imcc->cur_unit->hash, r);
 }
 
 
@@ -1471,7 +1416,7 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * get_sym(PARROT_INTERP, const char *name)>
+=item C<SymReg * get_sym(imc_info_t * imcc, const char *name)>
 
 Gets a symbol from the current unit's symbol table.
 
@@ -1482,17 +1427,17 @@ Gets a symbol from the current unit's symbol table.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-get_sym(PARROT_INTERP, ARGIN(const char *name))
+get_sym(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(get_sym)
-    return _get_sym(&IMCC_INFO(interp)->cur_unit->hash, name);
+    return _get_sym(&imcc->cur_unit->hash, name);
 }
 
 
 /*
 
-=item C<SymReg * _find_sym(PARROT_INTERP, const Namespace *nspace, const SymHash
-*hsh, const char *name)>
+=item C<SymReg * _find_sym(imc_info_t * imcc, const Namespace *nspace, const
+SymHash *hsh, const char *name)>
 
 Find a symbol hash or ghash (internal use only);
 
@@ -1503,7 +1448,7 @@ Find a symbol hash or ghash (internal use only);
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-_find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
+_find_sym(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(const Namespace *nspace),
         ARGIN(const SymHash *hsh), ARGIN(const char *name))
 {
     ASSERT_ARGS(_find_sym)
@@ -1511,7 +1456,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
     SymReg          *p;
 
     for (ns = nspace; ns; ns = ns->parent) {
-        char * const fullname = _mk_fullname(interp, ns, name);
+        char * const fullname = _mk_fullname(imcc, ns, name);
         p                     = _get_sym(hsh, fullname);
 
         mem_sys_free(fullname);
@@ -1525,7 +1470,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
     if (p)
         return p;
 
-    p = _get_sym(&IMCC_INFO(interp)->ghash, name);
+    p = _get_sym(&imcc->ghash, name);
 
     if (p)
         return p;
@@ -1536,7 +1481,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
 
 /*
 
-=item C<SymReg * find_sym(PARROT_INTERP, const char *name)>
+=item C<SymReg * find_sym(imc_info_t * imcc, const char *name)>
 
 Finds a symbol hash or ghash in the current unit, if it exists.  Otherwise
 returns NULL.
@@ -1548,12 +1493,12 @@ returns NULL.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 SymReg *
-find_sym(PARROT_INTERP, ARGIN(const char *name))
+find_sym(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(find_sym)
-    if (IMCC_INFO(interp)->cur_unit)
-        return _find_sym(interp, IMCC_INFO(interp)->namespace_stack,
-            &IMCC_INFO(interp)->cur_unit->hash, name);
+    if (imcc->cur_unit)
+        return _find_sym(imcc, NULL, &imcc->cur_unit->hash,
+                name);
 
     return NULL;
 }
@@ -1632,7 +1577,7 @@ clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 
 /*
 
-=item C<void clear_globals(PARROT_INTERP)>
+=item C<void clear_globals(imc_info_t * imcc)>
 
 Clears global symbols.
 
@@ -1641,10 +1586,10 @@ Clears global symbols.
 */
 
 void
-clear_globals(PARROT_INTERP)
+clear_globals(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(clear_globals)
-    SymHash * const hsh = &IMCC_INFO(interp)->ghash;
+    SymHash * const hsh = &imcc->ghash;
 
     if (hsh->data)
         clear_sym_hash(hsh);

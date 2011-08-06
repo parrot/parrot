@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 package Parrot::Configure::Options;
 
@@ -9,7 +9,6 @@ our @EXPORT_OK = qw(
     process_options
 );
 use Carp;
-use File::Spec;
 use lib qw( lib );
 use Parrot::Configure::Options::Conf::CLI ();
 use Parrot::Configure::Options::Conf::File ();

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -120,6 +120,9 @@ Initialize the structure.  (Create a blank PackFile object.)
                 PMC_data_typed(SELF, Parrot_Packfile_attributes*);
         PackFile                   *pf;
 
+        /* copy_packfile_header can trigger GC. Set custom_mark flag early */
+        PObj_custom_mark_SET(SELF);
+
         attrs->uuid     = CONST_STRING(INTERP, "");
         attrs->directory = Parrot_pmc_new(INTERP, enum_class_PackfileDirectory);
 
@@ -127,8 +130,6 @@ Initialize the structure.  (Create a blank PackFile object.)
         pf = PackFile_new(INTERP, 0);
         copy_packfile_header(INTERP, SELF, pf);
         PackFile_destroy(INTERP, pf);
-
-        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -160,15 +161,10 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
 */
     VTABLE STRING *get_string() {
-        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        STRING *str;
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile                   * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
-
-        STRING      *str;
-
-        /* Calculate required memory */
-        const opcode_t length = PackFile_pack_size(INTERP, pf) * sizeof (opcode_t);
-        opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(INTERP, length);
 
         /* Copy related attributes to header */
         pf->header->major     = attrs->version_major;
@@ -176,12 +172,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
         pf->header->patch     = attrs->version_patch;
         pf->header->uuid_type = attrs->uuid_type;
 
-        /* And pack it! */
-        PackFile_pack(INTERP, pf, ptr);
-
-        str = Parrot_str_new_init(INTERP, (const char*)ptr, length,
-                Parrot_binary_encoding_ptr, 0);
-        Parrot_gc_free_memory_chunk(INTERP, ptr);
+        str = Parrot_pf_serialize(INTERP, pf);
 
         PackFile_destroy(INTERP, pf);
         return str;
@@ -201,29 +192,35 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
 
     VTABLE void set_string_native(STRING *str) {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
-        PackFile                   * const pf    = PackFile_new(INTERP, 0);
-        const opcode_t             * const ptr   =
-                (const opcode_t *)Parrot_str_cstring(INTERP, str);
-
-        const int length = Parrot_str_byte_length(INTERP, str);
-
-        if (!PackFile_unpack(INTERP, pf, ptr, length)) {
-            PackFile_destroy(INTERP, pf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile.");
-        }
+        PackFile * const pf = Parrot_pf_deserialize(INTERP, str);
 
         /* Disable GC during copy data into internal structures. */
         Parrot_block_GC_mark(INTERP);
 
         /* Copy values from PackFile header to own attributes */
         copy_packfile_header(INTERP, SELF, pf);
-
         VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
-
         Parrot_unblock_GC_mark(INTERP);
-
         PackFile_destroy(INTERP, pf);
+    }
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Set a raw PackFile* pointer to this Packfile PMC
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void * ptr) {
+        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        PackFile * const pf = (PackFile *)ptr;
+        Parrot_block_GC_mark(INTERP);
+        copy_packfile_header(INTERP, SELF, pf);
+        VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
+        Parrot_unblock_GC_mark(INTERP);
     }
 
 
@@ -261,7 +258,7 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 
 */
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
 
         INTVAL result;
         switch (getAttrEnum(INTERP, key)) {
@@ -500,6 +497,14 @@ start of the packfile.
         RETURN(PMC *dir);
     }
 
+    METHOD view() {
+        const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
+        PackFile * const pf =
+                (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
+        PMC * const view = Parrot_pf_get_packfile_pmc(INTERP, pf);
+        RETURN(PMC * view);
+    }
+
 }
 
 
@@ -508,10 +513,6 @@ start of the packfile.
 =back
 
 =cut
-
-*/
-
-/*
 
 =head2 Auxliary functions
 

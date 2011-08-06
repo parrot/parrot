@@ -35,19 +35,20 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-const STR_VTABLE * Parrot_default_encoding(SHIM_INTERP);
+const STR_VTABLE * Parrot_default_encoding(PARROT_INTERP);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const char * Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding);
+const char * Parrot_encoding_c_name(PARROT_INTERP,
+    INTVAL number_of_encoding);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-STRING* Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding);
+STRING* Parrot_encoding_name(PARROT_INTERP, INTVAL number_of_encoding);
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
@@ -60,7 +61,8 @@ INTVAL Parrot_encoding_number(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_encoding_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
+INTVAL Parrot_encoding_number_of_str(PARROT_INTERP,
+    ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -71,7 +73,7 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const STR_VTABLE * Parrot_find_encoding(SHIM_INTERP,
+const STR_VTABLE * Parrot_find_encoding(PARROT_INTERP,
     ARGIN(const char *encodingname))
         __attribute__nonnull__(2);
 
@@ -88,7 +90,7 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-const STR_VTABLE* Parrot_get_encoding(SHIM_INTERP,
+const STR_VTABLE* Parrot_get_encoding(PARROT_INTERP,
     INTVAL number_of_encoding);
 
 PARROT_EXPORT
@@ -100,9 +102,10 @@ const STR_VTABLE * Parrot_load_encoding(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_make_default_encoding(SHIM_INTERP,
-    SHIM(const char *encodingname),
+INTVAL Parrot_make_default_encoding(PARROT_INTERP,
+    ARGIN(const char *encodingname),
     ARGIN(STR_VTABLE *encoding))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
@@ -143,7 +146,8 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(encodingname))
 #define ASSERT_ARGS_Parrot_make_default_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(encoding))
+       PARROT_ASSERT_ARG(encodingname_unused) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_new_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_register_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

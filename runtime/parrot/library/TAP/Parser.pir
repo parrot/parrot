@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ TAP/Parser
 
 Simplified port of TAP::Parser (version 3.21)
 
-See L<http://search.cpan.org/~andya/Test-Harness/>
+See L<http://search.cpan.org/dist/Test-Harness/>
 
 =head3 Class TAP;Parser;Result
 
@@ -895,6 +895,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     .param string tap
     $P0 = new 'StringHandle'
     $P0.'open'('tap', 'w')
+    $P0.'encoding'('utf8')
     print $P0, tap
     setattribute self, 'stream', $P0
 .end
@@ -909,6 +910,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     push_eh _handler
     $P0.'open'(filename, 'r')
     pop_eh
+    $P0.'encoding'('utf8')
     $S0 = $P0.'readline'()
     $I0 = index $S0, '#!'
     unless $I0 == 0 goto L1
@@ -966,6 +968,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     push_eh _handler
     $P0.'open'(cmd, 'pr')
     pop_eh
+    $P0.'encoding'('utf8')
     setattribute self, 'stream', $P0
     .return ()
   _handler:

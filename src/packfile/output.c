@@ -1,11 +1,11 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
 =head1 NAME
 
-src/packout.c - Functions for writing out packfiles
+src/packfile/output.c - Functions for writing out packfiles
 
 =head1 DESCRIPTION
 
@@ -21,21 +21,26 @@ This file implements various functions for creating and writing packfiles.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: include/parrot/packfile.h */
+/* HEADERIZER HFILE: src/packfile/pf_private.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
 static void update_backref_hash(PARROT_INTERP,
-    PackFile_ConstTable *ct,
-    Hash *seen,
+    ARGIN(PackFile_ConstTable *ct),
+    ARGIN(Hash *seen),
     INTVAL constno)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_update_backref_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ct) \
+    , PARROT_ASSERT_ARG(seen))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -168,14 +173,16 @@ Update C<ct>'s backref hash with new entries from C<seen>.
 
 PARROT_INLINE
 static void
-update_backref_hash(PARROT_INTERP, PackFile_ConstTable *ct, Hash *seen, INTVAL constno)
+update_backref_hash(PARROT_INTERP,
+                    ARGIN(PackFile_ConstTable *ct), ARGIN(Hash *seen), INTVAL constno)
 {
     ASSERT_ARGS(update_backref_hash)
     parrot_hash_iterate(seen, {
-        PMC *k = (PMC *)_bucket->key;
+        PMC * const k = (PMC *)_bucket->key;
         if (!Parrot_hash_get(interp, ct->pmc_hash, k)) {
-            UINTVAL idx = (UINTVAL)_bucket->value;
-            PMC *rec = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 2);
+            const UINTVAL idx = (UINTVAL)_bucket->value;
+            PMC * const rec = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, 2);
+
             VTABLE_set_integer_keyed_int(interp, rec, 0, constno);
             VTABLE_set_integer_keyed_int(interp, rec, 1, idx);
             Parrot_hash_put(interp, ct->pmc_hash, k, rec);
@@ -197,7 +204,7 @@ constant table into a contiguous region of memory.
 
 PARROT_EXPORT
 size_t
-PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
+PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack_size)
     opcode_t i;
@@ -212,7 +219,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
     self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
         Hash *seen;
-        PMC *c = self->pmc.constants[i];
+        PMC * const c = self->pmc.constants[i];
         size += PF_size_strlen(Parrot_freeze_pbc_size(interp, c, self, &seen)) - 1;
         update_backref_hash(interp, self, seen, i);
     }
@@ -244,7 +251,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_ConstTable_pack(PARROT_INTERP,
-        ARGIN(PackFile_Segment *seg), ARGMOD(opcode_t *cursor))
+        ARGMOD(PackFile_Segment *seg), ARGOUT(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_pack)
     PackFile_ConstTable * const self = (PackFile_ConstTable *)seg;
@@ -263,7 +270,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     self->pmc_hash = Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC_ptr);
     for (i = 0; i < self->pmc.const_count; i++) {
         Hash *seen;
-        PMC  *c = self->pmc.constants[i];
+        PMC * const c = self->pmc.constants[i];
         cursor  = Parrot_freeze_pbc(interp, c, self, cursor, &seen);
         update_backref_hash(interp, self, seen, i);
     }
@@ -292,8 +299,7 @@ Reverse lookup a constant in the constant table.
 
 PARROT_EXPORT
 int
-PackFile_ConstTable_rlookup_num(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
+PackFile_ConstTable_rlookup_num(SHIM_INTERP, ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
 {
     ASSERT_ARGS(PackFile_ConstTable_rlookup_num)
     int i;
@@ -316,7 +322,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     int i;
 
     if (ct->string_hash) {
-        HashBucket *bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
+        const HashBucket * const bucket = Parrot_hash_get_bucket(interp, ct->string_hash, s);
         if (bucket) {
             i = (int)PTR2INTVAL(bucket->value);
             return i;
@@ -325,9 +331,8 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
     }
 
     for (i = 0; i < ct->str.const_count; i++) {
-        STRING *sc = ct->str.constants[i];
-        if (STRING_equal(interp, s, sc)
-        &&  s->encoding == sc->encoding) {
+        STRING * const sc = ct->str.constants[i];
+        if ((s->encoding == sc->encoding) && STRING_equal(interp, s, sc)) {
             return i;
         }
     }

@@ -29,7 +29,9 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CAN_RETURN_NULL
 static Parrot_Interp detach(UINTVAL tid);
+
 PARROT_CAN_RETURN_NULL
 static Shared_gc_info * get_pool(void);
 
@@ -1300,6 +1302,7 @@ Returns the interpreter, if it didn't finish yet.
 
 */
 
+PARROT_CAN_RETURN_NULL
 static Parrot_Interp
 detach(UINTVAL tid)
 {
@@ -1548,7 +1551,7 @@ Records that GC has finished for the root set.  EXCEPTION_UNIMPLEMENTED
 */
 
 void
-pt_gc_mark_root_finished(PARROT_INTERP)
+pt_gc_mark_root_finished(SHIM_INTERP)
 {
     ASSERT_ARGS(pt_gc_mark_root_finished)
     if (!running_threads)
@@ -1616,7 +1619,7 @@ Blocks stop-the-world GC runs.
 
 PARROT_EXPORT
 void
-Parrot_shared_gc_block(PARROT_INTERP)
+Parrot_shared_gc_block(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_shared_gc_block)
     Shared_gc_info * const info = get_pool();
@@ -1640,7 +1643,7 @@ Unblocks stop-the-world GC runs.
 
 PARROT_EXPORT
 void
-Parrot_shared_gc_unblock(PARROT_INTERP)
+Parrot_shared_gc_unblock(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_shared_gc_unblock)
     Shared_gc_info * const info = get_pool();
@@ -1650,6 +1653,18 @@ Parrot_shared_gc_unblock(PARROT_INTERP)
         PARROT_ASSERT(level >= 0);
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/thread.h>
+
+=cut
+
+*/
 
 /*
  * Local variables:

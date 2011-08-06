@@ -46,7 +46,8 @@ ParserUtil - Parser support functions.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static int change_op_arg_to_num(PARROT_INTERP,
+static int change_op_arg_to_num(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGMOD(SymReg **r),
     int num,
@@ -54,12 +55,14 @@ static int change_op_arg_to_num(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static op_info_t * try_find_op(PARROT_INTERP,
+static op_info_t * try_find_op(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
     ARGMOD(SymReg **r),
@@ -70,6 +73,7 @@ static op_info_t * try_find_op(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
@@ -83,7 +87,8 @@ static const char * try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static Instruction * var_arg_ins(PARROT_INTERP,
+static Instruction * var_arg_ins(
+    ARGMOD(imc_info_t * imcc),
     ARGMOD(IMC_Unit *unit),
     ARGIN(const char *name),
     ARGMOD(SymReg **r),
@@ -93,15 +98,16 @@ static Instruction * var_arg_ins(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
 #define ASSERT_ARGS_change_op_arg_to_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_try_find_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
@@ -109,7 +115,7 @@ static Instruction * var_arg_ins(PARROT_INTERP,
        PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
 #define ASSERT_ARGS_var_arg_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
+       PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(r))
@@ -118,7 +124,7 @@ static Instruction * var_arg_ins(PARROT_INTERP,
 
 /*
  * used in -D20 to print files with the output of every PIR compilation
- * this can't be attached to the interpreter or packfile because it has to be
+ * this can't be attached to the imcc->interpreter or packfile because it has to be
  * absolutely global to prevent the files from being overwritten.
  *
  */
@@ -186,8 +192,8 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
 
 /*
 
-=item C<void check_op(PARROT_INTERP, op_info_t **op_info, char *fullname, const
-char *name, SymReg * const * r, int narg, int keyvec)>
+=item C<void check_op(imc_info_t * imcc, op_info_t **op_info, char *fullname,
+const char *name, SymReg * const * r, int narg, int keyvec)>
 
 Return opcode value for op name
 
@@ -196,19 +202,19 @@ Return opcode value for op name
 */
 
 void
-check_op(PARROT_INTERP, ARGOUT(op_info_t **op_info), ARGOUT(char *fullname),
+check_op(ARGMOD(imc_info_t * imcc), ARGOUT(op_info_t **op_info), ARGOUT(char *fullname),
         ARGIN(const char *name), ARGIN(SymReg * const * r), int narg, int keyvec)
 {
     ASSERT_ARGS(check_op)
     op_fullname(fullname, name, r, narg, keyvec);
-    *op_info = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
+    *op_info = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, fullname);
     if (*op_info && !STREQ((*op_info)->full_name, fullname))
         *op_info = NULL;
 }
 
 /*
 
-=item C<int is_op(PARROT_INTERP, const char *name)>
+=item C<int is_op(imc_info_t * imcc, const char *name)>
 
 Is instruction a parrot opcode?
 
@@ -218,16 +224,16 @@ Is instruction a parrot opcode?
 
 PARROT_WARN_UNUSED_RESULT
 int
-is_op(PARROT_INTERP, ARGIN(const char *name))
+is_op(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 {
     ASSERT_ARGS(is_op)
-    return Parrot_hash_exists(interp, interp->op_hash, name);
+    return Parrot_hash_exists(imcc->interp, imcc->interp->op_hash, name);
 }
 
 /*
 
-=item C<static Instruction * var_arg_ins(PARROT_INTERP, IMC_Unit *unit, const
-char *name, SymReg **r, int n, int emit)>
+=item C<static Instruction * var_arg_ins(imc_info_t * imcc, IMC_Unit *unit,
+const char *name, SymReg **r, int n, int emit)>
 
 Create an C<Instruction> object for an instruction that takes a variable
 number of arguments.
@@ -240,7 +246,7 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static Instruction *
-var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+var_arg_ins(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, int emit)
 {
     ASSERT_ARGS(var_arg_ins)
@@ -254,16 +260,16 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     /* XXX: Maybe the check for n == 0 is the only one required
      * and the other must be assertions? */
     if (n == 0 || r[0] == NULL || r[0]->name == NULL)
-        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+        IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "The opcode '%s' needs arguments", name);
 
     if (r[0]->set == 'S') {
-        r[0]           = mk_const(interp, r[0]->name, 'P');
+        r[0]           = mk_const(imcc, r[0]->name, 'P');
         r[0]->pmc_type = enum_class_FixedIntegerArray;
     }
 
     op_fullname(fullname, name, r, 1, 0);
-    op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
+    op = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, fullname);
 
     PARROT_ASSERT(op && STREQ(op->full_name, fullname));
 
@@ -272,15 +278,15 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ins->opsize = n + 1;
 
     if (emit)
-        emitb(interp, unit, ins);
+        emitb(imcc, unit, ins);
 
     return ins;
 }
 
 /*
 
-=item C<Instruction * INS(PARROT_INTERP, IMC_Unit *unit, const char *name, const
-char *fmt, SymReg **r, int n, int keyvec, int emit)>
+=item C<Instruction * INS(imc_info_t * imcc, IMC_Unit *unit, const char *name,
+const char *fmt, SymReg **r, int n, int keyvec, int emit)>
 
 Makes an instruction.
 
@@ -300,7 +306,7 @@ see imc.c for usage
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 Instruction *
-INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+INS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     ARGIN_NULLOK(const char *fmt), ARGIN(SymReg **r), int n, int keyvec,
     int emit)
 {
@@ -309,16 +315,16 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (STREQ(name, ".annotate")) {
         Instruction *ins = _mk_instruction(name, "", n, r, 0);
         if (emit)
-            return emitb(interp, unit, ins);
+            return emitb(imcc, unit, ins);
         else
             return ins;
     }
 
     if ((STREQ(name, "set_args"))
-    ||  (STREQ(name, "get_results"))
-    ||  (STREQ(name, "get_params"))
-    ||  (STREQ(name, "set_returns")))
-        return var_arg_ins(interp, unit, name, r, n, emit);
+            ||  (STREQ(name, "get_results"))
+            ||  (STREQ(name, "get_params"))
+            ||  (STREQ(name, "set_returns")))
+        return var_arg_ins(imcc, unit, name, r, n, emit);
     else {
         Instruction *ins;
         int i, len;
@@ -327,13 +333,13 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         char fullname[64] = "", format[128] = "";
 
         op_fullname(fullname, name, r, n, keyvec);
-        op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
 
         /* maybe we have a fullname */
         if (!op) {
-            op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, name);
+            op = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, name);
             if (op && !STREQ(op->full_name, name))
                 op = NULL;
         }
@@ -344,7 +350,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             if (n_name) {
                 name = n_name;
                 op_fullname(fullname, name, r, n, keyvec);
-                op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
+                op = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, fullname);
                 if (op && !STREQ(op->full_name, fullname))
                     op = NULL;
             }
@@ -352,18 +358,18 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
         /* still wrong, try to find an existing op */
         if (!op)
-            op = try_find_op(interp, unit, name, r, n, keyvec, emit);
+            op = try_find_op(imcc, unit, name, r, n, keyvec, emit);
 
         if (!op) {
             int ok = 0;
 
             /* check mixed constants */
-            ins = IMCC_subst_constants_umix(interp, unit, name, r, n + 1);
+            ins = IMCC_subst_constants_umix(imcc, unit, name, r, n + 1);
             if (ins)
                 goto found_ins;
 
             /* and finally multiple constants */
-            ins = IMCC_subst_constants(interp, unit, name, r, n + 1, &ok);
+            ins = IMCC_subst_constants(imcc, unit, name, r, n + 1, &ok);
 
             if (ok) {
                 if (ins)
@@ -376,7 +382,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             strcpy(fullname, name);
 
         if (!op)
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                         "The opcode '%s' (%s<%d>) was not found. "
                         "Check the type and number of the arguments",
                         fullname, name, n);
@@ -387,7 +393,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
          * build instruction format
          * set LV_in / out flags */
         if (n != op->op_count - 1)
-            IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "arg count mismatch: op #%d '%s' needs %d given %d",
                     op, fullname, op->op_count-1, n);
 
@@ -433,7 +439,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             format[sizeof (format) - 1] = '\0';
         }
 
-        IMCC_debug(interp, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
+        IMCC_debug(imcc, DEBUG_PARSER, "%s %s\t%s\n", name, format, fullname);
 
         /* make the instruction */
         ins         = _mk_instruction(name, format, n, r, dirs);
@@ -448,11 +454,11 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             ins->type |= ITBRANCH | IF_goto;
         }
         else if (STREQ(name, "yield")) {
-            if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0])
-                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+            if (!imcc->cur_unit->instructions->symregs[0])
+                IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "Cannot yield from non-continuation\n");
 
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->yield = 1;
+            imcc->cur_unit->instructions->symregs[0]->pcc_sub->yield = 1;
         }
 
         /* set up branch flags
@@ -462,7 +468,7 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
                 ins->type |= ITBRANCH | (1 << i);
             else {
                 if (r[i]->type == VTADDRESS)
-                    IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                             "undefined identifier '%s'\n", r[i]->name);
             }
         }
@@ -471,22 +477,17 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             ins->type |= ITBRANCH;
             /* TODO use opnum constants */
             if (STREQ(name, "branch")
-            ||  STREQ(name, "tailcall")
-            ||  STREQ(name, "returncc"))
+                    ||  STREQ(name, "tailcall")
+                    ||  STREQ(name, "returncc"))
                 ins->type |= IF_goto;
             else if (STREQ(fullname, "jump_i")
-                 ||  STREQ(fullname, "branch_i"))
-                IMCC_INFO(interp)->dont_optimize = 1;
-        }
-        else if (STREQ(name, "set") && n == 2) {
-            /* set Px, Py: both PMCs have the same address */
-            if (r[0]->set == r[1]->set && REG_NEEDS_ALLOC(r[1]))
-                ins->type |= ITALIAS;
+                     ||  STREQ(fullname, "branch_i"))
+                imcc->dont_optimize = 1;
         }
 
       found_ins:
         if (emit)
-            emitb(interp, unit, ins);
+            emitb(imcc, unit, ins);
 
         return ins;
     }
@@ -495,8 +496,8 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 /*
 
-=item C<static int change_op_arg_to_num(PARROT_INTERP, IMC_Unit *unit, SymReg
-**r, int num, int emit)>
+=item C<static int change_op_arg_to_num(imc_info_t * imcc, IMC_Unit *unit,
+SymReg **r, int num, int emit)>
 
 Change one argument of an op to be numeric in stead of integral. Used when
 integer argument op variants don't exist.
@@ -507,7 +508,8 @@ integer argument op variants don't exist.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, int emit)
+change_op_arg_to_num(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
+        ARGMOD(SymReg **r), int num, int emit)
 {
     ASSERT_ARGS(change_op_arg_to_num)
     int changed = 0;
@@ -519,7 +521,7 @@ change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), 
         if (c->type & VT_CONSTP)
             c = c->reg;
 
-        r[num]  = mk_const(interp, c->name, 'N');
+        r[num]  = mk_const(imcc, c->name, 'N');
         changed = 1;
     }
     else if (emit) {
@@ -531,16 +533,16 @@ change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), 
         */
         SymReg *rr[2];
 
-        rr[0]   = mk_temp_reg(interp, 'N');
+        rr[0]   = mk_temp_reg(imcc, 'N');
         rr[1]   = r[num];
 
-        INS(interp, unit, "set", NULL, rr, 2, 0, 1);
+        INS(imcc, unit, "set", NULL, rr, 2, 0, 1);
 
         r[num]  = rr[0];
         changed = 1;
 
         /* need to allocate the temp - run reg_alloc */
-        IMCC_INFO(interp)->optimizer_level |= OPT_PASM;
+        imcc->optimizer_level |= OPT_PASM;
     }
 
     return changed;
@@ -548,8 +550,8 @@ change_op_arg_to_num(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), 
 
 /*
 
-=item C<static op_info_t * try_find_op(PARROT_INTERP, IMC_Unit *unit, const char
-*name, SymReg **r, int n, int keyvec, int emit)>
+=item C<static op_info_t * try_find_op(imc_info_t * imcc, IMC_Unit *unit, const
+char *name, SymReg **r, int n, int keyvec, int emit)>
 
 Try to find valid op doing the same operation e.g.
 
@@ -566,7 +568,7 @@ Try to find valid op doing the same operation e.g.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static op_info_t *
-try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
+try_find_op(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         ARGMOD(SymReg **r), int n, int keyvec, int emit)
 {
     ASSERT_ARGS(try_find_op)
@@ -576,7 +578,7 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     if (n == 3 && r[0]->set == 'N') {
         if (r[1]->set == 'I') {
             const SymReg * const r1 = r[1];
-            changed |= change_op_arg_to_num(interp, unit, r, 1, emit);
+            changed |= change_op_arg_to_num(imcc, unit, r, 1, emit);
 
             /* op Nx, Iy, Iy: reuse generated temp Nz */
             if (r[2]->set == 'I' && r[2]->type != VTADDRESS && r[2] == r1)
@@ -584,26 +586,26 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
         }
 
         if (r[2]->set == 'I' && r[2]->type != VTADDRESS)
-            changed |= change_op_arg_to_num(interp, unit, r, 2, emit);
+            changed |= change_op_arg_to_num(imcc, unit, r, 2, emit);
     }
 
     /* handle eq_i_n_ic */
     else if (n == 3 && r[1]->set == 'N' && r[0]->set == 'I' &&
             r[2]->type == VTADDRESS) {
-        changed |= change_op_arg_to_num(interp, unit, r, 0, emit);
+        changed |= change_op_arg_to_num(imcc, unit, r, 0, emit);
     }
     else if (n == 2 && r[0]->set == 'N' && r[1]->set == 'I') {
         /*
          * transcendentals  e.g. acos N, I
          */
         if (!STREQ(name, "fact"))
-            changed = change_op_arg_to_num(interp, unit, r, 1, emit);
+            changed = change_op_arg_to_num(imcc, unit, r, 1, emit);
     }
 
     if (changed) {
         op_info_t *op;
         op_fullname(fullname, name, r, n, keyvec);
-        op = (op_info_t *)Parrot_hash_get(interp, interp->op_hash, fullname);
+        op = (op_info_t *)Parrot_hash_get(imcc->interp, imcc->interp->op_hash, fullname);
         if (op && !STREQ(op->full_name, fullname))
             op = NULL;
         return op;
@@ -663,8 +665,8 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 /*
 
-=item C<int imcc_vfprintf(PARROT_INTERP, PMC *io, const char *format, va_list
-ap)>
+=item C<int imcc_vfprintf(imc_info_t * imcc, PMC *io, const char *format,
+va_list ap)>
 
 Formats a given series of arguments per a given format string and prints it to
 the given Parrot IO PMC.
@@ -675,10 +677,40 @@ the given Parrot IO PMC.
 
 PARROT_IGNORABLE_RESULT
 int
-imcc_vfprintf(PARROT_INTERP, ARGMOD(PMC *io), ARGIN(const char *format), va_list ap)
+imcc_vfprintf(ARGMOD(imc_info_t * imcc), ARGMOD(PMC *io),
+        ARGIN(const char *format), va_list ap)
 {
     ASSERT_ARGS(imcc_vfprintf)
-    return Parrot_io_putps(interp, io, Parrot_vsprintf_c(interp, format, ap));
+    return Parrot_io_putps(imcc->interp, io, Parrot_vsprintf_c(imcc->interp, format, ap));
+}
+
+/*
+
+=item C<int imcc_string_ends_with(imc_info_t * imcc, const STRING *str, const
+char *ext)>
+
+Checks whether string C<str> has extension C<ext>.
+
+=cut
+
+*/
+
+int
+imcc_string_ends_with(ARGMOD(imc_info_t * imcc), ARGIN(const STRING *str),
+        ARGIN(const char *ext))
+{
+    ASSERT_ARGS(imcc_string_ends_with)
+    STRING *ext_str = Parrot_str_new(imcc->interp, ext, 0);
+    STRING *substr;
+    INTVAL  ext_len = STRING_length(ext_str);
+    INTVAL  len     = STRING_length(str);
+
+    if (ext_len >= len)
+        return 0;
+
+    substr = STRING_substr(imcc->interp, str, len - ext_len, ext_len);
+
+    return STRING_equal(imcc->interp, substr, ext_str);
 }
 
 /*

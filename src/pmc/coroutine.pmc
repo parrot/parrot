@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,6 +48,8 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 /*
 
 =item C<static void print_sub_name(PARROT_INTERP, PMC *sub_pmc)>
+
+static function to print coroutine information (for tracing/debugging)
 
 =cut
 
@@ -187,7 +189,7 @@ Swaps the "context".
             if (PMC_IS_NULL(ctx))
                 ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
 
-            CURRENT_CONTEXT(INTERP) = ctx;
+            Parrot_pcc_set_context(INTERP, ctx);
 
             GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
             Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
@@ -247,7 +249,7 @@ Swaps the "context".
             Parrot_pcc_set_caller_ctx(INTERP, ctx, CURRENT_CONTEXT(INTERP));
 
             /* set context to coroutine context */
-            CURRENT_CONTEXT(INTERP) = ctx;
+            Parrot_pcc_set_context(INTERP, ctx);
         }
         else {
             INTVAL             yield;
@@ -284,7 +286,7 @@ Swaps the "context".
                                "Cannot resume dead coroutine.");
             }
 
-            CURRENT_CONTEXT(INTERP) = to_ctx;
+            Parrot_pcc_set_context(INTERP, to_ctx);
         }
 
         Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), signature);

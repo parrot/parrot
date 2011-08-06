@@ -20,7 +20,7 @@ Tests various io opcodes.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(64)
+    plan(60)
 
     read_on_null()
     open_delegates_to_filehandle_pmc()
@@ -567,19 +567,6 @@ OUTPUT
     ok(1, 'can stat_i_sc_i')
   done_stat_filename_tests:
 
-    $I2 = 1
-    $I0 = stat $I2, $I1
-    ok(1, 'can stat_i_i_i')
-
-    $I0 = stat 1, $I1
-    ok(1, 'can stat_i_i_ic')
-
-    $I0 = stat $I2, .STAT_FILESIZE
-    ok(1, 'can stat_i_i_ic')
-
-    $I0 = stat 1, .STAT_FILESIZE
-    ok(1, 'can stat_i_i_i')
-
 throws_substring(<<"CODE", description, "bad stat_i_sc_ic")
     .sub main
         $I0 = stat 'no_such_file', .STAT_FILESIZE
@@ -593,31 +580,6 @@ throws_substring(<<"CODE", description, "bad stat_i_s_i")
     .end
 CODE
 
-# These tests cause the test to abort prematurely. See TT #1933 for details
-#throws_substring(<<"CODE", description, "bad stat_i_i_i")
-#    .sub main
-#        $I1 = .STAT_FILESIZE
-#        $I2 = 1000
-#        $I0 = stat $I2, $I1
-#    .end
-#CODE
-#throws_substring(<<"CODE", description, "bad stat_i_ic_i")
-#    .sub main
-#        $I1 = .STAT_FILESIZE
-#        $I0 = stat 1000, $I1
-#    .end
-#CODE
-#throws_substring(<<"CODE", description, "bad stat_i_i_ic")
-#    .sub main
-#        $I2 = 1000
-#        $I0 = stat $I2, .STAT_FILESIZE
-#    .end
-#CODE
-#throws_substring(<<"CODE", description, "bad stat_i_ic_ic")
-#    .sub main
-#        $I0 = stat 1000, .STAT_FILESIZE
-#    .end
-#CODE
 .end
 
 .sub stdout_tests

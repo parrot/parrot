@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -37,10 +37,14 @@ pmclass Opcode auto_attrs {
     }
 
     VTABLE INTVAL get_integer() {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (!attrs->info)
             return -1;
         return attrs->op_number;
+    }
+
+    VTABLE FLOATVAL get_number() {
+        return STATICSELF.get_integer();
     }
 
     VTABLE void set_integer_native(INTVAL value) {
@@ -59,14 +63,14 @@ pmclass Opcode auto_attrs {
     }
 
     VTABLE INTVAL elements() {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (!attrs->info)
             return -1;
         return attrs->info->op_count - 1;
     }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         return i < attrs->info->op_count - 1
                ? (INTVAL)attrs->info->types[i]
                : -1;
@@ -75,7 +79,7 @@ pmclass Opcode auto_attrs {
     METHOD family_name() {
         const char * const name = PARROT_OPCODE(SELF)->info->name;
         const INTVAL len = strlen(name);
-        STRING * result = Parrot_str_new(INTERP, name, len);
+        STRING * const result = Parrot_str_new(INTERP, name, len);
         RETURN(STRING *result);
     }
 
@@ -87,8 +91,8 @@ pmclass Opcode auto_attrs {
 
     METHOD dirs() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        const INTVAL arg_count = info->op_count - 1;
         PMC *result;
-        INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
             INTVAL i;
             result = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, arg_count);
@@ -102,8 +106,8 @@ pmclass Opcode auto_attrs {
 
     METHOD labels() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
-        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
-        INTVAL arg_count = info->op_count - 1;
+        PMC * const result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        const INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
             INTVAL i;
             VTABLE_set_integer_native(INTERP, result, arg_count);

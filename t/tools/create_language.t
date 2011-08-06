@@ -38,18 +38,13 @@ BEGIN {
 }
 
 
-{
-    local $TODO = "--help isn't helpful";
+create_output_like(
+    "--help",
+    qr{documentation},
+    'create_language DTRT with --help'
+);
+ok(!-e '--help', 'create_language does not create a language called --help');
 
-    create_output_like(
-        "--help",
-        qr{Unknown option: help},
-        'create_language DTRT with --help'
-    );
-    ok(!-e '--help', 'create_language does not create a language called --help');
-
-    rmtree('--help');
-}
 
 create_output_like(
     "test_parrot_language_$$",

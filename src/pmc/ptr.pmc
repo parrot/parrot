@@ -1,0 +1,220 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/ptr.pmc - Pointer base type
+
+=head1 DESCRIPTION
+
+C<Ptr> is a bare bones PMC for representing pointers. It is intended that
+additional functionality be added via subclassing. Any functionality added
+to this PMC not critical to its operation as a pointer representation is
+deprecated in advance and subject to removal without notice.
+
+=head2 Fat versus Thin
+
+C<Ptr> can be implemented with two separate representations - C<fat>, which
+makes use of the conventional PMC attributes structure and C<thin> which is
+more efficient and stores the pointer directly, avoiding memory allocation and
+pointer dereference costs at the expense of extensibility.
+
+The distinction is managed via a set of macros - C<PTR_FAT_TEST>,
+C<PTR_FAT_SET>, and C<PTR_FAT_CLEAR>. Internally, these use the
+C<private1> flag, and this flag is therefore unavailable for subclass use.
+
+=cut
+
+*/
+
+BEGIN_PMC_HEADER_PREAMBLE
+#define PTR_FAT_TEST(i, s)  PObj_flag_TEST(private1, (s))
+#define PTR_FAT_SET(i, s)   PObj_flag_SET(private1, (s))
+#define PTR_FAT_CLEAR(i, s) PObj_flag_CLEAR(private1, (s))
+END_PMC_HEADER_PREAMBLE
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+/*
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+pmclass Ptr manual_attrs {
+    ATTR void *ptr;
+
+/*
+
+=item C<void init()>
+
+If C<fat> and attributes have not yet been otherwise allocated, will allocate
+room for the representation.
+
+Unless otherwise initialized, Parrot will have zeroed this and the pointer
+value will be C<NULL>.
+
+=item C<init_int(INTVAL i)>
+
+C<init> with a value from an C<INTVAL>.
+
+=item C<init_pmc(PMC *p)>
+
+C<init> with a value from an existing pointer-ish PMC.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        if (PTR_FAT_TEST(INTERP, SELF) && !PMC_data(SELF)) {
+            PMC_data(SELF) = (void *)mem_gc_allocate_zeroed_typed(INTERP, Parrot_Ptr_attributes);
+            PObj_custom_destroy_SET(SELF);
+        }
+    }
+
+    VTABLE void init_int(INTVAL i) {
+        void *ptr = (void *)i;
+        SELF.init();
+        STATICSELF.set_pointer(ptr);
+    }
+
+    VTABLE void init_pmc(PMC *p) {
+        void *ptr = VTABLE_get_pointer(INTERP, p);
+        SELF.init();
+        STATICSELF.set_pointer(ptr);
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+=item C<void set_pointer(void *ptr)>
+
+Get and set the pointer value.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        void *ptr;
+        if (PTR_FAT_TEST(INTERP, SELF))
+            GET_ATTR_ptr(INTERP, SELF, ptr);
+        else
+            ptr = PMC_data(SELF);
+        /* We are returning raw pointer. Someone can write into it */
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        return ptr;
+    }
+
+    VTABLE void set_pointer(void *ptr) {
+        if (PTR_FAT_TEST(INTERP, SELF))
+            SET_ATTR_ptr(INTERP, SELF, ptr);
+        else
+            PMC_data(SELF) = ptr;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Boolean value of the pointer. Non-C<NULL> is true, following in the C tradition.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        return STATICSELF.get_pointer() != NULL;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Manage attribute deallocation for C<fat> representation.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
+            mem_gc_free(INTERP, PMC_data(SELF));
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Implement C<PtrBuf> interface. Specifies length of the buffer.
+
+In this case, always returns C<0>, indicating undetermined length.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return 0;
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified. If the encoding is omitted or null, use platform encoding.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname :optional) {
+        STRING *result = STRINGNULL;
+        const char * content = (const char *)SELF.get_pointer();
+        if (content) {
+            const STR_VTABLE *encoding = STRING_IS_NULL(encodingname) ?
+                    Parrot_platform_encoding_ptr :
+                    Parrot_find_encoding_by_string(INTERP, encodingname);
+            if (encoding == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_ENCODING,
+                        "Invalid encoding");
+            else {
+                int size = strlen(content);
+                result = Parrot_str_new_init(INTERP, content, size, encoding, 0);
+            }
+        }
+        RETURN(STRING result);
+    }
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

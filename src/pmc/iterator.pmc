@@ -186,6 +186,7 @@ Returns whether the iterator contains an aggregate.
 
 
     VTABLE PMC *get_iter() {
+        UNUSED(INTERP);
         return SELF;
     }
 

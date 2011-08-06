@@ -39,8 +39,6 @@ Break into debugger. Implementation notes:
 
 For other architectures, this is a C<noop>.
 
-=back
-
 =cut
 
 op trap() :deprecated {
@@ -52,8 +50,6 @@ op trap() :deprecated {
 #endif
 }
 
-=over 4
-
 =item B<set_label>(invar PMC, inconst LABEL)
 
 Sets the opcode_t* label value for the given PMC. This is basically only
@@ -63,8 +59,6 @@ useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
 
 Gets the opcode_t* label value from the given PMC. This is basically only
 useful for PMCs such as Sub, Continuation, ExceptionHandler and derivatives
-
-=back
 
 =cut
 
@@ -77,8 +71,6 @@ inline op get_label(out INT, invar PMC) {
     $1 =  PTR2INTVAL(ptr);
 }
 
-=over 4
-
 =item B<fetch>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
@@ -88,71 +80,31 @@ uses the type in $4 to create and return a new PMC.
 
 =item B<fetch>(out PMC, in PMC, in STR, in PMC)
 
-=back
-
 =cut
 
 inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
-    if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
 
-            $1 = Parrot_pmc_new(interp, type);
-        }
+    if (PMC_IS_NULL($1)) {
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
 inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
-    if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
 
-            $1 = Parrot_pmc_new(interp, type);
-        }
+    if (PMC_IS_NULL($1)) {
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
 inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
-    if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
 
-            $1 = Parrot_pmc_new(interp, type);
-        }
+    if (PMC_IS_NULL($1)) {
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
-
-=over 4
 
 =item B<vivify>(out PMC, in PMC, in PMC, in PMC)
 
@@ -163,29 +115,14 @@ uses the type in $4 to create and return a new PMC.
 
 =item B<vivify>(out PMC, in PMC, in STR, in PMC)
 
-=back
-
 =cut
 
 inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
-
-            $1 = Parrot_pmc_new(interp, type);
-        }
         VTABLE_set_pmc_keyed(interp, $2, $3, $1);
     }
 }
@@ -194,20 +131,7 @@ inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
-
-            $1 = Parrot_pmc_new(interp, type);
-        }
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_int(interp, $2, $3, $1);
     }
@@ -217,32 +141,15 @@ inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        PMC * const classobj = Parrot_oo_get_class(interp, $4);
-        if (!PMC_IS_NULL(classobj))
-            $1 = VTABLE_instantiate(interp, classobj, PMCNULL);
-        else {
-            const INTVAL type = Parrot_pmc_get_type(interp, $4);
-            if (type <= 0) {
-                opcode_t *dest = Parrot_ex_throw_from_op_args(
-                    interp, expr NEXT(), EXCEPTION_NO_CLASS,
-                    "Class '%Ss' not found", VTABLE_get_repr(interp, $4));
-                goto ADDRESS(dest);
-            }
-
-            $1 = Parrot_pmc_new(interp, type);
-        }
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_str(interp, $2, $3, $1);
     }
 }
 
-=over 4
-
 =item B<new>(out PMC, in STR, in INT)
 
 =item B<new>(out PMC, in PMC, in INT)
-
-=back
 
 =cut
 
@@ -254,7 +161,7 @@ op new(out PMC, in STR, in INT) {
                           : PMCNULL;
 
     if (!PMC_IS_NULL(_class)) {
-        PMC *initial = Parrot_pmc_new(interp,
+        PMC * const initial = Parrot_pmc_new(interp,
                                       Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
         VTABLE_set_integer_native(interp, initial, $3);
         $1 = VTABLE_instantiate(interp, _class, initial);
@@ -282,7 +189,7 @@ op new(out PMC, in PMC, in INT) {
     if (type > enum_class_core_max) {
         PMC * const _class = Parrot_oo_get_class(interp, name_key);
         if (!PMC_IS_NULL(_class)) {
-            PMC *initial = Parrot_pmc_new(interp,
+            PMC * const initial = Parrot_pmc_new(interp,
                 Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
@@ -295,14 +202,12 @@ op new(out PMC, in PMC, in INT) {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
     }
 }
-
-=over 4
 
 =item B<root_new>(out PMC, in PMC, in INT)
 
@@ -320,7 +225,7 @@ op root_new(out PMC, in PMC, in INT) {
         PMC * const ns       = Parrot_ns_get_namespace_keyed(interp, root_ns, name_key);
         PMC * const _class   = Parrot_oo_get_class(interp, ns);
         if (!PMC_IS_NULL(_class)) {
-            PMC *initial = Parrot_pmc_new(interp,
+            PMC * const initial = Parrot_pmc_new(interp,
                 Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
             VTABLE_set_integer_native(interp, initial, $3);
             $1 = VTABLE_instantiate(interp, _class, initial);
@@ -333,7 +238,7 @@ op root_new(out PMC, in PMC, in INT) {
 
     /* it's a typo */
     else {
-        opcode_t *dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_NO_CLASS,
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
@@ -344,7 +249,7 @@ op root_new(out PMC, in PMC, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 
