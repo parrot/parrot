@@ -224,7 +224,7 @@ Load an M0 bytecode file into memory.
 sub load_m0b {
     my ($interp, $filename) = @_;
 
-    my $m0b = slurp($filename);
+    my $m0b = slurp($filename, {binmode => ':raw'});
     my $cursor = 0;
     parse_m0b_header($interp, $m0b, \$cursor);
     parse_m0b_dirseg($interp, $m0b, \$cursor);
