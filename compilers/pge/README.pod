@@ -16,6 +16,9 @@ parser for bottom-up (shift/reduce) parsing, and allows control
 to pass freely between the two styles as well as to custom parsing
 subroutines.
 
+Note that PGE is currently in update-only mode. If you're writing a language
+from scratch, you'd be better off using NQP or NQP-rx.
+
 =head1 Installation
 
 PGE assumes that it is part of the parrot distribution in the
