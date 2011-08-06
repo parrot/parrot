@@ -29,7 +29,7 @@ IMCC helpers.
 #include <stdlib.h>
 
 #include "imc.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"

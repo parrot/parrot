@@ -266,6 +266,7 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/namespace.h"
 #include "parrot/hll.h"
 #include "parrot/pbcversion.h"
+#include "parrot/disassemble.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 

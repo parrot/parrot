@@ -169,6 +169,10 @@ static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+static PMC* set_current_sub(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static int sub_pragma(PARROT_INTERP,
     pbc_action_enum_t action,
     ARGIN(const PMC *sub_pmc))
@@ -235,6 +239,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_read_pbc_file_packfile_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
+#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_sub_pragma __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -2709,7 +2715,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 /*
 
-=item C<PMC* set_current_sub(PARROT_INTERP)>
+=item C<static PMC* set_current_sub(PARROT_INTERP)>
 
 Search the fixup table for a PMC matching the argument.  On a match,
 set up the appropriate context.
@@ -2724,7 +2730,7 @@ DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
 */
 
 PARROT_CANNOT_RETURN_NULL
-PMC*
+static PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)

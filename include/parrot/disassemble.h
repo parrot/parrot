@@ -1,16 +1,12 @@
 /* embed.h
  *  Copyright (C) 2001-2010, Parrot Foundation.
  *  Overview:
- *     This is the Parrot embedding system--the only part of Parrot that
- *     the outside world should see.
- *  References:
- *      embed.c, docs/embed.pod.
+ *     disassembly-related utilities
  */
 
 #ifndef PARROT_DISASSEMBLE_H_GUARD
 #define PARROT_DISASSEMBLE_H_GUARD
 
-#include "parrot/parrot.h"
 #include "parrot/core_types.h"  /* types used */
 #include "parrot/compiler.h"    /* compiler capabilities */
 #include "parrot/config.h"      /* PARROT_VERSION... */

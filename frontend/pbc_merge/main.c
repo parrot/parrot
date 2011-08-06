@@ -42,7 +42,6 @@ segments from the input PBC files.
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
-#include "parrot/embed.h"
 
 extern const unsigned char * Parrot_get_config_hash_bytes(void);
 extern int Parrot_get_config_hash_length(void);

@@ -40,7 +40,7 @@ sub linedirective
 
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -62,7 +62,7 @@ OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)register_pmc' );
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -88,7 +88,7 @@ OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -118,7 +118,6 @@ c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_fprintf');
 #include <stdio.h>
 // This is to get Parrot_io_STDOUT, is there a better way?
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/extend.h"
 
 int
@@ -141,7 +140,7 @@ OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf/Parrot_eprintf with no interp');
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -160,7 +159,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_numreg' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -190,7 +189,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -216,7 +215,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string/Parrot_(un)register_string' );
 
 #include <stdio.h>
-	#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -246,7 +245,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -276,7 +275,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -308,7 +307,7 @@ OUTPUT
 c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
 #include <stdio.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 static void fail(const char *msg);
@@ -359,7 +358,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -391,7 +390,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_pmcreg' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -429,7 +428,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_number' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -462,7 +461,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_string' );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 int
@@ -516,7 +515,7 @@ system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
+#include <parrot/parrot.h>
 #include <parrot/extend.h>
 
 /* also both the test PASM and the_test() print to stderr
@@ -564,7 +563,6 @@ OUTPUT
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub using the unified interface' );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 /* also both the test PASM and the_test() print to stderr
@@ -630,7 +628,6 @@ system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub and return an integer' );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 /* also both the test PASM and the_test() print to stderr
@@ -687,7 +684,6 @@ system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub, catch exception' );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 /* also both the test PASM and the_test() print to stderr
@@ -775,7 +771,6 @@ system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 int
 main(int argc, const char *argv[])
@@ -803,7 +798,6 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986', todo => "Must explicitly set a PIR compreg" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 int
@@ -835,7 +829,6 @@ OUTPUT
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511' );
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 int
@@ -863,7 +856,6 @@ OUTPUT
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - unified interface' );
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/extend.h>
 
 int
@@ -893,7 +885,6 @@ c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_x_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 
 /* this is Parrot_x_exit without the exit()
  * it will call Parrot_really_destroy() as an exit handler

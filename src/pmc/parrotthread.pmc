@@ -23,9 +23,6 @@ It provides the following methods:
 
 */
 
-#include "parrot/embed.h"
-
-
 pmclass ParrotThread no_ro auto_attrs {
     ATTR INTVAL tid; /* thread id */
 

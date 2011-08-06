@@ -1,6 +1,5 @@
 #define PERL_NO_GET_CONTEXT
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/extend.h"
 #include "EXTERN.h"
 #include "perl.h"

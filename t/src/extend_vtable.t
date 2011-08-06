@@ -39,7 +39,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/extend_vtable.h"
 

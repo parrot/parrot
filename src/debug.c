@@ -22,7 +22,6 @@ the Parrot debugger, and the C<debug> ops.
 #include <stdlib.h>
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
-#include "parrot/embed.h"
 #include "parrot/oplib.h"
 #include "parrot/debugger.h"
 #include "parrot/oplib/ops.h"
