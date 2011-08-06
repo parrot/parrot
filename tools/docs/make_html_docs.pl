@@ -11,7 +11,81 @@ tools/docs/make_html_docs.pl - Write HTML documentation
 
 =head1 DESCRIPTION
 
-This script writes the HTML documentation for Parrot.
+This script writes the HTML documentation for Parrot by transforming existing POD
+files into pretty HTML output. Index pages are also generated.
+
+This script will look in the F<docs/index> directory for JSON files.  Each JSON
+file will generate a separate "table of contents" page, and each referenced POD
+file will generate a HTML page. Referenced files must reside within the Parrot
+repo, but they may be located outside of the F</docs> directory.
+
+=head2 JSON Syntax
+
+Each JSON file should look similar to the following:
+
+    {
+       "page" : "index",
+       "content" : [
+          {
+             "title" : "Introduction",
+             "source" : [
+                "docs/intro.pod",
+                "docs/project/*.pod"
+             ]
+          },
+          {
+             "title" : "Working with Parrot",
+             "source" : [
+                "docs/running.pod",
+                "docs/tests.pod",
+                "docs/gettingstarted.pod",
+                "docs/submissions.pod"
+             ],
+             "resource" : "docs/*.png"
+          },
+    }
+
+=head3 Elements
+
+=over
+
+=item C<page>
+
+The name of this page. It must be unique for all JSON pages; the generated HTML
+will reside at "$target_dir/$page.html", where C<$target_dir> is the
+destination for all generated content.
+
+Each page must contain a C<content> element.
+
+=item C<content>
+
+An array of sections shown for this page.
+
+Each section must be a hash that contains a C<title> and C<source> entry.
+
+=item C<title>
+
+The title of each section. It need not be unique.
+
+=item C<source>
+
+A listing of POD files. This may be an array or a string; a string will behave as
+an array of one element.
+
+Each element in the array must be a path relative to the Parrot repo, such as
+"docs/pmc/default.pmc". Globbing is supported, so paths liek "docs/pmc/*.pmc" are
+also allowed.
+
+=item C<resource>
+
+An optional listing of files that should be copied directly to C<$target_dir>. This
+is useful for things like images that require no transformation, but should be accessible
+to generated output.
+
+This element behaves similarly to C<source>: a string or array may be passed, and globbing
+is performed for each element.
+
+=back
 
 =cut
 
@@ -160,6 +234,24 @@ foreach my $page (keys %pages) {
 
 exit 0;
 
+=head2 Utility Methods
+
+=over
+
+=item C<canonicalize_files($json_chunk)>
+
+Process a given JSON chunk to retrieve a list of input files. Currently, this
+is used to retrieve input POD files and static images.
+
+The JSON chunk may be an array or a string (which is transformed into a
+single-element array).
+
+Each array element should be a file path relative to the parrot repo; it is not
+necessary for resources to live under docs/. Globs are also allowed, so you can
+include many files at once.
+
+=cut
+
 sub canonicalize_files {
     my ($file_chunk) = @_;
 
@@ -182,9 +274,21 @@ sub canonicalize_files {
     return @files_list;
 }
 
-#
-# transform individual files from .pod to .html
-#
+
+=item C<transform_input($input, $parent, $parent_title)>
+
+Transform the specfied POD file into HTML. C<$input> should be a path to the
+POD file, relative to the Parrot repo (e.g., "src/pmc/default.pmc"). C<$parent>
+and C<$parent_title> both refer to the parent's "page" JSON chunk and "title"
+JSON chunk, respectively. Parent information will be used to create breadcrumb
+links.
+
+The resulting HTML will be copied to C<$target_dir>, preserving the relative
+location of the input file, for example:
+
+    "src/pmc/default.pmc" => "$target_dir/src/pmc/default.pmc"
+
+=cut
 
 sub transform_input {
     my ($input, $parent, $parent_title) = @_;
@@ -217,6 +321,10 @@ sub transform_input {
 
     $file_titles{$input} = $page_title;
 }
+
+=back
+
+=cut
 
 # Local Variables:
 #   mode: cperl
