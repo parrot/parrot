@@ -24,12 +24,13 @@ Tests compiling some basic POST structures to PBC
     # plan(?) TODO: Add numer of tests
 
     basic_tests()
+    test_return()
 .end
 
 # Compile a tree and return the main sub
 .sub compile
     .param pmc node
-	.param pmc adverbs :named :slurpy
+    .param pmc adverbs :named :slurpy
 
     .local pmc compiler
     compiler = new ['PCT';'HLLCompiler']
@@ -38,6 +39,16 @@ Tests compiling some basic POST structures to PBC
     compiler.'stages'($P0)
 
     .tailcall compiler.'compile'(node, adverbs :flat)
+.end
+
+# Create a main block with the given children
+.sub main_block
+    .param pmc nodes :slurpy
+
+    $P0 = get_hll_global ['PAST'], 'Block'
+    $P0 = $P0.'new'(nodes :flat)
+    $P0.'pirflags'(':main')
+    .return ($P0)
 .end
 
 # Some basic tests like typechecking and running an empty sub
@@ -54,7 +65,24 @@ Tests compiling some basic POST structures to PBC
     isa_ok( $P0, 'Sub', 'compiler return' )
     $P0()
     ok( 1, 'Sub seemed to run' )
-    is( $I0, 42, 'Sub returned correct value' )
+.end
+
+# Test return values
+.sub test_return
+    $P0 = main_block(42)
+    $P0 = compile($P0)
+    $I0 = $P0()
+    is( $I0, 42, 'integer return' )
+
+    $P0 = main_block(3.14)
+    $P0 = compile($P0)
+    $N0 = $P0()
+    is( $N0, 3.14, 'float return' )
+
+    $P0 = main_block('foo')
+    $P0 = compile($P0)
+    $S0 = $P0()
+    is( $S0, 'foo', 'string return' )
 .end
 
 
