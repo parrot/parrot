@@ -181,28 +181,13 @@ sub arg_output_like {
 sub cmd_output_is {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
+    my $lines;
 
     $self->{cmd} = $cmd if defined $cmd;
 
-    _enter_cmd($self->{cmd});
+    _select($self, \$lines);
 
-    my $select = IO::Select->new();
-    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
-
-    my @fh_ready = $select->can_read();
-
-    foreach my $fh (@fh_ready) {
-        next unless defined $fh;
-
-        # Only read from HBDB_STDERR for bad commands
-        if (fileno $fh  == fileno \*HBDB_STDERR) {
-            my @lines = <HBDB_STDERR> || '';
-
-            $builder->is($lines[0], $expected, $desc);
-        }
-
-        $select->remove($fh) if eof $fh;
-    }
+    $builder->is($lines, $expected, $desc);
 
     _close_fh();
 }
@@ -211,32 +196,13 @@ sub cmd_output_is {
 sub cmd_output_like {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
-    my @lines;
+    my $lines;
 
     $self->{cmd} = $cmd if defined $cmd;
 
-    _enter_cmd($self->{cmd});
+    _select($self, \$lines);
 
-    my $select = IO::Select->new();
-    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
-
-    my @fh_ready = $select->can_read();
-
-    foreach my $fh (@fh_ready) {
-        next unless defined $fh;
-
-        # Only read from HBDB_STDERR for bad commands
-        if (fileno $fh  == fileno \*HBDB_STDERR) {
-            @lines = <HBDB_STDERR> || '';
-        }
-        else {
-            @lines = <HBDB_STDOUT> || ''; 
-        }
-
-        $select->remove($fh) if eof $fh;
-    }
-
-    $builder->like(@lines, $expected, $desc);
+    $builder->like($lines, $expected, $desc);
 
     _close_fh();
 }
@@ -297,6 +263,32 @@ sub _generate_pbc {
 END {
     # TODO How can I get rid of this hard-coded string?
     unlink "t/tools/hbdb/testlib/hello.pbc";
+}
+
+sub _select {
+    my ($self, $lines) = @_;
+
+    #$self->{cmd} = $cmd if defined $cmd;
+
+    _enter_cmd($self->{cmd});
+
+    my $select = IO::Select->new();
+    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
+
+    my @fh_ready = $select->can_read();
+
+    foreach my $fh (@fh_ready) {
+        next unless defined $fh;
+
+        if (fileno $fh  == fileno \*HBDB_STDERR) {
+            $lines = <HBDB_STDERR> || '';
+        }
+        else {
+            $lines = <HBDB_STDOUT> || ''; 
+        }
+
+        $select->remove($fh) if eof $fh;
+    }
 }
 
 1;
