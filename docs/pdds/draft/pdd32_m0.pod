@@ -197,14 +197,14 @@ Explicitly do nothing.  C<$1>, C<$2> and C<$3> are ignored.
 =item * goto - go to a fixed offset in the current bytecode segment
 
 Unconditionally transfer control flow to a fixed offset within the current
-bytecode segment.  The target address is calculated as 256 * C<*$1> + C<*$2>.
+bytecode segment.  The target address is calculated as 256 * C<$1> + C<$2>.
 C<$3> is ignored.
 
 =item * goto_if - conditionally go to a fixed offset in the current bytecode segment
 
 Transfer control flow to a fixed offset within the current bytecode segment if
 C<*$3> is non-zero when treated as an integer.  As with C<goto>, the target
-address is calculated as 256 * C<*$1> + C<*$2>.
+address is calculated as 256 * C<$1> + C<$2>.
 
 =item * goto_chunk - go to an offset in another chunk
 
