@@ -70,7 +70,7 @@ sub write_bytecode {
     my ($file, $bytecode) = @_;
     my $bytecode_file = $file . 'b';
     say "Writing bytecode to $bytecode_file";
-    write_file $bytecode_file, $bytecode;
+    write_file $bytecode_file, {binmode => ':raw'}, $bytecode;
 }
 
 =item C<m0b_header>

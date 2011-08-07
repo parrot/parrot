@@ -171,6 +171,7 @@ sub m0b_build_file {
 
     my $bytes = m0b_build_bytes($chunks);
     open my $fh, '>', $filename or die "Couldn't open '$filename': $?";
+    binmode $fh;
     print $fh  $bytes;
     close $fh;
 
