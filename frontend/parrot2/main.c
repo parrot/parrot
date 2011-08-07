@@ -157,15 +157,9 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PMC   interp;
-    Parrot_PMC   bytecodepmc;
-    Parrot_PMC   argsarray;
-    int          pir_argc;
-    const char **pir_argv;
+    Parrot_PMC interp, bytecodepmc, sysargs, pirargs;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
-    Parrot_String source_str;
-    Parrot_String output_str;
 
     GET_INIT_STRUCT(initargs);
 
@@ -187,45 +181,26 @@ main(int argc, const char *argv[])
     }
 
     /* Parse flags */
-    parseflags(interp, argc, argv, &pir_argc, &pir_argv, &parsed_flags);
-    source_str = parsed_flags.sourcefile;
-    output_str = parsed_flags.outfile;
+    parseflags(interp, argc, argv, &parsed_flags);
 
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
 
     /* TODO: Get bytecode* reference to prt0.pir and execute it. Pass in all
              arguments we can. */
+    bytecodepmc = ???;
 
-    if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
-            show_last_error_and_exit(interp);
-    }
+    if (!Parrot_api_pmc_wrap_string_array(interp, initargs->sysargc, initargs->sysargv, &sysargs)
+     || !Parrot_api_pmc_wrap_string_array(interp, initargs->progargc, initargs->progargv, &progargs))
+        show_last_error_and_exit(interp);
 
-    if (parsed_flags.have_pbc_file) {
-        bytecodepmc = load_bytecode_file(interp, source_str);
-        if (parsed_flags.turn_gc_off)
-            Parrot_api_toggle_gc(interp, 0);
-    }
-    else {
-        Parrot_api_toggle_gc(interp, 0);
-        setup_imcc(interp, source_str, &parsed_flags);
-        if (!parsed_flags.turn_gc_off)
-            Parrot_api_toggle_gc(interp, 1);
-    }
+    Parrot_api_toggle_gc(interp, 0);
+    setup_imcc(interp, source_str, &parsed_flags);
+    if (!parsed_flags.turn_gc_off)
+        Parrot_api_toggle_gc(interp, 1);
 
-    /* -o outputs the file. -r outputs it and reads it in again from .pbc */
-    if (parsed_flags.write_packfile) {
-        if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str))
-            show_last_error_and_exit(interp);
-        if (parsed_flags.execute_packfile)
-            bytecodepmc = load_bytecode_file(interp, output_str);
-    }
-
-    if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
-            show_last_error_and_exit(interp);
-    }
+    if (!Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, progargs))
+        show_last_error_and_exit(interp);
 
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
@@ -254,44 +229,8 @@ setup_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t
     if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
-
-    /* TODO: Do preprocessing in prt0.pir */
-    if (flags->preprocess_only) {
-        Parrot_Int r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
-        exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
-    }*/
 }
 
-/*
-
-=item C<static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String
-filename)>
-
-Load in a .pbc file to a PackFile PMC
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-static PMC *
-load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
-{
-    ASSERT_ARGS(load_bytecode_file)
-    Parrot_PMC bytecode = NULL;
-
-    /* set up all the compregs */
-    Parrot_PMC pir_compiler;
-    Parrot_PMC pasm_compiler;
-
-    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
-          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
-        show_last_error_and_exit(interp);
-
-    if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
-        show_last_error_and_exit(interp);
-    return bytecode;
-}
 
 /*
 
@@ -782,9 +721,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         exit(EXIT_FAILURE);
     }
 
-    for (nprogargs = 0; nprogargs < argc - opt.opt_index; nprogargs++)
-        progargs[nprogargs] = arg
-
     args->progargv = progargs;
     args->progargc = nprogargs;
     args->sysargv = argv + opt.opt_index;
@@ -794,10 +730,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 /*
 
 =back
-
-=head1 SEE ALSO
-
-F<compilers/imcc/main.c>, unfortunately.
 
 =cut
 
