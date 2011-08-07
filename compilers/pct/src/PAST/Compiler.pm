@@ -861,7 +861,7 @@ multi method as_post(PAST::Block $node, *%options) {
             %symtable := $node.symtable();
             unless pir::defined(%symtable<>) {
                 ##  merge the Block's symtable with outersym
-                %symtable := pir::clone(%symtable);
+                %symtable := shallow_clone_hash(%symtable);
                 for %outersym {
                     next if pir::exists(%symtable, $_);
                     %symtable{$_} := %outersym{$_};
@@ -986,6 +986,15 @@ multi method as_post(PAST::Block $node, *%options) {
     ##  remove current block from @*BLOCKPAST
     pir::shift(@*BLOCKPAST);
     $bpost;
+}
+
+sub shallow_clone_hash(%to_clone) {
+    my %ret;
+    for %to_clone {
+        %ret{$_} := %to_clone{$_};
+    }
+
+    %ret;
 }
 
 
