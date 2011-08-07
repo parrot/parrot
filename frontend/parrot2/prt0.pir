@@ -21,7 +21,9 @@
     output_file = null
 
     unless input_file_type == 0 goto __have_valid_input_file
-    die "Invalid file type"
+    $S0 = "Invalid file type "
+    $S0 .= prog_name
+    die $S0
 
   __have_valid_input_file:
     exe_name = shift sys_args
@@ -114,7 +116,11 @@
     .return(packfile_pmc)
 
   __compile_pasm_file:
-    # TODO
+    .local pmc pasm_compiler
+    pasm_compiler = compreg "PASM"
+    packfile_pmc = pasm_compiler.'compile_file'(file_name)
+    .return(packfile_pmc)
+
   __load_pbc_file:
     packfile_pmc = new ['PackfileView']
     packfile_pmc.'read_from_file'(file_name)
@@ -130,11 +136,18 @@
     ext = substr file_name, $I0
     if ext == ".pir" goto __have_pir_file
     if ext == ".pbc" goto __have_pbc_file
-    .return(NO_FILE)
+    $I0 -= 1
+    ext = substr file_name, $I0
+    if ext == ".pasm" goto __have_pasm_file
+    # By default, it's a pir file
+    goto __have_pir_file
+
   __have_pir_file:
     .return(PIR_FILE)
   __have_pbc_file:
     .return(PBC_FILE)
+  __have_pasm_file:
+    .return(PASM_FILE)
 .end
 
 .sub '__init_packfile' :anon
@@ -171,6 +184,9 @@
   __backtrace_loop_bottom:
     .local int exit_code
     exit_code = exception["exit_code"]
+    unless exit_code == 0 goto __really_exit
+    exit_code = 1
+  __really_exit:
     exit exit_code
 .end
 
