@@ -229,10 +229,10 @@ sub cmd_output_like {
         next unless defined $fh;
 
         if (fileno $fh  == fileno \*HBDB_STDERR) {
-            $lines = <HBDB_STDERR> || '';
+            $lines .= <HBDB_STDERR> || '';
         }
         else {
-            $lines = <HBDB_STDOUT> || ''; 
+            $lines .= <HBDB_STDOUT> || '';
         }
 
         $select->remove($fh) if eof $fh;
