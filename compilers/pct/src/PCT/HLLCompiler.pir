@@ -572,6 +572,7 @@ stage if/when newPOST compiles to PIR properly.
     .param pmc adverbs :slurpy :named
 
     $P0 = get_hll_global ['PAST'], 'NewCompiler'
+    $P0 = $P0.'new'()
     .tailcall $P0.'to_post'(past, adverbs :flat :named)
 .end
 
