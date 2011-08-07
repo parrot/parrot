@@ -185,7 +185,25 @@ sub cmd_output_is {
 
     $self->{cmd} = $cmd if defined $cmd;
 
-    _select($self, \$lines);
+    _enter_cmd($self->{cmd});
+
+    my $select = IO::Select->new();
+    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
+
+    my @fh_ready = $select->can_read();
+
+    foreach my $fh (@fh_ready) {
+        next unless defined $fh;
+
+        if (fileno $fh  == fileno \*HBDB_STDERR) {
+            $lines = <HBDB_STDERR> || '';
+        }
+        else {
+            $lines = <HBDB_STDOUT> || ''; 
+        }
+
+        $select->remove($fh) if eof $fh;
+    }
 
     $builder->is($lines, $expected, $desc);
 
@@ -200,7 +218,25 @@ sub cmd_output_like {
 
     $self->{cmd} = $cmd if defined $cmd;
 
-    _select($self, \$lines);
+    _enter_cmd($self->{cmd});
+
+    my $select = IO::Select->new();
+    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
+
+    my @fh_ready = $select->can_read();
+
+    foreach my $fh (@fh_ready) {
+        next unless defined $fh;
+
+        if (fileno $fh  == fileno \*HBDB_STDERR) {
+            $lines = <HBDB_STDERR> || '';
+        }
+        else {
+            $lines = <HBDB_STDOUT> || ''; 
+        }
+
+        $select->remove($fh) if eof $fh;
+    }
 
     $builder->like($lines, $expected, $desc);
 
