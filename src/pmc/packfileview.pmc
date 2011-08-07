@@ -86,6 +86,16 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
     return bt->const_table;
 }
 
+/*
+
+=item C<static INTVAL find_called_tag(PARROT_INTERP, PMC * self, STRING *tag)>
+
+TK
+
+=cut
+
+*/
+
 static INTVAL
 find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
 {
@@ -103,6 +113,16 @@ find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
     }
     return 0;
 }
+
+/*
+
+=item C<static void add_called_tag(PARROT_INTERP, PMC * self, STRING * tag)>
+
+TK
+
+=cut
+
+*/
 
 static void
 add_called_tag(PARROT_INTERP, ARGMOD(PMC * self), ARGIN(STRING * tag))
