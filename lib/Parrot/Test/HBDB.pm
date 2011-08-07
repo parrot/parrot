@@ -233,10 +233,10 @@ sub cmd_output_like {
             @lines = <HBDB_STDOUT> || ''; 
         }
 
-        $builder->like(@lines, $expected, $desc);
-
         $select->remove($fh) if eof $fh;
     }
+
+    $builder->like(@lines, $expected, $desc);
 
     _close_fh();
 }
