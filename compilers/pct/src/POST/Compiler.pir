@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1312323120.13283")
+.sub "_block1000"  :anon :subid("10_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1312323120.13283" 
+    .const 'Sub' $P1003 = "11_1312695699.9274" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -13,21 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 16
-    .const 'Sub' $P1003 = "11_1312323120.13283" 
+    .const 'Sub' $P1003 = "11_1312695699.9274" 
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1077 = "22_1312323120.13283" 
+    .const 'Sub' $P1077 = "22_1312695699.9274" 
     .return ($P1077)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post23") :outer("10_1312323120.13283")
+.sub "" :load :init :subid("post23") :outer("10_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1312323120.13283" 
+    .const 'Sub' $P1001 = "10_1312695699.9274" 
     .local pmc block
     set block, $P1001
     $P1079 = get_root_global ["parrot"], "P6metaclass"
@@ -39,26 +39,26 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1002"  :subid("11_1312323120.13283") :outer("10_1312323120.13283")
+.sub "_block1002"  :subid("11_1312695699.9274") :outer("10_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 16
-    .const 'Sub' $P1061 = "20_1312323120.13283" 
+    .const 'Sub' $P1061 = "20_1312695699.9274" 
     capture_lex $P1061
-    .const 'Sub' $P1057 = "19_1312323120.13283" 
+    .const 'Sub' $P1057 = "19_1312695699.9274" 
     capture_lex $P1057
-    .const 'Sub' $P1052 = "18_1312323120.13283" 
+    .const 'Sub' $P1052 = "18_1312695699.9274" 
     capture_lex $P1052
-    .const 'Sub' $P1030 = "17_1312323120.13283" 
+    .const 'Sub' $P1030 = "17_1312695699.9274" 
     capture_lex $P1030
-    .const 'Sub' $P1026 = "16_1312323120.13283" 
+    .const 'Sub' $P1026 = "16_1312695699.9274" 
     capture_lex $P1026
-    .const 'Sub' $P1022 = "15_1312323120.13283" 
+    .const 'Sub' $P1022 = "15_1312695699.9274" 
     capture_lex $P1022
-    .const 'Sub' $P1013 = "14_1312323120.13283" 
+    .const 'Sub' $P1013 = "14_1312695699.9274" 
     capture_lex $P1013
-    .const 'Sub' $P1009 = "13_1312323120.13283" 
+    .const 'Sub' $P1009 = "13_1312695699.9274" 
     capture_lex $P1009
-    .const 'Sub' $P1005 = "12_1312323120.13283" 
+    .const 'Sub' $P1005 = "12_1312695699.9274" 
     capture_lex $P1005
 .annotate 'line', 129
     get_global $P1004, "%pirop_handlers"
@@ -82,16 +82,16 @@
     push $P102, "bang"
 .annotate 'line', 16
     .return ()
-    .const 'Sub' $P1073 = "21_1312323120.13283" 
+    .const 'Sub' $P1073 = "21_1312695699.9274" 
     .return ($P1073)
 .end
 
 
 .namespace ["POST";"Compiler"]
-.sub "" :load :init :subid("post24") :outer("11_1312323120.13283")
+.sub "" :load :init :subid("post24") :outer("11_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 16
-    .const 'Sub' $P1003 = "11_1312323120.13283" 
+    .const 'Sub' $P1003 = "11_1312695699.9274" 
     .local pmc block
     set block, $P1003
 .annotate 'line', 20
@@ -113,7 +113,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "escape"  :subid("12_1312323120.13283") :method :outer("11_1312323120.13283")
+.sub "escape"  :subid("12_1312695699.9274") :method :outer("11_1312695699.9274")
     .param pmc param_1008
 .annotate 'file', ''
 .annotate 'line', 36
@@ -138,7 +138,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "key_pir"  :subid("13_1312323120.13283") :method :outer("11_1312323120.13283")
+.sub "key_pir"  :subid("13_1312695699.9274") :method :outer("11_1312695699.9274")
     .param pmc param_1012 :slurpy
 .annotate 'file', ''
 .annotate 'line', 44
@@ -186,7 +186,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "to_pir"  :subid("14_1312323120.13283") :method :outer("11_1312323120.13283")
+.sub "to_pir"  :subid("14_1312695699.9274") :method :outer("11_1312695699.9274")
     .param pmc param_1016
     .param pmc param_1017 :slurpy :named
 .annotate 'file', ''
@@ -248,7 +248,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pir_children"  :subid("15_1312323120.13283") :method :outer("11_1312323120.13283")
+.sub "pir_children"  :subid("15_1312695699.9274") :method :outer("11_1312695699.9274")
     .param pmc param_1025
 .annotate 'file', ''
 .annotate 'line', 89
@@ -295,7 +295,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pir"  :subid("16_1312323120.13283") :method :outer("11_1312323120.13283") :multi(_,_)
+.sub "pir"  :subid("16_1312695699.9274") :method :outer("11_1312695699.9274") :multi(_,_)
     .param pmc param_1029
 .annotate 'file', ''
 .annotate 'line', 121
@@ -320,7 +320,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pir"  :subid("17_1312323120.13283") :method :outer("11_1312323120.13283") :multi(_,["POST";"Op"])
+.sub "pir"  :subid("17_1312695699.9274") :method :outer("11_1312695699.9274") :multi(_,["POST";"Op"])
     .param pmc param_1033
 .annotate 'file', ''
 .annotate 'line', 131
@@ -553,7 +553,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pir"  :subid("18_1312323120.13283") :method :outer("11_1312323120.13283") :multi(_,["POST";"Label"])
+.sub "pir"  :subid("18_1312695699.9274") :method :outer("11_1312695699.9274") :multi(_,["POST";"Label"])
     .param pmc param_1055
 .annotate 'file', ''
 .annotate 'line', 190
@@ -588,7 +588,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "pir"  :subid("19_1312323120.13283") :method :outer("11_1312323120.13283") :multi(_,["POST";"Sub"])
+.sub "pir"  :subid("19_1312695699.9274") :method :outer("11_1312695699.9274") :multi(_,["POST";"Sub"])
     .param pmc param_1060
 .annotate 'file', ''
 .annotate 'line', 201
@@ -772,7 +772,7 @@
 
 .namespace ["POST";"Compiler"]
 .include "except_types.pasm"
-.sub "hll_pir"  :subid("20_1312323120.13283") :method :outer("11_1312323120.13283")
+.sub "hll_pir"  :subid("20_1312695699.9274") :method :outer("11_1312695699.9274")
     .param pmc param_1064
     .param pmc param_1065 :slurpy :named
 .annotate 'file', ''
@@ -855,20 +855,20 @@
 
 
 .namespace ["POST";"Compiler"]
-.sub "_block1072" :load :anon :subid("21_1312323120.13283")
+.sub "_block1072" :load :anon :subid("21_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 16
-    .const 'Sub' $P1074 = "11_1312323120.13283" 
+    .const 'Sub' $P1074 = "11_1312695699.9274" 
     $P101 = $P1074()
     .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1076" :load :anon :subid("22_1312323120.13283")
+.sub "_block1076" :load :anon :subid("22_1312695699.9274")
 .annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1078 = "10_1312323120.13283" 
+    .const 'Sub' $P1078 = "10_1312695699.9274" 
     $P101 = $P1078()
     .return ($P101)
 .end

@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1312323137.01561")
+.sub "_block1000"  :anon :subid("10_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1312323137.01561" 
+    .const 'Sub' $P1003 = "11_1312695719.11152" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -13,21 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 3
-    .const 'Sub' $P1003 = "11_1312323137.01561" 
+    .const 'Sub' $P1003 = "11_1312695719.11152" 
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1309 = "64_1312323137.01561" 
+    .const 'Sub' $P1309 = "64_1312695719.11152" 
     .return ($P1309)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post65") :outer("10_1312323137.01561")
+.sub "" :load :init :subid("post65") :outer("10_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1312323137.01561" 
+    .const 'Sub' $P1001 = "10_1312695719.11152" 
     .local pmc block
     set block, $P1001
     $P1311 = get_root_global ["parrot"], "P6metaclass"
@@ -36,110 +36,110 @@
 
 
 .namespace ["POST";"Sub"]
-.sub "_block1002"  :subid("11_1312323137.01561") :outer("10_1312323137.01561")
+.sub "_block1002"  :subid("11_1312695719.11152") :outer("10_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 3
-    .const 'Sub' $P1291 = "62_1312323137.01561" 
+    .const 'Sub' $P1291 = "62_1312695719.11152" 
     capture_lex $P1291
-    .const 'Sub' $P1283 = "61_1312323137.01561" 
+    .const 'Sub' $P1283 = "61_1312695719.11152" 
     capture_lex $P1283
-    .const 'Sub' $P1277 = "60_1312323137.01561" 
+    .const 'Sub' $P1277 = "60_1312695719.11152" 
     capture_lex $P1277
-    .const 'Sub' $P1271 = "59_1312323137.01561" 
+    .const 'Sub' $P1271 = "59_1312695719.11152" 
     capture_lex $P1271
-    .const 'Sub' $P1264 = "58_1312323137.01561" 
+    .const 'Sub' $P1264 = "58_1312695719.11152" 
     capture_lex $P1264
-    .const 'Sub' $P1259 = "57_1312323137.01561" 
+    .const 'Sub' $P1259 = "57_1312695719.11152" 
     capture_lex $P1259
-    .const 'Sub' $P1254 = "56_1312323137.01561" 
+    .const 'Sub' $P1254 = "56_1312695719.11152" 
     capture_lex $P1254
-    .const 'Sub' $P1250 = "55_1312323137.01561" 
+    .const 'Sub' $P1250 = "55_1312695719.11152" 
     capture_lex $P1250
-    .const 'Sub' $P1245 = "54_1312323137.01561" 
+    .const 'Sub' $P1245 = "54_1312695719.11152" 
     capture_lex $P1245
-    .const 'Sub' $P1241 = "53_1312323137.01561" 
+    .const 'Sub' $P1241 = "53_1312695719.11152" 
     capture_lex $P1241
-    .const 'Sub' $P1236 = "52_1312323137.01561" 
+    .const 'Sub' $P1236 = "52_1312695719.11152" 
     capture_lex $P1236
-    .const 'Sub' $P1232 = "51_1312323137.01561" 
+    .const 'Sub' $P1232 = "51_1312695719.11152" 
     capture_lex $P1232
-    .const 'Sub' $P1227 = "50_1312323137.01561" 
+    .const 'Sub' $P1227 = "50_1312695719.11152" 
     capture_lex $P1227
-    .const 'Sub' $P1223 = "49_1312323137.01561" 
+    .const 'Sub' $P1223 = "49_1312695719.11152" 
     capture_lex $P1223
-    .const 'Sub' $P1218 = "48_1312323137.01561" 
+    .const 'Sub' $P1218 = "48_1312695719.11152" 
     capture_lex $P1218
-    .const 'Sub' $P1214 = "47_1312323137.01561" 
+    .const 'Sub' $P1214 = "47_1312695719.11152" 
     capture_lex $P1214
-    .const 'Sub' $P1209 = "46_1312323137.01561" 
+    .const 'Sub' $P1209 = "46_1312695719.11152" 
     capture_lex $P1209
-    .const 'Sub' $P1205 = "45_1312323137.01561" 
+    .const 'Sub' $P1205 = "45_1312695719.11152" 
     capture_lex $P1205
-    .const 'Sub' $P1200 = "44_1312323137.01561" 
+    .const 'Sub' $P1200 = "44_1312695719.11152" 
     capture_lex $P1200
-    .const 'Sub' $P1196 = "43_1312323137.01561" 
+    .const 'Sub' $P1196 = "43_1312695719.11152" 
     capture_lex $P1196
-    .const 'Sub' $P1191 = "42_1312323137.01561" 
+    .const 'Sub' $P1191 = "42_1312695719.11152" 
     capture_lex $P1191
-    .const 'Sub' $P1187 = "41_1312323137.01561" 
+    .const 'Sub' $P1187 = "41_1312695719.11152" 
     capture_lex $P1187
-    .const 'Sub' $P1182 = "40_1312323137.01561" 
+    .const 'Sub' $P1182 = "40_1312695719.11152" 
     capture_lex $P1182
-    .const 'Sub' $P1178 = "39_1312323137.01561" 
+    .const 'Sub' $P1178 = "39_1312695719.11152" 
     capture_lex $P1178
-    .const 'Sub' $P1173 = "38_1312323137.01561" 
+    .const 'Sub' $P1173 = "38_1312695719.11152" 
     capture_lex $P1173
-    .const 'Sub' $P1166 = "37_1312323137.01561" 
+    .const 'Sub' $P1166 = "37_1312695719.11152" 
     capture_lex $P1166
-    .const 'Sub' $P1161 = "36_1312323137.01561" 
+    .const 'Sub' $P1161 = "36_1312695719.11152" 
     capture_lex $P1161
-    .const 'Sub' $P1157 = "35_1312323137.01561" 
+    .const 'Sub' $P1157 = "35_1312695719.11152" 
     capture_lex $P1157
-    .const 'Sub' $P1152 = "34_1312323137.01561" 
+    .const 'Sub' $P1152 = "34_1312695719.11152" 
     capture_lex $P1152
-    .const 'Sub' $P1145 = "33_1312323137.01561" 
+    .const 'Sub' $P1145 = "33_1312695719.11152" 
     capture_lex $P1145
-    .const 'Sub' $P1140 = "32_1312323137.01561" 
+    .const 'Sub' $P1140 = "32_1312695719.11152" 
     capture_lex $P1140
-    .const 'Sub' $P1133 = "31_1312323137.01561" 
+    .const 'Sub' $P1133 = "31_1312695719.11152" 
     capture_lex $P1133
-    .const 'Sub' $P1128 = "30_1312323137.01561" 
+    .const 'Sub' $P1128 = "30_1312695719.11152" 
     capture_lex $P1128
-    .const 'Sub' $P1121 = "29_1312323137.01561" 
+    .const 'Sub' $P1121 = "29_1312695719.11152" 
     capture_lex $P1121
-    .const 'Sub' $P1116 = "28_1312323137.01561" 
+    .const 'Sub' $P1116 = "28_1312695719.11152" 
     capture_lex $P1116
-    .const 'Sub' $P1109 = "27_1312323137.01561" 
+    .const 'Sub' $P1109 = "27_1312695719.11152" 
     capture_lex $P1109
-    .const 'Sub' $P1104 = "26_1312323137.01561" 
+    .const 'Sub' $P1104 = "26_1312695719.11152" 
     capture_lex $P1104
-    .const 'Sub' $P1097 = "25_1312323137.01561" 
+    .const 'Sub' $P1097 = "25_1312695719.11152" 
     capture_lex $P1097
-    .const 'Sub' $P1092 = "24_1312323137.01561" 
+    .const 'Sub' $P1092 = "24_1312695719.11152" 
     capture_lex $P1092
-    .const 'Sub' $P1085 = "23_1312323137.01561" 
+    .const 'Sub' $P1085 = "23_1312695719.11152" 
     capture_lex $P1085
-    .const 'Sub' $P1080 = "22_1312323137.01561" 
+    .const 'Sub' $P1080 = "22_1312695719.11152" 
     capture_lex $P1080
-    .const 'Sub' $P1073 = "21_1312323137.01561" 
+    .const 'Sub' $P1073 = "21_1312695719.11152" 
     capture_lex $P1073
-    .const 'Sub' $P1068 = "20_1312323137.01561" 
+    .const 'Sub' $P1068 = "20_1312695719.11152" 
     capture_lex $P1068
-    .const 'Sub' $P1061 = "19_1312323137.01561" 
+    .const 'Sub' $P1061 = "19_1312695719.11152" 
     capture_lex $P1061
-    .const 'Sub' $P1056 = "18_1312323137.01561" 
+    .const 'Sub' $P1056 = "18_1312695719.11152" 
     capture_lex $P1056
-    .const 'Sub' $P1052 = "17_1312323137.01561" 
+    .const 'Sub' $P1052 = "17_1312695719.11152" 
     capture_lex $P1052
-    .const 'Sub' $P1041 = "16_1312323137.01561" 
+    .const 'Sub' $P1041 = "16_1312695719.11152" 
     capture_lex $P1041
-    .const 'Sub' $P1027 = "15_1312323137.01561" 
+    .const 'Sub' $P1027 = "15_1312695719.11152" 
     capture_lex $P1027
-    .const 'Sub' $P1023 = "14_1312323137.01561" 
+    .const 'Sub' $P1023 = "14_1312695719.11152" 
     capture_lex $P1023
-    .const 'Sub' $P1009 = "13_1312323137.01561" 
+    .const 'Sub' $P1009 = "13_1312695719.11152" 
     capture_lex $P1009
-    .const 'Sub' $P1005 = "12_1312323137.01561" 
+    .const 'Sub' $P1005 = "12_1312695719.11152" 
     capture_lex $P1005
     get_global $P1004, "@paramfmt"
     unless_null $P1004, vivify_76
@@ -154,16 +154,16 @@
   ctxsave_done:
     get_global $P101, "@paramfmt"
     .return ()
-    .const 'Sub' $P1297 = "63_1312323137.01561" 
+    .const 'Sub' $P1297 = "63_1312695719.11152" 
     .return ($P1297)
 .end
 
 
 .namespace ["POST";"Sub"]
-.sub "" :load :init :subid("post66") :outer("11_1312323137.01561")
+.sub "" :load :init :subid("post66") :outer("11_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 3
-    .const 'Sub' $P1003 = "11_1312323137.01561" 
+    .const 'Sub' $P1003 = "11_1312695719.11152" 
     .local pmc block
     set block, $P1003
 .annotate 'line', 5
@@ -254,7 +254,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "symtable"  :subid("12_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "symtable"  :subid("12_1312695719.11152") :method :outer("11_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 19
     new $P1007, ['ExceptionHandler'], .CONTROL_RETURN
@@ -280,7 +280,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "symbol"  :subid("13_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "symbol"  :subid("13_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1012
     .param pmc param_1013 :optional
     .param int has_param_1013 :opt_flag
@@ -365,7 +365,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "labels"  :subid("14_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "labels"  :subid("14_1312695719.11152") :method :outer("11_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 43
     new $P1025, ['ExceptionHandler'], .CONTROL_RETURN
@@ -391,7 +391,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "label"  :subid("15_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "label"  :subid("15_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1030
     .param pmc param_1031 :optional
     .param int has_param_1031 :opt_flag
@@ -476,7 +476,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "param"  :subid("16_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "param"  :subid("16_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1044
     .param pmc param_1045
 .annotate 'file', ''
@@ -538,7 +538,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "constant_index"  :subid("17_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "constant_index"  :subid("17_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 84
     new $P1054, ['ExceptionHandler'], .CONTROL_RETURN
@@ -564,7 +564,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "constant_index"  :subid("18_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "constant_index"  :subid("18_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1059
 .annotate 'file', ''
 .annotate 'line', 85
@@ -592,7 +592,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "main"  :subid("19_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "main"  :subid("19_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 90
     new $P1063, ['ExceptionHandler'], .CONTROL_RETURN
@@ -625,7 +625,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "main"  :subid("20_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "main"  :subid("20_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1071
 .annotate 'file', ''
 .annotate 'line', 91
@@ -655,7 +655,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_init"  :subid("21_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "is_init"  :subid("21_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 94
     new $P1075, ['ExceptionHandler'], .CONTROL_RETURN
@@ -688,7 +688,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_init"  :subid("22_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "is_init"  :subid("22_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1083
 .annotate 'file', ''
 .annotate 'line', 95
@@ -718,7 +718,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "load"  :subid("23_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "load"  :subid("23_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 97
     new $P1087, ['ExceptionHandler'], .CONTROL_RETURN
@@ -751,7 +751,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "load"  :subid("24_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "load"  :subid("24_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1095
 .annotate 'file', ''
 .annotate 'line', 98
@@ -781,7 +781,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "immediate"  :subid("25_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "immediate"  :subid("25_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 100
     new $P1099, ['ExceptionHandler'], .CONTROL_RETURN
@@ -814,7 +814,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "immediate"  :subid("26_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "immediate"  :subid("26_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1107
 .annotate 'file', ''
 .annotate 'line', 101
@@ -844,7 +844,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "postcomp"  :subid("27_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "postcomp"  :subid("27_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 103
     new $P1111, ['ExceptionHandler'], .CONTROL_RETURN
@@ -877,7 +877,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "postcomp"  :subid("28_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "postcomp"  :subid("28_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1119
 .annotate 'file', ''
 .annotate 'line', 104
@@ -907,7 +907,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "anon"  :subid("29_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "anon"  :subid("29_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 106
     new $P1123, ['ExceptionHandler'], .CONTROL_RETURN
@@ -940,7 +940,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "anon"  :subid("30_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "anon"  :subid("30_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1131
 .annotate 'file', ''
 .annotate 'line', 107
@@ -970,7 +970,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_method"  :subid("31_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "is_method"  :subid("31_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 109
     new $P1135, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1003,7 +1003,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "is_method"  :subid("32_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "is_method"  :subid("32_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1143
 .annotate 'file', ''
 .annotate 'line', 110
@@ -1033,7 +1033,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "lex"  :subid("33_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "lex"  :subid("33_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 112
     new $P1147, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1066,7 +1066,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "lex"  :subid("34_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "lex"  :subid("34_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1155
 .annotate 'file', ''
 .annotate 'line', 113
@@ -1096,7 +1096,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "nsentry"  :subid("35_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "nsentry"  :subid("35_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 115
     new $P1159, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1122,7 +1122,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "nsentry"  :subid("36_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "nsentry"  :subid("36_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1164
 .annotate 'file', ''
 .annotate 'line', 116
@@ -1149,7 +1149,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "vtable"  :subid("37_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "vtable"  :subid("37_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 118
     new $P1168, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1182,7 +1182,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "vtable"  :subid("38_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "vtable"  :subid("38_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1176
 .annotate 'file', ''
 .annotate 'line', 119
@@ -1210,7 +1210,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "blocktype"  :subid("39_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "blocktype"  :subid("39_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 121
     new $P1180, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1236,7 +1236,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "blocktype"  :subid("40_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "blocktype"  :subid("40_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1185
 .annotate 'file', ''
 .annotate 'line', 122
@@ -1263,7 +1263,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "namespace"  :subid("41_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "namespace"  :subid("41_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 124
     new $P1189, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1289,7 +1289,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "namespace"  :subid("42_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "namespace"  :subid("42_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1194
 .annotate 'file', ''
 .annotate 'line', 125
@@ -1316,7 +1316,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "hll"  :subid("43_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "hll"  :subid("43_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 127
     new $P1198, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1342,7 +1342,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "hll"  :subid("44_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "hll"  :subid("44_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1203
 .annotate 'file', ''
 .annotate 'line', 128
@@ -1369,7 +1369,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "loadlibs"  :subid("45_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "loadlibs"  :subid("45_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 130
     new $P1207, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1395,7 +1395,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "loadlibs"  :subid("46_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "loadlibs"  :subid("46_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1212
 .annotate 'file', ''
 .annotate 'line', 131
@@ -1422,7 +1422,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "outer"  :subid("47_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "outer"  :subid("47_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 133
     new $P1216, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1448,7 +1448,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "outer"  :subid("48_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "outer"  :subid("48_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1221
 .annotate 'file', ''
 .annotate 'line', 134
@@ -1475,7 +1475,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "multi"  :subid("49_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "multi"  :subid("49_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 136
     new $P1225, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1501,7 +1501,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "multi"  :subid("50_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "multi"  :subid("50_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1230
 .annotate 'file', ''
 .annotate 'line', 137
@@ -1528,7 +1528,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "pirflags"  :subid("51_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "pirflags"  :subid("51_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 139
     new $P1234, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1554,7 +1554,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "pirflags"  :subid("52_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "pirflags"  :subid("52_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1239
 .annotate 'file', ''
 .annotate 'line', 140
@@ -1581,7 +1581,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler"  :subid("53_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "compiler"  :subid("53_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 142
     new $P1243, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1607,7 +1607,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler"  :subid("54_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "compiler"  :subid("54_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1248
 .annotate 'file', ''
 .annotate 'line', 143
@@ -1634,7 +1634,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler_args"  :subid("55_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "compiler_args"  :subid("55_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 145
     new $P1252, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1660,7 +1660,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "compiler_args"  :subid("56_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "compiler_args"  :subid("56_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1257
 .annotate 'file', ''
 .annotate 'line', 146
@@ -1687,7 +1687,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "subid"  :subid("57_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_,_)
+.sub "subid"  :subid("57_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_,_)
     .param pmc param_1262
 .annotate 'file', ''
 .annotate 'line', 148
@@ -1714,7 +1714,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "subid"  :subid("58_1312323137.01561") :method :outer("11_1312323137.01561") :multi(_)
+.sub "subid"  :subid("58_1312695719.11152") :method :outer("11_1312695719.11152") :multi(_)
 .annotate 'file', ''
 .annotate 'line', 149
     new $P1266, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1764,7 +1764,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "set_flag"  :subid("59_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "set_flag"  :subid("59_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1274
     .param pmc param_1275
 .annotate 'file', ''
@@ -1795,7 +1795,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "full_name"  :subid("60_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "full_name"  :subid("60_1312695719.11152") :method :outer("11_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 162
     new $P1279, ['ExceptionHandler'], .CONTROL_RETURN
@@ -1848,7 +1848,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "add_directive"  :subid("61_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "add_directive"  :subid("61_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1286
 .annotate 'file', ''
 .annotate 'line', 171
@@ -1913,7 +1913,7 @@
 
 .namespace ["POST";"Sub"]
 .include "except_types.pasm"
-.sub "add_param"  :subid("62_1312323137.01561") :method :outer("11_1312323137.01561")
+.sub "add_param"  :subid("62_1312695719.11152") :method :outer("11_1312695719.11152")
     .param pmc param_1294
     .param pmc param_1295 :slurpy :named
 .annotate 'file', ''
@@ -1984,20 +1984,20 @@
 
 
 .namespace ["POST";"Sub"]
-.sub "_block1296" :load :anon :subid("63_1312323137.01561")
+.sub "_block1296" :load :anon :subid("63_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 3
-    .const 'Sub' $P1298 = "11_1312323137.01561" 
+    .const 'Sub' $P1298 = "11_1312695719.11152" 
     $P101 = $P1298()
     .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1308" :load :anon :subid("64_1312323137.01561")
+.sub "_block1308" :load :anon :subid("64_1312695719.11152")
 .annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1310 = "10_1312323137.01561" 
+    .const 'Sub' $P1310 = "10_1312695719.11152" 
     $P101 = $P1310()
     .return ($P101)
 .end

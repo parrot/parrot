@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1312496524.56246")
+.sub "_block1000"  :anon :subid("10_1312695752.70808")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1312496524.56246" 
+    .const 'Sub' $P1003 = "11_1312695752.70808" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -13,21 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 14
-    .const 'Sub' $P1003 = "11_1312496524.56246" 
+    .const 'Sub' $P1003 = "11_1312695752.70808" 
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1056 = "20_1312496524.56246" 
+    .const 'Sub' $P1056 = "20_1312695752.70808" 
     .return ($P1056)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post21") :outer("10_1312496524.56246")
+.sub "" :load :init :subid("post21") :outer("10_1312695752.70808")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1312496524.56246" 
+    .const 'Sub' $P1001 = "10_1312695752.70808" 
     .local pmc block
     set block, $P1001
     $P1058 = get_root_global ["parrot"], "P6metaclass"
@@ -38,22 +38,22 @@
 
 
 .namespace ["PAST";"NewCompiler"]
-.sub "_block1002"  :subid("11_1312496524.56246") :outer("10_1312496524.56246")
+.sub "_block1002"  :subid("11_1312695752.70808") :outer("10_1312695752.70808")
 .annotate 'file', ''
 .annotate 'line', 14
-    .const 'Sub' $P1041 = "18_1312496524.56246" 
+    .const 'Sub' $P1041 = "18_1312695752.70808" 
     capture_lex $P1041
-    .const 'Sub' $P1033 = "17_1312496524.56246" 
+    .const 'Sub' $P1033 = "17_1312695752.70808" 
     capture_lex $P1033
-    .const 'Sub' $P1027 = "16_1312496524.56246" 
+    .const 'Sub' $P1027 = "16_1312695752.70808" 
     capture_lex $P1027
-    .const 'Sub' $P1021 = "15_1312496524.56246" 
+    .const 'Sub' $P1021 = "15_1312695752.70808" 
     capture_lex $P1021
-    .const 'Sub' $P1016 = "14_1312496524.56246" 
+    .const 'Sub' $P1016 = "14_1312695752.70808" 
     capture_lex $P1016
-    .const 'Sub' $P1010 = "13_1312496524.56246" 
+    .const 'Sub' $P1010 = "13_1312695752.70808" 
     capture_lex $P1010
-    .const 'Sub' $P1004 = "12_1312496524.56246" 
+    .const 'Sub' $P1004 = "12_1312695752.70808" 
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -62,18 +62,18 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 68
-    .const 'Sub' $P1041 = "18_1312496524.56246" 
+    .const 'Sub' $P1041 = "18_1312695752.70808" 
     newclosure $P1051, $P1041
 .annotate 'line', 14
     .return ($P1051)
-    .const 'Sub' $P1053 = "19_1312496524.56246" 
+    .const 'Sub' $P1053 = "19_1312695752.70808" 
     .return ($P1053)
 .end
 
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "super"  :subid("12_1312496524.56246") :method :outer("11_1312496524.56246")
+.sub "super"  :subid("12_1312695752.70808") :method :outer("11_1312695752.70808")
     .param pmc param_1007
     .param pmc param_1008 :slurpy
     .param pmc param_1009 :slurpy :named
@@ -107,7 +107,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "to_post"  :subid("13_1312496524.56246") :method :outer("11_1312496524.56246")
+.sub "to_post"  :subid("13_1312695752.70808") :method :outer("11_1312695752.70808")
     .param pmc param_1013
     .param pmc param_1014 :slurpy :named
 .annotate 'file', ''
@@ -158,7 +158,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "as_post"  :subid("14_1312496524.56246") :method :outer("11_1312496524.56246") :multi(_,_)
+.sub "as_post"  :subid("14_1312695752.70808") :method :outer("11_1312695752.70808") :multi(_,_)
     .param pmc param_1019
     .param pmc param_1020 :slurpy :named
 .annotate 'file', ''
@@ -186,7 +186,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "as_post"  :subid("15_1312496524.56246") :method :outer("11_1312496524.56246") :multi(_,["Integer"])
+.sub "as_post"  :subid("15_1312695752.70808") :method :outer("11_1312695752.70808") :multi(_,["Integer"])
     .param pmc param_1024
     .param pmc param_1025 :slurpy :named
 .annotate 'file', ''
@@ -223,7 +223,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "as_post"  :subid("16_1312496524.56246") :method :outer("11_1312496524.56246") :multi(_,["Float"])
+.sub "as_post"  :subid("16_1312695752.70808") :method :outer("11_1312695752.70808") :multi(_,["Float"])
     .param pmc param_1030
     .param pmc param_1031 :slurpy :named
 .annotate 'file', ''
@@ -260,7 +260,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "as_post"  :subid("17_1312496524.56246") :method :outer("11_1312496524.56246") :multi(_,["String"])
+.sub "as_post"  :subid("17_1312695752.70808") :method :outer("11_1312695752.70808") :multi(_,["String"])
     .param pmc param_1036
     .param pmc param_1037 :slurpy :named
 .annotate 'file', ''
@@ -321,7 +321,7 @@
 
 .namespace ["PAST";"NewCompiler"]
 .include "except_types.pasm"
-.sub "as_post"  :subid("18_1312496524.56246") :method :outer("11_1312496524.56246") :multi(_,["PAST";"Block"])
+.sub "as_post"  :subid("18_1312695752.70808") :method :outer("11_1312695752.70808") :multi(_,["PAST";"Block"])
     .param pmc param_1044
     .param pmc param_1045 :slurpy :named
 .annotate 'file', ''
@@ -406,20 +406,20 @@
 
 
 .namespace ["PAST";"NewCompiler"]
-.sub "_block1052" :load :anon :subid("19_1312496524.56246")
+.sub "_block1052" :load :anon :subid("19_1312695752.70808")
 .annotate 'file', ''
 .annotate 'line', 14
-    .const 'Sub' $P1054 = "11_1312496524.56246" 
+    .const 'Sub' $P1054 = "11_1312695752.70808" 
     $P101 = $P1054()
     .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1055" :load :anon :subid("20_1312496524.56246")
+.sub "_block1055" :load :anon :subid("20_1312695752.70808")
 .annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1057 = "10_1312496524.56246" 
+    .const 'Sub' $P1057 = "10_1312695752.70808" 
     $P101 = $P1057()
     .return ($P101)
 .end

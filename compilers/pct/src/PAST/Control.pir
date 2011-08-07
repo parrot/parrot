@@ -1,9 +1,9 @@
 
 .namespace []
-.sub "_block1000"  :anon :subid("10_1312323169.20443")
+.sub "_block1000"  :anon :subid("10_1312695755.05986")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1312323169.20443" 
+    .const 'Sub' $P1003 = "11_1312695755.05986" 
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -13,21 +13,21 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 5
-    .const 'Sub' $P1003 = "11_1312323169.20443" 
+    .const 'Sub' $P1003 = "11_1312695755.05986" 
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1017 = "15_1312323169.20443" 
+    .const 'Sub' $P1017 = "15_1312695755.05986" 
     .return ($P1017)
 .end
 
 
 .namespace []
-.sub "" :load :init :subid("post16") :outer("10_1312323169.20443")
+.sub "" :load :init :subid("post16") :outer("10_1312695755.05986")
 .annotate 'file', ''
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1312323169.20443" 
+    .const 'Sub' $P1001 = "10_1312695755.05986" 
     .local pmc block
     set block, $P1001
     $P1019 = get_root_global ["parrot"], "P6metaclass"
@@ -36,12 +36,12 @@
 
 
 .namespace ["PAST";"Control"]
-.sub "_block1002"  :subid("11_1312323169.20443") :outer("10_1312323169.20443")
+.sub "_block1002"  :subid("11_1312695755.05986") :outer("10_1312695755.05986")
 .annotate 'file', ''
 .annotate 'line', 5
-    .const 'Sub' $P1008 = "13_1312323169.20443" 
+    .const 'Sub' $P1008 = "13_1312695755.05986" 
     capture_lex $P1008
-    .const 'Sub' $P1004 = "12_1312323169.20443" 
+    .const 'Sub' $P1004 = "12_1312695755.05986" 
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -50,18 +50,18 @@
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 9
-    .const 'Sub' $P1008 = "13_1312323169.20443" 
+    .const 'Sub' $P1008 = "13_1312695755.05986" 
     newclosure $P1012, $P1008
 .annotate 'line', 5
     .return ($P1012)
-    .const 'Sub' $P1014 = "14_1312323169.20443" 
+    .const 'Sub' $P1014 = "14_1312695755.05986" 
     .return ($P1014)
 .end
 
 
 .namespace ["PAST";"Control"]
 .include "except_types.pasm"
-.sub "handle_types"  :subid("12_1312323169.20443") :method :outer("11_1312323169.20443")
+.sub "handle_types"  :subid("12_1312695755.05986") :method :outer("11_1312695755.05986")
     .param pmc param_1007 :optional
     .param int has_param_1007 :opt_flag
 .annotate 'file', ''
@@ -93,7 +93,7 @@
 
 .namespace ["PAST";"Control"]
 .include "except_types.pasm"
-.sub "handle_types_except"  :subid("13_1312323169.20443") :method :outer("11_1312323169.20443")
+.sub "handle_types_except"  :subid("13_1312695755.05986") :method :outer("11_1312695755.05986")
     .param pmc param_1011 :optional
     .param int has_param_1011 :opt_flag
 .annotate 'file', ''
@@ -124,20 +124,20 @@
 
 
 .namespace ["PAST";"Control"]
-.sub "_block1013" :load :anon :subid("14_1312323169.20443")
+.sub "_block1013" :load :anon :subid("14_1312695755.05986")
 .annotate 'file', ''
 .annotate 'line', 5
-    .const 'Sub' $P1015 = "11_1312323169.20443" 
+    .const 'Sub' $P1015 = "11_1312695755.05986" 
     $P101 = $P1015()
     .return ($P101)
 .end
 
 
 .namespace []
-.sub "_block1016" :load :anon :subid("15_1312323169.20443")
+.sub "_block1016" :load :anon :subid("15_1312695755.05986")
 .annotate 'file', ''
 .annotate 'line', 1
-    .const 'Sub' $P1018 = "10_1312323169.20443" 
+    .const 'Sub' $P1018 = "10_1312695755.05986" 
     $P101 = $P1018()
     .return ($P101)
 .end
