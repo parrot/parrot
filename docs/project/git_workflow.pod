@@ -490,6 +490,20 @@ This follows the general pattern of
 When local_branch_name is empty, you are pushing "nothing" to the remote
 branch, which deletes it.
 
+=head2 How Can I Tell If A Branch Is Merged?
+
+To see a list of all remote branches that are not merged into branch foo
+
+    git branch -r --no-merged foo
+
+If you leave out the last argument, it defaults to HEAD (the tip of the current
+branch). So, to see a list of all remote branches that have not been merged
+into master:
+
+    git checkout master
+    git branch -r --no-merged
+
+
 =cut
 
 __END__

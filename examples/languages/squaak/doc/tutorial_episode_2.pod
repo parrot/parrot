@@ -157,28 +157,23 @@ require you to know any details about this transformation.
 
 =head2 And now for the good news...
 
-We established the general data flow of PCT-based compilers, which consists of
-four stages:
+We established the general data flow of PCT-based compilers which transform plain
+source code into PIR through four transformations:
 
-=over 4
+=begin html
 
-=item 1. source to parse tree
+<img src="pct-stages.png"
+	style="display:block; margin:auto; width: 600px"
+	alt="Source -> Parse Tree -> PAST -> POST -> PIR"></img>
 
-=item 2. parse tree to PAST
+=end html
 
-=item 3. PAST to POST
-
-=item 4. POST to PIR
-
-=back
-
-The first two transformations happen during the parse stage. Now, as you're
-reading this tutorial, you're probably interested in using the PCT to implement
-Your Favorite Language on top of Parrot. We already saw that a language grammar
-is expressed in Perl 6 Rules. What about the other transformations?  Well,
-earlier in this episode we mentioned parse actions and that these actions
-create PAST nodes. After you have written a parse action for each grammar rule,
-you're done!
+Now, as you're reading this tutorial, you're probably interested in using the
+PCT to implement Your Favorite Language on top of Parrot. We already saw that a
+language grammar is expressed in Perl 6 Rules. What about the other
+transformations?  Well, earlier in this episode we mentioned parse actions and
+that these actions create PAST nodes. After you have written a parse action for
+each grammar rule, you're done!
 
 Say what?
 

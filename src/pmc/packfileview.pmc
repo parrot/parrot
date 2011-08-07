@@ -24,12 +24,35 @@ from utilities which generate them.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void add_called_tag(PARROT_INTERP,
+    ARGMOD(PMC * self),
+    ARGIN(STRING * tag))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* self);
+
+static INTVAL find_called_tag(PARROT_INTERP,
+    ARGIN(PMC * self),
+    ARGIN(STRING *tag))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     ARGIN(PMC * self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_add_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(tag))
+#define ASSERT_ARGS_find_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(tag))
 #define ASSERT_ARGS_get_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -63,9 +86,44 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
     return bt->const_table;
 }
 
+static INTVAL
+find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
+{
+    ASSERT_ARGS(find_called_tag)
+    Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);
+    PMC *  const called_tags = attrs->called_tags;
+    if (!PMC_IS_NULL(called_tags)) {
+        const INTVAL count = VTABLE_elements(interp, called_tags);
+        INTVAL i;
+        for (i = 0; i < count; i++) {
+            STRING * const str = VTABLE_get_string_keyed_int(interp, called_tags, i);
+            if (STRING_equal(interp, str, tag))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+static void
+add_called_tag(PARROT_INTERP, ARGMOD(PMC * self), ARGIN(STRING * tag))
+{
+    ASSERT_ARGS(add_called_tag)
+    const int has_it = find_called_tag(interp, self, tag);
+    if (!has_it) {
+        Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);
+        PMC *  called_tags = attrs->called_tags;
+        if (PMC_IS_NULL(called_tags)) {
+            called_tags = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+            attrs->called_tags = called_tags;
+        }
+        VTABLE_push_string(interp, called_tags, tag);
+    }
+}
+
 pmclass PackfileView auto_attrs {
     ATTR PackFile * pf;
     ATTR STRING * path;
+    ATTR PMC * called_tags;
 
 /*
 
@@ -92,6 +150,8 @@ Mark the PMC and the PackFile* contents
             Parrot_pf_mark_packfile(INTERP, attrs->pf);
         if (!STRING_IS_NULL(attrs->path))
             Parrot_gc_mark_STRING_alive(INTERP, attrs->path);
+        if (!PMC_IS_NULL(attrs->called_tags))
+            Parrot_gc_mark_PMC_alive(INTERP, attrs->called_tags);
     }
 
     VTABLE void init() {
@@ -308,6 +368,15 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
             }
         }
         RETURN(PMC *array);
+    }
+
+    METHOD mark_initialized(STRING *tag) {
+        add_called_tag(INTERP, SELF, tag);
+    }
+
+    METHOD is_initialized(STRING *tag) {
+        const INTVAL has_it = find_called_tag(INTERP, SELF, tag);
+        RETURN(INTVAL has_it);
     }
 
 /*

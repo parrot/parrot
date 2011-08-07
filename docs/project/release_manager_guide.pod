@@ -1,6 +1,6 @@
 # Copyright (C) 2007-2011, Parrot Foundation.
 
-=head1 RELEASE MANAGER GUIDE
+=head1 Release Manager Guide
 
 To prepare a release:
 

@@ -68,10 +68,8 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 .sub '_printError'
     .param pmc args :slurpy
     $S0 = join '', args
-    $P0 = getinterp
-    $P1 = $P0.'stderr_handle'()
-    $P1.'print'($S0)
-    $P1.'print'("\n")
+    printerr $S0
+    printerr "\n"
 .end
 
 .sub '_ioError' :method
@@ -153,6 +151,8 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 .end
 
 .sub 'init' :vtable :method
+    $P0 = box 0
+    setattribute self, 'compressedSize', $P0
     $P0 = box FA_UNIX
     setattribute self, 'fileAttributeFormat', $P0
     $P0 = box 0
@@ -419,11 +419,11 @@ to something different than the given 'fileName'.
 .sub '_refreshLocalFileHeader' :method
     .param pmc fh
     .local int here
-    here = fh.'tell'()
+    here = tell fh
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $I0 = $P0
     $I0 += SIGNATURE_LENGTH
-    fh.'seek'($I0, 0)
+    seek fh, $I0, 0
     .local string header, fileName, localExtraField
     .const string VERSION = 20
     header = self.'pack_v'(VERSION)
@@ -459,7 +459,7 @@ to something different than the given 'fileName'.
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
-    fh.'seek'(here, 0)
+    seek fh, here, 0
     .return (AZ_OK)
 .end
 
@@ -628,7 +628,7 @@ to something different than the given 'fileName'.
     .return ('', AZ_OK)
   L1:
     $P0 = self.'fh'()
-    $S0 = $P0.'read'(chunkSize)
+    $S0 = read $P0, chunkSize
     unless $S0 == '' goto L2
     $I0 = self.'_ioError'("reading data")
     .return ($S0, $I0)
@@ -638,9 +638,8 @@ to something different than the given 'fileName'.
 
 .sub '_newFromFileNamed'
     .param string fileName
-    .param string newName       :optional
-    .param int has_newName      :opt_flag
-    if has_newName goto L1
+    .param string newName
+    unless null newName goto L1
     newName = fileName
   L1:
     $I0 = stat fileName, .STAT_EXISTS
@@ -678,7 +677,7 @@ to something different than the given 'fileName'.
     .return ($I0)
   L1:
     $P0 = self.'fh'()
-    $P0.'seek'(0, 0)
+    seek $P0, 0, 0
     .return (AZ_OK)
 .end
 
@@ -715,8 +714,10 @@ Append a member.
 
 .sub 'addMember' :method
     .param pmc member
+    if null member goto L1
     $P0 = getattribute self, 'members'
     push $P0, member
+  L1:
 .end
 
 =item zip.'addFile' ( fileName [, newName ] )

@@ -809,7 +809,7 @@ pmclass UnManagedStruct auto_attrs no_ro {
 
 =back
 
-=head2 Methods
+=head2 Vtable Functions
 
 =over 4
 
@@ -1213,6 +1213,42 @@ Sets the value of the element associated with key C<*key> to C<*value>.
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified. If the encoding is omitted or null, use platform encoding.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname :optional) {
+        STRING *result = STRINGNULL;
+        const char * content = (const char *)SELF.get_pointer();
+        if (content) {
+            const STR_VTABLE *encoding = STRING_IS_NULL(encodingname) ?
+                    Parrot_platform_encoding_ptr :
+                    Parrot_find_encoding_by_string(INTERP, encodingname);
+            if (encoding == NULL)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_ENCODING,
+                        "Invalid encoding");
+            else {
+                int size = strlen(content);
+                result = Parrot_str_new_init(INTERP, content, size, encoding, 0);
+            }
+        }
+        RETURN(STRING result);
     }
 
 }
