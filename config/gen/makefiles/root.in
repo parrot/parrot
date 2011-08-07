@@ -859,7 +859,7 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
 frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
-	$(MINIPARROT) -o frontend/parrot2/prt0.pbc frontend/parrot2/prt0.pir
+	$(MINIPARROT) -Iruntime/parrot/include -o frontend/parrot2/prt0.pbc frontend/parrot2/prt0.pir
 
 $(PARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \

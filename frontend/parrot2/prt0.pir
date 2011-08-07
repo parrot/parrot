@@ -163,10 +163,16 @@
   init_loop_bottom:
 .end
 
+.include "except_severity.pasm"
 .sub '__handle_error_and_exit' :anon
     .param pmc exception
     .local pmc bts, bts_iter, stderr_pmc, interp
     .local string message
+    .local int severity, exit_code
+
+    severity = exception["severity"]
+    if severity == .EXCEPT_EXIT goto __direct_exit
+
     interp = getinterp
     stderr_pmc = interp.'stderr_handle'()
     message = exception["message"]
@@ -182,20 +188,30 @@
     stderr_pmc.'print'("\n")
     goto __backtrace_loop_top
   __backtrace_loop_bottom:
-    .local int exit_code
+
     exit_code = exception["exit_code"]
     unless exit_code == 0 goto __really_exit
     exit_code = 1
   __really_exit:
     exit exit_code
+
+  __direct_exit:
+    exit_code = exception["exit_code"]
+    exit exit_code
 .end
 
+.include "iglobals.pasm"
 .sub '__show_version'
-    .local pmc interp
-    .local string version_str, archname_str
-    # TODO: Get version_str and archname_str, probably from config
+    .local pmc interp, config
+    .local string version_str, devel_str, cpuarch_str, platform_str
+    interp = getinterp
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    version_str = config["VERSION"]
+    devel_str = config["DEVEL"]
+    cpuarch_str = config["cpuarch"]
+    platform_str = config["platform"]
     $S0 = <<'END_OF_VERSION'
-This is Parrot version %s built for %s
+This is Parrot version %s%s built for %s-%s
 Copyright (C) 2001-2011, Parrot Foundation.
 
 This code is distributed under the terms of the Artistic License 2.0.
@@ -204,7 +220,9 @@ included in the Parrot source tree
 END_OF_VERSION
     $P0 = new ['ResizableStringArray']
     $P0[0] = version_str
-    $P0[1] = archname_str
+    $P0[1] = devel_str
+    $P0[2] = cpuarch_str
+    $P0[3] = platform_str
     $S1 = sprintf $S0, $P0
     say $S1
 .end
