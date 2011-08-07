@@ -858,11 +858,11 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
-$(PARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
 	$(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-	frontend/parrot/main$(O) src/parrot_config$(O) src/longopt$(O) \
+	frontend/parrot2/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -898,11 +898,11 @@ $(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/lon
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEPARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(INSTALLABLEPARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/install_config$(O) src/longopt$(O) \
 	$(PARROT)
 	$(LINK) @ld_out@$@ \
-	frontend/parrot/main$(O) src/install_config$(O) src/longopt$(O) \
+	frontend/parrot2/main$(O) src/install_config$(O) src/longopt$(O) \
 	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1580,6 +1580,17 @@ src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
 
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
+frontend/parrot2/main$(O) : \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/compiler.h \
+	$(INC_DIR)/config.h \
+	$(INC_DIR)/core_types.h \
+	$(INC_DIR)/feature.h \
+	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/longopt.h \
+	include/imcc/api.h \
+	frontend/parrot2/main.c
+
 frontend/parrot/main$(O) : \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/compiler.h \
@@ -1589,7 +1600,7 @@ frontend/parrot/main$(O) : \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/longopt.h \
 	include/imcc/api.h \
-	frontend/parrot/main.c
+	frontend/parrot2/main.c
 
 src/multidispatch$(O) : \
 	src/multidispatch.c \
@@ -2317,7 +2328,7 @@ prog-clean :
 	$(PBC_MERGE) frontend/pbc_merge/main$(O) \
 	$(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
-	frontend/parrot/main$(O) \
+	frontend/parrot2/main$(O) \
 	src/null_config$(O) \
 	src/parrot_config$(O) \
 	src/install_config$(O) \
@@ -2470,7 +2481,7 @@ status :
 patch :
 	git diff
 
-LINTABLE_CFILES = `echo frontend/parrot/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+LINTABLE_CFILES = `echo frontend/parrot2/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 lint : sunlint
 
@@ -2709,7 +2720,7 @@ FULLCOVER_DIRS = \
 	src/runcore \
 	src/string \
 	src/string/encoding \
-	frontend/parrot \
+	frontend/parrot2 \
 	frontend/parrot_debugger \
 	frontend/pbc_dump \
 	frontend/pbc_merge \
@@ -2757,7 +2768,7 @@ COVER_DIRS = \
 	src/runcore \
 	src/string \
 	src/string/encoding \
-	frontend/parrot \
+	frontend/parrot2 \
 	frontend/parrot_debugger \
 	frontend/pbc_dump \
 	frontend/pbc_merge \
@@ -3064,7 +3075,7 @@ cagecritic:
 
 HEADERIZER_O_FILES = \
 	$(O_FILES) \
-	frontend/parrot/main$(O) \
+	frontend/parrot2/main$(O) \
 	frontend/pbc_dump/packdump$(O) \
 	frontend/pbc_merge/main$(O) \
 

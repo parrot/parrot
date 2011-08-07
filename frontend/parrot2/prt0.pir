@@ -18,6 +18,8 @@
     pir_compiler = compreg "PIR"
     prog_name = prog_args[0]
     input_file_type = '__get_input_file_type'(prog_name)
+    output_file = null
+
     unless input_file_type == 0 goto __have_valid_input_file
     die "Invalid file type"
 
@@ -56,6 +58,7 @@
     packfile_pmc.'write_to_file'(output_file)
     packfile_pmc = new ['PackfileView']
     packfile_pmc.'read_from_file'(output_file)
+    output_file = null
 
   __force_pbc_file:
     input_file_type = PBC_FILE
@@ -71,7 +74,7 @@
     packfile_pmc = '__default_get_packfile'(prog_name, input_file_type, pir_compiler)
 
   __have_packfile_pmc:
-    unless null output_file goto __run_packfile
+    if null output_file goto __run_packfile
     packfile_pmc.'write_to_file'(output_file)
     pop_eh
     exit 0
@@ -137,7 +140,7 @@
 .sub '__init_packfile' :anon
     .param pmc packfile
     .local pmc init_subs, sub_iter, sub
-    init_subs = packfile.'subs_by_id'("init")
+    init_subs = packfile.'subs_by_flag'("init")
     sub_iter = iter init_subs
   init_loop_top:
     unless sub_iter goto init_loop_bottom
@@ -154,6 +157,9 @@
     interp = getinterp
     stderr_pmc = interp.'stderr_handle'()
     message = exception["message"]
+    stderr_pmc.'print'(message)
+    stderr_pmc.'print'("\n")
+
     bts = exception.'backtrace_strings'()
     bts_iter = iter bts
   __backtrace_loop_top:
@@ -231,4 +237,9 @@ parrot [Options] <file> [<program options...>]
 see docs/running.pod for more
 END_OF_HELP
     say $S0
+.end
+
+.sub '__get_temporary_output_file'
+    .param string infile
+    # TODO
 .end

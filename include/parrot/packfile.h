@@ -650,12 +650,15 @@ void Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 PARROT_EXPORT
 void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
     ARGMOD(PMC *pbc),
-    ARGMOD(PMC *args))
+    ARGMOD(PMC * sysargs),
+    ARGMOD(PMC * progargs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pbc)
-        FUNC_MODIFIES(*args);
+        FUNC_MODIFIES(* sysargs)
+        FUNC_MODIFIES(* progargs);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -834,7 +837,8 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pbc) \
-    , PARROT_ASSERT_ARG(args))
+    , PARROT_ASSERT_ARG(sysargs) \
+    , PARROT_ASSERT_ARG(progargs))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))

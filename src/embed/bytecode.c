@@ -135,7 +135,7 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 /*
 
 =item C<Parrot_Int Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC
-pbc, Parrot_PMC mainargs)>
+pbc, Parrot_PMC sysargs, Parrot_PMC progargs)>
 
 Runs the bytecode C<pbc> passing optional C<mainargs> parameters. This function
 returns a true value if this call is successful and false value otherwise.
@@ -147,11 +147,12 @@ returns a true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-    Parrot_PMC mainargs)
+    Parrot_PMC sysargs, Parrot_PMC progargs)
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_PMC args = mainargs ? mainargs : PMCNULL;
+    Parrot_PMC _sysargs = sysargs ? sysargs : PMCNULL;
+    Parrot_PMC _progargs = progargs ? progargs : PMCNULL;
 
     /* Print out information if we are debugging */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -159,7 +160,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
                  interp->run_core->name);
     }
 
-    Parrot_pf_execute_bytecode_program(interp, pbc, args);
+    Parrot_pf_execute_bytecode_program(interp, pbc, _sysargs, _progargs);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
