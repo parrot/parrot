@@ -57,7 +57,7 @@
     packfile_pmc = new ['PackfileView']
     packfile_pmc.'read_from_file'(output_file)
 
-  __compile_to_file:
+  __force_pbc_file:
     input_file_type = PBC_FILE
     goto __sys_args_parse_top
 
@@ -66,7 +66,7 @@
     pop_eh
     exit 0
 
-  __sys_args_parse_bottom:
+  __sys_args_parse_end:
     unless null packfile_pmc goto __have_packfile_pmc
     packfile_pmc = '__default_get_packfile'(prog_name, input_file_type, pir_compiler)
 
@@ -112,7 +112,7 @@
 
   __compile_pasm_file:
     # TODO
-  __load_pbc_file
+  __load_pbc_file:
     packfile_pmc = new ['PackfileView']
     packfile_pmc.'read_from_file'(file_name)
     .return(packfile_pmc)
@@ -124,9 +124,9 @@
 
     $I0 = length file_name
     $I0 -= 4
-    extension = substr file_name, $I0
-    if extension == ".pir" goto __have_pir_file
-    if extension == ".pbc" goto __have_pbc_file
+    ext = substr file_name, $I0
+    if ext == ".pir" goto __have_pir_file
+    if ext == ".pbc" goto __have_pbc_file
     .return(NO_FILE)
   __have_pir_file:
     .return(PIR_FILE)
@@ -184,7 +184,7 @@ END_OF_VERSION
     $P0[0] = version_str
     $P0[1] = archname_str
     $S1 = sprintf $S0, $P0
-    say($S1)
+    say $S1
 .end
 
 .sub '__show_help'
@@ -230,5 +230,5 @@ parrot [Options] <file> [<program options...>]
    <Language options>
 see docs/running.pod for more
 END_OF_HELP
-    say($S0)
+    say $S0
 .end
