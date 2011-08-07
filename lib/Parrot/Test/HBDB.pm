@@ -124,10 +124,8 @@ my $pid;    # PID of HBDB process being tested
 
 # Check that HBDB has been built first
 BEGIN {
-    # Set global representation of tests
     $test    = Test::Builder->new();
 
-    # Get path to HBDB executable
     my $hbdb = File::Spec->join('.', 'hbdb') . $PConfig{exe};
 
     # Skip tests if executable doesn't exist
@@ -145,7 +143,6 @@ BEGIN {
 sub import {
     my ($self, $plan, $args) = @_;
 
-    # Plan number of tests
     $test->plan($plan, $args);
 }
 
@@ -153,12 +150,10 @@ sub import {
 sub new {
     my $class = shift;
 
-    # Initialize hashref
     my $obj = {
         exe => ".$PConfig{slash}hbdb$PConfig{exe}"
     };
 
-    # Return $obj as a blessed hashref in $class
     bless $obj, $class;
 }
 
@@ -169,7 +164,6 @@ sub arg_output_is {
 
     my $output                         = `$self->{exe} $arg`;
 
-    # Compare $output with $expected
     $builder->is($output, $expected, $desc);
 }
 
@@ -178,10 +172,8 @@ sub arg_output_like {
     my ($self, $arg, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
 
-    # Capture output of running HBDB with $arg argument
     my $output                         = `$self->{exe} $arg`;
 
-    # Match $output against the regex $expected
     $builder->like($output, $expected, $desc);
 }
 
@@ -194,14 +186,11 @@ sub cmd_output_is {
 
     _enter_cmd($self->{cmd});
 
-    # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
     my $select = IO::Select->new();
     $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
 
-    # Wait until one of the filehandles can be read
     my @fh_ready = $select->can_read();
 
-    # Iterate through filehandles
     foreach my $fh (@fh_ready) {
         next unless defined $fh;
 
@@ -209,7 +198,6 @@ sub cmd_output_is {
         if (fileno $fh  == fileno \*HBDB_STDERR) {
             my @lines = <HBDB_STDERR> || '';
 
-            # Compare $lines[0] with $expected
             $builder->is($lines[0], $expected, $desc);
         }
 
@@ -228,14 +216,11 @@ sub cmd_output_like {
 
     _enter_cmd($self->{cmd});
 
-    # Add HBDB_STDOUT and HBDB_STDERR to IO::Select object
     my $select = IO::Select->new();
     $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
 
-    # Wait until one of the filehandles can be read
     my @fh_ready = $select->can_read();
 
-    # Iterate through filehandles
     foreach my $fh (@fh_ready) {
         next unless defined $fh;
 
@@ -267,7 +252,6 @@ sub start {
         close HBDB_STDIN if fileno HBDB_STDIN;
     };
 
-    # Start HBDB and open it for reading and writing
     $pid = open3(\*HBDB_STDIN, \*HBDB_STDOUT, \*HBDB_STDERR, "$self->{exe} $self->{args} $self->{file}");
 }
 
@@ -285,12 +269,10 @@ sub _close_fh {
 sub _enter_cmd {
     my $cmd = shift || '';
 
-    # Write command then send EOF so HBDB quits
     print HBDB_STDIN "$cmd\n";
     print HBDB_STDIN "quit\n";
     close HBDB_STDIN;
 
-    # Wait for HBDB to terminate
     waitpid $pid, 0;
 }
 
@@ -300,7 +282,6 @@ sub _generate_pbc {
     my $pbc    = $pir;
     my $parrot = ".$PConfig{slash}$PConfig{test_prog}";
 
-    # Substitute file extension
     $pbc =~ s|\.pir|\.pbc|i;
 
     # Compile to bytecode
