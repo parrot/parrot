@@ -918,7 +918,10 @@ multi method as_post(PAST::Block $node, *%options) {
                 $ops := self.wrap_handlers($ops, $eh, :rtype(%options<rtype>));
             }
             $bpost.push($ops);
-            $bpost.push_pirop('return', $retval);
+            if +@($ops) > 0 {
+                ## Don't bother adding an explicit return for an empty block
+                $bpost.push_pirop('return', $retval);
+            }
 
             if $ctrlpast {
                 $bpost.push($ctrllabel);
