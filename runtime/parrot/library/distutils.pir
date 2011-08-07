@@ -2457,6 +2457,11 @@ the default value is man
     .local int has_zlib
     $P0 = get_config()
     has_zlib = $P0['has_zlib']
+    $S0 = $P0['osname']
+    unless $S0 == 'MSWin32' goto L8
+    has_zlib = 0
+  L8:
+
     $P0 = get_install_gzfiles(kv :flat :named)
     $P1 = iter $P0
   L5:
