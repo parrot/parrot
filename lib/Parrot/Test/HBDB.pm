@@ -223,19 +223,20 @@ sub cmd_output_like {
     my $select = IO::Select->new();
     $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
 
-    my @fh_ready = $select->can_read();
+    while (my @fh_ready = $select->can_read()) {
 
-    foreach my $fh (@fh_ready) {
-        next unless defined $fh;
+        foreach my $fh (@fh_ready) {
+            next unless defined $fh;
 
-        if (fileno $fh  == fileno \*HBDB_STDERR) {
-            $lines .= <HBDB_STDERR> || '';
+            if (fileno $fh  == fileno \*HBDB_STDERR) {
+                $lines .= <HBDB_STDERR> || '';
+            }
+            else {
+                $lines .= <HBDB_STDOUT> || '';
+            }
+
+            $select->remove($fh) if eof $fh;
         }
-        else {
-            $lines .= <HBDB_STDOUT> || '';
-        }
-
-        $select->remove($fh) if eof $fh;
     }
 
     $builder->like($lines, $expected, $desc);
