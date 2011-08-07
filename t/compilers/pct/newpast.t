@@ -44,20 +44,15 @@ Tests compiling some basic POST structures to PBC
 .sub basic_tests
     .local pmc node
     $P0 = get_hll_global ['PAST'], 'Block'
-    node = $P0.'new'('name' => 'main')
-    node.'pirflags'(':main')
-    node.'push'(42)
+    node = $P0.'new'()
 
     $P0 = compile(node, 'target'=>'newpost')
-    $I0 = defined $P0
-    ok( $I0, 'got a return' )
     set $P1, ['POST';'File']
     isa_ok( $P0, $P1, 'newpost top-level' )
-    _dumper($P0)
 
     $P0 = compile(node)
     isa_ok( $P0, 'Sub', 'compiler return' )
-    $I0 = $P0()
+    $P0()
     ok( 1, 'Sub seemed to run' )
     is( $I0, 42, 'Sub returned correct value' )
 .end
