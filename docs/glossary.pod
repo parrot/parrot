@@ -248,14 +248,8 @@ be added, or overridden (for instance, the PAST to PIR transformation).
 Parrot Design Document: documents that describe the features parrot must
 implement.
 
-See also L<< http://docs.parrot.org/parrot/latest/html/docs/running.pod.html >>.
-
-=begin html
-
-<bk>
-<a href="http://docs.parrot.org/parrot/latest/html/docs/pdds/pdd00_pdd.pod.html">PDD 0: Design Document Format</a>
-
-=end html
+See also L<< Running|http://docs.parrot.org/parrot/latest/html/docs/running.pod.html >> and
+L<< PDD 0: Design Document Format|http://docs.parrot.org/parrot/latest/html/docs/pdds/pdd00_pdd.pod.html >>.
 
 =item PGE
 
@@ -343,9 +337,7 @@ L<http://www.perl.com/pub/a/2003/02/p6pdigest/20030216.html>
 
 aka run loop, aka runcore. The way Parrot executes PBCs.
 See running.pod for a list of available runcores, and how to tell
-parrot which one to use.
-
-running.pod: L<<  http://docs.parrot.org/parrot/latest/html/docs/running.pod.html >>
+parrot which one to use.  L<<  Running|http://docs.parrot.org/parrot/latest/html/docs/running.pod.html >>
 
 =item SMOP
 
