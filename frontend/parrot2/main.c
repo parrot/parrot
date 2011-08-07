@@ -484,65 +484,6 @@ help_debug(void)
 
 /*
 
-=item C<static void help(void)>
-
-Print out "help" list of options.
-
-=cut
-
-*/
-
-static void
-help(void)
-{
-    ASSERT_ARGS(help)
-    /* split printf for C89 compliance on string length */
-    printf(
-    "parrot [Options] <file>\n"
-    "  Options:\n"
-    "    -h --help\n"
-    "    -V --version\n"
-    "    -I --include add path to include search\n"
-    "    -L --library add path to library search\n"
-    "       --hash-seed F00F  specify hex value to use as hash seed\n"
-    "    -X --dynext add path to dynamic extension search\n"
-    "   <Run core options>\n"
-    "    -R --runcore slow|bounds|fast\n"
-    "    -R --runcore trace|profiling|gcdebug\n"
-    "    -t --trace [flags]\n"
-    "   <VM options>\n"
-    "    -D --parrot-debug[=HEXFLAGS]\n"
-    "       --help-debug\n");
-    printf(
-    "    -w --warnings\n"
-    "    -G --no-gc\n"
-    "    -g --gc ms2|gms|ms|inf set GC type\n"
-    "       <GC MS2 options>\n"
-    "       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n"
-    "       --gc-min-threshold=KB\n"
-    "       <GC GMS options>\n"
-    "       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n"
-    "       --gc-debug\n"
-    "       --leak-test|--destroy-at-end\n"
-    "    -. --wait    Read a keystroke before starting\n"
-    "       --runtime-prefix\n"
-    "   <Compiler options>\n"
-    "    -d --imcc-debug[=HEXFLAGS]\n"
-    "    -v --verbose\n"
-    "    -E --pre-process-only\n"
-    "    -o --output=FILE\n"
-    "       --output-pbc\n"
-    "    -O --optimize[=LEVEL]\n"
-    "    -a --pasm\n"
-    "    -c --pbc\n"
-    "    -r --run-pbc\n"
-    "    -y --yydebug\n"
-    "   <Language options>\n"
-    "see docs/running.pod for more\n");
-}
-
-/*
-
 =item C<static const struct longopt_opt_decl * Parrot_cmd_options(void)>
 
 Set up the const struct declaration for cmd_options
@@ -596,34 +537,6 @@ Parrot_cmd_options(void)
         { 0, 0, (OPTION_flags)0, { NULL } }
     };
     return cmd_options;
-}
-
-
-/*
-
-=item C<static void Parrot_version(void)>
-
-Print out parrot version number.
-
-=cut
-
-*/
-
-static void
-Parrot_version(void)
-{
-    ASSERT_ARGS(Parrot_version)
-    printf("This is Parrot version " PARROT_VERSION);
-    printf(" built for " PARROT_ARCHNAME ".\n");
-    printf("Copyright (C) 2001-2011, Parrot Foundation.\n\
-\n\
-This code is distributed under the terms of the Artistic License 2.0.\
-\n\
-For more details, see the full text of the license in the LICENSE file\
-\n\
-included in the Parrot source tree.\n\n");
-
-    exit(EXIT_SUCCESS);
 }
 
 /*
@@ -776,8 +689,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             fgetc(stdin);
             break;
           case 'h':
-            help();
-            exit(EXIT_FAILURE);
+            sysargs[nsysargs++] = "-h"
             break;
           case OPT_HASH_SEED:
             /* handled in parseflags_minimal */
@@ -798,8 +710,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 exit(EXIT_SUCCESS);
             }
           case 'V':
-            /* TODO Can we do this in prt0.pir? */
-            Parrot_version();
+            sysargs[nsysargs++] = "-V"
             break;
           case OPT_PBC_OUTPUT:
           case 'o':
