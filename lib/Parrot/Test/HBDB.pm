@@ -211,6 +211,7 @@ sub cmd_output_is {
 sub cmd_output_like {
     my ($self, $cmd, $expected, $desc) = @_;
     my $builder                        = __PACKAGE__->builder;
+    my @lines;
 
     $self->{cmd} = $cmd if defined $cmd;
 
@@ -226,11 +227,13 @@ sub cmd_output_like {
 
         # Only read from HBDB_STDERR for bad commands
         if (fileno $fh  == fileno \*HBDB_STDERR) {
-            my @lines = <HBDB_STDERR> || '';
-
-            # Match $lines[0] against the regex $expected
-            $builder->like($lines[0], $expected, $desc);
+            @lines = <HBDB_STDERR> || '';
         }
+        else {
+            @lines = <HBDB_STDOUT> || ''; 
+        }
+
+        $builder->like(@lines, $expected, $desc);
 
         $select->remove($fh) if eof $fh;
     }
