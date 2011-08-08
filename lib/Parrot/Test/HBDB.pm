@@ -99,8 +99,6 @@ Initial version by Kevin Polulak (soh_cah_toa) <kpolulak@gmail.com>
 
 =cut
 
-# TODO Refactor this code into a common subroutine
-
 package Parrot::Test::HBDB;
 
 use strict;
@@ -185,7 +183,7 @@ sub cmd_output_is {
 
     _select($self, $cmd, \$lines);
 
-    $builder->is($lines, $expected, $desc);
+    $builder->is_eq($lines, $expected, $desc);
 
     _close_fh();
 }
@@ -203,14 +201,12 @@ sub cmd_output_like {
     _close_fh();
 }
 
-# Starts HBDB
+# Starts HBDB and sets the debugee file and command-line arguments
 sub start {
     my ($self, $file, $args) = @_;
 
-    # TODO Add handling for PIR files
-
-    $self->{file} = _generate_pbc($file) if defined $file;
-    $self->{args} = $args                if defined $args;
+    $self->{file} = $file if defined $file;
+    $self->{args} = $args if defined $args;
 
     # Don't write to `HBDB_STDIN` anymore when child has exited
     $SIG{CHLD} = sub {
@@ -241,21 +237,6 @@ sub _enter_cmd {
     waitpid $pid, 0;
 }
 
-# Compiles .pir file into .pbc
-sub _generate_pbc {
-    my $pir    = shift;
-    my $pbc    = $pir;
-    my $parrot = ".$PConfig{slash}$PConfig{test_prog}";
-
-    $pbc =~ s|\.pir|\.pbc|i;
-
-    # Compile to bytecode
-    eval { system "$parrot -o $pbc $pir" };
-    $test->diag("Failed to generate $pbc") if $@;
-
-    return $pbc;
-}
-
 # Enters a command and hangs until HBDB's file descriptors can be read
 sub _select {
     my ($self, $cmd, $lines) = @_;
@@ -284,11 +265,6 @@ sub _select {
             $select->remove($fh) if eof $fh;
         }
     }
-}
-
-END {
-    # TODO How can I get rid of this hard-coded string?
-    unlink "t/tools/hbdb/testlib/hello.pbc";
 }
 
 1;
