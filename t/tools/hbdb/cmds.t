@@ -50,18 +50,15 @@ sub test_bad_cmd {
 sub test_help_cmd {
     my $cmd    = 'help';
 
-    # FIXME This output is wrong b/c open3() is stupid
-    my $output = qr/\(hbdb\) \(hbdb\) /;
+    my $output = <<OUTPUT;
+/List of commands:
 
-    #my $output = <<OUTPUT;
-#/List of commands:
+((\\s+\\w+)(\\s+.*))+
 
-#(.*(\\s+--\\s+).*)+
-#
-#Type "help" followed by a command name for full documentation.
-#Command name abbreviations are allowed if it's unambiguous.
-#/m
-#OUTPUT
+Type "help" followed by a command name for full documentation.
+Command name abbreviations are allowed if it's unambiguous.
+/m
+OUTPUT
 
     # Start HBDB
     $hbdb->start($pir, '');

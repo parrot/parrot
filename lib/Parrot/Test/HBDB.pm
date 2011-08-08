@@ -183,27 +183,7 @@ sub cmd_output_is {
     my $builder                        = __PACKAGE__->builder;
     my $lines;
 
-    $self->{cmd} = $cmd if defined $cmd;
-
-    _enter_cmd($self->{cmd});
-
-    my $select = IO::Select->new();
-    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
-
-    my @fh_ready = $select->can_read();
-
-    foreach my $fh (@fh_ready) {
-        next unless defined $fh;
-
-        if (fileno $fh  == fileno \*HBDB_STDERR) {
-            $lines = <HBDB_STDERR> || '';
-        }
-        else {
-            $lines = <HBDB_STDOUT> || ''; 
-        }
-
-        $select->remove($fh) if eof $fh;
-    }
+    _select($self, $cmd, \$lines);
 
     $builder->is($lines, $expected, $desc);
 
@@ -216,28 +196,7 @@ sub cmd_output_like {
     my $builder                        = __PACKAGE__->builder;
     my $lines;
 
-    $self->{cmd} = $cmd if defined $cmd;
-
-    _enter_cmd($self->{cmd});
-
-    my $select = IO::Select->new();
-    $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
-
-    while (my @fh_ready = $select->can_read()) {
-
-        foreach my $fh (@fh_ready) {
-            next unless defined $fh;
-
-            if (fileno $fh  == fileno \*HBDB_STDERR) {
-                $lines .= <HBDB_STDERR> || '';
-            }
-            else {
-                $lines .= <HBDB_STDOUT> || '';
-            }
-
-            $select->remove($fh) if eof $fh;
-        }
-    }
+    _select($self, $cmd, \$lines);
 
     $builder->like($lines, $expected, $desc);
 
@@ -297,35 +256,39 @@ sub _generate_pbc {
     return $pbc;
 }
 
-END {
-    # TODO How can I get rid of this hard-coded string?
-    unlink "t/tools/hbdb/testlib/hello.pbc";
-}
-
+# Enters a command and hangs until HBDB's file descriptors can be read
 sub _select {
-    my ($self, $lines) = @_;
+    my ($self, $cmd, $lines) = @_;
 
-    #$self->{cmd} = $cmd if defined $cmd;
+    $self->{cmd} = $cmd if defined $cmd;
 
     _enter_cmd($self->{cmd});
 
     my $select = IO::Select->new();
     $select->add(\*HBDB_STDOUT, \*HBDB_STDERR);
 
-    my @fh_ready = $select->can_read();
+    # Continuously loop, capturing output from $cmd
+    while (my @fh_ready = $select->can_read()) {
+        foreach my $fh (@fh_ready) {
+            next unless defined $fh;
 
-    foreach my $fh (@fh_ready) {
-        next unless defined $fh;
+            $$lines .= <$fh>;
 
-        if (fileno $fh  == fileno \*HBDB_STDERR) {
-            $lines = <HBDB_STDERR> || '';
+            #if (fileno $fh  == fileno \*HBDB_STDERR) {
+                #$$lines .= <HBDB_STDERR> || '';
+            #}
+            #else {
+                #$$lines .= <HBDB_STDOUT> || ''; 
+            #}
+
+            $select->remove($fh) if eof $fh;
         }
-        else {
-            $lines = <HBDB_STDOUT> || ''; 
-        }
-
-        $select->remove($fh) if eof $fh;
     }
+}
+
+END {
+    # TODO How can I get rid of this hard-coded string?
+    unlink "t/tools/hbdb/testlib/hello.pbc";
 }
 
 1;
