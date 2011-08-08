@@ -1,5 +1,6 @@
 New in 3.7.0
 - Core
+  + Added mem_sys_strndup function.
 - Languages
 - Documentation
     + The Archive::Tar and Archive::Zip libraries now have POD docs

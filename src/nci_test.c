@@ -1065,12 +1065,6 @@ nci_cstring_cstring(const char * src)
     return buffer;
 }
 
-/*
-
-=cut
-
-*/
-
 #ifdef TEST
 
 char l2 = 4;
