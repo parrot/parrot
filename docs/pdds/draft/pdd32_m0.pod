@@ -335,7 +335,8 @@ implementation (or equivalent) and does not go through ffi.
 =item * copy_mem - copy data to/from memory
 
 Write C<*$3> bytes from the memory location starting at C<*$2> to C<*$1>.
-Segfaults may result.  Be careful.
+This instruction may access memory managed by the GC.  Segfaults may result.
+Be careful.
 
 =back
 
