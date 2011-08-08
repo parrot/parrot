@@ -253,6 +253,13 @@ sub _select {
         foreach my $fh (@fh_ready) {
             next unless defined $fh;
 
+            next if <$fh>
+               =~ m|^HBDB: The Honey Bee Debugger
+                    Copyright \(C\) 2001-2011, Parrot Foundation\.
+                    Enter "h" or "help" for help or see docs/hbdb\.pod for further information\.$|x;
+
+            next if <$fh> =~ m|\(hbdb\) .*|;
+
             $$lines .= <$fh>;
 
             #if (fileno $fh  == fileno \*HBDB_STDERR) {
