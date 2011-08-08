@@ -251,22 +251,23 @@ sub _select {
     # Continuously loop, capturing output from $cmd
     while (my @fh_ready = $select->can_read()) {
         foreach my $fh (@fh_ready) {
+            my $input_text = <$fh>;
             next unless defined $fh;
 
-            next if <$fh>
+            next if $input_text
                =~ m|^HBDB: The Honey Bee Debugger
                     Copyright \(C\) 2001-2011, Parrot Foundation\.
                     Enter "h" or "help" for help or see docs/hbdb\.pod for further information\.$|x;
 
-            next if <$fh> =~ m|\(hbdb\) .*|;
+            next if $input_text =~ m|\(hbdb\) .*|;
 
-            $$lines .= <$fh>;
+            $$lines .= $input_text;
 
             #if (fileno $fh  == fileno \*HBDB_STDERR) {
                 #$$lines .= <HBDB_STDERR> || '';
             #}
             #else {
-                #$$lines .= <HBDB_STDOUT> || ''; 
+                #$$lines .= <HBDB_STDOUT> || '';
             #}
 
             $select->remove($fh) if eof $fh;
