@@ -91,6 +91,41 @@ HBDB understands the following commands:
 
 =over 4
 
+=item B<t>
+
+=item B<backtrace>
+
+Displays a backtrace of the current continuation chain. Included in the output
+is the current instruction and the PC value, file, and line number where each
+function was called.
+
+=item B<b>
+
+=item B<break [I<pc>]>
+
+Sets a breakpoint at the I<pc> value. This means that when the program counter
+reaches I<pc>, execution will pause.
+
+It it's current state, HBDB only supports breaking at PC values and not line
+numbers. This feature is still in the works.
+
+=item B<c>
+
+=item B<continue>
+
+Continues execution until the next breakpoint or watchpoint. This can only be
+used once the debugee process has been started with the I<run> command.
+
+=item B<d>
+
+=item B<disassemble>
+
+Disassembles the source file. Put differently, this translates Parrot bytecode
+into Parrot assembly language (PASM).
+
+In it's current state, the I<disassemble> command is very buggy. It is not
+recommended for mainstream use just yet.
+
 =item B<h>
 
 =item B<help> [I<name>]
@@ -100,13 +135,21 @@ it displays a short description of each command.
 
 =item B<l>
 
-=item B<list> [I<start,end>] | [I<line>] | [I<function>]
+=item B<list> [I<start>,I<end>] | [I<line>] | [I<function>]
 
 Display lines from the source file being debugged. In the first form, it
-lists the lines from I<start> through I<end>. In the second form, it lists a
-single line. In the third form, it displays the line containg the definition of
-I<function>. Without any arguments, it lists 10 lines around the next line
-that will be executed.
+lists the lines from I<start> through I<end>. Without any arguments, it lists
+10 lines around the next line to be executed. There are several ways to specify
+what part of the file to display.
+
+Specifying I<start> and I<end> displays lines from I<start> to I<end>. Omitting
+either I<start> or I<end> will display lines ending with I<end> and starting
+with I<start> respectively.
+
+Specifying I<line> displays 10 lines centered around I<line>.
+
+Specifying I<function> displays 10 lines centered around the beginning of
+I<function>.
 
 =item B<q>
 
@@ -114,6 +157,22 @@ that will be executed.
 
 Exits HBDB. If you want to be different, you can also quit by sending the EOF
 character (ASCII 04) which is usually ^D.
+
+=item B<r>
+
+=item B<run>
+
+Starts program execution from the beginning of the file.
+
+In the future, you will also be able to specify command-line arguments for the
+debugee with this command.
+
+=item B<s>
+
+=item B<step>
+
+Step to next line of code. Will step into a function as compared to I<next>
+which will step over a function.
 
 =back
 
