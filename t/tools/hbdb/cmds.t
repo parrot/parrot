@@ -53,11 +53,8 @@ sub test_help_cmd {
 
     my $output = <<OUTPUT;
 /List of commands:
-
 ((\\s+\\w+)(\\s+.*))+
-
 Type "help" followed by a command name for full documentation.
-Command name abbreviations are allowed if it's unambiguous.
 /m
 OUTPUT
 
