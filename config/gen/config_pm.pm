@@ -72,7 +72,8 @@ sub runstep {
         ' ' . $conf->data->get('libs') );
 
     # escape spaces in current directory
-    my $cwd = cwd();
+    #my $cwd = cwd();
+    my $cwd = $conf->data->get('build_dir');
     $cwd =~ s{ }{\\ }g;
 
     # Build directory can have non ascii characters

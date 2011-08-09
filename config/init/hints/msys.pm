@@ -5,25 +5,26 @@ package init::hints::msys;
 use strict;
 use warnings;
 
+sub _real_path {
+    my ( $path ) = @_;
+    $path = `cd $path && pwd -W`;
+    chomp $path;
+    $path =~ s/ /\\ /g;
+    return $path;
+}
+
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $build_dir = $conf->data->get('build_dir');
-    $build_dir =~ s/ /\\ /g;
+    my @keys = qw(bindir build_dir tempdir);
+    my %dirs;
+    @dirs{@keys} = map { _real_path $conf->data->get($_) } @keys;
 
-    my $bindir = $conf->data->get('bindir');
-    $bindir =~ s/ /\\ /g;
+    $conf->data->set(%dirs);
 
-    # Hardcode paths for now
-    my $build_dir = 'c:/mingw/home/parrot';
-    my $libdir = 'c:/mingw/lib';
-    my $libexecdir = 'c:/mingw/libexec';
     my $winver = '0x0502';
 
     $conf->data->set(
-        libdir => $libdir,
-        libexecdir => $libexecdir,
-        build_dir           => $build_dir,
         ld_share_flags      => '-shared',
         ld_load_flags       => '-shared',
         has_dynamic_linking => 1,
@@ -31,10 +32,10 @@ sub runstep {
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)',
         blib_dir            => '.',
-        libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
-        inst_libparrot_ldflags => '-L' . $bindir . ' -lparrot',
-        libparrot_linkflags   => '-L' . $build_dir . ' -lparrot',
-        inst_libparrot_linkflags => '-L' . $bindir . ' -lparrot',
+        libparrot_ldflags   => '-L' . $dirs{build_dir} . ' -lparrot',
+        inst_libparrot_ldflags => '-L' . $dirs{bindir} . ' -lparrot',
+        libparrot_linkflags   => '-L' . $dirs{build_dir} . ' -lparrot',
+        inst_libparrot_linkflags => '-L' . $dirs{bindir} . ' -lparrot',
         ccflags             => "-DWIN32 -DWINVER=$winver ",
         libs =>
 '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion ',
