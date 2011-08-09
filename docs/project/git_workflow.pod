@@ -70,7 +70,7 @@ get the latest commits with:
 
 Then use this syntax to track the remote branch with a local branch:
 
-  git checkout -b username/foo origin/username/foo
+  git checkout -t origin/username/foo
 
 If you are using a very old version of Git, such as 1.5.x.x or older, you will
 want to tell it to track the remote branch:
