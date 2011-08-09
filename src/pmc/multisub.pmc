@@ -74,56 +74,6 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides in
                     VTABLE_get_string(INTERP, SELF));
         return VTABLE_invoke(INTERP, func, next);
     }
-
-
-    /* I don't really know how to implement these if they need something
-       special, so I'll sort the sub list and defer processing to the
-       ResizablePMCArray's VTABLEs of the same names. Hopefully we
-       don't need anything beyond that. */
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
-        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
-                SELF, sig_obj);
-
-        if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                    "No applicable candidates found to dispatch to for '%Ss'",
-                    VTABLE_get_string(INTERP, SELF));
-        return SUPER(key);
-    }
-
-    VTABLE PMC *get_pmc_keyed_str(STRING *s) {
-        PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
-        PMC * const sub     = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
-                SELF, sig_obj);
-
-        if (PMC_IS_NULL(sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
-                    "No applicable candidates found to dispatch to for '%Ss'",
-                    VTABLE_get_string(INTERP, SELF));
-        return SUPER(s);
-    }
-
-    /* get_iter method should take one of two inputs: either an array of
-       arguments, or a string with a whitespace delimited function signature
-       (N, I, S, P). It should sort the argument list according to closeness
-       to this input argument list and return an iterator over that list. */
-
-    METHOD get_iter(PMC *args) {
-        STRING * const _array  = CONST_STRING(INTERP, "Array");
-        STRING * const _string = CONST_STRING(INTERP, "String");
-
-        if (VTABLE_isa(INTERP, args, _array)){
-            /* TODO: What goes here? */
-        }
-        else if (VTABLE_isa(INTERP, args, _string)) {
-            STRING * const s = VTABLE_get_string(INTERP, args);
-            /* TODO: What goes here? */
-        }
-        else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "attempt to call get_iter method with invalid arg type.\n");
-    }
 }
 
 /*
@@ -133,8 +83,6 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides in
 =head1 SEE ALSO
 
 F<src/multidispatch.c>,
-F<$perl6/doc/trunk/design/apo/A12.pod>,
-F<$perl6/doc/trunk/design/syn/S12.pod>
 
 =cut
 
