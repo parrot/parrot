@@ -2112,7 +2112,7 @@ coretest : corevm pbctestfiles
 
 # temporary (?) target for hbdb testing
 hbdb_tests : corevm hbdb $(GEN_LIBRARY)
-	$(PROVE) t/tools/hbdb/*t
+	$(PERL) t/harness t/tools/hbdb/*t
 
 # automake compatibility
 check : test
