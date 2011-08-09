@@ -210,8 +210,9 @@
 /ext/Parrot-Embed/lib/Parrot/*.obj
 /ext/Parrot-Embed/t/*.pbc
 /ext/nqp-rx/src/stage0/nqp-setting.pir
-/frontend/parrot/main.o
 /frontend/hbdb/main.o
+/frontend/parrot/main.o
+/frontend/parrot_debugger/main.o
 /frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o
 /frontend/pbc_dump/packdump.o

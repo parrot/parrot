@@ -2313,6 +2313,7 @@ prog-clean :
     $(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
     frontend/parrot/main$(O) \
+    frontend/parrot_debugger/main$(O) \
     src/null_config$(O) \
     src/parrot_config$(O) \
     src/install_config$(O) \
