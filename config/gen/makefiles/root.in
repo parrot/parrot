@@ -1454,7 +1454,7 @@ src/runcore/trace$(O) : \
 
 src/hbdb$(O) : \
 	$(PARROT_H_HEADERS) \
-	$(INC_DIR)/parrot/embed.h \
+	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
