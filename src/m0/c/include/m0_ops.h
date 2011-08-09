@@ -33,6 +33,10 @@ enum M0_OPS {
     M0_SET_IMM,
     M0_DEREF,
     M0_SET_REF,
+    M0_SET_BYTE,
+    M0_GET_BYTE,
+    M0_SET_WORD,
+    M0_GET_WORD,
     M0_CSYM,
     M0_CCALL_ARG,
     M0_CCALL_RET,
@@ -41,8 +45,8 @@ enum M0_OPS {
     M0_PRINT_I,
     M0_PRINT_N,
     M0_EXIT
-};
-
+};                    
+                      
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf );
 
