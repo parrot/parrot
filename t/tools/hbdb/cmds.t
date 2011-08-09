@@ -4,11 +4,11 @@
 
 =head1 NAME
 
-t/tools/cmds.t - tests for the HBDB debugger
+t/tools/hbdb/cmds.t - tests for the HBDB debugger
 
 =head1 SYNOPSIS
 
-    prove t/tools/cmds.t
+    prove t/tools/hbdb/cmds.t
 
 =head1 DESCRIPTION
 
