@@ -31,13 +31,9 @@ use Parrot::Config;
 use Parrot::Test::HBDB tests => 3;
 
 my $pir  = join $PConfig{slash}, qw(t tools hbdb testlib hello.pir);
-my $hbdb = Parrot::Test::HBDB->new();
 
-test_bad_cmd();
-test_help_cmd();
-test_list_cmd();
-
-sub test_bad_cmd {
+{
+    my $hbdb    = Parrot::Test::HBDB->new();
     my $bad_cmd = 'this_is_not_a_command';
     my $err_msg = qr|Undefined command: "\w+". Try "help".|;
 
@@ -48,8 +44,9 @@ sub test_bad_cmd {
     $hbdb->cmd_output_like($bad_cmd, $err_msg, 'HBDB: Bad command');
 }
 
-sub test_help_cmd {
-    my $cmd    = 'help';
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'help';
 
     my $output = <<OUTPUT;
 /List of commands:
@@ -67,8 +64,9 @@ OUTPUT
     $hbdb->cmd_output_like($cmd, $output, 'HBDB: Help command');
 }
 
-sub test_list_cmd {
-    my $cmd = 'list';
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'list';
 
     my $output = <<OUTPUT;
 

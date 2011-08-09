@@ -1454,10 +1454,11 @@ src/runcore/trace$(O) : \
 
 src/hbdb$(O) : \
 	$(PARROT_H_HEADERS) \
-	include/parrot/embed.h \
+	$(INC_DIR)/parrot/embed.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
+	include/pmc/pmc_continuation.h \
 	src/hbdb.c
 
 src/debug$(O) : $(INC_DIR)/embed.h $(INC_DIR)/extend.h \
@@ -1926,10 +1927,10 @@ src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
     $(PARROT_H_HEADERS) \
-    include/parrot/dynext.h \
-    include/parrot/embed.h \
-    include/parrot/oplib/core_ops.h \
-    include/parrot/runcore_api.h \
+    $(INC_DIR)/dynext.h \
+    $(INC_DIR)/embed.h \
+    $(INC_DIR)/oplib/core_ops.h \
+    $(INC_DIR)/runcore_api.h \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_fixedintegerarray.h \
     include/pmc/pmc_parrotlibrary.h \
