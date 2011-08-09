@@ -48,21 +48,6 @@ pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides in
         SUPER(key, value);
     }
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "attempt to set non Sub PMC");
-    }
-
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "attempt to set non Sub PMC");
-    }
-
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "attempt to set non Sub PMC");
-    }
-
     VTABLE opcode_t *invoke(void *next) {
         PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
         PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
