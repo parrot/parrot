@@ -53,7 +53,9 @@ sub test_help_cmd {
 
     my $output = <<OUTPUT;
 /List of commands:
+
 ((\\s+\\w+)(\\s+.*))+
+
 Type "help" followed by a command name for full documentation.
 /m
 OUTPUT
@@ -69,8 +71,10 @@ sub test_list_cmd {
     my $cmd = 'list';
 
     my $output = <<OUTPUT;
+
+
 1     #! parrot
-2
+2     
 3     .sub 'main' :main
 4         say "Starting at line 4"
 5         say "About to call foo()"
@@ -78,7 +82,7 @@ sub test_list_cmd {
 7         say "Back in main() at line 7"
 8         say "About to quit"
 9     .end
-10
+10    
 OUTPUT
 
     $hbdb->start($pir, '');
