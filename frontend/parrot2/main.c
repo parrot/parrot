@@ -132,7 +132,6 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_PMC interp, bytecodepmc, sysargs, pirargs;
-    Parrot_String prt0_filename;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
 
@@ -168,8 +167,7 @@ main(int argc, const char *argv[])
 
     if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.sysargc,  parsed_flags.sysargv, &sysargs) &&
           Parrot_api_pmc_wrap_string_array(interp, parsed_flags.progargc, parsed_flags.progargv, &pirargs) &&
-          Parrot_api_string_import(interp, "frontend/parrot2/prt0.pbc", &prt0_filename) &&
-          Parrot_api_load_bytecode_file(interp, prt0_filename, &bytecodepmc) &&
+          Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(), &bytecodepmc) &&
           Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, pirargs)))
         show_last_error_and_exit(interp);
 
