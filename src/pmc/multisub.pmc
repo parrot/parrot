@@ -22,29 +22,47 @@ Sub PMCs with the same short name, but different long names.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void check_is_valid_sub(PARROT_INTERP, ARGIN(PMC * sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_check_is_valid_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sub))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-pmclass MultiSub extends ResizablePMCArray auto_attrs provides array provides invokable {
+static void
+check_is_valid_sub(PARROT_INTERP, ARGIN(PMC * sub))
+{
+    STRING * const invokable_str = CONST_STRING(interp, "invokable");
+    if (!VTABLE_does(interp, sub, invokable_str))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "attempt to add non-invokable PMC");
+}
+
+pmclass MultiSub
+    extends ResizablePMCArray
+    auto_attrs
+    provides array
+    provides invokable {
 
     VTABLE STRING * get_string() {
+        // TODO: No bounds-checking. This is not safe.
         PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
         STRING * const name = VTABLE_get_string(INTERP, sub0);
         return name;
     }
 
     VTABLE void push_pmc(PMC *value) {
-        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "invokable")))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION, "attempt to push non Sub PMC");
-
+        check_is_valid_sub(INTERP, value);
         SUPER(value);
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        STRING * const _sub = CONST_STRING(INTERP, "Sub");
-        if (!VTABLE_isa(INTERP, value, _sub))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "attempt to set non Sub PMC");
+        check_is_valid_sub(INTERP, value);
         SUPER(key, value);
     }
 
