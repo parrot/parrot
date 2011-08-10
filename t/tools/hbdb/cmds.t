@@ -29,7 +29,7 @@ use lib qw(lib);
 
 use Parrot::Config;
 #use Parrot::Test::HBDB tests => 3;
-use Parrot::Test::HBDB qw( no_plan );;
+use Parrot::Test::HBDB 'no_plan';
 
 my $pir  = join $PConfig{slash}, qw(t tools hbdb testlib hello.pir);
 my $bad_cmd = 'this_is_not_a_command';
@@ -116,6 +116,42 @@ my $err_msg = qr|Undefined command: "\w+"\. Try "help"\.|;
 8         say "About to quit"
 9     .end
 10    
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+}
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'list 3,9';
+
+    my $output = <<OUTPUT;
+
+
+3     .sub 'main' :main
+4         say "Starting at line 4"
+5         say "About to call foo()"
+6         foo()
+7         say "Back in main() at line 7"
+8         say "About to quit"
+9     .end
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+}
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'list 6,6';
+
+    my $output = <<OUTPUT;
+
+
+6         foo()
 OUTPUT
 
     $hbdb->start($pir, '');
