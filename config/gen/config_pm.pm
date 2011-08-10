@@ -74,7 +74,7 @@ sub runstep {
     my $cwd = cwd();
 
     # expand msys virtual paths
-    $cwd = `cd $cwd && pwd -W`, chomp $cwd if $^O eq 'msys';
+    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd if $^O eq 'msys';
 
     # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;

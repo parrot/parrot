@@ -7,7 +7,7 @@ use warnings;
 
 sub _real_path {
     my ( $path ) = @_;
-    $path = `cd $path && pwd -W`;
+    $path = `cd '$path' && pwd -W`;
     chomp $path;
     $path =~ s/ /\\ /g;
     return $path;
