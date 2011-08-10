@@ -50,6 +50,12 @@ as (likely invalid) unicode escape codes.
 sub create_tempfile {
         my ($filehandle, $filename) = &tempfile;
 
+        if($^O eq 'msys') {
+            my $tmpdir = `cd /tmp && pwd -W`;
+            chomp $tmpdir;
+            $filename =~ s/^\/tmp\//$tmpdir\//;
+        }
+
         $filename =~ s/\\/\//g;
 
         return ($filehandle, $filename);
