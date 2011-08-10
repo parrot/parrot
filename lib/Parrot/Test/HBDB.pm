@@ -205,6 +205,7 @@ sub cmd_output_like {
 sub start {
     my ($self, $file, $args) = @_;
 
+    ($self->{file}, $self->{args}) = ('') x 2;
     $self->{file} = $file if defined $file;
     $self->{args} = $args if defined $args;
 

@@ -28,40 +28,75 @@ use warnings;
 use lib qw(lib);
 
 use Parrot::Config;
-use Parrot::Test::HBDB tests => 3;
+#use Parrot::Test::HBDB tests => 3;
+use Parrot::Test::HBDB qw( no_plan );;
 
 my $pir  = join $PConfig{slash}, qw(t tools hbdb testlib hello.pir);
+my $bad_cmd = 'this_is_not_a_command';
+my $err_msg = qr|Undefined command: "\w+"\. Try "help"\.|;
 
 {
     my $hbdb    = Parrot::Test::HBDB->new();
-    my $bad_cmd = 'this_is_not_a_command';
-    my $err_msg = qr|Undefined command: "\w+". Try "help".|;
-
-    # Start HBDB
-    $hbdb->start($pir, '');
-
+    $hbdb->start();
     # Enter fake command
-    $hbdb->cmd_output_like($bad_cmd, $err_msg, 'HBDB: Bad command');
+    $hbdb->cmd_output_like(
+        $bad_cmd,
+        $err_msg,
+        'HBDB with no file or args, given bad command'
+    );
+}
+
+{
+    my $hbdb    = Parrot::Test::HBDB->new();
+    $hbdb->start($pir, '');
+    # Enter fake command
+    $hbdb->cmd_output_like(
+        $bad_cmd,
+        $err_msg,
+        'HBDB with file but no args, given bad command'
+    );
 }
 
 {
     my $hbdb = Parrot::Test::HBDB->new();
-    my $cmd  = 'help';
-
-    my $output = <<OUTPUT;
-/List of commands:
-
-((\\s+\\w+)(\\s+.*))+
-
-Type "help" followed by a command name for full documentation.
-/m
-OUTPUT
-
-    # Start HBDB
     $hbdb->start($pir, '');
 
+    my $cmd  = 'help';
+    my $expected = qr/List of commands:/m;
     # Enter "help" command
-    $hbdb->cmd_output_like($cmd, $output, 'HBDB: Help command');
+    $hbdb->cmd_output_like(
+        $cmd,
+        $expected,
+        "HBDB: Help command; got 'List' line"
+    );
+}
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    $hbdb->start($pir, '');
+
+    my $cmd  = 'help';
+    my $expected = qr/backtrace\s+Print backtrace of current continuation chain\.\s+break\s+Sets a breakpoint at the specified location\./m;
+    # Enter "help" command
+    $hbdb->cmd_output_like(
+        $cmd,
+        $expected,
+        "HBDB: Help command; got 'backtrace' and 'break' lines"
+    );
+}
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    $hbdb->start($pir, '');
+
+    my $cmd  = 'help';
+    my $expected = qr/Type "help" followed by a command name for full documentation\./m;
+    # Enter "help" command
+    $hbdb->cmd_output_like(
+        $cmd,
+        $expected,
+        "HBDB: Help command; got 'Type \"help\"' line"
+    );
 }
 
 {
