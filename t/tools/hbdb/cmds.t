@@ -159,6 +159,30 @@ OUTPUT
     $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
 }
 
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'list 15';
+
+    my $output = <<OUTPUT;
+
+
+10    
+11    .sub 'foo'
+12        say "This is foo() at line 12"
+13        say "About to call bar()"
+14        bar()
+15    .end
+16    
+17    .sub 'bar'
+18        say "This is bar() at line 18"
+19        say "About to call baz()"
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
