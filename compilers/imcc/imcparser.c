@@ -3864,10 +3864,10 @@ yyreduce:
 #line 1528 "compilers/imcc/imcc.y"
     {
            SymReg *r;
-           if (strcmp((yyvsp[(1) - (1)].s), "_") != 0)
-               r = mk_const(imcc, (yyvsp[(1) - (1)].s), 'S');
-           else {
+           if (strcmp((yyvsp[(1) - (1)].s), "\"_\"") == 0 || strcmp((yyvsp[(1) - (1)].s), "'_'") == 0)
                r = mk_const(imcc, "PMC", 'S');
+           else {
+               r = mk_const(imcc, (yyvsp[(1) - (1)].s), 'S');
            }
            mem_sys_free((yyvsp[(1) - (1)].s));
            (yyval.sr) = r;
