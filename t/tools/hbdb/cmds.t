@@ -183,6 +183,24 @@ OUTPUT
     $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; one arg');
 }
 
+# FIXME Since only one command can be invoked per test, this test is
+#       pretty useless right now but is needed all the same
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'backtrace';
+
+    my $output = <<OUTPUT;
+
+
+current instr.: 'main' pc 0 (t/tools/hbdb/testlib/hello.pir:4)
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: Backtrace command; no args');
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
