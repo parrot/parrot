@@ -183,8 +183,8 @@ OUTPUT
     $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; one arg');
 }
 
-# FIXME Since only one command can be invoked per test, this test is
-#       pretty useless right now but is needed all the same
+# XXX Since only one command can be invoked per test, this test is
+#     pretty useless right now but is needed all the same
 
 {
     my $hbdb = Parrot::Test::HBDB->new();
@@ -194,6 +194,24 @@ OUTPUT
 
 
 current instr.: 'main' pc 0 (t/tools/hbdb/testlib/hello.pir:4)
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: Backtrace command; no args');
+}
+
+# XXX Since only one command can be invoked per test, this test is
+#     pretty useless right now but is needed all the same
+
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'break 83';
+
+    my $output = <<OUTPUT;
+
+
+Breakpoint 1 at PC 0083: file t/tools/hbdb/testlib/hello.pir
 OUTPUT
 
     $hbdb->start($pir, '');
