@@ -120,7 +120,7 @@ OUTPUT
 
     $hbdb->start($pir, '');
 
-    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; no args');
 }
 
 {
@@ -141,7 +141,7 @@ OUTPUT
 
     $hbdb->start($pir, '');
 
-    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; range');
 }
 
 {
@@ -156,7 +156,7 @@ OUTPUT
 
     $hbdb->start($pir, '');
 
-    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; single line');
 }
 
 {
@@ -180,7 +180,7 @@ OUTPUT
 
     $hbdb->start($pir, '');
 
-    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command');
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: List command; one arg');
 }
 
 # Local Variables:
