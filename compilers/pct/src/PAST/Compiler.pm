@@ -437,122 +437,95 @@ in string context, the second child should be a PMC, and the
 third and subsequent children can be any value they wish.
 
 method post_children($node, *%options) {
+    my $ops := POST::Ops.new(:node($node));
+
+    my $pushop := $node.childorder() eq 'right' ?? 'unshift' !! 'push';
+
+    ## get any conversion types
+    my $signature := %options<signature> || '**';
+    my $sigmax := pir::length($signature) - 1;
+
+    ##  if the signature contains a ':', then we're doing 
+    ##  flagged arguments (:flat, :named) '
+    my @posargs;
+    my @namedargs;
+
+    my $sigidx := 1;
+    my $rtype  := pir::substr($signature, $sigidx, 1);
+    my $iter   := $node.iterator();
+    while $iter {
+        if $rtype ne 'Q' {
+            my $cpast  := pir::shift($iter);
+            my $cpost  := self.as_post($cpast, :rtype($rtype));
+            $cpost     := self.coerce($cpost, $rtype);
+
+            if $cpast ~~ PAST::Node {
+                my $isflat := $cpast.flat();
+                my $npast  := $cpast.named();
+                my $npost;
+                if $rtype eq ':' && $npast {
+                    my $S0 := ~$cpost;
+                    if $isflat {
+                        $S0 := "$S0 :named :flat";
+                    }
+                    else {
+                        $npost := self.as_post($npast, :rtype<~>);
+                        $cpost := $ops.new($cpost);
+                        $cpost.push($npost);
+                        my $S1 := ~$npost;
+                        $S0 := "$S0 :named($S1)";
+                    }
+                    $ops."$pushop"($cpost);
+                    @namedargs.push($S0);
+                }
+                else {
+                    if $isflat {
+                        $ops."$pushop"($cpost);
+                        @posargs.push(~$cpost ~ " :flat");
+                    }
+                    else {
+                        $ops."$pushop"($cpost);
+                        @posargs.push($cpost);
+                    }
+                }
+            }
+            else {
+                $ops."$pushop"($cpost);
+                @posargs.push($cpost);
+            }
+        } else {
+            # rtype is 'Q', so construct a keyed pmc argument
+            # first, get the base PMC
+            my $cpast := pir::shift($iter);
+            my $cpost := self.as_post($cpast, :rtype<P>);
+            $cpost := self.coerce($cpost, 'P');
+            # now process the key arg
+            if $iter {
+                my $kpast := pir::shift($iter);
+                $sigidx++;
+                $rtype := pir::substr($signature, $sigidx, 1);
+                my $kpost := self.as_post($kpast, :rtype($rtype));
+                $kpost := self.coerce($kpost, $rtype);
+                # now construct the keyed PMC
+                my $S0 := ~$cpost ~ '[' ~ ~$kpost ~ ']';
+                $kpost := $ops.new($kpost);
+                $kpost.push($cpost);
+                $ops."$pushop"($kpost);
+                @posargs.push($S0);
+            }
+        }
+        if $sigidx < $sigmax {
+            $sigidx++;
+            $rtype := pir::substr($signature, $sigidx, 1);
+        }
+    }
+
     Q:PIR {
-        .local pmc node
-        node = find_lex '$node'
-        .local pmc options
-        options = find_lex '%options'
+        .local pmc ops, posargs, namedargs
+        ops = find_lex '$ops'
+        posargs = find_lex '@posargs'
+        namedargs = find_lex '@namedargs'
 
-        .local pmc ops
-        $P0 = get_hll_global ['POST'], 'Ops'
-        ops = $P0.'new'('node'=>node)
-
-        .local string pushop
-        pushop = 'push'
-        $S0 = node.'childorder'()
-        if $S0 != 'right' goto have_pushop
-        pushop = 'unshift'
-      have_pushop:
-
-        ##  get any conversion types
-        .local string signature
-        signature = options['signature']
-        if signature goto have_signature
-        signature = '**'
-      have_signature:
-        .local int sigmax, sigidx
-        sigmax = length signature
-        dec sigmax
-
-        ##  if the signature contains a ':', then we're doing
-        ##  flagged arguments (:flat, :named)
-        .local pmc posargs, namedargs
-        posargs = new 'ResizableStringArray'
-        null namedargs
-        $I0 = index signature, ':'
-        if $I0 < 0 goto nocolon
-        namedargs = new 'ResizableStringArray'
-      nocolon:
-
-        .local pmc iter
-        .local string rtype
-        iter = node.'iterator'()
-        sigidx = 1
-        rtype = substr signature, sigidx, 1
-      iter_loop:
-        if rtype == 'Q' goto keyed_pos
-        unless iter goto iter_end
-        .local pmc cpast, cpost
-        cpast = shift iter
-        cpost = self.'as_post'(cpast, 'rtype'=>rtype)
-        cpost = self.'coerce'(cpost, rtype)
-        $I0 = isa cpast, ['PAST';'Node']
-        unless $I0 goto cpost_pos
-        .local pmc isflat
-        isflat = cpast.'flat'()
-        if rtype != ':' goto iter_pos
-        .local pmc npast, npost
-        npast = cpast.'named'()
-        unless npast goto iter_pos
-        $S0 = cpost
-        if isflat goto flat_named
-        npost = self.'as_post'(npast, 'rtype'=>'~')
-        cpost = ops.'new'(cpost)
-        cpost.'push'(npost)
-        $S1 = npost
-        $S0 = concat $S0, ' :named('
-        $S0 = concat $S0, $S1
-        $S0 = concat $S0, ')'
-        goto named_done
-      flat_named:
-        $S0 = concat $S0, ' :named :flat'
-      named_done:
-        ops.pushop(cpost)
-        push namedargs, $S0
-        goto iter_rtype
-      iter_pos:
-        if isflat goto flat_pos
-      cpost_pos:
-        ops.pushop(cpost)
-        push posargs, cpost
-        goto iter_rtype
-      flat_pos:
-        $S0 = cpost
-        $S0 = concat $S0, ' :flat'
-        ops.pushop(cpost)
-        push posargs, $S0
-      iter_rtype:
-        unless sigidx < sigmax goto iter_loop
-        inc sigidx
-        rtype = substr signature, sigidx, 1
-        goto iter_loop
-      keyed_pos:
-        # rtype is 'Q', so construct a keyed pmc argument
-        # first, get the base PMC
-        unless iter goto iter_end
-        cpast = shift iter
-        cpost = self.'as_post'(cpast, 'rtype'=>'P')
-        cpost = self.'coerce'(cpost, 'P')
-        # now process the key arg
-        unless iter goto iter_end
-        .local pmc kpast, kpost
-        kpast = shift iter
-        inc sigidx
-        rtype = substr signature, sigidx, 1
-        kpost = self.'as_post'(kpast, 'rtype'=>rtype)
-        kpost = self.'coerce'(kpost, rtype)
-        # now construct the keyed PMC
-        $S0 = cpost
-        $S0 = concat $S0, '['
-        $S1 = kpost
-        $S0 = concat $S0, $S1
-        $S0 = concat $S0, ']'
-        kpost = ops.'new'(kpost)
-        kpost.'push'(cpost)
-        ops.pushop(kpost)
-        push posargs, $S0
-        goto iter_rtype
-      iter_end:
         .return (ops, posargs, namedargs)
     }
 }
