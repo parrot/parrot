@@ -21,10 +21,11 @@ Tests compiling some basic POST structures to PBC
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
 
-    plan(6)
+    plan(9)
 
     basic_tests()
     test_return()
+    test_val()
 .end
 
 # Compile a tree and return the main sub
@@ -83,6 +84,30 @@ Tests compiling some basic POST structures to PBC
     $P0 = compile($P0)
     $S0 = $P0()
     is( $S0, 'foo', 'string return' )
+.end
+
+# Test val nodes
+.sub test_val
+    .local pmc val
+    val = get_hll_global ['PAST'], 'Val'
+
+    $P0 = val.'new'('value' => 42, 'returns' => 'Integer')
+    $P0 = main_block($P0)
+    $P0 = compile($P0)
+    $I0 = $P0()
+    is( $I0, 42, 'integer val' )
+
+    $P0 = val.'new'('value' => 3.14, 'returns' => 'Float')
+    $P0 = main_block(3.14)
+    $P0 = compile($P0)
+    $N0 = $P0()
+    is( $N0, 3.14, 'float val' )
+
+    $P0 = val.'new'('value' => 'foo', 'returns' => 'String')
+    $P0 = main_block($P0)
+    $P0 = compile($P0)
+    $S0 = $P0()
+    is( $S0, 'foo', 'string val' )
 .end
 
 

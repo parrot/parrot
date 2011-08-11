@@ -76,6 +76,34 @@ multi method as_post(PAST::Block $node, *%options) {
     return POST::Ops.new; # No-op
 }
 
+
+=item as_post(PAST::Val node)
+Check the value type and generate the proper type or pass thru
+
+# Map PAST::Val.returns -> POST::Constant.type
+our %valtypes;
+INIT {
+    %valtypes<String>  := 'sc';
+    %valtypes<Integer> := 'ic';
+    %valtypes<Float>   := 'nc';
+}
+
+multi method as_post(PAST::Val $node, *%options) {
+    my $returns := $node.returns;
+    my $type    := %valtypes{$returns};
+
+    # If we don't have a Constant type, use the original version
+    return self.super('as_post', $node, |%options) unless $type;
+
+    # Just re-use the work I did in as_post(String)
+    return self.as_post(~$node.value, |%options) if $type eq 'sc';
+
+    # Handle all simple cases.
+    my $const := POST::Constant.new(:type($type), :value($node.value));
+    return self.coerce($const, %options<rtype>);
+}
+
+
 =begin head1
 COPYRIGHT
 
