@@ -341,6 +341,12 @@ sub test_pct
     \$P0.'parsegrammar'('TestGrammar::Grammar')
     \$P0.'parseactions'('TestGrammar::Grammar::Actions')
 
+    \$P1 = clone args # Will reuse args
+    \$P1 = \$P0.'command_line'(\$P1)
+
+    # Do it again, but with newPOST and PBC generation
+    \$P1 = split ' ', 'parse past newpost pbc'
+    \$P0.'stages'(\$P1)
     \$P1 = \$P0.'command_line'(args)
 
     .return()
@@ -426,7 +432,9 @@ EOT
     my $sample_fn = "$TEST_DIR/complete_workflow_sample_input.txt";
     Parrot::Test::write_code_to_file( $in, $sample_fn );
 
-    pir_output_is( $pir_code, $out, "$test_name: output of compiler", @other );
+    # We test for doubled output.
+    # First is via PIR, second is via newPOST
+    pir_output_is( $pir_code, $out . $out, "$test_name: output of compiler", @other );
 
     unlink $sample_fn;
 
