@@ -15,7 +15,7 @@ into PBC or an Eval PMC (bytecode).
 
 INIT {
     POST::PBCCompiler.language('newPOST');
-    POST::PBCCompiler.language(<pbc mainpmc>);
+    POST::PBCCompiler.stages(<packfile pbc>);
 }
 
 =begin

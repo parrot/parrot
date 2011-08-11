@@ -151,9 +151,9 @@
 .annotate 'line', 18
     get_hll_global $P108, ["POST"], "PBCCompiler"
     new $P109, "ResizablePMCArray"
-    push $P109, "pbc"
+    push $P109, "packfile"
     push $P109, "mainpmc"
-    $P108."language"($P109)
+    $P108."stages"($P109)
 .end
 
 
