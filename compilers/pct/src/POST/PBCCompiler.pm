@@ -56,14 +56,14 @@ method packfile($post, *%adverbs) {
 
 
 sub trigger($view, $flag) {
-	$_() for $view.subs_by_flag($flag);
+    $_() for $view.subs_by_flag($flag);
 }
 
 method mainpmc($packfile, *%adverbs) {
     my $view := $packfile.view();
 
-	trigger($view, 'load');
-	trigger($view, 'init');
+    trigger($view, 'load');
+    trigger($view, 'init');
 
     $view.main_sub();
 }
@@ -77,12 +77,12 @@ and returns the main sub from the PBC.
 =end
 
 method pbc($packfile, *%adverbs) {
-	pir::load_bytecode('osutils.pbc'); # for tempdir and unlink
+    pir::load_bytecode('osutils.pbc'); # for tempdir and unlink
 
     my $unlink;
     my $filename := ~%adverbs<output>;
     if !$filename {
-		# XXX: Use mktemp instead, if we get one
+        # XXX: Use mktemp instead, if we get one
         $filename := tempdir(:SUFFIX('.pbc'));
         $unlink   := %adverbs<cleanup> // 1;
     }
@@ -94,7 +94,7 @@ method pbc($packfile, *%adverbs) {
 
     my $view := pir::load_bytecode__ps($filename);
 
-	unlink($filename) if $unlink;
+    unlink($filename) if $unlink;
 
     trigger($view, 'load');
     trigger($view, 'init');
@@ -110,29 +110,29 @@ method pbc($packfile, *%adverbs) {
 # register types.
 
 sub get_or_create_number($num) {
-	Q:PIR {
-		$P0 = find_caller_lex '%context'
-		$P0 = $P0['constants']
-		$P1 = find_lex '$num'
-		$N1 = $P1
-		%r = $P0.'get_or_create_constant'($N1)
-	}
+    Q:PIR {
+        $P0 = find_caller_lex '%context'
+        $P0 = $P0['constants']
+        $P1 = find_lex '$num'
+        $N1 = $P1
+        %r = $P0.'get_or_create_constant'($N1)
+    }
 }
 
 # this is included for symmetry, but doesn't need the PIR
 sub get_or_create_pmc($pmc) {
-	my %context := pir::find_caller_lex__ps('%context');
-	%context<constants>.get_or_create_constant($pmc);
+    my %context := pir::find_caller_lex__ps('%context');
+    %context<constants>.get_or_create_constant($pmc);
 }
 
 sub get_or_create_string($str) {
-	Q:PIR {
-		$P0 = find_caller_lex '%context'
-		$P0 = $P0['constants']
-		$P1 = find_lex '$str'
-		$S1 = $P1
-		%r = $P0.'get_or_create_constant'($S1)
-	}
+    Q:PIR {
+        $P0 = find_caller_lex '%context'
+        $P0 = $P0['constants']
+        $P1 = find_lex '$str'
+        $S1 = $P1
+        %r = $P0.'get_or_create_constant'($S1)
+    }
 }
 
 
@@ -163,12 +163,12 @@ multi method to_pbc(POST::Sub $sub, %context) {
 
     # Packfile poop his pants...
     my $sb := pir::new('StringBuilder');
-	pir::push($sb, ~$sub.name);
+    pir::push($sb, ~$sub.name);
     my $subname := ~$sb;
 
     self.debug("Emitting $subname") if %context<DEBUG>;
 
-	get_or_create_string($subname);
+    get_or_create_string($subname);
 
     my $start_offset := +$bc;
     self.debug("From $start_offset") if %context<DEBUG>;
@@ -190,12 +190,12 @@ multi method to_pbc(POST::Sub $sub, %context) {
 
     # Default .return(). XXX We don't need it (probably)
     self.debug("Emitting default return") if %context<DEBUG>;
-	pir::push($bc, [
+    pir::push($bc, [
         'set_returns_pc',
         0x000                      # id of FIA
     ]);
 
-	pir::push($bc, [
+    pir::push($bc, [
         'returncc'
     ]);
 
@@ -265,18 +265,18 @@ multi method to_pbc(POST::Sub $sub, %context) {
 }
 
 multi method to_pbc(POST::Op $op, %context) {
-	# Check for things that should have been calls
+    # Check for things that should have been calls
     my $fullname := $op.pirop;
     my @calls := <call callmethod return yield tailcall>;
     for @calls {
-    	if $fullname eq $_ {
-    		my $newpost := POST::Call.new(:calltype($_));
-    		my @args := [];
-			@args.push($_) for @($op);
-    		$newpost.params(@args);
-    		return self.to_pbc($newpost, %context);
-		}
-	}
+        if $fullname eq $_ {
+            my $newpost := POST::Call.new(:calltype($_));
+            my @args := [];
+            @args.push($_) for @($op);
+            $newpost.params(@args);
+            return self.to_pbc($newpost, %context);
+        }
+    }
 
     # Generate full name
     self.debug("Short name $fullname") if %context<DEBUG>;
@@ -298,7 +298,7 @@ multi method to_pbc(POST::Op $op, %context) {
         @op.push(self.to_op($_, %context));
     }
     self.debug("Op size { +@op }") if %context<DEBUG>;
-	pir::push(%context<bytecode>, @op);
+    pir::push(%context<bytecode>, @op);
 }
 
 # Some PIR sugar produces nested Nodes.
@@ -337,7 +337,7 @@ multi method to_pbc(POST::Call $call, %context) {
 
         if $call.invocant {
             if $call.name.isa(POST::Constant) {
-				pir::push($bc, [
+                pir::push($bc, [
                     $is_tailcall
                         ?? 'tailcallmethod_p_sc'
                         !! 'callmethodcc_p_sc',
@@ -370,7 +370,7 @@ multi method to_pbc(POST::Call $call, %context) {
                     }
 
                     $SUB := %context<sub>.symbol("!SUB");
-					pir::push($bc, [
+                    pir::push($bc, [
                         'set_p_pc',
                         self.to_op($SUB, %context),
                         $idx,
@@ -383,7 +383,7 @@ multi method to_pbc(POST::Call $call, %context) {
             unless $processed {
                 if $call.name.isa(POST::Constant) {
                     $SUB := %context<sub>.symbol("!SUB");
-					pir::push($bc, [
+                    pir::push($bc, [
                         'find_sub_not_null_p_sc',
                         self.to_op($SUB, %context),
                         self.to_op($call<name>, %context),
@@ -398,7 +398,7 @@ multi method to_pbc(POST::Call $call, %context) {
             my $o := $is_tailcall ?? "tailcall_p" !! "invokecc_p";
 
             self.debug($o) if %context<DEBUG>;
-			pir::push($bc, [ $o, self.to_op($SUB, %context) ]);
+            pir::push($bc, [ $o, self.to_op($SUB, %context) ]);
         }
 
         unless $is_tailcall {
@@ -407,7 +407,7 @@ multi method to_pbc(POST::Call $call, %context) {
     }
     elsif $calltype eq 'return' {
         self.build_pcc_call("set_returns_pc", $call<params>, %context);
-		pir::push($bc, ['returncc']);
+        pir::push($bc, ['returncc']);
     }
     elsif $calltype eq 'results' {
         # This is generated in eceptions handling
@@ -551,7 +551,7 @@ method build_pcc_call($opname, @args, %context) {
         @op.push(self.to_op($arg, %context));
     }
 
-	pir::push($bc, @op);
+    pir::push($bc, @op);
 }
 
 method build_args_signature(@args, %context) {
