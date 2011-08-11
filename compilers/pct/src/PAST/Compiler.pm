@@ -445,7 +445,7 @@ method post_children($node, *%options) {
     my $signature := %options<signature> || '**';
     my $sigmax := pir::length($signature) - 1;
 
-    ##  if the signature contains a ':', then we're doing 
+    ##  if the signature contains a ':', then we're doing
     ##  flagged arguments (:flat, :named) '
     my @posargs;
     my @namedargs;
@@ -493,7 +493,8 @@ method post_children($node, *%options) {
                 $ops."$pushop"($cpost);
                 @posargs.push($cpost);
             }
-        } else {
+        }
+        else {
             # rtype is 'Q', so construct a keyed pmc argument
             # first, get the base PMC
             my $cpast := pir::shift($iter);

@@ -72,7 +72,7 @@ Check for certain PIR flags, and attach it to the file
 multi method as_post(PAST::Block $node, *%options) {
     my $post := self.super('as_post', $node, |%options);
     my $flags := $node.pirflags;
-    $post.main(1) if pir::index($flags, ':main') >= 0; 
+    $post.main(1) if pir::index($flags, ':main') >= 0;
     $post.init(1) if pir::index($flags, ':init') >= 0;
     $post.load(1) if pir::index($flags, ':load') >= 0;
     $!file.push($post);
