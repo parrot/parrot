@@ -21,7 +21,7 @@ Tests compiling some basic POST structures to PBC
     load_bytecode 'PCT.pbc'
     load_bytecode 'dumper.pbc'
 
-    # plan(?) TODO: Add numer of tests
+    plan(6)
 
     basic_tests()
     test_return()
