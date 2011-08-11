@@ -57,21 +57,12 @@ callgrind-compatible tools (e.g. F<kcachegrind>) can understand.
 
 =head3 Interpreting Post-processed Output
 
-=over 4
-
-=item *
-
-Use F<callgrind_annotate> (include some known-good and useful invocations, plus examples)
-
-=item *
-
-Use F<kcachegrind> (results are likely to be buggy)
-
-=item *
-
-Don't use F<wincachegrind> (lovely tool, uses xdebug-flavored version of callgrind's format)
-
-=back
+{{{
+note to self about what to cover:
+  Use callgrind_annotate (include some known-good and useful invocations, plus examples)
+  Use kcachegrind (results are likely to be buggy)
+  Don't use wincachegrind (lovely tool, uses xdebug-flavored version of callgrind's format)
+}}}
 
 =head2 Bugs and Surprises
 
