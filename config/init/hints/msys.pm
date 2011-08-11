@@ -9,38 +9,48 @@ sub _real_path {
     my ( $path ) = @_;
     $path = `cd '$path' && pwd -W`;
     chomp $path;
-    $path =~ s/ /\\ /g;
     return $path;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my @keys = qw(bindir build_dir tempdir);
+    # Translate absolute paths accessed by Parrot tools
+    # from UNIX-style to Windows-style
+    my @keys = qw{bindir build_dir tempdir};
     my %dirs;
     @dirs{@keys} = map { _real_path $conf->data->get($_) } @keys;
-
     $conf->data->set(%dirs);
 
-    my $winver = '0x0502';
+    # Assume Windows 2000 or above
+    $conf->data->set(ccflags => "-DWIN32 -DWINVER=0x0500 ");
 
+    # Create Parrot as shared library
     $conf->data->set(
+        parrot_is_shared    => 1,
+        has_dynamic_linking => 1,
         ld_share_flags      => '-shared',
         ld_load_flags       => '-shared',
-        has_dynamic_linking => 1,
-        parrot_is_shared    => 1,
         sym_export          => '__declspec(dllexport)',
-        sym_import          => '__declspec(dllimport)',
-        blib_dir            => '.',
-        libparrot_ldflags   => '-L' . $dirs{build_dir} . ' -lparrot',
-        inst_libparrot_ldflags => '-L' . $dirs{bindir} . ' -lparrot',
-        libparrot_linkflags   => '-L' . $dirs{build_dir} . ' -lparrot',
-        inst_libparrot_linkflags => '-L' . $dirs{bindir} . ' -lparrot',
-        ccflags             => "-DWIN32 -DWINVER=$winver ",
-        libs =>
-'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion ',
-        ncilib_link_extra   => 'src/libnci_test.def',
+        sym_import          => '__declspec(dllimport)'
     );
+
+    # Create libparrot.dll in same directory as parrot.exe
+    # Generates unnecessary clutter in build directory
+    $conf->data->set(blib_dir => '.');
+
+    # Setup dynamic linking
+    $conf->data->set(
+        libparrot_ldflags        => '-L' . $dirs{build_dir} . ' -lparrot',
+        libparrot_linkflags      => '-L' . $dirs{build_dir} . ' -lparrot',
+        inst_libparrot_ldflags   => '-L' . $dirs{bindir} . ' -lparrot',
+        inst_libparrot_linkflags => '-L' . $dirs{bindir} . ' -lparrot',
+        libs =>
+'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion '
+    );
+
+    # NCI testing
+    $conf->data->set(ncilib_link_extra => 'src/libnci_test.def');
 }
 
 1;

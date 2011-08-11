@@ -50,6 +50,7 @@ as (likely invalid) unicode escape codes.
 sub create_tempfile {
         my ($filehandle, $filename) = &tempfile;
 
+        # expand msys virtual paths
         if($^O eq 'msys') {
             my $tmpdir = `cd /tmp && pwd -W`;
             chomp $tmpdir;
