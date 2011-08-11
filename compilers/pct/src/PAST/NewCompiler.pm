@@ -26,7 +26,11 @@ Compile the abstract syntax tree given by C<past> into POST.
 
 method to_post($past, *%options) {
     $!file := POST::File.new unless $!file;
-    $!file.push(self.super('to_post', $past, |%options));
+    my $anon := self.super('to_post', $past, |%options);
+    unless $anon ~~ POST::Ops && pir::elements($anon) == 0 {
+        # Don't push the no-op returned by as_post(PAST::Block)
+        $!file.push(POST::Sub.new($anon, :name<anon>));
+    }
     $!file;
 }
 
