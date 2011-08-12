@@ -817,7 +817,9 @@ runops_hbdb_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
         /* Store current opcode */
         interp->hbdb->current_opcode = pc - interp->hbdb->debugee->code->base.data;
 
-        Parrot_io_printf(interp->hbdb->debugger, "PC %ld\n", interp->hbdb->current_opcode);
+        /* STUB */
+        /*Parrot_io_printf(interp->hbdb->debugger, "PC %ld\n", interp->hbdb->current_opcode);*/
+        /* STUB */
 
         /* Check whether a command has indicated that execution should pause or continue */
         if (HBDB_FLAG_TEST(interp, HBDB_STOPPED)) {
