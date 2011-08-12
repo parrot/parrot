@@ -1,0 +1,74 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 OVERVIEW
+
+Dynamic PMC's are special in that they are loaded at runtime. This is useful
+for when you'd like to create your own custom PMC instead of using one of the
+core PMC's.
+
+A PMC called C<Foo> is defined in F<src/dynpmc/foo.pmc> which is provided as an
+example case.
+
+=head1 CREATING A DYNAMIC PMC
+
+=over 4
+
+=item 1
+
+First, you must create a C<.pmc> file to place the PMC's definition in. The
+F<tools/dev/gen_class.pl> script is provided for creating a template PMC file.
+
+There are some differences you have to be aware of when creating dynamic PMC's.
+
+When declaring a dynamic PMC, you must use the C<dynpmc> modifier. For example:
+
+	pmclass TclString extends TclObject dynpmc ... { ... }
+
+Note that regular (non-dynamic) PMC's have a type id C<enum_class_PMCNAME> but
+dynamic PMC's do not. Instead, a dynamically-chosen value is assigned at runtime
+so that when you refer to the type of the class, you must dynamically
+determine the PMC type. For example, the C<scalar> builtin has the luxury of
+knowing at compile time what the class number of its child, C<String>, is by
+using:
+
+	if (type == enum_class_String) { ... }
+
+However, a dynamic PMC such as C<TclInt> instead must perform a runtime lookup
+of its corresponding C<TclString> PMC using the more complicated:
+
+    static INTVAL dynpmc_TclString;
+
+    pmclass TclInt extends TclObject extends Integer dynpmc group tcl_group {
+        void class_init() {
+            if (pass)
+                dynpmc_TclString = Parrot_PMC_typenum(interp,"TclString");
+        }
+    }
+
+If you have a group of related PMC's that are interdependent, use the
+C<group> modifier to build a group library. Then you must specify the group name
+when loading the library with the C<loadlib> opcode. For example:
+
+        pmclass Match extends Hash dynpmc group match_group { ... }
+
+To load this group library, use:
+
+        loadlib $P0, "match_group"
+
+=item 2
+
+To build your dynamic PMC's, create a build target in C<src/dynpmc/Defines.in>.
+This file is included in the main Makefile, so running C<make> will build your
+dymamic PMC's:
+
+    perl Configure.pl
+    make
+
+=item 3
+
+To verify that any recent changes or deprecations don't adversely affect your
+PMC's, run:
+
+    make dynpmc-clean
+
+=back
