@@ -219,6 +219,32 @@ OUTPUT
     $hbdb->cmd_output_is($cmd, $output, 'HBDB: Backtrace command; no args');
 }
 
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'run';
+
+    my $output = <<OUTPUT;
+
+
+Starting at line 4
+About to call foo()
+This is foo() at line 12
+About to call bar()
+This is bar() at line 18
+About to call baz()
+This is baz() at line 24
+About to return to main()
+Back in main() at line 7
+About to quit
+
+Program exited normally.
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: Run command; no args');
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
