@@ -1,0 +1,79 @@
+== NAME ==
+
+src - source files used for Parrot internals
+
+== DESCRIPTION ==
+
+The 'src' directory contains the source files that make up the virtual machine
+and its various subsystems. It mostly contains C code, PMC definitions, and
+opcode definitions.
+
+== SUBDIRECTORIES ==
+
+* atomic
+
+Implementations of atomic operations on x86 and SPARC platforms.
+
+* call
+
+The Parrot Calling Conventions (PCC) for handling arguments and return values
+for subroutines.
+
+* dynoplibs
+
+Source files for creating dynamic opcode libraries that are loaded at runtime.
+
+* dynpmc
+
+Source files for creating dynamic PMC's that are loaded at runtime.
+
+* embed
+
+The Parrot embedding API. This is used for embedding a Parrot interpreter
+in third-party applications.
+
+* gc
+
+Source files that make up Parrot's garbage collection system and its public API.
+
+* interp
+
+Source files related to the interpreter such as callback handling, creation and
+destruction, compiler registration, etc.
+
+* io
+
+Parrot's IO subsystem and its public API.
+
+* nci
+
+The Native Call Interface for calling C code from PIR.
+
+* ops
+
+Core opcode definitions.
+
+* packfile
+
+Source files for processing packfiles: a PMC representation of Parrot bytecode.
+
+* platform
+
+Platform-dependent source files.
+
+* pmc
+
+Polymorphic Container (PMC) definitions.
+
+* runcore
+
+Source files that make up the runcore API.
+
+* string
+
+Parrot string subsystem.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
