@@ -245,6 +245,21 @@ OUTPUT
     $hbdb->cmd_output_is($cmd, $output, 'HBDB: Run command; no args');
 }
 
+{
+    my $hbdb = Parrot::Test::HBDB->new();
+    my $cmd  = 'step';
+
+    my $output = <<OUTPUT;
+
+
+Starting at line 4
+OUTPUT
+
+    $hbdb->start($pir, '');
+
+    $hbdb->cmd_output_is($cmd, $output, 'HBDB: Step command; no args');
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
