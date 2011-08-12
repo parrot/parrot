@@ -1,0 +1,38 @@
+== NAME ==
+
+runtime - runtime library for Parrot
+
+== DESCRIPTION ==
+
+The 'runtime' directory contains the runtime libraries and dynamic extensions
+used by HLL's.
+
+== SUBDIRECTORIES ==
+
+* parrot/bin
+
+Contains the Prove library: a PIR-based TAP harness.
+
+* parrot/dynext
+
+Contains the source files for dynamic extensions.
+
+* parrot/include
+
+Generated files containing constants and macros for use in PIR code. This
+directory is searched by default by the `.include` directive.
+
+* parrot/language
+
+Source files for Parrot::Compiler - a subclass of PCT::HLLCompiler - that's used
+for HLL interopability.
+
+* parrot/library
+
+Contains the files that serve as the Parrot runtime library. This directory is
+searched by default by the `.loadlib` directive.
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
