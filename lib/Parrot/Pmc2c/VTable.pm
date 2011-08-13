@@ -53,7 +53,7 @@ sub dump {
     my $dump_filename =
           cwd() . q{/}
         . basename( Parrot::Pmc2c::UtilFunctions::filename( $self->filename, '.dump' ) );
-    Storable::store( $self, $dump_filename );
+    Storable::nstore( $self, $dump_filename );
     return $dump_filename;
 }
 

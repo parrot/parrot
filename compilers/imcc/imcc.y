@@ -1443,10 +1443,10 @@ multi_type:
    | STRINGC
          {
            SymReg *r;
-           if (strcmp($1, "_") != 0)
-               r = mk_const(imcc, $1, 'S');
-           else {
+           if (strcmp($1, "\"_\"") == 0 || strcmp($1, "'_'") == 0)
                r = mk_const(imcc, "PMC", 'S');
+           else {
+               r = mk_const(imcc, $1, 'S');
            }
            mem_sys_free($1);
            $$ = r;
