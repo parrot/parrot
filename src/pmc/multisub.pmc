@@ -34,9 +34,20 @@ static void check_is_valid_sub(PARROT_INTERP, ARGIN(PMC * sub))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<static void check_is_valid_sub(PARROT_INTERP, PMC * sub)>
+
+TK
+
+=cut
+
+*/
+
 static void
 check_is_valid_sub(PARROT_INTERP, ARGIN(PMC * sub))
 {
+    ASSERT_ARGS(check_is_valid_sub)
     STRING * const invokable_str = CONST_STRING(interp, "invokable");
     if (!VTABLE_does(interp, sub, invokable_str))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -50,7 +61,7 @@ pmclass MultiSub
     provides invokable {
 
     VTABLE STRING * get_string() {
-        // TODO: No bounds-checking. This is not safe.
+        /* TODO: No bounds-checking. This is not safe. */
         PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
         STRING * const name = VTABLE_get_string(INTERP, sub0);
         return name;
