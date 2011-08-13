@@ -1071,9 +1071,10 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %type <i> pcc_sub_call
 %type <sr> sub_param pcc_arg pcc_result pcc_args pcc_results sub_param_type_def
 %type <sr> pcc_returns pcc_yields pcc_return pcc_call arg arglist the_sub multi_type
+%type <sr> subtags
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> proto sub_proto sub_proto_list multi subtag multi_types subtags outer
+%type <t> proto sub_proto sub_proto_list multi subtag multi_types outer
 %type <t> vtable instanceof subid
 %type <t> method ns_entry_name
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
@@ -1457,6 +1458,7 @@ multi_type:
 
 subtag:
     SUBTAG '(' subtags ')' { $$ = 0; }
+    ;
 
 subtags:
    subtags COMMA STRINGC
