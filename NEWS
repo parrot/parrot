@@ -1,6 +1,7 @@
 New in 3.7.0
 - Core
   + Added mem_sys_strndup function.
+  + Added new load_bytecode_p_s opcode as an eventual replacement for load_bytecode_s
 - Languages
 - Documentation
     + The Archive::Tar and Archive::Zip libraries now have POD docs
