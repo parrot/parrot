@@ -71,8 +71,12 @@ sub runstep {
         '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
         ' ' . $conf->data->get('libs') );
 
-    # escape spaces in current directory
     my $cwd = cwd();
+
+    # expand msys virtual paths
+    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd if $^O eq 'msys';
+
+    # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;
 
     # Build directory can have non ascii characters
