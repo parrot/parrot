@@ -1,3 +1,5 @@
+.include "iglobals.pasm"
+
 .const int NO_FILE = 0
 .const int PASM_FILE = 1
 .const int PIR_FILE = 2
@@ -11,9 +13,11 @@
     push_eh __top_level_handler
 
     # Dig through the system arguments, setting up the interp
-    .local pmc sys_args_iter, packfile_pmc, pir_compiler
+    .local pmc sys_args_iter, packfile_pmc, pir_compiler, interp
     .local string exe_name, prog_name, sys_arg, output_file
     .local int input_file_type
+
+    interp = getinterp
 
     pir_compiler = compreg "PIR"
     prog_name = prog_args[0]
@@ -23,10 +27,13 @@
     unless input_file_type == 0 goto __have_valid_input_file
     $S0 = "Invalid file type "
     $S0 .= prog_name
-    die $S0
+    '__usage_and_exit'($S0)
 
   __have_valid_input_file:
     exe_name = shift sys_args
+    $P0 = box exe_name
+    interp[.IGLOBALS_EXECUTABLE] = $P0
+
     sys_args_iter = iter sys_args
   __sys_args_parse_top:
     unless sys_args_iter goto __sys_args_parse_end
@@ -38,17 +45,13 @@
     if sys_arg == "-r" goto __setup_compile_run_from_file
     if sys_arg == "-c" goto __force_pbc_file
     if sys_arg == "-E" goto __preprocess_only
-    die "Unknown argument"
+    '__usage_and_exit'()
 
   __show_version:
-    '__show_version'()
-    pop_eh
-    exit 1
+    '__show_version_and_exit'()
 
   __show_help:
-    '__show_help'()
-    pop_eh
-    exit 1
+    '__show_help_and_exit'()
 
   __setup_output_file:
     output_file = shift sys_args_iter
@@ -73,7 +76,12 @@
 
   __sys_args_parse_end:
     unless null packfile_pmc goto __have_packfile_pmc
+    if null prog_name goto __no_input_file
     packfile_pmc = '__default_get_packfile'(prog_name, input_file_type, pir_compiler)
+    goto __have_packfile_pmc
+
+  __no_input_file:
+    '__usage_and_exit'("Missing program name")
 
   __have_packfile_pmc:
     if null output_file goto __run_packfile
@@ -200,8 +208,7 @@
     exit exit_code
 .end
 
-.include "iglobals.pasm"
-.sub '__show_version'
+.sub '__show_version_and_exit'
     .local pmc interp, config
     .local string version_str, devel_str, cpuarch_str, platform_str
     interp = getinterp
@@ -225,9 +232,12 @@ END_OF_VERSION
     $P0[3] = platform_str
     $S1 = sprintf $S0, $P0
     say $S1
+
+    pop_eh
+    exit 0
 .end
 
-.sub '__show_help'
+.sub '__show_help_and_exit'
     $S0 = <<'END_OF_HELP'
 parrot [Options] <file> [<program options...>]
   Options:
@@ -271,9 +281,28 @@ parrot [Options] <file> [<program options...>]
 see docs/running.pod for more
 END_OF_HELP
     say $S0
+
+    pop_eh
+    exit 0
 .end
 
 .sub '__get_temporary_output_file'
     .param string infile
     # TODO
+.end
+
+.sub '__usage_and_exit'
+    .param string msg :optional
+    .param int has_msg :opt_flag
+    $P0 = getinterp
+    $P1 = $P0.'stderr_handle'()
+    unless has_msg goto __print_usage
+    $P1.'print'(msg)
+    $P1.'print'("\n")
+  __print_usage:
+    $P1.'print'("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ")
+    $P1.'print'("[-O [level]] [-R runcore] [-o FILE] <file>\n")
+
+    pop_eh
+    exit 1
 .end

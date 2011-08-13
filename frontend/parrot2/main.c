@@ -148,8 +148,7 @@ main(int argc, const char *argv[])
             fprintf(stderr, "PARROT VM: No interpreter. Cannot get error details\n");
         exit(EXIT_FAILURE);
     }
-    if (!(Parrot_set_config_hash(interp) &&
-          Parrot_api_set_executable_name(interp, argv[0]))) {
+    if (!Parrot_set_config_hash(interp)) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
         show_last_error_and_exit(interp);
     }
@@ -678,13 +677,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
-        usage(stderr);
-        exit(EXIT_FAILURE);
-    }
-
-    /* reached the end of the option list and consumed all of argv */
-    if (argc == opt.opt_index) {
-        fprintf(stderr, "Missing program name\n");
         usage(stderr);
         exit(EXIT_FAILURE);
     }

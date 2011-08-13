@@ -435,6 +435,17 @@ Returns the PMC global value for C<key>.
         return PMCNULL;
     }
 
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC * value) {
+        Interp * const new_interp = PMC_interp(SELF);
+        if (key >= 0 && key < IGLOBALS_SIZE) {
+            VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals, key,
+                    value);
+            return;
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "Cannot set interp global %d (max: %d)", key, IGLOBALS_SIZE);
+    }
+
 /*
 
 =item C<PMC *get_pmc_keyed(PMC *key)>
