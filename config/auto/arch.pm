@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -84,7 +84,9 @@ sub runstep {
         # the OS. Might be incorrect in case of mingw32 on 64bit hardware.
         $cpuarch = lc (
             $ENV{PROCESSOR_ARCHITEW6432} ||
-            $ENV{PROCESSOR_ARCHITECTURE} );
+            $ENV{PROCESSOR_ARCHITECTURE} ||
+            'x86'
+        );
         $osname = 'msys';
     }
     elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {

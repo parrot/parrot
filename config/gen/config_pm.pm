@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -74,7 +74,8 @@ sub runstep {
     my $cwd = cwd();
 
     # expand msys virtual paths
-    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd if $^O eq 'msys';
+    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd
+        if $conf->data->get('osname') eq 'msys';
 
     # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;

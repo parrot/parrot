@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 package init::hints::msys;
 
