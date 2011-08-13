@@ -168,6 +168,11 @@ typedef struct PackFile_Segment {
 
 typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void *user_data));
 
+typedef struct PackFile_ConstTagPair {
+    opcode_t tag_idx;
+    opcode_t const_idx;
+} PackFile_ConstTagPair;
+
 typedef struct PackFile_ConstTable {
     PackFile_Segment           base;
     struct {
@@ -182,9 +187,11 @@ typedef struct PackFile_ConstTable {
         opcode_t        const_count;
         PMC           **constants;
     } pmc;
-    PackFile_ByteCode  *code;        /* where this segment belongs to */
-    Hash               *string_hash; /* Hash for lookup of string indices */
-    Hash               *pmc_hash;    /* Hash for lookup of pmc indices */
+    PackFile_ByteCode     *code;        /* where this segment belongs to */
+    Hash                  *string_hash; /* Hash for lookup of string indices */
+    Hash                  *pmc_hash;    /* Hash for lookup of pmc indices */
+    PackFile_ConstTagPair *tag_map;     /* n-m Mapping pmc constants to string tags */
+    opcode_t               ntags;       /* Number of tags */
 } PackFile_ConstTable;
 
 typedef struct PackFile_ByteCode_OpMappingEntry {
@@ -711,7 +718,7 @@ void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pf_subs_by_flag(PARROT_INTERP,
+PMC * Parrot_pf_subs_by_tag(PARROT_INTERP,
     ARGIN(PMC * pfpmc),
     ARGIN(STRING * flag))
         __attribute__nonnull__(1)
@@ -864,7 +871,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pbc))
-#define ASSERT_ARGS_Parrot_pf_subs_by_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_pf_subs_by_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pfpmc) \
     , PARROT_ASSERT_ARG(flag))

@@ -1054,7 +1054,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
-%token <t> MULTI VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
+%token <t> MULTI SUBTAG VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
 %token <s> LABEL
 %token <t> EMIT EOM
@@ -1073,7 +1073,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %type <sr> pcc_returns pcc_yields pcc_return pcc_call arg arglist the_sub multi_type
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
-%type <t> proto sub_proto sub_proto_list multi multi_types outer
+%type <t> proto sub_proto sub_proto_list multi subtag multi_types subtags outer
 %type <t> vtable instanceof subid
 %type <t> method ns_entry_name
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
@@ -1407,6 +1407,75 @@ multi:
      MULTI '(' multi_types ')' { $$ = 0; }
    ;
 
+multi_types:
+     /* empty */
+         {
+           add_pcc_multi(imcc, imcc->cur_call, NULL);
+         }
+   | multi_types COMMA multi_type
+         {
+           $$ = 0;
+           add_pcc_multi(imcc, imcc->cur_call, $3);
+         }
+   | multi_type
+         {
+           $$ = 0;
+           add_pcc_multi(imcc, imcc->cur_call, $1);
+         }
+   ;
+
+multi_type:
+     INTV        { $$ = mk_const(imcc, "INTVAL",   'S'); }
+   | FLOATV      { $$ = mk_const(imcc, "FLOATVAL", 'S'); }
+   | PMCV        { $$ = mk_const(imcc, "PMC",      'S'); }
+   | STRINGV     { $$ = mk_const(imcc, "STRING",   'S'); }
+   | IDENTIFIER
+         {
+           SymReg *r;
+           if (strcmp($1, "_") != 0)
+               r = mk_const(imcc, $1, 'S');
+           else {
+               r = mk_const(imcc, "PMC", 'S');
+           }
+           mem_sys_free($1);
+           $$ = r;
+         }
+   | STRINGC
+         {
+           SymReg *r;
+           if (strcmp($1, "\"_\"") == 0 || strcmp($1, "'_'") == 0)
+               r = mk_const(imcc, "PMC", 'S');
+           else {
+               r = mk_const(imcc, $1, 'S');
+           }
+           mem_sys_free($1);
+           $$ = r;
+         }
+   | '[' keylist ']'           { $$ = $2; }
+   ;
+
+
+subtag:
+    SUBTAG '(' subtags ')' { $$ = 0; }
+
+subtags:
+   subtags COMMA STRINGC
+         {
+           SymReg * const r = mk_const(imcc, $3, 'S');
+           add_pcc_flag_str(imcc, imcc->cur_call, r);
+           mem_sys_free($3);
+           $$ = r;
+         }
+   | STRINGC
+         {
+           SymReg * const r = mk_const(imcc, $1, 'S');
+           add_pcc_flag_str(imcc, imcc->cur_call, r);
+           mem_sys_free($1);
+           $$ = r;
+         }
+   ;
+
+
 outer:
      OUTER '(' STRINGC ')'
          {
@@ -1491,53 +1560,6 @@ subid:
          }
    ;
 
-multi_types:
-     /* empty */
-         {
-           add_pcc_multi(imcc, imcc->cur_call, NULL);
-         }
-   | multi_types COMMA multi_type
-         {
-           $$ = 0;
-           add_pcc_multi(imcc, imcc->cur_call, $3);
-         }
-   | multi_type
-         {
-           $$ = 0;
-           add_pcc_multi(imcc, imcc->cur_call, $1);
-         }
-   ;
-
-multi_type:
-     INTV        { $$ = mk_const(imcc, "INTVAL",   'S'); }
-   | FLOATV      { $$ = mk_const(imcc, "FLOATVAL", 'S'); }
-   | PMCV        { $$ = mk_const(imcc, "PMC",      'S'); }
-   | STRINGV     { $$ = mk_const(imcc, "STRING",   'S'); }
-   | IDENTIFIER
-         {
-           SymReg *r;
-           if (strcmp($1, "_") != 0)
-               r = mk_const(imcc, $1, 'S');
-           else {
-               r = mk_const(imcc, "PMC", 'S');
-           }
-           mem_sys_free($1);
-           $$ = r;
-         }
-   | STRINGC
-         {
-           SymReg *r;
-           if (strcmp($1, "\"_\"") == 0 || strcmp($1, "'_'") == 0)
-               r = mk_const(imcc, "PMC", 'S');
-           else {
-               r = mk_const(imcc, $1, 'S');
-           }
-           mem_sys_free($1);
-           $$ = r;
-         }
-   | '[' keylist ']'           { $$ = $2; }
-   ;
-
 sub_body:
      /* empty */
    |  statements
@@ -1590,14 +1612,29 @@ sub_proto_list:
    ;
 
 proto:
-     LOAD      { $$ = P_LOAD; }
-   | INIT      { $$ = P_INIT; }
+     LOAD   {
+                $$ = P_LOAD;
+                /*
+                SymReg * const r = mk_const(imcc, "load", 'S');
+                add_pcc_flag_str(imcc, imcc->cur_call, r);
+                $$ = r;
+                */
+            }
+   | INIT   {
+                $$ = P_INIT;
+                /*
+                SymReg * const r = mk_const(imcc, "load", 'S');
+                add_pcc_flag_str(imcc, imcc->cur_call, r);
+                $$ = r;
+                */
+            }
    | MAIN      { $$ = P_MAIN; }
    | IMMEDIATE { $$ = P_IMMEDIATE; }
    | POSTCOMP  { $$ = P_POSTCOMP; }
    | ANON      { $$ = P_ANON; }
    | NEED_LEX  { $$ = P_NEED_LEX; }
    | multi
+   | subtag
    | outer
    | vtable
    | method

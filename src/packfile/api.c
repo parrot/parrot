@@ -358,13 +358,55 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+
+void
+Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct), const int tag_idx,
+                        const int const_idx) {
+    int lo, hi, cur;
+    const STRING *tag = ct->str.constants[tag_idx];
+
+    /* allocate space */
+    if (ct->tag_map == NULL) {
+        ct->tag_map = mem_gc_allocate_n_zeroed_typed(interp, 1, PackFile_ConstTagPair);
+        ct->ntags   = 1;
+    }
+    else {
+        ct->tag_map = mem_gc_realloc_n_typed_zeroed(interp, ct->tag_map, ct->ntags + 1, ct->ntags,
+                                                    PackFile_ConstTagPair);
+        ct->ntags++;
+    }
+
+    /* find the slot to insert into */
+    lo  = 0;
+    cur = 0;
+    hi  = ct->ntags - 1;
+    while (lo < hi) {
+        cur = (lo + hi)/2;
+
+        switch (STRING_compare(interp, tag, ct->str.constants[ct->tag_map[cur].tag_idx])) {
+          case -1:
+            lo = ++cur;
+            break;
+          case 0:
+            lo = hi = cur;
+            break;
+          case 1:
+            hi = cur;
+            break;
+        }
+    }
+
+    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+                    ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
+    ct->tag_map[cur].tag_idx   = tag_idx;
+    ct->tag_map[cur].const_idx = const_idx;
+}
+
 /*
 
-=item C<PMC * Parrot_pf_subs_by_flag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
+=item C<PMC * Parrot_pf_subs_by_tag(PARROT_INTERP, PMC * pfpmc, STRING * flag)>
 
 Get an array of Subs in the packfile by named flag.
-
-Currently accepted values are "load" and "init".
 
 =cut
 
@@ -373,11 +415,12 @@ Currently accepted values are "load" and "init".
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 {
-    ASSERT_ARGS(Parrot_pf_subs_by_flag)
+    ASSERT_ARGS(Parrot_pf_subs_by_tag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     int mode = 0;
+    PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
@@ -386,12 +429,66 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         mode = 1;
     else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
         mode = 2;
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "%S is not a valid packfile trigger", flag);
-
     {
-        PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        opcode_t flag_idx = -1;
+
+        int bottom_lo, bottom_hi, top_lo, top_hi, cur;
+        int i;
+
+        bottom_lo = top_lo = cur = 0;
+        bottom_hi = top_hi = ct->ntags;
+
+        /* find the first match (if any) */
+        while (flag_idx < 0) {
+            if (bottom_lo == top_hi) {
+                /* tag not present */
+                goto done_find_bounds;
+            }
+
+            cur = (bottom_lo + top_hi)/2;
+
+            switch (STRING_compare(interp, flag, ct->str.constants[ct->tag_map[cur].tag_idx])) {
+              case -1:
+                bottom_lo = cur + 1;
+                break;
+              case 0:
+                flag_idx  = ct->tag_map[cur].tag_idx;
+                bottom_hi = cur;
+                top_lo    = cur + 1;
+                break;
+              case 1:
+                top_hi = cur;
+                break;
+            }
+        }
+
+        /* find the bottom of the map's range with this tag */
+        while (bottom_lo < bottom_hi) {
+            cur = (bottom_lo + bottom_hi)/2;
+            if (ct->tag_map[cur].tag_idx == flag_idx)
+                bottom_hi = cur;
+            else
+                bottom_lo = cur + 1;
+        }
+
+        /* find the top */
+        while (top_lo < top_hi) {
+            cur = (top_lo + top_hi)/2;
+            if (ct->tag_map[cur].tag_idx == flag_idx)
+                top_lo = cur + 1;
+            else
+                top_hi = cur;
+        }
+
+      done_find_bounds:
+        for (i = bottom_lo; i < top_hi; i++)
+            VTABLE_push_pmc(interp, subs, ct->pmc.constants[ct->tag_map[i].const_idx]);
+    }
+
+    /* Backwards compatibility. :load is equivalent to "load" tag. :init is
+       equivalent to "init" tag */
+    if (mode == 1 || mode == 2) {
         PackFile_ByteCode   * const self = pf->cur_cs;
         PackFile_ConstTable * const ct = self->const_table;
         STRING * const SUB = CONST_STRING(interp, "Sub");
@@ -412,8 +509,8 @@ Parrot_pf_subs_by_flag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
             else if (mode == 2 && Sub_comp_INIT_TEST(sub))
                 VTABLE_push_pmc(interp, subs, sub_pmc);
         }
-        return subs;
     }
+    return subs;
 }
 
 /*
