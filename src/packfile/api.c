@@ -358,6 +358,16 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     return pf;
 }
 
+/*
+
+=item C<void Parrot_pf_tag_constant(PARROT_INTERP, PackFile_ConstTable *ct,
+const int tag_idx, const int const_idx)>
+
+Tag a constant PMC with a constant STRING
+
+=cut
+
+*/
 
 void
 Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
