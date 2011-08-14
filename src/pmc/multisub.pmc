@@ -62,8 +62,8 @@ pmclass MultiSub
 
     VTABLE STRING * get_string() {
         PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
-        if (PMC_IS_NULL(sub0))
-            return STRINGNULL;
+        /*if (PMC_IS_NULL(sub0))
+            return STRINGNULL;*/
         STRING * const name = VTABLE_get_string(INTERP, sub0);
         return name;
     }
