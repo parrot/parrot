@@ -301,7 +301,7 @@ END_OF_HELP
     $P1.'print'("\n")
   __print_usage:
     $P1.'print'("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ")
-    $P1.'print'("[-O [level]] [-R runcore] [-o FILE] <file>\n")
+    $P1.'print'("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n")
 
     pop_eh
     exit 1

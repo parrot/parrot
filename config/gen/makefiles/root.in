@@ -521,6 +521,7 @@ OPS_FILES = @ops@
 
 # Executables
 PARROT              = .@slash@@test_prog@$(EXE)
+PARROTOLD           = .@slash@parrot_old$(EXE)
 MINIPARROT          = .@slash@miniparrot$(EXE)
 DIS                 = .@slash@pbc_disassemble$(EXE)
 PDUMP               = .@slash@pbc_dump$(EXE)
@@ -640,6 +641,7 @@ corevm : \
 	$(GEN_PM_INCLUDES) \
 	PARROT_LIBS \
 	$(PARROT) \
+        $(PARROTOLD) \
 	runtime/parrot/include/parrotlib.pbc \
 	runtime/parrot/include/config.fpmc \
 #IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
@@ -864,13 +866,24 @@ frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
 frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir $(MINIPARROT)
 	$(MINIPARROT) frontend/parrot2/build.pir frontend/parrot2/prt0.pbc
 
-$(PARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c
+
+$(PARROTOLD) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
-	$(MINIPARROT) frontend/parrot2/prt0.pbc.c
+	$(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-	frontend/parrot2/main$(O) frontend/parrot2/prt0.pbc.c src/parrot_config$(O) src/longopt$(O) \
+	frontend/parrot/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
+$(PARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+	src/parrot_config$(O) src/longopt$(O) \
+	$(MINIPARROT) frontend/parrot2/prt0.pbc$(O) $(GEN_PASM_INCLUDES)
+	$(LINK) @ld_out@$@ \
+	frontend/parrot2/main$(O) frontend/parrot2/prt0.pbc$(O) src/parrot_config$(O) src/longopt$(O) \
+	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
