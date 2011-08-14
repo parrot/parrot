@@ -373,6 +373,7 @@ void
 Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         const int tag_idx, const int const_idx)
 {
+    ASSERT_ARGS(Parrot_pf_tag_constant)
     int lo, hi, cur;
     const STRING *tag = ct->str.constants[tag_idx];
 
