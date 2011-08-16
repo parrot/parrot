@@ -1100,6 +1100,10 @@ sub _ponder_pod {
       $pod_handler->($line, $line_num, $self);
   }
 
+  # The surrounding methods set content_seen, so let us remain consistent.
+  # I do not know why it was not here before -- should it not be here?
+  # $self->{'content_seen'} ||= 1;
+
   return;
 }
 
