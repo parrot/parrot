@@ -23,6 +23,23 @@ This is a subclass of L<Pod::Simple::Methody> and inherits all its
 methods. The implementation is entirely different than
 L<Pod::Simple::HTML>, but it largely preserves the same interface.
 
+=head2 Minimal code
+
+  use Pod::Simple::XHTML;
+  my $psx = Pod::Simple::XHTML->new;
+  $psx->output_string(\my $html);
+  $psx->parse_file('path/to/Module/Name.pm');
+  open my $out, '>', 'out.html' or die "Cannot open 'out.html': $!\n";
+  print $out $html;
+
+You can also control the character encoding and entities. For example, if
+you're sure that the POD is properly encoded (using the C<=encoding> command),
+you can prevent high-bit characters from being encoded as HTML entities and
+declare the output character set as UTF-8 before parsing, like so:
+
+  $psx->html_charset('UTF-8');
+  $psx->html_encode_chars('&<>">');
+
 =cut
 
 package Pod::Simple::XHTML;
