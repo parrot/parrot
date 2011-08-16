@@ -422,6 +422,19 @@ sub parse_file {
       last unless defined $lines[-1];
        # but pass thru the undef, which will set source_dead to true
     }
+
+    my $at_eof = ! $lines[-1]; # keep track of the undef
+    pop @lines if $at_eof; # silence warnings
+
+    # be eol agnostic
+    s/\r\n?/\n/g for @lines;
+ 
+    # make sure there are only one line elements for parse_lines
+    @lines = split(/(?<=\n)/, join('', @lines));
+
+    # push the undef back after popping it to set source_dead to true
+    push @lines, undef if $at_eof;
+
     $self->parse_lines(@lines);
   }
   delete($self->{'source_fh'}); # so it can be GC'd
