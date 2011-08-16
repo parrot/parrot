@@ -451,7 +451,7 @@ sub _get_titled_section {
   $self->unget_token(@to_unget);
   
   if(DEBUG) {
-    if(defined $title) { print "  Returing title <$title>\n" }
+    if(defined $title) { print "  Returning title <$title>\n" }
     else { print "Returning title <>\n" }
   }
   
