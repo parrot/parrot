@@ -70,7 +70,7 @@ __PACKAGE__->_accessorize(
     #  out of apparently longstanding habit)
 
  'html_css', # URL of CSS file to point to
- 'html_javascript', # URL of CSS file to point to
+ 'html_javascript', # URL of Javascript file to point to
 
  'force_title',   # should already be &-escaped
  'default_title', # should already be &-escaped
