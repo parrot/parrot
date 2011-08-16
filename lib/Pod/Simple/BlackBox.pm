@@ -1736,7 +1736,7 @@ sub _treelet_from_formatting_codes {
       pop @lineage;
       
     } elsif(defined $5) {
-      DEBUG > 3 and print "Found apparent simple end-text code \"$4\"\n";
+      DEBUG > 3 and print "Found apparent simple end-text code \"$5\"\n";
 
       if(@stack and ! $stack[-1]) {
         # We're indeed expecting a simple end-code
