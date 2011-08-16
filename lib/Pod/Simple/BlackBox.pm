@@ -88,8 +88,8 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       DEBUG > 2 and print "First line: [$source_line]\n";
 
       if( ($line = $source_line) =~ s/^\xEF\xBB\xBF//s ) {
-        DEBUG and print "UTF-8 BOM seen.  Faking a '=encode utf8'.\n";
-        $self->_handle_encoding_line( "=encode utf8" );
+        DEBUG and print "UTF-8 BOM seen.  Faking a '=encoding utf8'.\n";
+        $self->_handle_encoding_line( "=encoding utf8" );
         $line =~ tr/\n\r//d;
         
       } elsif( $line =~ s/^\xFE\xFF//s ) {
