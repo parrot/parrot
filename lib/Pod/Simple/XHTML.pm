@@ -117,6 +117,12 @@ default value is just a content type header tag:
 Add additional meta tags here, or blocks of inline CSS or JavaScript
 (wrapped in the appropriate tags).
 
+=head2 html_h_level
+
+This is the level of HTML "Hn" element to which a Pod "head1" corresponds.  For
+example, if C<html_h_level> is set to 2, a head1 will produce an H2, a head2
+will produce an H3, and so on.
+
 =head2 default_title
 
 Set a default title for the page if no title can be determined from the
