@@ -256,7 +256,7 @@ sub set_source {
     DEBUG and print "$self 's source is filename $_[0]\n";
     {
       local *PODSOURCE;
-      open(PODSOURCE, "<", "$_[0]") || Carp::croak "Can't open $_[0]: $!";
+      open(PODSOURCE, "<$_[0]") || Carp::croak "Can't open $_[0]: $!";
       $handle = *PODSOURCE{IO};
     }
     $self->{'source_filename'} = $_[0];

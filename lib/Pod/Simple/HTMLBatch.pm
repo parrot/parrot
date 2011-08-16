@@ -566,7 +566,7 @@ sub _wopen {
   require Symbol;
   my $out_fh = Symbol::gensym();
   DEBUG > 5 and print "Write-opening to $outpath\n";
-  return $out_fh if open($out_fh, ">", "$outpath");
+  return $out_fh if open($out_fh, "> $outpath");
   require Carp;  
   Carp::croak("Can't write-open $outpath: $!");
 }
