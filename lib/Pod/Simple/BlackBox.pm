@@ -24,6 +24,7 @@ use strict;
 use Carp ();
 use vars qw($VERSION );
 $VERSION = '3.19';
+#use constant DEBUG => 7;
 BEGIN {
   require Pod::Simple;
   *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG
