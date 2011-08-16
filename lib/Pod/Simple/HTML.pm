@@ -408,7 +408,7 @@ sub index_as_html {
     $indent = '  '  x $level;
     push @out, sprintf
       "%s<li class='indexItem indexItem%s'><a href='#%s'>%s</a>",
-      $indent, $level, $anchorname, esc($text)
+      $indent, $level, esc($anchorname), esc($text)
     ;
   }
   push @out, "</div>\n";
