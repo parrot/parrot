@@ -868,11 +868,22 @@ L<Pod::Simple>, L<Pod::Simple::HTMLBatch>
 TODO: a corpus of sample Pod input and HTML output?  Or common
 idioms?
 
+=head1 SUPPORT
 
+Questions or discussion about POD and Pod::Simple should be sent to the
+pod-people@perl.org mail list. Send an empty email to
+pod-people-subscribe@perl.org to subscribe.
+
+This module is managed in an open GitHub repository,
+L<http://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
+to clone L<git://github.com/theory/pod-simple.git> and send patches!
+
+Patches against Pod::Simple are welcome. Please send bug reports to
+<bug-pod-simple@rt.cpan.org>.
 
 =head1 COPYRIGHT AND DISCLAIMERS
 
-Copyright (c) 2002-2004 Sean M. Burke.  All rights reserved.
+Copyright (c) 2002-2004 Sean M. Burke.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -881,9 +892,29 @@ This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to L<Hurricane Electric|http://he.net/> for permission to use its
+L<Linux man pages online|http://man.he.net/> site for man page links.
+
+Thanks to L<search.cpan.org|http://search.cpan.org/> for permission to use the
+site for Perl module links.
+
 =head1 AUTHOR
 
-Sean M. Burke C<sburke@cpan.org>
+Pod::Simple was created by Sean M. Burke <sburke@cpan.org>.
+But don't bother him, he's retired.
+
+Pod::Simple is maintained by:
+
+=over
+
+=item * Allison Randal C<allison@perl.org>
+
+=item * Hans Dieter Pearcey C<hdp@cpan.org>
+
+=item * David E. Wheeler C<dwheeler@cpan.org>
+
+=back
 
 =cut
-
