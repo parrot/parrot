@@ -5,7 +5,7 @@ use strict;
 use Carp ();
 BEGIN           { *DEBUG = sub () {0} unless defined &DEBUG }
 use integer;
-use Pod::Escapes 1.03 ();
+use Pod::Escapes 1.04 ();
 use Pod::Simple::LinkSection ();
 use Pod::Simple::BlackBox ();
 #use utf8;
