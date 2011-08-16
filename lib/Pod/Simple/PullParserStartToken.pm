@@ -113,6 +113,10 @@ Pod::Simple::PullParserStartToken->new( I<tagname>, I<attrhash> )
 
 L<Pod::Simple::PullParserToken>, L<Pod::Simple>, L<Pod::Simple::Subclassing>
 
+=head1 SEE ALSO
+
+L<Pod::Simple::PullParserToken>, L<Pod::Simple>, L<Pod::Simple::Subclassing>
+
 =head1 SUPPORT
 
 Questions or discussion about POD and Pod::Simple should be sent to the

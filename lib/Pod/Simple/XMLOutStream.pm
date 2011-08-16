@@ -137,6 +137,10 @@ options in this module (and the dozen modules it depends on) are
 undocumented; but one of those undocumented bits might be just what
 you're looking for.
 
+=head1 SEE ALSO
+
+L<Pod::Simple>, L<Pod::Simple::Text>, L<Pod::Spell>
+
 =head1 SUPPORT
 
 Questions or discussion about POD and Pod::Simple should be sent to the

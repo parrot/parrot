@@ -396,7 +396,7 @@ __END__
 
 =head1 SEE ALSO
 
-L<Pod::Simple>, L<Pod::Simple::Methody>
+L<Pod::Simple>, L<Pod::Simple::Text>, L<Pod::Spell>
 
 =head1 SUPPORT
 
