@@ -13,8 +13,6 @@ $VERSION = '3.19';
 use Pod::Simple::HTML ();
 BEGIN {*esc = \&Pod::Simple::HTML::esc }
 use File::Spec ();
-use UNIVERSAL ();
-  # "Isn't the Universe an amazing place?  I wouldn't live anywhere else!"
 
 use Pod::Simple::Search;
 $SEARCH_CLASS ||= 'Pod::Simple::Search';

@@ -12,7 +12,6 @@ use vars qw(
 @ISA = ('Pod::Simple::PullParser');
 $VERSION = '3.19';
 
-use UNIVERSAL ();
 BEGIN {
   if(defined &DEBUG) { } # no-op
   elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }

@@ -1804,7 +1804,6 @@ sub stringify_lol {  # function: stringify_lol($lol)
 
 sub _stringify_lol {  # the real recursor
   my($lol, $to) = @_;
-  use UNIVERSAL ();
   for(my $i = 2; $i < @$lol; ++$i) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {
       _stringify_lol( $lol->[$i], $to);  # recurse!
