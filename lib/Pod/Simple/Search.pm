@@ -361,7 +361,7 @@ sub _recurse_dir {
     }
     pop @$modname_bits;
     return;
-  };
+  };;
 
   local $_;
   $recursor->($startdir, '');
