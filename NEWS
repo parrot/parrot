@@ -6,6 +6,12 @@ New in 3.7.0
   + Improved configuration support for msys
   + known-buggy parrot_debugger is no longer installed
 - Languages
+  + Winxed
+    - Updated snapshot to version 1.1.0
+    - multi functions and methods
+    - cast to var
+    - load_packfile builtin
+    - __NAMESPACE__ and __CLASS__ predefined constants
 - Documentation
     + The Archive::Tar and Archive::Zip libraries now have POD docs
 - Tests
