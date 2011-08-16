@@ -46,7 +46,6 @@ package Pod::Simple::XHTML;
 use strict;
 use vars qw( $VERSION @ISA $HAS_HTML_ENTITIES );
 $VERSION = '3.19';
-use Carp ();
 use Pod::Simple::Methody ();
 @ISA = ('Pod::Simple::Methody');
 
