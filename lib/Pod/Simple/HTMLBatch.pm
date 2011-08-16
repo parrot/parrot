@@ -1306,6 +1306,8 @@ TODO
     $page->batch_mode_page_object_init($self, $module, $infile, $outfile, $depth)
   or maybe override
     $batchconv->batch_mode_page_object_init($page, $module, $infile, $outfile, $depth)
+  subclass Pod::Simple::Search and set $batchconv->search_class to
+    that classname
 
 
 
