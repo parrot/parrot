@@ -28,7 +28,7 @@ L<Pod::Simple::HTML>, but it largely preserves the same interface.
 package Pod::Simple::XHTML;
 use strict;
 use vars qw( $VERSION @ISA $HAS_HTML_ENTITIES );
-$VERSION = '3.04';
+$VERSION = '3.19';
 use Carp ();
 use Pod::Simple::Methody ();
 @ISA = ('Pod::Simple::Methody');
