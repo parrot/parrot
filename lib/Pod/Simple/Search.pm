@@ -409,7 +409,7 @@ sub run {
             if m{^v?["']?([0-9_]+(\.[0-9_]+)*)["']?$}s
              # like in $VERSION = "3.14159";
              or m{\$Revision:\s*([0-9_]+(?:\.[0-9_]+)*)\s*\$}s
-             # like in sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+             # like in sprintf("%d.%02d", q$Revision: 4.13 $ =~ /(\d+)\.(\d+)/);
           ;
            
           # Like in sprintf("%d.%s", map {s/_//g; $_} q$Name: release-0_55-public $ =~ /-(\d+)_([\d_]+)/)
