@@ -66,6 +66,14 @@ sub end_Para        { $_[0]->emit_par( 0) }
 sub end_item_bullet { $_[0]->emit_par( 0) }
 sub end_item_number { $_[0]->emit_par( 0) }
 sub end_item_text   { $_[0]->emit_par(-2) }
+sub start_L         { $_[0]{'Link'} = $_[1] if $_[1]->{type} eq 'url' }
+sub end_L           {
+    if (my $link = delete $_[0]{'Link'}) {
+        # Append the URL to the output unless it's already present.
+        $_[0]{'Thispara'} .= " <$link->{to}>"
+            unless $_[0]{'Thispara'} =~ /\b\E$link->{to}/;
+    }
+}
 
 sub emit_par {
   my($self, $tweak_indent) = splice(@_,0,2);
