@@ -1273,6 +1273,10 @@ TODO
 =item $batchconv->html_render_class( I<classname> );
 
 This sets what class is used for rendering the files.
+The default is "Pod::Simple::HTML".  If you set it to something else,
+it should probably be a subclass of Pod::Simple::HTML, and you should
+C<require> or C<use> that class so that's it's loaded before
+Pod::Simple::HTMLBatch tries loading it.
 
 =item $batchconv->search_class( I<classname> );
 
