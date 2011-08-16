@@ -99,6 +99,9 @@ __PACKAGE__->_accessorize(
  # $code_handler->($line, $self->{'line_count'}, $self) if $code_handler;
  #  $cut_handler->($line, $self->{'line_count'}, $self) if $cut_handler;
  #  $pod_handler->($line, $self->{'line_count'}, $self) if $pod_handler;
+
+ 'parse_empty_lists', # whether to acknowledge empty =over/=back blocks
+
 );
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

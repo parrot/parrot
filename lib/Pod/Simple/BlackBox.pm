@@ -1112,10 +1112,13 @@ sub _ponder_over {
     $list_type = $self->_get_initial_item_type($paras->[0]);
 
   } elsif($paras->[0][0] eq '=back') {
-    # Ignore empty lists.  TODO: make this an option?
-    shift @$paras;
-    return 1;
-    
+    # Ignore empty lists by default
+    if ($self->{'parse_empty_lists'}) {
+      $list_type = 'empty';
+    } else {
+      shift @$paras;
+      return 1;
+    }
   } elsif($paras->[0][0] eq '~end') {
     $self->whine(
       $para->[1]{'start_line'},
