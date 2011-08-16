@@ -357,7 +357,8 @@ sub parse_string_document {
     next unless defined $line_group and length $line_group;
     pos($line_group) = 0;
     while($line_group =~
-      m/([^\n\r]*)((?:\r?\n)?)/g
+      m/([^\n\r]*)(\r?\n?)/g # supports \r, \n ,\r\n
+      #m/([^\n\r]*)((?:\r?\n)?)/g
     ) {
       #print(">> $1\n"),
       $self->parse_lines($1)
