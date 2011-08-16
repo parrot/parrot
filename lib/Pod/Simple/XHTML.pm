@@ -76,6 +76,16 @@ to put before the "Foo%3a%3aBar". The default value is
 What to put after "Foo%3a%3aBar" in the URL. This option is not set by
 default.
 
+=head2 man_url_prefix
+
+In turning C<< L<crontab(5)> >> into http://whatever/man/1/crontab, what
+to put before the "1/crontab". The default value is
+"http://man.he.net/man".
+
+=head2 man_url_postfix
+
+What to put after "1/crontab" in the URL. This option is not set by default.
+
 =head2 title_prefix, title_postfix
 
 What to put before and after the title in the head. The values should
@@ -148,6 +158,8 @@ index for the sake of tradition).
 __PACKAGE__->_accessorize(
  'perldoc_url_prefix',
  'perldoc_url_postfix',
+ 'man_url_prefix',
+ 'man_url_postfix',
  'title_prefix',  'title_postfix',
  'html_css',
  'html_javascript',
