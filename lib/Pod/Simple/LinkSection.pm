@@ -114,7 +114,7 @@ Output:
                           ], 'Pod::Simple::LinkSection' ),
                    'baz'
                  ], 'Pod::Simple::LinkSection' );
-  
+
 But stringify it and you get just the text content:
 
   % perl -MData::Dumper -e

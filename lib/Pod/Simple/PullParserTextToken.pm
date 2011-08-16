@@ -61,14 +61,14 @@ as calling $token->text would do.
 Or, if you want to alter the value, you can even do things like this:
 
   for ( ${  $token->text_r  } ) {  # Aliases it with $_ !!
-  
+
     s/ The / the /g; # just for example
-    
+
     if( 'A' eq chr(65) ) {  # (if in an ASCII world)
       tr/\xA0/ /;
       tr/\xAD//d;
     }
-    
+
     ...or however you want to alter the value...
   }
 

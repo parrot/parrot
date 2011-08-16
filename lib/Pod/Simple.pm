@@ -67,7 +67,7 @@ __PACKAGE__->_accessorize(
 
   'hide_line_numbers', # For some dumping subclasses: whether to pointedly
                        # suppress the start_line attribute
-                      
+
   'line_count',        # the current line number
   'pod_para_count',    # count of pod paragraphs seen so far
 
@@ -407,10 +407,11 @@ sub parse_file {
   # By here, $source is a FH.
 
   $self->{'source_fh'} = $source;
-  
+
   my($i, @lines);
   until( $self->{'source_dead'} ) {
     splice @lines;
+
     for($i = MANY_LINES; $i--;) {  # read those many lines at a time
       local $/ = $NL;
       push @lines, scalar(<$source>);  # readline

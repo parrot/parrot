@@ -196,6 +196,7 @@ sub new {
   $new->html_footer( qq[\n<!-- end doc -->\n\n</body></html>\n] );
 
   $new->{'Tagmap'} = {%Tagmap};
+
   return $new;
 }
 
@@ -863,7 +864,6 @@ maybe override do_beginning do_end
 =head1 SEE ALSO
 
 L<Pod::Simple>, L<Pod::Simple::HTMLBatch>
-
 
 TODO: a corpus of sample Pod input and HTML output?  Or common
 idioms?

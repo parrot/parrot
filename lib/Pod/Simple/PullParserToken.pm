@@ -56,10 +56,10 @@ Given a $parser that's an object of class Pod::Simple::PullParser
 
     } elsif($token->is_text) {
       ...access $token->text, $token->text_r, etc...
-    
+
     } elsif($token->is_end) {
       ...access $token->tagname...
-    
+
     }
   }
 

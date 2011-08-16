@@ -149,7 +149,7 @@ __PACKAGE__->_accessorize(
  'perldoc_url_prefix',
  'perldoc_url_postfix',
  'title_prefix',  'title_postfix',
- 'html_css', 
+ 'html_css',
  'html_javascript',
  'html_doctype',
  'html_header_tags',

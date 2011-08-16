@@ -531,7 +531,7 @@ And elsewhere:
  package SomePodProcessor;
  use strict;
  use base qw(Pod::Simple::PullParser);
- 
+
  sub run {
    my $self = shift;
   Token:
@@ -622,7 +622,7 @@ process the token-stream from the beginning.
 For example, suppose you have a document that starts out:
 
   =head1 NAME
-  
+
   Hoo::Boy::Wowza -- Stuff B<wow> yeah!
 
 $parser->get_title on that document will return "Hoo::Boy::Wowza --
@@ -639,7 +639,7 @@ the title seems to be of the form "SomeModuleName -- description".
 For example, suppose you have a document that starts out:
 
   =head1 NAME
-  
+
   Hoo::Boy::Wowza -- Stuff B<wow> yeah!
 
 then $parser->get_short_title on that document will return
@@ -648,7 +648,7 @@ then $parser->get_short_title on that document will return
 But if the document starts out:
 
   =head1 NAME
-  
+
   Hooboy, stuff B<wow> yeah!
 
 then $parser->get_short_title on that document will return "Hooboy,

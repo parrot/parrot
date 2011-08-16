@@ -246,7 +246,6 @@ sub _do_one_batch_conversion {
   }
 
   # Give each class a chance to init the converter:
-  
   $page->batch_mode_page_object_init($self, $module, $infile, $outfile, $depth)
    if $page->can('batch_mode_page_object_init');
   $self->batch_mode_page_object_init($page, $module, $infile, $outfile, $depth)
@@ -1228,7 +1227,7 @@ If you set this to a false value, no contents file will be written.
 This specifies what string should be put at the beginning of
 the contents page.
 The default is a string more or less like this:
-  
+
   <html>
   <head><title>Perl Documentation</title></head>
   <body class='contentspage'>
