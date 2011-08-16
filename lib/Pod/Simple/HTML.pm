@@ -487,7 +487,7 @@ sub _do_middle_main_loop {
           next;
         }
         DEBUG and print "    raw text ", $next->text, "\n";
-        printf $fh "\n" . $next->text . "\n";
+        print $fh "\n" . $next->text . "\n";
         next;
        
       } else {
