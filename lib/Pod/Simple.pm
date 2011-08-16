@@ -94,10 +94,11 @@ __PACKAGE__->_accessorize(
 
  'code_handler',      # coderef to call when a code (non-pod) line is seen
  'cut_handler',       # coderef to call when a =cut line is seen
+ 'pod_handler',       # coderef to call when a =pod line is seen
  #Called like:
  # $code_handler->($line, $self->{'line_count'}, $self) if $code_handler;
  #  $cut_handler->($line, $self->{'line_count'}, $self) if $cut_handler;
-  
+ #  $pod_handler->($line, $self->{'line_count'}, $self) if $pod_handler;
 );
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

@@ -1092,7 +1092,14 @@ sub _ponder_pod {
     "=pod directives shouldn't be over one line long!  Ignoring all "
      . (@$para - 2) . " lines of content"
   ) if @$para > 3;
-  # Content is always ignored.
+
+  # Content ignored unless 'pod_handler' is set
+  if (my $pod_handler = $self->{'pod_handler'}) {
+      my ($line_num, $line) = map $_, $para->[1]{'start_line'}, $para->[2];
+      $line = $line eq '' ? "=pod" : "=pod $line"; # imitate cut_handler output
+      $pod_handler->($line, $line_num, $self);
+  }
+
   return;
 }
 
