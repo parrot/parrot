@@ -1372,8 +1372,19 @@ sub _ponder_Verbatim {
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]{'xml:space'} = 'preserve';
+
+  my $indent = $self->strip_verbatim_indent;
+  if ($indent && ref $indent eq 'CODE') {
+      my @shifted = (shift @{$para}, shift @{$para});
+      $indent = $indent->($para);
+      unshift @{$para}, @shifted;
+  }
+
   for(my $i = 2; $i < @$para; $i++) {
     foreach my $line ($para->[$i]) { # just for aliasing
+      # Strip indentation.
+      $line =~ s/^\Q$indent// if $indent
+          && !($self->{accept_codes} && $self->{accept_codes}{VerbatimFormatted});
       while( $line =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
