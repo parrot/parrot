@@ -143,8 +143,6 @@ installable_parrot-prove.exe                     [main]bin
 installable_parrot.exe                           [main]bin
 installable_parrot_config                        [main]bin
 installable_parrot_config.exe                    [main]bin
-installable_parrot_debugger                      [main]bin
-installable_parrot_debugger.exe                  [main]bin
 installable_parrot_nci_thunk_gen                 [main]bin
 installable_pbc_disassemble                      [main]bin
 installable_pbc_disassemble.exe                  [main]bin

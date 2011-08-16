@@ -4,6 +4,7 @@ New in 3.7.0
   + Added new load_bytecode_p_s opcode as an eventual replacement for load_bytecode_s
   + Added new :tag() syntax to IMCC for PIR
   + Improved configuration support for msys
+  + known-buggy parrot_debugger is no longer installed
 - Languages
 - Documentation
     + The Archive::Tar and Archive::Zip libraries now have POD docs
