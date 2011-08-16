@@ -984,7 +984,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
   # L<text|name/"sec"> or L<text|name/sec>
   # L<text|/"sec"> or L<text|/sec> or L<text|"sec">
   # L<scheme:...>
-  # Ltext|scheme:...>
+  # L<text|scheme:...>
 
   my($self,@stack) = @_;
 
