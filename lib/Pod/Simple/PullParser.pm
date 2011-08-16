@@ -785,7 +785,7 @@ sub _old_get_title {  # some witchery in here
   $self->unget_token(@to_unget);
   
   if(DEBUG) {
-    if(defined $title) { print "  Returing title <$title>\n" }
+    if(defined $title) { print "  Returning title <$title>\n" }
     else { print "Returning title <>\n" }
   }
   

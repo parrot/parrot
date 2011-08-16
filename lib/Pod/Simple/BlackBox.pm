@@ -518,7 +518,7 @@ sub _ponder_paragraph_buffer {
     #   don't require any lookahead, but all others (bullets
     #   and numbers) do.
 
-# TODO: winge about many kinds of directives in non-resolving =for regions?
+# TODO: whinge about many kinds of directives in non-resolving =for regions?
 # TODO: many?  like what?  =head1 etc?
 
     $para = shift @$paras;
@@ -1902,7 +1902,7 @@ sub pretty { # adopted from Class::Classless
 
 # A rather unsubtle method of blowing away all the state information
 # from a parser object so it can be reused. Provided as a utility for
-# backward compatibilty in Pod::Man, etc. but not recommended for
+# backward compatibility in Pod::Man, etc. but not recommended for
 # general use.
 
 sub reinit {

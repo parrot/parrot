@@ -1142,7 +1142,7 @@ directory:
 
 =item $batchconv->batch_convert( 'somedir:someother:also' , ...);
 
-This specifies that you want the dirs "somedir", "somother", and "also"
+This specifies that you want the dirs "somedir", "someother", and "also"
 scanned, just as if you'd passed the arrayref
 C<[qw( somedir someother also)]>.  Note that a ":"-separator is normal
 under Unix, but Under MSWin, you'll need C<'somedir;someother;also'>

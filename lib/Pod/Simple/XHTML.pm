@@ -199,7 +199,7 @@ want to override this if you are adding a custom element type that does
 more than just display formatted text. Perhaps adding a way to generate
 HTML tables from an extended version of POD.
 
-So, let's say you want add a custom element called 'foo'. In your
+So, let's say you want to add a custom element called 'foo'. In your
 subclass's C<new> method, after calling C<SUPER::new> you'd call:
 
   $new->accept_targets_as_text( 'foo' );

@@ -476,7 +476,7 @@ sub whine {
   return $self->_complain_errata(@_);
 }
 
-sub scream {    # like whine, but not suppressable
+sub scream {    # like whine, but not suppressible
   #my($self,$line,$complaint) = @_;
   my $self = shift(@_);
   ++$self->{'errors_seen'};
