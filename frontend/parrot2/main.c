@@ -30,8 +30,8 @@ struct init_args_t {
     Parrot_Int trace;
     Parrot_Int turn_gc_off;
     char ** sysargv;
-    int sysargc;
     char ** progargv;
+    int sysargc;
     int progargc;
 };
 
