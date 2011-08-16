@@ -1617,8 +1617,6 @@ sub _treelet_from_formatting_codes {
   my $treelet = ['~Top', {'start_line' => $start_line},];
   
   unless ($preserve_space || $self->{'preserve_whitespace'}) {
-    $para =~ s/\.  /\.\xA0 /g if $self->{'fullstop_space_harden'};
-  
     $para =~ s/\s+/ /g; # collapse and trim all whitespace first.
     $para =~ s/ $//;
     $para =~ s/^ //;

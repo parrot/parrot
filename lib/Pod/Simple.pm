@@ -80,8 +80,6 @@ __PACKAGE__->_accessorize(
   'bare_output',       # For some subclasses: whether to prepend
                        #  header-code and postpend footer-code
 
-  'fullstop_space_harden', # Whether to turn ".  " into ".[nbsp] ";
-
   'nix_X_codes',       # whether to ignore X<...> codes
   'merge_text',        # whether to avoid breaking a single piece of
                        #  text up into several events
