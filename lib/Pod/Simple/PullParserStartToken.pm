@@ -2,9 +2,9 @@
 require 5;
 package Pod::Simple::PullParserStartToken;
 use Pod::Simple::PullParserToken ();
-@ISA = ('Pod::Simple::PullParserToken');
 use strict;
-use vars qw($VERSION);
+use vars qw(@ISA $VERSION);
+@ISA = ('Pod::Simple::PullParserToken');
 $VERSION = '3.19';
 
 sub new {  # Class->new(tagname, optional_attrhash);
