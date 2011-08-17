@@ -93,9 +93,7 @@
     .local pmc main_sub
     '__init_packfile'(packfile_pmc)
     main_sub = packfile_pmc.'main_sub'()
-    main_sub(prog_args)
-    pop_eh
-    exit 0
+    .tailcall main_sub(prog_args)
 
   __top_level_handler:
     # Something bad happened. This is the top-level error handler of last
