@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,11 +21,19 @@ In this encarnation it works on linux i386 and amd64 systems.
      .local pmc readdir
      .local pmc closedir
      libc = loadlib 'libc'
-     dlfunc opendir, libc, 'opendir', 'pt'
+     dlfunc opendir, libc, 'opendir', 'pp'
      dlfunc readdir, libc, 'readdir', 'pp'
      dlfunc closedir, libc, 'closedir', 'ip'
+
+     .const string dirname = "docs"
+     .local pmc dirname_c
+     # Convert the directory name string to a C string.
+     dirname_c = new ["ByteBuffer"]
+     dirname_c = dirname
+     push dirname_c, 0
+
      .local pmc curdir
-     curdir = opendir("docs")
+     curdir = opendir(dirname_c)
      .local pmc entry
 
      .include "datatypes.pasm"
