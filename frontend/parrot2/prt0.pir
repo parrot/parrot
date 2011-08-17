@@ -187,11 +187,13 @@
 
     bts = exception.'backtrace_strings'()
     bts_iter = iter bts
+    $S1 = ""
   __backtrace_loop_top:
     unless bts_iter goto __backtrace_loop_bottom
     $S0 = shift bts_iter
+    stderr_pmc.'print'($S1)
     stderr_pmc.'print'($S0)
-    stderr_pmc.'print'("\n")
+    $S1 = "\n"
     goto __backtrace_loop_top
   __backtrace_loop_bottom:
 
