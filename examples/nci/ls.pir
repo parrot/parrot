@@ -34,6 +34,16 @@ In this encarnation it works on linux i386 and amd64 systems.
 
      .local pmc curdir
      curdir = opendir(dirname_c)
+     unless null curdir goto opened
+
+     .local pmc err
+     getstderr err
+     print err, "Cannot open directory '"
+     print err, dirname
+     print err, "'\n"
+     exit 1
+
+opened:
      .local pmc entry
 
      .include "datatypes.pasm"
