@@ -45,12 +45,15 @@
     if sys_arg == "-r" goto __setup_compile_run_from_file
     if sys_arg == "-c" goto __force_pbc_file
     if sys_arg == "-E" goto __preprocess_only
+    pop_eh
     '__usage_and_exit'()
 
   __show_version:
+    pop_eh
     '__show_version_and_exit'()
 
   __show_help:
+    pop_eh
     '__show_help_and_exit'()
 
   __setup_output_file:
@@ -81,6 +84,7 @@
     goto __have_packfile_pmc
 
   __no_input_file:
+    pop_eh
     '__usage_and_exit'("Missing program name")
 
   __have_packfile_pmc:
@@ -233,7 +237,6 @@ END_OF_VERSION
     $S1 = sprintf $S0, $P0
     say $S1
 
-    pop_eh
     exit 0
 .end
 
@@ -282,7 +285,6 @@ see docs/running.pod for more
 END_OF_HELP
     say $S0
 
-    pop_eh
     exit 0
 .end
 
@@ -303,6 +305,5 @@ END_OF_HELP
     $P1.'print'("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ")
     $P1.'print'("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n")
 
-    pop_eh
     exit 1
 .end
