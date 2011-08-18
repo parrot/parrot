@@ -50,7 +50,7 @@ my @m0_files = (
     'm0_mult_i.m0',
 #    'm0_mult_n.m0',
 #    'm0_noop.m0',
-#    'm0_or.m0',
+    'm0_or.m0',
 #    'm0_poke_caller.m0',
 #    'm0_set.m0',
 #    'm0_set_imm.m0',

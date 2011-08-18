@@ -95,6 +95,13 @@ m0_op_and( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_or( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] |
+        frame->registers[ops[3]];
+}
+
+static void
 m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->registers[ops[1]] = frame->registers[ops[2]] >>
@@ -171,6 +178,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_AND):
                     m0_op_and( cf, &ops[pc] );
+                break;
+
+                case (M0_OR):
+                    m0_op_or( cf, &ops[pc] );
                 break;
 
                 case (M0_LSHR):
