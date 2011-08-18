@@ -39,7 +39,6 @@ sub runstep {
         libparrot_shared_alias  => "libparrot$share_ext",
         libparrot_soname        => "-Wl,-soname=libparrot$share_ext.$version",
         osvers                  => $osvers,
-        sha256sum               => 'sha256' || $conf->data->get('sha256sum'),
     );
 }
 

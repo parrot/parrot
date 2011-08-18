@@ -82,11 +82,6 @@ sub runstep {
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
 
-        # 'shasum' is a command-line utility (implemented in Perl) which
-        # is distributed with Mac OS X.  See 'man shasum'.
-        sha256sum           => 'shasum -a 256' ||
-                                $conf->data->get('sha256sum'),
-
         # TT #344:  When built against a dynamic libparrot,
         # installable_parrot records the path to the blib version
         # of the library.
