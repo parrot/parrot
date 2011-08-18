@@ -58,7 +58,7 @@ my @m0_files = (
     'm0_shl.m0',
     'm0_sub_i.m0',
 #    'm0_sub_n.m0',
-#    'm0_xor.m0',
+    'm0_xor.m0',
 );
 @m0_files = map { catfile( '.', (qw/t m0 integration/, $_) ) } @m0_files;
 
