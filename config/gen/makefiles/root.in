@@ -782,6 +782,7 @@ help :
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
 	@echo "  m0_tests:   		Run known-good M0 tests."
+	@echo "  m0_c_tests:   		Run known-good M0 tests with C implementation."
 	@echo "  m0_cover:   		Generate code coverage of m0 with Devel::Cover
 	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
@@ -2021,6 +2022,10 @@ M0_TEST_FILES = \
 	t/m0/m0_assembler.t \
 	t/m0/m0_run_hello_m0b.t \
 	t/m0/m0_integration.t
+M0_C_TEST_FILES = \
+	t/m0_c/m0_bytecode_loading.t \
+	t/m0_c/m0_run_hello_m0b.t \
+	t/m0_c/m0_integration.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
 MANIFEST_TEST_FILES = \
@@ -2201,6 +2206,9 @@ examples_tests : test_prep
 
 m0_tests :
 	$(PERL) t/harness $(M0_TEST_FILES)
+
+m0_c_tests :
+	$(PERL) t/harness $(M0_C_TEST_FILES)
 
 m0_cover :
 	PERL5OPT=-MDevel::Cover $(MAKE) m0_tests
