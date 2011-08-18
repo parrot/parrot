@@ -66,6 +66,13 @@ m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
         frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
 }
 
+static void
+m0_op_mult_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] *
+        frame->registers[ops[3]];
+}
+
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
@@ -113,6 +120,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_GOTO_IF):
                     m0_op_goto_if( cf, &ops[pc] );
+                break;
+
+                case (M0_MULT_I):
+                    m0_op_mult_i( cf, &ops[pc] );
                 break;
 
                 default:
