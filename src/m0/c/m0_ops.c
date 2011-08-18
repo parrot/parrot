@@ -101,6 +101,13 @@ m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
         frame->registers[ops[3]];
 }
 
+static void
+m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] <<
+        frame->registers[ops[3]];
+}
+
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
@@ -168,6 +175,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_LSHR):
                     m0_op_lshr( cf, &ops[pc] );
+                break;
+
+                case (M0_SHL):
+                    m0_op_shl( cf, &ops[pc] );
                 break;
 
                 default:
