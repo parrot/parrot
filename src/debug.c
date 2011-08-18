@@ -3667,7 +3667,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
     int     limit_count = 0;
 
     if (!PMC_IS_NULL(sub)) {
-        str = Parrot_sub_Context_infostr(interp, ctx);
+        str = Parrot_sub_Context_infostr(interp, ctx, 1);
         if (str) {
             VTABLE_push_string(interp, output, str);
             if (interp->code->annotations) {
@@ -3711,7 +3711,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
             break;
 
 
-        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
+        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx), 0);
 
 
         if (!str)
