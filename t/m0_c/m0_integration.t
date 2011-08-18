@@ -37,7 +37,7 @@ my @m0_files = (
 #    'm0_chunk_name_const.m0',
 #    'm0_convert_i_n.m0',
 #    'm0_deref.m0',
-#    'm0_div_i.m0',
+    'm0_div_i.m0',
 #    'm0_div_n.m0',
 #    'm0_goto_chunk.m0',
 #    'm0_hash.m0',
