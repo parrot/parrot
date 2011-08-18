@@ -1,0 +1,42 @@
+== NAME ==
+
+tools - development-related scripts and tools
+
+== DESCRIPTION ==
+
+The 'tools' directory contains the scripts and tools that are used during the
+build process and general Parrot development.
+
+== SUBDIRECTORIES ==
+
+* build
+
+Scripts, templates, and configuration files invoked by the default 'make'
+target. For example, the PMC to C compiler, opcode to C compiler, constant
+string support, etc.
+
+* dev
+
+Scripts for automating various tasks used by Parrot developers. For example,
+manipulating bytecode headers, generating test coverage reports, headerizer,
+etc.
+
+* docs
+
+Scripts related to documentation. For example, printing opcode summaries,
+generating HTML documentation, generating Latex documentation, etc.
+
+* install
+
+Scripts for checking that all things run in the 'install' directory and
+detecting missing parts.
+
+* release
+
+Scripts, templates, and configuration files invoked by the 'make install' and
+'make install-dev' targets. For example,
+
+== COPYRIGHT ==
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
