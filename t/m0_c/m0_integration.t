@@ -31,7 +31,7 @@ use Data::Dumper;
 my @m0_files = (
     'm0_add_i.m0',
 #    'm0_add_n.m0',
-#    'm0_and.m0',
+    'm0_and.m0',
 #    'm0_args.m0',
 #    'm0_ashr.m0',
 #    'm0_chunk_name_const.m0',
