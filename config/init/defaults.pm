@@ -203,6 +203,12 @@ sub runstep {
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
+
+        # tar and sha256sum are currently used only in 'make release'.
+        # 'sha256sum' is a Linux command-line utility; in the OS-specific
+        # 'hints' files we'll supply substitutes on other OSes as we can
+        # locate them.
+        
         tar       => which('tar') || '',
         sha256sum => which('sha256sum') || '',
 

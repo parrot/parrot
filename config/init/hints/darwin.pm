@@ -81,6 +81,9 @@ sub runstep {
         ld_load_flags       => '-undefined dynamic_lookup -bundle',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
+
+        # 'shasum' is a command-line utility (implemented in Perl) which
+        # is distributed with Mac OS X.  See 'man shasum'.
         sha256sum           => 'shasum -a 256' ||
                                 $conf->data->get('sha256sum'),
 

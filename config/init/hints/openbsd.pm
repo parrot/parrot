@@ -37,6 +37,7 @@ sub runstep {
         libparrot_shared       => "libparrot$share_ext.$version",
         libparrot_shared_alias => "libparrot$share_ext",
         libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
+        sha256sum              => 'sha256' || $conf->data->get('sha256sum'),
     );
 
     if ( ( split( m/-/, $conf->data->get('archname_provisional'), 2 ) )[0] eq 'powerpc' ) {
