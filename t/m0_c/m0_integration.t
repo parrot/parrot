@@ -45,7 +45,7 @@ my @m0_files = (
 #    'm0_labels_with_goto.m0',
 #    'm0_lshr.m0',
 #    'm0_metadata_basic.m0',
-#    'm0_mod_i.m0',
+    'm0_mod_i.m0',
 #    'm0_mod_n.m0',
     'm0_mult_i.m0',
 #    'm0_mult_n.m0',
