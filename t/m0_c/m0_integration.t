@@ -26,9 +26,41 @@ use File::Spec::Functions;
 use TAP::Parser;
 use Data::Dumper;
 
-my @m0_files = grep { $_ !~ /cps_factorial/ }
-    glob catfile( '.', qw/t m0 integration *.m0/);
-
+#my @m0_files = grep { $_ !~ /cps_factorial/ }
+#    glob catfile( '.', qw/t m0 integration *.m0/);
+my @m0_files = (
+    'm0_add_i.m0',
+#    'm0_add_n.m0',
+#    'm0_and.m0',
+#    'm0_args.m0',
+#    'm0_ashr.m0',
+#    'm0_chunk_name_const.m0',
+#    'm0_convert_i_n.m0',
+#    'm0_deref.m0',
+#    'm0_div_i.m0',
+#    'm0_div_n.m0',
+#    'm0_goto_chunk.m0',
+#    'm0_hash.m0',
+#    'm0_labels_without_goto.m0',
+#    'm0_labels_with_goto.m0',
+#    'm0_lshr.m0',
+#    'm0_metadata_basic.m0',
+#    'm0_mod_i.m0',
+#    'm0_mod_n.m0',
+#    'm0_mult_i.m0',
+#    'm0_mult_n.m0',
+#    'm0_noop.m0',
+#    'm0_or.m0',
+#    'm0_poke_caller.m0',
+#    'm0_set.m0',
+#    'm0_set_imm.m0',
+#    'm0_set_ref.m0',
+#    'm0_shl.m0',
+    'm0_sub_i.m0',
+#    'm0_sub_n.m0',
+#    'm0_xor.m0',
+);
+@m0_files = map { catfile( '.', (qw/t m0 integration/, $_) ) } @m0_files;
 
 plan tests => 2 * scalar @m0_files;
 
