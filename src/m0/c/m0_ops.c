@@ -69,6 +69,8 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_print_s( cf, &ops[pc] );
                 break;
 
+                case (M0_NOOP):
+                break;
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
                         op, ops[pc + 1], ops[pc + 2], ops[pc + 3] );
