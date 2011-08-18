@@ -8,7 +8,7 @@
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
     description (D), main username (U), alias usernames (A)
-    and snail-mail address (S).
+    and geographic location (S).
 
         Thanks,
 
@@ -454,6 +454,12 @@ A: gerd
 E: pokorra@uni-siegen.de
 D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
+N: Gerhard R.
+U: gerdr
+A: not_gerd
+W: http://gerdr.github.com/on-parrot/
+D: MSYS fixes
+
 N: Goplat
 D: Win98 and other fixes.
 
@@ -578,6 +584,12 @@ D: coding standard tests
 
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
+
+N: Jonathan Gentle
+E: atrodo@atrodo.org
+U: atrodo
+A: atrodo
+S: Ohio, USA
 
 N: Jonathan "Duke" Leto
 E: jonathan@leto.net

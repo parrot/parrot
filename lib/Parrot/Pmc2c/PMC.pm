@@ -71,7 +71,7 @@ sub dump {
     # gen_parent_lookup_info( $self, $pmc2cMain, $pmcs );
     # gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
 
-    Storable::store( $self, $self->filename('.dump') );
+    Storable::nstore( $self, $self->filename('.dump') );
 }
 
 # methods

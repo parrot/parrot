@@ -530,7 +530,7 @@ PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
-PROVE               = .@slash@parrot-prove$(EXE)
+PARROT_PROVE        = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
 WINXED              = .@slash@winxed$(EXE)
 
@@ -543,8 +543,8 @@ INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
-INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
-INSTALLABLEPROVE     = .@slash@installable_parrot-prove$(EXE)
+INSTALLABLENCITHUNKGEN  = .@slash@installable_parrot_nci_thunk_gen$(EXE)
+INSTALLABLEPARROT_PROVE = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
 INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
@@ -838,9 +838,9 @@ help :
 
 world : parrot_utils
 
-parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
+parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
@@ -885,7 +885,7 @@ $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
 parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 	$(PARROT) -o parrot-prove.pbc runtime/parrot/bin/prove.pir
 
-$(PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
+$(PARROT_PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
@@ -1044,7 +1044,7 @@ $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
 
-$(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
+$(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot-prove.pbc --install
 
 #
@@ -2303,7 +2303,7 @@ prog-clean :
 	$(INSTALLABLECONFIG) \
 	$(INSTALLABLENQP) \
 	$(INSTALLABLENCITHUNKGEN) \
-	$(INSTALLABLEPROVE) \
+	$(INSTALLABLEPARROT_PROVE) \
 	$(INSTALLABLEWINXED) \
 	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
 	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \

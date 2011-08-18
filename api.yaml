@@ -17,6 +17,7 @@
   tags:
     - 'C'
     - 'deprecated'
+    - 'completed'
   ticket:  'http://trac.parrot.org/parrot/ticket/2010'
 -
   name:  '":init" Sub flag'

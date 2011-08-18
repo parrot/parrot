@@ -34,7 +34,7 @@ static void add_called_tag(PARROT_INTERP,
 
 static INTVAL find_called_tag(PARROT_INTERP,
     ARGIN(PMC * self),
-    ARGIN(STRING *tag))
+    ARGIN(STRING * tag))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -86,8 +86,23 @@ get_const_table(PARROT_INTERP, ARGIN(PMC * self))
     return bt->const_table;
 }
 
+/*
+
+=item C<static INTVAL find_called_tag(PARROT_INTERP, PMC * self, STRING * tag)>
+
+Find a called tag in the cache. Return 1 if it exists, 0 otherwise.
+
+=item C<static void add_called_tag(PARROT_INTERP, PMC * self, STRING * tag)>
+
+Add a called tag to the cache, if it doesn't exist already. Do nothing
+otherwise.
+
+=cut
+
+*/
+
 static INTVAL
-find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING *tag))
+find_called_tag(PARROT_INTERP, ARGIN(PMC * self), ARGIN(STRING * tag))
 {
     ASSERT_ARGS(find_called_tag)
     Parrot_PackfileView_attributes * const attrs = PARROT_PACKFILEVIEW(self);
@@ -350,8 +365,8 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
         }
     }
 
-    METHOD subs_by_flag(STRING *flag) {
-        PMC * const subs = Parrot_pf_subs_by_flag(INTERP, SELF, flag);
+    METHOD subs_by_tag(STRING *flag) {
+        PMC * const subs = Parrot_pf_subs_by_tag(INTERP, SELF, flag);
         RETURN(PMC *subs);
     }
 
