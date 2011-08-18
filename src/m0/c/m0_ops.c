@@ -39,6 +39,33 @@ m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
     fprintf( stdout, "%s", (char *)frame->registers[ ops[2] ] );
 }
 
+static void
+m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] +
+        frame->registers[ops[3]];
+}
+
+static void
+m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] -
+        frame->registers[ops[3]];
+}
+
+static void
+m0_op_goto( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+}
+
+static void
+m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
+{
+    if( frame->registers[ops[3]] )
+        frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+}
+
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
@@ -71,6 +98,23 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_NOOP):
                 break;
+
+                case (M0_ADD_I):
+                    m0_op_add_i( cf, &ops[pc] );
+                break;
+
+                case (M0_SUB_I):
+                    m0_op_sub_i( cf, &ops[pc] );
+                break;
+
+                case (M0_GOTO):
+                    m0_op_goto( cf, &ops[pc] );
+                break;
+
+                case (M0_GOTO_IF):
+                    m0_op_goto_if( cf, &ops[pc] );
+                break;
+
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
                         op, ops[pc + 1], ops[pc + 2], ops[pc + 3] );
