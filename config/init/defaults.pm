@@ -18,6 +18,7 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Config;
+use File::Which;
 use FindBin;    # see build_dir
 use Parrot::BuildUtil;
 use Parrot::Configure::Step;
@@ -202,6 +203,8 @@ sub runstep {
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
+        tar       => which('tar') || '',
+        sha256sum => which('sha256sum') || '',
 
         ar        => $Config{ar},
         arflags   => 'cr',

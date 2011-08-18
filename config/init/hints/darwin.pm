@@ -8,6 +8,7 @@ use warnings;
 use lib qw( lib );
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
+use File::Which;
 
 our %defaults = (
     uname           => `uname -r`,
@@ -80,6 +81,8 @@ sub runstep {
         ld_load_flags       => '-undefined dynamic_lookup -bundle',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
+        sha256sum           => which('shasum -a 256') ||
+                                $conf->data->get('sha256sum'),
 
         # TT #344:  When built against a dynamic libparrot,
         # installable_parrot records the path to the blib version
