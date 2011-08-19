@@ -13,7 +13,7 @@
     push_eh __top_level_handler
 
     # Dig through the system arguments, setting up the interp
-    .local pmc sys_args_iter, packfile_pmc, pir_compiler, interp
+    .local pmc sys_args_iter, packfile_pmc, pir_compiler, interp, prt0_pf
     .local string exe_name, prog_name, sys_arg, output_file
     .local int input_file_type
 
@@ -96,7 +96,9 @@
   __run_packfile:
     .local pmc main_sub
     '__init_packfile'(packfile_pmc)
+    prt0_pf = interp["packfile"]
     main_sub = packfile_pmc.'main_sub'()
+    #packfile_pmc.'set_current_packfile'(interp)
     .tailcall main_sub(prog_args)
 
   __top_level_handler:
@@ -106,6 +108,7 @@
     .get_results(e)
     finalize e
     pop_eh
+    #prt0_pf.'set_current_packfile'(interp)
     '__handle_error_and_exit'(e)
 .end
 
@@ -207,7 +210,7 @@
     unless line_iter goto __line_loop_bottom
     $S0 = shift line_iter
     $I0 = index $S0, "frontend/parrot2/prt0"
-    unless $I0 == -1 goto __line_loop_top
+    #unless $I0 == -1 goto __line_loop_top
     stderr_pmc.'print'($S1)
     stderr_pmc.'print'($S0)
     $S1 = "\n"
