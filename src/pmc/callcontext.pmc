@@ -506,8 +506,7 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC      *caller_ctx;         /* caller context */
 
     ATTR void     *registers;          /* pointer to allocated registers */
-    ATTR Regs_ni   bp_ni;              /* pointers to FLOATVAL & INTVAL */
-    ATTR Regs_ps   bp_ps;              /* pointers to PMC & STR */
+    ATTR register_frame_base bp;
 
     ATTR UINTVAL   n_regs_used[4];     /* INSP in PBC points to Sub */
     ATTR PMC      *lex_pad;            /* LexPad PMC */
@@ -632,21 +631,21 @@ Mark any referenced strings and PMCs.
         GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
 
         if (n_regs_used) {
-            Regs_ps         bp_ps;
+            register_frame_base bp;
             const UINTVAL   regs_p = n_regs_used[REGNO_PMC];
             const UINTVAL   regs_s = n_regs_used[REGNO_STR];
             UINTVAL         i;
 
-            GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
+            GET_ATTR_bp(INTERP, SELF, bp);
             for (i = 0; i < regs_p; ++i) {
-                PMC * const p = bp_ps.regs_p[-1L-(i)];
                 /* Original code from CTX_REG_PMC */
+                PMC * const p = bp.bp_ps.regs_p[-1L-(i)];
                 if (p)
                     Parrot_gc_mark_PMC_alive(INTERP, p);
             }
 
             for (i = 0; i < regs_s; ++i) {
-                STRING * const s = bp_ps.regs_s[i];
+                STRING * const s = bp.bp_ps.regs_s[i];
                 if (s)
                     Parrot_gc_mark_STRING_alive(INTERP, s);
             }

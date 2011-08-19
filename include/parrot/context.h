@@ -22,6 +22,11 @@ typedef union {
     INTVAL       *regs_i;
 } Regs_ni;
 
+typedef struct {
+    Regs_ni bp_ni;
+    Regs_ps bp_ps;
+} register_frame_base;
+
 #include "pmc/pmc_callcontext.h"
 
 typedef struct Parrot_CallContext_attributes Parrot_Context;

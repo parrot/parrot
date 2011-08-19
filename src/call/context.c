@@ -232,18 +232,18 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 
     /* NULL out registers - P/S have to be NULL for GC */
     for (i = 0; i < s_regs; ++i)
-        ctx->bp_ps.regs_s[i] = STRINGNULL;
+        ctx->bp.bp_ps.regs_s[i] = STRINGNULL;
 
     for (i = 0; i < p_regs; ++i)
-        ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
+        ctx->bp.bp_ps.regs_p[-1L - i] = PMCNULL;
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40, set int and num to identifiable garbage values */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i)
-            ctx->bp_ni.regs_i[i] = -999;
+            ctx->bp.bp_ni.regs_i[i] = -999;
 
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i)
-            ctx->bp_ni.regs_n[-1L - i] = -99.9;
+            ctx->bp.bp_ni.regs_n[-1L - i] = -99.9;
     }
 }
 
@@ -446,11 +446,11 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
     ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
 
-    /* ctx.bp_ni points to I0, which has N0 on the left */
-    ctx->bp_ni.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
+    /* ctx.bp.bp_ni points to I0, which has N0 on the left */
+    ctx->bp.bp_ni.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
 
-    /* ctx.bp_ps points to S0, which has P0 on the left */
-    ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
+    /* ctx.bp.bp_ps points to S0, which has P0 on the left */
+    ctx->bp.bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
     clear_regs(interp, ctx);
 }
@@ -635,7 +635,7 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
-    return &(CONTEXT_STRUCT(ctx)->bp_ni.regs_i[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.bp_ni.regs_i[idx]);
 }
 
 /*
@@ -657,7 +657,7 @@ Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
-    return &(CONTEXT_STRUCT(ctx)->bp_ni.regs_n[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.bp_ni.regs_n[-1L - idx]);
 }
 
 /*
@@ -680,7 +680,7 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
-    return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp.bp_ps.regs_s[idx]);
 }
 
 /*
@@ -703,7 +703,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
     PMC **res;
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
-    res = &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
+    res = &(CONTEXT_STRUCT(ctx)->bp.bp_ps.regs_p[-1L - idx]);
     PARROT_ASSERT(!*res || !PObj_on_free_list_TEST(*res));
     return res;
 }
@@ -761,7 +761,7 @@ Regs_ni*
 Parrot_pcc_get_regs_ni(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ni)
-    return &(CONTEXT_STRUCT(ctx)->bp_ni);
+    return &(CONTEXT_STRUCT(ctx)->bp.bp_ni);
 }
 
 /*
@@ -779,7 +779,7 @@ void
 Parrot_pcc_set_regs_ni(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp_ni))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ni)
-    CONTEXT_STRUCT(ctx)->bp_ni = *bp_ni;
+    CONTEXT_STRUCT(ctx)->bp.bp_ni = *bp_ni;
 }
 
 /*
@@ -798,7 +798,7 @@ Regs_ps*
 Parrot_pcc_get_regs_ps(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ps)
-    return &(CONTEXT_STRUCT(ctx)->bp_ps);
+    return &(CONTEXT_STRUCT(ctx)->bp.bp_ps);
 }
 
 /*
@@ -816,7 +816,7 @@ void
 Parrot_pcc_set_regs_ps(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ps)
-    CONTEXT_STRUCT(ctx)->bp_ps = *bp_ps;
+    CONTEXT_STRUCT(ctx)->bp.bp_ps = *bp_ps;
 }
 
 /*
