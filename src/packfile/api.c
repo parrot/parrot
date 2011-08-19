@@ -1359,7 +1359,8 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc, INTVAL
+set_code)>
 
 Set's the current packfile for the interpreter.
 
@@ -1369,7 +1370,7 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc), INTVAL set_code)
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
     if (PMC_IS_NULL(pbc))
@@ -1378,7 +1379,8 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
         interp->current_pf = pbc;
-        interp->code       = pf->cur_cs;
+        if (set_code)
+            interp->code       = pf->cur_cs;
         PARROT_GC_WRITE_BARRIER(interp, pbc);
     }
 }
@@ -2734,7 +2736,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
 
-    Parrot_pf_set_current_packfile(interp, pbc);
+    Parrot_pf_set_current_packfile(interp, pbc, 1);
     Parrot_pf_prepare_packfile_init(interp, pbc);
     main_sub = packfile_main(pf->cur_cs);
 
@@ -2753,7 +2755,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
     }
 
     if (!PMC_IS_NULL(current_pf))
-        Parrot_pf_set_current_packfile(interp, current_pf);
+        Parrot_pf_set_current_packfile(interp, current_pf, 1);
 }
 
 /*

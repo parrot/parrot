@@ -460,7 +460,7 @@ Set this packfile as the current packfile for C<interp>.
 
     METHOD set_current_packfile(PMC * target_interp) {
         Interp * const i = Parrot_int_get_interp_from_pmc(target_interp);
-        Parrot_pf_set_current_packfile(i, SELF);
+        Parrot_pf_set_current_packfile(i, SELF, 0);
     }
 }
 

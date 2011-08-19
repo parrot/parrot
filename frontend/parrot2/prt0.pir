@@ -98,7 +98,7 @@
     '__init_packfile'(packfile_pmc)
     prt0_pf = interp["packfile"]
     main_sub = packfile_pmc.'main_sub'()
-    #packfile_pmc.'set_current_packfile'(interp)
+    packfile_pmc.'set_current_packfile'(interp)
     .tailcall main_sub(prog_args)
 
   __top_level_handler:

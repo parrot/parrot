@@ -95,7 +95,7 @@ void
 Parrot_pbc_load(PARROT_INTERP, ARGIN(Parrot_PackFile pf))
 {
     ASSERT_ARGS(Parrot_pbc_load)
-    Parrot_pf_set_current_packfile(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pf, 1);
 }
 
 /*

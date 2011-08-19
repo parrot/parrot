@@ -708,7 +708,9 @@ INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
+void Parrot_pf_set_current_packfile(PARROT_INTERP,
+    ARGIN(PMC *pbc),
+    INTVAL set_code)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
