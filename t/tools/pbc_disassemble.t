@@ -134,6 +134,7 @@ sub disassemble_output_like {
 sub disassemble_raw_output_like {
     my ($options, $snippet, $desc)  = @_;
     my $out = `$exefile $options 2>&1`;
+    $out =~ s/\r\n/\n/g if $^O eq 'msys';
     like( $out, $snippet, $desc );
     return;
 }
