@@ -186,6 +186,10 @@
     interp = getinterp
     stderr_pmc = interp.'stderr_handle'()
     message = exception["message"]
+    $I0 = length message
+    unless $I0 == 0 goto __have_message
+    message = "No exception handler and no message"
+  __have_message:
     stderr_pmc.'print'(message)
     stderr_pmc.'print'("\n")
 
