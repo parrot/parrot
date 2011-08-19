@@ -176,7 +176,7 @@
 .include "except_severity.pasm"
 .sub '__handle_error_and_exit' :anon
     .param pmc exception
-    .local pmc bts, bts_iter, stderr_pmc, interp
+    .local pmc bts, bts_iter, stderr_pmc, interp, line_iter
     .local string message
     .local int severity, exit_code
 
@@ -194,10 +194,22 @@
     $S1 = ""
   __backtrace_loop_top:
     unless bts_iter goto __backtrace_loop_bottom
+    stderr_pmc.'print'($S1)
+
     $S0 = shift bts_iter
+    $P0 = split "\n", $S0
+    line_iter = iter $P0
+  __line_loop_top:
+    unless line_iter goto __line_loop_bottom
+    $S0 = shift line_iter
+    $I0 = index $S0, "frontend/parrot2/prt0"
+    unless $I0 == -1 goto __line_loop_top
     stderr_pmc.'print'($S1)
     stderr_pmc.'print'($S0)
     $S1 = "\n"
+    goto __line_loop_top
+  __line_loop_bottom:
+
     goto __backtrace_loop_top
   __backtrace_loop_bottom:
 

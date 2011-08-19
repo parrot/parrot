@@ -3700,23 +3700,16 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
             break;
 
         sub = Parrot_pcc_get_continuation(interp, ctx);
-
         if (PMC_IS_NULL(sub))
             break;
 
-
         sub_cont = PARROT_CONTINUATION(sub);
-
         if (!sub_cont)
             break;
 
-
         str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx), 0);
-
-
         if (!str)
             break;
-
 
         /* recursion detection */
         if (ctx == sub_cont->to_ctx) {
