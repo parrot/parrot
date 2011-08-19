@@ -419,7 +419,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void Parrot_pcc_set_regs_ni(PARROT_INTERP,
     ARGIN(PMC *ctx),
-    ARGIN(Regs_ni *bp))
+    ARGIN(Regs_ni *bp_ni))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -522,7 +522,7 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_regs_ni __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx) \
-    , PARROT_ASSERT_ARG(bp))
+    , PARROT_ASSERT_ARG(bp_ni))
 #define ASSERT_ARGS_Parrot_pcc_set_regs_ps __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(bp_ps))

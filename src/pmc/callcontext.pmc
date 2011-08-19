@@ -506,7 +506,7 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC      *caller_ctx;         /* caller context */
 
     ATTR void     *registers;          /* pointer to allocated registers */
-    ATTR Regs_ni   bp;                 /* pointers to FLOATVAL & INTVAL */
+    ATTR Regs_ni   bp_ni;              /* pointers to FLOATVAL & INTVAL */
     ATTR Regs_ps   bp_ps;              /* pointers to PMC & STR */
 
     ATTR UINTVAL   n_regs_used[4];     /* INSP in PBC points to Sub */

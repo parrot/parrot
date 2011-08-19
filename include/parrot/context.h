@@ -41,8 +41,8 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
 /* Manually inlined macros. Used in optimized builds */
 #  define CTX_REG_PMC(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_p[-1L - (x)])
 #  define CTX_REG_STR(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_s[(x)])
-#  define CTX_REG_NUM(i, p, x) (CONTEXT_STRUCT(p)->bp.regs_n[-1L - (x)])
-#  define CTX_REG_INT(i, p, x) (CONTEXT_STRUCT(p)->bp.regs_i[(x)])
+#  define CTX_REG_NUM(i, p, x) (CONTEXT_STRUCT(p)->bp_ni.regs_n[-1L - (x)])
+#  define CTX_REG_INT(i, p, x) (CONTEXT_STRUCT(p)->bp_ni.regs_i[(x)])
 #endif
 
 #define REG_NUM(interp, x) CTX_REG_NUM((interp), (interp)->ctx, (x))

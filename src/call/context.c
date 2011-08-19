@@ -26,7 +26,7 @@ Parrot_Context functions.
     | context  || N  |  I   |   P        |  S +
     +----------++----+------+------------+----+
     ^          ^     ^                   ^
-    |          |     ctx.bp              ctx.bp_ps
+    |          |     ctx.bp_ni           ctx.bp_ps
     ctx.state  opt
                padding
 
@@ -240,10 +240,10 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
         /* depending on -D40, set int and num to identifiable garbage values */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i)
-            ctx->bp.regs_i[i] = -999;
+            ctx->bp_ni.regs_i[i] = -999;
 
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i)
-            ctx->bp.regs_n[-1L - i] = -99.9;
+            ctx->bp_ni.regs_n[-1L - i] = -99.9;
     }
 }
 
@@ -446,10 +446,10 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
     ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
 
-    /* ctx.bp points to I0, which has Nx on the left */
-    ctx->bp.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
+    /* ctx.bp_ni points to I0, which has N0 on the left */
+    ctx->bp_ni.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
 
-    /* ctx.bp_ps points to S0, which has Px on the left */
+    /* ctx.bp_ps points to S0, which has P0 on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
     clear_regs(interp, ctx);
@@ -635,7 +635,7 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
-    return &(CONTEXT_STRUCT(ctx)->bp.regs_i[idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ni.regs_i[idx]);
 }
 
 /*
@@ -657,7 +657,7 @@ Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
-    return &(CONTEXT_STRUCT(ctx)->bp.regs_n[-1L - idx]);
+    return &(CONTEXT_STRUCT(ctx)->bp_ni.regs_n[-1L - idx]);
 }
 
 /*
@@ -761,12 +761,12 @@ Regs_ni*
 Parrot_pcc_get_regs_ni(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_ni)
-    return &(CONTEXT_STRUCT(ctx)->bp);
+    return &(CONTEXT_STRUCT(ctx)->bp_ni);
 }
 
 /*
 
-=item C<void Parrot_pcc_set_regs_ni(PARROT_INTERP, PMC *ctx, Regs_ni *bp)>
+=item C<void Parrot_pcc_set_regs_ni(PARROT_INTERP, PMC *ctx, Regs_ni *bp_ni)>
 
 Copy Regs_ni into Context.
 
@@ -776,10 +776,10 @@ Copy Regs_ni into Context.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void
-Parrot_pcc_set_regs_ni(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp))
+Parrot_pcc_set_regs_ni(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp_ni))
 {
     ASSERT_ARGS(Parrot_pcc_set_regs_ni)
-    CONTEXT_STRUCT(ctx)->bp = *bp;
+    CONTEXT_STRUCT(ctx)->bp_ni = *bp_ni;
 }
 
 /*
