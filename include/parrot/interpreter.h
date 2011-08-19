@@ -148,12 +148,6 @@ struct _Caches;         /* caches .h */
  */
 #define CURRENT_CONTEXT(interp) ((interp)->ctx)
 
-
-typedef struct _context_mem {
-    void **free_list;               /* array of free-lists, per size free slots */
-    int n_free_slots;               /* amount of allocated */
-} context_mem;
-
 struct _handler_node_t; /* forward def - exit.h */
 
 /* The actual interpreter structure */
