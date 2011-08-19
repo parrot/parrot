@@ -152,6 +152,7 @@ struct _handler_node_t; /* forward def - exit.h */
 
 /* The actual interpreter structure */
 struct parrot_interp_t {
+    register_frame_base  bp;                  /* active register frame */
     PMC                 *ctx;                 /* current Context */
 
     struct GC_Subsystem *gc_sys;              /* functions and data specific

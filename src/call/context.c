@@ -854,6 +854,7 @@ set_context(PARROT_INTERP, ARGIN(PMC *ctx))
     ASSERT_ARGS(set_context)
 
     CURRENT_CONTEXT(interp) = ctx;
+    interp->bp              = CONTEXT_STRUCT(ctx)->bp;
 }
 
 /*

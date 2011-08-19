@@ -583,6 +583,7 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     } while (0)
 #  define Parrot_pcc_set_context(i, c)   do {           \
         CURRENT_CONTEXT(i) = (c);                       \
+        (i)->bp            = CONTEXT_STRUCT(c)->bp;     \
     } while (0)
 #else
 #  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
