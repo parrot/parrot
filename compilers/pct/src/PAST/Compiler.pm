@@ -160,7 +160,7 @@ INIT {
     $TEMPREG_BASE := 100;
     $UNIQUE_BASE  := 1000;
 
-	# XXX: clone protects the "constant" from the var incrementing
+    # XXX: clone protects the "constant" from the var incrementing
     $serno := pir::clone($UNIQUE_BASE);
 }
 
@@ -242,10 +242,11 @@ identifiers TEMPREG_BASE up to UNIQUE_BASE.
 
 method tempreg_frame() {
     my %tempregs;
-    %tempregs<I> := $TEMPREG_BASE;
-    %tempregs<N> := $TEMPREG_BASE;
-    %tempregs<S> := $TEMPREG_BASE;
-    %tempregs<P> := $TEMPREG_BASE;
+    # pir::clone protects the "constant" from getting incremented
+    %tempregs<I> := pir::clone($TEMPREG_BASE);
+    %tempregs<N> := pir::clone($TEMPREG_BASE);
+    %tempregs<S> := pir::clone($TEMPREG_BASE);
+    %tempregs<P> := pir::clone($TEMPREG_BASE);
 
     %tempregs;
 }
@@ -282,9 +283,10 @@ method tempreg($rtype) {
         # if we've run out of temporary registers, just make a unique one
         return self.unique('$' ~ $rtype) if $rnum >= $UNIQUE_BASE;
 
+        my $S0 := ~$rnum;
         $rnum++;
         %*TEMPREGS{$rtype} := $rnum;
-        $reg := '$' ~ $rtype ~ $rnum;
+        $reg := '$' ~ $rtype ~ $S0;
     }
 
     $reg;
@@ -658,7 +660,7 @@ multi method as_post(PAST::Stmt $node, *%options) {
     if %outerregs
         && %options<rtype> ne 'v'
         && pir::substr($result, 0, 1) eq '$'
-	{
+    {
         %outerregs{$result} := 1
     }
 
