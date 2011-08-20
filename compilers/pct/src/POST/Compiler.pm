@@ -346,7 +346,9 @@ multi method pir(POST::Sub $node) {
     files = find_caller_lex '$?FILES'
     if null files goto no_files
     unless files goto no_files
-    subpir.'append_format'(".annotate 'file', '%0'\n", files)
+    $S0 = self.'escape'(files)
+    # %% needed in Q:PIR so that it doesn't get eaten by StringBuilder
+    subpir.'append_format'(".annotate 'file', %%0\n", $S0)
   no_files:
 
     self.'pir_children'(node)
