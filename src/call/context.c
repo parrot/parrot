@@ -729,24 +729,6 @@ Parrot_pcc_get_regs_used(SHIM_INTERP, ARGIN(const PMC *ctx), int type)
 
 /*
 
-=item C<void Parrot_pcc_set_regs_used(PARROT_INTERP, PMC *ctx, int type, INTVAL
-num)>
-
-Set number of used registers of particular type.
-
-=cut
-
-*/
-PARROT_EXPORT
-void
-Parrot_pcc_set_regs_used(SHIM_INTERP, ARGIN(PMC *ctx), int type, INTVAL num)
-{
-    ASSERT_ARGS(Parrot_pcc_set_regs_used)
-    CONTEXT_STRUCT(ctx)->n_regs_used[type] = num;
-}
-
-/*
-
 =item C<Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, const PMC *ctx)>
 
 Get pointer to FLOANFAL and INTVAL registers.
