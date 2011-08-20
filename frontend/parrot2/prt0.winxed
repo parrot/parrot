@@ -30,10 +30,10 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
                     break;
                 case "-r":
                     output_file = __get_temporary_output_file(prog_name);
-                    packfile_pmc = pir_compiler.'compile_file'(prog_name);
+                    packfile_pmc = pir_compiler.compile_file(prog_name);
                     packfile_pmc.write_to_file(output_file);
                     packfile_pmc = new 'PackfileView';
-                    packfile_pmc.'read_from_file'(output_file);
+                    packfile_pmc.read_from_file(output_file);
                     output_file = null;
                     break;
                 case "-E":
@@ -70,7 +70,8 @@ function __default_get_packfile[anon](string file_name, int file_type, var pir_c
 {
     switch (file_type) {
         case PIR_FILE:
-            return pir_compiler.compile_file(file_name);
+            var pf = pir_compiler.compile_file(file_name);
+            return pf;
         case PASM_FILE:
             var pasm_compiler = compreg("PASM");
             return pasm_compiler.compile_file(file_name);
