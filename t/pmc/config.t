@@ -38,12 +38,7 @@ CODE
 Hash
 OUT
 
-my $cwd = cwd;
-if ($^O eq 'MSWin32') {
-    $cwd = lc(cwd);
-}
-
-pir_output_is( <<'CODE', $cwd, "prefix" );
+pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd), "prefix" );
 .sub main :main
     load_bytecode "config.pbc"
     .include "iglobals.pasm"
