@@ -1,13 +1,16 @@
-package MSYS::Cwd::Override;
+package MSYS::Cwd::Native;
+use warnings;
 use strict;
 
 our $VERSION = '0.01';
 
 my @cwdsubs = qw(cwd getcwd fastcwd fastgetcwd);
 
-sub _import {
+sub import {
+    return unless $^O eq 'msys';
+
     no strict 'refs';
-    local $^W = 0;
+    no warnings 'redefine';
 
     my $caller = caller;
     for (@cwdsubs) {
@@ -15,7 +18,5 @@ sub _import {
         *{$caller.'::'.$_} = \&Cwd::_NT_cwd if defined &{$caller.'::'.$_};
     }
 }
-
-*import = \&_import if $^O eq 'msys';
 
 1;

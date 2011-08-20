@@ -8,9 +8,10 @@ use Test::More;
 use Parrot::Test tests => 34;
 use Parrot::Config;
 use Cwd;
-use MSYS::Cwd::Override;
 use File::Spec;
 use File::Path;
+use MSYS::Cwd::Native;
+use MSYS::File::Spec::Native;
 
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;
@@ -40,6 +41,7 @@ END {
 
 # test 'cwd'
 my $cwd = File::Spec->canonpath(getcwd);
+$cwd =~ s{/}{\\}g if $^O eq 'msys';
 
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
@@ -99,6 +101,7 @@ OUT
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
+$upcwd =~ s{/}{\\}g if $^O eq 'msys';
 chdir '..';
 
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {

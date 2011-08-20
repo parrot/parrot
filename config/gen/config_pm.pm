@@ -21,7 +21,7 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
 use Cwd qw(cwd);
-use MSYS::Cwd::Override;
+use MSYS::Cwd::Native;
 use File::Spec::Functions qw(catdir);
 
 sub _init {
