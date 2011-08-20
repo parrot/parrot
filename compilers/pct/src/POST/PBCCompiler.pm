@@ -56,13 +56,12 @@ method packfile($post, *%adverbs) {
 
 
 sub trigger($view, $flag) {
-    $_() for $view.subs_by_flag($flag);
+    $_() for $view.subs_by_tag($flag);
 }
 
 method mainpmc($packfile, *%adverbs) {
     my $view := $packfile.view();
 
-    trigger($view, 'load');
     trigger($view, 'init');
 
     $view.main_sub();
@@ -96,7 +95,6 @@ method pbc($packfile, *%adverbs) {
 
     unlink($filename) if $unlink;
 
-    trigger($view, 'load');
     trigger($view, 'init');
 
     $view.main_sub();
