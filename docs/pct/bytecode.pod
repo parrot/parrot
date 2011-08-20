@@ -58,7 +58,7 @@ returns the main method from the source for execution by the compiler.
 Using C<--output file.pbc> will allow you to save the generated packfile to
 a file.
 
-=cut
+=back
 
 =head1 KNOWN ISSUES
 
@@ -78,7 +78,7 @@ Because PIR is not generated when using these stages, inline PIR can not be
 used.  To add this, a more fine-grained PIR parser would need to be addthat
 outputs newPOST trees.
 
-=cut
+=back
 
 =head1 UNKNOWN ISSUES
 
@@ -94,5 +94,7 @@ common errors:
 This likely means that some portion of PIR text made its way into
 C<POST::PBCCompiler>.  An additional override in C<PAST::NewCompiler> will
 probably be needed to replace/alter the generated POST tree.
+
+=back
 
 =cut
