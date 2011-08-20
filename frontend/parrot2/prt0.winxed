@@ -92,7 +92,7 @@ function __get_input_file_type[anon](string file_name)
     if (ext == ".pbc") return PBC_FILE;
     ext = substr(file_name, len - 1);
     if (ext == ".pasm") return PASM_FILE;
-    return NO_FILE;
+    return PIR_FILE;
 }
 
 function __handle_error_and_exit[anon](var interp, var exception)
@@ -107,21 +107,25 @@ function __handle_error_and_exit[anon](var interp, var exception)
     stderr_pmc.print(sprintf("%s\n", [message]));
 
     string line_sep = "";
-    for (string bt in exception.backtrace_strings()) {
-        stderr_pmc.print(line_sep);
+    var bts = exception.backtrace_strings();
+    for (int i = elements(bts) - 1; i >= 0; i--) {
+        string bt = bts[i];
         var lines = split("\n", bt);
         for (string line in lines) {
-            if (index(line, "frontend/parrot2/prt0") != -1)
+            int prt0_idx;
+            ${ index prt0_idx, line, "__PARROT_ENTRY_MAIN__" };
+            if (prt0_idx != -1)
                 continue;
             stderr_pmc.print(sprintf("%s%s", [line_sep, line]));
             line_sep = "\n";
         }
-
-        int exit_code = exception.exit_code;
-        if (exit_code == 0)
-            exit_code = 1;
-        exit(exit_code);
+        line_sep = "\nthrown from\n";
     }
+
+    int exit_code = exception.exit_code;
+    if (exit_code == 0)
+        exit_code = 1;
+    exit(exit_code);
 }
 
 function __show_version_and_exit[anon](var interp)

@@ -907,7 +907,7 @@ sub, or for the point of the call a level deeper for the rest.
         GET_ATTR_bt_strings(INTERP, SELF, bt_strings);
         if (PMC_IS_NULL(bt_strings))
             bt_strings = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        VTABLE_unshift_string(INTERP, bt_strings, bt);
+        VTABLE_push_string(INTERP, bt_strings, bt);
         RETURN(PMC *bt_strings);
     }
 
