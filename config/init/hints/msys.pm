@@ -5,25 +5,11 @@ package init::hints::msys;
 use strict;
 use warnings;
 
-sub _real_path {
-    my ( $path ) = @_;
-    $path = `cd '$path' && pwd -W`;
-    chomp $path;
-    return $path;
-}
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    # Translate absolute paths accessed by Parrot tools
-    # from UNIX-style to Windows-style
-    my @keys = qw{bindir build_dir tempdir};
-    my %dirs;
-    @dirs{@keys} = map { _real_path $conf->data->get($_) } @keys;
-    $conf->data->set(%dirs);
-
     # Assume Windows 2000 or above
-    $conf->data->set(ccflags => "-DWIN32 -DWINVER=0x0500 ");
+    $conf->data->set(ccflags => '-DWIN32 -DWINVER=0x0500 ');
 
     # Create Parrot as shared library
     $conf->data->set(
@@ -40,11 +26,12 @@ sub runstep {
     $conf->data->set(blib_dir => '.');
 
     # Setup dynamic linking
+    my $bindir = $conf->data->get('bindir');
     $conf->data->set(
-        libparrot_ldflags        => '-L' . $dirs{build_dir} . ' -lparrot',
-        libparrot_linkflags      => '-L' . $dirs{build_dir} . ' -lparrot',
-        inst_libparrot_ldflags   => '-L' . $dirs{bindir} . ' -lparrot',
-        inst_libparrot_linkflags => '-L' . $dirs{bindir} . ' -lparrot',
+        libparrot_ldflags        => "-L. -lparrot",
+        libparrot_linkflags      => "-L. -lparrot",
+        inst_libparrot_ldflags   => "-L$bindir -lparrot",
+        inst_libparrot_linkflags => "-L$bindir -lparrot",
         libs =>
 '-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion '
     );

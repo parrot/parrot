@@ -23,6 +23,7 @@ use Parrot::BuildUtil;
 use Parrot::Configure::Step;
 use Parrot::Harness::DefaultTests ();
 use Cwd qw(abs_path);
+use MSYS::Cwd::Override;
 use File::Spec;
 
 

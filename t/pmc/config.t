@@ -8,6 +8,7 @@ use Test::More;
 use Parrot::Test tests => 3;
 use Parrot::Config;
 use Cwd qw(cwd);
+use MSYS::Cwd::Override;
 
 =head1 NAME
 
@@ -40,10 +41,6 @@ OUT
 my $cwd = cwd;
 if ($^O eq 'MSWin32') {
     $cwd = lc(cwd);
-}
-elsif ($^O eq 'msys') {
-    $cwd = `cd '$cwd' && pwd -W`;
-    chomp $cwd;
 }
 
 pir_output_is( <<'CODE', $cwd, "prefix" );

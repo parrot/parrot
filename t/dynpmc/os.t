@@ -8,6 +8,7 @@ use Test::More;
 use Parrot::Test tests => 34;
 use Parrot::Config;
 use Cwd;
+use MSYS::Cwd::Override;
 use File::Spec;
 use File::Path;
 
@@ -37,17 +38,8 @@ END {
     unlink "xpto" if -f "xpto";
 }
 
-sub msys_path {
-    my ($path) = @_;
-    $path = `cd '$path' && pwd -W`;
-    chomp $path;
-    $path =~ s/\//\\/g;
-    return $path;
-}
-
 # test 'cwd'
 my $cwd = File::Spec->canonpath(getcwd);
-$cwd = msys_path $cwd if $^O eq 'msys';
 
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
@@ -107,7 +99,6 @@ OUT
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
-$upcwd = msys_path $upcwd if $^O eq 'msys';
 chdir '..';
 
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {
