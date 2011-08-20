@@ -37,23 +37,33 @@ typedef struct Parrot_CallContext_attributes Parrot_Context;
  * Macros to make accessing registers more convenient/readable.
  */
 
+#define BP_REG_PMC(bp, x) ((bp).bp_ps.regs_p[-1L - (x)])
+#define BP_REG_STR(bp, x) ((bp).bp_ps.regs_s[(x)])
+#define BP_REG_NUM(bp, x) ((bp).bp_ni.regs_n[-1L - (x)])
+#define BP_REG_INT(bp, x) ((bp).bp_ni.regs_i[(x)])
+
 #ifndef NDEBUG
 #  define CTX_REG_PMC(i, p, x) (*Parrot_pcc_get_PMC_reg((i), (p), (x)))
 #  define CTX_REG_STR(i, p, x) (*Parrot_pcc_get_STRING_reg((i), (p), (x)))
 #  define CTX_REG_NUM(i, p, x) (*Parrot_pcc_get_FLOATVAL_reg((i), (p), (x)))
 #  define CTX_REG_INT(i, p, x) (*Parrot_pcc_get_INTVAL_reg((i), (p), (x)))
+
+#  define REG_NUM(interp, x) CTX_REG_NUM((interp), (interp)->ctx, (x))
+#  define REG_INT(interp, x) CTX_REG_INT((interp), (interp)->ctx, (x))
+#  define REG_PMC(interp, x) CTX_REG_PMC((interp), (interp)->ctx, (x))
+#  define REG_STR(interp, x) CTX_REG_STR((interp), (interp)->ctx, (x))
 #else /* NDEBUG */
 /* Manually inlined macros. Used in optimized builds */
-#  define CTX_REG_PMC(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_p[-1L - (x)])
-#  define CTX_REG_STR(i, p, x) (CONTEXT_STRUCT(p)->bp_ps.regs_s[(x)])
-#  define CTX_REG_NUM(i, p, x) (CONTEXT_STRUCT(p)->bp_ni.regs_n[-1L - (x)])
-#  define CTX_REG_INT(i, p, x) (CONTEXT_STRUCT(p)->bp_ni.regs_i[(x)])
-#endif
+#  define CTX_REG_PMC(i, p, x) BP_REG_PMC(CONTEXT_STRUCT(p)->bp, (x))
+#  define CTX_REG_STR(i, p, x) BP_REG_STR(CONTEXT_STRUCT(p)->bp, (x))
+#  define CTX_REG_NUM(i, p, x) BP_REG_NUM(CONTEXT_STRUCT(p)->bp, (x))
+#  define CTX_REG_INT(i, p, x) BP_REG_INT(CONTEXT_STRUCT(p)->bp, (x))
 
-#define REG_NUM(interp, x) CTX_REG_NUM((interp), (interp)->ctx, (x))
-#define REG_INT(interp, x) CTX_REG_INT((interp), (interp)->ctx, (x))
-#define REG_PMC(interp, x) CTX_REG_PMC((interp), (interp)->ctx, (x))
-#define REG_STR(interp, x) CTX_REG_STR((interp), (interp)->ctx, (x))
+#  define REG_NUM(interp, x) BP_REG_NUM((interp)->bp, (x))
+#  define REG_INT(interp, x) BP_REG_INT((interp)->bp, (x))
+#  define REG_PMC(interp, x) BP_REG_PMC((interp)->bp, (x))
+#  define REG_STR(interp, x) BP_REG_STR((interp)->bp, (x))
+#endif
 
 
 #define REGNO_INT 0
