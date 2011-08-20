@@ -21,6 +21,7 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
 use Cwd qw(cwd);
+use MSYS::Cwd::Native;
 use File::Spec::Functions qw(catdir);
 
 sub _init {
@@ -72,10 +73,6 @@ sub runstep {
         ' ' . $conf->data->get('libs') );
 
     my $cwd = cwd();
-
-    # expand msys virtual paths
-    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd
-        if $conf->data->get('osname') eq 'msys';
 
     # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;

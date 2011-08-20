@@ -10,10 +10,13 @@ use Parrot::Config;
 use Cwd;
 use File::Spec;
 use File::Path;
+use MSYS::Cwd::Native;
+use MSYS::File::Spec::Native;
 
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;
 my $solaris = $^O =~ m!solaris!;
+my $msys    = $^O =~ m!msys!;
 my $MSVC = $PConfig{cc} =~ m/\bcl(?:\.exe)?/i;
 
 =head1 NAME
@@ -38,6 +41,8 @@ END {
 
 # test 'cwd'
 my $cwd = File::Spec->canonpath(getcwd);
+$cwd =~ s{/}{\\}g if $^O eq 'msys';
+
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
@@ -96,6 +101,7 @@ OUT
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
+$upcwd =~ s{/}{\\}g if $^O eq 'msys';
 chdir '..';
 
 if (File::Spec->case_tolerant(substr($cwd,0,2))) {
@@ -532,7 +538,8 @@ rmdir $xpto if -f $xpto;    # this way next test doesn't fail if this one does
 
 # Test symlink
 SKIP: {
-    skip "Admin rights and Vista needed for symlinks on Windows", 2 if $MSWin32;
+    skip "Admin rights and Vista needed for symlinks on Windows", 2
+        if $MSWin32 || $msys;
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
@@ -623,7 +630,7 @@ OUT
 
 # Test umask
 SKIP: {
-    skip "umask not available under Windows", 1 if $MSWin32;
+    skip "umask not available under Windows", 1 if $MSWin32 || $msys;
 
     my $umask = umask;
     pir_output_like( <<'CODE', <<"OUT", "Test umask" );
@@ -690,7 +697,7 @@ pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 CODE
 
 SKIP: {
-    skip 'no file modes on Win32', 3 if ($MSWin32 || $cygwin);
+    skip 'no file modes on Win32', 3 if ($MSWin32 || $cygwin || $msys);
 
     open my $fa, ">", "test_f_a";
     close $fa;
@@ -782,7 +789,7 @@ OUT
 
 # test can_execute
 $xa = -x "README" ? 1 : 0;
-my $parrot_exe_name = $MSWin32 ? "parrot.exe" : "parrot";
+my $parrot_exe_name = $MSWin32 || $msys ? "parrot.exe" : "parrot";
 $xb = -x $parrot_exe_name ? 1 : 0;
 pir_output_is( <<"CODE", <<"OUT", 'Test can_execute' );
 .sub main :main

@@ -24,6 +24,8 @@ use Parrot::Configure::Step;
 use Parrot::Harness::DefaultTests ();
 use Cwd qw(abs_path);
 use File::Spec;
+use MSYS::Cwd::Native;
+use MSYS::File::Spec::Native;
 
 
 sub _init {

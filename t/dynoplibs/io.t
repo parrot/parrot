@@ -112,6 +112,7 @@ CODE
     .include 'sysinfo.pasm'
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto tt661_todo
+    if $S0 == 'msys' goto tt661_todo
 
     .return (0)
 
@@ -539,6 +540,7 @@ OUTPUT
 
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto run_win32_stat_tests
+    if $S0 == 'msys' goto run_win32_stat_tests
     goto run_unix_stat_tests
 
   run_win32_stat_tests:
