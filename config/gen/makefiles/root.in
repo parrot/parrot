@@ -757,7 +757,7 @@ help :
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
 	@echo "Installation:"
-	@echo "  install:           Install under '$(PREFIX)' on Unix systems."
+	@echo "  install:           Install under '$(PREFIX)'."
 	@echo "  install-dev:       Same as 'install'."
 	@echo "  install-bin:       Install only files needed for Parrot runtime."
 	@echo "  install-dev-only:  Install only files needed for Parrot development."
