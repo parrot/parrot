@@ -200,7 +200,7 @@ Return C<str> as a PIR constant string.
 
 method escape($str) {
     my $estr := pir::escape__SS($str);
-    if pir::index($estr, '\x') >= 0 || pir::index($estr, '\u') > 0 {
+    if pir::index($estr, '\x') >= 0 || pir::index($estr, '\u') >= 0 {
         $estr := 'unicode:"' ~ $estr;
     }
     else {
