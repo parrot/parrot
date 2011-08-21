@@ -1488,7 +1488,7 @@ multi method chain(PAST::Op $node, *%options) {
 
     my $ops := POST::Ops.new(:node($node));
     $ops.result(self.unique('$P'));
-    my $endlabel := POST::Label(:name('chain_end_'));
+    my $endlabel := POST::Label.new(:name('chain_end_'));
 
     $cpast := pir::pop(@clist);
     my $apost := self.as_post($cpast[0], :rtype('P'));
