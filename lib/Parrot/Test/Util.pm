@@ -28,8 +28,8 @@ use strict;
 use warnings;
 
 use File::Temp 'tempfile';
-use MSYS::File::Spec::Native;
 use Exporter;
+use MSYS::MinGW;
 
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( create_tempfile );

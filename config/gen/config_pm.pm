@@ -21,8 +21,8 @@ use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
 use Cwd qw(cwd);
-use MSYS::Cwd::Native;
 use File::Spec::Functions qw(catdir);
+use MSYS::MinGW;
 
 sub _init {
     my $self = shift;

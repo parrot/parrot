@@ -10,8 +10,7 @@ use Parrot::Config;
 use Cwd;
 use File::Spec;
 use File::Path;
-use MSYS::Cwd::Native;
-use MSYS::File::Spec::Native;
+use MSYS::MinGW;
 
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;

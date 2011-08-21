@@ -8,7 +8,7 @@ use Test::More;
 use Parrot::Test tests => 3;
 use Parrot::Config;
 use Cwd qw(cwd);
-use MSYS::Cwd::Native;
+use MSYS::MinGW;
 
 =head1 NAME
 
