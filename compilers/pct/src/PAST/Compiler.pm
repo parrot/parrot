@@ -627,11 +627,19 @@ multi method as_post(PAST::Node $node, *%options) {
 method node_as_post($node, %options) {
     my $rtype := %options<rtype>;
 
-    my $signature := pir::repeat('v', +$node.list());
-    $signature := $signature ~ $rtype;
+    my $signature := $node.signature();
+    unless $signature {
+        $signature := pir::repeat('v', +$node.list());
+        $signature := $signature ~ $rtype;
+    }
 
     my $ops := self.post_children($node, signature => $signature);
-    $ops.result($ops[-1]);
+    my $result := $ops[-1];
+    my $I0 := pir::index('0123456789', pir::substr($signature, 0, 1));
+    $result := $ops[$I0] if $I0 >= 0;
+    $ops.result($result);
+
+    $ops := self.coerce($ops, $rtype) if $rtype;
 
     my $eh := $node.handlers();
     $ops := self.wrap_handlers($ops, $eh, rtype => $rtype) if $eh;

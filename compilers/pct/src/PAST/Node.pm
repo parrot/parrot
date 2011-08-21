@@ -70,6 +70,16 @@ method lvalue($value?) {
     self.attr('lvalue', $value, pir::defined($value));
 }
 
+
+=item signature([signature])
+Get/set the signature to be used for evaluating any
+children nodes.
+
+method signature($value?) {
+    self.attr('signature', $value, pir::defined($value));
+}
+
+
 =item childorder([order])
 Get/set the order in which children nodes should be evaluated
 (via Compiler::post_children).  If C<order> is 'right' then
