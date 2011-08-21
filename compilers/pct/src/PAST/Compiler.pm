@@ -1442,7 +1442,7 @@ multi method try(PAST::Op $node, *%options) {
 
     my $S0 := self.unique('catch_');
     my $catchlabel := POST::Label.new(:result($S0));
-    my $endlabel   := POST::Lable.new(:result($S0 ~ '_end'));
+    my $endlabel   := POST::Label.new(:result($S0 ~ '_end'));
 
     my $rtype := %options<rtype>;
 
