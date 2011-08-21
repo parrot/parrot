@@ -2419,7 +2419,10 @@ test-clean :
 	$(RM_F) \
 	 "t/src/*.c" \
 	 "t/src/*.pdb" \
-	 "t/src/*.manifest"
+	 "t/src/*.manifest" \
+	 "t/src/*.exp" \
+	 "t/src/*.lib" \
+	 "t/src/*.exe"
 	$(RM_F) \
 	 "t/src/embed/*.c" \
 	 "t/src/embed/*.pdb" \
