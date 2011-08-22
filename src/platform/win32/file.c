@@ -24,8 +24,8 @@ This file implements OS-specific file functions for Win32 platforms.
 #  endif
 #endif
 
-#include <tchar.h>
-#include <direct.h>
+#include <windows.h>
+#include <wchar.h>
 #include "parrot/parrot.h"
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \

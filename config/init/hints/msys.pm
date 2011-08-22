@@ -1,7 +1,5 @@
 # Copyright (C) 2005-2011, Parrot Foundation.
 
-# TODO: support MSYS mode
-
 package init::hints::msys;
 
 use strict;
@@ -9,29 +7,47 @@ use warnings;
 
 my %modes = (
     MINGW32 => \&_mingw,
-#    MSYS => \&_msys
+    MSYS => \&_msys
 );
 
 sub runstep {
-    my ( $self, $conf ) = @_;
+    my (undef, $conf) = @_;
+
+    # Assume Windows 2000 or above
+    $conf->data->set(ccflags => '-DWINVER=0x0500 ');
 
     # Create Parrot as shared library
     $conf->data->set(
         parrot_is_shared    => 1,
         has_dynamic_linking => 1,
+        has_static_linking  => 0,
         ld_share_flags      => '-shared',
         ld_load_flags       => '-shared',
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)'
     );
 
-    # Create libparrot.dll in same directory as parrot.exe
+    # Link non-default libs
+    $conf->data->set(libs => '-lws2_32');
+
+    # Create DLL in same directory as executable
     # Generates unnecessary clutter in build directory
     $conf->data->set(
         blib_dir            => '.',
-        libparrot_ldflags   => "-L. -lparrot",
-        libparrot_linkflags => "-L. -lparrot",
+        libparrot_ldflags   => '-L. -lparrot',
+        libparrot_linkflags => '-L. -lparrot',
     );
+
+    # Setup installed Parrot
+    my $bindir = $conf->data->get('bindir');
+    $bindir =~ s/ /\\ /g;
+    $conf->data->set(
+        inst_libparrot_ldflags   => "-L$bindir -lparrot",
+        inst_libparrot_linkflags => "-L$bindir -lparrot"
+    );
+
+    # NCI testing
+    $conf->data->set(ncilib_link_extra => 'src/libnci_test.def');
 
     # Custom settings for different MSYS modes
     my $mode = $ENV{MSYSTEM};
@@ -40,28 +56,31 @@ sub runstep {
 }
 
 sub _msys {
-    my ( $conf ) = @_;
+    my ($conf) = @_;
 
-    # TODO: use dll name msys-parrot-XXX.dll
+    # Use MSYS naming scheme for DLLs
+    my $libname = $conf->data->get('libparrot_shared');
+    my $suffix = join '_', Parrot::BuildUtil::parrot_version;
+    $libname =~ s/^lib/msys-/g;
+    $libname =~ s/\.dll$/-$suffix.dll/;
+    $conf->data->set(libparrot_shared => $libname);
+
+    # Set Windows defines
+    my $ccflags = $conf->data->get('ccflags');
+    $conf->data->set(ccflags => '-mwin32 '.$ccflags);
 }
 
 sub _mingw {
-    my ( $conf ) = @_;
+    my ($conf) = @_;
 
-    # Assume Windows 2000 or above
-    $conf->data->set(ccflags => '-DWIN32 -DWINVER=0x0500 ');
-
-    # Setup installed Parrot
     my $bindir = $conf->data->get('bindir');
-    $conf->data->set(
-        inst_libparrot_ldflags   => "-L$bindir -lparrot",
-        inst_libparrot_linkflags => "-L$bindir -lparrot",
-        libs =>
-'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion '
-    );
+    $bindir = `cd '$bindir' && pwd -W`;
+    chomp $bindir;
+    $conf->data->set(bindir => $bindir);
 
-    # NCI testing
-    $conf->data->set(ncilib_link_extra => 'src/libnci_test.def');
+    # Setup path for MSYS libs
+    my $libs = $conf->data->get('libs');
+    $conf->data->set(libs => $libs.' -L/bin');
 }
 
 1;

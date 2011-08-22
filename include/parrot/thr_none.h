@@ -33,7 +33,11 @@
 
 typedef void (*Cleanup_Handler)(void *);
 
+/* XXX-MSYS
 #if ! PARROT_HAS_TIMESPEC
+*/
+#if 0
+#define PARROT_HAS_TIMESPEC 1
 struct timespec {
     time_t tv_sec;
     long tv_nsec;
