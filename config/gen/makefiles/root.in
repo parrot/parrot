@@ -81,6 +81,7 @@ MKPATH           = @mkpath@
 RM_F             = @rm_f@
 RM_RF            = @rm_rf@
 TOUCH            = @touch@
+TAR              = @tar@
 AR_CR            = @ar@ @arflags@
 RANLIB           = @ranlib@
 YACC             = @yacc@
@@ -2940,11 +2941,13 @@ release : MANIFEST MANIFEST.generated
 	mv MANIFEST MANIFEST.real
 	grep -v DEVELOPING MANIFEST.real > MANIFEST
 	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
-	tar -zcv -T - -f parrot-$(VERSION).tar.gz
+	$(TAR) -zcv -T - -f parrot-$(VERSION).tar.gz
 	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' \
-	     MANIFEST | tar -jcv -T - -f parrot-$(VERSION).tar.bz2
-	sha256sum parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
-	sha256sum parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
+	     MANIFEST | $(TAR) -jcv -T - -f parrot-$(VERSION).tar.bz2
+	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
+        parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
+	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
+        parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 

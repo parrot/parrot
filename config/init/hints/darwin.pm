@@ -8,6 +8,7 @@ use warnings;
 use lib qw( lib );
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
+use File::Which;
 
 our %defaults = (
     uname           => `uname -r`,
