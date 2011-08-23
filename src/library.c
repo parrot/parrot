@@ -491,7 +491,7 @@ try_load_path(PARROT_INTERP, ARGIN(STRING* path))
 {
     ASSERT_ARGS(try_load_path)
 
-#ifdef WIN32
+#if defined WIN32 && !defined __MSYS__
     path = cnv_to_win32_filesep(interp, path);
 #endif
 
@@ -877,7 +877,7 @@ Parrot_lib_search_paths_as_string(PARROT_INTERP, enum_runtime_ft type)
     PMC    *paths;
 
 /* TODO: Get the real separator, not this hacked-together stuff */
-#ifdef WIN32
+#if defined WIN32 && !defined __MSYS__
     STRING * const env_search_path_sep = CONST_STRING(interp, ";");
 #else
     STRING * const env_search_path_sep = CONST_STRING(interp, ":");

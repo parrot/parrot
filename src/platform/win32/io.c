@@ -170,17 +170,17 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     DWORD      fAcc, fShare, fCreat;
     PIOHANDLE  fd;
-    LPWSTR     wpath;
+    LPWSTR     wp_path;
 
     /* Set open flags - <, >, >>, +<, +> */
     /* add ? and ! for block/non-block */
     convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat);
 
-    wpath = PARROT_WIN32_PATH(interp, path);
-    fd = CreateFileW(wpath, fAcc, fShare, NULL, fCreat,
-             FILE_ATTRIBUTE_NORMAL, NULL);
+    wp_path = PARROT_WIN32_PATH(interp, path);
+    fd      = CreateFileW(wp_path, fAcc, fShare, NULL, fCreat,
+                  FILE_ATTRIBUTE_NORMAL, NULL);
 
-    PARROT_WIN32_FREE_PATH(wpath);
+    PARROT_WIN32_FREE_PATH(wp_path);
     return fd;
 }
 

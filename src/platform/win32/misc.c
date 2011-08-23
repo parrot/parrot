@@ -37,7 +37,7 @@ Parrot_platform_msys_str_to_path(PARROT_INTERP, ARGIN(STRING *path))
     int    count;
     char   rpath[MAX_PATH];
     LPSTR  spath;
-    LPWSTR wpath;
+    LPWSTR wp_path;
 
     spath = Parrot_str_to_encoded_cstring(interp, path,
                 Parrot_utf8_encoding_ptr);
@@ -45,20 +45,24 @@ Parrot_platform_msys_str_to_path(PARROT_INTERP, ARGIN(STRING *path))
     // assumes that paths can only grow by 1 char via adding ':'
     // TODO: verify that this is indeed the case
     if(strlen(spath) >= sizeof rpath - 1)
+    {
+        Parrot_str_free_cstring(spath);
         return NULL;
+    }
 
     // TODO: what is the return value?
     cygwin_conv_to_win32_path(spath, rpath);
+fprintf(stderr, "\nXXX %s -> %s\n", spath, rpath);
     Parrot_str_free_cstring(spath);
 
     count = MultiByteToWideChar(CP_UTF8, 0, rpath, -1, NULL, 0);
     if(!count) return NULL;
 
-    wpath = mem_allocate_n_typed(count, WCHAR);
-    if(!wpath) return NULL;
+    wp_path = mem_allocate_n_typed(count, WCHAR);
+    if(!wp_path) return NULL;
 
-    MultiByteToWideChar(CP_UTF8, 0, rpath, -1, wpath, count);
-    return wpath;
+    MultiByteToWideChar(CP_UTF8, 0, rpath, -1, wp_path, count);
+    return wp_path;
 }
 
 #endif

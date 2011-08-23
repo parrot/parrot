@@ -27,7 +27,14 @@ This file implements OS-specific file functions for Win32 platforms.
 #include <windows.h>
 #include <wchar.h>
 #include "parrot/parrot.h"
+#include "../../io/io_private.h"
 #include "path.h"
+
+#ifdef __MSYS__
+#define SLASH "/"
+#else
+#define SLASH "\\"
+#endif
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
     EXCEPTION_EXTERNAL_ERROR, "%s failed: %Ss", (msg), \
@@ -108,6 +115,10 @@ Parrot_file_getcwd(PARROT_INTERP)
 
     mem_gc_free(interp, c_str);
 
+fputs("\nYYY ", stderr);
+Parrot_io_putps(interp, _PIO_STDERR(interp), result);
+fputs("\n", stderr);
+
     return result;
 }
 
@@ -124,11 +135,10 @@ Changes the current working directory to the one specified by C<path>.
 void
 Parrot_file_chdir(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                        Parrot_utf16_encoding_ptr);
-    BOOL  result = SetCurrentDirectoryW((LPWSTR)c_str);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    BOOL   result  = SetCurrentDirectoryW(wp_path);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     if (!result)
         THROW("chdir");
@@ -147,11 +157,10 @@ Creates a directory specified by C<path> with mode C<mode>.
 void
 Parrot_file_mkdir(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode)
 {
-    char *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                        Parrot_utf16_encoding_ptr);
-    BOOL  result = CreateDirectoryW((LPWSTR)c_str, NULL);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    BOOL   result  = CreateDirectoryW(wp_path, NULL);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     if (!result)
         THROW("mkdir");
@@ -170,11 +179,10 @@ Removes a directory specified by C<path>.
 void
 Parrot_file_rmdir(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                        Parrot_utf16_encoding_ptr);
-    BOOL  result = RemoveDirectoryW((LPWSTR)c_str);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    BOOL   result  = RemoveDirectoryW(wp_path);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     if (!result)
         THROW("rmdir");
@@ -193,11 +201,10 @@ Removes a file specified by C<path>.
 void
 Parrot_file_unlink(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                        Parrot_utf16_encoding_ptr);
-    BOOL  result = DeleteFileW((LPWSTR)c_str);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    BOOL   result  = DeleteFileW(wp_path);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     if (!result)
         THROW("unlink");
@@ -277,15 +284,14 @@ Parrot_file_stat(PARROT_INTERP, ARGIN(STRING *file),
         ARGOUT(Parrot_Stat_Buf *buf))
 {
     WIN32_FILE_ATTRIBUTE_DATA attr_data;
-    char   *c_str = Parrot_str_to_encoded_cstring(interp, file,
-                        Parrot_utf16_encoding_ptr);
-    BOOL    success;
-    INTVAL  type;
+    LPWSTR wp_file = PARROT_WIN32_PATH(interp, file);
+    BOOL   success;
+    INTVAL type;
 
-    success = GetFileAttributesExW((LPWSTR)c_str,
+    success = GetFileAttributesExW(wp_file,
                     GetFileExInfoStandard, &attr_data);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_file);
 
     if (!success)
         THROW("stat");
@@ -470,13 +476,13 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
       case STAT_MODIFYTIME:
       case STAT_CHANGETIME: {
             WIN32_FILE_ATTRIBUTE_DATA attr_data;
-            LPWSTR wpath = PARROT_WIN32_PATH(interp, file);
+            LPWSTR wp_path = PARROT_WIN32_PATH(interp, file);
             BOOL  success;
 
-            success = GetFileAttributesExW(wpath,
+            success = GetFileAttributesExW(wp_path,
                             GetFileExInfoStandard, &attr_data);
 
-            PARROT_WIN32_FREE_PATH(wpath);
+            PARROT_WIN32_FREE_PATH(wp_path);
 
             if (thing == STAT_EXISTS) {
                 result = success;
@@ -728,10 +734,10 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
     static csl_func_t csl;
     static int        initialized = 0;
 
-    char    *c_from;
-    char    *c_to;
-    DWORD    attrs;
-    BOOLEAN  result = 0; /* BOOLEAN, not BOOL */
+    LPWSTR  wp_from = PARROT_WIN32_PATH(interp, from);
+    LPWSTR  wp_to   = PARROT_WIN32_PATH(interp, to);
+    DWORD   attrs   = GetFileAttributesW(wp_from);
+    BOOLEAN result  = 0; /* BOOLEAN, not BOOL */
 
     if (!initialized) {
         csl = (csl_func_t)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
@@ -744,22 +750,16 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "CreateSymbolicLink not supported");
 
-    c_from = Parrot_str_to_encoded_cstring(interp, from,
-                            Parrot_utf16_encoding_ptr);
-    c_to   = Parrot_str_to_encoded_cstring(interp, to,
-                            Parrot_utf16_encoding_ptr);
-    attrs  = GetFileAttributesW((LPWSTR)c_from);
-
     if (attrs != INVALID_FILE_ATTRIBUTES) {
         DWORD flags = attrs & FILE_ATTRIBUTE_DIRECTORY
                     ? 0x1    /* SYMBOLIC_LINK_FLAG_DIRECTORY */
                     : 0x0;
 
-        result = csl((LPWSTR)c_to, (LPWSTR)c_from, flags);
+        result = csl(wp_to, wp_from, flags);
     }
 
-    Parrot_str_free_cstring(c_from);
-    Parrot_str_free_cstring(c_to);
+    PARROT_WIN32_FREE_PATH(wp_from);
+    PARROT_WIN32_FREE_PATH(wp_to);
 
     if (!result)
         THROW("symlink");
@@ -778,14 +778,12 @@ Creates a symlink
 void
 Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 {
-    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
-                            Parrot_utf16_encoding_ptr);
-    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
-                            Parrot_utf16_encoding_ptr);
-    BOOL     result = CreateHardLinkW((LPWSTR)c_to, (LPWSTR)c_from, NULL);
+    LPWSTR wp_from = PARROT_WIN32_PATH(interp, from);
+    LPWSTR wp_to   = PARROT_WIN32_PATH(interp, to);
+    BOOL   result  = CreateHardLinkW(wp_to, wp_from, NULL);
 
-    Parrot_str_free_cstring(c_from);
-    Parrot_str_free_cstring(c_to);
+    PARROT_WIN32_FREE_PATH(wp_from);
+    PARROT_WIN32_FREE_PATH(wp_to);
 
     if (!result)
         THROW("link");
@@ -842,8 +840,8 @@ PMC *
 Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 {
     PMC    *array = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
-    char   *c_str;
-    char   *suffix;
+    LPWSTR  wp_path;
+    LPCSTR  suffix;
     INTVAL  last_char;
     HANDLE  handle;
 
@@ -851,14 +849,13 @@ Parrot_file_readdir(PARROT_INTERP, ARGIN(STRING *path))
 
     /* Add \* to the directory name and start search. */
     last_char = STRING_ord(interp, path, -1);
-    suffix    = last_char == '\\' || last_char == '/' ? "*" : "\\*";
+    suffix    = last_char == '\\' || last_char == '/' ? "*" : SLASH "*";
     path      = Parrot_str_concat(interp, path,
                         string_from_literal(interp, suffix));
-    c_str     = Parrot_str_to_encoded_cstring(interp, path,
-                        Parrot_utf16_encoding_ptr);
-    handle    = FindFirstFileW((LPWSTR)c_str, &find_data);
+    wp_path   = PARROT_WIN32_PATH(interp, path);
+    handle    = FindFirstFileW(wp_path, &find_data);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     if (handle == INVALID_HANDLE_VALUE)
         THROW("readdir");
@@ -893,14 +890,12 @@ Renames a file
 void
 Parrot_file_rename(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 {
-    char    *c_from = Parrot_str_to_encoded_cstring(interp, from,
-                            Parrot_utf16_encoding_ptr);
-    char    *c_to   = Parrot_str_to_encoded_cstring(interp, to,
-                            Parrot_utf16_encoding_ptr);
-    BOOL     result = MoveFileW((LPWSTR)c_from, (LPWSTR)c_to);
+    LPWSTR wp_from = PARROT_WIN32_PATH(interp, from);
+    LPWSTR wp_to   = PARROT_WIN32_PATH(interp, to);
+    BOOL   result  = MoveFileW(wp_from, wp_to);
 
-    Parrot_str_free_cstring(c_from);
-    Parrot_str_free_cstring(c_to);
+    PARROT_WIN32_FREE_PATH(wp_from);
+    PARROT_WIN32_FREE_PATH(wp_to);
 
     if (!result)
         THROW("rename");
@@ -938,11 +933,10 @@ and don't look at the ACLs.
 INTVAL
 Parrot_file_can_read(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char    *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                            Parrot_utf16_encoding_ptr);
-    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    DWORD  attrs   = GetFileAttributesW(wp_path);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     return attrs != INVALID_FILE_ATTRIBUTES;
 }
@@ -962,11 +956,10 @@ and is not read-only. We should look at the ACLs.
 INTVAL
 Parrot_file_can_write(PARROT_INTERP, ARGIN(STRING *path))
 {
-    char    *c_str  = Parrot_str_to_encoded_cstring(interp, path,
-                            Parrot_utf16_encoding_ptr);
-    DWORD    attrs  = GetFileAttributesW((LPWSTR)c_str);
+    LPWSTR wp_path = PARROT_WIN32_PATH(interp, path);
+    DWORD  attrs   = GetFileAttributesW(wp_path);
 
-    Parrot_str_free_cstring(c_str);
+    PARROT_WIN32_FREE_PATH(wp_path);
 
     return attrs != INVALID_FILE_ATTRIBUTES
     &&    (attrs & FILE_ATTRIBUTE_READONLY) == 0;
