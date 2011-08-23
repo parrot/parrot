@@ -60,9 +60,7 @@ sub _msys {
 
     # Use MSYS naming scheme for DLLs
     my $libname = $conf->data->get('libparrot_shared');
-    my $suffix = join '_', Parrot::BuildUtil::parrot_version;
     $libname =~ s/^lib/msys-/g;
-    $libname =~ s/\.dll$/-$suffix.dll/;
     $conf->data->set(libparrot_shared => $libname);
 
     # Set Windows defines
