@@ -1,239 +1,11 @@
-2011.08.15     coke 
-	* Released 3.7.0
-	See NEWS for more information.
-
-2011.07.19     jkeenan
-	* Released 3.6.0
-	See NEWS for more information.
-
-2011.06.21     cotto
-	* Released 3.5.0
-	See NEWS for more information.
-
-2011.05.17     Gerd
-	* Released 3.4.0
-	See NEWS for more.
-
-2011.04.19     Whiteknight
-    * Released 3.3.0
-    See NEWS for more.
-
-2011.03.15     Gerd
-	* Released 3.2.0
-	See NEWS for more.
-
-2011.02.15     mikehh
-        * Released 3.1.0
-        See NEWS for more.
-
-2011.01.18     cotto
-	* Released 3.0.0
-	See NEWS for more.
-
-2010.12.21     Whiteknight
-	* Released 2.11.0
-	See NEWS for more.
-
-2010.11.16     tcurtis
-	* Released 2.10.0
-	See NEWS for more.
-
-2010.10.19     Gerd
-	* Released 2.9.0
-	See NEWS for more.
-
-2010.09.21     Gerd
-	* Released 2.8.0
-	See NEWS for more.
-
-2010.08.17     mikehh
-	* Released 2.7.0
-	See NEWS for more.
-
-2010.07.10     coke
-	* Released 2.6.0
-	See NEWS for more.
-
-2010.06.15     Gerd
-	* Released 2.5.0
-	See NEWS for more.
-
-2010.05.18     Whiteknight
-	* Released 2.4.0
-	See NEWS for more
-
-2010.04.20     Gerd
-	* Released 2.3.0
-	See NEWS for more.
-
-2010.03.16     cotto
-	* Released 2.2.0
-	See NEWS for more.
-
-2010.02.16     darbelo
-	* Released 2.1.0
-	See NEWS for more.
-
-2010.01.19     chromatic
-	* Released 2.0.0
-	See NEWS for more.
-
-2009.12.15     Gerd
-	* Released 1.9.0
-	See NEWS for more.
-
-2009.11.17     barney
-	* Released 1.8.0
-	See NEWS for more.
-
-2009.10.20     dukeleto
-	* Released 1.7.0
-	See NEWS for more.
-
-2009.9.15     particle
-	* Released 1.6.0
-	See NEWS for more.
-
-2009.8.18     Whiteknight
-	* Released 1.5.0
-	See NEWS for more.
-
-2009.7.21     cotto
-	* Released 1.4.0
-	See NEWS for more.
-
-2009.06.16    Whiteknight
-	* Released 1.3.0
-	See NEWS for more.
-
-2009.05.19    Infinoid
-	* Released 1.2.0
-	See NEWS for more.
-
-2009.04.21    fperrad
-	* Released 1.1.0
-	See NEWS for more.
-
-2009.03.17    allison
-	* Released 1.0.0
-	See NEWS for more.
-
-2009.02.17    kjs
-	* Released 0.9.1
-	See NEWS for more.
-
-2009.01.20    chromatic
-	* Released 0.9.0
-	See NEWS for more.
-
-2008.12.16    Whiteknight
-	* Released 0.8.2
-	See NEWS for more.
-
-2008.11.18    chromatic
-	* Released 0.8.1
-	See NEWS for more.
-
-2008.10.21    particle
-	* Released 0.8.0
-	See NEWS for more.
-
-2008.09.16    pmichaud
-	* Released 0.7.1
-	See NEWS for more.
-
-2008.08.19    rgrjr
-	* Released 0.7.0
-	See NEWS for more.
-
-2008.07.15    barney
-	* Released 0.6.4
-	See NEWS for more.
-
-2008.06.17    smash
-	* Released 0.6.3
-	See NEWS for more.
-
-2008.05.20    chromatic
-	* Released 0.6.2
-	See NEWS for more.
-
-2008.04.15    particle
-	* Released 0.6.1
-	See NEWS for more.
-
-2008.03.18    bernhard
-	* Released 0.6.0
-	See NEWS for more.
-
-2008.02.20    pmichaud
-	* Released 0.5.3
-	See NEWS for more.
-
-2008.01.15    rgrjr
-	* Released 0.5.2
-	See NEWS for more.
-
-2007.12.18    jonathan
-	* Released 0.5.1
-	See NEWS for more.
-
-2007.11.20    chromatic
-	* Released 0.5.0
-	See NEWS for more.
-
-2007.10.17    coke
-	* Released 0.4.17
-	See NEWS for more.
-
-2007.09.18    particle
-	* Released 0.4.16
-	See NEWS for more.
-
-2007.08.22    pmichaud
-	* Released 0.4.15
-	See NEWS for more.
-
-2007.07.17    particle
-	* Released 0.4.14
-	See NEWS for more.
-
-2007.06.19    allison
-	* Released 0.4.13
-	See NEWS for more.
-
-2007.05.15    chromatic
-	* Released 0.4.12
-	See NEWS for more.
-
-2007.04.17    mdiep
-	* Released 0.4.11
-	See NEWS for more.
-
-2007.03.20    coke
-	* Released 0.4.10
-	See NEWS for more.
-
 2007.3.10     coke
 	* removed parakeet
-
-2007.02.22    pmichaud
-	* Released 0.4.9
-	See NEWS for more.
 
 2007.01.17    chromatic
 	* changed 'name' method on namespaces to 'get_name' per pdd21
 
-2007.01.16    particle
-	* Released 0.4.8
-	See NEWS for more.
-
 2006.12.12    particle
 	* added C<isnull> opcode
-
-2006.11.14    chip
-	* Released 0.4.7
-	See NEWS for more.
 
 2006.11.07	tewk
 	* added :init pragma functionality to subs
@@ -254,10 +26,6 @@
 	* read-only PMC support
 	* several new PMC types (whose names start with STM*)
 	* support for threads (again)
-
-2006.08.08    chip
-	* Released 0.4.6
-	See NEWS for more.
 
 2006.08.02    chip
 	* opcodes: "in PMC" is no longer a synonym for "invar PMC";
@@ -289,32 +57,16 @@
 	* get_namespace and find_global opcodes no longer accept arrays
 	  of strings.  To use arrays, call namespace object methods.
 
-2006.06.19    leo
-	* Released 0.4.5
-	See NEWS for more.
-
 2006.06.03    leo
 	* I and N registers are never cleared to 0 / 0.0 on subroutine entry
 
-2006.05.14    leo
-	* Released 0.4.4
-	See NEWS for more.
-
 2006.04.30    bernhard
 	* Make the Perl PMCs dynamic and move them to src/dynpmc
-
-2006.04.02    leo
-	* Released 0.4.3
-	See NEWS for more.
 
 2006.03.06    leo
 	* Shifted argument type bits left by 2 according to r11754
 	  change of docs/pdds/pdd03_calling_conventions.pod
 	* if you are creating PASM then code needs adjustment
-
-2006.02.22    leo
-	* Released 0.4.2
-	See NEWS for more.
 
 2006.01.16    bernhard
 	 * rename src/dynclasses to src/dynpmc
@@ -324,10 +76,6 @@
 
 	 * find_global and friends returns a .Null PMC instead of .Undef on
 	  lookup failure, iff lookup exceptions are off
-
-2006.01.08    leo
-	* Released 0.4.1
-	See NEWS for more.
 
 2005.12.28    particle
 	* renamed all .imc files to .pir
@@ -363,28 +111,7 @@
 	* moved build_tools/ directory to tools/build/
 	* modified MANIFEST, MANIFEST.generated, and MANIFEST.SKIP
 
-2005.12.04    leo
-	* Released 0.4.0
-	* See NEWS for changes
-
-2005.11.06    leo
-	* Released 0.3.1
-	* See NEWS for changes
-
-2005.10.01    leo
-	* Released 0.3.0
-	* See NEWS for changes
-
-2005.08.05    leo
-	* Released 0.2.3
-	* See NEWS for changes
-
-2005.07.03    leo
-	* Released 0.2.2
-	* See NEWS for changes
-
 2005.06.04    leo
-	* Released 0.2.1
 	* allow short names for object attributes
 	* string encoding and charset can now be set independently
 	* experimental mmap IO layer for slurping files
@@ -398,7 +125,6 @@
 	* numerous bug fixes and enhancements
 
 2005-05-08    leo
-	* Released 0.2.0
 	* parrot repository is now under subversion
 	* MMD (Multi Method Dispatch) enhanced
 	* new unary and infix opcodes that return new result PMCs
@@ -411,7 +137,6 @@
 	* the usual bug fixes and improvements
 
 2005-03-06    leo
-	* Released 0.1.2
 	* big rewrite of string code, not yet finished but ...
 	* partial implementation of a generational garbage collector
 	* indirect register frame addressing
@@ -426,7 +151,6 @@
 	* and as always a lot more
 
 2004-10-09    leo
-	* Released 0.1.1
 	* Need Perl 5.6 now for building
 	* Basic AST support, PAST file parser, bits of code generation
 	* BigInt PMC using GMP
@@ -456,7 +180,6 @@
 	* ... and a lot more
 
 2004-02-29    leo
-	* Released 0.1.0
 	* "Ladies and gentlemen, I give you... objects!"
 	* Huge documentation overhaul
 	* More supported platforms, s. PLATFORMS
@@ -488,7 +211,6 @@
 
 
 2003-10-31    leo
-	* Released 0.0.13
 	* Yep thirteen - haunted by the ghost of 0.0.12
 	* Build imcc as parrot
 	* Objects more finished
@@ -516,11 +238,9 @@
 2003-09-20    sfink
 
 	* updated the native_pbc test files (from Leo)
-	* built 0.0.11.1 release tarball
 
 2003-09-20    sfink
 
-	* CHANGES BUNDLED INTO 0.0.11:
 	* Executable output
 	* Dynamic PMC registration
 	* Trial exception system
