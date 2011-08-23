@@ -27,6 +27,42 @@ Miscellaneous helper functions that are specific to Win32.
 
 /* HEADERIZER HFILE: none */
 
+#ifdef __MSYS__
+#include <sys/cygwin.h>
+
+PARROT_CAN_RETURN_NULL
+LPWSTR
+Parrot_platform_msys_str_to_path(PARROT_INTERP, ARGIN(STRING *path))
+{
+    int    count;
+    char   rpath[MAX_PATH];
+    LPSTR  spath;
+    LPWSTR wpath;
+
+    spath = Parrot_str_to_encoded_cstring(interp, path,
+                Parrot_utf8_encoding_ptr);
+
+    // assumes that paths can only grow by 1 char via adding ':'
+    // TODO: verify that this is indeed the case
+    if(strlen(spath) >= sizeof rpath - 1)
+        return NULL;
+
+    // TODO: what is the return value?
+    cygwin_conv_to_win32_path(spath, rpath);
+    Parrot_str_free_cstring(spath);
+
+    count = MultiByteToWideChar(CP_UTF8, 0, rpath, -1, NULL, 0);
+    if(!count) return NULL;
+
+    wpath = mem_allocate_n_typed(count, WCHAR);
+    if(!wpath) return NULL;
+
+    MultiByteToWideChar(CP_UTF8, 0, rpath, -1, wpath, count);
+    return wpath;
+}
+
+#endif
+
 /*
 
 =item C<void Parrot_platform_init_code(void)>

@@ -27,6 +27,7 @@ This file implements OS-specific file functions for Win32 platforms.
 #include <windows.h>
 #include <wchar.h>
 #include "parrot/parrot.h"
+#include "path.h"
 
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
     EXCEPTION_EXTERNAL_ERROR, "%s failed: %Ss", (msg), \
@@ -469,14 +470,13 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
       case STAT_MODIFYTIME:
       case STAT_CHANGETIME: {
             WIN32_FILE_ATTRIBUTE_DATA attr_data;
-            char *c_str = Parrot_str_to_encoded_cstring(interp, file,
-                                Parrot_utf16_encoding_ptr);
+            LPWSTR wpath = PARROT_WIN32_PATH(interp, file);
             BOOL  success;
 
-            success = GetFileAttributesExW((LPWSTR)c_str,
+            success = GetFileAttributesExW(wpath,
                             GetFileExInfoStandard, &attr_data);
 
-            Parrot_str_free_cstring(c_str);
+            PARROT_WIN32_FREE_PATH(wpath);
 
             if (thing == STAT_EXISTS) {
                 result = success;
