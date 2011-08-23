@@ -10,7 +10,6 @@
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
-DEVELOPING                                                  []
 DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
 MANIFEST                                                    []
@@ -2201,6 +2200,7 @@ tools/release/gen_release_info.pl                           []
 tools/release/inc_ver.pir                                   []
 tools/release/release.json                                  []
 tools/release/releasecheck.pl                               []
+tools/release/sha256sum.pl                                  []
 tools/release/templates.json                                []
 tools/release/update_version.pl                             []
 # Local variables:
