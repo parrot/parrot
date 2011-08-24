@@ -10,6 +10,7 @@
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
+DEVELOPING                                                  []
 DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
 MANIFEST                                                    []
@@ -1414,7 +1415,6 @@ src/pmc/role.pmc                                            []
 src/pmc/scalar.pmc                                          []
 src/pmc/scheduler.pmc                                       []
 src/pmc/schedulermessage.pmc                                []
-src/pmc/select.pmc                                          []
 src/pmc/sockaddr.pmc                                        []
 src/pmc/socket.pmc                                          []
 src/pmc/string.pmc                                          []
@@ -1940,7 +1940,6 @@ t/pmc/role.t                                                [test]
 t/pmc/scalar.t                                              [test]
 t/pmc/scheduler.t                                           [test]
 t/pmc/schedulermessage.t                                    [test]
-t/pmc/select.t                                              [test]
 t/pmc/signal.t                                              [test]
 t/pmc/sockaddr.t                                            [test]
 t/pmc/socket.t                                              [test]
