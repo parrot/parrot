@@ -2936,7 +2936,7 @@ install-doc:
 ###############################################################################
 
 release : MANIFEST MANIFEST.generated
-	$(PERL) tools/release/cut.pl $(VERSION)
+	$(PERL) $(RELEASE_TOOLS_DIR)/cut.pl $(VERSION)
 	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
         parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
 	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
