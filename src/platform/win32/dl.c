@@ -23,6 +23,10 @@ Functions for working with dynamic libraries under windows.
 #include "parrot/parrot.h"
 
 #include <windows.h>
+#ifdef __MSYS__
+#include <sys/cygwin.h>
+#endif
+
 
 /* HEADERIZER HFILE: none */
 
@@ -40,6 +44,11 @@ Returns Parrot_dlerror() on failure.
 void *
 Parrot_dlopen(const char *filename, SHIM(Parrot_dlopen_flags flags))
 {
+#ifdef __MSYS__
+    char rpath[MAX_PATH];
+    cygwin_conv_to_win32_path(filename, rpath);
+    filename = rpath;
+#endif
     return LoadLibrary(filename);
 }
 

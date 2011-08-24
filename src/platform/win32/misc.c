@@ -42,17 +42,8 @@ Parrot_platform_msys_str_to_path(PARROT_INTERP, ARGIN(STRING *path))
     spath = Parrot_str_to_encoded_cstring(interp, path,
                 Parrot_utf8_encoding_ptr);
 
-    // assumes that paths can only grow by 1 char via adding ':'
-    // TODO: verify that this is indeed the case
-    if(strlen(spath) >= sizeof rpath - 1)
-    {
-        Parrot_str_free_cstring(spath);
-        return NULL;
-    }
-
-    // TODO: what is the return value?
+    /* returns -1 for relative paths, 0 for abolute paths */
     cygwin_conv_to_win32_path(spath, rpath);
-fprintf(stderr, "\nXXX %s -> %s\n", spath, rpath);
     Parrot_str_free_cstring(spath);
 
     count = MultiByteToWideChar(CP_UTF8, 0, rpath, -1, NULL, 0);
