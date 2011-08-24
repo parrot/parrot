@@ -15,17 +15,30 @@ Testing Perl 6 objects.
 
 =cut
 
+.include 'iglobals.pasm'
+
 .sub 'main' :main
     load_bytecode 'Test/More.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Test';'More']
-    exports        = split ' ', 'plan diag ok nok is todo'
+    exports        = split ' ', 'plan diag ok nok is todo skip_all'
     test_namespace.'export_to'(curr_namespace, exports)
 
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I1 = $P1['HAS_EXTRA_NCI_THUNKS']
+    if $I1 == 1 goto have_enough_nci
+    $I1 = $P1['HAS_LIBFFI']
+    if $I1 == 1 goto have_enough_nci
+
+    skip_all('No NCI thunks')
+    exit 0
+
+  have_enough_nci:
     ##  set our plan
-    plan(13)
+    plan(14)
 
     ##  make sure we can load the NCI::Utils library
     push_eh load_fail
@@ -45,18 +58,36 @@ Testing Perl 6 objects.
 
     ## try some builtin stdlib funcs
     $P0 = ncifunc(null_pmc, 'atoi', 'it')
+    $I0 = defined $P0
+    unless $I0 goto check_atoi
     $S0 = "2468"
     ( $I0 ) = $P0($S0)
+  check_atoi:
     is($I0, 2468, 'atoi("2468")')
 
     $P0 = ncifunc(null_pmc, 'atol', 'lt')
+    $I0 = defined $P0
+    unless $I0 goto check_atol
     $S0 = "7654321"
     ( $I0 ) = $P0($S0)
+  check_atol:
     is($I0, 7654321, 'atol("7654321")')
 
     $P0 = ncifunc(null_pmc, 'strcmp', 'itt')
+    $I0 = 42
+    $I1 = defined $P0
+    unless $I1 goto check_strcmp
     ( $I0 ) = $P0('hello', 'hello')
+  check_strcmp:
     is($I0, 0, 'strcmp == 0')
+
+    $P0 = ncifunc(null_pmc, 'strstr', 'ttt')
+    $I0 = defined $P0
+    unless $I0 goto check_strstr
+    ( $S0 ) = $P0('hello', 'e')
+  check_strstr:
+    is($S0, 'ello', 'strstr("hello", "e")')
+
 
     ##  load a library
     .local pmc libnci_test

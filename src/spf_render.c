@@ -409,7 +409,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
-    const INTVAL pat_len = (INTVAL)Parrot_str_byte_length(interp, pat);
+    const INTVAL pat_len = (INTVAL)Parrot_str_length(interp, pat);
     HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
@@ -948,7 +948,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>.
+F<include/parrot/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>
 
 =cut
 

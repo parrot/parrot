@@ -89,7 +89,7 @@ void Parrot_gc_fixed_allocator_free(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(SHIM_INTERP);
+struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(PARROT_INTERP);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
@@ -100,12 +100,12 @@ void * Parrot_gc_pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator * pool))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-size_t Parrot_gc_pool_allocated_size(SHIM_INTERP,
+size_t Parrot_gc_pool_allocated_size(PARROT_INTERP,
     ARGIN(const Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
+void Parrot_gc_pool_destroy(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -120,7 +120,7 @@ void Parrot_gc_pool_free(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
+int Parrot_gc_pool_is_maybe_owned(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))
         __attribute__nonnull__(2)
@@ -130,7 +130,7 @@ int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-int Parrot_gc_pool_is_owned(SHIM_INTERP,
+int Parrot_gc_pool_is_owned(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))
         __attribute__nonnull__(2)
@@ -139,16 +139,16 @@ int Parrot_gc_pool_is_owned(SHIM_INTERP,
         FUNC_MODIFIES(*ptr);
 
 PARROT_CAN_RETURN_NULL
-void* Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+void* Parrot_gc_pool_high_ptr(PARROT_INTERP, ARGIN(Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-void* Parrot_gc_pool_low_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+void* Parrot_gc_pool_low_ptr(PARROT_INTERP, ARGIN(Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
+Pool_Allocator * Parrot_gc_pool_new(PARROT_INTERP, size_t object_size);
 
 #define ASSERT_ARGS_Parrot_gc_fixed_allocator_allocate \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

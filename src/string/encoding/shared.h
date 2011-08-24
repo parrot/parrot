@@ -23,7 +23,7 @@ INTVAL encoding_compare(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-STRING* encoding_decompose(PARROT_INTERP, SHIM(const STRING *src))
+STRING* encoding_decompose(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -140,7 +140,7 @@ INTVAL fixed8_equal(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_find_cclass(SHIM_INTERP,
+INTVAL fixed8_find_cclass(PARROT_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset,
@@ -148,7 +148,7 @@ INTVAL fixed8_find_cclass(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_find_not_cclass(SHIM_INTERP,
+INTVAL fixed8_find_not_cclass(PARROT_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset,
@@ -156,7 +156,7 @@ INTVAL fixed8_find_not_cclass(SHIM_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-size_t fixed8_hash(SHIM_INTERP, ARGIN(const STRING *src), size_t hashval)
+size_t fixed8_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t hashval)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -169,20 +169,20 @@ INTVAL fixed8_index(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-INTVAL fixed8_is_cclass(SHIM_INTERP,
+INTVAL fixed8_is_cclass(PARROT_INTERP,
     INTVAL flags,
     ARGIN(const STRING *src),
     UINTVAL offset)
         __attribute__nonnull__(3);
 
-UINTVAL fixed8_iter_get(SHIM_INTERP,
+UINTVAL fixed8_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGIN(const String_iter *iter),
     INTVAL offset)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-UINTVAL fixed8_iter_get_and_advance(SHIM_INTERP,
+UINTVAL fixed8_iter_get_and_advance(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *iter))
         __attribute__nonnull__(2)
@@ -199,7 +199,7 @@ void fixed8_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*iter);
 
-void fixed8_iter_skip(SHIM_INTERP,
+void fixed8_iter_skip(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *iter),
     INTVAL skip)
@@ -253,7 +253,7 @@ STRING* unicode_downcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-STRING* unicode_downcase_first(PARROT_INTERP, SHIM(const STRING *src))
+STRING* unicode_downcase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -262,7 +262,7 @@ STRING* unicode_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-STRING* unicode_titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
+STRING* unicode_titlecase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -271,7 +271,7 @@ STRING* unicode_upcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-STRING* unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
+STRING* unicode_upcase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_encoding_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

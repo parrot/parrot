@@ -21,9 +21,10 @@ This file implements various functions for creating and writing packfiles.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: include/parrot/packfile.h */
+/* HEADERIZER HFILE: src/packfile/pf_private.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -224,6 +225,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+    size += 1 + (self->ntags * 2);
 
     return size;
 }
@@ -275,6 +277,12 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+
+    *cursor++ = self->ntags;
+    for (i = 0; i < self->ntags; i++) {
+        *cursor++ = self->tag_map[i].tag_idx;
+        *cursor++ = self->tag_map[i].const_idx;
+    }
 
     return cursor;
 }
@@ -331,8 +339,7 @@ PackFile_ConstTable_rlookup_str(PARROT_INTERP,
 
     for (i = 0; i < ct->str.const_count; i++) {
         STRING * const sc = ct->str.constants[i];
-        if (STRING_equal(interp, s, sc)
-        &&  s->encoding == sc->encoding) {
+        if ((s->encoding == sc->encoding) && STRING_equal(interp, s, sc)) {
             return i;
         }
     }

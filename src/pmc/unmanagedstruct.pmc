@@ -22,6 +22,7 @@ bounds access will very likely segfault.
 */
 
 #include "parrot/compiler.h"
+#include "parrot/string_funcs.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -94,7 +95,7 @@ static PMC* ret_pmc(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static STRING* ret_string(PARROT_INTERP, ARGIN(char *p), int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -474,7 +475,7 @@ Returns the element of type C<type> starting at C<*p> as a Parrot string.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static STRING*
 ret_string(PARROT_INTERP, ARGIN(char *p), int type)
 {
@@ -495,7 +496,7 @@ ret_string(PARROT_INTERP, ARGIN(char *p), int type)
                     Parrot_latin1_encoding_ptr, 0);
         }
         else
-            return NULL;
+            return STRINGNULL;
     }
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -809,7 +810,7 @@ pmclass UnManagedStruct auto_attrs no_ro {
 
 =back
 
-=head2 Methods
+=head2 Vtable Functions
 
 =over 4
 
@@ -911,6 +912,8 @@ Returns whether the two C<struct>s are equivalent.
 
 /*
 
+=item C<INTVAL get_bool()>
+
 =item C<INTVAL defined()>
 
 Returns whether the C<struct> is defined.
@@ -918,6 +921,10 @@ Returns whether the C<struct> is defined.
 =cut
 
 */
+
+    VTABLE INTVAL get_bool() {
+        return SELF.get_pointer() != NULL;
+    }
 
     VTABLE INTVAL defined() {
         return SELF.get_pointer() != NULL;
@@ -1207,6 +1214,29 @@ Sets the value of the element associated with key C<*key> to C<*value>.
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified. If the encoding is omitted or null, use platform encoding.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname :optional) {
+        const char * content = (const char *)SELF.get_pointer();
+        STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
+        RETURN(STRING result);
     }
 
 }

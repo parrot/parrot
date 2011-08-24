@@ -2,7 +2,30 @@
 
 =head1 NAME
 
-Archive/Tar
+Archive/Tar - module for manipulations of tar archives
+
+head2 SYNOPSIS
+
+    load_bytecode 'Archive/Tar.pbc'
+
+    .local pmc archive
+    archive = new ['Archive';'Tar']
+
+    archive.'add_data'('file/baz.txt', "This is the contents now", 1000 :named('uid'))
+    archive.'add_files'('file/foo.pir', 'docs/README')
+
+    .local pmc fh
+    fh = new 'FileHandle'
+    fh.'open'('files.tar', 'wb')
+    archive.'write'(fh)                         # plain tar
+    fh.'close'()
+
+    $P0 = loadlib 'gziphandle'
+    .local pmc fh
+    fh = new 'GzipHandle'
+    fh.'open'('files.tgz', 'wb')
+    archive.'write'(fh)                         # gzip compressed
+    fh.'close'()
 
 =head2 DESCRIPTION
 
@@ -49,7 +72,9 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .globalconst int BLOCK = 512
 .end
 
-=item data
+=item $S0 = file.'data' ()
+
+Returns the current content for the in-memory file.
 
 =cut
 
@@ -58,7 +83,9 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return ($P0)
 .end
 
-=item new_from_file
+=item $P0 = new_from_file ( path )
+
+Returns a new ['Archive';'Tar';'File'] object from an existing file.
 
 =cut
 
@@ -94,7 +121,12 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return ($P0)
 .end
 
-=item new_from_data
+=item $P0 = new_from_data (path, data, opt :flat :named)
+
+Returns a new ['Archive';'Tar';'File'] object from data.
+
+'path' defines the file name (which need not exist), 'data' the file contents,
+and 'opt' is a hash of attributes which may be used to override the default attributes.
 
 =cut
 
@@ -198,7 +230,9 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return (directories, file)
 .end
 
-=item full_path
+=item $S0 = file.'full_path' ()
+
+Returns the full path from the tar header; this is basically a concatenation of the prefix and name fields.
 
 =cut
 
@@ -215,7 +249,9 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return ($S0)
 .end
 
-=item rename
+=item file.'rename' ( path )
+
+Rename the current file to 'path'.
 
 =cut
 
@@ -228,10 +264,6 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     $P0 = box prefix
     setattribute self, 'prefix', $P0
 .end
-
-=item _format_tar_entry
-
-=cut
 
 .sub '_format_tar_entry' :method
     $P0 = new 'StringBuilder'
@@ -342,6 +374,10 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
 
 =over 4
 
+=item tar = new ['Archive';'Tar']
+
+Returns a new ['Archive';'Tar'] object.
+
 =cut
 
 .namespace ['Archive';'Tar']
@@ -356,7 +392,11 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     setattribute self, 'data', $P0
 .end
 
-=item add_files
+=item tar.'add_files' ( filenamelist :flat )
+
+Takes a list of filenames and adds them to the in-memory archive.
+
+Returns a list of ['Archive';'Tar';'File'] objects that were just added.
 
 =cut
 
@@ -395,7 +435,12 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return (rv)
 .end
 
-=item add_data
+=item tar.'add_data' ( filename, data, opt :flat :named )
+
+Add a file to the in-memory archive, with name 'filename' and content 'data'
+and 'opt' is a hash of attributes which may be used to override the default attributes.
+
+Returns the ['Archive';'Tar';'File'] object that was just added.
 
 =cut
 
@@ -411,7 +456,9 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     .return (obj)
 .end
 
-=item write
+=item tar.'write' ( fh )
+
+Write the in-memory archive to disk. The argument is already opened filehandle.
 
 =cut
 
@@ -442,10 +489,6 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
     TAR_END = repeat "\0", $I0
     fh.'puts'(TAR_END)
 .end
-
-=item _error
-
-=cut
 
 .sub '_error' :method
     .param pmc args :slurpy

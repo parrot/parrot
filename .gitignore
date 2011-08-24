@@ -31,7 +31,8 @@
 /*.sto
 /*.suo
 /*.tmp
-/*.sw?
+# vim swap files
+/\.*sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
@@ -210,6 +211,7 @@
 /ext/nqp-rx/src/stage0/nqp-setting.pir
 /frontend/parrot/main.o
 /frontend/parrot_debugger/main.o
+/frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o
 /frontend/pbc_dump/packdump.o
 /frontend/pbc_merge/main.o
@@ -254,6 +256,7 @@
 /runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
+/runtime/parrot/languages/winxed
 /runtime/parrot/library/*.pbc
 /runtime/parrot/library/OpenGL_funcs.pir
 /runtime/parrot/library/PAST
@@ -311,6 +314,8 @@
 /src/parrot_config.c
 /src/parrot_config.h
 /src/platform/*/*.o
+/src/platform/*/*.gcda
+/src/platform/*/*.gcno
 /src/revision.c
 /src/atomic/*.o
 /src/call/*.o
@@ -357,7 +362,6 @@
 /src/nci/*.o
 /src/nci/*.obj
 /src/nci/*.str
-/src/ops/*.c
 /src/ops/*.o
 /src/ops/*.obj
 /src/packfile/*.o
@@ -445,6 +449,9 @@
 /t/pmc/*_pbcexe*
 /t/pmc/testlib/*.pbc
 /t/src/*_*.c
+/t/src/*.exe
+/t/src/*.lib
+/t/src/*.exp
 /t/src/*.gcov
 /t/src/*.gcdada
 /t/src/embed/*.c
@@ -522,6 +529,8 @@
 /src/string/encoding/*.gcda
 /src/string/encoding/*.gcno
 /src/string/encoding/*.gcov
+/winxed
+/winxed.*
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

@@ -33,13 +33,15 @@ BEGIN_PMC_HEADER_PREAMBLE
 #define PTR_FAT_CLEAR(i, s) PObj_flag_CLEAR(private1, (s))
 END_PMC_HEADER_PREAMBLE
 
+#include "parrot/string_funcs.h"
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
 /*
 
-=head2 VTABLEs
+=head2 Vtable Functions
 
 =over 4
 
@@ -165,6 +167,30 @@ In this case, always returns C<0>, indicating undetermined length.
     VTABLE INTVAL get_integer() {
         return 0;
     }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified. If the encoding is omitted or null, use platform encoding.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname :optional) {
+        const char * content = (const char *)SELF.get_pointer();
+        STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
+        RETURN(STRING result);
+    }
+
 }
 
 /*

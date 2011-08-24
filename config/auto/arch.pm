@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -79,6 +79,16 @@ sub runstep {
         $cpuarch = 'i386';
         $osname  = 'cygwin';
     }
+    elsif ( $osname =~ /msys/i || $cpuarch =~ /msys/i ) {
+        # msys-perl is 32bit-only, so we use the information provided by
+        # the OS. Might be incorrect in case of mingw32 on 64bit hardware.
+        $cpuarch = lc (
+            $ENV{PROCESSOR_ARCHITEW6432} ||
+            $ENV{PROCESSOR_ARCHITECTURE} ||
+            'x86'
+        );
+        $osname = 'msys';
+    }
     elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {
         # That's only the perl value, and is the same for both i386
         # and amd64.  Use uname -p instead to find the processor type.
@@ -93,6 +103,7 @@ sub runstep {
     $cpuarch =~ s/armv[34]l?/arm/i;
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
+    $cpuarch =~ s/x86/i386/i;
 
     $conf->data->set(
         cpuarch  => $cpuarch,

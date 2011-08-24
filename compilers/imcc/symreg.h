@@ -104,11 +104,13 @@ typedef struct pcc_sub_t {
     SymReg **multi;
     SymReg **ret;
     SymReg *object;
+    SymReg **flags;       /* "load", "init", etc */
     int    *arg_flags;    /* :slurpy, :optional, ... */
     int    *ret_flags;    /* :slurpy, :optional, ... */
     int     nargs;
     int     nret;
     int     nmulti;
+    int     nflags;
     int     yield;
     int     tailcall;
     int     label;
@@ -203,6 +205,16 @@ void add_pcc_cc(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
+
+void add_pcc_flag_str(
+    ARGMOD(imc_info_t * imcc),
+    ARGMOD(SymReg * r),
+    ARGIN(SymReg * arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(* r);
 
 void add_pcc_multi(
     ARGMOD(imc_info_t * imcc),
@@ -384,16 +396,6 @@ SymReg * mk_temp_reg(ARGMOD(imc_info_t * imcc), int t)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
-void pop_namespace(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* imcc);
-
-void push_namespace(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* imcc);
-
 void store_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -434,6 +436,10 @@ char * symreg_to_str(ARGIN(const SymReg *s))
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_add_pcc_cc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(r) \
+    , PARROT_ASSERT_ARG(arg))
+#define ASSERT_ARGS_add_pcc_flag_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(r) \
     , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_add_pcc_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -504,12 +510,6 @@ char * symreg_to_str(ARGIN(const SymReg *s))
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_mk_temp_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
-#define ASSERT_ARGS_pop_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_push_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(r))

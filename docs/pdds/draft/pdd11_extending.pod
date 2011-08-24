@@ -8,10 +8,6 @@ The extension API for Parrot is a simple, somewhat abstract, interface to
 Parrot for code written in C or other compiled languages. It provides about
 the same level of access to Parrot  that bytecode programs have.
 
-
-
-
-
 =head2 Description
 
 The API presents to C programs roughly the same interface presented to
@@ -261,15 +257,15 @@ C<class>.
 Returns the special C<NULL> PMC.
 
 =item C<Parrot_new_string(interp,
-char *buffer, int length, Parrot_Encoding encoding,
-Parrot_CharType charset, Parrot_Language language, Parrot_Int flags)>
+char *buffer, Parrot_UInt length, const char * const encoding,
+Parrot_Int flags)>
 
 Create a new Parrot string from a passed-in buffer. If the C<encoding>,
-C<charset>, or C<language> are unspecified (i.e. if you pass in 0), then the
+C<charset> are unspecified (i.e. if you pass in 0), then the
 defaults are used. Otherwise, the functions C<Parrot_find_encoding>,
-C<Parrot_find_chartype> and C<Parrot_find_language> (all described below) can
-be used to find the appropriate values for a particular choice of  encoding,
-chartype or language.
+or C<Parrot_find_chartype> (both described below) can
+be used to find the appropriate values for a particular choice of encoding,
+or chartype.
 
 Flag values are currently undocumented.
 
@@ -282,10 +278,6 @@ Find the magic token for an encoding, by name.
 =item C<Parrot_find_chartype(interp, char *chartype)>
 
 Find the magic token for a chartype, by name.
-
-=item C<Parrot_find_language(interp, char *language)>
-
-Find the magic token for a language, by language name.
 
 =item C<Parrot_free_cstring(char* string)>
 

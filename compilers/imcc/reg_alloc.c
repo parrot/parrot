@@ -176,7 +176,7 @@ imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
         return;
 
     imc_stat_init(unit);
-    if (!imcc->optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM) && unit->pasm_file)
+    if (!(imcc->optimizer_level & (OPT_PRE|OPT_CFG|OPT_PASM)) && unit->pasm_file)
         goto done;
 
     if (unit->instructions->symreg_count)

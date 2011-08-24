@@ -20,6 +20,9 @@ typedef enum {
     PARROT_WARNINGS_EXPERIMENTAL_FLAG = 0x20
 } Warnings_classes;
 
+/* Legacy embedding holdover. We can get rid of this after a deprecation */
+typedef Warnings_classes Parrot_warnclass;
+
 /* &end_gen */
 
 /* error flags */

@@ -754,7 +754,7 @@ In echo mode the script commands are written to stderr before executing."
     },
     cmd_enable = {
         & dbg_enable,
-        "reenable a disabled breakpoint",
+        "re-enable a disabled breakpoint",
 "Re-enable a disabled breakpoint."
     },
     cmd_eval = {
@@ -1957,7 +1957,7 @@ Init the program.
 */
 
 void
-PDB_init(PARROT_INTERP, SHIM(const char *command))
+PDB_init(PARROT_INTERP, ARGIN_NULLOK(SHIM(const char *command)))
 {
     ASSERT_ARGS(PDB_init)
     PDB_t * const pdb = interp->pdb;
@@ -2894,7 +2894,7 @@ Disassemble the bytecode.
 */
 
 void
-PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
+PDB_disassemble(PARROT_INTERP, ARGIN_NULLOK(SHIM(const char *command)))
 {
     ASSERT_ARGS(PDB_disassemble)
     PDB_t    * const pdb = interp->pdb;

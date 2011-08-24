@@ -1,4 +1,4 @@
-This is Parrot, version 3.4.0
+This is Parrot, version 3.7.0
 ------------------------------
 
 Parrot is Copyright (C) 2001-2011, Parrot Foundation.
@@ -86,7 +86,7 @@ INSTRUCTIONS
 For now, unpack your Parrot tarball, (if you're reading this, you've
 probably already done that) and type
 
-    perl Configure.pl
+    perl Configure.pl --optimize
 
 to run the Configure script. The Configure.pl script extracts configuration
 from the running perl5 program.  You may need to explicitly tell Configure.pl

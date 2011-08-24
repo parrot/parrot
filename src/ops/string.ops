@@ -261,7 +261,7 @@ inline op substr(out STR, in STR, in INT, in INT) :base_core {
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
-    $1 = VTABLE_substr_str(interp, $2, $3, $4);
+    $1 = VTABLE_substr(interp, $2, $3, $4);
 }
 
 inline op replace(out STR, in STR, in INT, in INT, in STR) :base_core {

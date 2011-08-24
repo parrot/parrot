@@ -47,7 +47,6 @@ request #4:
 If you do not want the default branch name, you can specify a third
 argument to specify one:
 
-
  perl $PARROT/tools/dev/merge_pull_request.pl 4 cardinal awesome_feature
 
 This will merge pull request #4 in the cardinal repo into a branch

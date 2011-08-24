@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # auto/arch-01.t
 
 use strict;
 use warnings;
-use Test::More tests =>  83;
+use Test::More tests =>  89;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::arch');
@@ -192,6 +192,26 @@ is($step->result(), q{}, "Result was empty string as expected");
 is($conf->data->get('cpuarch'), q{i386},
     "'cpuarch' was set as expected");
 is($conf->data->get('osname'), q{cygwin},
+    "'osname' was set as expected");
+
+$conf->replenish($serialized);
+
+########## mock msys ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ ],
+    mode => q{configure},
+} );
+
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+$pseudoarch = q{msys};
+$conf->data->set('archname' => $pseudoarch);
+$ret = $step->runstep($conf);
+ok( $ret, "runstep() returned true value: $pseudoarch" );
+is($step->result(), q{}, "Result was empty string as expected");
+is($conf->data->get('osname'), q{msys},
     "'osname' was set as expected");
 
 $conf->replenish($serialized);

@@ -3,7 +3,7 @@ Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
 
-src/platform/win32/file.c - Generic UNIX file functions
+src/platform/generic/file.c - Generic UNIX file functions
 
 =head1 DESCRIPTION
 
