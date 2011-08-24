@@ -66,6 +66,7 @@ END_HELP
 
     newsfile = new ['FileHandle']
     newsfile.'open'('ChangeLog', 'r')
+    newsfile.'encoding'('utf8')
 
     ## find the start of the news item for this version
     start    = concat ' Release ', version
@@ -75,7 +76,7 @@ END_HELP
     if $I0 goto err_news
     buf      = newsfile.'readline'()
     $I0      = index buf, start
-    if  $I0 != 0 goto before
+    if  $I0 < 0 goto before
 
   blank:
     buf      = newsfile.'readline'()

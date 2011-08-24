@@ -15,7 +15,7 @@
     - Documentation
         + The Archive::Tar and Archive::Zip libraries now have POD docs
     - Tests
-    
+
 2011-07-19    Release 3.6.0
     - Core
       + Class.add_vtable_override now allows you to overwrite an override
@@ -31,7 +31,7 @@
     - Languages
       + The snaphost of Winxed included with Parrot was updated to version 1.0.0
       + Winxed has migrated to Github: https://github.com/NotFound/winxed
-    
+
 2011-06-21    Release 3.5.0
     - Core
       + Parrot_PMC_destroy, Parrot_PMC_mark and Parrot_PMC_invoke were removed from
@@ -49,7 +49,7 @@
       + The Parrot test suite harness now understands the HARNESS_TIMER environment
         variable. Setting it to a true value will show timing results for a test run.
       + IPv6 tests are now parallel testing friendly.
-    
+
 2011-05-17    Release 3.4.0
     - Core
       + The Generational Mark and Sweep garbage collector is the new default.
@@ -73,7 +73,7 @@
         with their classes and much code will flow soon.
     - Documentation
       + More PCT introductions are available at: http://github.com/benabik/cish
-    
+
 2011-04-19    Release 3.3.0
     - Core
       + The isa and isa_pmc vtables can now be overridden from PIR
@@ -86,7 +86,7 @@
       + Rosella adds a stable "Event" library to implement a publish/subscribe mechanism
     - Tests
       + The test coverage of the extend_vtable subsystem was greatly increased
-    
+
 2011-03-15    Release 3.2.0
     - Core
       + Full support for Unicode filenames on Linux and Win32
@@ -129,7 +129,7 @@
       + A mockobject testing library is created, using the new proxy library
       + The PLA test suite is updated to use the new Rosella testing tools,
         including the new mockobjects to test callbacks
-    
+
 2011-02-15    Release 3.1.0
     - Core
       + Exception PMCs are now subclassable from PIR
@@ -170,7 +170,7 @@
       + Test coverage increased greatly for the Embed/Extend subsystem,
         thanks to a TPF grant:
         http://leto.net/dukeleto.pl/2011/01/parrot-embed-grant-update-2.html
-    
+
 2011-01-18    Release 3.0.0
     - Core
       + A new embedding API is available in "parrot/api.h" and documented in
@@ -210,7 +210,7 @@
       + Makefile dependency checking is now automatically tested, resulting in a
         more reliable parallel build.
       + Coverage tests were improved for platforms with and without Devel::Cover.
-    
+
 2010-12-21    Release 2.11.0
     - Core
      + Just In Time native call frame generation using LibFFI
@@ -242,7 +242,7 @@
         parts of coverage analysis
      + 'tools/dev/headerizer.pl' refactored to improve maintainability
         (no change in functionality)
-    
+
 2010-11-16    Release 2.10.0
     - Core
      + We are on github now! https://github.com/parrot/parrot
@@ -271,14 +271,14 @@
        PIR or Rakudo Perl 6     http://pl.parrot.org
      + Parrot Foundation is teaming up with The Perl Foundation and taking
        part in Google Code-In 2010. Learn about it and how to get involved here:
-    
+
        http://trac.parrot.org/parrot/wiki/GoogleCodeIn2010Tasks
-    
+
        http://leto.net/perl/2010/11/parrot-foundation-the-perl-foundation-google-code-in.html
-    
+
 2010-10-19    Release 2.9.1
      - This is a bugfix release.  If you run out of memory on a box with < 512 MB physical RAM, please report it to us.
-    
+
 2010-10-19    Release 2.9.0
     - Core
       + Parrot and Rakudo's build and tests can now be run under the profiling runcore
@@ -300,7 +300,7 @@
       + Majority of developer docs have been written for Git
     - Platforms
       + Parrot can now be built on Minix
-    
+
 2010-09-21    Release 2.8.0
     - Core
       + Inlined hashing and comparison functions
@@ -327,7 +327,7 @@
       + Parrot is now mirrored on github at http://github.com/parrot/parrot
     - Compilers
       + Fixed problem with imcc HLL in load_bytecode difference between loading a pbc and compiling a pir
-    
+
 2010-08-17    Release 2.7.0
     - Core
       + cleanups in packfile and freeze/thaw handling
@@ -344,7 +344,7 @@
     - NQP-rx
       + Updated version included from http://github.com/perl6/nqp-rx includes
         speed improvements
-    
+
 2010-07-20    Release 2.6.0
     - Core
       + Plug some memory leaks
@@ -362,7 +362,7 @@
       + Updated version included from http://github.com/perl6/nqp-rx includes
         new or improved: regex backtracking, named assertions, interactive mode,
         and setting (a minimal but useful runtime library)
-    
+
 2010-06-15    Release 2.5.0
     - Core
       + Added ByteBuffer PMC to allow direct byte manipulation
@@ -384,7 +384,7 @@
       + For more Information about Lorito see:
           http://trac.parrot.org/parrot/wiki/Lorito
           http://trac.parrot.org/parrot/wiki/LoritoRoadmap
-    
+
 2010-05-18    Release 2.4.0
     - Core
       + Various long-standing bugs in IMCC were fixed
@@ -417,7 +417,7 @@
     - Miscellaneous
       + Six Parrot-related projects accepted to GSoC
       + Improve use of const and other compiler hints
-    
+
 2010-04-20    Release 2.3.0
     - Core
       + Allow passing parameters to the dynamic linker ('dlopen' improved)
@@ -438,7 +438,7 @@
     - Miscellaneous
       + 3 month cycle for supported releases
       + Review and vote of GSoC applications
-    
+
 2010-03-16    Release 2.2.0
     - Core changes
       + Most internal allocations now use the GC
@@ -452,7 +452,7 @@
       + Compiler invocation no longer goes through a Perl script
     - Tools
       + NCI thunks are now generated by self-hosted PIR code
-    
+
 2010-02-16    Release 2.1.0
     - Core changes
       + GC performance and encapsulation were greatly improved.
@@ -468,7 +468,7 @@
       + Some cases in pbc_merge are now handled.
       + Improvements were made to the dependency checker.
       + New tool nativecall.pir added.
-    
+
 2010-01-19    Release 2.0.0
     - Features
       + Context PMCs now support attribute-based introspection
@@ -493,7 +493,7 @@
       + GC accuracy improved
       + PMC freeze improvements; much more reliable
       + Makefile improvements for dependency handling
-    
+
 2009-12-15    Release 1.9.0
     - Core
       + Made profiling runcore output format configurable and extensible
@@ -520,7 +520,7 @@
       + Several (build time, runtime) performance improvements
       + Converted many tests to PIR, reducing test execution time
       + Various bugfixes, code cleanups, and coding standard fixes
-    
+
 2009-11-17    Release 1.8.0
     - Functionality
       + The FileHandle PMC now exposes the exit code of child process that was run as pipe.
@@ -594,7 +594,7 @@
       + The mailing list parrot-users and a corresponding google group was created,
         http://groups.google.com/group/parrot-users.
       + Many bugfixes, code cleanups, and coding standard fixes.
-    
+
 2009-10-20    Release 1.7.0
     - Functionality
       + Parrot_capture_lex has been added to the PARROT_EXPORT API
@@ -618,7 +618,7 @@
       + Converted many more Perl 5 tests to PIR
       + Expanded test coverage of the CallSignature, Namespace, FixedPMCArray,
         ResizeableIntegerArray and ExceptionHandler PMCs
-    
+
 2009-09-15    Release 1.6.0
     - Functionality
       + Added a fixed-size structure allocator to the Garbage Collector
@@ -647,7 +647,7 @@
       + Expanded test coverage of NameSpace PMC
     - Compilers
       + Made Parrot Compiler Toolkit available in the base install
-    
+
 2009-08-18    Release 1.5.0
     - Core
       + Removed several deprecated functions and features
@@ -678,7 +678,7 @@
       + Deprecate 'PASM1' compiler object, update to warn instead of segfault
       + Added tests
       + Fixes to code, documentation, and standards
-    
+
 2009-07-21    Release 1.4.0
     - Core
       + Key and Iterator refactor
@@ -708,7 +708,7 @@
       + Beginnings of OpenGL::Math library; OpenGL bindings and library marked experimental
       + Localizing and consting fixes
       + Many memory and thread-related leaks plugged
-    
+
 2009-06-16    Release 1.3.0
     - Core
       + Optimized parts of the IO system
@@ -737,7 +737,7 @@
       + Various bugfixes, code cleanups, and coding standard fixes
       + Added an experimental compiler library to help use PIR libraries from HLLs
       + Updated OpenGL library and examples to support experimental HLL import
-    
+
 2009-05-19    Release 1.2.0
     - Core
       + Fixes for pir classes inheriting from core pmcs.
@@ -760,7 +760,7 @@
       + Several (build time, runtime) performance improvements.
       + Lots of updates to examples and tests.
       + Various bugfixes, code cleanups, and coding standard fixes.
-    
+
 2009-04-21    Release 1.1.0
     - Core
       + Added op: load_language, find_caller_lex
@@ -790,8 +790,8 @@
     - Miscellaneous
       + Improve Debian/Ubuntu package
       + various bugfixes, code cleanups, and coding standard fixes
-    
-    
+
+
 2009-03-17    Release 1.0.0
     - Documentation
       + New user documentation for exceptions.
@@ -820,7 +820,7 @@
         ParrotRunningThread, Rational, FixedPMCArray, ResizablePMCArray, and
         GDBMHash PMCs now use declared attributes (ATTR), in place of the
         deprecated UnionVal.
-    
+
 2009-02-17    Release 0.9.1
     - Implementation
       + Support for portable 'Inf', 'NaN' and -0.0
@@ -884,7 +884,7 @@
       + Parrot is now Copyright Parrot Foundation
       + Parrot's SVN repository is now hosted at https://svn.parrot.org
       + Various code cleanups, consting, 64-bit incompatibilities and other bug fixes
-    
+
 2009-01-20    Release 0.9.0
     - Implementation
       + Implemented bytecode annotations
@@ -971,7 +971,7 @@
         - Added information about Annotations, Exceptions, and Handlers
       + STM
         - Removed non-functional STM subsystem
-    
+
 2008-12-16    Release 0.8.2
     - Implementation
       + fixed lexical semantics
@@ -1032,7 +1032,7 @@
         - .return (in .begin/end_return) is now .set_return
         - .namespace x / .endnamespace x syntax is removed
       + Capture_PIR (runtime/parrot/library/Parrot/Capture_PIR.pir)
-    
+
 2008-11-18    Release 0.8.1
     - Implementation
       + added CPAN module Storable 2.12 as a configuration and build dependency
@@ -1100,7 +1100,7 @@
         - further improvements to parallel tests
         - tests no longer leave filesystem breadcrumbs
         - more thorough testing of Parrot::Test itself
-    
+
 2008-10-21    Release 0.8.0
     - Implementation
       + float precision expanded to 15 significant digits from 6
@@ -1153,7 +1153,7 @@
         - Added chapters for PCT, PMCs, and Opcodes/Runcores
         - Expanded and improved formatting in various chapters
         - Renumbered chapters
-    
+
 2008-09-16    Release 0.7.1
     - Implementation
       + add -I and -L command line options
@@ -1192,7 +1192,7 @@
     - Miscellaneous
       + add Xlib and Mysql modules and test programs to NCI examples
       + many updates and cleanups to PDD documents
-    
+
 2008-08-19    Release 0.7.0
     - Specification
       + PDD27: add multisub lookup
@@ -1271,7 +1271,7 @@
       + removed getfd, getclass opcodes
       + removed IMCC syntax that treated some methods as builtins
       + removed numeric get_attr and set_attr vtable entries
-    
+
 2008-07-15    Release 0.6.4
     - Documentation
       + removed a lot of old information from the FAQ
@@ -1336,7 +1336,7 @@
       + added support for smoke testing with Smolder
       + enabled use of Test::Harness 3.0 if available, but don't require it for 'make test'
       + added the executable 'parrot_config' to query Parrot configuration
-    
+
 2008-06-17    Release 0.6.3
     - Specification
       + updated pdd09_gc.pod
@@ -1391,7 +1391,7 @@
       + improved constant string caching
       + made code g++ and gcc (with optimizations) safe
       + the usual collection of bugfixes and optimizations
-    
+
 2008-05-20    Release 0.6.2
     - Specification
       + updated and launched pdd28_strings.pod
@@ -1448,7 +1448,7 @@
       + new dump_pbc.pl utility: PBC disassembly/source code weaver
       + improved C++ compiler support
       + optimized builds work again
-    
+
 2008-04-15    Release 0.6.1
     - Specification
       + drafted pdd29_compiler_tools.pod
@@ -1487,7 +1487,7 @@
       + pdb (the parrot debugger) can now catch parrot exceptions
       + better detection of glibc and gettext during configuration
       + various bugfixes, code cleanups, deprecations, and coding standard fixes
-    
+
 2008-03-18    Release 0.6.0
     - Specification
       + launched pdd18_security.pod
@@ -1537,7 +1537,7 @@
       + various bugfixes, code cleanups and coding standard fixes
       + consting
       + remove external Perl 5 modules from the Parrot distribution
-    
+
 2008-02-20    Release 0.5.3
     - Documentation
       + PDD09 (garbage collection) - approved
@@ -1576,7 +1576,7 @@
       + various bug fixes
       + #line directives added to generated JIT files, improving debugging
       + consting, attribute marking, refactoring, warnings cleanup
-    
+
 2008-01-15    Release 0.5.2
     - Documentation
       + PDD27 (multiple dispatch) - debut of new design
@@ -1612,7 +1612,7 @@
       + Minor speed enhancements with UTF-8 string handling
       + Debian packaging
       + consting, attribute marking, warnings cleanup, memory leaks plugged ...
-    
+
 2007-12-18    Release 0.5.1
     - Documentation
       + PDD19 (PIR) - reflect state on the ground; incorporate old IMCC docs
@@ -1643,7 +1643,7 @@
       + Bug cleanup
       + consting, attribute marking, warnings cleanup, memory leaks, GC...
       + dead code removal (includes some defunct languages)
-    
+
 2007-11-20    Release 0.5.0
     - Implementation
       + PDD15 (OO) branch merged with trunk; this release contains a working,
@@ -1686,7 +1686,7 @@
       + Simplify some core config steps to not allow interactive prompting
     - Removed
       + clear_eh opcode
-    
+
 2007-10-17    Release 0.4.17
     - Implementation
      + Bug fixes (including Coverity IDs 20, 22, 30, 119-122, 124-126, 129-131)
@@ -1712,7 +1712,7 @@
     - Miscellaneous:
      + make -j functional again
      + Code cleanup (refactoring, optimizations)
-    
+
 2007-09-18    Release 0.4.16
     - Implementation:
      + Performed code review on every PMC
@@ -1729,7 +1729,7 @@
      + Many bugfixes, enhancements, documentation, and coding standard updates
      + Deprecated PMC constants and other crufty syntax, see DEPRECATED.pod
      + Improved icc compiler compatibility for error line reporting
-    
+
 2007-08-22    Release 0.4.15
     - Implementation:
      + Lots of code review, many bugs fixed
@@ -1748,7 +1748,7 @@
      + Added a committers' HOWTO
      + More PIR tutorial examples
      + Added PAUSE guide
-    
+
 2007-07-17    Release 0.4.14
     - Now, with Seat Belts!
      + added makefile targets for Sun lint, BSD lint, and splint
@@ -1778,7 +1778,7 @@
      + updated parrot dubugger, "pdb", to allow loading of commands from file
     - Misc:
      + many bugfixes, enhancements, documentation, and coding standard updates
-    
+
 2007-06-19    Release 0.4.13
     - Languages:
      + Updated Lisp, Lua, PHP ("Plumhead"), Python ("Pynie"), ABC,
@@ -1802,7 +1802,7 @@
      + Updated Parrot distribution to Artistic License 2.0, from dual
        Artistic 1/GPL license.
      + SDL examples brought up-to-date with current features.
-    
+
 2007-05-15    Release 0.4.12
     - Build:
      + even more refactorings and improvements in configuration system
@@ -1819,9 +1819,9 @@
      + extended support for compilers other than GCC
      + improved C++ compiler compatibility
      + enhanced support for Solaris, non-MSVC Win32, and other platforms
-    
+
 2007-04-17    Release 0.4.11
-    
+
     - Compilers:
      + IMCC: added documentation for C-based Parrot Calling Conventions,
        refactorings and bug fixes
@@ -1848,7 +1848,7 @@
      + added example subversion config file
      + extended support for gcc, icc, and other compilers
      + extended support for Solaris and other platforms
-    
+
 2007-03-20    Release 0.4.10
     - Compilers:
      + IMCC: Parrot calling conventions now available between two C PMCs (PMINVOKE)
@@ -1878,7 +1878,7 @@
      + New utility: Crow, a template processor
      + New library module: Config/JSON for reading/writing JSON files
      + many bugfixes, enhancements, and coding standard updates, code cleanup
-    
+
 2007-3-10     coke
 
     * removed parakeet
@@ -7812,7 +7812,7 @@
     - User stack pushing, popping and rotating
     - Jako updates: subroutines, more example programs, optimizations
     - test_prog renamed to 'parrot'
-   
+
     - Added features to the assembler: @ for current location, and global
       labels
     - Build tweaks for VMS
