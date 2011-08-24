@@ -2037,10 +2037,6 @@ Release 0.4.6
     * namespace and global opcodes now accept name arrays again, as
     well as keys; the corresponding namespace PMC methods are gone.
 
-2006-07-21    leo
-
-    * Parrot_x_exit, Parrot_x_on_exit take now an Interp * argument
-
 2006-07-25    chip
 
     * add experimental op find_type_i_p
@@ -2052,6 +2048,11 @@ Release 0.4.6
     further implementation of new pdd21:
     * new opcodes {get,set}*global
       (old {find,store}*global will be supported for a short while)
+
+2006-07-21    leo
+
+    * Parrot_x_exit, Parrot_x_on_exit take now an Interp * argument
+
 
 2006-07-20    audreyt
 
