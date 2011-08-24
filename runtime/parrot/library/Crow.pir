@@ -67,7 +67,6 @@ END_HELP
     newsfile = new ['FileHandle']
     newsfile.'open'('ChangeLog', 'r')
 
-say "open"
     ## find the start of the news item for this version
     start    = concat ' Release ', version
 
@@ -75,7 +74,6 @@ say "open"
     $I0 = newsfile.'eof'()
     if $I0 goto err_news
     buf      = newsfile.'readline'()
-    say "readline"
     $I0      = index buf, start
     if  $I0 != 0 goto before
 
