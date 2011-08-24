@@ -10,12 +10,12 @@
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
+DEVELOPING                                                  []
 DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
-NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
