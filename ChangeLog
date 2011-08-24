@@ -1879,7 +1879,7 @@ Release 0.4.10
      + New library module: Config/JSON for reading/writing JSON files
      + many bugfixes, enhancements, and coding standard updates, code cleanup
     
-2007.3.10     coke
+2007-3-10     coke
 
     * removed parakeet
 
@@ -1916,7 +1916,7 @@ Release 0.4.9
        + extended support for Sun Workshop Compilers
        + Parrot now builds on PocketPC platform
 
-2007.01.17    chromatic
+2007-01-17    chromatic
 
     * changed 'name' method on namespaces to 'get_name' per pdd21
 
@@ -1945,7 +1945,7 @@ Release 0.4.8
        + many bugfixes, enhancements, and coding standard updates
        + extended support for non-core platforms including Cygwin, Tru64
 
-2006.12.12    particle
+2006-12-12    particle
 
     * added C<isnull> opcode
 
@@ -1985,24 +1985,24 @@ Release 0.4.7
        + Coroutine improvements
        + An impressive swarm of other bugfixes and enhancements
 
-2006.11.07    tewk
+2006-11-07    tewk
 
     * added :init pragma functionality to subs
 
-2006.10.28    jonathan
+2006-10-28    jonathan
 
     * added :vtable pragma functionality to subs
 
-2006.09.18    chromatic
+2006-09-18    chromatic
 
     * added Parrot::Embed under ext/Parrot-Embed
 
-2006.08.18    leo
+2006-08-18    leo
 
     * remove the None PMC - if needed it can trivially be reimplemented
       in languages from r14189
 
-2006.08.16    creiss
+2006-08-16    creiss
 
     Merged Software Transactional Memory branch into trunk, adds:
     * several new opcodes whose names start with stm_
@@ -2030,36 +2030,36 @@ Release 0.4.6
         cage/todo.pod
     - The usual plethora of bugfixes and enhancements
 
-2006.08.02    chip
+2006-08-02    chip
 
     * opcodes: "in PMC" is no longer a synonym for "invar PMC";
     there are opcodes now that want the real "in PMC".
     * namespace and global opcodes now accept name arrays again, as
     well as keys; the corresponding namespace PMC methods are gone.
 
-2006.07.21    leo
+2006-07-21    leo
 
     * Parrot_x_exit, Parrot_x_on_exit take now an Interp * argument
 
-2006.07.25    chip
+2006-07-25    chip
 
     * add experimental op find_type_i_p
     * fix longstanding bug that sometimes didn't encode pasm keys as
     Key PMCs (specifically "[S0]" and "['stringliteral']").
 
-2006.07.24    chip
+2006-07-24    chip
 
     further implementation of new pdd21:
     * new opcodes {get,set}*global
       (old {find,store}*global will be supported for a short while)
 
-2006.07.20    audreyt
+2006-07-20    audreyt
 
     * --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
       (or some such --leo)
       (at the moment code is checking for 2.0 -- ambs)
 
-2006.07.17    chip
+2006-07-17    chip
 
     partial implementation of new pdd21:
     * old: "get_namespace KEY".  new: "get_hll_namespace KEY"
@@ -2075,7 +2075,7 @@ Release 0.4.5
     - new STM branch in the svn repository
     - the usual bugfixes and enhancements
 
-2006.06.03    leo
+2006-06-03    leo
 
     * I and N registers are never cleared to 0 / 0.0 on subroutine entry
 
@@ -2095,7 +2095,7 @@ Release 0.4.4
       - support for many operators, lexical scalars, regex matches
     - new pheme (Parrot scheme) compiler
 
-2006.04.30    bernhard
+2006-04-30    bernhard
 
     * Make the Perl PMCs dynamic and move them to src/dynpmc
 
@@ -2109,7 +2109,7 @@ Release 0.4.3
     - NetBSD support
     - many bug fixes and improvements
 
-2006.03.06    leo
+2006-03-06    leo
 
     * Shifted argument type bits left by 2 according to r11754
       change of docs/pdds/pdd03_calling_conventions.pod
@@ -2128,12 +2128,12 @@ Release 0.4.2
     - ongoing config improvements
     - tons of bug fixes and other small improvements - too much to list all
 
-2006.01.16    bernhard
+2006-01-16    bernhard
 
      * rename src/dynclasses to src/dynpmc
      * rename src/classes to src/pmc
 
-2006.01.15    leo
+2006-01-15    leo
 
      * find_global and friends returns a .Null PMC instead of .Undef on
       lookup failure, iff lookup exceptions are off
@@ -2155,43 +2155,43 @@ Release 0.4.1
     - Jako updates: NCI, subroutines, global variables and constants all work.
       (Gregor)
 
-2005.12.28    particle
+2005-12-28    particle
 
     * renamed all .imc files to .pir
     * modified all doc references to .pir as well
 
-2005.12.13    particle
+2005-12-13    particle
 
     * moved jit/ directory to src/jit/
 
-2005.12.12    particle
+2005-12-12    particle
 
     * moved io/ directory to src/io/
     * moved classes/ directory to src/classes/
     * moved dynclasses/ directory to src/dynclasses/
 
-2005.12.08    particle
+2005-12-08    particle
 
     * moved types/ directory to src/types/
     * moved pf/ directory to src/packfile/
     * moved ops/ directory to src/ops/
 
-2005.12.08    particle
+2005-12-08    particle
 
     * moved charset/ directory to src/charset/
     * moved encodings/ directory to src/encodings/
 
-2005.12.07    particle
+2005-12-07    particle
 
     * moved imcc/ directory to compilers/imcc/
 
-2005.12.06    particle
+2005-12-06    particle
 
     * moved util/ directory to tools/util/
     * removed imcc/examples/ directory
     * moved ast/ directory to compilers/ast/
 
-2005.12.05    particle
+2005-12-05    particle
 
     * moved imcc/docs/ directory to docs/imcc/
     * moved build_tools/ directory to tools/build/
@@ -2242,7 +2242,7 @@ Release 0.2.3
     - many bugfixes, including GC and memory leaks
     - the new calling scheme continued to evolve in branches/leo-ctx5
 
-2005.06.04    leo
+2005-06-04    leo
 
     * allow short names for object attributes
     * string encoding and charset can now be set independently
