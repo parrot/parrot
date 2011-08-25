@@ -9,7 +9,7 @@ t/pmc/select.t - test the Select PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/select.t
+    % prove t/dynpmc/select.t
 
 =head1 DESCRIPTION
 
@@ -18,14 +18,28 @@ Tests the Select PMC.
 =cut
 
 .sub main :main
-.include 'test_more.pir'
-
+    .include 'test_more.pir'
+    .include "iglobals.pasm"
     plan(13)
+    .local pmc interp
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local string osname
+    osname = config['osname']
+    if osname == 'MSWin32' goto todo_all
+    if osname == 'msys' goto todo_all
+    goto tests
+todo_all:
+    skip(13, 'busted on Win32')
+    goto end
+tests:
     'test_load'()
     'test_update'()
     'test_read'()
     'test_write'()
     'test_select'()
+end:
 .end
 
 
