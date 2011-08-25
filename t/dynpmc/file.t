@@ -16,9 +16,10 @@ use File::Spec::Functions;
 
 my $tempdir = File::Temp::tempdir( CLEANUP => 1 );
 
-our ( $MSWin32, $cygwin );
+our ( $MSWin32, $cygwin, $msys );
 $MSWin32 = 1 if $^O =~ m!MSWin32!;
 $cygwin  = 1 if $^O =~ m!cygwin!;
+$msys    = 1 if $^O =~ m!msys!;
 
 =head1 NAME
 
@@ -150,7 +151,7 @@ CODE
 OUT
 
 SKIP: {
-    skip "Links not available under Windows", 1 if $MSWin32;
+    skip "Links not available under Windows", 1 if $MSWin32 || $msys;
 
     my $lotpx = catfile( $xpto, 'lotpx' );
     symlink $otpx, $lotpx;
@@ -186,7 +187,7 @@ OUT
 }
 
 SKIP: {
-    skip "Links not available under Windows", 1 if $MSWin32;
+    skip "Links not available under Windows", 1 if $MSWin32 || $msys;
 
     my $xptol = catdir( $xpto, 'xptol' );
     symlink $xpto, $xptol;
@@ -256,7 +257,7 @@ OUT
 
 # test rename
 SKIP: {
-    skip 'file exists', 1 if $MSWin32;
+    skip 'file exists', 1 if $MSWin32 || $msys;
 
     pir_output_is( <<"CODE", <<"OUT", "Test rename for files" );
 .sub main :main
