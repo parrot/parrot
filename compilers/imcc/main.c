@@ -43,8 +43,7 @@ extern int yydebug;
 /* defined in imcc.l */
 PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
-/* XXX non-reentrant */
-static Parrot_mutex eval_nr_lock;
+/* XXX non-reentrant because of global variables */
 static INTVAL       eval_nr  = 0;
 
 /* HEADERIZER HFILE: include/imcc/embed.h */
@@ -675,9 +674,6 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
         mem_sys_free(imcc->globals);
 
     mem_sys_free(imcc);
-
-    if (eval_nr != 0)
-        MUTEX_DESTROY(eval_nr_lock);
 }
 
 /*

@@ -1787,9 +1787,8 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 
     interp->code               = new_cs;
 
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), really
-                               ? find_constants(interp, new_cs->const_table)
-                               : new_cs->const_table);
+    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+            new_cs->const_table);
 
     if (really)
         prepare_for_run(interp);
@@ -1831,115 +1830,6 @@ clone_constant(PARROT_INTERP, ARGIN(PMC **c))
 
         *c = new_sub_pmc;
     }
-}
-
-
-/*
-
-=item C<static PackFile_ConstTable * find_constants(PARROT_INTERP,
-PackFile_ConstTable *ct)>
-
-Finds the constant table associated with a thread. For now, we need to copy
-constant tables because some entries aren't really constant; e.g. subroutines
-need to refer to namespace pointers.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_ConstTable *
-find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
-{
-    ASSERT_ARGS(find_constants)
-    if (!n_interpreters
-    ||  !interp->thread_data
-    ||  interp->thread_data->tid == 0)
-        return ct;
-    else {
-        Hash                 *tables;
-        PackFile_ConstTable  *new_ct;
-
-        PARROT_ASSERT(interp->thread_data);
-
-        if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables = Parrot_hash_new_pointer_hash(interp);
-        }
-
-        tables = interp->thread_data->const_tables;
-        new_ct = (PackFile_ConstTable *)Parrot_hash_get(interp, tables, ct);
-
-        if (!new_ct) {
-            /* need to construct it */
-
-            int i;
-
-            new_ct = mem_gc_allocate_zeroed_typed(interp, PackFile_ConstTable);
-
-            new_ct->num.const_count = ct->num.const_count;
-            new_ct->num.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->num.const_count, FLOATVAL);
-            memcpy(new_ct->num.constants, ct->num.constants,
-                    ct->num.const_count * sizeof (FLOATVAL));
-
-            new_ct->str.const_count = ct->str.const_count;
-            new_ct->str.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->str.const_count, STRING *);
-            memcpy(new_ct->str.constants, ct->str.constants,
-                    ct->str.const_count * sizeof (STRING *));
-
-            new_ct->pmc.const_count = ct->pmc.const_count;
-            new_ct->pmc.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->pmc.const_count, PMC *);
-            memcpy(new_ct->pmc.constants, ct->pmc.constants,
-                    ct->pmc.const_count * sizeof (PMC *));
-            for (i = 0; i < new_ct->pmc.const_count; ++i)
-                clone_constant(interp, &new_ct->pmc.constants[i]);
-
-            Parrot_hash_put(interp, tables, ct, new_ct);
-        }
-
-        return new_ct;
-    }
-}
-
-
-/*
-
-=item C<void Parrot_destroy_constants(PARROT_INTERP)>
-
-Destroys the constants for an interpreter.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_destroy_constants(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_destroy_constants)
-    Hash *hash;
-
-    return;
-
-    if (!interp->thread_data)
-        return;
-
-    hash = interp->thread_data->const_tables;
-
-    if (!hash)
-        return;
-
-    parrot_hash_iterate(hash,
-        PackFile_ConstTable * const ct = (PackFile_ConstTable *)_bucket->value;
-        PackFile_ConstTable_clear(interp, ct);
-        mem_gc_free(interp, ct););
-    Parrot_hash_destroy(interp, hash);
 }
 
 /*

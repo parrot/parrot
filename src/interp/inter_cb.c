@@ -175,15 +175,12 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
         PANIC(interp, "user_data doesn't look like a pointer");
 
     /* Fetch original interpreter from prop */
-    LOCK(interpreter_array_mutex);
-
-    interp      = interpreter_array[0];
-    sc          = CONST_STRING(interp, "_interpreter");
+    /*sc          = CONST_STRING(interp, "_interpreter");
     interp_pmc  = VTABLE_getprop(interp, user_data, sc);
     GETATTR_ParrotInterpreter_interp(interp, interp_pmc, interp);
-
-    UNLOCK(interpreter_array_mutex);
-    if (!interp)
+    if (!interp)*/
+    // TODO: Need to figure out how to handle this. Might need to rearrange
+    // the struture of user_data to make the interp easier to get.
         PANIC(interp, "interpreter not found for callback");
 
     /*
@@ -201,7 +198,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
     /*
      * ok fine till here
      */
-    callback_CD(interp, external_data, user_data);
+    //callback_CD(interp, external_data, user_data);
 }
 
 /*

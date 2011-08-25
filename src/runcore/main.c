@@ -293,14 +293,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     op_lib_t     *lib;
     oplib_init_f  init_func;
 
-    if (n_interpreters > 1) {
-        /* This is not supported yet because interp->all_op_libs
-         * and interp->op_hash are shared.
-         */
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "loading a new dynoplib while "
-            "more than one thread is running is not supported.");
-    }
-
     if (!interp->all_op_libs)
         interp->all_op_libs = mem_gc_allocate_n_zeroed_typed(interp,
                 interp->n_libs + 1, op_lib_t*);
