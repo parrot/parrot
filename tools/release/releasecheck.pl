@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent=1;
+use Archive::Tar;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -32,8 +32,9 @@ print "Performing releasecheck on $tb\n";
     my $ctarball = "$tdir/$tb";
     copy "$cwd/$tb" => $ctarball
         or croak "Unable to copy $tb";
-    system(qq{tar xzf $ctarball})
-        and croak "Unable to untar $ctarball";
+    my $tar = Archive::Tar->new;
+    $tar->read($ctarball);
+    $tar->extract();
     chdir $distro or croak "Unable to chdir to $distro";
     print "Reconfiguring\n";
     system(qq{$^X Configure.pl --silent}) and croak "Unable to configure";
