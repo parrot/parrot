@@ -327,7 +327,7 @@ close $X;
 
 my $stat;
 
-my $count = $MSWin32 ? 11 : 13;
+my $count = $MSWin32 || $msys ? 11 : 13;
 my @s = stat('xpto');
 $s[6] = 0; # Parrot does this internally...
 if ( $cygwin ) {
@@ -335,7 +335,7 @@ if ( $cygwin ) {
     $s[1] &= 0xffffffff;
 }
 
-if ( $MSWin32 ) {
+if ( $MSWin32 || $msys ) {
     $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter
     $s[2] = 0777;   # mode: always 0777 on Windows
     $s[3] = 0;      # nlink: only implemented in fstat for now
@@ -485,7 +485,7 @@ OUT
 my $lstat;
 
 SKIP: {
-    skip 'lstat not on Win32', 1 if $MSWin32;
+    skip 'lstat not on Win32', 1 if $MSWin32 || $msys;
     skip 'broken test TT #457', 1 if $solaris;
 
     my @s = lstat('xpto');
@@ -654,7 +654,7 @@ use English '$UID';
 
 # Test chroot
 SKIP: {
-    skip "chroot not available under Windows", 1 if $MSWin32;
+    skip "chroot not available under Windows", 1 if $MSWin32 || $msys;
     skip "chroot not available if not root", 1 if $UID != 0;
 
     mkdir "my-super-chroot";

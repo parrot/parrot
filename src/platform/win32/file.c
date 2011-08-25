@@ -115,10 +115,6 @@ Parrot_file_getcwd(PARROT_INTERP)
 
     mem_gc_free(interp, c_str);
 
-fputs("\nYYY ", stderr);
-Parrot_io_putps(interp, _PIO_STDERR(interp), result);
-fputs("\n", stderr);
-
     return result;
 }
 
