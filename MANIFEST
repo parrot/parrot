@@ -937,10 +937,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
-include/parrot/thr_none.h                                   [main]include
-include/parrot/thr_pthread.h                                [main]include
-include/parrot/thr_windows.h                                [main]include
-include/parrot/thread.h                                     [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
@@ -1397,7 +1393,6 @@ src/pmc/packfilesegment.pmc                                 []
 src/pmc/packfileview.pmc                                    []
 src/pmc/parrotinterpreter.pmc                               []
 src/pmc/parrotlibrary.pmc                                   []
-src/pmc/parrotthread.pmc                                    []
 src/pmc/pmc.num                                             []
 src/pmc/pmcproxy.pmc                                        []
 src/pmc/pointer.pmc                                         []
@@ -1422,7 +1417,6 @@ src/pmc/stringiterator.pmc                                  []
 src/pmc/structview.pmc                                      []
 src/pmc/sub.pmc                                             []
 src/pmc/task.pmc                                            []
-src/pmc/threadinterpreter.pmc                               []
 src/pmc/timer.pmc                                           []
 src/pmc/undef.pmc                                           []
 src/pmc/unmanagedstruct.pmc                                 []
@@ -1450,7 +1444,6 @@ src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
 src/sub.c                                                   []
-src/thread.c                                                []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []
@@ -1922,7 +1915,6 @@ t/pmc/parrotinterpreter.t                                   [test]
 t/pmc/parrotio.t                                            [test]
 t/pmc/parrotlibrary.t                                       [test]
 t/pmc/parrotobject.t                                        [test]
-t/pmc/parrotthread.t                                        [test]
 t/pmc/pmc.t                                                 [test]
 t/pmc/pmcproxy.t                                            [test]
 t/pmc/pointer.t                                             [test]
@@ -1955,7 +1947,6 @@ t/pmc/testlib/number.pasm                                   [test]
 t/pmc/testlib/packfile_common.pir                           [test]
 t/pmc/testlib/test_server.pir                               [test]
 t/pmc/testlib/test_server_ipv6.pir                          [test]
-t/pmc/threads.t                                             [test]
 t/pmc/timer.t                                               [test]
 t/pmc/undef.t                                               [test]
 t/pmc/unmanagedstruct.t                                     [test]

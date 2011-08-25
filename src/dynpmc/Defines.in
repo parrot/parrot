@@ -72,9 +72,6 @@ DYNPMC_H_FILES_MIN = \
     include/parrot/string.h \
     include/parrot/string_funcs.h \
     include/parrot/sub.h \
-    include/parrot/thread.h \
-    include/parrot/thr_pthread.h \
-    include/parrot/thr_windows.h \
     include/parrot/vtable.h \
     include/parrot/vtables.h \
     include/parrot/warnings.h \

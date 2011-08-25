@@ -391,9 +391,6 @@ include/parrot/oo.h
 include/parrot/feature.h
 include/parrot/oplib.h
 include/parrot/library.h
-include/parrot/thread.h
-include/parrot/thr_pthread.h
-include/parrot/thr_windows.h
 include/parrot/atomic.h
 include/parrot/atomic/fallback.h
 include/parrot/atomic/gcc_pcc.h
