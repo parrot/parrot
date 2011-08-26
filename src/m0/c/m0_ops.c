@@ -42,6 +42,13 @@ m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    /* note the lack of filehandle selection (ops[1]) for output */
+    fprintf( stdout, "%d", (int)frame->registers[ ops[2] ] );
+}
+
+static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->registers[ops[1]] = frame->registers[ops[2]] +
@@ -195,6 +202,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_PRINT_S):
                     m0_op_print_s( cf, &ops[pc] );
+                break;
+
+                case (M0_PRINT_I):
+                    m0_op_print_i( cf, &ops[pc] );
                 break;
 
                 case (M0_NOOP):
