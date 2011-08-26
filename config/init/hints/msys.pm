@@ -59,9 +59,10 @@ sub _msys {
     my ($conf) = @_;
 
     # Use MSYS naming scheme for DLLs
-    my $libname = $conf->data->get('libparrot_shared');
-    $libname =~ s/^lib/msys-/g;
-    $conf->data->set(libparrot_shared => $libname);
+# XXX: mysteriously fails now - worked before!
+#    my $libname = $conf->data->get('libparrot_shared');
+#    $libname =~ s/^lib/msys-/g;
+#    $conf->data->set(libparrot_shared => $libname);
 
     # Set Windows defines
     my $ccflags = $conf->data->get('ccflags');
