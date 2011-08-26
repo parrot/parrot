@@ -39,7 +39,7 @@ my @m0_files = (
 #    'm0_deref.m0',
     'm0_div_i.m0',
 #    'm0_div_n.m0',
-#    'm0_goto_chunk.m0',
+    'm0_goto_chunk.m0',
 #    'm0_hash.m0',
     'm0_labels_without_goto.m0',
     'm0_labels_with_goto.m0',
