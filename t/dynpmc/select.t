@@ -25,10 +25,9 @@ Tests the Select PMC.
     interp = getinterp
     .local pmc config
     config = interp[.IGLOBALS_CONFIG_HASH]
-    .local string osname
-    osname = config['osname']
-    if osname == 'MSWin32' goto todo_all
-    if osname == 'msys' goto todo_all
+    .local string platform
+    platform = config['platform']
+    if platform == 'win32' goto todo_all
     goto tests
 todo_all:
     skip(13, 'busted on Win32')
