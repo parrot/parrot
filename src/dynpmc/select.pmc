@@ -1,0 +1,370 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/select.pmc - IO Select PMC
+
+=head1 DESCRIPTION
+
+This is the base-class for non-blocking IO using select
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "../src/io/io_private.h"
+#include "pmc/pmc_filehandle.h"
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#define SELECT_READ  1
+#define SELECT_WRITE 2
+#define SELECT_ERROR 4
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<INTVAL find_max_fd(INTERP, PMC *fd_map)>
+
+Returns the maximum of all the c89 standard integer file descriptors held by
+the Hash PMC
+
+=back
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+    static INTVAL find_max_fd(PARROT_INTERP, ARGIN(PMC *fd_map)) {
+        PMC * const  iter  = VTABLE_get_iter(interp, fd_map);
+        const INTVAL n     = VTABLE_elements(interp, fd_map);
+        INTVAL       maxid = -1;
+        INTVAL       j;
+
+        for (j = 0; j < n; ++j) {
+            INTVAL id = VTABLE_shift_integer(interp, iter);
+            if (maxid < id)
+                maxid = id;
+        }
+        return maxid;
+    }
+
+
+pmclass Select auto_attrs dynpmc {
+
+    ATTR PMC    *fd_map;   /* map a fd to its PMC */
+    ATTR fd_set  rb_array; /* read bit array */
+    ATTR fd_set  wb_array; /* write bit array */
+    ATTR fd_set  eb_array; /* error bit array */
+    ATTR INTVAL  max_fd;
+
+/*
+
+=item C<void init()>
+
+Initializes the PMC.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PMC *fd_map = pmc_new(interp, enum_class_Hash);
+        SET_ATTR_fd_map(INTERP, SELF, fd_map);
+        SET_ATTR_max_fd(INTERP, SELF, -1);
+
+        FD_ZERO(&(PARROT_SELECT(SELF)->rb_array));
+        FD_ZERO(&(PARROT_SELECT(SELF)->wb_array));
+        FD_ZERO(&(PARROT_SELECT(SELF)->eb_array));
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<METHOD INTVAL max_fd()>
+
+Returns the maximum of all the c89 standard integer file descriptors held by
+the Select PMC
+
+=cut
+
+*/
+
+    METHOD max_fd() {
+      INTVAL v;
+      GET_ATTR_max_fd(INTERP, SELF, v);
+      RETURN(INTVAL v);
+    }
+
+/*
+
+=item C<METHOD PMC* fd_map()>
+
+Returns the Hash PMC that holds the mapping from file descriptor to the opaque
+PMC associated with the file descriptor when it was added to the Select PMC.
+
+Used mainly for testing purposes.
+
+=cut
+
+*/
+
+    METHOD fd_map() {
+      PMC *fd_map;
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      RETURN(PMC *fd_map);
+    }
+
+
+/*
+
+=item C<METHOD update(PMC* filehandle, PMC* data, INTVAL read_write_error_flag)>
+
+Adds filehandle PMC to the Select PMC for monitoring based on the
+read_write_error_flags
+
+read_write_error_flag = READ (0x1) | WRITE (0x2) | ERROR (0x4)
+
+An array of data PMCs are returned by the can_read, can_read, has_exception,
+and select methods when the filehandles meet one of read_write_error_flag
+conditions.
+
+=cut
+
+*/
+    METHOD update(PMC *handle, PMC* data, INTVAL rwe) {
+      PMC    *fd_map;
+      INTVAL  maxid,  fdkey;
+
+      GETATTR_FileHandle_os_handle(INTERP, handle, fdkey);
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
+      if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
+      if (rwe & SELECT_WRITE) { FD_SET(fdkey, &PARROT_SELECT(SELF)->wb_array); }
+      if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
+      if (maxid < fdkey)
+          maxid = fdkey;
+      SET_ATTR_max_fd(INTERP, SELF, maxid);
+    }
+
+/*
+
+=item C<METHOD remove(PMC* filehandle)>
+
+Removes filehandle from the Select PMC.
+
+=cut
+
+*/
+    METHOD remove(PMC *handle) {
+      PMC    *fdkey, *fd_map;
+      INTVAL  fd,  maxid;
+
+      GETATTR_FileHandle_os_handle(INTERP, handle, fd);
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      VTABLE_delete_keyed_int(interp, fd_map, fd);
+      FD_CLR(fd, &PARROT_SELECT(SELF)->rb_array);
+      FD_CLR(fd, &PARROT_SELECT(SELF)->wb_array);
+      FD_CLR(fd, &PARROT_SELECT(SELF)->eb_array);
+      if (fd == maxid) {
+        maxid = find_max_fd(interp, fd_map);
+        SET_ATTR_max_fd(INTERP, SELF, maxid);
+      }
+    }
+
+/*
+
+=item C<METHOD can_read()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be read from.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to
+read before returning.
+
+=cut
+
+*/
+
+    METHOD can_read(FLOATVAL timeout) {
+      fd_set          rdset;
+      struct  timeval timeouts;
+      PMC            *results, *fd_map;
+      INTVAL          maxid, i;
+      INTVAL          sec;
+      INTVAL          usec = modf(timeout, &sec) * 1000000;
+
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
+      memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
+
+      select(maxid + 1, &rdset, NULL, NULL, &timeouts);
+      for (i=0; i <= maxid; i++) {
+        if (FD_ISSET(i, &rdset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD can_write()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be written to.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to
+write to before returning.
+
+=cut
+
+*/
+
+    METHOD can_write(FLOATVAL timeout) {
+      fd_set         wbset;
+      struct timeval timeouts;
+      PMC           *results, *fd_map;
+      INTVAL         maxid, i;
+      INTVAL         sec;
+      INTVAL         usec = modf(timeout, &sec) * 1000000;
+
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
+      memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
+
+      select(maxid + 1, NULL, &wbset, NULL, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &wbset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD has_exception()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are in an exception state.
+
+Waits for a maximum of timeout seconds for a file descriptor to be in an
+exception state before returning.
+
+=cut
+
+*/
+
+    METHOD has_exception(FLOATVAL timeout) {
+      fd_set         ebset;
+      struct timeval timeouts;
+      PMC           *results, *fd_map;
+      INTVAL         maxid, i;
+      INTVAL         sec;
+      INTVAL         usec = modf(timeout, &sec) * 1000000;
+
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
+      memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+
+      select(maxid + 1, NULL, NULL, &ebset, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &ebset)) {
+          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+      }
+      RETURN(PMC *results);
+    }
+
+/*
+
+=item C<METHOD select()>
+
+Returns the associated data for the file descriptors in the Select PMC, which
+are ready to be read, written, or have an exception to be handled.
+
+Waits for a maximum of timeout seconds for a file descriptor to be ready to be
+handled.
+
+=back
+
+=cut
+
+*/
+
+    METHOD select(FLOATVAL timeout) {
+      fd_set          rdset, wrset, erset;
+      struct timeval  timeouts;
+      PMC            *results, *rresults, *wresults, *eresults, *fd_map;
+      INTVAL          maxid, i;
+      INTVAL          sec;
+      INTVAL          usec = modf(timeout, &sec) * 1000000;
+
+      GET_ATTR_fd_map(INTERP, SELF, fd_map);
+      GET_ATTR_max_fd(INTERP, SELF, maxid);
+      timeouts.tv_sec  = sec;
+      timeouts.tv_usec = usec;
+      results          = pmc_new(interp, enum_class_ResizablePMCArray);
+      rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+      wresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+      eresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+      memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
+      memcpy(&wrset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
+      memcpy(&erset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+
+      select(maxid + 1, &rdset, &wrset, &erset, &timeouts);
+      for (i=0; i<=maxid; i++) {
+        if (FD_ISSET(i, &rdset)) {
+          VTABLE_push_pmc(interp, rresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+        if (FD_ISSET(i, &wrset)) {
+          VTABLE_push_pmc(interp, wresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+        if (FD_ISSET(i, &erset)) {
+          VTABLE_push_pmc(interp, eresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        }
+      }
+      VTABLE_push_pmc(interp, results, rresults);
+      VTABLE_push_pmc(interp, results, wresults);
+      VTABLE_push_pmc(interp, results, eresults);
+      RETURN(PMC *results);
+    }
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

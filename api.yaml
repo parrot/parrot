@@ -1,5 +1,12 @@
 ---
 -
+  name:  'Experimental Select PMC'
+  note:  'The Select PMC is experimental until its interface gets some exercise.  See ticket for more information.'
+  tags: 
+    - 'PMC'
+    - 'experimental'
+  ticket:  'http://trac.parrot.org/parrot/ticket/2034'
+-
   name:     '"Advanced" NCI parameter types'
   eligible: '3.1'
   ticket:   'http://trac.parrot.org/parrot/ticket/1931'
