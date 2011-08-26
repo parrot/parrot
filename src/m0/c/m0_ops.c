@@ -125,6 +125,13 @@ m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = (int)frame->registers[ops[2]] >>
+        frame->registers[ops[3]];
+}
+
+static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
     unsigned int chunk_id = get_chunk_id_from_name(interp,(char *)frame->registers[ops[1]]);
@@ -253,6 +260,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_LSHR):
                     m0_op_lshr( cf, &ops[pc] );
+                break;
+
+                case (M0_ASHR):
+                    m0_op_ashr( cf, &ops[pc] );
                 break;
 
                 case (M0_SHL):
