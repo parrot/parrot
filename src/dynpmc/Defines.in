@@ -1,12 +1,9 @@
 # Copyright (C) 2010, Parrot Foundation.
 
 # The Select dynpmc is extravagantly broken on win32.  Help wanted.
-# XXX-MSYS:
-# fix doesn't work but should as platform is win32
-# #UNLESS(win32):   $(DYNEXT_DIR)/select$(LOAD_EXT)     \
-# remove select dynpmc on all platforms for now
 DYNPMC_TARGETS =                                      \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
+#UNLESS(win32 or msys):    $(DYNEXT_DIR)/select$(LOAD_EXT)     \
     $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT)                \
     $(DYNEXT_DIR)/file$(LOAD_EXT)                     \
     $(DYNEXT_DIR)/foo_group$(LOAD_EXT)                \

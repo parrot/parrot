@@ -7,7 +7,7 @@ use warnings;
 
 my %modes = (
     MINGW32 => \&_mingw,
-    MSYS => \&_msys
+    MSYS    => \&_msys
 );
 
 sub runstep {
@@ -15,6 +15,9 @@ sub runstep {
 
     # Assume Windows 2000 or above
     $conf->data->set(ccflags => '-DWINVER=0x0500 ');
+
+    # Identify as msys as setting win32 => 1 breaks the build
+    $conf->data->set(msys => 1);
 
     # Create Parrot as shared library
     $conf->data->set(
@@ -40,7 +43,7 @@ sub runstep {
 
     # Setup installed Parrot
     my $bindir = $conf->data->get('bindir');
-    $bindir =~ s/ /\\ /g;
+    $bindir =~ s{ }{\\ }g;
     $conf->data->set(
         inst_libparrot_ldflags   => "-L$bindir -lparrot",
         inst_libparrot_linkflags => "-L$bindir -lparrot"
@@ -78,6 +81,7 @@ sub _mingw {
     $conf->data->set(bindir => $bindir);
 
     # Setup path for MSYS libs
+    # Use /bin instead of /lib to avoid incorrectly pulling in other MSYS libs
     my $libs = $conf->data->get('libs');
     $conf->data->set(libs => $libs.' -L/bin');
 }
