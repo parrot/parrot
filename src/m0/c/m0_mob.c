@@ -227,7 +227,7 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
 				int string_len = read_long_from_stream(stream);
 				int encoding   = read_long_from_stream(stream);
 				if (encoding == 0) {
-					// TODO
+					constant = (char *)read_from_stream(stream, string_len);
 				} else {
 					constant = read_from_stream(stream, string_len);
 				}
