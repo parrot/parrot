@@ -2936,20 +2936,11 @@ install-doc:
 ###############################################################################
 
 release : MANIFEST MANIFEST.generated
-	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	@$(RM_F) MANIFEST.real
-	mv MANIFEST MANIFEST.real
-	grep -v DEVELOPING MANIFEST.real > MANIFEST
-	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
-	$(TAR) -zcv -T - -f parrot-$(VERSION).tar.gz
-	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' \
-	     MANIFEST | $(TAR) -jcv -T - -f parrot-$(VERSION).tar.bz2
+	$(PERL) $(RELEASE_TOOLS_DIR)/cut.pl $(VERSION)
 	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
         parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
 	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
         parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
-	mv MANIFEST.real MANIFEST
-	rm parrot-$(VERSION)
 
 release_check:
 	$(MAKE) release VERSION=$(SOVERSION)
