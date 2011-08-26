@@ -2,6 +2,8 @@
 
 DYNPMC_TARGETS =                                      \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
+#The Select dynpmc is extravagantly broken on win32.  Help wanted.
+#UNLESS(win32):   $(DYNEXT_DIR)/select$(LOAD_EXT)     \
     $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT)                \
     $(DYNEXT_DIR)/file$(LOAD_EXT)                     \
     $(DYNEXT_DIR)/foo_group$(LOAD_EXT)                \
@@ -9,8 +11,7 @@ DYNPMC_TARGETS =                                      \
     $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT)           \
     $(DYNEXT_DIR)/rotest$(LOAD_EXT)                   \
     $(DYNEXT_DIR)/rational$(LOAD_EXT)                 \
-    $(DYNEXT_DIR)/subproxy$(LOAD_EXT)                 \
-    $(DYNEXT_DIR)/select$(LOAD_EXT)
+    $(DYNEXT_DIR)/subproxy$(LOAD_EXT)
 
 DYNPMC_FOO =            \
     src/dynpmc/foo.pmc  \
