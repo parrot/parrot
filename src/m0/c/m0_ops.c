@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "include/m0_ops.h"
@@ -153,6 +154,11 @@ int get_chunk_id_from_name( M0_Interp *interp, const char *name) {
 	return id;
 }
 
+static void
+m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
+{
+	exit((int)frame->registers[ops[1]]);
+}
 
 static void
 m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
@@ -245,6 +251,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 case (M0_GOTO_CHUNK):
                     m0_op_goto_chunk( interp ,cf, &ops[pc] );
                 break;
+
+				case (M0_EXIT):
+					m0_op_exit( interp, cf, &ops[pc]);
+				break;
 
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
