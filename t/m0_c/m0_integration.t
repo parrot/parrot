@@ -33,7 +33,7 @@ my @m0_files = (
 #    'm0_add_n.m0',
     'm0_and.m0',
     'm0_args.m0',
-#    'm0_ashr.m0',
+    'm0_ashr.m0',
     'm0_chunk_name_const.m0',
 #    'm0_convert_i_n.m0',
 #    'm0_deref.m0',
