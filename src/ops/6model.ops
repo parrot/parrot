@@ -1,6 +1,8 @@
 
 /*
 
+=over
+
 =item get_knowhow()
 
 Returns the 6model core meta-object, KnowHOW.
@@ -972,3 +974,8 @@ inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
+/*
+
+=back
+
+*/

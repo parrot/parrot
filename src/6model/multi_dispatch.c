@@ -362,7 +362,8 @@ PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
 
         mem_sys_free(possibles);
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "No applicable candidates found to dispatch to for '%Ss'. Available candidates are:\n%Ss",
+                "No applicable candidates found to dispatch to for '%Ss'."
+                " Available candidates are:\n%Ss",
                 VTABLE_get_string(interp, candidates[0]->sub),
                 signatures);
     }

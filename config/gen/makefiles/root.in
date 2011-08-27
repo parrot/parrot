@@ -372,18 +372,18 @@ EXTEND_HEADERS = \
 # parrot.h and all the includes it causes to be included
 PARROT_H_HEADERS = \
 	$(INC_DIR)/parrot.h \
-        $(INC_DIR)/6model/knowhow_bootstrapper.h \
-        $(INC_DIR)/6model/repr_registry.h \
-        $(INC_DIR)/6model/serialization_context.h \
-        $(INC_DIR)/6model/sixmodelobject.h \
-        $(INC_DIR)/6model/storage_spec.h \
-        $(INC_DIR)/6model/repr/HashAttrStore.h \
-        $(INC_DIR)/6model/repr/KnowHOWREPR.h \
-        $(INC_DIR)/6model/repr/P6int.h \
-        $(INC_DIR)/6model/repr/P6num.h \
-        $(INC_DIR)/6model/repr/P6opaque.h \
-        $(INC_DIR)/6model/repr/P6str.h \
-        $(INC_DIR)/6model/repr/Uninstantiable.h \
+	$(INC_DIR)/6model/knowhow_bootstrapper.h \
+	$(INC_DIR)/6model/repr_registry.h \
+	$(INC_DIR)/6model/serialization_context.h \
+	$(INC_DIR)/6model/sixmodelobject.h \
+	$(INC_DIR)/6model/storage_spec.h \
+	$(INC_DIR)/6model/repr/HashAttrStore.h \
+	$(INC_DIR)/6model/repr/KnowHOWREPR.h \
+	$(INC_DIR)/6model/repr/P6int.h \
+	$(INC_DIR)/6model/repr/P6num.h \
+	$(INC_DIR)/6model/repr/P6opaque.h \
+	$(INC_DIR)/6model/repr/P6str.h \
+	$(INC_DIR)/6model/repr/Uninstantiable.h \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/settings.h \
 	$(INC_DIR)/enums.h \
