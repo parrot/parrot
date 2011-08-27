@@ -666,3 +666,7 @@
     - 'completed'
   ticket:  'https://github.com/parrot/parrot/issues/937'
 -
+  name : '6model'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2186'
