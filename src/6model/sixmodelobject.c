@@ -16,12 +16,12 @@ static PMC * default_find_method(PARROT_INTERP,
     INTVAL hint)
         __attribute__nonnull__(1);
 
-static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted)
+static INTVAL default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_default_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_default_type_check  __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_default_type_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -110,7 +110,7 @@ default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
  * be the only one we end up with since the HOW is the authority here.
  * So we may end up not calling this through the S-Table in the end. */
 static INTVAL
-default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted)
+default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
 {
     PMC *HOW, *meth, *result;
 

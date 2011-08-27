@@ -197,8 +197,7 @@ instance_of(PARROT_INTERP, PMC *WHAT)
     /* Allocate and set up object instance. */
     obj = (HashAttrStoreInstance *) Parrot_gc_allocate_fixed_size_storage(
                 interp,
-                sizeof(HashAttrStoreInstance)
-          );
+                sizeof (HashAttrStoreInstance));
     obj->common.stable = STABLE_PMC(WHAT);
     obj->store = pmc_new(interp, enum_class_Hash);
 
@@ -290,7 +289,7 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
     HashAttrStoreInstance *obj;
 
     /* Allocate and set up object instance. */
-    obj = (HashAttrStoreInstance *) Parrot_gc_allocate_fixed_size_storage(interp, sizeof(HashAttrStoreInstance));
+    obj = (HashAttrStoreInstance *) Parrot_gc_allocate_fixed_size_storage(interp, sizeof (HashAttrStoreInstance));
     obj->common.stable = STABLE_PMC(to_clone);
     obj->store = VTABLE_clone(interp, ((HashAttrStoreInstance *)PMC_data(to_clone))->store);
 
@@ -370,7 +369,7 @@ gc_mark(PARROT_INTERP, PMC *obj)
 static void
 gc_free(PARROT_INTERP, PMC *obj)
 {
-    Parrot_gc_free_fixed_size_storage(interp, sizeof(HashAttrStoreInstance), PMC_data(obj));
+    Parrot_gc_free_fixed_size_storage(interp, sizeof (HashAttrStoreInstance), PMC_data(obj));
     PMC_data(obj) = NULL;
 }
 
@@ -426,3 +425,10 @@ HashAttrStore_initialize(PARROT_INTERP)
     this_repr->is_attribute_initialized = is_attribute_initialized;
     return this_repr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

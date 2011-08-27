@@ -405,7 +405,7 @@ inline op publish_type_check_cache(in PMC, in PMC) :base_core {
         STable *target_st = STABLE(target);
         INTVAL items      = VTABLE_elements(interp, $2);
         if (items > 0) {
-            PMC ** cache = (PMC **) mem_sys_allocate(sizeof(PMC *) * items);
+            PMC ** cache = (PMC **) mem_sys_allocate(sizeof (PMC *) * items);
             INTVAL i;
             for (i = 0; i < items; i++)
                 cache[i] = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, $2, i));
@@ -979,3 +979,10 @@ inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
 =back
 
 */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

@@ -66,24 +66,24 @@ pmclass SerializationContext auto_attrs {
         INTVAL elems;
         GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
         elems = VTABLE_elements(interp, root_objects);
-        RETURN (INTVAL elems);
+        RETURN(INTVAL elems);
     }
 
     METHOD STRING* handle() {
         STRING *handle;
         GETATTR_SerializationContext_handle(interp, SELF, handle);
-        RETURN (STRING* handle);
+        RETURN(STRING* handle);
     }
 
     METHOD set_description(STRING *description) {
         SETATTR_SerializationContext_description(interp, SELF, description);
-        RETURN (STRING* description);
+        RETURN(STRING* description);
     }
 
     METHOD STRING* description() {
         STRING *description;
         GETATTR_SerializationContext_description(interp, SELF, description);
-        RETURN (STRING* description);
+        RETURN(STRING* description);
     }
 
     METHOD INTVAL slot_index_for(PMC *obj) {
@@ -94,10 +94,17 @@ pmclass SerializationContext auto_attrs {
         count = VTABLE_elements(interp, root_objects);
         for (i = 0; i < count; i++) {
             if (VTABLE_get_pmc_keyed_int(interp, root_objects, i) == obj) {
-                RETURN (INTVAL i);
+                RETURN(INTVAL i);
             }
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Object does not exist in serialization context");
     }
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

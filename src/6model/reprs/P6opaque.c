@@ -371,7 +371,7 @@ index_mapping_and_flat_list(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
 
     /* We can now form the name map. */
     num_classes = VTABLE_elements(interp, class_list);
-    result = (P6opaqueNameMap *) mem_sys_allocate_zeroed(sizeof(P6opaqueNameMap) * (1 + num_classes));
+    result = (P6opaqueNameMap *) mem_sys_allocate_zeroed(sizeof (P6opaqueNameMap) * (1 + num_classes));
     for (i = 0; i < num_classes; i++) {
         result[i].class_key = VTABLE_get_pmc_keyed_int(interp, class_list, i);
         result[i].name_map  = VTABLE_get_pmc_keyed_int(interp, attr_map_list, i);
@@ -408,14 +408,14 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
 
     /* If we have no attributes in the index mapping, then just the header. */
     if (repr_data->name_to_index_mapping[0].class_key == NULL) {
-        repr_data->allocation_size = sizeof(SixModelObjectCommonalities) + sizeof(PMC *);
+        repr_data->allocation_size = sizeof (SixModelObjectCommonalities) + sizeof (PMC *);
     }
 
     /* Otherwise, we need to compute the allocation strategy.  */
     else {
         /* Initial size is for commonalities (e.g. shared table pointer) and
          * spill hash space. */
-        INTVAL cur_size = sizeof(SixModelObjectCommonalities) + sizeof(PMC *);
+        INTVAL cur_size = sizeof (SixModelObjectCommonalities) + sizeof (PMC *);
 
         /* Get number of attributes and set up various counters. */
         INTVAL num_attrs    = VTABLE_elements(interp, flat_list);
@@ -426,7 +426,7 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
 
         /* Allocate offset array and GC mark info arrays. */
         repr_data->num_attributes      = num_attrs;
-        repr_data->attribute_offsets   = (INTVAL *) mem_sys_allocate(info_alloc * sizeof(INTVAL));
+        repr_data->attribute_offsets   = (INTVAL *) mem_sys_allocate(info_alloc * sizeof (INTVAL));
 
         /* Go over the attributes and arrange their allocation. */
         for (i = 0; i < num_attrs; i++) {
@@ -439,7 +439,7 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
 
             /* Work out what unboxed type it is, if any. Default to a boxed. */
             INTVAL unboxed_type = STORAGE_SPEC_BP_NONE;
-            INTVAL bits         = sizeof(PMC *) * 8;
+            INTVAL bits         = sizeof (PMC *) * 8;
             if (!PMC_IS_NULL(type)) {
                 /* Get the storage spec of the type and see what it wants. */
                 storage_spec spec = REPR(type)->get_storage_spec(interp, STABLE(type));
@@ -481,19 +481,19 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
             repr_data->attribute_offsets[i] = cur_size;
             if (unboxed_type == STORAGE_SPEC_BP_NONE) {
                 if (!repr_data->gc_pmc_mark_offsets)
-                    repr_data->gc_pmc_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof(INTVAL));
+                    repr_data->gc_pmc_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
                 repr_data->gc_pmc_mark_offsets[cur_pmc_attr] = cur_size;
                 cur_pmc_attr++;
                 if (!PMC_IS_NULL(av_cont)) {
                     /* Stash away auto-viv container info. */
                     if (!repr_data->auto_viv_values)
-                        repr_data->auto_viv_values = (PMC **) mem_sys_allocate_zeroed(info_alloc * sizeof(PMC *));
+                        repr_data->auto_viv_values = (PMC **) mem_sys_allocate_zeroed(info_alloc * sizeof (PMC *));
                     repr_data->auto_viv_values[i] = av_cont;
                 }
             }
             if (unboxed_type == STORAGE_SPEC_BP_STR) {
                 if (!repr_data->gc_str_mark_offsets)
-                    repr_data->gc_str_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof(INTVAL));
+                    repr_data->gc_str_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
                 repr_data->gc_str_mark_offsets[cur_str_attr] = cur_size;
                 cur_str_attr++;
             }
@@ -875,7 +875,7 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
     }
     else {
         obj = mem_allocate_zeroed_typed(P6opaqueInstance);
-        memcpy(obj, PMC_data(to_clone), sizeof(P6opaqueInstance));
+        memcpy(obj, PMC_data(to_clone), sizeof (P6opaqueInstance));
     }
 
     return wrap_object(interp, obj);
@@ -1223,3 +1223,10 @@ P6opaque_initialize(PARROT_INTERP)
     this_repr->change_type = change_type;
     return this_repr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

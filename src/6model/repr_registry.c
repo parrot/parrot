@@ -43,9 +43,9 @@ register_repr(PARROT_INTERP, STRING *name, REPROps *repr)
     INTVAL ID = num_reprs;
     num_reprs++;
     if (repr_registry)
-        repr_registry = mem_sys_realloc(repr_registry, num_reprs * sizeof(REPROps *));
+        repr_registry = mem_sys_realloc(repr_registry, num_reprs * sizeof (REPROps *));
     else
-        repr_registry = mem_sys_allocate(num_reprs * sizeof(REPROps *));
+        repr_registry = mem_sys_allocate(num_reprs * sizeof (REPROps *));
     repr_registry[ID] = repr;
     VTABLE_set_integer_keyed_str(interp, repr_name_to_id_map, name, ID);
 }
@@ -97,3 +97,10 @@ REPR_get_by_name(PARROT_INTERP, STRING *name)
 {
     return repr_registry[VTABLE_get_integer_keyed_str(interp, repr_name_to_id_map, name)];
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

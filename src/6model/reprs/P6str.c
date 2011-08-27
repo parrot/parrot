@@ -367,7 +367,7 @@ get_storage_spec(PARROT_INTERP, STable *st)
 {
     storage_spec spec;
     spec.inlineable = STORAGE_SPEC_INLINED;
-    spec.bits = sizeof(STRING *) * 8;
+    spec.bits = sizeof (STRING *) * 8;
     spec.boxed_primitive = STORAGE_SPEC_BP_STR;
     return spec;
 }
@@ -412,3 +412,10 @@ P6str_initialize(PARROT_INTERP)
     this_repr->is_attribute_initialized = is_attribute_initialized;
     return this_repr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

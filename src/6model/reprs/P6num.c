@@ -358,7 +358,7 @@ get_storage_spec(PARROT_INTERP, STable *st)
 {
     storage_spec spec;
     spec.inlineable = STORAGE_SPEC_INLINED;
-    spec.bits = sizeof(FLOATVAL) * 8;
+    spec.bits = sizeof (FLOATVAL) * 8;
     spec.boxed_primitive = STORAGE_SPEC_BP_NUM;
     return spec;
 }
