@@ -1739,7 +1739,6 @@ gc_ms_block_GC_mark(PARROT_INTERP)
     ASSERT_ARGS(gc_ms_block_GC_mark)
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     ++mem_pools->gc_mark_block_level;
-    Parrot_shared_gc_block(interp);
 }
 
 static void
@@ -1747,10 +1746,8 @@ gc_ms_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_mark)
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
-    if (mem_pools->gc_mark_block_level) {
+    if (mem_pools->gc_mark_block_level)
         --mem_pools->gc_mark_block_level;
-        Parrot_shared_gc_unblock(interp);
-    }
 }
 
 static void
