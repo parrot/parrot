@@ -1,0 +1,1 @@
+PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture);
