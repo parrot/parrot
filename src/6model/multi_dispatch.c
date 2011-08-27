@@ -1,11 +1,11 @@
-#define PARROT_IN_EXTENSION
+
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
-#include "sixmodelobject.h"
-#include "../pmc/pmc_dispatchersub.h"
-#include "../pmc/pmc_nqpmultisig.h"
-#include "pmc_sub.h"
-#include "multi_dispatch.h"
+#include "parrot/6model/sixmodelobject.h"
+#include "pmc/pmc_dispatchersub.h"
+#include "pmc/pmc_nqpmultisig.h"
+#include "pmc/pmc_sub.h"
+#include "parrot/6model/multi_dispatch.h"
 
 /* This file contains a somewhat simplified implementation of the Perl 6
  * multiple dispatch algorithm, to the degree that NQP needs it. */
@@ -353,7 +353,7 @@ PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
         while (1) {
             if (!cur_candidate[0] && !cur_candidate[1])
                 break;
-            /* XXX TODO: add sig dumping. 
+            /* XXX TODO: add sig dumping.
             if (cur_candidate[0])
                 signatures = dump_signature(interp, signatures, (*cur_candidate)->sub); */
             cur_candidate++;

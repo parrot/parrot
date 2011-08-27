@@ -1,11 +1,172 @@
 /* This is the implementation of the P6num representation, which holds a native
  * floating point number. */
 
-#define PARROT_IN_EXTENSION
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
-#include "../sixmodelobject.h"
-#include "P6num.h"
+#include "parrot/6model/sixmodelobject.h"
+#include "parrot/6model/repr/P6num.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void bind_attribute(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint,
+    PMC *value)
+        __attribute__nonnull__(1);
+
+static void bind_attribute_int(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint,
+    INTVAL value)
+        __attribute__nonnull__(1);
+
+static void bind_attribute_num(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint,
+    FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void bind_attribute_str(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint,
+    STRING *value)
+        __attribute__nonnull__(1);
+
+static INTVAL defined(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static void die_no_attrs(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void gc_free(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static void gc_mark(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static PMC * get_attribute(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint)
+        __attribute__nonnull__(1);
+
+static INTVAL get_attribute_int(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint)
+        __attribute__nonnull__(1);
+
+static FLOATVAL get_attribute_num(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint)
+        __attribute__nonnull__(1);
+
+static STRING * get_attribute_str(PARROT_INTERP,
+    PMC *obj,
+    PMC *class_handle,
+    STRING *name,
+    INTVAL hint)
+        __attribute__nonnull__(1);
+
+static INTVAL get_int(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static FLOATVAL get_num(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static storage_spec get_storage_spec(PARROT_INTERP, STable *st)
+        __attribute__nonnull__(1);
+
+static STRING * get_str(PARROT_INTERP, PMC *obj)
+        __attribute__nonnull__(1);
+
+static INTVAL hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
+        __attribute__nonnull__(1);
+
+static PMC * instance_of(PARROT_INTERP, PMC *WHAT)
+        __attribute__nonnull__(1);
+
+static INTVAL is_attribute_initialized(PARROT_INTERP,
+    PMC *Object,
+    PMC *ClassHandle,
+    STRING *Name,
+    INTVAL Hint)
+        __attribute__nonnull__(1);
+
+static PMC * repr_clone(PARROT_INTERP, PMC *to_clone)
+        __attribute__nonnull__(1);
+
+static void set_int(PARROT_INTERP, PMC *obj, INTVAL value)
+        __attribute__nonnull__(1);
+
+static void set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
+        __attribute__nonnull__(1);
+
+static void set_str(PARROT_INTERP, PMC *obj, STRING *value)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_bind_attribute __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bind_attribute_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bind_attribute_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_bind_attribute_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_defined __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_die_no_attrs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attribute __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attribute_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attribute_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_attribute_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_storage_spec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_get_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_hint_for __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_instance_of __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_is_attribute_initialized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_repr_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_set_str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /* This representation's function pointer table. */
 static REPROps *this_repr;
@@ -29,7 +190,9 @@ static PMC * type_object_for(PARROT_INTERP, PMC *HOW) {
 }
 
 /* Creates a new instance based on the type object. */
-static PMC * instance_of(PARROT_INTERP, PMC *WHAT) {
+static PMC *
+instance_of(PARROT_INTERP, PMC *WHAT)
+{
     P6numInstance *obj = mem_allocate_zeroed_typed(P6numInstance);
     obj->common.stable = STABLE_PMC(WHAT);
     obj->value         = 0.0;
@@ -38,56 +201,80 @@ static PMC * instance_of(PARROT_INTERP, PMC *WHAT) {
 
 /* Checks if a given object is defined (from the point of view of the
  * representation). */
-static INTVAL defined(PARROT_INTERP, PMC *obj) {
+static INTVAL
+defined(PARROT_INTERP, PMC *obj)
+{
     /* Native types only ever exist as the type object, which is undefined. */
     return 0;
 }
 
 /* Helper to die because this type doesn't support attributes. */
-static void die_no_attrs(PARROT_INTERP) {
+static void
+die_no_attrs(PARROT_INTERP)
+{
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "P6str representation does not support attribute storage");
 }
 
 /* Gets the current value for an attribute. */
-static PMC * get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint) {
+static PMC *
+get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
+{
     die_no_attrs(interp);
     return PMCNULL;
 }
-static INTVAL get_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint) {
+static INTVAL
+get_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
+{
     die_no_attrs(interp);
     return 0;
 }
-static FLOATVAL get_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint) {
+static FLOATVAL
+get_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
+{
     die_no_attrs(interp);
     return 0.0;
 }
-static STRING * get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint) {
+static STRING *
+get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
+{
     die_no_attrs(interp);
     return NULL;
 }
 
 /* Binds the given value to the specified attribute. */
-static void bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, PMC *value) {
+static void
+bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, PMC *value)
+{
     die_no_attrs(interp);
 }
-static void bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, INTVAL value) {
+static void
+bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, INTVAL value)
+{
     die_no_attrs(interp);
 }
-static void bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, FLOATVAL value) {
+static void
+bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, FLOATVAL value)
+{
     die_no_attrs(interp);
 }
-static void bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value) {
+static void
+bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value)
+{
     die_no_attrs(interp);
 }
 
 /* Gets the hint for the given attribute ID. */
-static INTVAL hint_for(PARROT_INTERP, PMC *class_handle, STRING *name) {
+static INTVAL
+hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
+{
     return NO_HINT;
 }
 
 /* Clones the current object; simply copies the value. */
-static PMC * repr_clone(PARROT_INTERP, PMC *to_clone) {
+static PMC *
+repr_clone(PARROT_INTERP, PMC *to_clone)
+{
     P6numInstance *obj = mem_allocate_zeroed_typed(P6numInstance);
     obj->common.stable = STABLE_PMC(to_clone);
     obj->value         = ((P6numInstance *)PMC_data(to_clone))->value;
@@ -96,46 +283,60 @@ static PMC * repr_clone(PARROT_INTERP, PMC *to_clone) {
 
 /* Used with boxing. Sets an integer value, for representations that can hold
  * one. */
-static void set_int(PARROT_INTERP, PMC *obj, INTVAL value) {
+static void
+set_int(PARROT_INTERP, PMC *obj, INTVAL value)
+{
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "P6num cannot box a native int");
 }
 
 /* Used with boxing. Gets an integer value, for representations that can
  * hold one. */
-static INTVAL get_int(PARROT_INTERP, PMC *obj) {
+static INTVAL
+get_int(PARROT_INTERP, PMC *obj)
+{
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "P6num cannot unbox to a native int");
 }
 
 /* Used with boxing. Sets a floating point value, for representations that can
  * hold one. */
-static void set_num(PARROT_INTERP, PMC *obj, FLOATVAL value) {
+static void
+set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
+{
     ((P6numInstance *)PMC_data(obj))->value = value;
 }
 
 /* Used with boxing. Gets a floating point value, for representations that can
  * hold one. */
-static FLOATVAL get_num(PARROT_INTERP, PMC *obj) {
+static FLOATVAL
+get_num(PARROT_INTERP, PMC *obj)
+{
     return ((P6numInstance *)PMC_data(obj))->value;
 }
 
 /* Used with boxing. Sets a string value, for representations that can hold
  * one. */
-static void set_str(PARROT_INTERP, PMC *obj, STRING *value) {
+static void
+set_str(PARROT_INTERP, PMC *obj, STRING *value)
+{
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "P6num cannot box a native string");
 }
 
 /* Used with boxing. Gets a string value, for representations that can hold
  * one. */
-static STRING * get_str(PARROT_INTERP, PMC *obj) {
+static STRING *
+get_str(PARROT_INTERP, PMC *obj)
+{
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "P6num cannot unbox to a native string");
 }
 
 /* This Parrot-specific addition to the API is used to mark an object. */
-static void gc_mark(PARROT_INTERP, PMC *obj) {
+static void
+gc_mark(PARROT_INTERP, PMC *obj)
+{
     P6numInstance *instance = (P6numInstance *)PMC_data(obj);
     if (!PMC_IS_NULL(instance->common.stable))
         Parrot_gc_mark_PMC_alive(interp, instance->common.stable);
@@ -144,13 +345,17 @@ static void gc_mark(PARROT_INTERP, PMC *obj) {
 }
 
 /* This Parrot-specific addition to the API is used to free an object. */
-static void gc_free(PARROT_INTERP, PMC *obj) {
+static void
+gc_free(PARROT_INTERP, PMC *obj)
+{
     mem_sys_free(PMC_data(obj));
     PMC_data(obj) = NULL;
 }
 
 /* Gets the storage specification for this representation. */
-static storage_spec get_storage_spec(PARROT_INTERP, STable *st) {
+static storage_spec
+get_storage_spec(PARROT_INTERP, STable *st)
+{
     storage_spec spec;
     spec.inlineable = STORAGE_SPEC_INLINED;
     spec.bits = sizeof(FLOATVAL) * 8;
@@ -159,12 +364,16 @@ static storage_spec get_storage_spec(PARROT_INTERP, STable *st) {
 }
 
 /* Checks if an attribute has been initialized. */
-static INTVAL is_attribute_initialized(PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint) {
+static INTVAL
+is_attribute_initialized(PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint)
+{
     die_no_attrs(interp);
 }
 
 /* Initializes the P6num representation. */
-REPROps * P6num_initialize(PARROT_INTERP) {
+REPROps *
+P6num_initialize(PARROT_INTERP)
+{
     /* Allocate and populate the representation function table. */
     this_repr = mem_allocate_typed(REPROps);
     this_repr->type_object_for = type_object_for;

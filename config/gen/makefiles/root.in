@@ -372,6 +372,18 @@ EXTEND_HEADERS = \
 # parrot.h and all the includes it causes to be included
 PARROT_H_HEADERS = \
 	$(INC_DIR)/parrot.h \
+        $(INC_DIR)/6model/knowhow_bootstrapper.h \
+        $(INC_DIR)/6model/repr_registry.h \
+        $(INC_DIR)/6model/serialization_context.h \
+        $(INC_DIR)/6model/sixmodelobject.h \
+        $(INC_DIR)/6model/storage_spec.h \
+        $(INC_DIR)/6model/repr/HashAttrStore.h \
+        $(INC_DIR)/6model/repr/KnowHOWREPR.h \
+        $(INC_DIR)/6model/repr/P6int.h \
+        $(INC_DIR)/6model/repr/P6num.h \
+        $(INC_DIR)/6model/repr/P6opaque.h \
+        $(INC_DIR)/6model/repr/P6str.h \
+        $(INC_DIR)/6model/repr/Uninstantiable.h \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/settings.h \
 	$(INC_DIR)/enums.h \
@@ -532,6 +544,19 @@ INTERP_O_FILES = \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
 	@TEMP_atomic_o@ \
+
+METAMODEL_O_FILES = \
+        src/6model/sixmodelobject$(O) \
+        src/6model/repr_registry$(O) \
+        src/6model/knowhow_bootstrapper$(O) \
+        src/6model/reprs/KnowHOWREPR$(O) \
+        src/6model/reprs/P6opaque$(O) \
+        src/6model/reprs/P6int$(O) \
+        src/6model/reprs/P6str$(O) \
+        src/6model/reprs/P6num$(O) \
+        src/6model/reprs/HashAttrStore$(O) \
+        src/6model/reprs/Uninstantiable$(O) \
+        src/6model/serialization_context$(O)
 
 OPS_FILES = @ops@
 
@@ -1129,7 +1154,8 @@ O_FILES = \
 	$(IO_O_FILES) \
 	$(CLASS_O_FILES) \
 	$(ENCODING_O_FILES) \
-	$(IMCC_O_FILES)
+	$(IMCC_O_FILES) \
+	$(METAMODEL_O_FILES)
 
 lib_deps_object : $(O_FILES)
 	$(PERL) $(DEV_TOOLS_DIR)/lib_deps.pl object $(O_FILES)
@@ -1493,6 +1519,28 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 # Dependencies:
 #
 ###############################################################################
+
+src/6model/knowhow_bootstrapper$(O) : $(PARROT_H_HEADERS) src/6model/knowhow_bootstrapper.c
+
+src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) src/6model/repr_registry.c
+
+src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) src/6model/serialization_context.c
+
+src/6model/sixmodelobject$(O) : $(PARROT_H_HEADERS) src/6model/sixmodelobject.c
+
+src/6model/reprs/HashAttrStore$(O) : $(PARROT_H_HEADERS) src/6model/reprs/HashAttrStore.c
+
+src/6model/reprs/KnowHOWREPR$(O) : $(PARROT_H_HEADERS) src/6model/reprs/KnowHOWREPR.c
+
+src/6model/reprs/P6int$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6int.c
+
+src/6model/reprs/P6num$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6num.c
+
+src/6model/reprs/P6opaque$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6opaque.c
+
+src/6model/reprs/P6str$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6str.c
+
+src/6model/reprs/Uninstantiable$(O) : $(PARROT_H_HEADERS) src/6model/reprs/Uninstantiable.c
 
 src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 

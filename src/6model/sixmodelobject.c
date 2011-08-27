@@ -1,10 +1,30 @@
-#define PARROT_IN_EXTENSION
+
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
-#include "sixmodelobject.h"
-#include "repr_registry.h"
-#include "knowhow_bootstrapper.h"
-#include "serialization_context.h"
+#include "parrot/6model/sixmodelobject.h"
+#include "parrot/6model/repr_registry.h"
+#include "parrot/6model/knowhow_bootstrapper.h"
+#include "parrot/6model/serialization_context.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static PMC * default_find_method(PARROT_INTERP,
+    PMC *obj,
+    STRING *name,
+    INTVAL hint)
+        __attribute__nonnull__(1);
+
+static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_default_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_default_type_check  __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /* Cached type IDs. */
 static INTVAL stable_id = 0;
@@ -17,10 +37,12 @@ static STRING *type_check_str = NULL;
 static STRING *accepts_type_str = NULL;
 
 /* Initializes 6model and produces the KnowHOW core meta-object. */
-void SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute) {
+void
+SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute)
+{
     PMC    *initial_sc;
     STRING *initial_sc_name;
-    
+
     /* Look up and cache some type IDs and strings. */
     stable_id        = pmc_type(interp, Parrot_str_new(interp, "STable", 0));
     smo_id           = pmc_type(interp, Parrot_str_new(interp, "SixModelObject", 0));
@@ -34,19 +56,21 @@ void SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attri
     initial_sc_name = Parrot_str_new(interp, "__6MODEL_CORE__", 0);
     VTABLE_set_string_native(interp, initial_sc, initial_sc_name);
     SC_set_sc(interp, initial_sc_name, initial_sc);
-    
+
     /* Build representations and initializes the representation registry. */
     REPR_initialize_registry(interp);
 
     /* Bootstrap the KnowHOW. */
     *knowhow = SixModelObject_bootstrap_knowhow(interp, initial_sc);
-    
+
     /* Set up the simple KnowHOWAttribute. */
     *knowhow_attribute = SixModelObject_setup_knowhow_attribute(interp, initial_sc, *knowhow);
 }
 
 /* Takes an object and wraps it in a SixModelObject PMC. */
-PMC * wrap_object(PARROT_INTERP, void *obj) {
+PMC *
+wrap_object(PARROT_INTERP, void *obj)
+{
     PMC *obj_pmc = pmc_new_noinit(interp, smo_id);
     PObj_custom_mark_SET(obj_pmc);
     PObj_custom_destroy_SET(obj_pmc);
@@ -56,9 +80,11 @@ PMC * wrap_object(PARROT_INTERP, void *obj) {
 
 /* This is the default method dispatch code. It tries to use the
  * v-table first, then falls back to a lookup. */
-static PMC * default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint) {
+static PMC *
+default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
+{
     PMC *HOW, *meth, *result;
-    
+
     /* See if we can find it by hint. */
     STable *st = STABLE(obj);
     if (st->vtable && hint != NO_HINT && hint < st->vtable_length) {
@@ -77,7 +103,7 @@ static PMC * default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL h
     /* Otherwise delegate to the HOW. */
     HOW = st->HOW;
     meth = STABLE(HOW)->find_method(interp, HOW, find_method_str, NO_HINT);
-        
+
     /* Call it to get the method to call. */
     /* XXX Really want a way to do this without creating a nested runloop. */
     if (PMC_IS_NULL(meth)) {
@@ -91,9 +117,11 @@ static PMC * default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL h
 /* This is the default type checking implementation. Note: it may also
  * be the only one we end up with since the HOW is the authority here.
  * So we may end up not calling this through the S-Table in the end. */
-static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted) {
+static INTVAL
+default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted)
+{
     PMC *HOW, *meth, *result;
-    
+
     STable *st = STABLE(to_check);
     INTVAL type_check_mode = STABLE(wanted)->type_check_mode;
     if (st->type_check_cache) {
@@ -103,13 +131,13 @@ static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted) {
         for (i = 0; i < st->type_check_cache_length; i++)
             if (st->type_check_cache[i] == wanted)
                 return 1;
-                
+
         /* If the type check cache is definitive, we're done. */
         if ((type_check_mode & TYPE_CHECK_CACHE_THEN_METHOD) == 0 &&
                 (type_check_mode & TYPE_CHECK_NEEDS_ACCEPTS) == 0)
             return 0;
     }
-    
+
     /* If we get here, need to call .^type_check on the value we're
      * checking. */
     if (!st->type_check_cache || (type_check_mode & TYPE_CHECK_CACHE_THEN_METHOD))
@@ -127,7 +155,7 @@ static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted) {
         if (result)
             return result;
     }
-    
+
     /* If the flag to call .accepts_type on the target value is set, do so. */
     if (type_check_mode & TYPE_CHECK_NEEDS_ACCEPTS) {
         PMC    *HOW = STABLE(wanted)->HOW;
@@ -140,13 +168,15 @@ static INTVAL default_type_check (PARROT_INTERP, PMC *to_check, PMC *wanted) {
         Parrot_ext_call(interp, meth, "PiPP->P", HOW, wanted, to_check, &result_pmc);
         return VTABLE_get_bool(interp, result_pmc);
     }
-    
+
     /* If we get here, type check failed. */
     return 0;
 }
 
 /* Creates an STable that references the given REPR and HOW. */
-PMC * create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW) {
+PMC *
+create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW)
+{
     PMC *st_pmc = pmc_new_init(interp, stable_id, HOW);
     STABLE_STRUCT(st_pmc)->REPR = REPR;
     STABLE_STRUCT(st_pmc)->WHO = PMCNULL;
@@ -157,7 +187,9 @@ PMC * create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW) {
 
 /* Performs a decontainerizing operation onf the passed variable, using
  * the 6model container API. */
-PMC * decontainerize(PARROT_INTERP, PMC *var) {
+PMC *
+decontainerize(PARROT_INTERP, PMC *var)
+{
     if (var->vtable->base_type == smo_id) {
         ContainerSpec *spec = STABLE(var)->container_spec;
         if (spec && REPR(var)->defined(interp, var)) {

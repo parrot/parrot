@@ -22,9 +22,23 @@
  * out (since that depends on the representation).
  */
 
-#include "../6model/sixmodelobject.h"
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PMC * decontainerize(PARROT_INTERP, PMC *var) {
+static PMC * decontainerize(PARROT_INTERP, PMC *var)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_decontainerize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+#include "parrot/6model/sixmodelobject.h"
+
+static PMC *
+decontainerize(PARROT_INTERP, PMC *var)
+{
     ContainerSpec *spec = STABLE(var)->container_spec;
     if (spec && REPR(var)->defined(interp, var)) {
         if (!PMC_IS_NULL(spec->value_slot.class_handle)) {
@@ -47,7 +61,7 @@ PMC * decontainerize(PARROT_INTERP, PMC *var) {
     return var;
 }
 
-pmclass SixModelObject manual_attrs dynpmc group nqp {
+pmclass SixModelObject manual_attrs {
     /* ********************************************** *
      * These methods are mapped to 6model primitives. *
      * ********************************************** */
@@ -58,7 +72,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
     }
 
     VTABLE void destroy() {
-        /* Delegate to the representation. 
+        /* Delegate to the representation.
          * XXX There's a really nasty problem here. Since the GC provides no
          * promises about ordering, the s-table may get collected before the
          * last object pointing to it (a situation that arises when we have
@@ -85,11 +99,11 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         PMC *handle = decontainerize(interp, class_handle);
         REPR(SELF)->bind_attribute(interp, SELF, handle, name, NO_HINT, value);
     }
-    
+
     VTABLE STRING * name() {
         return VTABLE_get_string(interp, VTABLE_get_class(interp, SELF));
     }
-    
+
     VTABLE PMC * get_class() {
         PMC *decont    = decontainerize(interp, SELF);
         PMC *how       = STABLE(decont)->HOW;
@@ -110,12 +124,12 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             return SUPER();
     }
-    
+
     /* XXX Hack for Parrot issue which needs invokable on stuff. */
     VTABLE INTVAL does(STRING *what) {
         return Parrot_str_equal(interp, what, CONST_STRING(interp, "invokable"));
     }
-    
+
     VTABLE PMC *clone() {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "SixModelObject does not support the clone v-table; consider using the repr_clone op instead");
@@ -209,7 +223,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             return SUPER();
     }
-    
+
     VTABLE PMC * get_pmc_keyed(PMC *key) {
         if (key->vtable->base_type == enum_class_Key) {
             if (PObj_get_FLAGS(key) & KEY_integer_FLAG)
@@ -241,7 +255,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
                 return SUPER(key);
         }
     }
-    
+
     VTABLE PMC * get_pmc_keyed_int(INTVAL key) {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;
@@ -289,7 +303,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             return SUPER(key);
     }
-    
+
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         if (key->vtable->base_type == enum_class_Key) {
             if (PObj_get_FLAGS(key) & KEY_integer_FLAG)
@@ -320,7 +334,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
                 SUPER(key, value);
         }
     }
-    
+
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;
@@ -343,7 +357,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             SUPER(key, value);
     }
-    
+
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;
@@ -523,7 +537,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             SUPER(key);
     }
-    
+
     VTABLE void unshift_pmc(PMC *value) {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;
@@ -546,7 +560,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             SUPER(value);
     }
-    
+
     VTABLE void push_pmc(PMC *value) {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;
@@ -589,7 +603,7 @@ pmclass SixModelObject manual_attrs dynpmc group nqp {
         else
             return SUPER(next);
     }
-    
+
     VTABLE PMC * get_iter() {
         PMC *decont = decontainerize(interp, SELF);
         PMC **vt = STABLE(decont)->parrot_vtable_mapping;

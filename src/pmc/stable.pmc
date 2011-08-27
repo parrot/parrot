@@ -2,14 +2,20 @@
  * dumb semantically and the PMC is really just a "holder" and makes sure we
  * mark things as needed in GC. */
 
-#include "../6model/sixmodelobject.h"
+#include "parrot/6model/sixmodelobject.h"
 
-/* This is a source of type cache IDs (see notes below about them). 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+/* This is a source of type cache IDs (see notes below about them).
  * The lowest one is 4. This is to make the lower two bits available for
  * defined/undefined flags for the multi dispatch cache, which is the
  * main reason these IDs exist at all. */
 static INTVAL TypeCacheIDSource = 0;
-static INTVAL get_next_type_cache_id(void) {
+static INTVAL
+get_next_type_cache_id(void)
+{
     /* XXX The C# original is doing:
      *     return Interlocked.Add(ref TypeCacheIDSource, 4);
      * But we don't yet have an abstraction layer for an atomic addition
@@ -18,7 +24,7 @@ static INTVAL get_next_type_cache_id(void) {
     return TypeCacheIDSource;
 }
 
-pmclass STable manual_attrs dynpmc group nqp {
+pmclass STable manual_attrs {
     /* Initializes the STable's type cache ID; and sets the HOW to
      * the supplied object. Leaves the rest to be filled out. Also
      * flags PMC as needing custom mark and destroy. */
@@ -52,7 +58,7 @@ pmclass STable manual_attrs dynpmc group nqp {
         /* Give the REPR a chance to mark it's own data. */
         if (st->REPR->gc_mark_repr)
             st->REPR->gc_mark_repr(interp, st);
-            
+
         /* Mark the v-table cache. */
         for (i = 0; i < st->vtable_length; i++) {
             PMC *entry = st->vtable[i];
@@ -72,19 +78,19 @@ pmclass STable manual_attrs dynpmc group nqp {
         STable *st = (STable *)PMC_data(SELF);
         if (st->REPR->gc_free_repr)
             st->REPR->gc_free_repr(interp, st);
-    
+
         /* If a v-table was allocated, free that. */
         if (st->vtable) {
             mem_sys_free(st->vtable);
             st->vtable = NULL;
         }
-        
+
         /* If a Parrot v-table mapping was installed, free that. */
         if (st->parrot_vtable_mapping) {
             mem_sys_free(st->parrot_vtable_mapping);
             st->parrot_vtable_mapping = NULL;
         }
-        
+
         /* Free the underlying struct. */
         mem_sys_free(PMC_data(SELF));
         PMC_data(SELF) = NULL;
