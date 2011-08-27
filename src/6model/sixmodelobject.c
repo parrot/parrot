@@ -1,3 +1,6 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
 
 #include "parrot/parrot.h"
 #include "parrot/extend.h"

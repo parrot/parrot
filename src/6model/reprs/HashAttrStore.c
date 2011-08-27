@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* This REPR stores named attributes in a hash. It doesn't key by the
  * class at all - it's just a completely flat view. It also doesn't know
  * about allowing index-optimized access (at least, not yet). */
@@ -257,7 +261,8 @@ bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL 
 }
 
 static void
-bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, INTVAL value)
+bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, INTVAL value)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");

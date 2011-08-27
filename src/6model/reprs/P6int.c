@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* This is the implementation of the P6int representation, which holds a native
  * integer. */
 
@@ -244,22 +248,26 @@ get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTV
 
 /* Binds the given value to the specified attribute. */
 static void
-bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, PMC *value)
+bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, PMC *value)
 {
     die_no_attrs(interp);
 }
 static void
-bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, INTVAL value)
+bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, INTVAL value)
 {
     die_no_attrs(interp);
 }
 static void
-bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, FLOATVAL value)
+bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, FLOATVAL value)
 {
     die_no_attrs(interp);
 }
 static void
-bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value)
+bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, STRING *value)
 {
     die_no_attrs(interp);
 }

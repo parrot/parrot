@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* This is an implementation of a representation registry. It keeps track of
  * all of the available representations, and is responsible for building them
  * at startup. */

@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* Contains the logic that bootstraps KnowHOW, the foundation for implementing
  * the various other bits of the object model. Works in conjunction with
  * KnowHOWREPR. */

@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* This implements a little bit of support for serialization contexts.
  * At the moment, its main role is to just be a global lookup table for
  * serialization contexts; it'll need to get much smarter. */

@@ -1,3 +1,6 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
 
 /*
 
@@ -31,7 +34,8 @@ Returns the 6model core meta-attribute, KnowHOWAttribute.
 
 */
 inline op get_knowhow_attribute(out PMC) :base_core {
-    PMC * const KnowHOWAttribute = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOWATTRIBUTE);
+    PMC * const KnowHOWAttribute =
+        VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOWATTRIBUTE);
     if (KnowHOWAttribute)
         $1 = KnowHOWAttribute;
     else

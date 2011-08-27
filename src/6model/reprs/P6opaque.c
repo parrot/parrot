@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* A mostly complete implementation of P6opaque, which supports inlining native
  * types, box/unbox of native types where it's declared possible and doing just
  * a single memory allocation in addition to the PMC header per object. For
@@ -329,7 +333,8 @@ index_mapping_and_flat_list(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
     while (mro_idx)
     {
         /* Get current class in MRO. */
-        PMC    *current_class = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, mro, --mro_idx));
+        PMC    *current_class = decontainerize(interp,
+                VTABLE_get_pmc_keyed_int(interp, mro, --mro_idx));
         PMC    *HOW           = STABLE(current_class)->HOW;
 
         /* Get its local parents. */

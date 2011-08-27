@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011, Parrot Foundation.
+*/
+
 /* A SixModelObject PMC is what actually represents an object so far as
  * the actual end user is concerned. While STable and REPR exist as
  * PMCs, they are not designed to ever really leak into user space.
@@ -99,7 +103,7 @@ pmclass SixModelObject manual_attrs {
 
     VTABLE PMC *clone() {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "SixModelObject does not support the clone v-table; consider using the repr_clone op instead");
+            "SixModelObject does not support clone v-table; consider repr_clone op instead");
     }
 
     /* ********************************************************* *
