@@ -365,25 +365,34 @@ FLUID_FILES_2 = \
 #
 ###############################################################################
 
-EXTEND_HEADERS = \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h
-
-# parrot.h and all the includes it causes to be included
-PARROT_H_HEADERS = \
-	$(INC_DIR)/parrot.h \
-	$(INC_DIR)/6model/knowhow_bootstrapper.h \
+ESSENTIAL_SIX_MODEL_HEADERS = \
 	$(INC_DIR)/6model/repr_registry.h \
 	$(INC_DIR)/6model/serialization_context.h \
 	$(INC_DIR)/6model/sixmodelobject.h \
-	$(INC_DIR)/6model/storage_spec.h \
+	$(INC_DIR)/6model/storage_spec.h
+
+SIX_MODEL_REPR_HEADERS = \
 	$(INC_DIR)/6model/repr/HashAttrStore.h \
 	$(INC_DIR)/6model/repr/KnowHOWREPR.h \
 	$(INC_DIR)/6model/repr/P6int.h \
 	$(INC_DIR)/6model/repr/P6num.h \
 	$(INC_DIR)/6model/repr/P6opaque.h \
 	$(INC_DIR)/6model/repr/P6str.h \
-	$(INC_DIR)/6model/repr/Uninstantiable.h \
+	$(INC_DIR)/6model/repr/Uninstantiable.h
+
+SIX_MODEL_HEADERS = \
+	$(ESSENTIAL_SIX_MODEL_HEADERS) \
+	$(INC_DIR)/6model/knowhow_bootstrapper.h \
+	$(SIX_MODEL_REPR_HEADERS)
+
+EXTEND_HEADERS = \
+	$(INC_DIR)/extend_vtable.h \
+	$(INC_DIR)/extend.h \
+
+# parrot.h and all the includes it causes to be included
+PARROT_H_HEADERS = \
+	$(INC_DIR)/parrot.h \
+	$(ESSENTIAL_SIX_MODEL_HEADERS) \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/settings.h \
 	$(INC_DIR)/enums.h \
@@ -1520,27 +1529,29 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 #
 ###############################################################################
 
-src/6model/knowhow_bootstrapper$(O) : $(PARROT_H_HEADERS) src/6model/knowhow_bootstrapper.c
+src/6model/knowhow_bootstrapper$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/knowhow_bootstrapper.h include/parrot/6model/repr/KnowHOWREPR.h src/6model/knowhow_bootstrapper.c
 
-src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) src/6model/repr_registry.c
+src/6model/multi_dispatch$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/multi_dispatch.h include/pmc/pmc_sub.h src/6model/multi_dispatch.c
 
-src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) src/6model/serialization_context.c
+src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) $(SIX_MODEL_REPR_HEADERS) $(EXTEND_HEADERS) src/6model/repr_registry.c
 
-src/6model/sixmodelobject$(O) : $(PARROT_H_HEADERS) src/6model/sixmodelobject.c
+src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) src/6model/serialization_context.c
 
-src/6model/reprs/HashAttrStore$(O) : $(PARROT_H_HEADERS) src/6model/reprs/HashAttrStore.c
+src/6model/sixmodelobject$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/knowhow_bootstrapper.h src/6model/sixmodelobject.c
 
-src/6model/reprs/KnowHOWREPR$(O) : $(PARROT_H_HEADERS) src/6model/reprs/KnowHOWREPR.c
+src/6model/reprs/HashAttrStore$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/HashAttrStore.h src/6model/reprs/HashAttrStore.c
 
-src/6model/reprs/P6int$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6int.c
+src/6model/reprs/KnowHOWREPR$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/KnowHOWREPR.h src/6model/reprs/KnowHOWREPR.c
 
-src/6model/reprs/P6num$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6num.c
+src/6model/reprs/P6int$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6int.h src/6model/reprs/P6int.c
 
-src/6model/reprs/P6opaque$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6opaque.c
+src/6model/reprs/P6num$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6num.h src/6model/reprs/P6num.c
 
-src/6model/reprs/P6str$(O) : $(PARROT_H_HEADERS) src/6model/reprs/P6str.c
+src/6model/reprs/P6opaque$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6opaque.h src/6model/reprs/P6opaque.c
 
-src/6model/reprs/Uninstantiable$(O) : $(PARROT_H_HEADERS) src/6model/reprs/Uninstantiable.c
+src/6model/reprs/P6str$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6str.h src/6model/reprs/P6str.c
+
+src/6model/reprs/Uninstantiable$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/Uninstantiable.h src/6model/reprs/Uninstantiable.c
 
 src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 
@@ -1711,7 +1722,13 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_exception.h \
 	$(INC_PMC_DIR)/pmc_continuation.h
 
-src/threads$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/threads.c
+src/thread$(O) : \
+	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
+	src/thread.c \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+	$(INC_DIR)/runcore_api.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : \
@@ -1777,8 +1794,8 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(EXTEND_HEADERS) \
-	$(INC_PMC_DIR)/pmc_callback.h \
-	src/interp/inter_cb.str src/interp/inter_cb.c
+	src/interp/inter_cb.str \
+	src/interp/inter_cb.c
 
 src/interp/api$(O) : $(PARROT_H_HEADERS) \
 	src/interp/api.c \
