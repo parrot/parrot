@@ -47,3 +47,10 @@ SC_set_sc(PARROT_INTERP, STRING *handle, PMC *sc)
         setup_sc_stores(interp);
     VTABLE_set_pmc_keyed_str(interp, scs, handle, sc);
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

@@ -395,3 +395,10 @@ Uninstantiable_initialize(PARROT_INTERP)
     this_repr->is_attribute_initialized = is_attribute_initialized;
     return this_repr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

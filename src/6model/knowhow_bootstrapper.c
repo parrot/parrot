@@ -433,3 +433,10 @@ SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC *knowhow)
 
     return knowhow_attr;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
