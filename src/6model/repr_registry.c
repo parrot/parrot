@@ -47,9 +47,9 @@ register_repr(PARROT_INTERP, STRING *name, REPROps *repr)
     INTVAL ID = num_reprs;
     num_reprs++;
     if (repr_registry)
-        repr_registry = mem_sys_realloc(repr_registry, num_reprs * sizeof (REPROps *));
+        mem_realloc_n_typed(repr_registry, num_reprs, REPROps *);
     else
-        repr_registry = mem_sys_allocate(num_reprs * sizeof (REPROps *));
+        repr_registry = mem_allocate_n_typed(num_reprs, REPROps *);
     repr_registry[ID] = repr;
     VTABLE_set_integer_keyed_str(interp, repr_name_to_id_map, name, ID);
 }
