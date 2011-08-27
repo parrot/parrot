@@ -212,8 +212,8 @@ read before returning.
       struct  timeval timeouts;
       PMC            *results, *fd_map;
       INTVAL          maxid, i;
-      INTVAL          sec;
-      INTVAL          usec = modf(timeout, &sec) * 1000000;
+      INTVAL          sec = timeout / 1000000;
+      INTVAL          usec = timeout - sec;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
@@ -250,8 +250,8 @@ write to before returning.
       struct timeval timeouts;
       PMC           *results, *fd_map;
       INTVAL         maxid, i;
-      INTVAL         sec;
-      INTVAL         usec = modf(timeout, &sec) * 1000000;
+      INTVAL         sec = timeout / 1000000;
+      INTVAL         usec = timeout - sec;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
@@ -288,8 +288,8 @@ exception state before returning.
       struct timeval timeouts;
       PMC           *results, *fd_map;
       INTVAL         maxid, i;
-      INTVAL         sec;
-      INTVAL         usec = modf(timeout, &sec) * 1000000;
+      INTVAL         sec = timeout / 1000000;
+      INTVAL         usec = timeout - sec;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
@@ -328,8 +328,8 @@ handled.
       struct timeval  timeouts;
       PMC            *results, *rresults, *wresults, *eresults, *fd_map;
       INTVAL          maxid, i;
-      INTVAL          sec;
-      INTVAL          usec = modf(timeout, &sec) * 1000000;
+      INTVAL          sec = timeout / 1000000;
+      INTVAL          usec = timeout - sec;
 
       GET_ATTR_fd_map(INTERP, SELF, fd_map);
       GET_ATTR_max_fd(INTERP, SELF, maxid);
