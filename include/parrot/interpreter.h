@@ -196,6 +196,7 @@ struct parrot_interp_t {
     VTABLE **vtables;                         /* array of vtable ptrs */
     int      n_vtable_max;                    /* highest used type */
     int      n_vtable_alloced;                /* alloced vtable space */
+    INTVAL  *om_type_cache;                   /* Easy cache for accessing 6model types */
 
     struct _ParrotIOData   *piodata;          /* interpreter's IO system */
 
@@ -315,6 +316,8 @@ typedef enum {
     IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */
     IGLOBALS_EXECUTABLE,        /* How Parrot was invoked (from argv[0]) */
     IGLOBALS_LOADED_PBCS,       /* Hash of .pbc file -> PackfileView */
+    IGLOBALS_KNOWHOW,
+    IGLOBALS_KNOWHOWATTRIBUTE,
 
     IGLOBALS_SIZE
 } iglobals_enum;
