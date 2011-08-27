@@ -1,0 +1,98 @@
+/* A serialization context is a container for a set of objects
+ * that exist per compilation unit and cross the compile-time /
+ * runtime boundary.*/
+pmclass SerializationContext auto_attrs dynpmc group nqp {
+    /* The handle of this SC. */
+    ATTR STRING *handle;
+    
+    /* The root set of objects that live in this SC. */
+    ATTR PMC *root_objects;
+    
+    /* Description (probably the file name) if any. */
+    ATTR STRING *description;
+    
+    VTABLE void init() {
+        PMC *root_objects = pmc_new(interp, enum_class_ResizablePMCArray);
+        SETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        PObj_custom_mark_SET(SELF);
+    }
+    
+    VTABLE void set_string_native(STRING *handle) {
+        SETATTR_SerializationContext_handle(interp, SELF, handle);
+    }
+
+    VTABLE void mark() {
+        PMC    *root_objects;
+        STRING *handle, *description;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        Parrot_gc_mark_PMC_alive(INTERP, root_objects);
+        GETATTR_SerializationContext_handle(interp, SELF, handle);
+        Parrot_gc_mark_STRING_alive(INTERP, handle);
+        GETATTR_SerializationContext_description(interp, SELF, description);
+        Parrot_gc_mark_STRING_alive(INTERP, description);
+    }
+    
+    VTABLE PMC* get_pmc_keyed_int(INTVAL idx) {
+        PMC    *root_objects;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        return VTABLE_get_pmc_keyed_int(interp, root_objects, idx);
+    }
+    
+    VTABLE PMC* get_pmc_keyed(PMC *idx) {
+        PMC    *root_objects;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        return VTABLE_get_pmc_keyed(interp, root_objects, idx);
+    }
+    
+    VTABLE void set_pmc_keyed_int(INTVAL idx, PMC *value) {
+        PMC    *root_objects;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        VTABLE_set_pmc_keyed_int(interp, root_objects, idx, value);
+    }
+    
+    VTABLE void set_pmc_keyed(PMC *idx, PMC *value) {
+        PMC    *root_objects;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        VTABLE_set_pmc_keyed(interp, root_objects, idx, value);
+    }
+    
+    METHOD INTVAL elems() {
+        PMC    *root_objects;
+        INTVAL elems;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        elems = VTABLE_elements(interp, root_objects);
+        RETURN (INTVAL elems);
+    }
+    
+    METHOD STRING* handle() {
+        STRING *handle;
+        GETATTR_SerializationContext_handle(interp, SELF, handle);
+        RETURN (STRING* handle);
+    }
+    
+    METHOD set_description(STRING *description) {
+        SETATTR_SerializationContext_description(interp, SELF, description);
+        RETURN (STRING* description);
+    }
+    
+    METHOD STRING* description() {
+        STRING *description;
+        GETATTR_SerializationContext_description(interp, SELF, description);
+        RETURN (STRING* description);
+    }
+    
+    METHOD INTVAL slot_index_for(PMC *obj) {
+        /* This is kinda stupid, but it'll do for now. */
+        PMC    *root_objects;
+        INTVAL  i, count;
+        GETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
+        count = VTABLE_elements(interp, root_objects);
+        for (i = 0; i < count; i++) {
+            if (VTABLE_get_pmc_keyed_int(interp, root_objects, i) == obj) {
+                RETURN (INTVAL i);
+            }
+        }
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Object does not exist in serialization context");
+    }
+}
