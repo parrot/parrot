@@ -1048,10 +1048,10 @@ static void
 gc_free(PARROT_INTERP, PMC *obj)
 {
     P6opaqueREPRData *repr_data = (P6opaqueREPRData *)STABLE(obj)->REPR_data;
-	if (repr_data->allocation_size)
-		Parrot_gc_free_fixed_size_storage(interp, repr_data->allocation_size, PMC_data(obj));
-	else
-		mem_sys_free(PMC_data(obj));
+    if (repr_data->allocation_size)
+        Parrot_gc_free_fixed_size_storage(interp, repr_data->allocation_size, PMC_data(obj));
+    else
+        mem_sys_free(PMC_data(obj));
     PMC_data(obj) = NULL;
 }
 

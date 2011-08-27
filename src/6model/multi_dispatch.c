@@ -316,7 +316,8 @@ PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
                 INTVAL defined = param->vtable->base_type == smo_id ?
                         REPR(param)->defined(interp, param) :
                         VTABLE_defined(interp, param);
-                if ((!defined && definedness == DEFINED_ONLY) || (defined && definedness == UNDEFINED_ONLY)) {
+                if ((!defined && definedness == DEFINED_ONLY)
+                        || (defined && definedness == UNDEFINED_ONLY)) {
                     type_mismatch = 1;
                     break;
                 }
