@@ -24,42 +24,9 @@
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static PMC * decontainerize(PARROT_INTERP, PMC *var)
-        __attribute__nonnull__(1);
-
-#define ASSERT_ARGS_decontainerize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 #include "parrot/6model/sixmodelobject.h"
-
-static PMC *
-decontainerize(PARROT_INTERP, PMC *var)
-{
-    ContainerSpec *spec = STABLE(var)->container_spec;
-    if (spec && REPR(var)->defined(interp, var)) {
-        if (!PMC_IS_NULL(spec->value_slot.class_handle)) {
-            /* Just get slot. */
-            return VTABLE_get_attr_keyed(interp, var, spec->value_slot.class_handle,
-                spec->value_slot.attr_name);
-        }
-        else {
-            /* Invoke FETCH method. */
-            PMC *old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-            PMC *meth    = spec->fetch_method;
-            PMC *cappy   = Parrot_pmc_new(interp, enum_class_CallContext);
-            VTABLE_push_pmc(interp, cappy, var);
-            Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
-            cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-            Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
-            return VTABLE_get_pmc_keyed_int(interp, cappy, 0);
-        }
-    }
-    return var;
-}
 
 pmclass SixModelObject manual_attrs {
     /* ********************************************** *

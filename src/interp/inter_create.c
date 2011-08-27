@@ -32,11 +32,16 @@ static Interp* emergency_interp;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void int_initialize_6model(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 static int is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_int_initialize_6model __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_is_env_var_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(var))
@@ -352,7 +357,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 static void
 int_initialize_6model(PARROT_INTERP)
 {
-    PMC * KnowHOW, KnowHOWAttribute;
+    PMC *KnowHOW, *KnowHOWAttribute;
     SixModelObject_initialize(interp, &KnowHOW, &KnowHOWAttribute);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW, KnowHOW);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOWATTRIBUTE,
