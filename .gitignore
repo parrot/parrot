@@ -295,6 +295,10 @@ winxed-c.html
 /src/*.o
 /src/*.obj
 /src/*.str
+/src/6model/*.o
+/src/6model/*.obj
+/src/6model/reprs/*.o
+/src/6model/reprs/*.obj
 /src/asmfun.*
 /src/core_pmcs.c
 /src/embed/*.o
