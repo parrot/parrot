@@ -623,14 +623,6 @@ CODE
 Done!
 OUTPUT
 
-# These will most likely be removed soon, but here for completeness
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_share(_ro)");
-    Parrot_PMC_share(interp, pmc);
-    Parrot_PMC_share_ro(interp, pmc);
-CODE
-Done!
-OUTPUT
-
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
     hashkey   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "HashIteratorKey"));

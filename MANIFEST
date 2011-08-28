@@ -879,11 +879,6 @@ include/imcc/api.h                                          [main]include
 include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
 include/parrot/api.h                                        [main]include
-include/parrot/atomic.h                                     [main]include
-include/parrot/atomic/fallback.h                            [main]include
-include/parrot/atomic/gcc_pcc.h                             [main]include
-include/parrot/atomic/gcc_x86.h                             [main]include
-include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
@@ -1175,8 +1170,6 @@ runtime/parrot/library/postgres.pir                         [library]
 runtime/parrot/library/random_lib.pir                       [library]
 runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
-src/atomic/gcc_x86.c                                        []
-src/atomic/sparc_v9.s                                       []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1960,7 +1953,6 @@ t/run/README                                                []doc
 t/run/exit.t                                                [test]
 t/run/options.t                                             [test]
 t/src/README                                                []doc
-t/src/atomic.t                                              [test]
 t/src/basic.t                                               [test]
 t/src/checkdepend.t                                         [test]
 t/src/embed.t                                               [test]
