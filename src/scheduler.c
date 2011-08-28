@@ -727,7 +727,6 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         PMC *message = Parrot_pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
-        message = VTABLE_share_ro(interp, message);
 
 #if CX_DEBUG
     fprintf(stderr, "sending message[interp=%p]\n", interp);

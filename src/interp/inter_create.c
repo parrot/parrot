@@ -388,7 +388,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
-        pt_join_threads(interp);
 
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
