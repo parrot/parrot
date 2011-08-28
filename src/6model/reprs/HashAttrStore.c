@@ -268,13 +268,15 @@ bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
             "HashAttrStore representation does not support native attribute storage");
 }
 static void
-bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, FLOATVAL value)
+bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, FLOATVAL value)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
 static void
-bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value)
+bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, STRING *value)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
@@ -294,7 +296,8 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
     HashAttrStoreInstance *obj;
 
     /* Allocate and set up object instance. */
-    obj = (HashAttrStoreInstance *) Parrot_gc_allocate_fixed_size_storage(interp, sizeof (HashAttrStoreInstance));
+    obj = (HashAttrStoreInstance *) Parrot_gc_allocate_fixed_size_storage(interp,
+            sizeof (HashAttrStoreInstance));
     obj->common.stable = STABLE_PMC(to_clone);
     obj->store = VTABLE_clone(interp, ((HashAttrStoreInstance *)PMC_data(to_clone))->store);
 

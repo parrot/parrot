@@ -267,7 +267,8 @@ bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
     die_no_attrs(interp);
 }
 static void
-bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value)
+bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, STRING *value)
 {
     die_no_attrs(interp);
 }
@@ -285,10 +286,12 @@ static PMC *
 repr_clone(PARROT_INTERP, PMC *to_clone)
 {
     KnowHOWREPRInstance *obj = mem_allocate_zeroed_typed(KnowHOWREPRInstance);
-    obj->common.stable       = STABLE_PMC(to_clone);
-    obj->methods             = VTABLE_clone(interp, ((KnowHOWREPRInstance *)PMC_data(to_clone))->methods);
-    obj->attributes          = VTABLE_clone(interp, ((KnowHOWREPRInstance *)PMC_data(to_clone))->attributes);
-    obj->name                = ((KnowHOWREPRInstance *)PMC_data(to_clone))->name;
+    obj->common.stable  = STABLE_PMC(to_clone);
+    obj->methods        =
+        VTABLE_clone(interp, ((KnowHOWREPRInstance *)PMC_data(to_clone))->methods);
+    obj->attributes     =
+        VTABLE_clone(interp, ((KnowHOWREPRInstance *)PMC_data(to_clone))->attributes);
+    obj->name           = ((KnowHOWREPRInstance *)PMC_data(to_clone))->name;
     return wrap_object(interp, obj);
 }
 

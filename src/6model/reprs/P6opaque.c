@@ -376,7 +376,8 @@ index_mapping_and_flat_list(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
 
     /* We can now form the name map. */
     num_classes = VTABLE_elements(interp, class_list);
-    result = (P6opaqueNameMap *) mem_sys_allocate_zeroed(sizeof (P6opaqueNameMap) * (1 + num_classes));
+    result = (P6opaqueNameMap *) mem_sys_allocate_zeroed(sizeof
+            (P6opaqueNameMap) * (1 + num_classes));
     for (i = 0; i < num_classes; i++) {
         result[i].class_key = VTABLE_get_pmc_keyed_int(interp, class_list, i);
         result[i].name_map  = VTABLE_get_pmc_keyed_int(interp, attr_map_list, i);
@@ -458,19 +459,22 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
                         switch (unboxed_type) {
                         case STORAGE_SPEC_BP_INT:
                             if (repr_data->unbox_int_offset)
-                                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                                Parrot_ex_throw_from_c_args(interp,
+                                    NULL, EXCEPTION_INVALID_OPERATION,
                                         "Duplicate box_target for native int");
                             repr_data->unbox_int_offset = cur_size;
                             break;
                         case STORAGE_SPEC_BP_NUM:
                             if (repr_data->unbox_num_offset)
-                                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                                Parrot_ex_throw_from_c_args(interp,
+                                    NULL, EXCEPTION_INVALID_OPERATION,
                                         "Duplicate box_target for native num");
                             repr_data->unbox_num_offset = cur_size;
                             break;
                         case STORAGE_SPEC_BP_STR:
                             if (repr_data->unbox_str_offset)
-                                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                                Parrot_ex_throw_from_c_args(interp,
+                                    NULL, EXCEPTION_INVALID_OPERATION,
                                         "Duplicate box_target for native str");
                             repr_data->unbox_str_offset = cur_size;
                             break;
@@ -486,19 +490,22 @@ compute_allocation_strategy(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_dat
             repr_data->attribute_offsets[i] = cur_size;
             if (unboxed_type == STORAGE_SPEC_BP_NONE) {
                 if (!repr_data->gc_pmc_mark_offsets)
-                    repr_data->gc_pmc_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
+                    repr_data->gc_pmc_mark_offsets =
+                        (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
                 repr_data->gc_pmc_mark_offsets[cur_pmc_attr] = cur_size;
                 cur_pmc_attr++;
                 if (!PMC_IS_NULL(av_cont)) {
                     /* Stash away auto-viv container info. */
                     if (!repr_data->auto_viv_values)
-                        repr_data->auto_viv_values = (PMC **) mem_sys_allocate_zeroed(info_alloc * sizeof (PMC *));
+                        repr_data->auto_viv_values =
+                            (PMC **) mem_sys_allocate_zeroed(info_alloc * sizeof (PMC *));
                     repr_data->auto_viv_values[i] = av_cont;
                 }
             }
             if (unboxed_type == STORAGE_SPEC_BP_STR) {
                 if (!repr_data->gc_str_mark_offsets)
-                    repr_data->gc_str_mark_offsets = (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
+                    repr_data->gc_str_mark_offsets =
+                        (INTVAL *) mem_sys_allocate_zeroed(info_alloc * sizeof (INTVAL));
                 repr_data->gc_str_mark_offsets[cur_str_attr] = cur_size;
                 cur_str_attr++;
             }
@@ -637,7 +644,8 @@ instance_of(PARROT_INTERP, PMC *WHAT)
     }
 
     /* Allocate and set up object instance. */
-    obj = (P6opaqueInstance *) Parrot_gc_allocate_fixed_size_storage(interp, repr_data->allocation_size);
+    obj = (P6opaqueInstance *) Parrot_gc_allocate_fixed_size_storage(interp,
+        repr_data->allocation_size);
     memset(obj, 0, repr_data->allocation_size);
     obj->common.stable = STABLE_PMC(WHAT);
 
@@ -792,7 +800,8 @@ bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL 
     no_such_attribute(interp, "bind", class_handle, name);
 }
 static void
-bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, INTVAL value)
+bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, INTVAL value)
 {
     P6opaqueInstance *instance  = (P6opaqueInstance *)PMC_data(obj);
     P6opaqueREPRData *repr_data = (P6opaqueREPRData *)STABLE(obj)->REPR_data;
@@ -814,7 +823,8 @@ bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INT
     no_such_attribute(interp, "bind", class_handle, name);
 }
 static void
-bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, FLOATVAL value)
+bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, FLOATVAL value)
 {
     P6opaqueInstance *instance  = (P6opaqueInstance *)PMC_data(obj);
     P6opaqueREPRData *repr_data = (P6opaqueREPRData *)STABLE(obj)->REPR_data;
@@ -836,7 +846,8 @@ bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INT
     no_such_attribute(interp, "bind", class_handle, name);
 }
 static void
-bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, STRING *value)
+bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
+        STRING *name, INTVAL hint, STRING *value)
 {
     P6opaqueInstance *instance  = (P6opaqueInstance *)PMC_data(obj);
     P6opaqueREPRData *repr_data = (P6opaqueREPRData *)STABLE(obj)->REPR_data;
@@ -873,7 +884,8 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
     P6opaqueREPRData *repr_data = (P6opaqueREPRData *)STABLE(to_clone)->REPR_data;
 
     if (defined(interp, to_clone)) {
-        obj = (P6opaqueInstance *)Parrot_gc_allocate_fixed_size_storage(interp, repr_data->allocation_size);
+        obj = (P6opaqueInstance *)Parrot_gc_allocate_fixed_size_storage(interp,
+                repr_data->allocation_size);
         memcpy(obj, PMC_data(to_clone), repr_data->allocation_size);
         if (!PMC_IS_NULL(obj->spill))
             obj->spill = VTABLE_clone(interp, obj->spill);
@@ -1168,7 +1180,7 @@ change_type(PARROT_INTERP, PMC *obj, PMC *new_type)
     }
     if (!mro_is_suffix)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "P6opaque only supports type changes where the MRO of the original type is a suffix of the MRO of the new type");
+   "P6opaque only supports type changes where MRO of original type is a suffix of MRO of new type");
 
     /* If the new REPR never calculated it's object layout, do so now. */
     if (!new_repr_data->allocation_size) {
@@ -1181,7 +1193,9 @@ change_type(PARROT_INTERP, PMC *obj, PMC *new_type)
      * really re-alloc, we need to go deal with the fixed size pool
      * allocator. */
     if (new_repr_data->allocation_size > cur_repr_data->allocation_size) {
-        P6opaqueInstance *new_body = (P6opaqueInstance *) Parrot_gc_allocate_fixed_size_storage(interp, new_repr_data->allocation_size);
+        P6opaqueInstance *new_body =
+            (P6opaqueInstance *) Parrot_gc_allocate_fixed_size_storage(interp,
+                    new_repr_data->allocation_size);
         memset(new_body, 0, new_repr_data->allocation_size);
         memcpy(new_body, instance, cur_repr_data->allocation_size);
         PMC_data(obj) = new_body;
