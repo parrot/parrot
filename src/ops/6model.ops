@@ -72,7 +72,7 @@ Gets the WHAT for a 6model Object, returns PMCNULL otherwise.
 
 inline op what_or_null(out PMC, in PMC) :base_core {
     PMC * const var = decontainerize(interp, $2);
-    if (var->vtable->base_type == smo_id)
+    if (var->vtable->base_type == enum_class_SixModelObject)
         $1 = STABLE(var)->WHAT;
     else
         $1 = PMCNULL;
@@ -86,7 +86,7 @@ Gets the WHO for a 6model Object.
 =cut
 
 inline op get_who(out PMC, in PMC) :base_core {
-    PMC *var = decontainerize(interp, $2);
+    PMC * const var = decontainerize(interp, $2);
     if (var->vtable->base_type == enum_class_SixModelObject)
         $1 = STABLE(var)->WHO;
     else
@@ -127,7 +127,7 @@ representation.
 
 
 inline op repr_type_object_for(out PMC, in PMC, in STR) :base_core {
-    REPROps const *REPR = REPR_get_by_name(interp, $3);
+    REPROps * REPR = REPR_get_by_name(interp, $3);
     $1 = REPR->type_object_for(interp, decontainerize(interp, $2));
 }
 

@@ -397,7 +397,7 @@ gc_free(PARROT_INTERP, PMC *obj)
 static storage_spec
 get_storage_spec(PARROT_INTERP, STable *st)
 {
-    ASSERT_ARGS(get_storage_spec)
+/*    ASSERT_ARGS(get_storage_spec) */
     storage_spec spec;
     spec.inlineable = STORAGE_SPEC_REFERENCE;
     spec.boxed_primitive = STORAGE_SPEC_BP_NONE;
@@ -408,7 +408,7 @@ get_storage_spec(PARROT_INTERP, STable *st)
 static INTVAL
 is_attribute_initialized(PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint)
 {
-    ASSERT_ARGS(is_attribute_initialized)
+/*    ASSERT_ARGS(is_attribute_initialized) */
     die_no_attrs(interp);
 }
 
