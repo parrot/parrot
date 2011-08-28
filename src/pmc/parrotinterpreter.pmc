@@ -66,7 +66,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     Parrot_block_GC_mark(d);
 
     d->scheduler = Parrot_pmc_new(d, enum_class_Scheduler);
-    d->scheduler = VTABLE_share_ro(d, d->scheduler);
 
     /* can't copy directly, unless you want double-frees */
     if (flags & PARROT_CLONE_RUNOPS)
@@ -149,12 +148,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         }
     }
 
-    if (flags & PARROT_CLONE_CODE)
-        pt_clone_code(d, s);
-
-    if (flags & PARROT_CLONE_GLOBALS)
-        pt_clone_globals(d, s);
-
     Parrot_unblock_GC_mark(d);
 }
 
@@ -211,10 +204,6 @@ new.
 =cut
 
 */
-
-    METHOD yield() {
-        pt_thread_yield();
-    }
 
     METHOD recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag) {
         const INTVAL ret = INTERP->recursion_limit;
@@ -356,9 +345,6 @@ Runs the interpreter's byte code.
 
     VTABLE opcode_t *invoke(void *next) {
         Interp * const new_interp = PMC_interp(SELF);
-
-        /* setup code */
-        pt_thread_prepare_for_run(new_interp, INTERP);
 
         /* TODO pass arguments from parent (interp) to child (new_interp) by
          * possibly clone of share the arguments r/o args can be passed as is */

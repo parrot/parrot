@@ -74,17 +74,8 @@ void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_init_scheduler)
-    if (!interp->parent_interpreter) {
-        PMC *scheduler;
-
-        /* Add the very first interpreter to the list of interps. */
-        pt_add_to_interpreters(interp, NULL);
-
-        scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
-        scheduler = VTABLE_share_ro(interp, scheduler);
-
-        interp->scheduler = scheduler;
-    }
+    if (!interp->parent_interpreter)
+        interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
 }
 
 /*
@@ -1089,7 +1080,6 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #if CX_DEBUG
     fprintf(stderr, "found a suspend, suspending [interp=%p]\n", interp);
 #endif
-            pt_suspend_self_for_gc(interp);
         }
     }
 

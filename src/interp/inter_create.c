@@ -457,9 +457,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
-    /* copies of constant tables */
-    Parrot_destroy_constants(interp);
-
     destroy_runloop_jump_points(interp);
 
     /* XXX Fix abstraction leak. packfile */

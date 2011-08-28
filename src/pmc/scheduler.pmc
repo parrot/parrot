@@ -119,7 +119,6 @@ current maximum, and a birthtime of the current time.
         STRING                  *task_id_str;
         INTVAL                   new_tid;
 
-        task = VTABLE_share_ro(INTERP, task);
         VTABLE_set_number_native(INTERP, task, Parrot_floatval_time());
 
         new_tid     = ++(core_struct->max_tid);
@@ -203,36 +202,6 @@ Removes the task with the given task ID from the task list.
 
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
         SCHEDULER_cache_valid_CLEAR(SELF);
-    }
-
-
-/*
-
-=item C<PMC *share_ro()>
-
-Sets this PMC as shared.
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        PMC              *shared_self;
-        Parrot_Scheduler_attributes *sched;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        shared_self       = pt_shared_fixup(INTERP, SELF);
-        sched             = PARROT_SCHEDULER(shared_self);
-
-        sched->task_list  = pt_shared_fixup(INTERP, sched->task_list);
-        sched->task_index = pt_shared_fixup(INTERP, sched->task_index);
-        sched->wait_index = pt_shared_fixup(INTERP, sched->wait_index);
-        sched->handlers   = pt_shared_fixup(INTERP, sched->handlers);
-        sched->messages   = pt_shared_fixup(INTERP, sched->messages);
-
-        return shared_self;
     }
 
 
