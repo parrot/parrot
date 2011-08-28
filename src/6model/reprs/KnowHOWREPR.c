@@ -200,8 +200,8 @@ instance_of(PARROT_INTERP, PMC *WHAT)
 {
     KnowHOWREPRInstance *obj = mem_allocate_zeroed_typed(KnowHOWREPRInstance);
     obj->common.stable       = STABLE_PMC(WHAT);
-    obj->methods             = pmc_new(interp, enum_class_Hash);
-    obj->attributes          = pmc_new(interp, enum_class_ResizablePMCArray);
+    obj->methods             = Parrot_pmc_new(interp, enum_class_Hash);
+    obj->attributes          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     return wrap_object(interp, obj);
 }
 

@@ -203,7 +203,7 @@ instance_of(PARROT_INTERP, PMC *WHAT)
                 interp,
                 sizeof (HashAttrStoreInstance));
     obj->common.stable = STABLE_PMC(WHAT);
-    obj->store = pmc_new(interp, enum_class_Hash);
+    obj->store = Parrot_pmc_new(interp, enum_class_Hash);
 
     return wrap_object(interp, obj);
 }

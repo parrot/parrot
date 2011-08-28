@@ -47,7 +47,7 @@ SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute)
     accepts_type_str = Parrot_str_new_constant(interp, "accepts_type");
 
     /* Create initial core serialization context. */
-    initial_sc = pmc_new(interp, enum_class_SerializationContext);
+    initial_sc = Parrot_pmc_new(interp, enum_class_SerializationContext);
     initial_sc_name = Parrot_str_new(interp, "__6MODEL_CORE__", 0);
     VTABLE_set_string_native(interp, initial_sc, initial_sc_name);
     SC_set_sc(interp, initial_sc_name, initial_sc);
@@ -66,7 +66,7 @@ SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute)
 PMC *
 wrap_object(PARROT_INTERP, void *obj)
 {
-    PMC *obj_pmc = pmc_new_noinit(interp, enum_class_SixModelObject);
+    PMC *obj_pmc = Parrot_pmc_new_noinit(interp, enum_class_SixModelObject);
     PObj_custom_mark_SET(obj_pmc);
     PObj_custom_destroy_SET(obj_pmc);
     PMC_data(obj_pmc) = obj;
@@ -172,7 +172,7 @@ default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
 PMC *
 create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW)
 {
-    PMC *st_pmc = pmc_new_init(interp, enum_class_STable, HOW);
+    PMC *st_pmc = Parrot_pmc_new_init(interp, enum_class_STable, HOW);
     STABLE_STRUCT(st_pmc)->REPR = REPR;
     STABLE_STRUCT(st_pmc)->WHO = PMCNULL;
     STABLE_STRUCT(st_pmc)->find_method = default_find_method;

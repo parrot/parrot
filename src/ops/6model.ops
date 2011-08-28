@@ -2,17 +2,17 @@
 Copyright (C) 2011, Parrot Foundation.
 */
 
-/*
-
 =over
 
 =item get_knowhow()
 
 Returns the 6model core meta-object, KnowHOW.
 
-=cut
+=item get_knowhow_attribute()
 
-*/
+Returns the 6model core meta-attribute, KnowHOWAttribute.
+
+=cut
 
 inline op get_knowhow(out PMC) :base_core {
     PMC * const KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
@@ -23,16 +23,6 @@ inline op get_knowhow(out PMC) :base_core {
                 "6model not yet initialized; cannot use get_knowhow");
 }
 
-
-/*
-
-=item get_knowhow_attribute()
-
-Returns the 6model core meta-attribute, KnowHOWAttribute.
-
-=cut
-
-*/
 inline op get_knowhow_attribute(out PMC) :base_core {
     PMC * const KnowHOWAttribute =
         VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOWATTRIBUTE);
@@ -43,16 +33,11 @@ inline op get_knowhow_attribute(out PMC) :base_core {
             "6model not yet initialized; cannot use get_knowhow_attribute");
 }
 
-
-/*
-
 =item get_how(obj)
 
 Gets the HOW for a 6model Object.
 
 =cut
-
-*/
 
 inline op get_how(out PMC, in PMC) :base_core {
     PMC * const var = decontainerize(interp, $2);
@@ -63,15 +48,11 @@ inline op get_how(out PMC, in PMC) :base_core {
             "Can only use get_how on a SixModelObject");
 }
 
-/*
-
 =item get_what(obj)
 
 Gets the WHAT for a 6model Object.
 
 =cut
-
-*/
 
 inline op get_what(out PMC, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -82,7 +63,7 @@ inline op get_what(out PMC, in PMC) :base_core {
             "Can only use get_what on a SixModelObject");
 }
 
-/*
+
 
 =item get_who(obj)
 
@@ -90,7 +71,7 @@ Gets the WHO for a 6model Object.
 
 =cut
 
-*/
+
 
 inline op get_who(out PMC, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -101,7 +82,7 @@ inline op get_who(out PMC, in PMC) :base_core {
             "Can only use get_who on a SixModelObject");
 }
 
-/*
+
 
 =item set_who(obj)
 
@@ -109,7 +90,7 @@ Sets the WHO for a 6model Object.
 
 =cut
 
-*/
+
 
 inline op set_who(in PMC, in PMC) :base_core {
     PMC *var = decontainerize(interp, $1);
@@ -122,7 +103,7 @@ inline op set_who(in PMC, in PMC) :base_core {
             "Can only use set_who on a SixModelObject");
 }
 
-/*
+
 
 =item repr_type_object_for(how, repr_name)
 
@@ -131,22 +112,22 @@ representation.
 
 =cut
 
-*/
+
 
 inline op repr_type_object_for(out PMC, in PMC, in STR) :base_core {
     REPROps *REPR = REPR_get_by_name(interp, $3);
     $1 = REPR->type_object_for(interp, decontainerize(interp, $2));
 }
 
-/*
+
 
 =item repr_instance_of()
 
-Instantiates a new object based on the given WHAT./*
+Instantiates a new object based on the given WHAT.
 
 =cut
 
-*/
+
 
 inline op repr_instance_of(out PMC, in PMC) :base_core {
     if ($2->vtable->base_type == enum_class_SixModelObject)
@@ -156,7 +137,7 @@ inline op repr_instance_of(out PMC, in PMC) :base_core {
             "Can only use repr_instance_of on a SixModelObject");
 }
 
-/*
+
 
 =item repr_clone()
 
@@ -164,7 +145,7 @@ Gets a REPR to clone itself.
 
 =cut
 
-*/
+
 
 inline op repr_clone(out PMC, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -176,7 +157,7 @@ inline op repr_clone(out PMC, in PMC) :base_core {
 }
 
 
-/*
+
 
 =item repr_defined()
 
@@ -184,7 +165,7 @@ Checks the REPRs idea of definedness.
 
 =cut
 
-*/
+
 
 inline op repr_defined(out INT, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -195,7 +176,7 @@ inline op repr_defined(out INT, in PMC) :base_core {
             "Can only use repr_defined on a SixModelObject");
 }
 
-/*
+
 
 =item repr_get_attr_int()
 
@@ -204,7 +185,7 @@ a native int - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_get_attr_int(out INT, in PMC, in PMC, in STR) :base_core {
     PMC *ch = decontainerize(interp, $3);
@@ -215,7 +196,7 @@ inline op repr_get_attr_int(out INT, in PMC, in PMC, in STR) :base_core {
             "Can only use repr_get_attr_int on a SixModelObject");
 }
 
-/*
+
 
 =item repr_get_attr_num()
 
@@ -224,7 +205,7 @@ a native num - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_get_attr_num(out NUM, in PMC, in PMC, in STR) :base_core {
     PMC *ch = decontainerize(interp, $3);
@@ -235,7 +216,7 @@ inline op repr_get_attr_num(out NUM, in PMC, in PMC, in STR) :base_core {
             "Can only use repr_get_attr_num on a SixModelObject");
 }
 
-/*
+
 
 =item repr_get_attr_str()
 
@@ -244,7 +225,7 @@ a native str - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_get_attr_str(out STR, in PMC, in PMC, in STR) :base_core {
     PMC *ch = decontainerize(interp, $3);
@@ -255,7 +236,7 @@ inline op repr_get_attr_str(out STR, in PMC, in PMC, in STR) :base_core {
             "Can only use repr_get_attr_str on a SixModelObject");
 }
 
-/*
+
 
 =item repr_bind_attr_int()
 
@@ -264,7 +245,7 @@ a native int - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_bind_attr_int(in PMC, in PMC, in STR, in INT) :base_core {
     PMC *ch = decontainerize(interp, $2);
@@ -275,7 +256,7 @@ inline op repr_bind_attr_int(in PMC, in PMC, in STR, in INT) :base_core {
             "Can only use repr_bind_attr_int on a SixModelObject");
 }
 
-/*
+
 
 =item repr_bind_attr_num()
 
@@ -284,7 +265,7 @@ a native num - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_bind_attr_num(in PMC, in PMC, in STR, in NUM) :base_core {
     PMC *ch = decontainerize(interp, $2);
@@ -295,7 +276,7 @@ inline op repr_bind_attr_num(in PMC, in PMC, in STR, in NUM) :base_core {
             "Can only use repr_bind_attr_num on a SixModelObject");
 }
 
-/*
+
 
 =item repr_bind_attr_str()
 
@@ -304,7 +285,7 @@ a native str - the repr is not obligated to do boxing/unboxing for you.
 
 =cut
 
-*/
+
 
 inline op repr_bind_attr_str(in PMC, in PMC, in STR, in STR) :base_core {
     PMC *ch = decontainerize(interp, $2);
@@ -315,7 +296,7 @@ inline op repr_bind_attr_str(in PMC, in PMC, in STR, in STR) :base_core {
             "Can only use repr_bind_attr_str on a SixModelObject");
 }
 
-/*
+
 
 =item repr_is_attr_initialized()
 
@@ -324,7 +305,7 @@ in $1 if so.
 
 =cut
 
-*/
+
 
 inline op repr_is_attr_initialized(out INT, in PMC, in PMC, in STR) :base_core {
     PMC *ch = decontainerize(interp, $3);
@@ -336,7 +317,7 @@ inline op repr_is_attr_initialized(out INT, in PMC, in PMC, in STR) :base_core {
 }
 
 
-/*
+
 
 =item repr_change_type()
 
@@ -346,7 +327,7 @@ REPR to decide what changes it will or won't allow.
 
 =cut
 
-*/
+
 
 inline op repr_change_type(in PMC, in PMC) :base_core {
     PMC *obj      = decontainerize(interp, $1);
@@ -364,7 +345,7 @@ inline op repr_change_type(in PMC, in PMC) :base_core {
     }
 }
 
-/*
+
 
 =item type_check(obj, wanted_type)
 
@@ -375,7 +356,7 @@ make sure.
 
 =cut
 
-*/
+
 
 inline op type_check(out INT, in PMC, in PMC) :base_core {
     PMC *val = decontainerize(interp, $2);
@@ -383,7 +364,7 @@ inline op type_check(out INT, in PMC, in PMC) :base_core {
     if (val->vtable->base_type == enum_class_SixModelObject && type->vtable->base_type == enum_class_SixModelObject) {
         $1 = STABLE(val)->type_check(interp, val, type);
     }
-    else if (type->vtable->base_type == smo_id) {
+    else if (type->vtable->base_type == enum_class_SixModelObject) {
         $1 = 0;
     }
     else {
@@ -393,7 +374,7 @@ inline op type_check(out INT, in PMC, in PMC) :base_core {
 }
 
 
-/*
+
 
 =item publish_type_check_cache(WHAT, type_list)
 
@@ -401,7 +382,7 @@ Publishes a type check cache, to be stored in the S-Table.
 
 =cut
 
-*/
+
 
 inline op publish_type_check_cache(in PMC, in PMC) :base_core {
     PMC *target = decontainerize(interp, $1);
@@ -429,7 +410,7 @@ inline op publish_type_check_cache(in PMC, in PMC) :base_core {
 }
 
 
-/*
+
 
 =item publish_method_cache(WHAT, method_cache_hash)
 
@@ -438,7 +419,7 @@ mappings.
 
 =cut
 
-*/
+
 
 inline op publish_method_cache(in PMC, in PMC) :base_core {
     PMC *target = decontainerize(interp, $1);
@@ -447,7 +428,7 @@ inline op publish_method_cache(in PMC, in PMC) :base_core {
          * calls into the language's own hash implementation every
          * time, which may be far more costly. */
         STable *target_st = STABLE(target);
-        PMC    *cache     = pmc_new(interp, enum_class_Hash);
+        PMC    *cache     = Parrot_pmc_new(interp, enum_class_Hash);
         PMC    *iter      = VTABLE_get_iter(interp, $2);
         while (VTABLE_get_bool(interp, iter)) {
             STRING *name = VTABLE_shift_string(interp, iter);
@@ -464,7 +445,7 @@ inline op publish_method_cache(in PMC, in PMC) :base_core {
 }
 
 
-/*
+
 
 =item repr_unbox_str()
 
@@ -472,7 +453,7 @@ Tries to unbox a native string using the REPR API.
 
 =cut
 
-*/
+
 
 inline op repr_unbox_str(out STR, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -483,7 +464,7 @@ inline op repr_unbox_str(out STR, in PMC) :base_core {
             "Can only use repr_unbox_str on a SixModelObject");
 }
 
-/*
+
 
 =item repr_unbox_int()
 
@@ -491,7 +472,7 @@ Tries to unbox a native integer using the REPR API.
 
 =cut
 
-*/
+
 
 inline op repr_unbox_int(out INT, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -502,7 +483,7 @@ inline op repr_unbox_int(out INT, in PMC) :base_core {
             "Can only use repr_unbox_int on a SixModelObject");
 }
 
-/*
+
 
 =item repr_unbox_num()
 
@@ -510,7 +491,7 @@ Tries to unbox a native floating pint number using the REPR API.
 
 =cut
 
-*/
+
 
 inline op repr_unbox_num(out NUM, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -521,7 +502,7 @@ inline op repr_unbox_num(out NUM, in PMC) :base_core {
             "Can only use repr_unbox_num on a SixModelObject");
 }
 
-/*
+
 
 =item repr_box_str()
 
@@ -529,7 +510,7 @@ Box a native string to an instance of the specified type.
 
 =cut
 
-*/
+
 
 inline op repr_box_str(out PMC, in STR, in PMC) :base_core {
     PMC *type = decontainerize(interp, $3);
@@ -542,7 +523,7 @@ inline op repr_box_str(out PMC, in STR, in PMC) :base_core {
             "Can only use repr_box_str with a SixModelObject as the box target");
 }
 
-/*
+
 
 =item repr_box_int()
 
@@ -550,7 +531,7 @@ Box a native int to an instance of the specified type.
 
 =cut
 
-*/
+
 
 inline op repr_box_int(out PMC, in INT, in PMC) :base_core {
     PMC *type = decontainerize(interp, $3);
@@ -563,7 +544,7 @@ inline op repr_box_int(out PMC, in INT, in PMC) :base_core {
             "Can only use repr_box_int with a SixModelObject as the box target");
 }
 
-/*
+
 
 =item repr_box_num()
 
@@ -571,7 +552,7 @@ Box a native floating point number to an instance of the specified type.
 
 =cut
 
-*/
+
 
 inline op repr_box_num(out PMC, in NUM, in PMC) :base_core {
     PMC *type = decontainerize(interp, $3);
@@ -584,7 +565,7 @@ inline op repr_box_num(out PMC, in NUM, in PMC) :base_core {
             "Can only use repr_box_num with a SixModelObject as the box target");
 }
 
-/*
+
 
 =item stable_set_type_check_mode()
 
@@ -592,7 +573,7 @@ Sets the type check mode flags.
 
 =cut
 
-*/
+
 
 inline op stable_set_type_check_mode(in PMC, in INT) :base_core {
     PMC *target = decontainerize(interp, $1);
@@ -604,7 +585,7 @@ inline op stable_set_type_check_mode(in PMC, in INT) :base_core {
 }
 
 
-/*
+
 
 =item stable_publish_vtable_mapping()
 
@@ -613,7 +594,7 @@ It's stored as an array, so lookups will be speedy.
 
 =cut
 
-*/
+
 
 inline op stable_publish_vtable_mapping(in PMC, in PMC) :base_core {
     PMC *target = decontainerize(interp, $1);
@@ -656,7 +637,7 @@ inline op stable_publish_vtable_mapping(in PMC, in PMC) :base_core {
             "Can only use stable_publish_vtable_mapping with a SixModelObject");
 }
 
-/*
+
 =item publish_vtable_handler_mapping()
 
 Publishes a Parrot v-table handler mapping, which will be hung off the s-table.
@@ -664,7 +645,7 @@ It's stored as an array, so lookups will be speedy.
 
 =cut
 
-*/
+
 
 inline op stable_publish_vtable_handler_mapping(in PMC, in PMC) :base_core {
     PMC *target = decontainerize(interp, $1);
@@ -709,7 +690,7 @@ inline op stable_publish_vtable_handler_mapping(in PMC, in PMC) :base_core {
             "Can only use stable_publish_vtable_handler_mapping with a SixModelObject");
 }
 
-/*
+
 
 =item nqp_get_sc_object()
 
@@ -717,7 +698,7 @@ Fetches an object from the serialization context keyed by handle and index.
 
 =cut
 
-*/
+
 
 inline op nqp_get_sc_object(out PMC, in STR, in INT) :base_core {
     PMC *sc = SC_get_sc(interp, $2);
@@ -729,7 +710,7 @@ inline op nqp_get_sc_object(out PMC, in STR, in INT) :base_core {
             $2);
 }
 
-/*
+
 
 =item nqp_get_sc()
 
@@ -738,13 +719,13 @@ NULL if it does not exist.
 
 =cut
 
-*/
+
 
 inline op nqp_get_sc(out PMC, in STR) {
     $1 = SC_get_sc(interp, $2);
 }
 
-/*
+
 
 =item nqp_create_sc()
 
@@ -753,16 +734,16 @@ to the registry and returns it.
 
 =cut
 
-*/
+
 
 inline op nqp_create_sc(out PMC, in STR) {
-    $1 = pmc_new(interp, pmc_type(interp,
+    $1 = Parrot_pmc_new(interp, pmc_type(interp,
         Parrot_str_new(interp, "SerializationContext", 0)));
     VTABLE_set_string_native(interp, $1, $2);
     SC_set_sc(interp, $2, $1);
 }
 
-/*
+
 
 =item nqp_set_sc_object()
 
@@ -770,7 +751,7 @@ Stores an object in the serialization context keyed by handle and index.
 
 =cut
 
-*/
+
 
 inline op nqp_set_sc_object(in STR, in INT, in PMC) :base_core {
     PMC *sc = SC_get_sc(interp, $1);
@@ -782,7 +763,7 @@ inline op nqp_set_sc_object(in STR, in INT, in PMC) :base_core {
             $1);
 }
 
-/*
+
 
 =item nqp_set_sc_for_object()
 
@@ -790,10 +771,10 @@ Sets an object's serialization context.
 
 =cut
 
-*/
+
 
 inline op nqp_set_sc_for_object(in PMC, in PMC) :base_core {
-    if ($1->vtable->base_type == smo_id) {
+    if ($1->vtable->base_type == enum_class_SixModelObject) {
         SC_PMC($1) = $2;
         PARROT_GC_WRITE_BARRIER(interp, $1);
     }
@@ -802,7 +783,7 @@ inline op nqp_set_sc_for_object(in PMC, in PMC) :base_core {
             "Can only use nqp_set_sc_for_object with a SixModelObject");
 }
 
-/*
+
 
 =item nqp_get_sc_for_object()
 
@@ -811,10 +792,10 @@ is none.
 
 =cut
 
-*/
+
 
 inline op nqp_get_sc_for_object(out PMC, in PMC) :base_core {
-    if ($2->vtable->base_type == smo_id)
+    if ($2->vtable->base_type == enum_class_SixModelObject)
         $1 = SC_PMC($2);
     else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -822,7 +803,7 @@ inline op nqp_get_sc_for_object(out PMC, in PMC) :base_core {
 }
 
 
-/*
+
 
 =item nqp_get_package_through_who
 
@@ -832,10 +813,10 @@ non exists.
 
 =cut
 
-*/
+
 
 inline op nqp_get_package_through_who(out PMC, in PMC, in STR) :base_core {
-    if ($2->vtable->base_type == smo_id) {
+    if ($2->vtable->base_type == enum_class_SixModelObject) {
         PMC *who = STABLE($2)->WHO;
         PMC *pkg = VTABLE_get_pmc_keyed_str(interp, who, $3);
         if (PMC_IS_NULL(pkg)) {
@@ -844,6 +825,7 @@ inline op nqp_get_package_through_who(out PMC, in PMC, in STR) :base_core {
              * XXX For now just create a KnowHOW; we can switch to a lighter
              * package temp type later. */
             PMC *old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            PMC *KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
             PMC *meth    = VTABLE_find_method(interp, KnowHOW, Parrot_str_new(interp, "new_type", 0));
             PMC *cappy   = Parrot_pmc_new(interp, enum_class_CallContext);
             VTABLE_push_pmc(interp, cappy, KnowHOW);
@@ -864,7 +846,7 @@ inline op nqp_get_package_through_who(out PMC, in PMC, in STR) :base_core {
     }
 }
 
-/*
+
 
 =item is_invokable
 
@@ -873,7 +855,7 @@ is not a 6model object must is otherwise marked invokable.
 
 =cut
 
-*/
+
 
 inline op is_invokable(out INT, in PMC) :base_core {
     if ($2->vtable->base_type == enum_class_SixModelObject) {
@@ -885,7 +867,7 @@ inline op is_invokable(out INT, in PMC) :base_core {
     }
 }
 
-/*
+
 
 =item repr_get_primitive_type_spec
 
@@ -894,7 +876,7 @@ unboxed, this will return what sort of primitive type it is.
 
 =cut
 
-*/
+
 
 inline op repr_get_primitive_type_spec(out INT, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -907,7 +889,7 @@ inline op repr_get_primitive_type_spec(out INT, in PMC) :base_core {
     }
 }
 
-/*
+
 
 =item is_container
 
@@ -917,7 +899,7 @@ considered not to be a container.
 
 =cut
 
-*/
+
 
 inline op is_container(out INT, in PMC) :base_core {
     if ($2->vtable->base_type == enum_class_SixModelObject)
@@ -926,7 +908,7 @@ inline op is_container(out INT, in PMC) :base_core {
         $1 = 0;
 }
 
-/*
+
 
 =item nqp_decontainerize
 
@@ -935,13 +917,13 @@ and puts the contained value in $1.
 
 =cut
 
-*/
+
 
 inline op nqp_decontainerize(out PMC, in PMC) :base_core {
     $1 = decontainerize(interp, $2);
 }
 
-/*
+
 
 =item set_container_spec
 
@@ -954,7 +936,7 @@ over $4.
 
 =cut
 
-*/
+
 
 inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
     if ($1->vtable->base_type == enum_class_SixModelObject) {
@@ -978,11 +960,18 @@ inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
     }
 }
 
-/*
-
 =back
 
-*/
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 LICENSE
+
+This program is free software. It is subject to the same license
+as the Parrot interpreter itself.
+
+=cut
 
 /*
  * Local variables:

@@ -34,6 +34,7 @@ sub MAIN() {
             src/ops/io.ops
             src/ops/math.ops
             src/ops/object.ops
+            src/ops/6model.ops
             src/ops/pmc.ops
             src/ops/set.ops
             src/ops/string.ops

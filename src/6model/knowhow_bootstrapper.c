@@ -128,7 +128,7 @@ new_type(PARROT_INTERP, PMC *nci)
     PARROT_GC_WRITE_BARRIER(interp, HOW);
 
     /* Set .WHO to an empty hash. */
-    STABLE(type_object)->WHO = pmc_new(interp, enum_class_Hash);
+    STABLE(type_object)->WHO = Parrot_pmc_new(interp, enum_class_Hash);
     PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(type_object));
 
     /* Put it into capture to act as return value. */
@@ -203,7 +203,7 @@ parents(PARROT_INTERP, PMC *nci)
 {
     PMC * unused;
     PMC *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-    PMC *empty   = pmc_new(interp, enum_class_FixedPMCArray);
+    PMC *empty   = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", empty);
 }
 
@@ -236,7 +236,7 @@ mro(PARROT_INTERP, PMC *nci)
     PMC * unused;
     PMC *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC *obj     = VTABLE_get_pmc_keyed_int(interp, capture, 1);
-    PMC *mro     = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC *mro     = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     VTABLE_push_pmc(interp, mro, STABLE(obj)->WHAT);
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", mro);
 }

@@ -21,7 +21,7 @@ pmclass SerializationContext auto_attrs {
     ATTR STRING *description;
 
     VTABLE void init() {
-        PMC *root_objects = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *root_objects = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         SETATTR_SerializationContext_root_objects(interp, SELF, root_objects);
         PObj_custom_mark_SET(SELF);
     }

@@ -230,7 +230,7 @@ japh_compiler(PARROT_INTERP, const char *program)
     /*
      * create sub PMC
      */
-    sub = pmc_new(interp, enum_class_Eval);
+    sub = Parrot_pmc_new(interp, enum_class_Eval);
     PMC_get_sub(interp, sub, sub_data);
     sub_data->seg = cur_cs;
     sub_data->address = cur_cs->base.data;

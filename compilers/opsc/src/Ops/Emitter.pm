@@ -150,10 +150,8 @@ method emit_opsenum_h_body($fh) {
     my $max_op_num := 0;
     for self.ops_file.ops -> $op {
         if !self.ops_file<core> || !self.ops_file.oplib.op_skip_table.exists( $op.full_name ) {
-            my $space := pir::repeat__SsI(' ', 30 - pir::length__Is($op.full_name));
-            $fh.print("    enum_ops_" ~ $op.full_name ~ $space ~ "=");
-            $space := pir::repeat__SsI(' ', 5 - pir::length__Is(~$max_op_num));
-            $fh.print($space ~ $max_op_num ~ ",\n");
+            $fh.print("    enum_ops_" ~ $op.full_name ~ " =");
+            $fh.print(" " ~ $max_op_num ~ ",\n");
             $max_op_num++;
         }
     }
@@ -197,7 +195,7 @@ method _emit_c_op_enum_header_part($fh) {
         $sb.append_format("    PARROT_OP_%0%1 %2 /* %3 */\n",
             $op.full_name,
             ($op.code == $last_op_code ?? ' ' !! ','),
-            pir::repeat__SsI(' ', 30 - pir::length__Is($op.full_name)),
+            " ",
             $op.code);
     }
     $fh.print(q|
