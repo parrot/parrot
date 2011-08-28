@@ -44,6 +44,7 @@ static PMC *repr_name_to_id_map = NULL;
 static void
 register_repr(PARROT_INTERP, STRING *name, REPROps *repr)
 {
+    ASSERT_ARGS(register_repr)
     INTVAL ID = num_reprs;
     num_reprs++;
     if (repr_registry)
