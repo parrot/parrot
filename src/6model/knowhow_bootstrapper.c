@@ -103,6 +103,7 @@ static STRING *p6opaque_str = NULL;
 static void
 new_type(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(new_type)
     PMC * unused;
     /* We first create a new HOW instance. */
     PMC *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
@@ -139,6 +140,7 @@ new_type(PARROT_INTERP, PMC *nci)
 static void
 add_method(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(add_method)
     PMC * unused;
     /* Get methods table out of meta-object. */
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
@@ -158,6 +160,7 @@ add_method(PARROT_INTERP, PMC *nci)
 static void
 add_attribute(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(add_attribute)
     PMC * unused;
     /* Get attributes list out of meta-object. */
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
@@ -174,6 +177,7 @@ add_attribute(PARROT_INTERP, PMC *nci)
 static void
 find_method(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(find_method)
     PMC * unused;
     /* Get methods table out of meta-object and look up method. */
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
@@ -190,6 +194,7 @@ find_method(PARROT_INTERP, PMC *nci)
 static void
 compose(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(compose)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *obj     = VTABLE_get_pmc_keyed_int(interp, capture, 1);
@@ -201,6 +206,7 @@ compose(PARROT_INTERP, PMC *nci)
 static void
 parents(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(parents)
     PMC * unused;
     PMC *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC *empty   = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
@@ -211,6 +217,7 @@ parents(PARROT_INTERP, PMC *nci)
 static void
 attributes(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(attributes)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *self    = VTABLE_get_pmc_keyed_int(interp, capture, 0);
@@ -222,6 +229,7 @@ attributes(PARROT_INTERP, PMC *nci)
 static void
 methods(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(methods)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *self    = VTABLE_get_pmc_keyed_int(interp, capture, 0);
@@ -233,6 +241,7 @@ methods(PARROT_INTERP, PMC *nci)
 static void
 mro(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(mro)
     PMC * unused;
     PMC *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC *obj     = VTABLE_get_pmc_keyed_int(interp, capture, 1);
@@ -245,6 +254,7 @@ mro(PARROT_INTERP, PMC *nci)
 static void
 name(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(name)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *self    = VTABLE_get_pmc_keyed_int(interp, capture, 0);
@@ -256,6 +266,7 @@ name(PARROT_INTERP, PMC *nci)
 static PMC *
 wrap_c(PARROT_INTERP, void *func)
 {
+    ASSERT_ARGS(wrap_c)
     PMC * const wrapped = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
     VTABLE_set_pointer_keyed_str(interp, wrapped, Parrot_str_new_constant(interp, "->"), func);
     return wrapped;
@@ -265,6 +276,7 @@ wrap_c(PARROT_INTERP, void *func)
 static PMC *
 bottom_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(bottom_find_method)
     PMC *methods = ((KnowHOWREPRInstance *)PMC_data(obj))->methods;
     PMC *method  = VTABLE_get_pmc_keyed_str(interp, methods, name);
     if (PMC_IS_NULL(method))
@@ -357,6 +369,7 @@ SixModelObject_bootstrap_knowhow(PARROT_INTERP, PMC *sc)
 static void
 attr_new(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(attr_new)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *type    = VTABLE_get_pmc_keyed_int(interp, capture, 0);
@@ -370,6 +383,7 @@ attr_new(PARROT_INTERP, PMC *nci)
 static void
 attr_name(PARROT_INTERP, PMC *nci)
 {
+    ASSERT_ARGS(attr_name)
     PMC * unused;
     PMC    *capture = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     PMC    *self    = VTABLE_get_pmc_keyed_int(interp, capture, 0);

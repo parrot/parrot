@@ -176,6 +176,7 @@ static REPROps *this_repr;
 static PMC *
 type_object_for(PARROT_INTERP, PMC *HOW)
 {
+    ASSERT_ARGS(type_object_for)
     /* Create new object instance. */
     HashAttrStoreInstance *obj = mem_allocate_zeroed_typed(HashAttrStoreInstance);
 
@@ -196,6 +197,7 @@ type_object_for(PARROT_INTERP, PMC *HOW)
 static PMC *
 instance_of(PARROT_INTERP, PMC *WHAT)
 {
+    ASSERT_ARGS(instance_of)
     HashAttrStoreInstance *obj;
 
     /* Allocate and set up object instance. */
@@ -213,6 +215,7 @@ instance_of(PARROT_INTERP, PMC *WHAT)
 static INTVAL
 defined(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(defined)
     HashAttrStoreInstance *instance = (HashAttrStoreInstance *)PMC_data(obj);
     return instance->store != NULL;
 }
@@ -221,6 +224,7 @@ defined(PARROT_INTERP, PMC *obj)
 static PMC *
 get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute)
     HashAttrStoreInstance *instance = (HashAttrStoreInstance *)PMC_data(obj);
     if (!instance->store)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -231,6 +235,7 @@ get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL h
 static INTVAL
 get_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -238,6 +243,7 @@ get_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTV
 static FLOATVAL
 get_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -245,6 +251,7 @@ get_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTV
 static STRING *
 get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -253,6 +260,7 @@ get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTV
 static void
 bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint, PMC *value)
 {
+    ASSERT_ARGS(bind_attribute)
     HashAttrStoreInstance *instance = (HashAttrStoreInstance *)PMC_data(obj);
     if (!instance->store)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -264,6 +272,7 @@ static void
 bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, INTVAL value)
 {
+    ASSERT_ARGS(bind_attribute_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -271,6 +280,7 @@ static void
 bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, FLOATVAL value)
 {
+    ASSERT_ARGS(bind_attribute_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -278,6 +288,7 @@ static void
 bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, STRING *value)
 {
+    ASSERT_ARGS(bind_attribute_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore representation does not support native attribute storage");
 }
@@ -286,6 +297,7 @@ bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
 static INTVAL
 hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
 {
+    ASSERT_ARGS(hint_for)
     return NO_HINT;
 }
 
@@ -293,6 +305,7 @@ hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
 static PMC *
 repr_clone(PARROT_INTERP, PMC *to_clone)
 {
+    ASSERT_ARGS(repr_clone)
     HashAttrStoreInstance *obj;
 
     /* Allocate and set up object instance. */
@@ -309,6 +322,7 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
 static void
 set_int(PARROT_INTERP, PMC *obj, INTVAL value)
 {
+    ASSERT_ARGS(set_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot box a native int");
 }
@@ -318,6 +332,7 @@ set_int(PARROT_INTERP, PMC *obj, INTVAL value)
 static INTVAL
 get_int(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot unbox to a native int");
 }
@@ -327,6 +342,7 @@ get_int(PARROT_INTERP, PMC *obj)
 static void
 set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
 {
+    ASSERT_ARGS(set_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot box a native num");
 }
@@ -336,6 +352,7 @@ set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
 static FLOATVAL
 get_num(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot unbox to a native num");
 }
@@ -345,6 +362,7 @@ get_num(PARROT_INTERP, PMC *obj)
 static void
 set_str(PARROT_INTERP, PMC *obj, STRING *value)
 {
+    ASSERT_ARGS(set_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot box a native string");
 }
@@ -354,6 +372,7 @@ set_str(PARROT_INTERP, PMC *obj, STRING *value)
 static STRING *
 get_str(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "HashAttrStore cannot unbox to a native string");
 }
@@ -362,6 +381,7 @@ get_str(PARROT_INTERP, PMC *obj)
 static void
 gc_mark(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(gc_mark)
     HashAttrStoreInstance *instance = (HashAttrStoreInstance *)PMC_data(obj);
 
     /* Mark STable. */
@@ -377,6 +397,7 @@ gc_mark(PARROT_INTERP, PMC *obj)
 static void
 gc_free(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(gc_free)
     Parrot_gc_free_fixed_size_storage(interp, sizeof (HashAttrStoreInstance), PMC_data(obj));
     PMC_data(obj) = NULL;
 }
@@ -395,6 +416,7 @@ storage_spec get_storage_spec(PARROT_INTERP, STable *st)
 static INTVAL
 is_attribute_initialized(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(is_attribute_initialized)
     HashAttrStoreInstance *instance = (HashAttrStoreInstance *)PMC_data(obj);
     if (!instance->store)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
