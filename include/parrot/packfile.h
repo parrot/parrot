@@ -19,6 +19,7 @@
 #define FIXUP_TABLE_SEGMENT_NAME Parrot_str_new_constant(interp, "FIXUP")
 #define CONSTANT_SEGMENT_NAME    Parrot_str_new_constant(interp, "CONSTANT")
 #define BYTE_CODE_SEGMENT_NAME   Parrot_str_new_constant(interp, "BYTECODE")
+#define ODIUS_SEGMENT_NAME       Parrot_str_new_constant(interp, "ODIUS")
 
 #define FLOATTYPE_8           0
 #define FLOATTYPE_8_NAME      "IEEE-754 8 byte double"
@@ -67,9 +68,10 @@ typedef enum {
     PF_CONST_SEG        = 2,
     PF_BYTEC_SEG        = 3,
     PF_DEBUG_SEG        = 4,
-    PF_ANNOTATIONS_SEG  = 5,
+    PF_ODIUS_SEG        = 5,
+    PF_ANNOTATIONS_SEG  = 6,
 
-    PF_MAX_SEG          = 6
+    PF_MAX_SEG          = 7
 } pack_file_types;
 
 /* &end_gen */
@@ -261,12 +263,18 @@ typedef struct PackFile_Annotations {
     PackFile_Annotations_Key    *keys;
 } PackFile_Annotations;
 
+typedef struct PackFile_Odius {
+    PackFile_Segment    base;
+    PackFile_ByteCode  *code;
+    /*opcode_t            num_keys;*/
+    /*PackFile_Odius_Key *keys;*/
+} PackFile_Odius;
+ 
 typedef struct PackFile_Directory {
     PackFile_Segment   base;
     size_t             num_segments;
     PackFile_Segment **segments;
 } PackFile_Directory;
-
 
 typedef opcode_t (*packfile_fetch_op_t)(ARGIN(const unsigned char *));
 typedef INTVAL   (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
@@ -1046,6 +1054,11 @@ void PackFile_funcs_register(PARROT_INTERP,
         FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment * PackFile_Odius_new(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1142,6 +1155,11 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
+void PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*seg);
+
 void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1158,6 +1176,8 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
+#define ASSERT_ARGS_PackFile_Odius_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Segment_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -1200,6 +1220,9 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_PackFile_Odius_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_pf_register_standard_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))

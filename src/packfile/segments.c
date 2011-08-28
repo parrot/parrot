@@ -2225,6 +2225,54 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
 }
 
 /*
+ 
+=item C<PackFile_Segment * PackFile_Odius_new(PARROT_INTERP)>
+
+Creates a new Odius segment structure.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment *
+PackFile_Odius_new(PARROT_INTERP)
+{
+    ASSERT_ARGS(PackFile_Odius_new)
+
+    /* Allocate annotations structure; create it all zeroed, and we will
+     * allocate memory for each of the arrays on demand. */
+    PackFile_Odius * const seg = mem_gc_allocate_zeroed_typed(interp, PackFile_Odius);
+
+    return (PackFile_Segment *) seg;
+}
+
+/*
+
+=item C<void PackFile_Odius_destroy(PARROT_INTERP, PackFile_Segment *seg)>
+
+Frees all memory allocated for the Odius debug segment.
+
+=cut
+
+*/
+
+void
+PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+{
+    ASSERT_ARGS(PackFile_Odius_destroy)
+
+    PackFile_Odius * const self = (PackFile_Odius *) seg;
+
+    /* Free any keys */
+    /*if (self->keys)*/
+        /*mem_gc_free(interp, self->keys);*/
+
+    /*self->keys = NULL;*/
+}
+
+/*
 
 =back
 
