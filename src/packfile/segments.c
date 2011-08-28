@@ -157,6 +157,30 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+static void PackFile_Odius_dump(PARROT_INTERP,
+    ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t * PackFile_Odius_pack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *self),
+    ARGOUT(opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*cursor);
+
+static const opcode_t * PackFile_Odius_unpack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *self),
+    ARGIN(const opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
 static void pf_debug_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -269,6 +293,17 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
 #define ASSERT_ARGS_PackFile_Constant_unpack_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(constt) \
+    , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_PackFile_Odius_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_PackFile_Odius_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_PackFile_Odius_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -929,12 +964,22 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         PackFile_Annotations_dump
     };
 
+    static const PackFile_funcs odiusf = {
+        PackFile_Odius_new,
+        PackFile_Odius_destroy,
+        PackFile_Odius_packed_size,
+        PackFile_Odius_pack,
+        PackFile_Odius_unpack,
+        PackFile_Odius_dump
+    };
+
     PackFile_funcs_register(interp, pf, PF_DIR_SEG,         dirf);
     PackFile_funcs_register(interp, pf, PF_UNKNOWN_SEG,     defaultf);
     PackFile_funcs_register(interp, pf, PF_CONST_SEG,       constf);
     PackFile_funcs_register(interp, pf, PF_BYTEC_SEG,       bytef);
     PackFile_funcs_register(interp, pf, PF_DEBUG_SEG,       debugf);
     PackFile_funcs_register(interp, pf, PF_ANNOTATIONS_SEG, annotationf);
+    PackFile_funcs_register(interp, pf, PF_ODIUS_SEG,       odiusf);
 
     return;
 }
@@ -2225,7 +2270,7 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
 }
 
 /*
- 
+
 =item C<PackFile_Segment * PackFile_Odius_new(PARROT_INTERP)>
 
 Creates a new Odius segment structure.
@@ -2271,6 +2316,38 @@ PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 
     /*self->keys = NULL;*/
 }
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t
+PackFile_Odius_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+{
+    ASSERT_ARGS(PackFile_Odius_packed_size)
+    return 0;
+}
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static opcode_t *
+PackFile_Odius_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+{
+    ASSERT_ARGS(PackFile_Odius_pack)
+    return NULL;
+}
+
+static const opcode_t *
+PackFile_Odius_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
+{
+    ASSERT_ARGS(PackFile_Odius_unpack)
+    return NULL;
+}
+
+static void
+PackFile_Odius_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+{
+    ASSERT_ARGS(PackFile_Odius_dump)
+}
+
 
 /*
 

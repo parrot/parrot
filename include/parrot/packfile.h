@@ -1160,6 +1160,14 @@ void PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t PackFile_Odius_packed_size(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*seg);
+
 void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1221,6 +1229,9 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_Odius_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(seg))
+#define ASSERT_ARGS_PackFile_Odius_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_pf_register_standard_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
