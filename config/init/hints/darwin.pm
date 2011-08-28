@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 package init::hints::darwin;
 
@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use lib qw( lib );
-use File::Spec ();
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
 
@@ -40,12 +39,12 @@ sub runstep {
 
     my $libs = _strip_ldl_as_needed( $conf->data->get( 'libs' ) );
 
-    _set_deployment_environment();
+    my $deploy_target = _set_deployment_environment();
 
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
-    $flagsref->{ldflags} .= " -L$lib_dir";
+    $flagsref->{ldflags} .= ' -L"' . $lib_dir . '"';
 
-    if ($ENV{'MACOSX_DEPLOYMENT_TARGET'} eq '10.6') {
+    if ($deploy_target =~ /^10\.(5|6|7)$/) {
         $flagsref->{ccflags} .= ' -pipe -fno-common ';
     }
     else {
@@ -66,7 +65,7 @@ sub runstep {
 
     $conf->data->set(
         darwin              => 1,
-        osx_version         => $ENV{'MACOSX_DEPLOYMENT_TARGET'},
+        osx_version         => $deploy_target,
         osvers              => $osvers,
         ccflags             => $flagsref->{ccflags},
         ldflags             => $flagsref->{ldflags},
@@ -91,9 +90,11 @@ sub runstep {
         libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
-            . $lib_dir
+            . '"'
+            . $conf->data->get('libdir')
             . '/libparrot'
             . $conf->data->get('share_ext')
+            . '"'
     );
 }
 
@@ -164,6 +165,7 @@ sub _set_deployment_environment {
         $OSX_vers =join '.', (split /[.]/, $OSX_vers)[0,1];
         $ENV{'MACOSX_DEPLOYMENT_TARGET'} = $OSX_vers;
     }
+    return $ENV{'MACOSX_DEPLOYMENT_TARGET'};
 }
 
 sub _probe_for_fink {

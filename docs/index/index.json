@@ -1,0 +1,62 @@
+{
+   "page" : "index",
+   "content" : [
+      {
+         "source" : [
+            "docs/intro.pod",
+            "docs/book/pct/ch02_getting_started.pod",
+            "docs/parrot.pod",
+            "docs/project/roles_responsibilities.pod",
+            "docs/parrothist.pod",
+            "DONORS.pod",
+            "docs/glossary.pod",
+            "docs/project/support_policy.pod"
+         ],
+         "title" : "Introduction"
+      },
+      {
+         "source" : [
+            "docs/running.pod",
+            "docs/tests.pod",
+            "docs/gettingstarted.pod",
+            "docs/submissions.pod"
+         ],
+         "title" : "Working with Parrot"
+      },
+      {
+         "source" : [
+            "docs/book/pct/ch03_compiler_tools.pod",
+            ":pct_tutorial",
+            "docs/book/pct/ch04_pge.pod",
+            "docs/book/pct/ch05_nqp.pod",
+            "docs/compiler_faq.pod"
+         ],
+         "title" : "Implementing Languages on Parrot"
+      },
+      {
+         "source" : [
+            "docs/overview.pod",
+            ":pdds",
+            ":pmc",
+            ":ops",
+            ":developer",
+            ":tools",
+            "editor/README.pod"
+         ],
+         "title" : "Design, Internals & Development"
+      },
+      {
+         "source" : [
+            "docs/book/pir/*"
+         ],
+         "title" : "PIR Book"
+      },
+      {
+         "source" : [
+            "docs/book/pct/*"
+         ],
+         "title" : "PCT Book"
+      }
+   ],
+   "title" : "Home"
+}

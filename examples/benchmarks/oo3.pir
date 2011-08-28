@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 .namespace [ "Foo" ]
-.sub 'main'
+.sub 'main' :main
     newclass $P1, "Foo"
     addattribute $P1, ".i"
     addattribute $P1, ".j"

@@ -46,47 +46,6 @@ sub runstep {
 
     _handle_version($conf, $version, $cmd);
 
-    my $TEMP_pod_build = <<'E_NOTE';
-
-# the following part of the Makefile was built by 'config/auto/perldoc.pm'
-
-E_NOTE
-
-    opendir OPS, 'src/ops' or die "opendir ops: $!";
-    my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
-    closedir OPS;
-
-    my $TEMP_pod = join q{ } =>
-        map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
-
-    my $new_perldoc = $conf->data->get('new_perldoc');
-
-    foreach my $ops (@ops) {
-        my $pod = $ops;
-        $pod =~ s/\.ops$/.pod/;
-        if ( $new_perldoc ) {
-            $TEMP_pod_build .= <<"END"
-ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC_BIN) -ud ops/$pod ../src/ops/$ops
-\t\$(CHMOD) 0644 ops/$pod
-
-END
-        }
-        else {
-            $TEMP_pod_build .= <<"END"
-ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC_BIN) -u ../ops/$ops > ops/$pod
-\t\$(CHMOD) 0644 ../ops/$pod
-
-END
-        }
-    }
-
-    $conf->data->set(
-        TEMP_pod             => $TEMP_pod,
-        TEMP_pod_build       => $TEMP_pod_build,
-    );
-
     return 1;
 }
 
@@ -98,8 +57,6 @@ sub _initial_content_check {
             has_perldoc => 0,
             new_perldoc => 0,
             perldoc     => 'echo',
-            TEMP_pod        => '',
-            TEMP_pod_build  => '',
         );
         $self->set_result('no');
         return;

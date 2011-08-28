@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -259,6 +259,8 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     /* Store built attribute index and invalidate cache. */
     _class->attrib_index = attrib_index;
     _class->attrib_cache = cache;
+
+    PARROT_GC_WRITE_BARRIER(interp, self);
 }
 
 /*
@@ -541,6 +543,7 @@ make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
             if (!PMC_IS_NULL(names))
                 /* remove the HLL namespace name */
                 VTABLE_shift_string(interp, names);
+                PARROT_GC_WRITE_BARRIER(interp, SELF);
                 _class->fullname = Parrot_str_join(interp, CONST_STRING(interp, ";"), names);
                 return _class->fullname;
         }
@@ -580,10 +583,13 @@ calculate_mro(PARROT_INTERP, ARGIN(PMC *SELF), INTVAL num_parents)
         PMC    * const parent_mro = VTABLE_inspect_str(interp, parent, ap);
         PMC    * const mro        = VTABLE_clone(interp, parent_mro);
         VTABLE_unshift_pmc(interp, mro, SELF);
+        PARROT_GC_WRITE_BARRIER(interp, SELF);
         _class->all_parents = mro;
     }
-    else
+    else {
+        PARROT_GC_WRITE_BARRIER(interp, SELF);
         _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+    }
 
     if (!CLASS_is_anon_TEST(SELF))
         interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
@@ -661,7 +667,7 @@ arguments. The class is attached to the current HLL namespace.
         _class->vtable_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
         _class->parent_overrides = Parrot_pmc_new(INTERP, enum_class_Hash);
 
-        _class->isa_cache        = parrot_create_hash(INTERP,
+        _class->isa_cache        = Parrot_hash_create(INTERP,
             enum_type_INTVAL, Hash_key_type_PMC_ptr);
 
 
@@ -723,7 +729,7 @@ arguments. The class is attached to the current HLL namespace.
 
     void destroy() {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        parrot_hash_destroy(INTERP, _class->isa_cache);
+        Parrot_hash_destroy(INTERP, _class->isa_cache);
     }
 
 /*
@@ -767,7 +773,7 @@ Marks any referenced strings and PMCs in the structure as live.
         Parrot_gc_mark_PMC_alive(INTERP, _class->resolve_method);
         Parrot_gc_mark_PMC_alive(INTERP, _class->meth_cache);
         if (_class->isa_cache)
-            parrot_mark_hash(INTERP, _class->isa_cache);
+            Parrot_hash_mark(INTERP, _class->isa_cache);
     }
 
 
@@ -901,20 +907,6 @@ Adds the given sub PMC as a vtable override with the given name.
 */
     VTABLE void add_vtable_override(STRING *name, PMC *sub) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        PMC                     * const vtable =
-            VTABLE_get_pmc_keyed_str(INTERP, _class->vtable_overrides, name);
-
-        /* If we have already added a vtable override with this name... */
-        if (!PMC_IS_NULL(vtable)) {
-            if (vtable == sub)
-                return;
-
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "A vtable override named '%S' already exists in class '%S'. "
-                "It may have been supplied by a role.",
-                name, VTABLE_get_string(INTERP, SELF));
-        }
 
         /* Check that the name is actually valid as a vtable override */
         if (Parrot_get_vtable_index(INTERP, name) == -1)
@@ -945,10 +937,20 @@ Adds the supplied PMC to the list of parents for the class.
                 EXCEPTION_INVALID_OPERATION,
                 "Modifications to classes are not allowed after instantiation.");
 
-        /* Ensure it really is a class. */
-        if (!PObj_is_class_TEST(parent))
+        if (PMC_IS_NULL(parent)) {
+            STRING * const me_str = make_class_name(INTERP, SELF);
             Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION, "Parent isn't a Class.");
+                EXCEPTION_UNEXPECTED_NULL, "Parent of '%Ss' is null", me_str);
+        }
+
+        /* Ensure it really is a class. */
+        if (!PObj_is_class_TEST(parent)) {
+            STRING * const pstr = VTABLE_get_string(INTERP, parent);
+            STRING * me_str = make_class_name(INTERP, SELF);
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Parent '%Ss' of '%Ss' isn't a Class.", pstr, me_str);
+        }
 
         /* Check is not self */
         if (parent == SELF)
@@ -993,7 +995,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(INTERP, _class->parents, parent);
-        parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)1);
+        Parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)1);
         calculate_mro(INTERP, SELF, parent_count + 1);
     }
 
@@ -1041,7 +1043,7 @@ if the class has been instantiated.
                 "Can't remove_parent: is not a parent.");
 
         VTABLE_delete_keyed_int(INTERP, _class->parents, index);
-        parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)0);
+        Parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)0);
         calculate_mro(INTERP, SELF, parent_count - 1);
     }
 
@@ -1161,7 +1163,7 @@ Array of Class PMCs representing the direct parents of this class.
             Hash       *src  = (Hash *)VTABLE_get_pointer(interp, found);
             Hash       *dest = (Hash *)VTABLE_get_pointer(interp, hash);
 
-            parrot_hash_clone_prunable(interp, src, dest, 0);
+            Parrot_hash_clone_prunable(interp, src, dest, 0);
 
             return hash;
         }
@@ -1360,6 +1362,7 @@ Creates a new PMC object of the type of the class and calls init().
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
             objattr->attrib_store = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+            PARROT_GC_WRITE_BARRIER(INTERP, object);
         }
 
         if (!PMC_IS_NULL(init)) {
@@ -1422,7 +1425,7 @@ Returns whether the class is or inherits from C<*class>.
             goto found;
 
         if (_class->instantiated) {
-            b = parrot_hash_get_bucket(INTERP, _class->isa_cache,
+            b = Parrot_hash_get_bucket(INTERP, _class->isa_cache,
                  (void *)classobj);
             if (b)
                 return (INTVAL)b->value;
@@ -1435,7 +1438,7 @@ Returns whether the class is or inherits from C<*class>.
         ||  classobj->vtable->base_type == enum_class_PMCProxy) {
             STRING *classname = make_class_name(INTERP, classobj);
             PARROT_ASSERT(SELF->vtable->isa_hash);
-            if (parrot_hash_exists(INTERP, SELF->vtable->isa_hash, classname))
+            if (Parrot_hash_exists(INTERP, SELF->vtable->isa_hash, classname))
                 goto found;
         }
 
@@ -1452,9 +1455,11 @@ Returns whether the class is or inherits from C<*class>.
         }
 
     cache_and_return:
-        if (_class->instantiated)
-            parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
+        if (_class->instantiated) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            Parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
                  (void *)retval);
+        }
         return retval;
 
     found:
@@ -1489,8 +1494,8 @@ Returns whether the class is or inherits from C<*classname>.
         else {
             Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
-            INTVAL num_classes = VTABLE_elements(INTERP, _class->all_parents);
-            int    i           = 0;
+            const INTVAL num_classes = VTABLE_elements(INTERP, _class->all_parents);
+            int i;
 
             for (i = 1; i < num_classes; ++i) {
                 PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,

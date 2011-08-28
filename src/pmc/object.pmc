@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -233,6 +233,7 @@ ARGIN(PMC *method))
 
     if (PMC_IS_NULL(cache)) {
         cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PARROT_GC_WRITE_BARRIER(interp, _class);
         SETATTR_Class_meth_cache(interp, _class, cache);
     }
 
@@ -635,27 +636,40 @@ non-zero value if it does.
 =cut
 
 */
+
     VTABLE INTVAL can(STRING *method_name) {
-        /* Just use find_method and see it if finds anything. */
-        const PMC * const method =
-            VTABLE_find_method(INTERP, SELF, method_name);
-        return !PMC_IS_NULL(method);
+        PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
+        return !PMC_IS_NULL(m);
     }
 
 
 /*
 
-=item C<INTVAL isa_pmc(PMC *classname)>
+=item C<INTVAL isa_pmc(PMC *lookup)>
 
-Returns whether the object's class is or inherits from C<*classname>.
+Returns whether the object's class is or inherits from C<lookup>.
 
 =cut
 
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
+        PMC * method = PMCNULL;
+
         if (PMC_IS_NULL(lookup))
             return 0;
+        else {
+            PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+            STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa_pmc");
+            method = Parrot_oo_find_vtable_override(INTERP, classobj,
+                vtable_meth_name);
+        }
+
+        if (!PMC_IS_NULL(method)) {
+            INTVAL result = 0;
+            Parrot_ext_call(INTERP, method, "PiP->I", SELF, lookup, &result);
+            return result;
+        }
 
         if (SUPER(lookup))
             return 1;
@@ -676,13 +690,21 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        if (SELF->vtable->whoami == classname
-        ||  STRING_equal(INTERP, SELF->vtable->whoami, classname))
-            return 1;
-        else {
-            PMC *_class = PARROT_OBJECT(SELF)->_class;
-            return VTABLE_isa(INTERP, _class, classname);
+        PMC * const classobj = VTABLE_get_class(INTERP, SELF);
+        STRING * const vtable_meth_name = CONST_STRING(INTERP, "isa");
+        PMC * const method = Parrot_oo_find_vtable_override(INTERP, classobj,
+                vtable_meth_name);
+
+        if (!PMC_IS_NULL(method)) {
+            INTVAL result = 0;
+            Parrot_ext_call(INTERP, method, "PiS->I", SELF, classname, &result);
+            return result;
         }
+        else if (SELF->vtable->whoami == classname
+                || STRING_equal(INTERP, SELF->vtable->whoami, classname))
+            return 1;
+        else
+            return VTABLE_isa(INTERP, classobj, classname);
     }
 
 
@@ -775,8 +797,8 @@ Invokes the object (if this vtable function is overridden).
                 Parrot_oo_find_vtable_override_for_class(INTERP, cur_class,
                                                          meth_name);
             if (!PMC_IS_NULL(meth)) {
-                /* Experimental code. See DEPRECATED.pod */
-                PMC *call_sig =
+                /* Experimental code. See api.yaml */
+                PMC * const call_sig =
                     Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
 
                 if ((VTABLE_elements(INTERP, call_sig) == 0
@@ -905,65 +927,6 @@ Called after the object has been thawed.
         PObj_is_object_SET(SELF);
     }
 
-
-/*
-
-=item C<PMC * share_ro()>
-
-Used to mark a PMC as read-only shared.
-
-=cut
-
-*/
-    VTABLE PMC *share_ro() {
-        PMC   *ret, *_true, *data;
-        INTVAL i, n;
-        PMC *classobj;
-        Parrot_Interp  master;
-        INTVAL         type_num;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        master = interpreter_array[0];
-        classobj = VTABLE_get_class(INTERP, SELF);
-        type_num = SELF->vtable->base_type;
-
-        /* make sure metadata doesn't go away unexpectedly */
-        if (PMC_metadata(SELF))
-            PMC_metadata(SELF) = pt_shared_fixup(INTERP, PMC_metadata(SELF));
-
-        PARROT_ASSERT(master->vtables[type_num]->pmc_class);
-        /* don't want the referenced class disappearing on us */
-        LOCK_INTERPRETER(master);
-        SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
-        UNLOCK_INTERPRETER(master);
-
-        ret = SELF;
-        /* Setting the '_ro' property switches to the read-only vtable */
-        _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
-        VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
-
-        SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
-        PObj_is_PMC_shared_SET(ret);
-
-        data = PARROT_CLASS(classobj)->parents;
-        n    = VTABLE_elements(INTERP, data);
-
-        for (i = 0; i < n; ++i) {
-            PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP, data, i);
-            VTABLE_set_pmc_keyed_int(INTERP, data, i, VTABLE_share_ro(INTERP, cur_class));
-        }
-
-        /* XXX This is perhaps not the best way to fix this up, but we
-         * need to ensure that the class object won't go away when
-         * this interpreter dies.
-         */
-        PARROT_ASSERT(ret->vtable->pmc_class);
-        PARROT_ASSERT(ret->vtable->share_ro == Parrot_Object_share_ro);
-
-        return ret;
-    }
 
 
 /*

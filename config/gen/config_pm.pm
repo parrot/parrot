@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -71,8 +71,13 @@ sub runstep {
         '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
         ' ' . $conf->data->get('libs') );
 
-    # escape spaces in current directory
     my $cwd = cwd();
+
+    # expand msys virtual paths
+    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd
+        if $conf->data->get('osname') eq 'msys';
+
+    # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;
 
     # Build directory can have non ascii characters
@@ -124,6 +129,10 @@ END
 
     while (<$IN>) {
         if (/\@PCONFIG\@/) {
+
+            print {$OUT} qq(    set \$P0["git_describe"], .PARROT_GIT_DESCRIBE\n);
+            print {$OUT} qq(    set \$P0["sha1"], .PARROT_SHA1\n);
+
             for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
                 next if exists $p5_keys{$k};
                 next if $k =~ /_provisional$/;

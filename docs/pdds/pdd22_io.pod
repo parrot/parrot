@@ -6,9 +6,9 @@
 
 Parrot's I/O subsystem.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 
@@ -224,7 +224,7 @@ the I/O object the same as C<read> does.
 
 On an unopened stream, if a string file path is passed in $S2,
 C<readall> will open a stream on the file, read the contents and close
-it again. 
+it again.
 
 The asynchronous version takes an additional final PMC callback argument
 ($P2 or $P3), and only returns a status object $P0. When the readall operation
@@ -426,11 +426,11 @@ C<buffer_type> setting: unbuffered, line-buffered, or fully-buffered.
 
 =item C<get_bool> (vtable)
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
   unless $P0 goto iter_end
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Returns a boolean value for the iterator, C<true> if there is more data
 to pull from the I/O object, C<false> if the iterator has reached the
@@ -1060,7 +1060,7 @@ comprehensive list of asynchronous I/O implementation options.
 
 =head2 References
 
-F<src/io/core.c>, F<src/ops/io.ops>, F<include/parrot/io.h>, 
+F<src/io/core.c>, F<src/ops/io.ops>, F<include/parrot/io.h>,
 F<runtime/parrot/library/Stream/*>, F<src/io/unix.c>, F<src/io/win32.c>,
 Perl 5's IO::AIO, and POE
 

@@ -28,9 +28,8 @@
 
 # please insert tab separated entries at the top of the list
 
-9.3	2010.11.24	NotFound	move op find_codepoint out of experimental TT #1629
-9.2	2010.11.21	plobsing	remove CodeString PMC
-9.1	2010.10.27	nwellnhof	remove charset ops
+11.0	2011.07.19	jkeenan	released 3.6.0
+10.0	2011.01.18	cotto	released 3.0.0
 9.0	2010.10.19	gerd	released 2.9.0
 8.0	2010.07.20	coke	released 2.6.0
 7.0	2010.04.20	gerd	released 2.3.0 (version # added ex post facto, as all previous version #s were published)

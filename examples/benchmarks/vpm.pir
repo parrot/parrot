@@ -5,7 +5,7 @@
 #
 #use warnings;
 
-.sub main
+.sub main :main
 
 .local string _string
 _string = "just another perl hacker"

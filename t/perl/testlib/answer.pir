@@ -1,5 +1,5 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
-.sub _main
+.sub _main :main
     print "The answer is\n"
     add $I0, 20, 23
     dec $I0

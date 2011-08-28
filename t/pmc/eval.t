@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -25,6 +25,7 @@ Tests on-the-fly PASM, PIR and PAST compilation and invocation.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
+.pcc_sub :main main:
     compreg P1, "PASM"	# get compiler
     set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
     invokecc P1			# compile
@@ -38,10 +39,11 @@ back again
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
+.pcc_sub :main main:
     set S5, ".pcc_sub _foo:\n"
-    concat S5, "print \"foo\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
+    concat S5, S5, "print \"foo\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
@@ -59,14 +61,15 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
+.pcc_sub :main main:
     set S5, ".pcc_sub _foo:\n"
-    concat S5, "print \"foo\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
-    concat S5, ".pcc_sub _bar:\n"
-    concat S5, "print \"bar\\n\"\n"
-    concat S5, "set_returns \"()\"\n"
-    concat S5, "returncc\n"
+    concat S5, S5, "print \"foo\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
+    concat S5, S5, ".pcc_sub _bar:\n"
+    concat S5, S5, "print \"bar\\n\"\n"
+    concat S5, S5, "set_returns \"()\"\n"
+    concat S5, S5, "returncc\n"
     compreg P1, "PASM"
     set_args "0", S5
     invokecc P1
@@ -292,7 +295,7 @@ OUTPUT
 (my $temp2_name = $temp2_pbc) =~ s/\.pbc$//;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "check loaded lib hash" );
-.sub main
+.sub main :main
   load_bytecode "$temp_pbc"
   load_bytecode "$temp2_pbc"
   .local pmc pbc_hash, interp
@@ -501,6 +504,31 @@ EOC
 CODE
 foo
 bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_main method" );
+.sub main :main
+    .local string code
+    .local pmc compi, e, smain
+    code = <<"EOC"
+    .sub notmain
+        say "NOOOO"
+    .end
+    .sub main
+        say "My name is main but I'm not main"
+    .end
+    .sub thisismain :main
+        .param pmc args :optional
+        say "This is main"
+    .end
+EOC
+    compi = compreg "PIR"
+    e = compi(code)
+    smain = e.'get_main'()
+    smain()
+.end
+CODE
+This is main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err" );

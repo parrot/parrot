@@ -6,9 +6,9 @@
 
 This PDD defines Parrot's multiple dispatch system.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 
@@ -166,26 +166,6 @@ The following attributes are used when declaring a MultiSub in PIR.
 
 The C<:multi> attribute marks a subroutine or method as participating in
 multiple dispatch.
-
-=item :invocant
-
-=begin PIR_INVALID
-
-  .sub mymultisub
-  .param pmc first :invocant
-  .end
-
-=end PIR_INVALID
-
-Not all elements of a multi-sub's signature are relevant for the purposes of
-multiple dispatch. The subroutine parameters that participate in dispatch are
-marked with the attribute C<:invocant>, and must be contiguous.
-Subs that are not marked with C<:multi> may not mark parameters with
-C<:invocant>.
-
-{{NOTE: I'm open to other names for the attribute. An English form of the
-Latin I<invocare>, "to call upon", is pretty appropriate to the act of using
-an argument as a selector for multiple dispatch.}}
 
 =back
 

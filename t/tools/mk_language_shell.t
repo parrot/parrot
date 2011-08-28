@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,22 +20,25 @@ use warnings;
 use lib qw(lib);
 
 use Test::More;
+use Carp;
 use IO::File ();
 use Parrot::Config;
 use Parrot::Test;
 use File::Spec::Functions;
 use File::Path qw/rmtree/;
 
-my $exefile;
+my $build_parrot;
 
 BEGIN {
-    $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
-    unless ( -f $exefile ) {
-        plan skip_all => "$exefile hasn't been built yet.";
+    $build_parrot = catfile($PConfig{build_dir}, $PConfig{test_prog} . $PConfig{exe});
+    unless (-e $build_parrot) {
+        plan skip_all => "Parrot binary has not been built yet";
         exit(0);
     }
-    plan tests => 7;
+
 }
+
+plan tests => 7;
 
 output_like(
     "test_parrot_language_$$",
@@ -47,22 +50,31 @@ my $lang_dir = "test_parrot_language_$$";
 my $test_dir = catfile($lang_dir, "t");
 my $src_dir = catfile($lang_dir, "src");
 my $setup = catfile($lang_dir, "setup.pir");
-my $parrot_exe = catfile($PConfig{build_dir}, $PConfig{test_prog});
+my $parrot_exe   = $build_parrot;
 my $to_dev_null = $^O =~ /Win/ ? "1> NUL 2>&1" : ">/dev/null 2>&1";
 ok(-e $lang_dir, "$lang_dir dir exists");
 ok(-e $test_dir, "$test_dir dir exists");
 ok(-e $src_dir, "$src_dir dir exists");
 ok(-s $setup, "$setup exists and has nonzero size");
 
-my $build_status = system("cd $lang_dir && $parrot_exe setup.pir $to_dev_null");
-my $build_error  = $!;
-diag("Faild to execute $parrot_exe setup.pir : $build_error") if $build_status == - 1;
-ok($build_status == 0, "language builds, exit code = " . ($build_status >> 8) );
+SKIP: {
+    my $reason = "tools/dev/mk_language_shell.pl requires installed parrot on Darwin";
+    skip $reason, 2 if (
+        ($PConfig{osname} eq 'darwin') and
+        ($parrot_exe eq $build_parrot)
+    );
+    my $build_status =
+        system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null")
+        and croak "Unable to execute setup.pir";
+    is($build_status, 0,
+        "system call to execute setup.pir completed successfully");
 
-my $test_status = system("cd $lang_dir && $parrot_exe setup.pir test $to_dev_null");
-my $test_error  = $!;
-diag("Faild to execute $parrot_exe setup.pir test: $test_error") if $test_status == - 1;
-ok($test_status == 0, "language passes all tests, exit code = " . ($test_status >> 8) );
+    my $test_status =
+        system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null")
+        and croak "Unable to execute setup.pir test";
+    is($test_status, 0,
+        "system call to execute setup.pir test completed successfully");
+}
 
 =head1 HELPER SUBROUTINES
 
@@ -76,6 +88,7 @@ Runs mk_language_shell with $keys as the argument and verifies the output.
 
 sub output_like {
     my ($options, $snippet, $desc)  = @_;
+    my $exefile = catfile( ".", qw/tools dev mk_language_shell.pl/ );
 
     my $out = `$^X $exefile $options`;
 

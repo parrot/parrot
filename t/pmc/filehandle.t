@@ -1,13 +1,12 @@
 #!perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
-use Parrot::Test::Util 'create_tempfile';
+use Parrot::Test tests => 30;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -219,6 +218,33 @@ ok 1 - $S0 = $P1.read($I2)
 ok 2 - $S0 = $P1.read($I2) # again on same stream
 OUT
 
+pir_output_is(
+    <<'CODE', <<'OUT', 'read_bytes - synchronous' );
+.sub 'test' :main
+    .local pmc fh, bb
+
+    fh = new ['FileHandle']
+    fh.'open'('README')
+
+    bb = fh.'read_bytes'(14)
+    $S0 = bb.'get_string'('ascii')
+    if $S0 == 'This is Parrot' goto ok_1
+    print 'not '
+  ok_1:
+    say 'ok 1 - read_bytes'
+
+    bb = fh.'read_bytes'(9)  # bytes
+    $S0 = bb.'get_string'('utf8')
+    if $S0 == ', version' goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - read_bytes # again on same stream'
+.end
+CODE
+ok 1 - read_bytes
+ok 2 - read_bytes # again on same stream
+OUT
+
 # L<PDD22/I\/O PMC API/=item print>
 pir_output_is( <<"CODE", <<'OUT', 'print - synchronous' );
 .sub 'test' :main
@@ -363,15 +389,47 @@ OUT
 # TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
+pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
 .sub 'test' :main
-    $P0 = new ['FileHandle']
+    \$P0 = new ['FileHandle']
+    \$P0.'open'('$temp_file', 'rw')
 
-    $S0 = $P0.'record_separator'()
-    if $S0 == "\n" goto ok_1
+    \$S0 = \$P0.'record_separator'()
+    if \$S0 == "\\n" goto ok_1
     print 'not '
   ok_1:
-    say 'ok 1 - $S0 = $P1.record_separator() # default'
+    say 'ok 1 - \$S0 = \$P1.record_separator() # default'
+
+    \$S99 = 'a'
+    \$P0.'record_separator'(\$S99)
+    \$S0 = \$P0.'record_separator'()
+    if \$S0 == \$S99 goto ok_2
+    print 'not '
+  ok_2:
+    say 'ok 2 - \$P0.record_separator(\$S1)'
+
+    \$P0.'print'(123)
+    \$S0 = \$P0.'record_separator'()
+    \$P0.'print'(\$S0)
+    \$P0.'print'(456)
+
+    \$P0.'seek'(0, 0)
+    \$S0 = \$P0.'readline'()
+    if \$S0 == '123a' goto ok_3
+    print 'not '
+  ok_3:
+    say 'ok 3 - \$P0.record_separator() # .readline works as expected'
+.end
+CODE
+ok 1 - $S0 = $P1.record_separator() # default
+ok 2 - $P0.record_separator($S1)
+ok 3 - $P0.record_separator() # .readline works as expected
+OUT
+
+# L<PDD22/I\/O PMC API/=item record_separator>
+pir_output_is( <<'CODE', <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented' );
+.sub 'test' :main
+    $P0 = new ['FileHandle']
 
     $S99 = 'abc'
     $P0.'record_separator'($S99)
@@ -379,7 +437,7 @@ pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implement
     if $S0 == $S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - $P0.record_separator($S1)'
+    say 'ok 1 - $P0.record_separator($S1)'
 
     $P0.'print'(123)
     $S0 = $P0.'record_separator'()
@@ -390,12 +448,11 @@ pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implement
     if $S0 == '123abc' goto ok_3
     print 'not '
   ok_3:
-    say 'ok 3 - $P0.record_separator() # .readline works as expected'
+    say 'ok 2 - $P0.record_separator() # .readline works as expected'
 .end
 CODE
-ok 1 - $S0 = $P1.record_separator() # default
-ok 2 - $P0.record_separator($S1)
-ok 3 - $P0.record_separator() # .readline works as expected
+ok 1 - $P0.record_separator($S1)
+ok 2 - $P0.record_separator() # .readline works as expected
 OUT
 
 # L<PDD22/I\/O PMC API/=item buffer_type>
@@ -576,6 +633,33 @@ CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehandle" );
+.sub main :main
+    .local pmc fh,fh_clone
+    .local string line1, line2
+
+    fh = new ['FileHandle']
+    fh.'open'('README')
+
+    line1 = fh.'readline'()
+
+    fh_clone = clone fh
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+
+    fh_clone.'seek'(0, 0)
+    line2 = fh_clone.'readline'()
+
+    $I0 = line1 == line2
+    say $I0
+.end
+CODE
+0
+1
+OUTPUT
+
 pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed filehandle" );
 .sub main :main
     \$S0 = <<"EOS"
@@ -658,7 +742,7 @@ caught reopen
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -675,7 +759,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened filehandle" );
-.sub 'main'
+.sub 'main' :main
     .local pmc ifh
     ifh = new ['FileHandle']
     ifh.'encoding'('utf8')
@@ -694,22 +778,25 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
-.sub 'main'
+.sub 'main' :main
     .local pmc pipe, conf, interp
     .local string cmd
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
 
-    cmd = conf['build_dir']
+    cmd = '"'
 
     .local string aux
+    aux = conf['build_dir']
+    cmd .= aux
     aux = conf['slash']
     cmd .= aux
     aux = conf['test_prog']
     cmd .= aux
     aux = conf['exe']
     cmd .= aux
+    cmd .= '"'
 
     pipe = new ['FileHandle']
     pipe.'open'(cmd, "rp")
@@ -833,6 +920,154 @@ pir_output_is( <<'CODE', <<'OUT', 'get_fd method' );
 .end
 CODE
 -1
+OUT
+
+pir_output_is( <<"CODE", <<'OUT', 'write after buffered read' );
+.sub test :main
+    .local pmc fh
+    .local string str
+    .local int pos
+
+    fh = new 'FileHandle'
+    fh.'open'('$temp_file', 'rw')
+
+    fh.'print'('abcdefghijklmno')
+    fh.'seek'(0, 0)
+
+    fh.'read'(5)
+    fh.'print'('#####')
+
+    pos = fh.'tell'()
+    say pos
+
+    fh.'seek'(0, 0)
+    str = fh.'readall'()
+    say str
+
+    fh.'close'()
+.end
+CODE
+10
+abcde#####klmno
+OUT
+
+pir_output_is( <<"CODE", <<'OUT', 'small reads and seeks' );
+.sub test :main
+    .local pmc fh
+    .local string str
+    .local int pos, i
+
+    fh = new 'FileHandle'
+    fh.'open'('$temp_file', 'rw')
+
+    i = 0
+  print_loop:
+    fh.'print'('abc123')
+    inc i
+    if i < 5000 goto print_loop
+
+    fh.'seek'(1, -24000)
+
+    i = 0
+  read_loop:
+    str = fh.'read'(3)
+    if str == 'abc' goto read_ok
+    print 'not '
+    goto read_done
+  read_ok:
+    fh.'seek'(1, 3)
+    inc i
+    if i < 4000 goto read_loop
+  read_done:
+    say 'ok 1 - read/seek 3 bytes'
+
+    str = fh.'read'(3)
+    if str == '' goto eof_ok
+    print 'not '
+  eof_ok:
+    say 'ok 2 - read/seek eof'
+
+    pos = fh.'tell'()
+    if pos == 30000 goto tell_ok
+    print 'not '
+  tell_ok:
+    say 'ok 3 - read/seek tell'
+
+    fh.'close'()
+.end
+CODE
+ok 1 - read/seek 3 bytes
+ok 2 - read/seek eof
+ok 3 - read/seek tell
+OUT
+
+# The code path we want to test here is a bit hard to trigger
+pir_output_is( <<"CODE", <<'OUT', 'partial multibyte char in buffer' );
+.sub test :main
+    .local pmc fh
+    .local string str, line
+    .local int pos, i
+
+    fh = new 'FileHandle'
+    fh.'open'('$temp_file', 'rw')
+
+    # set a buffer size of 6000 and utf8 encoding
+    fh.'buffer_size'(6000)
+    fh.'encoding'('utf8')
+
+    # write 599 lines, 5990 bytes
+    i = 0
+  print_loop:
+    fh.'print'("123456789\\n")
+    inc i
+    if i < 599 goto print_loop
+
+    # now write a final line with a utf8 character that will be split
+    # across buffers
+    line = utf8:"123456789\\x{2022}"
+    fh.'print'(line)
+
+    str = read_600_lines(fh)
+    i = iseq str, line
+    say i
+
+    str = fh.'readline'()
+    i = length str
+    say i
+
+    # test it again with a different setting
+
+    fh.'seek'(1, -12)
+    line = utf8:"12345678\\x{2022}#############\\n"
+    fh.'print'(line)
+    fh.'print'("####\\n###########\\n")
+
+    str = read_600_lines(fh)
+    i = iseq str, line
+    say i
+
+    fh.'close'()
+.end
+
+.sub read_600_lines
+    .param pmc fh
+    .local int i
+    .local string str
+
+    fh.'seek'(0, 0)
+
+    i = 0
+  read_loop:
+    str = fh.'readline'()
+    inc i
+    if i < 600 goto read_loop
+
+    .return (str)
+.end
+CODE
+1
+0
+1
 OUT
 
 # TT #1178

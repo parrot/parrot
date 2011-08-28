@@ -24,7 +24,7 @@ Tests the BigNum PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 33;
+    plan tests => 45;
 }
 else {
     plan skip_all => "No BigNum PMC enabled";
@@ -72,6 +72,7 @@ if ( $PConfig{gmp} ) {
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "create" );
+.pcc_sub :main main:
    new P0, ['BigNum']
    say "ok"
    end
@@ -80,19 +81,101 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999
    set I1, P0
    say I1
    get_repr S0, P0
    say S0
+
+   new P1, ['BigNum']
+   set P1, 22.2
+   setref P0, P1
+   set N0, P0
+   say N0
    end
 CODE
 999999
 999999N
+22.2
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "set/get keyed string" );
+.pcc_sub :main main:
+    new P0, ['BigNum']
+    set P0, 14
+    set S0, P0[16]
+    say S0
+
+    set P0, 26
+    set S0, P0[8]
+    say S0
+
+    set P0[16], "1F"
+    set S0, P0
+    say S0
+    end
+CODE
+e
+32
+31
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "destroy on copy" );
+.pcc_sub :main main:
+    new P0, ['BigNum']
+    new P1, ['BigNum']
+    set P0, 4183
+    set P1, 33
+    copy P0, P1
+    say P0
+    end
+CODE
+33
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "clone equality" );
+.pcc_sub :main main:
+    .include 'fp_equality.pasm'
+    new P0, ['BigNum']
+    set P0, 56.743
+    clone P1, P0
+    set N0, P0
+    set N1, P1
+    .fp_eq_pasm(N0, N1, OK1)
+    print "not "
+OK1:print "ok\n"
+    end
+CODE
+ok
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "inc/dec" );
+.pcc_sub :main main:
+    .include 'fp_equality.pasm'
+    new P0, ['BigNum']
+    set P0, 5.5
+    inc P0
+    set N0, P0
+    .fp_eq_pasm(N0, 6.5, OK1)
+    print "not "
+OK1:say "ok 1"
+
+    set P0, 5.5
+    dec P0
+    set N0, P0
+    .fp_eq_pasm(N0, 4.5, OK2)
+    print "not "
+OK2:say "ok 2"
+    end
+CODE
+ok 1
+ok 2
 OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
+.pcc_sub :main main:
      .include 'fp_equality.pasm'
      new P0, ['BigNum']
      set P0, 999999
@@ -128,6 +211,7 @@ OUT
 
 my @todo_str = ( todo => "bignum strings");
 pasm_output_is( <<'CODE', <<'OUT', "set double, get str", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 1.23e12
    say P0
@@ -140,6 +224,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add", @todo_str);
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999.5
    new P1, ['BigNum']
@@ -153,13 +238,84 @@ pasm_output_is( <<'CODE', <<'OUT', "add", @todo_str);
    add P2, P1, P0
    set S0, P2
    say S0
+
+   new P1, ['Integer']
+   set P0, 942
+   set P1, -2
+   add P0, P0, P1
+   set S0, P0
+   say S0
+
+   push_eh THROWN
+   new P1, ['BigInt']
+   set P0, 100
+   set P1, 100
+   add P0, P0, P1
+   print "no "
+THROWN:
+   pop_eh
+   say "exception thrown"
    end
 CODE
 2000000
 22345678987654321
+940
+exception thrown
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "i_add", @todo_str );
+.pcc_sub :main main:
+   new P0, ['BigNum']
+   new P1, ['Float']
+   set P0, 400
+   set P1, 3.75
+   add P0, P1
+   set S0, P0
+   say S0
+
+   new P1, ['BigNum']
+   set P0, 300
+   set P1, -200
+   add P0, P1
+   set S0, P0
+   say S0
+
+   new P1, ['Integer']
+   set P0, 300
+   set P1, -250
+   add P0, P1
+   set S0, P0
+   say S0
+
+   push_eh THROWN
+   new P1, ['BigInt']
+   set P1, 3
+   add P0, P1
+   print "no "
+THROWN:
+   say "exception thrown"
+
+   set P0, 200
+   add P0, 5
+   set S0, P0
+   say S0
+
+   set P0, 200
+   add P0, 200.4
+   set S0, P0
+   say S0
+   end
+CODE
+403.75
+100
+50
+exception thrown
+205
+400.4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add_int", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999999
    new P2, ['BigNum']
@@ -177,6 +333,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub bignum" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P1, ['BigNum']
@@ -208,6 +365,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P2, ['BigNum']
@@ -230,6 +388,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, 12345678
      new P1, ['Integer']
@@ -261,15 +420,88 @@ OK3: say "ok 3"
      eq P3, P2, OK4
      print "not "
 OK4: say "ok 4"
+     push_eh THROWN
+     new P1, ['BigInt']
+     set P0, 3
+     set P1, 3
+     sub P0, P0, P1
+     print "not "
+THROWN:
+     say "ok 5"
      end
 CODE
 ok 1
 ok 2
 ok 3
 ok 4
+ok 5
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i_subtract routine with immediate values' );
+.pcc_sub :main main:
+    .include 'fp_equality.pasm'
+    new P0, ['BigNum']
+    new P1, ['BigNum']
+    set P0, 400
+    set P1, 99.5
+    sub P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 300.5, OK1)
+    print "not "
+OK1:say "ok 1"
+
+    new P1, ['Integer']
+    set P0, 100
+    set P1, -50
+    sub P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 150.0, OK2)
+    print "not "
+OK2:say "ok 2"
+
+    new P1, ['Float']
+    set P0, 50
+    set P1, 24.5
+    sub P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 25.5, OK3)
+    print "not "
+OK3:say "ok 3"
+
+    push_eh THROWN
+    new P1, ['BigInt']
+    set P1, 10
+    sub P0, P1
+    print "not "
+THROWN:
+    pop_eh
+    say "ok 4"
+
+    set P0, 40
+    sub P0, 4
+    set N0, P0
+    .fp_eq_pasm(N0, 36.0, OK5)
+    print "not "
+OK5:say "ok 5"
+
+    set P0, 40
+    sub P0, 1.0
+    set N0, P0
+    .fp_eq_pasm(N0, 39.0, OK6)
+    print "not "
+OK6:say "ok 6"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999.999
    new P1, ['BigNum']
@@ -278,12 +510,90 @@ pasm_output_is( <<'CODE', <<'OUT', "mul", @todo_str );
    mul P2, P0, P1
    set S0, P2
    say S0
+
+   new P1, ['Integer']
+   set P0, 444
+   set P1, 2
+   mul P0, P0, P1
+   set S0, P0
+   say S0
+
+   push_eh THROWN
+   new P1, ['BigInt']
+   set P1, 3
+   mul P0, P0, P1
+   print "no "
+THROWN:
+   pop_eh
+   say "exception thrown"
+
+   set P0, 3
+   mul P0, P0, 2
+   set S0, P0
+   say S0
    end
 CODE
 9999.994999995
+888
+exception thrown
+6
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "i_multiply", @todo_str );
+.pcc_sub :main main:
+   new P0, ['BigNum']
+   set P0, 50
+   new P1, ['BigNum']
+   set P1, 2
+   mul P0, P1
+   set S0, P0
+   say S0
+
+   new P1, ['Float']
+   set P0, 3
+   set P1, 5.5
+   mul P0, P1
+   set S0, P0
+   say S0
+
+   new P1, ['Integer']
+   set P0, 2
+   set P1, 4
+   mul P0, P1
+   set S0, P0
+   say S0
+
+   push_eh THROWN
+   new P1, ['BigInt']
+   set P1, 3
+   mul P0, P1
+   print "no "
+THROWN:
+   pop_eh
+   say "exception thrown"
+
+   new P0, ['BigNum']
+   set P0, 3
+   mul P0, 2
+   set S0, P0
+   say S0
+
+   set P0, 2
+   mul P0, 2.5
+   set N0, P0
+   say N0
+   end
+CODE
+100
+16.5
+8
+exception thrown
+6
+5
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul_float", @todo_str);
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, 999.999
    mul P2, P0, 10.000005
@@ -294,6 +604,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div bignum" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -335,6 +646,7 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div native int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -358,6 +670,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div other int" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -385,6 +698,7 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div float" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "100000000000000000000"
      new P1, ['BigNum']
@@ -406,6 +720,211 @@ CODE
 ok 1
 ok 2
 OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "i_divide" );
+.pcc_sub :main main:
+    .include 'fp_equality.pasm'
+    new P0, ['BigNum']
+    new P1, ['BigNum']
+    set P0, 10000000000
+    set P1,  5000000000
+    div P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 2.0, OK1)
+    print "not "
+OK1:say "ok 1"
+
+    new P1, ['Integer']
+    set P0, 10
+    set P1, 4
+    div P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 2.5, OK2)
+    print "not "
+OK2:say "ok 2"
+
+    new P1, ['Float']
+    set P0, 6
+    set P1, 1.5
+    div P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 4.0, OK3)
+    print "not "
+OK3:say "ok 3"
+
+    push_eh THROWN
+    new P1, ['BigInt']
+    set P1, 3
+    div P0, P1
+    print "no "
+THROWN:
+    pop_eh
+    say "exception thrown"
+
+    set P0, 10
+    div P0, -5
+    set N0, P0
+    .fp_eq_pasm(N0, -2.0, OK4)
+    print "not "
+OK4:say "ok 4"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+exception thrown
+ok 4
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "floor_divide", todo => 'undiagnosed bug in floor division; no floor division is actually done.' );
+.pcc_sub :main main:
+    .include 'fp_equality.pasm'
+    new P0, ['BigNum']
+    new P1, ['Integer']
+    set P0, 10
+    set P1, 4
+    fdiv P0, P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 2.0, OK1)
+    print "not "
+OK1:say "ok 1"
+
+    push_eh THROWN
+    new P1, ['Float']
+    set P1, 3.0
+    fdiv P0, P0, P1
+    print "no "
+THROWN:
+    say "exception thrown"
+
+    set P0, 10
+    fdiv P0, P0, -4
+    set N0, P0
+    say N0
+    .fp_eq_pasm(N0, -2.0, OK2)
+    print "not "
+OK2:say "ok 2"
+
+    new P1, ['BigNum']
+    set P0, 10
+    set P1, 4
+    fdiv P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 2.0, OK3)
+    print "not "
+OK3:say "ok 3"
+
+    new P1, ['Integer']
+    set P0, 22
+    set P1, 4
+    fdiv P0, P1
+    set N0, P0
+    .fp_eq_pasm(N0, 5.0, OK4)
+    print "not "
+OK4:say "ok 4"
+
+    push_eh THROWN2
+    new P1, ['Float']
+    set P1, 3.0
+    fdiv P0, P1
+    print "no "
+THROWN2:
+    say "exception thrown"
+
+    set P0, 10
+    fdiv P0, 4
+    set N0, P0
+    .fp_eq_pasm(N0, 2.0, OK5)
+    print "not "
+OK5:say "ok 5"
+    end
+CODE
+ok 1
+exception thrown
+ok 2
+ok 3
+ok 4
+exception thrown
+ok 5
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "equality and comparison" );
+.pcc_sub :main main:
+    new P0, ['BigNum']
+    new P1, ['BigNum']
+    set P0, 3
+    set P1, 5
+    cmp I0, P0, P1
+    say I0
+
+    set P1, 2
+    cmp I0, P0, P1
+    say I0
+
+    set P1, 3
+    cmp I0, P0, P1
+    say I0
+
+    push_eh THROWN1
+    new P1, ['Float']
+    set P1, 3.3
+    iseq I0, P0, P1
+    print "no "
+THROWN1:
+    pop_eh
+    say "exception thrown"
+
+    push_eh THROWN2
+    cmp I0, P0, P1
+    print "no "
+THROWN2:
+    pop_eh
+    say "exception thrown"
+    end
+CODE
+-1
+1
+0
+exception thrown
+exception thrown
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "pow method" );
+.include 'fp_equality.pasm'
+.sub main :main
+    $P0 = new ['BigNum']
+    $P1 = new ['Integer']
+    $P0 = 5
+    $P1 = 3
+    $P0 = $P0.'pow'($P1)
+    $N0 = $P0
+    .fp_eq($N0, 125.0, OK1)
+    print "not "
+OK1:say "ok 1"
+
+    $P0 = 2
+    $P1 = -1
+    $P0 = $P0.'pow'($P1)
+    $N0 = $P0
+    .fp_eq($N0, 0.5, OK2)
+    print "not "
+OK2:say "ok 2"
+
+    $P0 = 2456347674
+    $P1 = 0
+    $P0 = $P0.'pow'($P1)
+    $N0 = $P0
+    .fp_eq($N0, 1, OK3)
+    print "not "
+OK3:say "ok 3"
+.end
+
+CODE
+ok 1
+ok 2
+ok 3
+OUT
+
 
 my @todo_sig = ( todo => "missing signature" );
 for my $op ( "/", "%" ) {
@@ -456,6 +975,7 @@ OUTPUT
     }
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
+    .pcc_sub :main main:
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
@@ -484,6 +1004,7 @@ ok
 OUT
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
+    .pcc_sub :main main:
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
@@ -510,9 +1031,25 @@ $d BigInt
 $e BigInt
 ok
 OUT
+
+    pasm_output_is( <<"CODE", <<'OUT', "set overflow Integer" );
+    .pcc_sub :main main:
+   push_eh THROWN
+   new P0, ['BigNum']
+   set P0, $d
+   set I0, P0
+   print "not "
+THROWN:
+   pop_eh
+   say "ok"
+   end
+CODE
+ok
+OUT
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "abs", @todo_str );
+.pcc_sub :main main:
    new P0, ['BigNum']
    set P0, "-1230000000000"
    new P1, ['Undef']
@@ -530,7 +1067,7 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
-.sub _main
+.sub _main :main
     .local pmc pmc1
     pmc1 = new ['BigNum']
     .local int bool1
@@ -546,6 +1083,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      set P0, "123456789123456789"
      if P0, OK1
@@ -562,6 +1100,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
+.pcc_sub :main main:
      new P0, ['BigNum']
      new P1, ['BigNum']
      set P0, "123456789123456789"
@@ -570,9 +1109,16 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
      eq P0, P1, OK1
      print "not "
 OK1: say "ok 1"
+
+     set P0, "123456789123456789"
+     neg P0, P0
+     eq P0, P1, OK2
+     print "not "
+OK2: say "ok 2"
      end
 CODE
 ok 1
+ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 gt" );

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -233,7 +233,7 @@ static void bigint_set_self(PARROT_INTERP,
 
 static void bigint_set_str(PARROT_INTERP,
     ARGMOD(PMC *self),
-    ARGIN(const char *value),
+    ARGIN(const STRING *value),
     int base)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -433,7 +433,8 @@ bigint_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src))
 {
     ASSERT_ARGS(bigint_set)
 
-    BIGINT *bi_dest, *bi_src;
+    BIGINT *bi_dest;
+    const BIGINT *bi_src;
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     GETATTR_BigInt_bi(interp, src,  bi_src);
     mpz_clear(bi_dest->b);
@@ -444,9 +445,6 @@ bigint_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src))
 /*
 
 =item C<static void bigint_set_long(PARROT_INTERP, PMC *self, long value)>
-
-
-
 
 =cut
 
@@ -484,21 +482,23 @@ bigint_set_double(PARROT_INTERP, ARGMOD(PMC *self), double value)
 
 /*
 
-=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const char *value,
-int base)>
+=item C<static void bigint_set_str(PARROT_INTERP, PMC *self, const STRING
+*value, int base)>
 
 =cut
 
 */
 
 static void
-bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const char *value), int base)
+bigint_set_str(PARROT_INTERP, ARGMOD(PMC *self), ARGIN(const STRING *value), int base)
 {
     ASSERT_ARGS(bigint_set_str)
 
+    char * const s = Parrot_str_to_cstring(interp, value);
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
-    mpz_set_str(bi->b, value, base);
+    mpz_set_str(bi->b, s, base);
+    Parrot_str_free_cstring(s);
 }
 
 /*
@@ -553,7 +553,7 @@ bigint_get_long(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(bigint_get_long)
 
-    BIGINT *bi;
+    const BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     if (mpz_fits_slong_p(bi->b))
         return mpz_get_si(bi->b);
@@ -575,7 +575,7 @@ bigint_get_bool(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(bigint_get_bool)
 
-    BIGINT *bi;
+    const BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     if (mpz_sgn(bi->b) != 0)
         return 1;
@@ -598,7 +598,7 @@ bigint_get_string(PARROT_INTERP, ARGIN(PMC *self), int base)
 {
     ASSERT_ARGS(bigint_get_string)
 
-    BIGINT *bi;
+    const BIGINT *bi;
     size_t  n;
     char   *s;
 
@@ -622,7 +622,7 @@ bigint_get_double(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(bigint_get_double)
 
-    BIGINT *bi;
+    const BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     return mpz_get_d(bi->b);
 }
@@ -642,7 +642,9 @@ bigint_add_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 {
     ASSERT_ARGS(bigint_add_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
@@ -663,7 +665,8 @@ bigint_add_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_add_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     if (value < 0)
@@ -686,7 +689,9 @@ bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 {
     ASSERT_ARGS(bigint_sub_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
@@ -707,7 +712,8 @@ bigint_sub_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_sub_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     if (value < 0)
@@ -730,7 +736,9 @@ bigint_mul_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 {
     ASSERT_ARGS(bigint_mul_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
@@ -751,7 +759,8 @@ bigint_mul_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_mul_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_mul_si(bi_dest->b, bi_self->b, value);
@@ -771,7 +780,8 @@ bigint_pow_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_pow_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_pow_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
@@ -807,7 +817,7 @@ bigint_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
     ASSERT_ARGS(bigint_check_divide_zero)
 
     /* Throw an exception if we are dividing by zero. */
-    BIGINT *bi;
+    const BIGINT *bi;
     GETATTR_BigInt_bi(interp, value, bi);
     if (mpz_cmp_si(bi->b, 0) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -828,7 +838,9 @@ bigint_div_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 {
     ASSERT_ARGS(bigint_div_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     bigint_check_divide_zero(interp, value);
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
@@ -851,7 +863,8 @@ bigint_div_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_div_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
@@ -879,7 +892,9 @@ bigint_fdiv_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *value), ARGMOD(P
 {
     ASSERT_ARGS(bigint_fdiv_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
@@ -901,7 +916,8 @@ bigint_fdiv_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC
 {
     ASSERT_ARGS(bigint_fdiv_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
@@ -928,7 +944,9 @@ bigint_mod_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *value), ARGMOD(PM
 {
     ASSERT_ARGS(bigint_mod_bigint)
 
-    BIGINT *bi_self, *bi_value, *bi_dest;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
@@ -950,7 +968,8 @@ bigint_mod_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 {
     ASSERT_ARGS(bigint_mod_bigint_int)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
@@ -976,7 +995,8 @@ bigint_cmp(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value))
 {
     ASSERT_ARGS(bigint_cmp)
 
-    BIGINT *bi_self, *bi_value;
+    const BIGINT *bi_self;
+    const BIGINT *bi_value;
     GETATTR_BigInt_bi(interp, self,  bi_self);
     GETATTR_BigInt_bi(interp, value, bi_value);
     return mpz_cmp(bi_self->b, bi_value->b);
@@ -996,7 +1016,7 @@ bigint_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value)
 {
     ASSERT_ARGS(bigint_cmp_int)
 
-    BIGINT *bi;
+    const BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     return mpz_cmp_si(bi->b, value);
 }
@@ -1014,7 +1034,8 @@ bigint_abs(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest))
 {
     ASSERT_ARGS(bigint_abs)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_abs(bi_dest->b, bi_self->b);
@@ -1033,7 +1054,8 @@ bigint_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest))
 {
     ASSERT_ARGS(bigint_neg)
 
-    BIGINT *bi_self, *bi_dest;
+    const BIGINT *bi_self;
+    BIGINT *bi_dest;
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_neg(bi_dest->b, bi_self->b);
@@ -1078,7 +1100,7 @@ bigint_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
 }
 
 static void
-bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), char *value, int base) {
+bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int base) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bigint lib loaded");
 }
@@ -1264,7 +1286,7 @@ Return GMP version string "x.y.z".
     }
 
     VTABLE PMC *clone() {
-        PMC *res = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const res = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         bigint_set(INTERP, res, SELF);
         return res;
     }
@@ -1315,15 +1337,11 @@ Same assume number base C<base>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bigint_set_str(INTERP, SELF, s, 10);
-        Parrot_str_free_cstring(s);
+        bigint_set_str(INTERP, SELF, value, 10);
     }
 
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
-        char * const s = Parrot_str_to_cstring(INTERP, value);
-        bigint_set_str(INTERP, SELF, s, base);
-        Parrot_str_free_cstring(s);
+        bigint_set_str(INTERP, SELF, value, base);
     }
 /*
 
@@ -1336,7 +1354,13 @@ Sets the value of the integer to the integer value of C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
+        if (value->vtable->base_type == enum_class_BigInt) {
+            bigint_set_self(INTERP, SELF, bigint_get_self(INTERP, value));
+        }
+        else {
+            const INTVAL i = VTABLE_get_integer(INTERP, value);
+            bigint_set_long(INTERP, SELF, (long)i);
+        }
     }
 
 /*
@@ -1614,14 +1638,13 @@ Decrements the integer.
     METHOD PMC *pow(PMC *value) {
         /* XXX only Integer RHS currently */
         const INTVAL r = VTABLE_get_integer(INTERP, value);
-        PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_pow_bigint_int(INTERP, SELF, r, dest);
         RETURN(PMC *dest);
     }
 
     MULTI PMC *divide(BigInt value, PMC *dest) {
-        BIGINT *bi;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_div_bigint(INTERP, SELF, value, dest);

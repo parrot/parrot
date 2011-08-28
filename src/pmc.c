@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,6 +20,7 @@ The base vtable calling functions
 #include "parrot/parrot.h"
 #include "pmc.str"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_integer.h"
 #include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
@@ -45,11 +46,13 @@ static PMC * get_new_pmc_header(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC* Parrot_pmc_reuse_noinit(PARROT_INTERP,
-    ARGIN(PMC *pmc),
+    ARGMOD(PMC *pmc),
     INTVAL new_type)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 #define ASSERT_ARGS_check_pmc_reuse_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -64,9 +67,7 @@ static PMC* Parrot_pmc_reuse_noinit(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 
-#if PARROT_CATCH_NULL
 PMC * PMCNULL;
-#endif
 
 /*
 
@@ -86,12 +87,7 @@ INTVAL
 Parrot_pmc_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pmc_is_null)
-    /* We can't use PMC_IS_NULL() because that calls us here in some cases */
-#if PARROT_CATCH_NULL
-    return pmc == PMCNULL || pmc == NULL;
-#else
-    return pmc == NULL;
-#endif
+    return (pmc == PMCNULL) || (pmc == NULL);
 }
 
 /*
@@ -152,6 +148,7 @@ PMC *
 Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 {
     ASSERT_ARGS(Parrot_pmc_new)
+    PARROT_ASSERT(interp->n_vtable_max > base_type);
     PARROT_ASSERT(interp->vtables[base_type]);
     {
         PMC *const classobj = interp->vtables[base_type]->pmc_class;
@@ -164,6 +161,45 @@ Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
             return pmc;
         }
     }
+}
+
+/*
+
+=item C<PMC * Parrot_pmc_new_from_type(PARROT_INTERP, PMC *key)>
+
+Creates a new PMC of type C<key>. You probably do not want this function as
+it is only used by a few experimental opcodes. See C<Parrot_pmc_new()> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
+{
+    ASSERT_ARGS(Parrot_pmc_new_from_type)
+
+    PMC *pmc;
+    PMC *const classobj = Parrot_oo_get_class(interp, key);
+
+    if (!PMC_IS_NULL(classobj))
+        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, key);
+
+        if (type <= 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
+                VTABLE_get_repr(interp, key));
+        }
+
+        pmc = Parrot_pmc_new(interp, type);
+    }
+
+    return pmc;
 }
 
 /*
@@ -187,7 +223,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-Parrot_pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, SHIM(UINTVAL flags))
+Parrot_pmc_reuse(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL new_type, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(Parrot_pmc_reuse)
     pmc = Parrot_pmc_reuse_noinit(interp, pmc, new_type);
@@ -220,7 +256,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-Parrot_pmc_reuse_init(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type, ARGIN(PMC *init),
+Parrot_pmc_reuse_init(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL new_type, ARGIN(PMC *init),
           SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(Parrot_pmc_reuse_init)
@@ -245,13 +281,15 @@ Prepare pmc for reuse. Do all scuffolding except initing.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static PMC*
-Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
+Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL new_type)
 {
     ASSERT_ARGS(Parrot_pmc_reuse_noinit)
 
     if (pmc->vtable->base_type != new_type) {
-        VTABLE * const new_vtable = interp->vtables[new_type];
+        const Parrot_UInt gc_flags = pmc->flags & PObj_GC_all_FLAGS;
+        VTABLE * const new_vtable  = interp->vtables[new_type];
 
         /* Singleton/const PMCs/types are not eligible */
         check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
@@ -259,7 +297,14 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type)
         /* Free the old PMC resources. */
         Parrot_pmc_destroy(interp, pmc);
 
-        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG);
+        /*
+         * We can reuse PMC from older generation. Preserve and soil it.
+         *
+         * FIXME It's abstraction leak. And it's really strange idea of reusing
+         * PMCs...
+         */
+        PObj_flags_SETTO(pmc, PObj_is_PMC_FLAG | gc_flags);
+        PARROT_GC_WRITE_BARRIER(interp, pmc);
 
         /* Set the right vtable */
         pmc->vtable = new_vtable;
@@ -781,11 +826,114 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
             if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;
             else
-                return VTABLE_get_integer(interp, item);
+                return PARROT_INTEGER(item)->iv;
         }
         else
-            return Parrot_dt_get_datatype_enum(interp, name);
+            return -Parrot_dt_get_datatype_enum(interp, name);
     }
+}
+
+
+/*
+
+=item C<PMC * Parrot_pmc_box_string(PARROT_INTERP, STRING *string)>
+
+Boxes a STRING C<string> into a String PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
+{
+    ASSERT_ARGS(Parrot_pmc_box_string)
+    PMC * const ret = Parrot_pmc_new(interp,
+                        Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
+    VTABLE_set_string_native(interp, ret, string);
+
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)>
+
+Lookup the PMC type which is used for floating point numbers.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_number(PARROT_INTERP, FLOATVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_number)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Float));
+    VTABLE_set_number_native(interp, ret, value);
+    return ret;
+}
+
+
+/*
+
+=item C<PMC* Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)>
+
+Lookup the PMC type which is used for storing native integers.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_HOT
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_pmc_box_integer(PARROT_INTERP, INTVAL value)
+{
+    ASSERT_ARGS(Parrot_pmc_box_integer)
+    PMC * const ret = Parrot_pmc_new(interp,
+                                     Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
+    VTABLE_set_integer_native(interp, ret, value);
+    return ret;
+}
+
+/*
+
+=item C<PMC * Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, const char
+**s)>
+
+Take a C string array and a count, and box it into a string array PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_box_c_string_array(PARROT_INTERP, int count, ARGIN(const char **s))
+{
+    ASSERT_ARGS(Parrot_pmc_box_c_string_array)
+    PMC * const s_pmc = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+
+    if (s != NULL && count > 0) {
+        Parrot_Int i = 0;
+        for (; i < count; ++i) {
+            /* Run through argv, adding everything to the array */
+            STRING * const item = Parrot_str_from_platform_cstring(interp, s[i]);
+            VTABLE_push_string(interp, s_pmc, item);
+        }
+    }
+    return s_pmc;
 }
 
 
@@ -847,7 +995,6 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
     &&  (_class == _class->vtable->pmc_class))
         interp->vtables[type]->pmc_class = _class;
     else {
-        gc_flag_CLEAR(is_special_PMC, _class);
         PObj_is_PMC_shared_CLEAR(_class);
         interp->vtables[type]->pmc_class = _class;
     }
@@ -974,7 +1121,8 @@ Parrot_pmc_gc_unregister(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, STRING *role, INTVAL type)>
+=item C<INTVAL Parrot_pmc_type_does(PARROT_INTERP, const STRING *role, INTVAL
+type)>
 
 Checks to see if PMCs of the given type does the given role. Checks
 C<<vtable->provides_str>> to find a match.
@@ -985,7 +1133,7 @@ Returns true (1) if B<role> is found, false (0) otherwise.
 */
 
 INTVAL
-Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
+Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 {
     ASSERT_ARGS(Parrot_pmc_type_does)
 
@@ -1024,10 +1172,8 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(STRING *role), INTVAL type)
 
 =head1 SEE ALSO
 
-F<include/parrot/vtable.h>.
-
-C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
-(http://www.nntp.perl.org/group/perl.perl6.internals/5516).
+F<include/parrot/pmc.h>, F<include/parrot/vtable.h>,
+L<http://www.nntp.perl.org/group/perl.perl6.internals/2001/10/msg5516.html>
 
 =cut
 

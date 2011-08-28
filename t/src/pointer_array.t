@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -9,14 +9,19 @@ use lib qw(. lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
+
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 =head1 NAME
 
-t/src/atomic.t - Parrot Atomic operations
+t/src/atomic.t - Parrot pointer array operations
 
 =head1 SYNPOSIS
 
-    % prove t/src/atomic.t
+    % prove t/src/pointer_array.t
 
 =head1 DESCRIPTION
 

@@ -220,7 +220,7 @@ sub _generate_pir_for {
         $captures = "";
     }
     return qq(
-        .sub _PGE_Test
+        .sub _PGE_Test :main
             .local pmc p6rule_compile
             load_bytecode "PGE.pbc"
             load_bytecode "PGE/Dumper.pir"
@@ -255,7 +255,7 @@ sub _generate_pir_catch_for {
     my ($pattern) = @_;
     $pattern = _parrot_stringify($pattern);
     return qq(
-        .sub _PGE_Test
+        .sub _PGE_Test :main
             .local pmc p6rule_compile
             load_bytecode "PGE.pbc"
             load_bytecode "PGE/Dumper.pir"
@@ -290,7 +290,7 @@ sub _generate_subrule_pir {
 
     # Beginning of the pir code
     my $pirCode = qq(
-        .sub _PGE_Test
+        .sub _PGE_Test :main
             .local pmc p6rule_compile
             load_bytecode "PGE.pbc"
             p6rule_compile = compreg "PGE::Perl6Regex"
@@ -340,7 +340,7 @@ sub _generate_glob_for {
     $target  = _parrot_stringify($target);
     $pattern = _parrot_stringify($pattern);
     return qq(
-        .sub _PGE_Test
+        .sub _PGE_Test :main
             .local pmc glob_compile
             load_bytecode "PGE.pbc"
             load_bytecode "PGE/Glob.pbc"

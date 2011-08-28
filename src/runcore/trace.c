@@ -212,10 +212,6 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
               len += Parrot_io_eprintf(debugger, "%vi",
                  VTABLE_get_integer(interp, key));
             break;
-          case KEY_number_FLAG:
-              len += Parrot_io_eprintf(debugger, "%vg",
-                  VTABLE_get_number(interp, key));
-            break;
           case KEY_string_FLAG:
             {
             const STRING * const s = Parrot_key_string(interp, key);
@@ -231,11 +227,6 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
               len += Parrot_io_eprintf(debugger, "I%vd=%vd",
                   VTABLE_get_integer(interp, key),
                     REG_INT(interp, VTABLE_get_integer(interp, key)));
-            break;
-          case KEY_number_FLAG|KEY_register_FLAG:
-              len += Parrot_io_eprintf(debugger, "I%vd=%vd",
-                  VTABLE_get_integer(interp, key),
-                    REG_NUM(interp, VTABLE_get_integer(interp, key)));
             break;
           case KEY_string_FLAG|KEY_register_FLAG:
             {

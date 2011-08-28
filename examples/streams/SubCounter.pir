@@ -13,7 +13,7 @@ Creates a C<Stream::Sub> and dumps it.
 
 =cut
 
-.sub _main
+.sub _main :main
     .local pmc stream
 
     load_bytecode 'Stream/Base.pbc'

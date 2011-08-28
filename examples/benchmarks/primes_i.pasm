@@ -15,6 +15,8 @@ of primes, the last one found, and the time taken.
 
 =cut
 
+.pcc_sub :main main:
+
 # I1 holds the number we're currently checking for primality
 	set     I1, 1
 	# I2 holds the highest number we want to check for primality

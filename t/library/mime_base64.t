@@ -341,11 +341,11 @@ END_JSON
         base64      = shift test_case
         comment     = 'encode'
         comment_count = count
-        concat comment, comment_count
+        comment = concat comment, comment_count
         test_encode( plain, base64, comment )
         comment     = 'decode'
         comment_count = count
-        concat comment, comment_count
+        comment = concat comment, comment_count
         test_decode( plain, base64, comment )
         inc count
     goto enc_dec_loop
@@ -360,7 +360,7 @@ END_JSON
         plain       = shift test_case
         comment     = 'decode'
         comment_count = count
-        concat comment, comment_count
+        comment = concat comment, comment_count
         test_decode( plain, base64, comment )
         inc count
     goto dec_loop

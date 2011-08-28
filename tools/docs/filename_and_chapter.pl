@@ -96,7 +96,7 @@ close( $TEX_FH );
 
 
 sub write_mod {
-    my $upper_bound = 6;
+    my $upper_bound = 5;
 
     open( my $IN_FH, '<', $item_list_ref->[$_[0]][0] ) or
         die "$0: can't open $item_list_ref->[$_[0]][0] for reading ($!)\n";
@@ -104,11 +104,11 @@ sub write_mod {
         die "$0: can't open ${MOD_BUILD_PATH}$item_list_ref->[$_[0]][0]: $!\n";
 
     # change the upper bound for the file running.pod
-    $upper_bound = 14 if $_[0] == 3;
+    $upper_bound = 9 if $_[0] == 3;
 
     # do the same as: sed -e '4,6c\=head0 $item_list_ref->[$i][1]'
     while( <$IN_FH> ) {
-        if ( ($. < 4) || ($. > $upper_bound) ) {
+        if ( ($. < 3) || ($. > $upper_bound) ) {
             print $OUT_FH $_
         }
         else {

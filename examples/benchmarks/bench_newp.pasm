@@ -33,6 +33,7 @@ prints out some statistics indicating:
 
 =cut
 
+.pcc_sub :main main:
 	set I2, 1000
 	set I3, 1000
 	set I0, I2

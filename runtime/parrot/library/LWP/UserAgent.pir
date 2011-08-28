@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,8 +6,8 @@ LWP - The World-Wide Web library for Parrot
 
 =head2 DESCRIPTION
 
-Simplified port of LWP (version 5.834)
-see http://search.cpan.org/~gaas/libwww-perl/
+Simplified port of LWP::UserAgent (version 5.834)
+see http://search.cpan.org/dist/libwww-perl/
 
 =head3 Class LWP;UserAgent
 

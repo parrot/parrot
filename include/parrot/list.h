@@ -96,7 +96,7 @@ do {                                        \
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_list_append(SHIM_INTERP,
+void Parrot_list_append(PARROT_INTERP,
     ARGMOD(Linked_List *list),
     ARGMOD(List_Item_Header *item))
         __attribute__nonnull__(2)
@@ -105,34 +105,35 @@ void Parrot_list_append(SHIM_INTERP,
         FUNC_MODIFIES(*item);
 
 PARROT_EXPORT
-INTVAL Parrot_list_check(SHIM_INTERP, ARGIN(Linked_List *list))
+PARROT_CONST_FUNCTION
+INTVAL Parrot_list_check(PARROT_INTERP, ARGIN(const Linked_List *list))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_list_contains(SHIM_INTERP,
-    ARGIN(Linked_List *list),
-    ARGIN(List_Item_Header *item))
+PARROT_PURE_FUNCTION
+INTVAL Parrot_list_contains(PARROT_INTERP,
+    ARGIN(const Linked_List *list),
+    ARGIN(const List_Item_Header *item))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_list_destroy(SHIM_INTERP, ARGMOD(Linked_List* list))
+void Parrot_list_destroy(PARROT_INTERP, ARGMOD(Linked_List* list))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* list);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-struct Linked_List* Parrot_list_new(SHIM_INTERP);
+struct Linked_List* Parrot_list_new(PARROT_INTERP);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 List_Item_Header* Parrot_list_pop(PARROT_INTERP, ARGIN(Linked_List *list))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-List_Item_Header* Parrot_list_remove(SHIM_INTERP,
+List_Item_Header* Parrot_list_remove(PARROT_INTERP,
     ARGMOD(Linked_List *list),
     ARGMOD(List_Item_Header *item))
         __attribute__nonnull__(2)
@@ -152,8 +153,7 @@ List_Item_Header* Parrot_list_remove(SHIM_INTERP,
        PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_Parrot_list_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_list_pop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(list))
+       PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_Parrot_list_remove __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(list) \
     , PARROT_ASSERT_ARG(item))

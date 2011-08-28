@@ -19,7 +19,6 @@
 #include "parrot/compiler.h"
 #include "parrot/pobj.h"
 #include "parrot/cclass.h"
-#include "parrot/parrot.h"
 
 #define STREQ(x, y)  (strcmp((x), (y))==0)
 #define STRNEQ(x, y) (strcmp((x), (y))!=0)
@@ -80,6 +79,12 @@ typedef struct string_iterator_t {
     UINTVAL charpos;
 } String_iter;
 
+typedef struct _Parrot_String_Bounds {
+    UINTVAL bytes;
+    INTVAL  chars;
+    INTVAL  delim;
+} Parrot_String_Bounds;
+
 /* constructors */
 typedef STRING * (*str_vtable_to_encoding_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_chr_t)(PARROT_INTERP, UINTVAL codepoint);
@@ -90,7 +95,8 @@ typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), 
 typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 
-typedef UINTVAL  (*str_vtable_scan_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef void     (*str_vtable_scan_t)(PARROT_INTERP, ARGMOD(STRING *src));
+typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds));
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
 typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL count);
 
@@ -113,15 +119,20 @@ typedef STRING * (*str_vtable_downcase_first_t)(PARROT_INTERP, ARGIN(const STRIN
 typedef STRING * (*str_vtable_titlecase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 
 /* iterator functions */
-typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, const STRING *str, const String_iter *i, INTVAL offset);
-typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, const STRING *str, String_iter *i, INTVAL skip);
-typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP, const STRING *str, String_iter *i);
-typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, STRING *str, String_iter *i, UINTVAL c);
+typedef UINTVAL  (*str_vtable_iter_get_t)(PARROT_INTERP, ARGIN(const STRING *str),
+                    ARGIN(const String_iter *i), INTVAL offset);
+typedef void     (*str_vtable_iter_skip_t)(PARROT_INTERP, ARGIN(const STRING *str),
+                    ARGIN(String_iter *i), INTVAL skip);
+typedef UINTVAL  (*str_vtable_iter_get_and_advance_t)(PARROT_INTERP,
+                    ARGIN(const STRING *str), ARGMOD(String_iter *i));
+typedef void     (*str_vtable_iter_set_and_advance_t)(PARROT_INTERP, ARGIN(STRING *str),
+                    ARGMOD(String_iter *i), UINTVAL c);
 
 struct _str_vtable {
     int         num;
     const char *name;
     STRING     *name_str;
+    UINTVAL     bytes_per_unit;
     UINTVAL     max_bytes_per_codepoint;
 
     str_vtable_to_encoding_t            to_encoding;
@@ -134,6 +145,7 @@ struct _str_vtable {
     str_vtable_hash_t                   hash;
 
     str_vtable_scan_t                   scan;
+    str_vtable_partial_scan_t           partial_scan;
     str_vtable_ord_t                    ord;
     str_vtable_substr_t                 substr;
 

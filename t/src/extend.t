@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -10,8 +10,13 @@ use Parrot::Test::Util 'create_tempfile';
 
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
 
-plan tests => 18;
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 24;
 
 =head1 NAME
 
@@ -27,8 +32,63 @@ Tests the extension API.
 
 =cut
 
-c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
+sub linedirective
+{
+    # Provide a #line directive for the C code in the heredoc
+    # starting immediately after where this sub is called.
+    my $linenum = shift() + 1;
+    return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
+}
 
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    pmcnull;
+
+    /* Interpreter set-up */
+    if (interp) {
+        pmcnull  = Parrot_PMC_null();
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+OUTPUT
+
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)register_pmc' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    ns;
+
+    /* Interpreter set-up */
+    if (interp) {
+        ns  = Parrot_get_root_namespace(interp);
+        Parrot_register_pmc(interp, ns);
+        Parrot_unregister_pmc(interp, ns);
+
+        Parrot_printf(interp,"%P\n", ns);
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
 #include <stdio.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
@@ -53,6 +113,49 @@ main(int argc, const char *argv[])
 }
 
 CODE
+42
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_fprintf');
+#include <stdio.h>
+// This is to get Parrot_io_STDOUT, is there a better way?
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_PMC pio;
+    Parrot_Interp interp  = Parrot_new(NULL);
+    pio = Parrot_io_STDOUT(interp);
+
+    /* Interpreter set-up */
+    if (interp) {
+        Parrot_fprintf(interp, pio,"42\n");
+    }
+    return 0;
+}
+
+CODE
+42
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf/Parrot_eprintf with no interp');
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_printf(NULL,"42\n");
+    Parrot_eprintf(NULL,"42\n");
+    return 0;
+}
+
+CODE
+42
 42
 OUTPUT
 
@@ -96,7 +199,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_String output;
+    Parrot_String output, output2;
 
     /* Interpreter set-up */
     if (interp) {
@@ -110,6 +213,36 @@ main(int argc, const char *argv[])
 
 CODE
 Test
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string/Parrot_(un)register_string' );
+
+#include <stdio.h>
+	#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_String output, output2;
+
+    /* Interpreter set-up */
+    if (interp) {
+        output = Parrot_new_string(interp, "Test_reg_unreg", 14, "iso-8859-1", 0);
+
+        Parrot_register_string(interp, output);
+        Parrot_unregister_string(interp, output);
+
+        Parrot_eprintf(interp, "%S\n", output);
+
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+
+CODE
+Test_reg_unreg
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
@@ -174,29 +307,62 @@ CODE
 101010
 OUTPUT
 
+c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, string;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = new_interp();
+
+    string = createstring(interp, "PIR");
+    str    = Parrot_str_to_cstring(interp, string);
+
+    Parrot_free_cstring(str);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+OUTPUT
+
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-
-static opcode_t*
-the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
-{
-    Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
-    Parrot_PMC array = Parrot_PMC_new(interp, type);
-    Parrot_Int value = 12345;
-    Parrot_Int key   = 10;
-    Parrot_Int new_value;
-
-    Parrot_PMC_set_integer_keyed_int(interp, array, key, value);
-
-    new_value = Parrot_PMC_get_integer_keyed_int(interp, array, key);
-
-    printf("%ld\n", (long)new_value);
-    return NULL;
-}
 
 int
 main(int argc, const char *argv[])
@@ -205,8 +371,17 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        Parrot_run_native(interp, the_test);
+        Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
+        Parrot_PMC array = Parrot_PMC_new(interp, type);
+        Parrot_Int value = 12345;
+        Parrot_Int key   = 10;
+        Parrot_Int new_value;
 
+        Parrot_PMC_set_integer_keyed_int(interp, array, key, value);
+
+        new_value = Parrot_PMC_get_integer_keyed_int(interp, array, key);
+
+        printf("%ld\n", (long)new_value);
         Parrot_destroy(interp);
     }
     return 0;
@@ -346,51 +521,41 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
 #include <parrot/embed.h>
 #include <parrot/extend.h>
 
-static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
 
 int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
+        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
+        PMC            *sub, *arg;
 
-        Parrot_run_native(interp, the_test);
+        Parrot_pbc_load(interp, pf);
+        sub = Parrot_ns_find_current_namespace_global(interp, name);
+        Parrot_ext_call(interp, sub, "->");
+        Parrot_eprintf(interp, "back\\n");
+
+        /* win32 seems to buffer stderr ? */
+        Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
+
+        name = Parrot_str_new_constant(interp, "_sub2");
+        sub  = Parrot_ns_find_current_namespace_global(interp, name);
+        arg  = Parrot_pmc_new(interp, enum_class_String);
+
+        Parrot_PMC_set_string_native(interp, arg,
+                     Parrot_str_new(interp, "hello ", 0));
+
+        Parrot_ext_call(interp, sub, "P->", arg);
+        Parrot_eprintf(interp, "back\\n");
 
         Parrot_destroy(interp);
     }
     return 0;
 }
 
-/* also both the test PASM and the_test() print to stderr
- * so that buffering in PIO is not an issue */
-
-static opcode_t*
-the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
-{
-    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
-    PMC           *sub, *arg;
-
-    Parrot_pbc_load(interp, pf);
-    sub = Parrot_ns_find_current_namespace_global(interp, name);
-    Parrot_ext_call(interp, sub, "->");
-    Parrot_eprintf(interp, "back\\n");
-
-    /* win32 seems to buffer stderr ? */
-    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
-
-    name = Parrot_str_new_constant(interp, "_sub2");
-    sub  = Parrot_ns_find_current_namespace_global(interp, name);
-    arg  = Parrot_pmc_new(interp, enum_class_String);
-
-    Parrot_PMC_set_string_native(interp, arg,
-                 Parrot_str_new(interp, "hello ", 0));
-
-    Parrot_ext_call(interp, sub, "P->", arg);
-    Parrot_eprintf(interp, "back\\n");
-
-    return NULL;
-}
 CODE
 in sub1
 back
@@ -404,50 +569,41 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub using the unified interfac
 #include <parrot/embed.h>
 #include <parrot/extend.h>
 
-static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
 
 int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_run_native(interp, the_test);
+        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
+        PMC            *sub, *arg;
+
+        Parrot_pbc_load(interp, pf);
+        sub = Parrot_ns_find_current_namespace_global(interp, name);
+        Parrot_ext_call(interp, sub, "->");
+        Parrot_eprintf(interp, "back\\n");
+
+        /* win32 seems to buffer stderr ? */
+        Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
+
+        name = Parrot_str_new_constant(interp, "_sub2");
+        sub  = Parrot_ns_find_current_namespace_global(interp, name);
+        arg  = Parrot_pmc_new(interp, enum_class_String);
+
+        Parrot_PMC_set_string_native(interp, arg,
+                     Parrot_str_new(interp, "hello ", 0));
+
+        Parrot_ext_call(interp, sub, "P->", arg);
+        Parrot_eprintf(interp, "back\\n");
 
         Parrot_destroy(interp);
     }
     return 0;
 }
 
-/* also both the test PASM and the_test() print to stderr
- * so that buffering in PIO is not an issue */
-
-static opcode_t*
-the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
-{
-    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
-    PMC           *sub, *arg;
-
-    Parrot_pbc_load(interp, pf);
-    sub = Parrot_ns_find_current_namespace_global(interp, name);
-    Parrot_ext_call(interp, sub, "->");
-    Parrot_eprintf(interp, "back\\n");
-
-    /* win32 seems to buffer stderr ? */
-    Parrot_io_flush(interp, Parrot_io_STDERR(interp));
-
-    name = Parrot_str_new_constant(interp, "_sub2");
-    sub  = Parrot_ns_find_current_namespace_global(interp, name);
-    arg  = Parrot_pmc_new(interp, enum_class_String);
-
-    Parrot_PMC_set_string_native(interp, arg,
-                 Parrot_str_new(interp, "hello ", 0));
-
-    Parrot_ext_call(interp, sub, "P->", arg);
-    Parrot_eprintf(interp, "back\\n");
-
-    return NULL;
-}
 CODE
 in sub1
 back
@@ -479,44 +635,35 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub and return an integer' );
 #include <parrot/embed.h>
 #include <parrot/extend.h>
 
-static opcode_t *the_test(Parrot_Interp, opcode_t *, opcode_t *);
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
 
 int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_run_native(interp, the_test);
+        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   name = Parrot_str_new_constant(interp, "foo");
+        PMC            *sub, *arg;
+        Parrot_Int      result;
+
+        Parrot_pbc_load(interp, pf);
+        sub  = Parrot_ns_find_current_namespace_global(interp, name);
+        arg  = Parrot_pmc_new(interp, enum_class_String);
+
+        Parrot_PMC_set_string_native(interp, arg,
+                Parrot_str_new(interp, "hello ", 0));
+
+        Parrot_ext_call(interp, sub, "P->I", arg, &result);
+        Parrot_eprintf(interp, "result %d\\n", result);
+        Parrot_eprintf(interp, "back\\n");
 
         Parrot_destroy(interp);
     }
     return 0;
 }
 
-/* also both the test PASM and the_test() print to stderr
- * so that buffering in PIO is not an issue */
-
-static opcode_t*
-the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
-{
-    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String  name = Parrot_str_new_constant(interp, "foo");
-    PMC           *sub, *arg;
-    Parrot_Int     result;
-
-    Parrot_pbc_load(interp, pf);
-    sub  = Parrot_ns_find_current_namespace_global(interp, name);
-    arg  = Parrot_pmc_new(interp, enum_class_String);
-
-    Parrot_PMC_set_string_native(interp, arg,
-                 Parrot_str_new(interp, "hello ", 0));
-
-    Parrot_ext_call(interp, sub, "P->I", arg, &result);
-    Parrot_eprintf(interp, "result %d\\n", result);
-    Parrot_eprintf(interp, "back\\n");
-
-    return NULL;
-}
 CODE
 hello in sub2
 result 42
@@ -545,50 +692,40 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub, catch exception' );
 #include <parrot/embed.h>
 #include <parrot/extend.h>
 
-static opcode_t *
-the_test(Parrot_Interp, opcode_t *, opcode_t *);
+/* also both the test PASM and the_test() print to stderr
+ * so that buffering in PIO is not an issue */
 
 int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_run_native(interp, the_test);
+        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
+        PMC            *sub;
+        Parrot_runloop  jump_point;
+
+        Parrot_pbc_load(interp, pf);
+        sub = Parrot_ns_find_current_namespace_global(interp, name);
+
+        if (setjmp(jump_point.resume)) {
+            Parrot_eprintf(interp, "caught\\n");
+        }
+        else {
+            /* pretend the EH was pushed by the sub call. */
+            interp->current_runloop_id++;
+
+            Parrot_ex_add_c_handler(interp, &jump_point);
+            Parrot_ext_call(interp, sub, "->");
+        }
+
+        Parrot_eprintf(interp, "back\\n");
 
         Parrot_destroy(interp);
     }
     return 0;
 }
 
-/* also both the test PASM and the_test() print to stderr
- * so that buffering in PIO is not an issue */
-
-static opcode_t*
-the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
-{
-    PackFile      *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
-    Parrot_String  name = Parrot_str_new_constant(interp, "_sub1");
-    PMC           *sub;
-    Parrot_runloop jump_point;
-
-    Parrot_pbc_load(interp, pf);
-    sub = Parrot_ns_find_current_namespace_global(interp, name);
-
-    if (setjmp(jump_point.resume)) {
-        Parrot_eprintf(interp, "caught\\n");
-    }
-    else {
-        /* pretend the EH was pushed by the sub call. */
-        interp->current_runloop_id++;
-
-        Parrot_ex_add_c_handler(interp, &jump_point);
-        Parrot_ext_call(interp, sub, "->");
-    }
-
-    Parrot_eprintf(interp, "back\\n");
-
-    return NULL;
-}
 CODE
 in sub1
 caught
@@ -637,7 +774,7 @@ close $TEMP;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
-c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669' );
+c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -665,7 +802,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986' );
+c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986', todo => "Must explicitly set a PIR compreg" );
 
 #include <parrot/parrot.h>
 #include <parrot/embed.h>
@@ -675,7 +812,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp   interp    = Parrot_new(NULL);
-    const char      *code      = ".sub foo\nprint\"Hello from foo!\\n\"\n.end\n";
+    const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
     Parrot_String   code_type, error, foo_name;

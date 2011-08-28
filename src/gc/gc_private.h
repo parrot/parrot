@@ -46,6 +46,10 @@ extern void *flush_reg_store(void);
 
 #define POOL_MAX_BYTES                         65536 * 128
 #define GC_SIZE_THRESHOLD                      1024  * 1024
+#define GC_DEFAULT_DYNAMIC_THRESHOLD           75
+#define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
+/* promills of system memory */
+#define GC_DEFAULT_NURSERY_SIZE                2
 
 #define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
 #define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
@@ -77,14 +81,6 @@ typedef struct GC_MS_PObj_Wrapper {
     struct GC_MS_PObj_Wrapper * next_ptr;
 } GC_MS_PObj_Wrapper;
 
-
-typedef enum _gc_sys_type_enum {
-    MS,  /* mark and sweep */
-    INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2
-} gc_sys_type_enum;
-
 /* how often to skip a full GC when this pool has nothing free */
 typedef enum _gc_skip_type_enum {
     GC_NO_SKIP = 0,
@@ -102,11 +98,13 @@ typedef struct GC_Statistics {
     size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last
-                                                 * compaction run */
+                                                 * compaction run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  header_allocs_since_last_collect;   /* The size of header
                                                  * blocks allocated from
                                                  * the system since the last
-                                                 * GC run */
+                                                 * GC run.
+                                                 * UNUSED, ALWAYS 0 */
     size_t  memory_allocated;     /* The total amount of memory allocated
                                    * in fixed and variable size pools.
                                    * Doesn't count memory for internal
@@ -135,48 +133,48 @@ typedef struct GC_Subsystem {
 
     /** Function hooks that each subsystem MUST provide */
     void (*finalize_gc_system) (PARROT_INTERP);
-    void (*destroy_child_interp)(Interp *dest_interp, Interp *child_interp);
+    void (*destroy_child_interp)(ARGMOD(Interp *dest_interp), ARGIN(Interp *child_interp));
 
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*compact_string_pool)(PARROT_INTERP);
 
-    void (*mark_special)(PARROT_INTERP, PMC *);
-    void (*pmc_needs_early_collection)(PARROT_INTERP, PMC *);
+    void (*mark_special)(PARROT_INTERP, ARGMOD(PMC *pmc));
+    void (*pmc_needs_early_collection)(PARROT_INTERP, ARGMOD(PMC *));
 
-    void (*init_pool)(PARROT_INTERP, struct Fixed_Size_Pool *);
+    void (*init_pool)(PARROT_INTERP, ARGMOD(struct Fixed_Size_Pool *));
 
     PMC* (*allocate_pmc_header)(PARROT_INTERP, UINTVAL flags);
-    void (*free_pmc_header)(PARROT_INTERP, PMC *);
+    void (*free_pmc_header)(PARROT_INTERP, ARGFREE(PMC *));
 
     STRING* (*allocate_string_header)(PARROT_INTERP, UINTVAL flags);
-    void    (*free_string_header)(PARROT_INTERP, STRING*);
+    void    (*free_string_header)(PARROT_INTERP, ARGFREE(STRING *));
 
     Buffer* (*allocate_bufferlike_header)(PARROT_INTERP, size_t size);
-    void    (*free_bufferlike_header)(PARROT_INTERP, Buffer*, size_t size);
+    void    (*free_bufferlike_header)(PARROT_INTERP, ARGFREE(Buffer *), size_t size);
 
-    int  (*is_pmc_ptr)(PARROT_INTERP, void*);
-    int  (*is_string_ptr)(PARROT_INTERP, void*);
-    void (*mark_pobj_header)(PARROT_INTERP, PObj*);
-    void (*mark_pmc_header)(PARROT_INTERP, PMC *);
+    int  (*is_pmc_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
+    int  (*is_string_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
+    void (*mark_str_header)(PARROT_INTERP, ARGMOD(STRING *));
+    void (*mark_pmc_header)(PARROT_INTERP, ARGMOD(PMC *));
 
-    void* (*allocate_pmc_attributes)(PARROT_INTERP, PMC *);
-    void (*free_pmc_attributes)(PARROT_INTERP, PMC *);
+    void* (*allocate_pmc_attributes)(PARROT_INTERP, ARGMOD(PMC *));
+    void (*free_pmc_attributes)(PARROT_INTERP, ARGFREE(PMC *));
 
-    void (*allocate_string_storage)(PARROT_INTERP, STRING *str, size_t size);
-    void (*reallocate_string_storage)(PARROT_INTERP, STRING *str, size_t size);
+    void (*allocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
+    void (*reallocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
 
     void (*allocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t nsize);
     void (*reallocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize);
 
     void* (*allocate_fixed_size_storage)(PARROT_INTERP, size_t size);
-    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, void *);
+    void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, ARGFREE(void *));
 
     void* (*allocate_memory_chunk)(PARROT_INTERP, size_t size);
-    void* (*reallocate_memory_chunk)(PARROT_INTERP, void *data, size_t newsize);
+    void* (*reallocate_memory_chunk)(PARROT_INTERP, ARGFREE(void *data), size_t newsize);
     void* (*allocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, size_t size);
-    void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, void *data,
+    void* (*reallocate_memory_chunk_with_interior_pointers)(PARROT_INTERP, ARGFREE(void *data),
             size_t oldsize, size_t newsize);
-    void (*free_memory_chunk)(PARROT_INTERP, void *data);
+    void (*free_memory_chunk)(PARROT_INTERP, ARGFREE(void *data));
 
     void (*block_mark)(PARROT_INTERP);
     void (*unblock_mark)(PARROT_INTERP);
@@ -190,15 +188,20 @@ typedef struct GC_Subsystem {
     /* Return by value to simplify memory management */
     size_t (*get_gc_info)(PARROT_INTERP, Interpinfo_enum);
 
+    /* Get boundaries of allocated memory. Used during scanning of C stack */
+    void* (*get_low_str_ptr)(PARROT_INTERP);
+    void* (*get_high_str_ptr)(PARROT_INTERP);
+    void* (*get_low_pmc_ptr)(PARROT_INTERP);
+    void* (*get_high_pmc_ptr)(PARROT_INTERP);
+
     /* Iterate over _live_ strings. Used for string pool compacting */
     void (*iterate_live_strings)(PARROT_INTERP, string_iterator_callback callback, void *data);
 
+    /* Write barrier */
+    void (*write_barrier)(PARROT_INTERP, ARGMOD(PMC *));
+
     /* Statistic for GC */
     struct GC_Statistics stats;
-
-    /*Function hooks that GC systems can CHOOSE to provide if they need them
-     *These will be called via the GC API functions Parrot_gc_func_name
-     *e.g. read barrier && write barrier hooks can go here later ...*/
 
     /* Holds system-specific data structures */
     void * gc_private;
@@ -385,13 +388,11 @@ void initialize_fixed_size_pools(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
-void mark_special(PARROT_INTERP,
-    SHIM(Memory_Pools *mem_pools),
-    ARGIN(PMC *obj))
+void mark_special(PARROT_INTERP, Memory_Pools *mem_pools, ARGIN(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void Parrot_add_to_free_list(SHIM_INTERP,
+void Parrot_add_to_free_list(PARROT_INTERP,
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *arena))
         __attribute__nonnull__(2)
@@ -412,11 +413,11 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
-void Parrot_gc_clear_live_bits(SHIM_INTERP,
+void Parrot_gc_clear_live_bits(PARROT_INTERP,
     ARGIN(const Fixed_Size_Pool *pool))
         __attribute__nonnull__(2);
 
-void Parrot_gc_run_init(SHIM_INTERP, ARGMOD(Memory_Pools *mem_pools))
+void Parrot_gc_run_init(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mem_pools);
 
@@ -550,10 +551,9 @@ void gc_ms_compact_memory_pool(PARROT_INTERP)
 
 void gc_ms_free_fixed_size_storage(PARROT_INTERP,
     size_t size,
-    ARGMOD(void *data))
+    ARGFREE_NOTNULL(void *data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*data);
+        __attribute__nonnull__(3);
 
 void gc_ms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -586,10 +586,9 @@ PARROT_PURE_FUNCTION
 size_t Parrot_gc_get_info(PARROT_INTERP,
     Interpinfo_enum which,
     ARGIN(GC_Statistics *stats))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-void Parrot_gc_ms_init(PARROT_INTERP)
+void Parrot_gc_ms_init(PARROT_INTERP, Parrot_GC_Init_Args *args)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -629,8 +628,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_gc_get_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stats))
+       PARROT_ASSERT_ARG(stats))
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -641,7 +639,7 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_inf.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_inf_init(PARROT_INTERP)
+void Parrot_gc_inf_init(PARROT_INTERP, Parrot_GC_Init_Args *args)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_gc_inf_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -652,13 +650,46 @@ void Parrot_gc_inf_init(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/gc/gc_ms2.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_ms2_init(PARROT_INTERP)
+void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_Parrot_gc_maybe_mark_and_sweep \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(args))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms2.c */
+
+/* HEADERIZER BEGIN: src/gc/gc_gms.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int pobj2gen(ARGIN(PObj *pmc))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_gc_gms_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_Parrot_gc_gms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(args))
+#define ASSERT_ARGS_pobj2gen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pmc))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/gc/gc_gms.c */
 
 /* HEADERIZER BEGIN: src/gc/string_gc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -674,7 +705,7 @@ void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
 
 void Parrot_gc_str_allocate_string_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
-    ARGOUT(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -685,11 +716,11 @@ void Parrot_gc_str_compact_pool(PARROT_INTERP, ARGIN(String_GC *gc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_gc_str_finalize(SHIM_INTERP, ARGMOD(String_GC *gc))
+void Parrot_gc_str_finalize(PARROT_INTERP, ARGMOD(String_GC *gc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*gc);
 
-void Parrot_gc_str_free_buffer_storage(SHIM_INTERP,
+void Parrot_gc_str_free_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
     ARGMOD(Buffer *b))
         __attribute__nonnull__(2)

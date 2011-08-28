@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -226,8 +226,8 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
 /*
 
-=item C<static void add_nci_to_namespace(PARROT_INTERP, PMC *SELF, STRING *key,
-PMC *value)>
+=item C<static void add_native_to_namespace(PARROT_INTERP, PMC *SELF, STRING
+*key, PMC *value)>
 
 =cut
 
@@ -292,10 +292,11 @@ add_multi_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
                 add_to_class(interp, nsinfo, classobj, method_name, value);
 
                 GETATTR_NameSpace_hash(interp, SELF, hash);
+                PARROT_GC_WRITE_BARRIER(interp, SELF);
 
-                parrot_hash_put(interp, hash,
-                    hash_key_from_string(interp, hash, key),
-                    hash_value_from_pmc(interp, hash, value));
+                Parrot_hash_put(interp, hash,
+                    Parrot_hash_key_from_string(interp, hash, key),
+                    Parrot_hash_value_from_pmc(interp, hash, value));
             }
         }
     }
@@ -342,11 +343,11 @@ Initialize a C<NameSpace> PMC.
 */
 
     VTABLE void init() {
+        SUPER();
         PARROT_NAMESPACE(SELF)->vtable  = PMCNULL;
         PARROT_NAMESPACE(SELF)->methods = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class  = PMCNULL;
-        SELF.set_pointer(parrot_new_hash(INTERP));
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -361,9 +362,7 @@ Marks the namespace as live.
     VTABLE void mark() {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
-        if (nsinfo->hash)
-            parrot_mark_hash(INTERP, nsinfo->hash);
-
+        SUPER();
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->parent);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->_class);
         Parrot_gc_mark_PMC_alive(INTERP, nsinfo->vtable);
@@ -382,6 +381,7 @@ Returns the class or role PMC that is associated with this namespace.
 */
 
     PMC *get_class() {
+        UNUSED(INTERP);
         return PARROT_NAMESPACE(SELF)->_class;
     }
 
@@ -437,7 +437,7 @@ really a public API.
         /* If it's a multi-sub and the first in this NS... */
         add_multi_to_namespace(INTERP, SELF, key, value);
 
-        old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        old = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!old)
             SUPER(key, value);
@@ -466,7 +466,7 @@ really a public API.
 
         if (val_is_NS) {
             /* TODO - this hack needs to go */
-            Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(value);
+            Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(value);
             nsinfo->parent = SELF;  /* set parent */
             nsinfo->name   = key;   /* and name */
 
@@ -475,7 +475,7 @@ really a public API.
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub,
                                          old);
 
-                parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
+                Parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
                 /* distinction from a plain FPA, which doesn't extend the
                  * namespace storage */
             }
@@ -483,7 +483,7 @@ really a public API.
         else if (new_tuple) {
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, old);
             VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_var_sub, value);
-            parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
+            Parrot_hash_put(INTERP, (Hash *)SELF.get_pointer(), key, new_tuple);
         }
     }
 
@@ -530,7 +530,7 @@ really a public API.
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
         Hash * const hash = (Hash *)SELF.get_pointer();
-        PMC *ns = (PMC *)parrot_hash_get(INTERP, hash, key);
+        PMC *ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
 
         if (!ns)
             return PMCNULL;
@@ -568,8 +568,9 @@ really a public API.
             return VTABLE_get_pmc_keyed(INTERP, ns, key);
         }
         else if (VTABLE_does(INTERP, key, CONST_STRING(INTERP, "array"))) {
-            INTVAL i = 0;
-            while (!PMC_IS_NULL(ns) && VTABLE_elements(INTERP, key)) {
+            const INTVAL elements = VTABLE_elements(INTERP, key);
+            INTVAL i;
+            for (i = 0; i < elements && !PMC_IS_NULL(ns); ++i) {
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, key, i);
                 if (STRING_IS_NULL(name)) {
                     ns = PMCNULL;
@@ -577,7 +578,6 @@ really a public API.
                     break;
                 }
                 ns = Parrot_ns_get_namespace_keyed_str(INTERP, ns, name);
-                ++i;
             }
             return ns;
         }
@@ -619,17 +619,18 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 */
 
     VTABLE void *get_pointer_keyed_str(STRING *key) {
-        PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC  *ns;
+        Hash *hash;
+        GETATTR_NameSpace_hash(INTERP, SELF, hash);
+
+        ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
+
+        if (ns && (PObj_get_FLAGS(ns) & FPA_is_ns_ext)
+        &&   ns->vtable->base_type == enum_class_FixedPMCArray)
+            ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
 
         /* Be extra careful about returning PMCNULL */
-        if (! PMC_IS_NULL(ns)) {
-            if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
-                    ns->vtable->base_type == enum_class_FixedPMCArray)
-                ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
-        }
-        if (PMC_IS_NULL(ns))
-            ns = PMCNULL;
-        return ns;
+        return ns ? ns : PMCNULL;
     }
 
     VTABLE void *get_pointer_keyed(PMC *key) {
@@ -692,6 +693,7 @@ Return the name of this namespace part.
 
     VTABLE STRING *get_string() {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        UNUSED(INTERP);
         return nsinfo->name;
     }
 
@@ -884,7 +886,7 @@ Return the namespace with the given name.
 
     METHOD find_namespace(STRING *key) {
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
-        PMC    * const ns   = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
+        PMC    * const ns   = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
                                                      key);
 
         if (!ns)
@@ -909,7 +911,7 @@ Return the Sub PMC with the given name.
 
     METHOD find_sub(STRING *key) {
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
-        PMC    * const sub   = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
+        PMC    * const sub   = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(),
                                                       key);
 
         if (!sub)
@@ -933,7 +935,7 @@ Return the PMC with the given name.
 */
 
     METHOD find_var(STRING *key) {
-        PMC * const val = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC * const val = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!val)
             RETURN(PMC *PMCNULL);
@@ -955,7 +957,7 @@ does not delete the PMC.
 
     METHOD del_namespace(STRING *name) {
         Hash   * const hash = (Hash *)SELF.get_pointer();
-        PMC    * const ns   = (PMC *)parrot_hash_get(INTERP, hash, name);
+        PMC    * const ns   = (PMC *)Parrot_hash_get(INTERP, hash, name);
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (PMC_IS_NULL(ns))
@@ -966,7 +968,7 @@ does not delete the PMC.
                 "Invalid type %d for '%Ss' in del_namespace()",
                 ns->vtable->base_type, name);
 
-        parrot_hash_delete(INTERP, hash, name);
+        Parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
@@ -983,7 +985,7 @@ delete the PMC.
 
     METHOD del_sub(STRING *name) {
         Hash   * const hash  = (Hash *)SELF.get_pointer();
-        PMC    * const sub   = (PMC *)parrot_hash_get(INTERP, hash, name);
+        PMC    * const sub   = (PMC *)Parrot_hash_get(INTERP, hash, name);
         STRING * const s_sub = CONST_STRING(INTERP, "Sub");
 
         if (PMC_IS_NULL(sub))
@@ -994,7 +996,7 @@ delete the PMC.
                 "Invalid type %d for '%Ss' in del_sub()",
                 sub->vtable->base_type, name);
 
-        parrot_hash_delete(INTERP, hash, name);
+        Parrot_hash_delete(INTERP, hash, name);
     }
 
 /*
@@ -1008,7 +1010,7 @@ Deletes the contained variable-like PMC with the given name.
 */
 
     METHOD del_var(STRING *name) {
-        parrot_hash_delete(INTERP, (Hash *)SELF.get_pointer(), name);
+        Parrot_hash_delete(INTERP, (Hash *)SELF.get_pointer(), name);
     }
 
 /*
@@ -1023,7 +1025,7 @@ to retrieve symbols, if a NameSpace with the same name exists.
 */
 
     METHOD get_sym(STRING *key) {
-        PMC *ns = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC *ns = (PMC *)Parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         if (!ns)
             RETURN(PMC *PMCNULL);
@@ -1064,11 +1066,11 @@ NOTE: exporting 'default' set of items is not yet implemented.
         STRING * const s_array = CONST_STRING(INTERP, "array");
 
         if (PMC_IS_NULL(dest))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "destination namespace not specified");
 
         if (PMC_IS_NULL(what) || !VTABLE_elements(INTERP, what))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "exporting default object set not yet implemented");
 
         /* if "what" does "hash", we extract string key/value pairs,
@@ -1085,7 +1087,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const src_name = VTABLE_shift_string(INTERP, iter);
 
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "source object name not specified");
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(INTERP, what, src_name))) {
@@ -1100,7 +1102,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 object = VTABLE_get_pmc_keyed_str(INTERP, SELF, src_name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                         "object '%Ss' not found in current namespace", src_name);
 
                 VTABLE_set_pmc_keyed_str(INTERP, dest, dest_name, object);
@@ -1115,21 +1117,21 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, what, i);
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "object name not specified");
 
                 object = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);
 
                 if (PMC_IS_NULL(object))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                         "object '%Ss' not found in current namespace", name);
 
                 VTABLE_set_pmc_keyed_str(INTERP, dest, name, object);
             }
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                "can't handle argument of type %s", what->vtable->base_type);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "can't handle argument of type %Ss", what->vtable->whoami);
     }
 
 /*
@@ -1143,7 +1145,8 @@ Return the parent NameSpace or PMCNULL, if none.
 */
 
     METHOD get_parent() {
-        PMC *parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
+        PMC * const parent = PARROT_NAMESPACE(SELF)->parent ?
+                                 PARROT_NAMESPACE(SELF)->parent : PMCNULL;
         RETURN(PMC *parent);
     }
 

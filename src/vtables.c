@@ -70,8 +70,8 @@ Parrot_vtbl_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
     /* when called from global PMC initialization, not all vtables have isa_hash
      * when called at runtime, they do */
     if (base_vtable->isa_hash) {
-        new_vtable->isa_hash = parrot_new_hash(interp);
-        parrot_hash_clone(interp, base_vtable->isa_hash, new_vtable->isa_hash);
+        new_vtable->isa_hash = Parrot_hash_new(interp);
+        Parrot_hash_clone(interp, base_vtable->isa_hash, new_vtable->isa_hash);
     }
 
 
@@ -101,7 +101,7 @@ Parrot_vtbl_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
         VTABLE * const ro_vtable = vtable->ro_variant_vtable;
 
         if (ro_vtable->isa_hash) {
-            parrot_hash_destroy(interp, ro_vtable->isa_hash);
+            Parrot_hash_destroy(interp, ro_vtable->isa_hash);
             if (ro_vtable->isa_hash == vtable->isa_hash)
                 vtable->isa_hash = NULL;
 
@@ -113,7 +113,7 @@ Parrot_vtbl_destroy_vtable(PARROT_INTERP, ARGFREE_NOTNULL(VTABLE *vtable))
     }
 
     if (vtable->isa_hash) {
-        parrot_hash_destroy(interp, vtable->isa_hash);
+        Parrot_hash_destroy(interp, vtable->isa_hash);
         vtable->isa_hash = NULL;
     }
 
@@ -242,6 +242,18 @@ Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)
         Parrot_gbl_initialize_core_pmcs(interp, 0);
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/vtables.h>
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 10;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::ipv6');
@@ -39,8 +39,6 @@ $conf->data->set( HAS_IPV6 => undef );
 $ipv6_status = 1;
 $exp = 'yes';
 $step->_handle_ipv6_status($conf, $ipv6_status);
-ok( defined $conf->data->get( 'HAS_IPV6' ),
-    "HAS_IPV6 is defined" );
 ok( $conf->data->get( 'HAS_IPV6' ),
     "HAS_IPV6 is true value" );
 is( $step->result(), $exp, "Got expected result '$exp'" );
@@ -49,8 +47,6 @@ $conf->data->set( HAS_IPV6 => undef );
 $ipv6_status = 0;
 $exp = 'no';
 $step->_handle_ipv6_status($conf, $ipv6_status);
-ok( defined $conf->data->get( 'HAS_IPV6' ),
-    "HAS_IPV6 is defined" );
 ok( ! $conf->data->get( 'HAS_IPV6' ),
     "HAS_IPV6 is false value" );
 is( $step->result(), $exp, "Got expected result '$exp'" );

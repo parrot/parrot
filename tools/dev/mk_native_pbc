@@ -144,7 +144,7 @@ if [ "$enable_long_double" = "1" ]; then
       exit
     fi
     make -s prog-clean
-    perl Configure.pl --floatval="long double" --jitcapable=0 --nomanicheck
+    perl Configure.pl --floatval="long double" --nomanicheck
     tail myconfig
     make -s || exit 1
     hugefloatvalsize=$(./parrot_config hugefloatvalsize)

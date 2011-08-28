@@ -41,6 +41,7 @@ Initialize PackfileDirectory.
 =cut
 
 */
+
     VTABLE void init() {
         Parrot_PackfileDirectory_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileDirectory_attributes*);
@@ -106,6 +107,8 @@ Initialize PackfileDirectory from PackFile_Directory.
                 pmc_type = enum_class_PackfileDebug;
                 break;
               case PF_BYTEC_SEG:
+                pmc_type = enum_class_PackfileBytecodeSegment;
+                break;
               case PF_UNKNOWN_SEG:
               default:
                 pmc_type = enum_class_PackfileRawSegment;
@@ -162,6 +165,7 @@ Get the number of elements in the array.
 =cut
 
 */
+
     VTABLE INTVAL elements() {
         return VTABLE_elements(INTERP, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
@@ -190,6 +194,7 @@ Search the array for a segment with the given name, and return it if it exists.
 =cut
 
 */
+
     VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
         return VTABLE_get_pmc_keyed_str(INTERP,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, name);
@@ -205,6 +210,7 @@ Fetch a keyed string value from the packfiledirectory object.
 =cut
 
 */
+
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         STRING * const s_key = VTABLE_get_string(INTERP, key);
         return VTABLE_get_pmc_keyed_str(INTERP,
@@ -224,6 +230,7 @@ name already existed, it will be replaced with the new segment.
 TODO: check type
 
 */
+
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
         Parrot_pcc_invoke_method_from_c_args(INTERP, segment,
             Parrot_str_new_constant(INTERP, "set_directory"),

@@ -142,7 +142,7 @@ EOF
     pir_output_is( <<'CODE', <<'OUTPUT', ":anon subs still get default namespace" );
 .HLL 'cromulent'
 
-.sub what
+.sub what :main
    load_bytecode 'temp_a.pir'
   .local pmc var
    var = get_root_namespace

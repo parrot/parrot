@@ -22,7 +22,7 @@ module ResizablePMCArray {
     =end item
 
     method delete($pos) {
-        pir::delete__vQi(self, $pos);
+        pir::delete(self, $pos);
     }
 
     =begin item exists
@@ -30,14 +30,14 @@ module ResizablePMCArray {
     =end item
 
     method exists($pos) {
-        pir::exists__IQi(self, $pos);
+        pir::exists(self, $pos);
     }
 
     =begin item join
     Return all elements joined by $sep.
     =end item
 
-    method join ($separator) {
+    method join ($separator = '') {
         pir::join($separator, self);
     }
 
@@ -54,6 +54,16 @@ module ResizablePMCArray {
         @mapped;
     }
 
+    =begin item grep
+    Return an array with elements matching code.
+    =end item
+
+    method grep (&code) {
+        my @grepped;
+        for self { @grepped.push($_) if &code($_) };
+        @grepped;
+    }
+
     =begin item reverse
     Return a reversed copy of the invocant.
     =end item
@@ -68,6 +78,7 @@ module ResizablePMCArray {
 
 our sub join ($separator, *@values) { @values.join($separator); }
 our sub map (&code, *@values) { @values.map(&code); }
+our sub grep (&code, *@values) { @values.grep(&code); }
 our sub list (*@values) { @values; }
 
 # vim: ft=perl6
@@ -214,34 +225,41 @@ our sub subst ($text, $regex, $repl, :$global?) {
 }
 
 =begin item split
-Splits C<$text> on occurrences of C<$regex>
+Splits C<$text> on occurences of C<$regex>
 =end item
 
-# our sub split ($regex, $text) {
-#     my $pos := 0;
-#     my @result;
-#     my $looking := 1;
-#     while $looking {
-#         my $match :=
-#             Regex::Cursor.parse($text, :rule($regex), :c($pos)) ;
-# 
-#         if ?$match {
-#             my $from := $match.from();
-#             my $to := $match.to();
-#             my $prefix := pir::substr__sPii($text, $pos, $from-$pos);
-#             @result.push($prefix);
-#             $pos := $match.to();
-#         } else {
-#             my $len := pir::length($text);
-#             if $pos < $len {
-#                 @result.push(pir::substr__ssi($text, $pos) );
-#             }
-#             $looking := 0;
-#         }
-#     }
-#     return @result;
-# }
+our multi sub split (Regex::Regex $regex, $text) {
+    my $pos := 0;
+    my @result;
+    my $looking := 1;
+    while $looking {
+        my $match :=
+            Regex::Cursor.parse($text, :rule($regex), :c($pos)) ;
 
+        if ?$match {
+            my $from := $match.from();
+            my $to := $match.to();
+            my $prefix := pir::substr__sPii($text, $pos, $from-$pos);
+            @result.push($prefix);
+            $pos := $match.to();
+        } else {
+            my $len := pir::length($text);
+            if $pos < $len {
+                @result.push(pir::substr__ssi($text, $pos) );
+            }
+            $looking := 0;
+        }
+    }
+    return @result;
+}
+
+# Use parrot's split for plain strings.
+our multi sub split($string, $text) {
+    # op split produces RSA. So, convert it to RPA.
+    my @res;
+    @res.push($_) for pir::split($string, $text);
+    @res;
+}
 
 # vim: ft=perl6
 # From src/setting/IO.pm
@@ -254,13 +272,32 @@ IO Methods and Functions
 
 =end
 
+=begin item open
+Open file.
+=end item
+
+sub open($filename, :$r, :$w, :$a, :$bin) {
+    my $mode := $w ?? 'w' !! ($a ?? 'wa' !! 'r');
+    my $handle := pir::new__Ps('FileHandle');
+    $handle.open($filename, $mode);
+    $handle.encoding($bin ?? 'binary' !! 'utf8');
+    $handle;
+}
+
+=begin item close
+Close handle
+=end item
+
+sub close($handle) {
+    $handle.close();
+}
+
 =begin item slurp
 Returns the contents of C<$filename> as a single string.
 =end item
 
 our sub slurp ($filename) {
-    my $handle := pir::new__Ps('FileHandle');
-    $handle.open($filename, 'r');
+    my $handle := open($filename, :r);
     my $contents := $handle.readall;
     $handle.close();
     $contents;

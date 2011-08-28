@@ -33,6 +33,7 @@ indicating:
 
 =cut
 
+.pcc_sub :main main:
 	set I0, 200
 	set I2, 500
 	set S0,  ""

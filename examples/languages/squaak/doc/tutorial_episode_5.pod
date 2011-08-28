@@ -21,7 +21,9 @@ C<"Undef">. Some examples are shown below.
  x = 42             # x was not declared, so it is global
  var k = 10         # k is local and initialized to 10
  a + b              # neither a nor b was declared;
-                    # both default to the value "Undef"Scoping and Symbol Tables
+                    # both default to the value "Undef"
+
+=head2 Scoping and Symbol Tables
 
 Earlier we mentioned the need to store declared local variables. In compiler
 jargon, such a data structure to store declarations is called a I<symbol table>.

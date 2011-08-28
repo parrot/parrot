@@ -489,11 +489,12 @@ void
 Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
     ASSERT_ARGS(Parrot_cx_add_handler_local)
-    if (PMC_IS_NULL(Parrot_pcc_get_handlers(interp, interp->ctx)))
-        Parrot_pcc_set_handlers(interp, interp->ctx, Parrot_pmc_new(interp,
-                                                                    enum_class_ResizablePMCArray));
-
-    VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
+    PMC *handlers = Parrot_pcc_get_handlers(interp, interp->ctx);
+    if (PMC_IS_NULL(handlers)) {
+        handlers = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        Parrot_pcc_set_handlers(interp, interp->ctx, handlers);
+    }
+    VTABLE_unshift_pmc(interp, handlers, handler);
 
 }
 
@@ -511,7 +512,7 @@ handlers.
 
 PARROT_EXPORT
 void
-Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN_NULLOK(STRING *handler_type))
 {
     ASSERT_ARGS(Parrot_cx_delete_handler_local)
     PMC *handlers  = Parrot_pcc_get_handlers(interp, interp->ctx);
@@ -731,7 +732,7 @@ Send a message to a scheduler in a different interpreter/thread.
 
 PARROT_EXPORT
 void
-Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), SHIM(PMC *payload))
+Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC *payload)))
 {
     ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {
@@ -861,6 +862,8 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
     PMC            *iter             = PMCNULL;
     STRING * const  handled_str      = CONST_STRING(interp, "handled");
     STRING * const  handler_iter_str = CONST_STRING(interp, "handler_iter");
+    STRING * const  exception_str    = CONST_STRING(interp, "Exception");
+    const Parrot_Int is_exception = VTABLE_does(interp, task, exception_str);
 
     if (already_doing) {
         Parrot_io_eprintf(interp,
@@ -873,25 +876,28 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
          */
         context = Parrot_pcc_get_caller_ctx(interp, keep_context);
         keep_context = NULL;
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
-        else
-            iter = PMCNULL;
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
+        }
     }
     else {
         ++already_doing;
 
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
-        if (task->vtable->base_type == enum_class_Exception
-        && VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
+        if (is_exception &&
+            VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
             iter    = VTABLE_get_attr_str(interp, task, handler_iter_str);
             context = (PMC *)VTABLE_get_pointer(interp, task);
         }
         else {
+            PMC * handlers;
             context = CURRENT_CONTEXT(interp);
-            if (!PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-                iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+            handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
         }
     }
 
@@ -907,7 +913,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
                         "P->I", task, &valid_handler);
 
                 if (valid_handler) {
-                    if (task->vtable->base_type == enum_class_Exception) {
+                    if (is_exception) {
                         /* Store iterator and context for a later rethrow. */
                         VTABLE_set_attr_str(interp, task, handler_iter_str, iter);
                         VTABLE_set_pointer(interp, task, context);
@@ -921,8 +927,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
         /* Continue the search in the next context up the chain. */
         context = Parrot_pcc_get_caller_ctx(interp, context);
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            iter = PMC_IS_NULL(handlers) ? PMCNULL :
+                    VTABLE_get_iter(interp, handlers);
+        }
         else
             iter = PMCNULL;
     }
@@ -989,7 +998,6 @@ Functions that are called from within opcodes, that take and return an
 opcode_t* to allow for changing the code flow.
 
 =over 4
-
 
 =item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time,
 opcode_t *next)>
@@ -1099,8 +1107,6 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=over 4
-
 =item C<static void scheduler_process_messages(PARROT_INTERP, PMC *scheduler)>
 
 Scheduler maintenance, scan the list of messages sent from other schedulers and
@@ -1148,6 +1154,10 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 /*
 
 =back
+
+=head1 SEE ALSO
+
+F<include/parrot/scheduler.h>
 
 =cut
 

@@ -1,0 +1,363 @@
+/*
+Copyright (C) 2001-2011, Parrot Foundation.
+
+
+=head1 NAME
+
+src/pmc/packfileopmap.pmc - Packfile Debug Segment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileOpMap, which provides a map between op
+numbers in a bytecode segment and the libraries and offsets within those
+libraries that the ops come from.
+
+=head2 Vtable functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "pmc/pmc_parrotlibrary.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+
+pmclass PackfileOpMap auto_attrs {
+    ATTR PMC    *op_maps;       /* RPA of Hashes of op lib maps */
+    ATTR PMC    *map_cache;     /* Hash mapping full op names to numbers */
+    ATTR PMC    *ops;           /* RSA of mapped ops. */
+
+/*
+
+=item C<init>
+
+Create empty PackfileOpMap for a given op library.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PMC *core_ops_info, *core_ops_pmc;
+        STRING *oplib_name, *oplib_str, *lib_ops, *table_ops;
+        Parrot_PackfileOpMap_attributes *attrs = PARROT_PACKFILEOPMAP(SELF);
+
+        PObj_custom_mark_SET(SELF);
+
+        attrs->op_maps    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attrs->map_cache  = Parrot_pmc_new(INTERP, enum_class_Hash);
+        attrs->ops        = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
+
+        core_ops_pmc = Parrot_pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, core_ops_pmc, CONST_STRING(INTERP, "core_ops"));
+        lib_ops      = CONST_STRING(INTERP, "lib_ops");
+        table_ops    = CONST_STRING(INTERP, "table_ops");
+        oplib_name   = CONST_STRING(INTERP, "oplib_name");
+        oplib_str    = CONST_STRING(INTERP, "oplib");
+
+        core_ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_name, core_ops_pmc);
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, oplib_str,
+                Parrot_pmc_new_init(INTERP, enum_class_OpLib, core_ops_pmc));
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, lib_ops,
+                Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_set_pmc_keyed_str(INTERP, core_ops_info, table_ops,
+                Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_push_pmc(INTERP, attrs->op_maps, core_ops_info);
+    }
+
+/*
+
+=item C<get_integer_keyed>
+
+Return the integer which maps to the given op, if any.  If the op is not
+already in the map, a new map will be created.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed(PMC *key) {
+        STRING *key_str, *oplib_str;
+        PMC    *map_cache, *op_maps, *ops;
+        INTVAL  op_map_count, i;
+
+        GET_ATTR_map_cache(INTERP, SELF, map_cache);
+
+        if (VTABLE_exists_keyed(INTERP, map_cache, key)) {
+            return VTABLE_get_integer_keyed(INTERP, map_cache, key);
+        }
+
+        key_str = Parrot_key_string(INTERP, key);
+        oplib_str = CONST_STRING(INTERP, "oplib");
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+        op_map_count = VTABLE_elements(INTERP, op_maps);
+        for (i = 0; i < op_map_count; i++) {
+
+            PMC *table_ops, *lib_ops;
+            STRING *table_ops_str, *lib_ops_str;
+            INTVAL op_count;
+
+            PMC * const op_map  = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const oplib   = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
+            const INTVAL op_num = VTABLE_get_integer_keyed(INTERP, oplib, key);
+
+            /* Not in this oplib */
+            if (op_num == -1) {
+                continue;
+            }
+
+            table_ops_str = CONST_STRING(INTERP, "table_ops");
+            lib_ops_str   = CONST_STRING(INTERP, "lib_ops");
+
+            table_ops = VTABLE_get_pmc_keyed_str(INTERP, op_map, table_ops_str);
+            lib_ops   = VTABLE_get_pmc_keyed_str(INTERP, op_map, lib_ops_str);
+
+            GET_ATTR_ops(INTERP, SELF, ops);
+            op_count = VTABLE_elements(INTERP, ops);
+
+            VTABLE_set_integer_keyed(INTERP, map_cache, key, op_count);
+            VTABLE_push_integer(INTERP, table_ops, op_count);
+            VTABLE_push_integer(INTERP, lib_ops, op_num);
+
+            VTABLE_push_string(INTERP, ops, key_str);
+
+            return op_count;
+        }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Couldn't find '%Ss' op.", key_str);
+        return -1;
+    }
+
+    VTABLE INTVAL get_integer_keyed_str(STRING *str_key) {
+        PMC * const pmc_key = Parrot_key_new_string(INTERP, str_key);
+        return SELF.get_integer_keyed(pmc_key);
+    }
+
+
+/*
+=item C<get_pmc_keyed_str()>
+
+Get Op PMC by name.
+
+=cut
+*/
+
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+        PMC    *op_maps;
+        INTVAL  op_map_count, i;
+        STRING * const oplib_str = CONST_STRING(INTERP, "oplib");
+
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+        op_map_count = VTABLE_elements(INTERP, op_maps);
+        for (i = 0; i < op_map_count; i++) {
+            PMC * const op_map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const oplib  = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
+            PMC * const op     = VTABLE_get_pmc_keyed_str(INTERP, oplib, name);
+
+            if (!PMC_IS_NULL(op))
+                return op;
+        }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Couldn't find '%Ss' op.", name);
+        return PMCNULL;
+    }
+
+    VTABLE PMC* get_pmc_keyed(PMC *key) {
+        return STATICSELF.get_pmc_keyed_str(Parrot_key_string(INTERP, key));
+    }
+
+/*
+=item C<get_string_keyed_int()>
+
+=item C<get_pmc_keyed_int()>
+
+Lookup op name by mapped id.
+
+=cut
+*/
+    VTABLE STRING* get_string_keyed_int(INTVAL key) {
+        PMC *ops;
+        GET_ATTR_ops(INTERP, SELF, ops);
+        return VTABLE_get_string_keyed_int(INTERP, ops, key);
+    }
+
+    VTABLE PMC* get_pmc_keyed_int(INTVAL key) {
+        return Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
+    }
+
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC *tmp;
+
+        GET_ATTR_op_maps(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_map_cache(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_ops(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+    }
+
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Get the number of filename mappings.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        PMC *ops;
+        GET_ATTR_ops(INTERP, SELF, ops);
+        return VTABLE_elements(INTERP, ops);
+    }
+
+/*
+
+=item C<METHOD load_lib>
+
+Ensure that an op library is loaded and accessible to this OpMap.
+
+=cut
+
+*/
+    METHOD load_lib(STRING *lib_name) {
+        /* check if the library has been loaded */
+        PMC *op_maps, *ops_info, *oplib, *lib_name_pmc;
+        INTVAL i, op_map_count;
+        STRING *oplib_name, *lib_ops, *table_ops, *oplib_str;
+        Parrot_PackfileOpMap_attributes * const attrs =
+                PARROT_PACKFILEOPMAP(SELF);
+
+        oplib_name = CONST_STRING(INTERP, "oplib_name");
+
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+        op_map_count = VTABLE_elements(INTERP, op_maps);
+
+        for (i = 0; i < op_map_count; i++) {
+            PMC * const map = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            if (Parrot_str_equal(INTERP, lib_name,
+                        VTABLE_get_string_keyed_str(INTERP, map, oplib_name))) {
+                RETURN(INTVAL 1);
+            }
+        }
+
+        /* create a new OpLib etc */
+        lib_name_pmc = Parrot_pmc_new(INTERP, enum_class_String);
+        VTABLE_set_string_native(INTERP, lib_name_pmc, lib_name);
+        /* OpLib.init will throw exception on failure */
+        oplib = Parrot_pmc_new_init(INTERP, enum_class_OpLib, lib_name_pmc);
+
+        lib_ops   = CONST_STRING(INTERP, "lib_ops");
+        table_ops = CONST_STRING(INTERP, "table_ops");
+        oplib_str = CONST_STRING(INTERP, "oplib");
+
+        ops_info = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_name, lib_name_pmc);
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, oplib_str, oplib);
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, lib_ops,
+                Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_set_pmc_keyed_str(INTERP, ops_info, table_ops,
+                Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray));
+        VTABLE_push_pmc(INTERP, attrs->op_maps, ops_info);
+
+        RETURN(INTVAL 1);
+    }
+
+
+/*
+=item C<get_pointer>
+
+Construct PackFile_ByteCode_OpMapping.
+
+=cut
+*/
+
+    VTABLE void *get_pointer() {
+        PMC                         *op_maps;
+        PackFile_ByteCode_OpMapping *m;
+        INTVAL                       i;
+
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+
+        /* Allocate OpMapping. Caller must free results */
+        m = mem_gc_allocate_zeroed_typed(INTERP, PackFile_ByteCode_OpMapping);
+
+        m->n_libs = VTABLE_get_integer(INTERP, op_maps);
+        m->libs   = mem_gc_allocate_n_zeroed_typed(INTERP, m->n_libs,
+                            PackFile_ByteCode_OpMappingEntry);
+
+        /* Fill OpMappingEntry */
+        for (i = 0; i < m->n_libs; i++) {
+            INTVAL j;
+            PackFile_ByteCode_OpMappingEntry *om = &m->libs[i];
+            PMC * const mapping = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+
+            STRING *tmp;
+            PMC    *oplib, *table_ops, *lib_ops;
+
+            tmp     = CONST_STRING(INTERP, "oplib");
+            oplib   = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+            om->lib = (op_lib_t *)VTABLE_get_pointer(INTERP, oplib);
+
+            tmp       = CONST_STRING(INTERP, "table_ops");
+            table_ops = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+
+            om->n_ops = VTABLE_get_integer(INTERP, table_ops);
+
+            om->table_ops = mem_gc_allocate_n_zeroed_typed(INTERP, om->n_ops, opcode_t);
+            for (j = 0; j < om->n_ops; j++) {
+                om->table_ops[j] = VTABLE_get_integer_keyed_int(INTERP, table_ops, j);
+            }
+
+            tmp = CONST_STRING(INTERP, "lib_ops");
+            lib_ops     = VTABLE_get_pmc_keyed_str(INTERP, mapping, tmp);
+            om->lib_ops = mem_gc_allocate_n_zeroed_typed(INTERP, om->n_ops, opcode_t);
+            for (j = 0; j < om->n_ops; j++) {
+                om->lib_ops[j] = VTABLE_get_integer_keyed_int(INTERP, lib_ops, j);
+            }
+
+        }
+
+        return m;
+    }
+
+}
+
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

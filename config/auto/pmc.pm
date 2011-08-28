@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,14 +62,20 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/Method.pm \\
     lib/Parrot/Pmc2c/PCCMETHOD.pm \\
     lib/Parrot/Pmc2c/MULTI.pm \\
-    lib/Parrot/Pmc2c/PMCEmitter.pm \\
-    lib/Parrot/Pmc2c/MethodEmitter.pm \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\
     lib/Parrot/Pmc2c/PMC/default.pm \\
     lib/Parrot/Pmc2c/PMC/Null.pm \\
     lib/Parrot/Pmc2c/PMC/RO.pm
 END
+
+    my %universal_deps;
+    while (<DATA>) {
+        next if /^#/;
+        next if /^\s*$/;
+        chomp;
+        $universal_deps{$_} = 1;
+    }
 
     for my $pmc ( split( /\s+/, $pmc_list ) ) {
         $pmc =~ s/\.pmc$//;
@@ -85,18 +91,40 @@ END
         # add dependencies that result from METHOD usage.
         my $pmc_fname = catfile('src', 'pmc', "$pmc.pmc");
         my $pccmethod_depend = '';
+        my %o_deps    = %universal_deps;
+        $o_deps{"src/pmc/$pmc.c"}         = 1;
+        $o_deps{"src/pmc/$pmc.str"}       = 1;
+        $o_deps{"include/pmc/pmc_$pmc.h"} = 1;
+
         if (contains_pccmethod($pmc_fname)) {
             $pccmethod_depend = 'lib/Parrot/Pmc2c/PCCMETHOD.pm';
+            $o_deps{"include/pmc/pmc_fixedintegerarray.h"} = 1;
             if ($pmc ne 'fixedintegerarray') {
                 $pccmethod_depend .= ' include/pmc/pmc_fixedintegerarray.h';
             }
         }
+
         my $include_headers = get_includes($pmc_fname);
         my $cc_shared = $conf->data->get('cc_shared');
         my $cc_o_out  = $conf->data->get('cc_o_out');
         my $warnings  = $conf->data->get('ccwarn');
         my $optimize  = $conf->data->get('optimize');
 
+        foreach my $header (split ' ', $parent_headers) {
+            $o_deps{$header} = 1;
+        }
+        foreach my $header (split ' ', $include_headers) {
+            $o_deps{$header} = 1;
+        }
+
+        # includes of includes
+        # (cheat. The right way to handle this is to do what
+        # checkdepend.t does.)
+        if (exists $o_deps{'include/parrot/oplib/core_ops.h'} ) {
+            $o_deps{'include/parrot/runcore_api.h'} = 1;
+        }
+
+        my $o_deps = "    " . join(" \\\n    ", keys %o_deps);
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
@@ -107,10 +135,8 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 ## SUFFIX OVERRIDE -Warnings
-src/pmc/$pmc\$(O): include/pmc/pmc_$pmc.h src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
-    $parent_headers $include_headers include/pmc/pmc_continuation.h \\
-    include/pmc/pmc_callcontext.h include/pmc/pmc_fixedintegerarray.h \\
-    src/pmc/$pmc.c
+src/pmc/$pmc\$(O): \\
+$o_deps
 \t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D) $cc_o_out\$@ -c src/pmc/$pmc.c
 
 END
@@ -289,7 +315,7 @@ sub contains_pccmethod {
 
     local $_;
     while (<$fh>) {
-        next unless /METHOD/;
+        next unless /\bMETHOD\b/;
         return 1;
     }
 
@@ -304,15 +330,21 @@ sub get_includes {
     my @retval;
     local $_;
     while (<$fh>) {
-        next unless /^\s*#include\s+["<](.*)[">]\s+$/;
+        next unless /^\s*# *include\s+"(.*)"\s+$/;
         my $include = $1;
-        if ($include =~ m{^(\.|parrot/)}) { # main parrot include dir
+        if ($include =~ m{^parrot}) { # main parrot include dir
+          next if $include eq "parrot/parrot.h"; # already implicit everywhere.
+          next if $include eq "parrot/io.h";     # already implicit everywhere.
           $include = "include/" . $include;
         } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
           $include = "src/pmc/" . $include;
-        } elsif ($include =~ m/^pmc\/pmc_|\.h$/) { # local pmc header
+        } elsif ($include =~ m/^pmc\/pmc_/) { # local pmc header
           $include = "include/" . $include;
-        } # else it's probably a system header, don't depend on it.
+        } elsif ($include =~ m/^imcc/) { # IMCC header.
+            $include = "include/" . $include;
+        } elsif ($include =~ m{^\.\./}) { # relative to include/ dir...
+          $include =~ s{^\.\./}{};
+        }
         push @retval, $include;
     }
 
@@ -345,6 +377,68 @@ sub get_kids_for_parent {
 }
 
 1;
+
+__DATA__
+include/parrot/cclass.h
+include/parrot/multidispatch.h
+include/parrot/call.h
+include/parrot/exit.h
+include/parrot/pobj.h
+include/parrot/extend_vtable.h
+include/parrot/memory.h
+include/parrot/key.h
+include/parrot/oo.h
+include/parrot/feature.h
+include/parrot/oplib.h
+include/parrot/library.h
+include/parrot/thread.h
+include/parrot/thr_pthread.h
+include/parrot/thr_windows.h
+include/parrot/atomic.h
+include/parrot/atomic/fallback.h
+include/parrot/atomic/gcc_pcc.h
+include/parrot/atomic/gcc_x86.h
+include/parrot/atomic/sparc.h
+include/parrot/string.h
+include/parrot/settings.h
+include/parrot/namespace.h
+include/parrot/extend.h
+include/parrot/pbcversion.h
+include/parrot/core_types.h
+include/parrot/interpreter.h
+include/parrot/io.h
+include/parrot/context.h
+include/parrot/parrot.h
+include/parrot/dynext.h
+include/parrot/hash.h
+include/parrot/enums.h
+include/parrot/encoding.h
+include/parrot/vtable.h
+include/parrot/scheduler.h
+include/parrot/pmc.h
+include/parrot/datatypes.h
+include/parrot/core_pmcs.h
+include/parrot/misc.h
+include/parrot/sub.h
+include/parrot/pmc_freeze.h
+include/parrot/global_setup.h
+include/parrot/gc_api.h
+include/parrot/nci.h
+include/parrot/vtables.h
+include/parrot/has_header.h
+include/parrot/warnings.h
+include/parrot/op.h
+include/parrot/debugger.h
+include/parrot/caches.h
+include/parrot/config.h
+include/parrot/platform_interface.h
+include/parrot/hll.h
+include/parrot/packfile.h
+include/parrot/exceptions.h
+include/parrot/string_funcs.h
+include/parrot/compiler.h
+include/pmc/pmc_callcontext.h
+include/pmc/pmc_continuation.h
 
 # Local Variables:
 #   mode: cperl

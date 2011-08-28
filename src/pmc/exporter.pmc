@@ -166,7 +166,7 @@ Throws an exception if a non-NameSpace PMC is passed.
     METHOD source(PMC *src :optional, int got_src :opt_flag) {
         if (got_src) {
             if (src->vtable->base_type != enum_class_NameSpace)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "source must be a NameSpace PMC");
 
             SET_ATTR_ns_src(INTERP, SELF, src);
@@ -196,8 +196,8 @@ Throws an exception if a non-NameSpace PMC is passed.
         if (got_dest) {
 
             if (dest->vtable->base_type != enum_class_NameSpace)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "destination must be a NameSpace PMC");
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "destination must be a NameSpace PMC");
 
             SET_ATTR_ns_dest(INTERP, SELF, dest);
         }
@@ -267,8 +267,8 @@ Throws an exception if an unknown PMC type is passed.
                     temp_globals = glb;
             }
             else {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "Invalid type %d in globals()", glb->vtable->base_type);
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                        "Invalid type %d in globals()", glb->vtable->base_type);
             }
 
             SET_ATTR_globals(INTERP, SELF, temp_globals);
@@ -323,12 +323,16 @@ Throws an exception upon error.
 
         GET_ATTR_ns_src(INTERP, SELF, ns_src);
         if (PMC_IS_NULL(ns_src))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "source namespace not set");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "source namespace not set");
 
         GET_ATTR_ns_dest(INTERP, SELF, ns_dest);
-        if (PMC_IS_NULL(ns_dest))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                "destination namespace not set");
+
+        /* This condition must never happen, destination is set during init and
+         * attempts to change it with wrong values are rejected.
+         * Even if it gets changed for unexpected reasons, "export_to" will
+         * catch the problem. */
+        PARROT_ASSERT(!PMC_IS_NULL(ns_dest));
 
         GET_ATTR_globals(INTERP, SELF, ns_globals);
 

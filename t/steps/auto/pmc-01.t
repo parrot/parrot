@@ -63,7 +63,7 @@ my $cwd = cwd();
     my $pmc_with_PCCMETHOD = q{yes.pmc};
     open my $IN1, ">", $pmc_with_PCCMETHOD
         or croak "Unable to open file for writing: $!";
-    print $IN1 "PCCMETHOD\n";
+    print $IN1 "METHOD\n";
     close $IN1 or croak "Unable to close file after writing: $!";
     ok(auto::pmc::contains_pccmethod($pmc_with_PCCMETHOD),
         "Internal subroutine contains_pccmethod returns true as expected");
@@ -75,7 +75,7 @@ my $cwd = cwd();
     close $IN2 or croak "Unable to close file after writing: $!";
     ok( !  defined (
             auto::pmc::contains_pccmethod($pmc_sans_PCCMETHOD)
-        ), "Internal subroutine contains_pccmethod returns true as expected"
+        ), "Internal subroutine contains_pccmethod returns undefined as expected"
     );
 
     my $file = 'foobar';

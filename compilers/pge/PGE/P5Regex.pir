@@ -149,6 +149,7 @@
 
 .sub "parse_lit"
     .param pmc mob
+    .param pmc adverbs        :slurpy :named
     .local string target
     .local int pos, lastpos
     .local int litstart, litlen
@@ -209,6 +210,7 @@
 
 .sub "parse_quant"
     .param pmc mob
+    .param pmc adverbs        :slurpy :named
     .local string target
     .local int min, max, backtrack
     .local int pos, lastpos
@@ -265,6 +267,7 @@
 
 .sub parse_group
     .param pmc mob
+    .param pmc adverbs        :slurpy :named
     .local string target
     .local int pos, lastpos
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CGroup')
@@ -281,6 +284,7 @@
 
 .sub "parse_enumclass"
     .param pmc mob
+    .param pmc adverbs        :slurpy :named
     .local string target
     .local int pos, lastpos
     .local int isrange

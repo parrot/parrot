@@ -192,7 +192,7 @@ NOT_A_PLUS:
         goto INC_IN
 
 INC_IN:
-    concat out, char_out
+    out = concat out, char_out
     inc pos_in
     goto START
 

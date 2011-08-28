@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2010, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,6 +31,7 @@ feature.
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "hll.str"
 
 /* HEADERIZER HFILE: include/parrot/hll.h */
@@ -40,11 +41,13 @@ feature.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
-        __attribute__nonnull__(1);
+static PMC* new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_new_hll_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(entry_name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -69,7 +72,7 @@ Used by Parrot_hll_register_HLL.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC*
-new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
+new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
 {
     ASSERT_ARGS(new_hll_entry)
     PMC * const hll_info = interp->HLL_info;
@@ -133,11 +136,12 @@ If there is an error, C<-1> is returned.
 */
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
     ASSERT_ARGS(Parrot_hll_register_HLL)
-    PMC   *entry, *name, *type_hash, *ns_hash, *hll_info;
+    PMC   *entry, *name, *ns_hash, *hll_info;
     INTVAL idx;
 
     /* TODO LOCK or disallow in threads */
@@ -173,9 +177,7 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     VTABLE_set_pmc_keyed_int(interp, interp->HLL_namespace, idx, ns_hash);
 
     /* create HLL typemap hash */
-    type_hash = Parrot_pmc_new_constant(interp, enum_class_Hash);
-    VTABLE_set_pointer(interp, type_hash, parrot_new_intval_hash(interp));
-    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_hash);
+    VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, PMCNULL);
 
     return idx;
 }
@@ -196,14 +198,14 @@ does not exist, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
+Parrot_hll_get_HLL_id(PARROT_INTERP, ARGIN(STRING *hll_name))
 {
     ASSERT_ARGS(Parrot_hll_get_HLL_id)
     PMC *       entry;
     PMC * const hll_info = interp->HLL_info;
     INTVAL      i        = -1;
 
-    if (!hll_name)
+    if (STRING_IS_NULL(hll_name))
         return i;
 
     START_READ_HLL_INFO(interp, hll_info);
@@ -234,7 +236,7 @@ that some HLLs are anonymous and so might also return NULL.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 {
@@ -245,7 +247,7 @@ Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
     PMC         *entry, *name_pmc;
 
     if (id < 0 || id >= nelements)
-        return NULL;
+        return STRINGNULL;
 
     START_READ_HLL_INFO(interp, hll_info);
 
@@ -256,7 +258,7 @@ Parrot_hll_get_HLL_name(PARROT_INTERP, INTVAL id)
 
     /* loadlib-created 'HLL's are nameless */
     if (PMC_IS_NULL(name_pmc))
-        return NULL;
+        return STRINGNULL;
     else
         return VTABLE_get_string(interp, name_pmc);
 }
@@ -283,19 +285,25 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot map without an HLL");
     else {
-        PMC *hll_info = interp->HLL_info;
+        PMC * const hll_info = interp->HLL_info;
         const INTVAL n = VTABLE_elements(interp, hll_info);
         if (hll_id >= n)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                 "no such HLL ID (%vd)", hll_id);
         else {
-            PMC  *type_hash;
-            PMC  *entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
+            PMC  *type_array;
+            PMC * const entry = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
             PARROT_ASSERT(!PMC_IS_NULL(entry));
-            type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
-            PARROT_ASSERT(!PMC_IS_NULL(type_hash));
-
-            VTABLE_set_integer_keyed_int(interp, type_hash, core_type, hll_type);
+            type_array = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
+            if (PMC_IS_NULL(type_array)) {
+                int i;
+                type_array = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
+                VTABLE_set_integer_native(interp, type_array, PARROT_MAX_CLASSES);
+                for (i = 0; i < PARROT_MAX_CLASSES; ++i)
+                    VTABLE_set_integer_keyed_int(interp, type_array, i, i);
+                VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_typemap, type_array);
+            }
+            VTABLE_set_integer_keyed_int(interp, type_array, core_type, hll_type);
         }
     }
 }
@@ -327,8 +335,8 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             "no such HLL ID (%vd)", hll_id);
     else {
         PMC * const hll_info = interp->HLL_info;
-        INTVAL  id;
-        PMC    *entry, *type_hash;
+        PMC    *entry, *type_array;
+        Parrot_FixedIntegerArray_attributes *type_array_attrs;
 
         START_READ_HLL_INFO(interp, hll_info);
         entry     = VTABLE_get_pmc_keyed_int(interp, hll_info, hll_id);
@@ -338,14 +346,18 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_GLOBAL_NOT_FOUND, "no such HLL ID (%vd)", hll_id);
 
-        type_hash = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
+        type_array = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
 
-        if (PMC_IS_NULL(type_hash))
+        if (PMC_IS_NULL(type_array))
             return core_type;
 
-        id = VTABLE_get_integer_keyed_int(interp, type_hash, core_type);
+        if (core_type >= PARROT_MAX_CLASSES || core_type < 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "FixedIntegerArray: index out of bounds!");
+        }
 
-        return id ? id : core_type;
+        type_array_attrs = PARROT_FIXEDINTEGERARRAY(type_array);
+        return type_array_attrs->int_array[core_type];
     }
 }
 
@@ -406,7 +418,7 @@ special value C<PARROT_HLL_NONE>, return the global root namespace.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_hll_get_HLL_namespace(PARROT_INTERP, int hll_id)
 {
@@ -474,8 +486,11 @@ Parrot_hll_regenerate_HLL_namespaces(PARROT_INTERP)
 
 Leopold Toetsch
 
-=cut
+=head1 SEE ALSO
 
+F<include/parrot/hll.h>
+
+=cut
 
 */
 

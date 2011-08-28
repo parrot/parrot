@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -279,14 +279,12 @@ Returns the Parrot string representation of the array.
         UINTVAL i;
         const UINTVAL elems = SELF.elements();
 
-        STRING * const zero = CONST_STRING(INTERP, "0");
-        STRING * const one  = CONST_STRING(INTERP, "1");
+        const STRING * const zero = CONST_STRING(INTERP, "0");
+        const STRING * const one  = CONST_STRING(INTERP, "1");
 
         for (i = 0; i < elems; ++i) {
-            if (SELF.get_integer_keyed_int((INTVAL)i))
-                str = Parrot_str_concat(INTERP, str, one);
-            else
-                str = Parrot_str_concat(INTERP, str, zero);
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_integer_keyed_int((INTVAL)i) ? one : zero);
         }
 
         return str;
@@ -581,15 +579,19 @@ Used to unarchive the string.
         SUPER(info);
 
         {
-            const INTVAL    size      = VTABLE_shift_integer(INTERP, info);
-            STRING * const  s         = VTABLE_shift_string(INTERP, info);
+            const INTVAL    size          = VTABLE_shift_integer(INTERP, info);
+            STRING * const  s             = VTABLE_shift_string(INTERP, info);
+            const size_t    size_in_bytes = get_size_in_bytes(size);
+            unsigned char  *bit_array;
 
-            unsigned char * const bit_array = (unsigned char *)Parrot_str_to_cstring(INTERP, s);
-            const UINTVAL   threshold = Parrot_str_byte_length(INTERP, s) * BITS_PER_CHAR;
+            SELF.set_integer_native(size);
 
-            SET_ATTR_size(INTERP, SELF, size);
-            SET_ATTR_resize_threshold(INTERP, SELF, threshold);
-            SET_ATTR_bit_array(INTERP, SELF, bit_array);
+            if (s->bufused < size_in_bytes)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+                    "FixedBooleanArray: invalid buffer size during thaw");
+
+            GET_ATTR_bit_array(INTERP, SELF, bit_array);
+            memcpy(bit_array, s->strstart, size_in_bytes);
         }
     }
 

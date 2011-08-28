@@ -26,7 +26,6 @@ pmclass Key auto_attrs {
                                 not.  The Key code is like that. */
     ATTR INTVAL    int_key;  /* int value of this key, or something magical if
                                 it's a hash iterator key */
-    ATTR FLOATVAL  num_key;  /* num value of this key, if any */
     ATTR STRING   *str_key;  /* STRING value of this key, if any */
                              /* Theoretically there'd also be a pmc_key here,
                               * but that code looks broken and unneeded. */
@@ -66,10 +65,6 @@ Creates and returns a clone of the key.
               case KEY_integer_FLAG:
               case KEY_integer_FLAG | KEY_register_FLAG:
                 Parrot_key_set_integer(INTERP, dkey, Parrot_key_integer(INTERP, key));
-                break;
-              case KEY_number_FLAG:
-              case KEY_number_FLAG | KEY_register_FLAG:
-                Parrot_key_set_number(INTERP, dkey, Parrot_key_number(INTERP, key));
                 break;
               case KEY_string_FLAG:
               case KEY_string_FLAG | KEY_register_FLAG:
@@ -125,20 +120,6 @@ Returns the integer value of the key.
 
 /*
 
-=item C<FLOATVAL get_number()>
-
-Returns the floating-point number value of the key.
-
-=cut
-
-*/
-
-    VTABLE FLOATVAL get_number() {
-        return Parrot_key_number(INTERP, SELF);
-    }
-
-/*
-
 =item C<STRING *get_string()>
 
 Returns the Parrot string value of the key.
@@ -179,20 +160,6 @@ Returns the PMC value of the key.
 
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_key_set_integer(INTERP, SELF, value);
-    }
-
-/*
-
-=item C<void set_number_native(FLOATVAL value)>
-
-Sets the value of the key to C<value>.
-
-=cut
-
-*/
-
-    VTABLE void set_number_native(FLOATVAL value) {
-        Parrot_key_set_number(INTERP, SELF, value);
     }
 
 /*
@@ -313,21 +280,13 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
             switch (flags) {
               case KEY_integer_FLAG | KEY_register_FLAG:
-              case KEY_number_FLAG  | KEY_register_FLAG:
               case KEY_string_FLAG  | KEY_register_FLAG:
+              case KEY_pmc_FLAG     | KEY_register_FLAG:
               case KEY_integer_FLAG:
                 {
                     INTVAL i;
                     GET_ATTR_int_key(INTERP, k, i);
                     VTABLE_push_integer(INTERP, info, i);
-                }
-                break;
-
-              case KEY_number_FLAG:
-                {
-                    FLOATVAL f;
-                    GET_ATTR_num_key(INTERP, k, f);
-                    VTABLE_push_float(INTERP, info, f);
                 }
                 break;
 
@@ -363,14 +322,10 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
             /* get contents */
             switch (flags) {
               case KEY_integer_FLAG | KEY_register_FLAG:
-              case KEY_number_FLAG  | KEY_register_FLAG:
               case KEY_string_FLAG  | KEY_register_FLAG:
+              case KEY_pmc_FLAG     | KEY_register_FLAG:
               case KEY_integer_FLAG:
                 SET_ATTR_int_key(INTERP, k, VTABLE_shift_integer(INTERP, info));
-                break;
-
-              case KEY_number_FLAG:
-                VTABLE_set_number_native(INTERP, k, VTABLE_shift_float(INTERP, info));
                 break;
 
               case KEY_string_FLAG:
@@ -425,6 +380,49 @@ Set key to hold particular register.
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
+/*
+
+=item C<INTVAL elements()>
+
+=item C<INTVAL get_integer_keyed_int(INTVAL n)>
+
+=item C<STRING *get_string_keyed_int(INTVAL n)>
+
+=item C<PMC *get_pmc_keyed_init(INTVAL n)>
+
+Aggregate interface.
+
+=cut
+
+*/
+
+    VTABLE INTVAL elements() {
+        INTVAL n = 0;
+        for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
+            n++;
+        return n;
+    }
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_integer(INTERP, SELF);
+    }
+
+    VTABLE STRING *get_string_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_string(INTERP, SELF);
+    }
+
+    VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
+        for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
+        if (n)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+        return Parrot_key_pmc(INTERP, SELF);
+    }
 }
 
 /*

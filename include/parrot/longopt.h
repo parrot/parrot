@@ -7,6 +7,8 @@
 #ifndef PARROT_LONGOPT_H_GUARD
 #define PARROT_LONGOPT_H_GUARD
 
+#include "parrot/api.h"
+
 /* I use a char* here because this needs to be easily statically
  * initialized, and because the interpreter is probably not running
  * yet.
@@ -38,41 +40,33 @@ struct longopt_opt_info {
 
 #define LONGOPT_OPT_INFO_INIT { 1, 0, NULL, NULL, NULL }
 
-#define OPT_GC_DEBUG       128
-#define OPT_DESTROY_FLAG   129
-#define OPT_HELP_DEBUG     130
-#define OPT_PBC_OUTPUT     131
-#define OPT_RUNTIME_PREFIX 132
-#define OPT_HASH_SEED      133
-#define OPT_GC_THRESHOLD   134
+#define OPT_GC_DEBUG              128
+#define OPT_DESTROY_FLAG          129
+#define OPT_HELP_DEBUG            130
+#define OPT_PBC_OUTPUT            131
+#define OPT_RUNTIME_PREFIX        132
+#define OPT_HASH_SEED             133
+#define OPT_GC_DYNAMIC_THRESHOLD  134
+#define OPT_GC_MIN_THRESHOLD      135
+#define OPT_GC_NURSERY_SIZE       136
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-int longopt_get(PARROT_INTERP,
+int longopt_get(
     int argc,
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
     ARGMOD(struct longopt_opt_info* info_buf))
-        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(* info_buf);
 
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_CONST_FUNCTION
-const struct longopt_opt_decl * Parrot_cmd_options(void);
-
 #define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(argv) \
+       PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))
-#define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/longopt.c */
 

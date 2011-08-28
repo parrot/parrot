@@ -1,13 +1,19 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
+use File::Spec::Functions;
 
-plan tests => 10;
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 16;
 
 =head1 NAME
 
@@ -31,11 +37,46 @@ sub linedirective
     return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
 }
 
+
+my $common = linedirective(__LINE__) . <<'CODE';
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+#include "parrot/extend_vtable.h"
+#include "imcc/api.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+CODE
+
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "parrot/embed.h"
 
 void fail(const char *msg);
@@ -61,30 +102,82 @@ CODE
 Done
 OUTPUT
 
-my $common = linedirective(__LINE__) . <<'CODE';
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps" );
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "parrot/embed.h"
-#include "parrot/extend.h"
 
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
+void fail(const char *msg);
 
-static void fail(const char *msg)
+void fail(const char *msg)
 {
     fprintf(stderr, "failed: %s\n", msg);
     exit(EXIT_FAILURE);
 }
 
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
+int main(int argc, const char **argv)
 {
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+    Parrot_Interp interp1, interp2;
+    interp1 = Parrot_new(NULL);
+    if (!interp1)
+        fail("Cannot create 1st parrot interpreter");
+
+    interp2 = Parrot_new(interp1);
+
+    if (!interp2)
+        fail("Cannot create 2nd parrot interpreter");
+
+    puts("Done");
+    Parrot_destroy(interp1);
+    Parrot_destroy(interp2);
+    puts("Really done");
+    return 0;
+}
+CODE
+Done
+Really done
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ", todo => 'TT #1880 : Parrot_new requires the 1st interp created as an argument');
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
 }
 
-CODE
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp1, interp2;
+    interp1 = Parrot_new(NULL);
+    if (!interp1)
+        fail("Cannot create 1st parrot interpreter");
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments');
+    interp2 = Parrot_new(NULL);
+
+    if (!interp2)
+        fail("Cannot create 2nd parrot interpreter");
+
+    puts("Done");
+    Parrot_destroy(interp1);
+    Parrot_destroy(interp2);
+    puts("Really done");
+    return 0;
+}
+CODE
+Done
+Really done
+OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when an opcode is given improper arguments', todo => "Must explicitly set a PIR compreg");
 
 int main(int argc, const char **argv)
 {
@@ -107,7 +200,7 @@ CODE
 The opcode 'copy' (copy<0>) was not found. Check the type and number of the arguments
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when given invalid language string');
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_compile_string populates the error string when given invalid language string', todo => "Must explicitly set a PIR compreg" );
 
 int main(int argc, const char **argv)
 {
@@ -157,13 +250,12 @@ error:imcc:syntax error, unexpected IDENTIFIER ('The')
 OUTPUT
 
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from main", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
+    Parrot_String compiler, errstr;
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
@@ -192,7 +284,8 @@ Hello, parrot
 Hello, pir
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub" );
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello world from a sub", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -244,7 +337,7 @@ CODE
 Hello, sub
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with argument and return" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a string", todo => "Must explicitly set a PIR compreg" );
 
 int main(void)
 {
@@ -303,7 +396,181 @@ CODE
 Hello, world!
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning a Float PMC", todo => "Must explicitly set a PIR compreg" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC code, rootns, parrotns, sub, ret;
+    Parrot_String compiler, errstr, parrotname, subname, msg;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir code */
+    compiler = createstring(interp, "PIR");
+    code = Parrot_compile_string(interp, compiler,
+".sub main :main\n"
+"  say 'Must not be seen!'\n"
+"\n"
+".end\n"
+"\n"
+".sub hello\n"
+"  .param string s\n"
+"  .param pmc extra :optional\n"
+"  .local pmc foo\n"
+"  foo = new 'Float'\n"
+"  foo = 42.0\n"
+"  .return(foo)\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Get parrot namespace */
+    rootns     = Parrot_get_root_namespace(interp);
+    parrotname = createstring(interp, "parrot");
+    parrotns   = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+
+    /* Get the sub */
+    subname = createstring(interp, "hello");
+    sub     = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+
+    /* Execute it */
+    msg = createstring(interp, "Hello, ");
+    Parrot_ext_call(interp, sub, "S->P", msg, &ret);
+    Parrot_printf(interp, "%.1Pf is the answer. What is the question?\n", ret);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+42.0 is the answer. What is the question?
+OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "returning two Float PMCs in a ResizablePMCArray", todo => "Must explicitly set a PIR compreg" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_PMC code, rootns, parrotns, sub, result;
+    Parrot_String compiler, errstr, parrotname, subname, msg;
+    Parrot_PMC res1, res2;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir code */
+    compiler = createstring(interp, "PIR");
+    code = Parrot_compile_string(interp, compiler,
+".sub main :main\n"
+"  say 'Must not be seen!'\n"
+"\n"
+".end\n"
+"\n"
+".sub hello\n"
+"  .param string s\n"
+"  .local pmc foo\n"
+"  foo = new 'ResizablePMCArray', 2\n"
+"  foo[0] = 42.0\n"
+"  foo[1] = 314.0\n"
+"  .return(foo)\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Get parrot namespace */
+    rootns = Parrot_get_root_namespace(interp);
+    parrotname = createstring(interp, "parrot");
+    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    /* Get the sub */
+    subname = createstring(interp, "hello");
+    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+
+    /* Execute it */
+    msg = createstring(interp, "Hello, ");
+    Parrot_ext_call(interp, sub, "S->P", msg, &result);
+
+    res2 = Parrot_PMC_pop_pmc(interp, result);
+    res1 = Parrot_PMC_pop_pmc(interp, result);
+
+    Parrot_printf(interp, "%.1Pf is the answer and pi*100 = %.1Pf\n",
+        res1, res2);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+42.0 is the answer and pi*100 = 314.0
+OUTPUT
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "calling a sub with string argument and return a numeric", todo => "Must explicitly set a PIR compreg" );
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC code;
+    Parrot_PMC rootns;
+    Parrot_String parrotname;
+    Parrot_PMC parrotns;
+    Parrot_String subname;
+    Parrot_PMC sub;
+    Parrot_String msg;
+    Parrot_Float ret;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir code */
+    compiler = createstring(interp, "PIR");
+    code = Parrot_compile_string(interp, compiler,
+".sub main :main\n"
+"  say 'Must not be seen!'\n"
+"\n"
+".end\n"
+"\n"
+".sub hello\n"
+"  .param string s\n"
+"  .return(42.0)\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Get parrot namespace */
+    rootns = Parrot_get_root_namespace(interp);
+    parrotname = createstring(interp, "parrot");
+    parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns,  parrotname);
+    /* Get the sub */
+    subname = createstring(interp, "hello");
+    sub = Parrot_PMC_get_pmc_keyed_str(interp, parrotns,  subname);
+
+    /* Execute it */
+    msg = createstring(interp, "Hello, ");
+    Parrot_ext_call(interp, sub, "S->N", msg, &ret);
+    Parrot_printf(interp, "%.1f is the answer. What is the question?\n", ret);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+42.0 is the answer. What is the question?
+OUTPUT
+
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
 
@@ -318,17 +585,18 @@ int main(void)
     Parrot_String compiler;
     Parrot_String errstr;
     Parrot_PMC code;
-    Parrot_PMC hellosub;
+    Parrot_PMC hellosub, pir_compiler, pasm_compiler, interp_pmc;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
+    interp = new_interp();
+
+    imcc_get_pir_compreg_api(interp_pmc, 1, &pir_compiler);
+    imcc_get_pir_compreg_api(interp_pmc, 1, &pasm_compiler);
 
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  .param pmc ec\n"
 "  ec()\n"
 "\n"
@@ -346,7 +614,7 @@ CODE
 Hello from C
 OUTPUT
 
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
 
@@ -358,7 +626,7 @@ void hello(Parrot_Interp interp)
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler;
+    Parrot_String compiler, pir_compiler;
     Parrot_String errstr;
     Parrot_PMC code;
     Parrot_PMC hellosub;
@@ -373,10 +641,11 @@ int main(void)
     if (! interp)
         fail("Cannot create parrot interpreter");
 
+
     /* Compile pir */
     compiler = createstring(interp, "PIR");
     code = Parrot_compile_string(interp, compiler,
-".sub externcall\n"
+".sub externcall :main\n"
 "  hello()\n"
 "\n"
 ".end\n"
@@ -852,6 +1121,39 @@ Pir compiler returned no prog
 Pir compiler returned no prog
 OUTPUT
 
+}
+
+SKIP: {
+skip 'Need extra NCI thunks',1 unless $PConfig{HAS_EXTRA_NCI_THUNKS};
+
+c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
+
+void test(int x);
+
+void test(int x)
+{
+    printf("Hello!\n", x);
+}
+
+int main()
+{
+    Parrot_Interp interp;
+    Parrot_PMC test_pmc;
+    int x,y;
+
+    /* Create the interpreter */
+    interp = new_interp();
+
+    x = 10;
+
+    test_pmc = Parrot_sub_new_from_c_func(interp, (void (*)())& test, "i");
+    Parrot_ext_call(interp, test_pmc, "I->", x, &y);
+
+    Parrot_x_exit(interp, 0);
+}
+CODE
+Hello!
+OUTPUT
 }
 
 # Local Variables:

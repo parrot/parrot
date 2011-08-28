@@ -146,12 +146,12 @@ t/compilers/imcc/*/*.t
 t/op/*.t
 t/pmc/*.t
 t/oo/*.t
+t/pir/*.t
 t/native_pbc/*.t
-t/dynpmc/*.t
-t/dynoplibs/*.t
 TEST
     .const string core_tests = <<'TEST'
 t/src/*.t
+t/src/embed/*.t
 t/run/*.t
 t/perl/*.t
 TEST
@@ -161,7 +161,12 @@ t/compilers/pge/*.t
 t/compilers/pge/p5regex/*.t
 t/compilers/pge/perl6regex/*.t
 t/compilers/tge/*.t
+t/compilers/opsc/*.t
+t/compilers/data_json/*.t
+t/dynoplibs/*.t
+t/dynpmc/*.t
 t/library/*.t
+t/ext/winxed/*.t
 t/tools/*.t
 t/profiling/*.t
 TEST
@@ -208,6 +213,12 @@ TEST
     optimize = config['optimize']
   L1:
     $P0['Optimize'] = optimize
+
+    $I0 = exists config['configure_args']
+    unless $I0 goto L2
+    $S0 = config['configure_args']
+    $P0['Configure args'] = $S0
+  L2:
     .local string osname
     osname = config['osname']
     $P0['Platform'] = osname
@@ -218,11 +229,11 @@ TEST
     submitter = _get_submitter(config, env)
     $P0['Submitter'] = submitter
     $I0 = exists config['sha1']
-    unless $I0 goto L2
+    unless $I0 goto L3
     .local string sha1
     sha1 = config['sha1']
     $P0['Git sha1'] = sha1
-  L2:
+  L3:
     _add_git_info($P0)
     .return ($P0)
 .end

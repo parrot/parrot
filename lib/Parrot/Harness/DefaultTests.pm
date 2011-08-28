@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -71,6 +71,7 @@ our @EXPORT_OK = qw(
 # this list and the list above are run in response to --core-tests
 @core_tests = qw(
     t/src/*.t
+    t/src/embed/*.t
     t/run/*.t
     t/perl/*.t
 );
@@ -86,7 +87,9 @@ our @EXPORT_OK = qw(
     t/compilers/opsc/*.t
     t/compilers/data_json/*.t
     t/dynoplibs/*.t
+    t/dynpmc/*.t
     t/library/*.t
+    t/ext/winxed/*.t
     t/tools/*.t
     t/profiling/*.t
 );

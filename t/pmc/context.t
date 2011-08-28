@@ -22,7 +22,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
 .sub main :main
     .include 'test_more.pir'
 
-    plan(19)
+    plan(20)
 
     test_new()
 
@@ -122,7 +122,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     ok($I0, 'Got CallContext.current_HLL')
 
     $P0 = getattribute ctx, 'current_hll'
-    ok($P0, 'FOO', 'Got CallContext.current_hll')
+    is($P0, 'FOO', 'Got CallContext.current_hll')
 
   done:
     pop_eh

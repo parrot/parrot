@@ -15,10 +15,12 @@ Tests the C<String> PMC.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
 
-    plan(136)
+    plan(160)
 
     set_or_get_strings()
     setting_integers()
@@ -32,15 +34,18 @@ Tests the C<String> PMC.
     test_if_string()
     test_concat()
     test_concat_without_defining_dest()
+    test_cmp_num()
     test_cmp()
     cmp_with_integer()
     test_substr()
+    test_eq_num()
     test_eq_str()
     test_ne_str()
     check_whether_interface_is_done()
     test_clone()
     test_set_px_i()
     test_set_px_s()
+    test_set_bool()
     test_string_replace()
     set_i0__p0__string_to_int()
     test_string_trans()
@@ -55,14 +60,17 @@ Tests the C<String> PMC.
     out_of_bounds_substr_negative_offset()
     exception_to_int_2()
     exception_to_int_3()
+    exception_to_int_noalphanum()
     assign_null_string()
     access_keyed()
     exists_keyed()
+    test_unescape()
     # END_OF_TESTS
 .end
 
 .sub set_or_get_strings
         new $P0, ['String']
+        new $P1, ['Boolean']
 
         set $P0, "foo"
         set $S0, $P0
@@ -87,6 +95,11 @@ Tests the C<String> PMC.
         set $P0, "0xFFFFFF"
         set $S0, $P0
         is( $S0, "0xFFFFFF", 'String obj set with literal hex string' )
+
+        new $P1, ['Float']
+        set $P1, 3.14159
+        setref $P0, $P1
+        is( $P0, "3.14159", 'String obj set with Float PMC' )
 
         null $S0
         set $P0, $S0
@@ -366,6 +379,28 @@ TRUE5:  nok( $I0, 'uninitialized String is false' )
     is( $I0, "-1", 'cmp "abcde", "abc" = -1' )
 .end
 
+.sub test_cmp_num
+    new $P1, ['String']
+    new $P2, ['Integer']
+    set $P1, "10"
+    set $P2, 10
+
+    cmp_num $I0, $P1, $P2
+    is( $I0, 0, 'cmp_num "10"(String PMC), 10(Integer PMC) = 0' )
+
+    set $P2, 20
+    cmp_num $I0, $P1, $P2
+    is( $I0, -1, 'cmp_num "10", 20 = -1' )
+
+    set $P2, 5
+    cmp_num $I0, $P1, $P2
+    is( $I0, 1, 'cmp_num "10", 5 = 1' )
+
+    set $P1, "asd"
+    cmp_num $I0, $P1, $P2
+    is( $I0, -1, 'cmp_num "asd", 5 = -1' )
+.end
+
 .sub cmp_with_integer
     new $P1, ['Integer']
     new $P2, ['String']
@@ -411,6 +446,30 @@ TRUE5:  nok( $I0, 'uninitialized String is false' )
     is( $S2, ' is',               'start from the end' )
     is( $S3, " a test\n",         'valid offset, but length > string length' )
     is( $P0, "This is a test\n",  'original is unmodified' )
+.end
+
+.sub test_eq_num
+        new $P1, ['String']
+        new $P2, ['Float']
+        set $P1, "124"
+        set $P2, 124
+
+        set $I0, 1
+        eq_num $P2, $P1, OK1
+        set $I0, 0
+OK1:    ok( $I0, 'eq_num "124"(String), 124(Float) -> true' )
+
+        set $P2, 124.2
+        set $I0, 1
+        eq_num $P2, $P1, OK2
+        set $I0, 0
+OK2:    nok( $I0, 'eq_num "124"(String), 124.2(Float) -> false' )
+
+        set $P2, 0
+        set $I0, 1
+        eq_num $P1, $P2, OK3
+        set $I0, 0
+OK3:    nok( $I0, 'eq_num 0(Float), "124"(String) -> false' )
 .end
 
 .sub test_eq_str
@@ -509,6 +568,25 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
   is( $P0, "abABef\n", 'set p[x] = string' )
 .end
 
+.sub test_set_bool
+    new $P0, ['String']
+
+    set $P0, "1"
+    not $P0
+    is( $P0, "0", 'not "1" = "0"' )
+
+    not $P0
+    is( $P0, "1", 'not "0" = "1"' )
+
+    set $P0, "false"
+    not $P0
+    is( $P0, "0", 'not "false" = "0"' )
+
+    set $P0, 0
+    not $P0
+    is( $P0, "1", 'not 0 = "1"' )
+.end
+
 .sub test_string_replace
     $P0 = new ['String']
     $P0 = "hello world"
@@ -545,6 +623,16 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 
     is( t, 'TAACGSTAACGS', 'trans' )
     is( s, 'atugcsATUGCS', "trans doesn't touch source string")
+
+    push_eh THROWN
+    $I0 = 1
+    $P0.'trans'(unicode:"abc", tr_00)
+    goto TEST
+THROWN:
+    $I0 = 0
+TEST:
+    pop_eh
+    todo( $I0, 'trans works with unicode' )
 .end
 
 # create tr table at compile-time
@@ -579,7 +667,6 @@ loop:
     $P0 = box unicode:"科ムウオ"
     $P0.'reverse'()
     is( $P0, unicode:"オウム科", 'reverse unicode string')
-
 .end
 
 .sub is_integer__check_integer
@@ -607,6 +694,16 @@ loop:
   $S1 = substr $S0, 3, 3
   $I0 = $P0.'is_integer'($S1)
   ok( $I0, '... substr' )
+
+  push_eh THROWN
+  $I0 = 1
+  $P0.'is_integer'(utf8:"123")
+  goto TEST
+THROWN:
+  $I0 = 0
+TEST:
+  pop_eh
+  ok( $I0, 'is_integer works with utf8' )
 .end
 
 .sub instantiate_str
@@ -669,6 +766,25 @@ loop:
 
   $I0 = $P0.'reverse_index'('l', 8)
   is( $I0, 3, "search2 3" )
+
+  $P0 = utf8:"string strin \x{12345}-\x{aa}-\x{ab} world"
+  $I0 = $P0.'reverse_index'('', 0)
+  is( $I0, -1, "search empty -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', -1)
+  is( $I0, -1, "negative start -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('o', 24)
+  is( $I0, -1, "out of bounds -1 unicode" )
+
+  $I0 = $P0.'reverse_index'('string', 23)
+  is( $I0, 0, "search1 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 15)
+  is( $I0, 15, "search2 unicode" )
+
+  $I0 = $P0.'reverse_index'(utf16:"\x{aa}-\x{ab}", 14)
+  is( $I0, -1, "search3 unicode" )
 .end
 
 .macro exception_is ( M )
@@ -718,6 +834,18 @@ handler:
         $I0 = s.'to_int'(37)
 handler:
     .exception_is( 'invalid conversion to int - bad base 37' )
+.end
+
+.sub to_int_noalnum
+    .local pmc s
+    s = new ['String']
+    s = "?"
+    $I0 = s.'to_int'(10)
+.end
+
+.sub exception_to_int_noalphanum
+    .const 'Sub' noalnum = 'to_int_noalnum'
+    throws_type(noalnum, .EXCEPTION_INVALID_OPERATION, 'to_int - no aplhanumeric')
 .end
 
 .sub assign_null_string
@@ -830,6 +958,23 @@ check:
     i = -2
     r = exists s[i]
     is(r, 0, 'exists_keyed negative out of bounds')
+.end
+
+.sub test_unescape
+    .local pmc s1, s2
+
+    s1 = new['String']
+    s1 = '\n'
+    s2 = s1.'unescape'('ascii')
+    is( s2, "\n", "unescape('\\n') == \"\\n\"" )
+
+    s1 = '\x41\x42'
+    s2 = s1.'unescape'('ascii')
+    is( s2, 'AB', "unescape('\\x41\\x42') == 'AB'" )
+
+    s1 = '\u0043\u0044'
+    s2 = s1.'unescape'('ascii')
+    is( s2, 'CD', "unescape('\\u0043\\u0044') == 'CD'" )
 .end
 
 # Local Variables:

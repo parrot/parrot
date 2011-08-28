@@ -22,6 +22,9 @@ Test::More - Parrot extension for testing modules
     # run your tests
     ok( 1 )
     ok( 0, 'failing test with diagnostic' )
+    ok( 0, 'failing test with diagnostic', 'todo' => 'and a TODO comment' )
+
+    nok( 1, 'failing test with diagnostic', 'todo' => 'and a TODO comment' )
 
     is( 100, 100 )
     is( 200, 100, 'failing integer compare with diagnostic' )
@@ -41,7 +44,12 @@ Test::More - Parrot extension for testing modules
 
     like( 'foo', 'f o**{2}', 'passing regex compare with diagnostic' )
     skip(1, 'reason for skipping')
+
+    # old way
     todo(0, 'this is a failed test', 'reason for todo')
+
+    # better way
+    is(0, 'FAIL', todo => 'failure reason')
 
     $P0 = get_class "Squirrel"
     $P0.new()
@@ -123,13 +131,22 @@ recording it with the optional test description in C<description>.
 
 .sub ok
     .param pmc    passed
-    .param string description     :optional
+    .param string description                 :optional
+    .param string todo         :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     $I0 = istrue passed
+
+    if todo goto todo_l
     test.'ok'( $I0, description )
+    goto done
+
+  todo_l:
+    test.'todo'( $I0, description, todo )
+
+  done:
 .end
 
 =item C<nok( passed, description )>
@@ -140,8 +157,9 @@ C<passed>, recording it with the optional test description in C<description>.
 =cut
 
 .sub nok
-    .param pmc passed
-    .param string description :optional
+    .param pmc    passed
+    .param string description                 :optional
+    .param string todo         :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -149,7 +167,14 @@ C<passed>, recording it with the optional test description in C<description>.
     .local int reverse_passed
     reverse_passed = isfalse passed
 
+    if todo goto todo_l
     test.'ok'( reverse_passed, description )
+    goto done
+
+  todo_l:
+    test.'todo'( reverse_passed, description, todo )
+
+  done:
 .end
 
 =item C<is( left, right, description )>
@@ -198,6 +223,7 @@ will pass.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -212,8 +238,14 @@ will pass.
 
     pass = iseq l, r
 
-report:
+  report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -224,12 +256,12 @@ report:
     if null left goto r_str
     l_string    = left
 
-r_str:
+  r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
 
-diag:
+  diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -245,6 +277,7 @@ diag:
     .param int    have_desc   :opt_flag
     .param num    precision   :optional
     .param int    have_prec   :opt_flag
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -270,7 +303,13 @@ diag:
     pass = isle diff, precision
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -297,6 +336,7 @@ diag:
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -310,8 +350,14 @@ diag:
     r = right
     pass = iseq l, r
 
-report:
+  report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -322,12 +368,12 @@ report:
     if null left goto r_str
     l_string    = left
 
-r_str:
+  r_str:
     r_string    = 'null'
     if null right goto diag
     r_string    = right
 
-diag:
+  diag:
     diagnostic = _make_diagnostic( l_string, r_string )
     test.'diag'( diagnostic )
   done:
@@ -338,6 +384,7 @@ diag:
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -376,7 +423,13 @@ diag:
     goto result
 
   result:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -409,6 +462,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -425,7 +479,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -446,6 +506,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -462,7 +523,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -483,6 +550,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -499,7 +567,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -520,6 +594,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -533,7 +608,13 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     pass = isne left, right
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     .local string diagnostic
@@ -580,6 +661,7 @@ This handles comparisons of array-like and hash-like structures.
     .param pmc right
     .param pmc description :optional
     .param int have_desc   :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local int    result
     .local pmc diagnosis
@@ -612,7 +694,12 @@ This handles comparisons of array-like and hash-like structures.
     goto report_result
 
   report_result:
+    if todo goto todo_l
     test.'ok'( result, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( result, description, todo )
+  after_todo_l:
 
     unless result goto report_diagnostic
     .return( result )
@@ -990,6 +1077,71 @@ Records a passing test if the PMC passed in is null, fails otherwise.
   done:
 .end
 
+=item C<throws_type( invokable, type, description)>
+
+Passes a test if calling the invokable throws an exception of the
+expected type, fails a test otherwise.
+If the invokable parameter is an invokable object, invoke it.
+It it's a String, compile it as PIR code and invokes the result.
+Otherwise, fail the test.
+
+=cut
+
+.sub throws_type
+    .param pmc invokable
+    .param int type
+    .param string description :optional
+
+    .local pmc test, ex
+    .local string msg, exmsg
+    .local int check, extype
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
+    msg = ''
+    if null description goto setmsg
+    $I0 = length description
+    unless $I0 goto setmsg
+    msg = description
+  setmsg:
+    msg = concat msg, ': '
+
+    push_eh catch
+
+    check = does invokable, 'invokable'
+    if check goto invokeit
+    check = isa invokable, 'String'
+    unless check goto badinvoke
+    .local pmc compiler
+    .local string source
+    source = invokable
+    compiler = compreg 'PIR'
+    invokable = compiler(source)
+    goto invokeit
+
+  badinvoke:
+    die 'throws_type argument is not invokable'
+
+  invokeit:
+    invokable()
+
+    pop_eh
+    msg = concat msg, "expected to throw but doesn't"
+    ok(0, msg)
+    goto end
+
+  catch:
+    .get_results(ex)
+    extype = ex['type']
+    exmsg = ex['message']
+    finalize ex
+    pop_eh
+    msg = concat msg, "throws expected type"
+    exmsg = concat 'exception message is: "', exmsg
+    exmsg = concat exmsg, '"'
+    is(extype, type, msg)
+    diag(exmsg)
+  end:
+.end
+
 =item C<dies_ok( codestring, description )>
 
 Takes PIR code in C<codestring> and an optional message in C<description>.
@@ -1000,6 +1152,7 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
 .sub dies_ok
     .param string target
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1011,7 +1164,7 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1020,9 +1173,14 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
     pop_eh
 
     # if it doesn't throw an exception fail
+    if todo goto todo_l
     test.'ok'( 0, description )
-    test.'diag'('no error thrown')
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 0, description, todo )
+  after_todo_l:
 
+    test.'diag'('no error thrown')
     goto done
 
   handler:
@@ -1033,7 +1191,13 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     test.'ok'( 1, description )
+    goto after_todo_l2
+  todo_l2:
+    test.'todo'( 1, description, todo )
+  after_todo_l2:
 
   done:
 
@@ -1049,6 +1213,7 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
 .sub lives_ok
     .param string target
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1060,7 +1225,7 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1069,7 +1234,12 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
     pop_eh
 
     # if it doesn't throw an exception pass
+    if todo goto todo_l
     test.'ok'( 1, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 1, description, todo )
+  after_todo_l:
 
     goto done
 
@@ -1081,7 +1251,14 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     test.'ok'( 0, description )
+    goto after_todo_l2
+  todo_l2:
+    test.'todo'( 0, description, todo )
+  after_todo_l2:
+
     test.'diag'(error_msg)
 
   done:
@@ -1100,6 +1277,7 @@ an exception that matches the pattern, fails the test otherwise.
     .param string target
     .param string pattern
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1111,7 +1289,7 @@ an exception that matches the pattern, fails the test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1120,9 +1298,14 @@ an exception that matches the pattern, fails the test otherwise.
     pop_eh
 
     # if it doesn't throw an exception, fail
+    if todo goto todo_l
     test.'ok'( 0, description )
-    test.'diag'( 'no error thrown' )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( 0, description, todo )
+  after_todo_l:
 
+    test.'diag'('no error thrown')
     goto done
 
   handler:
@@ -1131,7 +1314,13 @@ an exception that matches the pattern, fails the test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+    if todo goto todo_l2
     like(error_msg, pattern, description)
+    goto after_todo_l2
+  todo_l2:
+    like(error_msg, pattern, description, 'todo' => todo)
+  after_todo_l2:
 
   done:
 .end
@@ -1159,7 +1348,7 @@ an exception that matches the pattern, fails the test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1230,6 +1419,7 @@ optional test description in C<description>.
     .param string target
     .param string pattern
     .param string description :optional
+    .param string todo        :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1272,7 +1462,13 @@ optional test description in C<description>.
     pass = 1
 
   report:
+    if todo goto todo_l
     test.'ok'( pass, description )
+    goto after_todo_l
+  todo_l:
+    test.'todo'( pass, description, todo )
+  after_todo_l:
+
     if pass goto done
 
     test.'diag'( diagnostic )
@@ -1364,6 +1560,7 @@ Bad input: "C<test that the return from Foo is correct type>"
     .param pmc class_name
     .param pmc object_name :optional
     .param int got_name :opt_flag
+    .param string todo     :named("todo") :optional
 
     .local pmc test
     get_hll_global test, [ 'Test'; 'More' ], '_test'
@@ -1384,7 +1581,14 @@ Bad input: "C<test that the return from Foo is correct type>"
     description .= $S0
 
     $I0 = isa thingy, class_name
+
+    if todo goto todo_l
     test.'ok'($I0, description)
+    goto after_todo_l
+  todo_l:
+    test.'todo'( $I0, description, todo )
+  after_todo_l:
+
     if $I0 goto out
     diagnostic .= " isn't a "
     $S1 = class_name

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, TT #1171' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 56 );
+plan( tests => 54 );
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ Tests various lexical scratchpad operations, as described in PDD20.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds' );
-.pcc_sub main:
+.pcc_sub :main main:
     .lex "$a", P0
     print "ok\n"
     end
@@ -39,7 +39,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PIR' );
-.sub main
+.sub main :main
     .lex "$a", $P0
     print "ok\n"
 .end
@@ -68,7 +68,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)' );
-.pcc_sub main:
+.pcc_sub :main main:
     .lex '$a', P0
     .lex '$b', P0
     new P0, 'String'
@@ -167,7 +167,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - no pad inherited in coro' );
-.sub main
+.sub main :main
      coro()
 .end
 .sub coro
@@ -186,7 +186,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set var via pad' );
-.sub main
+.sub main :main
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"]
@@ -209,7 +209,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -> 2 pmc)' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     .lex '$b', $P2
     .local pmc pad, interp
@@ -238,7 +238,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'synopsis example' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     $P1 = new 'Integer'
     $P1 = 13013
@@ -252,7 +252,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PASM' );
-.pcc_sub main:
+.pcc_sub :main main:
     print "ok\n"
     end
 .pcc_sub :lex foo:
@@ -262,7 +262,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PIR' );
-.sub main
+.sub main :main
     print "ok\n"
 .end
 .sub foo :lex
@@ -272,7 +272,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - PASM' );
-.pcc_sub main:
+.pcc_sub :main main:
     print "ok\n"
     end
 .pcc_sub :outer('main') foo:
@@ -282,7 +282,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - PIR' );
-.sub main
+.sub main :main
     print "ok\n"
 .end
 .sub foo :outer('main')
@@ -292,7 +292,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - ident' );
-.sub main
+.sub main :main
     .local pmc a
     .lex "$a", a
     print "ok\n"
@@ -315,7 +315,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo from pad' );
-.sub main
+.sub main :main
     .lex '$a', $P0
     .local pmc pad, interp, info
     interp = getinterp
@@ -337,7 +337,7 @@ LexInfo
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - verify info and pad' );
-.sub main
+.sub main :main
     foo()
     print "ok\n"
 .end
@@ -366,7 +366,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer' );
-.sub "main"
+.sub 'main' :main
     foo()
 .end
 .sub foo :outer('main')
@@ -381,7 +381,7 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer 2' );
-.sub "main"
+.sub 'main' :main
     foo()
 .end
 .sub foo  :outer('main')
@@ -403,7 +403,7 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer via interp' );
-.sub "main"
+.sub 'main' :main
     .const 'Sub' foo = "foo"
     .local pmc foo_cl
     .lex "a", $P0
@@ -1460,7 +1460,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'TT #536: lexical sub lookup' );
-.sub 'main'
+.sub 'main' :main
     .const 'Sub' $P0 = 'lexfoo'
     .lex 'foo1', $P0
     .lex 'foo2', $P0
@@ -1488,7 +1488,7 @@ ok 2 - looking up lexical sub
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex basic' );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'foo'()
@@ -1509,7 +1509,7 @@ null
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_dynamic_lex doesn't search outer" );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'bar'()
@@ -1534,7 +1534,7 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'find_dynamic_lex two levels deep' );
-.sub 'main'
+.sub 'main' :main
     $P0 = box 'main'
     .lex '$*VAR', $P0
     'bar'()
@@ -1552,58 +1552,96 @@ CODE
 main
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $S#');
-.sub 'main'
-    $S0 = 'hello world'
-    .lex '$var', $S0
+pir_output_is( <<'CODE', <<'OUTPUT', 'I-register lexicals' );
+.sub main :main
+    'il'()
+.end
+.sub 'il'
+    .lex '$i', $I0
+    store_lex '$i', 42
+    $I1 = find_lex '$i'
+    say $I1
+    'il_fetch'()
+.end
+.sub 'il_fetch' :outer('il')
+    $I0 = find_lex '$i'
+    say $I0
 .end
 CODE
-/error.*Cannot use S register with \.lex/
+42
+42
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $I#');
-.sub 'main'
-    $I0 = 5
-    .lex '$var', $I0
+pir_output_is( <<'CODE', <<'OUTPUT', 'N-register lexicals' );
+.sub main :main
+    'nl'()
+.end
+.sub 'nl'
+    .lex '$n', $N0
+    store_lex '$n', 6.9
+    $N1 = find_lex '$n'
+    say $N1
+    'nl_fetch'()
+.end
+.sub 'nl_fetch' :outer('nl')
+    $N0 = find_lex '$n'
+    say $N0
 .end
 CODE
-/error.*Cannot use I register with \.lex/
+6.9
+6.9
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', '.lex should not accept $N#');
-.sub 'main'
-    $N0 = 3.14
-    .lex '$pi', $N0
+pir_output_is( <<'CODE', <<'OUTPUT', 'S-register lexicals' );
+.sub main :main
+    'sl'()
+.end
+.sub 'sl'
+    .lex '$s', $S0
+    store_lex '$s', 'Staropramen'
+    $S1 = find_lex '$s'
+    say $S1
+    'sl_fetch'()
+.end
+.sub 'sl_fetch' :outer('sl')
+    $S0 = find_lex '$s'
+    say $S0
 .end
 CODE
-/error.*Cannot use N register with \.lex/
+Staropramen
+Staropramen
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $S#');
-.sub 'main'
-    $S0 = 'hello world'
-    store_lex '$var', $S0
-.end
-CODE
-/error/
-OUTPUT
+pir_output_is( <<'CODE', <<'OUTPUT', 'all register lexicals' );
+.sub main :main
+    .lex 'i', $I0
+    .lex 'n', $N0
+    .lex 's', $S0
+    .lex 'p', $P0
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $I#');
-.sub 'main'
-    $I0 = 5
-    store_lex '$var', $I0
-.end
-CODE
-/error/
-OUTPUT
+    store_lex 'i', 101
+    store_lex 'n', 4.2
+    store_lex 's', 'Starobrno'
+    $P1 = box 'Pilsner Urquell'
+    store_lex 'p', $P1
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'store_lex should not accept $N#');
-.sub 'main'
-    $N0 = 3.14
-    store_lex '$pi', $N0
+    'czech'()
+.end
+.sub 'czech' :outer('main')
+    $I0 = find_lex 'i'
+    say $I0
+    $N0 = find_lex 'n'
+    say $N0
+    $S0 = find_lex 's'
+    say $S0
+    $P0 = find_lex 'p'
+    say $P0
 .end
 CODE
-/error/
+101
+4.2
+Starobrno
+Pilsner Urquell
 OUTPUT
 
 # Local Variables:

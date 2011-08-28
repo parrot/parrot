@@ -81,16 +81,16 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 static int sweep_cb_buf(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGFREE(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -151,7 +151,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-    UINTVAL i;
+    int i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
@@ -357,23 +357,30 @@ static void
 check_var_size_obj_pool(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(check_var_size_obj_pool)
-    size_t count;
-    Memory_Block * block_walker;
-    count = 10000000; /*detect unendless loop just use big enough number*/
+    Memory_Block *block_walker = (Memory_Block *)pool->top_block;
 
-    block_walker = (Memory_Block *)pool->top_block;
-    while (block_walker != NULL) {
-        PARROT_ASSERT(block_walker->start == (char *)block_walker +
-            sizeof (Memory_Block));
-        PARROT_ASSERT((size_t)(block_walker->top -
-            block_walker->start) == block_walker->size - block_walker->free);
+#ifdef NDEBUG
+    while (block_walker) {
+        block_walker = block_walker->prev;
+    }
+#else
+    /* detect unendless loop with a big enough number */
+    size_t count = 10000000;
+
+    while (block_walker) {
+        PARROT_ASSERT(block_walker->start
+            == (char *)block_walker + sizeof (Memory_Block));
+        PARROT_ASSERT((size_t)(block_walker->top - block_walker->start)
+            == block_walker->size - block_walker->free);
 
         /*check the list*/
-        if (block_walker->prev != NULL)
+        if (block_walker->prev)
             PARROT_ASSERT(block_walker->prev->next == block_walker);
         block_walker = block_walker->prev;
-        PARROT_ASSERT(--count);
+        --count;
+        PARROT_ASSERT(count > 0);
     }
+#endif
 }
 
 /*

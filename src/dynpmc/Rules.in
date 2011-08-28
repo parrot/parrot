@@ -7,7 +7,10 @@ $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT): src/dynpmc/dynlexpad$(O)
 
 src/dynpmc/pmc_dynlexpad.h : src/dynpmc/dynlexpad.c
 
-src/dynpmc/dynlexpad$(O): src/dynpmc/dynlexpad.c $(DYNPMC_H_FILES) src/dynpmc/pmc_dynlexpad.h
+src/dynpmc/dynlexpad$(O): \
+    src/dynpmc/dynlexpad.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_dynlexpad.h
 
 src/dynpmc/dynlexpad.c: src/dynpmc/dynlexpad.dump
 	$(PMC2CC) src/dynpmc/dynlexpad.pmc
@@ -24,7 +27,11 @@ $(DYNEXT_DIR)/file$(LOAD_EXT): src/dynpmc/file$(O)
 
 src/dynpmc/pmc_file.h : src/dynpmc/file.c
 
-src/dynpmc/file$(O): src/dynpmc/file.c $(DYNPMC_H_FILES) src/dynpmc/pmc_file.h include/pmc/pmc_fixedintegerarray.h
+src/dynpmc/file$(O): \
+    src/dynpmc/file.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_file.h \
+    include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/file.c: src/dynpmc/file.dump
 	$(PMC2CC) src/dynpmc/file.pmc
@@ -39,7 +46,11 @@ $(DYNEXT_DIR)/foo_group$(LOAD_EXT): $(DYNPMC_FOO_OBJS) src/dynpmc/foo_group$(O)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
-src/dynpmc/foo_group$(O): src/dynpmc/foo.c src/dynpmc/foo2.c $(DYNPMC_H_FILES)
+src/dynpmc/foo_group$(O): \
+    src/dynpmc/pmc_foo2.h \
+    src/dynpmc/pmc_foo.h \
+    src/dynpmc/foo_group.c \
+    $(DYNPMC_H_FILES_MIN)
 
 src/dynpmc/foo_group.c: $(DYNPMC_FOO_OBJS)
 	$(PMC2C) --library foo_group --c $(DYNPMC_FOO)
@@ -48,8 +59,12 @@ src/dynpmc/foo_group.c: $(DYNPMC_FOO_OBJS)
 
 src/dynpmc/pmc_foo.h : src/dynpmc/foo.c
 
-src/dynpmc/foo$(O): src/dynpmc/foo.c $(DYNPMC_H_FILES) src/dynpmc/pmc_foo.h \
-    include/pmc/pmc_integer.h include/pmc/pmc_scalar.h
+src/dynpmc/foo$(O): \
+    src/dynpmc/foo.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_foo.h \
+    include/pmc/pmc_integer.h \
+    include/pmc/pmc_scalar.h
 
 src/dynpmc/foo.c: src/dynpmc/foo.dump
 	$(PMC2CC) src/dynpmc/foo.pmc
@@ -59,8 +74,13 @@ src/dynpmc/foo.dump: src/dynpmc/foo.pmc vtable.dump $(CLASS_O_FILES)
 
 src/dynpmc/pmc_foo2.h : src/dynpmc/foo2.c
 
-src/dynpmc/foo2$(O): src/dynpmc/foo2.c $(DYNPMC_H_FILES) src/dynpmc/pmc_foo2.h \
-    include/pmc/pmc_integer.h include/pmc/pmc_scalar.h src/dynpmc/pmc_foo.h
+src/dynpmc/foo2$(O): \
+    src/dynpmc/foo2.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_foo2.h \
+    include/pmc/pmc_integer.h \
+    include/pmc/pmc_scalar.h \
+    src/dynpmc/pmc_foo.h
 
 src/dynpmc/foo2.c: src/dynpmc/foo2.dump src/dynpmc/foo.pmc
 	$(PMC2CC) src/dynpmc/foo2.pmc
@@ -99,7 +119,10 @@ $(DYNEXT_DIR)/os$(LOAD_EXT): src/dynpmc/os$(O)
 
 src/dynpmc/pmc_os.h : src/dynpmc/os.c
 
-src/dynpmc/os$(O): src/dynpmc/os.c $(DYNPMC_H_FILES) src/dynpmc/pmc_os.h \
+src/dynpmc/os$(O): \
+    src/dynpmc/os.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_os.h \
     include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/os.c: src/dynpmc/os.dump
@@ -116,8 +139,11 @@ $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT): src/dynpmc/pccmethod_test$(O)
 
 src/dynpmc/pmc_pccmethod_test.h : src/dynpmc/pccmethod_test.c
 
-src/dynpmc/pccmethod_test$(O): src/dynpmc/pccmethod_test.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_pccmethod_test.h include/pmc/pmc_fixedintegerarray.h
+src/dynpmc/pccmethod_test$(O): \
+    src/dynpmc/pccmethod_test.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_pccmethod_test.h \
+    include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/pccmethod_test.c: src/dynpmc/pccmethod_test.dump
 	$(PMC2CC) src/dynpmc/pccmethod_test.pmc
@@ -134,9 +160,13 @@ $(DYNEXT_DIR)/rotest$(LOAD_EXT): src/dynpmc/rotest$(O)
 
 src/dynpmc/pmc_rotest.h : src/dynpmc/rotest.c
 
-src/dynpmc/rotest$(O): src/dynpmc/rotest.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_rotest.h include/pmc/pmc_fixedintegerarray.h \
-    include/pmc/pmc_integer.h include/pmc/pmc_scalar.h
+src/dynpmc/rotest$(O): \
+    src/dynpmc/rotest.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_rotest.h \
+    include/pmc/pmc_fixedintegerarray.h \
+    include/pmc/pmc_integer.h \
+    include/pmc/pmc_scalar.h
 
 src/dynpmc/rotest.c: src/dynpmc/rotest.dump
 	$(PMC2CC) src/dynpmc/rotest.pmc
@@ -153,8 +183,11 @@ $(DYNEXT_DIR)/rational$(LOAD_EXT): src/dynpmc/rational$(O)
 
 src/dynpmc/pmc_rational.h : src/dynpmc/rational.c
 
-src/dynpmc/rational$(O): src/dynpmc/rational.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_rational.h include/pmc/pmc_fixedintegerarray.h
+src/dynpmc/rational$(O): \
+    src/dynpmc/rational.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_rational.h \
+    include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/rational.c: src/dynpmc/rational.dump
 	$(PMC2CC) src/dynpmc/rational.pmc
@@ -171,11 +204,34 @@ $(DYNEXT_DIR)/subproxy$(LOAD_EXT): src/dynpmc/subproxy$(O)
 
 src/dynpmc/pmc_subproxy.h : src/dynpmc/subproxy.c
 
-src/dynpmc/subproxy$(O): src/dynpmc/subproxy.c $(DYNPMC_H_FILES) \
-    src/dynpmc/pmc_subproxy.h include/pmc/pmc_sub.h
+src/dynpmc/subproxy$(O): \
+    src/dynpmc/subproxy.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_subproxy.h \
+    include/pmc/pmc_sub.h
 
 src/dynpmc/subproxy.c: src/dynpmc/subproxy.dump
 	$(PMC2CC) src/dynpmc/subproxy.pmc
 
 src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/subproxy.pmc
+
+
+$(DYNEXT_DIR)/select$(LOAD_EXT): src/dynpmc/select$(O)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/select$(LOAD_EXT) src/dynpmc/select$(O) $(LINKARGS)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin or hpux):   $(CHMOD) 0775 $@
+
+src/dynpmc/pmc_select.h : src/dynpmc/select.c
+
+src/dynpmc/select$(O): \
+    src/dynpmc/select.c \
+    $(DYNPMC_H_FILES) \
+    src/dynpmc/pmc_select.h \
+    include/pmc/pmc_sub.h
+
+src/dynpmc/select.c: src/dynpmc/select.dump
+	$(PMC2CC) src/dynpmc/select.pmc
+
+src/dynpmc/select.dump: src/dynpmc/select.pmc vtable.dump $(CLASS_O_FILES)
+	$(PMC2CD) src/dynpmc/select.pmc

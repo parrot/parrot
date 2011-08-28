@@ -43,7 +43,7 @@ Parrot_list_new(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_list_new)
 
-    Linked_List *res = (Linked_List*)mem_sys_allocate_zeroed(sizeof (Linked_List));
+    Linked_List * const res = (Linked_List*)mem_sys_allocate_zeroed(sizeof (Linked_List));
     return res;
 }
 
@@ -119,8 +119,8 @@ Parrot_list_remove(SHIM_INTERP, ARGMOD(Linked_List *list), ARGMOD(List_Item_Head
 {
     ASSERT_ARGS(Parrot_list_remove)
 
-    List_Item_Header *next = item->next;
-    List_Item_Header *prev = item->prev;
+    List_Item_Header * const next = item->next;
+    List_Item_Header * const prev = item->prev;
 
     PARROT_ASSERT(list == item->owner);
 
@@ -153,11 +153,11 @@ Pop an item off the list - i.e. get the first item in the list and remove it.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 List_Item_Header*
-Parrot_list_pop(PARROT_INTERP, ARGIN(Linked_List *list))
+Parrot_list_pop(SHIM_INTERP, ARGIN(Linked_List *list))
 {
     ASSERT_ARGS(Parrot_list_pop)
 
-    List_Item_Header *ret = list->first;
+    List_Item_Header * const ret = list->first;
     if (ret)
         LIST_REMOVE(list, ret);
     return ret;
@@ -165,7 +165,7 @@ Parrot_list_pop(PARROT_INTERP, ARGIN(Linked_List *list))
 
 /*
 
-=item C<INTVAL Parrot_list_check(PARROT_INTERP, Linked_List *list)>
+=item C<INTVAL Parrot_list_check(PARROT_INTERP, const Linked_List *list)>
 
 Check the validity of the list
 
@@ -174,12 +174,13 @@ Check the validity of the list
 */
 
 PARROT_EXPORT
+PARROT_CONST_FUNCTION
 INTVAL
-Parrot_list_check(SHIM_INTERP, ARGIN(Linked_List *list))
+Parrot_list_check(SHIM_INTERP, ARGIN(const Linked_List *list))
 {
     ASSERT_ARGS(Parrot_list_check)
 
-    List_Item_Header *tmp = list->first;
+    const List_Item_Header *tmp = list->first;
     size_t counter = 0;
 
     while (tmp) {
@@ -195,8 +196,8 @@ Parrot_list_check(SHIM_INTERP, ARGIN(Linked_List *list))
 
 /*
 
-=item C<INTVAL Parrot_list_contains(PARROT_INTERP, Linked_List *list,
-List_Item_Header *item)>
+=item C<INTVAL Parrot_list_contains(PARROT_INTERP, const Linked_List *list,
+const List_Item_Header *item)>
 
 Returns True if the is in the list
 
@@ -205,12 +206,14 @@ Returns True if the is in the list
 */
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
 INTVAL
-Parrot_list_contains(SHIM_INTERP, ARGIN(Linked_List *list), ARGIN(List_Item_Header *item))
+Parrot_list_contains(SHIM_INTERP,
+                     ARGIN(const Linked_List *list), ARGIN(const List_Item_Header *item))
 {
     ASSERT_ARGS(Parrot_list_contains)
 
-    List_Item_Header *tmp = list->first;
+    const List_Item_Header *tmp = list->first;
 
 #ifndef NDEBUG
     if (item->owner != list)
@@ -229,6 +232,10 @@ Parrot_list_contains(SHIM_INTERP, ARGIN(Linked_List *list), ARGIN(List_Item_Head
 /*
 
 =back
+
+=head1 SEE ALSO
+
+F<include/parrot/list.h>
 
 =cut
 

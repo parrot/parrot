@@ -1,8 +1,8 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-examples/pasm/fact.pasm - Mmmm, beer good
+examples/pasm/fact.pasm - Recursive Factorial in PASM
 
 =head1 SYNOPSIS
 
@@ -12,20 +12,9 @@ examples/pasm/fact.pasm - Mmmm, beer good
 
 Compute the factorial recursively for 0! to 30! and print the results.
 
-=head1 HISTORY
-
-=over 4
-
-=item 20020316 bdwheele@indiana.edu
-
-Changed local labels to global for new assembler. Use C<pushi> instead
-of the now missing C<clonei>.
-
-=back
-
 =cut
 
-main:
+.pcc_sub :main main:
     new P10, 'ResizableIntegerArray'
 	set 	I1,0
 	## P9 is used as a stack for temporaries.

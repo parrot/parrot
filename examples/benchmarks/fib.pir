@@ -15,42 +15,38 @@ unspecified).
 
 =cut
 
-.sub _main
+.sub main :main
     .param pmc argv
+
     .local int argc
     argc = argv
+
     .local int N
     N = 28
+
     if argc <= 1 goto noarg
-    $S0 = argv[1]
-    N = $S0
+    N = argv[1]
+
 noarg:
-    .local num start
-    .local pmc fib
     .local int r
-    time start
-    r = _fib(N)
-    .local num fin
-    time fin
+    r = fib(N)
+
     print "fib("
     print N
     print ") = "
-    print r
-    print " "
-    fin -= start
-    print fin
-    print "s\n"
-    end
+    say r
 .end
 
-.sub _fib
+.sub fib
     .param int n
+
     if n < 2 goto ret
+
     .local int n1, n2, r1, r2
     n1 = n - 1
     n2 = n - 2
-    r1 = _fib(n1)
-    r2 = _fib(n2)
+    r1 = fib(n1)
+    r2 = fib(n2)
     n = r1 + r2
 ret:
     .return (n)

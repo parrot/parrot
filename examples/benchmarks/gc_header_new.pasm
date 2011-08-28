@@ -44,6 +44,7 @@ F<examples/benchmarks/gc_waves_sizeable_headers.pasm>.
 
 =cut
 
+.pcc_sub :main main:
 	set I0, 40000
 	set I1, 0
 	set S0,  ""

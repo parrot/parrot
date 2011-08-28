@@ -42,6 +42,11 @@ do anything.
 */
 
     VTABLE void init() {
+        Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
+        e->interp = PMCNULL;
+        e->code = PMCNULL;
+        e->type = STRINGNULL;
+        e->priority = 0;
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
     }
@@ -99,10 +104,6 @@ handler to care
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "EventHandler initializer must be Sub or Hash");
         }
-
-        if (PMC_IS_NULL(interpreter))
-            interpreter = VTABLE_get_pmc_keyed_int(INTERP,
-                    INTERP->iglobals, IGLOBALS_INTERPRETER);
 
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
@@ -234,16 +235,20 @@ Runs the contained code, if any; this is what handles the event.
 */
     VTABLE opcode_t *invoke(void *next) {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
+        Interp * target_interp = NULL;
 
-        /* can't invoke on INTERP and can't return its result; this may not be
-         * the right interpreter */
-        if (e) {
-            void *unused;
+        if (!e)
+            return (opcode_t *)next;
 
-            unused = VTABLE_invoke(PMC_data_typed(e->interp, Parrot_Interp),
-                    e->code, next);
-            UNUSED(unused);
-        }
+        if (!PMC_IS_NULL(e->interp))
+            target_interp = PMC_data_typed(e->interp, Interp *);
+        if (target_interp == NULL)
+            target_interp = INTERP;
+
+        if (PMC_IS_NULL(e->code))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "No code object to execute in EventHandler");
+        Parrot_ext_call(target_interp, e->code, "->");
 
         return (opcode_t *)next;
     }

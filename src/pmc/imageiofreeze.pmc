@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,6 +22,12 @@ Freezes other PMCs.
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_INLINE
+static UINTVAL check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void create_buffer(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
@@ -52,6 +58,10 @@ static void SET_VISIT_CURSOR(ARGMOD(PMC *pmc), ARGIN(const char *cursor))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+#define ASSERT_ARGS_check_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(v))
 #define ASSERT_ARGS_create_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))
@@ -208,6 +218,30 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 #endif
 }
 
+
+/*
+
+=item C<static UINTVAL check_seen(PARROT_INTERP, PMC *self, PMC *v)>
+
+Check the seen hash to prevent duplicate serialization.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static UINTVAL
+check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
+{
+    ASSERT_ARGS(check_seen)
+    Hash       * const seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOFREEZE(self)->seen);
+    HashBucket * const b    = Parrot_hash_get_bucket(interp, seen, v);
+    if (b)
+        return (UINTVAL)b->value;
+    else
+        return 0;
+}
+
 pmclass ImageIOFreeze auto_attrs {
     ATTR Buffer              *buffer;      /* buffer to store the image */
     ATTR size_t               pos;         /* current read/write buf position */
@@ -239,16 +273,16 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
+        PObj_custom_mark_SET(SELF);
+
         PARROT_IMAGEIOFREEZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen,
-            parrot_new_intval_hash(INTERP));
+            Parrot_hash_new_intval_hash(INTERP));
 
         PARROT_IMAGEIOFREEZE(SELF)->todo =
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
         PObj_flag_CLEAR(private1, SELF);
-
-        PObj_custom_mark_SET(SELF);
     }
 
 
@@ -301,20 +335,20 @@ Returns the content of the image as a string.
                                           PARROT_IMAGEIOFREEZE(SELF)->pos);
     }
 
-
 /*
 
-=item C<VTABLE PMC *get_iter()>
+=item C<void *get_pointer()>
 
-Get the C<todo> list for this freeze/thaw for iterating over.
+Returns the seen hash.
 
 =cut
 
 */
 
-    VTABLE PMC *get_iter() {
-        return PARROT_IMAGEIOFREEZE(SELF)->todo;
+    VTABLE void *get_pointer() {
+        return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
     }
+
 
 /*
 
@@ -421,43 +455,35 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
     VTABLE void push_pmc(PMC *v) {
         UINTVAL id;
-        int packid_type;
 
-        if (PMC_IS_NULL(v)) {
-            id   = 0;
-            packid_type = enum_PackID_seen;
-        }
+        if (PMC_IS_NULL(v))
+            SELF.push_integer(PackID_new(0, enum_PackID_seen));
+        else if ((id = check_seen(INTERP, SELF, v)))
+            SELF.push_integer(PackID_new(id, enum_PackID_seen));
         else {
-            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
-                    PARROT_IMAGEIOFREEZE(SELF)->seen);
-            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+            INTVAL constno, idx;
+            PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
+            Hash * const seen = (Hash *)VTABLE_get_pointer(INTERP,
+                                                    PARROT_IMAGEIOFREEZE(SELF)->seen);
 
-            if (b) {
-                id = (UINTVAL)b->value;
-                packid_type = enum_PackID_seen;
+            id = ++PARROT_IMAGEIOFREEZE(SELF)->id;
+
+            if (PObj_flag_TEST(private1, SELF)
+            &&  PackFile_ConstTable_rlookup_pmc(INTERP, table, v, &constno, &idx)) {
+                SELF.push_integer(PackID_new(id, enum_PackID_pbc_backref));
+                SELF.push_integer(constno);
+                SELF.push_integer(idx - 1);
             }
             else {
-                ++PARROT_IMAGEIOFREEZE(SELF)->id; /* next id to freeze */
-                id = PARROT_IMAGEIOFREEZE(SELF)->id;
-                packid_type = enum_PackID_normal;
+                const INTVAL base_type = PObj_is_object_TEST(v)
+                                    ? (INTVAL) enum_class_Object
+                                    : v->vtable->base_type;
+                SELF.push_integer(PackID_new(id, enum_PackID_normal));
+                SELF.push_integer(base_type);
+                VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
             }
-        }
 
-        SELF.push_integer(PackID_new(id, packid_type));
-
-        if (packid_type == enum_PackID_normal) {
-            Hash * const hash = (Hash *)VTABLE_get_pointer(INTERP,
-                    PARROT_IMAGEIOFREEZE(SELF)->seen);
-
-            PARROT_ASSERT(v);
-
-            SELF.push_integer(
-                    PObj_is_object_TEST(v)
-                    ? (INTVAL) enum_class_Object
-                    : v->vtable->base_type);
-
-            parrot_hash_put(INTERP, hash, v, (void *)id);
-            VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
+            Parrot_hash_put(INTERP, seen, v, (void *)id);
         }
     }
 
@@ -478,8 +504,7 @@ Sets the constant table of this ImageIO PMC.
     }
 
 
-    VTABLE void set_pmc(PMC *p)
-    {
+    VTABLE void set_pmc(PMC *p) {
         create_buffer(INTERP, p, SELF);
 
         if (PObj_flag_TEST(private1, SELF)) {
@@ -499,7 +524,16 @@ Sets the constant table of this ImageIO PMC.
         }
 
         STATICSELF.push_pmc(p);
-        Parrot_visit_loop_visit(INTERP, SELF);
+
+        {
+            PMC * const todo = PARROT_IMAGEIOFREEZE(SELF)->todo;
+            while (VTABLE_elements(INTERP, todo)) {
+                PMC * const current = VTABLE_shift_pmc(INTERP, todo);
+                VTABLE_freeze(INTERP, current, SELF);
+                VTABLE_visit(INTERP,  current, SELF);
+                SELF.push_pmc(PMC_metadata(current));
+            }
+        }
     }
 }
 

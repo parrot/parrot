@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -151,7 +151,7 @@ Resizes the array to C<size> elements.
         /* Nothing allocated yet */
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         if (!bit_array) {
-            void *new_bit_array = Parrot_gc_allocate_memory_chunk(INTERP, new_size_in_bytes);
+            void * const new_bit_array = Parrot_gc_allocate_memory_chunk(INTERP, new_size_in_bytes);
             memset(new_bit_array, 0, new_size_in_bytes);
             SET_ATTR_bit_array(INTERP, SELF, (unsigned char *)new_bit_array);
 
@@ -390,7 +390,7 @@ Returns a copy of the array.
         SET_ATTR_resize_threshold(INTERP, dest, head_pos);
 
         if (my_bit_array) {
-            size_t size_in_bits = tail_pos / BITS_PER_CHAR + 1;
+            const size_t size_in_bits = tail_pos / BITS_PER_CHAR + 1;
             dest_bit_array = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, size_in_bits);
             mem_sys_memcopy(dest_bit_array, my_bit_array, size_in_bits);
         }
@@ -453,15 +453,21 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
+        const UINTVAL   head_pos      = VTABLE_shift_integer(INTERP, info);
+        const UINTVAL   tail_pos      = VTABLE_shift_integer(INTERP, info);
+        STRING * const  s             = VTABLE_shift_string(INTERP, info);
+        const size_t    size_in_bytes = ROUND_BYTES(tail_pos);
+        unsigned char  *bit_array;
 
-        const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, info);
-        const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, info);
-        STRING * const   s        = VTABLE_shift_string(INTERP, info);
-
-        unsigned char * const bit_array = (unsigned char*)Parrot_str_to_cstring(INTERP, s);
-        SET_ATTR_size(INTERP, SELF, tail_pos);
+        SELF.set_integer_native(tail_pos);
         SET_ATTR_resize_threshold(INTERP, SELF, head_pos);
-        SET_ATTR_bit_array(INTERP, SELF, bit_array);
+
+        if (s->bufused < size_in_bytes)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+                "ResizableBooleanArray: invalid buffer size during thaw");
+
+        GET_ATTR_bit_array(INTERP, SELF, bit_array);
+        memcpy(bit_array, s->strstart, size_in_bytes);
     }
 
 }  /* pmclass */
@@ -473,18 +479,6 @@ Used to unarchive the string.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version                  - Matt Fowles 2004-06-11
-
-Changed allocator to double size - Matt Fowles 2004-06-15
-
-Added push_integer               - Bernhard Schmalhofer 2004-10-17
-
-Changed allocation code, added   - Dino Morelli 2005-06-10
-  push_, pop_, shift_,
-  unshift_integer, freeze, thaw
 
 =cut
 

@@ -16,7 +16,7 @@ prints the result (21001097.970000).
 
 =cut
 
-_main:
+.pcc_sub :main _main:
         new P10, 'ResizableIntegerArray'
         new P5, 'ResizablePMCArray'
         push P5, 1000

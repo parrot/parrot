@@ -61,7 +61,7 @@ BUG:    print "This can't happen\n"
 
 =head1 SEE ALSO
 
-F<examples/assembly/mops_p.pasm>,
+F<examples/benchmarks/mops.pasm>,
 F<examples/mops/mops.c>,
 F<examples/mops/mops.cs>,
 F<examples/mops/mops.il>,

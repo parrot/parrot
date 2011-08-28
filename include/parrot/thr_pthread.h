@@ -53,6 +53,13 @@
 #  define CLEANUP_PUSH(f, a) pthread_cleanup_push((f), (a))
 #  define CLEANUP_POP(a)     pthread_cleanup_pop(a)
 
+#ifdef PARROT_HAS_HEADER_UNISTD
+#  include <unistd.h>
+#  ifdef _POSIX_PRIORITY_SCHEDULING
+#    define YIELD sched_yield()
+#  endif
+#endif /* PARROT_HAS_HEADER_UNISTD */
+
 typedef pthread_mutex_t Parrot_mutex;
 typedef pthread_cond_t Parrot_cond;
 typedef pthread_t Parrot_thread;

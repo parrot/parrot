@@ -15,6 +15,8 @@ total number of GC runs made.
 
 =cut
 
+.pcc_sub :main main:
+
         new P10, 'ResizableIntegerArray'
 	set I0, 10
 	new P0, 'ResizablePMCArray'

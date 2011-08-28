@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2009, Parrot Foundation.
+Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,11 +46,11 @@ Initializes the instance.
 */
 
     VTABLE void init() {
-        Hash  *pmc_registry = parrot_create_hash(INTERP,
+        Hash * const pmc_registry = Parrot_hash_create(INTERP,
                 enum_type_int,
                 Hash_key_type_PMC_ptr);
 
-        Hash  *str_registry = parrot_create_hash(INTERP,
+        Hash * const str_registry = Parrot_hash_create(INTERP,
                 enum_type_int,
                 Hash_key_type_STRING);
 
@@ -77,8 +77,8 @@ Mark any PMCs and STRINGs in this registry.
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
 
-        parrot_mark_hash(interp, pmc_registry);
-        parrot_mark_hash(interp, str_registry);
+        Parrot_hash_mark(interp, pmc_registry);
+        Parrot_hash_mark(interp, str_registry);
 
     }
 
@@ -99,8 +99,8 @@ Destroy this PMC.
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
 
-        parrot_hash_destroy(interp, pmc_registry);
-        parrot_hash_destroy(interp, str_registry);
+        Parrot_hash_destroy(interp, pmc_registry);
+        Parrot_hash_destroy(interp, str_registry);
 
         SET_ATTR_str_registry(INTERP, SELF, NULL);
         SET_ATTR_pmc_registry(INTERP, SELF, NULL);
@@ -132,7 +132,7 @@ Returns true if the hash size is not zero.
         const void *value;
 
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
-        value = parrot_hash_get(INTERP, hash, key);
+        value = Parrot_hash_get(INTERP, hash, key);
 
         if (value)
             return (INTVAL)value;
@@ -146,8 +146,8 @@ Returns true if the hash size is not zero.
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
 
-        return parrot_hash_size(INTERP, pmc_registry) +
-               parrot_hash_size(INTERP, str_registry);
+        return Parrot_hash_size(INTERP, pmc_registry) +
+               Parrot_hash_size(INTERP, str_registry);
     }
 
     VTABLE INTVAL get_bool() {
@@ -156,8 +156,8 @@ Returns true if the hash size is not zero.
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
 
-        return (parrot_hash_size(INTERP, pmc_registry) +
-                parrot_hash_size(INTERP, str_registry)) != 0;
+        return (Parrot_hash_size(INTERP, pmc_registry) +
+                Parrot_hash_size(INTERP, str_registry)) != 0;
     }
 /*
 
@@ -190,12 +190,12 @@ reaches 0, delete the entry.
 
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
 
-        oldval = parrot_hash_get(INTERP, hash, key);
+        oldval = Parrot_hash_get(INTERP, hash, key);
 
         if (oldval)
             newval += (long)oldval;
 
-        parrot_hash_put(INTERP, hash, key, (void *)newval);
+        Parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
@@ -206,18 +206,18 @@ reaches 0, delete the entry.
 
         GET_ATTR_str_registry(INTERP, SELF, hash);
 
-        oldval = parrot_hash_get(INTERP, hash, key);
+        oldval = Parrot_hash_get(INTERP, hash, key);
 
         if (oldval)
             newval += (long)oldval;
 
-        parrot_hash_put(INTERP, hash, key, (void *)newval);
+        Parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         Hash *hash;
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
-        parrot_hash_put(INTERP, hash, key, (void *)value);
+        Parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
     VTABLE void delete_keyed(PMC *key) {
@@ -225,16 +225,16 @@ reaches 0, delete the entry.
         void       *value;
 
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
-        value = parrot_hash_get(INTERP, hash, key);
+        value = Parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */
         if (value) {
             long val = (long)value;
             if (val == 1L)
-                parrot_hash_delete(INTERP, hash, key);
+                Parrot_hash_delete(INTERP, hash, key);
             else {
                 value = (void *)(--val);
-                parrot_hash_put(INTERP, hash, key, value);
+                Parrot_hash_put(INTERP, hash, key, value);
             }
         }
     }
@@ -244,16 +244,16 @@ reaches 0, delete the entry.
         void       *value;
 
         GET_ATTR_str_registry(INTERP, SELF, hash);
-        value = parrot_hash_get(INTERP, hash, key);
+        value = Parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */
         if (value) {
             long val = (long)value;
             if (val == 1L)
-                parrot_hash_delete(INTERP, hash, key);
+                Parrot_hash_delete(INTERP, hash, key);
             else {
                 value = (void *)(--val);
-                parrot_hash_put(INTERP, hash, key, value);
+                Parrot_hash_put(INTERP, hash, key, value);
             }
         }
     }

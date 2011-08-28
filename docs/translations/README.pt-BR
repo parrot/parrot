@@ -1,0 +1,192 @@
+Este é o Parrot, versão 2.10.1
+------------------------------
+
+Parrot Copyright (C) 2001-2010, Parrot Foundation.
+
+
+INFORMAÇÕES SOBRE A LICENÇA
+---------------------------
+
+Este código é distribuído através dos termos da Licença Artística 2.0.
+Para mais detalhes, veja o texto completo da licença no arquivo LICENSE.
+
+RESUMO
+------
+
+Parrot é uma máquina virtual desenhada para compilar e executar de
+maneira eficiente bytecode para linguagens dinâmicas.
+
+
+PRÉ-REQUISITOS
+--------------
+
+Você vai precisar de um compilador de C, um ligador (linker) e, é claro, 
+um programa de "make".
+
+Se você for usar a biblioteca ICU você vai precisar fazer o download e 
+a instalação antes de configurar o Parrot. A biblioteca está disponível 
+através do site http://site.icu-project.org/download.
+
+Você também vai precisar do Perl 5.8.4 ou mais novo, e do Storable 2.12 ou
+mais novo para executar os scripts de configuração e de compilação.
+
+Para a maioria das plataformas que nós damos suporte, Parrot consegue ser
+compilado sem a necessidade de pacotes adicionais. docs/parrot.pod contém
+uma lista com estas plataformas. O arquivo PLATFORMS dispõe de relatórios
+sobre as plataformas a qual o Parrot já foi compilado e testado.
+
+COMO INSTALAR O PARROT PELO GITHUB
+----------------------------------
+I. Instalando o Git.
+
+Linux:
+Esta etapa depende da sua distribuição. Para instalar pacotes você deve
+executar os comandos como "root" (ou através do comando "sudo"):
+
+No Ubuntu/Debian (baseado no apt):
+
+    apt-get install git-core
+
+No Red Hat, Fedora (baseado em rpm):
+
+    yum install git
+
+No Gentoo (portage):
+
+    emerge -av dev-vcs/git
+
+Windows:
+Existe 2 versões de compatibilidade do Git no Windows:
+
+msysgit http://code.google.com/p/msysgit/downloads/list
+TortoiseGit http://code.google.com/p/tortoisegit/downloads/list
+
+Macintosh OS X:
+
+Uma busca na Internet irá resultar em uma varidade de instaladores do
+Git para o Mac OS X, incluíndo este:
+
+    http://help.github.com/mac-git-installation/
+
+II. Obtendo o Parrot pelo github.com
+
+Para obter uma cópia do repositório Git do Parrot:
+
+    git clone git://github.com/parrot/parrot.git
+
+Por padrão, apenas a "branch" "master" é baixada. Para criar um "branch" 
+local que que siga o curso da branch "some_branch":
+
+    git checkout -b --track some_branch origin/some_branch
+
+Todas as URLs acima são apenas para leitura. Se você é um desenvolvedor 
+do núcleo do Parrot você deve usar a URL com permissão de escrita:
+
+    git clone git@github.com:parrot/parrot.git
+
+Uma lista com todos os "branches" pode ser encontrada em
+http://github.com/parrot/parrot
+
+INSTRUÇÕES
+----------
+
+Se você baixou uma versão compactada do Parrot você vai precisar 
+descompactar o pacote antes de prosseguir. Em seguida, entre na 
+pasta do Parrot e execute o seguinte comando
+
+    perl Configure.pl
+
+para rodar o script de configuração. Este script extrai a configuração
+do perl5 que está sendo executado. Pode ser que você precise mostrar
+explicitamente ao Configure.pl qual compilador e qual ligador (linker)
+você deseja usar. Por exemplo, para compilar os arquivos em C com o "cc",
+os arquivos em C++ com o "CC" e ligar tudo com o "CC", basta executar o 
+script da seguinte forma:
+
+    perl Configure.pl --cc=cc --link=CC --ld=CC
+
+Consulte "perl Configure.pl --help" para mais informações e 
+docs/configuration.pod para mais detalhes.
+
+Para sistemas como o HPUX, que não contém o inet_pton, execute
+
+    perl Configure.pl --define=inet_aton
+
+O Configure.pl irá gerar o cabeçalho config.h, o módulo Parrot::Config,
+arquivos específicos da plataforma e vários arquivos "Makefile".
+
+O arquivo "myconfig" contém um resumo com todas as opções de configuração.
+
+A seguir, execute o comando "make". Configure.pl irá reportar qual a
+versão do make que ele recomenda ao seu sistema.
+
+Agora o interpretador será compilado. Se você está compilando a 
+biblioteca ICU (padrão na maioria dos sistemas), você vai precisar 
+do GNU make (ou algo compatível com ele).
+
+Você pode testar o Parrot através do comando "make test". Também é 
+possível rodar os testes em paralelo, executando "make TEST_JOBS=3 test".
+
+Para rodar a suíte completa de testes, execute:
+
+    make fulltest
+
+Nota: o arquivo PLATFORMS contém notas sobre falhas esperadas nos testes
+de acordo com os diferentes sistemas.
+
+Para instalar o Parrot:
+
+    make install
+
+Por padrão ele será instalado em /usr/local, com os executáveis em
+/usr/local/bin. Se você quer instalar Parrot em alguum outro lugar, use:
+
+    perl Configure.pl --prefix=/home/joe/bird
+    make install
+
+Mas por favor, note que as bibliotecas dinâmicas não serão encontradas
+nos lugares não convencionais, ao menos que você as inclua no 
+LD_LIBRARY_PATH ou similar.
+
+Leia o docs/parrot.pod e docs/intro.pod para saber onde ir a partir 
+daqui. Se você encontrar algum problema, olhe a seção "How To Submit 
+A Bug Report" em docs/submissions.pod. Esses documentos estão no formato
+POD. Você pode os ler através do comando:
+
+    perldoc -F docs/intro.pod
+
+ATUALIZAÇÕES
+------------
+
+Para documentação sobre as mudanças visíveis aos usuários ao longo
+das diferentes versões, por favor confira o arquivo NEWS.
+
+LISTAS DE EMAIL
+---------------
+
+A lista de usuários do Parrot é parrot-users@lists.parrot.org. 
+Subscreva-se preenchendo o formulário em 
+http://lists.parrot.org/mailman/listinfo/parrot-users. A lista é 
+arquivada em http://lists.parrot.org/pipermail/parrot-users/.
+
+Para discussões sobre desenvolvimento, confira o arquivo 
+docs/gettingstarted.pod.
+
+FEEDBACK, PATCHES, etc.
+-----------------------
+
+Dê uma olhada em docs/submissions.pod para mais informações sobre
+como reportar bugs e submeter patches.
+
+WEB SITES
+---------
+
+Os seguintes sites contém todas as informações que você precisa saber
+sobre Parrot.
+    http://www.parrot.org/
+    http://trac.parrot.org/
+    http://docs.parrot.org/
+
+Se divirta,
+   A equipe do Parrot.
+

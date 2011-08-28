@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -33,31 +33,25 @@ sub runstep {
 
     $conf->debug("(optimization options: init::optimize)\n");
 
-    # A plain --optimize means use -O2.  If an argument
-    # is given, however, use that instead.
-    my $optimize = $conf->options->get('optimize');
+    my $request_optimize = $conf->options->get('optimize') || '';
 
-    if (! defined $optimize) {
+    if (! $request_optimize) {
         $self->set_result('no');
-        $conf->debug("(none requested) ");
-        return 1;
     }
 
-    $self->set_result('yes');
-    my $gccversion = $conf->data->get( 'gccversion' );
-
-    my $options;
-    if ( $optimize eq "1" ) {
-        $options = '-O2';
+    # A plain --optimize will mean: use -O2.  If an argument
+    # is given, however, use that verbatim instead.
+    my $optimization_level;
+    if ( $request_optimize eq '1' ) {
+        $optimization_level = '-O2';
     }
     else {
-        # use the command line verbatim
-        $options = $optimize;
+        $optimization_level = $request_optimize;
     }
 
     # save the options, however we got them.
-    $conf->data->set( optimize => $options );
-    $conf->debug("optimize options: ", $options, "\n");
+    $conf->data->set( optimize => $optimization_level );
+    $conf->debug("optimize options: ", $optimization_level, "\n");
 
     # disable debug flags.
     $conf->data->set( cc_debug => '' );
@@ -67,6 +61,7 @@ sub runstep {
     if ($conf->data->get('cpuarch') eq 'amd64') {
         $conf->data->set('optimize::src/gc/system.c','');
     }
+    $self->set_result('yes');
 
     return 1;
 }

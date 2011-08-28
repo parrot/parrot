@@ -71,7 +71,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in add for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -101,7 +101,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in divide for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -131,7 +131,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in multiply for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -161,7 +161,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in floor_divide for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -191,7 +191,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in logical_and for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -221,7 +221,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in concatenate for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -251,7 +251,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in logical_xor for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -281,7 +281,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in logical_or for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -311,7 +311,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in modulus for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done
@@ -341,7 +341,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
     $S0 = "original dest is untouched in subtract for "
     $S1 = type
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
 
     # ignore exceptions
     push_eh done

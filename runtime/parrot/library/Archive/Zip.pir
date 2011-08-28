@@ -1,14 +1,31 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
-Archive/Zip
+Archive::Zip - Provide an interface to ZIP archive files.
+
+=head2 SYNOPSIS
+
+    load_bytecode 'Archive/Zip.pbc'
+
+    .local pmc archive
+    archive = new ['Archive';'Zip']
+
+    archive.'addFile'('xyz.pl', 'AnotherName.pl')
+
+    archive.'writeToFileNamed'('someZip.zip')
+
+    .local pmc fh
+    fh = new 'FileHandle'
+    fh.'open'('files.zip', 'wb')
+    archive.'writeToFileHandle'(fh, 1)
+    fh.'close'()
 
 =head2 DESCRIPTION
 
 Partial port of Archive::Zip (version 1.30)
 
-See L<http://search.cpan.org/~adamk/Archive-Zip/>
+See L<http://search.cpan.org/dist/Archive-Zip/>
 
 =cut
 
@@ -51,10 +68,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_printError'
     .param pmc args :slurpy
     $S0 = join '', args
-    $P0 = getinterp
-    $P1 = $P0.'stderr_handle'()
-    $P1.'print'($S0)
-    $P1.'print'("\n")
+    printerr $S0
+    printerr "\n"
 .end
 
 .sub '_ioError' :method
@@ -136,6 +151,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .end
 
 .sub 'init' :vtable :method
+    $P0 = box 0
+    setattribute self, 'compressedSize', $P0
     $P0 = box FA_UNIX
     setattribute self, 'fileAttributeFormat', $P0
     $P0 = box 0
@@ -154,7 +171,11 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     setattribute self, 'fileComment', $P0
 .end
 
-=item newFromFile
+=item newFromFile( fileName, [ zipName ] )
+
+Construct a new member from the given file.
+The optional 'zipName' argument sets the internal file name
+to something different than the given 'fileName'.
 
 =cut
 
@@ -398,11 +419,11 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 .sub '_refreshLocalFileHeader' :method
     .param pmc fh
     .local int here
-    here = fh.'tell'()
+    here = tell fh
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $I0 = $P0
     $I0 += SIGNATURE_LENGTH
-    fh.'seek'($I0, 0)
+    seek fh, $I0, 0
     .local string header, fileName, localExtraField
     .const string VERSION = 20
     header = self.'pack_v'(VERSION)
@@ -438,7 +459,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
-    fh.'seek'(here, 0)
+    seek fh, here, 0
     .return (AZ_OK)
 .end
 
@@ -607,7 +628,7 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ('', AZ_OK)
   L1:
     $P0 = self.'fh'()
-    $S0 = $P0.'read'(chunkSize)
+    $S0 = read $P0, chunkSize
     unless $S0 == '' goto L2
     $I0 = self.'_ioError'("reading data")
     .return ($S0, $I0)
@@ -617,9 +638,8 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
 
 .sub '_newFromFileNamed'
     .param string fileName
-    .param string newName       :optional
-    .param int has_newName      :opt_flag
-    if has_newName goto L1
+    .param string newName
+    unless null newName goto L1
     newName = fileName
   L1:
     $I0 = stat fileName, .STAT_EXISTS
@@ -657,13 +677,17 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ($I0)
   L1:
     $P0 = self.'fh'()
-    $P0.'seek'(0, 0)
+    seek $P0, 0, 0
     .return (AZ_OK)
 .end
 
 =head3 Class Archive;Zip
 
 =over 4
+
+=item zip = new ['Archive';'Zip']
+
+Make a new, empty zip archive.
 
 =cut
 
@@ -682,17 +706,25 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     setattribute self, 'zipfileComment', $P0
 .end
 
-=item addMember
+=item zip.'addMember' ( member )
+
+Append a member.
 
 =cut
 
 .sub 'addMember' :method
     .param pmc member
+    if null member goto L1
     $P0 = getattribute self, 'members'
     push $P0, member
+  L1:
 .end
 
-=item addFile
+=item zip.'addFile' ( fileName [, newName ] )
+
+Append a member whose data comes from an external file.
+The optional 'newName' argument sets the internal file name
+to something different than the given 'fileName'.
 
 =cut
 
@@ -705,7 +737,9 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .return ($P1)
 .end
 
-=item writeToFileNamed
+=item zip.'writeToFileNamed' ( fileName )
+
+Write a zip archive to named file. Returns AZ_OK on success.
 
 =cut
 
@@ -733,7 +767,10 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .tailcall self.'_ioError'("Can't open ", fileName, " for write")
 .end
 
-=item writeToFileHandle
+=item zip.'writeToFileHandle' ( fileHandle, seekable )
+
+Write a zip archive to a file handle. Returns AZ_OK on success.
+The second arg tells whether or not to try to seek backwards to re-write headers.
 
 =cut
 
@@ -741,13 +778,13 @@ See L<http://search.cpan.org/~adamk/Archive-Zip/>
     .param pmc fh
     .param int fhIsSeekable
     unless null fh goto L1
-    $I0 = isa fh, 'FileHandle'
+    $I0 = isa fh, 'Handle'
     if $I0 goto L1
-    .tailcall self.'_error'('No filehandle given')
+    .tailcall self.'_error'('No handle given')
   L1:
     $I0 = fh.'is_closed'()
     unless $I0 goto L2
-    .tailcall self.'_ioError'('filehandle not open')
+    .tailcall self.'_ioError'('handle not open')
   L2:
     .local int offset
     offset = 0

@@ -10,7 +10,7 @@ INIT {
 plan(13);
 
 my $pir_code :=
-'.sub main
+'.sub main :main
   say "what"
 .end';
 
@@ -164,7 +164,7 @@ my $uncaught_c_ex := '
 .sub main :main
     .local string s
     s = <<"CODE"
-    .sub main
+    .sub main :main
         $P0 = new ["FixedPMCArray"], -10 #throw a C-level exception
     .end
 CODE
@@ -214,14 +214,17 @@ $matcher := ProfTest::Matcher.new(
 
 ok( $matcher.matches($prof), "profile shows 'say' inside nqp sub");
 
+# XXX workaround nqp-rx not generating :main
+Q:PIR { exit 0 };
+
 #convenience subs to avoid repetitive typing and visual noise
 
 sub version(*@p, *%n) { ProfTest::Want::Version.new(|@p, |%n) }
 sub cli(*@p, *%n)     { ProfTest::Want::CLI.new(|@p, |%n) }
 sub eor(*@p, *%n)     { ProfTest::Want::EndOfRunloop.new(|@p, |%n) }
-sub op(*@p, *%n)      { ProfTest::Want::Op.new(|@p, |%n) }
+sub op(*@p, *%n)      { ProfTest::Want::Op.new(|@p) }
 sub cs(*@p, *%n)      { ProfTest::Want::CS.new(|@p, |%n) }
-sub any(*@p, *%n)     { ProfTest::Want::Any.new(|@p, |%n) }
+sub any(*@p, *%n)     { ProfTest::Want::Any.new(|@p) }
 
 # Local Variables:
 #   mode: perl6

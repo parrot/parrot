@@ -283,7 +283,7 @@ Compile a grammar from a source string.
     goto have_infile
   quote_infile:
     infile = concat '"', infile
-    concat infile, '"'
+    infile = concat infile, '"'
   have_infile:
     $P0 = new 'String'
     $P0 = infile

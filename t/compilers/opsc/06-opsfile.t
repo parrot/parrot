@@ -15,13 +15,13 @@ my @files := <
 my $f := Ops::File.new(:oplib($oplib), |@files, :core(1));
 
 my @ops := $f.ops;
-# 84 core
+# 82 core
 # 116 math
 # We can generate more than 1 Ops::Op per op due args expansion.
 say( "# Parsed " ~ +@ops);
 # There is more than 200 ops in this 2 files.
 # Feel free to update number if you change them.
-ok(+@ops == 264, "Ops parsed correctly");
+ok(+@ops == 268, "Ops parsed correctly");
 say('# ' ~ +@ops);
 
 my $op := @ops[0];

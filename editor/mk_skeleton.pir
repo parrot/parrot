@@ -13,12 +13,10 @@
     timeArray = decodetime epoch
     year = timeArray[.TM_YEAR]
 
-    # split up to avoid various svn/codingstd issues.
+    # split up to avoid various codingstd issues.
     print '# Copyright (C) '
     print year
     say   ' Parrot Foundation.'
-    print '# $'
-    say   'Id: $'
     say ''
     say ".sub 'main' :main"
     say '    # For Parrot developers.'

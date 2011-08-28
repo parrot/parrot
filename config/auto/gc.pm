@@ -8,15 +8,35 @@ config/auto/gc.pm - Garbage Collection
 
 Sets memory allocator.
 
-Currently, we have only one choice:  the memory allocator in
-F<src/gc/alloc_resources.c>.
-
-In the future, we will have a C<--gc> command-line option which will enable
-the configurer to choose among several garbage collectors.
+The C<--gc> command-line option enables the configurer to choose among
+several garbage collectors.  Current available options are:
 
 =over 4
 
+=item ms
+
+Stop-the-world mark & sweep
+
+=item inf
+
+Infinite memory "collector"
+
+=item ms2
+
+New style mark & sweep
+
+=item gms (default)
+
+Generational M&S based on MS2
+
 =back
+
+The choice is stored as C<gc_type> in C<%PConfig>, and available
+(uppercased) as PARROT_GC_DEFAULT_TYPE in F<parrot/config.h>
+
+For backwards compatibility with parrot 3.1.0 and earlier, an empty
+entry C<gc_flag> is maintained.  (It used to be used in Makefiles to
+append to the C compiler flags.)
 
 =cut
 
@@ -26,8 +46,6 @@ use strict;
 use warnings;
 
 use base qw(Parrot::Configure::Step);
-
-use Parrot::Configure::Utils ':auto';
 
 sub _init {
     my $self = shift;
@@ -40,16 +58,19 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $gc = 'gc';
-
-    $conf->data->set(
-        TEMP_gc_c => <<"EOF",
-src/gc/alloc_resources\$(O):	\$(GENERAL_H_FILES) src/gc/alloc_resources.c
-EOF
-        TEMP_gc_o => "src/gc/alloc_resources\$(O)",
-        gc_flag   => '',
-    );
+    my $gc = $conf->options->get('gc') || 'gms';
     $conf->debug(" ($gc) ");
+
+    my @known_gcs = qw<gms ms ms2 inf>;
+
+    if ($gc) {
+        if (!grep /$gc/, @known_gcs) {
+            die "unknown gc '$gc': valid gc cores are ".join(', ', @known_gcs);
+        }
+        $conf->data->set(gc_type => uc($gc));
+        $self->set_result($gc);
+    }
+    $conf->data->set(gc_flag => ''); # Compatibility with parrot-3.1.0 and earlier
 
     return 1;
 }

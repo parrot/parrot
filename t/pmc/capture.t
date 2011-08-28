@@ -16,12 +16,8 @@ a variety of keys and values.
 
 =cut
 
-.const int TESTS = 53
-
 .sub 'test' :main
     .include 'test_more.pir'
-
-    plan(TESTS)
 
     test_new_capture()
     empty_capture_tests()
@@ -32,6 +28,11 @@ a variety of keys and values.
     test_get_number()
     test_keyed_int_delegation()
     test_list_delegation()
+    test_set_capture()
+
+    test_freeze_thaw()
+
+    "done_testing"()
 .end
 
 .sub 'test_new_capture'
@@ -312,6 +313,52 @@ a variety of keys and values.
     $P2 = 0
     $I0 = elements $P2
     is($I0, 0, 'list method delegation')
+.end
+
+.sub 'test_set_capture'
+    .local pmc capt
+    .local pmc capt2
+    $P1 = new ['String']
+
+    capt = new ['Capture']
+    capt2 = new ['Capture']
+
+    capt[0] = 1337
+
+    setref capt2, capt
+
+    $I0 = capt2[0]
+    is($I0, 1337, "Set PMC values correct")
+
+    $P0 = new ['Role']
+    push_eh set_badpmc
+        setref capt, $P0
+    pop_eh
+    goto finally
+    set_badpmc:
+        .get_results($P1)
+        ok(1, "Bad set_pmc handled properly")
+    finally:
+.end
+
+.sub 'test_freeze_thaw'
+    $P0 = new ["Capture"]
+    $P0["foo"] = "foo"
+    $P0[0]     = "bar"
+
+    # Sanity check
+    $S0 = $P0["foo"]
+    "is"($S0, "foo")
+    $S0 = $P0[0]
+    "is"($S0, "bar")
+
+    $S1 = freeze $P0
+    $P0 = thaw $S1
+
+    $S0 = $P0["foo"]
+    "is"($S0, "foo", "Hash thawed")
+    $S0 = $P0[0]
+    "is"($S0, "bar", "Array thawed")
 .end
 
 # Local Variables:

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
@@ -347,6 +347,55 @@ done:
 CODE
 0
 OUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', ".tailcall into an NCI" );
+.sub main :main
+    say "A"
+    $P0 = 'Foo'("C")
+    $S0 = typeof $P0
+    $P1 = $P0[0]
+    $P1 = 'Bar'($P1, "F")
+    say $P1
+    say "H"
+.end
+
+.sub 'Foo'
+    .param string c
+    say "B"
+    $P0 = compreg "PIR"
+    $S0 = <<'PIRSOURCE'
+    .sub 'Baz' :main
+        .param string f
+        say f
+        .return("G")
+    .end
+
+    .sub 'Fie' :init
+        say "D"
+    .end
+
+PIRSOURCE
+
+    say c
+    .tailcall $P0($S0)
+.end
+
+.sub 'Bar'
+    .param pmc baz
+    .param string f
+    say "E"
+    .tailcall baz(f)
+.end
+CODE
+A
+B
+C
+D
+E
+F
+G
+H
+OUTPUT
 
 # Local Variables:
 #   mode: cperl

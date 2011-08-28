@@ -1,5 +1,9 @@
 # Parrot is Copyright (C) 2001-2008, Parrot Foundation.
 
+=head1 NAME
+
+DONORS
+
 =head1 DONORS
 
 We would like to thank the following people and institutions,

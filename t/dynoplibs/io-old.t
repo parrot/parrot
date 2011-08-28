@@ -27,26 +27,29 @@ my ($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
 close $FOO;
 
 pasm_error_output_like( <<"CODE", <<'OUTPUT', '32bit seek: exception (ops)' );
+.pcc_sub :main main:
 .loadlib 'io_ops'
    open P0, "$temp_file", 'w'
    seek P0, -1, 0
    say "error!"
    end
 CODE
-/seek failed \(32bit\)/
+/seek failed/
 OUTPUT
 
 pasm_error_output_like( <<"CODE", <<'OUTPUT', '64bit seek: exception (ops)' );
+.pcc_sub :main main:
 .loadlib 'io_ops'
    open P0, "$temp_file", 'w'
    seek P0, -1, -1, 0
    say "error!"
    end
 CODE
-/seek failed \(64bit\)/
+/seek failed/
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "peek (ops)" );
+.pcc_sub :main main:
 .loadlib 'io_ops'
     open P0, "$temp_file", 'w'
     print P0, "a line\\n"
@@ -68,6 +71,7 @@ l
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "peek on an empty file (ops)" );
+.pcc_sub :main main:
 .loadlib 'io_ops'
     open P0, "$temp_file", 'w'
     close P0

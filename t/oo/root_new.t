@@ -52,8 +52,8 @@ via the C<root_new> opcode.
     $P1 = new 'Key'
     $P1 = $S1
     push key_pmc, $P1
-    concat class_name, ';'
-    concat class_name, $S1
+    class_name = concat class_name, ';'
+    class_name = concat class_name, $S1
     $I1 += 1
     goto LOOP
 

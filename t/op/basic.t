@@ -23,51 +23,61 @@ Tests basic string and branching operations.
 
 # It would be very embarrassing if these didnt work...
 pasm_output_is( <<'CODE', '', "noop, end" );
+.pcc_sub :main main:
         noop
         end
 CODE
 
 pasm_output_is( <<'CODE', '1', "print 1" );
+.pcc_sub :main main:
         print   1
         end
 CODE
 
 pasm_output_is( <<'CODE', 'Parrot flies', "print string" );
+.pcc_sub :main main:
         print 'Parrot flies'
         end
 CODE
 
 pasm_output_is( <<'CODE', 'Parrot flies', "print double-quoted string" );
+.pcc_sub :main main:
        print "Parrot flies"
        end
 CODE
 
 pasm_output_is( <<'CODE', "Parrot\tflies", "print double-quoted string, tabs" );
+.pcc_sub :main main:
        print "Parrot\tflies"
        end
 CODE
 
 pasm_output_is( <<'CODE', q('Parrot' flies), "print double-quoted string, nested single" );
+.pcc_sub :main main:
        print "'Parrot' flies"
        end
 CODE
 
 pasm_output_is( <<'CODE', q("Parrot" flies), "print single-quoted string, nested double" );
+.pcc_sub :main main:
        print '"Parrot" flies'
        end
 CODE
 
 pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escape" );
+.pcc_sub :main main:
        print "Parrot\x20flies"
        end
 CODE
 
 pasm_output_is( <<'CODE', q(Parrot flies), "escaped non-special" );
+.pcc_sub :main main:
        print "Parrot fl\ies"
        end
 CODE
 
 pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
+.pcc_sub :main main:
        print "Parrot flies\n"
        end
 CODE
@@ -75,6 +85,7 @@ Parrot flies
 OUTPUT
 
 pasm_output_is( <<'CODE', '42', "branch_ic" );
+.pcc_sub :main main:
         set     I4, 42
         branch  HERE
         set     I4, 1234
@@ -84,6 +95,7 @@ HERE:
 CODE
 
 pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
+.pcc_sub :main main:
         set     I4, 42
         branch  one
 two:    branch  three
@@ -97,6 +109,7 @@ three:
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
+.pcc_sub :main main:
         print    "start\n"
 
         new P0, 'ResizableIntegerArray'
@@ -115,6 +128,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
+.pcc_sub :main main:
        set_addr I1, FOO
        jump I1
        print "Jump failed\n"
@@ -127,6 +141,7 @@ Jump succeeded
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiple labels" );
+.pcc_sub :main main:
      if 0,FOO
      if 1,BAR
      print "not "
@@ -139,6 +154,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<'CODE', 32, "Predeclared opcodes" );
+.pcc_sub :main main:
      set_i_ic I0,32
      print I0
      end
@@ -146,7 +162,7 @@ CODE
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pir syntax with marker - is" );
 
-.sub _main
+.sub _main :main
      .const string OK = "ok\n"
      print OK
      end
@@ -158,7 +174,7 @@ OUTPUT
 
 pir_output_isnt( <<'CODE', <<'OUTPUT', "pir syntax with marker - isnt" );
 
-.sub _main
+.sub _main :main
      .const string OK = "ok\n"
      print OK
      end
@@ -170,7 +186,7 @@ OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "pir syntax with marker - like" );
 
-.sub _main
+.sub _main :main
      .const string OK = "ok\n"
      print OK
      end
@@ -181,7 +197,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pir syntax with function - is" );
-.sub _main
+.sub _main :main
      .const string OK = "ok\n"
      print OK
      end
@@ -192,7 +208,7 @@ ok
 OUTPUT
 
 pir_output_isnt( <<'CODE', <<'OUTPUT', "pir syntax with function - isnt" );
-.sub _main
+.sub _main :main
      .const string OK = "ok\n"
      print OK
      end
@@ -203,7 +219,7 @@ nada niete
 OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "pir syntax with function - like" );
-.sub _main
+.sub _main :main
      .const string OK = "ok 1\n"
      print OK
      end
@@ -214,7 +230,7 @@ CODE
 OUTPUT
 
 my $CODE = '
-.sub _main
+.sub _main :main
     print "ok\n"
     end
 .end

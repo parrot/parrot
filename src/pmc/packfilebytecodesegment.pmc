@@ -1,0 +1,245 @@
+/*
+Copyright (C) 2001-2011, Parrot Foundation.
+
+
+=head1 NAME
+
+src/pmc/packfilebytecodesegment.pmc - PackfileBytecodeSegment PMC
+
+=head1 DESCRIPTION
+
+This class implements a PackfileBytecode class, providing a PMC-based interface
+for bytecode creation and manipulation.
+
+See packfile.pmc for the toplevel Packfile interface; see PDD13 for the design
+spec.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
+#include "pmc/pmc_packfileopmap.h"
+
+pmclass PackfileBytecodeSegment auto_attrs extends PackfileRawSegment {
+    ATTR PMC    *op_map;    /* OpMap PMC */
+    ATTR INTVAL  main_sub;  /* Index of :main sub */
+
+
+
+/*
+
+=item C<void init()>
+
+Initialize PackfileBytecodeSegment.
+
+=cut
+
+*/
+    VTABLE void init() {
+        Parrot_PackfileBytecodeSegment_attributes * const attrs =
+                PARROT_PACKFILEBYTECODESEGMENT(SELF);
+
+        PObj_custom_mark_SET(SELF);
+
+        attrs->op_map = Parrot_pmc_new(INTERP, enum_class_PackfileOpMap);
+
+        SUPER();
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC *tmp;
+
+        GET_ATTR_op_map(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        SUPER();
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Return a pointer to a PackFile_ByteCode* built from this PMC's data.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        INTVAL op_count;
+        size_t i;
+
+        PMC    *ops, *op_map;
+
+        PackFile_ByteCode_OpMapping * mapping;
+
+        /* ByteCode to return */
+        PackFile_ByteCode * const bc = mem_gc_allocate_zeroed_typed(interp, PackFile_ByteCode);
+        bc->base.type = PF_BYTEC_SEG;
+
+        /* Create proper ByteCode structure from internal PMCs */
+        GET_ATTR_main_sub(INTERP, SELF, bc->main_sub);
+
+        /* Copy ops into ByteCode */
+        GET_ATTR_opcodes(INTERP, SELF, ops);
+        bc->base.size = VTABLE_get_integer(INTERP, ops);
+        bc->base.data = mem_gc_allocate_n_typed(INTERP, bc->base.size, opcode_t);
+
+        /* Not very efficient... */
+        for (i = 0; i < bc->base.size; ++i) {
+            bc->base.data[i] = VTABLE_get_integer_keyed_int(INTERP, ops, i);
+        }
+
+        /* Create various dynop mapping related structures */
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+        op_count = VTABLE_get_integer(INTERP, op_map);
+
+        bc->op_count = op_count;
+        bc->op_func_table = mem_gc_allocate_n_zeroed_typed(interp, op_count, op_func_t);
+        /* TODO Fill it */
+
+        bc->op_info_table = mem_gc_allocate_n_zeroed_typed(interp, op_count, op_info_t*);
+        /* TODO Fill it */
+
+        /* Construct mappings */
+        mapping = (PackFile_ByteCode_OpMapping *)VTABLE_get_pointer(INTERP, op_map);
+        memcpy(&bc->op_mapping, mapping, sizeof (PackFile_ByteCode_OpMapping));
+        /* Don't free "mapping". Caller will do it */
+
+        return bc;
+    }
+
+/*
+=item C<void set_pointer()>
+
+Initialize PackfileBytecodeSegment from PackFile_Bytecode*
+
+=cut
+*/
+    VTABLE void set_pointer(void *pointer) {
+        const PackFile_ByteCode * const pfseg =
+                (const PackFile_ByteCode *)pointer;
+        opcode_t i, j;
+        PMC     *op_map;
+
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+
+        /* Recreate OpMapping */
+        for (i = 0; i < pfseg->op_mapping.n_libs; i++) {
+            PackFile_ByteCode_OpMappingEntry entry = pfseg->op_mapping.libs[i];
+            for (j = 0; j < entry.n_ops; j++) {
+                opcode_t lib_op = entry.lib_ops[j];
+                VTABLE_get_integer_keyed_str(INTERP, op_map,
+                    Parrot_str_from_platform_cstring(INTERP,
+                                                     entry.lib->op_info_table[lib_op].full_name));
+            }
+        }
+
+        /* TODO. Figure out how to generate OpLibs and where to store them */
+
+        SUPER(pointer);
+    }
+
+
+/*
+
+=item C<void push_pmc()>
+
+Add an op and its arguments to this bytecode.  The PMC should be a
+ResizablePMCArray with the first PMC being a String containing the full name of
+an op and the remaining PMCs being Integers.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *p) {
+
+        const Parrot_PackfileBytecodeSegment_attributes * const attrs =
+            PMC_data_typed(SELF, Parrot_PackfileBytecodeSegment_attributes*);
+
+        INTVAL  i, op_num, arr_size;
+
+        if (!VTABLE_does(INTERP, p, CONST_STRING(INTERP, "array"))) {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    "PMC passed to push_pmc is not array-like");
+        }
+
+        op_num = VTABLE_get_integer_keyed_str(INTERP, attrs->op_map,
+                 VTABLE_get_string_keyed_int(INTERP, p, 0));
+
+        /* add the things to attrs->ops */
+        VTABLE_push_integer(INTERP, attrs->opcodes, op_num);
+        arr_size = VTABLE_elements(INTERP, p);
+
+        for (i = 1; i < arr_size; i++){
+            VTABLE_push_integer(INTERP, attrs->opcodes,
+                    VTABLE_get_integer_keyed_int(INTERP, p, i));
+        }
+    }
+
+/*
+=item C<PMC* main_sub()>
+
+Return :main Sub for this segment.
+
+=cut
+*/
+
+
+    METHOD main_sub(INTVAL main_sub :optional, INTVAL got_main :opt_flag) {
+        if (got_main) {
+            SET_ATTR_main_sub(INTERP, SELF, main_sub);
+        }
+        GET_ATTR_main_sub(INTERP, SELF, main_sub);
+        RETURN(INTVAL main_sub);
+    }
+
+/*
+=item C<PMC* opmap()>
+
+Return PackfileOpMap for this BytecodeSegment.
+
+=cut
+*/
+
+    METHOD PMC* opmap() {
+        PMC *op_map;
+        GET_ATTR_op_map(INTERP, SELF, op_map);
+        RETURN(PMC* op_map);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

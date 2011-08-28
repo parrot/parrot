@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,10 +81,8 @@ sub new {
         $self->new_group(
             'Utilities',
             '',
-            $self->new_item( '', 'tools/dev/list_unjitted.pl' ),
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
-            $self->new_item( '', 'tools/dev/nm.pl' ),
-            $self->new_item( '', 'tools/dev/ncidef2pasm.pl' ),
+            $self->new_item( '', 'tools/dev/ncidef2pir.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
         ),
         $self->new_group(

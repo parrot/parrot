@@ -67,15 +67,15 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
     if $I0 goto args_array
   args_string:
     $S0 = self.'escape'($P0)
-    concat out, sep
-    concat out, $S0
+    out = concat out, sep
+    out = concat out, $S0
     sep = ';'
     goto args_loop
   args_array:
     splice args, $P0, 0, 0
     goto args_loop
   args_done:
-    concat out, ']'
+    out = concat out, ']'
     .return (out)
 .end
 
@@ -169,7 +169,7 @@ Return pir for an operation node.
     .local string result
     result = node.'result'()
     unless result goto have_result
-    concat result, ' = '
+    result = concat result, ' = '
   have_result:
 
     ##  get list of arguments to operation
@@ -216,7 +216,7 @@ Return pir for an operation node.
 
   pirop_inline:
     fmt = node.'inline'()
-    concat fmt, "\n"
+    fmt = concat fmt, "\n"
     result = node.'result'()
     goto pirop_emit
 
@@ -297,8 +297,8 @@ the sub.
     outername = outerpost.'subid'()
     $S0 = self.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
-    concat pirflags, $S0
-    concat pirflags, ')'
+    pirflags = concat pirflags, $S0
+    pirflags = concat pirflags, ')'
   pirflags_done:
 
     .local pmc outerhll, hll
@@ -396,6 +396,15 @@ the sub.
     subpir .= $P0
     goto param_loop
   paramlist_done:
+
+    ## Add a file annotation
+    .local pmc files
+    files = find_caller_lex '$?FILES'
+    if null files goto no_files
+    unless files goto no_files
+    $S0 = self.'escape'(files)
+    subpir.'append_format'(".annotate 'file', %0\n", $S0)
+  no_files:
 
     self.'pir_children'(node)
     subpir.'append_format'(".end\n\n")

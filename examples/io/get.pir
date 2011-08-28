@@ -28,7 +28,7 @@ The HTTP redirection is supported (for example http://fperrad.googlepages.com/ho
     ua = new ['LWP';'UserAgent']
     ua.'env_proxy'()
     ua.'show_progress'(1)
-    response = ua.'get'(url, 'close' :named('Connection'))
+    response = ua.'get'(url)
     $S0 = response.'content'()
     say $S0
 .end

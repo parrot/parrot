@@ -33,6 +33,7 @@ If the data is not valid, an exception will be thrown.
     throw $P0
 
   slurp_file:
+    fh.'encoding'('utf8')
     text = fh.'readall'()
 
     # Convert the text to an object and return it.

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,6 +21,7 @@ Handles class and object manipulation.
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_object.h"
+#include "pmc/pmc_namespace.h"
 
 #include "oo.str"
 
@@ -30,7 +31,7 @@ Handles class and object manipulation.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC* C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -153,14 +154,19 @@ void
 Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(Parrot_oo_extract_methods_from_namespace)
+    Parrot_NameSpace_attributes * nsattrs;
     PMC *methods, *vtable_overrides;
 
     /* Pull in methods from the namespace, if any. */
     if (PMC_IS_NULL(ns))
         return;
 
+    nsattrs = PARROT_NAMESPACE(ns);
+
     /* Import any methods. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);*/
+    methods = nsattrs->methods;
+    nsattrs->methods = PMCNULL;
 
     if (!PMC_IS_NULL(methods)) {
         PMC * const iter = VTABLE_get_iter(interp, methods);
@@ -174,7 +180,9 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
     }
 
     /* Import any vtables. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);*/
+    vtable_overrides = nsattrs->vtable;
+    nsattrs->vtable = PMCNULL;
 
     if (!PMC_IS_NULL(vtable_overrides)) {
         PMC * const iter = VTABLE_get_iter(interp, vtable_overrides);
@@ -207,7 +215,7 @@ major way
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
@@ -385,8 +393,12 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
         /* Create proxy if not found */
         if (PMC_IS_NULL(proxy)) {
+            /* TODO: doing direct register access is faster, but Lua (at least) seems to depend
+                     on this method call */
+            /*Parrot_NameSpace_attributes * const nsattrs = PARROT_NAMESPACE(pmc_ns); */
             proxy = Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
             Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
+            /*nsattrs->_class = proxy;*/
         }
         return proxy;
     }
@@ -404,7 +416,7 @@ return it. Otherwise, create a new PMCProxy for the type ID number.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
@@ -441,7 +453,7 @@ Create a new Class PMC for a new type of the given C<name>.
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
@@ -501,7 +513,7 @@ from parents.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_oo_find_vtable_override(PARROT_INTERP,
@@ -907,7 +919,7 @@ interpreter, and name of the method. Don't use a possible method cache.
 */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *method_name))
@@ -921,8 +933,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
     INTVAL         i;
 
     for (i = 0; i < n; ++i) {
-        PMC * const _class    = VTABLE_get_pmc_keyed_int(interp, mro, i);
-        PMC * const ns        = VTABLE_get_namespace(interp, _class);
+        PMC * const _class_i  = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class_i);
         PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
         PMC        *method    = PMCNULL;
         PMC        *method_hash;
@@ -938,7 +950,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
         if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
 
-        TRACE_FM(interp, _class, method_name, method);
+        TRACE_FM(interp, _class_i, method_name, method);
 
         if (!PMC_IS_NULL(method))
             return method;
@@ -1038,7 +1050,7 @@ Merge together the MRO of the items in the list.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 static PMC*
 C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 {
@@ -1141,7 +1153,7 @@ F<http://192.220.96.201/dylan/linearization-oopsla96.html>
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {

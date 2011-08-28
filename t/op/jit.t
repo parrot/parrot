@@ -28,6 +28,7 @@ should just be the same.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -42,6 +43,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -62,6 +64,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -82,6 +85,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -102,6 +106,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -123,6 +128,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -143,6 +149,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -163,6 +170,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -184,6 +192,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -198,6 +207,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -218,6 +228,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -238,6 +249,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -258,6 +270,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -279,6 +292,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -299,6 +313,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -319,6 +334,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -340,6 +356,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -361,6 +378,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -375,6 +393,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -395,6 +414,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -415,6 +435,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -435,6 +456,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -456,6 +478,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -476,6 +499,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -496,6 +520,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -517,6 +542,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -536,6 +562,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -555,6 +582,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -574,6 +602,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -594,6 +623,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,6
 set I2,2
@@ -608,6 +638,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,8
 set I2,2
@@ -628,6 +659,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -648,6 +680,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,9
 set I2,2
@@ -668,6 +701,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -689,6 +723,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,8
 set I2,2
@@ -709,6 +744,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -729,6 +765,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -750,6 +787,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,9
@@ -769,6 +807,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,8
@@ -788,6 +827,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 2 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -807,6 +847,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 0 mapped" );
+.pcc_sub :main main:
 set I0,0
 set I1,1
 set I2,2
@@ -828,6 +869,7 @@ OUTPUT
 
 # tests for JIT CGP
 pasm_output_is( <<'CODE', <<'OUTPUT', "1 non jit" );
+.pcc_sub :main main:
         set I0, 16
         print "ok 1\n"
         end
@@ -836,6 +878,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
+.pcc_sub :main main:
         print "ok 1\n"
         print "ok 2\n"
         end
@@ -845,6 +888,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
+.pcc_sub :main main:
         set I0, 16
         print "ok 1\n"
         print "ok 2\n"
@@ -855,6 +899,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, JITed branch to JIT" );
+.pcc_sub :main main:
         set I0, 42
         print I0
         print "\n"
@@ -872,6 +917,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to JIT" );
+.pcc_sub :main main:
         set I0, 42
         print I0
         print "\n"
@@ -889,6 +935,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, JITed branch to non JIT" );
+.pcc_sub :main main:
         set I0, 42
         print I0
         print "\n"
@@ -904,6 +951,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit, non JITed branch to non JIT" );
+.pcc_sub :main main:
         set I0, 42
         print I0
         print "\n"
@@ -919,6 +967,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
+.pcc_sub :main main:
        set_addr I1, FOO
        jump I1
        print "Jump failed\n"
@@ -931,6 +980,7 @@ Jump succeeded
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );
+.pcc_sub :main main:
     print "ok 1\n"
     branch l2
 l1:
@@ -946,6 +996,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is branch" );
+.pcc_sub :main main:
     print "ok 1\n"
     branch l2
 l1:
@@ -963,6 +1014,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is JIT branch" );
+.pcc_sub :main main:
     null I0
     print "ok 1\n"
     branch l2
@@ -979,6 +1031,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "last is JIT branch" );
+.pcc_sub :main main:
     null I0
     print "ok 1\n"
     branch l2
@@ -997,6 +1050,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "t/op/arithmetic_26: non jit seq w. branch" );
+.pcc_sub :main main:
 new P0, 'Integer'
 set N0, 4000
 set P0, 123
@@ -1022,6 +1076,7 @@ OUTPUT
 # multiply optimization tests
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "mul power of 2" );
+.pcc_sub :main main:
    set I0, 5
    mul I1, I0, 0
    eq I1, 0, ok_1
@@ -1069,6 +1124,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "small imm" );
+.pcc_sub :main main:
    set I0, 5
    mul I1, I0, 3
    eq I1, 15, ok_1
@@ -1124,6 +1180,7 @@ ok 7
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div power of 2" );
+.pcc_sub :main main:
    set I0, 1024
    div I1, I0, 2
    eq I1, 512, ok_1
@@ -1156,7 +1213,10 @@ ok 3
 ok 4
 OUTPUT
 
-my $code;
+my $code = <<CODE;
+.pcc_sub :main main:
+CODE
+
 for ( 0 .. 4096 ) {
     $code .= qq{   set S0, "hello"\n};
 }
@@ -1172,6 +1232,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "volatile clobbered by function call" );
+.pcc_sub :main main:
   null I3
   null I6
   null I5
@@ -1199,6 +1260,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "div bug" );
+.pcc_sub :main main:
     set I1, 1
     set I2, 2
     set I3, 4

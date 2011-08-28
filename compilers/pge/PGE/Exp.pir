@@ -140,8 +140,8 @@ tree as a PIR code object that can be compiled.
     if null $P0 goto have_subid
     $S0 = escape($P0)
     pirflags = concat pirflags, ' :subid('
-    concat pirflags, $S0
-    concat pirflags, ')'
+    pirflags = concat pirflags, $S0
+    pirflags = concat pirflags, ')'
   have_subid:
 
     ##   Perform reduction/optimization on the
@@ -444,7 +444,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != $I1 goto concat_lit_shift
     $S0 = exp0.'ast'()
     $S1 = exp1.'ast'()
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     exp0.'!make'($S0)
     goto concat_lit_loop
   concat_lit_shift:

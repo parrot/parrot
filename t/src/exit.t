@@ -1,11 +1,19 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 1;
+use Parrot::Test;
+use Parrot::Config;
+use File::Spec::Functions;
+
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 1;
 
 =head1 NAME
 
@@ -50,13 +58,12 @@ main(int argc, char* argv[])
     Interp *interp;
 
     interp = Parrot_new(NULL);
-    if (!interp) {
-        return 1;
+    if (interp) {
+        Parrot_x_on_exit(interp, ex1, 0);
+        Parrot_x_on_exit(interp, ex2, 0);
+        Parrot_x_on_exit(interp, ex3, 0);
+        Parrot_x_exit(interp, 0);
     }
-    Parrot_x_on_exit(interp, ex1, 0);
-    Parrot_x_on_exit(interp, ex2, 0);
-    Parrot_x_on_exit(interp, ex3, 0);
-    Parrot_x_exit(interp, 0);
     exit(0);
 }
 CODE

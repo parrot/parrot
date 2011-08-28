@@ -52,6 +52,30 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
 
 /*
 
+=item C<void Parrot_x_jump_out(PARROT_INTERP, int status)>
+
+Jumps out returning to the caller api function.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+Parrot_x_jump_out(PARROT_INTERP, int status)
+{
+    ASSERT_ARGS(Parrot_x_jump_out)
+
+    if (interp->api_jmp_buf)
+        longjmp(*(interp->api_jmp_buf), 1);
+    else
+        exit(status);
+}
+
+/*
+
 =item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Exit, calling any registered exit handlers.
@@ -93,7 +117,8 @@ Parrot_x_exit(PARROT_INTERP, int status)
         node = next;
     }
 
-    exit(status);
+    interp->exit_handler_list = NULL;
+    Parrot_x_jump_out(interp, status);
 }
 
 /*

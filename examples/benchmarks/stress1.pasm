@@ -15,6 +15,8 @@ GC runs made.
 
 =cut
 
+.pcc_sub :main main:
+
 # Our master loop, I20 times
 	set I20, 10
 	time N0

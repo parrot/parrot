@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -43,18 +43,19 @@ Get "key".
         if (!attrs->parrot_hash || !attrs->bucket)
             return PMCNULL;
 
-        return hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
+        return Parrot_hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
     METHOD key() {
-        PMC *ret = SELF.get_pmc();
+        PMC * const ret = SELF.get_pmc();
         RETURN(PMC* ret);
     }
 
     METHOD value() {
-        Parrot_HashIteratorKey_attributes *attrs =
+        const Parrot_HashIteratorKey_attributes * const attrs =
                 PARROT_HASHITERATORKEY(SELF);
-        PMC *ret = hash_value_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
+        PMC * const ret =
+            Parrot_hash_value_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->value);
         RETURN(PMC* ret);
     }
 
@@ -64,14 +65,14 @@ Get "key".
     }
 
     VTABLE STRING* get_string() {
-        Parrot_HashIteratorKey_attributes *attrs =
+        const Parrot_HashIteratorKey_attributes * const attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
         /* TT #1080 & TT #1081 Wallpapering problem with NULL attributes */
         if (!attrs->parrot_hash || !attrs->bucket)
             return CONST_STRING(INTERP, "");
 
-        return hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
+        return Parrot_hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
 /*

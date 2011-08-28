@@ -31,7 +31,7 @@
 # parrot -R jit oo1-prop.pasm                     0.54
 
 .namespace [ "Foo" ]
-.sub 'main'
+.sub 'main' :main
     newclass $P1, "Foo"
     addattribute $P1, ".i"
     addattribute $P1, ".j"

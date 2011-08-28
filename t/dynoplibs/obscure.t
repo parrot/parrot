@@ -21,7 +21,7 @@ Tests obscure.ops
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(42)
+    plan(70)
     ok(1,"load obscure_ops")
 
     test_covers()
@@ -102,6 +102,8 @@ Tests obscure.ops
     .fp_eq_ok(x, -2, 'exsec of pi')
     exsec x, y
     .fp_eq_ok(x, 0.414213562373095, 'exsec of pi/4')
+    exsec x, 3.14159265
+    .fp_eq_ok(x, -2, 'exsec of const pi')
 .end
 
 .sub lcm_test
@@ -110,8 +112,26 @@ Tests obscure.ops
     lcm $I2, $I1, $I0
     is( $I2, 10, 'lcm_test' )
 
+    lcm $I2, 10, $I0
+    is( $I2, 10, 'lcm_test' )
+
+    lcm $I2, $I1, 10
+    is( $I2, 10, 'lcm_test' )
+
+    lcm $I2, 10, 10
+    is( $I2, 10, 'lcm_test' )
+
     set $I1, 17
     lcm $I2, $I1, $I0
+    is( $I2, 170, 'lcm_test' )
+
+    lcm $I2, 17, $I0
+    is( $I2, 170, 'lcm_test' )
+
+    lcm $I2, $I1, 10
+    is( $I2, 170, 'lcm_test' )
+
+    lcm $I2, 17, 10
     is( $I2, 170, 'lcm_test' )
 
     set $I0, 17
@@ -119,14 +139,41 @@ Tests obscure.ops
     lcm $I2, $I1, $I0
     is( $I2, 170, 'lcm_test' )
 
+    lcm $I2, 10, $I0
+    is( $I2, 170, 'lcm_test' )
+
+    lcm $I2, $I1, 17
+    is( $I2, 170, 'lcm_test' )
+
+    lcm $I2, 10, 17
+    is( $I2, 170, 'lcm_test' )
+
     set $I0, 10
     set $I1, 0
     lcm $I2, $I1, $I0
     is( $I2, 0, 'lcm_test' )
 
+    lcm $I2, 0, $I0
+    is( $I2, 0, 'lcm_test' )
+
+    lcm $I2, $I1, 10
+    is( $I2, 0, 'lcm_test' )
+
+    lcm $I2, 0, 10
+    is( $I2, 0, 'lcm_test' )
+
     set $I0, 0
     set $I1, 10
     lcm $I2, $I1, $I0
+    is( $I2, 0, 'lcm_test' )
+
+    lcm $I2, 10, $I0
+    is( $I2, 0, 'lcm_test' )
+
+    lcm $I2, $I1, 0
+    is( $I2, 0, 'lcm_test' )
+
+    lcm $I2, 10, 0
     is( $I2, 0, 'lcm_test' )
 .end
 
@@ -136,8 +183,26 @@ Tests obscure.ops
     gcd $I2, $I1, $I0
     is( $I2, 14, 'gcd_test' )
 
+    gcd $I2, 42, $I0
+    is( $I2, 14, 'gcd_test' )
+
+    gcd $I2, $I1, 70
+    is( $I2, 14, 'gcd_test' )
+
+    gcd $I2, 42, 70
+    is( $I2, 14, 'gcd_test' )
+
     set $I0, 66
     gcd $I2, $I1, $I0
+    is( $I2, 6, 'gcd_test' )
+
+    gcd $I2, 42, $I0
+    is( $I2, 6, 'gcd_test' )
+
+    gcd $I2, $I1, 66
+    is( $I2, 6, 'gcd_test' )
+
+    gcd $I2, 42, 66
     is( $I2, 6, 'gcd_test' )
 
     set $I0, 70
@@ -145,9 +210,27 @@ Tests obscure.ops
     gcd $I2, $I1, $I0
     is( $I2, 1, 'gcd_test' )
 
+    gcd $I2, 1, $I0
+    is( $I2, 1, 'gcd_test' )
+
+    gcd $I2, $I1, 70
+    is( $I2, 1, 'gcd_test' )
+
+    gcd $I2, 1, 70
+    is( $I2, 1, 'gcd_test' )
+
     set $I0, 70
     set $I1, 3
     gcd $I2, $I1, $I0
+    is( $I2, 1, 'gcd_test' )
+
+    gcd $I2, 3, $I0
+    is( $I2, 1, 'gcd_test' )
+
+    gcd $I2, $I1, 70
+    is( $I2, 1, 'gcd_test' )
+
+    gcd $I2, 3, 70
     is( $I2, 1, 'gcd_test' )
 .end
 

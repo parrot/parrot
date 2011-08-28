@@ -21,18 +21,18 @@ id (generally the same as the short option), some flags, and finally a list of
 up to nine long options (all for this one behavior), terminated with a NULL
 pointer.
 
-There is currently one possible flag: OPTION_required_FLAG, which states that
-this option has a required argument.  Optional arguments are not supported, and
-they should be.
+There are currently two possible flags: OPTION_required_FLAG, which states that
+this option has a required argument, and OPTION_optional_FLAG, which indicates 
+that this option has an optional argument.
 
-The array should be terminated with an element that has 0 for the option id.
+The array must be terminated with an element that has 0 for the option id.
 So, for example:
 
     struct longopt_opt_decl options[] = {
         { 'f', 'f', 0,                    { "--foo", NULL } },
         { 'b', 'b', OPTION_required_FLAG, { "--bar", NULL } },
         {   0, 128, 0,                    { "--baz", "--bazbar", NULL } },
-        {   0,   0, 0,                    { NULL } }
+        {   0,   0, OPTION_optional_FLAG, { NULL } }
     };
 
 This is a structure that specifies three options.

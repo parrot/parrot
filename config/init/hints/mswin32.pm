@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 package init::hints::mswin32;
 
@@ -13,7 +13,6 @@ sub runstep {
     my $ccflags   = $conf->option_or_data('ccflags');
     my $cc        = $conf->option_or_data('cc');
     my $share_ext = $conf->option_or_data('share_ext');
-    my $version   = $conf->option_or_data('VERSION');
 
     # Later in the Parrot::Configure::runsteps() process,
     # inter::progs will merge the command-line overrides with the defaults.
@@ -197,6 +196,55 @@ sub runstep {
         );
     }
     elsif ($is_mingw) {
+        # when using mingw gcc, parrot needs at least Windows2000, but WindowsME.
+        my @os_version = Win32::GetOSVersion();
+        my $winver = (($os_version[4] >=2 && $os_version[1]>=5)
+            || ($os_version[4] = 1 && $os_version[1] = 4))? 'Windows2000' : 'WindowsNT4';
+
+        my $make = $conf->data->get(qw(make));
+
+        if ( $make =~ /nmake/i ) {
+
+            # ActiveState Perl
+            $conf->data->set(
+                a       => '.a',
+                ar      => 'ar',
+                ccflags => "-DWIN32 -DWINVER=$winver ",
+                ld      => 'g++',
+                ldflags => '',
+                libs =>
+'-lmsvcrt -lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwinmm -lversion ',
+                link      => 'gcc',
+                linkflags => '',
+                o         => '.o',
+            );
+        }
+        elsif ( $make =~ /dmake/i ) {
+
+            # strawberry Perl
+            $conf->data->set(
+                ccflags   => "-DWIN32 -DWINVER=$winver ",
+                ldflags   => '',
+                linkflags => '',
+                optimize  => '',
+            );
+        }
+        elsif ( $make =~ /mingw32-make/i ) {
+            ; # Vanilla Perl
+            $conf->data->set(
+                ccflags   => "-DWINVER=$winver ",
+                make      => 'mingw32-make',
+                make_c    => 'mingw32-make -C',
+            );
+        }
+        else {
+            warn "unknown configuration";
+        }
+
+        if ( $conf->data->get(qw(optimize)) eq "1" ) {
+            $conf->data->set( optimize => '-O2' );
+        }
+
         $conf->data->set(
             cc                  => 'gcc',
             ccflags             => '-DWIN32',

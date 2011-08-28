@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 package Parrot::Configure::Messages;
 
@@ -16,7 +16,7 @@ sub print_introduction {
     my $parrot_version = shift;
     print <<"END";
 Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 Hello, I'm Configure. My job is to poke and prod your system to figure out
 how to build Parrot. The process is completely automated, unless you passed in
@@ -30,8 +30,7 @@ END
 }
 
 sub print_conclusion {
-    my $conf = shift;
-    my $make = shift;
+    my ($conf, $make, $args) = @_;
     my @failed_steps = @{ $conf->{log} };
     my @logged_failed_steps = ();
     for (my $i = 1; $i <= $#failed_steps; $i++) {
@@ -40,19 +39,20 @@ sub print_conclusion {
         }
     }
     if ( scalar ( @logged_failed_steps ) ) {
-        print "\nDuring configuration the following steps failed:\n";
+        print STDERR "\nDuring configuration the following steps failed:\n";
         foreach my $fail (@logged_failed_steps) {
             my $msg = sprintf "    %02d:  %s\n", (
                 $fail->[0],
                 $fail->[1]->{step},
             );
-            print $msg;
+            print STDERR $msg;
         }
-        print "You should diagnose and fix these errors before calling '$make'\n";
+        print STDERR "You should diagnose and fix these errors before calling '$make'\n";
         return;
     }
     else {
-        print <<"END";
+        unless ( $args->{silent} ) {
+            print <<"END";
 
 Okay, we're done!
 
@@ -63,6 +63,7 @@ Happy Hacking,
         The Parrot Team
 
 END
+        }
         return 1;
     }
 }
@@ -84,7 +85,7 @@ Parrot::Configure::Messages - Introduce and conclude Parrot configuration proces
 
     print_introduction($parrot_version);
 
-    print_conclusion($make_version);
+    $rv = print_conclusion( $conf, $make, $args );
 
 =head1 DESCRIPTION
 
@@ -126,14 +127,17 @@ and instructing the user to run F<make>.
 
 =item * Arguments
 
-One argument:  String holding the version of F<make> located by the
-configuration process.
+    $rv = print_conclusion( $conf, $make, $args );
+
+List of three arguments: the Parrot::Configure object; the string holding the
+version of F<make> located by the configuration process; and the hash
+reference which is the first element in the list returned by
+C<Parrot::Configure::Options::process_options()>.
 
 =item * Return Value
 
-Implicit true value when C<print> returns successfully.
-
-=item * Comment
+Returns true value when configuration is successful and message has been
+printed.  Otherwise return value is undefined.
 
 =back
 

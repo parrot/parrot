@@ -74,7 +74,7 @@ my @hlls = (
     {
         name       => 'cardinal',
         scm        => 'GIT',
-        repository => 'git://github.com/cardinal/cardinal.git'
+        repository => 'git://github.com/parrot/cardinal.git'
     },
 
     {
@@ -313,8 +313,8 @@ my @hlls = (
 
     {
         name       => 'winxed',
-        scm        => 'SVN',
-        repository => 'http://winxed.googlecode.com/svn/trunk/'
+        scm        => 'GIT',
+        repository => 'git://github.com/NotFound/winxed.git'
     },
 
     {

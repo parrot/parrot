@@ -9,6 +9,7 @@ use lib qw(. lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 use Parrot::Config;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -25,6 +26,10 @@ Tests atomic operation support.
 =cut
 
 # generic tests
+
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 plan tests => 4;
 

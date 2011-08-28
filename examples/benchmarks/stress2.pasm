@@ -14,6 +14,8 @@ Creates 200 arrays of 10000 elements each.
 
 =cut
 
+.pcc_sub :main main:
+
     set I3, 20
     new P10, 'ResizableIntegerArray'
 ol:

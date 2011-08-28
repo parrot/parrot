@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 TITLE
+=head1 NAME
 
 The Headerizer
 

@@ -29,7 +29,7 @@ regressions in the parrot VM, JIT and GC
     load_bytecode "Digest/MD5.pbc"
 
     .include 'test_more.pir'
-    plan(517)
+    plan(518)
 
     test_miscellaneous_words()
     test_funny_chars()
@@ -37,6 +37,7 @@ regressions in the parrot VM, JIT and GC
     test_really_long_string()
     test_recursive_md5_1()
     test_recursive_md5_2()
+    test_object_interface()
 .end
 
 .sub test_miscellaneous_words
@@ -678,6 +679,13 @@ OUTPUT
     branch loop
   end:
 
+.end
+
+.sub test_object_interface
+    $P0 = new ["Digest";"MD5"]
+    $P0."md5sum"("Hello")
+    $S0 = $P0."md5_hex"()
+    is($S0, '8b1a9953c4611296a827abf8c47804d7', 'md5 Hello')
 .end
 
 # Local Variables:

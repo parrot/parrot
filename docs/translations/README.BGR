@@ -1,0 +1,176 @@
+﻿Това е Parrot, версия 3.4.0
+-----------------------------
+
+Parrot is Copyright (C) 2001-2010, Parrot Foundation.
+
+
+ЛИЦЕНЗНА ИНФОРМАЦИЯ
+-------------------
+
+Този код се разпространява под условията на Artistic License 2.0.
+За повече детайли, вижте пълния текст на лиценза във файла LICENSE.
+
+ПРЕГЛЕД
+--------
+Parrot е виртуално машина, разработена за ефикасно компилиране и изпълнение на 
+bytecode за динамични езици.
+
+ПРЕДПОСТАВКИ
+-------------
+
+Трябва ви компилатор за С, линкер и, разбира се, make програма.
+
+Ако ще линквате с ICU библиотеката, трябва да я свалите и инсталирате
+преди да конфигурирате Parrot. Свалете я от http://site.icu-project.org/download
+
+Също така ви трябва Perl 5.8.4 или по-нов, и Storable 2.12 или по-нов
+за пускане на различни скриптове за конфигуриране и билдване.
+
+For most of the platforms that we are supporting initially, Parrot should build
+out of the box. docs/parrot.pod lists the core platforms. PLATFORMS provides
+reports on the platforms on which Parrot has been built and tested.
+
+КАК ДА ВЗЕМЕТЕ PARROT ОТ GITHUB
+-----------------------------
+I.  Инсталирайте Git.
+
+Linux:
+Методът зависи от дистрибуцията ви. За да инсталирате трябва да изпълните (като root или sudo <cmd>):
+
+На Ubuntu/Debian (apt-базирани):
+
+    apt-get install git-core
+
+На Red Hat, Fedora (rpm-базирани):
+
+    yum install git
+
+На Gentoo (portage):
+
+    emerge -av dev-vcs/git
+
+Windows:
+Има 2 Git порта за Windows:
+
+msysgit 	    http://code.google.com/p/msysgit/downloads/list
+TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
+
+Macintosh OS X:
+
+Търсене в интернет ще намери разнообразни git инсталатори за Mac OS X,
+включително:
+
+    http://help.github.com/mac-git-installation/
+
+II.  Получаване на Parrot от github.com
+
+За да вземете копие Parrot Git хранилището:
+
+    git clone git://github.com/parrot/parrot.git
+
+Това по подразбиране ще провери главния клон по подразбиране. За да създадете локален клон
+който следи клона "some_branch":
+
+    git checkout -b --track some_branch origin/some_branch
+
+Горните URL са само за четене. Ако сте разработчик на Parrot използвайте URL
+за четене и запис:
+
+    git clone git@github.com:parrot/parrot.git
+
+Можете да видите списъкът от клони на http://github.com/parrot/parrot
+
+ИНСТРУКЦИИ
+------------
+
+За сега, разархивирайте Parrot tarball-а, (ако четете това, вече сигурно 
+сте го направили) и напишете
+
+    perl Configure.pl
+
+за да пуснете Конфигурационния скрипт. Скриптът Configure.pl извлича конфигурацията 
+от работещата perl5 програма.  Може да се наложи изрично да кажете на  Configure.pl
+кой компилатор и линкер да използва.  Например, за компилиране на C файлове с 'cc',
+C++ файлове с 'CC', и линкване на всичко с 'CC', трябва да напишете
+
+    perl Configure.pl --cc=cc --link=CC --ld=CC
+
+Вижте "perl Configure.pl --help" за повече опции и docs/configuration.pod
+за повече детайли.
+
+За системи като HPUX които нямат inet_pton моля изпълнете
+
+    perl Configure.pl --define=inet_aton
+
+Пускането на Configure.pl ще генерира config.h хедър, Parrot::Config
+модул, платформени файлове и много Make файлове.
+
+Файлът "myconfig" съдържа преглед на настройките.
+
+След това изпълнете make. (Configure.pl ще ви каже коя версия на make се препоръчва
+за системата ви.)
+
+Сега трябва да се билдне интерпретаторът.  Ако билдвате ICU библиотеката
+(това е по подразбиране на повечето системи), трябва да използвате GNU make
+(или нещо съвместимо с него).
+
+Можете да тествате Parrot като изпълните "make test". Можете да изпълнявате тестовете
+паралелно с "make TEST_JOBS=3 test".
+
+Можете да изпълните целия тестов пакет с 
+
+    make fulltest
+
+Бележка: PLATFORMS съдържа бележки дали тестови провали се очакват на системата ви.
+
+Можете да инсталирате Parrot с:
+
+    make install
+
+По подразбиране се инсталира в /usr/local, с Parrot executable в
+/usr/local/bin. Ако искате да инсталирате Parrot на друго място използвайте:
+
+    perl Configure.pl --prefix=/home/joe/bird
+    make install
+
+Но динамичните библиотеки няма да бъдат намерени за нестандартни 
+местоположения освен ако не настроите LD_LIBRARY_PATH или подобно.
+
+Вижте docs/parrot.pod и docs/intro.pod за да разберете на къде да вървите от тук.
+Ако имате проблеми, вижте секцията "How To Submit A Bug Report" в
+docs/submissions.pod.  Тези документи са в POD формат. Можете да ги видите с 
+командата:
+
+    perldoc -F docs/intro.pod
+
+ПРОМЕНИ
+-------
+
+За документация относно юзър-видимите промени между тази версия и предишните 
+версии, вижте NEWS.
+
+ПОЩЕНСКИ СПИСЪЦИ
+-------------
+
+Списъкът за юзърски писма на Parrot е parrot-users@lists.parrot.org. Абонирайте се
+като попълните бланката на http://lists.parrot.org/mailman/listinfo/parrot-users .
+Списъкът е архивиран на http://lists.parrot.org/pipermail/parrot-users/ .
+
+За дискусии по разработването вижте информацията в docs/gettingstarted.pod.
+
+ОБРАТНА ВРЪЗКА, ПАТЧОВЕ И Т.Н.
+-----------------------
+
+Вижте docs/submissions.pod за повече информациия за докладване на бъгове и
+събмитване на патчове.
+
+УЕБ САЙТОВЕ
+---------
+
+Тези сайтове съдържат всичките нужна информация за Parrot:
+    http://www.parrot.org/
+    http://trac.parrot.org/
+    http://docs.parrot.org/
+
+Забавлявайте се,
+   Екипът на Parrot.

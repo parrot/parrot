@@ -60,7 +60,7 @@ pgeglob_isnt( '', '[^0]', 'glob empty string' );
 ## alternate
 pir_output_is( <<'CODE', <<'OUT', "Glob, alternate" );
 
-.sub _main
+.sub _main :main
   load_bytecode "PGE.pbc"
   load_bytecode "PGE/Glob.pbc"
 

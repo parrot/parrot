@@ -20,7 +20,7 @@ type combinations.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(33)
+    plan(35)
     init_null_tests()
     init_int_tests()
     instantiate_tests()
@@ -30,6 +30,7 @@ type combinations.
     boolean_as_conditional()
     logic_operations()
     negation_tests()
+    iseq_tests()
     interface_check()
 .end
 
@@ -212,6 +213,19 @@ end:
     set $P0, 0
     neg $P0
     is($P0, 0, "in-place negated Boolean false is still false")
+.end
+
+.sub iseq_tests
+    $P1 = new ['Boolean']
+    $P2 = new ['Boolean']
+    $P3 = new ['Boolean']
+    set $P3, 1
+
+    $I0 = iseq $P1, $P2
+    is($I0, 1, "equal")
+
+    $I0 = iseq $P1, $P3
+    is($I0, 0, "not equal")
 .end
 
 .sub interface_check

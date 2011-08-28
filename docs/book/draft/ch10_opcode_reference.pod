@@ -683,14 +683,6 @@ X<end opcode (PASM)>
 End execution within the current code segment or halt the interpreter
 if in the main code segment.
 
-=head3 enternative
-
-X<enternative opcode (PASM)>
-
-  enternative
-
-Run the C<run_native> C function.
-
 =head3 eq
 
 X<eq opcode (PASM)>

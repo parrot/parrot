@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,19 +8,19 @@ docs/project/git_workflow.pod - How to use Git to work on Parrot
 
 To minimize the disruption of feature development on language and tool
 developers, all major changes to Parrot core take place in a branch. Ideally,
-branches are short-lived, and contain the smallest set of changes possible.
-It is also good practice to have "atomic" commits, in the sense that each
-commit does one thing, so that it makes it easier to accept/revert some
-things while keeping others. Git provides many powerful tools in the
-maintainence of branches. This document aims to provide everything a Parrot
-developer needs to know about Git to successfully create a branch, work on
-it, keep it in sync with changes on master and finally merge the branch.
+branches are short-lived, and contain the smallest set of changes possible.  It
+is also good practice to have "atomic" commits, in the sense that each commit
+does one thing, so that it makes it easier to accept/revert some things while
+keeping others. Git provides many powerful tools in the maintenance of
+branches. This document aims to provide everything a Parrot developer needs to
+know about Git to successfully create a branch, work on it, keep it in sync
+with changes on master and finally merge the branch (or send a pull request).
 
 =head2 Cloning the Git Repository
 
-To get the full version history Parrot, which is called "cloning a repository",
-you will use the C<git clone> command. This will show how to clone the repo from
-L<http://github.com> :
+To get the full version history of Parrot, which is called "cloning a
+repository", you will use the C<git clone> command. This will show how to clone
+the repo from L<http://github.com>:
 
   git clone git://github.com/parrot/parrot.git
 
@@ -47,6 +47,9 @@ Please note that branches are first created locally, and then pushed
 to any number of remotes. A branch cannot be seen by anyone else
 until it is pushed to a remote.
 
+Branches in git are very "light-weight", i.e. they take up virtually
+no extra space (unlike in Subversion), so please use them liberally.
+
 Current convention is to create branch names of the form username/foo.
 
   git checkout -b username/foo
@@ -59,6 +62,22 @@ To checkout (or "switch to", as it is commonly referred to) the username/foo
 branch:
 
   git checkout username/foo
+
+If you would like to checkout a branch that already exists, first make sure to
+get the latest commits with:
+
+  git fetch
+
+Then use this syntax to track the remote branch with a local branch:
+
+  git checkout -t origin/username/foo
+
+If you are using a very old version of Git, such as 1.5.x.x or older, you will
+want to tell it to track the remote branch:
+
+  git checkout --track -b username/foo origin/username/foo
+
+Tracking remote branches is the default in Git 1.6.x.x and higher.
 
 =head2 Pushing branches and tags
 
@@ -103,28 +122,30 @@ or other branches.
 
 =head2 How to commit
 
-Let's say you modified the file foo.c and added the file bar.c and you want to commit
-these changes. To add these changes to the staging area (the list of stuff 
-that will be included in your next commit) :
+Let's say you modified the file foo.c and added the file bar.c and you want to
+commit these changes. To add these changes to the staging area (the list of
+stuff that will be included in your next commit):
 
   git add foo.c bar.c
 
-The command C<git add> is not only for adding new files, just keep that in mind.
-It tells git "add the state of these files to my staging area."
+The command C<git add> is not only for adding new files, just keep that in
+mind.  It tells git "add the *current* state of these files to my staging
+area." If these files change after you C<git add> them, they will need to be
+added again.
 
 If you are trying to add files that are in .gitignore, you can do that with
 the --force flag:
 
     git add --force ports/foo
 
-NOTE: Make sure these files should actually be added. Most files in .gitignore should
-never be added, but some, such as some files in "ports/" will need need the --force
-flag.
+NOTE: Make sure these files should actually be added. Most files in .gitignore
+should never be added, but some, such as some files in "ports/" will need need
+the --force flag.
 
-Now for actually creating your commit! Since Git is a distributed version control
-system, committing code is seperate from sending your changes to a remote server.
-Keep this in mind if you are used to Subversion or similar VCS's, where committing
-and sending changes are tied together.
+Now for actually creating your commit! Since Git is a distributed version
+control system, committing code is separate from sending your changes to a
+remote server.  Keep this in mind if you are used to Subversion or similar
+VCS's, where committing and sending changes are tied together.
 
   git commit -m "This is an awesome and detailed commit message"
 
@@ -161,21 +182,23 @@ To update your local git index from origin:
 
     git fetch
 
-If you are following multiple remotes, you can fetch updates from all of them with
+If you are following multiple remotes, you can fetch updates from all of them
+with:
 
     git fetch --all
 
 Note that this command requires a recent (1.7.x.x) version of git.
 
-The command C<git fetch> only modifies the index, not your working copy or staging
-area. To update your working copy of the branch bobby/tables
+The command C<git fetch> only modifies the index, not your working copy or
+staging area. To update your working copy of the branch bobby/tables:
 
   git checkout bobby/tables         # make sure we are on the branch
   git rebase origin/bobby/tables    # get the latest sql injections
 
-If you have a topic branch and want to pick up the most recent changes in master
-since the topic branch diverged, you can merge the master branch into the topic
-branch. In this case, we assume the topic branch is called parrot/beak:
+If you have a topic branch and want to pick up the most recent changes in
+master since the topic branch diverged, you can merge the master branch into
+the topic branch. In this case, we assume the topic branch is called
+parrot/beak:
 
   git checkout parrot/beak          # make sure we are on the branch
   git merge master                  # merge master into parrot/beak
@@ -186,7 +209,8 @@ branch.
 =head2 Preparing to Merge a Branch
 
 Post to parrot-dev@lists.parrot.org letting people know that you're about to
-merge a branch.
+merge a branch. Follow the guidelines in
+L<docs/project/merge_review_guidelines.pod>, especially:
 
 =over
 
@@ -212,10 +236,35 @@ want tested.
 
 =back
 
+=head2 Merging a Github Pull Request
+
+If someone has sent the Parrot Github Organization a pull request, life is a
+bit easier now. If pull request #123 has been sent, then type:
+
+    perl tools/dev/merge_pull_request.pl 123
+
+and you will automatically be on a branch called pull_request_123 with all
+commits in the pull request applied as individually signed-off commits. Now
+you can review the code, run tests, etc and vet the code. You can even type
+
+    git checkout -b way_cooler_branch_name
+
+if you want a more informative branch name than the autogenerated one.
+
+If you want to merge this code to master, you then type
+
+    git checkout master
+    git merge --no-ff pull_request_123
+
+Don't forget to close the pull request manually, since signing off on the
+commits changes their SHA1s, which means Github can't detect the merge and
+autoclose the pull request. That's it!
+
+
 =head2 Merging a Branch
 
 When you're ready to merge your changes back into master, use the C<git merge>
-command. First, make sure you are on the master branch with
+command. First, make sure you are on the master branch with:
 
   git checkout master
 
@@ -246,7 +295,7 @@ and mention the branch.
 Why use "--no-ff" ? This flag mean "no fast forwards". Usually fast forwards
 are good, but if there is a branch that has all the commits of master, plus
 a few more, when you merge without --no-ff, there will be no merge commit.
-Git is smart enought to "fast forward." But for the purpose of looking at
+Git is smart enough to "fast forward." But for the purpose of looking at
 history, Parrot would like to always have a merge commit for a merge, even
 if it *could* be fast-forwarded.
 
@@ -254,16 +303,106 @@ This flag is only needed when merging branches into master. It is optional
 for other merge cases, but it won't hurt. If it is simpler to think about,
 you can always use "--no-ff" when merging.
 
+=head2 Maintain A Fork
+
+If you fork Parrot on github, you will have a copy of the entire history
+of Parrot, which you can sync with the main parrot git repo as often as
+you want.
+
+First Rule:
+
+    Don't Commit To Master In Your Fork
+
+Create a branch (with git checkout -b branch) and do any development in that.
+
+Next, you will add the main parrot.git repo as a remote called "upstream"
+
+    git remote add upstream git://github.com/parrot/parrot.git
+
+You may call this remote anything you like, but for the purposes of this
+document, we will always refer to is as "upstream".
+
+We now want to get a copy of the index from upstream. If you are using
+a recent git (1.7.x.x or higher) you can update your copy of the index
+of all remotes with
+
+    git fetch --all
+
+If you have an elderly git, you can give the fetch command the name of
+the remote to fetch:
+
+    git fetch upstream
+
+Now you need to update your working copy, and specifically, the master
+branch, so make sure you are on the master branch of your fork
+
+    git checkout master
+
+and then sync up with upstream master
+
+    git rebase upstream/master
+
+There is no possibility of conflicts here *if you didn't commit to master*.
+If you get conflicts at this step, you are doing something wrong. Stop
+and ask someone for help.
+
+It is in your best interest to sync up your master branch with upstream before
+creating new branches from master, since that will minimize the possibilities
+of conflicts when merging the branch back to master later on.
+
+Second Rule:
+
+    Don't Rebase Branches Against Each Other
+
+For instance, if you are on branch 'foo' and you do
+
+    git rebase upstream/master
+
+you will be entering a world of pain. Don't do it. If you are smart
+enough to know when it is OK to do this, you don't need this document.
+
+This workflow to maintain a fork will make submitting pull requests
+"Just Work" and if you plan to submit pull requests, this workflow
+is required. If you don't want to submit pull requests, do whatever
+ye will.
+
 =head2 Merging Code From Forks
 
 NOTE: This is not official policy, and could change at any time.
+
+ALSO NOTE: With the introduction of the magical Github Merge Button, doesn't
+this seem like a ridiculous amount of work to accept code from a fork? This
+workflow is still useful if you want to run tests or do any other analysis
+on the pull request.
 
 If you are merging code from non-core committers, Parrot would like to see
 "Signed-off-by" lines on each commit, so it is clear that one person wrote the
 code and someone else is taking responsibility for merging the code.
 
-To merge in a pull request on Github, the following method should be used.
-Follow the first two steps on the Github pull request page, i.e:
+To merge in a pull request on Github, there is the easy way or the hard way.
+The easy way is to use tools/dev/merge_pull_request.pl like so:
+
+    perl $PARROT/tools/dev/merge_pull_request.pl N
+
+where N is the number of the pull request. This will create a branch for the
+pull request and plop you on it, so that tests or other analyses can be run.
+
+This script can be used to merge a pull request for any repo in the Parrot
+Github Organization. For instance, to merge Cardinal Pull request #4:
+
+ perl $PARROT/tools/dev/merge_pull_request.pl 4 cardinal
+
+If you do not want the default branch name, you can specify a third
+argument to specify one:
+
+ perl $PARROT/tools/dev/merge_pull_request.pl 4 cardinal awesome_feature
+
+This will merge pull request #4 in the cardinal repo into a branch
+called 'awesome_feature'.
+
+Run C<perldoc tools/dev/merge_pull_request.pl> for more info.
+
+The hard way: Follow the first two steps on the Github pull request page, i.e:
 
     # 1) Make a new branch to pull stuff into
     git checkout -b someguy-newbranch master
@@ -320,7 +459,6 @@ pull request, since adding Signed-Off-By lines changes
 the SHA1's which Github uses to automatically close
 pull requests.
 
-
 =head2 Announcing a Merge
 
 Send a message to parrot-dev@lists.parrot.org letting people know that your
@@ -334,15 +472,14 @@ before merging but couldn't get any response from the responsible person, you
 may want to include some warning in the announcement that you weren't able to
 test that piece fully.
 
-
 =head2 Deleting a Branch
 
-After merging a branch, you will have a local copy of the merged branch, as well
-as a copy of the branch on your remote. To remove the local branch:
+After merging a branch, you will have a local copy of the merged branch, as
+well as a copy of the branch on your remote. To remove the local branch:
 
   git branch -d user/foo
 
-To remove the remote branch user/foo on the remote origin :
+To remove the remote branch user/foo on the remote origin:
 
   git push origin :user/foo
 
@@ -350,8 +487,22 @@ This follows the general pattern of
 
   git push origin local_branch_name:remote_branch_name
 
-When local_branch_name is empty, you are pushing "nothing" to the remote branch,
-which deletes it.
+When local_branch_name is empty, you are pushing "nothing" to the remote
+branch, which deletes it.
+
+=head2 How Can I Tell If A Branch Is Merged?
+
+To see a list of all remote branches that are not merged into branch foo
+
+    git branch -r --no-merged foo
+
+If you leave out the last argument, it defaults to HEAD (the tip of the current
+branch). So, to see a list of all remote branches that have not been merged
+into master:
+
+    git checkout master
+    git branch -r --no-merged
+
 
 =cut
 

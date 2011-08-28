@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 package Parrot::Configure::Options::Conf;
 
 use strict;
@@ -7,7 +7,6 @@ use base qw( Exporter );
 our @EXPORT_OK = qw(
     $script
     $parrot_version
-    $svnid
     print_help
     print_version
 );
@@ -17,11 +16,9 @@ use FindBin qw($Bin);
 
 our $script         = q{Configure.pl};
 our $parrot_version = Parrot::BuildUtil::parrot_version("$Bin/../../");
-our $svnid          = '$Id$';
 
 sub print_version {
     print "Parrot Version $parrot_version Configure 2.0\n";
-    print "$svnid\n";
     return 1;
 }
 
@@ -67,7 +64,6 @@ Compile Options:
    --cc=(compiler)      Use the given compiler
    --ccflags=(flags)    Use the given compiler flags
    --ccwarn=(flags)     Use the given compiler warning flags
-   --cxx=(compiler)     Use the given C++ compiler
    --libs=(libs)        Use the given libraries
    --link=(linker)      Use the given linker
    --linkflags=(flags)  Use the given linker flags
@@ -80,8 +76,8 @@ Compile Options:
    --yacc=(parser)      Use the given parser generator
 
    --no-line-directives Disable creation of C #line directives
-
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
+   --gc=(type)          Which implementation of GC to use. One of ms, ms2 or gms.
 
 Parrot Options:
 
@@ -90,10 +86,7 @@ Parrot Options:
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
 
-   --jitcapable         Use JIT
-   --execcapable        Use JIT to emit a native executable
    --without-threads    Build parrot without thread support
-   --buildframes        Dynamically build NCI call frames
    --without-core-nci-thunks
                         Build parrot without core-required
                         statically compiled NCI call frames
@@ -104,6 +97,7 @@ Parrot Options:
 
 External Library Options:
 
+   --with-llvm          Link to LLVM if it is available
    --without-gettext    Build parrot without gettext support
    --without-gmp        Build parrot without GMP support
    --without-libffi     Build parrot without libffi support
@@ -163,8 +157,6 @@ Install Options:
     --oldincludedir=DIR   C header files for non-gcc [/usr/include]
     --infodir=DIR         info documentation [PREFIX/info]
     --mandir=DIR          man documentation [PREFIX/man]
-    --pkgconfigdir=DIR    subdirectory of <libdir> for pkgconfig
-                              [<libdir>/pkgconfig/<version>]
 
 EOT
     return 1;
@@ -184,7 +176,6 @@ configuration options processing modes
     use Parrot::Configure::Options::Conf qw(
         $script
         $parrot_version
-        $svnid
         print_help
         print_version
      );
@@ -218,11 +209,6 @@ Defaults to string 'Configure.pl', but may be overridden for testing purposes.
 =head2 C<$parrot_version>
 
 String which is return value of C<Parrot::BuildUtil::parrot_version()>; may be
-overridden for testing purposes.
-
-=head2 C<$svnid>
-
-String holding a standard Subversion 'Id' tag; may be
 overridden for testing purposes.
 
 =head1 EXPORTED SUBROUTINES

@@ -30,7 +30,6 @@ typedef enum {
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
     SUB_FLAG_PF_MASK      = SUB_FLAG_PF_ANON
-                          | SUB_FLAG_PF_MAIN
                           | SUB_FLAG_PF_LOAD
                           | SUB_FLAG_PF_IMMEDIATE
                           | SUB_FLAG_PF_POSTCOMP

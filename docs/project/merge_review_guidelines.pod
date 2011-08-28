@@ -1,0 +1,179 @@
+# Copyright (C) 2010, Parrot Foundation.
+
+=head1 NAME
+
+docs/project/merge_review_guidelines.pod - Guidelines for pending merge reviews
+
+=head1 DESCRIPTION
+
+To maintain Parrot's standards of quality, we evaluate each branch proposed for
+merging to trunk in terms of several criteria.  Not every criterion applies to
+every branch; these guidelines are guidelines to which we apply our best
+judgment.  As well, these guidelines are not exhaustive.
+
+=head2 Documentation
+
+The purpose of the branch governs the amount and type of documentation it
+requires.  Documentation falls into three broad categories:
+
+=over 4
+
+=item * User-visible documentation
+
+How do users (language developers, people running Parrot directly, people
+embedding Parrot, people writing PIR, people packaging Parrot) use the feature?
+What do they need to know to enable it, how does it work, and what
+configuration options are available?
+
+=item * Design documentation
+
+How does the feature fit into Parrot as a whole?  What design considerations
+did you make?  Are there patterns you followed, or is there literature to read?
+
+=item * Developer documentation
+
+What functions are available, and to whom are they available?  What data
+structures are present, and what do other developers need to understand about
+them?  What are areas of future work, and what are invariants that underlie the
+whole system?
+
+=back
+
+=head2 Testing
+
+We know that well-tested features work and we know that well-tested features
+will continue to work.  Under-tested features give us and users much less
+confidence.  A well-tested branch demonstrates several attributes:
+
+=over 4
+
+=item * Coverage
+
+A full coverage report from an automated testing tool is very valuable, but in
+lieu of that the tests for the branch's feature should pass the eyeball test.
+Is everything documented as working tested effectively?  If there are gaps in
+testing, are they clear?  Do they have tickets for cage cleaners and other
+volunteers?
+
+=item * Language Testing
+
+If your feature affects languages running on Parrot (and what feature
+doesn't?), the branch needs testing from a couple of major languages to
+demonstrate that it does not harm those languages.  If those languages need
+changes to accommodate the branch, we must work with the language to schedule
+those changes or to review them as per our deprecation policy.
+
+=item * Platform Testing
+
+Does your feature work on the platform combinations we support?  Be especially
+aware of the differences between C and C++ compilers and 32-bit and 64-bit
+support, as well as any deviations from POSIX.  C<make fulltest> should pass on
+all of our target platforms.
+
+=back
+
+=head2 Deprecation Policy
+
+We manage incompatible changes of features and interfaces in multiple ways:
+
+=over 4
+
+=item * Replacements for removed features
+
+If the branch supplants or supersedes an existing feature, follow the
+deprecation policy to provide alternatives, shims, compatibility layers, and
+whatever other mechanisms the deprecation notice promises.
+
+=item * New deprecations recorded
+
+If the branch necessitates new deprecations, the deprecation list needs
+sufficient detail to help affected users plan their upgrades.
+
+=item * Removals marked clearly
+
+If you've removed any deprecated items, have you marked them as such?
+
+=item * User-visible exclusions to policy marked and dated clearly
+
+If you need any exclusions to the deprecation policy, have you asked for and
+received them?  Have you documented them appropriately?
+
+=back
+
+=head2 Roadmap
+
+Branches may implement features requested on the roadmap in whole or in part.
+They may also affect the schedule of other roadmap items.  Have you documented
+the implications?
+
+=head2 Code Quality
+
+Any branch proposed for merging must meet our quality standards in several
+areas not previously mentioned:
+
+=over 4
+
+=item * Coding standards
+
+At a minimum, the code must pass all of our active coding standards tests.  It
+must also follow our naming conventions and organizational principles.  This
+means review from other developers.  This also means a clean run of C<make
+codingstd>.
+
+=item * User-visible features
+
+We have no strict guideline for how user-visible features should work apart
+from a few systems (vtables, embedding and extension API).  In general, any
+public features need review from the user point of view.
+
+=item * API review
+
+Internal features for developers also need a review, especially of any
+functions or data structures you expose to other parts of Parrot.  Where
+possible, stick with Parrot conventions, especially for constness and the
+avoiding of null parameters.
+
+=item * Performance characteristics
+
+How does your branch affect performance on our selected benchmarks?  For hosted
+languages?  Does it have memory leaks?  Does it affect memory use or startup
+time?  We have traditionally let these questions go unanswered, but we can be
+more disciplined here.
+
+=back
+
+=head2 Integration into Parrot Proper
+
+Your branch must also integrate into Parrot as well as possible.  In
+particular:
+
+=over 4
+
+=item * Manage dependencies
+
+This includes proper dependencies in our configuration and build system for
+building the code as well as any external configuration or dependencies.
+Certain parts of Parrot core can depend on external tools such as NQP, while
+others cannot.
+
+=item * Identify configuration options
+
+If your feature adds configuration options, they need documentation and review
+outside of the code itself.  If your feature depends on configuration options,
+it needs explicit testing and documentation.  This should be self-evident, but
+it is worth detailed review.
+
+=item * Encapsulation and isolation
+
+Does your branch respect the encapsulation of other parts of Parrot?  Does it
+provide its own sensible encapsulation boundaries?  If you need to make changes
+to other parts of Parrot, should we consider them as a separate branch?
+
+=back
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

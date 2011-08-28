@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -90,12 +90,6 @@ PARROT_WARN_UNUSED_RESULT
 static PMC* box_number(PARROT_INTERP, FLOATVAL val)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* box_string(PARROT_INTERP, ARGIN(STRING *str))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void find_bounds(PARROT_INTERP,
     ARGIN(PMC *pmc_hash),
     ARGMOD(PMC **first),
@@ -117,9 +111,6 @@ static PMC* get_list_item(PARROT_INTERP, ARGIN(PMC *self), INTVAL idx)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_box_number __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_find_bounds __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc_hash) \
@@ -205,29 +196,6 @@ find_bounds(PARROT_INTERP, ARGIN(PMC *pmc_hash), ARGMOD(PMC **first), ARGMOD(PMC
 
 /*
 
-=item C<static PMC* box_string(PARROT_INTERP, STRING *str)>
-
-Helper function to box STRING
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-box_string(PARROT_INTERP, ARGIN(STRING *str))
-{
-    ASSERT_ARGS(box_string)
-
-    PMC * const ret = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp,
-                enum_class_String));
-    VTABLE_set_string_native(interp, ret, str);
-    return ret;
-}
-
-/*
-
 =item C<static PMC* box_integer(PARROT_INTERP, INTVAL val)>
 
 Helper function to box INTVAL
@@ -310,7 +278,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE void mark() {
-        Parrot_OrderedHash_attributes * const attrs =
+        const Parrot_OrderedHash_attributes * const attrs =
                 PARROT_ORDEREDHASH(SELF);
 
         if (attrs->hash)
@@ -378,9 +346,6 @@ Main set function.
             /* We have old entry. Just update value */
             PMC * const nextkey = Parrot_key_next(INTERP, key);
             if (nextkey) {
-                /* XXX old_value is unused.  Should we be storing this at all? */
-                PMC * const old_value = VTABLE_get_pmc_keyed_int(INTERP, list_entry,
-                        ORDERED_HASH_ITEM_VALUE);
                 VTABLE_set_pmc_keyed(INTERP, value, nextkey, value);
             }
             else
@@ -431,19 +396,13 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        PMC * const v = box_string(INTERP, value);
+        PMC * const v = Parrot_pmc_box_string(INTERP, value);
         SELF.set_pmc_keyed(key, v);
     }
 
 /*
 
 =item C<void set_pmc_keyed_str(STRING *key, PMC *val)>
-
-=item C<void set_integer_keyed_str(STRING *key, INTVAL value)>
-
-=item C<void set_number_keyed_str(STRING *key, FLOATVAL value)>
-
-=item C<void set_string_keyed_str(STRING *key, STRING *value)>
 
 Sets the PMC value of the element at index C<key> to C<val>.
 
@@ -460,21 +419,6 @@ Sets the PMC value of the element at index C<key> to C<val>.
         PMC * const pkey = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, pkey, key);
         VTABLE_set_pmc_keyed(INTERP, SELF, pkey, value);
-    }
-
-    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
-        PMC * const v = box_string(INTERP, value);
-        STATICSELF.set_pmc_keyed_str(key, v);
-    }
-
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
-        PMC * const v = box_integer(INTERP, value);
-        STATICSELF.set_pmc_keyed_str(key, v);
-    }
-
-    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        PMC * const v = box_number(INTERP, value);
-        STATICSELF.set_pmc_keyed_str(key, v);
     }
 
 /*
@@ -512,7 +456,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *key) {
-        PMC *item = VTABLE_get_pmc_keyed_str(INTERP,
+        PMC * const item = VTABLE_get_pmc_keyed_str(INTERP,
             PARROT_ORDEREDHASH(SELF)->hash, key);
 
         if (PMC_IS_NULL(item))
@@ -720,8 +664,6 @@ The created key = "\1idx".
 
 =item C<INTVAL defined_keyed(PMC *key)>
 
-=item C<INTVAL defined_keyed_str(STRING *key)>
-
 =item C<INTVAL defined_keyed_int(INTVAL key)>
 
 =cut
@@ -731,13 +673,6 @@ The created key = "\1idx".
     VTABLE INTVAL defined_keyed(PMC *key) {
         /* We store list_item (which is defined). So fetch original PMC and check it */
         PMC * const item = STATICSELF.get_pmc_keyed(key);
-        if (PMC_IS_NULL(item))
-            return 0;
-        return VTABLE_defined(INTERP, item);
-    }
-
-    VTABLE INTVAL defined_keyed_str(STRING *key) {
-        PMC * const item = STATICSELF.get_pmc_keyed_str(key);
         if (PMC_IS_NULL(item))
             return 0;
         return VTABLE_defined(INTERP, item);
@@ -761,8 +696,6 @@ The created key = "\1idx".
 
 =item C<void delete_keyed(PMC *key)>
 
-=item C<void delete_keyed_str(STRING *key)>
-
 =item C<void delete_keyed_int(INTVAL key)>
 
 Deletes the key C<*key> from the hash.
@@ -772,8 +705,7 @@ Deletes the key C<*key> from the hash.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        Parrot_OrderedHash_attributes *attrs =
-                PARROT_ORDEREDHASH(SELF);
+        Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         PMC *list_entry, *prev, *next;
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             const INTVAL intval = VTABLE_get_integer(INTERP, key);
@@ -809,10 +741,6 @@ Deletes the key C<*key> from the hash.
 
         /* And finally delete it */
         VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
-    }
-
-    VTABLE void delete_keyed_str(STRING *key) {
-        STATICSELF.delete_keyed(box_string(INTERP, key));
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) {
@@ -869,7 +797,7 @@ Used to unarchive the hash.
     }
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_OrderedHash_attributes *attrs = PARROT_ORDEREDHASH(SELF);
+        Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         find_bounds(INTERP, attrs->hash, &attrs->first, &attrs->last);
         SUPER(info);
     }

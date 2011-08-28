@@ -49,6 +49,7 @@ my ($stdout, $debug, $debug_validity);
 foreach my $p (
     qw|
         cc
+        cxx
         link
         ld
         ccflags
@@ -57,7 +58,6 @@ foreach my $p (
         arflags
         ldflags
         libs
-        cxx
     |
     )
 {

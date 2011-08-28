@@ -1,0 +1,476 @@
+/*
+Copyright (C) 2001-2011, Parrot Foundation.
+
+
+=head1 NAME
+
+src/pmc/nci.pmc - Native Call Interface
+
+=head1 DESCRIPTION
+
+The vtable functions for the native C call functions.
+
+=head2 Methods
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_IGNORABLE_RESULT
+static nci_thunk_t /*@alt void@*/
+build_func(PARROT_INTERP,
+    ARGMOD(Parrot_NCI_attributes *nci_info))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*nci_info);
+
+static void pcc_params(PARROT_INTERP,
+    ARGIN(STRING *sig),
+    ARGMOD(Parrot_NCI_attributes *nci_info),
+    size_t sig_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*nci_info);
+
+#define ASSERT_ARGS_build_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(nci_info))
+#define ASSERT_ARGS_pcc_params __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sig) \
+    , PARROT_ASSERT_ARG(nci_info))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes
+*nci_info, size_t sig_length)>
+
+Check and validate parameter signatures
+
+=cut
+
+*/
+
+static void
+pcc_params(PARROT_INTERP, ARGIN(STRING *sig), ARGMOD(Parrot_NCI_attributes *nci_info),
+                size_t sig_length)
+{
+    ASSERT_ARGS(pcc_params)
+
+    /* NCI and PCC have a 1 to 1 mapping except an
+       extra char in PCC for invocant and slurpy */
+    size_t       buf_length = sig_length + 2 + 1;
+
+    /* avoid malloc churn on common signatures */
+    char         static_buf[16];
+    char * const sig_buf = sig_length <= sizeof static_buf ?
+                            static_buf :
+                            (char *)mem_sys_allocate(buf_length);
+
+    size_t j = 0;
+    size_t i;
+
+    for (i = 0; i < sig_length; ++i) {
+        const INTVAL c = STRING_ord(interp, sig, i);
+
+        PARROT_ASSERT(j < buf_length - 1);
+
+        switch (c) {
+          case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
+            break;
+          case (INTVAL)'f':
+          case (INTVAL)'N':
+          case (INTVAL)'d':
+            sig_buf[j++] = 'N';
+            break;
+          case (INTVAL)'I':   /* INTVAL */
+          case (INTVAL)'l':   /* long */
+          case (INTVAL)'i':   /* int */
+          case (INTVAL)'s':   /* short */
+          case (INTVAL)'c':   /* char */
+            sig_buf[j++] = 'I';
+            break;
+          case (INTVAL)'S':
+          case (INTVAL)'t':   /* string, pass a cstring */
+            sig_buf[j++] = 'S';
+            break;
+          case (INTVAL)'J':   /* interpreter */
+            break;
+          case (INTVAL)'p':   /* push pmc->data */
+          case (INTVAL)'P':   /* push PMC * */
+          case (INTVAL)'V':   /* push PMC * */
+          case (INTVAL)'2':
+          case (INTVAL)'3':
+          case (INTVAL)'4':
+            sig_buf[j++] = 'P';
+            break;
+          case (INTVAL)'v':
+            /* null return */
+            if (j == 0)
+                sig_buf[j++] = '\0';
+            break;
+          case (INTVAL)'O':   /* push PMC * invocant */
+            sig_buf[j++] = 'P';
+            sig_buf[j++] = 'i';
+            break;
+          case (INTVAL)'@':   /* push PMC * slurpy */
+            sig_buf[j++] = 'P';
+            sig_buf[j++] = 's';
+            break;
+          case (INTVAL)'b': /* buffer (void*) pass Buffer_bufstart(SReg) */
+          case (INTVAL)'B': /* buffer (void**) pass &Buffer_bufstart(SReg) */
+            sig_buf[j++] = 'S';
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_JIT_ERROR,
+                    "Unknown param Signature %c\n", (char)c);
+            break;
+        }
+    }
+
+    PARROT_ASSERT(j < buf_length);
+    sig_buf[j++] = '\0';
+
+
+    nci_info->pcc_return_signature =
+        Parrot_str_new(interp, sig_buf, 1);
+
+    nci_info->pcc_params_signature = j > 1 ?
+        Parrot_str_new(interp, sig_buf + 1, j - 1) :
+        CONST_STRING(interp, "");
+
+    if (sig_buf != static_buf)
+        mem_sys_free(sig_buf);
+}
+
+/*
+
+=item C<static nci_thunk_t build_func(PARROT_INTERP, Parrot_NCI_attributes
+*nci_info)>
+
+Actually build the NCI thunk.
+
+=cut
+
+*/
+
+PARROT_IGNORABLE_RESULT
+static nci_thunk_t
+build_func(PARROT_INTERP, ARGMOD(Parrot_NCI_attributes *nci_info))
+{
+    ASSERT_ARGS(build_func)
+
+    STRING * const key      = nci_info->signature;
+    const size_t key_length = Parrot_str_byte_length(interp, key);
+
+    pcc_params(interp, key, nci_info, key_length);
+
+    /* Arity is length of that string minus one (the return type). */
+    nci_info->arity       = key_length - 1;
+
+    /* Build call function. */
+    nci_info->fb_info     = build_call_func(interp, key);
+    nci_info->func        = F2DPTR(VTABLE_get_pointer(interp, nci_info->fb_info));
+
+    return (nci_thunk_t)nci_info->func;
+}
+
+
+pmclass NCI auto_attrs provides invokable {
+    /* NCI thunk handling attributes */
+    /* NCI thunk handling attributes */
+    ATTR STRING    *signature;              /* The signature. */
+    ATTR void      *func;                   /* Function pointer to call. */
+    ATTR PMC       *fb_info;                /* Frame-builder info */
+    ATTR void      *orig_func;              /* Function pointer
+                                             * used to create func */
+    /* Parrot Sub-ish attributes */
+    ATTR STRING    *pcc_params_signature;
+    ATTR STRING    *pcc_return_signature;
+    ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
+
+    /* MMD fields */
+    ATTR STRING    *long_signature;         /* The full signature. */
+    ATTR PMC       *multi_sig;              /* type tuple array (?) */
+
+/*
+
+=item C<METHOD get_multisig()>
+
+Return the MMD signature PMC, if any or a Null PMC.
+
+=cut
+
+*/
+
+    METHOD get_multisig() {
+        PMC *sig;
+        GET_ATTR_multi_sig(INTERP, SELF, sig);
+        if (PMC_IS_NULL(sig))
+            sig = PMCNULL;
+        RETURN(PMC *sig);
+    }
+
+/*
+
+=item C<void init()>
+
+Initializes the NCI with a C<NULL> function pointer.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        PObj_custom_mark_SET(SELF);
+    }
+
+    VTABLE void *get_pointer() {
+        return PARROT_NCI(SELF)->orig_func;
+    }
+
+/*
+
+=item C<void set_pointer_keyed_str(STRING *key, void *func)>
+
+Sets the specified function pointer and signature (C<*key>).
+
+=cut
+
+*/
+
+    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
+        Parrot_NCI_attributes * const nci_info   = PARROT_NCI(SELF);
+
+        /* Store the original function and signature. */
+        SET_ATTR_orig_func(INTERP, SELF, func);
+
+        /* ensure that the STRING signature is constant */
+        if (!PObj_constant_TEST(key)) {
+            char * const key_c      = Parrot_str_to_cstring(INTERP, key);
+            const size_t key_length = Parrot_str_byte_length(interp, key);
+            key                     = Parrot_str_new_init(interp, key_c, key_length,
+                                        Parrot_default_encoding_ptr, PObj_constant_FLAG);
+            Parrot_str_free_cstring(key_c);
+        }
+
+        nci_info->signature = key;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark any referenced strings and PMCs.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        if (PARROT_NCI(SELF)) {
+            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+
+            Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
+            Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
+
+            Parrot_gc_mark_STRING_alive(interp, nci_info->signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->long_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_params_signature);
+            Parrot_gc_mark_STRING_alive(interp, nci_info->pcc_return_signature);
+        }
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the NCI.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
+        Parrot_NCI_attributes *nci_info_ret;
+        void                  *orig_func;
+
+        PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        nci_info_ret        = PARROT_NCI(ret);
+
+        /* FIXME if data is malloced (JIT/i386!) then we need
+         * the length of data here, to memcpy it
+         * ManagedStruct or Buffer?
+         */
+        nci_info_ret->func                  = nci_info_self->func;
+        nci_info_ret->fb_info               = nci_info_self->fb_info;
+        nci_info_ret->orig_func             = nci_info_self->orig_func;
+        nci_info_ret->signature             = nci_info_self->signature;
+        nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
+        nci_info_ret->pcc_return_signature  = nci_info_self->pcc_params_signature;
+        nci_info_ret->arity                 = nci_info_self->arity;
+        PObj_get_FLAGS(ret)                 = PObj_get_FLAGS(SELF);
+
+        return ret;
+    }
+
+/*
+
+=item C<INTVAL defined()>
+
+Returns whether the NCI is defined.
+
+=cut
+
+*/
+
+    VTABLE INTVAL defined() {
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        return nci_info->orig_func != NULL;
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Calls the associated C function, returning C<*next>. If the invocant is a
+class, the PMC arguments are shifted down.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        nci_thunk_t                   func;
+        PMC                          *fb_info;
+        char                         *sig_str;
+        void                         *orig_func;
+        PMC                          *cont;
+
+        GET_ATTR_orig_func(INTERP, SELF, orig_func);
+        func = (nci_thunk_t)D2FPTR(nci_info->func);
+
+        GET_ATTR_fb_info(INTERP, SELF, fb_info);
+
+        if (!func) {
+            /* build the thunk only when necessary */
+            func = build_func(interp, nci_info);
+
+            if (!func)
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "attempt to call NULL function");
+        }
+
+        func(INTERP, SELF, fb_info);
+        cont = INTERP->current_cont;
+
+        /*
+         * If the NCI function was tailcalled, the return result
+         * is already passed back to the caller of this frame
+         * - see  Parrot_init_ret_nci(). We therefore invoke the
+         * return continuation here, which gets rid of this frame
+         * and returns the real return address
+         */
+        if (cont && cont != NEED_CONTINUATION
+        && (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
+            cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+            next = VTABLE_invoke(INTERP, cont, next);
+        }
+
+        return (opcode_t *)next;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the function pointer as an integer.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        if (!nci_info->func)
+            build_func(INTERP, nci_info);
+        return (INTVAL)nci_info->func;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns the boolean value of the pointer.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        return (0 != (INTVAL)nci_info->orig_func);
+    }
+
+/*
+
+=item C<METHOD arity()>
+
+Return the arity of the NCI (the number of arguments).
+
+=cut
+
+*/
+    METHOD arity() {
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        INTVAL arity = 0;
+
+        if (nci_info) {
+            if (!nci_info->func)
+                build_func(INTERP, nci_info);
+            if (nci_info->func) {
+                arity = nci_info->arity;
+                RETURN(INTVAL arity);
+            }
+        }
+
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
+            EXCEPTION_INVALID_OPERATION,
+            "You cannot get the arity of an undefined NCI.");
+    }
+}
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<docs/pdds/pdd03_calling_conventions.pod>.
+
+=head1 HISTORY
+
+Initial revision by sean 2002/08/04.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

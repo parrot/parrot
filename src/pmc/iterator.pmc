@@ -186,6 +186,7 @@ Returns whether the iterator contains an aggregate.
 
 
     VTABLE PMC *get_iter() {
+        UNUSED(INTERP);
         return SELF;
     }
 
@@ -206,9 +207,7 @@ Restart iterator
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC *self = SELF;
         PARROT_FAILURE("Iterator: implementation have to override this method");
-
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");
     }

@@ -1,8 +1,14 @@
-# Copyright (C) 2005-2008, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 =head1 NAME
 
-Parrot::Revision - SVN Revision of Parrot
+Parrot::Revision - Revision number of Parrot
+
+B<Note:> This package is largely obsolete, as the Git version control system
+does not use a continually incrementing integer to designate a particular
+revision, as our previous CVS and Subversion VCSes did.  We retain it for
+backwards compatibility for certain high-level languages built on top of
+Parrot.
 
 =head1 SYNOPSIS
 
@@ -24,7 +30,8 @@ package Parrot::Revision;
 
 use strict;
 use warnings;
-use File::Spec;
+use lib qw( lib );
+use Parrot::Configure::Utils qw( :cache );
 
 our $cache = q{.parrot_current_rev};
 
@@ -45,12 +52,12 @@ sub _handle_update {
     my $args = shift;
     if (! defined $args->{revision}) {
         $args->{revision} = 'unknown';
-        _print_to_cache($args->{cache}, $args->{revision});
+        print_to_cache($args->{cache}, $args->{revision});
         return $args->{revision};
     }
     else {
         if (defined ($args->{prev}) && ($args->{revision} ne $args->{prev})) {
-            _print_to_cache($args->{cache}, $args->{revision});
+            print_to_cache($args->{cache}, $args->{revision});
             return $args->{revision};
         }
         else {
@@ -59,25 +66,14 @@ sub _handle_update {
     }
 }
 
-sub _print_to_cache {
-    my ($cache, $revision) = @_;
-    open my $FH, ">", $cache
-        or die "Unable to open handle to $cache for writing: $!";
-    print {$FH} "$revision\n";
-    close $FH or die "Unable to close handle to $cache after writing: $!";
-}
-
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($revision = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
+        $revision = read_from_cache($cache);
     }
     else {
         $revision = 1;
-        _print_to_cache($cache, $revision);
+        print_to_cache($cache, $revision);
     }
     return $revision;
 }

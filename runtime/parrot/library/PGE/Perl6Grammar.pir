@@ -163,7 +163,7 @@ the output to the correct output file.
     unless match goto stmt_end
     unless match > '' goto stmt_end
     $S0 = match['cmd']
-    concat $S0, '_stmt'
+    $S0 = concat $S0, '_stmt'
     $P0 = find_name $S0
     $P0(match, ns, nstable)
     goto stmt_loop
@@ -396,10 +396,10 @@ the output to the correct output file.
   trait_arg_null:
     arg = '1'
   trait_arg_done:
-    concat traitlist, ", '"
-    concat traitlist, trait
-    concat traitlist, "'=>"
-    concat traitlist, arg
+    traitlist = concat traitlist, ", '"
+    traitlist = concat traitlist, trait
+    traitlist = concat traitlist, "'=>"
+    traitlist = concat traitlist, arg
     goto trait_loop
   trait_end:
     $P0 = get_root_global ['parrot';'PGE';'Util'], 'pir_str_escape'

@@ -1,6 +1,6 @@
 # This line will be printed by ./parrot examples/pir/readline.t
 
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,24 +24,24 @@ received the buffer is printed and the program is terminated.
         .local pmc stdin
         .local string buffer, line
 
-	stdin = getstdin
-	buffer = ""
+        stdin = getstdin
+        buffer = ""
 
 AGAIN:
-	line = readline stdin
-	$I1 = length line
-	if $I1 <= 1 goto MAINLOOP
-	# test for multi-char newlines
-	if $I1 >=3 goto CONCAT
-	$I2 = is_cclass .CCLASS_NEWLINE, line, 0
-	if $I2, MAINLOOP
+        line = readline stdin
+        $I1 = length line
+        if $I1 <= 1 goto MAINLOOP
+        # test for multi-char newlines
+        if $I1 >=3 goto CONCAT
+        $I2 = is_cclass .CCLASS_NEWLINE, line, 0
+        if $I2, MAINLOOP
 
 CONCAT:
-	concat buffer, line
-	branch AGAIN
+        buffer = concat buffer, line
+        branch AGAIN
 
 MAINLOOP:
-	print buffer
+        print buffer
 .end
 
 # Local Variables:

@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -368,7 +368,7 @@ EOT
     # that is passed to pir_output_is().
     ( my $gen_parser_fn = $pg_fn ) =~s/pg$/pir/;
     my $rv = Parrot::Test::run_command(
-       qq{$PARROT $PERL6GRAMMAR --output=$gen_parser_fn $pg_fn},
+       qq{"$PARROT" "$PERL6GRAMMAR" --output="$gen_parser_fn" "$pg_fn"},
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_parser_fn, "$test_name: generated parser file exists" );
@@ -403,7 +403,7 @@ EOT
     # compile the actions
     ( my $gen_actions_fn = $pm_fn ) =~s/pm$/pir/;
     $rv = Parrot::Test::run_command(
-        qq{$PARROT $NQP --target=pir --output=$gen_actions_fn $pm_fn},
+        qq{"$PARROT" "$NQP" --target=pir --output="$gen_actions_fn" "$pm_fn"},
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_actions_fn, "$test_name: generated actions file exists" );

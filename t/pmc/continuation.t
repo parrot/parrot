@@ -17,12 +17,14 @@ Tests the Continuation PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(4)
+    plan(9)
 
     test_new()
     invoke_with_init()
     returns_tt1511()
     returns_tt1528()
+    experimental_caller()
+    get_pointer_and_string()
 .end
 
 .sub test_new
@@ -138,6 +140,37 @@ end:
   final_failure:
     $S0 = join '', $P0
     is('lala nyny bosbos ', $S0, 'Results processed correctly - without .tailcall')
+.end
+
+.sub experimental_caller
+   .local pmc cc
+   cc = new 'Continuation'
+   $S0 = cc.'caller'()
+   is($S0, 'experimental_caller', 'continuation caller is experimental_caller')
+.end
+
+.sub get_pointer_and_string
+   # Create and initialize a Continuation
+   .local pmc cc
+   cc = new 'Continuation'
+   set_label cc, dummy
+
+   # Test get_string vtable.
+   $S0 = cc
+   $I0 = index $S0, 'get_pointer_and_string'
+   isnt($I0, -1,  "Continuation's stringification has name of current function")
+
+   $I0 = index $S0, 't/pmc/continuation.t'
+   isnt($I0, -1, "Continuation's stringification has name of current file")
+
+   $P1 = cc."continuation"()
+   $S0 = typeof $P1
+   is($S0, "Continuation", "continuation method")
+
+   $I0 = get_addr cc
+   $I1 = set_addr dummy
+   is($I0, $I1, "set/get_addr")
+   dummy:
 .end
 
 # end of tests.

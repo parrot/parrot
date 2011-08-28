@@ -532,38 +532,38 @@ col:
 nocol:
     .local string world
     world = $S0
-    concat world, $S16
-    concat world, $S1
-    concat world, $S16
-    concat world, $S2
-    concat world, $S16
-    concat world, $S3
-    concat world, $S16
-    concat world, $S4
-    concat world, $S16
-    concat world, $S5
-    concat world, $S16
-    concat world, $S6
-    concat world, $S16
-    concat world, $S7
-    concat world, $S16
-    concat world, $S8
-    concat world, $S16
-    concat world, $S9
-    concat world, $S16
-    concat world, $S10
-    concat world, $S16
-    concat world, $S11
-    concat world, $S16
-    concat world, $S12
-    concat world, $S16
-    concat world, $S13
-    concat world, $S16
-    concat world, $S14
-    concat world, $S16
+    world = concat world, $S16
+    world = concat world, $S1
+    world = concat world, $S16
+    world = concat world, $S2
+    world = concat world, $S16
+    world = concat world, $S3
+    world = concat world, $S16
+    world = concat world, $S4
+    world = concat world, $S16
+    world = concat world, $S5
+    world = concat world, $S16
+    world = concat world, $S6
+    world = concat world, $S16
+    world = concat world, $S7
+    world = concat world, $S16
+    world = concat world, $S8
+    world = concat world, $S16
+    world = concat world, $S9
+    world = concat world, $S16
+    world = concat world, $S10
+    world = concat world, $S16
+    world = concat world, $S11
+    world = concat world, $S16
+    world = concat world, $S12
+    world = concat world, $S16
+    world = concat world, $S13
+    world = concat world, $S16
+    world = concat world, $S14
+    world = concat world, $S16
     $I1 = size * $I0
     repeat $S16, $S17, $I1
-    concat world, $S16
+    world = concat world, $S16
     .return(world)
 .end
 
@@ -884,8 +884,8 @@ key_done:
 
 =head1 SEE ALSO
 
-F<examples/library/acorn.life>, F<examples/pasm/life.pasm>,
-F<runtime/parrot/library/ncurses.pasm>,
+F<examples/library/acorn.life>, F<examples/pir/life.pir>,
+F<runtime/parrot/library/ncurses.pir>,
 F<runtime/parrot/library/ncurses.declarations>.
 
 =head1 NOTE

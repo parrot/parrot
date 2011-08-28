@@ -19,9 +19,10 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(43)
+    plan(53)
     test_bool()
     test_int()
+    test_new_int()
     test_integer_keyed()
     test_string_keyed()
     test_attrs()
@@ -36,8 +37,11 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     test_throw_obj()
     test_clone()
     test_throw_clone()
+    test_throw_serialized()
     test_backtrace()
     test_annotations()
+    test_subclass_throw()
+    test_subclass_finalize()
 .end
 
 .sub test_bool
@@ -50,6 +54,14 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     $P0 = 42
     $I0 = $P0
     is($I0, 42, 'set/get integer on Exception')
+.end
+
+.sub test_new_int
+    .local pmc ex
+    ex = new ['Exception'], .EXCEPTION_SYNTAX_ERROR
+    .local int value
+    value = ex['type']
+    is(value, .EXCEPTION_SYNTAX_ERROR, 'new with int argument sets type')
 .end
 
 .sub test_integer_keyed
@@ -281,7 +293,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_push_eh_throw
@@ -305,7 +317,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_die
@@ -392,6 +404,57 @@ _handler:
     is(result, 1, 'caught a cloned Exception with payload')
 .end
 
+.sub test_throw_serialized
+    .local pmc ex, exclone, eh, ehguard
+    .local int result
+    ex = new ['Exception']
+    ex['type'] = .EXCEPTION_SYNTAX_ERROR
+    $S0     = freeze ex
+    exclone = thaw $S0
+
+    ehguard = new ['ExceptionHandler']
+    set_label ehguard, catchall
+    push_eh ehguard
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR)
+    set_label eh, catch
+    result = 0
+    push_eh eh
+    throw exclone
+    goto catchall
+  catch:
+    result = 1
+  catchall:
+    finalize eh
+    finalize ehguard
+    is(result, 1, 'caught a cloned Exception')
+
+    null exclone
+    result = 0
+    .local pmc pay, getpay, exc
+    set_label ehguard, catchall2
+    set_label eh, catch2
+
+    pay = new ['Integer'], 9875
+    ex['payload'] = pay
+    $S0     = freeze ex
+    exclone = thaw $S0
+    result = iseq ex, exclone
+    is(result, 1, 'cloned Exception with payload is equal to original')
+
+    result = 0
+    throw exclone
+    goto catchall2
+  catch2:
+    .get_results(exc)
+    getpay = exc['payload']
+    $I0 = getpay
+    if $I0 != 9875 goto catchall2
+    result = 1
+  catchall2:
+    is(result, 1, 'caught a cloned Exception with payload')
+.end
+
 .sub test_backtrace
     .local pmc ex, bt
     ex = new ['Exception']
@@ -408,6 +471,65 @@ _handler:
     is($I0, 0, 'got annotations from unthrow Exception')
     $I0 = ann
     is($I0, 0, 'annotations from unthrow Exception are empty')
+.end
+
+.sub test_subclass_throw
+    $P1 = get_class ["Exception"]
+    $P2 = subclass $P1, "MyException"
+    $P3 = new $P2
+    $S0 = typeof $P3
+    is ($S0, "MyException", "can create a subclass")
+    $S0 = $P3
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+
+    push_eh my_handler
+    throw $P3
+    pop_eh
+    ok(0, "Could not throw MyException")
+    .return()
+  my_handler:
+    .get_results($P4)
+    pop_eh
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    .return()
+.end
+
+.sub test_subclass_finalize
+    $P0 = newclass "MyBuggyObject"
+    $P3 = new $P0
+    push_eh my_handler
+    $S0 = $P3
+    pop_eh
+    ok(0, "MyBuggyObject not as buggy as advertised")
+    .return()
+  my_handler:
+    .get_results($P4)
+    $S0 = typeof $P4
+    is ($S0, "MyException", "received a MyException object")
+    $S0 = $P4
+    is ($S0, "MyException", "really is a subclass, with :vtable override")
+    finalize $P4
+    .return()
+.end
+
+.namespace ["MyException"]
+
+.sub get_string :vtable("get_string") :method
+    .return("MyException")
+.end
+
+.namespace ["MyBuggyObject"]
+
+.sub get_string :vtable("get_string") :method
+    $P0 = new ["MyException"]
+    diag("throwing")
+    throw $P0
+    diag("this didn't work!")
+    ok(0, "Oops! We shouldn't ever end up here unless finalize fails")
+    exit 1
 .end
 
 # Local Variables:

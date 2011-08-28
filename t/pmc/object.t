@@ -21,16 +21,31 @@ Tests the Object PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(3)
 
-    push_eh cant_instantiate
-      new $P0, ['Object']
-    pop_eh
-    ok(0, 'Able to instantiate Object')
-    goto done_1
-cant_instantiate:
-    ok(1, 'Unable to Instantiate Object')
-done_1:
+    test_new()
+    test_isa()
+.end
+
+.sub test_new
+    throws_substring(<<'CODE', 'Object must be created by a class.', 'new Object fails')
+    .sub main
+        new $P0, ['Object']
+    .end
+CODE
+    throws_substring(<<'CODE', 'Object must be created by a class.', 'new(pmc) Object fails')
+    .sub main
+        new $P0, ['String']
+        new $P1, ['Object'], $P0
+    .end
+CODE
+.end
+
+.sub test_isa
+    $P0 = new ['String']
+    null $P1
+    $I0 = isa $P0, $P1
+    is($I0, 0, 'isa null pmc')
 .end
 
 # Local Variables:

@@ -8,9 +8,9 @@ This PDD describes the conventions for strings in Parrot,
 including but not limited to support for multiple character sets,
 encodings, and languages.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Definitions
 
@@ -700,11 +700,6 @@ Compares two PMCs and returns 1 if SELF is shorter, 0 if they are equal length
 strings, and -1 if the passed in string argument is shorter.
 
 =item substr
-
-Extract a substring of a given length starting from a given offset (in
-graphemes) and store the result in the string argument.
-
-=item substr_str
 
 Extract a substring of a given length starting from a given offset (in
 graphemes) and return the string.

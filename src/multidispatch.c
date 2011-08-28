@@ -142,7 +142,7 @@ static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
     ARGIN(PMC *arg_tuple),
     ARGIN(PMC *cl))
@@ -206,9 +206,7 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
 #define MMD_DEBUG 0
-
 
 /*
 
@@ -305,7 +303,6 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     va_end(args);
 }
 
-
 /*
 
 =item C<PMC * Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, STRING *name,
@@ -341,7 +338,6 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
         return Parrot_mmd_sort_candidates(interp, type_tuple, multi_sub);
     }
 }
-
 
 /*
 
@@ -401,13 +397,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         INTVAL  type;
 
         if (STRING_equal(interp, type_name, CONST_STRING(interp, "DEFAULT")))
-            type = enum_type_PMC;
+            type = -enum_type_PMC;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "STRING")))
-            type = enum_type_STRING;
+            type = -enum_type_STRING;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "INTVAL")))
-            type = enum_type_INTVAL;
+            type = -enum_type_INTVAL;
         else if (STRING_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL")))
-            type = enum_type_FLOATVAL;
+            type = -enum_type_FLOATVAL;
         else
             type = Parrot_pmc_get_type_str(interp, type_name);
 
@@ -416,7 +412,6 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
 
     return multi_sig;
 }
-
 
 /*
 
@@ -441,7 +436,6 @@ mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
     return mmd_build_type_tuple_from_type_list(interp, type_list);
 }
 
-
 /*
 
 =item C<PMC* Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, PMC
@@ -463,7 +457,6 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
     ASSERT_ARGS(Parrot_mmd_build_type_tuple_from_sig_obj)
     return VTABLE_get_pmc(interp, sig_obj);
 }
-
 
 /*
 
@@ -526,7 +519,6 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
     return ar;
 }
 
-
 /*
 
 =item C<static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, PMC
@@ -559,6 +551,7 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
             if (PMC_IS_NULL(converted_sig))
                 return PMCNULL;
 
+            PARROT_GC_WRITE_BARRIER(interp, sub_pmc);
             multi_sig = sub->multi_signature = converted_sig;
         }
 
@@ -567,7 +560,6 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     return PMCNULL;
 }
-
 
 #define MMD_BIG_DISTANCE 0x7fff
 
@@ -597,6 +589,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
             GETATTR_NativePCCMethod_mmd_long_signature(interp, pmc, long_sig);
             multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            PARROT_GC_WRITE_BARRIER(interp, pmc);
             SETATTR_NativePCCMethod_mmd_multi_sig(interp, pmc, multi_sig);
         }
     }
@@ -607,6 +600,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
             GETATTR_NCI_long_signature(interp, pmc, long_sig);
             multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            PARROT_GC_WRITE_BARRIER(interp, pmc);
             SETATTR_NCI_multi_sig(interp, pmc, multi_sig);
         }
     }
@@ -651,25 +645,25 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * weighing other things. A direct autobox should be cheaper than an
          * autobox plus type conversion or implicit type acceptance. */
         switch (type_call) {
-          case enum_type_INTVAL:
+          case -enum_type_INTVAL:
             if (type_sig == enum_class_Integer) { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Integer;
             }
             break;
-          case enum_type_FLOATVAL:
+          case -enum_type_FLOATVAL:
             if (type_sig == enum_class_Float)   { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_Float;
             }
             break;
-          case enum_type_STRING:
+          case -enum_type_STRING:
             if (type_sig == enum_class_String)  { dist++; continue; }
-            if (type_sig == enum_type_PMC ||
+            if (type_sig == -enum_type_PMC ||
                 (type_sig >= enum_class_default && type_sig < enum_class_core_max)) {
                 ++dist;
                 type_call = enum_class_String;
@@ -683,12 +677,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * different native types are very different, except a PMC
          * which matches any PMC
          */
-        if (type_call <= 0 && type_sig == enum_type_PMC) {
+        if (type_call <= 0 && type_sig == -enum_type_PMC) {
             ++dist;
             continue;
         }
 
-        if ((type_sig <= 0 && type_sig != enum_type_PMC) || type_call <= 0) {
+        if ((type_sig <= 0 && type_sig != -enum_type_PMC) || type_call <= 0) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -715,7 +709,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
          * if the type wasn't in MRO check, if any PMC matches
          * in that case use the distance + 1 (of an any PMC parent)
          */
-        if (j == m && type_sig != enum_type_PMC) {
+        if (j == m && type_sig != -enum_type_PMC) {
             dist = MMD_BIG_DISTANCE;
             break;
         }
@@ -726,12 +720,12 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
         {
             STRING *s1, *s2;
             if (type_sig < 0)
-                s1 = Parrot_dt_get_datatype_name(interp, type_sig);
+                s1 = Parrot_dt_get_datatype_name(interp, -type_sig);
             else
                 s1 = interp->vtables[type_sig]->whoami;
 
             if (type_call < 0)
-                s2 = Parrot_dt_get_datatype_name(interp, type_call);
+                s2 = Parrot_dt_get_datatype_name(interp, -type_call);
             else
                 s2 = interp->vtables[type_call]->whoami;
 
@@ -743,7 +737,6 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
     return dist;
 }
-
 
 /*
 
@@ -757,7 +750,7 @@ candidate.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 static PMC *
 Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 {
@@ -778,7 +771,6 @@ Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 
     return best_candidate;
 }
-
 
 /*
 
@@ -824,7 +816,6 @@ Parrot_mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
     return 0;
 }
 
-
 /*
 
 =item C<static void mmd_search_by_sig_obj(PARROT_INTERP, STRING *name, PMC
@@ -861,7 +852,6 @@ mmd_search_by_sig_obj(PARROT_INTERP, ARGIN(STRING *name),
     Parrot_mmd_maybe_candidate(interp, multi_sub, candidates);
 }
 
-
 /*
 
 =item C<static void mmd_search_global(PARROT_INTERP, STRING *name, PMC *cl)>
@@ -886,7 +876,6 @@ mmd_search_global(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *cl))
 
     Parrot_mmd_maybe_candidate(interp, multi_sub, cl);
 }
-
 
 /*
 
@@ -917,7 +906,6 @@ mmd_add_multi_global(PARROT_INTERP, ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj)
     PARROT_ASSERT(multi_sub->vtable->base_type == enum_class_MultiSub);
     VTABLE_push_pmc(interp, multi_sub, sub_obj);
 }
-
 
 /*
 
@@ -951,7 +939,6 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
     VTABLE_push_pmc(interp, multi_sub, sub_obj);
 }
 
-
 /*
 
 =item C<void Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP, STRING *sub_name,
@@ -978,6 +965,8 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     /* Attach a type tuple array to the sub for multi dispatch */
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
 
+    PARROT_GC_WRITE_BARRIER(interp, sub_obj);
+
     if (sub_obj->vtable->base_type == enum_class_NativePCCMethod) {
         SETATTR_NativePCCMethod_mmd_multi_sig(interp, sub_obj, multi_sig);
     }
@@ -992,7 +981,6 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     mmd_add_multi_to_namespace(interp, ns_name, sub_name, sub_obj);
     mmd_add_multi_global(interp, sub_name, sub_obj);
 }
-
 
 /*
 
@@ -1025,6 +1013,8 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
     PMC    *sub_obj       = Parrot_pmc_new_constant(interp, enum_class_NCI);
     PMC    *multi_sig     = mmd_build_type_tuple_from_long_sig(interp,
                                 long_sig_str);
+
+    PARROT_GC_WRITE_BARRIER(interp, sub_obj);
 
     VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig_str,
                                     F2DPTR(multi_func_ptr));
@@ -1071,6 +1061,8 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         /* Create an NCI sub for the C function */
         PMC    *sub_obj       = Parrot_pmc_new(interp, enum_class_NCI);
 
+        PARROT_GC_WRITE_BARRIER(interp, sub_obj);
+
         VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
                                      F2DPTR(func_ptr));
 
@@ -1081,7 +1073,6 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         mmd_add_multi_global(interp, sub_name, sub_obj);
     }
 }
-
 
 /*
 
@@ -1100,10 +1091,9 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_mmd_cache_create)
     /* String hash. */
-    Hash *cache = parrot_new_hash(interp);
+    PMC *cache = Parrot_pmc_new(interp, enum_class_Hash);
     return cache;
 }
-
 
 /*
 
@@ -1152,7 +1142,6 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     return key;
 }
 
-
 /*
 
 =item C<PMC * Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache,
@@ -1175,11 +1164,10 @@ Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        return (PMC *)parrot_hash_get(interp, cache, key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }
-
 
 /*
 
@@ -1202,9 +1190,8 @@ Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_values(interp, name, values);
 
     if (key)
-        parrot_hash_put(interp, cache, key, chosen);
+        VTABLE_set_pmc_keyed_str(interp, cache, key, chosen);
 }
-
 
 /*
 
@@ -1255,7 +1242,6 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     return key;
 }
 
-
 /*
 
 =item C<PMC * Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, MMD_Cache *cache,
@@ -1275,14 +1261,13 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     ARGIN(const char *name), ARGIN(PMC *types))
 {
     ASSERT_ARGS(Parrot_mmd_cache_lookup_by_types)
-    const STRING * const key = mmd_cache_key_from_types(interp, name, types);
+    STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        return (PMC *)parrot_hash_get(interp, cache, key);
+        return VTABLE_get_pmc_keyed_str(interp, cache, key);
 
     return PMCNULL;
 }
-
 
 /*
 
@@ -1306,9 +1291,8 @@ Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
     STRING * const key = mmd_cache_key_from_types(interp, name, types);
 
     if (key)
-        parrot_hash_put(interp, cache, key, chosen);
+        VTABLE_set_pmc_keyed_str(interp, cache, key, chosen);
 }
-
 
 /*
 
@@ -1328,28 +1312,8 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
     /* As a small future optimization, note that we only *really* need to mark
     * keys - the candidates will be referenced outside the cache, provided it's
     * invalidated properly. */
-    parrot_mark_hash(interp, cache);
+    Parrot_gc_mark_PMC_alive(interp, cache);
 }
-
-
-/*
-
-=item C<void Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)>
-
-Destroys an MMD cache.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
-{
-    ASSERT_ARGS(Parrot_mmd_cache_destroy)
-    parrot_hash_destroy(interp, cache);
-}
-
 
 /*
 
@@ -1358,13 +1322,12 @@ Parrot_mmd_cache_destroy(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 =head1 SEE ALSO
 
 F<include/parrot/multidispatch.h>,
-F<http://svn.perl.org/perl6/doc/trunk/design/apo/A12.pod>,
-F<http://svn.perl.org/perl6/doc/trunk/design/syn/S12.pod>
+L<http://perlcabal.org/syn/S12.html>,
+L<http://dev.perl.org/perl6/doc/design/apo/A12.html>
 
 =cut
 
 */
-
 
 /*
  * Local variables:

@@ -144,7 +144,7 @@
 
     playfield = get_global "playfield"
     divider = repeat '-', 82
-    concat divider, "\n"
+    divider = concat divider, "\n"
     print divider
 
     $I0 = 0
@@ -156,11 +156,11 @@
     if $I1 >= 80 goto DEBUG__DUMP_PLAYFIELD__EOL
     $I2 = playfield[$I0;$I1]
     $S0 = chr $I2
-    concat line, $S0
+    line = concat line, $S0
     inc $I1
     goto DEBUG__DUMP_PLAYFIELD__NEXT_CHAR
   DEBUG__DUMP_PLAYFIELD__EOL:
-    concat line, "|\n"
+    line = concat line, "|\n"
     print line
     inc $I0
     goto DEBUG__DUMP_PLAYFIELD__NEXT_LINE
@@ -286,8 +286,8 @@
     y = status["y"]
     $S0 = x
     $S1 = y
-    concat $S0, ","
-    concat $S0, $S1
+    $S0 = concat $S0, ","
+    $S0 = concat $S0, $S1
     $I0 = exists breakpoints[$S0]
     if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__ROW
     _debug__interact()
@@ -296,7 +296,7 @@
   DEBUG__CHECK_BREAKPOINT__ROW:
     $S0 = "r:"
     $S1 = y
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     $I0 = exists breakpoints[$S0]
     if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__COL
     _debug__interact()
@@ -305,7 +305,7 @@
   DEBUG__CHECK_BREAKPOINT__COL:
     $S0 = "c:"
     $S1 = x
-    concat $S0, $S1
+    $S0 = concat $S0, $S1
     $I0 = exists breakpoints[$S0]
     if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__END
     _debug__interact()

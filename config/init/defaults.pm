@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,6 +18,7 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Config;
+use File::Which;
 use FindBin;    # see build_dir
 use Parrot::BuildUtil;
 use Parrot::Configure::Step;
@@ -76,7 +77,6 @@ sub runstep {
 
     # escape spaces in build directory
     my $build_dir =  abs_path($FindBin::Bin);
-    $build_dir    =~ s{ }{\\ }g;
 
     my $cc_option = $conf->options->get('cc');
     my $cc        = $cc_option ? $cc_option : $Config{cc};
@@ -101,6 +101,15 @@ sub runstep {
         # Flags used to indicate this object file is to be compiled
         # with position-independent code suitable for dynamic loading.
         cc_shared => '',    # e.g. -fpic for GNU cc.
+
+        # C++ compiler -- used to compile parts of ICU.  ICU's configure
+        # will try to find a suitable compiler, but it prefers GNU c++ over
+        # a system c++, which might not be appropriate.  This setting
+        # allows you to override ICU's guess, but is otherwise currently
+        # unset.  Ultimately, it should be set to whatever ICU figures
+        # out, or parrot should look for it and always tell ICU what to
+        # use.
+        cxx => 'c++',
 
         # Linker, used to link object files (plus libraries) into
         # an executable.  It is usually $cc on Unix-ish systems.
@@ -194,6 +203,8 @@ sub runstep {
 
         ar        => 'ar',
         arflags   => 'cr',
+        # tar is currently used only in 'make release'.
+        tar       => which('tar') || '',
 
         # for Win32
         ar_out => '',
@@ -243,7 +254,7 @@ sub runstep {
 
         tempdir => File::Spec->tmpdir,
 
-        PKGCONFIG_DIR => $conf->options->get('pkgconfigdir') || '',
+        coveragedir => $conf->options->get('coveragedir') || $build_dir,
     );
 
     # TT #855:  Profiling options are too specific to GCC
@@ -290,7 +301,9 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            for my $cc (qw(cc link ld)) {
+            ## add parentheses around qw(...)
+            ## to remove deprecation warning in perl 5.14.0
+            for my $cc (qw(cc cxx link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }
 

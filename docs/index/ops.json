@@ -1,0 +1,14 @@
+{
+   "page" : "ops",
+   "content" : [
+      {
+         "source" : "src/ops/*.ops",
+         "title" : "Opcode Libraries"
+      },
+      {
+         "source" : "src/dynoplibs/*.ops",
+         "title" : "Dynamic Opcode Libraries"
+      }
+   ],
+   "title" : "Opcodes"
+}

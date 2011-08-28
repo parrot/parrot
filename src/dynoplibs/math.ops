@@ -72,9 +72,9 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 =cut
 
 inline op cmod(out INT, in INT, in INT) :base_core {
-    INTVAL den = $3;
+    const INTVAL den = $3;
     if ($3 == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -86,7 +86,7 @@ inline op cmod(invar PMC, invar PMC, in INT) :base_core {
     INTVAL result;
 
     if ($3 == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -99,10 +99,10 @@ inline op cmod(invar PMC, invar PMC, in INT) :base_core {
 
 inline op cmod(invar PMC, invar PMC, invar PMC) :base_core {
     INTVAL result;
-    INTVAL value = VTABLE_get_integer(interp, $3);
+    const INTVAL value = VTABLE_get_integer(interp, $3);
 
     if (value == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -147,9 +147,9 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 =cut
 
 inline op cmod(out NUM, in NUM, in NUM) :base_core {
-    FLOATVAL den = $3;
+    const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO($3)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -159,10 +159,10 @@ inline op cmod(out NUM, in NUM, in NUM) :base_core {
 
 inline op cmod(invar PMC, invar PMC, in NUM) :base_core {
     FLOATVAL result;
-    FLOATVAL value = $3;
+    const FLOATVAL value = $3;
 
     if (FLOAT_IS_ZERO(value)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -272,7 +272,7 @@ inline op rand(out INT, in INT, in INT) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

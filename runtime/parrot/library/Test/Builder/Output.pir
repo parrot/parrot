@@ -149,7 +149,7 @@ unescaped newlines.
 
 	.local string new_line
 	new_line = '# '
-	concat new_line, line
+	new_line = concat new_line, line
 	lines[i] = new_line
 
   LINE_OK:
@@ -158,7 +158,7 @@ unescaped newlines.
 	if i < num_lines goto LOOP
 
 	message = join '', lines
-	concat message, "\n"
+	message = concat message, "\n"
 
 	.return( message )
 .end
@@ -187,9 +187,7 @@ unescaped newlines.
 	first_char = substr message, 0, 1
 	if first_char == '#' goto WRITE_MESSAGE
 
-	first_char = '# '
-	concat first_char, message
-	message = first_char
+	message = concat '# ', message
 
   WRITE_MESSAGE:
 	.local pmc diag_output

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ Initializes the PMC.
 
         PARROT_IMAGEIOSTRINGS(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pointer(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen,
-            parrot_new_intval_hash(INTERP));
+            Parrot_hash_new_intval_hash(INTERP));
 
         PARROT_IMAGEIOSTRINGS(SELF)->list = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
 
@@ -80,20 +80,6 @@ Gets the result PMC after a thaw.
 
     VTABLE PMC *get_pmc() {
         return PARROT_IMAGEIOSTRINGS(SELF)->list;
-    }
-
-/*
-
-=item C<VTABLE PMC *get_iter()>
-
-Get the C<todo> list for this freeze/thaw for iterating over.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_iter() {
-        return PARROT_IMAGEIOSTRINGS(SELF)->todo;
     }
 
 /*
@@ -166,10 +152,10 @@ Checks new pmcs for strings.
         if (!PMC_IS_NULL(v)) {
             Hash * const hash    = (Hash *)VTABLE_get_pointer(INTERP,
                                                 PARROT_IMAGEIOSTRINGS(SELF)->seen);
-            HashBucket * const b = parrot_hash_get_bucket(INTERP, hash, v);
+            HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash, v);
             if (!b) {
                 /* not yet seen */
-                parrot_hash_put(INTERP, hash, v, v);
+                Parrot_hash_put(INTERP, hash, v, v);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo, v);
             }
         }
@@ -177,8 +163,14 @@ Checks new pmcs for strings.
 
     VTABLE void set_pmc(PMC *p)
     {
+        PMC * const todo = PARROT_IMAGEIOSTRINGS(SELF)->todo;
         STATICSELF.push_pmc(p);
-        Parrot_visit_loop_visit(INTERP, SELF);
+        while (VTABLE_elements(INTERP, todo)) {
+            PMC * const current = VTABLE_shift_pmc(INTERP, todo);
+            VTABLE_freeze(INTERP, current, SELF);
+            VTABLE_visit(INTERP,  current, SELF);
+            SELF.push_pmc(PMC_metadata(current));
+        }
     }
 
 /*

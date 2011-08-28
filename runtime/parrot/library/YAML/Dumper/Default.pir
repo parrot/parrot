@@ -102,7 +102,7 @@ A YAML::Dumper::Default object has the following methods:
 
     print " with-properties: "
     clone name, paramName
-    concat name, ".properties()"
+    name = concat name, ".properties()"
     ret = self."yaml"( name, prop )
 
 END:

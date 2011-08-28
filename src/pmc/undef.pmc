@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,10 +48,9 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class_  = PARROT_OBJECT(other)->_class;
-            PMC        *clone   = VTABLE_clone(INTERP, other);
+            PMC * const clone   = VTABLE_clone(INTERP, other);
             void       *attrs   = PMC_data(clone);
-            PMC        *meta    = PMC_metadata(clone);
+            PMC * const meta    = PMC_metadata(clone);
 
             /* now swap memory without leaking it */
             PMC_data(clone)     = PMC_data(SELF);
@@ -102,6 +101,8 @@ Returns 0.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(SELF);
+        UNUSED(INTERP);
         return 0;
     }
 
@@ -116,6 +117,8 @@ Returns 0.
 */
 
     VTABLE INTVAL defined() {
+        UNUSED(SELF);
+        UNUSED(INTERP);
         return 0;
     }
 
@@ -145,6 +148,8 @@ Returns 0.0.
 */
 
     VTABLE FLOATVAL get_number() {
+        UNUSED(SELF);
+        UNUSED(INTERP);
         return 0.0;
     }
 
@@ -174,6 +179,7 @@ Returns an empty string.
 */
 
     VTABLE STRING *get_string() {
+        UNUSED(SELF);
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
             "Stringifying an Undef PMC");
 
@@ -206,6 +212,8 @@ Returns 0.
 */
 
     VTABLE INTVAL get_bool() {
+        UNUSED(SELF);
+        UNUSED(INTERP);
         return 0;
     }
 
@@ -220,24 +228,9 @@ Unknown. (TODO)
 */
 
     VTABLE void share() {
+        UNUSED(SELF);
+        UNUSED(INTERP);
         /* see src/pmc/integer.pmc */
-    }
-
-/*
-
-=item C<PMC *share_ro()>
-
-Unknown. (TODO)
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-        else
-            return pt_shared_fixup(INTERP, SELF);
     }
 
 /*
@@ -265,10 +258,16 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
 */
 
     MULTI INTVAL is_equal(Undef value) {
+        UNUSED(SELF);
+        UNUSED(INTERP);
+        UNUSED(value);
         return 1;
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
+        UNUSED(SELF);
+        UNUSED(INTERP);
+        UNUSED(value);
         return 0;
     }
 }

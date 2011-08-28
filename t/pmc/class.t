@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(73)
+     plan(89)
      'new op'()
      'class flag'()
      'name'()
@@ -28,12 +28,16 @@ Tests the Class PMC.
      'add_attribute'()
      'set_attr/get_attr'()
      'add_method'()
+     'remove_method'()
+     'find_method'()
+     'vtable_override'()
      'parents'()
      'roles'()
      'inspect'()
      'clone'()
      'clone_pmc'()
      'new with init hash'()
+     'new with init hash exceptions'()
      'isa'()
      'does'()
      'more does'()
@@ -155,7 +159,7 @@ Tests the Class PMC.
 
 # L<PDD15/Class PMC API/=item add_attribute>
 .sub 'add_attribute'
-    .local pmc class, attribs
+    .local pmc class, attribs, object
     .local int test_val
     class = new ['Class']
 
@@ -186,6 +190,16 @@ Tests the Class PMC.
 
   t_existing_attribute:
     ok($I0, 'add_attribute() with existing attribute name fails')
+
+    push_eh t_after_instantiation
+    $I0 = 1
+    object = class.'new'()
+    class.'add_attribute'( 'bar', 'Integer' )
+    $I0 = 0
+    pop_eh
+
+  t_after_instantiation:
+    ok($I0, 'add_attribute() after instantiation fails')
 .end
 
 
@@ -240,6 +254,7 @@ Tests the Class PMC.
     attribs['foo'] = 'bar'
 
     .const 'Sub' meth_to_add = 'foo'
+    .const 'Sub' another_meth_to_add = 'foobar'
 
     class.'add_method'( 'foo', meth_to_add )
     attribs = class.'methods'()
@@ -274,10 +289,14 @@ t_class_meth:
 
     $I0 = 1
     push_eh t_existing_method
-    class.'add_method'( 'foo' )
+    # Adding the same method with the same name is OK
+    class.'add_method'( 'foo', meth_to_add )
+    class.'add_method'( 'foo', meth_to_add )
+
+    # Adding another method with the same name should raise exception
+    class.'add_method'( 'foo', another_meth_to_add )
     $I0 = 0
     pop_eh
-
   t_existing_method:
     ok($I0, 'add_method() with existing method name fails')
 .end
@@ -285,7 +304,94 @@ t_class_meth:
 .sub 'foo' :method
     .return ('bar')
 .end
+.sub 'foobar' :method
+    .return ('bar')
+.end
 
+# L<PDD15/Class PMC API/=item remove_method>
+.sub 'remove_method'
+    .local pmc class, attribs
+    .local int test_val
+
+    class = new ['Class']
+
+    $I0 = 1
+    push_eh t_no_args
+    class.'remove_method'()
+    $I0 = 0
+    pop_eh
+  t_no_args:
+    ok($I0, 'remove_method() with no args fails')
+
+    .const 'Sub' meth_to_add = 'foo'
+
+    class.'add_method'( 'foo', meth_to_add )
+    class.'remove_method'( 'foo' )
+
+    attribs = class.'methods'()
+
+    test_val = exists attribs['foo']
+    is(test_val, 0, 'remove_method() removed the method')
+
+    $I0 = 1
+    push_eh t_remove_inexistent_method
+    class.'remove_method'( 'bar' )
+    $I0 = 0
+    pop_eh
+  t_remove_inexistent_method:
+    ok($I0, 'remove_method() with inexistent method fails')
+.end
+
+# L<PDD15/Class PMC API/=item find_method>
+.sub 'find_method'
+    .local pmc class
+    .local int test_val
+
+    class = new ['Class']
+
+    .const 'Sub' meth_to_add = 'foo'
+
+    class.'add_method'( 'foo1', meth_to_add )
+    class.'add_method'( 'foo2', meth_to_add )
+    class.'add_method'( 'foo3', meth_to_add )
+
+    $P0 = class.'find_method'( 'foo2' )
+    is($P0, 'foo', 'find_method() found the method')
+
+    $P0 = class.'find_method'( 'zzzz' )
+    $I0 = isnull $P0
+    ok($I0, 'find_method() returned null for inexistent method')
+.end
+
+# L<PDD15/Class PMC API/=item add_vtable_override>
+.sub 'vtable_override'
+    .local pmc class, obj
+    class = new ['Class']
+
+    $P0 = get_global 'new_add_role'
+    class.'add_vtable_override'('add_role', $P0)
+    ok(1, 'add_vtable_override() overrode a vtable')
+
+    obj = class.'new'()
+
+    $P0 = class.'inspect'('vtable_overrides')
+    $S0 = $P0['add_role']
+    is($S0, 'new_add_role', 'add_vtable_override() confirmed by inspect()')
+
+    $P0 = new ['Role']
+    addrole obj, $P0
+
+    $I0 = 1
+    push_eh t_invalid_name
+    class.'add_vtable_override'('zzz', $P0)
+    $I0 = 0
+    pop_eh
+  t_invalid_name:
+    ok($I0, 'add_vtable_override() with invalid name fails')
+.end
+.sub 'new_add_role'
+    ok(1, 'overridden vtable method called')
+.end
 
 # L<PDD15/Class PMC API/=item parents>
 .sub 'parents'
@@ -346,6 +452,26 @@ t_class_meth:
     result = class.'inspect'('attributes')
     test_val = elements result
     is(test_val, 1, 'inspect() "attributes" param returns correctly sized value')
+
+    result = class.'inspect'('id')
+    $I0 = class
+    is(result, $I0, 'inspect() "id" returns expected default value')
+
+    result = class.'inspect'('attrib_index')
+    $I0 = isnull result
+    ok($I0, 'inspect() "attrib_index" returns expected default value')
+
+    result = class.'inspect'('vtable_overrides')
+    $S0 = typeof result
+    is($S0, 'Hash', 'inspect() "vtable_overrides" param returns expected value')
+
+    $I0 = 1
+    push_eh t_inexistent_attribute
+    result = class.'inspect'('zzzzzz')
+    $I0 = 0
+    pop_eh
+  t_inexistent_attribute:
+    ok($I0, 'inspect() with inexistent attribute fails')
 .end
 # TODO more tests
 
@@ -415,7 +541,7 @@ t_class_meth:
 
 
 .sub 'new with init hash'
-    .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance
+    .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance, role, roles
     .local pmc attr_val, result
     init_hash = new ['Hash']
 
@@ -430,6 +556,16 @@ t_class_meth:
     meth_to_add = get_global 'add'
     methods['add'] = meth_to_add
     init_hash['methods'] = methods
+
+    # And a role
+    $P0 = new ['Hash']
+    $P0['name'] = 'Flob'
+    $P0['namespace'] = 'Bob'
+    role = new ['Role'], $P0
+
+    roles = new ['ResizablePMCArray']
+    roles[0] = role
+    init_hash['roles'] = roles
 
     class = new ['Class'], init_hash
     ok(1, 'new() created new class with attributes and methods supplied')
@@ -449,6 +585,22 @@ t_class_meth:
     # Call method.
     result = class_instance.'add'()
     is(result, 42, 'new() added method returns expected value')
+.end
+
+.sub 'new with init hash exceptions'
+    .local pmc class, init_hash, null_pmc
+    null_pmc = new ['Null']
+
+    init_hash = new ['Hash']
+    init_hash['name'] = ""
+
+    $I0 = 1
+    push_eh t_invalid_name
+    class = new ['Class'], init_hash
+    $I0 = 0
+    pop_eh
+  t_invalid_name:
+    ok($I0, 'new() with invalid name raises exception')
 .end
 
 .sub add :method :nsentry('add')
@@ -593,6 +745,16 @@ t_class_meth:
     addparent $P2, $P0
     addparent $P2, $P1
     ok(1, 'inheritance of two different anonymous classes works')
+
+    push_eh t_after_instantiation
+    $I0 = 1
+    $P3 = $P2.'new'()
+    addparent $P2, $P1
+    $I0 = 0
+    pop_eh
+
+  t_after_instantiation:
+    ok($I0, 'addparent VTABLE after instantiation fails')
 .end
 
 .sub 'method_cache_tt1497'

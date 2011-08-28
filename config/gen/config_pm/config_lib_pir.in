@@ -1,8 +1,9 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 .include 'datatypes.pasm'
+.include 'parrot_version.pir'
 
-.sub 'main'
+.sub 'main' :main
     get_params "(0)", $P5
     set $I10, $P5     # argv
     set $I11, 0      # flag

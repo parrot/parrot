@@ -196,7 +196,8 @@ void Parrot_debugger_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(STRING *filename))
+void Parrot_debugger_load(PARROT_INTERP,
+    ARGIN_NULLOK(const STRING *filename))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -222,6 +223,14 @@ PARROT_EXPORT
 void PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_dbg_get_exception_backtrace(PARROT_INTERP,
+    ARGMOD(PMC * exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* exception);
 
 long PDB_add_label(PARROT_INTERP,
     ARGMOD(PDB_file_t *file),
@@ -268,7 +277,7 @@ void PDB_disable_breakpoint(PARROT_INTERP, ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_disassemble(PARROT_INTERP, SHIM(const char *command))
+void PDB_disassemble(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 size_t PDB_disassemble_op(PARROT_INTERP,
@@ -326,7 +335,7 @@ void PDB_help(PARROT_INTERP, ARGIN(const char *command))
 void PDB_info(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void PDB_init(PARROT_INTERP, SHIM(const char *command))
+void PDB_init(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         __attribute__nonnull__(1);
 
 void PDB_list(PARROT_INTERP, ARGIN(const char *command))
@@ -385,6 +394,10 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
 #define ASSERT_ARGS_PDB_script_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))
+#define ASSERT_ARGS_Parrot_dbg_get_exception_backtrace \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(exception))
 #define ASSERT_ARGS_PDB_add_label __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file) \

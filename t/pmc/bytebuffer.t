@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(38)
+    plan(46)
 
     test_init()
     test_set_string()
@@ -32,6 +32,7 @@ Tests C<ByteBuffer> PMC..
     test_alloc()
     test_iterate()
     test_invalid()
+    test_get_chars()
 .end
 
 ################################################################
@@ -360,6 +361,47 @@ catch_content:
     pop_eh
     ok(1, "get_string with invalid content throws")
 end:
+.end
+
+.sub get_chars_outofbounds
+    .local pmc bb
+    .local string s
+    bb = new ['ByteBuffer']
+    bb = 'a'
+    s = bb.'get_chars'(2, 1, 'ascii')
+.end
+
+.sub test_get_chars
+    .local pmc bb
+    .local string s
+    bb = new ['ByteBuffer']
+
+    bb = 'plain ascii string'
+    s = bb.'get_chars'(6, 5, 'ascii')
+    is( s, 'ascii', 'get_chars ascii' )
+
+    bb = iso-8859-1:"D\x{E9}p\x{EA}che"
+    s = bb.'get_chars'(1, 3, 'iso-8859-1')
+    is( s, utf8:"épê", 'get_chars iso-8859-1' )
+
+    bb = binary:"D\x{E9}p\x{EA}che"
+    s = bb.'get_chars'(3, 3, 'binary')
+    is( s, utf8:"êch", 'get_chars binary' )
+
+    bb = ucs2:"Grüße"
+    s = bb.'get_chars'(0, 3, 'ucs2')
+    is( s, utf8:"Grü", 'get_chars ucs2' )
+    s = bb.'get_chars'(4, 3, 'ucs2')
+    is( s, utf8:"üße", 'get_chars ucs2' )
+
+    bb = ucs4:"Grüße"
+    s = bb.'get_chars'(0, 3, 'ucs4')
+    is( s, utf16:"Grü", 'get_chars ucs4' )
+    s = bb.'get_chars'(8, 3, 'ucs4')
+    is( s, utf16:"üße", 'get_chars ucs4' )
+
+    .const 'Sub' get_chars_oob = 'get_chars_outofbounds'
+    throws_type(get_chars_oob, .EXCEPTION_OUT_OF_BOUNDS, 'get_chars out of bounds')
 .end
 
 # Local Variables:

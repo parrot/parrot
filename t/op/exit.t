@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -23,49 +23,42 @@ Test both success and failure exit status.
 =cut
 
 pir_exit_code_is( <<'CODE', 0, 'pir exit with success' );
-.sub main
+.sub main :main
     exit 0
 .end
 CODE
 
 pir_exit_code_is( <<'CODE', 1, 'pir exit with failure' );
-.sub main
+.sub main :main
     exit 1
 .end
 CODE
 
 pasm_exit_code_is( <<'CODE', 1, 'pasm exit with failure' );
+.pcc_sub :main main:
     exit 1
 CODE
 
 pasm_exit_code_is( <<'CODE', 0, 'pasm exit without failure' );
+.pcc_sub :main main:
     exit 0
 CODE
 
 # If you know of a better place to put these tests, please put them there
 
 pir_exit_code_is( <<'CODE', 0, 'pir exits with success by default' );
-.sub main
+.sub main :main
     $S0 = "cheese"
 .end
 CODE
 
-TODO: {
-    local $TODO = 'pasm exits with 1 by default';
-    pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
-        set I0, 0
+pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
+    set I0, 0
+    end
 CODE
 
-}
-TODO: {
-    local $TODO = 'pbc exits with 1 by default';
-    # Should we be using this file?
-    my $pbc = File::Spec->catfile(qw/ t native_pbc integer_1.pbc /);
-    pbc_exit_code_is($pbc, 0, 'pbc exits with 0 by default');
-}
-
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
-.sub main
+.sub main :main
     $P0 = new ['ExceptionHandler']
     set_label $P0, catcher
     $P0.'handle_types'(2)
@@ -77,6 +70,16 @@ pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
     exit 10
 .end
 CODE
+
+my $exit_3_snippet = <<'CODE';
+.sub main :main
+    exit 3
+.end
+CODE
+
+pir_exit_code_is($exit_3_snippet, 3, "exit 3 causes exit code 3");
+pir_error_output_like($exit_3_snippet, '/^\s*$/', "exit opcode causes no error message to print");
+
 
 # Local Variables:
 #   mode: cperl

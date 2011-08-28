@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,7 +7,7 @@ LWP - The World-Wide Web library for Parrot
 =head2 DESCRIPTION
 
 Simplified port of LWP (version 5.834)
-see http://search.cpan.org/~gaas/libwww-perl/
+see http://search.cpan.org/dist/libwww-perl/
 
 =head3 Class LWP;Protocol
 
@@ -18,6 +18,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol']
 
 .sub '' :init :load :anon
+    load_bytecode 'osutils.pbc'
     load_bytecode 'HTTP/Message.pbc'
     $P0 = newclass ['LWP';'Protocol']
     $P0.'add_attribute'('scheme')
@@ -110,7 +111,6 @@ see http://search.cpan.org/~gaas/libwww-perl/
     setattribute $P0, 'message', $P1
     .return ($P0)
   L1:
-    load_bytecode 'osutils.pbc'
     .local string method
     method = request.'method'()
     $P0 = get_hll_global ['LWP';'Protocol';'file'], method
@@ -279,12 +279,13 @@ see http://search.cpan.org/~gaas/libwww-perl/
 .namespace ['LWP';'Protocol';'http']
 
 .include 'socket.pasm'
+.include 'cclass.pasm'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
 .end
 
-.sub '_new_socket' :method
+.sub '_new_socket'
     .param string host
     .param int port
     .local pmc sock, addr
@@ -299,6 +300,7 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .param pmc headers
     .param pmc url
     .param pmc proxy
+
     # Extract 'Host' header
     .local string host
     host = url.'authority'()
@@ -326,6 +328,11 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = 'Basic ' . $S0
     headers['Proxy-Authorization'] = $S0
   L2:
+
+    $I0 = exists headers['Connection']
+    if $I0 goto L3
+    headers['Connection'] = 'Keep-Alive'
+  L3:
 .end
 
 .sub '_format_request'
@@ -354,32 +361,20 @@ see http://search.cpan.org/~gaas/libwww-perl/
     .return ($P0)
 .end
 
-.sub '_parse_response_headers' :method
+.sub '_receive_status_line'
+    .param pmc sock
     .param pmc response
-    .param string str
-    .local string sep
-    sep = "\r\n"
-    $I0 = index str, "\r"
-    unless $I0 < 0 goto L0
-    sep = "\n"
-  L0:
-    $S0 = sep . sep
-    $I0 = index str, $S0
-    if $I0 < 0 goto L1
-    str = substr str, 0, $I0
-  L1:
-
-    $P0 = split sep, str
     .local string status_line
-    status_line = shift $P0
+    status_line = sock.'readline'()
+    status_line = chomp(status_line)
     $I0 = index status_line, " "
-    if $I0 < 0 goto L2
+    if $I0 < 0 goto L1
     $S0 = substr status_line, 0, $I0
     $P1 = box $S0
     setattribute response, 'protocol', $P1
     $I1 = $I0 + 1
     $I0 = index status_line, " ", $I1
-    if $I0 < 0 goto L2
+    if $I0 < 0 goto L1
     $I2 = $I0 - $I1
     $S0 = substr status_line, $I1, $I2
     $P1 = box $S0
@@ -388,43 +383,28 @@ see http://search.cpan.org/~gaas/libwww-perl/
     $S0 = substr status_line, $I0
     $P1 = box $S0
     setattribute response, 'message', $P1
-
-    $P3 = new ['HTTP';'Headers']
-  L3:
-    unless $P0 goto L4
-    $S0 = shift $P0
-    $I0 = index $S0, ": "
-    if $I0 < 0 goto L3
-    $S1 = substr $S0, 0, $I0
-    $I0 += 2
-    $S2 = substr $S0, $I0
-    $P3[$S1] = $S2
-    goto L3
-  L4:
-    setattribute response, 'headers', $P3
-
-    $I0 = length str
-    .return ($I0)
-  L2:
+    .return (1)
+  L1:
+    $P1 = box status_line
+    setattribute response, 'message', $P1
     .return (0)
 .end
 
-.sub '_parse_response_content' :method
-    .param pmc response
-    .param string str
-    $I0 = index str, "\r\n\r\n"
-    if $I0 < 0 goto L1
-    $I0 += 4
-    goto L2
+.sub '_receive_headers'
+    .param pmc sock
+    .param pmc headers
   L1:
-    $I0 = index str, "\n\n"
-    if $I0 < 0 goto L3
+    $S0 = sock.'readline'()
+    $S0 = chomp($S0)
+    if $S0 == '' goto L2
+    $I0 = index $S0, ": "
+    if $I0 < 0 goto L1
+    $S1 = substr $S0, 0, $I0
     $I0 += 2
+    $S2 = substr $S0, $I0
+    headers[$S1] = $S2
+    goto L1
   L2:
-    $S0 = substr str, $I0
-    $P0 = box $S0
-    setattribute response, 'content', $P0
-  L3:
 .end
 
 =item request
@@ -464,68 +444,91 @@ see http://search.cpan.org/~gaas/libwww-perl/
 
     # connect to remote site
     .local pmc sock
-    sock = self.'_new_socket'(host, port)
+    sock = _new_socket(host, port)
 
     .local pmc request_headers
     request_headers = request.'headers'()
     self.'_fixup_header'(request_headers, url, proxy)
 
-    .local pmc ua
-    ua = self.'ua'()
     $S0 = _format_request(method, fullpath, request_headers)
-    sock.'send'($S0)
+    sock.'puts'($S0)
 
     .local pmc response
     response = new ['HTTP';'Response']
+    .local pmc pcontent
     .local string content
-    content = request.'content'()
+    pcontent = request.'content'()
+    if null pcontent goto L11
+    content = pcontent
     unless content goto L11
-    .local int content_length
-    content_length = length content
-    $I0 = 0
-  L12:
-    unless $I0 < content_length goto L11
-    $S0 = substr content, $I0, 8192
-    $I1 = sock.'send'($S0)
-    if $I1 >= 0 goto L13
+    $I1 = sock.'puts'(content)
+    if $I1 >= 0 goto L11
     $P0 = box RC_INTERNAL_SERVER_ERROR
     setattribute response, 'code', $P0
     $P0 = box "I/O error"
     setattribute response, 'message', $P0
     .return (response)
-  L13:
-    $I0 += $I1
-    $N0 = $I0 / content_length
-    goto L12
   L11:
 
+    .local pmc ua
+    ua = self.'ua'()
+    ua.'progress'('tick', request)
+    $I0 = _receive_status_line(sock, response)
+    unless $I0 == 0 goto L21
+    .return (response)
+  L21:
+    .local pmc headers
+    headers = new ['HTTP';'Headers']
+    setattribute response, 'headers', headers
+    _receive_headers(sock, headers)
     .local pmc buf
     buf = new 'StringBuilder'
-    .local int header_length
+    $S0 = response.'get_header'('Transfer-Encoding')
+    $I0 = index $S0, 'chunked'
+    unless $I0 < 0 goto L51
+    .local int content_length
     content_length = 0
-  L21:
+    $S0 = response.'get_header'('Content-Length')
+    if $S0 == '' goto L22
+    content_length = $S0
+  L22:
+    unless content_length == 0 goto L41
+  L31:
     ua.'progress'('tick', request)
     $S0 = sock.'recv'()
-    if $S0 == '' goto L22
+    if $S0 == '' goto L23
     push buf, $S0
-    header_length = self.'_parse_response_headers'(response, buf)
-    $I0 = response.'is_success'()
-    unless $I0 goto L22
-    $S0 = response.'get_header'('Content-Length')
-    if $S0 == '' goto L21
-    content_length = $S0
-  L23:
+    goto L31
+  L41:
     $I0 = buf.'get_string_length'()
-    $I0 -= header_length
     $N0 = $I0 / content_length
     ua.'progress'($N0, request)
+    if $I0 >= content_length goto L23
     $S0 = sock.'recv'()
-    if $S0 == '' goto L22
+    if $S0 == '' goto L23
     push buf, $S0
-    goto L23
-  L22:
+    goto L41
+  L51:
+    .local int chunk_length
+    $S0 = sock.'readline'()
+    $I1 = length $S0
+    $I0 = find_not_cclass .CCLASS_HEXADECIMAL, $S0, 0, $I1
+    $S0 = substr $S0, 0, $I0
+    $P0 = box $S0
+    chunk_length = $P0.'to_int'(16)
+    if chunk_length == 0 goto L52
+    ua.'progress'('tick', request)
+    $S0 = sock.'read'(chunk_length)
+    push buf, $S0
+    sock.'readline'()
+    goto L51
+  L52:
+    _receive_headers(sock, headers) # trailers
+  L23:
+    $S0 = buf
+    $P0 = box $S0
+    setattribute response, 'content', $P0
     sock.'close'()
-    self.'_parse_response_content'(response, buf)
     .return (response)
 .end
 

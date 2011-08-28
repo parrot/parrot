@@ -1,7 +1,7 @@
-This is Parrot, version 2.10.1
------------------------------
+This is Parrot, version 3.7.0
+------------------------------
 
-Parrot is Copyright (C) 2001-2010, Parrot Foundation.
+Parrot is Copyright (C) 2001-2011, Parrot Foundation.
 
 
 LICENSE INFORMATION
@@ -55,7 +55,8 @@ There are 2 Git ports on Windows:
 msysgit 	    http://code.google.com/p/msysgit/downloads/list
 TortoiseGit 	http://code.google.com/p/tortoisegit/downloads/list
 
-Macintosh OS X
+Macintosh OS X:
+
 An Internet search will locate a variety of git installers for Mac OS X,
 including this:
 
@@ -85,14 +86,14 @@ INSTRUCTIONS
 For now, unpack your Parrot tarball, (if you're reading this, you've
 probably already done that) and type
 
-    perl Configure.pl
+    perl Configure.pl --optimize
 
 to run the Configure script. The Configure.pl script extracts configuration
 from the running perl5 program.  You may need to explicitly tell Configure.pl
 which compiler and linker to use.  For example, to compile C files with 'cc',
 C++ files with 'CC', and link everything together with 'CC', you would type
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 See "perl Configure.pl --help" for more options and docs/configuration.pod
 for more details.

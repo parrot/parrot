@@ -127,7 +127,7 @@ according to C<radix>.
 
   err_radix:
     $S0 = "Invalid radix: "
-    concat $S0, radix
+    $S0 = concat $S0, radix
     $P0 = new 'Exception'
     $P0 = $S0
     throw $P0
@@ -173,7 +173,7 @@ conversion.
     ($I0, $I1) = 'convert_string_to_int'(source, radix, pos)
     if $I1 == 0 goto bracketed_end
     $S0 = chr $I0
-    concat $S1, $S0
+    $S1 = concat $S1, $S0
     pos += $I1
   bracketed_end:
     $S0 = substr source, pos, 1

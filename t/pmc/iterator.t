@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -25,6 +25,7 @@ Tests the C<Iterator> PMC.
 # TT #1478: Split this test into aggregate specific one.
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
+.pcc_sub :main main:
     new P2, ['ResizablePMCArray']
     iter P1, P2
     print "ok 1\n"
@@ -33,7 +34,190 @@ CODE
 ok 1
 OUTPUT
 
+pasm_output_is( <<'CODE', <<'OUTPUT', "new iter fails (init)" );
+.pcc_sub :main main:
+    push_eh THROWN
+    new P0, ['ResizablePMCArray']
+    new P1, ['Iterator'], P0
+    print "not "
+THROWN:
+    pop_eh
+    print "ok 1\n"
+    end
+CODE
+ok 1
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "keyed access on String and Hash PMCs" );
+.pcc_sub :main main:
+    new P0, ['String']
+    set P0, "I am a very long string."
+    new P2, ['Integer']
+    set P2, 1
+    iter P1, P0
+    set I0, P1[P2]
+    eq I0, 32, OK1
+    print "not "
+OK1:print "ok 1\n"
+
+    set P2, 0
+    set I0, P1[P2]
+    eq I0, 73, OK2
+    print "not "
+OK2:print "ok 2\n"
+
+    set P2, 5
+    set S0, P1[P2]
+    eq S0, 'a', OK3
+    print "not "
+OK3:print "ok 3\n"
+
+    new P0, ['Hash']
+    set P0['derp'], 3.257
+    set P0['herp'], 2
+    iter P1, P0
+    set P2, 'herp'
+    set N0, P1[P2]
+    eq N0, 2, OK4
+    print "not "
+OK4:print "ok 4\n"
+
+    set P2, 'derp'
+    set N0, P1[P2]
+    eq N0, 3.257, OK5
+    print "not "
+OK5:print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "keyed exist and defined on String and Hash PMCs" );
+.pcc_sub :main main:
+    new P0, ['String']
+    set P0, 'somelongstring'
+    iter P1, P0
+
+    new P2, ['Integer']
+    set P2, 2
+    exists I0, P1[P2]
+    eq I0, 1, OK1
+    print "not "
+OK1:print "ok 1\n"
+
+    set P2, 20
+    exists I0, P1[P2]
+    eq I0, 0, OK2
+    print "not "
+OK2:print "ok 2\n"
+
+    defined I0, P1
+    eq I0, 1, OK3
+    print "not "
+OK3:print "ok 3\n"
+
+
+    new P0, ['Hash']
+    set P0['something'], 'stringg'
+    set P0['nothing'], 'something'
+    iter P1, P0
+    set P2, 'something'
+    defined I0, P1[P2]
+    eq I0, 1, OK4
+    print "not "
+OK4:print "ok 4\n"
+
+    set P2, 'somenothing'
+    defined I0, P1[P2]
+    eq I0, 0, OK5
+    print "not "
+OK5:print "ok 5\n"
+    end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
+.pcc_sub :main main:
+    new P0, ['ResizableIntegerArray']
+    push P0, 20
+    iter P1, P0
+    iter P2, P1
+
+    issame I0, P1, P2
+    eq I0, 1, OK
+    print "not "
+OK: print "ok\n"
+    end
+CODE
+ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "next()" );
+.sub _main :main
+    .local pmc str, str2, iterate
+    str = new ['String']
+    str = '0hey'
+    iterate = iter str
+
+    str2 = iterate.'next'()
+    eq str2, '0', OK1
+    print "not "
+OK1:print "ok 1 - next returns first character\n"
+
+    eq str, '0hey', OK2
+    print "not "
+OK2:print "ok 2 - does not touch input\n"
+
+    str2 = iterate.'next'()
+    eq str2, 'h', OK3
+    print "not "
+OK3:print "ok 3 - next returns second character\n"
+.end
+CODE
+ok 1 - next returns first character
+ok 2 - does not touch input
+ok 3 - next returns second character
+OUTPUT
+
+TODO: {
+pir_output_is( <<'CODE', <<'OUTPUT', "custom subclass, set_integer_native", todo => "subclassing init VTABLE method is not properly overridden." );
+
+.sub _main :main
+    .local pmc myiter, inst
+    myiter = subclass 'Iterator', 'MyIter'
+    #myiter = newclass 'MyIter'
+    inst = new ['MyIter']
+
+    push_eh THROWN
+    inst = 1
+    print "not "
+THROWN:
+    pop_eh
+    print "ok\n"
+.end
+
+.namespace ["MyIter"]
+.sub init :vtable
+    print "init\n"
+    .return()
+.end
+
+CODE
+ok
+OUTPUT
+}
+
 pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['ResizablePMCArray']    # empty array
     new P2, ['ResizablePMCArray']    # array with 2 elements
@@ -110,6 +294,7 @@ ok 12
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['Hash']    # empty Hash
     new P2, ['Hash']    # Hash with 2 elements
@@ -164,6 +349,7 @@ ok 8
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['Hash']    # empty Hash
     new P2, ['Hash']    # Hash with 2 elements
@@ -218,6 +404,7 @@ ok 8
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P0, ['Hash']    # Hash for iteration
     new P2, ['Hash']    # for test
@@ -258,6 +445,7 @@ ok 1
 ok 2
 OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "parrot"
@@ -279,6 +467,7 @@ parrot
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "parrot"
@@ -300,6 +489,7 @@ parrot
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "ABC"
@@ -321,6 +511,7 @@ ABC
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
+.pcc_sub :main main:
 .include "iterator.pasm"
     new P2, ['String']
     set P2, "ABC"
@@ -344,7 +535,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
 
 .include "iterator.pasm"
-.sub _main
+.sub _main :main
     .local pmc string_1
     string_1 = new ['String']
     string_1 = "abcd\x65\x66\x67"
@@ -381,7 +572,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "Index access for Iterator on String" );
 
 .include "iterator.pasm"
-.sub _main
+.sub _main :main
     .local pmc string_1
     string_1 = new ['String']
     string_1 = "abcd\x65\x66\x67"
@@ -431,7 +622,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePMCArray" );
 
 .include "iterator.pasm"
-.sub _main
+.sub _main :main
     .local pmc array_1
     array_1 = new ['ResizablePMCArray']
     push array_1, 'a'
@@ -536,7 +727,8 @@ Iterator get_integer: 7
 OUTPUT
 
 TODO: {
-    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access", todo => "N/Y: length of rest of array ");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
+    .pcc_sub :main main:
     .include "iterator.pasm"
 
     new P2, ['ResizablePMCArray']    # array with 4 elements
@@ -569,7 +761,8 @@ ok3:    print "ok 3\n"
     print " not "
 ok6:    print "ok 6\n"
 
-        print P1
+    print I0
+    print "\n"
     end
 CODE
 ok 1
@@ -583,6 +776,7 @@ OUTPUT
 
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
+.pcc_sub :main main:
    .include "iterator.pasm"
    new P0, ['ResizablePMCArray']
    push P0, 100
@@ -618,6 +812,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
+.pcc_sub :main main:
     .include "iterator.pasm"
     new P2, ['String']
     set P2, "parrot"

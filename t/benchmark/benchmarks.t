@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006, Parrot Foundation.
+# Copyright (C) 2006-2010, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -76,7 +76,7 @@ FixedPMCArray:\s\d+\.\d+s\n
         There\sare\s\d+\stotal\sPMC\sstructs\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
-    q{fib.pir}     => qr/^fib\(28\)\s=\s317811\s\d+\.\d+s$/x,
+    q{fib.pir}     => qr/^fib\(28\)\s=\s317811$/x,
     q{freeze.pasm} => qr/^constr.time\s\d+\.\d+\n
         freeze\stime\s\d+\.\d+\n
         \s\sthaw\stime\s\d+\.\d+\n

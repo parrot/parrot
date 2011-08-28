@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 package Parrot::Pmc2c::UtilFunctions;
 use strict;
@@ -11,6 +11,8 @@ our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
     c_code_coda slurp spew filename
     args_from_parameter_list
     passable_args_from_parameter_list
+    gen_multi_name
+    trim
 );
 
 =head1 NAME
@@ -19,7 +21,7 @@ Parrot::Pmc2c::UtilFunctions
 
 =head1 DESCRIPTION
 
-Various utility functions used in PMC to C transformations.  All functionas
+Various utility functions used in PMC to C transformations.  All functions
 are exported on request only.
 
 =head1 SUBROUTINES
@@ -70,7 +72,7 @@ Returns the number of newlines (C<\n>) in C<$string>.
 =cut
 
 sub count_newlines {
-    return scalar $_[0] =~ tr/\n//;
+    return $_[0] =~ tr/\n//;
 }
 
 =item C<dont_edit($pmcfile)>
@@ -298,6 +300,23 @@ sub filename {
     $filename =~ s/\.\w+$/.pmc/          if ( $type eq ".pmc" );
     return $filename;
 }
+
+sub gen_multi_name {
+    my ($name, $cache) = @_;
+
+    return $cache->{$name} if exists $cache->{$name};
+    my $count              = keys %$cache;
+    return $cache->{$name} = "mfl_$count";
+}
+
+# Perl trim function to remove whitespace from the start and end of the string
+sub trim {
+    my $string = shift;
+    $string    =~ s/^\s+//;
+    $string    =~ s/\s+$//;
+    return $string;
+}
+
 1;
 
 # Local Variables:

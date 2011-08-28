@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,6 +28,7 @@ These are the vtable functions for the Capture PMC.
             PObj_custom_mark_SET(obj); \
             (arr) = Parrot_pmc_new((i), enum_class_ResizablePMCArray); \
             SETATTR_Capture_array((i), (obj), (arr)); \
+            PARROT_GC_WRITE_BARRIER((i), (obj));  \
         } \
     } while (0)
 #define CAPTURE_hash_CREATE(i, obj, hsh) \
@@ -37,6 +38,7 @@ These are the vtable functions for the Capture PMC.
             PObj_custom_mark_SET(obj); \
             (hsh) = Parrot_pmc_new((i), enum_class_Hash); \
             SETATTR_Capture_hash((i), (obj), (hsh)); \
+            PARROT_GC_WRITE_BARRIER((i), (obj)); \
         } \
     } while (0)
 
@@ -56,7 +58,7 @@ Creates an identical copy of the Capture.
 
     VTABLE PMC *clone() {
         PMC *array, *hash;
-        PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
         if (!PMC_IS_NULL(array)) {
@@ -69,6 +71,9 @@ Creates an identical copy of the Capture.
             hash = VTABLE_clone(INTERP, hash);
             SET_ATTR_hash(INTERP, dest, hash);
         }
+
+        /* clone of parts can trigger GC. Explicitely WB dest */
+        PARROT_GC_WRITE_BARRIER(INTERP, dest);
 
         return dest;
     }
@@ -765,16 +770,48 @@ Mark the array.
 */
 
     VTABLE void mark() {
-        if (PMC_data(SELF)) {
-            PMC *array, *hash;
-            GET_ATTR_array(INTERP, SELF, array);
-            GET_ATTR_hash(INTERP, SELF, hash);
+        PMC *array, *hash;
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
-            Parrot_gc_mark_PMC_alive(INTERP, array);
-            Parrot_gc_mark_PMC_alive(INTERP, hash);
-        }
+        Parrot_gc_mark_PMC_alive(INTERP, array);
+        Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
+/*
+
+=item C<void freeze()>
+
+=item C<void thaw()>
+
+Freeze/thaw Capture
+
+=cut
+
+*/
+
+    VTABLE void freeze(PMC *info) {
+        PMC *array, *hash;
+        GET_ATTR_array(INTERP, SELF, array);
+        GET_ATTR_hash(INTERP, SELF, hash);
+
+        VTABLE_push_pmc(INTERP, info, array);
+        VTABLE_push_pmc(INTERP, info, hash);
+    }
+
+    VTABLE void thaw(PMC *info) {
+        PMC *tmp;
+        tmp = VTABLE_shift_pmc(INTERP, info);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_array(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
+        tmp = VTABLE_shift_pmc(INTERP, info);
+        if (!PMC_IS_NULL(tmp)) {
+            SET_ATTR_hash(INTERP, SELF, tmp);
+            PObj_custom_mark_SET(SELF);
+        }
+    }
 /*
 
 =back
@@ -787,39 +824,41 @@ Mark the array.
 
 */
 
-    METHOD list() {
+    METHOD list() :manual_wb {
         PMC *array;
-        PMC *capt = SELF;
+        PMC *capt;
 
         /* XXX:  This workaround is for when we get here as
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
             PMC    *classobj;
             PMC    *ns        = INTERP->root_namespace;
-            STRING *attribute = CONST_STRING(INTERP, "proxy");
 
             ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
             ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
             classobj          = Parrot_oo_get_class(INTERP, ns);
-            capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
+            capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, CONST_STRING(INTERP, "proxy"));
         }
+        else
+            capt = SELF;
 
         CAPTURE_array_CREATE(INTERP, capt, array);
         RETURN(PMC *array);
     }
 
-    METHOD hash() {
+    METHOD hash() :manual_wb {
         PMC *hash;
-        PMC *capt = SELF;
+        PMC *capt;
         /* XXX:  This workaround is for when we get here as
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
             STRING * const classname = CONST_STRING(INTERP, "Capture");
-            STRING        *attribute = CONST_STRING(INTERP, "proxy");
-            PMC           *classobj  = Parrot_oo_get_class_str(INTERP, classname);
+            PMC    * const classobj  = Parrot_oo_get_class_str(INTERP, classname);
 
-            capt                     = VTABLE_get_attr_keyed(INTERP, SELF, classobj, attribute);
+            capt = VTABLE_get_attr_keyed(INTERP, SELF, classobj, CONST_STRING(INTERP, "proxy"));
         }
+        else
+            capt = SELF;
 
         CAPTURE_hash_CREATE(INTERP, capt, hash);
 
@@ -831,10 +870,6 @@ Mark the array.
 /*
 
 =back
-
-=head1 HISTORY
-
-Initial version                  - Patrick Michaud 2006-11-03
 
 =cut
 

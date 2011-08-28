@@ -13,7 +13,6 @@
 #define PARROT_ATOMIC_H_GUARD
 
 #  include "parrot/has_header.h"
-#  include "parrot/thread.h"
 
 #ifdef PARROT_HAS_THREADS
 #  if defined(PARROT_HAS_I386_GCC_CMPXCHG)
@@ -47,9 +46,9 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
       do { \
           void * orig; \
-          PARROT_ATOMIC_PTR_GET((a), orig); \
+          PARROT_ATOMIC_PTR_GET(orig, (a)); \
           if ((expect) == (orig)) { \
-              ATOMIC_SET((a), (update)); \
+              PARROT_ATOMIC_PTR_SET((a), (update)); \
               (result) = 1; \
           } \
           else { \
@@ -64,9 +63,9 @@ typedef struct Parrot_atomic_integer {
 #  define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
       do { \
           INTVAL orig; \
-          PARROT_ATOMIC_PTR_GET((a), (orig)); \
+          PARROT_ATOMIC_INT_GET(orig, (a)); \
           if ((expect) == (orig)) { \
-              ATOMIC_SET((a), (update)); \
+              PARROT_ATOMIC_INT_SET((a), (update)); \
               (result) = 1; \
           } \
           else { \

@@ -17,6 +17,7 @@ our @shared_valid_options = qw{
     ccflags
     ccwarn
     configure_trace
+    coveragedir
     cxx
     darwin_no_fink
     darwin_no_macports
@@ -25,10 +26,10 @@ our @shared_valid_options = qw{
     define
     disable-rpath
     exec-prefix
-    execcapable
     fatal
     fatal-step
     floatval
+    gc
     help
     hintsfile
     icu-config
@@ -38,8 +39,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    jitcapable
-    buildframes
     ld
     ldflags
     lex
@@ -60,7 +59,6 @@ our @shared_valid_options = qw{
     ops
     optimize
     parrot_is_shared
-    pkgconfigdir
     prefix
     profile
     sbindir
@@ -71,6 +69,7 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
+    with-llvm
     without-crypto
     without-core-nci-thunks
     without-extra-nci-thunks

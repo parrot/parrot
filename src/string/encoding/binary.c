@@ -28,12 +28,19 @@ static STRING * binary_chr(PARROT_INTERP, UINTVAL codepoint)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* binary_error(PARROT_INTERP, SHIM(const STRING *src))
+static STRING* binary_error(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
-static UINTVAL binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static INTVAL binary_partial_scan(PARROT_INTERP,
+    ARGIN(const char *buf),
+    ARGMOD(Parrot_String_Bounds *bounds))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bounds);
+
+static void binary_scan(PARROT_INTERP, ARGMOD(STRING *src))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*src);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
@@ -44,9 +51,11 @@ static STRING* binary_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_binary_error __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_binary_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(buf) \
+    , PARROT_ASSERT_ARG(bounds))
 #define ASSERT_ARGS_binary_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(src))
+       PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_binary_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -124,7 +133,7 @@ binary_chr(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static UINTVAL binary_scan(PARROT_INTERP, const STRING *src)>
+=item C<static void binary_scan(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>. No scanning needed
 for fixed encodings.
@@ -133,19 +142,67 @@ for fixed encodings.
 
 */
 
-static UINTVAL
-binary_scan(PARROT_INTERP, ARGIN(const STRING *src))
+static void
+binary_scan(SHIM_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(binary_scan)
 
-    return src->bufused;
+    src->strlen = src->bufused;
+}
+
+
+/*
+
+=item C<static INTVAL binary_partial_scan(PARROT_INTERP, const char *buf,
+Parrot_String_Bounds *bounds)>
+
+Partial scan of binary string. Stops after C<count> bytes or if character
+C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
+
+=cut
+
+*/
+
+static INTVAL
+binary_partial_scan(SHIM_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds))
+{
+    ASSERT_ARGS(binary_partial_scan)
+    UINTVAL       i;
+    UINTVAL       len   = bounds->bytes;
+    const INTVAL  chars = bounds->chars;
+    const INTVAL  delim = bounds->delim;
+    INTVAL        c     = -1;
+
+    if (chars >= 0 && (UINTVAL)chars < len)
+        len = chars;
+
+    if (delim >= 0) {
+        for (i = 0; i < len; ++i) {
+            c = (unsigned char)buf[i];
+
+            if (c == delim) {
+                len = i + 1;
+                break;
+            }
+        }
+    }
+    else {
+        c = buf[len-1];
+    }
+
+    bounds->bytes = len;
+    bounds->chars = len;
+    bounds->delim = c;
+
+    return 0;
 }
 
 
 static STR_VTABLE Parrot_binary_encoding = {
-    0,
+    -1,
     "binary",
     NULL,
+    1, /* Bytes per unit */
     1, /* Max bytes per codepoint */
 
     binary_to_encoding,
@@ -158,6 +215,7 @@ static STR_VTABLE Parrot_binary_encoding = {
     fixed8_hash,
 
     binary_scan,
+    binary_partial_scan,
     fixed8_ord,
     fixed_substr,
 

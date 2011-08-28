@@ -15,7 +15,6 @@ usr/lib/parrot/@VERSION@/library/P6Regex.pbc
 usr/lib/parrot/@VERSION@/library/PCT.pbc
 usr/lib/parrot/@VERSION@/library/PCT/*
 usr/lib/parrot/@VERSION@/library/P6object.pbc
-usr/lib/parrot/@VERSION@/library/Protoobject.pbc
 usr/lib/parrot/@VERSION@/library/Parrot/Exception.pbc
 usr/lib/parrot/@VERSION@/library/config.pir
 usr/lib/parrot/@VERSION@/library/config.pbc

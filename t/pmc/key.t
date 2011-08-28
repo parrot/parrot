@@ -18,14 +18,27 @@ Tests the C<Key> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(12)
+    plan(13)
 
+    test_push_bad_args()
+    test_clone()
     traverse_key_chain()
     extract_int_from_string_keys()
     extract_string_from_int_keys()
-    use_number_keys()
     do_not_collect_string_keys_early_rt_60128()
     'get_repr'()
+
+.end
+
+.sub test_push_bad_args
+    push_eh bad_push
+    new $P1, ['FileHandle']
+    new $P0, ['Key']
+    push $P0, $P1
+    pop_eh
+
+    bad_push:
+        ok( 1, 'Bad Arguments to push handled.')
 .end
 
 .sub traverse_key_chain
@@ -87,19 +100,22 @@ e2:
     is( $P1, 'ok2', 'retrieve key is const int, set key was str const' )
 .end
 
-.sub use_number_keys
-    .local pmc hash, key
-    .local string foo
-
-    hash = new ['Hash']
+.sub test_clone
+    .local pmc key
     key  = new ['Key']
+    key  = 1
 
-    key = 1.234
-    is(key, "1.234", "number-valued Key stringification works")
+    # Test cloning integer keys.
+    clone $P0, key
 
-    hash[key] = "FOO"
-    foo = hash[key]
-    is(foo, "FOO", "set/get via number-valued Key works")
+    # Test get integer
+    $I0 = $P0
+
+    is ($I0, "1", "cloning integer keys works")
+
+    freeze $S0, $P0
+    thaw $P2, $S0
+    is ($P2, "1", "freeze/thaw integer keys works")
 .end
 
 
@@ -189,7 +205,7 @@ code
     # XXX PCC treats key arguments as special. Don't pass keys to subroutines.
     # repr_is($P0, '[ S1 ]')
     $S0 = get_repr $P0
-    is($S0, '[ S1 ]')
+    is($S0, '[ S1 ]', 'get_repr')
 .end
 
 .sub repr_is
@@ -197,7 +213,7 @@ code
     .param pmc repr
     .include 'test_more.pir'
     $S0 = get_repr x
-    is($S0, repr)
+    is($S0, repr, 'get_repr')
 .end
 
 # Local Variables:

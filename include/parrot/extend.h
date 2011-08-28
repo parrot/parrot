@@ -14,8 +14,9 @@
 #define PARROT_EXTEND_H_GUARD
 
 #include <stdarg.h>
+#include "parrot/parrot.h"
 #include "parrot/core_types.h"
-#include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
+#include "parrot/config.h"      /* PARROT_VERSION... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 
@@ -24,23 +25,6 @@
    we'll split this into two pieces and not install the core version,
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
-
-#define Parrot_Language Parrot_Int
-
-/* Macro to save off the original stack pointer for GC scanning. If
-   the stacktop was NULL, then set it to the address of the cached
-   pointer, which is on the stack and as good a thing as any to use as
-   an anchor */
-#define PARROT_CALLIN_START(x) void *oldtop = (x)->lo_var_ptr; \
-                               if (oldtop) {} else (x)->lo_var_ptr = &oldtop
-/* Put the stack top back, if what we cached was NULL. Otherwise we
-   leave it alone and assume it's OK */
-#define PARROT_CALLIN_END(x)   do {\
-                if (!oldtop) {\
-                    PARROT_ASSERT((x)->lo_var_ptr == &oldtop);\
-                    (x)->lo_var_ptr = NULL;\
-                }\
-            } while (0)
 
 #else
 
@@ -71,10 +55,14 @@ void Parrot_ext_call(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-Parrot_Language Parrot_find_language(SHIM_INTERP,
-    SHIM(const char *language));
+void Parrot_ext_try(PARROT_INTERP,
+    ARGIN_NULLOK(void (*cfunction)(Parrot_Interp,
+    void *)),
+    ARGIN_NULLOK(void (*chandler)(Parrot_Interp,
+    PMC *,
+    void *)),
+    ARGIN_NULLOK(void *data))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
@@ -133,6 +121,7 @@ Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 Parrot_PMC Parrot_PMC_null(void);
 
 PARROT_EXPORT
@@ -201,7 +190,8 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc) \
     , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_find_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pio) \

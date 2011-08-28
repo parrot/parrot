@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 70;
+use Parrot::Test tests => 78;
 use Parrot::Config;
 
 =head1 NAME
@@ -26,9 +26,12 @@ C<Continuation> PMCs.
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
+my $testr = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 my @todo;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
+.pcc_sub :main main:
     .const 'Sub' P0 = "func"
 
     set I5, 3
@@ -62,6 +65,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
+.pcc_sub :main main:
     new P5, ['Integer']
     set P5, 3
     set_global "foo", P5
@@ -94,6 +98,7 @@ done
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
+.pcc_sub :main main:
     new P1, ['Continuation']
     defined I1, P1
     print I1
@@ -114,6 +119,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub" );
+.pcc_sub :main main:
     get_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
@@ -133,6 +139,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "pcc sub, tail call" );
+.pcc_sub :main main:
     get_global P0, "_the_sub"
     defined I0, P0
     if I0, ok
@@ -171,7 +178,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -201,7 +208,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub, ret" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -235,7 +242,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call different subs, ret" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -292,7 +299,7 @@ in sub2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode PBC call different subs, ret" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -331,7 +338,7 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "equality of closures" );
-.pcc_sub main:
+.pcc_sub :main main:
       .const 'Sub' P3 = "f1"
       newclosure P0, P3
       clone P1, P0
@@ -360,6 +367,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "equality of subs" );
+.pcc_sub :main main:
       .const 'Sub' P0 = "f1"
       clone P1, P0
       eq P0, P1, OK1
@@ -404,7 +412,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load' );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "back"
@@ -427,7 +435,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub' );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "back"
@@ -441,7 +449,7 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load in pbc' );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pbc"
     say "back"
@@ -465,7 +473,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -484,7 +492,7 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first in pbc" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -513,7 +521,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -532,7 +540,7 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second in pbc" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -561,7 +569,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "loaded"
@@ -581,7 +589,7 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both in pbc" );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
@@ -643,15 +651,6 @@ first
 second
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "implicit :main with wrong # args." );
-.sub a
-  .param int op1
-  .param int op2
-.end
-CODE
-/too few positional arguments: 1 passed, 2 \(or more\) expected/
-OUTPUT
-
 pir_error_output_like( <<'CODE', <<'OUTPUT', "explicit :main with wrong # args." );
 .sub a :main
   .param int op1
@@ -671,7 +670,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load first sub - pir' );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "back"
@@ -698,7 +697,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub - pir' );
-.pcc_sub _main:
+.pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
     say "back"
@@ -723,7 +722,7 @@ EOF
 close $TEMP;
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode no :load - pir' );
-.pcc_sub _main:
+.pcc_sub :main _main:
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -786,7 +785,7 @@ ok/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
-.pcc_sub main:
+.pcc_sub :main main:
     .include "interpinfo.pasm"
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
@@ -893,7 +892,9 @@ caller 1 main
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
 .sub optc :immediate :postcomp
     print "initial\n"
 .end
@@ -905,6 +906,7 @@ initial
 initial
 main
 OUT
+}
 
 pir_output_like( <<'CODE', <<'OUTPUT', ':anon' );
 .sub main :main
@@ -1130,7 +1132,9 @@ CODE
 /Stringifying an Undef PMC/
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
+SKIP: {
+    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
+    pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
 .sub main :main
     say 'main'
 .end
@@ -1153,10 +1157,11 @@ pc
 pc2
 main
 OUTPUT
+}
 
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
-.sub utf8:"\u7777"
+.sub utf8:"\u7777" :main
    print "ok\n"
 .end
 CODE
@@ -1219,7 +1224,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'literal \u in sub name (not unicode)' );
-.sub '\u2193'
+.sub '\u2193' :main
     say 'ok'
 .end
 CODE
@@ -1258,6 +1263,38 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'assign' );
 
 .sub ok
     say "ok"
+.end
+CODE
+ok
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "assign exception" );
+.sub a :main
+  $P0 = get_global 'ok'
+
+  $P1 = new ['String']
+  assign $P0, $P1
+.end
+
+.sub ok
+.end
+CODE
+/Can't assign a non-Sub type to a Sub/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'destroy' );
+.sub main :main
+    $P0 = get_global 'ok'
+
+    # Make sure destroy is exercised
+    null $P0
+    sweep 1
+
+    say "ok"
+.end
+
+.sub ok
+    say "nothing"
 .end
 CODE
 ok
@@ -1436,8 +1473,7 @@ CODE
 I can has outer from eval?
 OUTPUT
 
-$ENV{TEST_PROG_ARGS} ||= '';
-@todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+@todo = $testr
     ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
@@ -1486,7 +1522,7 @@ DEF lex
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':subid and identical string constants' );
-.sub 'main'
+.sub 'main' :main
     'foo'()
     'bar'()
 .end
@@ -1508,7 +1544,7 @@ abc
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'copy sub to self' );
-.sub 'main'
+.sub 'main' :main
     $P0 = new ['Sub']
     assign $P0, $P0
     say 'no segfault'
@@ -1518,7 +1554,7 @@ no segfault
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_string null check' );
-.sub 'main'
+.sub 'main' :main
     $P0 = new ['Sub']
     $S0 = $P0
     say 'ok'
@@ -1527,10 +1563,52 @@ CODE
 ok
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_string_native' );
+.sub 'main' :main
+    $P0 = get_global 'original'
+    $P0()
+
+    $P0 = 'new_name'
+    $S0 = $P0
+    say $S0
+
+    $P0()
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+new_name
+inside
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_integer_keyed' );
+.sub 'main' :main
+    $P0 = get_global 'original'
+    $P0()
+
+    $I0 = $P0[0]
+
+    if $I0, ok
+
+  ok:
+    say 'ok'
+.end
+
+.sub 'original'
+    say 'inside'
+.end
+CODE
+inside
+ok
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'use of :init sub pointed to by a :outer in compreg' );
-.sub 'comptest'
+.sub 'comptest' :main
     $S0 = <<'PIR'
-.sub 'MAIN'
+.sub 'MAIN' :main
     say 'MAIN'
     .return ()
 .end
@@ -1560,7 +1638,7 @@ lived
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.get_subid' );
-.sub 'main'
+.sub 'main' :main
     .const 'Sub' foo = 'foo'
     $S0 = foo.'get_subid'()
     say $S0
@@ -1633,13 +1711,49 @@ thawed
 hi
 OUTPUT
 
+pir_output_is( <<'CODE', <<'OUTPUT', 'comp_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'comp_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'pf_flags method returns 0 for new Subs' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $I0 = $P0.'pf_flags'()
+    say $I0
+.end
+CODE
+0
+OUTPUT
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'init_pmc' );
-.sub 'main'
+.sub 'main' :main
     .local pmc init, s, regs, arg_info
 
     init = new ['Hash']
-    init['start_offs']  = 42
-    init['end_offs']    = 115200
+    init['start_offs']     = 42
+    init['end_offs']       = 115200
+    init['HLL_id']         = 0
+    init['namespace_name'] = ''
+    init['namespace_stash'] = ''
+    init['name']           = 'foo'
+    init['method_name']    = 'bar'
+    init['ns_entry_name']  = 'ns_entry_name'
+    init['subid']          = 'subid'
+    init['vtable_index']   = -1
+    init['multi_signature'] = ''
+    init['lex_info']       = ''
+    init['outer_sub']      = ''
+    init['comp_flags']     = 0
+    init['pf_flags']       = 0
+
 
     regs = new ['FixedIntegerArray']
     regs = 4
@@ -1725,6 +1839,70 @@ pos_slurpy 2
 named_required 3
 named_optional 5
 named_slurpy 8
+OUTPUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "inspect unknown introspection value exception" );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0, 'foo_bar'
+.end
+CODE
+/Unknown introspection value 'foo_bar'/
+OUTPUT
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'inspect return a hash' );
+.sub 'main' :main
+    $P0 = new ['Sub']
+
+    $P1 = inspect $P0
+    say $P1
+.end
+CODE
+/Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'inspect return hash with values' );
+.sub 'main' :main
+    $P0 = get_global 'foo'
+
+    $P1 = inspect $P0
+
+    print 'pos_required '
+    $S0 = $P1['pos_required']
+    say $S0
+
+    print 'pos_optional '
+    $S0 = $P1['pos_optional']
+    say $S0
+
+    print 'pos_slurpy '
+    $S0 = $P1['pos_slurpy']
+    say $S0
+
+    print 'named_required '
+    $S0 = $P1['named_required']
+    say $S0
+
+    print 'named_optional '
+    $S0 = $P1['named_optional']
+    say $S0
+
+    print 'named_slurpy '
+    $S0 = $P1['named_slurpy']
+    say $S0
+.end
+
+.sub foo
+    say 'bar'
+.end
+CODE
+pos_required 0
+pos_optional 0
+pos_slurpy 0
+named_required 0
+named_optional 0
+named_slurpy 0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'interface' );

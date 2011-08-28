@@ -108,7 +108,7 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)
 {
     ASSERT_ARGS(Parrot_warn)
-    if (!PARROT_WARNINGS_test(interp, warnclass))
+    if (!PMC_IS_NULL(interp->ctx) && !PARROT_WARNINGS_test(interp, warnclass))
         return 2;
     else {
         STRING *targ;

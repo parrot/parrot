@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,10 +18,122 @@ Tests the UnManagedStruct PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(1)
+    plan(10)
 
+    test_new()
+    test_bool()
+    is_defined()
+    is_equal()
+    initialize()
+    can_clone()
+.end
+
+.sub test_new
     new $P0, ['UnManagedStruct']
     ok(1, 'Instantiated an UnManagedStruct PMC')
+.end
+
+.sub test_bool
+    new $P0, ['UnManagedStruct']
+
+    $I0 = 0
+    if $P0 goto check
+    $I0 = 1
+  check:
+    is($I0, 1, 'undefined struct is false')
+.end
+
+.sub is_defined
+    $P0 = new ['UnManagedStruct']
+    $I0 = defined $P0
+    is($I0, 0, 'undefined struct is undefined')
+.end
+
+.sub is_equal
+    $P0 = new ['UnManagedStruct']
+    $P1 = new ['UnManagedStruct']
+    $P1 = $P0
+    eq $P0, $P1, OK
+    ok(0, 'unable to compate the equality of two unmanagedstructs')
+OK:
+    ok(1, 'can compare the equality of two unmanagedstructs')
+.end
+
+.sub initialize
+    $P0 = new ['UnManagedStruct']
+    $P1 = new ['String']
+    $P1 = "test"
+    push_eh eh1
+    $S0 = $P0[$P1]
+
+    ok(0, "no error thrown when trying to get key of unintialized struct")
+    goto finally1
+eh1:
+    .get_results($P1)
+    is($P1, "Missing struct initializer", "error correctly thrown for get")
+finally1:
+    pop_eh
+
+    push_eh eh2
+    $P0[$P1] = "test"
+    ok(0, "no error thrown when trying to set key of unintialized struct")
+    goto finally2
+eh2:
+    .get_results($P1)
+    is($P1, "Missing struct initializer", "error correctly thrown for set")
+finally2:
+    pop_eh
+
+    $P1 = new ['OrderedHash']
+    $P1['x'] = -1
+
+    push_eh eh3
+    $P0 = new ['UnManagedStruct'], $P1
+    ok(0, "no error when setting bad initializer")
+    goto finally3
+eh3:
+    .get_results($P2)
+    is($P2, "Illegal initializer for struct", "error correctly thrown for bad initializer")
+finally3:
+    pop_eh
+
+    .include "datatypes.pasm"
+    push $P1, 0
+    push $P1, 0
+
+    set $P1['y'], .DATATYPE_INT16
+    push $P1, 0
+    push $P1, 0
+
+    push_eh eh4
+    $P0 = new ['UnManagedStruct'], $P1
+    ok(0, "no error when initializing with bad type")
+    goto finally4
+eh4:
+    .get_results($P2)
+    is($P2, "Illegal type (-1) in initializer for struct", "error correctly thrown for bad initializer type")
+finally4:
+    pop_eh
+
+    set $P1['x'], .DATATYPE_INT16
+
+    $P0 = new ['UnManagedStruct'], $P1
+    ok(1, "can initialize unmanagedstruct from orderedhash")
+.end
+
+.sub can_clone
+    new $P1, ['OrderedHash']
+    set  $P1['x'], .DATATYPE_INT16
+    push $P1, 0
+    push $P1, 0
+
+    set $P1['y'], .DATATYPE_INT16
+    push $P1, 0
+    push $P1, 0
+
+    $P0 = new ['UnManagedStruct'], $P1
+    $P2 = clone $P0
+    ok(1, "can clone unmanagedstruct")
 .end
 
 # Local Variables:

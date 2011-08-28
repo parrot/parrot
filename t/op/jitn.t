@@ -26,6 +26,7 @@ registers.
 my $output;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -44,6 +45,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,2,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set I2,2
@@ -59,6 +61,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -83,6 +86,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -107,6 +111,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 1,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set I1,1
 set N1,1
@@ -129,6 +134,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -153,6 +159,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_i 2,3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set I1,1
@@ -178,6 +185,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -203,6 +211,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 2 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -227,6 +236,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 3 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -251,6 +261,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 0 mapped" );
+.pcc_sub :main main:
 set N0,0
 set N1,1
 set N2,2
@@ -276,6 +287,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n mapped same" );
+.pcc_sub :main main:
 set N2, 1
 add N2, N2, N2  # reserve first reg
 add N2, N2, N2
@@ -298,8 +310,7 @@ OUTPUT
 
 # rounding behavior
 pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
-
-.sub _main
+.sub _main :main
     .local num n
     .local int i
 
@@ -324,6 +335,7 @@ OUT
 
 $output = $PConfig{numvalsize} < 16 ? "zero\n" : "not zero\n";
 pasm_output_is( <<'CODE', $output, "rounding due to mapped" );
+.pcc_sub :main main:
     set N0, 15
     mul N0, N0, 0.1
     sub N0, 1.5

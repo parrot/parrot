@@ -182,38 +182,43 @@ ok 5
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
+.pcc_sub :main main:
     set S0, "x\uy"
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
+.pcc_sub :main main:
     set S0, "x\u123y"
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
+.pcc_sub :main main:
     set S0, "x\U123y"
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
+.pcc_sub :main main:
     set S0, "x\xy"
     print "never\n"
     end
 CODE
-/Illegal escape sequence in/
+/Illegal escape sequence/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+.pcc_sub :main main:
     set S0, utf8:"«"
     length I0, S0
     print I0
@@ -227,6 +232,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+.pcc_sub :main main:
     set S0, ascii:"«"
     length I0, S0
     print I0
@@ -237,6 +243,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-8" );
+.pcc_sub :main main:
     set S0, utf8:"\x{D888}"
     length I0, S0
     print I0
@@ -247,6 +254,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+.pcc_sub :main main:
     set S0, utf16:"\x{FDDA}"
     length I0, S0
     print I0
@@ -257,6 +265,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+.pcc_sub :main main:
     set S0, utf16:"\x{3FFFE}"
     length I0, S0
     print I0
@@ -267,6 +276,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-2" );
+.pcc_sub :main main:
     set S0, ucs2:"\x{12345}"
     length I0, S0
     print I0
@@ -277,6 +287,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-4" );
+.pcc_sub :main main:
     set S0, ucs4:"\x{130000}"
     length I0, S0
     print I0
@@ -287,6 +298,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
+.pcc_sub :main main:
     set S0, "AAAAAAAAAA\\u666"
     set I0, 0x666
     chr S1, I0
@@ -301,7 +313,7 @@ OUTPUT
 SKIP: {
     skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
     pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
-.sub main
+.sub main :main
     .local string str
     .local string rest
 
@@ -323,7 +335,7 @@ xyz
 OUTPUT
 
     pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish" );
-.sub main
+.sub main :main
     .local string str
     .local string rest
     str = utf8:".XYZ"
@@ -337,7 +349,7 @@ OUTPUT
 
     # escape does not produce utf8, just a raw sequence of chars
     pir_output_is( <<"CODE", <<'OUTPUT', "escape utf16" );
-.sub main
+.sub main :main
     .local string s, t
     .local int i
     s = iso-8859-1:"T\xf6tsch"
@@ -355,7 +367,7 @@ OUTPUT
 
 # Tests for .CCLASS_WHITESPACE
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
-.sub main
+.sub main :main
     .include 'cclass.pasm'
     .local string s
     s = utf8:" \t\u207babc\n\u2000\u2009"
@@ -382,7 +394,7 @@ OUTPUT
 
 # Tests for .CCLASS_ANY
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_ANY in unicode" );
-.sub main
+.sub main :main
     .include 'cclass.pasm'
     .local string s
     s = utf8:" \t\u207babc\n\u2000\u2009"
@@ -414,7 +426,7 @@ SKIP: {
 
     # Tests for .CCLASS_NUMERIC
     pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
-.sub main
+.sub main :main
     .include 'cclass.pasm'
     .local string s
     s = utf8:"01\u207bxyz\u0660\u17e1\u19d9"
@@ -442,7 +454,7 @@ OUTPUT
     # Concatenate utf8: with iso-8859-1
     pir_output_is(
         <<'CODE', <<"OUTPUT", "Concat unicode with iso-8859-1" );
-.sub main
+.sub main :main
     $S0 = utf8:"A"
     $S1 = ascii:"B"
     $S2 = concat $S0, $S1
@@ -469,7 +481,7 @@ OUTPUT
 }
 
 pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
-.sub 'main'
+.sub 'main' :main
     .local string str0, str1
     str0 = utf8:"\u00ab"
     str1 = iso-8859-1:"\xab"
@@ -496,7 +508,7 @@ hello
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket" );
-.sub 'main'
+.sub 'main' :main
     .local string str0, str1
     str0 = utf8:"infix:\u00b1"
     str1 = iso-8859-1:"infix:\xb1"
@@ -580,7 +592,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT #752)' );
-.sub 'main'
+.sub 'main' :main
 
     $S1 = chr 0xe5
     $S2 = chr 0x263b
@@ -605,7 +617,7 @@ equal
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and ucs4' );
-.sub 'main'
+.sub 'main' :main
 
     $S1 = utf8:"\u263a"
     $S2 = ucs4:"\u263b"
@@ -630,7 +642,7 @@ equal
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'join mixed encodings' );
-.sub 'main'
+.sub 'main' :main
     new $P0, 'ResizablePMCArray'
     push $P0, ascii:"a"
     push $P0, utf8:"\x{e1}" # a acute
@@ -644,7 +656,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
-.sub 'main'
+.sub 'main' :main
     # malformed strings
     'test_chars'(binary:"\x41\x80\x41")
     'test_chars'(binary:"\x41\xBF\x41")
@@ -682,7 +694,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('utf8')
     say 'valid'
@@ -721,7 +733,7 @@ Invalid character in UTF-8 string
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'valid utf8 chars' );
-.sub 'main'
+.sub 'main' :main
     'test_chars'(binary:"\xC2\x80")
     'test_chars'(binary:"\xE0\xA0\x80")
     'test_chars'(binary:"\xED\x9F\xBF")
@@ -796,7 +808,7 @@ $code .= units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'illegal utf16 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -806,7 +818,7 @@ $code
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('utf16')
     say 'valid'
@@ -851,7 +863,7 @@ $code = units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'valid utf16 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -900,7 +912,7 @@ $code .= units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'illegal ucs2 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -910,7 +922,7 @@ $code
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('ucs2')
     say 'valid'
@@ -953,7 +965,7 @@ $code = units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'valid ucs2 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -1001,7 +1013,7 @@ $code .= units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'illegal ucs4 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -1011,7 +1023,7 @@ $code
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('ucs4')
     say 'valid'
@@ -1060,7 +1072,7 @@ $code = units_to_code(
 );
 
 pir_output_is( <<CODE, <<'OUT', 'valid ucs4 chars' );
-.sub 'main'
+.sub 'main' :main
 $code
 .end
 
@@ -1095,7 +1107,7 @@ SKIP: {
     skip( 'no ICU lib', 1 ) unless $PConfig{has_icu};
 
 pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode (experimental)');
-.sub 'main'
+.sub 'main' :main
     $I1 = find_codepoint 'THISISNOTTHENAMEOFNOTHING'
     say $I1
 
@@ -1123,7 +1135,7 @@ OUT
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'ord with Unicode encodings' );
-.sub 'main'
+.sub 'main' :main
     test(utf8:"a\uBABEb c\uBEEFd")
     test(utf16:"a\uBABEb c\uBEEFd")
     test(ucs2:"a\uBABEb c\uBEEFd")

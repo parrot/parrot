@@ -138,8 +138,9 @@ Test the LWP library
     is($I0, 200, "code")
     $I0 = response.'is_success'()
     ok($I0, "is success")
-    $S0 = response.'content'()
-    is($S0, '', "no content")
+    $P0 = response.'content'()
+    $I0 = isnull $P0
+    ok($I0, "no content")
     $I0 = response.'get_header'('Content-Length')
     $I0 = $I0 > 2000
     ok($I0, "Content-Length")

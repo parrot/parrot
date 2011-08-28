@@ -58,7 +58,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3", todo => 'TT #452' );
 
-.sub _main
+.sub _main :main
     .local pmc add
     add = get_global "add"
     add_multi "add", "Integer,Integer,Integer", add
@@ -90,7 +90,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin 10 / 3 = 42", todo => 'TT #452' );
 
-.sub _main
+.sub _main :main
     .local pmc divide
     divide = get_global "Integer_divide_Integer"
     add_multi "divide", "Integer,Integer,Integer", divide
@@ -118,7 +118,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq", todo => 'TT #452' );
 
-.sub _main
+.sub _main :main
     .local pmc comp
     comp = get_global "Float_cmp_Integer"
     add_multi "cmp", "Float,Integer", comp
@@ -145,7 +145,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_multi" );
 
-.sub _main
+.sub _main :main
     .local pmc comp
     comp = get_global "Float_cmp_Integer"
     add_multi "cmp_num", "Float,Integer", comp
@@ -173,7 +173,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_multi - invoke it" );
 
-.sub _main
+.sub _main :main
     .local pmc comp
     comp = get_global "Float_cmp_Integer"
     add_multi "cmp_num", "Float,Integer", comp
@@ -220,7 +220,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub", todo => 'TT #452' );
-.sub _main
+.sub _main :main
     .local pmc divide
     load_bytecode "$temp_pir"
     divide = get_global "Integer_divide_Integer"
@@ -861,7 +861,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "override builtin add" );
-.sub main
+.sub main :main
     load_bytecode "$temp_pir"
     \$P0 = subclass "Integer", "AInt"
     \$P0 = new ['AInt']

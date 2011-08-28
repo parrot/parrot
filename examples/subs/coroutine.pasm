@@ -19,6 +19,8 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 
 =cut
 
+.pcc_sub :main main:
+
 # create a coro and save it on the user stack
 .const 'Sub' P0 =  "MYCOROUTINE"
 # a coroutine carries state - clone it

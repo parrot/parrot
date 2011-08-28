@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -44,6 +44,14 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     print $P3
     print "\n"
 
+    $P2 = new ['String']
+    $P2 = "sub event"
+    setattribute $P0, 'subtype', $P2
+
+    $P3 = getattribute $P0, 'subtype'
+    print $P3
+    print "\n"
+
     $P2 = new ['Integer']
     $P2 = 10
     setattribute $P0, 'priority', $P2
@@ -67,16 +75,68 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     $P3 = getattribute $P0, 'birthtime'
     print $P3
     print "\n"
+
+    $P2 = new ['String']
+    $P2 = "aditional data"
+    setattribute $P0, 'data', $P2
+
+    $P2 = get_global 'code'
+    setattribute $P0, 'code', $P2
+
+    # Make sure the mark vtable is exercised
+    sweep 1
+
     end
+  .end
+
+  .sub code
+    say "sub"
   .end
 CODE
 created
 inprocess
 event
+sub event
 10
 7405
 1.1
 OUT
+
+pir_error_output_like( <<'CODE', <<'OUTPUT', "init with wrong initializer type" );
+.sub main :main
+    $P0 = new ['String']
+    $P0 = 'foo'
+
+    $P1 = new ['Task'], $P0
+.end
+CODE
+/Task initializer must be a Hash/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "set_string_native set type of task" );
+.sub main :main
+    $P0 = new ['Task']
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+
+    $P2 = new ['String']
+    $P2 = "new_type"
+    setattribute $P0, 'type', $P2
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+
+    $P0 = "newer_type"
+
+    $P1 = getattribute $P0, 'type'
+    say $P1
+.end
+CODE
+
+new_type
+newer_type
+OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
   .sub main :main
@@ -127,6 +187,23 @@ event
 10
 7405
 1.1
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'create a task and get invalid attribute' );
+  .sub main :main
+    $P0 = new ['Task']
+
+    $P0 = getattribute $P0, 'foobar'
+    isnull $I0, $P0
+
+    if $I0, ok
+    say 'fail'
+
+  ok:
+    say 'ok'
+  .end
+CODE
+ok
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );

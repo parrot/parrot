@@ -1,67 +1,41 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+
+Copyright (C) 2010-2011, Parrot Foundation.
 
 */
 
-#include <sys/socket.h>
-#include <netinet/in.h>
+#ifdef _WIN32
+#  include <ws2tcpip.h>
+#else
+#  include <sys/types.h>
+#  include <sys/socket.h>
+#  include <netdb.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <string.h>
 
-int main(int c,char**v) {
-    int x = socket( PF_INET6, SOCK_DGRAM, 0 );
-    int errno;
+int main(int argc, char *argv[]) {
+#ifdef _WIN32
+    struct WSAData sockinfo;
+#endif
+    struct addrinfo  hints;
+    struct addrinfo *ai;
 
-    if ( x < 0 ) {
-        perror("Not OK - socket failed");
-        return EXIT_FAILURE;
-    }
+#ifdef _WIN32
+    WSAStartup(2, &sockinfo);
+#endif
 
-    /*
-    By now we have (a) PF_INET6 defined, and (b) in-principle kernel
-    support for v6; however we don't yet know if we have any v6
-    interfaces.
-    */
+    memset(&hints, 0, sizeof (struct addrinfo));
+    hints.ai_family   = PF_INET6;
+    hints.ai_protocol = IPPROTO_TCP;
 
-    struct in6_addr A = IN6ADDR_LOOPBACK_INIT;  /* IN6ADDR_ANY_INIT; */
-    struct sockaddr_in6 S = { AF_INET6 };  /* family is always first field in sockaddr_* */
-    S.sin6_addr = A;
-    S.sin6_port = 32760;  /* a pseudorandom 15-bit number */
+    getaddrinfo(NULL, "1234", &hints, &ai);
 
-    /*
-    By now we have struct in6_addr, struct sockaddr_in6 and AF_INET6 and
-    IN6ADDR_LOOPBACK_INIT. But we still don't know about interfaces.
-    */
+    if (socket(AF_INET6, SOCK_STREAM, 0) > 0)
+        printf("OK\n");
 
-    #ifdef linux  /* might not be supported elsewhere */
-    S.sin6_flowinfo = 0;
-    S.sin6_scope_id = 0;
-    #endif
-
-    /*
-    Set the SO_REUSEADDR option so as not to interfere with anyone else
-    using the port, including running this test again within the
-    re-use timeout period.
-    */
-    int reuse_address = 1;
-    if ( setsockopt(x, SOL_SOCKET, SO_REUSEADDR, &reuse_address, sizeof(reuse_address)) < 0 ) {
-        perror("Not OK - setsockopt failed");
-        return EXIT_FAILURE;
-    }
-
-    if ( bind( x, (void*) &S, sizeof(S) ) < 0 && errno != EADDRINUSE ) {
-        perror("Not OK - bind failed");
-        return EXIT_FAILURE;
-    }
-
-    /*
-    By now we know we can bind to "::1", which means we truly do have
-    IPv6 support. Of course, we might not have any useful routes off
-    this host, but that wasn't the question.
-    */
-    puts("OK");
-    close(x);
     return EXIT_SUCCESS;
 }
 

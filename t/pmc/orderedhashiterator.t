@@ -19,7 +19,7 @@ t/pmc/orderedhash.t.
 .include 'iterator.pasm'
 .include 'except_types.pasm'
 
-.sub 'main'
+.sub 'main' :main
     .include 'test_more.pir'
 
     plan(7)

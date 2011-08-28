@@ -20,7 +20,7 @@ Parrot installation NQP is known as C<parrot-nqp>.
 
 To build NQP from source, you'll just need a C<make> utility
 and Perl 5.8 or newer.  To automatically obtain and build Parrot
-you may also need a subversion (svn) client.
+you may also need a Git client.
 
 To obtain NQP directly from its repository:
 

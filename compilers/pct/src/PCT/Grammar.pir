@@ -103,6 +103,7 @@ to enforce whitespace between lexical words.
 .include 'cclass.pasm'
 
 .sub 'ww' :method
+    .param pmc adverbs         :slurpy :named
     .local pmc mob
     .local int pos
     .local string target
@@ -205,7 +206,7 @@ to enforce whitespace between lexical words.
     goto literal_xdo_char_loop
   literal_xdo_char_end:
     $S1 = chr codepoint
-    concat literal, $S1
+    literal = concat literal, $S1
     unless isbracketed goto literal_xdo_end
     if $S0 == ']' goto literal_xdo_end
     if $S0 != ',' goto fail

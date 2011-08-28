@@ -145,6 +145,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
+.pcc_sub :main main:
     set I0, 2.0
     print I0
     print "\n"
@@ -197,7 +198,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PIR heredocs: accepts inline with concat' );
     $S0 = ""
     $I0 = 0
 LOOP:
-    concat $S0, <<"end"
+    $S0 = concat $S0, <<"end"
 ending
 end
     inc $I0
@@ -575,7 +576,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "const int" );
 .const int c = 12
-.sub test
+.sub test :main
     .local num a
     a = 96
     # Uncomment this line, and the c symbol is 'forgotten'

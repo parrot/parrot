@@ -285,8 +285,12 @@ Returns the result of comparing the number with C<*value>.
     }
 
     MULTI INTVAL cmp_num(DEFAULT value) {
-        const FLOATVAL diff =
-                SELF.get_number() - VTABLE_get_number(INTERP, value);
+        /* fix an apparent gcc 4.4.x and 4.5.x bug that manifests itself when
+         * using g++ and an optimized build. See TT #1978.
+         */
+        volatile FLOATVAL n1 = SELF.get_number();
+        volatile FLOATVAL n2 = VTABLE_get_number(INTERP, value);
+        const FLOATVAL diff = n1 - n2;
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 

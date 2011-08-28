@@ -21,8 +21,8 @@ version 0.1
     ...
 
     .sub _reader :method
-	.local string str
-	str = self."read"()
+        .local string str
+        str = self."read"()
     .end
 
 =head1 DESCRIPTION

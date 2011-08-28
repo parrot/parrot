@@ -1,8 +1,14 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
 embed.pod - Parrot embedding system
+
+=head1 NOTE
+
+Parrot's embedding API is being replaced with a newer version. This document
+is for the old embedding API and will be phased out over time. Documentation
+for the newer API is located at F<docs/embed_new.pod>.
 
 =head1 SYNOPSIS
 
@@ -16,6 +22,7 @@ embed.pod - Parrot embedding system
 
         interp = Parrot_new(NULL);
         if (!interp) {
+            fprintf(stderr, "Cannot create Parrot interpreter!\n");
             return 1;
         }
 
@@ -69,21 +76,64 @@ line.
 
 =item C<Parrot_Int>
 
+Parrot's integer numeric type.
+
 =item C<Parrot_Float>
+
+Parrot's floating point numeric type.
 
 =item C<Parrot_UInt>
 
-Parrot's numeric types.
+Parrot's unsigned integer numeric type.
 
 =back
 
-=head2 Constants
+=head2 Function signatures
 
-Not documented yet.
+What is a function signature? It is a string which represents the calling and
+return conventions of a function. It is a very succinct representation of the
+answer to the question "How do I call this function and what does it
+return?".
 
-=head2 Type signatures
+All function signatures follow the form of:
 
-    TODO: Write about signature strings
+    Foo->Bar
+
+where C<Foo> and C<Bar> are a list of zero or more Parrot datatypes. C<Foo>
+and C<Bar> are individually called 'type signatures'. The datatypes on the
+left of the arrow are function arguments being passed in and the datatypes on
+the right are the datatype being returned. No spaces are allowed in a
+function signature.
+
+There are four datatypes that can be used in Parrot function signatures:
+
+    I <=> Parrot_Int
+    N <=> Parrot_Float (Numeric)
+    S <=> Parrot_String
+    P <=> Parrot_PMC
+
+Here are some example function signatures and what they mean:
+
+   INN->N   In: Integer, two Numerics    Out: Numeric
+   SIN->S   In: String, Integer, Numeric Out: String
+   P->S     In: PMC                      Out: String
+   PiP->S   In: PMC (method call)        Out: String
+   NN->N    In: Two Numerics             Out: Numeric
+   I->I     In: Integer                  Out: Integer
+   I->N     In: Integer                  Out: Numeric
+   N->P     In: Numeric                  Out: PMC
+   Pi->     In: none (method call)       Out: none
+   ->I      In: none                     Out: Integer
+   ->       In: none                     Out: none
+
+TODO: Multiple return values?
+
+
+There is also the C<Pi> datatype, which may only appear at the beginning of a
+function signature. It stands for "PMC invocant" and basically means SELF. C<Pi>
+will only be used if calling a method on an object.
+
+Parrot function signature are mostly used when calling C<Parrot_ext_call>.
 
 =head2 Interpreter initialization and destruction
 
@@ -106,24 +156,39 @@ flags include:
 
 =item PARROT_NO_FLAGS
 
+The default. No flags.
+
 =item PARROT_BOUNDS_FLAG
+
+True if bytecode bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 
+True if debugging memory management.
+
 =item PARROT_EXTERN_CODE_FLAG
+
+True if reusing another interpreters code.
 
 =item PARROT_DESTROY_FLAG
 
+True if the last interpreter shall cleanup.
+
 =item PARROT_IS_THREAD
+
+True if interpreter is a thread.
 
 =item PARROT_THR_COPY_INTERP
 
+True if thread start copies interpreter state.
+
 =item PARROT_THR_THREAD_POOL
+
+True if type3 threads are being used.
 
 =back
 
-See F<interpreter.h> for the definition of these flags (TODO: document flag
-definitions here).
+These are defined in F<interpreter.h>.
 
 =item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
 
@@ -313,7 +378,7 @@ Not documented yet.
 
 =item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub, const_char *signature, varargs ...)>
 
-Call a Parrot subroutine using the supplied signature. Variables to be filled
+Call a Parrot subroutine using the supplied function signature. Variables to be filled
 with return values are passed as references in the varargs list, after all
 arguments.
 
@@ -346,7 +411,7 @@ supplying an argument.
 
 Methods are called using the same API function as calling a subroutine. The
 first argument should be the object that the method will be invoked on, and it
-should have the signature "Pi".
+should have the signature "Pi", which stands for "PMC invocant".
 
 =back
 
@@ -764,8 +829,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_io_get_flags>
 
-=item C<Parrot_io_get_last_file_position>
-
 =item C<Parrot_io_get_os_handle>
 
 =item C<Parrot_io_init>
@@ -962,8 +1025,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_delprop>
 
-=item C<Parrot_PMC_destroy>
-
 =item C<Parrot_PMC_divide>
 
 =item C<Parrot_PMC_divide_float>
@@ -1118,8 +1179,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_instantiate>
 
-=item C<Parrot_PMC_invoke>
-
 =item C<Parrot_PMC_i_pow>
 
 =item C<Parrot_PMC_i_pow_float>
@@ -1147,8 +1206,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_subtract_float>
 
 =item C<Parrot_PMC_i_subtract_int>
-
-=item C<Parrot_PMC_mark>
 
 =item C<Parrot_PMC_modulus>
 
@@ -1322,8 +1379,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_substr>
 
-=item C<Parrot_PMC_substr_str>
-
 =item C<Parrot_PMC_subtract>
 
 =item C<Parrot_PMC_subtract_float>
@@ -1371,8 +1426,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_run_callback>
 
 =item C<Parrot_runcode>
-
-=item C<Parrot_run_native>
 
 =item C<Parrot_schedule_event>
 

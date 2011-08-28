@@ -19,18 +19,20 @@ Tests the PMCProxy PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(46)
+    plan(50)
 
     new_tests()
     get_class_tests()
     name_and_namespace_tests()
     method_introspection_tests()
+    parent_introspection_tests()
     new_creates_pmc()
     add_pmcproxy_as_parent()
     non_vtable_method_override()
     vtable_method_override()
     self_calls_overridden_methods()
     get_class_and_typeof_return_same_pmcproxy()
+    inspect_pmcproxy()
 .end
 
 .sub new_tests
@@ -88,6 +90,20 @@ Tests the PMCProxy PMC.
 
     $I0 = exists $P1['get_name']
     is($I0, 1, "get_name method in the list")
+.end
+
+.sub parent_introspection_tests
+    $P0 = get_class 'PMCProxy'
+
+    $P1 = new ['FixedPMCArray']
+    $P1 = $P0.'parents'()
+    ok(1, "got parents")
+
+    $P2 = new ['Class']
+    $P2 = $P1[0]
+
+    $S0 = $P2.'inspect'('name')
+    is($S0, 'Class', 'PMCProxy inherits from Class')
 .end
 
 
@@ -184,6 +200,7 @@ Tests the PMCProxy PMC.
 
 
 .sub self_calls_overridden_methods
+
     $P0 = new ['Class']
     ok(1, 'created a PDD15 class')
 
@@ -228,6 +245,19 @@ Tests the PMCProxy PMC.
     is($I0, 1, "PMCs have the same types")
     is($P3, "Integer", "P3 is an Integer")
     is($P4, "Integer", "P4 is also an Integer")
+.end
+
+.sub inspect_pmcproxy
+   $P0 = new ['PMCProxy']
+   $P1 = new ['Hash']
+   $P0 = get_class 'Integer'
+   $P1 = inspect $P0
+
+   $S0 = $P1['name']
+   is($S0, 'Integer', 'Integer name inspected correctly')
+
+   $S1 = $P1['namespace']
+   is($S1, 'Integer', 'Integer namespace inspected correctly')
 .end
 
 # Local Variables:

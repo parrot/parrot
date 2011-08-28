@@ -39,6 +39,7 @@ else {
 }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "interp identity" );
+.pcc_sub :main main:
     getinterp P2
     clone P3, P2
     ne P3, P2, ok1
@@ -57,7 +58,7 @@ ok 2
 OUTPUT
 
 SKIP: {
-    skip 'busted on win32' => 2 if $^O eq 'MSWin32';
+    skip 'busted on win32' => 2 if $^O eq 'MSWin32' || $^O eq 'msys';
 
     pir_output_is( <<'CODE', <<'OUTPUT', "thread type 1" );
 .sub main :main
@@ -103,7 +104,7 @@ loop:
     if $I0 < 2 goto loop
 .end
 
-.sub main
+.sub main :main
     .local pmc threadfunc
     .local pmc thread
     $I5 = 10
@@ -221,7 +222,7 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
-.sub _main
+.sub _main :main :main
     .const int MAX = 1000
     .local pmc kid
     .local pmc Adder
@@ -327,7 +328,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE only" );
     test3 = get_hll_global ['Test3'], 'test3'
     test3()
     .local pmc test4
-    errorsoff .PARROT_ERRORS_GLOBALS_FLAG
     test4 = get_global 'test4'
     if null test4 goto okay
     print "not "
