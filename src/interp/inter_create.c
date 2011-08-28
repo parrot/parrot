@@ -357,6 +357,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 static void
 int_initialize_6model(PARROT_INTERP)
 {
+    ASSERT_ARGS(int_initialize_6model)
     PMC *KnowHOW, *KnowHOWAttribute;
     SixModelObject_initialize(interp, &KnowHOW, &KnowHOWAttribute);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW, KnowHOW);

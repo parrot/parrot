@@ -172,6 +172,7 @@ static REPROps *this_repr;
 static PMC *
 type_object_for(PARROT_INTERP, PMC *HOW)
 {
+    ASSERT_ARGS(type_object_for)
     /* Create new type object instance. */
     UninstantiableInstance *obj = mem_allocate_zeroed_typed(UninstantiableInstance);
 
@@ -191,6 +192,7 @@ type_object_for(PARROT_INTERP, PMC *HOW)
 static PMC *
 instance_of(PARROT_INTERP, PMC *WHAT)
 {
+    ASSERT_ARGS(instance_of)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "You cannot create an instance of this type");
 }
@@ -208,6 +210,7 @@ INTVAL defined(PARROT_INTERP, PMC *obj)
 static void
 die_no_attrs(PARROT_INTERP)
 {
+    ASSERT_ARGS(die_no_attrs)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable representation does not support attribute storage");
 }
@@ -216,12 +219,14 @@ die_no_attrs(PARROT_INTERP)
 static PMC *
 get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute)
     die_no_attrs(interp);
     return PMCNULL;
 }
 static INTVAL
 get_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute_int)
     die_no_attrs(interp);
     return 0;
 }
@@ -234,6 +239,7 @@ FLOATVAL get_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *n
 static STRING *
 get_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(get_attribute_str)
     die_no_attrs(interp);
     return NULL;
 }
@@ -243,24 +249,28 @@ static void
 bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, PMC *value)
 {
+    ASSERT_ARGS(bind_attribute)
     die_no_attrs(interp);
 }
 static void
 bind_attribute_int(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, INTVAL value)
 {
+    ASSERT_ARGS(bind_attribute_int)
     die_no_attrs(interp);
 }
 static void
 bind_attribute_num(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, FLOATVAL value)
 {
+    ASSERT_ARGS(bind_attribute_num)
     die_no_attrs(interp);
 }
 static void
 bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
         STRING *name, INTVAL hint, STRING *value)
 {
+    ASSERT_ARGS(bind_attribute_str)
     die_no_attrs(interp);
 }
 
@@ -268,6 +278,7 @@ bind_attribute_str(PARROT_INTERP, PMC *obj, PMC *class_handle,
 static INTVAL
 hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
 {
+    ASSERT_ARGS(hint_for)
     return NO_HINT;
 }
 
@@ -275,6 +286,7 @@ hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)
 static PMC *
 repr_clone(PARROT_INTERP, PMC *to_clone)
 {
+    ASSERT_ARGS(repr_clone)
     UninstantiableInstance *obj = mem_allocate_zeroed_typed(UninstantiableInstance);
     obj->common.stable = STABLE_PMC(to_clone);
     return wrap_object(interp, obj);
@@ -285,6 +297,7 @@ repr_clone(PARROT_INTERP, PMC *to_clone)
 static void
 set_int(PARROT_INTERP, PMC *obj, INTVAL value)
 {
+    ASSERT_ARGS(set_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot box a native int");
 }
@@ -294,6 +307,7 @@ set_int(PARROT_INTERP, PMC *obj, INTVAL value)
 static INTVAL
 get_int(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_int)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot unbox to a native int");
 }
@@ -303,6 +317,7 @@ get_int(PARROT_INTERP, PMC *obj)
 static void
 set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
 {
+    ASSERT_ARGS(set_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot box a native num");
 }
@@ -312,6 +327,7 @@ set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)
 static FLOATVAL
 get_num(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_num)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot unbox to a native num");
 }
@@ -321,6 +337,7 @@ get_num(PARROT_INTERP, PMC *obj)
 static void
 set_str(PARROT_INTERP, PMC *obj, STRING *value)
 {
+    ASSERT_ARGS(set_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot box a native string");
 }
@@ -330,6 +347,7 @@ set_str(PARROT_INTERP, PMC *obj, STRING *value)
 static STRING *
 get_str(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(get_str)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Uninstantiable object cannot unbox to a native string");
 }
@@ -338,6 +356,7 @@ get_str(PARROT_INTERP, PMC *obj)
 static void
 gc_mark(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(gc_mark)
     UninstantiableInstance *instance = (UninstantiableInstance *)PMC_data(obj);
     if (!PMC_IS_NULL(instance->common.stable))
         Parrot_gc_mark_PMC_alive(interp, instance->common.stable);
@@ -349,6 +368,7 @@ gc_mark(PARROT_INTERP, PMC *obj)
 static void
 gc_free(PARROT_INTERP, PMC *obj)
 {
+    ASSERT_ARGS(gc_free)
     mem_sys_free(PMC_data(obj));
     PMC_data(obj) = NULL;
 }
@@ -357,6 +377,7 @@ gc_free(PARROT_INTERP, PMC *obj)
 static storage_spec
 get_storage_spec(PARROT_INTERP, STable *st)
 {
+    ASSERT_ARGS(get_storage_spec)
     storage_spec spec;
     spec.inlineable = STORAGE_SPEC_REFERENCE;
     spec.boxed_primitive = STORAGE_SPEC_BP_NONE;
@@ -367,6 +388,7 @@ get_storage_spec(PARROT_INTERP, STable *st)
 static INTVAL
 is_attribute_initialized(PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint)
 {
+    ASSERT_ARGS(is_attribute_initialized)
     die_no_attrs(interp);
 }
 

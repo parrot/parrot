@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 */
 
 =over
@@ -55,7 +55,7 @@ Gets the WHAT for a 6model Object.
 =cut
 
 inline op get_what(out PMC, in PMC) :base_core {
-    PMC *var = decontainerize(interp, $2);
+    PMC * const var = decontainerize(interp, $2);
     if (var->vtable->base_type == enum_class_SixModelObject)
         $1 = STABLE(var)->WHAT;
     else
@@ -64,14 +64,26 @@ inline op get_what(out PMC, in PMC) :base_core {
 }
 
 
+=item what_or_null(obj)
+
+Gets the WHAT for a 6model Object, returns PMCNULL otherwise.
+
+=cut
+
+inline op what_or_null(out PMC, in PMC) :base_core {
+    PMC * const var = decontainerize(interp, $2);
+    if (var->vtable->base_type == smo_id)
+        $1 = STABLE(var)->WHAT;
+    else
+        $1 = PMCNULL;
+}
+
 
 =item get_who(obj)
 
 Gets the WHO for a 6model Object.
 
 =cut
-
-
 
 inline op get_who(out PMC, in PMC) :base_core {
     PMC *var = decontainerize(interp, $2);
@@ -93,7 +105,7 @@ Sets the WHO for a 6model Object.
 
 
 inline op set_who(in PMC, in PMC) :base_core {
-    PMC *var = decontainerize(interp, $1);
+    PMC * const var = decontainerize(interp, $1);
     if (var->vtable->base_type == enum_class_SixModelObject) {
         STABLE(var)->WHO = $2;
         PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(var));
@@ -115,7 +127,7 @@ representation.
 
 
 inline op repr_type_object_for(out PMC, in PMC, in STR) :base_core {
-    REPROps *REPR = REPR_get_by_name(interp, $3);
+    REPROps const *REPR = REPR_get_by_name(interp, $3);
     $1 = REPR->type_object_for(interp, decontainerize(interp, $2));
 }
 
@@ -148,7 +160,7 @@ Gets a REPR to clone itself.
 
 
 inline op repr_clone(out PMC, in PMC) :base_core {
-    PMC *var = decontainerize(interp, $2);
+    PMC * const var = decontainerize(interp, $2);
     if (var->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR(var)->clone(interp, var);
     else
@@ -168,7 +180,7 @@ Checks the REPRs idea of definedness.
 
 
 inline op repr_defined(out INT, in PMC) :base_core {
-    PMC *var = decontainerize(interp, $2);
+    PMC * const var = decontainerize(interp, $2);
     if (var->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR(var)->defined(interp, var);
     else
@@ -188,7 +200,7 @@ a native int - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_get_attr_int(out INT, in PMC, in PMC, in STR) :base_core {
-    PMC *ch = decontainerize(interp, $3);
+    PMC * const ch = decontainerize(interp, $3);
     if ($2->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR($2)->get_attribute_int(interp, $2, ch, $4, NO_HINT);
     else
@@ -208,7 +220,7 @@ a native num - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_get_attr_num(out NUM, in PMC, in PMC, in STR) :base_core {
-    PMC *ch = decontainerize(interp, $3);
+    PMC * const ch = decontainerize(interp, $3);
     if ($2->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR($2)->get_attribute_num(interp, $2, ch, $4, NO_HINT);
     else
@@ -228,7 +240,7 @@ a native str - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_get_attr_str(out STR, in PMC, in PMC, in STR) :base_core {
-    PMC *ch = decontainerize(interp, $3);
+    PMC * const ch = decontainerize(interp, $3);
     if ($2->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR($2)->get_attribute_str(interp, $2, ch, $4, NO_HINT);
     else
@@ -248,7 +260,7 @@ a native int - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_bind_attr_int(in PMC, in PMC, in STR, in INT) :base_core {
-    PMC *ch = decontainerize(interp, $2);
+    PMC * const ch = decontainerize(interp, $2);
     if ($1->vtable->base_type == enum_class_SixModelObject)
         REPR($1)->bind_attribute_int(interp, $1, ch, $3, NO_HINT, $4);
     else
@@ -268,7 +280,7 @@ a native num - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_bind_attr_num(in PMC, in PMC, in STR, in NUM) :base_core {
-    PMC *ch = decontainerize(interp, $2);
+    PMC * const ch = decontainerize(interp, $2);
     if ($1->vtable->base_type == enum_class_SixModelObject)
         REPR($1)->bind_attribute_num(interp, $1, ch, $3, NO_HINT, $4);
     else
@@ -288,7 +300,7 @@ a native str - the repr is not obligated to do boxing/unboxing for you.
 
 
 inline op repr_bind_attr_str(in PMC, in PMC, in STR, in STR) :base_core {
-    PMC *ch = decontainerize(interp, $2);
+    PMC * const ch = decontainerize(interp, $2);
     if ($1->vtable->base_type == enum_class_SixModelObject)
         REPR($1)->bind_attribute_str(interp, $1, ch, $3, NO_HINT, $4);
     else
@@ -308,7 +320,7 @@ in $1 if so.
 
 
 inline op repr_is_attr_initialized(out INT, in PMC, in PMC, in STR) :base_core {
-    PMC *ch = decontainerize(interp, $3);
+    PMC * const ch = decontainerize(interp, $3);
     if ($2->vtable->base_type == enum_class_SixModelObject)
         $1 = REPR($2)->is_attribute_initialized(interp, $2, ch, $4, NO_HINT);
     else
@@ -330,8 +342,8 @@ REPR to decide what changes it will or won't allow.
 
 
 inline op repr_change_type(in PMC, in PMC) :base_core {
-    PMC *obj      = decontainerize(interp, $1);
-    PMC *new_type = decontainerize(interp, $2);
+    PMC * const obj      = decontainerize(interp, $1);
+    PMC * const new_type = decontainerize(interp, $2);
     if (obj->vtable->base_type == enum_class_SixModelObject &&
         new_type->vtable->base_type == enum_class_SixModelObject) {
         if (REPR(obj)->change_type)
@@ -360,8 +372,8 @@ make sure.
 
 
 inline op type_check(out INT, in PMC, in PMC) :base_core {
-    PMC *val = decontainerize(interp, $2);
-    PMC *type = decontainerize(interp, $3);
+    PMC * const val = decontainerize(interp, $2);
+    PMC * const type = decontainerize(interp, $3);
     if (val->vtable->base_type == enum_class_SixModelObject &&
         type->vtable->base_type == enum_class_SixModelObject) {
         $1 = STABLE(val)->type_check(interp, val, type);
@@ -387,7 +399,7 @@ Publishes a type check cache, to be stored in the S-Table.
 
 
 inline op publish_type_check_cache(in PMC, in PMC) :base_core {
-    PMC *target = decontainerize(interp, $1);
+    PMC * const target = decontainerize(interp, $1);
     if (target->vtable->base_type == enum_class_SixModelObject) {
         STable *target_st = STABLE(target);
         INTVAL items      = VTABLE_elements(interp, $2);
@@ -698,13 +710,11 @@ inline op stable_publish_vtable_handler_mapping(in PMC, in PMC) :base_core {
 }
 
 
-
 =item nqp_get_sc_object()
 
 Fetches an object from the serialization context keyed by handle and index.
 
 =cut
-
 
 
 inline op nqp_get_sc_object(out PMC, in STR, in INT) :base_core {
@@ -718,14 +728,12 @@ inline op nqp_get_sc_object(out PMC, in STR, in INT) :base_core {
 }
 
 
-
 =item nqp_get_sc()
 
 Gets the serialization context with the specified handle. Returns
 NULL if it does not exist.
 
 =cut
-
 
 
 inline op nqp_get_sc(out PMC, in STR) {
@@ -742,9 +750,8 @@ to the registry and returns it.
 =cut
 
 
-
 inline op nqp_create_sc(out PMC, in STR) {
-    $1 = Parrot_pmc_new(interp, pmc_type(interp,
+    $1 = Parrot_pmc_new(interp, Parrot_pmc_get_type_str(interp,
         Parrot_str_new(interp, "SerializationContext", 0)));
     VTABLE_set_string_native(interp, $1, $2);
     SC_set_sc(interp, $2, $1);
@@ -972,7 +979,7 @@ inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 LICENSE
 

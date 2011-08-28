@@ -1588,9 +1588,9 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_pmc_is_null>
 
-=item C<pmc_new>
+=item C<Parrot_pmc_new>
 
-=item C<pmc_type>
+=item C<Parrot_pmc_get_type_str>
 
 =item C<PObj_custom_destroy_SET>
 

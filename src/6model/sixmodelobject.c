@@ -78,6 +78,7 @@ wrap_object(PARROT_INTERP, void *obj)
 static PMC *
 default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
 {
+    ASSERT_ARGS(default_find_method)
     PMC *HOW, *meth, *result;
 
     /* See if we can find it by hint. */
@@ -115,6 +116,7 @@ default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
 static INTVAL
 default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
 {
+    ASSERT_ARGS(default_type_check)
     PMC *HOW, *meth, *result;
 
     STable *st = STABLE(to_check);

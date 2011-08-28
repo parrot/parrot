@@ -628,6 +628,8 @@ op_lib_t *PARROT_CORE_OPLIB_INIT(PARROT_INTERP, long init);
  opcode_t * Parrot_get_how_p_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_what_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_what_p_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_what_or_null_p_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_what_or_null_p_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_who_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_who_p_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_set_who_p_p(opcode_t *, PARROT_INTERP);

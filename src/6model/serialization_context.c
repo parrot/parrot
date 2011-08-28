@@ -29,6 +29,7 @@ static PMC *scs = NULL;
 static void
 setup_sc_stores(PARROT_INTERP)
 {
+    ASSERT_ARGS(setup_sc_stores)
     scs = Parrot_pmc_new(interp, enum_class_Hash);
     Parrot_pmc_gc_register(interp, scs);
 }
