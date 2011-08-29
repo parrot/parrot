@@ -338,6 +338,12 @@
 ^/frontend/parrot/.*\.gcov/
 ^/frontend/parrot/main\.o$
 ^/frontend/parrot/main\.o/
+^/frontend/parrot2/main\.o$
+^/frontend/parrot2/main\.o/
+^/frontend/parrot2/prt0\.pbc$
+^/frontend/parrot2/prt0\.pbc/
+^/frontend/parrot2/prt0\.pbc\.c$
+^/frontend/parrot2/prt0\.pbc\.c/
 ^/frontend/parrot_debugger/.*\.gcda$
 ^/frontend/parrot_debugger/.*\.gcda/
 ^/frontend/parrot_debugger/.*\.gcno$
