@@ -18,7 +18,6 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
             __usage_and_exit(interp, "Invalid file type " + prog_name);
         var exe_name = sys_args.shift();
         var packfile_pmc = null;
-        interp[IGLOBALS_EXECUTABLE] = exe_name;
         for (int i = 0; i < elements(sys_args); i++) {
             string sys_arg = sys_args[i];
             switch (sys_arg) {
