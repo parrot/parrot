@@ -1612,8 +1612,7 @@ frontend/parrot2/main$(O) : \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/longopt.h \
 	include/imcc/api.h \
-	frontend/parrot2/main.c \
-	frontend/parrot2/prt0.pbc
+	frontend/parrot2/main.c
 
 frontend/parrot/main$(O) : \
 	$(INC_DIR)/api.h \
@@ -1624,7 +1623,7 @@ frontend/parrot/main$(O) : \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/longopt.h \
 	include/imcc/api.h \
-	frontend/parrot2/main.c
+	frontend/parrot/main.c
 
 src/multidispatch$(O) : \
 	src/multidispatch.c \
