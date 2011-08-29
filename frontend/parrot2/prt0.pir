@@ -46,7 +46,6 @@
     $P3 = __ARG_1.'shift'()
 # var packfile_pmc: $P4
     null $P4
-    $P1[11] = $P3
 # for loop
 # i: $I2
     null $I2
