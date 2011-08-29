@@ -13748,10 +13748,14 @@ Parrot_die_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
         _exit(IREG(2));
     }
     else {
+        opcode_t         * dest;
         opcode_t  * const  ret =  cur_opcode + 3;
+        PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
         PMC       * const  exception = Parrot_ex_build_exception(interp, IREG(1), IREG(2), NULL);
-        opcode_t  * const  dest = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+        VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         return (opcode_t *)dest;
     }
 
@@ -13763,10 +13767,14 @@ Parrot_die_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
         _exit(IREG(2));
     }
     else {
+        opcode_t         * dest;
         opcode_t  * const  ret =  cur_opcode + 3;
+        PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
         PMC       * const  exception = Parrot_ex_build_exception(interp, ICONST(1), IREG(2), NULL);
-        opcode_t  * const  dest = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+        VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         return (opcode_t *)dest;
     }
 
@@ -13778,10 +13786,14 @@ Parrot_die_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         _exit(ICONST(2));
     }
     else {
+        opcode_t         * dest;
         opcode_t  * const  ret =  cur_opcode + 3;
+        PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
         PMC       * const  exception = Parrot_ex_build_exception(interp, IREG(1), ICONST(2), NULL);
-        opcode_t  * const  dest = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+        VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         return (opcode_t *)dest;
     }
 
@@ -13793,10 +13805,14 @@ Parrot_die_ic_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         _exit(ICONST(2));
     }
     else {
+        opcode_t         * dest;
         opcode_t  * const  ret =  cur_opcode + 3;
+        PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
         PMC       * const  exception = Parrot_ex_build_exception(interp, ICONST(1), ICONST(2), NULL);
-        opcode_t  * const  dest = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+        VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         return (opcode_t *)dest;
     }
 
@@ -23685,7 +23701,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   3,    /* major_version */
-  6,    /* minor_version */
+  7,    /* minor_version */
   0,    /* patch_version */
   1091,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -23813,7 +23829,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_3_6_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_3_7_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -23842,7 +23858,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_6_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_7_0;
     dynop_register(interp, lib);
     return lib;
 }

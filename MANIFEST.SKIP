@@ -988,10 +988,16 @@
 ^/t/pmc/.*_pbcexe.*/
 ^/t/pmc/testlib/.*\.pbc$
 ^/t/pmc/testlib/.*\.pbc/
+^/t/src/.*\.exe$
+^/t/src/.*\.exe/
+^/t/src/.*\.exp$
+^/t/src/.*\.exp/
 ^/t/src/.*\.gcdada$
 ^/t/src/.*\.gcdada/
 ^/t/src/.*\.gcov$
 ^/t/src/.*\.gcov/
+^/t/src/.*\.lib$
+^/t/src/.*\.lib/
 ^/t/src/.*_.*\.c$
 ^/t/src/.*_.*\.c/
 ^/t/src/embed/.*\.c$

@@ -39,16 +39,14 @@ static void print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void print_debug(PARROT_INTERP, int status, ARGIN(void *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
+static void print_debug(PARROT_INTERP, int status, ARGIN_NULLOK(void *p))
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(output))
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p_unused))
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -130,7 +128,7 @@ Prints GC info.
 */
 
 static void
-print_debug(PARROT_INTERP, SHIM(int status), ARGIN(SHIM(void *p)))
+print_debug(PARROT_INTERP, SHIM(int status), ARGIN_NULLOK(SHIM(void *p)))
 {
     ASSERT_ARGS(print_debug)
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {

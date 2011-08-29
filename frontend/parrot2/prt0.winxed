@@ -54,7 +54,7 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
             packfile_pmc.write_to_file(output_file);
             exit(0);
         }
-        for (var init_sub in packfile_pmc.subs_by_flag("init"))
+        for (var init_sub in packfile_pmc.subs_by_tag("init"))
             init_sub();
         var main_sub = packfile_pmc.main_sub();
         var prt0_pf = interp["packfile"];

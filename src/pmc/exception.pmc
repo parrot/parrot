@@ -870,6 +870,13 @@ which holds the PMC representing the sub, and C<annotations> which is a hash
 of the annotations at the point where the exception was thrown for the current
 sub, or for the point of the call a level deeper for the rest.
 
+=item C<PMC *backtrace_strings>
+
+Return an array of strings representing a displayable backtrace. Each element
+in the array is the backtrace at the time when the exception was thrown.
+Rethrowing the exception adds a new entry. The first item in the list is the
+most recent throw of the Exception.
+
 =cut
 
 */

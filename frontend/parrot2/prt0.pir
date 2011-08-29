@@ -38,7 +38,7 @@
     set $I1, $P9
 # output_file: $S2
     null $S2
-    ne $I1, 0, __label_3
+    if $I1, __label_3
     concat $S4, "Invalid file type ", $S1
     WSubId_2($P1, $S4)
   __label_3: # endif
@@ -120,7 +120,7 @@
     exit 0
 # }
   __label_17: # endif
-    $P9 = $P4.'subs_by_flag'("init")
+    $P9 = $P4.'subs_by_tag'("init")
     if_null $P9, __label_19
     iter $P10, $P9
     set $P10, 0
@@ -311,7 +311,7 @@
 # exit_code: $I4
     getattribute $P4, __ARG_2, 'exit_code'
     set $I4, $P4
-    ne $I4, 0, __label_11
+    if $I4, __label_11
     set $I4, 1
   __label_11: # endif
 # predefined exit

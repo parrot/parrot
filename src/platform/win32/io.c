@@ -229,6 +229,41 @@ Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
 
 /*
 
+=item C<INTVAL Parrot_io_async(PARROT_INTERP, PMC *pmc, INTVAL async)>
+
+Sets a handle C<*pmc> to blocking or non-blocking mode
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
+{
+    ASSERT_ARGS(Parrot_io_is_async)
+    int rflags;
+    PIOHANDLE file_descriptor;
+    if (Parrot_io_is_closed(interp, pmc))
+        return 0;
+
+#if 0
+    if (async)
+       Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) | PIO_F_ASYNC);
+    else
+       Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) & ~PIO_F_ASYNC);
+
+    file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+#else
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+        "Async support not available");
+#endif
+    return -1;
+}
+
+/*
+
 =item C<INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE os_handle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
