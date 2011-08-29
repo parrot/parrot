@@ -856,7 +856,6 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
-            sub->eval_pmc = eval_pmc;
 
             if (action == 0)
                 continue;
@@ -1375,6 +1374,8 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
     pf->fetch_iv = (packfile_fetch_iv_t)NULL;
     pf->fetch_nv = (packfile_fetch_nv_t)NULL;
 
+    pf->view = NULL;
+
     return pf;
 }
 
@@ -1411,6 +1412,9 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC *ptr;
 
+    if (pf->view)
+        return pf->view;
+
     /* We have to block GC here. */
     /* XXX We should never-ever have raw PackFile* laying around */
     /* XXX But it require a lot of effort to cleanup codebase */
@@ -1418,6 +1422,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
 
     ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
+    pf->view = ptr;
 
     Parrot_unblock_GC_mark(interp);
 
