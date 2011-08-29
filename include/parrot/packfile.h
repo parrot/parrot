@@ -263,9 +263,158 @@ typedef struct PackFile_Annotations {
     PackFile_Annotations_Key    *keys;
 } PackFile_Annotations;
 
+/* Odius class types and codes */
+typedef enum {
+    CLASS_padding       = 0x0000,
+    CLASS_array_type    = 0x0001,
+    CLASS_class_type    = 0x0002,
+    CLASS_enum          = 0x0003,
+    CLASS_param         = 0x0004,
+    CLASS_global_sub    = 0x0005,
+    CLASS_global_var    = 0x0006,
+    CLASS_label         = 0x0007,
+    CLASS_lex_block     = 0x0008,
+    CLASS_local_var     = 0x0009,
+    CLASS_member        = 0x000a,
+    CLASS_ptr_type      = 0x000b,
+    CLASS_ref_type      = 0x000c,
+    CLASS_compile_unit  = 0x000d,
+    CLASS_src_file      = 0x000e,
+    CLASS_str_type      = 0x000f,
+    CLASS_struct_type   = 0x0010,
+    CLASS_sub           = 0x0011,
+    CLASS_sub_type      = 0x0012,
+    CLASS_typedef       = 0x0013,
+    CLASS_unspec_params = 0x0014,
+    CLASS_inherit       = 0x0015,
+    CLASS_inline_sub    = 0x0016,
+    CLASS_start_user    = 0x4080,
+    CLASS_end_user      = 0xffff
+} pf_odius_class_t;
+
+/* Odius form types and codes */
+typedef enum {
+    FORM_addr   = 0x1,
+    FORM_ref    = 0x2,
+    FORM_block2 = 0x3,
+    FORM_block4 = 0x4,
+    FORM_data2  = 0x5,
+    FORM_data4  = 0x6,
+    FORM_data8  = 0x7,
+    FORM_string = 0x8
+} pf_odius_form_t;
+
+/* Odius property types and codes */
+typedef enum {
+    PT_sibling       = 0x0010,
+    PT_location      = 0x0020,
+    PT_name          = 0x0030,
+    PT_fund_type     = 0x0050,
+    PT_mod_fund_type = 0x0060,
+    PT_user_def_type = 0x0070,
+    PT_mod_u_d_type  = 0x0080,
+    PT_subscr_data   = 0x00a0,
+    PT_byte_size     = 0x00b0,
+    PT_stmt_list     = 0x0100,
+    PT_start_pc      = 0x0110,
+    PT_end_pc        = 0x0120,
+    PT_lang          = 0x0130,
+    PT_member        = 0x0140,
+    PT_str_len       = 0x0190,
+    PT_comp_dir      = 0x01b0,
+    PT_const_val     = 0x01c0,
+    PT_def_val       = 0x01e0,
+    PT_inline        = 0x0200,
+    PT_is_opt        = 0x0210,
+    PT_low_bound     = 0x0220,
+    PT_program       = 0x0230,
+    PT_private       = 0x0240,
+    PT_compiler      = 0x0250,
+    PT_protected     = 0x0260,
+    PT_proto         = 0x0270,
+    PT_public        = 0x0280,
+    PT_ret_cont      = 0x02a0,
+    PT_spec          = 0x02b0,
+    PT_start_scope   = 0x02c0,
+    PT_up_bound      = 0x02f0,
+    PT_start_user    = 0x2000,
+    PT_end_user      = 0x3ff0
+} pf_odius_property_t;
+
+/* Location iota types and codes */
+typedef enum {
+    OP_reg        = 0x01,
+    OP_addr       = 0x02,
+    OP_const      = 0x03,
+    OP_start_user = 0xe0,
+    OP_end_user   = 0xff
+} pf_odius_location_iota;
+
+/* Fundamental data types and codes */
+typedef enum {
+    FT_int        = 0x0001,
+    FT_num        = 0x0002,
+    FT_str        = 0x0003,
+    FT_pmc        = 0x0004,
+    FT_start_user = 0x8000,
+    FT_end_user   = 0xffff
+} pf_odius_fund_type_t;
+
+/* Type modifier types and codes */
+typedef enum {
+    MOD_ptr_to     = 0x01,
+    MOD_ref_to     = 0x02,
+    MOD_const      = 0x03,
+    MOD_start_user = 0x80,
+    MOD_end_user   = 0xff
+} pf_odius_type_mod_t;
+
+/* Source language names and codes */
+typedef enum {
+    LANG_perl6      = 0x00000001,
+    LANG_nqp        = 0x00000002,
+    LANG_winxed     = 0x00000003,
+    LANG_partcl     = 0x00000004,
+    LANG_lua        = 0x00000005,
+    LANG_cardinal   = 0x00000006,
+    LANG_start_user = 0x00008000,
+    LANG_end_user   = 0x0000ffff
+} pf_odius_src_lang_t;
+
+/* Array ordering types and codes */
+typedef enum {
+    ORD_row_major = 0x0,
+    ORD_col_major = 0x1
+} pf_odius_array_dim_ord_t;
+
+/* Format specifier types and codes */
+typedef enum {
+    FMT_ft_c_c = 0x1,
+    FMT_ft_c_d = 0x2,
+    FMT_ft_d_c = 0x3,
+    FMT_ft_d_d = 0x4,
+    FMT_ut_c_c = 0x5,
+    FMT_ut_c_d = 0x6,
+    FMT_ut_d_c = 0x7,
+    FMT_ut_d_d = 0x8
+} pf_odius_fmt_spec_t;
+
+/* Property name/value pair associated with a particular class */
+typedef struct {
+    pf_odius_property_t property;
+    pf_odius_form_t     value;
+} pf_odius_dde_props;
+
+/* Odius Data Description Entity (DDE) */
+typedef struct PackFile_Odius_DDE {
+    pf_odius_class_t     class_type;
+    pf_odius_property_t *properties;
+} PackFile_Odius_DDE;
+
 typedef struct PackFile_Odius {
     PackFile_Segment    base;
     PackFile_ByteCode  *code;
+    PackFile_Odius_DDE *dde;
     /*opcode_t            num_keys;*/
     /*PackFile_Odius_Key *keys;*/
 } PackFile_Odius;
