@@ -83,20 +83,20 @@ sub _evaluate_gcc {
     $gccversion .= ".$minor" if defined $minor;
     $self->set_result("yes, $gccversion");
 
-    if ($^O eq 'MSWin32') {
-        $conf->data->set(
-            cc_shared      => '',
-            ld_share_flags => '-shared',
-            ld_load_flags  => '-shared',
-        );
-    }
-    else {
-        $conf->data->set(
-            cc_shared      => '-fPIC',
-            ld_share_flags => '-shared -fPIC',
-            ld_load_flags  => '-shared -fPIC',
-        );
-    }
+#    if ($^O eq 'MSWin32') {
+#        $conf->data->set(
+#            cc_shared      => '',
+#            ld_share_flags => '-shared',
+#            ld_load_flags  => '-shared',
+#        );
+#    }
+#    else {
+#        $conf->data->set(
+#            cc_shared      => '-fPIC',
+#            ld_share_flags => '-shared -fPIC',
+#            ld_load_flags  => '-shared -fPIC',
+#        );
+#    }
 
     $conf->data->set( noinline => '__attribute__ ((noinline))' );
 

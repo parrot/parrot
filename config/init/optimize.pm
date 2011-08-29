@@ -54,8 +54,10 @@ sub runstep {
     $conf->debug("optimize options: ", $optimization_level, "\n");
 
     # disable debug flags.
-    $conf->data->set( cc_debug => '' );
-    $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
+    if ($conf->data->get('optimize')) {
+        $conf->data->set( cc_debug => '' );
+        $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
+    }
 
     # TT #405
     if ($conf->data->get('cpuarch') eq 'amd64') {

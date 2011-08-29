@@ -176,7 +176,10 @@ sub runstep {
 
         # libparrot library names
         libparrot_static => 'libparrot.a',
+        # libparrot_shared and libparrot_soname may be overwritten in
+        # OS-specific hints files
         libparrot_shared => 'libparrot.so',
+        libparrot_soname => '',
 
         # does the system know about static/dynamic linking?
         has_static_linking  => 1,
@@ -185,8 +188,6 @@ sub runstep {
         # default behaviour for linking parrot to a static or shared libparrot
         parrot_is_shared => 0,
 
-        #avoid a warning during Configure.pl
-        libparrot_soname => '',
 
         perl      => $^X,
         test_prog => 'parrot',
@@ -201,21 +202,20 @@ sub runstep {
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
-        ar        => 'ar',
-        arflags   => 'cr',
-        # tar is currently used only in 'make release'.
-        tar       => which('tar') || '',
-
+        ranlib      => ':',
+        ar          => 'ar',
+        arflags     => 'cr',
         # for Win32
-        ar_out => '',
-
+        ar_out      => '',
         # for Borland C
-        ar_extra      => '',
-        ranlib        => ':',
-        rpath         => '',
-        make          => $Config{make},
-        make_set_make => $Config{make_set_make},
-        make_and      => '&&',
+        ar_extra    => '',
+
+        # tar is currently used only in 'make release'.
+        tar             => which('tar') || '',
+        rpath           => '',
+        make            => $Config{make},
+        make_set_make   => $Config{make_set_make},
+        make_and        => '&&',
 
         # make_c: Command to emulate GNU make's C<-C directory> option:  chdir
         # to C<directory> before executing $(MAKE)

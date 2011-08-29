@@ -21,7 +21,7 @@ our %defaults = (
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $share_ext = $conf->option_or_data('share_ext');
+    my $share_ext = '.dylib';
     my $version   = $conf->option_or_data('VERSION');
 
     # The hash referenced by $flagsref is the list of options that have -arch
@@ -63,7 +63,7 @@ sub runstep {
     my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
     chomp $osvers;
 
-    $conf->data->set(
+    my %darwin_hints = (
         darwin              => 1,
         osx_version         => $deploy_target,
         osvers              => $osvers,
@@ -71,7 +71,7 @@ sub runstep {
         ldflags             => $flagsref->{ldflags},
         ccwarn              => "-Wno-shadow",
         libs                => $libs,
-        share_ext           => '.dylib',
+        share_ext           => $share_ext,
         load_ext            => '.bundle',
         link                => 'c++',
         linkflags           => $flagsref->{linkflags},
@@ -80,22 +80,30 @@ sub runstep {
         ld_load_flags       => '-undefined dynamic_lookup -bundle',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
+        ranlib              => 'ranlib',
 
         # TT #344:  When built against a dynamic libparrot,
         # installable_parrot records the path to the blib version
         # of the library.
 
+        rpath                  => "-L",
         parrot_is_shared       => 1,
         libparrot_shared       => "libparrot.$version$share_ext",
         libparrot_shared_alias => "libparrot$share_ext",
-        rpath                  => "-L",
         libparrot_soname       => "-install_name "
             . '"'
             . $conf->data->get('libdir')
             . '/libparrot'
-            . $conf->data->get('share_ext')
-            . '"'
+            . $share_ext
+            . '"',
     );
+    $conf->data->set( %darwin_hints );
+    my $verbose_message = '';
+    foreach my $k (sort keys %darwin_hints) {
+        $verbose_message .= sprintf("  %-24s => %s\n" =>
+            ($k, $darwin_hints{$k}));
+    }
+    $conf->debug($verbose_message);
 }
 
 #################### INTERNAL SUBROUTINES ####################
