@@ -19,6 +19,11 @@ GC related bugs.
 .include 'interpinfo.pasm'
 
 .sub main :main
+    # XXX HACK
+    # :main is tailcalled from prt0, but tailcaller frames aren't eliminated
+    # until get_params is called.
+    .param pmc argv
+
     .include 'test_more.pir'
 
     sweep_1()
@@ -268,7 +273,7 @@ buffer_ok:
     $P1 = 0
     n = $P0."b11"($P1)
     ok(1, "recursion_and_exceptions")
-    is(n,8, "recursion_and_exceptions")
+    is(n, 8, "recursion_and_exceptions")
 .end
 .namespace ["b"]
 .sub b11 :method
