@@ -105,8 +105,10 @@
     inc $I2
     goto __label_6
   __label_5: # for end
-    unless_null $S1, __label_15
-    WSubId_2($P1)
+# predefined elements
+    elements $I3, __ARG_2
+    ge $I3, 1, __label_15
+    WSubId_2($P1, "Missing program name")
   __label_15: # endif
     unless_null $P4, __label_16
     $P4 = WSubId_6($S1, $I1, $P2)

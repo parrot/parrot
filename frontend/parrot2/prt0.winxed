@@ -46,8 +46,8 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
                     __usage_and_exit(interp, "Unknown argument " + sys_arg);
             }
         }
-        if (prog_name == null)
-            __usage_and_exit(interp);
+        if (elements(prog_args) < 1)
+            __usage_and_exit(interp, "Missing program name");
         if (packfile_pmc == null)
             packfile_pmc = __default_get_packfile(prog_name, input_file_type, pir_compiler);
         if (output_file != null) {

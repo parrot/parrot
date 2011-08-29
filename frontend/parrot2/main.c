@@ -682,13 +682,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         exit(EXIT_FAILURE);
     }
 
-    /* reached the end of the option list and consumed all of argv */
-    if (argc == opt.opt_index) {
-        fprintf(stderr, "Missing program name\n");
-        usage(stderr);
-        exit(EXIT_FAILURE);
-    }
-
     args->progargv = argv + opt.opt_index;
     args->progargc = argc - opt.opt_index;
     args->sysargv = sysargs;
