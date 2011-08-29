@@ -870,7 +870,7 @@ frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.p
 frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c
 
 bootstrap-prt0: $(WINXED) frontend/parrot2/prt0.winxed
-	$(WINXED) -c frontend/parrot2/prt0.winxed
+	$(WINXED) --noan -c frontend/parrot2/prt0.winxed
 
 $(PARROTOLD) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
