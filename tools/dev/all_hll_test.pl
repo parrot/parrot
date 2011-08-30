@@ -16,12 +16,6 @@ projects.
 
 =cut
 
-# make a temp dir
-# install Parrot to tmp/parrot_install
-# download Rakudo to tmp/download
-# build Rakudo using tmp/parrot_install/bin/parrot_config
-# run Rakudo's spectest
-
 my $tmp_dir = "/tmp/parrot_all_hll_test";
 my $install_dir = "$tmp_dir/parrot_install";
 qx<rm -rf $tmp_dir>;
@@ -29,28 +23,57 @@ mkdir $tmp_dir;
 mkdir $install_dir;
 
 print "running Configure.pl on Parrot in cwd\n";
-system "perl Configure.pl --prefix=$install_dir";
+system "perl Configure.pl --prefix=$install_dir --optimize";
 print "installing Parrot into tmp dir\n";
 system qw<make install>;
 
-chdir $tmp_dir;
-print "cloning nqp\n";
-system qw<git clone git://github.com/perl6/nqp.git nqp_test>;
-chdir "nqp_test";
-system "perl Configure.pl --with_parrot=$install_dir/bin/parrot";
-print "installing nqp to tmp dir\n";
-system qw<make install>;
+{
+    local %ENV = %ENV;
+    $ENV{"PATH"} = "$install_dir/bin:" . $ENV{"PATH"};
 
-chdir $tmp_dir;
-system qw<git clone -b nom https://github.com/rakudo/rakudo.git rakudo_test>;
-chdir "rakudo_test";
-system "perl Configure.pl --with-parrot=$install_dir/bin/parrot";
-print "building Rakudo\n";
-system qw<make spectest_regression>;
-print "running Rakudo's spectest_regression\n";
-system qw<make spectest_regression>;
+    chdir $tmp_dir;
+    print "cloning winxed\n";
+    system qw<git clone https://github.com/NotFound/winxed.git winxed_test>;
+    chdir "winxed_test";
+    system qq<winxed setup.winxed>;
+    print "testing winxed";
+    system qq<winxed setup.winxed test>;
 
+    chdir $tmp_dir;
+    print "cloning rosella\n";
+    system qw<git clone https://github.com/Whiteknight/Rosella.git rosella_test>;
+    chdir "rosella_test";
+    print "building rosella\n";
+    system qq<winxed setup.winxed>;
+    print "testing rosella";
+    system qq<winxed setup.winxed test>;
 
+    chdir $tmp_dir;
+    print "cloning nqp\n";
+    system qw<git clone git://github.com/perl6/nqp.git nqp_test>;
+    chdir "nqp_test";
+    system "perl Configure.pl --with_parrot=$install_dir/bin/parrot";
+    print "installing nqp to tmp dir\n";
+    system qw<make install>;
+
+    chdir $tmp_dir;
+    system qw<git clone -b nom https://github.com/rakudo/rakudo.git rakudo_test>;
+    chdir "rakudo_test";
+    system "perl Configure.pl --with-parrot=$install_dir/bin/parrot";
+    print "building Rakudo\n";
+    system qw<make spectest_regression>;
+    print "running Rakudo's spectest_regression\n";
+    system qw<make spectest_regression>;
+
+    chdir $tmp_dir;
+    print "cloning lua\n";
+    system qw<git clone https://github.com/fperrad/lua.git lua_test>;
+    chdir "lua_test";
+    system qw<parrot setup.pir>;
+    print "running lua's tests\n";
+    system qw<parrot setup.pir test>;
+
+}
 
 # Local Variables:
 #   mode: cperl
