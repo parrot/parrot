@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use autodie;
 use System::Command;
+use feature qw<say>;
 
 =head1 NAME
 
@@ -23,29 +24,39 @@ qx<rm -rf $tmp_dir>;
 mkdir $tmp_dir;
 mkdir $install_dir;
 
-print "running Configure.pl on Parrot in cwd\n";
-my $parrot_configure = System::Command->new(qq<perl Configure.pl --prefix=$install_dir --optimize>);
-waitpid($parrot_configure->pid(), 0);
-if (!waitpid($parrot_configure->pid(), 0)) {
-    die "OH NOES TEH PARROT CONFIGUER DIED";
-}
-my $configure_stdout = join('', readline($parrot_configure->stdout()));
-my $configure_stderr = join('', readline($parrot_configure->stderr()));
+#print "running Configure.pl on Parrot in cwd\n";
+#my $parrot_configure = System::Command->new(qq<perl Configure.pl --prefix=$install_dir --optimize>);
+#waitpid($parrot_configure->pid(), 0);
+#if (!waitpid($parrot_configure->pid(), 0)) {
+    #die "OH NOES TEH PARROT CONFIGUER DIED";
+#}
+#my $configure_stdout = join('', readline($parrot_configure->stdout()));
+#my $configure_stderr = join('', readline($parrot_configure->stderr()));
 
-print "building Parrot\n";
-my $parrot_build = System::Command->new(qw<make>);
-print while readline($parrot_build->stdout());
-waitpid($parrot_build->pid(), 0);
-print "installing Parrot into tmp dir\n";
-my $parrot_install = System::Command->new(qw<make install>);
-print while readline($parrot_install->stdout());
-waitpid($parrot_install->pid(), 0);
+#print "building Parrot\n";
+#my $parrot_build = System::Command->new(qw<make>);
+#print while readline($parrot_build->stdout());
+#waitpid($parrot_build->pid(), 0);
+#print "installing Parrot into tmp dir\n";
+#my $parrot_install = System::Command->new(qw<make install>);
+#print while readline($parrot_install->stdout());
+#waitpid($parrot_install->pid(), 0);
+
+build_project({
+    "name" => "Parrot",
+    "configure" => [qq<perl Configure.pl --prefix=$install_dir --optimize>],
+    "build" => [qq<make>],
+    "test" =>  [qq<make test>],
+    "tmp"  => $tmp_dir,
+    "use_cwd" => 1,
+});
+
 
 {
     local %ENV = %ENV;
     $ENV{"PATH"} = "$install_dir/bin:" . $ENV{"PATH"};
 
-    test_hll({
+    build_project({
         "name" => "Winxed",
         "clone" => [qw<git clone https://github.com/NotFound/winxed.git winxed_test>],
         "build" => [qq<winxed setup.winxed>],
@@ -53,7 +64,7 @@ waitpid($parrot_install->pid(), 0);
         "tmp"  => $tmp_dir,
     });
 
-    test_hll({
+    build_project({
         "name" => "Rosella",
         "clone" => [qw<git clone https://github.com/Whiteknight/Rosella.git rosella_test>],
         "build" => [qq<winxed setup.winxed>],
@@ -61,7 +72,7 @@ waitpid($parrot_install->pid(), 0);
         "tmp"  => $tmp_dir,
     });
 
-    test_hll({
+    build_project({
         "name"      => "nqp",
         "clone"     => [qw<git clone https://github.com/perl6/nqp.git nqp_test>],
         "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
@@ -70,7 +81,7 @@ waitpid($parrot_install->pid(), 0);
         "tmp"       => $tmp_dir,
     });
 
-    test_hll({
+    build_project({
         "name"      => "Rakudo",
         "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git rakudo_test>],
         "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
@@ -79,7 +90,7 @@ waitpid($parrot_install->pid(), 0);
         "tmp"       => $tmp_dir,
     });
 
-    test_hll({
+    build_project({
         "name"  => "Lua",
         "clone" => [qw<git clone https://github.com/fperrad/lua.git lua_test>],
         "build" => [qq<parrot setup.pir>],
@@ -89,7 +100,7 @@ waitpid($parrot_install->pid(), 0);
 
 }
 
-sub test_hll {
+sub build_project {
     my %opts = %{$_[0]};
     my $proj_name     = $opts{name};
     my $clone_cmd     = $opts{clone};
@@ -98,29 +109,23 @@ sub test_hll {
     my $install_cmd   = $opts{install};
     my $test_cmd      = $opts{test};
     my $tmp_dir       = $opts{tmp};
+    my $use_cwd       = $opts{use_cwd};
 
     my $proj_dir = lc($proj_name) . "_test";
-    chdir $tmp_dir;
-    qx<rm -rf $proj_dir>;
-    print "cloning $proj_name\n";
-    system @$clone_cmd;
-    chdir $proj_dir;
 
-    if ($configure_cmd) {
-        print "configuring $proj_name";
-        system @$configure_cmd;
-    }
-    if ($build_cmd) {
-        print "building $proj_name\n";
-        system @$build_cmd;
-    }
-    if ($install_cmd) {
-        print "installing $proj_name";
-        system @$install_cmd;
-    }
-    if ($test_cmd) {
-        print "testing $proj_name";
-        system @$test_cmd;
+    foreach my $stage (qw<clone configure build install test>){
+        if ($stage eq "clone" exists $opts{$stage} && !$use_cwd) {
+            print "running stage '$stage' for $proj_name\n";
+            chdir $tmp_dir;
+            qx<rm -rf $proj_dir>;
+            print "cloning $proj_name\n";
+            system @$clone_cmd;
+            chdir $proj_dir;
+        }
+        elsif (exists $opts{$stage}) {
+            print "running stage '$stage' for $proj_name\n";
+            system @{$opts{$stage}}
+        }
     }
 }
 
