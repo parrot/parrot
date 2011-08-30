@@ -287,6 +287,8 @@ typedef struct PackFile {
 
     PackFile_ByteCode   *cur_cs;   /* used during PF loading */
 
+    PMC                 *view; /* cached PMC used to reference this packfile */
+
     INTVAL               options;
     INTVAL               need_wordsize;
     INTVAL               need_endianize;
