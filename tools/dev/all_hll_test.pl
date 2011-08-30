@@ -24,24 +24,6 @@ qx<rm -rf $tmp_dir>;
 mkdir $tmp_dir;
 mkdir $install_dir;
 
-#print "running Configure.pl on Parrot in cwd\n";
-#my $parrot_configure = System::Command->new(qq<perl Configure.pl --prefix=$install_dir --optimize>);
-#waitpid($parrot_configure->pid(), 0);
-#if (!waitpid($parrot_configure->pid(), 0)) {
-    #die "OH NOES TEH PARROT CONFIGUER DIED";
-#}
-#my $configure_stdout = join('', readline($parrot_configure->stdout()));
-#my $configure_stderr = join('', readline($parrot_configure->stderr()));
-
-#print "building Parrot\n";
-#my $parrot_build = System::Command->new(qw<make>);
-#print while readline($parrot_build->stdout());
-#waitpid($parrot_build->pid(), 0);
-#print "installing Parrot into tmp dir\n";
-#my $parrot_install = System::Command->new(qw<make install>);
-#print while readline($parrot_install->stdout());
-#waitpid($parrot_install->pid(), 0);
-
 build_project({
     "name" => "Parrot",
     "configure" => [qq<perl Configure.pl --prefix=$install_dir --optimize>],
@@ -84,7 +66,7 @@ build_project({
     build_project({
         "name"      => "Rakudo",
         "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git rakudo_test>],
-        "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
+        "configure" => [qq<perl Configure.pl --with-parrot=$install_dir/bin/parrot>],
         #XXX: should be spectest_regression; using test to make this easier to test
         "test"      => [qq<make test>],
         "tmp"       => $tmp_dir,
@@ -104,27 +86,35 @@ sub build_project {
     my %opts = %{$_[0]};
     my $proj_name     = $opts{name};
     my $clone_cmd     = $opts{clone};
-    my $configure_cmd = $opts{configure};
-    my $build_cmd     = $opts{build};
-    my $install_cmd   = $opts{install};
-    my $test_cmd      = $opts{test};
     my $tmp_dir       = $opts{tmp};
     my $use_cwd       = $opts{use_cwd};
 
     my $proj_dir = lc($proj_name) . "_test";
 
     foreach my $stage (qw<clone configure build install test>){
-        if ($stage eq "clone" exists $opts{$stage} && !$use_cwd) {
-            print "running stage '$stage' for $proj_name\n";
+        if ($stage eq "clone" && exists $opts{$stage} && !$use_cwd) {
+            say "running stage '$stage' for $proj_name";
             chdir $tmp_dir;
             qx<rm -rf $proj_dir>;
-            print "cloning $proj_name\n";
-            system @$clone_cmd;
+            say "cloning $proj_name";
+            my $cmd = System::Command->new(@$clone_cmd);
+            waitpid($cmd->pid(), 0);
+            my $cmd_stdout = join('', readline($cmd->stdout()));
+            my $cmd_stderr = join('', readline($cmd->stderr()));
+            if (!waitpid($cmd->pid(), 0)) {
+                die "OH NOES TEH CLOEN HAVE DIED";
+            }
             chdir $proj_dir;
         }
         elsif (exists $opts{$stage}) {
-            print "running stage '$stage' for $proj_name\n";
-            system @{$opts{$stage}}
+            say "running stage '$stage' for $proj_name";
+            my $cmd = System::Command->new(@{$opts{$stage}});
+            waitpid($cmd->pid(), 0);
+            my $cmd_stdout = join('', readline($cmd->stdout()));
+            my $cmd_stderr = join('', readline($cmd->stderr()));
+            if (!waitpid($cmd->pid(), 0)) {
+                die "OH NOES TEH $stage STAEG HAVE DIED";
+            }
         }
     }
 }
