@@ -1,3 +1,5 @@
+# Copyright (C) 2011, Parrot Foundation.
+
 .sub 'main' :main
     .param pmc args
     .local pmc outfh, ifh
@@ -69,4 +71,8 @@ END_OF_FUNCTION
     die "cannot open infile"
 .end
 
-
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

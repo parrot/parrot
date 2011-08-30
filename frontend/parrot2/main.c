@@ -165,10 +165,13 @@ main(int argc, const char *argv[])
     if (!parsed_flags.turn_gc_off)
         Parrot_api_toggle_gc(interp, 1);
 
-    if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.sysargc,  parsed_flags.sysargv, &sysargs) &&
-          Parrot_api_pmc_wrap_string_array(interp, parsed_flags.progargc, parsed_flags.progargv, &pirargs) &&
-          Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(), &bytecodepmc) &&
-          Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, pirargs)))
+    if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.sysargc,  parsed_flags.sysargv,
+                                            &sysargs)
+    && Parrot_api_pmc_wrap_string_array(interp, parsed_flags.progargc, parsed_flags.progargv,
+                                        &pirargs)
+    && Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(),
+                                        &bytecodepmc)
+    && Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, pirargs)))
         show_last_error_and_exit(interp);
 
     /* Clean-up after ourselves */
@@ -546,7 +549,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int status;
     int result = 1;
     int nsysargs = 0;
-    const char **sysargs = (char**)calloc(argc, sizeof(char*));
+    const char **sysargs = (char**)calloc(argc, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);
