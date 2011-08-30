@@ -29,13 +29,15 @@ struct init_args_t {
     const char *run_core_name;
     Parrot_Int trace;
     Parrot_Int turn_gc_off;
-    char ** sysargv;
-    char ** progargv;
+    const char ** sysargv;
+    const char ** progargv;
     int sysargc;
     int progargc;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+extern const unsigned char * get_program_code(void);
+size_t get_program_code_size(void);
 
 /* HEADERIZER HFILE: none */
 
@@ -88,7 +90,7 @@ static void print_parrot_string(
         FUNC_MODIFIES(*vector);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * setup_imcc(Parrot_PMC interp);
+static void setup_imcc(Parrot_PMC interp);
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
@@ -181,7 +183,7 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static PMC * setup_imcc(Parrot_PMC interp)>
+=item C<static void setup_imcc(Parrot_PMC interp)>
 
 Call into IMCC to either compile or preprocess the input.
 
@@ -190,7 +192,7 @@ Call into IMCC to either compile or preprocess the input.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC *
+static void
 setup_imcc(Parrot_PMC interp)
 {
     ASSERT_ARGS(setup_imcc)
@@ -549,7 +551,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int status;
     int result = 1;
     int nsysargs = 0;
-    const char **sysargs = (char**)calloc(argc, sizeof (char*));
+    const char **sysargs = (const char**)calloc(argc, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);

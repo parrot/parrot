@@ -52,12 +52,12 @@
     print outfh, $S0
     print outfh, ";\n"
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             return program_code;
         }
 
-        const size_t get_program_code_size(void)
+        size_t get_program_code_size(void)
         {
             return bytecode_size;
         }
