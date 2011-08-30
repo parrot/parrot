@@ -17,103 +17,93 @@
 .annotate 'line', 19
 # var options: $P1
     root_new $P1, ['parrot';'ResizablePMCArray']
+    assign $P1, 11
 .annotate 'line', 20
-    root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, 'c'
-    push $P4, $P5
-    box $P5, 'Compile to pir'
-    push $P4, $P5
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    assign $P3, 2
+    $P3[0] = 'c'
+    $P3[1] = 'Compile to pir'
 .annotate 'line', 19
-    push $P1, $P4
+    $P1[0] = $P3
 .annotate 'line', 21
-    root_new $P6, ['parrot';'ResizablePMCArray']
-    box $P7, 'e=s'
-    push $P6, $P7
-    box $P7, 'Evaluate'
-    push $P6, $P7
+    root_new $P4, ['parrot';'ResizablePMCArray']
+    assign $P4, 2
+    $P4[0] = 'e=s'
+    $P4[1] = 'Evaluate'
 .annotate 'line', 19
-    push $P1, $P6
+    $P1[1] = $P4
 .annotate 'line', 22
-    root_new $P8, ['parrot';'ResizablePMCArray']
-    box $P9, 'o=s'
-    push $P8, $P9
-    box $P9, 'Object name'
-    push $P8, $P9
+    root_new $P5, ['parrot';'ResizablePMCArray']
+    assign $P5, 2
+    $P5[0] = 'o=s'
+    $P5[1] = 'Object name'
 .annotate 'line', 19
-    push $P1, $P8
+    $P1[2] = $P5
 .annotate 'line', 23
-    root_new $P10, ['parrot';'ResizablePMCArray']
-    box $P11, 'target=s'
-    push $P10, $P11
-    box $P11, 'Set target type'
-    push $P10, $P11
+    root_new $P6, ['parrot';'ResizablePMCArray']
+    assign $P6, 2
+    $P6[0] = 'target=s'
+    $P6[1] = 'Set target type'
 .annotate 'line', 19
-    push $P1, $P10
+    $P1[3] = $P6
 .annotate 'line', 24
-    root_new $P12, ['parrot';'ResizablePMCArray']
-    box $P13, 'L=s'
-    push $P12, $P13
-    box $P13, 'Add to parrot library search path'
-    push $P12, $P13
+    root_new $P7, ['parrot';'ResizablePMCArray']
+    assign $P7, 2
+    $P7[0] = 'L=s'
+    $P7[1] = 'Add to parrot library search path'
 .annotate 'line', 19
-    push $P1, $P12
+    $P1[4] = $P7
 .annotate 'line', 25
-    root_new $P14, ['parrot';'ResizablePMCArray']
-    box $P15, 'I=s'
-    push $P14, $P15
-    box $P15, 'Add to parrot include search path'
-    push $P14, $P15
+    root_new $P8, ['parrot';'ResizablePMCArray']
+    assign $P8, 2
+    $P8[0] = 'I=s'
+    $P8[1] = 'Add to parrot include search path'
 .annotate 'line', 19
-    push $P1, $P14
+    $P1[5] = $P8
 .annotate 'line', 26
-    root_new $P16, ['parrot';'ResizablePMCArray']
-    box $P17, 'debug'
-    push $P16, $P17
-    box $P17, 'Set debug mode'
-    push $P16, $P17
+    root_new $P9, ['parrot';'ResizablePMCArray']
+    assign $P9, 2
+    $P9[0] = 'debug'
+    $P9[1] = 'Set debug mode'
 .annotate 'line', 19
-    push $P1, $P16
+    $P1[6] = $P9
 .annotate 'line', 27
-    root_new $P18, ['parrot';'ResizablePMCArray']
-    box $P19, 'nowarn'
-    push $P18, $P19
-    box $P19, 'No warnings'
-    push $P18, $P19
+    root_new $P10, ['parrot';'ResizablePMCArray']
+    assign $P10, 2
+    $P10[0] = 'nowarn'
+    $P10[1] = 'No warnings'
 .annotate 'line', 19
-    push $P1, $P18
+    $P1[7] = $P10
 .annotate 'line', 28
-    root_new $P20, ['parrot';'ResizablePMCArray']
-    box $P21, 'noan'
-    push $P20, $P21
-    box $P21, 'No code annotations'
-    push $P20, $P21
+    root_new $P11, ['parrot';'ResizablePMCArray']
+    assign $P11, 2
+    $P11[0] = 'noan'
+    $P11[1] = 'No code annotations'
 .annotate 'line', 19
-    push $P1, $P20
+    $P1[8] = $P11
 .annotate 'line', 29
-    root_new $P22, ['parrot';'ResizablePMCArray']
-    box $P23, 'help'
-    push $P22, $P23
-    box $P23, 'Show this help'
-    push $P22, $P23
+    root_new $P12, ['parrot';'ResizablePMCArray']
+    assign $P12, 2
+    $P12[0] = 'help'
+    $P12[1] = 'Show this help'
 .annotate 'line', 19
-    push $P1, $P22
+    $P1[9] = $P12
 .annotate 'line', 30
-    root_new $P24, ['parrot';'ResizablePMCArray']
-    box $P25, 'version'
-    push $P24, $P25
-    box $P25, 'Show version and exit'
-    push $P24, $P25
+    root_new $P13, ['parrot';'ResizablePMCArray']
+    assign $P13, 2
+    $P13[0] = 'version'
+    $P13[1] = 'Show version and exit'
 .annotate 'line', 19
-    push $P1, $P24
+    $P1[10] = $P13
 .annotate 'line', 32
     setattribute self, 'options', $P1
 .annotate 'line', 33
     if_null $P1, __label_2
-    iter $P26, $P1
-    set $P26, 0
+    iter $P14, $P1
+    set $P14, 0
   __label_1: # for iteration
-    unless $P26 goto __label_2
-    shift $P2, $P26
+    unless $P14 goto __label_2
+    shift $P2, $P14
 .annotate 'line', 34
     $P3 = $P2[0]
     self.'push_string'($P3)
@@ -501,14 +491,11 @@
 # var compileoptions: $P9
     root_new $P9, ['parrot';'Hash']
 .annotate 'line', 150
-    box $P20, $I3
-    $P9["debug"] = $P20
+    $P9["debug"] = $I3
 .annotate 'line', 151
-    box $P21, $I5
-    $P9["noan"] = $P21
+    $P9["noan"] = $I5
 .annotate 'line', 152
-    box $P22, $I4
-    $P9["nowarn"] = $P22
+    $P9["nowarn"] = $I4
 .annotate 'line', 154
     unless $I2 goto __label_10
 # {
