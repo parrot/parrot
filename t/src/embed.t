@@ -139,7 +139,7 @@ Done
 Really done
 OUTPUT
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ", todo => 'TT #1880 : Parrot_new requires the 1st interp created as an argument');
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ");
 
 #include <stdio.h>
 #include <stdlib.h>
