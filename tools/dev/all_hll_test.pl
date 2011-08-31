@@ -81,6 +81,14 @@ build_project({
         "tmp"   => $tmp_dir,
     });
 
+    build_project({
+        "name"      => "Partcl-nqp",
+        "clone"     => [qw<git clone https://github.com/partcl/partcl-nqp.git CLONE_DIR>],
+        "configure" => [qq<perl Configure.pl --parrot-config=$install_dir/bin/parrot_config>],
+        "test"      => [qq<make test>],
+        "tmp"       => $tmp_dir,
+    });
+
 }
 
 sub build_project {
