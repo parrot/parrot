@@ -134,38 +134,22 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned int chunk_id = get_chunk_id_from_name(interp,(char *)frame->registers[ops[1]]);
     uint64_t new_pc = frame->registers[ops[2]];
-
-    M0_Chunk *chunk = interp->first_chunk;
-    while(chunk != NULL) {
-        if(chunk->id == chunk_id) {
+	M0_Chunk *chunk = interp->first_chunk;
+	while(chunk) {
+		if(	strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
             frame->registers[CHUNK]  = (uint64_t)chunk;
             frame->registers[CONSTS] = (uint64_t)chunk->constants;
             frame->registers[MDS]    = (uint64_t)chunk->metadata;
             frame->registers[BCS]    = (uint64_t)chunk->bytecode;
             frame->registers[PC]     = (uint64_t)new_pc;
 			break;
-        }
-        chunk = chunk->next;
-    }
-    if(chunk == NULL) {
-        // TODO error handling
-    }
-
-}
-
-int get_chunk_id_from_name( M0_Interp *interp, const char *name) {
-	M0_Chunk *chunk = interp->first_chunk;
-	int id = -1;
-	while(chunk) {
-		if(	strncmp( chunk->name, name, chunk->name_length) == 0) {
-			id = chunk->id;
-			break;
 		}
 		chunk = chunk->next;
 	}
-	return id;
+    if(chunk == NULL) {
+        // TODO error handling
+    }
 }
 
 static void
