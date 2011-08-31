@@ -17,6 +17,16 @@ projects.
 
   $ perl tools/dev/all_hll_test.pl
 
+=head1 DESCRIPTION
+
+This script builds Parrot from the cwd, installs it to a temporary directory
+and installs/tests a number of HLLs and libraries, storing the output from
+their builds.  Its goal is to provide us with improved assurance that changes
+made to Parrot won't adversely affect HLLs and libraries without our knowledge.
+
+Hopefully an irc bot or some other form of notification will get involved at
+some point.
+
 =cut
 
 my $tmp_dir = "/tmp/parrot_all_hll_test";
