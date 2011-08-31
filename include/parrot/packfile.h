@@ -19,7 +19,7 @@
 #define FIXUP_TABLE_SEGMENT_NAME Parrot_str_new_constant(interp, "FIXUP")
 #define CONSTANT_SEGMENT_NAME    Parrot_str_new_constant(interp, "CONSTANT")
 #define BYTE_CODE_SEGMENT_NAME   Parrot_str_new_constant(interp, "BYTECODE")
-#define ODIUS_SEGMENT_NAME       Parrot_str_new_constant(interp, "ODIUS")
+#define PODDS_SEGMENT_NAME       Parrot_str_new_constant(interp, "PODDS")
 
 #define FLOATTYPE_8           0
 #define FLOATTYPE_8_NAME      "IEEE-754 8 byte double"
@@ -68,7 +68,7 @@ typedef enum {
     PF_CONST_SEG        = 2,
     PF_BYTEC_SEG        = 3,
     PF_DEBUG_SEG        = 4,
-    PF_ODIUS_SEG        = 5,
+    PF_PODDS_SEG        = 5,
     PF_ANNOTATIONS_SEG  = 6,
 
     PF_MAX_SEG          = 7
@@ -263,7 +263,7 @@ typedef struct PackFile_Annotations {
     PackFile_Annotations_Key    *keys;
 } PackFile_Annotations;
 
-/* Odius class types and codes */
+/* PODDS class types and codes */
 typedef enum {
     CLASS_padding       = 0x0000,
     CLASS_array_type    = 0x0001,
@@ -290,9 +290,9 @@ typedef enum {
     CLASS_inline_sub    = 0x0016,
     CLASS_start_user    = 0x4080,
     CLASS_end_user      = 0xffff
-} pf_odius_class_t;
+} pf_podds_class_t;
 
-/* Odius form types and codes */
+/* PODDS form types and codes */
 typedef enum {
     FORM_addr   = 0x1,
     FORM_ref    = 0x2,
@@ -302,9 +302,9 @@ typedef enum {
     FORM_data4  = 0x6,
     FORM_data8  = 0x7,
     FORM_string = 0x8
-} pf_odius_form_t;
+} pf_podds_form_t;
 
-/* Odius property types and codes */
+/* PODDS property types and codes */
 typedef enum {
     PT_sibling       = 0x0010,
     PT_location      = 0x0020,
@@ -339,7 +339,7 @@ typedef enum {
     PT_up_bound      = 0x02f0,
     PT_start_user    = 0x2000,
     PT_end_user      = 0x3ff0
-} pf_odius_property_t;
+} pf_podds_property_t;
 
 /* Location iota types and codes */
 typedef enum {
@@ -348,7 +348,7 @@ typedef enum {
     OP_const      = 0x03,
     OP_start_user = 0xe0,
     OP_end_user   = 0xff
-} pf_odius_location_iota;
+} pf_podds_location_iota;
 
 /* Fundamental data types and codes */
 typedef enum {
@@ -358,7 +358,7 @@ typedef enum {
     FT_pmc        = 0x0004,
     FT_start_user = 0x8000,
     FT_end_user   = 0xffff
-} pf_odius_fund_type_t;
+} pf_podds_fund_type_t;
 
 /* Type modifier types and codes */
 typedef enum {
@@ -367,7 +367,7 @@ typedef enum {
     MOD_const      = 0x03,
     MOD_start_user = 0x80,
     MOD_end_user   = 0xff
-} pf_odius_type_mod_t;
+} pf_podds_type_mod_t;
 
 /* Source language names and codes */
 typedef enum {
@@ -379,13 +379,13 @@ typedef enum {
     LANG_cardinal   = 0x00000006,
     LANG_start_user = 0x00008000,
     LANG_end_user   = 0x0000ffff
-} pf_odius_src_lang_t;
+} pf_podds_src_lang_t;
 
 /* Array ordering types and codes */
 typedef enum {
     ORD_row_major = 0x0,
     ORD_col_major = 0x1
-} pf_odius_array_dim_ord_t;
+} pf_podds_array_dim_ord_t;
 
 /* Format specifier types and codes */
 typedef enum {
@@ -397,27 +397,27 @@ typedef enum {
     FMT_ut_c_d = 0x6,
     FMT_ut_d_c = 0x7,
     FMT_ut_d_d = 0x8
-} pf_odius_fmt_spec_t;
+} pf_podds_fmt_spec_t;
 
 /* Property name/value pair associated with a particular class */
 typedef struct {
-    pf_odius_property_t property;
-    pf_odius_form_t     value;
-} pf_odius_dde_props;
+    pf_podds_property_t property;
+    pf_podds_form_t     value;
+} pf_podds_dde_props;
 
-/* Odius Data Description Entity (DDE) */
-typedef struct PackFile_Odius_DDE {
-    pf_odius_class_t     class_type;
-    pf_odius_property_t *properties;
-} PackFile_Odius_DDE;
+/* PODDS Data Description Entity (DDE) */
+typedef struct PackFile_Podds_DDE {
+    pf_podds_class_t     class_type;
+    pf_podds_property_t *properties;
+} PackFile_Podds_DDE;
 
-typedef struct PackFile_Odius {
+typedef struct PackFile_Podds {
     PackFile_Segment    base;
     PackFile_ByteCode  *code;
-    PackFile_Odius_DDE *dde;
+    PackFile_Podds_DDE *dde;
     /*opcode_t            num_keys;*/
-    /*PackFile_Odius_Key *keys;*/
-} PackFile_Odius;
+    /*PackFile_Podds_Key *keys;*/
+} PackFile_Podds;
  
 typedef struct PackFile_Directory {
     PackFile_Segment   base;
@@ -1204,7 +1204,7 @@ void PackFile_funcs_register(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Odius_new(PARROT_INTERP)
+PackFile_Segment * PackFile_Podds_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -1304,14 +1304,14 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
-void PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+void PackFile_Podds_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-size_t PackFile_Odius_packed_size(PARROT_INTERP,
+size_t PackFile_Podds_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -1333,7 +1333,7 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pf))
-#define ASSERT_ARGS_PackFile_Odius_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_Segment_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -1377,10 +1377,10 @@ void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg) \
     , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_PackFile_Odius_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_PackFile_Odius_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_packed_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
 #define ASSERT_ARGS_pf_register_standard_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

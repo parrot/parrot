@@ -157,14 +157,14 @@ static PMC * PackFile_Constant_unpack_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void PackFile_Odius_dump(PARROT_INTERP,
+static void PackFile_Podds_dump(PARROT_INTERP,
     ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static opcode_t * PackFile_Odius_pack(PARROT_INTERP,
+static opcode_t * PackFile_Podds_pack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGOUT(opcode_t *cursor))
         __attribute__nonnull__(1)
@@ -173,7 +173,9 @@ static opcode_t * PackFile_Odius_pack(PARROT_INTERP,
         FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*cursor);
 
-static const opcode_t * PackFile_Odius_unpack(PARROT_INTERP,
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static const opcode_t * PackFile_Podds_unpack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self),
     ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
@@ -294,14 +296,14 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(constt) \
     , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_PackFile_Odius_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_PackFile_Odius_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_PackFile_Odius_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_PackFile_Podds_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
@@ -964,13 +966,13 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
         PackFile_Annotations_dump
     };
 
-    static const PackFile_funcs odiusf = {
-        PackFile_Odius_new,
-        PackFile_Odius_destroy,
-        PackFile_Odius_packed_size,
-        PackFile_Odius_pack,
-        PackFile_Odius_unpack,
-        PackFile_Odius_dump
+    static const PackFile_funcs poddsf = {
+        PackFile_Podds_new,
+        PackFile_Podds_destroy,
+        PackFile_Podds_packed_size,
+        PackFile_Podds_pack,
+        PackFile_Podds_unpack,
+        PackFile_Podds_dump
     };
 
     PackFile_funcs_register(interp, pf, PF_DIR_SEG,         dirf);
@@ -979,7 +981,7 @@ pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
     PackFile_funcs_register(interp, pf, PF_BYTEC_SEG,       bytef);
     PackFile_funcs_register(interp, pf, PF_DEBUG_SEG,       debugf);
     PackFile_funcs_register(interp, pf, PF_ANNOTATIONS_SEG, annotationf);
-    PackFile_funcs_register(interp, pf, PF_ODIUS_SEG,       odiusf);
+    PackFile_funcs_register(interp, pf, PF_PODDS_SEG,       poddsf);
 
     return;
 }
@@ -2271,9 +2273,9 @@ make_code_pointers(ARGMOD(PackFile_Segment *seg))
 
 /*
 
-=item C<PackFile_Segment * PackFile_Odius_new(PARROT_INTERP)>
+=item C<PackFile_Segment * PackFile_Podds_new(PARROT_INTERP)>
 
-Creates a new Odius segment structure.
+Creates a new PODDS segment structure.
 
 =cut
 
@@ -2282,33 +2284,33 @@ Creates a new Odius segment structure.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Odius_new(PARROT_INTERP)
+PackFile_Podds_new(PARROT_INTERP)
 {
-    ASSERT_ARGS(PackFile_Odius_new)
+    ASSERT_ARGS(PackFile_Podds_new)
 
     /* Allocate annotations structure; create it all zeroed, and we will
      * allocate memory for each of the arrays on demand. */
-    PackFile_Odius * const seg = mem_gc_allocate_zeroed_typed(interp, PackFile_Odius);
+    PackFile_Podds * const seg = mem_gc_allocate_zeroed_typed(interp, PackFile_Podds);
 
     return (PackFile_Segment *) seg;
 }
 
 /*
 
-=item C<void PackFile_Odius_destroy(PARROT_INTERP, PackFile_Segment *seg)>
+=item C<void PackFile_Podds_destroy(PARROT_INTERP, PackFile_Segment *seg)>
 
-Frees all memory allocated for the Odius debug segment.
+Frees all memory allocated for the PODDS debug segment.
 
 =cut
 
 */
 
 void
-PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+PackFile_Podds_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
-    ASSERT_ARGS(PackFile_Odius_destroy)
+    ASSERT_ARGS(PackFile_Podds_destroy)
 
-    PackFile_Odius * const self = (PackFile_Odius *) seg;
+    PackFile_Podds * const self = (PackFile_Podds *) seg;
 
     /* Free any keys */
     /*if (self->keys)*/
@@ -2317,35 +2319,90 @@ PackFile_Odius_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     /*self->keys = NULL;*/
 }
 
+/*
+
+=item C<size_t PackFile_Podds_packed_size(PARROT_INTERP, PackFile_Segment *seg)>
+
+Determines the size of the PODDS segment being packed.
+
+The C<seg> parameter represents the PODDS segment.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-PackFile_Odius_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
+PackFile_Podds_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
-    ASSERT_ARGS(PackFile_Odius_packed_size)
+    ASSERT_ARGS(PackFile_Podds_packed_size)
     return 0;
 }
+
+/*
+
+=item C<static opcode_t * PackFile_Podds_pack(PARROT_INTERP, PackFile_Segment
+*self, opcode_t *cursor)>
+
+Packs the PODDS segment into the bytecode file.
+
+The C<self> parameter represents the segment to pack into. The C<cursor>
+parameter represents the position in the bytecode.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static opcode_t *
-PackFile_Odius_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
+PackFile_Podds_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cursor))
 {
-    ASSERT_ARGS(PackFile_Odius_pack)
+    ASSERT_ARGS(PackFile_Podds_pack)
     return NULL;
 }
 
+/*
+
+=item C<static const opcode_t * PackFile_Podds_unpack(PARROT_INTERP,
+PackFile_Segment *self, const opcode_t *cursor)>
+
+Unpacks the PODDS segment into memory.
+
+The C<self> parameter represents the PODDS segment in the bytecode. The
+C<cursor> parameter represents its position in the bytecode.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static const opcode_t *
-PackFile_Odius_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
+PackFile_Podds_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
 {
-    ASSERT_ARGS(PackFile_Odius_unpack)
+    ASSERT_ARGS(PackFile_Podds_unpack)
     return NULL;
 }
+
+/*
+
+=item C<static void PackFile_Podds_dump(PARROT_INTERP, const PackFile_Segment
+*self)>
+
+Produces a dump of the PODDS segment.
+
+The C<self> parameter represents the PODDS segment to dump.
+
+=cut
+
+*/
 
 static void
-PackFile_Odius_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+PackFile_Podds_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
-    ASSERT_ARGS(PackFile_Odius_dump)
+    ASSERT_ARGS(PackFile_Podds_dump)
 }
 
 
