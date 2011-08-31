@@ -240,6 +240,41 @@ ARGIN(PMC *method))
     VTABLE_set_pmc_keyed_str(interp, cache, name, method);
 }
 
+/*
+
+=item C<static PMC* clone_key_arg(PARROT_INTERP, PMC *key)>
+
+Replaces any src registers by their values. Used for C<*_keyed> overrides.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC*
+clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
+{
+    /* ASSERT_ARGS(clone_key_arg) */
+    PMC *t;
+
+    if (PMC_IS_NULL(key))
+        return key;
+
+    if (key->vtable->base_type != enum_class_Key)
+        return key;
+
+    for (t = key; !PMC_IS_NULL(t); t=Parrot_key_next(interp, t)) {
+        /* register keys have to be cloned */
+        if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
+            return VTABLE_clone(interp, key);
+        }
+    }
+
+    return key;
+}
+
+
 pmclass Object auto_attrs {
     ATTR PMC *_class;       /* The class this is an instance of. */
     ATTR PMC *attrib_store; /* The attributes store - a resizable PMC array. */
