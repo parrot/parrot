@@ -25,6 +25,8 @@ and installs/tests a number of HLLs and libraries, storing the output from
 their builds.  Its goal is to provide us with improved assurance that changes
 made to Parrot won't adversely affect HLLs and libraries without our knowledge.
 
+This program requires installation of the System::Command library from CPAN.
+
 Hopefully an irc bot or some other form of notification will get involved at
 some point.
 
