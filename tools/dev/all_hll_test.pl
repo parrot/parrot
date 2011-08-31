@@ -6,6 +6,7 @@ use warnings;
 use autodie;
 use System::Command;
 use File::Slurp;
+use Data::Dumper;
 use feature qw<say>;
 
 =head1 NAME
@@ -37,44 +38,43 @@ mkdir $install_dir;
 my %status;
 
 build_project({
-    "name" => "Parrot",
-    "configure" => [qq<perl Configure.pl --prefix=$install_dir --optimize>],
-    "build" => [qq<make>],
-    "install" => [qq<make install>],
-    #"test" =>  [qq<make test>],
-    "tmp"  => $tmp_dir,
-    "use_cwd" => 1,
+    "name"      => "Parrot",
+    "configure" => [qq<perl Configure.pl --prefix = $install_dir --optimize>],
+    "build"     => [qq<make>],
+    "install"   => [qq<make install>],
+    "test"      =>  [qq<make test>],
+    "tmp"       => $tmp_dir,
+    "use_cwd"   => 1,
 }, \%status);
-
 
 {
     local %ENV = %ENV;
     $ENV{"PATH"} = "$install_dir/bin:" . $ENV{"PATH"};
 
     build_project({
-        "name" => "Winxed",
+        "name"  => "Winxed",
         "clone" => [qw<git clone https://github.com/NotFound/winxed.git CLONE_DIR>],
         "build" => [qq<winxed setup.winxed>],
-        "test" =>  [qq<winxed setup.winxed test>],
-        "tmp"  => $tmp_dir,
+        "test"  => [qq<winxed setup.winxed test>],
+        "tmp"   => $tmp_dir,
     }, \%status);
 
     build_project({
-        "name" => "Rosella",
-        "clone" => [qw<git clone https://github.com/Whiteknight/Rosella.git CLONE_DIR>],
-        "build" => [qq<winxed setup.winxed>],
-        "test" =>  [qq<winxed setup.winxed test>],
+        "name"    => "Rosella",
+        "clone"   => [qw<git clone https://github.com/Whiteknight/Rosella.git CLONE_DIR>],
+        "build"   => [qq<winxed setup.winxed>],
+        "test"    => [qq<winxed setup.winxed test>],
         # needed by parrot-linear-algebra
         "install" => [qq<winxed setup.winxed install>],
-        "tmp"  => $tmp_dir,
+        "tmp"     => $tmp_dir,
     }, \%status);
 
     build_project({
-        "name" => "parrot-linear-algebra",
+        "name"  => "parrot-linear-algebra",
         "clone" => [qw<git clone https://github.com/Whiteknight/parrot-linear-algebra.git CLONE_DIR>],
         "build" => [qq<parrot-nqp setup.nqp>],
-        "test" =>  [qq<parrot-nqp setup.nqp test>],
-        "tmp"  => $tmp_dir,
+        "test"  => [qq<parrot-nqp setup.nqp test>],
+        "tmp"   => $tmp_dir,
     }, \%status);
 
     build_project({
@@ -131,6 +131,11 @@ build_project({
     }, \%status);
 }
 
+say "finished all everything";
+say "status for all projects and stages:";
+say Dumper(%status);
+
+
 sub build_project {
     my %opts = %{$_[0]};
     my $status = %{$_[1]};
@@ -156,12 +161,12 @@ sub build_project {
                 $cmd_stdout .= $_;
                 print $_;
             }
-            waitpid($cmd->pid(), 0);
 
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
 
+            $cmd->close();
             $status{$proj_name}[$stage_num] = {
                 stage => $stage,
                 exit  => $cmd->exit(),
@@ -185,11 +190,12 @@ sub build_project {
                 print $_;
             }
             my $cmd_stderr = join('', readline($cmd->stderr()));
-            waitpid($cmd->pid(), 0);
 
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+
+            $cmd->close();
             $status{$proj_name}[$stage_num] = {
                 stage => $stage,
                 exit  => $cmd->exit(),
