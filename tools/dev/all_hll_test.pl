@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use autodie;
 use System::Command;
+use File::Slurp;
 use feature qw<say>;
 
 =head1 NAME
@@ -68,7 +69,7 @@ build_project({
         "name"      => "Rakudo",
         "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with-parrot=$install_dir/bin/parrot>],
-        #XXX: should be spectest_regression; using test to make this easier to test
+        #XXX: should be spectest_regression; using test to make this quicker to test
         "test"      => [qq<make test>],
         "tmp"       => $tmp_dir,
     });
@@ -96,18 +97,18 @@ sub build_project {
     my $proj_name     = $opts{name};
     my $tmp_dir       = $opts{tmp};
     my $use_cwd       = exists $opts{use_cwd} ? 1 : 0;
+    my $stage_num     = 0;
 
     my $proj_dir = lc($proj_name) . "_test";
+    mkdir "$tmp_dir/logs" unless -d "$tmp_dir/logs";
 
     foreach my $stage (qw<clone configure build install test>){
         if ($stage eq "clone" && exists $opts{$stage} && !$use_cwd) {
 
             say "running stage '$stage' for $proj_name: ";
             chdir $tmp_dir;
-            say "deletening '$proj_dir'";
             qx<rm -rf $proj_dir>;
 
-            say "cloning $proj_name";
             my @cmd_args = map { $_ =~ s/CLONE_DIR/$proj_dir/g; $_ } @{$opts{$stage}};
             my $cmd = System::Command->new(@cmd_args);
             my $cmd_stdout = '';
@@ -116,11 +117,12 @@ sub build_project {
                 print $_;
             }
             waitpid($cmd->pid(), 0);
-            my $cmd_stderr = join('', readline($cmd->stderr()));
+
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+
             if ($cmd->exit()) {
-                say "cmdline: ". join(" ",$cmd->cmdline());
-                say "stderr: $cmd_stderr";
-                say "stdout: $cmd_stdout";
                 die "OH NOES TEH CLOEN HAVE DIED";
             }
             #say "done";
@@ -128,10 +130,11 @@ sub build_project {
             #say "stdout: $cmd_stdout";
             #say "stderr: $cmd_stderr";
             chdir "$tmp_dir/$proj_dir";
+            $stage_num++;
         }
         elsif (exists $opts{$stage}) {
 
-            say "running stage '$stage' for $proj_name:" . join(' ', @{$opts{$stage}});
+            say "running stage '$stage' for $proj_name: " . join(' ', @{$opts{$stage}});
             $use_cwd || chdir "$tmp_dir/$proj_dir";
             my $cmd = System::Command->new(@{$opts{$stage}});
             my $cmd_stdout = '';
@@ -142,6 +145,11 @@ sub build_project {
             }
             my $cmd_stderr = join('', readline($cmd->stderr()));
             waitpid($cmd->pid(), 0);
+
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
+            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+
             if ($cmd->exit()) {
                 say "cmdline: ". join(" ",$cmd->cmdline());
                 say "stdout: $cmd_stdout";
@@ -152,6 +160,7 @@ sub build_project {
             #say "cmdline: ". join(" ",$cmd->cmdline());
             #say "stdout: $cmd_stdout";
             #say "stderr: $cmd_stderr";
+            $stage_num++;
         }
     }
 }
