@@ -191,15 +191,15 @@ sub build_project {
 
             my @cmd_args = map { $_ =~ s/CLONE_DIR/$proj_dir/g; $_ } @{$opts{$stage}};
             my $cmd = System::Command->new(@cmd_args);
-            my $cmd_stdout = '';
+            my $log_base_name = "$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}";
+            write_file("${log_base_name}_cmdline.log", join(' ', $cmd->cmdline()));
+
             while (readline($cmd->stdout())) {
-                $cmd_stdout .= $_;
+                append_file("${log_base_name}_stdout.log", $_);
                 print $_ if $verbose;
             }
 
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+            write_file("${log_base_name}_stderr.log", join('', readline($cmd->stderr())));
 
             $cmd->close();
             push @proj_status, {
@@ -220,17 +220,15 @@ sub build_project {
             print "\n" if $verbose;
             $use_cwd || chdir "$tmp_dir/$proj_dir";
             my $cmd = System::Command->new(@{$opts{$stage}});
-            my $cmd_stdout = '';
+            my $log_base_name = "$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}";
+            write_file("${log_base_name}_cmdline.log", join(' ', $cmd->cmdline()));
 
             while (readline($cmd->stdout())) {
-                $cmd_stdout .= $_;
+                append_file("${log_base_name}_stdout.log", $_);
                 print $_ if $verbose;
             }
-            my $cmd_stderr = join('', readline($cmd->stderr()));
 
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
-            write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+            write_file("${log_base_name}_stderr.log", join('', readline($cmd->stderr())));
 
             $cmd->close();
             push @proj_status, {
