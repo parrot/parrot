@@ -928,10 +928,10 @@ $(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/lon
 
 $(INSTALLABLEPARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/install_config$(O) src/longopt$(O) \
-	$(PARROT)
+	frontend/parrot2/prt0.pbc$(O) $(PARROT)
 	$(LINK) @ld_out@$@ \
 	frontend/parrot2/main$(O) src/install_config$(O) src/longopt$(O) \
-	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	frontend/parrot2/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INC_DIR)/context.h : include/pmc/pmc_callcontext.h
