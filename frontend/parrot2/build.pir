@@ -14,7 +14,7 @@
     outfh = new ['FileHandle']
     outfh.'open'(outfile, 'wb')
     print outfh, "#include <stdlib.h>\n\n"
-    print outfh, "const unsigned char program_code[] = {"
+    print outfh, "static const unsigned char program_code[] = {"
     size = 0
 
     read_loop:
@@ -47,7 +47,7 @@
     ifh.'close'()
 
     say "writing coda"
-    print outfh, "\n};\n\nconst size_t bytecode_size = "
+    print outfh, "\n};\n\nstatic const size_t bytecode_size = "
     $S0 = size
     print outfh, $S0
     print outfh, ";\n"
