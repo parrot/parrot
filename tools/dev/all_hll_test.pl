@@ -209,6 +209,7 @@ sub build_project {
 
             if ($cmd->exit()) {
                 say "\n$stage failed";
+                push @$global_status, { $proj_name => [ @proj_status ] };
                 return;
             }
             chdir "$tmp_dir/$proj_dir";
@@ -238,6 +239,7 @@ sub build_project {
 
             if ($cmd->exit()) {
                 say "$stage FAILED";
+                push @$global_status, { $proj_name => [ @proj_status ] };
                 return;
             }
             $stage_num++;
