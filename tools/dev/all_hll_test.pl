@@ -30,13 +30,17 @@ some point.
 
 =cut
 
-my $tmp_dir = "/tmp/parrot_all_hll_test";
+
+my $tmp_dir = "/tmp/parrot_all_hll_test_$$";
 my $install_dir = "$tmp_dir/parrot_install";
 qx<rm -rf $tmp_dir>;
 mkdir $tmp_dir;
 mkdir $install_dir;
 my $status = [];
 my $verbose = 0;
+if ($ARGV[0] eq '-v' || $ARGV[0] eq '--verbose') {
+    $verbose = 1;
+}
 
 build_project({
     "name"      => "Parrot",
@@ -63,11 +67,19 @@ build_project({
     build_project({
         "name"    => "Rosella",
         "clone"   => [qw<git clone https://github.com/Whiteknight/Rosella.git CLONE_DIR>],
-        "build"   => [qq<winxed setup.winxed>],
+        "build"   => [qq<winxed setup.winxed build>],
         "test"    => [qq<winxed setup.winxed test>],
-        # needed by parrot-linear-algebra
+        # needed by parrot-linear-algebra and parrot-gmp
         "install" => [qq<winxed setup.winxed install>],
         "tmp"     => $tmp_dir,
+    }, $status);
+
+    build_project({
+        "name"  => "parrot-gmp",
+        "clone" => [qw<git clone https://github.com/bubaflub/parrot-gmp.git CLONE_DIR>],
+        "build" => [qq<winxed setup.winxed build>],
+        "test"  => [qq<winxed setup.winxed test>],
+        "tmp"   => $tmp_dir,
     }, $status);
 
     build_project({
@@ -134,7 +146,7 @@ build_project({
 
 foreach my $proj_status (@$status) {
     my $proj_name = (keys %$proj_status)[0];
-    print "status for '$proj_name':";
+    print "status for '$proj_name' - ";
     my $stage_num = 0;
     my @bad_stages;
     my @good_stages;
@@ -173,6 +185,7 @@ sub build_project {
         if ($stage eq "clone" && exists $opts{$stage} && !$use_cwd) {
 
             print "$stage ";
+            print "\n" if $verbose;
             chdir $tmp_dir;
             qx<rm -rf $proj_dir>;
 
@@ -204,6 +217,7 @@ sub build_project {
         elsif (exists $opts{$stage}) {
 
             print "$stage ";
+            print "\n" if $verbose;
             $use_cwd || chdir "$tmp_dir/$proj_dir";
             my $cmd = System::Command->new(@{$opts{$stage}});
             my $cmd_stdout = '';
