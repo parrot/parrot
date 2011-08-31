@@ -63,15 +63,42 @@ build_project({
         "clone" => [qw<git clone https://github.com/Whiteknight/Rosella.git CLONE_DIR>],
         "build" => [qq<winxed setup.winxed>],
         "test" =>  [qq<winxed setup.winxed test>],
+        # needed by parrot-linear-algebra
+        "install" => [qq<winxed setup.winxed install>],
         "tmp"  => $tmp_dir,
+    });
+
+    build_project({
+        "name" => "parrot-linear-algebra",
+        "clone" => [qw<git clone https://github.com/Whiteknight/parrot-linear-algebra.git CLONE_DIR>],
+        "build" => [qq<parrot-nqp setup.nqp>],
+        "test" =>  [qq<parrot-nqp setup.nqp test>],
+        "tmp"  => $tmp_dir,
+    });
+
+    build_project({
+        "name"  => "ohm-eta-wink-kzd",
+        "clone" => [qw<git clone https://github.com/plobsing/ohm-eta-wink-kzd.git CLONE_DIR>],
+        "build" => [qq<make>],
+        "test"  => [qq<make test>],
+        "tmp"   => $tmp_dir,
+    });
+
+    build_project({
+        "name"  => "Plumage",
+        "clone" => [qw<git clone https://github.com/parrot/plumage.git CLONE_DIR>],
+        "build" => [qq<parrot setup.pir build>],
+        "test"  => [qq<parrot setup.pir test>],
+        "tmp"   => $tmp_dir,
     });
 
     build_project({
         "name"      => "nqp",
         "clone"     => [qw<git clone https://github.com/perl6/nqp.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
-        "install"   => [qq<make install>],
         "test"      => [qq<make test>],
+        # needed by Rakudo
+        "install"   => [qq<make install>],
         "tmp"       => $tmp_dir,
     });
 
@@ -99,7 +126,6 @@ build_project({
         "test"      => [qq<make test>],
         "tmp"       => $tmp_dir,
     });
-
 }
 
 sub build_project {
@@ -135,10 +161,6 @@ sub build_project {
             if ($cmd->exit()) {
                 die "OH NOES TEH CLOEN HAVE DIED";
             }
-            #say "done";
-            #say "cmdline: ". join(" ",$cmd->cmdline());
-            #say "stdout: $cmd_stdout";
-            #say "stderr: $cmd_stderr";
             chdir "$tmp_dir/$proj_dir";
             $stage_num++;
         }
@@ -166,10 +188,6 @@ sub build_project {
                 say "stderr: $cmd_stderr";
                 die "OH NOES TEH $stage STAEG HAVE DIED";
             }
-            #say "done";
-            #say "cmdline: ". join(" ",$cmd->cmdline());
-            #say "stdout: $cmd_stdout";
-            #say "stderr: $cmd_stderr";
             $stage_num++;
         }
     }
