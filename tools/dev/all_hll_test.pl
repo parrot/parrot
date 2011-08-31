@@ -28,7 +28,8 @@ build_project({
     "name" => "Parrot",
     "configure" => [qq<perl Configure.pl --prefix=$install_dir --optimize>],
     "build" => [qq<make>],
-    "test" =>  [qq<make test>],
+    "install" => [qq<make install>],
+    #"test" =>  [qq<make test>],
     "tmp"  => $tmp_dir,
     "use_cwd" => 1,
 });
@@ -40,7 +41,7 @@ build_project({
 
     build_project({
         "name" => "Winxed",
-        "clone" => [qw<git clone https://github.com/NotFound/winxed.git winxed_test>],
+        "clone" => [qw<git clone https://github.com/NotFound/winxed.git CLONE_DIR>],
         "build" => [qq<winxed setup.winxed>],
         "test" =>  [qq<winxed setup.winxed test>],
         "tmp"  => $tmp_dir,
@@ -48,7 +49,7 @@ build_project({
 
     build_project({
         "name" => "Rosella",
-        "clone" => [qw<git clone https://github.com/Whiteknight/Rosella.git rosella_test>],
+        "clone" => [qw<git clone https://github.com/Whiteknight/Rosella.git CLONE_DIR>],
         "build" => [qq<winxed setup.winxed>],
         "test" =>  [qq<winxed setup.winxed test>],
         "tmp"  => $tmp_dir,
@@ -56,7 +57,7 @@ build_project({
 
     build_project({
         "name"      => "nqp",
-        "clone"     => [qw<git clone https://github.com/perl6/nqp.git nqp_test>],
+        "clone"     => [qw<git clone https://github.com/perl6/nqp.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
         "install"   => [qq<make install>],
         "test"      => [qq<make test>],
@@ -65,7 +66,7 @@ build_project({
 
     build_project({
         "name"      => "Rakudo",
-        "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git rakudo_test>],
+        "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with-parrot=$install_dir/bin/parrot>],
         #XXX: should be spectest_regression; using test to make this easier to test
         "test"      => [qq<make test>],
@@ -74,7 +75,7 @@ build_project({
 
     build_project({
         "name"  => "Lua",
-        "clone" => [qw<git clone https://github.com/fperrad/lua.git lua_test>],
+        "clone" => [qw<git clone https://github.com/fperrad/lua.git CLONE_DIR>],
         "build" => [qq<parrot setup.pir>],
         "test"  => [qq<parrot setup.pir test>],
         "tmp"   => $tmp_dir,
@@ -85,36 +86,64 @@ build_project({
 sub build_project {
     my %opts = %{$_[0]};
     my $proj_name     = $opts{name};
-    my $clone_cmd     = $opts{clone};
     my $tmp_dir       = $opts{tmp};
-    my $use_cwd       = $opts{use_cwd};
+    my $use_cwd       = exists $opts{use_cwd} ? 1 : 0;
 
     my $proj_dir = lc($proj_name) . "_test";
 
     foreach my $stage (qw<clone configure build install test>){
         if ($stage eq "clone" && exists $opts{$stage} && !$use_cwd) {
-            say "running stage '$stage' for $proj_name";
+
+            say "running stage '$stage' for $proj_name: ";
             chdir $tmp_dir;
+            say "deletening '$proj_dir'";
             qx<rm -rf $proj_dir>;
+
             say "cloning $proj_name";
-            my $cmd = System::Command->new(@$clone_cmd);
+            my @cmd_args = map { $_ =~ s/CLONE_DIR/$proj_dir/g; $_ } @{$opts{$stage}};
+            my $cmd = System::Command->new(@cmd_args);
+            my $cmd_stdout = '';
+            while (readline($cmd->stdout())) {
+                $cmd_stdout .= $_;
+                print $_;
+            }
             waitpid($cmd->pid(), 0);
-            my $cmd_stdout = join('', readline($cmd->stdout()));
             my $cmd_stderr = join('', readline($cmd->stderr()));
-            if (!waitpid($cmd->pid(), 0)) {
+            if ($cmd->exit()) {
+                say "cmdline: ". join(" ",$cmd->cmdline());
+                say "stderr: $cmd_stderr";
+                say "stdout: $cmd_stdout";
                 die "OH NOES TEH CLOEN HAVE DIED";
             }
-            chdir $proj_dir;
+            #say "done";
+            #say "cmdline: ". join(" ",$cmd->cmdline());
+            #say "stdout: $cmd_stdout";
+            #say "stderr: $cmd_stderr";
+            chdir "$tmp_dir/$proj_dir";
         }
         elsif (exists $opts{$stage}) {
-            say "running stage '$stage' for $proj_name";
+
+            say "running stage '$stage' for $proj_name:" . join(' ', @{$opts{$stage}});
+            $use_cwd || chdir "$tmp_dir/$proj_dir";
             my $cmd = System::Command->new(@{$opts{$stage}});
-            waitpid($cmd->pid(), 0);
-            my $cmd_stdout = join('', readline($cmd->stdout()));
+            my $cmd_stdout = '';
+
+            while (readline($cmd->stdout())) {
+                $cmd_stdout .= $_;
+                print $_;
+            }
             my $cmd_stderr = join('', readline($cmd->stderr()));
-            if (!waitpid($cmd->pid(), 0)) {
+            waitpid($cmd->pid(), 0);
+            if ($cmd->exit()) {
+                say "cmdline: ". join(" ",$cmd->cmdline());
+                say "stdout: $cmd_stdout";
+                say "stderr: $cmd_stderr";
                 die "OH NOES TEH $stage STAEG HAVE DIED";
             }
+            #say "done";
+            #say "cmdline: ". join(" ",$cmd->cmdline());
+            #say "stdout: $cmd_stdout";
+            #say "stderr: $cmd_stderr";
         }
     }
 }
