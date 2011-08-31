@@ -345,8 +345,8 @@ FLUID_FILES_2 = \
 	$(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	$(LIBRARY_DIR)/ProfTest/Want.pbc \
 	$(LIBRARY_DIR)/YAML/Tiny.pbc \
-	runtime/parrot/include/parrotlib.pbc
-
+	runtime/parrot/include/parrotlib.pbc \
+	frontend/parrot2/prt0.pbc*
 
 ###############################################################################
 #
@@ -2351,6 +2351,7 @@ prog-clean :
 	$(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
 	frontend/parrot2/main$(O) \
+	parrot_old \
 	src/null_config$(O) \
 	src/parrot_config$(O) \
 	src/install_config$(O) \
