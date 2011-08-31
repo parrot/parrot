@@ -38,7 +38,7 @@ mkdir $tmp_dir;
 mkdir $install_dir;
 my $status = [];
 my $verbose = 0;
-if ($ARGV[0] eq '-v' || $ARGV[0] eq '--verbose') {
+if (defined $ARGV[0] && ($ARGV[0] eq '-v' || $ARGV[0] eq '--verbose')) {
     $verbose = 1;
 }
 
