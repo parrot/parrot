@@ -146,9 +146,11 @@ build_project({
     }, $status);
 }
 
+my @pass;
+my @fail;
+
 foreach my $proj_status (@$status) {
     my $proj_name = (keys %$proj_status)[0];
-    print "status for '$proj_name' - ";
     my $stage_num = 0;
     my @bad_stages;
     my @good_stages;
@@ -161,12 +163,27 @@ foreach my $proj_status (@$status) {
         }
     }
     if (@bad_stages) {
-        say "$bad_stages[0] failed";
+        push @fail, "$proj_name ($bad_stages[0])";
     }
     else {
-        say "ok";
+        push @pass, $proj_name;
     }
 }
+
+say "\nresults for all projects:";
+
+if (@pass) {
+    print "PASS: ";
+    say join(', ', @pass);
+}
+if (@fail) {
+    say "FAIL: ";
+    say join(', ', @fail);
+}
+else {
+    say "no projects failed!";
+}
+
 
 
 sub build_project {
