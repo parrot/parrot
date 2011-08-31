@@ -34,6 +34,7 @@ my $install_dir = "$tmp_dir/parrot_install";
 qx<rm -rf $tmp_dir>;
 mkdir $tmp_dir;
 mkdir $install_dir;
+my %status;
 
 build_project({
     "name" => "Parrot",
@@ -43,7 +44,7 @@ build_project({
     #"test" =>  [qq<make test>],
     "tmp"  => $tmp_dir,
     "use_cwd" => 1,
-});
+}, \%status);
 
 
 {
@@ -56,7 +57,7 @@ build_project({
         "build" => [qq<winxed setup.winxed>],
         "test" =>  [qq<winxed setup.winxed test>],
         "tmp"  => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name" => "Rosella",
@@ -66,7 +67,7 @@ build_project({
         # needed by parrot-linear-algebra
         "install" => [qq<winxed setup.winxed install>],
         "tmp"  => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name" => "parrot-linear-algebra",
@@ -74,7 +75,7 @@ build_project({
         "build" => [qq<parrot-nqp setup.nqp>],
         "test" =>  [qq<parrot-nqp setup.nqp test>],
         "tmp"  => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"  => "ohm-eta-wink-kzd",
@@ -82,7 +83,7 @@ build_project({
         "build" => [qq<make>],
         "test"  => [qq<make test>],
         "tmp"   => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"  => "Plumage",
@@ -90,26 +91,27 @@ build_project({
         "build" => [qq<parrot setup.pir build>],
         "test"  => [qq<parrot setup.pir test>],
         "tmp"   => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"      => "nqp",
         "clone"     => [qw<git clone https://github.com/perl6/nqp.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with_parrot=$install_dir/bin/parrot>],
+        "build"     => [qq<make>],
         "test"      => [qq<make test>],
         # needed by Rakudo
         "install"   => [qq<make install>],
         "tmp"       => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"      => "Rakudo",
         "clone"     => [qw<git clone -b nom https://github.com/rakudo/rakudo.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --with-parrot=$install_dir/bin/parrot>],
-        #XXX: should be spectest_regression; using test to make this quicker to test
-        "test"      => [qq<make test>],
+        "build"     => [qq<make>],
+        "test"      => [qq<make spectest_regression>],
         "tmp"       => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"  => "Lua",
@@ -117,23 +119,25 @@ build_project({
         "build" => [qq<parrot setup.pir>],
         "test"  => [qq<parrot setup.pir test>],
         "tmp"   => $tmp_dir,
-    });
+    }, \%status);
 
     build_project({
         "name"      => "Partcl-nqp",
         "clone"     => [qw<git clone https://github.com/partcl/partcl-nqp.git CLONE_DIR>],
         "configure" => [qq<perl Configure.pl --parrot-config=$install_dir/bin/parrot_config>],
+        "build"     => [qq<make>],
         "test"      => [qq<make test>],
         "tmp"       => $tmp_dir,
-    });
+    }, \%status);
 }
 
 sub build_project {
     my %opts = %{$_[0]};
-    my $proj_name     = $opts{name};
-    my $tmp_dir       = $opts{tmp};
-    my $use_cwd       = exists $opts{use_cwd} ? 1 : 0;
-    my $stage_num     = 0;
+    my $status = %{$_[1]};
+    my $proj_name = $opts{name};
+    my $tmp_dir   = $opts{tmp};
+    my $use_cwd   = exists $opts{use_cwd} ? 1 : 0;
+    my $stage_num = 0;
 
     my $proj_dir = lc($proj_name) . "_test";
     mkdir "$tmp_dir/logs" unless -d "$tmp_dir/logs";
@@ -158,8 +162,13 @@ sub build_project {
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
 
+            $status{$proj_name}[$stage_num] = {
+                stage => $stage,
+                exit  => $cmd->exit(),
+            };
+
             if ($cmd->exit()) {
-                die "OH NOES TEH CLOEN HAVE DIED";
+                return;
             }
             chdir "$tmp_dir/$proj_dir";
             $stage_num++;
@@ -181,12 +190,13 @@ sub build_project {
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stdout.log", $cmd_stdout);
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_stderr.log", join('', readline($cmd->stderr())));
             write_file("$tmp_dir/logs/${proj_name}_stage${stage_num}_${stage}_cmdline.log", join(' ', $cmd->cmdline()));
+            $status{$proj_name}[$stage_num] = {
+                stage => $stage,
+                exit  => $cmd->exit(),
+            };
 
             if ($cmd->exit()) {
-                say "cmdline: ". join(" ",$cmd->cmdline());
-                say "stdout: $cmd_stdout";
-                say "stderr: $cmd_stderr";
-                die "OH NOES TEH $stage STAEG HAVE DIED";
+                return;
             }
             $stage_num++;
         }
