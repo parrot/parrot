@@ -230,10 +230,9 @@ static int nomoreargs(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
-    ARGMOD(PMC * ctx))
+    ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(* ctx);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -3639,8 +3638,7 @@ PDB_backtrace(PARROT_INTERP)
 
 /*
 
-=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC *
-ctx)>
+=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC *ctx)>
 
 Returns an string with the backtrace of interpreter's call chain for the given context information.
 
@@ -3656,14 +3654,15 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
     ASSERT_ARGS(PDB_get_continuation_backtrace)
     PMC    *output     = Parrot_pmc_new(interp, enum_class_StringBuilder);
     int     rec_level  = 0;
+    int     is_top;
     int     loop_count;
     PMC    *prev_ctx;
 
     /* backtrace: follow the continuation chain */
-    for (prev_ctx = PMCNULL, loop_count = 0;
+    for (prev_ctx = PMCNULL, loop_count = 0, is_top = 1;
         ctx && loop_count < RECURSION_LIMIT;
-        loop_count++, prev_ctx = ctx, ctx = Parrot_pcc_get_caller_ctx(interp, ctx)) {
-        STRING *info_str = Parrot_sub_Context_infostr(interp, ctx);
+        loop_count++, is_top = 0, prev_ctx = ctx, ctx = Parrot_pcc_get_caller_ctx(interp, ctx)) {
+        STRING *info_str = Parrot_sub_Context_infostr(interp, ctx, is_top);
         if (!info_str)
             break;
 
@@ -3682,8 +3681,9 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
             VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
-        else {
-            /* print the context description */
+
+        /* print the context description */
+        if (rec_level == 0) {
             PMC               *sub = Parrot_pcc_get_sub(interp, ctx);
             PackFile_ByteCode *seg = PARROT_SUB(sub)->seg;
             VTABLE_push_string(interp, output, info_str);

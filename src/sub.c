@@ -290,7 +290,7 @@ Parrot_sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
 
 /*
 
-=item C<STRING* Parrot_sub_Context_infostr(PARROT_INTERP, PMC *ctx)>
+=item C<STRING* Parrot_sub_Context_infostr(PARROT_INTERP, PMC *ctx, int is_top)>
 
 Formats context information for display.  Takes a context pointer and
 returns a pointer to the text.  Used in debug.c and warnings.c
@@ -303,14 +303,12 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
+Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx), int is_top)
 {
     ASSERT_ARGS(Parrot_sub_Context_infostr)
     Parrot_Context_info info;
     STRING             *res = NULL;
-    const char * const  msg = (CURRENT_CONTEXT(interp) == ctx)
-        ? "current instr.:"
-        : "called from Sub";
+    const char * const  msg = is_top ? "current instr.:" : "called from Sub";
 
     Parrot_block_GC_mark(interp);
     if (Parrot_sub_context_get_info(interp, ctx, &info)) {
