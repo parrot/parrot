@@ -163,6 +163,16 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+PARROT_API
+void
+Parrot_api_dump_profile_data (Parrot_PMC interp_pmc)
+{
+    EMBED_API_CALLIN(interp_pmc, interp)
+    dump_profile_data(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+
 /*
 
 =item C<Parrot_Int Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc,

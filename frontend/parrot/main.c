@@ -227,6 +227,8 @@ main(int argc, const char *argv[])
             show_last_error_and_exit(interp);
     }
 
+    Parrot_api_dump_profile_data(interp);
+
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
     exit(EXIT_SUCCESS);
