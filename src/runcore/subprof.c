@@ -74,18 +74,6 @@ static struct subprofile * sub2subprofile(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 
-/*
-
-=item C<static opcode_t * runops_slow_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the Parrot operations starting at C<pc> until there are no more
-operations, with tracing and bounds checking enabled.
-
-=cut
-
-*/
-
 static struct subprofile *
 sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 {
