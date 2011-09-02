@@ -558,4 +558,31 @@
 
     PObj flag C<PObj_constant_FLAG> and related macros will be removed.
   ticket : 'https://trac.parrot.org/parrot/ticket/1875'
+-
+  name : 'Non-const STRING* arguments'
+  eligible : '3.1'
+  note : |
+    Due immutable nature of STRINGs we are changing internal handling to use only
+    const STRING pointers. It will improve optimizations possibilities by compiler,
+    make parrot const-correct, etc.
+    
+    Passing of non-const STRING* arguments is deprecated and will be changed to
+    const STRING*. This includes (but not limited to) all string API functions,
+    VTABLEs, PCC, etc
+  ticket : 'http://trac.parrot.org/parrot/ticket/1906'
+-
+  name : 'X-to-Y native PBC reading'
+  eligible : '3.1'
+  note : 'Support for PBC files optimized for alternate platforms will be dropped in favour of a universal network PBC format.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1961'
+-
+  name : 'The PIR and PASM compreg PMCs'
+  eligible : '3.1'
+  note : |
+    The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+    it will be a new type of PMC which conforms to PDD31 and will be similar to
+    HLLCompiler.
+    
+    There will not be a PASM compreg anymore.
+  ticket : 'http://trac.parrot.org/parrot/ticket/1967'
 
