@@ -752,7 +752,7 @@ namespace em {
     }
 }
 
-function main[main]() {
+function main[main](var argv) {
     var user = new em.User();
     user.call0();
 }
