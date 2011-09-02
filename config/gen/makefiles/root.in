@@ -499,6 +499,7 @@ INTERP_O_FILES = \
 	src/runcore/main$(O)  \
 	src/runcore/cores$(O) \
 	src/runcore/profiling$(O) \
+	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
@@ -714,6 +715,7 @@ STR_FILES = \
 	src/runcore/cores.str \
 	src/runcore/main.str \
 	src/runcore/profiling.str \
+	src/runcore/subprof.str \
 	src/scheduler.str \
 	src/spf_render.str \
 	src/spf_vtable.str \
@@ -1537,7 +1539,16 @@ src/runcore/main$(O) : \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_subprof.h \
 	$(INC_DIR)/runcore_profiling.h
+
+src/runcore/subprof$(O) : src/runcore/subprof.str src/runcore/subprof.c \
+	include/pmc/pmc_sub.h \
+	include/pmc/pmc_namespace.h \
+	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_subprof.h $(INC_DIR)/embed.h \
+	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS)
 
 src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	include/pmc/pmc_sub.h \
