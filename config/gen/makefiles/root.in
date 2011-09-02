@@ -782,6 +782,7 @@ help :
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
 	@echo "  m0_tests:   		Run known-good M0 tests."
+	@echo "  m0_c_tests:   		Run known-good M0 tests with C implementation."
 	@echo "  m0_cover:   		Generate code coverage of m0 with Devel::Cover
 	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
@@ -2201,6 +2202,9 @@ examples_tests : test_prep
 
 m0_tests :
 	$(PERL) t/harness $(M0_TEST_FILES)
+
+m0_c_tests :
+	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
 
 m0_cover :
 	PERL5OPT=-MDevel::Cover $(MAKE) m0_tests

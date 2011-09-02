@@ -6,6 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 1;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -21,7 +22,7 @@ Run the canonically "correct", hand-assembled hello_canon.m0b.
 
 =cut
 
-my $m0_interp = "$^X src/m0/perl5/m0_interp.pl";
+my $m0_interp = $ENV{M0_INTERP} || "$^X " . catfile(qw/src m0 perl5 m0_interp.pl/);
 
 my $output = `$m0_interp t/m0/basic/hello_canon.m0b`;
 
