@@ -32,6 +32,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "debug.str"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_sub.h"
 #include "parrot/oplib/core_ops.h"
 
 /* Hand switched debugger tracing
@@ -3663,10 +3664,11 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD(PMC * ctx))
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_sub_Context_infostr(interp, ctx);
         if (str) {
+            PackFile_ByteCode *seg = PARROT_SUB(CONTEXT_STRUCT(ctx)->current_sub)->seg;
             VTABLE_push_string(interp, output, str);
-            if (interp->code->annotations) {
-                PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
-                        Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1, NULL);
+            if (seg->annotations) {
+                PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                        Parrot_pcc_get_pc(interp, ctx) - seg->base.data + 1, NULL);
                 if (!PMC_IS_NULL(annot)) {
                     PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "file"));

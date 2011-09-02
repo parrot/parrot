@@ -1462,7 +1462,8 @@ src/debug$(O) : $(INC_DIR)/embed.h \
 	    $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
 	src/debug.str include/pmc/pmc_key.h \
-	include/pmc/pmc_continuation.h
+	include/pmc/pmc_continuation.h \
+	include/pmc/pmc_sub.h
 
 src/sub$(O) : \
 	$(PARROT_H_HEADERS) \
