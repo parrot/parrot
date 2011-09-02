@@ -8,6 +8,8 @@ use feature 'say';
 use Test::More;
 use Parrot::Test tests => 7;
 use Data::Dumper;
+use Parrot::Config;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -37,7 +39,8 @@ my $M0_BC_SEG       = 0x04;
 
 # basic test with one chunk containing all empty segments
 
-my $m0_interp = "./src/m0/c/m0.exe";
+my $m0 = "m0$PConfig{exe}";
+my $m0_interp = catfile (qw/ src m0 c/, $m0);
 
 my $m0b_data = [
     { 

@@ -18,6 +18,7 @@ t/m0/integration/ .
 
 use strict;
 use warnings;
+use lib qw( . lib ../lib ../../lib );
 use File::Slurp qw/slurp/;
 #use Carp::Always;
 
@@ -25,6 +26,7 @@ use Test::More;
 use File::Spec::Functions;
 use TAP::Parser;
 use Data::Dumper;
+use Parrot::Config;
 
 #my @m0_files = grep { $_ !~ /cps_factorial/ }
 #    glob catfile( '.', qw/t m0 integration *.m0/);
@@ -77,10 +79,11 @@ sub test_m0_file {
     my $file  = shift;
 
     assemble($file);
-    my $interp    = catfile( ".", qw/src m0 c m0.exe/ );
+    my $m0 = "m0$PConfig{exe}";
+    my $interp    = catfile( ".", (qw/src m0 c /, $m0) );
     my $args = join(' ', @_);
 
-    print "$interp ${file}b $args 2>&1\n";
+    # print "$interp ${file}b $args 2>&1\n";
     my $tap = `$interp ${file}b $args 2>&1`;
     my $parser = TAP::Parser->new( {tap => $tap} );
     $parser->run;
