@@ -1005,7 +1005,7 @@ memoize the line offsets as a C<!lineof> property on C<target>.
   linepos_done_1:
   linepos_done:
 
-    # We have C<linepos>, so now we (binary) search the array 
+    # We have C<linepos>, so now we (binary) search the array
     # for the largest element that is not greater than C<pos>.
     .local int lo, hi, line
     lo = 0
