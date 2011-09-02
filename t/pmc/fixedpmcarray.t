@@ -20,11 +20,8 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(88)
+    plan(85)
     test_setting_array_size()
-    test_assign_from_another()
-    test_assign_self()
-    test_assign_non_array()
     test_resize_exception()
     test_truthiness()
     test_tt991()
@@ -662,37 +659,6 @@ CODE
             set $P0,"GIGO"
         .end
 CODE
-.end
-
-.sub test_assign_non_array
-    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
-    .sub main :main
-        .local pmc arr, other
-        .local int n
-        arr = new ['FixedPMCArray']
-        other = new ['Integer']
-        assign arr, other
-    .end
-CODE
-.end
-
-.sub test_assign_self
-    .local pmc arr
-    arr = new ['FixedPMCArray']
-    assign arr, arr
-    ok(1, 'Can assign FixedPMCArray to itself')
-.end
-
-.sub test_assign_from_another
-    .local pmc arr1, arr2
-    .local int n
-    arr1 = new ['FixedPMCArray']
-    arr1 = 32
-    arr2 = new ['FixedPMCArray']
-    arr2 = 15
-    assign arr1, arr2
-    n = arr1
-    is(n,15,'assigning to FixedPMCArray from another FixedPMCArray')
 .end
 
 .sub test_setting_array_size

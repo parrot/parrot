@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(143)
+    plan(146)
 
     init_tests()
     resize_tests()
@@ -58,6 +58,9 @@ out-of-bounds test. Checks INT and PMC keys.
     equality_tests()
     sort_tailcall()
     push_to_subclasses_array()
+    test_assign_from_another()
+    test_assign_self()
+    test_assign_non_array()
 .end
 
 .sub init_negative
@@ -1160,6 +1163,38 @@ end:
 
     ok(1, "Push to subclassed array works")
 .end
+
+.sub test_assign_non_array
+    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
+    .sub main :main
+        .local pmc arr, other
+        .local int n
+        arr = new ['ResizablePMCArray']
+        other = new ['Integer']
+        assign arr, other
+    .end
+CODE
+.end
+
+.sub test_assign_self
+    .local pmc arr
+    arr = new ['ResizablePMCArray']
+    assign arr, arr
+    ok(1, 'Can assign ResizablePMCArray to itself')
+.end
+
+.sub test_assign_from_another
+    .local pmc arr1, arr2
+    .local int n
+    arr1 = new ['ResizablePMCArray']
+    arr1 = 32
+    arr2 = new ['ResizablePMCArray']
+    arr2 = 15
+    assign arr1, arr2
+    n = arr1
+    is(n,15,'assigning to ResizablePMCArray from another ResizablePMCArray')
+.end
+
 
 # don't forget to change the test plan
 
