@@ -3,11 +3,11 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot2/main.c - The alternate PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
-Start Parrot
+Start Parrot, bootstrapping to PIR as early as possible.
 
 =head2 Functions
 
@@ -27,25 +27,23 @@ Start Parrot
 
 struct init_args_t {
     const char *run_core_name;
-    Parrot_String sourcefile;
-    Parrot_String outfile;
     Parrot_Int trace;
-    Parrot_Int execute_packfile;
-    Parrot_Int write_packfile;
-    Parrot_Int have_pbc_file;
-    Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
-    Parrot_Int preprocess_only;
+    const char ** sysargv;
+    const char ** progargv;
+    int sysargc;
+    int progargc;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+extern const unsigned char * get_program_code(void);
+size_t get_program_code_size(void);
 
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void help(void);
 static void help_debug(void);
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -62,27 +60,17 @@ PARROT_PURE_FUNCTION
 static int is_float(ARGIN(const char *s))
         __attribute__nonnull__(1);
 
-PARROT_CAN_RETURN_NULL
-static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String filename);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const struct longopt_opt_decl * Parrot_cmd_options(void);
 
-static void Parrot_version(void);
 static void parseflags(
     Parrot_PMC interp,
     int argc,
     ARGIN(const char *argv[]),
-    ARGOUT(int *pgm_argc),
-    ARGOUT(const char ***pgm_argv),
     ARGMOD(struct init_args_t * args))
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        FUNC_MODIFIES(*pgm_argc)
-        FUNC_MODIFIES(*pgm_argv)
         FUNC_MODIFIES(* args);
 
 static void parseflags_minimal(
@@ -102,22 +90,13 @@ static void print_parrot_string(
         FUNC_MODIFIES(*vector);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * run_imcc(
-    Parrot_PMC interp,
-    Parrot_String sourcefile,
-    ARGIN(struct init_args_t *flags))
-        __attribute__nonnull__(3);
+static void setup_imcc(Parrot_PMC interp);
 
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void usage(ARGMOD(FILE *fp))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*fp);
 
-static void verify_file_names(
-    ARGIN_NULLOK(const char * input),
-    ARGIN_NULLOK(const char * output));
-
-#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_help_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_is_all_digits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
@@ -125,25 +104,19 @@ static void verify_file_names(
        PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_is_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_load_bytecode_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_cmd_options __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_version __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_parseflags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(argv) \
-    , PARROT_ASSERT_ARG(pgm_argc) \
-    , PARROT_ASSERT_ARG(pgm_argv) \
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_parseflags_minimal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(initargs) \
     , PARROT_ASSERT_ARG(argv))
 #define ASSERT_ARGS_print_parrot_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(vector))
-#define ASSERT_ARGS_run_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(flags))
+#define ASSERT_ARGS_setup_imcc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_usage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(fp))
-#define ASSERT_ARGS_verify_file_names __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -160,15 +133,9 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PMC   interp;
-    Parrot_PMC   bytecodepmc;
-    Parrot_PMC   argsarray;
-    int          pir_argc;
-    const char **pir_argv;
+    Parrot_PMC interp, bytecodepmc, sysargs, pirargs;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
-    Parrot_String source_str;
-    Parrot_String output_str;
 
     GET_INIT_STRUCT(initargs);
 
@@ -190,44 +157,24 @@ main(int argc, const char *argv[])
     }
 
     /* Parse flags */
-    parseflags(interp, argc, argv, &pir_argc, &pir_argv, &parsed_flags);
-    source_str = parsed_flags.sourcefile;
-    output_str = parsed_flags.outfile;
+    parseflags(interp, argc, argv, &parsed_flags);
 
     if (!Parrot_api_set_runcore(interp, parsed_flags.run_core_name, parsed_flags.trace))
         show_last_error_and_exit(interp);
 
-    if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_pmc_wrap_string_array(interp, pir_argc, pir_argv, &argsarray))
-            show_last_error_and_exit(interp);
-    }
+    Parrot_api_toggle_gc(interp, 0);
+    setup_imcc(interp);
+    if (!parsed_flags.turn_gc_off)
+        Parrot_api_toggle_gc(interp, 1);
 
-    if (parsed_flags.have_pbc_file) {
-        bytecodepmc = load_bytecode_file(interp, source_str);
-        if (parsed_flags.turn_gc_off)
-            Parrot_api_toggle_gc(interp, 0);
-    }
-    else {
-        Parrot_api_toggle_gc(interp, 0);
-        bytecodepmc = run_imcc(interp, source_str, &parsed_flags);
-        if (!parsed_flags.turn_gc_off)
-            Parrot_api_toggle_gc(interp, 1);
-    }
-
-    /* -o outputs the file. -r outputs it and reads it in again from .pbc */
-    if (parsed_flags.write_packfile) {
-        if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str))
-            show_last_error_and_exit(interp);
-        if (parsed_flags.execute_packfile)
-            bytecodepmc = load_bytecode_file(interp, output_str);
-    }
-
-    if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray, NULL))
-            show_last_error_and_exit(interp);
-    }
-
-    Parrot_api_dump_profile_data(interp);
+    if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.sysargc,  parsed_flags.sysargv,
+                                            &sysargs)
+    && Parrot_api_pmc_wrap_string_array(interp, parsed_flags.progargc, parsed_flags.progargv,
+                                        &pirargs)
+    && Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(),
+                                        &bytecodepmc)
+    && Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, pirargs)))
+        show_last_error_and_exit(interp);
 
     /* Clean-up after ourselves */
     Parrot_api_destroy_interpreter(interp);
@@ -236,8 +183,7 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static PMC * run_imcc(Parrot_PMC interp, Parrot_String sourcefile,
-struct init_args_t *flags)>
+=item C<static void setup_imcc(Parrot_PMC interp)>
 
 Call into IMCC to either compile or preprocess the input.
 
@@ -246,61 +192,18 @@ Call into IMCC to either compile or preprocess the input.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC *
-run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *flags))
+static void
+setup_imcc(Parrot_PMC interp)
 {
-    ASSERT_ARGS(run_imcc)
+    ASSERT_ARGS(setup_imcc)
     Parrot_PMC pir_compiler = NULL;
     Parrot_PMC pasm_compiler = NULL;;
 
     if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
-    if (flags->preprocess_only) {
-        Parrot_Int r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
-        exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
-    }
-    else {
-        const Parrot_Int pasm_mode = flags->have_pasm_file;
-        const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
-        Parrot_PMC pbc;
-
-        if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
-            show_last_error_and_exit(interp);
-        return pbc;
-    }
 }
 
-/*
-
-=item C<static PMC * load_bytecode_file(Parrot_PMC interp, Parrot_String
-filename)>
-
-Load in a .pbc file to a PackFile PMC
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-static PMC *
-load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
-{
-    ASSERT_ARGS(load_bytecode_file)
-    Parrot_PMC bytecode = NULL;
-
-    /* set up all the compregs */
-    Parrot_PMC pir_compiler;
-    Parrot_PMC pasm_compiler;
-
-    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
-          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
-        show_last_error_and_exit(interp);
-
-    if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
-        show_last_error_and_exit(interp);
-    return bytecode;
-}
 
 /*
 
@@ -443,7 +346,7 @@ usage(ARGMOD(FILE *fp))
     ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
-            "[-O [level]] [-L path] [-R runcore] [-o FILE] <file>\n");
+            "[-O [level]] [-R runcore] [-o FILE] <file>\n");
 }
 
 /*
@@ -489,65 +392,6 @@ help_debug(void)
     "    0001    opcodes\n"
     "    0002    find_method\n"
     "    0004    function calls\n");
-}
-
-/*
-
-=item C<static void help(void)>
-
-Print out "help" list of options.
-
-=cut
-
-*/
-
-static void
-help(void)
-{
-    ASSERT_ARGS(help)
-    /* split printf for C89 compliance on string length */
-    printf(
-    "parrot [Options] <file>\n"
-    "  Options:\n"
-    "    -h --help\n"
-    "    -V --version\n"
-    "    -I --include add path to include search\n"
-    "    -L --library add path to library search\n"
-    "       --hash-seed F00F  specify hex value to use as hash seed\n"
-    "    -X --dynext add path to dynamic extension search\n"
-    "   <Run core options>\n"
-    "    -R --runcore slow|bounds|fast\n"
-    "    -R --runcore trace|profiling|gcdebug\n"
-    "    -t --trace [flags]\n"
-    "   <VM options>\n"
-    "    -D --parrot-debug[=HEXFLAGS]\n"
-    "       --help-debug\n");
-    printf(
-    "    -w --warnings\n"
-    "    -G --no-gc\n"
-    "    -g --gc ms2|gms|ms|inf set GC type\n"
-    "       <GC MS2 options>\n"
-    "       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n"
-    "       --gc-min-threshold=KB\n"
-    "       <GC GMS options>\n"
-    "       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n"
-    "       --gc-debug\n"
-    "       --leak-test|--destroy-at-end\n"
-    "    -. --wait    Read a keystroke before starting\n"
-    "       --runtime-prefix\n"
-    "   <Compiler options>\n"
-    "    -d --imcc-debug[=HEXFLAGS]\n"
-    "    -v --verbose\n"
-    "    -E --pre-process-only\n"
-    "    -o --output=FILE\n"
-    "       --output-pbc\n"
-    "    -O --optimize[=LEVEL]\n"
-    "    -a --pasm\n"
-    "    -c --pbc\n"
-    "    -r --run-pbc\n"
-    "    -y --yydebug\n"
-    "   <Language options>\n"
-    "see docs/running.pod for more\n");
 }
 
 /*
@@ -605,34 +449,6 @@ Parrot_cmd_options(void)
         { 0, 0, (OPTION_flags)0, { NULL } }
     };
     return cmd_options;
-}
-
-
-/*
-
-=item C<static void Parrot_version(void)>
-
-Print out parrot version number.
-
-=cut
-
-*/
-
-static void
-Parrot_version(void)
-{
-    ASSERT_ARGS(Parrot_version)
-    printf("This is Parrot version " PARROT_VERSION);
-    printf(" built for " PARROT_ARCHNAME ".\n");
-    printf("Copyright (C) 2001-2011, Parrot Foundation.\n\
-\n\
-This code is distributed under the terms of the Artistic License 2.0.\
-\n\
-For more details, see the full text of the license in the LICENSE file\
-\n\
-included in the Parrot source tree.\n\n");
-
-    exit(EXIT_SUCCESS);
 }
 
 /*
@@ -718,7 +534,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
 /*
 
 =item C<static void parseflags(Parrot_PMC interp, int argc, const char *argv[],
-int *pgm_argc, const char ***pgm_argv, struct init_args_t * args)>
+struct init_args_t * args)>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -728,31 +544,24 @@ Parse Parrot's command line for options and set appropriate flags.
 
 static void
 parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
-        ARGOUT(int *pgm_argc), ARGOUT(const char ***pgm_argv),
         ARGMOD(struct init_args_t * args))
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    const char * outfile = NULL;
     int status;
     int result = 1;
-    const char *sourcefile;
-
-    args->run_core_name = "fast";
-    args->write_packfile = 0;
-    args->execute_packfile = 1;
-    args->have_pbc_file = 0;
-    args->have_pasm_file = 0;
-    args->trace = 0;
-    args->turn_gc_off = 0;
-    args->outfile = NULL;
-    args->sourcefile = NULL;
-    args->preprocess_only = 0;
+    int nsysargs = 0;
+    const char **sysargs = (const char**)calloc(argc, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);
         exit(EXIT_SUCCESS);
     }
+
+    args->run_core_name = "fast";
+    args->trace = 0;
+    args->turn_gc_off = 0;
+    sysargs[nsysargs++] = argv[argc];
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
@@ -792,8 +601,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             fgetc(stdin);
             break;
           case 'h':
-            help();
-            exit(EXIT_FAILURE);
+            sysargs[nsysargs++] = "-h";
             break;
           case OPT_HASH_SEED:
             /* handled in parseflags_minimal */
@@ -804,6 +612,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case OPT_RUNTIME_PREFIX:
             {
+                /* TODO Can we do this in prt0.pir? */
                 Parrot_String runtimepath;
                 char * runtimepath_c;
                 Parrot_api_get_runtime_path(interp, &runtimepath);
@@ -813,24 +622,18 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 exit(EXIT_SUCCESS);
             }
           case 'V':
-            Parrot_version();
+            sysargs[nsysargs++] = "-V";
             break;
           case OPT_PBC_OUTPUT:
           case 'o':
-            args->write_packfile = 1;
-            args->execute_packfile = 0;
-            outfile = opt.opt_arg;
-            if (!Parrot_api_string_import(interp, opt.opt_arg, &args->outfile))
-                show_last_error_and_exit(interp);
+            sysargs[nsysargs++] = "-o";
+            sysargs[nsysargs++] = opt.opt_arg;
             break;
           case 'r':
-            args->write_packfile = 1;
-            args->execute_packfile = 1;
-            /* TODO: What else do we need to do for -r? We need to write the
-                     packfile out to a file first, then open and execute it? */
+            sysargs[nsysargs++] = "-r";
             break;
           case 'c':
-            args->have_pbc_file = 1;
+            sysargs[nsysargs++] = "-c";
             break;
           case OPT_GC_DEBUG:
           /*
@@ -848,6 +651,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             /* Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1); */
             result = Parrot_api_flag(interp, 0x200, 1);
             break;
+
+            /* TODO: Can we do these in prt0.pir? */
           case 'I':
             result = Parrot_api_add_include_search_path(interp, opt.opt_arg);
             break;
@@ -861,80 +666,36 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
             result = Parrot_api_set_warnings(interp, 0xFFFF);
             break;
+
           case 'E':
-            args->preprocess_only = 1;
+            sysargs[nsysargs++] = "-E";
+            break;
           default:
             /* languages handle their arguments later (after being initialized) */
             break;
         }
+        if (!result) {
+            fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
+            usage(stderr);
+            exit(EXIT_FAILURE);
+        }
     }
 
-    if (!result) {
-        fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
-        usage(stderr);
-        exit(EXIT_FAILURE);
-    }
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
         exit(EXIT_FAILURE);
     }
 
-    /* reached the end of the option list and consumed all of argv */
-    if (argc == opt.opt_index) {
-        /* We are not looking at an option, so it must be a program name */
-        fprintf(stderr, "Missing program name\n");
-        usage(stderr);
-        exit(EXIT_FAILURE);
-    }
-
-    *pgm_argc = argc - opt.opt_index;
-    *pgm_argv = argv + opt.opt_index;
-
-    sourcefile = (*pgm_argv)[0];
-    if (sourcefile) {
-        const char * const ext = strrchr(sourcefile, '.');
-        if (ext) {
-            if (strcmp(ext, ".pbc") == 0)
-                args->have_pbc_file = 1;
-            else if (strcmp(ext, ".pasm") == 0)
-                args->have_pasm_file = 1;
-        }
-    }
-    verify_file_names(sourcefile, outfile);
-    if (!Parrot_api_string_import(interp, sourcefile, &args->sourcefile))
-        show_last_error_and_exit(interp);
-}
-
-/*
-
-=item C<static void verify_file_names(const char * input, const char * output)>
-
-Verify that the input and output filenames are sane and are not the same.
-
-=cut
-
-*/
-
-static void
-verify_file_names(ARGIN_NULLOK(const char * input), ARGIN_NULLOK(const char * output))
-{
-    ASSERT_ARGS(verify_file_names)
-    const char is_stdin = (input == NULL);
-    const char is_stdout = (output == NULL);
-    if (!is_stdin && !is_stdout && (strcmp(input, output)==0)) {
-        fprintf(stderr, "Input and output files are the same");
-        exit(EXIT_FAILURE);
-    }
+    args->progargv = argv + opt.opt_index;
+    args->progargc = argc - opt.opt_index;
+    args->sysargv = sysargs;
+    args->sysargc = nsysargs;
 }
 
 /*
 
 =back
-
-=head1 SEE ALSO
-
-F<compilers/imcc/main.c>, unfortunately.
 
 =cut
 

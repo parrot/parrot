@@ -23,7 +23,6 @@ pir_output_is( <<'CODE', <<'OUT', "low-level syntax" );
     .get_result z
     .end_call
     print z
-    end
 .end
 .sub _sub
     .param int a
@@ -46,7 +45,6 @@ pir_output_is( <<'CODE', <<'OUT', "func() syntax" );
     .local string z
     z = _sub(10, y)
     print z
-    end
 .end
 .sub _sub
     .param int a
@@ -88,7 +86,6 @@ pir_output_is( <<'CODE', <<'OUT', "_func() syntax with var - global" );
     .local pmc the_sub
     the_sub = get_global "_sub"
     the_sub(10, 20)
-    end
 .end
 .sub _sub
     .param int a
@@ -97,7 +94,6 @@ pir_output_is( <<'CODE', <<'OUT', "_func() syntax with var - global" );
     print "\n"
     print b
     print "\n"
-    end
 .end
 CODE
 10
@@ -126,7 +122,6 @@ pir_output_is( <<'CODE', <<'OUT', "tail recursive sub" );
     result = _fact(product, count)
     print result
     print "\n"
-    end
 .end
 
 .sub _fact
@@ -280,7 +275,6 @@ pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
     .set_arg z
     .call s
     .end_call
-    end
 .end
 .sub _sub
     .param pmc a
@@ -328,7 +322,6 @@ pir_output_is( <<'CODE', <<'OUT', "foo (arg :flat)" );
     push ar2, "ok 4\n"
     push ar2, "ok 5\n"
     _sub(x, ar :flat, y, ar2 :flat, z)
-    end
 .end
 
 .sub _sub
@@ -364,7 +357,6 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', ":main pragma, syntax only" );
 .sub _main :main
     print "ok\n"
-    end
 .end
 CODE
 ok
@@ -376,7 +368,6 @@ OUT
 pir_output_like( <<'CODE', <<'OUT', "more pragmas, syntax only" );
 .sub _main :main :load :postcomp
     print "ok\n"
-    end
 .end
 CODE
 /(ok\n){1,2}/
@@ -401,14 +392,12 @@ pir_output_is( <<'CODE', <<'OUT', "\:main defined twice" );
         set $S0, 'ok'
         print $S0
         print "\r\n"
-        end
 .end
 
 .sub bar :main
         set $S0, 'not ok'
         print $S0
         print "\r\n"
-        end
 .end
 CODE
 ok
