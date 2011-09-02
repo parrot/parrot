@@ -5,7 +5,9 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 32,
+    qw[run_command slurp_file];
+use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
 
@@ -692,6 +694,87 @@ in the handler
 ok 3
 ok 4
 OUTPUT
+
+# Test massaged from TT #2188
+{
+    sub compile_wx {
+        my $code = shift;
+        my ($fh, $wx_filename) = create_tempfile( SUFFIX => '.winxed', UNLINK => 1 );
+        (undef, my $pir_filename) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+        (undef, my $pbc_filename) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
+        print $fh $code;
+        if (system(qw[./winxed --target=pir -o], $pir_filename, $wx_filename)
+        ||  system(qw[./parrot -o], $pbc_filename, $pir_filename)) {
+            die "couldn't compile winxed";
+        }
+        close $fh;
+        return $pbc_filename;
+    }
+
+
+    my $friend = compile_wx(<<'WX1'); my $exptest = compile_wx(sprintf(<<'WX2', $friend));
+namespace em {
+    class Friend {
+        function Friend() {}
+
+        function call() {
+            throw new 'Exception'({
+                        "message"   : "Damned ! an exception !",
+                        "severity"  : 100});
+        }
+    }
+}
+WX1
+$load '%s';
+
+namespace em {
+    class User {
+        function User() {}
+
+        function call0() {
+            try {
+                self.call1();
+            } catch(ex) {
+                say(ex['message']);
+                for (string exstr in ex.backtrace_strings()) {
+                    for (string str in split("\n",exstr)) {
+                        say(str);
+                    }
+                }
+            }
+            self.call1();
+        }
+
+        function call1() {
+            var friend = new em.Friend();
+            friend.call();
+        }
+    }
+}
+
+function main[main]() {
+    var user = new em.User();
+    user.call0();
+}
+WX2
+
+    (undef, my $user_bt_file) = create_tempfile( UNLINK => 1 );
+    (undef, my $auto_bt_file) = create_tempfile( UNLINK => 1 );
+
+    run_command("./parrot $exptest",
+        STDOUT => $user_bt_file,
+        STDERR => $auto_bt_file);
+
+    my @user_bt = split /\n/, slurp_file($user_bt_file);
+    my @auto_bt = split /\n/, slurp_file($auto_bt_file);
+
+    # 3rd backtrace frame differs intentionally
+    delete $user_bt[3]; delete $auto_bt[3];
+
+    is_deeply([@user_bt], [@auto_bt],
+        "user-level backtraces the same as automatically generated backtraces");
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
