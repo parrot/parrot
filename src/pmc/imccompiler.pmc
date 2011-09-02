@@ -51,7 +51,7 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
         Parrot_unblock_GC_mark((i)); \
         (i)->code = __old_bc; \
         if (!PMC_IS_NULL(__old_cur_pf)) \
-            Parrot_pf_set_current_packfile((i), __old_cur_pf); \
+            Parrot_pf_set_current_packfile((i), __old_cur_pf, 1); \
     } while (0)
 
 #define ERROR_IMCC_COMPILE(i) \
@@ -59,7 +59,7 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
     Parrot_unblock_GC_mark((i)); \
     (i)->code = __old_bc; \
     if (!PMC_IS_NULL(__old_cur_pf)) \
-        Parrot_pf_set_current_packfile((i), __old_cur_pf); \
+        Parrot_pf_set_current_packfile((i), __old_cur_pf, 1); \
 
 /*
 
