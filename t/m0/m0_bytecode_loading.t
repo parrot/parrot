@@ -8,6 +8,7 @@ use feature 'say';
 use Test::More;
 use Parrot::Test tests => 7;
 use Data::Dumper;
+use File::Spec::Functions;
 
 =head1 NAME
 
@@ -37,7 +38,7 @@ my $M0_BC_SEG       = 0x04;
 
 # basic test with one chunk containing all empty segments
 
-my $m0_interp = "$^X src/m0/perl5/m0_interp.pl";
+my $m0_interp = $ENV{M0_INTERP} || "$^X " . catfile(qw/src m0 perl5 m0_interp.pl/);
 
 my $m0b_data = [
     { 
