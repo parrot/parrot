@@ -55,7 +55,10 @@
     - 'deprecated'
     - 'PIR'
     - 'syntax'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1705'
+  tickets:
+    - 'https://trac.parrot.org/parrot/ticket/1033'
+    - 'https://trac.parrot.org/parrot/ticket/1704'
+    - 'https://trac.parrot.org/parrot/ticket/1705'
 -
   name:  'Action methods in rules'
   note:  'Per Synopsis 5, all regexes will have an implied {*} token at the end which cause invocation of an action method if a ":action" object is supplied.'
@@ -515,3 +518,71 @@
   tags :
     - 'experimental'
   ticket : 'http://trac.parrot.org/parrot/ticket/2146'
+-
+  name : 'FixedPMCArray.set_pmc'
+  eligible : '3.1'
+  tags :
+    - 'deprecated'
+    - 'completed'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1904'
+-
+  name : 'Scalar PMC'
+  note : 'The Scalar PMC can be removed, so long as the behaviors of PMCs which inherit from it do not change.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1754'
+  eligible : '3.1'
+-
+  name : 'encoding:charset:"" string literals'
+  note : 'This form of string literals will be removed.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1808'
+  eligible : '3.1'
+-
+  name : 'Old string_* functions'
+  eligible : '3.0'
+  note : 'The old string_* functions will be removed.'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1809'
+-
+  name : 'PIR compiler availability'
+  eligible : '3.1'
+  note : 'The PIR compiler (currently IMCC) will be extracted to a separately loadable component.'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1868'
+-
+  name : '"constant" PObj'
+  eligible : '3.1'
+  note : |
+    "constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
+    should be properly marked during GC.
+
+    Functions C<Parrot_pmc_new_constant>, C<Parrot_pmc_new_constant_noinit>,
+    C<Parrot_pmc_new_constant_init> and C<Parrot_pmc_new_constant_init_int>
+    will be removed.
+
+    PObj flag C<PObj_constant_FLAG> and related macros will be removed.
+  ticket : 'https://trac.parrot.org/parrot/ticket/1875'
+-
+  name : 'Non-const STRING* arguments'
+  eligible : '3.1'
+  note : |
+    Due immutable nature of STRINGs we are changing internal handling to use only
+    const STRING pointers. It will improve optimizations possibilities by compiler,
+    make parrot const-correct, etc.
+    
+    Passing of non-const STRING* arguments is deprecated and will be changed to
+    const STRING*. This includes (but not limited to) all string API functions,
+    VTABLEs, PCC, etc
+  ticket : 'http://trac.parrot.org/parrot/ticket/1906'
+-
+  name : 'X-to-Y native PBC reading'
+  eligible : '3.1'
+  note : 'Support for PBC files optimized for alternate platforms will be dropped in favour of a universal network PBC format.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1961'
+-
+  name : 'The PIR and PASM compreg PMCs'
+  eligible : '3.1'
+  note : |
+    The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+    it will be a new type of PMC which conforms to PDD31 and will be similar to
+    HLLCompiler.
+    
+    There will not be a PASM compreg anymore.
+  ticket : 'http://trac.parrot.org/parrot/ticket/1967'
+

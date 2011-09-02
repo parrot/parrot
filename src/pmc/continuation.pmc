@@ -339,7 +339,7 @@ Experimental: return callers PMC or PMCNULL if none.
 
 =item C<PMC *continuation()>
 
-Experimental: returns continuation PMC of this Continuation or PMCNULL if none.
+Experimental: fetches the return continuation PMC of this Continuation or PMCNULL if none.
 
 =cut
 
