@@ -515,3 +515,10 @@
   tags :
     - 'experimental'
   ticket : 'http://trac.parrot.org/parrot/ticket/2146'
+-
+  name : 'FixedPMCArray.set_pmc'
+  eligible : '3.1'
+  tags :
+    - 'deprecated'
+    - 'completed'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1904'
