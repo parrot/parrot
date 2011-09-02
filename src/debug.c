@@ -229,11 +229,9 @@ static int nomoreargs(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC * sub),
     ARGMOD(PMC * ctx))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* sub)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(* ctx);
 
 PARROT_WARN_UNUSED_RESULT
@@ -3583,9 +3581,7 @@ Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
     if (PMC_IS_NULL(ctx))
         return STRINGNULL;
     else {
-        const Parrot_CallContext_attributes * const cattrs = PARROT_CALLCONTEXT(ctx);
-        PMC * const sub = cattrs->current_sub;
-        STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+        STRING * const bt = PDB_get_continuation_backtrace(interp, ctx);
         return bt;
     }
 }
@@ -3636,19 +3632,16 @@ PDB_backtrace(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_backtrace)
     /* information about the current sub */
-    PMC * const sub = interpinfo_p(interp, CURRENT_SUB);
-    PMC * const ctx = CURRENT_CONTEXT(interp);
-    STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+    STRING * const bt = PDB_get_continuation_backtrace(interp, CURRENT_CONTEXT(interp));
     Parrot_io_eprintf(interp, "%Ss", bt);
 }
 
 /*
 
-=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC * sub,
-PMC * ctx)>
+=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC *
+ctx)>
 
-Returns an string with the backtrace of interpreter's call chain for the given sub including
-context information.
+Returns an string with the backtrace of interpreter's call chain for the given context information.
 
 =cut
 
@@ -3657,9 +3650,10 @@ context information.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(PMC * ctx))
+PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD(PMC * ctx))
 {
     ASSERT_ARGS(PDB_get_continuation_backtrace)
+    PMC    *sub         = Parrot_pcc_get_sub(interp, ctx);
     STRING *str;
     PMC    *old         = PMCNULL;
     PMC    *output      = Parrot_pmc_new(interp, enum_class_StringBuilder);
