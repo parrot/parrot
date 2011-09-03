@@ -1,3 +1,7 @@
+New in 3.8.0
+- Core
+  + New parrot frontend executable, with bootstrapped PIR entry
+
 New in 3.7.0
 - Core
   + Added mem_sys_strndup function.
