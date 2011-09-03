@@ -63,7 +63,7 @@ SKIP: {
         ($PConfig{osname} eq 'darwin') and
         ($parrot_exe eq $build_parrot)
     );
-print "cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null";
+
     my $build_status =
         system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null")
         and croak "Unable to execute setup.pir";
