@@ -548,7 +548,7 @@
 -
   name : '"constant" PObj'
   eligible : '3.1'
-  note : |
+  note :
     "constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
     should be properly marked during GC.
 
@@ -561,7 +561,7 @@
 -
   name : 'Non-const STRING* arguments'
   eligible : '3.1'
-  note : |
+  note :
     Due immutable nature of STRINGs we are changing internal handling to use only
     const STRING pointers. It will improve optimizations possibilities by compiler,
     make parrot const-correct, etc.
@@ -578,11 +578,12 @@
 -
   name : 'The PIR and PASM compreg PMCs'
   eligible : '3.1'
-  note : |
+  note :
     The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
     it will be a new type of PMC which conforms to PDD31 and will be similar to
     HLLCompiler.
     
     There will not be a PASM compreg anymore.
   ticket : 'http://trac.parrot.org/parrot/ticket/1967'
+
 
