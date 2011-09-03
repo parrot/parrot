@@ -1269,12 +1269,14 @@ gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_free_pmc_attributes)
     if (PMC_data(pmc)) {
-        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-        Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
-                PMC_data(pmc), pmc->vtable->attr_size);
+        GC_Subsystem * const gc_sys = interp->gc_sys;
+        MarkSweep_GC * const self   = (MarkSweep_GC *)gc_sys->gc_private;
+        const UINTVAL        size   = pmc->vtable->attr_size;
 
-        interp->gc_sys->stats.memory_used           -= pmc->vtable->attr_size;
-        interp->gc_sys->stats.mem_used_last_collect -= pmc->vtable->attr_size;
+        Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator, PMC_data(pmc), size);
+
+        gc_sys->stats.memory_used           -= size;
+        gc_sys->stats.mem_used_last_collect -= size;
     }
 }
 

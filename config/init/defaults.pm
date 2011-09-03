@@ -64,7 +64,6 @@ sub runstep {
         scriptdirexp
         sig_name
         sPRIgldbl
-        sPRIgldbl
     | ) {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
     }

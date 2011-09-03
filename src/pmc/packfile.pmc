@@ -201,7 +201,15 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
         copy_packfile_header(INTERP, SELF, pf);
         VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
         Parrot_unblock_GC_mark(INTERP);
+
+        /* XXX memory leak
+         * Destroying the packfile here frees segments that may still have live references
+         * (eg: sub->seg)
+         * A memory leak is better than an invalid memory access
+         */
+#if 0
         PackFile_destroy(INTERP, pf);
+#endif
     }
 
 /*

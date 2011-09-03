@@ -16,7 +16,7 @@ package gen::config_pm;
 
 use strict;
 use warnings;
-
+use Data::Dumper;$Data::Dumper::Indent=1;
 use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 
@@ -68,9 +68,25 @@ sub runstep {
     # add some keys convenient for embedders
     $conf->data->add( ' ', 'embed-cflags' =>
         '-I' . $conf->data->get('includedir') . $conf->data->get('versiondir') );
-    $conf->data->add( ' ', 'embed-ldflags' =>
-        '-L' . $conf->data->get('libdir') . ' -lparrot ' . $conf->data->get('icu_shared') .
-        ' ' . $conf->data->get('libs') );
+    my $embed_ldflags_str = join(' ' => (
+        '-L' . $conf->data->get('libdir'),
+        '-lparrot',
+        $conf->data->get('icu_shared'),
+        $conf->data->get('libs'),
+    ) );
+    $embed_ldflags_str =~ s/\s+/ /g;
+    $embed_ldflags_str =~ s/\s+$//g;
+    # Eliminate duplicate entries
+    my @embeds = split / /, $embed_ldflags_str;
+    my %embeds_seen = ();
+    my @deduped = ();
+    for my $em (@embeds) {
+        if (! $embeds_seen{$em}) {
+            push @deduped, $em;
+            $embeds_seen{$em}++;
+        }
+    }
+    $conf->data->add( ' ', 'embed-ldflags' => join(' ' => @deduped) );
 
     my $cwd = cwd();
 

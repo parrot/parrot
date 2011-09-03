@@ -212,6 +212,9 @@
 /ext/Parrot-Embed/t/*.pbc
 /ext/nqp-rx/src/stage0/nqp-setting.pir
 /frontend/parrot/main.o
+/frontend/parrot2/main.o
+/frontend/parrot2/prt0.pbc
+/frontend/parrot2/prt0.pbc.c
 /frontend/parrot_debugger/main.o
 /frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o
