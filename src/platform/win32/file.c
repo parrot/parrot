@@ -95,25 +95,35 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_file_getcwd(PARROT_INTERP)
 {
+    /* counts terminating zero */
     DWORD   len = GetCurrentDirectoryW(0, NULL);
     STRING *result;
-    char   *c_str;
+    LPWSTR  wstr;
 
     if (!len)
         THROW("getcwd");
 
-    c_str = mem_gc_allocate_n_typed(interp, (len + 1) * 2, char);
-    len   = GetCurrentDirectoryW(len, (LPWSTR)c_str);
+    wstr = mem_allocate_n_typed(len, WCHAR);
+
+    /* doesn't count terminating zero */
+    len  = GetCurrentDirectoryW(len, wstr);
 
     if (!len) {
-        mem_gc_free(interp, c_str);
+        mem_sys_free(wstr);
         THROW("getcwd");
     }
 
-    result = Parrot_str_new_init(interp, c_str, len * 2,
+#ifdef __MSYS__
+    result = Parrot_platform_msys_path_to_str(interp, wstr);
+#else
+    result = Parrot_str_new_init(interp, (char *)wstr, len * 2,
                     Parrot_utf16_encoding_ptr, 0);
+#endif
 
-    mem_gc_free(interp, c_str);
+    mem_sys_free(wstr);
+
+    if (!result)
+        THROW("getcwd");
 
     return result;
 }

@@ -35,25 +35,55 @@ LPWSTR
 Parrot_platform_msys_str_to_path(PARROT_INTERP, ARGIN(STRING *path))
 {
     int    count;
-    char   rpath[MAX_PATH];
-    LPSTR  spath;
+    char   win32_path[MAX_PATH];
+    LPSTR  posix_path;
     LPWSTR wp_path;
 
-    spath = Parrot_str_to_encoded_cstring(interp, path,
-                Parrot_utf8_encoding_ptr);
+    posix_path = Parrot_str_to_encoded_cstring(interp, path,
+                     Parrot_utf8_encoding_ptr);
 
-    /* returns -1 for relative paths, 0 for abolute paths */
-    cygwin_conv_to_win32_path(spath, rpath);
-    Parrot_str_free_cstring(spath);
+    /* ignore return value (-1 for relative paths, 0 for abolute paths) */
+    cygwin_conv_to_win32_path(posix_path, win32_path);
+    Parrot_str_free_cstring(posix_path);
 
-    count = MultiByteToWideChar(CP_UTF8, 0, rpath, -1, NULL, 0);
+    count = MultiByteToWideChar(CP_UTF8, 0, win32_path, -1, NULL, 0);
     if(!count) return NULL;
 
     wp_path = mem_allocate_n_typed(count, WCHAR);
     if(!wp_path) return NULL;
 
-    MultiByteToWideChar(CP_UTF8, 0, rpath, -1, wp_path, count);
+    if(!MultiByteToWideChar(CP_UTF8, 0, win32_path, -1, wp_path, count))
+    {
+        mem_sys_free(wp_path);
+        return NULL;
+    }
+
     return wp_path;
+}
+
+PARROT_CAN_RETURN_NULL
+STRING *
+Parrot_platform_msys_path_to_str(PARROT_INTERP, ARGIN(LPWSTR path))
+{
+    /* TODO: check if cygwin_conv_to_posix_path() can be done in-place */
+    int  count;
+    char win32_path[MAX_PATH];
+    char posix_path[MAX_PATH];
+
+    count = WideCharToMultiByte(CP_UTF8, 0, path, -1, win32_path,
+                sizeof win32_path, NULL, NULL);
+
+    if(!count)
+        return NULL;
+
+    /* TODO: return value */
+    cygwin_conv_to_posix_path(win32_path, posix_path);
+
+    /* TODO: check if you can re-use old count */
+    count = strlen(posix_path);
+
+    return Parrot_str_new_init(interp, posix_path, count,
+               Parrot_utf8_encoding_ptr, 0);
 }
 
 #endif
