@@ -11,41 +11,40 @@
 #include <stdint.h>
 #include "pmc/pmc_sub.h"
 
+typedef struct subprofile subprofile;
+typedef struct callinfo callinfo;
+
 struct callinfo {
-    struct subprofile *callee;
-    int                count;
-    unsigned int       ops;
-    uint64_t           ticks;
+    subprofile   *callee;
+    int           count;
+    unsigned int  ops;
+    uint64_t      ticks;
 };
 
 struct subprofile {
-    struct subprofile     *hnext;
-
-    struct subprofile     *rnext;
+    subprofile            *hnext;
+    subprofile            *rnext;
     int                    rcnt;
-
     PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
-
-    struct callinfo       *calls;
+    callinfo              *calls;
     int                    ncalls;
-
     unsigned int           ops;
     uint64_t               ticks;
 
     /* call chain */
-    struct subprofile     *caller;
+    subprofile            *caller;
     int                    calleri;
     PMC                   *ctx;
     unsigned int           callerops;
     uint64_t               callerticks;
 };
 
-struct subprofile *subprofilehash[32768];
+subprofile *subprofilehash[32768];
 
 static PMC *cursubpmc;
 static PMC *curctx;
-static struct subprofile *cursp;
+static subprofile *cursp;
 
 uint64_t opstart;
 
@@ -65,7 +64,7 @@ void dump_profile_data(PARROT_INTERP)
 void profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
         __attribute__nonnull__(1);
 
-static struct subprofile * sub2subprofile(PARROT_INTERP,
+static subprofile * sub2subprofile(PARROT_INTERP,
     PMC *ctx,
     PMC *subpmc)
         __attribute__nonnull__(1);

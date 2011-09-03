@@ -42,16 +42,16 @@ static void finishcallchain(PARROT_INTERP)
 static void popcallchain(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void printspline(PARROT_INTERP, struct subprofile *sp)
+static void printspline(PARROT_INTERP, subprofile *sp)
         __attribute__nonnull__(1);
 
-static void printspname(PARROT_INTERP, struct subprofile *sp)
+static void printspname(PARROT_INTERP, subprofile *sp)
         __attribute__nonnull__(1);
 
 static inline const char * str2cs(PARROT_INTERP, STRING *s)
         __attribute__nonnull__(1);
 
-static struct subprofile * sub2subprofile(PARROT_INTERP,
+static subprofile * sub2subprofile(PARROT_INTERP,
     PMC *ctx,
     PMC *subpmc)
         __attribute__nonnull__(1);
@@ -83,13 +83,13 @@ implements a hash.  Don't do this.
 
 */
 
-static struct subprofile *
+static subprofile *
 sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 {
     Parrot_Sub_attributes *sub;
     int h;
-    struct subprofile *sp, **spp;
-    static struct subprofile *lastsp;
+    subprofile *sp, **spp;
+    static subprofile *lastsp;
 
     PMC_get_sub(interp, subpmc, sub);
     if (lastsp && lastsp->sub == sub)
@@ -99,7 +99,7 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         if (sp->sub == sub)
             break;
     if (!sp) {
-        sp         = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
+        sp         = (subprofile *)calloc(sizeof(subprofile), 1);
         sp->sub    = sub;
         sp->subpmc = subpmc;
         *spp       = sp;
@@ -119,8 +119,8 @@ str2cs(PARROT_INTERP, STRING *s)
 static void
 popcallchain(PARROT_INTERP)
 {
-    struct subprofile *sp = cursp;
-    struct subprofile *csp = sp->caller;
+    subprofile *sp = cursp;
+    subprofile *csp = sp->caller;
     if (csp) {
         csp->calls[sp->calleri].ops   += sp->callerops;
         csp->calls[sp->calleri].ticks += sp->callerticks;
@@ -152,7 +152,7 @@ the process.
 static void
 finishcallchain(PARROT_INTERP)
 {
-    struct subprofile *sp, *csp;
+    subprofile *sp, *csp;
 
     /* finish all calls */
     for (sp = cursp; sp; sp = csp) {
@@ -188,7 +188,7 @@ static void
 buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 {
     PMC *cctx;
-    struct subprofile *sp;
+    subprofile *sp;
 
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
     if (cctx) {
@@ -202,8 +202,8 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     while (sp->ctx) {
         /* recursion! */
         if (!sp->rnext) {
-            struct subprofile *rsp;
-            rsp         = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
+            subprofile *rsp;
+            rsp         = (subprofile *)calloc(sizeof(subprofile), 1);
             rsp->sub    = sp->sub;
             rsp->subpmc = sp->subpmc;
             rsp->rcnt   = sp->rcnt + 1;
@@ -214,16 +214,16 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     sp->ctx = ctx;
     sp->caller = cursp;
     if (cursp) {
-        struct subprofile *csp = cursp;
+        subprofile *csp = cursp;
         int i;
         for (i = 0; i < csp->ncalls; i++) if (csp->calls[i].callee == sp)
                 break;
         if (i == csp->ncalls) {
             if ((csp->ncalls & 15) == 0) {
                 if (csp->ncalls)
-                    csp->calls = (struct callinfo *)realloc(csp->calls, sizeof(*csp->calls) * (csp->ncalls + 16));
+                    csp->calls = (callinfo *)realloc(csp->calls, sizeof(*csp->calls) * (csp->ncalls + 16));
                 else
-                    csp->calls = (struct callinfo *)malloc(sizeof(*csp->calls) * (csp->ncalls + 16));
+                    csp->calls = (callinfo *)malloc(sizeof(*csp->calls) * (csp->ncalls + 16));
             }
             memset(csp->calls + i, 0, sizeof(*csp->calls));
             csp->calls[i].callee = sp;
@@ -237,7 +237,7 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 }
 
 static void
-printspname(PARROT_INTERP, struct subprofile *sp)
+printspname(PARROT_INTERP, subprofile *sp)
 {
     fprintf(stderr, "%p:%s", sp, str2cs(interp, sp->sub->name));
     if (sp->rcnt)
@@ -245,7 +245,7 @@ printspname(PARROT_INTERP, struct subprofile *sp)
 }
 
 static void
-printspline(PARROT_INTERP, struct subprofile *sp)
+printspline(PARROT_INTERP, subprofile *sp)
 {
     PMC * annot;
     PackFile_Annotations *ann;
@@ -312,9 +312,9 @@ dump_profile_data(PARROT_INTERP)
     finishcallchain(interp);	/* just in case... */
 
     for (h = 0; h < 32767; h++) {
-        struct subprofile *hsp;
+        subprofile *hsp;
         for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
-            struct subprofile *sp;
+            subprofile *sp;
             for (sp = hsp; sp; sp = sp->rnext) {
                 int i;
 
@@ -327,7 +327,7 @@ dump_profile_data(PARROT_INTERP)
                 fprintf(stderr, "\n");
                 fprintf(stderr, "0 %d %lld\n", sp->ops, sp->ticks);
                 for (i = 0; i < sp->ncalls; i++) {
-                    struct subprofile *csp = sp->calls[i].callee;
+                    subprofile *csp = sp->calls[i].callee;
                     fprintf(stderr, "cfl=");
                     printspline(interp, csp);
                     fprintf(stderr, "\n");
@@ -370,7 +370,7 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
 {
     PMC *subpmc;
     PackFile_ByteCode  *code = interp->code;
-    struct subprofile *sp;
+    subprofile *sp;
 
     uint64_t tick;
 
