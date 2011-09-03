@@ -28,6 +28,7 @@ the C-library.
 #include "pmc/pmc_parrotinterpreter.h"
 #include "inter_cb.str"
 
+static Interp * default_interp = NULL;
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -79,6 +80,10 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC *cb, *cb_sig;
     int type = 0;
     STRING *sc;
+
+    if (default_interp == NULL)
+        default_interp = interp;
+
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
@@ -156,7 +161,7 @@ static void
 verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
 {
     ASSERT_ARGS(verify_CD)
-    PARROT_INTERP = NULL;
+    PARROT_INTERP = default_interp;
     PMC    *interp_pmc;
     STRING *sc;
 
@@ -175,12 +180,10 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
         PANIC(interp, "user_data doesn't look like a pointer");
 
     /* Fetch original interpreter from prop */
-    /*sc          = CONST_STRING(interp, "_interpreter");
+    sc          = CONST_STRING(interp, "_interpreter");
     interp_pmc  = VTABLE_getprop(interp, user_data, sc);
     GETATTR_ParrotInterpreter_interp(interp, interp_pmc, interp);
-    if (!interp)*/
-    // TODO: Need to figure out how to handle this. Might need to rearrange
-    // the struture of user_data to make the interp easier to get.
+    if (!interp)
         PANIC(interp, "interpreter not found for callback");
 
     /*
@@ -198,7 +201,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
     /*
      * ok fine till here
      */
-    //callback_CD(interp, external_data, user_data);
+    callback_CD(interp, external_data, user_data);
 }
 
 /*
