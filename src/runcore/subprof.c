@@ -89,8 +89,7 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     for (spp = subprofilehash + h; (sp = *spp) != 0; spp = &sp->hnext)
         if (sp->sub == sub)
             break;
-    if (!sp)
-    {
+    if (!sp) {
         sp = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
         sp->sub = sub;
         sp->subpmc = subpmc;
@@ -113,8 +112,7 @@ popcallchain(PARROT_INTERP)
 {
     struct subprofile *sp = cursp;
     struct subprofile *csp = sp->caller;
-    if (csp)
-    {
+    if (csp) {
         csp->calls[sp->calleri].ops += sp->callerops;
         csp->calls[sp->calleri].ticks += sp->callerticks;
         csp->callerops += sp->callerops;
@@ -137,11 +135,9 @@ finishcallchain(PARROT_INTERP)
     struct subprofile *sp, *csp;
 
     /* finish all calls */
-    for (sp = cursp; sp; sp = csp)
-    {
+    for (sp = cursp; sp; sp = csp) {
         csp = sp->caller;
-        if (csp)
-        {
+        if (csp) {
             csp->calls[sp->calleri].ops += sp->callerops;
             csp->calls[sp->calleri].ticks += sp->callerticks;
             csp->callerops += sp->callerops;
@@ -165,8 +161,7 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     struct subprofile *sp;
 
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
-    if (cctx)
-    {
+    if (cctx) {
         PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
         if (curctx != cctx || cursubpmc != csubpmc)
             buildcallchain(interp, cctx, csubpmc);
@@ -174,11 +169,9 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     if (PMC_IS_NULL(subpmc))
         return;
     sp = sub2subprofile(interp, ctx, subpmc);
-    while (sp->ctx)
-    {
+    while (sp->ctx) {
         /* recursion! */
-        if (!sp->rnext)
-        {
+        if (!sp->rnext) {
             struct subprofile *rsp;
             rsp = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
             rsp->sub = sp->sub;
@@ -190,17 +183,13 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     }
     sp->ctx = ctx;
     sp->caller = cursp;
-    if (cursp)
-    {
+    if (cursp) {
         struct subprofile *csp = cursp;
         int i;
-        for (i = 0; i < csp->ncalls; i++)
-            if (csp->calls[i].callee == sp)
+        for (i = 0; i < csp->ncalls; i++) if (csp->calls[i].callee == sp)
                 break;
-        if (i == csp->ncalls)
-        {
-            if ((csp->ncalls & 15) == 0)
-            {
+        if (i == csp->ncalls) {
+            if ((csp->ncalls & 15) == 0) {
                 if (csp->ncalls)
                     csp->calls = (struct callinfo *)realloc(csp->calls, sizeof(*csp->calls) * (csp->ncalls + 16));
                 else
@@ -238,28 +227,24 @@ printspline(PARROT_INTERP, struct subprofile *sp)
         return;
     ann = sp->sub->seg->annotations;
     /* search for the first line annotation in our sub */
-    for (i = 0; i < ann->num_keys; i++)
-    {
+    for (i = 0; i < ann->num_keys; i++) {
         STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
         if (STRING_equal(interp, test_key, line_str))
             break;
 
     }
-    if (i < ann->num_keys)
-    {
+    if (i < ann->num_keys) {
         /* ok, found the line key, now search for the sub */
         unsigned int j;
         key = ann->keys + i;
-        for (j = key->start; j < key->start + key->len; j++)
-        {
+        for (j = key->start; j < key->start + key->len; j++) {
             if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->sub->start_offs)
                 continue;
             if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->sub->end_offs)
                 continue;
             break;
         }
-        if (j < key->start + key->len)
-        {
+        if (j < key->start + key->len) {
             /* found it! */
             INTVAL line = ann->base.data[j * 2 + ANN_ENTRY_VAL];
             /* need +1, sigh */
@@ -284,14 +269,11 @@ dump_profile_data(PARROT_INTERP)
     fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
     finishcallchain(interp);	/* just in case... */
 
-    for (h = 0; h < 32767; h++)
-    {
+    for (h = 0; h < 32767; h++) {
         struct subprofile *hsp;
-        for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext)
-        {
+        for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
             struct subprofile *sp;
-            for (sp = hsp; sp; sp = sp->rnext)
-            {
+            for (sp = hsp; sp; sp = sp->rnext) {
                 int i;
 
                 fprintf(stderr, "\n");
@@ -302,8 +284,7 @@ dump_profile_data(PARROT_INTERP)
                 printspname(interp, sp);
                 fprintf(stderr, "\n");
                 fprintf(stderr, "0 %d %lld\n", sp->ops, sp->ticks);
-                for (i = 0; i < sp->ncalls; i++)
-                {
+                for (i = 0; i < sp->ncalls; i++) {
                     struct subprofile *csp = sp->calls[i].callee;
                     fprintf(stderr, "cfl=");
                     printspline(interp, csp);
@@ -343,8 +324,7 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
 
     /* finish old ticks */
     tick = rdtsc();
-    if (tickadd)
-    {
+    if (tickadd) {
         uint64_t tickdiff = tick - starttick;
         *tickadd += tickdiff;
         *tickadd2 += tickdiff;
@@ -356,44 +336,36 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
     if (PMC_IS_NULL(subpmc))
         return;
 
-    if (subpmc != cursubpmc || ctx != curctx)
-    {
+    if (subpmc != cursubpmc || ctx != curctx) {
         /* context changed! either called new sub or returned from sub */
-        if (cursp)
-        {
+        if (cursp) {
             /* optimize common cases */
             /* did we just return? */
-            if (cursp->caller && cursp->caller->subpmc == subpmc && cursp->caller->ctx == ctx)
-            {
+            if (cursp->caller && cursp->caller->subpmc == subpmc && cursp->caller->ctx == ctx) {
                 /* a simple return */
                 popcallchain(interp);
             }
-            else
-            {
+            else {
                 PMC *cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
                 PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
-                if (curctx == cctx && cursubpmc == csubpmc)
-                {
+                if (curctx == cctx && cursubpmc == csubpmc) {
                     /* a simple call */
                     buildcallchain(interp, ctx, subpmc);
                 }
-                else if (cursp->caller && cursp->caller->subpmc == csubpmc && cursp->caller->ctx == cctx)
-                {
+                else if (cursp->caller && cursp->caller->subpmc == csubpmc && cursp->caller->ctx == cctx) {
                     /* some kind of tailcall */
                     popcallchain(interp);
                     buildcallchain(interp, ctx, subpmc);
                 }
             }
         }
-        if (subpmc != cursubpmc || ctx != curctx)
-        {
+        if (subpmc != cursubpmc || ctx != curctx) {
             /* out of luck! redo call chain */
             finishcallchain(interp);
             buildcallchain(interp, ctx, subpmc);
         }
         sp = cursp;
-        if (pc == sp->sub->seg->base.data + sp->sub->start_offs)
-        {
+        if (pc == sp->sub->seg->base.data + sp->sub->start_offs) {
             /* assume new call */
             if (sp->caller)
                 sp->caller->calls[sp->calleri].count++;
