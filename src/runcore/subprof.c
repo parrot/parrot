@@ -73,6 +73,15 @@ static struct subprofile * sub2subprofile(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*        
+
+=item *C<static thingy sub2subprofile(...)>
+
+implements a hash.  Don't do this.
+
+=cut
+
+*/
 
 static struct subprofile *
 sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
@@ -90,10 +99,10 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         if (sp->sub == sub)
             break;
     if (!sp) {
-        sp = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
-        sp->sub = sub;
+        sp         = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
+        sp->sub    = sub;
         sp->subpmc = subpmc;
-        *spp = sp;
+        *spp       = sp;
     }
     lastsp = sp;
     return sp;
@@ -113,21 +122,32 @@ popcallchain(PARROT_INTERP)
     struct subprofile *sp = cursp;
     struct subprofile *csp = sp->caller;
     if (csp) {
-        csp->calls[sp->calleri].ops += sp->callerops;
+        csp->calls[sp->calleri].ops   += sp->callerops;
         csp->calls[sp->calleri].ticks += sp->callerticks;
-        csp->callerops += sp->callerops;
-        csp->callerticks += sp->callerticks;
+        csp->callerops                += sp->callerops;
+        csp->callerticks              += sp->callerticks;
     }
-    sp->ctx = 0;
-    sp->callerops = 0;
+    sp->ctx         = 0;
+    sp->callerops   = 0;
     sp->callerticks = 0;
-    sp->caller = 0;
-    sp->calleri = 0;
-    sp->ctx = 0;
-    cursubpmc = csp ? csp->subpmc : 0;
-    curctx = csp ? csp->ctx : 0;
-    cursp = csp;
+    sp->caller      = 0;
+    sp->calleri     = 0;
+    sp->ctx         = 0;
+    cursubpmc       = csp ? csp->subpmc : 0;
+    curctx          = csp ? csp->ctx : 0;
+    cursp           = csp;
 }
+
+/*
+
+=item * C<static void finishcallchain(PARROT_INTERP)>
+
+Propagate timing information up the call chain, clearing out old frames during
+the process.
+
+=cut
+
+*/
 
 static void
 finishcallchain(PARROT_INTERP)
@@ -138,21 +158,31 @@ finishcallchain(PARROT_INTERP)
     for (sp = cursp; sp; sp = csp) {
         csp = sp->caller;
         if (csp) {
-            csp->calls[sp->calleri].ops += sp->callerops;
+            csp->calls[sp->calleri].ops   += sp->callerops;
             csp->calls[sp->calleri].ticks += sp->callerticks;
-            csp->callerops += sp->callerops;
-            csp->callerticks += sp->callerticks;
+            csp->callerops                += sp->callerops;
+            csp->callerticks              += sp->callerticks;
         }
-        sp->callerops = 0;
+        sp->callerops   = 0;
         sp->callerticks = 0;
-        sp->caller = 0;
-        sp->calleri = 0;
-        sp->ctx = 0;
+        sp->caller      = 0;
+        sp->calleri     = 0;
+        sp->ctx         = 0;
     }
-    cursp = 0;
-    curctx = 0;
+    cursp     = 0;
+    curctx    = 0;
     cursubpmc = 0;
 }
+
+/*
+
+=item * C<static void buildcallchain(...)>
+
+...
+
+=cut
+
+*/
 
 static void
 buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
@@ -173,11 +203,11 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         /* recursion! */
         if (!sp->rnext) {
             struct subprofile *rsp;
-            rsp = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
-            rsp->sub = sp->sub;
+            rsp         = (struct subprofile *)calloc(sizeof(struct subprofile), 1);
+            rsp->sub    = sp->sub;
             rsp->subpmc = sp->subpmc;
-            rsp->rcnt = sp->rcnt + 1;
-            sp->rnext = rsp;
+            rsp->rcnt   = sp->rcnt + 1;
+            sp->rnext   = rsp;
         }
         sp = sp->rnext;
     }
@@ -201,8 +231,8 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         }
         sp->calleri = i;
     }
-    cursp = sp;
-    curctx = ctx;
+    cursp     = sp;
+    curctx    = ctx;
     cursubpmc = subpmc;
 }
 
@@ -256,6 +286,18 @@ printspline(PARROT_INTERP, struct subprofile *sp)
         }
     }
 }
+
+/*
+
+=item * C<void dump_profile_data(PARROT_INTERP)>
+
+After the program has completed, print the resulting callgrind-compatible
+profile to stderr.
+
+=cut
+
+*/
+
 
 void
 dump_profile_data(PARROT_INTERP)
@@ -313,6 +355,16 @@ __inline__ uint64_t rdtsc(void) {
     return (uint64_t)hi << 32 | lo; 
 }
 
+/*
+
+=item * C<void profile(...)>
+
+main entry point for this pile, does all accounting for a single op
+
+=cut
+
+*/
+
 void
 profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
 {
@@ -326,10 +378,10 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
     tick = rdtsc();
     if (tickadd) {
         uint64_t tickdiff = tick - starttick;
-        *tickadd += tickdiff;
-        *tickadd2 += tickdiff;
-        totalticks += tickdiff;
-        starttick = tick;
+        *tickadd         += tickdiff;
+        *tickadd2        += tickdiff;
+        totalticks       += tickdiff;
+        starttick         = tick;
     }
 
     subpmc = Parrot_pcc_get_sub(interp, ctx);
@@ -370,8 +422,8 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
             if (sp->caller)
                 sp->caller->calls[sp->calleri].count++;
         }
-        tickadd = &sp->ticks;
-        tickadd2 = &sp->callerticks;
+        tickadd   = &sp->ticks;
+        tickadd2  = &sp->callerticks;
         starttick = rdtsc();
     }
     sp = cursp;

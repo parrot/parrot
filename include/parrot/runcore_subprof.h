@@ -13,32 +13,32 @@
 
 struct callinfo {
     struct subprofile *callee;
-    int count;
-    unsigned int ops;
-    uint64_t ticks;
+    int                count;
+    unsigned int       ops;
+    uint64_t           ticks;
 };
 
 struct subprofile {
-    struct subprofile *hnext;
+    struct subprofile     *hnext;
 
-    struct subprofile *rnext;
-    int rcnt;
+    struct subprofile     *rnext;
+    int                    rcnt;
 
-    PMC *subpmc;
+    PMC                   *subpmc;
     Parrot_Sub_attributes *sub;
 
-    struct callinfo *calls;
-    int ncalls;
+    struct callinfo       *calls;
+    int                    ncalls;
 
-    unsigned int ops;
-    uint64_t ticks;
+    unsigned int           ops;
+    uint64_t               ticks;
 
     /* call chain */
-    struct subprofile *caller;
-    int calleri;
-    PMC *ctx;
-    unsigned int callerops;
-    uint64_t callerticks;
+    struct subprofile     *caller;
+    int                    calleri;
+    PMC                   *ctx;
+    unsigned int           callerops;
+    uint64_t               callerticks;
 };
 
 struct subprofile *subprofilehash[32768];
@@ -65,9 +65,17 @@ void dump_profile_data(PARROT_INTERP)
 void profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
         __attribute__nonnull__(1);
 
+static struct subprofile * sub2subprofile(PARROT_INTERP,
+    PMC *ctx,
+    PMC *subpmc)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_dump_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_profile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_struct subprofile * sub2subprofile \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/subprof.c */
