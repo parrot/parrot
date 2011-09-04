@@ -576,9 +576,9 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 
     pool->num_arenas++;
     if (pool->arena_bounds == NULL)
-        pool->arena_bounds = mem_sys_allocate(2 * pool->num_arenas * sizeof (void*));
-    else
-        pool->arena_bounds = mem_sys_realloc(pool->arena_bounds, 2 * pool->num_arenas * sizeof (void*));
+        pool->arena_bounds = mem_sys_allocate(NEXT_ARENA_BOUNDS_SIZE(0));
+    else if (pool->num_arenas % ARENA_BOUNDS_PADDING == 0)
+        pool->arena_bounds = mem_sys_realloc(pool->arena_bounds, NEXT_ARENA_BOUNDS_SIZE(pool->num_arenas));
     {
         size_t ptr_idx = (pool->num_arenas - 1) * 2;
         pool->arena_bounds[ptr_idx] = (size_t) (new_arena + 1);

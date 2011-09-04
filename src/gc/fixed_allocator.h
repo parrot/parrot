@@ -23,6 +23,9 @@ src/gc/fixed_allocator.h - implementation of allocator for small-size objects.
    increase *_HEADERS_PER_ALLOC and GC_FIXED_SIZE_POOL_SIZE to be large
    enough to satisfy most startup costs. */
 
+#define ARENA_BOUNDS_PADDING 128
+#define NEXT_ARENA_BOUNDS_SIZE(n) (2 * ((n) + ARENA_BOUNDS_PADDING) * sizeof (void*))
+
 typedef struct Pool_Allocator_Free_List {
     struct Pool_Allocator_Free_List * next;
 } Pool_Allocator_Free_List;
