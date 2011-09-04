@@ -516,8 +516,11 @@ pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(const void *ptr))
             const size_t idx = 2 * p;
             void * const low = pool->arena_bounds[idx];
             void * const high = pool->arena_bounds[idx + 1];
-            if (ptr >= low && ptr <= high && (ptr - low) % pool->object_size == 0)
-                return 1;
+            if (ptr >= low && ptr <= high) {
+                const ptrdiff_t ptrdiff = (const char *)ptr - (const char *)low;
+                if (ptrdiff % pool->object_size == 0)
+                    return 1;
+            }
         }
     }
         //const Pool_Allocator_Arena *arena   = pool->top_arena;
@@ -595,7 +598,7 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
         pool->arena_bounds = mem_sys_realloc(pool->arena_bounds, 2 * pool->num_arenas * sizeof (void*));
     {
         size_t ptr_idx = (pool->num_arenas - 1) * 2;
-        pool->arena_bounds[ptr_idx] = (size_t) new_arena;
+        pool->arena_bounds[ptr_idx] = (size_t) (new_arena + 1);
         pool->arena_bounds[ptr_idx + 1] = (size_t)(new_arena + total_size);
     }
 }
