@@ -426,6 +426,11 @@ Invokes the subroutine.
 
         Parrot_pcc_set_context(INTERP, context);
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
+
+        /* support callcontext reuse */
+        if (context == caller_ctx)
+            Parrot_pcc_free_registers(INTERP, context);
+
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
         object = Parrot_pcc_get_object(INTERP, context);
