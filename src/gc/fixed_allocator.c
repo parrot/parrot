@@ -313,6 +313,8 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->hi_arena_ptr      = NULL;
     newpool->newfree           = NULL;
     newpool->newlast           = NULL;
+    newpool->num_arenas        = 0;
+    newpool->arena_bounds      = NULL;
 
     return newpool;
 }
@@ -330,6 +332,7 @@ Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
         mem_internal_free(arena);
         arena = next;
     }
+    mem_sys_free(pool->arena_bounds);
 
     mem_internal_free(pool);
 }
@@ -506,24 +509,33 @@ static int
 pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(pool_is_owned)
+    int p;
 
     if (ptr >= pool->lo_arena_ptr && ptr <= pool->hi_arena_ptr) {
-        const Pool_Allocator_Arena *arena   = pool->top_arena;
-
-        /* We can cache these values. All arenas are same size */
-        const ptrdiff_t             a_size  = arena_size(pool);
-
-        while (arena) {
-            const Pool_Allocator_Arena * const arena_item = arena + 1;
-            const ptrdiff_t ptr_diff = (const char *) ptr - (const char *) arena_item;
-
-            if (ptr_diff >= 0 && ptr_diff < a_size
-                &&  ptr_diff % pool->object_size == 0)
-                    return 1;
-
-            arena = arena->next;
+        for (p = 0; p < pool->num_arenas; p++) {
+            const size_t idx = 2 * p;
+            void * const low = pool->arena_bounds[idx];
+            void * const high = pool->arena_bounds[idx + 1];
+            if (ptr >= low && ptr <= high && (ptr - low) % pool->object_size == 0)
+                return 1;
         }
     }
+        //const Pool_Allocator_Arena *arena   = pool->top_arena;
+
+        /* We can cache these values. All arenas are same size */
+        //const ptrdiff_t             a_size  = arena_size(pool);
+
+        //while (arena) {
+            //const Pool_Allocator_Arena * const arena_item = arena + 1;
+            //const ptrdiff_t ptr_diff = (const char *) ptr - (const char *) arena_item;
+
+            //if (ptr_diff >= 0 && ptr_diff < a_size
+                //&&  ptr_diff % pool->object_size == 0)
+                    //return 1;
+
+            //arena = arena->next;
+        //}
+    //}
 
     return 0;
 }
@@ -575,6 +587,17 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 
     if ((char *)pool->hi_arena_ptr < (char *)new_arena + total_size)
         pool->hi_arena_ptr = (char *)new_arena + total_size;
+
+    pool->num_arenas++;
+    if (pool->arena_bounds == NULL)
+        pool->arena_bounds = mem_sys_allocate(2 * pool->num_arenas * sizeof (void*));
+    else
+        pool->arena_bounds = mem_sys_realloc(pool->arena_bounds, 2 * pool->num_arenas * sizeof (void*));
+    {
+        size_t ptr_idx = (pool->num_arenas - 1) * 2;
+        pool->arena_bounds[ptr_idx] = (size_t) new_arena;
+        pool->arena_bounds[ptr_idx + 1] = (size_t)(new_arena + total_size);
+    }
 }
 
 /*
@@ -611,6 +634,7 @@ arena_size(ARGIN(const Pool_Allocator *self))
 =back
 
 =cut
+
 
 */
 
