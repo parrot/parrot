@@ -523,23 +523,6 @@ pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(const void *ptr))
             }
         }
     }
-        //const Pool_Allocator_Arena *arena   = pool->top_arena;
-
-        /* We can cache these values. All arenas are same size */
-        //const ptrdiff_t             a_size  = arena_size(pool);
-
-        //while (arena) {
-            //const Pool_Allocator_Arena * const arena_item = arena + 1;
-            //const ptrdiff_t ptr_diff = (const char *) ptr - (const char *) arena_item;
-
-            //if (ptr_diff >= 0 && ptr_diff < a_size
-                //&&  ptr_diff % pool->object_size == 0)
-                    //return 1;
-
-            //arena = arena->next;
-        //}
-    //}
-
     return 0;
 }
 

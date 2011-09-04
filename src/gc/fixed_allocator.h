@@ -45,8 +45,10 @@ typedef struct Pool_Allocator {
     /* Pointers of arena bounds. Used in .is_owned check */
     void *lo_arena_ptr;
     void *hi_arena_ptr;
-    int num_arenas;
-    void **arena_bounds;
+
+    int num_arenas;      /* number of arenas, for keeping track of the
+                            size of arena_bounds */
+    void **arena_bounds; /* Array of low/high pairs for each arena. */
 } Pool_Allocator;
 
 typedef struct Fixed_Allocator
