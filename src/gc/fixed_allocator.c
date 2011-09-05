@@ -569,19 +569,19 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     pool->num_free_objects += num_items;
     pool->total_objects    += num_items;
 
-    if ((char *)pool->lo_arena_ptr > (char *)next)
-        pool->lo_arena_ptr = (char *)next;
+    if (pool->lo_arena_ptr > (void *)next)
+        pool->lo_arena_ptr = next;
 
-    if ((char *)pool->hi_arena_ptr < (char *)last)
-        pool->hi_arena_ptr = (char *)last;
+    if (pool->hi_arena_ptr < (void *)last)
+        pool->hi_arena_ptr = last;
 
     if (pool->num_arenas % ARENA_BOUNDS_PADDING == 0)
         pool->arena_bounds = (void **)mem_sys_realloc(pool->arena_bounds, NEXT_ARENA_BOUNDS_SIZE(pool->num_arenas));
     pool->num_arenas++;
     {
         size_t ptr_idx = (pool->num_arenas - 1) * 2;
-        pool->arena_bounds[ptr_idx] = (char *)next;
-        pool->arena_bounds[ptr_idx + 1] = (char *)last;
+        pool->arena_bounds[ptr_idx] = next;
+        pool->arena_bounds[ptr_idx + 1] = last;
     }
 }
 
