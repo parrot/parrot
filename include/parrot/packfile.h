@@ -840,6 +840,18 @@ PackFile * Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+void Parrot_pf_podds_read_dde(PARROT_INTERP, ARGIN(PackFile_ByteCode *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_pf_podds_write_dde(PARROT_INTERP,
+    ARGIN(PackFile_Podds_DDE *dde))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pf_prepare_packfile_init(PARROT_INTERP,
     ARGIN(PMC * const pfpmc))
         __attribute__nonnull__(1)
@@ -1015,6 +1027,12 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
     , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_pf_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pf_podds_read_dde __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(seg))
+#define ASSERT_ARGS_Parrot_pf_podds_write_dde __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dde))
 #define ASSERT_ARGS_Parrot_pf_prepare_packfile_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

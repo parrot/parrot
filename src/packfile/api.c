@@ -1748,6 +1748,45 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
     return CONST_STRING(interp, "(unknown file)");
 }
 
+/*
+
+=item C<void Parrot_pf_podds_write_dde(PARROT_INTERP, PackFile_Podds_DDE *dde)>
+
+Writes the Data Description Entity pointed to by C<dde> to the PODDS segment.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pf_podds_write_dde(PARROT_INTERP, ARGIN(PackFile_Podds_DDE *dde))
+{
+    ASSERT_ARGS(Parrot_pf_podds_write_dde)
+}
+
+/*
+
+=item C<void Parrot_pf_podds_read_dde(PARROT_INTERP, PackFile_ByteCode *seg)>
+
+Reads a Data Description Entity (DDE) from the PODDS segment.
+
+=cut
+
+*/
+
+/* XXX How do we specify *what* DDE to read? By offset? Address? What? */
+/* XXX Add PARROT_CANNOT_RETURN_NULL once function is actually implemented */
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+void
+Parrot_pf_podds_read_dde(PARROT_INTERP, ARGIN(PackFile_ByteCode *seg))
+{
+    ASSERT_ARGS(Parrot_pf_podds_read_dde)
+
+    return NULL;
+}
 
 /*
 
