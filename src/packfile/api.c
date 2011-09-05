@@ -1767,7 +1767,8 @@ Parrot_pf_podds_write_dde(PARROT_INTERP, ARGIN(PackFile_Podds_DDE *dde))
 
 /*
 
-=item C<void Parrot_pf_podds_read_dde(PARROT_INTERP, PackFile_ByteCode *seg)>
+=item C<PackFile_Podds_DDE * Parrot_pf_podds_read_dde(PARROT_INTERP,
+PackFile_ByteCode *seg)>
 
 Reads a Data Description Entity (DDE) from the PODDS segment.
 
@@ -1780,7 +1781,7 @@ Reads a Data Description Entity (DDE) from the PODDS segment.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-void
+PackFile_Podds_DDE *
 Parrot_pf_podds_read_dde(PARROT_INTERP, ARGIN(PackFile_ByteCode *seg))
 {
     ASSERT_ARGS(Parrot_pf_podds_read_dde)

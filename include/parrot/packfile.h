@@ -841,7 +841,8 @@ PackFile * Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-void Parrot_pf_podds_read_dde(PARROT_INTERP, ARGIN(PackFile_ByteCode *seg))
+PackFile_Podds_DDE * Parrot_pf_podds_read_dde(PARROT_INTERP,
+    ARGIN(PackFile_ByteCode *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
