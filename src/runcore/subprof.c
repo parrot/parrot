@@ -78,7 +78,7 @@ static subprofiledata spdata;
 
 =item *C<static thingy sub2subprofile(...)>
 
-implements a hash.  Don't do this.
+...
 
 =cut
 
@@ -444,7 +444,7 @@ sync_callchainchange(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 
 =item * C<void profile(...)>
 
-main entry point for this pile, does all accounting for a single op
+main entry point, does all accounting for a single op
 
 =cut
 
