@@ -13,6 +13,7 @@
 
 typedef struct subprofile subprofile;
 typedef struct callinfo callinfo;
+typedef struct subprofiledata subprofiledata;
 
 struct callinfo {
     subprofile   *callee;
@@ -52,19 +53,21 @@ struct subprofile {
     uint64_t               callerticks;
 };
 
-static int have_profile_data;
+struct subprofiledata {
+    int have_profile_data;
+    /* the collected data */
+    subprofile *subprofilehash[32768];
 
-static subprofile *subprofilehash[32768];
+    /* the current context */
+    PMC *cursubpmc;
+    PMC *curctx;
+    subprofile *cursp;
 
-static PMC *cursubpmc;
-static PMC *curctx;
-static subprofile *cursp;
-
-static uint64_t opstart;
-
-static uint64_t *tickadd;
-static uint64_t *tickadd2;
-static uint64_t starttick;
+    /* ticks are added at the end of the op */
+    uint64_t *tickadd;
+    uint64_t *tickadd2;
+    uint64_t starttick;
+};
 
 
 /* HEADERIZER BEGIN: src/runcore/subprof.c */

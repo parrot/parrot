@@ -71,6 +71,9 @@ static subprofile * sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+
+static subprofiledata spdata;
+
 /*        
 
 =item *C<static thingy sub2subprofile(...)>
@@ -93,7 +96,7 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     if (lastsp && lastsp->subattrs == subattrs)
         return lastsp;
     h = ((int)subattrs >> 5) & 32767;
-    for (spp = subprofilehash + h; (sp = *spp) != 0; spp = &sp->hnext)
+    for (spp = spdata.subprofilehash + h; (sp = *spp) != 0; spp = &sp->hnext)
         if (sp->subattrs == subattrs)
             break;
     if (!sp) {
@@ -101,8 +104,8 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         sp->subattrs = subattrs;
         sp->subpmc   = subpmc;
         *spp         = sp;
-        if (!have_profile_data)
-            have_profile_data = 1;
+        if (!spdata.have_profile_data)
+            spdata.have_profile_data = 1;
     }
     lastsp = sp;
     return sp;
@@ -139,7 +142,7 @@ str2cs(PARROT_INTERP, STRING *s)
 static void
 popcallchain(PARROT_INTERP)
 {
-    subprofile *sp = cursp;
+    subprofile *sp = spdata.cursp;
     subprofile *csp = sp->caller;
     if (csp) {
         csp->calls[sp->calleri].ops   += sp->callerops;
@@ -153,9 +156,9 @@ popcallchain(PARROT_INTERP)
     sp->caller      = 0;
     sp->calleri     = 0;
     sp->ctx         = 0;
-    cursubpmc       = csp ? csp->subpmc : 0;
-    curctx          = csp ? csp->ctx : 0;
-    cursp           = csp;
+    spdata.cursubpmc       = csp ? csp->subpmc : 0;
+    spdata.curctx          = csp ? csp->ctx : 0;
+    spdata.cursp           = csp;
 }
 
 /*
@@ -175,7 +178,7 @@ finishcallchain(PARROT_INTERP)
     subprofile *sp, *csp;
 
     /* finish all calls */
-    for (sp = cursp; sp; sp = csp) {
+    for (sp = spdata.cursp; sp; sp = csp) {
         csp = sp->caller;
         if (csp) {
             csp->calls[sp->calleri].ops   += sp->callerops;
@@ -189,9 +192,9 @@ finishcallchain(PARROT_INTERP)
         sp->calleri     = 0;
         sp->ctx         = 0;
     }
-    cursp     = 0;
-    curctx    = 0;
-    cursubpmc = 0;
+    spdata.cursp     = 0;
+    spdata.curctx    = 0;
+    spdata.cursubpmc = 0;
 }
 
 /*
@@ -213,7 +216,7 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
     if (cctx) {
         PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
-        if (curctx != cctx || cursubpmc != csubpmc)
+        if (spdata.curctx != cctx || spdata.cursubpmc != csubpmc)
             buildcallchain(interp, cctx, csubpmc);
     }
     if (PMC_IS_NULL(subpmc))
@@ -232,9 +235,9 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         sp = sp->rnext;
     }
     sp->ctx = ctx;
-    sp->caller = cursp;
-    if (cursp) {
-        subprofile *csp = cursp;
+    sp->caller = spdata.cursp;
+    if (sp->caller) {
+        subprofile *csp = spdata.cursp;
         int i;
         for (i = 0; i < csp->ncalls; i++) if (csp->calls[i].callee == sp)
                 break;
@@ -251,9 +254,9 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         }
         sp->calleri = i;
     }
-    cursp     = sp;
-    curctx    = ctx;
-    cursubpmc = subpmc;
+    spdata.cursp     = sp;
+    spdata.curctx    = ctx;
+    spdata.cursubpmc = subpmc;
 }
 
 static void
@@ -338,12 +341,12 @@ dump_profile_data(PARROT_INTERP)
     unsigned int totalops = 0;
     uint64_t totalticks = 0;
 
-    if (!have_profile_data)
+    if (!spdata.have_profile_data)
         return;
 
     for (h = 0; h < 32768; h++) {
         subprofile *hsp;
-        for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
+        for (hsp = spdata.subprofilehash[h]; hsp; hsp = hsp->hnext) {
             subprofile *sp;
             for (sp = hsp; sp; sp = sp->rnext) {
                 totalops += sp->ops;
@@ -357,7 +360,7 @@ dump_profile_data(PARROT_INTERP)
 
     for (h = 0; h < 32768; h++) {
         subprofile *hsp;
-        for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
+        for (hsp = spdata.subprofilehash[h]; hsp; hsp = hsp->hnext) {
             subprofile *sp;
             for (sp = hsp; sp; sp = sp->rnext) {
                 int i;
@@ -387,16 +390,54 @@ dump_profile_data(PARROT_INTERP)
     fprintf(stderr, "\ntotals: %d %lld\n", totalops, totalticks);
 }
 
-/*
-   __asm__ __volatile__ (
-   "xorl %%eax,%%eax \n        cpuid"
-   ::: "%rax", "%rbx", "%rcx", "%rdx");
-   */
-
-__inline__ uint64_t rdtsc(void) {
+static __inline__ uint64_t rdtsc(void) {
     uint32_t lo, hi; 
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return (uint64_t)hi << 32 | lo; 
+}
+
+
+/*
+
+=item * C<void sync_callchain(...)>
+
+bring the profile context chain back in sync with the context's call chain
+
+=cut
+
+*/
+
+static void
+sync_callchainchange(PARROT_INTERP, PMC *ctx, PMC *subpmc)
+{
+    subprofile *sp = spdata.cursp;
+
+    if (sp) {
+        /* optimize common cases */
+        /* did we just return? */
+        if (sp->caller && sp->caller->subpmc == subpmc && sp->caller->ctx == ctx) {
+            /* a simple return */
+            popcallchain(interp);
+        }
+        else {
+            PMC *cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
+            PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
+            if (spdata.curctx == cctx && spdata.cursubpmc == csubpmc) {
+                /* a simple call */
+                buildcallchain(interp, ctx, subpmc);
+            }
+            else if (sp->caller && sp->caller->subpmc == csubpmc && sp->caller->ctx == cctx) {
+                /* some kind of tailcall */
+                popcallchain(interp);
+                buildcallchain(interp, ctx, subpmc);
+            }
+        }
+    }
+    if (subpmc != spdata.cursubpmc || ctx != spdata.curctx) {
+        /* out of luck! redo call chain */
+        finishcallchain(interp);
+        buildcallchain(interp, ctx, subpmc);
+    }
 }
 
 /*
@@ -418,54 +459,28 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
     if (PMC_IS_NULL(subpmc))
         return;
 
-    if (subpmc != cursubpmc || ctx != curctx) {
+    if (subpmc != spdata.cursubpmc || ctx != spdata.curctx) {
         /* context changed! either called new sub or returned from sub */
 
         /* finish old ticks */
         uint64_t tick = rdtsc();
-        if (tickadd) {
-            uint64_t tickdiff = tick - starttick;
-            *tickadd         += tickdiff;
-            *tickadd2        += tickdiff;
+        if (spdata.tickadd) {
+            uint64_t tickdiff = tick - spdata.starttick;
+            *spdata.tickadd         += tickdiff;
+            *spdata.tickadd2        += tickdiff;
         }
-
-        if (cursp) {
-            /* optimize common cases */
-            /* did we just return? */
-            if (cursp->caller && cursp->caller->subpmc == subpmc && cursp->caller->ctx == ctx) {
-                /* a simple return */
-                popcallchain(interp);
-            }
-            else {
-                PMC *cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
-                PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
-                if (curctx == cctx && cursubpmc == csubpmc) {
-                    /* a simple call */
-                    buildcallchain(interp, ctx, subpmc);
-                }
-                else if (cursp->caller && cursp->caller->subpmc == csubpmc && cursp->caller->ctx == cctx) {
-                    /* some kind of tailcall */
-                    popcallchain(interp);
-                    buildcallchain(interp, ctx, subpmc);
-                }
-            }
-        }
-        if (subpmc != cursubpmc || ctx != curctx) {
-            /* out of luck! redo call chain */
-            finishcallchain(interp);
-            buildcallchain(interp, ctx, subpmc);
-        }
-        sp = cursp;
+        sync_callchainchange(interp, ctx, subpmc);
+        sp = spdata.cursp;
         if (pc == sp->subattrs->seg->base.data + sp->subattrs->start_offs) {
             /* assume new call */
             if (sp->caller)
                 sp->caller->calls[sp->calleri].count++;
         }
-        tickadd   = &sp->ticks;
-        tickadd2  = &sp->callerticks;
-        starttick = rdtsc();
+        spdata.tickadd   = &sp->ticks;
+        spdata.tickadd2  = &sp->callerticks;
+        spdata.starttick = rdtsc();
     }
-    sp = cursp;
+    sp = spdata.cursp;
     sp->ops++;
     sp->callerops++;	/* to distribute */
 }
