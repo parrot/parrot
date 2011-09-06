@@ -253,8 +253,8 @@
     set $S1, "No exception handler and no message"
   __label_3: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S1
-    push $P4, $P5
+    assign $P4, 1
+    $P4[0] = $S1
 # predefined sprintf
     sprintf $S5, "%s\n", $P4
     $P1.'print'($S5)
@@ -276,11 +276,11 @@
 # predefined split
     split $P3, "\n", $S3
     if_null $P3, __label_9
-    iter $P6, $P3
-    set $P6, 0
+    iter $P5, $P3
+    set $P5, 0
   __label_8: # for iteration
-    unless $P6 goto __label_9
-    shift $S4, $P6
+    unless $P5 goto __label_9
+    shift $S4, $P5
 # {
 # prt0_idx: $I3
     null $I3
@@ -290,10 +290,9 @@
     goto __label_8 # continue
   __label_10: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S2
-    push $P4, $P5
-    box $P5, $S4
-    push $P4, $P5
+    assign $P4, 2
+    $P4[0] = $S2
+    $P4[1] = $S4
 # predefined sprintf
     sprintf $S5, "%s%s", $P4
     $P1.'print'($S5)
@@ -331,14 +330,15 @@
     set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2011, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
 # var msg: $P2
     root_new $P3, ['parrot';'ResizablePMCArray']
-    $P5 = $P1["VERSION"]
-    push $P3, $P5
-    $P6 = $P1["DEVEL"]
-    push $P3, $P6
-    $P7 = $P1["cpuarch"]
-    push $P3, $P7
-    $P8 = $P1["platform"]
-    push $P3, $P8
+    assign $P3, 4
+    $P4 = $P1["VERSION"]
+    $P3[0] = $P4
+    $P5 = $P1["DEVEL"]
+    $P3[1] = $P5
+    $P6 = $P1["cpuarch"]
+    $P3[2] = $P6
+    $P7 = $P1["platform"]
+    $P3[3] = $P7
 # predefined sprintf
     sprintf $S2, $S1, $P3
     box $P2, $S2
@@ -356,7 +356,7 @@
 # Body
 # {
 # msg: $S1
-    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
+    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
 # predefined say
     say $S1
 # predefined exit

@@ -76,17 +76,9 @@ void dump_profile_data(PARROT_INTERP)
 void profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
         __attribute__nonnull__(1);
 
-static subprofile * sub2subprofile(PARROT_INTERP,
-    PMC *ctx,
-    PMC *subpmc)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_dump_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_profile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_struct subprofile * sub2subprofile \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/subprof.c */

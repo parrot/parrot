@@ -51,9 +51,7 @@ static void printspname(PARROT_INTERP, subprofile *sp)
 static inline const char * str2cs(PARROT_INTERP, STRING *s)
         __attribute__nonnull__(1);
 
-static subprofile * sub2subprofile(PARROT_INTERP,
-    PMC *ctx,
-    PMC *subpmc)
+static subprofile * sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_buildcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

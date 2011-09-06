@@ -156,7 +156,7 @@ parrot [Options] <file> [<program options...>]
        --hash-seed F00F  specify hex value to use as hash seed
     -X --dynext add path to dynamic extension search
    <Run core options>
-    -R --runcore slow|bounds|fast
+    -R --runcore slow|bounds|fast|subprof
     -R --runcore trace|profiling|gcdebug
     -t --trace [flags]
    <VM options>
