@@ -35,6 +35,8 @@ typedef struct Pool_Allocator {
     size_t total_objects;
     size_t objects_per_alloc;
     size_t num_free_objects;
+
+    Pool_Allocator_Arena * top_arena;
     Pool_Allocator_Arena * free_list;
     Pool_Allocator_Arena * newfree;
     Pool_Allocator_Arena * newlast;
