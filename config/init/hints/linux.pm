@@ -26,9 +26,12 @@ sub runstep {
     if ( $libs !~ /-lrt\b/ ) {
         $libs .= ' -lrt';
     }
-    my $cc_shared      = $conf->data->get('cc_shared');
-    my $ld_share_flags = $conf->data->get('ld_share_flags');
-    my $ld_load_flags  = $ld_share_flags;;
+
+    # On Linux, we'll start by assuming that 'cc' is a symlink to 'gcc'
+    my $cc_shared      = $conf->option_or_data('cc_shared') || '-fPIC';
+    my $ld_share_flags = $conf->option_or_data('ld_share_flags') ||
+        '-shared -fPIC';
+    my $ld_load_flags  = $ld_share_flags;
 
     if ( $cc =~ /icc/ ) {
 
@@ -46,11 +49,6 @@ sub runstep {
         if ( $cc_shared !~ /-KPIC/ ) {
             $cc_shared = '-KPIC';
         }
-    }
-    elsif ( $cc =~ /g(c|\+){2}/ ) {
-        $cc_shared      = '-fPIC',
-        $ld_share_flags = '-shared -fPIC',
-        $ld_load_flags  = '-shared -fPIC',
     }
 
     if ( $ccflags !~ /-D_GNU_SOURCE/ ) {
