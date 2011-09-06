@@ -86,27 +86,37 @@ implements a hash.  Don't do this.
 static subprofile *
 sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 {
-    Parrot_Sub_attributes *sub;
+    Parrot_Sub_attributes *subattrs;
     int h;
     subprofile *sp, **spp;
     static subprofile *lastsp;
 
-    PMC_get_sub(interp, subpmc, sub);
-    if (lastsp && lastsp->sub == sub)
+    PMC_get_sub(interp, subpmc, subattrs);
+    if (lastsp && lastsp->subattrs == subattrs)
         return lastsp;
-    h = ((int)sub >> 5) & 32767;
+    h = ((int)subattrs >> 5) & 32767;
     for (spp = subprofilehash + h; (sp = *spp) != 0; spp = &sp->hnext)
-        if (sp->sub == sub)
+        if (sp->subattrs == subattrs)
             break;
     if (!sp) {
-        sp         = (subprofile *)calloc(sizeof(subprofile), 1);
-        sp->sub    = sub;
-        sp->subpmc = subpmc;
-        *spp       = sp;
+        sp           = (subprofile *)calloc(sizeof(subprofile), 1);
+        sp->subattrs = subattrs;
+        sp->subpmc   = subpmc;
+        *spp         = sp;
     }
     lastsp = sp;
     return sp;
 }
+
+/*
+
+=item *C<static thingy str2cs(...)>
+
+Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
+
+=cut
+
+*/
 
 static inline const char *
 str2cs(PARROT_INTERP, STRING *s)
@@ -115,6 +125,16 @@ str2cs(PARROT_INTERP, STRING *s)
         return "STRNULL";
     return Parrot_str_to_cstring(interp, s);
 }
+
+/*
+
+=item *C<static thingy popcallchain(...)>
+
+...
+
+=cut
+
+*/
 
 static void
 popcallchain(PARROT_INTERP)
@@ -203,11 +223,11 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         /* recursion! */
         if (!sp->rnext) {
             subprofile *rsp;
-            rsp         = (subprofile *)calloc(sizeof(subprofile), 1);
-            rsp->sub    = sp->sub;
-            rsp->subpmc = sp->subpmc;
-            rsp->rcnt   = sp->rcnt + 1;
-            sp->rnext   = rsp;
+            rsp           = (subprofile *)calloc(sizeof(subprofile), 1);
+            rsp->subattrs = sp->subattrs;
+            rsp->subpmc   = sp->subpmc;
+            rsp->rcnt     = sp->rcnt + 1;
+            sp->rnext     = rsp;
         }
         sp = sp->rnext;
     }
@@ -239,7 +259,7 @@ buildcallchain(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 static void
 printspname(PARROT_INTERP, subprofile *sp)
 {
-    fprintf(stderr, "%p:%s", sp, str2cs(interp, sp->sub->name));
+    fprintf(stderr, "%p:%s", sp, str2cs(interp, sp->subattrs->name));
     if (sp->rcnt)
         fprintf(stderr, "'%d", sp->rcnt);
 }
@@ -253,9 +273,9 @@ printspline(PARROT_INTERP, subprofile *sp)
     STRING *line_str = Parrot_str_new_constant(interp, "line");
     int i;
 
-    if (!sp->sub || !sp->sub->seg || !sp->sub->seg->annotations)
+    if (!sp->subattrs || !sp->subattrs->seg || !sp->subattrs->seg->annotations)
         return;
-    ann = sp->sub->seg->annotations;
+    ann = sp->subattrs->seg->annotations;
     /* search for the first line annotation in our sub */
     for (i = 0; i < ann->num_keys; i++) {
         STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
@@ -268,9 +288,9 @@ printspline(PARROT_INTERP, subprofile *sp)
         unsigned int j;
         key = ann->keys + i;
         for (j = key->start; j < key->start + key->len; j++) {
-            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->sub->start_offs)
+            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
                 continue;
-            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->sub->end_offs)
+            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
                 continue;
             break;
         }
@@ -417,7 +437,7 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
             buildcallchain(interp, ctx, subpmc);
         }
         sp = cursp;
-        if (pc == sp->sub->seg->base.data + sp->sub->start_offs) {
+        if (pc == sp->subattrs->seg->base.data + sp->subattrs->start_offs) {
             /* assume new call */
             if (sp->caller)
                 sp->caller->calls[sp->calleri].count++;

@@ -22,19 +22,31 @@ struct callinfo {
 };
 
 struct subprofile {
+    /* next subprofile according to hash order */
     subprofile            *hnext;
+    /* next subprofile according to recursion  */
     subprofile            *rnext;
+    /* recursion level of this subprofile */
     int                    rcnt;
-    PMC                   *subpmc;
-    Parrot_Sub_attributes *sub;
+    /* the Sub PMC being profiled by this subprofile* */
+    PMC                   *subpmc; 
+    /* the ATTRs of subpmc */
+    Parrot_Sub_attributes *subattrs;
+    /* array of callinfo structs related to the current call chain  */
     callinfo              *calls;
+    /* number of elements in the callinfo array */
     int                    ncalls;
+    /* number of ops executed in this sub */
     unsigned int           ops;
+    /* number of CPU ticks spent in this sub */
     uint64_t               ticks;
 
-    /* call chain */
+    /* call chain info */
+    /* profile info for the caller */
     subprofile            *caller;
+    /* some kind of index into calls */
     int                    calleri;
+    /* the active Context for the Sub being profiled */
     PMC                   *ctx;
     unsigned int           callerops;
     uint64_t               callerticks;
