@@ -101,6 +101,8 @@ sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
         sp->subattrs = subattrs;
         sp->subpmc   = subpmc;
         *spp         = sp;
+        if (!have_profile_data)
+            have_profile_data = 1;
     }
     lastsp = sp;
     return sp;
@@ -265,43 +267,53 @@ printspname(PARROT_INTERP, subprofile *sp)
 static void
 printspline(PARROT_INTERP, subprofile *sp)
 {
-    PMC * annot;
-    PackFile_Annotations *ann;
-    PackFile_Annotations_Key *key;
-    STRING *line_str = Parrot_str_new_constant(interp, "line");
     int i;
 
-    if (!sp->subattrs || !sp->subattrs->seg || !sp->subattrs->seg->annotations)
+    if (!sp->subattrs || !sp->subattrs->seg)
         return;
-    ann = sp->subattrs->seg->annotations;
-    /* search for the first line annotation in our sub */
-    for (i = 0; i < ann->num_keys; i++) {
-        STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
-        if (STRING_equal(interp, test_key, line_str))
-            break;
 
+    /* try HLL annotations */
+    if (sp->subattrs->seg->annotations) {
+        PackFile_Annotations *ann = sp->subattrs->seg->annotations;
+        PackFile_Annotations_Key *key;
+        STRING *line_str = Parrot_str_new_constant(interp, "line");
+
+        /* search for the first line annotation in our sub */
+        for (i = 0; i < ann->num_keys; i++) {
+            STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
+            if (STRING_equal(interp, test_key, line_str))
+                break;
+
+        }
+        if (i < ann->num_keys) {
+            /* ok, found the line key, now search for the sub */
+            unsigned int j;
+            key = ann->keys + i;
+            for (j = key->start; j < key->start + key->len; j++) {
+                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
+                    continue;
+                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
+                    continue;
+                break;
+            }
+            if (j < key->start + key->len) {
+                /* found it! */
+                INTVAL line = ann->base.data[j * 2 + ANN_ENTRY_VAL];
+                /* need +1, sigh */
+                PMC *pfile = PackFile_Annotations_lookup(interp, ann, ann->base.data[j * 2 + ANN_ENTRY_OFF] + 1, Parrot_str_new_constant(interp, "file"));
+                if (PMC_IS_NULL(pfile))
+                    fprintf(stderr, "???:%d", (int)line);
+                else
+                    fprintf(stderr, "%s:%d", str2cs(interp, VTABLE_get_string(interp, pfile)), (int)line);
+                return;
+            }
+        }
     }
-    if (i < ann->num_keys) {
-        /* ok, found the line key, now search for the sub */
-        unsigned int j;
-        key = ann->keys + i;
-        for (j = key->start; j < key->start + key->len; j++) {
-            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
-                continue;
-            if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
-                continue;
-            break;
-        }
-        if (j < key->start + key->len) {
-            /* found it! */
-            INTVAL line = ann->base.data[j * 2 + ANN_ENTRY_VAL];
-            /* need +1, sigh */
-            PMC *pfile = PackFile_Annotations_lookup(interp, ann, ann->base.data[j * 2 + ANN_ENTRY_OFF] + 1, Parrot_str_new_constant(interp, "file"));
-            if (PMC_IS_NULL(pfile))
-                fprintf(stderr, "???:%d", (int)line);
-            else
-                fprintf(stderr, "%s:%d", str2cs(interp, VTABLE_get_string(interp, pfile)), (int)line);
-        }
+    /* try the debug section */
+    if (sp->subattrs->seg->debugs) {
+        STRING *file = Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->subattrs->seg->base.data + sp->subattrs->start_offs);
+        INTVAL line = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->subattrs->seg->base.data + sp->subattrs->start_offs);
+        fprintf(stderr, "%s:%d", str2cs(interp, file), (int)line);
     }
 }
 
@@ -323,13 +335,27 @@ dump_profile_data(PARROT_INTERP)
     int h;
     size_t off;
 
-    if (!totalops)
+    unsigned int totalops = 0;
+    uint64_t totalticks = 0;
+
+    if (!have_profile_data)
         return;
+
+    for (h = 0; h < 32768; h++) {
+        subprofile *hsp;
+        for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
+            subprofile *sp;
+            for (sp = hsp; sp; sp = sp->rnext) {
+                totalops += sp->ops;
+                totalticks += sp->ticks;
+            }
+        }
+    }
     fprintf(stderr, "events: ops ticks\n");
     fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
     finishcallchain(interp);	/* just in case... */
 
-    for (h = 0; h < 32767; h++) {
+    for (h = 0; h < 32768; h++) {
         subprofile *hsp;
         for (hsp = subprofilehash[h]; hsp; hsp = hsp->hnext) {
             subprofile *sp;
@@ -386,28 +412,23 @@ main entry point for this pile, does all accounting for a single op
 void
 profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
 {
-    PMC *subpmc;
-    PackFile_ByteCode  *code = interp->code;
+    PMC *subpmc = ((Parrot_Context *)PMC_data_typed(ctx, Parrot_Context*))->current_sub;
     subprofile *sp;
 
-    uint64_t tick;
-
-    /* finish old ticks */
-    tick = rdtsc();
-    if (tickadd) {
-        uint64_t tickdiff = tick - starttick;
-        *tickadd         += tickdiff;
-        *tickadd2        += tickdiff;
-        totalticks       += tickdiff;
-        starttick         = tick;
-    }
-
-    subpmc = Parrot_pcc_get_sub(interp, ctx);
     if (PMC_IS_NULL(subpmc))
         return;
 
     if (subpmc != cursubpmc || ctx != curctx) {
         /* context changed! either called new sub or returned from sub */
+
+        /* finish old ticks */
+        uint64_t tick = rdtsc();
+        if (tickadd) {
+            uint64_t tickdiff = tick - starttick;
+            *tickadd         += tickdiff;
+            *tickadd2        += tickdiff;
+        }
+
         if (cursp) {
             /* optimize common cases */
             /* did we just return? */
@@ -447,7 +468,6 @@ profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
     sp = cursp;
     sp->ops++;
     sp->callerops++;	/* to distribute */
-    totalops++;
 }
 
 /*

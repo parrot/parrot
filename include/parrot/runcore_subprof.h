@@ -52,20 +52,20 @@ struct subprofile {
     uint64_t               callerticks;
 };
 
-subprofile *subprofilehash[32768];
+static int have_profile_data;
+
+static subprofile *subprofilehash[32768];
 
 static PMC *cursubpmc;
 static PMC *curctx;
 static subprofile *cursp;
 
-uint64_t opstart;
+static uint64_t opstart;
 
-uint64_t *tickadd;
-uint64_t *tickadd2;
-uint64_t starttick;
+static uint64_t *tickadd;
+static uint64_t *tickadd2;
+static uint64_t starttick;
 
-unsigned int totalops;
-uint64_t totalticks;
 
 /* HEADERIZER BEGIN: src/runcore/subprof.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -314,6 +314,7 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
         if (_oldtop == NULL)
             interp->lo_var_ptr = &_oldtop;
         interp->api_jmp_buf = &env;
+        dump_profile_data(interp);
         Parrot_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */
