@@ -1047,6 +1047,28 @@ Parrot_io_is_tty_handle(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
+=item C<INTVAL Parrot_io_is_async(PARROT_INTERP, PMC *pmc)>
+
+Returns a boolean value indicating whether C<*pmc> is a non-blocking
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_is_async(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_io_is_async)
+    if (Parrot_io_is_closed(interp, pmc))
+        return 0;
+
+    return (Parrot_io_get_flags(interp, pmc) & PIO_F_ASYNC) ? 1 : 0;
+}
+
+/*
+
 =back
 
 =head2 C<Parrot_io_STD*> Functions

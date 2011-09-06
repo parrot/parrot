@@ -3,11 +3,13 @@
 
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent=1;
+use Archive::Tar;
 use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp qw( tempdir );
+use lib qw( ./lib );
+use Parrot::Config;
 
 my $cwd = cwd();
 opendir my $DIRH, $cwd
@@ -32,19 +34,22 @@ print "Performing releasecheck on $tb\n";
     my $ctarball = "$tdir/$tb";
     copy "$cwd/$tb" => $ctarball
         or croak "Unable to copy $tb";
-    system(qq{tar xzf $ctarball})
-        and croak "Unable to untar $ctarball";
+    my $tar = Archive::Tar->new;
+    $tar->read($ctarball);
+    $tar->extract();
     chdir $distro or croak "Unable to chdir to $distro";
     print "Reconfiguring\n";
     system(qq{$^X Configure.pl --silent}) and croak "Unable to configure";
     print "Rebuilding\n";
-    system(qq{make --silent}) and croak "Unable to build";
+    my $make = $PConfig{make};
+    my $silent = $make =~ 'nmake' ? '/S' : '--silent';
+    system(qq{$make $silent}) and croak "Unable to build";
     print "Retesting\n";
-    system(qq{make test}) and croak "'make test' did not complete successfully";
+    system(qq{$make test}) and croak "'$make test' did not complete successfully";
     print "Rereleasing\n";
-    system(qq{make release --silent}) and croak "Unable to release";
+    system(qq{$make release $silent}) and croak "Unable to release";
     print "Recleaning\n";
-    system(qq{make realclean --silent}) and croak "Unable to realclean";
+    system(qq{$make realclean $silent}) and croak "Unable to realclean";
     chdir $cwd or croak "Unable to change dir back";
     print "Leaving temporary directory\n";
 }

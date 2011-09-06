@@ -956,7 +956,7 @@ Return a C<Ptr> to the C<n>th element of an array of structs.
         if ((size_t)p != ALIGN_UP((size_t)p, align))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Attempt to dereference unaligned pointer "
-                        "(%x, required alignement: %d)",
+                        "(%x, required alignment: %d)",
                     p, align);
 
         size = ALIGN_UP(size, align);
@@ -1006,7 +1006,7 @@ Return a C<Ptr> to the C<n>th element of a struct.
             if ((size_t)p != ALIGN_UP((size_t)p, align))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                         "Attempt to dereference unaligned pointer "
-                            "(%x, required alignement: %d)",
+                            "(%x, required alignment: %d)",
                         p, align);
         }
 

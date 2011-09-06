@@ -3,7 +3,7 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -223,7 +223,7 @@ main(int argc, const char *argv[])
     }
 
     if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
+        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray, NULL))
             show_last_error_and_exit(interp);
     }
 

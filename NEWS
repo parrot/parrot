@@ -1,3 +1,7 @@
+New in 3.8.0
+- Core
+  + New parrot frontend executable, with bootstrapped PIR entry
+
 New in 3.7.0
 - Core
   + Added mem_sys_strndup function.
@@ -182,7 +186,7 @@ New in 3.0.0
     command-line parameters was improved.
   + An experimental gdb pretty-printers in tools/dev for Parrot STRINGs and
     PMCs is now available.  (gdb 7.2 or later and Python are required)
-  + c2str.pl and pmc2c.pl improvements result in a noticably faster build.
+  + c2str.pl and pmc2c.pl improvements result in a noticeably faster build.
   + Bugs in our Digest::sha256 library and bit-related dynamic ops were fixed
     by GCI student Nolan Lum. Both now work correctly on 32 and 64 bit systems.
 - Languages
@@ -919,7 +923,7 @@ New in January 2009 release (0.9.0)
     - skip creating a class/grammar if it already exists
 - Languages
   + Rakudo
-    - improved error mesages in multi dispatch
+    - improved error messages in multi dispatch
     - implemented clone method for all objects
     - implemented MAIN sub
     - Unicode versions of infix hyper operators

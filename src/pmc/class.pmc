@@ -1081,7 +1081,7 @@ String PMC containing the name of the class
 
 =item namespace
 
-NameSpace PMC of the the namespace attached to the class.
+NameSpace PMC of the namespace attached to the class.
 
 =item attributes
 

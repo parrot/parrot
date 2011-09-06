@@ -7979,7 +7979,7 @@
 	before 5.6 did not handle the 0b numeric prefix; therefore, it was
 	returning 0.  To fix this, I added a from_binary function that
 	would take a binary string and return its decimal representation.
-	Now, instead of blindly calilng oct, it makes a distinction between
+	Now, instead of blindly calling oct, it makes a distinction between
 	0/0x numbers and 0b numbers.
 
 2001-09-26 19:30  thgibbs

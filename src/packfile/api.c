@@ -856,7 +856,6 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
             Parrot_Sub_attributes *sub;
 
             PMC_get_sub(interp, sub_pmc, sub);
-            sub->eval_pmc = eval_pmc;
 
             if (action == 0)
                 continue;
@@ -1375,6 +1374,8 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
     pf->fetch_iv = (packfile_fetch_iv_t)NULL;
     pf->fetch_nv = (packfile_fetch_nv_t)NULL;
 
+    pf->view = NULL;
+
     return pf;
 }
 
@@ -1411,6 +1412,9 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC *ptr;
 
+    if (pf->view)
+        return pf->view;
+
     /* We have to block GC here. */
     /* XXX We should never-ever have raw PackFile* laying around */
     /* XXX But it require a lot of effort to cleanup codebase */
@@ -1418,6 +1422,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
 
     ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
+    pf->view = ptr;
 
     Parrot_unblock_GC_mark(interp);
 
@@ -1468,7 +1473,8 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc, INTVAL
+set_code)>
 
 Set's the current packfile for the interpreter.
 
@@ -1478,7 +1484,7 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc), INTVAL set_code)
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
     if (PMC_IS_NULL(pbc))
@@ -1487,7 +1493,8 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
         interp->current_pf = pbc;
-        interp->code       = pf->cur_cs;
+        if (set_code)
+            interp->code       = pf->cur_cs;
         PARROT_GC_WRITE_BARRIER(interp, pbc);
     }
 }
@@ -2708,8 +2715,8 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 /*
 
-=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC
-*args)>
+=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC *
+sysargs, PMC * progargs)>
 
 Execute a PackFile* as if it were a main program. This is an entrypoint into
 executing a Parrot program, it is not intended (and can be dangerous) if you
@@ -2721,7 +2728,8 @@ try to call it from within a running Parrot program
 
 PARROT_EXPORT
 void
-Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *args))
+Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
+        ARGMOD(PMC * sysargs), ARGMOD(PMC * progargs))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
     PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
@@ -2732,7 +2740,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
 
-    Parrot_pf_set_current_packfile(interp, pbc);
+    Parrot_pf_set_current_packfile(interp, pbc, 1);
     Parrot_pf_prepare_packfile_init(interp, pbc);
     main_sub = packfile_main(pf->cur_cs);
 
@@ -2741,11 +2749,17 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc), ARGMOD(PMC *
     if (!main_sub)
         main_sub = set_current_sub(interp);
 
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
+    if (PMC_IS_NULL(progargs)) {
+        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, sysargs);
+        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", sysargs);
+    }
+    else {
+        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, progargs);
+        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "PP->", sysargs, progargs);
+    }
 
     if (!PMC_IS_NULL(current_pf))
-        Parrot_pf_set_current_packfile(interp, current_pf);
+        Parrot_pf_set_current_packfile(interp, current_pf, 1);
 }
 
 /*

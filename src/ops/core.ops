@@ -811,10 +811,16 @@ inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
         _exit($2);
     else {
+        opcode_t        *dest;
         opcode_t * const ret       = expr NEXT();
+        PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
         PMC      * const exception = Parrot_ex_build_exception(interp, $1, $2, NULL);
-        opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+
+        VTABLE_set_attr_str(interp, exception,
+                Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         goto ADDRESS(dest);
     }
 }
@@ -966,7 +972,7 @@ inline op gc_debug(in INT) {
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
-The valid constants for each return value are (excluding the the .INTERPINFO_
+The valid constants for each return value are (excluding the .INTERPINFO_
 prefix):
 
 =over 4

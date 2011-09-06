@@ -53,7 +53,7 @@ Initializes a new empty Eval.
 
 =item C<void destroy()>
 
-Destroy the Eval and its asscociated bytecode.
+Destroy the Eval and its associated bytecode.
 
 =item C<void mark()>
 
