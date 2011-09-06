@@ -80,7 +80,7 @@ Tests the MappedByteArray PMC.
     mm = new ['MappedByteArray'], filename
 
     $I0 = elements mm
-    # The test file is one line of text, and line ending may have beeen
+    # The test file is one line of text, and line ending may have been
     # converted, so the lenght can be one byte different.
     $I1 = $I0 == 43
     $I2 = $I0 == 44

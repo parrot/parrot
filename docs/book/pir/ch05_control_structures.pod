@@ -326,7 +326,7 @@ PIR requires one conditional branch and two unconditional branches.
 The first time through the loop, this example sets the initial value of the
 counter in C<loop_init>. It then goes on to test that the loop condition is met
 in C<loop_test>. If the condition is true (C<counter> is less than or equal to
-10) it jumps to C<loop_body> and executes the body of the loop. If the the
+10) it jumps to C<loop_body> and executes the body of the loop. If the
 condition is false, it will jump straight to C<loop_end> and the loop will end.
 The body of the loop prints the current counter then goes on to
 C<loop_continue>, which increments the counter and jumps back up to

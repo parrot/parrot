@@ -77,7 +77,7 @@ pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
     print "\n"
 
     $P2 = new ['String']
-    $P2 = "aditional data"
+    $P2 = "additional data"
     setattribute $P0, 'data', $P2
 
     $P2 = get_global 'code'

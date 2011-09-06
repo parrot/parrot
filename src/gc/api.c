@@ -551,7 +551,7 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-Deallocates an attibutes structure from a PMC if it has the auto_attrs
+Deallocates an attributes structure from a PMC if it has the auto_attrs
 flag set.
 
 =cut

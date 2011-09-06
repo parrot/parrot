@@ -258,7 +258,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 
 =item C<PMC * Parrot_cx_peek_task(PARROT_INTERP)>
 
-Retrieve the the top task on the scheduler's task list, but don't remove it
+Retrieve the top task on the scheduler's task list, but don't remove it
 from the list.
 
 =cut

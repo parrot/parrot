@@ -2277,7 +2277,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 =item C<static void gc_gms_str_get_youngest_generation(PARROT_INTERP, STRING
 *str)>
 
-Calculate youngest genereation of PMC children. Used to remove items from
+Calculate youngest generation of PMC children. Used to remove items from
 dirty_list.
 
 =cut

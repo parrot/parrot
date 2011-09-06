@@ -1032,7 +1032,7 @@ slurpy arguments).
 
         PMC_get_sub(INTERP, SELF, sub);
         /*
-        XXX Rakudo's failing with with this code on ASSERT. Why???
+        XXX Rakudo's failing with this code on ASSERT. Why???
         GET_ATTR_namespace_stash(INTERP, SELF, _namespace);
         PARROT_ASSERT(_namespace == sub->namespace_stash || !"consistency!!!");
         */

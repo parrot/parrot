@@ -1265,7 +1265,7 @@ get_next_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
 
-Throw the appropiate exception.
+Throw the appropriate exception.
 
 =cut
 

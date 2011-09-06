@@ -92,7 +92,7 @@ magic of virtual dispatch.
 
 =head3 Rational
 
-They're old, crufty, and don't do anything that cannot be acheived by .call.
+They're old, crufty, and don't do anything that cannot be achieved by .call.
 
 Except obfuscasion of course.
 
