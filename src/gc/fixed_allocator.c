@@ -307,6 +307,7 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->total_objects     = 0;
     newpool->objects_per_alloc = num_objs;
     newpool->num_free_objects  = 0;
+    newpool->top_arena         = NULL;
     newpool->free_list         = NULL;
     newpool->lo_arena_ptr      = (void *)((size_t)-1);
     newpool->hi_arena_ptr      = NULL;
@@ -551,11 +552,10 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 
     interp->gc_sys->stats.memory_allocated += total_size;
 
-    next            = (Pool_Allocator_Arena *)(new_arena + 1);
-    last            = (Pool_Allocator_Arena *)((char *)next + item_space);
-
     new_arena->next = pool->top_arena;
     pool->top_arena = new_arena;
+    next            = (Pool_Allocator_Arena *)(new_arena + 1);
+    last            = (Pool_Allocator_Arena *)((char *)next + item_space);
     pool->newfree   = next;
     pool->newlast   = last;
 
@@ -572,8 +572,8 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
         pool->arena_bounds = (void **)mem_sys_realloc(pool->arena_bounds, NEXT_ARENA_BOUNDS_SIZE(pool->num_arenas));
     {
         const size_t ptr_idx = pool->num_arenas * 2;
-        pool->arena_bounds[ptr_idx] = new_arena + 1;
-        pool->arena_bounds[ptr_idx + 1] = new_arena + 1 + item_space;
+        pool->arena_bounds[ptr_idx] = next;
+        pool->arena_bounds[ptr_idx + 1] = last;
     }
     ++pool->num_arenas;
 }

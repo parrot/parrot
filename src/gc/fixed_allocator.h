@@ -48,7 +48,6 @@ typedef struct Pool_Allocator {
     int num_arenas;      /* number of arenas, for keeping track of the
                             size of arena_bounds */
     void **arena_bounds; /* Array of low/high pairs for each arena. */
-    void **arena_lists; /* Array of low/high pairs for each arena. */
 } Pool_Allocator;
 
 typedef struct Fixed_Allocator
