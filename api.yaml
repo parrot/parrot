@@ -562,12 +562,12 @@
   name : 'Non-const STRING* arguments'
   eligible : '3.1'
   note :
-    Due immutable nature of STRINGs we are changing internal handling to use only
-    const STRING pointers. It will improve optimizations possibilities by compiler,
-    make parrot const-correct, etc.
-    
+    Due to the immutable nature of STRINGs we are changing the internal handling to use only
+    const STRING pointers. This will improve optimizations possibilities for compilers,
+    and make parrot const-correct.
+
     Passing of non-const STRING* arguments is deprecated and will be changed to
-    const STRING*. This includes (but not limited to) all string API functions,
+    const STRING*. This includes (but is not limited to) all string API functions,
     VTABLEs, PCC, etc
   ticket : 'http://trac.parrot.org/parrot/ticket/1906'
 -
