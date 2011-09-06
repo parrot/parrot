@@ -314,7 +314,6 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->newlast           = NULL;
     newpool->num_arenas        = 0;
     newpool->arena_bounds      = (void **)mem_sys_allocate(NEXT_ARENA_BOUNDS_SIZE(0));
-    newpool->arena_lists      = (void **)mem_sys_allocate(NEXT_ARENA_BOUNDS_SIZE(0));
 
     return newpool;
 }
@@ -325,13 +324,15 @@ Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(Parrot_gc_pool_destroy)
 
-    int p;
-    for (p = 0; p < pool->num_arenas; p++) {
-        mem_internal_free(pool->arena_lists[p]);
+    Pool_Allocator_Arena *arena = pool->top_arena;
+
+    while (arena) {
+        Pool_Allocator_Arena *next = arena->next;
+        mem_internal_free(arena);
+        arena = next;
     }
 
     mem_sys_free(pool->arena_bounds);
-    mem_sys_free(pool->arena_lists);
 
     mem_internal_free(pool);
 }
@@ -553,6 +554,8 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     next            = (Pool_Allocator_Arena *)(new_arena + 1);
     last            = (Pool_Allocator_Arena *)((char *)next + item_space);
 
+    new_arena->next = pool->top_arena;
+    pool->top_arena = new_arena;
     pool->newfree   = next;
     pool->newlast   = last;
 
@@ -565,16 +568,12 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     if (pool->hi_arena_ptr < (void *)last)
         pool->hi_arena_ptr = last;
 
-    if (pool->num_arenas % ARENA_BOUNDS_PADDING == 0) {
+    if (pool->num_arenas % ARENA_BOUNDS_PADDING == 0)
         pool->arena_bounds = (void **)mem_sys_realloc(pool->arena_bounds, NEXT_ARENA_BOUNDS_SIZE(pool->num_arenas));
-        pool->arena_lists  = (void **)mem_sys_realloc(pool->arena_lists, NEXT_ARENA_BOUNDS_SIZE(pool->num_arenas));
-     }
     {
-	const size_t num = pool->num_arenas;
-        const size_t ptr_idx = num * 2;
+        const size_t ptr_idx = pool->num_arenas * 2;
         pool->arena_bounds[ptr_idx] = new_arena + 1;
         pool->arena_bounds[ptr_idx + 1] = new_arena + 1 + item_space;
-       pool->arena_lists[num] = new_arena;
     }
     ++pool->num_arenas;
 }
