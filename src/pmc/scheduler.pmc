@@ -27,8 +27,6 @@ pmclass Scheduler auto_attrs {
 
     ATTR INTVAL        id;         /* The scheduler's ID. */
     ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
-    ATTR INTVAL        pending;    /* A count of pending tasks (cached for fast
-                                     lookup). */
     ATTR PMC          *task_list;  /* The current list of tasks. */
     ATTR PMC          *task_index; /* An index into the current list of tasks,
                                      ordered by priority. */
