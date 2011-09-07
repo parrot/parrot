@@ -137,8 +137,6 @@ current maximum, and a birthtime of the current time.
         else
             VTABLE_push_integer(INTERP, core_struct->task_index, new_tid);
 
-        SCHEDULER_cache_valid_CLEAR(SELF);
-
         if (!VTABLE_does(interp, task, CONST_STRING(interp, "Exception")))
             Parrot_cx_runloop_wake(core_struct->INTERP, SELF);
     }
@@ -204,7 +202,6 @@ Removes the task with the given task ID from the task list.
         const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
         VTABLE_delete_keyed_int(INTERP, core_struct->task_list, key);
-        SCHEDULER_cache_valid_CLEAR(SELF);
     }
 
 

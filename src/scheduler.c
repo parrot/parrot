@@ -188,7 +188,6 @@ Parrot_cx_refresh_task_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     /* TODO: Sort the task list index */
 
-    SCHEDULER_cache_valid_SET(scheduler);
     return;
 }
 
@@ -1098,7 +1097,6 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
                     VTABLE_push_integer(interp, sched_struct->task_index, tid);
                     VTABLE_set_integer_keyed_int(interp, sched_struct->wait_index, index, 0);
                     Parrot_cx_schedule_repeat(interp, task);
-                    SCHEDULER_cache_valid_CLEAR(scheduler);
                 }
             }
         }
