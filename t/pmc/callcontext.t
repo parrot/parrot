@@ -280,7 +280,7 @@ eh:
     unshift $P0, $P1
     $P2 = shift $P0
 
-    is($P2, 'derF', '... but not convert when unneccesary')
+    is($P2, 'derF', '... but not convert when unnecesary')
     $I0 = issame $P1, $P2
     ok($I0, '... returning the same item' )
 

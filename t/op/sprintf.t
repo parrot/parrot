@@ -350,7 +350,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     local_branch jmpstack,  set_skip_loop
 
     skip_info[114] = 'harness needs support for * modifier'
-    skip_info[144] = 'perl5 expresssion as test value'
+    skip_info[144] = 'perl5 expression as test value'
     skip_info[131] = 'harness needs support for * modifier'
     skip_info[141] = 'harness needs support for * modifier'
     skip_info[161] = 'harness needs support for * modifier'

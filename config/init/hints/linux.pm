@@ -71,7 +71,7 @@ sub runstep {
     my $osvers = `/sbin/sysctl -n kernel.osrelease`;
     chomp $osvers;
 
-    $conf->data->set(
+    my %linux_selections = (
         ccflags         => $ccflags,
         libs            => $libs,
         ld_share_flags  => $ld_share_flags,
@@ -88,11 +88,19 @@ sub runstep {
         libparrot_shared_alias => "libparrot$share_ext",
         libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
     );
+    if ( ( split( m/-/, $conf->data->get('archname_provisional'), 2 ) )[0] eq 'ia64' ) {
 
-     if ( ( split( m/-/, $conf->data->get('archname_provisional'), 2 ) )[0] eq 'ia64' ) {
-
-        $conf->data->set( platform_asm => 1 );
+        $linux_selections{platform_asm} = 1;
     }
+    my $linux_hints = "Linux hints settings:\n";
+    for my $k (sort keys %linux_selections) {
+        $linux_hints .= sprintf("  %-24s => %s\n" => (
+                $k, qq|'$linux_selections{$k}'|,
+        ) );
+    }
+    $conf->debug($linux_hints);
+
+    $conf->data->set( %linux_selections );
     return;
 }
 

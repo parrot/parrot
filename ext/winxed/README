@@ -19,6 +19,6 @@ How to choose and tag the release used:
 
 Releases are tagged like this: RELEASE_1_0_0
 
-To tag a new releease switch to the appropiate branch, like version_1_0,
-verify is updated with the appropiate changes and the pir generated files
+To tag a new release switch to the appropriate branch, like version_1_0,
+verify is updated with the appropriate changes and the pir generated files
 are also updated, an tag it. Don't forget to push the tag to origin.

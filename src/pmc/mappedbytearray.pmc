@@ -7,7 +7,7 @@ src/pmc/mappedbytearray.pmc - Mapped byte array
 
 =head1 DESCRIPTION
 
-A memory mapped file or shared memory segment accesible as array of bytes.
+A memory mapped file or shared memory segment accessible as array of bytes.
 
 Bare minimal functionality available, only for posix platforms
 (tested on linux).
@@ -445,7 +445,7 @@ in codepoints.
 
 =item C<static void unavailable(PARROT_INTERP, const char *msg)>
 
-Throws appropiately for functionality not available in the current platform.
+Throws appropriately for functionality not available in the current platform.
 
 =item C<static void * mapfromfilehandle(PIOHANDLE handle, unsigned long size,
 int flag)>

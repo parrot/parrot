@@ -88,6 +88,9 @@ PIOHANDLE Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flag
         ARGOUT(INTVAL *pid_out));
 INTVAL Parrot_io_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer));
 
+PARROT_EXPORT
+INTVAL Parrot_io_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async);
+
 /*
  * Socket
  */

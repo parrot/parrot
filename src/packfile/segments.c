@@ -700,6 +700,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     Parrot_io_printf(interp, "\n  [\n");
     for (i = 0; i < self->num_keys; ++i) {
         const PackFile_Annotations_Key * const key = &self->keys[i];
+        const size_t                       key_end = key->start + key->len;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
                 self->code->const_table->str.constants[key->name]);
@@ -708,7 +709,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
                 key->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
                 key->type == PF_ANNOTATION_KEY_TYPE_PMC ? "pmc" :
                 "<ERROR>");
-        for (j = key->start; j < key->len; j++) {
+        for (j = key->start; j < key_end; j++) {
             Parrot_io_printf(interp, "      [\n", i);
             Parrot_io_printf(interp, "          BYTECODE_OFFSET => %d\n",
                     self->base.data[j * 2 + ANN_ENTRY_OFF]);

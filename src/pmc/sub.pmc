@@ -79,7 +79,6 @@ pmclass Sub auto_attrs provides invokable {
 
     ATTR PMC               *lex_info;        /* LexInfo PMC */
     ATTR PMC               *outer_sub;       /* :outer for closures */
-    ATTR PMC               *eval_pmc;        /* eval container / NULL */
     ATTR PMC               *ctx;             /* the context this sub is in */
     ATTR UINTVAL            comp_flags;      /* compile time and additional flags */
     ATTR Parrot_sub_arginfo *arg_info;       /* Argument counts and flags. */
@@ -236,8 +235,7 @@ surboutine is fully constructed but not attached to interpreter.
             attrs->arg_info->named_slurpy = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "named_slurpy"));
         }
 
-        /* C<eval_pmc> and C<ctx> are not handled here, and shouldn't be,
-         * because of run-time nature.  */
+        /* C<ctx> not handled here, and shouldn't be, because of run-time nature.  */
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -428,6 +426,11 @@ Invokes the subroutine.
 
         Parrot_pcc_set_context(INTERP, context);
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
+
+        /* support callcontext reuse */
+        if (context == caller_ctx)
+            Parrot_pcc_free_registers(INTERP, context);
+
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
         object = Parrot_pcc_get_object(INTERP, context);
@@ -612,13 +615,20 @@ Marks the sub as live.
         Parrot_gc_mark_STRING_alive(INTERP, sub->ns_entry_name);
 
         Parrot_gc_mark_PMC_alive(INTERP, sub->ctx);
-        Parrot_gc_mark_PMC_alive(INTERP, sub->eval_pmc);
         Parrot_gc_mark_PMC_alive(INTERP, sub->lex_info);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_sub);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_name);
         Parrot_gc_mark_PMC_alive(INTERP, sub->multi_signature);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_stash);
+
+        /* XXX
+         * Workaround for things that subclass sub but don't point into packfiles
+         * (eg: EventHandler)
+         * TODO: use inheritance properly to avoid this
+         */
+        if (sub->seg)
+            Parrot_gc_mark_PMC_alive(INTERP, sub->seg->base.pf->view);
     }
 
 /*
@@ -1022,7 +1032,7 @@ slurpy arguments).
 
         PMC_get_sub(INTERP, SELF, sub);
         /*
-        XXX Rakudo's failing with with this code on ASSERT. Why???
+        XXX Rakudo's failing with this code on ASSERT. Why???
         GET_ATTR_namespace_stash(INTERP, SELF, _namespace);
         PARROT_ASSERT(_namespace == sub->namespace_stash || !"consistency!!!");
         */
