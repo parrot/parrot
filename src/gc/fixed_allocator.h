@@ -26,6 +26,11 @@ src/gc/fixed_allocator.h - implementation of allocator for small-size objects.
 #define ARENA_BOUNDS_PADDING 128
 #define NEXT_ARENA_BOUNDS_SIZE(n) (2 * ((n) + ARENA_BOUNDS_PADDING) * sizeof (void*))
 
+typedef struct Pool_Allocator_Free_List {
+    struct Pool_Allocator_Free_List * next;
+
+} Pool_Allocator_Free_List;
+
 typedef struct Pool_Allocator_Arena {
     struct Pool_Allocator_Arena * next;
 } Pool_Allocator_Arena;
@@ -36,10 +41,10 @@ typedef struct Pool_Allocator {
     size_t objects_per_alloc;
     size_t num_free_objects;
 
-    Pool_Allocator_Arena * top_arena;
-    Pool_Allocator_Arena * free_list;
-    Pool_Allocator_Arena * newfree;
-    Pool_Allocator_Arena * newlast;
+    Pool_Allocator_Arena     * top_arena;
+    Pool_Allocator_Free_List * free_list;
+    Pool_Allocator_Free_List * newfree;
+    Pool_Allocator_Free_List * newlast;
 
     /* Pointers of arena bounds. Used in .is_owned check */
     void *lo_arena_ptr;

@@ -431,7 +431,7 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(get_free_list_item)
 
-    Pool_Allocator_Arena * const item = pool->free_list;
+    Pool_Allocator_Free_List * const item = pool->free_list;
     pool->free_list = item->next;
     --pool->num_free_objects;
     return item;
@@ -458,8 +458,8 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(get_newfree_list_item)
 
-    Pool_Allocator_Arena * const item = pool->newfree;
-    pool->newfree = (Pool_Allocator_Arena *)
+    Pool_Allocator_Free_List * const item = pool->newfree;
+    pool->newfree = (Pool_Allocator_Free_List *)
                     ((char *)(pool->newfree) + pool->object_size);
 
     if (pool->newfree >= pool->newlast)
@@ -473,7 +473,7 @@ static void
 pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *data))
 {
     ASSERT_ARGS(pool_free)
-    Pool_Allocator_Arena * const item = (Pool_Allocator_Arena *)data;
+    Pool_Allocator_Free_List * const item = (Pool_Allocator_Free_List *)data;
 
     /* It's too expensive.
     PARROT_ASSERT(Parrot_gc_pool_is_owned(pool, data));
@@ -536,7 +536,7 @@ static void
 allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 {
     ASSERT_ARGS(allocate_new_pool_arena)
-    Pool_Allocator_Arena *next, *last;
+    Pool_Allocator_Free_List *next, *last;
     Pool_Allocator_Arena     *new_arena;
 
     const size_t num_items  = pool->objects_per_alloc;
@@ -554,8 +554,8 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
 
     new_arena->next = pool->top_arena;
     pool->top_arena = new_arena;
-    next            = (Pool_Allocator_Arena *)(new_arena + 1);
-    last            = (Pool_Allocator_Arena *)((char *)next + item_space);
+    next            = (Pool_Allocator_Free_List *)(new_arena + 1);
+    last            = (Pool_Allocator_Free_List *)((char *)next + item_space);
     pool->newfree   = next;
     pool->newlast   = last;
 
