@@ -207,7 +207,6 @@ popcallchain(PARROT_INTERP)
     subprofile *sp = spdata.cursp;
     subprofile *csp = sp->caller;
     if (csp) {
-        fprintf(stderr, "# pushing %d from %p -> %p ci %p, next %p\n", sp->callerops, sp, csp, sp->callerci, csp->caller);
         sp->callerci->ops   += sp->callerops;
         sp->callerci->ticks += sp->callerticks;
         csp->callerops      += sp->callerops;
@@ -244,7 +243,6 @@ finishcallchain(PARROT_INTERP)
     for (sp = spdata.cursp; sp; sp = csp) {
         csp = sp->caller;
         if (csp) {
-	    fprintf(stderr, "# finishing %d from %p -> %p ci %p, next %p\n", sp->callerops, sp, csp, sp->callerci, csp->caller);
             sp->callerci->ops   += sp->callerops;
             sp->callerci->ticks += sp->callerticks;
             csp->callerops      += sp->callerops;
