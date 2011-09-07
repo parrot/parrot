@@ -17,7 +17,7 @@ C<File> is a singleton class which provides access to File functions.
 
 */
 
-#ifdef WIN32
+#if defined WIN32 && !defined __MSYS__
 #  include <direct.h>
 #endif
 

@@ -49,8 +49,10 @@
 /generated_hello.pbc
 /install_config.fpmc
 /installable*
+/libparrot.a
 /libparrot.def
 /libparrot.dll
+/libparrot.dll.a
 /miniparrot
 /myconfig
 /ops2c
@@ -243,6 +245,7 @@
 /runtime/parrot/dynext/*.bundle
 /runtime/parrot/dynext/*.def
 /runtime/parrot/dynext/*.dll
+/runtime/parrot/dynext/*.dll.a
 /runtime/parrot/dynext/*.dylib
 /runtime/parrot/dynext/*.exe
 /runtime/parrot/dynext/*.exp

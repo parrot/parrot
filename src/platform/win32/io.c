@@ -23,6 +23,9 @@ Win32 System Programming, 2nd Edition.
 
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
+#include "path.h"
+
+#include <windows.h>
 
 /* HEADERIZER HFILE: none */
 
@@ -47,8 +50,6 @@ static void convert_flags_to_win32(
     , PARROT_ASSERT_ARG(fdwCreate))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#include <tchar.h>
 
 #define PIO_TRACE 0
 
@@ -169,33 +170,17 @@ Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
     DWORD      fAcc, fShare, fCreat;
     PIOHANDLE  fd;
-    char      *spath;
-
-#if 0
-    if ((Interp_flags_TEST(interp, PARROT_DEBUG_FLAG)) != 0) {
-        fprintf(stderr, "Parrot_io_open: %s\n", spath);
-    }
-#endif
+    LPWSTR     wp_path;
 
     /* Set open flags - <, >, >>, +<, +> */
     /* add ? and ! for block/non-block */
     convert_flags_to_win32(flags, &fAcc, &fShare, &fCreat);
 
-    if (path->encoding == Parrot_ascii_encoding_ptr) {
-        spath = Parrot_str_to_encoded_cstring(interp, path,
-                    Parrot_ascii_encoding_ptr);
-        fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
-                    FILE_ATTRIBUTE_NORMAL, NULL);
-    }
-    else {
-        spath = Parrot_str_to_encoded_cstring(interp, path,
-                    Parrot_utf16_encoding_ptr);
-        fd = CreateFileW((LPCWSTR)spath, fAcc, fShare, NULL, fCreat,
-                    FILE_ATTRIBUTE_NORMAL, NULL);
-    }
+    wp_path = PARROT_WIN32_PATH(interp, path);
+    fd      = CreateFileW(wp_path, fAcc, fShare, NULL, fCreat,
+                  FILE_ATTRIBUTE_NORMAL, NULL);
 
-    Parrot_str_free_cstring(spath);
-
+    PARROT_WIN32_FREE_PATH(wp_path);
     return fd;
 }
 

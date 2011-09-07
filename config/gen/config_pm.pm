@@ -22,6 +22,7 @@ use Parrot::Configure::Utils ':gen';
 
 use Cwd qw(cwd);
 use File::Spec::Functions qw(catdir);
+use MSYS::MinGW;
 
 sub _init {
     my $self = shift;
@@ -88,10 +89,6 @@ sub runstep {
     $conf->data->add( ' ', 'embed-ldflags' => join(' ' => @deduped) );
 
     my $cwd = cwd();
-
-    # expand msys virtual paths
-    $cwd = `cd '$cwd' && pwd -W`, chomp $cwd
-        if $conf->data->get('osname') eq 'msys';
 
     # escape spaces in current directory
     $cwd =~ s{ }{\\ }g;

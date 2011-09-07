@@ -950,6 +950,7 @@ include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
 lib/File/Which.pm                                           [devel]lib
 lib/IO/CaptureOutput.pm                                     []
+lib/MSYS/MinGW.pm                                           [devel]lib
 lib/Parrot/BuildUtil.pm                                     [devel]lib
 lib/Parrot/Config.pm                                        [devel]lib
 lib/Parrot/Configure.pm                                     [devel]lib

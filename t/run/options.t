@@ -59,6 +59,10 @@ say "first"
 .end
 
 END_PIR
+
+$expected_preprocesses_pir =~ s/\n/\r\n/g
+    if $^O eq 'msys';
+
 is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
 is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
 $expected_preprocesses_pir, 'option --pre-process-only' );
