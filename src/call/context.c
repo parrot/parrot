@@ -210,43 +210,6 @@ create_initial_context(PARROT_INTERP)
     UNUSED(ignored);
 }
 
-/*
-
-=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
-
-Clears all registers in a context.  PMC and STRING registers contain PMCNULL
-and NULL, respectively.  Integer and float registers contain negative flag
-values, for debugging purposes.
-
-=cut
-
-*/
-
-static void
-clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
-{
-    ASSERT_ARGS(clear_regs)
-    UINTVAL       i;
-    const UINTVAL s_regs = ctx->n_regs_used[REGNO_STR];
-    const UINTVAL p_regs = ctx->n_regs_used[REGNO_PMC];
-
-    /* NULL out registers - P/S have to be NULL for GC */
-    for (i = 0; i < s_regs; ++i)
-        ctx->bp_ps.regs_s[i] = STRINGNULL;
-
-    for (i = 0; i < p_regs; ++i)
-        ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
-
-    if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
-        /* depending on -D40, set int and num to identifiable garbage values */
-        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i)
-            ctx->bp.regs_i[i] = -999;
-
-        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i)
-            ctx->bp.regs_n[-1L - i] = -99.9;
-    }
-}
-
 
 /*
 
@@ -436,15 +399,17 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     const size_t all_regs_size = size_n + size_i + size_p + size_s;
     const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
 
-    /* don't allocate any storage if there are no registers */
-    ctx->registers = reg_alloc
-        ? (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, reg_alloc)
-        : NULL;
-
     ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
     ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
     ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
     ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
+
+    if (!reg_alloc) {
+        ctx->registers = NULL;
+        return;
+    }
+    /* don't allocate any storage if there are no registers */
+    ctx->registers = (Parrot_Context *)Parrot_gc_allocate_fixed_size_storage(interp, reg_alloc);
 
     /* ctx.bp points to I0, which has Nx on the left */
     ctx->bp.regs_i = (INTVAL *)((char *)ctx->registers + size_n);
@@ -452,7 +417,45 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
-    clear_regs(interp, ctx);
+    return clear_regs(interp, ctx);
+}
+
+
+/*
+
+=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
+
+Clears all registers in a context.  PMC and STRING registers contain PMCNULL
+and NULL, respectively.  Integer and float registers contain negative flag
+values, for debugging purposes.
+
+=cut
+
+*/
+
+static void
+clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
+{
+    ASSERT_ARGS(clear_regs)
+    UINTVAL       i;
+    const UINTVAL s_regs = ctx->n_regs_used[REGNO_STR];
+    const UINTVAL p_regs = ctx->n_regs_used[REGNO_PMC];
+
+    /* NULL out registers - P/S have to be NULL for GC */
+    for (i = 0; i < s_regs; ++i)
+        ctx->bp_ps.regs_s[i] = STRINGNULL;
+
+    for (i = 0; i < p_regs; ++i)
+        ctx->bp_ps.regs_p[-1L - i] = PMCNULL;
+
+    if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
+        /* depending on -D40, set int and num to identifiable garbage values */
+        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; ++i)
+            ctx->bp.regs_i[i] = -999;
+
+        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; ++i)
+            ctx->bp.regs_n[-1L - i] = -99.9;
+    }
 }
 
 
