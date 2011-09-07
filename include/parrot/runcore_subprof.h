@@ -13,13 +13,32 @@
 
 typedef struct subprofile subprofile;
 typedef struct callinfo callinfo;
+typedef struct lineinfo lineinfo;
 typedef struct subprofiledata subprofiledata;
 
 struct callinfo {
+    /* which sub we called */
     subprofile   *callee;
+    /* how often it was called */
     int           count;
+    /* how many ops where executed in it (including subcalls) */
     unsigned int  ops;
+    /* how many ticks where spent in it (including subcalls) */
     uint64_t      ticks;
+};
+
+struct lineinfo {
+    /* start op of this line */
+    size_t                startop;
+    /* first op after the end of this line */
+    size_t                endop;
+    /* calls made from this line */
+    callinfo              *calls;
+    int                   line;
+    /* number of ops executed in this line */
+    unsigned int          ops;
+    /* number of CPU ticks spent in this line */
+    uint64_t              ticks;
 };
 
 struct subprofile {
@@ -33,22 +52,23 @@ struct subprofile {
     PMC                   *subpmc; 
     /* the ATTRs of subpmc */
     Parrot_Sub_attributes *subattrs;
-    /* array of callinfo structs related to the current call chain  */
-    callinfo              *calls;
-    /* number of elements in the callinfo array */
-    int                    ncalls;
-    /* number of ops executed in this sub */
-    unsigned int           ops;
-    /* number of CPU ticks spent in this sub */
-    uint64_t               ticks;
+    /* first op of segment */
+    opcode_t              *code_ops;
+
+    lineinfo              *lines;
+    int                   nlines;
 
     /* call chain info */
-    /* profile info for the caller */
+    /* which sub called us */
     subprofile            *caller;
-    /* some kind of index into calls */
-    int                    calleri;
+    /* where the call was done */
+    callinfo              *callerci;
+
     /* the active Context for the Sub being profiled */
     PMC                   *ctx;
+
+    /* ops/ticks we need to distribute to the caller when
+       we leave the sub */
     unsigned int           callerops;
     uint64_t               callerticks;
 };
@@ -62,6 +82,10 @@ struct subprofiledata {
     PMC *cursubpmc;
     PMC *curctx;
     subprofile *cursp;
+    lineinfo *curline;
+
+    opcode_t *startop;
+    opcode_t *endop;
 
     /* ticks are added at the end of the op */
     uint64_t *tickadd;
