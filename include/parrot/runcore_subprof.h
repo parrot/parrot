@@ -73,8 +73,13 @@ struct subprofile {
     uint64_t               callerticks;
 };
 
+#define SUBPROF_TYPE_FUN 1
+#define SUBPROF_TYPE_HLL 2
+#define SUBPROF_TYPE_OPS 3
+
 struct subprofiledata {
-    int have_profile_data;
+    /* type of profile */
+    int profile_type;
     /* the collected data */
     subprofile *subprofilehash[32768];
 
@@ -82,10 +87,6 @@ struct subprofiledata {
     PMC *cursubpmc;
     PMC *curctx;
     subprofile *cursp;
-    lineinfo *curline;
-
-    opcode_t *startop;
-    opcode_t *endop;
 
     /* ticks are added at the end of the op */
     uint64_t *tickadd;
