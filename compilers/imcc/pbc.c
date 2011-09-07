@@ -681,7 +681,6 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
         if (ins->opname && STREQ(ins->opname, ".annotate")) {
             /* Annotations contribute nothing to code size, since they do not
              * end up in bytecode segment. */
-            (*src_lines)++;
         }
         else if (ins->opname && *ins->opname) {
             (*src_lines)++;
