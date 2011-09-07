@@ -80,6 +80,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC *cb, *cb_sig;
     int type = 0;
     STRING *sc;
+
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
