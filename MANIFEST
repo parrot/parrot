@@ -16,7 +16,6 @@ LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
-NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
@@ -1034,7 +1033,6 @@ lib/Parrot/SearchOps.pm                                     [devel]lib
 lib/Parrot/Test.pm                                          [devel]lib
 lib/Parrot/Test/Harness.pm                                  [devel]lib
 lib/Parrot/Test/PGE.pm                                      [devel]lib
-lib/Parrot/Test/PIR_PGE.pm                                  [devel]lib
 lib/Parrot/Test/Pod.pm                                      [devel]lib
 lib/Parrot/Test/Pod/Utils.pm                                [devel]lib
 lib/Parrot/Test/Util.pm                                     [devel]lib
