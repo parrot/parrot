@@ -675,33 +675,39 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
     *src_lines = 0;
 
     for (code_size = 0; ins ; ins = ins->next) {
+        char * const opname = ins->opname;
+        const int opsize = ins->opsize;
+
         if (ins->type & ITLABEL)
             ins->symregs[0]->color = code_size;
 
-        if (ins->opname && STREQ(ins->opname, ".annotate")) {
+        if (!opname || !*opname) {
+            if (opsize)
+                IMCC_fatal(imcc, 1, "get_code_size: non instruction with size found\n");
+            continue;
+        }
+
+        if (STREQ(opname, ".annotate")) {
             /* Annotations contribute nothing to code size, since they do not
              * end up in bytecode segment. */
+            continue;
         }
-        else if (ins->opname && *ins->opname) {
-            (*src_lines)++;
-            if (!ins->op)
-                IMCC_fatal(imcc, 1, "get_code_size: "
-                        "no opnum ins#%d %d\n",
-                        ins->index, ins);
+        (*src_lines)++;
+        if (!ins->op)
+            IMCC_fatal(imcc, 1, "get_code_size: "
+                    "no opnum ins#%d %d\n",
+                    ins->index, ins);
 
-            if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
-                /* set_p_pc opcode */
-                IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
-                        ins->symregs[1]->name);
+        if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
+            /* set_p_pc opcode */
+            IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
+                    ins->symregs[1]->name);
 
-                if (ins->symregs[1]->usage & U_FIXUP)
-                    store_fixup(imcc, ins->symregs[1], code_size, 2);
-            }
-
-            code_size += ins->opsize;
+            if (ins->symregs[1]->usage & U_FIXUP)
+                store_fixup(imcc, ins->symregs[1], code_size, 2);
         }
-        else if (ins->opsize)
-            IMCC_fatal(imcc, 1, "get_code_size: non instruction with size found\n");
+
+        code_size += opsize;
     }
 
     return code_size;
