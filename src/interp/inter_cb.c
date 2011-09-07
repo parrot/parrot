@@ -80,16 +80,15 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC *cb, *cb_sig;
     int type = 0;
     STRING *sc;
-
-    if (default_interp == NULL)
-        default_interp = interp;
-
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
      */
     PMC * const interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
+
+    if (default_interp == NULL)
+        default_interp = interp;
 
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
