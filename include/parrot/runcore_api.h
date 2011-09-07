@@ -143,9 +143,6 @@ void Parrot_runcore_gc_debug_init(PARROT_INTERP)
 void Parrot_runcore_slow_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_runcore_subprof_init(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_get_core_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_Parrot_runcore_debugger_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -157,8 +154,6 @@ void Parrot_runcore_subprof_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_runcore_gc_debug_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_slow_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_runcore_subprof_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/cores.c */

@@ -73,7 +73,7 @@ struct subprofile {
     uint64_t               callerticks;
 };
 
-#define SUBPROF_TYPE_FUN 1
+#define SUBPROF_TYPE_SUB 1
 #define SUBPROF_TYPE_HLL 2
 #define SUBPROF_TYPE_OPS 3
 
@@ -101,12 +101,35 @@ struct subprofiledata {
 void dump_profile_data(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void profile(PARROT_INTERP, PMC *ctx, opcode_t *pc)
+void mark_profile_data(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_runcore_subprof_sub_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_runcore_subprof_ops_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+lineinfo * sync_hll_linechange(PARROT_INTERP, opcode_t *pc_op)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_dump_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_profile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_mark_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runcore_subprof_sub_init \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runcore_subprof_hll_init \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runcore_subprof_ops_init \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_sync_hll_linechange __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/subprof.c */

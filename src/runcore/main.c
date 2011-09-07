@@ -71,7 +71,7 @@ Parrot_runcore_init(PARROT_INTERP)
 
     Parrot_runcore_subprof_ops_init(interp);
     Parrot_runcore_subprof_hll_init(interp);
-    Parrot_runcore_subprof_fun_init(interp);
+    Parrot_runcore_subprof_sub_init(interp);
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);

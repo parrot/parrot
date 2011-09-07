@@ -188,8 +188,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
-        else if (STREQ(corename, "subprof_fun"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_fun"));
+        else if (STREQ(corename, "subprof_sub"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
         else if (STREQ(corename, "subprof_hll"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
         else if (STREQ(corename, "subprof_ops"))
