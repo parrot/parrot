@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -61,6 +61,7 @@ Initializes a concurrency scheduler object.
         core_struct->id          = 0;
         core_struct->max_tid     = 0;
         core_struct->task_list   = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_integer_native(INTERP, core_struct->task_list, Hash_key_type_int);
         core_struct->task_index  = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
         core_struct->wait_index  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->handlers    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
@@ -127,10 +128,9 @@ current maximum, and a birthtime of the current time.
 
         new_tid     = ++(core_struct->max_tid);
         VTABLE_set_integer_native(INTERP, task, new_tid);
-        task_id_str = Parrot_str_from_int(INTERP, new_tid);
 
-        VTABLE_set_pmc_keyed_str(INTERP, core_struct->task_list,
-                                         task_id_str, task);
+        VTABLE_set_pmc_keyed_int(INTERP, core_struct->task_list,
+                                         new_tid, task);
 
         if (task->vtable->base_type == enum_class_Timer)
             VTABLE_push_integer(INTERP, core_struct->wait_index, new_tid);
@@ -202,9 +202,8 @@ Removes the task with the given task ID from the task list.
 
     VTABLE void delete_keyed_int(INTVAL key) {
         const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        STRING                      * const task_id_str = Parrot_str_from_int(INTERP, key);
 
-        VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
+        VTABLE_delete_keyed_int(INTERP, core_struct->task_list, key);
         SCHEDULER_cache_valid_CLEAR(SELF);
     }
 
