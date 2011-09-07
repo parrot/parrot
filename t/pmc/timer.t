@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 use Parrot::Config;
 
 =head1 NAME
@@ -247,6 +247,46 @@ ok 2
 ok 3
 OUT
 }
+
+pir_output_is( <<'CODE', <<'OUT', "Timer start/repeat/stop");
+.include "timer.pasm"
+.sub tick
+    get_global $P0, 'counter'
+    inc $P0
+.end
+.sub main :main
+    .local pmc timer
+    .local int t1, t2, r
+    .const 'Sub' tick = 'tick'
+    $P0 = new 'Integer'
+    set_global 'counter', $P0
+    timer = new ['Timer']
+    timer[.PARROT_TIMER_HANDLER] = tick
+    timer[.PARROT_TIMER_NSEC] = 0.1
+    timer[.PARROT_TIMER_REPEAT] = -1
+    timer[.PARROT_TIMER_RUNNING] = 1
+    # Allow at least two ticks
+    sleep 0.2
+    sleep 0.2
+    timer[.PARROT_TIMER_RUNNING] = 0
+    # Give a chance to run a possible pending tick
+    sleep 0.2
+    get_global $P0, 'counter'
+    t1 = $P0
+    r = isgt t1, 1
+    say r
+    # Give a chance to tick to verify that is stoped
+    sleep 0.2
+    sleep 0.2
+    get_global $P0, 'counter'
+    t2 = $P0
+    r = iseq t1, t2
+    say r
+.end
+CODE
+1
+1
+OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
