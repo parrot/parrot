@@ -80,8 +80,8 @@ struct subprofile {
 struct subprofiledata {
     /* type of profile */
     int profile_type;
-    /* the collected data */
-    subprofile *subprofilehash[32768];
+    /* the collected data, maps subpmc -> subprofile */
+    Hash *sphash;
 
     /* the current context */
     PMC *cursubpmc;

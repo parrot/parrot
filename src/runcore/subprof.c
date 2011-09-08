@@ -224,27 +224,21 @@ createlines(PARROT_INTERP, subprofile *sp)
 static subprofile *
 sub2subprofile(PARROT_INTERP, PMC *ctx, PMC *subpmc)
 {
-    Parrot_Sub_attributes *subattrs;
-    int h;
-    subprofile *sp, **spp;
-    static subprofile *lastsp;
+    subprofile *sp;
 
-    PMC_get_sub(interp, subpmc, subattrs);
-    if (lastsp && lastsp->subattrs == subattrs)
-        return lastsp;
-    h = ((int)subattrs >> 5) & 32767;
-    for (spp = spdata.subprofilehash + h; (sp = *spp) != 0; spp = &sp->hnext)
-        if (sp->subattrs == subattrs)
-            break;
+    if (!spdata.sphash)
+        spdata.sphash = Parrot_hash_create(interp, enum_type_ptr, Hash_key_type_PMC_ptr);
+    sp = (subprofile *)Parrot_hash_get(interp, spdata.sphash, (void*)subpmc);
     if (!sp) {
+        Parrot_Sub_attributes *subattrs;
+        PMC_get_sub(interp, subpmc, subattrs);
         sp           = (subprofile *)calloc(sizeof(subprofile), 1);
         sp->subattrs = subattrs;
         sp->subpmc   = subpmc;
         sp->code_ops = sp->subattrs->seg->base.data;
-        *spp         = sp;
         createlines(interp, sp);
+        Parrot_hash_put(interp, spdata.sphash, (void*)subpmc, (void*)sp);
     }
-    lastsp = sp;
     return sp;
 }
 
@@ -533,73 +527,66 @@ dump_profile_data(PARROT_INTERP)
         return;
 
     finishcallchain(interp);    /* just in case... */
+    if (!spdata.sphash)
+        spdata.sphash = Parrot_hash_create(interp, enum_type_ptr, Hash_key_type_PMC_ptr);
 
-    for (h = 0; h < 32768; h++) {
-        subprofile *hsp;
-        for (hsp = spdata.subprofilehash[h]; hsp; hsp = hsp->hnext) {
-            subprofile *sp;
-            for (sp = hsp; sp; sp = sp->rnext) {
-                int j;
-                for (j = 0; j < sp->nlines; j++) {
-                    totalops += sp->lines[j].ops;
-                    totalticks += sp->lines[j].ticks;
-                }
+    parrot_hash_iterate(spdata.sphash,
+        subprofile *hsp = (subprofile*)_bucket->value;
+        subprofile *sp;
+        for (sp = hsp; sp; sp = sp->rnext) {
+            int j;
+            for (j = 0; j < sp->nlines; j++) {
+                totalops += sp->lines[j].ops;
+                totalticks += sp->lines[j].ticks;
             }
         }
-    }
+    );
+
     fprintf(stderr, "events: ops ticks\n");
     fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
 
-    for (h = 0; h < 32768; h++) {
-        subprofile *hsp;
-        for (hsp = spdata.subprofilehash[h]; hsp; hsp = hsp->hnext) {
-            subprofile *sp;
-            for (sp = hsp; sp; sp = sp->rnext) {
-                int i, j;
+    parrot_hash_iterate(spdata.sphash,
+        subprofile *hsp = (subprofile*)_bucket->value;
+        subprofile *sp;
+        for (sp = hsp; sp; sp = sp->rnext) {
+            int i;
 
-                fprintf(stderr, "\n");
-                fprintf(stderr, "fl=");
-                printspline(interp, sp);
-                fprintf(stderr, "\n");
-                fprintf(stderr, "fn=");
-                printspname(interp, sp);
-                fprintf(stderr, "\n");
-                for (j = 0; j < sp->nlines; j++) {
-                    lineinfo *li = sp->lines + j;
-                    callinfo *ci;
-                    if (li->ops || li->ticks)
-                        fprintf(stderr, "%d %d %lld\n", li->line, li->ops, li->ticks);
-                    for (ci = li->calls; ci && ci->callee; ci++) {
-                        subprofile *csp = ci->callee;
-                        fprintf(stderr, "cfl=");
-                        printspline(interp, csp);
-                        fprintf(stderr, "\n");
-                        fprintf(stderr, "cfn=");
-                        printspname(interp, csp);
-                        fprintf(stderr, "\n");
-                        fprintf(stderr, "calls=%d %d\n", ci->count, csp->lines[0].line);
-                        fprintf(stderr, "%d %d %lld\n", li->line, ci->ops, ci->ticks);
-                    }
+            fprintf(stderr, "\n");
+            fprintf(stderr, "fl=");
+            printspline(interp, sp);
+            fprintf(stderr, "\n");
+            fprintf(stderr, "fn=");
+            printspname(interp, sp);
+            fprintf(stderr, "\n");
+            for (i = 0; i < sp->nlines; i++) {
+                lineinfo *li = sp->lines + i;
+                callinfo *ci;
+                if (li->ops || li->ticks)
+                    fprintf(stderr, "%d %d %lld\n", li->line, li->ops, li->ticks);
+                for (ci = li->calls; ci && ci->callee; ci++) {
+                    subprofile *csp = ci->callee;
+                    fprintf(stderr, "cfl=");
+                    printspline(interp, csp);
+                    fprintf(stderr, "\n");
+                    fprintf(stderr, "cfn=");
+                    printspname(interp, csp);
+                    fprintf(stderr, "\n");
+                    fprintf(stderr, "calls=%d %d\n", ci->count, csp->lines[0].line);
+                    fprintf(stderr, "%d %d %lld\n", li->line, ci->ops, ci->ticks);
                 }
             }
         }
-    }
+    );
+
     fprintf(stderr, "\ntotals: %d %lld\n", totalops, totalticks);
 }
 
 void
 mark_profile_data(PARROT_INTERP)
 {
-    int h;
-
-    if (!spdata.profile_type)
+    if (!spdata.profile_type || !spdata.sphash)
         return;
-    for (h = 0; h < 32768; h++) {
-        subprofile *sp;
-        for (sp = spdata.subprofilehash[h]; sp; sp = sp->hnext) {
-            Parrot_gc_mark_PMC_alive(interp, sp->subpmc);
-        }
-    }
+    Parrot_hash_mark(interp, spdata.sphash);
 }
 
 
