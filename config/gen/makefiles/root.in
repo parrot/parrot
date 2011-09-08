@@ -2204,7 +2204,8 @@ m0_tests :
 	$(PERL) t/harness $(M0_TEST_FILES)
 
 m0_c_tests :
-	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
+#IF(win32):	set M0_INTERP=.\src\m0\c\m0$(EXE) && $(PERL) t/harness $(M0_TEST_FILES)
+#UNLESS(win32):	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
 
 m0_cover :
 	PERL5OPT=-MDevel::Cover $(MAKE) m0_tests
