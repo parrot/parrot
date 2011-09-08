@@ -1362,7 +1362,9 @@ Creates a new PMC object of the type of the class and calls init().
             Parrot_Object_attributes * const objattr =
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
-            objattr->attrib_store = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+            objattr->attrib_store =
+                Parrot_pmc_new_init_int(INTERP, enum_class_ResizablePMCArray,
+                        VTABLE_elements(INTERP, _class->attrib_index));
             PARROT_GC_WRITE_BARRIER(INTERP, object);
         }
 
