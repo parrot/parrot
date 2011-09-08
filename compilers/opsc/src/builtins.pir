@@ -89,14 +89,41 @@ Variour helper builtins.
     die why
 .end
 
-.sub 'slurp'
+.sub 'transcode_slurp'
     .param string file
     .local pmc pio
     pio = new ['FileHandle']
     pio.'open'(file)
     $S0  = pio.'readall'()
     pio.'close'()
-    .return ($S0)
+    ($I0, $S1) = transcode( $S0, 'ascii' )
+    if $I0 goto return_result
+    ($I0, $S1) = transcode( $S0, 'iso-8859-1' )
+    if $I0 goto return_result
+    $S1 = $S0
+
+  return_result:
+    .return ($S1)
+.end
+
+.sub 'transcode'
+    .param string source
+    .param string encoding
+    .local int    result
+
+    push_eh transcoding_failure
+    $I0 = find_encoding encoding
+    $S0 = trans_encoding source, $I0
+    goto return_result
+
+  transcoding_failure:
+    result = 0
+    $S0    = source
+
+  return_result:
+    pop_eh
+    .return( result, $S0 )
+
 .end
 
 .sub 'split' :multi(_,_)
