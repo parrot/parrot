@@ -24,6 +24,9 @@ m0 : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 m0-debug : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug m0_mob.c m0_interp.c m0_ops.c
 
+clean:
+	rm -f *.o m0
+
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
 	ctags -e \
