@@ -85,7 +85,8 @@ static void clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ctx);
 
-static void init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
+PARROT_CANNOT_RETURN_NULL
+static PMC* init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pmcctx);
 
@@ -213,15 +214,16 @@ create_initial_context(PARROT_INTERP)
 
 /*
 
-=item C<static void init_context(PMC *pmcctx, PMC *pmcold)>
+=item C<static PMC* init_context(PMC *pmcctx, PMC *pmcold)>
 
-Initializes a freshly allocated or recycled context.
+Initializes a freshly allocated or recycled context and returns the new one.
 
 =cut
 
 */
 
-static void
+PARROT_CANNOT_RETURN_NULL
+static PMC*
 init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
 {
     ASSERT_ARGS(init_context)
@@ -236,7 +238,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
      * check ctx->current_sub. If it's not null return from here
      */
     if (!PMC_IS_NULL(ctx->current_sub))
-        return;
+        return pmcctx;
 
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
@@ -273,6 +275,8 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->recursion_depth   = old->recursion_depth;
         ctx->caller_ctx        = pmcold;
     }
+
+    return pmcctx;
 }
 
 
@@ -533,9 +537,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used),
     PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
     allocate_registers(interp, pmcctx, number_regs_used);
-    init_context(pmcctx, old);
-
-    return pmcctx;
+    return init_context(pmcctx, old);
 }
 
 
@@ -558,9 +560,7 @@ Parrot_pcc_allocate_empty_context(PARROT_INTERP, ARGIN_NULLOK(PMC *old))
     ASSERT_ARGS(Parrot_pcc_allocate_empty_context)
     PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
 
-    init_context(pmcctx, old);
-
-    return pmcctx;
+    return init_context(pmcctx, old);
 }
 
 /*
@@ -579,9 +579,7 @@ Parrot_pcc_init_context(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_pcc_init_context)
 
-    init_context(ctx, old);
-
-    return ctx;
+    return init_context(ctx, old);
 }
 
 /*
