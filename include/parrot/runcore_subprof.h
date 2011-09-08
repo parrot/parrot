@@ -42,8 +42,6 @@ struct lineinfo {
 };
 
 struct subprofile {
-    /* next subprofile according to hash order */
-    subprofile            *hnext;
     /* next subprofile according to recursion  */
     subprofile            *rnext;
     /* recursion level of this subprofile */
