@@ -304,7 +304,6 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     Pool_Allocator * const newpool = mem_internal_allocate_typed(Pool_Allocator);
 
     newpool->object_size       = attrib_size;
-    newpool->total_objects     = 0;
     newpool->objects_per_alloc = num_objs;
     newpool->num_free_objects  = 0;
     newpool->top_arena         = NULL;
@@ -560,7 +559,6 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     pool->newlast   = last;
 
     pool->num_free_objects += num_items;
-    pool->total_objects    += num_items;
 
     if (pool->lo_arena_ptr > (void *)next)
         pool->lo_arena_ptr = next;
