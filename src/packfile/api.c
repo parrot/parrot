@@ -1783,29 +1783,35 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_PREV_CS,
             "No code segment to switch to\n");
 
-    /* compiling source code uses this function too,
-     * which gives misleading trace messages */
-    if (really && Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        Interp * const tracer = interp->pdb && interp->pdb->debugger
-                              ? interp->pdb->debugger
-                              : interp;
-        Parrot_io_eprintf(tracer, "*** switching to %s\n", new_cs->base.name);
+    interp->code = new_cs;
+
+    if (really) {
+        /* compiling source code uses this function too,
+         * which gives misleading trace messages */
+        if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
+            Interp * const tracer = interp->pdb && interp->pdb->debugger
+                                  ? interp->pdb->debugger
+                                  : interp;
+            Parrot_io_eprintf(tracer, "*** switching to %s\n",
+                             new_cs->base.name);
+        }
+
+
+        if (n_interpreters
+        &&  interp->thread_data && interp->thread_data->tid != 0)
+            Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                   find_constants(interp, new_cs->const_table));
+        else
+            Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                   new_cs->const_table);
+
+        prepare_for_run(interp);
+        return cur_cs;
     }
 
-    interp->code               = new_cs;
 
-    if (really
-    && (n_interpreters
-    &&  interp->thread_data && interp->thread_data->tid != 0))
-        Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
-                               find_constants(interp, new_cs->const_table));
-    else
-        Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
-                               new_cs->const_table);
-
-    if (really)
-        prepare_for_run(interp);
-
+    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                     new_cs->const_table);
     return cur_cs;
 }
 
