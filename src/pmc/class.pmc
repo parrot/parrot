@@ -239,7 +239,8 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     int                  cur_index    = 0;
     PMC * const          attrib_index = Parrot_pmc_new(interp, enum_class_Hash);
-    PMC * const          cache        = Parrot_pmc_new(interp, enum_class_Hash);
+    PMC * const          cache        = Parrot_pmc_new_init_int(interp,
+                                            enum_class_Hash, enum_type_INTVAL);
     const int            num_classes  = VTABLE_elements(interp, _class->all_parents);
     int                  i;
 
@@ -1081,7 +1082,7 @@ String PMC containing the name of the class
 
 =item namespace
 
-NameSpace PMC of the the namespace attached to the class.
+NameSpace PMC of the namespace attached to the class.
 
 =item attributes
 

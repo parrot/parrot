@@ -543,7 +543,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 Provide access to a (possibly) valid interp pointer.  This is intended B<only>
 for use cases when an interp is not available otherwise, which shouldn't be
-often.  There are no guarantees about what what this function returns.  If you
+often.  There are no guarantees about what this function returns.  If you
 have access to a valid interp, use that instead.  Don't use this for anything
 other than error handling.
 

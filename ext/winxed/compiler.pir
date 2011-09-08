@@ -7326,7 +7326,7 @@
 .annotate 'line', 2635
     unless_null $P2, __label_2
 .annotate 'line', 2636
-    WSubId_1('unknow namespace', __ARG_1)
+    WSubId_1('unknown namespace', __ARG_1)
   __label_2: # endif
 .annotate 'line', 2637
     __ARG_3.'usenamespace'($P2)
@@ -16547,7 +16547,7 @@
     goto __label_5 # break
   __label_9: # case
 .annotate 'line', 5559
-    WSubId_6("Builtin unexpeted here", self)
+    WSubId_6("Builtin unexpected here", self)
   __label_6: # default
 .annotate 'line', 5561
     root_new $P6, ['parrot';'ResizablePMCArray']

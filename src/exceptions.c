@@ -7,7 +7,7 @@ src/exceptions.c - Exceptions
 
 =head1 DESCRIPTION
 
-Define the the core subsystem for exceptions.
+Define the core subsystem for exceptions.
 
 =head2 Exception Functions
 

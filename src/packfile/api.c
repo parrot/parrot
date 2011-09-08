@@ -1783,24 +1783,35 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_PREV_CS,
             "No code segment to switch to\n");
 
-    /* compiling source code uses this function too,
-     * which gives misleading trace messages */
-    if (really && Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        Interp * const tracer = interp->pdb && interp->pdb->debugger
-                              ? interp->pdb->debugger
-                              : interp;
-        Parrot_io_eprintf(tracer, "*** switching to %s\n", new_cs->base.name);
+    interp->code = new_cs;
+
+    if (really) {
+        /* compiling source code uses this function too,
+         * which gives misleading trace messages */
+        if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
+            Interp * const tracer = interp->pdb && interp->pdb->debugger
+                                  ? interp->pdb->debugger
+                                  : interp;
+            Parrot_io_eprintf(tracer, "*** switching to %s\n",
+                             new_cs->base.name);
+        }
+
+
+        if (n_interpreters
+        &&  interp->thread_data && interp->thread_data->tid != 0)
+            Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                   find_constants(interp, new_cs->const_table));
+        else
+            Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                   new_cs->const_table);
+
+        prepare_for_run(interp);
+        return cur_cs;
     }
 
-    interp->code               = new_cs;
 
-    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp), really
-                               ? find_constants(interp, new_cs->const_table)
-                               : new_cs->const_table);
-
-    if (really)
-        prepare_for_run(interp);
-
+    Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
+                                     new_cs->const_table);
     return cur_cs;
 }
 
@@ -1860,55 +1871,49 @@ static PackFile_ConstTable *
 find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
 {
     ASSERT_ARGS(find_constants)
-    if (!n_interpreters
-    ||  !interp->thread_data
-    ||  interp->thread_data->tid == 0)
-        return ct;
-    else {
-        Hash                 *tables;
-        PackFile_ConstTable  *new_ct;
+    Hash                 *tables;
+    PackFile_ConstTable  *new_ct;
 
-        PARROT_ASSERT(interp->thread_data);
+    PARROT_ASSERT(interp->thread_data);
 
-        if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables = Parrot_hash_new_pointer_hash(interp);
-        }
-
-        tables = interp->thread_data->const_tables;
-        new_ct = (PackFile_ConstTable *)Parrot_hash_get(interp, tables, ct);
-
-        if (!new_ct) {
-            /* need to construct it */
-
-            int i;
-
-            new_ct = mem_gc_allocate_zeroed_typed(interp, PackFile_ConstTable);
-
-            new_ct->num.const_count = ct->num.const_count;
-            new_ct->num.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->num.const_count, FLOATVAL);
-            memcpy(new_ct->num.constants, ct->num.constants,
-                    ct->num.const_count * sizeof (FLOATVAL));
-
-            new_ct->str.const_count = ct->str.const_count;
-            new_ct->str.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->str.const_count, STRING *);
-            memcpy(new_ct->str.constants, ct->str.constants,
-                    ct->str.const_count * sizeof (STRING *));
-
-            new_ct->pmc.const_count = ct->pmc.const_count;
-            new_ct->pmc.constants = mem_gc_allocate_n_zeroed_typed(interp,
-                                        ct->pmc.const_count, PMC *);
-            memcpy(new_ct->pmc.constants, ct->pmc.constants,
-                    ct->pmc.const_count * sizeof (PMC *));
-            for (i = 0; i < new_ct->pmc.const_count; ++i)
-                clone_constant(interp, &new_ct->pmc.constants[i]);
-
-            Parrot_hash_put(interp, tables, ct, new_ct);
-        }
-
-        return new_ct;
+    if (!interp->thread_data->const_tables) {
+        interp->thread_data->const_tables = Parrot_hash_new_pointer_hash(interp);
     }
+
+    tables = interp->thread_data->const_tables;
+    new_ct = (PackFile_ConstTable *)Parrot_hash_get(interp, tables, ct);
+
+    if (!new_ct) {
+        /* need to construct it */
+
+        int i;
+
+        new_ct = mem_gc_allocate_zeroed_typed(interp, PackFile_ConstTable);
+
+        new_ct->num.const_count = ct->num.const_count;
+        new_ct->num.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    ct->num.const_count, FLOATVAL);
+        memcpy(new_ct->num.constants, ct->num.constants,
+                ct->num.const_count * sizeof (FLOATVAL));
+
+        new_ct->str.const_count = ct->str.const_count;
+        new_ct->str.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    ct->str.const_count, STRING *);
+        memcpy(new_ct->str.constants, ct->str.constants,
+                ct->str.const_count * sizeof (STRING *));
+
+        new_ct->pmc.const_count = ct->pmc.const_count;
+        new_ct->pmc.constants = mem_gc_allocate_n_zeroed_typed(interp,
+                                    ct->pmc.const_count, PMC *);
+        memcpy(new_ct->pmc.constants, ct->pmc.constants,
+                ct->pmc.const_count * sizeof (PMC *));
+        for (i = 0; i < new_ct->pmc.const_count; ++i)
+            clone_constant(interp, &new_ct->pmc.constants[i]);
+
+        Parrot_hash_put(interp, tables, ct, new_ct);
+    }
+
+    return new_ct;
 }
 
 

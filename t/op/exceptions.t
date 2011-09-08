@@ -728,6 +728,7 @@ WX1
 $load '%s';
 
 namespace em {
+    class Friend;
     class User {
         function User() {}
 

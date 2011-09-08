@@ -202,7 +202,7 @@ foreach my $page (keys %pages) {
 
     my $outfile = File::Spec->catfile($target_dir, $outfilename) . '.html';
 
-    # replace make_path with legacy functional mkpath to accomodate older versions of Perl
+    # replace make_path with legacy functional mkpath to accommodate older versions of Perl
     my $dir = File::Path::mkpath(File::Basename::dirname($outfile));
 
     open my $out_fh, '>', $outfile;
@@ -307,7 +307,7 @@ sub transform_input {
 
     my $outfile = File::Spec->catfile($target_dir, $input) . '.html';
 
-    # replace make_path with legacy functional mkpath to accomodate older versions of Perl
+    # replace make_path with legacy functional mkpath to accommodate older versions of Perl
     my $dir = File::Path::mkpath(File::Basename::dirname($outfile));
 
     open my $out_fh, '>', $outfile;
