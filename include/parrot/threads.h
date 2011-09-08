@@ -49,7 +49,7 @@ typedef struct Thread_args {
 #define UNLOCK_INTERP(interp) \
     UNLOCK((interp)->interp_lock)
 
-#define BLOCK_THREAD_ON((interp), (blocking_call)) \
+#define BLOCK_THREAD_ON(interp, blocking_call) \
     do { \
       INTVAL tid, runloop_id, runloop_level; \
       PMC *context = Parrot_pmc_new((interp), enum_class_Continuation); \
