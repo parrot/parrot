@@ -1066,6 +1066,10 @@
 ^/winxed/
 ^/winxed\..*$
 ^/winxed\..*/
+^cachegrind\.out\..*$
+^cachegrind\.out\..*/
+^callgrind\.out\..*$
+^callgrind\.out\..*/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
