@@ -518,7 +518,7 @@ printspline(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         return;
 
     /* try HLL annotations */
-    if (sp->subattrs->seg->annotations) {
+    if (sp->subattrs->seg->annotations && spdata->profile_type != SUBPROF_TYPE_OPS) {
         PackFile_Annotations *ann = sp->subattrs->seg->annotations;
         PackFile_Annotations_Key *key;
         STRING *line_str = Parrot_str_new_constant(interp, "line");
@@ -1012,6 +1012,7 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
     subprofiledata *spdata = &_spdata;
     subprofile *sp = spdata->cursp;
     opcode_t *startop;
+    uint64_t tick;
     
     if (spdata->profile_type && spdata->profile_type != SUBPROF_TYPE_OPS)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1028,16 +1029,17 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
         subpmc = ((Parrot_Context *)PMC_data_typed(ctx, Parrot_Context*))->current_sub;
 
         if (!PMC_IS_NULL(subpmc)) {
+            /* finish old ticks */
+            uint64_t tick = rdtsc();
+            if (spdata->tickadd) {
+                uint64_t tickdiff = tick - spdata->starttick;
+                *spdata->tickadd         += tickdiff;
+                *spdata->tickadd2        += tickdiff;
+                spdata->starttick = tick;
+            }
+
             if (subpmc != spdata->cursubpmc || ctx != spdata->curctx) {
                 /* context changed! either called new sub or returned from sub */
-
-                /* finish old ticks */
-                uint64_t tick = rdtsc();
-                if (spdata->tickadd) {
-                    uint64_t tickdiff = tick - spdata->starttick;
-                    *spdata->tickadd         += tickdiff;
-                    *spdata->tickadd2        += tickdiff;
-                }
                 sync_callchainchange(interp, spdata, ctx, subpmc);
                 sp = spdata->cursp;
                 if (pc == sp->code_ops + sp->subattrs->start_offs) {
@@ -1046,12 +1048,12 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                         sp->callerci->count++;
                 }
                 startop = sp->code_ops + sp->subattrs->start_offs;
-                spdata->tickadd   = &sp->lines[(int)(pc - startop)].ticks;
                 spdata->tickadd2  = &sp->callerticks;
                 spdata->starttick = rdtsc();
             }
             sp->lines[(int)(pc - startop)].ops++;
             sp->callerops++;
+            spdata->tickadd = &sp->lines[(int)(pc - startop)].ticks;
         }
         DO_OP(pc, interp);
     }
