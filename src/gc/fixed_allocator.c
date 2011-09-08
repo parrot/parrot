@@ -445,7 +445,7 @@ pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     if (pool->free_list)
         return get_free_list_item(pool);
 
-    if (!pool->newfree)
+    if (pool->newfree >= pool->newlast)
         allocate_new_pool_arena(interp, pool);
 
     return get_newfree_list_item(pool);
@@ -460,9 +460,6 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
     Pool_Allocator_Free_List * const item = pool->newfree;
     pool->newfree = (Pool_Allocator_Free_List *)
                     ((char *)(pool->newfree) + pool->object_size);
-
-    if (pool->newfree >= pool->newlast)
-        pool->newfree = NULL;
 
     --pool->num_free_objects;
     return item;
