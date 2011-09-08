@@ -44,11 +44,11 @@ sub test_m0_file {
     my $file  = shift;
 
     assemble($file);
-    my $interp = $ENV{M0_INTERP} || catfile( ".", qw/src m0 perl5 m0_interp.pl/ );
+    my $interp = $ENV{M0_INTERP} || "$^X " . catfile( ".", qw/src m0 perl5 m0_interp.pl/ );
     my $args   = join(' ', @_);
 
-    diag "$^X $interp ${file}b $args 2>&1\n" if $ENV{DEBUG};
-    my $tap = `$^X $interp ${file}b $args 2>&1`;
+    diag "$interp ${file}b $args 2>&1\n" if $ENV{DEBUG};
+    my $tap = `$interp ${file}b $args 2>&1`;
     my $parser = TAP::Parser->new( {tap => $tap} );
     $parser->run;
     is($parser->has_problems, 0, "$file passes");
