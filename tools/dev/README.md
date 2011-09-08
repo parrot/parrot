@@ -13,7 +13,14 @@ Below is a list of Parrot Developer Tools and a short description of what they d
 
 ## dedeprecator.nqp
 
-This utility will scan your codebase use api.yaml to detect deprecated code and warn you about it.
+This utility will scan your codebase to detect deprecated code and warn you about it.
+For example, to find all deprecations in your PIR code:
+
+    dedeprecator.nqp myproject/*.pir
+
+It uses api.yaml by default, but can read alternate YAML configuration files:
+
+    dedeprecator.nqp --apiyaml foo.yaml myproject/*.pir
 
 ## show_deprecated.nqp
 
