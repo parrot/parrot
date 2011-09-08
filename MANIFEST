@@ -2130,7 +2130,7 @@ tools/build/pmc2c.pl                                        [devel]
 tools/build/vtable_extend.pl                                []
 tools/build/vtable_h.pl                                     []
 tools/dev/.gdbinit                                          []
-tools/dev/README                                            []doc
+tools/dev/README.md                                         []doc
 tools/dev/addopstags.pl                                     []
 tools/dev/all_hll_test.pl                                   []
 tools/dev/as2c.pl                                           []
