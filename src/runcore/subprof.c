@@ -464,11 +464,16 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
             cpc--;
 
         /* convert cpc into line */
-        for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
-            if (cpc >= li->startop && cpc < li->endop)
-                break;
-        if (i >= csp->nlines)
-            li = csp->lines - 1;    /* just in case */
+	if (spdata->profile_type != SUBPROF_TYPE_OPS) {
+            /* might do a binary seach instead */
+            for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
+                if (cpc >= li->startop && cpc < li->endop)
+                    break;
+            if (i >= csp->nlines)
+                li = csp->lines - 1;    /* just in case */
+        } else {
+            li = csp->lines + (cpc - csp->subattrs->start_offs);
+        }
 
         /* add caller to line */
         if (!li->calls) {
