@@ -81,6 +81,9 @@ struct subprofiledata {
     /* the collected data, maps subpmc -> subprofile */
     Hash *sphash;
 
+    /* maps to expanded debug data */
+    Hash *seg2debug;
+
     /* the current context */
     PMC *cursubpmc;
     PMC *curctx;

@@ -37,11 +37,10 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 
 static void buildcallchain(PARROT_INTERP,
     ARGIN(subprofiledata *spdata),
-    ARGIN(PMC *ctx),
+    ARGIN_NULLOK(PMC *ctx),
     ARGIN_NULLOK(PMC *subpmc))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 static void createlines(PARROT_INTERP,
     ARGIN(subprofiledata *spdata),
@@ -97,6 +96,14 @@ static opcode_t * runops_subprof_sub_core(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
+static INTVAL * sptodebug(PARROT_INTERP,
+    ARGIN(subprofiledata *spdata),
+    ARGIN(subprofile *sp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_CANNOT_RETURN_NULL
 static inline const char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         __attribute__nonnull__(1);
 
@@ -127,8 +134,7 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 
 #define ASSERT_ARGS_buildcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata) \
-    , PARROT_ASSERT_ARG(ctx))
+    , PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_createlines __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata) \
@@ -156,6 +162,10 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 #define ASSERT_ARGS_runops_subprof_sub_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
+#define ASSERT_ARGS_sptodebug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(spdata) \
+    , PARROT_ASSERT_ARG(sp))
 #define ASSERT_ARGS_str2cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_sub2subprofile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -176,6 +186,46 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 
 static subprofiledata _spdata;
 
+PARROT_CANNOT_RETURN_NULL
+static INTVAL *
+sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
+{
+    INTVAL *xdebug;
+    size_t di, op;
+    opcode_t *base_pc, *debug_ops;
+    size_t code_size, debug_size;
+    int i;
+
+    if (!spdata->seg2debug)
+        spdata->seg2debug = Parrot_hash_new_pointer_hash(interp);
+    xdebug = (INTVAL *)Parrot_hash_get(interp, spdata->seg2debug, (void*)sp->subattrs->seg);
+    if (xdebug)
+        return xdebug;
+
+    base_pc = sp->subattrs->seg->base.data;
+    code_size = sp->subattrs->seg->base.size;
+    debug_ops = sp->subattrs->seg->debugs->base.data;
+    debug_size = sp->subattrs->seg->debugs->base.size;
+
+    xdebug = (INTVAL *)calloc(sizeof(INTVAL), code_size);
+    for (di = 0, op = 0; op < code_size && di < debug_size; di++) {
+        op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
+        opcode_t opsize = op_info->op_count;
+        ADD_OP_VAR_PART(interp, sp->subattrs->seg, base_pc, opsize);
+        base_pc += opsize;
+        xdebug[op++] = *debug_ops >= 0 ? *debug_ops : -1;
+        while (--opsize > 0) {
+            xdebug[op++] = -2;
+        }
+        debug_ops++;
+    }
+    while (op < code_size)
+      xdebug[op++] = -2;
+    Parrot_hash_put(interp, spdata->seg2debug, (void*)sp->subattrs->seg, (void*)xdebug);
+    return xdebug;
+}
+
+
 /*        
 
 =item *C<static void createlines(...)>
@@ -191,35 +241,23 @@ static void
 createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 {
     if (spdata->profile_type == SUBPROF_TYPE_OPS) {
-        int i;
-        size_t di, op;
-        opcode_t *base_pc = sp->subattrs->seg->base.data;
-        size_t code_size = sp->subattrs->seg->base.size;
-        opcode_t *debug_ops = sp->subattrs->seg->debugs->base.data;
-        size_t debug_size = sp->subattrs->seg->debugs->base.size;
+        int i, lasti;
+        INTVAL *xdebug = sptodebug(interp, spdata, sp);
 
         sp->nlines = sp->subattrs->end_offs - sp->subattrs->start_offs;
         sp->lines = (lineinfo *)calloc(sizeof(lineinfo), sp->nlines ? sp->nlines : 1);
-        for (i = 0; i < sp->nlines; i++) {
-            sp->lines[i].line = -1;
-            sp->lines[i].startop = sp->subattrs->start_offs + i;
-            sp->lines[i].endop = sp->subattrs->start_offs + i + 1;
-        }
-        i = 0;
-        for (di = 0, op = 0; op < code_size && di < debug_size; di++) {
-            op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
-            opcode_t var_args = 0;
-            while (i < sp->nlines && op > sp->lines[i].startop)
-                i++;
-            ADD_OP_VAR_PART(interp, sp->subattrs->seg, base_pc, var_args);
-            var_args += op_info->op_count;
-            while (i < sp->nlines && op + var_args > sp->lines[i].startop) {
-                sp->lines[i].line = debug_ops[di];
-                i++;
+        sp->lines[0].line = -1;
+        sp->lines[0].startop = sp->subattrs->start_offs;        /* just in case... */
+        for (i = lasti = 0; i < sp->nlines; i++) {
+            INTVAL line = xdebug[sp->subattrs->start_offs + i];
+            if (line != -2) {
+                sp->lines[i].line = line;
+                sp->lines[i].startop = sp->subattrs->start_offs + i;
+                sp->lines[lasti].endop = sp->subattrs->start_offs + i;
+                lasti = i;
             }
-            op      += var_args;
-            base_pc += var_args;
         }
+        sp->lines[lasti].endop = sp->subattrs->end_offs;
         return;
     }
     if (sp->subattrs->seg->annotations && spdata->profile_type == SUBPROF_TYPE_HLL) {
@@ -409,7 +447,7 @@ finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 */
 
 static void
-buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *subpmc))
+buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *ctx), ARGIN_NULLOK(PMC *subpmc))
 {
     PMC *cctx;
     subprofile *sp;
@@ -473,6 +511,8 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
                 li = csp->lines - 1;    /* just in case */
         } else {
             li = csp->lines + (cpc - csp->subattrs->start_offs);
+            while (li->endop == 0 && li > csp->lines)
+                li--;
         }
 
         /* add caller to line */
@@ -1016,7 +1056,7 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
     PMC *ctx, *subpmc;
     subprofiledata *spdata = &_spdata;
     subprofile *sp = spdata->cursp;
-    opcode_t *startop;
+    opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : 0;
     uint64_t tick;
     
     if (spdata->profile_type && spdata->profile_type != SUBPROF_TYPE_OPS)
