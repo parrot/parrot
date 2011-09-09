@@ -608,8 +608,8 @@ printspline(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     /* try the debug section */
     if (sp->subattrs->seg->debugs) {
         STRING *file = Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
-        INTVAL line = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
 #if 0
+        INTVAL line = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
         fprintf(stderr, "%s:%d", str2cs(interp, file), (int)line);
 #else
         fprintf(stderr, "%s", str2cs(interp, file));
