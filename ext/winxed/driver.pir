@@ -231,11 +231,13 @@
   __label_8:
     unless $I3 goto __label_6
 .annotate 'line', 66
-    concat $S1, '--', $S1
+    concat $S3, '--', $S1
+    set $S1, $S3
     goto __label_7
   __label_6: # else
 .annotate 'line', 68
-    concat $S1, '-', $S1
+    concat $S4, '-', $S1
+    set $S1, $S4
   __label_7: # endif
 .annotate 'line', 69
 # predefined length
@@ -296,11 +298,13 @@
     sub $I3, $I1, 7
 # predefined substr
     substr $S3, __ARG_1, 0, $I3
-    concat $S1, $S3, __ARG_2
+    concat $S4, $S3, __ARG_2
+    set $S1, $S4
     goto __label_2
   __label_1: # else
 .annotate 'line', 85
-    concat $S1, __ARG_1, __ARG_2
+    concat $S5, __ARG_1, __ARG_2
+    set $S1, $S5
   __label_2: # endif
 .annotate 'line', 86
     .return($S1)
@@ -653,8 +657,9 @@
   __label_29: # endif
 .annotate 'line', 210
 # expr: $S8
-    concat $S8, 'function main[main](argv){', $S2
-    concat $S8, $S8, ';}'
+    concat $S10, 'function main[main](argv){', $S2
+    concat $S10, $S10, ';}'
+    set $S8, $S10
 .annotate 'line', 211
     $P11 = $P10.'compile'($S8, $P9 :flat :named)
 .annotate 'line', 213
@@ -743,7 +748,8 @@
     goto __label_42
   __label_43:
 # predefined getstdout
-    getstdout $P16
+    getstdout $P20
+    set $P16, $P20
   __label_42:
 .annotate 'line', 236
     $P16.'print'($P11)
