@@ -230,9 +230,6 @@ mark_interp(PARROT_INTERP)
     /* mark the concurrency scheduler */
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
-    /* s. packfile.c */
-    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
-
     /* mark caches and freelists */
     mark_object_cache(interp);
 

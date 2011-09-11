@@ -57,8 +57,6 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
         for (var init_sub in packfile_pmc.subs_by_tag("init"))
             init_sub();
         var main_sub = packfile_pmc.main_sub();
-        var prt0_pf = interp["packfile"];
-        packfile_pmc.set_current_packfile(interp);
         return main_sub(prog_args);
     } catch (e) {
         __handle_error_and_exit(interp, e);

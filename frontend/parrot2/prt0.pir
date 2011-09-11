@@ -23,9 +23,9 @@
 # predefined getinterp
     getinterp $P1
 # try: create handler
-    new $P9, 'ExceptionHandler'
-    set_label $P9, __label_1
-    push_eh $P9
+    new $P8, 'ExceptionHandler'
+    set_label $P8, __label_1
+    push_eh $P8
 # try: begin
 # {
 # var pir_compiler: $P2
@@ -34,8 +34,8 @@
 # prog_name: $S1
     $S1 = __ARG_2[0]
 # input_file_type: $I1
-    $P9 = WSubId_1($S1)
-    set $I1, $P9
+    $P8 = WSubId_1($S1)
+    set $I1, $P8
 # output_file: $S2
     null $S2
     if $I1, __label_3
@@ -79,8 +79,8 @@
     set $I1, 3
     goto __label_7 # break
   __label_11: # case
-    $P9 = WSubId_3($S1)
-    set $S2, $P9
+    $P8 = WSubId_3($S1)
+    set $S2, $P8
     $P4 = $P2.'compile_file'($S1)
     $P4.'write_to_file'($S2)
     new $P4, [ 'PackfileView' ]
@@ -120,21 +120,18 @@
     exit 0
 # }
   __label_17: # endif
-    $P9 = $P4.'subs_by_tag'("init")
-    if_null $P9, __label_19
-    iter $P10, $P9
-    set $P10, 0
+    $P8 = $P4.'subs_by_tag'("init")
+    if_null $P8, __label_19
+    iter $P9, $P8
+    set $P9, 0
   __label_18: # for iteration
-    unless $P10 goto __label_19
-    shift $P5, $P10
+    unless $P9 goto __label_19
+    shift $P5, $P9
     $P5()
     goto __label_18
   __label_19: # endfor
 # var main_sub: $P6
     $P6 = $P4.'main_sub'()
-# var prt0_pf: $P7
-    $P7 = $P1["packfile"]
-    $P4.'set_current_packfile'($P1)
     .tailcall $P6(__ARG_2)
 # }
 # try: end
@@ -142,11 +139,11 @@
     goto __label_2
 # catch
   __label_1:
-    .get_results($P8)
-    finalize $P8
+    .get_results($P7)
+    finalize $P7
     pop_eh
 # {
-    WSubId_7($P1, $P8)
+    WSubId_7($P1, $P7)
 # }
 # catch end
   __label_2:
@@ -253,8 +250,8 @@
     set $S1, "No exception handler and no message"
   __label_3: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S1
-    push $P4, $P5
+    assign $P4, 1
+    $P4[0] = $S1
 # predefined sprintf
     sprintf $S5, "%s\n", $P4
     $P1.'print'($S5)
@@ -276,11 +273,11 @@
 # predefined split
     split $P3, "\n", $S3
     if_null $P3, __label_9
-    iter $P6, $P3
-    set $P6, 0
+    iter $P5, $P3
+    set $P5, 0
   __label_8: # for iteration
-    unless $P6 goto __label_9
-    shift $S4, $P6
+    unless $P5 goto __label_9
+    shift $S4, $P5
 # {
 # prt0_idx: $I3
     null $I3
@@ -290,10 +287,9 @@
     goto __label_8 # continue
   __label_10: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S2
-    push $P4, $P5
-    box $P5, $S4
-    push $P4, $P5
+    assign $P4, 2
+    $P4[0] = $S2
+    $P4[1] = $S4
 # predefined sprintf
     sprintf $S5, "%s%s", $P4
     $P1.'print'($S5)
@@ -331,14 +327,15 @@
     set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2011, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
 # var msg: $P2
     root_new $P3, ['parrot';'ResizablePMCArray']
-    $P5 = $P1["VERSION"]
-    push $P3, $P5
-    $P6 = $P1["DEVEL"]
-    push $P3, $P6
-    $P7 = $P1["cpuarch"]
-    push $P3, $P7
-    $P8 = $P1["platform"]
-    push $P3, $P8
+    assign $P3, 4
+    $P4 = $P1["VERSION"]
+    $P3[0] = $P4
+    $P5 = $P1["DEVEL"]
+    $P3[1] = $P5
+    $P6 = $P1["cpuarch"]
+    $P3[2] = $P6
+    $P7 = $P1["platform"]
+    $P3[3] = $P7
 # predefined sprintf
     sprintf $S2, $S1, $P3
     box $P2, $S2
