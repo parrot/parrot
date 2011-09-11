@@ -747,16 +747,6 @@ PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
-    ARGIN(STRING *file_name),
-    int add,
-    int set_def)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_CANNOT_RETURN_NULL
 PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
@@ -895,9 +885,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_switch_to_cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(new_cs))
-#define ASSERT_ARGS_PF_create_default_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(file_name))
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
