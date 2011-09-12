@@ -9,6 +9,7 @@ const int PBC_FILE = 3;
 function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
 {
     var interp = getinterp();
+    var packfile_pmc;
     try {
         var pir_compiler = compreg("PIR");
         string prog_name = prog_args[0];
@@ -17,7 +18,6 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
         if (input_file_type == 0)
             __usage_and_exit(interp, "Invalid file type " + prog_name);
         var exe_name = sys_args.shift();
-        var packfile_pmc = null;
         for (int i = 0; i < elements(sys_args); i++) {
             string sys_arg = sys_args[i];
             switch (sys_arg) {
@@ -56,11 +56,12 @@ function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
         }
         for (var init_sub in packfile_pmc.subs_by_tag("init"))
             init_sub();
-        var main_sub = packfile_pmc.main_sub();
-        return main_sub(prog_args);
     } catch (e) {
         __handle_error_and_exit(interp, e);
     }
+    // Out of the try block to allow tailcalling main_sub
+    var main_sub = packfile_pmc.main_sub();
+    return main_sub(prog_args);
 }
 
 function __default_get_packfile[anon](string file_name, int file_type, var pir_compiler)
