@@ -229,9 +229,9 @@
     set $I1, $P4
     ne $I1, 6, __label_1
     getattribute $P4, __ARG_2, 'exit_code'
-    set $I5, $P4
+    set $I4, $P4
 # predefined exit
-    exit $I5
+    exit $I4
   __label_1: # endif
 # var stderr_pmc: $P1
 # predefined getstderr
@@ -242,11 +242,11 @@
     if_null $P4, __label_2
     set $S1, $P4
   __label_2:
-    isnull $I5, $S1
-    if $I5 goto __label_4
-    iseq $I5, $S1, ""
+    isnull $I4, $S1
+    if $I4 goto __label_4
+    iseq $I4, $S1, ""
   __label_4:
-    unless $I5 goto __label_3
+    unless $I4 goto __label_3
     set $S1, "No exception handler and no message"
   __label_3: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
@@ -262,8 +262,8 @@
 # for loop
 # i: $I2
 # predefined elements
-    elements $I5, $P2
-    sub $I2, $I5, 1
+    elements $I4, $P2
+    sub $I2, $I4, 1
   __label_7: # for condition
     lt $I2, 0, __label_6
 # {
@@ -279,11 +279,9 @@
     unless $P5 goto __label_9
     shift $S4, $P5
 # {
-# prt0_idx: $I3
-    null $I3
-# pirop index
-    index $I3, $S4, "__PARROT_ENTRY_MAIN__"
-    eq $I3, -1, __label_10
+# predefined indexof
+    index $I4, $S4, "__PARROT_ENTRY_MAIN__"
+    eq $I4, -1, __label_10
     goto __label_8 # continue
   __label_10: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
@@ -300,18 +298,18 @@
     set $S2, "\nthrown from\n"
 # }
   __label_5: # for iteration
-    set $I5, $I2
+    set $I4, $I2
     dec $I2
     goto __label_7
   __label_6: # for end
-# exit_code: $I4
+# exit_code: $I3
     getattribute $P4, __ARG_2, 'exit_code'
-    set $I4, $P4
-    if $I4 goto __label_11
-    set $I4, 1
+    set $I3, $P4
+    if $I3 goto __label_11
+    set $I3, 1
   __label_11: # endif
 # predefined exit
-    exit $I4
+    exit $I3
 # }
 
 .end # __handle_error_and_exit

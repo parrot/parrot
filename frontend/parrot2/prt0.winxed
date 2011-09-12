@@ -109,9 +109,7 @@ function __handle_error_and_exit[anon](var interp, var exception)
         string bt = bts[i];
         var lines = split("\n", bt);
         for (string line in lines) {
-            int prt0_idx;
-            ${ index prt0_idx, line, "__PARROT_ENTRY_MAIN__" };
-            if (prt0_idx != -1)
+            if (indexof(line, "__PARROT_ENTRY_MAIN__") != -1)
                 continue;
             stderr_pmc.print(sprintf("%s%s", [line_sep, line]));
             line_sep = "\n";
