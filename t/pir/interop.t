@@ -19,10 +19,24 @@ Tests for HLL interoperability from PIR.
 .sub main :main
 
     .include 'test_more.pir'
-    plan(1)
-    load_language 'parrot'
-    ok(1)
+    plan(3)
 
+    load_language 'parrot'
+    ok(1, 'loaded parrot language')
+    .local pmc c
+    c = compreg 'parrot'
+    $P0 = get_class [ 'Parrot'; 'Compiler' ]
+    isa_ok(c, $P0)
+
+    c.'export'('foo bar')
+    ok(1, 'can call export on parrot compiler')
+
+.end
+
+.sub foo
+.end
+
+.sub bar
 .end
 
 # Local Variables:
