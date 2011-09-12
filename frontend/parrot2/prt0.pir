@@ -22,17 +22,15 @@
 # var interp: $P1
 # predefined getinterp
     getinterp $P1
-# var packfile_pmc: $P2
-    null $P2
 # try: create handler
     new $P8, 'ExceptionHandler'
     set_label $P8, __label_1
     push_eh $P8
 # try: begin
 # {
-# var pir_compiler: $P3
+# var pir_compiler: $P2
 # predefined compreg
-    compreg $P3, "PIR"
+    compreg $P2, "PIR"
 # prog_name: $S1
     $S1 = __ARG_2[0]
 # input_file_type: $I1
@@ -44,8 +42,10 @@
     concat $S4, "Invalid file type ", $S1
     WSubId_2($P1, $S4)
   __label_3: # endif
-# var exe_name: $P4
-    $P4 = __ARG_1.'shift'()
+# var exe_name: $P3
+    $P3 = __ARG_1.'shift'()
+# var packfile_pmc: $P4
+    null $P4
 # for loop
 # i: $I2
     null $I2
@@ -81,14 +81,14 @@
   __label_11: # case
     $P8 = WSubId_3($S1)
     set $S2, $P8
-    $P2 = $P3.'compile_file'($S1)
-    $P2.'write_to_file'($S2)
-    new $P2, [ 'PackfileView' ]
-    $P2.'read_from_file'($S2)
+    $P4 = $P2.'compile_file'($S1)
+    $P4.'write_to_file'($S2)
+    new $P4, [ 'PackfileView' ]
+    $P4.'read_from_file'($S2)
     null $S2
     goto __label_7 # break
   __label_12: # case
-    $P3.'preprocess'($S1)
+    $P2.'preprocess'($S1)
 # predefined exit
     exit 0
   __label_13: # case
@@ -110,17 +110,17 @@
     ge $I3, 1, __label_15
     WSubId_2($P1, "Missing program name")
   __label_15: # endif
-    unless_null $P2, __label_16
-    $P2 = WSubId_6($S1, $I1, $P3)
+    unless_null $P4, __label_16
+    $P4 = WSubId_6($S1, $I1, $P2)
   __label_16: # endif
     if_null $S2, __label_17
 # {
-    $P2.'write_to_file'($S2)
+    $P4.'write_to_file'($S2)
 # predefined exit
     exit 0
 # }
   __label_17: # endif
-    $P8 = $P2.'subs_by_tag'("init")
+    $P8 = $P4.'subs_by_tag'("init")
     if_null $P8, __label_19
     iter $P9, $P8
     set $P9, 0
@@ -130,23 +130,23 @@
     $P5()
     goto __label_18
   __label_19: # endfor
+# var main_sub: $P6
+    $P6 = $P4.'main_sub'()
+    .tailcall $P6(__ARG_2)
 # }
 # try: end
     pop_eh
     goto __label_2
 # catch
   __label_1:
-    .get_results($P6)
-    finalize $P6
+    .get_results($P7)
+    finalize $P7
     pop_eh
 # {
-    WSubId_7($P1, $P6)
+    WSubId_7($P1, $P7)
 # }
 # catch end
   __label_2:
-# var main_sub: $P7
-    $P7 = $P2.'main_sub'()
-    .tailcall $P7(__ARG_2)
 # }
 
 .end # __PARROT_ENTRY_MAIN__
