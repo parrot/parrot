@@ -6,67 +6,72 @@ const int PASM_FILE = 1;
 const int PIR_FILE = 2;
 const int PBC_FILE = 3;
 
+function __PARROT_ENTRY_MAIN__args[anon](var sys_args, var prog_args)
+{
+    string prog_name = prog_args[0];
+    int input_file_type = __get_input_file_type(prog_name);
+    string output_file = null;
+    if (input_file_type == 0)
+        __usage_and_exit("Invalid file type " + prog_name);
+    var exe_name = sys_args.shift();
+    var packfile_pmc = null;
+    for (int i = 0; i < elements(sys_args); i++) {
+        string sys_arg = sys_args[i];
+        switch (sys_arg) {
+            case "-o":
+                output_file = sys_args[++i];
+                break;
+            case "-c":
+                input_file_type = PBC_FILE;
+                break;
+            case "-r":
+                output_file = __get_temporary_output_file(prog_name);
+                packfile_pmc = compreg("PIR").compile_file(prog_name);
+                packfile_pmc.write_to_file(output_file);
+                packfile_pmc = new 'PackfileView';
+                packfile_pmc.read_from_file(output_file);
+                output_file = null;
+                break;
+            case "-E":
+                compreg("PIR").preprocess(prog_name);
+                exit(0);
+            case "-V":
+                __show_version_and_exit();
+            case "-h":
+                __show_help_and_exit();
+            default:
+                __usage_and_exit("Unknown argument " + sys_arg);
+        }
+    }
+    if (elements(prog_args) < 1)
+        __usage_and_exit("Missing program name");
+    if (packfile_pmc == null)
+        packfile_pmc = __default_get_packfile(prog_name, input_file_type);
+    if (output_file != null) {
+        packfile_pmc.write_to_file(output_file);
+        exit(0);
+    }
+    for (var init_sub in packfile_pmc.subs_by_tag("init"))
+        init_sub();
+    return packfile_pmc;
+}
+
 function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
 {
-    var interp = getinterp();
     try [allowtailcall] {
-        var pir_compiler = compreg("PIR");
-        string prog_name = prog_args[0];
-        int input_file_type = __get_input_file_type(prog_name);
-        string output_file = null;
-        if (input_file_type == 0)
-            __usage_and_exit(interp, "Invalid file type " + prog_name);
-        var exe_name = sys_args.shift();
-        var packfile_pmc = null;
-        for (int i = 0; i < elements(sys_args); i++) {
-            string sys_arg = sys_args[i];
-            switch (sys_arg) {
-                case "-o":
-                    output_file = sys_args[++i];
-                    break;
-                case "-c":
-                    input_file_type = PBC_FILE;
-                    break;
-                case "-r":
-                    output_file = __get_temporary_output_file(prog_name);
-                    packfile_pmc = pir_compiler.compile_file(prog_name);
-                    packfile_pmc.write_to_file(output_file);
-                    packfile_pmc = new 'PackfileView';
-                    packfile_pmc.read_from_file(output_file);
-                    output_file = null;
-                    break;
-                case "-E":
-                    pir_compiler.preprocess(prog_name);
-                    exit(0);
-                case "-V":
-                    __show_version_and_exit(interp);
-                case "-h":
-                    __show_help_and_exit(interp);
-                default:
-                    __usage_and_exit(interp, "Unknown argument " + sys_arg);
-            }
-        }
-        if (elements(prog_args) < 1)
-            __usage_and_exit(interp, "Missing program name");
-        if (packfile_pmc == null)
-            packfile_pmc = __default_get_packfile(prog_name, input_file_type, pir_compiler);
-        if (output_file != null) {
-            packfile_pmc.write_to_file(output_file);
-            exit(0);
-        }
-        for (var init_sub in packfile_pmc.subs_by_tag("init"))
-            init_sub();
+        var packfile_pmc = __PARROT_ENTRY_MAIN__args(sys_args, prog_args);
         var main_sub = packfile_pmc.main_sub();
         return main_sub(prog_args);
     } catch (e) {
-        __handle_error_and_exit(interp, e);
+        __handle_error_and_exit(e);
     }
 }
 
-function __default_get_packfile[anon](string file_name, int file_type, var pir_compiler)
+function __default_get_packfile[anon](string file_name, int file_type)
 {
     switch (file_type) {
         case PIR_FILE:
+            var pir_compiler = compreg("PIR");
             var pf = pir_compiler.compile_file(file_name);
             return pf;
         case PASM_FILE:
@@ -92,7 +97,7 @@ function __get_input_file_type[anon](string file_name)
     return PIR_FILE;
 }
 
-function __handle_error_and_exit[anon](var interp, var exception)
+function __handle_error_and_exit[anon](var exception)
 {
     int severity = exception.severity;
     if (severity == EXCEPT_EXIT)
@@ -123,9 +128,9 @@ function __handle_error_and_exit[anon](var interp, var exception)
     exit(exit_code);
 }
 
-function __show_version_and_exit[anon](var interp)
+function __show_version_and_exit[anon]()
 {
-    var config = interp[IGLOBALS_CONFIG_HASH];
+    var config = getinterp()[IGLOBALS_CONFIG_HASH];
     string msg_fmt = <<:
 This is Parrot version %s%s built for %s-%s
 Copyright (C) 2001-2011, Parrot Foundation.
@@ -140,7 +145,7 @@ included in the Parrot source tree
     exit(0);
 }
 
-function __show_help_and_exit[anon](var interp)
+function __show_help_and_exit[anon]()
 {
     string msg = <<:
 parrot [Options] <file> [<program options...>]
@@ -195,9 +200,9 @@ function __get_temporary_output_file[anon](string infile)
     return infile + ".pbc";
 }
 
-function __usage_and_exit[anon](var interp, string msg [optional], int has_msg [opt_flag])
+function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
 {
-    var stderr = interp.stderr_handle();
+    var stderr = getstderr();
     if (has_msg)
         stderr.print(msg + "\n");
     stderr.print("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ");
