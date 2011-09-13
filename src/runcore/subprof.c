@@ -49,6 +49,17 @@ static void createlines(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CAN_RETURN_NULL
+static opcode_t * findlineannotations(PARROT_INTERP,
+    ARGIN(subprofiledata *spdata),
+    ARGIN(subprofile *sp),
+    ARGOUT(size_t *cntp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*cntp);
+
 static void finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -56,13 +67,6 @@ static void finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 static void popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-static void printspline(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
-    ARGIN(subprofile *sp))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 static void printspname(PARROT_INTERP,
     ARGIN(subprofiledata *spdata),
@@ -104,7 +108,7 @@ static INTVAL * sptodebug(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static inline const char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static inline char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -139,16 +143,17 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata) \
     , PARROT_ASSERT_ARG(sp))
+#define ASSERT_ARGS_findlineannotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(spdata) \
+    , PARROT_ASSERT_ARG(sp) \
+    , PARROT_ASSERT_ARG(cntp))
 #define ASSERT_ARGS_finishcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_popcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata))
-#define ASSERT_ARGS_printspline __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata) \
-    , PARROT_ASSERT_ARG(sp))
 #define ASSERT_ARGS_printspname __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata) \
@@ -185,6 +190,17 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 
 
 static subprofiledata _spdata;
+
+/*        
+
+=item *C<static INTVAL *sptodebug(...)>
+
+Unpacks the debug segment data into an array indexed by the opcode offset.
+Hashes the result in spdata->seg2debug.
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static INTVAL *
@@ -225,6 +241,75 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     return xdebug;
 }
 
+/*
+
+=item *C<static thingy str2cs(...)>
+
+Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static inline char *
+str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+{
+    if (s == STRINGNULL)
+        return strdup("STRNULL");
+    return Parrot_str_to_cstring(interp, s);
+}
+
+
+/*
+
+=item *C<static opcode_t findlineannotations(...)>
+
+Return a pointer to the first line annotation of the sub and the number
+of line annotations for this sub.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+static opcode_t *
+findlineannotations(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp), ARGOUT(size_t *cntp))
+{
+    PackFile_Annotations *ann = sp->subattrs->seg->annotations;
+    PackFile_Annotations_Key *key;
+    int i;
+    size_t j, cnt, first;
+    STRING *line_str;
+
+    if (!ann)
+        return NULL;
+    line_str = Parrot_str_new_constant(interp, "line");
+
+    /* search for the first line annotation in our sub */
+    for (i = 0; i < ann->num_keys; i++) {
+        STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
+        if (STRING_equal(interp, test_key, line_str))
+            break;
+    }
+    if (i == ann->num_keys)
+        return NULL;    /* no annotations with this key */
+    cnt = 0;
+    first = 0;
+    key = ann->keys + i;
+    for (j = key->start; j < key->start + key->len; j++) {
+        if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
+            continue;
+        if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
+            break;
+        if (!cnt++) {
+            first = j;
+        }
+    }
+    *cntp = cnt;
+    return cnt ? ann->base.data + first * 2 : NULL;
+}
+
 
 /*        
 
@@ -232,6 +317,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
 Create the lines array from the annotations/debug segment. Every line
 describes a opcode segment.
+Also sets sp->srcfile and sp->srcline.
 
 =cut
 
@@ -245,74 +331,65 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         INTVAL *xdebug = sptodebug(interp, spdata, sp);
 
         sp->nlines = sp->subattrs->end_offs - sp->subattrs->start_offs;
-        sp->lines = (lineinfo *)calloc(sizeof(lineinfo), sp->nlines ? sp->nlines : 1);
-        sp->lines[0].line = -1;
+        sp->lines = (lineinfo *)calloc(sizeof(lineinfo), (sp->nlines ? sp->nlines : 1) + 1);
         sp->lines[0].startop = sp->subattrs->start_offs;        /* just in case... */
         for (i = lasti = 0; i < sp->nlines; i++) {
             INTVAL line = xdebug[sp->subattrs->start_offs + i];
             if (line != -2) {
-                sp->lines[i].line = line;
                 sp->lines[i].startop = sp->subattrs->start_offs + i;
-                sp->lines[lasti].endop = sp->subattrs->start_offs + i;
+                sp->lines[lasti + 1].startop = sp->subattrs->start_offs + i;
                 lasti = i;
             }
         }
-        sp->lines[lasti].endop = sp->subattrs->end_offs;
+        sp->lines[lasti + 1].startop = sp->subattrs->end_offs;
+        sp->srcline = xdebug[sp->subattrs->start_offs];
+        sp->srcfile = str2cs(interp, Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs));
         return;
     }
-    if (sp->subattrs->seg->annotations && spdata->profile_type == SUBPROF_TYPE_HLL) {
-        PackFile_Annotations *ann = sp->subattrs->seg->annotations;
-        PackFile_Annotations_Key *key;
-        int i, j, cnt, first;
-
-        STRING *line_str = Parrot_str_new_constant(interp, "line");
-        /* search for the first line annotation in our sub */
-        for (i = 0; i < ann->num_keys; i++) {
-            STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
-            if (STRING_equal(interp, test_key, line_str))
-                break;
-        }
-        cnt = 0;
-        first = 0;
-        if (i < ann->num_keys) {
-            unsigned int j;
-            key = ann->keys + i;
-            for (j = key->start; j < key->start + key->len; j++) {
-                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
-                    continue;
-                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
-                    break;
-                if (!cnt++)
-                    first = j;
-            }
-        }
-        if (cnt) {
+    if (sp->subattrs->seg->annotations) {
+	PackFile_Annotations *ann = sp->subattrs->seg->annotations;
+        size_t cnt = 0;
+        opcode_t *anndata = findlineannotations(interp, spdata, sp, &cnt);
+        if (anndata) {
             size_t off;
-            sp->lines = (lineinfo *)calloc(sizeof(lineinfo), cnt);
-            for (j = 0; j < cnt; j++, first++) {
-                sp->lines[j].startop = ann->base.data[first * 2 + ANN_ENTRY_OFF];
-                if (j && sp->lines[j - 1].startop == sp->lines[j].startop) {
-                    /* no zero size segments, please */
-                    j--;
-                    cnt--;
+            PMC *srcfilepmc;
+	    size_t i, j;
+
+            if (spdata->profile_type == SUBPROF_TYPE_SUB) {
+                /* we just need the first annotation for sub profiling */
+                cnt = 1;
+            }
+            /* set srcfile and srcline */
+            sp->srcline = anndata[ANN_ENTRY_VAL];
+            /* + 1 needed because Annotations_lookup looks up the annotation _before_ the pc */
+            srcfilepmc = PackFile_Annotations_lookup(interp, ann, anndata[ANN_ENTRY_OFF] + 1, Parrot_str_new_constant(interp, "file"));
+            if (PMC_IS_NULL(srcfilepmc))
+                sp->srcfile = strdup("???");
+            else
+                sp->srcfile = str2cs(interp, VTABLE_get_string(interp, srcfilepmc));
+            sp->lines = (lineinfo *)calloc(sizeof(lineinfo), cnt + 1);
+            for (i = j = 0; i < cnt; i++) {
+                if (j && sp->lines[j - 1].startop == (size_t)anndata[i * 2 + ANN_ENTRY_OFF]) {
+                    /* no empty segments, please */
+                    continue;
                 }
-                sp->lines[j].line = ann->base.data[first * 2 + ANN_ENTRY_VAL];
-                if (j)
-                    sp->lines[j - 1].endop = sp->lines[j].startop;
+                sp->lines[j++].startop = anndata[i * 2 + ANN_ENTRY_OFF];
             }
             sp->lines[0].startop = sp->subattrs->start_offs;    /* workaround */
-            sp->lines[cnt - 1].endop = sp->subattrs->end_offs;
-            if (sp->lines[cnt - 1].startop == sp->lines[cnt - 1].endop)
-                cnt--;
-            sp->nlines = cnt;
-        }
+            sp->lines[j].startop = sp->subattrs->end_offs;
+            if (j > 1 && sp->lines[j - 1].startop == sp->subattrs->end_offs)
+                /* no empty segments, please */
+                j--;
+	    sp->nlines = j;
+	}
     }
     if (!sp->nlines) {
-        INTVAL line = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
-        sp->lines = (lineinfo *)calloc(sizeof(lineinfo), 1);
-        sp->lines[0].line = line;
+        /* no annotations, fall back to debug segment */
+        sp->srcline = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
+        sp->srcfile = str2cs(interp, Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs));
+        sp->lines = (lineinfo *)calloc(sizeof(lineinfo), 1 + 1);
         sp->lines[0].startop = sp->subattrs->start_offs;
-        sp->lines[0].endop = sp->subattrs->end_offs;
+        sp->lines[1].startop = sp->subattrs->end_offs;
         sp->nlines = 1;
     }
 }
@@ -349,24 +426,6 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
     return sp;
 }
 
-/*
-
-=item *C<static thingy str2cs(...)>
-
-Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static inline const char *
-str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
-{
-    if (s == STRINGNULL)
-        return "STRNULL";
-    return Parrot_str_to_cstring(interp, s);
-}
 
 /*
 
@@ -472,16 +531,15 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
             rsp->subpmc   = sp->subpmc;
             rsp->code_ops = sp->code_ops;
             rsp->rcnt     = sp->rcnt + 1;
+            rsp->srcline  = sp->srcline;
+            rsp->srcfile  = strdup(sp->srcfile);
             sp->rnext     = rsp;
             if (sp->nlines) {
                 int i;
-                rsp->lines = (lineinfo *)calloc(sizeof(lineinfo), sp->nlines);
+                rsp->lines = (lineinfo *)calloc(sizeof(lineinfo), sp->nlines + 1);
                 rsp->nlines = sp->nlines;
-                for (i = 0; i < sp->nlines; i++) {
-                    rsp->lines[i].line    = sp->lines[i].line;
+                for (i = 0; i < sp->nlines + 1; i++)
                     rsp->lines[i].startop = sp->lines[i].startop;
-                    rsp->lines[i].endop   = sp->lines[i].endop;
-                }
             }
         }
         sp = sp->rnext;
@@ -505,13 +563,13 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
 	if (spdata->profile_type != SUBPROF_TYPE_OPS) {
             /* might do a binary seach instead */
             for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
-                if (cpc >= li->startop && cpc < li->endop)
+                if (cpc >= li->startop && cpc < li[1].startop)
                     break;
             if (i >= csp->nlines)
                 li = csp->lines - 1;    /* just in case */
         } else {
             li = csp->lines + (cpc - csp->subattrs->start_offs);
-            while (li->endop == 0 && li > csp->lines)
+            while (li > csp->lines && (li->startop == 0 || li->startop > cpc))
                 li--;
         }
 
@@ -552,69 +610,6 @@ printspname(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     fprintf(stderr, "%p:%s", sp, str2cs(interp, sp->subattrs->name));
     if (sp->rcnt)
         fprintf(stderr, "'%d", sp->rcnt);
-}
-
-static void
-printspline(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
-{
-    int i;
-
-    if (!sp->subattrs || !sp->subattrs->seg)
-        return;
-
-    /* try HLL annotations */
-    if (sp->subattrs->seg->annotations && spdata->profile_type != SUBPROF_TYPE_OPS) {
-        PackFile_Annotations *ann = sp->subattrs->seg->annotations;
-        PackFile_Annotations_Key *key;
-        STRING *line_str = Parrot_str_new_constant(interp, "line");
-
-        /* search for the first line annotation in our sub */
-        for (i = 0; i < ann->num_keys; i++) {
-            STRING * const test_key = ann->code->const_table->str.constants[ann->keys[i].name];
-            if (STRING_equal(interp, test_key, line_str))
-                break;
-        }
-        if (i < ann->num_keys) {
-            /* ok, found the line key, now search for the sub */
-            unsigned int j;
-            key = ann->keys + i;
-            for (j = key->start; j < key->start + key->len; j++) {
-                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] < sp->subattrs->start_offs)
-                    continue;
-                if ((size_t)ann->base.data[j * 2 + ANN_ENTRY_OFF] >= sp->subattrs->end_offs)
-                    continue;
-                break;
-            }
-            if (j < key->start + key->len) {
-                /* found it! */
-                INTVAL line = ann->base.data[j * 2 + ANN_ENTRY_VAL];
-                /* need +1, sigh */
-                PMC *pfile = PackFile_Annotations_lookup(interp, ann, ann->base.data[j * 2 + ANN_ENTRY_OFF] + 1, Parrot_str_new_constant(interp, "file"));
-#if 0
-                if (PMC_IS_NULL(pfile))
-                    fprintf(stderr, "???:%d", (int)line);
-                else
-                    fprintf(stderr, "%s:%d", str2cs(interp, VTABLE_get_string(interp, pfile)), (int)line);
-#else
-                if (PMC_IS_NULL(pfile))
-                    fprintf(stderr, "???");
-                else
-                    fprintf(stderr, "%s", str2cs(interp, VTABLE_get_string(interp, pfile)));
-#endif
-                return;
-            }
-        }
-    }
-    /* try the debug section */
-    if (sp->subattrs->seg->debugs) {
-        STRING *file = Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
-#if 0
-        INTVAL line = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
-        fprintf(stderr, "%s:%d", str2cs(interp, file), (int)line);
-#else
-        fprintf(stderr, "%s", str2cs(interp, file));
-#endif
-    }
 }
 
 /*
@@ -665,32 +660,56 @@ dump_profile_data(PARROT_INTERP)
         subprofile *hsp = (subprofile*)_bucket->value;
         subprofile *sp;
         for (sp = hsp; sp; sp = sp->rnext) {
+            opcode_t *anndata = NULL;
+            INTVAL *xdebug = NULL;
+            size_t cnt = 0;
             int i;
 
+            if (spdata->profile_type != SUBPROF_TYPE_OPS)
+                anndata = findlineannotations(interp, spdata, sp, &cnt);
+            else
+                xdebug = sptodebug(interp, spdata, sp);
             fprintf(stderr, "\n");
-            fprintf(stderr, "fl=");
-            printspline(interp, spdata, sp);
-            fprintf(stderr, "\n");
+            fprintf(stderr, "fl=%s\n", sp->srcfile);
             fprintf(stderr, "fn=");
             printspname(interp, spdata, sp);
             fprintf(stderr, "\n");
             for (i = 0; i < sp->nlines; i++) {
                 lineinfo *li = sp->lines + i;
                 callinfo *ci;
+                INTVAL srcline = -1;
+                if (!li->ops && !li->ticks && !li->calls)
+                    continue;
+                if (i == 0) {
+                    /* easy for the first annotation */
+                    srcline = sp->srcline;
+                } else {
+                    if (spdata->profile_type == SUBPROF_TYPE_OPS) {
+                        srcline = xdebug[sp->subattrs->start_offs + i];
+                    } else if (anndata) {
+                        while (cnt && (size_t)anndata[ANN_ENTRY_OFF + 2] <= li->startop) {
+                            anndata += 2;
+                            cnt--;
+                        }
+                        srcline = anndata[ANN_ENTRY_VAL]; 
+                        anndata += 2;
+                        cnt--;
+                    }
+                }
                 if (li->ops || li->ticks)
-                    fprintf(stderr, "%d %d %lld\n", li->line, li->ops, li->ticks);
+                    fprintf(stderr, "%d %d %lld\n", (int)srcline, li->ops, li->ticks);
                 for (ci = li->calls; ci && ci->callee; ci++) {
                     subprofile *csp = ci->callee;
-                    fprintf(stderr, "cfl=");
-                    printspline(interp, spdata, csp);
-                    fprintf(stderr, "\n");
+                    fprintf(stderr, "cfl=%s\n", csp->srcfile);
                     fprintf(stderr, "cfn=");
                     printspname(interp, spdata, csp);
                     fprintf(stderr, "\n");
-                    fprintf(stderr, "calls=%d %d\n", ci->count, csp->lines[0].line);
-                    fprintf(stderr, "%d %d %lld\n", li->line, ci->ops, ci->ticks);
+                    fprintf(stderr, "calls=%d %d\n", ci->count, (int)csp->srcline);
+                    fprintf(stderr, "%d %d %lld\n", (int)srcline, ci->ops, ci->ticks);
                 }
             }
+            if (anndata)
+                free(anndata);
         }
     );
 
@@ -783,7 +802,7 @@ sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(o
     if (sp->nlines > 1) {
         pc = pc_op ? pc_op - sp->code_ops : 0;
         for (i = 0, li = sp->lines; i < sp->nlines; i++, li++)
-            if (pc >= li->startop && pc < li->endop)
+            if (pc >= li->startop && pc < li[1].startop)
                 break;
         if (i == sp->nlines)
             li = sp->lines;    /* just in case */
@@ -964,7 +983,7 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 spdata->tickadd2  = &sp->callerticks;
                 spdata->starttick = rdtsc();
                 startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline->endop;
+                endop   = sp->code_ops + curline[1].startop;
             }
 
             if (pc >= endop) {
@@ -976,11 +995,11 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                     *spdata->tickadd2        += tickdiff;
                 }
                 spdata->starttick = tick;
-                while (pc >= sp->code_ops + curline->endop) {
+                while (pc >= sp->code_ops + curline[1].startop) {
                     curline++;
                 }
                 startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline->endop;
+                endop   = sp->code_ops + curline[1].startop;
                 spdata->tickadd = &curline->ticks;
             }
             else if (pc < startop) {
@@ -996,7 +1015,7 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                     curline--;
                 }
                 startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline->endop;
+                endop   = sp->code_ops + curline[1].startop;
                 spdata->tickadd = &curline->ticks;
             }
 

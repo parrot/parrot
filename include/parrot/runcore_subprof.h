@@ -30,11 +30,8 @@ struct callinfo {
 struct lineinfo {
     /* start op of this line */
     size_t                startop;
-    /* first op after the end of this line */
-    size_t                endop;
     /* calls made from this line */
     callinfo              *calls;
-    int                   line;
     /* number of ops executed in this line */
     unsigned int          ops;
     /* number of CPU ticks spent in this line */
@@ -53,6 +50,9 @@ struct subprofile {
     /* first op of segment */
     opcode_t              *code_ops;
 
+    INTVAL                srcline;
+    char                  *srcfile;
+
     lineinfo              *lines;
     int                   nlines;
 
@@ -61,7 +61,6 @@ struct subprofile {
     subprofile            *caller;
     /* where the call was done */
     callinfo              *callerci;
-
     /* the active Context for the Sub being profiled */
     PMC                   *ctx;
 
