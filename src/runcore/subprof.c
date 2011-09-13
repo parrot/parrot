@@ -661,12 +661,13 @@ dump_profile_data(PARROT_INTERP)
         subprofile *sp;
         for (sp = hsp; sp; sp = sp->rnext) {
             opcode_t *anndata = NULL;
+            opcode_t *adp = NULL;
             INTVAL *xdebug = NULL;
             size_t cnt = 0;
             int i;
 
             if (spdata->profile_type != SUBPROF_TYPE_OPS)
-                anndata = findlineannotations(interp, spdata, sp, &cnt);
+                anndata = adp = findlineannotations(interp, spdata, sp, &cnt);
             else
                 xdebug = sptodebug(interp, spdata, sp);
             fprintf(stderr, "\n");
@@ -687,12 +688,12 @@ dump_profile_data(PARROT_INTERP)
                     if (spdata->profile_type == SUBPROF_TYPE_OPS) {
                         srcline = xdebug[sp->subattrs->start_offs + i];
                     } else if (anndata) {
-                        while (cnt && (size_t)anndata[ANN_ENTRY_OFF + 2] <= li->startop) {
-                            anndata += 2;
+                        while (cnt && (size_t)adp[ANN_ENTRY_OFF + 2] <= li->startop) {
+                            adp += 2;
                             cnt--;
                         }
-                        srcline = anndata[ANN_ENTRY_VAL]; 
-                        anndata += 2;
+                        srcline = adp[ANN_ENTRY_VAL]; 
+                        adp += 2;
                         cnt--;
                     }
                 }
