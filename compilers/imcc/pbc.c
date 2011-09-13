@@ -490,12 +490,7 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
     else
         cs->prev->next = cs;
 
-    /* we need some segments */
-    if (!current_bc) {
-        STRING * const name = imcc->state->file;
-
-        cs->seg = PF_create_default_segs(imcc->interp, name, 1, 1);
-    }
+    PARROT_ASSERT(current_bc);
 
     imcc->globals->cs = cs;
 
