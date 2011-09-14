@@ -442,9 +442,11 @@ popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
     subprofile *sp = spdata->cursp;
     subprofile *csp = sp->caller;
-    if (csp) {
+    if (sp->callerci) {
         sp->callerci->ops   += sp->callerops;
         sp->callerci->ticks += sp->callerticks;
+    }
+    if (csp) {
         csp->callerops      += sp->callerops;
         csp->callerticks    += sp->callerticks;
     }
@@ -478,9 +480,11 @@ finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
     /* finish all calls */
     for (sp = spdata->cursp; sp; sp = csp) {
         csp = sp->caller;
-        if (csp) {
+        if (sp->callerci) {
             sp->callerci->ops   += sp->callerops;
             sp->callerci->ticks += sp->callerticks;
+        }
+        if (csp) {
             csp->callerops      += sp->callerops;
             csp->callerticks    += sp->callerticks;
         }
@@ -510,6 +514,7 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
 {
     PMC *cctx;
     subprofile *sp;
+    lineinfo *li;
 
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
     if (cctx) {
@@ -550,8 +555,6 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
     if (sp->caller) {
         int i;
         subprofile *csp = sp->caller;
-        lineinfo *li;
-        callinfo *ci;
 
         /* get caller pc */
         opcode_t *cpc_op = Parrot_pcc_get_pc(interp, csp->ctx);
@@ -572,8 +575,14 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
             while (li > csp->lines && (li->startop == 0 || li->startop > cpc))
                 li--;
         }
+    } else {
+        li = &spdata->rootline;
+    }
 
+    if (li) {
         /* add caller to line */
+        callinfo *ci;
+
         if (!li->calls) {
             li->calls = (callinfo *)malloc(sizeof(*ci) * (1 + 8));
             ci = li->calls;
@@ -599,6 +608,7 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
     } else {
         sp->callerci = 0;
     }
+
     spdata->cursp     = sp;
     spdata->curctx    = ctx;
     spdata->cursubpmc = subpmc;
@@ -710,6 +720,25 @@ dump_profile_data(PARROT_INTERP)
             }
         }
     );
+
+    /* also dump profiling root if there are more than one callees */
+    if (spdata->rootline.calls && spdata->rootline.calls[0].callee && spdata->rootline.calls[1].callee) {
+	lineinfo *li = &spdata->rootline;
+	callinfo *ci;
+
+        fprintf(stderr, "\n");
+        fprintf(stderr, "fl=\n");
+        fprintf(stderr, "fn=__profiling_root__\n");
+        for (ci = li->calls; ci && ci->callee; ci++) {
+            subprofile *csp = ci->callee;
+            fprintf(stderr, "cfl=%s\n", csp->srcfile);
+            fprintf(stderr, "cfn=");
+            printspname(interp, spdata, csp);
+            fprintf(stderr, "\n");
+            fprintf(stderr, "calls=%d %d\n", ci->count, (int)csp->srcline);
+            fprintf(stderr, "%d %d %lld\n", 0, ci->ops, ci->ticks);
+        }
+    }
 
     fprintf(stderr, "\ntotals: %d %lld\n", totalops, totalticks);
 }

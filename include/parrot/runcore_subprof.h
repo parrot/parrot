@@ -66,8 +66,8 @@ struct subprofile {
 
     /* ops/ticks we need to distribute to the caller when
        we leave the sub */
-    unsigned int           callerops;
-    uint64_t               callerticks;
+    unsigned int          callerops;
+    uint64_t              callerticks;
 };
 
 #define SUBPROF_TYPE_SUB 1
@@ -79,6 +79,9 @@ struct subprofiledata {
     int profile_type;
     /* the collected data, maps subpmc -> subprofile */
     Hash *sphash;
+
+    /* the root call data */
+    lineinfo rootline;
 
     /* maps to expanded debug data */
     Hash *seg2debug;
