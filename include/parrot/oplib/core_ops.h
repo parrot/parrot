@@ -1052,6 +1052,8 @@ op_lib_t *Parrot_DynOp_core_3_7_0(PARROT_INTERP, long init);
  opcode_t * Parrot_trap(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_set_label_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_get_label_i_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_get_id_i_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_get_id_i_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_fetch_p_p_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_fetch_p_pc_p_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_fetch_p_p_pc_p(opcode_t *, PARROT_INTERP);
