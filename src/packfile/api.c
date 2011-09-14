@@ -1449,7 +1449,10 @@ PMC *
 Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pf_get_current_packfile)
-    return interp->current_pf;
+    if (interp->code)
+        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf);
+    else
+        return PMCNULL;
 }
 
 /*
@@ -1473,8 +1476,7 @@ Parrot_pf_get_current_code_segment(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc, INTVAL
-set_code)>
+=item C<void Parrot_pf_set_current_packfile(PARROT_INTERP, PMC *pbc)>
 
 Set's the current packfile for the interpreter.
 
@@ -1484,7 +1486,7 @@ Set's the current packfile for the interpreter.
 
 PARROT_EXPORT
 void
-Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc), INTVAL set_code)
+Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
     if (PMC_IS_NULL(pbc))
@@ -1492,41 +1494,9 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc), INTVAL set_code)
             "Cannot set null packfile");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-        interp->current_pf = pbc;
-        if (set_code)
-            interp->code       = pf->cur_cs;
+        Parrot_switch_to_cs(interp, pf->cur_cs, 1);
         PARROT_GC_WRITE_BARRIER(interp, pbc);
     }
-}
-
-/*
-
-=item C<PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP, STRING
-*file_name, int add, int set_def)>
-
-Creates the bytecode and constant segments for C<file_name>. If C<add>
-is true, the current packfile becomes the owner of these segments by adding the
-segments to the directory.
-
-Deprecated: Use Parrot_pf_create_default_segments and
-Parrot_pf_set_current_packfile instead. TT #2140
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode *
-PF_create_default_segs(PARROT_INTERP, ARGIN(STRING *file_name), int add, int set_def)
-{
-    ASSERT_ARGS(PF_create_default_segs)
-    PackFile_ByteCode * const bc = Parrot_pf_create_default_segments(interp,
-        interp->current_pf, file_name, add);
-    if (set_def)
-        interp->code = bc;
-    return bc;
 }
 
 /*
@@ -1602,12 +1572,13 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
     else {
         STRING * name;
         const int add     = (interp->code && interp->code->base.dir);
+        PMC *current_pfpmc = Parrot_pf_get_current_packfile(interp);
         PackFile_Directory * const dir = add
                 ? interp->code->base.dir
                 : cs->base.dir
                     ? cs->base.dir
-                    : &((PackFile*)VTABLE_get_pointer(interp, interp->current_pf))->directory;
-        PARROT_GC_WRITE_BARRIER(interp, interp->current_pf);
+                    : &((PackFile*)VTABLE_get_pointer(interp, current_pfpmc))->directory;
+        PARROT_GC_WRITE_BARRIER(interp, current_pfpmc);
 
         name = Parrot_sprintf_c(interp, "%Ss_DB", cs->base.name);
         debug = (PackFile_Debug *)PackFile_Segment_new_seg(interp, dir,
@@ -1783,22 +1754,24 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_PREV_CS,
             "No code segment to switch to\n");
 
-    /* compiling source code uses this function too,
-     * which gives misleading trace messages */
-    if (really && Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        Interp * const tracer = interp->pdb && interp->pdb->debugger
-                              ? interp->pdb->debugger
-                              : interp;
-        Parrot_io_eprintf(tracer, "*** switching to %s\n", new_cs->base.name);
-    }
-
-    interp->code               = new_cs;
-
+    interp->code = new_cs;
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
             new_cs->const_table);
 
-    if (really)
+    if (really) {
+        /* compiling source code uses this function too,
+         * which gives misleading trace messages */
+        if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
+            Interp * const tracer = interp->pdb && interp->pdb->debugger
+                                  ? interp->pdb->debugger
+                                  : interp;
+            Parrot_io_eprintf(tracer, "*** switching to %s\n",
+                             new_cs->base.name);
+        }
+
         prepare_for_run(interp);
+        return cur_cs;
+    }
 
     return cur_cs;
 }
@@ -2248,20 +2221,19 @@ PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
 {
     ASSERT_ARGS(PackFile_append_pmc)
     PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
-    PARROT_ASSERT(!PMC_IS_NULL(interp->current_pf));
 
     if (pf) {
-        PackFile *current_pf = (PackFile *)VTABLE_get_pointer(interp, interp->current_pf);
+        PackFile *current_pf = interp->code->base.pf;
+        PMC      *current_pfpmc = Parrot_pf_get_current_packfile(interp);
         if (!interp->code) {
             STRING * const name = CONST_STRING(interp, "dummy");
-            interp->code = Parrot_pf_create_default_segments(interp,
-                interp->current_pf, name, 1);
+            interp->code = Parrot_pf_create_default_segments(interp, current_pfpmc, name, 1);
             PARROT_ASSERT(interp->code);
         }
 
         PackFile_add_segment(interp, &current_pf->directory,
                 &pf->directory.base);
-        PARROT_GC_WRITE_BARRIER(interp, interp->current_pf);
+        PARROT_GC_WRITE_BARRIER(interp, current_pfpmc);
 
         do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
     }
@@ -2403,7 +2375,7 @@ void
 PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
 {
     ASSERT_ARGS(PackFile_fixup_subs)
-    do_sub_pragmas(interp, interp->current_pf, what, eval);
+    do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
 }
 
 
@@ -2740,7 +2712,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
 
-    Parrot_pf_set_current_packfile(interp, pbc, 1);
+    Parrot_pf_set_current_packfile(interp, pbc);
     Parrot_pf_prepare_packfile_init(interp, pbc);
     main_sub = packfile_main(pf->cur_cs);
 
@@ -2759,7 +2731,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
     }
 
     if (!PMC_IS_NULL(current_pf))
-        Parrot_pf_set_current_packfile(interp, current_pf, 1);
+        Parrot_pf_set_current_packfile(interp, current_pf);
 }
 
 /*

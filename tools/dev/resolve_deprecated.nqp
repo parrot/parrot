@@ -8,8 +8,7 @@ pir::load_bytecode("nqp-setting.pbc");
 pir::load_bytecode("dumper.pbc");
 
 =begin NAME
-resolve_deprecated.nqp - Resolve deprecated features listed in api.yaml by
-quering trac for status of ticket.
+resolve_deprecated.nqp - Resolve deprecated features
 =end NAME
 =begin SYNOPSIS
 
@@ -18,7 +17,8 @@ quering trac for status of ticket.
 =end SYNOPSIS
 =begin DESCRIPTION
 
-Resolve all freshly deprecated features.
+Resolve all freshly deprecated features listed in api.yaml by quering trac for
+status of ticket.
 
 =end DESCRIPTION
 =begin COMPLICATIONS

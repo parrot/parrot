@@ -772,7 +772,8 @@ help :
 	@echo "  allhlltest:        Run the test suite for all known languages and libraries."
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
 	@echo "                     Valid runcores are b, f, g, j, r."
-	@echo "  src_tests:         Run test in C-file."
+	@echo "  src_tests:         Run tests in C files."
+	@echo "  interop_tests:     Run HLL interop tests."
 	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
@@ -789,6 +790,7 @@ help :
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
 	@echo "  smoke:             Alias for smolder_test."
+	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -2061,6 +2063,8 @@ DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
 DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
 EXAMPLES_TEST_FILES = \
 	t/examples/*.t
+INTEROP_TEST_FILES = \
+	t/pir/interop.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
 MANIFEST_TEST_FILES = \
@@ -2128,6 +2132,9 @@ smolder_coretest : corevm pbctestfiles
 
 smoke : smolder_test
 
+resubmit_smolder :
+	$(PERL) $(DEV_TOOLS_DIR)/resubmit_smolder.pl
+
 # "core tests" -- test basic functionality but not ancillaries
 coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
@@ -2192,6 +2199,9 @@ testexec: test_prep
 # Test that need to be compiled by the C-compiler
 src_tests : test_prep
 	$(PERL) t/harness $(SRC_TEST_FILES)
+
+interop_tests: test_prep
+	$(PERL) t/harness $(INTEROP_TEST_FILES)
 
 dynoplibs_tests : test_prep
 	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)

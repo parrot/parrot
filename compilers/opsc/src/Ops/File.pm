@@ -244,7 +244,7 @@ method read_ops($file, $nolines) {
 
     self<quiet> || say("# Parsing $file...");
     my $start_time := pir::time__N();
-    my $buffer     := slurp($file);
+    my $buffer     := transcode_slurp($file);
     my $start_ops  := +self<ops>;
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
     my $end_ops  := +self<ops>;
