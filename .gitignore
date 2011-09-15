@@ -10,6 +10,10 @@
 *.patch
 *.diff
 
+# Ignore profiling files
+callgrind.out.*
+cachegrind.out.*
+
 # ports/ should not go into release tarballs
 *.obj
 *.rc

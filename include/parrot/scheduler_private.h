@@ -1,5 +1,5 @@
 /* scheduler.h
- *  Copyright (C) 2007, Parrot Foundation.
+ *  Copyright (C) 2007-2011, Parrot Foundation.
  *  Overview:
  *     Parrot concurrency scheduler private core structs and flags
  *  Data Structure and Algorithms:
@@ -15,7 +15,6 @@
 
 /* Scheduler private flags */
 typedef enum {
-    SCHEDULER_cache_valid_FLAG         = PObj_private0_FLAG,
     SCHEDULER_wake_requested_FLAG      = PObj_private1_FLAG,
     SCHEDULER_terminate_requested_FLAG = PObj_private2_FLAG,
     SCHEDULER_in_handler_FLAG          = PObj_private3_FLAG
@@ -25,11 +24,6 @@ typedef enum {
 #define SCHEDULER_flag_TEST(flag, o) (SCHEDULER_get_FLAGS(o) & SCHEDULER_ ## flag ## _FLAG)
 #define SCHEDULER_flag_SET(flag, o) (SCHEDULER_get_FLAGS(o) |= SCHEDULER_ ## flag ## _FLAG)
 #define SCHEDULER_flag_CLEAR(flag, o) (SCHEDULER_get_FLAGS(o) &= ~(UINTVAL)(SCHEDULER_ ## flag ## _FLAG))
-
-/* Mark if the scheduler's cache is valid */
-#define SCHEDULER_cache_valid_TEST(o)  SCHEDULER_flag_TEST(cache_valid, o)
-#define SCHEDULER_cache_valid_SET(o)   SCHEDULER_flag_SET(cache_valid, o)
-#define SCHEDULER_cache_valid_CLEAR(o) SCHEDULER_flag_CLEAR(cache_valid, o)
 
 /* Mark if the scheduler received a wake signal */
 #define SCHEDULER_wake_requested_TEST(o)  SCHEDULER_flag_TEST(wake_requested, o)

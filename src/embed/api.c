@@ -188,8 +188,12 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
-        else if (STREQ(corename, "subprof"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof"));
+        else if (STREQ(corename, "subprof_sub"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
+        else if (STREQ(corename, "subprof_hll"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
+        else if (STREQ(corename, "subprof_ops"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_ops"));
         else if (STREQ(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
         else if (STREQ(corename, "trace"))
@@ -314,6 +318,7 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
         if (_oldtop == NULL)
             interp->lo_var_ptr = &_oldtop;
         interp->api_jmp_buf = &env;
+        dump_profile_data(interp);
         Parrot_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */

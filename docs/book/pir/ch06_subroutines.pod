@@ -189,7 +189,7 @@ X<named parameters>
 Named parameters are an alternative to positional parameters. Instead of
 passing parameters by their position in the string, Parrot assigns
 arguments to parameters by their name.  Consequently you may pass named
-parameters in any order.  Declare named parameters with with the
+parameters in any order.  Declare named parameters with the
 C<:named>X<:named parameter modifier> modifier.
 
 This example declares two named parameters in the subroutine C<shoutout>

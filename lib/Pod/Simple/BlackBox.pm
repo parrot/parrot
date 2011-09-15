@@ -22,6 +22,9 @@ package Pod::Simple::BlackBox;
 use integer; # vroom!
 use strict;
 use Carp ();
+use vars qw($VERSION );
+$VERSION = '3.19';
+#use constant DEBUG => 7;
 BEGIN {
   require Pod::Simple;
   *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG
@@ -85,8 +88,8 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       DEBUG > 2 and print "First line: [$source_line]\n";
 
       if( ($line = $source_line) =~ s/^\xEF\xBB\xBF//s ) {
-        DEBUG and print "UTF-8 BOM seen.  Faking a '=encode utf8'.\n";
-        $self->_handle_encoding_line( "=encode utf8" );
+        DEBUG and print "UTF-8 BOM seen.  Faking a '=encoding utf8'.\n";
+        $self->_handle_encoding_line( "=encoding utf8" );
         $line =~ tr/\n\r//d;
         
       } elsif( $line =~ s/^\xFE\xFF//s ) {
@@ -516,7 +519,7 @@ sub _ponder_paragraph_buffer {
     #   don't require any lookahead, but all others (bullets
     #   and numbers) do.
 
-# TODO: winge about many kinds of directives in non-resolving =for regions?
+# TODO: whinge about many kinds of directives in non-resolving =for regions?
 # TODO: many?  like what?  =head1 etc?
 
     $para = shift @$paras;
@@ -1089,7 +1092,18 @@ sub _ponder_pod {
     "=pod directives shouldn't be over one line long!  Ignoring all "
      . (@$para - 2) . " lines of content"
   ) if @$para > 3;
-  # Content is always ignored.
+
+  # Content ignored unless 'pod_handler' is set
+  if (my $pod_handler = $self->{'pod_handler'}) {
+      my ($line_num, $line) = map $_, $para->[1]{'start_line'}, $para->[2];
+      $line = $line eq '' ? "=pod" : "=pod $line"; # imitate cut_handler output
+      $pod_handler->($line, $line_num, $self);
+  }
+
+  # The surrounding methods set content_seen, so let us remain consistent.
+  # I do not know why it was not here before -- should it not be here?
+  # $self->{'content_seen'} ||= 1;
+
   return;
 }
 
@@ -1102,10 +1116,13 @@ sub _ponder_over {
     $list_type = $self->_get_initial_item_type($paras->[0]);
 
   } elsif($paras->[0][0] eq '=back') {
-    # Ignore empty lists.  TODO: make this an option?
-    shift @$paras;
-    return 1;
-    
+    # Ignore empty lists by default
+    if ($self->{'parse_empty_lists'}) {
+      $list_type = 'empty';
+    } else {
+      shift @$paras;
+      return 1;
+    }
   } elsif($paras->[0][0] eq '~end') {
     $self->whine(
       $para->[1]{'start_line'},
@@ -1369,8 +1386,19 @@ sub _ponder_Verbatim {
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]{'xml:space'} = 'preserve';
+
+  my $indent = $self->strip_verbatim_indent;
+  if ($indent && ref $indent eq 'CODE') {
+      my @shifted = (shift @{$para}, shift @{$para});
+      $indent = $indent->($para);
+      unshift @{$para}, @shifted;
+  }
+
   for(my $i = 2; $i < @$para; $i++) {
     foreach my $line ($para->[$i]) { # just for aliasing
+      # Strip indentation.
+      $line =~ s/^\Q$indent// if $indent
+          && !($self->{accept_codes} && $self->{accept_codes}{VerbatimFormatted});
       while( $line =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
@@ -1614,8 +1642,6 @@ sub _treelet_from_formatting_codes {
   my $treelet = ['~Top', {'start_line' => $start_line},];
   
   unless ($preserve_space || $self->{'preserve_whitespace'}) {
-    $para =~ s/\.  /\.\xA0 /g if $self->{'fullstop_space_harden'};
-  
     $para =~ s/\s+/ /g; # collapse and trim all whitespace first.
     $para =~ s/ $//;
     $para =~ s/^ //;
@@ -1733,7 +1759,7 @@ sub _treelet_from_formatting_codes {
       pop @lineage;
       
     } elsif(defined $5) {
-      DEBUG > 3 and print "Found apparent simple end-text code \"$4\"\n";
+      DEBUG > 3 and print "Found apparent simple end-text code \"$5\"\n";
 
       if(@stack and ! $stack[-1]) {
         # We're indeed expecting a simple end-code
@@ -1801,7 +1827,6 @@ sub stringify_lol {  # function: stringify_lol($lol)
 
 sub _stringify_lol {  # the real recursor
   my($lol, $to) = @_;
-  use UNIVERSAL ();
   for(my $i = 2; $i < @$lol; ++$i) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {
       _stringify_lol( $lol->[$i], $to);  # recurse!
@@ -1900,7 +1925,7 @@ sub pretty { # adopted from Class::Classless
 
 # A rather unsubtle method of blowing away all the state information
 # from a parser object so it can be reused. Provided as a utility for
-# backward compatibilty in Pod::Man, etc. but not recommended for
+# backward compatibility in Pod::Man, etc. but not recommended for
 # general use.
 
 sub reinit {

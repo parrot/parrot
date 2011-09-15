@@ -29,7 +29,7 @@ END:
 
 =item blockdata."rotate"( dir )
 
-Changes the the C<block data> in a way to make
+Changes the C<block data> in a way to make
 the block look rotated.
 
 =over 4

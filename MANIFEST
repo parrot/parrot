@@ -16,7 +16,6 @@ LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
-NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
@@ -1034,7 +1033,6 @@ lib/Parrot/SearchOps.pm                                     [devel]lib
 lib/Parrot/Test.pm                                          [devel]lib
 lib/Parrot/Test/Harness.pm                                  [devel]lib
 lib/Parrot/Test/PGE.pm                                      [devel]lib
-lib/Parrot/Test/PIR_PGE.pm                                  [devel]lib
 lib/Parrot/Test/Pod.pm                                      [devel]lib
 lib/Parrot/Test/Pod/Utils.pm                                [devel]lib
 lib/Parrot/Test/Util.pm                                     [devel]lib
@@ -1845,6 +1843,7 @@ t/pharness/01-default_tests.t                               [test]
 t/pharness/02-get_test_prog_args.t                          [test]
 t/pharness/03-handle_long_options.t                         [test]
 t/pharness/04-Usage.t                                       [test]
+t/pir/interop.t                                             [test]
 t/pir/macro.t                                               [test]
 t/pir/pbc_fallback.t                                        [test]
 t/pir/registernames.t                                       [test]
@@ -2131,7 +2130,7 @@ tools/build/pmc2c.pl                                        [devel]
 tools/build/vtable_extend.pl                                []
 tools/build/vtable_h.pl                                     []
 tools/dev/.gdbinit                                          []
-tools/dev/README                                            []doc
+tools/dev/README.md                                         []doc
 tools/dev/addopstags.pl                                     []
 tools/dev/all_hll_test.pl                                   []
 tools/dev/as2c.pl                                           []

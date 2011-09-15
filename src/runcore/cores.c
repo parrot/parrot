@@ -244,7 +244,6 @@ next opcode, or examine and manipulate data from the executing program.
 #include "parrot/runcore_api.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_trace.h"
-#include "parrot/runcore_subprof.h"
 #include "cores.str"
 
 #include "parrot/oplib/ops.h"
@@ -306,14 +305,6 @@ static opcode_t * runops_slow_core(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static opcode_t * runops_subprof_core(PARROT_INTERP,
-    Parrot_runcore_t *runcore,
-    ARGIN(opcode_t *pc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -332,9 +323,6 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pc))
-#define ASSERT_ARGS_runops_subprof_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_runops_trace_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -403,35 +391,6 @@ Parrot_runcore_fast_init(PARROT_INTERP)
     Parrot_runcore_register(interp, coredata);
 }
 
-
-/*
-
-=item C<void Parrot_runcore_subprof_init(PARROT_INTERP)>
-
-Registers the subprof runcore with Parrot.
-
-=cut
-
-*/
-
-void
-Parrot_runcore_subprof_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_runcore_subprof_init)
-
-    Parrot_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_runcore_t);
-    coredata->name             = CONST_STRING(interp, "subprof");
-    coredata->id               = PARROT_SLOW_CORE;
-    coredata->opinit           = PARROT_CORE_OPLIB_INIT;
-    coredata->runops           = runops_subprof_core;
-    coredata->prepare_run      = NULL;
-    coredata->destroy          = NULL;
-    coredata->flags            = 0;
-
-    PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
-
-    Parrot_runcore_register(interp, coredata);
-}
 
 /*
 
@@ -641,44 +600,6 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     }
 
     Parrot_io_flush_handle(debugger, Parrot_io_STDERR(debugger));
-
-    return pc;
-}
-
-
-/*
-
-=item C<static opcode_t * runops_subprof_core(PARROT_INTERP, Parrot_runcore_t
-*runcore, opcode_t *pc)>
-
-Runs the Parrot operations starting at C<pc> until there are no more
-operations, with sub-level profiling, tracing and bounds checking enabled.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static opcode_t *
-runops_subprof_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
-{
-    ASSERT_ARGS(runops_slow_core)
-
-    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG))
-        return runops_trace_core(interp, pc);
-
-    while (pc) {
-        if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "attempt to access code outside of current code segment");
-
-        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
-
-        profile(interp, CURRENT_CONTEXT(interp), pc);
-
-        DO_OP(pc, interp);
-    }
 
     return pc;
 }

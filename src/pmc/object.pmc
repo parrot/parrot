@@ -108,24 +108,22 @@ get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
     ASSERT_ARGS(get_attrib_index)
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
     const INTVAL                    cur_hll = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp));
+    INTVAL                          index   = -1;
     int                             num_classes, i;
-    INTVAL                          retval;
-
-    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), 0);
 
     /* First see if we can find it in the cache. */
-    retval                       = VTABLE_get_integer_keyed_str(interp,
+    const INTVAL retval  = VTABLE_get_integer_keyed_str(interp,
                                          _class->attrib_cache, name);
 
     /* there's a semi-predicate problem with a retval of 0 */
     if (retval
-    ||  VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
-        Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_hll);
+    ||  VTABLE_exists_keyed_str(interp, _class->attrib_cache, name))
         return retval;
-    }
 
     /* No hit. We need to walk up the list of parents to try and find the
      * attribute. */
+    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), 0);
+
     num_classes = VTABLE_elements(interp, _class->all_parents);
 
     for (i = 0; i < num_classes; i++) {
@@ -140,18 +138,17 @@ get_attrib_index(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *name))
         /* Look up. */
         if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
             /* Found it. Get value, cache it and we're done. */
-            const INTVAL index = VTABLE_get_integer_keyed_str(interp,
+            index = VTABLE_get_integer_keyed_str(interp,
                 _class->attrib_index, fq_name);
             VTABLE_set_integer_keyed_str(interp, _class->attrib_cache, name,
                 index);
 
-            Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_hll);
-            return index;
+            break;
         }
     }
 
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_hll);
-    return -1;
+    return index;
 }
 
 /*
@@ -172,30 +169,17 @@ static INTVAL
 get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(STRING *name))
 {
     ASSERT_ARGS(get_attrib_index_keyed)
-    Parrot_Class_attributes * const _class       = PARROT_CLASS(self);
-    PMC                     * const class_cache  =
-        VTABLE_get_pmc_keyed_str(interp, _class->attrib_cache,
-                                 VTABLE_get_string(interp, key));
-
-    PMC                 *parent_class;
-    STRING              *fq_name;
-
-    if (!PMC_IS_NULL(class_cache))
-        if (VTABLE_exists_keyed_str(interp, class_cache, name))
-            return VTABLE_get_integer_keyed_str(interp, class_cache, name);
+    Parrot_Class_attributes * const _class = PARROT_CLASS(self);
 
     /* Build a string representing the fully qualified attribute name. */
-    parent_class = Parrot_oo_get_class(interp, key);
-    fq_name      = VTABLE_get_string(interp, parent_class);
-    fq_name      = Parrot_str_concat(interp, fq_name, name);
+    PMC    * const parent_class = Parrot_oo_get_class(interp, key);
+    STRING * const fq_name      = Parrot_str_concat(interp,
+                                VTABLE_get_string(interp, parent_class), name);
 
     /* Look up. */
-    if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
-        /* Found it. Get value and we're done. */
-        const INTVAL index = VTABLE_get_integer_keyed_str(interp,
+    if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name))
+        return VTABLE_get_integer_keyed_str(interp,
             _class->attrib_index, fq_name);
-        return index;
-    }
 
     return -1;
 }
