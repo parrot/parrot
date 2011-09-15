@@ -275,7 +275,7 @@ pir_output_is( <<'CODE', <<'OUT', "Timer start/repeat/stop");
     t1 = $P0
     r = isgt t1, 1
     say r
-    # Give a chance to tick to verify that is stoped
+    # Give a chance to tick to verify that is stopped
     sleep 0.2
     sleep 0.2
     get_global $P0, 'counter'

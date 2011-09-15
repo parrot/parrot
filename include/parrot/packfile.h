@@ -611,10 +611,6 @@ STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_destroy_constants(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_load_bytecode(PARROT_INTERP,
     ARGIN_NULLOK(Parrot_String file_str))
         __attribute__nonnull__(1);
@@ -819,8 +815,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_debug_pc_to_filename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(debug))
-#define ASSERT_ARGS_Parrot_destroy_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

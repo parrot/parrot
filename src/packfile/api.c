@@ -74,13 +74,6 @@ static INTVAL find_const_iter(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static PackFile_ConstTable * find_constants(PARROT_INTERP,
-    ARGIN(PackFile_ConstTable *ct))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 static INTVAL find_pf_ann_idx(
@@ -192,9 +185,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_const_iter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_find_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pfa) \
     , PARROT_ASSERT_ARG(key))
