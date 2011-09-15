@@ -426,6 +426,11 @@ Invokes the subroutine.
 
         Parrot_pcc_set_context(INTERP, context);
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
+
+        /* support callcontext reuse */
+        if (context == caller_ctx)
+            Parrot_pcc_free_registers(INTERP, context);
+
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
         object = Parrot_pcc_get_object(INTERP, context);
@@ -1027,7 +1032,7 @@ slurpy arguments).
 
         PMC_get_sub(INTERP, SELF, sub);
         /*
-        XXX Rakudo's failing with with this code on ASSERT. Why???
+        XXX Rakudo's failing with this code on ASSERT. Why???
         GET_ATTR_namespace_stash(INTERP, SELF, _namespace);
         PARROT_ASSERT(_namespace == sub->namespace_stash || !"consistency!!!");
         */

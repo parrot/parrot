@@ -221,7 +221,7 @@ Parrot_sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     ASSERT_ARGS(Parrot_sub_get_line_from_pc)
     Parrot_Sub_attributes *sub;
     opcode_t              *base_pc, *debug_ops;
-    size_t                 i, op, current_annotation, debug_size;
+    size_t                 i, op, current_annotation, debug_size, code_size;
 
     if (!subpmc || !pc)
         return -1;
@@ -230,13 +230,14 @@ Parrot_sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
 
     debug_ops          = sub->seg->debugs->base.data;
     debug_size         = sub->seg->debugs->base.size;
+    code_size          = sub->seg->base.size;
     base_pc            = sub->seg->base.data;
     current_annotation = pc - base_pc;
 
     /* assert pc is in correct segment */
-    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + sub->seg->base.size);
+    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + code_size);
 
-    for (i = op = 0; op < debug_size; ++i) {
+    for (i = op = 0; op < code_size; ++i) {
         op_info_t * const op_info  = sub->seg->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 

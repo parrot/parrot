@@ -549,7 +549,7 @@ Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         /* Redirect input to NULL. This is to avoid
          * interferences in case both the child and
          * the parent tries to read from stdin.
-         * May be unneccessary or even interfere
+         * May be unnecessary or even interfere
          * with valid usages, need more feedback. */
         hnull = CreateFile("NUL", GENERIC_READ|GENERIC_WRITE,
                 0, &sec, OPEN_EXISTING,

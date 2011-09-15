@@ -1344,9 +1344,7 @@ PMC* Parrot_${classname}_get_mro(PARROT_INTERP, ARGMOD(PMC* mro)) {
         mro = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     }
 $get_mro
-    VTABLE_unshift_string(interp, mro,
-        Parrot_str_new_init(interp, "$classname", @{[length($classname)]},
-            Parrot_default_encoding_ptr, 0));
+    VTABLE_unshift_string(interp, mro, CONST_STRING_GEN(interp, "$classname"));
     return mro;
 }
 

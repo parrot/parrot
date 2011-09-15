@@ -97,7 +97,7 @@ page (e.g. [wiki:ParrotDeprecationsFor2.6 ParrotDeprecationsFor2.6])
 
 =item *
 
-walk through the the documentation to ensure that it's sufficient for a user to
+walk through the documentation to ensure that it's sufficient for a user to
 use to upgrade his or her code
 
 =item *

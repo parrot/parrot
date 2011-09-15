@@ -503,7 +503,7 @@ C<i> that's visible after it's used, which is confusing at best.
 
 =item Filenames
 
-Filenames must be assumed to be case-insensitive, in the sense that that you
+Filenames must be assumed to be case-insensitive, in the sense that you
 may not have two different files called F<Foo> and F<foo>. Normal source-code
 filenames should be all lower-case; filenames with upper-case letters in them
 are reserved for notice-me-first files such as F<README>, and for files which

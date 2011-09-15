@@ -92,7 +92,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     is($I0, 1, "char val of 1 is correct")
     set $I0, $P0[0;1]
     is($I0, 2, "char val of 258 retrieved as 2")
-    # now acces that as a short
+    # now access that as a short
     new $P2, ['ResizablePMCArray']
     push $P2, .DATATYPE_SHORT
     push $P2, 1
