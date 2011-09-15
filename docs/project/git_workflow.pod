@@ -101,6 +101,10 @@ To get the latest updates:
 
 This copies the index from your default remote (origin) and saves it to your
 local index. This does not effect your working copy, so it doesn't matter
+# Using the word "index" here is confusing to people who know Git terminology, as
+# git fetch never touches any "index". The operation fetches the contents of the
+# branches from the remote (in this case, "origin"), and remembers the tips of
+# these remote branches so that you can later refer them as "origin/user/branch"
 what branch you are on when you run this command. To sync up your working
 copy, you can use C<git rebase>
 
@@ -114,7 +118,10 @@ This is a common action, so there is also a simpler way to do it:
 Whenever you don't specify a remote or branch to a git command, they default
 to the remote called "origin" and the master branch, so the previous command
 means exactly the same as:
-
+# Not really. Especially because you are encouraging people to use -t origin/user/branch
+# when your developers fork their work off of others' work, "pull --rebase" run while on
+# user/branch most likely to mean "git pull --rebase origin origin/user/branch", which is
+# more desirable thing to happen than "git pull --rebase origin master".
   git pull --rebase origin master
 
 This is important to note when you are working with remotes other than origin,
@@ -179,7 +186,10 @@ a good idea.
 =head2 Maintaining a Branch
 
 To update your local git index from origin:
-
+# Again, "index" is confusing here. It is updating the local copy you keep to
+# remember which commits the "origin" repository had at tips of its branches
+# when you last updated the record by running "git fetch". They are called
+# "remote tracking branches".
     git fetch
 
 If you are following multiple remotes, you can fetch updates from all of them
@@ -418,7 +428,7 @@ Then you will follow this procedure:
 
     # 4) let's make a patch of the difference between this branch and master
     git format-patch master --stdout > foo.patch
-
+# "foo.patch" does not match the following description. Should read "gci.patch", I think.
     # 5) Switch back to the master branch
     git checkout master
 
@@ -446,7 +456,32 @@ of C<git log> and finding the most recent SHA1 before your
 branch, then doing:
 
     git reset --hard $sha1
-
+# This is a workflow suggestion, but because you are requiring your
+# developers to merge with --no-ff to _always_ create a merge commit,
+# you can avoid the above complexity and risk of confusion coming from
+# reset by instead requiring your trusted developers to sign off these
+# merges. I.e. this procedure
+# 1. git checkout -b someguy-newbranch master
+# 2. git pull --no-ff https://github.com/someguy/parrot.git newbranch
+# 3. EDITOR=: git commit --amend -s
+# will create a merge commit that is signed by the person who is responding
+# to a pull request (if the step 2 fails in conflict, conclude the merge
+# resolution with "git commit -s" instead and you can omit the third step).
+# When auditing the overall project history, use "git log --first-parent"
+# to traverse the mainline of the history, and any and all merges you would
+# find would be a merge from a side branch. For such a merge commit $M,
+# git log $M^1..$M would give you the commits the merge brought into the
+# history from the side branch (they may not be signed off by the authorized
+# "committers") but a sign-off on the merge commit $M already indicates that
+# the person who responded to the pull-request VOUCHES FOR all these commits
+# from the side branch, and no auditing trail is lost.
+# Again, the above is a workflow suggestion, and it may go against the
+# project policy of having sign-off by authorized "committers" on ALL commits;
+# I am just pointing out that the project may realize that such a policy is
+# suboptimal, if it reconsiders what the policy tries to achieve.
+# By loosening the policy the way I outlined above, you do not have to worry
+# about changing the SHA-1 of the third-party commits, hence you do not have
+# to worry about using "git reset".
 Be careful with C<git reset>! Make sure there are no untracked
 files that you care about BEFORE YOUR RUN C<git reset>.
 
