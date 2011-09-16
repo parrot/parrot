@@ -20,22 +20,22 @@ struct callinfo {
     /* which sub we called */
     subprofile   *callee;
     /* how often it was called */
-    int           count;
+    UINTVAL       count;
     /* how many ops where executed in it (including subcalls) */
-    unsigned int  ops;
+    UINTVAL       ops;
     /* how many ticks where spent in it (including subcalls) */
-    uint64_t      ticks;
+    UHUGEINTVAL   ticks;
 };
 
 struct lineinfo {
     /* start op of this line */
-    size_t                startop;
+    size_t                op_offs;
     /* calls made from this line */
     callinfo              *calls;
     /* number of ops executed in this line */
-    unsigned int          ops;
+    UINTVAL               ops;
     /* number of CPU ticks spent in this line */
-    uint64_t              ticks;
+    UHUGEINTVAL           ticks;
 };
 
 struct subprofile {
@@ -43,6 +43,7 @@ struct subprofile {
     subprofile            *rnext;
     /* recursion level of this subprofile */
     int                    rcnt;
+
     /* the Sub PMC being profiled by this subprofile* */
     PMC                   *subpmc; 
     /* the ATTRs of subpmc */
@@ -64,10 +65,9 @@ struct subprofile {
     /* the active Context for the Sub being profiled */
     PMC                   *ctx;
 
-    /* ops/ticks we need to distribute to the caller when
-       we leave the sub */
-    unsigned int          callerops;
-    uint64_t              callerticks;
+    /* ops/ticks we need to distribute to the caller */
+    UINTVAL               callerops;
+    UHUGEINTVAL           callerticks;
 };
 
 #define SUBPROF_TYPE_SUB 1
@@ -92,9 +92,9 @@ struct subprofiledata {
     subprofile *cursp;
 
     /* ticks are added at the end of the op */
-    uint64_t *tickadd;
-    uint64_t *tickadd2;
-    uint64_t starttick;
+    UHUGEINTVAL *tickadd;
+    UHUGEINTVAL *tickadd2;
+    UHUGEINTVAL starttick;
 };
 
 

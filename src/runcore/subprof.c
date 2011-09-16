@@ -332,16 +332,16 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
         sp->nlines = sp->subattrs->end_offs - sp->subattrs->start_offs;
         sp->lines = (lineinfo *)calloc(sizeof(lineinfo), (sp->nlines ? sp->nlines : 1) + 1);
-        sp->lines[0].startop = sp->subattrs->start_offs;        /* just in case... */
+        sp->lines[0].op_offs = sp->subattrs->start_offs;        /* just in case... */
         for (i = lasti = 0; i < sp->nlines; i++) {
             INTVAL line = xdebug[sp->subattrs->start_offs + i];
             if (line != -2) {
-                sp->lines[i].startop = sp->subattrs->start_offs + i;
-                sp->lines[lasti + 1].startop = sp->subattrs->start_offs + i;
+                sp->lines[i].op_offs = sp->subattrs->start_offs + i;
+                sp->lines[lasti + 1].op_offs = sp->subattrs->start_offs + i;
                 lasti = i;
             }
         }
-        sp->lines[lasti + 1].startop = sp->subattrs->end_offs;
+        sp->lines[lasti + 1].op_offs = sp->subattrs->end_offs;
         sp->srcline = xdebug[sp->subattrs->start_offs];
         sp->srcfile = str2cs(interp, Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs));
         return;
@@ -369,15 +369,15 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
                 sp->srcfile = str2cs(interp, VTABLE_get_string(interp, srcfilepmc));
             sp->lines = (lineinfo *)calloc(sizeof(lineinfo), cnt + 1);
             for (i = j = 0; i < cnt; i++) {
-                if (j && sp->lines[j - 1].startop == (size_t)anndata[i * 2 + ANN_ENTRY_OFF]) {
+                if (j && sp->lines[j - 1].op_offs == (size_t)anndata[i * 2 + ANN_ENTRY_OFF]) {
                     /* no empty segments, please */
                     continue;
                 }
-                sp->lines[j++].startop = anndata[i * 2 + ANN_ENTRY_OFF];
+                sp->lines[j++].op_offs = anndata[i * 2 + ANN_ENTRY_OFF];
             }
-            sp->lines[0].startop = sp->subattrs->start_offs;    /* workaround */
-            sp->lines[j].startop = sp->subattrs->end_offs;
-            if (j > 1 && sp->lines[j - 1].startop == sp->subattrs->end_offs)
+            sp->lines[0].op_offs = sp->subattrs->start_offs;    /* workaround */
+            sp->lines[j].op_offs = sp->subattrs->end_offs;
+            if (j > 1 && sp->lines[j - 1].op_offs == sp->subattrs->end_offs)
                 /* no empty segments, please */
                 j--;
             sp->nlines = j;
@@ -388,8 +388,8 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         sp->srcline = Parrot_sub_get_line_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs);
         sp->srcfile = str2cs(interp, Parrot_sub_get_filename_from_pc(interp, sp->subpmc, sp->code_ops + sp->subattrs->start_offs));
         sp->lines = (lineinfo *)calloc(sizeof(lineinfo), 1 + 1);
-        sp->lines[0].startop = sp->subattrs->start_offs;
-        sp->lines[1].startop = sp->subattrs->end_offs;
+        sp->lines[0].op_offs = sp->subattrs->start_offs;
+        sp->lines[1].op_offs = sp->subattrs->end_offs;
         sp->nlines = 1;
     }
 }
@@ -544,7 +544,7 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
                 rsp->lines = (lineinfo *)calloc(sizeof(lineinfo), sp->nlines + 1);
                 rsp->nlines = sp->nlines;
                 for (i = 0; i < sp->nlines + 1; i++)
-                    rsp->lines[i].startop = sp->lines[i].startop;
+                    rsp->lines[i].op_offs = sp->lines[i].op_offs;
             }
         }
         sp = sp->rnext;
@@ -566,13 +566,13 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
         if (spdata->profile_type != SUBPROF_TYPE_OPS) {
             /* might do a binary seach instead */
             for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
-                if (cpc >= li->startop && cpc < li[1].startop)
+                if (cpc >= li->op_offs && cpc < li[1].op_offs)
                     break;
             if (i >= csp->nlines)
                 li = csp->lines - 1;    /* just in case */
         } else {
             li = csp->lines + (cpc - csp->subattrs->start_offs);
-            while (li > csp->lines && (li->startop == 0 || li->startop > cpc))
+            while (li > csp->lines && (li->op_offs == 0 || li->op_offs > cpc))
                 li--;
         }
     } else {
@@ -642,7 +642,7 @@ dump_profile_data(PARROT_INTERP)
     size_t off;
 
     unsigned int totalops = 0;
-    uint64_t totalticks = 0;
+    UHUGEINTVAL totalticks = 0;
 
     if (!spdata->profile_type)
         return;
@@ -697,7 +697,7 @@ dump_profile_data(PARROT_INTERP)
                     if (spdata->profile_type == SUBPROF_TYPE_OPS) {
                         srcline = xdebug[sp->subattrs->start_offs + i];
                     } else if (anndata) {
-                        while (cnt && (size_t)anndata[ANN_ENTRY_OFF + 2] <= li->startop) {
+                        while (cnt && (size_t)anndata[ANN_ENTRY_OFF + 2] <= li->op_offs) {
                             anndata += 2;
                             cnt--;
                         }
@@ -707,15 +707,15 @@ dump_profile_data(PARROT_INTERP)
                     }
                 }
                 if (li->ops || li->ticks)
-                    fprintf(stderr, "%d %d %lld\n", (int)srcline, li->ops, li->ticks);
+                    fprintf(stderr, "%d %u %llu\n", (int)srcline, (unsigned int)li->ops, (unsigned long long)li->ticks);
                 for (ci = li->calls; ci && ci->callee; ci++) {
                     subprofile *csp = ci->callee;
                     fprintf(stderr, "cfl=%s\n", csp->srcfile);
                     fprintf(stderr, "cfn=");
                     printspname(interp, spdata, csp);
                     fprintf(stderr, "\n");
-                    fprintf(stderr, "calls=%d %d\n", ci->count, (int)csp->srcline);
-                    fprintf(stderr, "%d %d %lld\n", (int)srcline, ci->ops, ci->ticks);
+                    fprintf(stderr, "calls=%u %d\n", (unsigned int)ci->count, (int)csp->srcline);
+                    fprintf(stderr, "%d %u %llu\n", (int)srcline, (unsigned int)ci->ops, (unsigned long long)ci->ticks);
                 }
             }
         }
@@ -723,8 +723,8 @@ dump_profile_data(PARROT_INTERP)
 
     /* also dump profiling root if there are more than one callees */
     if (spdata->rootline.calls && spdata->rootline.calls[0].callee && spdata->rootline.calls[1].callee) {
-	lineinfo *li = &spdata->rootline;
-	callinfo *ci;
+        lineinfo *li = &spdata->rootline;
+        callinfo *ci;
 
         fprintf(stderr, "\n");
         fprintf(stderr, "fl=\n");
@@ -735,8 +735,8 @@ dump_profile_data(PARROT_INTERP)
             fprintf(stderr, "cfn=");
             printspname(interp, spdata, csp);
             fprintf(stderr, "\n");
-            fprintf(stderr, "calls=%d %d\n", ci->count, (int)csp->srcline);
-            fprintf(stderr, "%d %d %lld\n", 0, ci->ops, ci->ticks);
+            fprintf(stderr, "calls=%u %d\n", (unsigned int)ci->count, (int)csp->srcline);
+            fprintf(stderr, "%d %u %llu\n", 0, (unsigned int)ci->ops, (unsigned long long)ci->ticks);
         }
     }
 
@@ -753,10 +753,10 @@ mark_profile_data(PARROT_INTERP)
 }
 
 
-static __inline__ uint64_t rdtsc(void) {
+static __inline__ UHUGEINTVAL rdtsc(void) {
     uint32_t lo, hi; 
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return (uint64_t)hi << 32 | lo; 
+    return (UHUGEINTVAL)hi << 32 | lo; 
 }
 
 
@@ -829,7 +829,7 @@ sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(o
     if (sp->nlines > 1) {
         pc = pc_op ? pc_op - sp->code_ops : 0;
         for (i = 0, li = sp->lines; i < sp->nlines; i++, li++)
-            if (pc >= li->startop && pc < li[1].startop)
+            if (pc >= li->op_offs && pc < li[1].op_offs)
                 break;
         if (i == sp->nlines)
             li = sp->lines;    /* just in case */
@@ -889,9 +889,9 @@ runops_subprof_sub_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 /* context changed! either called new sub or returned from sub */
 
                 /* finish old ticks */
-                uint64_t tick = rdtsc();
+                UHUGEINTVAL tick = rdtsc();
                 if (spdata->tickadd) {
-                    uint64_t tickdiff = tick - spdata->starttick;
+                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
@@ -965,17 +965,14 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
     subprofiledata *spdata = &_spdata;
     subprofile *sp = spdata->cursp;
     PMC *ctx, *subpmc;
+    lineinfo *curline = sp ? sp->lines : 0;
     opcode_t *startop = 0;
-    opcode_t *endop = 0;
-    lineinfo *curline = 0;
+    opcode_t *endop = 0;        /* triggers pc >= endop below */
 
     if (spdata->profile_type && spdata->profile_type != SUBPROF_TYPE_HLL)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
             "illegal profile type change");
     spdata->profile_type = SUBPROF_TYPE_HLL;
-
-    if (sp)
-        curline = sp->lines;
 
     while (pc) {
         if (pc < code_start || pc >= code_end)
@@ -992,57 +989,59 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 /* context changed! either called new sub or returned from sub */
 
                 /* finish old ticks */
-                uint64_t tick = rdtsc();
+                UHUGEINTVAL tick = rdtsc();
                 if (spdata->tickadd) {
-                    uint64_t tickdiff = tick - spdata->starttick;
+                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
                 sync_callchainchange(interp, spdata, ctx, subpmc);
-                curline = sync_hll_linechange(interp, spdata, pc);
                 sp = spdata->cursp;
                 if (pc == sp->code_ops + sp->subattrs->start_offs) {
                     /* assume new call */
                     if (sp->callerci)
                         sp->callerci->count++;
                 }
+                curline = sync_hll_linechange(interp, spdata, pc);
                 spdata->tickadd   = &curline->ticks;
                 spdata->tickadd2  = &sp->callerticks;
+                startop = sp->code_ops + curline->op_offs;
+                endop   = sp->code_ops + curline[1].op_offs;
                 spdata->starttick = rdtsc();
-                startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline[1].startop;
             }
 
             if (pc >= endop) {
                 /* finish old ticks */
-                uint64_t tick = rdtsc();
+                UHUGEINTVAL tick = rdtsc();
                 if (spdata->tickadd) {
-                    uint64_t tickdiff = tick - spdata->starttick;
+                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
                 spdata->starttick = tick;
-                while (pc >= sp->code_ops + curline[1].startop) {
+                /* bring curline in sync with the pc */
+                while (pc >= sp->code_ops + curline[1].op_offs) {
                     curline++;
                 }
-                startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline[1].startop;
+                startop = sp->code_ops + curline->op_offs;
+                endop   = sp->code_ops + curline[1].op_offs;
                 spdata->tickadd = &curline->ticks;
             }
             else if (pc < startop) {
                 /* finish old ticks */
-                uint64_t tick = rdtsc();
+                UHUGEINTVAL tick = rdtsc();
                 if (spdata->tickadd) {
-                    uint64_t tickdiff = tick - spdata->starttick;
+                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
                 spdata->starttick = tick;
-                while (pc < sp->code_ops + curline->startop) {
+                /* bring curline in sync with the pc */
+                while (pc < sp->code_ops + curline->op_offs) {
                     curline--;
                 }
-                startop = sp->code_ops + curline->startop;
-                endop   = sp->code_ops + curline[1].startop;
+                startop = sp->code_ops + curline->op_offs;
+                endop   = sp->code_ops + curline[1].op_offs;
                 spdata->tickadd = &curline->ticks;
             }
 
@@ -1103,7 +1102,7 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
     subprofiledata *spdata = &_spdata;
     subprofile *sp = spdata->cursp;
     opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : 0;
-    uint64_t tick;
+    UHUGEINTVAL tick;
     
     if (spdata->profile_type && spdata->profile_type != SUBPROF_TYPE_OPS)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -1121,9 +1120,9 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
 
         if (!PMC_IS_NULL(subpmc)) {
             /* finish old ticks */
-            uint64_t tick = rdtsc();
+            UHUGEINTVAL tick = rdtsc();
             if (spdata->tickadd) {
-                uint64_t tickdiff = tick - spdata->starttick;
+                UHUGEINTVAL tickdiff = tick - spdata->starttick;
                 *spdata->tickadd         += tickdiff;
                 *spdata->tickadd2        += tickdiff;
                 spdata->starttick = tick;
