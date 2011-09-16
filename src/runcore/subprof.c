@@ -753,11 +753,17 @@ mark_profile_data(PARROT_INTERP)
 }
 
 
-static __inline__ UHUGEINTVAL rdtsc(void) {
+#if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+static __inline__ UHUGEINTVAL getticks(void) {
     uint32_t lo, hi; 
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return (UHUGEINTVAL)hi << 32 | lo; 
 }
+#else
+static UHUGEINTVAL getticks(void) {
+    return Parrot_hires_get_time();
+}
+#endif
 
 
 
@@ -889,7 +895,7 @@ runops_subprof_sub_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 /* context changed! either called new sub or returned from sub */
 
                 /* finish old ticks */
-                UHUGEINTVAL tick = rdtsc();
+                UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -904,7 +910,7 @@ runops_subprof_sub_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 }
                 spdata->tickadd   = &sp->lines->ticks;
                 spdata->tickadd2  = &sp->callerticks;
-                spdata->starttick = rdtsc();
+                spdata->starttick = getticks();
             }
 
             sp->lines->ops++;
@@ -989,7 +995,7 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 /* context changed! either called new sub or returned from sub */
 
                 /* finish old ticks */
-                UHUGEINTVAL tick = rdtsc();
+                UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -1007,12 +1013,12 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 spdata->tickadd2  = &sp->callerticks;
                 startop = sp->code_ops + curline->op_offs;
                 endop   = sp->code_ops + curline[1].op_offs;
-                spdata->starttick = rdtsc();
+                spdata->starttick = getticks();
             }
 
             if (pc >= endop) {
                 /* finish old ticks */
-                UHUGEINTVAL tick = rdtsc();
+                UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -1029,7 +1035,7 @@ runops_subprof_hll_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
             }
             else if (pc < startop) {
                 /* finish old ticks */
-                UHUGEINTVAL tick = rdtsc();
+                UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -1120,7 +1126,7 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
 
         if (!PMC_IS_NULL(subpmc)) {
             /* finish old ticks */
-            UHUGEINTVAL tick = rdtsc();
+            UHUGEINTVAL tick = getticks();
             if (spdata->tickadd) {
                 UHUGEINTVAL tickdiff = tick - spdata->starttick;
                 *spdata->tickadd         += tickdiff;
@@ -1139,7 +1145,7 @@ runops_subprof_ops_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(op
                 }
                 startop = sp->code_ops + sp->subattrs->start_offs;
                 spdata->tickadd2  = &sp->callerticks;
-                spdata->starttick = rdtsc();
+                spdata->starttick = getticks();
             }
             sp->lines[(int)(pc - startop)].ops++;
             sp->callerops++;
