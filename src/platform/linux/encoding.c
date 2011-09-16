@@ -54,7 +54,7 @@ Parrot_init_platform_encoding(PARROT_INTERP)
         else {
             /* Can't use Parrot_warn here, the interpreter is not ready */
             fprintf(stderr,
-                "Unknown codeset `%s', defaulting to ASCII", codeset);
+                "Unknown codeset `%s', defaulting to ASCII\n", codeset);
             Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
         }
     }
