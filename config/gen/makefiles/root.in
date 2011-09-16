@@ -1539,6 +1539,7 @@ src/runcore/main$(O) : \
 	src/runcore/main.c \
 	src/runcore/main.str \
 	include/pmc/pmc_parrotlibrary.h \
+	include/pmc/pmc_sub.h \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
@@ -1546,12 +1547,14 @@ src/runcore/main$(O) : \
 	$(INC_DIR)/runcore_profiling.h
 
 src/runcore/subprof$(O) : src/runcore/subprof.str src/runcore/subprof.c \
+	$(INC_DIR)/dynext.h \
+	$(INC_DIR)/embed.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_subprof.h \
 	include/pmc/pmc_sub.h \
-	include/pmc/pmc_namespace.h \
-	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/runcore_subprof.h $(INC_DIR)/embed.h \
-	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS)
+	$(PARROT_H_HEADERS)
 
 src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	include/pmc/pmc_sub.h \
