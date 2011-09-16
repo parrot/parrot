@@ -10,6 +10,23 @@ src/pmc/os.pmc - Files and Directories PMC
 C<OS> is a PMC type which provides access to the filesystem
 files and directories.
 
+=head2 Usage
+
+From PIR code:
+
+    loadlib "os"
+    $P0 = new 'OS'
+
+From NQP:
+
+    pir::loadlib__s("os");
+    my $os := pir::new__ps("OS");
+
+From Winxed:
+
+    loadlib("os");
+    var os = new 'OS';
+
 =head2 Methods
 
 =over 4
