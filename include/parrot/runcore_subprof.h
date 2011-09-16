@@ -15,6 +15,7 @@ typedef struct subprofile subprofile;
 typedef struct callinfo callinfo;
 typedef struct lineinfo lineinfo;
 typedef struct subprofiledata subprofiledata;
+typedef struct subprof_runcore_t Parrot_subprof_runcore_t;
 
 struct callinfo {
     /* which sub we called */
@@ -29,13 +30,13 @@ struct callinfo {
 
 struct lineinfo {
     /* start op of this line */
-    size_t                op_offs;
+    size_t                 op_offs;
     /* calls made from this line */
     callinfo              *calls;
     /* number of ops executed in this line */
-    UINTVAL               ops;
+    UINTVAL                ops;
     /* number of CPU ticks spent in this line */
-    UHUGEINTVAL           ticks;
+    UHUGEINTVAL            ticks;
 };
 
 struct subprofile {
@@ -51,11 +52,11 @@ struct subprofile {
     /* first op of segment */
     opcode_t              *code_ops;
 
-    INTVAL                srcline;
+    INTVAL                 srcline;
     char                  *srcfile;
 
     lineinfo              *lines;
-    int                   nlines;
+    int                    nlines;
 
     /* call chain info */
     /* which sub called us */
@@ -66,8 +67,8 @@ struct subprofile {
     PMC                   *ctx;
 
     /* ops/ticks we need to distribute to the caller */
-    UINTVAL               callerops;
-    UHUGEINTVAL           callerticks;
+    UINTVAL                callerops;
+    UHUGEINTVAL            callerticks;
 };
 
 #define SUBPROF_TYPE_SUB 1
@@ -75,37 +76,46 @@ struct subprofile {
 #define SUBPROF_TYPE_OPS 3
 
 struct subprofiledata {
+    /* the interpreter we're profiling */
+    Interp      *interp;
     /* type of profile */
-    int profile_type;
+    int          profile_type;
     /* the collected data, maps subpmc -> subprofile */
-    Hash *sphash;
+    Hash        *sphash;
 
     /* the root call data */
-    lineinfo rootline;
+    lineinfo     rootline;
 
     /* maps to expanded debug data */
-    Hash *seg2debug;
+    Hash        *seg2debug;
 
     /* the current context */
-    PMC *cursubpmc;
-    PMC *curctx;
-    subprofile *cursp;
+    PMC         *cursubpmc;
+    PMC         *curctx;
+    subprofile  *cursp;
 
     /* ticks are added at the end of the op */
     UHUGEINTVAL *tickadd;
     UHUGEINTVAL *tickadd2;
-    UHUGEINTVAL starttick;
+    UHUGEINTVAL  starttick;
 };
+
+struct subprof_runcore_t {
+    STRING                      *name;
+    int                          id;
+    oplib_init_f                 opinit;
+    Parrot_runcore_runops_fn_t   runops;
+    Parrot_runcore_destroy_fn_t  destroy;
+    Parrot_runcore_prepare_fn_t  prepare_run;
+    INTVAL                       flags;
+
+    subprofiledata              *spdata;
+};
+
 
 
 /* HEADERIZER BEGIN: src/runcore/subprof.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-void dump_profile_data(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void mark_profile_data(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -116,10 +126,10 @@ void Parrot_runcore_subprof_ops_init(PARROT_INTERP)
 void Parrot_runcore_subprof_sub_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_dump_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_mark_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+void runops_subprof_mark(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_runcore_subprof_hll_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -129,6 +139,9 @@ void Parrot_runcore_subprof_sub_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_runcore_subprof_sub_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_runops_subprof_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(runcore))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/subprof.c */
 

@@ -254,7 +254,8 @@ mark_interp(PARROT_INTERP)
     if (!PMC_IS_NULL(interp->final_exception))
         Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
 
-    mark_profile_data(interp);
+    if (interp->run_core)
+        runops_subprof_mark(interp, interp->run_core);
 
     if (interp->parent_interpreter)
         mark_interp(interp->parent_interpreter);
