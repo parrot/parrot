@@ -20,6 +20,8 @@ it to become ready for an I/O operation.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
+    load_bytecode 'osutils.pbc'
+
     plan(13)
 
     .local pmc interp
@@ -121,11 +123,13 @@ it to become ready for an I/O operation.
 .end
 
 .sub 'test_write'
+    $S0 = 'README2'
+
     $P9 = new 'String'
     $P9 = 'FH1'
 
     $P0 = new ['FileHandle']
-    $P0.'open'('README2', 'w')
+    $P0.'open'($S0, 'w')
 
     $P1 = new ['Select']
     $P1.'update'($P0, $P9, 2)
@@ -137,9 +141,12 @@ it to become ready for an I/O operation.
     $P6 = $P1.'can_read'(0)
     $I0 = $P6
     is($I0, 0, 'Test can_read() for README2')
+
+    unlink($S0)
 .end
 
 .sub 'test_select'
+    $S0 = 'README2'
     $P9 = new 'String'
     $P9 = 'FH1'
 
@@ -153,7 +160,7 @@ it to become ready for an I/O operation.
     $P9 = 'FH2'
 
     $P0 = new ['FileHandle']
-    $P0.'open'('README2', 'w')
+    $P0.'open'($S0, 'w')
 
     $P1.'update'($P0, $P9, 6)
 
@@ -169,6 +176,8 @@ it to become ready for an I/O operation.
     $P7 = $P6[2]
     $I0 = $P7
     is($I0, 0, 'Test has_exception() for README2 (array index)')
+
+    unlink($S0)
 .end
 
 # Local Variables:
