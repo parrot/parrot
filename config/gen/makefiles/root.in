@@ -1540,6 +1540,7 @@ src/runcore/main$(O) : \
 	src/runcore/main.c \
 	src/runcore/main.str \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
