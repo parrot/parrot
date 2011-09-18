@@ -7,7 +7,7 @@
     - Documentation
     - Tests
       + New Makefile target "resubmit_smolder" to resubmit test results
-      + New Makefile target "allhlltest" runs the test suite of all HLLs
+      + New Makefile target "all_hll_test" runs the test suite of all HLLs
         and libraries known to work on Parrot
       + New Makefile target "interop_tests" run language interoperability tests,
         which runs as part of the normal "make test" as well
