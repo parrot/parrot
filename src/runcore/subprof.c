@@ -454,6 +454,7 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
         sp->code_ops = sp->subattrs->seg->base.data;
         createlines(interp, spdata, sp);
         Parrot_hash_put(interp, spdata->sphash, (void*)(subattrs->seg->base.data + subattrs->start_offs), (void*)sp);
+        VTABLE_push_pmc(interp, spdata->markpmcs, subpmc);
     }
     return sp;
 }
@@ -879,6 +880,8 @@ get_subprofiledata(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), int type)
         spdata = (subprofiledata *)calloc(1, sizeof(subprofiledata));
         spdata->profile_type = type;
         spdata->interp = interp;
+        spdata->markpmcs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        Parrot_pmc_gc_register(interp, spdata->markpmcs);
         core->spdata = spdata;
     }
     if (spdata->profile_type != type)
@@ -1229,27 +1232,6 @@ Parrot_runcore_subprof_ops_init(PARROT_INTERP)
     PARROT_RUNCORE_FUNC_TABLE_SET(coredata);
 
     Parrot_runcore_register(interp, (Parrot_runcore_t *)coredata);
-}
-
-
-
-void
-runops_subprof_mark(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-{
-    Parrot_subprof_runcore_t *core;
-    subprofiledata *spdata;
-
-    if (runcore->destroy != runops_subprof_destroy)
-        return;
-    core = (Parrot_subprof_runcore_t *)runcore;
-    spdata = core->spdata;
-    if (!spdata || !spdata->profile_type || !spdata->sphash)
-        return;
-   
-    parrot_hash_iterate(spdata->sphash,
-        subprofile *sp = (subprofile*)_bucket->value;
-        Parrot_gc_mark_PMC_alive(interp, sp->subpmc);
-    );
 }
 
 

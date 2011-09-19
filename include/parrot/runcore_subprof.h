@@ -82,6 +82,8 @@ struct subprofiledata {
     int          profile_type;
     /* the collected data, maps subpmc -> subprofile */
     Hash        *sphash;
+    /* all the pmcs we have to mark */
+    PMC         *markpmcs;
 
     /* the root call data */
     lineinfo     rootline;
@@ -126,10 +128,6 @@ void Parrot_runcore_subprof_ops_init(PARROT_INTERP)
 void Parrot_runcore_subprof_sub_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void runops_subprof_mark(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_Parrot_runcore_subprof_hll_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -139,9 +137,6 @@ void runops_subprof_mark(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
 #define ASSERT_ARGS_Parrot_runcore_subprof_sub_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_runops_subprof_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(runcore))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/subprof.c */
 
