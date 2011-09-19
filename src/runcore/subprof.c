@@ -441,19 +441,19 @@ static subprofile *
 sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), ARGIN(PMC *subpmc))
 {
     subprofile *sp;
+    Parrot_Sub_attributes *subattrs;
+    PMC_get_sub(interp, subpmc, subattrs);
 
     if (!spdata->sphash)
-        spdata->sphash = Parrot_hash_create(interp, enum_type_ptr, Hash_key_type_PMC_ptr);
-    sp = (subprofile *)Parrot_hash_get(interp, spdata->sphash, (void*)subpmc);
+        spdata->sphash = Parrot_hash_new_pointer_hash(interp);
+    sp = (subprofile *)Parrot_hash_get(interp, spdata->sphash, (void*)(subattrs->seg->base.data + subattrs->start_offs));
     if (!sp) {
-        Parrot_Sub_attributes *subattrs;
-        PMC_get_sub(interp, subpmc, subattrs);
         sp           = (subprofile *)calloc(sizeof(subprofile), 1);
         sp->subattrs = subattrs;
         sp->subpmc   = subpmc;
         sp->code_ops = sp->subattrs->seg->base.data;
         createlines(interp, spdata, sp);
-        Parrot_hash_put(interp, spdata->sphash, (void*)subpmc, (void*)sp);
+        Parrot_hash_put(interp, spdata->sphash, (void*)(subattrs->seg->base.data + subattrs->start_offs), (void*)sp);
     }
     return sp;
 }
@@ -1245,7 +1245,11 @@ runops_subprof_mark(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
     spdata = core->spdata;
     if (!spdata || !spdata->profile_type || !spdata->sphash)
         return;
-    Parrot_hash_mark(interp, spdata->sphash);
+   
+    parrot_hash_iterate(spdata->sphash,
+        subprofile *sp = (subprofile*)_bucket->value;
+        Parrot_gc_mark_PMC_alive(interp, sp->subpmc);
+    );
 }
 
 
