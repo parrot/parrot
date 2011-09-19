@@ -156,7 +156,9 @@ ok 3
 OUT
 
 SKIP: {
-    skip( "No thread enabled", 4 ) unless ( $PConfig{HAS_THREADS} );
+    # skip( "No thread enabled", 4 ) unless ( $PConfig{HAS_THREADS} );
+    # TESTING fix_sleep branch
+    # The current fix should work in most platforms.
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
     .pcc_sub :main main:
