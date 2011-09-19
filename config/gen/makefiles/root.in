@@ -784,7 +784,7 @@ help :
 	@echo "  coretest:          Run the minimal 'core functionality' suite."
 	@echo "  codetest:          Run file metadata and coding standards tests."
 	@echo "  fulltest:          Run the full test suite under many runcores."
-	@echo "  allhlltest:        Run the test suite for all known languages and libraries."
+	@echo "  all_hll_test:      Run the test suite for all known languages and libraries."
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
 	@echo "                     Valid runcores are b, f, g, j, r."
 	@echo "  src_tests:         Run tests in C files."
@@ -2198,7 +2198,7 @@ fulltest :
 	distro_tests \
 	headerizer_tests
 
-allhlltest :
+all_hll_test :
 	$(PERL) tools/dev/all_hll_test.pl
 
 # bounds checking, slow core
