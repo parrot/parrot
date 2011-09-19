@@ -2,7 +2,12 @@
     - Core
     - Languages
       + Winxed
-        - Updated snapshot
+        - Updated snapshot to version 1.2.0
+        - allowtailcall modifier in try
+        --debug command-line option, __DEBUG__ predefined constant
+        and __ASSERT__ builtin
+        - namespace, class, and ~ (bitwise not) operators
+        - Implicit nested namespace in namespace and class declarations
         - -X command-line arg
     - Documentation
     - Tests
