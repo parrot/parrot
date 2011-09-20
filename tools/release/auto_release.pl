@@ -194,10 +194,10 @@ sub commit_changes {
     system('git', 'commit', '-a', "-m $msg") == 0 or stop();
 
     # Get SHA-1 digest for commit
-    open REV_PARSE, 'git rev-parse master |' or stop();
+    open my $REV_PARSE, '-|', 'git rev-parse master' or stop();
 
-    my $commit = <REV_PARSE>;
-    close REV_PARSE;
+    my $commit = <$REV_PARSE>;
+    close $REV_PARSE;
 
     chomp $commit;
     $commit = substr $commit, 0, 7;
@@ -428,11 +428,11 @@ sub verify_new_version {
 
     print "== VERIFYING NEW VERSION ==\n";
 
-    open PARROT, './parrot -V |' or stop();
+    open my $PARROT, '-|', './parrot -V' or stop();
 
-    my @output = <PARROT>;
+    my @output = <$PARROT>;
 
-    close PARROT;
+    close $PARROT;
 
     # XXX There has got to be a better way to do this
     if ($type eq 'developer') {
