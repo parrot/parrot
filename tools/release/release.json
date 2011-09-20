@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.7.0",
-    "release.name"     : "Wanda",
+    "release.version"  : "3.8.0",
+    "release.name"     : "Magrathea",
     "release.day"      : "Tuesday",
-    "release.date"     : "16 August 2011",
-    "release.nextdate" : "20 September 2011",
+    "release.date"     : "20 September 2011",
+    "release.nextdate" : "18 October 2011",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 September 2011",
+    "bugday.date"      : "15 October 2011",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2011_09_17",
+    "wiki.bugday"      : "bug_day_2011_10_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.7.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.8.0/"
 }

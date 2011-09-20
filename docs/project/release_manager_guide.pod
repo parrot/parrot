@@ -523,7 +523,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with an asterisk (*) are supported releases:
 
-    - Sep 20, 2011 - 3.8   - soh_cah_toa
     - Oct 18, 2011 - 3.9*  - dukeleto
     - Nov 15, 2011 - 3.10  - ??
     - Dec 20, 2011 - 3.11  - cotto
