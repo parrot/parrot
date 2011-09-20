@@ -29,10 +29,10 @@ sub runstep {
 
     $libs .= ' -pthread';
 
-    $conf->data->set(
-        libs  => $libs,
-        link  => 'g++',
-        rpath => '-Wl,-R',
+    my %freebsd_selections = (
+        libs                    => $libs,
+        link                    => 'g++',
+        rpath                   => '-Wl,-R',
         has_dynamic_linking     => 1,
         parrot_is_shared        => 1,
         libparrot_shared        => "libparrot$share_ext.$version",
@@ -40,6 +40,14 @@ sub runstep {
         libparrot_soname        => "-Wl,-soname=libparrot$share_ext.$version",
         osvers                  => $osvers,
     );
+    my $freebsd_hints = "FreeBSD hints settings:\n";
+    for my $k (sort keys %freebsd_selections) {
+        $freebsd_hints .= sprintf("  %-24s => %s\n" => (
+                $k, qq|'$freebsd_selections{$k}'|,
+        ) );
+    }
+    $conf->debug($freebsd_hints);
+    $conf->data->set( %freebsd_selections );
 }
 
 1;
