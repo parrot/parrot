@@ -303,7 +303,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
 
     /* create exceptions list */
@@ -457,10 +456,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
     destroy_runloop_jump_points(interp);
-
-    /* XXX Fix abstraction leak. packfile */
-    if (!PMC_IS_NULL(interp->current_pf))
-        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
 
     /* cache structure */
     destroy_object_cache(interp);

@@ -611,10 +611,6 @@ STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_destroy_constants(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_load_bytecode(PARROT_INTERP,
     ARGIN_NULLOK(Parrot_String file_str))
         __attribute__nonnull__(1);
@@ -717,9 +713,7 @@ INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pf_set_current_packfile(PARROT_INTERP,
-    ARGIN(PMC *pbc),
-    INTVAL set_code)
+void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -746,16 +740,6 @@ PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
     ARGIN(PackFile_ByteCode *new_cs),
     int really)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * PF_create_default_segs(PARROT_INTERP,
-    ARGIN(STRING *file_name),
-    int add,
-    int set_def)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -831,8 +815,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_debug_pc_to_filename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(debug))
-#define ASSERT_ARGS_Parrot_destroy_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -897,9 +879,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_switch_to_cs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(new_cs))
-#define ASSERT_ARGS_PF_create_default_segs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(file_name))
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))

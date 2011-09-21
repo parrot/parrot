@@ -29,40 +29,62 @@ These are the vtable functions for the lexpad PMC.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_INLINE
+PARROT_CAN_RETURN_NULL
+static HashBucket * register_bucket(PARROT_INTERP,
+    ARGMOD(PMC *info),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
 static INTVAL register_number_for_get(PARROT_INTERP,
-    ARGMOD(PMC *self),
     ARGMOD(PMC *info),
     ARGIN(STRING *name),
     INTVAL reg_type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*info);
 
 static INTVAL register_number_for_set(PARROT_INTERP,
-    ARGMOD(PMC *self),
     ARGMOD(PMC *info),
     ARGMOD(STRING *name),
     INTVAL reg_type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*self)
         FUNC_MODIFIES(*info)
         FUNC_MODIFIES(*name);
 
+PARROT_DOES_NOT_RETURN
+static void throw_lexical_not_found(PARROT_INTERP, ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_DOES_NOT_RETURN
+static void throw_wrong_register_type(PARROT_INTERP, ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_register_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_register_number_for_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(info) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_register_number_for_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_throw_lexical_not_found __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_throw_wrong_register_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -70,8 +92,61 @@ static INTVAL register_number_for_set(PARROT_INTERP,
 
 /*
 
-=item C<static INTVAL register_number_for_get(PARROT_INTERP, PMC *self, PMC
-*info, STRING *name, INTVAL reg_type)>
+=item C<static void throw_wrong_register_type(PARROT_INTERP, STRING *name)>
+
+=item C<static void throw_lexical_not_found(PARROT_INTERP, STRING *name)>
+
+Helper functions for common exceptions.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_wrong_register_type(PARROT_INTERP, ARGIN(STRING *name))
+{
+    ASSERT_ARGS(throw_wrong_register_type)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
+            "Lexical '%Ss' is of wrong register type in lexical lookup", name);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_lexical_not_found(PARROT_INTERP, ARGIN(STRING *name))
+{
+    ASSERT_ARGS(throw_lexical_not_found)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
+            "Lexical '%Ss' not found", name);
+}
+
+/*
+
+=item C<static HashBucket * register_bucket(PARROT_INTERP, PMC *info, STRING
+*name)>
+
+Helper for register_number_ functions.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_CAN_RETURN_NULL
+static HashBucket *
+register_bucket(PARROT_INTERP, ARGMOD(PMC *info), ARGIN(STRING *name))
+{
+    ASSERT_ARGS(register_bucket)
+    const Hash * const hash = (const Hash *)VTABLE_get_pointer(interp, info);
+    return hash->entries ?
+            Parrot_hash_get_bucket(interp, hash, name) :
+            NULL;
+}
+
+/*
+
+=item C<static INTVAL register_number_for_get(PARROT_INTERP, PMC *info, STRING
+*name, INTVAL reg_type)>
 
 Locates the register number for getting the specified name
 and type of lexical.
@@ -81,32 +156,24 @@ and type of lexical.
 */
 
 static INTVAL
-register_number_for_get(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
-        ARGIN(STRING *name), INTVAL reg_type)
+register_number_for_get(PARROT_INTERP, ARGMOD(PMC *info), ARGIN(STRING *name),
+        INTVAL reg_type)
 {
     ASSERT_ARGS(register_number_for_get)
 
-    const Hash *hash;
-    HashBucket *b;
-
-    hash = (const Hash *)VTABLE_get_pointer(interp, info);
-    if (!hash->entries)
-        return -1;
-
-    b = Parrot_hash_get_bucket(interp, hash, name);
+    const HashBucket * const b = register_bucket(interp, info, name);
     if (!b)
         return -1;
     if (((INTVAL)b->value & 3) != reg_type)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-            "Lexical '%Ss' is of wrong register type in lexical lookup", name);
+        throw_wrong_register_type(interp, name);
 
     return ((INTVAL)b->value) >> 2;
 }
 
 /*
 
-=item C<static INTVAL register_number_for_set(PARROT_INTERP, PMC *self, PMC
-*info, STRING *name, INTVAL reg_type)>
+=item C<static INTVAL register_number_for_set(PARROT_INTERP, PMC *info, STRING
+*name, INTVAL reg_type)>
 
 Locates the register number for setting the specified name
 and type of lexical.
@@ -116,23 +183,16 @@ and type of lexical.
 */
 
 static INTVAL
-register_number_for_set(PARROT_INTERP, ARGMOD(PMC *self), ARGMOD(PMC *info),
-        ARGMOD(STRING *name), INTVAL reg_type)
+register_number_for_set(PARROT_INTERP, ARGMOD(PMC *info), ARGMOD(STRING *name),
+        INTVAL reg_type)
 {
     ASSERT_ARGS(register_number_for_set)
 
-    const Hash       * hash;
-    HashBucket       * b;
-
-    hash = (const Hash *)VTABLE_get_pointer(interp, info);
-    b    = Parrot_hash_get_bucket(interp, hash, name);
-
+    const HashBucket * const b = register_bucket(interp, info, name);
     if (!b)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-            "Lexical '%Ss' not found", name);
+        throw_lexical_not_found(interp, name);
     if (((INTVAL)b->value & 3) != reg_type)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-            "Lexical '%Ss' is of wrong register type in lexical lookup", name);
+        throw_wrong_register_type(interp, name);
 
     return ((INTVAL)b->value) >> 2;
 }
@@ -225,8 +285,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_get(INTERP, SELF, info, name, REGNO_PMC);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_PMC);
         if (reg < 0)
             return PMCNULL;
 
@@ -239,11 +299,10 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_get(INTERP, SELF, info, name, REGNO_INT);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_INT);
         if (reg < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", name);
+            throw_lexical_not_found(INTERP, name);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         return CTX_REG_INT(INTERP, ctx, reg);
@@ -254,11 +313,10 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_get(INTERP, SELF, info, name, REGNO_NUM);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_NUM);
         if (reg < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", name);
+            throw_lexical_not_found(INTERP, name);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         return CTX_REG_NUM(INTERP, ctx, reg);
@@ -269,11 +327,10 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_get(INTERP, SELF, info, name, REGNO_STR);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_STR);
         if (reg < 0)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", name);
+            throw_lexical_not_found(INTERP, name);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         return CTX_REG_STR(INTERP, ctx, reg);
@@ -304,8 +361,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_set(INTERP, SELF, info, name, REGNO_PMC);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_PMC);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_PMC(INTERP, ctx, reg) = value;
@@ -317,8 +374,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_set(INTERP, SELF, info, name, REGNO_INT);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_INT);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_INT(INTERP, ctx, reg) = value;
@@ -329,8 +386,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_set(INTERP, SELF, info, name, REGNO_NUM);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_NUM);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_NUM(INTERP, ctx, reg) = value;
@@ -341,8 +398,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         PMC    *ctx;
         INTVAL  reg;
 
-        GET_ATTR_lexinfo(interp, SELF, info);
-        reg = register_number_for_set(INTERP, SELF, info, name, REGNO_STR);
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_STR);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_STR(INTERP, ctx, reg) = value;
