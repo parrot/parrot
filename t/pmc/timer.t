@@ -156,7 +156,7 @@ ok 3
 OUT
 
 SKIP: {
-    skip( "No thread enabled", 3 ) unless ( $PConfig{HAS_THREADS} );
+    skip( "No thread enabled", 4 ) unless ( $PConfig{HAS_THREADS} );
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
     .pcc_sub :main main:
@@ -246,7 +246,6 @@ ok 2
 ok 2
 ok 3
 OUT
-}
 
 pir_output_is( <<'CODE', <<'OUT', "Timer start/repeat/stop");
 .include "timer.pasm"
@@ -287,6 +286,7 @@ CODE
 1
 1
 OUT
+}
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 

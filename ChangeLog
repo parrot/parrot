@@ -1,4 +1,25 @@
-2011-08-16    Release 3.7.0
+2011-09-20    release 3.8.0
+    - Core
+      + New tools/release/auto_release.pl script automates most of release
+    - Languages
+      + Winxed
+        - Updated snapshot to version 1.2.0
+        - allowtailcall modifier in try
+        --debug command-line option, __DEBUG__ predefined constant
+        and __ASSERT__ builtin
+        - namespace, class, and ~ (bitwise not) operators
+        - Implicit nested namespace in namespace and class declarations
+        - -X command-line arg
+    - Documentation
+      + Improved release manager guide
+    - Tests
+      + New Makefile target "resubmit_smolder" to resubmit test results
+      + New Makefile target "all_hll_test" runs the test suite of all HLLs
+        and libraries known to work on Parrot
+      + New Makefile target "interop_tests" run language interoperability tests,
+        which runs as part of the normal "make test" as well
+
+2011-08-16    release 3.7.0
     - Core
       + Added mem_sys_strndup function.
       + Added new load_bytecode_p_s opcode as an eventual replacement for load_bytecode_s

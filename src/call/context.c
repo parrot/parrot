@@ -421,7 +421,7 @@ allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *numbe
     /* ctx.bp_ps points to S0, which has Px on the left */
     ctx->bp_ps.regs_s = (STRING **)((char *)ctx->registers + size_nip);
 
-    return clear_regs(interp, ctx);
+    clear_regs(interp, ctx);
 }
 
 

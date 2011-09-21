@@ -69,7 +69,7 @@ END_HELP
     newsfile.'encoding'('utf8')
 
     ## find the start of the news item for this version
-    start    = concat ' Release ', version
+    start    = concat ' release ', version
 
   before:
     $I0 = newsfile.'eof'()

@@ -131,5 +131,6 @@ Starred release numbers indicate supported releases.
 
  jkeenan     3.6.0 *        2011-Jul-19     "Pájaros del Caribe"
  coke        3.7.0          2011-Aug-16     "Wanda"
+ soh_cah_toa 3.8.0          2011-Sep-20     "Magrathea"
 
 =cut

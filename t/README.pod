@@ -52,7 +52,7 @@ of what is tested in there.
 
 =over 4
 
-=item allhlltest
+=item all_hll_test
 
 Run all the tests for all HLLs and libraries. Useful before and after
 merges to detect regressions in projects using Parrot.
