@@ -289,7 +289,7 @@ SP              [ ]
 <INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
-".sub"                   return SUB;
+".sub"                   { SET_LINE_NUMBER; return SUB; }
 ".end"                   return ESUB;
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;

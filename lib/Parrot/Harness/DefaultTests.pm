@@ -28,7 +28,7 @@ Example:
     );
 
 
-In addition, Parrot::Harness::Default Tests exports B<by default> one
+In addition, Parrot::Harness::DefaultTests exports B<by default> one
 subroutine:  C<get_default_tests()>.  In list context, C<get_default_tests()>
 returns a list of shell-expandable paths to the most common tests.  In scalar
 context it returns a reference to that list.
