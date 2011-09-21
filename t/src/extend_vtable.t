@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 139;
+plan tests => 138;
 
 =head1 NAME
 
@@ -620,14 +620,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer");
     Parrot_printf(interp,"42\n");
 CODE
 42
-Done!
-OUTPUT
-
-# These will most likely be removed soon, but here for completeness
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_share(_ro)");
-    Parrot_PMC_share(interp, pmc);
-    Parrot_PMC_share_ro(interp, pmc);
-CODE
 Done!
 OUTPUT
 

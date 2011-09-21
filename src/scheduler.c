@@ -74,17 +74,8 @@ void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_init_scheduler)
-    if (!interp->parent_interpreter) {
-        PMC *scheduler;
-
-        /* Add the very first interpreter to the list of interps. */
-        pt_add_to_interpreters(interp, NULL);
-
-        scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
-        scheduler = VTABLE_share_ro(interp, scheduler);
-
-        interp->scheduler = scheduler;
-    }
+    if (!interp->parent_interpreter)
+        interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
 }
 
 /*
@@ -447,7 +438,6 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 #if CX_DEBUG
     fprintf(stderr, "locking msg_lock (delete) [interp=%p]\n", interp);
 #endif
-        LOCK(sched_struct->msg_lock);
         /* Search the task index for GC suspend tasks */
         num_tasks = VTABLE_elements(interp, sched_struct->messages);
         for (index = 0; index < num_tasks; ++index) {
@@ -456,14 +446,12 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
             &&   STRING_equal(interp, VTABLE_get_string(interp, message),
                         suspend_str)) {
                 VTABLE_delete_keyed_int(interp, sched_struct->messages, index);
-                UNLOCK(sched_struct->msg_lock);
                 return message;
             }
         }
 #if CX_DEBUG
     fprintf(stderr, "unlocking msg_lock (delete) [interp=%p]\n", interp);
 #endif
-        UNLOCK(sched_struct->msg_lock);
 
     }
     else
@@ -738,7 +726,6 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         PMC *message = Parrot_pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
-        message = VTABLE_share_ro(interp, message);
 
 #if CX_DEBUG
     fprintf(stderr, "sending message[interp=%p]\n", interp);
@@ -747,44 +734,13 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
 #if CX_DEBUG
     fprintf(stderr, "locking msg_lock (send) [interp=%p]\n", interp);
 #endif
-        LOCK(sched_struct->msg_lock);
         VTABLE_push_pmc(interp, sched_struct->messages, message);
 #if CX_DEBUG
     fprintf(stderr, "unlocking msg_lock (send) [interp=%p]\n", interp);
 #endif
-        UNLOCK(sched_struct->msg_lock);
         Parrot_cx_runloop_wake(interp, interp->scheduler);
 
     }
-
-}
-
-/*
-
-=item C<void Parrot_cx_broadcast_message(PARROT_INTERP, STRING *messagetype, PMC
-*data)>
-
-Send a message to the schedulers in all interpreters/threads linked to this
-one.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_broadcast_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *data))
-{
-    ASSERT_ARGS(Parrot_cx_broadcast_message)
-    UINTVAL i;
-    LOCK(interpreter_array_mutex);
-    for (i = 0; i < n_interpreters; ++i) {
-        Parrot_Interp other_interp = interpreter_array[i];
-        if (interp == other_interp)
-            continue;
-        Parrot_cx_send_message(other_interp, messagetype, data);
-    }
-    UNLOCK(interpreter_array_mutex);
 
 }
 
@@ -1036,34 +992,16 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
      * pending tasks. */
     Parrot_cx_runloop_wake(interp, interp->scheduler);
 
-#ifdef PARROT_HAS_THREADS
-    {
-        Parrot_cond condition;
-        Parrot_mutex lock;
-        const FLOATVAL timer_end = time + Parrot_floatval_time();
-        struct timespec time_struct;
-
-        /* Tell this thread to sleep for the requested time. */
-        COND_INIT(condition);
-        MUTEX_INIT(lock);
-        LOCK(lock);
-        time_struct.tv_sec = (time_t) timer_end;
-        time_struct.tv_nsec = (long)((timer_end - time_struct.tv_sec)*1000.0f) *1000L*1000L;
-        COND_TIMED_WAIT(condition, lock, &time_struct);
-        UNLOCK(lock);
-        COND_DESTROY(condition);
-        MUTEX_DESTROY(lock);
-    }
-#else
     /* A more primitive, platform-specific, non-threaded form of sleep. */
-    if (time > 1000) {
-        /* prevent integer overflow when converting to microseconds */
+    if (time > 1) {
+        /* prevent integer overflow when converting to microseconds
+         * and problems in platforms that doesn't allow usleep more
+         * than 1 second */
         const int seconds = floor(time);
         Parrot_sleep(seconds);
         time -= seconds;
     }
-    Parrot_usleep((UINTVAL) time*1000000);
-#endif
+    Parrot_usleep((int) (time*1000000));
     return next;
 }
 
@@ -1146,19 +1084,16 @@ scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 #if CX_DEBUG
     fprintf(stderr, "locking msg_lock (process) [interp=%p]\n", interp);
 #endif
-        LOCK(sched_struct->msg_lock);
         message = VTABLE_pop_pmc(interp, sched_struct->messages);
 #if CX_DEBUG
     fprintf(stderr, "unlocking msg_lock (process) [interp=%p]\n", interp);
 #endif
-        UNLOCK(sched_struct->msg_lock);
         if (!PMC_IS_NULL(message)
          && STRING_equal(interp, VTABLE_get_string(interp, message),
                 suspend_str)) {
 #if CX_DEBUG
     fprintf(stderr, "found a suspend, suspending [interp=%p]\n", interp);
 #endif
-            pt_suspend_self_for_gc(interp);
         }
     }
 

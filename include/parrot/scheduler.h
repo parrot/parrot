@@ -27,13 +27,6 @@ void Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_cx_broadcast_message(PARROT_INTERP,
-    ARGIN(STRING *messagetype),
-    ARGIN_NULLOK(PMC *data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP,
     ARGIN(STRING *handler_type))
         __attribute__nonnull__(1)
@@ -172,9 +165,6 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 #define ASSERT_ARGS_Parrot_cx_add_handler_local __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handler))
-#define ASSERT_ARGS_Parrot_cx_broadcast_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(messagetype))
 #define ASSERT_ARGS_Parrot_cx_count_handlers_local \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

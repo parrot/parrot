@@ -170,31 +170,6 @@ Set the message type.
         core_struct->type = value;
     }
 
-
-/*
-
-=item C<PMC *share_ro()>
-
-Set this PMC as shared.
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        PMC *shared_self;
-        Parrot_SchedulerMessage_attributes *shared_struct;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        shared_self         = pt_shared_fixup(INTERP, SELF);
-        shared_struct       = PARROT_SCHEDULERMESSAGE(shared_self);
-        shared_struct->data = pt_shared_fixup(INTERP, shared_struct->data);
-
-        return shared_self;
-    }
-
 /*
 
 =item C<void mark()>

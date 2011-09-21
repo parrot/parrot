@@ -304,20 +304,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
 
-
-                if (PObj_is_shared_TEST(b)) {
-                    /* only mess with shared objects if we
-                     * (and thus everyone) is suspended for
-                     * a GC run.
-                     * XXX wrong thing to do with "other" GCs
-                     */
-                    if (!(interp->thread_data
-                    &&   (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))) {
-                        ++total_used;
-                        goto next;
-                    }
-                }
-
                 if (gc_object)
                     gc_object(interp, mem_pools, pool, b);
 

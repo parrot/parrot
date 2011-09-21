@@ -1311,7 +1311,6 @@ gc_ms2_block_GC_mark(PARROT_INTERP)
     ASSERT_ARGS(gc_ms2_block_GC_mark)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_mark_block_level;
-    Parrot_shared_gc_block(interp);
 }
 
 
@@ -1320,10 +1319,8 @@ gc_ms2_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_unblock_GC_mark)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    if (self->gc_mark_block_level) {
+    if (self->gc_mark_block_level)
         --self->gc_mark_block_level;
-        Parrot_shared_gc_unblock(interp);
-    }
 }
 
 

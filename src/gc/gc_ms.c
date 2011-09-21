@@ -607,7 +607,6 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     mem_pools->lazy_gc = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing GC mark */
-    pt_gc_start_mark(interp);
     Parrot_gc_run_init(interp, mem_pools);
 
     /* Now go trace the PMCs. returning true means we did a complete trace.
@@ -632,8 +631,6 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     /* compact STRING pools to collect free headers and allocated buffers */
     Parrot_gc_compact_memory_pool(interp);
-
-    pt_gc_stop_mark(interp);
 
     /* Note it */
     ++interp->gc_sys->stats.gc_mark_runs;
@@ -1472,7 +1469,6 @@ gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
     if (!Parrot_gc_trace_root(interp, mem_pools, trace))
         return 0;
 
-    pt_gc_mark_root_finished(interp);
     mem_pools->gc_trace_ptr  = NULL;
     return 1;
 
@@ -1739,7 +1735,6 @@ gc_ms_block_GC_mark(PARROT_INTERP)
     ASSERT_ARGS(gc_ms_block_GC_mark)
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     ++mem_pools->gc_mark_block_level;
-    Parrot_shared_gc_block(interp);
 }
 
 static void
@@ -1747,10 +1742,8 @@ gc_ms_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms_unblock_GC_mark)
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
-    if (mem_pools->gc_mark_block_level) {
+    if (mem_pools->gc_mark_block_level)
         --mem_pools->gc_mark_block_level;
-        Parrot_shared_gc_unblock(interp);
-    }
 }
 
 static void

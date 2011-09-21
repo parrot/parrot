@@ -13,7 +13,6 @@
 
 #include "parrot/core_pmcs.h"
 #include "parrot/pobj.h"
-#include "parrot/thread.h"
 
 #define PARROT_MAX_CLASSES 100
 

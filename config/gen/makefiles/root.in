@@ -391,14 +391,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/key.h \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
-	$(INC_DIR)/thread.h \
-	$(INC_DIR)/thr_pthread.h \
-	$(INC_DIR)/thr_windows.h \
-	$(INC_DIR)/atomic.h \
-	$(INC_DIR)/atomic/fallback.h \
-	$(INC_DIR)/atomic/gcc_pcc.h \
-	$(INC_DIR)/atomic/gcc_x86.h \
-	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
@@ -444,7 +436,6 @@ IO_O_FILES = \
 INTERP_O_FILES = \
 	src/string/api$(O) \
 	src/ops/core_ops$(O) \
-#IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
@@ -504,7 +495,6 @@ INTERP_O_FILES = \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
 	src/sub$(O) \
-	src/thread$(O) \
 	src/runcore/trace$(O) \
 	src/utils$(O) \
 	src/vtables$(O) \
@@ -515,7 +505,6 @@ INTERP_O_FILES = \
 	src/packfile/segments$(O) \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
-	@TEMP_atomic_o@ \
 
 OPS_FILES = @ops@
 
@@ -642,7 +631,6 @@ all : \
 	$(GEN_LIBRARY) \
 	src/install_config$(O)
 
-# We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
 	$(GEN_PM_INCLUDES) \
 	PARROT_LIBS \
@@ -1518,14 +1506,6 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	src/exceptions.str src/exceptions.c \
 	$(INC_PMC_DIR)/pmc_continuation.h
 
-src/thread$(O) : \
-	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS) \
-	src/thread.c \
-	$(INC_PMC_DIR)/pmc_sub.h \
-	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
-	$(INC_DIR)/runcore_api.h
-
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1968,8 +1948,6 @@ src/io/filehandle$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_filehandle.h \
 src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
-
-src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
@@ -2580,8 +2558,6 @@ BSD_LINT_FLAGS = -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 # 236: static function unused
 # 241: dubious operation on enum
 # 247: pointer casts may be troublesome
-# 249: syntax error (huh? this appears in atomic/gcc_x86.h but doesn't
-#      cause any compiler to barf)
 # 259: conversion to '...' due to prototype
 # 265: ANSI C does not support 'long long'
 # 277: initialisation of '...' with '...'

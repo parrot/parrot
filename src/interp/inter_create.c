@@ -188,11 +188,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         emergency_interp           = interp;
 
         PMCNULL                    = NULL;
-
-        /*
-         * we need a global mutex to protect the interpreter array
-         */
-        MUTEX_INIT(interpreter_array_mutex);
     }
 
     /* Must initialize flags before Parrot_gc_initialize() is called
@@ -330,7 +325,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
      * the first or "master" interpreter is handling events and signals
      */
     interp->task_queue  = NULL;
-    interp->thread_data = NULL;
 
     Parrot_cx_init_scheduler(interp);
 
@@ -393,7 +387,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
-        pt_join_threads(interp);
 
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
@@ -426,11 +419,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Interp_trace_CLEAR(interp, ~0);
     }
 
-    /* Destroys all PMCs, even constants and the FileHandle objects for
-     * std{in, out, err}, so don't be verbose about GC'ing. */
-    if (interp->thread_data)
-        interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -462,16 +450,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
         return;
 
-    if (interp->parent_interpreter
-    &&  interp->thread_data
-    && (interp->thread_data->state & THREAD_STATE_JOINED)) {
+    if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
-    }
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
-
-    /* copies of constant tables */
-    Parrot_destroy_constants(interp);
 
     destroy_runloop_jump_points(interp);
 
@@ -490,9 +472,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     PARROT_CORE_OPLIB_INIT(interp, 0);
 
     if (!interp->parent_interpreter) {
-        if (interp->thread_data)
-            mem_internal_free(interp->thread_data);
-
         /* get rid of ops */
         if (interp->op_hash)
             Parrot_hash_destroy(interp, interp->op_hash);
@@ -503,31 +482,15 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         /* Finalize GC */
         Parrot_gc_finalize(interp);
 
-        MUTEX_DESTROY(interpreter_array_mutex);
         mem_internal_free(interp);
-
-        /* finally free other globals */
-        mem_internal_free(interpreter_array);
-        interpreter_array = NULL;
     }
 
     else {
-        /* don't free a thread interpreter, if it isn't joined yet */
-        if (!interp->thread_data
-        || (interp->thread_data
-        && (interp->thread_data->state & THREAD_STATE_JOINED))) {
-            if (interp->thread_data) {
-                mem_internal_free(interp->thread_data);
-                interp->thread_data = NULL;
-            }
+        Parrot_vtbl_free_vtables(interp);
 
-            Parrot_vtbl_free_vtables(interp);
-
-            /* Finalyze GC */
-            Parrot_gc_finalize(interp);
-
-            mem_internal_free(interp);
-        }
+        /* Finalize GC */
+        Parrot_gc_finalize(interp);
+        mem_internal_free(interp);
     }
 }
 

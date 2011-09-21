@@ -24,7 +24,6 @@ Implements the core concurrency scheduler.
 /* HEADERIZER END: static */
 
 pmclass Scheduler auto_attrs {
-
     ATTR INTVAL        id;         /* The scheduler's ID. */
     ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
     ATTR PMC          *task_list;  /* The current list of tasks. */
@@ -34,7 +33,6 @@ pmclass Scheduler auto_attrs {
     ATTR PMC          *handlers;   /* The list of currently active handlers. */
     ATTR PMC          *messages;   /* A message queue used for communication
                                      between schedulers. */
-    ATTR Parrot_mutex  msg_lock;   /* Lock to synchronize the message queue. */
     ATTR Parrot_Interp interp;     /* A link to the scheduler's interpreter. */
 
 /*
@@ -65,7 +63,6 @@ Initializes a concurrency scheduler object.
         core_struct->handlers    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->messages    = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         core_struct->interp      = INTERP;
-        MUTEX_INIT(core_struct->msg_lock);
     }
 
 
@@ -121,7 +118,6 @@ current maximum, and a birthtime of the current time.
         STRING                  *task_id_str;
         INTVAL                   new_tid;
 
-        task = VTABLE_share_ro(INTERP, task);
         VTABLE_set_number_native(INTERP, task, Parrot_floatval_time());
 
         new_tid     = ++(core_struct->max_tid);
@@ -205,36 +201,6 @@ Removes the task with the given task ID from the task list.
 
 /*
 
-=item C<PMC *share_ro()>
-
-Sets this PMC as shared.
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        PMC              *shared_self;
-        Parrot_Scheduler_attributes *sched;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        shared_self       = pt_shared_fixup(INTERP, SELF);
-        sched             = PARROT_SCHEDULER(shared_self);
-
-        sched->task_list  = pt_shared_fixup(INTERP, sched->task_list);
-        sched->task_index = pt_shared_fixup(INTERP, sched->task_index);
-        sched->wait_index = pt_shared_fixup(INTERP, sched->wait_index);
-        sched->handlers   = pt_shared_fixup(INTERP, sched->handlers);
-        sched->messages   = pt_shared_fixup(INTERP, sched->messages);
-
-        return shared_self;
-    }
-
-
-/*
-
 =item C<void destroy()>
 
 Frees the scheduler's underlying struct.
@@ -245,10 +211,6 @@ Frees the scheduler's underlying struct.
     VTABLE void destroy() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         core_struct->interp->scheduler = NULL;
-        /* TT #946: this line is causing an order-of-destruction error
-           because the scheduler is being freed before its tasks.
-           Commenting this out till we get a real fix (although it's a hack) */
-        /* MUTEX_DESTROY(core_struct->msg_lock); */
     }
 
 
