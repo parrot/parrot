@@ -71,6 +71,23 @@ inline op get_label(out INT, invar PMC) {
     $1 =  PTR2INTVAL(ptr);
 }
 
+=item B<get_id>(out INT, in PMC)
+
+Gets a unique(*) ID for a PMC.
+
+This may or may not be based on the pointer of the PMC, but almost certainly is
+not the raw pointer value.
+
+(*) Uniqueness of these IDs is only guarranteed within code to which this PMC is
+currently visible (ie: not across processes, or share-nothing threads, and not
+beyond the lifetime of the PMC).
+
+=cut
+
+inline op get_id(out INT, in PMC) {
+    $1 = Parrot_hash_pointer((void *)$2, interp->hash_seed);
+}
+
 =item B<fetch>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
