@@ -2203,6 +2203,7 @@ tools/docs/ops_summary.pl                                   []
 tools/install/smoke.pl                                      []
 tools/install/smoke_languages.pl                            []
 tools/release/README                                        []doc
+tools/release/auto_release.pl                               []
 tools/release/crow.pir                                      []
 tools/release/cut.pl                                        []
 tools/release/gen_release_info.pl                           []

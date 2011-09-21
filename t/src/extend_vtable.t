@@ -111,7 +111,7 @@ void dotest(Parrot_Interp interp, void *unused)
     fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
     hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
     ns           = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
-    nci          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Nci"));
+    nci          = Parrot_sub_new_from_c_func(interp, Parrot_PMC_new, "PpI");
     pmc          = Parrot_PMC_new(interp, type);
     pmc2         = Parrot_PMC_new(interp, type);
     pmc3         = Parrot_PMC_new(interp, type);
@@ -951,9 +951,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
-    Parrot_PMC_set_integer_native(interp, pmc, 42);
-
-    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, nci);
     Parrot_printf(interp,"pointer = %d\n", integer);
     if (integer != NULL)
         Parrot_printf(interp,"Got pointer!n");
