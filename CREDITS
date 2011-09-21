@@ -815,6 +815,11 @@ D: tracwiki additions
 D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
+N: Michael Schroeder
+U: mls
+D: subprof profiling runcore
+E: mls@suse.de
+
 N: Michael G. Schwern
 
 N: Michael Scott
