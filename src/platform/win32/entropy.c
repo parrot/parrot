@@ -21,6 +21,8 @@ Get some entropy from the system.
 */
 
 #include "parrot/parrot.h"
+
+#include<Windows.h>
 #include <Wincrypt.h>
 
 /* HEADERIZER HFILE: none */
