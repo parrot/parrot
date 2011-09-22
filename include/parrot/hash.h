@@ -321,7 +321,7 @@ STRING* Parrot_hash_key_to_string(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t Parrot_hash_pointer(
-    ARGIN_NULLOK(const void const *p),
+    ARGIN_NULLOK(const void * const p),
     size_t hashval);
 
 PARROT_CANNOT_RETURN_NULL
