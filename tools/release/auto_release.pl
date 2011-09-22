@@ -85,7 +85,7 @@ my $type;             # Developer or supported release
 my $result = GetOptions('v|version=s'   => \$version,
                         'd|developer'   => \$developer,
                         's|supported'   => \$supported,
-                        't|test_jobs=i' => \$test_jobs);
+                        't|test-jobs=i' => \$test_jobs);
 
 # Catch unrecognized switches
 stop('Unrecognized option') unless $result;
