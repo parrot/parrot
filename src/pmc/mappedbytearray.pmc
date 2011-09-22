@@ -29,6 +29,7 @@ Bare minimal functionality available, only for posix platforms
 #  ifdef __MINGW32__
 #    define ENABLED
 #    define MAPW32
+#    include<Windows.h>
 #  endif
 #endif
 
