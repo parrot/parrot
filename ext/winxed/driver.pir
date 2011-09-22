@@ -177,11 +177,11 @@
 # {
 .annotate 'line', 55
     getattribute $P2, self, 'name'
-# predefined say
+# builtin say
     print 'Usage: '
     print $P2
     say ' [options] [program] [args]'
-# predefined say
+# builtin say
 .annotate 'line', 56
     say '  Available options:'
 .annotate 'line', 57
@@ -205,7 +205,7 @@
 .annotate 'line', 61
     $P4 = $P1[0]
     set $S2, $P4
-# predefined length
+# builtin length
     length $I3, $S2
     add $I2, $I3, 4
 .annotate 'line', 62
@@ -228,11 +228,11 @@
 # s: $S1
     $S1 = $P1[0]
 .annotate 'line', 66
-# predefined length
+# builtin length
     length $I4, $S1
     isgt $I3, $I4, 1
     unless $I3 goto __label_8
-# predefined substr
+# builtin substr
     substr $S2, $S1, 1, 1
     isne $I3, $S2, '='
   __label_8:
@@ -247,13 +247,13 @@
     set $S1, $S4
   __label_7: # endif
 .annotate 'line', 70
-# predefined length
+# builtin length
     length $I3, $S1
     sub $I2, $I1, $I3
 .annotate 'line', 71
     repeat $S2, ' ', $I2
     $P2 = $P1[1]
-# predefined say
+# builtin say
     print '    '
     print $S1
     print $S2
@@ -299,7 +299,7 @@
 # {
 .annotate 'line', 81
 # var lpaths: $P1
-# predefined getinterp
+# builtin getinterp
     getinterp $P3
     $P1 = $P3[9]
 .annotate 'line', 82
@@ -325,19 +325,19 @@
     null $S1
 .annotate 'line', 92
 # l: $I1
-# predefined length
+# builtin length
     length $I1, __ARG_1
 .annotate 'line', 93
     isgt $I2, $I1, 7
     unless $I2 goto __label_3
-# predefined substr
+# builtin substr
     substr $S2, __ARG_1, -7
     iseq $I2, $S2, '.winxed'
   __label_3:
     unless $I2 goto __label_1
 .annotate 'line', 94
     sub $I3, $I1, 7
-# predefined substr
+# builtin substr
     substr $S3, __ARG_1, 0, $I3
     concat $S4, $S3, __ARG_2
     set $S1, $S4
@@ -368,7 +368,7 @@
     push_eh $P2
 # try: begin
 .annotate 'line', 104
-# predefined load_language
+# builtin load_language
     load_language 'winxed'
     compreg $P1, 'winxed'
 # try: end
@@ -385,7 +385,7 @@
 .annotate 'line', 106
     unless_null $P1, __label_3
 # {
-# predefined die
+# builtin die
 .annotate 'line', 114
     die "winxed: Cannot load language"
 # }
@@ -419,9 +419,9 @@
     $P2 = WSubId_1()
 .annotate 'line', 125
     $P12 = $P2.'version_string'()
-# predefined say
+# builtin say
     say $P12
-# predefined exit
+# builtin exit
 .annotate 'line', 126
     exit 0
 # }
@@ -472,7 +472,7 @@
 # {
 .annotate 'line', 139
     $P1.'showhelp'()
-# predefined exit
+# builtin exit
 .annotate 'line', 140
     exit 0
 # }
@@ -497,7 +497,7 @@
 # {
 .annotate 'line', 153
     if_null $S1, __label_8
-# predefined die
+# builtin die
 .annotate 'line', 154
     die "options -c and --target can't be used together"
   __label_8: # endif
@@ -538,7 +538,7 @@
 .annotate 'line', 170
     concat $S9, "Invalid target '", $S1
     concat $S9, $S9, "'"
-# predefined die
+# builtin die
     die $S9
   __label_10: # switch end
 # }
@@ -550,7 +550,7 @@
     not $I8, $I2
   __label_17:
     unless $I8 goto __label_16
-# predefined die
+# builtin die
 .annotate 'line', 175
     die '-o without -c or --target is not supported yet'
   __label_16: # endif
@@ -575,16 +575,16 @@
     unless_null $S2, __label_20
 # {
 .annotate 'line', 183
-# predefined elements
+# builtin elements
     elements $I8, __ARG_1
     ge $I8, 1, __label_22
 # {
-# predefined say
+# builtin say
 .annotate 'line', 184
     say "ERROR: No program specified"
 .annotate 'line', 185
     $P1.'showhelp'()
-# predefined exit
+# builtin exit
 .annotate 'line', 186
     exit 1
 # }
@@ -631,7 +631,7 @@
     unless $I8 goto __label_27
 # {
 .annotate 'line', 201
-# predefined open
+# builtin open
     root_new $P7, ['parrot';'FileHandle']
     $P7.'open'($S4,'w')
 .annotate 'line', 202
@@ -640,7 +640,7 @@
     goto __label_28
   __label_27: # else
 .annotate 'line', 205
-# predefined getstdout
+# builtin getstdout
     getstdout $P6
   __label_28: # endif
 .annotate 'line', 206
@@ -662,7 +662,7 @@
 .annotate 'line', 213
     $P7.'close'()
   __label_32: # endif
-# predefined exit
+# builtin exit
 .annotate 'line', 214
     exit 0
 # }
@@ -693,7 +693,7 @@
     getattribute $P12, $P9, 'filename'
     getattribute $P13, $P9, 'line'
     getattribute $P14, $P9, 'message'
-# predefined cry
+# builtin cry
     getstderr $P0
     print $P0, $P12
     print $P0, ':'
@@ -705,12 +705,12 @@
   __label_33: # else
 .annotate 'line', 225
     $P15 = $P8["message"]
-# predefined cry
+# builtin cry
     getstderr $P0
     print $P0, $P15
     print $P0, "\n"
   __label_34: # endif
-# predefined exit
+# builtin exit
 .annotate 'line', 226
     exit 1
 # }
@@ -734,12 +734,12 @@
 .annotate 'line', 233
 # var outfile: $P10
     unless $I6 goto __label_39
-# predefined open
+# builtin open
     root_new $P10, ['parrot';'FileHandle']
     $P10.'open'($S4,'w')
     goto __label_38
   __label_39:
-# predefined getstdout
+# builtin getstdout
     getstdout $P12
     set $P10, $P12
   __label_38:
@@ -750,7 +750,7 @@
 .annotate 'line', 236
     $P10.'close'()
   __label_40: # endif
-# predefined exit
+# builtin exit
 .annotate 'line', 237
     exit 0
 # }
@@ -791,7 +791,7 @@
     goto __label_44 # break
   __label_46: # endif
 .annotate 'line', 251
-# predefined string
+# builtin string
     set $S7, $P11
     ne $S7, 'main', __label_47
     goto __label_44 # break
@@ -830,7 +830,7 @@
 .annotate 'line', 264
     isnull $I2, $P1
     not $I2
-# predefined __ASSERT__
+# builtin __ASSERT__
 .annotate 'line', 266
 # retval: $I1
     null $I1
@@ -872,7 +872,7 @@
   __label_5:
     unless $I2 goto __label_4
 .annotate 'line', 275
-# predefined cry
+# builtin cry
     getstderr $P0
     print $P0, $S1
     print $P0, "\n"
@@ -883,7 +883,7 @@
 # catch end
   __label_2:
 .annotate 'line', 278
-# predefined exit
+# builtin exit
     exit $I1
 # }
 .annotate 'line', 279
