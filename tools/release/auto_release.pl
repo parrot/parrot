@@ -53,7 +53,6 @@ use 5.008;
 use strict;
 use warnings;
 
-use Env qw(EDITOR);
 use Getopt::Long;
 use System::Command;
 
@@ -145,7 +144,7 @@ sub build_old_version {
     print "== REBUILDING PARROT ==\n";
 
     system('perl', 'Configure.pl') == 0 or stop();
-    system('make -j5')                 == 0 or stop();
+    system('make')                 == 0 or stop();
 }
 
 # Verifies that there aren't any uncommitted local changes
@@ -464,12 +463,13 @@ sub _edit {
 
         chomp $answer;
 
+        # XXX Use an OS-dependent solution (with $^O) for the default editor
         if ($answer eq 'y') {
-            if (defined($EDITOR)) {
-                system("$EDITOR $doc") == 0 or stop();
+            if (defined $ENV{'EDITOR'}) {
+                system("$ENV{'EDITOR'} $doc") == 0 or stop();
             }
             else {
-                system("vim $doc") == 0 or stop();
+                system("vim $doc")            == 0 or stop();
             }
 
             last;
