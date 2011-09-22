@@ -111,7 +111,7 @@ void dotest(Parrot_Interp interp, void *unused)
     fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
     hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
     ns           = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
-    nci          = Parrot_sub_new_from_c_func(interp, Parrot_PMC_new, "PpI");
+    nci          = Parrot_sub_new_from_c_func(interp, (void (*)(void))Parrot_PMC_new, "PpI");
     pmc          = Parrot_PMC_new(interp, type);
     pmc2         = Parrot_PMC_new(interp, type);
     pmc3         = Parrot_PMC_new(interp, type);
