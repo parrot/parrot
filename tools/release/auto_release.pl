@@ -37,6 +37,19 @@ developer release by default. It's merely provided for the sake of consistency.
 
 Builds a supported release. Cannot be used in conjunction with C<-d>.
 
+=item B<-t>, B<--test-jobs>=I<n>
+
+Represents the number of test harnesses to run simultaneously when the test
+suite is being run. If given, it's value will override the one in the
+C<$TEST_JOBS> environment variable.
+
+If not given, it will default to 1 unless C<$TEST_JOBS> is defined; in which
+case, C<$TEST_JOBS> will be used as a default.
+
+Using the C<-t> switch (or C<$TEST_JOBS>) is strongly recommended as it can
+significantly reduce the amount of time spent on running the test suite which
+can take up to several minutes.
+
 =back
 
 =head1 HISTORY
@@ -56,18 +69,23 @@ use warnings;
 use Getopt::Long;
 use System::Command;
 
-# TODO  Be more verbose in perldoc
-# TODO  Migrate code from update_version.pl
-# TODO  Edit '== ==' strings so that newlines are on top and bottom
+# TODO Add help switch (-h), consider using Pod::Usage
+# TODO Be more verbose in perldoc
+# TODO Migrate code from update_version.pl
+# TODO Edit '== ==' strings so that newlines are on top and bottom
 
-my $version;      # Version number
-my $developer;    # Developer release
-my $supported;    # Supported release
-my $type;         # Developer or supported
+# Switches
+my $version;          # Version number
+my $developer;        # Developer release
+my $supported;        # Supported release
+my $test_jobs = 1;    # Number of parallel test harnesses
 
-my $result = GetOptions('v|version=s' => \$version,
-                        'd|developer' => \$developer,
-                        's|supported' => \$supported);
+my $type;             # Developer or supported release
+
+my $result = GetOptions('v|version=s'   => \$version,
+                        'd|developer'   => \$developer,
+                        's|supported'   => \$supported,
+                        't|test_jobs=i' => \$test_jobs);
 
 # Catch unrecognized switches
 stop('Unrecognized option') unless $result;
@@ -134,7 +152,12 @@ sub build_and_run_tests {
     print "== RUNNING FULL TEST SUITE ==\n";
 
     # XXX Use separate filehandles to redirect stderr/stdout to log file
-    system('make', 'fulltest') == 0 or stop();
+    if (defined $ENV{'TEST_JOBS'}) {
+        system('make', 'fulltest', $ENV{'TEST_JOBS'}) == 0 or stop();
+    }
+    else {
+        system('make', 'fulltest', $test_jobs)        == 0 or stop();
+    }
 
     #_edit('make_fulltest.log');
 }
@@ -226,7 +249,12 @@ sub commit_changes {
 sub distro_tests {
     print "== RUNNING DISTRIBUTION TESTS ==\n";
 
-    system('make', 'distro_tests') == 0 or stop();
+    if (defined $ENV{'TEST_JOBS'}) {
+        system('make', 'distro_tests', $ENV{'TEST_JOBS'}) == 0 or stop();
+    }
+    else {
+        system('make', 'distro_tests', $test_jobs)        == 0 or stop();
+    }
 }
 
 # Clones a local copy of 'master' branch
