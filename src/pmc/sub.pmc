@@ -691,7 +691,6 @@ Archives the subroutine.
         STRING                *hll_name;
         int i;
 
-        SUPER(info);
         PMC_get_sub(INTERP, SELF, sub);
         /*
          * we currently need to write these items:

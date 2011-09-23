@@ -192,12 +192,10 @@ Used to unarchive the C<Boolean>.
 */
 
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_integer(INTERP, info, SELF.get_bool());
     }
 
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_bool(VTABLE_shift_integer(INTERP, info));
     }
 

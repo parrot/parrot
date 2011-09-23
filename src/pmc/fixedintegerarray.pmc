@@ -588,8 +588,6 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
         INTVAL   *int_array;
         INTVAL    i, n;
 
-        SUPER(info);
-
         GET_ATTR_size(INTERP, SELF, n);
         VTABLE_push_integer(INTERP, info, n);
         GET_ATTR_int_array(INTERP, SELF, int_array);

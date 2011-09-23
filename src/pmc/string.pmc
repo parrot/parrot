@@ -593,7 +593,6 @@ Used to archive the string.
 */
     VTABLE void freeze(PMC *info) {
         STRING *str_val;
-        SUPER(info);
         GET_ATTR_str_val(INTERP, SELF, str_val);
         VTABLE_push_string(INTERP, info, str_val);
     }
@@ -608,7 +607,6 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, info));
     }
 /*

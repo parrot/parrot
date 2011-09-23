@@ -1261,7 +1261,6 @@ Used to archive the integer.
 
 */
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_integer(INTERP, info, SELF.get_integer());
     }
 
@@ -1276,7 +1275,6 @@ Used to unarchive the integer.
 
 */
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
 }

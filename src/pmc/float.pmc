@@ -363,7 +363,6 @@ Used to archive the number.
 
 */
     VTABLE void freeze(PMC *info) {
-        SUPER(info);
         VTABLE_push_float(INTERP, info, SELF.get_number());
     }
 
@@ -377,7 +376,6 @@ Used to unarchive the number.
 
 */
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
         SET_ATTR_fv(INTERP, SELF, VTABLE_shift_float(INTERP, info));
     }
 /*

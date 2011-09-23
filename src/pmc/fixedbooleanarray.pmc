@@ -576,23 +576,19 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(PMC *info) {
-        SUPER(info);
+        const INTVAL    size          = VTABLE_shift_integer(INTERP, info);
+        STRING * const  s             = VTABLE_shift_string(INTERP, info);
+        const size_t    size_in_bytes = get_size_in_bytes(size);
+        unsigned char  *bit_array;
 
-        {
-            const INTVAL    size          = VTABLE_shift_integer(INTERP, info);
-            STRING * const  s             = VTABLE_shift_string(INTERP, info);
-            const size_t    size_in_bytes = get_size_in_bytes(size);
-            unsigned char  *bit_array;
+        SELF.set_integer_native(size);
 
-            SELF.set_integer_native(size);
+        if (s->bufused < size_in_bytes)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+                "FixedBooleanArray: invalid buffer size during thaw");
 
-            if (s->bufused < size_in_bytes)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_BAD_BUFFER_SIZE,
-                    "FixedBooleanArray: invalid buffer size during thaw");
-
-            GET_ATTR_bit_array(INTERP, SELF, bit_array);
-            memcpy(bit_array, s->strstart, size_in_bytes);
-        }
+        GET_ATTR_bit_array(INTERP, SELF, bit_array);
+        memcpy(bit_array, s->strstart, size_in_bytes);
     }
 
 /*

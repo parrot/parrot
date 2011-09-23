@@ -68,7 +68,7 @@ Create a copy of the socket handle.
 */
 
     VTABLE PMC *clone() {
-        PMC * const copy = SUPER();
+        PMC * const copy = Parrot_pmc_new(interp, SELF->vtable->base_type);
         const Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 

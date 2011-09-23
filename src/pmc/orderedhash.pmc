@@ -791,6 +791,20 @@ Used to unarchive the hash.
 
 */
 
+    /*
+     * freeze and thaw need to be defined to avoid falling back to default.pmc's throwing versions
+     * the fact that they're no-ops and the real work is done by visit speaks to the fact that these
+     * two systems are redundant (see TT #1916)
+     */
+
+    VTABLE void freeze(PMC *info) {
+        UNUSED(info);
+    }
+
+    VTABLE void thaw(PMC *info) {
+        UNUSED(info);
+    }
+
     VTABLE void visit(PMC *info) {
         VISIT_PMC_ATTR(INTERP, info, SELF, OrderedHash, hash);
         SUPER(info);

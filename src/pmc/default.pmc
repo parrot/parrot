@@ -1143,36 +1143,6 @@ Clones this PMC.  By default, this just does a freeze and thaw.
 
 /*
 
-=item C<void freeze(PMC *info)>
-
-Does nothing.
-
-=cut
-
-*/
-
-    VTABLE void freeze(PMC *info) {
-        UNUSED(info)
-        /* default - no action */
-    }
-
-/*
-
-=item C<void thaw(PMC *info)>
-
-Initializes the PMC during unarchiving.
-
-=cut
-
-*/
-
-    VTABLE void thaw(PMC *info) {
-        /* default - initialize the PMC */
-        SELF.init();
-    }
-
-/*
-
 =item C<void thawfinish(PMC *info)>
 
 Does nothing.

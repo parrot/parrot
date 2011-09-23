@@ -394,8 +394,6 @@ Serialize/deserialize this object for bytecode.
     VTABLE void freeze(PMC *visit) {
         FLOATVAL re, im;
 
-        SUPER(visit);
-
         GET_ATTR_re(INTERP, SELF, re);
         VTABLE_push_float(INTERP, visit, re);
 
@@ -405,8 +403,6 @@ Serialize/deserialize this object for bytecode.
 
     VTABLE void thaw(PMC *visit) {
         FLOATVAL re, im;
-
-        SUPER(visit);
 
         re = VTABLE_shift_float(INTERP, visit);
         SET_ATTR_re(INTERP, SELF, re);
