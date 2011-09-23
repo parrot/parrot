@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# Copyright (C) 2009, Parrot Foundation
+
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 from fusil.application    import Application
 from fusil.process.watch  import WatchProcess
@@ -17,64 +18,65 @@ import random
 
 =head1 NAME
 
-parrot-fuzzer
+parrot_fuzzer.py - opcode fuzzer
 
 =head1 DESCRIPTION
 
-This is a fuzzer for Parrot, written in Python using the fusil library.  It
+This is a fuzzer for Parrot, written in Python using the Fusil library. It
 attempts to break Parrot by generating calls to random PIR opcodes.
 
 =head1 DEPENDENCIES
 
-This script requires Python 2.5+ to run.  The fusil
+This script requires Python 2.5+ to run. The Fusil
 L<http://fusil.hachoir.org/trac> and python-ptrace
 L<http://python-ptrace.hachoir.org/trac> libraries are also required.
 
 =head1 USAGE
 
-Short version: C<sudo ./tools/dev/parrot-fuzzer>
+Short version: C<sudo python tools/dev/parrot_fuzzer.py>
 
-C<parrot-fuzzer> is run like any other fusil-based fuzzer.  Fusil likes to be
-run as root.  This so that the child process in which Parrot runs can be put in
-a more restricted environment, limiting potential damage.
+C<parrot_fuzzer.py> is run like any other Fusil-based fuzzer. Fusil likes to be
+run as the root user so that the child process in which Parrot runs can be put
+in a more restricted environment, limiting potential damage.
 
-fusil assumes the existence of a C<fusil> user and group.  Parrot runs as this
-user/group as part of its restricted environment.  Passing C<--unsafe> allows
-it to run as the current user.  Although it is not likely that this will cause
+Fusil assumes the existence of a C<fusil> user and group. Parrot runs as this
+user/group as part of its restricted environment. Passing C<--unsafe> allows
+it to run as the current user. Although it is not likely that this will cause
 any damage to your system, it is possible.
 
-C<parrot-fuzzer> needs access to Parrot's source code in order to figure out
-which PMCs and ops are available.  It assumes that it's running in the root dir
-of Parrot's source code.  You can use a different dir via
-C<--parrot_root=/some/other/path>.
+C<parrot_fuzzer.py> needs access to Parrot's source code in order to figure out
+which PMCs and ops are available. It assumes that it's running in the root
+directory of Parrot's source code. You can specify a different directory using
+the C<--parrot-root> switch.
 
 =head1 OPTIONS
 
 =over 4
 
-=item C<--parrot_root=/path/to/parrot>
+=item C<--parrot-root=/path/to/parrot>
 
-Specify the path to the root of Parrot's source dir.  By default, this is the
-current dir.
+Represents the path to the Parrot root directory. By default, this is the
+current directory.
 
 =item C<--runcore=--some-runcore>
 
-Specify which runcore to use when running Parrot.  The default is the C<slow>
-core.  This option corresponds directly to Parrot's C<--runcore> option.  Other
-runcores include C<fast>.
-See Parrot's help for more details.
+Specifies which runcore to use when running Parrot. The default is the I<slow>
+core. This option corresponds directly to Parrot's C<--runcore> option. Other
+runcores include I<fast>.
 
-=item C<--ignore_blacklist>
+Run C<parrot --help> for more details.
 
-Some PMCs and opcodes are known to cause false positives or results of limited
-value.  These are blacklisted by default.  Using C<--ignore_blacklist> causes
-the fuzzer to use all available PMCs and opcodes, even those known to behave
+=item C<--ignore-blacklist>
+
+Some PMC's and opcodes are known to cause false positives or results of limited
+value. These are blacklisted by default. Using C<--ignore-blacklist> causes
+the fuzzer to use all available PMC's and opcodes, even those known to behave
 badly during testing.
 
 =item C<--instructions=10>
 
-Generate this number of instructions during test run.  The default is 3.  Note
-that a larger number such as 20 does not necessarily result in more failures.
+Represents the number of instructions during the test run. Note that a larger
+number such as 20 does not necessarily result in more failures. Defaults to 3.
 
 =back
 
@@ -88,12 +90,12 @@ This program is distributed under the same license as Parrot itself.
 
 class ParrotFuzzer(Application):
 
-    #base name of the dir where temp files and successful results will be stored
-    NAME="parrot-fuzz"
+    # Base name of the dir where temp files and successful results will be stored
+    NAME="parrot_fuzz"
 
     def createFuzzerOptions(self, parser):
         options = OptionGroup(parser, "Parrot fuzzer")
-        options.add_option("--parrot_root",
+        options.add_option("--parrot-root",
                 help="Parrot program path (default: .)",
                 type="str",
                 default=".")
@@ -105,7 +107,7 @@ class ParrotFuzzer(Application):
                 help="Generate this many instructions per test run (default: 3)",
                 type="int",
                 default="3")
-        options.add_option("--ignore_blacklist",
+        options.add_option("--ignore-blacklist",
                 help="Use opcodes and PMCs known to cause bad or questionable results (default: use blacklists)",
                 action="store_true",
                 default=False)
@@ -146,14 +148,14 @@ class PirGenerator(ProjectAgent, WriteCode):
 """
         self.pir_postamble = """
 catchall:
-    #Don't do anything with exceptions: we're hoping for a segfault or similar.
+    # Don't do anything with exceptions: we're hoping for a segfault or similar.
 .end
 """
-        #how many instructions to generate
-        #Strangely, a low number like 3 seems to generate slightly more faults
-        #than a high number like 20.
+        # How many instructions to generate
+        # Strangely, a low number like 3 seems to generate slightly more faults
+        # than a high number like 20
         opfunc_count = self.instruction_count
-        self.pir_body += "    #generating "+str(opfunc_count)+" instructions\n"
+        self.pir_body += "    # generating "+str(opfunc_count)+" instructions\n"
 
         arg_types = ['s', 'p', 'i', 'n', 'sc', 'ic', 'nc']
         opfuncs      = []
@@ -161,21 +163,20 @@ catchall:
         self.createFile(filename)
         arg_gen = self.arg_gen
 
-        #pick some opfuncs
+        # Pick some opfuncs
         for i in range(opfunc_count):
             opfuncs.append(OpfuncCall(*self.opfunc_gen.getOpfunc()))
 
-        #calculate how many of each type of arg will be needed
+        # Calculate how many of each type of arg will be needed
         for arg_type in arg_types:
             arg_counts[arg_type] = 0
             for opfunc in opfuncs:
                 arg_counts[arg_type] += opfunc.getArgCount(arg_type)
 
         for arg_type in arg_types:
-            #print "need "+str(arg_counts[arg_type])+" args of type "+arg_type
             arg_gen.setArgCount(arg_type, arg_counts[arg_type])
 
-        #generate the args, adding any supporting code to the preamble
+        # Generate the args, adding any supporting code to the preamble
         self.pir_preamble += arg_gen.generateStringArgs()
         self.pir_preamble += arg_gen.generatePMCArgs()
         self.pir_preamble += arg_gen.generateIntArgs()
@@ -184,17 +185,14 @@ catchall:
         self.pir_preamble += arg_gen.generateIntConstArgs()
         self.pir_preamble += arg_gen.generateNumConstArgs()
 
-        #put the args into the opfunc calls
+        # Put the args into the opfunc calls
         for opfunc in opfuncs:
-            #print "working on " + opfunc.getLongName()
             for arg_num in range(opfunc.getTotalArgCount()):
                 arg_type = opfunc.getArgType(arg_num)
-                #print "arg type for #"+str(arg_num)+" is "+arg_type
                 opfunc.setArgVal(arg_num, arg_gen.getArgVal(arg_type))
-            #append getOpfuncCall
             self.pir_body += opfunc.getOpfuncCall()
 
-        #write the code
+        # Write the code
         self.write(0, self.pir_preamble)
         self.write(0, self.pir_body)
         self.write(0, self.pir_postamble)
@@ -205,8 +203,8 @@ catchall:
         self.generatePir(filename)
         self.send('pir_source', filename)
 
-#Representation of a call to an opfunc, including values of arguments
-#Note that argumens are literal, e.g. '$P0', '"foo"', etc
+# Representation of a call to an opfunc, including values of arguments
+# Note that argumens are literal, e.g. '$P0', '"foo"', etc
 class OpfuncCall:
     def __init__(self, name, sig):
         self.arg_types = []
@@ -217,13 +215,11 @@ class OpfuncCall:
         else:
             self.long_name = name + '_' + sig
         self.total_arg_count = 0
-        #print "making an opfunc: " + self.long_name
         if sig != '':
             for arg in string.split(sig, "_"):
                 self.arg_types.append(arg)
                 self.arg_vals.append('')
                 self.total_arg_count += 1
-                #print "found an arg: " + arg
 
     def getLongName(self):
         return self.long_name
@@ -244,7 +240,7 @@ class OpfuncCall:
         self.arg_vals[n] = arg_val
 
     def getOpfuncCall(self):
-        opfunc_call = '\n    #'+self.long_name+'\n    ' + self.name
+        opfunc_call = '\n    # '+self.long_name+'\n    ' + self.name
         for arg_val in self.arg_vals:
             opfunc_call += ' ' + arg_val + ','
         opfunc_call = string.rstrip(opfunc_call, ",")
@@ -334,7 +330,7 @@ class ArgGenerator:
         pir_preamble = ""
         self.args['ic'] = []
         for n in range(self.arg_counts['ic']):
-            #negative numbers and zero mess up control flow-related ops
+            # Negative numbers and zero mess up control flow-related ops
             #num = random.choice(['neg_many','neg_one','zero','pos_one','pos_many'])
             num = random.choice(['pos_one','pos_many'])
 
@@ -418,9 +414,9 @@ class PMCTypeGenerator:
 class OpfuncGenerator:
     opfunc_list = []
     opfunc_blacklist = [
-            'check_events', #only for testing
-            'check_events__', #not for direct use
-            'clears', #clearing all [SPIN] registers isn't useful
+            'check_events', # Only for testing
+            'check_events__', # Not for direct use
+            'clears', # Clearing all [SPIN] registers isn't useful
             'clearp',
             'cleari',
             'clearn',
@@ -463,18 +459,18 @@ class OpfuncGenerator:
     def populateOpfuncList(self, parrot_root, ignore_blacklist):
         ops_h = parrot_root + "/src/ops/core_ops.c"
         ops_f = open(ops_h, 'r')
-        #This is a moderately fragile hack that relies on the specific
-        #format of some generated code.  Expect breakage.
+        # This is a moderately fragile hack that relies on the specific
+        # format of some generated code, expect breakage
         for line in ops_f:
             if line.find('PARROT_INLINE_OP') > -1 or line.find('PARROT_FUNCTION_OP') > -1:
                 line = ops_f.next()
                 short_name = line
                 line = ops_f.next()
                 long_name = line
-                #strip leading space and opening double-quote
+                # Strip leading space and opening double-quote
                 short_name = re.sub('[ ]+"', '', short_name)
                 long_name  = re.sub('[ ]+"', '', long_name)
-                #strip everything after closing double-quote
+                # Strip everything after closing double-quote
                 short_name = re.sub('".*\n', '', short_name)
                 long_name  = re.sub('".*\n', '', long_name)
 
@@ -483,7 +479,7 @@ class OpfuncGenerator:
                 else:
                     sig = string.replace(long_name, short_name + '_', '')
 
-                #XXX: don't know how to handle these args
+                #XXX: Don't know how to handle these args
                 if (not re.search('(pc|k|ki|kc|kic)', sig)):
                     if ignore_blacklist or short_name not in self.opfunc_blacklist:
                         self.opfunc_list.append([short_name, sig])
