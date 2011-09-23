@@ -4,6 +4,14 @@ use strict;
 use warnings;
 use Carp;
 use autodie;
+use lib qw( ./lib );
+use Parrot::Release::Functions qw(
+    get_old_and_new_versions
+    get_simple_files
+    bump_gen_code_version
+    get_generated_files
+    simple_update_version
+);
 
 =head1 NAME
 
@@ -41,67 +49,16 @@ James E Keenan
 
 =cut
 
-croak "Must supply a version number as a command-line argument"
-    unless @ARGV == 1;
+my ($old_version, $new_version) = get_old_and_new_versions($ARGV[0]);
 
-my $new_version = $ARGV[0];
-open my $version_fh, '<', 'VERSION';
-my $old_version = <$version_fh>;
-chomp $old_version;
-close $version_fh;
-
-croak "'$new_version' is not a proper version number; must be n.n.n"
-    unless $new_version =~ m/^\d+\.\d+\.\d+$/;
-
-my @simple_files = (
-    'VERSION',
-    'MANIFEST.generated',
-    'README',
-);
-
-foreach my $f ( @simple_files ) {
-    my $new = "$f.tmp";
-    open my $IN, '<', $f or croak "Unable to open $f for reading";
-    open my $OUT, '>', $new or croak "Unable to open $new for writing";
-    while (<$IN>) {
-        chomp;
-        s/$old_version/$new_version/g;
-        print $OUT "$_\n";
-    }
-    close $OUT or croak "Unable to close $new after writing";
-    close $IN or croak "Unable to close $f after reading";
-    rename $new => $f or croak "Unable to rename $new to $f";
+foreach my $f ( get_simple_files() ) {
+    simple_update_version( $f, $old_version, $new_version );
 }
 
-
-my $filename = "include/parrot/oplib/core_ops.h";
-bump_gen_code_version($filename, $old_version, $new_version);
-$filename = "src/ops/core_ops.c";
-bump_gen_code_version($filename, $old_version, $new_version);
-
-
-
-sub bump_gen_code_version {
-
-    my ($filename, $old_version, $new_version) = @_;
-    my $old_h_version = join("_", split(/\./, $old_version));
-    my @new_version   = split(/\./, $new_version);
-    my $new_h_version = join("_", @new_version);
-
-    open my $gen_c_in, '<', "$filename";
-    open my $gen_c_out, '>', "$filename.tmp";
-    while(<$gen_c_in>) {
-        s/$old_h_version/$new_h_version/g;
-        s?\d+,    /\* major_version \*/?$new_version[0],    /* major_version */?;
-        s?\d+,    /\* minor_version \*/?$new_version[1],    /* minor_version */?;
-        s?\d+,    /\* patch_version \*/?$new_version[2],    /* patch_version */?;
-        print $gen_c_out $_;
-    }
-    close $gen_c_in;
-    close $gen_c_out;
-    rename "$filename.tmp", $filename;
+foreach my $f ( get_generated_files() ) {
+    bump_gen_code_version(
+        $f, $old_version, $new_version);
 }
-
 
 # Local Variables:
 #   mode: cperl

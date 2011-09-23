@@ -929,6 +929,7 @@ include/parrot/pobj.h                                       [main]include
 include/parrot/pointer_array.h                              [main]include
 include/parrot/runcore_api.h                                [main]include
 include/parrot/runcore_profiling.h                          [main]include
+include/parrot/runcore_subprof.h                            [main]include
 include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
@@ -1018,6 +1019,7 @@ lib/Parrot/Pmc2c/Parser.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Pmc2cMain.pm                               [devel]lib
 lib/Parrot/Pmc2c/UtilFunctions.pm                           [devel]lib
 lib/Parrot/Pmc2c/VTable.pm                                  [devel]lib
+lib/Parrot/Release/Functions.pm                             [devel]lib
 lib/Parrot/Revision.pm                                      [devel]lib
 lib/Parrot/SHA1.pm                                          [devel]lib
 lib/Parrot/SearchOps.pm                                     [devel]lib
@@ -1422,6 +1424,7 @@ src/pointer_array.c                                         []
 src/runcore/cores.c                                         []
 src/runcore/main.c                                          []
 src/runcore/profiling.c                                     []
+src/runcore/subprof.c                                       []
 src/runcore/trace.c                                         []
 src/scheduler.c                                             []
 src/spf_render.c                                            []

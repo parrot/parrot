@@ -1,5 +1,4 @@
 #! perl
-
 # Copyright (C) 2011, Parrot Foundation.
 
 =head1 NAME
@@ -55,9 +54,16 @@ use warnings;
 
 use Getopt::Long;
 use System::Command;
+use lib qw ( ./lib );
+use Parrot::Release::Functions qw(
+    get_old_and_new_versions
+    get_simple_files
+    bump_gen_code_version
+    get_generated_files
+    simple_update_version
+);
 
 # TODO  Be more verbose in perldoc
-# TODO  Migrate code from update_version.pl
 # TODO  Edit '== ==' strings so that newlines are on top and bottom
 
 my $version;      # Version number
@@ -412,7 +418,14 @@ sub update_version {
 
     print "== UPDATING VERSION INFORMATION ==\n";
 
-    system('perl', 'tools/release/update_version.pl', "$ver") == 0 or stop();
+    my ($old_version, $new_version) = get_old_and_new_versions($ver);
+    foreach my $f ( get_simple_files() ) {
+        simple_update_version( $f, $old_version, $new_version );
+    }
+    foreach my $f ( get_generated_files() ) {
+        bump_gen_code_version(
+            $f, $old_version, $new_version);
+    }
 
     _edit('docs/parrothist.pod');
     _edit('docs/project/release_manager_guide.pod');
