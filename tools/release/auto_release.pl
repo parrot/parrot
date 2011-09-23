@@ -8,7 +8,7 @@
 
 =head1 SYNOPSIS
 
-    % perl tools/release/auto_release.pl [OPTION]... VERSION
+    $ perl tools/release/auto_release.pl [OPTION]... VERSION
 
 =head1 DESCRIPTION
 
@@ -18,13 +18,9 @@ This script fully automates much of the process of packaging a release.
 
 =over 4
 
-=item B<-v>, B<--version>=I<a.b.c>
+=item B<-h>, B<--help>
 
-Specifies the new release version. Must be a string of the form a.b.c (e.g.
-3.8.0).
-
-The release version passed to C<-v> always takes precedence over the one given
-as C<VERSION> (if any).
+Displays help message and exits.
 
 =item B<-d>, B<--developer>
 
@@ -50,6 +46,14 @@ Using the C<-t> switch (or C<$TEST_JOBS>) is strongly recommended as it can
 significantly reduce the amount of time spent on running the test suite which
 can take up to several minutes.
 
+=item B<-v>, B<--version>=I<a.b.c>
+
+Specifies the new release version. Must be a string of the form a.b.c (e.g.
+3.8.0).
+
+The release version passed to C<-v> always takes precedence over the one given
+as C<VERSION> (if any).
+
 =back
 
 =head1 HISTORY
@@ -67,9 +71,9 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use Pod::Usage;
 use System::Command;
 
-# TODO Add help switch (-h), consider using Pod::Usage
 # TODO Be more verbose in perldoc
 # TODO Migrate code from update_version.pl
 # TODO Edit '== ==' strings so that newlines are on top and bottom
@@ -79,16 +83,21 @@ my $version;          # Version number
 my $developer;        # Developer release
 my $supported;        # Supported release
 my $test_jobs = 1;    # Number of parallel test harnesses
+my $help;             # Displays help message
 
 my $type;             # Developer or supported release
 
 my $result = GetOptions('v|version=s'   => \$version,
                         'd|developer'   => \$developer,
                         's|supported'   => \$supported,
-                        't|test-jobs=i' => \$test_jobs);
+                        't|test-jobs=i' => \$test_jobs,
+                        'h|help'        => \$help);
 
 # Catch unrecognized switches
-stop('Unrecognized option') unless $result;
+pod2usage() unless $result;
+
+# Display help message if -h was given
+pod2usage(0) if $help;
 
 # Determine whether to build a developer or supported release
 set_release_type(\$developer, \$supported, \$type);
