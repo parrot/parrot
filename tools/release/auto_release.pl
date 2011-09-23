@@ -18,7 +18,7 @@ etc.
 
 If you are familiar with the Release Manager Guide
 (F<docs/project/release_manager_guide.pod), this script can take care of
-everything up until section VIII.
+everything up until section IX.
 
 =head1 OPTIONS
 
@@ -146,6 +146,7 @@ prepare_tarball();
 verify_new_version($version, $type);
 tag_release($version);
 push_to_ftp_server($version, $type);
+crow();
 
 ##########################
 # Subroutine definitions #
@@ -257,6 +258,25 @@ sub commit_changes {
     print "== PUSHING COMMIT TO MASTER BRANCH ==\n";
 
     system('git', 'push', 'origin', 'master') == 0 or stop();
+}
+
+# Generates release announcement using `crow.pir`
+sub crow {
+    my $announcement = 'release_announcement.txt';
+
+    print "== GENERATING ANNOUNCEMENT MESSAGE ==\n";
+
+    open my $CROW,        '-|', './parrot tools/release/crow.pir --type=text' or stop();
+    open my $CROW_OUTPUT, '>',  $announcement                                 or stop();
+
+    while (<$CROW>) {
+        print $CROW_OUTPUT $_;
+    }
+
+    close $CROW;
+    close $CROW_OUTPUT;
+
+    _edit($announcement);
 }
 
 # Runs distribution tests
