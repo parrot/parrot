@@ -2198,7 +2198,6 @@ tools/release/release.json                                  []
 tools/release/releasecheck.pl                               []
 tools/release/sha256sum.pl                                  []
 tools/release/templates.json                                []
-tools/release/update_version.pl                             []
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
