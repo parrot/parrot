@@ -12,7 +12,13 @@
 
 =head1 DESCRIPTION
 
-This script fully automates much of the process of packaging a release.
+This script fully automates much of the process of packaging a release. It
+handles tasks such as running tests, creating tarballs, tagging the release,
+etc.
+
+If you are familiar with the Release Manager Guide
+(F<docs/project/release_manager_guide.pod), this script can take care of
+everything up until section VIII.
 
 =head1 OPTIONS
 
@@ -74,7 +80,6 @@ use Getopt::Long;
 use Pod::Usage;
 use System::Command;
 
-# TODO Be more verbose in perldoc
 # TODO Migrate code from update_version.pl
 # TODO Edit '== ==' strings so that newlines are on top and bottom
 
