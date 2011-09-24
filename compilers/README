@@ -1,15 +1,15 @@
-== NAME ==
+## NAME
 
 compilers - various compilers used by Parrot
 
-== DESCRIPTION ==
+## DESCRIPTION
 
-The 'compilers' directory contains the source files for several compilers that
+The *compilers* directory contains the source files for several compilers that
 are used by Parrot such as IMCC and PGE. For more detailed information on
-these, please see their respective README files in the subdirectories listed
+these, please see their respective `README` files in the subdirectories listed
 below.
 
-== SUBDIRECTORIES ==
+## SUBDIRECTORIES
 
 * data_json
 
@@ -41,7 +41,6 @@ Source files for the compiler used by the Tree Grammer Engine (TGE). This is the
 tool used to transform the trees output by the PGE into a Parrot Abstract
 Syntax Tree (PAST).
 
-== COPYRIGHT ==
+## COPYRIGHT
 
 Copyright (C) 2011, Parrot Foundation.
-
