@@ -90,6 +90,7 @@ implementation, and malloc wrappers for various purposes. These are unused.
 #define GC_C_SOURCE
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
+#include "parrot/threads.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -187,7 +188,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->lo_var_ptr = args->stacktop;
+    interp->thread_table->threads[0].lo_var_ptr = stacktop;
 
     interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
 

@@ -176,9 +176,6 @@ create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
     Interp_flags flag  = PARROT_NO_FLAGS;
     Parrot_Interp new_interp;
 
-    if (self->vtable->base_type == enum_class_ParrotThread)
-        flag = PARROT_IS_THREAD;
-
     new_interp       = make_interpreter(parent, (INTVAL)flag);
     PMC_interp(self) = new_interp;
 
@@ -653,15 +650,6 @@ have the same thread id.
             return 1;
 
         return 0;
-    }
-
-    MULTI INTVAL is_equal(ParrotThread value) {
-        Parrot_Interp self  = PMC_interp(SELF);
-
-        if (!self->thread_data)
-            return 0;
-
-        return self->thread_data->tid == (UINTVAL) VTABLE_get_integer(INTERP, value);
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {

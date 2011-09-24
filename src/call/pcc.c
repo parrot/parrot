@@ -269,6 +269,7 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
           case enum_class_Sub:
           case enum_class_MultiSub:
           case enum_class_Eval:
+          case enum_class_Continuation:
             return 1;
           case enum_class_Object:
             break;

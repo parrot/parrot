@@ -25,6 +25,7 @@ numbered.  You probably want src/embed/api.c
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
+#include "parrot/threads.h"
 #include "parrot/oplib/core_ops.h"
 #include "imcc/embed.h"
 
@@ -257,7 +258,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(const char **argv))
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
     Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
 
-    Parrot_ext_call(interp, main_sub, "P->", userargv);
+    Parrot_cx_begin_execution(interp, main_sub, userargv);
 }
 
 
@@ -291,7 +292,13 @@ Parrot_debug(PARROT_INTERP, ARGIN(Parrot_Interp debugger), ARGIN(Parrot_Opcode *
     interp               = pdb->debugee;
     interp->pdb          = pdb;
     */
-    debugger->lo_var_ptr = interp->lo_var_ptr;
+
+    /* Chandon FIXME: What's this? How should it work? */
+    /* debugger->lo_var_ptr = interp->lo_var_ptr; */
+
+    fprintf(stderr, "Debugger is broken.\n");
+    exit(1);
+
 
     PDB_disassemble(interp, NULL);
 

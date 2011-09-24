@@ -24,6 +24,7 @@ Create or destroy a Parrot interpreter
 #include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "inter_create.str"
+#include "parrot/threads.h"
 
 static Interp* emergency_interp;
 
@@ -177,8 +178,6 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* Get an empty interpreter from system memory */
     interp = mem_internal_allocate_zeroed_typed(Interp);
 
-    interp->lo_var_ptr = NULL;
-
     /* the last interpreter (w/o) parent has to cleanup globals
      * so remember parent if any */
     if (parent)
@@ -234,6 +233,9 @@ Parrot_Interp
 initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(initialize_interpreter)
+
+    /* Need threads table to init gc */
+    Parrot_threads_init(interp);
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, args);
@@ -330,7 +332,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
      */
-    interp->task_queue  = NULL;
     interp->thread_data = NULL;
 
     Parrot_cx_init_scheduler(interp);
@@ -381,17 +382,19 @@ Parrot_destroy(PARROT_INTERP)
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
-Note that C<exit_code> is ignored.
-
 =cut
 
 */
 
 void
-Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
+Parrot_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_really_destroy)
+
     /* wait for threads to complete if needed; terminate the event loop */
+    Parrot_threads_reap(interp);
+    Parrot_threads_cleanup(interp);
+
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
         pt_join_threads(interp);

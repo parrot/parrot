@@ -482,6 +482,8 @@ static void*
 thread_func(ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(thread_func)
+
+#ifdef OBSOLETE_THREAD_CODE
     Parrot_runloop   jump_point;
     int              lo_var_ptr;
     UINTVAL          tid;
@@ -548,6 +550,7 @@ thread_func(ARGIN_NULLOK(void *arg))
     UNLOCK(interpreter_array_mutex);
 
     return ret_val;
+#endif
 }
 
 /*

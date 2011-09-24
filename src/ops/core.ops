@@ -7,9 +7,11 @@ BEGIN_OPS_PREAMBLE
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "parrot/runcore_api.h"
+#include "parrot/events.h"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
+
 
 END_OPS_PREAMBLE
 
@@ -96,16 +98,20 @@ inline op noop() :base_core {
 }
 
 inline op check_events() :base_core :flow {
-    opcode_t * const next = expr NEXT();
-    Parrot_cx_check_tasks(interp, interp->scheduler);
+    opcode_t *next = expr NEXT();
+    next = Parrot_cx_check_scheduler(interp, next);
     goto ADDRESS(next);   /* force this being a branch op */
 }
 
 inline op check_events__() :internal :flow {
     opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, _this,
+        EXCEPTION_INVALID_OPERATION,
+        "check_events__ opcode doesn't do anything useful.");
+    goto ADDRESS(handler);
     /* Restore op_func_table. */
     disable_event_checking(interp);
-    Parrot_cx_handle_tasks(interp, interp->scheduler);
+    /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
@@ -151,6 +157,8 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch(in LABEL) :base_loop :flow {
+    if(Parrot_cx_check_scheduler(interp, cur_opcode + $1) == 0)
+        return 0;
     goto OFFSET($1);
 }
 

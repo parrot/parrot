@@ -47,6 +47,9 @@
 #  define THREAD_CREATE_JOINABLE(t, func, arg) \
         pthread_create(&(t), NULL, (func), (arg))
 
+#  define THREAD_SELF() pthread_self()
+#  define THREAD_EQUAL(t1, t2) pthread_equal((t1), (t2))
+
 #  define JOIN(t, ret) pthread_join((t), &(ret))
 #  define DETACH(t)    pthread_detach(t)
 
@@ -60,9 +63,18 @@
 #  endif
 #endif /* PARROT_HAS_HEADER_UNISTD */
 
+#  define THREAD_EXIT(s) pthread_exit((void*) (s))
+
+#  define Parrot_tls_key pthread_key_t
+#  define TLS_KEY_INIT(k) assert(pthread_key_create(&(k), free) == 0)
+#  define TLS_KEY_FREE(k) assert(pthread_key_delete(k) == 0)
+#  define TLS_SET(k, v) assert(pthread_setspecific(k, v) == 0)
+#  define TLS_GET(k) pthread_getspecific(k)
+
 typedef pthread_mutex_t Parrot_mutex;
 typedef pthread_cond_t Parrot_cond;
 typedef pthread_t Parrot_thread;
+typedef pthread_key_t Parrot_tls_key;
 
 typedef void (*Cleanup_Handler)(void *);
 
