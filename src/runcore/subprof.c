@@ -84,6 +84,7 @@ static subprofiledata * get_subprofiledata(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static __inline__ UHUGEINTVAL getticks(void);
 static UHUGEINTVAL getticks(void);
 static void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -202,6 +203,7 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
 #define ASSERT_ARGS_getticks __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_getticks __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_runcore_subprof_hll_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -270,6 +272,8 @@ PARROT_CANNOT_RETURN_NULL
 static INTVAL *
 sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 {
+    ASSERT_ARGS(sptodebug)
+
     INTVAL *xdebug;
     size_t di, op;
     opcode_t *base_pc, *debug_ops;
@@ -319,6 +323,8 @@ PARROT_CANNOT_RETURN_NULL
 static inline char *
 str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 {
+    ASSERT_ARGS(str2cs)
+
     if (s == STRINGNULL)
         return strdup("STRNULL");
     return Parrot_str_to_cstring(interp, s);
@@ -340,6 +346,8 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 findlineannotations(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp), ARGOUT(size_t *cntp))
 {
+    ASSERT_ARGS(findlineannotations)
+
     PackFile_Annotations *ann = sp->subattrs->seg->annotations;
     PackFile_Annotations_Key *key;
     int i;
@@ -390,6 +398,8 @@ Also sets sp->srcfile and sp->srcline.
 static void
 createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 {
+    ASSERT_ARGS(createlines)
+
     if (spdata->profile_type == SUBPROF_TYPE_OPS) {
         int i, lasti;
         INTVAL *xdebug = sptodebug(interp, spdata, sp);
@@ -472,6 +482,8 @@ PARROT_CANNOT_RETURN_NULL
 static subprofile *
 sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), ARGIN(PMC *subpmc))
 {
+    ASSERT_ARGS(sub2subprofile)
+
     subprofile *sp;
     Parrot_Sub_attributes *subattrs;
     PMC_get_sub(interp, subpmc, subattrs);
@@ -505,6 +517,8 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
 static void
 popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
+    ASSERT_ARGS(popcallchain)
+
     subprofile *sp = spdata->cursp;
     subprofile *csp = sp->caller;
     if (sp->callerci) {
@@ -540,6 +554,8 @@ the process.
 static void
 finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
+    ASSERT_ARGS(finishcallchain)
+
     subprofile *sp, *csp;
 
     /* finish all calls */
@@ -577,6 +593,8 @@ finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 static void
 buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *ctx), ARGIN_NULLOK(PMC *subpmc))
 {
+    ASSERT_ARGS(buildcallchain)
+
     PMC *cctx;
     subprofile *sp;
     lineinfo *li;
@@ -682,6 +700,8 @@ buildcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(PMC *c
 static void
 printspname(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 {
+    ASSERT_ARGS(printspname)
+
     char *cname;
     cname = str2cs(interp, sp->subattrs->name);
     fprintf(stderr, "%p:%s", sp, cname);
@@ -705,6 +725,8 @@ profile to stderr.
 static void
 dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
+    ASSERT_ARGS(dump_profile_data)
+
     int h;
     size_t off;
 
@@ -824,6 +846,8 @@ free memory we allocated for this subprofile
 static void
 free_subprofile(PARROT_INTERP, ARGIN(subprofile *sp))
 {
+    ASSERT_ARGS(free_subprofile)
+
     if (sp->srcfile)
         free(sp->srcfile);
     if (sp->lines) {
@@ -852,6 +876,8 @@ free every profile data we have accumulated
 static void
 free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
+    ASSERT_ARGS(free_profile_data)
+
     if (spdata->sphash) {
         parrot_hash_iterate(spdata->sphash,
             subprofile *sp = (subprofile*)_bucket->value;
@@ -877,11 +903,11 @@ free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
     free(spdata);
 }
 
-
-
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
 static __inline__ UHUGEINTVAL
 getticks(void) {
+    ASSERT_ARGS(getticks)
+
     uint32_t lo, hi; 
     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
     return (UHUGEINTVAL)hi << 32 | lo; 
@@ -908,6 +934,8 @@ bring the profile context chain back in sync with the context's call chain
 static void
 sync_callchainchange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *subpmc))
 {
+    ASSERT_ARGS(sync_callchainchange)
+
     subprofile *sp = spdata->cursp;
     int i;
 
@@ -955,6 +983,8 @@ PARROT_CANNOT_RETURN_NULL
 static lineinfo *
 sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(opcode_t *pc_op))
 {
+    ASSERT_ARGS(sync_hll_linechange)
+
     subprofile *sp = spdata->cursp;
     lineinfo *li;
     int i;
@@ -978,6 +1008,8 @@ PARROT_CANNOT_RETURN_NULL
 static subprofiledata *
 get_subprofiledata(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), int type)
 {
+    ASSERT_ARGS(get_subprofiledata)
+
     Parrot_subprof_runcore_t *core = (Parrot_subprof_runcore_t *)runcore;
     subprofiledata *spdata = core->spdata;
     if (!spdata) {
@@ -1017,6 +1049,8 @@ Destroy callback. We use it to print the profile data.
 static void
 runops_subprof_destroy(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore))
 {
+    ASSERT_ARGS(runops_subprof_destroy)
+
     Parrot_subprof_runcore_t *core = (Parrot_subprof_runcore_t *)runcore;
     if (core->spdata) {
         dump_profile_data(interp, core->spdata);
@@ -1041,6 +1075,8 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_subprof_sub_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_subprof_sub_core)
+
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_SUB);
     subprofile *sp = spdata->cursp;
     PMC *ctx, *subpmc;
@@ -1099,6 +1135,8 @@ Registers the subprof_sub runcore with Parrot.
 static void
 Parrot_runcore_subprof_sub_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_runcore_subprof_sub_init)
+
     Parrot_subprof_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name             = CONST_STRING(interp, "subprof_sub");
     coredata->id               = PARROT_SLOW_CORE;
@@ -1132,6 +1170,8 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_subprof_hll_core)
+
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_HLL);
     subprofile *sp = spdata->cursp;
     PMC *ctx, *subpmc;
@@ -1232,6 +1272,8 @@ Registers the subprof_hll runcore with Parrot.
 static void
 Parrot_runcore_subprof_hll_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_runcore_subprof_hll_init)
+
     Parrot_subprof_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name             = CONST_STRING(interp, "subprof_hll");
     coredata->id               = PARROT_SLOW_CORE;
@@ -1263,6 +1305,8 @@ PARROT_CAN_RETURN_NULL
 static opcode_t *
 runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t *pc))
 {
+    ASSERT_ARGS(runops_subprof_ops_core)
+
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_OPS);
     subprofile *sp = spdata->cursp;
     PMC *ctx, *subpmc;
@@ -1324,6 +1368,8 @@ Registers the subprof_ops runcore with Parrot.
 static void
 Parrot_runcore_subprof_ops_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_runcore_subprof_ops_init)
+
     Parrot_subprof_runcore_t * const coredata = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name             = CONST_STRING(interp, "subprof_ops");
     coredata->id               = PARROT_SLOW_CORE;
@@ -1352,6 +1398,8 @@ Register all three subprof cores
 void
 Parrot_runcore_subprof_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_runcore_subprof_init)
+
     Parrot_runcore_subprof_sub_init(interp);
     Parrot_runcore_subprof_hll_init(interp);
     Parrot_runcore_subprof_ops_init(interp);
