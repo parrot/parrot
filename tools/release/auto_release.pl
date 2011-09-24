@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-    tools/release/auto_release.pl - automates the release process
+tools/release/auto_release.pl - automates the release process
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,7 @@ handles tasks such as running tests, creating tarballs, tagging the release,
 etc.
 
 If you are familiar with the Release Manager Guide
-(F<docs/project/release_manager_guide.pod), this script can take care of
+(F<docs/project/release_manager_guide.pod>), this script can take care of
 everything up until section IX.
 
 =head1 OPTIONS
