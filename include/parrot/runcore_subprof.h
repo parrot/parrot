@@ -46,7 +46,7 @@ struct subprofile {
     int                    rcnt;
 
     /* the Sub PMC being profiled by this subprofile* */
-    PMC                   *subpmc; 
+    PMC                   *subpmc;
     /* the ATTRs of subpmc */
     Parrot_Sub_attributes *subattrs;
     /* first op of segment */
