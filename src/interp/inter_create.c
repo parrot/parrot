@@ -228,9 +228,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(initialize_interpreter)
 
-    /* Need threads table to init gc */
-    Parrot_threads_init(interp);
-
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, args);
     Parrot_block_GC_mark(interp);

@@ -26,8 +26,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#include "parrot/threads.h"
-
 #else
 
 typedef Parrot_Int Parrot_Language;

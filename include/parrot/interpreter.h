@@ -130,8 +130,6 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/call.h"
 #include "parrot/gc_api.h"
 
-#include "parrot/thread.h"
-
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
@@ -220,6 +218,7 @@ struct parrot_interp_t {
 
     PMC *root_namespace;                      /* namespace hash */
     PMC *scheduler;                           /* concurrency scheduler */
+    PMC *cur_task;
 
     MMD_Cache *op_mmd_cache;                  /* MMD cache for builtins. */
 
@@ -236,6 +235,9 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+
+    UINTVAL          last_alarm;              /* has an alarm triggered? */
+    FLOATVAL         quantum_done;            /* expiration of current quantum */
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 

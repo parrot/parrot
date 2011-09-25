@@ -106,11 +106,6 @@ Parrot_x_exit(PARROT_INTERP, int status)
      */
     handler_node_t *node;
 
-    INTVAL tidx = Parrot_threads_current(interp);
-    if (tidx != 0) {
-        exit(status);
-    }
-
     node = interp->exit_handler_list;
 
     Parrot_block_GC_mark(interp);

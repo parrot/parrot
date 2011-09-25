@@ -25,7 +25,6 @@ numbered.  You probably want src/embed/api.c
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "parrot/runcore_api.h"
-#include "parrot/threads.h"
 #include "parrot/oplib/core_ops.h"
 #include "imcc/embed.h"
 

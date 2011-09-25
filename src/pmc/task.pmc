@@ -31,7 +31,6 @@ pmclass Task provides invokable auto_attrs {
     ATTR PMC          *code;      /* An (optional) code for the task */
     ATTR PMC          *data;      /* Additional data for the task */
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
-    ATTR INTVAL        tidx;      /* Which thread to signal if killed */
     ATTR PMC          *mailbox;   /* List of incoming messages */
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
     ATTR Parrot_jump_buff abort_jump; /* Jump buffer to abort task */
@@ -59,7 +58,6 @@ Initialize a concurrency task object.
         core_struct->data      = PMCNULL;
         core_struct->interp    = INTERP;
         core_struct->killed    = 0;
-        core_struct->tidx      = -1;
         core_struct->mailbox   = Parrot_pmc_new(interp, enum_class_PMCList);
         core_struct->waiters   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -161,14 +159,12 @@ code as the first argument.
             TASK_active_SET(SELF);
 
             /* Actually run the task */
-            task->tidx = Parrot_threads_current(interp);
             if (PMC_IS_NULL(task->data)) {
                 Parrot_ext_call(interp, task->code, "->");
             }
             else {
                 Parrot_ext_call(interp, task->code, "P->", task->data);
             }
-            task->tidx = -1;
         }
 
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
@@ -403,10 +399,6 @@ Kill this task.
     METHOD kill() {
         Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
         tdata->killed = 1;
-
-        if (tdata->tidx >= 0) {
-            Parrot_threads_task_killed(interp, tdata->tidx);
-        }
     }
 }
 

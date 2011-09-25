@@ -26,7 +26,6 @@ TT #273: This file needs to be cleaned up significantly.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/threads.h"
 #include "gc_private.h"
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
@@ -237,27 +236,11 @@ trace_system_stack(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
        "top" of the stack. A value stored in interp->lo_var_ptr represents
        the "bottom" of the stack. We must trace the entire area between the
        top and bottom. */
-    const Thread_table *tbl = interp->thread_table;
-    int i, cur_idx;
+    const size_t lo_var_ptr = (size_t)interp->lo_var_ptr;
+    PARROT_ASSERT(lo_var_ptr);
 
-    /* We need to trace the stack in one running thread (this thread) as
-       well as the stack in each other active thread.
-    */
-    cur_idx = Parrot_threads_current(interp);
-
-    for (i = 0; i < tbl->count; ++i) {
-        void *lo  = tbl->threads[i].lo_var_ptr;
-
-        if (i == cur_idx) {
-            void *hi = &i;
-            trace_mem_block(interp, mem_pools, (size_t)lo, (size_t)hi);
-        }
-        else if (THREAD_STATE_TEST(interp, i, SCAN_STACK)) {
-            void *hi = tbl->threads[i].hi_var_ptr;
-            trace_mem_block(interp, mem_pools, (size_t)lo, (size_t)hi);
-        }
-    }
-
+    trace_mem_block(interp, mem_pools, (size_t)lo_var_ptr,
+            (size_t)&lo_var_ptr);
 }
 
 /*

@@ -101,7 +101,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC *scheduler = interp->scheduler;
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count, blocked_count;
+    INTVAL alarm_count;
     INTVAL task_count  = 1;
 
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
@@ -114,22 +114,14 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
     Parrot_cx_schedule_task(interp, main_task);
 
-    Parrot_threads_spawn(interp);
-
     do {
         Parrot_cx_check_alarms(interp, interp->scheduler);
-        (void) Parrot_threads_next_to_run(interp, 0);
 
-        UNLOCK_INTERP(interp);
         pause();
-        LOCK_INTERP(interp);
 
         task_count    = VTABLE_get_integer(interp, sched->task_queue);
         alarm_count   = VTABLE_get_integer(interp, sched->alarms);
-        blocked_count = Parrot_threads_count_active(interp);
-    } while (task_count + alarm_count + blocked_count > 0);
-
-    Parrot_threads_reap(interp);
+    } while (task_count + alarm_count > 0);
 
     task_count = VTABLE_get_integer(interp, sched->all_tasks);
     if (task_count > 0)
@@ -162,13 +154,12 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         opcode_t *dest;
 
         PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
-        INTVAL tidx = Parrot_threads_current(interp);
 
         if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Found a non-Task in the task queue.\n");
 
-        interp->thread_table->threads[tidx].cur_task = task;
+        interp->cur_task = task;
 
         interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
         Parrot_alarm_set(interp->quantum_done);
@@ -197,11 +188,6 @@ Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t* next))
     ASSERT_ARGS(Parrot_cx_check_scheduler)
     PMC *scheduler = interp->scheduler;
 
-    if (Parrot_threads_check_and_reset(interp)) {
-        SCHEDULER_wake_requested_SET(scheduler);
-        SCHEDULER_resched_requested_SET(scheduler);
-    }
-
     if (Parrot_alarm_check(&(interp->last_alarm))
         || SCHEDULER_wake_requested_TEST(scheduler)) {
         SCHEDULER_wake_requested_CLEAR(scheduler);
@@ -229,7 +215,6 @@ opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
-    INTVAL tid = Parrot_threads_current(interp);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -455,8 +440,7 @@ PMC*
 Parrot_task_current(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_task_current)
-    INTVAL tidx = Parrot_threads_current(interp);
-    return interp->thread_table->threads[tidx].cur_task;
+    return interp->cur_task;
 }
 
 
