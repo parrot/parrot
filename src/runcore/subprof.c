@@ -1039,7 +1039,7 @@ free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 
 /*
 
-=item C<static __inline__ UHUGEINTVAL getticks(void)>
+=item C<static UHUGEINTVAL getticks(void)>
 
 Returns a high-resolution number representing how long Parrot has been running.
 

@@ -29,13 +29,6 @@ void Parrot_cx_begin_execution(PARROT_INTERP,
         FUNC_MODIFIES(*argv);
 
 PARROT_EXPORT
-void Parrot_cx_broadcast_message(PARROT_INTERP,
-    ARGIN(STRING *messagetype),
-    ARGIN_NULLOK(PMC *data))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -139,9 +132,6 @@ PMC* Parrot_task_current(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(main) \
     , PARROT_ASSERT_ARG(argv))
-#define ASSERT_ARGS_Parrot_cx_broadcast_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(messagetype))
 #define ASSERT_ARGS_Parrot_cx_check_alarms __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
