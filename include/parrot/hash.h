@@ -318,6 +318,12 @@ STRING* Parrot_hash_key_to_string(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t Parrot_hash_pointer(
+    ARGIN_NULLOK(const void * const p),
+    size_t hashval);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Hash * Parrot_hash_thaw(PARROT_INTERP, ARGMOD(PMC *info))
@@ -460,6 +466,7 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_hash_key_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
+#define ASSERT_ARGS_Parrot_hash_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_hash_thaw __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(info))

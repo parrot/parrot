@@ -7,7 +7,7 @@
 # Constant PIR_FILE evaluated at compile time
 # Constant PBC_FILE evaluated at compile time
 
-.sub '__PARROT_ENTRY_MAIN__' :anon :main
+.sub '__PARROT_ENTRY_MAIN__args' :subid('WSubId_7') :anon
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
@@ -16,137 +16,146 @@
 .const 'Sub' WSubId_4 = "WSubId_4"
 .const 'Sub' WSubId_5 = "WSubId_5"
 .const 'Sub' WSubId_6 = "WSubId_6"
-.const 'Sub' WSubId_7 = "WSubId_7"
 # Body
 # {
-# var interp: $P1
-# predefined getinterp
-    getinterp $P1
-# try: create handler
-    new $P9, 'ExceptionHandler'
-    set_label $P9, __label_1
-    push_eh $P9
-# try: begin
-# {
-# var pir_compiler: $P2
-# predefined compreg
-    compreg $P2, "PIR"
 # prog_name: $S1
     $S1 = __ARG_2[0]
 # input_file_type: $I1
-    $P9 = WSubId_1($S1)
-    set $I1, $P9
+    $P4 = WSubId_1($S1)
+    set $I1, $P4
 # output_file: $S2
     null $S2
-    if $I1, __label_3
+    if $I1 goto __label_1
     concat $S4, "Invalid file type ", $S1
-    WSubId_2($P1, $S4)
-  __label_3: # endif
-# var exe_name: $P3
-    $P3 = __ARG_1.'shift'()
-# var packfile_pmc: $P4
-    null $P4
+    WSubId_2($S4)
+  __label_1: # endif
+# var exe_name: $P1
+    $P1 = __ARG_1.'shift'()
+# var packfile_pmc: $P2
+    null $P2
 # for loop
 # i: $I2
     null $I2
-  __label_6: # for condition
+  __label_4: # for condition
 # predefined elements
     elements $I3, __ARG_1
-    ge $I2, $I3, __label_5
+    ge $I2, $I3, __label_3
 # {
 # sys_arg: $S3
     $S3 = __ARG_1[$I2]
 # switch
     set $S4, $S3
     set $S5, "-o"
-    if $S4 == $S5 goto __label_9
+    if $S4 == $S5 goto __label_7
     set $S5, "-c"
-    if $S4 == $S5 goto __label_10
+    if $S4 == $S5 goto __label_8
     set $S5, "-r"
-    if $S4 == $S5 goto __label_11
+    if $S4 == $S5 goto __label_9
     set $S5, "-E"
-    if $S4 == $S5 goto __label_12
+    if $S4 == $S5 goto __label_10
     set $S5, "-V"
-    if $S4 == $S5 goto __label_13
+    if $S4 == $S5 goto __label_11
     set $S5, "-h"
-    if $S4 == $S5 goto __label_14
-    goto __label_8
-  __label_9: # case
+    if $S4 == $S5 goto __label_12
+    goto __label_6
+  __label_7: # case
     inc $I2
     $S2 = __ARG_1[$I2]
-    goto __label_7 # break
-  __label_10: # case
+    goto __label_5 # break
+  __label_8: # case
     set $I1, 3
-    goto __label_7 # break
-  __label_11: # case
-    $P9 = WSubId_3($S1)
-    set $S2, $P9
-    $P4 = $P2.'compile_file'($S1)
-    $P4.'write_to_file'($S2)
-    new $P4, [ 'PackfileView' ]
-    $P4.'read_from_file'($S2)
+    goto __label_5 # break
+  __label_9: # case
+    $P4 = WSubId_3($S1)
+    set $S2, $P4
+# predefined compreg
+    compreg $P5, "PIR"
+    $P2 = $P5.'compile_file'($S1)
+    $P2.'write_to_file'($S2)
+    new $P2, [ 'PackfileView' ]
+    $P2.'read_from_file'($S2)
     null $S2
-    goto __label_7 # break
-  __label_12: # case
-    $P2.'preprocess'($S1)
+    goto __label_5 # break
+  __label_10: # case
+# predefined compreg
+    compreg $P6, "PIR"
+    $P6.'preprocess'($S1)
 # predefined exit
     exit 0
-  __label_13: # case
-    WSubId_4($P1)
-  __label_14: # case
-    WSubId_5($P1)
-  __label_8: # default
+  __label_11: # case
+    WSubId_4()
+  __label_12: # case
+    WSubId_5()
+  __label_6: # default
     concat $S6, "Unknown argument ", $S3
-    WSubId_2($P1, $S6)
-  __label_7: # switch end
+    WSubId_2($S6)
+  __label_5: # switch end
 # }
-  __label_4: # for iteration
+  __label_2: # for iteration
     set $I3, $I2
     inc $I2
-    goto __label_6
-  __label_5: # for end
+    goto __label_4
+  __label_3: # for end
 # predefined elements
     elements $I3, __ARG_2
-    ge $I3, 1, __label_15
-    WSubId_2($P1, "Missing program name")
-  __label_15: # endif
-    unless_null $P4, __label_16
-    $P4 = WSubId_6($S1, $I1, $P2)
-  __label_16: # endif
-    if_null $S2, __label_17
+    ge $I3, 1, __label_13
+    WSubId_2("Missing program name")
+  __label_13: # endif
+    unless_null $P2, __label_14
+    $P2 = WSubId_6($S1, $I1)
+  __label_14: # endif
+    if_null $S2, __label_15
 # {
-    $P4.'write_to_file'($S2)
+    $P2.'write_to_file'($S2)
 # predefined exit
     exit 0
 # }
-  __label_17: # endif
-    $P9 = $P4.'subs_by_tag'("init")
-    if_null $P9, __label_19
-    iter $P10, $P9
-    set $P10, 0
-  __label_18: # for iteration
-    unless $P10 goto __label_19
-    shift $P5, $P10
-    $P5()
-    goto __label_18
-  __label_19: # endfor
-# var main_sub: $P6
-    $P6 = $P4.'main_sub'()
-# var prt0_pf: $P7
-    $P7 = $P1["packfile"]
-    $P4.'set_current_packfile'($P1)
-    .tailcall $P6(__ARG_2)
+  __label_15: # endif
+    $P4 = $P2.'subs_by_tag'("init")
+    if_null $P4, __label_17
+    iter $P7, $P4
+    set $P7, 0
+  __label_16: # for iteration
+    unless $P7 goto __label_17
+    shift $P3, $P7
+    $P3()
+    goto __label_16
+  __label_17: # endfor
+    .return($P2)
+# }
+
+.end # __PARROT_ENTRY_MAIN__args
+
+
+.sub '__PARROT_ENTRY_MAIN__' :anon :main
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+.const 'Sub' WSubId_7 = "WSubId_7"
+.const 'Sub' WSubId_8 = "WSubId_8"
+# Body
+# {
+# try: create handler
+    new $P4, 'ExceptionHandler'
+    set_label $P4, __label_1
+    push_eh $P4
+# try: begin
+# {
+# var packfile_pmc: $P1
+    $P1 = WSubId_7(__ARG_1, __ARG_2)
+# var main_sub: $P2
+    $P2 = $P1.'main_sub'()
+    .tailcall $P2(__ARG_2)
 # }
 # try: end
     pop_eh
     goto __label_2
 # catch
   __label_1:
-    .get_results($P8)
-    finalize $P8
+    .get_results($P3)
+    finalize $P3
     pop_eh
 # {
-    WSubId_7($P1, $P8)
+    WSubId_8($P3)
 # }
 # catch end
   __label_2:
@@ -158,7 +167,6 @@
 .sub '__default_get_packfile' :subid('WSubId_6') :anon
         .param string __ARG_1
         .param int __ARG_2
-        .param pmc __ARG_3
 # Body
 # {
 # switch
@@ -171,22 +179,25 @@
     if $I1 == $I2 goto __label_5
     goto __label_2
   __label_3: # case
-# var pf: $P1
-    $P1 = __ARG_3.'compile_file'(__ARG_1)
-    .return($P1)
-  __label_4: # case
-# var pasm_compiler: $P2
+# var pir_compiler: $P1
 # predefined compreg
-    compreg $P2, "PASM"
-    .tailcall $P2.'compile_file'(__ARG_1)
+    compreg $P1, "PIR"
+# var pf: $P2
+    $P2 = $P1.'compile_file'(__ARG_1)
+    .return($P2)
+  __label_4: # case
+# var pasm_compiler: $P3
+# predefined compreg
+    compreg $P3, "PASM"
+    .tailcall $P3.'compile_file'(__ARG_1)
   __label_5: # case
-# var packfile_pmc: $P3
-    new $P3, [ 'PackfileView' ]
-    $P3.'read_from_file'(__ARG_1)
-    .return($P3)
-  __label_2: # default
-    null $P4
+# var packfile_pmc: $P4
+    new $P4, [ 'PackfileView' ]
+    $P4.'read_from_file'(__ARG_1)
     .return($P4)
+  __label_2: # default
+    null $P5
+    .return($P5)
   __label_1: # switch end
 # }
 
@@ -222,51 +233,50 @@
 .end # __get_input_file_type
 
 
-.sub '__handle_error_and_exit' :subid('WSubId_7') :anon
+.sub '__handle_error_and_exit' :subid('WSubId_8') :anon
         .param pmc __ARG_1
-        .param pmc __ARG_2
 # Body
 # {
 # severity: $I1
-    getattribute $P4, __ARG_2, 'severity'
+    getattribute $P4, __ARG_1, 'severity'
     set $I1, $P4
     ne $I1, 6, __label_1
-    getattribute $P4, __ARG_2, 'exit_code'
-    set $I5, $P4
+    getattribute $P4, __ARG_1, 'exit_code'
+    set $I4, $P4
 # predefined exit
-    exit $I5
+    exit $I4
   __label_1: # endif
 # var stderr_pmc: $P1
 # predefined getstderr
     getstderr $P1
 # message: $S1
-    getattribute $P4, __ARG_2, 'message'
+    getattribute $P4, __ARG_1, 'message'
     null $S1
     if_null $P4, __label_2
     set $S1, $P4
   __label_2:
-    isnull $I5, $S1
-    if $I5 goto __label_4
-    iseq $I5, $S1, ""
+    isnull $I4, $S1
+    if $I4 goto __label_4
+    iseq $I4, $S1, ""
   __label_4:
-    unless $I5 goto __label_3
+    unless $I4 goto __label_3
     set $S1, "No exception handler and no message"
   __label_3: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S1
-    push $P4, $P5
+    assign $P4, 1
+    $P4[0] = $S1
 # predefined sprintf
     sprintf $S5, "%s\n", $P4
     $P1.'print'($S5)
 # line_sep: $S2
     set $S2, ""
 # var bts: $P2
-    $P2 = __ARG_2.'backtrace_strings'()
+    $P2 = __ARG_1.'backtrace_strings'()
 # for loop
 # i: $I2
 # predefined elements
-    elements $I5, $P2
-    sub $I2, $I5, 1
+    elements $I4, $P2
+    sub $I2, $I4, 1
   __label_7: # for condition
     lt $I2, 0, __label_6
 # {
@@ -276,24 +286,21 @@
 # predefined split
     split $P3, "\n", $S3
     if_null $P3, __label_9
-    iter $P6, $P3
-    set $P6, 0
+    iter $P5, $P3
+    set $P5, 0
   __label_8: # for iteration
-    unless $P6 goto __label_9
-    shift $S4, $P6
+    unless $P5 goto __label_9
+    shift $S4, $P5
 # {
-# prt0_idx: $I3
-    null $I3
-# pirop index
-    index $I3, $S4, "__PARROT_ENTRY_MAIN__"
-    eq $I3, -1, __label_10
+# predefined indexof
+    index $I4, $S4, "__PARROT_ENTRY_MAIN__"
+    eq $I4, -1, __label_10
     goto __label_8 # continue
   __label_10: # endif
     root_new $P4, ['parrot';'ResizablePMCArray']
-    box $P5, $S2
-    push $P4, $P5
-    box $P5, $S4
-    push $P4, $P5
+    assign $P4, 2
+    $P4[0] = $S2
+    $P4[1] = $S4
 # predefined sprintf
     sprintf $S5, "%s%s", $P4
     $P1.'print'($S5)
@@ -304,41 +311,43 @@
     set $S2, "\nthrown from\n"
 # }
   __label_5: # for iteration
-    set $I5, $I2
+    set $I4, $I2
     dec $I2
     goto __label_7
   __label_6: # for end
-# exit_code: $I4
-    getattribute $P4, __ARG_2, 'exit_code'
-    set $I4, $P4
-    if $I4, __label_11
-    set $I4, 1
+# exit_code: $I3
+    getattribute $P4, __ARG_1, 'exit_code'
+    set $I3, $P4
+    if $I3 goto __label_11
+    set $I3, 1
   __label_11: # endif
 # predefined exit
-    exit $I4
+    exit $I3
 # }
 
 .end # __handle_error_and_exit
 
 
 .sub '__show_version_and_exit' :subid('WSubId_4') :anon
-        .param pmc __ARG_1
 # Body
 # {
 # var config: $P1
-    $P1 = __ARG_1[8]
+# predefined getinterp
+    getinterp $P3
+    $P1 = $P3[8]
 # msg_fmt: $S1
     set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2011, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
 # var msg: $P2
     root_new $P3, ['parrot';'ResizablePMCArray']
-    $P5 = $P1["VERSION"]
-    push $P3, $P5
-    $P6 = $P1["DEVEL"]
-    push $P3, $P6
-    $P7 = $P1["cpuarch"]
-    push $P3, $P7
-    $P8 = $P1["platform"]
-    push $P3, $P8
+    assign $P3, 4
+    $P4 = $P1["VERSION"]
+    $P3[0] = $P4
+    $P5 = $P1["DEVEL"]
+    $P3[1] = $P5
+    $P6 = $P1["cpuarch"]
+    $P3[2] = $P6
+    $P7 = $P1["platform"]
+    $P3[3] = $P7
 # predefined sprintf
     sprintf $S2, $S1, $P3
     box $P2, $S2
@@ -352,11 +361,10 @@
 
 
 .sub '__show_help_and_exit' :subid('WSubId_5') :anon
-        .param pmc __ARG_1
 # Body
 # {
 # msg: $S1
-    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
+    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
 # predefined say
     say $S1
 # predefined exit
@@ -378,15 +386,15 @@
 
 
 .sub '__usage_and_exit' :subid('WSubId_2') :anon
-        .param pmc __ARG_1
-        .param string __ARG_2 :optional
-        .param int __ARG_3 :opt_flag
+        .param string __ARG_1 :optional
+        .param int __ARG_2 :opt_flag
 # Body
 # {
 # var stderr: $P1
-    $P1 = __ARG_1.'stderr_handle'()
-    unless __ARG_3 goto __label_1
-    concat $S1, __ARG_2, "\n"
+# predefined getstderr
+    getstderr $P1
+    unless __ARG_2 goto __label_1
+    concat $S1, __ARG_1, "\n"
     $P1.'print'($S1)
   __label_1: # endif
     $P1.'print'("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ")

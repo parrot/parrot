@@ -231,9 +231,6 @@ mark_interp(PARROT_INTERP)
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
     Parrot_threads_gc_mark(interp);
 
-    /* s. packfile.c */
-    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
-
     /* mark caches and freelists */
     mark_object_cache(interp);
 
@@ -307,20 +304,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
             }
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
-
-
-                if (PObj_is_shared_TEST(b)) {
-                    /* only mess with shared objects if we
-                     * (and thus everyone) is suspended for
-                     * a GC run.
-                     * XXX wrong thing to do with "other" GCs
-                     */
-                    if (!(interp->thread_data
-                    &&   (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))) {
-                        ++total_used;
-                        goto next;
-                    }
-                }
 
                 if (gc_object)
                     gc_object(interp, mem_pools, pool, b);

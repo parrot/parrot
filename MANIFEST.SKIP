@@ -344,6 +344,8 @@
 ^/frontend/parrot2/prt0\.pbc/
 ^/frontend/parrot2/prt0\.pbc\.c$
 ^/frontend/parrot2/prt0\.pbc\.c/
+^/frontend/parrot2/prt0\.pbc\.o$
+^/frontend/parrot2/prt0\.pbc\.o/
 ^/frontend/parrot_debugger/.*\.gcda$
 ^/frontend/parrot_debugger/.*\.gcda/
 ^/frontend/parrot_debugger/.*\.gcno$
@@ -470,6 +472,8 @@
 ^/parrot_nci_thunk_gen\.c/
 ^/parrot_nci_thunk_gen\.pbc$
 ^/parrot_nci_thunk_gen\.pbc/
+^/parrot_old$
+^/parrot_old/
 ^/parrot_test_run\.tar\.gz$
 ^/parrot_test_run\.tar\.gz/
 ^/pbc_disassemble$
@@ -1066,6 +1070,10 @@
 ^/winxed/
 ^/winxed\..*$
 ^/winxed\..*/
+^cachegrind\.out\..*$
+^cachegrind\.out\..*/
+^callgrind\.out\..*$
+^callgrind\.out\..*/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

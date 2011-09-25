@@ -2801,7 +2801,7 @@ return ARG;
 case 24:
 YY_RULE_SETUP
 #line 292 "compilers/imcc/imcc.l"
-return SUB;
+{ SET_LINE_NUMBER; return SUB; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP

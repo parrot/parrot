@@ -23,6 +23,7 @@ passing to and from subroutines following the Parrot Calling Conventions.
 #include "args.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_fixedintegerarray.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -586,7 +587,7 @@ set_call_from_varargs(PARROT_INTERP,
     INTVAL       i            = 0;
 
     parse_signature_string(interp, sig, &arg_flags);
-    VTABLE_set_attr_str(interp, signature, CONST_STRING(interp, "arg_flags"), arg_flags);
+    SETATTR_CallContext_arg_flags(interp, signature, arg_flags);
 
     /* Process the varargs list */
     for (; sig[i] != '\0'; ++i) {
@@ -730,7 +731,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         return call_object;
 
     parse_signature_string(interp, sig, &arg_flags);
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), arg_flags);
+    SETATTR_CallContext_arg_flags(interp, call_object, arg_flags);
 
     /* Process the varargs list */
     for (i = 0; sig[i] != '\0'; ++i) {

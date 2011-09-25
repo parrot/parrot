@@ -22,11 +22,6 @@ DYNPMC_FOO_OBJS =       \
     src/dynpmc/foo2$(O)
 
 DYNPMC_H_FILES_MIN =                    \
-    include/parrot/atomic.h             \
-    include/parrot/atomic/fallback.h    \
-    include/parrot/atomic/gcc_pcc.h     \
-    include/parrot/atomic/gcc_x86.h     \
-    include/parrot/atomic/sparc.h       \
     include/parrot/caches.h             \
     include/parrot/call.h               \
     include/parrot/cclass.h             \
@@ -74,9 +69,6 @@ DYNPMC_H_FILES_MIN =                    \
     include/parrot/string.h             \
     include/parrot/string_funcs.h       \
     include/parrot/sub.h                \
-    include/parrot/thread.h             \
-    include/parrot/thr_pthread.h        \
-    include/parrot/thr_windows.h        \
     include/parrot/vtable.h             \
     include/parrot/vtables.h            \
     include/parrot/warnings.h           \

@@ -10,6 +10,10 @@
 *.patch
 *.diff
 
+# Ignore profiling files
+callgrind.out.*
+cachegrind.out.*
+
 # ports/ should not go into release tarballs
 *.obj
 *.rc
@@ -74,6 +78,7 @@
 /parrot_nci_thunk_gen.c
 /parrot_nci_thunk_gen.pbc
 /parrot_test_run.tar.gz
+/parrot_old
 /pbc_disassemble
 /pbc_dump
 /pbc_info
@@ -213,6 +218,7 @@
 /frontend/parrot2/main.o
 /frontend/parrot2/prt0.pbc
 /frontend/parrot2/prt0.pbc.c
+/frontend/parrot2/prt0.pbc.o
 /frontend/parrot_debugger/main.o
 /frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o

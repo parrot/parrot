@@ -43,8 +43,7 @@ extern int yydebug;
 /* defined in imcc.l */
 PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
-/* XXX non-reentrant */
-static Parrot_mutex eval_nr_lock;
+/* XXX non-reentrant because of global variables */
 static INTVAL       eval_nr  = 0;
 
 /* HEADERIZER HFILE: include/imcc/embed.h */
@@ -568,7 +567,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, evalname, 1);
     }
 
-    Parrot_pf_set_current_packfile(imcc->interp, packfilepmc, 1);
+    Parrot_pf_set_current_packfile(imcc->interp, packfilepmc);
 
     IMCC_push_parser_state(imcc, source, is_file, is_pasm);
 
@@ -580,7 +579,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         /* XXX Parrot_pf_get_packfile_pmc registers PMC */
         Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
         if (!PMC_IS_NULL(old_packfilepmc))
-            Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc, 1);
+            Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
         return PMCNULL;
     }
 
@@ -595,7 +594,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
     if (!PMC_IS_NULL(old_packfilepmc))
-        Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc, 1);
+        Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
     return packfilepmc;
 }
 
@@ -675,9 +674,6 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
         mem_sys_free(imcc->globals);
 
     mem_sys_free(imcc);
-
-    if (eval_nr != 0)
-        MUTEX_DESTROY(eval_nr_lock);
 }
 
 /*

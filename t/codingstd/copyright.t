@@ -134,7 +134,7 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'heredoc for print_introduction()',
     },
     {
-        file    => 't/tools/dev/searchops/samples.pm',
+        file    => 't/tools/dev/search_ops/samples.pm',
         reason  => 'sample code used in testing',
     },
     {

@@ -128,7 +128,7 @@ Return the memory address for the invocant.
 =cut
 
 .sub 'WHERE' :method :nsentry
-    $I0 = get_addr self
+    $I0 = get_id self
     .return ($I0)
 .end
 

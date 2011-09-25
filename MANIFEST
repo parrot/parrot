@@ -17,7 +17,6 @@ LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
-NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
@@ -886,11 +885,6 @@ include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
 include/parrot/alarm.h                                      [main]include
 include/parrot/api.h                                        [main]include
-include/parrot/atomic.h                                     [main]include
-include/parrot/atomic/fallback.h                            [main]include
-include/parrot/atomic/gcc_pcc.h                             [main]include
-include/parrot/atomic/gcc_x86.h                             [main]include
-include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
@@ -939,6 +933,7 @@ include/parrot/pobj.h                                       [main]include
 include/parrot/pointer_array.h                              [main]include
 include/parrot/runcore_api.h                                [main]include
 include/parrot/runcore_profiling.h                          [main]include
+include/parrot/runcore_subprof.h                            [main]include
 include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
@@ -946,10 +941,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
-include/parrot/thr_none.h                                   [main]include
-include/parrot/thr_pthread.h                                [main]include
-include/parrot/thr_windows.h                                [main]include
-include/parrot/thread.h                                     [main]include
 include/parrot/threads.h                                    [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
@@ -1052,6 +1043,7 @@ lib/Perl/Critic/Policy/TestingAndDebugging/ProhibitShebangWarningsArg.pm []
 lib/Perl/Critic/Policy/TestingAndDebugging/RequirePortableShebang.pm []
 lib/Pod/Escapes.pm                                          []
 lib/Pod/Simple.pm                                           []
+lib/Pod/Simple.pod                                          []
 lib/Pod/Simple/BlackBox.pm                                  []
 lib/Pod/Simple/Checker.pm                                   []
 lib/Pod/Simple/Debug.pm                                     []
@@ -1071,6 +1063,7 @@ lib/Pod/Simple/PullParserToken.pm                           []
 lib/Pod/Simple/RTF.pm                                       []
 lib/Pod/Simple/Search.pm                                    []
 lib/Pod/Simple/SimpleTree.pm                                []
+lib/Pod/Simple/Subclassing.pod                              []
 lib/Pod/Simple/Text.pm                                      []
 lib/Pod/Simple/TextContent.pm                               []
 lib/Pod/Simple/TiedOutFH.pm                                 []
@@ -1185,12 +1178,9 @@ runtime/parrot/library/pcore.pir                            [library]
 runtime/parrot/library/pcre.pir                             [library]
 runtime/parrot/library/postgres.declarations                [library]
 runtime/parrot/library/postgres.pir                         [library]
-runtime/parrot/library/random_lib.pir                       [library]
 runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
 src/alarm.c                                                 []
-src/atomic/gcc_x86.c                                        []
-src/atomic/sparc_v9.s                                       []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1437,7 +1427,6 @@ src/pmc/stringiterator.pmc                                  []
 src/pmc/structview.pmc                                      []
 src/pmc/sub.pmc                                             []
 src/pmc/task.pmc                                            []
-src/pmc/threadinterpreter.pmc                               []
 src/pmc/timer.pmc                                           []
 src/pmc/undef.pmc                                           []
 src/pmc/unmanagedstruct.pmc                                 []
@@ -1445,6 +1434,7 @@ src/pointer_array.c                                         []
 src/runcore/cores.c                                         []
 src/runcore/main.c                                          []
 src/runcore/profiling.c                                     []
+src/runcore/subprof.c                                       []
 src/runcore/trace.c                                         []
 src/scheduler.c                                             []
 src/spf_render.c                                            []
@@ -1465,8 +1455,6 @@ src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
 src/sub.c                                                   []
-src/thread.c                                                []
-src/threads.c                                               []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []
@@ -1855,6 +1843,7 @@ t/pharness/01-default_tests.t                               [test]
 t/pharness/02-get_test_prog_args.t                          [test]
 t/pharness/03-handle_long_options.t                         [test]
 t/pharness/04-Usage.t                                       [test]
+t/pir/interop.t                                             [test]
 t/pir/macro.t                                               [test]
 t/pir/pbc_fallback.t                                        [test]
 t/pir/registernames.t                                       [test]
@@ -1985,7 +1974,6 @@ t/run/README                                                []doc
 t/run/exit.t                                                [test]
 t/run/options.t                                             [test]
 t/src/README                                                []doc
-t/src/atomic.t                                              [test]
 t/src/basic.t                                               [test]
 t/src/checkdepend.t                                         [test]
 t/src/embed.t                                               [test]
@@ -2086,8 +2074,8 @@ t/tools/dev/headerizer/testlib/nci_pmc.in                   [test]
 t/tools/dev/headerizer/testlib/none.in                      [test]
 t/tools/dev/headerizer/testlib/validheader.in               [test]
 t/tools/dev/pmctree.t                                       [test]
-t/tools/dev/searchops.t                                     [test]
-t/tools/dev/searchops/samples.pm                            [test]
+t/tools/dev/search_ops.t                                    [test]
+t/tools/dev/search_ops/samples.pm                           [test]
 t/tools/dump_pbc.t                                          [test]
 t/tools/install/01-create_directories.t                     [test]
 t/tools/install/02-install_files.t                          [test]
@@ -2142,7 +2130,7 @@ tools/build/pmc2c.pl                                        [devel]
 tools/build/vtable_extend.pl                                []
 tools/build/vtable_h.pl                                     []
 tools/dev/.gdbinit                                          []
-tools/dev/README                                            []doc
+tools/dev/README.md                                         []doc
 tools/dev/addopstags.pl                                     []
 tools/dev/all_hll_test.pl                                   []
 tools/dev/as2c.pl                                           []
@@ -2153,7 +2141,7 @@ tools/dev/dedeprecator.nqp                                  []
 tools/dev/dump_pbc.pl                                       []
 tools/dev/faces.pl                                          []
 tools/dev/fetch_languages.pl                                []
-tools/dev/findhacks.pl                                      []
+tools/dev/find_hacks.pl                                     []
 tools/dev/gdb-pp-load.py                                    []
 tools/dev/gdb-pp.py                                         []
 tools/dev/gen_charset_tables.pl                             []
@@ -2182,9 +2170,9 @@ tools/dev/nci_thunk_gen.pir                                 []
 tools/dev/ncidef2pir.pl                                     []
 tools/dev/nopaste.pl                                        []
 tools/dev/parrot-config.pir                                 []
-tools/dev/parrot-fuzzer                                     []
 tools/dev/parrot.supp                                       []
 tools/dev/parrot_coverage.pl                                []
+tools/dev/parrot_fuzzer.py                                  []
 tools/dev/parrot_shell.pl                                   []
 tools/dev/parrotbench.pl                                    []
 tools/dev/pbc_header.pl                                     []
@@ -2197,7 +2185,8 @@ tools/dev/pmctree.pl                                        []
 tools/dev/pprof2cg.pl                                       [devel]
 tools/dev/reconfigure.pl                                    [devel]
 tools/dev/resolve_deprecated.nqp                            []
-tools/dev/search-ops.pl                                     []
+tools/dev/resubmit_smolder.pl                               []
+tools/dev/search_ops.pl                                     []
 tools/dev/show_deprecated.nqp                               []
 tools/dev/show_experimental.nqp                             []
 tools/dev/symlink.pl                                        []
@@ -2213,6 +2202,7 @@ tools/docs/ops_summary.pl                                   []
 tools/install/smoke.pl                                      []
 tools/install/smoke_languages.pl                            []
 tools/release/README                                        []doc
+tools/release/auto_release.pl                               []
 tools/release/crow.pir                                      []
 tools/release/cut.pl                                        []
 tools/release/gen_release_info.pl                           []

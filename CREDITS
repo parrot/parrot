@@ -674,7 +674,7 @@ N: Kevin Falcone
 N: Kevin Polulak
 U: soh_cah_toa
 E: kpolulak@gmail.com
-D: HBDB debugger
+D: HBDB debugger, release manager for 3.8.0
 S: New Jersey, USA
 
 N: Kevin Tew
@@ -814,6 +814,11 @@ D: adding function documentation
 D: tracwiki additions
 D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
+
+N: Michael Schroeder
+U: mls
+D: subprof profiling runcore
+E: mls@suse.de
 
 N: Michael G. Schwern
 

@@ -794,39 +794,6 @@ Set an attribute value for the exception object.
 
 /*
 
-=item C<PMC *share_ro()>
-
-Set this PMC as shared.
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        PMC *shared_self;
-        Parrot_Exception_attributes *shared_struct;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        shared_self = pt_shared_fixup(INTERP, SELF);
-        shared_struct = PARROT_EXCEPTION(shared_self);
-
-        if (!PMC_IS_NULL(shared_struct->payload))
-            shared_struct->payload = pt_shared_fixup(INTERP, shared_struct->payload);
-
-        if (!PMC_IS_NULL(shared_struct->backtrace))
-            shared_struct->backtrace = pt_shared_fixup(INTERP, shared_struct->backtrace);
-
-        if (!PMC_IS_NULL(shared_struct->handler_iter))
-            shared_struct->handler_iter = pt_shared_fixup(INTERP, shared_struct->handler_iter);
-
-        return shared_self;
-    }
-
-
-/*
-
 =item C<PMC *annotations>
 
 Gets any bytecode annotations in force at the point where the exception was

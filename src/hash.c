@@ -233,6 +233,40 @@ Parrot_hash_buffer(ARGIN_NULLOK(const unsigned char *buf), size_t len, size_t ha
 
 /*
 
+=item C<size_t Parrot_hash_pointer(const void * const p, size_t hashval)>
+
+A (weak) perfect hash over pointers.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+size_t
+Parrot_hash_pointer(ARGIN_NULLOK(const void * const p), size_t hashval)
+{
+    ASSERT_ARGS(Parrot_hash_pointer)
+    size_t x = (size_t)p;
+    hashval ^= x;
+
+    {
+        unsigned char *c = (unsigned char *)&hashval;
+        unsigned int i, j;
+        for (i = 0; i < sizeof hashval; i++) {
+            /* swap bitsex of every byte */
+            unsigned char tmp = 0;
+            for (j = 0; j < CHAR_BIT; j++)
+                tmp |= (0x1 & c[i] >> j) << (CHAR_BIT - j - 1);
+            c[i] = tmp;
+        }
+    }
+
+    return hashval;
+}
+
+/*
+
 =item C<static size_t key_hash_STRING(PARROT_INTERP, const STRING *s, size_t
 seed)>
 

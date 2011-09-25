@@ -1,5 +1,5 @@
 /* scheduler.h
- *  Copyright (C) 2007, Parrot Foundation.
+ *  Copyright (C) 2007-2011, Parrot Foundation.
  *  Overview:
  *     Parrot concurrency scheduler private core structs and flags
  *  Data Structure and Algorithms:
