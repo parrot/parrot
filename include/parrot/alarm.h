@@ -17,11 +17,11 @@ int Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 PARROT_EXPORT
 void Parrot_alarm_set(FLOATVAL when);
 
-void Parrot_alarm_callback(NULLOK(int sig_number));
+void Parrot_alarm_callback(int sig_number);
 void Parrot_alarm_init(void);
-void Parrot_alarm_mask(SHIM_INTERP);
+void Parrot_alarm_mask(PARROT_INTERP);
 void Parrot_alarm_now(void);
-void Parrot_alarm_unmask(SHIM_INTERP);
+void Parrot_alarm_unmask(PARROT_INTERP);
 #define ASSERT_ARGS_Parrot_alarm_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(last_serial))
 #define ASSERT_ARGS_Parrot_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

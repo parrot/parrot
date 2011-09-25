@@ -106,7 +106,7 @@ Returns the number associated with C<key>.
 
 */
 
-    VTABLE FLOATVAL get_pmc_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
         if (key == PARROT_ALARM_TIME) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
             return data->alarm_time;

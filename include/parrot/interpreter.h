@@ -130,10 +130,13 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/call.h"
 #include "parrot/gc_api.h"
 
+#include "parrot/thread.h"
+
 typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
+struct Thread_table;    /* in threads.h */
 struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
@@ -234,7 +237,6 @@ struct parrot_interp_t {
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
     Hash        *const_cstring_hash;          /* cache of const_string items */
 
-    struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
@@ -243,6 +245,15 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+
+    UINTVAL          last_alarm;              /* has an alarm triggered? */
+    FLOATVAL         quantum_done;            /* expiration of current quantum */
+
+    Parrot_mutex     interp_lock;             /* Enforce one running thread per interp */
+
+    struct Thread_table  *thread_table;       /* Array of this interpreter's threads */
+    Parrot_atomic_integer thread_signal;      /* Flag. Set if threads need rescheduling */
+    Parrot_mutex          thread_lock;        /* Lock for the thread_table */
 
     struct _Thread_data *thread_data;         /* thread specific items */
 

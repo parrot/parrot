@@ -188,7 +188,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_initialize)
 
-    interp->thread_table->threads[0].lo_var_ptr = stacktop;
+    interp->thread_table->threads[0].lo_var_ptr = args->stacktop;
 
     interp->gc_sys->sys_type = PARROT_GC_DEFAULT_TYPE;
 

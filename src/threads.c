@@ -18,10 +18,11 @@ These functions transparently manage OS threads in the Parrot interpreter.
 
 */
 
+#include <signal.h>
 #include "parrot/threads.h"
 #include "parrot/alarm.h"
-#include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_task.h"
+#include "pmc/pmc_scheduler.h"
 
 /* HEADERIZER HFILE: include/parrot/threads.h */
 

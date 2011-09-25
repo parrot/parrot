@@ -5,6 +5,7 @@
 #ifndef PARROT_THREADS_H_GUARD
 #define PARROT_THREADS_H_GUARD
 
+#include "parrot/parrot.h"
 #include "parrot/thread.h"
 
 enum Thread_states {
@@ -124,7 +125,7 @@ void Parrot_threads_spawn(PARROT_INTERP)
 void Parrot_threads_task_killed(PARROT_INTERP, INTVAL tidx)
         __attribute__nonnull__(1);
 
-void Parrot_threads_task_killed_handler(NULLOK(int sig_number));
+void Parrot_threads_task_killed_handler(int sig_number);
 void Parrot_threads_unblock(PARROT_INTERP, ARGIN(INTVAL *tidx_ptr))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
