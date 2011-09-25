@@ -1107,6 +1107,10 @@ enum OPS_ENUM {
     enum_ops_root_new_p_pc_i               = 1090,
     enum_ops_root_new_p_p_ic               = 1091,
     enum_ops_root_new_p_pc_ic              = 1092,
+    enum_ops_receive_p                     = 1093,
+    enum_ops_wait_p                        = 1094,
+    enum_ops_wait_pc                       = 1095,
+    enum_ops_pass                          = 1096,
 };
 
 
