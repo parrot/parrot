@@ -882,6 +882,45 @@ Return the POST representation of a C<PAST::Control>.
     .return (ops)
 .end
 
+.sub 'push_exception_handler' :method
+    .param pmc node
+    .param pmc ops
+    .param pmc label
+
+    .local string type, extype
+    type = node.'handle_types'()
+    extype = node.'handle_types_except'()
+    if type goto handler_need_exhandler
+    if extype goto handler_need_exhandler
+    ops.'push_pirop'('push_eh', label)
+    .return ()
+
+  handler_need_exhandler:
+    .local pmc controltypes, subpost
+    .local string ehreg
+    subpost = find_dynamic_lex '$*SUB'
+    ehreg = self.'uniquereg'('P')
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
+    ops.'push_pirop'('set_label', ehreg, label)
+    controltypes = get_global '%!controltypes'
+    unless type, handle_types_done
+    type = controltypes[type]
+    unless type, handle_types_done
+    $P0 = split ',', type
+    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_done:
+    unless extype, handle_types_except_done
+    extype = controltypes[extype]
+    unless extype, handle_types_except_done
+    $P0 = split ',', extype
+    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
+    subpost.'add_directive'('.include "except_types.pasm"')
+  handle_types_except_done:
+    ops.'push_pirop'('push_eh', ehreg)
+    .return ()
+.end
+
 .sub 'wrap_handlers' :method
     .param pmc child
     .param pmc ehs
@@ -911,36 +950,11 @@ Return the POST representation of a C<PAST::Control>.
     unless it, handler_loop_done
     node = shift it
 
-    .local pmc ehpir, label, controltypes, subpost
-    .local string ehreg, type
+    .local pmc ehpir, label
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
-
-    subpost = find_dynamic_lex '$*SUB'
-
-    ehreg = self.'uniquereg'('P')
-    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_label', ehreg, label)
-    controltypes = get_global '%!controltypes'
-    type = node.'handle_types'()
-    unless type, handle_types_done
-    type = controltypes[type]
-    unless type, handle_types_done
-    $P0 = split ',', type
-    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
-    subpost.'add_directive'('.include "except_types.pasm"')
-  handle_types_done:
-    type = node.'handle_types_except'()
-    unless type, handle_types_except_done
-    type = controltypes[type]
-    unless type, handle_types_except_done
-    $P0 = split ',', type
-    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
-    subpost.'add_directive'('.include "except_types.pasm"')
-  handle_types_except_done:
-    ops.'push_pirop'('push_eh', ehreg)
-
+    self.'push_exception_handler'(node, ops, label)
     # Add one pop_eh for every handler we push_eh
     pops.'push_pirop'('pop_eh')
 
@@ -1875,7 +1889,7 @@ a return value.
 =item try(PAST::Op node)
 
 Return the POST representation of a C<PAST::Op>
-node with a 'pasttype' of bind.  The first child
+node with a 'pasttype' of try.  The first child
 is the code to be surrounded by an exception handler,
 the second child (if any) is the code to process the
 handler.
@@ -1903,7 +1917,7 @@ handler.
     .local pmc trypast, trypost
     trypast = node[0]
     trypost = self.'as_post'(trypast, 'rtype'=>rtype)
-    ops.'push_pirop'('push_eh', catchlabel)
+    self.'push_exception_handler'(node, ops, catchlabel)
     ops.'push'(trypost)
     ops.'push_pirop'('pop_eh')
     .local pmc elsepast, elsepost
