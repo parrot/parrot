@@ -244,6 +244,7 @@ struct parrot_interp_t {
     Parrot_jump_buff *api_jmp_buf;            /* jmp point out of Parrot */
     PMC * final_exception;                    /* Final exception PMC */
     INTVAL exit_code;
+    gc_anchor_storage *                       /* GC anchor storage structure */
 };
 
 /* typedef struct parrot_interp_t Interp;    done in parrot.h so that

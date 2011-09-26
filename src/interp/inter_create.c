@@ -338,6 +338,8 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         Parrot_x_on_exit(interp, Parrot_really_destroy, NULL);
 #endif
 
+    interp->gc_anchor_storage = NULL;
+
     return interp;
 }
 

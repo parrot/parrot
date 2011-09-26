@@ -118,6 +118,48 @@ typedef enum {
 #define GC_strings_cb_FLAG     (UINTVAL)(1 << 4)   /* Invoked from String GC during mem_alloc to sweep dead strings */
                                                    /* garbage collect. */
 
+typedef struct __gc_anchor_storage {
+    struct __gc_anchor_storage *prev;
+    size_t elements;
+} gc_anchor_storage;
+
+#define GC_SETUP_ANCHOR_STORAGE(i, n) { \
+        const size_t __num_slots = n; \
+        const size_t __pmc_storage_size = (n) * sizeof (PMC *); \
+        const size_t __anchor_storage_size = __pmc_storage_size + sizeof (gc_anchor_storage); \
+        gc_anchor_storage * const  __anchor_storage = (gc_anchor_storage *) \
+            Parrot_gc_allocate_fixed_size_storage((i), __anchor_storage_size); \
+        PMC ** __anchor_storage_slots = (PMC **) (__anchor_storage + 1); \
+        memset(__anchor_storage_slots, 0, ); \
+        __anchor_storage->size = __pmc_storage_size; \
+        __anchor_storage->prev = (i)->gc_anchor_storage->prev; \
+        (i)->gc_anchor_storage = __anchor_storage; \
+        {
+
+#define GC_CLEANUP_ANCHOR_STORAGE(i) \
+        } \
+        { \
+            gc_anchor_storage * __current_storage = (i)->gc_anchor_storage; \
+            while (__current_storage && __current_storage != __anchor_storage) { \
+                gc_anchor_storage * __tmp = __current_storage->prev; \
+                Parrot_gc_free_fixed_size_storage((i), __anchor_storage_size, __current_storage); \
+                __current_storage = __tmp; \
+            } \
+            (i)->gc_anchor_storage = __current_storage; \
+        } \
+    }
+
+#define GC_GET_ANCHOR_STORAGE(n, p) { \
+        PARROT_ASSERT(n < __num_slots); \
+        (p) = __anchor_storage_slots[(n)]; \
+    }
+
+#define GC_SET_ANCHOR_STORAGE(n, p) { \
+        PARROT_ASSERT(n < __num_slots); \
+        __anchor_storage[(n)] = (p); \
+    }
+
+
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
