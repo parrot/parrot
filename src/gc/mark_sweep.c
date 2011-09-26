@@ -178,9 +178,12 @@ Parrot_gc_trace_root(PARROT_INTERP,
             = interp->iglobals;
     }
 
+#if GC_USE_PRECISE != 2
 
     if (trace == GC_TRACE_FULL)
         trace_system_areas(interp, mem_pools);
+
+#endif
 
     mark_interp(interp);
 
@@ -257,6 +260,8 @@ mark_interp(PARROT_INTERP)
     if (interp->parent_interpreter)
         mark_interp(interp->parent_interpreter);
 
+#if GC_USE_PRECISE != 0
+
     {
         gc_anchor_storage * s = interp->gc_anchor_storage;
         while(s) {
@@ -271,6 +276,8 @@ mark_interp(PARROT_INTERP)
             s = s->prev;
         }
     }
+
+#endif
 }
 
 

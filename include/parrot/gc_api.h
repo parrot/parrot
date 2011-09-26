@@ -11,6 +11,14 @@
 
 #include "parrot/parrot.h"
 
+/* Flag to turn on precise GC
+    0 = no precise GC (use only stack walking)
+    1 = precise GC + stack walking
+    2 = precise GC only (this is what we want)
+*/
+
+#define GC_USE_PRECISE 1
+
 /*
  * we need an alignment that is the same as malloc(3) have for
  * allocating Buffer items like FLOATVAL (double)
@@ -123,6 +131,8 @@ typedef struct __gc_anchor_storage {
     size_t elements;
 } gc_anchor_storage;
 
+#if GC_USE_PRECISE != 0
+
 #define GC_SETUP_ANCHOR_STORAGE(i, n) { \
         const size_t __num_slots = n; \
         const size_t __pmc_storage_size = (n) * sizeof (PMC *); \
@@ -158,6 +168,15 @@ typedef struct __gc_anchor_storage {
         PARROT_ASSERT(n < __num_slots); \
         __anchor_storage[(n)] = (p); \
     }
+
+#else
+
+#define GC_SETUP_ANCHOR_STORAGE(i, n)
+#define GC_CLEANUP_ANCHOR_STORAGE(i)
+#define GC_GET_ANCHOR_STORAGE(n, p)
+#define GC_SET_ANCHOR_STORAGE(n, p)
+
+#endif
 
 
 /* HEADERIZER BEGIN: src/gc/api.c */
