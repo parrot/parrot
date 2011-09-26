@@ -250,21 +250,25 @@ static PMC *
 internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int flags)
 {
     ASSERT_ARGS(internal_ns_maybe_create)
+    PMC * sub_ns;
 
     /* TT #1220 - stop depending on typed namespace */
     if (!(flags & INTERN_NS_CREAT))
         return PMCNULL;
-    else {
+
+    GC_STACK_FRAME(interp, 1, 0, {
         const INTVAL type_id = Parrot_hll_get_ctx_HLL_type(interp, enum_class_NameSpace);
+
         /* TT #1221 - match HLL of enclosing namespace? */
-        PMC * const sub_ns = Parrot_pmc_new(interp, type_id);
+        sub_ns = Parrot_pmc_new(interp, type_id);
+        GC_SET_PMC_ANCHOR(0, sub_ns);
 
-        if (PMC_IS_NULL(sub_ns))
-            return PMCNULL;
-
-        VTABLE_set_pmc_keyed_str(interp, ns, key, sub_ns);
-        return sub_ns;
-    }
+        if (!PMC_IS_NULL(sub_ns))
+            VTABLE_set_pmc_keyed_str(interp, ns, key, sub_ns);
+        else
+            sub_ns = PMCNULL;
+    });
+    return sub_ns;
 }
 
 /*
@@ -318,25 +322,30 @@ static void
 store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(store_sub_in_multi)
-    Parrot_Sub_attributes *sub;
-    STRING     *ns_entry_name;
-    PMC        *multisub;
+    GC_STACK_FRAME(interp, 1, 0, {
+        Parrot_Sub_attributes *sub;
+        STRING     *ns_entry_name;
+        PMC        *multisub;
 
-    PMC_get_sub(interp, sub_pmc, sub);
-    ns_entry_name = sub->ns_entry_name;
-    multisub      = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
+        PMC_get_sub(interp, sub_pmc, sub);
+        ns_entry_name = sub->ns_entry_name;
+        multisub      = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
+        GC_SET_PMC_ANCHOR(0, multisub);
 
-    /* is there an existing MultiSub PMC? or do we need to create one? */
-    if (PMC_IS_NULL(multisub)) {
-        multisub = Parrot_pmc_new(interp,
-                                  Parrot_hll_get_ctx_HLL_type(interp, enum_class_MultiSub));
-        /* we have to push the sub onto the MultiSub before we try to store
-        it because storing requires information from the sub */
-        VTABLE_push_pmc(interp, multisub, sub_pmc);
-        VTABLE_set_pmc_keyed_str(interp, ns, ns_entry_name, multisub);
-    }
-    else
-        VTABLE_push_pmc(interp, multisub, sub_pmc);
+        /* is there an existing MultiSub PMC? or do we need to create one? */
+        if (PMC_IS_NULL(multisub)) {
+
+            multisub = Parrot_pmc_new(interp,
+                                      Parrot_hll_get_ctx_HLL_type(interp, enum_class_MultiSub));
+            GC_SET_PMC_ANCHOR(0, multisub);
+            /* we have to push the sub onto the MultiSub before we try to store
+            it because storing requires information from the sub */
+            VTABLE_push_pmc(interp, multisub, sub_pmc);
+            VTABLE_set_pmc_keyed_str(interp, ns, ns_entry_name, multisub);
+        }
+        else
+            VTABLE_push_pmc(interp, multisub, sub_pmc);
+    });
 }
 
 /*
