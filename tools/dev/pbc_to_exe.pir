@@ -106,7 +106,10 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not build args array");
                 show_last_error_and_exit(interp);
             }
-            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+            if (!Parrot_api_load_bytecode_bytes(interp,
+                                                program_code_addr,
+                                                (Parrot_Int) bytecode_size,
+                                                &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
