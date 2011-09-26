@@ -265,6 +265,21 @@ mark_interp(PARROT_INTERP)
      * so only mark it in the main thread */
     if (! Interp_flags_TEST(interp, PARROT_IS_THREAD))
         mark_code_segment(interp);
+
+    {
+        gc_anchor_storage * s = interp->gc_anchor_storage;
+        while(s) {
+            PMC ** const p = (PMC **)(s + 1);
+            size_t size = s->size;
+            size_t t = 0;
+            for( ; t < size; t++) {
+                PMC * const pmc = p[t];
+                if (!PMC_IS_NULL(pmc))
+                    Parrot_gc_mark_PMC_alive(interp, pmc);
+            }
+            s = s->prev;
+        }
+    }
 }
 
 /*
