@@ -13,7 +13,7 @@
 
 /* Flag to turn on precise GC
     0 = no precise GC (use only stack walking)
-    1 = precise GC + stack walking
+    1 = precise GC + stack walking (for debug, also print debug messages)
     2 = precise GC only (this is what we want)
 */
 

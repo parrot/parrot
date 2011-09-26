@@ -485,14 +485,25 @@ trace_mem_block(PARROT_INTERP,
             if ((pmc_min <= ptr)
             &&  (ptr < pmc_max)
             &&  interp->gc_sys->is_pmc_ptr(interp, (void *)ptr)) {
+#if GC_USE_PRECISE == 1
+                fprintf(stderr, "GC_USE_PRECISE: Found PMC %x at stack location %x\n", ptr, cur_var_ptr);
+#endif
                 Parrot_gc_mark_PMC_alive(interp, (PMC *)ptr);
             }
             else if ((buffer_min <= ptr) && (ptr < buffer_max)
             &&        interp->gc_sys->is_string_ptr(interp, (void *)ptr)) {
-                if (PObj_is_string_TEST((PObj *)ptr))
+                if (PObj_is_string_TEST((PObj *)ptr)) {
+#if GC_USE_PRECISE == 1
+                    fprintf(stderr, "GC_USE_PRECISE: Found STRING %x at stack location %x\n", ptr, cur_var_ptr);
+#endif
                     Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
-                else
+                }
+                else {
+#if GC_USE_PRECISE == 1
+                    fprintf(stderr, "GC_USE_PRECISE: Found random PObj (???) %x at stack location %x\n", ptr, cur_var_ptr);
+#endif
                     PObj_live_SET((PObj *)ptr);
+                }
             }
         }
     }
