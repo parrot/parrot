@@ -1911,12 +1911,17 @@ handler.
     $S0 = concat $S0, '_end'
     endlabel = $P0.'new'('result'=>$S0)
 
-    .local string rtype
+    .local string rtype, result
     rtype = options['rtype']
+    result = self.'tempreg'(rtype)
+    ops.'result'(result)
 
     .local pmc trypast, trypost
     trypast = node[0]
     trypost = self.'as_post'(trypast, 'rtype'=>rtype)
+    unless result goto trypost_no_result
+    trypost = self.'coerce'(trypost, result)
+  trypost_no_result:
     self.'push_exception_handler'(node, ops, catchlabel)
     ops.'push'(trypost)
     ops.'push_pirop'('pop_eh')
@@ -1931,12 +1936,14 @@ handler.
     .local pmc catchpast, catchpost
     catchpast = node[1]
     if null catchpast goto catch_done
-    catchpost = self.'as_post'(catchpast, 'rtype'=>'v')
+    catchpost = self.'as_post'(catchpast, 'rtype'=>rtype)
+    unless result goto catchpost_no_result
+    catchpost = self.'coerce'(catchpost, result)
+  catchpost_no_result:
     ops.'push'(catchpost)
     ops.'push_pirop'('pop_eh')         # FIXME: should be before catchpost
   catch_done:
     ops.'push'(endlabel)
-    ops.'result'(trypost)
     .return (ops)
 .end
 
