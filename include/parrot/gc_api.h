@@ -128,21 +128,25 @@ typedef enum {
 
 typedef struct __gc_anchor_storage {
     struct __gc_anchor_storage *prev;
-    size_t elements;
+    size_t num_p;
+    size_t num_s;
 } gc_anchor_storage;
 
 #if GC_USE_PRECISE != 0
 
-#define GC_SETUP_ANCHOR_STORAGE(i, n) { \
-        const size_t __num_slots = n; \
-        const size_t __pmc_storage_size = (n) * sizeof (PMC *); \
-        const size_t __anchor_storage_size = __pmc_storage_size + sizeof (gc_anchor_storage); \
+#define GC_SETUP_ANCHOR_STORAGE(i, p, s) { \
+        const size_t __num_pmc_slots = ; \
+        const size_t __num_str_slots = s; \
+        const size_t __slot_storage_size = ((p) * sizeof (PMC *)) + ((s) * sizeof(STRING*)); \
+        const size_t __total_storage_size = __slot_storage_size + sizeof (gc_anchor_storage); \
         gc_anchor_storage * const  __anchor_storage = (gc_anchor_storage *) \
-            Parrot_gc_allocate_fixed_size_storage((i), __anchor_storage_size); \
-        PMC ** __anchor_storage_slots = (PMC **) (__anchor_storage + 1); \
-        memset(__anchor_storage_slots, 0, ); \
-        __anchor_storage->size = __pmc_storage_size; \
-        __anchor_storage->prev = (i)->gc_anchor_storage->prev; \
+            Parrot_gc_allocate_fixed_size_storage((i), __total_storage_size); \
+        PMC ** const __pmc_storage_slots = (PMC **) (__anchor_storage + 1); \
+        STRING ** const __str_storage_slots = (STRING **) (__pmc_storage_slots + __num_pmc_slots); \
+        memset(__anchor_storage, 0, __total_storage_size); \
+        __anchor_storage->num_p = __pmc_storage_size; \
+        __anchor_storage->num_s = __str_storage_size; \
+        __anchor_storage->prev = (i)->gc_anchor_storage; \
         (i)->gc_anchor_storage = __anchor_storage; \
         {
 
@@ -151,7 +155,7 @@ typedef struct __gc_anchor_storage {
         { \
             gc_anchor_storage * __current_storage = (i)->gc_anchor_storage; \
             while (__current_storage && __current_storage != __anchor_storage) { \
-                gc_anchor_storage * __tmp = __current_storage->prev; \
+                gc_anchor_storage * const __tmp = __current_storage->prev; \
                 Parrot_gc_free_fixed_size_storage((i), __anchor_storage_size, __current_storage); \
                 __current_storage = __tmp; \
             } \
@@ -159,22 +163,34 @@ typedef struct __gc_anchor_storage {
         } \
     }
 
-#define GC_GET_ANCHOR_STORAGE(n, p) { \
-        PARROT_ASSERT(n < __num_slots); \
-        (p) = __anchor_storage_slots[(n)]; \
+#define GC_GET_PMC_ANCHOR(n, p) { \
+        PARROT_ASSERT(n < __num_pmc_slots); \
+        (p) = __pmc_storage_slots[(n)]; \
     }
 
-#define GC_SET_ANCHOR_STORAGE(n, p) { \
-        PARROT_ASSERT(n < __num_slots); \
-        __anchor_storage[(n)] = (p); \
+#define GC_SET_PMC_ANCHOR(n, p) { \
+        PARROT_ASSERT(n < __num_pmc_slots); \
+        __pmc_storage_slots[(n)] = (p); \
+    }
+
+#define GC_GET_STRING_ANCHOR(n, s) { \
+        PARROT_ASSERT(n < __num_str_slots); \
+        (s) = __str_storage_slots[(n)]; \
+    }
+
+#define GC_SET_STRING_ANCHOR(n, s) { \
+        PARROT_ASSERT(n < __num_str_slots); \
+        __str_storage_slots[(n)] = (s); \
     }
 
 #else
 
 #define GC_SETUP_ANCHOR_STORAGE(i, n)
 #define GC_CLEANUP_ANCHOR_STORAGE(i)
-#define GC_GET_ANCHOR_STORAGE(n, p)
-#define GC_SET_ANCHOR_STORAGE(n, p)
+#define GC_GET_PMC_ANCHOR(n, p)
+#define GC_SET_PMC_ANCHOR(n, p)
+#define GC_GET_STRING_ANCHOR(n, s)
+#define GC_SET_STRING_ANCHOR(n, s)
 
 #endif
 

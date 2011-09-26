@@ -263,17 +263,24 @@ mark_interp(PARROT_INTERP)
 #if GC_USE_PRECISE != 0
 
     {
-        gc_anchor_storage * s = interp->gc_anchor_storage;
-        while(s) {
-            PMC ** const p = (PMC **)(s + 1);
-            size_t size = s->size;
-            size_t t = 0;
-            for( ; t < size; t++) {
-                PMC * const pmc = p[t];
+        gc_anchor_storage * gcas = interp->gc_anchor_storage;
+        while(gcas) {
+            const size_t num_p = gcas->num_p;
+            const size_t num_s = gcas->num_s;
+            PMC ** const ps = (PMC **)(gcas + 1);
+            STRING ** const ss = (STRING **)(ps + num_p);
+            size_t t;
+            for(t = 0 ; t < num_p; t++) {
+                PMC * const pmc = ps[t];
                 if (!PMC_IS_NULL(pmc))
                     Parrot_gc_mark_PMC_alive(interp, pmc);
             }
-            s = s->prev;
+            for(t = 0 ; t < num_s; t++) {
+                STRING * const str = ss[t];
+                if (!PMC_IS_NULL(str))
+                    Parrot_gc_mark_STRING_alive(interp, str);
+            }
+            gcas = gcas->prev;
         }
     }
 
