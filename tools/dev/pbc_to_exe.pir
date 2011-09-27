@@ -139,6 +139,7 @@ HEADER
 
             if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
                 exit(EXIT_FAILURE);
+
             if (is_error) {
                 if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
                     exit(EXIT_FAILURE);
@@ -152,10 +153,14 @@ HEADER
         static void
         print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
         {
-            char * msg_raw;
+            char *msg_raw;
+
             if (!str)
                 return;
-            Parrot_api_string_export_ascii(interp, str, &msg_raw);
+
+            if (!Parrot_api_string_export_ascii(interp, str, &msg_raw))
+                show_last_error_and_exit(interp);
+
             if (msg_raw) {
                 fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
                 Parrot_api_string_free_exported_ascii(interp, msg_raw);
