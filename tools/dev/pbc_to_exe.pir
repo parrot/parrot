@@ -163,7 +163,9 @@ HEADER
 
             if (msg_raw) {
                 fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
-                Parrot_api_string_free_exported_ascii(interp, msg_raw);
+
+                if (!Parrot_api_string_free_exported_ascii(interp, msg_raw))
+                    show_last_error_and_exit(interp);
             }
         }
 
