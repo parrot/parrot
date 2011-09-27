@@ -849,8 +849,8 @@ Return the POST representation of a C<PAST::Control>.
     .param pmc options         :slurpy :named
 
      # Probably not safe to use tempregs in an exception handler
-     .local pmc tempregs
-     null tempregs
+    .local pmc tempregs
+    null tempregs
     .lex '%*TEMPREGS', tempregs
 
     .local pmc ops, children, ishandled, nothandled
@@ -926,12 +926,17 @@ Return the POST representation of a C<PAST::Control>.
     .param pmc ehs
     .param pmc options         :slurpy :named
 
-    .local string rtype
+    .local string rtype, result
+    .local int addreturn
     rtype = options['rtype']
+    addreturn = options['addreturn']
+    if addreturn goto wrap_no_result
+    result = self.'tempreg'(rtype)
+  wrap_no_result:
 
-     # Probably not safe to use tempregs in an exception handler
-     .local pmc tempregs
-     null tempregs
+    # Probably not safe to use tempregs in an exception handler
+    .local pmc tempregs
+    null tempregs
     .lex '%*TEMPREGS', tempregs
 
     .local pmc it, node, ops, pops, tail, skip
@@ -944,6 +949,11 @@ Return the POST representation of a C<PAST::Control>.
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('skip_handler_')
     skip = $P0.'new'('result'=>$S0)
+
+    ops.'result'(result)
+    unless result goto wrap_child_no_result
+    child = self.'coerce'(child, result)
+  wrap_child_no_result:
 
     it = iter ehs
   handler_loop:
@@ -961,8 +971,14 @@ Return the POST representation of a C<PAST::Control>.
     # Push the handler itself
     tail.'push'(label)
     ehpir = self.'as_post'(node, 'rtype'=>rtype)
+    unless result goto handler_loop_no_result
+    ehpir = self.'coerce'(ehpir, result)
+  handler_loop_no_result:
     tail.'push'(ehpir)
-
+    unless addreturn goto handler_loop
+    .local pmc retval
+    retval = ehpir.'result'()
+    tail.'push_pirop'('return', retval)
     goto handler_loop
   handler_loop_done:
 
@@ -1131,18 +1147,14 @@ Return the POST representation of a C<PAST::Block>.
     ##  convert children to post
     .local pmc ops, retval
     ops = self.'post_children'(node, 'signature'=>$S0)
+    ##  result of last child is return from block
+    retval = ops[-1]
     ##  wrap the child with appropriate exception handlers, if any
     .local pmc eh
     eh = node.'handlers'()
     unless eh, no_eh
-    $S0 = options['rtype']
-    retval = ops[-1]
-    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>$S0)
-    goto had_eh
+    ops = self.'wrap_handlers'(ops, eh, 'rtype'=>'*', 'addreturn'=>1)
   no_eh:
-    ##  result of last child is return from block
-    retval = ops[-1]
-  had_eh:
     bpost.'push'(ops)
     bpost.'push_pirop'('return', retval)
 
