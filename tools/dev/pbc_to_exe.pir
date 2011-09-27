@@ -80,15 +80,18 @@ HEADER
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
-            PMC * interp;
-            PMC * pbc;
-            PMC * argsarray;
+            PMC                 *interp;
+            PMC                 *pbc;
+            PMC                 *argsarray;
             const unsigned char *program_code_addr;
-            Parrot_Init_Args *initargs;
+
+            Parrot_Init_Args    *initargs;
             GET_INIT_STRUCT(initargs);
+
             initargs->gc_system = GCCORE;
 
             program_code_addr = (const unsigned char *)get_program_code();
+
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
 
@@ -106,6 +109,7 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not build args array");
                 show_last_error_and_exit(interp);
             }
+
             if (!Parrot_api_load_bytecode_bytes(interp,
                                                 program_code_addr,
                                                 (Parrot_Int) bytecode_size,
@@ -113,11 +117,16 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
+
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray, NULL)) {
                 show_last_error_and_exit(interp);
             }
 
-            Parrot_api_destroy_interpreter(interp);
+            if (!Parrot_api_destroy_interpreter(interp)) {
+                fprintf(stderr, "PARROT VM: Could not destroy interpreter\n");
+                show_last_error_and_exit(interp);
+            }
+
             exit(EXIT_SUCCESS);
         }
 
