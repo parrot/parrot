@@ -850,8 +850,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                 totalops += sp->lines[j].ops;
                 totalticks += sp->lines[j].ticks;
             }
-        }
-    );
+        });
 
     fprintf(stderr, "events: ops ticks\n");
     fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
@@ -923,8 +922,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                             (unsigned long long) ci->ticks);
                 }
             }
-        }
-    );
+        });
 
     /* also dump profiling root if there are more than one callees */
     if (spdata->rootline.calls
@@ -1014,8 +1012,7 @@ free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
             for (; sp; sp = rsp) {
                 rsp = sp->rnext;
                 free_subprofile(interp, sp);
-            }
-        );
+            });
         Parrot_hash_destroy(interp, spdata->sphash);
     }
     Parrot_pmc_gc_unregister(interp, spdata->markpmcs);
@@ -1027,8 +1024,7 @@ free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
     if (spdata->seg2debug) {
         parrot_hash_iterate(spdata->seg2debug,
             INTVAL *xdebug = (INTVAL *)_bucket->value;
-            free(xdebug);
-        );
+            free(xdebug););
         Parrot_hash_destroy(interp, spdata->seg2debug);
     }
     free(spdata);
