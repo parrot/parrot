@@ -118,7 +118,7 @@ HEADER
                 show_last_error_and_exit(interp);
             }
 
-            if (!Parrot_api_run_bytecode(interp, pbc, argsarray, NULL)) {
+            if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
                 show_last_error_and_exit(interp);
             }
 
