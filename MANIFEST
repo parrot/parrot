@@ -941,7 +941,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
-include/parrot/threads.h                                    [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
