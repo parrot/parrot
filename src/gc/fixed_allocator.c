@@ -62,19 +62,17 @@ static void pool_free(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int pool_is_maybe_owned(
-    ARGMOD(Pool_Allocator *pool),
-    ARGIN(void *ptr))
+    ARGIN(const Pool_Allocator *pool),
+    ARGIN(const void *ptr))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int pool_is_owned(
-    ARGMOD(Pool_Allocator *pool),
+    ARGIN(const Pool_Allocator *pool),
     ARGIN(const void *ptr))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_allocate_new_pool_arena __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -414,9 +412,10 @@ Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
 
 =item C<static void pool_free(PARROT_INTERP, Pool_Allocator *pool, void *data)>
 
-=item C<static int pool_is_owned(Pool_Allocator *pool, const void *ptr)>
+=item C<static int pool_is_owned(const Pool_Allocator *pool, const void *ptr)>
 
-=item C<static int pool_is_maybe_owned(Pool_Allocator *pool, void *ptr)>
+=item C<static int pool_is_maybe_owned(const Pool_Allocator *pool, const void
+*ptr)>
 
 Static implementation of public methods.
 
@@ -484,7 +483,7 @@ pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *data))
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
-pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
+pool_is_maybe_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(pool_is_maybe_owned)
 
@@ -497,12 +496,13 @@ pool_is_maybe_owned(ARGMOD(Pool_Allocator *pool), ARGIN(void *ptr))
 
 PARROT_WARN_UNUSED_RESULT
 static int
-pool_is_owned(ARGMOD(Pool_Allocator *pool), ARGIN(const void *ptr))
+pool_is_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(pool_is_owned)
-    int p;
 
     if (ptr >= pool->lo_arena_ptr && ptr < pool->hi_arena_ptr) {
+        int p;
+
         for (p = 0; p < pool->num_arenas; p++) {
             const size_t idx = 2 * p;
             void * const low = pool->arena_bounds[idx];

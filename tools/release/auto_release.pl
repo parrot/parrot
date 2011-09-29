@@ -113,7 +113,7 @@ stop('You must specify the release version') unless $version;
 
 # Parse version number
 stop('Release version must be of the form a.b.c (e.g. 3.8.0)')
-    if $version !~ /(\d+)\.(\d+)\.(\d+)/;
+    if $version !~ /^(\d+)\.(\d+)\.(\d+)$/;
 
 # Prompt user to begin packaging release
 while (1) {

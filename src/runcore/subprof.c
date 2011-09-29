@@ -84,7 +84,9 @@ static subprofiledata * get_subprofiledata(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static __inline__ UHUGEINTVAL getticks(void);
+PARROT_INLINE
+static UHUGEINTVAL getticks(void);
+
 static UHUGEINTVAL getticks(void);
 static void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -279,7 +281,6 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     size_t di, op;
     opcode_t *base_pc, *debug_ops;
     size_t code_size, debug_size;
-    int i;
 
     if (!spdata->seg2debug)
         spdata->seg2debug = Parrot_hash_new_pointer_hash(interp);
@@ -455,7 +456,6 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         opcode_t              *anndata = findlineannotations(interp, spdata, sp, &cnt);
 
         if (anndata) {
-            size_t off;
             PMC    *srcfilepmc;
             size_t i, j;
 
@@ -829,9 +829,6 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(dump_profile_data)
 
-    int    h;
-    size_t off;
-
     unsigned int totalops   = 0;
     UHUGEINTVAL  totalticks = 0;
 
@@ -1060,7 +1057,8 @@ Returns a high-resolution number representing how long Parrot has been running.
 */
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
-static __inline__ UHUGEINTVAL
+PARROT_INLINE
+static UHUGEINTVAL
 getticks(void) {
     ASSERT_ARGS(getticks)
 
@@ -1095,7 +1093,6 @@ sync_callchainchange(PARROT_INTERP,
     ASSERT_ARGS(sync_callchainchange)
 
     subprofile *sp = spdata->cursp;
-    int         i;
 
     if (sp) {
         /* optimize common cases */
@@ -1499,7 +1496,6 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
     subprofile *sp = spdata->cursp;
     PMC *ctx, *subpmc;
     opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : 0;
-    UHUGEINTVAL tick;
 
     while (pc) {
         if (pc < code_start || pc >= code_end)
@@ -1512,9 +1508,9 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
         if (!PMC_IS_NULL(subpmc)) {
             /* finish old ticks */
-            UHUGEINTVAL tick = getticks();
+            const UHUGEINTVAL tick = getticks();
             if (spdata->tickadd) {
-                UHUGEINTVAL tickdiff = tick - spdata->starttick;
+                const UHUGEINTVAL tickdiff = tick - spdata->starttick;
                 *spdata->tickadd         += tickdiff;
                 *spdata->tickadd2        += tickdiff;
                 spdata->starttick = tick;

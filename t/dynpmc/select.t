@@ -175,7 +175,7 @@ it to become ready for an I/O operation.
 
     $P7 = $P6[2]
     $I0 = $P7
-    is($I0, 0, 'Test has_exception() for README2 (array index)')
+    is($I0, 0, 'Test has_exception() for README2 (array index)', 'varies across OSes' :named('todo'))
 
     unlink($S0)
 .end
