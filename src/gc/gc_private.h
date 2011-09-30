@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,18 +44,18 @@ extern void *flush_reg_store(void);
 /* this factor is totally arbitrary, but gives good timings for stress.pasm */
 #define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
 
-#define POOL_MAX_BYTES                         65536 * 128
-#define GC_SIZE_THRESHOLD                      1024  * 1024
+#define POOL_MAX_BYTES                         (65536 * 128)
+#define GC_SIZE_THRESHOLD                      (1024  * 1024)
 #define GC_DEFAULT_DYNAMIC_THRESHOLD           75
-#define GC_DEFAULT_MIN_THRESHOLD               4 * 1024 * 1024
+#define GC_DEFAULT_MIN_THRESHOLD               (4 * 1024 * 1024)
 /* promills of system memory */
 #define GC_DEFAULT_NURSERY_SIZE                2
 
-#define PMC_HEADERS_PER_ALLOC     4096 * 10 / sizeof (PMC)
-#define BUFFER_HEADERS_PER_ALLOC  4096      / sizeof (Buffer)
-#define STRING_HEADERS_PER_ALLOC  4096 * 20 / sizeof (STRING)
+#define PMC_HEADERS_PER_ALLOC    (4096 * 10 / sizeof (PMC))
+#define BUFFER_HEADERS_PER_ALLOC (4096      / sizeof (Buffer))
+#define STRING_HEADERS_PER_ALLOC (4096 * 20 / sizeof (STRING))
 
-#define CONSTANT_PMC_HEADERS_PER_ALLOC 4096 / sizeof (PMC)
+#define CONSTANT_PMC_HEADERS_PER_ALLOC (4096 / sizeof (PMC))
 #define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
 #define GC_NUM_INITIAL_FIXED_SIZE_POOLS 128
 
