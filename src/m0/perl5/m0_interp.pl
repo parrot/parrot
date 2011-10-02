@@ -102,6 +102,7 @@ sub new_interp {
     my $interp;
 
     $interp->[OP_FUNCS] = [
+# gen_opnames_from(m0.ops) template("        \&m0_opfunc_LC_OP,")
         \&m0_opfunc_noop,
         \&m0_opfunc_goto,
         \&m0_opfunc_goto_if,
@@ -144,6 +145,7 @@ sub new_interp {
         \&m0_opfunc_print_i,
         \&m0_opfunc_print_n,
         \&m0_opfunc_exit,
+# end_gen    
     ];
     $interp->[CONFIG] = {};
     $interp->[CALL_FRAMES] = [];

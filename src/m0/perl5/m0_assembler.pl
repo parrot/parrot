@@ -97,10 +97,12 @@ sub m0b_header {
 
 sub parse_op_data {
     my $ops;
+    my $num = 0;
     while (<DATA>) {
         chomp;
-        my ($num, $name) = split / /, $_;
-        $ops->{$name} = $num;
+        next if (/^#/);
+        $ops->{$_} = $num;
+        $num++;
     }
     say "Parsed data for " . scalar(keys %$ops) . " ops";
     return $ops;
@@ -492,7 +494,7 @@ sub opname_to_num {
     $opname =~ s/-/_/g;
     die "Invalid M0: unknown op '$opname'" if (! exists $ops->{$opname});
 
-    return oct $ops->{$opname};
+    return $ops->{$opname};
 }
 
 sub parse_version {
@@ -623,45 +625,47 @@ sub parse_chunks {
 # vim: expandtab shiftwidth=4:
 
 __DATA__
-0x00 noop
-0x01 goto
-0x02 goto_if
-0x03 goto_chunk
-0x04 add_i
-0x05 add_n
-0x06 sub_i
-0x07 sub_n
-0x08 mult_i
-0x09 mult_n
-0x0A div_i
-0x0B div_n
-0x0C mod_i
-0x0D mod_n
-0x0E convert_i_n
-0x0F convert_n_i
-0x10 ashr
-0x11 lshr
-0x12 shl
-0x13 and
-0x14 or
-0x15 xor
-0x16 gc_alloc
-0x17 sys_alloc
-0x18 sys_free
-0x19 copy_mem 
-0x1A set
-0x1B set_imm
-0x1C deref
-0x1D set_ref
-0x1E set_byte
-0x1F get_byte
-0x20 set_word
-0x21 get_word
-0x22 csym
-0x23 ccall_arg
-0x24 ccall_ret
-0x25 ccall
-0x26 print_s
-0x27 print_i
-0x28 print_n
-0x29 exit
+# gen_opnames_from(m0.ops) template("LC_OP")
+noop
+goto
+goto_if
+goto_chunk
+add_i
+add_n
+sub_i
+sub_n
+mult_i
+mult_n
+div_i
+div_n
+mod_i
+mod_n
+convert_i_n
+convert_n_i
+ashr
+lshr
+shl
+and
+or
+xor
+gc_alloc
+sys_alloc
+sys_free
+copy_mem
+set
+set_imm
+deref
+set_ref
+set_byte
+get_byte
+set_word
+get_word
+csym
+ccall_arg
+ccall_ret
+ccall
+print_s
+print_i
+print_n
+exit
+# end_gen
