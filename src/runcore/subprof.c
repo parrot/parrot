@@ -102,8 +102,8 @@ static void popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         __attribute__nonnull__(2);
 
 static void printspname(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
-    ARGIN(subprofile *sp))
+    ARGIN(const subprofiledata *spdata),
+    ARGIN(const subprofile *sp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -581,8 +581,8 @@ popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(popcallchain)
 
-    subprofile *sp  = spdata->cursp;
-    subprofile *csp = sp->caller;
+    subprofile * const sp  = spdata->cursp;
+    subprofile * const csp = sp->caller;
 
     if (sp->callerci) {
         sp->callerci->ops   += sp->callerops;
@@ -594,15 +594,14 @@ popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         csp->callerticks    += sp->callerticks;
     }
 
-    sp->ctx         = 0;
+    sp->caller      = NULL;
+    sp->callerci    = NULL;
+    sp->ctx         = NULL;
     sp->callerops   = 0;
     sp->callerticks = 0;
-    sp->caller      = 0;
-    sp->callerci    = 0;
-    sp->ctx         = 0;
 
-    spdata->cursubpmc       = csp ? csp->subpmc : 0;
-    spdata->curctx          = csp ? csp->ctx    : 0;
+    spdata->cursubpmc       = csp ? csp->subpmc : NULL;
+    spdata->curctx          = csp ? csp->ctx    : NULL;
     spdata->cursp           = csp;
 }
 
@@ -638,16 +637,16 @@ finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
             csp->callerticks    += sp->callerticks;
         }
 
+        sp->caller      = NULL;
+        sp->callerci    = NULL;
+        sp->ctx         = NULL;
         sp->callerops   = 0;
         sp->callerticks = 0;
-        sp->caller      = 0;
-        sp->callerci    = 0;
-        sp->ctx         = 0;
     }
 
-    spdata->cursp       = 0;
-    spdata->curctx      = 0;
-    spdata->cursubpmc   = 0;
+    spdata->cursp       = NULL;
+    spdata->curctx      = NULL;
+    spdata->cursubpmc   = NULL;
 }
 
 /*
@@ -676,7 +675,7 @@ buildcallchain(PARROT_INTERP,
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
 
     if (cctx) {
-        PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
+        PMC * const csubpmc = Parrot_pcc_get_sub(interp, cctx);
         if (spdata->curctx != cctx || spdata->cursubpmc != csubpmc)
             buildcallchain(interp, spdata, cctx, csubpmc);
     }
@@ -714,11 +713,10 @@ buildcallchain(PARROT_INTERP,
     sp->caller = spdata->cursp;
 
     if (sp->caller) {
-        int i;
-        subprofile *csp = sp->caller;
+        subprofile * const csp = sp->caller;
 
         /* get caller pc */
-        opcode_t *cpc_op = Parrot_pcc_get_pc(interp, csp->ctx);
+        opcode_t * const cpc_op = Parrot_pcc_get_pc(interp, csp->ctx);
         size_t cpc = cpc_op ? cpc_op - csp->code_ops : 0;
 
         if (cpc > csp->subattrs->start_offs)
@@ -726,6 +724,7 @@ buildcallchain(PARROT_INTERP,
 
         /* convert cpc into line */
         if (spdata->profile_type != SUBPROF_TYPE_OPS) {
+            int i;
             /* might do a binary seach instead */
             for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
                 if (cpc >= li->op_offs && cpc < li[1].op_offs)
@@ -752,7 +751,7 @@ buildcallchain(PARROT_INTERP,
         if (!li->calls) {
             li->calls = (callinfo *) malloc(sizeof (*ci) * (1 + 8));
             ci = li->calls;
-            ci->callee = 0;
+            ci->callee = NULL;
         }
         else {
             for (ci = li->calls; ci->callee; ci++)
@@ -772,13 +771,13 @@ buildcallchain(PARROT_INTERP,
         if (!ci->callee) {
             memset(ci, 0, sizeof (*ci));
             ci->callee = sp;
-            ci[1].callee = 0;
+            ci[1].callee = NULL;
         }
 
         sp->callerci = ci;
     }
     else {
-        sp->callerci = 0;
+        sp->callerci = NULL;
     }
 
     spdata->cursp     = sp;
@@ -788,8 +787,8 @@ buildcallchain(PARROT_INTERP,
 
 /*
 
-=item C<static void printspname(PARROT_INTERP, subprofiledata *spdata,
-subprofile *sp)>
+=item C<static void printspname(PARROT_INTERP, const subprofiledata *spdata,
+const subprofile *sp)>
 
 Prints the name of the subprofile given in C<sp>.
 
@@ -798,11 +797,11 @@ Prints the name of the subprofile given in C<sp>.
 */
 
 static void
-printspname(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
+printspname(PARROT_INTERP, ARGIN(const subprofiledata *spdata), ARGIN(const subprofile *sp))
 {
     ASSERT_ARGS(printspname)
 
-    char *cname = str2cs(interp, sp->subattrs->name);
+    char * const cname = str2cs(interp, sp->subattrs->name);
 
     fprintf(stderr, "%p:%s", sp, cname);
 
@@ -1139,13 +1138,12 @@ sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(o
 {
     ASSERT_ARGS(sync_hll_linechange)
 
-    subprofile *sp = spdata->cursp;
+    const subprofile * const sp = spdata->cursp;
     lineinfo   *li;
-    int         i;
-    size_t      pc;
 
     if (sp->nlines > 1) {
-        pc = pc_op ? pc_op - sp->code_ops : 0;
+        const size_t pc = pc_op ? pc_op - sp->code_ops : 0;
+        int i;
 
         for (i = 0, li = sp->lines; i < sp->nlines; i++, li++)
             if (pc >= li->op_offs && pc < li[1].op_offs)
@@ -1353,12 +1351,13 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_HLL);
     subprofile *sp = spdata->cursp;
-    PMC *ctx, *subpmc;
-    lineinfo *curline = sp ? sp->lines : 0;
-    opcode_t *startop = 0;
-    opcode_t *endop = 0;        /* triggers pc >= endop below */
+    lineinfo *curline = sp ? sp->lines : NULL;
+    opcode_t *startop = NULL;
+    opcode_t *endop   = NULL;   /* triggers pc >= endop below */
 
     while (pc) {
+        PMC *ctx;
+        PMC *subpmc;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
@@ -1398,7 +1397,7 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
                 /* finish old ticks */
                 UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
-                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
+                    const UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
@@ -1413,7 +1412,7 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
             }
             else if (pc < startop) {
                 /* finish old ticks */
-                UHUGEINTVAL tick = getticks();
+                const UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -1490,10 +1489,11 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_OPS);
     subprofile *sp = spdata->cursp;
-    PMC *ctx, *subpmc;
-    opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : 0;
+    opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : NULL;
 
     while (pc) {
+        PMC *ctx;
+        PMC *subpmc;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
