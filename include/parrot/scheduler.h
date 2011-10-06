@@ -103,6 +103,9 @@ void Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
+void Parrot_cx_outer_runloop(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
     ARGMOD(PMC *scheduler),
@@ -171,6 +174,8 @@ PMC* Parrot_task_current(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_cx_next_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
+#define ASSERT_ARGS_Parrot_cx_outer_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_preempt_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler) \

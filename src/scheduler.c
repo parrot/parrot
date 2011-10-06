@@ -112,21 +112,44 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     tdata->code = main;
     tdata->data = argv;
 
-    Parrot_cx_schedule_task(interp, main_task);
-
-    do {
-        Parrot_cx_check_alarms(interp, interp->scheduler);
-
-        pause();
-
-        task_count    = VTABLE_get_integer(interp, sched->task_queue);
-        alarm_count   = VTABLE_get_integer(interp, sched->alarms);
-    } while (task_count + alarm_count > 0);
+    Parrot_cx_schedule_immediate(interp, main_task);
+    Parrot_cx_outer_runloop(interp);
 
     task_count = VTABLE_get_integer(interp, sched->all_tasks);
     if (task_count > 0)
         Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
                     "Exiting with %d active tasks.\n", task_count);
+}
+
+/*
+
+=item C<void Parrot_cx_outer_runloop(PARROT_INTERP)>
+
+This is the core loop performed by each active OS thread. If it's the
+thread that needs to be running, it invokes the Scheduler to pick a
+task.
+
+=cut
+
+*/
+
+void
+Parrot_cx_outer_runloop(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_cx_outer_runloop)
+    PMC* scheduler = interp->scheduler;
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
+    INTVAL next_thread, task_count;
+
+    while ((task_count = VTABLE_get_integer(interp, sched->task_queue))) {
+        /* there can be no active runloops at this point, so it should be save
+         * to start counting at 0 again. This way the continuation in the next
+         * task will find a runloop with id 1 when encountering an exception */
+        interp->current_runloop_level = 0;
+        reset_runloop_id_counter(interp);
+
+        Parrot_cx_next_task(interp, scheduler);
+    }
 }
 
 /*
@@ -147,28 +170,21 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL task_count;
 
-    task_count = VTABLE_get_integer(interp, sched->task_queue);
+    FLOATVAL  time_now = Parrot_floatval_time();
+    opcode_t *dest;
 
-    if (task_count > 0) {
-        FLOATVAL  time_now = Parrot_floatval_time();
-        opcode_t *dest;
+    PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
 
-        PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
+    if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Found a non-Task in the task queue.\n");
 
-        if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Found a non-Task in the task queue.\n");
+    interp->cur_task = task;
 
-        interp->cur_task = task;
+    interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
+    Parrot_alarm_set(interp->quantum_done);
 
-        interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
-        Parrot_alarm_set(interp->quantum_done);
-
-        Parrot_ext_call(interp, task, "->");
-    }
-    else {
-        Parrot_alarm_now();
-    }
+    Parrot_ext_call(interp, task, "->");
 }
 
 /*
