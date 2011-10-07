@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 6;
 use Parrot::Config;
 
 =head1 NAME
@@ -192,7 +192,7 @@ pir_output_is( <<'CODE', <<'OUT', "Timer start/repeat/stop");
     set_global 'counter', $P0
     timer = new ['Timer']
     timer[.PARROT_TIMER_HANDLER] = tick
-    timer[.PARROT_TIMER_NSEC] = 0.1
+    timer[.PARROT_TIMER_INTERVAL] = 0.1
     timer[.PARROT_TIMER_REPEAT] = -1
     timer[.PARROT_TIMER_RUNNING] = 1
     # Allow at least two ticks
