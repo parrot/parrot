@@ -43,6 +43,7 @@ my $verbose = 0;
 if (defined $ARGV[0] && ($ARGV[0] eq '-v' || $ARGV[0] eq '--verbose')) {
     $verbose = 1;
 }
+say "all output will be logged in $tmp_dir/logs";
 
 build_project({
     "name"      => "Parrot",

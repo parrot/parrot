@@ -2678,7 +2678,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 /*
 
 =item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC *
-sysargs, PMC * progargs)>
+args)>
 
 Execute a PackFile* as if it were a main program. This is an entrypoint into
 executing a Parrot program, it is not intended (and can be dangerous) if you
@@ -2691,7 +2691,7 @@ try to call it from within a running Parrot program
 PARROT_EXPORT
 void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
-        ARGMOD(PMC * sysargs), ARGMOD(PMC * progargs))
+        ARGMOD(PMC * args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
     PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
@@ -2711,14 +2711,8 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
     if (!main_sub)
         main_sub = set_current_sub(interp);
 
-    if (PMC_IS_NULL(progargs)) {
-        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, sysargs);
-        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", sysargs);
-    }
-    else {
-        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, progargs);
-        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "PP->", sysargs, progargs);
-    }
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
+    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
 
     if (!PMC_IS_NULL(current_pf))
         Parrot_pf_set_current_packfile(interp, current_pf);

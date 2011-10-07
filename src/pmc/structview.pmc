@@ -937,8 +937,8 @@ Return a C<Ptr> to the C<n>th element of an array of structs.
 */
 
     METHOD array_offs(PMC *array, INTVAL n) {
-        void   *p          = VTABLE_get_pointer(INTERP, array);
-        INTVAL  array_size = VTABLE_get_integer(INTERP, array);
+        void * const p          = VTABLE_get_pointer(INTERP, array);
+        const INTVAL array_size = VTABLE_get_integer(INTERP, array);
         PMC    *ret;
         size_t  size, align;
         GET_ATTR_size(INTERP, SELF, size);
@@ -991,7 +991,7 @@ Return a C<Ptr> to the C<n>th element of a struct.
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Attempt to dereference null pointer");
         {
-            size_t buf_size = VTABLE_get_integer(INTERP, array);
+            const size_t buf_size = VTABLE_get_integer(INTERP, array);
             size_t self_size;
             GET_ATTR_size(INTERP, SELF, self_size);
             if (buf_size && buf_size < self_size)
@@ -1133,4 +1133,3 @@ Implement the freeze/thaw API.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
