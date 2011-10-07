@@ -139,17 +139,28 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     ASSERT_ARGS(Parrot_cx_outer_runloop)
     PMC* scheduler = interp->scheduler;
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
-    INTVAL next_thread, task_count;
+    INTVAL next_thread, task_count, alarm_count;
 
-    while ((task_count = VTABLE_get_integer(interp, sched->task_queue))) {
-        /* there can be no active runloops at this point, so it should be save
-         * to start counting at 0 again. This way the continuation in the next
-         * task will find a runloop with id 1 when encountering an exception */
-        interp->current_runloop_level = 0;
-        reset_runloop_id_counter(interp);
+    do {
+        while ((task_count = VTABLE_get_integer(interp, sched->task_queue))) {
+            /* there can be no active runloops at this point, so it should be save
+             * to start counting at 0 again. This way the continuation in the next
+             * task will find a runloop with id 1 when encountering an exception */
+            interp->current_runloop_level = 0;
+            reset_runloop_id_counter(interp);
 
-        Parrot_cx_next_task(interp, scheduler);
-    }
+            Parrot_cx_next_task(interp, scheduler);
+
+            // add expired alarms to the task queue
+            Parrot_cx_check_alarms(interp, interp->scheduler);
+        }
+
+        alarm_count = VTABLE_get_integer(interp, sched->alarms);
+        if (alarm_count > 0) {
+            pause;
+            Parrot_cx_check_alarms(interp, interp->scheduler);
+        }
+    } while (alarm_count);
 }
 
 /*
