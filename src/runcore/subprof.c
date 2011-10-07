@@ -148,8 +148,9 @@ static INTVAL * sptodebug(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static inline char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -313,7 +314,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
 /*
 
-=item C<static inline char * str2cs(PARROT_INTERP, STRING *s)>
+=item C<static char * str2cs(PARROT_INTERP, STRING *s)>
 
 Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
@@ -321,8 +322,9 @@ Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
 */
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static inline char *
+static char *
 str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 {
     ASSERT_ARGS(str2cs)
