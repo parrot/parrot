@@ -256,6 +256,8 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *n
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
+    Parrot_alarm_set(interp->quantum_done);
+
     return next;
 }
 
