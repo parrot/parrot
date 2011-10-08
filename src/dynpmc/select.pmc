@@ -56,7 +56,7 @@ the Hash PMC
         INTVAL       j;
 
         for (j = 0; j < n; ++j) {
-            INTVAL id = VTABLE_shift_integer(interp, iter);
+            const INTVAL id = VTABLE_shift_integer(interp, iter);
             if (maxid < id)
                 maxid = id;
         }
@@ -83,7 +83,7 @@ Initializes the PMC.
 */
 
     VTABLE void init() {
-        PMC *fd_map = pmc_new(interp, enum_class_Hash);
+        PMC * const fd_map = pmc_new(interp, enum_class_Hash);
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
         SET_ATTR_max_fd(INTERP, SELF, -1);
 
@@ -177,7 +177,7 @@ Removes filehandle from the Select PMC.
 
 */
     METHOD remove(PMC *handle) {
-      PMC    *fdkey, *fd_map;
+      PMC     *fd_map;
       INTVAL  fd,  maxid;
 
       GETATTR_FileHandle_os_handle(INTERP, handle, fd);
