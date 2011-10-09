@@ -334,9 +334,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
     static PMC * keep_context = NULL;
 
     PMC            *context;
-    PMC            *iter        = PMCNULL;
-    STRING * const  handled_str = CONST_STRING(interp, "handled");
-    STRING * const  iter_str    = CONST_STRING(interp, "handler_iter");
+    PMC            *iter             = PMCNULL;
+    STRING * const  handled_str      = CONST_STRING(interp, "handled");
+    STRING * const  handler_iter_str = CONST_STRING(interp, "handler_iter");
+    STRING * const  exception_str    = CONST_STRING(interp, "Exception");
+    const Parrot_Int is_exception = VTABLE_does(interp, task, exception_str);
 
     if (already_doing) {
         Parrot_io_eprintf(interp,
@@ -349,25 +351,28 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
          */
         context = Parrot_pcc_get_caller_ctx(interp, keep_context);
         keep_context = NULL;
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
-        else
-            iter = PMCNULL;
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
+        }
     }
     else {
         ++already_doing;
 
         /* Exceptions store the handler iterator for rethrow, other kinds of
          * tasks don't (though they could). */
-        if (task->vtable->base_type == enum_class_Exception
-        && VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
-            iter    = VTABLE_get_attr_str(interp, task, iter_str);
+        if (is_exception &&
+            VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
+            iter    = VTABLE_get_attr_str(interp, task, handler_iter_str);
             context = (PMC *)VTABLE_get_pointer(interp, task);
         }
         else {
+            PMC * handlers;
             context = CURRENT_CONTEXT(interp);
-            if (!PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-                iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+            handlers = Parrot_pcc_get_handlers(interp, context);
+            if (!PMC_IS_NULL(handlers))
+                iter = VTABLE_get_iter(interp, handlers);
         }
     }
 
@@ -379,17 +384,13 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
             if (!PMC_IS_NULL(handler)) {
                 INTVAL valid_handler = 0;
-                if (handler->vtable->base_type == enum_class_Object)
-                    Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
-                        "P->I", task, &valid_handler);
-                else
-                    Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
+                Parrot_pcc_invoke_method_from_c_args(interp, handler, CONST_STRING(interp, "can_handle"),
                         "P->I", task, &valid_handler);
 
                 if (valid_handler) {
-                    if (task->vtable->base_type == enum_class_Exception) {
+                    if (is_exception) {
                         /* Store iterator and context for a later rethrow. */
-                        VTABLE_set_attr_str(interp, task, CONST_STRING(interp, "handler_iter"), iter);
+                        VTABLE_set_attr_str(interp, task, handler_iter_str, iter);
                         VTABLE_set_pointer(interp, task, context);
                     }
                     --already_doing;
@@ -401,8 +402,11 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
         /* Continue the search in the next context up the chain. */
         context = Parrot_pcc_get_caller_ctx(interp, context);
-        if (context && !PMC_IS_NULL(Parrot_pcc_get_handlers(interp, context)))
-            iter = VTABLE_get_iter(interp, Parrot_pcc_get_handlers(interp, context));
+        if (context) {
+            PMC * const handlers = Parrot_pcc_get_handlers(interp, context);
+            iter = PMC_IS_NULL(handlers) ? PMCNULL :
+                    VTABLE_get_iter(interp, handlers);
+        }
         else
             iter = PMCNULL;
     }
