@@ -159,12 +159,7 @@ code as the first argument.
             TASK_active_SET(SELF);
 
             /* Actually run the task */
-            if (PMC_IS_NULL(task->data)) {
-                Parrot_ext_call(interp, task->code, "->");
-            }
-            else {
-                Parrot_ext_call(interp, task->code, "P->", task->data);
-            }
+            Parrot_ext_call(interp, task->code, "P->", task->data);
         }
 
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
