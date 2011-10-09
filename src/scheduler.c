@@ -151,7 +151,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
             Parrot_cx_next_task(interp, scheduler);
 
-            // add expired alarms to the task queue
+            /* add expired alarms to the task queue */
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
 
