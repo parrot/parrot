@@ -137,7 +137,7 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 =item C<Parrot_Int Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC
 pbc, Parrot_PMC args)>
 
-Runs the bytecode C<pbc> passing optional C<mainargs> parameters. This function
+Runs the bytecode C<pbc> passing optional C<args> parameters. This function
 returns a true value if this call is successful and false value otherwise.
 
 =cut
