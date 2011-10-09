@@ -92,6 +92,5 @@ PMC * Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
