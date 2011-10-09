@@ -69,7 +69,7 @@ EOF
 
 my $pir_file = $pir->filename;
 
-open my $run, "|perl ${\$pir->filename} ${\$tmp->filename}";
+open my $run, '|-', "perl ${\$pir->filename} ${\$tmp->filename}";
 
 sleep(0.05);
 $run->print("grumblecake\n");
