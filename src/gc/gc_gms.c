@@ -1118,7 +1118,8 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
             else if (!PObj_constant_TEST(str)) {
                 Parrot_pa_remove(interp, self->strings[i], item->ptr);
                 if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-                    Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Parrot_Buffer*)str);
+                    Parrot_gc_str_free_buffer_storage(
+                        interp, &self->string_gc, (Parrot_Buffer*)str);
 
                 interp->gc_sys->stats.memory_used -= sizeof (STRING);
 
