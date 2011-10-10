@@ -59,7 +59,8 @@ static void gc_ms_alloc_objects(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static Parrot_Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
+static Parrot_Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP,
+    size_t size)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
@@ -669,11 +670,11 @@ size)>
 =item C<void gc_ms_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
 size)>
 
-=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
-size)>
+=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str,
+size_t size)>
 
-=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
-size)>
+=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str,
+size_t size)>
 
 Functions for allocating strings/buffers storage.
 
@@ -978,8 +979,8 @@ gc_ms_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
 
 /*
 
-=item C<static Parrot_Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t
-size)>
+=item C<static Parrot_Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP,
+size_t size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
@@ -1005,8 +1006,8 @@ gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<static void gc_ms_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer *obj,
-size_t size)>
+=item C<static void gc_ms_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer
+*obj, size_t size)>
 
 Free a bufferlike header that is not being used, so that Parrot can recycle
 it and use it again.

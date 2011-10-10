@@ -49,7 +49,8 @@ static void gc_inf_allocate_buffer_storage(PARROT_INTERP,
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Parrot_Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t size);
+static Parrot_Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP,
+    size_t size);
 
 PARROT_CAN_RETURN_NULL
 static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size);
@@ -227,11 +228,11 @@ flags)>
 
 =item C<static void gc_inf_free_string_header(PARROT_INTERP, STRING *s)>
 
-=item C<static Parrot_Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t
-size)>
-
-=item C<static void gc_inf_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer *b,
+=item C<static Parrot_Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP,
 size_t size)>
+
+=item C<static void gc_inf_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer
+*b, size_t size)>
 
 =item C<static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
@@ -246,8 +247,8 @@ size_t size)>
 =item C<static void gc_inf_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
 *buffer, size_t size)>
 
-=item C<static void gc_inf_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
-*buffer, size_t size)>
+=item C<static void gc_inf_reallocate_buffer_storage(PARROT_INTERP,
+Parrot_Buffer *buffer, size_t size)>
 
 =item C<static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>

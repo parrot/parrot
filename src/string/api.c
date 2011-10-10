@@ -558,8 +558,8 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), const UINTVAL le
 
 /*
 
-=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, Buffer *buffer, const
-UINTVAL len)>
+=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, Parrot_Buffer
+*buffer, const UINTVAL len)>
 
 Makes a Parrot string from a Buffer.
 

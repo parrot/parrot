@@ -394,7 +394,8 @@ Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)>
+=item C<Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t
+size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
@@ -417,8 +418,8 @@ Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<void Parrot_gc_free_bufferlike_header(PARROT_INTERP, Buffer *obj, size_t
-size)>
+=item C<void Parrot_gc_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer *obj,
+size_t size)>
 
 Free a bufferlike header that is not being used, so that Parrot can recycle
 it and use it again.
@@ -438,8 +439,8 @@ Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Parrot_Buffer *obj),
 
 /*
 
-=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP, Parrot_Buffer
-*buffer, size_t size)>
+=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
+Parrot_Buffer *buffer, size_t size)>
 
 Allocates a chunk of memory of at least size C<size> for the given Parrot_Buffer.
 buffer is guaranteed to be properly aligned for things like C<FLOATVALS>,
@@ -460,8 +461,8 @@ Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *buffer,
-size_t newsize)>
+=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
+*buffer, size_t newsize)>
 
 Reallocate the Parrot_Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with

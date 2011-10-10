@@ -41,7 +41,8 @@ typedef struct string_callback_data {
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
+static const char * buffer_location(PARROT_INTERP,
+    ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -131,7 +132,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 /*
 
-=item C<static const char * buffer_location(PARROT_INTERP, const Buffer *b)>
+=item C<static const char * buffer_location(PARROT_INTERP, const Parrot_Buffer
+*b)>
 
 Returns a constant string representing the location of the given
 Buffer C<b> in one of the PMC registers. If the PMC is not located

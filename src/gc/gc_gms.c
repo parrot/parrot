@@ -210,7 +210,8 @@ static void failed_allocation(unsigned int line, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP, size_t size)
+static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_gms_allocate_buffer_storage(PARROT_INTERP,
@@ -1230,11 +1231,11 @@ size_t size)>
 =item C<static void gc_gms_reallocate_string_storage(PARROT_INTERP, STRING *str,
 size_t size)>
 
-=item C<static void gc_gms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str,
-size_t size)>
+=item C<static void gc_gms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
+*str, size_t size)>
 
-=item C<static void gc_gms_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str,
-size_t size)>
+=item C<static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
+Parrot_Buffer *str, size_t size)>
 
 =item C<static void* gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>
@@ -1500,11 +1501,11 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 =item C<gc_gms_free_string_header(PARROT_INTERP, STRING *s)>
 
-=item C<static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP, size_t
-size)>
+=item C<static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
+size_t size)>
 
-=item C<static void gc_gms_free_buffer_header(PARROT_INTERP, Parrot_Buffer *s, size_t
-size)>
+=item C<static void gc_gms_free_buffer_header(PARROT_INTERP, Parrot_Buffer *s,
+size_t size)>
 
 Allocate/free string/buffer headers.
 

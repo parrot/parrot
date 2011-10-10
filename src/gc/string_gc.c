@@ -38,7 +38,9 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(ARGIN(const Parrot_Buffer *buffer), ARGIN(char *mem))
+static char * aligned_mem(
+    ARGIN(const Parrot_Buffer *buffer),
+    ARGIN(char *mem))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -55,7 +57,8 @@ static void alloc_new_block(
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
+static const char * buffer_location(PARROT_INTERP,
+    ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -678,7 +681,8 @@ aligned_mem(ARGIN(SHIM(const Parrot_Buffer *buffer)), ARGIN(char *mem))
 
 /*
 
-=item C<static const char * buffer_location(PARROT_INTERP, const Parrot_Buffer *b)>
+=item C<static const char * buffer_location(PARROT_INTERP, const Parrot_Buffer
+*b)>
 
 Returns a constant string representing the location of the given
 Parrot_Buffer C<b> in one of the PMC registers. If the PMC is not located
@@ -797,7 +801,8 @@ compact_pool(PARROT_INTERP,
 }
 
 /*
-=item C<static void move_buffer_callback(PARROT_INTERP, Parrot_Buffer *b, void *data)>
+=item C<static void move_buffer_callback(PARROT_INTERP, Parrot_Buffer *b, void
+*data)>
 
 Callback for live STRING/Buffer for compating.
 
@@ -890,8 +895,8 @@ pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 
 /*
 
-=item C<static void move_one_buffer(PARROT_INTERP, Memory_Block *pool, Parrot_Buffer
-*old_buf)>
+=item C<static void move_one_buffer(PARROT_INTERP, Memory_Block *pool,
+Parrot_Buffer *old_buf)>
 
 The compact_pool operation collects disjointed blocks of memory allocated on a
 given pool's free list into one large block of memory. Once the new larger
