@@ -2,11 +2,18 @@
     - Core
         + The whiteknight/kill_threads branch was merged, which removes the old and broken
         thread/concurrency implementation. Better and more flexible concurrency primitives
-        are currently being worked on.
+        are currently being worked on. This also involved removing some of the last vestiges
+        of assembly code from Parrot.
         + random_lib.pir was removed, since better alternatives already exist
+        + The freeze and thaw vtables were removed from Default PMC, because they weren't
+          useful and caused hard-to-find bugs.
+        + A new subroutine profiling runcore was added
     - Languages
         + Winxed
             - Updated snapshot
+    - Community
+        + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
+        PCT in Winxed: https://github.com/parrot/PACT
     - Documentation
     - Tests
         + Select PMC tests improved to pass on non-Linuxy platforms
