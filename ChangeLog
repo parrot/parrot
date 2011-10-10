@@ -7,7 +7,8 @@
         + random_lib.pir was removed, since better alternatives already exist
         + The freeze and thaw vtables were removed from Default PMC, because they weren't
           useful and caused hard-to-find bugs.
-        + A new subroutine profiling runcore was added
+        + A new subroutine profiling runcore was added. It can be enabled with the command-line
+        argument of -R subprof . The resulting data can be analyzed with kcachegrind.
     - Languages
         + Winxed
             - Updated snapshot
