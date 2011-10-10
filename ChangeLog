@@ -3,7 +3,7 @@
         + The whiteknight/kill_threads branch was merged, which removes the old and broken
         thread/concurrency implementation. Better and more flexible concurrency primitives
         are currently being worked on. This also involved removing some of the last vestiges
-        of assembly code from Parrot.
+        of assembly code from Parrot as well as removing the share and share_ro vtables.
         + random_lib.pir was removed, since better alternatives already exist
         + The freeze and thaw vtables were removed from Default PMC, because they weren't
           useful and caused hard-to-find bugs.
