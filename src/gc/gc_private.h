@@ -52,7 +52,7 @@ extern void *flush_reg_store(void);
 #define GC_DEFAULT_NURSERY_SIZE                2
 
 #define PMC_HEADERS_PER_ALLOC    (4096 * 10 / sizeof (PMC))
-#define BUFFER_HEADERS_PER_ALLOC (4096      / sizeof (Buffer))
+#define BUFFER_HEADERS_PER_ALLOC (4096      / sizeof (Parrot_Buffer))
 #define STRING_HEADERS_PER_ALLOC (4096 * 20 / sizeof (STRING))
 
 #define CONSTANT_PMC_HEADERS_PER_ALLOC (4096 / sizeof (PMC))
@@ -123,8 +123,8 @@ typedef struct GC_Statistics {
 
 } GC_Statistics;
 
-/* Callback for live string. Use Buffer for now... */
-typedef void (*string_iterator_callback)(PARROT_INTERP, Buffer *str, void *data);
+/* Callback for live string. Use Parrot_Buffer for now... */
+typedef void (*string_iterator_callback)(PARROT_INTERP, Parrot_Buffer *str, void *data);
 
 typedef struct GC_Subsystem {
     /* Which GC subsystem are we using? See PARROT_GC_DEFAULT_TYPE in
@@ -149,8 +149,8 @@ typedef struct GC_Subsystem {
     STRING* (*allocate_string_header)(PARROT_INTERP, UINTVAL flags);
     void    (*free_string_header)(PARROT_INTERP, ARGFREE(STRING *));
 
-    Buffer* (*allocate_bufferlike_header)(PARROT_INTERP, size_t size);
-    void    (*free_bufferlike_header)(PARROT_INTERP, ARGFREE(Buffer *), size_t size);
+    Parrot_Buffer* (*allocate_bufferlike_header)(PARROT_INTERP, size_t size);
+    void    (*free_bufferlike_header)(PARROT_INTERP, ARGFREE(Parrot_Buffer *), size_t size);
 
     int  (*is_pmc_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
     int  (*is_string_ptr)(PARROT_INTERP, ARGIN_NULLOK(void *));
@@ -163,8 +163,8 @@ typedef struct GC_Subsystem {
     void (*allocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
     void (*reallocate_string_storage)(PARROT_INTERP, ARGMOD(STRING *str), size_t size);
 
-    void (*allocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t nsize);
-    void (*reallocate_buffer_storage)(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize);
+    void (*allocate_buffer_storage)(PARROT_INTERP, ARGMOD(Parrot_Buffer *buffer), size_t nsize);
+    void (*reallocate_buffer_storage)(PARROT_INTERP, ARGMOD(Parrot_Buffer *buffer), size_t newsize);
 
     void* (*allocate_fixed_size_storage)(PARROT_INTERP, size_t size);
     void (*free_fixed_size_storage)(PARROT_INTERP, size_t size, ARGFREE(void *));
@@ -478,7 +478,7 @@ int Parrot_gc_trace_root(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void check_buffer_ptr(
-    ARGMOD(Buffer * pobj),
+    ARGMOD(Parrot_Buffer * pobj),
     ARGMOD(Variable_Size_Pool * pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -531,7 +531,7 @@ void Parrot_gc_merge_memory_pools(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void gc_ms_allocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGIN(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -570,7 +570,7 @@ void gc_ms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 void gc_ms_reallocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGIN(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -696,7 +696,7 @@ int pobj2gen(ARGIN(PObj *pmc))
 
 void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
-    ARGOUT(Buffer *buffer),
+    ARGOUT(Parrot_Buffer *buffer),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -722,7 +722,7 @@ void Parrot_gc_str_finalize(PARROT_INTERP, ARGMOD(String_GC *gc))
 
 void Parrot_gc_str_free_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
-    ARGMOD(Buffer *b))
+    ARGMOD(Parrot_Buffer *b))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
@@ -734,7 +734,7 @@ void Parrot_gc_str_initialize(PARROT_INTERP, ARGMOD(String_GC *gc))
 
 void Parrot_gc_str_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(String_GC *gc),
-    ARGMOD(Buffer *buffer),
+    ARGMOD(Parrot_Buffer *buffer),
     size_t newsize)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
