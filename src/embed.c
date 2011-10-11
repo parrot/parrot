@@ -445,7 +445,7 @@ Parrot_disassemble(PARROT_INTERP,
         Parrot_io_fprintf(interp, output, "\n");
     }
 
-    while (line->next) {
+    while (line) {
         const char *c;
 
         /* Parrot_io_fprintf(interp, output, "%i < %i %i == %i \n", curr_mapping,
