@@ -423,9 +423,9 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         int i, lasti;
         INTVAL *xdebug = sptodebug(interp, spdata, sp);
 
-        sp->nlines           = sp->subattrs->end_offs - sp->subattrs->start_offs;
-        sp->lines            = (lineinfo *) mem_sys_allocate_zeroed(((sp->nlines ? sp->nlines : 1) + 1)
-                                                                        * sizeof (lineinfo));
+        sp->nlines  = sp->subattrs->end_offs - sp->subattrs->start_offs;
+        sp->lines   = (lineinfo *) mem_sys_allocate_zeroed(
+                ((sp->nlines ? sp->nlines : 1) + 1) * sizeof (lineinfo));
         sp->lines[0].op_offs = sp->subattrs->start_offs;    /* just in case */
 
         for (i = lasti = 0; i < sp->nlines; i++) {
@@ -702,7 +702,8 @@ buildcallchain(PARROT_INTERP,
             sp->rnext     = rsp;
             if (sp->nlines) {
                 int i;
-                rsp->lines = (lineinfo *)mem_sys_allocate_zeroed((sp->nlines + 1) * sizeof (lineinfo));
+                rsp->lines = (lineinfo *)mem_sys_allocate_zeroed(
+                        (sp->nlines + 1) * sizeof (lineinfo));
                 rsp->nlines = sp->nlines;
                 for (i = 0; i < sp->nlines + 1; i++)
                     rsp->lines[i].op_offs = sp->lines[i].op_offs;
@@ -764,7 +765,8 @@ buildcallchain(PARROT_INTERP,
                 int ncalls = ci - li->calls;
 
                 if ((ncalls & 7) == 0) {
-                    li->calls = (callinfo *) mem_sys_realloc(li->calls, (ncalls + (1 + 8)) * sizeof (*ci));
+                    li->calls = (callinfo *) mem_sys_realloc(
+                            li->calls, (ncalls + (1 + 8)) * sizeof (*ci));
                     ci = li->calls + ncalls;
                 }
             }
