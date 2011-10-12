@@ -36,10 +36,6 @@ format of bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void clone_constant(PARROT_INTERP, ARGIN(PMC **c))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -96,13 +92,6 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile * PackFile_append_pmc(PARROT_INTERP,
-    ARGIN(PMC * const pf_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void PackFile_Header_read_uuid(PARROT_INTERP,
     ARGMOD(PackFile_Header *self),
@@ -168,9 +157,6 @@ static int sub_pragma(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(c))
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -197,9 +183,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf_pmc))
 #define ASSERT_ARGS_PackFile_Header_read_uuid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -1769,41 +1752,6 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 
 /*
 
-=item C<static void clone_constant(PARROT_INTERP, PMC **c)>
-
-Clones a constant (at least, if it's a Sub PMC), returning the clone.
-
-=cut
-
-*/
-
-static void
-clone_constant(PARROT_INTERP, ARGIN(PMC **c))
-{
-    ASSERT_ARGS(clone_constant)
-    STRING * const _sub = CONST_STRING(interp, "Sub");
-
-    if (VTABLE_isa(interp, *c, _sub)) {
-        Parrot_Sub_attributes *old_sub,     *new_sub;
-
-        PMC * const old_sub_pmc = *c;
-        PMC * const new_sub_pmc = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub_pmc));
-
-        PMC_get_sub(interp, new_sub_pmc, new_sub);
-        PMC_get_sub(interp, old_sub_pmc, old_sub);
-        new_sub->seg = old_sub->seg;
-
-        /* Vtable overrides and methods were already cloned, so don't reclone them. */
-        if (new_sub->vtable_index == -1
-        && !(old_sub->comp_flags   &  SUB_COMP_FLAG_METHOD))
-            Parrot_ns_store_sub(interp, new_sub_pmc);
-
-        *c = new_sub_pmc;
-    }
-}
-
-/*
-
 =item C<static INTVAL find_pf_ann_idx(PackFile_Annotations *pfa,
 PackFile_Annotations_Key *key, UINTVAL offs)>
 
@@ -2189,46 +2137,6 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     }
 
     Parrot_pop_context(interp);
-}
-
-/*
-
-=item C<static PackFile * PackFile_append_pmc(PARROT_INTERP, PMC * const
-pf_pmc)>
-
-Reads and appends a PBC to the current directory.  Fixes up sub addresses in
-newly loaded bytecode and runs C<:load> subs.
-
-=cut
-
-*/
-
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile *
-PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
-{
-    ASSERT_ARGS(PackFile_append_pmc)
-    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
-
-    if (pf) {
-        PackFile *current_pf = interp->code->base.pf;
-        PMC      *current_pfpmc = Parrot_pf_get_current_packfile(interp);
-        if (!interp->code) {
-            STRING * const name = CONST_STRING(interp, "dummy");
-            interp->code = Parrot_pf_create_default_segments(interp, current_pfpmc, name, 1);
-            PARROT_ASSERT(interp->code);
-        }
-
-        PackFile_add_segment(interp, &current_pf->directory,
-                &pf->directory.base);
-        PARROT_GC_WRITE_BARRIER(interp, current_pfpmc);
-
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
-    }
-
-    return pf;
 }
 
 /*
