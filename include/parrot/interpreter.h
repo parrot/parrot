@@ -218,6 +218,7 @@ struct parrot_interp_t {
 
     PMC *root_namespace;                      /* namespace hash */
     PMC *scheduler;                           /* concurrency scheduler */
+    PMC *cur_task;
 
     MMD_Cache *op_mmd_cache;                  /* MMD cache for builtins. */
 
@@ -226,7 +227,6 @@ struct parrot_interp_t {
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
     Hash        *const_cstring_hash;          /* cache of const_string items */
 
-    struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
@@ -235,6 +235,9 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+
+    UINTVAL          last_alarm;              /* has an alarm triggered? */
+    FLOATVAL         quantum_done;            /* expiration of current quantum */
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 

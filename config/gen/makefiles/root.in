@@ -450,6 +450,7 @@ INTERP_O_FILES = \
 	src/exit$(O) \
 	src/extend$(O) \
 	src/extend_vtable$(O) \
+	src/alarm$(O) \
 	src/gc/alloc_memory$(O) \
 	src/gc/alloc_resources$(O) \
 	src/gc/api$(O) \
@@ -493,6 +494,7 @@ INTERP_O_FILES = \
 	src/runcore/profiling$(O) \
 	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
+	src/events$(O) \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
 	src/sub$(O) \
@@ -706,6 +708,7 @@ STR_FILES = \
 	src/runcore/profiling.str \
 	src/runcore/subprof.str \
 	src/scheduler.str \
+	src/events.str \
 	src/spf_render.str \
 	src/spf_vtable.str \
 	src/string/api.str \
@@ -1001,7 +1004,21 @@ src/scheduler$(O) : \
 	$(INC_PMC_DIR)/pmc_timer.h \
 	$(EXTEND_HEADERS) \
 	$(INC_DIR)/scheduler_private.h \
+	$(INC_DIR)/alarm.h \
+	$(INC_PMC_DIR)/pmc_pmclist.h \
+	$(INC_PMC_DIR)/pmc_alarm.h \
+	$(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h
+
+src/events$(O) : \
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/events.h \
+	src/events.c \
+	src/events.str \
+	$(INC_DIR)/runcore_api.h
+
+src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
+	$(INC_DIR)/alarm.h
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
@@ -1493,7 +1510,8 @@ src/sub$(O) : \
 	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
-	src/string/private_cstring.h src/string/api.c
+	src/string/private_cstring.h src/string/api.c \
+	$(INC_DIR)/events.h
 
 src/longopt$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1506,7 +1524,10 @@ src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
 
 src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	src/exceptions.str src/exceptions.c \
+	$(INC_DIR)/events.h \
 	$(INC_PMC_DIR)/pmc_continuation.h
+
+src/threads$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/threads.c
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : \
@@ -1569,6 +1590,7 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(EXTEND_HEADERS) \
+	$(INC_PMC_DIR)/pmc_callback.h \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
@@ -1974,6 +1996,9 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_task.h \
+	$(INC_DIR)/events.h \
+	$(INC_DIR)/scheduler_private.h \
 	src/io/io_private.h
 
 

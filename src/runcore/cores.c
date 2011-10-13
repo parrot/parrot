@@ -561,7 +561,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         /* set the top of the stack so GC can trace it for GC-able pointers
          * see trace_system_areas() in src/gc/system.c */
-        debugger->lo_var_ptr = interp->lo_var_ptr;
+        /* Chandon FIXME: debugger */
+        /* debugger->lo_var_ptr = interp->lo_var_ptr; */
 
         pio = Parrot_io_STDERR(debugger);
 
