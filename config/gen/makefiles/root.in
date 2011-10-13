@@ -792,11 +792,8 @@ help :
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
-	@echo "  smolder_fulltest:  Run the full suite and send report to the smolder server."
 	@echo "  smoke:             Alias for smolder_test."
 	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
-	@echo "  smoke_coretest:    Alias for smolder_coretest."
-	@echo "  smoke_fulltest:    Alias for smolder_fulltest."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -2148,18 +2145,10 @@ smolder_test : test_prep
 smolder_coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
-# this isn't quite equivalent to fulltest yet
-smolder_fulltest : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --code-tests --runcore-tests --archive --send-to-smolder
-
 smoke : smolder_test
 
 resubmit_smolder :
 	$(PERL) $(DEV_TOOLS_DIR)/resubmit_smolder.pl
-
-smoke_coretest : smolder_coretest
-
-smoke_fulltest : smolder_fulltest
 
 # "core tests" -- test basic functionality but not ancillaries
 coretest : corevm pbctestfiles
