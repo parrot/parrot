@@ -107,8 +107,6 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     PMC* main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes *tdata = PARROT_TASK(main_task);
 
-    enable_scheduling  = 1;
-
     tdata->code = main;
     tdata->data = argv;
 
@@ -165,6 +163,27 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)>
+
+Set the task switch alarm for the scheduler.
+
+*/
+
+void
+Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_cx_set_scheduler_alarm)
+    Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
+    FLOATVAL  time_now = Parrot_floatval_time();
+
+    interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
+
+    Parrot_alarm_set(interp->quantum_done);
+    enable_scheduling = 1;
+}
+
+/*
+
 =item C<void Parrot_cx_next_task(PARROT_INTERP, PMC *scheduler)>
 
 Run the task at the head of the task queue until it ends or is
@@ -181,7 +200,6 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     INTVAL task_count;
 
-    FLOATVAL  time_now = Parrot_floatval_time();
     opcode_t *dest;
 
     PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
@@ -192,8 +210,12 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     interp->cur_task = task;
 
-    interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
-    Parrot_alarm_set(interp->quantum_done);
+    if (VTABLE_get_integer(interp, sched->task_queue) > 0) {
+        Parrot_cx_set_scheduler_alarm(interp);
+    }
+    else
+        if (VTABLE_get_integer(interp, sched->alarms) == 0)
+            enable_scheduling = 0;
 
     Parrot_ext_call(interp, task, "->");
 }
@@ -415,6 +437,10 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     }
 
     VTABLE_push_pmc(interp, sched->task_queue, task);
+
+    /* going from single to multi-tasking? */
+    if (VTABLE_get_integer(interp, sched->task_queue) == 1)
+        Parrot_cx_set_scheduler_alarm(interp);
 }
 
 /*
@@ -452,6 +478,10 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     VTABLE_unshift_pmc(interp, sched->task_queue, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
+
+    /* going from single to multi-tasking? */
+    if (VTABLE_get_integer(interp, sched->task_queue) == 1)
+        Parrot_cx_set_scheduler_alarm(interp);
 }
 
 /*
@@ -614,6 +644,7 @@ Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
     FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
     Parrot_alarm_set(alarm_time);
+    enable_scheduling = 1;
 
     /* Insert new alarm at correct (ordered by time) position in array. */
     Parrot_pmc_list_insert_by_number(interp, sched->alarms, alarm);
@@ -692,6 +723,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
 
     PMC *task = Parrot_cx_stop_task(interp, next);
+    enable_scheduling = 1;
 
     adata->alarm_time = done_time;
     adata->alarm_task = task;

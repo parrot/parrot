@@ -127,6 +127,9 @@ void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_task_current(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -188,6 +191,8 @@ PMC* Parrot_task_current(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_cx_schedule_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(alarm))
+#define ASSERT_ARGS_Parrot_cx_set_scheduler_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_task_current __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
