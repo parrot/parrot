@@ -6,113 +6,93 @@ use warnings;
 
 # BASIC GROUPS
 
-our @benchmark_test_files = qw(
-    t/benchmark/*.t
-);
-our @buildtools_test_files = qw(
-    t/tools/pmc2cutils/*.t
-    t/pharness/*.t
-);
-our @codingstd_test_files = qw(
-    t/codingstd/*.t
-);
-our @compilers_test_files = qw(
-    t/compilers/pct/*.t
-    t/compilers/pge/*.t
-    t/compilers/pge/p5regex/*.t
-    t/compilers/pge/perl6regex/*.t
-    t/compilers/tge/*.t
-    t/compilers/opsc/*.t
-    t/compilers/data_json/*.t
-);
-our @configure_test_files = qw(
-    t/configure/*.t
-    t/steps/*.t
-    t/postconfigure/*.t
-);
-our @distro_test_files = qw(
-    t/distro/*.t
-);
-our @dynoplibs_test_files = qw(
-    t/dynoplibs/*.t
-);
-our @dynpmc_test_files = qw(
-    t/dynpmc/*.t
-);
-our @examples_test_files = qw(
-    t/examples/*.t
-);
-our @headerizer_test_files = qw(
-    t/tools/dev/headerizer/*.t
-);
-our @library_test_files = qw(
-    t/library/*.t
-);
-our @manifest_test_files = qw(
-    t/manifest/*.t
-    t/tools/install/*.t
-);
-our @miscellaneous_test_files = qw(
-    t/ext/winxed/*.t
-    t/tools/*.t
-    t/profiling/*.t
-);
-our @perl_test_files = qw(
-    t/perl/*.t
-);
-our @run_test_files = qw(
-    t/run/*.t
-);
-our @runcore_test_files = qw(
-    t/compilers/imcc/*/*.t
-    t/op/*.t
-    t/pmc/*.t
-    t/oo/*.t
-    t/pir/*.t
-    t/native_pbc/*.t
-);
-our @src_test_files = qw(
-    t/src/*.t
-    t/src/embed/*.t
+our %test_groups = (
+    benchmark => [ qw(
+        t/benchmark/*.t
+    ) ],
+    buildtools => [ qw(
+        t/tools/pmc2cutils/*.t
+        t/pharness/*.t
+    ) ],
+    codingstd => [ qw(
+        t/codingstd/*.t
+    ) ],
+    compilers => [ qw(
+        t/compilers/pct/*.t
+        t/compilers/pge/*.t
+        t/compilers/pge/p5regex/*.t
+        t/compilers/pge/perl6regex/*.t
+        t/compilers/tge/*.t
+        t/compilers/opsc/*.t
+        t/compilers/data_json/*.t
+    ) ],
+    configure => [ qw(
+        t/configure/*.t
+        t/steps/*.t
+        t/postconfigure/*.t
+    ) ],
+    distro => [ qw(
+        t/distro/*.t
+    ) ],
+    dynoplibs => [ qw(
+        t/dynoplibs/*.t
+    ) ],
+    dynpmc => [ qw(
+        t/dynpmc/*.t
+    ) ],
+    examples => [ qw(
+        t/examples/*.t
+    ) ],
+    headerizer => [ qw(
+        t/tools/dev/headerizer/*.t
+    ) ],
+    library => [ qw(
+        t/library/*.t
+    ) ],
+    manifest => [ qw(
+        t/manifest/*.t
+        t/tools/install/*.t
+    ) ],
+    miscellaneous => [ qw(
+        t/ext/winxed/*.t
+        t/tools/*.t
+        t/profiling/*.t
+    ) ],
+    perl => [ qw(
+        t/perl/*.t
+    ) ],
+    run => [ qw(
+        t/run/*.t
+    ) ],
+    runcore => [ qw(
+        t/compilers/imcc/*/*.t
+        t/op/*.t
+        t/pmc/*.t
+        t/oo/*.t
+        t/pir/*.t
+        t/native_pbc/*.t
+    ) ],
+    src => [ qw(
+        t/src/*.t
+        t/src/embed/*.t
+    ) ],
 );
 
 # GROUPS OF BASIC GROUPS
 
-our @major_test_group = (
-    @compilers_test_files,
-    @dynoplibs_test_files,
-    @dynpmc_test_files,
-    @library_test_files,
-    @miscellaneous_test_files,
-);
-our @near_core_test_group = (
-    @src_test_files,
-    @run_test_files,
-    @perl_test_files,
-);
+our @major_test_group = map { $test_groups{$_} }
+    ( qw| compilers dynoplibs dynpmc library miscellaneous | );
+
+our @near_core_test_group = map { $test_groups{$_} }
+    ( qw| src run perl | );
+
+# EXPORT FUNCTIONALITY
 
 use base qw( Exporter );
-our @EXPORT_OK = (
-    @benchmark_test_files,
-    @buildtools_test_files,
-    @codingstd_test_files,
-    @compilers_test_files,
-    @configure_test_files,
-    @distro_test_files,
-    @dynoplibs_test_files,
-    @dynpmc_test_files,
-    @examples_test_files,
-    @headerizer_test_files,
-    @library_test_files,
-    @manifest_test_files,
-    @miscellaneous_test_files,
-    @perl_test_files,
-    @run_test_files,
-    @runcore_test_files,
-    @src_test_files,
-    #
-    @major_test_group,
-    @near_core_test_group,
+our @EXPORT_OK = qw(
+    %test_groups
+    @major_test_group
+    @near_core_test_group
 );
 
 1;
@@ -125,45 +105,43 @@ Parrot::Harness::TestSets - Various groups of tests
 
 This package attempts to consolidate all assignments to groups of files used
 during testing.  It exports, on demand only, various arrays used in
-F<t/harness> or in F<Makefile> and the templates (I<e.g.,>
-F<config/gen/makefiles/root.in>) underlying F<Makefile>.
+F<t/harness>, other harnesses and the libraries underlying those programs.
 
-Two types of arrays are defined in this package.
+=head1 EXPORTED IDENTIFIERS
 
-=over 4
+=head2 C<%test_groups>
 
-=item * Basic Groups
+Keys are labels like C<benchmark>. Values are references to arrays of file
+glop patterns.  Example:
 
-A basic group is a list of glob patterns, defined with respect to the
-top-level Parrot directory.  Example:
-
-    our @buildtools_test_files = qw(
+    buildtools => [ qw(
         t/tools/pmc2cutils/*.t
         t/pharness/*.t
-    );
+    ] ),
 
-=item * Groups of Basic Groups
+=head2 C<@major_test_group>
 
-A group of basic group is a list of basic groups.  Example:
+Array holding elements of the values of these C<%test_groups> elements:
 
-    our @major_test_group = (
-        @compilers_test_files,
-        @dynoplibs_test_files,
-        @dynpmc_test_files,
-        @library_test_files,
-        @miscellaneous_test_files,
-    );
+    compilers dynoplibs dynpmc library miscellaneous
 
-=back
+=head2 C<@near_core_test_group>
 
-=head2 How to Add a Group
+Array holding elements of the values of these C<%test_groups> elements:
 
-If you need to add a basic group, define the group as an C<our
-@XXX_test_files> and assign glob statements in the order you want them to be
-run.
+    src run perl
 
-Then add the array holding the basic group to C<@EXPORT_OK> toward the bottom
-of the file.
+=head1 HOW TO ADD A GROUP
+
+If you need to add a basic group, make up a label for the group to serve as
+its key in C<%test_groups>.  For its value, compose an array of file glob
+patterns needed, each beginning with C<t/>.
 
 =cut
 
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

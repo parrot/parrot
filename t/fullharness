@@ -1,0 +1,102 @@
+#!perl
+# Copyright (C) 2011, Parrot Foundation.
+
+use strict;
+use warnings;
+use TAP::Harness;
+use TAP::Formatter::Console;
+use TAP::Parser::Aggregator;
+use Data::Dumper;$Data::Dumper::Indent = 1;
+use Carp;
+use lib qw( ./lib );
+use Parrot::Harness::TestSets qw(
+    %test_groups
+    @major_test_group
+    @near_core_test_group
+);
+use Parrot::Harness::Options qw(
+    get_test_prog_args
+);
+
+my @runcore_test_files = glob("@{ $test_groups{runcore} }");
+
+my @targets = ();
+my @alternate_runcore_targets = ( qw| b f r | );
+foreach my $t (@alternate_runcore_targets) {
+    push @targets, set_alternate_runcore_target($t);
+}
+
+my @other_targets = ( qw|
+    src run buildtools perl
+    compilers dynoplibs dynpmc
+    library miscellaneous
+    codingstd benchmark manifest
+    examples distro headerizer
+| );
+foreach my $t ( @other_targets ) {
+  push @targets, set_usual_target($t);
+} 
+
+my $formatter   = TAP::Formatter::Console->new( {
+    verbosity  => $ENV{HARNESS_VERBOSE},
+    jobs       => $ENV{TEST_JOBS} || 1,
+    directives => 1,
+    timer      => $ENV{HARNESS_TIMER} || 0,
+} );
+my $aggregator = TAP::Parser::Aggregator->new;
+
+$aggregator->start();
+foreach my $set (@targets) {
+    # rewrite environment
+    &{$set->{rule}} if defined $set->{rule};
+    print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
+    my $harness = TAP::Harness->new( { formatter => $formatter } );
+    $harness->aggregate_tests($aggregator, @{$set->{tests}});
+}
+$aggregator->stop();
+$formatter->summary($aggregator);
+
+sub set_usual_env_args {
+    my %opts = ();
+    _handle_opts(\%opts);
+}
+
+sub set_alternate_runcore_env_args {
+    my $runcore = shift;
+    my %opts = ( $runcore => 1 );
+    _handle_opts(\%opts);
+}
+
+sub _handle_opts {
+    my $optsref = shift;
+    $optsref->{D} =
+        sprintf( '%x', hex(40) | (exists $optsref->{D} ? hex($optsref->{D}) : 0));
+    my $args = get_test_prog_args( $optsref, 1, 0 );
+    $ENV{TEST_PROG_ARGS} = $args;
+}
+
+sub set_alternate_runcore_target {
+    my $alt = shift;
+    return {
+        label           => "test$alt",
+        rule            => sub { set_alternate_runcore_env_args($alt) },
+        tests           => [ map { [ $_, "test$alt: $_", ] } @runcore_test_files ],
+    };
+}
+
+sub set_usual_target {
+    my $label = shift;
+    return {
+        label           => $label,
+        rule            => \&set_usual_env_args,
+        tests           => [ glob("@{$test_groups{$label}}") ],
+    };
+}
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

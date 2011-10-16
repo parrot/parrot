@@ -6,16 +6,19 @@ Parrot::Harness::DefaultTests - Tests run by default by F<t/harness>
 
 =head1 DESCRIPTION
 
-Upon request, this package exports six arrays holding various sets of paths to
+Upon request, this package exports four arrays holding glob patterns for
 directories holding test files:
 
     @runcore_tests
     @core_tests
     @library_tests
     @configure_tests
+
+The package also exports one array holding a list of test files:
+
     @developing_tests
 
-Each of these arrays holds lists defined in, and exported from,
+The definition of these lists is found in
 F<lib/Parrot/Harness/TestSets.pm>.
 
 In addition, Parrot::Harness::DefaultTests exports B<by default> one
@@ -47,22 +50,30 @@ our @EXPORT_OK = qw(
     @developing_tests
 );
 use lib qw( ./lib );
-use Parrot::Harness::TestSets ();
+use Parrot::Harness::TestSets qw(
+    %test_groups
+    @major_test_group
+    @near_core_test_group
+);
 
 # runcore tests are always run.
-@runcore_tests = @Parrot::Harness::TestSets::runcore_test_files;
+@runcore_tests = @{ $test_groups{runcore} };
 
 # core tests are run unless --runcore-tests is present.  Typically
 # this list and the list above are run in response to --core-tests
-@core_tests = @Parrot::Harness::TestSets::near_core_test_group;
+foreach my $el (@near_core_test_group) {
+    push @core_tests, @{$el};
+}
 
 # library tests are run unless --runcore-tests or --core-tests is present.
-@library_tests = @Parrot::Harness::TestSets::major_test_group;
+foreach my $el (@major_test_group) {
+    push @library_tests, @{$el};
+}
 
 # configure tests are tests to be run at the beginning of 'make test';
-@configure_tests = @Parrot::Harness::TestSets::configure_test_files;
+@configure_tests = @{ $test_groups{configure} };
 
-@developing_tests = glob("@Parrot::Harness::TestSets::codingstd_test_files");
+@developing_tests = glob("@{ $test_groups{codingstd} }");
 
 sub get_common_tests {
     my ($longopts) = @_;
