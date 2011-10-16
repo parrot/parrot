@@ -15,18 +15,8 @@ directories holding test files:
     @configure_tests
     @developing_tests
 
-Each of these arrays holds a list of paths containing wildcards which are
-expanded by the shell when provided to programs such as F<t/harness>.  The
-paths describe directories holding test files.
-
-Example:
-
-    @core_tests = qw(
-        t/run/*.t
-        t/src/*.t
-        t/perl/*.t
-    );
-
+Each of these arrays holds lists defined in, and exported from,
+F<lib/Parrot/Harness/TestSets.pm>.
 
 In addition, Parrot::Harness::DefaultTests exports B<by default> one
 subroutine:  C<get_common_tests()>.  In list context, C<get_common_tests()>
@@ -56,50 +46,23 @@ our @EXPORT_OK = qw(
     @configure_tests
     @developing_tests
 );
+use lib qw( ./lib );
+use Parrot::Harness::TestSets ();
 
 # runcore tests are always run.
-@runcore_tests = qw(
-    t/compilers/imcc/*/*.t
-    t/op/*.t
-    t/pmc/*.t
-    t/oo/*.t
-    t/pir/*.t
-    t/native_pbc/*.t
-);
+@runcore_tests = @Parrot::Harness::TestSets::runcore_test_files;
 
 # core tests are run unless --runcore-tests is present.  Typically
 # this list and the list above are run in response to --core-tests
-@core_tests = qw(
-    t/src/*.t
-    t/src/embed/*.t
-    t/run/*.t
-    t/perl/*.t
-);
-
+@core_tests = @Parrot::Harness::TestSets::near_core_test_group;
 
 # library tests are run unless --runcore-tests or --core-tests is present.
-@library_tests = qw(
-    t/compilers/pct/*.t
-    t/compilers/pge/*.t
-    t/compilers/pge/p5regex/*.t
-    t/compilers/pge/perl6regex/*.t
-    t/compilers/tge/*.t
-    t/compilers/opsc/*.t
-    t/compilers/data_json/*.t
-    t/dynoplibs/*.t
-    t/dynpmc/*.t
-    t/library/*.t
-    t/ext/winxed/*.t
-    t/tools/*.t
-    t/profiling/*.t
-);
+@library_tests = @Parrot::Harness::TestSets::major_test_group;
 
 # configure tests are tests to be run at the beginning of 'make test';
-@configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
+@configure_tests = @Parrot::Harness::TestSets::configure_test_files;
 
-@developing_tests = (
-    ( glob 't/codingstd/*.t' ),
-);
+@developing_tests = glob("@Parrot::Harness::TestSets::codingstd_test_files");
 
 sub get_common_tests {
     my ($longopts) = @_;
