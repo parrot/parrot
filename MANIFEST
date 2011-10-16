@@ -994,6 +994,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Harness/TestSets.pm                              [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
