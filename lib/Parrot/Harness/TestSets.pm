@@ -137,9 +137,9 @@ Two types of arrays are defined in this package.
 A basic group is a list of glob patterns, defined with respect to the
 top-level Parrot directory.  Example:
 
-    our @buildtools_test_files = (
-        glob("./t/tools/pmc2cutils/*.t"),
-        glob("./t/pharness/*.t"),
+    our @buildtools_test_files = qw(
+        t/tools/pmc2cutils/*.t
+        t/pharness/*.t
     );
 
 =item * Groups of Basic Groups
