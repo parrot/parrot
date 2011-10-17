@@ -17,6 +17,8 @@
         + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
         PCT in Winxed: https://github.com/parrot/PACT
     - Documentation
+		+ We are in the process to migrating our Track wiki to Github at
+			https://github.com/parrot/parrot/wiki
 		+ Packfile PMC documentation was updated
     - Tests
         + Select PMC tests improved to pass on non-Linuxy platforms
