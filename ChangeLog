@@ -12,7 +12,9 @@
 		+ Added get_string VTABLE to FixedIntegerArray and FixedFloatArray PMCs
     - Languages
         + Winxed
-            - Updated snapshot
+          - Updated snapshot to version 1.3.0
+          - Builtin sleep
+          - Modifier 'multi' allows some more multi functionality
     - Community
         + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
         PCT in Winxed: https://github.com/parrot/PACT
