@@ -245,11 +245,15 @@ the library.
 
     METHOD version() {
         const op_lib_t *oplib;
-        PMC * const version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        PMC * const version_array = Parrot_pmc_new_init_int(INTERP,
+                enum_class_FixedIntegerArray, 3);
         GET_ATTR_oplib(INTERP, SELF, oplib);
-        VTABLE_push_integer(INTERP, version_array, oplib->major_version);
-        VTABLE_push_integer(INTERP, version_array, oplib->minor_version);
-        VTABLE_push_integer(INTERP, version_array, oplib->patch_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                0, oplib->major_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                1, oplib->minor_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                2, oplib->patch_version);
         RETURN(PMC *version_array);
     }
 }
