@@ -4,10 +4,12 @@
 use strict;
 use warnings;
 use TAP::Harness;
+use TAP::Harness::Archive 0.10;
 use TAP::Formatter::Console;
 use TAP::Parser::Aggregator;
 use Data::Dumper;$Data::Dumper::Indent = 1;
 use Carp;
+use Getopt::Long;
 use lib qw( ./lib );
 use Parrot::Harness::TestSets qw(
     %test_groups
@@ -17,44 +19,84 @@ use Parrot::Harness::TestSets qw(
 use Parrot::Harness::Options qw(
     get_test_prog_args
 );
+use Parrot::Harness::Smoke qw(
+    collect_test_environment_data
+    send_archive_to_smolder
+);
+
+my ($archive, $smolder);
+GetOptions(
+    'archive'           => \$archive,
+    'send-to-smolder'   => \$smolder,
+);
 
 my @runcore_test_files = glob("@{ $test_groups{runcore} }");
 
 my @targets = ();
 my @alternate_runcore_targets = ( qw| b f r | );
 foreach my $t (@alternate_runcore_targets) {
-    push @targets, set_alternate_runcore_target($t);
+#    push @targets, set_alternate_runcore_target($t);
 }
 
-my @other_targets = ( qw|
-    src run buildtools perl
-    compilers dynoplibs dynpmc
-    library miscellaneous
-    codingstd benchmark manifest
-    examples distro headerizer
-| );
+#my @other_targets = ( qw|
+#    src run buildtools perl
+#    compilers dynoplibs dynpmc
+#    library miscellaneous
+#    codingstd benchmark manifest
+#    examples distro headerizer
+#| );
+my @other_targets = ( qw| run manifest headerizer | );
 foreach my $t ( @other_targets ) {
   push @targets, set_usual_target($t);
 } 
 
-my $formatter   = TAP::Formatter::Console->new( {
-    verbosity  => $ENV{HARNESS_VERBOSE},
-    jobs       => $ENV{TEST_JOBS} || 1,
-    directives => 1,
-    timer      => $ENV{HARNESS_TIMER} || 0,
-} );
-my $aggregator = TAP::Parser::Aggregator->new;
-
-$aggregator->start();
-foreach my $set (@targets) {
-    # rewrite environment
-    &{$set->{rule}} if defined $set->{rule};
-    print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
-    my $harness = TAP::Harness->new( { formatter => $formatter } );
-    $harness->aggregate_tests($aggregator, @{$set->{tests}});
+my ($formatter, $aggregator);
+if ($archive) {
+    my %env_data = collect_test_environment_data();
+    my $harness = TAP::Harness::Archive->new( {
+        verbosity        => $ENV{HARNESS_VERBOSE},
+        archive          => 'parrot_test_run.tar.gz',
+        merge            => 1,
+        jobs             => $ENV{TEST_JOBS} || 1,
+        extra_properties => \%env_data,
+        extra_files      => [ 'myconfig', 'config_lib.pir' ],
+    } );
+    $aggregator = TAP::Parser::Aggregator->new;
+    
+    $aggregator->start();
+    foreach my $set (@targets) {
+        # rewrite environment
+        &{$set->{rule}} if defined $set->{rule};
+        $harness->aggregate_tests($aggregator, @{$set->{tests}});
+    }
+    $aggregator->stop();
+    $harness->summary($aggregator);
+    send_archive_to_smolder(%env_data) if $smolder;
 }
-$aggregator->stop();
-$formatter->summary($aggregator);
+else {
+    $formatter   = TAP::Formatter::Console->new( {
+        verbosity  => $ENV{HARNESS_VERBOSE},
+        jobs       => $ENV{TEST_JOBS} || 1,
+        directives => 1,
+        timer      => $ENV{HARNESS_TIMER} || 0,
+    } );
+    $aggregator = TAP::Parser::Aggregator->new;
+    
+    $aggregator->start();
+    foreach my $set (@targets) {
+        # rewrite environment
+        &{$set->{rule}} if defined $set->{rule};
+        print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
+        my $harness = TAP::Harness->new( { formatter => $formatter } );
+        $harness->aggregate_tests($aggregator, @{$set->{tests}});
+    }
+    $aggregator->stop();
+    $formatter->summary($aggregator);
+    my $exit_value = $aggregator->failed ? 1 : 0;
+    exit($exit_value);
+}
+
+##### SUBROUTINES #####
 
 sub set_usual_env_args {
     my %opts = ();
