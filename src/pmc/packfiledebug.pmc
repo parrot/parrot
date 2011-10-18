@@ -29,6 +29,9 @@ Initial and experimental version, using some vtables as a quick way of testing.
 /* HEADERIZER END: static */
 
 pmclass PackfileDebug auto_attrs extends PackfileRawSegment {
+    /* ConstantTable used for name lookup */
+    ATTR PMC *const_table;
+
     /* Number of file mappings */
     ATTR INTVAL num_mappings;
     /* File name mapping */
@@ -50,6 +53,11 @@ Create empty PackfileDebug.
         SET_ATTR_type(INTERP, SELF, PF_DEBUG_SEG);
         Parrot_warn_experimental(interp, "PackfileDebug is experimental");
 
+        /* Don't initialize C<const_table>.  It will be set to NULL by
+         * auto_attrs handling.  And should be set to proper PMC in
+         * set_directory.
+         */
+
         PObj_custom_mark_SET(SELF);
     }
 
@@ -67,6 +75,7 @@ Marks the object as live.
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
 
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->const_table);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->mapping_offset);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->mapping_filename);
 
@@ -106,6 +115,9 @@ Set pointer to underlying PackFile_ConstTable
 /*
 
 =item C<void *get_pointer()>
+
+Builds a Packfile_Debug segment for this PMC.
+
 =cut
 
 */
@@ -155,7 +167,10 @@ Get the number of filename mappings.
 
 =item C<INTVAL get_pmc_keyed_int(INTVAL n)>
 
-Get the line mapping n.
+=item C<INTVAL get_integer_keyed_int(INTVAL n)>
+
+Get the line mapping n.  If n is greater than C<elements()>, then the integer
+version returns -1 and the PMC version returns PMCNULL;
 
 =cut
 
@@ -183,7 +198,9 @@ Get the line mapping n.
 
 =item C<INTVAL get_string_keyed_int(INTVAL n)>
 
-Get the filename mapping n.
+Get the filename mapping n.  If C<set_directory()> has been used, this will
+return the filename.  Otherwise it returns a string of the integer index into
+the constant table.
 
 =cut
 
@@ -200,7 +217,48 @@ Get the filename mapping n.
         filename = VTABLE_get_integer_keyed_int(INTERP,
                 attrs->mapping_filename, n);
 
+        if (attrs->const_table != PMCNULL)
+            return VTABLE_get_string_keyed_int(INTERP,
+                    attrs->const_table, filename);
+
         return Parrot_str_from_int(INTERP, filename);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void set_directory(PMC *directory)>
+
+Find PackfileConstantTable in PackfileDirectory and use it to perform lookup
+for filenames.
+
+=cut
+
+*/
+
+    METHOD set_directory(PMC *directory) {
+        Parrot_PackfileDebug_attributes * const attrs =
+                PARROT_PACKFILEDEBUG(SELF);
+
+        /* This should be SUPER(directory), but that doesn't work. */
+        attrs->directory = directory;
+
+        STRING * const const_table_str =
+                Parrot_str_new_constant(INTERP, "PackfileConstantTable");
+        PMC * const iter = VTABLE_get_iter(INTERP, directory);
+        while (VTABLE_get_bool(INTERP, iter)) {
+            STRING * const name = VTABLE_shift_string(INTERP, iter);
+            PMC * const segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
+            if (VTABLE_isa(INTERP, segment, const_table_str)) {
+                attrs->const_table = segment;
+                break;
+            }
+        }
     }
 
 }
