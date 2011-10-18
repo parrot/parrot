@@ -9,13 +9,19 @@
           useful and caused hard-to-find bugs.
         + A new subroutine profiling runcore was added. It can be enabled with the command-line
         argument of -R subprof . The resulting data can be analyzed with kcachegrind.
+		+ Added get_string VTABLE to FixedIntegerArray and FixedFloatArray PMCs
     - Languages
         + Winxed
-            - Updated snapshot
+          - Updated snapshot to version 1.3.0
+          - Builtin sleep
+          - Modifier 'multi' allows some more multi functionality
     - Community
         + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
         PCT in Winxed: https://github.com/parrot/PACT
     - Documentation
+		+ We are in the process to migrating our Track wiki to Github at
+			https://github.com/parrot/parrot/wiki
+		+ Packfile PMC documentation was updated
     - Tests
         + Select PMC tests improved to pass on non-Linuxy platforms
 

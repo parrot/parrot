@@ -4,7 +4,7 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/packfileopmap.pmc - Packfile Debug Segment PMC
+src/pmc/packfileopmap.pmc - Packfile Op Map PMC
 
 =head1 DESCRIPTION
 
@@ -222,7 +222,7 @@ Marks the object as live.
 
 =item C<INTVAL get_integer()>
 
-Get the number of filename mappings.
+Get the number of opcode mappings.
 
 =cut
 

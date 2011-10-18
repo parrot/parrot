@@ -258,8 +258,6 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 
 =item uuid_type
 
-=item uuid_length
-
 =back
 
 =cut
@@ -477,7 +475,7 @@ Return raw serialized PBC file data. Synonym for get_string.
 
 /*
 
-=item C<STRING * unpack()>
+=item C<void unpack(STRING *data)>
 
 Parse raw serialized PBC file data into the Packfile data structure.
 Synonym for set_string.

@@ -146,9 +146,9 @@ Get the number of filename mappings.
 
 /*
 
-=item C<INTVAL get_string_keyed_int(INTVAL n)>
+=item C<INTVAL get_pmc_keyed_int(INTVAL n)>
 
-Get the filename mapping n.
+Get the line mapping n.
 
 =cut
 
