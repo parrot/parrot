@@ -471,17 +471,7 @@ Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
 
 =back
 
-=head2 XI. Review the Milestones
-
-Review the milestone for the current release in Trac at
-L<http://trac.parrot.org/parrot/roadmap> and mark it as I<Completed>. Marking a
-milestone as I<Completed> will migrate all open tickets to a selected milestone
-(generally the next milestone). Non-critical tickets can have their milestone
-unset.
-
-Also make sure to close any completed release-related tickets.
-
-=head2 XII. Changes to Trac
+=head2 XI. Changes to Trac
 
 =over 4
 
@@ -500,9 +490,9 @@ Remove any sufficiently old versions listed there.
 
 =back
 
-=head2 XIII. Finish
+=head2 XII. Finish
 
-You're done! Help yourself to a beer, cola, or other celebratory drink.
+You're done! Help yourself to a beer, cola, or other delicious celebratory drink.
 
 =head1 SEE ALSO
 
