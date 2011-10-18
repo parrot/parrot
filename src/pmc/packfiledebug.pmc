@@ -245,13 +245,13 @@ for filenames.
     METHOD set_directory(PMC *directory) {
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
+        STRING * const const_table_str =
+                Parrot_str_new_constant(INTERP, "PackfileConstantTable");
+        PMC * const iter = VTABLE_get_iter(INTERP, directory);
 
         /* This should be SUPER(directory), but that doesn't work. */
         attrs->directory = directory;
 
-        STRING * const const_table_str =
-                Parrot_str_new_constant(INTERP, "PackfileConstantTable");
-        PMC * const iter = VTABLE_get_iter(INTERP, directory);
         while (VTABLE_get_bool(INTERP, iter)) {
             STRING * const name = VTABLE_shift_string(INTERP, iter);
             PMC * const segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);
