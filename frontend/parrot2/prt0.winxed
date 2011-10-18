@@ -111,11 +111,13 @@ function __default_get_packfile[anon](string file_name, int file_type)
 function __get_input_file_type[anon](string file_name)
 {
     int len = length(file_name) - 4;
-    string ext = substr(file_name, len);
+    string ext = len >= 0 ? substr(file_name, len) : '';
     if (ext == ".pir") return PIR_FILE;
     if (ext == ".pbc") return PBC_FILE;
-    ext = substr(file_name, len - 1);
-    if (ext == ".pasm") return PASM_FILE;
+    if (len > 0) {
+        ext = substr(file_name, len - 1);
+        if (ext == ".pasm") return PASM_FILE;
+    }
     return PIR_FILE;
 }
 
