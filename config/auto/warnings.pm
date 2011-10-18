@@ -188,6 +188,7 @@ sub _init {
         -Wunused
         -Wunused-function
         -Wunused-label
+        -Wunused-local-typedefs
         -Wunused-value
         -Wunused-variable
     ) ];
