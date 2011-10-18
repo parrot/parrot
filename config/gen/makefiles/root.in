@@ -2161,20 +2161,7 @@ check : test
 # 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest :
-	-@make@ testb \
-	testf \
-	testr \
-	src_tests \
-	run_tests \
-	buildtools_tests \
-	perl_tests \
-	library_tests \
-	codetest \
-	benchmark_tests \
-	manifest_tests \
-	examples_tests \
-	distro_tests \
-	headerizer_tests
+	$(PERL) t/fullharness
 
 all_hll_test :
 	$(PERL) tools/dev/all_hll_test.pl

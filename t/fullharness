@@ -35,17 +35,17 @@ my @runcore_test_files = glob("@{ $test_groups{runcore} }");
 my @targets = ();
 my @alternate_runcore_targets = ( qw| b f r | );
 foreach my $t (@alternate_runcore_targets) {
-#    push @targets, set_alternate_runcore_target($t);
+    push @targets, set_alternate_runcore_target($t);
 }
 
-#my @other_targets = ( qw|
-#    src run buildtools perl
-#    compilers dynoplibs dynpmc
-#    library miscellaneous
-#    codingstd benchmark manifest
-#    examples distro headerizer
-#| );
-my @other_targets = ( qw| run manifest headerizer | );
+my @other_targets = ( qw|
+    src run buildtools perl
+    compilers dynoplibs dynpmc
+    library miscellaneous
+    codingstd benchmark manifest
+    examples distro headerizer
+| );
+#my @other_targets = ( qw| run manifest headerizer | );
 foreach my $t ( @other_targets ) {
   push @targets, set_usual_target($t);
 } 
