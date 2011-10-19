@@ -1172,6 +1172,11 @@ NB: this method will destroy all old data!
 
 Return type of values in Hash.
 
+=item C<METHOD update(Hash *other)>
+
+Copies all entries from the other hash into the hash, overwriting
+entries with the same key.
+
 =cut
 
 */
@@ -1221,6 +1226,15 @@ Return type of values in Hash.
         RETURN(INTVAL ret);
     }
 
+    METHOD update(PMC *other) {
+        if (other->vtable->base_type == SELF->vtable->base_type
+        ||  other->vtable->base_type == enum_class_Hash) {
+            Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(), (Hash *)VTABLE_get_pointer(INTERP, other));
+        } else {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                        "Hash: don't know how to update from a non-Hash type");
+        }
+    }
 }
 
 /*
