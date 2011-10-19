@@ -721,7 +721,6 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 
     PMC *alarm = Parrot_pmc_new(interp, enum_class_Alarm);
     Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
-
     PMC *task = Parrot_cx_stop_task(interp, next);
     enable_scheduling = 1;
 

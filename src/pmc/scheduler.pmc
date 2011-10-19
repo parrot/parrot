@@ -118,10 +118,10 @@ current maximum, and a birthtime of the current time.
 */
 
     void push_pmc(PMC *task) {
-        Parrot_Scheduler_attributes *const core_struct = PARROT_SCHEDULER(SELF);
-
+        /* TODO: This does nothing */
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         PMC *const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
-        STRING *const type  = VTABLE_get_string(interp, type_pmc);
+        STRING *const type = VTABLE_get_string(interp, type_pmc);
     }
 
 
@@ -170,6 +170,8 @@ Frees the scheduler's underlying struct.
 */
     VTABLE void destroy() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        UNUSED(interp);
+
         core_struct->interp->scheduler = NULL;
     }
 

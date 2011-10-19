@@ -75,6 +75,8 @@ well.
     equality_tests()
 
     pmc_keys()
+    update()
+    update_mixed()
 
     'done_testing'()
 .end
@@ -1511,6 +1513,53 @@ postit_end:
     hash[$P0] = "answer"
     $P1 = getattribute $P0, "invoked"
     is ($P1, 42, "hashvalue was invoked")
+.end
+
+# test the update method
+.sub 'update'
+    .local pmc hash1, hash2, hash3
+    hash1 = new ['Hash']
+    hash2 = new ['Hash']
+    hash3 = new ['Hash']
+    hash1['one'] = "Hello Parrot!"
+    hash1['two'] = 1664
+    hash1['three'] = 2.718
+    hash2['three'] = "3.141"
+    hash2['four'] = "vier"
+    hash3['four'] = "vier"
+    hash3['three'] = "3.141"
+    hash3['two'] = 1664
+    hash3['one'] = "Hello Parrot!"
+    hash1."update"(hash2)
+    $I0 = elements hash1
+    is($I0, 4, "Got 4 elements in Hash after update")
+    is(hash1, hash3, 'update worked')
+.end
+
+.sub 'update_mixed'
+    .local pmc hash1, hash2, hash3
+    hash1 = new ['Hash']
+    hash1 = .Hash_key_type_int
+    hash1.'set_value_type'(.DATATYPE_INTVAL)
+    hash2 = new ['Hash']
+    hash2 = .Hash_key_type_PMC
+    hash2.'set_value_type'(.DATATYPE_STRING)
+    hash3 = new ['Hash']
+    hash3 = .Hash_key_type_int
+    hash3.'set_value_type'(.DATATYPE_INTVAL)
+    hash1[1] = "42"
+    hash1[2] = 1664
+    hash1[3] = 2.718
+    hash2["3"] = "3.141"
+    hash2["4"] = "4"
+    hash3[4] = 4
+    hash3[3] = 3
+    hash3[2] = 1664
+    hash3[1] = 42
+    hash1."update"(hash2)
+    $I0 = elements hash1
+    is($I0, 4, "Got 4 elements in Hash after update")
+    is(hash1, hash3, 'update_mixed worked')
 .end
 
 .namespace ['Foo']

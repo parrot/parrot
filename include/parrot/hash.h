@@ -221,6 +221,15 @@ PARROT_PURE_FUNCTION
 INTVAL Parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
 
+PARROT_EXPORT
+void Parrot_hash_update(PARROT_INTERP,
+    ARGMOD(Hash *hash),
+    ARGIN(Hash *other))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*hash);
+
 PARROT_HOT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -424,6 +433,10 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
     , PARROT_ASSERT_ARG(hash))
 #define ASSERT_ARGS_Parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(hash))
+#define ASSERT_ARGS_Parrot_hash_update __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(hash) \
+    , PARROT_ASSERT_ARG(other))
 #define ASSERT_ARGS_Parrot_hash_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_hash_chash_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

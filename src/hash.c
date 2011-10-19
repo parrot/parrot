@@ -1485,6 +1485,69 @@ Parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
 
 /*
 
+=item C<void Parrot_hash_update(PARROT_INTERP, Hash *hash, Hash *other)>
+
+Copies all entries from the other hash into the hash, overwriting
+entries with the same key.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
+{
+    ASSERT_ARGS(Parrot_hash_update)
+    if (hash->key_type == other->key_type && hash->entry_type == other->entry_type) {
+        parrot_hash_iterate(other, Parrot_hash_put(interp, hash, _bucket->key, _bucket->value););
+    } else {
+        parrot_hash_iterate(other,
+            void *key = _bucket->key;
+            void *value = _bucket->value;
+            if (hash->key_type != other->key_type) {
+                switch (hash->key_type) {
+                  case Hash_key_type_int:
+                    key = (void *)Parrot_hash_key_to_int(interp, other, key);
+                    break;
+                  case Hash_key_type_STRING:
+                  case Hash_key_type_STRING_enc:
+                    key = (void *)Parrot_hash_key_to_string(interp, other, key);
+                    break;
+                  case Hash_key_type_PMC:
+                  case Hash_key_type_PMC_ptr:
+                    key = (void *)Parrot_hash_key_to_pmc(interp, other, key);
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "unimplemented key type %i", (int)hash->key_type);
+                    break;
+                }
+            }
+            if (hash->entry_type != other->entry_type) {
+                switch (hash->entry_type) {
+                  case enum_hash_int:
+                    value = (void *)Parrot_hash_value_to_int(interp, other, value);
+                    break;
+                  case enum_hash_string:
+                    value = (void *)Parrot_hash_value_to_string(interp, other, value);
+                    break;
+                  case enum_hash_pmc:
+                    value = (void *)Parrot_hash_value_to_pmc(interp, other, value);
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "unimplemented value type %i", (int)hash->entry_type);
+                    break;
+                }
+            }
+            Parrot_hash_put(interp, hash, key, value);
+            );
+    }
+}
+
+/*
+
 =item C<void Parrot_hash_clone(PARROT_INTERP, const Hash *hash, Hash *dest)>
 
 Clones C<hash> to C<dest>.

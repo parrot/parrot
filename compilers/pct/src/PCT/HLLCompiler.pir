@@ -855,6 +855,10 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+
     .local int can_backtrace, ll_backtrace
     can_backtrace = can self, 'backtrace'
     unless can_backtrace goto no_push_eh
@@ -882,6 +886,9 @@ Generic method for compilers invoked from a shell command line.
     goto save_output
   eval_line:
     result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
+    if target == '' goto save_output
+    if target == 'pir' goto save_output
+    '_dumper'(result, target)
 
   save_output:
     unless can_backtrace goto no_pop_eh
@@ -890,9 +897,6 @@ Generic method for compilers invoked from a shell command line.
     if null result goto end
     $I0 = defined result
     unless $I0 goto end
-    .local string target
-    target = adverbs['target']
-    target = downcase target
     if target != 'pir' goto end
     .local string output
     .local pmc ofh

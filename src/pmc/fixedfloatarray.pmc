@@ -466,6 +466,42 @@ C<value>.
         SELF.set_pmc_keyed_int(k, value);
     }
 
+/*
+
+=item C<STRING *get_string()>
+
+=item C<STRING *get_repo()>
+
+Returns the Parrot string representation C<key>
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        return STATICSELF.get_repr();
+    }
+
+    VTABLE STRING *get_repr() {
+        STRING *str = CONST_STRING(INTERP, "[ ");
+        STRING *comma = CONST_STRING(INTERP, ", ");
+        UINTVAL i;
+        const UINTVAL elems = SELF.elements();
+
+        if (elems > 0)
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_string_keyed_int(0));
+
+        for (i = 1; i < elems; ++i) {
+            str = Parrot_str_concat(INTERP, str, comma);
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_string_keyed_int((INTVAL)i));
+        }
+
+        str = Parrot_str_concat(INTERP, str, CONST_STRING(INTERP, " ]"));
+        return str;
+    }
+
 }
 
 /*
