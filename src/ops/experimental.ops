@@ -262,6 +262,83 @@ op root_new(out PMC, in PMC, in INT) {
     }
 }
 
+op get_context(out PMC) {
+    $1 = CURRENT_CONTEXT(interp);
+}
+
+op new_call_context(out PMC) {
+    $1 = Parrot_pmc_new(interp, enum_class_CallContext);
+}
+
+inline op invokecc(invar PMC, invar PMC) :flow {
+    PMC      * const p     = $1;
+    opcode_t *dest         = expr NEXT();
+    PMC      * const signature = $2;
+
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
+    interp->current_cont   = NEED_CONTINUATION;
+    dest                   = VTABLE_invoke(interp, p, dest);
+
+    goto ADDRESS(dest);
+}
+
+op flatten_array_into(invar PMC, invar PMC, in INT) {
+    PMC * const dest = $1;
+    PMC * const src = $2;
+    INTVAL const overwrite = $3;
+    INTVAL i;
+    INTVAL start_idx = overwrite ? 0 : VTABLE_elements(interp, dest);
+    INTVAL src_elems = VTABLE_elements(interp, src);
+    for (i = 0; i < src_elems; i++) {
+        PMC * const val = VTABLE_get_pmc_keyed_int(interp, dest, i);
+        VTABLE_set_pmc_keyed_int(interp, dest, i + start_idx, val);
+    }
+}
+
+op flatten_hash_into(invar PMC, invar PMC, in INT) {
+    PMC * const dest = $1;
+    PMC * const src = $2;
+    INTVAL const overwrite = $3;
+    const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
+    if (overwrite) {
+        parrot_hash_iterate(hash,
+            VTABLE_set_pmc_keyed_str(interp, dest,
+                (STRING *)_bucket->key,
+                Parrot_hash_value_to_pmc(interp, hash, _bucket->value));
+        );
+    } else {
+        parrot_hash_iterate(hash,
+            STRING * const key = (STRING *)_bucket->key;
+            if (!VTABLE_exists_keyed_str(interp, dest, key)) {
+                PMC * const value = Parrot_hash_value_to_pmc(interp, hash, _bucket->value);
+                VTABLE_set_pmc_keyed_str(interp, dest, key, value);
+            }
+        );
+    }
+}
+
+op slurp_array_from(out PMC, invar PMC, in INT) {
+    PMC * const dest = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC * const src = $2;
+    const INTVAL src_elems = VTABLE_elements(interp, src);
+    INTVAL i;
+    for (i = $3; i < src_elems; i++) {
+        PMC * const value = VTABLE_get_pmc_keyed_int(interp, src, i);
+        VTABLE_push_pmc(interp, src, value);
+    }
+    $1 = dest;
+}
+
+/* TODO:
+    Need op/method or other mechanism to get a Hash of all named args from a 
+    CallContext
+    Need a "get_keyed_str_and_delete" op to read a value from a Hash and delete
+    it
+*/
+
 =back
 
 =head1 COPYRIGHT
