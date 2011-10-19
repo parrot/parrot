@@ -69,13 +69,13 @@ extern op_lib_t core_op_lib;
 
 
 
-INTVAL core_numops = 1094;
+INTVAL core_numops = 1103;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1094] = {
+static op_func_t core_op_func_table[1103] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1169,6 +1169,15 @@ static op_func_t core_op_func_table[1094] = {
   Parrot_root_new_p_pc_i,                            /*   1090 */
   Parrot_root_new_p_p_ic,                            /*   1091 */
   Parrot_root_new_p_pc_ic,                           /*   1092 */
+  Parrot_get_context_p,                              /*   1093 */
+  Parrot_new_call_context_p,                         /*   1094 */
+  Parrot_invokecc_p_p,                               /*   1095 */
+  Parrot_flatten_array_into_p_p_i,                   /*   1096 */
+  Parrot_flatten_array_into_p_p_ic,                  /*   1097 */
+  Parrot_flatten_hash_into_p_p_i,                    /*   1098 */
+  Parrot_flatten_hash_into_p_p_ic,                   /*   1099 */
+  Parrot_slurp_array_from_p_p_i,                     /*   1100 */
+  Parrot_slurp_array_from_p_p_ic,                    /*   1101 */
 
   NULL /* NULL function pointer */
 };
@@ -1179,7 +1188,7 @@ static op_func_t core_op_func_table[1094] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1094] = {
+static op_info_t core_op_info_table[1103] = {
   { /* 0 */
     "end",
     "end",
@@ -13203,6 +13212,105 @@ static op_info_t core_op_info_table[1094] = {
     { 0, 0, 0 },
     &core_op_lib
   },
+  { /* 1093 */
+    "get_context",
+    "get_context_p",
+    "Parrot_get_context_p",
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT },
+    { 0 },
+    &core_op_lib
+  },
+  { /* 1094 */
+    "new_call_context",
+    "new_call_context_p",
+    "Parrot_new_call_context_p",
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT },
+    { 0 },
+    &core_op_lib
+  },
+  { /* 1095 */
+    "invokecc",
+    "invokecc_p_p",
+    "Parrot_invokecc_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 1096 */
+    "flatten_array_into",
+    "flatten_array_into_p_p_i",
+    "Parrot_flatten_array_into_p_p_i",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 1097 */
+    "flatten_array_into",
+    "flatten_array_into_p_p_ic",
+    "Parrot_flatten_array_into_p_p_ic",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 1098 */
+    "flatten_hash_into",
+    "flatten_hash_into_p_p_i",
+    "Parrot_flatten_hash_into_p_p_i",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 1099 */
+    "flatten_hash_into",
+    "flatten_hash_into_p_p_ic",
+    "Parrot_flatten_hash_into_p_p_ic",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 1100 */
+    "slurp_array_from",
+    "slurp_array_from_p_p_i",
+    "Parrot_slurp_array_from_p_p_i",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_I },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 1101 */
+    "slurp_array_from",
+    "slurp_array_from_p_p_ic",
+    "Parrot_slurp_array_from_p_p_ic",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_IC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
 
 };
 
@@ -23725,6 +23833,128 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     return (opcode_t *)cur_opcode + 4;
 }
 
+opcode_t *
+Parrot_get_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = CURRENT_CONTEXT(interp);
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return (opcode_t *)cur_opcode + 2;
+}
+
+opcode_t *
+Parrot_new_call_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = Parrot_pmc_new(interp, enum_class_CallContext);
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return (opcode_t *)cur_opcode + 2;
+}
+
+opcode_t *
+Parrot_invokecc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC       * const  p = PREG(1);
+    opcode_t  * dest =  cur_opcode + 3;
+    PMC       * const  signature = PREG(2);
+
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+    if ((!PMC_IS_NULL(signature))) {
+        Parrot_pcc_set_object(interp, signature, NULL);
+    }
+
+    interp->current_cont = NEED_CONTINUATION;
+    dest = VTABLE_invoke(interp, p, dest);
+    return (opcode_t *)dest;
+}
+
+opcode_t *
+Parrot_flatten_array_into_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = PREG(1);
+    PMC  * const  src = PREG(2);
+    const INTVAL   overwrite = IREG(3);
+    INTVAL   i;
+    INTVAL   start_idx = overwrite ? 0 : VTABLE_elements(interp, dest);
+    INTVAL   src_elems = VTABLE_elements(interp, src);
+
+    for (i = 0; (i < src_elems); (i++)) {
+        PMC  * const  val = VTABLE_get_pmc_keyed_int(interp, dest, i);
+
+        VTABLE_set_pmc_keyed_int(interp, dest, (i + start_idx), val);
+    }
+
+    return (opcode_t *)cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_flatten_array_into_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = PREG(1);
+    PMC  * const  src = PREG(2);
+    const INTVAL   overwrite = ICONST(3);
+    INTVAL   i;
+    INTVAL   start_idx = overwrite ? 0 : VTABLE_elements(interp, dest);
+    INTVAL   src_elems = VTABLE_elements(interp, src);
+
+    for (i = 0; (i < src_elems); (i++)) {
+        PMC  * const  val = VTABLE_get_pmc_keyed_int(interp, dest, i);
+
+        VTABLE_set_pmc_keyed_int(interp, dest, (i + start_idx), val);
+    }
+
+    return (opcode_t *)cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_flatten_hash_into_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = PREG(1);
+    PMC  * const  src = PREG(2);
+    const INTVAL   overwrite = IREG(3);
+
+    Parrot_hash_flatten_hash_into(interp, dest, src, overwrite);
+    return (opcode_t *)cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_flatten_hash_into_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = PREG(1);
+    PMC  * const  src = PREG(2);
+    const INTVAL   overwrite = ICONST(3);
+
+    Parrot_hash_flatten_hash_into(interp, dest, src, overwrite);
+    return (opcode_t *)cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_slurp_array_from_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC  * const  src = PREG(2);
+    const INTVAL   src_elems = VTABLE_elements(interp, src);
+    INTVAL   i;
+
+    for (i = IREG(3); (i < src_elems); (i++)) {
+        PMC  * const  value = VTABLE_get_pmc_keyed_int(interp, src, i);
+
+        VTABLE_push_pmc(interp, src, value);
+    }
+
+    PREG(1) = dest;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return (opcode_t *)cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_slurp_array_from_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  dest = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC  * const  src = PREG(2);
+    const INTVAL   src_elems = VTABLE_elements(interp, src);
+    INTVAL   i;
+
+    for (i = ICONST(3); (i < src_elems); (i++)) {
+        PMC  * const  value = VTABLE_get_pmc_keyed_int(interp, src, i);
+
+        VTABLE_push_pmc(interp, src, value);
+    }
+
+    PREG(1) = dest;
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return (opcode_t *)cur_opcode + 4;
+}
+
 
 /*
 ** op lib descriptor:
@@ -23739,7 +23969,7 @@ op_lib_t core_op_lib = {
   3,    /* major_version */
   9,    /* minor_version */
   0,    /* patch_version */
-  1093,             /* op_count */
+  1102,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

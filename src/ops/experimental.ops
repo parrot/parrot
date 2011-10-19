@@ -288,7 +288,7 @@ inline op invokecc(invar PMC, invar PMC) :flow {
 op flatten_array_into(invar PMC, invar PMC, in INT) {
     PMC * const dest = $1;
     PMC * const src = $2;
-    INTVAL const overwrite = $3;
+    const INTVAL overwrite = $3;
     INTVAL i;
     INTVAL start_idx = overwrite ? 0 : VTABLE_elements(interp, dest);
     INTVAL src_elems = VTABLE_elements(interp, src);
@@ -301,23 +301,8 @@ op flatten_array_into(invar PMC, invar PMC, in INT) {
 op flatten_hash_into(invar PMC, invar PMC, in INT) {
     PMC * const dest = $1;
     PMC * const src = $2;
-    INTVAL const overwrite = $3;
-    const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
-    if (overwrite) {
-        parrot_hash_iterate(hash,
-            VTABLE_set_pmc_keyed_str(interp, dest,
-                (STRING *)_bucket->key,
-                Parrot_hash_value_to_pmc(interp, hash, _bucket->value));
-        );
-    } else {
-        parrot_hash_iterate(hash,
-            STRING * const key = (STRING *)_bucket->key;
-            if (!VTABLE_exists_keyed_str(interp, dest, key)) {
-                PMC * const value = Parrot_hash_value_to_pmc(interp, hash, _bucket->value);
-                VTABLE_set_pmc_keyed_str(interp, dest, key, value);
-            }
-        );
-    }
+    const INTVAL overwrite = $3;
+    Parrot_hash_flatten_hash_into(interp, dest, src, overwrite);
 }
 
 op slurp_array_from(out PMC, invar PMC, in INT) {
@@ -331,13 +316,6 @@ op slurp_array_from(out PMC, invar PMC, in INT) {
     }
     $1 = dest;
 }
-
-/* TODO:
-    Need op/method or other mechanism to get a Hash of all named args from a 
-    CallContext
-    Need a "get_keyed_str_and_delete" op to read a value from a Hash and delete
-    it
-*/
 
 =back
 

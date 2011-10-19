@@ -1107,7 +1107,16 @@ typedef enum {
     PARROT_OP_root_new_p_p_i,                  /* 1089 */
     PARROT_OP_root_new_p_pc_i,                 /* 1090 */
     PARROT_OP_root_new_p_p_ic,                 /* 1091 */
-    PARROT_OP_root_new_p_pc_ic                 /* 1092 */
+    PARROT_OP_root_new_p_pc_ic,                /* 1092 */
+    PARROT_OP_get_context_p,                   /* 1093 */
+    PARROT_OP_new_call_context_p,              /* 1094 */
+    PARROT_OP_invokecc_p_p,                    /* 1095 */
+    PARROT_OP_flatten_array_into_p_p_i,        /* 1096 */
+    PARROT_OP_flatten_array_into_p_p_ic,       /* 1097 */
+    PARROT_OP_flatten_hash_into_p_p_i,         /* 1098 */
+    PARROT_OP_flatten_hash_into_p_p_ic,        /* 1099 */
+    PARROT_OP_slurp_array_from_p_p_i,          /* 1100 */
+    PARROT_OP_slurp_array_from_p_p_ic          /* 1101 */
 
 } parrot_opcode_enums;
 

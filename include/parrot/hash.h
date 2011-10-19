@@ -275,6 +275,15 @@ Hash * Parrot_hash_create_sized(PARROT_INTERP,
     UINTVAL size)
         __attribute__nonnull__(1);
 
+void Parrot_hash_flatten_hash_into(PARROT_INTERP,
+    ARGMOD(PMC * const dest),
+    ARGIN(PMC * const src),
+    INTVAL overwrite)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* const dest);
+
 void Parrot_hash_freeze(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGMOD(PMC *info))
@@ -454,6 +463,10 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hash_create_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_hash_flatten_hash_into __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_Parrot_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \

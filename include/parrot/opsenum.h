@@ -1107,6 +1107,15 @@ enum OPS_ENUM {
     enum_ops_root_new_p_pc_i               = 1090,
     enum_ops_root_new_p_p_ic               = 1091,
     enum_ops_root_new_p_pc_ic              = 1092,
+    enum_ops_get_context_p                 = 1093,
+    enum_ops_new_call_context_p            = 1094,
+    enum_ops_invokecc_p_p                  = 1095,
+    enum_ops_flatten_array_into_p_p_i      = 1096,
+    enum_ops_flatten_array_into_p_p_ic     = 1097,
+    enum_ops_flatten_hash_into_p_p_i       = 1098,
+    enum_ops_flatten_hash_into_p_p_ic      = 1099,
+    enum_ops_slurp_array_from_p_p_i        = 1100,
+    enum_ops_slurp_array_from_p_p_ic       = 1101,
 };
 
 
