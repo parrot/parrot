@@ -993,10 +993,9 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     Parrot_cx_runloop_wake(interp, interp->scheduler);
 
     /* A more primitive, platform-specific, non-threaded form of sleep. */
-    if (time > 1) {
+    if (time >= 1) {
         /* prevent integer overflow when converting to microseconds
-         * and problems in platforms that doesn't allow usleep more
-         * than 1 second */
+         * and problems in platforms that don't allow usleep of >= 1 second */
         const int seconds = floor(time);
         Parrot_sleep(seconds);
         time -= seconds;
