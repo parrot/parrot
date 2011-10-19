@@ -22,7 +22,7 @@ it to become ready for an I/O operation.
 
     load_bytecode 'osutils.pbc'
 
-    plan(13)
+    plan(14)
 
     .local pmc interp
     interp = getinterp
@@ -38,7 +38,7 @@ it to become ready for an I/O operation.
     goto tests
 
   todo_all:
-    skip(13, 'Behavior of select() is undefined on Windows')
+    skip(14, 'Behavior of select() is undefined on Windows')
     goto end
 
   tests:
