@@ -458,7 +458,7 @@ Modify the topic on C<#parrot>:
 
 =item 4
 
-Update the wiki frontpage at L<http://trac.parrot.org/parrot/>.
+Update the wiki frontpage at L<https://github.com/parrot/parrot/wiki>
 
 =item 5
 
