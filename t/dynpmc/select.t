@@ -133,10 +133,15 @@ it to become ready for an I/O operation.
 
     $P1 = new ['Select']
     $P1.'update'($P0, $P9, 2)
+    sweep 1
+    $P9 = new 'String'
+    $P9 = 'FH2'
 
     $P6 = $P1.'can_write'(1)
     $I0 = $P6
     is($I0, 1, 'Test can_write() for README2')
+    $P2 = $P6[0]
+    is($P2, "FH1", 'can_write() returned the correct payload')
 
     $P6 = $P1.'can_read'(0)
     $I0 = $P6

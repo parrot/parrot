@@ -84,12 +84,30 @@ Initializes the PMC.
 
     VTABLE void init() {
         PMC * const fd_map = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(INTERP, fd_map, Hash_key_type_int);
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
         SET_ATTR_max_fd(INTERP, SELF, -1);
 
         FD_ZERO(&(PARROT_SELECT(SELF)->rb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->wb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->eb_array));
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark fd_map hash as live.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        PMC *fd_map;
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        Parrot_gc_mark_PMC_alive(interp, fd_map);
     }
 
 /*
