@@ -1,14 +1,17 @@
+# Copyright (C) 2008-2011, Parrot Foundation.
+
 package Parrot::SearchOps;
-# Copyright (C) 2008, Parrot Foundation.
 
 use strict;
 use warnings;
+use lib qw(lib);
 
 use Exporter;
 use Text::Wrap;
-use lib qw( ./lib );
-use Parrot::Configure::Utils qw( _slurp );
-our @ISA = qw( Exporter );
+
+use Parrot::Configure::Utils qw(_slurp);
+
+our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
     search_all_ops_files
     help
@@ -103,7 +106,7 @@ sub _handle_indices {
 
 sub usage {
     print <<USAGE;
-    perl tools/dev/search-ops.pl [--help] [--all] ops_pattern
+    perl tools/dev/search_ops.pl [--help] [--all] ops_pattern
 USAGE
 }
 
@@ -117,7 +120,7 @@ description.  The program must be called from the top-level Parrot directory.
 To dump every op, call '--all' on the command line.
 
 Example:
-> perl tools/dev/search-ops.pl load
+> perl tools/dev/search_ops.pl load
 
 ----------------------------------------------------------------------
 File: core.ops - Parrot Core Ops (2 matches)
@@ -143,7 +146,7 @@ HELP
 
 =head1 NAME
 
-Parrot::SearchOps - functions used in tools/dev/search-ops.pl
+Parrot::SearchOps - functions used in tools/dev/search_ops.pl
 
 =head1 SYNOPSIS
 
@@ -164,7 +167,7 @@ Parrot::SearchOps - functions used in tools/dev/search-ops.pl
 =head1 DESCRIPTION
 
 This package provides functionality for the Perl 5 program
-F<tools/dev/search-ops.pl>, designed to replace the Python program
+F<tools/dev/search_ops.pl>, designed to replace the Python program
 F<tools/docs/search-ops.py>.  It exports two subroutines on demand.
 
 =head2 C<search_all_ops_files()>
@@ -183,12 +186,12 @@ C<n_concat>.
 
 =item * $wrap_width
 
-In F<tools/dev/search-ops.pl>, this is set to C<70> characters. Can be varied
+In F<tools/dev/search_ops.pl>, this is set to C<70> characters. Can be varied
 during testing or development.
 
 =item * $opsdir
 
-In F<tools/dev/search-ops.pl>, this is set to F<src/ops/>.  Can be varied
+In F<tools/dev/search_ops.pl>, this is set to F<src/ops/>.  Can be varied
 during testing or development.
 
 =back
@@ -198,7 +201,7 @@ files.
 
 =head2 C<usage()>
 
-B<Purpose:>  Display usage statement for F<tools/dev/search-ops.pl>.
+B<Purpose:>  Display usage statement for F<tools/dev/search_ops.pl>.
 
 B<Arguments:>  None.
 
@@ -206,7 +209,7 @@ C<Return Value:>  Implicitly returns true upon success.
 
 =head2 C<help()>
 
-B<Purpose:>  Display usage statement and more complete help message for F<tools/dev/search-ops.pl>.
+B<Purpose:>  Display usage statement and more complete help message for F<tools/dev/search_ops.pl>.
 
 B<Arguments:>  None.
 

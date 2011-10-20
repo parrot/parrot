@@ -8,7 +8,7 @@
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
     description (D), main username (U), alias usernames (A)
-    and snail-mail address (S).
+    and geographic location (S).
 
         Thanks,
 
@@ -18,6 +18,13 @@
         PPPS: To turn this file into a author map for git-svn, see tools/dev/mk_author_map.pl
 
 ----------
+N: Aaron Faanes
+E: dafrito@gmail.com
+W: http://www.dafrito.com
+D: make_html_docs revisions
+U: dafrito
+S: Richardson, TX
+
 N: Aaron Sherman
 U: ajs
 E: ajs@ajs.com
@@ -447,6 +454,12 @@ A: gerd
 E: pokorra@uni-siegen.de
 D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
+N: Gerhard R.
+U: gerdr
+A: not_gerd
+W: http://gerdr.github.com/on-parrot/
+D: MSYS fixes
+
 N: Goplat
 D: Win98 and other fixes.
 
@@ -572,6 +585,12 @@ D: coding standard tests
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
+N: Jonathan Gentle
+E: atrodo@atrodo.org
+U: atrodo
+A: atrodo
+S: Ohio, USA
+
 N: Jonathan "Duke" Leto
 E: jonathan@leto.net
 W: http://leto.net
@@ -655,7 +674,7 @@ N: Kevin Falcone
 N: Kevin Polulak
 U: soh_cah_toa
 E: kpolulak@gmail.com
-D: HBDB debugger
+D: HBDB debugger, release manager for 3.8.0
 S: New Jersey, USA
 
 N: Kevin Tew
@@ -796,6 +815,11 @@ D: tracwiki additions
 D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
+N: Michael Schroeder
+U: mls
+D: subprof profiling runcore
+E: mls@suse.de
+
 N: Michael G. Schwern
 
 N: Michael Scott
@@ -928,6 +952,9 @@ U: pdcawley
 D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
 W: http://www.bofh.org.uk:8080/
+
+N: Piotr Fusik
+D: Fixed typos
 
 N: Reini Urban
 U: rurban

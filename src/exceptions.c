@@ -7,7 +7,7 @@ src/exceptions.c - Exceptions
 
 =head1 DESCRIPTION
 
-Define the the core subsystem for exceptions.
+Define the core subsystem for exceptions.
 
 =head2 Exception Functions
 
@@ -146,19 +146,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
             VTABLE_set_string_native(interp, exception, newmessage);
         }
-
     }
-
-    /*
-     * returning NULL from here returns resume address NULL to the
-     * runloop, which will terminate the thread function finally
-     *
-     * TT #1287 this check should better be in Parrot_x_exit
-     */
-
-    /* no exception handler, but this is not the main thread */
-    if (interp->thread_data && interp->thread_data->tid)
-        pt_thread_detach(interp->thread_data->tid);
 
     Parrot_x_jump_out(interp, 1);
 }

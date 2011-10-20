@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.6.0.dylib                   [main]lib
+blib/lib/libparrot.3.9.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.6.0                      [main]lib
+blib/lib/libparrot.so.3.9.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -103,7 +103,6 @@ include/pmc/pmc_packfilesegment.h                [devel]include
 include/pmc/pmc_packfileview.h                   [devel]include
 include/pmc/pmc_parrotinterpreter.h              [devel]include
 include/pmc/pmc_parrotlibrary.h                  [devel]include
-include/pmc/pmc_parrotthread.h                   [devel]include
 include/pmc/pmc_pmcproxy.h                       [devel]include
 include/pmc/pmc_pointer.h                        [devel]include
 include/pmc/pmc_ptr.h                            [devel]include
@@ -128,7 +127,6 @@ include/pmc/pmc_stringiterator.h                 [devel]include
 include/pmc/pmc_structview.h                     [devel]include
 include/pmc/pmc_sub.h                            [devel]include
 include/pmc/pmc_task.h                           [devel]include
-include/pmc/pmc_threadinterpreter.h              [devel]include
 include/pmc/pmc_timer.h                          [devel]include
 include/pmc/pmc_undef.h                          [devel]include
 include/pmc/pmc_unmanagedstruct.h                [devel]include
@@ -143,8 +141,6 @@ installable_parrot-prove.exe                     [main]bin
 installable_parrot.exe                           [main]bin
 installable_parrot_config                        [main]bin
 installable_parrot_config.exe                    [main]bin
-installable_parrot_debugger                      [main]bin
-installable_parrot_debugger.exe                  [main]bin
 installable_parrot_nci_thunk_gen                 [main]bin
 installable_pbc_disassemble                      [main]bin
 installable_pbc_disassemble.exe                  [main]bin
@@ -209,6 +205,10 @@ runtime/parrot/dynext/rational.bundle            [library]
 runtime/parrot/dynext/rational.dll               [library]
 runtime/parrot/dynext/rational.dylib             [library]
 runtime/parrot/dynext/rational.so                [library]
+runtime/parrot/dynext/select.bundle              [library]
+runtime/parrot/dynext/select.dll                 [library]
+runtime/parrot/dynext/select.dylib               [library]
+runtime/parrot/dynext/select.so                  [library]
 runtime/parrot/dynext/sys_ops.bundle             [library]
 runtime/parrot/dynext/sys_ops.dll                [library]
 runtime/parrot/dynext/sys_ops.dylib              [library]
@@ -415,7 +415,6 @@ src/pmc/packfilesegment.dump                     [devel]src
 src/pmc/packfileview.dump                        [devel]src
 src/pmc/parrotinterpreter.dump                   [devel]src
 src/pmc/parrotlibrary.dump                       [devel]src
-src/pmc/parrotthread.dump                        [devel]src
 src/pmc/pmcproxy.dump                            [devel]src
 src/pmc/pointer.dump                             [devel]src
 src/pmc/ptr.dump                                 [devel]src
@@ -440,7 +439,6 @@ src/pmc/stringiterator.dump                      [devel]src
 src/pmc/structview.dump                          [devel]src
 src/pmc/sub.dump                                 [devel]src
 src/pmc/task.dump                                [devel]src
-src/pmc/threadinterpreter.dump                   [devel]src
 src/pmc/timer.dump                               [devel]src
 src/pmc/undef.dump                               [devel]src
 src/pmc/unmanagedstruct.dump                     [devel]src

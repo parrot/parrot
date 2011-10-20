@@ -16,7 +16,6 @@ LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
 MANIFEST.generated                                          []
-NEWS                                                        [main]doc
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README                                                      [devel]doc
@@ -303,8 +302,8 @@ docs/dev/infant.pod                                         [doc]
 docs/dev/longopt.pod                                        [doc]
 docs/dev/optimizer.pod                                      [doc]
 docs/dev/parrot_api.pod                                     [doc]
+docs/dev/pcc_methods.pod                                    [doc]
 docs/dev/pcc_state.pod                                      [doc]
-docs/dev/pccmethods.pod                                     [doc]
 docs/dev/pmc_freeze.pod                                     [doc]
 docs/dev/pmc_obj_design_meeting_notes.pod                   [doc]
 docs/dev/profiling.pod                                      [doc]
@@ -541,6 +540,8 @@ examples/languages/abc/t/abc_special_variables              [examples]
 examples/languages/abc/t/abc_statement                      [examples]
 examples/languages/squaak/MAINTAINER                        [examples]
 examples/languages/squaak/README                            [examples]
+examples/languages/squaak/doc/pct-stages.png                [examples]
+examples/languages/squaak/doc/pct-stages.svg                [examples]
 examples/languages/squaak/doc/tutorial_episode_1.pod        [examples]
 examples/languages/squaak/doc/tutorial_episode_2.pod        [examples]
 examples/languages/squaak/doc/tutorial_episode_3.pod        [examples]
@@ -868,6 +869,10 @@ ext/winxed/Rules.mak                                        []
 ext/winxed/compiler.pir                                     []
 ext/winxed/driver.pir                                       []
 frontend/parrot/main.c                                      []
+frontend/parrot2/build.pir                                  []
+frontend/parrot2/main.c                                     []
+frontend/parrot2/prt0.pir                                   []
+frontend/parrot2/prt0.winxed                                []
 frontend/parrot_debugger/main.c                             []
 frontend/pbc_disassemble/main.c                             []
 frontend/pbc_dump/main.c                                    []
@@ -877,11 +882,6 @@ include/imcc/api.h                                          [main]include
 include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
 include/parrot/api.h                                        [main]include
-include/parrot/atomic.h                                     [main]include
-include/parrot/atomic/fallback.h                            [main]include
-include/parrot/atomic/gcc_pcc.h                             [main]include
-include/parrot/atomic/gcc_x86.h                             [main]include
-include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
@@ -929,6 +929,7 @@ include/parrot/pobj.h                                       [main]include
 include/parrot/pointer_array.h                              [main]include
 include/parrot/runcore_api.h                                [main]include
 include/parrot/runcore_profiling.h                          [main]include
+include/parrot/runcore_subprof.h                            [main]include
 include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
@@ -936,10 +937,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
-include/parrot/thr_none.h                                   [main]include
-include/parrot/thr_pthread.h                                [main]include
-include/parrot/thr_windows.h                                [main]include
-include/parrot/thread.h                                     [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
@@ -1028,7 +1025,6 @@ lib/Parrot/SearchOps.pm                                     [devel]lib
 lib/Parrot/Test.pm                                          [devel]lib
 lib/Parrot/Test/Harness.pm                                  [devel]lib
 lib/Parrot/Test/PGE.pm                                      [devel]lib
-lib/Parrot/Test/PIR_PGE.pm                                  [devel]lib
 lib/Parrot/Test/Pod.pm                                      [devel]lib
 lib/Parrot/Test/Pod/Utils.pm                                [devel]lib
 lib/Parrot/Test/Util.pm                                     [devel]lib
@@ -1042,6 +1038,7 @@ lib/Perl/Critic/Policy/TestingAndDebugging/ProhibitShebangWarningsArg.pm []
 lib/Perl/Critic/Policy/TestingAndDebugging/RequirePortableShebang.pm []
 lib/Pod/Escapes.pm                                          []
 lib/Pod/Simple.pm                                           []
+lib/Pod/Simple.pod                                          []
 lib/Pod/Simple/BlackBox.pm                                  []
 lib/Pod/Simple/Checker.pm                                   []
 lib/Pod/Simple/Debug.pm                                     []
@@ -1061,6 +1058,7 @@ lib/Pod/Simple/PullParserToken.pm                           []
 lib/Pod/Simple/RTF.pm                                       []
 lib/Pod/Simple/Search.pm                                    []
 lib/Pod/Simple/SimpleTree.pm                                []
+lib/Pod/Simple/Subclassing.pod                              []
 lib/Pod/Simple/Text.pm                                      []
 lib/Pod/Simple/TextContent.pm                               []
 lib/Pod/Simple/TiedOutFH.pm                                 []
@@ -1174,11 +1172,8 @@ runtime/parrot/library/pcore.pir                            [library]
 runtime/parrot/library/pcre.pir                             [library]
 runtime/parrot/library/postgres.declarations                [library]
 runtime/parrot/library/postgres.pir                         [library]
-runtime/parrot/library/random_lib.pir                       [library]
 runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
-src/atomic/gcc_x86.c                                        []
-src/atomic/sparc_v9.s                                       []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1212,6 +1207,7 @@ src/dynpmc/os.pmc                                           []
 src/dynpmc/pccmethod_test.pmc                               []
 src/dynpmc/rational.pmc                                     []
 src/dynpmc/rotest.pmc                                       []
+src/dynpmc/select.pmc                                       []
 src/dynpmc/subproxy.pmc                                     []
 src/embed/api.c                                             []
 src/embed/bytecode.c                                        []
@@ -1396,7 +1392,6 @@ src/pmc/packfilesegment.pmc                                 []
 src/pmc/packfileview.pmc                                    []
 src/pmc/parrotinterpreter.pmc                               []
 src/pmc/parrotlibrary.pmc                                   []
-src/pmc/parrotthread.pmc                                    []
 src/pmc/pmc.num                                             []
 src/pmc/pmcproxy.pmc                                        []
 src/pmc/pointer.pmc                                         []
@@ -1421,7 +1416,6 @@ src/pmc/stringiterator.pmc                                  []
 src/pmc/structview.pmc                                      []
 src/pmc/sub.pmc                                             []
 src/pmc/task.pmc                                            []
-src/pmc/threadinterpreter.pmc                               []
 src/pmc/timer.pmc                                           []
 src/pmc/undef.pmc                                           []
 src/pmc/unmanagedstruct.pmc                                 []
@@ -1429,6 +1423,7 @@ src/pointer_array.c                                         []
 src/runcore/cores.c                                         []
 src/runcore/main.c                                          []
 src/runcore/profiling.c                                     []
+src/runcore/subprof.c                                       []
 src/runcore/trace.c                                         []
 src/scheduler.c                                             []
 src/spf_render.c                                            []
@@ -1449,7 +1444,6 @@ src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
 src/sub.c                                                   []
-src/thread.c                                                []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []
@@ -1667,6 +1661,7 @@ t/dynpmc/os_unicode.t                                       [test]
 t/dynpmc/pccmethod_test.t                                   [test]
 t/dynpmc/rational.t                                         [test]
 t/dynpmc/rotest.t                                           [test]
+t/dynpmc/select.t                                           [test]
 t/dynpmc/subclass_with_pir_method.t                         [test]
 t/dynpmc/subproxy.t                                         [test]
 t/examples/catchall.t                                       [test]
@@ -1837,6 +1832,7 @@ t/pharness/01-default_tests.t                               [test]
 t/pharness/02-get_test_prog_args.t                          [test]
 t/pharness/03-handle_long_options.t                         [test]
 t/pharness/04-Usage.t                                       [test]
+t/pir/interop.t                                             [test]
 t/pir/macro.t                                               [test]
 t/pir/pbc_fallback.t                                        [test]
 t/pir/registernames.t                                       [test]
@@ -1921,7 +1917,6 @@ t/pmc/parrotinterpreter.t                                   [test]
 t/pmc/parrotio.t                                            [test]
 t/pmc/parrotlibrary.t                                       [test]
 t/pmc/parrotobject.t                                        [test]
-t/pmc/parrotthread.t                                        [test]
 t/pmc/pmc.t                                                 [test]
 t/pmc/pmcproxy.t                                            [test]
 t/pmc/pointer.t                                             [test]
@@ -1954,7 +1949,6 @@ t/pmc/testlib/number.pasm                                   [test]
 t/pmc/testlib/packfile_common.pir                           [test]
 t/pmc/testlib/test_server.pir                               [test]
 t/pmc/testlib/test_server_ipv6.pir                          [test]
-t/pmc/threads.t                                             [test]
 t/pmc/timer.t                                               [test]
 t/pmc/undef.t                                               [test]
 t/pmc/unmanagedstruct.t                                     [test]
@@ -1967,7 +1961,6 @@ t/run/README                                                []doc
 t/run/exit.t                                                [test]
 t/run/options.t                                             [test]
 t/src/README                                                []doc
-t/src/atomic.t                                              [test]
 t/src/basic.t                                               [test]
 t/src/checkdepend.t                                         [test]
 t/src/embed.t                                               [test]
@@ -2067,8 +2060,8 @@ t/tools/dev/headerizer/testlib/nci_pmc.in                   [test]
 t/tools/dev/headerizer/testlib/none.in                      [test]
 t/tools/dev/headerizer/testlib/validheader.in               [test]
 t/tools/dev/pmctree.t                                       [test]
-t/tools/dev/searchops.t                                     [test]
-t/tools/dev/searchops/samples.pm                            [test]
+t/tools/dev/search_ops.t                                    [test]
+t/tools/dev/search_ops/samples.pm                           [test]
 t/tools/dump_pbc.t                                          [test]
 t/tools/install/01-create_directories.t                     [test]
 t/tools/install/02-install_files.t                          [test]
@@ -2123,8 +2116,9 @@ tools/build/pmc2c.pl                                        [devel]
 tools/build/vtable_extend.pl                                []
 tools/build/vtable_h.pl                                     []
 tools/dev/.gdbinit                                          []
-tools/dev/README                                            []doc
+tools/dev/README.md                                         []doc
 tools/dev/addopstags.pl                                     []
+tools/dev/all_hll_test.pl                                   []
 tools/dev/as2c.pl                                           []
 tools/dev/bench_op.pir                                      []
 tools/dev/create_language.pl                                [devel]
@@ -2133,7 +2127,7 @@ tools/dev/dedeprecator.nqp                                  []
 tools/dev/dump_pbc.pl                                       []
 tools/dev/faces.pl                                          []
 tools/dev/fetch_languages.pl                                []
-tools/dev/findhacks.pl                                      []
+tools/dev/find_hacks.pl                                     []
 tools/dev/gdb-pp-load.py                                    []
 tools/dev/gdb-pp.py                                         []
 tools/dev/gen_charset_tables.pl                             []
@@ -2162,9 +2156,9 @@ tools/dev/nci_thunk_gen.pir                                 []
 tools/dev/ncidef2pir.pl                                     []
 tools/dev/nopaste.pl                                        []
 tools/dev/parrot-config.pir                                 []
-tools/dev/parrot-fuzzer                                     []
 tools/dev/parrot.supp                                       []
 tools/dev/parrot_coverage.pl                                []
+tools/dev/parrot_fuzzer.py                                  []
 tools/dev/parrot_shell.pl                                   []
 tools/dev/parrotbench.pl                                    []
 tools/dev/pbc_header.pl                                     []
@@ -2177,7 +2171,8 @@ tools/dev/pmctree.pl                                        []
 tools/dev/pprof2cg.pl                                       [devel]
 tools/dev/reconfigure.pl                                    [devel]
 tools/dev/resolve_deprecated.nqp                            []
-tools/dev/search-ops.pl                                     []
+tools/dev/resubmit_smolder.pl                               []
+tools/dev/search_ops.pl                                     []
 tools/dev/show_deprecated.nqp                               []
 tools/dev/show_experimental.nqp                             []
 tools/dev/symlink.pl                                        []
@@ -2193,11 +2188,14 @@ tools/docs/ops_summary.pl                                   []
 tools/install/smoke.pl                                      []
 tools/install/smoke_languages.pl                            []
 tools/release/README                                        []doc
+tools/release/auto_release.pl                               []
 tools/release/crow.pir                                      []
+tools/release/cut.pl                                        []
 tools/release/gen_release_info.pl                           []
 tools/release/inc_ver.pir                                   []
 tools/release/release.json                                  []
 tools/release/releasecheck.pl                               []
+tools/release/sha256sum.pl                                  []
 tools/release/templates.json                                []
 tools/release/update_version.pl                             []
 # Local variables:

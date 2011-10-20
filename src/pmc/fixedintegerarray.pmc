@@ -269,6 +269,8 @@ Returns the Parrot string value of the element at index C<key>.
 
 /*
 
+=item C<STRING *get_string()>
+
 =item C<STRING *get_repr()>
 
 Returns the Parrot string representation C<key>.
@@ -276,6 +278,10 @@ Returns the Parrot string representation C<key>.
 =cut
 
 */
+
+    VTABLE STRING *get_string() {
+        return STATICSELF.get_repr();
+    }
 
     VTABLE STRING *get_repr() {
         STRING *res    = CONST_STRING(INTERP, "[ ");

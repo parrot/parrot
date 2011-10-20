@@ -321,7 +321,7 @@ For testing purpose only?
     VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        /* We must clone here becase we can reallocate buffer behind the scene... */
+        /* We must clone here because we can reallocate buffer behind the scene... */
         /* TODO Optimize it to avoid creation of redundant STRING */
         return Parrot_str_clone(INTERP,
                 STRING_substr(INTERP, buffer, offset, length));

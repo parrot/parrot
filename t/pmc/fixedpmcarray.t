@@ -20,11 +20,8 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(88)
+    plan(86)
     test_setting_array_size()
-    test_assign_from_another()
-    test_assign_self()
-    test_assign_non_array()
     test_resize_exception()
     test_truthiness()
     test_tt991()
@@ -41,6 +38,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_definedness()
     test_splice_oob()
     test_get_repr()
+    test_get_string()
     test_elements()
     test_equality()
     test_multi_keys()
@@ -357,9 +355,17 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub get_repr_fpa_n
     .param int n
+    .local pmc fpa
+    .local string s
+    fpa = fpa_n(n)
+    s = get_repr fpa
+    .return(s)
+.end
+
+.sub fpa_n
+    .param int n
     .local int i
     .local pmc fpa, p
-    .local string s
     fpa = new ['FixedPMCArray']
     fpa = n
     i = 0
@@ -370,8 +376,24 @@ next:
     inc i
     goto next
 done:
-    s = get_repr fpa
-    .return(s)
+    .return (fpa)
+.end
+
+.sub test_get_string
+    .local string s, aux
+    .local pmc a
+    a = fpa_n(0)
+    s = a
+    a = fpa_n(1)
+    aux = a
+    s = concat s, aux
+    a = fpa_n(2)
+    aux = a
+    s = concat s, aux
+    a = fpa_n(3)
+    aux = a
+    s = concat s, aux
+    substring(s,'0123','get_string')
 .end
 
 .sub test_splice_oob
@@ -662,37 +684,6 @@ CODE
             set $P0,"GIGO"
         .end
 CODE
-.end
-
-.sub test_assign_non_array
-    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
-    .sub main :main
-        .local pmc arr, other
-        .local int n
-        arr = new ['FixedPMCArray']
-        other = new ['Integer']
-        assign arr, other
-    .end
-CODE
-.end
-
-.sub test_assign_self
-    .local pmc arr
-    arr = new ['FixedPMCArray']
-    assign arr, arr
-    ok(1, 'Can assign FixedPMCArray to itself')
-.end
-
-.sub test_assign_from_another
-    .local pmc arr1, arr2
-    .local int n
-    arr1 = new ['FixedPMCArray']
-    arr1 = 32
-    arr2 = new ['FixedPMCArray']
-    arr2 = 15
-    assign arr1, arr2
-    n = arr1
-    is(n,15,'assigning to FixedPMCArray from another FixedPMCArray')
 .end
 
 .sub test_setting_array_size

@@ -201,7 +201,15 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
         copy_packfile_header(INTERP, SELF, pf);
         VTABLE_set_pointer(INTERP, attrs->directory, &pf->directory);
         Parrot_unblock_GC_mark(INTERP);
+
+        /* XXX memory leak
+         * Destroying the packfile here frees segments that may still have live references
+         * (eg: sub->seg)
+         * A memory leak is better than an invalid memory access
+         */
+#if 0
         PackFile_destroy(INTERP, pf);
+#endif
     }
 
 /*
@@ -249,8 +257,6 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 =item bytecode_minor
 
 =item uuid_type
-
-=item uuid_length
 
 =back
 
@@ -469,7 +475,7 @@ Return raw serialized PBC file data. Synonym for get_string.
 
 /*
 
-=item C<STRING * unpack()>
+=item C<void unpack(STRING *data)>
 
 Parse raw serialized PBC file data into the Packfile data structure.
 Synonym for set_string.

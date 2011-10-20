@@ -11,7 +11,7 @@ examples/past/blocktype_immediate.pir - Evaluating a PAST::Block immediately
 =head1 DESCRIPTION
 
 Create and evaluate a PAST::Block with blocktype 'immediate'.
-'immediate' means the the block is evaluated end the last value
+'immediate' means the block is evaluated and the last value
 is returned.
 
 Beware that this doesn't work yet as expected:

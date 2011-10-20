@@ -30,20 +30,31 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC * get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_get_packfile_eval_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc))
-#define ASSERT_ARGS_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf_ptr_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+#define BEGIN_IMCC_COMPILE(i) \
+    do { \
+        UINTVAL __regs_used[4] = {3, 3, 3, 3}; \
+        PMC * const __newcontext = Parrot_push_context((i), __regs_used); \
+        PackFile_ByteCode * const __old_bc = (i)->code; \
+        Parrot_block_GC_mark((i)); \
+        Parrot_pcc_set_HLL((i), __newcontext, 0); \
+        Parrot_pcc_set_sub((i), __newcontext, 0); \
+
+#define END_IMCC_COMPILE(i) \
+        Parrot_pop_context((i)); \
+        Parrot_unblock_GC_mark((i)); \
+        (i)->code = __old_bc; \
+    } while (0)
+
+#define ERROR_IMCC_COMPILE(i) \
+    Parrot_pop_context((i)); \
+    Parrot_unblock_GC_mark((i)); \
+    (i)->code = __old_bc; \
 
 /*
 
@@ -78,31 +89,6 @@ get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
     return eval_pmc;
 }
 
-/*
-
-=item C<static PMC * get_packfile_pmc(PARROT_INTERP, PMC *pf_ptr_pmc)>
-
-Get a PMC pointer to a passed packfile pointer
-
-=back
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC *
-get_packfile_pmc(PARROT_INTERP, ARGIN(PMC *pf_ptr_pmc))
-{
-    ASSERT_ARGS(get_packfile_pmc)
-
-    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_ptr_pmc);
-    PMC * const pf_pmc = Parrot_pmc_new(interp, enum_class_PackfileView);
-    VTABLE_set_pointer(interp, pf_pmc, pf);
-    return pf_pmc;
-}
-
 /* HEADERIZER HFILE: none */
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
@@ -131,6 +117,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     /* provided to emulate the current NCI compreg */
+    /* DEPRECATED. See TT #1967 */
     VTABLE opcode_t* invoke(void* next) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imc_info_t * const imcc = (imc_info_t*) attrs->imcc_info;
@@ -204,34 +191,26 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf;
-        PMC * eval_pmc = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
-        UINTVAL regs_used[4] = {3, 3, 3, 3};
-        PMC * const newcontext = Parrot_push_context(interp, regs_used);
-        PackFile_ByteCode * const old_bc = interp->code;
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
 
-        Parrot_block_GC_mark(interp);
-        Parrot_pcc_set_HLL(interp, newcontext, 0);
-        Parrot_pcc_set_sub(interp, newcontext, 0);
+        BEGIN_IMCC_COMPILE(interp);
 
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_string(imcc, source, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
             STRING * const msg = imcc_last_error_message(imcc);
             INTVAL code = imcc_last_error_code(imcc);
+            ERROR_IMCC_COMPILE(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
-        eval_pmc = get_packfile_pmc(INTERP, pf);
 
-        Parrot_pop_context(interp);
-        Parrot_unblock_GC_mark(interp);
-        interp->code = old_bc;
+        END_IMCC_COMPILE(interp);
 
-        RETURN(PMC *eval_pmc);
+        RETURN(PMC *pf);
     }
 
     METHOD compile_file(STRING *filename,
@@ -241,33 +220,23 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
-        UINTVAL regs_used[4] = {3, 3, 3, 3};
-        PMC * const newcontext = Parrot_push_context(interp, regs_used);
-        PMC * const old_pf = Parrot_pf_get_current_packfile(interp);
-        PMC * pf_pmc;
 
         if (has_target)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: compiler does not support the target option");
 
-        Parrot_block_GC_mark(interp);
-        Parrot_pcc_set_HLL(interp, newcontext, 0);
-        Parrot_pcc_set_sub(interp, newcontext, 0);
+        BEGIN_IMCC_COMPILE(interp);
 
         /* TODO: Handle outer_ctx */
         pf = imcc_compile_file(imcc, filename, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
             STRING * const msg = imcc_last_error_message(imcc);
             const INTVAL code = imcc_last_error_code(imcc);
+            ERROR_IMCC_COMPILE(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
-        /* This causes errors during the build */
-        /*pf_pmc = get_packfile_pmc(INTERP, pf);*/
 
-        Parrot_pop_context(interp);
-        Parrot_unblock_GC_mark(interp);
-        if (!PMC_IS_NULL(old_pf))
-            Parrot_pf_set_current_packfile(interp, old_pf);
+        END_IMCC_COMPILE(interp);
 
         RETURN(PMC *pf);
     }

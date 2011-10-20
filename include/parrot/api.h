@@ -314,7 +314,7 @@ PARROT_API
 Parrot_Int Parrot_api_run_bytecode(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
-    Parrot_PMC mainargs);
+    Parrot_PMC args);
 
 PARROT_API
 Parrot_Int Parrot_api_serialize_bytecode_pmc(

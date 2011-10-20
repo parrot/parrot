@@ -80,15 +80,18 @@ HEADER
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
-            PMC * interp;
-            PMC * pbc;
-            PMC * argsarray;
+            PMC                 *interp;
+            PMC                 *pbc;
+            PMC                 *argsarray;
             const unsigned char *program_code_addr;
-            Parrot_Init_Args *initargs;
+
+            Parrot_Init_Args    *initargs;
             GET_INIT_STRUCT(initargs);
+
             initargs->gc_system = GCCORE;
 
             program_code_addr = (const unsigned char *)get_program_code();
+
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
 
@@ -106,15 +109,24 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not build args array");
                 show_last_error_and_exit(interp);
             }
-            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+
+            if (!Parrot_api_load_bytecode_bytes(interp,
+                                                program_code_addr,
+                                                (Parrot_Int) bytecode_size,
+                                                &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
+
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
                 show_last_error_and_exit(interp);
             }
 
-            Parrot_api_destroy_interpreter(interp);
+            if (!Parrot_api_destroy_interpreter(interp)) {
+                fprintf(stderr, "PARROT VM: Could not destroy interpreter\n");
+                show_last_error_and_exit(interp);
+            }
+
             exit(EXIT_SUCCESS);
         }
 
@@ -127,6 +139,7 @@ HEADER
 
             if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
                 exit(EXIT_FAILURE);
+
             if (is_error) {
                 if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
                     exit(EXIT_FAILURE);
@@ -140,13 +153,19 @@ HEADER
         static void
         print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
         {
-            char * msg_raw;
+            char *msg_raw;
+
             if (!str)
                 return;
-            Parrot_api_string_export_ascii(interp, str, &msg_raw);
+
+            if (!Parrot_api_string_export_ascii(interp, str, &msg_raw))
+                show_last_error_and_exit(interp);
+
             if (msg_raw) {
                 fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
-                Parrot_api_string_free_exported_ascii(interp, msg_raw);
+
+                if (!Parrot_api_string_free_exported_ascii(interp, msg_raw))
+                    show_last_error_and_exit(interp);
             }
         }
 

@@ -59,6 +59,7 @@ RELEASE_TOOLS_DIR = tools/release
 
 # directory for header files
 INC_DIR         = include/parrot
+INC_PMC_DIR     = include/pmc
 
 # directory with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
@@ -81,6 +82,7 @@ MKPATH           = @mkpath@
 RM_F             = @rm_f@
 RM_RF            = @rm_rf@
 TOUCH            = @touch@
+TAR              = @tar@
 AR_CR            = @ar@ @arflags@
 RANLIB           = @ranlib@
 YACC             = @yacc@
@@ -344,14 +346,18 @@ FLUID_FILES_2 = \
 	$(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	$(LIBRARY_DIR)/ProfTest/Want.pbc \
 	$(LIBRARY_DIR)/YAML/Tiny.pbc \
-	runtime/parrot/include/parrotlib.pbc
-
+	runtime/parrot/include/parrotlib.pbc \
+	frontend/parrot2/prt0.pbc*
 
 ###############################################################################
 #
 # OTHER FILE GROUPS:
 #
 ###############################################################################
+
+EXTEND_HEADERS = \
+	$(INC_DIR)/extend.h \
+	$(INC_DIR)/extend_vtable.h
 
 # parrot.h and all the includes it causes to be included
 PARROT_H_HEADERS = \
@@ -386,14 +392,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/key.h \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
-	$(INC_DIR)/thread.h \
-	$(INC_DIR)/thr_pthread.h \
-	$(INC_DIR)/thr_windows.h \
-	$(INC_DIR)/atomic.h \
-	$(INC_DIR)/atomic/fallback.h \
-	$(INC_DIR)/atomic/gcc_pcc.h \
-	$(INC_DIR)/atomic/gcc_x86.h \
-	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
@@ -411,7 +409,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
-	include/pmc/pmc_callcontext.h
+	$(INC_PMC_DIR)/pmc_callcontext.h
 
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
@@ -439,7 +437,6 @@ IO_O_FILES = \
 INTERP_O_FILES = \
 	src/string/api$(O) \
 	src/ops/core_ops$(O) \
-#IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
@@ -495,11 +492,11 @@ INTERP_O_FILES = \
 	src/runcore/main$(O)  \
 	src/runcore/cores$(O) \
 	src/runcore/profiling$(O) \
+	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
 	src/sub$(O) \
-	src/thread$(O) \
 	src/runcore/trace$(O) \
 	src/utils$(O) \
 	src/vtables$(O) \
@@ -510,7 +507,6 @@ INTERP_O_FILES = \
 	src/packfile/segments$(O) \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
-	@TEMP_atomic_o@ \
 
 OPS_FILES = @ops@
 
@@ -522,6 +518,7 @@ OPS_FILES = @ops@
 
 # Executables
 PARROT              = .@slash@@test_prog@$(EXE)
+PARROTOLD           = .@slash@parrot_old$(EXE)
 MINIPARROT          = .@slash@miniparrot$(EXE)
 DIS                 = .@slash@pbc_disassemble$(EXE)
 PDUMP               = .@slash@pbc_dump$(EXE)
@@ -531,7 +528,7 @@ PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
-PROVE               = .@slash@parrot-prove$(EXE)
+PARROT_PROVE        = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
 WINXED              = .@slash@winxed$(EXE)
 
@@ -544,8 +541,8 @@ INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
-INSTALLABLENCITHUNKGEN = .@slash@installable_parrot_nci_thunk_gen$(EXE)
-INSTALLABLEPROVE     = .@slash@installable_parrot-prove$(EXE)
+INSTALLABLENCITHUNKGEN  = .@slash@installable_parrot_nci_thunk_gen$(EXE)
+INSTALLABLEPARROT_PROVE = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
 INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
@@ -636,11 +633,11 @@ all : \
 	$(GEN_LIBRARY) \
 	src/install_config$(O)
 
-# We build DYNPMC_TARGET in corevm. It's kinda hack to test t/pmc/threads.t CLONE_LIBRARIES
 corevm : \
 	$(GEN_PM_INCLUDES) \
 	PARROT_LIBS \
 	$(PARROT) \
+        $(PARROTOLD) \
 	runtime/parrot/include/parrotlib.pbc \
 	runtime/parrot/include/config.fpmc \
 #IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
@@ -708,6 +705,7 @@ STR_FILES = \
 	src/runcore/cores.str \
 	src/runcore/main.str \
 	src/runcore/profiling.str \
+	src/runcore/subprof.str \
 	src/scheduler.str \
 	src/spf_render.str \
 	src/spf_vtable.str \
@@ -757,7 +755,7 @@ help :
 	@echo "  installable:       same as 'world', but targets for installation"
 	@echo ""
 	@echo "Installation:"
-	@echo "  install:           Install under '$(PREFIX)' on Unix systems."
+	@echo "  install:           Install under '$(PREFIX)'."
 	@echo "  install-dev:       Same as 'install'."
 	@echo "  install-bin:       Install only files needed for Parrot runtime."
 	@echo "  install-dev-only:  Install only files needed for Parrot development."
@@ -774,9 +772,11 @@ help :
 	@echo "  coretest:          Run the minimal 'core functionality' suite."
 	@echo "  codetest:          Run file metadata and coding standards tests."
 	@echo "  fulltest:          Run the full test suite under many runcores."
+	@echo "  all_hll_test:      Run the test suite for all known languages and libraries."
 	@echo "  test<runcore>:     Run the test suite with a specified runcore."
 	@echo "                     Valid runcores are b, f, g, j, r."
-	@echo "  src_tests:         Run test in C-file."
+	@echo "  src_tests:         Run tests in C files."
+	@echo "  interop_tests:     Run HLL interop tests."
 	@echo "  run_tests:         Command line and various environments."
 	@echo "  perl_tests:        Test the Perl modules in the distribution."
 	@echo "  codingstd_tests:   Test pdd07_codingstd."
@@ -793,6 +793,7 @@ help :
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
 	@echo "  smoke:             Alias for smolder_test."
+	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  mopsbench:         Million operations"
@@ -801,8 +802,8 @@ help :
 	@echo "  clean:             Basic cleaning up."
 	@echo "  archclean:         Remove any platform dependent files."
 	@echo "  realclean:         Removes also files generated by 'Configure.pl'"
-	@echo "  distclean:         Alias for realclean."
-	@echo "  reconfig:          'clean' and redo configuration."
+	@echo "  distclean:         Alias for 'realclean'."
+	@echo "  reconfig:          Run 'realclean' and redo configuration."
 	@echo ""
 	@echo "Fetch from source repository:"
 	@echo "  update:            git pull."
@@ -825,7 +826,8 @@ help :
 	@echo "  perlcritic:        Check Perl code with Perl::Critic."
 	@echo "  cagecritic:        Extra strict checking with Perl::Critic."
 	@echo "  bootstrap-ops:     Generate C code from .ops files. Requires already built parrot."
-	@echo "  bootstrap-nci      Generate C code for NCI. Requires already built parrot."
+	@echo "  bootstrap-nci:     Generate C code for NCI. Requires already built parrot."
+	@echo "  bootstrap-prt0:    Generate prt0.pir. Requires already built parrot."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
@@ -838,9 +840,9 @@ help :
 
 world : parrot_utils
 
-parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PROVE) $(OPS2C)
+parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
@@ -858,13 +860,33 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
-$(PARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
+	$(MINIPARROT) -Iruntime/parrot/include -o frontend/parrot2/prt0.pbc frontend/parrot2/prt0.pir
+
+frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir $(MINIPARROT)
+	$(MINIPARROT) frontend/parrot2/build.pir frontend/parrot2/prt0.pbc
+
+frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c
+
+bootstrap-prt0: $(WINXED) frontend/parrot2/prt0.winxed
+	$(WINXED) --noan -c frontend/parrot2/prt0.winxed
+
+$(PARROTOLD) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
 	$(MINIPARROT)
 	$(LINK) @ld_out@$@ \
 	frontend/parrot/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
+$(PARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+	src/parrot_config$(O) src/longopt$(O) \
+	$(MINIPARROT) frontend/parrot2/prt0.pbc$(O) $(GEN_PASM_INCLUDES)
+	$(LINK) @ld_out@$@ \
+	frontend/parrot2/main$(O) frontend/parrot2/prt0.pbc$(O) src/parrot_config$(O) src/longopt$(O) \
+	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
@@ -885,7 +907,7 @@ $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
 parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 	$(PARROT) -o parrot-prove.pbc runtime/parrot/bin/prove.pir
 
-$(PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
+$(PARROT_PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
@@ -898,15 +920,15 @@ $(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/lon
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INSTALLABLEPARROT) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(INSTALLABLEPARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/install_config$(O) src/longopt$(O) \
-	$(PARROT)
+	frontend/parrot2/prt0.pbc$(O) $(PARROT)
 	$(LINK) @ld_out@$@ \
-	frontend/parrot/main$(O) src/install_config$(O) src/longopt$(O) \
-	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	frontend/parrot2/main$(O) src/install_config$(O) src/longopt$(O) \
+	frontend/parrot2/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INC_DIR)/context.h : include/pmc/pmc_callcontext.h
+$(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 
 $(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
@@ -966,19 +988,18 @@ src/pointer_array$(O) : \
 	src/pointer_array.c \
 	$(INC_DIR)/pointer_array.h
 
-src/oo$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_class.h src/oo.c \
-	include/pmc/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
-	include/pmc/pmc_namespace.h
+src/oo$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_class.h src/oo.c \
+	$(INC_PMC_DIR)/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
+	$(INC_PMC_DIR)/pmc_namespace.h
 
 src/scheduler$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/scheduler.str \
 	src/scheduler.c \
-	include/pmc/pmc_scheduler.h \
-	include/pmc/pmc_task.h \
-	include/pmc/pmc_timer.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h \
+	$(INC_PMC_DIR)/pmc_scheduler.h \
+	$(INC_PMC_DIR)/pmc_task.h \
+	$(INC_PMC_DIR)/pmc_timer.h \
+	$(EXTEND_HEADERS) \
 	$(INC_DIR)/scheduler_private.h \
 	$(INC_DIR)/runcore_api.h
 
@@ -988,8 +1009,8 @@ src/io/socket_api$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/io/io_private.h \
 	src/io/api.str \
-	include/pmc/pmc_socket.h \
-	include/pmc/pmc_sockaddr.h \
+	$(INC_PMC_DIR)/pmc_socket.h \
+	$(INC_PMC_DIR)/pmc_sockaddr.h \
 	src/io/socket_api.c
 
 O_FILES = \
@@ -1044,7 +1065,7 @@ $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
 
-$(INSTALLABLEPROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
+$(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot-prove.pbc --install
 
 #
@@ -1098,8 +1119,8 @@ $(INSTALLABLEDIS) : frontend/pbc_disassemble/main$(O) \
 #
 # Parrot Dump
 #
-frontend/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_sub.h \
-	include/pmc/pmc_key.h frontend/pbc_dump/packdump.c
+frontend/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_key.h frontend/pbc_dump/packdump.c
 
 $(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT) $(INC_DIR)/api.h
 	$(LINK) @ld_out@$@ \
@@ -1328,7 +1349,8 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 
 src/extend_vtable$(O) : $(PARROT_H_HEADERS) \
-	$(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h src/extend_vtable.c
+	$(EXTEND_HEADERS) \
+	src/extend_vtable.c
 
 src/global_setup$(O) : $(PARROT_H_HEADERS) \
 	src/global_setup.str \
@@ -1337,9 +1359,9 @@ src/global_setup$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h
 
 src/namespace$(O) : $(PARROT_H_HEADERS) src/namespace.str src/namespace.c \
-	include/pmc/pmc_sub.h
+	$(INC_PMC_DIR)/pmc_sub.h
 
-src/pmc$(O) : include/pmc/pmc_class.h include/pmc/pmc_integer.h src/pmc.c \
+src/pmc$(O) : $(INC_PMC_DIR)/pmc_class.h $(INC_PMC_DIR)/pmc_integer.h src/pmc.c \
 	src/pmc.str $(PARROT_H_HEADERS)
 
 src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
@@ -1353,7 +1375,7 @@ $(INC_DIR)/extend_vtable.h src/extend_vtable.c src/vtable.h : src/vtable.tbl $(B
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
 
 src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
-	include/pmc/pmc_key.h
+	$(INC_PMC_DIR)/pmc_key.h
 
 src/gc/mark_sweep$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1434,13 +1456,13 @@ src/hll$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/hll.str \
 	$(INC_DIR)/dynext.h \
-	include/pmc/pmc_fixedintegerarray.h \
+	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	src/hll.c
 
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
 src/runcore/trace$(O) : \
-	include/pmc/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
 	src/runcore/trace.c \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_trace.h \
@@ -1450,12 +1472,13 @@ src/runcore/trace$(O) : \
 
 src/debug$(O) : $(INC_DIR)/extend.h \
 	$(PARROT_H_HEADERS) src/debug.c \
+	$(EXTEND_HEADERS) \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
-	src/debug.str include/pmc/pmc_key.h \
-	include/pmc/pmc_continuation.h \
-	$(INC_DIR)/extend_vtable.h
+	src/debug.str $(INC_PMC_DIR)/pmc_key.h \
+	$(INC_PMC_DIR)/pmc_continuation.h \
+	$(INC_PMC_DIR)/pmc_sub.h
 
 src/sub$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1464,8 +1487,8 @@ src/sub$(O) : \
 	$(INC_DIR)/runcore_api.h \
 	src/sub.str \
 	src/sub.c \
-	include/pmc/pmc_sub.h \
-	include/pmc/pmc_continuation.h
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 	src/string/private_cstring.h src/string/api.c
@@ -1477,51 +1500,55 @@ src/longopt$(O) : \
 	src/longopt.c
 
 src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
-	src/dynext.str include/pmc/pmc_parrotlibrary.h src/dynext.c
+	src/dynext.str $(INC_PMC_DIR)/pmc_parrotlibrary.h src/dynext.c
 
 src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	src/exceptions.str src/exceptions.c \
-	include/pmc/pmc_continuation.h
-
-src/thread$(O) : \
-	$(PARROT_H_HEADERS) \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h \
-	src/thread.c \
-	include/pmc/pmc_sub.h \
-	include/pmc/pmc_parrotinterpreter.h \
-	$(INC_DIR)/runcore_api.h
+	$(INC_PMC_DIR)/pmc_continuation.h
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
-src/extend$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/extend.h \
-	include/pmc/pmc_sub.h $(INC_DIR)/extend_vtable.h src/extend.c
+src/extend$(O) : \
+	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
 	src/runcore/main.c \
 	src/runcore/main.str \
-	include/pmc/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_subprof.h \
 	$(INC_DIR)/runcore_profiling.h
 
+src/runcore/subprof$(O) : src/runcore/subprof.str src/runcore/subprof.c \
+	$(INC_DIR)/dynext.h \
+	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/oplib/ops.h \
+	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/runcore_subprof.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(PARROT_H_HEADERS)
+
 src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
-	include/pmc/pmc_sub.h \
-	include/pmc/pmc_namespace.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_namespace.h \
 	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/runcore_profiling.h \
 	$(PARROT_H_HEADERS) \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h
+	$(EXTEND_HEADERS)
 
 
 src/call/args$(O) : \
 	$(PARROT_H_HEADERS) $(INC_DIR)/oplib/ops.h \
 	src/call/args.c \
 	src/call/args.str \
-	include/pmc/pmc_key.h \
-	include/pmc/pmc_fixedintegerarray.h
+	$(INC_PMC_DIR)/pmc_key.h \
+	$(INC_PMC_DIR)/pmc_fixedintegerarray.h
 
 src/call/context_accessors$(O): $(PARROT_H_HEADERS) \
 	src/call/context_accessors.c
@@ -1531,24 +1558,23 @@ src/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
 	src/call/pcc.c \
 	src/call/pcc.str \
-	include/pmc/pmc_key.h include/pmc/pmc_continuation.h
+	$(INC_PMC_DIR)/pmc_key.h $(INC_PMC_DIR)/pmc_continuation.h
 
 src/call/context$(O) : $(PARROT_H_HEADERS) \
-	include/pmc/pmc_sub.h src/call/context.c
+	$(INC_PMC_DIR)/pmc_sub.h src/call/context.c
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
-	include/pmc/pmc_parrotinterpreter.h \
-	    $(INC_DIR)/extend.h \
-	    $(INC_DIR)/extend_vtable.h \
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+	$(EXTEND_HEADERS) \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
 	src/interp/inter_misc.c \
 	src/interp/inter_misc.str \
 	include/imcc/embed.h \
-	    include/imcc/yyscanner.h \
+	include/imcc/yyscanner.h \
 	$(INC_DIR)/runcore_api.h \
-	    include/pmc/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
 
 src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
@@ -1559,7 +1585,7 @@ src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
 	    src/gc/variable_size_pool.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
-	$(PARROT_H_HEADERS) include/pmc/pmc_continuation.h \
+	$(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h src/call/ops.c
 
 src/io/api$(O) : \
@@ -1567,16 +1593,26 @@ src/io/api$(O) : \
 	src/io/io_private.h \
 	src/io/api.c \
 	src/io/api.str \
-	include/pmc/pmc_filehandle.h \
-	include/pmc/pmc_stringhandle.h \
-	include/pmc/pmc_socket.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h
+	$(INC_PMC_DIR)/pmc_filehandle.h \
+	$(INC_PMC_DIR)/pmc_stringhandle.h \
+	$(INC_PMC_DIR)/pmc_socket.h \
+	$(EXTEND_HEADERS)
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
-	include/pmc/pmc_handle.h
+	$(INC_PMC_DIR)/pmc_handle.h
 
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
+
+frontend/parrot2/main$(O) : \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/compiler.h \
+	$(INC_DIR)/config.h \
+	$(INC_DIR)/core_types.h \
+	$(INC_DIR)/feature.h \
+	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/longopt.h \
+	include/imcc/api.h \
+	frontend/parrot2/main.c
 
 frontend/parrot/main$(O) : \
 	$(INC_DIR)/api.h \
@@ -1594,29 +1630,29 @@ src/multidispatch$(O) : \
 	src/multidispatch.str \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nativepccmethod.h \
-	include/pmc/pmc_nci.h \
-	include/pmc/pmc_sub.h
+	$(INC_PMC_DIR)/pmc_nativepccmethod.h \
+	$(INC_PMC_DIR)/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_sub.h
 
 src/packfile/api$(O) : \
 	src/packfile/api.str \
 	src/packfile/api.c \
 	src/packfile/pf_private.h \
-	include/pmc/pmc_sub.h \
-        include/pmc/pmc_packfileview.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_packfileview.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
 	$(INC_DIR)/extend.h \
 	$(INC_DIR)/extend_vtable.h \
 	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
 	$(INC_DIR)/runcore_api.h
 
 src/packfile/output$(O) : \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_key.h \
+	$(EXTEND_HEADERS) \
+	$(INC_PMC_DIR)/pmc_key.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/extend_vtable.h \
-	$(INC_DIR)/extend.h \
 	$(INC_DIR)/runcore_api.h \
 	src/packfile/pf_private.h \
 	$(INC_DIR)/oplib/core_ops.h \
@@ -1635,8 +1671,9 @@ src/packfile/segments$(O) : \
 	$(INC_DIR)/extend.h \
 	$(INC_DIR)/extend_vtable.h \
 	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
 	src/packfile/pf_private.h \
-	include/pmc/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
 	$(INC_DIR)/runcore_api.h \
 	src/packfile/segments.c
 
@@ -1677,8 +1714,8 @@ src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
-src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_socket.h \
-	src/io/io_private.h include/pmc/pmc_sockaddr.h src/platform/generic/socket.c
+src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_socket.h \
+	src/io/io_private.h $(INC_PMC_DIR)/pmc_sockaddr.h src/platform/generic/socket.c
 
 src/platform/generic/sysmem$(O) : src/platform/generic/sysmem.c $(PARROT_H_HEADERS)
 
@@ -1725,7 +1762,7 @@ src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
-	include/pmc/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
@@ -1735,11 +1772,12 @@ src/disassemble$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/disassemble.c \
 	$(INC_DIR)/oplib/ops.h \
+	$(EXTEND_HEADERS) \
 	$(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/extend_vtable.h \
 	$(INC_DIR)/oplib/core_ops.h \
-	include/pmc/pmc_sub.h \
-	include/pmc/pmc_callcontext.h
+	$(INC_PMC_DIR)/pmc_sub.h \
+	include/imcc/embed.h \
+	include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1747,7 +1785,7 @@ src/embed/api$(O) : \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/api.c \
 	src/embed/embed_private.h \
-	include/pmc/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
 
 src/embed/bytecode$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1755,21 +1793,21 @@ src/embed/bytecode$(O) : \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/bytecode.c \
 	src/embed/embed_private.h \
-	include/pmc/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
 
 src/embed/strings$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
 	src/embed/strings.c \
 	src/embed/embed_private.h \
-	include/pmc/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
 
 src/embed/pmc$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
 	src/embed/pmc.c \
 	src/embed/embed_private.h \
-	include/pmc/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
 
 src/dataypes$(O) : $(GEN_HEADERS) src/dataypes.c
 
@@ -1782,27 +1820,27 @@ src/nci/api$(O) : src/nci/api.str \
 src/nci/core_thunks$(O) : src/nci/core_thunks.str \
 	src/nci/core_thunks.c \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nci.h
+	$(INC_PMC_DIR)/pmc_nci.h
 
 src/nci/libffi$(O) : src/nci/libffi.c \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nci.h \
-	include/pmc/pmc_unmanagedstruct.h \
-	include/pmc/pmc_managedstruct.h \
+	$(INC_PMC_DIR)/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_unmanagedstruct.h \
+	$(INC_PMC_DIR)/pmc_managedstruct.h \
 
 ## SUFFIX OVERRIDE
 src/nci/extra_thunks$(O) : \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_nci.h \
 	src/nci/extra_thunks.str \
 	src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
 
 src/nci/libffi$(O) : src/nci/libffi.c \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nci.h \
-	include/pmc/pmc_unmanagedstruct.h \
-	include/pmc/pmc_managedstruct.h
+	$(INC_PMC_DIR)/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_unmanagedstruct.h \
+	$(INC_PMC_DIR)/pmc_managedstruct.h
 
 src/nci/signatures$(O) : \
 	src/nci/signatures.c \
@@ -1829,10 +1867,9 @@ src/misc$(O) : $(PARROT_H_HEADERS) src/misc.c
 
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
-	include/pmc/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_nci.h \
 	src/utils.c \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h
+	$(EXTEND_HEADERS)
 
 ## SUFFIX OVERRIDE
 src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
@@ -1906,20 +1943,18 @@ frontend/pbc_merge/main$(O) : \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/longopt.h \
 	frontend/pbc_merge/main.c \
-	include/pmc/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
 	$(PARROT_H_HEADERS)
 
-src/io/filehandle$(O) : $(PARROT_H_HEADERS) include/pmc/pmc_filehandle.h \
+src/io/filehandle$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_filehandle.h \
 	src/io/io_private.h src/io/filehandle.c
 
 src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
-
-src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
@@ -1928,9 +1963,9 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/dynext.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
-	include/pmc/pmc_continuation.h \
-	include/pmc/pmc_fixedintegerarray.h \
-	include/pmc/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_continuation.h \
+	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
+	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
 	src/io/io_private.h
 
 
@@ -2035,6 +2070,8 @@ DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
 DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
 EXAMPLES_TEST_FILES = \
 	t/examples/*.t
+INTEROP_TEST_FILES = \
+	t/pir/interop.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
 MANIFEST_TEST_FILES = \
@@ -2102,6 +2139,9 @@ smolder_coretest : corevm pbctestfiles
 
 smoke : smolder_test
 
+resubmit_smolder :
+	$(PERL) $(DEV_TOOLS_DIR)/resubmit_smolder.pl
+
 # "core tests" -- test basic functionality but not ancillaries
 coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests
@@ -2127,6 +2167,9 @@ fulltest :
 	examples_tests \
 	distro_tests \
 	headerizer_tests
+
+all_hll_test :
+	$(PERL) tools/dev/all_hll_test.pl
 
 # bounds checking, slow core
 testb : test_prep
@@ -2163,6 +2206,9 @@ testexec: test_prep
 # Test that need to be compiled by the C-compiler
 src_tests : test_prep
 	$(PERL) t/harness $(SRC_TEST_FILES)
+
+interop_tests: test_prep
+	$(PERL) t/harness $(INTEROP_TEST_FILES)
 
 dynoplibs_tests : test_prep
 	$(PERL) t/harness $(DYNOPLIBS_TEST_FILES)
@@ -2290,7 +2336,7 @@ prog-clean :
 	$(INSTALLABLECONFIG) \
 	$(INSTALLABLENQP) \
 	$(INSTALLABLENCITHUNKGEN) \
-	$(INSTALLABLEPROVE) \
+	$(INSTALLABLEPARROT_PROVE) \
 	$(INSTALLABLEWINXED) \
 	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
 	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
@@ -2304,7 +2350,8 @@ prog-clean :
 	$(PBC_MERGE) frontend/pbc_merge/main$(O) \
 	$(DIS) frontend/pbc_disassemble/main$(O)
 	$(RM_F) \
-	frontend/parrot/main$(O) \
+	frontend/parrot2/main$(O) \
+	parrot_old \
 	src/null_config$(O) \
 	src/parrot_config$(O) \
 	src/install_config$(O) \
@@ -2318,7 +2365,7 @@ prog-clean :
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
 	$(STR_FILES) \
-	src/string/private_cstring.h "src/pmc/*.c" "include/pmc/pmc_*.h" \
+	src/string/private_cstring.h "src/pmc/*.c" "$(INC_PMC_DIR)/pmc_*.h" \
 	"src/pmc/*.dump" vtable.dump "*.def" "*.lib" "*.exp"
 
 archclean: dynext-clean
@@ -2406,7 +2453,10 @@ test-clean :
 	$(RM_F) \
 	 "t/src/*.c" \
 	 "t/src/*.pdb" \
-	 "t/src/*.manifest"
+	 "t/src/*.manifest" \
+	 "t/src/*.exp" \
+	 "t/src/*.lib" \
+	 "t/src/*.exe"
 	$(RM_F) \
 	 "t/src/embed/*.c" \
 	 "t/src/embed/*.pdb" \
@@ -2457,7 +2507,7 @@ status :
 patch :
 	git diff
 
-LINTABLE_CFILES = `echo frontend/parrot/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+LINTABLE_CFILES = `echo frontend/parrot2/main$(O) $(O_FILES) src/parrot_config$(O) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 
 lint : sunlint
 
@@ -2514,8 +2564,6 @@ BSD_LINT_FLAGS = -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 # 236: static function unused
 # 241: dubious operation on enum
 # 247: pointer casts may be troublesome
-# 249: syntax error (huh? this appears in atomic/gcc_x86.h but doesn't
-#      cause any compiler to barf)
 # 259: conversion to '...' due to prototype
 # 265: ANSI C does not support 'long long'
 # 277: initialisation of '...' with '...'
@@ -2696,7 +2744,7 @@ FULLCOVER_DIRS = \
 	src/runcore \
 	src/string \
 	src/string/encoding \
-	frontend/parrot \
+	frontend/parrot2 \
 	frontend/parrot_debugger \
 	frontend/pbc_dump \
 	frontend/pbc_merge \
@@ -2744,7 +2792,7 @@ COVER_DIRS = \
 	src/runcore \
 	src/string \
 	src/string/encoding \
-	frontend/parrot \
+	frontend/parrot2 \
 	frontend/parrot_debugger \
 	frontend/pbc_dump \
 	frontend/pbc_merge \
@@ -2919,21 +2967,14 @@ install-doc:
 ###############################################################################
 
 release : MANIFEST MANIFEST.generated
-	[ -d parrot-$(VERSION) ] || ln -s . parrot-$(VERSION)
-	@$(RM_F) MANIFEST.real
-	mv MANIFEST MANIFEST.real
-	grep -v DEVELOPING MANIFEST.real > MANIFEST
-	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' MANIFEST | \
-	tar -zcv -T - -f parrot-$(VERSION).tar.gz
-	$(PERL) -lane 'print"parrot-$(VERSION)/$$F[0]"unless!length||/#/' \
-	     MANIFEST | tar -jcv -T - -f parrot-$(VERSION).tar.bz2
-	sha256sum parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
-	sha256sum parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
-	mv MANIFEST.real MANIFEST
-	rm parrot-$(VERSION)
+	$(PERL) $(RELEASE_TOOLS_DIR)/cut.pl $(VERSION)
+	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
+        parrot-$(VERSION).tar.gz > parrot-$(VERSION).tar.gz.sha256
+	$(PERL) $(RELEASE_TOOLS_DIR)/sha256sum.pl \
+        parrot-$(VERSION).tar.bz2 > parrot-$(VERSION).tar.bz2.sha256
 
 release_check:
-	make release VERSION=$(SOVERSION)
+	$(MAKE) release VERSION=$(SOVERSION)
 	$(PERL) $(RELEASE_TOOLS_DIR)/releasecheck.pl
 
 relcheck : release_check
@@ -2963,8 +3004,10 @@ $(LIBNCI_TEST_SO): src/nci_test$(O)
 	@ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
 # for use by runtime/parrot/library/OpenGL.pir
-src/glut_callbacks$(O): $(PARROT_H_HEADERS) \
-	$(INC_DIR)/extend.h $(INC_DIR)/extend_vtable.h src/glut_callbacks.c
+src/glut_callbacks$(O): \
+	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
+	src/glut_callbacks.c
 
 src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) \
@@ -2975,7 +3018,7 @@ src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 
 src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
 	src/glut_nci_thunks.c \
-	include/pmc/pmc_nci.h
+	$(INC_PMC_DIR)/pmc_nci.h
 
 $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
@@ -2991,7 +3034,7 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN
 
 ## SUFFIX OVERRIDE
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
-	include/pmc/pmc_nci.h
+	$(INC_PMC_DIR)/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 # emacs etags
@@ -3051,7 +3094,7 @@ cagecritic:
 
 HEADERIZER_O_FILES = \
 	$(O_FILES) \
-	frontend/parrot/main$(O) \
+	frontend/parrot2/main$(O) \
 	frontend/pbc_dump/packdump$(O) \
 	frontend/pbc_merge/main$(O) \
 

@@ -289,7 +289,7 @@ SP              [ ]
 <INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
-".sub"                   return SUB;
+".sub"                   { SET_LINE_NUMBER; return SUB; }
 ".end"                   return ESUB;
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;
@@ -308,6 +308,7 @@ SP              [ ]
 <emit,INITIAL>":init"      return INIT;
 <emit,INITIAL>":immediate" return IMMEDIATE;
 <emit,INITIAL>":postcomp"  return POSTCOMP;
+<emit,INITIAL>":tag"       return SUBTAG;
 <emit,INITIAL>":anon"      return ANON;
 <emit,INITIAL>":outer"     return OUTER;
 <emit,INITIAL>":lex"       return NEED_LEX;
@@ -1199,7 +1200,7 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
     if (STRING_IS_NULL(s)
     ||  (file = PIO_OPEN(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
         IMCC_fataly(imcc, EXCEPTION_EXTERNAL_ERROR,
-            "No such file or directory");
+            "No such file or directory '%Ss'", file_name);
     }
 
     frame->s.file   = file_name;

@@ -338,6 +338,14 @@
 ^/frontend/parrot/.*\.gcov/
 ^/frontend/parrot/main\.o$
 ^/frontend/parrot/main\.o/
+^/frontend/parrot2/main\.o$
+^/frontend/parrot2/main\.o/
+^/frontend/parrot2/prt0\.pbc$
+^/frontend/parrot2/prt0\.pbc/
+^/frontend/parrot2/prt0\.pbc\.c$
+^/frontend/parrot2/prt0\.pbc\.c/
+^/frontend/parrot2/prt0\.pbc\.o$
+^/frontend/parrot2/prt0\.pbc\.o/
 ^/frontend/parrot_debugger/.*\.gcda$
 ^/frontend/parrot_debugger/.*\.gcda/
 ^/frontend/parrot_debugger/.*\.gcno$
@@ -464,6 +472,8 @@
 ^/parrot_nci_thunk_gen\.c/
 ^/parrot_nci_thunk_gen\.pbc$
 ^/parrot_nci_thunk_gen\.pbc/
+^/parrot_old$
+^/parrot_old/
 ^/parrot_test_run\.tar\.gz$
 ^/parrot_test_run\.tar\.gz/
 ^/pbc_disassemble$
@@ -988,10 +998,16 @@
 ^/t/pmc/.*_pbcexe.*/
 ^/t/pmc/testlib/.*\.pbc$
 ^/t/pmc/testlib/.*\.pbc/
+^/t/src/.*\.exe$
+^/t/src/.*\.exe/
+^/t/src/.*\.exp$
+^/t/src/.*\.exp/
 ^/t/src/.*\.gcdada$
 ^/t/src/.*\.gcdada/
 ^/t/src/.*\.gcov$
 ^/t/src/.*\.gcov/
+^/t/src/.*\.lib$
+^/t/src/.*\.lib/
 ^/t/src/.*_.*\.c$
 ^/t/src/.*_.*\.c/
 ^/t/src/embed/.*\.c$
@@ -1054,6 +1070,10 @@
 ^/winxed/
 ^/winxed\..*$
 ^/winxed\..*/
+^cachegrind\.out\..*$
+^cachegrind\.out\..*/
+^callgrind\.out\..*$
+^callgrind\.out\..*/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

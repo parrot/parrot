@@ -20,6 +20,7 @@ The runcore API handles running the operations.
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/runcore_profiling.h"
+#include "parrot/runcore_subprof.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/ops.h"
 #include "main.str"
@@ -68,6 +69,7 @@ Parrot_runcore_init(PARROT_INTERP)
     Parrot_runcore_slow_init(interp);
     Parrot_runcore_fast_init(interp);
 
+    Parrot_runcore_subprof_init(interp);
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);
@@ -292,14 +294,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     ASSERT_ARGS(dynop_register)
     op_lib_t     *lib;
     oplib_init_f  init_func;
-
-    if (n_interpreters > 1) {
-        /* This is not supported yet because interp->all_op_libs
-         * and interp->op_hash are shared.
-         */
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "loading a new dynoplib while "
-            "more than one thread is running is not supported.");
-    }
 
     if (!interp->all_op_libs)
         interp->all_op_libs = mem_gc_allocate_n_zeroed_typed(interp,

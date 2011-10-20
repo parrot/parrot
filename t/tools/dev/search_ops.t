@@ -1,14 +1,16 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
-use File::Temp qw( tempdir );
-use Test::More tests => 10;
-use lib qw( ./lib ./t/tools/dev/searchops );
-use IO::CaptureOutput qw( capture );
-use Parrot::SearchOps qw( search_all_ops_files help );
-use samples qw( $core $debug $mangled $string );
+use lib qw(lib t/tools/dev/search_ops);
+
+use File::Temp        qw(tempdir);
+use Test::More        tests => 10;
+use IO::CaptureOutput qw(capture);
+
+use Parrot::SearchOps qw(search_all_ops_files help);
+use samples           qw($core $debug $mangled $string);
 
 my %samples;
 
@@ -27,7 +29,7 @@ my %samples;
         \$stderr,
     );
     like($stdout,
-        qr/^\s*perl\stools\/dev\/search-ops\.pl.*?ops_pattern/s,
+        qr/^\s*perl\stools\/dev\/search_ops\.pl.*?ops_pattern/s,
         "Got expected start to help message",
     );
     like($stdout,
@@ -37,7 +39,7 @@ my %samples;
 }
 
 my $wrap_width = 70;
-my $opsdir = q{t/tools/dev/searchops};
+my $opsdir = q{t/tools/dev/search_ops};
 
 {
     my $tdir = tempdir( CLEANUP => 1 );
@@ -140,11 +142,11 @@ my $opsdir = q{t/tools/dev/searchops};
 
 =head1 NAME
 
-t/tools/dev/searchops.t - test subroutines used in tools/dev/search-ops.pl
+t/tools/dev/search_ops.t - test subroutines used in tools/dev/search_ops.pl
 
 =head1 SYNOPSIS
 
-    % prove t/tools/dev/searchops.t
+    % prove t/tools/dev/search_ops.t
 
 =head1 DESCRIPTION
 
@@ -172,7 +174,7 @@ followed by another paragraph will not print the C<NAME> paragraph.
 =item *
 
 Demonstrate what happens when the C<--all> option is provided to
-F<tools/dev/search-ops.pl>.
+F<tools/dev/search_ops.pl>.
 
 =item *
 

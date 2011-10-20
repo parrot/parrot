@@ -699,22 +699,15 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
                 Parrot_str_escape(interp, classname));
     }
 
-    /* Type doesn't exist, so go ahead and register it. Lock interpreter so
-     * pt_shared_fixup() can safely do a type lookup. */
-    LOCK_INTERPRETER(interp);
-    {
-        type = Parrot_pmc_get_new_vtable_index(interp);
+    /* Type doesn't exist, so go ahead and register it. */
+    type = Parrot_pmc_get_new_vtable_index(interp);
+    if (!typeid_exists) {
+        /* set entry in name->type hash */
+        PMC * const classname_hash = interp->class_hash;
+        PMC * const item           = Parrot_pmc_new_init_int(interp,
+                enum_class_Integer, type);
+        VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
     }
-    {
-        if (!typeid_exists) {
-            /* set entry in name->type hash */
-            PMC * const classname_hash = interp->class_hash;
-            PMC * const item           = Parrot_pmc_new_init_int(interp,
-                    enum_class_Integer, type);
-            VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
-        }
-    }
-    UNLOCK_INTERPRETER(interp);
 
     return type;
 }
@@ -1221,7 +1214,7 @@ Used by the Class and Object PMCs internally to compose a role into either of
 them. The C<role> parameter is the role that we are composing into the class
 or role. C<methods_hash> is the hash of method names to invokable PMCs that
 contains the methods the class or role has. C<roles_list> is the list of roles
-the the class or method does.
+the class or method does.
 
 The C<role> parameter is only dealt with by its external interface. Whether
 this routine is usable by any other object system implemented in Parrot very

@@ -65,7 +65,16 @@ X<token>
 There are two different kinds of rules: C<rule>, which we saw above, and
 C<token>. A C<rule> performs smart whitespace matching between the various
 pieces of the pattern. The C<record> rule given previously would match
-"6355 John" or "6355      John" but not "6355John".
+
+    6355 John
+
+or
+
+    6355        John
+
+but not
+
+    6355John
 
 A C<token> matches whitespace only if you specifically request it. To get the
 same effect with a token, add the C<\s> (match a space character) and C<+>
@@ -1334,7 +1343,7 @@ Protofunctions define operators in the optable in the same way that rules and
 tokens make up the grammar. A proto declares a rule, defined elsewhere, which
 other code may override dynamically.  In this case, PCT takes information from
 the proto declaration and fills in the details. The "dynamic overriding"
-implies that a high-level language itself itself can modify its own grammar at
+implies that a high-level language itself can modify its own grammar at
 run time, by overriding the proto definitions for its operator table. Some
 languages call this process X<operator overloading> I<operator overloading>.
 

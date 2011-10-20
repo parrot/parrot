@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub 'test' :main
     .include 'test_more.pir'
 
-    plan(41)
+    plan(42)
 
     setting_array_size()
     resizing_not_allowed()
@@ -38,6 +38,7 @@ out-of-bounds test. Checks INT and PMC keys.
     fill()
     test_new_style_init()
     test_invalid_init_tt1509()
+    test_get_string()
 .end
 
 .sub 'setting_array_size'
@@ -359,6 +360,13 @@ CODE
         $P0 = new 'FixedBooleanArray', -10
     .end
 CODE
+.end
+
+.sub test_get_string
+    $P0 = new 'FixedBooleanArray', 2
+    $P0[1] = 1
+    $S0 = $P0
+    is($S0, '01', 'converts to string')
 .end
 
 # Local Variables:

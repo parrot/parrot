@@ -57,10 +57,10 @@ void Parrot_ext_call(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_ext_try(PARROT_INTERP,
     ARGIN_NULLOK(void (*cfunction)(Parrot_Interp,
-    void *)),
+    ARGIN_NULLOK(void *))),
     ARGIN_NULLOK(void (*chandler)(Parrot_Interp,
-    PMC *,
-    void *)),
+    ARGIN_NULLOK(PMC *),
+    ARGIN_NULLOK(void *))),
     ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 

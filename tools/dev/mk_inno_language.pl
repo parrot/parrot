@@ -83,6 +83,24 @@ my $readme = -f 'README'
            ? qq{Source: ".\\README"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags:}
            : '; no README';
 
+my $rakudo = $lang eq 'rakudo'
+        ? <<'RAKUDO' : '';
+; nqp is required by rakudo
+Source: ".\nqp\nqp.exe"; DestDir: "{app}\bin"; Flags:
+Source: ".\nqp\src\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\src\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\ModuleLoader.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
+Source: ".\nqp\PASTRegex.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
+Source: ".\nqp\NQPP6Regex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPHLL.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPCORE.setting.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\nqpmo.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\nqp.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\blib\Perl6\*.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib\Perl6"; Flags:
+RAKUDO
+
 my $filename = 'parrot-' . $lclang . '.iss';
 open my $OUT, '>', $filename
     or die "Can't open $filename ($!)";
@@ -106,6 +124,7 @@ SolidCompression=yes
 Uninstallable=no
 
 [Files]
+$rakudo
 $exe
 $pbc
 $lng

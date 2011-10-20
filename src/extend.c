@@ -341,9 +341,9 @@ If the function throws, the provided handler function is invoked
 PARROT_EXPORT
 void
 Parrot_ext_try(PARROT_INTERP,
-                ARGIN_NULLOK(void (*cfunction)(Parrot_Interp, void *)),
-                ARGIN_NULLOK(void (*chandler)(Parrot_Interp, PMC *, void *)),
-                ARGIN_NULLOK(void *data))
+    ARGIN_NULLOK(void (*cfunction)(Parrot_Interp, ARGIN_NULLOK(void *))),
+    ARGIN_NULLOK(void (*chandler)(Parrot_Interp, ARGIN_NULLOK(PMC *), ARGIN_NULLOK(void *))),
+    ARGIN_NULLOK(void *data))
 {
     ASSERT_ARGS(Parrot_ext_try)
     if (cfunction) {

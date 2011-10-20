@@ -268,7 +268,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_new_from_buffer(PARROT_INTERP,
-    ARGMOD(Buffer *buffer),
+    ARGMOD(Parrot_Buffer *buffer),
     const UINTVAL len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -489,6 +489,13 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
+    ARGIN_NULLOK(const char *buffer),
+    ARGIN_NULLOK(STRING *encodingname))
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_str_bitwise_and __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_bitwise_not __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -652,6 +659,8 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(l))
+#define ASSERT_ARGS_Parrot_str_new_from_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/api.c */
 

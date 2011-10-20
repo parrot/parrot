@@ -104,10 +104,49 @@ Accessor method -- sets/returns the "flatten" flag on arguments.
     .tailcall self.'attr'('flat', value, has_value)
 .end
 
+
+=item handlers([node array])
+
+Accessor method -- sets/returns handlers associated with this node.
+Handlers can be used for PAST::Block and PAST::Stmts nodes.
+
+=cut
+
 .sub 'handlers' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('handlers', value, has_value)
+.end
+
+
+=item handle_types([value])
+
+Accessor method -- sets/returns the exception types this node
+handles. This is evaluated if the node is used as a block
+handler, the node is a PAST::Control node, or the node is
+a PAST::Op node of type 'try'.
+
+=cut
+
+.sub 'handle_types' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types', value, has_value)
+.end
+
+
+=item handle_types_except([value])
+
+Accessor method -- sets/returns the exception types this node
+does not handle. Same as handle_types, but all exceptions not
+matching the specified ones will be caught.
+
+=cut
+
+.sub 'handle_types_except' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('handle_types_except', value, has_value)
 .end
 
 
@@ -839,21 +878,6 @@ outer statement.
     .param pmc value           :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('tempregs', value, has_value)
-.end
-
-
-.namespace [ 'PAST';'Control' ]
-
-.sub 'handle_types' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('handle_types', value, has_value)
-.end
-
-.sub 'handle_types_except' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('handle_types_except', value, has_value)
 .end
 
 

@@ -134,7 +134,6 @@ typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
-struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
 /* Get Context from interpreter */
@@ -147,12 +146,6 @@ struct _Caches;         /* caches .h */
  * functions to manipulate Context.
  */
 #define CURRENT_CONTEXT(interp) ((interp)->ctx)
-
-
-typedef struct _context_mem {
-    void **free_list;               /* array of free-lists, per size free slots */
-    int n_free_slots;               /* amount of allocated */
-} context_mem;
 
 struct _handler_node_t; /* forward def - exit.h */
 
@@ -192,7 +185,6 @@ struct parrot_interp_t {
     size_t             resume_offset;
 
     PackFile_ByteCode  *code;                 /* The code we are executing */
-    PMC                *current_pf;           /* Current PF  */
 
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
@@ -243,8 +235,6 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
-
-    struct _Thread_data *thread_data;         /* thread specific items */
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 

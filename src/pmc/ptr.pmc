@@ -33,6 +33,8 @@ BEGIN_PMC_HEADER_PREAMBLE
 #define PTR_FAT_CLEAR(i, s) PObj_flag_CLEAR(private1, (s))
 END_PMC_HEADER_PREAMBLE
 
+#include "parrot/string_funcs.h"
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
@@ -184,21 +186,8 @@ specified. If the encoding is omitted or null, use platform encoding.
 */
 
     METHOD as_string(STRING *encodingname :optional) {
-        STRING *result = STRINGNULL;
         const char * content = (const char *)SELF.get_pointer();
-        if (content) {
-            const STR_VTABLE *encoding = STRING_IS_NULL(encodingname) ?
-                    Parrot_platform_encoding_ptr :
-                    Parrot_find_encoding_by_string(INTERP, encodingname);
-            if (encoding == NULL)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_ENCODING,
-                        "Invalid encoding");
-            else {
-                int size = strlen(content);
-                result = Parrot_str_new_init(INTERP, content, size, encoding, 0);
-            }
-        }
+        STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
         RETURN(STRING result);
     }
 

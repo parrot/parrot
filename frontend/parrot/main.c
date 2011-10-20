@@ -3,7 +3,7 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 

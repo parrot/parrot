@@ -33,7 +33,7 @@ throughout the rest of Parrot.
 static void free_buffer(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     Fixed_Size_Pool *pool,
-    ARGMOD(Buffer *b))
+    ARGMOD(Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(4)
@@ -230,9 +230,6 @@ mark_interp(PARROT_INTERP)
     /* mark the concurrency scheduler */
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
-    /* s. packfile.c */
-    Parrot_gc_mark_PMC_alive(interp, interp->current_pf);
-
     /* mark caches and freelists */
     mark_object_cache(interp);
 
@@ -306,20 +303,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
             }
             else if (!PObj_on_free_list_TEST(b)) {
                 /* it must be dead */
-
-
-                if (PObj_is_shared_TEST(b)) {
-                    /* only mess with shared objects if we
-                     * (and thus everyone) is suspended for
-                     * a GC run.
-                     * XXX wrong thing to do with "other" GCs
-                     */
-                    if (!(interp->thread_data
-                    &&   (interp->thread_data->state & THREAD_STATE_SUSPENDED_GC))) {
-                        ++total_used;
-                        goto next;
-                    }
-                }
 
                 if (gc_object)
                     gc_object(interp, mem_pools, pool, b);
@@ -417,12 +400,12 @@ Parrot_gc_clear_live_bits(SHIM_INTERP, ARGIN(const Fixed_Size_Pool *pool))
     const UINTVAL object_size = pool->object_size;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        Buffer *b = (Buffer *)arena->start_objects;
+        Parrot_Buffer *b = (Parrot_Buffer *)arena->start_objects;
         UINTVAL i;
 
         for (i = 0; i < arena->used; ++i) {
             PObj_live_CLEAR(b);
-            b = (Buffer *)((char *)b + object_size);
+            b = (Parrot_Buffer *)((char *)b + object_size);
         }
     }
 }
@@ -661,7 +644,7 @@ new_string_pool(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools), INTVAL constant)
 /*
 
 =item C<static void free_buffer(PARROT_INTERP, Memory_Pools *mem_pools,
-Fixed_Size_Pool *pool, Buffer *b)>
+Fixed_Size_Pool *pool, Parrot_Buffer *b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
 reuse later.
@@ -672,7 +655,7 @@ reuse later.
 
 static void
 free_buffer(PARROT_INTERP, ARGMOD(Memory_Pools *mem_pools),
-        SHIM(Fixed_Size_Pool *pool), ARGMOD(Buffer *b))
+        SHIM(Fixed_Size_Pool *pool), ARGMOD(Parrot_Buffer *b))
 {
     ASSERT_ARGS(free_buffer)
 

@@ -62,6 +62,7 @@ programming language): a conditional expression, a "then" part and an "else"
 part. Implementing this in Perl 6 rules and PAST is almost trivial, but first, let's add a little
 infrastructure to simplify adding new statement types. Replace the statement rule with the
 following:
+
     proto rule statement { <...> }
 
 Delete the statement method from Action.pm, and rename the assignment rule in both Grammar.pm and
@@ -82,14 +83,17 @@ brackets. Within the body of the rule, it can be matched literally with <sym>.
 
 Note that the optional else block is stored in the match object's "else" field, and the then block
 is stored in the match object's "then" field.
+
 If we hadn't written this $<else>= part, then <block> would have been an array,
 with block[0] the "then" part, and block[1] the optional else part. Assigning
 the optional else block to a different field, makes the action method slightly
 easier to read.
+
 Note that the proto declaration for statement means that the result object for  $<statement> in any
 rule which calls statement as a subrule will be result object for whichever statement type matched.
 Because of this, we can delete the statement action method.
- The relevant action methods are shown below:
+
+The relevant action methods are shown below:
 
     method block($/) {
         # create a new block, set its type to 'immediate',

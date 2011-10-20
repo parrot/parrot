@@ -23,6 +23,7 @@ passing to and from subroutines following the Parrot Calling Conventions.
 #include "args.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_fixedintegerarray.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -62,12 +63,6 @@ static void assign_default_param_value(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void dissect_aggregate_arg(PARROT_INTERP,
     ARGMOD(PMC *call_object),
@@ -248,9 +243,6 @@ static STRING** string_param_from_op(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(arg_info) \
     , PARROT_ASSERT_ARG(accessor))
-#define ASSERT_ARGS_clone_key_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_dissect_aggregate_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(call_object) \
@@ -414,9 +406,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                     dissect_aggregate_arg(interp, call_object, pmc_value);
                 }
                 else {
-                    VTABLE_push_pmc(interp, call_object, PMC_IS_NULL(pmc_value)
-                            ? PMCNULL
-                            : clone_key_arg(interp, pmc_value));
+                    VTABLE_push_pmc(interp, call_object, pmc_value);
                     if (arg_flags & PARROT_ARG_INVOCANT)
                         Parrot_pcc_set_object(interp, call_object, pmc_value);
                 }
@@ -597,7 +587,7 @@ set_call_from_varargs(PARROT_INTERP,
     INTVAL       i            = 0;
 
     parse_signature_string(interp, sig, &arg_flags);
-    VTABLE_set_attr_str(interp, signature, CONST_STRING(interp, "arg_flags"), arg_flags);
+    SETATTR_CallContext_arg_flags(interp, signature, arg_flags);
 
     /* Process the varargs list */
     for (; sig[i] != '\0'; ++i) {
@@ -625,9 +615,7 @@ set_call_from_varargs(PARROT_INTERP,
                     }
                 }
                 else
-                    VTABLE_push_pmc(interp, signature, PMC_IS_NULL(pmc_arg)
-                            ? PMCNULL
-                            : clone_key_arg(interp, pmc_arg));
+                    VTABLE_push_pmc(interp, signature, pmc_arg);
                 break;
             }
           case 'S':
@@ -743,7 +731,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         return call_object;
 
     parse_signature_string(interp, sig, &arg_flags);
-    VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "arg_flags"), arg_flags);
+    SETATTR_CallContext_arg_flags(interp, call_object, arg_flags);
 
     /* Process the varargs list */
     for (i = 0; sig[i] != '\0'; ++i) {
@@ -773,9 +761,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
                      ++i; /* skip 'f' */
                 }
                 else {
-                    VTABLE_push_pmc(interp, call_object, PMC_IS_NULL(pmc_arg)
-                            ? PMCNULL
-                            : clone_key_arg(interp, pmc_arg));
+                    VTABLE_push_pmc(interp, call_object, pmc_arg);
                     if (type_lookahead == 'i') {
                         if (i != 0)
                             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -1848,42 +1834,6 @@ pmc_constant_from_varargs(SHIM_INTERP, ARGIN(SHIM(void *data)), SHIM(INTVAL inde
     ASSERT_ARGS(pmc_constant_from_varargs)
     PARROT_FAILURE("Wrong call");
     return PMCNULL;
-}
-
-/*
-
-=item C<static PMC* clone_key_arg(PARROT_INTERP, PMC *key)>
-
-Replaces any src registers by their values (done inside clone).  This needs a
-test for tailcalls too, but I think there is no syntax to pass a key to a
-tailcalled function or method.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-clone_key_arg(PARROT_INTERP, ARGIN(PMC *key))
-{
-    ASSERT_ARGS(clone_key_arg)
-    PMC *t;
-
-    if (PMC_IS_NULL(key))
-        return key;
-
-    if (key->vtable->base_type != enum_class_Key)
-        return key;
-
-    for (t = key; !PMC_IS_NULL(t); t=Parrot_key_next(interp, t)) {
-        /* register keys have to be cloned */
-        if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
-            return VTABLE_clone(interp, key);
-        }
-    }
-
-    return key;
 }
 
 /*

@@ -838,6 +838,30 @@ Sets C<*value> as the value for C<*key>.
 
 /*
 
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Sets C<*value> as the value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)
+        && (!PObj_constant_TEST((PObj *)value)))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC value in constant hash.");
+
+        Parrot_hash_put(INTERP, hash,
+                Parrot_hash_key_from_int(INTERP, hash, key),
+                Parrot_hash_value_from_pmc(INTERP, hash, value));
+    }
+
+/*
+
 =item C<INTVAL exists_keyed_str(STRING *key)>
 
 =cut
@@ -943,6 +967,19 @@ Returns whether the value for C<*key> is defined.
     VTABLE void delete_keyed_str(STRING *key) {
         Hash * const hash = (Hash *)SELF.get_pointer();
         Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key));
+    }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed_int(INTVAL. key) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+        Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_int(INTERP, hash, key));
     }
 
 /*
@@ -1135,6 +1172,11 @@ NB: this method will destroy all old data!
 
 Return type of values in Hash.
 
+=item C<METHOD update(Hash *other)>
+
+Copies all entries from the other hash into the hash, overwriting
+entries with the same key.
+
 =cut
 
 */
@@ -1184,6 +1226,15 @@ Return type of values in Hash.
         RETURN(INTVAL ret);
     }
 
+    METHOD update(PMC *other) {
+        if (other->vtable->base_type == SELF->vtable->base_type
+        ||  other->vtable->base_type == enum_class_Hash) {
+            Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(), (Hash *)VTABLE_get_pointer(INTERP, other));
+        } else {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                        "Hash: don't know how to update from a non-Hash type");
+        }
+    }
 }
 
 /*
@@ -1228,7 +1279,7 @@ get_next_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
 
-Throw the appropiate exception.
+Throw the appropriate exception.
 
 =cut
 

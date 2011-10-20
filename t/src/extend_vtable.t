@@ -6,11 +6,15 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
 
-plan tests => 139;
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+
+plan tests => 138;
 
 =head1 NAME
 
@@ -107,7 +111,7 @@ void dotest(Parrot_Interp interp, void *unused)
     fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
     hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
     ns           = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
-    nci          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Nci"));
+    nci          = Parrot_sub_new_from_c_func(interp, (void (*)(void))Parrot_PMC_new, "PpI");
     pmc          = Parrot_PMC_new(interp, type);
     pmc2         = Parrot_PMC_new(interp, type);
     pmc3         = Parrot_PMC_new(interp, type);
@@ -619,14 +623,6 @@ CODE
 Done!
 OUTPUT
 
-# These will most likely be removed soon, but here for completeness
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_share(_ro)");
-    Parrot_PMC_share(interp, pmc);
-    Parrot_PMC_share_ro(interp, pmc);
-CODE
-Done!
-OUTPUT
-
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
     hashkey   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "HashIteratorKey"));
@@ -947,9 +943,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
-    Parrot_PMC_set_integer_native(interp, pmc, 42);
-
-    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, nci);
     Parrot_printf(interp,"pointer = %d\n", integer);
     if (integer != NULL)
         Parrot_printf(interp,"Got pointer!n");

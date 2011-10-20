@@ -24,6 +24,8 @@ Win32 System Programming, 2nd Edition.
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 
+#include<Windows.h>
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -47,10 +49,6 @@ static void convert_flags_to_win32(
     , PARROT_ASSERT_ARG(fdwCreate))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#include <tchar.h>
-
-#define PIO_TRACE 0
 
 /*
 
@@ -225,6 +223,41 @@ Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle)
         DUPLICATE_SAME_ACCESS);
 
     return new_handle;
+}
+
+/*
+
+=item C<INTVAL Parrot_io_async(PARROT_INTERP, PMC *pmc, INTVAL async)>
+
+Sets a handle C<*pmc> to blocking or non-blocking mode
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
+{
+    ASSERT_ARGS(Parrot_io_is_async)
+    int rflags;
+    PIOHANDLE file_descriptor;
+    if (Parrot_io_is_closed(interp, pmc))
+        return 0;
+
+#if 0
+    if (async)
+       Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) | PIO_F_ASYNC);
+    else
+       Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) & ~PIO_F_ASYNC);
+
+    file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+#else
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+        "Async support not available");
+#endif
+    return -1;
 }
 
 /*
@@ -514,7 +547,7 @@ Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         /* Redirect input to NULL. This is to avoid
          * interferences in case both the child and
          * the parent tries to read from stdin.
-         * May be unneccessary or even interfere
+         * May be unnecessary or even interfere
          * with valid usages, need more feedback. */
         hnull = CreateFile("NUL", GENERIC_READ|GENERIC_WRITE,
                 0, &sec, OPEN_EXISTING,
