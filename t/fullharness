@@ -24,10 +24,11 @@ use Parrot::Harness::Smoke qw(
     send_archive_to_smolder
 );
 
-my ($archive, $smolder);
+my ($archive, $smolder, $IN_TESTING);
 GetOptions(
     'archive'           => \$archive,
     'send-to-smolder'   => \$smolder,
+    'in-testing'        => \$IN_TESTING,
 );
 
 my @runcore_test_files = glob("@{ $test_groups{runcore} }");
@@ -45,10 +46,13 @@ my @other_targets = ( qw|
     codingstd benchmark manifest
     examples distro headerizer
 | );
-#my @other_targets = ( qw| run manifest headerizer | );
 foreach my $t ( @other_targets ) {
   push @targets, set_usual_target($t);
 } 
+if ($IN_TESTING) {
+    @targets =
+        map { set_usual_target($_) } ( qw| run manifest headerizer | );
+}
 
 my ($formatter, $aggregator);
 if ($archive) {
@@ -92,7 +96,8 @@ else {
     }
     $aggregator->stop();
     $formatter->summary($aggregator);
-    my $exit_value = $aggregator->failed ? 1 : 0;
+    # We'll treat both FAIL and NOTESTS as failures.
+    my $exit_value = ($aggregator->get_status() eq 'PASS') ? 0 : 1;
     exit($exit_value);
 }
 
