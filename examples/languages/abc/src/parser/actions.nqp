@@ -75,6 +75,7 @@ method statement:sym<expr>($/) {
     if pir::typeof__sp($past) ne 'PAST::Op' && ~$past.name() ne '&infix:<=>' {
         my $last := PAST::Var.new( :name('last'),
                                    :scope('package'),
+                                   :namespace(['abc','vars']),
                                    :lvalue(1) );
         $past := PAST::Op.new( $last,
                                $past,
@@ -204,6 +205,7 @@ method term:sym<variable>($/) {
     else {
         make PAST::Var.new( :name( ~$<name> ),
                             :scope('package'),
+                            :namespace(['abc', 'vars']),
                             :viviself('Float'),
                             :lvalue(1),
                             :node( $/ )

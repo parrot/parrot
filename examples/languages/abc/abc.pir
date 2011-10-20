@@ -23,6 +23,8 @@ object.
 
 =cut
 
+.loadlib 'trans_ops'
+
 .HLL 'abc'
 
 .sub '' :anon :load :init
