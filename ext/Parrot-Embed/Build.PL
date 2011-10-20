@@ -84,7 +84,7 @@ sub get_path_separator
 sub get_compiler_flags
 {
     my $in_parrot_tree = shift;
-    my $parrot_config = $in_parrot_tree ? "./parrot_config" : "parrot_config";
+    my $parrot_config = $in_parrot_tree ? "../../parrot_config" : "parrot_config";
     return (`$parrot_config embed-cflags`, `$parrot_config embed-ldflags`);
 }
 
