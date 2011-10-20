@@ -2,6 +2,7 @@
 length(1)		1\n		length function
 length(11)		2\n		length function
 length(111)		3\n		length function
+length(abc)		1\n		abc isn't last - TT161
 
 # read function
 # TODO?
