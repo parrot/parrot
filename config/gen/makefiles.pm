@@ -29,9 +29,6 @@ sub _init {
         'Makefile' => {
             SOURCE => 'config/gen/makefiles/root.in',
         },
-        'ext/Makefile' => {
-            SOURCE => 'config/gen/makefiles/ext.in',
-        },
         'compilers/imcc/Rules.mak' => {
              SOURCE => 'compilers/imcc/Rules.in',
         },
@@ -40,11 +37,6 @@ sub _init {
         },
         'src/dynoplibs/Defines.mak' => {
              SOURCE => 'src/dynoplibs/Defines.in',
-        },
-
-        'ext/Parrot-Embed/Makefile.PL' => {
-            SOURCE            => 'config/gen/makefiles/parrot_embed_pl.in',
-            conditioned_lines => 1,
         },
 
         'src/dynpmc/Rules.mak' => {
