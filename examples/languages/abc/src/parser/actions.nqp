@@ -38,6 +38,7 @@ method TOP($/) {
     make PAST::Block.new(
         :blocktype('declaration'),
         :hll('abc'),
+        :loadlibs('trans_ops'),
         $<statement_list>.ast);
 }
 
