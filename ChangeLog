@@ -1,3 +1,11 @@
+2011-11-15    release 3.10.0
+    - Core
+        + The mark VTABLE was added to the Select PMC
+    - Languages
+    - Community
+    - Documentation
+    - Tests
+
 2011-10-18    release 3.9.0
     - Core
         + The whiteknight/kill_threads branch was merged, which removes the old and broken

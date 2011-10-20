@@ -246,7 +246,7 @@ later use.
 
 Currently there are two functions to get a bytecode PMC.
 
-    Parrot_api_load_bytecode(interp, filename, *pbc)
+    Parrot_api_load_bytecode_file(interp, filename, *pbc)
     Parrot_api_load_bytecode_bytes(interp, bytecode, size, *pbc)
 
 The first function loads bytecode from a file. The second loads bytecode in

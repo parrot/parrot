@@ -151,7 +151,6 @@ GEN_MAKEFILES = \
 	Makefile \
 	docs/Makefile \
 	editor/Makefile \
-	ext/Makefile \
 	src/dynoplibs/Rules.mak \
 	src/dynoplibs/Defines.mak \
 	src/dynpmc/Rules.mak \
@@ -214,7 +213,6 @@ GEN_PM_INCLUDES = \
 CONFIGURE_GENERATED_FILES = \
 	$(GEN_CONFIGS) \
 	$(GEN_MAKEFILES) \
-	ext/Parrot-Embed/Makefile.PL \
 	myconfig  \
 	MANIFEST.configure.generated \
 	.configure_trace.sto \
