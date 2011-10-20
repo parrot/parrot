@@ -676,7 +676,7 @@ Reverse the contents of the array.
                 data[n] = val;
             }
         }
-    }   
+    }
 
 }
 

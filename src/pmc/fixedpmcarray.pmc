@@ -79,7 +79,7 @@ Reverse the contents of the array.
 
 */
     METHOD reverse() {
-	INTVAL n = SELF.elements();
+        INTVAL n = SELF.elements();
         if (n > 1) {
             PMC *val;
             PMC **data = PMC_array(SELF);

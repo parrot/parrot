@@ -514,7 +514,7 @@ Reverse the contents of the array.
 
     METHOD reverse() {
         INTVAL n;
-        GET_ATTR_size(INTERP, SELF, n); 
+        GET_ATTR_size(INTERP, SELF, n);
         if (n > 1) {
             FLOATVAL val;
             FLOATVAL *data;
@@ -527,7 +527,7 @@ Reverse the contents of the array.
                 data[n] = val;
             }
         }
-    }   
+    }
 
 }
 
