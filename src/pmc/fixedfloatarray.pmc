@@ -502,6 +502,33 @@ Returns the Parrot string representation C<key>
         return str;
     }
 
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+
+    METHOD reverse() {
+        INTVAL n;
+        GET_ATTR_size(INTERP, SELF, n); 
+        if (n > 1) {
+            FLOATVAL val;
+            FLOATVAL *data;
+            INTVAL i;
+
+            GET_ATTR_float_array(INTERP, SELF, data);
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
+    }   
+
 }
 
 /*
