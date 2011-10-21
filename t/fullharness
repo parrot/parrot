@@ -33,6 +33,7 @@ GetOptions(
 );
 
 my @runcore_test_files = glob("@{ $test_groups{runcore} }");
+my @testing_runcore_test_files = glob("@{ $test_groups{testing_runcore} }");
 
 my @targets = ();
 my @alternate_runcore_targets = ( qw| b f r | );
@@ -51,8 +52,11 @@ foreach my $t ( @other_targets ) {
   push @targets, set_usual_target($t);
 } 
 if ($IN_TESTING) {
-    @targets =
-        map { set_usual_target($_) } ( qw| run manifest headerizer | );
+    @targets = (
+        ( map { set_alternate_runcore_target($_, $IN_TESTING) }
+            ( qw| b f | ) ),
+        ( map { set_usual_target($_) } ( qw| run manifest headerizer | ) ),
+    );
 }
 
 if ($archive) {
@@ -116,11 +120,15 @@ sub _handle_opts {
 }
 
 sub set_alternate_runcore_target {
-    my $alt = shift;
+    my ($alt, $in_testing)  = @_;
     return {
         label           => "test$alt",
         rule            => sub { set_alternate_runcore_env_args($alt) },
-        tests           => [ map { [ $_, "test$alt: $_", ] } @runcore_test_files ],
+        tests           => [ map { [ $_, "test$alt: $_", ] } 
+                            ( $in_testing
+                                ? @testing_runcore_test_files
+                                : @runcore_test_files
+                            ) ],
     };
 }
 

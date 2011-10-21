@@ -76,6 +76,9 @@ our %test_groups = (
         t/src/*.t
         t/src/embed/*.t
     ) ],
+    testing_runcore => [ qw(
+        t/oo/*.t
+    ) ],
 );
 
 # GROUPS OF BASIC GROUPS
