@@ -10,7 +10,8 @@ use TAP::Parser::Aggregator;
 use Data::Dumper;$Data::Dumper::Indent = 1;
 use Carp;
 use Getopt::Long;
-use lib qw( ./lib );
+use lib qw( /home/jimk/lib ./lib );
+use TAP::Harness::Archive::MultipleHarnesses;
 use Parrot::Harness::TestSets qw(
     %test_groups
     @major_test_group
@@ -54,10 +55,9 @@ if ($IN_TESTING) {
         map { set_usual_target($_) } ( qw| run manifest headerizer | );
 }
 
-my ($formatter, $aggregator);
 if ($archive) {
     my %env_data = collect_test_environment_data();
-    my $harness = TAP::Harness::Archive->new( {
+    my $archive = TAP::Harness::Archive::MultipleHarnesses->new( {
         verbosity        => $ENV{HARNESS_VERBOSE},
         archive          => 'parrot_test_run.tar.gz',
         merge            => 1,
@@ -65,19 +65,12 @@ if ($archive) {
         extra_properties => \%env_data,
         extra_files      => [ 'myconfig', 'config_lib.pir' ],
     } );
-    $aggregator = TAP::Parser::Aggregator->new;
-    
-    $aggregator->start();
-    foreach my $set (@targets) {
-        # rewrite environment
-        &{$set->{rule}} if defined $set->{rule};
-        $harness->aggregate_tests($aggregator, @{$set->{tests}});
-    }
-    $aggregator->stop();
-    $harness->summary($aggregator);
+    my $overall_aggregator = $archive->runtests(\@targets);
+    $archive->summary($overall_aggregator);
     send_archive_to_smolder(%env_data) if $smolder;
 }
 else {
+    my ($formatter, $aggregator);
     $formatter   = TAP::Formatter::Console->new( {
         verbosity  => $ENV{HARNESS_VERBOSE},
         jobs       => $ENV{TEST_JOBS} || 1,
