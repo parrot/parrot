@@ -1499,7 +1499,19 @@ void
 Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
 {
     ASSERT_ARGS(Parrot_hash_update)
+    if (other->entries <= 0)
+        return;
     if (hash->key_type == other->key_type && hash->entry_type == other->entry_type) {
+        if (hash->entries <= 0) {
+            /* presize hash */
+            if (hash->buckets) {
+                if (hash->mask + 1 > SPLIT_POINT)
+                    Parrot_gc_free_memory_chunk(interp, hash->buckets);
+                else
+                    Parrot_gc_free_fixed_size_storage(interp, HASH_ALLOC_SIZE(hash->mask + 1), hash->buckets);
+            }
+            allocate_buckets(interp, hash, other->mask);
+        }
         parrot_hash_iterate(other, Parrot_hash_put(interp, hash, _bucket->key, _bucket->value););
     }
     else {
