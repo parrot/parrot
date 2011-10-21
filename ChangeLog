@@ -1,6 +1,8 @@
 2011-11-15    release 3.10.0
     - Core
         + The mark VTABLE was added to the Select PMC
+		+ The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
+	  	  at https://github.com/parrot/parrot-embed
     - Languages
     - Community
     - Documentation
