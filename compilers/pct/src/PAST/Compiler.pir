@@ -2405,6 +2405,16 @@ attribute.
     unless $I0 goto param_lex_done
     name = self.'escape'(name)
     ops.'push_pirop'('.lex', name, ops)
+    .local int directaccess
+    directaccess = node.'directaccess'()
+    unless directaccess goto param_lex_done
+    .local pmc lexregs
+    lexregs = find_dynamic_lex '%*LEXREGS'
+    unless null lexregs goto have_lexregs
+    lexregs = new 'Hash'
+    store_dynamic_lex '%*LEXREGS', lexregs
+  have_lexregs:
+    lexregs[name] = pname
   param_lex_done:
     .return (ops)
 .end
