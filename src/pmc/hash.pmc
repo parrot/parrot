@@ -1230,7 +1230,8 @@ entries with the same key.
         if (other->vtable->base_type == SELF->vtable->base_type
         ||  other->vtable->base_type == enum_class_Hash) {
             Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(), (Hash *)VTABLE_get_pointer(INTERP, other));
-        } else {
+        }
+        else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                         "Hash: don't know how to update from a non-Hash type");
         }

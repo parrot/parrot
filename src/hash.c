@@ -1501,7 +1501,8 @@ Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
     ASSERT_ARGS(Parrot_hash_update)
     if (hash->key_type == other->key_type && hash->entry_type == other->entry_type) {
         parrot_hash_iterate(other, Parrot_hash_put(interp, hash, _bucket->key, _bucket->value););
-    } else {
+    }
+    else {
         parrot_hash_iterate(other,
             void *key = _bucket->key;
             void *value = _bucket->value;
