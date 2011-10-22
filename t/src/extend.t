@@ -708,7 +708,7 @@ main(int argc, const char *argv[])
         PMC            *sub;
         Parrot_runloop  jump_point;
         Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
-        
+
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
 
