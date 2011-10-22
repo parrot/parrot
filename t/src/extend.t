@@ -528,11 +528,13 @@ main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
 
-        Parrot_pbc_load(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
         Parrot_ext_call(interp, sub, "->");
         Parrot_eprintf(interp, "back\\n");
@@ -575,11 +577,13 @@ main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
 
-        Parrot_pbc_load(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
         Parrot_ext_call(interp, sub, "->");
         Parrot_eprintf(interp, "back\\n");
@@ -640,12 +644,14 @@ main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "foo");
         PMC            *sub, *arg;
         Parrot_Int      result;
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
 
-        Parrot_pbc_load(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
         sub  = Parrot_ns_find_current_namespace_global(interp, name);
         arg  = Parrot_pmc_new(interp, enum_class_String);
 
@@ -696,12 +702,14 @@ main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        Parrot_PackFile pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub;
         Parrot_runloop  jump_point;
-
-        Parrot_pbc_load(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        
+        Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
 
         if (setjmp(jump_point.resume)) {
@@ -779,13 +787,16 @@ main(int argc, const char *argv[])
 {
     Parrot_PackFile packfile;
     const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
+    Parrot_PMC pbc;
 
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
-        packfile = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        packfile   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
 
         if (packfile) {
-            Parrot_pbc_load( interp, packfile );
+            pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+            Parrot_pf_set_current_packfile(interp, pbc);
             Parrot_runcode( interp, 1, code );
         }
 
@@ -837,13 +848,15 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Int      result;
-    Parrot_PMC      sub;
+    Parrot_PMC      sub, pbc;
     Parrot_PackFile pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
     if (interp) {
-        pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
-        Parrot_pbc_load( interp, pf );
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
         Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
@@ -864,13 +877,15 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Int      result;
-    Parrot_PMC      sub;
+    Parrot_PMC      sub, pbc;
     Parrot_PackFile pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
     if (interp) {
-        pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
-        Parrot_pbc_load( interp, pf );
+        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
+        pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
         Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
