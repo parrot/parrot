@@ -137,7 +137,9 @@ sub set_usual_target {
     return {
         label           => $label,
         rule            => \&set_usual_env_args,
-        tests           => [ glob("@{$test_groups{$label}}") ],
+        tests           => [ map { [ $_, "$label: $_" ] }
+                                glob("@{$test_groups{$label}}")
+                            ],
     };
 }
 
