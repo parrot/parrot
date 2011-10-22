@@ -2669,7 +2669,7 @@ try to call it from within a running Parrot program
 PARROT_EXPORT
 void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
-        ARGMOD(PMC * args))
+        ARGMOD(PMC *args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
     PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
