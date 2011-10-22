@@ -1470,9 +1470,8 @@ src/runcore/trace$(O) : \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h
 
-src/debug$(O) : $(INC_DIR)/extend.h \
+src/debug$(O) : \
 	$(PARROT_H_HEADERS) src/debug.c \
-	$(EXTEND_HEADERS) \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
@@ -1642,10 +1641,8 @@ src/packfile/api$(O) : \
 	$(INC_PMC_DIR)/pmc_packfileview.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h \
-	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
+	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/runcore_api.h
 
 src/packfile/output$(O) : \
@@ -1668,8 +1665,6 @@ src/packfile/segments$(O) : \
 	src/packfile/segments.str \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/extend.h \
-	$(INC_DIR)/extend_vtable.h \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	src/packfile/pf_private.h \
@@ -1772,12 +1767,9 @@ src/disassemble$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/disassemble.c \
 	$(INC_DIR)/oplib/ops.h \
-	$(EXTEND_HEADERS) \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	include/imcc/embed.h \
-	include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
 	$(PARROT_H_HEADERS) \
