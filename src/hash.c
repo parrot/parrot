@@ -1542,8 +1542,7 @@ Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
                     break;
                 }
             }
-            Parrot_hash_put(interp, hash, key, value);
-            );
+            Parrot_hash_put(interp, hash, key, value););
     }
 }
 
