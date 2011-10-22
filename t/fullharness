@@ -3,14 +3,14 @@
 
 use strict;
 use warnings;
-use TAP::Harness;
-use TAP::Harness::Archive 0.10;
-use TAP::Formatter::Console;
-use TAP::Parser::Aggregator;
 use Data::Dumper;$Data::Dumper::Indent = 1;
 use Carp;
 use Getopt::Long;
 use lib qw( /home/jimk/lib ./lib );
+use TAP::Harness;
+use TAP::Harness::Archive 0.10;
+use TAP::Formatter::Console;
+use TAP::Parser::Aggregator;
 use TAP::Harness::Archive::MultipleHarnesses;
 use Parrot::Harness::TestSets qw(
     %test_groups
@@ -124,7 +124,7 @@ sub set_alternate_runcore_target {
     return {
         label           => "test$alt",
         rule            => sub { set_alternate_runcore_env_args($alt) },
-        tests           => [ map { [ $_, "test$alt: $_", ] } 
+        tests           => [ map { [ $_, "test${alt}__$_", ] } 
                             ( $in_testing
                                 ? @testing_runcore_test_files
                                 : @runcore_test_files
@@ -137,7 +137,7 @@ sub set_usual_target {
     return {
         label           => $label,
         rule            => \&set_usual_env_args,
-        tests           => [ map { [ $_, "$label: $_" ] }
+        tests           => [ map { [ $_, "${label}__$_" ] }
                                 glob("@{$test_groups{$label}}")
                             ],
     };
