@@ -1229,7 +1229,8 @@ entries with the same key.
     METHOD update(PMC *other) {
         if (other->vtable->base_type == SELF->vtable->base_type
         ||  other->vtable->base_type == enum_class_Hash) {
-            Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(), (Hash *)VTABLE_get_pointer(INTERP, other));
+            Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(),
+                    (Hash *)VTABLE_get_pointer(INTERP, other));
         }
         else {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
