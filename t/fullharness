@@ -3,15 +3,13 @@
 
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent = 1;
 use Carp;
 use Getopt::Long;
-use lib qw( /home/jimk/lib ./lib );
+use lib qw( ./lib );
 use TAP::Harness;
 use TAP::Harness::Archive 0.10;
 use TAP::Formatter::Console;
 use TAP::Parser::Aggregator;
-use TAP::Harness::Archive::MultipleHarnesses;
 use Parrot::Harness::TestSets qw(
     %test_groups
     @major_test_group
@@ -60,6 +58,7 @@ if ($IN_TESTING) {
 }
 
 if ($archive) {
+    use TAP::Harness::Archive::MultipleHarnesses;
     my %env_data = collect_test_environment_data();
     my $archive = TAP::Harness::Archive::MultipleHarnesses->new( {
         verbosity        => $ENV{HARNESS_VERBOSE},

@@ -479,6 +479,7 @@ sub get_perl_exemption_regexp {
         lib/File/
         lib/IO/
         lib/Pod/
+        lib/TAP/
         ext/
     };
 

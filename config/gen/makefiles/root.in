@@ -792,6 +792,7 @@ help :
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
+	@echo "  smolder_fulltest:  Run 'make fulltest' and send report to the smolder server"
 	@echo "  smoke:             Alias for smolder_test."
 	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
 	@echo ""
@@ -2145,6 +2146,9 @@ smolder_test : test_prep
 smolder_coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
+smolder_fulltest : test_prep
+	$(PERL) t/fullharness --archive --send-to-smolder
+
 smoke : smolder_test
 
 resubmit_smolder :
@@ -2160,7 +2164,7 @@ check : test
 # Test various run cores and other stuff
 # 'testg' and 'testj' are tested only
 # when the needed runcores are available
-fulltest :
+fulltest : test_prep
 	$(PERL) t/fullharness
 
 all_hll_test :
