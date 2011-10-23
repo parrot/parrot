@@ -54,12 +54,13 @@ PARROT_WARN_UNUSED_RESULT
 static INTVAL check_set_std_props(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGIN(const STRING *key),
-    ARGIN(PMC *value))
+    ARGMOD(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*pmc);
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*value);
 
 PARROT_WARN_UNUSED_RESULT
 static INTVAL has_pending_std_props(ARGIN(const PMC *self))
