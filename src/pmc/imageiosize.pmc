@@ -24,7 +24,9 @@ Gets the size of an ImageIO image without the allocation costs.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static int check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
+static int check_seen(PARROT_INTERP,
+    ARGIN(const PMC *self),
+    ARGIN(const PMC *v))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -38,7 +40,7 @@ static int check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
 
 /*
 
-=item C<static int check_seen(PARROT_INTERP, PMC *self, PMC *v)>
+=item C<static int check_seen(PARROT_INTERP, const PMC *self, const PMC *v)>
 
 Check the seen hash to prevent duplicate serialization.
 
@@ -49,11 +51,11 @@ Check the seen hash to prevent duplicate serialization.
 
 PARROT_INLINE
 static int
-check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
+check_seen(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const PMC *v))
 {
     ASSERT_ARGS(check_seen)
-    Hash       *seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
-    HashBucket *b    = Parrot_hash_get_bucket(interp, seen, v);
+    const Hash *       const seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
+    const HashBucket * const b    = Parrot_hash_get_bucket(interp, seen, v);
     if (b)
         return 1;
     else
@@ -258,8 +260,8 @@ hasn't been seen yet, it is also pushed onto the todo list.
             SELF.push_integer(0);
         else {
             INTVAL cno, idx;
-            PackFile_ConstTable *ct   = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            Hash                *seen = (Hash *)VTABLE_get_pointer(INTERP,
+            PackFile_ConstTable * const ct   = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            Hash                * const seen = (Hash *)VTABLE_get_pointer(INTERP,
                                                     PARROT_IMAGEIOSIZE(SELF)->seen);
 
             if (PObj_flag_TEST(private1, SELF)
@@ -285,7 +287,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
     VTABLE void set_pmc(PMC *p)
     {
         if (!PObj_flag_TEST(private1, SELF)) {
-            UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+            const UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
             PARROT_IMAGEIOSIZE(SELF)->size += header_length;
         }
 
