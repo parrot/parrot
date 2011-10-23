@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ Initializes the pointer.
 */
 
     VTABLE void init() {
+        UNUSED(interp);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -54,7 +55,7 @@ Marks the pointer as live.
     VTABLE void mark() {
         void (*mark_function)(Interp *, void *) =
             (void (*)(Interp *, void *))D2FPTR(PARROT_POINTER(SELF)->mark_function);
-        void * data = PARROT_POINTER(SELF)->pointer;
+        void * const data = PARROT_POINTER(SELF)->pointer;
         if (data && mark_function)
             (*mark_function)(INTERP, data);
     }
@@ -87,6 +88,7 @@ Sets the pointer value.
 */
 
     VTABLE void set_pointer(void *ptr) {
+        UNUSED(interp);
         PARROT_POINTER(SELF)->pointer = ptr;
     }
 
@@ -101,6 +103,7 @@ Returns the pointer value.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(interp);
         return PARROT_POINTER(SELF)->pointer;
     }
 
@@ -115,6 +118,7 @@ Returns the pointer value as an integer.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(interp);
         return (INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
 
@@ -129,6 +133,7 @@ Returns the pointer value as a floating-point number.
 */
 
     VTABLE FLOATVAL get_number() {
+        UNUSED(interp);
         return (FLOATVAL)(INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
 
@@ -143,6 +148,7 @@ Returns the pointer value as a Parrot string.
 */
 
     VTABLE STRING *get_repr() {
+        UNUSED(interp);
         return Parrot_sprintf_c(INTERP, "Pointer = 0x%p", PARROT_POINTER(SELF)->pointer);
     }
 
@@ -172,6 +178,7 @@ Returns whether the pointer is not C<NULL>.
 */
 
     VTABLE INTVAL get_bool() {
+        UNUSED(interp);
         return (INTVAL)(PMC_data(SELF) != NULL);
     }
 
@@ -186,6 +193,7 @@ Returns whether the pointer has the same value as C<*pmc2>.
 */
 
     VTABLE INTVAL is_same(PMC *pmc2) {
+        UNUSED(interp);
         return (INTVAL)(SELF->vtable   == pmc2->vtable &&
                         PARROT_POINTER(SELF)->pointer == PARROT_POINTER(pmc2)->pointer);
     }
