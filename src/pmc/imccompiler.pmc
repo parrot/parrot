@@ -56,39 +56,6 @@ static PMC * get_packfile_eval_pmc(PARROT_INTERP,
     Parrot_unblock_GC_mark((i)); \
     (i)->code = __old_bc; \
 
-/*
-
-=over 4
-
-=item C<static PMC * get_packfile_eval_pmc(PARROT_INTERP, PMC *pf_pmc, INTVAL
-current_eval)>
-
-get eval_pmc info from packfile
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC *
-get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
-{
-    ASSERT_ARGS(get_packfile_eval_pmc)
-
-    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pf_pmc);
-    PMC * const eval_pmc = Parrot_pmc_new(interp, enum_class_Eval);
-    Parrot_Sub_attributes *sub_data;
-
-    PMC_get_sub(interp, eval_pmc, sub_data);
-    sub_data->seg = pf->cur_cs;
-    sub_data->start_offs = 0;
-    sub_data->end_offs = pf->cur_cs->base.size;
-    sub_data->name = Parrot_sprintf_c(interp, "EVAL_%d", current_eval);
-    Parrot_pf_prepare_packfile_init(interp, eval_pmc);
-    return eval_pmc;
-}
-
 /* HEADERIZER HFILE: none */
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
@@ -127,7 +94,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         PackFile_ByteCode * const cur_code = interp->code;
         STRING * code = STRINGNULL;
         PMC * result = PMCNULL;
-        PMC * eval_pmc;
         const UINTVAL regs_used[4] = {3, 3, 3, 3};
         PMC * const newcontext = Parrot_push_context(interp, regs_used);
 
@@ -143,7 +109,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
-        eval_pmc = get_packfile_eval_pmc(interp, result, attrs->current_eval++);
 
         Parrot_pop_context(interp);
         Parrot_unblock_GC_mark(interp);
@@ -156,7 +121,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             next = VTABLE_invoke(INTERP, cont, next);
         }
 
-        Parrot_pcc_set_call_from_c_args(INTERP, call_object, "P", eval_pmc);
+        Parrot_pcc_set_call_from_c_args(INTERP, call_object, "P", result);
         interp->code = cur_code;
         return (opcode_t*)next;
     }

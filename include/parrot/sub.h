@@ -131,8 +131,7 @@ typedef struct Parrot_sub_arginfo {
     do { \
         const INTVAL type = (pmc)->vtable->base_type; \
         if (type == enum_class_Sub || \
-            type == enum_class_Coroutine || \
-            type == enum_class_Eval)  \
+            type == enum_class_Coroutine) \
         {\
             (sub) = PARROT_SUB((pmc)); \
         } \

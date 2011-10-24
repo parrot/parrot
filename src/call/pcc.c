@@ -268,7 +268,6 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
         switch (sub_obj->vtable->base_type) {
           case enum_class_Sub:
           case enum_class_MultiSub:
-          case enum_class_Eval:
             return 1;
           case enum_class_Object:
             break;
