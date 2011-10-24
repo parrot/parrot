@@ -45,7 +45,6 @@ sub linedirective
 ##include <string.h>
 ##include "parrot/parrot.h"
 ##include "parrot/api.h"
-##include "parrot/embed.h"
 ##include "parrot/extend.h"
 #
 #static void fail(const char *msg);

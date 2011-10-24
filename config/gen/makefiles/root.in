@@ -374,6 +374,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/pmc_freeze.h \
 	$(INC_DIR)/vtable.h \
 	$(INC_DIR)/context.h \
+	$(INC_DIR)/disassemble.h \
 	$(INC_DIR)/exceptions.h \
 	$(INC_DIR)/warnings.h \
 	$(INC_DIR)/memory.h \
@@ -437,8 +438,8 @@ INTERP_O_FILES = \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
+	src/disassemble$(O) \
 	src/dynext$(O) \
-	src/embed$(O) \
 	src/embed/api$(O) \
 	src/embed/bytecode$(O) \
 	src/embed/strings$(O) \
@@ -709,7 +710,6 @@ STR_FILES = \
 	src/string/api.str \
 	src/string/encoding.str \
 	src/sub.str \
-	src/embed.str \
 	$(CLASS_STR_FILES)
 
 src/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
@@ -1073,8 +1073,7 @@ $(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(
 frontend/parrot_debugger/main$(O) : \
 	$(PARROT_H_HEADERS) \
 	frontend/parrot_debugger/main.c \
-	$(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/embed.h
+	$(INC_DIR)/runcore_api.h
 
 $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1131,7 +1130,6 @@ $(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT
 frontend/pbc_dump/main$(O) : \
 	$(INC_DIR)/longopt.h \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(PARROT_H_HEADERS) \
@@ -1470,9 +1468,8 @@ src/runcore/trace$(O) : \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h
 
-src/debug$(O) : $(INC_DIR)/embed.h \
+src/debug$(O) : \
 	$(PARROT_H_HEADERS) src/debug.c \
-	$(EXTEND_HEADERS) \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
@@ -1527,7 +1524,6 @@ src/runcore/main$(O) : \
 
 src/runcore/subprof$(O) : src/runcore/subprof.str src/runcore/subprof.c \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
@@ -1539,7 +1535,7 @@ src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_PMC_DIR)/pmc_namespace.h \
 	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/runcore_profiling.h $(INC_DIR)/embed.h \
+	$(INC_DIR)/runcore_profiling.h \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS)
 
@@ -1643,9 +1639,8 @@ src/packfile/api$(O) : \
 	$(INC_PMC_DIR)/pmc_packfileview.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
-	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
+	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/runcore_api.h
 
 src/packfile/output$(O) : \
@@ -1655,7 +1650,6 @@ src/packfile/output$(O) : \
 	$(INC_DIR)/dynext.h \
 	$(INC_DIR)/runcore_api.h \
 	src/packfile/pf_private.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/packfile/output.c
 
@@ -1669,7 +1663,6 @@ src/packfile/segments$(O) : \
 	src/packfile/segments.str \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	src/packfile/pf_private.h \
@@ -1763,28 +1756,22 @@ src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	$(INC_DIR)/dynext.h $(INC_DIR)/embed.h $(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
 	$(PARROT_H_HEADERS)
 
-src/embed$(O) : \
+src/disassemble$(O) : \
 	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS) \
-	src/embed.c \
-	src/embed.str \
+	src/disassemble.c \
 	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	include/imcc/embed.h \
-	include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/api.c \
 	src/embed/embed_private.h \
@@ -1793,7 +1780,6 @@ src/embed/api$(O) : \
 src/embed/bytecode$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/bytecode.c \
 	src/embed/embed_private.h \
@@ -1944,7 +1930,6 @@ src/string/encoding/ucs4$(O) : \
 	src/string/encoding/unicode.h
 
 frontend/pbc_merge/main$(O) : \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/longopt.h \
 	frontend/pbc_merge/main.c \
@@ -1966,7 +1951,6 @@ src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_PMC_DIR)/pmc_continuation.h \

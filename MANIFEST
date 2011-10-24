@@ -872,8 +872,8 @@ include/parrot/context.h                                    [main]include
 include/parrot/core_types.h                                 [main]include
 include/parrot/datatypes.h                                  [main]include
 include/parrot/debugger.h                                   [main]include
+include/parrot/disassemble.h                                [main]include
 include/parrot/dynext.h                                     [main]include
-include/parrot/embed.h                                      [main]include
 include/parrot/encoding.h                                   [main]include
 include/parrot/enums.h                                      [main]include
 include/parrot/exceptions.h                                 [main]include
@@ -1163,6 +1163,7 @@ src/call/ops.c                                              []
 src/call/pcc.c                                              []
 src/datatypes.c                                             []
 src/debug.c                                                 []
+src/disassemble.c                                           []
 src/dynext.c                                                []
 src/dynoplibs/Defines.in                                    []
 src/dynoplibs/README                                        []doc
@@ -1190,7 +1191,6 @@ src/dynpmc/rational.pmc                                     []
 src/dynpmc/rotest.pmc                                       []
 src/dynpmc/select.pmc                                       []
 src/dynpmc/subproxy.pmc                                     []
-src/embed.c                                                 []
 src/embed/api.c                                             []
 src/embed/bytecode.c                                        []
 src/embed/embed_private.h                                   []

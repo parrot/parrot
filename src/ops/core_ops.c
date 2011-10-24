@@ -37,7 +37,6 @@ extern op_lib_t core_op_lib;
 
 
 #include "parrot/dynext.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_fixedintegerarray.h"
@@ -23742,7 +23741,7 @@ op_lib_t core_op_lib = {
   1093,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*

@@ -143,6 +143,7 @@ Returns C<PIO_BLKSIZE>.
 
 */
 
+PARROT_CONST_FUNCTION
 INTVAL
 Parrot_io_getblksize(SHIM(PIOHANDLE fd))
 {

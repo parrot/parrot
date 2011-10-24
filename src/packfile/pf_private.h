@@ -9,7 +9,6 @@ Parrot itself.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
-#include "parrot/embed.h"
 #include "parrot/extend.h"
 #include "parrot/dynext.h"
 #include "parrot/runcore_api.h"
