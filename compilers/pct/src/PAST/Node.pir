@@ -291,7 +291,7 @@ for retrieval and storage.
 .sub 'directaccess' :method
     .param pmc value           :optional
     .param int has_value       :opt_flag
-    .tailcall self.'attr'('isdecl', value, has_value)
+    .tailcall self.'attr'('directaccess', value, has_value)
 .end
 
 
