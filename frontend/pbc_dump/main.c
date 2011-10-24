@@ -50,7 +50,6 @@ efficiency on reading non-native PBCs.
 #include "parrot/longopt.h"
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
-#include "parrot/embed.h"
 
 /*
 
@@ -313,6 +312,7 @@ main(int argc, const char **argv)
     Parrot_PackFile  pfpmc;
     PackFile        *pf;
     Interp          *interp;
+    Parrot_String   infilename;
 
     const char *file            = NULL;
     int         terse           = 0;
@@ -364,16 +364,16 @@ main(int argc, const char **argv)
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pfpmc = Parrot_pbc_read(interp, *argv, options);
+    infilename = Parrot_str_new(interp, *argv, 0);
+    pf = Parrot_pf_read_pbc_file(interp, infilename);
 
-    if (pfpmc == NULL) {
+    if (pf == NULL) {
         printf("Can't read PBC\n");
         return 1;
     }
 
-    Parrot_pbc_load(interp, pfpmc);
-    pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
-
+    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    Parrot_pf_set_current_packfile(interp, pfpmc);
 
     if (convert) {
         size_t   size  = PackFile_pack_size(interp,

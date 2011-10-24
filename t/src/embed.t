@@ -13,7 +13,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 16;
+plan tests => 15;
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/extend_vtable.h"
 #include "imcc/api.h"
@@ -73,40 +73,11 @@ static Parrot_Interp new_interp()
 
 CODE
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "parrot/embed.h"
-
-void fail(const char *msg);
-
-void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-int main(int argc, const char **argv)
-{
-    Parrot_Interp interp;
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
-
-    puts("Done");
-    Parrot_destroy(interp);
-    return 0;
-}
-CODE
-Done
-OUTPUT
-
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps" );
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 void fail(const char *msg);
 
@@ -144,7 +115,7 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, crea
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 void fail(const char *msg);
 
@@ -682,7 +653,7 @@ SKIP: {
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static opcode_t *
 run(PARROT_INTERP, int argc, cosnt char *argv[])
@@ -762,7 +733,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -853,7 +824,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -944,7 +915,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -1034,7 +1005,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
