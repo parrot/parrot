@@ -529,7 +529,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
-        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
         Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
@@ -578,7 +578,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
-        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        PackFile * pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
         Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
@@ -645,7 +645,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
-        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "foo");
         PMC            *sub, *arg;
         Parrot_Int      result;
@@ -703,7 +703,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp = Parrot_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
-        Parrot_PackFile pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
+        PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub;
         Parrot_runloop  jump_point;
@@ -785,7 +785,7 @@ c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', to
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PackFile packfile;
+    PackFile* packfile;
     const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
     Parrot_PMC pbc;
 
@@ -849,7 +849,7 @@ main(int argc, const char *argv[])
 {
     Parrot_Int      result;
     Parrot_PMC      sub, pbc;
-    Parrot_PackFile pf;
+    PackFile* pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
     if (interp) {
@@ -878,7 +878,7 @@ main(int argc, const char *argv[])
 {
     Parrot_Int      result;
     Parrot_PMC      sub, pbc;
-    Parrot_PackFile pf;
+    PackFile* pf;
     Parrot_Interp   interp = Parrot_new(NULL);
 
     if (interp) {
