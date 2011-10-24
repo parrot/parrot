@@ -291,6 +291,7 @@ if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
 
 */
 
+PARROT_CONST_FUNCTION
 INTVAL
 Parrot_io_getblksize(PIOHANDLE fd)
 {
