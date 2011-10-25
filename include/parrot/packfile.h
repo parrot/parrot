@@ -655,12 +655,12 @@ void Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 PARROT_EXPORT
 void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
     ARGMOD(PMC *pbc),
-    ARGMOD(PMC * args))
+    ARGMOD(PMC *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pbc)
-        FUNC_MODIFIES(* args);
+        FUNC_MODIFIES(*args);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
