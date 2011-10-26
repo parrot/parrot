@@ -625,9 +625,6 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
 
 /*
 
-
-/*
-
 =item C<void Parrot_cx_schedule_alarm(PARROT_INTERP, PMC *alarm)>
 
 Schedule an alarm.
