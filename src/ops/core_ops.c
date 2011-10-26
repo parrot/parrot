@@ -37,7 +37,6 @@ extern op_lib_t core_op_lib;
 
 
 #include "parrot/dynext.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_api.h"
 #include "parrot/events.h"
 #include "pmc/pmc_continuation.h"
@@ -23876,12 +23875,12 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   3,    /* major_version */
-  8,    /* minor_version */
+  9,    /* minor_version */
   0,    /* patch_version */
   1097,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*
@@ -24004,7 +24003,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_3_8_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -24033,7 +24032,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_8_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_3_9_0;
     dynop_register(interp, lib);
     return lib;
 }

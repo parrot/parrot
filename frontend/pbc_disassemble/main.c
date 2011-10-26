@@ -63,12 +63,6 @@ Writes output to C<filename>.
  * which in turn uses the C<PDB_disassemble()> function from F<src/debug.c>.
  */
 
-/* Flags indicating the presence of the -b and -h command-line switches */
-typedef enum {
-    enum_DIS_BARE      = 1,    /* -b switch */
-    enum_DIS_HEADER    = 2     /* -h switch */
-} Parrot_disassemble_options;
-
 /* Longopts option table */
 static struct longopt_opt_decl options[] = {
     { '?', '?', OPTION_optional_FLAG, { "--help"        } },

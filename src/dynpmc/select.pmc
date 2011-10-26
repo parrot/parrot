@@ -84,12 +84,30 @@ Initializes the PMC.
 
     VTABLE void init() {
         PMC * const fd_map = pmc_new(interp, enum_class_Hash);
+        VTABLE_set_integer_native(INTERP, fd_map, Hash_key_type_int);
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
         SET_ATTR_max_fd(INTERP, SELF, -1);
 
         FD_ZERO(&(PARROT_SELECT(SELF)->rb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->wb_array));
         FD_ZERO(&(PARROT_SELECT(SELF)->eb_array));
+
+        PObj_custom_mark_SET(SELF);
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark fd_map hash as live.
+
+=cut
+
+*/
+    VTABLE void mark() {
+        PMC *fd_map;
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        Parrot_gc_mark_PMC_alive(interp, fd_map);
     }
 
 /*
@@ -110,9 +128,9 @@ the Select PMC
 */
 
     METHOD max_fd() {
-      INTVAL v;
-      GET_ATTR_max_fd(INTERP, SELF, v);
-      RETURN(INTVAL v);
+        INTVAL v;
+        GET_ATTR_max_fd(INTERP, SELF, v);
+        RETURN(INTVAL v);
     }
 
 /*
@@ -129,9 +147,9 @@ Used mainly for testing purposes.
 */
 
     METHOD fd_map() {
-      PMC *fd_map;
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      RETURN(PMC *fd_map);
+        PMC *fd_map;
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        RETURN(PMC *fd_map);
     }
 
 
@@ -152,19 +170,19 @@ conditions.
 
 */
     METHOD update(PMC *handle, PMC* data, INTVAL rwe) {
-      PMC    *fd_map;
-      INTVAL  maxid,  fdkey;
+        PMC    *fd_map;
+        INTVAL  maxid,  fdkey;
 
-      GETATTR_FileHandle_os_handle(INTERP, handle, fdkey);
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
-      if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
-      if (rwe & SELECT_WRITE) { FD_SET(fdkey, &PARROT_SELECT(SELF)->wb_array); }
-      if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
-      if (maxid < fdkey)
-          maxid = fdkey;
-      SET_ATTR_max_fd(INTERP, SELF, maxid);
+        GETATTR_FileHandle_os_handle(INTERP, handle, fdkey);
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        VTABLE_set_pmc_keyed_int(interp, fd_map, fdkey, data);
+        if (rwe & SELECT_READ)  { FD_SET(fdkey, &PARROT_SELECT(SELF)->rb_array); }
+        if (rwe & SELECT_WRITE) { FD_SET(fdkey, &PARROT_SELECT(SELF)->wb_array); }
+        if (rwe & SELECT_ERROR) { FD_SET(fdkey, &PARROT_SELECT(SELF)->eb_array); }
+        if (maxid < fdkey)
+            maxid = fdkey;
+        SET_ATTR_max_fd(INTERP, SELF, maxid);
     }
 
 /*
@@ -177,20 +195,20 @@ Removes filehandle from the Select PMC.
 
 */
     METHOD remove(PMC *handle) {
-      PMC     *fd_map;
-      INTVAL  fd,  maxid;
+        PMC    *fd_map;
+        INTVAL fd, maxid;
 
-      GETATTR_FileHandle_os_handle(INTERP, handle, fd);
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      VTABLE_delete_keyed_int(interp, fd_map, fd);
-      FD_CLR(fd, &PARROT_SELECT(SELF)->rb_array);
-      FD_CLR(fd, &PARROT_SELECT(SELF)->wb_array);
-      FD_CLR(fd, &PARROT_SELECT(SELF)->eb_array);
-      if (fd == maxid) {
-        maxid = find_max_fd(interp, fd_map);
-        SET_ATTR_max_fd(INTERP, SELF, maxid);
-      }
+        GETATTR_FileHandle_os_handle(INTERP, handle, fd);
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        VTABLE_delete_keyed_int(interp, fd_map, fd);
+        FD_CLR(fd, &PARROT_SELECT(SELF)->rb_array);
+        FD_CLR(fd, &PARROT_SELECT(SELF)->wb_array);
+        FD_CLR(fd, &PARROT_SELECT(SELF)->eb_array);
+        if (fd == maxid) {
+            maxid = find_max_fd(interp, fd_map);
+            SET_ATTR_max_fd(INTERP, SELF, maxid);
+        }
     }
 
 /*
@@ -208,27 +226,29 @@ read before returning.
 */
 
     METHOD can_read(FLOATVAL timeout) {
-      fd_set          rdset;
-      struct  timeval timeouts;
-      PMC            *results, *fd_map;
-      INTVAL          maxid, i;
-      INTVAL          sec = timeout / 1000000;
-      INTVAL          usec = timeout - sec;
+        fd_set rdset;
+        struct timeval timeouts;
+        PMC    *results;
+        PMC    *fd_map;
+        INTVAL maxid, i;
 
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = sec;
-      timeouts.tv_usec = usec;
-      results          = pmc_new(interp, enum_class_ResizablePMCArray);
-      memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
+        const INTVAL sec  = timeout / 1000000;
+        const INTVAL usec = timeout - sec;
 
-      select(maxid + 1, &rdset, NULL, NULL, &timeouts);
-      for (i=0; i <= maxid; i++) {
-        if (FD_ISSET(i, &rdset)) {
-          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        timeouts.tv_sec  = sec;
+        timeouts.tv_usec = usec;
+        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
+
+        select(maxid + 1, &rdset, NULL, NULL, &timeouts);
+        for (i=0; i <= maxid; i++) {
+            if (FD_ISSET(i, &rdset)) {
+                VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
         }
-      }
-      RETURN(PMC *results);
+        RETURN(PMC *results);
     }
 
 /*
@@ -246,27 +266,28 @@ write to before returning.
 */
 
     METHOD can_write(FLOATVAL timeout) {
-      fd_set         wbset;
-      struct timeval timeouts;
-      PMC           *results, *fd_map;
-      INTVAL         maxid, i;
-      INTVAL         sec = timeout / 1000000;
-      INTVAL         usec = timeout - sec;
+        fd_set         wbset;
+        struct timeval timeouts;
+        PMC    *results, *fd_map;
+        INTVAL maxid, i;
 
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = sec;
-      timeouts.tv_usec = usec;
-      results          = pmc_new(interp, enum_class_ResizablePMCArray);
-      memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
+        const INTVAL sec  = timeout / 1000000;
+        const INTVAL usec = timeout - sec;
 
-      select(maxid + 1, NULL, &wbset, NULL, &timeouts);
-      for (i=0; i<=maxid; i++) {
-        if (FD_ISSET(i, &wbset)) {
-          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        timeouts.tv_sec  = sec;
+        timeouts.tv_usec = usec;
+        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
+
+        select(maxid + 1, NULL, &wbset, NULL, &timeouts);
+        for (i=0; i<=maxid; i++) {
+            if (FD_ISSET(i, &wbset)) {
+                VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
         }
-      }
-      RETURN(PMC *results);
+        RETURN(PMC *results);
     }
 
 /*
@@ -284,27 +305,28 @@ exception state before returning.
 */
 
     METHOD has_exception(FLOATVAL timeout) {
-      fd_set         ebset;
-      struct timeval timeouts;
-      PMC           *results, *fd_map;
-      INTVAL         maxid, i;
-      INTVAL         sec = timeout / 1000000;
-      INTVAL         usec = timeout - sec;
+        fd_set ebset;
+        struct timeval timeouts;
+        PMC    *results, *fd_map;
+        INTVAL maxid, i;
 
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = sec;
-      timeouts.tv_usec = usec;
-      results          = pmc_new(interp, enum_class_ResizablePMCArray);
-      memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+        const INTVAL sec  = timeout / 1000000;
+        const INTVAL usec = timeout - sec;
 
-      select(maxid + 1, NULL, NULL, &ebset, &timeouts);
-      for (i=0; i<=maxid; i++) {
-        if (FD_ISSET(i, &ebset)) {
-          VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        timeouts.tv_sec  = sec;
+        timeouts.tv_usec = usec;
+        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+
+        select(maxid + 1, NULL, NULL, &ebset, &timeouts);
+        for (i=0; i<=maxid; i++) {
+            if (FD_ISSET(i, &ebset)) {
+                VTABLE_push_pmc(interp, results, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
         }
-      }
-      RETURN(PMC *results);
+        RETURN(PMC *results);
     }
 
 /*
@@ -324,41 +346,43 @@ handled.
 */
 
     METHOD select(FLOATVAL timeout) {
-      fd_set          rdset, wrset, erset;
-      struct timeval  timeouts;
-      PMC            *results, *rresults, *wresults, *eresults, *fd_map;
-      INTVAL          maxid, i;
-      INTVAL          sec = timeout / 1000000;
-      INTVAL          usec = timeout - sec;
+        fd_set rdset, wrset, erset;
+        struct timeval timeouts;
 
-      GET_ATTR_fd_map(INTERP, SELF, fd_map);
-      GET_ATTR_max_fd(INTERP, SELF, maxid);
-      timeouts.tv_sec  = sec;
-      timeouts.tv_usec = usec;
-      results          = pmc_new(interp, enum_class_ResizablePMCArray);
-      rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
-      wresults         = pmc_new(interp, enum_class_ResizablePMCArray);
-      eresults         = pmc_new(interp, enum_class_ResizablePMCArray);
-      memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
-      memcpy(&wrset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
-      memcpy(&erset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+        PMC    *results, *rresults, *wresults, *eresults, *fd_map;
+        INTVAL maxid, i;
 
-      select(maxid + 1, &rdset, &wrset, &erset, &timeouts);
-      for (i=0; i<=maxid; i++) {
-        if (FD_ISSET(i, &rdset)) {
-          VTABLE_push_pmc(interp, rresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+        const INTVAL sec  = timeout / 1000000;
+        const INTVAL usec = timeout - sec;
+
+        GET_ATTR_fd_map(INTERP, SELF, fd_map);
+        GET_ATTR_max_fd(INTERP, SELF, maxid);
+        timeouts.tv_sec  = sec;
+        timeouts.tv_usec = usec;
+        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+        wresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+        eresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+        memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
+        memcpy(&wrset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
+        memcpy(&erset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
+
+        select(maxid + 1, &rdset, &wrset, &erset, &timeouts);
+        for (i=0; i<=maxid; i++) {
+            if (FD_ISSET(i, &rdset)) {
+                VTABLE_push_pmc(interp, rresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
+            if (FD_ISSET(i, &wrset)) {
+                VTABLE_push_pmc(interp, wresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
+            if (FD_ISSET(i, &erset)) {
+                VTABLE_push_pmc(interp, eresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
+            }
         }
-        if (FD_ISSET(i, &wrset)) {
-          VTABLE_push_pmc(interp, wresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-        }
-        if (FD_ISSET(i, &erset)) {
-          VTABLE_push_pmc(interp, eresults, VTABLE_get_pmc_keyed_int(interp, fd_map, i));
-        }
-      }
-      VTABLE_push_pmc(interp, results, rresults);
-      VTABLE_push_pmc(interp, results, wresults);
-      VTABLE_push_pmc(interp, results, eresults);
-      RETURN(PMC *results);
+        VTABLE_push_pmc(interp, results, rresults);
+        VTABLE_push_pmc(interp, results, wresults);
+        VTABLE_push_pmc(interp, results, eresults);
+        RETURN(PMC *results);
     }
 }
 

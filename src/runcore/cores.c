@@ -242,7 +242,6 @@ next opcode, or examine and manipulate data from the executing program.
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_trace.h"
 #include "cores.str"
 

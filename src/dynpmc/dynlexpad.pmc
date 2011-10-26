@@ -23,6 +23,7 @@ pmclass DynLexPad dynpmc provides lexpad auto_attrs {
     ATTR PMC  *init; /* the PMC used to initialize this DynLexPad */
 
     VTABLE void init() {
+        UNUSED(SELF);
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "don't create me like this");
     }
@@ -82,6 +83,7 @@ Return the raw Hash pointer, for use in iterators
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP);
         return PARROT_DYNLEXPAD(SELF)->hash;
     }
 

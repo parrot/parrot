@@ -29,7 +29,7 @@ Example:
 
 
 In addition, Parrot::Harness::DefaultTests exports B<by default> one
-subroutine:  C<get_default_tests()>.  In list context, C<get_default_tests()>
+subroutine:  C<get_common_tests()>.  In list context, C<get_common_tests()>
 returns a list of shell-expandable paths to the most common tests.  In scalar
 context it returns a reference to that list.
 

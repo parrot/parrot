@@ -157,7 +157,7 @@ Returns whether the Socket is currently open.
 
 =item C<poll(INTVAL which, INTVAL sec, INTVAL usec)>
 
-Watches the socket for C<sec> seconds and C<usec> milliseconds.  C<which>
+Watches the socket for C<sec> seconds and C<usec> microseconds.  C<which>
 is a bitmask representing the states you want to watch for.  Or together 1
 for readable, two for writeable, and four for exceptions.
 

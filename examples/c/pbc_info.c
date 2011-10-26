@@ -23,7 +23,6 @@ over the main directory.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 
 /*
 =item C<static INTVAL iter(PARROT_INTERP, PackFile_Segment *seg, void

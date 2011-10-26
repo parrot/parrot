@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.8.0",
-    "release.name"     : "Magrathea",
+    "release.version"  : "3.9.0",
+    "release.name"     : "Archaeopteryx",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 September 2011",
-    "release.nextdate" : "18 October 2011",
+    "release.date"     : "18 October 2011",
+    "release.nextdate" : "15 November 2011",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -14,8 +14,8 @@
     "bugday.day"       : "Saturday",
     "bugday.date"      : "15 October 2011",
 
-    "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
+    "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2011_10_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.8.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/3.9.0/"
 }

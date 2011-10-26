@@ -36,7 +36,6 @@ Hacked from t/src/basics.t
 c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 int
 main(int argc, const char* argv[])
@@ -58,7 +57,6 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 int
 main(int argc, const char* argv[])

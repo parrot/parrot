@@ -68,6 +68,32 @@ Sort this array, optionally using the provided cmp_func
         RETURN(PMC *SELF);
     }
 
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+    METHOD reverse() {
+        INTVAL n = SELF.elements();
+        if (n > 1) {
+            PMC *val;
+            PMC **data = PMC_array(SELF);
+            INTVAL i;
+
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
+    }
+
+
 /*
 
 =back

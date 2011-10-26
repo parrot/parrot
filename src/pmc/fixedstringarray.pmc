@@ -626,6 +626,34 @@ Used to unarchive the string.
                 str_array[i] = VTABLE_shift_string(INTERP, info);
         }
     }
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+
+    METHOD reverse() {
+        UINTVAL n;
+        GET_ATTR_size(INTERP, SELF, n);
+        if (n > 1) {
+            STRING *val;
+            STRING **data;
+            UINTVAL i;
+
+            GET_ATTR_str_array(INTERP, SELF, data);
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
+    }
+
 }
 
 /*

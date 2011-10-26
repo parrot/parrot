@@ -1823,11 +1823,11 @@ the value is the POD pathname, for example 'src/prog.pir'
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $S1 = _mk_path_exe(pbc, exe)
+    $S1 = concat bin, exe
     unlink($S1, 1 :named('verbose'))
-    $S1 = _mk_path_exe(pbc, '.c')
+    $S1 = concat bin, '.c'
     unlink($S1, 1 :named('verbose'))
-    $S1 = _mk_path_exe(pbc, obj)
+    $S1 = concat bin, obj
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:

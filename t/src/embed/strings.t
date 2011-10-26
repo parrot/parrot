@@ -31,7 +31,6 @@ plan tests => 1;
 c_output_is( <<'CODE', <<'OUTPUT', "wchar import / export" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/api.h>
 #include <stdio.h>
 
