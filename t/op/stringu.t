@@ -1020,12 +1020,21 @@ $code
 .sub 'test_chars'
     .param string chars
     .local pmc eh, ex, bb
+    .local string aux
+    aux = escape chars
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
     set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('ucs4')
+    pop_eh
+    # Print some useful info in case of unexpectedly legal
+    print aux
+    print " - "
+    aux = escape chars
+    print aux
+    print " : "
     say 'valid'
     goto end
   handler:
@@ -1033,8 +1042,8 @@ $code
     .get_results (ex)
     \$S0 = ex['message']
     print \$S0
-  end:
     pop_eh
+  end:
 .end
 CODE
 Unaligned end in UCS-4 string
