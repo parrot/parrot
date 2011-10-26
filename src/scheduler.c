@@ -38,12 +38,22 @@ exceptions, async I/O, and concurrent tasks (threads).
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void Parrot_cx_disable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void Parrot_cx_enable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void scheduler_process_messages(PARROT_INTERP,
     ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*scheduler);
 
+#define ASSERT_ARGS_Parrot_cx_disable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_enable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_scheduler_process_messages __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
@@ -52,6 +62,7 @@ static void scheduler_process_messages(PARROT_INTERP,
 
 
 static int enable_scheduling = 0;
+static int enable_preemption = 0;
 
 /*
 
@@ -110,6 +121,8 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
     tdata->code = main;
     tdata->data = argv;
 
+    enable_scheduling = 1;
+
     Parrot_cx_schedule_immediate(interp, main_task);
     Parrot_cx_outer_runloop(interp);
 
@@ -140,7 +153,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     INTVAL next_thread, task_count, alarm_count;
 
     do {
-        while ((task_count = VTABLE_get_integer(interp, sched->task_queue))) {
+        while ((task_count = VTABLE_get_integer(interp, sched->task_queue)) > 0) {
             /* there can be no active runloops at this point, so it should be save
              * to start counting at 0 again. This way the continuation in the next
              * task will find a runloop with id 1 when encountering an exception */
@@ -179,7 +192,6 @@ Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
     interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
 
     Parrot_alarm_set(interp->quantum_done);
-    enable_scheduling = 1;
 }
 
 /*
@@ -210,12 +222,10 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
     interp->cur_task = task;
 
-    if (VTABLE_get_integer(interp, sched->task_queue) > 0) {
-        Parrot_cx_set_scheduler_alarm(interp);
-    }
+    if (VTABLE_get_integer(interp, sched->task_queue) > 0)
+        Parrot_cx_enable_preemption(interp);
     else
-        if (VTABLE_get_integer(interp, sched->alarms) == 0)
-            enable_scheduling = 0;
+        Parrot_cx_disable_preemption(interp);
 
     Parrot_ext_call(interp, task, "->");
 }
@@ -278,7 +288,10 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGMOD(PMC *scheduler), ARGIN(opcode_t *n
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
-    Parrot_alarm_set(interp->quantum_done);
+    /* Some alarm seems to have fired, but not the scheduler's.
+     * Re-set the scheduler alarm */
+    if (enable_preemption)
+        Parrot_alarm_set(interp->quantum_done);
 
     return next;
 }
@@ -300,7 +313,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(scheduler);
     FLOATVAL time_now = Parrot_floatval_time();
 
-    if (time_now >= interp->quantum_done)
+    if (enable_preemption && time_now >= interp->quantum_done)
         SCHEDULER_resched_requested_SET(scheduler);
 }
 
@@ -438,9 +451,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
-    /* going from single to multi-tasking? */
+    /* going from single to multi tasking? */
     if (VTABLE_get_integer(interp, sched->task_queue) == 1)
-        Parrot_cx_set_scheduler_alarm(interp);
+        Parrot_cx_enable_preemption(interp);
 }
 
 /*
@@ -478,10 +491,6 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     VTABLE_unshift_pmc(interp, sched->task_queue, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
-
-    /* going from single to multi-tasking? */
-    if (VTABLE_get_integer(interp, sched->task_queue) == 1)
-        Parrot_cx_set_scheduler_alarm(interp);
 }
 
 /*
@@ -641,7 +650,6 @@ Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
     Parrot_Scheduler_attributes *sched = PARROT_SCHEDULER(interp->scheduler);
     FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
     Parrot_alarm_set(alarm_time);
-    enable_scheduling = 1;
 
     /* Insert new alarm at correct (ordered by time) position in array. */
     Parrot_pmc_list_insert_by_number(interp, sched->alarms, alarm);
@@ -720,13 +728,55 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     Parrot_Alarm_attributes *adata = PARROT_ALARM(alarm);
 
     PMC *task = Parrot_cx_stop_task(interp, next);
-    enable_scheduling = 1;
 
     adata->alarm_time = done_time;
     adata->alarm_task = task;
     (void) VTABLE_invoke(interp, alarm, 0);
 
     return (opcode_t*) 0;
+}
+
+/*
+
+=back
+
+=head2 Internal functions
+
+Functions that are used by the scheduler itself.
+
+=over 4
+
+=item C<static void Parrot_cx_enable_preemption(PARROT_INTERP)>
+
+Enable preemption. Used when more than one task is runnable.
+
+=cut
+
+*/
+
+static void
+Parrot_cx_enable_preemption(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_cx_enable_preemption)
+    enable_preemption = 1;
+    Parrot_cx_set_scheduler_alarm(interp);
+}
+
+/*
+
+=item C<static void Parrot_cx_disable_preemption(PARROT_INTERP)>
+
+Disable preemption. Used when only one task is runnable.
+
+=cut
+
+*/
+
+static void
+Parrot_cx_disable_preemption(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_cx_disable_preemption)
+    enable_preemption = 0;
 }
 
 /*
