@@ -119,9 +119,9 @@ current maximum, and a birthtime of the current time.
 
     void push_pmc(PMC *task) {
         /* TODO: This doesn't appear to do anything */
-        Parrot_Scheduler_attributes *const core_struct = PARROT_SCHEDULER(SELF);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         PMC *const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
-        STRING *const type  = VTABLE_get_string(interp, type_pmc);
+        STRING *const type = VTABLE_get_string(interp, type_pmc);
     }
 
 
@@ -155,7 +155,7 @@ Retrieves the number of pending tasks in the scheduler's task list.
 
     VTABLE INTVAL get_integer() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        return VTABLE_elements(INTERP, core_struct->task_index);
+        return VTABLE_elements(INTERP, core_struct->task_queue);
     }
 
 
