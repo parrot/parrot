@@ -219,6 +219,7 @@ mark_interp(PARROT_INTERP)
         Parrot_gc_mark_PMC_alive(interp, (PMC *)obj);
 
     /* mark the current context. */
+    Parrot_gc_mark_PMC_alive(interp, interp->cur_task);
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
 
     /* mark the vtables: the data, Class PMCs, etc. */

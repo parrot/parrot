@@ -120,6 +120,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGMOD(PMC *main), ARGMOD(PMC *argv))
 
     tdata->code = main;
     tdata->data = argv;
+    PARROT_GC_WRITE_BARRIER(interp, main_task);
 
     enable_scheduling = 1;
 
@@ -215,12 +216,11 @@ Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
     opcode_t *dest;
 
     PMC *task = VTABLE_shift_pmc(interp, sched->task_queue);
+    interp->cur_task = task;
 
     if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Found a non-Task in the task queue.\n");
-
-    interp->cur_task = task;
 
     if (VTABLE_get_integer(interp, sched->task_queue) > 0)
         Parrot_cx_enable_preemption(interp);
@@ -343,6 +343,7 @@ Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
             "Attempt to stop invalid interp->current_task.\n");
 
     tdata->code = cont;
+    PARROT_GC_WRITE_BARRIER(interp, task);
     TASK_in_preempt_SET(task);
 
     return task;
@@ -443,6 +444,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         task  = Parrot_pmc_new(interp, enum_class_Task);
         tdata = PARROT_TASK(task);
         tdata->code = task_or_sub;
+        PARROT_GC_WRITE_BARRIER(interp, task);
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -482,6 +484,7 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         task  = Parrot_pmc_new(interp, enum_class_Task);
         tdata = PARROT_TASK(task);
         tdata->code = task_or_sub;
+        PARROT_GC_WRITE_BARRIER(interp, task);
     }
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -731,6 +734,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 
     adata->alarm_time = done_time;
     adata->alarm_task = task;
+    PARROT_GC_WRITE_BARRIER(interp, alarm);
     (void) VTABLE_invoke(interp, alarm, 0);
 
     return (opcode_t*) 0;
