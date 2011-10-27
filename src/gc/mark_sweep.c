@@ -227,7 +227,7 @@ mark_interp(PARROT_INTERP)
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);
 
-    /* mark the concurrency scheduler */
+    /* mark the concurrency scheduler and tasks */
     Parrot_gc_mark_PMC_alive(interp, interp->scheduler);
 
     /* mark caches and freelists */

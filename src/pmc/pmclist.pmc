@@ -1,0 +1,593 @@
+/*
+Copyright (C) 2010, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/pmclist.pmc - List of PMCs
+
+=head1 DESCRIPTION
+
+A doubly linked list of PMCs, for when push, pop, shift, and unshift
+all want to be O(1).
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void throw_pop_empty(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void throw_shift_empty(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_throw_pop_empty __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_throw_shift_empty __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
+
+
+/* It's a doubly linked list */
+typedef struct PMC_List_Item {
+    PMC *data;
+    struct PMC_List_Item *prev;
+    struct PMC_List_Item *next;
+} PMC_List_Item;
+
+pmclass PMCList auto_attrs {
+    ATTR void *head;
+    ATTR void *foot;
+    ATTR INTVAL size;
+
+/*
+=item C<void init()>
+
+Initializes the list.
+
+=cut
+*/
+
+    VTABLE void init() {
+        PObj_custom_mark_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
+
+        SET_ATTR_head(INTERP, SELF, NULL);
+        SET_ATTR_foot(INTERP, SELF, NULL);
+        SET_ATTR_size(INTERP, SELF, 0);
+    }
+
+/*
+=item C<void destroy()>
+
+Free all the list cells.
+
+=cut
+*/
+
+    VTABLE void destroy() {
+        void *tmp;
+        PMC_List_Item *aa;
+        PMC_List_Item *bb;
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        aa = (PMC_List_Item*) tmp;
+
+        while (aa != NULL) {
+            bb = aa;
+            aa = aa->next;
+            free(bb);
+        }
+    }
+
+/*
+=item C<INTVAL get_integer()>
+
+Returns the size of the list.
+
+=cut
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
+    VTABLE INTVAL elements() {
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
+    }
+
+/*
+=item C<PMC *shift_pmc()>
+
+Removes and returns an item from the start of the array.
+
+=cut
+*/
+
+    VTABLE PMC *shift_pmc() {
+        INTVAL size;
+        void *tmp;
+        PMC_List_Item *head;
+        PMC_List_Item *next;
+        PMC_List_Item *item;
+        PMC *data;
+
+        GET_ATTR_size(INTERP, SELF, size);
+
+        if (0 >= size)
+            throw_shift_empty(INTERP);
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        item = (PMC_List_Item*) tmp;
+        data = item->data;
+
+        size -= 1;
+        SET_ATTR_size(INTERP, SELF, size);
+
+        head = item->next;
+        SET_ATTR_head(INTERP, SELF, head);
+
+        if (head == NULL) {
+            /* size == 0 */
+            SET_ATTR_foot(INTERP, SELF, NULL);
+        }
+        else {
+            head->prev = NULL;
+        }
+
+        if (size == 1) {
+            head->next = NULL;
+            SET_ATTR_foot(INTERP, SELF, head);
+        }
+
+        free(item);
+
+        return data;
+    }
+
+/*
+=item C<void push_pmc(PMC *value)>
+
+Extends the array by adding an element of value C<*value> to the end of
+the array.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *value) {
+        INTVAL size;
+        void *tmp;
+        PMC_List_Item *foot;
+        PMC_List_Item *item;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_foot(INTERP, SELF, tmp);
+        foot = (PMC_List_Item*) tmp;
+
+        item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
+        item->next = NULL;
+        item->prev = foot;
+        item->data = value;
+
+        if (foot)
+            foot->next = item;
+
+        size += 1;
+
+        SET_ATTR_foot(INTERP, SELF, item);
+        SET_ATTR_size(INTERP, SELF, size);
+
+        if (size == 1)
+            SET_ATTR_head(INTERP, SELF, item);
+
+        return;
+    }
+
+/*
+=item C<PMC *pop_pmc()>
+
+Removes and returns the last element in the array.
+
+=cut
+*/
+
+    VTABLE PMC *pop_pmc() {
+        INTVAL size;
+        void *tmp;
+        PMC_List_Item *foot;
+        PMC_List_Item *item;
+        PMC *data;
+
+        GET_ATTR_size(INTERP, SELF, size);
+
+        if (0 >= size)
+            throw_pop_empty(INTERP);
+
+        GET_ATTR_foot(INTERP, SELF, tmp);
+        item = (PMC_List_Item*) tmp;
+        data = item->data;
+
+        size -= 1;
+        SET_ATTR_size(INTERP, SELF, size);
+
+        foot = item->prev;
+        SET_ATTR_foot(INTERP, SELF, foot);
+
+        if (foot == NULL) {
+            /* size == 0 */
+            SET_ATTR_head(INTERP, SELF, NULL);
+        }
+        else {
+            foot->next = NULL;
+        }
+
+        if (size == 1) {
+            foot->prev = NULL;
+            SET_ATTR_head(INTERP, SELF, foot);
+        }
+
+        free(item);
+
+        return data;
+    }
+
+/*
+
+=item C<void unshift_pmc(PMC *value)>
+
+Extends the array by adding an element of value C<*value> to the begin of
+the array.
+
+=cut
+*/
+
+    VTABLE void unshift_pmc(PMC *value) {
+        INTVAL size;
+        void *tmp;
+        PMC_List_Item *head;
+        PMC_List_Item *item;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        GET_ATTR_head(INTERP, SELF, tmp);
+        head = (PMC_List_Item*) tmp;
+
+        item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
+        item->prev = NULL;
+        item->next = head;
+        item->data = value;
+
+        if (head)
+            head->prev = item;
+
+        size += 1;
+
+        SET_ATTR_head(INTERP, SELF, item);
+        SET_ATTR_size(INTERP, SELF, size);
+
+        if (size == 1)
+            SET_ATTR_foot(INTERP, SELF, item);
+
+        return;
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a copy of the list.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC *copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        void* tmp;
+        PMC_List_Item *it;
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        it = (PMC_List_Item*) tmp;
+
+        while (it != NULL) {
+            VTABLE_push_pmc(INTERP, copy, it->data);
+            it = it->next;
+        }
+
+        return copy;
+    }
+
+/*
+
+=item C<STRING *get_repr()>
+
+Returns the Parrot string representation C<ResizablePMCArray>.
+
+=cut
+
+*/
+
+    VTABLE STRING *get_repr() {
+        PMC_List_Item *it;
+        void* tmp;
+        STRING *res = CONST_STRING(INTERP, "[ ");
+        STRING *space = CONST_STRING(INTERP, " ");
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        it = (PMC_List_Item*) tmp;
+
+        while (it != NULL) {
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, it->data));
+            res = Parrot_str_concat(INTERP, res, space);
+            it = it->next;
+        }
+
+        return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "]"));
+    }
+
+    VTABLE STRING *get_string() {
+        return VTABLE_get_repr(INTERP, SELF);
+    }
+
+
+/*
+
+=item C<void visit(PMC *info)>
+
+This is used by freeze/thaw to visit the contents of the array.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(PMC *info)>
+
+Used to archive the array.
+
+=item C<void thaw(PMC *info)>
+
+Used to unarchive the array.
+
+=cut
+
+*/
+
+    VTABLE void visit(PMC *info) {
+        void* tmp;
+        PMC_List_Item *it;
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        it = (PMC_List_Item*) tmp;
+
+        while (it != NULL) {
+            VISIT_PMC(INTERP, info, it->data);
+            it = it->next;
+        }
+        SUPER(info);
+    }
+
+    VTABLE void freeze(PMC *info) {
+        SUPER(info);
+        VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
+    }
+
+    VTABLE void thaw(PMC *info) {
+        int n, i;
+        SUPER(info);
+        n = VTABLE_shift_integer(INTERP, info);
+        SET_ATTR_size(INTERP, SELF, n);
+
+        for (i = 0; i < n; ++i)
+            VTABLE_push_pmc(INTERP, SELF, PMCNULL);
+    }
+
+/*
+=item C<void mark()>
+
+Mark the stuff.
+
+=cut
+*/
+
+    VTABLE void mark() {
+        void* tmp;
+        PMC_List_Item *it;
+
+        GET_ATTR_head(INTERP, SELF, tmp);
+        it = (PMC_List_Item*) tmp;
+
+        while (it != NULL) {
+            if (!PObj_is_PMC_TEST(it->data)) {
+                fprintf(stderr, "not a pmc\n");
+                exit(1);
+            }
+
+            Parrot_gc_mark_PMC_alive(INTERP, it->data);
+            it = it->next;
+        }
+    }
+
+
+/*
+
+=item METHOD PMC* shift()
+
+=item METHOD PMC* pop()
+
+Method forms to remove and return a PMC from the beginning or
+end of the array.
+
+=cut
+
+*/
+
+    METHOD shift() {
+        PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
+        RETURN(PMC *value);
+    }
+
+    METHOD pop() {
+        PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
+        RETURN(PMC *value);
+    }
+
+/*
+
+=item METHOD unshift(PMC* value)
+
+=item METHOD push(PMC* value)
+
+Method forms to add a PMC to the beginning or end of the array.
+
+=cut
+
+*/
+
+    METHOD unshift(PMC* value) {
+        VTABLE_unshift_pmc(INTERP, SELF, value);
+    }
+
+    METHOD push(PMC* value) {
+        VTABLE_push_pmc(INTERP, SELF, value);
+    }
+
+/*
+=item METHOD insert_by_number(PMC* value)
+
+Inserts an item into an ordered list by it's number value.
+
+=cut
+*/
+
+    METHOD insert_by_number(PMC* value) {
+        Parrot_pmc_list_insert_by_number(INTERP, SELF, value);
+    }
+
+}
+
+/*
+
+=back
+
+=head2 Auxiliary functions
+
+=over 4
+
+=item C<void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC
+*value)>
+
+Insert an item into a sorted list by its num value.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
+{
+    void *tmp;
+    PMC_List_Item *item;
+    PMC_List_Item *head;
+    PMC_List_Item *foot;
+    FLOATVAL vkey, ikey;
+    int size;
+
+    GETATTR_PMCList_size(interp, list, size);
+    GETATTR_PMCList_head(interp, list, tmp);
+
+    item = (PMC_List_Item*) malloc(sizeof (PMC_List_Item));
+    item->data = value;
+    item->next = (PMC_List_Item*) tmp;
+    item->prev = NULL;
+
+    vkey = VTABLE_get_number(interp, value);
+
+    /* Find the list item to insert before */
+    while (item->next != NULL) {
+        ikey = VTABLE_get_number(interp, item->next->data);
+        if (ikey > vkey)
+            break;
+        item->prev = item->next;
+        item->next = item->next->next;
+    }
+
+    if (item->next == NULL) {
+        SETATTR_PMCList_foot(interp, list, item);
+    }
+    else {
+        item->next->prev = item;
+    }
+
+    if (item->prev == NULL) {
+        SETATTR_PMCList_head(interp, list, item);
+    }
+    else {
+        item->prev->next = item;
+    }
+
+    SETATTR_PMCList_size(interp, list, size + 1);
+}
+
+/*
+=item C<static void throw_shift_empty(PARROT_INTERP)>
+
+=item C<static void throw_pop_empty(PARROT_INTERP)>
+
+Throws with the appropiate message.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_shift_empty(PARROT_INTERP)
+{
+    ASSERT_ARGS(throw_shift_empty)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "PMCList: Can't shift from an empty list!");
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_pop_empty(PARROT_INTERP)
+{
+    ASSERT_ARGS(throw_pop_empty)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "PMCList: Can't pop from an empty list!");
+}
+
+/*
+
+=back
+
+=head1 See also
+
+F<docs/pdds/pdd17_basic_types.pod>.
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

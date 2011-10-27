@@ -297,6 +297,7 @@ void Parrot_sleep(unsigned int seconds);
 
 PARROT_EXPORT
 void Parrot_usleep(unsigned int microseconds);
+void Parrot_floatval_sleep(FLOATVAL time);
 
 PARROT_EXPORT
 INTVAL Parrot_intval_time(void);
