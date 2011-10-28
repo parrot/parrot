@@ -31,8 +31,6 @@ exceptions, async I/O, and concurrent tasks (threads).
 
 #include "scheduler.str"
 
-#define CX_DEBUG 0
-
 /* HEADERIZER HFILE: include/parrot/scheduler.h */
 
 /* HEADERIZER BEGIN: static */
@@ -523,9 +521,6 @@ void
 Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_request_suspend_for_gc)
-#if CX_DEBUG
-    fprintf(stderr, "requesting gc suspend [interp=%p]\n", interp);
-#endif
     Parrot_cx_send_message(interp, CONST_STRING(interp, "suspend_for_gc"), PMCNULL);
 }
 
@@ -552,13 +547,6 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
         INTVAL index;
         const INTVAL num_tasks = VTABLE_elements(interp, sched_struct->messages);
 
-#if CX_DEBUG
-    fprintf(stderr, "called delete_suspend_for_gc\n");
-#endif
-
-#if CX_DEBUG
-    fprintf(stderr, "locking msg_lock (delete) [interp=%p]\n", interp);
-#endif
         /* Search the task index for GC suspend tasks */
         for (index = 0; index < num_tasks; ++index) {
             PMC * const message = VTABLE_get_pmc_keyed_int(interp,
@@ -570,10 +558,6 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
                 return message;
             }
         }
-#if CX_DEBUG
-    fprintf(stderr, "unlocking msg_lock (delete) [interp=%p]\n", interp);
-#endif
-
     }
     else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -613,17 +597,7 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
         PMC * const message = Parrot_pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
 
-#if CX_DEBUG
-        fprintf(stderr, "sending message[interp=%p]\n", interp);
-#endif
-
-#if CX_DEBUG
-        fprintf(stderr, "locking msg_lock (send) [interp=%p]\n", interp);
-#endif
         VTABLE_push_pmc(interp, sched_struct->messages, message);
-#if CX_DEBUG
-        fprintf(stderr, "unlocking msg_lock (send) [interp=%p]\n", interp);
-#endif
         Parrot_cx_runloop_wake(interp, interp->scheduler);
     }
 }
