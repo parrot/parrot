@@ -31,15 +31,6 @@ void Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
 opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP,
@@ -92,6 +83,10 @@ opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_cx_current_task(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -124,10 +119,6 @@ void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC * const alarm))
 void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_task_current(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_Parrot_cx_begin_execution __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(main) \
@@ -135,12 +126,6 @@ PMC* Parrot_task_current(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_cx_check_alarms __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
-#define ASSERT_ARGS_Parrot_cx_delete_suspend_for_gc \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_cx_request_suspend_for_gc \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_run_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler) \
@@ -166,6 +151,8 @@ PMC* Parrot_task_current(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_cx_check_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(next))
+#define ASSERT_ARGS_Parrot_cx_current_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_init_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_next_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -186,8 +173,6 @@ PMC* Parrot_task_current(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(alarm))
 #define ASSERT_ARGS_Parrot_cx_set_scheduler_alarm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_task_current __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/scheduler.c */

@@ -322,7 +322,7 @@ PMC*
 Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t * const next))
 {
     ASSERT_ARGS(Parrot_cx_stop_task)
-    PMC * const task = Parrot_task_current(interp);
+    PMC * const task = Parrot_cx_current_task(interp);
     Parrot_Task_attributes * const tdata = PARROT_TASK(task);
     PMC * const cont = Parrot_pmc_new(interp, enum_class_Continuation);
 
@@ -489,7 +489,7 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
 
 /*
 
-=item C<PMC* Parrot_task_current(PARROT_INTERP)>
+=item C<PMC* Parrot_cx_current_task(PARROT_INTERP)>
 
 Returns the task that is currently running.
 
@@ -499,71 +499,10 @@ Returns the task that is currently running.
 
 PARROT_CANNOT_RETURN_NULL
 PMC*
-Parrot_task_current(PARROT_INTERP)
+Parrot_cx_current_task(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_task_current)
+    ASSERT_ARGS(Parrot_cx_current_task)
     return interp->cur_task;
-}
-
-
-/*
-
-=item C<void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)>
-
-Tell the scheduler to suspend for GC at the next safe pause.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_cx_request_suspend_for_gc)
-    Parrot_cx_send_message(interp, CONST_STRING(interp, "suspend_for_gc"), PMCNULL);
-}
-
-/*
-
-=item C<PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)>
-
-Remove a message that would suspend GC from the message queue. (Provided for
-backward compatibility in the threads implementation.)
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_cx_delete_suspend_for_gc)
-    if (interp->scheduler) {
-        STRING * const suspend_str = CONST_STRING(interp, "suspend_for_gc");
-        Parrot_Scheduler_attributes * const sched_struct = PARROT_SCHEDULER(interp->scheduler);
-        INTVAL index;
-        const INTVAL num_tasks = VTABLE_elements(interp, sched_struct->messages);
-
-        /* Search the task index for GC suspend tasks */
-        for (index = 0; index < num_tasks; ++index) {
-            PMC * const message = VTABLE_get_pmc_keyed_int(interp,
-                    sched_struct->messages, index);
-            if (!PMC_IS_NULL(message)
-            &&   STRING_equal(interp, VTABLE_get_string(interp, message),
-                        suspend_str)) {
-                VTABLE_delete_keyed_int(interp, sched_struct->messages, index);
-                return message;
-            }
-        }
-    }
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Scheduler was not initialized for this interpreter.\n");
-
-    return PMCNULL;
 }
 
 /*

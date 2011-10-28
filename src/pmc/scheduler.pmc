@@ -120,8 +120,8 @@ current maximum, and a birthtime of the current time.
     void push_pmc(PMC *task) {
         /* TODO: This doesn't appear to do anything */
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        PMC *const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
-        STRING *const type = VTABLE_get_string(interp, type_pmc);
+        PMC * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
+        STRING * const type = VTABLE_get_string(interp, type_pmc);
     }
 
 
@@ -137,8 +137,8 @@ recalculates it before retrieving the next task.
 */
 
     VTABLE PMC *pop_pmc() {
-        Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
-        PMC *task = VTABLE_shift_pmc(INTERP, core_struct->task_queue);
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        PMC * const task = VTABLE_shift_pmc(INTERP, core_struct->task_queue);
         return task;
     }
 
@@ -303,15 +303,15 @@ Returns a ResizablePMCArray containing pointers to all active tasks.
 
     METHOD active_tasks() {
         Parrot_Scheduler_attributes *sdata = PARROT_SCHEDULER(SELF);
-        PMC *tasks = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        PMC *iter  = Parrot_pmc_new_init(interp, enum_class_HashIterator, sdata->all_tasks);
+        PMC * const tasks = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC * const iter  = Parrot_pmc_new_init(interp, enum_class_HashIterator, sdata->all_tasks);
 
         while (!VTABLE_get_bool(interp, iter)) {
-            PMC *pair = VTABLE_shift_pmc(interp, iter);
-            PMC *task;
-            STRING *value = CONST_STRING(interp, "value");
+            PMC * const pair = VTABLE_shift_pmc(interp, iter);
+            PMC * task = PMCNULL;
+            STRING * const value = CONST_STRING(interp, "value");
             Parrot_pcc_invoke_method_from_c_args(interp, pair,
-                value, "->P", task);
+                value, "->P", &task);
             VTABLE_push_pmc(interp, tasks, task);
         }
 
