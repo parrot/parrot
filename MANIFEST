@@ -1068,8 +1068,6 @@ lib/Pod/Simple/TranscodeDumb.pm                             []
 lib/Pod/Simple/TranscodeSmart.pm                            []
 lib/Pod/Simple/XHTML.pm                                     []
 lib/Pod/Simple/XMLOutStream.pm                              []
-lib/TAP/Harness/Archive/MultipleHarnesses.pm                []
-lib/TAP/Harness/ReportByDescription.pm                      []
 parrotbug                                                   []
 runtime/parrot/bin/prove.pir                                [library]
 runtime/parrot/dynext/README                                []doc
