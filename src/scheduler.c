@@ -384,25 +384,6 @@ Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_end(PARROT_INTERP)>
-
-Schedule an event to terminate the scheduler runloop.
-
-=cut
-
-*/
-
-void
-Parrot_cx_runloop_end(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_cx_runloop_end)
-    SCHEDULER_terminate_requested_SET(interp->scheduler);
-    /* Chandon TODO: Why is this here? */
-    /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
-}
-
-/*
-
 =item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC * const task_or_sub)>
 
 Add a task to to the task queue for execution.

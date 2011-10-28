@@ -105,9 +105,6 @@ opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void Parrot_cx_runloop_end(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -164,8 +161,6 @@ void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler) \
     , PARROT_ASSERT_ARG(next))
-#define ASSERT_ARGS_Parrot_cx_runloop_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_runloop_wake __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))
