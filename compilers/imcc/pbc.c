@@ -1739,8 +1739,8 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
           case VTPASM:             /* P[S0] */
           case VTREG:              /* P[S0] */
 
-            /* if key is a register, the original sym is in r->reg */
-            if (r->reg)
+            /* if key is a copy created by link_keys, use the original */
+            if (r->reg && r->reg->type == r->type)
                 r = r->reg;
 
             /* don't emit mapped regs in key parts */
