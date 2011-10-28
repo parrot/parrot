@@ -279,7 +279,7 @@ If there is no waiting message, block and wait.
 
 op receive(out PMC) {
     opcode_t *const dest = expr NEXT();
-    PMC *cur_task = Parrot_task_current(interp);
+    PMC *cur_task = Parrot_cx_current_task(interp);
     Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
     int msg_count;
     if (PMC_IS_NULL(tdata->mailbox)) {

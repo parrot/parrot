@@ -23792,7 +23792,7 @@ Parrot_root_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  *const  dest =  cur_opcode + 2;
-    PMC  * cur_task = Parrot_task_current(interp);
+    PMC  * cur_task = Parrot_cx_current_task(interp);
     Parrot_Task_attributes  * tdata = PARROT_TASK(cur_task);
     int   msg_count;
 
