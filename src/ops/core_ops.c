@@ -23794,7 +23794,16 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  *const  dest =  cur_opcode + 2;
     PMC  * cur_task = Parrot_task_current(interp);
     Parrot_Task_attributes  * tdata = PARROT_TASK(cur_task);
-    int   msg_count = VTABLE_get_integer(interp, tdata->mailbox);
+    int   msg_count;
+
+    if (PMC_IS_NULL(tdata->mailbox)) {
+        tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+        PARROT_GC_WRITE_BARRIER(interp, cur_task);
+        msg_count = 0;
+    }
+    else {
+        msg_count = VTABLE_elements(interp, tdata->mailbox);
+    }
 
     if ((msg_count > 0)) {
         PREG(1) = VTABLE_shift_pmc(interp, tdata->mailbox);
@@ -23831,6 +23840,11 @@ Parrot_wait_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
     cur_task = Parrot_cx_stop_task(interp, next);
     tdata = PARROT_TASK(task);
+    if (PMC_IS_NULL(tdata->waiters)) {
+        tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PARROT_GC_WRITE_BARRIER(interp, task);
+    }
+
     VTABLE_push_pmc(interp, tdata->waiters, cur_task);
     return (opcode_t *)0;
     return (opcode_t *)cur_opcode + 2;
@@ -23849,6 +23863,11 @@ Parrot_wait_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
     cur_task = Parrot_cx_stop_task(interp, next);
     tdata = PARROT_TASK(task);
+    if (PMC_IS_NULL(tdata->waiters)) {
+        tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PARROT_GC_WRITE_BARRIER(interp, task);
+    }
+
     VTABLE_push_pmc(interp, tdata->waiters, cur_task);
     return (opcode_t *)0;
     return (opcode_t *)cur_opcode + 2;
@@ -23880,7 +23899,7 @@ op_lib_t core_op_lib = {
   1097,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */
+  get_op          /* op_code() */ 
 };
 
 /*

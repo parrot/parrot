@@ -19,6 +19,16 @@ all want to be O(1).
 
 */
 
+BEGIN_PMC_HEADER_PREAMBLE
+
+PARROT_EXPORT
+void
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
+
+END_PMC_HEADER_PREAMBLE
+
+
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -37,8 +47,6 @@ static void throw_shift_empty(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-void Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value);
 
 
 /* It's a doubly linked list */
@@ -496,6 +504,7 @@ Insert an item into a sorted list by its num value.
 =cut
 
 */
+
 
 PARROT_EXPORT
 void

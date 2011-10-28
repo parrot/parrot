@@ -58,8 +58,12 @@ Initialize a concurrency task object.
         core_struct->data      = PMCNULL;
         core_struct->interp    = INTERP;
         core_struct->killed    = 0;
+        core_struct->mailbox   = PMCNULL;
+        core_struct->waiters   = PMCNULL;
+        /*
         core_struct->mailbox   = Parrot_pmc_new(interp, enum_class_PMCList);
         core_struct->waiters   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        */
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -173,7 +177,10 @@ code as the first argument.
             VTABLE_delete_keyed(interp, active_tasks, task_id);
 
             /* schedule any waiters. */
-            n = VTABLE_get_integer(interp, task->waiters);
+            if (PMC_IS_NULL(task->waiters))
+                n = 0;
+            else
+                n = VTABLE_get_integer(interp, task->waiters);
 
             for (i = 0; i < n; ++i) {
                 PMC *wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
@@ -373,6 +380,8 @@ Send a message to this task.
 
     METHOD send(PMC *message) {
         Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
+        if (PMC_IS_NULL(tdata->mailbox))
+            tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
         VTABLE_push_pmc(interp, tdata->mailbox, message);
 
         if (TASK_recv_block_TEST(SELF)) {
