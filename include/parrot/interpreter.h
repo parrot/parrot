@@ -405,7 +405,7 @@ PMC* Parrot_make_cb(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_run_callback(PARROT_INTERP,
     ARGMOD(PMC* user_data),
-    ARGIN(char* external_data))
+    ARGIN(void* external_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

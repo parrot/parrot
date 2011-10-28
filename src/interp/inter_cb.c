@@ -273,7 +273,7 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
 
 /*
 
-=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char*
+=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, void*
 external_data)>
 
 Run a callback function. The PMC* user_data holds all
@@ -286,7 +286,7 @@ necessary items in its properties.
 PARROT_EXPORT
 void
 Parrot_run_callback(PARROT_INTERP,
-        ARGMOD(PMC* user_data), ARGIN(char* external_data))
+        ARGMOD(PMC* user_data), ARGIN(void* external_data))
 {
     ASSERT_ARGS(Parrot_run_callback)
     PMC     *signature;
@@ -337,7 +337,7 @@ case_I:
         break;
       case 't':
         pasm_sig[1] = 'S';
-        param = Parrot_str_new(interp, external_data, 0);
+        param = Parrot_str_new(interp, (const char*)external_data, 0);
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, 1,

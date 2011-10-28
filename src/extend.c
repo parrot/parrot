@@ -67,6 +67,7 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
 
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
+#include "parrot/events.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
