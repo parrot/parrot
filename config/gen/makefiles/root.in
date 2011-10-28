@@ -1529,6 +1529,7 @@ src/extend$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_DIR)/events.h \
 	src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
