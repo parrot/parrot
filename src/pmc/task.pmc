@@ -46,8 +46,9 @@ Initialize a concurrency task object.
 */
 
     VTABLE void init() {
-        Parrot_Task_attributes *const core_struct = PARROT_TASK(SELF);
-        Parrot_Scheduler_attributes  *sched_data  = PARROT_SCHEDULER(interp->scheduler);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        Parrot_Scheduler_attributes * const sched_data =
+                PARROT_SCHEDULER(interp->scheduler);
 
         /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
@@ -58,12 +59,8 @@ Initialize a concurrency task object.
         core_struct->data      = PMCNULL;
         core_struct->interp    = INTERP;
         core_struct->killed    = 0;
-        core_struct->mailbox   = PMCNULL;
-        core_struct->waiters   = PMCNULL;
-        /*
-        core_struct->mailbox   = Parrot_pmc_new(interp, enum_class_PMCList);
-        core_struct->waiters   = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        */
+        core_struct->mailbox   = PMCNULL; /* Created lazily on demand */
+        core_struct->waiters   = PMCNULL; /* Created lazily on demand */
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -104,7 +101,7 @@ Some data that will be passed to C<code> when invoked.
 
     VTABLE void init_pmc(PMC *data) {
         PMC         *elem;
-        Parrot_Task_attributes *core_struct = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         SELF.init();
 
@@ -144,9 +141,10 @@ code as the first argument.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_Task_attributes *const task  = PARROT_TASK(SELF);
-        Parrot_Scheduler_attributes  *sdata = PARROT_SCHEDULER(interp->scheduler);
-        PMC *active_tasks = sdata->all_tasks;
+        Parrot_Task_attributes * const task = PARROT_TASK(SELF);
+        Parrot_Scheduler_attributes * const sdata =
+                PARROT_SCHEDULER(interp->scheduler);
+        PMC * const active_tasks = sdata->all_tasks;
 
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
@@ -170,20 +168,18 @@ code as the first argument.
             /* The task is done. */
             /* Remove it from the set of active Tasks */
 
-            int i, n;
-            PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
+            int i, n = 0;
+            PMC * const task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
             TASK_active_CLEAR(SELF);
             VTABLE_delete_keyed(interp, active_tasks, task_id);
 
             /* schedule any waiters. */
-            if (PMC_IS_NULL(task->waiters))
-                n = 0;
-            else
+            if (!PMC_IS_NULL(task->waiters))
                 n = VTABLE_get_integer(interp, task->waiters);
 
             for (i = 0; i < n; ++i) {
-                PMC *wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
+                PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
                 Parrot_cx_schedule_task(interp, wtask);
             }
         }
@@ -227,7 +223,7 @@ Gets the value of an attribute for this task.
 
     VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
-        PMC *value;
+        PMC * value = PMCNULL;
 
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             value = Parrot_pmc_new(INTERP, enum_class_Float);
@@ -238,9 +234,6 @@ Gets the value of an attribute for this task.
         }
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
             value = core_struct->data;
-        }
-        else {
-            value = PMCNULL;
         }
 
         return value;
@@ -357,9 +350,9 @@ Called after the task has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_Task_attributes * core_struct = PARROT_TASK(SELF);
+        /* Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF); */
 
-        UNUSED(core_struct); /* Do nothing */
+        /* UNUSED(core_struct); *//* Do nothing */
     }
 
 /*
@@ -379,7 +372,7 @@ Send a message to this task.
 */
 
     METHOD send(PMC *message) {
-        Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         if (PMC_IS_NULL(tdata->mailbox))
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
         VTABLE_push_pmc(interp, tdata->mailbox, message);
@@ -401,7 +394,7 @@ Kill this task.
 */
 
     METHOD kill() {
-        Parrot_Task_attributes *tdata = PARROT_TASK(SELF);
+        Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         tdata->killed = 1;
     }
 }
