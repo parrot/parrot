@@ -20,19 +20,16 @@
 
 PARROT_EXPORT
 void Parrot_cx_begin_execution(PARROT_INTERP,
-    ARGMOD(PMC *main),
-    ARGMOD(PMC *argv))
+    ARGIN(PMC * const main),
+    ARGIN(PMC * const argv))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*main)
-        FUNC_MODIFIES(*argv);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_cx_check_alarms(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -46,15 +43,15 @@ void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
 opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP,
-    ARGMOD(PMC *scheduler),
-    ARGIN(opcode_t *next))
+    ARGIN(PMC * const scheduler),
+    ARGIN(opcode_t * const next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
+void Parrot_cx_schedule_immediate(PARROT_INTERP,
+    ARGIN(PMC * const task_or_sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -63,11 +60,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP,
     FLOATVAL time,
-    ARGIN_NULLOK(opcode_t *next))
+    ARGIN_NULLOK(opcode_t * const next))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
+void Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -81,49 +78,46 @@ void Parrot_cx_send_message(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
+PMC* Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t * const next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_cx_check_quantum(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t* next))
+opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP,
+    ARGIN(opcode_t * const next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_cx_next_task(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(2);
 
 void Parrot_cx_outer_runloop(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
-    ARGMOD(PMC *scheduler),
-    ARGIN(opcode_t *next))
+    ARGIN(PMC * const scheduler),
+    ARGIN(opcode_t * const next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(3);
 
 void Parrot_cx_runloop_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
+void Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*scheduler);
+        __attribute__nonnull__(2);
 
-void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
+void Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC * const alarm))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
