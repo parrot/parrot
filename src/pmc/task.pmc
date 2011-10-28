@@ -33,7 +33,6 @@ pmclass Task provides invokable auto_attrs {
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
     ATTR PMC          *mailbox;   /* List of incoming messages */
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
-    ATTR Parrot_jump_buff abort_jump; /* Jump buffer to abort task */
 
 /*
 
@@ -150,10 +149,6 @@ code as the first argument.
 
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
-
-        if (setjmp(task->abort_jump)) {
-            /* do nothing, we're back where we want to be */
-        }
 
         if (!(task->killed || PMC_IS_NULL(task->code))) {
             /* Add the task to the set of active Tasks */
