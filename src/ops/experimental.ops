@@ -281,7 +281,14 @@ op receive(out PMC) {
     opcode_t *const dest = expr NEXT();
     PMC *cur_task = Parrot_task_current(interp);
     Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
-    int msg_count = VTABLE_get_integer(interp, tdata->mailbox);
+    int msg_count;
+    if (PMC_IS_NULL(tdata->mailbox)) {
+        tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+        PARROT_GC_WRITE_BARRIER(interp, cur_task);
+        msg_count = 0;
+    } 
+    else
+        msg_count = VTABLE_elements(interp, tdata->mailbox);
 
     if (msg_count > 0) {
         $1 = VTABLE_shift_pmc(interp, tdata->mailbox);
@@ -312,6 +319,10 @@ op wait(in PMC) {
 
     cur_task = Parrot_cx_stop_task(interp, next);
     tdata    = PARROT_TASK(task);
+    if (PMC_IS_NULL(tdata->waiters)) {
+        tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PARROT_GC_WRITE_BARRIER(interp, task);
+    }
     VTABLE_push_pmc(interp, tdata->waiters, cur_task);
 
     goto ADDRESS(0);
