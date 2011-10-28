@@ -173,6 +173,8 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
 Set the task switch alarm for the scheduler.
 
+=cut
+
 */
 
 void
