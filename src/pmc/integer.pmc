@@ -1298,6 +1298,7 @@ Set to a random value.
     METHOD set_random(INTVAL a :optional, INTVAL has_a :opt_flag,
                       INTVAL b :optional, INTVAL has_b :opt_flag)
     {
+        INTVAL r;
         if (has_a && a != 0) {
             if (!has_b) {
                 if (a < 0)
@@ -1311,15 +1312,15 @@ Set to a random value.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "set_random: range start must be less than range end (%d, %d)", a, b);
             }
-            const double spread = (double)(b - a + 1);
-            const double randpart = Parrot_util_float_rand(0);
-            const INTVAL r = a + (INTVAL)(spread * randpart);
-            SELF.set_integer_native(r);
+            {
+                const double spread = (double)(b - a + 1);
+                const double randpart = Parrot_util_float_rand(0);
+                r = a + (INTVAL)(spread * randpart);
+            }
         }
-        else {
-            const INTVAL r = Parrot_util_int_rand(0);
-            SELF.set_integer_native(r);
-        }
+        else
+            r = Parrot_util_int_rand(0);
+        SELF.set_integer_native(r);
     }
 }
 
