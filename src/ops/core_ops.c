@@ -13290,7 +13290,7 @@ Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, _this, EXCEPTION_INVALID_OPERATION, "check_events__ opcode doesn't do anything useful.");
 
     return (opcode_t *)handler;
-    disable_event_checking(interp);
+    Parrot_runcore_disable_event_checking(interp);
     return (opcode_t *)_this;
 }
 

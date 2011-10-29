@@ -49,10 +49,6 @@ static void Parrot_cx_enable_preemption(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-static int enable_scheduling = 0;
-static int enable_preemption = 0;
-
 /*
 
 =head2 Scheduler Interface Functions
@@ -103,17 +99,15 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC * const main),
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count;
-    INTVAL task_count  = 1;
-
     PMC * const main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const tdata = PARROT_TASK(main_task);
+    INTVAL task_count  = 1;
 
     tdata->code = main;
     tdata->data = argv;
     PARROT_GC_WRITE_BARRIER(interp, main_task);
 
-    enable_scheduling = 1;
+    sched->enable_scheduling = 1;
 
     Parrot_cx_schedule_immediate(interp, main_task);
     Parrot_cx_outer_runloop(interp);
@@ -160,8 +154,6 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
         if (alarm_count > 0) {
-            /* TODO: What is this pause? */
-            /* pause; */
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
     } while (alarm_count);
@@ -265,6 +257,7 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
         ARGIN(opcode_t * const next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -275,13 +268,13 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
         /* A task switch will only work in the outer runloop of a fully
            booted Parrot. In a Parrot that hasn't called begin_execution,
            or in a nested runloop, we silently ignore task switches. */
-        if (enable_scheduling && interp->current_runloop_level <= 1)
+        if (sched->enable_scheduling && interp->current_runloop_level <= 1)
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
     /* Some alarm seems to have fired, but not the scheduler's.
      * Re-set the scheduler alarm */
-    if (enable_preemption)
+    if (sched->enable_preemption)
         Parrot_alarm_set(interp->quantum_done);
 
     return next;
@@ -304,7 +297,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC * const scheduler))
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     const FLOATVAL time_now = Parrot_floatval_time();
 
-    if (enable_preemption && time_now >= interp->quantum_done)
+    if (sched->enable_preemption && time_now >= interp->quantum_done)
         SCHEDULER_resched_requested_SET(scheduler);
 }
 
@@ -377,7 +370,7 @@ void
 Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
 {
     ASSERT_ARGS(Parrot_cx_runloop_wake)
-    enable_event_checking(interp);
+    Parrot_runcore_enable_event_checking(interp);
     SCHEDULER_wake_requested_SET(scheduler);
 }
 
@@ -667,7 +660,8 @@ static void
 Parrot_cx_enable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_enable_preemption)
-    enable_preemption = 1;
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
+    sched->enable_preemption = 1;
     Parrot_cx_set_scheduler_alarm(interp);
 }
 
@@ -685,7 +679,8 @@ static void
 Parrot_cx_disable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_disable_preemption)
-    enable_preemption = 0;
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
+    sched->enable_preemption = 0;
 }
 
 /*

@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
-$Id$
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -118,7 +117,6 @@ unblocked should avoid waiting on a lock or condition variable.
 =cut
 
 */
-
 
 void
 Parrot_alarm_mask(SHIM_INTERP)
