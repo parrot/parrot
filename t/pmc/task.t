@@ -1,270 +1,146 @@
-#! perl
-# Copyright (C) 2007, Parrot Foundation.
+#!./parrot
+# Copyright (C) 2010, Parrot Foundation.
+# $Id$
 
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
+.sub main
+    .include 'test_more.pir'
 
-=head1 NAME
+    plan(10)
 
-t/pmc/task.t - Concurrent Task
-
-=head1 SYNOPSIS
-
-    % prove t/pmc/task.t
-
-=head1 DESCRIPTION
-
-Tests the task PMC used by the concurrency scheduler.
-
-=cut
-
-pir_output_is( <<'CODE', <<'OUT', "create a task and set attributes" );
-  .sub main :main
-    $P0 = new ['Task']
-    $P1 = getattribute $P0, 'status'
-    print $P1
-    print "\n"
-
-    $P2 = new ['String']
-    $P2 = "inprocess"
-    setattribute $P0, 'status', $P2
-
-    $P3 = getattribute $P0, 'status'
-    print $P3
-    print "\n"
-
-    $P2 = new ['String']
-    $P2 = "event"
-    setattribute $P0, 'type', $P2
-
-    $P3 = getattribute $P0, 'type'
-    print $P3
-    print "\n"
-
-    $P2 = new ['String']
-    $P2 = "sub event"
-    setattribute $P0, 'subtype', $P2
-
-    $P3 = getattribute $P0, 'subtype'
-    print $P3
-    print "\n"
-
-    $P2 = new ['Integer']
-    $P2 = 10
-    setattribute $P0, 'priority', $P2
-
-    $P3 = getattribute $P0, 'priority'
-    print $P3
-    print "\n"
-
-    $P2 = new ['Integer']
-    $P2 = 7405
-    setattribute $P0, 'id', $P2
-
-    $P3 = getattribute $P0, 'id'
-    print $P3
-    print "\n"
-
-    $P2 = new ['Float']
-    $P2 = 1.1
-    setattribute $P0, 'birthtime', $P2
-
-    $P3 = getattribute $P0, 'birthtime'
-    print $P3
-    print "\n"
-
-    $P2 = new ['String']
-    $P2 = "additional data"
-    setattribute $P0, 'data', $P2
-
-    $P2 = get_global 'code'
-    setattribute $P0, 'code', $P2
-
-    # Make sure the mark vtable is exercised
-    sweep 1
-
-    end
-  .end
-
-  .sub code
-    say "sub"
-  .end
-CODE
-created
-inprocess
-event
-sub event
-10
-7405
-1.1
-OUT
-
-pir_error_output_like( <<'CODE', <<'OUTPUT', "init with wrong initializer type" );
-.sub main :main
-    $P0 = new ['String']
-    $P0 = 'foo'
-
-    $P1 = new ['Task'], $P0
+    tasks_run_in_order()
+    task_send_recv()
+    task_kill()
+    task_wait()
+    preempt_and_exit()
 .end
-CODE
-/Task initializer must be a Hash/
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "set_string_native set type of task" );
-.sub main :main
-    $P0 = new ['Task']
+.sub tasks_run_in_order
+    $P0 = new 'Integer', 0
+    set_global 'N', $P0
 
-    $P1 = getattribute $P0, 'type'
-    say $P1
+    $P0 = get_global 'task1'
+    $P1 = new 'Task', $P0
+    schedule $P1
 
-    $P2 = new ['String']
-    $P2 = "new_type"
-    setattribute $P0, 'type', $P2
+    $P0 = get_global 'sub1'
+    schedule $P0
 
-    $P1 = getattribute $P0, 'type'
-    say $P1
+    $P0 = get_global 'task2'
+    $P1 = new 'Task', $P0
+    schedule $P1
 
-    $P0 = "newer_type"
-
-    $P1 = getattribute $P0, 'type'
-    say $P1
+    sleep 0.01
 .end
-CODE
 
-new_type
-newer_type
-OUTPUT
+.sub task1
+    $P0 = get_global 'N'
+    is($P0, 0, "Task ran in order (0)")
 
-pir_output_is( <<'CODE', <<'OUT', 'create a task and set attributes in init' );
-  .sub main :main
-    .local pmc data
-    data = new ['Hash']
+    $P0 = 1
+    set_global 'N', $P0
+.end
 
-    $P2 = new ['String']
-    $P2 = 'inprocess'
-    data['status'] = $P2
+.sub sub1
+    $P0 = get_global 'N'
+    is($P0, 1, "Implicit task ran in order (1)")
 
-    $P2 = new ['String']
-    $P2 = 'event'
-    data['type'] = $P2
+    $P0 = 2
+    set_global 'N', $P0
+.end
 
-    $P2 = new ['Integer']
-    $P2 = 10
-    data['priority'] = $P2
+.sub task2
+    $P0 = get_global 'N'
+    is($P0, 2, "Task ran in order (2)")
 
-    $P2 = new ['Integer']
-    $P2 = 7405
-    data['id'] = $P2
+    $P0 = 3
+    set_global 'N', $P0
+.end
 
-    $P2 = new ['Float']
-    $P2 = 1.1
-    data['birthtime'] = $P2
+.sub task_send_recv
+    $P0 = get_global 'recv_msg1'
+    $P1 = new 'Task', $P0
+    schedule $P1
+    pass
 
-    $P0 = new ['Task'], data
+    $P2 = new 'String'
+    $P2 = "Hai 1"
 
-    $P3 = getattribute $P0, 'status'
-    say $P3
+    $P1.'send'($P2)
 
-    $P3 = getattribute $P0, 'type'
-    say $P3
+    wait $P1
 
-    $P3 = getattribute $P0, 'priority'
-    say $P3
+    $P0 = get_global 'recv_msg2'
+    $P1 = new 'Task', $P0
 
-    $P3 = getattribute $P0, 'id'
-    say $P3
+    $P2 = new 'String'
+    $P2 = "Hai 2"
+    $P1.'send'($P2)
 
-    $P3 = getattribute $P0, 'birthtime'
-    say $P3
-    end
-  .end
-CODE
-inprocess
-event
-10
-7405
-1.1
-OUT
+    schedule $P1
 
-pir_output_is( <<'CODE', <<'OUT', 'create a task and get invalid attribute' );
-  .sub main :main
-    $P0 = new ['Task']
+    wait $P1
+.end
 
-    $P0 = getattribute $P0, 'foobar'
-    isnull $I0, $P0
+.sub recv_msg1
+    $P0 = receive
+    $P1 = new 'String'
+    $P1 = "Hai 1"
+    is($P0, $P1, "Got message after block")
+.end
 
-    if $I0, ok
-    say 'fail'
+.sub recv_msg2
+    $P0 = receive
+    $P1 = new 'String'
+    $P1 = "Hai 2"
+    is($P0, $P1, "Got existing message")
+.end
 
-  ok:
-    say 'ok'
-  .end
-CODE
-ok
-OUT
+.sub task_kill
+    $P0 = get_global 'task_to_kill'
+    $P1 = new 'Task', $P0
+    schedule $P1
+    pass
+    $P1.'kill'()
+    sleep 0.1
+    ok(1, "task_to_kill killed")
+.end
 
-pir_output_is( <<'CODE', <<'OUT', "freeze and thaw a task" );
-  .sub main :main
-    $P0 = new ['Task']
+.sub task_to_kill
+    ok(1, "task_to_kill running")
+    sleep 0.05
+    ok(0, "task_to_kill wasn't killed")
+.end
 
-    $P2 = new ['String']
-    $P2 = "inprocess"
-    setattribute $P0, 'status', $P2
+.sub task_wait
+    $P0 = get_global 'wait_sub1'
+    $P1 = new 'Task', $P0
+    schedule $P1
 
-    $P2 = new ['String']
-    $P2 = "event"
-    setattribute $P0, 'type', $P2
+    wait $P1
+    ok(1, "After wait")
+.end
 
-    $P2 = new ['Integer']
-    $P2 = 10
-    setattribute $P0, 'priority', $P2
+.sub wait_sub1
+    ok(1, "in wait_sub1")
+.end
 
-    $P2 = new ['Integer']
-    $P2 = 7405
-    setattribute $P0, 'id', $P2
+.sub preempt_and_exit
+    $P0 = get_global 'exit0'
+    $P1 = new 'Task', $P0
+    schedule $P1
 
-    $P2 = new ['Float']
-    $P2 = 1.1
-    setattribute $P0, 'birthtime', $P2
+again:
+    goto again
+.end
 
-    $S0  = freeze $P0
-    $P10 = thaw $S0
-
-    $P3 = getattribute $P10, 'status'
-    print $P3
-    print "\n"
-
-    $P3 = getattribute $P10, 'type'
-    print $P3
-    print "\n"
-
-    $P3 = getattribute $P10, 'priority'
-    print $P3
-    print "\n"
-
-    $P3 = getattribute $P10, 'id'
-    print $P3
-    print "\n"
-
-    $P3 = getattribute $P10, 'birthtime'
-    print $P3
-    print "\n"
-    end
-  .end
-CODE
-inprocess
-event
-10
-7405
-1.1
-OUT
+.sub exit0
+    ok(1, "Pre-empt and exit")
+    exit 0
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
+

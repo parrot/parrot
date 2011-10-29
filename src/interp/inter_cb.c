@@ -26,6 +26,7 @@ the C-library.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "pmc/pmc_parrotinterpreter.h"
+#include "pmc/pmc_callback.h"
 #include "inter_cb.str"
 
 static Interp * default_interp = NULL;
@@ -261,13 +262,18 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
          * then wait for the CB_EVENT_xx to finish and return the
          * result
          */
-        Parrot_cx_schedule_callback(interp, user_data, external_data);
+        PMC *callback = Parrot_pmc_new(interp, enum_class_Callback);
+        Parrot_Callback_attributes *cb_data = PARROT_CALLBACK(callback);
+        cb_data->user_data     = (PMC*) user_data;
+        cb_data->external_data = (PMC*) external_data;
+
+        Parrot_cx_schedule_immediate(interp, callback);
     }
 }
 
 /*
 
-=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char*
+=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, void*
 external_data)>
 
 Run a callback function. The PMC* user_data holds all
@@ -280,7 +286,7 @@ necessary items in its properties.
 PARROT_EXPORT
 void
 Parrot_run_callback(PARROT_INTERP,
-        ARGMOD(PMC* user_data), ARGIN(char* external_data))
+        ARGMOD(PMC* user_data), ARGIN(void* external_data))
 {
     ASSERT_ARGS(Parrot_run_callback)
     PMC     *signature;
@@ -331,7 +337,7 @@ case_I:
         break;
       case 't':
         pasm_sig[1] = 'S';
-        param = Parrot_str_new(interp, external_data, 0);
+        param = Parrot_str_new(interp, (const char*)external_data, 0);
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, 1,

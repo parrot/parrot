@@ -2690,7 +2690,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
         main_sub = set_current_sub(interp);
 
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", args);
+    Parrot_cx_begin_execution(interp, main_sub, args);
 
     if (!PMC_IS_NULL(current_pf))
         Parrot_pf_set_current_packfile(interp, current_pf);

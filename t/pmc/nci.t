@@ -1915,6 +1915,10 @@ OUTPUT
     print "loaded a function that takes a callback\n"
     nci_cb_D4( cb_wrapped, user_data )
 
+    # Need to force reschedule to see async callbacks.
+    # Chandon TODO: Is this a bug?
+    sleep 0.001
+
     # reset int_cb_D4 to 1
     int_cb_D4[0] = 1
 
