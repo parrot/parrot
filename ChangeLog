@@ -1,8 +1,10 @@
 2011-11-15    release 3.10.0
     - Core
         + The mark VTABLE was added to the Select PMC
-		+ The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
-	  	  at https://github.com/parrot/parrot-embed
+        + The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
+            at https://github.com/parrot/parrot-embed
+        + A set_random VTABLE was added to the Integer PMC, so random numbers can
+            be generated without needing to load math dynops
     - Languages
     - Community
     - Documentation
