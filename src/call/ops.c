@@ -136,6 +136,24 @@ runops(PARROT_INTERP, size_t offs)
 #endif
 }
 
+/*
+
+=item C<void reset_runloop_id_counter(PARROT_INTERP)>
+
+Reset runloop_id_counter to 0.
+For use in outer_runloop
+
+=cut
+
+*/
+
+void
+reset_runloop_id_counter(PARROT_INTERP)
+{
+    ASSERT_ARGS(reset_runloop_id_counter)
+    runloop_id_counter = 0;
+}
+
 
 /*
 
