@@ -1279,6 +1279,48 @@ Used to unarchive the integer.
         SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
+
+/*
+
+=item C<void set_random(from, to)>
+
+Set to a random value.
+
+    SELF.set_random()       # value from [INTVAL_MIN..INTVAL_MAX]
+    SELF.set_random(0)      # same
+    SELF.set_random(a)      # value from [0..a] or [a..0] if a is negative
+    SELF.set_random(a, b)   # value from [a..b] (b > a)
+
+=cut
+
+*/
+
+    METHOD set_random(INTVAL a :optional, INTVAL has_a :opt_flag,
+                      INTVAL b :optional, INTVAL has_b :opt_flag)
+    {
+        if (has_a && a != 0) {
+            if (!has_b) {
+                if (a < 0)
+                    b = 0;
+                if (a > 0) {
+                    b = a;
+                    a = 0;
+                }
+            }
+            if (a == b || a > b) {
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "set_random: range start must be less than range end (%d, %d)", a, b);
+            }
+            const double spread = (double)(b - a + 1);
+            const double randpart = Parrot_util_float_rand(0);
+            const INTVAL r = a + (INTVAL)(spread * randpart);
+            SELF.set_integer_native(r);
+        }
+        else {
+            const INTVAL r = Parrot_util_int_rand(0);
+            SELF.set_integer_native(r);
+        }
+    }
 }
 
 /*
