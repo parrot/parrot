@@ -5,6 +5,8 @@
             at https://github.com/parrot/parrot-embed
         + A set_random VTABLE was added to the Integer PMC, so random numbers can
             be generated without needing to load math dynops
+        + A new implementation of green threads was added to Parrot, in preparation
+        for a robust hybrid threading system
     - Languages
     - Community
     - Documentation
@@ -33,7 +35,7 @@
         + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
           PCT in Winxed: https://github.com/parrot/PACT
     - Documentation
-        + We are in the process to migrating our Trac wiki at http://trac.parrot.org/ to Github 
+        + We are in the process to migrating our Trac wiki at http://trac.parrot.org/ to Github
           at https://github.com/parrot/parrot/wiki
         + Packfile PMC documentation was updated
     - Tests
