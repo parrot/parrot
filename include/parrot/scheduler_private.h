@@ -17,7 +17,9 @@
 typedef enum {
     SCHEDULER_resched_requested_FLAG = PObj_private0_FLAG,
     SCHEDULER_wake_requested_FLAG    = PObj_private1_FLAG,
-    SCHEDULER_in_handler_FLAG        = PObj_private3_FLAG
+    SCHEDULER_enable_preemption_FLAG = PObj_private2_FLAG,
+    SCHEDULER_in_handler_FLAG        = PObj_private3_FLAG,
+    SCHEDULER_enable_scheduler_FLAG  = PObj_private4_FLAG
 } scheduler_flags_enum;
 
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
@@ -35,10 +37,20 @@ typedef enum {
 #define SCHEDULER_wake_requested_SET(o)   SCHEDULER_flag_SET(wake_requested, o)
 #define SCHEDULER_wake_requested_CLEAR(o) SCHEDULER_flag_CLEAR(wake_requested, o)
 
+/* Are preemption and the scheduler timer enabled? */
+#define SCHEDULER_enable_preemption_TEST(o)  SCHEDULER_flag_TEST(enable_preemption, o)
+#define SCHEDULER_enable_preemption_SET(o)   SCHEDULER_flag_SET(enable_preemption, o)
+#define SCHEDULER_enable_preemption_CLEAR(o) SCHEDULER_flag_CLEAR(enable_preemption, o)
+
 /* Mark if the scheduler is inside a handler */
 #define SCHEDULER_in_handler_TEST(o)  SCHEDULER_flag_TEST(in_handler, o)
 #define SCHEDULER_in_handler_SET(o)   SCHEDULER_flag_SET(in_handler, o)
 #define SCHEDULER_in_handler_CLEAR(o) SCHEDULER_flag_CLEAR(in_handler, o)
+
+/* Is the scheduler up and running? */
+#define SCHEDULER_enable_scheduler_TEST(o)  SCHEDULER_flag_TEST(enable_scheduler, o)
+#define SCHEDULER_enable_scheduler_SET(o)   SCHEDULER_flag_SET(enable_scheduler, o)
+#define SCHEDULER_enable_scheduler_CLEAR(o) SCHEDULER_flag_CLEAR(enable_scheduler, o)
 
 /*
  * Task private flags

@@ -391,7 +391,7 @@ Send a message to this task.
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         code = tdata->code;
-        RETURN (PMC *code);
+        RETURN(PMC *code);
     }
 
     METHOD data(PMC * data :optional, INTVAL has_data :opt_flag) {
@@ -402,7 +402,7 @@ Send a message to this task.
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         data = tdata->data;
-        RETURN (PMC *data);
+        RETURN(PMC *data);
     }
 
 /*
