@@ -257,6 +257,7 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"
+#include "parrot/thread.h"
 #include "parrot/scheduler.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"

@@ -867,6 +867,11 @@ include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
 include/parrot/alarm.h                                      [main]include
 include/parrot/api.h                                        [main]include
+include/parrot/atomic.h                                     [main]include
+include/parrot/atomic/fallback.h                            [main]include
+include/parrot/atomic/gcc_pcc.h                             [main]include
+include/parrot/atomic/gcc_x86.h                             [main]include
+include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
@@ -923,6 +928,10 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
+include/parrot/thr_none.h                                   [main]include
+include/parrot/thr_pthread.h                                [main]include
+include/parrot/thr_windows.h                                [main]include
+include/parrot/thread.h                                     [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
@@ -1162,6 +1171,8 @@ runtime/parrot/library/postgres.pir                         [library]
 runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
 src/alarm.c                                                 []
+src/atomic/gcc_x86.c                                        []
+src/atomic/sparc_v9.s                                       []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1436,6 +1447,7 @@ src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
 src/sub.c                                                   []
+src/thread.c                                                []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []

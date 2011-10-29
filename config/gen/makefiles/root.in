@@ -391,6 +391,14 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/exit.h \
 	$(INC_DIR)/nci.h \
 	$(INC_DIR)/scheduler.h \
+	$(INC_DIR)/thread.h \
+	$(INC_DIR)/thr_pthread.h \
+	$(INC_DIR)/thr_windows.h \
+	$(INC_DIR)/atomic.h \
+	$(INC_DIR)/atomic/fallback.h \
+	$(INC_DIR)/atomic/gcc_pcc.h \
+	$(INC_DIR)/atomic/gcc_x86.h \
+	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/oo.h \
 	$(INC_DIR)/vtables.h \
 	$(INC_DIR)/multidispatch.h \
@@ -435,6 +443,7 @@ IO_O_FILES = \
 INTERP_O_FILES = \
 	src/string/api$(O) \
 	src/ops/core_ops$(O) \
+#IF(i386_has_gcc_cmpxchg):    src/atomic/gcc_x86$(O) \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
@@ -493,6 +502,7 @@ INTERP_O_FILES = \
 	src/runcore/profiling$(O) \
 	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
+	src/thread$(O) \
 	src/events$(O) \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
@@ -507,6 +517,7 @@ INTERP_O_FILES = \
 	src/packfile/segments$(O) \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
+	@TEMP_atomic_o@ \
 
 OPS_FILES = @ops@
 
@@ -1017,6 +1028,14 @@ src/events$(O) : \
 
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
 	$(INC_DIR)/alarm.h
+
+src/thread$(O) : \
+	$(PARROT_H_HEADERS) \
+	$(EXTEND_HEADERS) \
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_DIR)/runcore_api.h \
+	src/thread.c
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
@@ -1968,6 +1987,8 @@ src/io/filehandle$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_filehandle.h \
 src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
+
+src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
