@@ -747,6 +747,12 @@ support it.
         RETURN(INTVAL id);
     }
 
+    METHOD current_task() {
+        Interp * const this_interp = PMC_interp(SELF);
+        PMC * const current_task = this_interp->cur_task;
+        RETURN(PMC *current_task);
+    }
+
 }
 
 /*

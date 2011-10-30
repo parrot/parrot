@@ -54,9 +54,6 @@ static int Parrot_cx_preemption_enabled(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-static int enable_scheduling = 0;
-
 /*
 
 =head2 Scheduler Interface Functions
@@ -107,17 +104,15 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC * const main),
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count;
-    INTVAL task_count  = 1;
-
     PMC * const main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const tdata = PARROT_TASK(main_task);
+    INTVAL task_count  = 1;
 
     tdata->code = main;
     tdata->data = argv;
     PARROT_GC_WRITE_BARRIER(interp, main_task);
 
-    enable_scheduling = 1;
+    SCHEDULER_enable_scheduler_SET(scheduler);
 
     Parrot_cx_schedule_immediate(interp, main_task);
     Parrot_cx_outer_runloop(interp);
@@ -164,8 +159,6 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
         if (alarm_count > 0) {
-            /* TODO: What is this pause? */
-            /* pause; */
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
     } while (alarm_count);
@@ -281,7 +274,7 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
         /* A task switch will only work in the outer runloop of a fully
            booted Parrot. In a Parrot that hasn't called begin_execution,
            or in a nested runloop, we silently ignore task switches. */
-        if (enable_scheduling && interp->current_runloop_level <= 1)
+        if (SCHEDULER_enable_scheduler_TEST(scheduler) && interp->current_runloop_level <= 1)
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
@@ -383,7 +376,7 @@ void
 Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
 {
     ASSERT_ARGS(Parrot_cx_runloop_wake)
-    enable_event_checking(interp);
+    Parrot_runcore_enable_event_checking(interp);
     SCHEDULER_wake_requested_SET(scheduler);
 }
 

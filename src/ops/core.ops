@@ -109,7 +109,7 @@ inline op check_events__() :internal :flow {
         "check_events__ opcode doesn't do anything useful.");
     goto ADDRESS(handler);
     /* Restore op_func_table. */
-    disable_event_checking(interp);
+    Parrot_runcore_disable_event_checking(interp);
     /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
     goto ADDRESS(_this);   /* force this being a branch op */
 }
