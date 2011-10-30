@@ -979,6 +979,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Harness/TestSets.pm                              [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
@@ -1668,6 +1669,7 @@ t/examples/streams.t                                        [test]
 t/examples/subs.t                                           [test]
 t/examples/tutorial.t                                       [test]
 t/ext/winxed/compreg.t                                      [test]
+t/fullharness                                               [test]
 t/harness                                                   [test]
 t/harness.pir                                               [test]
 t/include/fp_equality.t                                     [test]
