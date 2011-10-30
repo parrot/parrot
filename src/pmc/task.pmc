@@ -379,6 +379,33 @@ Send a message to this task.
     }
 
 /*
+    METHOD receive() {
+    }
+*/
+
+    METHOD code(PMC * code :optional, INTVAL has_code :opt_flag) {
+        Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
+        PMC * code;
+        if (has_code) {
+            tdata->code = code;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
+        code = tdata->code;
+        RETURN (PMC *code);
+    }
+
+    METHOD data(PMC * data :optional, INTVAL has_data :opt_flag) {
+        Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
+        PMC * data;
+        if (has_data) {
+            tdata->data = data;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
+        data = tdata->data;
+        RETURN (PMC *data);
+    }
+
+/*
 
 =item METHOD kill()
 

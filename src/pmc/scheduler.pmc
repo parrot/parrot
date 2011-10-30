@@ -34,6 +34,10 @@ pmclass Scheduler auto_attrs {
 
     ATTR PMC          *all_tasks;    /* Hash of all active tasks by ID */
     ATTR UINTVAL       next_task_id; /* ID to assign to the next created task */
+    ATTR INTVAL        enable_preemption;
+                                     /* Can perform uncooperative task preemption */
+    ATTR INTVAL        enable_scheduling;
+                                     /* Can perform task scheduling behaviors */
 
     ATTR Parrot_Interp interp;       /* A link to the scheduler's interpreter. */
 
@@ -62,6 +66,8 @@ Initializes a concurrency scheduler object.
         core_struct->task_queue   = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->alarms       = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->all_tasks    = Parrot_pmc_new(INTERP, enum_class_Hash);
+        core_struct->enable_scheduling = 0;
+        core_struct->enable_preemption = 0;
         core_struct->next_task_id = 0;
         core_struct->interp       = INTERP;
 
