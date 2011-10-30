@@ -118,6 +118,39 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* HEADERIZER BEGIN: src/thread.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
+        __attribute__nonnull__(1);
+
+int Parrot_thread_run(PARROT_INTERP,
+    ARGMOD(PMC *thread_interp_pmc),
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*thread_interp_pmc);
+
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_thread_transfer_sub(
+    ARGOUT(Parrot_Interp destination),
+    ARGIN(Parrot_Interp source),
+    ARGIN(PMC *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(destination);
+
+#define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread_interp_pmc) \
+    , PARROT_ASSERT_ARG(sub))
+#define ASSERT_ARGS_Parrot_thread_transfer_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(destination) \
+    , PARROT_ASSERT_ARG(source) \
+    , PARROT_ASSERT_ARG(sub))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
 
