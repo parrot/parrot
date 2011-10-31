@@ -980,6 +980,9 @@ Return the POST representation of a C<PAST::Control>.
     tail.'push_pirop'('return', retval)
     goto handler_loop
   handler_loop_no_return:
+    # this assumes that we got no exception while setting up
+    # the handlers...
+    tail.'push'(pops)
     unless it, handler_loop_done
     tail.'push_pirop'('goto', skip)
     goto handler_loop
