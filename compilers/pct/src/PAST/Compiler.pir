@@ -855,13 +855,11 @@ Return the POST representation of a C<PAST::Control>.
     null tempregs
     .lex '%*TEMPREGS', tempregs
 
-    .local pmc ops, children, ishandled, nothandled
+    .local pmc ops, children, ishandled
     .local string handled
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('handled_')
     ishandled = $P0.'new'('result'=>$S0)
-    $S0 = self.'unique'('nothandled_')
-    nothandled = $P0.'new'('result'=>$S0)
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     .local string rtype
@@ -876,11 +874,10 @@ Return the POST representation of a C<PAST::Control>.
     ops.'push'(children)
     handled = self.'uniquereg'('I')
     ops.'push_pirop'('set', handled, 'exception["handled"]')
-    ops.'push_pirop'('ne', handled, 1, nothandled)
-    ops.'push'(ishandled)
-    ops.'push_pirop'('return', 'exception')
-    ops.'push'(nothandled)
+    ops.'push_pirop'('eq', handled, 1, ishandled)
     ops.'push_pirop'('rethrow', 'exception')
+    ops.'push'(ishandled)
+    ops.'result'('exception')
     .return (ops)
 .end
 
@@ -977,15 +974,18 @@ Return the POST representation of a C<PAST::Control>.
     ehpir = self.'coerce'(ehpir, result)
   handler_loop_no_result:
     tail.'push'(ehpir)
-    unless addreturn goto handler_loop
+    unless addreturn goto handler_loop_no_return
     .local pmc retval
     retval = ehpir.'result'()
     tail.'push_pirop'('return', retval)
     goto handler_loop
+  handler_loop_no_return:
+    unless it, handler_loop_done
+    tail.'push_pirop'('goto', skip)
+    goto handler_loop
   handler_loop_done:
 
     ops.'push'(child)
-
 
     ops.'push'(pops)
     ops.'push_pirop'('goto', skip)
@@ -1130,7 +1130,7 @@ Return the POST representation of a C<PAST::Block>.
     .local pmc lexregs, outerlexregs
     outerlexregs = find_dynamic_lex '%*LEXREGS'
     null lexregs
-    .lex '%*LEXREGS', lexregs 
+    .lex '%*LEXREGS', lexregs
 
     ##  control exception handler
     .local pmc ctrlpast, ctrllabel
@@ -1156,6 +1156,7 @@ Return the POST representation of a C<PAST::Block>.
     ops = self.'post_children'(node, 'signature'=>$S0)
     ##  result of last child is return from block
     retval = ops[-1]
+    ops.'result'(retval)
     ##  wrap the child with appropriate exception handlers, if any
     .local pmc eh
     eh = node.'handlers'()
