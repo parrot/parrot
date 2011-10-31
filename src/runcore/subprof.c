@@ -14,7 +14,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_subprof.h"
 
 #include "parrot/oplib/ops.h"

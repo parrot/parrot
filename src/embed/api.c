@@ -19,7 +19,6 @@ This file implements functions of the Parrot embedding interface.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
 

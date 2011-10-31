@@ -78,6 +78,7 @@ PIOHANDLE Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
 PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd);
+PARROT_CONST_FUNCTION
 INTVAL Parrot_io_getblksize(PIOHANDLE fd);
 INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle);
 size_t Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len);
@@ -296,6 +297,7 @@ void Parrot_sleep(unsigned int seconds);
 
 PARROT_EXPORT
 void Parrot_usleep(unsigned int microseconds);
+void Parrot_floatval_sleep(FLOATVAL time);
 
 PARROT_EXPORT
 INTVAL Parrot_intval_time(void);

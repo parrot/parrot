@@ -1508,8 +1508,8 @@ Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
                 if (hash->mask + 1 > SPLIT_POINT)
                     Parrot_gc_free_memory_chunk(interp, hash->buckets);
                 else
-                    Parrot_gc_free_fixed_size_storage(interp, HASH_ALLOC_SIZE(hash->mask + 1),
-                        hash->buckets);
+                    Parrot_gc_free_fixed_size_storage(interp,
+                            HASH_ALLOC_SIZE(hash->mask + 1), hash->buckets);
             }
             allocate_buckets(interp, hash, other->mask);
         }

@@ -24,7 +24,6 @@ These are the vtable functions for the ParrotInterpreter base class
 
 */
 
-#include "parrot/embed.h"
 #include "parrot/dynext.h"
 #include "parrot/io.h"
 #include "parrot/runcore_api.h"
@@ -746,6 +745,12 @@ support it.
     METHOD getpid() {
         const INTVAL id = Parrot_getpid();
         RETURN(INTVAL id);
+    }
+
+    METHOD current_task() {
+        Interp * const this_interp = PMC_interp(SELF);
+        PMC * const current_task = this_interp->cur_task;
+        RETURN(PMC *current_task);
     }
 
 }

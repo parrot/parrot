@@ -42,7 +42,6 @@ segments from the input PBC files.
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_sub.h"
-#include "parrot/embed.h"
 
 extern const unsigned char * Parrot_get_config_hash_bytes(void);
 extern int Parrot_get_config_hash_length(void);
@@ -807,13 +806,6 @@ main(int argc, const char **argv)
     Interp * const interp = Parrot_new(NULL);
     STRING * pbcname = NULL;
     PMC * pbcpmc = NULL;
-
-    {
-        const int config_length = Parrot_get_config_hash_length();
-        const unsigned char * const config_bytes =
-            Parrot_get_config_hash_bytes();
-        Parrot_set_configuration_hash_legacy(interp, config_length, config_bytes);
-    }
 
     Parrot_block_GC_mark(interp);
 

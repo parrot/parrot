@@ -25,6 +25,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include <stdio.h>
 
 #include "parrot/parrot.h"
+#include "parrot/events.h"
 #include "private_cstring.h"
 #include "api.str"
 

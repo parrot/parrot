@@ -24,16 +24,22 @@ Implements the core concurrency scheduler.
 /* HEADERIZER END: static */
 
 pmclass Scheduler auto_attrs {
-    ATTR INTVAL        id;         /* The scheduler's ID. */
-    ATTR INTVAL        max_tid;    /* The highest assigned task ID. */
-    ATTR PMC          *task_list;  /* The current list of tasks. */
-    ATTR PMC          *task_index; /* An index into the current list of tasks,
-                                     ordered by priority. */
-    ATTR PMC          *wait_index; /* An unordered index of inactive tasks. */
-    ATTR PMC          *handlers;   /* The list of currently active handlers. */
-    ATTR PMC          *messages;   /* A message queue used for communication
-                                     between schedulers. */
-    ATTR Parrot_Interp interp;     /* A link to the scheduler's interpreter. */
+    ATTR INTVAL        id;           /* The scheduler's ID. */
+    ATTR PMC          *handlers;     /* The list of currently active handlers. */
+    ATTR PMC          *messages;     /* A message queue used for communication
+                                        between schedulers. */
+
+    ATTR PMC          *task_queue;   /* List of tasks/green threads waiting to run */
+    ATTR PMC          *alarms;       /* List of future alarms ordered by time */
+
+    ATTR PMC          *all_tasks;    /* Hash of all active tasks by ID */
+    ATTR UINTVAL       next_task_id; /* ID to assign to the next created task */
+    ATTR INTVAL        enable_preemption;
+                                     /* Can perform uncooperative task preemption */
+    ATTR INTVAL        enable_scheduling;
+                                     /* Can perform task scheduling behaviors */
+
+    ATTR Parrot_Interp interp;       /* A link to the scheduler's interpreter. */
 
 /*
 
@@ -54,15 +60,20 @@ Initializes a concurrency scheduler object.
         PObj_custom_destroy_SET(SELF);
 
         /* Set up the core struct. */
-        core_struct->id          = 0;
-        core_struct->max_tid     = 0;
-        core_struct->task_list   = Parrot_pmc_new(INTERP, enum_class_Hash);
-        VTABLE_set_integer_native(INTERP, core_struct->task_list, Hash_key_type_int);
-        core_struct->task_index  = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
-        core_struct->wait_index  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        core_struct->handlers    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        core_struct->messages    = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        core_struct->interp      = INTERP;
+        core_struct->id           = 0;
+        core_struct->handlers     = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->messages     = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->task_queue   = Parrot_pmc_new(INTERP, enum_class_PMCList);
+        core_struct->alarms       = Parrot_pmc_new(INTERP, enum_class_PMCList);
+        core_struct->all_tasks    = Parrot_pmc_new(INTERP, enum_class_Hash);
+        core_struct->enable_scheduling = 0;
+        core_struct->enable_preemption = 0;
+        core_struct->next_task_id = 0;
+        core_struct->interp       = INTERP;
+
+        /* Chandon TODO: Delete from int-keyed hash doesn't like me. */
+        /* VTABLE_set_integer_native(interp, core_struct->all_tasks, Hash_key_type_int); */
+
     }
 
 
@@ -101,7 +112,6 @@ An C<Integer> representing the unique identifier for this scheduler.
             core_struct->id = VTABLE_get_integer(INTERP, elem);
     }
 
-
 /*
 
 =item C<void push_pmc(PMC *value)>
@@ -114,24 +124,10 @@ current maximum, and a birthtime of the current time.
 */
 
     void push_pmc(PMC *task) {
+        /* TODO: This doesn't appear to do anything */
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        INTVAL                   new_tid;
-
-        VTABLE_set_number_native(INTERP, task, Parrot_floatval_time());
-
-        new_tid     = ++(core_struct->max_tid);
-        VTABLE_set_integer_native(INTERP, task, new_tid);
-
-        VTABLE_set_pmc_keyed_int(INTERP, core_struct->task_list,
-                                         new_tid, task);
-
-        if (task->vtable->base_type == enum_class_Timer)
-            VTABLE_push_integer(INTERP, core_struct->wait_index, new_tid);
-        else
-            VTABLE_push_integer(INTERP, core_struct->task_index, new_tid);
-
-        if (!VTABLE_does(interp, task, CONST_STRING(interp, "Exception")))
-            Parrot_cx_runloop_wake(core_struct->INTERP, SELF);
+        PMC * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
+        STRING * const type = VTABLE_get_string(interp, type_pmc);
     }
 
 
@@ -147,20 +143,8 @@ recalculates it before retrieving the next task.
 */
 
     VTABLE PMC *pop_pmc() {
-        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        PMC *task = PMCNULL;
-
-        /* Pull the next valid task off the task list, skipping expired and
-         * deleted tasks. */
-        while (PMC_IS_NULL(task)
-        &&     VTABLE_elements(INTERP, core_struct->task_index) > 0) {
-            const INTVAL tid = VTABLE_shift_integer(INTERP, core_struct->task_index);
-
-            if (tid > 0)
-                task = VTABLE_get_pmc_keyed_int(INTERP,
-                            core_struct->task_list, tid);
-        }
-
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        PMC * const task = VTABLE_shift_pmc(INTERP, core_struct->task_queue);
         return task;
     }
 
@@ -177,24 +161,7 @@ Retrieves the number of pending tasks in the scheduler's task list.
 
     VTABLE INTVAL get_integer() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        return VTABLE_elements(INTERP, core_struct->task_index);
-    }
-
-
-/*
-
-=item C<void delete_keyed_int(INTVAL key)>
-
-Removes the task with the given task ID from the task list.
-
-=cut
-
-*/
-
-    VTABLE void delete_keyed_int(INTVAL key) {
-        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-
-        VTABLE_delete_keyed_int(INTERP, core_struct->task_list, key);
+        return VTABLE_elements(INTERP, core_struct->task_queue);
     }
 
 
@@ -228,12 +195,12 @@ Marks any referenced strings and PMCs as live.
         if (PARROT_SCHEDULER(SELF)) {
             Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
-            Parrot_gc_mark_PMC_alive(INTERP, core_struct->task_list);
-            Parrot_gc_mark_PMC_alive(INTERP, core_struct->task_index);
-            Parrot_gc_mark_PMC_alive(INTERP, core_struct->wait_index);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->handlers);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->messages);
-        }
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->task_queue);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->alarms);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->all_tasks);
+       }
     }
 
 
@@ -251,10 +218,16 @@ C<*info> is the visit info (see F<include/parrot/pmc_freeze.h>).
 
     VTABLE void visit(PMC *info) {
         /* 1) visit task list */
-        VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, task_list);
+        VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, task_queue);
 
         /* 2) visit the handlers */
         VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, handlers);
+
+        /* 3) visit the alarms */
+        VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, alarms);
+
+        /* 3) visit all tasks */
+        VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, all_tasks);
     }
 
 
@@ -273,11 +246,7 @@ Archives the scheduler.
 
         /* 1) freeze scheduler id */
         VTABLE_push_integer(INTERP, info, core_struct->id);
-
-        /* 2) freeze maximum task id */
-        VTABLE_push_integer(INTERP, info, core_struct->max_tid);
     }
-
 
 /*
 
@@ -293,17 +262,11 @@ Unarchives the scheduler.
         /* 1. thaw scheduler id */
         const INTVAL id = VTABLE_shift_integer(INTERP, info);
 
-        /* 2. thaw maximum task id */
-        const INTVAL max_tid = VTABLE_shift_integer(INTERP, info);
-
         /* Allocate the scheduler's core data struct and set custom flags. */
         SELF.init();
 
         /* Set the scheduler's id to the frozen id */
         PARROT_SCHEDULER(SELF)->id = id;
-
-        /* Set the scheduler's maximum task id to the frozen tid */
-        PARROT_SCHEDULER(SELF)->max_tid = max_tid;
     }
 
 
@@ -318,7 +281,7 @@ Finishes thawing the scheduler.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_cx_refresh_task_list(INTERP, SELF);
+        /* Parrot_cx_refresh_task_list(INTERP, SELF); */
     }
 
 
@@ -336,156 +299,29 @@ Finishes thawing the scheduler.
 
 /*
 
-=item C<METHOD add_handler(PMC *handler)>
+=item C<METHOD active_tasks()>
 
-Adds a handler to the scheduler.
-
-=cut
-
-*/
-
-    METHOD add_handler(PMC *handler) {
-        const Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        VTABLE_unshift_pmc(INTERP, core_struct->handlers, handler);
-    }
-
-
-/*
-
-=item C<METHOD delete_handler(STRING *type :optional, INTVAL have_type :opt_flag)>
-
-Deletes a handler from the scheduler.
+Returns a ResizablePMCArray containing pointers to all active tasks.
 
 =cut
 
 */
 
-    METHOD delete_handler(STRING *type :optional, INTVAL have_type :opt_flag) {
-        PMC    *handlers;
-        INTVAL  elements, index;
-        STRING * const except_str = CONST_STRING(INTERP, "exception");
-        STRING * const event_str  = CONST_STRING(INTERP, "event");
+    METHOD active_tasks() {
+        Parrot_Scheduler_attributes *sdata = PARROT_SCHEDULER(SELF);
+        PMC * const tasks = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC * const iter  = Parrot_pmc_new_init(interp, enum_class_HashIterator, sdata->all_tasks);
 
-        GET_ATTR_handlers(INTERP, SELF, handlers);
-        elements = VTABLE_elements(INTERP, handlers);
-
-        if (!have_type)
-            VTABLE_shift_pmc(INTERP, handlers);
-
-        /* Loop from newest handler to oldest handler. */
-        for (index = 0; index < elements; ++index) {
-            const PMC * const handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
-            if (!PMC_IS_NULL(handler)) {
-                if (STRING_equal(INTERP, type, except_str)
-                &&  handler->vtable->base_type == enum_class_ExceptionHandler) {
-                    VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
-                    RETURN(void);
-                }
-                else if (STRING_equal(INTERP, type, event_str)
-                     && handler->vtable->base_type == enum_class_EventHandler) {
-                    VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
-                    RETURN(void);
-               }
-            }
+        while (!VTABLE_get_bool(interp, iter)) {
+            PMC * const pair = VTABLE_shift_pmc(interp, iter);
+            PMC * task = PMCNULL;
+            STRING * const value = CONST_STRING(interp, "value");
+            Parrot_pcc_invoke_method_from_c_args(interp, pair,
+                value, "->P", &task);
+            VTABLE_push_pmc(interp, tasks, task);
         }
 
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "No handler to delete.");
-    }
-
-
-/*
-
-=item C<METHOD find_handler(PMC *task)>
-
-Searchs for a handler for the given task. If no handler is found, returns
-PMCNULL.
-
-=cut
-
-*/
-
-    METHOD find_handler(PMC *task) {
-        STRING * const handled_str = CONST_STRING(INTERP, "handled");
-        STRING * const iter_str    = CONST_STRING(INTERP, "handler_iter");
-        STRING * const exception_str = CONST_STRING(INTERP, "Exception");
-        PMC    *iter;
-
-        /* Exceptions store the handler iterator for rethrow, other kinds of
-         * tasks don't (though they could). */
-        if (VTABLE_does(interp, task, exception_str)
-        &&  VTABLE_get_integer_keyed_str(INTERP, task, handled_str) == -1) {
-            iter = VTABLE_get_attr_str(INTERP, task, iter_str);
-        }
-        else {
-            PMC *handlers;
-            GET_ATTR_handlers(INTERP, SELF, handlers);
-            iter = VTABLE_get_iter(INTERP, handlers);
-
-            if (task->vtable->base_type == enum_class_Exception)
-                VTABLE_set_attr_str(INTERP, task, iter_str, iter);
-        }
-
-        /* Loop from newest handler to oldest handler. */
-        while (VTABLE_get_bool(INTERP, iter)) {
-            PMC * const handler = VTABLE_shift_pmc(INTERP, iter);
-
-            INTVAL valid_handler;
-            if (!PMC_IS_NULL(handler)) {
-                (const INTVAL valid_handler) = PCCINVOKE(INTERP, handler, "can_handle", PMC *task);
-                if (valid_handler) {
-                    if (!VTABLE_does(interp, task, exception_str))
-                        VTABLE_set_integer_native(INTERP, handler, 1);
-                    RETURN(PMC *handler);
-                }
-            }
-
-        }
-
-        RETURN(PMC *PMCNULL);
-    }
-
-
-/*
-
-=item C<METHOD count_handlers(STRING *type :optional, INTVAL have_type :opt_flag)>
-
-Returns the number of handlers currently held by the scheduler. If a type
-argument is passed, only counts handlers of that type (C<event>, C<exception>).
-If no type argument is passed, counts all handlers.
-
-=cut
-
-*/
-
-    METHOD count_handlers(STRING *type :optional, INTVAL have_type :opt_flag) {
-        /* avoid uninitialized value warning */
-        PMC   *handlers = NULL;
-        INTVAL elements;
-        INTVAL count    = 0;
-        INTVAL index;
-
-        GET_ATTR_handlers(INTERP, SELF, handlers);
-        elements = VTABLE_elements(INTERP, handlers);
-
-        if (!have_type)
-            RETURN(INTVAL elements);
-
-        for (index = 0; index < elements; ++index) {
-            const PMC * const handler   = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
-            const STRING * const exception = CONST_STRING(INTERP, "exception");
-            const STRING * const event     = CONST_STRING(INTERP, "event");
-
-            if (!PMC_IS_NULL(handler)) {
-                if ((STRING_equal(INTERP, type, exception)
-                &&   handler->vtable->base_type == enum_class_ExceptionHandler)
-                || (STRING_equal(INTERP, type, event)
-                &&  handler->vtable->base_type == enum_class_EventHandler))
-                        ++count;
-            }
-        }
-
-        RETURN(INTVAL count);
+        RETURN(PMC* tasks);
     }
 }
 

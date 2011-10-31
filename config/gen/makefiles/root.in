@@ -374,6 +374,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/pmc_freeze.h \
 	$(INC_DIR)/vtable.h \
 	$(INC_DIR)/context.h \
+	$(INC_DIR)/disassemble.h \
 	$(INC_DIR)/exceptions.h \
 	$(INC_DIR)/warnings.h \
 	$(INC_DIR)/memory.h \
@@ -437,8 +438,8 @@ INTERP_O_FILES = \
 	src/core_pmcs$(O) \
 	src/datatypes$(O) \
 	src/debug$(O) \
+	src/disassemble$(O) \
 	src/dynext$(O) \
-	src/embed$(O) \
 	src/embed/api$(O) \
 	src/embed/bytecode$(O) \
 	src/embed/strings$(O) \
@@ -448,6 +449,7 @@ INTERP_O_FILES = \
 	src/exit$(O) \
 	src/extend$(O) \
 	src/extend_vtable$(O) \
+	src/alarm$(O) \
 	src/gc/alloc_memory$(O) \
 	src/gc/alloc_resources$(O) \
 	src/gc/api$(O) \
@@ -491,6 +493,7 @@ INTERP_O_FILES = \
 	src/runcore/profiling$(O) \
 	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
+	src/events$(O) \
 	src/spf_render$(O) \
 	src/spf_vtable$(O) \
 	src/sub$(O) \
@@ -704,12 +707,12 @@ STR_FILES = \
 	src/runcore/profiling.str \
 	src/runcore/subprof.str \
 	src/scheduler.str \
+	src/events.str \
 	src/spf_render.str \
 	src/spf_vtable.str \
 	src/string/api.str \
 	src/string/encoding.str \
 	src/sub.str \
-	src/embed.str \
 	$(CLASS_STR_FILES)
 
 src/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
@@ -790,6 +793,7 @@ help :
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
+	@echo "  smolder_fulltest:  Run 'make fulltest' and send report to the smolder server"
 	@echo "  smoke:             Alias for smolder_test."
 	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
 	@echo ""
@@ -999,7 +1003,21 @@ src/scheduler$(O) : \
 	$(INC_PMC_DIR)/pmc_timer.h \
 	$(EXTEND_HEADERS) \
 	$(INC_DIR)/scheduler_private.h \
+	$(INC_DIR)/alarm.h \
+	$(INC_PMC_DIR)/pmc_pmclist.h \
+	$(INC_PMC_DIR)/pmc_alarm.h \
+	$(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h
+
+src/events$(O) : \
+	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/events.h \
+	src/events.c \
+	src/events.str \
+	$(INC_DIR)/runcore_api.h
+
+src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
+	$(INC_DIR)/alarm.h
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
 
@@ -1073,8 +1091,7 @@ $(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(
 frontend/parrot_debugger/main$(O) : \
 	$(PARROT_H_HEADERS) \
 	frontend/parrot_debugger/main.c \
-	$(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/embed.h
+	$(INC_DIR)/runcore_api.h
 
 $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1131,7 +1148,6 @@ $(PDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) $(LIBPARROT
 frontend/pbc_dump/main$(O) : \
 	$(INC_DIR)/longopt.h \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(PARROT_H_HEADERS) \
@@ -1470,9 +1486,8 @@ src/runcore/trace$(O) : \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h
 
-src/debug$(O) : $(INC_DIR)/embed.h \
+src/debug$(O) : \
 	$(PARROT_H_HEADERS) src/debug.c \
-	$(EXTEND_HEADERS) \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
@@ -1491,7 +1506,8 @@ src/sub$(O) : \
 	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
-	src/string/private_cstring.h src/string/api.c
+	src/string/private_cstring.h src/string/api.c \
+	$(INC_DIR)/events.h
 
 src/longopt$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1504,13 +1520,17 @@ src/dynext$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/dynext.h \
 
 src/exceptions$(O) : $(PARROT_H_HEADERS) \
 	src/exceptions.str src/exceptions.c \
+	$(INC_DIR)/events.h \
 	$(INC_PMC_DIR)/pmc_continuation.h
+
+src/threads$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/threads.c
 
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	$(INC_PMC_DIR)/pmc_sub.h \
+    $(INC_DIR)/events.h \
 	src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extend.c
 
@@ -1527,7 +1547,6 @@ src/runcore/main$(O) : \
 
 src/runcore/subprof$(O) : src/runcore/subprof.str src/runcore/subprof.c \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
@@ -1539,7 +1558,7 @@ src/runcore/profiling$(O) : src/runcore/profiling.str src/runcore/profiling.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_PMC_DIR)/pmc_namespace.h \
 	$(INC_DIR)/oplib/core_ops.h $(INC_DIR)/runcore_api.h \
-	$(INC_DIR)/runcore_profiling.h $(INC_DIR)/embed.h \
+	$(INC_DIR)/runcore_profiling.h \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS)
 
@@ -1567,6 +1586,7 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(EXTEND_HEADERS) \
+	$(INC_PMC_DIR)/pmc_callback.h \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
 src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
@@ -1643,9 +1663,8 @@ src/packfile/api$(O) : \
 	$(INC_PMC_DIR)/pmc_packfileview.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
-	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
+	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/runcore_api.h
 
 src/packfile/output$(O) : \
@@ -1655,7 +1674,6 @@ src/packfile/output$(O) : \
 	$(INC_DIR)/dynext.h \
 	$(INC_DIR)/runcore_api.h \
 	src/packfile/pf_private.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/packfile/output.c
 
@@ -1669,7 +1687,6 @@ src/packfile/segments$(O) : \
 	src/packfile/segments.str \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	src/packfile/pf_private.h \
@@ -1763,28 +1780,22 @@ src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	$(INC_DIR)/dynext.h $(INC_DIR)/embed.h $(INC_DIR)/oplib/core_ops.h \
+	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
 	$(PARROT_H_HEADERS)
 
-src/embed$(O) : \
+src/disassemble$(O) : \
 	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS) \
-	src/embed.c \
-	src/embed.str \
+	src/disassemble.c \
 	$(INC_DIR)/oplib/ops.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	include/imcc/embed.h \
-	include/imcc/yyscanner.h \
 
 src/embed/api$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/api.c \
 	src/embed/embed_private.h \
@@ -1793,7 +1804,6 @@ src/embed/api$(O) : \
 src/embed/bytecode$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/runcore_api.h \
 	src/embed/bytecode.c \
 	src/embed/embed_private.h \
@@ -1944,7 +1954,6 @@ src/string/encoding/ucs4$(O) : \
 	src/string/encoding/unicode.h
 
 frontend/pbc_merge/main$(O) : \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/longopt.h \
 	frontend/pbc_merge/main.c \
@@ -1966,12 +1975,14 @@ src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/dynext.h \
-	$(INC_DIR)/embed.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_task.h \
+	$(INC_DIR)/events.h \
+	$(INC_DIR)/scheduler_private.h \
 	src/io/io_private.h
 
 
@@ -2143,6 +2154,9 @@ smolder_test : test_prep
 smolder_coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
+smolder_fulltest : test_prep
+	$(PERL) t/fullharness --archive --send-to-smolder
+
 smoke : smolder_test
 
 resubmit_smolder :
@@ -2158,21 +2172,8 @@ check : test
 # Test various run cores and other stuff
 # 'testg' and 'testj' are tested only
 # when the needed runcores are available
-fulltest :
-	-@make@ testb \
-	testf \
-	testr \
-	src_tests \
-	run_tests \
-	buildtools_tests \
-	perl_tests \
-	library_tests \
-	codetest \
-	benchmark_tests \
-	manifest_tests \
-	examples_tests \
-	distro_tests \
-	headerizer_tests
+fulltest : test_prep
+	$(PERL) t/fullharness
 
 all_hll_test :
 	$(PERL) tools/dev/all_hll_test.pl
