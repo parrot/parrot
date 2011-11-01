@@ -21,6 +21,7 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "parrot/runcore_api.h"
 #include "parrot/alarm.h"
 #include "parrot/scheduler.h"
+#include "parrot/thread.h"
 
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_task.h"
@@ -401,6 +402,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
     ASSERT_ARGS(Parrot_cx_schedule_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     PMC * task = PMCNULL;
+    PMC * thread;
 
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -421,11 +423,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
-    VTABLE_push_pmc(interp, sched->task_queue, task);
-
-    /* going from single to multi tasking? */
-    if (VTABLE_get_integer(interp, sched->task_queue) == 1)
-        Parrot_cx_enable_preemption(interp);
+    thread = Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_CODE | PARROT_CLONE_RUNOPS | PARROT_CLONE_INTERP_FLAGS | PARROT_CLONE_HLL);
+    Parrot_thread_schedule_task(interp, thread, task);
+    Parrot_thread_run(interp, thread, task, NULL);
 }
 
 /*

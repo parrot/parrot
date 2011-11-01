@@ -239,6 +239,8 @@ struct parrot_interp_t {
     UINTVAL          last_alarm;              /* has an alarm triggered? */
     FLOATVAL         quantum_done;            /* expiration of current quantum */
 
+    struct _Thread_data *thread_data;         /* thread specific items */
+
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
     /* during a call sequencer the caller fills these objects

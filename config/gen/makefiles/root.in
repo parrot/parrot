@@ -1034,6 +1034,7 @@ src/thread$(O) : \
 	$(EXTEND_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_scheduler.h \
 	$(INC_DIR)/runcore_api.h \
 	src/thread.c
 

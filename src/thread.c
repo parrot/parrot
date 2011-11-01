@@ -22,6 +22,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "parrot/thread.h"
 #include "parrot/atomic.h"
 #include "parrot/runcore_api.h"
+#include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
@@ -45,6 +46,9 @@ static PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_CAN_RETURN_NULL
+static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
+
 #define ASSERT_ARGS_Parrot_thread_make_local_args_copy \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -53,6 +57,7 @@ static PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(from) \
     , PARROT_ASSERT_ARG(arg))
+#define ASSERT_ARGS_Parrot_thread_outer_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -76,6 +81,9 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     Interp * const new_interp     = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
 
     clone_interpreter(new_interp, interp, clone_flags);
+    new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
+    new_interp->thread_data->tid = 0;
+    PARROT_GC_WRITE_BARRIER(interp, new_interp);
 
     return new_interp_pmc;
 }
@@ -98,17 +106,82 @@ Parrot_thread_run(PARROT_INTERP, ARGMOD(PMC *thread_interp_pmc), ARGIN(PMC *sub)
     ASSERT_ARGS(Parrot_thread_run)
     Interp * const thread_interp = (Interp *)VTABLE_get_pointer(interp, thread_interp_pmc);
 
-    SETATTR_ParrotInterpreter_sub(interp, thread_interp_pmc,
-                                  Parrot_thread_transfer_sub(thread_interp, interp, sub));
+    /*SETATTR_ParrotInterpreter_sub(interp, thread_interp_pmc,
+                                  Parrot_thread_transfer_sub(thread_interp, interp, sub)); */
     VTABLE_set_pmc(interp, thread_interp_pmc,
                    Parrot_thread_make_local_args_copy(thread_interp, interp, arg));
-    /* thread_interp->thread_data->state = THREAD_STATE_JOINABLE; */
+    thread_interp->thread_data->state = THREAD_STATE_JOINABLE;
 
-    /* THREAD_CREATE_JOINABLE(thread_interp->thread_data->thread,
-                              thread_func, thread_interp_pmc); */
+    THREAD_CREATE_JOINABLE(thread_interp->thread_data->thread,
+                              Parrot_thread_outer_runloop, thread_interp_pmc);
 
-    /* return thread_interp->thread_data->tid; */
-    return 0;
+    return thread_interp->thread_data->tid;
+}
+
+/*
+
+=item C<void Parrot_thread_schedule_task(PARROT_INTERP, PMC *thread, PMC *task)>
+
+Schedule a task with the thread's scheduler.
+
+=cut
+
+*/
+
+void
+Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
+{
+    ASSERT_ARGS(Parrot_thread_schedule_task)
+    PMC * const   self                        = (PMC*) thread;
+    Parrot_Interp thread_interp               =
+       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
+    PMC * const scheduler                     = thread_interp->scheduler;
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(thread_interp->scheduler);
+
+    VTABLE_push_pmc(thread_interp, sched->task_queue, task);
+}
+
+/*
+
+=item C<static void* Parrot_thread_outer_runloop(void *arg)>
+
+Run a Parrot_thread
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+static void*
+Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
+{
+    ASSERT_ARGS(Parrot_thread_outer_runloop)
+    PMC * const      self    = (PMC*) arg;
+    PMC             *ret_val = PMCNULL;
+    Parrot_Interp    interp  =
+       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
+
+    PMC * const scheduler = interp->scheduler;
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
+    INTVAL alarm_count;
+
+    Parrot_block_GC_mark(interp);
+    Parrot_block_GC_sweep(interp);
+
+    /* need to set it here because argument passing can trigger GC */
+    /* interp->lo_var_ptr = &lo_var_ptr; */
+
+    while (VTABLE_get_integer(interp, sched->task_queue) > 0) {
+        /* there can be no active runloops at this point, so it should be save
+         * to start counting at 0 again. This way the continuation in the next
+         * task will find a runloop with id 1 when encountering an exception */
+        interp->current_runloop_level = 0;
+        reset_runloop_id_counter(interp);
+
+        Parrot_cx_next_task(interp, scheduler);
+    }
+
+    return ret_val;
 }
 
 /*

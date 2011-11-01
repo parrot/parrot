@@ -131,6 +131,13 @@ int Parrot_thread_run(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*thread_interp_pmc);
 
+void Parrot_thread_schedule_task(PARROT_INTERP,
+    ARGIN(PMC *thread),
+    ARGIN(PMC *task))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_thread_transfer_sub(
     ARGOUT(Parrot_Interp destination),
@@ -147,6 +154,10 @@ PMC * Parrot_thread_transfer_sub(
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread_interp_pmc) \
     , PARROT_ASSERT_ARG(sub))
+#define ASSERT_ARGS_Parrot_thread_schedule_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread) \
+    , PARROT_ASSERT_ARG(task))
 #define ASSERT_ARGS_Parrot_thread_transfer_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(destination) \
     , PARROT_ASSERT_ARG(source) \
