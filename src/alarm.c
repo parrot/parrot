@@ -93,7 +93,7 @@ posix_alarm_set(FLOATVAL wait)
 #else
     const int MIL = 1000000;
     struct itimerval itmr;
-    int sec, usec;e sr
+    int sec, usec;
 
     sec  = (int) wait;
     usec = (int) ((wait - sec) * MIL);
