@@ -3,7 +3,7 @@
         + The mark VTABLE was added to the Select PMC
         + The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
             at https://github.com/parrot/parrot-embed
-        + A set_random VTABLE was added to the Integer PMC, so random numbers can
+        + A set_random method was added to the Integer PMC, so random numbers can
             be generated without needing to load math dynops
         + A new implementation of green threads was added to Parrot, in preparation
         for a robust hybrid threading system
