@@ -27,7 +27,7 @@
     push contents, 'report_file'
     $P0 = new 'FixedStringArray'
     set $P0, 1
-    $P0[0] = 'parrot_test_run.tar.gz'
+    $P0[0] = 't/archive/parrot_test_run.tar.gz'
     push contents, $P0
     load_bytecode 'LWP/UserAgent.pir'
     .const string url = 'http://smolder.parrot.org/app/projects/process_add_report/1'
