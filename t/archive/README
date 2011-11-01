@@ -1,4 +1,3 @@
-README for directory t/archive/
+README for t/archive
 
-This directory exists to have a location for temporary storage of a tarball
-created by t/harness or t/fullharness.
+This directory holds parrot_test_run.tar.gz.
