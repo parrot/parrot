@@ -202,11 +202,15 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC * const scheduler))
     if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Found a non-Task in the task queue.\n");
-
+            
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     if (VTABLE_get_integer(interp, sched->task_queue) > 0)
         Parrot_cx_enable_preemption(interp);
     else
         Parrot_cx_disable_preemption(interp);
+#endif
 
     Parrot_ext_call(interp, task, "->");
 }
@@ -272,10 +276,14 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     /* Some alarm seems to have fired, but not the scheduler's.
      * Re-set the scheduler alarm */
     if (sched->enable_preemption)
         Parrot_alarm_set(interp->quantum_done);
+#endif
 
     return next;
 }
@@ -436,9 +444,13 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
 
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     /* going from single to multi tasking? */
     if (VTABLE_get_integer(interp, sched->task_queue) == 1)
         Parrot_cx_enable_preemption(interp);
+#endif
 }
 
 /*
@@ -660,9 +672,13 @@ static void
 Parrot_cx_enable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_enable_preemption)
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     sched->enable_preemption = 1;
     Parrot_cx_set_scheduler_alarm(interp);
+#endif
 }
 
 /*
