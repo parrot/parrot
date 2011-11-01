@@ -202,7 +202,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC * const scheduler))
     if (!VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Found a non-Task in the task queue.\n");
-            
+
 #ifdef _WIN32
     /* TODO: Implement on Windows */
 #else
