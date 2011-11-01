@@ -2476,7 +2476,7 @@ test-clean :
 	 "test$(EXE)" \
 	 "test.*"
 	$(RM_F) \
-	 "parrot_test_run.tar.gz" \
+	 "t/archive/parrot_test_run.tar.gz" \
 	 ".pod_examinable*.sto"
 
 # a failing step of cleaning, usually doesn't concern the following steps

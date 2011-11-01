@@ -1442,6 +1442,7 @@ src/vtables.c                                               []
 src/warnings.c                                              []
 t/README.pod                                                []doc
 t/TESTS_STATUS.pod                                          [test]
+t/archive/README                                            []doc
 t/benchmark/benchmarks.t                                    [test]
 t/codingstd/c_arg_assert.t                                  [test]
 t/codingstd/c_code_coda.t                                   [test]

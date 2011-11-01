@@ -10,7 +10,7 @@ use Parrot::Harness::Smoke qw(
     send_archive_to_smolder
 );
 
-my $tarball = 'parrot_test_run.tar.gz';
+my $tarball = 't/archive/parrot_test_run.tar.gz';
 die "Could not locate $tarball" unless (-f $tarball);
 
 send_archive_to_smolder(collect_test_environment_data());
@@ -30,7 +30,8 @@ needed to resubmit a smoke test tarball to our Smolder server if the initial
 transmission of that tarball failed.
 
 The command should be run from the top-level of your checkout of Parrot.  It
-will fail if no file named F<parrot_test_run.tar.gz> exists in that directory.
+will fail if no file named F<t/archive/parrot_test_run.tar.gz> exists in that
+directory.
 
 =head1 AUTHOR
 
