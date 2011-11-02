@@ -22,6 +22,8 @@ to the appropriate handler asynchronously.
 #include "parrot/events.h"
 
 #include "events.str"
+#include "pmc/pmc_arrayiterator.h"
+
 
 /* HEADERIZER HFILE: include/parrot/events.h */
 
@@ -52,11 +54,9 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void Parrot_cx_delete_handler_local(PARROT_INTERP, STRING
-*handler_type)>
+=item C<void Parrot_cx_delete_handler_local(PARROT_INTERP)>
 
-Remove the top task handler of a particular type from the context's list of
-handlers.
+Remove the top task handler from the context's list of handlers.
 
 =cut
 
@@ -64,7 +64,7 @@ handlers.
 
 PARROT_EXPORT
 void
-Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+Parrot_cx_delete_handler_local(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_delete_handler_local)
     PMC *handlers  = Parrot_pcc_get_handlers(interp, interp->ctx);
@@ -73,60 +73,20 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "No handler to delete.");
 
-    if (STRING_IS_NULL(handler_type) || STRING_IS_EMPTY(handler_type))
-        VTABLE_shift_pmc(interp, handlers);
-    else {
-        /* Loop from newest handler to oldest handler. */
-        STRING      *exception_str = CONST_STRING(interp, "exception");
-        STRING      *event_str     = CONST_STRING(interp, "event");
-        STRING      *handler_str   = CONST_STRING(interp, "ExceptionHandler");
-        const INTVAL elements      = VTABLE_elements(interp, handlers);
-        INTVAL       index;
-        typedef enum { Hunknown,  Hexception, Hevent } Htype;
+    /* test elements so that we get a nice error message */
+    if (!VTABLE_elements(interp, handlers))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "No handler to delete.");
 
-        const Htype htype =
-            Parrot_str_equal(interp, handler_type, exception_str) ?
-            Hexception :
-            Parrot_str_equal(interp, handler_type, event_str) ?
-                Hevent :
-                Hunknown;
-        STRING * const handler_name = (htype == Hexception) ? handler_str : (STRING *)NULL;
-
-        for (index = 0; index < elements; ++index) {
-            PMC * const handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
-            if (!PMC_IS_NULL(handler)) {
-                switch (htype) {
-                  case Hexception:
-                    if (VTABLE_isa(interp, handler, handler_name)) {
-                        VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                        return;
-                    }
-                    break;
-                  case Hevent:
-                    if (handler->vtable->base_type == enum_class_EventHandler) {
-                        VTABLE_set_pmc_keyed_int(interp, handlers, index, PMCNULL);
-                        return;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-            }
-        }
-
-        Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_INVALID_OPERATION, "No handler to delete.");
-    }
+    VTABLE_shift_pmc(interp, handlers);
 }
 
 
 /*
 
-=item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP, STRING
-*handler_type)>
+=item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP)>
 
-Count the number of active handlers of a particular type from the
-context's list of handlers.
+Count the number of active handlers from the context's list of handlers.
 
 =cut
 
@@ -134,7 +94,7 @@ context's list of handlers.
 
 PARROT_EXPORT
 INTVAL
-Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+Parrot_cx_count_handlers_local(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_count_handlers_local)
     PMC * const handlers = Parrot_pcc_get_handlers(interp, interp->ctx);
@@ -143,47 +103,7 @@ Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
     if (PMC_IS_NULL(handlers))
         return 0;
 
-    elements = VTABLE_elements(interp, handlers);
-
-    if (STRING_IS_NULL(handler_type) || STRING_IS_EMPTY(handler_type))
-        return elements;
-
-    /* Loop from newest handler to oldest handler. */
-    {
-        STRING      *exception_str = CONST_STRING(interp, "exception");
-        STRING      *event_str     = CONST_STRING(interp, "event");
-        STRING      *handler_str   = CONST_STRING(interp, "ExceptionHandler");
-        INTVAL       count = 0;
-        INTVAL       index;
-        typedef enum { Hunknown,  Hexception, Hevent } Htype;
-
-        const Htype htype =
-            (Parrot_str_equal(interp, handler_type, exception_str)) ?
-            Hexception :
-            (Parrot_str_equal(interp, handler_type, event_str)) ?
-                Hevent :
-                Hunknown;
-        STRING * const handler_name = (htype == Hexception) ? handler_str : (STRING *)NULL;
-
-        for (index = 0; index < elements; ++index) {
-            PMC * const handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
-            if (!PMC_IS_NULL(handler)) {
-                switch (htype) {
-                  case Hexception:
-                    if (VTABLE_isa(interp, handler, handler_name))
-                        ++count;
-                    break;
-                  case Hevent:
-                    if (handler->vtable->base_type == enum_class_EventHandler)
-                        ++count;
-                    break;
-                  default:
-                    break;
-                }
-            }
-        }
-        return count;
-    }
+    return VTABLE_elements(interp, handlers);
 }
 
 
@@ -366,6 +286,20 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
             VTABLE_get_integer_keyed_str(interp, task, handled_str) == -1) {
             iter    = VTABLE_get_attr_str(interp, task, handler_iter_str);
             context = (PMC *)VTABLE_get_pointer(interp, task);
+            if (!PMC_IS_NULL(iter) && iter->vtable->base_type == enum_class_ArrayIterator) {
+                /* We have to be a bit careful here, as the handler array
+                 * may have been changed in the meantime. We assume the tail
+                 * has been left unchanged. */
+                INTVAL iterelements = VTABLE_elements(interp, iter);
+                INTVAL arrayelements;
+                PMC *iterarray;
+                GETATTR_ArrayIterator_array(interp, iter, iterarray);
+                arrayelements = VTABLE_elements(interp, iterarray);
+                if (iterelements > arrayelements)
+                    iterelements = arrayelements;
+                SETATTR_ArrayIterator_length(interp, iter, arrayelements);
+                SETATTR_ArrayIterator_pos(interp, iter, arrayelements - iterelements);
+            }
         }
         else {
             PMC * handlers;

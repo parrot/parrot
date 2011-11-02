@@ -359,7 +359,7 @@ Parrot_ext_try(PARROT_INTERP,
             if (curctx != initialctx) {
                 POP_CONTEXT(interp, curctx, initialctx);
             }
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
             break;
           default: /* catch */
             {
@@ -368,7 +368,7 @@ Parrot_ext_try(PARROT_INTERP,
                 if (curctx != initialctx) {
                     POP_CONTEXT(interp, curctx, initialctx);
                 }
-                Parrot_cx_delete_handler_local(interp, STRINGNULL);
+                Parrot_cx_delete_handler_local(interp);
                 if (chandler)
                     (*chandler)(interp, exception, data);
             }

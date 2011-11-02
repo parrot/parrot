@@ -13716,7 +13716,7 @@ Parrot_push_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_pop_eh(opcode_t *cur_opcode, PARROT_INTERP) {
-    Parrot_cx_delete_handler_local(interp, Parrot_str_new_constant(interp, "exception"));
+    Parrot_cx_delete_handler_local(interp);
     return (opcode_t *)cur_opcode + 1;
 }
 
@@ -13772,7 +13772,7 @@ Parrot_rethrow_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_count_eh_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_cx_count_handlers_local(interp, Parrot_str_new_constant(interp, "exception"));
+    IREG(1) = Parrot_cx_count_handlers_local(interp);
     return (opcode_t *)cur_opcode + 2;
 }
 

@@ -750,7 +750,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 
         if (setjmp(jmp.resume)) {
             /* catch */
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
             retv =  Parrot_str_new_init(interp, c, strlen(c),
                                         Parrot_binary_encoding_ptr, 0);
         }
@@ -759,7 +759,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
             Parrot_ex_add_c_handler(interp, &jmp);
             retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                         Parrot_platform_encoding_ptr, 0);
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
         }
 
         return retv;
