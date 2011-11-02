@@ -837,7 +837,8 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         }
         positional_args = 0;
         call_object = NULL;  /* so we don't need to use PMC_IS_NULL below */
-    } else {
+    }
+    else {
         GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
     }
 
