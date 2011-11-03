@@ -1015,6 +1015,7 @@ src/events$(O) : \
 	src/events.c \
 	src/events.str \
 	$(INC_PMC_DIR)/pmc_arrayiterator.h \
+	$(INC_PMC_DIR)/pmc_exception.h \
 	$(INC_DIR)/runcore_api.h
 
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
@@ -1979,6 +1980,8 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_PMC_DIR)/pmc_continuation.h \
+	$(INC_PMC_DIR)/pmc_exception.h \
+	$(INC_PMC_DIR)/pmc_exceptionhandler.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
 	$(INC_PMC_DIR)/pmc_task.h \
