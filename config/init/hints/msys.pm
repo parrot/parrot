@@ -25,6 +25,9 @@ sub runstep {
     # Assume Windows 2000 or above
     $conf->data->set(ccflags => "-DWIN32 -DWINVER=0x0500 ");
 
+    # Identify as msys as setting win32 => 1 breaks the build
+    $conf->data->set(msys => 1);
+
     # Create Parrot as shared library
     $conf->data->set(
         parrot_is_shared    => 1,
