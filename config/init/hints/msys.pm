@@ -5,9 +5,11 @@ package init::hints::msys;
 use strict;
 use warnings;
 
+# TODO: update to gerdr/msys
+
 sub _real_path {
     my ( $path ) = @_;
-    $path = `cd '$path' && pwd -W`;
+    $path = `mkdir -p '$path' && cd '$path' && pwd -W`;
     chomp $path;
     return $path;
 }
@@ -17,7 +19,7 @@ sub runstep {
 
     # Translate absolute paths accessed by Parrot tools
     # from UNIX-style to Windows-style
-    my @keys = qw{bindir build_dir tempdir};
+    my @keys = qw{bindir build_dir tempdir libdir includedir};
     my %dirs;
     @dirs{@keys} = map { _real_path $conf->data->get($_) } @keys;
     $conf->data->set(%dirs);
