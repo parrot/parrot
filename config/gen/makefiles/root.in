@@ -549,7 +549,7 @@ INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
 #IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
-#IF(win32):LIBPARROT_SHARED  = @libparrot_shared@
+#IF(win32 or msys):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
 # This line controls whether a static or shared library is built
