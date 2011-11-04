@@ -1149,7 +1149,7 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'", '.CONTROL_RETURN')
+    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'", '[.CONTROL_RETURN]')
     bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
