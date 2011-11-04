@@ -20,6 +20,7 @@ exception object's C<_P5> attribute.
 */
 
 #include "parrot/oplib/ops.h"
+#include "pmc_exception.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -170,20 +171,23 @@ Report whether the exception handler can handle a particular type of exception.
 */
 
     METHOD can_handle(PMC *exception) {
-        STRING * const sev    = CONST_STRING(INTERP, "severity");
         STRING * const ex_str = CONST_STRING(INTERP, "Exception");
-
-        INTVAL severity = VTABLE_get_integer_keyed_str(INTERP, exception, sev);
 
         /* We handle Exception and anything that claims to implement that role
            here. Include the base_type check as a sort of optimization */
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
+            INTVAL severity;
             PMC *handled_types;
             PMC *handled_types_except;
             INTVAL min_severity, max_severity;
             GET_ATTR_max_severity(INTERP, SELF, max_severity);
             GET_ATTR_min_severity(INTERP, SELF, min_severity);
+
+            if (exception->vtable->base_type == enum_class_Exception)
+                GETATTR_Exception_severity(INTERP, exception, severity);
+            else
+                severity = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "severity"));
 
             if (severity < min_severity) {
                 RETURN(INTVAL 0);
@@ -191,11 +195,16 @@ Report whether the exception handler can handle a particular type of exception.
             if (max_severity > 0 &&  severity > max_severity) {
                 RETURN(INTVAL 0);
             }
+
             GET_ATTR_handled_types(INTERP, SELF, handled_types);
             if (! PMC_IS_NULL(handled_types)) {
                 const INTVAL elems = VTABLE_elements(INTERP, handled_types);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
-                INTVAL i;
+                INTVAL i, type;
+
+                if (exception->vtable->base_type == enum_class_Exception)
+                    GETATTR_Exception_type(INTERP, exception, type);
+                else
+                    type = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
 
                 for (i = 0; i < elems; ++i) {
                     const INTVAL handled_type =
@@ -209,8 +218,12 @@ Report whether the exception handler can handle a particular type of exception.
             GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
             if (! PMC_IS_NULL(handled_types_except)) {
                 const INTVAL elems = VTABLE_elements(INTERP, handled_types_except);
-                const INTVAL type  = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
-                INTVAL i;
+                INTVAL i, type;
+
+                if (exception->vtable->base_type == enum_class_Exception)
+                    GETATTR_Exception_type(INTERP, exception, type);
+                else
+                    type = VTABLE_get_integer_keyed_str(INTERP, exception, CONST_STRING(INTERP, "type"));
 
                 for (i = 0; i < elems; ++i) {
                     const INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
