@@ -899,17 +899,23 @@ Return the POST representation of a C<PAST::Control>.
     .local string ehreg
     subpost = find_dynamic_lex '$*SUB'
     ehreg = self.'uniquereg'('P')
-    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_label', ehreg, label)
+    unless type, no_handle_types
     controltypes = get_global '%!controltypes'
-    unless type, handle_types_done
     type = controltypes[type]
-    unless type, handle_types_done
+    unless type, no_handle_types
     $P0 = split ',', type
-    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
+    $S0 = join ';', $P0
+    $S0 = concat '[', $S0
+    $S0 = concat $S0, ']'
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'", $S0)
     subpost.'add_directive'('.include "except_types.pasm"')
+    goto handle_types_done
+  no_handle_types:
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
   handle_types_done:
+    ops.'push_pirop'('set_label', ehreg, label)
     unless extype, handle_types_except_done
+    controltypes = get_global '%!controltypes'
     extype = controltypes[extype]
     unless extype, handle_types_except_done
     $P0 = split ',', extype
@@ -1143,7 +1149,7 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
+    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'", '.CONTROL_RETURN')
     bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
@@ -1626,9 +1632,8 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
 
     .local string handreg
     handreg = self.'tempreg'('P')
-    ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
+    ops.'push_pirop'('new', handreg, "'ExceptionHandler'", "[.CONTROL_LOOP_NEXT;.CONTROL_LOOP_REDO;.CONTROL_LOOP_LAST]")
     ops.'push_pirop'('set_label', handreg, handlabel)
-    ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
     unless bodyfirst goto bodyfirst_done

@@ -71,6 +71,35 @@ Initializes the exception handler with one handled type.
         VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, handledtype);
     }
 
+
+/*
+
+=item C<void init_pmc(PMC)>
+
+Initializes the exception handler with one handled type. If the argument
+is a key, intitialize it with the key contents.
+
+=cut
+
+*/
+    VTABLE void init_pmc(PMC *handledtype) {
+        Parrot_ExceptionHandler_attributes * const attrs = PARROT_EXCEPTIONHANDLER(SELF);
+        SELF.init();
+        if (handledtype->vtable->base_type == enum_class_Key) {
+            PMC *key = handledtype;
+            attrs->handled_types = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+            while (key) {
+                VTABLE_push_integer(interp, attrs->handled_types, Parrot_key_integer(INTERP, key));
+                key = Parrot_key_next(INTERP, key);
+            }
+        }
+        else {
+            INTVAL type = VTABLE_get_integer(INTERP, handledtype);
+            attrs->handled_types = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, 1);
+            VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, handledtype);
+        }
+    }
+
 /*
 
 =item C<void mark()>
