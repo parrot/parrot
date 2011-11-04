@@ -110,7 +110,7 @@ Parrot_cx_delete_upto_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
         }
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-	"Specified handler is not in the handler list.");
+        "Specified handler is not in the handler list.");
 }
 
 
