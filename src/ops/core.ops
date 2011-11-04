@@ -905,17 +905,8 @@ op pop_upto_eh(in PMC) {
         else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
             eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
     }
-    if (!PMC_IS_NULL(eh)) {
-        PMC *handlers = Parrot_pcc_get_handlers(interp, CURRENT_CONTEXT(interp));
-        if (!PMC_IS_NULL(handlers)) {
-            while (VTABLE_elements(interp, handlers)) {
-                PMC * const handler = VTABLE_get_pmc_keyed_int(interp, handlers, 0);
-                if (handler == $1)
-                    break;
-                VTABLE_shift_pmc(interp, handlers);
-            }
-        }
-    }
+    if (!PMC_IS_NULL(eh))
+        Parrot_cx_delete_upto_handler_local(interp, eh);
 }
 
 =back

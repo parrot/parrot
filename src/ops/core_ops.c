@@ -14094,21 +14094,7 @@ Parrot_pop_upto_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
     }
 
     if ((!PMC_IS_NULL(eh))) {
-        PMC  * handlers = Parrot_pcc_get_handlers(interp, CURRENT_CONTEXT(interp));
-
-        if ((!PMC_IS_NULL(handlers))) {
-            while (VTABLE_elements(interp, handlers)) {
-                PMC  * const  handler = VTABLE_get_pmc_keyed_int(interp, handlers, 0);
-
-                if ((handler == PREG(1))) {
-                    break;
-                }
-
-                VTABLE_shift_pmc(interp, handlers);
-            }
-
-        }
-
+        Parrot_cx_delete_upto_handler_local(interp, eh);
     }
 
     return (opcode_t *)cur_opcode + 2;
@@ -14138,21 +14124,7 @@ Parrot_pop_upto_eh_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     }
 
     if ((!PMC_IS_NULL(eh))) {
-        PMC  * handlers = Parrot_pcc_get_handlers(interp, CURRENT_CONTEXT(interp));
-
-        if ((!PMC_IS_NULL(handlers))) {
-            while (VTABLE_elements(interp, handlers)) {
-                PMC  * const  handler = VTABLE_get_pmc_keyed_int(interp, handlers, 0);
-
-                if ((handler == PCONST(1))) {
-                    break;
-                }
-
-                VTABLE_shift_pmc(interp, handlers);
-            }
-
-        }
-
+        Parrot_cx_delete_upto_handler_local(interp, eh);
     }
 
     return (opcode_t *)cur_opcode + 2;

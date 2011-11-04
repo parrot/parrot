@@ -85,6 +85,37 @@ Parrot_cx_delete_handler_local(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_cx_delete_upto_handler_local(PARROT_INTERP, PMC *handler)>
+
+Remove handlers until the specified handler is reached. The handler itself
+is not removed. If the handler is not found, all handlers will be removed
+and an exception is thrown.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_cx_delete_upto_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
+{
+    ASSERT_ARGS(Parrot_cx_delete_upto_handler_local)
+    PMC *handlers  = Parrot_pcc_get_handlers(interp, interp->ctx);
+    if (!PMC_IS_NULL(handlers)) {
+        while (VTABLE_elements(interp, handlers)) {
+            PMC * const cand = VTABLE_get_pmc_keyed_int(interp, handlers, 0);
+            if (cand == handler)
+                return;
+            VTABLE_shift_pmc(interp, handlers);
+        }
+    }
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+	"Specified handler is not in the handler list.");
+}
+
+
+/*
+
 =item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP)>
 
 Count the number of active handlers from the context's list of handlers.
