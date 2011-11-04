@@ -245,7 +245,8 @@ Report whether the exception handler can handle a particular type of exception.
                 if (handled_types->vtable->base_type == enum_class_Key) {
                     PMC *key = handled_types;
                     for (; key; key = Parrot_key_next(INTERP, key)) {
-                        if (Parrot_key_integer(INTERP, key) == type)
+                        const INTVAL handled_type = Parrot_key_integer(INTERP, key);
+                        if (handled_type == type || handled_type == (type | EXCEPTION_TYPE_ALL_MASK))
                             RETURN(INTVAL 1);
                     }
                 }
@@ -256,7 +257,7 @@ Report whether the exception handler can handle a particular type of exception.
                     for (i = 0; i < elems; ++i) {
                         const INTVAL handled_type =
                             VTABLE_get_integer_keyed_int(INTERP, handled_types, i);
-                        if (handled_type == type)
+                        if (handled_type == type || handled_type == (type | EXCEPTION_TYPE_ALL_MASK))
                             RETURN(INTVAL 1);
                     }
                 }
@@ -276,7 +277,7 @@ Report whether the exception handler can handle a particular type of exception.
                 for (i = 0; i < elems; ++i) {
                     const INTVAL handled_type = VTABLE_get_integer_keyed_int(INTERP,
                             handled_types_except, i);
-                    if (handled_type == type)
+                    if (handled_type == type || handled_type == (type | EXCEPTION_TYPE_ALL_MASK))
                         RETURN(INTVAL 0);
                 }
             }
