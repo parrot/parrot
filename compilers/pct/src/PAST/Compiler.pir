@@ -155,7 +155,7 @@ any value type.
     ##  type of exception handler we support
     .local pmc controltypes
     controltypes = new 'Hash'
-    controltypes['CONTROL']  = '.CONTROL_ALL'
+    controltypes['CONTROL']  = '.CONTROL_RETURN, .CONTROL_OK, .CONTROL_BREAK, .CONTROL_CONTINUE, .CONTROL_TAKE, .CONTROL_LEAVE, .CONTROL_EXIT, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_LAST, .CONTROL_LOOP_REDO'
     controltypes['RETURN']   = '.CONTROL_RETURN'
     controltypes['OK']       = '.CONTROL_OK'
     controltypes['BREAK']    = '.CONTROL_BREAK'
