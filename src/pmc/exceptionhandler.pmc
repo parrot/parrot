@@ -20,7 +20,7 @@ exception object's C<_P5> attribute.
 */
 
 #include "parrot/oplib/ops.h"
-#include "pmc_exception.h"
+#include "pmc/pmc_exception.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
