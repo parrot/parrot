@@ -81,8 +81,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_begin_execution(PARROT_INTERP, PMC * const main, PMC *
-const argv)>
+=item C<void Parrot_cx_begin_execution(PARROT_INTERP, PMC *main, PMC *argv)>
 
 Construct the main task, add it to the task queue, and then execute tasks
 until the task queue becomes empty.
@@ -93,8 +92,7 @@ until the task queue becomes empty.
 
 PARROT_EXPORT
 void
-Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC * const main),
-        ARGIN(PMC * const argv))
+Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC *main), ARGIN(PMC *argv))
 {
     ASSERT_ARGS(Parrot_cx_begin_execution)
     PMC * const scheduler = interp->scheduler;
@@ -177,7 +175,6 @@ void
 Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_set_scheduler_alarm)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     const FLOATVAL time_now = Parrot_floatval_time();
 
     interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
@@ -187,7 +184,7 @@ Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_next_task(PARROT_INTERP, PMC * const scheduler)>
+=item C<void Parrot_cx_next_task(PARROT_INTERP, PMC *scheduler)>
 
 Run the task at the head of the task queue until it ends or is
 pre-empted.
@@ -197,7 +194,7 @@ pre-empted.
 */
 
 void
-Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC * const scheduler))
+Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_next_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
@@ -223,8 +220,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC * const scheduler))
 
 /*
 
-=item C<opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, opcode_t * const
-next)>
+=item C<opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, opcode_t *next)>
 
 Does the scheduler need to wake up and do anything? If so, do that now.
 
@@ -234,7 +230,7 @@ Does the scheduler need to wake up and do anything? If so, do that now.
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t * const next))
+Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_check_scheduler)
     PMC * const scheduler = interp->scheduler;
@@ -250,8 +246,8 @@ Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t * const next))
 
 /*
 
-=item C<opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP, PMC * const scheduler,
-opcode_t * const next)>
+=item C<opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP, PMC *scheduler,
+opcode_t *next)>
 
 Checks to see if any tasks need to be scheduled or if the current task
 needs to be pre-empted.
@@ -263,8 +259,7 @@ needs to be pre-empted.
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
 opcode_t*
-Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
-        ARGIN(opcode_t * const next))
+Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
@@ -296,7 +291,7 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC * const scheduler),
 
 /*
 
-=item C<void Parrot_cx_check_quantum(PARROT_INTERP, PMC * const scheduler)>
+=item C<void Parrot_cx_check_quantum(PARROT_INTERP, PMC *scheduler)>
 
 If the quantum has expired, schedule the next task.
 
@@ -305,7 +300,7 @@ If the quantum has expired, schedule the next task.
 */
 
 void
-Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC * const scheduler))
+Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_quantum)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
@@ -316,7 +311,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC * const scheduler))
 }
 
 /*
-=item C<PMC* Parrot_cx_stop_task(PARROT_INTERP, opcode_t * const next)>
+=item C<PMC* Parrot_cx_stop_task(PARROT_INTERP, opcode_t *next)>
 
 Stop the current task and pack it up into a PMC what can be used to resume later.
 
@@ -326,7 +321,7 @@ Stop the current task and pack it up into a PMC what can be used to resume later
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t * const next))
+Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_stop_task)
     PMC * const task = Parrot_cx_current_task(interp);
@@ -347,8 +342,8 @@ Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t * const next))
 }
 
 /*
-=item C<opcode_t* Parrot_cx_preempt_task(PARROT_INTERP, PMC * const scheduler,
-opcode_t * const next)>
+=item C<opcode_t* Parrot_cx_preempt_task(PARROT_INTERP, PMC *scheduler, opcode_t
+*next)>
 
 Pre-empt the current task. It goes on the foot of the task queue,
 and then we jump all the way back to the task scheduling loop.
@@ -358,8 +353,7 @@ and then we jump all the way back to the task scheduling loop.
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t*
-Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC * const scheduler),
-        ARGIN(opcode_t * const next))
+Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_preempt_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
@@ -371,7 +365,7 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC * const scheduler),
 
 /*
 
-=item C<void Parrot_cx_runloop_wake(PARROT_INTERP, PMC * const scheduler)>
+=item C<void Parrot_cx_runloop_wake(PARROT_INTERP, PMC *scheduler)>
 
 Wake a sleeping scheduler runloop (generally called when new tasks are added to
 the scheduler's task list).
@@ -381,7 +375,7 @@ the scheduler's task list).
 */
 
 void
-Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC * const scheduler))
+Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_runloop_wake)
     Parrot_runcore_enable_event_checking(interp);
@@ -410,7 +404,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC * const task_or_sub)>
+=item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC *task_or_sub)>
 
 Add a task to to the task queue for execution.
 
@@ -423,7 +417,7 @@ called from within the interpreter's runloop.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
+Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
@@ -461,8 +455,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
 
 /*
 
-=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC * const
-task_or_sub)>
+=item C<void Parrot_cx_schedule_immediate(PARROT_INTERP, PMC *task_or_sub)>
 
 Add a task to the task queue for immediate execution.
 
@@ -472,7 +465,7 @@ Add a task to the task queue for immediate execution.
 
 PARROT_EXPORT
 void
-Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
+Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_immediate)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
@@ -509,6 +502,7 @@ Returns the task that is currently running.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_PURE_FUNCTION
 PMC*
 Parrot_cx_current_task(PARROT_INTERP)
 {
@@ -554,7 +548,7 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
 
 /*
 
-=item C<void Parrot_cx_schedule_alarm(PARROT_INTERP, PMC * const alarm)>
+=item C<void Parrot_cx_schedule_alarm(PARROT_INTERP, PMC *alarm)>
 
 Schedule an alarm.
 
@@ -563,7 +557,7 @@ Schedule an alarm.
 */
 
 void
-Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC * const alarm))
+Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC *alarm))
 {
     ASSERT_ARGS(Parrot_cx_schedule_alarm)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
@@ -577,7 +571,7 @@ Parrot_cx_schedule_alarm(PARROT_INTERP, ARGIN(PMC * const alarm))
 
 /*
 
-=item C<void Parrot_cx_check_alarms(PARROT_INTERP, PMC * const scheduler)>
+=item C<void Parrot_cx_check_alarms(PARROT_INTERP, PMC *scheduler)>
 
 Add the subs attached to any expired alarms to the task queue.
 
@@ -587,7 +581,7 @@ Add the subs attached to any expired alarms to the task queue.
 
 PARROT_EXPORT
 void
-Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC * const scheduler))
+Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_alarms)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
@@ -624,7 +618,7 @@ opcode_t* to allow for changing the code flow.
 =over 4
 
 =item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time,
-opcode_t * const next)>
+opcode_t *next)>
 
 Add a sleep timer to the scheduler. This function is called by the C<sleep>
 opcode.
@@ -637,11 +631,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *
-Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time,
-        ARGIN_NULLOK(opcode_t * const next))
+Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     const FLOATVAL now_time  = Parrot_floatval_time();
     const FLOATVAL done_time = now_time + time;
     PMC * const alarm = Parrot_pmc_new(interp, enum_class_Alarm);
