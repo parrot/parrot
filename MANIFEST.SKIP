@@ -364,6 +364,8 @@
 ^/libparrot\.def/
 ^/libparrot\.dll$
 ^/libparrot\.dll/
+^/libparrot\.dll\.a$
+^/libparrot\.dll\.a/
 ^/miniparrot$
 ^/miniparrot/
 ^/myconfig$
@@ -432,6 +434,8 @@
 ^/runtime/parrot/dynext/.*\.def/
 ^/runtime/parrot/dynext/.*\.dll$
 ^/runtime/parrot/dynext/.*\.dll/
+^/runtime/parrot/dynext/.*\.dll\.a$
+^/runtime/parrot/dynext/.*\.dll\.a/
 ^/runtime/parrot/dynext/.*\.dylib$
 ^/runtime/parrot/dynext/.*\.dylib/
 ^/runtime/parrot/dynext/.*\.exe$
@@ -570,6 +574,8 @@
 ^/src/dynoplibs/.*\.c/
 ^/src/dynoplibs/.*\.dll$
 ^/src/dynoplibs/.*\.dll/
+^/src/dynoplibs/.*\.dll\.a$
+^/src/dynoplibs/.*\.dll\.a/
 ^/src/dynoplibs/.*\.exp$
 ^/src/dynoplibs/.*\.exp/
 ^/src/dynoplibs/.*\.gcda$
@@ -606,6 +612,8 @@
 ^/src/dynpmc/.*\.def/
 ^/src/dynpmc/.*\.dll$
 ^/src/dynpmc/.*\.dll/
+^/src/dynpmc/.*\.dll\.a$
+^/src/dynpmc/.*\.dll\.a/
 ^/src/dynpmc/.*\.dump$
 ^/src/dynpmc/.*\.dump/
 ^/src/dynpmc/.*\.dylib$
