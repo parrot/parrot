@@ -88,7 +88,6 @@ Mark this Eval.
          * OTOH - if the global exists - this eval pmc ought
          *        to be alive and destroy isn't called.
          */
-        PackFile_Segment  *seg;
         PackFile_ByteCode *cur_cs;
         Parrot_Sub_attributes *sub_data;
 
@@ -157,7 +156,7 @@ Returns the address of the associated packfile.
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
         if (sub) {
-            PackFile_ByteCode *seg = sub->seg;
+            const PackFile_ByteCode * const seg = sub->seg;
             if (seg)
                 return seg->base.pf;
         }
@@ -330,11 +329,11 @@ Unarchives the code.
         seg = sub->seg;
 
         if (seg) {
-            PackFile_ConstTable *const ct = seg->const_table;
+            const PackFile_ConstTable * const ct = seg->const_table;
             if (ct) {
                 INTVAL i;
                 STRING * const SUB = CONST_STRING(interp, "Sub");
-                for (i = n = 0; i < ct->pmc.const_count; ++i) {
+                for (i = 0; i < ct->pmc.const_count; ++i) {
                     PMC * const x = ct->pmc.constants[i];
                     if (VTABLE_isa(interp, x, SUB))
                         ++n;
@@ -363,7 +362,7 @@ Return the main sub, if any, null PMC otherwise.
 
     METHOD get_main()
     {
-        PMC *mainsub = Parrot_pf_get_packfile_main_sub(INTERP, SELF);
+        PMC * const mainsub = Parrot_pf_get_packfile_main_sub(INTERP, SELF);
         RETURN(PMC * mainsub);
     }
 
@@ -397,10 +396,10 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
     seg = sub->seg;
 
     if (seg) {
-        PackFile_ConstTable * const ct = seg->const_table;
+        const PackFile_ConstTable * const ct = seg->const_table;
         if (ct) {
-            INTVAL i, n;
-            for (i = n = 0; i < ct->pmc.const_count; ++i) {
+            INTVAL i;
+            for (i = 0; i < ct->pmc.const_count; ++i) {
                 STRING * const SUB = CONST_STRING(interp, "Sub");
                 PMC * const x = ct->pmc.constants[i];
                 if (VTABLE_isa(interp, x, SUB))
