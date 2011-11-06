@@ -202,6 +202,8 @@ Compile the abstract syntax tree given by C<past> into POST.
     .lex '@*BLOCKPAST', blockpast
     null $P99
     .lex '$*SUB', $P99
+    null $P98
+    .lex '%*LEXREGS', $P98
 
     .local pmc tempregs
     tempregs = find_dynamic_lex '%*TEMPREGS'
@@ -853,13 +855,11 @@ Return the POST representation of a C<PAST::Control>.
     null tempregs
     .lex '%*TEMPREGS', tempregs
 
-    .local pmc ops, children, ishandled, nothandled
+    .local pmc ops, children, ishandled
     .local string handled
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('handled_')
     ishandled = $P0.'new'('result'=>$S0)
-    $S0 = self.'unique'('nothandled_')
-    nothandled = $P0.'new'('result'=>$S0)
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     .local string rtype
@@ -874,11 +874,10 @@ Return the POST representation of a C<PAST::Control>.
     ops.'push'(children)
     handled = self.'uniquereg'('I')
     ops.'push_pirop'('set', handled, 'exception["handled"]')
-    ops.'push_pirop'('ne', handled, 1, nothandled)
-    ops.'push'(ishandled)
-    ops.'push_pirop'('return', 'exception')
-    ops.'push'(nothandled)
+    ops.'push_pirop'('eq', handled, 1, ishandled)
     ops.'push_pirop'('rethrow', 'exception')
+    ops.'push'(ishandled)
+    ops.'result'('exception')
     .return (ops)
 .end
 
@@ -975,15 +974,21 @@ Return the POST representation of a C<PAST::Control>.
     ehpir = self.'coerce'(ehpir, result)
   handler_loop_no_result:
     tail.'push'(ehpir)
-    unless addreturn goto handler_loop
+    unless addreturn goto handler_loop_no_return
     .local pmc retval
     retval = ehpir.'result'()
     tail.'push_pirop'('return', retval)
     goto handler_loop
+  handler_loop_no_return:
+    # this assumes that we got no exception while setting up
+    # the handlers...
+    tail.'push'(pops)
+    unless it, handler_loop_done
+    tail.'push_pirop'('goto', skip)
+    goto handler_loop
   handler_loop_done:
 
     ops.'push'(child)
-
 
     ops.'push'(pops)
     ops.'push_pirop'('goto', skip)
@@ -1125,6 +1130,11 @@ Return the POST representation of a C<PAST::Block>.
   have_tempregs:
     .lex '%*TEMPREGS', tempregs
 
+    .local pmc lexregs, outerlexregs
+    outerlexregs = find_dynamic_lex '%*LEXREGS'
+    null lexregs
+    .lex '%*LEXREGS', lexregs
+
     ##  control exception handler
     .local pmc ctrlpast, ctrllabel
     ctrlpast = node.'control'()
@@ -1149,6 +1159,7 @@ Return the POST representation of a C<PAST::Block>.
     ops = self.'post_children'(node, 'signature'=>$S0)
     ##  result of last child is return from block
     retval = ops[-1]
+    ops.'result'(retval)
     ##  wrap the child with appropriate exception handlers, if any
     .local pmc eh
     eh = node.'handlers'()
@@ -1205,6 +1216,9 @@ Return the POST representation of a C<PAST::Block>.
 
     ## restore the outer temporary register bank
     store_lex '%*TEMPREGS', outerregs
+
+    ## restore the outer lexical register hash
+    store_lex '%*LEXREGS', outerlexregs
 
     ##  restore previous outer scope and symtable
     setattribute self, '%!symtable', outersym
@@ -2395,6 +2409,16 @@ attribute.
     unless $I0 goto param_lex_done
     name = self.'escape'(name)
     ops.'push_pirop'('.lex', name, ops)
+    .local int directaccess
+    directaccess = node.'directaccess'()
+    unless directaccess goto param_lex_done
+    .local pmc lexregs
+    lexregs = find_dynamic_lex '%*LEXREGS'
+    unless null lexregs goto have_lexregs
+    lexregs = new 'Hash'
+    store_dynamic_lex '%*LEXREGS', lexregs
+  have_lexregs:
+    lexregs[name] = pname
   param_lex_done:
     .return (ops)
 .end
@@ -2453,6 +2477,9 @@ attribute.
     name = node.'name'()
     name = self.'escape'(name)
 
+    .local pmc lexregs
+    lexregs = find_dynamic_lex '%*LEXREGS'
+
     .local int isdecl
     isdecl = node.'isdecl'()
 
@@ -2463,6 +2490,14 @@ attribute.
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Op'
+    if null lexregs goto no_lexregs
+    .local string lexreg
+    lexreg = lexregs[name]
+    unless lexreg goto no_lexregs
+    fetchop = $P0.'new'(ops, lexreg, 'pirop'=>'set')
+    storeop = $P0.'new'(lexreg, ops, 'pirop'=>'set')
+    .tailcall self.'vivify'(node, ops, fetchop, storeop)
+  no_lexregs:
     fetchop = $P0.'new'(ops, name, 'pirop'=>'find_lex')
     storeop = $P0.'new'(name, ops, 'pirop'=>'store_lex')
     .tailcall self.'vivify'(node, ops, fetchop, storeop)
@@ -2484,10 +2519,25 @@ attribute.
   have_lexreg:
     ops.'push_pirop'('.lex', name, lexreg)
     ops.'result'(lexreg)
+    .local int directaccess
+    directaccess = node.'directaccess'()
+    unless directaccess goto no_directaccess
+    unless null lexregs goto have_lexregs
+    lexregs = new 'Hash'
+    store_dynamic_lex '%*LEXREGS', lexregs
+  have_lexregs:
+    lexregs[name] = lexreg
+  no_directaccess:
     .return (ops)
 
   lexical_bind:
     $P0 = get_hll_global ['POST'], 'Op'
+    if null lexregs goto no_lexregs_bind
+    .local string lexreg
+    lexreg = lexregs[name]
+    unless lexreg goto no_lexregs_bind
+    .tailcall $P0.'new'(lexreg, bindpost, 'pirop'=>'set', 'result'=>bindpost)
+  no_lexregs_bind:
     .tailcall $P0.'new'(name, bindpost, 'pirop'=>'store_lex', 'result'=>bindpost)
 .end
 

@@ -96,7 +96,7 @@ my %SMOLDER_CONFIG = (
     username     => 'parrot-autobot',
     password     => 'qa_rocks',
     project_id   => 1,
-    report_file  => ['parrot_test_run.tar.gz'],
+    report_file  => ['t/archive/parrot_test_run.tar.gz'],
 );
 
 # language implementations must pass their respective project id

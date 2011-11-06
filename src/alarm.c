@@ -19,8 +19,12 @@ static volatile FLOATVAL alarm_set_to = 0.0;
 /* This file relies on POSIX. Probably need two other versions of it:
  *  one for Windows and one for platforms with no signals or threads. */
 
-#include <sys/time.h>
-#include <signal.h>
+#ifdef _WIN32
+#  include <time.h>
+#else
+#  include <sys/time.h>
+#  include <signal.h>
+#endif
 #include <errno.h>
 
 /* HEADERIZER HFILE: include/parrot/alarm.h */
@@ -53,7 +57,9 @@ void
 Parrot_alarm_init(void)
 {
     ASSERT_ARGS(Parrot_alarm_init)
-
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     struct sigaction sa;
     memset(&sa, 0, sizeof (struct sigaction));
     sa.sa_handler = Parrot_alarm_callback;
@@ -65,6 +71,7 @@ Parrot_alarm_init(void)
     }
 
     Parrot_alarm_unmask(NULL);
+#endif
 }
 
 /*
@@ -81,7 +88,9 @@ static void
 posix_alarm_set(FLOATVAL wait)
 {
     ASSERT_ARGS(posix_alarm_set)
-
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     const int MIL = 1000000;
     struct itimerval itmr;
     int sec, usec;
@@ -103,6 +112,7 @@ posix_alarm_set(FLOATVAL wait)
             exit(EXIT_FAILURE);
         }
     }
+#endif
 }
 
 /*
@@ -122,20 +132,28 @@ void
 Parrot_alarm_mask(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_alarm_mask)
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGALRM);
     pthread_sigmask(SIG_BLOCK, &mask, 0);
+#endif
 }
 
 void
 Parrot_alarm_unmask(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_alarm_unmask)
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGALRM);
     pthread_sigmask(SIG_UNBLOCK, &mask, 0);
+#endif
 }
 
 /*
@@ -200,7 +218,9 @@ void
 Parrot_alarm_set(FLOATVAL when)
 {
     ASSERT_ARGS(Parrot_alarm_set)
-
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     FLOATVAL now = Parrot_floatval_time();
 
     /* Better late than early */
@@ -211,6 +231,7 @@ Parrot_alarm_set(FLOATVAL when)
 
     alarm_set_to = when;
     posix_alarm_set(when - now);
+#endif
 }
 
 /*
@@ -227,7 +248,11 @@ void
 Parrot_alarm_now(void)
 {
     ASSERT_ARGS(Parrot_alarm_now)
+#ifdef _WIN32
+    /* TODO: Implement on Windows */
+#else
     kill(getpid(), SIGALRM);
+#endif
 }
 
 /*

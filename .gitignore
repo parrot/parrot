@@ -55,6 +55,7 @@ cachegrind.out.*
 /installable*
 /libparrot.def
 /libparrot.dll
+/libparrot.dll.a
 /miniparrot
 /myconfig
 /ops2c
@@ -77,7 +78,6 @@ cachegrind.out.*
 /parrot_nci_thunk_gen
 /parrot_nci_thunk_gen.c
 /parrot_nci_thunk_gen.pbc
-/parrot_test_run.tar.gz
 /parrot_old
 /pbc_disassemble
 /pbc_dump
@@ -216,6 +216,7 @@ cachegrind.out.*
 /runtime/parrot/dynext/*.bundle
 /runtime/parrot/dynext/*.def
 /runtime/parrot/dynext/*.dll
+/runtime/parrot/dynext/*.dll.a
 /runtime/parrot/dynext/*.dylib
 /runtime/parrot/dynext/*.exe
 /runtime/parrot/dynext/*.exp
@@ -300,6 +301,7 @@ cachegrind.out.*
 /src/dynoplibs/*.bundle
 /src/dynoplibs/*.c
 /src/dynoplibs/*.dll
+/src/dynoplibs/*.dll.a
 /src/dynoplibs/*.exp
 /src/dynoplibs/*.h
 /src/dynoplibs/*.ilk
@@ -315,6 +317,7 @@ cachegrind.out.*
 /src/dynpmc/*.c
 /src/dynpmc/*.def
 /src/dynpmc/*.dll
+/src/dynpmc/*.dll.a
 /src/dynpmc/*.dump
 /src/dynpmc/*.dylib
 /src/dynpmc/*.exe
@@ -361,6 +364,7 @@ cachegrind.out.*
 /src/string/charset/*.obj
 /src/string/encoding/*.o
 /src/string/encoding/*.obj
+/t/archive/parrot_test_run.tar.gz
 /t/benchmark/*.pasm
 /t/benchmark/*.pir
 /t/compilers/data_json/*.pbc

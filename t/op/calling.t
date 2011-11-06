@@ -2494,7 +2494,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .sub 'main' :main
     $P0   = new ['Undef']
     ($P0) = foo()
+    unless null $P0 goto L1
+    $S0 = "PMCNULL"
+    goto L2
+  L1:
     $S0   = typeof $P0
+  L2:
     say $S0
 .end
 
@@ -2506,7 +2511,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .end
 CODE
 ResizablePMCArray
-Undef
+PMCNULL
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable" );

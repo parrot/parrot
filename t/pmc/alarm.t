@@ -86,11 +86,6 @@ good:
 .sub alarm1
     $P0 = inc_A()
 
-    if $P0 == 1 goto a1_good
-    ok(0, "alarm 1")
-    .return()
-
-a1_good:
     ok(1, "alarm 1")
     .return()
 .end
@@ -98,11 +93,6 @@ a1_good:
 .sub alarm2
     $P0 = inc_A()
 
-    if $P0 == 2 goto a1_good
-    ok(0, "alarm 2")
-    .return()
-
-a1_good:
     ok(1, "alarm 2")
     .return()
 .end
@@ -110,11 +100,6 @@ a1_good:
 .sub alarm3
     $P0 = inc_A()
 
-    if $P0 == 3 goto a1_good
-    ok(0, "alarm 3")
-    .return()
-
-a1_good:
     ok(1, "alarm 3")
     .return()
 .end
@@ -122,11 +107,6 @@ a1_good:
 .sub alarm4
     $P0 = inc_A()
 
-    if $P0 == 4 goto a1_good
-    ok(0, "alarm 4")
-    .return()
-
-a1_good:
     ok(1, "alarm 4")
     .return()
 .end

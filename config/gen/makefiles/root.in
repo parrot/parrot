@@ -560,7 +560,7 @@ INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
 #IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
-#IF(win32):LIBPARROT_SHARED  = @libparrot_shared@
+#IF(win32 or msys):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
 # This line controls whether a static or shared library is built
@@ -804,6 +804,7 @@ help :
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
 	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
+	@echo "  smolder_fulltest:  Run 'make fulltest' and send report to the smolder server"
 	@echo "  smoke:             Alias for smolder_test."
 	@echo "  resubmit_smolder:  Resubmit a smoke test if transmission failed."
 	@echo ""
@@ -2175,6 +2176,9 @@ smolder_test : test_prep
 smolder_coretest : corevm pbctestfiles
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
+smolder_fulltest : test_prep
+	$(PERL) t/fullharness --archive --send-to-smolder
+
 smoke : smolder_test
 
 resubmit_smolder :
@@ -2190,21 +2194,8 @@ check : test
 # Test various run cores and other stuff
 # 'testg' and 'testj' are tested only
 # when the needed runcores are available
-fulltest :
-	-@make@ testb \
-	testf \
-	testr \
-	src_tests \
-	run_tests \
-	buildtools_tests \
-	perl_tests \
-	library_tests \
-	codetest \
-	benchmark_tests \
-	manifest_tests \
-	examples_tests \
-	distro_tests \
-	headerizer_tests
+fulltest : test_prep
+	$(PERL) t/fullharness
 
 all_hll_test :
 	$(PERL) tools/dev/all_hll_test.pl
@@ -2507,7 +2498,7 @@ test-clean :
 	 "test$(EXE)" \
 	 "test.*"
 	$(RM_F) \
-	 "parrot_test_run.tar.gz" \
+	 "t/archive/parrot_test_run.tar.gz" \
 	 ".pod_examinable*.sto"
 
 # a failing step of cleaning, usually doesn't concern the following steps

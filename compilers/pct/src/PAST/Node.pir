@@ -278,6 +278,23 @@ Otherwise, the node refers to a lexical variable from an outer scope.
 .end
 
 
+=item directaccess([flag])
+
+Get/set the node's C<directaccess> attribute (for lexical variables) to C<flag>.
+A true value of C<isdecl> indicates that the variable given by this node
+can be accessed directly through the assigned register without going
+through the lexpad. Otherwise, find_lex/store_lex instructions will be used
+for retrieval and storage.
+
+=cut
+
+.sub 'directaccess' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('directaccess', value, has_value)
+.end
+
+
 =item namespace([namespace])
 
 Get/set the variable's namespace attribute to the array of strings

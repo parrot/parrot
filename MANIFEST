@@ -988,6 +988,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Harness/TestSets.pm                              [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
@@ -1453,6 +1454,7 @@ src/vtables.c                                               []
 src/warnings.c                                              []
 t/README.pod                                                []doc
 t/TESTS_STATUS.pod                                          [test]
+t/archive/README                                            []doc
 t/benchmark/benchmarks.t                                    [test]
 t/codingstd/c_arg_assert.t                                  [test]
 t/codingstd/c_code_coda.t                                   [test]
@@ -1680,6 +1682,7 @@ t/examples/streams.t                                        [test]
 t/examples/subs.t                                           [test]
 t/examples/tutorial.t                                       [test]
 t/ext/winxed/compreg.t                                      [test]
+t/fullharness                                               [test]
 t/harness                                                   [test]
 t/harness.pir                                               [test]
 t/include/fp_equality.t                                     [test]
