@@ -165,9 +165,6 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count;
 
-    Parrot_block_GC_mark(interp);
-    Parrot_block_GC_sweep(interp);
-
     /* need to set it here because argument passing can trigger GC */
     /* interp->lo_var_ptr = &lo_var_ptr; */
 
