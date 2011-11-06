@@ -104,9 +104,6 @@ opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void Parrot_cx_runloop_end(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
