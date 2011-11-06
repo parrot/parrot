@@ -423,7 +423,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC * const task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
-    thread = Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_CODE | PARROT_CLONE_RUNOPS | PARROT_CLONE_INTERP_FLAGS | PARROT_CLONE_HLL);
+    thread = Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_RUNOPS | PARROT_CLONE_INTERP_FLAGS | PARROT_CLONE_HLL);
     Parrot_thread_schedule_task(interp, thread, task);
     Parrot_thread_run(interp, thread, task, NULL);
 }

@@ -186,6 +186,35 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 
 /*
 
+=back
+
+=head2 Helper functions used also for running plain interpreters
+
+=over 4
+
+=item C<void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s)>
+
+Copies/clones the packfile/code from interpreter C<s> to C<d>. All
+resources are created in C<d>.
+
+=cut
+
+*/
+
+
+void
+Parrot_clone_code(Parrot_Interp d, Parrot_Interp s)
+{
+    ASSERT_ARGS(Parrot_clone_code)
+    Parrot_block_GC_mark(d);
+    Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
+    d->code = NULL;
+    Parrot_switch_to_cs(d, s->code, 1);
+    Parrot_unblock_GC_mark(d);
+}
+
+/*
+
 =item C<PMC * Parrot_thread_transfer_sub(Parrot_Interp destination,
 Parrot_Interp source, PMC *sub)>
 

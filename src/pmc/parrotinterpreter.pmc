@@ -27,6 +27,7 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "parrot/io.h"
 #include "parrot/runcore_api.h"
+#include "parrot/thread.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_sub.h"
 
@@ -146,6 +147,9 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
             }
         }
     }
+
+    if (flags & PARROT_CLONE_CODE)
+        Parrot_clone_code(d, s);
 
     Parrot_unblock_GC_mark(d);
 }
