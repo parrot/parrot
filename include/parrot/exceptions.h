@@ -95,7 +95,7 @@ typedef enum {
     CONTROL_LOOP_LAST,
     CONTROL_LOOP_REDO,
     CONTROL_ALL = 0x1ffff,
-   
+
     EXCEPTION_TYPE_ALL_MASK = 0xffff
 } exception_type_enum;
 
