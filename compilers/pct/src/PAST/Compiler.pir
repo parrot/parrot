@@ -944,11 +944,10 @@ Return the POST representation of a C<PAST::Control>.
     null tempregs
     .lex '%*TEMPREGS', tempregs
 
-    .local pmc it, node, ops, pops, tail, skip
+    .local pmc it, node, ops, tail, skip
+    .local int depth
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    $P0 = get_hll_global ['POST'], 'Ops'
-    pops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Ops'
     tail = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Label'
@@ -961,42 +960,56 @@ Return the POST representation of a C<PAST::Control>.
   wrap_child_no_result:
 
     it = iter ehs
+    depth = 0
   handler_loop:
     unless it, handler_loop_done
     node = shift it
 
     .local pmc ehpir, label
+    .local string exceptreg
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
     self.'push_exception_handler'(node, ops, label)
-    # Add one pop_eh for every handler we push_eh
-    pops.'push_pirop'('pop_eh')
+    inc depth
 
     # Push the handler itself
     tail.'push'(label)
+    exceptreg = self.'uniquereg'('P')
+    $S0 = concat '(', exceptreg
+    $S0 = concat $S0, ')'
+    tail.'push_pirop'('.get_results', $S0)
     ehpir = self.'as_post'(node, 'rtype'=>rtype)
     unless result goto handler_loop_no_result
     ehpir = self.'coerce'(ehpir, result)
   handler_loop_no_result:
     tail.'push'(ehpir)
+    tail.'push_pirop'('finalize', exceptreg)
     unless addreturn goto handler_loop_no_return
     .local pmc retval
     retval = ehpir.'result'()
     tail.'push_pirop'('return', retval)
     goto handler_loop
   handler_loop_no_return:
-    # this assumes that we got no exception while setting up
-    # the handlers...
-    tail.'push'(pops)
+    tail.'push_pirop'('pop_upto_eh', exceptreg)
+    $I0 = depth
+  pops_loop_handler:
+    tail.'push_pirop'('pop_eh')
+    dec $I0
+    if $I0 goto pops_loop_handler
     unless it, handler_loop_done
     tail.'push_pirop'('goto', skip)
     goto handler_loop
   handler_loop_done:
 
     ops.'push'(child)
-
-    ops.'push'(pops)
+    $I0 = depth
+    unless $I0 goto pops_done
+  pops_loop:
+    ops.'push_pirop'('pop_eh')
+    dec $I0
+    if $I0 goto pops_loop
+  pops_done:
     ops.'push_pirop'('goto', skip)
     ops.'push'(tail)
     ops.'push'(skip)
@@ -1964,15 +1977,23 @@ handler.
   else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
+    .local string exceptreg
+    exceptreg = self.'uniquereg'('P')
+    $S0 = concat '(', exceptreg
+    $S0 = concat $S0, ')'
+    ops.'push_pirop'('.get_results', $S0)
     .local pmc catchpast, catchpost
     catchpast = node[1]
-    if null catchpast goto catch_done
+    if null catchpast goto catchpost_done
     catchpost = self.'as_post'(catchpast, 'rtype'=>rtype)
     unless result goto catchpost_no_result
     catchpost = self.'coerce'(catchpost, result)
   catchpost_no_result:
     ops.'push'(catchpost)
-    ops.'push_pirop'('pop_eh')         # FIXME: should be before catchpost
+  catchpost_done:
+    ops.'push_pirop'('finalize', exceptreg)
+    ops.'push_pirop'('pop_upto_eh', exceptreg)
+    ops.'push_pirop'('pop_eh')
   catch_done:
     ops.'push'(endlabel)
     .return (ops)
