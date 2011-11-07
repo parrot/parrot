@@ -797,7 +797,7 @@ inline op die(in STR) :flow {
     opcode_t * const ret       = expr NEXT();
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
-                                    CONTROL_ERROR, $1);
+                                    EXCEPTION_DIE, $1);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -813,7 +813,7 @@ inline op die(in PMC) :flow {
     PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL($1) ? NULL : VTABLE_get_string(interp, $1);
     PMC      * const exception =
-        Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+        Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, msg);
 
     VTABLE_set_pointer(interp, resume, ret);
 

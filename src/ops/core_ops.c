@@ -13807,7 +13807,7 @@ Parrot_die_s(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t         * dest;
     opcode_t  * const  ret =  cur_opcode + 2;
     PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
-    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, SREG(1));
+    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, SREG(1));
 
     VTABLE_set_pointer(interp, resume, ret);
     VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
@@ -13820,7 +13820,7 @@ Parrot_die_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t         * dest;
     opcode_t  * const  ret =  cur_opcode + 2;
     PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
-    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, SCONST(1));
+    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, SCONST(1));
 
     VTABLE_set_pointer(interp, resume, ret);
     VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
@@ -13834,7 +13834,7 @@ Parrot_die_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  ret =  cur_opcode + 2;
     PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
     STRING    * const  msg = PMC_IS_NULL(PREG(1)) ? NULL : VTABLE_get_string(interp, PREG(1));
-    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, msg);
 
     VTABLE_set_pointer(interp, resume, ret);
     VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
@@ -13848,7 +13848,7 @@ Parrot_die_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  ret =  cur_opcode + 2;
     PMC       * const  resume = pmc_new(interp, enum_class_Continuation);
     STRING    * const  msg = PMC_IS_NULL(PCONST(1)) ? NULL : VTABLE_get_string(interp, PCONST(1));
-    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+    PMC       * const  exception = Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, msg);
 
     VTABLE_set_pointer(interp, resume, ret);
     VTABLE_set_attr_str(interp, exception, Parrot_str_new_constant(interp, "resume"), resume);
