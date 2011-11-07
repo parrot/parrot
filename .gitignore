@@ -55,6 +55,7 @@ cachegrind.out.*
 /installable*
 /libparrot.def
 /libparrot.dll
+/libparrot.dll.a
 /miniparrot
 /myconfig
 /ops2c
@@ -215,6 +216,7 @@ cachegrind.out.*
 /runtime/parrot/dynext/*.bundle
 /runtime/parrot/dynext/*.def
 /runtime/parrot/dynext/*.dll
+/runtime/parrot/dynext/*.dll.a
 /runtime/parrot/dynext/*.dylib
 /runtime/parrot/dynext/*.exe
 /runtime/parrot/dynext/*.exp
@@ -299,6 +301,7 @@ cachegrind.out.*
 /src/dynoplibs/*.bundle
 /src/dynoplibs/*.c
 /src/dynoplibs/*.dll
+/src/dynoplibs/*.dll.a
 /src/dynoplibs/*.exp
 /src/dynoplibs/*.h
 /src/dynoplibs/*.ilk
@@ -314,6 +317,7 @@ cachegrind.out.*
 /src/dynpmc/*.c
 /src/dynpmc/*.def
 /src/dynpmc/*.dll
+/src/dynpmc/*.dll.a
 /src/dynpmc/*.dump
 /src/dynpmc/*.dylib
 /src/dynpmc/*.exe
