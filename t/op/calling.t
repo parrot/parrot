@@ -257,7 +257,7 @@ ok 3
 back
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "return :flat" );
+pir_error_output_like( <<'CODE', qr/Invalid operation on null string/, "return :flat" );
 .sub main :main
   .local string s, r
   .local pmc arr
@@ -278,8 +278,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "return :flat" );
   .return(arr :flat )
 .end
 CODE
-FOO
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
