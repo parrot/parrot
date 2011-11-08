@@ -168,15 +168,28 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     /* need to set it here because argument passing can trigger GC */
     /* interp->lo_var_ptr = &lo_var_ptr; */
 
-    while (VTABLE_get_integer(interp, sched->task_queue) > 0) {
-        /* there can be no active runloops at this point, so it should be save
-         * to start counting at 0 again. This way the continuation in the next
-         * task will find a runloop with id 1 when encountering an exception */
-        interp->current_runloop_level = 0;
-        reset_runloop_id_counter(interp);
+    do {
+        while (VTABLE_get_integer(interp, sched->task_queue) > 0) {
+            /* there can be no active runloops at this point, so it should be save
+             * to start counting at 0 again. This way the continuation in the next
+             * task will find a runloop with id 1 when encountering an exception */
+            interp->current_runloop_level = 0;
+            reset_runloop_id_counter(interp);
 
-        Parrot_cx_next_task(interp, scheduler);
-    }
+            Parrot_cx_next_task(interp, scheduler);
+        }
+
+        alarm_count = VTABLE_get_integer(interp, sched->alarms);
+        if (alarm_count > 0) {
+#ifdef _WIN32
+            /* TODO: Implement on Windows */
+#else
+            /* Nothing to do except to wait for the next alarm to expire */
+            /* TODO: block on a pipe read */
+#endif
+            Parrot_cx_check_alarms(interp, interp->scheduler);
+        }
+    } while (alarm_count);
 
     return ret_val;
 }
