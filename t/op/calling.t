@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 103;
+use Parrot::Test tests => 104;
 
 =head1 NAME
 
@@ -255,6 +255,30 @@ ok 1
 ok 2
 ok 3
 back
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "return :flat" );
+.sub main :main
+  .local string s, r
+  .local pmc arr
+
+  say "get"
+  s = s_get()
+  r = substr s, 0, 1
+  print "'"
+  print r
+  print "'"
+  say " done"
+.end
+
+.sub s_get
+  .local pmc arr
+  arr = new ["ResizableStringArray"]
+  # push arr, "xy"
+  .return(arr :flat )
+.end
+CODE
+FOO
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
