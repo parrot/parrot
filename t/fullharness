@@ -99,7 +99,10 @@ else {
         # rewrite environment
         &{$set->{rule}} if defined $set->{rule};
         print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
-        my $harness = TAP::Harness->new( { formatter => $formatter } );
+        my $harness = TAP::Harness->new( {
+            formatter => $formatter,
+            jobs      => $ENV{TEST_JOBS} || 1,
+        } );
         $harness->aggregate_tests($aggregator, @{$set->{tests}});
     }
     $aggregator->stop();
