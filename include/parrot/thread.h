@@ -25,6 +25,8 @@
 
 #include "parrot/atomic.h"
 
+#define MAX_THREADS 4
+
 #ifndef YIELD
 #  define YIELD
 #endif /* YIELD */
@@ -71,6 +73,11 @@ typedef struct _Thread_data {
 
     /* COW'd constant tables */
     Hash             *const_tables;
+
+#ifdef _WIN32
+#else
+    int notifierfd[2];
+#endif
 } Thread_data;
 
 #  define LOCK_INTERPRETER(interp) \
@@ -123,6 +130,22 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
 
+int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PMC** Parrot_thread_get_threads_array(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_thread_init_threads_array(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_thread_insert_thread(PARROT_INTERP,
+    ARGIN(Interp* thread),
+    int index)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 int Parrot_thread_run(PARROT_INTERP,
     ARGMOD(PMC *thread_interp_pmc),
     ARGIN(PMC *sub),
@@ -152,6 +175,18 @@ PMC * Parrot_thread_transfer_sub(
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_get_free_threads_array_index \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_get_threads_array \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_init_threads_array \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_insert_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread))
 #define ASSERT_ARGS_Parrot_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread_interp_pmc) \

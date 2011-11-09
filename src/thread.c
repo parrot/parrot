@@ -61,6 +61,8 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+static Interp * threads_array[MAX_THREADS];
+
 /*
 
 =item C<PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL
@@ -83,6 +85,10 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     clone_interpreter(new_interp, interp, clone_flags);
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
     new_interp->thread_data->tid = 0;
+#ifdef _WIN32
+#else
+    pipe(new_interp->thread_data->notifierfd);
+#endif
     PARROT_GC_WRITE_BARRIER(interp, new_interp);
 
     return new_interp_pmc;
@@ -164,6 +170,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count;
+    char dummy;
 
     /* need to set it here because argument passing can trigger GC */
     /* interp->lo_var_ptr = &lo_var_ptr; */
@@ -185,7 +192,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             /* TODO: Implement on Windows */
 #else
             /* Nothing to do except to wait for the next alarm to expire */
-            /* TODO: block on a pipe read */
+            read(interp->thread_data->notifierfd[0], &dummy, 1);
 #endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
@@ -345,6 +352,90 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
     }
 
     return ret_val;
+}
+
+/*
+
+=item C<PMC** Parrot_thread_get_threads_array(PARROT_INTERP)>
+
+Returns the threads array.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC**
+Parrot_thread_get_threads_array(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_get_threads_array)
+
+    return threads_array;
+}
+
+/*
+
+=item C<void Parrot_thread_init_threads_array(PARROT_INTERP)>
+
+Initialize the threads array.
+
+=cut
+
+*/
+
+void
+Parrot_thread_init_threads_array(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_init_threads_array)
+
+    int i = 0;
+
+    for (; i < MAX_THREADS; i++)
+        threads_array[i] = NULL;
+}
+
+/*
+
+=item C<int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)>
+
+Returns an index of a free slot in the threads_array.
+Returns -1 if no slot is available.
+
+=cut
+
+*/
+
+int
+Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
+
+    int i = 0;
+
+    for (; i < MAX_THREADS; i++)
+        if (threads_array[i] == NULL)
+            return i;
+
+    return -1;
+}
+
+/*
+
+=item C<void Parrot_thread_insert_thread(PARROT_INTERP, Interp* thread, int
+index)>
+
+Insert the given thread into the threads_array at index i.
+
+=cut
+
+*/
+
+void
+Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
+{
+    ASSERT_ARGS(Parrot_thread_insert_thread)
+
+    threads_array[index] = thread;
 }
 
 /*

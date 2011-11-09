@@ -111,6 +111,9 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC *main), ARGIN(PMC *argv))
     tdata->data = argv;
     PARROT_GC_WRITE_BARRIER(interp, main_task);
 
+    Parrot_thread_init_threads_array(interp);
+    Parrot_thread_insert_thread(interp, interp, 0);
+
     SCHEDULER_enable_scheduler_SET(scheduler);
 
     Parrot_cx_schedule_immediate(interp, main_task);
@@ -271,6 +274,18 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
 
+#ifdef _WIN32
+#else
+    int i;
+    char dummy = 0;
+    Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
+
+    for (i = 1; i < MAX_THREADS; i++)
+        if (threads_array[i]) {
+            write(threads_array[i]->thread_data->notifierfd[1], &dummy, 1);
+        }
+#endif
+
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 
@@ -410,7 +425,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     ASSERT_ARGS(Parrot_cx_schedule_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     PMC * task = PMCNULL;
-    PMC * thread;
+    int index;
 
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -431,9 +446,25 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
-    thread = Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_DEFAULT);
-    Parrot_thread_schedule_task(interp, thread, task);
-    Parrot_thread_run(interp, thread, task, NULL);
+    index = Parrot_thread_get_free_threads_array_index(interp);
+    if (index > -1) {
+        PMC * const thread =
+            Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_DEFAULT);
+        Interp * const thread_interp = (Interp *)VTABLE_get_pointer(interp, thread);
+        Parrot_thread_schedule_task(interp, thread, task);
+        Parrot_thread_insert_thread(interp, thread_interp, index);
+        Parrot_thread_run(interp, thread, task, NULL);
+    }
+    else {
+        VTABLE_push_pmc(interp, sched->task_queue, task);
+
+#ifdef _WIN32
+#else
+        /* going from single to multi tasking? */
+        if (VTABLE_get_integer(interp, sched->task_queue) == 1)
+            Parrot_cx_enable_preemption(interp);
+#endif
+    }
 }
 
 /*
