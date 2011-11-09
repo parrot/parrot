@@ -371,11 +371,11 @@ rule pointer { <star> 'const'? }
 token star { '*' }
 
 rule pointerless_type {
-    'struct'? 'const'? <identifier>
+    'struct'? 'const'? 'unsigned'? <identifier>
 }
 
 rule type_declarator {
-    'struct'? 'const'? <identifier> <pointer>*
+    'struct'? 'const'? 'unsigned'? <identifier> <pointer>*
 }
 
 token eat_terminator {
