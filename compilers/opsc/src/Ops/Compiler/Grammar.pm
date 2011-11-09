@@ -183,7 +183,7 @@ token statement {
 
 token label {
     [
-    | 'case' <.ws> [ <integer> | <identifier> ] ':'
+    | 'case' <.ws> [ <integer> | <identifier> | "'" <alnum> "'" ] ':'
     | 'default:'
     | <identifier> ':'
     ]
