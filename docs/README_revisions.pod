@@ -1,3 +1,5 @@
+# Copyright (C) 20011-2011, Parrot Foundation.
+
 =head1 NAME
 
 docs/README_revisions.pod - Readme file for the revision of Parrot's Documentation 
