@@ -1,0 +1,113 @@
+TODO - The Task List file for Parrot's Document Revisions
+
+This document is an overview of the tasks necessary to complete our 
+revision of Parrot's Documentation Set.  Please note, by complete, we
+mean a set of documents sufficient to satisfy the goals set out in 
+'README_revisions.pod'.
+
+[Done] 1.  Write a README_revision and this TODO_revision and commit them
+       	   to a new documentation branch on github.
+
+[Done] 2.  Create a new 'documentation_set' branch on github to house
+       	   our revisions.
+
+[Open] 3.  Convert 'docs.parrot.org' to Github pages.
+
+[Open] 4.  Review and revise (i.e., correct, update, and delete, where
+       	   appropriate) each and every document in the 'docs/' directory.
+
+[Open] 5.  Add a new 'README.pod' to 'docs/', giving an overview of the 
+       	   contents of each directory in 'docs/' and of the '*.pod's in
+	   'docs/'.
+
+[Open] 6.  Apply a number system to all of the docs in 'docs/' 
+       	   (e.g., something similar to what we presently use in 
+	   'docs/book/...'). 
+
+[Open] 7.  Revise and update 'docs/parrot.pod'.
+
+[Open] 8.  Add a directory structure for the new manuals.[1]
+
+[Open] 9.  Revise the PIR book contained in 'docs/book/pir'.
+
+[Open] 10. Revise the PCT book contained in 'docs/book/pct'.[2]
+
+[Open] 11. Revise 'parrotbug' to clarify its use for documents, as well
+       	   as its use for bugs (because we want folks to use 'parrotbug' to
+	   inform us of any need doc changes or corrections).
+
+[Open] 12. Revise 'README' to,
+
+       	   (1) reflect this revision effort;
+
+       	   (2) instruct folks to run 'make html' and use *only* the html 
+	   version of the docs, and *not* the pod docs in 'docs/';
+
+	   (3) update 'FEEDBACK, PATCHES, etc.' section to make mention of 
+	   how to report or suggest doc changes/corrections/revisions; and
+
+	   (4) reformat the 'README' as a '*.pod'.
+
+[Open] 13. Revise 'docs/submissions.pod' to reflect this revision effort 
+           (e.g., "How to submit bug reports, patches and new files to 
+	   Parrot" out now to read something like, "How to submit bug 
+	   reports, documentation changes, patches, and new files to Parrot")
+
+[Open] 14. Ensure all 'README's are properly formatted in '*.pod'.
+
+[Open] 15. Identify and archive, where appropriate, any and all obsolete 
+       	   documentation (e.g., Wikibooks, Allison Randall's video
+	   presentations, etc.)
+
+[Open] 16. Update (or subclass or clone) 'perldoc' to,
+
+       	   (1) work more closely with Parrot's docs and
+
+	   (2) eliminate certain Perl specific features (e.g., displaying
+	   the phrase, "User Contributed Perl Documentation", at the top
+	   of the page.
+
+[Open] 17. Write '*.pod' pages for each of the installable binaries in
+       	   Parrot's distribution.
+
+[Open] 18. Write an autogen tool to run our '*.pod' pages in (17) above 
+       	   through 'pod2man', converting them to '*roff' pages.
+
+[Open] 19. Write an autogen indexer with which to generate an easy to use 
+       	   reference to Parrot's documentation.
+
+[Open] 20. Implementation such tools, procedures, and tests as are necessary
+       	   to ensure Parrot's code documentation comports with its internal 
+	   coding standards.
+
+[Open] 21. Create a new, friendlier front page for 'parrot.org'.
+
+[Open] 22. Produce a "standard" presentation on the ParrotVM. 
+
+[Open] 23. Develop something to help new users and developers keep track
+       	   of what they've read and where they've been in 'docs/'.[3]
+
+[Open] 24. Implement some way to log our completed revisions.[4]
+
+[Open] 25. Solicit the aid of others in the completion of the Documentation
+       	   Revision effort.
+
+Note: The above list is, by-no-means, complete.  We will add tasks (and 
+      subtasks to the above tasks) as this revision effort comes more clearly
+      into focus or as others make us aware of the need for additional tasks.
+      --acy
+
+
+---------------
+[1]  Note: Ensure we include, at least, a '.gitignore' in each new directory.
+
+[2]  Note: Benabik, presently, is engaged in a rewrite of PCT, called PACT,
+using the winxed programming language rather than PIR.  Given this, we will
+engage only in nominal, i.e., only those necessary to bring them up-to-date,
+corrections to the documents in 'docs/book/pct'.
+
+[3]  For example, when the user fires up 'perldoc' (or our 'perldoc' clone),
+it reads a DOT directory which contains the reader's document-flow.
+
+[4]  Write (or find) something on CPAN which will log our completions to
+'.parrot_revision' directory within 'docs/'.   
