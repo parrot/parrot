@@ -166,6 +166,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 #else
             /* Nothing to do except to wait for the next alarm to expire */
             pause();
+            Parrot_thread_notify_threads(interp);
 #endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
@@ -274,18 +275,7 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
 
-#ifdef _WIN32
-#else
-    int i;
-    char dummy = 0;
-    Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
-
-    for (i = 1; i < MAX_THREADS; i++)
-        if (threads_array[i]) {
-            write(threads_array[i]->thread_data->notifierfd[1], &dummy, 1);
-        }
-#endif
-
+    Parrot_thread_notify_threads(interp);
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 

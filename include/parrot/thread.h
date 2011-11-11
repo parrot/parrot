@@ -146,6 +146,9 @@ void Parrot_thread_insert_thread(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_thread_notify_threads(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 int Parrot_thread_run(PARROT_INTERP,
     ARGMOD(PMC *thread_interp_pmc),
     ARGIN(PMC *sub),
@@ -187,6 +190,8 @@ PMC * Parrot_thread_transfer_sub(
 #define ASSERT_ARGS_Parrot_thread_insert_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread))
+#define ASSERT_ARGS_Parrot_thread_notify_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread_interp_pmc) \

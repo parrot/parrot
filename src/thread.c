@@ -184,6 +184,9 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             reset_runloop_id_counter(interp);
 
             Parrot_cx_next_task(interp, scheduler);
+
+            /* add expired alarms to the task queue */
+            Parrot_cx_check_alarms(interp, interp->scheduler);
         }
 
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
@@ -199,6 +202,33 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     } while (alarm_count);
 
     return ret_val;
+}
+
+/*
+
+=item C<void Parrot_thread_notify_threads(PARROT_INTERP)>
+
+Give all threads a chance to check their alarms.
+
+=cut
+
+*/
+
+void
+Parrot_thread_notify_threads(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_notify_threads)
+#ifdef _WIN32
+#else
+    int i;
+    char dummy = 0;
+    Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
+
+    for (i = 1; i < MAX_THREADS; i++)
+        if (threads_array[i]) {
+            write(threads_array[i]->thread_data->notifierfd[1], &dummy, 1);
+        }
+#endif
 }
 
 /*
