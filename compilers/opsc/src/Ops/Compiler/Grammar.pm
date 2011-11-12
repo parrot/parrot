@@ -237,10 +237,11 @@ token term:sym<call> {
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
 token term:sym<str>  { <quote> }
 token term:sym<float_constant_long> { # longer to work-around lack of LTM
-    [
+    (
     | \d+ '.' \d*
     | \d* '.' \d+
-    ]
+    )
+    <[fF]>?
 }
 
 token term:sym<reg>   {
