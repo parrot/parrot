@@ -213,9 +213,8 @@ rule statement_control:sym<do-while> {
 
 # Not real "C" switch. Just close enough
 rule statement_control:sym<switch> {
-    <sym> '(' <test=.EXPR> ')' '{'
+    <sym> '(' <test=.EXPR> ')' '{' ~ '}'
     <statement_list>
-    '}'
 }
 
 rule statement_control:sym<break> { <sym> }
@@ -350,7 +349,7 @@ token prefix:sym<~>   { <sym>  <O('%symbolic_unary :pirop<~>')> }
 token prefix:sym<return> { <sym>  <O('%symbolic_unary :pirop<return>')> }
 
 rule blockoid {
-    '{' <mixed_content> '}'
+    '{' ~ '}' <mixed_content>
 }
 
 rule mixed_content {
