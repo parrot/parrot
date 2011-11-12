@@ -381,6 +381,7 @@ token eat_terminator {
     | ';'
     | <?MARKED('endstmt')>
     | $
+    | <.panic('Statement not properly terminated')>
 }
 
 token pod_ws {
