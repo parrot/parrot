@@ -33,6 +33,7 @@ pmclass Task provides invokable auto_attrs {
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
     ATTR PMC          *mailbox;   /* List of incoming messages */
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
+    ATTR PMC          *shared;    /* List of variables shared with this task */
 
 /*
 
@@ -60,6 +61,7 @@ Initialize a concurrency task object.
         core_struct->killed    = 0;
         core_struct->mailbox   = PMCNULL; /* Created lazily on demand */
         core_struct->waiters   = PMCNULL; /* Created lazily on demand */
+        core_struct->shared    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -256,6 +258,22 @@ Sets the value of an attribute for this task.
         else if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "data"))) {
             core_struct->data = value;
         }
+    }
+
+/*
+
+=item C<void push_pmc(PMC *value)>
+
+Add value to the list of PMCs shared with this task.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *value) {
+        VTABLE_push_pmc(interp, PARROT_TASK(SELF)->shared, value);
+
+        return;
     }
 
 /*

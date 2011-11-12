@@ -16,6 +16,8 @@ start:
     number = new ['String']
     number = i
     task = new ['Task']
+    push task, starter
+    push task, ender
     setattribute task, 'code', sayer
     setattribute task, 'data', number
     print "ok "
