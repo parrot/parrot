@@ -146,7 +146,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     INTVAL alarm_count;
 
     do {
-        while (VTABLE_get_integer(interp, sched->task_queue) > 0) {
+        while (VTABLE_get_integer(interp, scheduler) > 0) {
             /* there can be no active runloops at this point, so it should be save
              * to start counting at 0 again. This way the continuation in the next
              * task will find a runloop with id 1 when encountering an exception */
@@ -210,7 +210,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_next_task)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    PMC * const task = VTABLE_shift_pmc(interp, sched->task_queue);
+    PMC * const task = VTABLE_shift_pmc(interp, scheduler);
 
     interp->cur_task = task;
 
@@ -221,7 +221,7 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 #ifdef _WIN32
     /* TODO: Implement on Windows */
 #else
-    if (VTABLE_get_integer(interp, sched->task_queue) > 0)
+    if (VTABLE_get_integer(interp, scheduler) > 0)
         Parrot_cx_enable_preemption(interp);
     else
         Parrot_cx_disable_preemption(interp);
@@ -368,9 +368,8 @@ opcode_t*
 Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_preempt_task)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     PMC * const task = Parrot_cx_stop_task(interp, next);
-    VTABLE_push_pmc(interp, sched->task_queue, task);
+    VTABLE_push_pmc(interp, scheduler, task);
 
     return (opcode_t*) 0;
 }
@@ -413,7 +412,6 @@ void
 Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_task)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     PMC * task = PMCNULL;
     int index;
 
@@ -446,12 +444,12 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         Parrot_thread_run(interp, thread, task, NULL);
     }
     else {
-        VTABLE_push_pmc(interp, sched->task_queue, task);
+        VTABLE_push_pmc(interp, interp->scheduler, task);
 
 #ifdef _WIN32
 #else
         /* going from single to multi tasking? */
-        if (VTABLE_get_integer(interp, sched->task_queue) == 1)
+        if (VTABLE_get_integer(interp, interp->scheduler) == 1)
             Parrot_cx_enable_preemption(interp);
 #endif
     }
@@ -490,7 +488,7 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
-    VTABLE_unshift_pmc(interp, sched->task_queue, task);
+    VTABLE_unshift_pmc(interp, interp->scheduler, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
 }

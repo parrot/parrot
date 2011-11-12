@@ -138,13 +138,11 @@ void
 Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_schedule_task)
-    PMC * const   self                        = (PMC*) thread;
-    Parrot_Interp thread_interp               =
+    PMC * const   self                = (PMC*) thread;
+    Parrot_Interp const thread_interp =
        (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
-    PMC * const scheduler                     = thread_interp->scheduler;
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(thread_interp->scheduler);
 
-    VTABLE_push_pmc(thread_interp, sched->task_queue, task);
+    VTABLE_push_pmc(thread_interp, thread_interp->scheduler, task);
 }
 
 /*
@@ -176,7 +174,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     /* interp->lo_var_ptr = &lo_var_ptr; */
 
     do {
-        while (VTABLE_get_integer(interp, sched->task_queue) > 0) {
+        while (VTABLE_get_integer(interp, scheduler) > 0) {
             /* there can be no active runloops at this point, so it should be save
              * to start counting at 0 again. This way the continuation in the next
              * task will find a runloop with id 1 when encountering an exception */

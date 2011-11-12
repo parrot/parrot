@@ -1,4 +1,5 @@
 #!./parrot
+# Copyright (C) 2011, Parrot Foundation.
 
 .sub main :main
     .local pmc task, sayer, name, starter, ender, number
@@ -53,4 +54,8 @@ end:
     set_global 'ender', ender
 .end
 
-# vim: ft=pir expandtab shiftwidth=4 cinoptions='\:2=2' :
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

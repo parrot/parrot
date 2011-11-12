@@ -30,6 +30,7 @@ pmclass Scheduler auto_attrs {
                                         between schedulers. */
 
     ATTR PMC          *task_queue;   /* List of tasks/green threads waiting to run */
+    ATTR Parrot_mutex task_queue_lock;
     ATTR PMC          *alarms;       /* List of future alarms ordered by time */
 
     ATTR PMC          *all_tasks;    /* Hash of all active tasks by ID */
@@ -64,6 +65,8 @@ Initializes a concurrency scheduler object.
         core_struct->all_tasks    = Parrot_pmc_new(INTERP, enum_class_Hash);
         core_struct->next_task_id = 0;
         core_struct->interp       = INTERP;
+
+        MUTEX_INIT(core_struct->task_queue_lock);
 
         /* Chandon TODO: Delete from int-keyed hash doesn't like me. */
         /* VTABLE_set_integer_native(interp, core_struct->all_tasks, Hash_key_type_int); */
@@ -106,39 +109,63 @@ An C<Integer> representing the unique identifier for this scheduler.
             core_struct->id = VTABLE_get_integer(INTERP, elem);
     }
 
+
 /*
 
 =item C<void push_pmc(PMC *value)>
 
-Inserts a task into the task list, giving it a task ID one higher than the
-current maximum, and a birthtime of the current time.
+Inserts a task into the task list.
 
 =cut
 
 */
 
     void push_pmc(PMC *task) {
-        /* TODO: This doesn't appear to do anything */
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        PMC * const type_pmc = VTABLE_get_attr_str(interp, task, CONST_STRING(interp, "type"));
-        STRING * const type = VTABLE_get_string(interp, type_pmc);
+
+        LOCK(core_struct->task_queue_lock);
+        VTABLE_push_pmc(INTERP, core_struct->task_queue, task);
+        UNLOCK(core_struct->task_queue_lock);
     }
 
 
 /*
 
-=item C<PMC *pop_pmc()>
+=item C<void unshift_pmc(PMC *value)>
 
-Retrieves the next task from the task list. If the task index is invalid,
-recalculates it before retrieving the next task.
+Inserts a task into the head of the task list.
 
 =cut
 
 */
 
-    VTABLE PMC *pop_pmc() {
+    void unshift_pmc(PMC *task) {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        PMC * const task = VTABLE_shift_pmc(INTERP, core_struct->task_queue);
+
+        LOCK(core_struct->task_queue_lock);
+        VTABLE_unshift_pmc(INTERP, core_struct->task_queue, task);
+        UNLOCK(core_struct->task_queue_lock);
+    }
+
+
+/*
+
+=item C<PMC *shift_pmc()>
+
+Retrieves the next task from the task list.
+
+=cut
+
+*/
+
+    VTABLE PMC *shift_pmc() {
+        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        PMC * task;
+
+        LOCK(core_struct->task_queue_lock);
+        task = VTABLE_shift_pmc(INTERP, core_struct->task_queue);
+        UNLOCK(core_struct->task_queue_lock);
+
         return task;
     }
 
@@ -155,7 +182,13 @@ Retrieves the number of pending tasks in the scheduler's task list.
 
     VTABLE INTVAL get_integer() {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
-        return VTABLE_elements(INTERP, core_struct->task_queue);
+        INTVAL elements;
+
+        LOCK(core_struct->task_queue_lock);
+        elements = VTABLE_elements(INTERP, PARROT_SCHEDULER(SELF)->task_queue);
+        UNLOCK(core_struct->task_queue_lock);
+
+        return elements;
     }
 
 
