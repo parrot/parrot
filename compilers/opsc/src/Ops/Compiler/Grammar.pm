@@ -231,7 +231,7 @@ token term:sym<concatenate_strings> { # Long-long name as LTM workaround
 }
 
 token term:sym<call> {
-    <identifier> <.ws> '(' <arglist> ')'
+    <identifier> <.ws> '(' ~ ')' <arglist>
 }
 
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
