@@ -198,17 +198,17 @@ rule statement_control:sym<if> {
 }
 
 rule statement_control:sym<while> {
-    <sym> '(' <condition=.EXPR> ')'
+    <sym> '(' ~ ')' <condition=.EXPR>
     <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<for> {
-    <sym> '(' <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ')'
+    <sym> '(' ~ ')' [ <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ]
     <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<do-while> {
-    'do' <blockoid> 'while' '(' <condition=.EXPR> ')'
+    'do' <blockoid> 'while' '(' ~  ')' <condition=.EXPR>
 }
 
 # Not real "C" switch. Just close enough
