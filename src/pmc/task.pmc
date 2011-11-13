@@ -308,6 +308,7 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->mailbox);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->waiters);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->shared);
         }
     }
 
