@@ -1,0 +1,168 @@
+/* Proxy.pmc
+ *  Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+src/pmc/proxy.pmc - Class for proxy objects used in threading
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the Proxy PMC class.
+
+All methods which are not defined here get a default implementation
+generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+ */
+
+#include "parrot/parrot.h"
+
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING * caller(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void cant_do_write_method(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *pmc),
+    int index)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_caller __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_cant_do_write_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+/*
+
+=item C<static STRING * caller(PARROT_INTERP, PMC *pmc)>
+
+Returns a C string for the name of C<*pmc>.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING *
+caller(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+{
+    ASSERT_ARGS(caller)
+
+    return !PMC_IS_NULL(pmc) && pmc->vtable && pmc->vtable->whoami
+                ? VTABLE_name(interp, pmc)
+                : CONST_STRING(interp, "(null)");
+}
+
+/*
+
+=item C<static void cant_do_write_method(PARROT_INTERP, PMC *pmc, int index)>
+
+Throws an exception "$methname() on read-only instance of '$class'", used by
+all updating messages on read-only instances.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+cant_do_write_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
+{
+    ASSERT_ARGS(cant_do_write_method)
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
+            "%s() in read-only proxy of '%Ss'",
+            Parrot_get_vtable_name(interp, index),
+            caller(interp, pmc));
+}
+
+pmclass Proxy auto_attrs {
+    ATTR PMC          *target; /* The PMC we proxy to */
+    ATTR Parrot_Interp interp; /* The interpreter owning target */
+
+    VTABLE void init() {
+        Parrot_Proxy_attributes * const core_struct = PARROT_PROXY(SELF);
+
+        /* Set flags for custom GC mark. */
+        PObj_custom_mark_SET(SELF);
+
+        core_struct->target = PMCNULL;
+        core_struct->interp = INTERP;
+    }
+
+    VTABLE void init_pmc(PMC *target) {
+        Parrot_Proxy_attributes * const core_struct = PARROT_PROXY(SELF);
+
+        /* Set flags for custom GC mark. */
+        PObj_custom_mark_SET(SELF);
+
+        core_struct->target = target;
+        core_struct->interp = INTERP;
+    }
+
+/*
+
+=item C<void mark()>
+
+Don't mark target and interp since they belong to a different interpreter.
+
+=cut
+
+*/
+    VTABLE void mark() {
+    }
+
+/*
+
+=item C<PMC *get_attr_str(STRING *name)>
+
+Gets the value of an attribute of this proxy or it's target.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_attr_str(STRING *name) {
+        Parrot_Proxy_attributes * const core_struct = PARROT_PROXY(SELF);
+        PMC * value = PMCNULL;
+
+        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "target"))) {
+            fprintf(stderr, "get target\n");
+            value = core_struct->target;
+        }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "interp"))) {
+            value = Parrot_pmc_new_init(interp, enum_class_Proxy, core_struct->interp);
+            fprintf(stderr, "get interp %p\n", core_struct->interp);
+        }
+        else {
+            value = VTABLE_get_attr_str(INTERP, core_struct->target, name);
+        }
+
+        return value;
+    }
+
+    VTABLE PMC *find_method(STRING *method_name)
+    {
+        return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target, method_name);
+    }
+}
+
+/*
+ * Local Variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -17,6 +17,7 @@ use Parrot::Pmc2c::UtilFunctions 'filename';
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Object ();
+use Parrot::Pmc2c::PMC::Proxy ();
 
 # put the options in a package var so it can be accessed from
 # Parrot::Pmc2c::Emitter.
