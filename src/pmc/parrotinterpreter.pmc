@@ -751,10 +751,36 @@ support it.
         RETURN(INTVAL id);
     }
 
+/*
+
+=item METHOD current_task()
+
+Returns the task currently executed by this interpreter.
+
+=cut
+
+*/
+
     METHOD current_task() {
         Interp * const this_interp = PMC_interp(SELF);
         PMC * const current_task = this_interp->cur_task;
         RETURN(PMC *current_task);
+    }
+
+/*
+
+=item METHOD schedule(PMC *task)
+
+Schedules the given task on this interpreter.
+
+=cut
+
+*/
+
+    METHOD schedule(PMC *task) {
+        Interp * const this_interp = PMC_interp(SELF);
+        PMC * const current_task = this_interp->cur_task;
+        Parrot_cx_schedule_immediate(this_interp, task);
     }
 
 }

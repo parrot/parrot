@@ -278,6 +278,21 @@ Add value to the list of PMCs shared with this task.
 
 /*
 
+=item C<PMC *pop_pmc()>
+
+Return a proxy for the last shared PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *pop_pmc() {
+        /* TODO create a proxy */
+        return VTABLE_pop_pmc(interp, PARROT_TASK(SELF)->shared);
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any referenced strings and PMCs.

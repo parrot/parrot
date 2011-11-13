@@ -2,13 +2,11 @@
 # Copyright (C) 2011, Parrot Foundation.
 
 .sub main :main
-    .local pmc task, sayer, name, starter, ender, number
+    .local pmc task, sayer, starter, ender, number, interp
     .local int i
     sayer = get_global 'sayer'
     starter = new ['Integer']
     ender   = new ['Integer']
-    set_global 'starter', starter
-    set_global 'ender',   ender
     i = 1
     starter = 0
     ender   = 0
@@ -20,7 +18,8 @@ start:
     push task, starter
     push task, ender
     setattribute task, 'code', sayer
-    setattribute task, 'data', number
+    interp = getinterp
+    setattribute task, 'data', interp
     print "ok "
     say number
     schedule task
@@ -30,7 +29,6 @@ start:
 end:
     starter = 1
     sleep 1 # give threads time to run. Replace by join once that's implemented
-    ender = get_global 'ender'
     if ender == 1 goto win
     say "not ok"
     goto done
@@ -40,18 +38,28 @@ done:
 .end
 
 .sub sayer
-    .param pmc name
-    .local pmc starter, ender
+    .param pmc parent
+    .local pmc interp, task, starter, ender, end_sub, end_task
     .local int i
-    starter = get_global 'starter'
-    ender = get_global 'starter'
+    interp = getinterp
+    task = interp.'current_task'()
+    ender = pop task
+    starter = pop task
 start:
     if starter > 0 goto end
     sleep 0.1
     goto start
 end:
+    end_sub = get_global 'end_this'
+    end_task = new ['Task']
+    setattribute end_task, 'code', end_sub
+    setattribute end_task, 'data', ender
+    parent.'schedule'(end_task)
+.end
+
+.sub end_this
+    .param pmc ender
     ender = 1
-    set_global 'ender', ender
 .end
 
 # Local Variables:
