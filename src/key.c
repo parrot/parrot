@@ -373,7 +373,7 @@ Parrot_key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_key_next)
 
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
+    if (key->vtable->base_type == enum_class_Key || VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         PMC *next_key;
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
