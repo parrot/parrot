@@ -732,7 +732,7 @@ inline op throw(invar PMC) :flow {
     PMC * except = $1;
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
-    PMC      * const resume = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume = Parrot_pmc_new(interp, enum_class_Continuation);
     STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
@@ -786,7 +786,7 @@ inline op count_eh(out INT) {
 inline op die(in STR) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
                                     CONTROL_ERROR, $1);
 
@@ -801,7 +801,7 @@ inline op die(in STR) :flow {
 inline op die(in PMC) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL($1) ? NULL : VTABLE_get_string(interp, $1);
     PMC      * const exception =
         Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
@@ -820,7 +820,7 @@ inline op die(in INT, in INT) :flow {
     else {
         opcode_t        *dest;
         opcode_t * const ret       = expr NEXT();
-        PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+        PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
         PMC      * const exception = Parrot_ex_build_exception(interp, $1, $2, NULL);
 
         VTABLE_set_pointer(interp, resume, ret);
@@ -835,7 +835,7 @@ inline op die(in INT, in INT) :flow {
 inline op exit(in INT) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
 
