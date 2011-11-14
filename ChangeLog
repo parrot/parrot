@@ -8,6 +8,11 @@
         + A new implementation of green threads was added to Parrot, in preparation
         for a robust hybrid threading system
     - Languages
+        + Winxed
+          - 'multi' modifier improved
+          - throw "string" now emits throw instead of die
+          - several optimizations in generated code
+          - improved some error dianostics
     - Community
     - Documentation
     - Tests
