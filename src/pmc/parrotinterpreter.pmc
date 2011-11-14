@@ -30,6 +30,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/thread.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_proxy.h"
+#include "pmc/pmc_task.h"
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 #define PMC_args(x)   ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->args
@@ -779,8 +781,27 @@ Schedules the given task on this interpreter.
 
     METHOD schedule(PMC *task) {
         Interp * const this_interp = PMC_interp(SELF);
-        PMC * const current_task = this_interp->cur_task;
         Parrot_cx_schedule_immediate(this_interp, task);
+    }
+
+/*
+
+=item METHOD schedule_proxied(PMC *task, PMC *proxy)
+
+Schedules the given task on the proxy's interpreter.
+
+=cut
+
+*/
+
+    METHOD schedule_proxied(PMC *task, PMC *proxy) {
+        Parrot_Proxy_attributes * const core_struct = PARROT_PROXY(proxy);
+        Parrot_Task_attributes * const task_struct = PARROT_TASK(task);
+        if (task_struct->data) {
+            task_struct->data = PARROT_PROXY(task_struct->data)->target;
+            PARROT_GC_WRITE_BARRIER(interp, task);
+        }
+        Parrot_cx_schedule_immediate(core_struct->interp, task);
     }
 
 }

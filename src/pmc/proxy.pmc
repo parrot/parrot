@@ -125,34 +125,6 @@ Don't mark target and interp since they belong to a different interpreter.
     VTABLE void mark() {
     }
 
-/*
-
-=item C<PMC *get_attr_str(STRING *name)>
-
-Gets the value of an attribute of this proxy or it's target.
-
-=cut
-
-*/
-
-    VTABLE PMC *get_attr_str(STRING *name) {
-        Parrot_Proxy_attributes * const core_struct = PARROT_PROXY(SELF);
-        PMC * value = PMCNULL;
-
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "target"))) {
-            fprintf(stderr, "get target\n");
-            value = core_struct->target;
-        }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "interp"))) {
-            value = Parrot_pmc_new_init(interp, enum_class_Proxy, core_struct->interp);
-            fprintf(stderr, "get interp %p\n", core_struct->interp);
-        }
-        else {
-            value = VTABLE_get_attr_str(INTERP, core_struct->target, name);
-        }
-
-        return value;
-    }
 
     VTABLE PMC *find_method(STRING *method_name)
     {

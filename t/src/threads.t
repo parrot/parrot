@@ -24,13 +24,11 @@ start:
     say number
     schedule task
     inc i
-    if i > 2 goto end
+    if i > 10 goto end
     goto start
 end:
     starter = 1
-    say "sleeping"
     sleep 1 # give threads time to run. Replace by join once that's implemented
-    say "checking ender"
     if ender == 1 goto win
     say "not ok"
     goto done
@@ -41,7 +39,7 @@ done:
 
 .sub sayer
     .param pmc name
-    .local pmc interp, task, starter, ender, ender_target, end_sub, end_task, parent
+    .local pmc interp, task, starter, ender, end_sub, end_task
     .local int i
     interp = getinterp
     task = interp.'current_task'()
@@ -55,20 +53,12 @@ end:
     end_sub = get_global 'end_this'
     end_task = new ['Task']
     setattribute end_task, 'code', end_sub
-    ender_target = getattribute ender, 'target'
-    say "ender_target"
-    setattribute end_task, 'data', ender_target
-    say "getting parent"
-    parent = getattribute ender, 'interp'
-    say "parent"
-    parent.'schedule'(end_task)
-    say "parent scheduled"
+    setattribute end_task, 'data', ender
+    interp.'schedule_proxied'(end_task, ender)
 .end
 
 .sub end_this
     .param pmc ender
-#.local pmc target
-#target = getattribute ender, 'target'
     ender = 1
 .end
 
