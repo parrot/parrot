@@ -273,24 +273,6 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
 
-/* Allows compatibility with old name (see r44190) */
-#define Parrot_create_mro       Parrot_pmc_create_mro
-#define PMC_is_null             Parrot_pmc_is_null
-#define constant_pmc_new        Parrot_pmc_new_constant
-#define constant_pmc_new_init   Parrot_pmc_new_constant_init
-#define gc_register_pmc         Parrot_pmc_gc_register
-#define gc_unregister_pmc       Parrot_pmc_gc_unregister
-#define pmc_new                 Parrot_pmc_new
-#define pmc_new_init            Parrot_pmc_new_init
-#define pmc_new_noinit          Parrot_pmc_new_noinit
-#define pmc_register            Parrot_pmc_register_new_type
-#define pmc_reuse               Parrot_pmc_reuse
-#define pmc_reuse_by_class      Parrot_pmc_reuse_by_class
-#define pmc_reuse_init          Parrot_pmc_reuse_init
-#define pmc_reuse_no_init       Parrot_pmc_reuse_noinit
-#define pmc_type                Parrot_pmc_get_type_str
-#define pmc_type_p              Parrot_pmc_get_type
-
 #define PMC_IS_TYPE(p, t) ((p)->vtable->base_type == enum_class_ ## t)
 #define PMC_IS_TYPE_ENUM(p, e) ((p)->vtable->base_type == (e))
 
