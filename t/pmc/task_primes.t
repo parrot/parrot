@@ -10,10 +10,21 @@ is now a Parrot test.
 =cut
 
 .include 'interpinfo.pasm'
+.include 'sysinfo.pasm'
+.loadlib 'sys_ops'
 
 .sub main
     .include 'test_more.pir'
     .local pmc nt, tt
+    
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    if $S0 == 'MSWin32' goto run_win32_tests
+    goto run_unix_tests
+  run_win32_tests:
+    say "1..1"
+    say "ok 1 - All tests skipped on Win32"
+    exit 0
+  run_unix_tests:
 
     $P0 = get_global 'test_sub'
     tt  = new 'Task', $P0

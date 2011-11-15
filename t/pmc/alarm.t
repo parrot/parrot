@@ -3,9 +3,21 @@
 # $Id$
 
 .include 'timer.pasm'
+.include 'sysinfo.pasm'
+.loadlib 'sys_ops'
 
 .sub main
     .include 'test_more.pir'
+    
+    
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    if $S0 == 'MSWin32' goto run_win32_tests
+    goto run_unix_tests
+  run_win32_tests:
+    say "1..1"
+    say "ok 1 - All tests skipped on Win32"
+    goto all_tests_end
+  run_unix_tests:
 
     plan(7)
 
@@ -63,6 +75,7 @@ good:
 
     sleep 5.0
     ok(0, "Alarm/sleep interaction")
+  all_tests_end:
 .end
 
 .sub make_alarm
