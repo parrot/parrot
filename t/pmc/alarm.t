@@ -1,6 +1,5 @@
 #!./parrot
-# Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 .include 'timer.pasm'
 .include 'sysinfo.pasm'
@@ -8,8 +7,7 @@
 
 .sub main
     .include 'test_more.pir'
-    
-    
+
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto run_win32_tests
     goto run_unix_tests

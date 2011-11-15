@@ -1,6 +1,5 @@
 #!./parrot
-# Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 task_primes.t
 
@@ -16,7 +15,7 @@ is now a Parrot test.
 .sub main
     .include 'test_more.pir'
     .local pmc nt, tt
-    
+
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto run_win32_tests
     goto run_unix_tests
