@@ -6,7 +6,8 @@
         + A set_random method was added to the Integer PMC, so random numbers can
             be generated without needing to load math dynops
         + A new implementation of green threads was added to Parrot, in preparation
-        for a robust hybrid threading system
+        for a robust hybrid threading system. Green threads are currently
+        not available on Windows.
     - Languages
         + Winxed
           - 'multi' modifier improved
