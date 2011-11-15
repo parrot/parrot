@@ -14,8 +14,12 @@
           - several optimizations in generated code
           - improved some error dianostics
     - Community
+        + Parrot Foundation was accepted to Google Code-In 2011. We could always use more volunteers.
+          Task ideas are on the wiki:
+             https://github.com/parrot/parrot/wiki/Google-Code-In-Task-Ideas
     - Documentation
     - Tests
+        + Added tests for recently-fixed bugs using return :flat and ResizableStringArrays.
 
 2011-10-18    release 3.9.0
     - Core
