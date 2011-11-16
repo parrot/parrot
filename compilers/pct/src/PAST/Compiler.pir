@@ -966,7 +966,7 @@ Return the POST representation of a C<PAST::Control>.
     node = shift it
 
     .local pmc ehpir, label
-    .local string exceptreg
+    #.local string exceptreg
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
@@ -975,23 +975,23 @@ Return the POST representation of a C<PAST::Control>.
 
     # Push the handler itself
     tail.'push'(label)
-    exceptreg = self.'uniquereg'('P')
-    $S0 = concat '(', exceptreg
-    $S0 = concat $S0, ')'
-    tail.'push_pirop'('.get_results', $S0)
+    #exceptreg = self.'uniquereg'('P')
+    #$S0 = concat '(', exceptreg
+    #$S0 = concat $S0, ')'
+    #tail.'push_pirop'('.get_results', $S0)
     ehpir = self.'as_post'(node, 'rtype'=>rtype)
     unless result goto handler_loop_no_result
     ehpir = self.'coerce'(ehpir, result)
   handler_loop_no_result:
     tail.'push'(ehpir)
-    tail.'push_pirop'('finalize', exceptreg)
+    #tail.'push_pirop'('finalize', exceptreg)
     unless addreturn goto handler_loop_no_return
     .local pmc retval
     retval = ehpir.'result'()
     tail.'push_pirop'('return', retval)
     goto handler_loop
   handler_loop_no_return:
-    tail.'push_pirop'('pop_upto_eh', exceptreg)
+    #tail.'push_pirop'('pop_upto_eh', exceptreg)
     $I0 = depth
   pops_loop_handler:
     tail.'push_pirop'('pop_eh')
@@ -1977,11 +1977,11 @@ handler.
   else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
-    .local string exceptreg
-    exceptreg = self.'uniquereg'('P')
-    $S0 = concat '(', exceptreg
-    $S0 = concat $S0, ')'
-    ops.'push_pirop'('.get_results', $S0)
+    #.local string exceptreg
+    #exceptreg = self.'uniquereg'('P')
+    #$S0 = concat '(', exceptreg
+    #$S0 = concat $S0, ')'
+    #ops.'push_pirop'('.get_results', $S0)
     .local pmc catchpast, catchpost
     catchpast = node[1]
     if null catchpast goto catchpost_done
@@ -1991,8 +1991,8 @@ handler.
   catchpost_no_result:
     ops.'push'(catchpost)
   catchpost_done:
-    ops.'push_pirop'('finalize', exceptreg)
-    ops.'push_pirop'('pop_upto_eh', exceptreg)
+    #ops.'push_pirop'('finalize', exceptreg)
+    #ops.'push_pirop'('pop_upto_eh', exceptreg)
     ops.'push_pirop'('pop_eh')
   catch_done:
     ops.'push'(endlabel)
