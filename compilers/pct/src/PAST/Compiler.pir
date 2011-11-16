@@ -155,7 +155,7 @@ any value type.
     ##  type of exception handler we support
     .local pmc controltypes
     controltypes = new 'Hash'
-    controltypes['CONTROL']  = '.CONTROL_RETURN, .CONTROL_OK, .CONTROL_BREAK, .CONTROL_CONTINUE, .CONTROL_TAKE, .CONTROL_LEAVE, .CONTROL_EXIT, .CONTROL_LOOP_NEXT, .CONTROL_LOOP_LAST, .CONTROL_LOOP_REDO'
+    controltypes['CONTROL']  = '.CONTROL_ALL'
     controltypes['RETURN']   = '.CONTROL_RETURN'
     controltypes['OK']       = '.CONTROL_OK'
     controltypes['BREAK']    = '.CONTROL_BREAK'
@@ -899,17 +899,23 @@ Return the POST representation of a C<PAST::Control>.
     .local string ehreg
     subpost = find_dynamic_lex '$*SUB'
     ehreg = self.'uniquereg'('P')
-    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-    ops.'push_pirop'('set_label', ehreg, label)
+    unless type, no_handle_types
     controltypes = get_global '%!controltypes'
-    unless type, handle_types_done
     type = controltypes[type]
-    unless type, handle_types_done
+    unless type, no_handle_types
     $P0 = split ',', type
-    ops.'push_pirop'('callmethod', '"handle_types"', ehreg, $P0 :flat)
+    $S0 = join ';', $P0
+    $S0 = concat '[', $S0
+    $S0 = concat $S0, ']'
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'", $S0)
     subpost.'add_directive'('.include "except_types.pasm"')
+    goto handle_types_done
+  no_handle_types:
+    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
   handle_types_done:
+    ops.'push_pirop'('set_label', ehreg, label)
     unless extype, handle_types_except_done
+    controltypes = get_global '%!controltypes'
     extype = controltypes[extype]
     unless extype, handle_types_except_done
     $P0 = split ',', extype
@@ -938,11 +944,10 @@ Return the POST representation of a C<PAST::Control>.
     null tempregs
     .lex '%*TEMPREGS', tempregs
 
-    .local pmc it, node, ops, pops, tail, skip
+    .local pmc it, node, ops, tail, skip
+    .local int depth
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
-    $P0 = get_hll_global ['POST'], 'Ops'
-    pops = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Ops'
     tail = $P0.'new'('node'=>node)
     $P0 = get_hll_global ['POST'], 'Label'
@@ -955,42 +960,56 @@ Return the POST representation of a C<PAST::Control>.
   wrap_child_no_result:
 
     it = iter ehs
+    depth = 0
   handler_loop:
     unless it, handler_loop_done
     node = shift it
 
     .local pmc ehpir, label
+    .local string exceptreg
     $P0 = get_hll_global ['POST'], 'Label'
     $S0 = self.'unique'('control_')
     label = $P0.'new'('result'=>$S0)
     self.'push_exception_handler'(node, ops, label)
-    # Add one pop_eh for every handler we push_eh
-    pops.'push_pirop'('pop_eh')
+    inc depth
 
     # Push the handler itself
     tail.'push'(label)
+    exceptreg = self.'uniquereg'('P')
+    $S0 = concat '(', exceptreg
+    $S0 = concat $S0, ')'
+    tail.'push_pirop'('.get_results', $S0)
     ehpir = self.'as_post'(node, 'rtype'=>rtype)
     unless result goto handler_loop_no_result
     ehpir = self.'coerce'(ehpir, result)
   handler_loop_no_result:
     tail.'push'(ehpir)
+    tail.'push_pirop'('finalize', exceptreg)
     unless addreturn goto handler_loop_no_return
     .local pmc retval
     retval = ehpir.'result'()
     tail.'push_pirop'('return', retval)
     goto handler_loop
   handler_loop_no_return:
-    # this assumes that we got no exception while setting up
-    # the handlers...
-    tail.'push'(pops)
+    tail.'push_pirop'('pop_upto_eh', exceptreg)
+    $I0 = depth
+  pops_loop_handler:
+    tail.'push_pirop'('pop_eh')
+    dec $I0
+    if $I0 goto pops_loop_handler
     unless it, handler_loop_done
     tail.'push_pirop'('goto', skip)
     goto handler_loop
   handler_loop_done:
 
     ops.'push'(child)
-
-    ops.'push'(pops)
+    $I0 = depth
+    unless $I0 goto pops_done
+  pops_loop:
+    ops.'push_pirop'('pop_eh')
+    dec $I0
+    if $I0 goto pops_loop
+  pops_done:
     ops.'push_pirop'('goto', skip)
     ops.'push'(tail)
     ops.'push'(skip)
@@ -1143,7 +1162,7 @@ Return the POST representation of a C<PAST::Block>.
     $S0 = self.'unique'('control_')
     ctrllabel = $P0.'new'('result'=>$S0)
     $S0 = self.'uniquereg'('P')
-    bpost.'push_pirop'('new', $S0, "['ExceptionHandler']", '.CONTROL_RETURN')
+    bpost.'push_pirop'('new', $S0, "'ExceptionHandler'", '[.CONTROL_RETURN]')
     bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
     bpost.'add_directive'('.include "except_types.pasm"')
@@ -1626,9 +1645,8 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
 
     .local string handreg
     handreg = self.'tempreg'('P')
-    ops.'push_pirop'('new', handreg, "'ExceptionHandler'")
+    ops.'push_pirop'('new', handreg, "'ExceptionHandler'", "[.CONTROL_LOOP_NEXT;.CONTROL_LOOP_REDO;.CONTROL_LOOP_LAST]")
     ops.'push_pirop'('set_label', handreg, handlabel)
-    ops.'push_pirop'('callmethod', '"handle_types"', handreg, '.CONTROL_LOOP_NEXT', '.CONTROL_LOOP_REDO', '.CONTROL_LOOP_LAST')
     ops.'push_pirop'('push_eh', handreg)
 
     unless bodyfirst goto bodyfirst_done
@@ -1959,15 +1977,23 @@ handler.
   else_done:
     ops.'push_pirop'('goto', endlabel)
     ops.'push'(catchlabel)
+    .local string exceptreg
+    exceptreg = self.'uniquereg'('P')
+    $S0 = concat '(', exceptreg
+    $S0 = concat $S0, ')'
+    ops.'push_pirop'('.get_results', $S0)
     .local pmc catchpast, catchpost
     catchpast = node[1]
-    if null catchpast goto catch_done
+    if null catchpast goto catchpost_done
     catchpost = self.'as_post'(catchpast, 'rtype'=>rtype)
     unless result goto catchpost_no_result
     catchpost = self.'coerce'(catchpost, result)
   catchpost_no_result:
     ops.'push'(catchpost)
-    ops.'push_pirop'('pop_eh')         # FIXME: should be before catchpost
+  catchpost_done:
+    ops.'push_pirop'('finalize', exceptreg)
+    ops.'push_pirop'('pop_upto_eh', exceptreg)
+    ops.'push_pirop'('pop_eh')
   catch_done:
     ops.'push'(endlabel)
     .return (ops)
