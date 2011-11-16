@@ -516,7 +516,7 @@ Versions with an asterisk (*) are supported releases:
     - Dec 20, 2011 - 3.11.0  - cotto
     - Jan 17, 2012 - 4.0.0   - ??
     - Feb 21, 2012 - 4.1.0   - ??
-    - Mar 20, 2012 - 4.2.0   - ??
+    - Mar 20, 2012 - 4.2.0   - dukeleto
     - Apr 17, 2012 - 4.3.0   - ??
     - May 15, 2012 - 4.4.0   - ??
     - Jun 19, 2012 - 4.5.0   - ??
