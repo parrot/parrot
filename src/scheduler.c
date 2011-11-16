@@ -643,9 +643,9 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     adata->alarm_time = done_time;
     adata->alarm_task = task;
     PARROT_GC_WRITE_BARRIER(interp, alarm);
-    (void) VTABLE_invoke(interp, alarm, 0);
+    (void) VTABLE_invoke(interp, alarm, NULL);
 
-    return (opcode_t*) 0;
+    return (opcode_t*) NULL;
 }
 
 /*
