@@ -105,7 +105,7 @@ is a key, intitialize it with the key contents.
         else {
             INTVAL type = VTABLE_get_integer(INTERP, handledtype);
             attrs->handled_types = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, 1);
-            VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, handledtype);
+            VTABLE_set_integer_keyed_int(INTERP, attrs->handled_types, 0, type);
         }
     }
 
