@@ -183,7 +183,7 @@ token statement {
 
 token label {
     [
-    | 'case' <.ws> [ <integer> | <identifier> ] ':'
+    | 'case' <.ws> [ <integer> | <identifier> | "'" <alnum> "'" ] ':'
     | 'default:'
     | <identifier> ':'
     ]
@@ -198,24 +198,23 @@ rule statement_control:sym<if> {
 }
 
 rule statement_control:sym<while> {
-    <sym> '(' <condition=.EXPR> ')'
+    <sym> '(' ~ ')' <condition=.EXPR>
     <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<for> {
-    <sym> '(' <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ')'
+    <sym> '(' ~ ')' [ <init=.EXPR>? ';' <test=.EXPR>? ';' <step=.EXPR>? ]
     <statement_list=.statement_or_block>
 }
 
 rule statement_control:sym<do-while> {
-    'do' <blockoid> 'while' '(' <condition=.EXPR> ')'
+    'do' <blockoid> 'while' '(' ~  ')' <condition=.EXPR>
 }
 
 # Not real "C" switch. Just close enough
 rule statement_control:sym<switch> {
-    <sym> '(' <test=.EXPR> ')' '{'
+    <sym> '(' <test=.EXPR> ')' '{' ~ '}'
     <statement_list>
-    '}'
 }
 
 rule statement_control:sym<break> { <sym> }
@@ -232,16 +231,17 @@ token term:sym<concatenate_strings> { # Long-long name as LTM workaround
 }
 
 token term:sym<call> {
-    <identifier> <.ws> '(' <arglist> ')'
+    <identifier> <.ws> '(' ~ ')' <arglist>
 }
 
 token term:sym<int>  { <integer> ('u'|'U'|'l'|'L')* }
 token term:sym<str>  { <quote> }
 token term:sym<float_constant_long> { # longer to work-around lack of LTM
-    [
+    (
     | \d+ '.' \d*
     | \d* '.' \d+
-    ]
+    )
+    <[fF]>?
 }
 
 token term:sym<reg>   {
@@ -350,7 +350,7 @@ token prefix:sym<~>   { <sym>  <O('%symbolic_unary :pirop<~>')> }
 token prefix:sym<return> { <sym>  <O('%symbolic_unary :pirop<return>')> }
 
 rule blockoid {
-    '{' <mixed_content> '}'
+    '{' ~ '}' <mixed_content>
 }
 
 rule mixed_content {
@@ -371,17 +371,18 @@ rule pointer { <star> 'const'? }
 token star { '*' }
 
 rule pointerless_type {
-    'struct'? 'const'? <identifier>
+    'struct'? 'const'? 'unsigned'? <identifier>
 }
 
 rule type_declarator {
-    'struct'? 'const'? <identifier> <pointer>*
+    'struct'? 'const'? 'unsigned'? <identifier> <pointer>*
 }
 
 token eat_terminator {
     | ';'
     | <?MARKED('endstmt')>
     | $
+    | <.panic('Statement not properly terminated')>
 }
 
 token pod_ws {

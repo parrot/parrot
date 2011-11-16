@@ -177,7 +177,7 @@ Swaps the "context".
             PMC               *ccont      = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION) {
-                ccont = pmc_new(INTERP, enum_class_Continuation);
+                ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
                 VTABLE_set_pointer(INTERP, ccont, next_op);
             }
 

@@ -149,9 +149,11 @@ code as the first argument.
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
 
+#ifndef WIN32
         if (setjmp(task->abort_jump)) {
             /* do nothing, we're back where we want to be */
         }
+#endif
 
         if (!(task->killed || PMC_IS_NULL(task->code))) {
             /* Add the task to the set of active Tasks */
