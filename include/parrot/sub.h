@@ -22,7 +22,6 @@ typedef enum {
 
     /* compile/loadtime usage flags */
     /* from packfile */
-    SUB_FLAG_IS_OUTER     = PObj_private1_FLAG,
     SUB_FLAG_PF_ANON      = PObj_private3_FLAG,
     SUB_FLAG_PF_MAIN      = PObj_private4_FLAG,
     SUB_FLAG_PF_LOAD      = PObj_private5_FLAG,

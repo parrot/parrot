@@ -1376,7 +1376,6 @@ find_outer(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
 
     for (s = imcc->globals->cs->first; s; s = s->next) {
         if (STREQ(s->unit->subid->name, unit->outer->name)) {
-            PObj_get_FLAGS(s->unit->sub_pmc) |= SUB_FLAG_IS_OUTER;
             return s->unit->sub_pmc;
         }
     }

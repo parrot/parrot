@@ -25,9 +25,21 @@ These are the vtable functions for the Sub (subroutine) base class
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void autoclose_ctx(PARROT_INTERP,
+    ARGIN(PMC *autoclose_ctx),
+    ARGIN(PMC *outer_pmc),
+    ARGIN_NULLOK(PMC *autoclose_caller_ctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_autoclose_ctx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(autoclose_ctx) \
+    , PARROT_ASSERT_ARG(outer_pmc))
 #define ASSERT_ARGS_print_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -58,6 +70,80 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
     print_pbc_location(interp);
 }
 
+
+/*
+
+=item C<static void autoclose_ctx(PARROT_INTERP, PMC *autoclose_ctx, PMC
+*outer_pmc, PMC *autoclose_caller_ctx)>
+
+autoclose a context, i.e. set the outer_ctx element.
+We search the call chain beginning with autoclose_caller_ctx for a context
+associated with the outer_pmc sub. If no context is found, we allocate
+a dummy context. We may need to repeat the closing at this point, as
+the outer_pmc sub in turn may have an outer sub set.
+
+=cut
+
+*/
+
+static void
+autoclose_ctx(PARROT_INTERP, ARGIN(PMC *autoclose_ctx), ARGIN(PMC *outer_pmc),
+        ARGIN_NULLOK(PMC *autoclose_caller_ctx))
+{
+    ASSERT_ARGS(autoclose_ctx)
+    /* autoclose the context */
+    while (!PMC_IS_NULL(outer_pmc)) {
+        PMC *ctx;
+        Parrot_Sub_attributes *outer_sub;
+        PMC_get_sub(interp, outer_pmc, outer_sub);
+
+        /* find outer sub in call chain */
+        for (ctx = autoclose_caller_ctx; !PMC_IS_NULL(ctx);
+                    ctx = Parrot_pcc_get_caller_ctx(interp, ctx)) {
+            Parrot_Sub_attributes *current_sub;
+            PMC *current_pmc = Parrot_pcc_get_sub(interp, ctx);
+            if (current_pmc == outer_pmc)
+                break;
+            if (PMC_IS_NULL(current_pmc))
+                continue;
+            PMC_get_sub(interp, current_pmc, current_sub);
+            if (current_pmc->vtable == outer_pmc->vtable
+                    && current_sub->start_offs == outer_sub->start_offs
+                    && current_sub->seg == outer_sub->seg)
+                break;
+        }
+        if (!PMC_IS_NULL(ctx)) {
+            Parrot_pcc_set_outer_ctx(interp, autoclose_ctx, ctx);
+            return;
+        }
+        /* outer_sub not found, have to allocate dummy context */
+        ctx = Parrot_alloc_context(interp, outer_sub->n_regs_used, PMCNULL);
+        Parrot_pcc_set_sub(interp, ctx, outer_pmc);
+
+        if (!PMC_IS_NULL(outer_sub->lex_info)) {
+            Parrot_pcc_set_lex_pad(interp, ctx,
+                Parrot_pmc_new_init(interp,
+                    Parrot_hll_get_ctx_HLL_type(interp,
+                        enum_class_LexPad), outer_sub->lex_info));
+
+            VTABLE_set_pointer(interp, Parrot_pcc_get_lex_pad(interp, ctx), ctx);
+        }
+        /* hmm, should we really do this? */
+        if (!PMC_IS_NULL(outer_sub->outer_ctx))
+            Parrot_pcc_set_outer_ctx(interp, ctx, outer_sub->outer_ctx);
+
+        Parrot_pcc_set_outer_ctx(interp, autoclose_ctx, ctx);
+
+        if (!PMC_IS_NULL(Parrot_pcc_get_outer_ctx(interp, ctx)))
+            break;
+
+        /* continue closing */
+        autoclose_ctx = ctx;
+        outer_pmc = outer_sub->outer_sub;
+    }
+}
+
+
 pmclass Sub auto_attrs provides invokable {
     ATTR PackFile_ByteCode *seg;        /* bytecode segment */
     ATTR size_t             start_offs; /* sub entry in ops from seg->base.data */
@@ -79,7 +165,6 @@ pmclass Sub auto_attrs provides invokable {
 
     ATTR PMC               *lex_info;        /* LexInfo PMC */
     ATTR PMC               *outer_sub;       /* :outer for closures */
-    ATTR PMC               *ctx;             /* the context this sub is in */
     ATTR UINTVAL            comp_flags;      /* compile time and additional flags */
     ATTR Parrot_sub_arginfo *arg_info;       /* Argument counts and flags. */
 
@@ -98,8 +183,6 @@ Initializes the subroutine.
     /*
      * Sub PMC's flags usage:
      * - private0 ... Coroutine flip/flop - C exception handler
-     * - private1 ... _IS_OUTER - have to preserve context
-     *                as some other sub has :outer(this)
      * - private2 ... tailcall invoked this Sub
      * - private3 ... pythonic coroutine generator flag
      * - private4 ... :main (originally @MAIN)
@@ -374,7 +457,7 @@ Invokes the subroutine.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
+        PMC *caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
         PMC *object;
 
@@ -425,11 +508,13 @@ Invokes the subroutine.
             context = Parrot_pmc_new(INTERP, enum_class_CallContext);
 
         Parrot_pcc_set_context(INTERP, context);
-        Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
 
         /* support callcontext reuse */
-        if (context == caller_ctx)
+        if (context == caller_ctx) {
             Parrot_pcc_free_registers(INTERP, context);
+            caller_ctx = Parrot_pcc_get_caller_ctx(INTERP, context);
+        }
+        Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
 
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
@@ -450,13 +535,6 @@ Invokes the subroutine.
         PARROT_GC_WRITE_BARRIER(interp, ccont);
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
-        /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context */
-        if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
-            PARROT_GC_WRITE_BARRIER(interp, SELF);
-            sub->ctx = context;
-        }
-
         /* create pad if needed
          * TODO move this up in front of argument passing
          *      and factor out common code with coroutine pmc
@@ -472,51 +550,11 @@ Invokes the subroutine.
         if (!PMC_IS_NULL(sub->outer_ctx))
             Parrot_pcc_set_outer_ctx(INTERP, context, sub->outer_ctx);
         else {
-            /* autoclose */
-            PMC *c       = context;
-            PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
-
-            for (c = context;
-                 PMC_IS_NULL(outer_c);
-                 c = outer_c, outer_c = Parrot_pcc_get_outer_ctx(INTERP, c)) {
-
-                PMC *outer_pmc;
-                Parrot_Sub_attributes *current_sub, *outer_sub;
-
-                PMC_get_sub(INTERP, Parrot_pcc_get_sub(INTERP, c), current_sub);
-                outer_pmc   = current_sub->outer_sub;
-
-                if (PMC_IS_NULL(outer_pmc))
-                    break;
-
-                PMC_get_sub(INTERP, outer_pmc, outer_sub);
-
-                if (PMC_IS_NULL(outer_sub->ctx)) {
-                    PMC * const dummy = Parrot_alloc_context(INTERP,
-                                                outer_sub->n_regs_used, PMCNULL);
-                    Parrot_pcc_set_sub(INTERP, dummy, outer_pmc);
-
-                    if (!PMC_IS_NULL(outer_sub->lex_info)) {
-                        Parrot_pcc_set_lex_pad(INTERP, dummy,
-                            Parrot_pmc_new_init(INTERP,
-                                Parrot_hll_get_ctx_HLL_type(INTERP,
-                                    enum_class_LexPad), outer_sub->lex_info));
-
-                        VTABLE_set_pointer(INTERP,
-                            Parrot_pcc_get_lex_pad(INTERP, dummy), dummy);
-                    }
-
-                    if (!PMC_IS_NULL(outer_sub->outer_ctx))
-                        Parrot_pcc_set_outer_ctx(INTERP, dummy,
-                            outer_sub->outer_ctx);
-
-                    PARROT_GC_WRITE_BARRIER(interp, outer_pmc);
-                    outer_sub->ctx = dummy;
-                }
-
-                Parrot_pcc_set_outer_ctx(INTERP, c, outer_sub->ctx);
-                outer_c = outer_sub->ctx;
-            }
+            /* hotpath for immediate subs */
+            if (sub->outer_sub == Parrot_pcc_get_sub(INTERP, caller_ctx))
+                Parrot_pcc_set_outer_ctx(INTERP, context, caller_ctx);
+            else
+                autoclose_ctx(INTERP, context, sub->outer_sub, caller_ctx);
         }
 
         /* switch code segment if needed */
@@ -614,7 +652,6 @@ Marks the sub as live.
         Parrot_gc_mark_STRING_alive(INTERP, sub->method_name);
         Parrot_gc_mark_STRING_alive(INTERP, sub->ns_entry_name);
 
-        Parrot_gc_mark_PMC_alive(INTERP, sub->ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->lex_info);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_sub);
@@ -1109,9 +1146,6 @@ slurpy arguments).
 
         sub->outer_sub = outer;
 
-        /* Make sure outer flag of that sub is set. */
-        PObj_get_FLAGS(outer) |= SUB_FLAG_IS_OUTER;
-
         /* Ensure we have lex info. */
         if (PMC_IS_NULL(sub->lex_info)) {
             const INTVAL lex_info_id = Parrot_hll_get_ctx_HLL_type(INTERP,
@@ -1123,7 +1157,7 @@ slurpy arguments).
         sub->outer_ctx = PMCNULL;
 
         /* If we've got a context around for the outer sub, set it as the
-         * outer context. */
+         * outer context. XXX: why? */
         outer_ctx = CURRENT_CONTEXT(INTERP);
 
         while (!PMC_IS_NULL(outer_ctx)) {

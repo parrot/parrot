@@ -85,6 +85,7 @@ pmclass Coroutine extends Sub provides invokable auto_attrs {
     ATTR INTVAL             yield;      /* yield in process */
     ATTR opcode_t          *address;    /* next address to run - toggled each time */
     ATTR PackFile_ByteCode *caller_seg; /* bytecode segment */
+    ATTR PMC               *ctx;
 
 /*
 
@@ -107,6 +108,13 @@ Clone the coroutine.
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+
+    VTABLE void mark() {
+        PMC *ctx;
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, ctx);
+        SUPER();
+    }
 
 /*
 

@@ -493,7 +493,7 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
             if (!VTABLE_isa(interp, sub_pmc, SUB))
                 continue;
             PMC_get_sub(interp, sub_pmc, sub);
-            pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK & ~SUB_FLAG_IS_OUTER;
+            pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK;
 
             if (mode == 1 && (pragmas & SUB_FLAG_PF_LOAD))
                 VTABLE_push_pmc(interp, subs, sub_pmc);
@@ -530,8 +530,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
     DECL_CONST_CAST;
     Parrot_Sub_attributes *sub;
     int         todo    = 0;
-    const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
-                                                  & ~SUB_FLAG_IS_OUTER;
+    const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK;
     PMC_get_sub(interp, PARROT_const_cast(PMC *, sub_pmc), sub);
     if (!pragmas && !Sub_comp_INIT_TEST(sub))
         return 0;
