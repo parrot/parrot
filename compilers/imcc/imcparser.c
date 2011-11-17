@@ -568,6 +568,12 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
+    else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
+        rhs = mk_const(imcc, const_name, 'l');
+        if (!ascii)
+            rhs->type |= VT_ENCODED;
+        rhs->usage    |= U_FIXUP | U_LEXINFO_LOOKUP;
+    }
     else {
         rhs = mk_const(imcc, const_name, 'P');
     }

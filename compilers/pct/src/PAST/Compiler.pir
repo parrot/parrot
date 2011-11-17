@@ -2870,7 +2870,16 @@ to have a PMC generated containing the constant value.
   value_block:
     .local string blockreg, blockref
     blockreg = self.'uniquereg'('P')
+    returns = node.'returns'()
+    if null returns goto value_block_no_returns
+    $S0 = returns
+    blockref = concat ".const '", $S0
+    blockref = concat blockref, "' "
+    blockref = concat blockref, blockreg
+    goto value_block_blockref_set
+  value_block_no_returns:
     blockref = concat ".const 'Sub' ", blockreg
+  value_block_blockref_set:
     blockref = concat blockref, ' = '
     $P0 = value.'subid'()
     $S0 = self.'escape'($P0)
