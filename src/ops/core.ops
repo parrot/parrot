@@ -722,6 +722,15 @@ or finalize has been called. This limitation may be fixed in a future
 version of parrot. Also note that the specified exception handler
 is not popped.
 
+=item B<peek_exception>()
+
+Returns the caught exception without clearing the call object. This is
+currently needed because HLL authors use get_params to fetch the exception,
+but get_params clears the call object. So we can't use get_params in PCT
+to get the exception object without disturbing the HLL code.
+This op will be removed again when PCT offers another mechansim to get
+the exception and the HLLs switched to it.
+
 =cut
 
 inline op push_eh(inconst LABEL) {
@@ -907,6 +916,12 @@ op pop_upto_eh(in PMC) {
     }
     if (!PMC_IS_NULL(eh))
         Parrot_cx_delete_upto_handler_local(interp, eh);
+}
+
+op peek_exception(out PMC) {
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    $1 = VTABLE_get_pmc_keyed_int(interp, call_object, 0);
 }
 
 =back
