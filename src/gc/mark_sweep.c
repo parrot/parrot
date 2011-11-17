@@ -240,7 +240,6 @@ mark_interp(PARROT_INTERP)
     /* Now mark the HLL stuff */
     Parrot_gc_mark_PMC_alive(interp, interp->HLL_info);
     Parrot_gc_mark_PMC_alive(interp, interp->HLL_namespace);
-    Parrot_gc_mark_PMC_alive(interp, interp->HLL_entries);
 
     /* Mark the registry */
     PARROT_ASSERT(interp->gc_registry);

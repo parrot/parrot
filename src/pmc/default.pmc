@@ -315,7 +315,9 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
 {
     ASSERT_ARGS(make_prop_hash)
 
-    PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
+    PMC * const prop = PObj_constant_TEST(self)
+                       ? Parrot_pmc_new_constant(interp, enum_class_Hash)
+                       : Parrot_pmc_new(interp, enum_class_Hash);
 
     propagate_std_props(interp, self, prop);
     PARROT_GC_WRITE_BARRIER(interp, self);

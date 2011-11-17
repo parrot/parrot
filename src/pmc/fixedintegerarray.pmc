@@ -109,7 +109,10 @@ Creates and returns a copy of the array.
          */
 
         INTVAL * int_array;
-        PMC    * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC    * const dest =
+            PObj_constant_TEST(SELF)
+                ? Parrot_pmc_new_constant(INTERP, SELF->vtable->base_type)
+                : Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
 

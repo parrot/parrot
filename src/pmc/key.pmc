@@ -342,7 +342,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 SET_ATTR_next_key(INTERP, k, NULL);
             }
             else {
-                SET_ATTR_next_key(INTERP, k, Parrot_pmc_new(INTERP, enum_class_Key));
+                SET_ATTR_next_key(INTERP, k, Parrot_pmc_new_constant(INTERP, enum_class_Key));
                 GET_ATTR_next_key(INTERP, k, k);
             }
         }

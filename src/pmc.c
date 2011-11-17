@@ -528,6 +528,49 @@ Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
+=item C<PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)>
+
+Creates a new constant PMC of type C<base_type>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
+{
+    ASSERT_ARGS(Parrot_pmc_new_constant_noinit)
+    return get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+}
+
+
+/*
+
+=item C<PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)>
+
+Creates a new constant PMC of type C<base_type>, then calls its C<init>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)
+{
+    ASSERT_ARGS(Parrot_pmc_new_constant)
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    VTABLE_init(interp, pmc);
+    return pmc;
+}
+
+
+/*
+
 =item C<PMC * Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)>
 
 As C<Parrot_pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> vtable entry.
@@ -583,6 +626,55 @@ Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
         VTABLE_init_int(interp, pmc, init);
         return pmc;
     }
+}
+
+
+
+/*
+
+=item C<PMC * Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, PMC
+*init)>
+
+As C<Parrot_pmc_new_constant>, but passes C<init> to the PMC's C<init_pmc> vtable
+entry.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
+{
+    ASSERT_ARGS(Parrot_pmc_new_constant_init)
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    VTABLE_init_pmc(interp, pmc, init);
+    return pmc;
+}
+
+
+/*
+
+=item C<PMC * Parrot_pmc_new_constant_init_int(PARROT_INTERP, INTVAL base_type,
+INTVAL init)>
+
+As C<Parrot_pmc_new_constant>, but passes C<init> to the PMC's C<init_int> vtable
+entry.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pmc_new_constant_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
+{
+    ASSERT_ARGS(Parrot_pmc_new_constant_init_int)
+    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
+    VTABLE_init_int(interp, pmc, init);
+    return pmc;
 }
 
 
