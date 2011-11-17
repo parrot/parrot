@@ -257,8 +257,38 @@ mark_interp(PARROT_INTERP)
 
     if (interp->parent_interpreter)
         mark_interp(interp->parent_interpreter);
+
+    mark_code_segment(interp);
 }
 
+/*
+
+=item mark_code_segment()
+
+Mark constants inside code segment.
+
+=cut
+
+*/
+static
+void
+mark_code_segment(PARROT_INTERP)
+{
+    int i;
+    PackFile_ByteCode   *bc = Parrot_pf_get_current_code_segment(interp);
+
+    if (bc != NULL) {
+        PackFile_ConstTable *ct = bc->const_table;
+
+        for (i = 0; i < ct->pmc.const_count; i++) {
+            Parrot_gc_mark_PMC_alive(interp, ct->pmc.constants[i]);
+        }
+
+        for (i = 0; i < ct->str.const_count; i++) {
+            Parrot_gc_mark_STRING_alive(interp, ct->str.constants[i]);
+        }
+    }
+}
 
 /*
 
