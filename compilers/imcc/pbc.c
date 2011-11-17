@@ -1538,7 +1538,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             break;
           case 'S':
             if (ns_const >= 0 && ns_const < ct->str.const_count) {
-                ns_pmc = Parrot_pmc_new_constant(imcc->interp, enum_class_String);
+                ns_pmc = Parrot_pmc_new(imcc->interp, enum_class_String);
                 VTABLE_set_string_native(imcc->interp, ns_pmc,
                     ct->str.constants[ns_const]);
             }
@@ -1726,12 +1726,12 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
         SymReg *r = reg;
 
         if (tail) {
-            PMC * temp = Parrot_pmc_new_constant(imcc->interp, enum_class_Key);
+            PMC * temp = Parrot_pmc_new(imcc->interp, enum_class_Key);
             SETATTR_Key_next_key(imcc->interp, tail, temp);
             GETATTR_Key_next_key(imcc->interp, tail, tail);
         }
         else {
-            head = tail = Parrot_pmc_new_constant(imcc->interp, enum_class_Key);
+            head = tail = Parrot_pmc_new(imcc->interp, enum_class_Key);
         }
 
         switch (r->type) {
@@ -1990,7 +1990,7 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
     else
         s = Parrot_str_unescape(imcc->interp, r->name, 0, NULL);
 
-    p  = Parrot_pmc_new_constant(imcc->interp, r->pmc_type);
+    p  = Parrot_pmc_new(imcc->interp, r->pmc_type);
 
     switch (r->pmc_type) {
       case enum_class_Integer:
