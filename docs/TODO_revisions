@@ -5,6 +5,8 @@ revision of Parrot's Documentation Set.  Please note, by complete, we
 mean a set of documents sufficient to satisfy the goals set out in 
 'README_revisions.pod'.
 
+[Open] 0.  Solicit aid!
+
 [Done] 1.  Write a README_revision and this TODO_revision and commit them
        	   to a new documentation branch on github.
 
@@ -87,10 +89,10 @@ mean a set of documents sufficient to satisfy the goals set out in
 [Open] 23. Develop something to help new users and developers keep track
        	   of what they've read and where they've been in 'docs/'.[3]
 
-[Open] 24. Implement some way to log our completed revisions.[4]
+[Open] 24. Implement some way to log completed revisions.[4]
 
-[Open] 25. Solicit the aid of others in the completion of the Documentation
-       	   Revision effort.
+[Open] 25. Implement an html link validation system to ensure the integrity
+       	   of our html links, especially to our, own documentation.
 
 Note: The above list is, by-no-means, complete.  We will add tasks (and 
       subtasks to the above tasks) as this revision effort comes more clearly
@@ -102,9 +104,9 @@ Note: The above list is, by-no-means, complete.  We will add tasks (and
 [1]  Note: Ensure we include, at least, a '.gitignore' in each new directory.
 
 [2]  Note: Benabik, presently, is engaged in a rewrite of PCT, called PACT,
-using the winxed programming language rather than PIR.  Given this, we will
-engage only in nominal, i.e., only those necessary to bring them up-to-date,
-corrections to the documents in 'docs/book/pct'.
+using the winxed programming language rather than nqp-rx or PIR.  Given this,
+we will engage only in nominal, i.e., only those necessary to bring them 
+up-to-date, corrections to the documents in 'docs/book/pct'.
 
 [3]  For example, when the user fires up 'perldoc' (or our 'perldoc' clone),
 it reads a DOT directory which contains the reader's document-flow.
