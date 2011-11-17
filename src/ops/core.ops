@@ -722,7 +722,7 @@ or finalize has been called. This limitation may be fixed in a future
 version of parrot. Also note that the specified exception handler
 is not popped.
 
-=item B<peek_exception>()
+=item B<peek_exception>(out PMC)
 
 Returns the caught exception without clearing the call object. This is
 currently needed because HLL authors use get_params to fetch the exception,
