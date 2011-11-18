@@ -6,11 +6,21 @@
         + A set_random method was added to the Integer PMC, so random numbers can
             be generated without needing to load math dynops
         + A new implementation of green threads was added to Parrot, in preparation
-        for a robust hybrid threading system
+        for a robust hybrid threading system. Green threads are currently
+        not available on Windows.
     - Languages
+        + Winxed
+          - 'multi' modifier improved
+          - throw "string" now emits throw instead of die
+          - several optimizations in generated code
+          - improved some error dianostics
     - Community
+        + Parrot Foundation was accepted to Google Code-In 2011. We could always use more volunteers.
+          Task ideas are on the wiki:
+             https://github.com/parrot/parrot/wiki/Google-Code-In-Task-Ideas
     - Documentation
     - Tests
+        + Added tests for recently-fixed bugs using return :flat and ResizableStringArrays.
 
 2011-10-18    release 3.9.0
     - Core

@@ -2,60 +2,38 @@
 # Begin generated code
 
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant VERSION_MAJOR evaluated at compile time
-# Constant VERSION_MINOR evaluated at compile time
-# Constant VERSION_BUILD evaluated at compile time
 
-.sub 'isspace' :subid('WSubId_18')
+.sub 'isspace' :subid('WSubId_21')
         .param string __ARG_1
-# Body
-# {
 .annotate 'file', 'winxedst1.winxed'
 .annotate 'line', 22
-    iseq $I3, __ARG_1, ' '
-    if $I3 goto __label_3
-    iseq $I4, __ARG_1, "\n"
-    set $I2, $I4
-    goto __label_4
-  __label_3:
-    set $I2, $I3
-  __label_4:
-    if $I2 goto __label_1
-    iseq $I5, __ARG_1, "\t"
-    set $I1, $I5
-    goto __label_2
-  __label_1:
-    set $I1, $I2
+    iseq $I1, __ARG_1, ' '
+    if $I1 goto __label_2
+    iseq $I1, __ARG_1, "\n"
   __label_2:
+    if $I1 goto __label_1
+    iseq $I1, __ARG_1, "\t"
+  __label_1:
     .return($I1)
-# }
 .annotate 'line', 23
 
 .end # isspace
 
 
-.sub 'isdigit' :subid('WSubId_9')
+.sub 'isdigit' :subid('WSubId_11')
         .param string __ARG_1
-# Body
-# {
 .annotate 'line', 27
-# builtin indexof
     index $I2, '0123456789', __ARG_1
     isgt $I1, $I2, -1
     .return($I1)
-# }
 .annotate 'line', 28
 
 .end # isdigit
 
 
-.sub 'hexdigit' :subid('WSubId_10')
+.sub 'hexdigit' :subid('WSubId_12')
         .param string __ARG_1
-# Body
-# {
 .annotate 'line', 32
-# i: $I1
-# builtin indexof
     index $I1, '0123456789abcdef0123456789ABCDEF', __ARG_1
 .annotate 'line', 33
     lt $I1, 0, __label_1
@@ -63,50 +41,118 @@
   __label_1: # endif
 .annotate 'line', 34
     .return($I1)
-# }
 .annotate 'line', 35
 
 .end # hexdigit
 
 
-.sub 'isidentstart' :subid('WSubId_19')
+.sub 'isidentstart' :subid('WSubId_22')
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 42
-# builtin indexof
 .annotate 'line', 39
     index $I2, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_', __ARG_1
 .annotate 'line', 42
     isgt $I1, $I2, -1
 .annotate 'line', 39
     .return($I1)
-# }
 .annotate 'line', 43
 
 .end # isidentstart
 
 
-.sub 'isident' :subid('WSubId_8')
+.sub 'isident' :subid('WSubId_10')
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 51
-# builtin indexof
 .annotate 'line', 47
     index $I2, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789', __ARG_1
 .annotate 'line', 51
     isgt $I1, $I2, -1
 .annotate 'line', 47
     .return($I1)
-# }
 .annotate 'line', 52
 
 .end # isident
 
-# Constant ERR_INTERNAL evaluated at compile time
-# Constant ERR_TOKEN evaluated at compile time
-# Constant ERR_PARSER evaluated at compile time
+
+.sub 'sformat' :subid('WSubId_26')
+        .param string __ARG_1
+        .param pmc __ARG_2 :slurpy
+.annotate 'line', 56
+    new $P1, [ 'StringBuilder' ]
+.annotate 'line', 57
+    $P1.'append_format'(__ARG_1, __ARG_2 :flat)
+.annotate 'line', 58
+    set $S1, $P1
+    .return($S1)
+.annotate 'line', 59
+
+.end # sformat
+
+
+.sub 'for_each' :subid('WSubId_111')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+.annotate 'line', 65
+    if_null __ARG_1, __label_2
+    iter $P2, __ARG_1
+    set $P2, 0
+  __label_1: # for iteration
+    unless $P2 goto __label_2
+    shift $P1, $P2
+.annotate 'line', 66
+    __ARG_2($P1)
+    goto __label_1
+  __label_2: # endfor
+.annotate 'line', 67
+
+.end # for_each
+
+
+.sub 'transform' :subid('WSubId_31')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+.annotate 'line', 71
+    if_null __ARG_1, __label_2
+    iter $P2, __ARG_1
+    set $P2, 0
+  __label_1: # for iteration
+    unless $P2 goto __label_2
+    shift $P1, $P2
+.annotate 'line', 72
+    $P3 = __ARG_3($P1)
+    push __ARG_2, $P3
+    goto __label_1
+  __label_2: # endfor
+.annotate 'line', 73
+    .return(__ARG_2)
+.annotate 'line', 74
+
+.end # transform
+
+
+.sub 'find_same' :subid('WSubId_124')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+.annotate 'line', 78
+    if_null __ARG_1, __label_2
+    iter $P2, __ARG_1
+    set $P2, 0
+  __label_1: # for iteration
+    unless $P2 goto __label_2
+    shift $P1, $P2
+.annotate 'line', 79
+    ne_addr $P1, __ARG_2, __label_3
+.annotate 'line', 80
+    .return($P1)
+  __label_3: # endif
+    goto __label_1
+  __label_2: # endfor
+    null $P3
+.annotate 'line', 81
+    .return($P3)
+.annotate 'line', 82
+
+.end # find_same
+
 .namespace [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
 
 .sub 'WinxedCompilerError' :method
@@ -114,65 +160,55 @@
         .param string __ARG_2
         .param string __ARG_3 :optional
         .param int __ARG_4 :optional
-# Body
-# {
-.annotate 'line', 78
+.annotate 'line', 107
     box $P1, __ARG_1
     setattribute self, 'type', $P1
-.annotate 'line', 79
+.annotate 'line', 108
     box $P1, __ARG_2
     setattribute self, 'message', $P1
-.annotate 'line', 80
+.annotate 'line', 109
     box $P1, __ARG_3
     setattribute self, 'filename', $P1
-.annotate 'line', 81
+.annotate 'line', 110
     box $P1, __ARG_4
     setattribute self, 'line', $P1
-# }
-.annotate 'line', 82
+.annotate 'line', 111
 
 .end # WinxedCompilerError
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
-.annotate 'line', 67
+.annotate 'line', 96
     addattribute $P0, 'type'
-.annotate 'line', 68
+.annotate 'line', 97
     addattribute $P0, 'filename'
-.annotate 'line', 69
+.annotate 'line', 98
     addattribute $P0, 'line'
-.annotate 'line', 70
+.annotate 'line', 99
     addattribute $P0, 'message'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'Warn' :subid('WSubId_21')
+.sub 'Warn' :subid('WSubId_24')
         .param string __ARG_1
         .param pmc __ARG_2 :optional
-# Body
-# {
-.annotate 'line', 87
-# var stderr: $P1
-# builtin getstderr
+.annotate 'line', 116
     getstderr $P1
-.annotate 'line', 88
+.annotate 'line', 117
     $P1.'print'('WARNING: ')
-.annotate 'line', 89
+.annotate 'line', 118
     $P1.'print'(__ARG_1)
-.annotate 'line', 90
+.annotate 'line', 119
     if_null __ARG_2, __label_1
-# {
-.annotate 'line', 91
+.annotate 'line', 120
     $P1.'print'(' near ')
-.annotate 'line', 92
+.annotate 'line', 121
     $P2 = __ARG_2.'show'()
     $P1.'print'($P2)
-# }
   __label_1: # endif
-.annotate 'line', 94
+.annotate 'line', 123
     $P1.'print'("\n")
-# }
-.annotate 'line', 95
+.annotate 'line', 124
 
 .end # Warn
 
@@ -181,181 +217,120 @@
         .param string __ARG_1
         .param pmc __ARG_2 :optional
         .param int __ARG_3 :opt_flag
-# Body
-# {
-.annotate 'line', 99
+.annotate 'line', 128
     unless __ARG_3 goto __label_1
-# {
-.annotate 'line', 100
-# desc: $S1
+.annotate 'line', 129
     $P2 = __ARG_2.'show'()
     null $S1
     if_null $P2, __label_2
     set $S1, $P2
   __label_2:
-.annotate 'line', 101
+.annotate 'line', 130
     concat $S2, __ARG_1, ' near '
     concat $S2, $S2, $S1
     set __ARG_1, $S2
-# }
   __label_1: # endif
-.annotate 'line', 103
-# var payload: $P1
+.annotate 'line', 132
     unless __ARG_3 goto __label_4
-.annotate 'line', 104
+.annotate 'line', 133
     new $P2, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
-.annotate 'line', 105
+.annotate 'line', 134
     $P3 = __ARG_2.'filename'()
     $P4 = __ARG_2.'linenum'()
     $P2.'WinxedCompilerError'('internal', __ARG_1, $P3, $P4)
     set $P1, $P2
     goto __label_3
   __label_4:
-.annotate 'line', 106
+.annotate 'line', 135
     new $P6, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     $P6.'WinxedCompilerError'('internal', __ARG_1)
     set $P5, $P6
     set $P1, $P5
   __label_3:
-.annotate 'line', 107
-# builtin Error
+.annotate 'line', 136
     root_new $P2, ['parrot';'Exception']
     $P2['message'] = __ARG_1
     $P2['severity'] = 2
     $P2['type'] = 567
     $P2['payload'] = $P1
     throw $P2
-# }
-.annotate 'line', 108
+.annotate 'line', 137
 
 .end # InternalError
-
-
-.sub 'TokenError' :subid('WSubId_7')
-        .param string __ARG_1
-        .param pmc __ARG_2
-        .param int __ARG_3
-# Body
-# {
-.annotate 'line', 112
-# builtin string
-    getattribute $P2, __ARG_2, 'filename'
-    set $S1, $P2
-# builtin string
-    set $S2, __ARG_3
-    concat $S3, __ARG_1, ' in '
-    concat $S3, $S3, $S1
-    concat $S3, $S3, ' line '
-    concat $S3, $S3, $S2
-.annotate 'line', 114
-    new $P4, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
-    getattribute $P5, __ARG_2, 'filename'
-    $P4.'WinxedCompilerError'('tokenizer', __ARG_1, $P5, __ARG_3)
-    set $P3, $P4
-# builtin Error
-.annotate 'line', 112
-    root_new $P1, ['parrot';'Exception']
-    $P1['message'] = $S3
-    $P1['severity'] = 2
-    $P1['type'] = 567
-    $P1['payload'] = $P3
-    throw $P1
-# }
-.annotate 'line', 115
-
-.end # TokenError
 
 
 .sub 'SyntaxError' :subid('WSubId_1')
         .param string __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 119
-# line: $I1
+.annotate 'line', 141
     $P1 = __ARG_2.'linenum'()
     set $I1, $P1
-.annotate 'line', 120
-# file: $S1
+.annotate 'line', 142
     $P1 = __ARG_2.'filename'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 121
-# desc: $S2
-# builtin string
+.annotate 'line', 143
     $P1 = __ARG_2.'viewable'()
     set $S3, $P1
     concat $S4, ' near ', $S3
     set $S2, $S4
-.annotate 'line', 122
-# builtin string
+.annotate 'line', 144
     set $S3, $I1
     concat $S4, __ARG_1, ' in '
     concat $S4, $S4, $S1
     concat $S4, $S4, ' line '
     concat $S4, $S4, $S3
     concat $S4, $S4, $S2
-.annotate 'line', 124
+.annotate 'line', 146
     new $P3, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     concat $S5, __ARG_1, $S2
-.annotate 'line', 125
+.annotate 'line', 147
     $P3.'WinxedCompilerError'('parser', $S5, $S1, $I1)
     set $P2, $P3
-# builtin Error
-.annotate 'line', 122
+.annotate 'line', 144
     root_new $P1, ['parrot';'Exception']
     $P1['message'] = $S4
     $P1['severity'] = 2
     $P1['type'] = 567
     $P1['payload'] = $P2
     throw $P1
-# }
-.annotate 'line', 126
+.annotate 'line', 148
 
 .end # SyntaxError
 
 
-.sub 'NoLeftSide' :subid('WSubId_67')
+.sub 'NoLeftSide' :subid('WSubId_73')
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 130
+.annotate 'line', 152
     WSubId_1('Not a left-side expression', __ARG_1)
-# }
-.annotate 'line', 131
+.annotate 'line', 153
 
 .end # NoLeftSide
 
 
-.sub 'Expected' :subid('WSubId_48')
+.sub 'Expected' :subid('WSubId_54')
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 135
+.annotate 'line', 157
     concat $S1, "Expected ", __ARG_1
     WSubId_1($S1, __ARG_2)
-# }
-.annotate 'line', 136
+.annotate 'line', 158
 
 .end # Expected
 
 
-.sub 'Unexpected' :subid('WSubId_49')
+.sub 'Unexpected' :subid('WSubId_55')
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 140
+.annotate 'line', 162
     concat $S1, "Unexpected ", __ARG_1
     WSubId_1($S1, __ARG_2)
-# }
-.annotate 'line', 141
+.annotate 'line', 163
 
 .end # Unexpected
 
@@ -363,12 +338,9 @@
 .sub 'ExpectedIdentifier' :subid('WSubId_3')
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 145
+.annotate 'line', 167
     WSubId_1("Expected identifier", __ARG_1)
-# }
-.annotate 'line', 146
+.annotate 'line', 168
 
 .end # ExpectedIdentifier
 
@@ -377,14 +349,11 @@
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 150
+.annotate 'line', 172
     concat $S1, "Expected '", __ARG_1
     concat $S1, $S1, "'"
     WSubId_1($S1, __ARG_2)
-# }
-.annotate 'line', 151
+.annotate 'line', 173
 
 .end # ExpectedOp
 
@@ -393,17 +362,14 @@
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_2 = "WSubId_2"
-# Body
-# {
-.annotate 'line', 155
+.annotate 'line', 177
     $P1 = __ARG_2.'isop'(__ARG_1)
     isfalse $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 156
+.annotate 'line', 178
     WSubId_2(__ARG_1, __ARG_2)
   __label_1: # endif
-# }
-.annotate 'line', 157
+.annotate 'line', 179
 
 .end # RequireOp
 
@@ -412,86 +378,68 @@
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_2 = "WSubId_2"
-# Body
-# {
-.annotate 'line', 161
+.annotate 'line', 183
     $P1 = __ARG_2.'iskeyword'(__ARG_1)
     isfalse $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 162
+.annotate 'line', 184
     WSubId_2(__ARG_1, __ARG_2)
   __label_1: # endif
-# }
-.annotate 'line', 163
+.annotate 'line', 185
 
 .end # RequireKeyword
 
 
-.sub 'RequireIdentifier' :subid('WSubId_102')
+.sub 'RequireIdentifier' :subid('WSubId_108')
         .param pmc __ARG_1
 .const 'Sub' WSubId_3 = "WSubId_3"
-# Body
-# {
-.annotate 'line', 167
+.annotate 'line', 189
     $P1 = __ARG_1.'isidentifier'()
     isfalse $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 168
+.annotate 'line', 190
     WSubId_3(__ARG_1)
   __label_1: # endif
-# }
-.annotate 'line', 169
+.annotate 'line', 191
 
 .end # RequireIdentifier
 
 
-.sub 'ExpectOp' :subid('WSubId_62')
+.sub 'ExpectOp' :subid('WSubId_68')
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 173
-# var t: $P1
+.annotate 'line', 195
     $P1 = __ARG_2.'get'()
-.annotate 'line', 174
+.annotate 'line', 196
     WSubId_4(__ARG_1, $P1)
-# }
-.annotate 'line', 175
+.annotate 'line', 197
 
 .end # ExpectOp
 
 
-.sub 'ExpectKeyword' :subid('WSubId_104')
+.sub 'ExpectKeyword' :subid('WSubId_110')
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_5 = "WSubId_5"
-# Body
-# {
-.annotate 'line', 179
-# var t: $P1
+.annotate 'line', 201
     $P1 = __ARG_2.'get'()
-.annotate 'line', 180
+.annotate 'line', 202
     WSubId_5(__ARG_1, $P1)
-# }
-.annotate 'line', 181
+.annotate 'line', 203
 
 .end # ExpectKeyword
 
 
-.sub 'UndefinedVariable' :subid('WSubId_69')
+.sub 'UndefinedVariable' :subid('WSubId_75')
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 185
-# builtin string
+.annotate 'line', 207
     set $S1, __ARG_1
     concat $S2, "Variable '", $S1
     concat $S2, $S2, "' is not defined"
     WSubId_1($S2, __ARG_1)
-# }
-.annotate 'line', 186
+.annotate 'line', 208
 
 .end # UndefinedVariable
 
@@ -500,215 +448,156 @@
 .sub 'Token' :method
         .param string __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 198
+.annotate 'line', 220
     box $P1, __ARG_1
     setattribute self, 'file', $P1
-.annotate 'line', 199
+.annotate 'line', 221
     box $P1, __ARG_2
     setattribute self, 'line', $P1
-# }
-.annotate 'line', 200
+.annotate 'line', 222
 
 .end # Token
 
 
 .sub 'iseof' :method
-# Body
-# {
-.annotate 'line', 202
+.annotate 'line', 224
     .return(0)
-# }
 
 .end # iseof
 
 
 .sub 'iscomment' :method
-# Body
-# {
-.annotate 'line', 203
+.annotate 'line', 225
     .return(0)
-# }
 
 .end # iscomment
 
 
 .sub 'isidentifier' :method
-# Body
-# {
-.annotate 'line', 204
+.annotate 'line', 226
     .return(0)
-# }
 
 .end # isidentifier
 
 
 .sub 'isint' :method
-# Body
-# {
-.annotate 'line', 205
+.annotate 'line', 227
     .return(0)
-# }
 
 .end # isint
 
 
 .sub 'isfloat' :method
-# Body
-# {
-.annotate 'line', 206
+.annotate 'line', 228
     .return(0)
-# }
 
 .end # isfloat
 
 
 .sub 'isstring' :method
-# Body
-# {
-.annotate 'line', 207
+.annotate 'line', 229
     .return(0)
-# }
 
 .end # isstring
 
 
 .sub 'issinglequoted' :method
-# Body
-# {
-.annotate 'line', 208
+.annotate 'line', 230
     .return(0)
-# }
 
 .end # issinglequoted
 
 
 .sub 'getintvalue' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 212
+.annotate 'line', 234
     WSubId_6('Not a literal int', self)
-# }
-.annotate 'line', 213
+.annotate 'line', 235
 
 .end # getintvalue
 
 
 .sub 'rawstring' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 216
+.annotate 'line', 238
     WSubId_6('Not a literal string', self)
-# }
-.annotate 'line', 217
+.annotate 'line', 239
 
 .end # rawstring
 
 
 .sub 'getidentifier' :method
 .const 'Sub' WSubId_3 = "WSubId_3"
-# Body
-# {
-.annotate 'line', 220
+.annotate 'line', 242
     WSubId_3(self)
-# }
-.annotate 'line', 221
+.annotate 'line', 243
 
 .end # getidentifier
 
 
 .sub 'iskeyword' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 222
+.annotate 'line', 244
     .return(0)
-# }
 
 .end # iskeyword
 
 
 .sub 'checkkeyword' :method
-# Body
-# {
-.annotate 'line', 223
+.annotate 'line', 245
     .return(0)
-# }
 
 .end # checkkeyword
 
 
 .sub 'isop' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 224
+.annotate 'line', 246
     .return(0)
-# }
 
 .end # isop
 
 
 .sub 'checkop' :method
-# Body
-# {
-.annotate 'line', 225
+.annotate 'line', 247
     .return('')
-# }
 
 .end # checkop
 
 
 .sub 'viewable' :method
-# Body
-# {
-.annotate 'line', 226
+.annotate 'line', 248
     .return('(unknown)')
-# }
 
 .end # viewable
 
 
 .sub 'filename' :method
-# Body
-# {
-.annotate 'line', 227
+.annotate 'line', 249
     getattribute $P1, self, 'file'
     .return($P1)
-# }
 
 .end # filename
 
 
 .sub 'linenum' :method
-# Body
-# {
-.annotate 'line', 228
+.annotate 'line', 250
     getattribute $P1, self, 'line'
     .return($P1)
-# }
 
 .end # linenum
 
 
 .sub 'show' :method
-# Body
-# {
-.annotate 'line', 231
-# r: $S1
+.annotate 'line', 253
     $P1 = self.'viewable'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 232
-# builtin string
+.annotate 'line', 254
     getattribute $P1, self, 'file'
     set $S2, $P1
-# builtin string
     getattribute $P2, self, 'line'
     set $S3, $P2
     concat $S4, $S1, ' at '
@@ -716,54 +605,44 @@
     concat $S4, $S4, ' line '
     concat $S4, $S4, $S3
     .return($S4)
-# }
-.annotate 'line', 233
+.annotate 'line', 255
 
 .end # show
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Token' ]
-.annotate 'line', 194
+.annotate 'line', 216
     addattribute $P0, 'file'
-.annotate 'line', 195
+.annotate 'line', 217
     addattribute $P0, 'line'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TokenEof' ]
 
 .sub 'TokenEof' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 240
+.annotate 'line', 262
     self.'Token'(__ARG_1, 0)
-# }
-.annotate 'line', 241
+.annotate 'line', 263
 
 .end # TokenEof
 
 
 .sub 'iseof' :method
-# Body
-# {
-.annotate 'line', 242
+.annotate 'line', 264
     .return(1)
-# }
 
 .end # iseof
 
 
 .sub 'viewable' :method
-# Body
-# {
-.annotate 'line', 243
+.annotate 'line', 265
     .return('(End of file)')
-# }
 
 .end # viewable
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
-.annotate 'line', 236
+.annotate 'line', 258
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Token' ]
     addparent $P0, $P1
 .end
@@ -773,47 +652,38 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 251
+.annotate 'line', 273
     self.'Token'(__ARG_1, __ARG_2)
-.annotate 'line', 252
+.annotate 'line', 274
     box $P1, __ARG_3
     setattribute self, 'str', $P1
-# }
-.annotate 'line', 253
+.annotate 'line', 275
 
 .end # TokenWithVal
 
 
 .sub 'get_string' :method :vtable
-# Body
-# {
-.annotate 'line', 254
+.annotate 'line', 276
     getattribute $P1, self, 'str'
     .return($P1)
-# }
 
 .end # get_string
 
 
 .sub 'viewable' :method
-# Body
-# {
-.annotate 'line', 257
+.annotate 'line', 279
     getattribute $P1, self, 'str'
     .return($P1)
-# }
-.annotate 'line', 258
+.annotate 'line', 280
 
 .end # viewable
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
-.annotate 'line', 246
+.annotate 'line', 268
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Token' ]
     addparent $P0, $P1
-.annotate 'line', 248
+.annotate 'line', 270
     addattribute $P0, 'str'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TokenComment' ]
@@ -822,28 +692,22 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 265
+.annotate 'line', 287
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 266
+.annotate 'line', 288
 
 .end # TokenComment
 
 
 .sub 'iscomment' :method
-# Body
-# {
-.annotate 'line', 267
+.annotate 'line', 289
     .return(1)
-# }
 
 .end # iscomment
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
-.annotate 'line', 261
+.annotate 'line', 283
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
@@ -853,47 +717,37 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 274
+.annotate 'line', 296
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 275
+.annotate 'line', 297
 
 .end # TokenOp
 
 
 .sub 'isop' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 278
+.annotate 'line', 300
     getattribute $P1, self, 'str'
     set $S1, $P1
     iseq $I1, $S1, __ARG_1
     .return($I1)
-# }
-.annotate 'line', 279
+.annotate 'line', 301
 
 .end # isop
 
 
 .sub 'checkop' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 282
+.annotate 'line', 304
     getattribute $P1, self, 'str'
     set $S1, $P1
     .return($S1)
-# }
-.annotate 'line', 283
+.annotate 'line', 305
 
 .end # checkop
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenOp' ]
-.annotate 'line', 270
+.annotate 'line', 292
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
@@ -903,98 +757,76 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 290
+.annotate 'line', 312
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 291
+.annotate 'line', 313
 
 .end # TokenIdentifier
 
 
 .sub 'isidentifier' :method
-# Body
-# {
-.annotate 'line', 292
+.annotate 'line', 314
     .return(1)
-# }
 
 .end # isidentifier
 
 
 .sub 'getidentifier' :method
-# Body
-# {
-.annotate 'line', 295
+.annotate 'line', 317
     getattribute $P1, self, 'str'
     .return($P1)
-# }
-.annotate 'line', 296
+.annotate 'line', 318
 
 .end # getidentifier
 
 
 .sub 'checkkeyword' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 299
+.annotate 'line', 321
     getattribute $P1, self, 'str'
     set $S1, $P1
     .return($S1)
-# }
-.annotate 'line', 300
+.annotate 'line', 322
 
 .end # checkkeyword
 
 
 .sub 'iskeyword' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 303
+.annotate 'line', 325
     getattribute $P1, self, 'str'
     set $S1, $P1
     iseq $I1, $S1, __ARG_1
     .return($I1)
-# }
-.annotate 'line', 304
+.annotate 'line', 326
 
 .end # iskeyword
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
-.annotate 'line', 286
+.annotate 'line', 308
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TokenString' ]
 
 .sub 'isstring' :method
-# Body
-# {
-.annotate 'line', 309
+.annotate 'line', 331
     .return(1)
-# }
 
 .end # isstring
 
 
 .sub 'rawstring' :method
-# Body
-# {
-.annotate 'line', 312
+.annotate 'line', 334
     getattribute $P1, self, 'str'
     .return($P1)
-# }
-.annotate 'line', 313
+.annotate 'line', 335
 
 .end # rawstring
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenString' ]
-.annotate 'line', 307
+.annotate 'line', 329
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
@@ -1004,106 +836,77 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 320
+.annotate 'line', 342
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 321
+.annotate 'line', 343
 
 .end # TokenQuoted
 
 
 .sub 'get_string' :method :vtable
-# Body
-# {
-# builtin string
-.annotate 'line', 324
+.annotate 'line', 346
     getattribute $P1, self, 'str'
     set $S1, $P1
     concat $S2, '"', $S1
     concat $S2, $S2, '"'
     .return($S2)
-# }
-.annotate 'line', 325
+.annotate 'line', 347
 
 .end # get_string
 
 
 .sub 'viewable' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 328
+.annotate 'line', 350
     getattribute $P1, self, 'str'
     set $S1, $P1
     concat $S2, '"', $S1
     concat $S2, $S2, '"'
     .return($S2)
-# }
-.annotate 'line', 329
+.annotate 'line', 351
 
 .end # viewable
 
 
 .sub 'getasquoted' :method
-# Body
-# {
-.annotate 'line', 332
+.annotate 'line', 354
     getattribute $P1, self, 'str'
     .return($P1)
-# }
-.annotate 'line', 333
+.annotate 'line', 355
 
 .end # getasquoted
 
 
 .sub 'getPirString' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 336
-# str: $S1
+.annotate 'line', 358
     getattribute $P1, self, 'str'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 337
-# strunesc: $S2
+.annotate 'line', 359
     null $S2
-.annotate 'line', 338
-# try: create handler
+.annotate 'line', 360
     new $P1, 'ExceptionHandler'
     set_label $P1, __label_2
     push_eh $P1
-# try: begin
-# {
-.annotate 'line', 339
-# builtin unescape
+.annotate 'line', 361
     $P0 = new ['String']
     $P0 = $S1
     $S2 = $P0.'unescape'('utf8')
-# }
-# try: end
     pop_eh
     goto __label_3
-.annotate 'line', 338
-# catch
   __label_2:
+.annotate 'line', 360
     .get_results($P2)
     finalize $P2
     pop_eh
-# {
-.annotate 'line', 342
+.annotate 'line', 364
     WSubId_1("Invalid escape sequence in literal string", self)
-# }
-# catch end
   __label_3:
-.annotate 'line', 344
-# need_encoding: $I1
+.annotate 'line', 366
     null $I1
-.annotate 'line', 345
+.annotate 'line', 367
     box $P1, $S2
     if_null $P1, __label_5
     iter $P3, $P1
@@ -1111,43 +914,35 @@
   __label_4: # for iteration
     unless $P3 goto __label_5
     shift $I2, $P3
-# {
-.annotate 'line', 346
+.annotate 'line', 368
     le $I2, 127, __label_6
-# {
-.annotate 'line', 347
+.annotate 'line', 369
     set $I1, 1
     goto __label_5 # break
-.annotate 'line', 348
-# }
   __label_6: # endif
-# }
     goto __label_4
   __label_5: # endfor
-.annotate 'line', 351
-# builtin escape
+.annotate 'line', 373
     escape $S1, $S2
-.annotate 'line', 352
-# encoding: $S3
+.annotate 'line', 374
     unless $I1 goto __label_8
     set $S3, "utf8:"
     goto __label_7
   __label_8:
     set $S3, ""
   __label_7:
-.annotate 'line', 353
+.annotate 'line', 375
     concat $S4, $S3, '"'
     concat $S4, $S4, $S1
     concat $S4, $S4, '"'
     .return($S4)
-# }
-.annotate 'line', 354
+.annotate 'line', 376
 
 .end # getPirString
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
-.annotate 'line', 316
+.annotate 'line', 338
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenString' ]
     addparent $P0, $P1
 .end
@@ -1157,65 +952,48 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 361
+.annotate 'line', 383
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 362
+.annotate 'line', 384
 
 .end # TokenSingleQuoted
 
 
 .sub 'issinglequoted' :method
-# Body
-# {
-.annotate 'line', 363
+.annotate 'line', 385
     .return(1)
-# }
 
 .end # issinglequoted
 
 
 .sub 'get_string' :method :vtable
-# Body
-# {
-# builtin string
-.annotate 'line', 366
+.annotate 'line', 388
     getattribute $P1, self, 'str'
     set $S1, $P1
     concat $S2, "'", $S1
     concat $S2, $S2, "'"
     .return($S2)
-# }
-.annotate 'line', 367
+.annotate 'line', 389
 
 .end # get_string
 
 
 .sub 'viewable' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 370
+.annotate 'line', 392
     getattribute $P1, self, 'str'
     set $S1, $P1
     concat $S2, "'", $S1
     concat $S2, $S2, "'"
     .return($S2)
-# }
-.annotate 'line', 371
+.annotate 'line', 393
 
 .end # viewable
 
 
 .sub 'getasquoted' :method
-# Body
-# {
-.annotate 'line', 374
-# s: $S1
+.annotate 'line', 396
     set $S1, ''
-.annotate 'line', 375
+.annotate 'line', 397
     getattribute $P1, self, 'str'
     if_null $P1, __label_2
     iter $P2, $P1
@@ -1223,56 +1001,43 @@
   __label_1: # for iteration
     unless $P2 goto __label_2
     shift $S2, $P2
-# {
-# switch
-.annotate 'line', 376
-    set $S3, $S2
-    set $S4, '"'
-    if $S3 == $S4 goto __label_5
-    set $S4, '\'
-    if $S3 == $S4 goto __label_6
-    set $S4, "'"
-    if $S3 == $S4 goto __label_7
+.annotate 'line', 398
+    if $S2 == '"' goto __label_5
+    if $S2 == '\' goto __label_6
+    if $S2 == "'" goto __label_7
     goto __label_4
   __label_5: # case
   __label_6: # case
   __label_7: # case
-.annotate 'line', 380
-    concat $S5, '\', $S2
-    set $S2, $S5
+.annotate 'line', 402
+    concat $S4, '\', $S2
+    set $S2, $S4
     goto __label_3 # break
   __label_4: # default
   __label_3: # switch end
-.annotate 'line', 383
+.annotate 'line', 405
     concat $S1, $S1, $S2
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 385
+.annotate 'line', 407
     .return($S1)
-# }
-.annotate 'line', 386
+.annotate 'line', 408
 
 .end # getasquoted
 
 
 .sub 'getPirString' :method
-# Body
-# {
-.annotate 'line', 389
-# str: $S1
+.annotate 'line', 411
     getattribute $P1, self, 'str'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 390
-# quote: $S2
+.annotate 'line', 412
     set $S2, "'"
-.annotate 'line', 391
-# need_escape: $I1
+.annotate 'line', 413
     null $I1
-.annotate 'line', 392
+.annotate 'line', 414
     box $P1, $S1
     if_null $P1, __label_3
     iter $P2, $P1
@@ -1280,121 +1045,94 @@
   __label_2: # for iteration
     unless $P2 goto __label_3
     shift $I2, $P2
-# {
-.annotate 'line', 393
-    islt $I6, $I2, 32
-    if $I6 goto __label_5
-    isgt $I7, $I2, 127
-    set $I5, $I7
-    goto __label_6
+.annotate 'line', 415
+    islt $I5, $I2, 32
+    if $I5 goto __label_5
+    isgt $I5, $I2, 127
   __label_5:
-    set $I5, $I6
-  __label_6:
     unless $I5 goto __label_4
-# {
-.annotate 'line', 394
+.annotate 'line', 416
     set $I1, 1
     goto __label_3 # break
-.annotate 'line', 395
-# }
   __label_4: # endif
-# }
     goto __label_2
   __label_3: # endfor
-.annotate 'line', 398
-# need_encoding: $I3
+.annotate 'line', 420
     null $I3
-.annotate 'line', 399
-    unless $I1 goto __label_7
-# {
-.annotate 'line', 400
+.annotate 'line', 421
+    unless $I1 goto __label_6
+.annotate 'line', 422
     set $S2, '"'
-.annotate 'line', 401
-# result: $S3
+.annotate 'line', 423
     set $S3, ''
-.annotate 'line', 402
+.annotate 'line', 424
     box $P1, $S1
-    if_null $P1, __label_9
+    if_null $P1, __label_8
     iter $P3, $P1
     set $P3, 0
-  __label_8: # for iteration
-    unless $P3 goto __label_9
+  __label_7: # for iteration
+    unless $P3 goto __label_8
     shift $S4, $P3
-# {
-.annotate 'line', 403
-    ne $S4, '\', __label_10
-.annotate 'line', 404
+.annotate 'line', 425
+    ne $S4, '\', __label_9
+.annotate 'line', 426
     concat $S3, $S3, '\\'
-    goto __label_11
-  __label_10: # else
-# {
-.annotate 'line', 407
-# n: $I4
-# builtin ord
+    goto __label_10
+  __label_9: # else
+.annotate 'line', 429
     ord $I4, $S4
-.annotate 'line', 408
-    islt $I6, $I4, 32
-    if $I6 goto __label_14
-    isgt $I7, $I4, 127
-    set $I5, $I7
-    goto __label_15
-  __label_14:
-    set $I5, $I6
-  __label_15:
-    unless $I5 goto __label_12
-# {
-.annotate 'line', 409
-    le $I4, 127, __label_16
-.annotate 'line', 410
+.annotate 'line', 430
+    islt $I5, $I4, 32
+    if $I5 goto __label_13
+    isgt $I5, $I4, 127
+  __label_13:
+    unless $I5 goto __label_11
+.annotate 'line', 431
+    le $I4, 127, __label_14
+.annotate 'line', 432
     set $I3, 1
-  __label_16: # endif
-.annotate 'line', 411
-# h: $S5
+  __label_14: # endif
+.annotate 'line', 433
     box $P4, $I4
     $P1 = $P4.'get_as_base'(16)
     null $S5
-    if_null $P1, __label_17
+    if_null $P1, __label_15
     set $S5, $P1
-  __label_17:
-.annotate 'line', 412
+  __label_15:
+.annotate 'line', 434
     concat $S3, $S3, '\x{'
     concat $S3, $S3, $S5
     concat $S3, $S3, '}'
-# }
-    goto __label_13
-  __label_12: # else
-.annotate 'line', 415
+    goto __label_12
+  __label_11: # else
+.annotate 'line', 437
     concat $S3, $S3, $S4
-  __label_13: # endif
-# }
-  __label_11: # endif
-# }
-    goto __label_8
-  __label_9: # endfor
-.annotate 'line', 418
+  __label_12: # endif
+  __label_10: # endif
+    goto __label_7
+  __label_8: # endfor
+.annotate 'line', 440
     set $S1, $S3
-# }
-  __label_7: # endif
-.annotate 'line', 420
+  __label_6: # endif
+.annotate 'line', 442
     concat $S6, $S2, $S1
     concat $S6, $S6, $S2
     set $S1, $S6
-.annotate 'line', 421
-    unless $I3 goto __label_18
-.annotate 'line', 422
+.annotate 'line', 443
+    unless $I3 goto __label_16
+.annotate 'line', 444
     concat $S6, 'utf8:', $S1
     set $S1, $S6
-  __label_18: # endif
-.annotate 'line', 423
+  __label_16: # endif
+.annotate 'line', 445
     .return($S1)
-# }
-.annotate 'line', 424
+.annotate 'line', 446
 
 .end # getPirString
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenSingleQuoted' ]
-.annotate 'line', 357
+.annotate 'line', 379
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenString' ]
     addparent $P0, $P1
 .end
@@ -1404,42 +1142,32 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 431
+.annotate 'line', 453
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 432
+.annotate 'line', 454
 
 .end # TokenInteger
 
 
 .sub 'isint' :method
-# Body
-# {
-.annotate 'line', 433
+.annotate 'line', 455
     .return(1)
-# }
 
 .end # isint
 
 
 .sub 'getintvalue' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 436
+.annotate 'line', 458
     getattribute $P1, self, 'str'
     set $I1, $P1
     .return($I1)
-# }
-.annotate 'line', 437
+.annotate 'line', 459
 
 .end # getintvalue
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
-.annotate 'line', 427
+.annotate 'line', 449
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
@@ -1449,731 +1177,636 @@
         .param string __ARG_1
         .param int __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 444
+.annotate 'line', 466
     self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 445
+.annotate 'line', 467
 
 .end # TokenFloat
 
 
 .sub 'isfloat' :method
-# Body
-# {
-.annotate 'line', 446
+.annotate 'line', 468
     .return(1)
-# }
 
 .end # isfloat
 
 
 .sub 'getfloatvalue' :method
-# Body
-# {
-.annotate 'line', 450
-# value: $N1
+.annotate 'line', 472
     getattribute $P1, self, 'str'
     set $N1, $P1
-.annotate 'line', 451
+.annotate 'line', 473
     .return($N1)
-# }
-.annotate 'line', 452
+.annotate 'line', 474
 
 .end # getfloatvalue
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
-.annotate 'line', 440
+.annotate 'line', 462
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'getquoted' :subid('WSubId_13')
+.sub 'TokenError' :subid('WSubId_7')
+        .param string __ARG_1
+        .param pmc __ARG_2
+        .param int __ARG_3
+.annotate 'line', 484
+    getattribute $P2, __ARG_2, 'filename'
+    set $S1, $P2
+    set $S2, __ARG_3
+    concat $S3, __ARG_1, ' in '
+    concat $S3, $S3, $S1
+    concat $S3, $S3, ' line '
+    concat $S3, $S3, $S2
+.annotate 'line', 486
+    new $P4, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
+    getattribute $P5, __ARG_2, 'filename'
+    $P4.'WinxedCompilerError'('tokenizer', __ARG_1, $P5, __ARG_3)
+    set $P3, $P4
+.annotate 'line', 484
+    root_new $P1, ['parrot';'Exception']
+    $P1['message'] = $S3
+    $P1['severity'] = 2
+    $P1['type'] = 567
+    $P1['payload'] = $P3
+    throw $P1
+.annotate 'line', 487
+
+.end # TokenError
+
+
+.sub 'UnterminatedString' :subid('WSubId_8')
+        .param pmc __ARG_1
+        .param int __ARG_2
+.const 'Sub' WSubId_7 = "WSubId_7"
+.annotate 'line', 491
+    WSubId_7('Unterminated string', __ARG_1, __ARG_2)
+.annotate 'line', 492
+
+.end # UnterminatedString
+
+
+.sub 'UnterminatedHeredoc' :subid('WSubId_9')
+        .param pmc __ARG_1
+        .param int __ARG_2
+.const 'Sub' WSubId_7 = "WSubId_7"
+.annotate 'line', 496
+    WSubId_7('Unterminated heredoc', __ARG_1, __ARG_2)
+.annotate 'line', 497
+
+.end # UnterminatedHeredoc
+
+
+.sub 'UnclosedComment' :subid('WSubId_13')
+        .param pmc __ARG_1
+        .param int __ARG_2
+.const 'Sub' WSubId_7 = "WSubId_7"
+.annotate 'line', 501
+    WSubId_7("Unclosed comment", __ARG_1, __ARG_2)
+.annotate 'line', 502
+
+.end # UnclosedComment
+
+
+.sub 'getquoted' :subid('WSubId_16')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_7 = "WSubId_7"
-# Body
-# {
-.annotate 'line', 462
-# s: $S1
+.const 'Sub' WSubId_8 = "WSubId_8"
+.annotate 'line', 506
     set $S1, ''
-.annotate 'line', 463
-# c: $S2
+.annotate 'line', 507
     null $S2
-# for loop
-.annotate 'line', 464
+.annotate 'line', 508
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
     eq $S2, '"', __label_2
-# {
-# switch
-.annotate 'line', 465
-    set $S4, $S2
-    set $S5, ""
-    if $S4 == $S5 goto __label_6
-    set $S5, "\n"
-    if $S4 == $S5 goto __label_7
-    set $S5, '\'
-    if $S4 == $S5 goto __label_8
+.annotate 'line', 509
+    if $S2 == "" goto __label_6
+    if $S2 == "\n" goto __label_7
+    if $S2 == '\' goto __label_8
     goto __label_5
   __label_6: # case
   __label_7: # case
-.annotate 'line', 468
-    WSubId_7('Unterminated string', __ARG_1, __ARG_3)
+.annotate 'line', 512
+    WSubId_8(__ARG_1, __ARG_3)
   __label_8: # case
-.annotate 'line', 471
-# c2: $S3
+.annotate 'line', 515
     $P2 = __ARG_1.'getchar'()
     null $S3
     if_null $P2, __label_9
     set $S3, $P2
   __label_9:
-.annotate 'line', 472
-    iseq $I2, $S3, ''
-    if $I2 goto __label_11
-    iseq $I3, $S3, "\n"
-    set $I1, $I3
-    goto __label_12
+.annotate 'line', 516
+    iseq $I1, $S3, ''
+    if $I1 goto __label_11
+    iseq $I1, $S3, "\n"
   __label_11:
-    set $I1, $I2
-  __label_12:
     unless $I1 goto __label_10
-.annotate 'line', 473
-    WSubId_7('Unterminated string', __ARG_1, __ARG_3)
+.annotate 'line', 517
+    WSubId_8(__ARG_1, __ARG_3)
   __label_10: # endif
-.annotate 'line', 474
+.annotate 'line', 518
     concat $S1, $S1, $S2
     concat $S1, $S1, $S3
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 477
+.annotate 'line', 521
     concat $S1, $S1, $S2
   __label_4: # switch end
-# }
   __label_1: # for iteration
-.annotate 'line', 464
+.annotate 'line', 508
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_3
   __label_2: # for end
-.annotate 'line', 480
+.annotate 'line', 524
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenQuoted'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 481
+.annotate 'line', 525
 
 .end # getquoted
 
 
-.sub 'getsinglequoted' :subid('WSubId_14')
+.sub 'getsinglequoted' :subid('WSubId_17')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_7 = "WSubId_7"
-# Body
-# {
-.annotate 'line', 485
-# s: $S1
+.const 'Sub' WSubId_8 = "WSubId_8"
+.annotate 'line', 529
     set $S1, ''
-.annotate 'line', 486
-# c: $S2
+.annotate 'line', 530
     null $S2
-# for loop
-.annotate 'line', 487
+.annotate 'line', 531
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
     eq $S2, "'", __label_2
-# {
-.annotate 'line', 488
-    iseq $I2, $S2, ""
-    if $I2 goto __label_5
-    iseq $I3, $S2, "\n"
-    set $I1, $I3
-    goto __label_6
+.annotate 'line', 532
+    iseq $I1, $S2, ""
+    if $I1 goto __label_5
+    iseq $I1, $S2, "\n"
   __label_5:
-    set $I1, $I2
-  __label_6:
     unless $I1 goto __label_4
-.annotate 'line', 489
-    WSubId_7('Unterminated string', __ARG_1, __ARG_3)
+.annotate 'line', 533
+    WSubId_8(__ARG_1, __ARG_3)
   __label_4: # endif
-.annotate 'line', 490
+.annotate 'line', 534
     concat $S1, $S1, $S2
-# }
   __label_1: # for iteration
-.annotate 'line', 487
+.annotate 'line', 531
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_3
   __label_2: # for end
-.annotate 'line', 492
+.annotate 'line', 536
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenSingleQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenSingleQuoted'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 493
+.annotate 'line', 537
 
 .end # getsinglequoted
 
 
-.sub 'getheredoc' :subid('WSubId_15')
+.sub 'getheredoc' :subid('WSubId_18')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_7 = "WSubId_7"
-# Body
-# {
-.annotate 'line', 497
-# mark: $S1
+.const 'Sub' WSubId_9 = "WSubId_9"
+.annotate 'line', 541
     set $S1, ''
-.annotate 'line', 498
-# c: $S2
+.annotate 'line', 542
     null $S2
-# for loop
-.annotate 'line', 499
+.annotate 'line', 543
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
     eq $S2, "\n", __label_2
-# {
-# switch
-.annotate 'line', 500
-    set $S5, $S2
-    set $S6, ''
-    if $S5 == $S6 goto __label_6
-    set $S6, '"'
-    if $S5 == $S6 goto __label_7
-    set $S6, '\'
-    if $S5 == $S6 goto __label_8
+.annotate 'line', 544
+    if $S2 == '' goto __label_6
+    if $S2 == '"' goto __label_7
+    if $S2 == '\' goto __label_8
     goto __label_5
   __label_6: # case
-.annotate 'line', 502
-    WSubId_7('Unterminated heredoc', __ARG_1, __ARG_3)
+.annotate 'line', 546
+    WSubId_9(__ARG_1, __ARG_3)
   __label_7: # case
   __label_8: # case
-.annotate 'line', 507
-    concat $S7, '\', $S2
-    set $S2, $S7
+.annotate 'line', 551
+    concat $S6, '\', $S2
+    set $S2, $S6
     goto __label_4 # break
   __label_5: # default
   __label_4: # switch end
-.annotate 'line', 510
+.annotate 'line', 554
     concat $S5, $S1, $S2
     set $S1, $S5
-# }
   __label_1: # for iteration
-.annotate 'line', 499
+.annotate 'line', 543
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_3
   __label_2: # for end
-.annotate 'line', 512
+.annotate 'line', 556
     concat $S5, $S1, ':>>'
     set $S1, $S5
-.annotate 'line', 514
-# content: $S3
+.annotate 'line', 558
     set $S3, ''
-.annotate 'line', 515
-# line: $S4
+.annotate 'line', 559
     null $S4
   __label_9: # do
-.annotate 'line', 516
-# {
-.annotate 'line', 517
+.annotate 'line', 561
     set $S4, ''
-# for loop
-.annotate 'line', 518
+.annotate 'line', 562
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_14: # for condition
     eq $S2, "\n", __label_13
-# {
-# switch
-.annotate 'line', 519
-    set $S5, $S2
-    set $S6, ''
-    if $S5 == $S6 goto __label_17
-    set $S6, '"'
-    if $S5 == $S6 goto __label_18
-    set $S6, '\'
-    if $S5 == $S6 goto __label_19
+.annotate 'line', 563
+    if $S2 == '' goto __label_17
+    if $S2 == '"' goto __label_18
+    if $S2 == '\' goto __label_19
     goto __label_16
   __label_17: # case
-.annotate 'line', 521
-    WSubId_7('Unterminated heredoc', __ARG_1, __ARG_3)
+.annotate 'line', 565
+    WSubId_9(__ARG_1, __ARG_3)
   __label_18: # case
   __label_19: # case
-.annotate 'line', 524
-    concat $S7, '\', $S2
-    set $S2, $S7
+.annotate 'line', 568
+    concat $S6, '\', $S2
+    set $S2, $S6
     goto __label_15 # break
   __label_16: # default
   __label_15: # switch end
-.annotate 'line', 527
+.annotate 'line', 571
     concat $S4, $S4, $S2
-# }
   __label_12: # for iteration
-.annotate 'line', 518
+.annotate 'line', 562
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_14
   __label_13: # for end
-.annotate 'line', 529
+.annotate 'line', 573
     eq $S4, $S1, __label_20
-.annotate 'line', 530
+.annotate 'line', 574
     concat $S3, $S3, $S4
     concat $S3, $S3, '\n'
   __label_20: # endif
-# }
   __label_11: # continue
-.annotate 'line', 531
+.annotate 'line', 575
     ne $S4, $S1, __label_9
   __label_10: # enddo
-.annotate 'line', 532
+.annotate 'line', 576
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenQuoted'($P3, __ARG_3, $S3)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 533
+.annotate 'line', 577
 
 .end # getheredoc
 
 
-.sub 'getident' :subid('WSubId_11')
+.sub 'getident' :subid('WSubId_14')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_8 = "WSubId_8"
-# Body
-# {
-.annotate 'line', 537
-# s: $S1
+.const 'Sub' WSubId_10 = "WSubId_10"
+.annotate 'line', 581
     set $S1, __ARG_2
-.annotate 'line', 538
-# c: $S2
+.annotate 'line', 582
     null $S2
-# for loop
-.annotate 'line', 539
+.annotate 'line', 583
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
-    $P2 = WSubId_8($S2)
+    $P2 = WSubId_10($S2)
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 540
+.annotate 'line', 584
     concat $S1, $S1, $S2
   __label_1: # for iteration
-.annotate 'line', 539
+.annotate 'line', 583
     $P3 = __ARG_1.'getchar'()
     set $S2, $P3
     goto __label_3
   __label_2: # for end
-.annotate 'line', 541
+.annotate 'line', 585
     __ARG_1.'ungetchar'($S2)
-.annotate 'line', 542
+.annotate 'line', 586
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenIdentifier'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 543
+.annotate 'line', 587
 
 .end # getident
 
 
-.sub 'getnumber' :subid('WSubId_20')
+.sub 'getnumber' :subid('WSubId_23')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_9 = "WSubId_9"
-.const 'Sub' WSubId_10 = "WSubId_10"
-# Body
-# {
-.annotate 'line', 547
-# s: $S1
+.const 'Sub' WSubId_11 = "WSubId_11"
+.const 'Sub' WSubId_12 = "WSubId_12"
+.annotate 'line', 591
     null $S1
-.annotate 'line', 548
-# c: $S2
+.annotate 'line', 592
     set $S2, __ARG_2
   __label_1: # do
-.annotate 'line', 549
-# {
-.annotate 'line', 550
+.annotate 'line', 594
     concat $S1, $S1, $S2
-.annotate 'line', 551
+.annotate 'line', 595
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-# }
   __label_3: # continue
-.annotate 'line', 552
-    $P1 = WSubId_9($S2)
+.annotate 'line', 596
+    $P1 = WSubId_11($S2)
     if_null $P1, __label_2
     if $P1 goto __label_1
   __label_2: # enddo
-.annotate 'line', 553
-    iseq $I4, $S1, '0'
-    unless $I4 goto __label_5
-    iseq $I6, $S2, 'x'
-    if $I6 goto __label_7
-    iseq $I7, $S2, 'X'
-    set $I5, $I7
-    goto __label_8
-  __label_7:
-    set $I5, $I6
-  __label_8:
-    set $I3, $I5
-    goto __label_6
-  __label_5:
-    set $I3, $I4
+.annotate 'line', 597
+    iseq $I3, $S1, '0'
+    unless $I3 goto __label_5
+    iseq $I3, $S2, 'x'
+    if $I3 goto __label_6
+    iseq $I3, $S2, 'X'
   __label_6:
+  __label_5:
     unless $I3 goto __label_4
-# {
-.annotate 'line', 554
-# hexval: $I1
+.annotate 'line', 598
     null $I1
-# h: $I2
     null $I2
-# for loop
-.annotate 'line', 555
+.annotate 'line', 599
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-  __label_11: # for condition
-    $P2 = WSubId_10($S2)
+  __label_9: # for condition
+    $P2 = WSubId_12($S2)
     set $I2, $P2
-    lt $I2, 0, __label_10
-# {
-.annotate 'line', 556
+    lt $I2, 0, __label_8
+.annotate 'line', 600
     mul $I3, $I1, 16
     add $I1, $I3, $I2
-.annotate 'line', 557
+.annotate 'line', 601
     concat $S1, $S1, $S2
-# }
-  __label_9: # for iteration
-.annotate 'line', 555
+  __label_7: # for iteration
+.annotate 'line', 599
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-    goto __label_11
-  __label_10: # for end
-.annotate 'line', 559
+    goto __label_9
+  __label_8: # for end
+.annotate 'line', 603
     __ARG_1.'ungetchar'($S2)
-.annotate 'line', 560
+.annotate 'line', 604
     set $S1, $I1
-.annotate 'line', 561
+.annotate 'line', 605
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenInteger'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
   __label_4: # endif
-.annotate 'line', 563
-    ne $S2, '.', __label_12
-# {
-  __label_14: # do
-.annotate 'line', 564
-# {
-.annotate 'line', 565
+.annotate 'line', 607
+    ne $S2, '.', __label_10
+  __label_12: # do
+.annotate 'line', 609
     concat $S1, $S1, $S2
-.annotate 'line', 566
+.annotate 'line', 610
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-# }
-  __label_16: # continue
-.annotate 'line', 567
-    $P1 = WSubId_9($S2)
-    if_null $P1, __label_15
-    if $P1 goto __label_14
-  __label_15: # enddo
-.annotate 'line', 568
-    iseq $I4, $S2, 'e'
-    if $I4 goto __label_18
-    iseq $I5, $S2, 'E'
-    set $I3, $I5
-    goto __label_19
+  __label_14: # continue
+.annotate 'line', 611
+    $P1 = WSubId_11($S2)
+    if_null $P1, __label_13
+    if $P1 goto __label_12
+  __label_13: # enddo
+.annotate 'line', 612
+    iseq $I3, $S2, 'e'
+    if $I3 goto __label_16
+    iseq $I3, $S2, 'E'
+  __label_16:
+    unless $I3 goto __label_15
+.annotate 'line', 613
+    concat $S1, $S1, 'E'
+.annotate 'line', 614
+    $P1 = __ARG_1.'getchar'()
+    set $S2, $P1
+    iseq $I3, $S2, '+'
+    if $I3 goto __label_18
+    iseq $I3, $S2, '-'
   __label_18:
-    set $I3, $I4
-  __label_19:
     unless $I3 goto __label_17
-# {
-.annotate 'line', 569
-    concat $S1, $S1, 'E'
-.annotate 'line', 570
+.annotate 'line', 615
+    concat $S1, $S1, $S2
+.annotate 'line', 616
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-    iseq $I4, $S2, '+'
-    if $I4 goto __label_21
-    iseq $I5, $S2, '-'
-    set $I3, $I5
-    goto __label_22
-  __label_21:
-    set $I3, $I4
-  __label_22:
-    unless $I3 goto __label_20
-# {
-.annotate 'line', 571
-    concat $S1, $S1, $S2
-.annotate 'line', 572
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-# }
-  __label_20: # endif
-# for loop
-  __label_25: # for condition
-.annotate 'line', 574
-    $P1 = WSubId_9($S2)
-    if_null $P1, __label_24
-    unless $P1 goto __label_24
-.annotate 'line', 575
-    concat $S1, $S1, $S2
-  __label_23: # for iteration
-.annotate 'line', 574
-    $P2 = __ARG_1.'getchar'()
-    set $S2, $P2
-    goto __label_25
-  __label_24: # for end
-# }
   __label_17: # endif
-.annotate 'line', 577
-    __ARG_1.'ungetchar'($S2)
-.annotate 'line', 578
-    new $P2, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
-    getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenFloat'($P3, __ARG_3, $S1)
-    set $P1, $P2
-    .return($P1)
-# }
-    goto __label_13
-  __label_12: # else
-# {
-.annotate 'line', 581
-    iseq $I4, $S2, 'e'
-    if $I4 goto __label_28
-    iseq $I5, $S2, 'E'
-    set $I3, $I5
-    goto __label_29
-  __label_28:
-    set $I3, $I4
-  __label_29:
-    unless $I3 goto __label_26
-# {
-.annotate 'line', 582
-    concat $S1, $S1, 'E'
-.annotate 'line', 583
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    iseq $I4, $S2, '+'
-    if $I4 goto __label_31
-    iseq $I5, $S2, '-'
-    set $I3, $I5
-    goto __label_32
-  __label_31:
-    set $I3, $I4
-  __label_32:
-    unless $I3 goto __label_30
-# {
-.annotate 'line', 584
+  __label_21: # for condition
+.annotate 'line', 618
+    $P1 = WSubId_11($S2)
+    if_null $P1, __label_20
+    unless $P1 goto __label_20
+.annotate 'line', 619
     concat $S1, $S1, $S2
-.annotate 'line', 585
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-# }
-  __label_30: # endif
-# for loop
-  __label_35: # for condition
-.annotate 'line', 587
-    $P1 = WSubId_9($S2)
-    if_null $P1, __label_34
-    unless $P1 goto __label_34
-.annotate 'line', 588
-    concat $S1, $S1, $S2
-  __label_33: # for iteration
-.annotate 'line', 587
+  __label_19: # for iteration
+.annotate 'line', 618
     $P2 = __ARG_1.'getchar'()
     set $S2, $P2
-    goto __label_35
-  __label_34: # for end
-.annotate 'line', 589
+    goto __label_21
+  __label_20: # for end
+  __label_15: # endif
+.annotate 'line', 621
     __ARG_1.'ungetchar'($S2)
-.annotate 'line', 590
+.annotate 'line', 622
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenFloat'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-    goto __label_27
-  __label_26: # else
-# {
-.annotate 'line', 593
+    goto __label_11
+  __label_10: # else
+.annotate 'line', 625
+    iseq $I3, $S2, 'e'
+    if $I3 goto __label_24
+    iseq $I3, $S2, 'E'
+  __label_24:
+    unless $I3 goto __label_22
+.annotate 'line', 626
+    concat $S1, $S1, 'E'
+.annotate 'line', 627
+    $P1 = __ARG_1.'getchar'()
+    set $S2, $P1
+    iseq $I3, $S2, '+'
+    if $I3 goto __label_26
+    iseq $I3, $S2, '-'
+  __label_26:
+    unless $I3 goto __label_25
+.annotate 'line', 628
+    concat $S1, $S1, $S2
+.annotate 'line', 629
+    $P1 = __ARG_1.'getchar'()
+    set $S2, $P1
+  __label_25: # endif
+  __label_29: # for condition
+.annotate 'line', 631
+    $P1 = WSubId_11($S2)
+    if_null $P1, __label_28
+    unless $P1 goto __label_28
+.annotate 'line', 632
+    concat $S1, $S1, $S2
+  __label_27: # for iteration
+.annotate 'line', 631
+    $P2 = __ARG_1.'getchar'()
+    set $S2, $P2
+    goto __label_29
+  __label_28: # for end
+.annotate 'line', 633
     __ARG_1.'ungetchar'($S2)
-.annotate 'line', 594
+.annotate 'line', 634
+    new $P2, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
+    getattribute $P3, __ARG_1, 'filename'
+    $P2.'TokenFloat'($P3, __ARG_3, $S1)
+    set $P1, $P2
+    .return($P1)
+    goto __label_23
+  __label_22: # else
+.annotate 'line', 637
+    __ARG_1.'ungetchar'($S2)
+.annotate 'line', 638
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenInteger'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-  __label_27: # endif
-# }
-  __label_13: # endif
-# }
-.annotate 'line', 597
+  __label_23: # endif
+  __label_11: # endif
+.annotate 'line', 641
 
 .end # getnumber
 
 
-.sub 'getlinecomment' :subid('WSubId_16')
+.sub 'getlinecomment' :subid('WSubId_19')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 601
-# s: $S1
+.annotate 'line', 645
     set $S1, __ARG_2
-# for loop
-.annotate 'line', 602
-# c: $S2
+.annotate 'line', 646
     $P1 = __ARG_1.'getchar'()
     null $S2
     if_null $P1, __label_4
     set $S2, $P1
   __label_4:
   __label_3: # for condition
-    isne $I2, $S2, ''
-    unless $I2 goto __label_5
-    isne $I3, $S2, "\n"
-    set $I1, $I3
-    goto __label_6
+    isne $I1, $S2, ''
+    unless $I1 goto __label_5
+    isne $I1, $S2, "\n"
   __label_5:
-    set $I1, $I2
-  __label_6:
     unless $I1 goto __label_2
-.annotate 'line', 603
+.annotate 'line', 647
     concat $S1, $S1, $S2
   __label_1: # for iteration
-.annotate 'line', 602
+.annotate 'line', 646
     $P2 = __ARG_1.'getchar'()
     set $S2, $P2
     goto __label_3
   __label_2: # for end
-.annotate 'line', 604
+.annotate 'line', 648
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenComment'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 605
+.annotate 'line', 649
 
 .end # getlinecomment
 
 
-.sub 'getcomment' :subid('WSubId_17')
+.sub 'getcomment' :subid('WSubId_20')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_7 = "WSubId_7"
-# Body
-# {
-.annotate 'line', 609
-# s: $S1
+.const 'Sub' WSubId_13 = "WSubId_13"
+.annotate 'line', 653
     set $S1, __ARG_2
-.annotate 'line', 610
-# c: $S2
+.annotate 'line', 654
     $P1 = __ARG_1.'getchar'()
     null $S2
     if_null $P1, __label_1
     set $S2, $P1
   __label_1:
   __label_2: # do
-.annotate 'line', 611
-# {
-# for loop
   __label_7: # for condition
-.annotate 'line', 612
-    isne $I2, $S2, ''
-    unless $I2 goto __label_8
-    isne $I3, $S2, '*'
-    set $I1, $I3
-    goto __label_9
+.annotate 'line', 656
+    isne $I1, $S2, ''
+    unless $I1 goto __label_8
+    isne $I1, $S2, '*'
   __label_8:
-    set $I1, $I2
-  __label_9:
     unless $I1 goto __label_6
-.annotate 'line', 613
+.annotate 'line', 657
     concat $S1, $S1, $S2
   __label_5: # for iteration
-.annotate 'line', 612
+.annotate 'line', 656
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_7
   __label_6: # for end
-.annotate 'line', 614
-    ne $S2, '', __label_10
-.annotate 'line', 615
-    WSubId_7("Unclosed comment", __ARG_1, __ARG_3)
-  __label_10: # endif
-.annotate 'line', 616
+.annotate 'line', 658
+    ne $S2, '', __label_9
+.annotate 'line', 659
+    WSubId_13(__ARG_1, __ARG_3)
+  __label_9: # endif
+.annotate 'line', 660
     concat $S1, $S1, $S2
-.annotate 'line', 617
+.annotate 'line', 661
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-.annotate 'line', 618
-    ne $S2, '', __label_11
-.annotate 'line', 619
-    WSubId_7("Unclosed comment", __ARG_1, __ARG_3)
-  __label_11: # endif
-# }
+.annotate 'line', 662
+    ne $S2, '', __label_10
+.annotate 'line', 663
+    WSubId_13(__ARG_1, __ARG_3)
+  __label_10: # endif
   __label_4: # continue
-.annotate 'line', 620
+.annotate 'line', 664
     ne $S2, '/', __label_2
   __label_3: # enddo
-.annotate 'line', 621
+.annotate 'line', 665
     concat $S1, $S1, '/'
-.annotate 'line', 622
+.annotate 'line', 666
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenComment'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 623
+.annotate 'line', 667
 
 .end # getcomment
 
 
-.sub 'getop' :subid('WSubId_12')
+.sub 'getop' :subid('WSubId_15')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 627
-# s: $S1
+.annotate 'line', 671
     set $S1, __ARG_2
-.annotate 'line', 628
+.annotate 'line', 672
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenOp' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenOp'($P3, __ARG_3, $S1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 629
+.annotate 'line', 673
 
 .end # getop
 
@@ -2182,528 +1815,438 @@
 .sub 'Tokenizer' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_11 = "WSubId_11"
-.const 'Sub' WSubId_12 = "WSubId_12"
-.const 'Sub' WSubId_13 = "WSubId_13"
 .const 'Sub' WSubId_14 = "WSubId_14"
 .const 'Sub' WSubId_15 = "WSubId_15"
 .const 'Sub' WSubId_16 = "WSubId_16"
 .const 'Sub' WSubId_17 = "WSubId_17"
-# Body
-# {
-.annotate 'line', 645
+.const 'Sub' WSubId_18 = "WSubId_18"
+.const 'Sub' WSubId_19 = "WSubId_19"
+.const 'Sub' WSubId_20 = "WSubId_20"
+.annotate 'line', 689
     setattribute self, 'h', __ARG_1
-.annotate 'line', 646
+.annotate 'line', 690
     box $P2, ''
     setattribute self, 'pending', $P2
-.annotate 'line', 647
+.annotate 'line', 691
     root_new $P3, ['parrot';'ResizablePMCArray']
     setattribute self, 'stacked', $P3
-.annotate 'line', 648
+.annotate 'line', 692
     box $P2, __ARG_2
     setattribute self, 'filename', $P2
-.annotate 'line', 649
+.annotate 'line', 693
     box $P2, 1
     setattribute self, 'line', $P2
-.annotate 'line', 650
-# var select: $P1
+.annotate 'line', 694
     root_new $P1, ['parrot';'Hash']
-.annotate 'line', 651
+.annotate 'line', 695
     root_new $P2, ['parrot';'Hash']
-    $P2[''] = WSubId_11
-    $P2['{'] = WSubId_12
+    $P2[''] = WSubId_14
+    $P2['{'] = WSubId_15
     $P1['$'] = $P2
-.annotate 'line', 652
-    $P1['"'] = WSubId_13
-.annotate 'line', 653
-    $P1["'"] = WSubId_14
-.annotate 'line', 654
+.annotate 'line', 696
+    $P1['"'] = WSubId_16
+.annotate 'line', 697
+    $P1["'"] = WSubId_17
+.annotate 'line', 698
     root_new $P3, ['parrot';'Hash']
-.annotate 'line', 655
+.annotate 'line', 699
     root_new $P4, ['parrot';'Hash']
-    $P4[''] = WSubId_12
-    $P4['='] = WSubId_12
+    $P4[''] = WSubId_15
+    $P4['='] = WSubId_15
     $P3['='] = $P4
-.annotate 'line', 656
-    $P3[':'] = WSubId_12
+.annotate 'line', 700
+    $P3[':'] = WSubId_15
     $P1['='] = $P3
-.annotate 'line', 658
+.annotate 'line', 702
     root_new $P5, ['parrot';'Hash']
-    $P5['+'] = WSubId_12
-    $P5['='] = WSubId_12
+    $P5['+'] = WSubId_15
+    $P5['='] = WSubId_15
     $P1['+'] = $P5
-.annotate 'line', 659
+.annotate 'line', 703
     root_new $P6, ['parrot';'Hash']
-    $P6['-'] = WSubId_12
-    $P6['='] = WSubId_12
+    $P6['-'] = WSubId_15
+    $P6['='] = WSubId_15
     $P1['-'] = $P6
-.annotate 'line', 660
+.annotate 'line', 704
     root_new $P7, ['parrot';'Hash']
-    $P7['='] = WSubId_12
+    $P7['='] = WSubId_15
     $P1['*'] = $P7
-.annotate 'line', 661
+.annotate 'line', 705
     root_new $P8, ['parrot';'Hash']
-    $P8['|'] = WSubId_12
+    $P8['|'] = WSubId_15
     $P1['|'] = $P8
-.annotate 'line', 662
+.annotate 'line', 706
     root_new $P9, ['parrot';'Hash']
-    $P9['&'] = WSubId_12
+    $P9['&'] = WSubId_15
     $P1['&'] = $P9
-.annotate 'line', 663
+.annotate 'line', 707
     root_new $P10, ['parrot';'Hash']
-.annotate 'line', 664
+.annotate 'line', 708
     root_new $P11, ['parrot';'Hash']
-    $P11[''] = WSubId_12
-    $P11[':'] = WSubId_15
+    $P11[''] = WSubId_15
+    $P11[':'] = WSubId_18
     $P10['<'] = $P11
-.annotate 'line', 665
-    $P10['='] = WSubId_12
+.annotate 'line', 709
+    $P10['='] = WSubId_15
     $P1['<'] = $P10
-.annotate 'line', 667
+.annotate 'line', 711
     root_new $P12, ['parrot';'Hash']
-    $P12['>'] = WSubId_12
-    $P12['='] = WSubId_12
+    $P12['>'] = WSubId_15
+    $P12['='] = WSubId_15
     $P1['>'] = $P12
-.annotate 'line', 668
+.annotate 'line', 712
     root_new $P13, ['parrot';'Hash']
-.annotate 'line', 669
+.annotate 'line', 713
     root_new $P14, ['parrot';'Hash']
-    $P14[''] = WSubId_12
-    $P14['='] = WSubId_12
+    $P14[''] = WSubId_15
+    $P14['='] = WSubId_15
     $P13['='] = $P14
     $P1['!'] = $P13
-.annotate 'line', 671
+.annotate 'line', 715
     root_new $P15, ['parrot';'Hash']
-    $P15['%'] = WSubId_12
-    $P15['='] = WSubId_12
+    $P15['%'] = WSubId_15
+    $P15['='] = WSubId_15
     $P1['%'] = $P15
-.annotate 'line', 672
+.annotate 'line', 716
     root_new $P16, ['parrot';'Hash']
-    $P16['='] = WSubId_12
-    $P16['/'] = WSubId_16
-    $P16['*'] = WSubId_17
+    $P16['='] = WSubId_15
+    $P16['/'] = WSubId_19
+    $P16['*'] = WSubId_20
     $P1['/'] = $P16
-.annotate 'line', 673
-    $P1['#'] = WSubId_16
-.annotate 'line', 675
+.annotate 'line', 717
+    $P1['#'] = WSubId_19
+.annotate 'line', 719
     setattribute self, 'select', $P1
-# }
-.annotate 'line', 676
+.annotate 'line', 720
 
 .end # Tokenizer
 
 
 .sub 'getchar' :method
-# Body
-# {
-.annotate 'line', 679
-# var pending: $P1
+.annotate 'line', 723
     getattribute $P1, self, 'pending'
-.annotate 'line', 680
-# c: $S1
+.annotate 'line', 724
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 681
+.annotate 'line', 725
     eq $S1, '', __label_2
-.annotate 'line', 682
+.annotate 'line', 726
     assign $P1, ''
     goto __label_3
   __label_2: # else
-# {
-.annotate 'line', 684
-# var h: $P2
+.annotate 'line', 728
     getattribute $P2, self, 'h'
-.annotate 'line', 685
+.annotate 'line', 729
     $P3 = $P2.'read'(1)
     set $S1, $P3
-.annotate 'line', 686
+.annotate 'line', 730
     ne $S1, "\n", __label_4
-.annotate 'line', 687
+.annotate 'line', 731
     getattribute $P3, self, 'line'
     inc $P3
   __label_4: # endif
-# }
   __label_3: # endif
-.annotate 'line', 689
+.annotate 'line', 733
     .return($S1)
-# }
-.annotate 'line', 690
+.annotate 'line', 734
 
 .end # getchar
 
 
 .sub 'ungetchar' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 693
+.annotate 'line', 737
     getattribute $P1, self, 'pending'
     assign $P1, __ARG_1
-# }
-.annotate 'line', 694
+.annotate 'line', 738
 
 .end # ungetchar
 
 
 .sub 'get_token' :method
-.const 'Sub' WSubId_18 = "WSubId_18"
-.const 'Sub' WSubId_19 = "WSubId_19"
+.const 'Sub' WSubId_21 = "WSubId_21"
+.const 'Sub' WSubId_22 = "WSubId_22"
+.const 'Sub' WSubId_14 = "WSubId_14"
 .const 'Sub' WSubId_11 = "WSubId_11"
-.const 'Sub' WSubId_9 = "WSubId_9"
-.const 'Sub' WSubId_20 = "WSubId_20"
-.const 'Sub' WSubId_12 = "WSubId_12"
-# Body
-# {
-.annotate 'line', 697
+.const 'Sub' WSubId_23 = "WSubId_23"
+.const 'Sub' WSubId_15 = "WSubId_15"
+.annotate 'line', 741
     getattribute $P3, self, 'stacked'
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 698
+.annotate 'line', 742
     getattribute $P4, self, 'stacked'
     .tailcall $P4.'pop'()
   __label_1: # endif
-.annotate 'line', 700
-# c: $S1
+.annotate 'line', 744
     $P3 = self.'getchar'()
     null $S1
     if_null $P3, __label_2
     set $S1, $P3
   __label_2:
   __label_4: # while
-.annotate 'line', 701
-    $P3 = WSubId_18($S1)
+.annotate 'line', 745
+    $P3 = WSubId_21($S1)
     if_null $P3, __label_3
     unless $P3 goto __label_3
-.annotate 'line', 702
+.annotate 'line', 746
     $P4 = self.'getchar'()
     set $S1, $P4
     goto __label_4
   __label_3: # endwhile
-.annotate 'line', 703
-# line: $I1
+.annotate 'line', 747
     getattribute $P3, self, 'line'
     set $I1, $P3
-.annotate 'line', 704
+.annotate 'line', 748
     ne $S1, '', __label_5
-.annotate 'line', 705
+.annotate 'line', 749
     new $P4, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     getattribute $P5, self, 'filename'
     $P4.'TokenEof'($P5)
     set $P3, $P4
     .return($P3)
   __label_5: # endif
-.annotate 'line', 706
-    $P3 = WSubId_19($S1)
+.annotate 'line', 750
+    $P3 = WSubId_22($S1)
     if_null $P3, __label_6
     unless $P3 goto __label_6
-.annotate 'line', 707
-    .tailcall WSubId_11(self, $S1, $I1)
+.annotate 'line', 751
+    .tailcall WSubId_14(self, $S1, $I1)
   __label_6: # endif
-.annotate 'line', 708
-    $P3 = WSubId_9($S1)
+.annotate 'line', 752
+    $P3 = WSubId_11($S1)
     if_null $P3, __label_7
     unless $P3 goto __label_7
-.annotate 'line', 709
-    .tailcall WSubId_20(self, $S1, $I1)
+.annotate 'line', 753
+    .tailcall WSubId_23(self, $S1, $I1)
   __label_7: # endif
-.annotate 'line', 711
-# op: $S2
+.annotate 'line', 755
     set $S2, $S1
-.annotate 'line', 712
-# var select: $P1
+.annotate 'line', 756
     getattribute $P1, self, 'select'
-.annotate 'line', 713
-# var current: $P2
+.annotate 'line', 757
     $P2 = $P1[$S1]
   __label_9: # while
-.annotate 'line', 715
-    isnull $I3, $P2
-    not $I3
-    unless $I3 goto __label_10
-    isa $I4, $P2, 'Hash'
-    set $I2, $I4
-    goto __label_11
+.annotate 'line', 759
+    isnull $I2, $P2
+    not $I2
+    unless $I2 goto __label_10
+    isa $I2, $P2, 'Hash'
   __label_10:
-    set $I2, $I3
-  __label_11:
     unless $I2 goto __label_8
-# {
-.annotate 'line', 716
+.annotate 'line', 760
     $P3 = self.'getchar'()
     set $S1, $P3
-.annotate 'line', 717
+.annotate 'line', 761
     set $P1, $P2
-.annotate 'line', 718
+.annotate 'line', 762
     $P2 = $P1[$S1]
-.annotate 'line', 719
-    unless_null $P2, __label_12
-# {
-.annotate 'line', 720
+.annotate 'line', 763
+    unless_null $P2, __label_11
+.annotate 'line', 764
     self.'ungetchar'($S1)
-.annotate 'line', 721
+.annotate 'line', 765
     $P2 = $P1['']
-# }
-    goto __label_13
-  __label_12: # else
-.annotate 'line', 724
+    goto __label_12
+  __label_11: # else
+.annotate 'line', 768
     concat $S2, $S2, $S1
-  __label_13: # endif
-# }
+  __label_12: # endif
     goto __label_9
   __label_8: # endwhile
-.annotate 'line', 726
-    if_null $P2, __label_15
-.annotate 'line', 727
+.annotate 'line', 770
+    if_null $P2, __label_14
+.annotate 'line', 771
     $P3 = $P2(self, $S2, $I1)
-    goto __label_14
-  __label_15:
-.annotate 'line', 728
-    $P4 = WSubId_12(self, $S2, $I1)
-    set $P3, $P4
+    goto __label_13
   __label_14:
-.annotate 'line', 726
+.annotate 'line', 772
+    $P4 = WSubId_15(self, $S2, $I1)
+    set $P3, $P4
+  __label_13:
+.annotate 'line', 770
     .return($P3)
-# }
-.annotate 'line', 729
+.annotate 'line', 773
 
 .end # get_token
 
 
 .sub 'get' :method
         .param int __ARG_1 :optional
-# Body
-# {
-.annotate 'line', 732
-# var t: $P1
+.annotate 'line', 776
     $P1 = self.'get_token'()
   __label_2: # while
-.annotate 'line', 733
+.annotate 'line', 777
     $P3 = $P1.'iseof'()
-    isfalse $I2, $P3
-    unless $I2 goto __label_5
-    not $I3, __ARG_1
-    set $I1, $I3
-    goto __label_6
-  __label_5:
-    set $I1, $I2
-  __label_6:
-    unless $I1 goto __label_3
-    $P4 = $P1.'iscomment'()
-    set $P2, $P4
-    goto __label_4
-  __label_3:
-    box $P2, $I1
+    isfalse $I1, $P3
+    unless $I1 goto __label_4
+    not $I1, __ARG_1
   __label_4:
+    box $P2, $I1
+    unless $P2 goto __label_3
+    $P2 = $P1.'iscomment'()
+  __label_3:
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 734
+.annotate 'line', 778
     $P1 = self.'get_token'()
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 735
+.annotate 'line', 779
     .return($P1)
-# }
-.annotate 'line', 736
+.annotate 'line', 780
 
 .end # get
 
 
 .sub 'unget' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 739
+.annotate 'line', 783
     getattribute $P1, self, 'stacked'
-# builtin push
     push $P1, __ARG_1
-# }
-.annotate 'line', 740
+.annotate 'line', 784
 
 .end # unget
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
-.annotate 'line', 637
+.annotate 'line', 681
     addattribute $P0, 'h'
-.annotate 'line', 638
+.annotate 'line', 682
     addattribute $P0, 'pending'
-.annotate 'line', 639
+.annotate 'line', 683
     addattribute $P0, 'select'
-.annotate 'line', 640
+.annotate 'line', 684
     addattribute $P0, 'stacked'
-.annotate 'line', 641
+.annotate 'line', 685
     addattribute $P0, 'filename'
-.annotate 'line', 642
+.annotate 'line', 686
     addattribute $P0, 'line'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant REGint evaluated at compile time
-# Constant REGfloat evaluated at compile time
-# Constant REGstring evaluated at compile time
-# Constant REGvar evaluated at compile time
-# Constant REGarglist evaluated at compile time
-# Constant REGany evaluated at compile time
-# Constant REGs_v evaluated at compile time
-# Constant REGraw1 evaluated at compile time
-# Constant REGnone evaluated at compile time
 
-.sub 'typetoregcheck' :subid('WSubId_105')
+.sub 'typetoregcheck' :subid('WSubId_112')
         .param string __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 762
-    set $S1, __ARG_1
-    set $S2, 'int'
-    if $S1 == $S2 goto __label_3
-    set $S2, 'float'
-    if $S1 == $S2 goto __label_4
-    set $S2, 'string'
-    if $S1 == $S2 goto __label_5
-    set $S2, 'var'
-    if $S1 == $S2 goto __label_6
+.annotate 'line', 812
+    if __ARG_1 == 'int' goto __label_3
+    if __ARG_1 == 'float' goto __label_4
+    if __ARG_1 == 'string' goto __label_5
+    if __ARG_1 == 'var' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 763
+.annotate 'line', 813
     .return('I')
   __label_4: # case
-.annotate 'line', 764
+.annotate 'line', 814
     .return('N')
   __label_5: # case
-.annotate 'line', 765
+.annotate 'line', 815
     .return('S')
   __label_6: # case
-.annotate 'line', 766
+.annotate 'line', 816
     .return('P')
   __label_2: # default
-.annotate 'line', 767
+.annotate 'line', 817
     .return('')
   __label_1: # switch end
-# }
-.annotate 'line', 769
+.annotate 'line', 819
 
 .end # typetoregcheck
 
 
-.sub 'typetopirname' :subid('WSubId_115')
+.sub 'typetopirname' :subid('WSubId_122')
         .param string __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-# switch
-.annotate 'line', 773
-    set $S1, __ARG_1
-    set $S2, 'I'
-    if $S1 == $S2 goto __label_3
-    set $S2, 'N'
-    if $S1 == $S2 goto __label_4
-    set $S2, 'S'
-    if $S1 == $S2 goto __label_5
-    set $S2, 'P'
-    if $S1 == $S2 goto __label_6
+.annotate 'line', 823
+    if __ARG_1 == 'I' goto __label_3
+    if __ARG_1 == 'N' goto __label_4
+    if __ARG_1 == 'S' goto __label_5
+    if __ARG_1 == 'P' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 774
+.annotate 'line', 824
     .return('int')
   __label_4: # case
-.annotate 'line', 775
+.annotate 'line', 825
     .return('num')
   __label_5: # case
-.annotate 'line', 776
+.annotate 'line', 826
     .return('string')
   __label_6: # case
-.annotate 'line', 777
+.annotate 'line', 827
     .return('pmc')
   __label_2: # default
-.annotate 'line', 778
+.annotate 'line', 828
     WSubId_6('Invalid reg type')
   __label_1: # switch end
-# }
-.annotate 'line', 780
+.annotate 'line', 830
 
 .end # typetopirname
 
-# Constant INDENT evaluated at compile time
-# Constant INDENTLABEL evaluated at compile time
 .namespace [ 'Winxed'; 'Compiler'; 'Emit' ]
 
 .sub 'Emit' :method
         .param pmc __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 802
+.annotate 'line', 852
     setattribute self, 'handle', __ARG_1
-.annotate 'line', 803
+.annotate 'line', 853
     box $P1, ""
     setattribute self, 'file', $P1
-.annotate 'line', 804
+.annotate 'line', 854
     box $P1, 0
     setattribute self, 'line', $P1
-.annotate 'line', 805
+.annotate 'line', 855
     box $P1, 0
     setattribute self, 'pendingf', $P1
-.annotate 'line', 806
+.annotate 'line', 856
     box $P1, 0
     setattribute self, 'pendingl', $P1
-.annotate 'line', 807
+.annotate 'line', 857
     not $I1, __ARG_2
     new $P2, [ 'Boolean' ], $I1
     setattribute self, 'warnings', $P2
-# }
-.annotate 'line', 808
+.annotate 'line', 858
 
 .end # Emit
 
 
 .sub 'setDebug' :method
-# Body
-# {
-.annotate 'line', 811
+.annotate 'line', 861
     box $P1, 1
     setattribute self, 'debug', $P1
-# }
-.annotate 'line', 812
+.annotate 'line', 862
 
 .end # setDebug
 
 
 .sub 'getDebug' :method
-# Body
-# {
-.annotate 'line', 815
+.annotate 'line', 865
     getattribute $P1, self, 'debug'
     isnull $I1, $P1
     not $I1
     .return($I1)
-# }
-.annotate 'line', 816
+.annotate 'line', 866
 
 .end # getDebug
 
 
 .sub 'disable_annotations' :method
-# Body
-# {
-.annotate 'line', 819
+.annotate 'line', 869
     box $P1, 1
     setattribute self, 'noan', $P1
-# }
-.annotate 'line', 820
+.annotate 'line', 870
 
 .end # disable_annotations
 
 
 .sub 'close' :method
-# Body
-# {
-.annotate 'line', 823
+.annotate 'line', 873
     null $P1
     setattribute self, 'handle', $P1
-# }
-.annotate 'line', 824
+.annotate 'line', 874
 
 .end # close
 
@@ -2711,200 +2254,163 @@
 .sub 'warn' :method
         .param string __ARG_1
         .param pmc __ARG_2 :optional
-.const 'Sub' WSubId_21 = "WSubId_21"
-# Body
-# {
-.annotate 'line', 827
+.const 'Sub' WSubId_24 = "WSubId_24"
+.annotate 'line', 877
     getattribute $P1, self, 'warnings'
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 828
-    WSubId_21(__ARG_1, __ARG_2)
+.annotate 'line', 878
+    WSubId_24(__ARG_1, __ARG_2)
   __label_1: # endif
-# }
-.annotate 'line', 829
+.annotate 'line', 879
 
 .end # warn
 
 
 .sub 'updateannot' :method
-# Body
-# {
-.annotate 'line', 832
+.annotate 'line', 882
     getattribute $P1, self, 'pendingf'
     if_null $P1, __label_1
     unless $P1 goto __label_1
-# {
-.annotate 'line', 833
+.annotate 'line', 883
     getattribute $P2, self, 'handle'
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 3
     $P3[0] = ".annotate 'file', '"
-.annotate 'line', 835
+.annotate 'line', 885
     getattribute $P4, self, 'file'
-.annotate 'line', 833
+.annotate 'line', 883
     $P3[1] = $P4
     $P3[2] = "'\n"
-# builtin join
     join $S1, "", $P3
     $P2.'print'($S1)
-.annotate 'line', 838
+.annotate 'line', 888
     getattribute $P1, self, 'pendingf'
     assign $P1, 0
-# }
   __label_1: # endif
-.annotate 'line', 840
+.annotate 'line', 890
     getattribute $P1, self, 'pendingl'
     if_null $P1, __label_2
     unless $P1 goto __label_2
-# {
-.annotate 'line', 841
+.annotate 'line', 891
     getattribute $P2, self, 'handle'
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 3
     $P3[0] = ".annotate 'line', "
-.annotate 'line', 843
+.annotate 'line', 893
     getattribute $P4, self, 'line'
-.annotate 'line', 841
+.annotate 'line', 891
     $P3[1] = $P4
     $P3[2] = "\n"
-# builtin join
     join $S1, "", $P3
     $P2.'print'($S1)
-.annotate 'line', 846
+.annotate 'line', 896
     getattribute $P1, self, 'pendingl'
     assign $P1, 0
-# }
   __label_2: # endif
-# }
-.annotate 'line', 848
+.annotate 'line', 898
 
 .end # updateannot
 
 
 .sub 'vprint' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 851
+.annotate 'line', 901
     if_null __ARG_1, __label_2
     iter $P2, __ARG_1
     set $P2, 0
   __label_1: # for iteration
     unless $P2 goto __label_2
     shift $P1, $P2
-.annotate 'line', 852
+.annotate 'line', 902
     getattribute $P3, self, 'handle'
     $P3.'print'($P1)
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 853
+.annotate 'line', 903
 
 .end # vprint
 
 
 .sub 'print' :method
         .param pmc __ARG_1 :slurpy
-# Body
-# {
-.annotate 'line', 856
+.annotate 'line', 906
     self.'updateannot'()
-.annotate 'line', 857
+.annotate 'line', 907
     self.'vprint'(__ARG_1)
-# }
-.annotate 'line', 858
+.annotate 'line', 908
 
 .end # print
 
 
 .sub 'say' :method
         .param pmc __ARG_1 :slurpy
-# Body
-# {
-.annotate 'line', 861
+.annotate 'line', 911
     self.'updateannot'()
-.annotate 'line', 862
+.annotate 'line', 912
     self.'vprint'(__ARG_1)
-.annotate 'line', 863
+.annotate 'line', 913
     getattribute $P1, self, 'handle'
     $P1.'print'("\n")
-# }
-.annotate 'line', 864
+.annotate 'line', 914
 
 .end # say
 
 
 .sub 'annotate' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 867
+.annotate 'line', 917
     getattribute $P3, self, 'noan'
     unless_null $P3, __label_1
-# {
-.annotate 'line', 869
-# var file: $P1
+.annotate 'line', 919
     getattribute $P1, self, 'file'
-.annotate 'line', 870
-# var line: $P2
+.annotate 'line', 920
     getattribute $P2, self, 'line'
-.annotate 'line', 871
-# tfile: $S1
+.annotate 'line', 921
     getattribute $P3, __ARG_1, 'file'
     null $S1
     if_null $P3, __label_2
     set $S1, $P3
   __label_2:
-.annotate 'line', 872
-# tline: $I1
+.annotate 'line', 922
     getattribute $P3, __ARG_1, 'line'
     set $I1, $P3
-.annotate 'line', 873
+.annotate 'line', 923
     set $S2, $P1
     eq $S2, $S1, __label_3
-# {
-.annotate 'line', 874
+.annotate 'line', 924
     assign $P1, $S1
-.annotate 'line', 875
+.annotate 'line', 925
     getattribute $P3, self, 'pendingf'
     assign $P3, 1
-.annotate 'line', 876
+.annotate 'line', 926
     assign $P2, 0
-# }
   __label_3: # endif
-.annotate 'line', 878
+.annotate 'line', 928
     set $I2, $P2
     eq $I2, $I1, __label_4
-# {
-.annotate 'line', 879
+.annotate 'line', 929
     assign $P2, $I1
-.annotate 'line', 880
+.annotate 'line', 930
     getattribute $P3, self, 'pendingl'
     assign $P3, 1
-# }
   __label_4: # endif
-# }
   __label_1: # endif
-# }
-.annotate 'line', 883
+.annotate 'line', 933
 
 .end # annotate
 
 
 .sub 'comment' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 886
+.annotate 'line', 936
     self.'updateannot'()
-.annotate 'line', 887
+.annotate 'line', 937
     getattribute $P1, self, 'handle'
     concat $S1, "# ", __ARG_1
     concat $S1, $S1, "\n"
     $P1.'print'($S1)
-# }
-.annotate 'line', 888
+.annotate 'line', 938
 
 .end # comment
 
@@ -2912,27 +2418,23 @@
 .sub 'emitlabel' :method
         .param string __ARG_1
         .param string __ARG_2 :optional
-# Body
-# {
-.annotate 'line', 891
-# var handle: $P1
+.annotate 'line', 941
     getattribute $P1, self, 'handle'
-.annotate 'line', 892
+.annotate 'line', 942
     $P1.'print'('  ')
-.annotate 'line', 893
+.annotate 'line', 943
     $P1.'print'(__ARG_1)
-.annotate 'line', 894
+.annotate 'line', 944
     $P1.'print'(":")
-.annotate 'line', 895
+.annotate 'line', 945
     if_null __ARG_2, __label_1
-.annotate 'line', 896
+.annotate 'line', 946
     concat $S1, " # ", __ARG_2
     $P1.'print'($S1)
   __label_1: # endif
-.annotate 'line', 897
+.annotate 'line', 947
     $P1.'print'("\n")
-# }
-.annotate 'line', 898
+.annotate 'line', 948
 
 .end # emitlabel
 
@@ -2940,25 +2442,21 @@
 .sub 'emitgoto' :method
         .param string __ARG_1
         .param string __ARG_2 :optional
-# Body
-# {
-.annotate 'line', 901
-# var handle: $P1
+.annotate 'line', 951
     getattribute $P1, self, 'handle'
-.annotate 'line', 902
+.annotate 'line', 952
     $P1.'print'("    goto ")
-.annotate 'line', 903
+.annotate 'line', 953
     $P1.'print'(__ARG_1)
-.annotate 'line', 904
+.annotate 'line', 954
     if_null __ARG_2, __label_1
-.annotate 'line', 905
+.annotate 'line', 955
     concat $S1, " # ", __ARG_2
     $P1.'print'($S1)
   __label_1: # endif
-.annotate 'line', 906
+.annotate 'line', 956
     $P1.'print'("\n")
-# }
-.annotate 'line', 907
+.annotate 'line', 957
 
 .end # emitgoto
 
@@ -2966,12 +2464,9 @@
 .sub 'emitarg1' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 911
+.annotate 'line', 961
     self.'say'('    ', __ARG_1, " ", __ARG_2)
-# }
-.annotate 'line', 912
+.annotate 'line', 962
 
 .end # emitarg1
 
@@ -2980,12 +2475,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 915
+.annotate 'line', 965
     self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 916
+.annotate 'line', 966
 
 .end # emitarg2
 
@@ -2995,12 +2487,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 919
+.annotate 'line', 969
     self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
-# }
-.annotate 'line', 920
+.annotate 'line', 970
 
 .end # emitarg3
 
@@ -3010,12 +2499,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 923
+.annotate 'line', 973
     self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
-# }
-.annotate 'line', 924
+.annotate 'line', 974
 
 .end # emitcompare
 
@@ -3023,12 +2509,9 @@
 .sub 'emitif' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 927
+.annotate 'line', 977
     self.'say'("    if ", __ARG_1, " goto ", __ARG_2)
-# }
-.annotate 'line', 928
+.annotate 'line', 978
 
 .end # emitif
 
@@ -3036,12 +2519,9 @@
 .sub 'emitunless' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 931
+.annotate 'line', 981
     self.'say'("    unless ", __ARG_1, " goto ", __ARG_2)
-# }
-.annotate 'line', 932
+.annotate 'line', 982
 
 .end # emitunless
 
@@ -3049,12 +2529,9 @@
 .sub 'emitif_null' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 935
+.annotate 'line', 985
     self.'say'("    if_null ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 936
+.annotate 'line', 986
 
 .end # emitif_null
 
@@ -3062,48 +2539,36 @@
 .sub 'emitunless_null' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 939
+.annotate 'line', 989
     self.'say'("    unless_null ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 940
+.annotate 'line', 990
 
 .end # emitunless_null
 
 
 .sub 'emitnull' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 943
+.annotate 'line', 993
     self.'say'("    null ", __ARG_1)
-# }
-.annotate 'line', 944
+.annotate 'line', 994
 
 .end # emitnull
 
 
 .sub 'emitinc' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 948
+.annotate 'line', 998
     self.'say'("    inc ", __ARG_1)
-# }
-.annotate 'line', 949
+.annotate 'line', 999
 
 .end # emitinc
 
 
 .sub 'emitdec' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 952
+.annotate 'line', 1002
     self.'say'("    dec ", __ARG_1)
-# }
-.annotate 'line', 953
+.annotate 'line', 1003
 
 .end # emitdec
 
@@ -3111,12 +2576,9 @@
 .sub 'emitset' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 956
+.annotate 'line', 1006
     self.'say'("    set ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 957
+.annotate 'line', 1007
 
 .end # emitset
 
@@ -3124,12 +2586,9 @@
 .sub 'emitassign' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 960
+.annotate 'line', 1010
     self.'say'("    assign ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 961
+.annotate 'line', 1011
 
 .end # emitassign
 
@@ -3137,12 +2596,9 @@
 .sub 'emitbox' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 964
+.annotate 'line', 1014
     self.'say'("    box ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 965
+.annotate 'line', 1015
 
 .end # emitbox
 
@@ -3150,12 +2606,9 @@
 .sub 'emitunbox' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 968
+.annotate 'line', 1018
     self.'say'("    unbox ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 969
+.annotate 'line', 1019
 
 .end # emitunbox
 
@@ -3165,12 +2618,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 972
+.annotate 'line', 1022
     self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
-# }
-.annotate 'line', 973
+.annotate 'line', 1023
 
 .end # emitbinop
 
@@ -3178,12 +2628,9 @@
 .sub 'emitaddto' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 976
+.annotate 'line', 1026
     self.'say'("    add ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 977
+.annotate 'line', 1027
 
 .end # emitaddto
 
@@ -3191,12 +2638,9 @@
 .sub 'emitsubto' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 980
+.annotate 'line', 1030
     self.'say'("    sub ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 981
+.annotate 'line', 1031
 
 .end # emitsubto
 
@@ -3205,12 +2649,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 984
+.annotate 'line', 1034
     self.'say'("    add ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 985
+.annotate 'line', 1035
 
 .end # emitadd
 
@@ -3219,12 +2660,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 988
+.annotate 'line', 1038
     self.'say'("    sub ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 989
+.annotate 'line', 1039
 
 .end # emitsub
 
@@ -3233,12 +2671,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 992
+.annotate 'line', 1042
     self.'say'("    mul ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 993
+.annotate 'line', 1043
 
 .end # emitmul
 
@@ -3247,12 +2682,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 996
+.annotate 'line', 1046
     self.'say'("    div ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 997
+.annotate 'line', 1047
 
 .end # emitdiv
 
@@ -3260,12 +2692,9 @@
 .sub 'emitconcat1' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1000
+.annotate 'line', 1050
     self.'say'("    concat ", __ARG_1, ", ", __ARG_1, ", ", __ARG_2)
-# }
-.annotate 'line', 1001
+.annotate 'line', 1051
 
 .end # emitconcat1
 
@@ -3274,12 +2703,9 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 1004
+.annotate 'line', 1054
     self.'say'("    concat ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 1005
+.annotate 'line', 1055
 
 .end # emitconcat
 
@@ -3288,36 +2714,27 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 1008
+.annotate 'line', 1058
     self.'say'("    repeat ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-# }
-.annotate 'line', 1009
+.annotate 'line', 1059
 
 .end # emitrepeat
 
 
 .sub 'emitprint' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 1012
+.annotate 'line', 1062
     self.'say'("    print ", __ARG_1)
-# }
-.annotate 'line', 1013
+.annotate 'line', 1063
 
 .end # emitprint
 
 
 .sub 'emitsay' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 1016
+.annotate 'line', 1066
     self.'say'("    say ", __ARG_1)
-# }
-.annotate 'line', 1017
+.annotate 'line', 1067
 
 .end # emitsay
 
@@ -3325,13 +2742,10 @@
 .sub 'emitget_hll_namespace' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1020
+.annotate 'line', 1070
     concat $S1, ", ", __ARG_2
     self.'say'("    get_hll_namespace ", __ARG_1, $S1)
-# }
-.annotate 'line', 1021
+.annotate 'line', 1071
 
 .end # emitget_hll_namespace
 
@@ -3339,13 +2753,10 @@
 .sub 'emitget_root_namespace' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1024
+.annotate 'line', 1074
     concat $S1, ", ", __ARG_2
     self.'say'("    get_root_namespace ", __ARG_1, $S1)
-# }
-.annotate 'line', 1025
+.annotate 'line', 1075
 
 .end # emitget_root_namespace
 
@@ -3354,19 +2765,16 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 1028
+.annotate 'line', 1078
     self.'print'("    get_hll_global ", __ARG_1)
-.annotate 'line', 1029
+.annotate 'line', 1079
     if_null __ARG_3, __label_1
-.annotate 'line', 1030
+.annotate 'line', 1080
     self.'print'(", ", __ARG_3)
   __label_1: # endif
-.annotate 'line', 1031
+.annotate 'line', 1081
     self.'say'(", '", __ARG_2, "'")
-# }
-.annotate 'line', 1032
+.annotate 'line', 1082
 
 .end # emitget_hll_global
 
@@ -3375,19 +2783,16 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 1035
+.annotate 'line', 1085
     self.'print'("    get_root_global ", __ARG_1)
-.annotate 'line', 1036
+.annotate 'line', 1086
     if_null __ARG_3, __label_1
-.annotate 'line', 1037
+.annotate 'line', 1087
     self.'print'(", ", __ARG_3)
   __label_1: # endif
-.annotate 'line', 1038
+.annotate 'line', 1088
     self.'say'(", '", __ARG_2, "'")
-# }
-.annotate 'line', 1039
+.annotate 'line', 1089
 
 .end # emitget_root_global
 
@@ -3395,12 +2800,9 @@
 .sub 'emitfind_lex' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1042
+.annotate 'line', 1092
     self.'say'("    find_lex ", __ARG_1, ", '", __ARG_2, "'")
-# }
-.annotate 'line', 1043
+.annotate 'line', 1093
 
 .end # emitfind_lex
 
@@ -3408,370 +2810,292 @@
 .sub 'emitstore_lex' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1046
+.annotate 'line', 1096
     self.'say'("    store_lex '", __ARG_1, "', ", __ARG_2)
-# }
-.annotate 'line', 1047
+.annotate 'line', 1097
 
 .end # emitstore_lex
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Emit' ]
-.annotate 'line', 791
+.annotate 'line', 841
     addattribute $P0, 'handle'
-.annotate 'line', 792
+.annotate 'line', 842
     addattribute $P0, 'file'
-.annotate 'line', 793
+.annotate 'line', 843
     addattribute $P0, 'line'
-.annotate 'line', 794
+.annotate 'line', 844
     addattribute $P0, 'pendingf'
-.annotate 'line', 795
+.annotate 'line', 845
     addattribute $P0, 'pendingl'
-.annotate 'line', 796
+.annotate 'line', 846
     addattribute $P0, 'debug'
-.annotate 'line', 797
+.annotate 'line', 847
     addattribute $P0, 'noan'
-.annotate 'line', 798
+.annotate 'line', 848
     addattribute $P0, 'warnings'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant SEARCH_NAMESPACE evaluated at compile time
-# Constant SEARCH_CLASS evaluated at compile time
-# Constant VAR_is_volatile evaluated at compile time
-# Constant VAR_is_lexical evaluated at compile time
-# Constant VAR_is_extern evaluated at compile time
-# Constant NULL evaluated at compile time
-# Constant SELF evaluated at compile time
 
-.sub 'integerValue' :subid('WSubId_22')
+.sub 'integerValue' :subid('WSubId_25')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 1072
+.annotate 'line', 1122
     new $P2, [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
     $P2.'IntegerLiteral'(__ARG_1, __ARG_2, __ARG_3)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 1073
+.annotate 'line', 1123
 
 .end # integerValue
 
 
-.sub 'floatValue' :subid('WSubId_71')
+.sub 'floatValue' :subid('WSubId_77')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param num __ARG_3
-# Body
-# {
-.annotate 'line', 1077
-# var t: $P1
+.annotate 'line', 1127
     new $P1, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
     getattribute $P2, __ARG_2, 'file'
     getattribute $P3, __ARG_2, 'line'
     $P1.'TokenFloat'($P2, $P3, __ARG_3)
-.annotate 'line', 1078
+.annotate 'line', 1128
     new $P3, [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
     $P3.'FloatLiteral'(__ARG_1, $P1)
     set $P2, $P3
     .return($P2)
-# }
-.annotate 'line', 1079
+.annotate 'line', 1129
 
 .end # floatValue
 
 
-.sub 'stringQuotedValue' :subid('WSubId_23')
+.sub 'stringQuotedValue' :subid('WSubId_27')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 1083
-# var t: $P1
+.annotate 'line', 1133
     new $P1, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P2, __ARG_2, 'file'
     getattribute $P3, __ARG_2, 'line'
     $P1.'TokenQuoted'($P2, $P3, __ARG_3)
-.annotate 'line', 1084
+.annotate 'line', 1134
     new $P3, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     $P3.'StringLiteral'(__ARG_1, $P1)
     set $P2, $P3
     .return($P2)
-# }
-.annotate 'line', 1085
+.annotate 'line', 1135
 
 .end # stringQuotedValue
 
 
-.sub 'floatresult' :subid('WSubId_73')
+.sub 'floatresult' :subid('WSubId_79')
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 1093
-# result: $I1
-    iseq $I3, __ARG_1, 'N'
-    unless $I3 goto __label_3
-    iseq $I5, __ARG_2, 'N'
-    if $I5 goto __label_5
-    iseq $I6, __ARG_2, 'I'
-    set $I4, $I6
-    goto __label_6
-  __label_5:
-    set $I4, $I5
-  __label_6:
-    set $I2, $I4
-    goto __label_4
+.annotate 'line', 1143
+    iseq $I1, __ARG_1, 'N'
+    unless $I1 goto __label_2
+    iseq $I1, __ARG_2, 'N'
+    if $I1 goto __label_3
+    iseq $I1, __ARG_2, 'I'
   __label_3:
-    set $I2, $I3
-  __label_4:
-    if $I2 goto __label_1
-.annotate 'line', 1094
-    iseq $I8, __ARG_2, 'N'
-    unless $I8 goto __label_7
-    iseq $I10, __ARG_1, 'N'
-    if $I10 goto __label_9
-    iseq $I11, __ARG_1, 'I'
-    set $I9, $I11
-    goto __label_10
-  __label_9:
-    set $I9, $I10
-  __label_10:
-    set $I7, $I9
-    goto __label_8
-  __label_7:
-    set $I7, $I8
-  __label_8:
-    set $I1, $I7
-    goto __label_2
-  __label_1:
-    set $I1, $I2
   __label_2:
-.annotate 'line', 1095
+    if $I1 goto __label_1
+.annotate 'line', 1144
+    iseq $I1, __ARG_2, 'N'
+    unless $I1 goto __label_4
+    iseq $I1, __ARG_1, 'N'
+    if $I1 goto __label_5
+    iseq $I1, __ARG_1, 'I'
+  __label_5:
+  __label_4:
+  __label_1:
+.annotate 'line', 1145
     .return($I1)
-# }
-.annotate 'line', 1096
+.annotate 'line', 1146
 
 .end # floatresult
 
 
-.sub 'floatAsString' :subid('WSubId_68')
+.sub 'floatAsString' :subid('WSubId_74')
         .param num __ARG_1
-# Body
-# {
-.annotate 'line', 1106
-# aux: $S1
+.annotate 'line', 1156
     null $S1
     set $S1, __ARG_1
-.annotate 'line', 1108
+.annotate 'line', 1158
     box $P2, $S1
     $P1 = $P2.'is_integer'($S1)
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 1109
+.annotate 'line', 1159
     concat $S1, $S1, '.0'
   __label_1: # endif
-.annotate 'line', 1110
+.annotate 'line', 1160
     .return($S1)
-# }
-.annotate 'line', 1111
+.annotate 'line', 1161
 
 .end # floatAsString
 
-# Constant PREDEFCONST_FILENAME evaluated at compile time
-# Constant PREDEFCONST_LINENUM evaluated at compile time
 
-.sub 'createPredefConstInt' :subid('WSubId_125')
+.sub 'createPredefConstInt' :subid('WSubId_138')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1122
-# var tid: $P1
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 1172
     new $P1, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
-.annotate 'line', 1123
+.annotate 'line', 1173
     $P1.'TokenIdentifier'('__predefconst__', 0, __ARG_2)
-.annotate 'line', 1124
-# var cst: $P2
+.annotate 'line', 1174
     $P2 = __ARG_1.'createconst'($P1, 'I', 4)
-.annotate 'line', 1125
-    $P3 = WSubId_22(__ARG_1, $P1, __ARG_3)
+.annotate 'line', 1175
+    $P3 = WSubId_25(__ARG_1, $P1, __ARG_3)
     $P2.'setvalue'($P3)
-# }
-.annotate 'line', 1126
+.annotate 'line', 1176
 
 .end # createPredefConstInt
 
 
-.sub 'createPredefConstString' :subid('WSubId_118')
+.sub 'createPredefConstString' :subid('WSubId_128')
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 1130
-# var tid: $P1
+.annotate 'line', 1180
     new $P1, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
-.annotate 'line', 1131
+.annotate 'line', 1181
     $P1.'TokenIdentifier'('__predefconst__', 0, __ARG_2)
-.annotate 'line', 1132
-# var cst: $P2
+.annotate 'line', 1182
     $P2 = __ARG_1.'createconst'($P1, 'S', 4)
-.annotate 'line', 1133
+.annotate 'line', 1183
     new $P4, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-.annotate 'line', 1134
+.annotate 'line', 1184
     new $P6, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     $P6.'TokenQuoted'('__predefconst__', 0, __ARG_3)
     set $P5, $P6
     $P4.'StringLiteral'(__ARG_1, $P5)
     set $P3, $P4
-.annotate 'line', 1133
+.annotate 'line', 1183
     $P2.'setvalue'($P3)
-# }
-.annotate 'line', 1135
+.annotate 'line', 1185
 
 .end # createPredefConstString
 
-# Constant BULTIN_arglist evaluated at compile time
-# Constant BULTIN_raw1 evaluated at compile time
 
-.sub 'string_from_literal' :subid('WSubId_24')
+.sub 'string_from_literal' :subid('WSubId_28')
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1149
-# value: $S1
+.annotate 'line', 1199
     null $S1
-# switch-case
-.annotate 'line', 1151
+.annotate 'line', 1201
     $I1 = __ARG_1.'isintegerliteral'()
     if $I1 goto __label_3
-.annotate 'line', 1154
+.annotate 'line', 1204
     $I1 = __ARG_1.'isfloatliteral'()
     if $I1 goto __label_4
-.annotate 'line', 1157
+.annotate 'line', 1207
     $I1 = __ARG_1.'isstringliteral'()
     if $I1 goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 1152
+.annotate 'line', 1202
     getattribute $P1, __ARG_1, 'numval'
     set $S1, $P1
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 1155
+.annotate 'line', 1205
     $P2 = __ARG_1.'getFloatValue'()
     set $S1, $P2
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 1158
+.annotate 'line', 1208
     $P3 = __ARG_1.'get_value'()
     set $S1, $P3
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 1161
+.annotate 'line', 1211
     WSubId_6('wrong call to string_from_literal', __ARG_1)
   __label_1: # switch end
-.annotate 'line', 1163
+.annotate 'line', 1213
     .return($S1)
-# }
-.annotate 'line', 1164
+.annotate 'line', 1214
 
 .end # string_from_literal
 
 
-.sub 'int_from_literal' :subid('WSubId_25')
+.sub 'int_from_literal' :subid('WSubId_29')
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1168
-# value: $I1
+.annotate 'line', 1218
     null $I1
-# switch-case
-.annotate 'line', 1170
+.annotate 'line', 1220
     $I2 = __ARG_1.'isintegerliteral'()
     if $I2 goto __label_3
-.annotate 'line', 1173
+.annotate 'line', 1223
     $I2 = __ARG_1.'isfloatliteral'()
     if $I2 goto __label_4
-.annotate 'line', 1176
+.annotate 'line', 1226
     $I2 = __ARG_1.'isstringliteral'()
     if $I2 goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 1171
+.annotate 'line', 1221
     getattribute $P1, __ARG_1, 'numval'
     set $I1, $P1
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 1174
+.annotate 'line', 1224
     $P2 = __ARG_1.'getFloatValue'()
     set $I1, $P2
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 1177
+.annotate 'line', 1227
     $P3 = __ARG_1.'get_value'()
     set $I1, $P3
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 1180
+.annotate 'line', 1230
     WSubId_6('wrong call to int_from_literal', __ARG_1)
   __label_1: # switch end
-.annotate 'line', 1182
+.annotate 'line', 1232
     .return($I1)
-# }
-.annotate 'line', 1183
+.annotate 'line', 1233
 
 .end # int_from_literal
 
 
-.sub 'float_from_literal' :subid('WSubId_106')
+.sub 'float_from_literal' :subid('WSubId_113')
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1187
-# value: $N1
+.annotate 'line', 1237
     null $N1
-# switch-case
-.annotate 'line', 1189
+.annotate 'line', 1239
     $I1 = __ARG_1.'isintegerliteral'()
     if $I1 goto __label_3
-.annotate 'line', 1190
+.annotate 'line', 1240
     $I1 = __ARG_1.'isfloatliteral'()
     if $I1 goto __label_4
-.annotate 'line', 1193
+.annotate 'line', 1243
     $I1 = __ARG_1.'isstringliteral'()
     if $I1 goto __label_5
     goto __label_2
   __label_3: # case
   __label_4: # case
-.annotate 'line', 1191
+.annotate 'line', 1241
     $P1 = __ARG_1.'getFloatValue'()
     set $N1, $P1
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 1194
+.annotate 'line', 1244
     $P2 = __ARG_1.'get_value'()
     set $N1, $P2
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 1197
+.annotate 'line', 1247
     WSubId_6('wrong call to float_from_literal', __ARG_1)
   __label_1: # switch end
-.annotate 'line', 1199
+.annotate 'line', 1249
     .return($N1)
-# }
-.annotate 'line', 1200
+.annotate 'line', 1250
 
 .end # float_from_literal
 
@@ -3781,36 +3105,27 @@
         .param string __ARG_1
         .param string __ARG_2
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1220
-# l: $I2
-# builtin length
+.annotate 'line', 1277
     length $I3, __ARG_2
     sub $I2, $I3, 1
-.annotate 'line', 1221
-# builtin substr
+.annotate 'line', 1278
     substr $S1, __ARG_2, $I2, 1
     ne $S1, "\n", __label_1
-.annotate 'line', 1222
-# builtin substr
+.annotate 'line', 1279
     substr __ARG_2, __ARG_2, 0, $I2
   __label_1: # endif
-.annotate 'line', 1223
-# builtin split
+.annotate 'line', 1280
     split $P1, "\n", __ARG_2
-# builtin join
     join $S1, "\n    ", $P1
     concat $S2, '    ', $S1
     set __ARG_2, $S2
-.annotate 'line', 1224
+.annotate 'line', 1281
     box $P1, __ARG_2
     setattribute self, 'body', $P1
-.annotate 'line', 1225
+.annotate 'line', 1282
     box $P1, __ARG_1
     setattribute self, 'typeresult', $P1
-# }
-.annotate 'line', 1226
+.annotate 'line', 1283
 
 .end # Builtin_frombody
 
@@ -3823,73 +3138,52 @@
         .param pmc __ARG_5
 .const 'Sub' WSubId_1 = "WSubId_1"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1229
-# typeresult: $S1
-    getattribute $P2, self, 'typeresult'
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 1286
+    getattribute $P1, self, 'typeresult'
     null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
+    if_null $P1, __label_1
+    set $S1, $P1
   __label_1:
-.annotate 'line', 1231
+.annotate 'line', 1288
     ne $S1, 'v', __label_2
-# {
-.annotate 'line', 1232
-    isnull $I2, __ARG_4
-    not $I2
-    unless $I2 goto __label_5
-    isne $I3, __ARG_4, ''
-    set $I1, $I3
-    goto __label_6
+.annotate 'line', 1289
+    isnull $I1, __ARG_4
+    not $I1
+    unless $I1 goto __label_5
+    isne $I1, __ARG_4, ''
   __label_5:
-    set $I1, $I2
-  __label_6:
     unless $I1 goto __label_4
-.annotate 'line', 1233
+.annotate 'line', 1290
     WSubId_1('using return value from void builtin')
   __label_4: # endif
-# }
     goto __label_3
   __label_2: # else
-# {
-.annotate 'line', 1236
-    isnull $I2, __ARG_4
-    if $I2 goto __label_8
-    iseq $I3, __ARG_4, ''
-    set $I1, $I3
-    goto __label_9
-  __label_8:
-    set $I1, $I2
-  __label_9:
-    unless $I1 goto __label_7
-.annotate 'line', 1237
+.annotate 'line', 1293
+    isnull $I1, __ARG_4
+    if $I1 goto __label_7
+    iseq $I1, __ARG_4, ''
+  __label_7:
+    unless $I1 goto __label_6
+.annotate 'line', 1294
     WSubId_6('Bad result in non void builtin')
-  __label_7: # endif
-# }
+  __label_6: # endif
   __label_3: # endif
-.annotate 'line', 1240
-# var builder: $P1
-    new $P1, [ 'StringBuilder' ]
-.annotate 'line', 1241
-    getattribute $P2, self, 'body'
-    $P1.'append_format'($P2, __ARG_4, __ARG_5 :flat)
-.annotate 'line', 1242
+.annotate 'line', 1297
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1243
-# builtin string
-    set $S2, $P1
-    __ARG_1.'say'($S2)
-# }
-.annotate 'line', 1244
+.annotate 'line', 1298
+    getattribute $P2, self, 'body'
+    $P1 = WSubId_26($P2, __ARG_4, __ARG_5 :flat)
+    __ARG_1.'say'($P1)
+.annotate 'line', 1299
 
 .end # invoke
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin_frombody' ]
-.annotate 'line', 1206
+.annotate 'line', 1256
     addattribute $P0, 'body'
-.annotate 'line', 1207
+.annotate 'line', 1257
     addattribute $P0, 'typeresult'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
@@ -3903,152 +3197,123 @@
         .param string __ARG_6
         .param string __ARG_7
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1265
+.annotate 'line', 1320
     box $P1, __ARG_1
     setattribute self, 'name', $P1
-.annotate 'line', 1266
+.annotate 'line', 1321
     isa $I2, __ARG_2, 'String'
     unless $I2 goto __label_1
-.annotate 'line', 1267
+.annotate 'line', 1322
     new $P3, [ 'Winxed'; 'Compiler'; 'Builtin_frombody' ]
     $P3.'Builtin_frombody'(__ARG_3, __ARG_2)
     set $P2, $P3
     setattribute self, 'body', $P2
     goto __label_2
   __label_1: # else
-.annotate 'line', 1269
+.annotate 'line', 1324
     setattribute self, 'body', __ARG_2
   __label_2: # endif
-.annotate 'line', 1270
+.annotate 'line', 1325
     box $P1, __ARG_3
     setattribute self, 'typeresult', $P1
-.annotate 'line', 1271
-# n: $I1
+.annotate 'line', 1326
     null $I1
-.annotate 'line', 1272
+.annotate 'line', 1327
     if_null __ARG_4, __label_3
-# {
-.annotate 'line', 1273
+.annotate 'line', 1328
     box $P1, __ARG_4
     setattribute self, 'type0', $P1
-# switch
-.annotate 'line', 1274
-    set $S1, __ARG_4
-    set $S2, '*'
-    if $S1 == $S2 goto __label_6
-    set $S2, '!'
-    if $S1 == $S2 goto __label_7
+.annotate 'line', 1329
+    if __ARG_4 == '*' goto __label_6
+    if __ARG_4 == '!' goto __label_7
     goto __label_5
   __label_6: # case
-.annotate 'line', 1276
+.annotate 'line', 1331
     set $I1, -1
     goto __label_4 # break
   __label_7: # case
-.annotate 'line', 1279
+.annotate 'line', 1334
     set $I1, -2
-.annotate 'line', 1280
+.annotate 'line', 1335
     if_null __ARG_5, __label_8
-.annotate 'line', 1281
-    concat $S3, "Invalid builtin '", __ARG_1
-    concat $S3, $S3, '"'
-    WSubId_6($S3)
+.annotate 'line', 1336
+    concat $S2, "Invalid builtin '", __ARG_1
+    concat $S2, $S2, '"'
+    WSubId_6($S2)
   __label_8: # endif
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 1284
+.annotate 'line', 1339
     set $I1, 1
-.annotate 'line', 1285
+.annotate 'line', 1340
     if_null __ARG_5, __label_9
-# {
-.annotate 'line', 1286
+.annotate 'line', 1341
     box $P1, __ARG_5
     setattribute self, 'type1', $P1
-.annotate 'line', 1287
+.annotate 'line', 1342
     inc $I1
-# }
   __label_9: # endif
-.annotate 'line', 1289
+.annotate 'line', 1344
     if_null __ARG_6, __label_10
-# {
-.annotate 'line', 1290
+.annotate 'line', 1345
     box $P1, __ARG_6
     setattribute self, 'type2', $P1
-.annotate 'line', 1291
+.annotate 'line', 1346
     inc $I1
-# }
   __label_10: # endif
-.annotate 'line', 1293
+.annotate 'line', 1348
     if_null __ARG_7, __label_11
-# {
-.annotate 'line', 1294
+.annotate 'line', 1349
     box $P1, __ARG_7
     setattribute self, 'type3', $P1
-.annotate 'line', 1295
+.annotate 'line', 1350
     inc $I1
-# }
   __label_11: # endif
   __label_4: # switch end
-# }
   __label_3: # endif
-.annotate 'line', 1299
+.annotate 'line', 1354
     box $P1, $I1
     setattribute self, 'nparams', $P1
-# }
-.annotate 'line', 1300
+.annotate 'line', 1355
 
 .end # BuiltinBase
 
 
 .sub 'iscompileevaluable' :method
-# Body
-# {
-.annotate 'line', 1303
+.annotate 'line', 1358
     .return(0)
-# }
-.annotate 'line', 1304
+.annotate 'line', 1359
 
 .end # iscompileevaluable
 
 
 .sub 'name' :method
-# Body
-# {
-.annotate 'line', 1307
-# name: $S1
+.annotate 'line', 1362
     getattribute $P1, self, 'name'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 1308
+.annotate 'line', 1363
     .return($S1)
-# }
-.annotate 'line', 1309
+.annotate 'line', 1364
 
 .end # name
 
 
 .sub 'result' :method
-# Body
-# {
-.annotate 'line', 1312
+.annotate 'line', 1367
     getattribute $P1, self, 'typeresult'
     .return($P1)
-# }
-.annotate 'line', 1313
+.annotate 'line', 1368
 
 .end # result
 
 
 .sub 'params' :method
-# Body
-# {
-.annotate 'line', 1314
+.annotate 'line', 1369
     getattribute $P1, self, 'nparams'
     .return($P1)
-# }
 
 .end # params
 
@@ -4056,51 +3321,41 @@
 .sub 'paramtype' :method
         .param int __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1317
-# type: $S1
+.annotate 'line', 1372
     null $S1
-# switch
-.annotate 'line', 1318
-    set $I1, __ARG_1
-    null $I2
-    if $I1 == $I2 goto __label_3
-    set $I2, 1
-    if $I1 == $I2 goto __label_4
-    set $I2, 2
-    if $I1 == $I2 goto __label_5
-    set $I2, 3
-    if $I1 == $I2 goto __label_6
+.annotate 'line', 1373
+    if __ARG_1 == 0 goto __label_3
+    if __ARG_1 == 1 goto __label_4
+    if __ARG_1 == 2 goto __label_5
+    if __ARG_1 == 3 goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 1319
+.annotate 'line', 1374
     getattribute $P1, self, 'type0'
     set $S1, $P1
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 1320
+.annotate 'line', 1375
     getattribute $P2, self, 'type1'
     set $S1, $P2
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 1321
+.annotate 'line', 1376
     getattribute $P3, self, 'type2'
     set $S1, $P3
     goto __label_1 # break
   __label_6: # case
-.annotate 'line', 1322
+.annotate 'line', 1377
     getattribute $P4, self, 'type3'
     set $S1, $P4
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 1324
+.annotate 'line', 1379
     WSubId_6('Invalid builtin arg')
   __label_1: # switch end
-.annotate 'line', 1326
+.annotate 'line', 1381
     .return($S1)
-# }
-.annotate 'line', 1327
+.annotate 'line', 1382
 
 .end # paramtype
 
@@ -4111,69 +3366,64 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1330
-# name: $S1
+.annotate 'line', 1385
     getattribute $P2, self, 'name'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 1333
-    eq $S1, '__ASSERT__', __label_2
-.annotate 'line', 1334
+.annotate 'line', 1387
+    $P2 = __ARG_1.'getDebug'()
+    if_null $P2, __label_2
+    unless $P2 goto __label_2
+.annotate 'line', 1389
+    eq $S1, '__ASSERT__', __label_3
+.annotate 'line', 1390
     concat $S3, 'builtin ', $S1
     __ARG_1.'comment'($S3)
+  __label_3: # endif
   __label_2: # endif
-.annotate 'line', 1336
-# typeresult: $S2
+.annotate 'line', 1393
     getattribute $P2, self, 'typeresult'
     null $S2
-    if_null $P2, __label_3
+    if_null $P2, __label_4
     set $S2, $P2
-  __label_3:
-.annotate 'line', 1337
-    isne $I2, $S2, 'v'
-    unless $I2 goto __label_5
-    iseq $I3, __ARG_4, ''
-    set $I1, $I3
-    goto __label_6
-  __label_5:
-    set $I1, $I2
+  __label_4:
+.annotate 'line', 1394
+    isne $I1, $S2, 'v'
+    unless $I1 goto __label_6
+    iseq $I1, __ARG_4, ''
   __label_6:
-    unless $I1 goto __label_4
-.annotate 'line', 1338
+    unless $I1 goto __label_5
+.annotate 'line', 1395
     $P2 = __ARG_2.'tempreg'($S2)
     set __ARG_4, $P2
-  __label_4: # endif
-.annotate 'line', 1339
-# var fun: $P1
+  __label_5: # endif
+.annotate 'line', 1396
     getattribute $P1, self, 'body'
-.annotate 'line', 1340
+.annotate 'line', 1397
     $P1(__ARG_1, __ARG_2, __ARG_3, __ARG_4, __ARG_5)
-# }
-.annotate 'line', 1341
+.annotate 'line', 1398
 
 .end # expand
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
-.annotate 'line', 1249
+.annotate 'line', 1304
     addattribute $P0, 'name'
-.annotate 'line', 1250
+.annotate 'line', 1305
     addattribute $P0, 'body'
-.annotate 'line', 1251
+.annotate 'line', 1306
     addattribute $P0, 'typeresult'
-.annotate 'line', 1252
+.annotate 'line', 1307
     addattribute $P0, 'type0'
-.annotate 'line', 1253
+.annotate 'line', 1308
     addattribute $P0, 'type1'
-.annotate 'line', 1254
+.annotate 'line', 1309
     addattribute $P0, 'type2'
-.annotate 'line', 1255
+.annotate 'line', 1310
     addattribute $P0, 'type3'
-.annotate 'line', 1256
+.annotate 'line', 1311
     addattribute $P0, 'nparams'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
@@ -4186,18 +3436,15 @@
         .param string __ARG_5 :optional
         .param string __ARG_6 :optional
         .param string __ARG_7 :optional
-# Body
-# {
-.annotate 'line', 1353
+.annotate 'line', 1410
     self.'BuiltinBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, __ARG_5, __ARG_6, __ARG_7)
-# }
-.annotate 'line', 1354
+.annotate 'line', 1411
 
 .end # BuiltinFunction
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 1344
+.annotate 'line', 1401
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
     addparent $P0, $P1
 .end
@@ -4212,47 +3459,38 @@
         .param string __ARG_6 :optional
         .param string __ARG_7 :optional
         .param string __ARG_8 :optional
-# Body
-# {
-.annotate 'line', 1367
+.annotate 'line', 1424
     self.'BuiltinBase'(__ARG_1, __ARG_3, __ARG_4, __ARG_5, __ARG_6, __ARG_7, __ARG_8)
-.annotate 'line', 1368
+.annotate 'line', 1425
     setattribute self, 'evalfun', __ARG_2
-# }
-.annotate 'line', 1369
+.annotate 'line', 1426
 
 .end # BuiltinFunctionEval
 
 
 .sub 'iscompileevaluable' :method
-# Body
-# {
-.annotate 'line', 1372
+.annotate 'line', 1429
     .return(1)
-# }
-.annotate 'line', 1373
+.annotate 'line', 1430
 
 .end # iscompileevaluable
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1357
+.annotate 'line', 1414
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
     addparent $P0, $P1
-.annotate 'line', 1359
+.annotate 'line', 1416
     addattribute $P0, 'evalfun'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
 
 .sub 'Builtin_typecast' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 1381
+.annotate 'line', 1438
     box $P1, __ARG_1
     setattribute self, 'type', $P1
-# }
-.annotate 'line', 1382
+.annotate 'line', 1439
 
 .end # Builtin_typecast
 
@@ -4261,899 +3499,723 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-        .param pmc __ARG_4
+        .param string __ARG_4
         .param pmc __ARG_5
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 1385
-# type: $S1
+.annotate 'line', 1442
     getattribute $P2, self, 'type'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 1386
-# builtin elements
+.annotate 'line', 1443
     elements $I1, __ARG_5
     eq $I1, 1, __label_2
-.annotate 'line', 1387
+.annotate 'line', 1444
     WSubId_6("Invalid Builtin_typecast.invoke call")
   __label_2: # endif
-.annotate 'line', 1388
-# var rawarg: $P1
+.annotate 'line', 1445
     $P1 = __ARG_5[0]
-.annotate 'line', 1389
-# argtype: $S2
+.annotate 'line', 1446
     $P2 = $P1.'checkresult'()
     null $S2
     if_null $P2, __label_3
     set $S2, $P2
   __label_3:
-# switch-case
-.annotate 'line', 1391
+.annotate 'line', 1448
     iseq $I1, $S2, $S1
     if $I1 goto __label_6
-.annotate 'line', 1392
+.annotate 'line', 1449
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
     if $I1 goto __label_7
     goto __label_5
   __label_6: # case
   __label_7: # case
-.annotate 'line', 1393
+.annotate 'line', 1450
     $P1.'emit'(__ARG_1, __ARG_4)
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 1396
-# arg: $S3
+.annotate 'line', 1453
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S3
     if_null $P2, __label_8
     set $S3, $P2
   __label_8:
-.annotate 'line', 1397
+.annotate 'line', 1454
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1399
+.annotate 'line', 1456
     ne $S3, 'null', __label_9
-.annotate 'line', 1400
+.annotate 'line', 1457
     __ARG_1.'emitnull'(__ARG_4)
     goto __label_10
   __label_9: # else
-.annotate 'line', 1402
+.annotate 'line', 1459
     __ARG_1.'emitset'(__ARG_4, $S3)
   __label_10: # endif
   __label_4: # switch end
-# }
-.annotate 'line', 1404
+.annotate 'line', 1461
 
 .end # invoke
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
-.annotate 'line', 1378
+.annotate 'line', 1435
     addattribute $P0, 'type'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'builtineval_stringcast' :subid('WSubId_28')
+.sub 'builtineval_stringcast' :subid('WSubId_34')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_23 = "WSubId_23"
-.const 'Sub' WSubId_24 = "WSubId_24"
-# Body
-# {
-.annotate 'line', 1409
-# var arg: $P1
+.const 'Sub' WSubId_27 = "WSubId_27"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.annotate 'line', 1466
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1410
-    $P2 = WSubId_24($P1)
-    .tailcall WSubId_23(__ARG_1, __ARG_2, $P2)
-# }
-.annotate 'line', 1411
+.annotate 'line', 1467
+    $P2 = WSubId_28($P1)
+    .tailcall WSubId_27(__ARG_1, __ARG_2, $P2)
+.annotate 'line', 1468
 
 .end # builtineval_stringcast
 
 
-.sub 'builtineval_intcast' :subid('WSubId_27')
+.sub 'builtineval_intcast' :subid('WSubId_33')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
+.const 'Sub' WSubId_29 = "WSubId_29"
 .const 'Sub' WSubId_25 = "WSubId_25"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1415
-# var arg: $P1
+.annotate 'line', 1472
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1416
-# value: $I1
-    $P2 = WSubId_25($P1)
+.annotate 'line', 1473
+    $P2 = WSubId_29($P1)
     set $I1, $P2
-.annotate 'line', 1417
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I1)
-# }
-.annotate 'line', 1418
+.annotate 'line', 1474
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I1)
+.annotate 'line', 1475
 
 .end # builtineval_intcast
 
 
-.sub 'Builtin_varcast' :subid('WSubId_29')
+.sub 'Builtin_varcast' :subid('WSubId_35')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
 .const 'Sub' WSubId_6 = "WSubId_6"
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 1422
-# builtin elements
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 1479
     elements $I1, __ARG_5
     eq $I1, 1, __label_1
-.annotate 'line', 1423
+.annotate 'line', 1480
     WSubId_6("Invalid var cast")
   __label_1: # endif
-.annotate 'line', 1424
-# var arg: $P1
+.annotate 'line', 1481
     $P1 = __ARG_5[0]
-.annotate 'line', 1425
-# argtype: $S1
+.annotate 'line', 1482
     $P7 = $P1.'checkresult'()
     null $S1
     if_null $P7, __label_2
     set $S1, $P7
   __label_2:
-.annotate 'line', 1426
+.annotate 'line', 1483
     ne $S1, 'P', __label_3
-# {
-.annotate 'line', 1427
-# name: $S2
+.annotate 'line', 1484
     null $S2
-.annotate 'line', 1428
-# var sym: $P2
+.annotate 'line', 1485
     null $P2
-# switch-case
-.annotate 'line', 1430
+.annotate 'line', 1487
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
     if $I1 goto __label_7
-.annotate 'line', 1446
+.annotate 'line', 1503
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
     if $I1 goto __label_8
     goto __label_6
   __label_7: # case
-.annotate 'line', 1431
+.annotate 'line', 1488
     $P7 = $P1.'getName'()
     set $S2, $P7
-.annotate 'line', 1432
-# id: $S3
+.annotate 'line', 1489
     $P8 = $P1.'checkIdentifier'()
     null $S3
     if_null $P8, __label_9
     set $S3, $P8
   __label_9:
-.annotate 'line', 1433
-# var desc: $P3
+.annotate 'line', 1490
     $P3 = $P1.'checkVar'()
-.annotate 'line', 1434
-    isne $I4, $S3, ''
-    unless $I4 goto __label_14
-    isnull $I5, $P3
-    not $I5
-    set $I3, $I5
-    goto __label_15
-  __label_14:
-    set $I3, $I4
-  __label_15:
-    unless $I3 goto __label_12
-    $P9 = $P3.'issubid'()
-    isfalse $I6, $P9
-    set $I2, $I6
-    goto __label_13
-  __label_12:
-    set $I2, $I3
+.annotate 'line', 1491
+    isne $I2, $S3, ''
+    unless $I2 goto __label_13
+    isnull $I2, $P3
+    not $I2
   __label_13:
+    unless $I2 goto __label_12
+    $P9 = $P3.'issubid'()
+    isfalse $I2, $P9
+  __label_12:
     unless $I2 goto __label_10
-# {
-.annotate 'line', 1436
+.annotate 'line', 1493
     $P1.'emit'(__ARG_1, __ARG_4)
-# }
     goto __label_11
   __label_10: # else
-# {
-.annotate 'line', 1439
+.annotate 'line', 1496
     root_new $P7, ['parrot';'ResizablePMCArray']
     assign $P7, 1
     $P7[0] = $S2
     $P2 = $P1.'scopesearch'($P7, 0)
-.annotate 'line', 1440
-    isnull $I2, $P2
-    not $I2
-    unless $I2 goto __label_17
-    isa $I3, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    set $I1, $I3
-    goto __label_18
-  __label_17:
-    set $I1, $I2
-  __label_18:
-    unless $I1 goto __label_16
-# {
-.annotate 'line', 1441
-# var path: $P4
+.annotate 'line', 1497
+    isnull $I1, $P2
+    not $I1
+    unless $I1 goto __label_15
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+  __label_15:
+    unless $I1 goto __label_14
+.annotate 'line', 1498
     getattribute $P7, $P2, 'owner'
     $P4 = $P7.'getpath'()
-.annotate 'line', 1442
-    $P7 = WSubId_26($P4)
+.annotate 'line', 1499
+    $P7 = WSubId_30($P4)
     __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $P7)
-# }
-  __label_16: # endif
-# }
+  __label_14: # endif
   __label_11: # endif
     goto __label_5 # break
   __label_8: # case
-.annotate 'line', 1449
+.annotate 'line', 1506
     new $P5, ['ResizableStringArray']
-.annotate 'line', 1450
+.annotate 'line', 1507
     $P1.'buildkey'($P5)
-.annotate 'line', 1451
+.annotate 'line', 1508
     $P2 = __ARG_2.'scopesearch'($P5, 0)
-.annotate 'line', 1452
-    isnull $I2, $P2
-    not $I2
-    unless $I2 goto __label_20
-    isa $I3, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    set $I1, $I3
-    goto __label_21
-  __label_20:
-    set $I1, $I2
-  __label_21:
-    unless $I1 goto __label_19
-# {
-.annotate 'line', 1453
-# var path: $P6
+.annotate 'line', 1509
+    isnull $I1, $P2
+    not $I1
+    unless $I1 goto __label_17
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+  __label_17:
+    unless $I1 goto __label_16
+.annotate 'line', 1510
     getattribute $P7, $P2, 'owner'
     $P6 = $P7.'getpath'()
-.annotate 'line', 1454
+.annotate 'line', 1511
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1455
-    $P7 = WSubId_26($P6)
+.annotate 'line', 1512
+    $P7 = WSubId_30($P6)
     __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $P7)
-# }
-  __label_19: # endif
-.annotate 'line', 1457
+  __label_16: # endif
+.annotate 'line', 1514
     $P7 = $P5.'pop'()
     set $S2, $P7
-.annotate 'line', 1458
+.annotate 'line', 1515
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1459
-    $P8 = WSubId_26($P5)
+.annotate 'line', 1516
+    $P8 = WSubId_30($P5)
     __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $P8)
     goto __label_5 # break
   __label_6: # default
-.annotate 'line', 1462
+.annotate 'line', 1519
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1463
+.annotate 'line', 1520
     $P1.'emit'(__ARG_1, __ARG_4)
   __label_5: # switch end
-# }
     goto __label_4
   __label_3: # else
-# {
-.annotate 'line', 1467
-# reg: $S4
+.annotate 'line', 1524
     $P7 = $P1.'emit_get'(__ARG_1)
     null $S4
-    if_null $P7, __label_22
+    if_null $P7, __label_18
     set $S4, $P7
-  __label_22:
-.annotate 'line', 1468
+  __label_18:
+.annotate 'line', 1525
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1469
-    ne $S4, 'null', __label_23
-.annotate 'line', 1470
+.annotate 'line', 1526
+    ne $S4, 'null', __label_19
+.annotate 'line', 1527
     __ARG_1.'emitnull'(__ARG_4)
-    goto __label_24
-  __label_23: # else
-.annotate 'line', 1472
+    goto __label_20
+  __label_19: # else
+.annotate 'line', 1529
     __ARG_1.'emitbox'(__ARG_4, $S4)
-  __label_24: # endif
-# }
+  __label_20: # endif
   __label_4: # endif
-# }
-.annotate 'line', 1474
+.annotate 'line', 1531
 
 .end # Builtin_varcast
 
 
-.sub 'Builtin_say' :subid('WSubId_40')
+.sub 'Builtin_say' :subid('WSubId_46')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1478
+.annotate 'line', 1535
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1479
-# n: $I1
-# builtin elements
+.annotate 'line', 1536
     elements $I3, __ARG_5
     sub $I1, $I3, 1
-.annotate 'line', 1480
+.annotate 'line', 1537
     lt $I1, 0, __label_1
-# {
-# for loop
-.annotate 'line', 1481
-# i: $I2
+.annotate 'line', 1538
     null $I2
   __label_5: # for condition
     ge $I2, $I1, __label_4
-.annotate 'line', 1482
+.annotate 'line', 1539
     $P1 = __ARG_5[$I2]
     __ARG_1.'emitprint'($P1)
   __label_3: # for iteration
-.annotate 'line', 1481
+.annotate 'line', 1538
     inc $I2
     goto __label_5
   __label_4: # for end
-.annotate 'line', 1483
+.annotate 'line', 1540
     $P1 = __ARG_5[$I1]
     __ARG_1.'emitsay'($P1)
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 1486
+.annotate 'line', 1543
     __ARG_1.'emitsay'("''")
   __label_2: # endif
-# }
-.annotate 'line', 1487
+.annotate 'line', 1544
 
 .end # Builtin_say
 
 
-.sub 'Builtin_cry' :subid('WSubId_41')
+.sub 'emit_printP0' :subid('WSubId_32')
+        .param string __ARG_1
+.annotate 'line', 1548
+    concat $S1, "    print $P0, ", __ARG_1
+    .return($S1)
+.annotate 'line', 1549
+
+.end # emit_printP0
+
+
+.sub 'Builtin_cry' :subid('WSubId_47')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1491
+.const 'Sub' WSubId_26 = "WSubId_26"
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_32 = "WSubId_32"
+.annotate 'line', 1553
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1492
-    __ARG_1.'say'('    ', "getstderr $P0")
-.annotate 'line', 1493
-    if_null __ARG_5, __label_2
-    iter $P1, __ARG_5
-    set $P1, 0
-  __label_1: # for iteration
-    unless $P1 goto __label_2
-    shift $S1, $P1
-.annotate 'line', 1494
-    __ARG_1.'say'('    ', "print $P0, ", $S1)
-    goto __label_1
-  __label_2: # endfor
-.annotate 'line', 1495
-    __ARG_1.'say'('    ', "print $P0, \"\\n\"")
-# }
-.annotate 'line', 1496
+.annotate 'line', 1560
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    $P2 = WSubId_31(__ARG_5, $P3, WSubId_32)
+    join $S1, "\n", $P2
+.annotate 'line', 1554
+    $P1 = WSubId_26("    getstderr $P0\n%0\n    print $P0, \"\\n\"\n", $S1)
+    __ARG_1.'say'($P1)
+.annotate 'line', 1561
 
 .end # Builtin_cry
 
 
-.sub 'Builtin_print' :subid('WSubId_39')
+.sub 'Builtin_print' :subid('WSubId_45')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1500
+.annotate 'line', 1565
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1501
+.annotate 'line', 1566
     if_null __ARG_5, __label_2
     iter $P1, __ARG_5
     set $P1, 0
   __label_1: # for iteration
     unless $P1 goto __label_2
     shift $S1, $P1
-.annotate 'line', 1502
+.annotate 'line', 1567
     __ARG_1.'emitprint'($S1)
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 1503
+.annotate 'line', 1568
 
 .end # Builtin_print
 
 
-.sub 'Builtin_ASSERT' :subid('WSubId_42')
+.sub 'Builtin_ASSERT' :subid('WSubId_48')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1509
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 1574
     $P3 = __ARG_1.'getDebug'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 1510
+.annotate 'line', 1575
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1511
-# label: $S1
+.annotate 'line', 1576
     $P3 = __ARG_2.'genlabel'()
     null $S1
     if_null $P3, __label_2
     set $S1, $P3
   __label_2:
-.annotate 'line', 1512
-# var arg: $P1
+.annotate 'line', 1577
     $P1 = __ARG_5[0]
-.annotate 'line', 1513
-# var reg: $P2
+.annotate 'line', 1578
     $P2 = $P1.'emit_getint'(__ARG_1)
-.annotate 'line', 1514
+.annotate 'line', 1579
     __ARG_1.'emitif'($P2, $S1)
-.annotate 'line', 1515
-    __ARG_1.'say'('    ', "getstderr $P0")
-.annotate 'line', 1516
-    $P3 = __ARG_3.'filename'()
-    __ARG_1.'say'('    ', "print $P0, \"Assertion failed at '", $P3, "' line \"")
-.annotate 'line', 1517
-    $P3 = __ARG_3.'linenum'()
-    __ARG_1.'say'('    ', "print $P0, ", $P3)
-.annotate 'line', 1518
-    __ARG_1.'say'('    ', "print $P0, \"\\n\"")
-.annotate 'line', 1519
-    __ARG_1.'say'('    ', "exit 1")
-.annotate 'line', 1520
+.annotate 'line', 1588
+    $P4 = __ARG_3.'filename'()
+    $P5 = __ARG_3.'linenum'()
+.annotate 'line', 1580
+    $P3 = WSubId_26("    getstderr $P0\n    print $P0, \"Assertion failed at '%0' line \"\n    print $P0, %1\n    print $P0, \"\\n\"\n    exit 1\n", $P4, $P5)
+    __ARG_1.'print'($P3)
+.annotate 'line', 1589
     __ARG_1.'emitlabel'($S1)
-# }
   __label_1: # endif
-# }
-.annotate 'line', 1522
+.annotate 'line', 1591
 
 .end # Builtin_ASSERT
 
 
-.sub 'Builtin_invoke' :subid('WSubId_43')
+.sub 'Builtin_invoke' :subid('WSubId_49')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 1528
-# var arg: $P1
+.annotate 'line', 1597
     $P1 = __ARG_5[0]
-.annotate 'line', 1529
+.annotate 'line', 1598
     isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     not $I1, $I2
     unless $I1 goto __label_1
-.annotate 'line', 1530
+.annotate 'line', 1599
     WSubId_1("invoke argument must be callable", __ARG_3)
   __label_1: # endif
-.annotate 'line', 1531
+.annotate 'line', 1600
     concat $S1, "(", __ARG_4
     concat $S1, $S1, " :call_sig)"
     $P1.'emit'(__ARG_1, $S1)
-# }
-.annotate 'line', 1532
+.annotate 'line', 1601
 
 .end # Builtin_invoke
 
 
-.sub 'builtineval_length' :subid('WSubId_31')
+.sub 'builtineval_length' :subid('WSubId_37')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1536
-# var arg: $P1
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 1605
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1537
-# s: $S1
-    $P2 = WSubId_24($P1)
+.annotate 'line', 1606
+    $P2 = WSubId_28($P1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 1538
-# builtin length
+.annotate 'line', 1607
     length $I1, $S1
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I1)
-# }
-.annotate 'line', 1539
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I1)
+.annotate 'line', 1608
 
 .end # builtineval_length
 
 
-.sub 'builtineval_bytelength' :subid('WSubId_32')
+.sub 'builtineval_bytelength' :subid('WSubId_38')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1543
-# var arg: $P1
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 1612
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1544
-# s: $S1
-    $P2 = WSubId_24($P1)
+.annotate 'line', 1613
+    $P2 = WSubId_28($P1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 1545
-# builtin bytelength
+.annotate 'line', 1614
     bytelength $I1, $S1
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I1)
-# }
-.annotate 'line', 1546
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I1)
+.annotate 'line', 1615
 
 .end # builtineval_bytelength
 
 
-.sub 'builtineval_ord' :subid('WSubId_34')
+.sub 'builtineval_ord' :subid('WSubId_40')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_29 = "WSubId_29"
 .const 'Sub' WSubId_25 = "WSubId_25"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1550
-# nargs: $I1
-# builtin elements
+.annotate 'line', 1619
     elements $I1, __ARG_3
-.annotate 'line', 1551
-# var arg: $P1
+.annotate 'line', 1620
     $P3 = __ARG_3[0]
     getattribute $P1, $P3, 'arg'
-.annotate 'line', 1552
-# s: $S1
-    $P3 = WSubId_24($P1)
+.annotate 'line', 1621
+    $P3 = WSubId_28($P1)
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 1553
-# pos: $I2
+.annotate 'line', 1622
     null $I2
-.annotate 'line', 1554
+.annotate 'line', 1623
     le $I1, 1, __label_2
-# {
-.annotate 'line', 1555
-# var argpos: $P2
+.annotate 'line', 1624
     $P3 = __ARG_3[1]
     getattribute $P2, $P3, 'arg'
-.annotate 'line', 1556
-    $P3 = WSubId_25($P2)
+.annotate 'line', 1625
+    $P3 = WSubId_29($P2)
     set $I2, $P3
-# }
   __label_2: # endif
-.annotate 'line', 1558
-# builtin ord
+.annotate 'line', 1627
     ord $I3, $S1, $I2
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I3)
-# }
-.annotate 'line', 1559
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I3)
+.annotate 'line', 1628
 
 .end # builtineval_ord
 
 
-.sub 'builtineval_chr' :subid('WSubId_33')
+.sub 'builtineval_chr' :subid('WSubId_39')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_23 = "WSubId_23"
-.const 'Sub' WSubId_25 = "WSubId_25"
-# Body
-# {
-.annotate 'line', 1563
-# var arg: $P1
+.const 'Sub' WSubId_27 = "WSubId_27"
+.const 'Sub' WSubId_29 = "WSubId_29"
+.annotate 'line', 1632
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1564
-    $P2 = WSubId_25($P1)
+.annotate 'line', 1633
+    $P2 = WSubId_29($P1)
     set $I1, $P2
-# builtin chr
     chr $S0, $I1
     find_encoding $I0, 'utf8'
     trans_encoding $S1, $S0, $I0
-    .tailcall WSubId_23(__ARG_1, __ARG_2, $S1)
-# }
-.annotate 'line', 1565
+    .tailcall WSubId_27(__ARG_1, __ARG_2, $S1)
+.annotate 'line', 1634
 
 .end # builtineval_chr
 
 
-.sub 'builtineval_substr' :subid('WSubId_35')
+.sub 'builtineval_substr' :subid('WSubId_41')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
-.const 'Sub' WSubId_25 = "WSubId_25"
-.const 'Sub' WSubId_23 = "WSubId_23"
-# Body
-# {
-.annotate 'line', 1569
-# nargs: $I1
-# builtin elements
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_29 = "WSubId_29"
+.const 'Sub' WSubId_27 = "WSubId_27"
+.annotate 'line', 1638
     elements $I1, __ARG_3
-.annotate 'line', 1570
-# var argstr: $P1
+.annotate 'line', 1639
     $P4 = __ARG_3[0]
     getattribute $P1, $P4, 'arg'
-.annotate 'line', 1571
-# var argpos: $P2
+.annotate 'line', 1640
     $P4 = __ARG_3[1]
     getattribute $P2, $P4, 'arg'
-.annotate 'line', 1572
-# str: $S1
-    $P4 = WSubId_24($P1)
+.annotate 'line', 1641
+    $P4 = WSubId_28($P1)
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 1573
-# pos: $I2
-    $P4 = WSubId_25($P2)
+.annotate 'line', 1642
+    $P4 = WSubId_29($P2)
     set $I2, $P4
-.annotate 'line', 1574
-# result: $S2
+.annotate 'line', 1643
     null $S2
-.annotate 'line', 1575
+.annotate 'line', 1644
     set $I4, __ARG_3
     le $I4, 2, __label_2
-# {
-.annotate 'line', 1576
-# var arglen: $P3
+.annotate 'line', 1645
     $P4 = __ARG_3[2]
     getattribute $P3, $P4, 'arg'
-.annotate 'line', 1577
-# len: $I3
-    $P4 = WSubId_25($P3)
+.annotate 'line', 1646
+    $P4 = WSubId_29($P3)
     set $I3, $P4
-.annotate 'line', 1578
-# builtin substr
+.annotate 'line', 1647
     substr $S2, $S1, $I2, $I3
-# }
     goto __label_3
   __label_2: # else
-.annotate 'line', 1581
-# builtin substr
+.annotate 'line', 1650
     substr $S2, $S1, $I2
   __label_3: # endif
-.annotate 'line', 1582
-    .tailcall WSubId_23(__ARG_1, __ARG_2, $S2)
-# }
-.annotate 'line', 1583
+.annotate 'line', 1651
+    .tailcall WSubId_27(__ARG_1, __ARG_2, $S2)
+.annotate 'line', 1652
 
 .end # builtineval_substr
 
 
-.sub 'builtineval_indexof' :subid('WSubId_36')
+.sub 'builtineval_indexof' :subid('WSubId_42')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1587
-# var argstrfrom: $P1
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 1656
     $P3 = __ARG_3[0]
     getattribute $P1, $P3, 'arg'
-.annotate 'line', 1588
-# var argstrsearch: $P2
+.annotate 'line', 1657
     $P3 = __ARG_3[1]
     getattribute $P2, $P3, 'arg'
-.annotate 'line', 1589
-# strfrom: $S1
-    $P3 = WSubId_24($P1)
+.annotate 'line', 1658
+    $P3 = WSubId_28($P1)
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 1590
-# strsearch: $S2
-    $P3 = WSubId_24($P2)
+.annotate 'line', 1659
+    $P3 = WSubId_28($P2)
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 1591
-# builtin indexof
+.annotate 'line', 1660
     index $I1, $S1, $S2
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I1)
-# }
-.annotate 'line', 1592
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I1)
+.annotate 'line', 1661
 
 .end # builtineval_indexof
 
 
-.sub 'builtineval_indexof_pos' :subid('WSubId_37')
+.sub 'builtineval_indexof_pos' :subid('WSubId_43')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_24 = "WSubId_24"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_29 = "WSubId_29"
 .const 'Sub' WSubId_25 = "WSubId_25"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 1596
-# var argstrfrom: $P1
+.annotate 'line', 1665
     $P4 = __ARG_3[0]
     getattribute $P1, $P4, 'arg'
-.annotate 'line', 1597
-# var argstrsearch: $P2
+.annotate 'line', 1666
     $P4 = __ARG_3[1]
     getattribute $P2, $P4, 'arg'
-.annotate 'line', 1598
-# var argpos: $P3
+.annotate 'line', 1667
     $P4 = __ARG_3[2]
     getattribute $P3, $P4, 'arg'
-.annotate 'line', 1599
-# strfrom: $S1
-    $P4 = WSubId_24($P1)
+.annotate 'line', 1668
+    $P4 = WSubId_28($P1)
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 1600
-# strsearch: $S2
-    $P4 = WSubId_24($P2)
+.annotate 'line', 1669
+    $P4 = WSubId_28($P2)
     null $S2
     if_null $P4, __label_2
     set $S2, $P4
   __label_2:
-.annotate 'line', 1601
-# pos: $I1
+.annotate 'line', 1670
     $P6 = __ARG_3[2]
     getattribute $P5, $P6, 'arg'
-    $P4 = WSubId_25($P5)
+    $P4 = WSubId_29($P5)
     set $I1, $P4
-.annotate 'line', 1602
-# builtin indexof
+.annotate 'line', 1671
     index $I2, $S1, $S2, $I1
-    .tailcall WSubId_22(__ARG_1, __ARG_2, $I2)
-# }
-.annotate 'line', 1603
+    .tailcall WSubId_25(__ARG_1, __ARG_2, $I2)
+.annotate 'line', 1672
 
 .end # builtineval_indexof_pos
 
 
-.sub 'builtineval_escape' :subid('WSubId_38')
+.sub 'builtineval_escape' :subid('WSubId_44')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_23 = "WSubId_23"
-.const 'Sub' WSubId_24 = "WSubId_24"
-# Body
-# {
-.annotate 'line', 1607
-# var argstrfrom: $P1
+.const 'Sub' WSubId_27 = "WSubId_27"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.annotate 'line', 1676
     $P2 = __ARG_3[0]
     getattribute $P1, $P2, 'arg'
-.annotate 'line', 1611
-    $P2 = WSubId_24($P1)
+.annotate 'line', 1680
+    $P2 = WSubId_28($P1)
     set $S3, $P2
-# builtin escape
     escape $S2, $S3
-# builtin escape
     escape $S1, $S2
-.annotate 'line', 1610
-    .tailcall WSubId_23(__ARG_1, __ARG_2, $S1)
-# }
-.annotate 'line', 1612
+.annotate 'line', 1679
+    .tailcall WSubId_27(__ARG_1, __ARG_2, $S1)
+.annotate 'line', 1681
 
 .end # builtineval_escape
 
 
-.sub 'builtin_sleep' :subid('WSubId_30')
+.sub 'builtin_sleep' :subid('WSubId_36')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 1616
-# var expr: $P1
+.annotate 'line', 1685
     $P1 = __ARG_5[0]
-.annotate 'line', 1617
-# reg: $S1
+.annotate 'line', 1686
     null $S1
-.annotate 'line', 1618
-# type: $S2
+.annotate 'line', 1687
     $P2 = $P1.'checkresult'()
     null $S2
     if_null $P2, __label_1
     set $S2, $P2
   __label_1:
-# switch
-.annotate 'line', 1619
-    set $S4, $S2
-    set $S5, 'I'
-    if $S4 == $S5 goto __label_4
-    set $S5, 'N'
-    if $S4 == $S5 goto __label_5
+.annotate 'line', 1688
+    if $S2 == 'I' goto __label_4
+    if $S2 == 'N' goto __label_5
     goto __label_3
   __label_4: # case
-.annotate 'line', 1621
+.annotate 'line', 1690
     $P2 = $P1.'emit_getint'(__ARG_1)
     set $S1, $P2
     goto __label_2 # break
   __label_5: # case
-.annotate 'line', 1624
+.annotate 'line', 1693
     $P3 = $P1.'emit_get'(__ARG_1)
     set $S1, $P3
     goto __label_2 # break
   __label_3: # default
-.annotate 'line', 1627
+.annotate 'line', 1696
     $P4 = $P1.'isnull'()
     if_null $P4, __label_6
     unless $P4 goto __label_6
-.annotate 'line', 1628
+.annotate 'line', 1697
     set $S1, "0"
     goto __label_7
   __label_6: # else
-# {
-.annotate 'line', 1630
-# aux: $S3
+.annotate 'line', 1699
     $P5 = $P1.'emit_get'(__ARG_1)
     null $S3
     if_null $P5, __label_8
     set $S3, $P5
   __label_8:
-.annotate 'line', 1631
-    $P2 = __ARG_2.'tempreg'('N')
-    set $S1, $P2
-.annotate 'line', 1632
+.annotate 'line', 1700
+    set $S1, "$N0"
+.annotate 'line', 1701
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1633
+.annotate 'line', 1702
     __ARG_1.'emitset'($S1, $S3)
-# }
   __label_7: # endif
   __label_2: # switch end
-.annotate 'line', 1636
+.annotate 'line', 1705
     __ARG_1.'annotate'(__ARG_3)
-.annotate 'line', 1637
+.annotate 'line', 1706
     __ARG_1.'emitarg1'('sleep', $S1)
-# }
-.annotate 'line', 1638
+.annotate 'line', 1707
 
 .end # builtin_sleep
 
 
-.sub 'getbuiltins' :subid('WSubId_126')
+.sub 'getbuiltins' :subid('WSubId_139')
         .param pmc __ARG_1
-.const 'Sub' WSubId_27 = "WSubId_27"
-.const 'Sub' WSubId_28 = "WSubId_28"
-.const 'Sub' WSubId_29 = "WSubId_29"
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_31 = "WSubId_31"
-.const 'Sub' WSubId_32 = "WSubId_32"
 .const 'Sub' WSubId_33 = "WSubId_33"
 .const 'Sub' WSubId_34 = "WSubId_34"
 .const 'Sub' WSubId_35 = "WSubId_35"
@@ -5165,654 +4227,618 @@
 .const 'Sub' WSubId_41 = "WSubId_41"
 .const 'Sub' WSubId_42 = "WSubId_42"
 .const 'Sub' WSubId_43 = "WSubId_43"
-# Body
-# {
-.annotate 'line', 1642
+.const 'Sub' WSubId_44 = "WSubId_44"
+.const 'Sub' WSubId_45 = "WSubId_45"
+.const 'Sub' WSubId_46 = "WSubId_46"
+.const 'Sub' WSubId_47 = "WSubId_47"
+.const 'Sub' WSubId_48 = "WSubId_48"
+.const 'Sub' WSubId_49 = "WSubId_49"
+.annotate 'line', 1711
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1644
+.annotate 'line', 1713
     new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
     $P4.'Builtin_typecast'('I')
     set $P3, $P4
-    $P2.'BuiltinFunctionEval'('int', WSubId_27, $P3, 'I', '!')
+    $P2.'BuiltinFunctionEval'('int', WSubId_33, $P3, 'I', '!')
     set $P1, $P2
-.annotate 'line', 1642
+.annotate 'line', 1711
     __ARG_1.'add'($P1)
-.annotate 'line', 1647
+.annotate 'line', 1716
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 1648
+.annotate 'line', 1717
     new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
     $P4.'Builtin_typecast'('N')
     set $P3, $P4
     $P2.'BuiltinFunction'('float', $P3, 'N', '!')
     set $P1, $P2
-.annotate 'line', 1647
+.annotate 'line', 1716
     __ARG_1.'add'($P1)
-.annotate 'line', 1651
+.annotate 'line', 1720
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1653
+.annotate 'line', 1722
     new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
     $P4.'Builtin_typecast'('S')
     set $P3, $P4
-    $P2.'BuiltinFunctionEval'('string', WSubId_28, $P3, 'S', '!')
+    $P2.'BuiltinFunctionEval'('string', WSubId_34, $P3, 'S', '!')
     set $P1, $P2
-.annotate 'line', 1651
+.annotate 'line', 1720
     __ARG_1.'add'($P1)
-.annotate 'line', 1656
+.annotate 'line', 1725
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 1657
-    $P2.'BuiltinFunction'('var', WSubId_29, 'P', '!')
+.annotate 'line', 1726
+    $P2.'BuiltinFunction'('var', WSubId_35, 'P', '!')
     set $P1, $P2
-.annotate 'line', 1656
+.annotate 'line', 1725
     __ARG_1.'add'($P1)
-.annotate 'line', 1660
+.annotate 'line', 1729
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('die', 'die %1', 'v', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1664
+.annotate 'line', 1733
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('exit', 'exit %1', 'v', 'I')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1668
+.annotate 'line', 1737
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('time', 'time %0', 'I')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1672
+.annotate 'line', 1741
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('floattime', 'time %0', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1676
+.annotate 'line', 1745
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 1677
-    $P2.'BuiltinFunction'('sleep', WSubId_30, 'v', '!')
+.annotate 'line', 1746
+    $P2.'BuiltinFunction'('sleep', WSubId_36, 'v', '!')
     set $P1, $P2
-.annotate 'line', 1676
+.annotate 'line', 1745
     __ARG_1.'add'($P1)
-.annotate 'line', 1680
+.annotate 'line', 1749
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('spawnw', 'spawnw %0, %1', 'I', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1684
+.annotate 'line', 1753
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getstdin', 'getstdin %0', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1688
+.annotate 'line', 1757
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getstdout', 'getstdout %0', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1692
+.annotate 'line', 1761
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getstderr', 'getstderr %0', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1696
+.annotate 'line', 1765
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('open', "root_new %0, ['parrot';'FileHandle']\n%0.'open'(%1)\n", 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1703
+.annotate 'line', 1772
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('open', "root_new %0, ['parrot';'FileHandle']\n%0.'open'(%1,%2)\n", 'P', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1710
+.annotate 'line', 1779
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n", 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1717
+.annotate 'line', 1786
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n", 'P', 'S', 'I')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1725
+.annotate 'line', 1794
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n%0['type'] = %3\n", 'P', 'S', 'I', 'I')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1734
+.annotate 'line', 1803
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n%0['type'] = %3\n%0['payload'] = %4\n", 'P', 'S', 'I', 'I', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1744
+.annotate 'line', 1813
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('elements', 'elements %0, %1', 'I', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1748
+.annotate 'line', 1817
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1749
-    $P2.'BuiltinFunctionEval'('length', WSubId_31, 'length %0, %1', 'I', 'S')
+.annotate 'line', 1818
+    $P2.'BuiltinFunctionEval'('length', WSubId_37, 'length %0, %1', 'I', 'S')
     set $P1, $P2
-.annotate 'line', 1748
+.annotate 'line', 1817
     __ARG_1.'add'($P1)
-.annotate 'line', 1753
+.annotate 'line', 1822
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1754
-    $P2.'BuiltinFunctionEval'('bytelength', WSubId_32, 'bytelength %0, %1', 'I', 'S')
+.annotate 'line', 1823
+    $P2.'BuiltinFunctionEval'('bytelength', WSubId_38, 'bytelength %0, %1', 'I', 'S')
     set $P1, $P2
-.annotate 'line', 1753
+.annotate 'line', 1822
     __ARG_1.'add'($P1)
-.annotate 'line', 1758
+.annotate 'line', 1827
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1759
-    $P2.'BuiltinFunctionEval'('chr', WSubId_33, "chr $S0, %1\nfind_encoding $I0, 'utf8'\ntrans_encoding %0, $S0, $I0\n", 'S', 'I')
+.annotate 'line', 1828
+    $P2.'BuiltinFunctionEval'('chr', WSubId_39, "chr $S0, %1\nfind_encoding $I0, 'utf8'\ntrans_encoding %0, $S0, $I0\n", 'S', 'I')
     set $P1, $P2
-.annotate 'line', 1758
+.annotate 'line', 1827
     __ARG_1.'add'($P1)
-.annotate 'line', 1767
+.annotate 'line', 1836
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1768
-    $P2.'BuiltinFunctionEval'('ord', WSubId_34, 'ord %0, %1', 'I', 'S')
+.annotate 'line', 1837
+    $P2.'BuiltinFunctionEval'('ord', WSubId_40, 'ord %0, %1', 'I', 'S')
     set $P1, $P2
-.annotate 'line', 1767
+.annotate 'line', 1836
     __ARG_1.'add'($P1)
-.annotate 'line', 1772
+.annotate 'line', 1841
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1773
-    $P2.'BuiltinFunctionEval'('ord', WSubId_34, 'ord %0, %1, %2', 'I', 'S', 'I')
+.annotate 'line', 1842
+    $P2.'BuiltinFunctionEval'('ord', WSubId_40, 'ord %0, %1, %2', 'I', 'S', 'I')
     set $P1, $P2
-.annotate 'line', 1772
+.annotate 'line', 1841
     __ARG_1.'add'($P1)
-.annotate 'line', 1777
+.annotate 'line', 1846
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1778
-    $P2.'BuiltinFunctionEval'('substr', WSubId_35, 'substr %0, %1, %2', 'S', 'S', 'I')
+.annotate 'line', 1847
+    $P2.'BuiltinFunctionEval'('substr', WSubId_41, 'substr %0, %1, %2', 'S', 'S', 'I')
     set $P1, $P2
-.annotate 'line', 1777
+.annotate 'line', 1846
     __ARG_1.'add'($P1)
-.annotate 'line', 1782
+.annotate 'line', 1851
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1783
-    $P2.'BuiltinFunctionEval'('substr', WSubId_35, 'substr %0, %1, %2, %3', 'S', 'S', 'I', 'I')
+.annotate 'line', 1852
+    $P2.'BuiltinFunctionEval'('substr', WSubId_41, 'substr %0, %1, %2, %3', 'S', 'S', 'I', 'I')
     set $P1, $P2
-.annotate 'line', 1782
+.annotate 'line', 1851
     __ARG_1.'add'($P1)
-.annotate 'line', 1787
+.annotate 'line', 1856
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('replace', 'replace %0, %1, %2, %3, %4', 'S', 'S', 'I', 'I', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1791
+.annotate 'line', 1860
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1792
-    $P2.'BuiltinFunctionEval'('indexof', WSubId_36, 'index %0, %1, %2', 'I', 'S', 'S')
+.annotate 'line', 1861
+    $P2.'BuiltinFunctionEval'('indexof', WSubId_42, 'index %0, %1, %2', 'I', 'S', 'S')
     set $P1, $P2
-.annotate 'line', 1791
+.annotate 'line', 1860
     __ARG_1.'add'($P1)
-.annotate 'line', 1796
+.annotate 'line', 1865
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1797
-    $P2.'BuiltinFunctionEval'('indexof', WSubId_37, 'index %0, %1, %2, %3', 'I', 'S', 'S', 'I')
+.annotate 'line', 1866
+    $P2.'BuiltinFunctionEval'('indexof', WSubId_43, 'index %0, %1, %2, %3', 'I', 'S', 'S', 'I')
     set $P1, $P2
-.annotate 'line', 1796
+.annotate 'line', 1865
     __ARG_1.'add'($P1)
-.annotate 'line', 1801
+.annotate 'line', 1870
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('join', 'join %0, %1, %2', 'S', 'S', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1805
+.annotate 'line', 1874
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-.annotate 'line', 1806
-    $P2.'BuiltinFunctionEval'('escape', WSubId_38, 'escape %0, %1', 'S', 'S')
+.annotate 'line', 1875
+    $P2.'BuiltinFunctionEval'('escape', WSubId_44, 'escape %0, %1', 'S', 'S')
     set $P1, $P2
-.annotate 'line', 1805
+.annotate 'line', 1874
     __ARG_1.'add'($P1)
-.annotate 'line', 1810
+.annotate 'line', 1879
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('unescape', "$P0 = new ['String']\n$P0 = %1\n%0 = $P0.'unescape'('utf8')\n", 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1818
+.annotate 'line', 1887
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('unescape', "$P0 = new ['String']\n$P0 = %1\n%0 = $P0.'unescape'(%2)\n", 'S', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1826
+.annotate 'line', 1895
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('trans_encoding', "find_encoding $I0, %2\ntrans_encoding %0, %1, $I0\n", 'S', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1833
+.annotate 'line', 1902
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('encoding_name', "encoding $I0, %1\nencodingname %0, $I0\n", 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1840
+.annotate 'line', 1909
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('upcase', 'upcase %0, %1', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1844
+.annotate 'line', 1913
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('downcase', 'downcase %0, %1', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1848
+.annotate 'line', 1917
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('titlecase', 'titlecase %0, %1', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1852
+.annotate 'line', 1921
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('split', 'split %0, %1, %2', 'P', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1856
+.annotate 'line', 1925
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('chomp', "$P0 = get_root_global ['parrot';'String';'Utils'], 'chomp'\n%0 = $P0(%1)\n", 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1863
+.annotate 'line', 1932
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('chomp', "$P0 = get_root_global ['parrot';'String';'Utils'], 'chomp'\n%0 = $P0(%1, %2)\n", 'S', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1870
+.annotate 'line', 1939
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('push', 'push %1, %2', 'v', 'P', '?')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1874
+.annotate 'line', 1943
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('sqrt', 'sqrt %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1878
+.annotate 'line', 1947
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('pow', 'pow %0, %1, %2', 'N', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1882
+.annotate 'line', 1951
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('exp', 'exp %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1886
+.annotate 'line', 1955
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('ln', 'ln %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1890
+.annotate 'line', 1959
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('sin', 'sin %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1894
+.annotate 'line', 1963
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('cos', 'cos %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1898
+.annotate 'line', 1967
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('tan', 'tan %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1902
+.annotate 'line', 1971
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('asin', 'asin %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1906
+.annotate 'line', 1975
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('acos', 'acos %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1910
+.annotate 'line', 1979
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('atan', 'atan %0, %1', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1914
+.annotate 'line', 1983
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('atan', 'atan %0, %1, %2', 'N', 'N', 'N')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1918
+.annotate 'line', 1987
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getinterp', 'getinterp %0', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1922
+.annotate 'line', 1991
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getcontext', "getinterp $P0\n%0 = $P0[\"context\"]\n", 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1935
+.annotate 'line', 2004
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('get_class', 'get_class %0, %1', 'P', 'p')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1939
+.annotate 'line', 2008
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('typeof', 'typeof %0, %1', 'P', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1943
+.annotate 'line', 2012
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getattribute', 'getattribute %0, %1, %2', 'P', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1947
+.annotate 'line', 2016
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('getattribute', 'getattribute %0, %1, %2, %3', 'P', 'P', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1951
+.annotate 'line', 2020
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('setattribute', 'setattribute %1, %2, %3, %4', 'v', 'P', 'P', 'S', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1955
+.annotate 'line', 2024
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('find_method', 'find_method %0, %1, %2', 'P', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1959
+.annotate 'line', 2028
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('callmethodwithargs', '%0 = %1.%2(%3 :flat)', 'P', 'P', 'P', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1963
+.annotate 'line', 2032
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('clone', 'clone %0, %1', 'P', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1967
+.annotate 'line', 2036
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('compreg', 'compreg %0, %1', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1971
+.annotate 'line', 2040
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('compreg', 'compreg %1, %2', 'v', 'S', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1975
+.annotate 'line', 2044
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('load_language', "load_language %1\ncompreg %0, %1\n", 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1982
+.annotate 'line', 2051
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('load_language', "load_language %1\ncompreg %0, %2\n", 'P', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1989
+.annotate 'line', 2058
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('loadlib', 'loadlib %0, %1', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1993
+.annotate 'line', 2062
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('load_bytecode', 'load_bytecode %1', 'v', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 1997
+.annotate 'line', 2066
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('load_packfile', 'load_bytecode %0, %1', 'P', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 2001
+.annotate 'line', 2070
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('dlfunc', 'dlfunc %0, %1, %2, %3', 'P', 'P', 'S', 'S')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 2005
+.annotate 'line', 2074
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     $P2.'BuiltinFunction'('sprintf', 'sprintf %0, %1, %2', 'S', 'S', 'P')
     set $P1, $P2
     __ARG_1.'add'($P1)
-.annotate 'line', 2009
+.annotate 'line', 2078
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 2010
-    $P2.'BuiltinFunction'('print', WSubId_39, 'v', '*')
+.annotate 'line', 2079
+    $P2.'BuiltinFunction'('print', WSubId_45, 'v', '*')
     set $P1, $P2
-.annotate 'line', 2009
+.annotate 'line', 2078
     __ARG_1.'add'($P1)
-.annotate 'line', 2013
+.annotate 'line', 2082
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 2014
-    $P2.'BuiltinFunction'('say', WSubId_40, 'v', '*')
+.annotate 'line', 2083
+    $P2.'BuiltinFunction'('say', WSubId_46, 'v', '*')
     set $P1, $P2
-.annotate 'line', 2013
+.annotate 'line', 2082
     __ARG_1.'add'($P1)
-.annotate 'line', 2017
+.annotate 'line', 2086
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 2018
-    $P2.'BuiltinFunction'('cry', WSubId_41, 'v', '*')
+.annotate 'line', 2087
+    $P2.'BuiltinFunction'('cry', WSubId_47, 'v', '*')
     set $P1, $P2
-.annotate 'line', 2017
+.annotate 'line', 2086
     __ARG_1.'add'($P1)
-.annotate 'line', 2021
+.annotate 'line', 2090
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 2022
-    $P2.'BuiltinFunction'('__ASSERT__', WSubId_42, 'v', '!')
+.annotate 'line', 2091
+    $P2.'BuiltinFunction'('__ASSERT__', WSubId_48, 'v', '!')
     set $P1, $P2
-.annotate 'line', 2021
+.annotate 'line', 2090
     __ARG_1.'add'($P1)
-.annotate 'line', 2025
+.annotate 'line', 2094
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-.annotate 'line', 2026
-    $P2.'BuiltinFunction'('invoke', WSubId_43, 'P', '!')
+.annotate 'line', 2095
+    $P2.'BuiltinFunction'('invoke', WSubId_49, 'P', '!')
     set $P1, $P2
-.annotate 'line', 2025
+.annotate 'line', 2094
     __ARG_1.'add'($P1)
-# }
-.annotate 'line', 2029
+.annotate 'line', 2098
 
 .end # getbuiltins
 
 
-.sub 'optimize_array' :subid('WSubId_46')
+.sub 'optimize_array' :subid('WSubId_52')
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2037
-    if_null __ARG_1, __label_1
-# {
-.annotate 'line', 2038
-# n: $I1
-# builtin elements
+.annotate 'line', 2106
+    if_null __ARG_1, __label_2
     elements $I1, __ARG_1
-# for loop
-.annotate 'line', 2039
-# i: $I2
+    goto __label_1
+  __label_2:
+    null $I1
+  __label_1:
+.annotate 'line', 2107
     null $I2
-  __label_4: # for condition
-    ge $I2, $I1, __label_3
-.annotate 'line', 2040
+  __label_5: # for condition
+    ge $I2, $I1, __label_4
+.annotate 'line', 2108
     $P2 = __ARG_1[$I2]
     $P1 = $P2.'optimize'()
     __ARG_1[$I2] = $P1
-  __label_2: # for iteration
-.annotate 'line', 2039
+  __label_3: # for iteration
+.annotate 'line', 2107
     inc $I2
-    goto __label_4
-  __label_3: # for end
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 2042
+    goto __label_5
+  __label_4: # for end
+.annotate 'line', 2109
 
 .end # optimize_array
 
 
-.sub 'emit_array' :subid('WSubId_60')
+.sub 'emit_array' :subid('WSubId_66')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2046
+.annotate 'line', 2113
     if_null __ARG_2, __label_2
     iter $P2, __ARG_2
     set $P2, 0
   __label_1: # for iteration
     unless $P2 goto __label_2
     shift $P1, $P2
-.annotate 'line', 2047
+.annotate 'line', 2114
     $P1.'emit'(__ARG_1)
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 2048
+.annotate 'line', 2115
 
 .end # emit_array
 
 
-.sub 'parseDotted' :subid('WSubId_63')
+.sub 'parseDotted' :subid('WSubId_69')
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2052
-# var list: $P1
+.annotate 'line', 2119
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 2053
-# var t: $P2
+.annotate 'line', 2120
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2054
+.annotate 'line', 2121
     $P3 = $P2.'isidentifier'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 2055
-# builtin push
+.annotate 'line', 2122
     push $P1, $P2
   __label_3: # while
-.annotate 'line', 2056
+.annotate 'line', 2123
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isop'('.')
     if_null $P3, __label_2
     unless $P3 goto __label_2
-# {
-.annotate 'line', 2057
+.annotate 'line', 2124
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2058
-# builtin push
+.annotate 'line', 2125
     push $P1, $P2
-# }
     goto __label_3
   __label_2: # endwhile
-# }
   __label_1: # endif
-.annotate 'line', 2061
+.annotate 'line', 2128
     __ARG_1.'unget'($P2)
-.annotate 'line', 2062
+.annotate 'line', 2129
     .return($P1)
-# }
-.annotate 'line', 2063
+.annotate 'line', 2130
 
 .end # parseDotted
 
 
-.sub 'parseList' :subid('WSubId_44')
+.sub 'parseList' :subid('WSubId_50')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4 :optional
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2071
-# var list: $P1
+.annotate 'line', 2138
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 2072
-# var t: $P2
+.annotate 'line', 2139
     null $P2
   __label_1: # do
-.annotate 'line', 2073
-# {
-.annotate 'line', 2074
-# var value: $P3
+.annotate 'line', 2141
     $P3 = __ARG_3(__ARG_1, __ARG_2)
-.annotate 'line', 2075
-# builtin push
+.annotate 'line', 2142
     push $P1, $P3
-# }
   __label_3: # continue
-.annotate 'line', 2076
+.annotate 'line', 2143
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'(',')
     if_null $P4, __label_2
     if $P4 goto __label_1
   __label_2: # enddo
-.annotate 'line', 2077
+.annotate 'line', 2144
     unless_null __ARG_4, __label_4
-.annotate 'line', 2078
+.annotate 'line', 2145
     __ARG_1.'unget'($P2)
     goto __label_5
   __label_4: # else
-.annotate 'line', 2080
+.annotate 'line', 2147
     $P4 = $P2.'isop'(__ARG_4)
     isfalse $I1, $P4
     unless $I1 goto __label_6
-.annotate 'line', 2081
+.annotate 'line', 2148
     WSubId_1("Unfinished argument list", $P2)
   __label_6: # endif
   __label_5: # endif
-.annotate 'line', 2082
+.annotate 'line', 2149
     .return($P1)
-# }
-.annotate 'line', 2083
+.annotate 'line', 2150
 
 .end # parseList
 
 
-.sub 'parseIdentifier' :subid('WSubId_65')
+.sub 'parseIdentifier' :subid('WSubId_71')
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_3 = "WSubId_3"
-# Body
-# {
-.annotate 'line', 2088
-# var t: $P1
+.annotate 'line', 2155
     $P1 = __ARG_1.'get'()
-.annotate 'line', 2089
+.annotate 'line', 2156
     $P2 = $P1.'isidentifier'()
     isfalse $I1, $P2
     unless $I1 goto __label_1
-.annotate 'line', 2090
+.annotate 'line', 2157
     WSubId_3($P1)
   __label_1: # endif
-.annotate 'line', 2091
+.annotate 'line', 2158
     .return($P1)
-# }
-.annotate 'line', 2092
+.annotate 'line', 2159
 
 .end # parseIdentifier
 
 
-.sub 'toIdentifierList' :subid('WSubId_64')
+.sub 'toIdentifierList' :subid('WSubId_70')
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2096
+.annotate 'line', 2163
     new $P1, ['ResizableStringArray']
-.annotate 'line', 2097
+.annotate 'line', 2164
     if_null __ARG_1, __label_2
     iter $P3, __ARG_1
     set $P3, 0
   __label_1: # for iteration
     unless $P3 goto __label_2
     shift $P2, $P3
-.annotate 'line', 2098
+.annotate 'line', 2165
     $P4 = $P2.'getidentifier'()
-# builtin push
     push $P1, $P4
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 2099
+.annotate 'line', 2166
     .return($P1)
-# }
-.annotate 'line', 2100
+.annotate 'line', 2167
 
 .end # toIdentifierList
 
@@ -5821,150 +4847,120 @@
 .sub 'initbase' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2113
+.annotate 'line', 2180
     setattribute self, 'start', __ARG_1
-.annotate 'line', 2114
+.annotate 'line', 2181
     setattribute self, 'owner', __ARG_2
-# }
-.annotate 'line', 2115
+.annotate 'line', 2182
 
 .end # initbase
 
 
 .sub 'filename' :method
-# Body
-# {
-.annotate 'line', 2118
+.annotate 'line', 2185
     getattribute $P1, self, 'start'
     if_null $P1, __label_1
-.annotate 'line', 2119
+.annotate 'line', 2186
     getattribute $P2, self, 'start'
     .tailcall $P2.'filename'()
     goto __label_2
   __label_1: # else
-.annotate 'line', 2121
+.annotate 'line', 2188
     .return("unknown")
   __label_2: # endif
-# }
-.annotate 'line', 2122
+.annotate 'line', 2189
 
 .end # filename
 
 
 .sub 'linenum' :method
-# Body
-# {
-.annotate 'line', 2125
+.annotate 'line', 2192
     getattribute $P1, self, 'start'
     if_null $P1, __label_1
-.annotate 'line', 2126
+.annotate 'line', 2193
     getattribute $P2, self, 'start'
     .tailcall $P2.'linenum'()
     goto __label_2
   __label_1: # else
-.annotate 'line', 2128
+.annotate 'line', 2195
     .return(0)
   __label_2: # endif
-# }
-.annotate 'line', 2129
+.annotate 'line', 2196
 
 .end # linenum
 
 
 .sub 'viewable' :method
-# Body
-# {
-.annotate 'line', 2132
+.annotate 'line', 2199
     getattribute $P1, self, 'start'
     if_null $P1, __label_1
-.annotate 'line', 2133
+.annotate 'line', 2200
     getattribute $P2, self, 'start'
     .tailcall $P2.'viewable'()
     goto __label_2
   __label_1: # else
-.annotate 'line', 2135
+.annotate 'line', 2202
     .return("")
   __label_2: # endif
-# }
-.annotate 'line', 2136
+.annotate 'line', 2203
 
 .end # viewable
 
 
 .sub 'annotate' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2139
+.annotate 'line', 2206
     getattribute $P1, self, 'start'
     __ARG_1.'annotate'($P1)
-# }
-.annotate 'line', 2140
+.annotate 'line', 2207
 
 .end # annotate
 
 
 .sub 'getpath' :method
-# Body
-# {
-.annotate 'line', 2143
+.annotate 'line', 2210
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getpath'()
-# }
-.annotate 'line', 2144
+.annotate 'line', 2211
 
 .end # getpath
 
 
 .sub 'use_builtin' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2147
+.annotate 'line', 2214
     getattribute $P1, self, 'owner'
     $P1.'use_builtin'(__ARG_1)
-# }
-.annotate 'line', 2148
+.annotate 'line', 2215
 
 .end # use_builtin
 
 
 .sub 'generatesubid' :method
-# Body
-# {
-.annotate 'line', 2151
+.annotate 'line', 2218
     getattribute $P1, self, 'owner'
     .tailcall $P1.'generatesubid'()
-# }
-.annotate 'line', 2152
+.annotate 'line', 2219
 
 .end # generatesubid
 
 
 .sub 'usesubid' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2155
+.annotate 'line', 2222
     getattribute $P1, self, 'owner'
     $P1.'usesubid'(__ARG_1)
-# }
-.annotate 'line', 2156
+.annotate 'line', 2223
 
 .end # usesubid
 
 
 .sub 'addlocalfunction' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2159
+.annotate 'line', 2226
     getattribute $P1, self, 'owner'
     .tailcall $P1.'addlocalfunction'(__ARG_1)
-# }
-.annotate 'line', 2160
+.annotate 'line', 2227
 
 .end # addlocalfunction
 
@@ -5972,33 +4968,27 @@
 .sub 'scopesearch' :method
         .param pmc __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 2163
+.annotate 'line', 2230
     getattribute $P1, self, 'owner'
     .tailcall $P1.'scopesearch'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 2164
+.annotate 'line', 2231
 
 .end # scopesearch
 
 
 .sub 'dowarnings' :method
-# Body
-# {
-.annotate 'line', 2167
+.annotate 'line', 2234
     getattribute $P1, self, 'owner'
     .tailcall $P1.'dowarnings'()
-# }
-.annotate 'line', 2168
+.annotate 'line', 2235
 
 .end # dowarnings
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
-.annotate 'line', 2108
+.annotate 'line', 2175
     addattribute $P0, 'start'
-.annotate 'line', 2109
+.annotate 'line', 2176
     addattribute $P0, 'owner'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'CollectValues' ]
@@ -6006,77 +4996,63 @@
 .sub 'CollectValues' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2185
+.annotate 'line', 2252
     setattribute self, 'owner', __ARG_1
-.annotate 'line', 2186
+.annotate 'line', 2253
     setattribute self, 'e', __ARG_2
-# }
-.annotate 'line', 2187
+.annotate 'line', 2254
 
 .end # CollectValues
 
 
 .sub 'add' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2191
-# var e: $P1
+.annotate 'line', 2258
     getattribute $P1, self, 'e'
-.annotate 'line', 2192
-# valuereg: $S1
+.annotate 'line', 2259
     null $S1
-.annotate 'line', 2193
+.annotate 'line', 2260
     $P3 = __ARG_1.'isnull'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 2194
-# var pnull: $P2
+.annotate 'line', 2261
     getattribute $P2, self, 'pnull'
-.annotate 'line', 2195
+.annotate 'line', 2262
     unless_null $P2, __label_3
-# {
-.annotate 'line', 2196
-# regnull: $S2
+.annotate 'line', 2263
     getattribute $P4, self, 'owner'
     $P3 = $P4.'tempreg'('P')
     null $S2
     if_null $P3, __label_4
     set $S2, $P3
   __label_4:
-.annotate 'line', 2197
+.annotate 'line', 2264
     $P1.'emitnull'($S2)
-.annotate 'line', 2198
+.annotate 'line', 2265
     box $P2, $S2
     setattribute self, 'pnull', $P2
-# }
   __label_3: # endif
-.annotate 'line', 2200
+.annotate 'line', 2267
     set $S1, $P2
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 2203
+.annotate 'line', 2270
     $P3 = __ARG_1.'emit_get'($P1)
     set $S1, $P3
   __label_2: # endif
-.annotate 'line', 2204
+.annotate 'line', 2271
     .return($S1)
-# }
-.annotate 'line', 2205
+.annotate 'line', 2272
 
 .end # add
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
-.annotate 'line', 2180
+.annotate 'line', 2247
     addattribute $P0, 'owner'
-.annotate 'line', 2181
+.annotate 'line', 2248
     addattribute $P0, 'e'
-.annotate 'line', 2182
+.annotate 'line', 2249
     addattribute $P0, 'pnull'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
@@ -6085,70 +5061,53 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 2220
-    $P2 = WSubId_44(__ARG_1, __ARG_2, WSubId_45, __ARG_3)
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 2287
+    $P2 = WSubId_50(__ARG_1, __ARG_2, WSubId_51, __ARG_3)
     setattribute self, 'args', $P2
-# }
-.annotate 'line', 2221
+.annotate 'line', 2288
 
 .end # SimpleArgList
 
 
 .sub 'numargs' :method
-# Body
-# {
-.annotate 'line', 2225
+.annotate 'line', 2292
     getattribute $P1, self, 'args'
-# builtin elements
     elements $I1, $P1
     .return($I1)
-# }
-.annotate 'line', 2226
+.annotate 'line', 2293
 
 .end # numargs
 
 
 .sub 'getarg' :method
         .param int __ARG_1
-# Body
-# {
-.annotate 'line', 2229
-# var args: $P1
+.annotate 'line', 2296
     getattribute $P1, self, 'args'
-.annotate 'line', 2230
+.annotate 'line', 2297
     $P2 = $P1[__ARG_1]
     .return($P2)
-# }
-.annotate 'line', 2231
+.annotate 'line', 2298
 
 .end # getarg
 
 
 .sub 'optimizeargs' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 2235
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 2302
     getattribute $P1, self, 'args'
-    WSubId_46($P1)
-# }
-.annotate 'line', 2236
+    WSubId_52($P1)
+.annotate 'line', 2303
 
 .end # optimizeargs
 
 
 .sub 'getargvalues' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2239
-# var argreg: $P1
+.annotate 'line', 2306
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 2240
+.annotate 'line', 2307
     getattribute $P3, self, 'args'
     if_null $P3, __label_2
     iter $P4, $P3
@@ -6156,60 +5115,47 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P2, $P4
-.annotate 'line', 2241
+.annotate 'line', 2308
     $P5 = $P2.'emit_get'(__ARG_1)
-# builtin push
     push $P1, $P5
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 2242
+.annotate 'line', 2309
     .return($P1)
-# }
-.annotate 'line', 2243
+.annotate 'line', 2310
 
 .end # getargvalues
 
 
 .sub 'emitargs' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2246
+.annotate 'line', 2313
     $P1 = self.'getargvalues'(__ARG_1)
-# builtin join
     join $S1, ', ', $P1
     __ARG_1.'print'($S1)
-# }
-.annotate 'line', 2247
+.annotate 'line', 2314
 
 .end # emitargs
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
-.annotate 'line', 2216
+.annotate 'line', 2283
     addattribute $P0, 'args'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Modifier' ]
 
 .sub 'getname' :method
-# Body
-# {
-.annotate 'line', 2259
+.annotate 'line', 2326
     getattribute $P1, self, 'name'
     .return($P1)
-# }
 
 .end # getname
 
 
 .sub 'numargs' :method
-# Body
-# {
-.annotate 'line', 2262
-# var args: $P1
+.annotate 'line', 2329
     getattribute $P1, self, 'args'
-.annotate 'line', 2263
-# nargs: $I1
+.annotate 'line', 2330
     unless_null $P1, __label_2
     null $I1
     goto __label_1
@@ -6217,10 +5163,9 @@
     $P2 = $P1.'numargs'()
     set $I1, $P2
   __label_1:
-.annotate 'line', 2264
+.annotate 'line', 2331
     .return($I1)
-# }
-.annotate 'line', 2265
+.annotate 'line', 2332
 
 .end # numargs
 
@@ -6228,22 +5173,18 @@
 .sub 'getarg' :method
         .param int __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 2268
-# var args: $P1
+.annotate 'line', 2335
     getattribute $P1, self, 'args'
-.annotate 'line', 2269
+.annotate 'line', 2336
     $P2 = $P1.'numargs'()
     set $I1, $P2
     lt __ARG_1, $I1, __label_1
-.annotate 'line', 2270
+.annotate 'line', 2337
     WSubId_6('Wrong modifier arg number')
   __label_1: # endif
-.annotate 'line', 2271
+.annotate 'line', 2338
     .tailcall $P1.'getarg'(__ARG_1)
-# }
-.annotate 'line', 2272
+.annotate 'line', 2339
 
 .end # getarg
 
@@ -6251,88 +5192,76 @@
 .sub 'Modifier' :method
         .param string __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2275
+.annotate 'line', 2342
     box $P1, __ARG_1
     setattribute self, 'name', $P1
-.annotate 'line', 2276
+.annotate 'line', 2343
     if_null __ARG_2, __label_1
-.annotate 'line', 2277
+.annotate 'line', 2344
     setattribute self, 'args', __ARG_2
   __label_1: # endif
-# }
-.annotate 'line', 2278
+.annotate 'line', 2345
 
 .end # Modifier
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2281
+.annotate 'line', 2348
     getattribute $P1, self, 'args'
     if_null $P1, __label_1
-.annotate 'line', 2282
+.annotate 'line', 2349
     getattribute $P2, self, 'args'
     $P2.'optimizeargs'()
   __label_1: # endif
-.annotate 'line', 2283
+.annotate 'line', 2350
     .return(self)
-# }
-.annotate 'line', 2284
+.annotate 'line', 2351
 
 .end # optimize
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Modifier' ]
-.annotate 'line', 2256
+.annotate 'line', 2323
     addattribute $P0, 'name'
-.annotate 'line', 2257
+.annotate 'line', 2324
     addattribute $P0, 'args'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseModifier' :subid('WSubId_47')
+.sub 'parseModifier' :subid('WSubId_53')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2289
-# var t: $P1
+.annotate 'line', 2356
     $P1 = __ARG_1.'get'()
-.annotate 'line', 2290
-# name: $S1
+.annotate 'line', 2357
     $P3 = $P1.'getidentifier'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 2291
+.annotate 'line', 2358
     $P1 = __ARG_1.'get'()
-.annotate 'line', 2292
-# var args: $P2
+.annotate 'line', 2359
     null $P2
-.annotate 'line', 2293
+.annotate 'line', 2360
     $P3 = $P1.'isop'('(')
     if_null $P3, __label_2
     unless $P3 goto __label_2
-.annotate 'line', 2294
+.annotate 'line', 2361
     new $P4, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
     $P4.'SimpleArgList'(__ARG_1, __ARG_2, ')')
     set $P2, $P4
     goto __label_3
   __label_2: # else
-.annotate 'line', 2296
+.annotate 'line', 2363
     __ARG_1.'unget'($P1)
   __label_3: # endif
-.annotate 'line', 2297
+.annotate 'line', 2364
     new $P4, [ 'Winxed'; 'Compiler'; 'Modifier' ]
     $P4.'Modifier'($S1, $P2)
     set $P3, $P4
     .return($P3)
-# }
-.annotate 'line', 2298
+.annotate 'line', 2365
 
 .end # parseModifier
 
@@ -6341,48 +5270,37 @@
 .sub 'ModifierList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_47 = "WSubId_47"
-# Body
-# {
-.annotate 'line', 2307
-    $P2 = WSubId_44(__ARG_1, __ARG_2, WSubId_47, ']')
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_53 = "WSubId_53"
+.annotate 'line', 2374
+    $P2 = WSubId_50(__ARG_1, __ARG_2, WSubId_53, ']')
     setattribute self, 'list', $P2
-# }
-.annotate 'line', 2308
+.annotate 'line', 2375
 
 .end # ModifierList
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 2311
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 2378
     getattribute $P1, self, 'list'
-    WSubId_46($P1)
-# }
-.annotate 'line', 2312
+    WSubId_52($P1)
+.annotate 'line', 2379
 
 .end # optimize
 
 
 .sub 'getlist' :method
-# Body
-# {
-.annotate 'line', 2313
+.annotate 'line', 2380
     getattribute $P1, self, 'list'
     .return($P1)
-# }
 
 .end # getlist
 
 
 .sub 'pick' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2316
+.annotate 'line', 2383
     getattribute $P2, self, 'list'
     if_null $P2, __label_2
     iter $P3, $P2
@@ -6390,469 +5308,413 @@
   __label_1: # for iteration
     unless $P3 goto __label_2
     shift $P1, $P3
-# {
-.annotate 'line', 2317
+.annotate 'line', 2384
     $P4 = $P1.'getname'()
     set $S1, $P4
     ne $S1, __ARG_1, __label_3
-.annotate 'line', 2318
+.annotate 'line', 2385
     .return($P1)
   __label_3: # endif
-# }
     goto __label_1
   __label_2: # endfor
     null $P2
-.annotate 'line', 2320
+.annotate 'line', 2387
     .return($P2)
-# }
-.annotate 'line', 2321
+.annotate 'line', 2388
 
 .end # pick
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
-.annotate 'line', 2303
+.annotate 'line', 2370
     addattribute $P0, 'list'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'getparrotkey' :subid('WSubId_26')
+.sub 'getparrotkey' :subid('WSubId_30')
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2330
-# r: $S1
+.annotate 'line', 2397
     null $S1
-.annotate 'line', 2331
-# builtin elements
+.annotate 'line', 2398
     elements $I1, __ARG_1
     unless $I1 goto __label_1
-.annotate 'line', 2332
-# builtin string
-# builtin join
+.annotate 'line', 2399
     join $S2, "'; '", __ARG_1
     concat $S3, "[ '", $S2
     concat $S3, $S3, "' ]"
     set $S1, $S3
   __label_1: # endif
-.annotate 'line', 2333
+.annotate 'line', 2400
     .return($S1)
-# }
-.annotate 'line', 2334
+.annotate 'line', 2401
 
 .end # getparrotkey
 
 
-.sub 'parseUsing' :subid('WSubId_51')
+.sub 'parseUsing' :subid('WSubId_57')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 2338
-# var taux: $P1
+.annotate 'line', 2405
     $P1 = __ARG_2.'get'()
-# switch-case
-.annotate 'line', 2340
+.annotate 'line', 2407
     $I1 = $P1.'iskeyword'('extern')
     if $I1 goto __label_3
-.annotate 'line', 2342
+.annotate 'line', 2409
     $I1 = $P1.'iskeyword'('static')
     if $I1 goto __label_4
-.annotate 'line', 2344
+.annotate 'line', 2411
     $I1 = $P1.'iskeyword'('namespace')
     if $I1 goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 2341
+.annotate 'line', 2408
     new $P3, [ 'Winxed'; 'Compiler'; 'ExternStatement' ]
     $P3.'ExternStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P2, $P3
     .return($P2)
   __label_4: # case
-.annotate 'line', 2343
+.annotate 'line', 2410
     new $P5, [ 'Winxed'; 'Compiler'; 'StaticStatement' ]
     $P5.'StaticStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P4, $P5
     .return($P4)
   __label_5: # case
-.annotate 'line', 2345
+.annotate 'line', 2412
     new $P7, [ 'Winxed'; 'Compiler'; 'UsingNamespaceStatement' ]
     $P7.'UsingNamespaceStatement'($P1, __ARG_2, __ARG_3)
     set $P6, $P7
     .return($P6)
   __label_2: # default
-.annotate 'line', 2347
+.annotate 'line', 2414
     __ARG_2.'unget'($P1)
-.annotate 'line', 2348
+.annotate 'line', 2415
     new $P9, [ 'Winxed'; 'Compiler'; 'UsingStatement' ]
     $P9.'UsingStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P8, $P9
     .return($P8)
   __label_1: # switch end
-# }
-.annotate 'line', 2350
+.annotate 'line', 2417
 
 .end # parseUsing
 
 
-.sub 'parseSig' :subid('WSubId_50')
+.sub 'parseSig' :subid('WSubId_56')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 2354
-# var params: $P1
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 2421
     new $P1, [ 'Winxed'; 'Compiler'; 'SigParameterList' ]
     $P1.'SigParameterList'(__ARG_2, __ARG_3)
-.annotate 'line', 2355
-# var t: $P2
+.annotate 'line', 2422
     $P2 = __ARG_2.'get'()
-.annotate 'line', 2356
+.annotate 'line', 2423
     $P4 = $P2.'isop'('=')
     isfalse $I1, $P4
     unless $I1 goto __label_1
-.annotate 'line', 2357
-    WSubId_48("'='", $P2)
+.annotate 'line', 2424
+    WSubId_54("'='", $P2)
   __label_1: # endif
-.annotate 'line', 2358
-# var expr: $P3
-    $P3 = WSubId_45(__ARG_2, __ARG_3)
-.annotate 'line', 2359
+.annotate 'line', 2425
+    $P3 = WSubId_51(__ARG_2, __ARG_3)
+.annotate 'line', 2426
     new $P5, [ 'Winxed'; 'Compiler'; 'MultiAssignStatement' ]
     $P5.'MultiAssignStatement'(__ARG_1, __ARG_3, $P1, $P3)
     set $P4, $P5
     .return($P4)
-# }
-.annotate 'line', 2360
+.annotate 'line', 2427
 
 .end # parseSig
 
 
-.sub 'parseClassSpecifier' :subid('WSubId_70')
+.sub 'parseClassSpecifier' :subid('WSubId_76')
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2364
-# var t: $P1
+.annotate 'line', 2431
     $P1 = __ARG_1.'get'()
-.annotate 'line', 2365
+.annotate 'line', 2432
     $P2 = $P1.'isstring'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 2366
+.annotate 'line', 2433
     new $P4, [ 'Winxed'; 'Compiler'; 'ClassSpecifierStr' ]
     $P4.'ClassSpecifierStr'(__ARG_2, $P1)
     set $P3, $P4
     .return($P3)
   __label_1: # endif
-.annotate 'line', 2367
+.annotate 'line', 2434
     $P2 = $P1.'isop'('[')
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 2368
+.annotate 'line', 2435
     new $P4, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
     $P4.'ClassSpecifierParrotKey'(__ARG_1, __ARG_2, $P1)
     set $P3, $P4
     .return($P3)
   __label_2: # endif
-.annotate 'line', 2369
+.annotate 'line', 2436
     $P2 = $P1.'isidentifier'()
     if_null $P2, __label_3
     unless $P2 goto __label_3
-.annotate 'line', 2370
+.annotate 'line', 2437
     new $P4, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
     $P4.'ClassSpecifierId'(__ARG_1, __ARG_2, $P1)
     set $P3, $P4
     .return($P3)
   __label_3: # endif
-.annotate 'line', 2371
+.annotate 'line', 2438
     WSubId_1('Invalid class', $P1)
-# }
-.annotate 'line', 2372
+.annotate 'line', 2439
 
 .end # parseClassSpecifier
 
 
-.sub 'parseStatement' :subid('WSubId_103')
+.sub 'parseStatement' :subid('WSubId_109')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_49 = "WSubId_49"
-.const 'Sub' WSubId_50 = "WSubId_50"
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_52 = "WSubId_52"
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_54 = "WSubId_54"
 .const 'Sub' WSubId_55 = "WSubId_55"
 .const 'Sub' WSubId_56 = "WSubId_56"
 .const 'Sub' WSubId_57 = "WSubId_57"
 .const 'Sub' WSubId_58 = "WSubId_58"
 .const 'Sub' WSubId_59 = "WSubId_59"
-# Body
-# {
-.annotate 'line', 2376
-# var t: $P1
+.const 'Sub' WSubId_60 = "WSubId_60"
+.const 'Sub' WSubId_61 = "WSubId_61"
+.const 'Sub' WSubId_62 = "WSubId_62"
+.const 'Sub' WSubId_63 = "WSubId_63"
+.const 'Sub' WSubId_64 = "WSubId_64"
+.const 'Sub' WSubId_65 = "WSubId_65"
+.annotate 'line', 2443
     $P1 = __ARG_1.'get'()
-.annotate 'line', 2377
-# var t2: $P2
+.annotate 'line', 2444
     null $P2
-.annotate 'line', 2378
+.annotate 'line', 2445
     $P5 = $P1.'isop'(';')
     if_null $P5, __label_1
     unless $P5 goto __label_1
-.annotate 'line', 2379
+.annotate 'line', 2446
     new $P6, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
     .return($P6)
   __label_1: # endif
-.annotate 'line', 2380
+.annotate 'line', 2447
     $P5 = $P1.'isop'('{')
     if_null $P5, __label_2
     unless $P5 goto __label_2
-.annotate 'line', 2381
+.annotate 'line', 2448
     new $P7, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     $P7.'CompoundStatement'($P1, __ARG_1, __ARG_2)
     set $P6, $P7
     .return($P6)
   __label_2: # endif
-.annotate 'line', 2382
+.annotate 'line', 2449
     $P5 = $P1.'isop'('${')
     if_null $P5, __label_3
     unless $P5 goto __label_3
-.annotate 'line', 2383
+.annotate 'line', 2450
     new $P7, [ 'Winxed'; 'Compiler'; 'PiropStatement' ]
     $P7.'PiropStatement'($P1, __ARG_1, __ARG_2)
     set $P6, $P7
     .return($P6)
   __label_3: # endif
-.annotate 'line', 2384
+.annotate 'line', 2451
     $P5 = $P1.'isop'(':')
     if_null $P5, __label_4
     unless $P5 goto __label_4
-# {
-.annotate 'line', 2385
-# var open: $P3
+.annotate 'line', 2452
     $P3 = __ARG_1.'get'()
-.annotate 'line', 2386
+.annotate 'line', 2453
     $P5 = $P3.'isop'('(')
     isfalse $I1, $P5
     unless $I1 goto __label_5
-.annotate 'line', 2387
-    WSubId_49("':'", $P1)
+.annotate 'line', 2454
+    WSubId_55("':'", $P1)
   __label_5: # endif
-.annotate 'line', 2388
-    .tailcall WSubId_50($P1, __ARG_1, __ARG_2)
-# }
+.annotate 'line', 2455
+    .tailcall WSubId_56($P1, __ARG_1, __ARG_2)
   __label_4: # endif
-# switch
-.annotate 'line', 2391
+.annotate 'line', 2458
     $P5 = $P1.'checkkeyword'()
     set $S1, $P5
-    set $S2, 'using'
-    if $S1 == $S2 goto __label_8
-    set $S2, 'const'
-    if $S1 == $S2 goto __label_9
-    set $S2, 'volatile'
-    if $S1 == $S2 goto __label_10
-    set $S2, 'var'
-    if $S1 == $S2 goto __label_11
-    set $S2, 'string'
-    if $S1 == $S2 goto __label_12
-    set $S2, 'int'
-    if $S1 == $S2 goto __label_13
-    set $S2, 'float'
-    if $S1 == $S2 goto __label_14
-    set $S2, 'return'
-    if $S1 == $S2 goto __label_15
-    set $S2, 'yield'
-    if $S1 == $S2 goto __label_16
-    set $S2, 'goto'
-    if $S1 == $S2 goto __label_17
-    set $S2, 'if'
-    if $S1 == $S2 goto __label_18
-    set $S2, 'while'
-    if $S1 == $S2 goto __label_19
-    set $S2, 'do'
-    if $S1 == $S2 goto __label_20
-    set $S2, 'continue'
-    if $S1 == $S2 goto __label_21
-    set $S2, 'break'
-    if $S1 == $S2 goto __label_22
-    set $S2, 'switch'
-    if $S1 == $S2 goto __label_23
-    set $S2, 'for'
-    if $S1 == $S2 goto __label_24
-    set $S2, 'throw'
-    if $S1 == $S2 goto __label_25
-    set $S2, 'try'
-    if $S1 == $S2 goto __label_26
+    if $S1 == 'using' goto __label_8
+    if $S1 == 'const' goto __label_9
+    if $S1 == 'volatile' goto __label_10
+    if $S1 == 'var' goto __label_11
+    if $S1 == 'string' goto __label_12
+    if $S1 == 'int' goto __label_13
+    if $S1 == 'float' goto __label_14
+    if $S1 == 'return' goto __label_15
+    if $S1 == 'yield' goto __label_16
+    if $S1 == 'goto' goto __label_17
+    if $S1 == 'if' goto __label_18
+    if $S1 == 'while' goto __label_19
+    if $S1 == 'do' goto __label_20
+    if $S1 == 'continue' goto __label_21
+    if $S1 == 'break' goto __label_22
+    if $S1 == 'switch' goto __label_23
+    if $S1 == 'for' goto __label_24
+    if $S1 == 'throw' goto __label_25
+    if $S1 == 'try' goto __label_26
     goto __label_7
   __label_8: # case
-.annotate 'line', 2393
-    .tailcall WSubId_51($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2460
+    .tailcall WSubId_57($P1, __ARG_1, __ARG_2)
   __label_9: # case
-.annotate 'line', 2395
-    .tailcall WSubId_52($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2462
+    .tailcall WSubId_58($P1, __ARG_1, __ARG_2)
     goto __label_6 # break
   __label_10: # case
-.annotate 'line', 2398
-    .tailcall WSubId_53($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2465
+    .tailcall WSubId_59($P1, __ARG_1, __ARG_2)
     goto __label_6 # break
   __label_11: # case
-.annotate 'line', 2401
+.annotate 'line', 2468
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2402
+.annotate 'line', 2469
     __ARG_1.'unget'($P2)
-.annotate 'line', 2403
+.annotate 'line', 2470
     $P6 = $P2.'isop'("(")
     isfalse $I1, $P6
     unless $I1 goto __label_27
-.annotate 'line', 2404
-    .tailcall WSubId_54($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2471
+    .tailcall WSubId_60($P1, __ARG_1, __ARG_2)
   __label_27: # endif
     goto __label_6 # break
   __label_12: # case
-.annotate 'line', 2407
+.annotate 'line', 2474
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2408
+.annotate 'line', 2475
     __ARG_1.'unget'($P2)
-.annotate 'line', 2409
+.annotate 'line', 2476
     $P7 = $P2.'isop'("(")
     isfalse $I2, $P7
     unless $I2 goto __label_28
-.annotate 'line', 2410
-    .tailcall WSubId_55($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2477
+    .tailcall WSubId_61($P1, __ARG_1, __ARG_2)
   __label_28: # endif
     goto __label_6 # break
   __label_13: # case
-.annotate 'line', 2413
+.annotate 'line', 2480
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2414
+.annotate 'line', 2481
     __ARG_1.'unget'($P2)
-.annotate 'line', 2415
+.annotate 'line', 2482
     $P8 = $P2.'isop'("(")
     isfalse $I3, $P8
     unless $I3 goto __label_29
-.annotate 'line', 2416
-    .tailcall WSubId_56($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2483
+    .tailcall WSubId_62($P1, __ARG_1, __ARG_2)
   __label_29: # endif
     goto __label_6 # break
   __label_14: # case
-.annotate 'line', 2419
+.annotate 'line', 2486
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2420
+.annotate 'line', 2487
     __ARG_1.'unget'($P2)
-.annotate 'line', 2421
+.annotate 'line', 2488
     $P9 = $P2.'isop'("(")
     isfalse $I4, $P9
     unless $I4 goto __label_30
-.annotate 'line', 2422
-    .tailcall WSubId_57($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2489
+    .tailcall WSubId_63($P1, __ARG_1, __ARG_2)
   __label_30: # endif
     goto __label_6 # break
   __label_15: # case
-.annotate 'line', 2425
+.annotate 'line', 2492
     new $P11, [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
     $P11.'ReturnStatement'($P1, __ARG_1, __ARG_2)
     set $P10, $P11
     .return($P10)
   __label_16: # case
-.annotate 'line', 2427
+.annotate 'line', 2494
     new $P13, [ 'Winxed'; 'Compiler'; 'YieldStatement' ]
     $P13.'YieldStatement'($P1, __ARG_1, __ARG_2)
     set $P12, $P13
     .return($P12)
   __label_17: # case
-.annotate 'line', 2429
+.annotate 'line', 2496
     new $P15, [ 'Winxed'; 'Compiler'; 'GotoStatement' ]
     $P15.'GotoStatement'($P1, __ARG_1, __ARG_2)
     set $P14, $P15
     .return($P14)
   __label_18: # case
-.annotate 'line', 2431
+.annotate 'line', 2498
     new $P17, [ 'Winxed'; 'Compiler'; 'IfStatement' ]
     $P17.'IfStatement'($P1, __ARG_1, __ARG_2)
     set $P16, $P17
     .return($P16)
   __label_19: # case
-.annotate 'line', 2433
+.annotate 'line', 2500
     new $P19, [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
     $P19.'WhileStatement'($P1, __ARG_1, __ARG_2)
     set $P18, $P19
     .return($P18)
   __label_20: # case
-.annotate 'line', 2435
+.annotate 'line', 2502
     new $P21, [ 'Winxed'; 'Compiler'; 'DoStatement' ]
     $P21.'DoStatement'($P1, __ARG_1, __ARG_2)
     set $P20, $P21
     .return($P20)
   __label_21: # case
-.annotate 'line', 2437
+.annotate 'line', 2504
     new $P23, [ 'Winxed'; 'Compiler'; 'ContinueStatement' ]
     $P23.'ContinueStatement'($P1, __ARG_1, __ARG_2)
     set $P22, $P23
     .return($P22)
   __label_22: # case
-.annotate 'line', 2439
+.annotate 'line', 2506
     new $P25, [ 'Winxed'; 'Compiler'; 'BreakStatement' ]
     $P25.'BreakStatement'($P1, __ARG_1, __ARG_2)
     set $P24, $P25
     .return($P24)
   __label_23: # case
-.annotate 'line', 2441
-    .tailcall WSubId_58($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2508
+    .tailcall WSubId_64($P1, __ARG_1, __ARG_2)
   __label_24: # case
-.annotate 'line', 2443
-    .tailcall WSubId_59($P1, __ARG_1, __ARG_2)
+.annotate 'line', 2510
+    .tailcall WSubId_65($P1, __ARG_1, __ARG_2)
   __label_25: # case
-.annotate 'line', 2445
+.annotate 'line', 2512
     new $P27, [ 'Winxed'; 'Compiler'; 'ThrowStatement' ]
     $P27.'ThrowStatement'($P1, __ARG_1, __ARG_2)
     set $P26, $P27
     .return($P26)
   __label_26: # case
-.annotate 'line', 2447
+.annotate 'line', 2514
     new $P29, [ 'Winxed'; 'Compiler'; 'TryStatement' ]
     $P29.'TryStatement'($P1, __ARG_1, __ARG_2)
     set $P28, $P29
     .return($P28)
   __label_7: # default
   __label_6: # switch end
-.annotate 'line', 2450
+.annotate 'line', 2517
     $P5 = $P1.'isidentifier'()
     if_null $P5, __label_31
     unless $P5 goto __label_31
-# {
-.annotate 'line', 2451
-# var t2: $P4
+.annotate 'line', 2518
     $P4 = __ARG_1.'get'()
-.annotate 'line', 2452
+.annotate 'line', 2519
     $P5 = $P4.'isop'(':')
     if_null $P5, __label_32
     unless $P5 goto __label_32
-.annotate 'line', 2453
+.annotate 'line', 2520
     new $P7, [ 'Winxed'; 'Compiler'; 'LabelStatement' ]
     $P7.'LabelStatement'($P1, __ARG_2)
     set $P6, $P7
     .return($P6)
   __label_32: # endif
-.annotate 'line', 2454
+.annotate 'line', 2521
     __ARG_1.'unget'($P4)
-# }
   __label_31: # endif
-.annotate 'line', 2456
+.annotate 'line', 2523
     __ARG_1.'unget'($P1)
-.annotate 'line', 2457
+.annotate 'line', 2524
     new $P6, [ 'Winxed'; 'Compiler'; 'ExprStatement' ]
     $P6.'ExprStatement'($P1, __ARG_1, __ARG_2)
     set $P5, $P6
     .return($P5)
-# }
-.annotate 'line', 2458
+.annotate 'line', 2525
 
 .end # parseStatement
 
@@ -6861,110 +5723,83 @@
 .sub 'Statement' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2468
+.annotate 'line', 2535
     self.'initbase'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 2469
+.annotate 'line', 2536
 
 .end # Statement
 
 
 .sub 'isempty' :method
-# Body
-# {
-.annotate 'line', 2470
+.annotate 'line', 2537
     .return(0)
-# }
 
 .end # isempty
 
 
 .sub 'allowtailcall' :method
-# Body
-# {
-.annotate 'line', 2473
+.annotate 'line', 2540
     getattribute $P1, self, 'owner'
     .tailcall $P1.'allowtailcall'()
-# }
-.annotate 'line', 2474
+.annotate 'line', 2541
 
 .end # allowtailcall
 
 
 .sub 'createreg' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2477
+.annotate 'line', 2544
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createreg'(__ARG_1)
-# }
-.annotate 'line', 2478
+.annotate 'line', 2545
 
 .end # createreg
 
 
 .sub 'tempreg' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2481
+.annotate 'line', 2548
     getattribute $P1, self, 'owner'
     .tailcall $P1.'tempreg'(__ARG_1)
-# }
-.annotate 'line', 2482
+.annotate 'line', 2549
 
 .end # tempreg
 
 
 .sub 'freetemps' :method
-# Body
-# {
-.annotate 'line', 2485
+.annotate 'line', 2552
     getattribute $P1, self, 'owner'
     $P1.'freetemps'()
-# }
-.annotate 'line', 2486
+.annotate 'line', 2553
 
 .end # freetemps
 
 
 .sub 'genlabel' :method
-# Body
-# {
-.annotate 'line', 2489
+.annotate 'line', 2556
     getattribute $P1, self, 'owner'
     .tailcall $P1.'genlabel'()
-# }
-.annotate 'line', 2490
+.annotate 'line', 2557
 
 .end # genlabel
 
 
 .sub 'getlabel' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2493
+.annotate 'line', 2560
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getlabel'(__ARG_1)
-# }
-.annotate 'line', 2494
+.annotate 'line', 2561
 
 .end # getlabel
 
 
 .sub 'createlabel' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2497
+.annotate 'line', 2564
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createlabel'(__ARG_1)
-# }
-.annotate 'line', 2498
+.annotate 'line', 2565
 
 .end # createlabel
 
@@ -6973,13 +5808,10 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 2501
+.annotate 'line', 2568
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createconst'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 2502
+.annotate 'line', 2569
 
 .end # createconst
 
@@ -6988,13 +5820,10 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 2505
+.annotate 'line', 2572
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createvar'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 2506
+.annotate 'line', 2573
 
 .end # createvar
 
@@ -7002,13 +5831,10 @@
 .sub 'createvarused' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2509
+.annotate 'line', 2576
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createvarused'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 2510
+.annotate 'line', 2577
 
 .end # createvarused
 
@@ -7017,122 +5843,95 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 2513
+.annotate 'line', 2580
     getattribute $P1, self, 'owner'
     .tailcall $P1.'createvarnamed'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 2514
+.annotate 'line', 2581
 
 .end # createvarnamed
 
 
 .sub 'getvar' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2517
+.annotate 'line', 2584
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getvar'(__ARG_1)
-# }
-.annotate 'line', 2518
+.annotate 'line', 2585
 
 .end # getvar
 
 
 .sub 'checkclass' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2521
+.annotate 'line', 2588
     getattribute $P1, self, 'owner'
     .tailcall $P1.'checkclass'(__ARG_1)
-# }
-.annotate 'line', 2522
+.annotate 'line', 2589
 
 .end # checkclass
 
 
 .sub 'usenamespace' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2525
+.annotate 'line', 2592
     getattribute $P1, self, 'owner'
     $P1.'usenamespace'(__ARG_1)
-# }
-.annotate 'line', 2526
+.annotate 'line', 2593
 
 .end # usenamespace
 
 
 .sub 'getouter' :method
-# Body
-# {
-.annotate 'line', 2533
+.annotate 'line', 2600
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getouter'()
-# }
-.annotate 'line', 2534
+.annotate 'line', 2601
 
 .end # getouter
 
 
 .sub 'getcontinuelabel' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2537
+.annotate 'line', 2604
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getcontinuelabel'(__ARG_1)
-# }
-.annotate 'line', 2538
+.annotate 'line', 2605
 
 .end # getcontinuelabel
 
 
 .sub 'getbreaklabel' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2541
+.annotate 'line', 2608
     getattribute $P1, self, 'owner'
     .tailcall $P1.'getbreaklabel'(__ARG_1)
-# }
-.annotate 'line', 2542
+.annotate 'line', 2609
 
 .end # getbreaklabel
 
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 2545
+.annotate 'line', 2612
     getattribute $P1, self, 'start'
     WSubId_6('**checking**', $P1)
-.annotate 'line', 2547
+.annotate 'line', 2614
     .return(self)
-# }
-.annotate 'line', 2548
+.annotate 'line', 2615
 
 .end # optimize
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Statement' ]
-.annotate 'line', 2464
+.annotate 'line', 2531
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
 
 .sub 'isempty' :method
-# Body
-# {
-.annotate 'line', 2553
+.annotate 'line', 2620
     .return(1)
-# }
 
 .end # isempty
 
@@ -7140,101 +5939,79 @@
 .sub 'annotate' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 2556
+.annotate 'line', 2623
     WSubId_6('Attempt to annotate empty statement')
-# }
-.annotate 'line', 2557
+.annotate 'line', 2624
 
 .end # annotate
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2558
+.annotate 'line', 2625
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Empty body
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-.annotate 'line', 2551
+.annotate 'line', 2618
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2571
-# var statements: $P1
+.annotate 'line', 2638
     getattribute $P1, self, 'statements'
-.annotate 'line', 2572
-# n: $I1
-# builtin elements
+.annotate 'line', 2639
     elements $I1, $P1
-.annotate 'line', 2573
-# empty: $I2
+.annotate 'line', 2640
     set $I2, 1
-# for loop
-.annotate 'line', 2574
-# i: $I3
+.annotate 'line', 2641
     null $I3
   __label_3: # for condition
     ge $I3, $I1, __label_2
-# {
-.annotate 'line', 2575
-# var st: $P2
+.annotate 'line', 2642
     $P3 = $P1[$I3]
     $P2 = $P3.'optimize'()
-.annotate 'line', 2576
-    unless $I2 goto __label_5
-    $P3 = $P2.'isempty'()
-    isfalse $I5, $P3
-    set $I4, $I5
-    goto __label_6
-  __label_5:
+.annotate 'line', 2643
     set $I4, $I2
-  __label_6:
+    unless $I4 goto __label_5
+    $P3 = $P2.'isempty'()
+    isfalse $I4, $P3
+  __label_5:
     unless $I4 goto __label_4
-.annotate 'line', 2577
+.annotate 'line', 2644
     null $I2
   __label_4: # endif
-.annotate 'line', 2578
+.annotate 'line', 2645
     $P1[$I3] = $P2
-# }
   __label_1: # for iteration
-.annotate 'line', 2574
+.annotate 'line', 2641
     inc $I3
     goto __label_3
   __label_2: # for end
-.annotate 'line', 2580
-    unless $I2 goto __label_8
+.annotate 'line', 2647
+    unless $I2 goto __label_7
     new $P3, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-    goto __label_7
-  __label_8:
-    set $P3, self
+    goto __label_6
   __label_7:
+    set $P3, self
+  __label_6:
     .return($P3)
-# }
-.annotate 'line', 2581
+.annotate 'line', 2648
 
 .end # optimize
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
-.annotate 'line', 2567
+.annotate 'line', 2634
     addattribute $P0, 'statements'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
@@ -7242,145 +6019,117 @@
 .sub 'MultiStatement' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 2588
-# var statements: $P1
+.annotate 'line', 2655
     root_new $P1, ['parrot';'ResizablePMCArray']
     assign $P1, 2
     $P1[0] = __ARG_1
     $P1[1] = __ARG_2
-.annotate 'line', 2589
+.annotate 'line', 2656
     setattribute self, 'statements', $P1
-# }
-.annotate 'line', 2590
+.annotate 'line', 2657
 
 .end # MultiStatement
 
 
 .sub 'isempty' :method
-# Body
-# {
-.annotate 'line', 2591
+.annotate 'line', 2658
     .return(0)
-# }
 
 .end # isempty
 
 
 .sub 'push' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2594
+.annotate 'line', 2661
     getattribute $P1, self, 'statements'
-# builtin push
     push $P1, __ARG_1
-.annotate 'line', 2595
+.annotate 'line', 2662
     .return(self)
-# }
-.annotate 'line', 2596
+.annotate 'line', 2663
 
 .end # push
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 2599
+.const 'Sub' WSubId_66 = "WSubId_66"
+.annotate 'line', 2666
     getattribute $P1, self, 'statements'
-    WSubId_60(__ARG_1, $P1)
-# }
-.annotate 'line', 2600
+    WSubId_66(__ARG_1, $P1)
+.annotate 'line', 2667
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
-.annotate 'line', 2584
+.annotate 'line', 2651
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'addtomulti' :subid('WSubId_107')
+.sub 'addtomulti' :subid('WSubId_114')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-# switch-case
-.annotate 'line', 2606
+.annotate 'line', 2673
     isnull $I1, __ARG_1
     if $I1 goto __label_3
-.annotate 'line', 2608
+.annotate 'line', 2675
     isa $I1, __ARG_1, [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
     if $I1 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 2607
+.annotate 'line', 2674
     .return(__ARG_2)
   __label_4: # case
-.annotate 'line', 2609
+.annotate 'line', 2676
     .tailcall __ARG_1.'push'(__ARG_2)
   __label_2: # default
-.annotate 'line', 2611
+.annotate 'line', 2678
     new $P2, [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
     $P2.'MultiStatement'(__ARG_1, __ARG_2)
     set $P1, $P2
     .return($P1)
   __label_1: # switch end
-# }
-.annotate 'line', 2613
+.annotate 'line', 2680
 
 .end # addtomulti
 
 
-.sub 'parsePiropArg' :subid('WSubId_61')
+.sub 'parsePiropArg' :subid('WSubId_67')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 2621
-# var arg: $P1
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 2688
     null $P1
-.annotate 'line', 2622
-# var t: $P2
+.annotate 'line', 2689
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2623
+.annotate 'line', 2690
     $P3 = $P2.'isop'(':')
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 2624
+.annotate 'line', 2691
     $P2 = __ARG_1.'get'()
-.annotate 'line', 2625
-# label: $S1
+.annotate 'line', 2692
     $P3 = $P2.'getidentifier'()
     null $S1
     if_null $P3, __label_3
     set $S1, $P3
   __label_3:
-.annotate 'line', 2626
+.annotate 'line', 2693
     new $P3, [ 'Winxed'; 'Compiler'; 'Reflabel' ]
     $P3.'Reflabel'(__ARG_2, $S1)
     set $P1, $P3
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 2629
+.annotate 'line', 2696
     __ARG_1.'unget'($P2)
-.annotate 'line', 2630
-    $P1 = WSubId_45(__ARG_1, __ARG_2)
-# }
+.annotate 'line', 2697
+    $P1 = WSubId_51(__ARG_1, __ARG_2)
   __label_2: # endif
-.annotate 'line', 2632
+.annotate 'line', 2699
     .return($P1)
-# }
-.annotate 'line', 2633
+.annotate 'line', 2700
 
 .end # parsePiropArg
 
@@ -7390,33 +6139,28 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_61 = "WSubId_61"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 2642
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_67 = "WSubId_67"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 2709
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 2643
-# var t: $P1
+.annotate 'line', 2710
     $P1 = __ARG_2.'get'()
-.annotate 'line', 2644
-# dotted: $I1
+.annotate 'line', 2711
     $P2 = $P1.'isop'('.')
     set $I1, $P2
-.annotate 'line', 2645
+.annotate 'line', 2712
     unless $I1 goto __label_1
-.annotate 'line', 2646
+.annotate 'line', 2713
     $P1 = __ARG_2.'get'()
   __label_1: # endif
-.annotate 'line', 2647
-# opname: $S1
+.annotate 'line', 2714
     $P2 = $P1.'getidentifier'()
     null $S1
     if_null $P2, __label_2
     set $S1, $P2
   __label_2:
-.annotate 'line', 2648
+.annotate 'line', 2715
     unless $I1 goto __label_4
     set $S2, '.'
     goto __label_3
@@ -7426,106 +6170,95 @@
     concat $S3, $S2, $S1
     box $P2, $S3
     setattribute self, 'opname', $P2
-.annotate 'line', 2649
+.annotate 'line', 2716
     $P1 = __ARG_2.'get'()
-.annotate 'line', 2650
+.annotate 'line', 2717
     $P2 = $P1.'isop'('}')
     isfalse $I2, $P2
     unless $I2 goto __label_5
-# {
-.annotate 'line', 2651
+.annotate 'line', 2718
     __ARG_2.'unget'($P1)
-.annotate 'line', 2652
-    $P3 = WSubId_44(__ARG_2, __ARG_3, WSubId_61, '}')
+.annotate 'line', 2719
+    $P3 = WSubId_50(__ARG_2, __ARG_3, WSubId_67, '}')
     setattribute self, 'args', $P3
-# }
   __label_5: # endif
-.annotate 'line', 2654
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 2655
+.annotate 'line', 2721
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 2722
 
 .end # PiropStatement
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 2658
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 2725
     getattribute $P1, self, 'args'
-    WSubId_46($P1)
-.annotate 'line', 2659
+    WSubId_52($P1)
+.annotate 'line', 2726
     .return(self)
-# }
-.annotate 'line', 2660
+.annotate 'line', 2727
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2663
-# opname: $S1
+.annotate 'line', 2730
     getattribute $P4, self, 'opname'
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 2664
+.annotate 'line', 2731
     self.'annotate'(__ARG_1)
-.annotate 'line', 2665
+.annotate 'line', 2732
+    $P4 = __ARG_1.'getDebug'()
+    if_null $P4, __label_2
+    unless $P4 goto __label_2
+.annotate 'line', 2733
     concat $S2, 'pirop ', $S1
     __ARG_1.'comment'($S2)
-.annotate 'line', 2666
-# var args: $P1
+  __label_2: # endif
+.annotate 'line', 2734
     getattribute $P1, self, 'args'
-.annotate 'line', 2667
+.annotate 'line', 2735
     __ARG_1.'print'('    ')
-.annotate 'line', 2668
-    unless_null $P1, __label_2
-.annotate 'line', 2669
+.annotate 'line', 2736
+    unless_null $P1, __label_3
+.annotate 'line', 2737
     __ARG_1.'say'($S1)
-    goto __label_3
-  __label_2: # else
-# {
-.annotate 'line', 2671
-# var argreg: $P2
+    goto __label_4
+  __label_3: # else
+.annotate 'line', 2739
     root_new $P2, ['parrot';'ResizablePMCArray']
-.annotate 'line', 2672
-    if_null $P1, __label_5
+.annotate 'line', 2740
+    if_null $P1, __label_6
     iter $P5, $P1
     set $P5, 0
-  __label_4: # for iteration
-    unless $P5 goto __label_5
+  __label_5: # for iteration
+    unless $P5 goto __label_6
     shift $P3, $P5
-.annotate 'line', 2673
+.annotate 'line', 2741
     $P4 = $P3.'emit_get'(__ARG_1)
-# builtin push
     push $P2, $P4
-    goto __label_4
-  __label_5: # endfor
-.annotate 'line', 2674
-# builtin join
+    goto __label_5
+  __label_6: # endfor
+.annotate 'line', 2742
     join $S2, ', ', $P2
     __ARG_1.'say'($S1, ' ', $S2)
-# }
-  __label_3: # endif
-# }
-.annotate 'line', 2676
+  __label_4: # endif
+.annotate 'line', 2744
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'PiropStatement' ]
-.annotate 'line', 2635
+.annotate 'line', 2702
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 2637
+.annotate 'line', 2704
     addattribute $P0, 'opname'
-.annotate 'line', 2638
+.annotate 'line', 2705
     addattribute $P0, 'args'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ExternStatement' ]
@@ -7534,70 +6267,58 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_63 = "WSubId_63"
+.const 'Sub' WSubId_69 = "WSubId_69"
 .const 'Sub' WSubId_3 = "WSubId_3"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_64 = "WSubId_64"
-# Body
-# {
-.annotate 'line', 2688
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_70 = "WSubId_70"
+.annotate 'line', 2756
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 2689
-# var path: $P1
-    $P1 = WSubId_63(__ARG_2)
-.annotate 'line', 2690
-# builtin elements
+.annotate 'line', 2757
+    $P1 = WSubId_69(__ARG_2)
+.annotate 'line', 2758
     elements $I1, $P1
     if $I1 goto __label_1
-.annotate 'line', 2691
+.annotate 'line', 2759
     $P2 = __ARG_2.'get'()
     WSubId_3($P2)
   __label_1: # endif
-.annotate 'line', 2692
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 2693
-    $P3 = WSubId_64($P1)
+.annotate 'line', 2760
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 2761
+    $P3 = WSubId_70($P1)
     setattribute self, 'path', $P3
-.annotate 'line', 2694
+.annotate 'line', 2762
     .return(self)
-# }
-.annotate 'line', 2695
+.annotate 'line', 2763
 
 .end # ExternStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2696
+.annotate 'line', 2764
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2699
+.annotate 'line', 2767
     self.'annotate'(__ARG_1)
-.annotate 'line', 2700
+.annotate 'line', 2768
     getattribute $P1, self, 'path'
-# builtin join
     join $S1, '/', $P1
     __ARG_1.'say'('    ', "load_bytecode '", $S1, ".pbc'")
-# }
-.annotate 'line', 2701
+.annotate 'line', 2769
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ExternStatement' ]
-.annotate 'line', 2683
+.annotate 'line', 2751
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 2685
+.annotate 'line', 2753
     addattribute $P0, 'path'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'StaticStatement' ]
@@ -7606,62 +6327,50 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_65 = "WSubId_65"
-# Body
-# {
-.annotate 'line', 2713
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_71 = "WSubId_71"
+.annotate 'line', 2781
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 2714
-# var names: $P1
+.annotate 'line', 2782
     null $P3
-    $P1 = WSubId_44(__ARG_2, $P3, WSubId_65, ';')
-.annotate 'line', 2715
+    $P1 = WSubId_50(__ARG_2, $P3, WSubId_71, ';')
+.annotate 'line', 2783
     if_null $P1, __label_2
     iter $P4, $P1
     set $P4, 0
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P2, $P4
-# {
-.annotate 'line', 2716
-# id: $S1
+.annotate 'line', 2784
     $P3 = self.'generatesubid'()
     null $S1
     if_null $P3, __label_3
     set $S1, $P3
   __label_3:
-.annotate 'line', 2717
+.annotate 'line', 2785
     self.'createvarnamed'($P2, 'P', $S1)
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 2719
+.annotate 'line', 2787
     setattribute self, 'names', $P1
-# }
-.annotate 'line', 2720
+.annotate 'line', 2788
 
 .end # StaticStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2723
+.annotate 'line', 2791
     .return(self)
-# }
-.annotate 'line', 2724
+.annotate 'line', 2792
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2727
+.annotate 'line', 2795
     self.'annotate'(__ARG_1)
-.annotate 'line', 2728
+.annotate 'line', 2796
     getattribute $P3, self, 'names'
     if_null $P3, __label_2
     iter $P4, $P3
@@ -7669,27 +6378,23 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P1, $P4
-# {
-.annotate 'line', 2729
-# var v: $P2
+.annotate 'line', 2797
     $P2 = self.'getvar'($P1)
-.annotate 'line', 2730
+.annotate 'line', 2798
     $P3 = $P2.'getreg'()
     __ARG_1.'say'(".const 'Sub' ", $P3, " = '", $P1, "'")
-# }
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 2732
+.annotate 'line', 2800
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StaticStatement' ]
-.annotate 'line', 2708
+.annotate 'line', 2776
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 2710
+.annotate 'line', 2778
     addattribute $P0, 'names'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'UsingStatement' ]
@@ -7698,206 +6403,165 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_63 = "WSubId_63"
+.const 'Sub' WSubId_69 = "WSubId_69"
 .const 'Sub' WSubId_3 = "WSubId_3"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 2746
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 2814
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 2747
-# var path: $P1
-    $P1 = WSubId_63(__ARG_2)
-.annotate 'line', 2748
-# builtin elements
+.annotate 'line', 2815
+    $P1 = WSubId_69(__ARG_2)
+.annotate 'line', 2816
     elements $I1, $P1
     if $I1 goto __label_1
-.annotate 'line', 2749
+.annotate 'line', 2817
     $P2 = __ARG_2.'get'()
     WSubId_3($P2)
   __label_1: # endif
-.annotate 'line', 2750
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 2751
+.annotate 'line', 2818
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 2819
     setattribute self, 'path', $P1
-# }
-.annotate 'line', 2752
+.annotate 'line', 2820
 
 .end # UsingStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2755
-# var path: $P1
+.annotate 'line', 2823
     getattribute $P1, self, 'path'
-.annotate 'line', 2756
-# var name: $P2
+.annotate 'line', 2824
     $P2 = $P1[-1]
-.annotate 'line', 2758
-# var symbol: $P3
+.annotate 'line', 2826
     $P3 = self.'scopesearch'($P1, 0)
-# switch-case
-.annotate 'line', 2760
+.annotate 'line', 2828
     isnull $I1, $P3
     if $I1 goto __label_3
-.annotate 'line', 2774
+.annotate 'line', 2842
     isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     if $I1 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 2761
-# builtin elements
+.annotate 'line', 2829
     elements $I2, $P1
     unless $I2 goto __label_5
-# {
-.annotate 'line', 2762
-# var p: $P4
-# builtin clone
+.annotate 'line', 2830
     clone $P4, $P1
-.annotate 'line', 2763
+.annotate 'line', 2831
     $P4.'pop'()
-.annotate 'line', 2764
-# var ns: $P5
+.annotate 'line', 2832
     $P5 = self.'scopesearch'($P4, 1)
-.annotate 'line', 2765
+.annotate 'line', 2833
     if_null $P5, __label_6
-# {
-.annotate 'line', 2766
+.annotate 'line', 2834
     $P3 = $P5.'getvar'($P2)
-.annotate 'line', 2767
+.annotate 'line', 2835
     if_null $P3, __label_7
-# {
-.annotate 'line', 2768
+.annotate 'line', 2836
     self.'createvarused'($P2, $P3)
-.annotate 'line', 2769
+.annotate 'line', 2837
     new $P6, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
     .return($P6)
-# }
   __label_7: # endif
-# }
   __label_6: # endif
-# }
   __label_5: # endif
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 2775
-# subid: $S1
+.annotate 'line', 2843
     $P6 = $P3.'makesubid'()
     null $S1
     if_null $P6, __label_8
     set $S1, $P6
   __label_8:
-.annotate 'line', 2776
+.annotate 'line', 2844
     self.'createvarnamed'($P2, 'P', $S1)
-.annotate 'line', 2777
+.annotate 'line', 2845
     box $P7, $S1
     setattribute self, 'subid', $P7
-.annotate 'line', 2778
+.annotate 'line', 2846
     self.'usesubid'($S1)
-.annotate 'line', 2779
+.annotate 'line', 2847
     .return(self)
   __label_2: # default
   __label_1: # switch end
-.annotate 'line', 2781
+.annotate 'line', 2849
     self.'createvar'($P2, 'P')
-.annotate 'line', 2782
+.annotate 'line', 2850
     .return(self)
-# }
-.annotate 'line', 2783
+.annotate 'line', 2851
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 2786
-# var path: $P1
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 2854
     getattribute $P1, self, 'path'
-.annotate 'line', 2787
-# name: $S1
+.annotate 'line', 2855
     $S1 = $P1[-1]
-.annotate 'line', 2788
-# var vdata: $P2
+.annotate 'line', 2856
     $P2 = self.'getvar'($S1)
-.annotate 'line', 2789
+.annotate 'line', 2857
     getattribute $P3, self, 'subid'
     unless_null $P3, __label_1
-# {
-.annotate 'line', 2790
+.annotate 'line', 2858
     self.'annotate'(__ARG_1)
-.annotate 'line', 2791
-# key: $S2
+.annotate 'line', 2859
     null $S2
-.annotate 'line', 2792
-# builtin elements
+.annotate 'line', 2860
     elements $I1, $P1
     le $I1, 1, __label_2
-# {
-.annotate 'line', 2793
+.annotate 'line', 2861
     $P1.'pop'()
-.annotate 'line', 2794
-    $P3 = WSubId_26($P1)
+.annotate 'line', 2862
+    $P3 = WSubId_30($P1)
     set $S2, $P3
-# }
   __label_2: # endif
-.annotate 'line', 2796
+.annotate 'line', 2864
     $P3 = $P2.'getreg'()
     __ARG_1.'emitget_hll_global'($P3, $S1, $S2)
-# }
   __label_1: # endif
-# }
-.annotate 'line', 2798
+.annotate 'line', 2866
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'UsingStatement' ]
-.annotate 'line', 2739
+.annotate 'line', 2807
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 2741
+.annotate 'line', 2809
     addattribute $P0, 'path'
-.annotate 'line', 2742
+.annotate 'line', 2810
     addattribute $P0, 'subid'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'usingNamespace' :subid('WSubId_66')
+.sub 'usingNamespace' :subid('WSubId_72')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_63 = "WSubId_63"
-.const 'Sub' WSubId_48 = "WSubId_48"
+.const 'Sub' WSubId_69 = "WSubId_69"
+.const 'Sub' WSubId_54 = "WSubId_54"
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2808
-# var nskey: $P1
-    $P1 = WSubId_63(__ARG_2)
-.annotate 'line', 2809
-# builtin elements
+.annotate 'line', 2876
+    $P1 = WSubId_69(__ARG_2)
+.annotate 'line', 2877
     elements $I1, $P1
     if $I1 goto __label_1
-.annotate 'line', 2810
-    WSubId_48('namespace identifier', __ARG_1)
+.annotate 'line', 2878
+    WSubId_54('namespace identifier', __ARG_1)
   __label_1: # endif
-.annotate 'line', 2811
-# var nssym: $P2
+.annotate 'line', 2879
     $P2 = __ARG_3.'scopesearch'($P1, 1)
-.annotate 'line', 2812
+.annotate 'line', 2880
     unless_null $P2, __label_2
-.annotate 'line', 2813
+.annotate 'line', 2881
     WSubId_1('unknow namespace', __ARG_1)
   __label_2: # endif
-.annotate 'line', 2814
+.annotate 'line', 2882
     __ARG_3.'usenamespace'($P2)
-# }
-.annotate 'line', 2815
+.annotate 'line', 2883
 
 .end # usingNamespace
 
@@ -7907,42 +6571,35 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_66 = "WSubId_66"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 2821
+.const 'Sub' WSubId_72 = "WSubId_72"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 2889
     self.'Statement'(__ARG_2, __ARG_3)
-.annotate 'line', 2822
-    WSubId_66(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 2823
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 2824
+.annotate 'line', 2890
+    WSubId_72(__ARG_1, __ARG_2, __ARG_3)
+.annotate 'line', 2891
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 2892
 
 .end # UsingNamespaceStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2827
+.annotate 'line', 2895
     .return(self)
-# }
-.annotate 'line', 2828
+.annotate 'line', 2896
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Empty body
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'UsingNamespaceStatement' ]
-.annotate 'line', 2817
+.annotate 'line', 2885
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
 .end
@@ -7952,56 +6609,47 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 2843
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 2911
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 2844
-    $P2 = WSubId_45(__ARG_2, self)
+.annotate 'line', 2912
+    $P2 = WSubId_51(__ARG_2, self)
     setattribute self, 'expr', $P2
-.annotate 'line', 2845
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 2846
+.annotate 'line', 2913
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 2914
 
 .end # ExprStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 2849
+.annotate 'line', 2917
     getattribute $P3, self, 'expr'
     $P2 = $P3.'optimize'()
     setattribute self, 'expr', $P2
-.annotate 'line', 2850
+.annotate 'line', 2918
     .return(self)
-# }
-.annotate 'line', 2851
+.annotate 'line', 2919
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2854
+.annotate 'line', 2922
     getattribute $P1, self, 'expr'
-    $P1.'emit'(__ARG_1, '')
-# }
-.annotate 'line', 2855
+    $P1.'emit_void'(__ARG_1)
+.annotate 'line', 2923
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ExprStatement' ]
-.annotate 'line', 2838
+.annotate 'line', 2906
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 2840
+.annotate 'line', 2908
     addattribute $P0, 'expr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'VarData' ]
@@ -8011,179 +6659,137 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param int __ARG_4
-# Body
-# {
-.annotate 'line', 2872
+.annotate 'line', 2940
     setattribute self, 'type', __ARG_1
-.annotate 'line', 2873
+.annotate 'line', 2941
     setattribute self, 'reg', __ARG_2
-.annotate 'line', 2874
+.annotate 'line', 2942
     setattribute self, 'scope', __ARG_3
-.annotate 'line', 2875
+.annotate 'line', 2943
     box $P1, __ARG_4
     setattribute self, 'flags', $P1
-# }
-.annotate 'line', 2876
+.annotate 'line', 2944
 
 .end # VarData
 
 
 .sub 'setlex' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 2879
+.annotate 'line', 2947
     box $P1, __ARG_1
     setattribute self, 'lexname', $P1
-# }
-.annotate 'line', 2880
+.annotate 'line', 2948
 
 .end # setlex
 
 
 .sub 'gettype' :method
-# Body
-# {
-.annotate 'line', 2881
+.annotate 'line', 2949
     getattribute $P1, self, 'type'
     .return($P1)
-# }
 
 .end # gettype
 
 
 .sub 'getreg' :method
-# Body
-# {
-.annotate 'line', 2882
+.annotate 'line', 2950
     getattribute $P1, self, 'reg'
     .return($P1)
-# }
 
 .end # getreg
 
 
 .sub 'getscope' :method
-# Body
-# {
-.annotate 'line', 2883
+.annotate 'line', 2951
     getattribute $P1, self, 'scope'
     .return($P1)
-# }
 
 .end # getscope
 
 
 .sub 'getvalue' :method
-# Body
-# {
-.annotate 'line', 2884
+.annotate 'line', 2952
     getattribute $P1, self, 'value'
     .return($P1)
-# }
 
 .end # getvalue
 
 
 .sub 'isconst' :method
-# Body
-# {
-.annotate 'line', 2885
+.annotate 'line', 2953
     .return(0)
-# }
 
 .end # isconst
 
 
 .sub 'getlex' :method
-# Body
-# {
-.annotate 'line', 2886
+.annotate 'line', 2954
     getattribute $P1, self, 'lexname'
     .return($P1)
-# }
 
 .end # getlex
 
 
 .sub 'getflags' :method
-# Body
-# {
-.annotate 'line', 2887
+.annotate 'line', 2955
     getattribute $P1, self, 'flags'
     .return($P1)
-# }
 
 .end # getflags
 
 
 .sub 'issubid' :method
-# Body
-# {
-.annotate 'line', 2890
-# var reg: $P1
+.annotate 'line', 2958
     getattribute $P1, self, 'reg'
-.annotate 'line', 2891
-    isnull $I2, $P1
-    not $I2
-    unless $I2 goto __label_1
+.annotate 'line', 2959
+    isnull $I1, $P1
+    not $I1
+    unless $I1 goto __label_1
     set $S2, $P1
-# builtin substr
     substr $S1, $S2, 0, 7
-    iseq $I3, $S1, 'WSubId_'
-    set $I1, $I3
-    goto __label_2
+    iseq $I1, $S1, 'WSubId_'
   __label_1:
-    set $I1, $I2
-  __label_2:
     .return($I1)
-# }
-.annotate 'line', 2892
+.annotate 'line', 2960
 
 .end # issubid
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarData' ]
-.annotate 'line', 2864
+.annotate 'line', 2932
     addattribute $P0, 'type'
-.annotate 'line', 2865
+.annotate 'line', 2933
     addattribute $P0, 'reg'
-.annotate 'line', 2866
+.annotate 'line', 2934
     addattribute $P0, 'scope'
-.annotate 'line', 2867
+.annotate 'line', 2935
     addattribute $P0, 'flags'
-.annotate 'line', 2868
+.annotate 'line', 2936
     addattribute $P0, 'lexname'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ConstantInternalFail' ]
 
 .sub 'ConstantInternalFail' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2900
+.annotate 'line', 2968
     setattribute self, 'name', __ARG_1
-# }
-.annotate 'line', 2901
+.annotate 'line', 2969
 
 .end # ConstantInternalFail
 
 
 .sub 'get_string' :method :vtable
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 2904
+.annotate 'line', 2972
     getattribute $P1, self, 'name'
     WSubId_6('Attempt to use unexpanded constant!!!', $P1)
-# }
-.annotate 'line', 2905
+.annotate 'line', 2973
 
 .end # get_string
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConstantInternalFail' ]
-.annotate 'line', 2897
+.annotate 'line', 2965
     addattribute $P0, 'name'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'VarData_const' ]
@@ -8193,25 +6799,19 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 2914
+.annotate 'line', 2982
     new $P2, [ 'Winxed'; 'Compiler'; 'ConstantInternalFail' ]
     $P2.'ConstantInternalFail'(__ARG_2)
     set $P1, $P2
     self.'VarData'(__ARG_1, $P1, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 2915
+.annotate 'line', 2983
 
 .end # VarData_const
 
 
 .sub 'isconst' :method
-# Body
-# {
-.annotate 'line', 2916
+.annotate 'line', 2984
     .return(1)
-# }
 
 .end # isconst
 
@@ -8219,41 +6819,35 @@
 .sub 'setvalue' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 2919
+.annotate 'line', 2987
     getattribute $P1, self, 'value'
     if_null $P1, __label_1
-.annotate 'line', 2920
+.annotate 'line', 2988
     WSubId_6('Attempt change value of constant!!!')
   __label_1: # endif
-.annotate 'line', 2921
+.annotate 'line', 2989
     setattribute self, 'value', __ARG_1
-# }
-.annotate 'line', 2922
+.annotate 'line', 2990
 
 .end # setvalue
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarData_const' ]
-.annotate 'line', 2908
+.annotate 'line', 2976
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarData' ]
     addparent $P0, $P1
-.annotate 'line', 2910
+.annotate 'line', 2978
     addattribute $P0, 'value'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'VarContainer' ]
 
-.sub 'init' :method :vtable
-# Body
-# {
-.annotate 'line', 2933
+.sub 'VarContainer' :method
+.annotate 'line', 3001
     root_new $P2, ['parrot';'Hash']
     setattribute self, 'locals', $P2
-# }
-.annotate 'line', 2934
+.annotate 'line', 3002
 
-.end # init
+.end # VarContainer
 
 
 .sub 'createvar' :method
@@ -8261,44 +6855,36 @@
         .param string __ARG_2
         .param int __ARG_3 :optional
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2937
-# var locals: $P1
+.annotate 'line', 3005
     getattribute $P1, self, 'locals'
-.annotate 'line', 2938
-# sname: $S1
+.annotate 'line', 3006
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 2939
-# var exist: $P2
+.annotate 'line', 3007
     $P2 = $P1[$S1]
-.annotate 'line', 2940
+.annotate 'line', 3008
     if_null $P2, __label_2
-.annotate 'line', 2941
+.annotate 'line', 3009
     concat $S3, "Redeclared '", $S1
     concat $S3, $S3, "'"
     WSubId_1($S3, __ARG_1)
   __label_2: # endif
-.annotate 'line', 2942
-# reg: $S2
+.annotate 'line', 3010
     $P4 = self.'createreg'(__ARG_2)
     null $S2
     if_null $P4, __label_3
     set $S2, $P4
   __label_3:
-.annotate 'line', 2943
-# var data: $P3
+.annotate 'line', 3011
     new $P3, [ 'Winxed'; 'Compiler'; 'VarData' ]
     $P3.'VarData'(__ARG_2, $S2, self, __ARG_3)
-.annotate 'line', 2944
+.annotate 'line', 3012
     $P1[$S1] = $P3
-.annotate 'line', 2945
+.annotate 'line', 3013
     .return($P3)
-# }
-.annotate 'line', 2946
+.annotate 'line', 3014
 
 .end # createvar
 
@@ -8307,31 +6893,25 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2949
-# var locals: $P1
+.annotate 'line', 3017
     getattribute $P1, self, 'locals'
-.annotate 'line', 2950
-# sname: $S1
+.annotate 'line', 3018
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 2951
-# var exist: $P2
+.annotate 'line', 3019
     $P2 = $P1[$S1]
-.annotate 'line', 2952
+.annotate 'line', 3020
     if_null $P2, __label_2
-.annotate 'line', 2953
+.annotate 'line', 3021
     concat $S2, "Redeclared '", $S1
     concat $S2, $S2, "'"
     WSubId_1($S2, __ARG_1)
   __label_2: # endif
-.annotate 'line', 2954
+.annotate 'line', 3022
     $P1[$S1] = __ARG_2
-# }
-.annotate 'line', 2955
+.annotate 'line', 3023
 
 .end # createvarused
 
@@ -8341,34 +6921,28 @@
         .param string __ARG_2
         .param string __ARG_3
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2958
-# var locals: $P1
+.annotate 'line', 3026
     getattribute $P1, self, 'locals'
-.annotate 'line', 2959
-# sname: $S1
+.annotate 'line', 3027
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 2960
-# var exist: $P2
+.annotate 'line', 3028
     $P2 = $P1[$S1]
-.annotate 'line', 2961
+.annotate 'line', 3029
     if_null $P2, __label_2
-.annotate 'line', 2962
+.annotate 'line', 3030
     concat $S2, "Redeclared '", $S1
     concat $S2, $S2, "'"
     WSubId_1($S2, __ARG_1)
   __label_2: # endif
-.annotate 'line', 2963
+.annotate 'line', 3031
     new $P4, [ 'Winxed'; 'Compiler'; 'VarData' ]
     $P4.'VarData'(__ARG_2, __ARG_3, self, 0)
     set $P3, $P4
     $P1[$S1] = $P3
-# }
-.annotate 'line', 2964
+.annotate 'line', 3032
 
 .end # createvarnamed
 
@@ -8378,67 +6952,52 @@
         .param string __ARG_2
         .param int __ARG_3 :optional
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 2967
-# var locals: $P1
+.annotate 'line', 3035
     getattribute $P1, self, 'locals'
-.annotate 'line', 2968
-# sname: $S1
+.annotate 'line', 3036
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 2969
-# var exist: $P2
+.annotate 'line', 3037
     $P2 = $P1[$S1]
-.annotate 'line', 2970
+.annotate 'line', 3038
     if_null $P2, __label_2
-.annotate 'line', 2971
+.annotate 'line', 3039
     concat $S2, "Redeclared '", $S1
     concat $S2, $S2, "'"
     WSubId_1($S2, __ARG_1)
   __label_2: # endif
-.annotate 'line', 2972
-# var data: $P3
+.annotate 'line', 3040
     new $P3, [ 'Winxed'; 'Compiler'; 'VarData_const' ]
     $P3.'VarData_const'(__ARG_2, __ARG_1, self, __ARG_3)
-.annotate 'line', 2973
+.annotate 'line', 3041
     $P1[$S1] = $P3
-.annotate 'line', 2974
+.annotate 'line', 3042
     .return($P3)
-# }
-.annotate 'line', 2975
+.annotate 'line', 3043
 
 .end # createconst
 
 
 .sub 'getlocalvar' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2978
-# var locals: $P1
+.annotate 'line', 3046
     getattribute $P1, self, 'locals'
-# builtin string
-.annotate 'line', 2979
+.annotate 'line', 3047
     set $S1, __ARG_1
     $P2 = $P1[$S1]
     .return($P2)
-# }
-.annotate 'line', 2980
+.annotate 'line', 3048
 
 .end # getlocalvar
 
 
 .sub 'getusedvar' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2983
-# var sym: $P1
+.annotate 'line', 3051
     null $P1
-.annotate 'line', 2984
+.annotate 'line', 3052
     getattribute $P3, self, 'usednamespaces'
     if_null $P3, __label_2
     iter $P4, $P3
@@ -8446,110 +7005,104 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P2, $P4
-# {
-.annotate 'line', 2985
+.annotate 'line', 3053
     $P1 = $P2.'getlocalvar'(__ARG_1)
     if_null $P1, __label_3
-.annotate 'line', 2986
+.annotate 'line', 3054
     .return($P1)
   __label_3: # endif
-# }
     goto __label_1
   __label_2: # endfor
     null $P3
-.annotate 'line', 2988
+.annotate 'line', 3056
     .return($P3)
-# }
-.annotate 'line', 2989
+.annotate 'line', 3057
 
 .end # getusedvar
 
 
 .sub 'getvar' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 2992
-# var sym: $P1
+.annotate 'line', 3060
     null $P1
-.annotate 'line', 2993
+.annotate 'line', 3061
     $P1 = self.'getlocalvar'(__ARG_1)
     if_null $P1, __label_1
-.annotate 'line', 2994
+.annotate 'line', 3062
     .return($P1)
   __label_1: # endif
-.annotate 'line', 2995
+.annotate 'line', 3063
     $P1 = self.'getusedvar'(__ARG_1)
     if_null $P1, __label_2
-.annotate 'line', 2996
+.annotate 'line', 3064
     .return($P1)
   __label_2: # endif
-.annotate 'line', 2997
-# var owner: $P2
+.annotate 'line', 3065
     getattribute $P2, self, 'owner'
-.annotate 'line', 2998
+.annotate 'line', 3066
     if_null $P2, __label_3
-.annotate 'line', 2999
+.annotate 'line', 3067
     .tailcall $P2.'getvar'(__ARG_1)
   __label_3: # endif
     null $P3
-.annotate 'line', 3000
+.annotate 'line', 3068
     .return($P3)
-# }
-.annotate 'line', 3001
+.annotate 'line', 3069
 
 .end # getvar
 
 
 .sub 'makelexical' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3004
-# var lexowner: $P1
+.annotate 'line', 3072
     $P1 = self.'getouter'()
-.annotate 'line', 3005
-# lexname: $S1
+.annotate 'line', 3073
     $P2 = $P1.'createlex'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3006
+.annotate 'line', 3074
     .return($S1)
-# }
-.annotate 'line', 3007
+.annotate 'line', 3075
 
 .end # makelexical
 
 
 .sub 'makelexicalself' :method
-# Body
-# {
-.annotate 'line', 3010
-# var lexowner: $P1
+.annotate 'line', 3078
     set $P1, self
-# Constant lexname evaluated at compile time
-.annotate 'line', 3012
+.annotate 'line', 3080
     self.'setlex'('__WLEX_self', 'self')
-.annotate 'line', 3013
+.annotate 'line', 3081
     .return('__WLEX_self')
-# }
-.annotate 'line', 3014
+.annotate 'line', 3082
 
 .end # makelexicalself
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
-.annotate 'line', 2928
+.annotate 'line', 2996
     addattribute $P0, 'locals'
-.annotate 'line', 2929
+.annotate 'line', 2997
     addattribute $P0, 'usednamespaces'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
+
+.sub 'BlockStatement' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+.annotate 'line', 3095
+    self.'Statement'(__ARG_1, __ARG_2)
+.annotate 'line', 3096
+    self.'VarContainer'()
+.annotate 'line', 3097
+
+.end # BlockStatement
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
-.annotate 'line', 3023
+.annotate 'line', 3091
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Statement' ]
@@ -8560,284 +7113,294 @@
 .sub 'Expr' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3035
+.annotate 'line', 3108
     self.'initbase'(__ARG_2, __ARG_1)
-# }
-.annotate 'line', 3036
+.annotate 'line', 3109
 
 .end # Expr
 
 
 .sub 'issimple' :method
-# Body
-# {
-.annotate 'line', 3037
+.annotate 'line', 3110
     .return(0)
-# }
 
 .end # issimple
 
 
 .sub 'isliteral' :method
-# Body
-# {
-.annotate 'line', 3038
+.annotate 'line', 3111
     .return(0)
-# }
 
 .end # isliteral
 
 
 .sub 'isintegerliteral' :method
-# Body
-# {
-.annotate 'line', 3039
+.annotate 'line', 3112
     .return(0)
-# }
 
 .end # isintegerliteral
 
 
 .sub 'isintegerzero' :method
-# Body
-# {
-.annotate 'line', 3040
+.annotate 'line', 3113
     .return(0)
-# }
 
 .end # isintegerzero
 
 
 .sub 'isfloatliteral' :method
-# Body
-# {
-.annotate 'line', 3041
+.annotate 'line', 3114
     .return(0)
-# }
 
 .end # isfloatliteral
 
 
 .sub 'isstringliteral' :method
-# Body
-# {
-.annotate 'line', 3042
+.annotate 'line', 3115
     .return(0)
-# }
 
 .end # isstringliteral
 
 
 .sub 'isidentifier' :method
-# Body
-# {
-.annotate 'line', 3043
+.annotate 'line', 3116
     .return(0)
-# }
 
 .end # isidentifier
 
 
 .sub 'isnull' :method
-# Body
-# {
-.annotate 'line', 3044
+.annotate 'line', 3117
     .return(0)
-# }
 
 .end # isnull
 
 
 .sub 'hascompilevalue' :method
-# Body
-# {
-.annotate 'line', 3045
+.annotate 'line', 3118
     .return(0)
-# }
 
 .end # hascompilevalue
 
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 3046
+.annotate 'line', 3119
     .return(0)
-# }
 
 .end # isnegable
 
 
 .sub 'tempreg' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3049
+.annotate 'line', 3122
     getattribute $P1, self, 'owner'
     .tailcall $P1.'tempreg'(__ARG_1)
-# }
-.annotate 'line', 3050
+.annotate 'line', 3123
 
 .end # tempreg
 
 
 .sub 'genlabel' :method
-# Body
-# {
-.annotate 'line', 3053
+.annotate 'line', 3126
     getattribute $P1, self, 'owner'
     .tailcall $P1.'genlabel'()
-# }
-.annotate 'line', 3054
+.annotate 'line', 3127
 
 .end # genlabel
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3058
+.annotate 'line', 3131
     .return(self)
-# }
-.annotate 'line', 3059
+.annotate 'line', 3132
 
 .end # optimize
 
 
 .sub 'cantailcall' :method
-# Body
-# {
-.annotate 'line', 3060
+.annotate 'line', 3133
     .return(0)
-# }
 
 .end # cantailcall
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3063
-# type: $S1
+.annotate 'line', 3136
     $P1 = self.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3064
-# reg: $S2
-    ne $S1, 'v', __label_3
-    set $S2, ''
-    goto __label_2
-  __label_3:
+.annotate 'line', 3137
     $P1 = self.'tempreg'($S1)
+    null $S2
+    if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 3065
+.annotate 'line', 3138
     self.'emit'(__ARG_1, $S2)
-.annotate 'line', 3066
+.annotate 'line', 3139
     .return($S2)
-# }
-.annotate 'line', 3067
+.annotate 'line', 3140
 
 .end # emit_get
+
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_6 = "WSubId_6"
+.annotate 'line', 3143
+    $P1 = self.'checkresult'()
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 3144
+    null $S2
+.annotate 'line', 3145
+    if $S1 == 'I' goto __label_4
+    if $S1 == 'N' goto __label_5
+    if $S1 == 'S' goto __label_6
+    if $S1 == 'P' goto __label_7
+    goto __label_3
+  __label_4: # case
+.annotate 'line', 3146
+    set $S2, "$I0"
+    goto __label_2 # break
+  __label_5: # case
+.annotate 'line', 3147
+    set $S2, "$N0"
+    goto __label_2 # break
+  __label_6: # case
+.annotate 'line', 3148
+    set $S2, "$S0"
+    goto __label_2 # break
+  __label_7: # case
+.annotate 'line', 3149
+    set $S2, "$P0"
+    goto __label_2 # break
+  __label_3: # default
+.annotate 'line', 3151
+    concat $S4, "Unexcpected emit_void with type '", $S1
+    concat $S4, $S4, "'"
+    getattribute $P1, self, 'start'
+    WSubId_6($S4, $P1)
+  __label_2: # switch end
+.annotate 'line', 3153
+    self.'emit'(__ARG_1, $S2)
+.annotate 'line', 3154
+
+.end # emit_void
 
 
 .sub 'emit_get_nonull' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 3070
+.annotate 'line', 3157
     $P1 = self.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 3071
+.annotate 'line', 3158
     WSubId_1("Invalid 'null' usage", self)
   __label_1: # endif
-.annotate 'line', 3072
+.annotate 'line', 3159
     .tailcall self.'emit_get'(__ARG_1)
-# }
-.annotate 'line', 3073
+.annotate 'line', 3160
 
 .end # emit_get_nonull
 
 
 .sub 'emit_getint' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3076
-# reg: $S1
+.annotate 'line', 3163
     $P1 = self.'emit_get_nonull'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3077
+.annotate 'line', 3164
     $P1 = self.'checkresult'()
     set $S3, $P1
     eq $S3, 'I', __label_2
-# {
-.annotate 'line', 3078
-# aux: $S2
+.annotate 'line', 3165
     $P2 = self.'tempreg'('I')
     null $S2
     if_null $P2, __label_3
     set $S2, $P2
   __label_3:
-.annotate 'line', 3079
+.annotate 'line', 3166
     self.'annotate'(__ARG_1)
-.annotate 'line', 3080
+.annotate 'line', 3167
     __ARG_1.'emitset'($S2, $S1)
-.annotate 'line', 3081
+.annotate 'line', 3168
     set $S1, $S2
-# }
   __label_2: # endif
-.annotate 'line', 3083
+.annotate 'line', 3170
     .return($S1)
-# }
-.annotate 'line', 3084
+.annotate 'line', 3171
 
 .end # emit_getint
+
+
+.sub 'emit_getvar' :method
+        .param pmc __ARG_1
+.annotate 'line', 3174
+    $P1 = self.'checkresult'()
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 3175
+    $P1 = self.'emit_get'(__ARG_1)
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 3176
+    eq $S1, 'P', __label_3
+.annotate 'line', 3177
+    set $S3, $S2
+.annotate 'line', 3178
+    $P1 = self.'tempreg'('P')
+    set $S2, $P1
+.annotate 'line', 3179
+    __ARG_1.'emitbox'($S2, $S3)
+  __label_3: # endif
+.annotate 'line', 3181
+    .return($S2)
+.annotate 'line', 3182
+
+.end # emit_getvar
 
 
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_67 = "WSubId_67"
-# Body
-# {
-.annotate 'line', 3087
-    WSubId_67(self)
-# }
-.annotate 'line', 3088
+.const 'Sub' WSubId_73 = "WSubId_73"
+.annotate 'line', 3185
+    WSubId_73(self)
+.annotate 'line', 3186
 
 .end # emit_assign_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Expr' ]
-.annotate 'line', 3031
+.annotate 'line', 3104
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
 
 .sub 'issimple' :method
-# Body
-# {
-.annotate 'line', 3093
+.annotate 'line', 3191
     .return(1)
-# }
 
 .end # issimple
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
-.annotate 'line', 3091
+.annotate 'line', 3189
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
 .end
@@ -8847,167 +7410,137 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 3103
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 3201
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 3104
-# var t: $P1
+.annotate 'line', 3202
     $P1 = __ARG_1.'get'()
-.annotate 'line', 3105
+.annotate 'line', 3203
     $P2 = $P1.'isop'('(')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-.annotate 'line', 3106
-    WSubId_48('anonymous function', $P1)
+.annotate 'line', 3204
+    WSubId_54('anonymous function', $P1)
   __label_1: # endif
-.annotate 'line', 3107
+.annotate 'line', 3205
     new $P4, [ 'Winxed'; 'Compiler'; 'LocalFunctionStatement' ]
     $P4.'LocalFunctionStatement'(__ARG_3, __ARG_1, __ARG_2)
     set $P3, $P4
     setattribute self, 'fn', $P3
-# }
-.annotate 'line', 3108
+.annotate 'line', 3206
 
 .end # FunctionExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3109
+.annotate 'line', 3207
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3112
+.annotate 'line', 3210
     getattribute $P3, self, 'fn'
     $P2 = $P3.'optimize'()
     setattribute self, 'fn', $P2
-.annotate 'line', 3113
+.annotate 'line', 3211
     getattribute $P2, self, 'fn'
     $P1 = $P2.'getsubid'()
     self.'usesubid'($P1)
-.annotate 'line', 3114
+.annotate 'line', 3212
     .return(self)
-# }
-.annotate 'line', 3115
+.annotate 'line', 3213
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3118
+        .param string __ARG_2
+.annotate 'line', 3216
     self.'annotate'(__ARG_1)
-.annotate 'line', 3119
-# var fn: $P1
+.annotate 'line', 3217
     getattribute $P1, self, 'fn'
-.annotate 'line', 3120
-    set $S2, __ARG_2
-    eq $S2, '', __label_1
-# {
-.annotate 'line', 3121
-# subid: $S1
+.annotate 'line', 3218
     $P2 = $P1.'getsubid'()
     null $S1
-    if_null $P2, __label_2
+    if_null $P2, __label_1
     set $S1, $P2
-  __label_2:
-.annotate 'line', 3122
+  __label_1:
+.annotate 'line', 3219
     $P2 = $P1.'needclosure'()
-    if_null $P2, __label_3
-    unless $P2 goto __label_3
-.annotate 'line', 3123
+    if_null $P2, __label_2
+    unless $P2 goto __label_2
+.annotate 'line', 3220
     __ARG_1.'emitarg2'('newclosure', __ARG_2, $S1)
-    goto __label_4
-  __label_3: # else
-.annotate 'line', 3125
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 3222
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_4: # endif
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 3127
+  __label_3: # endif
+.annotate 'line', 3223
 
 .end # emit
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionExpr' ]
-.annotate 'line', 3098
+.annotate 'line', 3196
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 3100
+.annotate 'line', 3198
     addattribute $P0, 'fn'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant CONDisruntime evaluated at compile time
-# Constant CONDistrue evaluated at compile time
-# Constant CONDisfalse evaluated at compile time
 .namespace [ 'Winxed'; 'Compiler'; 'Condition' ]
 
 .sub 'set' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3142
+.annotate 'line', 3241
     setattribute self, 'condexpr', __ARG_1
-.annotate 'line', 3143
+.annotate 'line', 3242
     .return(self)
-# }
-.annotate 'line', 3144
+.annotate 'line', 3243
 
 .end # set
 
 
 .sub 'optimize_condition' :method
-# Body
-# {
-.annotate 'line', 3147
+.annotate 'line', 3246
     getattribute $P3, self, 'condexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'condexpr', $P2
-# }
-.annotate 'line', 3148
+.annotate 'line', 3247
 
 .end # optimize_condition
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3151
+.annotate 'line', 3250
     getattribute $P3, self, 'condexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'condexpr', $P2
-.annotate 'line', 3152
+.annotate 'line', 3251
     .return(self)
-# }
-.annotate 'line', 3153
+.annotate 'line', 3252
 
 .end # optimize
 
 
 .sub 'getvalue' :method
-# Body
-# {
-.annotate 'line', 3156
-# var condexpr: $P1
+.annotate 'line', 3255
     getattribute $P1, self, 'condexpr'
-.annotate 'line', 3157
+.annotate 'line', 3256
     $P2 = $P1.'isintegerliteral'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 3158
+.annotate 'line', 3257
     $P3 = $P1.'isintegerzero'()
     if_null $P3, __label_3
     unless $P3 goto __label_3
@@ -9018,10 +7551,9 @@
   __label_2:
     .return($I1)
   __label_1: # endif
-.annotate 'line', 3159
+.annotate 'line', 3258
     .return(0)
-# }
-.annotate 'line', 3160
+.annotate 'line', 3259
 
 .end # getvalue
 
@@ -9031,64 +7563,48 @@
         .param string __ARG_2
         .param string __ARG_3
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 3163
-# var condexpr: $P1
+.annotate 'line', 3262
     getattribute $P1, self, 'condexpr'
-.annotate 'line', 3165
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
-    if $I2 goto __label_3
-.annotate 'line', 3166
-    isa $I3, $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
-    set $I1, $I3
-    goto __label_4
+.annotate 'line', 3264
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
+    if $I1 goto __label_3
+.annotate 'line', 3265
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_1
-.annotate 'line', 3167
+.annotate 'line', 3266
     $P1.'emit_if'(__ARG_1, __ARG_2)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 3169
-# reg: $S1
+.annotate 'line', 3268
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
-    if_null $P2, __label_5
+    if_null $P2, __label_4
     set $S1, $P2
-  __label_5:
-# switch
-.annotate 'line', 3170
+  __label_4:
+.annotate 'line', 3269
     $P2 = $P1.'checkresult'()
     set $S2, $P2
-    set $S3, 'S'
-    if $S2 == $S3 goto __label_8
-    set $S3, 'P'
-    if $S2 == $S3 goto __label_9
-    set $S3, 'I'
-    if $S2 == $S3 goto __label_10
-    set $S3, 'N'
-    if $S2 == $S3 goto __label_11
-    goto __label_7
+    if $S2 == 'S' goto __label_7
+    if $S2 == 'P' goto __label_8
+    if $S2 == 'I' goto __label_9
+    if $S2 == 'N' goto __label_10
+    goto __label_6
+  __label_7: # case
   __label_8: # case
-  __label_9: # case
-.annotate 'line', 3173
+.annotate 'line', 3272
     __ARG_1.'emitif_null'($S1, __ARG_3)
+  __label_9: # case
   __label_10: # case
-  __label_11: # case
-.annotate 'line', 3176
+.annotate 'line', 3275
     __ARG_1.'emitif'($S1, __ARG_2)
-    goto __label_6 # break
-  __label_7: # default
-.annotate 'line', 3179
+    goto __label_5 # break
+  __label_6: # default
+.annotate 'line', 3278
     WSubId_6('Invalid if condition')
-  __label_6: # switch end
-# }
+  __label_5: # switch end
   __label_2: # endif
-# }
-.annotate 'line', 3182
+.annotate 'line', 3281
 
 .end # emit_if
 
@@ -9097,96 +7613,80 @@
         .param pmc __ARG_1
         .param string __ARG_2
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 3185
-# var condexpr: $P1
+.annotate 'line', 3284
     getattribute $P1, self, 'condexpr'
-.annotate 'line', 3187
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
-    if $I2 goto __label_3
-.annotate 'line', 3188
-    isa $I3, $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
-    set $I1, $I3
-    goto __label_4
+.annotate 'line', 3286
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
+    if $I1 goto __label_3
+.annotate 'line', 3287
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_1
-.annotate 'line', 3189
+.annotate 'line', 3288
     $P1.'emit_else'(__ARG_1, __ARG_2)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 3191
-# reg: $S1
+.annotate 'line', 3290
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
-    if_null $P2, __label_5
+    if_null $P2, __label_4
     set $S1, $P2
-  __label_5:
-# switch
-.annotate 'line', 3192
+  __label_4:
+.annotate 'line', 3291
     $P2 = $P1.'checkresult'()
     set $S2, $P2
-    set $S3, 'S'
-    if $S2 == $S3 goto __label_8
-    set $S3, 'P'
-    if $S2 == $S3 goto __label_9
-    set $S3, 'I'
-    if $S2 == $S3 goto __label_10
-    set $S3, 'N'
-    if $S2 == $S3 goto __label_11
-    goto __label_7
+    if $S2 == 'S' goto __label_7
+    if $S2 == 'P' goto __label_8
+    if $S2 == 'I' goto __label_9
+    if $S2 == 'N' goto __label_10
+    goto __label_6
+  __label_7: # case
   __label_8: # case
-  __label_9: # case
-.annotate 'line', 3195
+.annotate 'line', 3294
     __ARG_1.'emitif_null'($S1, __ARG_2)
+  __label_9: # case
   __label_10: # case
-  __label_11: # case
-.annotate 'line', 3198
+.annotate 'line', 3297
     __ARG_1.'emitunless'($S1, __ARG_2)
-    goto __label_6 # break
-  __label_7: # default
-.annotate 'line', 3201
+    goto __label_5 # break
+  __label_6: # default
+.annotate 'line', 3300
     WSubId_6('Invalid if condition')
-  __label_6: # switch end
-# }
+  __label_5: # switch end
   __label_2: # endif
-# }
-.annotate 'line', 3204
+.annotate 'line', 3303
 
 .end # emit_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Condition' ]
-.annotate 'line', 3139
+.annotate 'line', 3238
     addattribute $P0, 'condexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Literal' ]
 
 .sub 'isliteral' :method
-# Body
-# {
-.annotate 'line', 3211
+.annotate 'line', 3310
     .return(1)
-# }
 
 .end # isliteral
 
 
 .sub 'hascompilevalue' :method
-# Body
-# {
-.annotate 'line', 3212
+.annotate 'line', 3311
     .return(1)
-# }
 
 .end # hascompilevalue
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Literal' ]
-.annotate 'line', 3209
+.annotate 'line', 3308
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     addparent $P0, $P1
 .end
@@ -9195,124 +7695,94 @@
 .sub 'StringLiteral' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3222
+.annotate 'line', 3322
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 3223
+.annotate 'line', 3323
     setattribute self, 'strval', __ARG_2
-# }
-.annotate 'line', 3224
+.annotate 'line', 3324
 
 .end # StringLiteral
 
 
 .sub 'isstringliteral' :method
-# Body
-# {
-.annotate 'line', 3225
+.annotate 'line', 3325
     .return(1)
-# }
 
 .end # isstringliteral
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3226
+.annotate 'line', 3326
     .return('S')
-# }
 
 .end # checkresult
 
 
 .sub 'getPirString' :method
-# Body
-# {
-.annotate 'line', 3229
-# var strtok: $P1
+.annotate 'line', 3329
     getattribute $P1, self, 'strval'
-.annotate 'line', 3230
-# str: $S1
+.annotate 'line', 3330
     $P2 = $P1.'getPirString'()
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3231
+.annotate 'line', 3331
     .return($S1)
-# }
-.annotate 'line', 3232
+.annotate 'line', 3332
 
 .end # getPirString
 
 
 .sub 'get_value' :method
-# Body
-# {
-.annotate 'line', 3235
-# var strtok: $P1
+.annotate 'line', 3335
     getattribute $P1, self, 'strval'
-.annotate 'line', 3236
-# str: $S1
+.annotate 'line', 3336
     getattribute $P2, $P1, 'str'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3237
+.annotate 'line', 3337
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     unless $I1 goto __label_2
-.annotate 'line', 3238
-# builtin unescape
+.annotate 'line', 3338
     $P0 = new ['String']
     $P0 = $S1
     $S1 = $P0.'unescape'('utf8')
   __label_2: # endif
-.annotate 'line', 3239
+.annotate 'line', 3339
     .return($S1)
-# }
-.annotate 'line', 3240
+.annotate 'line', 3340
 
 .end # get_value
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3243
-    set $S1, __ARG_2
-    eq $S1, '', __label_1
-.annotate 'line', 3244
+        .param string __ARG_2
+.annotate 'line', 3343
     $P1 = self.'getPirString'()
     __ARG_1.'emitset'(__ARG_2, $P1)
-  __label_1: # endif
-# }
-.annotate 'line', 3245
+.annotate 'line', 3344
 
 .end # emit
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3248
+.annotate 'line', 3347
     .tailcall self.'getPirString'()
-# }
-.annotate 'line', 3249
+.annotate 'line', 3348
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-.annotate 'line', 3217
+.annotate 'line', 3317
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
-.annotate 'line', 3219
+.annotate 'line', 3319
     addattribute $P0, 'strval'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
@@ -9321,135 +7791,101 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3260
+.annotate 'line', 3359
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 3261
+.annotate 'line', 3360
     setattribute self, 'pos', __ARG_2
-.annotate 'line', 3262
-# n: $I1
+.annotate 'line', 3361
     set $I1, __ARG_3
-.annotate 'line', 3263
+.annotate 'line', 3362
     box $P1, $I1
     setattribute self, 'numval', $P1
-# }
-.annotate 'line', 3264
+.annotate 'line', 3363
 
 .end # IntegerLiteral
 
 
 .sub 'isintegerliteral' :method
-# Body
-# {
-.annotate 'line', 3265
+.annotate 'line', 3364
     .return(1)
-# }
 
 .end # isintegerliteral
 
 
 .sub 'isintegerzero' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 3268
+.annotate 'line', 3367
     getattribute $P1, self, 'numval'
     set $I2, $P1
     iseq $I1, $I2, 0
     .return($I1)
-# }
-.annotate 'line', 3269
+.annotate 'line', 3368
 
 .end # isintegerzero
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3270
+.annotate 'line', 3369
     .return('I')
-# }
 
 .end # checkresult
 
 
 .sub 'getIntegerValue' :method
-# Body
-# {
-.annotate 'line', 3273
+.annotate 'line', 3372
     getattribute $P1, self, 'numval'
     .return($P1)
-# }
-.annotate 'line', 3274
+.annotate 'line', 3373
 
 .end # getIntegerValue
 
 
 .sub 'getFloatValue' :method
-# Body
-# {
-.annotate 'line', 3277
-# value: $N1
+.annotate 'line', 3376
     $P1 = self.'getIntegerValue'()
     set $N1, $P1
-.annotate 'line', 3278
+.annotate 'line', 3377
     .return($N1)
-# }
-.annotate 'line', 3279
+.annotate 'line', 3378
 
 .end # getFloatValue
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3282
-    set $S1, __ARG_2
-    eq $S1, '', __label_1
-# {
-.annotate 'line', 3283
-# value: $I1
+        .param string __ARG_2
+.annotate 'line', 3381
     $P1 = self.'getIntegerValue'()
     set $I1, $P1
-.annotate 'line', 3284
-    if $I1 goto __label_2
-.annotate 'line', 3285
+.annotate 'line', 3382
+    if $I1 goto __label_1
+.annotate 'line', 3383
     __ARG_1.'emitnull'(__ARG_2)
-    goto __label_3
-  __label_2: # else
-.annotate 'line', 3287
+    goto __label_2
+  __label_1: # else
+.annotate 'line', 3385
     __ARG_1.'emitset'(__ARG_2, $I1)
-  __label_3: # endif
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 3289
+  __label_2: # endif
+.annotate 'line', 3386
 
 .end # emit
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3292
+.annotate 'line', 3389
     .tailcall self.'getIntegerValue'()
-# }
-.annotate 'line', 3293
+.annotate 'line', 3390
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
-.annotate 'line', 3254
+.annotate 'line', 3353
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
-.annotate 'line', 3256
+.annotate 'line', 3355
     addattribute $P0, 'pos'
-.annotate 'line', 3257
+.annotate 'line', 3356
     addattribute $P0, 'numval'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
@@ -9457,180 +7893,184 @@
 .sub 'FloatLiteral' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3303
+.annotate 'line', 3400
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 3304
+.annotate 'line', 3401
     setattribute self, 'numval', __ARG_2
-# }
-.annotate 'line', 3305
+.annotate 'line', 3402
 
 .end # FloatLiteral
 
 
 .sub 'isfloatliteral' :method
-# Body
-# {
-.annotate 'line', 3306
+.annotate 'line', 3403
     .return(1)
-# }
 
 .end # isfloatliteral
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3307
+.annotate 'line', 3404
     .return('N')
-# }
 
 .end # checkresult
 
 
 .sub 'getFloatValue' :method
-# Body
-# {
-.annotate 'line', 3310
-# value: $N1
+.annotate 'line', 3407
     getattribute $P2, self, 'numval'
     $P1 = $P2.'getfloatvalue'()
     set $N1, $P1
-.annotate 'line', 3311
+.annotate 'line', 3408
     .return($N1)
-# }
-.annotate 'line', 3312
+.annotate 'line', 3409
 
 .end # getFloatValue
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3315
-    set $S2, __ARG_2
-    eq $S2, '', __label_1
-# {
-.annotate 'line', 3316
-# n: $S1
+        .param string __ARG_2
+.annotate 'line', 3412
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
-    if_null $P1, __label_2
+    if_null $P1, __label_1
     set $S1, $P1
-  __label_2:
-.annotate 'line', 3317
+  __label_1:
+.annotate 'line', 3413
     __ARG_1.'emitset'(__ARG_2, $S1)
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 3319
+.annotate 'line', 3414
 
 .end # emit
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_68 = "WSubId_68"
-# Body
-# {
-.annotate 'line', 3322
-# value: $N1
+.const 'Sub' WSubId_74 = "WSubId_74"
+.annotate 'line', 3417
     $P1 = self.'getFloatValue'()
     set $N1, $P1
-.annotate 'line', 3323
-    .tailcall WSubId_68($N1)
-# }
-.annotate 'line', 3324
+.annotate 'line', 3418
+    .tailcall WSubId_74($N1)
+.annotate 'line', 3419
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
-.annotate 'line', 3298
+.annotate 'line', 3395
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
-.annotate 'line', 3300
+.annotate 'line', 3397
     addattribute $P0, 'numval'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'concat_literal' :subid('WSubId_72')
+.sub 'concat_literal' :subid('WSubId_78')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3334
-# var etok: $P1
+.annotate 'line', 3429
     getattribute $P1, __ARG_1, 'strval'
-.annotate 'line', 3335
-# var rtok: $P2
+.annotate 'line', 3430
     getattribute $P2, __ARG_2, 'strval'
-.annotate 'line', 3338
-# var t: $P3
-    $P5 = $P1.'issinglequoted'()
-    unless $P5 goto __label_3
-    $P6 = $P2.'issinglequoted'()
-    set $P4, $P6
-    goto __label_4
+.annotate 'line', 3433
+    $P4 = $P1.'issinglequoted'()
+    unless $P4 goto __label_3
+    $P4 = $P2.'issinglequoted'()
   __label_3:
-    set $P4, $P5
-  __label_4:
     if_null $P4, __label_2
     unless $P4 goto __label_2
-.annotate 'line', 3340
-    new $P7, [ 'Winxed'; 'Compiler'; 'TokenSingleQuoted' ]
-    getattribute $P8, $P1, 'file'
-    getattribute $P9, $P1, 'line'
-# builtin string
-.annotate 'line', 3341
-    getattribute $P10, $P1, 'str'
-    set $S1, $P10
-# builtin string
-    getattribute $P11, $P2, 'str'
-    set $S2, $P11
+.annotate 'line', 3435
+    new $P5, [ 'Winxed'; 'Compiler'; 'TokenSingleQuoted' ]
+    getattribute $P6, $P1, 'file'
+    getattribute $P7, $P1, 'line'
+.annotate 'line', 3436
+    getattribute $P8, $P1, 'str'
+    set $S1, $P8
+    getattribute $P9, $P2, 'str'
+    set $S2, $P9
     concat $S3, $S1, $S2
-    $P7.'TokenSingleQuoted'($P8, $P9, $S3)
-    set $P3, $P7
+    $P5.'TokenSingleQuoted'($P6, $P7, $S3)
+    set $P3, $P5
     goto __label_1
   __label_2:
-.annotate 'line', 3343
-    new $P13, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
-    getattribute $P14, $P1, 'file'
-    getattribute $P15, $P1, 'line'
-# builtin string
-.annotate 'line', 3344
-    $P16 = $P1.'getasquoted'()
-    set $S4, $P16
-# builtin string
-    $P17 = $P2.'getasquoted'()
-    set $S5, $P17
+.annotate 'line', 3438
+    new $P11, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
+    getattribute $P12, $P1, 'file'
+    getattribute $P13, $P1, 'line'
+.annotate 'line', 3439
+    $P14 = $P1.'getasquoted'()
+    set $S4, $P14
+    $P15 = $P2.'getasquoted'()
+    set $S5, $P15
     concat $S6, $S4, $S5
-    $P13.'TokenQuoted'($P14, $P15, $S6)
-    set $P12, $P13
-    set $P3, $P12
+    $P11.'TokenQuoted'($P12, $P13, $S6)
+    set $P10, $P11
+    set $P3, $P10
   __label_1:
-.annotate 'line', 3345
+.annotate 'line', 3440
     new $P5, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     getattribute $P6, __ARG_1, 'owner'
     $P5.'StringLiteral'($P6, $P3)
     set $P4, $P5
     .return($P4)
-# }
-.annotate 'line', 3346
+.annotate 'line', 3441
 
 .end # concat_literal
 
+.namespace [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+
+.sub 'FunctionRef' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+.annotate 'line', 3450
+    self.'Expr'(__ARG_1, __ARG_2)
+.annotate 'line', 3451
+    setattribute self, 'sym', __ARG_3
+.annotate 'line', 3452
+
+.end # FunctionRef
+
+
+.sub 'checkresult' :method
+.annotate 'line', 3453
+    .return('P')
+
+.end # checkresult
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+.annotate 'line', 3456
+    getattribute $P1, self, 'sym'
+.annotate 'line', 3457
+    getattribute $P3, $P1, 'owner'
+    $P2 = $P3.'getpath'()
+.annotate 'line', 3458
+    self.'annotate'(__ARG_1)
+.annotate 'line', 3459
+    getattribute $P3, self, 'owner'
+    getattribute $P4, $P1, 'name'
+    $P2.'emit_get_global'(__ARG_1, $P3, __ARG_2, $P4)
+.annotate 'line', 3460
+
+.end # emit
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+.annotate 'line', 3445
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
+    addparent $P0, $P1
+.annotate 'line', 3447
+    addattribute $P0, 'sym'
+.end
 .namespace [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
 
 .sub 'isidentifier' :method
-# Body
-# {
-.annotate 'line', 3354
+.annotate 'line', 3467
     .return(1)
-# }
 
 .end # isidentifier
 
@@ -9638,337 +8078,285 @@
 .sub 'IdentifierExpr' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3357
+.annotate 'line', 3470
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 3358
+.annotate 'line', 3471
     setattribute self, 'name', __ARG_2
-# }
-.annotate 'line', 3359
+.annotate 'line', 3472
 
 .end # IdentifierExpr
 
 
 .sub 'isnull' :method
-# Body
-# {
-.annotate 'line', 3362
-# var name: $P1
+.annotate 'line', 3475
     getattribute $P1, self, 'name'
-.annotate 'line', 3363
+.annotate 'line', 3476
     getattribute $P3, self, 'owner'
     $P2 = $P3.'getvar'($P1)
     if_null $P2, __label_1
-.annotate 'line', 3364
+.annotate 'line', 3477
     .return(0)
   __label_1: # endif
-.annotate 'line', 3365
+.annotate 'line', 3478
     .tailcall $P1.'iskeyword'('null')
-# }
-.annotate 'line', 3366
+.annotate 'line', 3479
 
 .end # isnull
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3369
-# var name: $P1
+.annotate 'line', 3482
     getattribute $P1, self, 'name'
-.annotate 'line', 3370
-# var desc: $P2
+.annotate 'line', 3483
     getattribute $P3, self, 'owner'
     $P2 = $P3.'getvar'($P1)
-.annotate 'line', 3371
+.annotate 'line', 3484
     if_null $P2, __label_1
-.annotate 'line', 3372
+.annotate 'line', 3485
     .tailcall $P2.'gettype'()
     goto __label_2
   __label_1: # else
-# {
-# switch
-.annotate 'line', 3374
+.annotate 'line', 3487
     set $S1, $P1
-    set $S2, 'self'
-    if $S1 == $S2 goto __label_5
-    set $S2, 'null'
-    if $S1 == $S2 goto __label_6
+    if $S1 == 'self' goto __label_5
+    if $S1 == 'null' goto __label_6
     goto __label_4
   __label_5: # case
   __label_6: # case
-.annotate 'line', 3377
+.annotate 'line', 3490
     .return('P')
   __label_4: # default
-.annotate 'line', 3379
+.annotate 'line', 3492
     .return('')
   __label_3: # switch end
-# }
   __label_2: # endif
-# }
-.annotate 'line', 3382
+.annotate 'line', 3495
 
 .end # checkresult
 
 
 .sub 'getName' :method
-# Body
-# {
-.annotate 'line', 3385
-# s: $S1
+.annotate 'line', 3498
     getattribute $P1, self, 'name'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3386
+.annotate 'line', 3499
     .return($S1)
-# }
-.annotate 'line', 3387
+.annotate 'line', 3500
 
 .end # getName
 
 
 .sub 'checkVar' :method
-# Body
-# {
-.annotate 'line', 3390
+.annotate 'line', 3503
     getattribute $P1, self, 'owner'
-# builtin string
     getattribute $P2, self, 'name'
     set $S1, $P2
     .tailcall $P1.'getvar'($S1)
-# }
-.annotate 'line', 3391
+.annotate 'line', 3504
 
 .end # checkVar
 
 
 .sub 'checkIdentifier' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 3394
-# var name: $P1
+.annotate 'line', 3507
     getattribute $P1, self, 'name'
-.annotate 'line', 3395
+.annotate 'line', 3508
     unless_null $P1, __label_1
-.annotate 'line', 3396
+.annotate 'line', 3509
     WSubId_6('Bad thing')
   __label_1: # endif
-.annotate 'line', 3397
-# var desc: $P2
+.annotate 'line', 3510
     getattribute $P3, self, 'owner'
     $P2 = $P3.'getvar'($P1)
-.annotate 'line', 3398
-# s: $S1
+.annotate 'line', 3511
     null $S1
-.annotate 'line', 3399
+.annotate 'line', 3512
     unless_null $P2, __label_2
-# {
-# switch
-.annotate 'line', 3400
+.annotate 'line', 3513
     set $S2, $P1
-    set $S3, 'self'
-    if $S2 == $S3 goto __label_6
-    set $S3, 'null'
-    if $S2 == $S3 goto __label_7
+    if $S2 == 'self' goto __label_6
+    if $S2 == 'null' goto __label_7
     goto __label_5
   __label_6: # case
   __label_7: # case
-.annotate 'line', 3403
+.annotate 'line', 3516
     set $S1, $P1
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 3405
+.annotate 'line', 3518
     set $S1, ''
   __label_4: # switch end
-# }
     goto __label_3
   __label_2: # else
-.annotate 'line', 3409
+.annotate 'line', 3522
     $P3 = $P2.'getreg'()
     set $S1, $P3
   __label_3: # endif
-.annotate 'line', 3410
+.annotate 'line', 3523
     .return($S1)
-# }
-.annotate 'line', 3411
+.annotate 'line', 3524
 
 .end # checkIdentifier
 
 
 .sub 'getIdentifier' :method
-.const 'Sub' WSubId_69 = "WSubId_69"
-# Body
-# {
-.annotate 'line', 3414
-# var value: $P1
+.const 'Sub' WSubId_75 = "WSubId_75"
+.annotate 'line', 3527
     $P1 = self.'checkIdentifier'()
-.annotate 'line', 3415
+.annotate 'line', 3528
     set $S1, $P1
     ne $S1, '', __label_1
-.annotate 'line', 3416
+.annotate 'line', 3529
     getattribute $P2, self, 'name'
-    WSubId_69($P2)
+    WSubId_75($P2)
   __label_1: # endif
-.annotate 'line', 3417
+.annotate 'line', 3530
     .return($P1)
-# }
-.annotate 'line', 3418
+.annotate 'line', 3531
 
 .end # getIdentifier
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3421
-# var name: $P1
+.annotate 'line', 3534
     getattribute $P1, self, 'name'
-.annotate 'line', 3422
-# var desc: $P2
+.annotate 'line', 3535
     getattribute $P5, self, 'owner'
     $P2 = $P5.'getvar'($P1)
-.annotate 'line', 3423
+.annotate 'line', 3536
     if_null $P2, __label_1
-# {
-.annotate 'line', 3424
+.annotate 'line', 3537
     $P5 = $P2.'isconst'()
     if_null $P5, __label_3
     unless $P5 goto __label_3
-.annotate 'line', 3425
+.annotate 'line', 3538
     .tailcall $P2.'getvalue'()
   __label_3: # endif
-.annotate 'line', 3426
-# flags: $I1
+.annotate 'line', 3539
     $P5 = $P2.'getflags'()
     set $I1, $P5
-.annotate 'line', 3427
+.annotate 'line', 3540
     band $I2, $I1, 1
     unless $I2 goto __label_4
-# {
-.annotate 'line', 3428
+.annotate 'line', 3541
     band $I3, $I1, 2
     unless $I3 goto __label_6
-.annotate 'line', 3429
+.annotate 'line', 3542
     new $P6, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     $P6.'LexicalVolatileExpr'(self, $P2)
     set $P5, $P6
     .return($P5)
   __label_6: # endif
-# }
     goto __label_5
   __label_4: # else
-# {
-.annotate 'line', 3436
-# var reg: $P3
+.annotate 'line', 3549
     $P3 = $P2.'getreg'()
-.annotate 'line', 3437
-    isnull $I3, $P3
-    not $I3
-    unless $I3 goto __label_8
+.annotate 'line', 3550
+    isnull $I2, $P3
+    not $I2
+    unless $I2 goto __label_8
     set $S3, $P3
-# builtin substr
     substr $S2, $S3, 0, 7
-    iseq $I4, $S2, 'WSubId_'
-    set $I2, $I4
-    goto __label_9
+    iseq $I2, $S2, 'WSubId_'
   __label_8:
-    set $I2, $I3
-  __label_9:
     unless $I2 goto __label_7
-.annotate 'line', 3438
-# builtin string
+.annotate 'line', 3551
     set $S4, $P3
     box $P5, $S4
     setattribute self, 'subid', $P5
   __label_7: # endif
-# }
   __label_5: # endif
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 3442
-# var sym: $P4
+.annotate 'line', 3555
     root_new $P5, ['parrot';'ResizablePMCArray']
     assign $P5, 1
     $P5[0] = $P1
     $P4 = self.'scopesearch'($P5, 0)
-.annotate 'line', 3443
-    isnull $I3, $P4
-    not $I3
-    unless $I3 goto __label_11
-    isa $I4, $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    set $I2, $I4
-    goto __label_12
-  __label_11:
-    set $I2, $I3
-  __label_12:
-    unless $I2 goto __label_10
-# {
-.annotate 'line', 3444
+.annotate 'line', 3557
+    isnull $I2, $P4
+    if $I2 goto __label_11
+.annotate 'line', 3559
+    isa $I2, $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    if $I2 goto __label_12
+.annotate 'line', 3569
+    isa $I2, $P4, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    if $I2 goto __label_13
+    goto __label_10
+  __label_11: # case
+    goto __label_9 # break
+  __label_12: # case
+.annotate 'line', 3560
     $P5 = $P4.'ismulti'()
-    isfalse $I5, $P5
-    unless $I5 goto __label_13
-# {
-.annotate 'line', 3445
-# id: $S1
+    isfalse $I3, $P5
+    unless $I3 goto __label_14
+.annotate 'line', 3561
     $P6 = $P4.'makesubid'()
     null $S1
-    if_null $P6, __label_14
+    if_null $P6, __label_16
     set $S1, $P6
-  __label_14:
-.annotate 'line', 3446
+  __label_16:
+.annotate 'line', 3562
     box $P5, $S1
     setattribute self, 'subid', $P5
-.annotate 'line', 3447
+.annotate 'line', 3563
     self.'usesubid'($S1)
-.annotate 'line', 3448
+.annotate 'line', 3564
     getattribute $P5, self, 'owner'
     $P5.'createvarnamed'($P1, 'P', $S1)
-# }
-  __label_13: # endif
-# }
-  __label_10: # endif
-# }
+    goto __label_15
+  __label_14: # else
+.annotate 'line', 3567
+    new $P6, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    getattribute $P7, self, 'owner'
+    getattribute $P8, self, 'start'
+    $P6.'FunctionRef'($P7, $P8, $P4)
+    set $P5, $P6
+    .return($P5)
+  __label_15: # endif
+    goto __label_9 # break
+  __label_13: # case
+.annotate 'line', 3570
+    new $P10, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    getattribute $P11, self, 'owner'
+    getattribute $P12, self, 'start'
+    $P10.'FunctionRef'($P11, $P12, $P4)
+    set $P9, $P10
+    .return($P9)
+  __label_10: # default
+  __label_9: # switch end
   __label_2: # endif
-.annotate 'line', 3452
+.annotate 'line', 3573
     .return(self)
-# }
-.annotate 'line', 3453
+.annotate 'line', 3574
 
 .end # optimize
 
 
 .sub 'emit_getid' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3456
-# id: $S1
+.annotate 'line', 3577
     null $S1
-.annotate 'line', 3457
+.annotate 'line', 3578
     getattribute $P2, self, 'subid'
     if_null $P2, __label_1
-.annotate 'line', 3458
+.annotate 'line', 3579
     getattribute $P3, self, 'subid'
     set $S1, $P3
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 3460
+.annotate 'line', 3581
     $P4 = self.'getIdentifier'()
     set $S1, $P4
-.annotate 'line', 3461
-# var desc: $P1
+.annotate 'line', 3582
     getattribute $P2, self, 'owner'
     getattribute $P3, self, 'name'
     $P1 = $P2.'getvar'($P3)
-.annotate 'line', 3462
-# flags: $I1
+.annotate 'line', 3583
     unless_null $P1, __label_4
     null $I1
     goto __label_3
@@ -9976,87 +8364,68 @@
     $P2 = $P1.'getflags'()
     set $I1, $P2
   __label_3:
-.annotate 'line', 3463
+.annotate 'line', 3584
     band $I2, $I1, 1
     unless $I2 goto __label_5
-# {
-.annotate 'line', 3464
+.annotate 'line', 3585
     band $I3, $I1, 2
     unless $I3 goto __label_6
-# {
-.annotate 'line', 3465
-# lexname: $S2
+.annotate 'line', 3586
     $P2 = $P1.'getlex'()
     null $S2
     if_null $P2, __label_7
     set $S2, $P2
   __label_7:
-.annotate 'line', 3466
-    isnull $I3, $S2
-    not $I3
-    unless $I3 goto __label_9
-    isne $I4, $S2, ''
-    set $I2, $I4
-    goto __label_10
+.annotate 'line', 3587
+    isnull $I2, $S2
+    not $I2
+    unless $I2 goto __label_9
+    isne $I2, $S2, ''
   __label_9:
-    set $I2, $I3
-  __label_10:
     unless $I2 goto __label_8
-.annotate 'line', 3467
+.annotate 'line', 3588
     __ARG_1.'emitfind_lex'($S1, $S2)
   __label_8: # endif
-# }
   __label_6: # endif
-# }
   __label_5: # endif
-# }
   __label_2: # endif
-.annotate 'line', 3471
+.annotate 'line', 3592
     .return($S1)
-# }
-.annotate 'line', 3472
+.annotate 'line', 3593
 
 .end # emit_getid
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3475
-    set $S2, __ARG_2
-    eq $S2, '', __label_1
-# {
-.annotate 'line', 3476
+        .param string __ARG_2
+.annotate 'line', 3596
     self.'annotate'(__ARG_1)
-.annotate 'line', 3477
-# id: $S1
+.annotate 'line', 3597
     $P1 = self.'emit_getid'(__ARG_1)
     null $S1
-    if_null $P1, __label_2
+    if_null $P1, __label_1
     set $S1, $P1
-  __label_2:
-.annotate 'line', 3478
+  __label_1:
+.annotate 'line', 3598
     __ARG_1.'emitset'(__ARG_2, $S1)
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 3480
+.annotate 'line', 3599
 
 .end # emit
 
 
+.sub 'emit_void' :method
+
+.end # emit_void
+
+
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3483
+.annotate 'line', 3603
     self.'annotate'(__ARG_1)
-.annotate 'line', 3484
+.annotate 'line', 3604
     .tailcall self.'emit_getid'(__ARG_1)
-# }
-.annotate 'line', 3485
+.annotate 'line', 3605
 
 .end # emit_get
 
@@ -10065,131 +8434,108 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 3488
+.annotate 'line', 3608
     self.'annotate'(__ARG_1)
-.annotate 'line', 3489
+.annotate 'line', 3609
     $P1 = self.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 3490
+.annotate 'line', 3610
     WSubId_1("Cannot assign to null", self)
   __label_1: # endif
-.annotate 'line', 3491
-# typeleft: $S1
+.annotate 'line', 3611
     $P1 = self.'checkresult'()
     null $S1
     if_null $P1, __label_2
     set $S1, $P1
   __label_2:
-.annotate 'line', 3492
-# lreg: $S2
+.annotate 'line', 3612
     $P1 = self.'getIdentifier'()
     null $S2
     if_null $P1, __label_3
     set $S2, $P1
   __label_3:
-.annotate 'line', 3493
+.annotate 'line', 3613
     $P1 = __ARG_2.'isnull'()
     if_null $P1, __label_4
     unless $P1 goto __label_4
-# {
-# switch
-.annotate 'line', 3494
-    set $S5, $S1
-    set $S6, 'S'
-    if $S5 == $S6 goto __label_8
-    set $S6, 'P'
-    if $S5 == $S6 goto __label_9
+.annotate 'line', 3614
+    if $S1 == 'S' goto __label_8
+    if $S1 == 'P' goto __label_9
     goto __label_7
   __label_8: # case
   __label_9: # case
-.annotate 'line', 3497
+.annotate 'line', 3617
     __ARG_1.'emitnull'($S2)
     goto __label_6 # break
   __label_7: # default
-.annotate 'line', 3500
+.annotate 'line', 3620
     WSubId_1("Can't assign null to that type", self)
   __label_6: # switch end
-# }
     goto __label_5
   __label_4: # else
-.annotate 'line', 3503
+.annotate 'line', 3623
     isa $I1, __ARG_2, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
     unless $I1 goto __label_10
-.annotate 'line', 3504
+.annotate 'line', 3624
     __ARG_2.'emit'(__ARG_1, $S2)
     goto __label_11
   __label_10: # else
-# {
-.annotate 'line', 3506
-# typeright: $S3
+.annotate 'line', 3626
     $P1 = __ARG_2.'checkresult'()
     null $S3
     if_null $P1, __label_12
     set $S3, $P1
   __label_12:
-.annotate 'line', 3507
+.annotate 'line', 3627
     ne $S3, 'v', __label_13
-.annotate 'line', 3508
+.annotate 'line', 3628
     WSubId_1("Can't assign from void expression", self)
   __label_13: # endif
-.annotate 'line', 3509
+.annotate 'line', 3629
     ne $S1, $S3, __label_14
-# {
-.annotate 'line', 3510
+.annotate 'line', 3630
     __ARG_2.'emit'(__ARG_1, $S2)
-# }
     goto __label_15
   __label_14: # else
-# {
-.annotate 'line', 3513
-# rreg: $S4
+.annotate 'line', 3633
     $P1 = __ARG_2.'emit_get'(__ARG_1)
     null $S4
     if_null $P1, __label_16
     set $S4, $P1
   __label_16:
-.annotate 'line', 3514
+.annotate 'line', 3634
     self.'annotate'(__ARG_1)
-.annotate 'line', 3515
-    iseq $I2, $S1, 'P'
-    unless $I2 goto __label_19
-    isne $I3, $S3, 'P'
-    set $I1, $I3
-    goto __label_20
+.annotate 'line', 3635
+    iseq $I1, $S1, 'P'
+    unless $I1 goto __label_19
+    isne $I1, $S3, 'P'
   __label_19:
-    set $I1, $I2
-  __label_20:
     unless $I1 goto __label_17
-.annotate 'line', 3516
+.annotate 'line', 3636
     __ARG_1.'emitbox'($S2, $S4)
     goto __label_18
   __label_17: # else
-.annotate 'line', 3518
+.annotate 'line', 3638
     __ARG_1.'emitset'($S2, $S4)
   __label_18: # endif
-# }
   __label_15: # endif
-# }
   __label_11: # endif
   __label_5: # endif
-.annotate 'line', 3521
+.annotate 'line', 3641
     .return($S2)
-# }
-.annotate 'line', 3522
+.annotate 'line', 3642
 
 .end # emit_assign_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
-.annotate 'line', 3350
+.annotate 'line', 3463
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     addparent $P0, $P1
-.annotate 'line', 3352
+.annotate 'line', 3465
     addattribute $P0, 'name'
-.annotate 'line', 3353
+.annotate 'line', 3466
     addattribute $P0, 'subid'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
@@ -10197,48 +8543,37 @@
 .sub 'LexicalVolatileExpr' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3532
+.annotate 'line', 3652
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     self.'Expr'($P1, $P2)
-.annotate 'line', 3533
+.annotate 'line', 3653
     setattribute self, 'desc', __ARG_2
-# }
-.annotate 'line', 3534
+.annotate 'line', 3654
 
 .end # LexicalVolatileExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3537
+.annotate 'line', 3657
     getattribute $P1, self, 'desc'
     .tailcall $P1.'gettype'()
-# }
-.annotate 'line', 3538
+.annotate 'line', 3658
 
 .end # checkresult
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3541
-# var desc: $P1
+.annotate 'line', 3661
     getattribute $P1, self, 'desc'
-.annotate 'line', 3542
-# lexname: $S1
+.annotate 'line', 3662
     $P2 = $P1.'getlex'()
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3543
-# reg: $S2
+.annotate 'line', 3663
     getattribute $P3, self, 'owner'
     $P4 = $P1.'gettype'()
     $P2 = $P3.'tempreg'($P4)
@@ -10246,40 +8581,29 @@
     if_null $P2, __label_2
     set $S2, $P2
   __label_2:
-.annotate 'line', 3544
+.annotate 'line', 3664
     __ARG_1.'emitfind_lex'($S2, $S1)
-.annotate 'line', 3545
+.annotate 'line', 3665
     .return($S2)
-# }
-.annotate 'line', 3546
+.annotate 'line', 3666
 
 .end # emit_get
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3549
-    set $S2, __ARG_2
-    eq $S2, '', __label_1
-# {
-.annotate 'line', 3550
+        .param string __ARG_2
+.annotate 'line', 3669
     self.'annotate'(__ARG_1)
-.annotate 'line', 3551
-# reg: $S1
+.annotate 'line', 3670
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
-    if_null $P1, __label_2
+    if_null $P1, __label_1
     set $S1, $P1
-  __label_2:
-.annotate 'line', 3552
+  __label_1:
+.annotate 'line', 3671
     __ARG_1.'emitset'(__ARG_2, $S1)
-# }
-  __label_1: # endif
-# }
-.annotate 'line', 3554
+.annotate 'line', 3672
 
 .end # emit
 
@@ -10287,87 +8611,70 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3557
-# var desc: $P1
-    getattribute $P1, self, 'desc'
-.annotate 'line', 3558
-# typelex: $S1
-    $P2 = $P1.'gettype'()
+.annotate 'line', 3675
+    getattribute $P1, self, 'owner'
+.annotate 'line', 3676
+    getattribute $P2, self, 'desc'
+.annotate 'line', 3677
+    $P3 = $P2.'gettype'()
     null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
+    if_null $P3, __label_1
+    set $S1, $P3
   __label_1:
-.annotate 'line', 3559
-# lreg: $S2
-    getattribute $P3, self, 'owner'
-    $P4 = $P1.'gettype'()
-    $P2 = $P3.'tempreg'($P4)
+.annotate 'line', 3678
     null $S2
-    if_null $P2, __label_2
-    set $S2, $P2
-  __label_2:
-# switch-case
-.annotate 'line', 3561
+.annotate 'line', 3680
     $I1 = __ARG_2.'isnull'()
-    if $I1 goto __label_5
-.annotate 'line', 3564
+    if $I1 goto __label_4
+.annotate 'line', 3684
     isa $I1, __ARG_2, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-    if $I1 goto __label_6
-    goto __label_4
-  __label_5: # case
-.annotate 'line', 3562
+    if $I1 goto __label_5
+    goto __label_3
+  __label_4: # case
+.annotate 'line', 3681
+    $P3 = $P1.'tempreg'($S1)
+    set $S2, $P3
+.annotate 'line', 3682
     __ARG_1.'emitnull'($S2)
-    goto __label_3 # break
-  __label_6: # case
-.annotate 'line', 3565
+    goto __label_2 # break
+  __label_5: # case
+.annotate 'line', 3685
+    $P4 = $P1.'tempreg'($S1)
+    set $S2, $P4
+.annotate 'line', 3686
     __ARG_2.'emit'(__ARG_1, $S2)
-    goto __label_3 # break
-  __label_4: # default
-.annotate 'line', 3568
-# typeright: $S3
-    $P2 = __ARG_2.'checkresult'()
-    null $S3
-    if_null $P2, __label_7
-    set $S3, $P2
-  __label_7:
-.annotate 'line', 3569
-    iseq $I3, $S1, $S3
-    if $I3 goto __label_10
-    isne $I4, $S1, 'P'
-    set $I2, $I4
-    goto __label_11
-  __label_10:
-    set $I2, $I3
-  __label_11:
-    unless $I2 goto __label_8
-.annotate 'line', 3570
-    __ARG_2.'emit'(__ARG_1, $S2)
+    goto __label_2 # break
+  __label_3: # default
+.annotate 'line', 3689
+    ne $S1, 'P', __label_6
+.annotate 'line', 3690
+    $P5 = __ARG_2.'emit_getvar'(__ARG_1)
+    set $S2, $P5
+    goto __label_7
+  __label_6: # else
+.annotate 'line', 3691
+    $P6 = __ARG_2.'checkresult'()
+    set $S3, $P6
+    ne $S1, $S3, __label_8
+.annotate 'line', 3692
+    $P7 = __ARG_2.'emit_get'(__ARG_1)
+    set $S2, $P7
     goto __label_9
   __label_8: # else
-# {
-.annotate 'line', 3572
-# rreg: $S4
-    $P3 = __ARG_2.'emit_get'(__ARG_1)
-    null $S4
-    if_null $P3, __label_12
-    set $S4, $P3
-  __label_12:
-.annotate 'line', 3573
-    self.'annotate'(__ARG_1)
-.annotate 'line', 3574
-    __ARG_1.'emitbox'($S2, $S4)
-# }
+.annotate 'line', 3694
+    $P8 = $P1.'tempreg'($S1)
+    set $S2, $P8
+.annotate 'line', 3695
+    __ARG_2.'emit'(__ARG_1, $S2)
   __label_9: # endif
-  __label_3: # switch end
-.annotate 'line', 3578
-    $P2 = $P1.'getlex'()
-    __ARG_1.'emitstore_lex'($P2, $S2)
-.annotate 'line', 3579
+  __label_7: # endif
+  __label_2: # switch end
+.annotate 'line', 3699
+    $P3 = $P2.'getlex'()
+    __ARG_1.'emitstore_lex'($P3, $S2)
+.annotate 'line', 3700
     .return($S2)
-# }
-.annotate 'line', 3580
+.annotate 'line', 3701
 
 .end # emit_assign_get
 
@@ -10375,23 +8682,20 @@
 .sub 'emit_store' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3583
+.annotate 'line', 3704
     getattribute $P2, self, 'desc'
     $P1 = $P2.'getlex'()
     __ARG_1.'emitstore_lex'($P1, __ARG_2)
-# }
-.annotate 'line', 3584
+.annotate 'line', 3705
 
 .end # emit_store
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
-.annotate 'line', 3527
+.annotate 'line', 3647
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 3529
+.annotate 'line', 3649
     addattribute $P0, 'desc'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpExpr' ]
@@ -10399,18 +8703,15 @@
 .sub 'initop' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3593
+.annotate 'line', 3714
     self.'Expr'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 3594
+.annotate 'line', 3715
 
 .end # initop
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
-.annotate 'line', 3589
+.annotate 'line', 3710
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
 .end
@@ -10420,74 +8721,61 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_63 = "WSubId_63"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 3604
+.const 'Sub' WSubId_69 = "WSubId_69"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 3725
     self.'initop'(__ARG_2, __ARG_3)
-.annotate 'line', 3605
-    $P2 = WSubId_63(__ARG_1)
+.annotate 'line', 3726
+    $P2 = WSubId_69(__ARG_1)
     setattribute self, 'key', $P2
-.annotate 'line', 3606
+.annotate 'line', 3727
     getattribute $P1, self, 'key'
-# builtin elements
     elements $I1, $P1
     if $I1 goto __label_1
-.annotate 'line', 3607
-    WSubId_48('namespace identifier', __ARG_3)
+.annotate 'line', 3728
+    WSubId_54('namespace identifier', __ARG_3)
   __label_1: # endif
-# }
-.annotate 'line', 3608
+.annotate 'line', 3729
 
 .end # OpNamespaceExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3609
+.annotate 'line', 3730
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 3612
-# var owner: $P1
+.annotate 'line', 3733
     getattribute $P1, self, 'owner'
-.annotate 'line', 3613
-# var sym: $P2
+.annotate 'line', 3734
     getattribute $P4, self, 'key'
     $P2 = $P1.'scopesearch'($P4, 1)
-.annotate 'line', 3614
+.annotate 'line', 3735
     unless_null $P2, __label_1
-.annotate 'line', 3615
+.annotate 'line', 3736
     getattribute $P4, self, 'start'
     WSubId_1('unknown namespace', $P4)
   __label_1: # endif
-.annotate 'line', 3616
-# var path: $P3
+.annotate 'line', 3737
     $P3 = $P2.'getpath'()
-.annotate 'line', 3617
+.annotate 'line', 3738
     $P3.'emit_get_namespace'(__ARG_1, $P1, __ARG_2)
-# }
-.annotate 'line', 3618
+.annotate 'line', 3739
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpNamespaceExpr' ]
-.annotate 'line', 3599
+.annotate 'line', 3720
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
-.annotate 'line', 3601
+.annotate 'line', 3722
     addattribute $P0, 'key'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpClassExpr' ]
@@ -10496,26 +8784,20 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_70 = "WSubId_70"
-# Body
-# {
-.annotate 'line', 3629
+.const 'Sub' WSubId_76 = "WSubId_76"
+.annotate 'line', 3750
     self.'initop'(__ARG_2, __ARG_3)
-.annotate 'line', 3630
-    $P2 = WSubId_70(__ARG_1, __ARG_2)
+.annotate 'line', 3751
+    $P2 = WSubId_76(__ARG_1, __ARG_2)
     setattribute self, 'clspec', $P2
-# }
-.annotate 'line', 3631
+.annotate 'line', 3752
 
 .end # OpClassExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3632
+.annotate 'line', 3753
     .return('P')
-# }
 
 .end # checkresult
 
@@ -10523,32 +8805,26 @@
 .sub 'get_class_raw_key' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 3635
-# var owner: $P1
+.annotate 'line', 3756
     getattribute $P1, self, 'owner'
-.annotate 'line', 3636
-# var clspec: $P2
+.annotate 'line', 3757
     getattribute $P2, self, 'clspec'
-.annotate 'line', 3637
-# var clkey: $P3
+.annotate 'line', 3758
     null $P3
-# switch-case
-.annotate 'line', 3640
+.annotate 'line', 3761
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
     if $I1 goto __label_3
-.annotate 'line', 3643
+.annotate 'line', 3764
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
     if $I1 goto __label_4
-.annotate 'line', 3646
+.annotate 'line', 3767
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     if $I1 goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 3641
+.annotate 'line', 3762
     $P3 = $P2.'checknskey'($P1)
-.annotate 'line', 3642
+.annotate 'line', 3763
     if_null $P3, __label_7
     getattribute $P4, $P3, 'path'
     goto __label_6
@@ -10557,9 +8833,9 @@
   __label_6:
     .return($P4)
   __label_4: # case
-.annotate 'line', 3644
+.annotate 'line', 3765
     $P3 = $P2.'checknskey'($P1)
-.annotate 'line', 3645
+.annotate 'line', 3766
     if_null $P3, __label_9
     getattribute $P5, $P3, 'path'
     goto __label_8
@@ -10568,84 +8844,65 @@
   __label_8:
     .return($P5)
   __label_5: # case
-.annotate 'line', 3647
-# builtin string
-# builtin typeof
+.annotate 'line', 3768
     typeof $P6, $P2
     set $S1, $P6
     concat $S2, $S1, " not supported yet here"
-.annotate 'line', 3648
+.annotate 'line', 3769
     getattribute $P7, $P2, 'start'
-.annotate 'line', 3647
+.annotate 'line', 3768
     WSubId_1($S2, $P7)
   __label_2: # default
   __label_1: # switch end
-.annotate 'line', 3650
+.annotate 'line', 3771
     getattribute $P4, $P2, 'start'
     WSubId_6("Unexpected class key", $P4)
-# }
-.annotate 'line', 3651
+.annotate 'line', 3772
 
 .end # get_class_raw_key
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3654
-# var owner: $P1
+        .param string __ARG_2
+.annotate 'line', 3775
     getattribute $P1, self, 'owner'
-.annotate 'line', 3655
-# var clspec: $P2
+.annotate 'line', 3776
     getattribute $P2, self, 'clspec'
-.annotate 'line', 3658
-    set $S1, __ARG_2
-    ne $S1, '', __label_1
-.annotate 'line', 3659
-    getattribute $P4, self, 'owner'
-    __ARG_2 = $P4.'tempreg'('P')
-  __label_1: # endif
-# switch-case
-.annotate 'line', 3663
+.annotate 'line', 3779
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
-    if $I1 goto __label_4
-    goto __label_3
-  __label_4: # case
-.annotate 'line', 3664
-# var clkey: $P3
+    if $I1 goto __label_3
+    goto __label_2
+  __label_3: # case
+.annotate 'line', 3780
     $P3 = $P2.'checknskey'($P1)
-.annotate 'line', 3665
-    if_null $P3, __label_5
-# {
-.annotate 'line', 3666
+.annotate 'line', 3781
+    if_null $P3, __label_4
+.annotate 'line', 3782
     $P3.'emit_get_class'(__ARG_1, $P1, __ARG_2)
-.annotate 'line', 3667
+.annotate 'line', 3783
     .return()
-# }
-  __label_5: # endif
-    goto __label_2 # break
-  __label_3: # default
-  __label_2: # switch end
-.annotate 'line', 3672
+  __label_4: # endif
+    goto __label_1 # break
+  __label_2: # default
+  __label_1: # switch end
+.annotate 'line', 3788
     __ARG_1.'print'('    get_class ', __ARG_2, ', ')
-.annotate 'line', 3673
+.annotate 'line', 3789
     getattribute $P4, self, 'owner'
     $P2.'emit'(__ARG_1, $P4)
-.annotate 'line', 3674
+.annotate 'line', 3790
     __ARG_1.'say'()
-# }
-.annotate 'line', 3675
+.annotate 'line', 3791
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpClassExpr' ]
-.annotate 'line', 3623
+.annotate 'line', 3744
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
-.annotate 'line', 3625
+.annotate 'line', 3746
     addattribute $P0, 'clspec'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
@@ -10654,49 +8911,40 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3685
+.annotate 'line', 3801
     self.'initop'(__ARG_1, __ARG_2)
-.annotate 'line', 3686
+.annotate 'line', 3802
     setattribute self, 'subexpr', __ARG_3
-# }
-.annotate 'line', 3687
+.annotate 'line', 3803
 
 .end # OpUnaryExpr
 
 
 .sub 'optimizearg' :method
-# Body
-# {
-.annotate 'line', 3690
+.annotate 'line', 3806
     getattribute $P3, self, 'subexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'subexpr', $P2
-# }
-.annotate 'line', 3691
+.annotate 'line', 3807
 
 .end # optimizearg
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3694
+.annotate 'line', 3810
     self.'optimizearg'()
-.annotate 'line', 3695
+.annotate 'line', 3811
     .return(self)
-# }
-.annotate 'line', 3696
+.annotate 'line', 3812
 
 .end # optimize
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
-.annotate 'line', 3680
+.annotate 'line', 3796
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
-.annotate 'line', 3682
+.annotate 'line', 3798
     addattribute $P0, 'subexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
@@ -10706,16 +8954,13 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 3707
+.annotate 'line', 3823
     self.'initop'(__ARG_1, __ARG_2)
-.annotate 'line', 3708
+.annotate 'line', 3824
     setattribute self, 'lexpr', __ARG_3
-.annotate 'line', 3709
+.annotate 'line', 3825
     setattribute self, 'rexpr', __ARG_4
-# }
-.annotate 'line', 3710
+.annotate 'line', 3826
 
 .end # initbinary
 
@@ -10725,179 +8970,142 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 3713
+.annotate 'line', 3829
     self.'initbinary'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-.annotate 'line', 3714
+.annotate 'line', 3830
     .return(self)
-# }
-.annotate 'line', 3715
+.annotate 'line', 3831
 
 .end # set
 
 
 .sub 'setfrom' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3718
+.annotate 'line', 3834
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     getattribute $P3, __ARG_1, 'lexpr'
     getattribute $P4, __ARG_1, 'rexpr'
     .tailcall self.'set'($P1, $P2, $P3, $P4)
-# }
-.annotate 'line', 3719
+.annotate 'line', 3835
 
 .end # setfrom
 
 
 .sub 'optimizearg' :method
-# Body
-# {
-.annotate 'line', 3722
+.annotate 'line', 3838
     getattribute $P3, self, 'lexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'lexpr', $P2
-.annotate 'line', 3723
+.annotate 'line', 3839
     getattribute $P3, self, 'rexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'rexpr', $P2
-# }
-.annotate 'line', 3724
+.annotate 'line', 3840
 
 .end # optimizearg
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 3727
+.annotate 'line', 3843
     self.'optimizearg'()
-.annotate 'line', 3728
+.annotate 'line', 3844
     .return(self)
-# }
-.annotate 'line', 3729
+.annotate 'line', 3845
 
 .end # optimize
 
 
 .sub 'emit_intleft' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3732
+.annotate 'line', 3848
     getattribute $P1, self, 'lexpr'
     .tailcall $P1.'emit_getint'(__ARG_1)
-# }
-.annotate 'line', 3733
+.annotate 'line', 3849
 
 .end # emit_intleft
 
 
 .sub 'emit_intright' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3736
+.annotate 'line', 3852
     getattribute $P1, self, 'rexpr'
     .tailcall $P1.'emit_getint'(__ARG_1)
-# }
-.annotate 'line', 3737
+.annotate 'line', 3853
 
 .end # emit_intright
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
-.annotate 'line', 3701
+.annotate 'line', 3817
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
-.annotate 'line', 3703
+.annotate 'line', 3819
     addattribute $P0, 'lexpr'
-.annotate 'line', 3704
+.annotate 'line', 3820
     addattribute $P0, 'rexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3746
+.annotate 'line', 3862
     .return('I')
-# }
-.annotate 'line', 3747
+.annotate 'line', 3863
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 3750
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 3866
     self.'optimizearg'()
-.annotate 'line', 3751
-# var lexpr: $P1
+.annotate 'line', 3867
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 3752
-# var rexpr: $P2
+.annotate 'line', 3868
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 3753
-    $P4 = $P1.'isintegerliteral'()
-    unless $P4 goto __label_2
-    $P5 = $P2.'isintegerliteral'()
-    set $P3, $P5
-    goto __label_3
+.annotate 'line', 3869
+    $P3 = $P1.'isintegerliteral'()
+    unless $P3 goto __label_2
+    $P3 = $P2.'isintegerliteral'()
   __label_2:
-    set $P3, $P4
-  __label_3:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 3754
-# li: $I1
-    $P6 = $P1.'getIntegerValue'()
-    set $I1, $P6
-.annotate 'line', 3755
-# ri: $I2
+.annotate 'line', 3870
+    $P4 = $P1.'getIntegerValue'()
+    set $I1, $P4
+.annotate 'line', 3871
     $P3 = $P2.'getIntegerValue'()
     set $I2, $P3
-.annotate 'line', 3756
+.annotate 'line', 3872
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     $P5 = self.'do_op'($I1, $I2)
-    .tailcall WSubId_22($P3, $P4, $P5)
-# }
+    .tailcall WSubId_25($P3, $P4, $P5)
   __label_1: # endif
-.annotate 'line', 3758
+.annotate 'line', 3874
     .return(self)
-# }
-.annotate 'line', 3759
+.annotate 'line', 3875
 
 .end # optimize
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
-.annotate 'line', 3742
+.annotate 'line', 3858
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3768
+.annotate 'line', 3884
     .return('I')
-# }
-.annotate 'line', 3769
+.annotate 'line', 3885
 
 .end # checkresult
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
-.annotate 'line', 3764
+.annotate 'line', 3880
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
 .end
@@ -10907,68 +9115,51 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3777
+.annotate 'line', 3893
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3778
+.annotate 'line', 3894
 
 .end # OpDeleteExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 3781
-# var expr: $P1
+.annotate 'line', 3897
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3782
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-    unless $I2 goto __label_3
+.annotate 'line', 3898
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
+    unless $I1 goto __label_3
     $P2 = $P1.'checkresult'()
     set $S1, $P2
-    isne $I3, $S1, 'S'
-    set $I1, $I3
-    goto __label_4
+    isne $I1, $S1, 'S'
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_1
-# {
-.annotate 'line', 3783
+.annotate 'line', 3899
     $P1.'emit_prep'(__ARG_1)
-.annotate 'line', 3784
+.annotate 'line', 3900
     self.'annotate'(__ARG_1)
-.annotate 'line', 3785
+.annotate 'line', 3901
     __ARG_1.'print'('    delete ')
-.annotate 'line', 3786
+.annotate 'line', 3902
     $P1.'emit_aux'(__ARG_1)
-.annotate 'line', 3787
+.annotate 'line', 3903
     __ARG_1.'say'()
-.annotate 'line', 3788
-    set $S1, __ARG_2
-    eq $S1, '', __label_5
-.annotate 'line', 3789
+.annotate 'line', 3904
     __ARG_1.'emitset'(__ARG_2, '1')
-  __label_5: # endif
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 3792
+.annotate 'line', 3907
     WSubId_1("delete with invalid operator", self)
   __label_2: # endif
-# }
-.annotate 'line', 3793
+.annotate 'line', 3908
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDeleteExpr' ]
-.annotate 'line', 3773
+.annotate 'line', 3889
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
     addparent $P0, $P1
 .end
@@ -10978,76 +9169,49 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3800
+.annotate 'line', 3915
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3801
+.annotate 'line', 3916
 
 .end # OpExistsExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 3804
-# var expr: $P1
+.annotate 'line', 3919
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3805
-# reg: $S1
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-    set $P2, __ARG_2
-    goto __label_1
-  __label_2:
-    $P3 = self.'tempreg'('I')
-    set $P2, $P3
-  __label_1:
-    null $S1
-    if_null $P2, __label_3
-    set $S1, $P2
-  __label_3:
-.annotate 'line', 3806
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-    unless $I2 goto __label_6
+.annotate 'line', 3920
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
+    unless $I1 goto __label_3
     $P2 = $P1.'checkresult'()
-    set $S2, $P2
-    isne $I3, $S2, 'S'
-    set $I1, $I3
-    goto __label_7
-  __label_6:
-    set $I1, $I2
-  __label_7:
-    unless $I1 goto __label_4
-# {
-.annotate 'line', 3807
+    set $S1, $P2
+    isne $I1, $S1, 'S'
+  __label_3:
+    unless $I1 goto __label_1
+.annotate 'line', 3921
     $P1.'emit_prep'(__ARG_1)
-.annotate 'line', 3808
+.annotate 'line', 3922
     self.'annotate'(__ARG_1)
-.annotate 'line', 3809
-    __ARG_1.'print'('    exists ', $S1, ', ')
-.annotate 'line', 3810
+.annotate 'line', 3923
+    __ARG_1.'print'('    exists ', __ARG_2, ', ')
+.annotate 'line', 3924
     $P1.'emit_aux'(__ARG_1)
-.annotate 'line', 3811
+.annotate 'line', 3925
     __ARG_1.'say'()
-# }
-    goto __label_5
-  __label_4: # else
-.annotate 'line', 3814
+    goto __label_2
+  __label_1: # else
+.annotate 'line', 3928
     WSubId_1("exists with invalid operator", self)
-  __label_5: # endif
-# }
-.annotate 'line', 3815
+  __label_2: # endif
+.annotate 'line', 3929
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpExistsExpr' ]
-.annotate 'line', 3796
+.annotate 'line', 3911
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
     addparent $P0, $P1
 .end
@@ -11057,24 +9221,18 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3824
+.annotate 'line', 3938
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3825
+.annotate 'line', 3939
 
 .end # OpUnaryMinusExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3828
+.annotate 'line', 3942
     getattribute $P1, self, 'subexpr'
     .tailcall $P1.'checkresult'()
-# }
-.annotate 'line', 3829
+.annotate 'line', 3943
 
 .end # checkresult
 
@@ -11083,95 +9241,76 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3832
+.annotate 'line', 3946
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 3833
+.annotate 'line', 3947
     .return(self)
-# }
-.annotate 'line', 3834
+.annotate 'line', 3948
 
 .end # set
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-.const 'Sub' WSubId_71 = "WSubId_71"
-# Body
-# {
-.annotate 'line', 3837
-# var subexpr: $P1
+.const 'Sub' WSubId_25 = "WSubId_25"
+.const 'Sub' WSubId_77 = "WSubId_77"
+.annotate 'line', 3951
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3838
+.annotate 'line', 3952
     self.'optimizearg'()
-.annotate 'line', 3839
+.annotate 'line', 3953
     $P2 = $P1.'isintegerliteral'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 3840
-# i: $I1
+.annotate 'line', 3954
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 3841
+.annotate 'line', 3955
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     neg $I2, $I1
-    .tailcall WSubId_22($P2, $P3, $I2)
-# }
+    .tailcall WSubId_25($P2, $P3, $I2)
   __label_1: # endif
-# {
-.annotate 'line', 3844
+.annotate 'line', 3958
     $P2 = $P1.'isfloatliteral'()
     if_null $P2, __label_2
     unless $P2 goto __label_2
-# {
-.annotate 'line', 3845
-# n: $N1
+.annotate 'line', 3959
     $P3 = $P1.'getFloatValue'()
     set $N1, $P3
-.annotate 'line', 3846
+.annotate 'line', 3960
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     neg $N2, $N1
-    .tailcall WSubId_71($P2, $P3, $N2)
-# }
+    .tailcall WSubId_77($P2, $P3, $N2)
   __label_2: # endif
-# }
-.annotate 'line', 3849
+.annotate 'line', 3963
     .return(self)
-# }
-.annotate 'line', 3850
+.annotate 'line', 3964
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3853
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 3967
     getattribute $P2, self, 'subexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3854
+.annotate 'line', 3968
     self.'annotate'(__ARG_1)
-.annotate 'line', 3855
+.annotate 'line', 3969
     __ARG_1.'emitarg2'('neg', __ARG_2, $S1)
-# }
-.annotate 'line', 3856
+.annotate 'line', 3970
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpUnaryMinusExpr' ]
-.annotate 'line', 3820
+.annotate 'line', 3934
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
 .end
@@ -11181,33 +9320,24 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3865
+.annotate 'line', 3979
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3866
+.annotate 'line', 3980
 
 .end # OpNotExpr
 
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 3867
+.annotate 'line', 3981
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3870
+.annotate 'line', 3984
     .return('I')
-# }
-.annotate 'line', 3871
+.annotate 'line', 3985
 
 .end # checkresult
 
@@ -11216,116 +9346,95 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3874
+.annotate 'line', 3988
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 3875
+.annotate 'line', 3989
     .return(self)
-# }
-.annotate 'line', 3876
+.annotate 'line', 3990
 
 .end # set
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 3879
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 3993
     self.'optimizearg'()
-.annotate 'line', 3880
-# var subexpr: $P1
+.annotate 'line', 3994
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3881
+.annotate 'line', 3995
     $P2 = $P1.'isintegerliteral'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 3882
-# n: $I1
+.annotate 'line', 3996
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 3883
+.annotate 'line', 3997
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     not $I2, $I1
-    .tailcall WSubId_22($P2, $P3, $I2)
-# }
+    .tailcall WSubId_25($P2, $P3, $I2)
   __label_1: # endif
-.annotate 'line', 3885
+.annotate 'line', 3999
     $P2 = $P1.'isnegable'()
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 3886
+.annotate 'line', 4000
     .tailcall $P1.'negated'()
   __label_2: # endif
-.annotate 'line', 3887
+.annotate 'line', 4001
     .return(self)
-# }
-.annotate 'line', 3888
+.annotate 'line', 4002
 
 .end # optimize
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 3891
+.annotate 'line', 4005
     getattribute $P1, self, 'subexpr'
     .return($P1)
-# }
-.annotate 'line', 3892
+.annotate 'line', 4006
 
 .end # negated
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3895
-# var subexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 4009
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3896
-# reg: $S1
+.annotate 'line', 4010
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3897
+.annotate 'line', 4011
     self.'annotate'(__ARG_1)
-# switch
-.annotate 'line', 3898
+.annotate 'line', 4012
     $P2 = $P1.'checkresult'()
     set $S2, $P2
-    set $S3, 'I'
-    if $S2 == $S3 goto __label_4
-    set $S3, 'P'
-    if $S2 == $S3 goto __label_5
+    if $S2 == 'I' goto __label_4
+    if $S2 == 'P' goto __label_5
     goto __label_3
   __label_4: # case
-.annotate 'line', 3900
+.annotate 'line', 4014
     __ARG_1.'emitarg2'('not', __ARG_2, $S1)
     goto __label_2 # break
   __label_5: # case
-.annotate 'line', 3903
+.annotate 'line', 4017
     __ARG_1.'emitarg2'('isfalse', __ARG_2, $S1)
     goto __label_2 # break
   __label_3: # default
-.annotate 'line', 3906
+.annotate 'line', 4020
     __ARG_1.'emitarg2'('isfalse', __ARG_2, $S1)
   __label_2: # switch end
-# }
-.annotate 'line', 3908
+.annotate 'line', 4022
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpNotExpr' ]
-.annotate 'line', 3861
+.annotate 'line', 3975
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
 .end
@@ -11335,23 +9444,17 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3917
+.annotate 'line', 4031
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3918
+.annotate 'line', 4032
 
 .end # OpBinNotExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3921
+.annotate 'line', 4035
     .return('I')
-# }
-.annotate 'line', 3922
+.annotate 'line', 4036
 
 .end # checkresult
 
@@ -11360,104 +9463,80 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3925
+.annotate 'line', 4039
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 3926
+.annotate 'line', 4040
     .return(self)
-# }
-.annotate 'line', 3927
+.annotate 'line', 4041
 
 .end # set
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 3930
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 4044
     self.'optimizearg'()
-.annotate 'line', 3931
-# var subexpr: $P1
+.annotate 'line', 4045
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3932
+.annotate 'line', 4046
     $P2 = $P1.'isintegerliteral'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 3933
-# n: $I1
+.annotate 'line', 4047
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 3934
+.annotate 'line', 4048
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     bxor $I2, $I1, -1
-    .tailcall WSubId_22($P2, $P3, $I2)
-# }
+    .tailcall WSubId_25($P2, $P3, $I2)
   __label_1: # endif
-.annotate 'line', 3936
+.annotate 'line', 4050
     $P2 = $P1.'isnegable'()
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 3937
+.annotate 'line', 4051
     .tailcall $P1.'negated'()
   __label_2: # endif
-.annotate 'line', 3938
+.annotate 'line', 4052
     .return(self)
-# }
-.annotate 'line', 3939
+.annotate 'line', 4053
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3942
-# var subexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 4056
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3943
-# reg: $S1
+.annotate 'line', 4057
     $P2 = $P1.'emit_getint'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 3944
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-# {
-.annotate 'line', 3945
+.annotate 'line', 4058
     self.'annotate'(__ARG_1)
-.annotate 'line', 3946
+.annotate 'line', 4059
     __ARG_1.'emitarg3'('bxor', __ARG_2, $S1, -1)
-# }
-  __label_2: # endif
-# }
-.annotate 'line', 3948
+.annotate 'line', 4060
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinNotExpr' ]
-.annotate 'line', 3913
+.annotate 'line', 4027
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 3957
+.annotate 'line', 4069
     getattribute $P1, self, 'subexpr'
     .tailcall $P1.'checkresult'()
-# }
-.annotate 'line', 3958
+.annotate 'line', 4070
 
 .end # checkresult
 
@@ -11465,25 +9544,21 @@
 .sub 'iflexical' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3961
-# var expr: $P1
+.annotate 'line', 4073
     getattribute $P1, self, 'subexpr'
-.annotate 'line', 3962
+.annotate 'line', 4074
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     unless $I1 goto __label_1
-.annotate 'line', 3963
+.annotate 'line', 4075
     $P1.'emit_store'(__ARG_1, __ARG_2)
   __label_1: # endif
-# }
-.annotate 'line', 3964
+.annotate 'line', 4076
 
 .end # iflexical
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
-.annotate 'line', 3953
+.annotate 'line', 4065
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
 .end
@@ -11491,30 +9566,31 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 3973
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 4085
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3974
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-.annotate 'line', 3975
+.annotate 'line', 4086
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_2: # endif
-# }
-.annotate 'line', 3976
+.annotate 'line', 4087
 
 .end # emit
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4090
+    self.'emit_get'(__ARG_1)
+.annotate 'line', 4091
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
-.annotate 'line', 3969
+.annotate 'line', 4081
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
 .end
@@ -11524,44 +9600,37 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3983
+.annotate 'line', 4098
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 3984
+.annotate 'line', 4099
 
 .end # OpPreIncExpr
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 3987
-# reg: $S1
+.annotate 'line', 4102
     getattribute $P2, self, 'subexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 3988
+.annotate 'line', 4103
     self.'annotate'(__ARG_1)
-.annotate 'line', 3989
+.annotate 'line', 4104
     __ARG_1.'emitinc'($S1)
-.annotate 'line', 3990
+.annotate 'line', 4105
     self.'iflexical'(__ARG_1, $S1)
-.annotate 'line', 3991
+.annotate 'line', 4106
     .return($S1)
-# }
-.annotate 'line', 3992
+.annotate 'line', 4107
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreIncExpr' ]
-.annotate 'line', 3979
+.annotate 'line', 4094
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
     addparent $P0, $P1
 .end
@@ -11571,44 +9640,37 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 3999
+.annotate 'line', 4114
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 4000
+.annotate 'line', 4115
 
 .end # OpPreDecExpr
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4003
-# reg: $S1
+.annotate 'line', 4118
     getattribute $P2, self, 'subexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4004
+.annotate 'line', 4119
     self.'annotate'(__ARG_1)
-.annotate 'line', 4005
+.annotate 'line', 4120
     __ARG_1.'emitdec'($S1)
-.annotate 'line', 4006
+.annotate 'line', 4121
     self.'iflexical'(__ARG_1, $S1)
-.annotate 'line', 4007
+.annotate 'line', 4122
     .return($S1)
-# }
-.annotate 'line', 4008
+.annotate 'line', 4123
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreDecExpr' ]
-.annotate 'line', 3995
+.annotate 'line', 4110
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
     addparent $P0, $P1
 .end
@@ -11618,51 +9680,60 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 4017
+.annotate 'line', 4132
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 4018
+.annotate 'line', 4133
 
 .end # OpPostIncExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4021
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 4136
     getattribute $P2, self, 'subexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4022
+.annotate 'line', 4137
     self.'annotate'(__ARG_1)
-.annotate 'line', 4023
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-.annotate 'line', 4024
+.annotate 'line', 4138
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_2: # endif
-.annotate 'line', 4025
+.annotate 'line', 4139
     __ARG_1.'emitinc'($S1)
-.annotate 'line', 4026
+.annotate 'line', 4140
     self.'iflexical'(__ARG_1, $S1)
-.annotate 'line', 4027
+.annotate 'line', 4141
     .return($S1)
-# }
-.annotate 'line', 4028
+.annotate 'line', 4142
 
 .end # emit
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4145
+    getattribute $P2, self, 'subexpr'
+    $P1 = $P2.'emit_get'(__ARG_1)
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4146
+    self.'annotate'(__ARG_1)
+.annotate 'line', 4147
+    __ARG_1.'emitinc'($S1)
+.annotate 'line', 4148
+    self.'iflexical'(__ARG_1, $S1)
+.annotate 'line', 4149
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPostIncExpr' ]
-.annotate 'line', 4013
+.annotate 'line', 4128
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
 .end
@@ -11672,51 +9743,60 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 4035
+.annotate 'line', 4156
     self.'OpUnaryExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 4036
+.annotate 'line', 4157
 
 .end # OpPostDecExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4039
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 4160
     getattribute $P2, self, 'subexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4040
+.annotate 'line', 4161
     self.'annotate'(__ARG_1)
-.annotate 'line', 4041
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-.annotate 'line', 4042
+.annotate 'line', 4162
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_2: # endif
-.annotate 'line', 4043
+.annotate 'line', 4163
     __ARG_1.'emitdec'($S1)
-.annotate 'line', 4044
+.annotate 'line', 4164
     self.'iflexical'(__ARG_1, $S1)
-.annotate 'line', 4045
+.annotate 'line', 4165
     .return($S1)
-# }
-.annotate 'line', 4046
+.annotate 'line', 4166
 
 .end # emit
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4169
+    getattribute $P2, self, 'subexpr'
+    $P1 = $P2.'emit_get'(__ARG_1)
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4170
+    self.'annotate'(__ARG_1)
+.annotate 'line', 4171
+    __ARG_1.'emitdec'($S1)
+.annotate 'line', 4172
+    self.'iflexical'(__ARG_1, $S1)
+.annotate 'line', 4173
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPostDecExpr' ]
-.annotate 'line', 4031
+.annotate 'line', 4152
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
 .end
@@ -11727,150 +9807,130 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4057
+.annotate 'line', 4184
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 4058
+.annotate 'line', 4185
     setattribute self, 'lexpr', __ARG_3
-.annotate 'line', 4059
+.annotate 'line', 4186
     setattribute self, 'rexpr', __ARG_4
-.annotate 'line', 4060
+.annotate 'line', 4187
     .return(self)
-# }
-.annotate 'line', 4061
+.annotate 'line', 4188
 
 .end # set
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4064
+.annotate 'line', 4191
     getattribute $P1, self, 'lexpr'
     .tailcall $P1.'checkresult'()
-# }
-.annotate 'line', 4065
+.annotate 'line', 4192
 
 .end # checkresult
 
 
 .sub 'optimize_base' :method
-# Body
-# {
-.annotate 'line', 4068
+.annotate 'line', 4195
     getattribute $P3, self, 'lexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'lexpr', $P2
-.annotate 'line', 4069
+.annotate 'line', 4196
     getattribute $P3, self, 'rexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'rexpr', $P2
-.annotate 'line', 4070
+.annotate 'line', 4197
     .return(self)
-# }
-.annotate 'line', 4071
+.annotate 'line', 4198
 
 .end # optimize_base
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 4074
+.annotate 'line', 4201
     .tailcall self.'optimize_base'()
-# }
-.annotate 'line', 4075
+.annotate 'line', 4202
 
 .end # optimize
 
 
 .sub 'checkleft' :method
-.const 'Sub' WSubId_67 = "WSubId_67"
-# Body
-# {
-.annotate 'line', 4078
-# var lexpr: $P1
+.const 'Sub' WSubId_73 = "WSubId_73"
+.annotate 'line', 4205
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4079
-    $P3 = $P1.'isnull'()
-    if $P3 goto __label_2
-    $P4 = $P1.'isliteral'()
-    set $P2, $P4
-    goto __label_3
+.annotate 'line', 4206
+    $P2 = $P1.'isnull'()
+    if $P2 goto __label_2
+    $P2 = $P1.'isliteral'()
   __label_2:
-    set $P2, $P3
-  __label_3:
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 4080
-    WSubId_67($P1)
+.annotate 'line', 4207
+    WSubId_73($P1)
   __label_1: # endif
-# }
-.annotate 'line', 4081
+.annotate 'line', 4208
 
 .end # checkleft
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4084
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 4211
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4085
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-# {
-.annotate 'line', 4086
+.annotate 'line', 4212
     self.'annotate'(__ARG_1)
-.annotate 'line', 4087
+.annotate 'line', 4213
     __ARG_1.'emitset'(__ARG_2, $S1)
-# }
-  __label_2: # endif
-# }
-.annotate 'line', 4089
+.annotate 'line', 4214
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
-.annotate 'line', 4051
+.annotate 'line', 4178
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 4053
+.annotate 'line', 4180
     addattribute $P0, 'lexpr'
-.annotate 'line', 4054
+.annotate 'line', 4181
     addattribute $P0, 'rexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpAssignExpr' ]
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4098
+.annotate 'line', 4223
     self.'annotate'(__ARG_1)
-.annotate 'line', 4099
-# var lexpr: $P1
+.annotate 'line', 4224
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4100
+.annotate 'line', 4225
     getattribute $P2, self, 'rexpr'
     .tailcall $P1.'emit_assign_get'(__ARG_1, $P2)
-# }
-.annotate 'line', 4101
+.annotate 'line', 4226
 
 .end # emit_get
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4229
+    self.'annotate'(__ARG_1)
+.annotate 'line', 4230
+    getattribute $P1, self, 'lexpr'
+.annotate 'line', 4231
+    getattribute $P2, self, 'rexpr'
+    $P1.'emit_assign_get'(__ARG_1, $P2)
+.annotate 'line', 4232
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAssignExpr' ]
-.annotate 'line', 4094
+.annotate 'line', 4219
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -11878,35 +9938,18 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4110
+        .param string __ARG_2
+.annotate 'line', 4241
     self.'annotate'(__ARG_1)
-.annotate 'line', 4111
-# reg: $S1
+.annotate 'line', 4242
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4112
-    isnull $I2, __ARG_2
-    not $I2
-    unless $I2 goto __label_3
-    set $S2, __ARG_2
-    isne $I3, $S2, ''
-    set $I1, $I3
-    goto __label_4
-  __label_3:
-    set $I1, $I2
-  __label_4:
-    unless $I1 goto __label_2
-.annotate 'line', 4113
+.annotate 'line', 4243
     __ARG_1.'emitassign'(__ARG_2, $S1)
-  __label_2: # endif
-# }
-.annotate 'line', 4114
+.annotate 'line', 4244
 
 .end # emit
 
@@ -11914,49 +9957,58 @@
 .sub 'emit_get' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 4117
+.annotate 'line', 4247
     self.'checkleft'()
-.annotate 'line', 4118
-# var lexpr: $P1
+.annotate 'line', 4248
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4119
+.annotate 'line', 4249
     $P2 = $P1.'checkresult'()
     set $S3, $P2
     eq $S3, 'P', __label_1
-.annotate 'line', 4120
+.annotate 'line', 4250
     WSubId_1("Wrong dest type in =:", $P1)
   __label_1: # endif
-.annotate 'line', 4121
-# reg: $S1
+.annotate 'line', 4251
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
     if_null $P2, __label_2
     set $S1, $P2
   __label_2:
-.annotate 'line', 4122
-# reg2: $S2
+.annotate 'line', 4252
     getattribute $P3, self, 'rexpr'
     $P2 = $P3.'emit_get'(__ARG_1)
     null $S2
     if_null $P2, __label_3
     set $S2, $P2
   __label_3:
-.annotate 'line', 4123
+.annotate 'line', 4253
     self.'annotate'(__ARG_1)
-.annotate 'line', 4124
+.annotate 'line', 4254
     __ARG_1.'emitassign'($S1, $S2)
-.annotate 'line', 4125
+.annotate 'line', 4255
     .return($S1)
-# }
-.annotate 'line', 4126
+.annotate 'line', 4256
 
 .end # emit_get
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4259
+    self.'annotate'(__ARG_1)
+.annotate 'line', 4260
+    $P1 = self.'emit_get'(__ARG_1)
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4261
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAssignToExpr' ]
-.annotate 'line', 4106
+.annotate 'line', 4237
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -11964,123 +10016,107 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4135
+.annotate 'line', 4270
     self.'checkleft'()
-.annotate 'line', 4136
-# var lexpr: $P1
+.annotate 'line', 4271
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4137
-# var rexpr: $P2
+.annotate 'line', 4272
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4138
-# ltype: $S1
+.annotate 'line', 4273
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4139
-# rtype: $S2
+.annotate 'line', 4274
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 4140
-# reg: $S3
+.annotate 'line', 4275
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S3
     if_null $P3, __label_3
     set $S3, $P3
   __label_3:
-.annotate 'line', 4141
-    iseq $I2, $S1, 'S'
-    unless $I2 goto __label_6
-    isa $I3, $P2, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
-    set $I1, $I3
-    goto __label_7
+.annotate 'line', 4276
+    iseq $I1, $S1, 'S'
+    unless $I1 goto __label_6
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
   __label_6:
-    set $I1, $I2
-  __label_7:
     unless $I1 goto __label_4
-.annotate 'line', 4142
+.annotate 'line', 4277
     $P2.'emit_concat_to'(__ARG_1, $S3)
     goto __label_5
   __label_4: # else
-# {
-.annotate 'line', 4144
-# reg2: $S4
+.annotate 'line', 4279
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S4
-    if_null $P3, __label_8
+    if_null $P3, __label_7
     set $S4, $P3
-  __label_8:
-.annotate 'line', 4145
-# aux: $S5
+  __label_7:
+.annotate 'line', 4280
     null $S5
-.annotate 'line', 4146
+.annotate 'line', 4281
     self.'annotate'(__ARG_1)
-# switch
-.annotate 'line', 4147
-    set $S6, $S1
-    set $S7, 'S'
-    if $S6 == $S7 goto __label_11
-    set $S7, 'I'
-    if $S6 == $S7 goto __label_12
-    set $S7, 'N'
-    if $S6 == $S7 goto __label_13
-    goto __label_10
-  __label_11: # case
-.annotate 'line', 4149
-    eq $S2, 'S', __label_14
-# {
-.annotate 'line', 4150
+.annotate 'line', 4282
+    if $S1 == 'S' goto __label_10
+    if $S1 == 'I' goto __label_11
+    if $S1 == 'N' goto __label_12
+    goto __label_9
+  __label_10: # case
+.annotate 'line', 4284
+    eq $S2, 'S', __label_13
+.annotate 'line', 4285
     $P3 = self.'tempreg'('S')
     set $S5, $P3
-.annotate 'line', 4151
+.annotate 'line', 4286
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4152
+.annotate 'line', 4287
     set $S4, $S5
-# }
-  __label_14: # endif
-.annotate 'line', 4154
+  __label_13: # endif
+.annotate 'line', 4289
     __ARG_1.'emitconcat1'($S3, $S4)
-    goto __label_9 # break
+    goto __label_8 # break
+  __label_11: # case
   __label_12: # case
-  __label_13: # case
-.annotate 'line', 4158
-    eq $S1, $S2, __label_15
-# {
-.annotate 'line', 4159
+.annotate 'line', 4293
+    eq $S1, $S2, __label_14
+.annotate 'line', 4294
     $P3 = self.'tempreg'($S1)
     set $S5, $P3
-.annotate 'line', 4160
+.annotate 'line', 4295
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4161
+.annotate 'line', 4296
     set $S4, $S5
-# }
-  __label_15: # endif
-.annotate 'line', 4163
+  __label_14: # endif
+.annotate 'line', 4298
     __ARG_1.'emitaddto'($S3, $S4)
-    goto __label_9 # break
-  __label_10: # default
-.annotate 'line', 4166
+    goto __label_8 # break
+  __label_9: # default
+.annotate 'line', 4301
     __ARG_1.'emitaddto'($S3, $S4)
-  __label_9: # switch end
-# }
+  __label_8: # switch end
   __label_5: # endif
-.annotate 'line', 4169
+.annotate 'line', 4304
     .return($S3)
-# }
-.annotate 'line', 4170
+.annotate 'line', 4305
 
 .end # emit_get
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 4308
+    self.'emit_get'(__ARG_1)
+.annotate 'line', 4309
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAddToExpr' ]
-.annotate 'line', 4131
+.annotate 'line', 4266
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -12089,93 +10125,76 @@
 .sub 'emit_get' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 4179
+.annotate 'line', 4318
     self.'checkleft'()
-.annotate 'line', 4180
-# var lexpr: $P1
+.annotate 'line', 4319
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4181
-# var rexpr: $P2
+.annotate 'line', 4320
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4182
-# ltype: $S1
+.annotate 'line', 4321
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4183
-# rtype: $S2
+.annotate 'line', 4322
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 4184
-# reg: $S3
+.annotate 'line', 4323
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S3
     if_null $P3, __label_3
     set $S3, $P3
   __label_3:
-.annotate 'line', 4185
-# reg2: $S4
+.annotate 'line', 4324
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S4
     if_null $P3, __label_4
     set $S4, $P3
   __label_4:
-.annotate 'line', 4186
-# aux: $S5
+.annotate 'line', 4325
     null $S5
-.annotate 'line', 4187
+.annotate 'line', 4326
     self.'annotate'(__ARG_1)
-# switch
-.annotate 'line', 4188
-    set $S6, $S1
-    set $S7, 'S'
-    if $S6 == $S7 goto __label_7
-    set $S7, 'I'
-    if $S6 == $S7 goto __label_8
-    set $S7, 'N'
-    if $S6 == $S7 goto __label_9
+.annotate 'line', 4327
+    if $S1 == 'S' goto __label_7
+    if $S1 == 'I' goto __label_8
+    if $S1 == 'N' goto __label_9
     goto __label_6
   __label_7: # case
-.annotate 'line', 4190
+.annotate 'line', 4329
     WSubId_1("-= can't be applied to string", self)
   __label_8: # case
   __label_9: # case
-.annotate 'line', 4193
+.annotate 'line', 4332
     eq $S1, $S2, __label_10
-# {
-.annotate 'line', 4194
+.annotate 'line', 4333
     $P3 = self.'tempreg'($S1)
     set $S5, $P3
-.annotate 'line', 4195
+.annotate 'line', 4334
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4196
+.annotate 'line', 4335
     set $S4, $S5
-# }
   __label_10: # endif
-.annotate 'line', 4198
+.annotate 'line', 4337
     __ARG_1.'emitsubto'($S3, $S4)
     goto __label_5 # break
   __label_6: # default
-.annotate 'line', 4201
+.annotate 'line', 4340
     __ARG_1.'emitsubto'($S3, $S4)
   __label_5: # switch end
-.annotate 'line', 4203
+.annotate 'line', 4342
     .return($S3)
-# }
-.annotate 'line', 4204
+.annotate 'line', 4343
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSubToExpr' ]
-.annotate 'line', 4175
+.annotate 'line', 4314
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -12183,61 +10202,52 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4213
+.annotate 'line', 4352
     self.'checkleft'()
-.annotate 'line', 4214
-# var lexpr: $P1
+.annotate 'line', 4353
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4215
-# var rexpr: $P2
+.annotate 'line', 4354
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4216
-# lreg: $S1
+.annotate 'line', 4355
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4217
-# rreg: $S2
+.annotate 'line', 4356
     null $S2
-# switch
-.annotate 'line', 4218
+.annotate 'line', 4357
     $P3 = $P1.'checkresult'()
     set $S3, $P3
-    set $S4, 'S'
-    if $S3 == $S4 goto __label_4
+    if $S3 == 'S' goto __label_4
     goto __label_3
   __label_4: # case
-.annotate 'line', 4220
+.annotate 'line', 4359
     $P4 = $P2.'emit_getint'(__ARG_1)
     set $S2, $P4
-.annotate 'line', 4221
+.annotate 'line', 4360
     self.'annotate'(__ARG_1)
-.annotate 'line', 4222
+.annotate 'line', 4361
     __ARG_1.'emitrepeat'($S1, $S1, $S2)
     goto __label_2 # break
   __label_3: # default
-.annotate 'line', 4225
+.annotate 'line', 4364
     $P5 = $P2.'emit_get'(__ARG_1)
     set $S2, $P5
-.annotate 'line', 4226
+.annotate 'line', 4365
     self.'annotate'(__ARG_1)
-.annotate 'line', 4227
+.annotate 'line', 4366
     __ARG_1.'emitarg2'('mul', $S1, $S2)
   __label_2: # switch end
-.annotate 'line', 4229
+.annotate 'line', 4368
     .return($S1)
-# }
-.annotate 'line', 4230
+.annotate 'line', 4369
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpMulToExpr' ]
-.annotate 'line', 4209
+.annotate 'line', 4348
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -12245,48 +10255,42 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4239
+.annotate 'line', 4378
     self.'checkleft'()
-.annotate 'line', 4240
-# type: $S1
+.annotate 'line', 4379
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4241
-# reg: $S2
+.annotate 'line', 4380
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 4242
-# reg2: $S3
+.annotate 'line', 4381
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S3
     if_null $P1, __label_3
     set $S3, $P1
   __label_3:
-.annotate 'line', 4243
+.annotate 'line', 4382
     self.'annotate'(__ARG_1)
-.annotate 'line', 4244
+.annotate 'line', 4383
     __ARG_1.'emitarg2'('div', $S2, $S3)
-.annotate 'line', 4245
+.annotate 'line', 4384
     .return($S2)
-# }
-.annotate 'line', 4246
+.annotate 'line', 4385
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDivToExpr' ]
-.annotate 'line', 4235
+.annotate 'line', 4374
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
@@ -12294,316 +10298,248 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4255
+.annotate 'line', 4394
     self.'checkleft'()
-.annotate 'line', 4256
-# type: $S1
+.annotate 'line', 4395
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4257
-# reg: $S2
+.annotate 'line', 4396
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 4258
-# reg2: $S3
+.annotate 'line', 4397
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S3
     if_null $P1, __label_3
     set $S3, $P1
   __label_3:
-.annotate 'line', 4259
+.annotate 'line', 4398
     self.'annotate'(__ARG_1)
-.annotate 'line', 4260
+.annotate 'line', 4399
     __ARG_1.'emitarg2'('mod', $S2, $S3)
-.annotate 'line', 4261
+.annotate 'line', 4400
     .return($S2)
-# }
-.annotate 'line', 4262
+.annotate 'line', 4401
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpModToExpr' ]
-.annotate 'line', 4251
+.annotate 'line', 4390
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant COMPARATOR_DEFAULT evaluated at compile time
-# Constant COMPARATOR_IF evaluated at compile time
-# Constant COMPARATOR_ELSE evaluated at compile time
 .namespace [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4274
+.annotate 'line', 4413
     .return('I')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 4277
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 4416
     self.'optimizearg'()
-.annotate 'line', 4278
-# var lexpr: $P1
+.annotate 'line', 4417
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4279
-# var rexpr: $P2
+.annotate 'line', 4418
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4280
-    $P4 = $P1.'isintegerliteral'()
-    unless $P4 goto __label_2
-    $P5 = $P2.'isintegerliteral'()
-    set $P3, $P5
-    goto __label_3
+.annotate 'line', 4419
+    $P3 = $P1.'isintegerliteral'()
+    unless $P3 goto __label_2
+    $P3 = $P2.'isintegerliteral'()
   __label_2:
-    set $P3, $P4
-  __label_3:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 4281
-# li: $I1
-    $P6 = $P1.'getIntegerValue'()
-    set $I1, $P6
-.annotate 'line', 4282
-# ri: $I2
+.annotate 'line', 4420
+    $P4 = $P1.'getIntegerValue'()
+    set $I1, $P4
+.annotate 'line', 4421
     $P3 = $P2.'getIntegerValue'()
     set $I2, $P3
-.annotate 'line', 4283
+.annotate 'line', 4422
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     $P5 = self.'int_op'($I1, $I2)
-    .tailcall WSubId_22($P3, $P4, $P5)
-# }
+    .tailcall WSubId_25($P3, $P4, $P5)
   __label_1: # endif
-.annotate 'line', 4285
+.annotate 'line', 4424
     .return(self)
-# }
-.annotate 'line', 4286
+.annotate 'line', 4425
 
 .end # optimize
 
 
 .sub 'emit_comparator' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
         .param int __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 4289
-# rl: $S1
+.annotate 'line', 4428
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4290
-# rr: $S2
+.annotate 'line', 4429
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'checkresult'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 4291
-# regl: $S3
+.annotate 'line', 4430
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S3
     if_null $P1, __label_3
     set $S3, $P1
   __label_3:
-.annotate 'line', 4292
-# regr: $S4
+.annotate 'line', 4431
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S4
     if_null $P1, __label_4
     set $S4, $P1
   __label_4:
-.annotate 'line', 4293
+.annotate 'line', 4432
     self.'annotate'(__ARG_1)
-.annotate 'line', 4294
-# aux: $S5
+.annotate 'line', 4433
     null $S5
-# switch-case
-.annotate 'line', 4296
-    iseq $I2, $S1, 'I'
-    unless $I2 goto __label_8
-    iseq $I3, $S2, 'N'
-    set $I1, $I3
-    goto __label_9
+.annotate 'line', 4435
+    iseq $I1, $S1, 'I'
+    unless $I1 goto __label_8
+    iseq $I1, $S2, 'N'
   __label_8:
-    set $I1, $I2
-  __label_9:
     if $I1 goto __label_7
-.annotate 'line', 4301
-    iseq $I4, $S1, 'N'
-    unless $I4 goto __label_11
-    iseq $I5, $S2, 'I'
-    set $I1, $I5
-    goto __label_12
-  __label_11:
-    set $I1, $I4
+.annotate 'line', 4440
+    iseq $I1, $S1, 'N'
+    unless $I1 goto __label_10
+    iseq $I1, $S2, 'I'
+  __label_10:
+    if $I1 goto __label_9
+.annotate 'line', 4445
+    iseq $I1, $S2, 'I'
+    unless $I1 goto __label_12
+    iseq $I1, $S1, 'P'
   __label_12:
-    if $I1 goto __label_10
-.annotate 'line', 4306
-    iseq $I6, $S2, 'I'
-    unless $I6 goto __label_14
-    iseq $I7, $S1, 'P'
-    set $I1, $I7
-    goto __label_15
+    if $I1 goto __label_11
+.annotate 'line', 4450
+    iseq $I1, $S2, 'P'
+    unless $I1 goto __label_14
+    iseq $I1, $S1, 'I'
   __label_14:
-    set $I1, $I6
-  __label_15:
     if $I1 goto __label_13
-.annotate 'line', 4311
-    iseq $I8, $S2, 'P'
-    unless $I8 goto __label_17
-    iseq $I9, $S1, 'I'
-    set $I1, $I9
-    goto __label_18
-  __label_17:
-    set $I1, $I8
+.annotate 'line', 4455
+    iseq $I1, $S2, 'S'
+    unless $I1 goto __label_16
+    iseq $I1, $S1, 'P'
+  __label_16:
+    if $I1 goto __label_15
+.annotate 'line', 4460
+    iseq $I1, $S2, 'P'
+    unless $I1 goto __label_18
+    iseq $I1, $S1, 'S'
   __label_18:
-    if $I1 goto __label_16
-.annotate 'line', 4316
-    iseq $I10, $S2, 'S'
-    unless $I10 goto __label_20
-    iseq $I11, $S1, 'P'
-    set $I1, $I11
-    goto __label_21
-  __label_20:
-    set $I1, $I10
-  __label_21:
-    if $I1 goto __label_19
-.annotate 'line', 4321
-    iseq $I12, $S2, 'P'
-    unless $I12 goto __label_23
-    iseq $I13, $S1, 'S'
-    set $I1, $I13
-    goto __label_24
-  __label_23:
-    set $I1, $I12
-  __label_24:
-    if $I1 goto __label_22
+    if $I1 goto __label_17
     goto __label_6
   __label_7: # case
-.annotate 'line', 4297
+.annotate 'line', 4436
     $P1 = self.'tempreg'('N')
     set $S5, $P1
-.annotate 'line', 4298
+.annotate 'line', 4437
     __ARG_1.'emitset'($S5, $S3)
-.annotate 'line', 4299
+.annotate 'line', 4438
     set $S3, $S5
     goto __label_5 # break
-  __label_10: # case
-.annotate 'line', 4302
+  __label_9: # case
+.annotate 'line', 4441
     $P2 = self.'tempreg'('N')
     set $S5, $P2
-.annotate 'line', 4303
+.annotate 'line', 4442
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4304
+.annotate 'line', 4443
     set $S4, $S5
     goto __label_5 # break
-  __label_13: # case
-.annotate 'line', 4307
+  __label_11: # case
+.annotate 'line', 4446
     $P3 = self.'tempreg'('I')
     set $S5, $P3
-.annotate 'line', 4308
+.annotate 'line', 4447
     __ARG_1.'emitset'($S5, $S3)
-.annotate 'line', 4309
+.annotate 'line', 4448
     set $S3, $S5
     goto __label_5 # break
-  __label_16: # case
-.annotate 'line', 4312
+  __label_13: # case
+.annotate 'line', 4451
     $P4 = self.'tempreg'('I')
     set $S5, $P4
-.annotate 'line', 4313
+.annotate 'line', 4452
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4314
+.annotate 'line', 4453
     set $S4, $S5
     goto __label_5 # break
-  __label_19: # case
-.annotate 'line', 4317
+  __label_15: # case
+.annotate 'line', 4456
     $P5 = self.'tempreg'('S')
     set $S5, $P5
-.annotate 'line', 4318
+.annotate 'line', 4457
     __ARG_1.'emitset'($S5, $S3)
-.annotate 'line', 4319
+.annotate 'line', 4458
     set $S3, $S5
     goto __label_5 # break
-  __label_22: # case
-.annotate 'line', 4322
+  __label_17: # case
+.annotate 'line', 4461
     $P6 = self.'tempreg'('S')
     set $S5, $P6
-.annotate 'line', 4323
+.annotate 'line', 4462
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 4324
+.annotate 'line', 4463
     set $S4, $S5
     goto __label_5 # break
   __label_6: # default
   __label_5: # switch end
-.annotate 'line', 4325
-# switch
-.annotate 'line', 4328
-    set $I1, __ARG_3
-    null $I2
-    if $I1 == $I2 goto __label_27
-    set $I2, 1
-    if $I1 == $I2 goto __label_28
-    set $I2, 2
-    if $I1 == $I2 goto __label_29
-    goto __label_26
-  __label_27: # case
-.annotate 'line', 4330
+.annotate 'line', 4467
+    if __ARG_3 == 0 goto __label_21
+    if __ARG_3 == 1 goto __label_22
+    if __ARG_3 == 2 goto __label_23
+    goto __label_20
+  __label_21: # case
+.annotate 'line', 4469
     self.'emitop'(__ARG_1, __ARG_2, $S3, $S4)
-    goto __label_25 # break
-  __label_28: # case
-.annotate 'line', 4333
+    goto __label_19 # break
+  __label_22: # case
+.annotate 'line', 4472
     self.'emitop_if'(__ARG_1, __ARG_2, $S3, $S4)
-    goto __label_25 # break
-  __label_29: # case
-.annotate 'line', 4336
+    goto __label_19 # break
+  __label_23: # case
+.annotate 'line', 4475
     self.'emitop_else'(__ARG_1, __ARG_2, $S3, $S4)
-    goto __label_25 # break
-  __label_26: # default
-  __label_25: # switch end
-.annotate 'line', 4337
-# }
-.annotate 'line', 4339
+    goto __label_19 # break
+  __label_20: # default
+  __label_19: # switch end
+.annotate 'line', 4478
 
 .end # emit_comparator
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4342
+        .param string __ARG_2
+.annotate 'line', 4481
     self.'emit_comparator'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 4343
+.annotate 'line', 4482
 
 .end # emit
 
@@ -12611,12 +10547,9 @@
 .sub 'emit_if' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 4346
+.annotate 'line', 4485
     self.'emit_comparator'(__ARG_1, __ARG_2, 1)
-# }
-.annotate 'line', 4347
+.annotate 'line', 4486
 
 .end # emit_if
 
@@ -12624,18 +10557,15 @@
 .sub 'emit_else' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 4350
+.annotate 'line', 4489
     self.'emit_comparator'(__ARG_1, __ARG_2, 2)
-# }
-.annotate 'line', 4351
+.annotate 'line', 4490
 
 .end # emit_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
-.annotate 'line', 4272
+.annotate 'line', 4411
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -12643,47 +10573,37 @@
 
 .sub 'Negable' :method
         .param int __ARG_1
-# Body
-# {
-.annotate 'line', 4362
+.annotate 'line', 4501
     new $P2, [ 'Boolean' ], __ARG_1
     setattribute self, 'positive', $P2
-# }
-.annotate 'line', 4363
+.annotate 'line', 4502
 
 .end # Negable
 
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 4364
+.annotate 'line', 4503
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 4367
-# positive: $I1
+.annotate 'line', 4506
     getattribute $P1, self, 'positive'
     isfalse $I1, $P1
-.annotate 'line', 4368
+.annotate 'line', 4507
     getattribute $P1, self, 'positive'
     assign $P1, $I1
-.annotate 'line', 4369
+.annotate 'line', 4508
     .return(self)
-# }
-.annotate 'line', 4370
+.annotate 'line', 4509
 
 .end # negated
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Negable' ]
-.annotate 'line', 4358
+.annotate 'line', 4497
     addattribute $P0, 'positive'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
@@ -12692,39 +10612,33 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 4384
+.annotate 'line', 4523
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     self.'Expr'($P1, $P2)
-.annotate 'line', 4385
+.annotate 'line', 4524
     self.'Negable'(__ARG_3)
-.annotate 'line', 4386
+.annotate 'line', 4525
     setattribute self, 'expr', __ARG_2
-# }
-.annotate 'line', 4387
+.annotate 'line', 4526
 
 .end # CheckerExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4388
+.annotate 'line', 4527
     .return('I')
-# }
 
 .end # checkresult
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
-.annotate 'line', 4378
+.annotate 'line', 4517
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Negable' ]
     addparent $P0, $P2
-.annotate 'line', 4380
+.annotate 'line', 4519
     addattribute $P0, 'expr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
@@ -12733,42 +10647,35 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 4395
+.annotate 'line', 4534
     self.'CheckerExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 4396
+.annotate 'line', 4535
 
 .end # NullCheckerExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4399
-# reg: $S1
+        .param string __ARG_2
+.annotate 'line', 4538
     getattribute $P2, self, 'expr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4400
+.annotate 'line', 4539
     self.'annotate'(__ARG_1)
-.annotate 'line', 4401
+.annotate 'line', 4540
     __ARG_1.'emitarg2'('isnull', __ARG_2, $S1)
-.annotate 'line', 4402
+.annotate 'line', 4541
     getattribute $P1, self, 'positive'
     isfalse $I1, $P1
     unless $I1 goto __label_2
-.annotate 'line', 4403
+.annotate 'line', 4542
     __ARG_1.'emitarg1'('not', __ARG_2)
   __label_2: # endif
-# }
-.annotate 'line', 4404
+.annotate 'line', 4543
 
 .end # emit
 
@@ -12776,37 +10683,33 @@
 .sub 'emit_else' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 4407
-# reg: $S1
+.annotate 'line', 4546
     getattribute $P2, self, 'expr'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4408
+.annotate 'line', 4547
     self.'annotate'(__ARG_1)
-.annotate 'line', 4409
+.annotate 'line', 4548
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
-.annotate 'line', 4410
+.annotate 'line', 4549
     __ARG_1.'emitunless_null'($S1, __ARG_2)
     goto __label_3
   __label_2: # else
-.annotate 'line', 4412
+.annotate 'line', 4551
     __ARG_1.'emitif_null'($S1, __ARG_2)
   __label_3: # endif
-# }
-.annotate 'line', 4413
+.annotate 'line', 4552
 
 .end # emit_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
-.annotate 'line', 4391
+.annotate 'line', 4530
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
     addparent $P0, $P1
 .end
@@ -12816,52 +10719,38 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 4420
+.annotate 'line', 4559
     self.'CheckerExpr'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 4421
+.annotate 'line', 4560
 
 .end # ZeroCheckerExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4424
-# var expr: $P1
+        .param string __ARG_2
+.annotate 'line', 4563
     getattribute $P1, self, 'expr'
-.annotate 'line', 4425
-# reg: $S1
+.annotate 'line', 4564
     $P2 = $P1.'emit_getint'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 4426
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-# {
-.annotate 'line', 4427
+.annotate 'line', 4565
     self.'annotate'(__ARG_1)
-.annotate 'line', 4428
+.annotate 'line', 4566
     getattribute $P2, self, 'positive'
-    if_null $P2, __label_3
-    unless $P2 goto __label_3
-.annotate 'line', 4429
+    if_null $P2, __label_2
+    unless $P2 goto __label_2
+.annotate 'line', 4567
     __ARG_1.'emitarg3'('iseq', __ARG_2, $S1, 0)
-    goto __label_4
-  __label_3: # else
-.annotate 'line', 4431
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 4569
     __ARG_1.'emitarg3'('isne', __ARG_2, $S1, 0)
-  __label_4: # endif
-# }
-  __label_2: # endif
-# }
-.annotate 'line', 4433
+  __label_3: # endif
+.annotate 'line', 4570
 
 .end # emit
 
@@ -12869,39 +10758,34 @@
 .sub 'emit_else' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 4436
-# var expr: $P1
+.annotate 'line', 4573
     getattribute $P1, self, 'expr'
-.annotate 'line', 4437
-# reg: $S1
+.annotate 'line', 4574
     $P2 = $P1.'emit_getint'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 4438
+.annotate 'line', 4575
     self.'annotate'(__ARG_1)
-.annotate 'line', 4439
+.annotate 'line', 4576
     getattribute $P2, self, 'positive'
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 4440
+.annotate 'line', 4577
     __ARG_1.'emitif'($S1, __ARG_2)
     goto __label_3
   __label_2: # else
-.annotate 'line', 4442
+.annotate 'line', 4579
     __ARG_1.'emitunless'($S1, __ARG_2)
   __label_3: # endif
-# }
-.annotate 'line', 4443
+.annotate 'line', 4580
 
 .end # emit_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
-.annotate 'line', 4416
+.annotate 'line', 4555
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
     addparent $P0, $P1
 .end
@@ -12913,191 +10797,159 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param int __ARG_5
-# Body
-# {
-.annotate 'line', 4452
+.annotate 'line', 4589
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-.annotate 'line', 4453
+.annotate 'line', 4590
     self.'Negable'(__ARG_5)
-# }
-.annotate 'line', 4454
+.annotate 'line', 4591
 
 .end # OpEqualExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 4457
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 4594
     self.'optimizearg'()
-.annotate 'line', 4458
-# var lexpr: $P1
+.annotate 'line', 4595
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4459
-# var rexpr: $P2
+.annotate 'line', 4596
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4460
-# lnull: $I1
+.annotate 'line', 4597
     $P3 = $P1.'isnull'()
     set $I1, $P3
-.annotate 'line', 4461
-# rnull: $I2
+.annotate 'line', 4598
     $P3 = $P2.'isnull'()
     set $I2, $P3
-.annotate 'line', 4462
+.annotate 'line', 4599
     unless $I1 goto __label_1
-# {
-.annotate 'line', 4463
+.annotate 'line', 4600
     unless $I2 goto __label_2
-.annotate 'line', 4464
+.annotate 'line', 4601
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     getattribute $P5, self, 'positive'
-    .tailcall WSubId_22($P3, $P4, $P5)
+    .tailcall WSubId_25($P3, $P4, $P5)
     goto __label_3
   __label_2: # else
-.annotate 'line', 4466
+.annotate 'line', 4603
     new $P7, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
     getattribute $P8, self, 'positive'
     $P7.'NullCheckerExpr'(self, $P2, $P8)
     set $P6, $P7
     .return($P6)
   __label_3: # endif
-# }
   __label_1: # endif
-.annotate 'line', 4468
+.annotate 'line', 4605
     unless $I2 goto __label_4
-.annotate 'line', 4469
+.annotate 'line', 4606
     new $P4, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
     getattribute $P5, self, 'positive'
     $P4.'NullCheckerExpr'(self, $P1, $P5)
     set $P3, $P4
     .return($P3)
   __label_4: # endif
-.annotate 'line', 4470
-# ltype: $S1
+.annotate 'line', 4607
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_5
     set $S1, $P3
   __label_5:
-.annotate 'line', 4471
-# rtype: $S2
+.annotate 'line', 4608
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_6
     set $S2, $P3
   __label_6:
-.annotate 'line', 4472
-    $P4 = $P1.'isliteral'()
-    unless $P4 goto __label_8
-    $P5 = $P2.'isliteral'()
-    set $P3, $P5
-    goto __label_9
+.annotate 'line', 4609
+    $P3 = $P1.'isliteral'()
+    unless $P3 goto __label_8
+    $P3 = $P2.'isliteral'()
   __label_8:
-    set $P3, $P4
-  __label_9:
     if_null $P3, __label_7
     unless $P3 goto __label_7
-# {
-.annotate 'line', 4473
-    ne $S1, $S2, __label_10
-# {
-# switch
-.annotate 'line', 4474
-    set $S5, $S1
-    set $S6, 'I'
-    if $S5 == $S6 goto __label_13
-    set $S6, 'S'
-    if $S5 == $S6 goto __label_14
-    goto __label_12
-  __label_13: # case
-.annotate 'line', 4476
-# li: $I3
-    $P6 = $P1.'getIntegerValue'()
-    set $I3, $P6
-.annotate 'line', 4477
-# ri: $I4
-    $P7 = $P2.'getIntegerValue'()
-    set $I4, $P7
-.annotate 'line', 4478
-# vi: $I5
-    getattribute $P8, self, 'positive'
-    if_null $P8, __label_16
-    unless $P8 goto __label_16
+.annotate 'line', 4610
+    ne $S1, $S2, __label_9
+.annotate 'line', 4611
+    if $S1 == 'I' goto __label_12
+    if $S1 == 'S' goto __label_13
+    goto __label_11
+  __label_12: # case
+.annotate 'line', 4613
+    $P4 = $P1.'getIntegerValue'()
+    set $I3, $P4
+.annotate 'line', 4614
+    $P5 = $P2.'getIntegerValue'()
+    set $I4, $P5
+.annotate 'line', 4615
+    getattribute $P6, self, 'positive'
+    if_null $P6, __label_15
+    unless $P6 goto __label_15
     iseq $I5, $I3, $I4
-    goto __label_15
-  __label_16:
-    isne $I5, $I3, $I4
+    goto __label_14
   __label_15:
-.annotate 'line', 4479
-    getattribute $P9, self, 'owner'
-    getattribute $P10, self, 'start'
-    .tailcall WSubId_22($P9, $P10, $I5)
-  __label_14: # case
-.annotate 'line', 4481
-# ls: $S3
-    getattribute $P12, $P1, 'strval'
-    getattribute $P11, $P12, 'str'
+    isne $I5, $I3, $I4
+  __label_14:
+.annotate 'line', 4616
+    getattribute $P7, self, 'owner'
+    getattribute $P8, self, 'start'
+    .tailcall WSubId_25($P7, $P8, $I5)
+  __label_13: # case
+.annotate 'line', 4618
+    getattribute $P10, $P1, 'strval'
+    getattribute $P9, $P10, 'str'
     null $S3
-    if_null $P11, __label_17
-    set $S3, $P11
-  __label_17:
-.annotate 'line', 4482
-# rs: $S4
-    getattribute $P14, $P2, 'strval'
-    getattribute $P13, $P14, 'str'
+    if_null $P9, __label_16
+    set $S3, $P9
+  __label_16:
+.annotate 'line', 4619
+    getattribute $P12, $P2, 'strval'
+    getattribute $P11, $P12, 'str'
     null $S4
-    if_null $P13, __label_18
-    set $S4, $P13
-  __label_18:
-.annotate 'line', 4483
-# vs: $I6
-    getattribute $P15, self, 'positive'
-    if_null $P15, __label_20
-    unless $P15 goto __label_20
+    if_null $P11, __label_17
+    set $S4, $P11
+  __label_17:
+.annotate 'line', 4620
+    getattribute $P13, self, 'positive'
+    if_null $P13, __label_19
+    unless $P13 goto __label_19
     iseq $I6, $S3, $S4
-    goto __label_19
-  __label_20:
-    isne $I6, $S3, $S4
+    goto __label_18
   __label_19:
-.annotate 'line', 4484
-    getattribute $P16, self, 'owner'
-    getattribute $P17, self, 'start'
-    .tailcall WSubId_22($P16, $P17, $I6)
-  __label_12: # default
-  __label_11: # switch end
-# }
-  __label_10: # endif
-# }
+    isne $I6, $S3, $S4
+  __label_18:
+.annotate 'line', 4621
+    getattribute $P14, self, 'owner'
+    getattribute $P15, self, 'start'
+    .tailcall WSubId_25($P14, $P15, $I6)
+  __label_11: # default
+  __label_10: # switch end
+  __label_9: # endif
   __label_7: # endif
-.annotate 'line', 4488
+.annotate 'line', 4625
     $P3 = $P2.'isintegerzero'()
-    if_null $P3, __label_21
-    unless $P3 goto __label_21
-.annotate 'line', 4489
+    if_null $P3, __label_20
+    unless $P3 goto __label_20
+.annotate 'line', 4626
     new $P5, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
     getattribute $P6, self, 'positive'
     $P5.'ZeroCheckerExpr'(self, $P1, $P6)
     set $P4, $P5
     .return($P4)
-  __label_21: # endif
-.annotate 'line', 4490
+  __label_20: # endif
+.annotate 'line', 4627
     $P3 = $P1.'isintegerzero'()
-    if_null $P3, __label_22
-    unless $P3 goto __label_22
-.annotate 'line', 4491
+    if_null $P3, __label_21
+    unless $P3 goto __label_21
+.annotate 'line', 4628
     new $P5, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
     getattribute $P6, self, 'positive'
     $P5.'ZeroCheckerExpr'(self, $P2, $P6)
     set $P4, $P5
     .return($P4)
-  __label_22: # endif
-.annotate 'line', 4492
+  __label_21: # endif
+.annotate 'line', 4629
     .return(self)
-# }
-.annotate 'line', 4493
+.annotate 'line', 4630
 
 .end # optimize
 
@@ -13107,11 +10959,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4496
+.annotate 'line', 4633
     self.'annotate'(__ARG_1)
-.annotate 'line', 4497
+.annotate 'line', 4634
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
@@ -13121,23 +10971,19 @@
     set $S1, 'isne'
   __label_1:
     __ARG_1.'emitbinop'($S1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4498
+.annotate 'line', 4635
 
 .end # emitop
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4501
+        .param string __ARG_2
+.annotate 'line', 4638
     self.'annotate'(__ARG_1)
-.annotate 'line', 4502
+.annotate 'line', 4639
     self.'emit_comparator'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 4503
+.annotate 'line', 4640
 
 .end # emit
 
@@ -13147,11 +10993,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4506
+.annotate 'line', 4643
     self.'annotate'(__ARG_1)
-.annotate 'line', 4507
+.annotate 'line', 4644
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
@@ -13161,8 +11005,7 @@
     set $S1, 'ne'
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4508
+.annotate 'line', 4645
 
 .end # emitop_if
 
@@ -13172,11 +11015,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4511
+.annotate 'line', 4648
     self.'annotate'(__ARG_1)
-.annotate 'line', 4512
+.annotate 'line', 4649
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
@@ -13186,14 +11027,13 @@
     set $S1, 'eq'
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4513
+.annotate 'line', 4650
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpEqualExpr' ]
-.annotate 'line', 4448
+.annotate 'line', 4585
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Negable' ]
@@ -13207,14 +11047,11 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param int __ARG_5
-# Body
-# {
-.annotate 'line', 4524
+.annotate 'line', 4661
     self.'initbinary'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-.annotate 'line', 4525
+.annotate 'line', 4662
     self.'Negable'(__ARG_5)
-# }
-.annotate 'line', 4526
+.annotate 'line', 4663
 
 .end # OpSameExpr
 
@@ -13222,9 +11059,7 @@
 .sub 'int_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4529
+.annotate 'line', 4666
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
@@ -13234,8 +11069,7 @@
     isne $I1, __ARG_1, __ARG_2
   __label_1:
     .return($I1)
-# }
-.annotate 'line', 4530
+.annotate 'line', 4667
 
 .end # int_op
 
@@ -13245,39 +11079,31 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4533
+.annotate 'line', 4670
     self.'annotate'(__ARG_1)
-.annotate 'line', 4534
-# positive: $I1
+.annotate 'line', 4671
     getattribute $P1, self, 'positive'
     set $I1, $P1
-.annotate 'line', 4535
-# op: $S1
+.annotate 'line', 4672
     unless $I1 goto __label_2
     set $S1, 'issame'
     goto __label_1
   __label_2:
     set $S1, 'isntsame'
   __label_1:
-.annotate 'line', 4536
+.annotate 'line', 4673
     __ARG_1.'emitbinop'($S1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4537
+.annotate 'line', 4674
 
 .end # emitop
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4540
+        .param string __ARG_2
+.annotate 'line', 4677
     self.'emit_comparator'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 4541
+.annotate 'line', 4678
 
 .end # emit
 
@@ -13287,26 +11113,21 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4544
+.annotate 'line', 4681
     self.'annotate'(__ARG_1)
-.annotate 'line', 4545
-# positive: $I1
+.annotate 'line', 4682
     getattribute $P1, self, 'positive'
     set $I1, $P1
-.annotate 'line', 4546
-# op: $S1
+.annotate 'line', 4683
     unless $I1 goto __label_2
     set $S1, 'eq_addr'
     goto __label_1
   __label_2:
     set $S1, 'ne_addr'
   __label_1:
-.annotate 'line', 4547
+.annotate 'line', 4684
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4548
+.annotate 'line', 4685
 
 .end # emitop_if
 
@@ -13316,59 +11137,48 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4551
+.annotate 'line', 4688
     self.'annotate'(__ARG_1)
-.annotate 'line', 4552
-# positive: $I1
+.annotate 'line', 4689
     getattribute $P1, self, 'positive'
     set $I1, $P1
-.annotate 'line', 4553
-# op: $S1
+.annotate 'line', 4690
     unless $I1 goto __label_2
     set $S1, 'ne_addr'
     goto __label_1
   __label_2:
     set $S1, 'eq_addr'
   __label_1:
-.annotate 'line', 4554
+.annotate 'line', 4691
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4555
+.annotate 'line', 4692
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSameExpr' ]
-.annotate 'line', 4519
+.annotate 'line', 4656
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Negable' ]
     addparent $P0, $P2
-.annotate 'line', 4521
+.annotate 'line', 4658
     addattribute $P0, 'positive'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpLessExpr' ]
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 4562
+.annotate 'line', 4699
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 4565
+.annotate 'line', 4702
     new $P1, [ 'Winxed'; 'Compiler'; 'OpGreaterEqualExpr' ]
     .tailcall $P1.'setfrom'(self)
-# }
-.annotate 'line', 4566
+.annotate 'line', 4703
 
 .end # negated
 
@@ -13376,13 +11186,10 @@
 .sub 'int_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4569
+.annotate 'line', 4706
     islt $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4570
+.annotate 'line', 4707
 
 .end # int_op
 
@@ -13392,12 +11199,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4573
+.annotate 'line', 4710
     __ARG_1.'emitbinop'('islt', __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4574
+.annotate 'line', 4711
 
 .end # emitop
 
@@ -13407,12 +11211,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4577
+.annotate 'line', 4714
     __ARG_1.'emitcompare'('lt', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4578
+.annotate 'line', 4715
 
 .end # emitop_if
 
@@ -13422,41 +11223,32 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4581
+.annotate 'line', 4718
     __ARG_1.'emitcompare'('ge', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4582
+.annotate 'line', 4719
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpLessExpr' ]
-.annotate 'line', 4560
+.annotate 'line', 4697
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpGreaterExpr' ]
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 4589
+.annotate 'line', 4726
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 4592
+.annotate 'line', 4729
     new $P1, [ 'Winxed'; 'Compiler'; 'OpLessEqualExpr' ]
     .tailcall $P1.'setfrom'(self)
-# }
-.annotate 'line', 4593
+.annotate 'line', 4730
 
 .end # negated
 
@@ -13464,13 +11256,10 @@
 .sub 'int_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4596
+.annotate 'line', 4733
     isgt $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4597
+.annotate 'line', 4734
 
 .end # int_op
 
@@ -13480,12 +11269,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4600
+.annotate 'line', 4737
     __ARG_1.'emitbinop'('isgt', __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4601
+.annotate 'line', 4738
 
 .end # emitop
 
@@ -13495,12 +11281,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4604
+.annotate 'line', 4741
     __ARG_1.'emitcompare'('gt', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4605
+.annotate 'line', 4742
 
 .end # emitop_if
 
@@ -13510,41 +11293,32 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4608
+.annotate 'line', 4745
     __ARG_1.'emitcompare'('le', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4609
+.annotate 'line', 4746
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpGreaterExpr' ]
-.annotate 'line', 4587
+.annotate 'line', 4724
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpLessEqualExpr' ]
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 4616
+.annotate 'line', 4753
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 4619
+.annotate 'line', 4756
     new $P1, [ 'Winxed'; 'Compiler'; 'OpGreaterExpr' ]
     .tailcall $P1.'setfrom'(self)
-# }
-.annotate 'line', 4620
+.annotate 'line', 4757
 
 .end # negated
 
@@ -13552,13 +11326,10 @@
 .sub 'int_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4623
+.annotate 'line', 4760
     isle $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4624
+.annotate 'line', 4761
 
 .end # int_op
 
@@ -13568,12 +11339,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4627
+.annotate 'line', 4764
     __ARG_1.'emitbinop'('isle', __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4628
+.annotate 'line', 4765
 
 .end # emitop
 
@@ -13583,12 +11351,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4631
+.annotate 'line', 4768
     __ARG_1.'emitcompare'('le', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4632
+.annotate 'line', 4769
 
 .end # emitop_if
 
@@ -13598,41 +11363,32 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4635
+.annotate 'line', 4772
     __ARG_1.'emitcompare'('gt', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4636
+.annotate 'line', 4773
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpLessEqualExpr' ]
-.annotate 'line', 4614
+.annotate 'line', 4751
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpGreaterEqualExpr' ]
 
 .sub 'isnegable' :method
-# Body
-# {
-.annotate 'line', 4643
+.annotate 'line', 4780
     .return(1)
-# }
 
 .end # isnegable
 
 
 .sub 'negated' :method
-# Body
-# {
-.annotate 'line', 4646
+.annotate 'line', 4783
     new $P1, [ 'Winxed'; 'Compiler'; 'OpLessExpr' ]
     .tailcall $P1.'setfrom'(self)
-# }
-.annotate 'line', 4647
+.annotate 'line', 4784
 
 .end # negated
 
@@ -13640,13 +11396,10 @@
 .sub 'int_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4650
+.annotate 'line', 4787
     isge $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4651
+.annotate 'line', 4788
 
 .end # int_op
 
@@ -13656,12 +11409,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4654
+.annotate 'line', 4791
     __ARG_1.'emitbinop'('isge', __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4655
+.annotate 'line', 4792
 
 .end # emitop
 
@@ -13671,12 +11421,9 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4658
+.annotate 'line', 4795
     __ARG_1.'emitcompare'('ge', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4659
+.annotate 'line', 4796
 
 .end # emitop_if
 
@@ -13686,41 +11433,32 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 4662
+.annotate 'line', 4799
     __ARG_1.'emitcompare'('lt', __ARG_3, __ARG_4, __ARG_2)
-# }
-.annotate 'line', 4663
+.annotate 'line', 4800
 
 .end # emitop_else
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpGreaterEqualExpr' ]
-.annotate 'line', 4641
+.annotate 'line', 4778
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4672
+.annotate 'line', 4809
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     set $S2, $P1
-    iseq $I2, $S2, 'I'
-    unless $I2 goto __label_3
+    iseq $I1, $S2, 'I'
+    unless $I1 goto __label_3
     getattribute $P4, self, 'rexpr'
     $P3 = $P4.'checkresult'()
     set $S3, $P3
-    iseq $I3, $S3, 'I'
-    set $I1, $I3
-    goto __label_4
+    iseq $I1, $S3, 'I'
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_2
     set $S1, 'I'
     goto __label_1
@@ -13728,14 +11466,13 @@
     set $S1, 'P'
   __label_1:
     .return($S1)
-# }
-.annotate 'line', 4674
+.annotate 'line', 4811
 
 .end # checkresult
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
-.annotate 'line', 4668
+.annotate 'line', 4805
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -13746,213 +11483,152 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4683
+.annotate 'line', 4820
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4684
+.annotate 'line', 4821
 
 .end # OpBoolAndExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 4687
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 4824
     self.'optimizearg'()
-.annotate 'line', 4688
+.annotate 'line', 4825
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'isintegerliteral'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-# {
-.annotate 'line', 4689
-# ln: $I1
+.annotate 'line', 4826
     getattribute $P4, self, 'lexpr'
     $P3 = $P4.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 4690
+.annotate 'line', 4827
     unless $I1 goto __label_3
-.annotate 'line', 4691
+.annotate 'line', 4828
     getattribute $P1, self, 'rexpr'
     goto __label_2
   __label_3:
-.annotate 'line', 4692
+.annotate 'line', 4829
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
-    $P2 = WSubId_22($P3, $P4, $I1)
+    $P2 = WSubId_25($P3, $P4, $I1)
     set $P1, $P2
   __label_2:
-.annotate 'line', 4690
+.annotate 'line', 4827
     .return($P1)
-# }
   __label_1: # endif
-.annotate 'line', 4694
+.annotate 'line', 4831
     .return(self)
-# }
-.annotate 'line', 4695
+.annotate 'line', 4832
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4698
-# var lexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 4835
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4699
-# var rexpr: $P2
+.annotate 'line', 4836
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4700
-# type: $S1
+.annotate 'line', 4837
     $P3 = self.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4701
-# res: $S2
-    if_null __ARG_2, __label_3
-    set $P3, __ARG_2
-    goto __label_2
-  __label_3:
-    $P4 = self.'tempreg'($S1)
-    set $P3, $P4
-  __label_2:
-    null $S2
-    if_null $P3, __label_4
-    set $S2, $P3
-  __label_4:
-.annotate 'line', 4702
+.annotate 'line', 4838
     iseq $I1, $S1, 'I'
-    unless $I1 goto __label_9
-    $P5 = $P1.'issimple'()
-    set $P4, $P5
-    goto __label_10
-  __label_9:
-    box $P4, $I1
-  __label_10:
-    unless $P4 goto __label_7
-    $P6 = $P2.'issimple'()
-    set $P3, $P6
-    goto __label_8
-  __label_7:
-    set $P3, $P4
-  __label_8:
-    if_null $P3, __label_5
+    box $P3, $I1
     unless $P3 goto __label_5
-# {
-.annotate 'line', 4703
-# lreg: $S3
-    $P7 = self.'emit_intleft'(__ARG_1)
-    null $S3
-    if_null $P7, __label_11
-    set $S3, $P7
-  __label_11:
-.annotate 'line', 4704
-# rreg: $S4
+    $P3 = $P1.'issimple'()
+  __label_5:
+    unless $P3 goto __label_4
+    $P3 = $P2.'issimple'()
+  __label_4:
+    if_null $P3, __label_2
+    unless $P3 goto __label_2
+.annotate 'line', 4839
+    $P4 = self.'emit_intleft'(__ARG_1)
+    null $S2
+    if_null $P4, __label_6
+    set $S2, $P4
+  __label_6:
+.annotate 'line', 4840
     $P3 = self.'emit_intright'(__ARG_1)
+    null $S3
+    if_null $P3, __label_7
+    set $S3, $P3
+  __label_7:
+.annotate 'line', 4841
+    __ARG_1.'emitbinop'('and', __ARG_2, $S2, $S3)
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 4844
+    getattribute $P4, self, 'owner'
+    $P3 = $P4.'genlabel'()
     null $S4
-    if_null $P3, __label_12
+    if_null $P3, __label_8
     set $S4, $P3
-  __label_12:
-.annotate 'line', 4705
-    __ARG_1.'emitbinop'('and', $S2, $S3, $S4)
-# }
-    goto __label_6
-  __label_5: # else
-# {
-.annotate 'line', 4708
-# isfalse: $S5
-    getattribute $P4, self, 'owner'
-    $P3 = $P4.'genlabel'()
-    null $S5
-    if_null $P3, __label_13
-    set $S5, $P3
-  __label_13:
-.annotate 'line', 4709
-# done: $S6
-    getattribute $P4, self, 'owner'
-    $P3 = $P4.'genlabel'()
-    null $S6
-    if_null $P3, __label_14
-    set $S6, $P3
-  __label_14:
-.annotate 'line', 4710
-# lres: $S7
-    $P3 = $P1.'emit_get'(__ARG_1)
-    null $S7
-    if_null $P3, __label_15
-    set $S7, $P3
-  __label_15:
-.annotate 'line', 4711
-    __ARG_1.'emitunless'($S7, $S5)
-.annotate 'line', 4712
-# rres: $S8
-    $P3 = $P2.'emit_get'(__ARG_1)
-    null $S8
-    if_null $P3, __label_16
-    set $S8, $P3
-  __label_16:
-.annotate 'line', 4713
-    iseq $I2, $S1, 'P'
-    unless $I2 goto __label_19
-    $P3 = $P2.'checkresult'()
-    set $S9, $P3
-    isne $I3, $S9, 'P'
-    set $I1, $I3
-    goto __label_20
-  __label_19:
-    set $I1, $I2
-  __label_20:
-    unless $I1 goto __label_17
-.annotate 'line', 4714
-    __ARG_1.'emitbox'($S2, $S8)
-    goto __label_18
-  __label_17: # else
-.annotate 'line', 4716
-    __ARG_1.'emitset'($S2, $S8)
-  __label_18: # endif
-.annotate 'line', 4717
-    __ARG_1.'emitgoto'($S6)
-.annotate 'line', 4718
-    __ARG_1.'emitlabel'($S5)
-.annotate 'line', 4719
-    iseq $I2, $S1, 'P'
-    unless $I2 goto __label_23
+  __label_8:
+.annotate 'line', 4845
+    iseq $I1, $S1, 'P'
+    unless $I1 goto __label_11
     $P3 = $P1.'checkresult'()
-    set $S9, $P3
-    isne $I3, $S9, 'P'
-    set $I1, $I3
-    goto __label_24
-  __label_23:
-    set $I1, $I2
-  __label_24:
-    unless $I1 goto __label_21
-.annotate 'line', 4720
-    __ARG_1.'emitbox'($S2, $S7)
-    goto __label_22
-  __label_21: # else
-.annotate 'line', 4722
-    __ARG_1.'emitset'($S2, $S7)
-  __label_22: # endif
-.annotate 'line', 4723
-    __ARG_1.'emitlabel'($S6)
-# }
-  __label_6: # endif
-# }
-.annotate 'line', 4725
+    set $S7, $P3
+    isne $I1, $S7, 'P'
+  __label_11:
+    unless $I1 goto __label_9
+.annotate 'line', 4846
+    getattribute $P5, self, 'lexpr'
+    $P4 = $P5.'emit_get'(__ARG_1)
+    null $S5
+    if_null $P4, __label_12
+    set $S5, $P4
+  __label_12:
+.annotate 'line', 4847
+    __ARG_1.'emitbox'(__ARG_2, $S5)
+    goto __label_10
+  __label_9: # else
+.annotate 'line', 4850
+    getattribute $P3, self, 'lexpr'
+    $P3.'emit'(__ARG_1, __ARG_2)
+  __label_10: # endif
+.annotate 'line', 4851
+    __ARG_1.'emitunless'(__ARG_2, $S4)
+.annotate 'line', 4852
+    iseq $I1, $S1, 'P'
+    unless $I1 goto __label_15
+    $P3 = $P2.'checkresult'()
+    set $S7, $P3
+    isne $I1, $S7, 'P'
+  __label_15:
+    unless $I1 goto __label_13
+.annotate 'line', 4853
+    $P4 = $P2.'emit_get'(__ARG_1)
+    null $S6
+    if_null $P4, __label_16
+    set $S6, $P4
+  __label_16:
+.annotate 'line', 4854
+    __ARG_1.'emitbox'(__ARG_2, $S6)
+    goto __label_14
+  __label_13: # else
+.annotate 'line', 4857
+    getattribute $P3, self, 'rexpr'
+    $P3.'emit'(__ARG_1, __ARG_2)
+  __label_14: # endif
+.annotate 'line', 4858
+    __ARG_1.'emitlabel'($S4)
+  __label_3: # endif
+.annotate 'line', 4860
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBoolAndExpr' ]
-.annotate 'line', 4679
+.annotate 'line', 4816
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
     addparent $P0, $P1
 .end
@@ -13963,224 +11639,162 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4734
+.annotate 'line', 4869
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4735
+.annotate 'line', 4870
 
 .end # OpBoolOrExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 4738
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 4873
     self.'optimizearg'()
-.annotate 'line', 4739
+.annotate 'line', 4874
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'isintegerliteral'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-# {
-.annotate 'line', 4740
-# ln: $I1
+.annotate 'line', 4875
     getattribute $P4, self, 'lexpr'
     $P3 = $P4.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 4741
+.annotate 'line', 4876
     if $I1 goto __label_3
-.annotate 'line', 4742
+.annotate 'line', 4877
     getattribute $P1, self, 'rexpr'
     goto __label_2
   __label_3:
-.annotate 'line', 4743
+.annotate 'line', 4878
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
-    $P2 = WSubId_22($P3, $P4, $I1)
+    $P2 = WSubId_25($P3, $P4, $I1)
     set $P1, $P2
   __label_2:
-.annotate 'line', 4741
+.annotate 'line', 4876
     .return($P1)
-# }
   __label_1: # endif
-.annotate 'line', 4745
+.annotate 'line', 4880
     .return(self)
-# }
-.annotate 'line', 4746
+.annotate 'line', 4881
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4749
-# var lexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 4884
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4750
-# var rexpr: $P2
+.annotate 'line', 4885
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4751
-# type: $S1
+.annotate 'line', 4886
     $P3 = self.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4752
-# res: $S2
-    if_null __ARG_2, __label_3
-    set $P3, __ARG_2
-    goto __label_2
-  __label_3:
-    $P4 = self.'tempreg'($S1)
-    set $P3, $P4
-  __label_2:
-    null $S2
-    if_null $P3, __label_4
-    set $S2, $P3
-  __label_4:
-.annotate 'line', 4753
+.annotate 'line', 4887
     iseq $I1, $S1, 'I'
-    unless $I1 goto __label_9
-    getattribute $P6, self, 'lexpr'
-    $P5 = $P6.'issimple'()
-    set $P4, $P5
-    goto __label_10
-  __label_9:
-    box $P4, $I1
-  __label_10:
-    unless $P4 goto __label_7
-    getattribute $P8, self, 'rexpr'
-    $P7 = $P8.'issimple'()
-    set $P3, $P7
-    goto __label_8
-  __label_7:
-    set $P3, $P4
-  __label_8:
-    if_null $P3, __label_5
+    box $P3, $I1
     unless $P3 goto __label_5
-# {
-.annotate 'line', 4754
-# lreg: $S3
-    $P9 = self.'emit_intleft'(__ARG_1)
-    null $S3
-    if_null $P9, __label_11
-    set $S3, $P9
-  __label_11:
-.annotate 'line', 4755
-# rreg: $S4
-    $P3 = self.'emit_intright'(__ARG_1)
-    null $S4
-    if_null $P3, __label_12
-    set $S4, $P3
-  __label_12:
-.annotate 'line', 4756
-    __ARG_1.'emitbinop'('or', $S2, $S3, $S4)
-# }
-    goto __label_6
-  __label_5: # else
-# {
-.annotate 'line', 4759
-# istrue: $S5
-    getattribute $P4, self, 'owner'
-    $P3 = $P4.'genlabel'()
-    null $S5
-    if_null $P3, __label_13
-    set $S5, $P3
-  __label_13:
-.annotate 'line', 4760
-# done: $S6
-    getattribute $P4, self, 'owner'
-    $P3 = $P4.'genlabel'()
-    null $S6
-    if_null $P3, __label_14
-    set $S6, $P3
-  __label_14:
-.annotate 'line', 4761
-# lres: $S7
     getattribute $P4, self, 'lexpr'
-    $P3 = $P4.'emit_get'(__ARG_1)
-    null $S7
-    if_null $P3, __label_15
-    set $S7, $P3
-  __label_15:
-.annotate 'line', 4762
-    __ARG_1.'emitif'($S7, $S5)
-.annotate 'line', 4763
-# rres: $S8
-    getattribute $P4, self, 'rexpr'
-    $P3 = $P4.'emit_get'(__ARG_1)
-    null $S8
-    if_null $P3, __label_16
-    set $S8, $P3
-  __label_16:
-.annotate 'line', 4764
-    iseq $I2, $S1, 'P'
-    unless $I2 goto __label_19
-    $P3 = $P2.'checkresult'()
-    set $S9, $P3
-    isne $I3, $S9, 'P'
-    set $I1, $I3
-    goto __label_20
-  __label_19:
-    set $I1, $I2
-  __label_20:
-    unless $I1 goto __label_17
-.annotate 'line', 4765
-    __ARG_1.'emitbox'($S2, $S8)
-    goto __label_18
-  __label_17: # else
-.annotate 'line', 4767
-    __ARG_1.'emitset'($S2, $S8)
-  __label_18: # endif
-.annotate 'line', 4768
-    __ARG_1.'emitgoto'($S6)
-.annotate 'line', 4769
-    __ARG_1.'emitlabel'($S5)
-.annotate 'line', 4770
-    iseq $I2, $S1, 'P'
-    unless $I2 goto __label_23
+    $P3 = $P4.'issimple'()
+  __label_5:
+    unless $P3 goto __label_4
+    getattribute $P5, self, 'rexpr'
+    $P3 = $P5.'issimple'()
+  __label_4:
+    if_null $P3, __label_2
+    unless $P3 goto __label_2
+.annotate 'line', 4888
+    $P6 = self.'emit_intleft'(__ARG_1)
+    null $S2
+    if_null $P6, __label_6
+    set $S2, $P6
+  __label_6:
+.annotate 'line', 4889
+    $P3 = self.'emit_intright'(__ARG_1)
+    null $S3
+    if_null $P3, __label_7
+    set $S3, $P3
+  __label_7:
+.annotate 'line', 4890
+    __ARG_1.'emitbinop'('or', __ARG_2, $S2, $S3)
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 4893
+    getattribute $P4, self, 'owner'
+    $P3 = $P4.'genlabel'()
+    null $S4
+    if_null $P3, __label_8
+    set $S4, $P3
+  __label_8:
+.annotate 'line', 4894
+    iseq $I1, $S1, 'P'
+    unless $I1 goto __label_11
     $P3 = $P1.'checkresult'()
-    set $S9, $P3
-    isne $I3, $S9, 'P'
-    set $I1, $I3
-    goto __label_24
-  __label_23:
-    set $I1, $I2
-  __label_24:
-    unless $I1 goto __label_21
-.annotate 'line', 4771
-    __ARG_1.'emitbox'($S2, $S7)
-    goto __label_22
-  __label_21: # else
-.annotate 'line', 4773
-    __ARG_1.'emitset'($S2, $S7)
-  __label_22: # endif
-.annotate 'line', 4774
-    __ARG_1.'emitlabel'($S6)
-# }
-  __label_6: # endif
-# }
-.annotate 'line', 4776
+    set $S7, $P3
+    isne $I1, $S7, 'P'
+  __label_11:
+    unless $I1 goto __label_9
+.annotate 'line', 4895
+    getattribute $P5, self, 'lexpr'
+    $P4 = $P5.'emit_get'(__ARG_1)
+    null $S5
+    if_null $P4, __label_12
+    set $S5, $P4
+  __label_12:
+.annotate 'line', 4896
+    __ARG_1.'emitbox'(__ARG_2, $S5)
+    goto __label_10
+  __label_9: # else
+.annotate 'line', 4899
+    getattribute $P3, self, 'lexpr'
+    $P3.'emit'(__ARG_1, __ARG_2)
+  __label_10: # endif
+.annotate 'line', 4900
+    __ARG_1.'emitif'(__ARG_2, $S4)
+.annotate 'line', 4901
+    iseq $I1, $S1, 'P'
+    unless $I1 goto __label_15
+    $P3 = $P2.'checkresult'()
+    set $S7, $P3
+    isne $I1, $S7, 'P'
+  __label_15:
+    unless $I1 goto __label_13
+.annotate 'line', 4902
+    getattribute $P5, self, 'rexpr'
+    $P4 = $P5.'emit_get'(__ARG_1)
+    null $S6
+    if_null $P4, __label_16
+    set $S6, $P4
+  __label_16:
+.annotate 'line', 4903
+    __ARG_1.'emitbox'(__ARG_2, $S6)
+    goto __label_14
+  __label_13: # else
+.annotate 'line', 4906
+    getattribute $P3, self, 'rexpr'
+    $P3.'emit'(__ARG_1, __ARG_2)
+  __label_14: # endif
+.annotate 'line', 4907
+    __ARG_1.'emitlabel'($S4)
+  __label_3: # endif
+.annotate 'line', 4909
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBoolOrExpr' ]
-.annotate 'line', 4730
+.annotate 'line', 4865
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
-.annotate 'line', 4781
+.annotate 'line', 4914
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
 .end
@@ -14191,54 +11805,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4791
+.annotate 'line', 4924
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4792
+.annotate 'line', 4925
 
 .end # OpBinAndExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4795
-# res: $S1
-    if_null __ARG_2, __label_2
-    set $P1, __ARG_2
-    goto __label_1
-  __label_2:
-    $P2 = self.'tempreg'('I')
-    set $P1, $P2
-  __label_1:
-    null $S1
-    if_null $P1, __label_3
-    set $S1, $P1
-  __label_3:
-.annotate 'line', 4796
-# lreg: $S2
+        .param string __ARG_2
+.annotate 'line', 4928
     $P1 = self.'emit_intleft'(__ARG_1)
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
-  __label_4:
-.annotate 'line', 4797
-# rreg: $S3
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4929
     $P1 = self.'emit_intright'(__ARG_1)
-    null $S3
-    if_null $P1, __label_5
-    set $S3, $P1
-  __label_5:
-.annotate 'line', 4798
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 4930
     self.'annotate'(__ARG_1)
-.annotate 'line', 4799
-    __ARG_1.'emitbinop'('band', $S1, $S2, $S3)
-# }
-.annotate 'line', 4800
+.annotate 'line', 4931
+    __ARG_1.'emitbinop'('band', __ARG_2, $S1, $S2)
+.annotate 'line', 4932
 
 .end # emit
 
@@ -14246,19 +11839,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4803
+.annotate 'line', 4935
     band $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4804
+.annotate 'line', 4936
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinAndExpr' ]
-.annotate 'line', 4787
+.annotate 'line', 4920
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
 .end
@@ -14269,54 +11859,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4813
+.annotate 'line', 4945
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4814
+.annotate 'line', 4946
 
 .end # OpBinOrExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4817
-# res: $S1
-    if_null __ARG_2, __label_2
-    set $P1, __ARG_2
-    goto __label_1
-  __label_2:
-    $P2 = self.'tempreg'('I')
-    set $P1, $P2
-  __label_1:
-    null $S1
-    if_null $P1, __label_3
-    set $S1, $P1
-  __label_3:
-.annotate 'line', 4818
-# lreg: $S2
+        .param string __ARG_2
+.annotate 'line', 4949
     $P1 = self.'emit_intleft'(__ARG_1)
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
-  __label_4:
-.annotate 'line', 4819
-# rreg: $S3
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4950
     $P1 = self.'emit_intright'(__ARG_1)
-    null $S3
-    if_null $P1, __label_5
-    set $S3, $P1
-  __label_5:
-.annotate 'line', 4820
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 4951
     self.'annotate'(__ARG_1)
-.annotate 'line', 4821
-    __ARG_1.'emitbinop'('bor', $S1, $S2, $S3)
-# }
-.annotate 'line', 4822
+.annotate 'line', 4952
+    __ARG_1.'emitbinop'('bor', __ARG_2, $S1, $S2)
+.annotate 'line', 4953
 
 .end # emit
 
@@ -14324,19 +11893,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4825
+.annotate 'line', 4956
     bor $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4826
+.annotate 'line', 4957
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinOrExpr' ]
-.annotate 'line', 4809
+.annotate 'line', 4941
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
 .end
@@ -14347,54 +11913,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4835
+.annotate 'line', 4966
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4836
+.annotate 'line', 4967
 
 .end # OpBinXorExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4839
-# res: $S1
-    if_null __ARG_2, __label_2
-    set $P1, __ARG_2
-    goto __label_1
-  __label_2:
-    $P2 = self.'tempreg'('I')
-    set $P1, $P2
-  __label_1:
-    null $S1
-    if_null $P1, __label_3
-    set $S1, $P1
-  __label_3:
-.annotate 'line', 4840
-# lreg: $S2
+        .param string __ARG_2
+.annotate 'line', 4970
     $P1 = self.'emit_intleft'(__ARG_1)
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
-  __label_4:
-.annotate 'line', 4841
-# rreg: $S3
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 4971
     $P1 = self.'emit_intright'(__ARG_1)
-    null $S3
-    if_null $P1, __label_5
-    set $S3, $P1
-  __label_5:
-.annotate 'line', 4842
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 4972
     self.'annotate'(__ARG_1)
-.annotate 'line', 4843
-    __ARG_1.'emitbinop'('bxor', $S1, $S2, $S3)
-# }
-.annotate 'line', 4844
+.annotate 'line', 4973
+    __ARG_1.'emitbinop'('bxor', __ARG_2, $S1, $S2)
+.annotate 'line', 4974
 
 .end # emit
 
@@ -14402,19 +11947,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 4847
+.annotate 'line', 4977
     bxor $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 4848
+.annotate 'line', 4978
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinXorExpr' ]
-.annotate 'line', 4831
+.annotate 'line', 4962
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
 .end
@@ -14425,399 +11967,311 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4858
+.annotate 'line', 4988
     self.'Expr'(__ARG_1, __ARG_2)
-# switch-case
-.annotate 'line', 4860
+.annotate 'line', 4990
     isa $I1, __ARG_3, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     if $I1 goto __label_3
-.annotate 'line', 4867
+.annotate 'line', 4997
     isa $I1, __ARG_4, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     if $I1 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 4861
+.annotate 'line', 4991
     getattribute $P2, __ARG_3, 'values'
     setattribute self, 'values', $P2
-.annotate 'line', 4862
+.annotate 'line', 4992
     isa $I2, __ARG_4, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     unless $I2 goto __label_5
-.annotate 'line', 4863
+.annotate 'line', 4993
     getattribute $P3, __ARG_4, 'values'
     self.'append'($P3)
     goto __label_6
   __label_5: # else
-.annotate 'line', 4865
+.annotate 'line', 4995
     self.'pushexpr'(__ARG_4)
   __label_6: # endif
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 4868
+.annotate 'line', 4998
     getattribute $P5, __ARG_4, 'values'
     setattribute self, 'values', $P5
-.annotate 'line', 4869
+.annotate 'line', 4999
     self.'unshiftexpr'(__ARG_3)
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 4872
+.annotate 'line', 5002
     root_new $P7, ['parrot';'ResizablePMCArray']
     assign $P7, 2
     $P7[0] = __ARG_3
     $P7[1] = __ARG_4
     setattribute self, 'values', $P7
   __label_1: # switch end
-# }
-.annotate 'line', 4874
+.annotate 'line', 5004
 
 .end # ConcatString
 
 
 .sub 'pushexpr' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_72 = "WSubId_72"
-# Body
-# {
-.annotate 'line', 4877
-# var values: $P1
+.const 'Sub' WSubId_78 = "WSubId_78"
+.annotate 'line', 5007
     getattribute $P1, self, 'values'
-.annotate 'line', 4878
-# var last: $P2
+.annotate 'line', 5008
     $P2 = $P1[-1]
-.annotate 'line', 4879
-    $P4 = $P2.'isstringliteral'()
-    unless $P4 goto __label_3
-    $P5 = __ARG_1.'isstringliteral'()
-    set $P3, $P5
-    goto __label_4
+.annotate 'line', 5009
+    $P3 = $P2.'isstringliteral'()
+    unless $P3 goto __label_3
+    $P3 = __ARG_1.'isstringliteral'()
   __label_3:
-    set $P3, $P4
-  __label_4:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 4880
-    $P6 = WSubId_72($P2, __ARG_1)
-    $P1[-1] = $P6
+.annotate 'line', 5010
+    $P4 = WSubId_78($P2, __ARG_1)
+    $P1[-1] = $P4
     goto __label_2
   __label_1: # else
-.annotate 'line', 4882
-# builtin push
+.annotate 'line', 5012
     push $P1, __ARG_1
   __label_2: # endif
-# }
-.annotate 'line', 4883
+.annotate 'line', 5013
 
 .end # pushexpr
 
 
 .sub 'unshiftexpr' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_72 = "WSubId_72"
-# Body
-# {
-.annotate 'line', 4886
-# var values: $P1
+.const 'Sub' WSubId_78 = "WSubId_78"
+.annotate 'line', 5016
     getattribute $P1, self, 'values'
-.annotate 'line', 4887
-# var first: $P2
+.annotate 'line', 5017
     $P2 = $P1[0]
-.annotate 'line', 4888
-    $P4 = $P2.'isstringliteral'()
-    unless $P4 goto __label_3
-    $P5 = __ARG_1.'isstringliteral'()
-    set $P3, $P5
-    goto __label_4
+.annotate 'line', 5018
+    $P3 = $P2.'isstringliteral'()
+    unless $P3 goto __label_3
+    $P3 = __ARG_1.'isstringliteral'()
   __label_3:
-    set $P3, $P4
-  __label_4:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 4889
-    $P6 = WSubId_72(__ARG_1, $P2)
-    $P1[0] = $P6
+.annotate 'line', 5019
+    $P4 = WSubId_78(__ARG_1, $P2)
+    $P1[0] = $P4
     goto __label_2
   __label_1: # else
-.annotate 'line', 4891
+.annotate 'line', 5021
     'unshift'($P1, __ARG_1)
   __label_2: # endif
-# }
-.annotate 'line', 4892
+.annotate 'line', 5022
 
 .end # unshiftexpr
 
 
 .sub 'append' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_72 = "WSubId_72"
-# Body
-# {
-.annotate 'line', 4895
-# var values: $P1
+.const 'Sub' WSubId_78 = "WSubId_78"
+.annotate 'line', 5025
     getattribute $P1, self, 'values'
-.annotate 'line', 4896
-# var last: $P2
+.annotate 'line', 5026
     $P2 = $P1[-1]
-.annotate 'line', 4897
+.annotate 'line', 5027
     $P4 = $P2.'isstringliteral'()
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 4898
-# var first: $P3
+.annotate 'line', 5028
     $P3 = __ARG_1[0]
-.annotate 'line', 4899
+.annotate 'line', 5029
     $P4 = $P3.'isstringliteral'()
     if_null $P4, __label_2
     unless $P4 goto __label_2
-# {
-.annotate 'line', 4900
-    $P5 = WSubId_72($P2, $P3)
+.annotate 'line', 5030
+    $P5 = WSubId_78($P2, $P3)
     $P1[-1] = $P5
-.annotate 'line', 4901
+.annotate 'line', 5031
     __ARG_1.'shift'()
-# }
   __label_2: # endif
-# }
   __label_1: # endif
-.annotate 'line', 4904
+.annotate 'line', 5034
     $P1.'append'(__ARG_1)
-# }
-.annotate 'line', 4905
+.annotate 'line', 5035
 
 .end # append
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4907
+.annotate 'line', 5037
     .return('S')
-# }
 
 .end # checkresult
 
 
 .sub 'getregs' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4910
-# var values: $P1
+.annotate 'line', 5040
     getattribute $P1, self, 'values'
-.annotate 'line', 4911
-# nvalues: $I1
-# builtin elements
+.annotate 'line', 5041
     elements $I1, $P1
-.annotate 'line', 4912
+.annotate 'line', 5042
     new $P2, ['FixedStringArray'], $I1
-.annotate 'line', 4913
-# i: $I2
+.annotate 'line', 5043
     null $I2
-# for loop
-.annotate 'line', 4914
+.annotate 'line', 5044
     null $I2
   __label_3: # for condition
     ge $I2, $I1, __label_2
-.annotate 'line', 4915
-# builtin string
+.annotate 'line', 5045
     $P4 = $P1[$I2]
     $P3 = $P4.'emit_get'(__ARG_1)
     set $S1, $P3
     $P2[$I2] = $S1
   __label_1: # for iteration
-.annotate 'line', 4914
+.annotate 'line', 5044
     inc $I2
     goto __label_3
   __label_2: # for end
-.annotate 'line', 4916
+.annotate 'line', 5046
     .return($P2)
-# }
-.annotate 'line', 4917
+.annotate 'line', 5047
 
 .end # getregs
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4920
-# auxreg: $S1
+        .param string __ARG_2
+.annotate 'line', 5050
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 4921
-    set $S2, __ARG_2
-    eq $S2, '', __label_2
-.annotate 'line', 4922
+.annotate 'line', 5051
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_2: # endif
-# }
-.annotate 'line', 4923
+.annotate 'line', 5052
 
 .end # emit
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4926
-# var regvalues: $P1
+.annotate 'line', 5055
     $P1 = self.'getregs'(__ARG_1)
-.annotate 'line', 4927
-# nvalues: $I1
-# builtin elements
+.annotate 'line', 5056
     elements $I1, $P1
-.annotate 'line', 4928
-# auxreg: $S1
+.annotate 'line', 5057
     $P2 = self.'tempreg'('S')
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 4929
+.annotate 'line', 5058
     self.'annotate'(__ARG_1)
-.annotate 'line', 4930
+.annotate 'line', 5059
     $P2 = $P1[0]
     $P3 = $P1[1]
     __ARG_1.'emitconcat'($S1, $P2, $P3)
-# for loop
-.annotate 'line', 4931
-# i: $I2
+.annotate 'line', 5060
     set $I2, 2
   __label_4: # for condition
     ge $I2, $I1, __label_3
-.annotate 'line', 4932
+.annotate 'line', 5061
     $P2 = $P1[$I2]
     __ARG_1.'emitconcat1'($S1, $P2)
   __label_2: # for iteration
-.annotate 'line', 4931
+.annotate 'line', 5060
     inc $I2
     goto __label_4
   __label_3: # for end
-.annotate 'line', 4933
+.annotate 'line', 5062
     .return($S1)
-# }
-.annotate 'line', 4934
+.annotate 'line', 5063
 
 .end # emit_get
 
 
 .sub 'emit_concat_to' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4937
-# var regvalues: $P1
+        .param string __ARG_2
+.annotate 'line', 5066
     $P1 = self.'getregs'(__ARG_1)
-.annotate 'line', 4938
-# nvalues: $I1
-# builtin elements
+.annotate 'line', 5067
     elements $I1, $P1
-.annotate 'line', 4939
+.annotate 'line', 5068
     self.'annotate'(__ARG_1)
-# for loop
-.annotate 'line', 4940
-# i: $I2
+.annotate 'line', 5069
     null $I2
   __label_3: # for condition
     ge $I2, $I1, __label_2
-.annotate 'line', 4941
+.annotate 'line', 5070
     $P2 = $P1[$I2]
     __ARG_1.'emitconcat1'(__ARG_2, $P2)
   __label_1: # for iteration
-.annotate 'line', 4940
+.annotate 'line', 5069
     inc $I2
     goto __label_3
   __label_2: # for end
-# }
-.annotate 'line', 4942
+.annotate 'line', 5071
 
 .end # emit_concat_to
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
-.annotate 'line', 4853
+.annotate 'line', 4983
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 4855
+.annotate 'line', 4985
     addattribute $P0, 'values'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'RepeatString' ]
 
 .sub 'RepeatString' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 4951
+.annotate 'line', 5080
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     getattribute $P3, __ARG_1, 'lexpr'
     getattribute $P4, __ARG_1, 'rexpr'
     self.'set'($P1, $P2, $P3, $P4)
-# }
-.annotate 'line', 4952
+.annotate 'line', 5081
 
 .end # RepeatString
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 4953
+.annotate 'line', 5082
     .return('S')
-# }
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 4956
-# var rexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 5085
     getattribute $P1, self, 'rexpr'
-.annotate 'line', 4957
-# lreg: $S1
+.annotate 'line', 5086
     getattribute $P3, self, 'lexpr'
     $P2 = $P3.'emit_get'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 4958
-# rreg: $S2
+.annotate 'line', 5087
     $P2 = $P1.'emit_getint'(__ARG_1)
     null $S2
     if_null $P2, __label_2
     set $S2, $P2
   __label_2:
-.annotate 'line', 4959
-    set $S3, __ARG_2
-    eq $S3, '', __label_3
-# {
-.annotate 'line', 4960
+.annotate 'line', 5088
     self.'annotate'(__ARG_1)
-.annotate 'line', 4961
+.annotate 'line', 5089
     __ARG_1.'emitrepeat'(__ARG_2, $S1, $S2)
-# }
-  __label_3: # endif
-# }
-.annotate 'line', 4963
+.annotate 'line', 5090
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RepeatString' ]
-.annotate 'line', 4947
+.annotate 'line', 5076
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -14828,374 +12282,280 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 4972
+.annotate 'line', 5099
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 4973
+.annotate 'line', 5100
 
 .end # OpAddExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_72 = "WSubId_72"
-.const 'Sub' WSubId_22 = "WSubId_22"
-.const 'Sub' WSubId_73 = "WSubId_73"
-.const 'Sub' WSubId_71 = "WSubId_71"
-# Body
-# {
-.annotate 'line', 4976
+.const 'Sub' WSubId_78 = "WSubId_78"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_77 = "WSubId_77"
+.annotate 'line', 5103
     self.'optimizearg'()
-.annotate 'line', 4977
-# var lexpr: $P1
+.annotate 'line', 5104
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 4978
-# var rexpr: $P2
+.annotate 'line', 5105
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 4979
-# ltype: $S1
+.annotate 'line', 5106
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 4980
-# rtype: $S2
+.annotate 'line', 5107
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 4981
-    $P4 = $P1.'isliteral'()
-    unless $P4 goto __label_4
-    $P5 = $P2.'isliteral'()
-    set $P3, $P5
-    goto __label_5
+.annotate 'line', 5108
+    $P3 = $P1.'isliteral'()
+    unless $P3 goto __label_4
+    $P3 = $P2.'isliteral'()
   __label_4:
-    set $P3, $P4
-  __label_5:
     if_null $P3, __label_3
     unless $P3 goto __label_3
-# {
-.annotate 'line', 4982
-    iseq $I4, $S1, 'S'
-    unless $I4 goto __label_7
-    iseq $I5, $S2, 'S'
-    set $I3, $I5
-    goto __label_8
-  __label_7:
-    set $I3, $I4
-  __label_8:
+.annotate 'line', 5109
+    iseq $I3, $S1, 'S'
     unless $I3 goto __label_6
-.annotate 'line', 4983
-    .tailcall WSubId_72($P1, $P2)
-  __label_6: # endif
-.annotate 'line', 4984
-    iseq $I4, $S1, 'I'
-    unless $I4 goto __label_10
-    iseq $I5, $S2, 'I'
-    set $I3, $I5
-    goto __label_11
-  __label_10:
-    set $I3, $I4
-  __label_11:
-    unless $I3 goto __label_9
-# {
-.annotate 'line', 4985
-# ln: $I1
+    iseq $I3, $S2, 'S'
+  __label_6:
+    unless $I3 goto __label_5
+.annotate 'line', 5110
+    .tailcall WSubId_78($P1, $P2)
+  __label_5: # endif
+.annotate 'line', 5111
+    iseq $I3, $S1, 'I'
+    unless $I3 goto __label_8
+    iseq $I3, $S2, 'I'
+  __label_8:
+    unless $I3 goto __label_7
+.annotate 'line', 5112
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 4986
-# rn: $I2
+.annotate 'line', 5113
     $P3 = $P2.'getIntegerValue'()
     set $I2, $P3
-.annotate 'line', 4987
+.annotate 'line', 5114
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     add $I3, $I1, $I2
-    .tailcall WSubId_22($P3, $P4, $I3)
-# }
-  __label_9: # endif
-# {
-.annotate 'line', 4990
-    $P3 = WSubId_73($S1, $S2)
-    if_null $P3, __label_12
-    unless $P3 goto __label_12
-# {
-.annotate 'line', 4991
-# lf: $N1
+    .tailcall WSubId_25($P3, $P4, $I3)
+  __label_7: # endif
+.annotate 'line', 5117
+    $P3 = WSubId_79($S1, $S2)
+    if_null $P3, __label_9
+    unless $P3 goto __label_9
+.annotate 'line', 5118
     $P4 = $P1.'getFloatValue'()
     set $N1, $P4
-.annotate 'line', 4992
-# rf: $N2
+.annotate 'line', 5119
     $P3 = $P2.'getFloatValue'()
     set $N2, $P3
-.annotate 'line', 4993
+.annotate 'line', 5120
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     add $N3, $N1, $N2
-    .tailcall WSubId_71($P3, $P4, $N3)
-# }
-  __label_12: # endif
-# }
-# }
+    .tailcall WSubId_77($P3, $P4, $N3)
+  __label_9: # endif
   __label_3: # endif
-.annotate 'line', 4997
-    iseq $I4, $S1, 'S'
-    unless $I4 goto __label_14
-    iseq $I5, $S2, 'S'
-    set $I3, $I5
-    goto __label_15
-  __label_14:
-    set $I3, $I4
-  __label_15:
-    unless $I3 goto __label_13
-# {
-.annotate 'line', 4998
+.annotate 'line', 5124
+    iseq $I3, $S1, 'S'
+    unless $I3 goto __label_11
+    iseq $I3, $S2, 'S'
+  __label_11:
+    unless $I3 goto __label_10
+.annotate 'line', 5125
     new $P4, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     getattribute $P5, self, 'owner'
     getattribute $P6, self, 'start'
     $P4.'ConcatString'($P5, $P6, $P1, $P2)
     set $P3, $P4
     .return($P3)
-# }
-  __label_13: # endif
-.annotate 'line', 5000
+  __label_10: # endif
+.annotate 'line', 5127
     .return(self)
-# }
-.annotate 'line', 5001
+.annotate 'line', 5128
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-.const 'Sub' WSubId_73 = "WSubId_73"
-# Body
-# {
-.annotate 'line', 5004
-# rl: $S1
+.const 'Sub' WSubId_79 = "WSubId_79"
+.annotate 'line', 5131
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5005
-# rr: $S2
+.annotate 'line', 5132
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'checkresult'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 5006
+.annotate 'line', 5133
     ne $S1, $S2, __label_3
-.annotate 'line', 5007
+.annotate 'line', 5134
     .return($S1)
   __label_3: # endif
-.annotate 'line', 5008
-    iseq $I2, $S1, 'I'
-    unless $I2 goto __label_5
-    iseq $I3, $S2, 'S'
-    set $I1, $I3
-    goto __label_6
+.annotate 'line', 5135
+    iseq $I1, $S1, 'I'
+    unless $I1 goto __label_5
+    iseq $I1, $S2, 'S'
   __label_5:
-    set $I1, $I2
-  __label_6:
     unless $I1 goto __label_4
-.annotate 'line', 5009
+.annotate 'line', 5136
     .return('S')
   __label_4: # endif
-.annotate 'line', 5010
-    iseq $I2, $S1, 'S'
-    unless $I2 goto __label_8
-    iseq $I3, $S2, 'I'
-    set $I1, $I3
-    goto __label_9
-  __label_8:
-    set $I1, $I2
-  __label_9:
+.annotate 'line', 5137
+    iseq $I1, $S1, 'S'
     unless $I1 goto __label_7
-.annotate 'line', 5011
+    iseq $I1, $S2, 'I'
+  __label_7:
+    unless $I1 goto __label_6
+.annotate 'line', 5138
     .return('S')
-  __label_7: # endif
-.annotate 'line', 5012
-    $P1 = WSubId_73($S1, $S2)
-    if_null $P1, __label_10
-    unless $P1 goto __label_10
-.annotate 'line', 5013
+  __label_6: # endif
+.annotate 'line', 5139
+    $P1 = WSubId_79($S1, $S2)
+    if_null $P1, __label_8
+    unless $P1 goto __label_8
+.annotate 'line', 5140
     .return('N')
-  __label_10: # endif
-.annotate 'line', 5014
+  __label_8: # endif
+.annotate 'line', 5141
     .return('I')
-# }
-.annotate 'line', 5015
+.annotate 'line', 5142
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5018
-# var lexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 5145
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5019
-# var rexpr: $P2
+.annotate 'line', 5146
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5020
-# restype: $S1
+.annotate 'line', 5147
     $P3 = self.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 5021
-# ltype: $S2
+.annotate 'line', 5148
     $P3 = $P1.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 5022
-# rtype: $S3
+.annotate 'line', 5149
     $P3 = $P2.'checkresult'()
     null $S3
     if_null $P3, __label_3
     set $S3, $P3
   __label_3:
-.annotate 'line', 5024
-# rleft: $S4
+.annotate 'line', 5151
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S4
     if_null $P3, __label_4
     set $S4, $P3
   __label_4:
-.annotate 'line', 5025
-# rright: $S5
+.annotate 'line', 5152
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S5
     if_null $P3, __label_5
     set $S5, $P3
   __label_5:
-.annotate 'line', 5026
+.annotate 'line', 5153
     ne $S1, 'S', __label_6
-# {
-.annotate 'line', 5027
-    isne $I2, $S2, 'S'
-    if $I2 goto __label_9
-    isne $I3, $S3, 'S'
-    set $I1, $I3
-    goto __label_10
+.annotate 'line', 5154
+    isne $I1, $S2, 'S'
+    if $I1 goto __label_9
+    isne $I1, $S3, 'S'
   __label_9:
-    set $I1, $I2
-  __label_10:
     unless $I1 goto __label_8
-# {
-.annotate 'line', 5028
-# aux: $S6
+.annotate 'line', 5155
     $P3 = self.'tempreg'('S')
     null $S6
-    if_null $P3, __label_11
+    if_null $P3, __label_10
     set $S6, $P3
-  __label_11:
-.annotate 'line', 5029
-    eq $S2, 'S', __label_12
-# {
-.annotate 'line', 5030
+  __label_10:
+.annotate 'line', 5156
+    eq $S2, 'S', __label_11
+.annotate 'line', 5157
     __ARG_1.'emitset'($S6, $S4)
-.annotate 'line', 5031
+.annotate 'line', 5158
     set $S4, $S6
-# }
-    goto __label_13
-  __label_12: # else
-# {
-.annotate 'line', 5034
+    goto __label_12
+  __label_11: # else
+.annotate 'line', 5161
     __ARG_1.'emitset'($S6, $S5)
-.annotate 'line', 5035
+.annotate 'line', 5162
     set $S5, $S6
-# }
-  __label_13: # endif
-# }
+  __label_12: # endif
   __label_8: # endif
-.annotate 'line', 5038
+.annotate 'line', 5165
     __ARG_1.'emitconcat'(__ARG_2, $S4, $S5)
-# }
     goto __label_7
   __label_6: # else
-# {
-.annotate 'line', 5041
-    iseq $I2, $S1, 'I'
-    unless $I2 goto __label_16
-    isne $I4, $S2, 'I'
-    if $I4 goto __label_18
-    isne $I5, $S3, 'I'
-    set $I3, $I5
-    goto __label_19
-  __label_18:
-    set $I3, $I4
-  __label_19:
-    set $I1, $I3
-    goto __label_17
+.annotate 'line', 5168
+    iseq $I1, $S1, 'I'
+    unless $I1 goto __label_15
+    isne $I1, $S2, 'I'
+    if $I1 goto __label_16
+    isne $I1, $S3, 'I'
   __label_16:
-    set $I1, $I2
-  __label_17:
-    unless $I1 goto __label_14
-# {
-.annotate 'line', 5042
-# l: $S7
+  __label_15:
+    unless $I1 goto __label_13
+.annotate 'line', 5169
     null $S7
-.annotate 'line', 5043
-    ne $S2, 'I', __label_20
+.annotate 'line', 5170
+    ne $S2, 'I', __label_17
     set $S7, $S4
-    goto __label_21
-  __label_20: # else
-# {
-.annotate 'line', 5045
+    goto __label_18
+  __label_17: # else
+.annotate 'line', 5172
     $P3 = self.'tempreg'('I')
     set $S7, $P3
-.annotate 'line', 5046
+.annotate 'line', 5173
     __ARG_1.'emitset'($S7, $S4)
-# }
-  __label_21: # endif
-.annotate 'line', 5048
-# r: $S8
+  __label_18: # endif
+.annotate 'line', 5175
     null $S8
-.annotate 'line', 5049
-    ne $S3, 'I', __label_22
+.annotate 'line', 5176
+    ne $S3, 'I', __label_19
     set $S8, $S5
-    goto __label_23
-  __label_22: # else
-# {
-.annotate 'line', 5051
+    goto __label_20
+  __label_19: # else
+.annotate 'line', 5178
     $P3 = self.'tempreg'('I')
     set $S8, $P3
-.annotate 'line', 5052
+.annotate 'line', 5179
     __ARG_1.'emitset'($S8, $S5)
-# }
-  __label_23: # endif
-.annotate 'line', 5054
+  __label_20: # endif
+.annotate 'line', 5181
     __ARG_1.'emitadd'(__ARG_2, $S7, $S8)
-# }
-    goto __label_15
-  __label_14: # else
-.annotate 'line', 5057
+    goto __label_14
+  __label_13: # else
+.annotate 'line', 5184
     __ARG_1.'emitadd'(__ARG_2, $S4, $S5)
-  __label_15: # endif
-# }
+  __label_14: # endif
   __label_7: # endif
-# }
-.annotate 'line', 5059
+.annotate 'line', 5186
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAddExpr' ]
-.annotate 'line', 4968
+.annotate 'line', 5095
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -15206,263 +12566,206 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5068
+.annotate 'line', 5195
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5069
+.annotate 'line', 5196
 
 .end # OpSubExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 5072
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 5199
     self.'optimizearg'()
-.annotate 'line', 5073
-# var lexpr: $P1
+.annotate 'line', 5200
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5074
-# var rexpr: $P2
+.annotate 'line', 5201
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5075
-    $P4 = $P1.'isliteral'()
-    unless $P4 goto __label_2
-    $P5 = $P2.'isliteral'()
-    set $P3, $P5
-    goto __label_3
+.annotate 'line', 5202
+    $P3 = $P1.'isliteral'()
+    unless $P3 goto __label_2
+    $P3 = $P2.'isliteral'()
   __label_2:
-    set $P3, $P4
-  __label_3:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 5076
-# ltype: $S1
-    $P6 = $P1.'checkresult'()
+.annotate 'line', 5203
+    $P4 = $P1.'checkresult'()
     null $S1
-    if_null $P6, __label_4
-    set $S1, $P6
-  __label_4:
-.annotate 'line', 5077
-# rtype: $S2
+    if_null $P4, __label_3
+    set $S1, $P4
+  __label_3:
+.annotate 'line', 5204
     $P3 = $P2.'checkresult'()
     null $S2
-    if_null $P3, __label_5
+    if_null $P3, __label_4
     set $S2, $P3
-  __label_5:
-.annotate 'line', 5078
-    iseq $I4, $S1, 'I'
-    unless $I4 goto __label_7
-    iseq $I5, $S2, 'I'
-    set $I3, $I5
-    goto __label_8
-  __label_7:
-    set $I3, $I4
-  __label_8:
+  __label_4:
+.annotate 'line', 5205
+    iseq $I3, $S1, 'I'
     unless $I3 goto __label_6
-# {
-.annotate 'line', 5079
-# ln: $I1
+    iseq $I3, $S2, 'I'
+  __label_6:
+    unless $I3 goto __label_5
+.annotate 'line', 5206
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 5080
-# rn: $I2
+.annotate 'line', 5207
     $P3 = $P2.'getIntegerValue'()
     set $I2, $P3
-.annotate 'line', 5081
+.annotate 'line', 5208
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     sub $I3, $I1, $I2
-    .tailcall WSubId_22($P3, $P4, $I3)
-# }
-  __label_6: # endif
-# }
+    .tailcall WSubId_25($P3, $P4, $I3)
+  __label_5: # endif
   __label_1: # endif
-.annotate 'line', 5084
+.annotate 'line', 5211
     .return(self)
-# }
-.annotate 'line', 5085
+.annotate 'line', 5212
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5088
-# ltype: $S1
+.annotate 'line', 5215
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5089
-# rtype: $S2
+.annotate 'line', 5216
     getattribute $P2, self, 'rexpr'
     $P1 = $P2.'checkresult'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-# switch-case
-.annotate 'line', 5091
+.annotate 'line', 5218
     iseq $I1, $S1, $S2
     if $I1 goto __label_5
-.annotate 'line', 5093
-    iseq $I2, $S1, 'P'
-    if $I2 goto __label_7
-    iseq $I3, $S2, 'P'
-    set $I1, $I3
-    goto __label_8
+.annotate 'line', 5220
+    iseq $I1, $S1, 'P'
+    if $I1 goto __label_7
+    iseq $I1, $S2, 'P'
   __label_7:
-    set $I1, $I2
-  __label_8:
     if $I1 goto __label_6
-.annotate 'line', 5095
-    iseq $I4, $S1, 'I'
-    unless $I4 goto __label_10
-    iseq $I5, $S2, 'N'
-    set $I1, $I5
-    goto __label_11
-  __label_10:
-    set $I1, $I4
+.annotate 'line', 5222
+    iseq $I1, $S1, 'I'
+    unless $I1 goto __label_9
+    iseq $I1, $S2, 'N'
+  __label_9:
+    if $I1 goto __label_8
+.annotate 'line', 5224
+    iseq $I1, $S1, 'N'
+    unless $I1 goto __label_11
+    iseq $I1, $S2, 'I'
   __label_11:
-    if $I1 goto __label_9
-.annotate 'line', 5097
-    iseq $I6, $S1, 'N'
-    unless $I6 goto __label_13
-    iseq $I7, $S2, 'I'
-    set $I1, $I7
-    goto __label_14
-  __label_13:
-    set $I1, $I6
-  __label_14:
-    if $I1 goto __label_12
+    if $I1 goto __label_10
     goto __label_4
   __label_5: # case
-.annotate 'line', 5092
+.annotate 'line', 5219
     .return($S1)
   __label_6: # case
-.annotate 'line', 5094
+.annotate 'line', 5221
     .return('P')
-  __label_9: # case
-.annotate 'line', 5096
+  __label_8: # case
+.annotate 'line', 5223
     .return('N')
-  __label_12: # case
-.annotate 'line', 5098
+  __label_10: # case
+.annotate 'line', 5225
     .return('N')
   __label_4: # default
-.annotate 'line', 5100
+.annotate 'line', 5227
     .return('I')
   __label_3: # switch end
-# }
-.annotate 'line', 5102
+.annotate 'line', 5229
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5105
-# type: $S1
+        .param string __ARG_2
+.annotate 'line', 5232
     $P3 = self.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 5106
-# var lexpr: $P1
+.annotate 'line', 5233
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5107
-# var rexpr: $P2
+.annotate 'line', 5234
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5108
-# ltype: $S2
+.annotate 'line', 5235
     $P3 = $P1.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 5109
-# rtype: $S3
+.annotate 'line', 5236
     $P3 = $P2.'checkresult'()
     null $S3
     if_null $P3, __label_3
     set $S3, $P3
   __label_3:
-.annotate 'line', 5110
-# lreg: $S4
+.annotate 'line', 5237
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S4
     if_null $P3, __label_4
     set $S4, $P3
   __label_4:
-.annotate 'line', 5111
-# rreg: $S5
+.annotate 'line', 5238
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S5
     if_null $P3, __label_5
     set $S5, $P3
   __label_5:
-.annotate 'line', 5112
-# aux: $S6
+.annotate 'line', 5239
     null $S6
-.annotate 'line', 5113
+.annotate 'line', 5240
     eq $S2, $S1, __label_6
-# {
-.annotate 'line', 5114
+.annotate 'line', 5241
     $P3 = self.'tempreg'($S1)
     set $S6, $P3
-.annotate 'line', 5115
+.annotate 'line', 5242
     ne $S1, 'P', __label_7
-.annotate 'line', 5116
+.annotate 'line', 5243
     __ARG_1.'emitbox'($S6, $S4)
     goto __label_8
   __label_7: # else
-.annotate 'line', 5118
+.annotate 'line', 5245
     __ARG_1.'emitset'($S6, $S4)
   __label_8: # endif
-.annotate 'line', 5119
+.annotate 'line', 5246
     set $S4, $S6
-# }
   __label_6: # endif
-.annotate 'line', 5121
+.annotate 'line', 5248
     eq $S3, $S1, __label_9
-# {
-.annotate 'line', 5122
+.annotate 'line', 5249
     $P3 = self.'tempreg'($S1)
     set $S6, $P3
-.annotate 'line', 5123
+.annotate 'line', 5250
     ne $S1, 'P', __label_10
-.annotate 'line', 5124
+.annotate 'line', 5251
     __ARG_1.'emitbox'($S6, $S5)
     goto __label_11
   __label_10: # else
-.annotate 'line', 5126
+.annotate 'line', 5253
     __ARG_1.'emitset'($S6, $S5)
   __label_11: # endif
-.annotate 'line', 5127
+.annotate 'line', 5254
     set $S5, $S6
-# }
   __label_9: # endif
-.annotate 'line', 5129
+.annotate 'line', 5256
     __ARG_1.'emitsub'(__ARG_2, $S4, $S5)
-# }
-.annotate 'line', 5130
+.annotate 'line', 5257
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSubExpr' ]
-.annotate 'line', 5064
+.annotate 'line', 5191
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -15473,397 +12776,296 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5139
+.annotate 'line', 5266
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5140
+.annotate 'line', 5267
 
 .end # OpMulExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-.const 'Sub' WSubId_73 = "WSubId_73"
-.const 'Sub' WSubId_71 = "WSubId_71"
-# Body
-# {
-.annotate 'line', 5143
+.const 'Sub' WSubId_25 = "WSubId_25"
+.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_77 = "WSubId_77"
+.annotate 'line', 5270
     self.'optimizearg'()
-.annotate 'line', 5144
-# var lexpr: $P1
+.annotate 'line', 5271
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5145
-# var rexpr: $P2
+.annotate 'line', 5272
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5146
-# ltype: $S1
+.annotate 'line', 5273
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 5147
-# rtype: $S2
+.annotate 'line', 5274
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 5148
-    $P4 = $P1.'isliteral'()
-    unless $P4 goto __label_4
-    $P5 = $P2.'isliteral'()
-    set $P3, $P5
-    goto __label_5
+.annotate 'line', 5275
+    $P3 = $P1.'isliteral'()
+    unless $P3 goto __label_4
+    $P3 = $P2.'isliteral'()
   __label_4:
-    set $P3, $P4
-  __label_5:
     if_null $P3, __label_3
     unless $P3 goto __label_3
-# {
-.annotate 'line', 5149
-    iseq $I4, $S1, 'I'
-    unless $I4 goto __label_7
-    iseq $I5, $S2, 'I'
-    set $I3, $I5
-    goto __label_8
-  __label_7:
-    set $I3, $I4
-  __label_8:
+.annotate 'line', 5276
+    iseq $I3, $S1, 'I'
     unless $I3 goto __label_6
-# {
-.annotate 'line', 5150
-# ln: $I1
-    $P6 = $P1.'getIntegerValue'()
-    set $I1, $P6
-.annotate 'line', 5151
-# rn: $I2
+    iseq $I3, $S2, 'I'
+  __label_6:
+    unless $I3 goto __label_5
+.annotate 'line', 5277
+    $P4 = $P1.'getIntegerValue'()
+    set $I1, $P4
+.annotate 'line', 5278
     $P3 = $P2.'getIntegerValue'()
     set $I2, $P3
-.annotate 'line', 5152
+.annotate 'line', 5279
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     mul $I3, $I1, $I2
-    .tailcall WSubId_22($P3, $P4, $I3)
-# }
-  __label_6: # endif
-# {
-.annotate 'line', 5155
-    $P3 = WSubId_73($S1, $S2)
-    if_null $P3, __label_9
-    unless $P3 goto __label_9
-# {
-.annotate 'line', 5156
-# lf: $N1
+    .tailcall WSubId_25($P3, $P4, $I3)
+  __label_5: # endif
+.annotate 'line', 5282
+    $P3 = WSubId_79($S1, $S2)
+    if_null $P3, __label_7
+    unless $P3 goto __label_7
+.annotate 'line', 5283
     $P4 = $P1.'getFloatValue'()
     set $N1, $P4
-.annotate 'line', 5157
-# rf: $N2
+.annotate 'line', 5284
     $P3 = $P2.'getFloatValue'()
     set $N2, $P3
-.annotate 'line', 5158
+.annotate 'line', 5285
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     mul $N3, $N1, $N2
-    .tailcall WSubId_71($P3, $P4, $N3)
-# }
-  __label_9: # endif
-# }
-# }
+    .tailcall WSubId_77($P3, $P4, $N3)
+  __label_7: # endif
   __label_3: # endif
-.annotate 'line', 5162
-    ne $S1, 'S', __label_10
-.annotate 'line', 5163
+.annotate 'line', 5289
+    ne $S1, 'S', __label_8
+.annotate 'line', 5290
     new $P4, [ 'Winxed'; 'Compiler'; 'RepeatString' ]
     $P4.'RepeatString'(self)
     set $P3, $P4
     .return($P3)
-  __label_10: # endif
-.annotate 'line', 5164
+  __label_8: # endif
+.annotate 'line', 5291
     .return(self)
-# }
-.annotate 'line', 5165
+.annotate 'line', 5292
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5168
-# var lexpr: $P1
+.annotate 'line', 5295
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5169
-# rl: $S1
+.annotate 'line', 5296
     getattribute $P3, self, 'lexpr'
     $P2 = $P3.'checkresult'()
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 5170
-# rr: $S2
+.annotate 'line', 5297
     getattribute $P3, self, 'rexpr'
     $P2 = $P3.'checkresult'()
     null $S2
     if_null $P2, __label_2
     set $S2, $P2
   __label_2:
-.annotate 'line', 5171
+.annotate 'line', 5298
     ne $S1, $S2, __label_3
-.annotate 'line', 5172
+.annotate 'line', 5299
     .return($S1)
   __label_3: # endif
-.annotate 'line', 5173
+.annotate 'line', 5300
     ne $S1, 'S', __label_4
-.annotate 'line', 5174
+.annotate 'line', 5301
     .return('S')
     goto __label_5
   __label_4: # else
-.annotate 'line', 5176
+.annotate 'line', 5303
     .return('N')
   __label_5: # endif
-# }
-.annotate 'line', 5177
+.annotate 'line', 5304
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5180
-# var lexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 5307
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5181
-# var rexpr: $P2
+.annotate 'line', 5308
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5182
-# ltype: $S1
+.annotate 'line', 5309
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 5183
-# rtype: $S2
+.annotate 'line', 5310
     $P3 = $P2.'checkresult'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 5184
-# lreg: $S3
+.annotate 'line', 5311
     null $S3
-# rreg: $S4
     null $S4
-.annotate 'line', 5185
-    iseq $I4, $S1, $S2
-    unless $I4 goto __label_4
-    iseq $I7, $S1, 'I'
-    if $I7 goto __label_8
-    iseq $I8, $S1, 'N'
-    set $I6, $I8
-    goto __label_9
-  __label_8:
-    set $I6, $I7
-  __label_9:
-    if $I6 goto __label_6
-    iseq $I9, $S1, 'P'
-    set $I5, $I9
-    goto __label_7
+.annotate 'line', 5312
+    iseq $I3, $S1, $S2
+    unless $I3 goto __label_4
+    iseq $I3, $S1, 'I'
+    if $I3 goto __label_6
+    iseq $I3, $S1, 'N'
   __label_6:
-    set $I5, $I6
-  __label_7:
-    set $I3, $I5
-    goto __label_5
-  __label_4:
-    set $I3, $I4
+    if $I3 goto __label_5
+    iseq $I3, $S1, 'P'
   __label_5:
+  __label_4:
     unless $I3 goto __label_3
-# {
-.annotate 'line', 5186
+.annotate 'line', 5313
     $P3 = $P1.'emit_get'(__ARG_1)
     set $S3, $P3
-.annotate 'line', 5187
+.annotate 'line', 5314
     $P3 = $P2.'emit_get'(__ARG_1)
     set $S4, $P3
-.annotate 'line', 5188
+.annotate 'line', 5315
     __ARG_1.'emitmul'(__ARG_2, $S3, $S4)
-.annotate 'line', 5189
+.annotate 'line', 5316
     .return()
-# }
   __label_3: # endif
-.annotate 'line', 5194
-    ne $S1, 'N', __label_10
-# {
-.annotate 'line', 5195
+.annotate 'line', 5321
+    ne $S1, 'N', __label_7
+.annotate 'line', 5322
     $P3 = $P1.'emit_get'(__ARG_1)
     set $S3, $P3
-.annotate 'line', 5196
+.annotate 'line', 5323
     $P3 = $P2.'emit_get'(__ARG_1)
     set $S4, $P3
-.annotate 'line', 5197
-# rval: $S5
+.annotate 'line', 5324
     null $S5
-# switch
-.annotate 'line', 5198
-    set $S6, $S2
-    set $S7, 'I'
-    if $S6 == $S7 goto __label_13
-    set $S7, 'N'
-    if $S6 == $S7 goto __label_14
-    goto __label_12
-  __label_13: # case
-.annotate 'line', 5200
+.annotate 'line', 5325
+    if $S2 == 'I' goto __label_10
+    if $S2 == 'N' goto __label_11
+    goto __label_9
+  __label_10: # case
+.annotate 'line', 5327
     $P3 = self.'tempreg'('N')
     set $S5, $P3
-.annotate 'line', 5201
+.annotate 'line', 5328
     __ARG_1.'emitset'($S5, $S4)
-.annotate 'line', 5202
+.annotate 'line', 5329
     set $S5, $S4
-    goto __label_11 # break
-  __label_14: # case
-.annotate 'line', 5205
+    goto __label_8 # break
+  __label_11: # case
+.annotate 'line', 5332
     set $S5, $S4
-    goto __label_11 # break
-  __label_12: # default
-.annotate 'line', 5208
+    goto __label_8 # break
+  __label_9: # default
+.annotate 'line', 5335
     $P4 = self.'tempreg'('N')
     set $S5, $P4
-.annotate 'line', 5209
+.annotate 'line', 5336
     __ARG_1.'emitset'($S5, $S4)
-  __label_11: # switch end
-.annotate 'line', 5211
-    set $S6, __ARG_2
-    eq $S6, '', __label_15
-# {
-.annotate 'line', 5212
+  __label_8: # switch end
+.annotate 'line', 5338
     self.'annotate'(__ARG_1)
-.annotate 'line', 5213
+.annotate 'line', 5339
     __ARG_1.'emitmul'(__ARG_2, $S3, $S5)
-# }
-  __label_15: # endif
-.annotate 'line', 5215
+.annotate 'line', 5340
     .return()
-# }
-  __label_10: # endif
-.annotate 'line', 5218
-# nleft: $I1
+  __label_7: # endif
+.annotate 'line', 5343
     null $I1
-# nright: $I2
     null $I2
-.annotate 'line', 5219
+.annotate 'line', 5344
     $P4 = $P1.'issimple'()
     isfalse $I3, $P4
-    if $I3 goto __label_18
-    $P5 = $P1.'isidentifier'()
-    set $P3, $P5
-    goto __label_19
-  __label_18:
     box $P3, $I3
-  __label_19:
-    if_null $P3, __label_16
-    unless $P3 goto __label_16
-# {
-.annotate 'line', 5220
-    $P7 = self.'checkresult'()
-    $P6 = self.'tempreg'($P7)
-    set $S3, $P6
-.annotate 'line', 5221
+    if $P3 goto __label_14
+    $P3 = $P1.'isidentifier'()
+  __label_14:
+    if_null $P3, __label_12
+    unless $P3 goto __label_12
+.annotate 'line', 5345
+    $P6 = self.'checkresult'()
+    $P5 = self.'tempreg'($P6)
+    set $S3, $P5
+.annotate 'line', 5346
     $P1.'emit'(__ARG_1, $S3)
-# }
-    goto __label_17
-  __label_16: # else
-# {
-.annotate 'line', 5224
+    goto __label_13
+  __label_12: # else
+.annotate 'line', 5349
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
-.annotate 'line', 5225
+.annotate 'line', 5350
     set $S3, $I1
-# }
-  __label_17: # endif
-.annotate 'line', 5227
+  __label_13: # endif
+.annotate 'line', 5352
     $P4 = $P2.'issimple'()
     isfalse $I3, $P4
-    if $I3 goto __label_22
-    $P5 = $P2.'isidentifier'()
-    set $P3, $P5
-    goto __label_23
-  __label_22:
     box $P3, $I3
-  __label_23:
-    if_null $P3, __label_20
-    unless $P3 goto __label_20
-# {
-.annotate 'line', 5228
-    $P7 = self.'checkresult'()
-    $P6 = self.'tempreg'($P7)
-    set $S4, $P6
-.annotate 'line', 5229
+    if $P3 goto __label_17
+    $P3 = $P2.'isidentifier'()
+  __label_17:
+    if_null $P3, __label_15
+    unless $P3 goto __label_15
+.annotate 'line', 5353
+    $P6 = self.'checkresult'()
+    $P5 = self.'tempreg'($P6)
+    set $S4, $P5
+.annotate 'line', 5354
     $P2.'emit'(__ARG_1, $S4)
-# }
-    goto __label_21
-  __label_20: # else
-# {
-# switch
-.annotate 'line', 5232
-    set $S6, $S2
-    set $S7, 'S'
-    if $S6 == $S7 goto __label_26
-    set $S7, 'N'
-    if $S6 == $S7 goto __label_27
-    set $S7, 'I'
-    if $S6 == $S7 goto __label_28
-    goto __label_25
-  __label_26: # case
-.annotate 'line', 5234
+    goto __label_16
+  __label_15: # else
+.annotate 'line', 5357
+    if $S2 == 'S' goto __label_20
+    if $S2 == 'N' goto __label_21
+    if $S2 == 'I' goto __label_22
+    goto __label_19
+  __label_20: # case
+.annotate 'line', 5359
     $P4 = self.'checkresult'()
     $P3 = self.'tempreg'($P4)
     set $S4, $P3
-.annotate 'line', 5235
+.annotate 'line', 5360
     $P2.'emit'(__ARG_1, $S4)
-    goto __label_24 # break
-  __label_27: # case
-.annotate 'line', 5238
+    goto __label_18 # break
+  __label_21: # case
+.annotate 'line', 5363
     $P5 = $P2.'emit_get'(__ARG_1)
     set $S4, $P5
-    goto __label_24 # break
-  __label_28: # case
-  __label_25: # default
-.annotate 'line', 5242
+    goto __label_18 # break
+  __label_22: # case
+  __label_19: # default
+.annotate 'line', 5367
     $P6 = $P2.'getIntegerValue'()
     set $I2, $P6
-.annotate 'line', 5243
+.annotate 'line', 5368
     set $S4, $I2
-    goto __label_24 # break
-  __label_24: # switch end
-.annotate 'line', 5244
-# }
-  __label_21: # endif
-.annotate 'line', 5247
+    goto __label_18 # break
+  __label_18: # switch end
+  __label_16: # endif
+.annotate 'line', 5372
     self.'annotate'(__ARG_1)
-.annotate 'line', 5248
-    set $S6, __ARG_2
-    ne $S6, '', __label_29
-.annotate 'line', 5249
-    $P3 = self.'checkresult'()
-    __ARG_2 = self.'tempreg'($P3)
-  __label_29: # endif
-.annotate 'line', 5250
+.annotate 'line', 5373
     __ARG_1.'emitmul'(__ARG_2, $S3, $S4)
-# }
-.annotate 'line', 5251
+.annotate 'line', 5374
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpMulExpr' ]
-.annotate 'line', 5135
+.annotate 'line', 5262
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -15874,198 +13076,151 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5260
+.annotate 'line', 5383
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5261
+.annotate 'line', 5384
 
 .end # OpDivExpr
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_22 = "WSubId_22"
-.const 'Sub' WSubId_73 = "WSubId_73"
-.const 'Sub' WSubId_71 = "WSubId_71"
-# Body
-# {
-.annotate 'line', 5264
+.const 'Sub' WSubId_25 = "WSubId_25"
+.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_77 = "WSubId_77"
+.annotate 'line', 5387
     self.'optimizearg'()
-.annotate 'line', 5265
-# var lexpr: $P1
+.annotate 'line', 5388
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5266
-# var rexpr: $P2
+.annotate 'line', 5389
     getattribute $P2, self, 'rexpr'
-.annotate 'line', 5267
-    $P6 = $P1.'isliteral'()
-    unless $P6 goto __label_2
-    $P7 = $P2.'isliteral'()
-    set $P5, $P7
-    goto __label_3
+.annotate 'line', 5390
+    $P5 = $P1.'isliteral'()
+    unless $P5 goto __label_2
+    $P5 = $P2.'isliteral'()
   __label_2:
-    set $P5, $P6
-  __label_3:
     if_null $P5, __label_1
     unless $P5 goto __label_1
-# {
-.annotate 'line', 5268
-# ltype: $S1
-    $P8 = $P1.'checkresult'()
+.annotate 'line', 5391
+    $P6 = $P1.'checkresult'()
     null $S1
-    if_null $P8, __label_4
-    set $S1, $P8
-  __label_4:
-.annotate 'line', 5269
-# rtype: $S2
+    if_null $P6, __label_3
+    set $S1, $P6
+  __label_3:
+.annotate 'line', 5392
     $P5 = $P2.'checkresult'()
     null $S2
-    if_null $P5, __label_5
+    if_null $P5, __label_4
     set $S2, $P5
-  __label_5:
-.annotate 'line', 5270
-# var lval: $P3
+  __label_4:
+.annotate 'line', 5393
     null $P3
-.annotate 'line', 5271
-# var rval: $P4
+.annotate 'line', 5394
     null $P4
-.annotate 'line', 5272
-    iseq $I4, $S1, 'I'
-    unless $I4 goto __label_7
-    iseq $I5, $S2, 'I'
-    set $I3, $I5
-    goto __label_8
-  __label_7:
-    set $I3, $I4
-  __label_8:
+.annotate 'line', 5395
+    iseq $I3, $S1, 'I'
     unless $I3 goto __label_6
-# {
-.annotate 'line', 5273
-# ln: $I1
+    iseq $I3, $S2, 'I'
+  __label_6:
+    unless $I3 goto __label_5
+.annotate 'line', 5396
     $P5 = $P1.'getIntegerValue'()
     set $I1, $P5
-.annotate 'line', 5274
-# rn: $I2
+.annotate 'line', 5397
     $P5 = $P2.'getIntegerValue'()
     set $I2, $P5
-.annotate 'line', 5275
-    unless $I2 goto __label_9
-.annotate 'line', 5276
+.annotate 'line', 5398
+    unless $I2 goto __label_7
+.annotate 'line', 5399
     getattribute $P5, self, 'owner'
     getattribute $P6, self, 'start'
     set $N4, $I1
     set $N5, $I2
     div $N3, $N4, $N5
-    .tailcall WSubId_22($P5, $P6, $N3)
-  __label_9: # endif
-# }
-  __label_6: # endif
-# {
-.annotate 'line', 5279
-    $P5 = WSubId_73($S1, $S2)
-    if_null $P5, __label_10
-    unless $P5 goto __label_10
-# {
-.annotate 'line', 5280
-# lf: $N1
+    .tailcall WSubId_25($P5, $P6, $N3)
+  __label_7: # endif
+  __label_5: # endif
+.annotate 'line', 5402
+    $P5 = WSubId_79($S1, $S2)
+    if_null $P5, __label_8
+    unless $P5 goto __label_8
+.annotate 'line', 5403
     $P6 = $P1.'getFloatValue'()
     set $N1, $P6
-.annotate 'line', 5281
-# rf: $N2
+.annotate 'line', 5404
     $P5 = $P2.'getFloatValue'()
     set $N2, $P5
-.annotate 'line', 5282
+.annotate 'line', 5405
     set $I3, $N2
-    unless $I3 goto __label_11
-.annotate 'line', 5283
+    unless $I3 goto __label_9
+.annotate 'line', 5406
     getattribute $P5, self, 'owner'
     getattribute $P6, self, 'start'
     div $N3, $N1, $N2
-    .tailcall WSubId_71($P5, $P6, $N3)
-  __label_11: # endif
-# }
-  __label_10: # endif
-# }
-# }
+    .tailcall WSubId_77($P5, $P6, $N3)
+  __label_9: # endif
+  __label_8: # endif
   __label_1: # endif
-.annotate 'line', 5287
+.annotate 'line', 5410
     .return(self)
-# }
-.annotate 'line', 5288
+.annotate 'line', 5411
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5291
+.annotate 'line', 5414
     .return('N')
-# }
-.annotate 'line', 5292
+.annotate 'line', 5415
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5295
-# var lexpr: $P1
+        .param string __ARG_2
+.annotate 'line', 5418
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 5296
-# var aux: $P2
+.annotate 'line', 5419
     null $P2
-.annotate 'line', 5297
-# var lreg: $P3
+.annotate 'line', 5420
     $P3 = $P1.'emit_get'(__ARG_1)
-.annotate 'line', 5298
+.annotate 'line', 5421
     $P6 = $P1.'checkresult'()
     set $S1, $P6
     eq $S1, 'N', __label_1
-# {
-.annotate 'line', 5299
+.annotate 'line', 5422
     $P2 = self.'tempreg'('N')
-.annotate 'line', 5300
+.annotate 'line', 5423
     __ARG_1.'emitset'($P2, $P3)
-.annotate 'line', 5301
+.annotate 'line', 5424
     set $P3, $P2
-# }
   __label_1: # endif
-.annotate 'line', 5303
-# var rexpr: $P4
+.annotate 'line', 5426
     getattribute $P4, self, 'rexpr'
-.annotate 'line', 5304
-# var rreg: $P5
+.annotate 'line', 5427
     $P5 = $P4.'emit_get'(__ARG_1)
-.annotate 'line', 5305
+.annotate 'line', 5428
     $P6 = $P4.'checkresult'()
     set $S1, $P6
     eq $S1, 'N', __label_2
-# {
-.annotate 'line', 5306
+.annotate 'line', 5429
     $P2 = self.'tempreg'('N')
-.annotate 'line', 5307
+.annotate 'line', 5430
     __ARG_1.'emitset'($P2, $P5)
-.annotate 'line', 5308
+.annotate 'line', 5431
     set $P5, $P2
-# }
   __label_2: # endif
-.annotate 'line', 5310
+.annotate 'line', 5433
     self.'annotate'(__ARG_1)
-.annotate 'line', 5311
+.annotate 'line', 5434
     __ARG_1.'emitdiv'(__ARG_2, $P3, $P5)
-# }
-.annotate 'line', 5312
+.annotate 'line', 5435
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDivExpr' ]
-.annotate 'line', 5256
+.annotate 'line', 5379
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -16076,41 +13231,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5321
+.annotate 'line', 5444
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5322
+.annotate 'line', 5445
 
 .end # OpModExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5325
-# lreg: $S1
+        .param string __ARG_2
+.annotate 'line', 5448
     $P1 = self.'emit_intleft'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5326
-# rreg: $S2
+.annotate 'line', 5449
     $P1 = self.'emit_intright'(__ARG_1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 5327
+.annotate 'line', 5450
     self.'annotate'(__ARG_1)
-.annotate 'line', 5328
+.annotate 'line', 5451
     __ARG_1.'emitbinop'('mod', __ARG_2, $S1, $S2)
-# }
-.annotate 'line', 5329
+.annotate 'line', 5452
 
 .end # emit
 
@@ -16118,19 +13265,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 5332
+.annotate 'line', 5455
     mod $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 5333
+.annotate 'line', 5456
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpModExpr' ]
-.annotate 'line', 5317
+.annotate 'line', 5440
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
 .end
@@ -16141,58 +13285,47 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5342
+.annotate 'line', 5465
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5343
+.annotate 'line', 5466
 
 .end # OpCModExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5346
+.annotate 'line', 5469
     .return('I')
-# }
-.annotate 'line', 5347
+.annotate 'line', 5470
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5350
-# lreg: $S1
+        .param string __ARG_2
+.annotate 'line', 5473
     $P1 = self.'emit_intleft'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5351
-# rreg: $S2
+.annotate 'line', 5474
     $P1 = self.'emit_intright'(__ARG_1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 5352
+.annotate 'line', 5475
     self.'annotate'(__ARG_1)
-.annotate 'line', 5357
+.annotate 'line', 5480
     __ARG_1.'emitbinop'('mod', __ARG_2, $S1, $S2)
-# }
-.annotate 'line', 5358
+.annotate 'line', 5481
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpCModExpr' ]
-.annotate 'line', 5338
+.annotate 'line', 5461
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
 .end
@@ -16203,54 +13336,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5367
+.annotate 'line', 5490
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5368
+.annotate 'line', 5491
 
 .end # OpShiftleftExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5371
-# res: $S1
-    if_null __ARG_2, __label_2
-    set $P1, __ARG_2
-    goto __label_1
-  __label_2:
-    $P2 = self.'tempreg'('I')
-    set $P1, $P2
-  __label_1:
-    null $S1
-    if_null $P1, __label_3
-    set $S1, $P1
-  __label_3:
-.annotate 'line', 5372
-# lreg: $S2
+        .param string __ARG_2
+.annotate 'line', 5494
     $P1 = self.'emit_intleft'(__ARG_1)
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
-  __label_4:
-.annotate 'line', 5373
-# rreg: $S3
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 5495
     $P1 = self.'emit_intright'(__ARG_1)
-    null $S3
-    if_null $P1, __label_5
-    set $S3, $P1
-  __label_5:
-.annotate 'line', 5374
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 5496
     self.'annotate'(__ARG_1)
-.annotate 'line', 5375
-    __ARG_1.'emitbinop'('shl', $S1, $S2, $S3)
-# }
-.annotate 'line', 5376
+.annotate 'line', 5497
+    __ARG_1.'emitbinop'('shl', __ARG_2, $S1, $S2)
+.annotate 'line', 5498
 
 .end # emit
 
@@ -16258,19 +13370,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 5379
+.annotate 'line', 5501
     shl $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 5380
+.annotate 'line', 5502
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpShiftleftExpr' ]
-.annotate 'line', 5363
+.annotate 'line', 5486
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
 .end
@@ -16281,54 +13390,33 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5389
+.annotate 'line', 5511
     self.'set'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
-# }
-.annotate 'line', 5390
+.annotate 'line', 5512
 
 .end # OpShiftrightExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5393
-# res: $S1
-    if_null __ARG_2, __label_2
-    set $P1, __ARG_2
-    goto __label_1
-  __label_2:
-    $P2 = self.'tempreg'('I')
-    set $P1, $P2
-  __label_1:
-    null $S1
-    if_null $P1, __label_3
-    set $S1, $P1
-  __label_3:
-.annotate 'line', 5394
-# lreg: $S2
+        .param string __ARG_2
+.annotate 'line', 5515
     $P1 = self.'emit_intleft'(__ARG_1)
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
-  __label_4:
-.annotate 'line', 5395
-# rreg: $S3
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 5516
     $P1 = self.'emit_intright'(__ARG_1)
-    null $S3
-    if_null $P1, __label_5
-    set $S3, $P1
-  __label_5:
-.annotate 'line', 5396
+    null $S2
+    if_null $P1, __label_2
+    set $S2, $P1
+  __label_2:
+.annotate 'line', 5517
     self.'annotate'(__ARG_1)
-.annotate 'line', 5397
-    __ARG_1.'emitbinop'('shr', $S1, $S2, $S3)
-# }
-.annotate 'line', 5398
+.annotate 'line', 5518
+    __ARG_1.'emitbinop'('shr', __ARG_2, $S1, $S2)
+.annotate 'line', 5519
 
 .end # emit
 
@@ -16336,19 +13424,16 @@
 .sub 'do_op' :method
         .param int __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 5401
+.annotate 'line', 5522
     shr $I1, __ARG_1, __ARG_2
     .return($I1)
-# }
-.annotate 'line', 5402
+.annotate 'line', 5523
 
 .end # do_op
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpShiftrightExpr' ]
-.annotate 'line', 5385
+.annotate 'line', 5507
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
 .end
@@ -16357,12 +13442,9 @@
 .sub 'ArgumentModifierList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5411
+.annotate 'line', 5532
     self.'ModifierList'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 5412
+.annotate 'line', 5533
 
 .end # ArgumentModifierList
 
@@ -16370,17 +13452,12 @@
 .sub 'emitmodifiers' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 5415
-# isflat: $I1
+.annotate 'line', 5536
     null $I1
-# isnamed: $I2
     null $I2
-.annotate 'line', 5416
-# setname: $S1
+.annotate 'line', 5537
     set $S1, ''
-.annotate 'line', 5417
+.annotate 'line', 5538
     $P3 = self.'getlist'()
     if_null $P3, __label_2
     iter $P4, $P3
@@ -16388,97 +13465,85 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P1, $P4
-# {
-# switch
-.annotate 'line', 5418
+.annotate 'line', 5539
     $P5 = $P1.'getname'()
     set $S2, $P5
-    set $S3, 'flat'
-    if $S2 == $S3 goto __label_5
-    set $S3, 'named'
-    if $S2 == $S3 goto __label_6
+    if $S2 == 'flat' goto __label_5
+    if $S2 == 'named' goto __label_6
     goto __label_4
   __label_5: # case
-.annotate 'line', 5420
+.annotate 'line', 5541
     set $I1, 1
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 5423
+.annotate 'line', 5544
     set $I2, 1
-# switch
-.annotate 'line', 5424
+.annotate 'line', 5545
     $P6 = $P1.'numargs'()
     set $I3, $P6
-    null $I4
-    if $I3 == $I4 goto __label_9
-    set $I4, 1
-    if $I3 == $I4 goto __label_10
+    if $I3 == 0 goto __label_9
+    if $I3 == 1 goto __label_10
     goto __label_8
   __label_9: # case
     goto __label_7 # break
   __label_10: # case
-.annotate 'line', 5428
-# var argmod: $P2
+.annotate 'line', 5549
     $P2 = $P1.'getarg'(0)
-.annotate 'line', 5429
+.annotate 'line', 5550
     $P7 = $P2.'isstringliteral'()
     isfalse $I5, $P7
     unless $I5 goto __label_11
-.annotate 'line', 5430
+.annotate 'line', 5551
     WSubId_1('Invalid modifier', self)
   __label_11: # endif
-.annotate 'line', 5431
+.annotate 'line', 5552
     $P8 = $P2.'getPirString'()
     set $S1, $P8
     goto __label_7 # break
   __label_8: # default
-.annotate 'line', 5434
+.annotate 'line', 5555
     WSubId_1('Invalid modifier', self)
   __label_7: # switch end
   __label_4: # default
   __label_3: # switch end
-# }
     goto __label_1
   __label_2: # endfor
-# switch-case
-.annotate 'line', 5439
+.annotate 'line', 5560
     and $I3, $I1, $I2
     if $I3 goto __label_14
-.annotate 'line', 5442
+.annotate 'line', 5563
     set $I3, $I1
     if $I3 goto __label_15
-.annotate 'line', 5445
+.annotate 'line', 5566
     set $I3, $I2
     if $I3 goto __label_16
     goto __label_13
   __label_14: # case
-.annotate 'line', 5440
+.annotate 'line', 5561
     __ARG_1.'print'(' :flat :named')
     goto __label_12 # break
   __label_15: # case
-.annotate 'line', 5443
+.annotate 'line', 5564
     __ARG_1.'print'(' :flat')
     goto __label_12 # break
   __label_16: # case
-.annotate 'line', 5446
+.annotate 'line', 5567
     __ARG_1.'print'(' :named')
-.annotate 'line', 5447
+.annotate 'line', 5568
     eq $S1, '', __label_17
-.annotate 'line', 5448
+.annotate 'line', 5569
     __ARG_1.'print'("(", $S1, ")")
   __label_17: # endif
     goto __label_12 # break
   __label_13: # default
   __label_12: # switch end
-.annotate 'line', 5449
-# }
-.annotate 'line', 5451
+.annotate 'line', 5572
 
 .end # emitmodifiers
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArgumentModifierList' ]
-.annotate 'line', 5407
+.annotate 'line', 5528
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
 .end
@@ -16487,104 +13552,85 @@
 .sub 'Argument' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5460
+.annotate 'line', 5581
     setattribute self, 'arg', __ARG_1
-.annotate 'line', 5461
+.annotate 'line', 5582
     setattribute self, 'modifiers', __ARG_2
-# }
-.annotate 'line', 5462
+.annotate 'line', 5583
 
 .end # Argument
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 5465
+.annotate 'line', 5586
     getattribute $P3, self, 'arg'
     $P2 = $P3.'optimize'()
     setattribute self, 'arg', $P2
-.annotate 'line', 5466
+.annotate 'line', 5587
     .return(self)
-# }
-.annotate 'line', 5467
+.annotate 'line', 5588
 
 .end # optimize
 
 
 .sub 'hascompilevalue' :method
-# Body
-# {
-.annotate 'line', 5470
+.annotate 'line', 5591
     getattribute $P1, self, 'arg'
     .tailcall $P1.'hascompilevalue'()
-# }
-.annotate 'line', 5471
+.annotate 'line', 5592
 
 .end # hascompilevalue
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Argument' ]
-.annotate 'line', 5456
+.annotate 'line', 5577
     addattribute $P0, 'arg'
-.annotate 'line', 5457
+.annotate 'line', 5578
     addattribute $P0, 'modifiers'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseArgument' :subid('WSubId_74')
+.sub 'parseArgument' :subid('WSubId_80')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 5476
-# var modifier: $P1
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 5597
     null $P1
-.annotate 'line', 5477
-# var expr: $P2
-    $P2 = WSubId_45(__ARG_1, __ARG_2)
-.annotate 'line', 5478
-# var t: $P3
+.annotate 'line', 5598
+    $P2 = WSubId_51(__ARG_1, __ARG_2)
+.annotate 'line', 5599
     $P3 = __ARG_1.'get'()
-.annotate 'line', 5479
+.annotate 'line', 5600
     $P4 = $P3.'isop'(':')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 5480
+.annotate 'line', 5601
     $P3 = __ARG_1.'get'()
-.annotate 'line', 5481
+.annotate 'line', 5602
     $P4 = $P3.'isop'('[')
     if_null $P4, __label_3
     unless $P4 goto __label_3
-# {
-.annotate 'line', 5482
+.annotate 'line', 5603
     new $P5, [ 'Winxed'; 'Compiler'; 'ArgumentModifierList' ]
     $P5.'ArgumentModifierList'(__ARG_1, __ARG_2)
     set $P1, $P5
-# }
     goto __label_4
   __label_3: # else
-.annotate 'line', 5485
-    WSubId_48('modifier list', $P3)
+.annotate 'line', 5606
+    WSubId_54('modifier list', $P3)
   __label_4: # endif
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 5488
+.annotate 'line', 5609
     __ARG_1.'unget'($P3)
   __label_2: # endif
-.annotate 'line', 5489
+.annotate 'line', 5610
     new $P5, [ 'Winxed'; 'Compiler'; 'Argument' ]
     $P5.'Argument'($P2, $P1)
     set $P4, $P5
     .return($P4)
-# }
-.annotate 'line', 5490
+.annotate 'line', 5611
 
 .end # parseArgument
 
@@ -16595,134 +13641,104 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_74 = "WSubId_74"
-# Body
-# {
-.annotate 'line', 5501
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_80 = "WSubId_80"
+.annotate 'line', 5622
     setattribute self, 'owner', __ARG_1
-.annotate 'line', 5502
+.annotate 'line', 5623
     setattribute self, 'start', __ARG_2
-.annotate 'line', 5503
-# var t: $P1
+.annotate 'line', 5624
     $P1 = __ARG_3.'get'()
-.annotate 'line', 5504
+.annotate 'line', 5625
     $P2 = $P1.'isop'(__ARG_4)
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 5505
+.annotate 'line', 5626
     __ARG_3.'unget'($P1)
-.annotate 'line', 5506
-    $P3 = WSubId_44(__ARG_3, __ARG_1, WSubId_74, __ARG_4)
+.annotate 'line', 5627
+    $P3 = WSubId_50(__ARG_3, __ARG_1, WSubId_80, __ARG_4)
     setattribute self, 'args', $P3
-# }
   __label_1: # endif
-# }
-.annotate 'line', 5508
+.annotate 'line', 5629
 
 .end # ArgumentList
 
 
 .sub 'numargs' :method
-# Body
-# {
-.annotate 'line', 5511
-# var args: $P1
+.annotate 'line', 5632
     getattribute $P1, self, 'args'
-.annotate 'line', 5512
+.annotate 'line', 5633
     unless_null $P1, __label_2
     null $I1
     goto __label_1
   __label_2:
-# builtin elements
     elements $I1, $P1
   __label_1:
     .return($I1)
-# }
-.annotate 'line', 5513
+.annotate 'line', 5634
 
 .end # numargs
 
 
 .sub 'getrawargs' :method
-# Body
-# {
-.annotate 'line', 5516
+.annotate 'line', 5637
     getattribute $P1, self, 'args'
     .return($P1)
-# }
-.annotate 'line', 5517
+.annotate 'line', 5638
 
 .end # getrawargs
 
 
 .sub 'getarg' :method
         .param int __ARG_1
-# Body
-# {
-.annotate 'line', 5520
-# var args: $P1
+.annotate 'line', 5641
     getattribute $P1, self, 'args'
-.annotate 'line', 5521
+.annotate 'line', 5642
     $P2 = $P1[__ARG_1]
     .return($P2)
-# }
-.annotate 'line', 5522
+.annotate 'line', 5643
 
 .end # getarg
 
 
 .sub 'getfreearg' :method
         .param int __ARG_1
-# Body
-# {
-.annotate 'line', 5525
-# var args: $P1
+.annotate 'line', 5646
     getattribute $P1, self, 'args'
-.annotate 'line', 5526
+.annotate 'line', 5647
     $P3 = $P1[__ARG_1]
     getattribute $P2, $P3, 'arg'
     .return($P2)
-# }
-.annotate 'line', 5527
+.annotate 'line', 5648
 
 .end # getfreearg
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 5530
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 5651
     getattribute $P1, self, 'args'
-    WSubId_46($P1)
-.annotate 'line', 5531
+    WSubId_52($P1)
+.annotate 'line', 5652
     .return(self)
-# }
-.annotate 'line', 5532
+.annotate 'line', 5653
 
 .end # optimize
 
 
 .sub 'getargvalues' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5535
-# var argregs: $P1
+.annotate 'line', 5656
     getattribute $P1, self, 'argregs'
-.annotate 'line', 5536
+.annotate 'line', 5657
     unless_null $P1, __label_1
-# {
-.annotate 'line', 5537
+.annotate 'line', 5658
     new $P2, ['ResizableStringArray']
-.annotate 'line', 5538
-# var collect: $P3
+.annotate 'line', 5659
     new $P3, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     getattribute $P5, self, 'owner'
     $P3.'CollectValues'($P5, __ARG_1)
-.annotate 'line', 5539
+.annotate 'line', 5660
     getattribute $P5, self, 'args'
     if_null $P5, __label_3
     iter $P6, $P5
@@ -16730,119 +13746,98 @@
   __label_2: # for iteration
     unless $P6 goto __label_3
     shift $P4, $P6
-# {
-.annotate 'line', 5540
-# reg: $S1
+.annotate 'line', 5661
     getattribute $P8, $P4, 'arg'
     $P7 = $P3.'add'($P8)
     null $S1
     if_null $P7, __label_4
     set $S1, $P7
   __label_4:
-.annotate 'line', 5541
-# builtin push
+.annotate 'line', 5662
     push $P2, $S1
-# }
     goto __label_2
   __label_3: # endfor
-.annotate 'line', 5543
+.annotate 'line', 5664
     setattribute self, 'argregs', $P2
-# }
   __label_1: # endif
-.annotate 'line', 5545
+.annotate 'line', 5666
     .return($P1)
-# }
-.annotate 'line', 5546
+.annotate 'line', 5667
 
 .end # getargvalues
 
 
 .sub 'emitargs' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5549
-# var args: $P1
+.annotate 'line', 5670
     getattribute $P1, self, 'args'
-.annotate 'line', 5550
-# var argreg: $P2
+.annotate 'line', 5671
     $P2 = self.'getargvalues'(__ARG_1)
-.annotate 'line', 5552
-# sep: $S1
+.annotate 'line', 5673
     set $S1, ''
-.annotate 'line', 5553
-# n: $I1
+.annotate 'line', 5674
     $P4 = self.'numargs'()
     set $I1, $P4
-# for loop
-.annotate 'line', 5554
-# i: $I2
+.annotate 'line', 5675
     null $I2
   __label_3: # for condition
     ge $I2, $I1, __label_2
-# {
-.annotate 'line', 5555
+.annotate 'line', 5676
     $P4 = $P2[$I2]
     __ARG_1.'print'($S1, $P4)
-.annotate 'line', 5556
-# var modifiers: $P3
+.annotate 'line', 5677
     $P4 = $P1[$I2]
     getattribute $P3, $P4, 'modifiers'
-.annotate 'line', 5557
+.annotate 'line', 5678
     if_null $P3, __label_4
-.annotate 'line', 5558
+.annotate 'line', 5679
     $P3.'emitmodifiers'(__ARG_1)
   __label_4: # endif
-.annotate 'line', 5559
+.annotate 'line', 5680
     set $S1, ', '
-# }
   __label_1: # for iteration
-.annotate 'line', 5554
+.annotate 'line', 5675
     inc $I2
     goto __label_3
   __label_2: # for end
-# }
-.annotate 'line', 5561
+.annotate 'line', 5682
 
 .end # emitargs
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
-.annotate 'line', 5494
+.annotate 'line', 5615
     addattribute $P0, 'owner'
-.annotate 'line', 5495
+.annotate 'line', 5616
     addattribute $P0, 'start'
-.annotate 'line', 5496
+.annotate 'line', 5617
     addattribute $P0, 'args'
-.annotate 'line', 5497
+.annotate 'line', 5618
     addattribute $P0, 'argregs'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'arglist_hascompilevalue' :subid('WSubId_75')
+.sub 'arglist_hascompilevalue' :subid('WSubId_81')
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5566
+.annotate 'line', 5687
     if_null __ARG_1, __label_2
     iter $P2, __ARG_1
     set $P2, 0
   __label_1: # for iteration
     unless $P2 goto __label_2
     shift $P1, $P2
-.annotate 'line', 5567
+.annotate 'line', 5688
     $P3 = $P1.'hascompilevalue'()
     isfalse $I1, $P3
     unless $I1 goto __label_3
-.annotate 'line', 5568
+.annotate 'line', 5689
     .return(0)
   __label_3: # endif
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 5569
+.annotate 'line', 5690
     .return(1)
-# }
-.annotate 'line', 5570
+.annotate 'line', 5691
 
 .end # arglist_hascompilevalue
 
@@ -16853,327 +13848,312 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5581
+.annotate 'line', 5702
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 5582
+.annotate 'line', 5703
     setattribute self, 'builtin', __ARG_3
-.annotate 'line', 5583
+.annotate 'line', 5704
     setattribute self, 'args', __ARG_4
-# }
-.annotate 'line', 5584
+.annotate 'line', 5705
 
 .end # CallBuiltinExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5587
+.annotate 'line', 5708
     getattribute $P1, self, 'builtin'
     .tailcall $P1.'result'()
-# }
-.annotate 'line', 5588
+.annotate 'line', 5709
 
 .end # checkresult
 
 
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 5712
+    self.'emit'(__ARG_1, "")
+.annotate 'line', 5713
+
+.end # emit_void
+
+
+.sub 'emit_get' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_1 = "WSubId_1"
+.const 'Sub' WSubId_6 = "WSubId_6"
+.annotate 'line', 5716
+    $P1 = self.'checkresult'()
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 5717
+    if $S1 == 'I' goto __label_4
+    if $S1 == 'N' goto __label_5
+    if $S1 == 'S' goto __label_6
+    if $S1 == 'P' goto __label_7
+    if $S1 == 'v' goto __label_8
+    goto __label_3
+  __label_4: # case
+  __label_5: # case
+  __label_6: # case
+  __label_7: # case
+    goto __label_2 # break
+  __label_8: # case
+.annotate 'line', 5722
+    getattribute $P1, self, 'start'
+    WSubId_1("Can't use result of a void builtin", $P1)
+  __label_3: # default
+.annotate 'line', 5724
+    concat $S4, "Unexpected result type '", $S1
+    concat $S4, $S4, "'"
+    getattribute $P2, self, 'start'
+    WSubId_6($S4, $P2)
+  __label_2: # switch end
+.annotate 'line', 5726
+    $P1 = self.'tempreg'($S1)
+    null $S2
+    if_null $P1, __label_9
+    set $S2, $P1
+  __label_9:
+.annotate 'line', 5727
+    self.'emit'(__ARG_1, $S2)
+.annotate 'line', 5728
+    .return($S2)
+.annotate 'line', 5729
+
+.end # emit_get
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5591
-# var builtin: $P1
+        .param string __ARG_2
+.annotate 'line', 5732
     getattribute $P1, self, 'builtin'
-.annotate 'line', 5592
-# var args: $P2
+.annotate 'line', 5733
     getattribute $P2, self, 'args'
-.annotate 'line', 5593
+.annotate 'line', 5734
     new $P3, ['ResizableStringArray']
-.annotate 'line', 5594
-# var arg: $P4
+.annotate 'line', 5735
     null $P4
-# switch
-.annotate 'line', 5595
+.annotate 'line', 5736
     $P8 = $P1.'params'()
     set $I3, $P8
-    set $I4, -1
-    if $I3 == $I4 goto __label_3
-    set $I4, -2
-    if $I3 == $I4 goto __label_4
+    if $I3 == -1 goto __label_3
+    if $I3 == -2 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 5597
-# var collectarglist: $P5
+.annotate 'line', 5738
     new $P5, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     getattribute $P9, self, 'owner'
     $P5.'CollectValues'($P9, __ARG_1)
-.annotate 'line', 5598
+.annotate 'line', 5739
     if_null $P2, __label_6
     iter $P10, $P2
     set $P10, 0
   __label_5: # for iteration
     unless $P10 goto __label_6
     shift $P4, $P10
-.annotate 'line', 5599
+.annotate 'line', 5740
     getattribute $P12, $P4, 'arg'
     $P11 = $P5.'add'($P12)
-# builtin push
     push $P3, $P11
     goto __label_5
   __label_6: # endfor
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 5602
-# var rawargs: $P6
+.annotate 'line', 5743
     root_new $P6, ['parrot';'ResizablePMCArray']
-.annotate 'line', 5603
+.annotate 'line', 5744
     if_null $P2, __label_8
     iter $P13, $P2
     set $P13, 0
   __label_7: # for iteration
     unless $P13 goto __label_8
     shift $P4, $P13
-.annotate 'line', 5604
+.annotate 'line', 5745
     getattribute $P14, $P4, 'arg'
-# builtin push
     push $P6, $P14
     goto __label_7
   __label_8: # endfor
-.annotate 'line', 5605
+.annotate 'line', 5746
     getattribute $P15, self, 'builtin'
     getattribute $P16, self, 'start'
     $P15.'expand'(__ARG_1, self, $P16, __ARG_2, $P6)
-.annotate 'line', 5606
+.annotate 'line', 5747
     .return()
   __label_2: # default
-.annotate 'line', 5608
-# n: $I1
+.annotate 'line', 5749
     getattribute $P17, self, 'args'
     set $I1, $P17
-.annotate 'line', 5609
-# var collectdefault: $P7
+.annotate 'line', 5750
     new $P7, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     getattribute $P18, self, 'owner'
     $P7.'CollectValues'($P18, __ARG_1)
-# for loop
-.annotate 'line', 5610
-# i: $I2
+.annotate 'line', 5751
     null $I2
   __label_11: # for condition
     ge $I2, $I1, __label_10
-# {
-.annotate 'line', 5611
+.annotate 'line', 5752
     $P19 = $P2[$I2]
     getattribute $P4, $P19, 'arg'
-.annotate 'line', 5612
-# argtype: $S1
+.annotate 'line', 5753
     $P8 = $P4.'checkresult'()
     null $S1
     if_null $P8, __label_12
     set $S1, $P8
   __label_12:
-.annotate 'line', 5613
-# paramtype: $S2
+.annotate 'line', 5754
     $P8 = $P1.'paramtype'($I2)
     null $S2
     if_null $P8, __label_13
     set $S2, $P8
   __label_13:
-.annotate 'line', 5614
-# argr: $S3
+.annotate 'line', 5755
     null $S3
-.annotate 'line', 5615
+.annotate 'line', 5756
     $P8 = $P4.'isnull'()
     if_null $P8, __label_14
     unless $P8 goto __label_14
-# {
-# switch
-.annotate 'line', 5616
-    set $S5, $S2
-    set $S6, 'I'
-    if $S5 == $S6 goto __label_18
-    set $S6, 'N'
-    if $S5 == $S6 goto __label_19
-    set $S6, 'S'
-    if $S5 == $S6 goto __label_20
+.annotate 'line', 5757
+    if $S2 == 'I' goto __label_18
+    if $S2 == 'N' goto __label_19
+    if $S2 == 'S' goto __label_20
     goto __label_17
   __label_18: # case
   __label_19: # case
   __label_20: # case
-.annotate 'line', 5620
+.annotate 'line', 5761
     $P9 = self.'tempreg'($S2)
     set $S3, $P9
-.annotate 'line', 5621
+.annotate 'line', 5762
     __ARG_1.'emitnull'($S3)
     goto __label_16 # break
   __label_17: # default
-.annotate 'line', 5624
+.annotate 'line', 5765
     $P11 = $P7.'add'($P4)
     set $S3, $P11
   __label_16: # switch end
-# }
     goto __label_15
   __label_14: # else
-# {
-.annotate 'line', 5628
-    iseq $I5, $S1, $S2
-    if $I5 goto __label_25
-    iseq $I6, $S2, '?'
-    set $I4, $I6
-    goto __label_26
-  __label_25:
-    set $I4, $I5
-  __label_26:
-    if $I4 goto __label_23
-.annotate 'line', 5629
-    iseq $I8, $S2, 'p'
-    unless $I8 goto __label_27
-.annotate 'line', 5630
-    iseq $I10, $S1, 'S'
-    if $I10 goto __label_29
-    iseq $I11, $S1, 'P'
-    set $I9, $I11
-    goto __label_30
-  __label_29:
-    set $I9, $I10
-  __label_30:
-    set $I7, $I9
-    goto __label_28
-  __label_27:
-    set $I7, $I8
-  __label_28:
-    set $I3, $I7
-    goto __label_24
-  __label_23:
-    set $I3, $I4
+.annotate 'line', 5769
+    iseq $I3, $S1, $S2
+    if $I3 goto __label_24
+    iseq $I3, $S2, '?'
   __label_24:
+    if $I3 goto __label_23
+.annotate 'line', 5770
+    iseq $I3, $S2, 'p'
+    unless $I3 goto __label_25
+.annotate 'line', 5771
+    iseq $I3, $S1, 'S'
+    if $I3 goto __label_26
+    iseq $I3, $S1, 'P'
+  __label_26:
+  __label_25:
+  __label_23:
     unless $I3 goto __label_21
-.annotate 'line', 5631
+.annotate 'line', 5772
     $P8 = $P4.'emit_get'(__ARG_1)
     set $S3, $P8
     goto __label_22
   __label_21: # else
-# {
-.annotate 'line', 5633
-    ne $S2, 'p', __label_31
-.annotate 'line', 5634
+.annotate 'line', 5774
+    ne $S2, 'p', __label_27
+.annotate 'line', 5775
     set $S2, 'P'
-  __label_31: # endif
-.annotate 'line', 5635
-# aux: $S4
+  __label_27: # endif
+.annotate 'line', 5776
     $P8 = $P4.'emit_get'(__ARG_1)
     null $S4
-    if_null $P8, __label_32
+    if_null $P8, __label_28
     set $S4, $P8
-  __label_32:
-# switch
-.annotate 'line', 5636
-    set $S5, $S2
-    set $S6, 'P'
-    if $S5 == $S6 goto __label_35
-    set $S6, 'I'
-    if $S5 == $S6 goto __label_36
-    set $S6, 'N'
-    if $S5 == $S6 goto __label_37
-    set $S6, 'S'
-    if $S5 == $S6 goto __label_38
-    goto __label_34
-  __label_35: # case
-# switch
-.annotate 'line', 5638
-    set $S7, $S1
-    set $S8, 'I'
-    if $S7 == $S8 goto __label_41
-    set $S8, 'N'
-    if $S7 == $S8 goto __label_42
-    set $S8, 'S'
-    if $S7 == $S8 goto __label_43
-    goto __label_40
-  __label_41: # case
-  __label_42: # case
-  __label_43: # case
-.annotate 'line', 5642
-    $P8 = self.'tempreg'($S2)
-    set $S3, $P8
-.annotate 'line', 5643
-    __ARG_1.'emitbox'($S3, $S4)
-    goto __label_39 # break
-  __label_40: # default
-.annotate 'line', 5646
-    set $S3, $S4
-  __label_39: # switch end
-    goto __label_33 # break
-  __label_36: # case
+  __label_28:
+.annotate 'line', 5777
+    if $S2 == 'P' goto __label_31
+    if $S2 == 'I' goto __label_32
+    if $S2 == 'N' goto __label_33
+    if $S2 == 'S' goto __label_34
+    goto __label_30
+  __label_31: # case
+.annotate 'line', 5779
+    if $S1 == 'I' goto __label_37
+    if $S1 == 'N' goto __label_38
+    if $S1 == 'S' goto __label_39
+    goto __label_36
   __label_37: # case
   __label_38: # case
-.annotate 'line', 5652
+  __label_39: # case
+.annotate 'line', 5783
+    $P8 = self.'tempreg'($S2)
+    set $S3, $P8
+.annotate 'line', 5784
+    __ARG_1.'emitbox'($S3, $S4)
+    goto __label_35 # break
+  __label_36: # default
+.annotate 'line', 5787
+    set $S3, $S4
+  __label_35: # switch end
+    goto __label_29 # break
+  __label_32: # case
+  __label_33: # case
+  __label_34: # case
+.annotate 'line', 5793
     $P9 = self.'tempreg'($S2)
     set $S3, $P9
-.annotate 'line', 5653
+.annotate 'line', 5794
     __ARG_1.'emitset'($S3, $S4)
-    goto __label_33 # break
-  __label_34: # default
-.annotate 'line', 5656
+    goto __label_29 # break
+  __label_30: # default
+.annotate 'line', 5797
     set $S3, $S4
-  __label_33: # switch end
-# }
+  __label_29: # switch end
   __label_22: # endif
-# }
   __label_15: # endif
-.annotate 'line', 5660
-# builtin push
+.annotate 'line', 5801
     push $P3, $S3
-# }
   __label_9: # for iteration
-.annotate 'line', 5610
+.annotate 'line', 5751
     inc $I2
     goto __label_11
   __label_10: # for end
   __label_1: # switch end
-.annotate 'line', 5663
+.annotate 'line', 5804
     getattribute $P8, self, 'builtin'
     getattribute $P9, self, 'start'
     $P8.'expand'(__ARG_1, self, $P9, __ARG_2, $P3)
-# }
-.annotate 'line', 5664
+.annotate 'line', 5805
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
-.annotate 'line', 5574
+.annotate 'line', 5695
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 5576
+.annotate 'line', 5697
     addattribute $P0, 'builtin'
-.annotate 'line', 5577
+.annotate 'line', 5698
     addattribute $P0, 'args'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'gencallbuiltin' :subid('WSubId_76')
+.sub 'gencallbuiltin' :subid('WSubId_82')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_75 = "WSubId_75"
-# Body
-# {
-.annotate 'line', 5671
-# callname: $S1
+.const 'Sub' WSubId_81 = "WSubId_81"
+.annotate 'line', 5812
     $P7 = __ARG_3.'getname'()
     null $S1
     if_null $P7, __label_1
     set $S1, $P7
   __label_1:
-.annotate 'line', 5672
+.annotate 'line', 5813
     __ARG_1.'use_builtin'($S1)
-.annotate 'line', 5673
-# nargs: $I1
+.annotate 'line', 5814
     unless_null __ARG_4, __label_3
     null $I1
     goto __label_2
@@ -17181,8 +14161,7 @@
     $P7 = __ARG_4.'numargs'()
     set $I1, $P7
   __label_2:
-.annotate 'line', 5674
-# var rawargs: $P1
+.annotate 'line', 5815
     if $I1 goto __label_5
     root_new $P7, ['parrot';'ResizablePMCArray']
     set $P1, $P7
@@ -17191,121 +14170,87 @@
     $P8 = __ARG_4.'getrawargs'()
     set $P1, $P8
   __label_4:
-.annotate 'line', 5676
-# var variants: $P2
+.annotate 'line', 5817
     getattribute $P2, __ARG_3, 'variants'
-.annotate 'line', 5677
-# var variant: $P3
+.annotate 'line', 5818
     null $P3
-.annotate 'line', 5678
+.annotate 'line', 5819
     if_null $P2, __label_7
     iter $P9, $P2
     set $P9, 0
   __label_6: # for iteration
     unless $P9 goto __label_7
     shift $P4, $P9
-# {
-.annotate 'line', 5679
-# vargs: $I2
+.annotate 'line', 5820
     getattribute $P7, $P4, 'nparams'
     set $I2, $P7
-.annotate 'line', 5680
-    iseq $I5, $I2, $I1
-    if $I5 goto __label_11
-.annotate 'line', 5681
-    iseq $I6, $I2, -1
-    set $I4, $I6
-    goto __label_12
-  __label_11:
-    set $I4, $I5
-  __label_12:
-    if $I4 goto __label_9
-.annotate 'line', 5682
-    iseq $I8, $I2, -2
-    unless $I8 goto __label_13
-    iseq $I9, $I1, 1
-    set $I7, $I9
-    goto __label_14
-  __label_13:
-    set $I7, $I8
-  __label_14:
-    set $I3, $I7
-    goto __label_10
-  __label_9:
-    set $I3, $I4
+.annotate 'line', 5821
+    iseq $I3, $I2, $I1
+    if $I3 goto __label_10
+.annotate 'line', 5822
+    iseq $I3, $I2, -1
   __label_10:
+    if $I3 goto __label_9
+.annotate 'line', 5823
+    iseq $I3, $I2, -2
+    unless $I3 goto __label_11
+    iseq $I3, $I1, 1
+  __label_11:
+  __label_9:
     unless $I3 goto __label_8
-.annotate 'line', 5683
+.annotate 'line', 5824
     set $P3, $P4
   __label_8: # endif
-# }
     goto __label_6
   __label_7: # endfor
-.annotate 'line', 5685
-    unless_null $P3, __label_15
-.annotate 'line', 5686
+.annotate 'line', 5826
+    unless_null $P3, __label_12
+.annotate 'line', 5827
     WSubId_1("Wrong arguments for builtin", __ARG_2)
-  __label_15: # endif
-.annotate 'line', 5689
+  __label_12: # endif
+.annotate 'line', 5830
     $P7 = $P3.'iscompileevaluable'()
-    if_null $P7, __label_16
-    unless $P7 goto __label_16
-# {
-.annotate 'line', 5690
-    $P8 = WSubId_75($P1)
-    if_null $P8, __label_17
-    unless $P8 goto __label_17
-# {
-.annotate 'line', 5691
-# var evalfun: $P5
+    if_null $P7, __label_13
+    unless $P7 goto __label_13
+.annotate 'line', 5831
+    $P8 = WSubId_81($P1)
+    if_null $P8, __label_14
+    unless $P8 goto __label_14
+.annotate 'line', 5832
     getattribute $P5, $P3, 'evalfun'
-.annotate 'line', 5692
-# try: create handler
+.annotate 'line', 5833
     new $P7, 'ExceptionHandler'
-    set_label $P7, __label_18
+    set_label $P7, __label_15
     push_eh $P7
-# try: begin
-# {
-.annotate 'line', 5693
+.annotate 'line', 5834
     getattribute $P10, __ARG_1, 'owner'
     getattribute $P11, __ARG_1, 'start'
     $P8 = $P5($P10, $P11, $P1)
     .return($P8)
-# }
-# try: end
     pop_eh
-    goto __label_19
-.annotate 'line', 5692
-# catch
-  __label_18:
+    goto __label_16
+  __label_15:
+.annotate 'line', 5833
     .get_results($P6)
     finalize $P6
     pop_eh
-# {
-.annotate 'line', 5696
-# builtin string
-.annotate 'line', 5697
+.annotate 'line', 5838
     $S2 = $P6["message"]
     concat $S3, "Compile time evaluation of builtin ", $S1
     concat $S3, $S3, " failed: '"
     concat $S3, $S3, $S2
     concat $S3, $S3, "'"
-.annotate 'line', 5696
+.annotate 'line', 5837
     WSubId_1($S3, __ARG_2)
-# }
-# catch end
-  __label_19:
-# }
-  __label_17: # endif
-# }
-  __label_16: # endif
-.annotate 'line', 5702
+  __label_16:
+  __label_14: # endif
+  __label_13: # endif
+.annotate 'line', 5843
     new $P8, [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
     $P8.'CallBuiltinExpr'(__ARG_1, __ARG_2, $P3, $P1)
     set $P7, $P8
     .return($P7)
-# }
-.annotate 'line', 5703
+.annotate 'line', 5844
 
 .end # gencallbuiltin
 
@@ -17316,214 +14261,174 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5712
+.annotate 'line', 5853
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 5713
+.annotate 'line', 5854
     setattribute self, 'funref', __ARG_4
-.annotate 'line', 5714
-# var t: $P1
+.annotate 'line', 5855
     $P1 = __ARG_1.'get'()
-.annotate 'line', 5715
+.annotate 'line', 5856
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 5716
+.annotate 'line', 5857
     __ARG_1.'unget'($P1)
-.annotate 'line', 5717
+.annotate 'line', 5858
     new $P4, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
     $P4.'ArgumentList'(__ARG_2, __ARG_3, __ARG_1, ')')
     set $P3, $P4
     setattribute self, 'args', $P3
-# }
   __label_1: # endif
-# }
-.annotate 'line', 5719
+.annotate 'line', 5860
 
 .end # CallExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5720
+.annotate 'line', 5861
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_76 = "WSubId_76"
-# Body
-# {
-.annotate 'line', 5723
-# var funref: $P1
-    getattribute $P9, self, 'funref'
-    $P1 = $P9.'optimize'()
-.annotate 'line', 5724
-# var args: $P2
+.const 'Sub' WSubId_82 = "WSubId_82"
+.const 'Sub' WSubId_6 = "WSubId_6"
+.annotate 'line', 5864
+    getattribute $P6, self, 'funref'
+    $P1 = $P6.'optimize'()
+.annotate 'line', 5865
     getattribute $P2, self, 'args'
-.annotate 'line', 5725
+.annotate 'line', 5866
     if_null $P2, __label_1
-.annotate 'line', 5726
+.annotate 'line', 5867
     $P2 = $P2.'optimize'()
   __label_1: # endif
-.annotate 'line', 5728
+.annotate 'line', 5869
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
     unless $I1 goto __label_2
-# {
-.annotate 'line', 5732
-# var sym: $P3
-    null $P3
-.annotate 'line', 5733
-# var subid: $P4
-    null $P4
-.annotate 'line', 5734
-# var first: $P5
-    getattribute $P5, $P1, 'left'
-  __label_4: # while
-.annotate 'line', 5735
-    isa $I1, $P5, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
-    unless $I1 goto __label_3
-.annotate 'line', 5736
-    getattribute $P5, $P5, 'left'
-    goto __label_4
-  __label_3: # endwhile
-.annotate 'line', 5737
-    isa $I1, $P5, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
-    unless $I1 goto __label_5
-# {
-.annotate 'line', 5738
-# var idfirst: $P6
-    $P6 = $P5.'checkIdentifier'()
-.annotate 'line', 5739
-    isnull $I2, $P6
-    if $I2 goto __label_7
-    set $S1, $P6
-    iseq $I3, $S1, ''
-    set $I1, $I3
-    goto __label_8
-  __label_7:
-    set $I1, $I2
-  __label_8:
-    unless $I1 goto __label_6
-# {
-.annotate 'line', 5740
-# var key: $P7
-    root_new $P7, ['parrot';'ResizablePMCArray']
-.annotate 'line', 5741
-    $P1.'buildkey'($P7)
-.annotate 'line', 5742
-    $P3 = self.'scopesearch'($P7, 0)
-.annotate 'line', 5743
-    if_null $P3, __label_9
-# {
-.annotate 'line', 5744
+.annotate 'line', 5870
+    $P3 = $P1.'search_nonmember'()
+.annotate 'line', 5872
+    isnull $I1, $P3
+    if $I1 goto __label_5
+.annotate 'line', 5874
     isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    unless $I1 goto __label_10
-# {
-.annotate 'line', 5745
-    $P9 = $P3.'ismulti'()
-    isfalse $I2, $P9
-    unless $I2 goto __label_11
-# {
-.annotate 'line', 5746
-    $P4 = $P3.'makesubid'()
-.annotate 'line', 5747
-    self.'usesubid'($P4)
-# }
-  __label_11: # endif
-# }
-  __label_10: # endif
-.annotate 'line', 5750
+    if $I1 goto __label_6
+.annotate 'line', 5885
+    isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    if $I1 goto __label_7
+.annotate 'line', 5888
     isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'Builtin' ]
-    unless $I1 goto __label_12
-.annotate 'line', 5751
+    if $I1 goto __label_8
+    goto __label_4
+  __label_5: # case
+.annotate 'line', 5873
+    new $P7, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
+    $P7.'CallMemberExpr'(self, $P1, $P2)
+    set $P6, $P7
+    .return($P6)
+  __label_6: # case
+.annotate 'line', 5875
+    $P8 = $P3.'ismulti'()
+    isfalse $I2, $P8
+    unless $I2 goto __label_9
+.annotate 'line', 5876
+    $P4 = $P3.'makesubid'()
+.annotate 'line', 5877
+    self.'usesubid'($P4)
+.annotate 'line', 5878
+    new $P7, [ 'Winxed'; 'Compiler'; 'CallSubid' ]
+    $P7.'CallSubid'(self, $P1, $P2, $P4)
+    set $P6, $P7
+    .return($P6)
+    goto __label_10
+  __label_9: # else
+.annotate 'line', 5881
+    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
     getattribute $P9, self, 'owner'
-    getattribute $P10, $P1, 'start'
-    .tailcall WSubId_76($P9, $P10, $P3, $P2)
-  __label_12: # endif
-# }
-  __label_9: # endif
-# }
-  __label_6: # endif
-# }
-  __label_5: # endif
-.annotate 'line', 5755
-    new $P10, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
-    $P10.'CallMemberExpr'(self, $P1, $P2, $P3, $P4)
-    set $P9, $P10
-    .return($P9)
-# }
-  __label_2: # endif
-.annotate 'line', 5757
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
-    unless $I1 goto __label_13
-.annotate 'line', 5758
-    new $P10, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
-    $P10.'CallMemberRefExpr'(self, $P1, $P2)
-    set $P9, $P10
-    .return($P9)
-  __label_13: # endif
-.annotate 'line', 5761
-    $P9 = $P1.'isidentifier'()
-    if_null $P9, __label_14
-    unless $P9 goto __label_14
-# {
-.annotate 'line', 5762
-    $P10 = $P1.'checkIdentifier'()
-    set $S1, $P10
-    ne $S1, '', __label_15
-# {
-.annotate 'line', 5763
-# var sym: $P8
-    root_new $P11, ['parrot';'ResizablePMCArray']
-    assign $P11, 1
-    $P12 = $P1.'getName'()
-    $P11[0] = $P12
-    $P8 = self.'scopesearch'($P11, 0)
-.annotate 'line', 5764
-    isnull $I2, $P8
-    not $I2
-    unless $I2 goto __label_17
-    isa $I3, $P8, [ 'Winxed'; 'Compiler'; 'Builtin' ]
-    set $I1, $I3
-    goto __label_18
-  __label_17:
-    set $I1, $I2
-  __label_18:
-    unless $I1 goto __label_16
-.annotate 'line', 5765
-    getattribute $P9, self, 'owner'
-    getattribute $P10, $P1, 'start'
-    .tailcall WSubId_76($P9, $P10, $P8, $P2)
-  __label_16: # endif
-# }
-  __label_15: # endif
-# }
-  __label_14: # endif
-.annotate 'line', 5769
-    setattribute self, 'funref', $P1
-.annotate 'line', 5770
-    setattribute self, 'args', $P2
-.annotate 'line', 5771
+    getattribute $P10, self, 'start'
+    $P8.'FunctionRef'($P9, $P10, $P3)
+    set $P7, $P8
+    setattribute self, 'funref', $P7
+.annotate 'line', 5882
     .return(self)
-# }
-.annotate 'line', 5772
+  __label_10: # endif
+    goto __label_3 # break
+  __label_7: # case
+.annotate 'line', 5886
+    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    getattribute $P9, self, 'owner'
+    getattribute $P10, self, 'start'
+    $P8.'FunctionRef'($P9, $P10, $P3)
+    set $P7, $P8
+    setattribute self, 'funref', $P7
+.annotate 'line', 5887
+    .return(self)
+  __label_8: # case
+.annotate 'line', 5889
+    getattribute $P11, self, 'owner'
+    getattribute $P12, $P1, 'start'
+    .tailcall WSubId_82($P11, $P12, $P3, $P2)
+    goto __label_3 # break
+  __label_4: # default
+.annotate 'line', 5892
+    getattribute $P13, self, 'start'
+    WSubId_6("unexpected type found in scope", $P13)
+  __label_3: # switch end
+  __label_2: # endif
+.annotate 'line', 5895
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
+    unless $I1 goto __label_11
+.annotate 'line', 5896
+    new $P7, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
+    $P7.'CallMemberRefExpr'(self, $P1, $P2)
+    set $P6, $P7
+    .return($P6)
+  __label_11: # endif
+.annotate 'line', 5899
+    $P6 = $P1.'isidentifier'()
+    if_null $P6, __label_12
+    unless $P6 goto __label_12
+.annotate 'line', 5900
+    $P7 = $P1.'checkIdentifier'()
+    set $S1, $P7
+    ne $S1, '', __label_13
+.annotate 'line', 5901
+    root_new $P8, ['parrot';'ResizablePMCArray']
+    assign $P8, 1
+    $P9 = $P1.'getName'()
+    $P8[0] = $P9
+    $P5 = self.'scopesearch'($P8, 0)
+.annotate 'line', 5902
+    isnull $I1, $P5
+    not $I1
+    unless $I1 goto __label_15
+    isa $I1, $P5, [ 'Winxed'; 'Compiler'; 'Builtin' ]
+  __label_15:
+    unless $I1 goto __label_14
+.annotate 'line', 5903
+    getattribute $P6, self, 'owner'
+    getattribute $P7, $P1, 'start'
+    .tailcall WSubId_82($P6, $P7, $P5, $P2)
+  __label_14: # endif
+  __label_13: # endif
+  __label_12: # endif
+.annotate 'line', 5907
+    setattribute self, 'funref', $P1
+.annotate 'line', 5908
+    setattribute self, 'args', $P2
+.annotate 'line', 5909
+    .return(self)
+.annotate 'line', 5910
 
 .end # optimize
 
 
 .sub 'cantailcall' :method
-# Body
-# {
-.annotate 'line', 5775
+.annotate 'line', 5913
     .return(1)
-# }
-.annotate 'line', 5776
+.annotate 'line', 5914
 
 .end # cantailcall
 
@@ -17531,199 +14436,217 @@
 .sub 'emitcall' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 5779
-# var funref: $P1
+.annotate 'line', 5917
     getattribute $P1, self, 'funref'
-.annotate 'line', 5780
-# call: $S1
+.annotate 'line', 5918
     null $S1
-.annotate 'line', 5782
-    $P4 = $P1.'isidentifier'()
-    unless $P4 goto __label_3
-    getattribute $P5, $P1, 'subid'
-    isnull $I1, $P5
+.annotate 'line', 5920
+    $P3 = $P1.'isidentifier'()
+    unless $P3 goto __label_3
+    getattribute $P4, $P1, 'subid'
+    isnull $I1, $P4
     box $P3, $I1
-    goto __label_4
   __label_3:
-    set $P3, $P4
-  __label_4:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 5783
-    $P6 = $P1.'checkIdentifier'()
-    set $S1, $P6
-.annotate 'line', 5784
-    ne $S1, '', __label_5
-# {
-.annotate 'line', 5785
-# var sym: $P2
+.annotate 'line', 5921
+    $P5 = $P1.'checkIdentifier'()
+    set $S1, $P5
+.annotate 'line', 5922
+    ne $S1, '', __label_4
+.annotate 'line', 5923
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 1
     $P4 = $P1.'getName'()
     $P3[0] = $P4
     $P2 = self.'scopesearch'($P3, 0)
-# switch-case
-.annotate 'line', 5787
+.annotate 'line', 5925
     isnull $I1, $P2
-    if $I1 goto __label_8
-.annotate 'line', 5790
+    if $I1 goto __label_7
+.annotate 'line', 5928
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
-    if $I1 goto __label_9
-.annotate 'line', 5793
+    if $I1 goto __label_8
+.annotate 'line', 5931
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'Builtin' ]
-    if $I1 goto __label_10
-    goto __label_7
-  __label_8: # case
-.annotate 'line', 5788
+    if $I1 goto __label_9
+    goto __label_6
+  __label_7: # case
+.annotate 'line', 5926
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 3
     $P3[0] = "'"
     $P4 = $P1.'getName'()
     $P3[1] = $P4
     $P3[2] = "'"
-# builtin join
     join $S1, "", $P3
-    goto __label_6 # break
-  __label_9: # case
-.annotate 'line', 5791
+    goto __label_5 # break
+  __label_8: # case
+.annotate 'line', 5929
     $P5 = $P2.'emit_get'(__ARG_1, self)
     set $S1, $P5
-    goto __label_6 # break
-  __label_10: # case
-.annotate 'line', 5794
-    WSubId_6("Builtin unexpeted here", self)
-  __label_7: # default
-.annotate 'line', 5796
+    goto __label_5 # break
+  __label_9: # case
+.annotate 'line', 5932
+    WSubId_6("Builtin unexpected here", self)
+  __label_6: # default
+.annotate 'line', 5934
     root_new $P6, ['parrot';'ResizablePMCArray']
     assign $P6, 3
     $P6[0] = "'"
     $P7 = $P1.'getName'()
     $P6[1] = $P7
     $P6[2] = "'"
-# builtin join
     join $S1, "", $P6
-  __label_6: # switch end
-# }
-  __label_5: # endif
-# }
+  __label_5: # switch end
+  __label_4: # endif
     goto __label_2
   __label_1: # else
-.annotate 'line', 5801
+.annotate 'line', 5939
     $P3 = $P1.'emit_get'(__ARG_1)
     set $S1, $P3
   __label_2: # endif
-.annotate 'line', 5802
+.annotate 'line', 5940
     .return($S1)
-# }
-.annotate 'line', 5803
+.annotate 'line', 5941
 
 .end # emitcall
 
 
 .sub 'prepareargs' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5806
-# var args: $P1
+.annotate 'line', 5944
     getattribute $P1, self, 'args'
-.annotate 'line', 5807
+.annotate 'line', 5945
     if_null $P1, __label_1
-.annotate 'line', 5808
+.annotate 'line', 5946
     $P1.'getargvalues'(__ARG_1)
   __label_1: # endif
-# }
-.annotate 'line', 5809
+.annotate 'line', 5947
 
 .end # prepareargs
 
 
 .sub 'emitargs' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5812
+.annotate 'line', 5950
     __ARG_1.'print'('(')
-.annotate 'line', 5813
-# var args: $P1
+.annotate 'line', 5951
     getattribute $P1, self, 'args'
-.annotate 'line', 5814
+.annotate 'line', 5952
     if_null $P1, __label_1
-.annotate 'line', 5815
+.annotate 'line', 5953
     $P1.'emitargs'(__ARG_1)
   __label_1: # endif
-.annotate 'line', 5816
+.annotate 'line', 5954
     __ARG_1.'say'(')')
-# }
-.annotate 'line', 5817
+.annotate 'line', 5955
 
 .end # emitargs
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5820
-# call: $S1
+        .param string __ARG_2
+.annotate 'line', 5958
     $P1 = self.'emitcall'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5821
+.annotate 'line', 5959
     self.'prepareargs'(__ARG_1)
-.annotate 'line', 5823
+.annotate 'line', 5961
     self.'annotate'(__ARG_1)
-.annotate 'line', 5825
+.annotate 'line', 5963
     __ARG_1.'print'('    ')
-.annotate 'line', 5826
-    isnull $I2, __ARG_2
-    not $I2
-    unless $I2 goto __label_3
-    set $S2, __ARG_2
-    isne $I3, $S2, ''
-    set $I1, $I3
-    goto __label_4
-  __label_3:
-    set $I1, $I2
-  __label_4:
-    unless $I1 goto __label_2
-# {
-.annotate 'line', 5827
-    set $S3, __ARG_2
-    ne $S3, '.tailcall', __label_5
-.annotate 'line', 5828
+.annotate 'line', 5964
+    ne __ARG_2, '.tailcall', __label_2
+.annotate 'line', 5965
     __ARG_1.'print'('.tailcall ')
-    goto __label_6
-  __label_5: # else
-.annotate 'line', 5830
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 5967
     __ARG_1.'print'(__ARG_2, ' = ')
-  __label_6: # endif
-# }
-  __label_2: # endif
-.annotate 'line', 5833
+  __label_3: # endif
+.annotate 'line', 5969
     __ARG_1.'print'($S1)
-.annotate 'line', 5834
+.annotate 'line', 5970
     self.'emitargs'(__ARG_1)
-# }
-.annotate 'line', 5835
+.annotate 'line', 5971
 
 .end # emit
 
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 5974
+    $P1 = self.'emitcall'(__ARG_1)
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+.annotate 'line', 5975
+    self.'prepareargs'(__ARG_1)
+.annotate 'line', 5976
+    self.'annotate'(__ARG_1)
+.annotate 'line', 5977
+    __ARG_1.'print'('    ')
+.annotate 'line', 5978
+    __ARG_1.'print'($S1)
+.annotate 'line', 5979
+    self.'emitargs'(__ARG_1)
+.annotate 'line', 5980
+
+.end # emit_void
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
-.annotate 'line', 5705
+.annotate 'line', 5846
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 5707
+.annotate 'line', 5848
     addattribute $P0, 'funref'
-.annotate 'line', 5708
+.annotate 'line', 5849
     addattribute $P0, 'args'
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'CallSubid' ]
+
+.sub 'CallSubid' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+        .param pmc __ARG_4
+.annotate 'line', 5992
+    getattribute $P1, __ARG_1, 'owner'
+    getattribute $P2, __ARG_1, 'start'
+    self.'Expr'($P1, $P2)
+.annotate 'line', 5993
+    setattribute self, 'funref', __ARG_2
+.annotate 'line', 5994
+    setattribute self, 'args', __ARG_3
+.annotate 'line', 5995
+    setattribute self, 'subid', __ARG_4
+.annotate 'line', 5996
+
+.end # CallSubid
+
+
+.sub 'emitcall' :method
+        .param pmc __ARG_1
+.annotate 'line', 5999
+    getattribute $P1, self, 'subid'
+    .return($P1)
+.annotate 'line', 6000
+
+.end # emitcall
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'CallSubid' ]
+.annotate 'line', 5987
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
+    addparent $P0, $P1
+.annotate 'line', 5989
+    addattribute $P0, 'subid'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
 
@@ -17731,145 +14654,93 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-        .param pmc __ARG_4
-        .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 5849
+.annotate 'line', 6008
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     self.'Expr'($P1, $P2)
-.annotate 'line', 5850
+.annotate 'line', 6009
     setattribute self, 'funref', __ARG_2
-.annotate 'line', 5851
+.annotate 'line', 6010
     setattribute self, 'args', __ARG_3
-.annotate 'line', 5852
-    setattribute self, 'sym', __ARG_4
-.annotate 'line', 5853
-    setattribute self, 'subid', __ARG_5
-# }
-.annotate 'line', 5854
+.annotate 'line', 6011
 
 .end # CallMemberExpr
 
 
 .sub 'emitcall' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 5857
-    getattribute $P6, self, 'sym'
-    if_null $P6, __label_1
-# {
-.annotate 'line', 5858
-    getattribute $P7, self, 'subid'
-    if_null $P7, __label_2
-.annotate 'line', 5859
-    getattribute $P8, self, 'subid'
-    .return($P8)
-  __label_2: # endif
-.annotate 'line', 5860
-# var sym: $P1
-    getattribute $P1, self, 'sym'
-.annotate 'line', 5861
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
-    unless $I1 goto __label_3
-.annotate 'line', 5862
-    .tailcall $P1.'emit_get'(__ARG_1, self)
-  __label_3: # endif
-# }
-  __label_1: # endif
-.annotate 'line', 5864
-# var funref: $P2
-    getattribute $P2, self, 'funref'
-.annotate 'line', 5866
-# var first: $P3
-    getattribute $P3, $P2, 'left'
-  __label_5: # while
-.annotate 'line', 5867
-    isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
-    unless $I1 goto __label_4
-.annotate 'line', 5868
-    getattribute $P3, $P3, 'left'
-    goto __label_5
-  __label_4: # endwhile
-.annotate 'line', 5869
-    $P6 = $P3.'isidentifier'()
-    if_null $P6, __label_6
-    unless $P6 goto __label_6
-# {
-.annotate 'line', 5870
-# check: $S1
-    $P7 = $P3.'checkIdentifier'()
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 6014
+    getattribute $P1, self, 'funref'
+.annotate 'line', 6016
+    getattribute $P2, $P1, 'left'
+  __label_2: # while
+.annotate 'line', 6017
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
+    unless $I1 goto __label_1
+.annotate 'line', 6018
+    getattribute $P2, $P2, 'left'
+    goto __label_2
+  __label_1: # endwhile
+.annotate 'line', 6019
+    $P5 = $P2.'isidentifier'()
+    if_null $P5, __label_3
+    unless $P5 goto __label_3
+.annotate 'line', 6020
+    $P6 = $P2.'checkIdentifier'()
     null $S1
-    if_null $P7, __label_7
-    set $S1, $P7
-  __label_7:
-.annotate 'line', 5871
-    isnull $I2, $S1
-    if $I2 goto __label_9
-    iseq $I3, $S1, ''
-    set $I1, $I3
-    goto __label_10
-  __label_9:
-    set $I1, $I2
-  __label_10:
-    unless $I1 goto __label_8
-# {
-.annotate 'line', 5875
-    new $P4, ['ResizableStringArray']
-.annotate 'line', 5876
-    $P2.'buildkey'($P4)
-.annotate 'line', 5877
-# fun: $S2
-    $P6 = $P4.'pop'()
+    if_null $P6, __label_4
+    set $S1, $P6
+  __label_4:
+.annotate 'line', 6021
+    isnull $I1, $S1
+    if $I1 goto __label_6
+    iseq $I1, $S1, ''
+  __label_6:
+    unless $I1 goto __label_5
+.annotate 'line', 6025
+    new $P3, ['ResizableStringArray']
+.annotate 'line', 6026
+    $P1.'buildkey'($P3)
+.annotate 'line', 6027
+    $P5 = $P3.'pop'()
     null $S2
-    if_null $P6, __label_11
-    set $S2, $P6
-  __label_11:
-.annotate 'line', 5878
-# var reg: $P5
-    $P5 = self.'tempreg'('P')
-.annotate 'line', 5879
+    if_null $P5, __label_7
+    set $S2, $P5
+  __label_7:
+.annotate 'line', 6028
+    $P4 = self.'tempreg'('P')
+.annotate 'line', 6029
     self.'annotate'(__ARG_1)
-.annotate 'line', 5880
-    $P6 = WSubId_26($P4)
-    __ARG_1.'emitget_hll_global'($P5, $S2, $P6)
-.annotate 'line', 5881
-    .return($P5)
-# }
-  __label_8: # endif
-# }
-  __label_6: # endif
-.annotate 'line', 5884
-    root_new $P6, ['parrot';'ResizablePMCArray']
-    assign $P6, 4
-    $P7 = $P2.'emit_left_get'(__ARG_1)
-    $P6[0] = $P7
-    $P6[1] = ".'"
-.annotate 'line', 5885
-    $P8 = $P2.'get_member'()
-.annotate 'line', 5884
-    $P6[2] = $P8
-    $P6[3] = "'"
-# builtin join
-    join $S3, "", $P6
+.annotate 'line', 6030
+    $P5 = WSubId_30($P3)
+    __ARG_1.'emitget_hll_global'($P4, $S2, $P5)
+.annotate 'line', 6031
+    .return($P4)
+  __label_5: # endif
+  __label_3: # endif
+.annotate 'line', 6034
+    root_new $P5, ['parrot';'ResizablePMCArray']
+    assign $P5, 4
+    $P6 = $P1.'emit_left_get'(__ARG_1)
+    $P5[0] = $P6
+    $P5[1] = ".'"
+.annotate 'line', 6035
+    $P7 = $P1.'get_member'()
+.annotate 'line', 6034
+    $P5[2] = $P7
+    $P5[3] = "'"
+    join $S3, "", $P5
     .return($S3)
-# }
-.annotate 'line', 5886
+.annotate 'line', 6036
 
 .end # emitcall
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
-.annotate 'line', 5843
+.annotate 'line', 6004
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     addparent $P0, $P1
-.annotate 'line', 5845
-    addattribute $P0, 'sym'
-.annotate 'line', 5846
-    addattribute $P0, 'subid'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
 
@@ -17877,18 +14748,15 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 5896
+.annotate 'line', 6046
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     self.'Expr'($P1, $P2)
-.annotate 'line', 5897
+.annotate 'line', 6047
     setattribute self, 'funref', __ARG_2
-.annotate 'line', 5898
+.annotate 'line', 6048
     setattribute self, 'args', __ARG_3
-# }
-.annotate 'line', 5899
+.annotate 'line', 6049
 
 .end # CallMemberRefExpr
 
@@ -17896,58 +14764,46 @@
 .sub 'emitcall' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 5902
-# var funref: $P1
+.annotate 'line', 6052
     getattribute $P1, self, 'funref'
-.annotate 'line', 5903
-# var right: $P2
+.annotate 'line', 6053
     getattribute $P2, $P1, 'right'
-.annotate 'line', 5904
-# var type: $P3
+.annotate 'line', 6054
     $P3 = $P2.'checkresult'()
-.annotate 'line', 5905
+.annotate 'line', 6055
     set $S3, $P3
-    isne $I2, $S3, 'P'
-    unless $I2 goto __label_2
+    isne $I1, $S3, 'P'
+    unless $I1 goto __label_2
     set $S4, $P3
-    isne $I3, $S4, 'S'
-    set $I1, $I3
-    goto __label_3
+    isne $I1, $S4, 'S'
   __label_2:
-    set $I1, $I2
-  __label_3:
     unless $I1 goto __label_1
-.annotate 'line', 5906
+.annotate 'line', 6056
     WSubId_1("Invalid expression type in '.*'", $P1)
   __label_1: # endif
-.annotate 'line', 5909
-# lreg: $S1
+.annotate 'line', 6059
     $P4 = $P1.'emit_left_get'(__ARG_1)
     null $S1
-    if_null $P4, __label_4
+    if_null $P4, __label_3
     set $S1, $P4
-  __label_4:
-.annotate 'line', 5910
-# rreg: $S2
+  __label_3:
+.annotate 'line', 6060
     $P4 = $P2.'emit_get'(__ARG_1)
     null $S2
-    if_null $P4, __label_5
+    if_null $P4, __label_4
     set $S2, $P4
-  __label_5:
-.annotate 'line', 5911
+  __label_4:
+.annotate 'line', 6061
     concat $S3, $S1, '.'
     concat $S3, $S3, $S2
     .return($S3)
-# }
-.annotate 'line', 5912
+.annotate 'line', 6062
 
 .end # emitcall
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
-.annotate 'line', 5892
+.annotate 'line', 6042
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     addparent $P0, $P1
 .end
@@ -17957,65 +14813,30 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 5922
+.annotate 'line', 6072
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 5923
+.annotate 'line', 6073
     setattribute self, 'left', __ARG_3
-# }
-.annotate 'line', 5924
+.annotate 'line', 6074
 
 .end # MemberExprBase
 
 
 .sub 'emit_left_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5927
-# var left: $P1
+.annotate 'line', 6077
     getattribute $P1, self, 'left'
-.annotate 'line', 5928
-# type: $S1
-    $P2 = $P1.'checkresult'()
-    null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
-.annotate 'line', 5929
-# reg: $S2
-    $P2 = $P1.'emit_get'(__ARG_1)
-    null $S2
-    if_null $P2, __label_2
-    set $S2, $P2
-  __label_2:
-.annotate 'line', 5930
-    eq $S1, 'P', __label_3
-# {
-.annotate 'line', 5931
-# auxreg: $S3
-    set $S3, $S2
-.annotate 'line', 5932
-    $P2 = self.'tempreg'('P')
-    set $S2, $P2
-.annotate 'line', 5933
-    __ARG_1.'emitbox'($S2, $S3)
-# }
-  __label_3: # endif
-.annotate 'line', 5935
-    .return($S2)
-# }
-.annotate 'line', 5936
+    .tailcall $P1.'emit_getvar'(__ARG_1)
+.annotate 'line', 6078
 
 .end # emit_left_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
-.annotate 'line', 5917
+.annotate 'line', 6067
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 5919
+.annotate 'line', 6069
     addattribute $P0, 'left'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
@@ -18025,81 +14846,144 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 5945
+.annotate 'line', 6087
     self.'MemberExprBase'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 5946
+.annotate 'line', 6088
     setattribute self, 'right', __ARG_4
-# }
-.annotate 'line', 5947
+.annotate 'line', 6089
 
 .end # MemberExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 5948
+.annotate 'line', 6090
     .return('P')
-# }
 
 .end # checkresult
 
 
-.sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 5951
+.sub 'search_nonmember' :method
+.annotate 'line', 6096
+    null $P1
+.annotate 'line', 6097
+    null $P2
+.annotate 'line', 6098
     getattribute $P3, self, 'left'
-    $P2 = $P3.'optimize'()
-    setattribute self, 'left', $P2
-.annotate 'line', 5952
+  __label_2: # while
+.annotate 'line', 6099
+    isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
+    unless $I1 goto __label_1
+.annotate 'line', 6100
+    getattribute $P3, $P3, 'left'
+    goto __label_2
+  __label_1: # endwhile
+.annotate 'line', 6101
+    isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
+    unless $I1 goto __label_3
+.annotate 'line', 6102
+    $P4 = $P3.'checkIdentifier'()
+.annotate 'line', 6103
+    isnull $I1, $P4
+    if $I1 goto __label_5
+    set $S1, $P4
+    iseq $I1, $S1, ''
+  __label_5:
+    unless $I1 goto __label_4
+.annotate 'line', 6104
+    root_new $P5, ['parrot';'ResizablePMCArray']
+.annotate 'line', 6105
+    self.'buildkey'($P5)
+.annotate 'line', 6106
+    .tailcall self.'scopesearch'($P5, 0)
+  __label_4: # endif
+  __label_3: # endif
+    null $P6
+.annotate 'line', 6109
+    .return($P6)
+.annotate 'line', 6110
+
+.end # search_nonmember
+
+
+.sub 'optimize' :method
+.annotate 'line', 6113
+    getattribute $P4, self, 'left'
+    $P3 = $P4.'optimize'()
+    setattribute self, 'left', $P3
+.annotate 'line', 6115
+    $P1 = self.'search_nonmember'()
+.annotate 'line', 6117
+    isnull $I1, $P1
+    if $I1 goto __label_3
+.annotate 'line', 6119
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    if $I1 goto __label_4
+.annotate 'line', 6123
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    if $I1 goto __label_5
+    goto __label_2
+  __label_3: # case
+    goto __label_1 # break
+  __label_4: # case
+.annotate 'line', 6120
+    $P2 = $P1.'ismulti'()
+    if_null $P2, __label_6
+    unless $P2 goto __label_6
+.annotate 'line', 6121
+    new $P4, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    getattribute $P5, self, 'owner'
+    getattribute $P6, self, 'start'
+    $P4.'FunctionRef'($P5, $P6, $P1)
+    set $P3, $P4
+    .return($P3)
+  __label_6: # endif
+    goto __label_1 # break
+  __label_5: # case
+.annotate 'line', 6124
+    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    getattribute $P9, self, 'owner'
+    getattribute $P10, self, 'start'
+    $P8.'FunctionRef'($P9, $P10, $P1)
+    set $P7, $P8
+    .return($P7)
+  __label_2: # default
+  __label_1: # switch end
+.annotate 'line', 6126
     .return(self)
-# }
-.annotate 'line', 5953
+.annotate 'line', 6127
 
 .end # optimize
 
 
 .sub 'buildkey' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5956
-# var left: $P1
+.annotate 'line', 6130
     getattribute $P1, self, 'left'
-.annotate 'line', 5957
+.annotate 'line', 6131
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
     unless $I1 goto __label_1
-.annotate 'line', 5958
+.annotate 'line', 6132
     $P2 = $P1.'getName'()
-# builtin push
     push __ARG_1, $P2
     goto __label_2
   __label_1: # else
-.annotate 'line', 5960
+.annotate 'line', 6134
     $P1.'buildkey'(__ARG_1)
   __label_2: # endif
-.annotate 'line', 5961
+.annotate 'line', 6135
     getattribute $P3, self, 'right'
     $P2 = $P3.'getidentifier'()
-# builtin push
     push __ARG_1, $P2
-# }
-.annotate 'line', 5962
+.annotate 'line', 6136
 
 .end # buildkey
 
 
 .sub 'get_member' :method
-# Body
-# {
-.annotate 'line', 5965
+.annotate 'line', 6139
     getattribute $P1, self, 'right'
     .return($P1)
-# }
-.annotate 'line', 5966
+.annotate 'line', 6140
 
 .end # get_member
 
@@ -18108,87 +14992,71 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 5969
-# ident: $S1
+.annotate 'line', 6143
     getattribute $P2, self, 'right'
     $P1 = $P2.'getidentifier'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5970
+.annotate 'line', 6144
     self.'annotate'(__ARG_1)
-.annotate 'line', 5971
+.annotate 'line', 6145
     __ARG_1.'say'('    ', "setattribute ", __ARG_2, ", '", $S1, "', ", __ARG_3)
-# }
-.annotate 'line', 5972
+.annotate 'line', 6146
 
 .end # __emit_assign_aux
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 5975
-# result: $S1
+.annotate 'line', 6149
     $P1 = self.'tempreg'('P')
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5976
+.annotate 'line', 6150
     self.'emit'(__ARG_1, $S1)
-.annotate 'line', 5977
+.annotate 'line', 6151
     .return($S1)
-# }
-.annotate 'line', 5978
+.annotate 'line', 6152
 
 .end # emit_get
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5981
-# obj: $S1
+        .param string __ARG_2
+.annotate 'line', 6155
     getattribute $P2, self, 'left'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5982
-# ident: $S2
+.annotate 'line', 6156
     getattribute $P2, self, 'right'
     $P1 = $P2.'getidentifier'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 5983
+.annotate 'line', 6157
     self.'annotate'(__ARG_1)
-.annotate 'line', 5984
+.annotate 'line', 6158
     __ARG_1.'say'('    ', 'getattribute ', __ARG_2, ', ', $S1, ", '", $S2, "'")
-# }
-.annotate 'line', 5985
+.annotate 'line', 6159
 
 .end # emit
 
 
 .sub 'emit_init' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 5988
+        .param string __ARG_2
+.annotate 'line', 6162
     self.'emit'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 5989
+.annotate 'line', 6163
 
 .end # emit_init
 
@@ -18197,49 +15065,38 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 5992
-# obj: $S1
+.annotate 'line', 6166
     getattribute $P2, self, 'left'
     $P1 = $P2.'emit_get_nonull'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 5993
-# value: $S2
+.annotate 'line', 6167
     null $S2
-.annotate 'line', 5994
+.annotate 'line', 6168
     ne __ARG_2, 'P', __label_2
-# {
-.annotate 'line', 5996
+.annotate 'line', 6170
     ne __ARG_3, 'null', __label_4
-# {
-.annotate 'line', 5997
+.annotate 'line', 6171
     $P1 = self.'tempreg'('P')
     set __ARG_3, $P1
-.annotate 'line', 5998
+.annotate 'line', 6172
     __ARG_1.'emitnull'(__ARG_3)
-# }
   __label_4: # endif
-.annotate 'line', 6000
+.annotate 'line', 6174
     set $S2, __ARG_3
-# }
     goto __label_3
   __label_2: # else
-# {
-.annotate 'line', 6003
+.annotate 'line', 6177
     $P1 = self.'tempreg'('P')
     set $S2, $P1
-.annotate 'line', 6004
+.annotate 'line', 6178
     __ARG_1.'emitbox'($S2, __ARG_3)
-# }
   __label_3: # endif
-.annotate 'line', 6006
+.annotate 'line', 6180
     self.'__emit_assign_aux'(__ARG_1, $S1, $S2)
-# }
-.annotate 'line', 6007
+.annotate 'line', 6181
 
 .end # emit_assign
 
@@ -18247,67 +15104,59 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6010
-# obj: $S1
+.annotate 'line', 6184
     getattribute $P2, self, 'left'
     $P1 = $P2.'emit_get_nonull'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 6011
-# value: $S2
+.annotate 'line', 6185
     $P1 = self.'tempreg'('P')
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 6012
+.annotate 'line', 6186
     $P1 = __ARG_2.'isnull'()
     if_null $P1, __label_3
     unless $P1 goto __label_3
-.annotate 'line', 6013
+.annotate 'line', 6187
     __ARG_1.'emitnull'($S2)
     goto __label_4
   __label_3: # else
-# {
-.annotate 'line', 6015
-# rreg: $S3
+.annotate 'line', 6189
     $P2 = __ARG_2.'emit_get'(__ARG_1)
     null $S3
     if_null $P2, __label_5
     set $S3, $P2
   __label_5:
-.annotate 'line', 6016
+.annotate 'line', 6190
     $P1 = __ARG_2.'checkresult'()
     set $S4, $P1
     eq $S4, 'P', __label_6
-.annotate 'line', 6017
+.annotate 'line', 6191
     __ARG_1.'emitbox'($S2, $S3)
     goto __label_7
   __label_6: # else
-.annotate 'line', 6019
+.annotate 'line', 6193
     set $S2, $S3
   __label_7: # endif
-# }
   __label_4: # endif
-.annotate 'line', 6021
+.annotate 'line', 6195
     self.'__emit_assign_aux'(__ARG_1, $S1, $S2)
-.annotate 'line', 6022
+.annotate 'line', 6196
     .return($S2)
-# }
-.annotate 'line', 6023
+.annotate 'line', 6197
 
 .end # emit_assign_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
-.annotate 'line', 5939
+.annotate 'line', 6081
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
     addparent $P0, $P1
-.annotate 'line', 5941
+.annotate 'line', 6083
     addattribute $P0, 'right'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
@@ -18317,92 +15166,70 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 6034
+.annotate 'line', 6208
     self.'MemberExprBase'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 6035
+.annotate 'line', 6209
     setattribute self, 'right', __ARG_4
-# }
-.annotate 'line', 6036
+.annotate 'line', 6210
 
 .end # MemberRefExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6037
+.annotate 'line', 6211
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 6040
+.annotate 'line', 6214
     getattribute $P3, self, 'left'
     $P2 = $P3.'optimize'()
     setattribute self, 'left', $P2
-.annotate 'line', 6041
+.annotate 'line', 6215
     getattribute $P3, self, 'right'
     $P2 = $P3.'optimize'()
     setattribute self, 'right', $P2
-.annotate 'line', 6042
+.annotate 'line', 6216
     .return(self)
-# }
-.annotate 'line', 6043
+.annotate 'line', 6217
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 6046
-# var left: $P1
+        .param string __ARG_2
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 6220
     getattribute $P1, self, 'left'
-.annotate 'line', 6047
-# var right: $P2
+.annotate 'line', 6221
     getattribute $P2, self, 'right'
-.annotate 'line', 6048
+.annotate 'line', 6222
     $P3 = $P2.'checkresult'()
     set $S3, $P3
     eq $S3, 'S', __label_1
-.annotate 'line', 6049
-    WSubId_48("string expression", $P2)
+.annotate 'line', 6223
+    WSubId_54("string expression", $P2)
   __label_1: # endif
-.annotate 'line', 6050
-# lreg: $S1
+.annotate 'line', 6224
     $P3 = $P1.'emit_get_nonull'(__ARG_1)
     null $S1
     if_null $P3, __label_2
     set $S1, $P3
   __label_2:
-.annotate 'line', 6051
-# rreg: $S2
+.annotate 'line', 6225
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S2
     if_null $P3, __label_3
     set $S2, $P3
   __label_3:
-.annotate 'line', 6052
+.annotate 'line', 6226
     self.'annotate'(__ARG_1)
-.annotate 'line', 6053
-    set $S3, __ARG_2
-    ne $S3, '', __label_4
-.annotate 'line', 6054
-    __ARG_2 = self.'tempreg'('P')
-  __label_4: # endif
-.annotate 'line', 6055
+.annotate 'line', 6227
     __ARG_1.'say'('    ', 'getattribute ', __ARG_2, ', ', $S1, ", ", $S2)
-# }
-.annotate 'line', 6056
+.annotate 'line', 6228
 
 .end # emit
 
@@ -18410,92 +15237,79 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 6059
-# var left: $P1
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 6231
     getattribute $P1, self, 'left'
-.annotate 'line', 6060
-# var right: $P2
+.annotate 'line', 6232
     getattribute $P2, self, 'right'
-.annotate 'line', 6061
+.annotate 'line', 6233
     $P3 = $P2.'checkresult'()
     set $S5, $P3
     eq $S5, 'S', __label_1
-.annotate 'line', 6062
-    WSubId_48("string expression", $P2)
+.annotate 'line', 6234
+    WSubId_54("string expression", $P2)
   __label_1: # endif
-.annotate 'line', 6063
-# lreg: $S1
+.annotate 'line', 6235
     $P3 = $P1.'emit_get_nonull'(__ARG_1)
     null $S1
     if_null $P3, __label_2
     set $S1, $P3
   __label_2:
-.annotate 'line', 6064
-# rreg: $S2
+.annotate 'line', 6236
     $P3 = $P2.'emit_get'(__ARG_1)
     null $S2
     if_null $P3, __label_3
     set $S2, $P3
   __label_3:
-.annotate 'line', 6065
-# vreg: $S3
+.annotate 'line', 6237
     null $S3
-# switch
-.annotate 'line', 6066
+.annotate 'line', 6238
     $P3 = __ARG_2.'checkresult'()
     set $S5, $P3
-    set $S6, 'P'
-    if $S5 == $S6 goto __label_6
+    if $S5 == 'P' goto __label_6
     goto __label_5
   __label_6: # case
-.annotate 'line', 6068
+.annotate 'line', 6240
     $P4 = __ARG_2.'emit_get'(__ARG_1)
     set $S3, $P4
-.annotate 'line', 6070
+.annotate 'line', 6242
     ne $S3, 'null', __label_7
-# {
-.annotate 'line', 6071
+.annotate 'line', 6243
     $P5 = self.'tempreg'('P')
     set $S3, $P5
-.annotate 'line', 6072
+.annotate 'line', 6244
     __ARG_1.'emitnull'($S3)
-# }
   __label_7: # endif
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 6076
+.annotate 'line', 6248
     $P3 = self.'tempreg'('P')
     set $S3, $P3
-.annotate 'line', 6077
-# aux: $S4
+.annotate 'line', 6249
     $P4 = __ARG_2.'emit_get'(__ARG_1)
     null $S4
     if_null $P4, __label_8
     set $S4, $P4
   __label_8:
-.annotate 'line', 6078
+.annotate 'line', 6250
     __ARG_1.'emitbox'($S3, $S4)
   __label_4: # switch end
-.annotate 'line', 6081
+.annotate 'line', 6253
     self.'annotate'(__ARG_1)
-.annotate 'line', 6082
+.annotate 'line', 6254
     __ARG_1.'say'('    ', "setattribute ", $S1, ", ", $S2, ", ", $S3)
-.annotate 'line', 6083
+.annotate 'line', 6255
     .return($S3)
-# }
-.annotate 'line', 6084
+.annotate 'line', 6256
 
 .end # emit_assign_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
-.annotate 'line', 6029
+.annotate 'line', 6203
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
     addparent $P0, $P1
-.annotate 'line', 6031
+.annotate 'line', 6205
     addattribute $P0, 'right'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'StringIndexExpr' ]
@@ -18505,75 +15319,60 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 6095
+.annotate 'line', 6267
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 6096
+.annotate 'line', 6268
     setattribute self, 'left', __ARG_3
-.annotate 'line', 6097
+.annotate 'line', 6269
     setattribute self, 'arg', __ARG_4
-# }
-.annotate 'line', 6098
+.annotate 'line', 6270
 
 .end # StringIndexExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6101
+.annotate 'line', 6273
     .return('S')
-# }
-.annotate 'line', 6102
+.annotate 'line', 6274
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6105
-# lreg: $S1
+        .param string __ARG_2
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 6277
     getattribute $P2, self, 'left'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 6106
-# rreg: $S2
+.annotate 'line', 6278
     getattribute $P2, self, 'arg'
     $P1 = $P2.'emit_getint'(__ARG_1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 6107
-    set $S3, __ARG_2
-    eq $S3, '', __label_3
-# {
-.annotate 'line', 6108
+.annotate 'line', 6279
     self.'annotate'(__ARG_1)
-.annotate 'line', 6109
-    __ARG_1.'say'('    ', 'substr ', __ARG_2, ', ', $S1, ', ', $S2, ', ', 1)
-# }
-  __label_3: # endif
-# }
-.annotate 'line', 6111
+.annotate 'line', 6280
+    $P1 = WSubId_26("    substr %0, %1, %2, 1", __ARG_2, $S1, $S2)
+    __ARG_1.'say'($P1)
+.annotate 'line', 6282
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringIndexExpr' ]
-.annotate 'line', 6089
+.annotate 'line', 6261
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6091
+.annotate 'line', 6263
     addattribute $P0, 'left'
-.annotate 'line', 6092
+.annotate 'line', 6264
     addattribute $P0, 'arg'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
@@ -18583,111 +15382,88 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 6125
+.annotate 'line', 6296
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6126
+.annotate 'line', 6297
     setattribute self, 'left', __ARG_4
-.annotate 'line', 6127
+.annotate 'line', 6298
     new $P3, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
     $P3.'SimpleArgList'(__ARG_1, __ARG_2, ']')
     set $P2, $P3
     setattribute self, 'args', $P2
-# }
-.annotate 'line', 6128
+.annotate 'line', 6299
 
 .end # IndexExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6131
+.annotate 'line', 6302
     .return('P')
-# }
-.annotate 'line', 6132
+.annotate 'line', 6303
 
 .end # checkresult
 
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_23 = "WSubId_23"
-# Body
-# {
-.annotate 'line', 6135
-# var left: $P1
+.const 'Sub' WSubId_27 = "WSubId_27"
+.annotate 'line', 6306
     getattribute $P4, self, 'left'
     $P1 = $P4.'optimize'()
-.annotate 'line', 6136
+.annotate 'line', 6307
     setattribute self, 'left', $P1
-.annotate 'line', 6137
-# var args: $P2
+.annotate 'line', 6308
     getattribute $P2, self, 'args'
-.annotate 'line', 6138
+.annotate 'line', 6309
     $P2.'optimizeargs'()
-.annotate 'line', 6140
+.annotate 'line', 6311
     $P4 = $P1.'checkresult'()
     set $S2, $P4
     ne $S2, 'S', __label_1
-# {
-.annotate 'line', 6141
+.annotate 'line', 6312
     $P5 = $P2.'numargs'()
     set $I2, $P5
     eq $I2, 1, __label_2
-.annotate 'line', 6142
+.annotate 'line', 6313
     WSubId_1('Bad string index', self)
   __label_2: # endif
-.annotate 'line', 6143
-# var arg: $P3
+.annotate 'line', 6314
     $P3 = $P2.'getarg'(0)
-.annotate 'line', 6146
-    $P5 = $P1.'isstringliteral'()
-    unless $P5 goto __label_4
-    $P6 = $P3.'isintegerliteral'()
-    set $P4, $P6
-    goto __label_5
+.annotate 'line', 6317
+    $P4 = $P1.'isstringliteral'()
+    unless $P4 goto __label_4
+    $P4 = $P3.'isintegerliteral'()
   __label_4:
-    set $P4, $P5
-  __label_5:
     if_null $P4, __label_3
     unless $P4 goto __label_3
-# {
-.annotate 'line', 6147
-# ival: $I1
-    $P7 = $P3.'getIntegerValue'()
-    set $I1, $P7
-.annotate 'line', 6148
-# sval: $S1
+.annotate 'line', 6318
+    $P5 = $P3.'getIntegerValue'()
+    set $I1, $P5
+.annotate 'line', 6319
     $P4 = $P1.'get_value'()
     null $S1
-    if_null $P4, __label_6
+    if_null $P4, __label_5
     set $S1, $P4
-  __label_6:
-.annotate 'line', 6149
+  __label_5:
+.annotate 'line', 6320
     getattribute $P4, self, 'owner'
     getattribute $P5, self, 'start'
-.annotate 'line', 6150
-# builtin substr
+.annotate 'line', 6321
     substr $S2, $S1, $I1, 1
-.annotate 'line', 6149
-    .tailcall WSubId_23($P4, $P5, $S2)
-# }
+.annotate 'line', 6320
+    .tailcall WSubId_27($P4, $P5, $S2)
   __label_3: # endif
-.annotate 'line', 6152
+.annotate 'line', 6323
     new $P5, [ 'Winxed'; 'Compiler'; 'StringIndexExpr' ]
     getattribute $P6, self, 'owner'
     getattribute $P7, self, 'start'
     $P5.'StringIndexExpr'($P6, $P7, $P1, $P3)
     set $P4, $P5
     .return($P4)
-# }
   __label_1: # endif
-.annotate 'line', 6155
+.annotate 'line', 6326
     .return(self)
-# }
-.annotate 'line', 6156
+.annotate 'line', 6327
 
 .end # optimize
 
@@ -18695,49 +15471,41 @@
 .sub 'emit_prep' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 6159
+.annotate 'line', 6330
     getattribute $P2, self, 'regleft'
-    isnull $I2, $P2
-    not $I2
-    if $I2 goto __label_2
+    isnull $I1, $P2
+    not $I1
+    if $I1 goto __label_2
     getattribute $P3, self, 'argregs'
-    isnull $I3, $P3
-    not $I3
-    set $I1, $I3
-    goto __label_3
+    isnull $I1, $P3
+    not $I1
   __label_2:
-    set $I1, $I2
-  __label_3:
     unless $I1 goto __label_1
-.annotate 'line', 6160
+.annotate 'line', 6331
     getattribute $P4, self, 'start'
     WSubId_6('wrong call to IndexExpr.emit_args', $P4)
   __label_1: # endif
-.annotate 'line', 6161
-# var left: $P1
+.annotate 'line', 6332
     getattribute $P1, self, 'left'
-.annotate 'line', 6162
+.annotate 'line', 6333
     $P4 = $P1.'isidentifier'()
-    if_null $P4, __label_5
-    unless $P4 goto __label_5
-.annotate 'line', 6163
+    if_null $P4, __label_4
+    unless $P4 goto __label_4
+.annotate 'line', 6334
     $P3 = $P1.'getIdentifier'()
-    goto __label_4
-  __label_5:
-.annotate 'line', 6164
+    goto __label_3
+  __label_4:
+.annotate 'line', 6335
     $P5 = $P1.'emit_get'(__ARG_1)
     set $P3, $P5
-  __label_4:
-.annotate 'line', 6162
+  __label_3:
+.annotate 'line', 6333
     setattribute self, 'regleft', $P3
-.annotate 'line', 6165
+.annotate 'line', 6336
     getattribute $P4, self, 'args'
     $P3 = $P4.'getargvalues'(__ARG_1)
     setattribute self, 'argregs', $P3
-# }
-.annotate 'line', 6166
+.annotate 'line', 6337
 
 .end # emit_prep
 
@@ -18745,81 +15513,64 @@
 .sub 'emit_aux' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 6169
-# var regleft: $P1
+.annotate 'line', 6340
     getattribute $P1, self, 'regleft'
-.annotate 'line', 6170
-# var argregs: $P2
+.annotate 'line', 6341
     getattribute $P2, self, 'argregs'
-.annotate 'line', 6171
-    isnull $I2, $P1
-    if $I2 goto __label_2
-    isnull $I3, $P2
-    set $I1, $I3
-    goto __label_3
+.annotate 'line', 6342
+    isnull $I1, $P1
+    if $I1 goto __label_2
+    isnull $I1, $P2
   __label_2:
-    set $I1, $I2
-  __label_3:
     unless $I1 goto __label_1
-.annotate 'line', 6172
+.annotate 'line', 6343
     getattribute $P3, self, 'start'
     WSubId_6('wrong call to IndexExpr.emit_aux', $P3)
   __label_1: # endif
-.annotate 'line', 6173
+.annotate 'line', 6344
     getattribute $P3, self, 'regleft'
     __ARG_1.'print'($P3, '[')
-.annotate 'line', 6174
-# builtin join
+.annotate 'line', 6345
     join $S1, '; ', $P2
     __ARG_1.'print'($S1)
-.annotate 'line', 6175
+.annotate 'line', 6346
     __ARG_1.'print'(']')
-# }
-.annotate 'line', 6176
+.annotate 'line', 6347
 
 .end # emit_aux
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6179
+        .param string __ARG_2
+.annotate 'line', 6350
     self.'emit_prep'(__ARG_1)
-.annotate 'line', 6180
+.annotate 'line', 6351
     self.'annotate'(__ARG_1)
-.annotate 'line', 6181
+.annotate 'line', 6352
     __ARG_1.'print'('    ', __ARG_2, ' = ')
-.annotate 'line', 6182
+.annotate 'line', 6353
     self.'emit_aux'(__ARG_1)
-.annotate 'line', 6183
+.annotate 'line', 6354
     __ARG_1.'say'('')
-# }
-.annotate 'line', 6184
+.annotate 'line', 6355
 
 .end # emit
 
 
 .sub 'emit_getint' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 6187
-# result: $S1
+.annotate 'line', 6358
     $P1 = self.'tempreg'('I')
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 6188
+.annotate 'line', 6359
     self.'emit'(__ARG_1, $S1)
-.annotate 'line', 6189
+.annotate 'line', 6360
     .return($S1)
-# }
-.annotate 'line', 6190
+.annotate 'line', 6361
 
 .end # emit_getint
 
@@ -18828,20 +15579,17 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 6193
+.annotate 'line', 6364
     self.'emit_prep'(__ARG_1)
-.annotate 'line', 6194
+.annotate 'line', 6365
     self.'annotate'(__ARG_1)
-.annotate 'line', 6195
+.annotate 'line', 6366
     __ARG_1.'print'('    ')
-.annotate 'line', 6196
+.annotate 'line', 6367
     self.'emit_aux'(__ARG_1)
-.annotate 'line', 6197
+.annotate 'line', 6368
     __ARG_1.'say'(' = ', __ARG_3)
-# }
-.annotate 'line', 6198
+.annotate 'line', 6369
 
 .end # emit_assign
 
@@ -18849,57 +15597,51 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6201
+.annotate 'line', 6372
     self.'emit_prep'(__ARG_1)
-.annotate 'line', 6202
-# rreg: $S1
+.annotate 'line', 6373
     null $S1
-.annotate 'line', 6203
+.annotate 'line', 6374
     $P1 = __ARG_2.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-# {
-.annotate 'line', 6204
+.annotate 'line', 6375
     $P2 = self.'tempreg'('P')
     set $S1, $P2
-.annotate 'line', 6205
+.annotate 'line', 6376
     __ARG_1.'emitnull'($S1)
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 6208
+.annotate 'line', 6379
     $P1 = __ARG_2.'emit_get'(__ARG_1)
     set $S1, $P1
   __label_2: # endif
-.annotate 'line', 6209
+.annotate 'line', 6380
     self.'annotate'(__ARG_1)
-.annotate 'line', 6210
+.annotate 'line', 6381
     __ARG_1.'print'('    ')
-.annotate 'line', 6211
+.annotate 'line', 6382
     self.'emit_aux'(__ARG_1)
-.annotate 'line', 6212
+.annotate 'line', 6383
     __ARG_1.'say'(' = ', $S1)
-.annotate 'line', 6213
+.annotate 'line', 6384
     .return($S1)
-# }
-.annotate 'line', 6214
+.annotate 'line', 6385
 
 .end # emit_assign_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-.annotate 'line', 6116
+.annotate 'line', 6287
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6118
+.annotate 'line', 6289
     addattribute $P0, 'left'
-.annotate 'line', 6119
+.annotate 'line', 6290
     addattribute $P0, 'regleft'
-.annotate 'line', 6120
+.annotate 'line', 6291
     addattribute $P0, 'args'
-.annotate 'line', 6121
+.annotate 'line', 6292
     addattribute $P0, 'argregs'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
@@ -18908,107 +15650,84 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 6225
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 6396
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6226
-# var t: $P1
+.annotate 'line', 6397
     $P1 = __ARG_1.'get'()
-.annotate 'line', 6227
+.annotate 'line', 6398
     $P2 = $P1.'isop'(']')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 6228
+.annotate 'line', 6399
     __ARG_1.'unget'($P1)
-.annotate 'line', 6229
-    $P3 = WSubId_44(__ARG_1, __ARG_2, WSubId_45, ']')
+.annotate 'line', 6400
+    $P3 = WSubId_50(__ARG_1, __ARG_2, WSubId_51, ']')
     setattribute self, 'values', $P3
-# }
   __label_1: # endif
-# }
-.annotate 'line', 6231
+.annotate 'line', 6402
 
 .end # ArrayExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6232
+.annotate 'line', 6403
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 6235
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 6406
     getattribute $P1, self, 'values'
-    WSubId_46($P1)
-.annotate 'line', 6236
+    WSubId_52($P1)
+.annotate 'line', 6407
     .return(self)
-# }
-.annotate 'line', 6237
+.annotate 'line', 6408
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6240
-    set $S2, __ARG_2
-    eq $S2, '', __label_1
-# {
-.annotate 'line', 6241
-# value: $S1
+        .param string __ARG_2
+.annotate 'line', 6411
     $P1 = self.'emit_get'(__ARG_1)
     null $S1
-    if_null $P1, __label_3
+    if_null $P1, __label_1
     set $S1, $P1
-  __label_3:
-.annotate 'line', 6242
+  __label_1:
+.annotate 'line', 6412
     __ARG_1.'emitset'(__ARG_2, $S1)
-# }
-    goto __label_2
-  __label_1: # else
-# {
-.annotate 'line', 6248
-    self.'emit_init'(__ARG_1, '')
-# }
-  __label_2: # endif
-# }
-.annotate 'line', 6250
+.annotate 'line', 6413
 
 .end # emit
 
 
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 6419
+    self.'emit_init'(__ARG_1, '')
+.annotate 'line', 6420
+
+.end # emit_void
+
+
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 6253
-# container: $S1
+.annotate 'line', 6423
     $P1 = self.'tempreg'('P')
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 6254
+.annotate 'line', 6424
     self.'emit_init'(__ARG_1, $S1)
-.annotate 'line', 6255
+.annotate 'line', 6425
     .return($S1)
-# }
-.annotate 'line', 6256
+.annotate 'line', 6426
 
 .end # emit_get
 
@@ -19016,82 +15735,69 @@
 .sub 'emit_init' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 6259
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 6429
     self.'annotate'(__ARG_1)
-.annotate 'line', 6260
-# var values: $P1
+.annotate 'line', 6430
     getattribute $P1, self, 'values'
-.annotate 'line', 6261
-# size: $I1
+.annotate 'line', 6431
     unless_null $P1, __label_2
     null $I1
     goto __label_1
   __label_2:
-# builtin elements
     elements $I1, $P1
   __label_1:
-.annotate 'line', 6262
+.annotate 'line', 6432
     eq __ARG_2, '', __label_3
-# {
-.annotate 'line', 6263
+.annotate 'line', 6433
     __ARG_1.'say'('    ', 'root_new ', __ARG_2, ", ['parrot';'ResizablePMCArray']")
-.annotate 'line', 6264
+.annotate 'line', 6434
     le $I1, 0, __label_4
-.annotate 'line', 6265
+.annotate 'line', 6435
     __ARG_1.'emitassign'(__ARG_2, $I1)
   __label_4: # endif
-# }
   __label_3: # endif
-.annotate 'line', 6267
-# var collect: $P2
+.annotate 'line', 6437
     new $P2, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     getattribute $P4, self, 'owner'
     $P2.'CollectValues'($P4, __ARG_1)
-.annotate 'line', 6268
-# i: $I2
+.annotate 'line', 6438
     null $I2
-.annotate 'line', 6269
+.annotate 'line', 6439
     if_null $P1, __label_6
     iter $P5, $P1
     set $P5, 0
   __label_5: # for iteration
     unless $P5 goto __label_6
     shift $P3, $P5
-# {
-.annotate 'line', 6270
-# valuereg: $S1
+.annotate 'line', 6440
     $P4 = $P2.'add'($P3)
     null $S1
     if_null $P4, __label_7
     set $S1, $P4
   __label_7:
-.annotate 'line', 6271
+.annotate 'line', 6441
     eq __ARG_2, '', __label_8
-# {
-.annotate 'line', 6272
+.annotate 'line', 6442
     self.'annotate'(__ARG_1)
-.annotate 'line', 6273
-    __ARG_1.'say'('    ', __ARG_2, "[", $I2, "] = ", $S1)
-.annotate 'line', 6274
+.annotate 'line', 6443
+    $P4 = WSubId_26("    %0[%1] = %2", __ARG_2, $I2, $S1)
+    __ARG_1.'say'($P4)
+.annotate 'line', 6444
     inc $I2
-# }
   __label_8: # endif
-# }
     goto __label_5
   __label_6: # endfor
-# }
-.annotate 'line', 6277
+.annotate 'line', 6447
 
 .end # emit_init
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
-.annotate 'line', 6219
+.annotate 'line', 6390
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6221
+.annotate 'line', 6392
     addattribute $P0, 'values'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'HashExpr' ]
@@ -19100,308 +15806,252 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 6289
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 6459
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6290
-# var t: $P1
+.annotate 'line', 6460
     $P1 = __ARG_1.'get'()
-.annotate 'line', 6291
-# var keys: $P2
+.annotate 'line', 6461
     root_new $P2, ['parrot';'ResizablePMCArray']
-.annotate 'line', 6292
-# var values: $P3
+.annotate 'line', 6462
     root_new $P3, ['parrot';'ResizablePMCArray']
-.annotate 'line', 6293
+.annotate 'line', 6463
     $P6 = $P1.'isop'('}')
     isfalse $I1, $P6
     unless $I1 goto __label_1
-# {
-.annotate 'line', 6294
+.annotate 'line', 6464
     __ARG_1.'unget'($P1)
   __label_2: # do
-.annotate 'line', 6295
-# {
-.annotate 'line', 6296
-# var key: $P4
-    $P4 = WSubId_45(__ARG_1, __ARG_2)
-.annotate 'line', 6297
-    WSubId_62(':', __ARG_1)
-.annotate 'line', 6298
-# var value: $P5
-    $P5 = WSubId_45(__ARG_1, __ARG_2)
-.annotate 'line', 6299
-# builtin push
+.annotate 'line', 6466
+    $P4 = WSubId_51(__ARG_1, __ARG_2)
+.annotate 'line', 6467
+    WSubId_68(':', __ARG_1)
+.annotate 'line', 6468
+    $P5 = WSubId_51(__ARG_1, __ARG_2)
+.annotate 'line', 6469
     push $P2, $P4
-.annotate 'line', 6300
-# builtin push
+.annotate 'line', 6470
     push $P3, $P5
-# }
   __label_4: # continue
-.annotate 'line', 6302
+.annotate 'line', 6472
     $P1 = __ARG_1.'get'()
     $P6 = $P1.'isop'(',')
     if_null $P6, __label_3
     if $P6 goto __label_2
   __label_3: # enddo
-.annotate 'line', 6303
+.annotate 'line', 6473
     $P6 = $P1.'isop'('}')
     isfalse $I1, $P6
     unless $I1 goto __label_5
-.annotate 'line', 6304
-    WSubId_48("',' or '}'", $P1)
+.annotate 'line', 6474
+    WSubId_54("',' or '}'", $P1)
   __label_5: # endif
-# }
   __label_1: # endif
-.annotate 'line', 6306
+.annotate 'line', 6476
     setattribute self, 'keys', $P2
-.annotate 'line', 6307
+.annotate 'line', 6477
     setattribute self, 'values', $P3
-# }
-.annotate 'line', 6308
+.annotate 'line', 6478
 
 .end # HashExpr
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6309
+.annotate 'line', 6479
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 6312
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 6482
     getattribute $P1, self, 'keys'
-    WSubId_46($P1)
-.annotate 'line', 6313
+    WSubId_52($P1)
+.annotate 'line', 6483
     getattribute $P1, self, 'values'
-    WSubId_46($P1)
-.annotate 'line', 6314
+    WSubId_52($P1)
+.annotate 'line', 6484
     .return(self)
-# }
-.annotate 'line', 6315
+.annotate 'line', 6485
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6318
+        .param string __ARG_2
+.annotate 'line', 6488
     self.'annotate'(__ARG_1)
-.annotate 'line', 6323
-    set $S4, __ARG_2
-    eq $S4, '', __label_1
-.annotate 'line', 6324
+.annotate 'line', 6493
+    eq __ARG_2, '', __label_1
+.annotate 'line', 6494
     __ARG_1.'say'('    ', 'root_new ', __ARG_2, ", ['parrot';'Hash']")
   __label_1: # endif
-.annotate 'line', 6326
-# var keys: $P1
+.annotate 'line', 6496
     getattribute $P1, self, 'keys'
-.annotate 'line', 6327
-# var values: $P2
+.annotate 'line', 6497
     getattribute $P2, self, 'values'
-.annotate 'line', 6328
-# var collectvalues: $P3
+.annotate 'line', 6498
     new $P3, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     getattribute $P5, self, 'owner'
     $P3.'CollectValues'($P5, __ARG_1)
-.annotate 'line', 6329
-# n: $I1
+.annotate 'line', 6499
     set $I1, $P1
-# for loop
-.annotate 'line', 6330
-# i: $I2
+.annotate 'line', 6500
     null $I2
   __label_4: # for condition
     ge $I2, $I1, __label_3
-# {
-.annotate 'line', 6331
-# var key: $P4
+.annotate 'line', 6501
     $P4 = $P1[$I2]
-.annotate 'line', 6332
-# keyreg: $S1
+.annotate 'line', 6502
     null $S1
-.annotate 'line', 6333
-    $P6 = $P4.'isidentifier'()
-    unless $P6 goto __label_7
-    $P7 = $P4.'checkIdentifier'()
-    set $S4, $P7
+.annotate 'line', 6503
+    $P5 = $P4.'isidentifier'()
+    unless $P5 goto __label_7
+    $P6 = $P4.'checkIdentifier'()
+    set $S4, $P6
     iseq $I3, $S4, ''
     box $P5, $I3
-    goto __label_8
   __label_7:
-    set $P5, $P6
-  __label_8:
     if_null $P5, __label_5
     unless $P5 goto __label_5
-# {
-.annotate 'line', 6334
-# id: $S2
-    $P8 = $P4.'getName'()
+.annotate 'line', 6504
+    $P7 = $P4.'getName'()
     null $S2
-    if_null $P8, __label_9
-    set $S2, $P8
-  __label_9:
-.annotate 'line', 6335
+    if_null $P7, __label_8
+    set $S2, $P7
+  __label_8:
+.annotate 'line', 6505
     $P5 = self.'tempreg'('P')
     set $S1, $P5
-.annotate 'line', 6336
+.annotate 'line', 6506
     __ARG_1.'emitget_hll_global'($S1, $S2)
-# }
     goto __label_6
   __label_5: # else
-.annotate 'line', 6339
+.annotate 'line', 6509
     $P5 = $P4.'emit_get'(__ARG_1)
     set $S1, $P5
   __label_6: # endif
-.annotate 'line', 6341
-# valuereg: $S3
+.annotate 'line', 6511
     $P6 = $P2[$I2]
     $P5 = $P3.'add'($P6)
     null $S3
-    if_null $P5, __label_10
+    if_null $P5, __label_9
     set $S3, $P5
-  __label_10:
-.annotate 'line', 6342
-    set $S4, __ARG_2
-    eq $S4, '', __label_11
-.annotate 'line', 6343
+  __label_9:
+.annotate 'line', 6512
+    eq __ARG_2, '', __label_10
+.annotate 'line', 6513
     __ARG_1.'say'('    ', __ARG_2, '[', $S1, '] = ', $S3)
-  __label_11: # endif
-# }
+  __label_10: # endif
   __label_2: # for iteration
-.annotate 'line', 6330
+.annotate 'line', 6500
     inc $I2
     goto __label_4
   __label_3: # for end
-# }
-.annotate 'line', 6345
+.annotate 'line', 6515
 
 .end # emit
 
 
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+.annotate 'line', 6518
+    self.'emit'(__ARG_1, '')
+.annotate 'line', 6519
+
+.end # emit_void
+
+
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 6348
-# container: $S1
+.annotate 'line', 6522
     $P1 = self.'tempreg'('P')
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 6349
+.annotate 'line', 6523
     self.'emit'(__ARG_1, $S1)
-.annotate 'line', 6350
+.annotate 'line', 6524
     .return($S1)
-# }
-.annotate 'line', 6351
+.annotate 'line', 6525
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'HashExpr' ]
-.annotate 'line', 6282
+.annotate 'line', 6452
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6284
+.annotate 'line', 6454
     addattribute $P0, 'keys'
-.annotate 'line', 6285
+.annotate 'line', 6455
     addattribute $P0, 'values'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6364
+.annotate 'line', 6538
     .return('P')
-# }
 
 .end # checkresult
 
 
 .sub 'parseinitializer' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 6369
+.annotate 'line', 6543
     new $P3, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
     getattribute $P4, self, 'owner'
     getattribute $P5, self, 'start'
     $P3.'ArgumentList'($P4, $P5, __ARG_1, ')')
     set $P2, $P3
     setattribute self, 'initializer', $P2
-# }
-.annotate 'line', 6370
+.annotate 'line', 6544
 
 .end # parseinitializer
 
 
 .sub 'numargs' :method
-# Body
-# {
-.annotate 'line', 6373
-# var initializer: $P1
+.annotate 'line', 6547
     getattribute $P1, self, 'initializer'
-.annotate 'line', 6374
+.annotate 'line', 6548
     unless_null $P1, __label_2
     set $I1, -1
     goto __label_1
   __label_2:
-# builtin int
     $P2 = $P1.'numargs'()
     set $I1, $P2
   __label_1:
     .return($I1)
-# }
-.annotate 'line', 6375
+.annotate 'line', 6549
 
 .end # numargs
 
 
 .sub 'optimize_initializer' :method
-# Body
-# {
-.annotate 'line', 6378
-# var initializer: $P1
+.annotate 'line', 6552
     getattribute $P1, self, 'initializer'
-.annotate 'line', 6379
+.annotate 'line', 6553
     if_null $P1, __label_1
-.annotate 'line', 6380
+.annotate 'line', 6554
     $P3 = $P1.'optimize'()
     setattribute self, 'initializer', $P3
   __label_1: # endif
-# }
-.annotate 'line', 6381
+.annotate 'line', 6555
 
 .end # optimize_initializer
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 6384
+.annotate 'line', 6558
     self.'optimize_initializer'()
-.annotate 'line', 6385
+.annotate 'line', 6559
     .return(self)
-# }
-.annotate 'line', 6386
+.annotate 'line', 6560
 
 .end # optimize
 
@@ -19410,52 +16060,45 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 6389
-# var initializer: $P1
+.annotate 'line', 6563
     getattribute $P1, self, 'initializer'
-.annotate 'line', 6390
+.annotate 'line', 6564
     if_null $P1, __label_1
-.annotate 'line', 6391
+.annotate 'line', 6565
     $P1.'getargvalues'(__ARG_1)
   __label_1: # endif
-.annotate 'line', 6392
+.annotate 'line', 6566
     __ARG_1.'print'('    ', __ARG_2, ".'", __ARG_3, "'(")
-.annotate 'line', 6393
+.annotate 'line', 6567
     if_null $P1, __label_2
-.annotate 'line', 6394
+.annotate 'line', 6568
     $P1.'emitargs'(__ARG_1)
   __label_2: # endif
-.annotate 'line', 6395
+.annotate 'line', 6569
     __ARG_1.'say'(")")
-# }
-.annotate 'line', 6396
+.annotate 'line', 6570
 
 .end # emit_constructor
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
-.annotate 'line', 6356
+.annotate 'line', 6530
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6358
+.annotate 'line', 6532
     addattribute $P0, 'initializer'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'warn_class_unknown' :subid('WSubId_77')
+.sub 'warn_class_unknown' :subid('WSubId_83')
         .param pmc __ARG_1
         .param string __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 6403
+.annotate 'line', 6577
     concat $S1, "class ", __ARG_2
     concat $S1, $S1, " not found at compile time"
     __ARG_1.'warn'($S1, __ARG_3)
-# }
-.annotate 'line', 6404
+.annotate 'line', 6578
 
 .end # warn_class_unknown
 
@@ -19467,134 +16110,106 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 6412
+.annotate 'line', 6586
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6414
-    $P3 = __ARG_4.'isstring'()
-    if $P3 goto __label_2
-    $P4 = __ARG_4.'isidentifier'()
-    set $P2, $P4
-    goto __label_3
+.annotate 'line', 6588
+    $P2 = __ARG_4.'isstring'()
+    if $P2 goto __label_2
+    $P2 = __ARG_4.'isidentifier'()
   __label_2:
-    set $P2, $P3
-  __label_3:
     isfalse $I1, $P2
     unless $I1 goto __label_1
-.annotate 'line', 6415
+.annotate 'line', 6589
     WSubId_1("Unimplemented", __ARG_4)
   __label_1: # endif
-.annotate 'line', 6416
+.annotate 'line', 6590
     setattribute self, 'value', __ARG_4
-.annotate 'line', 6417
-# var t: $P1
+.annotate 'line', 6591
     $P1 = __ARG_1.'get'()
-.annotate 'line', 6419
+.annotate 'line', 6593
     $P2 = $P1.'isop'('(')
-    if_null $P2, __label_4
-    unless $P2 goto __label_4
-.annotate 'line', 6420
+    if_null $P2, __label_3
+    unless $P2 goto __label_3
+.annotate 'line', 6594
     self.'parseinitializer'(__ARG_1)
-    goto __label_5
-  __label_4: # else
-.annotate 'line', 6422
+    goto __label_4
+  __label_3: # else
+.annotate 'line', 6596
     __ARG_1.'unget'($P1)
-  __label_5: # endif
-# }
-.annotate 'line', 6423
+  __label_4: # endif
+.annotate 'line', 6597
 
 .end # NewExpr
 
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 6426
-# var value: $P1
+.annotate 'line', 6600
     getattribute $P1, self, 'value'
-.annotate 'line', 6427
+.annotate 'line', 6601
     $P3 = $P1.'isidentifier'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 6430
-# var desc: $P2
+.annotate 'line', 6604
     getattribute $P4, self, 'owner'
     $P5 = $P1.'getidentifier'()
     $P2 = $P4.'getvar'($P5)
-.annotate 'line', 6431
+.annotate 'line', 6605
     isnull $I1, $P2
     not $I1
-    unless $I1 goto __label_3
-    $P4 = $P2.'isconst'()
-    set $P3, $P4
-    goto __label_4
-  __label_3:
     box $P3, $I1
-  __label_4:
+    unless $P3 goto __label_3
+    $P3 = $P2.'isconst'()
+  __label_3:
     if_null $P3, __label_2
     unless $P3 goto __label_2
-# {
-.annotate 'line', 6432
+.annotate 'line', 6606
     $P1 = $P2.'getvalue'()
-.annotate 'line', 6433
+.annotate 'line', 6607
     isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     not $I1, $I2
-    unless $I1 goto __label_5
-.annotate 'line', 6434
+    unless $I1 goto __label_4
+.annotate 'line', 6608
     WSubId_1('Constant value must evaluate to a string', $P1)
-  __label_5: # endif
-.annotate 'line', 6435
+  __label_4: # endif
+.annotate 'line', 6609
     getattribute $P4, $P1, 'strval'
     setattribute self, 'value', $P4
-# }
   __label_2: # endif
-# }
   __label_1: # endif
-.annotate 'line', 6438
+.annotate 'line', 6612
     self.'optimize_initializer'()
-.annotate 'line', 6439
+.annotate 'line', 6613
     .return(self)
-# }
-.annotate 'line', 6440
+.annotate 'line', 6614
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
         .param int __ARG_3 :optional
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_83 = "WSubId_83"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 6443
+.annotate 'line', 6617
     self.'annotate'(__ARG_1)
-.annotate 'line', 6445
-# var initializer: $P1
+.annotate 'line', 6619
     getattribute $P1, self, 'initializer'
-.annotate 'line', 6446
-# var value: $P2
+.annotate 'line', 6620
     getattribute $P2, self, 'value'
-.annotate 'line', 6447
-# numinits: $I1
+.annotate 'line', 6621
     $P8 = self.'numargs'()
     set $I1, $P8
-# Constant BYNAME evaluated at compile time
-# Constant BYIDENT evaluated at compile time
-.annotate 'line', 6450
-# type: $I2
+.annotate 'line', 6624
     $P8 = $P2.'isstring'()
     if_null $P8, __label_2
     unless $P8 goto __label_2
     null $I2
     goto __label_1
   __label_2:
-.annotate 'line', 6451
+.annotate 'line', 6625
     $P9 = $P2.'isidentifier'()
     if_null $P9, __label_4
     unless $P9 goto __label_4
@@ -19604,235 +16219,175 @@
     set $I2, -1
   __label_3:
   __label_1:
-.annotate 'line', 6453
-# reginit: $S1
+.annotate 'line', 6627
     set $S1, ''
-.annotate 'line', 6454
-# regnew: $S2
-    null $S2
-    if_null __ARG_2, __label_5
+.annotate 'line', 6628
     set $S2, __ARG_2
-  __label_5:
-.annotate 'line', 6455
-# constructor: $S3
+.annotate 'line', 6629
     null $S3
-# switch
-.annotate 'line', 6456
-    set $I3, $I1
-    set $I4, -1
-    if $I3 == $I4 goto __label_8
-    null $I4
-    if $I3 == $I4 goto __label_9
-    set $I4, 1
-    if $I3 == $I4 goto __label_10
-    goto __label_7
+.annotate 'line', 6630
+    if $I1 == -1 goto __label_7
+    if $I1 == 0 goto __label_8
+    if $I1 == 1 goto __label_9
+    goto __label_6
+  __label_7: # case
   __label_8: # case
+    goto __label_5 # break
   __label_9: # case
-    goto __label_6 # break
-  __label_10: # case
-.annotate 'line', 6461
-    ne $I2, 1, __label_11
-# {
-.annotate 'line', 6462
-    not $I5, __ARG_3
-    unless $I5 goto __label_13
-.annotate 'line', 6463
+.annotate 'line', 6635
+    ne $I2, 1, __label_10
+.annotate 'line', 6636
+    not $I4, __ARG_3
+    unless $I4 goto __label_12
+.annotate 'line', 6637
     $P8 = self.'tempreg'('P')
     set $S2, $P8
-  __label_13: # endif
-# }
-    goto __label_12
-  __label_11: # else
-# {
-.annotate 'line', 6466
-# var initval: $P3
+  __label_12: # endif
+    goto __label_11
+  __label_10: # else
+.annotate 'line', 6640
     $P3 = $P1.'getfreearg'(0)
-.annotate 'line', 6467
+.annotate 'line', 6641
     $P8 = $P3.'emit_get'(__ARG_1)
     set $S1, $P8
-.annotate 'line', 6468
+.annotate 'line', 6642
     concat $S5, ', ', $S1
     set $S1, $S5
-# }
-  __label_12: # endif
-    goto __label_6 # break
-  __label_7: # default
-.annotate 'line', 6472
-    eq $I2, 1, __label_14
-.annotate 'line', 6473
+  __label_11: # endif
+    goto __label_5 # break
+  __label_6: # default
+.annotate 'line', 6646
+    eq $I2, 1, __label_13
+.annotate 'line', 6647
     WSubId_1('Multiple init arguments not allowed here', self)
-  __label_14: # endif
-.annotate 'line', 6474
+  __label_13: # endif
+.annotate 'line', 6648
     not $I3, __ARG_3
-    unless $I3 goto __label_15
-.annotate 'line', 6475
+    unless $I3 goto __label_14
+.annotate 'line', 6649
+    $P8 = self.'tempreg'('P')
+    set $S2, $P8
+  __label_14: # endif
+  __label_5: # switch end
+.annotate 'line', 6652
+    ne $S2, '', __label_15
+.annotate 'line', 6653
     $P8 = self.'tempreg'('P')
     set $S2, $P8
   __label_15: # endif
-  __label_6: # switch end
-.annotate 'line', 6478
-    ne $S2, '', __label_16
-.annotate 'line', 6479
-    $P8 = self.'tempreg'('P')
-    set $S2, $P8
-  __label_16: # endif
-# switch
-.annotate 'line', 6481
-    set $I3, $I2
-    null $I4
-    if $I3 == $I4 goto __label_19
-    set $I4, 1
-    if $I3 == $I4 goto __label_20
-    goto __label_18
-  __label_19: # case
-.annotate 'line', 6484
-# name: $S4
+.annotate 'line', 6655
+    if $I2 == 0 goto __label_18
+    if $I2 == 1 goto __label_19
+    goto __label_17
+  __label_18: # case
+.annotate 'line', 6658
     $P8 = $P2.'rawstring'()
     null $S4
-    if_null $P8, __label_21
+    if_null $P8, __label_20
     set $S4, $P8
-  __label_21:
-.annotate 'line', 6485
-# var aux: $P4
-# builtin get_class
+  __label_20:
+.annotate 'line', 6659
     get_class $P4, $S4
-.annotate 'line', 6486
-    unless_null $P4, __label_22
-.annotate 'line', 6487
-    WSubId_77(__ARG_1, $S4, $P2)
-  __label_22: # endif
-.annotate 'line', 6491
+.annotate 'line', 6660
+    unless_null $P4, __label_21
+.annotate 'line', 6661
+    WSubId_83(__ARG_1, $S4, $P2)
+  __label_21: # endif
+.annotate 'line', 6665
     __ARG_1.'say'('    ', 'new ', $S2, ", [ ", $P2, " ]", $S1)
-.annotate 'line', 6492
-    le $I1, 1, __label_23
-# {
-.annotate 'line', 6493
+.annotate 'line', 6666
+    le $I1, 1, __label_22
+.annotate 'line', 6667
     __ARG_1.'say'($S2, ".'", $P2, "'()")
-# }
-  __label_23: # endif
-    goto __label_17 # break
-  __label_20: # case
-.annotate 'line', 6497
-# var id: $P5
+  __label_22: # endif
+    goto __label_16 # break
+  __label_19: # case
+.annotate 'line', 6671
     getattribute $P8, self, 'owner'
     $P5 = $P8.'getvar'($P2)
-.annotate 'line', 6498
-    unless_null $P5, __label_24
-# {
-.annotate 'line', 6499
-# var cl: $P6
+.annotate 'line', 6672
+    unless_null $P5, __label_23
+.annotate 'line', 6673
     getattribute $P9, self, 'owner'
     $P6 = $P9.'checkclass'($P2)
-.annotate 'line', 6500
-    if_null $P6, __label_26
-# {
-.annotate 'line', 6501
-# var key: $P7
+.annotate 'line', 6674
+    if_null $P6, __label_25
+.annotate 'line', 6675
     $P7 = $P6.'getpath'()
-.annotate 'line', 6502
+.annotate 'line', 6676
     $P7.'emit_new'(__ARG_1, self, $S2, $S1)
-# }
-    goto __label_27
-  __label_26: # else
-# {
-.annotate 'line', 6505
+    goto __label_26
+  __label_25: # else
+.annotate 'line', 6679
     root_new $P8, ['parrot';'ResizablePMCArray']
     assign $P8, 1
     $P8[0] = $P2
     $P5 = self.'scopesearch'($P8, 2)
-.annotate 'line', 6506
-    if_null $P5, __label_28
-.annotate 'line', 6507
+.annotate 'line', 6680
+    if_null $P5, __label_27
+.annotate 'line', 6681
     $P8 = $P5.'getclasskey'()
     __ARG_1.'say'('    ', 'new ', $S2, ", ", $P8, $S1)
-    goto __label_29
-  __label_28: # else
-# {
-.annotate 'line', 6509
+    goto __label_28
+  __label_27: # else
+.annotate 'line', 6683
     $P9 = $P2.'getidentifier'()
-    WSubId_77(__ARG_1, $P9, $P2)
-.annotate 'line', 6510
+    WSubId_83(__ARG_1, $P9, $P2)
+.annotate 'line', 6684
     __ARG_1.'say'('    ', 'new ', $S2, ", ['", $P2, "']", $S1)
-# }
-  __label_29: # endif
-# }
-  __label_27: # endif
-.annotate 'line', 6513
+  __label_28: # endif
+  __label_26: # endif
+.annotate 'line', 6687
     set $S3, $P2
-# }
-    goto __label_25
-  __label_24: # else
-# {
-.annotate 'line', 6517
+    goto __label_24
+  __label_23: # else
+.annotate 'line', 6691
     $P8 = $P5.'getreg'()
     __ARG_1.'say'('    ', 'new ', $S2, ", ", $P8, "", $S1)
-# }
-  __label_25: # endif
-    goto __label_17 # break
-  __label_18: # default
-.annotate 'line', 6521
+  __label_24: # endif
+    goto __label_16 # break
+  __label_17: # default
+.annotate 'line', 6695
     WSubId_6('Unexpected type in new')
-  __label_17: # switch end
-.annotate 'line', 6523
-    isgt $I4, $I1, 1
-    if $I4 goto __label_31
-    isge $I6, $I1, 0
-    unless $I6 goto __label_33
-    iseq $I7, $I2, 1
-    set $I5, $I7
-    goto __label_34
-  __label_33:
-    set $I5, $I6
-  __label_34:
-    set $I3, $I5
-    goto __label_32
+  __label_16: # switch end
+.annotate 'line', 6697
+    isgt $I3, $I1, 1
+    if $I3 goto __label_30
+    isge $I3, $I1, 0
+    unless $I3 goto __label_31
+    iseq $I3, $I2, 1
   __label_31:
-    set $I3, $I4
-  __label_32:
-    unless $I3 goto __label_30
-# {
-.annotate 'line', 6524
+  __label_30:
+    unless $I3 goto __label_29
+.annotate 'line', 6698
     self.'emit_constructor'(__ARG_1, $S2, $S3)
-.annotate 'line', 6525
-    not $I4, __ARG_3
-    unless $I4 goto __label_36
-    set $S5, __ARG_2
-    isne $I5, $S5, ''
-    set $I3, $I5
-    goto __label_37
-  __label_36:
-    set $I3, $I4
-  __label_37:
-    unless $I3 goto __label_35
-.annotate 'line', 6526
+.annotate 'line', 6699
+    not $I3, __ARG_3
+    unless $I3 goto __label_32
+.annotate 'line', 6700
     __ARG_1.'emitset'(__ARG_2, $S2)
-  __label_35: # endif
-# }
-  __label_30: # endif
-# }
-.annotate 'line', 6528
+  __label_32: # endif
+  __label_29: # endif
+.annotate 'line', 6702
 
 .end # emit
 
 
 .sub 'emit_init' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6531
+        .param string __ARG_2
+.annotate 'line', 6705
     .tailcall self.'emit'(__ARG_1, __ARG_2, 1)
-# }
-.annotate 'line', 6532
+.annotate 'line', 6706
 
 .end # emit_init
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewExpr' ]
-.annotate 'line', 6406
+.annotate 'line', 6580
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
-.annotate 'line', 6408
+.annotate 'line', 6582
     addattribute $P0, 'value'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NewIndexedExpr' ]
@@ -19841,115 +16396,94 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 6543
+.annotate 'line', 6717
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6544
+.annotate 'line', 6718
     setattribute self, 'owner', __ARG_2
-.annotate 'line', 6545
-# var nskey: $P1
+.annotate 'line', 6719
     new $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
     $P1.'ClassSpecifierParrotKey'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 6546
+.annotate 'line', 6720
     setattribute self, 'nskey', $P1
-.annotate 'line', 6547
-# var t: $P2
+.annotate 'line', 6721
     $P2 = __ARG_1.'get'()
-.annotate 'line', 6548
+.annotate 'line', 6722
     $P3 = $P2.'isop'('(')
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 6549
+.annotate 'line', 6723
     self.'parseinitializer'(__ARG_1)
     goto __label_2
   __label_1: # else
-.annotate 'line', 6551
+.annotate 'line', 6725
     __ARG_1.'unget'($P2)
   __label_2: # endif
-# }
-.annotate 'line', 6552
+.annotate 'line', 6726
 
 .end # NewIndexedExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 6555
-# reginit: $S1
+.annotate 'line', 6729
     null $S1
-# switch
-.annotate 'line', 6556
+.annotate 'line', 6730
     $P3 = self.'numargs'()
     set $I1, $P3
-    set $I2, -1
-    if $I1 == $I2 goto __label_3
-    null $I2
-    if $I1 == $I2 goto __label_4
-    set $I2, 1
-    if $I1 == $I2 goto __label_5
+    if $I1 == -1 goto __label_3
+    if $I1 == 0 goto __label_4
+    if $I1 == 1 goto __label_5
     goto __label_2
   __label_3: # case
   __label_4: # case
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 6561
-# var initval: $P1
+.annotate 'line', 6735
     getattribute $P4, self, 'initializer'
     $P1 = $P4.'getfreearg'(0)
-.annotate 'line', 6562
+.annotate 'line', 6736
     $P5 = $P1.'emit_get'(__ARG_1)
     set $S1, $P5
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 6565
+.annotate 'line', 6739
     WSubId_1('Multiple init arguments not allowed here', self)
   __label_1: # switch end
-.annotate 'line', 6567
-# var nskey: $P2
+.annotate 'line', 6741
     getattribute $P2, self, 'nskey'
-.annotate 'line', 6569
-    set $S2, __ARG_2
-    ne $S2, '', __label_6
-.annotate 'line', 6570
-    __ARG_2 = self.'tempreg'('P')
-  __label_6: # endif
-.annotate 'line', 6572
+.annotate 'line', 6743
     __ARG_1.'print'('    ')
-.annotate 'line', 6573
+.annotate 'line', 6744
     $P3 = $P2.'hasHLL'()
-    if_null $P3, __label_7
-    unless $P3 goto __label_7
-.annotate 'line', 6574
+    if_null $P3, __label_6
+    unless $P3 goto __label_6
+.annotate 'line', 6745
     __ARG_1.'print'("root_")
-  __label_7: # endif
-.annotate 'line', 6575
+  __label_6: # endif
+.annotate 'line', 6746
     __ARG_1.'print'("new ", __ARG_2, ", ")
-.annotate 'line', 6576
+.annotate 'line', 6747
     null $P3
     $P2.'emit'(__ARG_1, $P3)
-.annotate 'line', 6577
-    if_null $S1, __label_8
-.annotate 'line', 6578
+.annotate 'line', 6748
+    if_null $S1, __label_7
+.annotate 'line', 6749
     __ARG_1.'print'(', ', $S1)
-  __label_8: # endif
-.annotate 'line', 6579
+  __label_7: # endif
+.annotate 'line', 6750
     __ARG_1.'say'()
-# }
-.annotate 'line', 6580
+.annotate 'line', 6751
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewIndexedExpr' ]
-.annotate 'line', 6537
+.annotate 'line', 6711
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
-.annotate 'line', 6539
+.annotate 'line', 6713
     addattribute $P0, 'nskey'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
@@ -19958,169 +16492,140 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 6591
+.annotate 'line', 6762
     self.'Expr'(__ARG_2, __ARG_3)
-.annotate 'line', 6592
+.annotate 'line', 6763
     setattribute self, 'owner', __ARG_2
-.annotate 'line', 6593
-# var nskey: $P1
+.annotate 'line', 6764
     new $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
     $P1.'ClassSpecifierId'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 6594
+.annotate 'line', 6765
     setattribute self, 'nskey', $P1
-.annotate 'line', 6595
-# var t: $P2
+.annotate 'line', 6766
     $P2 = __ARG_1.'get'()
-.annotate 'line', 6596
+.annotate 'line', 6767
     $P3 = $P2.'isop'('(')
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 6597
+.annotate 'line', 6768
     self.'parseinitializer'(__ARG_1)
     goto __label_2
   __label_1: # else
-.annotate 'line', 6599
+.annotate 'line', 6770
     __ARG_1.'unget'($P2)
   __label_2: # endif
-# }
-.annotate 'line', 6600
+.annotate 'line', 6771
 
 .end # NewQualifiedExpr
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6603
-# numinits: $I1
+        .param string __ARG_2
+.annotate 'line', 6774
     $P2 = self.'numargs'()
     set $I1, $P2
-.annotate 'line', 6604
-# regnew: $S1
-    null $S1
-    if_null __ARG_2, __label_1
+.annotate 'line', 6775
     set $S1, __ARG_2
-  __label_1:
-.annotate 'line', 6605
-    le $I1, 0, __label_2
-.annotate 'line', 6606
+.annotate 'line', 6776
+    le $I1, 0, __label_1
+.annotate 'line', 6777
+    $P2 = self.'tempreg'('P')
+    set $S1, $P2
+  __label_1: # endif
+.annotate 'line', 6778
+    getattribute $P1, self, 'nskey'
+.annotate 'line', 6780
+    ne $S1, '', __label_2
+.annotate 'line', 6781
     $P2 = self.'tempreg'('P')
     set $S1, $P2
   __label_2: # endif
-.annotate 'line', 6607
-# var nskey: $P1
-    getattribute $P1, self, 'nskey'
-.annotate 'line', 6609
-    ne $S1, '', __label_3
-.annotate 'line', 6610
-    $P2 = self.'tempreg'('P')
-    set $S1, $P2
-  __label_3: # endif
-.annotate 'line', 6612
+.annotate 'line', 6783
     $P1.'emit_new'(__ARG_1, self, $S1)
-.annotate 'line', 6614
-    lt $I1, 0, __label_4
-# {
-.annotate 'line', 6615
-# constructor: $S2
+.annotate 'line', 6785
+    lt $I1, 0, __label_3
+.annotate 'line', 6786
     $P2 = $P1.'last'()
     null $S2
-    if_null $P2, __label_5
+    if_null $P2, __label_4
     set $S2, $P2
-  __label_5:
-.annotate 'line', 6616
+  __label_4:
+.annotate 'line', 6787
     self.'emit_constructor'(__ARG_1, $S1, $S2)
-.annotate 'line', 6617
-    set $S3, __ARG_2
-    eq $S3, '', __label_6
-.annotate 'line', 6618
+.annotate 'line', 6788
     __ARG_1.'emitset'(__ARG_2, $S1)
-  __label_6: # endif
-# }
-  __label_4: # endif
-# }
-.annotate 'line', 6620
+  __label_3: # endif
+.annotate 'line', 6790
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
-.annotate 'line', 6585
+.annotate 'line', 6756
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
-.annotate 'line', 6587
+.annotate 'line', 6758
     addattribute $P0, 'nskey'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseNew' :subid('WSubId_78')
+.sub 'parseNew' :subid('WSubId_84')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 6627
-# var t: $P1
+.annotate 'line', 6797
     $P1 = __ARG_1.'get'()
-# switch-case
-.annotate 'line', 6630
+.annotate 'line', 6800
     $I1 = $P1.'isop'('(')
     if $I1 goto __label_3
-.annotate 'line', 6634
+.annotate 'line', 6804
     $I1 = $P1.'isop'('[')
     if $I1 goto __label_4
-.annotate 'line', 6637
+.annotate 'line', 6807
     $I1 = $P1.'isidentifier'()
     if $I1 goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 6632
+.annotate 'line', 6802
     new $P4, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
-.annotate 'line', 6633
+.annotate 'line', 6803
     new $P6, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     $P6.'StringLiteral'(__ARG_2, __ARG_3)
     set $P5, $P6
     $P4.'CallExpr'(__ARG_1, __ARG_2, __ARG_3, $P5)
     set $P3, $P4
-.annotate 'line', 6632
+.annotate 'line', 6802
     .return($P3)
   __label_4: # case
-.annotate 'line', 6636
+.annotate 'line', 6806
     new $P8, [ 'Winxed'; 'Compiler'; 'NewIndexedExpr' ]
     $P8.'NewIndexedExpr'(__ARG_1, __ARG_2, __ARG_3)
     set $P7, $P8
     .return($P7)
   __label_5: # case
-.annotate 'line', 6640
-# var t2: $P2
+.annotate 'line', 6810
     $P2 = __ARG_1.'get'()
-.annotate 'line', 6641
+.annotate 'line', 6811
     __ARG_1.'unget'($P2)
-.annotate 'line', 6642
+.annotate 'line', 6812
     $P9 = $P2.'isop'('.')
     if_null $P9, __label_6
     unless $P9 goto __label_6
-# {
-.annotate 'line', 6644
+.annotate 'line', 6814
     new $P11, [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
     $P11.'NewQualifiedExpr'(__ARG_1, __ARG_2, $P1)
     set $P10, $P11
     .return($P10)
-# }
   __label_6: # endif
   __label_2: # default
-.annotate 'line', 6649
+.annotate 'line', 6819
     new $P4, [ 'Winxed'; 'Compiler'; 'NewExpr' ]
     $P4.'NewExpr'(__ARG_1, __ARG_2, __ARG_3, $P1)
     set $P3, $P4
     .return($P3)
   __label_1: # switch end
-# }
-.annotate 'line', 6651
+.annotate 'line', 6821
 
 .end # parseNew
 
@@ -20131,113 +16636,84 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_70 = "WSubId_70"
-# Body
-# {
-.annotate 'line', 6662
+.const 'Sub' WSubId_76 = "WSubId_76"
+.annotate 'line', 6832
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 6663
+.annotate 'line', 6833
     setattribute self, 'lexpr', __ARG_3
-.annotate 'line', 6664
-    $P2 = WSubId_70(__ARG_4, self)
+.annotate 'line', 6834
+    $P2 = WSubId_76(__ARG_4, self)
     setattribute self, 'checked', $P2
-# }
-.annotate 'line', 6665
+.annotate 'line', 6835
 
 .end # OpInstanceOfExpr
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 6668
+.annotate 'line', 6838
     getattribute $P3, self, 'lexpr'
     $P2 = $P3.'optimize'()
     setattribute self, 'lexpr', $P2
-.annotate 'line', 6669
+.annotate 'line', 6839
     .return(self)
-# }
-.annotate 'line', 6670
+.annotate 'line', 6840
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6671
+.annotate 'line', 6841
     .return('I')
-# }
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 6674
-# var lexpr: $P1
+.annotate 'line', 6844
     getattribute $P1, self, 'lexpr'
-.annotate 'line', 6675
-# ltype: $S1
+.annotate 'line', 6845
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 6676
+.annotate 'line', 6846
     eq $S1, 'P', __label_2
-.annotate 'line', 6677
+.annotate 'line', 6847
     WSubId_1('Invalid instanceof left operand', $P1)
   __label_2: # endif
-.annotate 'line', 6678
-# var checked: $P2
+.annotate 'line', 6848
     getattribute $P2, self, 'checked'
-.annotate 'line', 6680
-# r: $S2
-    set $S4, __ARG_2
-    ne $S4, '', __label_4
-    $P3 = self.'tempreg'('I')
-    goto __label_3
-  __label_4:
-    set $P3, __ARG_2
-  __label_3:
-    null $S2
-    if_null $P3, __label_5
-    set $S2, $P3
-  __label_5:
-.annotate 'line', 6681
-# check: $S3
+.annotate 'line', 6850
     $P3 = $P1.'emit_get'(__ARG_1)
-    null $S3
-    if_null $P3, __label_6
-    set $S3, $P3
-  __label_6:
-.annotate 'line', 6682
+    null $S2
+    if_null $P3, __label_3
+    set $S2, $P3
+  __label_3:
+.annotate 'line', 6851
     self.'annotate'(__ARG_1)
-.annotate 'line', 6683
-    __ARG_1.'print'('    isa ', $S2, ', ', $S3, ', ')
-.annotate 'line', 6684
+.annotate 'line', 6852
+    __ARG_1.'print'('    isa ', __ARG_2, ', ', $S2, ', ')
+.annotate 'line', 6853
     getattribute $P3, self, 'owner'
     $P2.'emit'(__ARG_1, $P3)
-.annotate 'line', 6685
+.annotate 'line', 6854
     __ARG_1.'say'()
-# }
-.annotate 'line', 6686
+.annotate 'line', 6855
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpInstanceOfExpr' ]
-.annotate 'line', 6655
+.annotate 'line', 6825
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6657
+.annotate 'line', 6827
     addattribute $P0, 'lexpr'
-.annotate 'line', 6658
+.annotate 'line', 6828
     addattribute $P0, 'checked'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpConditionalExpr' ]
@@ -20248,1663 +16724,1343 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 6699
+.annotate 'line', 6868
     self.'Expr'(__ARG_1, __ARG_2)
-.annotate 'line', 6700
+.annotate 'line', 6869
     new $P3, [ 'Winxed'; 'Compiler'; 'Condition' ]
     $P2 = $P3.'set'(__ARG_3)
     setattribute self, 'condition', $P2
-.annotate 'line', 6701
+.annotate 'line', 6870
     setattribute self, 'etrue', __ARG_4
-.annotate 'line', 6702
+.annotate 'line', 6871
     setattribute self, 'efalse', __ARG_5
-.annotate 'line', 6703
+.annotate 'line', 6872
     .return(self)
-# }
-.annotate 'line', 6704
+.annotate 'line', 6873
 
 .end # OpConditionalExpr
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 6707
+.annotate 'line', 6876
     getattribute $P3, self, 'condition'
     $P2 = $P3.'optimize'()
     setattribute self, 'condition', $P2
-# switch
-.annotate 'line', 6708
+.annotate 'line', 6877
     getattribute $P2, self, 'condition'
     $P1 = $P2.'getvalue'()
     set $I1, $P1
-    set $I2, 1
-    if $I1 == $I2 goto __label_3
-    set $I2, 2
-    if $I1 == $I2 goto __label_4
+    if $I1 == 1 goto __label_3
+    if $I1 == 2 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 6710
+.annotate 'line', 6879
     getattribute $P3, self, 'etrue'
     .tailcall $P3.'optimize'()
   __label_4: # case
-.annotate 'line', 6712
+.annotate 'line', 6881
     getattribute $P4, self, 'efalse'
     .tailcall $P4.'optimize'()
   __label_2: # default
-.annotate 'line', 6714
+.annotate 'line', 6883
     getattribute $P7, self, 'etrue'
     $P6 = $P7.'optimize'()
     setattribute self, 'etrue', $P6
-.annotate 'line', 6715
+.annotate 'line', 6884
     getattribute $P10, self, 'efalse'
     $P9 = $P10.'optimize'()
     setattribute self, 'efalse', $P9
-.annotate 'line', 6716
+.annotate 'line', 6885
     .return(self)
   __label_1: # switch end
-# }
-.annotate 'line', 6718
+.annotate 'line', 6887
 
 .end # optimize
 
 
 .sub 'checkresult' :method
-# Body
-# {
-.annotate 'line', 6721
-# var etrue: $P1
+.annotate 'line', 6890
     getattribute $P1, self, 'etrue'
-.annotate 'line', 6722
+.annotate 'line', 6891
     $P2 = $P1.'isnull'()
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 6723
+.annotate 'line', 6892
     getattribute $P3, self, 'efalse'
     .tailcall $P3.'checkresult'()
     goto __label_2
   __label_1: # else
-.annotate 'line', 6725
+.annotate 'line', 6894
     .tailcall $P1.'checkresult'()
   __label_2: # endif
-# }
-.annotate 'line', 6726
+.annotate 'line', 6895
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 6729
-# cond_end: $S1
+        .param string __ARG_2
+.annotate 'line', 6898
     getattribute $P5, self, 'owner'
     $P4 = $P5.'genlabel'()
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 6730
-# cond_false: $S2
+.annotate 'line', 6899
     getattribute $P5, self, 'owner'
     $P4 = $P5.'genlabel'()
     null $S2
     if_null $P4, __label_2
     set $S2, $P4
   __label_2:
-.annotate 'line', 6731
+.annotate 'line', 6900
     getattribute $P4, self, 'condition'
     $P4.'emit_else'(__ARG_1, $S2)
-.annotate 'line', 6732
-# var etrue: $P1
+.annotate 'line', 6901
     getattribute $P1, self, 'etrue'
-.annotate 'line', 6733
-# tres: $S3
+.annotate 'line', 6902
     $P4 = self.'checkresult'()
     null $S3
     if_null $P4, __label_3
     set $S3, $P4
   __label_3:
-.annotate 'line', 6734
+.annotate 'line', 6903
     $P4 = $P1.'isnull'()
     if_null $P4, __label_4
     unless $P4 goto __label_4
-.annotate 'line', 6735
+.annotate 'line', 6904
     __ARG_1.'emitnull'(__ARG_2)
     goto __label_5
   __label_4: # else
-.annotate 'line', 6737
+.annotate 'line', 6906
     $P1.'emit'(__ARG_1, __ARG_2)
   __label_5: # endif
-.annotate 'line', 6738
+.annotate 'line', 6907
     __ARG_1.'emitgoto'($S1)
-.annotate 'line', 6739
+.annotate 'line', 6908
     __ARG_1.'emitlabel'($S2)
-.annotate 'line', 6740
-# var efalse: $P2
+.annotate 'line', 6909
     getattribute $P2, self, 'efalse'
-.annotate 'line', 6741
+.annotate 'line', 6910
     $P4 = $P2.'isnull'()
     if_null $P4, __label_6
     unless $P4 goto __label_6
-.annotate 'line', 6742
+.annotate 'line', 6911
     __ARG_1.'emitnull'(__ARG_2)
     goto __label_7
   __label_6: # else
-# {
-.annotate 'line', 6744
-# tfalse: $S4
+.annotate 'line', 6913
     $P5 = $P2.'checkresult'()
     null $S4
     if_null $P5, __label_8
     set $S4, $P5
   __label_8:
-.annotate 'line', 6745
-    iseq $I2, $S3, 'P'
-    unless $I2 goto __label_11
-    isne $I3, $S4, 'P'
-    set $I1, $I3
-    goto __label_12
+.annotate 'line', 6914
+    iseq $I1, $S3, 'P'
+    unless $I1 goto __label_11
+    isne $I1, $S4, 'P'
   __label_11:
-    set $I1, $I2
-  __label_12:
     unless $I1 goto __label_9
-# {
-.annotate 'line', 6746
-# r: $S5
+.annotate 'line', 6915
     $P4 = $P2.'emit_get'(__ARG_1)
     null $S5
-    if_null $P4, __label_13
+    if_null $P4, __label_12
     set $S5, $P4
-  __label_13:
-.annotate 'line', 6747
+  __label_12:
+.annotate 'line', 6916
     __ARG_1.'emitbox'(__ARG_2, $S5)
-# }
     goto __label_10
   __label_9: # else
-# {
-.annotate 'line', 6751
-    ne $S4, 'P', __label_14
-# {
-.annotate 'line', 6752
-# var aux: $P3
+.annotate 'line', 6920
+    ne $S4, 'P', __label_13
+.annotate 'line', 6921
     $P3 = $P2.'emit_get'(__ARG_1)
-.annotate 'line', 6753
+.annotate 'line', 6922
     __ARG_1.'emitset'(__ARG_2, $P3)
-# }
-    goto __label_15
-  __label_14: # else
-.annotate 'line', 6756
+    goto __label_14
+  __label_13: # else
+.annotate 'line', 6925
     $P2.'emit'(__ARG_1, __ARG_2)
-  __label_15: # endif
-# }
+  __label_14: # endif
   __label_10: # endif
-# }
   __label_7: # endif
-.annotate 'line', 6759
+.annotate 'line', 6928
     __ARG_1.'emitlabel'($S1)
-# }
-.annotate 'line', 6760
+.annotate 'line', 6929
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpConditionalExpr' ]
-.annotate 'line', 6691
+.annotate 'line', 6860
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
-.annotate 'line', 6693
+.annotate 'line', 6862
     addattribute $P0, 'condition'
-.annotate 'line', 6694
+.annotate 'line', 6863
     addattribute $P0, 'etrue'
-.annotate 'line', 6695
+.annotate 'line', 6864
     addattribute $P0, 'efalse'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant Code_none evaluated at compile time
-# Constant Code_paren evaluated at compile time
-# Constant Code_bracket evaluated at compile time
-# Constant Code_dot evaluated at compile time
-# Constant Code_assign evaluated at compile time
-# Constant Code_assign_to evaluated at compile time
-# Constant Code_add_assign evaluated at compile time
-# Constant Code_add evaluated at compile time
-# Constant Code_minus evaluated at compile time
-# Constant Code_inc evaluated at compile time
-# Constant Code_dec evaluated at compile time
-# Constant Code_not evaluated at compile time
-# Constant Code_equal evaluated at compile time
-# Constant Code_not_equal evaluated at compile time
-# Constant Code_less evaluated at compile time
-# Constant Code_less_equal evaluated at compile time
-# Constant Code_greater evaluated at compile time
-# Constant Code_greater_equal evaluated at compile time
-# Constant Code_sub_assign evaluated at compile time
-# Constant Code_mul evaluated at compile time
-# Constant Code_div evaluated at compile time
-# Constant Code_mod evaluated at compile time
-# Constant Code_cmod evaluated at compile time
-# Constant Code_mul_assign evaluated at compile time
-# Constant Code_div_assign evaluated at compile time
-# Constant Code_same evaluated at compile time
-# Constant Code_not_same evaluated at compile time
-# Constant Code_instanceof evaluated at compile time
-# Constant Code_shiftleft evaluated at compile time
-# Constant Code_shiftright evaluated at compile time
-# Constant Code_mod_assign evaluated at compile time
-# Constant Code_delete evaluated at compile time
-# Constant Code_exists evaluated at compile time
-# Constant Code_bin_not evaluated at compile time
 
-.sub 'getOpCode_2' :subid('WSubId_80')
+.sub 'getOpCode_2' :subid('WSubId_86')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6805
+.annotate 'line', 6974
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '('
-    if $S1 == $S2 goto __label_3
-    set $S2, '['
-    if $S1 == $S2 goto __label_4
-    set $S2, '.'
-    if $S1 == $S2 goto __label_5
+    if $S1 == '(' goto __label_3
+    if $S1 == '[' goto __label_4
+    if $S1 == '.' goto __label_5
     goto __label_2
   __label_3: # case
-.annotate 'line', 6806
+.annotate 'line', 6975
     .return(1)
   __label_4: # case
-.annotate 'line', 6807
+.annotate 'line', 6976
     .return(2)
   __label_5: # case
-.annotate 'line', 6808
+.annotate 'line', 6977
     .return(3)
   __label_2: # default
-.annotate 'line', 6809
+.annotate 'line', 6978
     .return(0)
   __label_1: # switch end
-# }
-.annotate 'line', 6811
+.annotate 'line', 6980
 
 .end # getOpCode_2
 
 
-.sub 'getOpCode_4' :subid('WSubId_82')
+.sub 'getOpCode_4' :subid('WSubId_88')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6815
+.annotate 'line', 6984
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '-'
-    if $S1 == $S2 goto __label_3
-    set $S2, '!'
-    if $S1 == $S2 goto __label_4
-    set $S2, '~'
-    if $S1 == $S2 goto __label_5
-    set $S2, '++'
-    if $S1 == $S2 goto __label_6
-    set $S2, '--'
-    if $S1 == $S2 goto __label_7
+    if $S1 == '-' goto __label_3
+    if $S1 == '!' goto __label_4
+    if $S1 == '~' goto __label_5
+    if $S1 == '++' goto __label_6
+    if $S1 == '--' goto __label_7
     goto __label_2
   __label_3: # case
-.annotate 'line', 6816
+.annotate 'line', 6985
     .return(8)
   __label_4: # case
-.annotate 'line', 6817
+.annotate 'line', 6986
     .return(11)
   __label_5: # case
-.annotate 'line', 6818
+.annotate 'line', 6987
     .return(33)
   __label_6: # case
-.annotate 'line', 6819
+.annotate 'line', 6988
     .return(9)
   __label_7: # case
-.annotate 'line', 6820
+.annotate 'line', 6989
     .return(10)
   __label_2: # default
-.annotate 'line', 6822
+.annotate 'line', 6991
     $P2 = __ARG_1.'iskeyword'('delete')
     if_null $P2, __label_8
     unless $P2 goto __label_8
     .return(31)
     goto __label_9
   __label_8: # else
-.annotate 'line', 6823
+.annotate 'line', 6992
     $P3 = __ARG_1.'iskeyword'('exists')
     if_null $P3, __label_10
     unless $P3 goto __label_10
     .return(32)
     goto __label_11
   __label_10: # else
-.annotate 'line', 6824
+.annotate 'line', 6993
     .return(0)
   __label_11: # endif
   __label_9: # endif
   __label_1: # switch end
-# }
-.annotate 'line', 6826
+.annotate 'line', 6995
 
 .end # getOpCode_4
 
 
-.sub 'getOpCode_5' :subid('WSubId_85')
+.sub 'getOpCode_5' :subid('WSubId_91')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6830
+.annotate 'line', 6999
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '*'
-    if $S1 == $S2 goto __label_3
-    set $S2, '/'
-    if $S1 == $S2 goto __label_4
-    set $S2, '%'
-    if $S1 == $S2 goto __label_5
-    set $S2, '%%'
-    if $S1 == $S2 goto __label_6
+    if $S1 == '*' goto __label_3
+    if $S1 == '/' goto __label_4
+    if $S1 == '%' goto __label_5
+    if $S1 == '%%' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 6831
+.annotate 'line', 7000
     .return(19)
   __label_4: # case
-.annotate 'line', 6832
+.annotate 'line', 7001
     .return(20)
   __label_5: # case
-.annotate 'line', 6833
+.annotate 'line', 7002
     .return(21)
   __label_6: # case
-.annotate 'line', 6834
+.annotate 'line', 7003
     .return(22)
   __label_2: # default
-.annotate 'line', 6835
+.annotate 'line', 7004
     .return(0)
   __label_1: # switch end
-# }
-.annotate 'line', 6837
+.annotate 'line', 7006
 
 .end # getOpCode_5
 
 
-.sub 'getOpCode_7' :subid('WSubId_88')
+.sub 'getOpCode_7' :subid('WSubId_94')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6841
+.annotate 'line', 7010
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '<<'
-    if $S1 == $S2 goto __label_3
-    set $S2, '>>'
-    if $S1 == $S2 goto __label_4
+    if $S1 == '<<' goto __label_3
+    if $S1 == '>>' goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 6842
+.annotate 'line', 7011
     .return(28)
   __label_4: # case
-.annotate 'line', 6843
+.annotate 'line', 7012
     .return(29)
   __label_2: # default
-.annotate 'line', 6844
+.annotate 'line', 7013
     .return(0)
   __label_1: # switch end
-# }
-.annotate 'line', 6846
+.annotate 'line', 7015
 
 .end # getOpCode_7
 
 
-.sub 'getOpCode_8' :subid('WSubId_90')
+.sub 'getOpCode_8' :subid('WSubId_96')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6850
+.annotate 'line', 7019
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '<'
-    if $S1 == $S2 goto __label_3
-    set $S2, '>'
-    if $S1 == $S2 goto __label_4
-    set $S2, '<='
-    if $S1 == $S2 goto __label_5
-    set $S2, '>='
-    if $S1 == $S2 goto __label_6
+    if $S1 == '<' goto __label_3
+    if $S1 == '>' goto __label_4
+    if $S1 == '<=' goto __label_5
+    if $S1 == '>=' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 6851
+.annotate 'line', 7020
     .return(14)
   __label_4: # case
-.annotate 'line', 6852
+.annotate 'line', 7021
     .return(16)
   __label_5: # case
-.annotate 'line', 6853
+.annotate 'line', 7022
     .return(15)
   __label_6: # case
-.annotate 'line', 6854
+.annotate 'line', 7023
     .return(17)
   __label_2: # default
-.annotate 'line', 6856
+.annotate 'line', 7025
     $P2 = __ARG_1.'iskeyword'('instanceof')
     if_null $P2, __label_7
     unless $P2 goto __label_7
     .return(27)
     goto __label_8
   __label_7: # else
-.annotate 'line', 6857
+.annotate 'line', 7026
     .return(0)
   __label_8: # endif
   __label_1: # switch end
-# }
-.annotate 'line', 6859
+.annotate 'line', 7028
 
 .end # getOpCode_8
 
 
-.sub 'getOpCode_9' :subid('WSubId_92')
+.sub 'getOpCode_9' :subid('WSubId_98')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6863
+.annotate 'line', 7032
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '=='
-    if $S1 == $S2 goto __label_3
-    set $S2, '!='
-    if $S1 == $S2 goto __label_4
-    set $S2, '==='
-    if $S1 == $S2 goto __label_5
-    set $S2, '!=='
-    if $S1 == $S2 goto __label_6
+    if $S1 == '==' goto __label_3
+    if $S1 == '!=' goto __label_4
+    if $S1 == '===' goto __label_5
+    if $S1 == '!==' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 6864
+.annotate 'line', 7033
     .return(12)
   __label_4: # case
-.annotate 'line', 6865
+.annotate 'line', 7034
     .return(13)
   __label_5: # case
-.annotate 'line', 6866
+.annotate 'line', 7035
     .return(25)
   __label_6: # case
-.annotate 'line', 6867
+.annotate 'line', 7036
     .return(26)
   __label_2: # default
-.annotate 'line', 6868
+.annotate 'line', 7037
     .return(0)
   __label_1: # switch end
-# }
-.annotate 'line', 6870
+.annotate 'line', 7039
 
 .end # getOpCode_9
 
 
-.sub 'getOpCode_16' :subid('WSubId_101')
+.sub 'getOpCode_16' :subid('WSubId_107')
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 6874
+.annotate 'line', 7043
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    set $S2, '='
-    if $S1 == $S2 goto __label_3
-    set $S2, '=:'
-    if $S1 == $S2 goto __label_4
-    set $S2, '+='
-    if $S1 == $S2 goto __label_5
-    set $S2, '-='
-    if $S1 == $S2 goto __label_6
-    set $S2, '*='
-    if $S1 == $S2 goto __label_7
-    set $S2, '/='
-    if $S1 == $S2 goto __label_8
-    set $S2, '%='
-    if $S1 == $S2 goto __label_9
+    if $S1 == '=' goto __label_3
+    if $S1 == '=:' goto __label_4
+    if $S1 == '+=' goto __label_5
+    if $S1 == '-=' goto __label_6
+    if $S1 == '*=' goto __label_7
+    if $S1 == '/=' goto __label_8
+    if $S1 == '%=' goto __label_9
     goto __label_2
   __label_3: # case
-.annotate 'line', 6875
+.annotate 'line', 7044
     .return(4)
   __label_4: # case
-.annotate 'line', 6876
+.annotate 'line', 7045
     .return(5)
   __label_5: # case
-.annotate 'line', 6877
+.annotate 'line', 7046
     .return(6)
   __label_6: # case
-.annotate 'line', 6878
+.annotate 'line', 7047
     .return(18)
   __label_7: # case
-.annotate 'line', 6879
+.annotate 'line', 7048
     .return(23)
   __label_8: # case
-.annotate 'line', 6880
+.annotate 'line', 7049
     .return(24)
   __label_9: # case
-.annotate 'line', 6881
+.annotate 'line', 7050
     .return(30)
   __label_2: # default
-.annotate 'line', 6882
+.annotate 'line', 7051
     .return(0)
   __label_1: # switch end
-# }
-.annotate 'line', 6884
+.annotate 'line', 7053
 
 .end # getOpCode_16
 
 
-.sub 'parseExpr_0' :subid('WSubId_79')
+.sub 'parseExpr_0' :subid('WSubId_85')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_22 = "WSubId_22"
-.const 'Sub' WSubId_78 = "WSubId_78"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 6888
-# var t: $P1
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.const 'Sub' WSubId_84 = "WSubId_84"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 7057
     $P1 = __ARG_1.'get'()
-.annotate 'line', 6889
-# var expr: $P2
+.annotate 'line', 7058
     null $P2
-# switch-case
-.annotate 'line', 6892
+.annotate 'line', 7061
     $I1 = $P1.'isop'('(')
     if $I1 goto __label_3
-.annotate 'line', 6896
+.annotate 'line', 7065
     $I1 = $P1.'isop'('[')
     if $I1 goto __label_4
-.annotate 'line', 6898
+.annotate 'line', 7067
     $I1 = $P1.'isop'('{')
     if $I1 goto __label_5
-.annotate 'line', 6900
+.annotate 'line', 7069
     $I1 = $P1.'isstring'()
     if $I1 goto __label_6
-.annotate 'line', 6902
+.annotate 'line', 7071
     $I1 = $P1.'isint'()
     if $I1 goto __label_7
-.annotate 'line', 6904
+.annotate 'line', 7073
     $I1 = $P1.'isfloat'()
     if $I1 goto __label_8
-.annotate 'line', 6906
+.annotate 'line', 7075
     $I1 = $P1.'iskeyword'('new')
     if $I1 goto __label_9
-.annotate 'line', 6908
+.annotate 'line', 7077
     $I1 = $P1.'iskeyword'('function')
     if $I1 goto __label_10
-.annotate 'line', 6910
+.annotate 'line', 7079
     $I1 = $P1.'iskeyword'('class')
     if $I1 goto __label_11
-.annotate 'line', 6912
+.annotate 'line', 7081
     $I1 = $P1.'iskeyword'('namespace')
     if $I1 goto __label_12
-.annotate 'line', 6914
+.annotate 'line', 7083
     $I1 = $P1.'isidentifier'()
     if $I1 goto __label_13
     goto __label_2
   __label_3: # case
-.annotate 'line', 6893
-    $P2 = WSubId_45(__ARG_1, __ARG_2)
-.annotate 'line', 6894
-    WSubId_62(')', __ARG_1)
-.annotate 'line', 6895
+.annotate 'line', 7062
+    $P2 = WSubId_51(__ARG_1, __ARG_2)
+.annotate 'line', 7063
+    WSubId_68(')', __ARG_1)
+.annotate 'line', 7064
     .return($P2)
   __label_4: # case
-.annotate 'line', 6897
+.annotate 'line', 7066
     new $P4, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
     $P4.'ArrayExpr'(__ARG_1, __ARG_2, $P1)
     set $P3, $P4
     .return($P3)
   __label_5: # case
-.annotate 'line', 6899
+.annotate 'line', 7068
     new $P6, [ 'Winxed'; 'Compiler'; 'HashExpr' ]
     $P6.'HashExpr'(__ARG_1, __ARG_2, $P1)
     set $P5, $P6
     .return($P5)
   __label_6: # case
-.annotate 'line', 6901
+.annotate 'line', 7070
     new $P8, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     $P8.'StringLiteral'(__ARG_2, $P1)
     set $P7, $P8
     .return($P7)
   __label_7: # case
-.annotate 'line', 6903
+.annotate 'line', 7072
     $P9 = $P1.'getintvalue'()
-    .tailcall WSubId_22(__ARG_2, $P1, $P9)
+    .tailcall WSubId_25(__ARG_2, $P1, $P9)
   __label_8: # case
-.annotate 'line', 6905
+.annotate 'line', 7074
     new $P11, [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
     $P11.'FloatLiteral'(__ARG_2, $P1)
     set $P10, $P11
     .return($P10)
   __label_9: # case
-.annotate 'line', 6907
-    .tailcall WSubId_78(__ARG_1, __ARG_2, $P1)
+.annotate 'line', 7076
+    .tailcall WSubId_84(__ARG_1, __ARG_2, $P1)
   __label_10: # case
-.annotate 'line', 6909
+.annotate 'line', 7078
     new $P13, [ 'Winxed'; 'Compiler'; 'FunctionExpr' ]
     $P13.'FunctionExpr'(__ARG_1, __ARG_2, $P1)
     set $P12, $P13
     .return($P12)
   __label_11: # case
-.annotate 'line', 6911
+.annotate 'line', 7080
     new $P15, [ 'Winxed'; 'Compiler'; 'OpClassExpr' ]
     $P15.'OpClassExpr'(__ARG_1, __ARG_2, $P1)
     set $P14, $P15
     .return($P14)
   __label_12: # case
-.annotate 'line', 6913
+.annotate 'line', 7082
     new $P17, [ 'Winxed'; 'Compiler'; 'OpNamespaceExpr' ]
     $P17.'OpNamespaceExpr'(__ARG_1, __ARG_2, $P1)
     set $P16, $P17
     .return($P16)
   __label_13: # case
-.annotate 'line', 6915
+.annotate 'line', 7084
     new $P19, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
     $P19.'IdentifierExpr'(__ARG_2, $P1)
     set $P18, $P19
     .return($P18)
   __label_2: # default
-.annotate 'line', 6917
-    WSubId_48('expression', $P1)
+.annotate 'line', 7086
+    WSubId_54('expression', $P1)
   __label_1: # switch end
-# }
-.annotate 'line', 6919
+.annotate 'line', 7088
 
 .end # parseExpr_0
 
 
-.sub 'parseExpr_2' :subid('WSubId_81')
+.sub 'parseExpr_2' :subid('WSubId_87')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_80 = "WSubId_80"
+.const 'Sub' WSubId_85 = "WSubId_85"
+.const 'Sub' WSubId_86 = "WSubId_86"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 6923
-# var subexp: $P1
-    $P1 = WSubId_79(__ARG_1, __ARG_2)
-.annotate 'line', 6924
-# var t: $P2
+.annotate 'line', 7092
+    $P1 = WSubId_85(__ARG_1, __ARG_2)
+.annotate 'line', 7093
     null $P2
-.annotate 'line', 6925
-# var start: $P3
+.annotate 'line', 7094
     null $P3
-.annotate 'line', 6926
-# code: $I1
+.annotate 'line', 7095
     null $I1
   __label_2: # while
-.annotate 'line', 6927
+.annotate 'line', 7096
     $P2 = __ARG_1.'get'()
-    $P5 = WSubId_80($P2)
+    $P5 = WSubId_86($P2)
     set $I1, $P5
     unless $I1 goto __label_1
-# {
-# switch
-.annotate 'line', 6928
-    set $I2, $I1
-    set $I3, 1
-    if $I2 == $I3 goto __label_5
-    set $I3, 2
-    if $I2 == $I3 goto __label_6
-    set $I3, 3
-    if $I2 == $I3 goto __label_7
+.annotate 'line', 7097
+    if $I1 == 1 goto __label_5
+    if $I1 == 2 goto __label_6
+    if $I1 == 3 goto __label_7
     goto __label_4
   __label_5: # case
-.annotate 'line', 6930
+.annotate 'line', 7099
     new $P6, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     $P6.'CallExpr'(__ARG_1, __ARG_2, $P2, $P1)
     set $P1, $P6
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 6933
+.annotate 'line', 7102
     new $P7, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
     $P7.'IndexExpr'(__ARG_1, __ARG_2, $P2, $P1)
     set $P1, $P7
     goto __label_3 # break
   __label_7: # case
-.annotate 'line', 6936
+.annotate 'line', 7105
     set $P3, $P2
-.annotate 'line', 6937
+.annotate 'line', 7106
     $P2 = __ARG_1.'get'()
-.annotate 'line', 6938
+.annotate 'line', 7107
     $P8 = $P2.'isop'('*')
     if_null $P8, __label_8
     unless $P8 goto __label_8
-# {
-.annotate 'line', 6939
-# var right: $P4
-    $P4 = WSubId_79(__ARG_1, __ARG_2)
-.annotate 'line', 6940
+.annotate 'line', 7108
+    $P4 = WSubId_85(__ARG_1, __ARG_2)
+.annotate 'line', 7109
     new $P5, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
     $P5.'MemberRefExpr'(__ARG_2, $P2, $P1, $P4)
     set $P1, $P5
-# }
     goto __label_9
   __label_8: # else
-.annotate 'line', 6943
+.annotate 'line', 7112
     new $P5, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
     $P5.'MemberExpr'(__ARG_2, $P3, $P1, $P2)
     set $P1, $P5
   __label_9: # endif
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 6946
+.annotate 'line', 7115
     WSubId_6('Unexpected code in parseExpr_2')
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 6949
+.annotate 'line', 7118
     __ARG_1.'unget'($P2)
-.annotate 'line', 6950
+.annotate 'line', 7119
     .return($P1)
-# }
-.annotate 'line', 6951
+.annotate 'line', 7120
 
 .end # parseExpr_2
 
 
-.sub 'parseExpr_3' :subid('WSubId_84')
+.sub 'parseExpr_3' :subid('WSubId_90')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_81 = "WSubId_81"
-# Body
-# {
-.annotate 'line', 6955
-# var subexp: $P1
-    $P1 = WSubId_81(__ARG_1, __ARG_2)
-.annotate 'line', 6956
-# var t: $P2
+.const 'Sub' WSubId_87 = "WSubId_87"
+.annotate 'line', 7124
+    $P1 = WSubId_87(__ARG_1, __ARG_2)
+.annotate 'line', 7125
     $P2 = __ARG_1.'get'()
-# switch-case
-.annotate 'line', 6958
+.annotate 'line', 7127
     $I1 = $P2.'isop'('++')
     if $I1 goto __label_3
-.annotate 'line', 6960
+.annotate 'line', 7129
     $I1 = $P2.'isop'('--')
     if $I1 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 6959
+.annotate 'line', 7128
     new $P4, [ 'Winxed'; 'Compiler'; 'OpPostIncExpr' ]
     $P4.'OpPostIncExpr'(__ARG_2, $P2, $P1)
     set $P3, $P4
     .return($P3)
   __label_4: # case
-.annotate 'line', 6961
+.annotate 'line', 7130
     new $P6, [ 'Winxed'; 'Compiler'; 'OpPostDecExpr' ]
     $P6.'OpPostDecExpr'(__ARG_2, $P2, $P1)
     set $P5, $P6
     .return($P5)
   __label_2: # default
-.annotate 'line', 6963
+.annotate 'line', 7132
     __ARG_1.'unget'($P2)
-.annotate 'line', 6964
+.annotate 'line', 7133
     .return($P1)
   __label_1: # switch end
-# }
-.annotate 'line', 6966
+.annotate 'line', 7135
 
 .end # parseExpr_3
 
 
-.sub 'parseExpr_4' :subid('WSubId_83')
+.sub 'parseExpr_4' :subid('WSubId_89')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_82 = "WSubId_82"
-.const 'Sub' WSubId_83 = "WSubId_83"
+.const 'Sub' WSubId_88 = "WSubId_88"
+.const 'Sub' WSubId_89 = "WSubId_89"
 .const 'Sub' WSubId_6 = "WSubId_6"
-.const 'Sub' WSubId_84 = "WSubId_84"
-# Body
-# {
-.annotate 'line', 6970
-# var t: $P1
+.const 'Sub' WSubId_90 = "WSubId_90"
+.annotate 'line', 7139
     $P1 = __ARG_1.'get'()
-.annotate 'line', 6971
-# code: $I1
-    $P3 = WSubId_82($P1)
+.annotate 'line', 7140
+    $P3 = WSubId_88($P1)
     set $I1, $P3
-.annotate 'line', 6972
+.annotate 'line', 7141
     unless $I1 goto __label_1
-# {
-.annotate 'line', 6973
-# var subexpr: $P2
-    $P2 = WSubId_83(__ARG_1, __ARG_2)
-# switch
-.annotate 'line', 6974
-    set $I2, $I1
-    set $I3, 8
-    if $I2 == $I3 goto __label_5
-    set $I3, 11
-    if $I2 == $I3 goto __label_6
-    set $I3, 33
-    if $I2 == $I3 goto __label_7
-    set $I3, 9
-    if $I2 == $I3 goto __label_8
-    set $I3, 10
-    if $I2 == $I3 goto __label_9
-    set $I3, 31
-    if $I2 == $I3 goto __label_10
-    set $I3, 32
-    if $I2 == $I3 goto __label_11
+.annotate 'line', 7142
+    $P2 = WSubId_89(__ARG_1, __ARG_2)
+.annotate 'line', 7143
+    if $I1 == 8 goto __label_5
+    if $I1 == 11 goto __label_6
+    if $I1 == 33 goto __label_7
+    if $I1 == 9 goto __label_8
+    if $I1 == 10 goto __label_9
+    if $I1 == 31 goto __label_10
+    if $I1 == 32 goto __label_11
     goto __label_4
   __label_5: # case
-.annotate 'line', 6976
+.annotate 'line', 7145
     new $P4, [ 'Winxed'; 'Compiler'; 'OpUnaryMinusExpr' ]
     $P4.'OpUnaryMinusExpr'(__ARG_2, $P1, $P2)
     set $P3, $P4
     .return($P3)
   __label_6: # case
-.annotate 'line', 6978
+.annotate 'line', 7147
     new $P6, [ 'Winxed'; 'Compiler'; 'OpNotExpr' ]
     $P6.'OpNotExpr'(__ARG_2, $P1, $P2)
     set $P5, $P6
     .return($P5)
   __label_7: # case
-.annotate 'line', 6980
+.annotate 'line', 7149
     new $P8, [ 'Winxed'; 'Compiler'; 'OpBinNotExpr' ]
     $P8.'OpBinNotExpr'(__ARG_2, $P1, $P2)
     set $P7, $P8
     .return($P7)
   __label_8: # case
-.annotate 'line', 6982
+.annotate 'line', 7151
     new $P10, [ 'Winxed'; 'Compiler'; 'OpPreIncExpr' ]
     $P10.'OpPreIncExpr'(__ARG_2, $P1, $P2)
     set $P9, $P10
     .return($P9)
   __label_9: # case
-.annotate 'line', 6984
+.annotate 'line', 7153
     new $P12, [ 'Winxed'; 'Compiler'; 'OpPreDecExpr' ]
     $P12.'OpPreDecExpr'(__ARG_2, $P1, $P2)
     set $P11, $P12
     .return($P11)
   __label_10: # case
-.annotate 'line', 6986
+.annotate 'line', 7155
     new $P14, [ 'Winxed'; 'Compiler'; 'OpDeleteExpr' ]
     $P14.'OpDeleteExpr'(__ARG_2, $P1, $P2)
     set $P13, $P14
     .return($P13)
   __label_11: # case
-.annotate 'line', 6988
+.annotate 'line', 7157
     new $P16, [ 'Winxed'; 'Compiler'; 'OpExistsExpr' ]
     $P16.'OpExistsExpr'(__ARG_2, $P1, $P2)
     set $P15, $P16
     .return($P15)
   __label_4: # default
-.annotate 'line', 6990
+.annotate 'line', 7159
     WSubId_6('Invalid code in parseExpr_4', $P1)
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 6994
+.annotate 'line', 7163
     __ARG_1.'unget'($P1)
-.annotate 'line', 6995
-    .tailcall WSubId_84(__ARG_1, __ARG_2)
-# }
+.annotate 'line', 7164
+    .tailcall WSubId_90(__ARG_1, __ARG_2)
   __label_2: # endif
-# }
-.annotate 'line', 6997
+.annotate 'line', 7166
 
 .end # parseExpr_4
 
 
-.sub 'parseExpr_5' :subid('WSubId_86')
+.sub 'parseExpr_5' :subid('WSubId_92')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_83 = "WSubId_83"
-.const 'Sub' WSubId_85 = "WSubId_85"
+.const 'Sub' WSubId_89 = "WSubId_89"
+.const 'Sub' WSubId_91 = "WSubId_91"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7001
-# var lexpr: $P1
-    $P1 = WSubId_83(__ARG_1, __ARG_2)
-.annotate 'line', 7002
-# var t: $P2
+.annotate 'line', 7170
+    $P1 = WSubId_89(__ARG_1, __ARG_2)
+.annotate 'line', 7171
     null $P2
-.annotate 'line', 7003
-# code: $I1
+.annotate 'line', 7172
     null $I1
   __label_2: # while
-.annotate 'line', 7004
+.annotate 'line', 7173
     $P2 = __ARG_1.'get'()
-    $P4 = WSubId_85($P2)
+    $P4 = WSubId_91($P2)
     set $I1, $P4
     unless $I1 goto __label_1
-# {
-.annotate 'line', 7005
-# var rexpr: $P3
-    $P3 = WSubId_83(__ARG_1, __ARG_2)
-# switch
-.annotate 'line', 7006
-    set $I2, $I1
-    set $I3, 19
-    if $I2 == $I3 goto __label_5
-    set $I3, 20
-    if $I2 == $I3 goto __label_6
-    set $I3, 21
-    if $I2 == $I3 goto __label_7
-    set $I3, 22
-    if $I2 == $I3 goto __label_8
+.annotate 'line', 7174
+    $P3 = WSubId_89(__ARG_1, __ARG_2)
+.annotate 'line', 7175
+    if $I1 == 19 goto __label_5
+    if $I1 == 20 goto __label_6
+    if $I1 == 21 goto __label_7
+    if $I1 == 22 goto __label_8
     goto __label_4
   __label_5: # case
-.annotate 'line', 7008
+.annotate 'line', 7177
     new $P4, [ 'Winxed'; 'Compiler'; 'OpMulExpr' ]
     $P4.'OpMulExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 7011
+.annotate 'line', 7180
     new $P5, [ 'Winxed'; 'Compiler'; 'OpDivExpr' ]
     $P5.'OpDivExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P5
     goto __label_3 # break
   __label_7: # case
-.annotate 'line', 7014
+.annotate 'line', 7183
     new $P6, [ 'Winxed'; 'Compiler'; 'OpModExpr' ]
     $P6.'OpModExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P6
     goto __label_3 # break
   __label_8: # case
-.annotate 'line', 7017
+.annotate 'line', 7186
     new $P7, [ 'Winxed'; 'Compiler'; 'OpCModExpr' ]
     $P7.'OpCModExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P7
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 7020
+.annotate 'line', 7189
     WSubId_6('Invalid code in parseExpr_5', $P2)
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7023
+.annotate 'line', 7192
     __ARG_1.'unget'($P2)
-.annotate 'line', 7024
+.annotate 'line', 7193
     .return($P1)
-# }
-.annotate 'line', 7025
+.annotate 'line', 7194
 
 .end # parseExpr_5
 
 
-.sub 'parseExpr_6' :subid('WSubId_87')
+.sub 'parseExpr_6' :subid('WSubId_93')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_86 = "WSubId_86"
-# Body
-# {
-.annotate 'line', 7029
-# var lexpr: $P1
-    $P1 = WSubId_86(__ARG_1, __ARG_2)
-.annotate 'line', 7030
-# var t: $P2
+.const 'Sub' WSubId_92 = "WSubId_92"
+.annotate 'line', 7198
+    $P1 = WSubId_92(__ARG_1, __ARG_2)
+.annotate 'line', 7199
     null $P2
   __label_2: # while
-.annotate 'line', 7031
+.annotate 'line', 7200
     $P2 = __ARG_1.'get'()
-    $P6 = $P2.'isop'('+')
-    if $P6 goto __label_3
-    $P7 = $P2.'isop'('-')
-    set $P5, $P7
-    goto __label_4
+    $P5 = $P2.'isop'('+')
+    if $P5 goto __label_3
+    $P5 = $P2.'isop'('-')
   __label_3:
-    set $P5, $P6
-  __label_4:
     if_null $P5, __label_1
     unless $P5 goto __label_1
-# {
-.annotate 'line', 7032
-# var rexpr: $P3
-    $P3 = WSubId_86(__ARG_1, __ARG_2)
-.annotate 'line', 7033
-# var expr: $P4
+.annotate 'line', 7201
+    $P3 = WSubId_92(__ARG_1, __ARG_2)
+.annotate 'line', 7202
     null $P4
-.annotate 'line', 7034
+.annotate 'line', 7203
     $P5 = $P2.'isop'('+')
-    if_null $P5, __label_5
-    unless $P5 goto __label_5
-.annotate 'line', 7035
+    if_null $P5, __label_4
+    unless $P5 goto __label_4
+.annotate 'line', 7204
     new $P6, [ 'Winxed'; 'Compiler'; 'OpAddExpr' ]
     $P6.'OpAddExpr'(__ARG_2, $P2, $P1, $P3)
     set $P4, $P6
-    goto __label_6
-  __label_5: # else
-.annotate 'line', 7037
+    goto __label_5
+  __label_4: # else
+.annotate 'line', 7206
     new $P7, [ 'Winxed'; 'Compiler'; 'OpSubExpr' ]
     $P7.'OpSubExpr'(__ARG_2, $P2, $P1, $P3)
     set $P4, $P7
-  __label_6: # endif
-.annotate 'line', 7038
+  __label_5: # endif
+.annotate 'line', 7207
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7040
+.annotate 'line', 7209
     __ARG_1.'unget'($P2)
-.annotate 'line', 7041
+.annotate 'line', 7210
     .return($P1)
-# }
-.annotate 'line', 7042
+.annotate 'line', 7211
 
 .end # parseExpr_6
 
 
-.sub 'parseExpr_7' :subid('WSubId_89')
+.sub 'parseExpr_7' :subid('WSubId_95')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_87 = "WSubId_87"
-.const 'Sub' WSubId_88 = "WSubId_88"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_94 = "WSubId_94"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7046
-# var lexpr: $P1
-    $P1 = WSubId_87(__ARG_1, __ARG_2)
-.annotate 'line', 7047
-# var rexpr: $P2
+.annotate 'line', 7215
+    $P1 = WSubId_93(__ARG_1, __ARG_2)
+.annotate 'line', 7216
     null $P2
-.annotate 'line', 7048
-# var t: $P3
+.annotate 'line', 7217
     null $P3
-.annotate 'line', 7049
-# code: $I1
+.annotate 'line', 7218
     null $I1
   __label_2: # while
-.annotate 'line', 7050
+.annotate 'line', 7219
     $P3 = __ARG_1.'get'()
-    $P4 = WSubId_88($P3)
+    $P4 = WSubId_94($P3)
     set $I1, $P4
     unless $I1 goto __label_1
-# {
-# switch
-.annotate 'line', 7051
-    set $I2, $I1
-    set $I3, 28
-    if $I2 == $I3 goto __label_5
-    set $I3, 29
-    if $I2 == $I3 goto __label_6
+.annotate 'line', 7220
+    if $I1 == 28 goto __label_5
+    if $I1 == 29 goto __label_6
     goto __label_4
   __label_5: # case
-.annotate 'line', 7053
-    $P2 = WSubId_87(__ARG_1, __ARG_2)
-.annotate 'line', 7054
+.annotate 'line', 7222
+    $P2 = WSubId_93(__ARG_1, __ARG_2)
+.annotate 'line', 7223
     new $P5, [ 'Winxed'; 'Compiler'; 'OpShiftleftExpr' ]
     $P5.'OpShiftleftExpr'(__ARG_2, $P3, $P1, $P2)
     set $P1, $P5
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 7057
-    $P2 = WSubId_87(__ARG_1, __ARG_2)
-.annotate 'line', 7058
+.annotate 'line', 7226
+    $P2 = WSubId_93(__ARG_1, __ARG_2)
+.annotate 'line', 7227
     new $P6, [ 'Winxed'; 'Compiler'; 'OpShiftrightExpr' ]
     $P6.'OpShiftrightExpr'(__ARG_2, $P3, $P1, $P2)
     set $P1, $P6
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 7061
+.annotate 'line', 7230
     WSubId_6('Invalid code in parseExpr_7', $P3)
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7064
+.annotate 'line', 7233
     __ARG_1.'unget'($P3)
-.annotate 'line', 7065
+.annotate 'line', 7234
     .return($P1)
-# }
-.annotate 'line', 7066
+.annotate 'line', 7235
 
 .end # parseExpr_7
 
 
-.sub 'parseExpr_8' :subid('WSubId_91')
+.sub 'parseExpr_8' :subid('WSubId_97')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_89 = "WSubId_89"
-.const 'Sub' WSubId_90 = "WSubId_90"
+.const 'Sub' WSubId_95 = "WSubId_95"
+.const 'Sub' WSubId_96 = "WSubId_96"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7070
-# var lexpr: $P1
-    $P1 = WSubId_89(__ARG_1, __ARG_2)
-.annotate 'line', 7071
-# var rexpr: $P2
+.annotate 'line', 7239
+    $P1 = WSubId_95(__ARG_1, __ARG_2)
+.annotate 'line', 7240
     null $P2
-.annotate 'line', 7072
-# var t: $P3
+.annotate 'line', 7241
     null $P3
-.annotate 'line', 7073
-# code: $I1
+.annotate 'line', 7242
     null $I1
   __label_2: # while
-.annotate 'line', 7074
+.annotate 'line', 7243
     $P3 = __ARG_1.'get'()
-    $P4 = WSubId_90($P3)
+    $P4 = WSubId_96($P3)
     set $I1, $P4
     unless $I1 goto __label_1
-# {
-# switch
-.annotate 'line', 7075
-    set $I2, $I1
-    set $I3, 14
-    if $I2 == $I3 goto __label_5
-    set $I3, 16
-    if $I2 == $I3 goto __label_6
-    set $I3, 15
-    if $I2 == $I3 goto __label_7
-    set $I3, 17
-    if $I2 == $I3 goto __label_8
-    set $I3, 27
-    if $I2 == $I3 goto __label_9
+.annotate 'line', 7244
+    if $I1 == 14 goto __label_5
+    if $I1 == 16 goto __label_6
+    if $I1 == 15 goto __label_7
+    if $I1 == 17 goto __label_8
+    if $I1 == 27 goto __label_9
     goto __label_4
   __label_5: # case
-.annotate 'line', 7077
-    $P2 = WSubId_89(__ARG_1, __ARG_2)
-.annotate 'line', 7078
+.annotate 'line', 7246
+    $P2 = WSubId_95(__ARG_1, __ARG_2)
+.annotate 'line', 7247
     new $P5, [ 'Winxed'; 'Compiler'; 'OpLessExpr' ]
     $P1 = $P5.'set'(__ARG_2, $P3, $P1, $P2)
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 7081
-    $P2 = WSubId_89(__ARG_1, __ARG_2)
-.annotate 'line', 7082
+.annotate 'line', 7250
+    $P2 = WSubId_95(__ARG_1, __ARG_2)
+.annotate 'line', 7251
     new $P6, [ 'Winxed'; 'Compiler'; 'OpGreaterExpr' ]
     $P1 = $P6.'set'(__ARG_2, $P3, $P1, $P2)
     goto __label_3 # break
   __label_7: # case
-.annotate 'line', 7085
-    $P2 = WSubId_89(__ARG_1, __ARG_2)
-.annotate 'line', 7086
+.annotate 'line', 7254
+    $P2 = WSubId_95(__ARG_1, __ARG_2)
+.annotate 'line', 7255
     new $P7, [ 'Winxed'; 'Compiler'; 'OpLessEqualExpr' ]
     $P1 = $P7.'set'(__ARG_2, $P3, $P1, $P2)
     goto __label_3 # break
   __label_8: # case
-.annotate 'line', 7089
-    $P2 = WSubId_89(__ARG_1, __ARG_2)
-.annotate 'line', 7090
+.annotate 'line', 7258
+    $P2 = WSubId_95(__ARG_1, __ARG_2)
+.annotate 'line', 7259
     new $P8, [ 'Winxed'; 'Compiler'; 'OpGreaterEqualExpr' ]
     $P1 = $P8.'set'(__ARG_2, $P3, $P1, $P2)
     goto __label_3 # break
   __label_9: # case
-.annotate 'line', 7093
+.annotate 'line', 7262
     new $P9, [ 'Winxed'; 'Compiler'; 'OpInstanceOfExpr' ]
     $P9.'OpInstanceOfExpr'(__ARG_2, $P3, $P1, __ARG_1)
     set $P1, $P9
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 7096
+.annotate 'line', 7265
     WSubId_6('Invalid code in parseExpr_9', $P3)
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7099
+.annotate 'line', 7268
     __ARG_1.'unget'($P3)
-.annotate 'line', 7100
+.annotate 'line', 7269
     .return($P1)
-# }
-.annotate 'line', 7101
+.annotate 'line', 7270
 
 .end # parseExpr_8
 
 
-.sub 'parseExpr_9' :subid('WSubId_93')
+.sub 'parseExpr_9' :subid('WSubId_99')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_91 = "WSubId_91"
-.const 'Sub' WSubId_92 = "WSubId_92"
+.const 'Sub' WSubId_97 = "WSubId_97"
+.const 'Sub' WSubId_98 = "WSubId_98"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7105
-# var lexpr: $P1
-    $P1 = WSubId_91(__ARG_1, __ARG_2)
-.annotate 'line', 7106
-# var rexpr: $P2
+.annotate 'line', 7274
+    $P1 = WSubId_97(__ARG_1, __ARG_2)
+.annotate 'line', 7275
     null $P2
-.annotate 'line', 7107
-# var t: $P3
+.annotate 'line', 7276
     null $P3
-.annotate 'line', 7108
-# code: $I1
+.annotate 'line', 7277
     null $I1
   __label_2: # while
-.annotate 'line', 7109
+.annotate 'line', 7278
     $P3 = __ARG_1.'get'()
-    $P4 = WSubId_92($P3)
+    $P4 = WSubId_98($P3)
     set $I1, $P4
     unless $I1 goto __label_1
-# {
-# switch
-.annotate 'line', 7110
-    set $I2, $I1
-    set $I3, 12
-    if $I2 == $I3 goto __label_5
-    set $I3, 13
-    if $I2 == $I3 goto __label_6
-    set $I3, 25
-    if $I2 == $I3 goto __label_7
-    set $I3, 26
-    if $I2 == $I3 goto __label_8
+.annotate 'line', 7279
+    if $I1 == 12 goto __label_5
+    if $I1 == 13 goto __label_6
+    if $I1 == 25 goto __label_7
+    if $I1 == 26 goto __label_8
     goto __label_4
   __label_5: # case
-.annotate 'line', 7112
-    $P2 = WSubId_91(__ARG_1, __ARG_2)
-.annotate 'line', 7113
+.annotate 'line', 7281
+    $P2 = WSubId_97(__ARG_1, __ARG_2)
+.annotate 'line', 7282
     new $P5, [ 'Winxed'; 'Compiler'; 'OpEqualExpr' ]
     $P5.'OpEqualExpr'(__ARG_2, $P3, $P1, $P2, 1)
     set $P1, $P5
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 7116
-    $P2 = WSubId_91(__ARG_1, __ARG_2)
-.annotate 'line', 7117
+.annotate 'line', 7285
+    $P2 = WSubId_97(__ARG_1, __ARG_2)
+.annotate 'line', 7286
     new $P6, [ 'Winxed'; 'Compiler'; 'OpEqualExpr' ]
     $P6.'OpEqualExpr'(__ARG_2, $P3, $P1, $P2, 0)
     set $P1, $P6
     goto __label_3 # break
   __label_7: # case
-.annotate 'line', 7120
-    $P2 = WSubId_91(__ARG_1, __ARG_2)
-.annotate 'line', 7121
+.annotate 'line', 7289
+    $P2 = WSubId_97(__ARG_1, __ARG_2)
+.annotate 'line', 7290
     new $P7, [ 'Winxed'; 'Compiler'; 'OpSameExpr' ]
     $P7.'OpSameExpr'(__ARG_2, $P3, $P1, $P2, 1)
     set $P1, $P7
     goto __label_3 # break
   __label_8: # case
-.annotate 'line', 7124
-    $P2 = WSubId_91(__ARG_1, __ARG_2)
-.annotate 'line', 7125
+.annotate 'line', 7293
+    $P2 = WSubId_97(__ARG_1, __ARG_2)
+.annotate 'line', 7294
     new $P8, [ 'Winxed'; 'Compiler'; 'OpSameExpr' ]
     $P8.'OpSameExpr'(__ARG_2, $P3, $P1, $P2, 0)
     set $P1, $P8
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 7128
+.annotate 'line', 7297
     WSubId_6('Invalid code in parseExpr_8', $P3)
   __label_3: # switch end
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7131
+.annotate 'line', 7300
     __ARG_1.'unget'($P3)
-.annotate 'line', 7132
+.annotate 'line', 7301
     .return($P1)
-# }
-.annotate 'line', 7133
+.annotate 'line', 7302
 
 .end # parseExpr_9
 
 
-.sub 'parseExpr_10' :subid('WSubId_94')
+.sub 'parseExpr_10' :subid('WSubId_100')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_93 = "WSubId_93"
-# Body
-# {
-.annotate 'line', 7137
-# var lexpr: $P1
-    $P1 = WSubId_93(__ARG_1, __ARG_2)
-.annotate 'line', 7138
-# var t: $P2
+.const 'Sub' WSubId_99 = "WSubId_99"
+.annotate 'line', 7306
+    $P1 = WSubId_99(__ARG_1, __ARG_2)
+.annotate 'line', 7307
     null $P2
   __label_2: # while
-.annotate 'line', 7139
+.annotate 'line', 7308
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'('&')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 7140
-# var rexpr: $P3
-    $P3 = WSubId_93(__ARG_1, __ARG_2)
-.annotate 'line', 7141
+.annotate 'line', 7309
+    $P3 = WSubId_99(__ARG_1, __ARG_2)
+.annotate 'line', 7310
     new $P4, [ 'Winxed'; 'Compiler'; 'OpBinAndExpr' ]
     $P4.'OpBinAndExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7143
+.annotate 'line', 7312
     __ARG_1.'unget'($P2)
-.annotate 'line', 7144
+.annotate 'line', 7313
     .return($P1)
-# }
-.annotate 'line', 7145
+.annotate 'line', 7314
 
 .end # parseExpr_10
 
 
-.sub 'parseExpr_11' :subid('WSubId_95')
+.sub 'parseExpr_11' :subid('WSubId_101')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_94 = "WSubId_94"
-# Body
-# {
-.annotate 'line', 7149
-# var lexpr: $P1
-    $P1 = WSubId_94(__ARG_1, __ARG_2)
-.annotate 'line', 7150
-# var t: $P2
+.const 'Sub' WSubId_100 = "WSubId_100"
+.annotate 'line', 7318
+    $P1 = WSubId_100(__ARG_1, __ARG_2)
+.annotate 'line', 7319
     null $P2
   __label_2: # while
-.annotate 'line', 7151
+.annotate 'line', 7320
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'('^')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 7152
-# var rexpr: $P3
-    $P3 = WSubId_94(__ARG_1, __ARG_2)
-.annotate 'line', 7153
+.annotate 'line', 7321
+    $P3 = WSubId_100(__ARG_1, __ARG_2)
+.annotate 'line', 7322
     new $P4, [ 'Winxed'; 'Compiler'; 'OpBinXorExpr' ]
     $P4.'OpBinXorExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7155
+.annotate 'line', 7324
     __ARG_1.'unget'($P2)
-.annotate 'line', 7156
+.annotate 'line', 7325
     .return($P1)
-# }
-.annotate 'line', 7157
+.annotate 'line', 7326
 
 .end # parseExpr_11
 
 
-.sub 'parseExpr_12' :subid('WSubId_96')
+.sub 'parseExpr_12' :subid('WSubId_102')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_95 = "WSubId_95"
-# Body
-# {
-.annotate 'line', 7161
-# var lexpr: $P1
-    $P1 = WSubId_95(__ARG_1, __ARG_2)
-.annotate 'line', 7162
-# var t: $P2
+.const 'Sub' WSubId_101 = "WSubId_101"
+.annotate 'line', 7330
+    $P1 = WSubId_101(__ARG_1, __ARG_2)
+.annotate 'line', 7331
     null $P2
   __label_2: # while
-.annotate 'line', 7163
+.annotate 'line', 7332
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'('|')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 7164
-# var rexpr: $P3
-    $P3 = WSubId_95(__ARG_1, __ARG_2)
-.annotate 'line', 7165
+.annotate 'line', 7333
+    $P3 = WSubId_101(__ARG_1, __ARG_2)
+.annotate 'line', 7334
     new $P4, [ 'Winxed'; 'Compiler'; 'OpBinOrExpr' ]
     $P4.'OpBinOrExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7167
+.annotate 'line', 7336
     __ARG_1.'unget'($P2)
-.annotate 'line', 7168
+.annotate 'line', 7337
     .return($P1)
-# }
-.annotate 'line', 7169
+.annotate 'line', 7338
 
 .end # parseExpr_12
 
 
-.sub 'parseExpr_13' :subid('WSubId_97')
+.sub 'parseExpr_13' :subid('WSubId_103')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_96 = "WSubId_96"
-# Body
-# {
-.annotate 'line', 7173
-# var lexpr: $P1
-    $P1 = WSubId_96(__ARG_1, __ARG_2)
-.annotate 'line', 7174
-# var t: $P2
+.const 'Sub' WSubId_102 = "WSubId_102"
+.annotate 'line', 7342
+    $P1 = WSubId_102(__ARG_1, __ARG_2)
+.annotate 'line', 7343
     null $P2
   __label_2: # while
-.annotate 'line', 7175
+.annotate 'line', 7344
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'('&&')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 7176
-# var rexpr: $P3
-    $P3 = WSubId_96(__ARG_1, __ARG_2)
-.annotate 'line', 7177
+.annotate 'line', 7345
+    $P3 = WSubId_102(__ARG_1, __ARG_2)
+.annotate 'line', 7346
     new $P4, [ 'Winxed'; 'Compiler'; 'OpBoolAndExpr' ]
     $P4.'OpBoolAndExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7179
+.annotate 'line', 7348
     __ARG_1.'unget'($P2)
-.annotate 'line', 7180
+.annotate 'line', 7349
     .return($P1)
-# }
-.annotate 'line', 7181
+.annotate 'line', 7350
 
 .end # parseExpr_13
 
 
-.sub 'parseExpr_14' :subid('WSubId_98')
+.sub 'parseExpr_14' :subid('WSubId_104')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_97 = "WSubId_97"
-.const 'Sub' WSubId_96 = "WSubId_96"
-# Body
-# {
-.annotate 'line', 7185
-# var lexpr: $P1
-    $P1 = WSubId_97(__ARG_1, __ARG_2)
-.annotate 'line', 7186
-# var t: $P2
+.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_102 = "WSubId_102"
+.annotate 'line', 7354
+    $P1 = WSubId_103(__ARG_1, __ARG_2)
+.annotate 'line', 7355
     null $P2
   __label_2: # while
-.annotate 'line', 7187
+.annotate 'line', 7356
     $P2 = __ARG_1.'get'()
     $P4 = $P2.'isop'('||')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 7188
-# var rexpr: $P3
-    $P3 = WSubId_96(__ARG_1, __ARG_2)
-.annotate 'line', 7189
+.annotate 'line', 7357
+    $P3 = WSubId_102(__ARG_1, __ARG_2)
+.annotate 'line', 7358
     new $P4, [ 'Winxed'; 'Compiler'; 'OpBoolOrExpr' ]
     $P4.'OpBoolOrExpr'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7191
+.annotate 'line', 7360
     __ARG_1.'unget'($P2)
-.annotate 'line', 7192
+.annotate 'line', 7361
     .return($P1)
-# }
-.annotate 'line', 7193
+.annotate 'line', 7362
 
 .end # parseExpr_14
 
 
-.sub 'parseExpr_15' :subid('WSubId_100')
+.sub 'parseExpr_15' :subid('WSubId_106')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_98 = "WSubId_98"
-.const 'Sub' WSubId_99 = "WSubId_99"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 7197
-# var econd: $P1
-    $P1 = WSubId_98(__ARG_1, __ARG_2)
-.annotate 'line', 7198
-# var t: $P2
+.const 'Sub' WSubId_104 = "WSubId_104"
+.const 'Sub' WSubId_105 = "WSubId_105"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 7366
+    $P1 = WSubId_104(__ARG_1, __ARG_2)
+.annotate 'line', 7367
     $P2 = __ARG_1.'get'()
-.annotate 'line', 7199
+.annotate 'line', 7368
     $P5 = $P2.'isop'('?')
     if_null $P5, __label_1
     unless $P5 goto __label_1
-# {
-.annotate 'line', 7200
-# var etrue: $P3
-    $P3 = WSubId_99(__ARG_1, __ARG_2)
-.annotate 'line', 7201
-    WSubId_62(':', __ARG_1)
-.annotate 'line', 7202
-# var efalse: $P4
-    $P4 = WSubId_99(__ARG_1, __ARG_2)
-.annotate 'line', 7203
+.annotate 'line', 7369
+    $P3 = WSubId_105(__ARG_1, __ARG_2)
+.annotate 'line', 7370
+    WSubId_68(':', __ARG_1)
+.annotate 'line', 7371
+    $P4 = WSubId_105(__ARG_1, __ARG_2)
+.annotate 'line', 7372
     new $P6, [ 'Winxed'; 'Compiler'; 'OpConditionalExpr' ]
     $P6.'OpConditionalExpr'(__ARG_2, $P2, $P1, $P3, $P4)
     set $P5, $P6
     .return($P5)
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 7206
+.annotate 'line', 7375
     __ARG_1.'unget'($P2)
-.annotate 'line', 7207
+.annotate 'line', 7376
     .return($P1)
-# }
   __label_2: # endif
-# }
-.annotate 'line', 7209
+.annotate 'line', 7378
 
 .end # parseExpr_15
 
 
-.sub 'parseExpr_16' :subid('WSubId_99')
+.sub 'parseExpr_16' :subid('WSubId_105')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_100 = "WSubId_100"
-.const 'Sub' WSubId_101 = "WSubId_101"
-.const 'Sub' WSubId_99 = "WSubId_99"
+.const 'Sub' WSubId_106 = "WSubId_106"
+.const 'Sub' WSubId_107 = "WSubId_107"
+.const 'Sub' WSubId_105 = "WSubId_105"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7213
-# var lexpr: $P1
-    $P1 = WSubId_100(__ARG_1, __ARG_2)
-.annotate 'line', 7214
-# var t: $P2
+.annotate 'line', 7382
+    $P1 = WSubId_106(__ARG_1, __ARG_2)
+.annotate 'line', 7383
     null $P2
-.annotate 'line', 7215
-# code: $I1
+.annotate 'line', 7384
     null $I1
   __label_2: # while
-.annotate 'line', 7216
+.annotate 'line', 7385
     $P2 = __ARG_1.'get'()
-    $P5 = WSubId_101($P2)
+    $P5 = WSubId_107($P2)
     set $I1, $P5
     unless $I1 goto __label_1
-# {
-.annotate 'line', 7217
-# var rexpr: $P3
-    $P3 = WSubId_99(__ARG_1, __ARG_2)
-.annotate 'line', 7218
-# var expr: $P4
+.annotate 'line', 7386
+    $P3 = WSubId_105(__ARG_1, __ARG_2)
+.annotate 'line', 7387
     null $P4
-# switch
-.annotate 'line', 7219
-    set $I2, $I1
-    set $I3, 4
-    if $I2 == $I3 goto __label_5
-    set $I3, 5
-    if $I2 == $I3 goto __label_6
-    set $I3, 6
-    if $I2 == $I3 goto __label_7
-    set $I3, 18
-    if $I2 == $I3 goto __label_8
-    set $I3, 23
-    if $I2 == $I3 goto __label_9
-    set $I3, 24
-    if $I2 == $I3 goto __label_10
-    set $I3, 30
-    if $I2 == $I3 goto __label_11
+.annotate 'line', 7388
+    if $I1 == 4 goto __label_5
+    if $I1 == 5 goto __label_6
+    if $I1 == 6 goto __label_7
+    if $I1 == 18 goto __label_8
+    if $I1 == 23 goto __label_9
+    if $I1 == 24 goto __label_10
+    if $I1 == 30 goto __label_11
     goto __label_4
   __label_5: # case
-.annotate 'line', 7221
+.annotate 'line', 7390
     new $P4, [ 'Winxed'; 'Compiler'; 'OpAssignExpr' ]
     goto __label_3 # break
   __label_6: # case
-.annotate 'line', 7224
+.annotate 'line', 7393
     new $P4, [ 'Winxed'; 'Compiler'; 'OpAssignToExpr' ]
     goto __label_3 # break
   __label_7: # case
-.annotate 'line', 7227
+.annotate 'line', 7396
     new $P4, [ 'Winxed'; 'Compiler'; 'OpAddToExpr' ]
     goto __label_3 # break
   __label_8: # case
-.annotate 'line', 7230
+.annotate 'line', 7399
     new $P4, [ 'Winxed'; 'Compiler'; 'OpSubToExpr' ]
     goto __label_3 # break
   __label_9: # case
-.annotate 'line', 7233
+.annotate 'line', 7402
     new $P4, [ 'Winxed'; 'Compiler'; 'OpMulToExpr' ]
     goto __label_3 # break
   __label_10: # case
-.annotate 'line', 7236
+.annotate 'line', 7405
     new $P4, [ 'Winxed'; 'Compiler'; 'OpDivToExpr' ]
     goto __label_3 # break
   __label_11: # case
-.annotate 'line', 7239
+.annotate 'line', 7408
     new $P4, [ 'Winxed'; 'Compiler'; 'OpModToExpr' ]
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 7242
+.annotate 'line', 7411
     WSubId_6('Unexpected code in parseExpr_16', $P2)
   __label_3: # switch end
-.annotate 'line', 7244
+.annotate 'line', 7413
     $P4.'set'(__ARG_2, $P2, $P1, $P3)
-.annotate 'line', 7245
+.annotate 'line', 7414
     set $P1, $P4
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7247
+.annotate 'line', 7416
     __ARG_1.'unget'($P2)
-.annotate 'line', 7248
+.annotate 'line', 7417
     .return($P1)
-# }
-.annotate 'line', 7249
+.annotate 'line', 7418
 
 .end # parseExpr_16
 
 
-.sub 'parseExpr' :subid('WSubId_45')
+.sub 'parseExpr' :subid('WSubId_51')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_99 = "WSubId_99"
-# Body
-# {
-.annotate 'line', 7253
-    .tailcall WSubId_99(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 7254
+.const 'Sub' WSubId_105 = "WSubId_105"
+.annotate 'line', 7422
+    .tailcall WSubId_105(__ARG_1, __ARG_2)
+.annotate 'line', 7423
 
 .end # parseExpr
 
@@ -21912,28 +18068,24 @@
 
 .sub 'genbreaklabel' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7269
+.annotate 'line', 7438
     getattribute $P1, self, 'brlabel'
     if_null $P1, __label_1
-.annotate 'line', 7270
+.annotate 'line', 7439
     WSubId_6('attempt to generate break label twice')
   __label_1: # endif
-.annotate 'line', 7271
-# label: $S1
+.annotate 'line', 7440
     $P1 = self.'genlabel'()
     null $S1
     if_null $P1, __label_2
     set $S1, $P1
   __label_2:
-.annotate 'line', 7272
+.annotate 'line', 7441
     box $P1, $S1
     setattribute self, 'brlabel', $P1
-.annotate 'line', 7273
+.annotate 'line', 7442
     .return($S1)
-# }
-.annotate 'line', 7274
+.annotate 'line', 7443
 
 .end # genbreaklabel
 
@@ -21941,54 +18093,46 @@
 .sub 'getbreaklabel' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7277
-# var label: $P1
+.annotate 'line', 7446
     getattribute $P1, self, 'brlabel'
-.annotate 'line', 7278
+.annotate 'line', 7447
     unless_null $P1, __label_1
-.annotate 'line', 7279
+.annotate 'line', 7448
     WSubId_6('attempt to get break label before creating it')
   __label_1: # endif
-.annotate 'line', 7280
+.annotate 'line', 7449
     .return($P1)
-# }
-.annotate 'line', 7281
+.annotate 'line', 7450
 
 .end # getbreaklabel
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Breakable' ]
-.annotate 'line', 7265
+.annotate 'line', 7434
     addattribute $P0, 'brlabel'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Continuable' ]
 
 .sub 'gencontinuelabel' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7290
+.annotate 'line', 7459
     getattribute $P1, self, 'cntlabel'
     if_null $P1, __label_1
-.annotate 'line', 7291
+.annotate 'line', 7460
     WSubId_6('attempt to generate continue label twice')
   __label_1: # endif
-.annotate 'line', 7292
-# label: $S1
+.annotate 'line', 7461
     $P1 = self.'genlabel'()
     null $S1
     if_null $P1, __label_2
     set $S1, $P1
   __label_2:
-.annotate 'line', 7293
+.annotate 'line', 7462
     box $P1, $S1
     setattribute self, 'cntlabel', $P1
-.annotate 'line', 7294
+.annotate 'line', 7463
     .return($S1)
-# }
-.annotate 'line', 7295
+.annotate 'line', 7464
 
 .end # gencontinuelabel
 
@@ -21996,29 +18140,25 @@
 .sub 'getcontinuelabel' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 7298
-# var label: $P1
+.annotate 'line', 7467
     getattribute $P1, self, 'cntlabel'
-.annotate 'line', 7299
+.annotate 'line', 7468
     unless_null $P1, __label_1
-.annotate 'line', 7300
+.annotate 'line', 7469
     WSubId_6('attempt to get continue label before creating it')
   __label_1: # endif
-.annotate 'line', 7301
+.annotate 'line', 7470
     .return($P1)
-# }
-.annotate 'line', 7302
+.annotate 'line', 7471
 
 .end # getcontinuelabel
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Continuable' ]
-.annotate 'line', 7284
+.annotate 'line', 7453
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Breakable' ]
     addparent $P0, $P1
-.annotate 'line', 7286
+.annotate 'line', 7455
     addattribute $P0, 'cntlabel'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
@@ -22027,131 +18167,102 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 7318
+.annotate 'line', 7487
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7319
-# var t: $P1
+.annotate 'line', 7488
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7320
+.annotate 'line', 7489
     $P2 = $P1.'isop'(';')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 7321
+.annotate 'line', 7490
     __ARG_2.'unget'($P1)
-.annotate 'line', 7322
+.annotate 'line', 7491
     new $P4, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
     $P4.'ArgumentList'(__ARG_3, __ARG_1, __ARG_2, ";")
     set $P3, $P4
     setattribute self, 'values', $P3
-# }
   __label_1: # endif
-# }
-.annotate 'line', 7324
+.annotate 'line', 7493
 
 .end # parse
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7327
-# var values: $P1
+.annotate 'line', 7496
     getattribute $P1, self, 'values'
-.annotate 'line', 7328
+.annotate 'line', 7497
     if_null $P1, __label_1
-.annotate 'line', 7329
+.annotate 'line', 7498
     $P1 = $P1.'optimize'()
   __label_1: # endif
-.annotate 'line', 7330
+.annotate 'line', 7499
     .return(self)
-# }
-.annotate 'line', 7331
+.annotate 'line', 7500
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7335
-# var values: $P1
+.annotate 'line', 7504
     getattribute $P1, self, 'values'
-.annotate 'line', 7336
-# n: $I1
+.annotate 'line', 7505
     unless_null $P1, __label_2
     null $I1
     goto __label_1
   __label_2:
-# builtin int
     $P3 = $P1.'numargs'()
     set $I1, $P3
   __label_1:
-.annotate 'line', 7339
-    iseq $I3, $I1, 1
-    unless $I3 goto __label_4
-    isa $I4, self, [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
-    set $I2, $I4
-    goto __label_5
+.annotate 'line', 7508
+    iseq $I2, $I1, 1
+    unless $I2 goto __label_4
+    isa $I2, self, [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
   __label_4:
-    set $I2, $I3
-  __label_5:
     unless $I2 goto __label_3
-# {
-.annotate 'line', 7340
-# var func: $P2
+.annotate 'line', 7509
     $P2 = $P1.'getfreearg'(0)
-.annotate 'line', 7341
-    $P4 = $P2.'cantailcall'()
-    unless $P4 goto __label_7
-    getattribute $P6, self, 'owner'
-    $P5 = $P6.'allowtailcall'()
-    set $P3, $P5
-    goto __label_8
-  __label_7:
-    set $P3, $P4
-  __label_8:
-    if_null $P3, __label_6
+.annotate 'line', 7510
+    $P3 = $P2.'cantailcall'()
     unless $P3 goto __label_6
-# {
-.annotate 'line', 7342
+    getattribute $P4, self, 'owner'
+    $P3 = $P4.'allowtailcall'()
+  __label_6:
+    if_null $P3, __label_5
+    unless $P3 goto __label_5
+.annotate 'line', 7511
     self.'annotate'(__ARG_1)
-.annotate 'line', 7343
+.annotate 'line', 7512
     .tailcall $P2.'emit'(__ARG_1, '.tailcall')
-# }
-  __label_6: # endif
-# }
+  __label_5: # endif
   __label_3: # endif
-.annotate 'line', 7347
-    le $I1, 0, __label_9
-.annotate 'line', 7348
+.annotate 'line', 7516
+    le $I1, 0, __label_7
+.annotate 'line', 7517
     $P1.'getargvalues'(__ARG_1)
-  __label_9: # endif
-.annotate 'line', 7350
+  __label_7: # endif
+.annotate 'line', 7519
     self.'annotate'(__ARG_1)
-.annotate 'line', 7351
+.annotate 'line', 7520
     self.'emitret'(__ARG_1)
-.annotate 'line', 7352
-    le $I1, 0, __label_10
-.annotate 'line', 7353
+.annotate 'line', 7521
+    le $I1, 0, __label_8
+.annotate 'line', 7522
     $P1.'emitargs'(__ARG_1)
-  __label_10: # endif
-.annotate 'line', 7354
+  __label_8: # endif
+.annotate 'line', 7523
     __ARG_1.'say'(')')
-# }
-.annotate 'line', 7355
+.annotate 'line', 7524
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
-.annotate 'line', 7312
+.annotate 'line', 7481
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 7314
+.annotate 'line', 7483
     addattribute $P0, 'values'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
@@ -22160,30 +18271,24 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 7362
+.annotate 'line', 7531
     self.'parse'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 7363
+.annotate 'line', 7532
 
 .end # ReturnStatement
 
 
 .sub 'emitret' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7366
+.annotate 'line', 7535
     __ARG_1.'print'('    ', '.return(')
-# }
-.annotate 'line', 7367
+.annotate 'line', 7536
 
 .end # emitret
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
-.annotate 'line', 7358
+.annotate 'line', 7527
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
     addparent $P0, $P1
 .end
@@ -22193,30 +18298,24 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 7374
+.annotate 'line', 7543
     self.'parse'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 7375
+.annotate 'line', 7544
 
 .end # YieldStatement
 
 
 .sub 'emitret' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7378
+.annotate 'line', 7547
     __ARG_1.'print'('    ', '.yield(')
-# }
-.annotate 'line', 7379
+.annotate 'line', 7548
 
 .end # emitret
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'YieldStatement' ]
-.annotate 'line', 7370
+.annotate 'line', 7539
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
     addparent $P0, $P1
 .end
@@ -22225,58 +18324,48 @@
 .sub 'LabelStatement' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 7392
+.annotate 'line', 7561
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 7393
+.annotate 'line', 7562
     setattribute self, 'name', __ARG_1
-.annotate 'line', 7394
+.annotate 'line', 7563
     getattribute $P3, self, 'owner'
     $P2 = $P3.'createlabel'(__ARG_1)
     setattribute self, 'value', $P2
-# }
-.annotate 'line', 7395
+.annotate 'line', 7564
 
 .end # LabelStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7396
+.annotate 'line', 7565
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7399
+.annotate 'line', 7568
     self.'annotate'(__ARG_1)
-.annotate 'line', 7400
+.annotate 'line', 7569
     getattribute $P1, self, 'value'
-# builtin string
     getattribute $P2, self, 'name'
     set $S1, $P2
     concat $S2, 'label ', $S1
     __ARG_1.'emitlabel'($P1, $S2)
-# }
-.annotate 'line', 7401
+.annotate 'line', 7570
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LabelStatement' ]
-.annotate 'line', 7386
+.annotate 'line', 7555
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 7388
+.annotate 'line', 7557
     addattribute $P0, 'name'
-.annotate 'line', 7389
+.annotate 'line', 7558
     addattribute $P0, 'value'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Reflabel' ]
@@ -22284,60 +18373,49 @@
 .sub 'Reflabel' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 7415
+.annotate 'line', 7584
     setattribute self, 'owner', __ARG_1
-.annotate 'line', 7416
+.annotate 'line', 7585
     box $P1, __ARG_2
     setattribute self, 'label', $P1
-# }
-.annotate 'line', 7417
+.annotate 'line', 7586
 
 .end # Reflabel
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7418
+.annotate 'line', 7587
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7421
-# label: $S1
+.annotate 'line', 7590
     getattribute $P1, self, 'label'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 7422
-# value: $S2
+.annotate 'line', 7591
     getattribute $P2, self, 'owner'
     $P1 = $P2.'getlabel'($S1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 7423
+.annotate 'line', 7592
     .return($S2)
-# }
-.annotate 'line', 7424
+.annotate 'line', 7593
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Reflabel' ]
-.annotate 'line', 7410
+.annotate 'line', 7579
     addattribute $P0, 'owner'
-.annotate 'line', 7411
+.annotate 'line', 7580
     addattribute $P0, 'label'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'GotoStatement' ]
@@ -22346,110 +18424,92 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_102 = "WSubId_102"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 7437
+.const 'Sub' WSubId_108 = "WSubId_108"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 7606
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7438
-# var t: $P1
+.annotate 'line', 7607
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7439
-    WSubId_102($P1)
-.annotate 'line', 7440
+.annotate 'line', 7608
+    WSubId_108($P1)
+.annotate 'line', 7609
     setattribute self, 'label', $P1
-.annotate 'line', 7441
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 7442
+.annotate 'line', 7610
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 7611
 
 .end # GotoStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7443
+.annotate 'line', 7612
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7446
+.annotate 'line', 7615
     self.'annotate'(__ARG_1)
-.annotate 'line', 7447
-# label: $S1
+.annotate 'line', 7616
     getattribute $P1, self, 'label'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 7448
-# value: $S2
+.annotate 'line', 7617
     $P1 = self.'getlabel'($S1)
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 7449
+.annotate 'line', 7618
     concat $S3, 'goto ', $S1
     __ARG_1.'emitgoto'($S2, $S3)
-# }
-.annotate 'line', 7450
+.annotate 'line', 7619
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'GotoStatement' ]
-.annotate 'line', 7431
+.annotate 'line', 7600
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 7433
+.annotate 'line', 7602
     addattribute $P0, 'label'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
 
 .sub 'parseconditionshort' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 7461
-    $P1 = WSubId_45(__ARG_1, self)
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 7630
+    $P1 = WSubId_51(__ARG_1, self)
     self.'set'($P1)
-# }
-.annotate 'line', 7462
+.annotate 'line', 7631
 
 .end # parseconditionshort
 
 
 .sub 'parsecondition' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 7465
-    WSubId_62('(', __ARG_1)
-.annotate 'line', 7466
-    $P1 = WSubId_45(__ARG_1, self)
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 7634
+    WSubId_68('(', __ARG_1)
+.annotate 'line', 7635
+    $P1 = WSubId_51(__ARG_1, self)
     self.'set'($P1)
-.annotate 'line', 7467
-    WSubId_62(')', __ARG_1)
-# }
-.annotate 'line', 7468
+.annotate 'line', 7636
+    WSubId_68(')', __ARG_1)
+.annotate 'line', 7637
 
 .end # parsecondition
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
-.annotate 'line', 7457
+.annotate 'line', 7626
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Condition' ]
@@ -22461,216 +18521,184 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_103 = "WSubId_103"
-# Body
-# {
-.annotate 'line', 7481
+.const 'Sub' WSubId_109 = "WSubId_109"
+.annotate 'line', 7650
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7482
+.annotate 'line', 7651
     self.'parsecondition'(__ARG_2)
-.annotate 'line', 7483
-    $P3 = WSubId_103(__ARG_2, self)
+.annotate 'line', 7652
+    $P3 = WSubId_109(__ARG_2, self)
     setattribute self, 'truebranch', $P3
-.annotate 'line', 7484
-# var t: $P1
+.annotate 'line', 7653
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7485
+.annotate 'line', 7654
     $P2 = $P1.'iskeyword'("else")
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 7486
-    $P4 = WSubId_103(__ARG_2, self)
+.annotate 'line', 7655
+    $P4 = WSubId_109(__ARG_2, self)
     setattribute self, 'falsebranch', $P4
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 7488
+.annotate 'line', 7657
     new $P6, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
     setattribute self, 'falsebranch', $P6
-.annotate 'line', 7489
+.annotate 'line', 7658
     __ARG_2.'unget'($P1)
-# }
   __label_2: # endif
-# }
-.annotate 'line', 7491
+.annotate 'line', 7660
 
 .end # IfStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7494
+.annotate 'line', 7663
     self.'optimize_condition'()
-.annotate 'line', 7495
+.annotate 'line', 7664
     getattribute $P3, self, 'truebranch'
     $P2 = $P3.'optimize'()
     setattribute self, 'truebranch', $P2
-.annotate 'line', 7496
+.annotate 'line', 7665
     getattribute $P3, self, 'falsebranch'
     $P2 = $P3.'optimize'()
     setattribute self, 'falsebranch', $P2
-# switch
-.annotate 'line', 7497
+.annotate 'line', 7666
     $P1 = self.'getvalue'()
     set $I1, $P1
-    set $I2, 1
-    if $I1 == $I2 goto __label_3
-    set $I2, 2
-    if $I1 == $I2 goto __label_4
+    if $I1 == 1 goto __label_3
+    if $I1 == 2 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 7499
+.annotate 'line', 7668
     getattribute $P2, self, 'truebranch'
     .return($P2)
   __label_4: # case
-.annotate 'line', 7501
+.annotate 'line', 7670
     getattribute $P3, self, 'falsebranch'
     .return($P3)
   __label_2: # default
   __label_1: # switch end
-.annotate 'line', 7503
+.annotate 'line', 7672
     .return(self)
-# }
-.annotate 'line', 7504
+.annotate 'line', 7673
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7507
-# var truebranch: $P1
+.annotate 'line', 7676
     getattribute $P1, self, 'truebranch'
-.annotate 'line', 7508
-# var falsebranch: $P2
+.annotate 'line', 7677
     getattribute $P2, self, 'falsebranch'
-.annotate 'line', 7509
-# t_empty: $I1
+.annotate 'line', 7678
     $P3 = $P1.'isempty'()
     set $I1, $P3
-.annotate 'line', 7510
-# f_empty: $I2
+.annotate 'line', 7679
     $P3 = $P2.'isempty'()
     set $I2, $P3
-.annotate 'line', 7511
-# elselabel: $S1
+.annotate 'line', 7680
     set $S1, ''
-.annotate 'line', 7512
+.annotate 'line', 7681
     not $I3, $I2
     unless $I3 goto __label_1
-.annotate 'line', 7513
+.annotate 'line', 7682
     $P3 = self.'genlabel'()
     set $S1, $P3
   __label_1: # endif
-.annotate 'line', 7514
-# endlabel: $S2
+.annotate 'line', 7683
     $P3 = self.'genlabel'()
     null $S2
     if_null $P3, __label_2
     set $S2, $P3
   __label_2:
-.annotate 'line', 7515
-# cond_false: $S3
+.annotate 'line', 7684
     unless $I2 goto __label_4
     set $S3, $S2
     goto __label_3
   __label_4:
     set $S3, $S1
   __label_3:
-.annotate 'line', 7516
+.annotate 'line', 7685
     self.'annotate'(__ARG_1)
-.annotate 'line', 7517
+.annotate 'line', 7686
     self.'emit_else'(__ARG_1, $S3)
-.annotate 'line', 7518
+.annotate 'line', 7687
     $P1.'emit'(__ARG_1)
-.annotate 'line', 7520
+.annotate 'line', 7689
     not $I3, $I2
     unless $I3 goto __label_5
-# {
-.annotate 'line', 7521
+.annotate 'line', 7690
     __ARG_1.'emitgoto'($S2)
-.annotate 'line', 7522
+.annotate 'line', 7691
     __ARG_1.'emitlabel'($S1, 'else')
-.annotate 'line', 7523
+.annotate 'line', 7692
     $P2.'emit'(__ARG_1)
-# }
   __label_5: # endif
-.annotate 'line', 7525
+.annotate 'line', 7694
     __ARG_1.'emitlabel'($S2, 'endif')
-# }
-.annotate 'line', 7526
+.annotate 'line', 7695
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IfStatement' ]
-.annotate 'line', 7475
+.annotate 'line', 7644
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
     addparent $P0, $P1
-.annotate 'line', 7477
+.annotate 'line', 7646
     addattribute $P0, 'truebranch'
-.annotate 'line', 7478
+.annotate 'line', 7647
     addattribute $P0, 'falsebranch'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
 
 .sub 'parsebody' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_103 = "WSubId_103"
-# Body
-# {
-.annotate 'line', 7538
-    $P2 = WSubId_103(__ARG_1, self)
+.const 'Sub' WSubId_109 = "WSubId_109"
+.annotate 'line', 7707
+    $P2 = WSubId_109(__ARG_1, self)
     setattribute self, 'body', $P2
-# }
-.annotate 'line', 7539
+.annotate 'line', 7708
 
 .end # parsebody
 
 
 .sub 'emit_infinite' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7542
-# breaklabel: $S1
+.annotate 'line', 7711
     $P1 = self.'genbreaklabel'()
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 7543
-# continuelabel: $S2
+.annotate 'line', 7712
     $P1 = self.'gencontinuelabel'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 7545
+.annotate 'line', 7714
     self.'annotate'(__ARG_1)
-.annotate 'line', 7546
+.annotate 'line', 7715
     __ARG_1.'emitlabel'($S2, 'Infinite loop')
-.annotate 'line', 7547
+.annotate 'line', 7716
     getattribute $P1, self, 'body'
     $P1.'emit'(__ARG_1)
-.annotate 'line', 7548
+.annotate 'line', 7717
     __ARG_1.'emitgoto'($S2)
-.annotate 'line', 7549
+.annotate 'line', 7718
     __ARG_1.'emitlabel'($S1, 'Infinite loop end')
-# }
-.annotate 'line', 7550
+.annotate 'line', 7719
 
 .end # emit_infinite
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
-.annotate 'line', 7533
+.annotate 'line', 7702
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Continuable' ]
     addparent $P0, $P1
-.annotate 'line', 7535
+.annotate 'line', 7704
     addattribute $P0, 'body'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
@@ -22679,95 +18707,86 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 7561
+.annotate 'line', 7730
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7562
+.annotate 'line', 7731
     self.'parsecondition'(__ARG_2)
-.annotate 'line', 7563
+.annotate 'line', 7732
     self.'parsebody'(__ARG_2)
-# }
-.annotate 'line', 7564
+.annotate 'line', 7733
 
 .end # WhileStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7567
+.annotate 'line', 7736
     self.'optimize_condition'()
-.annotate 'line', 7568
+.annotate 'line', 7737
     getattribute $P3, self, 'body'
     $P2 = $P3.'optimize'()
     setattribute self, 'body', $P2
-.annotate 'line', 7569
+.annotate 'line', 7738
     .return(self)
-# }
-.annotate 'line', 7570
+.annotate 'line', 7739
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-# switch
-.annotate 'line', 7573
+.annotate 'line', 7742
     $P1 = self.'getvalue'()
     set $I1, $P1
-    set $I2, 1
-    if $I1 == $I2 goto __label_3
-    set $I2, 2
-    if $I1 == $I2 goto __label_4
+    if $I1 == 1 goto __label_3
+    if $I1 == 2 goto __label_4
     goto __label_2
   __label_3: # case
-.annotate 'line', 7575
+.annotate 'line', 7744
     self.'emit_infinite'(__ARG_1)
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 7578
+.annotate 'line', 7747
+    $P2 = __ARG_1.'getDebug'()
+    if_null $P2, __label_5
+    unless $P2 goto __label_5
+.annotate 'line', 7748
     __ARG_1.'comment'('while(false) optimized out')
+  __label_5: # endif
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 7581
-# breaklabel: $S1
-    $P2 = self.'genbreaklabel'()
+.annotate 'line', 7751
+    $P3 = self.'genbreaklabel'()
     null $S1
-    if_null $P2, __label_5
-    set $S1, $P2
-  __label_5:
-.annotate 'line', 7582
-# continuelabel: $S2
-    $P3 = self.'gencontinuelabel'()
-    null $S2
     if_null $P3, __label_6
-    set $S2, $P3
+    set $S1, $P3
   __label_6:
-.annotate 'line', 7584
+.annotate 'line', 7752
+    $P4 = self.'gencontinuelabel'()
+    null $S2
+    if_null $P4, __label_7
+    set $S2, $P4
+  __label_7:
+.annotate 'line', 7754
     self.'annotate'(__ARG_1)
-.annotate 'line', 7585
+.annotate 'line', 7755
     __ARG_1.'emitlabel'($S2, 'while')
-.annotate 'line', 7586
+.annotate 'line', 7756
     self.'emit_else'(__ARG_1, $S1)
-.annotate 'line', 7587
-    getattribute $P4, self, 'body'
-    $P4.'emit'(__ARG_1)
-.annotate 'line', 7588
+.annotate 'line', 7757
+    getattribute $P5, self, 'body'
+    $P5.'emit'(__ARG_1)
+.annotate 'line', 7758
     __ARG_1.'emitgoto'($S2)
-.annotate 'line', 7589
+.annotate 'line', 7759
     __ARG_1.'emitlabel'($S1, 'endwhile')
   __label_1: # switch end
-# }
-.annotate 'line', 7591
+.annotate 'line', 7761
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
-.annotate 'line', 7557
+.annotate 'line', 7726
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
@@ -22779,126 +18798,105 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_104 = "WSubId_104"
-# Body
-# {
-.annotate 'line', 7602
+.const 'Sub' WSubId_110 = "WSubId_110"
+.annotate 'line', 7772
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7603
+.annotate 'line', 7773
     self.'parsebody'(__ARG_2)
-.annotate 'line', 7604
-    WSubId_104('while', __ARG_2)
-.annotate 'line', 7605
+.annotate 'line', 7774
+    WSubId_110('while', __ARG_2)
+.annotate 'line', 7775
     self.'parsecondition'(__ARG_2)
-# }
-.annotate 'line', 7606
+.annotate 'line', 7776
 
 .end # DoStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7609
+.annotate 'line', 7779
     self.'optimize_condition'()
-.annotate 'line', 7610
-# var body: $P1
+.annotate 'line', 7780
     getattribute $P2, self, 'body'
     $P1 = $P2.'optimize'()
-.annotate 'line', 7611
-    $P3 = $P1.'isempty'()
-    unless $P3 goto __label_2
-    $P4 = self.'getvalue'()
-    set $I2, $P4
+.annotate 'line', 7781
+    $P2 = $P1.'isempty'()
+    unless $P2 goto __label_2
+    $P3 = self.'getvalue'()
+    set $I2, $P3
     iseq $I1, $I2, 2
     box $P2, $I1
-    goto __label_3
   __label_2:
-    set $P2, $P3
-  __label_3:
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 7612
-    new $P5, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-    .return($P5)
+.annotate 'line', 7782
+    new $P4, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
+    .return($P4)
   __label_1: # endif
-.annotate 'line', 7613
+.annotate 'line', 7783
     setattribute self, 'body', $P1
-.annotate 'line', 7614
+.annotate 'line', 7784
     .return(self)
-# }
-.annotate 'line', 7615
+.annotate 'line', 7785
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7618
-# var body: $P1
+.annotate 'line', 7788
     getattribute $P1, self, 'body'
-.annotate 'line', 7619
-# condvalue: $I1
+.annotate 'line', 7789
     $P2 = self.'getvalue'()
     set $I1, $P2
-# switch
-.annotate 'line', 7620
-    set $I2, $I1
-    set $I3, 1
-    if $I2 == $I3 goto __label_3
+.annotate 'line', 7790
+    if $I1 == 1 goto __label_3
     goto __label_2
   __label_3: # case
-.annotate 'line', 7622
+.annotate 'line', 7792
     self.'emit_infinite'(__ARG_1)
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 7625
-# looplabel: $S1
+.annotate 'line', 7795
     $P2 = self.'genlabel'()
     null $S1
     if_null $P2, __label_4
     set $S1, $P2
   __label_4:
-.annotate 'line', 7626
-# breaklabel: $S2
+.annotate 'line', 7796
     $P3 = self.'genbreaklabel'()
     null $S2
     if_null $P3, __label_5
     set $S2, $P3
   __label_5:
-.annotate 'line', 7627
-# continuelabel: $S3
+.annotate 'line', 7797
     $P4 = self.'gencontinuelabel'()
     null $S3
     if_null $P4, __label_6
     set $S3, $P4
   __label_6:
-.annotate 'line', 7629
+.annotate 'line', 7799
     self.'annotate'(__ARG_1)
-.annotate 'line', 7630
+.annotate 'line', 7800
     __ARG_1.'emitlabel'($S1, 'do')
-.annotate 'line', 7632
+.annotate 'line', 7802
     $P1.'emit'(__ARG_1)
-.annotate 'line', 7633
+.annotate 'line', 7803
     __ARG_1.'emitlabel'($S3, 'continue')
-.annotate 'line', 7634
+.annotate 'line', 7804
     eq $I1, 2, __label_7
-.annotate 'line', 7635
+.annotate 'line', 7805
     self.'emit_if'(__ARG_1, $S1, $S2)
   __label_7: # endif
-.annotate 'line', 7636
+.annotate 'line', 7806
     __ARG_1.'emitlabel'($S2, 'enddo')
   __label_1: # switch end
-# }
-.annotate 'line', 7638
+.annotate 'line', 7808
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DoStatement' ]
-.annotate 'line', 7598
+.annotate 'line', 7768
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
@@ -22910,53 +18908,43 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 7649
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 7819
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7650
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 7651
+.annotate 'line', 7820
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 7821
 
 .end # ContinueStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7652
+.annotate 'line', 7822
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7655
+.annotate 'line', 7825
     self.'annotate'(__ARG_1)
-.annotate 'line', 7656
-# label: $S1
+.annotate 'line', 7826
     getattribute $P2, self, 'start'
     $P1 = self.'getcontinuelabel'($P2)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 7657
+.annotate 'line', 7827
     __ARG_1.'emitgoto'($S1, 'continue')
-# }
-.annotate 'line', 7658
+.annotate 'line', 7828
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ContinueStatement' ]
-.annotate 'line', 7645
+.annotate 'line', 7815
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
 .end
@@ -22966,53 +18954,43 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 7669
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 7839
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7670
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 7671
+.annotate 'line', 7840
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 7841
 
 .end # BreakStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7672
+.annotate 'line', 7842
     .return(self)
-# }
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7675
+.annotate 'line', 7845
     self.'annotate'(__ARG_1)
-.annotate 'line', 7676
-# label: $S1
+.annotate 'line', 7846
     getattribute $P2, self, 'start'
     $P1 = self.'getbreaklabel'($P2)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 7677
+.annotate 'line', 7847
     __ARG_1.'emitgoto'($S1, 'break')
-# }
-.annotate 'line', 7678
+.annotate 'line', 7848
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BreakStatement' ]
-.annotate 'line', 7665
+.annotate 'line', 7835
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
 .end
@@ -23021,210 +18999,157 @@
 .sub 'SwitchBaseStatement' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 7693
+.annotate 'line', 7863
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 7694
+.annotate 'line', 7864
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'case_value', $P2
-.annotate 'line', 7695
+.annotate 'line', 7865
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'case_st', $P2
-.annotate 'line', 7696
+.annotate 'line', 7866
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'default_st', $P2
-# }
-.annotate 'line', 7697
+.annotate 'line', 7867
 
 .end # SwitchBaseStatement
 
 
 .sub 'parse_cases' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_103 = "WSubId_103"
-# Body
-# {
-.annotate 'line', 7700
-# var t: $P1
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_109 = "WSubId_109"
+.annotate 'line', 7870
     null $P1
   __label_2: # while
-.annotate 'line', 7701
+.annotate 'line', 7871
     $P1 = __ARG_1.'get'()
-    $P4 = $P1.'iskeyword'('case')
-    if $P4 goto __label_3
-    $P5 = $P1.'iskeyword'('default')
-    set $P3, $P5
-    goto __label_4
+    $P3 = $P1.'iskeyword'('case')
+    if $P3 goto __label_3
+    $P3 = $P1.'iskeyword'('default')
   __label_3:
-    set $P3, $P4
-  __label_4:
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 7702
-    $P6 = $P1.'iskeyword'('case')
-    if_null $P6, __label_5
-    unless $P6 goto __label_5
-# {
-.annotate 'line', 7703
-    getattribute $P7, self, 'case_value'
-    $P8 = WSubId_45(__ARG_1, self)
-# builtin push
-    push $P7, $P8
-.annotate 'line', 7704
+.annotate 'line', 7872
+    $P4 = $P1.'iskeyword'('case')
+    if_null $P4, __label_4
+    unless $P4 goto __label_4
+.annotate 'line', 7873
+    getattribute $P5, self, 'case_value'
+    $P6 = WSubId_51(__ARG_1, self)
+    push $P5, $P6
+.annotate 'line', 7874
     $P1 = __ARG_1.'get'()
-.annotate 'line', 7705
+.annotate 'line', 7875
     $P3 = $P1.'isop'(':')
+    isfalse $I1, $P3
+    unless $I1 goto __label_6
+.annotate 'line', 7876
+    WSubId_54("':' in case", $P1)
+  __label_6: # endif
+.annotate 'line', 7877
+    root_new $P2, ['parrot';'ResizablePMCArray']
+  __label_8: # while
+.annotate 'line', 7878
+    $P1 = __ARG_1.'get'()
+    $P3 = $P1.'isop'('}')
+    if $P3 goto __label_10
+    $P3 = $P1.'iskeyword'('case')
+  __label_10:
+    if $P3 goto __label_9
+    $P3 = $P1.'iskeyword'('default')
+  __label_9:
     isfalse $I1, $P3
     unless $I1 goto __label_7
-.annotate 'line', 7706
-    WSubId_48("':' in case", $P1)
-  __label_7: # endif
-.annotate 'line', 7707
-# var st: $P2
-    root_new $P2, ['parrot';'ResizablePMCArray']
-  __label_9: # while
-.annotate 'line', 7708
-    $P1 = __ARG_1.'get'()
-    $P5 = $P1.'isop'('}')
-    if $P5 goto __label_12
-    $P6 = $P1.'iskeyword'('case')
-    set $P4, $P6
-    goto __label_13
-  __label_12:
-    set $P4, $P5
-  __label_13:
-    if $P4 goto __label_10
-    $P7 = $P1.'iskeyword'('default')
-    set $P3, $P7
-    goto __label_11
-  __label_10:
-    set $P3, $P4
-  __label_11:
-    isfalse $I1, $P3
-    unless $I1 goto __label_8
-# {
-.annotate 'line', 7709
+.annotate 'line', 7879
     __ARG_1.'unget'($P1)
-.annotate 'line', 7710
-    $P3 = WSubId_103(__ARG_1, self)
-# builtin push
+.annotate 'line', 7880
+    $P3 = WSubId_109(__ARG_1, self)
     push $P2, $P3
-# }
-    goto __label_9
-  __label_8: # endwhile
-.annotate 'line', 7712
+    goto __label_8
+  __label_7: # endwhile
+.annotate 'line', 7882
     getattribute $P3, self, 'case_st'
-# builtin push
     push $P3, $P2
-.annotate 'line', 7713
+.annotate 'line', 7883
     __ARG_1.'unget'($P1)
-# }
-    goto __label_6
-  __label_5: # else
-# {
-.annotate 'line', 7716
+    goto __label_5
+  __label_4: # else
+.annotate 'line', 7886
     $P1 = __ARG_1.'get'()
-.annotate 'line', 7717
+.annotate 'line', 7887
     $P3 = $P1.'isop'(':')
     isfalse $I1, $P3
-    unless $I1 goto __label_14
-.annotate 'line', 7718
-    WSubId_48("':' in default", $P1)
-  __label_14: # endif
-  __label_16: # while
-.annotate 'line', 7719
+    unless $I1 goto __label_11
+.annotate 'line', 7888
+    WSubId_54("':' in default", $P1)
+  __label_11: # endif
+  __label_13: # while
+.annotate 'line', 7889
     $P1 = __ARG_1.'get'()
-    $P5 = $P1.'isop'('}')
-    if $P5 goto __label_19
-    $P6 = $P1.'iskeyword'('case')
-    set $P4, $P6
-    goto __label_20
-  __label_19:
-    set $P4, $P5
-  __label_20:
-    if $P4 goto __label_17
-    $P7 = $P1.'iskeyword'('default')
-    set $P3, $P7
-    goto __label_18
-  __label_17:
-    set $P3, $P4
-  __label_18:
+    $P3 = $P1.'isop'('}')
+    if $P3 goto __label_15
+    $P3 = $P1.'iskeyword'('case')
+  __label_15:
+    if $P3 goto __label_14
+    $P3 = $P1.'iskeyword'('default')
+  __label_14:
     isfalse $I1, $P3
-    unless $I1 goto __label_15
-# {
-.annotate 'line', 7720
+    unless $I1 goto __label_12
+.annotate 'line', 7890
     __ARG_1.'unget'($P1)
-.annotate 'line', 7721
+.annotate 'line', 7891
     getattribute $P3, self, 'default_st'
-    $P4 = WSubId_103(__ARG_1, self)
-# builtin push
+    $P4 = WSubId_109(__ARG_1, self)
     push $P3, $P4
-# }
-    goto __label_16
-  __label_15: # endwhile
-.annotate 'line', 7723
+    goto __label_13
+  __label_12: # endwhile
+.annotate 'line', 7893
     __ARG_1.'unget'($P1)
-# }
-  __label_6: # endif
-# }
+  __label_5: # endif
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 7726
+.annotate 'line', 7896
     $P3 = $P1.'isop'('}')
     isfalse $I1, $P3
-    unless $I1 goto __label_21
-.annotate 'line', 7727
-    WSubId_48("'}' in switch", $P1)
-  __label_21: # endif
-# }
-.annotate 'line', 7728
+    unless $I1 goto __label_16
+.annotate 'line', 7897
+    WSubId_54("'}' in switch", $P1)
+  __label_16: # endif
+.annotate 'line', 7898
 
 .end # parse_cases
 
 
 .sub 'optimize_cases' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 7731
-    getattribute $P2, self, 'case_value'
-    WSubId_46($P2)
-.annotate 'line', 7732
-    getattribute $P2, self, 'case_st'
-    if_null $P2, __label_2
-    iter $P3, $P2
-    set $P3, 0
-  __label_1: # for iteration
-    unless $P3 goto __label_2
-    shift $P1, $P3
-.annotate 'line', 7733
-    WSubId_46($P1)
-    goto __label_1
-  __label_2: # endfor
-.annotate 'line', 7734
-    getattribute $P2, self, 'default_st'
-    WSubId_46($P2)
-# }
-.annotate 'line', 7735
+.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_111 = "WSubId_111"
+.annotate 'line', 7901
+    getattribute $P1, self, 'case_value'
+    WSubId_52($P1)
+.annotate 'line', 7902
+    getattribute $P1, self, 'case_st'
+    WSubId_111($P1, WSubId_52)
+.annotate 'line', 7903
+    getattribute $P1, self, 'default_st'
+    WSubId_52($P1)
+.annotate 'line', 7904
 
 .end # optimize_cases
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
-.annotate 'line', 7685
+.annotate 'line', 7855
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Breakable' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P2
-.annotate 'line', 7687
+.annotate 'line', 7857
     addattribute $P0, 'case_value'
-.annotate 'line', 7688
+.annotate 'line', 7858
     addattribute $P0, 'case_st'
-.annotate 'line', 7689
+.annotate 'line', 7859
     addattribute $P0, 'default_st'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'SwitchStatement' ]
@@ -23233,55 +19158,48 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 7748
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 7917
     self.'SwitchBaseStatement'(__ARG_1, __ARG_3)
-.annotate 'line', 7749
-    $P3 = WSubId_45(__ARG_2, self)
+.annotate 'line', 7918
+    $P3 = WSubId_51(__ARG_2, self)
     setattribute self, 'condition', $P3
-.annotate 'line', 7750
-# var t: $P1
+.annotate 'line', 7919
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7751
+.annotate 'line', 7920
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-.annotate 'line', 7752
-    WSubId_48("')' in switch", $P1)
+.annotate 'line', 7921
+    WSubId_54("')' in switch", $P1)
   __label_1: # endif
-.annotate 'line', 7753
+.annotate 'line', 7922
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7754
+.annotate 'line', 7923
     $P2 = $P1.'isop'('{')
     isfalse $I1, $P2
     unless $I1 goto __label_2
-.annotate 'line', 7755
-    WSubId_48("'{' in switch", $P1)
+.annotate 'line', 7924
+    WSubId_54("'{' in switch", $P1)
   __label_2: # endif
-.annotate 'line', 7756
+.annotate 'line', 7925
     self.'parse_cases'(__ARG_2)
-# }
-.annotate 'line', 7757
+.annotate 'line', 7926
 
 .end # SwitchStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7760
+.annotate 'line', 7929
     getattribute $P3, self, 'condition'
     $P2 = $P3.'optimize'()
     setattribute self, 'condition', $P2
-.annotate 'line', 7761
+.annotate 'line', 7930
     self.'optimize_cases'()
-.annotate 'line', 7762
+.annotate 'line', 7931
     .return(self)
-# }
-.annotate 'line', 7763
+.annotate 'line', 7932
 
 .end # optimize
 
@@ -23289,13 +19207,11 @@
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 7767
-# type: $S1
+.const 'Sub' WSubId_26 = "WSubId_26"
+.const 'Sub' WSubId_66 = "WSubId_66"
+.annotate 'line', 7936
     set $S1, ''
-.annotate 'line', 7768
+.annotate 'line', 7937
     getattribute $P7, self, 'case_value'
     if_null $P7, __label_2
     iter $P8, $P7
@@ -23303,92 +19219,86 @@
   __label_1: # for iteration
     unless $P8 goto __label_2
     shift $P1, $P8
-# {
-.annotate 'line', 7769
-# t: $S2
+.annotate 'line', 7938
     $P9 = $P1.'checkresult'()
     null $S2
     if_null $P9, __label_3
     set $S2, $P9
   __label_3:
-.annotate 'line', 7770
+.annotate 'line', 7939
     ne $S2, 'N', __label_4
-.annotate 'line', 7771
+.annotate 'line', 7940
     WSubId_1("Invalid type in case", self)
   __label_4: # endif
-.annotate 'line', 7772
+.annotate 'line', 7941
     ne $S1, '', __label_5
-.annotate 'line', 7773
+.annotate 'line', 7942
     set $S1, $S2
     goto __label_6
   __label_5: # else
-.annotate 'line', 7774
+.annotate 'line', 7943
     eq $S1, $S2, __label_7
-.annotate 'line', 7775
+.annotate 'line', 7944
     set $S1, 'P'
   __label_7: # endif
   __label_6: # endif
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 7778
-# var condition: $P2
+.annotate 'line', 7947
     getattribute $P2, self, 'condition'
-.annotate 'line', 7779
-# var condtype: $P3
+.annotate 'line', 7948
     $P3 = $P2.'checkresult'()
-.annotate 'line', 7783
+.annotate 'line', 7952
     ne $S1, '', __label_8
-.annotate 'line', 7784
+.annotate 'line', 7953
     set $S1, $P3
   __label_8: # endif
-.annotate 'line', 7786
-    __ARG_1.'comment'('switch')
-.annotate 'line', 7787
-# reg: $S3
-    $P7 = self.'tempreg'($S1)
-    null $S3
+.annotate 'line', 7955
+    $P7 = __ARG_1.'getDebug'()
     if_null $P7, __label_9
+    unless $P7 goto __label_9
+.annotate 'line', 7956
+    __ARG_1.'comment'('switch')
+  __label_9: # endif
+.annotate 'line', 7957
+    null $S3
+.annotate 'line', 7958
+    set $S9, $P3
+    ne $S9, $S1, __label_10
+.annotate 'line', 7959
+    $P7 = $P2.'emit_get'(__ARG_1)
     set $S3, $P7
-  __label_9:
-.annotate 'line', 7788
-    set $S8, $P3
-    ne $S8, $S1, __label_10
-.annotate 'line', 7789
-    $P2.'emit'(__ARG_1, $S3)
     goto __label_11
   __label_10: # else
-# {
-.annotate 'line', 7791
-# regcond: $S4
+.annotate 'line', 7961
+    $P9 = self.'tempreg'($S1)
+    set $S3, $P9
+.annotate 'line', 7962
     $P7 = $P2.'emit_get'(__ARG_1)
     null $S4
     if_null $P7, __label_12
     set $S4, $P7
   __label_12:
-.annotate 'line', 7792
+.annotate 'line', 7963
     __ARG_1.'emitset'($S3, $S4)
-# }
   __label_11: # endif
-.annotate 'line', 7796
+.annotate 'line', 7967
     self.'genbreaklabel'()
-.annotate 'line', 7797
-# defaultlabel: $S5
+.annotate 'line', 7968
     $P7 = self.'genlabel'()
     null $S5
     if_null $P7, __label_13
     set $S5, $P7
   __label_13:
-.annotate 'line', 7798
+.annotate 'line', 7969
     new $P4, ['ResizableStringArray']
-.annotate 'line', 7799
-# regval: $S6
+.annotate 'line', 7970
     $P7 = self.'tempreg'($S1)
     null $S6
     if_null $P7, __label_14
     set $S6, $P7
   __label_14:
-.annotate 'line', 7800
+.annotate 'line', 7971
     getattribute $P7, self, 'case_value'
     if_null $P7, __label_16
     iter $P10, $P7
@@ -23396,73 +19306,85 @@
   __label_15: # for iteration
     unless $P10 goto __label_16
     shift $P5, $P10
-# {
-.annotate 'line', 7801
-# label: $S7
+.annotate 'line', 7972
     $P9 = self.'genlabel'()
     null $S7
     if_null $P9, __label_17
     set $S7, $P9
   __label_17:
-.annotate 'line', 7802
-# builtin push
+.annotate 'line', 7973
     push $P4, $S7
-.annotate 'line', 7803
+.annotate 'line', 7974
+    null $S8
+.annotate 'line', 7975
+    ne $S1, 'I', __label_18
+.annotate 'line', 7976
+    $P7 = $P5.'emit_getint'(__ARG_1)
+    set $S8, $P7
+    goto __label_19
+  __label_18: # else
+.annotate 'line', 7977
+    $P9 = $P5.'checkresult'()
+    set $S9, $P9
+    ne $S1, $S9, __label_20
+.annotate 'line', 7978
+    $P11 = $P5.'emit_get'(__ARG_1)
+    set $S8, $P11
+    goto __label_21
+  __label_20: # else
+.annotate 'line', 7980
     $P5.'emit'(__ARG_1, $S6)
-.annotate 'line', 7804
-    __ARG_1.'say'('    ', 'if ', $S3, ' == ', $S6, ' goto ', $S7)
-# }
+.annotate 'line', 7981
+    set $S8, $S6
+  __label_21: # endif
+  __label_19: # endif
+.annotate 'line', 7983
+    $P7 = WSubId_26("    if %0 == %1 goto %2", $S3, $S8, $S7)
+    __ARG_1.'say'($P7)
     goto __label_15
   __label_16: # endfor
-.annotate 'line', 7806
+.annotate 'line', 7985
     __ARG_1.'emitgoto'($S5)
-.annotate 'line', 7809
+.annotate 'line', 7988
     self.'annotate'(__ARG_1)
-.annotate 'line', 7810
-# var case_st: $P6
+.annotate 'line', 7989
     getattribute $P6, self, 'case_st'
-.annotate 'line', 7811
-# n: $I1
+.annotate 'line', 7990
     set $I1, $P6
-# for loop
-.annotate 'line', 7812
-# i: $I2
+.annotate 'line', 7991
     null $I2
-  __label_20: # for condition
-    ge $I2, $I1, __label_19
-# {
-.annotate 'line', 7813
+  __label_24: # for condition
+    ge $I2, $I1, __label_23
+.annotate 'line', 7992
     $P7 = $P4[$I2]
     __ARG_1.'emitlabel'($P7, 'case')
-.annotate 'line', 7814
+.annotate 'line', 7993
     $P7 = $P6[$I2]
-    WSubId_60(__ARG_1, $P7)
-# }
-  __label_18: # for iteration
-.annotate 'line', 7812
+    WSubId_66(__ARG_1, $P7)
+  __label_22: # for iteration
+.annotate 'line', 7991
     inc $I2
-    goto __label_20
-  __label_19: # for end
-.annotate 'line', 7817
+    goto __label_24
+  __label_23: # for end
+.annotate 'line', 7996
     __ARG_1.'emitlabel'($S5, 'default')
-.annotate 'line', 7818
+.annotate 'line', 7997
     getattribute $P7, self, 'default_st'
-    WSubId_60(__ARG_1, $P7)
-.annotate 'line', 7820
+    WSubId_66(__ARG_1, $P7)
+.annotate 'line', 7999
     getattribute $P9, self, 'start'
     $P7 = self.'getbreaklabel'($P9)
     __ARG_1.'emitlabel'($P7, 'switch end')
-# }
-.annotate 'line', 7821
+.annotate 'line', 8000
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchStatement' ]
-.annotate 'line', 7742
+.annotate 'line', 7911
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
     addparent $P0, $P1
-.annotate 'line', 7744
+.annotate 'line', 7913
     addattribute $P0, 'condition'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'SwitchCaseStatement' ]
@@ -23471,167 +19393,147 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 7833
+.annotate 'line', 8012
     self.'SwitchBaseStatement'(__ARG_1, __ARG_3)
-.annotate 'line', 7834
+.annotate 'line', 8013
     self.'parse_cases'(__ARG_2)
-# }
-.annotate 'line', 7835
+.annotate 'line', 8014
 
 .end # SwitchCaseStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7838
+.annotate 'line', 8017
     self.'optimize_cases'()
-.annotate 'line', 7839
+.annotate 'line', 8018
     .return(self)
-# }
-.annotate 'line', 7840
+.annotate 'line', 8019
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 7844
+.const 'Sub' WSubId_66 = "WSubId_66"
+.annotate 'line', 8023
     self.'genbreaklabel'()
-.annotate 'line', 7845
-# defaultlabel: $S1
+.annotate 'line', 8024
     $P4 = self.'genlabel'()
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 7846
+.annotate 'line', 8025
     new $P1, ['ResizableStringArray']
-.annotate 'line', 7848
+.annotate 'line', 8027
+    $P4 = __ARG_1.'getDebug'()
+    if_null $P4, __label_2
+    unless $P4 goto __label_2
+.annotate 'line', 8028
     __ARG_1.'comment'('switch-case')
-.annotate 'line', 7849
-# reg: $S2
+  __label_2: # endif
+.annotate 'line', 8029
     $P4 = self.'tempreg'('I')
     null $S2
-    if_null $P4, __label_2
+    if_null $P4, __label_3
     set $S2, $P4
-  __label_2:
-.annotate 'line', 7850
+  __label_3:
+.annotate 'line', 8030
     getattribute $P4, self, 'case_value'
-    if_null $P4, __label_4
+    if_null $P4, __label_5
     iter $P5, $P4
     set $P5, 0
-  __label_3: # for iteration
-    unless $P5 goto __label_4
+  __label_4: # for iteration
+    unless $P5 goto __label_5
     shift $P2, $P5
-# {
-.annotate 'line', 7851
-# label: $S3
+.annotate 'line', 8031
     $P6 = self.'genlabel'()
     null $S3
-    if_null $P6, __label_5
+    if_null $P6, __label_6
     set $S3, $P6
-  __label_5:
-.annotate 'line', 7852
-# builtin push
+  __label_6:
+.annotate 'line', 8032
     push $P1, $S3
-.annotate 'line', 7853
+.annotate 'line', 8033
     $P2.'emit'(__ARG_1, $S2)
-.annotate 'line', 7854
+.annotate 'line', 8034
     __ARG_1.'emitif'($S2, $S3)
-# }
-    goto __label_3
-  __label_4: # endfor
-.annotate 'line', 7856
+    goto __label_4
+  __label_5: # endfor
+.annotate 'line', 8036
     __ARG_1.'emitgoto'($S1)
-.annotate 'line', 7859
+.annotate 'line', 8039
     self.'annotate'(__ARG_1)
-.annotate 'line', 7860
-# var case_st: $P3
+.annotate 'line', 8040
     getattribute $P3, self, 'case_st'
-.annotate 'line', 7861
-# n: $I1
+.annotate 'line', 8041
     set $I1, $P3
-# for loop
-.annotate 'line', 7862
-# i: $I2
+.annotate 'line', 8042
     null $I2
-  __label_8: # for condition
-    ge $I2, $I1, __label_7
-# {
-.annotate 'line', 7863
+  __label_9: # for condition
+    ge $I2, $I1, __label_8
+.annotate 'line', 8043
     $P4 = $P1[$I2]
     __ARG_1.'emitlabel'($P4, 'case')
-.annotate 'line', 7864
+.annotate 'line', 8044
     $P4 = $P3[$I2]
-    WSubId_60(__ARG_1, $P4)
-# }
-  __label_6: # for iteration
-.annotate 'line', 7862
+    WSubId_66(__ARG_1, $P4)
+  __label_7: # for iteration
+.annotate 'line', 8042
     inc $I2
-    goto __label_8
-  __label_7: # for end
-.annotate 'line', 7867
+    goto __label_9
+  __label_8: # for end
+.annotate 'line', 8047
     __ARG_1.'emitlabel'($S1, 'default')
-.annotate 'line', 7868
+.annotate 'line', 8048
     getattribute $P4, self, 'default_st'
-    WSubId_60(__ARG_1, $P4)
-.annotate 'line', 7870
+    WSubId_66(__ARG_1, $P4)
+.annotate 'line', 8050
     getattribute $P6, self, 'start'
     $P4 = self.'getbreaklabel'($P6)
     __ARG_1.'emitlabel'($P4, 'switch end')
-# }
-.annotate 'line', 7871
+.annotate 'line', 8051
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchCaseStatement' ]
-.annotate 'line', 7828
+.annotate 'line', 8007
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseSwitch' :subid('WSubId_58')
+.sub 'parseSwitch' :subid('WSubId_64')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 7878
-# var t: $P1
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 8058
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7879
+.annotate 'line', 8059
     $P2 = $P1.'isop'('(')
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 7880
+.annotate 'line', 8060
     new $P4, [ 'Winxed'; 'Compiler'; 'SwitchStatement' ]
     $P4.'SwitchStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P3, $P4
     .return($P3)
   __label_1: # endif
-.annotate 'line', 7881
+.annotate 'line', 8061
     $P2 = $P1.'isop'('{')
     if_null $P2, __label_2
     unless $P2 goto __label_2
-.annotate 'line', 7882
+.annotate 'line', 8062
     new $P4, [ 'Winxed'; 'Compiler'; 'SwitchCaseStatement' ]
     $P4.'SwitchCaseStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P3, $P4
     .return($P3)
   __label_2: # endif
-.annotate 'line', 7883
-    WSubId_48("'(' in switch", $P1)
-# }
-.annotate 'line', 7884
+.annotate 'line', 8063
+    WSubId_54("'(' in switch", $P1)
+.annotate 'line', 8064
 
 .end # parseSwitch
 
@@ -23641,233 +19543,209 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_103 = "WSubId_103"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 7897
-    self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7898
-# var t: $P1
+.const 'Sub' WSubId_109 = "WSubId_109"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 8077
+    self.'BlockStatement'(__ARG_1, __ARG_3)
+.annotate 'line', 8078
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7899
+.annotate 'line', 8079
     $P2 = $P1.'isop'(';')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 7900
+.annotate 'line', 8080
     __ARG_2.'unget'($P1)
-.annotate 'line', 7901
-    $P3 = WSubId_103(__ARG_2, self)
+.annotate 'line', 8081
+    $P3 = WSubId_109(__ARG_2, self)
     setattribute self, 'initializer', $P3
-# }
   __label_1: # endif
-.annotate 'line', 7903
+.annotate 'line', 8083
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7904
+.annotate 'line', 8084
     $P2 = $P1.'isop'(';')
     isfalse $I1, $P2
     unless $I1 goto __label_2
-# {
-.annotate 'line', 7905
+.annotate 'line', 8085
     __ARG_2.'unget'($P1)
-.annotate 'line', 7906
+.annotate 'line', 8086
     self.'parseconditionshort'(__ARG_2)
-.annotate 'line', 7907
-    WSubId_62(';', __ARG_2)
-# }
+.annotate 'line', 8087
+    WSubId_68(';', __ARG_2)
   __label_2: # endif
-.annotate 'line', 7909
+.annotate 'line', 8089
     $P1 = __ARG_2.'get'()
-.annotate 'line', 7910
+.annotate 'line', 8090
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_3
-# {
-.annotate 'line', 7911
+.annotate 'line', 8091
     __ARG_2.'unget'($P1)
-.annotate 'line', 7912
-    $P3 = WSubId_45(__ARG_2, self)
+.annotate 'line', 8092
+    $P3 = WSubId_51(__ARG_2, self)
     setattribute self, 'iteration', $P3
-.annotate 'line', 7913
-    WSubId_62(')', __ARG_2)
-# }
+.annotate 'line', 8093
+    WSubId_68(')', __ARG_2)
   __label_3: # endif
-.annotate 'line', 7915
+.annotate 'line', 8095
     self.'parsebody'(__ARG_2)
-# }
-.annotate 'line', 7916
+.annotate 'line', 8096
 
 .end # ForStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7919
-# var initializer: $P1
+.annotate 'line', 8099
     getattribute $P1, self, 'initializer'
-.annotate 'line', 7920
+.annotate 'line', 8100
     if_null $P1, __label_1
-.annotate 'line', 7921
+.annotate 'line', 8101
     $P1 = $P1.'optimize'()
     setattribute self, 'initializer', $P1
   __label_1: # endif
-.annotate 'line', 7922
+.annotate 'line', 8102
     getattribute $P2, self, 'condexpr'
     if_null $P2, __label_2
-# {
-.annotate 'line', 7923
+.annotate 'line', 8103
     self.'optimize_condition'()
-.annotate 'line', 7924
+.annotate 'line', 8104
     $P2 = self.'getvalue'()
     set $I1, $P2
     ne $I1, 2, __label_3
-# {
-.annotate 'line', 7925
+.annotate 'line', 8105
     if_null $P1, __label_4
-.annotate 'line', 7926
+.annotate 'line', 8106
     .return($P1)
     goto __label_5
   __label_4: # else
-.annotate 'line', 7928
+.annotate 'line', 8108
     new $P3, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
     .return($P3)
   __label_5: # endif
-# }
   __label_3: # endif
-# }
   __label_2: # endif
-.annotate 'line', 7931
+.annotate 'line', 8111
     getattribute $P2, self, 'iteration'
     if_null $P2, __label_6
-.annotate 'line', 7932
+.annotate 'line', 8112
     getattribute $P5, self, 'iteration'
     $P4 = $P5.'optimize'()
     setattribute self, 'iteration', $P4
   __label_6: # endif
-.annotate 'line', 7933
+.annotate 'line', 8113
     getattribute $P4, self, 'body'
     $P3 = $P4.'optimize'()
     setattribute self, 'body', $P3
-.annotate 'line', 7934
+.annotate 'line', 8114
     .return(self)
-# }
-.annotate 'line', 7935
+.annotate 'line', 8115
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 7938
+.annotate 'line', 8118
+    getattribute $P1, self, 'iteration'
+    isnull $I1, $P1
+    not $I1
+.annotate 'line', 8119
     getattribute $P1, self, 'initializer'
-    isnull $I3, $P1
-    unless $I3 goto __label_4
-.annotate 'line', 7939
+    isnull $I2, $P1
+    unless $I2 goto __label_3
+.annotate 'line', 8120
     getattribute $P2, self, 'condexpr'
-    isnull $I4, $P2
-    set $I2, $I4
-    goto __label_5
-  __label_4:
-    set $I2, $I3
-  __label_5:
-    unless $I2 goto __label_2
-.annotate 'line', 7940
-    getattribute $P3, self, 'iteration'
-    isnull $I5, $P3
-    set $I1, $I5
-    goto __label_3
-  __label_2:
-    set $I1, $I2
+    isnull $I2, $P2
   __label_3:
-    unless $I1 goto __label_1
-# {
-.annotate 'line', 7941
+    unless $I2 goto __label_2
+.annotate 'line', 8121
+    not $I2, $I1
+  __label_2:
+    unless $I2 goto __label_1
+.annotate 'line', 8122
     self.'emit_infinite'(__ARG_1)
-.annotate 'line', 7942
+.annotate 'line', 8123
     .return()
-# }
   __label_1: # endif
-.annotate 'line', 7944
+.annotate 'line', 8125
+    $P1 = __ARG_1.'getDebug'()
+    if_null $P1, __label_4
+    unless $P1 goto __label_4
+.annotate 'line', 8126
     __ARG_1.'comment'('for loop')
-.annotate 'line', 7945
-# continuelabel: $S1
+  __label_4: # endif
+.annotate 'line', 8127
     $P1 = self.'gencontinuelabel'()
     null $S1
-    if_null $P1, __label_6
+    if_null $P1, __label_5
     set $S1, $P1
-  __label_6:
-.annotate 'line', 7946
-# breaklabel: $S2
+  __label_5:
+.annotate 'line', 8128
     $P1 = self.'genbreaklabel'()
     null $S2
-    if_null $P1, __label_7
+    if_null $P1, __label_6
     set $S2, $P1
-  __label_7:
-.annotate 'line', 7947
-# condlabel: $S3
+  __label_6:
+.annotate 'line', 8129
+    unless $I1 goto __label_8
+.annotate 'line', 8130
     $P1 = self.'genlabel'()
-    null $S3
-    if_null $P1, __label_8
     set $S3, $P1
+    goto __label_7
   __label_8:
-.annotate 'line', 7948
+.annotate 'line', 8131
+    set $S3, $S1
+  __label_7:
+.annotate 'line', 8132
     getattribute $P1, self, 'initializer'
     if_null $P1, __label_9
-.annotate 'line', 7949
+.annotate 'line', 8133
     getattribute $P2, self, 'initializer'
     $P2.'emit'(__ARG_1)
   __label_9: # endif
-.annotate 'line', 7951
+.annotate 'line', 8135
     __ARG_1.'emitlabel'($S3, 'for condition')
-.annotate 'line', 7952
+.annotate 'line', 8136
     getattribute $P1, self, 'condexpr'
     if_null $P1, __label_10
-.annotate 'line', 7953
+.annotate 'line', 8137
     self.'emit_else'(__ARG_1, $S2)
   __label_10: # endif
-.annotate 'line', 7955
+.annotate 'line', 8139
     getattribute $P1, self, 'body'
     $P1.'emit'(__ARG_1)
-.annotate 'line', 7956
+.annotate 'line', 8140
+    unless $I1 goto __label_11
+.annotate 'line', 8141
     __ARG_1.'emitlabel'($S1, 'for iteration')
-.annotate 'line', 7957
+.annotate 'line', 8142
     getattribute $P1, self, 'iteration'
-    if_null $P1, __label_11
-.annotate 'line', 7958
-# unused: $S4
-    getattribute $P3, self, 'iteration'
-    $P2 = $P3.'emit_get'(__ARG_1)
-    null $S4
-    if_null $P2, __label_12
-    set $S4, $P2
-  __label_12:
+    if_null $P1, __label_12
+.annotate 'line', 8143
+    getattribute $P2, self, 'iteration'
+    $P2.'emit_void'(__ARG_1)
+  __label_12: # endif
   __label_11: # endif
-.annotate 'line', 7959
+.annotate 'line', 8145
     __ARG_1.'emitgoto'($S3)
-.annotate 'line', 7961
+.annotate 'line', 8147
     __ARG_1.'emitlabel'($S2, 'for end')
-# }
-.annotate 'line', 7962
+.annotate 'line', 8148
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ForStatement' ]
-.annotate 'line', 7890
+.annotate 'line', 8070
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P2
     get_class $P3, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
     addparent $P0, $P3
-.annotate 'line', 7892
+.annotate 'line', 8072
     addattribute $P0, 'initializer'
-.annotate 'line', 7893
+.annotate 'line', 8073
     addattribute $P0, 'iteration'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
@@ -23878,264 +19756,226 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param string __ARG_5
-.const 'Sub' WSubId_105 = "WSubId_105"
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 7977
-    self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 7978
-# sname: $S1
+.const 'Sub' WSubId_112 = "WSubId_112"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 8163
+    self.'BlockStatement'(__ARG_1, __ARG_3)
+.annotate 'line', 8164
     null $S1
     if_null __ARG_4, __label_1
     set $S1, __ARG_4
   __label_1:
-.annotate 'line', 7979
+.annotate 'line', 8165
     eq __ARG_5, '', __label_2
-# {
-.annotate 'line', 7980
-# deftype: $S2
-    $P1 = WSubId_105(__ARG_5)
+.annotate 'line', 8166
+    $P1 = WSubId_112(__ARG_5)
     null $S2
     if_null $P1, __label_3
     set $S2, $P1
   __label_3:
-.annotate 'line', 7981
+.annotate 'line', 8167
     self.'createvar'($S1, $S2)
-.annotate 'line', 7982
+.annotate 'line', 8168
     box $P1, $S2
     setattribute self, 'deftype', $P1
-# }
   __label_2: # endif
-.annotate 'line', 7984
+.annotate 'line', 8170
     setattribute self, 'varname', __ARG_4
-.annotate 'line', 7985
-    $P2 = WSubId_45(__ARG_2, self)
+.annotate 'line', 8171
+    $P2 = WSubId_51(__ARG_2, self)
     setattribute self, 'container', $P2
-.annotate 'line', 7986
-    WSubId_62(')', __ARG_2)
-.annotate 'line', 7987
+.annotate 'line', 8172
+    WSubId_68(')', __ARG_2)
+.annotate 'line', 8173
     self.'parsebody'(__ARG_2)
-# }
-.annotate 'line', 7988
+.annotate 'line', 8174
 
 .end # ForeachStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 7991
-# var container: $P1
+.annotate 'line', 8177
     getattribute $P2, self, 'container'
     $P1 = $P2.'optimize'()
-.annotate 'line', 7995
-    $P3 = $P1.'isnull'()
-    if $P3 goto __label_2
-.annotate 'line', 7996
-    $P5 = $P1.'isstringliteral'()
-    unless $P5 goto __label_4
-.annotate 'line', 7997
-    $P6 = $P1.'get_value'()
-    set $S1, $P6
-# builtin length
+.annotate 'line', 8181
+    $P2 = $P1.'isnull'()
+    if $P2 goto __label_2
+.annotate 'line', 8182
+    $P2 = $P1.'isstringliteral'()
+    unless $P2 goto __label_3
+.annotate 'line', 8183
+    $P3 = $P1.'get_value'()
+    set $S1, $P3
     length $I2, $S1
     iseq $I1, $I2, 0
-    box $P4, $I1
-    goto __label_5
-  __label_4:
-    set $P4, $P5
-  __label_5:
-    set $P2, $P4
-    goto __label_3
-  __label_2:
-    set $P2, $P3
+    box $P2, $I1
   __label_3:
+  __label_2:
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 7998
-    new $P7, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-    .return($P7)
+.annotate 'line', 8184
+    new $P4, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
+    .return($P4)
   __label_1: # endif
-.annotate 'line', 8000
+.annotate 'line', 8186
     setattribute self, 'container', $P1
-.annotate 'line', 8001
+.annotate 'line', 8187
     getattribute $P4, self, 'body'
     $P3 = $P4.'optimize'()
     setattribute self, 'body', $P3
-.annotate 'line', 8002
+.annotate 'line', 8188
     .return(self)
-# }
-.annotate 'line', 8003
+.annotate 'line', 8189
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_69 = "WSubId_69"
-# Body
-# {
-.annotate 'line', 8006
+.const 'Sub' WSubId_75 = "WSubId_75"
+.annotate 'line', 8192
     self.'annotate'(__ARG_1)
-.annotate 'line', 8007
-# regcont: $S1
+.annotate 'line', 8193
     null $S1
-.annotate 'line', 8008
+.annotate 'line', 8194
     getattribute $P3, self, 'container'
     $P2 = $P3.'checkresult'()
     set $S6, $P2
     ne $S6, 'S', __label_1
-# {
-.annotate 'line', 8009
-# value: $S2
+.annotate 'line', 8195
     getattribute $P5, self, 'container'
     $P4 = $P5.'emit_get'(__ARG_1)
     null $S2
     if_null $P4, __label_3
     set $S2, $P4
   __label_3:
-.annotate 'line', 8010
+.annotate 'line', 8196
     $P2 = self.'tempreg'('P')
     set $S1, $P2
-.annotate 'line', 8011
+.annotate 'line', 8197
     __ARG_1.'emitbox'($S1, $S2)
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 8014
+.annotate 'line', 8200
     getattribute $P3, self, 'container'
     $P2 = $P3.'emit_get'(__ARG_1)
     set $S1, $P2
   __label_2: # endif
-.annotate 'line', 8016
-# var itvar: $P1
+.annotate 'line', 8202
     getattribute $P2, self, 'varname'
     $P1 = self.'getvar'($P2)
-.annotate 'line', 8017
+.annotate 'line', 8203
     unless_null $P1, __label_4
-.annotate 'line', 8018
+.annotate 'line', 8204
     getattribute $P2, self, 'varname'
-    WSubId_69($P2)
+    WSubId_75($P2)
   __label_4: # endif
-.annotate 'line', 8020
-# iterator: $S3
+.annotate 'line', 8206
     $P2 = self.'createreg'('P')
     null $S3
     if_null $P2, __label_5
     set $S3, $P2
   __label_5:
-.annotate 'line', 8021
-# continuelabel: $S4
+.annotate 'line', 8207
     $P2 = self.'gencontinuelabel'()
     null $S4
     if_null $P2, __label_6
     set $S4, $P2
   __label_6:
-.annotate 'line', 8022
-# breaklabel: $S5
+.annotate 'line', 8208
     $P2 = self.'genbreaklabel'()
     null $S5
     if_null $P2, __label_7
     set $S5, $P2
   __label_7:
-.annotate 'line', 8023
+.annotate 'line', 8209
     __ARG_1.'emitif_null'($S1, $S5)
-.annotate 'line', 8024
+.annotate 'line', 8210
     __ARG_1.'emitarg2'('iter', $S3, $S1)
-.annotate 'line', 8025
+.annotate 'line', 8211
     __ARG_1.'emitset'($S3, '0')
-.annotate 'line', 8026
+.annotate 'line', 8212
     __ARG_1.'emitlabel'($S4, 'for iteration')
-.annotate 'line', 8027
+.annotate 'line', 8213
     __ARG_1.'emitunless'($S3, $S5)
-.annotate 'line', 8028
+.annotate 'line', 8214
     $P2 = $P1.'getreg'()
     __ARG_1.'emitarg2'('shift', $P2, $S3)
-.annotate 'line', 8029
+.annotate 'line', 8215
     getattribute $P2, self, 'body'
     $P2.'emit'(__ARG_1)
-.annotate 'line', 8030
+.annotate 'line', 8216
     __ARG_1.'emitgoto'($S4)
-.annotate 'line', 8031
+.annotate 'line', 8217
     __ARG_1.'emitlabel'($S5, 'endfor')
-# }
-.annotate 'line', 8032
+.annotate 'line', 8218
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
-.annotate 'line', 7969
+.annotate 'line', 8155
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P2
-.annotate 'line', 7971
+.annotate 'line', 8157
     addattribute $P0, 'deftype'
-.annotate 'line', 7972
+.annotate 'line', 8158
     addattribute $P0, 'varname'
-.annotate 'line', 7973
+.annotate 'line', 8159
     addattribute $P0, 'container'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseFor' :subid('WSubId_59')
+.sub 'parseFor' :subid('WSubId_65')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 8039
-    WSubId_62('(', __ARG_2)
-.annotate 'line', 8040
-# var aux: $P1
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 8225
+    WSubId_68('(', __ARG_2)
+.annotate 'line', 8226
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8041
-# var in1: $P2
+.annotate 'line', 8227
     $P2 = __ARG_2.'get'()
-.annotate 'line', 8042
+.annotate 'line', 8228
     $P4 = $P2.'iskeyword'('in')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-.annotate 'line', 8043
+.annotate 'line', 8229
     new $P6, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
     $P6.'ForeachStatement'(__ARG_1, __ARG_2, __ARG_3, $P1, '')
     set $P5, $P6
     .return($P5)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 8045
-# var in2: $P3
+.annotate 'line', 8231
     $P3 = __ARG_2.'get'()
-.annotate 'line', 8046
+.annotate 'line', 8232
     $P4 = $P3.'iskeyword'('in')
     if_null $P4, __label_3
     unless $P4 goto __label_3
-.annotate 'line', 8047
+.annotate 'line', 8233
     new $P6, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
     $P6.'ForeachStatement'(__ARG_1, __ARG_2, __ARG_3, $P2, $P1)
     set $P5, $P6
     .return($P5)
   __label_3: # endif
-.annotate 'line', 8048
+.annotate 'line', 8234
     __ARG_2.'unget'($P3)
-.annotate 'line', 8049
+.annotate 'line', 8235
     __ARG_2.'unget'($P2)
-.annotate 'line', 8050
+.annotate 'line', 8236
     __ARG_2.'unget'($P1)
-# }
   __label_2: # endif
-.annotate 'line', 8052
+.annotate 'line', 8238
     new $P5, [ 'Winxed'; 'Compiler'; 'ForStatement' ]
     $P5.'ForStatement'(__ARG_1, __ARG_2, __ARG_3)
     set $P4, $P5
     .return($P4)
-# }
-.annotate 'line', 8053
+.annotate 'line', 8239
 
 .end # parseFor
 
@@ -24145,94 +19985,77 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 8065
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 8251
     self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 8066
-    $P2 = WSubId_45(__ARG_2, self)
+.annotate 'line', 8252
+    $P2 = WSubId_51(__ARG_2, self)
     setattribute self, 'excep', $P2
-# }
-.annotate 'line', 8067
+.annotate 'line', 8253
 
 .end # ThrowStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 8070
+.annotate 'line', 8256
     getattribute $P3, self, 'excep'
     $P2 = $P3.'optimize'()
     setattribute self, 'excep', $P2
-.annotate 'line', 8071
+.annotate 'line', 8257
     .return(self)
-# }
-.annotate 'line', 8072
+.annotate 'line', 8258
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
+.const 'Sub' WSubId_26 = "WSubId_26"
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8075
-# var excep: $P1
+.annotate 'line', 8261
     getattribute $P1, self, 'excep'
-.annotate 'line', 8076
-# reg: $S1
+.annotate 'line', 8262
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 8077
+.annotate 'line', 8263
     self.'annotate'(__ARG_1)
-# switch
-.annotate 'line', 8078
+.annotate 'line', 8264
     $P2 = $P1.'checkresult'()
     set $S3, $P2
-    set $S4, 'P'
-    if $S3 == $S4 goto __label_4
-    set $S4, 'S'
-    if $S3 == $S4 goto __label_5
+    if $S3 == 'P' goto __label_4
+    if $S3 == 'S' goto __label_5
     goto __label_3
   __label_4: # case
     goto __label_2 # break
   __label_5: # case
-.annotate 'line', 8084
-# msg: $S2
+.annotate 'line', 8270
     set $S2, $S1
-.annotate 'line', 8085
+.annotate 'line', 8271
     $P3 = self.'tempreg'('P')
     set $S1, $P3
-.annotate 'line', 8086
-    __ARG_1.'say'('    ', 'root_new ', $S1, ", ['parrot';'Exception']")
-.annotate 'line', 8087
-    concat $S5, '    ', $S1
-    concat $S5, $S5, "['message'] = "
-    __ARG_1.'say'($S5, $S2)
+.annotate 'line', 8272
+    $P4 = WSubId_26("    root_new %0, ['parrot';'Exception']\n    %0['message'] = %1\n", $S1, $S2)
+    __ARG_1.'print'($P4)
     goto __label_2 # break
   __label_3: # default
-.annotate 'line', 8090
+.annotate 'line', 8280
     WSubId_1("Invalid throw argument", self)
   __label_2: # switch end
-.annotate 'line', 8092
+.annotate 'line', 8282
     __ARG_1.'emitarg1'('throw', $S1)
-# }
-.annotate 'line', 8093
+.annotate 'line', 8283
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ThrowStatement' ]
-.annotate 'line', 8059
+.annotate 'line', 8245
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 8061
+.annotate 'line', 8247
     addattribute $P0, 'excep'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TryModifierList' ]
@@ -24241,28 +20064,22 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 8105
+.annotate 'line', 8295
     setattribute self, 'start', __ARG_1
-.annotate 'line', 8106
+.annotate 'line', 8296
     self.'ModifierList'(__ARG_2, __ARG_3)
-# }
-.annotate 'line', 8107
+.annotate 'line', 8297
 
 .end # TryModifierList
 
 
 .sub 'allowtailcall' :method
-# Body
-# {
-.annotate 'line', 8110
+.annotate 'line', 8300
     $P1 = self.'pick'('allowtailcall')
     isnull $I1, $P1
     not $I1
     .return($I1)
-# }
-.annotate 'line', 8111
+.annotate 'line', 8301
 
 .end # allowtailcall
 
@@ -24271,117 +20088,92 @@
         .param pmc __ARG_1
         .param string __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8114
-# var modiflist: $P1
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 8304
     $P1 = self.'getlist'()
-.annotate 'line', 8115
+.annotate 'line', 8305
     if_null $P1, __label_2
     iter $P6, $P1
     set $P6, 0
   __label_1: # for iteration
     unless $P6 goto __label_2
     shift $P2, $P6
-# {
-.annotate 'line', 8116
-# modifname: $S1
+.annotate 'line', 8306
     $P7 = $P2.'getname'()
     null $S1
     if_null $P7, __label_3
     set $S1, $P7
   __label_3:
-.annotate 'line', 8117
-# nargs: $I1
+.annotate 'line', 8307
     $P7 = $P2.'numargs'()
     set $I1, $P7
-# switch
-.annotate 'line', 8118
-    set $S3, $S1
-    set $S4, 'min_severity'
-    if $S3 == $S4 goto __label_6
-    set $S4, 'max_severity'
-    if $S3 == $S4 goto __label_7
-    set $S4, 'handle_types'
-    if $S3 == $S4 goto __label_8
-    set $S4, 'handle_types_except'
-    if $S3 == $S4 goto __label_9
-    set $S4, 'allowtailcall'
-    if $S3 == $S4 goto __label_10
+.annotate 'line', 8308
+    if $S1 == 'min_severity' goto __label_6
+    if $S1 == 'max_severity' goto __label_7
+    if $S1 == 'handle_types' goto __label_8
+    if $S1 == 'handle_types_except' goto __label_9
+    if $S1 == 'allowtailcall' goto __label_10
     goto __label_5
   __label_6: # case
   __label_7: # case
-.annotate 'line', 8121
+.annotate 'line', 8311
     eq $I1, 1, __label_11
-.annotate 'line', 8122
+.annotate 'line', 8312
     WSubId_1('Wrong modifier args', self)
   __label_11: # endif
-.annotate 'line', 8123
-# var arg: $P3
+.annotate 'line', 8313
     $P3 = $P2.'getarg'(0)
-.annotate 'line', 8124
-# argreg: $S2
-    $P7 = $P3.'emit_get'(__ARG_1)
-    null $S2
-    if_null $P7, __label_12
-    set $S2, $P7
-  __label_12:
-.annotate 'line', 8125
-    __ARG_1.'say'('    ', __ARG_2, ".'", $S1, "'(", $S2, ")")
+.annotate 'line', 8315
+    $P8 = $P3.'emit_get'(__ARG_1)
+.annotate 'line', 8314
+    $P7 = WSubId_26("    %0.'%1'(%2)", __ARG_2, $S1, $P8)
+    __ARG_1.'say'($P7)
     goto __label_4 # break
   __label_8: # case
   __label_9: # case
-.annotate 'line', 8129
+.annotate 'line', 8319
     new $P4, ['ResizableStringArray']
-# for loop
-.annotate 'line', 8130
-# i: $I2
+.annotate 'line', 8320
     null $I2
-  __label_15: # for condition
-    ge $I2, $I1, __label_14
-# {
-.annotate 'line', 8131
-# var arg: $P5
+  __label_14: # for condition
+    ge $I2, $I1, __label_13
+.annotate 'line', 8321
     $P5 = $P2.'getarg'($I2)
-.annotate 'line', 8132
+.annotate 'line', 8322
     $P7 = $P5.'emit_get'(__ARG_1)
-# builtin push
     push $P4, $P7
-# }
-  __label_13: # for iteration
-.annotate 'line', 8130
+  __label_12: # for iteration
+.annotate 'line', 8320
     inc $I2
-    goto __label_15
-  __label_14: # for end
-.annotate 'line', 8135
-# builtin join
-    join $S3, ', ', $P4
-.annotate 'line', 8134
-    __ARG_1.'say'('    ', __ARG_2, ".'", $S1, "'(", $S3, ")")
+    goto __label_14
+  __label_13: # for end
+.annotate 'line', 8325
+    join $S2, ', ', $P4
+.annotate 'line', 8324
+    $P7 = WSubId_26("    %0.'%1'(%2)", __ARG_2, $S1, $S2)
+    __ARG_1.'say'($P7)
     goto __label_4 # break
   __label_10: # case
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 8140
-    concat $S4, "Modifier '", $S1
-    concat $S4, $S4, "' not valid for try"
-    getattribute $P7, self, 'start'
-    WSubId_1($S4, $P7)
+.annotate 'line', 8330
+    concat $S3, "Modifier '", $S1
+    concat $S3, $S3, "' not valid for try"
+    getattribute $P8, self, 'start'
+    WSubId_1($S3, $P8)
   __label_4: # switch end
-# }
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 8143
+.annotate 'line', 8333
 
 .end # emitmodifiers
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TryModifierList' ]
-.annotate 'line', 8100
+.annotate 'line', 8290
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
-.annotate 'line', 8102
+.annotate 'line', 8292
     addattribute $P0, 'start'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TryStatement' ]
@@ -24390,171 +20182,153 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_109 = "WSubId_109"
 .const 'Sub' WSubId_2 = "WSubId_2"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 8155
-    self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 8156
-# var t: $P1
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 8345
+    self.'BlockStatement'(__ARG_1, __ARG_3)
+.annotate 'line', 8346
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8157
+.annotate 'line', 8347
     $P2 = $P1.'isop'('[')
     if_null $P2, __label_1
     unless $P2 goto __label_1
-.annotate 'line', 8158
+.annotate 'line', 8348
     new $P5, [ 'Winxed'; 'Compiler'; 'TryModifierList' ]
     $P5.'TryModifierList'($P1, __ARG_2, self)
     set $P4, $P5
     setattribute self, 'modifiers', $P4
     goto __label_2
   __label_1: # else
-.annotate 'line', 8160
+.annotate 'line', 8350
     __ARG_2.'unget'($P1)
   __label_2: # endif
-.annotate 'line', 8162
-    $P3 = WSubId_103(__ARG_2, self)
+.annotate 'line', 8352
+    $P3 = WSubId_109(__ARG_2, self)
     setattribute self, 'stry', $P3
-.annotate 'line', 8163
+.annotate 'line', 8353
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8164
+.annotate 'line', 8354
     $P2 = $P1.'iskeyword'('catch')
     isfalse $I1, $P2
     unless $I1 goto __label_3
-.annotate 'line', 8165
+.annotate 'line', 8355
     WSubId_2('catch', $P1)
   __label_3: # endif
-.annotate 'line', 8166
+.annotate 'line', 8356
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8167
+.annotate 'line', 8357
     $P2 = $P1.'isop'('(')
     isfalse $I1, $P2
     unless $I1 goto __label_4
-.annotate 'line', 8168
-    WSubId_48("'(' after 'catch'", $P1)
+.annotate 'line', 8358
+    WSubId_54("'(' after 'catch'", $P1)
   __label_4: # endif
-.annotate 'line', 8169
+.annotate 'line', 8359
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8170
+.annotate 'line', 8360
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_5
-# {
-.annotate 'line', 8171
-# exname: $S1
+.annotate 'line', 8361
     $P3 = $P1.'getidentifier'()
     null $S1
     if_null $P3, __label_6
     set $S1, $P3
   __label_6:
-.annotate 'line', 8172
+.annotate 'line', 8362
     setattribute self, 'exname', $P1
-.annotate 'line', 8173
+.annotate 'line', 8363
     self.'createvar'($S1, 'P')
-.annotate 'line', 8174
+.annotate 'line', 8364
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8175
+.annotate 'line', 8365
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_7
-.annotate 'line', 8176
-    WSubId_48("')' in 'catch'", $P1)
+.annotate 'line', 8366
+    WSubId_54("')' in 'catch'", $P1)
   __label_7: # endif
-# }
   __label_5: # endif
-.annotate 'line', 8178
-    $P3 = WSubId_103(__ARG_2, self)
+.annotate 'line', 8368
+    $P3 = WSubId_109(__ARG_2, self)
     setattribute self, 'scatch', $P3
-# }
-.annotate 'line', 8179
+.annotate 'line', 8369
 
 .end # TryStatement
 
 
 .sub 'allowtailcall' :method
-# Body
-# {
-.annotate 'line', 8182
+.annotate 'line', 8372
     getattribute $P1, self, 'modifiers'
     if_null $P1, __label_1
-.annotate 'line', 8183
+.annotate 'line', 8373
     getattribute $P2, self, 'modifiers'
     .tailcall $P2.'allowtailcall'()
     goto __label_2
   __label_1: # else
-.annotate 'line', 8185
+.annotate 'line', 8375
     .return(0)
   __label_2: # endif
-# }
-.annotate 'line', 8186
+.annotate 'line', 8376
 
 .end # allowtailcall
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 8189
+.annotate 'line', 8379
     getattribute $P1, self, 'modifiers'
     if_null $P1, __label_1
-.annotate 'line', 8190
+.annotate 'line', 8380
     getattribute $P2, self, 'modifiers'
     $P2.'optimize'()
   __label_1: # endif
-.annotate 'line', 8191
+.annotate 'line', 8381
     getattribute $P3, self, 'stry'
     $P2 = $P3.'optimize'()
     setattribute self, 'stry', $P2
-.annotate 'line', 8192
+.annotate 'line', 8382
     getattribute $P3, self, 'scatch'
     $P2 = $P3.'optimize'()
     setattribute self, 'scatch', $P2
-.annotate 'line', 8193
+.annotate 'line', 8383
     .return(self)
-# }
-.annotate 'line', 8194
+.annotate 'line', 8384
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8197
-# reghandler: $S1
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 8387
     $P1 = self.'tempreg'('P')
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 8198
-# labelhandler: $S2
+.annotate 'line', 8388
     $P1 = self.'genlabel'()
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 8199
-# labelpasthandler: $S3
+.annotate 'line', 8389
     $P1 = self.'genlabel'()
     null $S3
     if_null $P1, __label_3
     set $S3, $P1
   __label_3:
-.annotate 'line', 8200
-# exreg: $S4
+.annotate 'line', 8390
     getattribute $P2, self, 'exname'
     if_null $P2, __label_5
-.annotate 'line', 8201
+.annotate 'line', 8391
     getattribute $P4, self, 'exname'
     $P3 = self.'getvar'($P4)
     $P1 = $P3.'getreg'()
     goto __label_4
   __label_5:
-.annotate 'line', 8202
+.annotate 'line', 8392
     $P5 = self.'tempreg'('P')
     set $P1, $P5
   __label_4:
@@ -24562,70 +20336,86 @@
     if_null $P1, __label_6
     set $S4, $P1
   __label_6:
-.annotate 'line', 8204
+.annotate 'line', 8394
+    $P1 = __ARG_1.'getDebug'()
+    set $I1, $P1
+.annotate 'line', 8395
     self.'annotate'(__ARG_1)
-.annotate 'line', 8205
+.annotate 'line', 8396
+    unless $I1 goto __label_7
+.annotate 'line', 8397
     __ARG_1.'comment'('try: create handler')
-.annotate 'line', 8207
-    __ARG_1.'say'('    ', 'new ', $S1, ", 'ExceptionHandler'")
-.annotate 'line', 8208
-    __ARG_1.'say'('    ', 'set_label ', $S1, ', ', $S2)
-.annotate 'line', 8210
+  __label_7: # endif
+.annotate 'line', 8398
+    $P1 = WSubId_26("    new %0, 'ExceptionHandler'\n    set_label %0, %1\n", $S1, $S2)
+    __ARG_1.'print'($P1)
+.annotate 'line', 8405
     getattribute $P1, self, 'modifiers'
-    if_null $P1, __label_7
-.annotate 'line', 8211
+    if_null $P1, __label_8
+.annotate 'line', 8406
     getattribute $P2, self, 'modifiers'
     $P2.'emitmodifiers'(__ARG_1, $S1)
-  __label_7: # endif
-.annotate 'line', 8213
+  __label_8: # endif
+.annotate 'line', 8408
     __ARG_1.'emitarg1'('push_eh', $S1)
-.annotate 'line', 8214
+.annotate 'line', 8409
+    unless $I1 goto __label_9
+.annotate 'line', 8410
     __ARG_1.'comment'('try: begin')
-.annotate 'line', 8215
+  __label_9: # endif
+.annotate 'line', 8411
     getattribute $P1, self, 'stry'
     $P1.'emit'(__ARG_1)
-.annotate 'line', 8216
+.annotate 'line', 8412
+    unless $I1 goto __label_10
+.annotate 'line', 8413
     __ARG_1.'comment'('try: end')
-.annotate 'line', 8217
+  __label_10: # endif
+.annotate 'line', 8414
     __ARG_1.'say'('    ', 'pop_eh')
-.annotate 'line', 8219
+.annotate 'line', 8416
     self.'annotate'(__ARG_1)
-.annotate 'line', 8220
+.annotate 'line', 8417
     __ARG_1.'emitgoto'($S3)
-.annotate 'line', 8222
+.annotate 'line', 8419
+    unless $I1 goto __label_11
+.annotate 'line', 8420
     __ARG_1.'comment'('catch')
-.annotate 'line', 8223
+  __label_11: # endif
+.annotate 'line', 8421
     __ARG_1.'emitlabel'($S2)
-.annotate 'line', 8224
+.annotate 'line', 8422
     __ARG_1.'say'('    ', '.get_results(', $S4, ')')
-.annotate 'line', 8225
+.annotate 'line', 8423
     __ARG_1.'emitarg1'('finalize', $S4)
-.annotate 'line', 8226
+.annotate 'line', 8424
     __ARG_1.'say'('    ', 'pop_eh')
-.annotate 'line', 8227
+.annotate 'line', 8425
     getattribute $P1, self, 'scatch'
     $P1.'emit'(__ARG_1)
-.annotate 'line', 8229
+.annotate 'line', 8427
+    unless $I1 goto __label_12
+.annotate 'line', 8428
     __ARG_1.'comment'('catch end')
-.annotate 'line', 8230
+  __label_12: # endif
+.annotate 'line', 8429
     __ARG_1.'emitlabel'($S3)
-# }
-.annotate 'line', 8231
+.annotate 'line', 8430
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TryStatement' ]
-.annotate 'line', 8146
+.annotate 'line', 8336
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
-.annotate 'line', 8148
+.annotate 'line', 8338
     addattribute $P0, 'stry'
-.annotate 'line', 8149
+.annotate 'line', 8339
     addattribute $P0, 'modifiers'
-.annotate 'line', 8150
+.annotate 'line', 8340
     addattribute $P0, 'exname'
-.annotate 'line', 8151
+.annotate 'line', 8341
     addattribute $P0, 'scatch'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'VarBaseStatement' ]
@@ -24635,31 +20425,27 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param int __ARG_4 :optional
-# Body
-# {
-.annotate 'line', 8244
+.annotate 'line', 8443
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 8245
+.annotate 'line', 8444
     setattribute self, 'name', __ARG_3
-.annotate 'line', 8246
-# var vdata: $P1
+.annotate 'line', 8445
     $P1 = self.'createvar'(__ARG_3, 'P', __ARG_4)
-.annotate 'line', 8247
+.annotate 'line', 8446
     $P3 = $P1.'getreg'()
     setattribute self, 'reg', $P3
-# }
-.annotate 'line', 8248
+.annotate 'line', 8447
 
 .end # initvarbase
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarBaseStatement' ]
-.annotate 'line', 8238
+.annotate 'line', 8437
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 8240
+.annotate 'line', 8439
     addattribute $P0, 'name'
-.annotate 'line', 8241
+.annotate 'line', 8440
     addattribute $P0, 'reg'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
@@ -24670,36 +20456,32 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param string __ARG_5
-# Body
-# {
-.annotate 'line', 8263
+.annotate 'line', 8462
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 8264
+.annotate 'line', 8463
     setattribute self, 'name', __ARG_3
-.annotate 'line', 8265
+.annotate 'line', 8464
     box $P2, __ARG_4
     setattribute self, 'basetype', $P2
-.annotate 'line', 8266
-# var vdata: $P1
+.annotate 'line', 8465
     $P1 = self.'createvar'(__ARG_3, __ARG_5)
-.annotate 'line', 8267
+.annotate 'line', 8466
     $P3 = $P1.'getreg'()
     setattribute self, 'reg', $P3
-# }
-.annotate 'line', 8268
+.annotate 'line', 8467
 
 .end # DeclareBase
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
-.annotate 'line', 8255
+.annotate 'line', 8454
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 8257
+.annotate 'line', 8456
     addattribute $P0, 'name'
-.annotate 'line', 8258
+.annotate 'line', 8457
     addattribute $P0, 'basetype'
-.annotate 'line', 8259
+.annotate 'line', 8458
     addattribute $P0, 'reg'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
@@ -24710,243 +20492,201 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_45 = "WSubId_45"
-# Body
-# {
-.annotate 'line', 8279
+.const 'Sub' WSubId_51 = "WSubId_51"
+.annotate 'line', 8478
     self.'DeclareBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, __ARG_4)
-.annotate 'line', 8280
-# var t: $P1
+.annotate 'line', 8479
     $P1 = __ARG_5.'get'()
-.annotate 'line', 8281
+.annotate 'line', 8480
     $P2 = $P1.'isop'('=')
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 8283
-    $P4 = WSubId_45(__ARG_5, self)
+.annotate 'line', 8482
+    $P4 = WSubId_51(__ARG_5, self)
     setattribute self, 'init', $P4
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 8286
+.annotate 'line', 8485
     __ARG_5.'unget'($P1)
   __label_2: # endif
-# }
-.annotate 'line', 8287
+.annotate 'line', 8486
 
 .end # DeclareSingleStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 8290
-# var init: $P1
+.annotate 'line', 8489
     getattribute $P1, self, 'init'
-.annotate 'line', 8291
+.annotate 'line', 8490
     if_null $P1, __label_1
-.annotate 'line', 8292
+.annotate 'line', 8491
     $P3 = $P1.'optimize'()
     setattribute self, 'init', $P3
   __label_1: # endif
-.annotate 'line', 8293
+.annotate 'line', 8492
     .return(self)
-# }
-.annotate 'line', 8294
+.annotate 'line', 8493
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_25 = "WSubId_25"
-.const 'Sub' WSubId_106 = "WSubId_106"
-.const 'Sub' WSubId_24 = "WSubId_24"
+.const 'Sub' WSubId_29 = "WSubId_29"
+.const 'Sub' WSubId_113 = "WSubId_113"
+.const 'Sub' WSubId_28 = "WSubId_28"
 .const 'Sub' WSubId_6 = "WSubId_6"
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8297
+.annotate 'line', 8496
     self.'annotate'(__ARG_1)
-.annotate 'line', 8298
-# name: $S1
+.annotate 'line', 8497
     getattribute $P2, self, 'name'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 8299
-# reg: $S2
+.annotate 'line', 8498
     getattribute $P2, self, 'reg'
     null $S2
     if_null $P2, __label_2
     set $S2, $P2
   __label_2:
-.annotate 'line', 8300
-# ireg: $S3
+.annotate 'line', 8499
     null $S3
-.annotate 'line', 8301
-# basetype: $S4
+.annotate 'line', 8500
     getattribute $P2, self, 'basetype'
     null $S4
     if_null $P2, __label_3
     set $S4, $P2
   __label_3:
-.annotate 'line', 8302
-# var init: $P1
+.annotate 'line', 8501
     getattribute $P1, self, 'init'
-.annotate 'line', 8303
+.annotate 'line', 8502
+    $P2 = __ARG_1.'getDebug'()
+    if_null $P2, __label_4
+    unless $P2 goto __label_4
+.annotate 'line', 8503
     concat $S7, $S1, ': '
     concat $S7, $S7, $S2
     __ARG_1.'comment'($S7)
-.annotate 'line', 8305
+  __label_4: # endif
+.annotate 'line', 8505
     isnull $I1, $P1
-    if $I1 goto __label_6
-    $P3 = $P1.'isnull'()
-    set $P2, $P3
-    goto __label_7
-  __label_6:
     box $P2, $I1
+    if $P2 goto __label_7
+    $P2 = $P1.'isnull'()
   __label_7:
-    if_null $P2, __label_4
-    unless $P2 goto __label_4
-.annotate 'line', 8306
+    if_null $P2, __label_5
+    unless $P2 goto __label_5
+.annotate 'line', 8506
     __ARG_1.'emitnull'($S2)
-    goto __label_5
-  __label_4: # else
-# {
-.annotate 'line', 8308
-# itype: $S5
-    $P4 = $P1.'checkresult'()
+    goto __label_6
+  __label_5: # else
+.annotate 'line', 8508
+    $P3 = $P1.'checkresult'()
     null $S5
-    if_null $P4, __label_8
-    set $S5, $P4
+    if_null $P3, __label_8
+    set $S5, $P3
   __label_8:
-.annotate 'line', 8309
+.annotate 'line', 8509
     ne $S5, $S4, __label_9
-.annotate 'line', 8310
+.annotate 'line', 8510
     $P1.'emit'(__ARG_1, $S2)
     goto __label_10
   __label_9: # else
-# {
-.annotate 'line', 8312
+.annotate 'line', 8512
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
     unless $I1 goto __label_11
-# {
-.annotate 'line', 8314
+.annotate 'line', 8514
     $P1.'emit'(__ARG_1, $S2)
-# }
     goto __label_12
   __label_11: # else
-.annotate 'line', 8316
+.annotate 'line', 8516
     $P2 = $P1.'isliteral'()
     if_null $P2, __label_13
     unless $P2 goto __label_13
-# {
-# switch
-.annotate 'line', 8317
-    set $S7, $S4
-    set $S8, 'I'
-    if $S7 == $S8 goto __label_17
-    set $S8, 'N'
-    if $S7 == $S8 goto __label_18
-    set $S8, 'S'
-    if $S7 == $S8 goto __label_19
+.annotate 'line', 8517
+    if $S4 == 'I' goto __label_17
+    if $S4 == 'N' goto __label_18
+    if $S4 == 'S' goto __label_19
     goto __label_16
   __label_17: # case
-.annotate 'line', 8319
-    $P3 = WSubId_25($P1)
+.annotate 'line', 8519
+    $P3 = WSubId_29($P1)
     set $S3, $P3
-.annotate 'line', 8320
+.annotate 'line', 8520
     __ARG_1.'emitset'($S2, $S3)
     goto __label_15 # break
   __label_18: # case
-.annotate 'line', 8323
-    $P4 = WSubId_106($P1)
+.annotate 'line', 8523
+    $P4 = WSubId_113($P1)
     set $S3, $P4
-.annotate 'line', 8324
+.annotate 'line', 8524
     __ARG_1.'emitset'($S2, $S3)
     goto __label_15 # break
   __label_19: # case
-.annotate 'line', 8327
-    $P5 = WSubId_24($P1)
+.annotate 'line', 8527
+    $P5 = WSubId_28($P1)
     set $S3, $P5
-.annotate 'line', 8328
+.annotate 'line', 8528
     __ARG_1.'emitset'($S2, $S3)
     goto __label_15 # break
   __label_16: # default
-.annotate 'line', 8331
+.annotate 'line', 8531
     WSubId_6("Wrong type", self)
   __label_15: # switch end
-# }
     goto __label_14
   __label_13: # else
-# {
-# switch
-.annotate 'line', 8335
-    set $S7, $S5
-    set $S8, 'v'
-    if $S7 == $S8 goto __label_22
+.annotate 'line', 8535
+    if $S5 == 'v' goto __label_22
     goto __label_21
   __label_22: # case
-.annotate 'line', 8337
+.annotate 'line', 8537
     WSubId_1('Invalid initialization from void value', self)
   __label_21: # default
-.annotate 'line', 8339
+.annotate 'line', 8539
     $P2 = $P1.'emit_get'(__ARG_1)
     set $S3, $P2
   __label_20: # switch end
-.annotate 'line', 8341
-    iseq $I2, $S4, 'S'
-    unless $I2 goto __label_25
-    iseq $I3, $S5, 'P'
-    set $I1, $I3
-    goto __label_26
+.annotate 'line', 8541
+    iseq $I1, $S4, 'S'
+    unless $I1 goto __label_25
+    iseq $I1, $S5, 'P'
   __label_25:
-    set $I1, $I2
-  __label_26:
     unless $I1 goto __label_23
-# {
-.annotate 'line', 8342
-# auxlabel: $S6
+.annotate 'line', 8542
     $P2 = self.'genlabel'()
     null $S6
-    if_null $P2, __label_27
+    if_null $P2, __label_26
     set $S6, $P2
-  __label_27:
-.annotate 'line', 8343
+  __label_26:
+.annotate 'line', 8543
     __ARG_1.'emitnull'($S2)
-.annotate 'line', 8344
+.annotate 'line', 8544
     __ARG_1.'emitif_null'($S3, $S6)
-.annotate 'line', 8345
+.annotate 'line', 8545
     __ARG_1.'emitset'($S2, $S3)
-.annotate 'line', 8346
+.annotate 'line', 8546
     __ARG_1.'emitlabel'($S6)
-# }
     goto __label_24
   __label_23: # else
-.annotate 'line', 8349
+.annotate 'line', 8549
     __ARG_1.'emitset'($S2, $S3)
   __label_24: # endif
-# }
   __label_14: # endif
   __label_12: # endif
-# }
   __label_10: # endif
-# }
-  __label_5: # endif
-# }
-.annotate 'line', 8353
+  __label_6: # endif
+.annotate 'line', 8553
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
-.annotate 'line', 8273
+.annotate 'line', 8472
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
     addparent $P0, $P1
-.annotate 'line', 8275
+.annotate 'line', 8474
     addattribute $P0, 'init'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
@@ -24958,274 +20698,219 @@
         .param string __ARG_4
         .param string __ARG_5
         .param pmc __ARG_6
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_44 = "WSubId_44"
-# Body
-# {
-.annotate 'line', 8368
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_50 = "WSubId_50"
+.annotate 'line', 8568
     self.'DeclareBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, 'P')
-.annotate 'line', 8369
+.annotate 'line', 8569
     box $P2, __ARG_5
     setattribute self, 'arraytype', $P2
-.annotate 'line', 8370
-# var t: $P1
+.annotate 'line', 8570
     $P1 = __ARG_6.'get'()
-.annotate 'line', 8371
+.annotate 'line', 8571
     $P2 = $P1.'isop'(']')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 8373
+.annotate 'line', 8573
     __ARG_6.'unget'($P1)
-.annotate 'line', 8374
-    $P3 = WSubId_45(__ARG_6, self)
+.annotate 'line', 8574
+    $P3 = WSubId_51(__ARG_6, self)
     setattribute self, 'size', $P3
-.annotate 'line', 8375
-    WSubId_62(']', __ARG_6)
-# }
+.annotate 'line', 8575
+    WSubId_68(']', __ARG_6)
   __label_1: # endif
-.annotate 'line', 8377
+.annotate 'line', 8577
     $P1 = __ARG_6.'get'()
-.annotate 'line', 8378
+.annotate 'line', 8578
     $P2 = $P1.'isop'('=')
     if_null $P2, __label_2
     unless $P2 goto __label_2
-# {
-.annotate 'line', 8379
+.annotate 'line', 8579
     $P1 = __ARG_6.'get'()
-.annotate 'line', 8380
+.annotate 'line', 8580
     $P2 = $P1.'isop'('[')
     isfalse $I1, $P2
     unless $I1 goto __label_4
-.annotate 'line', 8381
-    WSubId_48("array initializer", $P1)
+.annotate 'line', 8581
+    WSubId_54("array initializer", $P1)
   __label_4: # endif
-.annotate 'line', 8382
+.annotate 'line', 8582
     $P1 = __ARG_6.'get'()
-.annotate 'line', 8383
+.annotate 'line', 8583
     $P2 = $P1.'isop'(']')
     isfalse $I1, $P2
     unless $I1 goto __label_5
-# {
-.annotate 'line', 8384
+.annotate 'line', 8584
     __ARG_6.'unget'($P1)
-.annotate 'line', 8385
-    $P3 = WSubId_44(__ARG_6, self, WSubId_45, ']')
+.annotate 'line', 8585
+    $P3 = WSubId_50(__ARG_6, self, WSubId_51, ']')
     setattribute self, 'initarray', $P3
-# }
   __label_5: # endif
-# }
     goto __label_3
   __label_2: # else
-.annotate 'line', 8389
+.annotate 'line', 8589
     __ARG_6.'unget'($P1)
   __label_3: # endif
-# }
-.annotate 'line', 8390
+.annotate 'line', 8590
 
 .end # DeclareArrayStatement
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 8393
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 8593
     getattribute $P1, self, 'size'
     if_null $P1, __label_1
-.annotate 'line', 8394
+.annotate 'line', 8594
     getattribute $P4, self, 'size'
     $P3 = $P4.'optimize'()
     setattribute self, 'size', $P3
   __label_1: # endif
-.annotate 'line', 8395
+.annotate 'line', 8595
     getattribute $P1, self, 'initarray'
-    WSubId_46($P1)
-.annotate 'line', 8396
+    WSubId_52($P1)
+.annotate 'line', 8596
     .return(self)
-# }
-.annotate 'line', 8397
+.annotate 'line', 8597
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8400
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 8600
     self.'annotate'(__ARG_1)
-.annotate 'line', 8402
-# var reg: $P1
+.annotate 'line', 8602
     getattribute $P1, self, 'reg'
-.annotate 'line', 8403
-# var size: $P2
+.annotate 'line', 8603
     getattribute $P2, self, 'size'
-.annotate 'line', 8404
-# var init: $P3
+.annotate 'line', 8604
     getattribute $P3, self, 'initarray'
-.annotate 'line', 8405
-# var basetype: $P4
+.annotate 'line', 8605
     getattribute $P4, self, 'basetype'
-.annotate 'line', 8406
-# arraytype: $S1
-# builtin string
-    getattribute $P6, self, 'arraytype'
-    set $S4, $P6
-    concat $S5, $S4, 'Array'
-    set $S1, $S5
-.annotate 'line', 8407
+.annotate 'line', 8606
+    getattribute $P5, self, 'arraytype'
+.annotate 'line', 8607
     if_null $P2, __label_1
-# {
-.annotate 'line', 8409
-# regsize: $S2
-    $P6 = $P2.'emit_get'(__ARG_1)
-    null $S2
-    if_null $P6, __label_3
-    set $S2, $P6
-  __label_3:
-.annotate 'line', 8410
-    __ARG_1.'say'('    ', 'new ', $P1, ", ['Fixed", $S1, "'], ", $S2)
-# }
+.annotate 'line', 8610
+    $P8 = $P2.'emit_get'(__ARG_1)
+.annotate 'line', 8609
+    $P7 = WSubId_26("    new %0, ['Fixed%1Array'], %2", $P1, $P5, $P8)
+    __ARG_1.'say'($P7)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 8414
-    __ARG_1.'say'('    ', 'new ', $P1, ", ['Resizable", $S1, "']")
-# }
+.annotate 'line', 8614
+    $P7 = WSubId_26("    new %0, ['Resizable%1Array']", $P1, $P5)
+    __ARG_1.'say'($P7)
   __label_2: # endif
-.annotate 'line', 8416
-    if_null $P3, __label_4
-# {
-.annotate 'line', 8417
-# itemreg: $S3
-    $P6 = self.'tempreg'($P4)
-    null $S3
-    if_null $P6, __label_5
-    set $S3, $P6
-  __label_5:
-.annotate 'line', 8418
-# n: $I1
-# builtin elements
+.annotate 'line', 8617
+    if_null $P3, __label_3
+.annotate 'line', 8618
+    $P7 = self.'tempreg'($P4)
+    null $S1
+    if_null $P7, __label_4
+    set $S1, $P7
+  __label_4:
+.annotate 'line', 8619
     elements $I1, $P3
-.annotate 'line', 8419
-    unless_null $P2, __label_6
-# {
-.annotate 'line', 8420
-    unless $I1 goto __label_7
-# {
-.annotate 'line', 8422
+.annotate 'line', 8620
+    unless_null $P2, __label_5
+.annotate 'line', 8621
+    unless $I1 goto __label_6
+.annotate 'line', 8623
     __ARG_1.'emitset'($P1, $I1)
-# }
-  __label_7: # endif
-# }
   __label_6: # endif
-.annotate 'line', 8425
-# i: $I2
+  __label_5: # endif
+.annotate 'line', 8626
     null $I2
-.annotate 'line', 8426
-    if_null $P3, __label_9
-    iter $P7, $P3
-    set $P7, 0
-  __label_8: # for iteration
-    unless $P7 goto __label_9
-    shift $P5, $P7
-# {
-.annotate 'line', 8427
-    $P5.'emit'(__ARG_1, $S3)
-.annotate 'line', 8428
-    __ARG_1.'say'('    ', $P1, '[', $I2, '] = ', $S3)
-.annotate 'line', 8429
+.annotate 'line', 8627
+    if_null $P3, __label_8
+    iter $P9, $P3
+    set $P9, 0
+  __label_7: # for iteration
+    unless $P9 goto __label_8
+    shift $P6, $P9
+.annotate 'line', 8628
+    $P6.'emit'(__ARG_1, $S1)
+.annotate 'line', 8629
+    $P7 = WSubId_26("    %0[%1] = %2", $P1, $I2, $S1)
+    __ARG_1.'say'($P7)
+.annotate 'line', 8630
     inc $I2
-# }
-    goto __label_8
-  __label_9: # endfor
-# }
-  __label_4: # endif
-# }
-.annotate 'line', 8432
+    goto __label_7
+  __label_8: # endfor
+  __label_3: # endif
+.annotate 'line', 8633
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
-.annotate 'line', 8358
+.annotate 'line', 8558
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
     addparent $P0, $P1
-.annotate 'line', 8360
+.annotate 'line', 8560
     addattribute $P0, 'size'
-.annotate 'line', 8361
+.annotate 'line', 8561
     addattribute $P0, 'initarray'
-.annotate 'line', 8362
+.annotate 'line', 8562
     addattribute $P0, 'arraytype'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseDeclareHelper' :subid('WSubId_108')
+.sub 'parseDeclareHelper' :subid('WSubId_115')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_102 = "WSubId_102"
-.const 'Sub' WSubId_107 = "WSubId_107"
+.const 'Sub' WSubId_108 = "WSubId_108"
+.const 'Sub' WSubId_114 = "WSubId_114"
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 8439
-# var next: $P1
+.annotate 'line', 8640
     null $P1
-.annotate 'line', 8440
-# var r: $P2
+.annotate 'line', 8641
     null $P2
   __label_1: # do
-.annotate 'line', 8441
-# {
-.annotate 'line', 8442
-# var name: $P3
+.annotate 'line', 8643
     $P3 = __ARG_4.'get'()
-.annotate 'line', 8443
-    WSubId_102($P3)
-.annotate 'line', 8444
-# var t: $P4
+.annotate 'line', 8644
+    WSubId_108($P3)
+.annotate 'line', 8645
     $P4 = __ARG_4.'get'()
-.annotate 'line', 8445
-# var item: $P5
+.annotate 'line', 8646
     null $P5
-.annotate 'line', 8446
+.annotate 'line', 8647
     $P6 = $P4.'isop'('[')
     if_null $P6, __label_4
     unless $P6 goto __label_4
-.annotate 'line', 8447
+.annotate 'line', 8648
     $P5 = __ARG_2(__ARG_3, __ARG_5, __ARG_4, $P3)
     goto __label_5
   __label_4: # else
-# {
-.annotate 'line', 8449
+.annotate 'line', 8650
     __ARG_4.'unget'($P4)
-.annotate 'line', 8450
+.annotate 'line', 8651
     $P5 = __ARG_1(__ARG_3, __ARG_5, $P3, __ARG_4)
-# }
   __label_5: # endif
-.annotate 'line', 8452
-    $P2 = WSubId_107($P2, $P5)
-.annotate 'line', 8453
+.annotate 'line', 8653
+    $P2 = WSubId_114($P2, $P5)
+.annotate 'line', 8654
     $P1 = __ARG_4.'get'()
-# }
   __label_3: # continue
-.annotate 'line', 8454
+.annotate 'line', 8655
     $P6 = $P1.'isop'(',')
     if_null $P6, __label_2
     if $P6 goto __label_1
   __label_2: # enddo
-.annotate 'line', 8455
+.annotate 'line', 8656
     WSubId_4(';', $P1)
-.annotate 'line', 8456
+.annotate 'line', 8657
     .return($P2)
-# }
-.annotate 'line', 8457
+.annotate 'line', 8658
 
 .end # parseDeclareHelper
 
@@ -25236,18 +20921,15 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8465
+.annotate 'line', 8666
     self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'I', __ARG_4)
-# }
-.annotate 'line', 8466
+.annotate 'line', 8667
 
 .end # IntStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntStatement' ]
-.annotate 'line', 8461
+.annotate 'line', 8662
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
 .end
@@ -25258,72 +20940,60 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8473
+.annotate 'line', 8674
     self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'I', 'Integer', __ARG_4)
-# }
-.annotate 'line', 8474
+.annotate 'line', 8675
 
 .end # IntArrayStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntArrayStatement' ]
-.annotate 'line', 8469
+.annotate 'line', 8670
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newIntSingle' :subid('WSubId_109')
+.sub 'newIntSingle' :subid('WSubId_116')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8480
+.annotate 'line', 8681
     new $P2, [ 'Winxed'; 'Compiler'; 'IntStatement' ]
     $P2.'IntStatement'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8481
+.annotate 'line', 8682
 
 .end # newIntSingle
 
 
-.sub 'newIntArray' :subid('WSubId_110')
+.sub 'newIntArray' :subid('WSubId_117')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8485
+.annotate 'line', 8686
     new $P2, [ 'Winxed'; 'Compiler'; 'IntArrayStatement' ]
     $P2.'IntArrayStatement'(__ARG_1, __ARG_2, __ARG_4, __ARG_3)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8486
+.annotate 'line', 8687
 
 .end # newIntArray
 
 
-.sub 'parseInt' :subid('WSubId_56')
+.sub 'parseInt' :subid('WSubId_62')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_108 = "WSubId_108"
-.const 'Sub' WSubId_109 = "WSubId_109"
-.const 'Sub' WSubId_110 = "WSubId_110"
-# Body
-# {
-.annotate 'line', 8490
-    .tailcall WSubId_108(WSubId_109, WSubId_110, __ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 8491
+.const 'Sub' WSubId_115 = "WSubId_115"
+.const 'Sub' WSubId_116 = "WSubId_116"
+.const 'Sub' WSubId_117 = "WSubId_117"
+.annotate 'line', 8691
+    .tailcall WSubId_115(WSubId_116, WSubId_117, __ARG_1, __ARG_2, __ARG_3)
+.annotate 'line', 8692
 
 .end # parseInt
 
@@ -25334,18 +21004,15 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8499
+.annotate 'line', 8700
     self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'N', __ARG_4)
-# }
-.annotate 'line', 8500
+.annotate 'line', 8701
 
 .end # FloatStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatStatement' ]
-.annotate 'line', 8495
+.annotate 'line', 8696
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
 .end
@@ -25356,72 +21023,60 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8507
+.annotate 'line', 8708
     self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'N', 'Float', __ARG_4)
-# }
-.annotate 'line', 8508
+.annotate 'line', 8709
 
 .end # FloatArrayStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatArrayStatement' ]
-.annotate 'line', 8503
+.annotate 'line', 8704
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newFloatSingle' :subid('WSubId_111')
+.sub 'newFloatSingle' :subid('WSubId_118')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8514
+.annotate 'line', 8715
     new $P2, [ 'Winxed'; 'Compiler'; 'FloatStatement' ]
     $P2.'FloatStatement'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8515
+.annotate 'line', 8716
 
 .end # newFloatSingle
 
 
-.sub 'newFloatArray' :subid('WSubId_112')
+.sub 'newFloatArray' :subid('WSubId_119')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8519
+.annotate 'line', 8720
     new $P2, [ 'Winxed'; 'Compiler'; 'FloatArrayStatement' ]
     $P2.'FloatArrayStatement'(__ARG_1, __ARG_2, __ARG_4, __ARG_3)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8520
+.annotate 'line', 8721
 
 .end # newFloatArray
 
 
-.sub 'parseFloat' :subid('WSubId_57')
+.sub 'parseFloat' :subid('WSubId_63')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_108 = "WSubId_108"
-.const 'Sub' WSubId_111 = "WSubId_111"
-.const 'Sub' WSubId_112 = "WSubId_112"
-# Body
-# {
-.annotate 'line', 8524
-    .tailcall WSubId_108(WSubId_111, WSubId_112, __ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 8525
+.const 'Sub' WSubId_115 = "WSubId_115"
+.const 'Sub' WSubId_118 = "WSubId_118"
+.const 'Sub' WSubId_119 = "WSubId_119"
+.annotate 'line', 8725
+    .tailcall WSubId_115(WSubId_118, WSubId_119, __ARG_1, __ARG_2, __ARG_3)
+.annotate 'line', 8726
 
 .end # parseFloat
 
@@ -25432,18 +21087,15 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8533
+.annotate 'line', 8734
     self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'S', __ARG_4)
-# }
-.annotate 'line', 8534
+.annotate 'line', 8735
 
 .end # StringStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringStatement' ]
-.annotate 'line', 8529
+.annotate 'line', 8730
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
 .end
@@ -25454,72 +21106,60 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8541
+.annotate 'line', 8742
     self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'S', 'String', __ARG_4)
-# }
-.annotate 'line', 8542
+.annotate 'line', 8743
 
 .end # StringArrayStatement
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringArrayStatement' ]
-.annotate 'line', 8537
+.annotate 'line', 8738
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newStringSingle' :subid('WSubId_113')
+.sub 'newStringSingle' :subid('WSubId_120')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8548
+.annotate 'line', 8749
     new $P2, [ 'Winxed'; 'Compiler'; 'StringStatement' ]
     $P2.'StringStatement'(__ARG_1, __ARG_2, __ARG_3, __ARG_4)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8549
+.annotate 'line', 8750
 
 .end # newStringSingle
 
 
-.sub 'newStringArray' :subid('WSubId_114')
+.sub 'newStringArray' :subid('WSubId_121')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 8553
+.annotate 'line', 8754
     new $P2, [ 'Winxed'; 'Compiler'; 'StringArrayStatement' ]
     $P2.'StringArrayStatement'(__ARG_1, __ARG_2, __ARG_4, __ARG_3)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8554
+.annotate 'line', 8755
 
 .end # newStringArray
 
 
-.sub 'parseString' :subid('WSubId_55')
+.sub 'parseString' :subid('WSubId_61')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_108 = "WSubId_108"
-.const 'Sub' WSubId_113 = "WSubId_113"
-.const 'Sub' WSubId_114 = "WSubId_114"
-# Body
-# {
-.annotate 'line', 8558
-    .tailcall WSubId_108(WSubId_113, WSubId_114, __ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 8559
+.const 'Sub' WSubId_115 = "WSubId_115"
+.const 'Sub' WSubId_120 = "WSubId_120"
+.const 'Sub' WSubId_121 = "WSubId_121"
+.annotate 'line', 8759
+    .tailcall WSubId_115(WSubId_120, WSubId_121, __ARG_1, __ARG_2, __ARG_3)
+.annotate 'line', 8760
 
 .end # parseString
 
@@ -25531,185 +21171,185 @@
         .param string __ARG_3
         .param pmc __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 8575
+.annotate 'line', 8776
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 8576
+.annotate 'line', 8777
     box $P1, __ARG_3
     setattribute self, 'type', $P1
-.annotate 'line', 8577
+.annotate 'line', 8778
     setattribute self, 'name', __ARG_4
-.annotate 'line', 8578
+.annotate 'line', 8779
     setattribute self, 'value', __ARG_5
-.annotate 'line', 8579
+.annotate 'line', 8780
     $P2 = self.'createconst'(__ARG_4, __ARG_3)
     setattribute self, 'data', $P2
-# }
-.annotate 'line', 8580
+.annotate 'line', 8781
 
 .end # ConstStatement
 
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8583
-# var value: $P1
+.annotate 'line', 8784
     getattribute $P1, self, 'value'
-.annotate 'line', 8584
-# var name: $P2
+.annotate 'line', 8785
     getattribute $P2, self, 'name'
-.annotate 'line', 8585
-# type: $S1
+.annotate 'line', 8786
     getattribute $P3, self, 'type'
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-.annotate 'line', 8586
+.annotate 'line', 8787
     $P1 = $P1.'optimize'()
-.annotate 'line', 8587
+.annotate 'line', 8788
     $P3 = $P1.'hascompilevalue'()
     isfalse $I1, $P3
     unless $I1 goto __label_2
-# {
-.annotate 'line', 8588
+.annotate 'line', 8789
     WSubId_1('Value for const is not evaluable at compile time', self)
-# }
   __label_2: # endif
-.annotate 'line', 8591
+.annotate 'line', 8792
     getattribute $P3, self, 'data'
     $P3.'setvalue'($P1)
-.annotate 'line', 8592
+.annotate 'line', 8793
     .return(self)
-# }
-.annotate 'line', 8593
+.annotate 'line', 8794
 
 .end # optimize
 
 
 .sub 'checkresult' :method
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 8596
+.annotate 'line', 8797
     getattribute $P1, self, 'start'
     WSubId_6('Direct use of const', $P1)
-# }
-.annotate 'line', 8597
+.annotate 'line', 8798
 
 .end # checkresult
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8600
-# builtin string
-    getattribute $P1, self, 'name'
-    set $S1, $P1
-    concat $S2, 'Constant ', $S1
-    concat $S2, $S2, ' evaluated at compile time'
-    __ARG_1.'comment'($S2)
-# }
-.annotate 'line', 8601
+.annotate 'line', 8801
+    $P2 = __ARG_1.'getDebug'()
+    if_null $P2, __label_1
+    unless $P2 goto __label_1
+.annotate 'line', 8802
+    getattribute $P3, self, 'data'
+    $P1 = $P3.'getvalue'()
+.annotate 'line', 8803
+    null $S1
+.annotate 'line', 8804
+    getattribute $P2, self, 'type'
+    set $S2, $P2
+    if $S2 == 'I' goto __label_4
+    if $S2 == 'N' goto __label_5
+    if $S2 == 'S' goto __label_6
+    goto __label_3
+  __label_4: # case
+.annotate 'line', 8805
+    $P3 = $P1.'getIntegerValue'()
+    set $S1, $P3
+    goto __label_2 # break
+  __label_5: # case
+.annotate 'line', 8806
+    $P4 = $P1.'getFloatValue'()
+    set $S1, $P4
+    goto __label_2 # break
+  __label_6: # case
+.annotate 'line', 8807
+    $P5 = $P1.'getPirString'()
+    set $S1, $P5
+    goto __label_2 # break
+  __label_3: # default
+  __label_2: # switch end
+.annotate 'line', 8810
+    getattribute $P2, self, 'name'
+    set $S2, $P2
+.annotate 'line', 8811
+    concat $S3, "Constant '", $S2
+    concat $S3, $S3, "' set to: "
+    concat $S3, $S3, $S1
+.annotate 'line', 8810
+    __ARG_1.'comment'($S3)
+  __label_1: # endif
+.annotate 'line', 8813
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConstStatement' ]
-.annotate 'line', 8565
+.annotate 'line', 8766
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 8567
+.annotate 'line', 8768
     addattribute $P0, 'type'
-.annotate 'line', 8568
+.annotate 'line', 8769
     addattribute $P0, 'name'
-.annotate 'line', 8569
+.annotate 'line', 8770
     addattribute $P0, 'data'
-.annotate 'line', 8570
+.annotate 'line', 8771
     addattribute $P0, 'value'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseConst' :subid('WSubId_52')
+.sub 'parseConst' :subid('WSubId_58')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_105 = "WSubId_105"
+.const 'Sub' WSubId_112 = "WSubId_112"
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_107 = "WSubId_107"
-# Body
-# {
-.annotate 'line', 8606
-# var t: $P1
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_114 = "WSubId_114"
+.annotate 'line', 8818
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8607
-# type: $S1
-    $P5 = WSubId_105($P1)
+.annotate 'line', 8819
+    $P5 = WSubId_112($P1)
     null $S1
     if_null $P5, __label_1
     set $S1, $P5
   __label_1:
-.annotate 'line', 8608
-    isne $I3, $S1, 'I'
-    unless $I3 goto __label_5
-    isne $I4, $S1, 'N'
-    set $I2, $I4
-    goto __label_6
-  __label_5:
-    set $I2, $I3
-  __label_6:
-    unless $I2 goto __label_3
-    isne $I5, $S1, 'S'
-    set $I1, $I5
-    goto __label_4
-  __label_3:
-    set $I1, $I2
+.annotate 'line', 8820
+    isne $I1, $S1, 'I'
+    unless $I1 goto __label_4
+    isne $I1, $S1, 'N'
   __label_4:
+    unless $I1 goto __label_3
+    isne $I1, $S1, 'S'
+  __label_3:
     unless $I1 goto __label_2
-.annotate 'line', 8609
+.annotate 'line', 8821
     WSubId_1('Invalid type for const', __ARG_1)
   __label_2: # endif
-.annotate 'line', 8611
-# var multi: $P2
+.annotate 'line', 8823
     null $P2
-  __label_7: # do
-.annotate 'line', 8612
-# {
-.annotate 'line', 8613
+  __label_5: # do
+.annotate 'line', 8825
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8614
-# var name: $P3
+.annotate 'line', 8826
     set $P3, $P1
-.annotate 'line', 8615
-    WSubId_62('=', __ARG_2)
-.annotate 'line', 8616
-# var value: $P4
-    $P4 = WSubId_45(__ARG_2, __ARG_3)
-.annotate 'line', 8618
+.annotate 'line', 8827
+    WSubId_68('=', __ARG_2)
+.annotate 'line', 8828
+    $P4 = WSubId_51(__ARG_2, __ARG_3)
+.annotate 'line', 8830
     new $P6, [ 'Winxed'; 'Compiler'; 'ConstStatement' ]
     $P6.'ConstStatement'($P1, __ARG_3, $S1, $P3, $P4)
     set $P5, $P6
-.annotate 'line', 8617
-    $P2 = WSubId_107($P2, $P5)
-# }
-  __label_9: # continue
-.annotate 'line', 8619
+.annotate 'line', 8829
+    $P2 = WSubId_114($P2, $P5)
+  __label_7: # continue
+.annotate 'line', 8831
     $P1 = __ARG_2.'get'()
     $P5 = $P1.'isop'(',')
-    if_null $P5, __label_8
-    if $P5 goto __label_7
-  __label_8: # enddo
-.annotate 'line', 8620
+    if_null $P5, __label_6
+    if $P5 goto __label_5
+  __label_6: # enddo
+.annotate 'line', 8832
     .return($P2)
-# }
-.annotate 'line', 8621
+.annotate 'line', 8833
 
 .end # parseConst
 
@@ -25721,61 +21361,49 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param int __ARG_5
-.const 'Sub' WSubId_45 = "WSubId_45"
+.const 'Sub' WSubId_51 = "WSubId_51"
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 8632
+.annotate 'line', 8844
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4, __ARG_5)
-.annotate 'line', 8633
-# var t: $P1
+.annotate 'line', 8845
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8634
+.annotate 'line', 8846
     $P2 = $P1.'isop'('=')
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 8635
-    $P4 = WSubId_45(__ARG_2, self)
+.annotate 'line', 8847
+    $P4 = WSubId_51(__ARG_2, self)
     setattribute self, 'init', $P4
-.annotate 'line', 8636
+.annotate 'line', 8848
     $P1 = __ARG_2.'get'()
-# }
   __label_1: # endif
-.annotate 'line', 8638
+.annotate 'line', 8850
     WSubId_4(';', $P1)
-# }
-.annotate 'line', 8639
+.annotate 'line', 8851
 
 .end # VarStatement
 
 
 .sub 'optimize_init' :method
-# Body
-# {
-.annotate 'line', 8642
+.annotate 'line', 8854
     getattribute $P1, self, 'init'
     if_null $P1, __label_1
-.annotate 'line', 8643
+.annotate 'line', 8855
     getattribute $P4, self, 'init'
     $P3 = $P4.'optimize'()
     setattribute self, 'init', $P3
   __label_1: # endif
-.annotate 'line', 8644
+.annotate 'line', 8856
     .return(self)
-# }
-.annotate 'line', 8645
+.annotate 'line', 8857
 
 .end # optimize_init
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 8648
+.annotate 'line', 8860
     .tailcall self.'optimize_init'()
-# }
-.annotate 'line', 8649
+.annotate 'line', 8861
 
 .end # optimize
 
@@ -25783,125 +21411,107 @@
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8652
+.annotate 'line', 8864
     self.'annotate'(__ARG_1)
-.annotate 'line', 8653
-# name: $S1
+.annotate 'line', 8865
     getattribute $P2, self, 'name'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 8654
-# reg: $S2
+.annotate 'line', 8866
     getattribute $P2, self, 'reg'
     null $S2
     if_null $P2, __label_2
     set $S2, $P2
   __label_2:
-.annotate 'line', 8655
-# var init: $P1
+.annotate 'line', 8867
     getattribute $P1, self, 'init'
-.annotate 'line', 8656
+.annotate 'line', 8868
+    $P2 = __ARG_1.'getDebug'()
+    if_null $P2, __label_3
+    unless $P2 goto __label_3
+.annotate 'line', 8869
     concat $S4, 'var ', $S1
     concat $S4, $S4, ': '
     concat $S4, $S4, $S2
     __ARG_1.'comment'($S4)
-.annotate 'line', 8657
-    if_null $P1, __label_3
-.annotate 'line', 8658
-    $P2 = $P1.'isnull'()
-    if_null $P2, __label_4
-    unless $P2 goto __label_4
-.annotate 'line', 8659
-    null $P1
-  __label_4: # endif
   __label_3: # endif
-.annotate 'line', 8660
-    if_null $P1, __label_5
-# {
-# switch
-.annotate 'line', 8661
+.annotate 'line', 8870
+    if_null $P1, __label_4
+.annotate 'line', 8871
+    $P2 = $P1.'isnull'()
+    if_null $P2, __label_5
+    unless $P2 goto __label_5
+.annotate 'line', 8872
+    null $P1
+  __label_5: # endif
+  __label_4: # endif
+.annotate 'line', 8873
+    if_null $P1, __label_6
+.annotate 'line', 8874
     $P2 = $P1.'checkresult'()
     set $S4, $P2
-    set $S5, 'P'
-    if $S4 == $S5 goto __label_9
-    set $S5, 'S'
-    if $S4 == $S5 goto __label_10
-    set $S5, 'I'
-    if $S4 == $S5 goto __label_11
-    set $S5, 'N'
-    if $S4 == $S5 goto __label_12
-    set $S5, 'v'
-    if $S4 == $S5 goto __label_13
-    goto __label_8
-  __label_9: # case
-.annotate 'line', 8663
-    isa $I3, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
-    if $I3 goto __label_18
-    isa $I4, $P1, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
-    set $I2, $I4
-    goto __label_19
-  __label_18:
-    set $I2, $I3
-  __label_19:
-    if $I2 goto __label_16
-    isa $I5, $P1, [ 'Winxed'; 'Compiler'; 'NewExpr' ]
-    set $I1, $I5
-    goto __label_17
-  __label_16:
-    set $I1, $I2
-  __label_17:
-    unless $I1 goto __label_14
-.annotate 'line', 8664
-    $P1.'emit_init'(__ARG_1, $S2)
-    goto __label_15
-  __label_14: # else
-.annotate 'line', 8666
-    $P1.'emit'(__ARG_1, $S2)
-  __label_15: # endif
-    goto __label_7 # break
+    if $S4 == 'P' goto __label_10
+    if $S4 == 'S' goto __label_11
+    if $S4 == 'I' goto __label_12
+    if $S4 == 'N' goto __label_13
+    if $S4 == 'v' goto __label_14
+    goto __label_9
   __label_10: # case
+.annotate 'line', 8876
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
+    if $I1 goto __label_18
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
+  __label_18:
+    if $I1 goto __label_17
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'NewExpr' ]
+  __label_17:
+    unless $I1 goto __label_15
+.annotate 'line', 8877
+    $P1.'emit_init'(__ARG_1, $S2)
+    goto __label_16
+  __label_15: # else
+.annotate 'line', 8879
+    $P1.'emit'(__ARG_1, $S2)
+  __label_16: # endif
+    goto __label_8 # break
   __label_11: # case
   __label_12: # case
-.annotate 'line', 8671
-# value: $S3
+  __label_13: # case
+.annotate 'line', 8884
     $P3 = $P1.'emit_get'(__ARG_1)
     null $S3
-    if_null $P3, __label_20
+    if_null $P3, __label_19
     set $S3, $P3
-  __label_20:
-.annotate 'line', 8672
+  __label_19:
+.annotate 'line', 8885
     __ARG_1.'emitbox'($S2, $S3)
-    goto __label_7 # break
-  __label_13: # case
-.annotate 'line', 8675
+    goto __label_8 # break
+  __label_14: # case
+.annotate 'line', 8888
     getattribute $P4, self, 'name'
     WSubId_1("Can't use void function as initializer", $P4)
-  __label_8: # default
-.annotate 'line', 8677
+  __label_9: # default
+.annotate 'line', 8890
     getattribute $P5, self, 'name'
     WSubId_1("Invalid var initializer", $P5)
-  __label_7: # switch end
-# }
-    goto __label_6
-  __label_5: # else
-.annotate 'line', 8681
+  __label_8: # switch end
+    goto __label_7
+  __label_6: # else
+.annotate 'line', 8894
     __ARG_1.'emitnull'($S2)
-  __label_6: # endif
-# }
-.annotate 'line', 8682
+  __label_7: # endif
+.annotate 'line', 8895
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
-.annotate 'line', 8627
+.annotate 'line', 8839
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarBaseStatement' ]
     addparent $P0, $P1
-.annotate 'line', 8629
+.annotate 'line', 8841
     addattribute $P0, 'init'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ResizableVarStatement' ]
@@ -25911,50 +21521,46 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 8689
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 8902
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4)
-.annotate 'line', 8690
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 8691
+.annotate 'line', 8903
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 8904
 
 .end # ResizableVarStatement
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8694
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 8907
     self.'annotate'(__ARG_1)
-.annotate 'line', 8695
-# reg: $S1
+.annotate 'line', 8908
     getattribute $P1, self, 'reg'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 8696
-# builtin string
-    getattribute $P1, self, 'name'
-    set $S2, $P1
-    concat $S3, 'var ', $S2
-    concat $S3, $S3, '[] : '
-    concat $S3, $S3, $S1
-    __ARG_1.'comment'($S3)
-.annotate 'line', 8697
-    __ARG_1.'say'('    ', 'new ', $S1, ", 'ResizablePMCArray'")
-# }
-.annotate 'line', 8698
+.annotate 'line', 8909
+    $P1 = __ARG_1.'getDebug'()
+    if_null $P1, __label_2
+    unless $P1 goto __label_2
+.annotate 'line', 8910
+    getattribute $P3, self, 'name'
+    $P2 = WSubId_26("var %0[] : %1", $P3, $S1)
+    __ARG_1.'comment'($P2)
+  __label_2: # endif
+.annotate 'line', 8911
+    $P1 = WSubId_26("    new %0, 'ResizablePMCArray'", $S1)
+    __ARG_1.'say'($P1)
+.annotate 'line', 8912
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ResizableVarStatement' ]
-.annotate 'line', 8685
+.annotate 'line', 8898
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     addparent $P0, $P1
 .end
@@ -25965,171 +21571,148 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_62 = "WSubId_62"
-# Body
-# {
-.annotate 'line', 8707
+.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 8921
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4)
-.annotate 'line', 8708
-    $P2 = WSubId_45(__ARG_2, self)
+.annotate 'line', 8922
+    $P2 = WSubId_51(__ARG_2, self)
     setattribute self, 'exprsize', $P2
-.annotate 'line', 8709
-    WSubId_62(']', __ARG_2)
-.annotate 'line', 8710
-    WSubId_62(';', __ARG_2)
-# }
-.annotate 'line', 8711
+.annotate 'line', 8923
+    WSubId_68(']', __ARG_2)
+.annotate 'line', 8924
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 8925
 
 .end # FixedVarStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 8714
+.annotate 'line', 8928
     getattribute $P3, self, 'exprsize'
     $P2 = $P3.'optimize'()
     setattribute self, 'exprsize', $P2
-.annotate 'line', 8715
+.annotate 'line', 8929
     .tailcall self.'optimize_init'()
-# }
-.annotate 'line', 8716
+.annotate 'line', 8930
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8719
-# regsize: $S1
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 8933
     getattribute $P2, self, 'exprsize'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 8720
+.annotate 'line', 8934
     self.'annotate'(__ARG_1)
-.annotate 'line', 8721
-# reg: $S2
+.annotate 'line', 8935
     getattribute $P1, self, 'reg'
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-.annotate 'line', 8722
-# builtin string
-    getattribute $P1, self, 'name'
-    set $S3, $P1
-    concat $S4, 'var ', $S3
-    concat $S4, $S4, '[] : '
-    concat $S4, $S4, $S2
-    __ARG_1.'comment'($S4)
-.annotate 'line', 8723
-    __ARG_1.'say'('    ', 'new ', $S2, ", 'FixedPMCArray', ", $S1)
-# }
-.annotate 'line', 8724
+.annotate 'line', 8936
+    $P1 = __ARG_1.'getDebug'()
+    if_null $P1, __label_3
+    unless $P1 goto __label_3
+.annotate 'line', 8937
+    getattribute $P3, self, 'name'
+    $P2 = WSubId_26("var %0[] : %1", $P3, $S2)
+    __ARG_1.'comment'($P2)
+  __label_3: # endif
+.annotate 'line', 8938
+    $P1 = WSubId_26("    new %0, 'FixedPMCArray', %1", $S2, $S1)
+    __ARG_1.'say'($P1)
+.annotate 'line', 8939
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FixedVarStatement' ]
-.annotate 'line', 8701
+.annotate 'line', 8915
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     addparent $P0, $P1
-.annotate 'line', 8703
+.annotate 'line', 8917
     addattribute $P0, 'exprsize'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseVar' :subid('WSubId_54')
+.sub 'parseVar' :subid('WSubId_60')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param int __ARG_4 :optional
-.const 'Sub' WSubId_102 = "WSubId_102"
-# Body
-# {
-.annotate 'line', 8729
-# var name: $P1
+.const 'Sub' WSubId_108 = "WSubId_108"
+.annotate 'line', 8944
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8730
-    WSubId_102($P1)
-.annotate 'line', 8731
-# var t: $P2
+.annotate 'line', 8945
+    WSubId_108($P1)
+.annotate 'line', 8946
     $P2 = __ARG_2.'get'()
-.annotate 'line', 8732
+.annotate 'line', 8947
     $P3 = $P2.'isop'('[')
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 8733
+.annotate 'line', 8948
     $P2 = __ARG_2.'get'()
-.annotate 'line', 8734
+.annotate 'line', 8949
     $P3 = $P2.'isop'(']')
     if_null $P3, __label_3
     unless $P3 goto __label_3
-.annotate 'line', 8735
+.annotate 'line', 8950
     new $P5, [ 'Winxed'; 'Compiler'; 'ResizableVarStatement' ]
     $P5.'ResizableVarStatement'(__ARG_1, __ARG_2, __ARG_3, $P1)
     set $P4, $P5
     .return($P4)
     goto __label_4
   __label_3: # else
-# {
-.annotate 'line', 8737
+.annotate 'line', 8952
     __ARG_2.'unget'($P2)
-.annotate 'line', 8738
+.annotate 'line', 8953
     new $P4, [ 'Winxed'; 'Compiler'; 'FixedVarStatement' ]
     $P4.'FixedVarStatement'(__ARG_1, __ARG_2, __ARG_3, $P1)
     set $P3, $P4
     .return($P3)
-# }
   __label_4: # endif
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 8742
+.annotate 'line', 8957
     __ARG_2.'unget'($P2)
-.annotate 'line', 8743
+.annotate 'line', 8958
     new $P4, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     $P4.'VarStatement'(__ARG_1, __ARG_2, __ARG_3, $P1, __ARG_4)
     set $P3, $P4
     .return($P3)
-# }
   __label_2: # endif
-# }
-.annotate 'line', 8745
+.annotate 'line', 8960
 
 .end # parseVar
 
 
-.sub 'parseVolatile' :subid('WSubId_53')
+.sub 'parseVolatile' :subid('WSubId_59')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_54 = "WSubId_54"
-# Body
-# {
-.annotate 'line', 8749
-# var t: $P1
+.const 'Sub' WSubId_60 = "WSubId_60"
+.annotate 'line', 8964
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8750
+.annotate 'line', 8965
     $P2 = $P1.'iskeyword'('var')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-.annotate 'line', 8751
+.annotate 'line', 8966
     WSubId_1("invalid volatile type", $P1)
   __label_1: # endif
-.annotate 'line', 8752
-    .tailcall WSubId_54(__ARG_1, __ARG_2, __ARG_3, 1)
-# }
-.annotate 'line', 8753
+.annotate 'line', 8967
+    .tailcall WSubId_60(__ARG_1, __ARG_2, __ARG_3, 1)
+.annotate 'line', 8968
 
 .end # parseVolatile
 
@@ -26139,88 +21722,70 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_109 = "WSubId_109"
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 8766
-    self.'Statement'(__ARG_1, __ARG_3)
-.annotate 'line', 8767
+.annotate 'line', 8981
+    self.'BlockStatement'(__ARG_1, __ARG_3)
+.annotate 'line', 8982
     root_new $P4, ['parrot';'Hash']
     setattribute self, 'labels', $P4
-.annotate 'line', 8768
+.annotate 'line', 8983
     root_new $P4, ['parrot';'ResizablePMCArray']
     setattribute self, 'statements', $P4
-.annotate 'line', 8769
-# var t: $P1
+.annotate 'line', 8984
     null $P1
   __label_2: # while
-.annotate 'line', 8770
+.annotate 'line', 8985
     $P1 = __ARG_2.'get'()
     $P3 = $P1.'isop'('}')
     isfalse $I1, $P3
     unless $I1 goto __label_1
-# {
-.annotate 'line', 8771
+.annotate 'line', 8986
     __ARG_2.'unget'($P1)
-.annotate 'line', 8772
-# var c: $P2
-    $P2 = WSubId_103(__ARG_2, self)
-.annotate 'line', 8773
+.annotate 'line', 8987
+    $P2 = WSubId_109(__ARG_2, self)
+.annotate 'line', 8988
     unless_null $P2, __label_3
-.annotate 'line', 8774
+.annotate 'line', 8989
     WSubId_6('Unexpected null statement')
   __label_3: # endif
-.annotate 'line', 8775
+.annotate 'line', 8990
     getattribute $P3, self, 'statements'
-# builtin push
     push $P3, $P2
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 8777
+.annotate 'line', 8992
     setattribute self, 'end', $P1
-# }
-.annotate 'line', 8778
+.annotate 'line', 8993
 
 .end # CompoundStatement
 
 
 .sub 'getlabel' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8781
-# s: $S1
+.annotate 'line', 8996
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 8782
-# var labels: $P1
+.annotate 'line', 8997
     getattribute $P1, self, 'labels'
-.annotate 'line', 8783
-# exist: $S2
+.annotate 'line', 8998
     $S2 = $P1[$S1]
-.annotate 'line', 8784
-    isnull $I2, $S2
-    if $I2 goto __label_3
-    iseq $I3, $S2, ''
-    set $I1, $I3
-    goto __label_4
+.annotate 'line', 8999
+    isnull $I1, $S2
+    if $I1 goto __label_3
+    iseq $I1, $S2, ''
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_2
-.annotate 'line', 8785
+.annotate 'line', 9000
     getattribute $P3, self, 'owner'
     $P2 = $P3.'getlabel'(__ARG_1)
     set $S2, $P2
   __label_2: # endif
-.annotate 'line', 8786
+.annotate 'line', 9001
     .return($S2)
-# }
-.annotate 'line', 8787
+.annotate 'line', 9002
 
 .end # getlabel
 
@@ -26228,242 +21793,201 @@
 .sub 'createlabel' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8790
-# s: $S1
+.annotate 'line', 9005
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
   __label_1:
-.annotate 'line', 8791
-# var labels: $P1
+.annotate 'line', 9006
     getattribute $P1, self, 'labels'
-.annotate 'line', 8792
-# exist: $S2
+.annotate 'line', 9007
     $S2 = $P1[$S1]
-.annotate 'line', 8793
-    isnull $I2, $S2
-    not $I2
-    unless $I2 goto __label_3
-    isne $I3, $S2, ''
-    set $I1, $I3
-    goto __label_4
+.annotate 'line', 9008
+    isnull $I1, $S2
+    not $I1
+    unless $I1 goto __label_3
+    isne $I1, $S2, ''
   __label_3:
-    set $I1, $I2
-  __label_4:
     unless $I1 goto __label_2
-.annotate 'line', 8794
+.annotate 'line', 9009
     WSubId_1('Label already defined', __ARG_1)
   __label_2: # endif
-.annotate 'line', 8795
-# value: $S3
+.annotate 'line', 9010
     $P2 = self.'genlabel'()
     null $S3
-    if_null $P2, __label_5
+    if_null $P2, __label_4
     set $S3, $P2
-  __label_5:
-.annotate 'line', 8796
+  __label_4:
+.annotate 'line', 9011
     $P1[$S1] = $S3
-.annotate 'line', 8797
+.annotate 'line', 9012
     .return($S3)
-# }
-.annotate 'line', 8798
+.annotate 'line', 9013
 
 .end # createlabel
 
 
 .sub 'getend' :method
-# Body
-# {
-.annotate 'line', 8799
+.annotate 'line', 9014
     getattribute $P1, self, 'end'
     .return($P1)
-# }
 
 .end # getend
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 8802
+.annotate 'line', 9017
+    $P2 = __ARG_1.'getDebug'()
+    set $I1, $P2
+.annotate 'line', 9018
+    unless $I1 goto __label_1
+.annotate 'line', 9019
     __ARG_1.'comment'('{')
-.annotate 'line', 8803
+  __label_1: # endif
+.annotate 'line', 9020
     getattribute $P2, self, 'statements'
-    if_null $P2, __label_2
+    if_null $P2, __label_3
     iter $P3, $P2
     set $P3, 0
-  __label_1: # for iteration
-    unless $P3 goto __label_2
+  __label_2: # for iteration
+    unless $P3 goto __label_3
     shift $P1, $P3
-# {
-.annotate 'line', 8804
+.annotate 'line', 9021
     $P1.'emit'(__ARG_1)
-.annotate 'line', 8805
+.annotate 'line', 9022
     self.'freetemps'()
-# }
-    goto __label_1
-  __label_2: # endfor
-.annotate 'line', 8807
+    goto __label_2
+  __label_3: # endfor
+.annotate 'line', 9024
+    unless $I1 goto __label_4
+.annotate 'line', 9025
     __ARG_1.'comment'('}')
-# }
-.annotate 'line', 8808
+  __label_4: # endif
+.annotate 'line', 9026
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
-.annotate 'line', 8759
+.annotate 'line', 8974
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P2
-.annotate 'line', 8761
+.annotate 'line', 8976
     addattribute $P0, 'end'
-.annotate 'line', 8762
+.annotate 'line', 8977
     addattribute $P0, 'labels'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
 
 .sub 'RegisterStore' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 8823
+.annotate 'line', 9041
     box $P3, __ARG_1
     setattribute self, 'type', $P3
-.annotate 'line', 8825
+.annotate 'line', 9043
     box $P3, 1
     setattribute self, 'nreg', $P3
-.annotate 'line', 8826
+.annotate 'line', 9044
     new $P1, ['ResizableStringArray']
-.annotate 'line', 8827
+.annotate 'line', 9045
     new $P2, ['ResizableStringArray']
-.annotate 'line', 8828
+.annotate 'line', 9046
     setattribute self, 'tempreg', $P1
-.annotate 'line', 8829
+.annotate 'line', 9047
     setattribute self, 'freereg', $P2
-# }
-.annotate 'line', 8830
+.annotate 'line', 9048
 
 .end # RegisterStore
 
 
 .sub 'createreg' :method
-# Body
-# {
-.annotate 'line', 8833
-# var n: $P1
+.annotate 'line', 9051
     getattribute $P1, self, 'nreg'
-.annotate 'line', 8834
-# i: $I1
+.annotate 'line', 9052
     set $I1, $P1
-.annotate 'line', 8835
-# reg: $S1
+.annotate 'line', 9053
     set $I2, $I1
     inc $I1
     set $S1, $I2
-.annotate 'line', 8836
+.annotate 'line', 9054
     assign $P1, $I1
-# builtin string
-.annotate 'line', 8837
+.annotate 'line', 9055
     getattribute $P2, self, 'type'
     set $S2, $P2
     concat $S3, '$', $S2
     concat $S3, $S3, $S1
     .return($S3)
-# }
-.annotate 'line', 8838
+.annotate 'line', 9056
 
 .end # createreg
 
 
 .sub 'tempreg' :method
-# Body
-# {
-.annotate 'line', 8841
-# var freereg: $P1
+.annotate 'line', 9059
     getattribute $P1, self, 'freereg'
-.annotate 'line', 8842
-# var tempreg: $P2
+.annotate 'line', 9060
     getattribute $P2, self, 'tempreg'
-.annotate 'line', 8843
-# reg: $S1
+.annotate 'line', 9061
     null $S1
-.annotate 'line', 8844
-# builtin elements
+.annotate 'line', 9062
     elements $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 8845
+.annotate 'line', 9063
     $P3 = $P1.'pop'()
     set $S1, $P3
     goto __label_2
   __label_1: # else
-.annotate 'line', 8847
+.annotate 'line', 9065
     $P4 = self.'createreg'()
     set $S1, $P4
   __label_2: # endif
-.annotate 'line', 8848
-# builtin push
+.annotate 'line', 9066
     push $P2, $S1
-.annotate 'line', 8849
+.annotate 'line', 9067
     .return($S1)
-# }
-.annotate 'line', 8850
+.annotate 'line', 9068
 
 .end # tempreg
 
 
 .sub 'freetemps' :method
-# Body
-# {
-.annotate 'line', 8853
-# var freereg: $P1
+.annotate 'line', 9071
     getattribute $P1, self, 'freereg'
-.annotate 'line', 8854
-# var tempreg: $P2
+.annotate 'line', 9072
     getattribute $P2, self, 'tempreg'
-.annotate 'line', 8855
-# n: $I1
-# builtin elements
+.annotate 'line', 9073
     elements $I1, $P2
-# for loop
-.annotate 'line', 8856
-# i: $I2
+.annotate 'line', 9074
     sub $I2, $I1, 1
   __label_3: # for condition
     lt $I2, 0, __label_2
-# {
-.annotate 'line', 8857
-# s: $S1
+.annotate 'line', 9075
     $S1 = $P2[$I2]
-.annotate 'line', 8858
-# builtin push
+.annotate 'line', 9076
     push $P1, $S1
-# }
   __label_1: # for iteration
-.annotate 'line', 8856
+.annotate 'line', 9074
     dec $I2
     goto __label_3
   __label_2: # for end
-.annotate 'line', 8860
+.annotate 'line', 9078
     assign $P2, 0
-# }
-.annotate 'line', 8861
+.annotate 'line', 9079
 
 .end # freetemps
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
-.annotate 'line', 8817
+.annotate 'line', 9035
     addattribute $P0, 'type'
-.annotate 'line', 8818
+.annotate 'line', 9036
     addattribute $P0, 'nreg'
-.annotate 'line', 8819
+.annotate 'line', 9037
     addattribute $P0, 'tempreg'
-.annotate 'line', 8820
+.annotate 'line', 9038
     addattribute $P0, 'freereg'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
@@ -26471,12 +21995,9 @@
 .sub 'ParameterModifierList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 8872
+.annotate 'line', 9090
     self.'ModifierList'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 8873
+.annotate 'line', 9091
 
 .end # ParameterModifierList
 
@@ -26486,137 +22007,113 @@
         .param pmc __ARG_2
         .param string __ARG_3
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 8876
-# var named: $P1
+.annotate 'line', 9094
     null $P1
-.annotate 'line', 8877
-# var slurpy: $P2
+.annotate 'line', 9095
     null $P2
-.annotate 'line', 8878
-# var modarglist: $P3
+.annotate 'line', 9096
     $P3 = self.'getlist'()
-.annotate 'line', 8879
+.annotate 'line', 9097
     if_null $P3, __label_2
     iter $P6, $P3
     set $P6, 0
   __label_1: # for iteration
     unless $P6 goto __label_2
     shift $P4, $P6
-# {
-.annotate 'line', 8880
-# modname: $S1
+.annotate 'line', 9098
     $P7 = $P4.'getname'()
     null $S1
     if_null $P7, __label_3
     set $S1, $P7
   __label_3:
-# switch
-.annotate 'line', 8881
-    set $S3, $S1
-    set $S4, 'named'
-    if $S3 == $S4 goto __label_6
-    set $S4, 'slurpy'
-    if $S3 == $S4 goto __label_7
+.annotate 'line', 9099
+    if $S1 == 'named' goto __label_6
+    if $S1 == 'slurpy' goto __label_7
     goto __label_5
   __label_6: # case
-.annotate 'line', 8883
+.annotate 'line', 9101
     set $P1, $P4
     goto __label_4 # break
   __label_7: # case
-.annotate 'line', 8886
+.annotate 'line', 9104
     set $P2, $P4
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 8889
+.annotate 'line', 9107
     __ARG_1.'print'(' :', $S1)
   __label_4: # switch end
-# }
     goto __label_1
   __label_2: # endfor
-# switch-case
-.annotate 'line', 8893
-    isnull $I2, $P1
-    not $I2
-    unless $I2 goto __label_11
-    isnull $I3, $P2
-    not $I3
-    set $I1, $I3
-    goto __label_12
-  __label_11:
-    set $I1, $I2
-  __label_12:
-    if $I1 goto __label_10
-.annotate 'line', 8900
+.annotate 'line', 9111
     isnull $I1, $P1
     not $I1
-    if $I1 goto __label_13
-.annotate 'line', 8917
+    unless $I1 goto __label_11
     isnull $I1, $P2
     not $I1
-    if $I1 goto __label_14
+  __label_11:
+    if $I1 goto __label_10
+.annotate 'line', 9118
+    isnull $I1, $P1
+    not $I1
+    if $I1 goto __label_12
+.annotate 'line', 9135
+    isnull $I1, $P2
+    not $I1
+    if $I1 goto __label_13
     goto __label_9
   __label_10: # case
-.annotate 'line', 8898
+.annotate 'line', 9116
     __ARG_1.'print'(" :named :slurpy")
     goto __label_8 # break
-  __label_13: # case
-.annotate 'line', 8901
-# setname: $S2
+  __label_12: # case
+.annotate 'line', 9119
     null $S2
-# switch
-.annotate 'line', 8902
+.annotate 'line', 9120
     $P7 = $P1.'numargs'()
-    set $I4, $P7
-    null $I5
-    if $I4 == $I5 goto __label_17
-    set $I5, 1
-    if $I4 == $I5 goto __label_18
-    goto __label_16
-  __label_17: # case
-.annotate 'line', 8904
+    set $I2, $P7
+    if $I2 == 0 goto __label_16
+    if $I2 == 1 goto __label_17
+    goto __label_15
+  __label_16: # case
+.annotate 'line', 9122
     concat $S3, "'", __ARG_3
     concat $S3, $S3, "'"
     set $S2, $S3
-    goto __label_15 # break
-  __label_18: # case
-.annotate 'line', 8907
-# var argmod: $P5
+    goto __label_14 # break
+  __label_17: # case
+.annotate 'line', 9125
     $P5 = $P1.'getarg'(0)
-.annotate 'line', 8908
+.annotate 'line', 9126
     $P8 = $P5.'isstringliteral'()
-    isfalse $I6, $P8
-    unless $I6 goto __label_19
-.annotate 'line', 8909
+    isfalse $I4, $P8
+    unless $I4 goto __label_18
+.annotate 'line', 9127
     WSubId_1('Invalid modifier', __ARG_2)
-  __label_19: # endif
-.annotate 'line', 8910
+  __label_18: # endif
+.annotate 'line', 9128
     $P9 = $P5.'getPirString'()
     set $S2, $P9
-    goto __label_15 # break
-  __label_16: # default
-.annotate 'line', 8913
+    goto __label_14 # break
+  __label_15: # default
+.annotate 'line', 9131
     WSubId_1('Invalid modifier', __ARG_2)
-  __label_15: # switch end
-.annotate 'line', 8915
+  __label_14: # switch end
+.annotate 'line', 9133
     __ARG_1.'print'(" :named(", $S2, ")")
     goto __label_8 # break
-  __label_14: # case
-.annotate 'line', 8918
+  __label_13: # case
+.annotate 'line', 9136
     __ARG_1.'print'(" :slurpy")
     goto __label_8 # break
   __label_9: # default
   __label_8: # switch end
-.annotate 'line', 8919
-# }
-.annotate 'line', 8921
+.annotate 'line', 9139
 
 .end # emitmodifiers
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
-.annotate 'line', 8868
+.annotate 'line', 9086
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
 .end
@@ -26625,55 +22122,48 @@
 .sub 'FunctionParameter' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_105 = "WSubId_105"
-# Body
-# {
-.annotate 'line', 8932
+.const 'Sub' WSubId_112 = "WSubId_112"
+.annotate 'line', 9150
     setattribute self, 'func', __ARG_1
-.annotate 'line', 8933
-# var t: $P1
+.annotate 'line', 9151
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8934
-# type: $S1
+.annotate 'line', 9152
     $P3 = $P1.'checkkeyword'()
-    $P2 = WSubId_105($P3)
+    $P2 = WSubId_112($P3)
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 8935
+.annotate 'line', 9153
     eq $S1, '', __label_2
-.annotate 'line', 8936
+.annotate 'line', 9154
     $P1 = __ARG_2.'get'()
     goto __label_3
   __label_2: # else
-.annotate 'line', 8938
+.annotate 'line', 9156
     set $S1, 'P'
   __label_3: # endif
-.annotate 'line', 8939
+.annotate 'line', 9157
     box $P2, $S1
     setattribute self, 'type', $P2
-.annotate 'line', 8940
-# argname: $S2
-# builtin string
+.annotate 'line', 9158
     $P2 = __ARG_1.'getparamnum'()
     set $S3, $P2
     concat $S4, '__ARG_', $S3
     set $S2, $S4
-.annotate 'line', 8941
+.annotate 'line', 9159
     __ARG_1.'createvarnamed'($P1, $S1, $S2)
-.annotate 'line', 8943
-# builtin string
+.annotate 'line', 9161
     set $S3, $P1
     box $P2, $S3
     setattribute self, 'name', $P2
-.annotate 'line', 8944
+.annotate 'line', 9162
     $P1 = __ARG_2.'get'()
-.annotate 'line', 8945
+.annotate 'line', 9163
     $P2 = $P1.'isop'('[')
     if_null $P2, __label_4
     unless $P2 goto __label_4
-.annotate 'line', 8946
+.annotate 'line', 9164
     new $P5, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
     getattribute $P6, __ARG_1, 'owner'
     $P5.'ParameterModifierList'(__ARG_2, $P6)
@@ -26681,97 +22171,82 @@
     setattribute self, 'modifiers', $P4
     goto __label_5
   __label_4: # else
-.annotate 'line', 8948
+.annotate 'line', 9166
     __ARG_2.'unget'($P1)
   __label_5: # endif
-# }
-.annotate 'line', 8949
+.annotate 'line', 9167
 
 .end # FunctionParameter
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_115 = "WSubId_115"
-# Body
-# {
-.annotate 'line', 8952
-# var func: $P1
+.const 'Sub' WSubId_122 = "WSubId_122"
+.annotate 'line', 9170
     getattribute $P1, self, 'func'
-.annotate 'line', 8953
-# paramname: $S1
+.annotate 'line', 9171
     getattribute $P4, self, 'name'
     null $S1
     if_null $P4, __label_1
     set $S1, $P4
   __label_1:
-.annotate 'line', 8954
-# var param: $P2
+.annotate 'line', 9172
     $P2 = $P1.'getvar'($S1)
-.annotate 'line', 8955
-# ptype: $S2
+.annotate 'line', 9173
     $P5 = $P2.'gettype'()
-    $P4 = WSubId_115($P5)
+    $P4 = WSubId_122($P5)
     null $S2
     if_null $P4, __label_2
     set $S2, $P4
   __label_2:
-.annotate 'line', 8956
+.annotate 'line', 9174
     $P4 = $P2.'getreg'()
     __ARG_1.'print'('        .param ', $S2, ' ', $P4)
-.annotate 'line', 8957
-# var modarg: $P3
+.annotate 'line', 9175
     getattribute $P3, self, 'modifiers'
-.annotate 'line', 8958
+.annotate 'line', 9176
     if_null $P3, __label_3
-.annotate 'line', 8959
+.annotate 'line', 9177
     getattribute $P4, $P1, 'start'
     $P3.'emitmodifiers'(__ARG_1, $P4, $S1)
   __label_3: # endif
-.annotate 'line', 8960
+.annotate 'line', 9178
     __ARG_1.'say'('')
-# }
-.annotate 'line', 8961
+.annotate 'line', 9179
 
 .end # emit
 
 
 .sub 'get_type' :method
-# Body
-# {
-.annotate 'line', 8964
+.annotate 'line', 9182
     getattribute $P1, self, 'type'
     .return($P1)
-# }
-.annotate 'line', 8965
+.annotate 'line', 9183
 
 .end # get_type
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionParameter' ]
-.annotate 'line', 8926
+.annotate 'line', 9144
     addattribute $P0, 'func'
-.annotate 'line', 8927
+.annotate 'line', 9145
     addattribute $P0, 'name'
-.annotate 'line', 8928
+.annotate 'line', 9146
     addattribute $P0, 'modifiers'
-.annotate 'line', 8929
+.annotate 'line', 9147
     addattribute $P0, 'type'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseParameter' :subid('WSubId_116')
+.sub 'parseParameter' :subid('WSubId_123')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 8971
+.annotate 'line', 9189
     new $P2, [ 'Winxed'; 'Compiler'; 'FunctionParameter' ]
     $P2.'FunctionParameter'(__ARG_2, __ARG_1)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 8972
+.annotate 'line', 9190
 
 .end # parseParameter
 
@@ -26780,14 +22255,11 @@
 .sub 'FunctionExtern' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 8983
+.annotate 'line', 9201
     self.'initbase'(__ARG_1, __ARG_2)
-.annotate 'line', 8984
+.annotate 'line', 9202
     setattribute self, 'name', __ARG_1
-# }
-.annotate 'line', 8985
+.annotate 'line', 9203
 
 .end # FunctionExtern
 
@@ -26795,50 +22267,56 @@
 .sub 'emit_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 8988
-# var path: $P1
+.annotate 'line', 9206
     getattribute $P2, self, 'owner'
     $P1 = $P2.'getpath'()
-.annotate 'line', 8989
-# reg: $S1
+.annotate 'line', 9207
     $P2 = __ARG_2.'tempreg'('P')
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 8990
+.annotate 'line', 9208
     self.'annotate'(__ARG_1)
-.annotate 'line', 8991
+.annotate 'line', 9209
     getattribute $P2, self, 'name'
     $P1.'emit_get_global'(__ARG_1, __ARG_2, $S1, $P2)
-.annotate 'line', 8992
+.annotate 'line', 9210
     .return($S1)
-# }
-.annotate 'line', 8993
+.annotate 'line', 9211
 
 .end # emit_get
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
-.annotate 'line', 8978
+.annotate 'line', 9196
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
-.annotate 'line', 8980
+.annotate 'line', 9198
     addattribute $P0, 'name'
 .end
+.namespace [ 'Winxed'; 'Compiler' ]
+
+.sub 'emit_subid' :subid('WSubId_126')
+        .param string __ARG_1
+.annotate 'line', 9220
+    concat $S1, ".const 'Sub' ", __ARG_1
+    concat $S1, $S1, ' = "'
+    concat $S1, $S1, __ARG_1
+    concat $S1, $S1, "\"\n"
+    .return($S1)
+.annotate 'line', 9221
+
+.end # emit_subid
+
 .namespace [ 'Winxed'; 'Compiler'; 'FunctionModifierList' ]
 
 .sub 'FunctionModifierList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9004
+.annotate 'line', 9227
     self.'ModifierList'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 9005
+.annotate 'line', 9228
 
 .end # FunctionModifierList
 
@@ -26846,9 +22324,7 @@
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 9008
+.annotate 'line', 9231
     $P3 = self.'getlist'()
     if_null $P3, __label_2
     iter $P4, $P3
@@ -26856,202 +22332,160 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P1, $P4
-# {
-.annotate 'line', 9009
-# name: $S1
+.annotate 'line', 9232
     $P5 = $P1.'getname'()
     null $S1
     if_null $P5, __label_3
     set $S1, $P5
   __label_3:
-.annotate 'line', 9011
+.annotate 'line', 9234
     ne $S1, 'multi', __label_4
     goto __label_1 # continue
   __label_4: # endif
-.annotate 'line', 9013
-# nargmods: $I1
+.annotate 'line', 9236
     $P3 = $P1.'numargs'()
     set $I1, $P3
-.annotate 'line', 9014
+.annotate 'line', 9237
     __ARG_1.'print'(' :', $S1)
-.annotate 'line', 9015
+.annotate 'line', 9238
     le $I1, 0, __label_5
-# {
-.annotate 'line', 9016
+.annotate 'line', 9239
     __ARG_1.'print'('(')
-# for loop
-.annotate 'line', 9017
-# iargmod: $I2
+.annotate 'line', 9240
     null $I2
   __label_8: # for condition
     ge $I2, $I1, __label_7
-# {
-.annotate 'line', 9018
-# var argmod: $P2
+.annotate 'line', 9241
     $P2 = $P1.'getarg'($I2)
-.annotate 'line', 9019
+.annotate 'line', 9242
     $P3 = $P2.'isstringliteral'()
     isfalse $I3, $P3
     unless $I3 goto __label_9
-.annotate 'line', 9020
+.annotate 'line', 9243
     WSubId_1('Invalid modifier', $P2)
   __label_9: # endif
-.annotate 'line', 9021
+.annotate 'line', 9244
     $P3 = $P2.'getPirString'()
     __ARG_1.'print'($P3)
-.annotate 'line', 9022
+.annotate 'line', 9245
     sub $I3, $I1, 1
     ge $I2, $I3, __label_10
-.annotate 'line', 9023
+.annotate 'line', 9246
     __ARG_1.'print'(", ")
   __label_10: # endif
-# }
   __label_6: # for iteration
-.annotate 'line', 9017
+.annotate 'line', 9240
     inc $I2
     goto __label_8
   __label_7: # for end
-.annotate 'line', 9025
+.annotate 'line', 9248
     __ARG_1.'print'(')')
-# }
   __label_5: # endif
-# }
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 9028
+.annotate 'line', 9251
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionModifierList' ]
-.annotate 'line', 9000
+.annotate 'line', 9223
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'multi_sig_from_multi_modifier' :subid('WSubId_117')
+.sub 'multi_sig_from_multi_modifier' :subid('WSubId_125')
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 9033
-# nargs: $I1
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 9256
     $P4 = __ARG_2.'numargs'()
     set $I1, $P4
-.annotate 'line', 9034
-# var sig: $P1
+.annotate 'line', 9257
     null $P1
-.annotate 'line', 9035
+.annotate 'line', 9258
     unless $I1 goto __label_1
-# {
-.annotate 'line', 9036
+.annotate 'line', 9259
     root_new $P4, ['parrot';'ResizablePMCArray']
     set $P1, $P4
-# for loop
-.annotate 'line', 9037
-# i: $I2
+.annotate 'line', 9260
     null $I2
   __label_4: # for condition
     ge $I2, $I1, __label_3
-# {
-.annotate 'line', 9038
-# var arg: $P2
+.annotate 'line', 9261
     $P2 = __ARG_2.'getarg'($I2)
-# switch-case
-.annotate 'line', 9040
+.annotate 'line', 9263
     $I3 = $P2.'isstringliteral'()
     if $I3 goto __label_7
-.annotate 'line', 9043
+.annotate 'line', 9266
     $I3 = $P2.'isidentifier'()
     if $I3 goto __label_8
-.annotate 'line', 9050
+.annotate 'line', 9273
     isa $I3, $P2, [ 'Winxed'; 'Compiler'; 'OpClassExpr' ]
     if $I3 goto __label_9
     goto __label_6
   __label_7: # case
-.annotate 'line', 9041
+.annotate 'line', 9264
     $P4 = $P2.'get_value'()
-# builtin push
     push $P1, $P4
     goto __label_5 # break
   __label_8: # case
-.annotate 'line', 9044
-# name: $S1
+.annotate 'line', 9267
     $P5 = $P2.'getName'()
     null $S1
     if_null $P5, __label_10
     set $S1, $P5
   __label_10:
-.annotate 'line', 9045
-    iseq $I7, $S1, "int"
-    if $I7 goto __label_17
-    iseq $I8, $S1, "float"
-    set $I6, $I8
-    goto __label_18
-  __label_17:
-    set $I6, $I7
-  __label_18:
-    if $I6 goto __label_15
-    iseq $I9, $S1, "string"
-    set $I5, $I9
-    goto __label_16
+.annotate 'line', 9268
+    iseq $I4, $S1, "int"
+    if $I4 goto __label_15
+    iseq $I4, $S1, "float"
   __label_15:
-    set $I5, $I6
-  __label_16:
-    if $I5 goto __label_13
-    iseq $I10, $S1, "var"
-    set $I4, $I10
-    goto __label_14
-  __label_13:
-    set $I4, $I5
+    if $I4 goto __label_14
+    iseq $I4, $S1, "string"
   __label_14:
+    if $I4 goto __label_13
+    iseq $I4, $S1, "var"
+  __label_13:
     unless $I4 goto __label_11
-.annotate 'line', 9046
-# builtin push
+.annotate 'line', 9269
     push $P1, $S1
     goto __label_12
   __label_11: # else
-.annotate 'line', 9048
+.annotate 'line', 9271
     getattribute $P6, $P2, 'start'
     WSubId_1("unsupported multi signature", $P6)
   __label_12: # endif
     goto __label_5 # break
   __label_9: # case
-.annotate 'line', 9051
-# var key: $P3
+.annotate 'line', 9274
     $P3 = $P2.'get_class_raw_key'()
-.annotate 'line', 9052
-    unless_null $P3, __label_19
-.annotate 'line', 9053
+.annotate 'line', 9275
+    unless_null $P3, __label_16
+.annotate 'line', 9276
     getattribute $P7, $P2, 'start'
     WSubId_1("class not found", $P7)
-  __label_19: # endif
-.annotate 'line', 9055
-    $P8 = WSubId_26($P3)
-# builtin push
+  __label_16: # endif
+.annotate 'line', 9278
+    $P8 = WSubId_30($P3)
     push $P1, $P8
     goto __label_5 # break
   __label_6: # default
-.annotate 'line', 9058
+.annotate 'line', 9281
     getattribute $P9, $P2, 'start'
     WSubId_1("unsupported multi signature", $P9)
   __label_5: # switch end
-# }
   __label_2: # for iteration
-.annotate 'line', 9037
+.annotate 'line', 9260
     inc $I2
     goto __label_4
   __label_3: # for end
-# }
   __label_1: # endif
-.annotate 'line', 9062
+.annotate 'line', 9285
     .return($P1)
-# }
-.annotate 'line', 9063
+.annotate 'line', 9286
 
 .end # multi_sig_from_multi_modifier
 
@@ -27060,209 +22494,161 @@
 .sub 'FunctionBase' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9085
-    self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 9086
+.annotate 'line', 9308
+    self.'BlockStatement'(__ARG_1, __ARG_2)
+.annotate 'line', 9309
     box $P1, 0
     setattribute self, 'nlabel', $P1
-.annotate 'line', 9087
+.annotate 'line', 9310
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
     $P3.'RegisterStore'('I')
     set $P2, $P3
     setattribute self, 'regstI', $P2
-.annotate 'line', 9088
+.annotate 'line', 9311
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
     $P3.'RegisterStore'('N')
     set $P2, $P3
     setattribute self, 'regstN', $P2
-.annotate 'line', 9089
+.annotate 'line', 9312
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
     $P3.'RegisterStore'('S')
     set $P2, $P3
     setattribute self, 'regstS', $P2
-.annotate 'line', 9090
+.annotate 'line', 9313
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
     $P3.'RegisterStore'('P')
     set $P2, $P3
     setattribute self, 'regstP', $P2
-# }
-.annotate 'line', 9091
+.annotate 'line', 9314
 
 .end # FunctionBase
 
 
 .sub 'getouter' :method
-# Body
-# {
-.annotate 'line', 9093
+.annotate 'line', 9316
     .return(self)
-# }
 
 .end # getouter
 
 
 .sub 'allowtailcall' :method
-# Body
-# {
-.annotate 'line', 9096
+.annotate 'line', 9319
     .return(1)
-# }
-.annotate 'line', 9097
+.annotate 'line', 9320
 
 .end # allowtailcall
 
 
 .sub 'makesubid' :method
-# Body
-# {
-.annotate 'line', 9101
-# var subid: $P1
+.annotate 'line', 9324
     getattribute $P1, self, 'subid'
-.annotate 'line', 9102
+.annotate 'line', 9325
     unless_null $P1, __label_1
-.annotate 'line', 9103
+.annotate 'line', 9326
     $P1 = self.'generatesubid'()
     setattribute self, 'subid', $P1
   __label_1: # endif
-.annotate 'line', 9104
+.annotate 'line', 9327
     .return($P1)
-# }
-.annotate 'line', 9105
+.annotate 'line', 9328
 
 .end # makesubid
 
 
 .sub 'usesubid' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 9108
-# var used: $P1
+.annotate 'line', 9331
     getattribute $P1, self, 'usedsubids'
-.annotate 'line', 9109
+.annotate 'line', 9332
     unless_null $P1, __label_1
-.annotate 'line', 9110
+.annotate 'line', 9333
     root_new $P1, ['parrot';'Hash']
     setattribute self, 'usedsubids', $P1
   __label_1: # endif
-.annotate 'line', 9111
+.annotate 'line', 9334
     $P1[__ARG_1] = 1
-# }
-.annotate 'line', 9112
+.annotate 'line', 9335
 
 .end # usesubid
 
 
 .sub 'same_scope_as' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9116
-# r: $I1
+.annotate 'line', 9339
     issame $I1, self, __ARG_1
-.annotate 'line', 9117
+.annotate 'line', 9340
     .return($I1)
-# }
-.annotate 'line', 9118
+.annotate 'line', 9341
 
 .end # same_scope_as
 
 
 .sub 'parse_parameters' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_116 = "WSubId_116"
-# Body
-# {
-.annotate 'line', 9121
-# var t: $P1
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_123 = "WSubId_123"
+.annotate 'line', 9344
     $P1 = __ARG_1.'get'()
-.annotate 'line', 9122
+.annotate 'line', 9345
     $P2 = $P1.'isop'(')')
     isfalse $I1, $P2
     unless $I1 goto __label_1
-# {
-.annotate 'line', 9123
+.annotate 'line', 9346
     __ARG_1.'unget'($P1)
-.annotate 'line', 9124
-    $P3 = WSubId_44(__ARG_1, self, WSubId_116, ')')
+.annotate 'line', 9347
+    $P3 = WSubId_50(__ARG_1, self, WSubId_123, ')')
     setattribute self, 'params', $P3
-# }
   __label_1: # endif
-# }
-.annotate 'line', 9126
+.annotate 'line', 9349
 
 .end # parse_parameters
 
 
 .sub 'addlocalfunction' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9130
-# var localfun: $P1
+.annotate 'line', 9353
     getattribute $P1, self, 'localfun'
-.annotate 'line', 9131
+.annotate 'line', 9354
     unless_null $P1, __label_1
-.annotate 'line', 9132
+.annotate 'line', 9355
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 1
     $P3[0] = __ARG_1
     setattribute self, 'localfun', $P3
     goto __label_2
   __label_1: # else
-.annotate 'line', 9134
-# builtin push
+.annotate 'line', 9357
     push $P1, __ARG_1
   __label_2: # endif
-# }
-.annotate 'line', 9135
+.annotate 'line', 9358
 
 .end # addlocalfunction
 
 
 .sub 'usenamespace' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9138
-# var usedns: $P1
+.const 'Sub' WSubId_124 = "WSubId_124"
+.annotate 'line', 9362
     getattribute $P1, self, 'usednamespaces'
-.annotate 'line', 9139
+.annotate 'line', 9363
     unless_null $P1, __label_1
-# {
-.annotate 'line', 9141
-    root_new $P4, ['parrot';'ResizablePMCArray']
-    assign $P4, 1
-    $P4[0] = __ARG_1
-    setattribute self, 'usednamespaces', $P4
-# }
+.annotate 'line', 9364
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    assign $P3, 1
+    $P3[0] = __ARG_1
+    setattribute self, 'usednamespaces', $P3
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 9144
-    if_null $P1, __label_4
-    iter $P5, $P1
-    set $P5, 0
-  __label_3: # for iteration
-    unless $P5 goto __label_4
-    shift $P2, $P5
-.annotate 'line', 9145
-    ne_addr __ARG_1, $P2, __label_5
-.annotate 'line', 9146
+.annotate 'line', 9366
+    $P4 = WSubId_124($P1, __ARG_1)
+    if_null $P4, __label_3
+.annotate 'line', 9367
     .return()
-  __label_5: # endif
-    goto __label_3
-  __label_4: # endfor
-.annotate 'line', 9147
-# builtin push
+  __label_3: # endif
+.annotate 'line', 9368
     push $P1, __ARG_1
-# }
   __label_2: # endif
-# }
-.annotate 'line', 9149
+.annotate 'line', 9370
 
 .end # usenamespace
 
@@ -27270,65 +22656,49 @@
 .sub 'scopesearch' :method
         .param pmc __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 9152
-# var found: $P1
-    null $P1
-.annotate 'line', 9153
+.annotate 'line', 9373
     getattribute $P3, self, 'usednamespaces'
     if_null $P3, __label_2
     iter $P4, $P3
     set $P4, 0
   __label_1: # for iteration
     unless $P4 goto __label_2
-    shift $P2, $P4
-# {
-.annotate 'line', 9154
-    $P1 = $P2.'scopesearch'(__ARG_1, __ARG_2)
-.annotate 'line', 9155
-    if_null $P1, __label_3
-.annotate 'line', 9156
-    .return($P1)
+    shift $P1, $P4
+.annotate 'line', 9374
+    $P2 = $P1.'scopesearch'(__ARG_1, __ARG_2)
+.annotate 'line', 9375
+    if_null $P2, __label_3
+.annotate 'line', 9376
+    .return($P2)
   __label_3: # endif
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 9158
+.annotate 'line', 9378
     getattribute $P3, self, 'owner'
     .tailcall $P3.'scopesearch'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 9159
+.annotate 'line', 9379
 
 .end # scopesearch
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_117 = "WSubId_117"
-# Body
-# {
-.annotate 'line', 9163
-# var modifiers: $P1
+.const 'Sub' WSubId_125 = "WSubId_125"
+.annotate 'line', 9383
     getattribute $P1, self, 'modifiers'
-.annotate 'line', 9164
+.annotate 'line', 9384
     if_null $P1, __label_1
-# {
-.annotate 'line', 9165
-# var multi: $P2
+.annotate 'line', 9385
     $P2 = $P1.'pick'('multi')
-.annotate 'line', 9166
+.annotate 'line', 9386
     if_null $P2, __label_2
-# {
-.annotate 'line', 9168
+.annotate 'line', 9388
     self.'setmulti'()
-.annotate 'line', 9169
-    $P5 = WSubId_117(self, $P2)
+.annotate 'line', 9389
+    $P5 = WSubId_125(self, $P2)
     setattribute self, 'multi_sig', $P5
-# }
   __label_2: # endif
-# }
   __label_1: # endif
-.annotate 'line', 9172
+.annotate 'line', 9392
     getattribute $P4, self, 'usednamespaces'
     if_null $P4, __label_4
     iter $P6, $P4
@@ -27336,18 +22706,17 @@
   __label_3: # for iteration
     unless $P6 goto __label_4
     shift $P3, $P6
-.annotate 'line', 9173
+.annotate 'line', 9393
     $P3.'fixnamespaces'()
     goto __label_3
   __label_4: # endfor
-.annotate 'line', 9174
+.annotate 'line', 9394
     getattribute $P7, self, 'body'
     $P5 = $P7.'optimize'()
     setattribute self, 'body', $P5
-.annotate 'line', 9175
+.annotate 'line', 9395
     .return(self)
-# }
-.annotate 'line', 9176
+.annotate 'line', 9396
 
 .end # optimize
 
@@ -27355,21 +22724,17 @@
 .sub 'setusedlex' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 9180
-# var lexicals: $P1
+.annotate 'line', 9400
     getattribute $P1, self, 'usedlexicals'
-.annotate 'line', 9181
+.annotate 'line', 9401
     unless_null $P1, __label_1
-.annotate 'line', 9182
+.annotate 'line', 9402
     root_new $P1, ['parrot';'Hash']
     setattribute self, 'usedlexicals', $P1
   __label_1: # endif
-.annotate 'line', 9183
+.annotate 'line', 9403
     $P1[__ARG_2] = __ARG_1
-# }
-.annotate 'line', 9184
+.annotate 'line', 9404
 
 .end # setusedlex
 
@@ -27377,68 +22742,54 @@
 .sub 'setlex' :method
         .param string __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 9187
-# var lexicals: $P1
+.annotate 'line', 9407
     getattribute $P1, self, 'lexicals'
-.annotate 'line', 9188
+.annotate 'line', 9408
     unless_null $P1, __label_1
-.annotate 'line', 9189
+.annotate 'line', 9409
     root_new $P1, ['parrot';'Hash']
     setattribute self, 'lexicals', $P1
   __label_1: # endif
-.annotate 'line', 9190
+.annotate 'line', 9410
     $P1[__ARG_2] = __ARG_1
-# }
-.annotate 'line', 9191
+.annotate 'line', 9411
 
 .end # setlex
 
 
 .sub 'createlex' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9196
-# var lex: $P1
+.annotate 'line', 9416
     $P1 = __ARG_1.'getlex'()
-.annotate 'line', 9197
-# lexname: $S1
+.annotate 'line', 9417
     null $S1
-.annotate 'line', 9198
+.annotate 'line', 9418
     if_null $P1, __label_1
-.annotate 'line', 9199
+.annotate 'line', 9419
     set $S1, $P1
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 9201
-# reg: $S2
+.annotate 'line', 9421
     $P2 = __ARG_1.'getreg'()
     null $S2
     if_null $P2, __label_3
     set $S2, $P2
   __label_3:
-.annotate 'line', 9202
-# lexnum: $I1
+.annotate 'line', 9422
     $P2 = self.'getlexnum'()
     set $I1, $P2
-.annotate 'line', 9203
-# builtin string
+.annotate 'line', 9423
     set $S3, $I1
     concat $S4, '__WLEX_', $S3
     set $S1, $S4
-.annotate 'line', 9204
+.annotate 'line', 9424
     self.'setlex'($S1, $S2)
-.annotate 'line', 9205
+.annotate 'line', 9425
     __ARG_1.'setlex'($S1)
-# }
   __label_2: # endif
-.annotate 'line', 9207
+.annotate 'line', 9427
     .return($S1)
-# }
-.annotate 'line', 9208
+.annotate 'line', 9428
 
 .end # createlex
 
@@ -27446,55 +22797,44 @@
 .sub 'createreg' :method
         .param string __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 9212
-# var store: $P1
+.annotate 'line', 9432
     null $P1
-# switch
-.annotate 'line', 9213
-    set $S2, __ARG_1
-    set $S3, 'I'
-    if $S2 == $S3 goto __label_3
-    set $S3, 'N'
-    if $S2 == $S3 goto __label_4
-    set $S3, 'S'
-    if $S2 == $S3 goto __label_5
-    set $S3, 'P'
-    if $S2 == $S3 goto __label_6
+.annotate 'line', 9433
+    if __ARG_1 == 'I' goto __label_3
+    if __ARG_1 == 'N' goto __label_4
+    if __ARG_1 == 'S' goto __label_5
+    if __ARG_1 == 'P' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 9215
+.annotate 'line', 9435
     getattribute $P1, self, 'regstI'
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 9217
+.annotate 'line', 9437
     getattribute $P1, self, 'regstN'
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 9219
+.annotate 'line', 9439
     getattribute $P1, self, 'regstS'
     goto __label_1 # break
   __label_6: # case
-.annotate 'line', 9221
+.annotate 'line', 9441
     getattribute $P1, self, 'regstP'
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 9223
-    concat $S4, 'Invalid type in createreg: ', __ARG_1
-    WSubId_6($S4)
+.annotate 'line', 9443
+    concat $S3, "Invalid type in createreg: ", __ARG_1
+    WSubId_6($S3)
   __label_1: # switch end
-.annotate 'line', 9225
-# reg: $S1
+.annotate 'line', 9445
     $P2 = $P1.'createreg'()
     null $S1
     if_null $P2, __label_7
     set $S1, $P2
   __label_7:
-.annotate 'line', 9226
+.annotate 'line', 9446
     .return($S1)
-# }
-.annotate 'line', 9227
+.annotate 'line', 9447
 
 .end # createreg
 
@@ -27502,64 +22842,50 @@
 .sub 'tempreg' :method
         .param string __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 9230
-# var store: $P1
+.annotate 'line', 9450
     null $P1
-# switch
-.annotate 'line', 9231
-    set $S2, __ARG_1
-    set $S3, 'I'
-    if $S2 == $S3 goto __label_3
-    set $S3, 'N'
-    if $S2 == $S3 goto __label_4
-    set $S3, 'S'
-    if $S2 == $S3 goto __label_5
-    set $S3, 'P'
-    if $S2 == $S3 goto __label_6
+.annotate 'line', 9451
+    if __ARG_1 == 'I' goto __label_3
+    if __ARG_1 == 'N' goto __label_4
+    if __ARG_1 == 'S' goto __label_5
+    if __ARG_1 == 'P' goto __label_6
     goto __label_2
   __label_3: # case
-.annotate 'line', 9233
+.annotate 'line', 9453
     getattribute $P1, self, 'regstI'
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 9235
+.annotate 'line', 9455
     getattribute $P1, self, 'regstN'
     goto __label_1 # break
   __label_5: # case
-.annotate 'line', 9237
+.annotate 'line', 9457
     getattribute $P1, self, 'regstS'
     goto __label_1 # break
   __label_6: # case
-.annotate 'line', 9239
+.annotate 'line', 9459
     getattribute $P1, self, 'regstP'
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 9241
-    concat $S4, "Invalid type '", __ARG_1
-    concat $S4, $S4, "' in tempreg"
-    WSubId_6($S4)
+.annotate 'line', 9461
+    concat $S3, "Invalid type in tempreg: ", __ARG_1
+    WSubId_6($S3)
   __label_1: # switch end
-.annotate 'line', 9243
-# reg: $S1
+.annotate 'line', 9463
     $P2 = $P1.'tempreg'()
     null $S1
     if_null $P2, __label_7
     set $S1, $P2
   __label_7:
-.annotate 'line', 9244
+.annotate 'line', 9464
     .return($S1)
-# }
-.annotate 'line', 9245
+.annotate 'line', 9465
 
 .end # tempreg
 
 
 .sub 'freetemps' :method
-# Body
-# {
-.annotate 'line', 9248
+.annotate 'line', 9468
     root_new $P2, ['parrot';'ResizablePMCArray']
     assign $P2, 4
     getattribute $P3, self, 'regstI'
@@ -27576,31 +22902,25 @@
   __label_1: # for iteration
     unless $P7 goto __label_2
     shift $P1, $P7
-.annotate 'line', 9249
+.annotate 'line', 9469
     $P1.'freetemps'()
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 9250
+.annotate 'line', 9470
 
 .end # freetemps
 
 
 .sub 'genlabel' :method
-# Body
-# {
-.annotate 'line', 9253
-# n: $I1
+.annotate 'line', 9473
     getattribute $P1, self, 'nlabel'
     inc $P1
     set $I1, $P1
-# builtin string
-.annotate 'line', 9254
+.annotate 'line', 9474
     set $S1, $I1
     concat $S2, '__label_', $S1
     .return($S2)
-# }
-.annotate 'line', 9255
+.annotate 'line', 9475
 
 .end # genlabel
 
@@ -27608,12 +22928,9 @@
 .sub 'getbreaklabel' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 9258
+.annotate 'line', 9478
     WSubId_1('break not allowed here', __ARG_1)
-# }
-.annotate 'line', 9259
+.annotate 'line', 9479
 
 .end # getbreaklabel
 
@@ -27621,344 +22938,309 @@
 .sub 'getcontinuelabel' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 9262
+.annotate 'line', 9482
     WSubId_1('continue not allowed here', __ARG_1)
-# }
-.annotate 'line', 9263
+.annotate 'line', 9483
 
 .end # getcontinuelabel
 
 
 .sub 'emit_extra_modifiers' :method
         .param pmc __ARG_1
-# Empty body
 
 .end # emit_extra_modifiers
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 9269
-# name: $S1
+.const 'Sub' WSubId_66 = "WSubId_66"
+.const 'Sub' WSubId_26 = "WSubId_26"
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_126 = "WSubId_126"
+.annotate 'line', 9489
     getattribute $P8, self, 'name'
     null $S1
     if_null $P8, __label_1
     set $S1, $P8
   __label_1:
-.annotate 'line', 9270
+.annotate 'line', 9490
     __ARG_1.'say'()
-.annotate 'line', 9271
+.annotate 'line', 9491
     __ARG_1.'print'(".sub ")
-.annotate 'line', 9272
+.annotate 'line', 9492
     $P8 = self.'isanonymous'()
     if_null $P8, __label_2
     unless $P8 goto __label_2
-.annotate 'line', 9273
+.annotate 'line', 9493
     __ARG_1.'print'("'' :anon")
     goto __label_3
   __label_2: # else
-.annotate 'line', 9275
+.annotate 'line', 9495
     __ARG_1.'print'("'", $S1, "'")
   __label_3: # endif
-.annotate 'line', 9276
+.annotate 'line', 9496
     getattribute $P8, self, 'subid'
     if_null $P8, __label_4
-.annotate 'line', 9277
+.annotate 'line', 9497
     getattribute $P9, self, 'subid'
     __ARG_1.'print'(" :subid('", $P9, "')")
   __label_4: # endif
-.annotate 'line', 9279
-# var outer: $P1
+.annotate 'line', 9499
     getattribute $P1, self, 'outer'
-.annotate 'line', 9280
+.annotate 'line', 9500
     isnull $I2, $P1
     not $I2
     unless $I2 goto __label_6
     getattribute $P8, self, 'usedlexicals'
-    isnull $I3, $P8
-    not $I3
-    set $I1, $I3
-    goto __label_7
+    isnull $I2, $P8
+    not $I2
   __label_6:
-    set $I1, $I2
-  __label_7:
-    unless $I1 goto __label_5
-# {
-.annotate 'line', 9281
-# var outerid: $P2
+    unless $I2 goto __label_5
+.annotate 'line', 9501
     getattribute $P2, $P1, 'subid'
-.annotate 'line', 9282
-    if_null $P2, __label_8
-.annotate 'line', 9283
+.annotate 'line', 9502
+    if_null $P2, __label_7
+.annotate 'line', 9503
     __ARG_1.'print'(" :outer('", $P2, "')")
-  __label_8: # endif
-# }
+  __label_7: # endif
   __label_5: # endif
-.annotate 'line', 9287
+.annotate 'line', 9507
     $P8 = self.'ismethod'()
-    if_null $P8, __label_9
-    unless $P8 goto __label_9
-.annotate 'line', 9288
+    if_null $P8, __label_8
+    unless $P8 goto __label_8
+.annotate 'line', 9508
     __ARG_1.'print'(' :method')
-  __label_9: # endif
-.annotate 'line', 9289
-# var modifiers: $P3
+  __label_8: # endif
+.annotate 'line', 9509
     getattribute $P3, self, 'modifiers'
-.annotate 'line', 9290
-    if_null $P3, __label_10
-.annotate 'line', 9291
+.annotate 'line', 9510
+    if_null $P3, __label_9
+.annotate 'line', 9511
     $P3.'emit'(__ARG_1)
-    goto __label_11
-  __label_10: # else
-# {
-.annotate 'line', 9293
-    ne $S1, 'main', __label_12
-.annotate 'line', 9294
+    goto __label_10
+  __label_9: # else
+.annotate 'line', 9513
+    ne $S1, 'main', __label_11
+.annotate 'line', 9514
     __ARG_1.'print'(' :main')
-  __label_12: # endif
-# }
   __label_11: # endif
-.annotate 'line', 9296
+  __label_10: # endif
+.annotate 'line', 9516
     self.'emit_extra_modifiers'(__ARG_1)
-.annotate 'line', 9297
+.annotate 'line', 9517
     __ARG_1.'say'()
-.annotate 'line', 9300
+.annotate 'line', 9520
     getattribute $P8, self, 'params'
-    WSubId_60(__ARG_1, $P8)
-.annotate 'line', 9302
-# var lexicals: $P4
+    WSubId_66(__ARG_1, $P8)
+.annotate 'line', 9522
     getattribute $P4, self, 'lexicals'
-.annotate 'line', 9303
-# var usedlexicals: $P5
+.annotate 'line', 9523
     getattribute $P5, self, 'usedlexicals'
-.annotate 'line', 9304
+.annotate 'line', 9524
     isnull $I2, $P4
     not $I2
-    if $I2 goto __label_14
-    isnull $I3, $P5
-    not $I3
-    set $I1, $I3
-    goto __label_15
-  __label_14:
-    set $I1, $I2
-  __label_15:
-    unless $I1 goto __label_13
-# {
-.annotate 'line', 9305
+    if $I2 goto __label_13
+    isnull $I2, $P5
+    not $I2
+  __label_13:
+    unless $I2 goto __label_12
+.annotate 'line', 9525
     getattribute $P8, self, 'start'
     __ARG_1.'annotate'($P8)
-.annotate 'line', 9307
-    if_null $P4, __label_17
+.annotate 'line', 9527
+    if_null $P4, __label_15
     iter $P10, $P4
     set $P10, 0
-  __label_16: # for iteration
-    unless $P10 goto __label_17
+  __label_14: # for iteration
+    unless $P10 goto __label_15
     shift $S2, $P10
-.annotate 'line', 9308
-    $P8 = $P4[$S2]
-    __ARG_1.'say'(".lex '", $P8, "', ", $S2)
-    goto __label_16
-  __label_17: # endfor
-.annotate 'line', 9310
-    if_null $P5, __label_19
+.annotate 'line', 9528
+    $P9 = $P4[$S2]
+    $P8 = WSubId_26(".lex '%0', %1", $P9, $S2)
+    __ARG_1.'say'($P8)
+    goto __label_14
+  __label_15: # endfor
+.annotate 'line', 9530
+    if_null $P5, __label_17
     iter $P11, $P5
     set $P11, 0
-  __label_18: # for iteration
-    unless $P11 goto __label_19
+  __label_16: # for iteration
+    unless $P11 goto __label_17
     shift $S3, $P11
-# {
-.annotate 'line', 9311
-# builtin substr
-    substr $S5, $S3, 0, 1
-    eq $S5, '$', __label_20
-.annotate 'line', 9312
-    concat $S6, "    .local pmc ", $S3
-    __ARG_1.'say'($S6)
-  __label_20: # endif
-.annotate 'line', 9313
+.annotate 'line', 9531
+    substr $S4, $S3, 0, 1
+    eq $S4, '$', __label_18
+.annotate 'line', 9532
+    concat $S5, "    .local pmc ", $S3
+    __ARG_1.'say'($S5)
+  __label_18: # endif
+.annotate 'line', 9533
     $P8 = $P5[$S3]
     __ARG_1.'emitfind_lex'($S3, $P8)
-# }
-    goto __label_18
-  __label_19: # endfor
-# }
-  __label_13: # endif
-.annotate 'line', 9317
-    getattribute $P8, self, 'usedsubids'
-    if_null $P8, __label_22
-    iter $P12, $P8
-    set $P12, 0
-  __label_21: # for iteration
-    unless $P12 goto __label_22
-    shift $S4, $P12
-# {
-.annotate 'line', 9319
-    __ARG_1.'say'(".const 'Sub' ", $S4, ' = "', $S4, '"')
-# }
-    goto __label_21
-  __label_22: # endfor
-.annotate 'line', 9322
-# var body: $P6
+    goto __label_16
+  __label_17: # endfor
+  __label_12: # endif
+.annotate 'line', 9537
+    getattribute $P9, self, 'usedsubids'
+    root_new $P12, ['parrot';'ResizablePMCArray']
+    $P8 = WSubId_31($P9, $P12, WSubId_126)
+    join $S4, "", $P8
+    __ARG_1.'print'($S4)
+.annotate 'line', 9539
+    $P8 = __ARG_1.'getDebug'()
+    set $I1, $P8
+.annotate 'line', 9540
     getattribute $P6, self, 'body'
-.annotate 'line', 9323
+.annotate 'line', 9541
     $P8 = $P6.'isempty'()
-    if_null $P8, __label_23
-    unless $P8 goto __label_23
-.annotate 'line', 9324
+    if_null $P8, __label_19
+    unless $P8 goto __label_19
+.annotate 'line', 9542
+    unless $I1 goto __label_21
+.annotate 'line', 9543
     __ARG_1.'comment'('Empty body')
-    goto __label_24
-  __label_23: # else
-# {
-.annotate 'line', 9326
+  __label_21: # endif
+    goto __label_20
+  __label_19: # else
+.annotate 'line', 9546
+    unless $I1 goto __label_22
+.annotate 'line', 9547
     __ARG_1.'comment'('Body')
-.annotate 'line', 9327
+  __label_22: # endif
+.annotate 'line', 9548
     $P6.'emit'(__ARG_1)
-.annotate 'line', 9328
+.annotate 'line', 9549
     $P8 = $P6.'getend'()
     __ARG_1.'annotate'($P8)
-# }
-  __label_24: # endif
-.annotate 'line', 9330
+  __label_20: # endif
+.annotate 'line', 9551
     __ARG_1.'say'("\n.end # ", $S1, "\n")
-.annotate 'line', 9333
+.annotate 'line', 9554
     getattribute $P8, self, 'localfun'
-    if_null $P8, __label_26
+    if_null $P8, __label_24
     iter $P13, $P8
     set $P13, 0
-  __label_25: # for iteration
-    unless $P13 goto __label_26
+  __label_23: # for iteration
+    unless $P13 goto __label_24
     shift $P7, $P13
-.annotate 'line', 9334
+.annotate 'line', 9555
     $P7.'emit'(__ARG_1)
-    goto __label_25
-  __label_26: # endfor
-# }
-.annotate 'line', 9335
+    goto __label_23
+  __label_24: # endfor
+.annotate 'line', 9556
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
-.annotate 'line', 9065
+.annotate 'line', 9288
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
-.annotate 'line', 9067
+.annotate 'line', 9290
     addattribute $P0, 'name'
-.annotate 'line', 9068
+.annotate 'line', 9291
     addattribute $P0, 'subid'
-.annotate 'line', 9069
+.annotate 'line', 9292
     addattribute $P0, 'modifiers'
-.annotate 'line', 9070
+.annotate 'line', 9293
     addattribute $P0, 'params'
-.annotate 'line', 9071
+.annotate 'line', 9294
     addattribute $P0, 'body'
-.annotate 'line', 9072
+.annotate 'line', 9295
     addattribute $P0, 'regstI'
-.annotate 'line', 9073
+.annotate 'line', 9296
     addattribute $P0, 'regstN'
-.annotate 'line', 9074
+.annotate 'line', 9297
     addattribute $P0, 'regstS'
-.annotate 'line', 9075
+.annotate 'line', 9298
     addattribute $P0, 'regstP'
-.annotate 'line', 9076
+.annotate 'line', 9299
     addattribute $P0, 'nlabel'
-.annotate 'line', 9077
+.annotate 'line', 9300
     addattribute $P0, 'localfun'
-.annotate 'line', 9078
+.annotate 'line', 9301
     addattribute $P0, 'lexicals'
-.annotate 'line', 9079
+.annotate 'line', 9302
     addattribute $P0, 'usedlexicals'
-.annotate 'line', 9080
+.annotate 'line', 9303
     addattribute $P0, 'usedsubids'
-.annotate 'line', 9081
+.annotate 'line', 9304
     addattribute $P0, 'outer'
 .end
+.namespace [ 'Winxed'; 'Compiler' ]
+
+.sub 'get_pir_type' :subid('WSubId_127')
+        .param pmc __ARG_1
+.const 'Sub' WSubId_122 = "WSubId_122"
+.annotate 'line', 9565
+    $P1 = __ARG_1.'get_type'()
+    .tailcall WSubId_122($P1)
+.annotate 'line', 9566
+
+.end # get_pir_type
+
 .namespace [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
 
 .sub 'FunctionStatement' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9351
+.annotate 'line', 9577
     self.'FunctionBase'(__ARG_1, __ARG_3)
-.annotate 'line', 9352
+.annotate 'line', 9578
     box $P1, 0
     setattribute self, 'paramnum', $P1
-.annotate 'line', 9353
+.annotate 'line', 9579
     box $P1, 0
     setattribute self, 'lexnum', $P1
-.annotate 'line', 9354
+.annotate 'line', 9580
     self.'parse'(__ARG_2)
-.annotate 'line', 9355
+.annotate 'line', 9581
     new $P2, [ 'Boolean' ]
     setattribute self, 'is_multi', $P2
-# }
-.annotate 'line', 9356
+.annotate 'line', 9582
 
 .end # FunctionStatement
 
 
 .sub 'isanonymous' :method
-# Body
-# {
-.annotate 'line', 9358
+.annotate 'line', 9584
     .return(0)
-# }
 
 .end # isanonymous
 
 
 .sub 'getparamnum' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 9362
+.annotate 'line', 9588
     getattribute $P1, self, 'paramnum'
     inc $P1
     set $I1, $P1
     .return($I1)
-# }
-.annotate 'line', 9363
+.annotate 'line', 9589
 
 .end # getparamnum
 
 
 .sub 'getlexnum' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 9367
+.annotate 'line', 9593
     getattribute $P1, self, 'lexnum'
     inc $P1
     set $I1, $P1
     .return($I1)
-# }
-.annotate 'line', 9368
+.annotate 'line', 9594
 
 .end # getlexnum
 
 
 .sub 'ismethod' :method
-# Body
-# {
-.annotate 'line', 9369
+.annotate 'line', 9595
     .return(0)
-# }
 
 .end # ismethod
 
 
 .sub 'ismulti' :method
-# Body
-# {
-.annotate 'line', 9373
+.annotate 'line', 9599
     getattribute $P1, self, 'is_multi'
     if_null $P1, __label_2
     unless $P1 goto __label_2
@@ -27968,58 +23250,38 @@
     null $I1
   __label_1:
     .return($I1)
-# }
-.annotate 'line', 9374
+.annotate 'line', 9600
 
 .end # ismulti
 
 
 .sub 'setmulti' :method
-# Body
-# {
-.annotate 'line', 9377
+.annotate 'line', 9603
     getattribute $P1, self, 'is_multi'
     assign $P1, 1
-# }
-.annotate 'line', 9378
+.annotate 'line', 9604
 
 .end # setmulti
 
 
 .sub 'default_multi_sig' :method
-.const 'Sub' WSubId_115 = "WSubId_115"
-# Body
-# {
-.annotate 'line', 9381
-# var multi_sig: $P1
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_127 = "WSubId_127"
+.annotate 'line', 9607
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9382
-    $P3 = self.'ismethod'()
-    if_null $P3, __label_1
-    unless $P3 goto __label_1
-.annotate 'line', 9383
-# builtin push
+.annotate 'line', 9608
+    $P2 = self.'ismethod'()
+    if_null $P2, __label_1
+    unless $P2 goto __label_1
+.annotate 'line', 9609
     push $P1, "_"
   __label_1: # endif
-.annotate 'line', 9384
-    getattribute $P3, self, 'params'
-    if_null $P3, __label_3
-    iter $P4, $P3
-    set $P4, 0
-  __label_2: # for iteration
-    unless $P4 goto __label_3
-    shift $P2, $P4
-.annotate 'line', 9385
-    $P6 = $P2.'get_type'()
-    $P5 = WSubId_115($P6)
-# builtin push
-    push $P1, $P5
-    goto __label_2
-  __label_3: # endfor
-.annotate 'line', 9386
+.annotate 'line', 9610
+    getattribute $P2, self, 'params'
+    WSubId_31($P2, $P1, WSubId_127)
+.annotate 'line', 9611
     .return($P1)
-# }
-.annotate 'line', 9387
+.annotate 'line', 9612
 
 .end # default_multi_sig
 
@@ -28027,126 +23289,93 @@
 .sub 'parse' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_4 = "WSubId_4"
-.const 'Sub' WSubId_118 = "WSubId_118"
+.const 'Sub' WSubId_128 = "WSubId_128"
 .const 'Sub' WSubId_2 = "WSubId_2"
-# Body
-# {
-.annotate 'line', 9390
-# var name: $P1
+.annotate 'line', 9615
     $P1 = __ARG_1.'get'()
-.annotate 'line', 9391
+.annotate 'line', 9616
     setattribute self, 'name', $P1
-.annotate 'line', 9392
-# var t: $P2
+.annotate 'line', 9617
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9393
+.annotate 'line', 9618
     $P4 = $P2.'isop'('[')
     if_null $P4, __label_1
     unless $P4 goto __label_1
-# {
-.annotate 'line', 9394
+.annotate 'line', 9619
     new $P7, [ 'Winxed'; 'Compiler'; 'FunctionModifierList' ]
     getattribute $P8, self, 'owner'
     $P7.'FunctionModifierList'(__ARG_1, $P8)
     set $P6, $P7
     setattribute self, 'modifiers', $P6
-.annotate 'line', 9395
+.annotate 'line', 9620
     $P2 = __ARG_1.'get'()
-# }
   __label_1: # endif
-.annotate 'line', 9397
+.annotate 'line', 9622
     WSubId_4('(', $P2)
-.annotate 'line', 9398
+.annotate 'line', 9623
     self.'parse_parameters'(__ARG_1)
-.annotate 'line', 9400
-# var path: $P3
+.annotate 'line', 9625
     getattribute $P5, self, 'owner'
     $P4 = $P5.'getpath'()
     $P6 = $P1.'getidentifier'()
     $P3 = $P4.'createchild'($P6)
-.annotate 'line', 9401
+.annotate 'line', 9626
     $P4 = $P3.'fullname'()
-    WSubId_118(self, '__FUNCTION__', $P4)
-.annotate 'line', 9403
+    WSubId_128(self, '__FUNCTION__', $P4)
+.annotate 'line', 9628
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9404
+.annotate 'line', 9629
     $P4 = $P2.'isop'('{')
     isfalse $I1, $P4
     unless $I1 goto __label_2
-.annotate 'line', 9405
+.annotate 'line', 9630
     WSubId_2('{', $P2)
   __label_2: # endif
-.annotate 'line', 9406
+.annotate 'line', 9631
     new $P6, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     $P6.'CompoundStatement'($P2, __ARG_1, self)
     set $P5, $P6
     setattribute self, 'body', $P5
-.annotate 'line', 9407
+.annotate 'line', 9632
     .return(self)
-# }
-.annotate 'line', 9408
+.annotate 'line', 9633
 
 .end # parse
 
 
 .sub 'emit_extra_modifiers' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9412
+.annotate 'line', 9637
     getattribute $P2, self, 'is_multi'
     if_null $P2, __label_1
     unless $P2 goto __label_1
-# {
-.annotate 'line', 9413
-# var multi_sig: $P1
+.annotate 'line', 9638
     getattribute $P1, self, 'multi_sig'
-.annotate 'line', 9414
+.annotate 'line', 9639
     unless_null $P1, __label_2
-.annotate 'line', 9415
+.annotate 'line', 9640
     $P1 = self.'default_multi_sig'()
   __label_2: # endif
-.annotate 'line', 9416
-    __ARG_1.'print'(' :multi(')
-.annotate 'line', 9417
-# sep: $S1
-    set $S1, ''
-.annotate 'line', 9418
-    if_null $P1, __label_4
-    iter $P3, $P1
-    set $P3, 0
-  __label_3: # for iteration
-    unless $P3 goto __label_4
-    shift $S2, $P3
-# {
-.annotate 'line', 9419
-    __ARG_1.'print'($S1, $S2)
-.annotate 'line', 9420
-    set $S1, ', '
-# }
-    goto __label_3
-  __label_4: # endfor
-.annotate 'line', 9422
-    __ARG_1.'print'(')')
-# }
+.annotate 'line', 9641
+    join $S1, ", ", $P1
+    __ARG_1.'print'(' :multi(', $S1, ')')
   __label_1: # endif
-# }
-.annotate 'line', 9424
+.annotate 'line', 9643
 
 .end # emit_extra_modifiers
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-.annotate 'line', 9342
+.annotate 'line', 9568
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     addparent $P0, $P1
-.annotate 'line', 9344
+.annotate 'line', 9570
     addattribute $P0, 'paramnum'
-.annotate 'line', 9345
+.annotate 'line', 9571
     addattribute $P0, 'lexnum'
-.annotate 'line', 9346
+.annotate 'line', 9572
     addattribute $P0, 'is_multi'
-.annotate 'line', 9347
+.annotate 'line', 9573
     addattribute $P0, 'multi_sig'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'LocalFunctionStatement' ]
@@ -28156,138 +23385,111 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 9435
+.annotate 'line', 9654
     self.'FunctionBase'(__ARG_1, __ARG_3)
-.annotate 'line', 9436
+.annotate 'line', 9655
     $P4 = __ARG_3.'getouter'()
     setattribute self, 'outer', $P4
-.annotate 'line', 9437
+.annotate 'line', 9656
     getattribute $P3, self, 'outer'
     $P3.'makesubid'()
-.annotate 'line', 9438
-# var subid: $P1
+.annotate 'line', 9657
     $P1 = self.'makesubid'()
-.annotate 'line', 9439
+.annotate 'line', 9658
     setattribute self, 'name', $P1
-.annotate 'line', 9440
+.annotate 'line', 9659
     self.'parse_parameters'(__ARG_2)
-.annotate 'line', 9441
-# var t: $P2
+.annotate 'line', 9660
     $P2 = __ARG_2.'get'()
-.annotate 'line', 9442
+.annotate 'line', 9661
     WSubId_4('{', $P2)
-.annotate 'line', 9443
+.annotate 'line', 9662
     new $P5, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     $P5.'CompoundStatement'($P2, __ARG_2, self)
     set $P4, $P5
     setattribute self, 'body', $P4
-.annotate 'line', 9444
+.annotate 'line', 9663
     __ARG_3.'addlocalfunction'(self)
-# }
-.annotate 'line', 9445
+.annotate 'line', 9664
 
 .end # LocalFunctionStatement
 
 
 .sub 'isanonymous' :method
-# Body
-# {
-.annotate 'line', 9446
+.annotate 'line', 9665
     .return(1)
-# }
 
 .end # isanonymous
 
 
 .sub 'ismethod' :method
-# Body
-# {
-.annotate 'line', 9447
+.annotate 'line', 9666
     .return(0)
-# }
 
 .end # ismethod
 
 
 .sub 'needclosure' :method
-# Body
-# {
-.annotate 'line', 9450
+.annotate 'line', 9669
     getattribute $P2, self, 'lexicals'
-    isnull $I2, $P2
-    not $I2
-    if $I2 goto __label_2
+    isnull $I1, $P2
+    not $I1
+    if $I1 goto __label_2
     getattribute $P3, self, 'usedlexicals'
-    isnull $I3, $P3
-    not $I3
-    set $I1, $I3
-    goto __label_3
+    isnull $I1, $P3
+    not $I1
   __label_2:
-    set $I1, $I2
-  __label_3:
     unless $I1 goto __label_1
-.annotate 'line', 9451
+.annotate 'line', 9670
     .return(1)
   __label_1: # endif
-.annotate 'line', 9452
+.annotate 'line', 9671
     getattribute $P2, self, 'localfun'
-    if_null $P2, __label_5
+    if_null $P2, __label_4
     iter $P4, $P2
     set $P4, 0
-  __label_4: # for iteration
-    unless $P4 goto __label_5
+  __label_3: # for iteration
+    unless $P4 goto __label_4
     shift $P1, $P4
-.annotate 'line', 9453
+.annotate 'line', 9672
     $P3 = $P1.'needclosure'()
-    if_null $P3, __label_6
-    unless $P3 goto __label_6
-.annotate 'line', 9454
+    if_null $P3, __label_5
+    unless $P3 goto __label_5
+.annotate 'line', 9673
     .return(1)
-  __label_6: # endif
-    goto __label_4
-  __label_5: # endfor
-.annotate 'line', 9455
+  __label_5: # endif
+    goto __label_3
+  __label_4: # endfor
+.annotate 'line', 9674
     .return(0)
-# }
-.annotate 'line', 9456
+.annotate 'line', 9675
 
 .end # needclosure
 
 
 .sub 'getsubid' :method
-# Body
-# {
-.annotate 'line', 9459
+.annotate 'line', 9678
     getattribute $P1, self, 'subid'
     .return($P1)
-# }
-.annotate 'line', 9460
+.annotate 'line', 9679
 
 .end # getsubid
 
 
 .sub 'getparamnum' :method
-# Body
-# {
-.annotate 'line', 9464
+.annotate 'line', 9683
     getattribute $P1, self, 'outer'
     .tailcall $P1.'getparamnum'()
-# }
-.annotate 'line', 9465
+.annotate 'line', 9684
 
 .end # getparamnum
 
 
 .sub 'getlexnum' :method
-# Body
-# {
-.annotate 'line', 9469
+.annotate 'line', 9688
     getattribute $P1, self, 'outer'
     .tailcall $P1.'getlexnum'()
-# }
-.annotate 'line', 9470
+.annotate 'line', 9689
 
 .end # getlexnum
 
@@ -28295,91 +23497,75 @@
 .sub 'checkvarlexical' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9473
+.annotate 'line', 9692
     $P5 = __ARG_2.'isconst'()
     if_null $P5, __label_1
     unless $P5 goto __label_1
-.annotate 'line', 9474
+.annotate 'line', 9693
     .return(__ARG_2)
   __label_1: # endif
-.annotate 'line', 9475
-# reg: $S1
+.annotate 'line', 9694
     $P5 = __ARG_2.'getreg'()
     null $S1
     if_null $P5, __label_2
     set $S1, $P5
   __label_2:
-.annotate 'line', 9477
-# builtin substr
+.annotate 'line', 9696
     substr $S4, $S1, 0, 6
     ne $S4, 'WSubId', __label_3
-.annotate 'line', 9478
+.annotate 'line', 9697
     .return(__ARG_2)
   __label_3: # endif
-.annotate 'line', 9479
-# var scope: $P1
+.annotate 'line', 9698
     $P1 = __ARG_2.'getscope'()
-.annotate 'line', 9480
-# var ownerscope: $P2
+.annotate 'line', 9699
     $P2 = $P1.'getouter'()
-.annotate 'line', 9481
-# var outer: $P3
+.annotate 'line', 9700
     getattribute $P3, self, 'outer'
-.annotate 'line', 9482
+.annotate 'line', 9701
     isa $I2, $P2, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     unless $I2 goto __label_4
-# {
-.annotate 'line', 9483
+.annotate 'line', 9702
     $P5 = $P2.'same_scope_as'($P3)
     if_null $P5, __label_5
     unless $P5 goto __label_5
-# {
-.annotate 'line', 9484
-# lexname: $S2
+.annotate 'line', 9703
     $P6 = $P1.'makelexical'(__ARG_2)
     null $S2
     if_null $P6, __label_6
     set $S2, $P6
   __label_6:
-.annotate 'line', 9485
-# flags: $I1
+.annotate 'line', 9704
     $P5 = __ARG_2.'getflags'()
     set $I2, $P5
     bor $I1, $I2, 2
-.annotate 'line', 9486
-# type: $S3
+.annotate 'line', 9705
     $P5 = __ARG_2.'gettype'()
     null $S3
     if_null $P5, __label_7
     set $S3, $P5
   __label_7:
-.annotate 'line', 9487
+.annotate 'line', 9706
     eq $S3, 'P', __label_8
-.annotate 'line', 9488
+.annotate 'line', 9707
     bor $I1, $I1, 1
   __label_8: # endif
-.annotate 'line', 9489
-# var lexused: $P4
+.annotate 'line', 9708
     $P5 = __ARG_2.'gettype'()
     $P4 = self.'createvar'(__ARG_1, $P5, $I1)
-.annotate 'line', 9490
+.annotate 'line', 9709
     box $P5, $S2
     setattribute $P4, 'lexname', $P5
-.annotate 'line', 9491
+.annotate 'line', 9710
     $P5 = $P4.'getreg'()
     self.'setusedlex'($S2, $P5)
-.annotate 'line', 9492
+.annotate 'line', 9711
     .return($P4)
-# }
   __label_5: # endif
-# }
   __label_4: # endif
-.annotate 'line', 9495
+.annotate 'line', 9714
     .return(__ARG_2)
-# }
-.annotate 'line', 9496
+.annotate 'line', 9715
 
 .end # checkvarlexical
 
@@ -28387,93 +23573,74 @@
 .sub 'getvar' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
-# Body
-# {
-.annotate 'line', 9499
-# var r: $P1
+.annotate 'line', 9718
     $P1 = self.'getlocalvar'(__ARG_1)
-.annotate 'line', 9500
+.annotate 'line', 9719
     unless_null $P1, __label_1
-.annotate 'line', 9501
+.annotate 'line', 9720
     $P1 = self.'getusedvar'(__ARG_1)
   __label_1: # endif
-.annotate 'line', 9502
+.annotate 'line', 9721
     unless_null $P1, __label_2
-# {
-.annotate 'line', 9505
+.annotate 'line', 9724
     getattribute $P3, self, 'owner'
     $P1 = $P3.'getvar'(__ARG_1)
-.annotate 'line', 9506
+.annotate 'line', 9725
     unless_null $P1, __label_3
-# {
-.annotate 'line', 9508
+.annotate 'line', 9727
     set $S3, __ARG_1
     ne $S3, 'self', __label_5
-# {
-.annotate 'line', 9509
-# var ownerscope: $P2
+.annotate 'line', 9728
     getattribute $P2, self, 'outer'
-.annotate 'line', 9510
+.annotate 'line', 9729
     getattribute $P4, self, 'outer'
     $P3 = $P4.'ismethod'()
     if_null $P3, __label_6
     unless $P3 goto __label_6
-# {
-.annotate 'line', 9511
-# lexself: $S1
+.annotate 'line', 9730
     $P5 = $P2.'makelexicalself'()
     null $S1
     if_null $P5, __label_7
     set $S1, $P5
   __label_7:
-.annotate 'line', 9512
+.annotate 'line', 9731
     $P1 = self.'createvar'(__ARG_1, 'P')
-.annotate 'line', 9513
-# reg: $S2
+.annotate 'line', 9732
     $P3 = $P1.'getreg'()
     null $S2
     if_null $P3, __label_8
     set $S2, $P3
   __label_8:
-.annotate 'line', 9514
+.annotate 'line', 9733
     self.'setusedlex'($S1, $S2)
-# }
   __label_6: # endif
-# }
   __label_5: # endif
-# }
     goto __label_4
   __label_3: # else
-.annotate 'line', 9518
+.annotate 'line', 9737
     $P1 = self.'checkvarlexical'(__ARG_1, $P1)
   __label_4: # endif
-# }
   __label_2: # endif
-.annotate 'line', 9520
-    isnull $I2, $P1
-    not $I2
-    unless $I2 goto __label_10
-    isa $I4, $P1, [ 'Winxed'; 'Compiler'; 'VarData' ]
-    not $I3, $I4
-    set $I1, $I3
-    goto __label_11
+.annotate 'line', 9739
+    isnull $I1, $P1
+    not $I1
+    unless $I1 goto __label_10
+    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'VarData' ]
+    not $I1, $I2
   __label_10:
-    set $I1, $I2
-  __label_11:
     unless $I1 goto __label_9
-.annotate 'line', 9521
+.annotate 'line', 9740
     WSubId_6('Incorrect data for variable in LocalFunction')
   __label_9: # endif
-.annotate 'line', 9522
+.annotate 'line', 9741
     .return($P1)
-# }
-.annotate 'line', 9523
+.annotate 'line', 9742
 
 .end # getvar
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LocalFunctionStatement' ]
-.annotate 'line', 9431
+.annotate 'line', 9650
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     addparent $P0, $P1
 .end
@@ -28483,28 +23650,22 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9534
+.annotate 'line', 9753
     self.'FunctionStatement'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 9535
+.annotate 'line', 9754
 
 .end # MethodStatement
 
 
 .sub 'ismethod' :method
-# Body
-# {
-.annotate 'line', 9536
+.annotate 'line', 9755
     .return(1)
-# }
 
 .end # ismethod
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MethodStatement' ]
-.annotate 'line', 9530
+.annotate 'line', 9749
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     addparent $P0, $P1
 .end
@@ -28514,120 +23675,101 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_3 = "WSubId_3"
-.const 'Sub' WSubId_105 = "WSubId_105"
-# Body
-# {
-.annotate 'line', 9550
-# var name: $P1
+.const 'Sub' WSubId_112 = "WSubId_112"
+.annotate 'line', 9769
     $P1 = __ARG_1.'get'()
-.annotate 'line', 9551
+.annotate 'line', 9770
     $P4 = $P1.'isidentifier'()
     isfalse $I1, $P4
     unless $I1 goto __label_1
-.annotate 'line', 9552
+.annotate 'line', 9771
     WSubId_3($P1)
   __label_1: # endif
-.annotate 'line', 9553
-# var t: $P2
+.annotate 'line', 9772
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9554
+.annotate 'line', 9773
     $P4 = $P2.'isidentifier'()
     if_null $P4, __label_2
     unless $P4 goto __label_2
-# {
-.annotate 'line', 9555
-# type: $S1
+.annotate 'line', 9774
     $P6 = $P1.'checkkeyword'()
-    $P5 = WSubId_105($P6)
+    $P5 = WSubId_112($P6)
     null $S1
     if_null $P5, __label_3
     set $S1, $P5
   __label_3:
-.annotate 'line', 9556
+.annotate 'line', 9775
     set $P1, $P2
-.annotate 'line', 9557
+.annotate 'line', 9776
     __ARG_2.'createvar'($P1, $S1)
-.annotate 'line', 9558
+.annotate 'line', 9777
     $P2 = __ARG_1.'get'()
-# }
   __label_2: # endif
-.annotate 'line', 9560
+.annotate 'line', 9779
     setattribute self, 'name', $P1
-.annotate 'line', 9561
-# var data: $P3
+.annotate 'line', 9780
     $P4 = $P1.'getidentifier'()
     $P3 = __ARG_2.'getvar'($P4)
-.annotate 'line', 9562
+.annotate 'line', 9781
     $P5 = $P3.'getreg'()
     setattribute self, 'reg', $P5
-.annotate 'line', 9563
+.annotate 'line', 9782
     $P4 = $P2.'isop'('[')
     if_null $P4, __label_4
     unless $P4 goto __label_4
-.annotate 'line', 9564
+.annotate 'line', 9783
     new $P7, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
     $P7.'ParameterModifierList'(__ARG_1, self)
     set $P6, $P7
     setattribute self, 'modifiers', $P6
     goto __label_5
   __label_4: # else
-.annotate 'line', 9566
+.annotate 'line', 9785
     __ARG_1.'unget'($P2)
   __label_5: # endif
-# }
-.annotate 'line', 9567
+.annotate 'line', 9786
 
 .end # SigParameter
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9570
+.annotate 'line', 9789
     getattribute $P3, self, 'reg'
     __ARG_1.'print'($P3)
-.annotate 'line', 9571
-# var modifiers: $P1
+.annotate 'line', 9790
     getattribute $P1, self, 'modifiers'
-.annotate 'line', 9572
+.annotate 'line', 9791
     if_null $P1, __label_1
-# {
-.annotate 'line', 9573
-# var name: $P2
+.annotate 'line', 9792
     getattribute $P2, self, 'name'
-.annotate 'line', 9574
+.annotate 'line', 9793
     $P1.'emitmodifiers'(__ARG_1, $P2, $P2)
-# }
   __label_1: # endif
-# }
-.annotate 'line', 9576
+.annotate 'line', 9795
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameter' ]
-.annotate 'line', 9545
+.annotate 'line', 9764
     addattribute $P0, 'name'
-.annotate 'line', 9546
+.annotate 'line', 9765
     addattribute $P0, 'modifiers'
-.annotate 'line', 9547
+.annotate 'line', 9766
     addattribute $P0, 'reg'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseSigParameter' :subid('WSubId_119')
+.sub 'parseSigParameter' :subid('WSubId_129')
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9581
+.annotate 'line', 9800
     new $P2, [ 'Winxed'; 'Compiler'; 'SigParameter' ]
     $P2.'SigParameter'(__ARG_1, __ARG_2)
     set $P1, $P2
     .return($P1)
-# }
-.annotate 'line', 9582
+.annotate 'line', 9801
 
 .end # parseSigParameter
 
@@ -28636,29 +23778,23 @@
 .sub 'SigParameterList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_119 = "WSubId_119"
-# Body
-# {
-.annotate 'line', 9589
-    $P2 = WSubId_44(__ARG_1, __ARG_2, WSubId_119, ')')
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_129 = "WSubId_129"
+.annotate 'line', 9808
+    $P2 = WSubId_50(__ARG_1, __ARG_2, WSubId_129, ')')
     setattribute self, 'params', $P2
-# }
-.annotate 'line', 9590
+.annotate 'line', 9809
 
 .end # SigParameterList
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9593
+.annotate 'line', 9812
     __ARG_1.'print'('(')
-.annotate 'line', 9594
-# sep: $S1
+.annotate 'line', 9813
     set $S1, ''
-.annotate 'line', 9595
+.annotate 'line', 9814
     getattribute $P2, self, 'params'
     if_null $P2, __label_2
     iter $P3, $P2
@@ -28666,26 +23802,23 @@
   __label_1: # for iteration
     unless $P3 goto __label_2
     shift $P1, $P3
-# {
-.annotate 'line', 9596
+.annotate 'line', 9815
     __ARG_1.'print'($S1)
-.annotate 'line', 9597
+.annotate 'line', 9816
     $P1.'emit'(__ARG_1)
-.annotate 'line', 9598
+.annotate 'line', 9817
     set $S1, ', '
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 9600
+.annotate 'line', 9819
     __ARG_1.'print'(')')
-# }
-.annotate 'line', 9601
+.annotate 'line', 9820
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameterList' ]
-.annotate 'line', 9586
+.annotate 'line', 9805
     addattribute $P0, 'params'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'MultiAssignStatement' ]
@@ -28695,31 +23828,25 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-# Body
-# {
-.annotate 'line', 9610
+.annotate 'line', 9829
     self.'Statement'(__ARG_1, __ARG_2)
-.annotate 'line', 9611
+.annotate 'line', 9830
     setattribute self, 'params', __ARG_3
-.annotate 'line', 9612
+.annotate 'line', 9831
     setattribute self, 'expr', __ARG_4
-# }
-.annotate 'line', 9613
+.annotate 'line', 9832
 
 .end # MultiAssignStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 9616
+.annotate 'line', 9835
     getattribute $P3, self, 'expr'
     $P2 = $P3.'optimize'()
     setattribute self, 'expr', $P2
-.annotate 'line', 9617
+.annotate 'line', 9836
     .return(self)
-# }
-.annotate 'line', 9618
+.annotate 'line', 9837
 
 .end # optimize
 
@@ -28727,94 +23854,76 @@
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 9621
-# var expr: $P1
+.annotate 'line', 9840
     getattribute $P1, self, 'expr'
-.annotate 'line', 9622
+.annotate 'line', 9841
     isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     not $I1, $I2
     unless $I1 goto __label_1
-.annotate 'line', 9623
+.annotate 'line', 9842
     WSubId_1('multi assignment used with non function call', $P1)
   __label_1: # endif
-.annotate 'line', 9624
-# var call: $P2
+.annotate 'line', 9843
     $P2 = $P1.'emitcall'(__ARG_1)
-.annotate 'line', 9625
+.annotate 'line', 9844
     $P1.'prepareargs'(__ARG_1)
-.annotate 'line', 9626
+.annotate 'line', 9845
     __ARG_1.'print'('    ')
-.annotate 'line', 9627
+.annotate 'line', 9846
     getattribute $P3, self, 'params'
     $P3.'emit'(__ARG_1)
-.annotate 'line', 9628
+.annotate 'line', 9847
     __ARG_1.'print'(' = ', $P2)
-.annotate 'line', 9629
+.annotate 'line', 9848
     $P1.'emitargs'(__ARG_1)
-.annotate 'line', 9630
+.annotate 'line', 9849
     __ARG_1.'say'()
-# }
-.annotate 'line', 9631
+.annotate 'line', 9850
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiAssignStatement' ]
-.annotate 'line', 9604
+.annotate 'line', 9823
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
-.annotate 'line', 9606
+.annotate 'line', 9825
     addattribute $P0, 'params'
-.annotate 'line', 9607
+.annotate 'line', 9826
     addattribute $P0, 'expr'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant CLASSSPECIFIER_invalid evaluated at compile time
-# Constant CLASSSPECIFIER_str evaluated at compile time
-# Constant CLASSSPECIFIER_parrotkey evaluated at compile time
-# Constant CLASSSPECIFIER_id evaluated at compile time
 .namespace [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
 
 .sub 'ClassSpecifier' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9648
+.annotate 'line', 9867
     self.'initbase'(__ARG_2, __ARG_1)
-# }
-.annotate 'line', 9649
+.annotate 'line', 9868
 
 .end # ClassSpecifier
 
 
 .sub 'reftype' :method
-# Body
-# {
-.annotate 'line', 9650
+.annotate 'line', 9869
     .return(0)
-# }
 
 .end # reftype
 
 
 .sub 'annotate' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9654
+.annotate 'line', 9873
     getattribute $P1, self, 'start'
     __ARG_1.'annotate'($P1)
-# }
-.annotate 'line', 9655
+.annotate 'line', 9874
 
 .end # annotate
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
-.annotate 'line', 9644
+.annotate 'line', 9863
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
 .end
@@ -28823,24 +23932,18 @@
 .sub 'ClassSpecifierStr' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9663
+.annotate 'line', 9882
     self.'ClassSpecifier'(__ARG_1, __ARG_2)
-.annotate 'line', 9664
+.annotate 'line', 9883
     setattribute self, 'name', __ARG_2
-# }
-.annotate 'line', 9665
+.annotate 'line', 9884
 
 .end # ClassSpecifierStr
 
 
 .sub 'reftype' :method
-# Body
-# {
-.annotate 'line', 9666
+.annotate 'line', 9885
     .return(1)
-# }
 
 .end # reftype
 
@@ -28848,28 +23951,24 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 9670
-# basestr: $S1
+.annotate 'line', 9889
     getattribute $P1, self, 'name'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 9671
+.annotate 'line', 9890
     __ARG_1.'print'($S1)
-# }
-.annotate 'line', 9672
+.annotate 'line', 9891
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierStr' ]
-.annotate 'line', 9658
+.annotate 'line', 9877
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
-.annotate 'line', 9660
+.annotate 'line', 9879
     addattribute $P0, 'name'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
@@ -28878,126 +23977,101 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_55 = "WSubId_55"
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 9681
+.annotate 'line', 9900
     self.'ClassSpecifier'(__ARG_2, __ARG_3)
-.annotate 'line', 9682
-# var key: $P1
+.annotate 'line', 9901
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9683
-# var t: $P2
+.annotate 'line', 9902
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9684
+.annotate 'line', 9903
     $P3 = $P2.'isstring'()
     isfalse $I1, $P3
     unless $I1 goto __label_1
-.annotate 'line', 9685
-    WSubId_48('literal string', $P2)
+.annotate 'line', 9904
+    WSubId_54('literal string', $P2)
   __label_1: # endif
-.annotate 'line', 9686
+.annotate 'line', 9905
     $P3 = $P2.'rawstring'()
-# builtin push
     push $P1, $P3
-.annotate 'line', 9687
+.annotate 'line', 9906
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9688
+.annotate 'line', 9907
     $P3 = $P2.'isop'(']')
     isfalse $I1, $P3
     unless $I1 goto __label_2
-# {
-# switch
-.annotate 'line', 9689
+.annotate 'line', 9908
     $P4 = $P2.'checkop'()
     set $S1, $P4
-    set $S2, ':'
-    if $S1 == $S2 goto __label_5
-    set $S2, ','
-    if $S1 == $S2 goto __label_6
+    if $S1 == ':' goto __label_5
+    if $S1 == ',' goto __label_6
     goto __label_4
   __label_5: # case
-.annotate 'line', 9691
+.annotate 'line', 9910
     box $P5, 1
     setattribute self, 'hll', $P5
   __label_6: # case
     goto __label_3 # break
   __label_4: # default
-.annotate 'line', 9695
-    WSubId_49('token in class key', $P2)
+.annotate 'line', 9914
+    WSubId_55('token in class key', $P2)
   __label_3: # switch end
   __label_7: # do
-.annotate 'line', 9697
-# {
-.annotate 'line', 9698
+.annotate 'line', 9917
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9699
+.annotate 'line', 9918
     $P3 = $P2.'isstring'()
     isfalse $I1, $P3
     unless $I1 goto __label_10
-.annotate 'line', 9700
-    WSubId_48('literal string', $P2)
+.annotate 'line', 9919
+    WSubId_54('literal string', $P2)
   __label_10: # endif
-.annotate 'line', 9701
+.annotate 'line', 9920
     $P3 = $P2.'rawstring'()
-# builtin push
     push $P1, $P3
-# }
   __label_9: # continue
-.annotate 'line', 9702
+.annotate 'line', 9921
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isop'(',')
     if_null $P3, __label_8
     if $P3 goto __label_7
   __label_8: # enddo
-.annotate 'line', 9703
+.annotate 'line', 9922
     WSubId_4(']', $P2)
-# }
   __label_2: # endif
-.annotate 'line', 9705
+.annotate 'line', 9924
     setattribute self, 'key', $P1
-# }
-.annotate 'line', 9706
+.annotate 'line', 9925
 
 .end # ClassSpecifierParrotKey
 
 
 .sub 'reftype' :method
-# Body
-# {
-.annotate 'line', 9707
+.annotate 'line', 9926
     .return(2)
-# }
 
 .end # reftype
 
 
 .sub 'hasHLL' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 9710
+.annotate 'line', 9929
     getattribute $P1, self, 'hll'
     isnull $I1, $P1
     not $I1
     .return($I1)
-# }
-.annotate 'line', 9711
+.annotate 'line', 9930
 
 .end # hasHLL
 
 
 .sub 'checknskey' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9715
-# var nskey: $P1
+.annotate 'line', 9934
     getattribute $P2, self, 'key'
     $P1 = __ARG_1.'scopesearch'($P2, 2)
-.annotate 'line', 9716
+.annotate 'line', 9935
     if_null $P1, __label_2
     $P2 = $P1.'getpath'()
     goto __label_1
@@ -29005,8 +24079,7 @@
     null $P2
   __label_1:
     .return($P2)
-# }
-.annotate 'line', 9717
+.annotate 'line', 9936
 
 .end # checknskey
 
@@ -29014,26 +24087,23 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 9720
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 9939
     getattribute $P2, self, 'key'
-    $P1 = WSubId_26($P2)
+    $P1 = WSubId_30($P2)
     __ARG_1.'print'($P1)
-# }
-.annotate 'line', 9721
+.annotate 'line', 9940
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
-.annotate 'line', 9675
+.annotate 'line', 9894
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
-.annotate 'line', 9677
+.annotate 'line', 9896
     addattribute $P0, 'key'
-.annotate 'line', 9678
+.annotate 'line', 9897
     addattribute $P0, 'hll'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
@@ -29042,81 +24112,61 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9729
+.annotate 'line', 9948
     self.'ClassSpecifier'(__ARG_2, __ARG_3)
-.annotate 'line', 9730
-# var key: $P1
+.annotate 'line', 9949
     root_new $P1, ['parrot';'ResizablePMCArray']
     assign $P1, 1
-# builtin string
     set $S1, __ARG_3
     $P1[0] = $S1
-.annotate 'line', 9731
-# var t: $P2
+.annotate 'line', 9950
     null $P2
   __label_2: # while
-.annotate 'line', 9732
+.annotate 'line', 9951
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isop'('.')
     if_null $P3, __label_1
     unless $P3 goto __label_1
-# {
-.annotate 'line', 9733
+.annotate 'line', 9952
     $P2 = __ARG_1.'get'()
-.annotate 'line', 9734
-# builtin string
+.annotate 'line', 9953
     set $S1, $P2
-# builtin push
     push $P1, $S1
-# }
     goto __label_2
   __label_1: # endwhile
-.annotate 'line', 9736
+.annotate 'line', 9955
     __ARG_1.'unget'($P2)
-.annotate 'line', 9737
+.annotate 'line', 9956
     setattribute self, 'key', $P1
-# }
-.annotate 'line', 9738
+.annotate 'line', 9957
 
 .end # ClassSpecifierId
 
 
 .sub 'reftype' :method
-# Body
-# {
-.annotate 'line', 9739
+.annotate 'line', 9958
     .return(3)
-# }
 
 .end # reftype
 
 
 .sub 'last' :method
-# Body
-# {
-.annotate 'line', 9743
-# var key: $P1
+.annotate 'line', 9962
     getattribute $P1, self, 'key'
-.annotate 'line', 9744
+.annotate 'line', 9963
     $P2 = $P1[-1]
     .return($P2)
-# }
-.annotate 'line', 9745
+.annotate 'line', 9964
 
 .end # last
 
 
 .sub 'checknskey' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 9748
-# var nskey: $P1
+.annotate 'line', 9967
     getattribute $P2, self, 'key'
     $P1 = __ARG_1.'scopesearch'($P2, 2)
-.annotate 'line', 9749
+.annotate 'line', 9968
     if_null $P1, __label_2
     $P2 = $P1.'getpath'()
     goto __label_1
@@ -29124,8 +24174,7 @@
     null $P2
   __label_1:
     .return($P2)
-# }
-.annotate 'line', 9750
+.annotate 'line', 9969
 
 .end # checknskey
 
@@ -29133,36 +24182,29 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 9754
-# var key: $P1
+.const 'Sub' WSubId_83 = "WSubId_83"
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 9973
     getattribute $P2, self, 'key'
     $P1 = __ARG_2.'scopesearch'($P2, 2)
-.annotate 'line', 9755
+.annotate 'line', 9974
     unless_null $P1, __label_1
-# {
-.annotate 'line', 9756
+.annotate 'line', 9975
     getattribute $P2, self, 'key'
-# builtin join
     join $S1, ".", $P2
     getattribute $P3, self, 'start'
-    WSubId_77(__ARG_1, $S1, $P3)
-.annotate 'line', 9757
+    WSubId_83(__ARG_1, $S1, $P3)
+.annotate 'line', 9976
     getattribute $P3, self, 'key'
-    $P2 = WSubId_26($P3)
+    $P2 = WSubId_30($P3)
     __ARG_1.'print'($P2)
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 9759
+.annotate 'line', 9978
     $P2 = $P1.'getclasskey'()
     __ARG_1.'print'($P2)
   __label_2: # endif
-# }
-.annotate 'line', 9760
+.annotate 'line', 9979
 
 .end # emit
 
@@ -29171,45 +24213,36 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_26 = "WSubId_26"
-# Body
-# {
-.annotate 'line', 9763
-# var nskey: $P1
+.const 'Sub' WSubId_83 = "WSubId_83"
+.const 'Sub' WSubId_30 = "WSubId_30"
+.annotate 'line', 9982
     $P1 = self.'checknskey'(__ARG_2)
-.annotate 'line', 9764
+.annotate 'line', 9983
     unless_null $P1, __label_1
-# {
-.annotate 'line', 9765
+.annotate 'line', 9984
     getattribute $P2, self, 'key'
-# builtin join
     join $S1, ".", $P2
     getattribute $P3, self, 'start'
-    WSubId_77(__ARG_1, $S1, $P3)
-.annotate 'line', 9766
+    WSubId_83(__ARG_1, $S1, $P3)
+.annotate 'line', 9985
     getattribute $P3, self, 'key'
-    $P2 = WSubId_26($P3)
+    $P2 = WSubId_30($P3)
     __ARG_1.'say'("new ", __ARG_3, ", ", $P2)
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 9769
+.annotate 'line', 9988
     $P1.'emit_new'(__ARG_1, __ARG_2, __ARG_3)
-# }
   __label_2: # endif
-# }
-.annotate 'line', 9771
+.annotate 'line', 9990
 
 .end # emit_new
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
-.annotate 'line', 9724
+.annotate 'line', 9943
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
-.annotate 'line', 9726
+.annotate 'line', 9945
     addattribute $P0, 'key'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ClassBase' ]
@@ -29218,56 +24251,109 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9784
+.annotate 'line', 10003
     self.'initbase'(__ARG_1, __ARG_3)
-.annotate 'line', 9785
+.annotate 'line', 10004
     setattribute self, 'name', __ARG_2
-.annotate 'line', 9786
-# var classns: $P1
+.annotate 'line', 10005
     $P2 = __ARG_3.'getpath'()
     $P1 = $P2.'createchild'(__ARG_2)
-.annotate 'line', 9787
+.annotate 'line', 10006
     setattribute self, 'classns', $P1
-# }
-.annotate 'line', 9788
+.annotate 'line', 10007
 
 .end # ClassBase
 
 
 .sub 'getpath' :method
-# Body
-# {
-.annotate 'line', 9791
+.annotate 'line', 10010
     getattribute $P1, self, 'classns'
     .return($P1)
-# }
-.annotate 'line', 9792
+.annotate 'line', 10011
 
 .end # getpath
 
 
 .sub 'getclasskey' :method
-# Body
-# {
-.annotate 'line', 9795
+.annotate 'line', 10014
     getattribute $P1, self, 'classns'
     .tailcall $P1.'getparrotkey'()
-# }
-.annotate 'line', 9796
+.annotate 'line', 10015
 
 .end # getclasskey
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
-.annotate 'line', 9778
+.annotate 'line', 9997
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
-.annotate 'line', 9780
+.annotate 'line', 9999
     addattribute $P0, 'name'
-.annotate 'line', 9781
+.annotate 'line', 10000
     addattribute $P0, 'classns'
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
+
+.sub 'FunctionContainer' :method
+.annotate 'line', 10023
+    root_new $P2, ['parrot';'Hash']
+    setattribute self, 'functions', $P2
+.annotate 'line', 10024
+
+.end # FunctionContainer
+
+
+.sub 'addfunction' :method
+        .param pmc __ARG_1
+.annotate 'line', 10030
+    getattribute $P1, self, 'functions'
+.annotate 'line', 10031
+    getattribute $P3, __ARG_1, 'name'
+    null $S1
+    if_null $P3, __label_1
+    set $S1, $P3
+  __label_1:
+.annotate 'line', 10032
+    $P2 = $P1[$S1]
+.annotate 'line', 10033
+    unless_null $P2, __label_2
+.annotate 'line', 10034
+    $P1[$S1] = __ARG_1
+    goto __label_3
+  __label_2: # else
+.annotate 'line', 10036
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    unless $I1 goto __label_4
+.annotate 'line', 10037
+    $P2.'setmulti'()
+  __label_4: # endif
+.annotate 'line', 10038
+    isa $I1, __ARG_1, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    unless $I1 goto __label_5
+.annotate 'line', 10039
+    __ARG_1.'setmulti'()
+  __label_5: # endif
+  __label_3: # endif
+.annotate 'line', 10041
+
+.end # addfunction
+
+
+.sub 'find' :method
+        .param string __ARG_1
+.annotate 'line', 10044
+    getattribute $P1, self, 'functions'
+.annotate 'line', 10045
+    $P2 = $P1[__ARG_1]
+    .return($P2)
+.annotate 'line', 10046
+
+.end # find
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
+.annotate 'line', 10020
+    addattribute $P0, 'functions'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
 
@@ -29276,173 +24362,139 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_70 = "WSubId_70"
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_76 = "WSubId_76"
 .const 'Sub' WSubId_4 = "WSubId_4"
-.const 'Sub' WSubId_118 = "WSubId_118"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_52 = "WSubId_52"
-.const 'Sub' WSubId_49 = "WSubId_49"
-# Body
-# {
-.annotate 'line', 9809
+.const 'Sub' WSubId_128 = "WSubId_128"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_58 = "WSubId_58"
+.const 'Sub' WSubId_55 = "WSubId_55"
+.annotate 'line', 10060
     self.'ClassBase'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 9810
+.annotate 'line', 10061
+    self.'VarContainer'()
+.annotate 'line', 10062
+    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
+    $P8.'FunctionContainer'()
+    set $P8, $P8
+    setattribute self, 'funcont', $P8
+.annotate 'line', 10063
     setattribute self, 'parent', __ARG_3
-.annotate 'line', 9811
-# var functions: $P1
+.annotate 'line', 10064
     root_new $P1, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9812
-    setattribute self, 'functions', $P1
-.annotate 'line', 9813
-# var members: $P2
+.annotate 'line', 10065
+    setattribute self, 'items', $P1
+.annotate 'line', 10066
     root_new $P2, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9814
+.annotate 'line', 10067
     setattribute self, 'members', $P2
-.annotate 'line', 9815
-# var constants: $P3
-    root_new $P3, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9816
-    setattribute self, 'constants', $P3
-.annotate 'line', 9817
-# var seen_functions: $P4
-    root_new $P4, ['parrot';'Hash']
-.annotate 'line', 9819
-# var t: $P5
-    $P5 = __ARG_4.'get'()
-.annotate 'line', 9820
-    $P10 = $P5.'isop'(':')
-    if_null $P10, __label_1
-    unless $P10 goto __label_1
-# {
-.annotate 'line', 9821
-    $P12 = WSubId_44(__ARG_4, self, WSubId_70)
-    setattribute self, 'bases', $P12
-.annotate 'line', 9822
-    $P5 = __ARG_4.'get'()
-# }
+.annotate 'line', 10069
+    $P3 = __ARG_4.'get'()
+.annotate 'line', 10070
+    $P7 = $P3.'isop'(':')
+    if_null $P7, __label_1
+    unless $P7 goto __label_1
+.annotate 'line', 10071
+    $P9 = WSubId_50(__ARG_4, self, WSubId_76)
+    setattribute self, 'bases', $P9
+.annotate 'line', 10072
+    $P3 = __ARG_4.'get'()
   __label_1: # endif
-.annotate 'line', 9824
-    WSubId_4('{', $P5)
-.annotate 'line', 9826
-    getattribute $P11, self, 'classns'
-    $P10 = $P11.'fullname'()
-    WSubId_118(self, '__CLASS__', $P10)
-# for loop
-.annotate 'line', 9828
-    $P5 = __ARG_4.'get'()
+.annotate 'line', 10074
+    WSubId_4('{', $P3)
+.annotate 'line', 10076
+    getattribute $P8, self, 'classns'
+    $P7 = $P8.'fullname'()
+    WSubId_128(self, '__CLASS__', $P7)
+.annotate 'line', 10078
+    $P3 = __ARG_4.'get'()
   __label_4: # for condition
-    $P10 = $P5.'isop'('}')
-    isfalse $I1, $P10
+    $P7 = $P3.'isop'('}')
+    isfalse $I1, $P7
     unless $I1 goto __label_3
-# {
-# switch
-.annotate 'line', 9829
-    $P11 = $P5.'checkkeyword'()
-    set $S1, $P11
-    set $S2, 'function'
-    if $S1 == $S2 goto __label_7
-    set $S2, 'var'
-    if $S1 == $S2 goto __label_8
-    set $S2, 'const'
-    if $S1 == $S2 goto __label_9
+.annotate 'line', 10079
+    $P8 = $P3.'checkkeyword'()
+    set $S1, $P8
+    if $S1 == 'function' goto __label_7
+    if $S1 == 'var' goto __label_8
+    if $S1 == 'const' goto __label_9
     goto __label_6
   __label_7: # case
-.annotate 'line', 9831
-# var f: $P6
-    new $P6, [ 'Winxed'; 'Compiler'; 'MethodStatement' ]
-    $P6.'MethodStatement'($P5, __ARG_4, self)
-.annotate 'line', 9832
-# builtin push
-    push $P1, $P6
-.annotate 'line', 9833
-# var first_func: $P7
-    getattribute $P12, $P6, 'name'
-    $P7 = $P4[$P12]
-.annotate 'line', 9834
-    unless_null $P7, __label_10
-.annotate 'line', 9835
-    getattribute $P13, $P6, 'name'
-    $P4[$P13] = $P6
-    goto __label_11
-  __label_10: # else
-# {
-.annotate 'line', 9837
-    $P7.'setmulti'()
-.annotate 'line', 9838
-    $P6.'setmulti'()
-# }
-  __label_11: # endif
+.annotate 'line', 10081
+    new $P4, [ 'Winxed'; 'Compiler'; 'MethodStatement' ]
+    $P4.'MethodStatement'($P3, __ARG_4, self)
+.annotate 'line', 10082
+    self.'addmethod'($P4)
+.annotate 'line', 10083
+    push $P1, $P4
     goto __label_5 # break
   __label_8: # case
-.annotate 'line', 9842
-# var name: $P8
-    $P8 = __ARG_4.'get'()
-.annotate 'line', 9843
-    $P10 = $P8.'isidentifier'()
-    isfalse $I1, $P10
-    unless $I1 goto __label_12
-.annotate 'line', 9844
-    WSubId_48("member identifier", $P8)
-  __label_12: # endif
-.annotate 'line', 9845
-# builtin push
-    push $P2, $P8
-.annotate 'line', 9846
+.annotate 'line', 10086
     $P5 = __ARG_4.'get'()
-.annotate 'line', 9847
-    $P11 = $P5.'isop'(';')
-    isfalse $I2, $P11
-    unless $I2 goto __label_13
-.annotate 'line', 9848
-    WSubId_48("';' in member declaration", $P5)
-  __label_13: # endif
+.annotate 'line', 10087
+    $P9 = $P5.'isidentifier'()
+    isfalse $I2, $P9
+    unless $I2 goto __label_10
+.annotate 'line', 10088
+    WSubId_54("member identifier", $P5)
+  __label_10: # endif
+.annotate 'line', 10089
+    push $P2, $P5
+.annotate 'line', 10090
+    $P3 = __ARG_4.'get'()
+.annotate 'line', 10091
+    $P10 = $P3.'isop'(';')
+    isfalse $I3, $P10
+    unless $I3 goto __label_11
+.annotate 'line', 10092
+    WSubId_54("';' in member declaration", $P3)
+  __label_11: # endif
     goto __label_5 # break
   __label_9: # case
-.annotate 'line', 9851
-# var cst: $P9
-    $P9 = WSubId_52($P5, __ARG_4, self)
-.annotate 'line', 9852
-# builtin push
-    push $P3, $P9
+.annotate 'line', 10095
+    $P6 = WSubId_58($P3, __ARG_4, self)
+.annotate 'line', 10096
+    push $P1, $P6
     goto __label_5 # break
   __label_6: # default
-.annotate 'line', 9855
-    WSubId_49("item in class", $P5)
+.annotate 'line', 10099
+    WSubId_55("item in class", $P3)
   __label_5: # switch end
-# }
   __label_2: # for iteration
-.annotate 'line', 9828
-    $P5 = __ARG_4.'get'()
+.annotate 'line', 10078
+    $P3 = __ARG_4.'get'()
     goto __label_4
   __label_3: # for end
-# }
-.annotate 'line', 9858
+.annotate 'line', 10102
 
 .end # ClassStatement
 
 
+.sub 'addmethod' :method
+        .param pmc __ARG_1
+.annotate 'line', 10106
+    getattribute $P1, self, 'funcont'
+    $P1.'addfunction'(__ARG_1)
+.annotate 'line', 10107
+
+.end # addmethod
+
+
 .sub 'generatesubid' :method
-# Body
-# {
-.annotate 'line', 9861
+.annotate 'line', 10110
     getattribute $P1, self, 'owner'
     .tailcall $P1.'generatesubid'()
-# }
-.annotate 'line', 9862
+.annotate 'line', 10111
 
 .end # generatesubid
 
 
 .sub 'checkclass' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 9865
+.annotate 'line', 10114
     getattribute $P1, self, 'parent'
     .tailcall $P1.'checkclass'(__ARG_1)
-# }
-.annotate 'line', 9866
+.annotate 'line', 10115
 
 .end # checkclass
 
@@ -29450,68 +24502,53 @@
 .sub 'scopesearch' :method
         .param pmc __ARG_1
         .param int __ARG_2
-# Body
-# {
-.annotate 'line', 9869
+.annotate 'line', 10118
     getattribute $P1, self, 'parent'
     .tailcall $P1.'scopesearch'(__ARG_1, __ARG_2)
-# }
-.annotate 'line', 9870
+.annotate 'line', 10119
 
 .end # scopesearch
 
 
 .sub 'use_builtin' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 9873
+.annotate 'line', 10122
     getattribute $P1, self, 'owner'
     .tailcall $P1.'use_builtin'(__ARG_1)
-# }
-.annotate 'line', 9874
+.annotate 'line', 10123
 
 .end # use_builtin
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 9877
-    getattribute $P1, self, 'constants'
-    WSubId_46($P1)
-.annotate 'line', 9878
-    getattribute $P1, self, 'functions'
-    WSubId_46($P1)
-.annotate 'line', 9879
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 10126
+    getattribute $P1, self, 'items'
+    WSubId_52($P1)
+.annotate 'line', 10127
     .return(self)
-# }
-.annotate 'line', 9880
+.annotate 'line', 10128
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 9883
+.const 'Sub' WSubId_66 = "WSubId_66"
+.annotate 'line', 10131
     getattribute $P3, self, 'classns'
     $P3.'emitnamespace'(__ARG_1)
-.annotate 'line', 9884
-    getattribute $P3, self, 'functions'
-    WSubId_60(__ARG_1, $P3)
-.annotate 'line', 9886
+.annotate 'line', 10132
+    getattribute $P3, self, 'items'
+    WSubId_66(__ARG_1, $P3)
+.annotate 'line', 10134
     __ARG_1.'say'('.sub Winxed_class_init :anon :load :init')
-.annotate 'line', 9888
+.annotate 'line', 10136
     $P3 = self.'getclasskey'()
     __ARG_1.'say'('    ', 'newclass $P0, ', $P3)
-.annotate 'line', 9889
-# n: $I1
+.annotate 'line', 10137
     set $I1, 1
-.annotate 'line', 9890
+.annotate 'line', 10138
     getattribute $P3, self, 'bases'
     if_null $P3, __label_2
     iter $P4, $P3
@@ -29519,28 +24556,25 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P1, $P4
-# {
-.annotate 'line', 9891
+.annotate 'line', 10139
     $P1.'annotate'(__ARG_1)
-.annotate 'line', 9892
-# reg: $S1
+.annotate 'line', 10140
     set $I2, $I1
     inc $I1
     set $S2, $I2
     concat $S1, "$P", $S2
-.annotate 'line', 9893
+.annotate 'line', 10141
     __ARG_1.'print'('    ', 'get_class ', $S1, ', ')
-.annotate 'line', 9894
+.annotate 'line', 10142
     getattribute $P3, self, 'parent'
     $P1.'emit'(__ARG_1, $P3)
-.annotate 'line', 9895
+.annotate 'line', 10143
     __ARG_1.'say'()
-.annotate 'line', 9896
+.annotate 'line', 10144
     __ARG_1.'say'('    ', 'addparent $P0, ', $S1)
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 9898
+.annotate 'line', 10146
     getattribute $P3, self, 'members'
     if_null $P3, __label_4
     iter $P5, $P3
@@ -29548,38 +24582,37 @@
   __label_3: # for iteration
     unless $P5 goto __label_4
     shift $P2, $P5
-# {
-.annotate 'line', 9899
+.annotate 'line', 10147
     __ARG_1.'annotate'($P2)
-.annotate 'line', 9900
+.annotate 'line', 10148
     __ARG_1.'say'('    ', "addattribute $P0, '", $P2, "'")
-# }
     goto __label_3
   __label_4: # endfor
-.annotate 'line', 9903
+.annotate 'line', 10151
     __ARG_1.'say'('.end')
-# }
-.annotate 'line', 9904
+.annotate 'line', 10152
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
-.annotate 'line', 9799
+.annotate 'line', 10049
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
     addparent $P0, $P1
     get_class $P2, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addparent $P0, $P2
-.annotate 'line', 9801
+.annotate 'line', 10051
     addattribute $P0, 'parent'
-.annotate 'line', 9802
+.annotate 'line', 10052
     addattribute $P0, 'bases'
-.annotate 'line', 9803
+.annotate 'line', 10053
     addattribute $P0, 'constants'
-.annotate 'line', 9804
-    addattribute $P0, 'functions'
-.annotate 'line', 9805
+.annotate 'line', 10054
+    addattribute $P0, 'items'
+.annotate 'line', 10055
     addattribute $P0, 'members'
+.annotate 'line', 10056
+    addattribute $P0, 'funcont'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'DeclareClassStatement' ]
 
@@ -29587,264 +24620,206 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9911
+.annotate 'line', 10159
     self.'ClassBase'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 9912
+.annotate 'line', 10160
 
 .end # DeclareClassStatement
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 9915
+.annotate 'line', 10163
     .return(self)
-# }
-.annotate 'line', 9916
+.annotate 'line', 10164
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Empty body
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareClassStatement' ]
-.annotate 'line', 9907
+.annotate 'line', 10155
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseClass' :subid('WSubId_121')
+.sub 'parseClass' :subid('WSubId_132')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 9924
-# var name: $P1
+.annotate 'line', 10172
     $P1 = __ARG_2.'get'()
-.annotate 'line', 9925
-# var t: $P2
+.annotate 'line', 10173
     $P2 = __ARG_2.'get'()
-.annotate 'line', 9926
-# var nskey: $P3
+.annotate 'line', 10174
     root_new $P3, ['parrot';'ResizablePMCArray']
-.annotate 'line', 9927
-# var ns: $P4
+.annotate 'line', 10175
     null $P4
-# for loop
   __label_3: # for condition
-.annotate 'line', 9929
+.annotate 'line', 10177
     $P5 = $P2.'isop'('.')
     if_null $P5, __label_2
     unless $P5 goto __label_2
-# {
-.annotate 'line', 9930
+.annotate 'line', 10178
     $P3.'push'($P1)
-.annotate 'line', 9931
+.annotate 'line', 10179
     $P1 = __ARG_2.'get'()
-# }
   __label_1: # for iteration
-.annotate 'line', 9929
+.annotate 'line', 10177
     $P2 = __ARG_2.'get'()
     goto __label_3
   __label_2: # for end
-.annotate 'line', 9934
+.annotate 'line', 10182
     $P5 = $P2.'isop'(';')
     if_null $P5, __label_4
     unless $P5 goto __label_4
-# {
-.annotate 'line', 9935
+.annotate 'line', 10183
     if_null $P3, __label_7
     iter $P6, $P3
     set $P6, 0
   __label_6: # for iteration
     unless $P6 goto __label_7
     shift $P4, $P6
-.annotate 'line', 9936
-# builtin string
+.annotate 'line', 10184
     set $S1, $P4
     __ARG_3 = __ARG_3.'declarenamespace'($P4, $S1)
     goto __label_6
   __label_7: # endfor
-.annotate 'line', 9937
+.annotate 'line', 10185
     new $P7, [ 'Winxed'; 'Compiler'; 'DeclareClassStatement' ]
     $P7.'DeclareClassStatement'(__ARG_1, $P1, __ARG_3)
     set $P5, $P7
     __ARG_3.'declareclass'($P5)
-# }
     goto __label_5
   __label_4: # else
-# {
-.annotate 'line', 9940
+.annotate 'line', 10188
     __ARG_2.'unget'($P2)
-.annotate 'line', 9941
+.annotate 'line', 10189
     if_null $P3, __label_9
     iter $P8, $P3
     set $P8, 0
   __label_8: # for iteration
     unless $P8 goto __label_9
     shift $P4, $P8
-.annotate 'line', 9942
+.annotate 'line', 10190
     null $P5
     __ARG_3 = __ARG_3.'childnamespace'(__ARG_1, $P4, $P5)
     goto __label_8
   __label_9: # endfor
-.annotate 'line', 9943
+.annotate 'line', 10191
     new $P7, [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
     $P7.'ClassStatement'(__ARG_1, $P1, __ARG_3, __ARG_2)
     set $P5, $P7
     __ARG_3.'addclass'($P5)
-# }
   __label_5: # endif
-# }
-.annotate 'line', 9945
+.annotate 'line', 10193
 
 .end # parseClass
 
 
-.sub 'open_include' :subid('WSubId_120')
+.sub 'open_include' :subid('WSubId_130')
         .param string __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 9953
-# var interp: $P1
-# builtin getinterp
+.annotate 'line', 10201
     getinterp $P1
-# Constant IGLOBALS_LIB_PATHS evaluated at compile time
-# Constant PARROT_LIB_PATH_INCLUDE evaluated at compile time
-.annotate 'line', 9958
-# var libpaths: $P2
+.annotate 'line', 10206
     $P2 = $P1[9]
-.annotate 'line', 9959
-# var paths: $P3
+.annotate 'line', 10207
     $P3 = $P2[0]
-.annotate 'line', 9960
-# var file: $P4
+.annotate 'line', 10208
     null $P4
-.annotate 'line', 9961
+.annotate 'line', 10209
     if_null $P3, __label_2
     iter $P5, $P3
     set $P5, 0
   __label_1: # for iteration
     unless $P5 goto __label_2
     shift $S1, $P5
-# {
-.annotate 'line', 9962
-# filepath: $S2
+.annotate 'line', 10210
     concat $S3, $S1, __ARG_1
     set $S2, $S3
-.annotate 'line', 9963
-# try: create handler
+.annotate 'line', 10211
     new $P6, 'ExceptionHandler'
     set_label $P6, __label_3
     push_eh $P6
-# try: begin
-# {
-.annotate 'line', 9964
-# builtin open
+.annotate 'line', 10212
     root_new $P4, ['parrot';'FileHandle']
     $P4.'open'($S2,'r')
-.annotate 'line', 9965
-    isnull $I2, $P4
-    not $I2
-    unless $I2 goto __label_6
+.annotate 'line', 10213
+    isnull $I1, $P4
+    not $I1
+    unless $I1 goto __label_6
     $P6 = $P4.'is_closed'()
-    isfalse $I3, $P6
-    set $I1, $I3
-    goto __label_7
+    isfalse $I1, $P6
   __label_6:
-    set $I1, $I2
-  __label_7:
     unless $I1 goto __label_5
     goto __label_2 # break
   __label_5: # endif
-.annotate 'line', 9966
-# }
-# try: end
+.annotate 'line', 10214
     pop_eh
     goto __label_4
-.annotate 'line', 9963
-# catch
   __label_3:
+.annotate 'line', 10211
     .get_results($P7)
     finalize $P7
     pop_eh
-# catch end
   __label_4:
-# }
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 9971
+.annotate 'line', 10219
     isnull $I1, $P4
-    if $I1 goto __label_9
-    $P7 = $P4.'is_closed'()
-    set $P6, $P7
-    goto __label_10
-  __label_9:
     box $P6, $I1
-  __label_10:
-    if_null $P6, __label_8
-    unless $P6 goto __label_8
-.annotate 'line', 9972
+    if $P6 goto __label_8
+    $P6 = $P4.'is_closed'()
+  __label_8:
+    if_null $P6, __label_7
+    unless $P6 goto __label_7
+.annotate 'line', 10220
     WSubId_1('File not found', __ARG_2)
-  __label_8: # endif
-.annotate 'line', 9973
+  __label_7: # endif
+.annotate 'line', 10221
     $P4.'encoding'("utf8")
-.annotate 'line', 9974
+.annotate 'line', 10222
     .return($P4)
-# }
-.annotate 'line', 9975
+.annotate 'line', 10223
 
 .end # open_include
 
 
-.sub 'include_parrot' :subid('WSubId_123')
+.sub 'include_parrot' :subid('WSubId_134')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_120 = "WSubId_120"
-.const 'Sub' WSubId_22 = "WSubId_22"
-# Body
-# {
-.annotate 'line', 9979
-# var tfile: $P1
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_130 = "WSubId_130"
+.const 'Sub' WSubId_25 = "WSubId_25"
+.annotate 'line', 10227
     $P1 = __ARG_2.'get'()
-.annotate 'line', 9980
+.annotate 'line', 10228
     $P4 = $P1.'isstring'()
     isfalse $I4, $P4
     unless $I4 goto __label_1
-.annotate 'line', 9981
-    WSubId_48('literal string', $P1)
+.annotate 'line', 10229
+    WSubId_54('literal string', $P1)
   __label_1: # endif
-.annotate 'line', 9982
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 9984
-# filename: $S1
+.annotate 'line', 10230
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 10232
     $P4 = $P1.'rawstring'()
     null $S1
     if_null $P4, __label_2
     set $S1, $P4
   __label_2:
-.annotate 'line', 9985
-# var file: $P2
-    $P2 = WSubId_120($S1, __ARG_1)
-# Constant MACRO_CONST evaluated at compile time
-# for loop
-.annotate 'line', 9990
-# line: $S2
+.annotate 'line', 10233
+    $P2 = WSubId_130($S1, __ARG_1)
+.annotate 'line', 10238
     $P4 = $P2.'readline'()
     null $S2
     if_null $P4, __label_6
@@ -29854,440 +24829,346 @@
     $P5 = $P2.'eof'()
     isfalse $I4, $P5
     unless $I4 goto __label_4
-# {
-.annotate 'line', 9991
-# builtin substr
+.annotate 'line', 10239
     substr $S6, $S2, 0, 12
     ne $S6, '.macro_const', __label_7
-# {
-.annotate 'line', 9992
-# pos: $I1
+.annotate 'line', 10240
     set $I1, 12
-.annotate 'line', 9993
-# c: $S3
+.annotate 'line', 10241
     null $S3
   __label_9: # while
-.annotate 'line', 9994
-# builtin substr
+.annotate 'line', 10242
     substr $S3, $S2, $I1, 1
-    iseq $I5, $S3, " "
-    if $I5 goto __label_10
-    iseq $I6, $S3, "\t"
-    set $I4, $I6
-    goto __label_11
+    iseq $I4, $S3, " "
+    if $I4 goto __label_10
+    iseq $I4, $S3, "\t"
   __label_10:
-    set $I4, $I5
-  __label_11:
     unless $I4 goto __label_8
-.annotate 'line', 9995
+.annotate 'line', 10243
     inc $I1
     goto __label_9
   __label_8: # endwhile
-.annotate 'line', 9996
-# pos2: $I2
+.annotate 'line', 10244
     set $I2, $I1
-  __label_13: # while
-.annotate 'line', 9997
-# builtin substr
+  __label_12: # while
+.annotate 'line', 10245
     substr $S3, $S2, $I2, 1
-    isne $I8, $S3, " "
-    unless $I8 goto __label_20
-    isne $I9, $S3, "\t"
-    set $I7, $I9
-    goto __label_21
-  __label_20:
-    set $I7, $I8
-  __label_21:
-    unless $I7 goto __label_18
-.annotate 'line', 9998
-    isne $I10, $S3, "\n"
-    set $I6, $I10
-    goto __label_19
-  __label_18:
-    set $I6, $I7
-  __label_19:
-    unless $I6 goto __label_16
-    isne $I11, $S3, "\r"
-    set $I5, $I11
-    goto __label_17
+    isne $I4, $S3, " "
+    unless $I4 goto __label_16
+    isne $I4, $S3, "\t"
   __label_16:
-    set $I5, $I6
-  __label_17:
-    unless $I5 goto __label_14
-    isne $I12, $S3, ""
-    set $I4, $I12
-    goto __label_15
-  __label_14:
-    set $I4, $I5
+    unless $I4 goto __label_15
+.annotate 'line', 10246
+    isne $I4, $S3, "\n"
   __label_15:
-    unless $I4 goto __label_12
-.annotate 'line', 9999
+    unless $I4 goto __label_14
+    isne $I4, $S3, "\r"
+  __label_14:
+    unless $I4 goto __label_13
+    isne $I4, $S3, ""
+  __label_13:
+    unless $I4 goto __label_11
+.annotate 'line', 10247
     inc $I2
-    goto __label_13
-  __label_12: # endwhile
-.annotate 'line', 10000
-    ne $I2, $I1, __label_22
+    goto __label_12
+  __label_11: # endwhile
+.annotate 'line', 10248
+    ne $I2, $I1, __label_17
     goto __label_3 # continue
-  __label_22: # endif
-.annotate 'line', 10002
-# name: $S4
+  __label_17: # endif
+.annotate 'line', 10250
     sub $I4, $I2, $I1
-# builtin substr
     substr $S4, $S2, $I1, $I4
-  __label_24: # while
-.annotate 'line', 10003
-# builtin substr
+  __label_19: # while
+.annotate 'line', 10251
     substr $S3, $S2, $I2, 1
-    iseq $I5, $S3, " "
-    if $I5 goto __label_25
-    iseq $I6, $S3, "\t"
-    set $I4, $I6
-    goto __label_26
-  __label_25:
-    set $I4, $I5
-  __label_26:
-    unless $I4 goto __label_23
-.annotate 'line', 10004
+    iseq $I4, $S3, " "
+    if $I4 goto __label_20
+    iseq $I4, $S3, "\t"
+  __label_20:
+    unless $I4 goto __label_18
+.annotate 'line', 10252
     inc $I2
-    goto __label_24
-  __label_23: # endwhile
-.annotate 'line', 10005
+    goto __label_19
+  __label_18: # endwhile
+.annotate 'line', 10253
     set $I1, $I2
-  __label_28: # while
-.annotate 'line', 10006
-# builtin substr
+  __label_22: # while
+.annotate 'line', 10254
     substr $S3, $S2, $I2, 1
-    isne $I8, $S3, " "
-    unless $I8 goto __label_35
-    isne $I9, $S3, "\t"
-    set $I7, $I9
-    goto __label_36
-  __label_35:
-    set $I7, $I8
-  __label_36:
-    unless $I7 goto __label_33
-.annotate 'line', 10007
-    isne $I10, $S3, "\n"
-    set $I6, $I10
-    goto __label_34
-  __label_33:
-    set $I6, $I7
-  __label_34:
-    unless $I6 goto __label_31
-    isne $I11, $S3, "\r"
-    set $I5, $I11
-    goto __label_32
-  __label_31:
-    set $I5, $I6
-  __label_32:
-    unless $I5 goto __label_29
-    isne $I12, $S3, ""
-    set $I4, $I12
-    goto __label_30
-  __label_29:
-    set $I4, $I5
-  __label_30:
-    unless $I4 goto __label_27
-.annotate 'line', 10008
+    isne $I4, $S3, " "
+    unless $I4 goto __label_26
+    isne $I4, $S3, "\t"
+  __label_26:
+    unless $I4 goto __label_25
+.annotate 'line', 10255
+    isne $I4, $S3, "\n"
+  __label_25:
+    unless $I4 goto __label_24
+    isne $I4, $S3, "\r"
+  __label_24:
+    unless $I4 goto __label_23
+    isne $I4, $S3, ""
+  __label_23:
+    unless $I4 goto __label_21
+.annotate 'line', 10256
     inc $I2
-    goto __label_28
-  __label_27: # endwhile
-.annotate 'line', 10009
-    ne $I2, $I1, __label_37
+    goto __label_22
+  __label_21: # endwhile
+.annotate 'line', 10257
+    ne $I2, $I1, __label_27
     goto __label_3 # continue
-  __label_37: # endif
-.annotate 'line', 10011
-# value: $S5
+  __label_27: # endif
+.annotate 'line', 10259
     sub $I4, $I2, $I1
-# builtin substr
     substr $S5, $S2, $I1, $I4
-.annotate 'line', 10013
-# ivalue: $I3
+.annotate 'line', 10261
     null $I3
-.annotate 'line', 10014
-# builtin substr
+.annotate 'line', 10262
     substr $S6, $S5, 0, 2
-    iseq $I5, $S6, '0x'
-    if $I5 goto __label_40
-# builtin substr
+    iseq $I4, $S6, '0x'
+    if $I4 goto __label_30
     substr $S7, $S5, 0, 2
-    iseq $I6, $S7, '0X'
-    set $I4, $I6
-    goto __label_41
-  __label_40:
-    set $I4, $I5
-  __label_41:
-    unless $I4 goto __label_38
-.annotate 'line', 10015
-# builtin substr
+    iseq $I4, $S7, '0X'
+  __label_30:
+    unless $I4 goto __label_28
+.annotate 'line', 10263
     substr $S8, $S5, 2
     box $P5, $S8
     $P4 = $P5.'to_int'(16)
     set $I3, $P4
-    goto __label_39
-  __label_38: # else
-.annotate 'line', 10017
+    goto __label_29
+  __label_28: # else
+.annotate 'line', 10265
     set $I3, $S5
-  __label_39: # endif
-.annotate 'line', 10018
-# var cst: $P3
+  __label_29: # endif
+.annotate 'line', 10266
     $P3 = __ARG_3.'createconst'($S4, 'I', 4)
-.annotate 'line', 10020
+.annotate 'line', 10268
     new $P6, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
     getattribute $P7, __ARG_1, 'file'
     getattribute $P8, __ARG_1, 'line'
     $P6.'TokenInteger'($P7, $P8, $S4)
     set $P5, $P6
-.annotate 'line', 10019
-    $P4 = WSubId_22(__ARG_3, $P5, $I3)
+.annotate 'line', 10267
+    $P4 = WSubId_25(__ARG_3, $P5, $I3)
     $P3.'setvalue'($P4)
-# }
   __label_7: # endif
-# }
   __label_3: # for iteration
-.annotate 'line', 9990
+.annotate 'line', 10238
     $P4 = $P2.'readline'()
     set $S2, $P4
     goto __label_5
   __label_4: # for end
-.annotate 'line', 10024
+.annotate 'line', 10272
     $P2.'close'()
-# }
-.annotate 'line', 10025
+.annotate 'line', 10273
 
 .end # include_parrot
 
 
-.sub 'include_winxed' :subid('WSubId_124')
+.sub 'include_winxed' :subid('WSubId_135')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_120 = "WSubId_120"
-# Body
-# {
-.annotate 'line', 10031
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_130 = "WSubId_130"
+.annotate 'line', 10279
     isa $I2, __ARG_3, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
     not $I1, $I2
     unless $I1 goto __label_1
-.annotate 'line', 10032
+.annotate 'line', 10280
     WSubId_1("Must be used at root namespace level")
   __label_1: # endif
-.annotate 'line', 10033
-# var tfile: $P1
+.annotate 'line', 10281
     $P1 = __ARG_2.'get'()
-.annotate 'line', 10034
+.annotate 'line', 10282
     $P4 = $P1.'isstring'()
     isfalse $I1, $P4
     unless $I1 goto __label_2
-.annotate 'line', 10035
-    WSubId_48('literal string', $P1)
+.annotate 'line', 10283
+    WSubId_54('literal string', $P1)
   __label_2: # endif
-.annotate 'line', 10036
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 10038
-# filename: $S1
+.annotate 'line', 10284
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 10286
     $P4 = $P1.'rawstring'()
     null $S1
     if_null $P4, __label_3
     set $S1, $P4
   __label_3:
-.annotate 'line', 10039
-# var file: $P2
-    $P2 = WSubId_120($S1, __ARG_1)
-.annotate 'line', 10041
-# var tkinc: $P3
+.annotate 'line', 10287
+    $P2 = WSubId_130($S1, __ARG_1)
+.annotate 'line', 10289
     new $P3, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     $P3.'Tokenizer'($P2, $S1)
-.annotate 'line', 10042
+.annotate 'line', 10290
     __ARG_3.'parse'($P3)
-.annotate 'line', 10044
+.annotate 'line', 10292
     $P2.'close'()
-# }
-.annotate 'line', 10045
+.annotate 'line', 10293
 
 .end # include_winxed
 
 
-.sub 'parsensUsing' :subid('WSubId_122')
+.sub 'parsensUsing' :subid('WSubId_133')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_66 = "WSubId_66"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_63 = "WSubId_63"
+.const 'Sub' WSubId_72 = "WSubId_72"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_69 = "WSubId_69"
 .const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_65 = "WSubId_65"
-.const 'Sub' WSubId_48 = "WSubId_48"
-# Body
-# {
-.annotate 'line', 10051
-# var t: $P1
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_71 = "WSubId_71"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.annotate 'line', 10299
     $P1 = __ARG_2.'get'()
-.annotate 'line', 10052
+.annotate 'line', 10300
     $P5 = $P1.'iskeyword'('namespace')
     if_null $P5, __label_1
     unless $P5 goto __label_1
-# {
-.annotate 'line', 10053
-    WSubId_66(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 10054
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 10055
+.annotate 'line', 10301
+    WSubId_72(__ARG_1, __ARG_2, __ARG_3)
+.annotate 'line', 10302
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 10303
     .return()
-# }
   __label_1: # endif
-.annotate 'line', 10057
+.annotate 'line', 10305
     $P5 = $P1.'iskeyword'('extern')
     isfalse $I2, $P5
     unless $I2 goto __label_2
-# {
-.annotate 'line', 10058
+.annotate 'line', 10306
     __ARG_2.'unget'($P1)
-.annotate 'line', 10059
-# var key: $P2
-    $P2 = WSubId_63(__ARG_2)
-.annotate 'line', 10060
-# nelems: $I1
-# builtin elements
+.annotate 'line', 10307
+    $P2 = WSubId_69(__ARG_2)
+.annotate 'line', 10308
     elements $I1, $P2
-.annotate 'line', 10061
+.annotate 'line', 10309
     ge $I1, 1, __label_3
-.annotate 'line', 10062
+.annotate 'line', 10310
     WSubId_1('Unsupported at namespace level', $P1)
   __label_3: # endif
-.annotate 'line', 10063
-    WSubId_62(';', __ARG_2)
-.annotate 'line', 10064
+.annotate 'line', 10311
+    WSubId_68(';', __ARG_2)
+.annotate 'line', 10312
     __ARG_3.'use'($P2)
-.annotate 'line', 10065
+.annotate 'line', 10313
     .return()
-# }
   __label_2: # endif
-.annotate 'line', 10067
+.annotate 'line', 10315
     $P1 = __ARG_2.'get'()
-# switch-case
-.annotate 'line', 10069
+.annotate 'line', 10317
     $I2 = $P1.'isstring'()
     if $I2 goto __label_6
-.annotate 'line', 10075
+.annotate 'line', 10323
     $I2 = $P1.'isidentifier'()
     if $I2 goto __label_7
     goto __label_5
   __label_6: # case
-.annotate 'line', 10071
-# reqlib: $S1
+.annotate 'line', 10319
     null $S1
     if_null $P1, __label_8
     set $S1, $P1
   __label_8:
-.annotate 'line', 10072
+.annotate 'line', 10320
     __ARG_3.'addlib'($S1)
-.annotate 'line', 10073
-    WSubId_62(';', __ARG_2)
+.annotate 'line', 10321
+    WSubId_68(';', __ARG_2)
     goto __label_4 # break
   __label_7: # case
-.annotate 'line', 10076
+.annotate 'line', 10324
     __ARG_2.'unget'($P1)
-.annotate 'line', 10077
-# var module: $P3
-    $P3 = WSubId_63(__ARG_2)
-.annotate 'line', 10078
+.annotate 'line', 10325
+    $P3 = WSubId_69(__ARG_2)
+.annotate 'line', 10326
     $P1 = __ARG_2.'get'()
-.annotate 'line', 10079
+.annotate 'line', 10327
     $P5 = $P1.'isop'(';')
     isfalse $I3, $P5
     unless $I3 goto __label_9
-# {
-.annotate 'line', 10080
+.annotate 'line', 10328
     __ARG_2.'unget'($P1)
-.annotate 'line', 10081
-# var names: $P4
+.annotate 'line', 10329
     null $P5
-    $P4 = WSubId_44(__ARG_2, $P5, WSubId_65, ';')
-.annotate 'line', 10082
+    $P4 = WSubId_50(__ARG_2, $P5, WSubId_71, ';')
+.annotate 'line', 10330
     __ARG_3.'addextern'($P3, $P4)
-# }
   __label_9: # endif
-.annotate 'line', 10084
-# reqmodule: $S2
-# builtin join
+.annotate 'line', 10332
     join $S3, '/', $P3
     concat $S4, '"', $S3
     concat $S4, $S4, '.pbc"'
     set $S2, $S4
-.annotate 'line', 10085
+.annotate 'line', 10333
     __ARG_3.'addload'($S2)
     goto __label_4 # break
   __label_5: # default
-.annotate 'line', 10088
-    WSubId_48('string literal or identifier', $P1)
+.annotate 'line', 10336
+    WSubId_54('string literal or identifier', $P1)
   __label_4: # switch end
-# }
-.annotate 'line', 10090
+.annotate 'line', 10338
 
 .end # parsensUsing
+
+
+.sub 'emit_push_symbols' :subid('WSubId_131')
+        .param string __ARG_1
+.annotate 'line', 10344
+    concat $S1, "    push symbols, '", __ARG_1
+    concat $S1, $S1, "'\n"
+    .return($S1)
+.annotate 'line', 10345
+
+.end # emit_push_symbols
 
 .namespace [ 'Winxed'; 'Compiler'; 'External' ]
 
 .sub 'External' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 10100
+.annotate 'line', 10353
     setattribute self, 'module', __ARG_1
-.annotate 'line', 10101
+.annotate 'line', 10354
     setattribute self, 'names', __ARG_2
-# }
-.annotate 'line', 10102
+.annotate 'line', 10355
 
 .end # External
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10107
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_131 = "WSubId_131"
+.annotate 'line', 10360
     __ARG_1.'say'(".sub 'importextern' :anon :load :init\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
-.annotate 'line', 10116
-# builtin string
-.annotate 'line', 10117
+.annotate 'line', 10370
     getattribute $P1, self, 'module'
-# builtin join
-    join $S2, "'; '", $P1
-    concat $S3, "['parrot'; '", $S2
-    concat $S3, $S3, "']"
-.annotate 'line', 10116
-    __ARG_1.'emitget_root_namespace'("srcns", $S3)
-.annotate 'line', 10119
-    getattribute $P1, self, 'names'
-    if_null $P1, __label_2
-    iter $P2, $P1
-    set $P2, 0
-  __label_1: # for iteration
-    unless $P2 goto __label_2
-    shift $S1, $P2
-.annotate 'line', 10120
-    __ARG_1.'say'("    push symbols, '", $S1, "'")
-    goto __label_1
-  __label_2: # endfor
-.annotate 'line', 10121
+    join $S1, "'; '", $P1
+    concat $S2, "['parrot'; '", $S1
+    concat $S2, $S2, "']"
+.annotate 'line', 10369
+    __ARG_1.'emitget_root_namespace'("srcns", $S2)
+.annotate 'line', 10372
+    getattribute $P2, self, 'names'
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    $P1 = WSubId_31($P2, $P3, WSubId_131)
+    join $S1, "", $P1
+    __ARG_1.'print'($S1)
+.annotate 'line', 10373
     __ARG_1.'say'("    ex.'destination'(curns)\n    ex.'import'(srcns :named('source'), curns :named('destination'), symbols :named('globals'))\n.end\n")
-# }
-.annotate 'line', 10127
+.annotate 'line', 10379
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'External' ]
-.annotate 'line', 10096
+.annotate 'line', 10349
     addattribute $P0, 'module'
-.annotate 'line', 10097
+.annotate 'line', 10350
     addattribute $P0, 'names'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
@@ -30295,88 +25176,70 @@
 .sub 'NamespacePath' :method
         .param string __ARG_1 :optional
         .param int __ARG_2 :optional
-# Body
-# {
-.annotate 'line', 10137
+.annotate 'line', 10389
     new $P1, ['ResizableStringArray']
-.annotate 'line', 10138
+.annotate 'line', 10390
     unless __ARG_2 goto __label_1
-.annotate 'line', 10139
+.annotate 'line', 10391
     box $P2, __ARG_1
     setattribute self, 'hll', $P2
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 10141
+.annotate 'line', 10393
     if_null __ARG_1, __label_3
-.annotate 'line', 10142
-# builtin push
+.annotate 'line', 10394
     push $P1, __ARG_1
   __label_3: # endif
-# }
   __label_2: # endif
-.annotate 'line', 10144
+.annotate 'line', 10396
     setattribute self, 'path', $P1
-# }
-.annotate 'line', 10145
+.annotate 'line', 10397
 
 .end # NamespacePath
 
 
 .sub 'createchild' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10148
-# var child: $P1
+.annotate 'line', 10400
     new $P1, [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
-.annotate 'line', 10149
+.annotate 'line', 10401
     getattribute $P4, self, 'hll'
     setattribute $P1, 'hll', $P4
-.annotate 'line', 10150
-# var path: $P2
+.annotate 'line', 10402
     getattribute $P3, self, 'path'
-# builtin clone
     clone $P2, $P3
-.annotate 'line', 10151
-# builtin push
+.annotate 'line', 10403
     push $P2, __ARG_1
-.annotate 'line', 10152
+.annotate 'line', 10404
     setattribute $P1, 'path', $P2
-.annotate 'line', 10153
+.annotate 'line', 10405
     .return($P1)
-# }
-.annotate 'line', 10154
+.annotate 'line', 10406
 
 .end # createchild
 
 
 .sub 'samehllas' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10157
-# var fromkey: $P1
+.annotate 'line', 10409
     $P1 = __ARG_1.'getpath'()
-.annotate 'line', 10158
-# var hll: $P2
+.annotate 'line', 10410
     getattribute $P2, self, 'hll'
-.annotate 'line', 10159
-# var fromhll: $P3
+.annotate 'line', 10411
     if_null $P1, __label_2
     getattribute $P3, $P1, 'hll'
     goto __label_1
   __label_2:
     null $P3
   __label_1:
-.annotate 'line', 10160
+.annotate 'line', 10412
     unless_null $P2, __label_3
-.annotate 'line', 10161
+.annotate 'line', 10413
     isnull $I1, $P3
     .return($I1)
     goto __label_4
   __label_3: # else
-.annotate 'line', 10163
+.annotate 'line', 10415
     unless_null $P3, __label_6
     null $I2
     goto __label_5
@@ -30385,25 +25248,19 @@
   __label_5:
     .return($I2)
   __label_4: # endif
-# }
-.annotate 'line', 10164
+.annotate 'line', 10416
 
 .end # samehllas
 
 
 .sub 'fullname' :method
-# Body
-# {
-.annotate 'line', 10167
-# name: $S1
+.annotate 'line', 10419
     getattribute $P1, self, 'path'
-# builtin join
     join $S1, '.', $P1
-.annotate 'line', 10168
+.annotate 'line', 10420
     getattribute $P1, self, 'hll'
     if_null $P1, __label_1
-# builtin string
-.annotate 'line', 10169
+.annotate 'line', 10421
     getattribute $P2, self, 'hll'
     set $S2, $P2
     concat $S3, $S2, '.'
@@ -30411,116 +25268,89 @@
     .return($S3)
     goto __label_2
   __label_1: # else
-.annotate 'line', 10171
+.annotate 'line', 10423
     .return($S1)
   __label_2: # endif
-# }
-.annotate 'line', 10172
+.annotate 'line', 10424
 
 .end # fullname
 
 
 .sub 'getparrotkey' :method
-# Body
-# {
-.annotate 'line', 10175
-# var path: $P1
+.annotate 'line', 10427
     getattribute $P1, self, 'path'
-.annotate 'line', 10176
-# r: $S1
+.annotate 'line', 10428
     null $S1
-.annotate 'line', 10177
-# builtin elements
+.annotate 'line', 10429
     elements $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 10178
-# builtin string
-# builtin join
+.annotate 'line', 10430
     join $S2, "'; '", $P1
     concat $S3, "[ '", $S2
     concat $S3, $S3, "' ]"
     set $S1, $S3
   __label_1: # endif
-.annotate 'line', 10179
+.annotate 'line', 10431
     .return($S1)
-# }
-.annotate 'line', 10180
+.annotate 'line', 10432
 
 .end # getparrotkey
 
 
 .sub 'getparrotrootkey' :method
-# Body
-# {
-.annotate 'line', 10183
-# var path: $P1
+.annotate 'line', 10435
     getattribute $P1, self, 'path'
-.annotate 'line', 10184
-# var hll: $P2
+.annotate 'line', 10436
     getattribute $P2, self, 'hll'
-.annotate 'line', 10185
-# r: $S1
+.annotate 'line', 10437
     set $S1, "[ '"
-.annotate 'line', 10186
+.annotate 'line', 10438
     if_null $P2, __label_1
-# {
-.annotate 'line', 10189
+.annotate 'line', 10441
     set $S3, $P2
-# builtin downcase
     downcase $S2, $S3
     concat $S1, $S1, $S2
-# }
     goto __label_2
   __label_1: # else
-.annotate 'line', 10192
+.annotate 'line', 10444
     concat $S1, $S1, "parrot"
   __label_2: # endif
-.annotate 'line', 10193
+.annotate 'line', 10445
     concat $S1, $S1, "'"
-.annotate 'line', 10194
-# builtin elements
+.annotate 'line', 10446
     elements $I1, $P1
     unless $I1 goto __label_3
-.annotate 'line', 10195
-# builtin string
-# builtin join
+.annotate 'line', 10447
     join $S2, "'; '", $P1
     concat $S1, $S1, "; '"
     concat $S1, $S1, $S2
     concat $S1, $S1, "'"
   __label_3: # endif
-.annotate 'line', 10196
+.annotate 'line', 10448
     concat $S1, $S1, " ]"
-.annotate 'line', 10197
+.annotate 'line', 10449
     .return($S1)
-# }
-.annotate 'line', 10198
+.annotate 'line', 10450
 
 .end # getparrotrootkey
 
 
 .sub 'emitnamespace' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10201
-# var path: $P1
+.annotate 'line', 10453
     getattribute $P1, self, 'path'
-.annotate 'line', 10202
+.annotate 'line', 10454
     __ARG_1.'print'(".namespace [ ")
-.annotate 'line', 10203
-# builtin elements
+.annotate 'line', 10455
     elements $I1, $P1
     unless $I1 goto __label_1
-.annotate 'line', 10204
-# builtin join
+.annotate 'line', 10456
     join $S1, "'; '", $P1
     __ARG_1.'print'("'", $S1, "' ")
   __label_1: # endif
-.annotate 'line', 10205
+.annotate 'line', 10457
     __ARG_1.'say'("]")
-# }
-.annotate 'line', 10206
+.annotate 'line', 10458
 
 .end # emitnamespace
 
@@ -30530,47 +25360,37 @@
         .param pmc __ARG_2
         .param string __ARG_3
         .param string __ARG_4 :optional
-# Body
-# {
-.annotate 'line', 10209
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 10461
     $P1 = self.'samehllas'(__ARG_2)
     if_null $P1, __label_1
     unless $P1 goto __label_1
-# {
-.annotate 'line', 10210
-    __ARG_1.'print'('    ', 'new ', __ARG_3, ", ")
-.annotate 'line', 10211
-    $P1 = self.'getparrotkey'()
-    __ARG_1.'print'($P1)
-# }
+.annotate 'line', 10463
+    $P3 = self.'getparrotkey'()
+.annotate 'line', 10462
+    $P2 = WSubId_26("    new %0, %1", __ARG_3, $P3)
+    __ARG_1.'print'($P2)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 10214
-    __ARG_1.'print'('    ', 'root_new ', __ARG_3, ", ")
-.annotate 'line', 10215
-    $P1 = self.'getparrotrootkey'()
-    __ARG_1.'print'($P1)
-# }
+.annotate 'line', 10466
+    $P5 = self.'getparrotrootkey'()
+.annotate 'line', 10465
+    $P4 = WSubId_26("    root_new %0, %1", __ARG_3, $P5)
+    __ARG_1.'print'($P4)
   __label_2: # endif
-.annotate 'line', 10217
-    isnull $I2, __ARG_4
-    not $I2
-    unless $I2 goto __label_4
-    isne $I3, __ARG_4, ''
-    set $I1, $I3
-    goto __label_5
+.annotate 'line', 10467
+    isnull $I1, __ARG_4
+    not $I1
+    unless $I1 goto __label_4
+    isne $I1, __ARG_4, ''
   __label_4:
-    set $I1, $I2
-  __label_5:
     unless $I1 goto __label_3
-.annotate 'line', 10218
+.annotate 'line', 10468
     __ARG_1.'print'(__ARG_4)
   __label_3: # endif
-.annotate 'line', 10219
+.annotate 'line', 10469
     __ARG_1.'say'()
-# }
-.annotate 'line', 10220
+.annotate 'line', 10470
 
 .end # emit_new
 
@@ -30579,23 +25399,20 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 10223
+.annotate 'line', 10473
     $P1 = self.'samehllas'(__ARG_2)
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 10224
+.annotate 'line', 10474
     $P2 = self.'getparrotkey'()
     __ARG_1.'emitget_hll_namespace'(__ARG_3, $P2)
     goto __label_2
   __label_1: # else
-.annotate 'line', 10226
+.annotate 'line', 10476
     $P3 = self.'getparrotrootkey'()
     __ARG_1.'emitget_root_namespace'(__ARG_3, $P3)
   __label_2: # endif
-# }
-.annotate 'line', 10227
+.annotate 'line', 10477
 
 .end # emit_get_namespace
 
@@ -30604,63 +25421,56 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-# Body
-# {
-.annotate 'line', 10230
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 10480
     $P3 = self.'samehllas'(__ARG_2)
     if_null $P3, __label_1
     unless $P3 goto __label_1
-.annotate 'line', 10231
-    $P4 = self.'getparrotkey'()
-    __ARG_1.'say'("    get_class ", __ARG_3, ", ", $P4)
+.annotate 'line', 10482
+    $P5 = self.'getparrotkey'()
+.annotate 'line', 10481
+    $P4 = WSubId_26("    get_class %0, %1", __ARG_3, $P5)
+    __ARG_1.'say'($P4)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 10236
-# var hll: $P1
+.annotate 'line', 10487
     getattribute $P1, self, 'hll'
-.annotate 'line', 10237
-# var path: $P2
+.annotate 'line', 10488
     getattribute $P3, self, 'path'
-# builtin clone
     clone $P2, $P3
-.annotate 'line', 10238
-# name: $S1
+.annotate 'line', 10489
     $P3 = $P2.'pop'()
     null $S1
     if_null $P3, __label_3
     set $S1, $P3
   __label_3:
-.annotate 'line', 10239
-# shll: $S2
+.annotate 'line', 10490
     if_null $P1, __label_5
     set $S3, $P1
-# builtin downcase
     downcase $S2, $S3
     goto __label_4
   __label_5:
     set $S2, 'parrot'
   __label_4:
-.annotate 'line', 10240
-# builtin elements
+.annotate 'line', 10491
     elements $I1, $P2
     unless $I1 goto __label_6
-.annotate 'line', 10242
-# builtin join
+.annotate 'line', 10494
     join $S3, "'; '", $P2
-.annotate 'line', 10241
-    __ARG_1.'say'("    get_root_global ", __ARG_3, ", ['", $S2, "'; '", $S3, "'], '", $S1, "'")
+.annotate 'line', 10492
+    $P3 = WSubId_26("    get_root_global %0, ['%1'; '%2'], '%3'", __ARG_3, $S2, $S3, $S1)
+    __ARG_1.'say'($P3)
     goto __label_7
   __label_6: # else
-.annotate 'line', 10244
-    __ARG_1.'say'("    get_root_global ", __ARG_3, ", ['", $S2, "'], '", $S1, "'")
+.annotate 'line', 10496
+    $P4 = WSubId_26("    get_root_global %0, ['%1'], '%2'", __ARG_3, $S2, $S1)
+    __ARG_1.'say'($P4)
   __label_7: # endif
-.annotate 'line', 10246
-    __ARG_1.'say'("    get_class ", __ARG_3, ", ", __ARG_3)
-# }
+.annotate 'line', 10499
+    $P3 = WSubId_26("    get_class %0, %0", __ARG_3)
+    __ARG_1.'say'($P3)
   __label_2: # endif
-# }
-.annotate 'line', 10248
+.annotate 'line', 10501
 
 .end # emit_get_class
 
@@ -30670,31 +25480,28 @@
         .param pmc __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-# Body
-# {
-.annotate 'line', 10251
+.annotate 'line', 10504
     $P1 = self.'samehllas'(__ARG_2)
     if_null $P1, __label_1
     unless $P1 goto __label_1
-.annotate 'line', 10252
+.annotate 'line', 10505
     $P2 = self.'getparrotkey'()
     __ARG_1.'emitget_hll_global'(__ARG_3, __ARG_4, $P2)
     goto __label_2
   __label_1: # else
-.annotate 'line', 10254
+.annotate 'line', 10507
     $P3 = self.'getparrotrootkey'()
     __ARG_1.'emitget_root_global'(__ARG_3, __ARG_4, $P3)
   __label_2: # endif
-# }
-.annotate 'line', 10255
+.annotate 'line', 10508
 
 .end # emit_get_global
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
-.annotate 'line', 10132
+.annotate 'line', 10384
     addattribute $P0, 'hll'
-.annotate 'line', 10133
+.annotate 'line', 10385
     addattribute $P0, 'path'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
@@ -30702,72 +25509,70 @@
 .sub 'NamespaceBase' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_118 = "WSubId_118"
-# Body
-# {
-.annotate 'line', 10275
+.const 'Sub' WSubId_128 = "WSubId_128"
+.annotate 'line', 10527
+    self.'VarContainer'()
+.annotate 'line', 10528
     setattribute self, 'nspath', __ARG_1
-.annotate 'line', 10276
+.annotate 'line', 10529
     unless_null __ARG_2, __label_1
-# {
-.annotate 'line', 10277
+.annotate 'line', 10530
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'namespaces', $P2
-.annotate 'line', 10278
+.annotate 'line', 10531
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'usednamespaces', $P2
-.annotate 'line', 10279
+.annotate 'line', 10532
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'classes', $P2
-.annotate 'line', 10280
-    root_new $P2, ['parrot';'ResizablePMCArray']
-    setattribute self, 'functions', $P2
-.annotate 'line', 10281
-    root_new $P2, ['parrot';'Hash']
-    setattribute self, 'functions_name', $P2
-.annotate 'line', 10282
+.annotate 'line', 10533
+    new $P2, [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
+    $P2.'FunctionContainer'()
+    set $P2, $P2
+    setattribute self, 'funcont', $P2
+.annotate 'line', 10534
     $P1 = __ARG_1.'fullname'()
-    WSubId_118(self, '__NAMESPACE__', $P1)
-# }
+    WSubId_128(self, '__NAMESPACE__', $P1)
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 10285
+.annotate 'line', 10537
     getattribute $P2, __ARG_2, 'locals'
     setattribute self, 'locals', $P2
-.annotate 'line', 10286
+.annotate 'line', 10538
     getattribute $P2, __ARG_2, 'namespaces'
     setattribute self, 'namespaces', $P2
-.annotate 'line', 10287
+.annotate 'line', 10539
     getattribute $P2, __ARG_2, 'usednamespaces'
     setattribute self, 'usednamespaces', $P2
-.annotate 'line', 10288
+.annotate 'line', 10540
     getattribute $P2, __ARG_2, 'classes'
     setattribute self, 'classes', $P2
-.annotate 'line', 10289
-    getattribute $P2, __ARG_2, 'functions'
-    setattribute self, 'functions', $P2
-.annotate 'line', 10290
-    getattribute $P2, __ARG_2, 'functions_name'
-    setattribute self, 'functions_name', $P2
-# }
+.annotate 'line', 10541
+    getattribute $P2, __ARG_2, 'funcont'
+    setattribute self, 'funcont', $P2
   __label_2: # endif
-.annotate 'line', 10292
+.annotate 'line', 10543
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'items', $P2
-# }
-.annotate 'line', 10293
+.annotate 'line', 10544
 
 .end # NamespaceBase
 
 
+.sub 'addfunction' :method
+        .param pmc __ARG_1
+.annotate 'line', 10547
+    getattribute $P1, self, 'funcont'
+    $P1.'addfunction'(__ARG_1)
+.annotate 'line', 10548
+
+.end # addfunction
+
+
 .sub 'fixnamespaces' :method
-# Body
-# {
-.annotate 'line', 10296
-# var ns: $P1
+.annotate 'line', 10551
     null $P1
-.annotate 'line', 10297
+.annotate 'line', 10552
     getattribute $P3, self, 'namespaces'
     if_null $P3, __label_2
     iter $P4, $P3
@@ -30775,11 +25580,11 @@
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $P1, $P4
-.annotate 'line', 10298
+.annotate 'line', 10553
     $P1.'fixnamespaces'()
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 10299
+.annotate 'line', 10554
     getattribute $P3, self, 'usednamespaces'
     if_null $P3, __label_4
     iter $P5, $P3
@@ -30787,7 +25592,7 @@
   __label_3: # for iteration
     unless $P5 goto __label_4
     shift $P1, $P5
-.annotate 'line', 10300
+.annotate 'line', 10555
     getattribute $P6, $P1, 'usednamespaces'
     if_null $P6, __label_6
     iter $P7, $P6
@@ -30795,122 +25600,90 @@
   __label_5: # for iteration
     unless $P7 goto __label_6
     shift $P2, $P7
-.annotate 'line', 10301
+.annotate 'line', 10556
     self.'usenamespace'($P2)
     goto __label_5
   __label_6: # endfor
     goto __label_3
   __label_4: # endfor
-# }
-.annotate 'line', 10302
+.annotate 'line', 10557
 
 .end # fixnamespaces
 
 
 .sub 'getpath' :method
-# Body
-# {
-.annotate 'line', 10305
+.annotate 'line', 10560
     getattribute $P1, self, 'nspath'
     .return($P1)
-# }
-.annotate 'line', 10306
+.annotate 'line', 10561
 
 .end # getpath
 
 
 .sub 'usenamespace' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10309
+.const 'Sub' WSubId_124 = "WSubId_124"
+.annotate 'line', 10564
     ne_addr __ARG_1, self, __label_1
-.annotate 'line', 10310
+.annotate 'line', 10565
     .return()
   __label_1: # endif
-.annotate 'line', 10311
-# var usednamespaces: $P1
+.annotate 'line', 10566
     getattribute $P1, self, 'usednamespaces'
-.annotate 'line', 10312
-    if_null $P1, __label_3
-    iter $P3, $P1
-    set $P3, 0
-  __label_2: # for iteration
-    unless $P3 goto __label_3
-    shift $P2, $P3
-.annotate 'line', 10313
-    ne_addr $P2, __ARG_1, __label_4
-.annotate 'line', 10314
+.annotate 'line', 10567
+    $P2 = WSubId_124($P1, __ARG_1)
+    if_null $P2, __label_2
+.annotate 'line', 10568
     .return()
-  __label_4: # endif
-    goto __label_2
-  __label_3: # endfor
-.annotate 'line', 10315
-# builtin push
+  __label_2: # endif
+.annotate 'line', 10569
     push $P1, __ARG_1
-# }
-.annotate 'line', 10316
+.annotate 'line', 10570
 
 .end # usenamespace
 
 
 .sub 'use' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10319
-# var sym: $P1
+.annotate 'line', 10573
     $P1 = self.'scopesearch'(__ARG_1, 0)
-.annotate 'line', 10320
+.annotate 'line', 10574
     if_null $P1, __label_1
-# {
-.annotate 'line', 10321
+.annotate 'line', 10575
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     unless $I1 goto __label_3
-.annotate 'line', 10322
-    getattribute $P3, self, 'functions'
-# builtin push
-    push $P3, $P1
+.annotate 'line', 10576
+    self.'addfunction'($P1)
   __label_3: # endif
-# }
     goto __label_2
   __label_1: # else
-# {
-.annotate 'line', 10325
-# name: $S1
+.annotate 'line', 10579
     $P3 = __ARG_1.'pop'()
     null $S1
     if_null $P3, __label_4
     set $S1, $P3
   __label_4:
-.annotate 'line', 10326
-# var ns: $P2
+.annotate 'line', 10580
     $P2 = self.'scopesearch'(__ARG_1, 1)
-.annotate 'line', 10327
+.annotate 'line', 10581
     if_null $P2, __label_5
-# {
-.annotate 'line', 10328
+.annotate 'line', 10582
     $P1 = $P2.'getvar'($S1)
-.annotate 'line', 10329
+.annotate 'line', 10583
     if_null $P1, __label_6
-.annotate 'line', 10330
+.annotate 'line', 10584
     self.'createvarused'($S1, $P1)
   __label_6: # endif
-# }
   __label_5: # endif
-# }
   __label_2: # endif
-# }
-.annotate 'line', 10333
+.annotate 'line', 10587
 
 .end # use
 
 
 .sub 'getusedns' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10336
+.annotate 'line', 10590
     getattribute $P2, self, 'usednamespaces'
     if_null $P2, __label_2
     iter $P3, $P2
@@ -30918,29 +25691,26 @@
   __label_1: # for iteration
     unless $P3 goto __label_2
     shift $P1, $P3
-.annotate 'line', 10337
+.annotate 'line', 10591
     getattribute $P4, $P1, 'name'
     set $S1, $P4
     ne $S1, __ARG_1, __label_3
-.annotate 'line', 10338
+.annotate 'line', 10592
     .return($P1)
   __label_3: # endif
     goto __label_1
   __label_2: # endfor
     null $P2
-.annotate 'line', 10339
+.annotate 'line', 10593
     .return($P2)
-# }
-.annotate 'line', 10340
+.annotate 'line', 10594
 
 .end # getusedns
 
 
 .sub 'getlocalns' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10343
+.annotate 'line', 10597
     getattribute $P2, self, 'namespaces'
     if_null $P2, __label_2
     iter $P3, $P2
@@ -30948,19 +25718,18 @@
   __label_1: # for iteration
     unless $P3 goto __label_2
     shift $P1, $P3
-.annotate 'line', 10344
+.annotate 'line', 10598
     getattribute $P4, $P1, 'name'
     set $S1, $P4
     ne $S1, __ARG_1, __label_3
-.annotate 'line', 10345
+.annotate 'line', 10599
     .return($P1)
   __label_3: # endif
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 10346
+.annotate 'line', 10600
     .tailcall self.'getusedns'(__ARG_1)
-# }
-.annotate 'line', 10347
+.annotate 'line', 10601
 
 .end # getlocalns
 
@@ -30968,18 +25737,14 @@
 .sub 'addextern' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 10351
-# var ext: $P1
+.annotate 'line', 10605
     new $P1, [ 'Winxed'; 'Compiler'; 'External' ]
     $P1.'External'(__ARG_1, __ARG_2)
-.annotate 'line', 10352
-# var externals: $P2
+.annotate 'line', 10606
     getattribute $P2, self, 'externals'
-.annotate 'line', 10353
+.annotate 'line', 10607
     unless_null $P2, __label_1
-.annotate 'line', 10354
+.annotate 'line', 10608
     root_new $P4, ['parrot';'ResizablePMCArray']
     assign $P4, 1
     $P4[0] = $P1
@@ -30987,101 +25752,73 @@
     setattribute self, 'externals', $P2
     goto __label_2
   __label_1: # else
-.annotate 'line', 10356
-# builtin push
+.annotate 'line', 10610
     push $P2, $P1
   __label_2: # endif
-# }
-.annotate 'line', 10357
+.annotate 'line', 10611
 
 .end # addextern
 
 
 .sub 'checkclass_base' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10361
-# var classes: $P1
-    getattribute $P1, self, 'classes'
-.annotate 'line', 10362
-# var cl: $P2
-    null $P2
-.annotate 'line', 10363
-    if_null $P1, __label_2
-    iter $P4, $P1
+.annotate 'line', 10615
+    null $P1
+.annotate 'line', 10616
+    getattribute $P3, self, 'classes'
+    if_null $P3, __label_2
+    iter $P4, $P3
     set $P4, 0
   __label_1: # for iteration
     unless $P4 goto __label_2
-    shift $P2, $P4
-.annotate 'line', 10364
-    getattribute $P5, $P2, 'name'
+    shift $P1, $P4
+.annotate 'line', 10617
+    getattribute $P5, $P1, 'name'
     set $S1, $P5
     ne $S1, __ARG_1, __label_3
-.annotate 'line', 10365
-    .return($P2)
+.annotate 'line', 10618
+    .return($P1)
   __label_3: # endif
     goto __label_1
   __label_2: # endfor
-.annotate 'line', 10366
-    getattribute $P5, self, 'usednamespaces'
-    if_null $P5, __label_5
-    iter $P6, $P5
+.annotate 'line', 10619
+    getattribute $P3, self, 'usednamespaces'
+    if_null $P3, __label_5
+    iter $P6, $P3
     set $P6, 0
   __label_4: # for iteration
     unless $P6 goto __label_5
-    shift $P3, $P6
-.annotate 'line', 10367
-    $P2 = $P3.'checkclass_base'(__ARG_1)
-    if_null $P2, __label_6
-.annotate 'line', 10368
-    .return($P2)
+    shift $P2, $P6
+.annotate 'line', 10620
+    $P1 = $P2.'checkclass_base'(__ARG_1)
+    if_null $P1, __label_6
+.annotate 'line', 10621
+    .return($P1)
   __label_6: # endif
     goto __label_4
   __label_5: # endfor
-    null $P5
-.annotate 'line', 10369
-    .return($P5)
-# }
-.annotate 'line', 10370
+    null $P3
+.annotate 'line', 10622
+    .return($P3)
+.annotate 'line', 10623
 
 .end # checkclass_base
 
 
 .sub 'findsymbolbyname' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10373
-# var sym: $P1
+.annotate 'line', 10626
     $P1 = self.'checkclass_base'(__ARG_1)
-.annotate 'line', 10374
+.annotate 'line', 10627
     if_null $P1, __label_1
-.annotate 'line', 10375
+.annotate 'line', 10628
     .return($P1)
   __label_1: # endif
-.annotate 'line', 10376
-    getattribute $P2, self, 'functions'
-    if_null $P2, __label_3
-    iter $P3, $P2
-    set $P3, 0
-  __label_2: # for iteration
-    unless $P3 goto __label_3
-    shift $P1, $P3
-.annotate 'line', 10377
-    getattribute $P4, $P1, 'name'
-    set $S1, $P4
-    ne $S1, __ARG_1, __label_4
-.annotate 'line', 10378
-    .return($P1)
-  __label_4: # endif
-    goto __label_2
-  __label_3: # endfor
-    null $P2
-.annotate 'line', 10379
-    .return($P2)
-# }
-.annotate 'line', 10380
+.annotate 'line', 10629
+    getattribute $P2, self, 'funcont'
+.annotate 'line', 10630
+    .tailcall $P2.'find'(__ARG_1)
+.annotate 'line', 10631
 
 .end # findsymbolbyname
 
@@ -31090,57 +25827,43 @@
         .param pmc __ARG_1
         .param int __ARG_2
         .param int __ARG_3
-# Body
-# {
-.annotate 'line', 10385
-# keylen: $I1
-# builtin elements
+.annotate 'line', 10636
     elements $I1, __ARG_1
-.annotate 'line', 10386
-# name: $S1
+.annotate 'line', 10637
     null $S1
-.annotate 'line', 10387
-# var sym: $P1
+.annotate 'line', 10638
     null $P1
-.annotate 'line', 10388
-# var ns: $P2
+.annotate 'line', 10639
     null $P2
-# switch
-.annotate 'line', 10389
+.annotate 'line', 10640
     sub $I2, $I1, __ARG_3
-    null $I3
-    if $I2 == $I3 goto __label_3
-    set $I3, 1
-    if $I2 == $I3 goto __label_4
+    if $I2 == 0 goto __label_3
+    if $I2 == 1 goto __label_4
     goto __label_2
   __label_3: # case
     goto __label_1 # break
   __label_4: # case
-.annotate 'line', 10393
+.annotate 'line', 10644
     sub $I4, $I1, 1
     $S1 = __ARG_1[$I4]
-# switch
-.annotate 'line', 10394
-    set $I5, __ARG_2
-    set $I6, 1
-    if $I5 == $I6 goto __label_7
-    set $I6, 2
-    if $I5 == $I6 goto __label_8
+.annotate 'line', 10645
+    if __ARG_2 == 1 goto __label_7
+    if __ARG_2 == 2 goto __label_8
     goto __label_6
   __label_7: # case
-.annotate 'line', 10396
+.annotate 'line', 10647
     .tailcall self.'getlocalns'($S1)
   __label_8: # case
-.annotate 'line', 10398
+.annotate 'line', 10649
     .tailcall self.'checkclass_base'($S1)
   __label_6: # default
-.annotate 'line', 10401
+.annotate 'line', 10652
     $P1 = self.'findsymbolbyname'($S1)
     if_null $P1, __label_9
-.annotate 'line', 10402
+.annotate 'line', 10653
     .return($P1)
   __label_9: # endif
-.annotate 'line', 10403
+.annotate 'line', 10654
     getattribute $P3, self, 'usednamespaces'
     if_null $P3, __label_11
     iter $P4, $P3
@@ -31148,10 +25871,10 @@
   __label_10: # for iteration
     unless $P4 goto __label_11
     shift $P2, $P4
-.annotate 'line', 10404
+.annotate 'line', 10655
     $P1 = $P2.'findsymbolbyname'($S1)
     if_null $P1, __label_12
-.annotate 'line', 10405
+.annotate 'line', 10656
     .return($P1)
   __label_12: # endif
     goto __label_10
@@ -31159,54 +25882,45 @@
   __label_5: # switch end
     goto __label_1 # break
   __label_2: # default
-.annotate 'line', 10412
+.annotate 'line', 10663
     $S1 = __ARG_1[__ARG_3]
-.annotate 'line', 10413
+.annotate 'line', 10664
     $P2 = self.'getlocalns'($S1)
-.annotate 'line', 10414
-    isnull $I8, $P2
-    not $I8
-    unless $I8 goto __label_14
-.annotate 'line', 10415
-    add $I10, __ARG_3, 1
-    $P1 = $P2.'scopesearchlocal'(__ARG_1, __ARG_2, $I10)
-    isnull $I9, $P1
-    not $I9
-    set $I7, $I9
-    goto __label_15
+.annotate 'line', 10665
+    isnull $I6, $P2
+    not $I6
+    unless $I6 goto __label_14
+.annotate 'line', 10666
+    add $I7, __ARG_3, 1
+    $P1 = $P2.'scopesearchlocal'(__ARG_1, __ARG_2, $I7)
+    isnull $I6, $P1
+    not $I6
   __label_14:
-    set $I7, $I8
-  __label_15:
-    unless $I7 goto __label_13
-.annotate 'line', 10416
+    unless $I6 goto __label_13
+.annotate 'line', 10667
     .return($P1)
   __label_13: # endif
-.annotate 'line', 10417
+.annotate 'line', 10668
     $P2 = self.'getusedns'($S1)
-.annotate 'line', 10418
-    isnull $I12, $P2
-    not $I12
-    unless $I12 goto __label_17
-.annotate 'line', 10419
-    add $I14, __ARG_3, 1
-    $P1 = $P2.'scopesearchlocal'(__ARG_1, __ARG_2, $I14)
-    isnull $I13, $P1
-    not $I13
-    set $I11, $I13
-    goto __label_18
-  __label_17:
-    set $I11, $I12
-  __label_18:
-    unless $I11 goto __label_16
-.annotate 'line', 10420
+.annotate 'line', 10669
+    isnull $I8, $P2
+    not $I8
+    unless $I8 goto __label_16
+.annotate 'line', 10670
+    add $I9, __ARG_3, 1
+    $P1 = $P2.'scopesearchlocal'(__ARG_1, __ARG_2, $I9)
+    isnull $I8, $P1
+    not $I8
+  __label_16:
+    unless $I8 goto __label_15
+.annotate 'line', 10671
     .return($P1)
-  __label_16: # endif
+  __label_15: # endif
   __label_1: # switch end
     null $P3
-.annotate 'line', 10422
+.annotate 'line', 10673
     .return($P3)
-# }
-.annotate 'line', 10423
+.annotate 'line', 10674
 
 .end # scopesearchlocal
 
@@ -31214,21 +25928,16 @@
 .sub 'declarenamespace' :method
         .param pmc __ARG_1
         .param string __ARG_2
-# Body
-# {
-.annotate 'line', 10426
-# var child: $P1
+.annotate 'line', 10677
     new $P1, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
     null $P2
     $P1.'NamespaceStatement'(self, __ARG_1, $P2, __ARG_2, $P2)
-.annotate 'line', 10427
+.annotate 'line', 10678
     getattribute $P2, self, 'namespaces'
-# builtin push
     push $P2, $P1
-.annotate 'line', 10428
+.annotate 'line', 10679
     .return($P1)
-# }
-.annotate 'line', 10429
+.annotate 'line', 10680
 
 .end # declarenamespace
 
@@ -31237,59 +25946,43 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param pmc __ARG_3
-# Body
-# {
-.annotate 'line', 10432
-# var existns: $P1
+.annotate 'line', 10683
     $P1 = self.'getlocalns'(__ARG_2)
-.annotate 'line', 10433
-# var child: $P2
+.annotate 'line', 10684
     new $P2, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
     $P2.'NamespaceStatement'(self, __ARG_1, $P1, __ARG_2, __ARG_3)
-.annotate 'line', 10434
+.annotate 'line', 10685
     getattribute $P3, self, 'namespaces'
-# builtin push
     push $P3, $P2
-.annotate 'line', 10435
+.annotate 'line', 10686
     getattribute $P3, self, 'items'
-# builtin push
     push $P3, $P2
-.annotate 'line', 10436
+.annotate 'line', 10687
     .return($P2)
-# }
-.annotate 'line', 10437
+.annotate 'line', 10688
 
 .end # childnamespace
 
 
 .sub 'declareclass' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10440
+.annotate 'line', 10691
     getattribute $P1, self, 'classes'
-# builtin push
     push $P1, __ARG_1
-# }
-.annotate 'line', 10441
+.annotate 'line', 10692
 
 .end # declareclass
 
 
 .sub 'addclass' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10444
+.annotate 'line', 10695
     getattribute $P1, self, 'classes'
-# builtin push
     push $P1, __ARG_1
-.annotate 'line', 10445
+.annotate 'line', 10696
     getattribute $P1, self, 'items'
-# builtin push
     push $P1, __ARG_1
-# }
-.annotate 'line', 10446
+.annotate 'line', 10697
 
 .end # addclass
 
@@ -31298,342 +25991,261 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_4 = "WSubId_4"
-# Body
-# {
-.annotate 'line', 10449
-# var t: $P1
+.annotate 'line', 10700
     $P1 = __ARG_2.'get'()
-.annotate 'line', 10450
-# name: $S1
+.annotate 'line', 10701
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-.annotate 'line', 10451
+.annotate 'line', 10702
     $P1 = __ARG_2.'get'()
-.annotate 'line', 10453
-# var parent: $P2
+.annotate 'line', 10704
     set $P2, self
-# for loop
   __label_4: # for condition
-.annotate 'line', 10454
+.annotate 'line', 10705
     $P5 = $P1.'isop'('.')
     if_null $P5, __label_3
     unless $P5 goto __label_3
-# {
-.annotate 'line', 10455
+.annotate 'line', 10706
     null $P6
     $P2 = $P2.'childnamespace'(__ARG_1, $S1, $P6)
-.annotate 'line', 10456
+.annotate 'line', 10707
     $P5 = __ARG_2.'get'()
     set $S1, $P5
-# }
   __label_2: # for iteration
-.annotate 'line', 10454
+.annotate 'line', 10705
     $P1 = __ARG_2.'get'()
     goto __label_4
   __label_3: # for end
-.annotate 'line', 10459
-# var modifier: $P3
+.annotate 'line', 10710
     null $P3
-.annotate 'line', 10460
+.annotate 'line', 10711
     $P5 = $P1.'isop'('[')
     if_null $P5, __label_5
     unless $P5 goto __label_5
-# {
-.annotate 'line', 10461
+.annotate 'line', 10712
     new $P6, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     $P6.'ModifierList'(__ARG_2, self)
     set $P3, $P6
-.annotate 'line', 10462
+.annotate 'line', 10713
     $P1 = __ARG_2.'get'()
-# }
   __label_5: # endif
-.annotate 'line', 10465
+.annotate 'line', 10716
     WSubId_4('{', $P1)
-.annotate 'line', 10466
-# var child: $P4
+.annotate 'line', 10717
     $P4 = $P2.'childnamespace'(__ARG_1, $S1, $P3)
-.annotate 'line', 10467
+.annotate 'line', 10718
     $P4.'parse'(__ARG_2)
-# }
-.annotate 'line', 10468
+.annotate 'line', 10719
 
 .end # parsenamespace
 
 
+.sub 'parseextern' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_1 = "WSubId_1"
+.const 'Sub' WSubId_108 = "WSubId_108"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.annotate 'line', 10724
+    $P1 = __ARG_1.'get'()
+.annotate 'line', 10725
+    $P3 = $P1.'iskeyword'('function')
+    isfalse $I1, $P3
+    unless $I1 goto __label_1
+.annotate 'line', 10726
+    WSubId_1('Unsupported extern', $P1)
+  __label_1: # endif
+.annotate 'line', 10727
+    $P1 = __ARG_1.'get'()
+.annotate 'line', 10728
+    WSubId_108($P1)
+.annotate 'line', 10729
+    WSubId_68(';', __ARG_1)
+.annotate 'line', 10730
+    new $P2, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    $P2.'FunctionExtern'($P1, self)
+.annotate 'line', 10731
+    self.'addfunction'($P2)
+.annotate 'line', 10732
+
+.end # parseextern
+
+
 .sub 'parse' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
-.const 'Sub' WSubId_121 = "WSubId_121"
-.const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_102 = "WSubId_102"
-.const 'Sub' WSubId_62 = "WSubId_62"
-.const 'Sub' WSubId_122 = "WSubId_122"
-.const 'Sub' WSubId_123 = "WSubId_123"
-.const 'Sub' WSubId_124 = "WSubId_124"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_49 = "WSubId_49"
-# Body
-# {
-.annotate 'line', 10471
-# var items: $P1
+.const 'Sub' WSubId_58 = "WSubId_58"
+.const 'Sub' WSubId_132 = "WSubId_132"
+.const 'Sub' WSubId_133 = "WSubId_133"
+.const 'Sub' WSubId_134 = "WSubId_134"
+.const 'Sub' WSubId_135 = "WSubId_135"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_68 = "WSubId_68"
+.const 'Sub' WSubId_55 = "WSubId_55"
+.annotate 'line', 10735
     getattribute $P1, self, 'items'
-.annotate 'line', 10472
-# var functions: $P2
-    getattribute $P2, self, 'functions'
-.annotate 'line', 10473
-# var functions_name: $P3
-    getattribute $P3, self, 'functions_name'
-.annotate 'line', 10474
-# var classes: $P4
-    getattribute $P4, self, 'classes'
-.annotate 'line', 10475
-# var t: $P5
-    null $P5
-# for loop
-.annotate 'line', 10476
-    $P5 = __ARG_1.'get'()
+.annotate 'line', 10736
+    null $P2
+.annotate 'line', 10737
+    $P2 = __ARG_1.'get'()
   __label_3: # for condition
-    $P12 = $P5.'iseof'()
-    if $P12 goto __label_4
-    $P13 = $P5.'isop'('}')
-    set $P11, $P13
-    goto __label_5
+    $P5 = $P2.'iseof'()
+    if $P5 goto __label_4
+    $P5 = $P2.'isop'('}')
   __label_4:
-    set $P11, $P12
-  __label_5:
-    isfalse $I1, $P11
+    isfalse $I1, $P5
     unless $I1 goto __label_2
-# {
-# switch
-.annotate 'line', 10478
-    $P14 = $P5.'checkkeyword'()
-    set $S2, $P14
-    set $S3, 'namespace'
-    if $S2 == $S3 goto __label_8
-    set $S3, 'const'
-    if $S2 == $S3 goto __label_9
-    set $S3, 'function'
-    if $S2 == $S3 goto __label_10
-    set $S3, 'class'
-    if $S2 == $S3 goto __label_11
-    set $S3, 'extern'
-    if $S2 == $S3 goto __label_12
-    set $S3, 'using'
-    if $S2 == $S3 goto __label_13
-    set $S3, '$include_const'
-    if $S2 == $S3 goto __label_14
-    set $S3, '$include'
-    if $S2 == $S3 goto __label_15
-    set $S3, '$load'
-    if $S2 == $S3 goto __label_16
-    set $S3, '$loadlib'
-    if $S2 == $S3 goto __label_17
-    goto __label_7
+.annotate 'line', 10739
+    $P6 = $P2.'checkkeyword'()
+    set $S2, $P6
+    if $S2 == 'namespace' goto __label_7
+    if $S2 == 'const' goto __label_8
+    if $S2 == 'function' goto __label_9
+    if $S2 == 'class' goto __label_10
+    if $S2 == 'extern' goto __label_11
+    if $S2 == 'using' goto __label_12
+    if $S2 == '$include_const' goto __label_13
+    if $S2 == '$include' goto __label_14
+    if $S2 == '$load' goto __label_15
+    if $S2 == '$loadlib' goto __label_16
+    goto __label_6
+  __label_7: # case
+.annotate 'line', 10741
+    self.'parsenamespace'($P2, __ARG_1)
+    goto __label_5 # break
   __label_8: # case
-.annotate 'line', 10480
-    self.'parsenamespace'($P5, __ARG_1)
-    goto __label_6 # break
+.annotate 'line', 10744
+    $P3 = WSubId_58($P2, __ARG_1, self)
+.annotate 'line', 10745
+    push $P1, $P3
+    goto __label_5 # break
   __label_9: # case
-.annotate 'line', 10483
-# var cst: $P6
-    $P6 = WSubId_52($P5, __ARG_1, self)
-.annotate 'line', 10484
-# builtin push
-    push $P1, $P6
-    goto __label_6 # break
-  __label_10: # case
-.annotate 'line', 10487
-# var f: $P7
-    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    $P7.'FunctionStatement'($P5, __ARG_1, self)
-.annotate 'line', 10488
-# name: $S1
-    getattribute $P15, $P7, 'name'
+.annotate 'line', 10748
+    new $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    $P4.'FunctionStatement'($P2, __ARG_1, self)
+.annotate 'line', 10749
+    getattribute $P7, $P4, 'name'
     null $S1
-    if_null $P15, __label_18
-    set $S1, $P15
-  __label_18:
-.annotate 'line', 10489
-# builtin push
-    push $P2, $P7
-.annotate 'line', 10490
-# builtin push
-    push $P1, $P7
-.annotate 'line', 10491
-# var funcs: $P8
-    $P8 = $P3[$S1]
-.annotate 'line', 10492
-    if_null $P8, __label_19
-# {
-.annotate 'line', 10493
-    $P7.'setmulti'()
-.annotate 'line', 10494
-# builtin elements
-    elements $I1, $P8
-    ne $I1, 1, __label_21
-.annotate 'line', 10495
-    $P11 = $P8[0]
-    $P11.'setmulti'()
-  __label_21: # endif
-.annotate 'line', 10496
-    $P8.'push'($P7)
-# }
-    goto __label_20
-  __label_19: # else
-.annotate 'line', 10499
-    root_new $P11, ['parrot';'ResizablePMCArray']
-    assign $P11, 1
-    $P11[0] = $P7
-    $P3[$S1] = $P11
-  __label_20: # endif
-    goto __label_6 # break
+    if_null $P7, __label_17
+    set $S1, $P7
+  __label_17:
+.annotate 'line', 10750
+    self.'addfunction'($P4)
+.annotate 'line', 10751
+    push $P1, $P4
+    goto __label_5 # break
+  __label_10: # case
+.annotate 'line', 10754
+    WSubId_132($P2, __ARG_1, self)
+    goto __label_5 # break
   __label_11: # case
-.annotate 'line', 10502
-    WSubId_121($P5, __ARG_1, self)
-    goto __label_6 # break
+.annotate 'line', 10757
+    self.'parseextern'(__ARG_1)
+    goto __label_5 # break
   __label_12: # case
-.annotate 'line', 10505
-# var t1: $P9
-    $P9 = __ARG_1.'get'()
-.annotate 'line', 10506
-    $P12 = $P9.'iskeyword'('function')
-    isfalse $I1, $P12
-    unless $I1 goto __label_22
-.annotate 'line', 10507
-    WSubId_1('Unsupported extern', $P9)
-  __label_22: # endif
-.annotate 'line', 10508
-    $P9 = __ARG_1.'get'()
-.annotate 'line', 10509
-    WSubId_102($P9)
-.annotate 'line', 10510
-    WSubId_62(';', __ARG_1)
-.annotate 'line', 10511
-# var fex: $P10
-    new $P10, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
-    $P10.'FunctionExtern'($P9, self)
-.annotate 'line', 10512
-# builtin push
-    push $P2, $P10
-    goto __label_6 # break
+.annotate 'line', 10760
+    WSubId_133($P2, __ARG_1, self)
+    goto __label_5 # break
   __label_13: # case
-.annotate 'line', 10515
-    WSubId_122($P5, __ARG_1, self)
-    goto __label_6 # break
+.annotate 'line', 10763
+    WSubId_134($P2, __ARG_1, self)
+    goto __label_5 # break
   __label_14: # case
-.annotate 'line', 10518
-    WSubId_123($P5, __ARG_1, self)
-    goto __label_6 # break
+.annotate 'line', 10766
+    WSubId_135($P2, __ARG_1, self)
+    goto __label_5 # break
   __label_15: # case
-.annotate 'line', 10521
-    WSubId_124($P5, __ARG_1, self)
-    goto __label_6 # break
+.annotate 'line', 10769
+    $P2 = __ARG_1.'get'()
+.annotate 'line', 10770
+    $P8 = $P2.'isstring'()
+    isfalse $I2, $P8
+    unless $I2 goto __label_18
+.annotate 'line', 10771
+    WSubId_54('string literal', $P2)
+  __label_18: # endif
+.annotate 'line', 10772
+    WSubId_68(';', __ARG_1)
+.annotate 'line', 10773
+    new $P11, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
+    $P11.'StringLiteral'(self, $P2)
+    set $P10, $P11
+    $P9 = $P10.'getPirString'()
+    self.'addload'($P9)
+    goto __label_5 # break
   __label_16: # case
-.annotate 'line', 10524
-    $P5 = __ARG_1.'get'()
-.annotate 'line', 10525
-    $P13 = $P5.'isstring'()
-    isfalse $I2, $P13
-    unless $I2 goto __label_23
-.annotate 'line', 10526
-    WSubId_48('string literal', $P5)
-  __label_23: # endif
-.annotate 'line', 10527
-    WSubId_62(';', __ARG_1)
-.annotate 'line', 10528
-    new $P16, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-    $P16.'StringLiteral'(self, $P5)
-    set $P15, $P16
-    $P14 = $P15.'getPirString'()
-    self.'addload'($P14)
-    goto __label_6 # break
-  __label_17: # case
-.annotate 'line', 10531
-    $P5 = __ARG_1.'get'()
-.annotate 'line', 10532
-    $P17 = $P5.'isstring'()
-    isfalse $I3, $P17
-    unless $I3 goto __label_24
-.annotate 'line', 10533
-    WSubId_48('string literal', $P5)
-  __label_24: # endif
-.annotate 'line', 10534
-    WSubId_62(';', __ARG_1)
-.annotate 'line', 10535
-    new $P20, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-    $P20.'StringLiteral'(self, $P5)
-    set $P19, $P20
-    $P18 = $P19.'getPirString'()
-    self.'addlib'($P18)
-    goto __label_6 # break
-  __label_7: # default
-.annotate 'line', 10538
-    WSubId_49("token", $P5)
-  __label_6: # switch end
-# }
+.annotate 'line', 10776
+    $P2 = __ARG_1.'get'()
+.annotate 'line', 10777
+    $P12 = $P2.'isstring'()
+    isfalse $I3, $P12
+    unless $I3 goto __label_19
+.annotate 'line', 10778
+    WSubId_54('string literal', $P2)
+  __label_19: # endif
+.annotate 'line', 10779
+    WSubId_68(';', __ARG_1)
+.annotate 'line', 10780
+    new $P15, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
+    $P15.'StringLiteral'(self, $P2)
+    set $P14, $P15
+    $P13 = $P14.'getPirString'()
+    self.'addlib'($P13)
+    goto __label_5 # break
+  __label_6: # default
+.annotate 'line', 10783
+    WSubId_55("token", $P2)
+  __label_5: # switch end
   __label_1: # for iteration
-.annotate 'line', 10476
-    $P5 = __ARG_1.'get'()
+.annotate 'line', 10737
+    $P2 = __ARG_1.'get'()
     goto __label_3
   __label_2: # for end
-.annotate 'line', 10541
-    $P11 = $P5.'iseof'()
-    if_null $P11, __label_25
-    unless $P11 goto __label_25
-.annotate 'line', 10542
+.annotate 'line', 10786
+    $P5 = $P2.'iseof'()
+    if_null $P5, __label_20
+    unless $P5 goto __label_20
+.annotate 'line', 10787
     self.'unclosed_ns'()
-    goto __label_26
-  __label_25: # else
-.annotate 'line', 10544
-    self.'close_ns'($P5)
-  __label_26: # endif
-# }
-.annotate 'line', 10545
+    goto __label_21
+  __label_20: # else
+.annotate 'line', 10789
+    self.'close_ns'($P2)
+  __label_21: # endif
+.annotate 'line', 10790
 
 .end # parse
 
 
 .sub 'optimize_base' :method
-.const 'Sub' WSubId_46 = "WSubId_46"
-# Body
-# {
-.annotate 'line', 10548
+.const 'Sub' WSubId_52 = "WSubId_52"
+.annotate 'line', 10793
     getattribute $P1, self, 'items'
-    WSubId_46($P1)
-# }
-.annotate 'line', 10549
+    WSubId_52($P1)
+.annotate 'line', 10794
 
 .end # optimize_base
 
 
 .sub 'emit_base' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_60 = "WSubId_60"
-# Body
-# {
-.annotate 'line', 10552
-# var path: $P1
+.const 'Sub' WSubId_66 = "WSubId_66"
+.annotate 'line', 10797
     $P1 = self.'getpath'()
-.annotate 'line', 10554
-# activate: $I1
+.annotate 'line', 10799
     set $I1, 1
-.annotate 'line', 10556
-# var externals: $P2
+.annotate 'line', 10801
     getattribute $P2, self, 'externals'
-.annotate 'line', 10557
+.annotate 'line', 10802
     if_null $P2, __label_1
-# {
-.annotate 'line', 10558
+.annotate 'line', 10803
     $P1.'emitnamespace'(__ARG_1)
-.annotate 'line', 10559
+.annotate 'line', 10804
     null $I1
-.annotate 'line', 10560
-    WSubId_60(__ARG_1, $P2)
-# }
+.annotate 'line', 10805
+    WSubId_66(__ARG_1, $P2)
   __label_1: # endif
-.annotate 'line', 10563
+.annotate 'line', 10808
     getattribute $P4, self, 'items'
     if_null $P4, __label_3
     iter $P5, $P4
@@ -31641,62 +26253,51 @@
   __label_2: # for iteration
     unless $P5 goto __label_3
     shift $P3, $P5
-# {
-.annotate 'line', 10564
-    isa $I3, $P3, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
-    if $I3 goto __label_6
-.annotate 'line', 10565
-    isa $I4, $P3, [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
-    set $I2, $I4
-    goto __label_7
+.annotate 'line', 10809
+    isa $I2, $P3, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
+    if $I2 goto __label_6
+.annotate 'line', 10810
+    isa $I2, $P3, [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
   __label_6:
-    set $I2, $I3
-  __label_7:
     unless $I2 goto __label_4
-.annotate 'line', 10566
+.annotate 'line', 10811
     set $I1, 1
     goto __label_5
   __label_4: # else
-.annotate 'line', 10568
-    unless $I1 goto __label_8
-# {
-.annotate 'line', 10569
+.annotate 'line', 10813
+    unless $I1 goto __label_7
+.annotate 'line', 10814
     $P1.'emitnamespace'(__ARG_1)
-.annotate 'line', 10570
+.annotate 'line', 10815
     null $I1
-# }
-  __label_8: # endif
+  __label_7: # endif
   __label_5: # endif
-.annotate 'line', 10572
+.annotate 'line', 10817
     $P3.'emit'(__ARG_1)
-# }
     goto __label_2
   __label_3: # endfor
-# }
-.annotate 'line', 10574
+.annotate 'line', 10819
 
 .end # emit_base
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
-.annotate 'line', 10262
+.annotate 'line', 10515
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addparent $P0, $P1
-.annotate 'line', 10264
+.annotate 'line', 10517
     addattribute $P0, 'nspath'
-.annotate 'line', 10265
+.annotate 'line', 10518
     addattribute $P0, 'externals'
-.annotate 'line', 10266
+.annotate 'line', 10519
     addattribute $P0, 'namespaces'
-.annotate 'line', 10267
+.annotate 'line', 10520
     addattribute $P0, 'classes'
-.annotate 'line', 10268
-    addattribute $P0, 'functions'
-.annotate 'line', 10269
-    addattribute $P0, 'functions_name'
-.annotate 'line', 10270
+.annotate 'line', 10521
+    addattribute $P0, 'funcont'
+.annotate 'line', 10522
     addattribute $P0, 'items'
-.annotate 'line', 10271
+.annotate 'line', 10523
     addattribute $P0, 'owner'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
@@ -31707,140 +26308,112 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-# Body
-# {
-.annotate 'line', 10592
+.annotate 'line', 10837
     setattribute self, 'modifier', __ARG_5
-.annotate 'line', 10593
-# is_hll: $I1
+.annotate 'line', 10838
     null $I1
-.annotate 'line', 10594
+.annotate 'line', 10839
     if_null __ARG_5, __label_1
-# {
-.annotate 'line', 10595
+.annotate 'line', 10840
     $P2 = __ARG_5.'pick'('HLL')
     if_null $P2, __label_2
-# {
-.annotate 'line', 10596
+.annotate 'line', 10841
     box $P3, __ARG_4
     setattribute self, 'hll', $P3
-.annotate 'line', 10597
+.annotate 'line', 10842
     set $I1, 1
-# }
   __label_2: # endif
-# }
   __label_1: # endif
-.annotate 'line', 10600
-# var nspath: $P1
+.annotate 'line', 10845
     unless $I1 goto __label_4
-.annotate 'line', 10601
+.annotate 'line', 10846
     new $P2, [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
     $P2.'NamespacePath'(__ARG_4, 1)
     set $P1, $P2
     goto __label_3
   __label_4:
-.annotate 'line', 10602
+.annotate 'line', 10847
     $P4 = __ARG_1.'getpath'()
     $P3 = $P4.'createchild'(__ARG_4)
     set $P1, $P3
   __label_3:
-.annotate 'line', 10603
+.annotate 'line', 10848
     self.'NamespaceBase'($P1, __ARG_3)
-.annotate 'line', 10605
+.annotate 'line', 10850
     setattribute self, 'parent', __ARG_1
-.annotate 'line', 10606
+.annotate 'line', 10851
     setattribute self, 'start', __ARG_2
-.annotate 'line', 10607
+.annotate 'line', 10852
     setattribute self, 'owner', __ARG_1
-.annotate 'line', 10608
+.annotate 'line', 10853
     box $P2, __ARG_4
     setattribute self, 'name', $P2
-# }
-.annotate 'line', 10609
+.annotate 'line', 10854
 
 .end # NamespaceStatement
 
 
 .sub 'dowarnings' :method
-# Body
-# {
-.annotate 'line', 10612
+.annotate 'line', 10857
     getattribute $P1, self, 'parent'
     .tailcall $P1.'dowarnings'()
-# }
-.annotate 'line', 10613
+.annotate 'line', 10858
 
 .end # dowarnings
 
 
 .sub 'generatesubid' :method
-# Body
-# {
-.annotate 'line', 10616
+.annotate 'line', 10861
     getattribute $P1, self, 'owner'
     .tailcall $P1.'generatesubid'()
-# }
-.annotate 'line', 10617
+.annotate 'line', 10862
 
 .end # generatesubid
 
 
 .sub 'use_builtin' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10620
+.annotate 'line', 10865
     getattribute $P1, self, 'owner'
     $P1.'use_builtin'(__ARG_1)
-# }
-.annotate 'line', 10621
+.annotate 'line', 10866
 
 .end # use_builtin
 
 
 .sub 'addlib' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10624
+.annotate 'line', 10869
     getattribute $P1, self, 'parent'
     $P1.'addlib'(__ARG_1)
-# }
-.annotate 'line', 10625
+.annotate 'line', 10870
 
 .end # addlib
 
 
 .sub 'addload' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10628
+.annotate 'line', 10873
     getattribute $P1, self, 'parent'
     $P1.'addload'(__ARG_1)
-# }
-.annotate 'line', 10629
+.annotate 'line', 10874
 
 .end # addload
 
 
 .sub 'checkclass' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10632
-# var cl: $P1
+.annotate 'line', 10877
     $P1 = self.'checkclass_base'(__ARG_1)
-.annotate 'line', 10633
+.annotate 'line', 10878
     unless_null $P1, __label_1
-.annotate 'line', 10634
+.annotate 'line', 10879
     getattribute $P2, self, 'parent'
     .tailcall $P2.'checkclass'(__ARG_1)
   __label_1: # endif
-.annotate 'line', 10635
+.annotate 'line', 10880
     .return($P1)
-# }
-.annotate 'line', 10636
+.annotate 'line', 10881
 
 .end # checkclass
 
@@ -31849,225 +26422,205 @@
         .param pmc __ARG_1
         .param int __ARG_2
         .param int __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 10639
-# var sym: $P1
+.annotate 'line', 10884
     $P1 = self.'scopesearchlocal'(__ARG_1, __ARG_2, __ARG_3)
-.annotate 'line', 10640
-    isnull $I2, $P1
-    unless $I2 goto __label_2
-    isle $I3, __ARG_3, 0
-    set $I1, $I3
-    goto __label_3
+.annotate 'line', 10885
+    isnull $I1, $P1
+    unless $I1 goto __label_2
+    isle $I1, __ARG_3, 0
   __label_2:
-    set $I1, $I2
-  __label_3:
     unless $I1 goto __label_1
-.annotate 'line', 10641
+.annotate 'line', 10886
     getattribute $P2, self, 'parent'
     .tailcall $P2.'scopesearch'(__ARG_1, __ARG_2, __ARG_3)
   __label_1: # endif
-.annotate 'line', 10642
+.annotate 'line', 10887
     .return($P1)
-# }
-.annotate 'line', 10643
+.annotate 'line', 10888
 
 .end # scopesearch
 
 
 .sub 'unclosed_ns' :method
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 10646
+.annotate 'line', 10891
     getattribute $P1, self, 'start'
     WSubId_1('unclosed namespace', $P1)
-# }
-.annotate 'line', 10647
+.annotate 'line', 10892
 
 .end # unclosed_ns
 
 
 .sub 'close_ns' :method
         .param pmc __ARG_1
-# Empty body
 
 .end # close_ns
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 10654
-# var modifier: $P1
+.annotate 'line', 10899
     getattribute $P1, self, 'modifier'
-.annotate 'line', 10655
+.annotate 'line', 10900
     if_null $P1, __label_1
-.annotate 'line', 10656
+.annotate 'line', 10901
     $P3 = $P1.'optimize'()
     setattribute self, 'modifier', $P3
   __label_1: # endif
-.annotate 'line', 10657
+.annotate 'line', 10902
     self.'optimize_base'()
-.annotate 'line', 10658
+.annotate 'line', 10903
     .return(self)
-# }
-.annotate 'line', 10659
+.annotate 'line', 10904
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10662
-# var hll: $P1
+.const 'Sub' WSubId_26 = "WSubId_26"
+.annotate 'line', 10907
     getattribute $P1, self, 'hll'
-.annotate 'line', 10663
+.annotate 'line', 10908
     if_null $P1, __label_1
-.annotate 'line', 10664
-    __ARG_1.'say'(".HLL '", $P1, "'")
+.annotate 'line', 10909
+    $P2 = WSubId_26(".HLL '%0'", $P1)
+    __ARG_1.'say'($P2)
   __label_1: # endif
-.annotate 'line', 10666
+.annotate 'line', 10911
     self.'emit_base'(__ARG_1)
-.annotate 'line', 10668
+.annotate 'line', 10913
     if_null $P1, __label_2
-.annotate 'line', 10669
+.annotate 'line', 10914
     __ARG_1.'say'(".HLL 'parrot'")
   __label_2: # endif
-# }
-.annotate 'line', 10670
+.annotate 'line', 10915
 
 .end # emit
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
-.annotate 'line', 10581
+.annotate 'line', 10826
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
     addparent $P0, $P1
-.annotate 'line', 10583
+.annotate 'line', 10828
     addattribute $P0, 'parent'
-.annotate 'line', 10584
+.annotate 'line', 10829
     addattribute $P0, 'start'
-.annotate 'line', 10585
+.annotate 'line', 10830
     addattribute $P0, 'name'
-.annotate 'line', 10586
+.annotate 'line', 10831
     addattribute $P0, 'modifier'
-.annotate 'line', 10587
+.annotate 'line', 10832
     addattribute $P0, 'hll'
 .end
+.namespace [ 'Winxed'; 'Compiler' ]
+
+.sub 'emit_loadlib' :subid('WSubId_136')
+        .param string __ARG_1
+.annotate 'line', 10924
+    concat $S1, '.loadlib ', __ARG_1
+    .return($S1)
+.annotate 'line', 10925
+
+.end # emit_loadlib
+
+
+.sub 'emit_loadbytecode' :subid('WSubId_137')
+        .param string __ARG_1
+.annotate 'line', 10929
+    concat $S1, '    load_bytecode ', __ARG_1
+    .return($S1)
+.annotate 'line', 10930
+
+.end # emit_loadbytecode
+
 .namespace [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
 
 .sub 'RootNamespace' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10687
+.annotate 'line', 10942
     new $P1, [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
     $P1.'NamespacePath'()
     set $P1, $P1
     null $P2
     self.'NamespaceBase'($P1, $P2)
-.annotate 'line', 10688
+.annotate 'line', 10943
     setattribute self, 'unit', __ARG_1
-.annotate 'line', 10689
+.annotate 'line', 10944
     root_new $P2, ['parrot';'Hash']
     setattribute self, 'bultins_used', $P2
-.annotate 'line', 10690
+.annotate 'line', 10945
     box $P1, 0
     setattribute self, 'subidgen', $P1
-# }
-.annotate 'line', 10691
+.annotate 'line', 10946
 
 .end # RootNamespace
 
 
 .sub 'use_builtin' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10694
-# var bultins_used: $P1
+.annotate 'line', 10949
     getattribute $P1, self, 'bultins_used'
-.annotate 'line', 10695
+.annotate 'line', 10950
     $P1[__ARG_1] = 1
-# }
-.annotate 'line', 10696
+.annotate 'line', 10951
 
 .end # use_builtin
 
 
 .sub 'generatesubid' :method
-# Body
-# {
-.annotate 'line', 10700
-# idgen: $I1
+.annotate 'line', 10955
     getattribute $P1, self, 'subidgen'
     inc $P1
     set $I1, $P1
-# builtin string
-.annotate 'line', 10701
+.annotate 'line', 10956
     set $S1, $I1
     concat $S2, 'WSubId_', $S1
     .return($S2)
-# }
-.annotate 'line', 10702
+.annotate 'line', 10957
 
 .end # generatesubid
 
 
 .sub 'addlib' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10706
-# var libs: $P1
+.annotate 'line', 10961
     getattribute $P1, self, 'libs'
-.annotate 'line', 10707
+.annotate 'line', 10962
     unless_null $P1, __label_1
-.annotate 'line', 10708
+.annotate 'line', 10963
     root_new $P1, ['parrot';'Hash']
     setattribute self, 'libs', $P1
   __label_1: # endif
-.annotate 'line', 10709
+.annotate 'line', 10964
     $P1[__ARG_1] = 1
-# }
-.annotate 'line', 10710
+.annotate 'line', 10965
 
 .end # addlib
 
 
 .sub 'addload' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10713
-# var loads: $P1
+.annotate 'line', 10968
     getattribute $P1, self, 'loads'
-.annotate 'line', 10714
+.annotate 'line', 10969
     unless_null $P1, __label_1
-.annotate 'line', 10715
+.annotate 'line', 10970
     root_new $P1, ['parrot';'Hash']
     setattribute self, 'loads', $P1
   __label_1: # endif
-.annotate 'line', 10716
+.annotate 'line', 10971
     $P1[__ARG_1] = 1
-# }
-.annotate 'line', 10717
+.annotate 'line', 10972
 
 .end # addload
 
 
 .sub 'checkclass' :method
         .param string __ARG_1
-# Body
-# {
-.annotate 'line', 10720
+.annotate 'line', 10975
     .tailcall self.'checkclass_base'(__ARG_1)
-# }
-.annotate 'line', 10721
+.annotate 'line', 10976
 
 .end # checkclass
 
@@ -32076,18 +26629,14 @@
         .param pmc __ARG_1
         .param int __ARG_2
         .param int __ARG_3 :optional
-# Body
-# {
-.annotate 'line', 10724
+.annotate 'line', 10979
     .tailcall self.'scopesearchlocal'(__ARG_1, __ARG_2, __ARG_3)
-# }
-.annotate 'line', 10725
+.annotate 'line', 10980
 
 .end # scopesearch
 
 
 .sub 'unclosed_ns' :method
-# Empty body
 
 .end # unclosed_ns
 
@@ -32095,232 +26644,159 @@
 .sub 'close_ns' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_1 = "WSubId_1"
-# Body
-# {
-.annotate 'line', 10732
+.annotate 'line', 10987
     WSubId_1('Cannot close root namespace', __ARG_1)
-# }
-.annotate 'line', 10733
+.annotate 'line', 10988
 
 .end # close_ns
 
 
 .sub 'dowarnings' :method
-# Body
-# {
-.annotate 'line', 10736
+.annotate 'line', 10991
     getattribute $P1, self, 'unit'
     .tailcall $P1.'dowarnings'()
-# }
-.annotate 'line', 10737
+.annotate 'line', 10992
 
 .end # dowarnings
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 10740
+.annotate 'line', 10995
     self.'optimize_base'()
-.annotate 'line', 10741
+.annotate 'line', 10996
     .return(self)
-# }
-.annotate 'line', 10742
+.annotate 'line', 10997
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10745
-# var bultins_used: $P1
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_136 = "WSubId_136"
+.const 'Sub' WSubId_26 = "WSubId_26"
+.const 'Sub' WSubId_137 = "WSubId_137"
+.annotate 'line', 11000
     getattribute $P1, self, 'bultins_used'
-.annotate 'line', 10748
-    $P5 = $P1['chomp']
-    if_null $P5, __label_1
-.annotate 'line', 10749
+.annotate 'line', 11003
+    $P4 = $P1['chomp']
+    if_null $P4, __label_1
+.annotate 'line', 11004
     self.'addload'('"String/Utils.pbc"')
   __label_1: # endif
-.annotate 'line', 10752
-    new $P2, ['ResizableStringArray']
-    set $P2, 9
-    set $S4, 'acos'
-    $P2[0] = $S4
-    set $S4, 'asin'
-    $P2[1] = $S4
-    set $S4, 'atan'
-    $P2[2] = $S4
-    set $S4, 'cos'
-    $P2[3] = $S4
-    set $S4, 'exp'
-    $P2[4] = $S4
-    set $S4, 'ln'
-    $P2[5] = $S4
-    set $S4, 'sin'
-    $P2[6] = $S4
-    set $S4, 'tan'
-    $P2[7] = $S4
-    set $S4, 'pow'
-    $P2[8] = $S4
-.annotate 'line', 10755
-    if_null $P2, __label_3
-    iter $P6, $P2
-    set $P6, 0
+.annotate 'line', 11008
+    split $P4, " ", "acos asin atan cos exp ln sin tan pow"
+    if_null $P4, __label_3
+    iter $P5, $P4
+    set $P5, 0
   __label_2: # for iteration
-    unless $P6 goto __label_3
-    shift $S1, $P6
-.annotate 'line', 10756
-    $P5 = $P1[$S1]
-    if_null $P5, __label_4
-# {
-.annotate 'line', 10757
+    unless $P5 goto __label_3
+    shift $S1, $P5
+.annotate 'line', 11009
+    $P6 = $P1[$S1]
+    if_null $P6, __label_4
+.annotate 'line', 11010
     self.'addlib'("'trans_ops'")
     goto __label_3 # break
-.annotate 'line', 10758
-# }
   __label_4: # endif
     goto __label_2
   __label_3: # endfor
-.annotate 'line', 10761
-# somelib: $I1
-    null $I1
-.annotate 'line', 10762
-# var libs: $P3
-    getattribute $P3, self, 'libs'
-.annotate 'line', 10763
-    if_null $P3, __label_5
-# {
-.annotate 'line', 10764
-    set $I1, 1
-.annotate 'line', 10765
-    if_null $P3, __label_7
-    iter $P7, $P3
-    set $P7, 0
-  __label_6: # for iteration
-    unless $P7 goto __label_7
-    shift $S2, $P7
-.annotate 'line', 10766
-    __ARG_1.'say'('.loadlib ', $S2)
-    goto __label_6
-  __label_7: # endfor
-# }
+.annotate 'line', 11014
+    getattribute $P2, self, 'libs'
+.annotate 'line', 11015
+    if_null $P2, __label_5
+.annotate 'line', 11016
+    root_new $P6, ['parrot';'ResizablePMCArray']
+    $P4 = WSubId_31($P2, $P6, WSubId_136)
+    join $S2, "\n", $P4
+    __ARG_1.'say'($S2)
   __label_5: # endif
-.annotate 'line', 10769
-# someload: $I2
-    null $I2
-.annotate 'line', 10770
-# var loads: $P4
-    getattribute $P4, self, 'loads'
-.annotate 'line', 10771
-    if_null $P4, __label_8
-# {
-.annotate 'line', 10772
-    set $I2, 1
-.annotate 'line', 10773
-    __ARG_1.'print'("\n.sub initial_load_bytecode :anon :load :init\n")
-.annotate 'line', 10774
-    if_null $P4, __label_10
-    iter $P8, $P4
-    set $P8, 0
-  __label_9: # for iteration
-    unless $P8 goto __label_10
-    shift $S3, $P8
-.annotate 'line', 10775
-    __ARG_1.'say'('    load_bytecode ', $S3)
-    goto __label_9
-  __label_10: # endfor
-.annotate 'line', 10776
-    __ARG_1.'print'(".end\n\n")
-# }
-  __label_8: # endif
-.annotate 'line', 10778
-    or $I3, $I1, $I2
-    unless $I3 goto __label_11
-.annotate 'line', 10779
+.annotate 'line', 11018
+    getattribute $P3, self, 'loads'
+.annotate 'line', 11019
+    if_null $P3, __label_6
+.annotate 'line', 11026
+    root_new $P7, ['parrot';'ResizablePMCArray']
+    $P6 = WSubId_31($P3, $P7, WSubId_137)
+    join $S2, "\n", $P6
+.annotate 'line', 11020
+    $P4 = WSubId_26(".sub initial_load_bytecode :anon :load :init\n%0\n.end\n", $S2)
+    __ARG_1.'say'($P4)
+  __label_6: # endif
+.annotate 'line', 11028
+    isnull $I1, $P2
+    not $I1
+    if $I1 goto __label_8
+    isnull $I1, $P3
+    not $I1
+  __label_8:
+    unless $I1 goto __label_7
+.annotate 'line', 11029
     __ARG_1.'comment'('end libs')
-  __label_11: # endif
-.annotate 'line', 10781
+  __label_7: # endif
+.annotate 'line', 11031
     self.'emit_base'(__ARG_1)
-# }
-.annotate 'line', 10782
+.annotate 'line', 11032
 
 .end # emit
 
 
 .sub 'emitinclude' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10785
-# var locals: $P1
+.annotate 'line', 11035
     getattribute $P1, self, 'locals'
-.annotate 'line', 10786
+.annotate 'line', 11036
     if_null $P1, __label_2
     iter $P4, $P1
     set $P4, 0
   __label_1: # for iteration
     unless $P4 goto __label_2
     shift $S1, $P4
-# {
-.annotate 'line', 10787
-# var data: $P2
+.annotate 'line', 11037
     $P2 = $P1[$S1]
-.annotate 'line', 10788
-    isa $I4, $P2, [ 'Winxed'; 'Compiler'; 'VarData' ]
-    not $I3, $I4
-    if $I3 goto __label_6
-.annotate 'line', 10789
+.annotate 'line', 11038
+    isa $I2, $P2, [ 'Winxed'; 'Compiler'; 'VarData' ]
+    not $I1, $I2
+    if $I1 goto __label_5
+.annotate 'line', 11039
     $P5 = $P2.'gettype'()
     set $S2, $P5
-    isne $I5, $S2, 'I'
-    set $I2, $I5
-    goto __label_7
-  __label_6:
-    set $I2, $I3
-  __label_7:
-    if $I2 goto __label_4
-.annotate 'line', 10790
-    $P6 = $P2.'getflags'()
-    set $I7, $P6
-    band $I6, $I7, 4
-    set $I1, $I6
-    goto __label_5
-  __label_4:
-    set $I1, $I2
+    isne $I1, $S2, 'I'
   __label_5:
+    if $I1 goto __label_4
+.annotate 'line', 11040
+    $P6 = $P2.'getflags'()
+    set $I3, $P6
+    band $I1, $I3, 4
+  __label_4:
     unless $I1 goto __label_3
     goto __label_1 # continue
   __label_3: # endif
-.annotate 'line', 10792
-# var value: $P3
+.annotate 'line', 11042
     $P3 = $P2.'getvalue'()
-.annotate 'line', 10793
+.annotate 'line', 11043
     $P5 = $P3.'getIntegerValue'()
     __ARG_1.'say'('.macro_const ', $S1, ' ', $P5)
-# }
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 10795
+.annotate 'line', 11045
 
 .end # emitinclude
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
-.annotate 'line', 10677
+.annotate 'line', 10932
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
     addparent $P0, $P1
-.annotate 'line', 10679
+.annotate 'line', 10934
     addattribute $P0, 'unit'
-.annotate 'line', 10680
+.annotate 'line', 10935
     addattribute $P0, 'bultins_used'
-.annotate 'line', 10681
+.annotate 'line', 10936
     addattribute $P0, 'libs'
-.annotate 'line', 10682
+.annotate 'line', 10937
     addattribute $P0, 'loads'
-.annotate 'line', 10683
+.annotate 'line', 10938
     addattribute $P0, 'subidgen'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'Builtin' ]
@@ -32328,134 +26804,108 @@
 .sub 'Builtin' :method
         .param string __ARG_1
         .param pmc __ARG_2
-# Body
-# {
-.annotate 'line', 10807
+.annotate 'line', 11057
     box $P1, __ARG_1
     setattribute self, 'name', $P1
-.annotate 'line', 10808
+.annotate 'line', 11058
     root_new $P2, ['parrot';'ResizablePMCArray']
     assign $P2, 1
     $P2[0] = __ARG_2
     setattribute self, 'variants', $P2
-# }
-.annotate 'line', 10809
+.annotate 'line', 11059
 
 .end # Builtin
 
 
 .sub 'getname' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 10810
+.annotate 'line', 11060
     getattribute $P1, self, 'name'
     set $S1, $P1
     .return($S1)
-# }
 
 .end # getname
 
 
 .sub 'addvariant' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10813
+.annotate 'line', 11063
     getattribute $P1, self, 'variants'
-# builtin push
     push $P1, __ARG_1
-# }
-.annotate 'line', 10814
+.annotate 'line', 11064
 
 .end # addvariant
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin' ]
-.annotate 'line', 10803
+.annotate 'line', 11053
     addattribute $P0, 'name'
-.annotate 'line', 10804
+.annotate 'line', 11054
     addattribute $P0, 'variants'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
-# Constant EVAL_NAME evaluated at compile time
 .namespace [ 'Winxed'; 'Compiler'; 'BuiltinBuilder' ]
 
 .sub 'BuiltinBuilder' :method
-# Body
-# {
-.annotate 'line', 10824
+.annotate 'line', 11074
     root_new $P2, ['parrot';'Hash']
     setattribute self, 'entries', $P2
-# }
-.annotate 'line', 10825
+.annotate 'line', 11075
 
 .end # BuiltinBuilder
 
 
 .sub 'add' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10828
-# var entries: $P1
+.annotate 'line', 11078
     getattribute $P1, self, 'entries'
-.annotate 'line', 10829
-# name: $S1
+.annotate 'line', 11079
     getattribute $P2, __ARG_1, 'name'
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-.annotate 'line', 10830
+.annotate 'line', 11080
     $P2 = $P1[$S1]
     if_null $P2, __label_2
-.annotate 'line', 10831
+.annotate 'line', 11081
     $P3 = $P1[$S1]
     $P3.'addvariant'(__ARG_1)
     goto __label_3
   __label_2: # else
-.annotate 'line', 10833
+.annotate 'line', 11083
     new $P5, [ 'Winxed'; 'Compiler'; 'Builtin' ]
     $P5.'Builtin'($S1, __ARG_1)
     set $P4, $P5
     $P1[$S1] = $P4
   __label_3: # endif
-# }
-.annotate 'line', 10834
+.annotate 'line', 11084
 
 .end # add
 
 
 .sub 'put' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10837
-# var entries: $P1
+.annotate 'line', 11087
     getattribute $P1, self, 'entries'
-.annotate 'line', 10838
+.annotate 'line', 11088
     if_null $P1, __label_2
     iter $P2, $P1
     set $P2, 0
   __label_1: # for iteration
     unless $P2 goto __label_2
     shift $S1, $P2
-.annotate 'line', 10839
-    getattribute $P3, __ARG_1, 'functions'
-    $P4 = $P1[$S1]
-# builtin push
-    push $P3, $P4
+.annotate 'line', 11089
+    $P3 = $P1[$S1]
+    __ARG_1.'addfunction'($P3)
     goto __label_1
   __label_2: # endfor
-# }
-.annotate 'line', 10840
+.annotate 'line', 11090
 
 .end # put
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinBuilder' ]
-.annotate 'line', 10821
+.annotate 'line', 11071
     addattribute $P0, 'entries'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
@@ -32463,176 +26913,146 @@
 .sub 'WinxedCompileUnit' :method
         .param int __ARG_1
         .param int __ARG_2
-.const 'Sub' WSubId_125 = "WSubId_125"
-.const 'Sub' WSubId_118 = "WSubId_118"
-.const 'Sub' WSubId_126 = "WSubId_126"
-# Body
-# {
-.annotate 'line', 10850
+.const 'Sub' WSubId_138 = "WSubId_138"
+.const 'Sub' WSubId_128 = "WSubId_128"
+.const 'Sub' WSubId_139 = "WSubId_139"
+.annotate 'line', 11100
     not $I1, __ARG_1
     box $P4, $I1
     setattribute self, 'warnings', $P4
-.annotate 'line', 10851
-# var rootns: $P1
+.annotate 'line', 11101
     new $P1, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
     $P1.'RootNamespace'(self)
-.annotate 'line', 10855
-    WSubId_125($P1, 'false', 0)
-.annotate 'line', 10856
-    WSubId_125($P1, 'true', 1)
-.annotate 'line', 10861
-    WSubId_118($P1, '__STAGE__', "3")
-.annotate 'line', 10864
-    WSubId_125($P1, '__DEBUG__', __ARG_2)
-.annotate 'line', 10867
-    WSubId_125($P1, '__WINXED_ERROR__', 567)
-.annotate 'line', 10870
-# var builtins_ns: $P2
+.annotate 'line', 11105
+    WSubId_138($P1, 'false', 0)
+.annotate 'line', 11106
+    WSubId_138($P1, 'true', 1)
+.annotate 'line', 11111
+    WSubId_128($P1, '__STAGE__', "3")
+.annotate 'line', 11114
+    WSubId_138($P1, '__DEBUG__', __ARG_2)
+.annotate 'line', 11117
+    WSubId_138($P1, '__WINXED_ERROR__', 567)
+.annotate 'line', 11120
     new $P5, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     $P5.'TokenEof'('__builtins__')
     set $P4, $P5
     null $P6
     $P2 = $P1.'childnamespace'($P4, "Winxed_Builtins", $P6)
-.annotate 'line', 10872
-# var builder: $P3
+.annotate 'line', 11122
     new $P3, [ 'Winxed'; 'Compiler'; 'BuiltinBuilder' ]
     $P3.'BuiltinBuilder'()
-.annotate 'line', 10873
-    WSubId_126($P3)
-.annotate 'line', 10874
+.annotate 'line', 11123
+    WSubId_139($P3)
+.annotate 'line', 11124
     $P3.'put'($P2)
-.annotate 'line', 10876
+.annotate 'line', 11126
     $P1.'usenamespace'($P2)
-.annotate 'line', 10878
+.annotate 'line', 11128
     setattribute self, 'rootns', $P1
-# }
-.annotate 'line', 10879
+.annotate 'line', 11129
 
 .end # WinxedCompileUnit
 
 
 .sub 'dowarnings' :method
-# Body
-# {
-# builtin int
-.annotate 'line', 10882
+.annotate 'line', 11132
     getattribute $P1, self, 'warnings'
     set $I1, $P1
     .return($I1)
-# }
-.annotate 'line', 10883
+.annotate 'line', 11133
 
 .end # dowarnings
 
 
 .sub 'parse' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10886
+.annotate 'line', 11136
     getattribute $P1, self, 'rootns'
     $P1.'parse'(__ARG_1)
-.annotate 'line', 10887
+.annotate 'line', 11137
     getattribute $P1, self, 'rootns'
     $P1.'fixnamespaces'()
-# }
-.annotate 'line', 10888
+.annotate 'line', 11138
 
 .end # parse
 
 
 .sub 'optimize' :method
-# Body
-# {
-.annotate 'line', 10891
+.annotate 'line', 11141
     getattribute $P3, self, 'rootns'
     $P2 = $P3.'optimize'()
     setattribute self, 'rootns', $P2
-# }
-.annotate 'line', 10892
+.annotate 'line', 11142
 
 .end # optimize
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10895
+.annotate 'line', 11145
     __ARG_1.'comment'('THIS IS A GENERATED FILE! DO NOT EDIT!')
-.annotate 'line', 10896
+.annotate 'line', 11146
     __ARG_1.'comment'('Begin generated code')
-.annotate 'line', 10897
+.annotate 'line', 11147
     __ARG_1.'say'('')
-.annotate 'line', 10899
+.annotate 'line', 11149
     getattribute $P1, self, 'rootns'
     $P1.'emit'(__ARG_1)
-.annotate 'line', 10901
+.annotate 'line', 11151
     __ARG_1.'comment'('End generated code')
-# }
-.annotate 'line', 10902
+.annotate 'line', 11152
 
 .end # emit
 
 
 .sub 'emitinclude' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10905
+.annotate 'line', 11155
     __ARG_1.'comment'('DO NOT EDIT THIS FILE')
-.annotate 'line', 10906
+.annotate 'line', 11156
     __ARG_1.'comment'('Generated automatically from Winxed sources')
-.annotate 'line', 10908
+.annotate 'line', 11158
     getattribute $P1, self, 'rootns'
     $P1.'emitinclude'(__ARG_1)
-.annotate 'line', 10910
+.annotate 'line', 11160
     __ARG_1.'comment'('End')
-# }
-.annotate 'line', 10911
+.annotate 'line', 11161
 
 .end # emitinclude
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
-.annotate 'line', 10845
+.annotate 'line', 11095
     addattribute $P0, 'rootns'
-.annotate 'line', 10846
+.annotate 'line', 11096
     addattribute $P0, 'warnings'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
 
 .sub 'version' :method
-# Body
-# {
-.annotate 'line', 10920
+.annotate 'line', 11170
     new $P1, ['FixedIntegerArray'], 3
     set $I1, 1
     $P1[0] = $I1
     set $I1, 4
     $P1[1] = $I1
-    set $I1, -1
+    set $I1, 1
     $P1[2] = $I1
-.annotate 'line', 10921
+.annotate 'line', 11171
     .return($P1)
-# }
-.annotate 'line', 10922
+.annotate 'line', 11172
 
 .end # version
 
 
 .sub 'version_string' :method
-# Body
-# {
-# builtin string
-.annotate 'line', 10925
+.annotate 'line', 11175
     $P1 = self.'version'()
-# builtin join
     join $S1, ".", $P1
     concat $S2, "Winxed ", $S1
     .return($S2)
-# }
-.annotate 'line', 10926
+.annotate 'line', 11176
 
 .end # version_string
 
@@ -32644,134 +27064,109 @@
         .param int __ARG_4
         .param int __ARG_5
         .param int __ARG_6
-# Body
-# {
-.annotate 'line', 10929
+.annotate 'line', 11179
     set $S2, __ARG_2
     ne $S2, 'parse', __label_1
-.annotate 'line', 10930
+.annotate 'line', 11180
     .return(__ARG_1)
   __label_1: # endif
-.annotate 'line', 10931
-# var handleout: $P1
+.annotate 'line', 11181
     null $P1
-.annotate 'line', 10932
+.annotate 'line', 11182
     unless_null __ARG_3, __label_2
-# {
-.annotate 'line', 10933
+.annotate 'line', 11183
     new $P1, [ 'StringHandle' ]
-.annotate 'line', 10934
+.annotate 'line', 11184
     $P1.'open'('__eval__', 'w')
-# }
     goto __label_3
   __label_2: # else
-.annotate 'line', 10937
+.annotate 'line', 11187
     set $P1, __ARG_3
   __label_3: # endif
-.annotate 'line', 10938
-# var emit: $P2
+.annotate 'line', 11188
     new $P2, [ 'Winxed'; 'Compiler'; 'Emit' ]
     $P2.'Emit'($P1, __ARG_6)
-.annotate 'line', 10939
+.annotate 'line', 11189
     unless __ARG_4 goto __label_4
-.annotate 'line', 10940
+.annotate 'line', 11190
     $P2.'setDebug'()
   __label_4: # endif
-.annotate 'line', 10941
+.annotate 'line', 11191
     unless __ARG_5 goto __label_5
-.annotate 'line', 10942
+.annotate 'line', 11192
     $P2.'disable_annotations'()
   __label_5: # endif
-.annotate 'line', 10943
+.annotate 'line', 11193
     __ARG_1.'emit'($P2)
-.annotate 'line', 10944
+.annotate 'line', 11194
     $P2.'close'()
-.annotate 'line', 10945
+.annotate 'line', 11195
     if_null __ARG_3, __label_6
-.annotate 'line', 10946
+.annotate 'line', 11196
     .return(__ARG_3)
     goto __label_7
   __label_6: # else
-# {
-.annotate 'line', 10948
+.annotate 'line', 11198
     $P1.'close'()
-.annotate 'line', 10949
-# pircode: $S1
+.annotate 'line', 11199
     $P5 = $P1.'read'(0)
     null $S1
     if_null $P5, __label_8
     set $S1, $P5
   __label_8:
-.annotate 'line', 10950
-# var object: $P3
+.annotate 'line', 11200
     null $P3
-# switch
-.annotate 'line', 10951
+.annotate 'line', 11201
     set $S2, __ARG_2
-    set $S3, 'pir'
-    if $S2 == $S3 goto __label_11
-    set $S3, 'pbc'
-    if $S2 == $S3 goto __label_12
-    set $S3, ''
-    if $S2 == $S3 goto __label_13
+    if $S2 == 'pir' goto __label_11
+    if $S2 == 'pbc' goto __label_12
+    if $S2 == '' goto __label_13
     goto __label_10
   __label_11: # case
-.annotate 'line', 10953
+.annotate 'line', 11203
     new $P3, [ 'String' ]
-.annotate 'line', 10954
+.annotate 'line', 11204
     assign $P3, $S1
     goto __label_9 # break
   __label_12: # case
   __label_13: # case
-.annotate 'line', 10958
-# var pircomp: $P4
-# builtin compreg
+.annotate 'line', 11208
     compreg $P4, 'PIR'
-.annotate 'line', 10959
+.annotate 'line', 11209
     $P3 = $P4($S1)
     goto __label_9 # break
   __label_10: # default
-.annotate 'line', 10960
-# builtin string
-.annotate 'line', 10962
+.annotate 'line', 11212
     set $S4, __ARG_2
     concat $S5, 'Invalid target: ', $S4
-# builtin die
     die $S5
   __label_9: # switch end
-.annotate 'line', 10964
+.annotate 'line', 11214
     .return($P3)
-# }
   __label_7: # endif
-# }
-.annotate 'line', 10966
+.annotate 'line', 11216
 
 .end # __private_compile_tail
 
 
 .sub '__private_geninclude' :method
         .param pmc __ARG_1
-# Body
-# {
-.annotate 'line', 10969
-# var handleout: $P1
+.annotate 'line', 11219
     new $P1, [ 'StringHandle' ]
-.annotate 'line', 10970
+.annotate 'line', 11220
     $P1.'open'('__eval__', 'w')
-.annotate 'line', 10971
-# var emit: $P2
+.annotate 'line', 11221
     new $P2, [ 'Winxed'; 'Compiler'; 'Emit' ]
     $P2.'Emit'($P1, 1)
-.annotate 'line', 10972
+.annotate 'line', 11222
     __ARG_1.'emitinclude'($P2)
-.annotate 'line', 10973
+.annotate 'line', 11223
     $P2.'close'()
-.annotate 'line', 10974
+.annotate 'line', 11224
     $P1.'close'()
-.annotate 'line', 10975
+.annotate 'line', 11225
     .tailcall $P1.'read'(0)
-# }
-.annotate 'line', 10976
+.annotate 'line', 11226
 
 .end # __private_geninclude
 
@@ -32783,49 +27178,43 @@
         .param int __ARG_4 :optional :named('debug')
         .param int __ARG_5 :optional :named('noan')
         .param int __ARG_6 :optional :named('nowarn')
-# Body
-# {
-.annotate 'line', 10984
+.annotate 'line', 11234
     unless_null __ARG_2, __label_1
-.annotate 'line', 10985
+.annotate 'line', 11235
     set __ARG_2, ''
   __label_1: # endif
-.annotate 'line', 10986
-# var handlein: $P1
+.annotate 'line', 11236
     new $P1, [ 'StringHandle' ]
-.annotate 'line', 10987
+.annotate 'line', 11237
     $P1.'open'('__eval__', 'w')
-.annotate 'line', 10988
+.annotate 'line', 11238
     $P1.'puts'(__ARG_1)
-.annotate 'line', 10989
+.annotate 'line', 11239
     $P1.'close'()
-.annotate 'line', 10990
+.annotate 'line', 11240
     $P1.'open'('__eval__', 'r')
-.annotate 'line', 10991
-# var tk: $P2
+.annotate 'line', 11241
     new $P2, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     $P2.'Tokenizer'($P1, '__eval__')
-.annotate 'line', 10992
-# var winxed: $P3
+.annotate 'line', 11242
     new $P3, [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
     $P3.'WinxedCompileUnit'(__ARG_6, __ARG_4)
-.annotate 'line', 10993
+.annotate 'line', 11243
     $P3.'parse'($P2)
-.annotate 'line', 10994
+.annotate 'line', 11244
     $P1.'close'()
-.annotate 'line', 10995
+.annotate 'line', 11245
     $P3.'optimize'()
-.annotate 'line', 10996
+.annotate 'line', 11246
     ne __ARG_2, 'include', __label_2
-.annotate 'line', 10997
+.annotate 'line', 11247
     .tailcall self.'__private_geninclude'($P3)
     goto __label_3
   __label_2: # else
-.annotate 'line', 10999
+.annotate 'line', 11249
     .tailcall self.'__private_compile_tail'($P3, __ARG_2, __ARG_3, __ARG_4, __ARG_5, __ARG_6)
   __label_3: # endif
-# }
-.annotate 'line', 11000
+.annotate 'line', 11250
 
 .end # compile
 
@@ -32837,45 +27226,39 @@
         .param int __ARG_4 :optional :named('debug')
         .param int __ARG_5 :optional :named('noan')
         .param int __ARG_6 :optional :named('nowarn')
-# Body
-# {
-.annotate 'line', 11009
+.annotate 'line', 11259
     unless_null __ARG_2, __label_1
-.annotate 'line', 11010
+.annotate 'line', 11260
     set __ARG_2, ''
   __label_1: # endif
-.annotate 'line', 11011
-# var handlein: $P1
+.annotate 'line', 11261
     new $P1, [ 'FileHandle' ]
-.annotate 'line', 11012
+.annotate 'line', 11262
     $P1.'open'(__ARG_1, 'r')
-.annotate 'line', 11013
+.annotate 'line', 11263
     $P1.'encoding'('utf8')
-.annotate 'line', 11014
-# var tk: $P2
+.annotate 'line', 11264
     new $P2, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     $P2.'Tokenizer'($P1, __ARG_1)
-.annotate 'line', 11015
-# var winxed: $P3
+.annotate 'line', 11265
     new $P3, [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
     $P3.'WinxedCompileUnit'(__ARG_6, __ARG_4)
-.annotate 'line', 11016
+.annotate 'line', 11266
     $P3.'parse'($P2)
-.annotate 'line', 11017
+.annotate 'line', 11267
     $P1.'close'()
-.annotate 'line', 11018
+.annotate 'line', 11268
     $P3.'optimize'()
-.annotate 'line', 11019
+.annotate 'line', 11269
     ne __ARG_2, 'include', __label_2
-.annotate 'line', 11020
+.annotate 'line', 11270
     .tailcall self.'__private_geninclude'($P3)
     goto __label_3
   __label_2: # else
-.annotate 'line', 11022
+.annotate 'line', 11272
     .tailcall self.'__private_compile_tail'($P3, __ARG_2, __ARG_3, __ARG_4, __ARG_5, __ARG_6)
   __label_3: # endif
-# }
-.annotate 'line', 11023
+.annotate 'line', 11273
 
 .end # compile_from_file
 
@@ -32885,16 +27268,11 @@
 .namespace [ 'Winxed'; 'Compiler' ]
 
 .sub 'initializer' :init :load
-# Body
-# {
-.annotate 'line', 11032
-# var comp: $P1
+.annotate 'line', 11282
     new $P1, [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
-.annotate 'line', 11033
-# builtin compreg
+.annotate 'line', 11283
     compreg 'winxed', $P1
-# }
-.annotate 'line', 11034
+.annotate 'line', 11284
 
 .end # initializer
 

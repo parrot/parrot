@@ -415,7 +415,7 @@ Invokes the subroutine.
         INTERP->current_cont = NULL;
 
         if (ccont == NEED_CONTINUATION) {
-            ccont = pmc_new(INTERP, enum_class_Continuation);
+            ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
             VTABLE_set_pointer(INTERP, ccont, next);
         }
 
@@ -443,7 +443,7 @@ Invokes the subroutine.
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
-            Parrot_ex_throw_from_c_args(INTERP, next, CONTROL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, next, EXCEPTION_INTERNAL_PANIC,
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
