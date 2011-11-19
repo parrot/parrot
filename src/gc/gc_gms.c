@@ -1081,7 +1081,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     }
                 }
             }
-            else if (!PObj_constant_TEST(pmc)) {
+            else {
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
@@ -1116,7 +1116,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 }
             }
 
-            else if (!PObj_constant_TEST(str)) {
+            else {
                 Parrot_pa_remove(interp, self->strings[i], item->ptr);
                 if (Buffer_bufstart(str) && !PObj_external_TEST(str))
                     Parrot_gc_str_free_buffer_storage(
@@ -1155,7 +1155,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         || !"Resurrecting of dead objects is not supported");
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc))
+    if (PObj_live_TEST(pmc))
         return;
 
     /* If object too old - skip it */
