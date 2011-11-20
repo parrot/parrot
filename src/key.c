@@ -445,11 +445,9 @@ Parrot_key_mark(PARROT_INTERP, ARGIN(PMC *key))
         Parrot_gc_mark_STRING_alive(interp, str_key);
     }
 
-    /* Mark next key */
-    if ((flags == KEY_string_FLAG) || (flags == KEY_pmc_FLAG)) {
-        GETATTR_Key_next_key(interp, key, next_key);
-        Parrot_gc_mark_PMC_alive(interp, next_key);
-    }
+    /* Mark next key or PMC portion of the key */
+    GETATTR_Key_next_key(interp, key, next_key);
+    Parrot_gc_mark_PMC_alive(interp, next_key);
 
 }
 
