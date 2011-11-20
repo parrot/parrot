@@ -565,6 +565,9 @@
 
     PObj flag C<PObj_constant_FLAG> and related macros will be removed.
   ticket : 'https://trac.parrot.org/parrot/ticket/1875'
+  tags:
+    - 'deprecated'
+    - 'completed'
 -
   name : 'Non-const STRING* arguments'
   eligible : '3.1'
