@@ -21091,6 +21091,7 @@ Parrot_new_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
     SREG(1) = Parrot_str_new_noinit(interp, IREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
@@ -21098,6 +21099,7 @@ Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_new_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
     SREG(1) = Parrot_str_new_noinit(interp, ICONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
