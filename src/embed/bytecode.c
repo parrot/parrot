@@ -187,7 +187,6 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
-    /* TODO: Break up the dependency with embed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
