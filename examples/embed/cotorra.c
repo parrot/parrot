@@ -25,7 +25,7 @@ options and able to run only pbc files.
 #include <stdlib.h>
 #include <string.h>
 
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 
 /**********************************************************************/

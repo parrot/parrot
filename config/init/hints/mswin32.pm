@@ -93,7 +93,8 @@ sub runstep {
             ld_load_flags       => '-dll',
             ld_out              => '-out:',
             ldflags             => '-nologo -nodefaultlib',
-            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib ',
+            # advapi32 needed for src/platform/win32/entropy.c
+            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
             libparrot_static    => 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',
@@ -201,9 +202,8 @@ sub runstep {
         );
     }
     elsif ($is_mingw) {
-
         # when using mingw gcc, parrot needs at least Windows2000, but WindowsME.
-        my @os_version =  Win32::GetOSVersion();
+        my @os_version = Win32::GetOSVersion();
         my $winver = (($os_version[4] >=2 && $os_version[1]>=5)
             || ($os_version[4] = 1 && $os_version[1] = 4))? 'Windows2000' : 'WindowsNT4';
 

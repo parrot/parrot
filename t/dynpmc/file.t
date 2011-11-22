@@ -26,7 +26,7 @@ t/pmc/file.t - Files functions
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/file.t
+    % prove t/dynpmc/file.t
 
 =head1 DESCRIPTION
 
@@ -93,7 +93,7 @@ loop:
         end
 .end
 CODE
-/^[\\w \t\r\n]+current instr\.:/
+/stat failed/
 OUT
 
 # test is_file
@@ -146,7 +146,7 @@ loop:
         end
 .end
 CODE
-/^[\\w \t\r\n]+current instr\.:/
+/stat failed/
 OUT
 
 SKIP: {

@@ -1,91 +1,81 @@
 # Copyright (C) 2010, Parrot Foundation.
 
-DYNPMC_TARGETS = \
+# The Select dynpmc is extravagantly broken on win32.  Help wanted.
+DYNPMC_TARGETS =                                      \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
-    $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) \
-    $(DYNEXT_DIR)/file$(LOAD_EXT) \
-    $(DYNEXT_DIR)/foo_group$(LOAD_EXT) \
-    $(DYNEXT_DIR)/os$(LOAD_EXT) \
-    $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT) \
-    $(DYNEXT_DIR)/rotest$(LOAD_EXT) \
-    $(DYNEXT_DIR)/rational$(LOAD_EXT) \
+#UNLESS(win32 or msys):    $(DYNEXT_DIR)/select$(LOAD_EXT)                   \
+    $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT)                \
+    $(DYNEXT_DIR)/file$(LOAD_EXT)                     \
+    $(DYNEXT_DIR)/foo_group$(LOAD_EXT)                \
+    $(DYNEXT_DIR)/os$(LOAD_EXT)                       \
+    $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT)           \
+    $(DYNEXT_DIR)/rotest$(LOAD_EXT)                   \
+    $(DYNEXT_DIR)/rational$(LOAD_EXT)                 \
     $(DYNEXT_DIR)/subproxy$(LOAD_EXT)
 
-DYNPMC_FOO = \
-    src/dynpmc/foo.pmc \
+DYNPMC_FOO =            \
+    src/dynpmc/foo.pmc  \
     src/dynpmc/foo2.pmc
 
-DYNPMC_FOO_OBJS = \
-    src/dynpmc/foo$(O) \
+DYNPMC_FOO_OBJS =       \
+    src/dynpmc/foo$(O)  \
     src/dynpmc/foo2$(O)
 
-DYNPMC_H_FILES_MIN = \
-    include/parrot/atomic.h \
-    include/parrot/atomic/fallback.h \
-    include/parrot/atomic/gcc_pcc.h \
-    include/parrot/atomic/gcc_x86.h \
-    include/parrot/atomic/sparc.h \
-    include/parrot/caches.h \
-    include/parrot/call.h \
-    include/parrot/cclass.h \
-    include/parrot/compiler.h \
-    include/parrot/config.h \
-    include/parrot/context.h \
-    include/parrot/core_pmcs.h \
-    include/parrot/core_types.h \
-    include/parrot/datatypes.h \
-    include/parrot/debugger.h \
-    include/parrot/dynext.h \
-    include/parrot/encoding.h \
-    include/parrot/enums.h \
-    include/parrot/exceptions.h \
-    include/parrot/exit.h \
-    include/parrot/extend.h \
-    include/parrot/extend_vtable.h \
-    include/parrot/feature.h \
-    include/parrot/gc_api.h \
-    include/parrot/global_setup.h \
-    include/parrot/has_header.h \
-    include/parrot/hash.h \
-    include/parrot/hll.h \
-    include/parrot/interpreter.h \
-    include/parrot/io.h \
-    include/parrot/io_portable.h \
-    include/parrot/io_unix.h \
-    include/parrot/io_win32.h \
-    include/parrot/key.h \
-    include/parrot/library.h \
-    include/parrot/memory.h \
-    include/parrot/misc.h \
-    include/parrot/multidispatch.h \
-    include/parrot/namespace.h \
-    include/parrot/nci.h \
-    include/parrot/oo.h \
-    include/parrot/op.h \
-    include/parrot/oplib.h \
-    include/parrot/packfile.h \
-    include/parrot/parrot.h \
-    include/parrot/pbcversion.h \
-    include/parrot/platform.h \
+DYNPMC_H_FILES_MIN =                    \
+    include/parrot/caches.h             \
+    include/parrot/call.h               \
+    include/parrot/cclass.h             \
+    include/parrot/compiler.h           \
+    include/parrot/config.h             \
+    include/parrot/context.h            \
+    include/parrot/core_pmcs.h          \
+    include/parrot/core_types.h         \
+    include/parrot/datatypes.h          \
+    include/parrot/debugger.h           \
+    include/parrot/dynext.h             \
+    include/parrot/encoding.h           \
+    include/parrot/enums.h              \
+    include/parrot/exceptions.h         \
+    include/parrot/exit.h               \
+    include/parrot/extend.h             \
+    include/parrot/extend_vtable.h      \
+    include/parrot/feature.h            \
+    include/parrot/gc_api.h             \
+    include/parrot/global_setup.h       \
+    include/parrot/has_header.h         \
+    include/parrot/hash.h               \
+    include/parrot/hll.h                \
+    include/parrot/interpreter.h        \
+    include/parrot/io.h                 \
+    include/parrot/key.h                \
+    include/parrot/library.h            \
+    include/parrot/memory.h             \
+    include/parrot/misc.h               \
+    include/parrot/multidispatch.h      \
+    include/parrot/namespace.h          \
+    include/parrot/nci.h                \
+    include/parrot/oo.h                 \
+    include/parrot/op.h                 \
+    include/parrot/oplib.h              \
+    include/parrot/packfile.h           \
+    include/parrot/parrot.h             \
+    include/parrot/pbcversion.h         \
     include/parrot/platform_interface.h \
-    include/parrot/platform_limits.h \
-    include/parrot/pmc.h \
-    include/parrot/pmc_freeze.h \
-    include/parrot/pobj.h \
-    include/parrot/scheduler.h \
-    include/parrot/settings.h \
-    include/parrot/stat.h \
-    include/parrot/string.h \
-    include/parrot/string_funcs.h \
-    include/parrot/sub.h \
-    include/parrot/thread.h \
-    include/parrot/vtable.h \
-    include/parrot/vtables.h \
-    include/parrot/warnings.h \
+    include/parrot/pmc.h                \
+    include/parrot/pmc_freeze.h         \
+    include/parrot/pobj.h               \
+    include/parrot/scheduler.h          \
+    include/parrot/settings.h           \
+    include/parrot/string.h             \
+    include/parrot/string_funcs.h       \
+    include/parrot/sub.h                \
+    include/parrot/vtable.h             \
+    include/parrot/vtables.h            \
+    include/parrot/warnings.h           \
     include/pmc/pmc_callcontext.h
 
-DYNPMC_H_FILES = \
-    $(DYNPMC_H_FILES_MIN) \
+DYNPMC_H_FILES =                   \
+    $(DYNPMC_H_FILES_MIN)          \
     include/pmc/pmc_continuation.h \
     include/pmc/pmc_default.h
 
@@ -93,18 +83,18 @@ DYNPMC_H_FILES = \
 #ELSIF(win32):LIB_ZLIB = zlib.lib
 #ELSE:LIB_ZLIB = -lz
 
-DYNPMC_CLEANUPS = \
-    $(DYNPMC_TARGETS) \
-    $(DYNPMC_FOO_OBJS) \
-    src/dynpmc/*.dump \
-    src/dynpmc/pmc_*.h \
-    src/dynpmc/*_group.h \
-    src/dynpmc/*.c \
-#IF(o):    src/dynpmc/*$(O) \
-#IF(win32):    src/dynpmc/*.lib" \
-#IF(win32):    src/dynpmc/*.pdb" \
-#IF(win32):    src/dynpmc/*.ilk" \
-#IF(win32):    src/dynpmc/*.exp" \
-#IF(win32):    src/dynpmc/*.def" \
-#IF(win32):    src/dynpmc/*.manifest" \
+DYNPMC_CLEANUPS =                        \
+    $(DYNPMC_TARGETS)                    \
+    $(DYNPMC_FOO_OBJS)                   \
+    src/dynpmc/*.dump                    \
+    src/dynpmc/pmc_*.h                   \
+    src/dynpmc/*_group.h                 \
+    src/dynpmc/*.c                       \
+#IF(o):    src/dynpmc/*$(O)              \
+#IF(win32):    src/dynpmc/*.lib"         \
+#IF(win32):    src/dynpmc/*.pdb"         \
+#IF(win32):    src/dynpmc/*.ilk"         \
+#IF(win32):    src/dynpmc/*.exp"         \
+#IF(win32):    src/dynpmc/*.def"         \
+#IF(win32):    src/dynpmc/*.manifest"    \
 #IF(load_ext):    src/dynpmc/*@load_ext@

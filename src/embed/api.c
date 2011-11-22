@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,7 +19,6 @@ This file implements functions of the Parrot embedding interface.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
 
@@ -125,22 +124,37 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     ASSERT_ARGS(Parrot_api_make_interpreter)
     int alt_stacktop;
     Parrot_Interp interp_raw;
-    void *stacktop_ptr = &alt_stacktop;
+    Parrot_GC_Init_Args gc_args;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
+    Parrot_jump_buff env;
     interp_raw = allocate_interpreter(parent_raw, flags);
-    if (args) {
-        if (args->stacktop)
-            stacktop_ptr = args->stacktop;
-        if (args->gc_system)
-            Parrot_gc_set_system_type(interp_raw, args->gc_system);
-        if (args->gc_threshold)
-            interp_raw->gc_threshold = args->gc_threshold;
-        if (args->hash_seed)
-            interp_raw->hash_seed = args->hash_seed;
+    if (setjmp(env)) {
+        interp_raw->api_jmp_buf = NULL;
+        *interp = NULL;
+        return !interp_raw->exit_code;
     }
-    initialize_interpreter(interp_raw, stacktop_ptr);
-    *interp = VTABLE_get_pmc_keyed_int(
-            interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
+    else {
+        interp_raw->api_jmp_buf = &env;
+        if (args) {
+            gc_args.stacktop          = args->stacktop
+                                      ? args->stacktop : &alt_stacktop;
+            gc_args.system            = args->gc_system;
+            gc_args.nursery_size      = args->gc_nursery_size;
+            gc_args.dynamic_threshold = args->gc_dynamic_threshold;
+            gc_args.min_threshold     = args->gc_min_threshold;
+
+            if (args->hash_seed)
+                interp_raw->hash_seed = args->hash_seed;
+        }
+        else {
+            memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
+            gc_args.stacktop = &alt_stacktop;
+        }
+        initialize_interpreter(interp_raw, &gc_args);
+        *interp = VTABLE_get_pmc_keyed_int(
+                interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
+    }
+    interp_raw->api_jmp_buf = NULL;
     return !PMC_IS_NULL(*interp);
 }
 
@@ -165,22 +179,27 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
-        Parrot_pcc_trace_flags_on(interp, interp->ctx, trace);
+        Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else {
-        if (!strcmp(corename, "slow") || !strcmp(corename, "bounds"))
+        if (STREQ(corename, "slow") || STREQ(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        else if (!strcmp(corename, "fast") ||
-            !strcmp(corename, "jit") || !strcmp(corename, "function"))
+        else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
-        else if (!strcmp(corename, "exec"))
+        else if (STREQ(corename, "subprof_sub"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
+        else if (STREQ(corename, "subprof_hll") || STREQ(corename, "subprof"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
+        else if (STREQ(corename, "subprof_ops"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_ops"));
+        else if (STREQ(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
-        else if (!strcmp(corename, "trace"))
+        else if (STREQ(corename, "trace"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        else if (!strcmp(corename, "profiling"))
+        else if (STREQ(corename, "profiling"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
-        else if (!strcmp(corename, "gcdebug"))
+        else if (STREQ(corename, "gcdebug"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gcdebug"));
         else
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
@@ -286,246 +305,23 @@ Parrot_Int
 Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
 {
     ASSERT_ARGS(Parrot_api_destroy_interpreter)
-    void * _oldtop;
     Parrot_jump_buff env;
-    Interp * const interp = GET_INTERP(interp_pmc);
-    _oldtop = interp->lo_var_ptr;
-    if (_oldtop == NULL)
-        interp->lo_var_ptr = &_oldtop;
-    interp->api_jmp_buf = &env;
     if (setjmp(env)) {
         /* We can't check for potential errors because the interpreter
          * might have been destroyed. */
         return 1;
     }
     else {
+        Interp * const interp = GET_INTERP(interp_pmc);
+        void * _oldtop = interp->lo_var_ptr;
+        if (_oldtop == NULL)
+            interp->lo_var_ptr = &_oldtop;
+        interp->api_jmp_buf = &env;
         Parrot_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */
         return 1;
     }
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc, const
-char *filename, Parrot_PMC * pbc)>
-
-Load a bytecode file and stores the resulting bytecode in C<pbc>. This function
-returns a true value if this call is successful and false value otherwise.
-
-=cut
-
-*/
-
-/* TODO: This only works with the inital bytecode. After this we should use
-         Parrot_append_bytecode or something similar */
-
-PARROT_API
-Parrot_Int
-Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
-        ARGIN(const char *filename), ARGOUT(Parrot_PMC * pbc))
-{
-    ASSERT_ARGS(Parrot_api_load_bytecode_file)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "Could not load packfile");
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    *pbc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, *pbc, pf);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc, const
-unsigned char * const pbc, Parrot_Int bytecode_size, Parrot_PMC * pbcpmc)>
-
-Unpacks a bytecode from a buffer C<pbc> of a C<bytecode_size> size, and stores
-the resulting bytecode in C<pbcpmc>. This function returns a true value if this
-call is successful and false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
-        ARGIN(const unsigned char * const pbc), Parrot_Int bytecode_size,
-        ARGOUT(Parrot_PMC * pbcpmc))
-{
-    ASSERT_ARGS(Parrot_api_load_bytecode_bytes)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = PackFile_new(interp, 0);
-    PARROT_ASSERT(pf);
-
-    if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "could not unpack packfile");
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-    *pbcpmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-    VTABLE_set_pointer(interp, *pbcpmc, pf);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-/* Load the bytecode into the interpreter, but don't execute it */
-/* TODO: This only works with the inital bytecode. After this we should use
-       Parrot_append_bytecode or something similar */
-
-/*
-
-=item C<Parrot_Int Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC
-pbc, Parrot_PMC *main_sub)>
-
-Prepares the bytecode C<pbc> to be run and stores the entry point subroutine in
-C<main_sub>. This function returns a true value if this call is successful and
-false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-        ARGOUT(Parrot_PMC *main_sub))
-{
-    ASSERT_ARGS(Parrot_api_ready_bytecode)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-
-    /* Debugging mode nonsense. */
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-         Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
-                 interp->run_core->name);
-    }
-
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    *main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-
-/*
-
-=item C<Parrot_Int Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC
-pbc, Parrot_PMC mainargs)>
-
-Runs the bytecode C<pbc> passing optional C<mainargs> parameters. This function
-returns a true value if this call is successful and false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-    Parrot_PMC mainargs)
-{
-    ASSERT_ARGS(Parrot_api_run_bytecode)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PMC * main_sub = NULL;
-
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-
-    /* Debugging mode nonsense. */
-    if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
-         Parrot_io_eprintf(interp, "*** Parrot VM: %Ss core ***\n",
-                 interp->run_core->name);
-    }
-
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    main_sub = Parrot_pcc_get_sub(interp, CURRENT_CONTEXT(interp));
-
-    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
-
-    if (!main_sub)
-        main_sub = set_current_sub(interp);
-
-    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
-    Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table);
-
-    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, mainargs);
-    Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", mainargs);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc,
-Parrot_PMC pbc, const char * const outfile, Parrot_Int opts)>
-
-Disassembles and prints out the C<pbc> bytecode. This function returns a true
-value if this call is successful and false value otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-        ARGIN_NULLOK(const char * const outfile), Parrot_Int opts)
-{
-    ASSERT_ARGS(Parrot_api_disassemble_bytecode)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    if (pf->cur_cs)
-        Parrot_pf_set_current_packfile(interp, pf);
-    /* TODO: Break up the dependency with emebed.c */
-    Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
-    EMBED_API_CALLOUT(interp_pmc, interp);
-}
-
-/*
-
-=item C<Parrot_Int Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc,
-Parrot_PMC pbc, Parrot_String * bc)>
-
-Serialize a packfile PMC into a sequence of bytes suitable for writing out
-to a .pbc file
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_serialize_bytecode_pmc(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-        ARGOUT(Parrot_String * bc))
-{
-    ASSERT_ARGS(Parrot_api_serialize_bytecode_pmc)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-    if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
-    else {
-        const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
-        opcode_t * const packed = (opcode_t*) mem_sys_allocate(size);
-        PackFile_pack(interp, pf, packed);
-        *bc = Parrot_str_new_init(interp, (const char *)packed, size,
-                Parrot_binary_encoding_ptr, 0);
-    }
-    EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
 /*
@@ -572,6 +368,10 @@ Parrot_api_add_library_search_path(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_add_library_search_path)
     EMBED_API_CALLIN(interp_pmc, interp)
     Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LIBRARY);
+
+    /* EXPERIMENTAL. This line has been added experimentally because it is a
+       missing feature, and it may go away at any time without warning. */
+    Parrot_lib_add_path_from_cstring(interp, path, PARROT_LIB_PATH_LANG);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -716,35 +516,6 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 
 /*
 
-=item C<Parrot_Int Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, const char *
-sourcefile, int argc, const char **argv, Parrot_PMC* bytecodepmc, int *result,
-imcc_hack_func_t func)>
-
-WARNING: This is an evil hack to provide a wrapper around IMCC to catch unhandled
-exceptions without having to assume IMCC is linked in with libparrot. Delete this
-as soon as we don't need it anymore.
-
-This function returns a true value if this call is successful and false value
-otherwise.
-
-=cut
-
-*/
-
-PARROT_API
-Parrot_Int
-Parrot_api_wrap_imcc_hack(Parrot_PMC interp_pmc, ARGIN(const char * sourcefile),
-    int argc, ARGIN_NULLOK(const char **argv), ARGMOD(Parrot_PMC* bytecodepmc),
-    ARGOUT(int *result), imcc_hack_func_t func)
-{
-    ASSERT_ARGS(Parrot_api_wrap_imcc_hack)
-    EMBED_API_CALLIN(interp_pmc, interp)
-    *result = func(interp_pmc, sourcefile, argc, argv, bytecodepmc);
-    EMBED_API_CALLOUT(interp_pmc, interp)
-}
-
-/*
-
 =item C<Parrot_Int Parrot_api_load_language(Parrot_PMC interp_pmc, Parrot_String
 lang)>
 
@@ -758,7 +529,7 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_language(Parrot_PMC interp_pmc, Parrot_String lang)
+Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang))
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -780,7 +551,7 @@ value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_get_compiler(Parrot_PMC interp_pmc, Parrot_String type,
+Parrot_api_get_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
     ARGOUT(Parrot_PMC *compiler))
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
@@ -803,8 +574,8 @@ value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_compiler(Parrot_PMC interp_pmc, Parrot_String type,
-    Parrot_PMC compiler)
+Parrot_api_set_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
+    ARGIN(Parrot_PMC compiler))
 {
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -837,6 +608,96 @@ Parrot_api_toggle_gc(Parrot_PMC interp_pmc, Parrot_Int on)
         Parrot_block_GC_sweep(interp);
     }
     EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_reset_call_signature(Parrot_PMC interp_pmc,
+Parrot_PMC ctx)>
+
+Reset the call signature
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, ARGMOD(Parrot_PMC ctx))
+{
+    ASSERT_ARGS(Parrot_api_reset_call_signature)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
+    if (!VTABLE_isa(interp, ctx, callcontext))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Not a valid CallContext");
+    VTABLE_morph(interp, ctx, PMCNULL);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, void *ptr,
+Parrot_Int size, Parrot_PMC *pmc)>
+
+Wrap a user data pointer into a Ptr PMC for passing into Parrot. This PMC
+is designed such that Parrot will treat the pointer as being opaque and will
+not attempt to dereference, examine, or manipulate it at all.
+
+Optionally a C<size> parameter can be passed. If C<size> is greater than zero,
+the size information will be included with the pointer for later use. If
+C<size> is less than or equal to zero, it will be ignored and will not be
+included in the PMC object.
+
+=item C<Parrot_Int Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc, Parrot_PMC
+pmc, void ** ptr, Parrot_Int * size)>
+
+Return a pointer from a PMC. This is typically used in conjunction with
+C<Parrot_api_wrap_pointer> to return the original wrapped pointer value from
+the PMC. Used with other PMC types besides C<Ptr> or C<PtrBuf> will have
+undefined results, and should not be used or relied upon.
+
+If the pointer was stored with size information, C<size> will contain that
+size value. Otherwise, C<size> will be -1.
+
+Notice that this function does not destroy or alter the data PMC.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_wrap_pointer(Parrot_PMC interp_pmc, ARGIN_NULLOK(void *ptr),
+        Parrot_Int size, ARGOUT(Parrot_PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_api_wrap_pointer)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    PMC * ptr_pmc = NULL;
+    if (size > 0) {
+        ptr_pmc = Parrot_pmc_new(interp, enum_class_PtrBuf);
+        VTABLE_set_integer_native(interp, ptr_pmc, size);
+    }
+    else
+        ptr_pmc = Parrot_pmc_new(interp, enum_class_Ptr);
+    VTABLE_set_pointer(interp, ptr_pmc, ptr);
+    *pmc = ptr_pmc;
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
+PARROT_API
+Parrot_Int
+Parrot_api_unwrap_pointer(Parrot_PMC interp_pmc, Parrot_PMC pmc,
+        ARGOUT(void ** ptr), ARGOUT(Parrot_Int * size))
+{
+    ASSERT_ARGS(Parrot_api_unwrap_pointer)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *ptr = VTABLE_get_pointer(interp, pmc);
+    if (pmc->vtable->base_type == enum_class_PtrBuf)
+        *size = VTABLE_get_integer(interp, pmc);
+    else
+        *size = -1;
+    EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,7 +27,176 @@ These are the vtable functions for the lexpad PMC.
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_INLINE
+PARROT_CAN_RETURN_NULL
+static HashBucket * register_bucket(PARROT_INTERP,
+    ARGMOD(PMC *info),
+    ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
+static INTVAL register_number_for_get(PARROT_INTERP,
+    ARGMOD(PMC *info),
+    ARGIN(STRING *name),
+    INTVAL reg_type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info);
+
+static INTVAL register_number_for_set(PARROT_INTERP,
+    ARGMOD(PMC *info),
+    ARGMOD(STRING *name),
+    INTVAL reg_type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*info)
+        FUNC_MODIFIES(*name);
+
+PARROT_DOES_NOT_RETURN
+static void throw_lexical_not_found(PARROT_INTERP, ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_DOES_NOT_RETURN
+static void throw_wrong_register_type(PARROT_INTERP, ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_register_bucket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_register_number_for_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_register_number_for_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(info) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_throw_lexical_not_found __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_throw_wrong_register_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+
+/*
+
+=item C<static void throw_wrong_register_type(PARROT_INTERP, STRING *name)>
+
+=item C<static void throw_lexical_not_found(PARROT_INTERP, STRING *name)>
+
+Helper functions for common exceptions.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_wrong_register_type(PARROT_INTERP, ARGIN(STRING *name))
+{
+    ASSERT_ARGS(throw_wrong_register_type)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
+            "Lexical '%Ss' is of wrong register type in lexical lookup", name);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+throw_lexical_not_found(PARROT_INTERP, ARGIN(STRING *name))
+{
+    ASSERT_ARGS(throw_lexical_not_found)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
+            "Lexical '%Ss' not found", name);
+}
+
+/*
+
+=item C<static HashBucket * register_bucket(PARROT_INTERP, PMC *info, STRING
+*name)>
+
+Helper for register_number_ functions.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_CAN_RETURN_NULL
+static HashBucket *
+register_bucket(PARROT_INTERP, ARGMOD(PMC *info), ARGIN(STRING *name))
+{
+    ASSERT_ARGS(register_bucket)
+    const Hash * const hash = (const Hash *)VTABLE_get_pointer(interp, info);
+    return hash->entries ?
+            Parrot_hash_get_bucket(interp, hash, name) :
+            NULL;
+}
+
+/*
+
+=item C<static INTVAL register_number_for_get(PARROT_INTERP, PMC *info, STRING
+*name, INTVAL reg_type)>
+
+Locates the register number for getting the specified name
+and type of lexical.
+
+=cut
+
+*/
+
+static INTVAL
+register_number_for_get(PARROT_INTERP, ARGMOD(PMC *info), ARGIN(STRING *name),
+        INTVAL reg_type)
+{
+    ASSERT_ARGS(register_number_for_get)
+
+    const HashBucket * const b = register_bucket(interp, info, name);
+    if (!b)
+        return -1;
+    if (((INTVAL)b->value & 3) != reg_type)
+        throw_wrong_register_type(interp, name);
+
+    return ((INTVAL)b->value) >> 2;
+}
+
+/*
+
+=item C<static INTVAL register_number_for_set(PARROT_INTERP, PMC *info, STRING
+*name, INTVAL reg_type)>
+
+Locates the register number for setting the specified name
+and type of lexical.
+
+=cut
+
+*/
+
+static INTVAL
+register_number_for_set(PARROT_INTERP, ARGMOD(PMC *info), ARGMOD(STRING *name),
+        INTVAL reg_type)
+{
+    ASSERT_ARGS(register_number_for_set)
+
+    const HashBucket * const b = register_bucket(interp, info, name);
+    if (!b)
+        throw_lexical_not_found(interp, name);
+    if (((INTVAL)b->value & 3) != reg_type)
+        throw_wrong_register_type(interp, name);
+
+    return ((INTVAL)b->value) >> 2;
+}
+
 
 pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *lexinfo;
@@ -97,9 +266,9 @@ Return the LexInfo PMC, if any or a Null PMC.
 
     VTABLE INTVAL exists_keyed_str(STRING *name) {
         PMC  *info;
-        Hash *hash;
+        const Hash *hash;
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
+        hash = (const Hash *)VTABLE_get_pointer(INTERP, info);
 
         return hash->entries
             ? (Parrot_hash_get_bucket(INTERP, hash, name) != 0)
@@ -112,24 +281,59 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *name) {
-        PMC        *info;
-        Hash       *hash;
-        PMC        *ctx;
-        HashBucket *b;
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
-
-        if (!hash->entries)
-            return PMCNULL;
-
-        b = Parrot_hash_get_bucket(INTERP, hash, name);
-
-        if (!b)
+        reg = register_number_for_get(INTERP, info, name, REGNO_PMC);
+        if (reg < 0)
             return PMCNULL;
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        return CTX_REG_PMC(ctx, (INTVAL)b->value);
+        return CTX_REG_PMC(INTERP, ctx, reg);
+    }
+
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_INT);
+        if (reg < 0)
+            throw_lexical_not_found(INTERP, name);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        return CTX_REG_INT(INTERP, ctx, reg);
+    }
+
+    VTABLE FLOATVAL get_number_keyed_str(STRING *name) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_NUM);
+        if (reg < 0)
+            throw_lexical_not_found(INTERP, name);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        return CTX_REG_NUM(INTERP, ctx, reg);
+    }
+
+    VTABLE STRING *get_string_keyed_str(STRING *name) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_get(INTERP, info, name, REGNO_STR);
+        if (reg < 0)
+            throw_lexical_not_found(INTERP, name);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        return CTX_REG_STR(INTERP, ctx, reg);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *name) {
@@ -137,27 +341,89 @@ Return the LexInfo PMC, if any or a Null PMC.
         return SELF.get_pmc_keyed_str(s);
     }
 
+    VTABLE INTVAL get_integer_keyed(PMC *name) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        return SELF.get_integer_keyed_str(s);
+    }
+
+    VTABLE FLOATVAL get_number_keyed(PMC *name) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        return SELF.get_number_keyed_str(s);
+    }
+
+    VTABLE STRING *get_string_keyed(PMC *name) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        return SELF.get_string_keyed_str(s);
+    }
+
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *value) {
-        PMC              * info;
-        Hash             * hash;
-        PMC              * ctx;
-        HashBucket       * b;
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
-        b    = Parrot_hash_get_bucket(INTERP, hash, name);
-
-        if (!b)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
-                "Lexical '%Ss' not found", name);
+        reg = register_number_for_set(INTERP, info, name, REGNO_PMC);
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        CTX_REG_PMC(ctx, (INTVAL)b->value) = value;
+        CTX_REG_PMC(INTERP, ctx, reg) = value;
+        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
+    }
+
+    VTABLE void set_integer_keyed_str(STRING *name, INTVAL value) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_INT);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        CTX_REG_INT(INTERP, ctx, reg) = value;
+    }
+
+    VTABLE void set_number_keyed_str(STRING *name, FLOATVAL value) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_NUM);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        CTX_REG_NUM(INTERP, ctx, reg) = value;
+    }
+
+    VTABLE void set_string_keyed_str(STRING *name, STRING *value) {
+        PMC    *info;
+        PMC    *ctx;
+        INTVAL  reg;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        reg = register_number_for_set(INTERP, info, name, REGNO_STR);
+
+        GET_ATTR_ctx(INTERP, SELF, ctx);
+        CTX_REG_STR(INTERP, ctx, reg) = value;
+        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
+    }
+
+    VTABLE void set_integer_keyed(PMC *name, INTVAL value) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        SELF.set_integer_keyed_str(s, value);
+    }
+
+    VTABLE void set_number_keyed(PMC *name, FLOATVAL value) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        SELF.set_number_keyed_str(s, value);
+    }
+
+    VTABLE void set_string_keyed(PMC *name, STRING *value) {
+        STRING * const s = VTABLE_get_string(INTERP, name);
+        SELF.set_string_keyed_str(s, value);
     }
 
     METHOD get_lexinfo() {

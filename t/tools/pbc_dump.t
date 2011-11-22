@@ -139,7 +139,6 @@ my $annotated_pir = <<'PIR';
   .annotate 'line', 441
   dec i
   .annotate 'goodbye', 'cactus'
-  .annotate 'num', 12.9
 .end
 PIR
 
@@ -176,7 +175,7 @@ close $pir_i;
 system($PARROT, '-o', $pbc_file, $pir_file);
 
 # Test -n option
-dump_raw_output_like("-n " . $pbc_file, qr/0003:  end/s, "pbc_dump -n command");
+dump_raw_output_like("-n " . $pbc_file, qr/0003:  returncc/s, "pbc_dump -n command");
 
 # Test -t option
 dump_raw_output_like("-t " . $pbc_file, qr/HEADER.*DIRECTORY.*BYTECODE.*CONSTANT/s, "pbc_dump -t command");

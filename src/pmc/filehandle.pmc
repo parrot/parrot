@@ -184,7 +184,7 @@ Free structures.
 */
     VTABLE void destroy() {
         if (PARROT_FILEHANDLE(SELF)) {
-            Parrot_FileHandle_attributes *attrs = PARROT_FILEHANDLE(SELF);
+            Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(SELF);
 
             if (!Parrot_io_is_closed_filehandle(INTERP, SELF)) {
                 if (attrs->flags & PIO_F_SHARED)
@@ -250,7 +250,11 @@ For internal usage only, subject to change without notice.
 
 =item C<INTVAL get_bool()>
 
-Returns whether the FileHandle has reached the end of the file.
+Return false if a previous read attempted to read past the end of the underlying
+filehandle.  Note that this method may return true even if there are no bytes
+remaining if the most recent read requested the exact number of bytes remaining
+in the file.
+
 
 =cut
 
@@ -294,7 +298,7 @@ filehandle, rather than modifying the invocant).
         if (!got_filename || STRING_IS_NULL(filename))
             GET_ATTR_filename(INTERP, SELF, filename);
 
-        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
+        filehandle = Parrot_io_open_handle(INTERP, SELF, filename, mode);
 
         RETURN(PMC *filehandle);
     }
@@ -347,7 +351,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 */
 
     METHOD isatty() {
-        const INTVAL isatty = Parrot_io_is_tty(INTERP, SELF);
+        const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
 
@@ -384,7 +388,7 @@ Read a line from the filehandle and return it in a string.
 
 #ifdef PARROT_HAS_READLINE
     /* 4-column indent to get c_indent.t to DTRT */
-        char *prompt_cstring =
+        char * const prompt_cstring =
             (got_prompt ? Parrot_str_to_cstring(INTERP, prompt) : NULL);
         char * const r = readline(prompt_cstring);
         Parrot_str_free_cstring(prompt_cstring);
@@ -405,7 +409,7 @@ Read a line from the filehandle and return it in a string.
         }
 #else
         if (got_prompt) {
-            char *prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
+            char * const prompt_cstring = Parrot_str_to_cstring(INTERP, prompt);
             fprintf(stderr, "%s", prompt_cstring);
             Parrot_str_free_cstring(prompt_cstring);
         }
@@ -478,15 +482,15 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open(INTERP, PMCNULL, name, NULL);
+            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, STRINGNULL);
 
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
-            size = (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
+            size = (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
 
             result = Parrot_io_reads(INTERP, filehandle, size);
-            Parrot_io_close(INTERP, filehandle);
+            Parrot_io_close_handle(INTERP, filehandle);
         }
         else {
             PMC *sb;
@@ -522,7 +526,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush(INTERP, SELF);
+        Parrot_io_flush_filehandle(INTERP, SELF);
     }
 
 /*
@@ -677,7 +681,10 @@ scheme) for the filehandle.
 
 =item C<METHOD eof()>
 
-Returns true if the filehandle is at end-of-file, returns false otherwise.
+Return true if a previous read attempted to read past the end of the underlying
+filehandle.  Note that this method may return false even if there are no bytes
+remaining if the most recent read requested the exact number of bytes remaining
+in the file.
 
 =cut
 
@@ -686,6 +693,23 @@ Returns true if the filehandle is at end-of-file, returns false otherwise.
     METHOD eof() {
         const INTVAL flags = Parrot_io_eof(INTERP, SELF);
         RETURN(INTVAL flags);
+    }
+
+
+/*
+
+=item C<METHOD handle()>
+
+Returns the INTVAL used by the OS to identify this filehandle.
+
+=cut
+
+*/
+
+    METHOD handle() {
+        INTVAL handle;
+        GET_ATTR_os_handle(INTERP, SELF, handle);
+        RETURN(INTVAL handle);
     }
 
 /*
@@ -747,7 +771,7 @@ C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
         const PIOOFF_T pio_offs = has_overflow ?
                                     Parrot_io_make_offset32(offs_overflow, offs) :
                                     offs;
-        if (0 > Parrot_io_seek(INTERP, SELF, pio_offs, whence))
+        if (0 > Parrot_io_seek_handle(INTERP, SELF, pio_offs, whence))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed");
     }
 
@@ -762,8 +786,30 @@ Returns the next byte from the stream, but does not remove it.
 */
 
     METHOD peek() {
-        STRING *s = Parrot_io_peek(INTERP, SELF);
+        STRING * const s = Parrot_io_peek(INTERP, SELF);
         RETURN(STRING* s);
+    }
+
+/*
+
+=item C<METHOD setasync()>
+
+=cut
+
+*/
+    METHOD setasync() {
+        Parrot_io_async(INTERP, SELF, 1);
+    }
+
+/*
+
+=item C<METHOD setblocking()>
+
+=cut
+
+*/
+    METHOD setblocking() {
+        Parrot_io_async(INTERP, SELF, 0);
     }
 
 /*
@@ -773,6 +819,7 @@ Returns the next byte from the stream, but does not remove it.
 =cut
 
 */
+
 
 } /* end pmclass */
 

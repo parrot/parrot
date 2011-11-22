@@ -54,8 +54,6 @@ Parrot_io_init(PARROT_INTERP)
         /* Init IO stacks and handles for interp instance.  */
         PIOHANDLE os_handle;
 
-        PIO_INIT(interp);
-
         os_handle           = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
         _PIO_STDIN(interp)  = Parrot_io_fdopen_flags(interp, PMCNULL,
                                 os_handle, PIO_F_READ);

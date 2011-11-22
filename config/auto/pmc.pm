@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,8 +62,6 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/Method.pm \\
     lib/Parrot/Pmc2c/PCCMETHOD.pm \\
     lib/Parrot/Pmc2c/MULTI.pm \\
-    lib/Parrot/Pmc2c/PMCEmitter.pm \\
-    lib/Parrot/Pmc2c/MethodEmitter.pm \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\
     lib/Parrot/Pmc2c/PMC/default.pm \\
@@ -342,6 +340,8 @@ sub get_includes {
           $include = "src/pmc/" . $include;
         } elsif ($include =~ m/^pmc\/pmc_/) { # local pmc header
           $include = "include/" . $include;
+        } elsif ($include =~ m/^imcc/) { # IMCC header.
+            $include = "include/" . $include;
         } elsif ($include =~ m{^\.\./}) { # relative to include/ dir...
           $include =~ s{^\.\./}{};
         }
@@ -391,12 +391,6 @@ include/parrot/oo.h
 include/parrot/feature.h
 include/parrot/oplib.h
 include/parrot/library.h
-include/parrot/thread.h
-include/parrot/atomic.h
-include/parrot/atomic/fallback.h
-include/parrot/atomic/gcc_pcc.h
-include/parrot/atomic/gcc_x86.h
-include/parrot/atomic/sparc.h
 include/parrot/string.h
 include/parrot/settings.h
 include/parrot/namespace.h
@@ -405,9 +399,6 @@ include/parrot/pbcversion.h
 include/parrot/core_types.h
 include/parrot/interpreter.h
 include/parrot/io.h
-include/parrot/io_portable.h
-include/parrot/io_unix.h
-include/parrot/io_win32.h
 include/parrot/context.h
 include/parrot/parrot.h
 include/parrot/dynext.h
@@ -421,7 +412,6 @@ include/parrot/datatypes.h
 include/parrot/core_pmcs.h
 include/parrot/misc.h
 include/parrot/sub.h
-include/parrot/platform.h
 include/parrot/pmc_freeze.h
 include/parrot/global_setup.h
 include/parrot/gc_api.h
@@ -430,8 +420,6 @@ include/parrot/vtables.h
 include/parrot/has_header.h
 include/parrot/warnings.h
 include/parrot/op.h
-include/parrot/platform_limits.h
-include/parrot/stat.h
 include/parrot/debugger.h
 include/parrot/caches.h
 include/parrot/config.h

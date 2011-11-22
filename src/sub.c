@@ -221,7 +221,7 @@ Parrot_sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
     ASSERT_ARGS(Parrot_sub_get_line_from_pc)
     Parrot_Sub_attributes *sub;
     opcode_t              *base_pc, *debug_ops;
-    size_t                 i, op, current_annotation, debug_size;
+    size_t                 i, op, current_annotation, debug_size, code_size;
 
     if (!subpmc || !pc)
         return -1;
@@ -230,13 +230,14 @@ Parrot_sub_get_line_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc), ARGIN_NULL
 
     debug_ops          = sub->seg->debugs->base.data;
     debug_size         = sub->seg->debugs->base.size;
+    code_size          = sub->seg->base.size;
     base_pc            = sub->seg->base.data;
     current_annotation = pc - base_pc;
 
     /* assert pc is in correct segment */
-    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + sub->seg->base.size);
+    PARROT_ASSERT(base_pc <= pc && pc <= base_pc + code_size);
 
-    for (i = op = 0; op < debug_size; ++i) {
+    for (i = op = 0; op < code_size; ++i) {
         op_info_t * const op_info  = sub->seg->op_info_table[*base_pc];
         opcode_t          var_args = 0;
 
@@ -290,7 +291,7 @@ Parrot_sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
 
 /*
 
-=item C<STRING* Parrot_sub_Context_infostr(PARROT_INTERP, PMC *ctx)>
+=item C<STRING* Parrot_sub_Context_infostr(PARROT_INTERP, PMC *ctx, int is_top)>
 
 Formats context information for display.  Takes a context pointer and
 returns a pointer to the text.  Used in debug.c and warnings.c
@@ -303,14 +304,12 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
+Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx), int is_top)
 {
     ASSERT_ARGS(Parrot_sub_Context_infostr)
     Parrot_Context_info info;
     STRING             *res = NULL;
-    const char * const  msg = (CURRENT_CONTEXT(interp) == ctx)
-        ? "current instr.:"
-        : "called from Sub";
+    const char * const  msg = is_top ? "current instr.:" : "called from Sub";
 
     Parrot_block_GC_mark(interp);
     if (Parrot_sub_context_get_info(interp, ctx, &info)) {
@@ -346,6 +345,8 @@ Parrot_sub_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
 
         if (PMC_IS_NULL(outer))
             return lex_pad;
+
+        PARROT_ASSERT(outer->vtable->base_type == enum_class_CallContext);
 
         if (!PMC_IS_NULL(lex_pad))
             if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))
@@ -427,6 +428,7 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
                 if (STRING_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
+                    PARROT_GC_WRITE_BARRIER(interp, child_pmc);
                     child_sub->outer_ctx = ctx;
                 }
             }
@@ -440,6 +442,7 @@ Parrot_sub_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         return;
 
     /* set the sub's outer context to the current context */
+    PARROT_GC_WRITE_BARRIER(interp, sub_pmc);
     sub->outer_ctx = ctx;
 }
 
@@ -515,13 +518,12 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
         PMC * const sub = Parrot_pcc_get_sub(interp, to_ctx);
 
-        Parrot_io_eprintf(interp, "# Back in sub '%Ss', env %p\n",
-                    Parrot_sub_full_sub_name(interp, sub),
-                    interp->dynamic_env);
+        Parrot_io_eprintf(interp, "# Back in sub '%Ss\n",
+                    Parrot_sub_full_sub_name(interp, sub));
     }
 
     /* set context */
-    CURRENT_CONTEXT(interp) = to_ctx;
+    Parrot_pcc_set_context(interp, to_ctx);
     Parrot_pcc_set_signature(interp, to_ctx, sig);
 }
 

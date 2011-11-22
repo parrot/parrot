@@ -13,8 +13,11 @@
             "examples/languages/squaak/doc/tutorial_episode_8.pod",
             "examples/languages/squaak/doc/tutorial_episode_9.pod"
          ],
+         "resource" : [
+            "examples/languages/squaak/doc/*.png"
+         ],
          "title" : "Tutorial of Parrot Compiler Tools"
       }
    ],
-   "title" : "PCT_Tutorial"
+   "title" : "PCT Tutorial"
 }

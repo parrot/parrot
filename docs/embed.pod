@@ -12,8 +12,8 @@ for the newer API is located at F<docs/embed_new.pod>.
 
 =head1 SYNOPSIS
 
-    #include <parrot/embed.h>
-    #include <parrot/extend.h>
+    #include "parrot/parrot.h"
+    #include "parrot/extend.h"
 
     int main(int argc, char* argv[])
     {
@@ -38,8 +38,6 @@ for the newer API is located at F<docs/embed_new.pod>.
 =head1 FILES
 
 =over 4
-
-=item F<include/parrot/embed.h>
 
 =item F<include/parrot/extend.h>
 
@@ -160,7 +158,7 @@ The default. No flags.
 
 =item PARROT_BOUNDS_FLAG
 
-True if byte code bounds should be tracked.
+True if bytecode bounds should be tracked.
 
 =item PARROT_GC_DEBUG_FLAG
 
@@ -462,7 +460,6 @@ performing both compiling and linking in one step.
 =head2 Load bytecode as a library and run a single subroutine
 
     #include <parrot/parrot.h>
-    #include <parrot/embed.h>
     #include <parrot/extend.h>
 
     int main(int argc, char *argv[])
@@ -1025,8 +1022,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_delprop>
 
-=item C<Parrot_PMC_destroy>
-
 =item C<Parrot_PMC_divide>
 
 =item C<Parrot_PMC_divide_float>
@@ -1181,8 +1176,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_instantiate>
 
-=item C<Parrot_PMC_invoke>
-
 =item C<Parrot_PMC_i_pow>
 
 =item C<Parrot_PMC_i_pow_float>
@@ -1210,8 +1203,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_PMC_i_subtract_float>
 
 =item C<Parrot_PMC_i_subtract_int>
-
-=item C<Parrot_PMC_mark>
 
 =item C<Parrot_PMC_modulus>
 
@@ -1385,8 +1376,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_substr>
 
-=item C<Parrot_PMC_substr_str>
-
 =item C<Parrot_PMC_subtract>
 
 =item C<Parrot_PMC_subtract_float>
@@ -1434,8 +1423,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_run_callback>
 
 =item C<Parrot_runcode>
-
-=item C<Parrot_run_native>
 
 =item C<Parrot_schedule_event>
 

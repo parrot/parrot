@@ -1,5 +1,5 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2004-2011, Parrot Foundation.
+#
 
 package Parrot::Headerizer;
 
@@ -48,7 +48,7 @@ use Parrot::Headerizer::Functions qw(
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
-    shim_test
+    clean_args_for_declarations
     handle_modified_args
     add_newline_if_multiline
     add_asserts_to_declarations
@@ -90,7 +90,7 @@ Parrot::Headerizer object.
 sub new {
     my ($class, $args) = @_;
     if (defined $args) {
-        die "Argument to Parrot::Headerizer must be hashref"
+        die 'Argument to Parrot::Headerizer must be hashref'
             unless reftype($args) eq 'HASH';
     }
     else {
@@ -244,6 +244,10 @@ sub extract_function_declarations {
 
     # Drop all text after HEADERIZER STOP
     $text =~ s{/\*\s*HEADERIZER STOP.+}{}s;
+
+    # Drop begin/end PMC HEADER sections
+    $text =~ s{BEGIN_PMC_HEADER_PREAMBLE}{}sx;
+    $text =~ s{END_PMC_HEADER_PREAMBLE}{}sx;
 
     # Strip blocks of comments
     $text =~ s{^/\*.*?\*/}{}mxsg;
@@ -855,11 +859,10 @@ sub make_function_decls {
         my @args    = @{ $func->{args} };
         my @attrs   = $self->attrs_from_args( $func, @args );
 
-        my @modified_args = shim_test($func, \@args);
+        my @modified_args = clean_args_for_declarations($func, \@args);
 
         my $multiline;
-        ($decl, $multiline) = handle_modified_args(
-            $decl, \@modified_args);
+        ($decl, $multiline) = handle_modified_args($decl, \@modified_args);
 
         my $attrs = join( "", map { "\n\t\t$_" } @attrs );
         if ($attrs) {

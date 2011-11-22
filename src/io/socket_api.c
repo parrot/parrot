@@ -21,6 +21,7 @@ These are the primary interface functions for working with socket objects.
 #include "io_private.h"
 #include "api.str"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_sockaddr.h"
 
 #include <stdarg.h>
 
@@ -36,79 +37,9 @@ Returns 1 if the socket is closed, 0 if it is open.
 
 */
 
-
-/*
- * Mapping between PIO_PF_* constants and system-specific PF_* constants.
- *
- * Uses -1 for unsupported protocols.
- */
-
-static int pio_pf[PIO_PF_MAX+1] = {
-#ifdef PF_LOCAL
-    PF_LOCAL,   /* PIO_PF_LOCAL */
-#else
-    -1,         /* PIO_PF_LOCAL */
-#endif
-#ifdef PF_UNIX
-    PF_UNIX,    /* PIO_PF_UNIX */
-#else
-    -1,         /* PIO_PF_UNIX */
-#endif
-#ifdef PF_INET
-    PF_INET,    /* PIO_PF_INET */
-#else
-    -1,         /* PIO_PF_INET */
-#endif
-#ifdef PF_INET6
-    PF_INET6,   /* PIO_PF_INET6 */
-#else
-    -1,         /* PIO_PF_INET6 */
-#endif
-};
-
-/*
- * Mapping between PIO_SOCK_* constants and system-specific SOCK_* constants.
- * Uses -1 for unsupported socket types.
- */
-
-static int pio_sock[PIO_SOCK_MAX+1] = {
-#ifdef SOCK_PACKET
-    SOCK_PACKET,    /* PIO_SOCK_PACKET */
-#else
-    -1,             /* PIO_SOCK_PACKET */
-#endif
-#ifdef SOCK_STREAM
-    SOCK_STREAM,    /* PIO_SOCK_STREAM */
-#else
-    -1,             /* PIO_SOCK_STREAM */
-#endif
-#ifdef SOCK_DGRAM
-    SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
-#else
-    -1,             /* PIO_SOCK_DGRAM */
-#endif
-#ifdef SOCK_RAW
-    SOCK_RAW,       /* PIO_SOCK_RAW */
-#else
-    -1,             /* PIO_SOCK_RAW */
-#endif
-#ifdef SOCK_RDM
-    SOCK_RDM,      /* PIO_SOCK_RDM */
-#else
-    -1,            /* PIO_SOCK_RDM */
-#endif
-#ifdef SOCK_SEQPACKET
-    SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
-#else
-    -1,             /* PIO_SOCK_SEQPACKET */
-#endif
-};
-
-
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 INTVAL
 Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
 {
@@ -138,8 +69,8 @@ Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
 
 /*
 
-=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *pmc, INTVAL which, INTVAL sec,
-INTVAL usec)>
+=item C<INTVAL Parrot_io_poll_handle(PARROT_INTERP, PMC *pmc, INTVAL which,
+INTVAL sec, INTVAL usec)>
 
 Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
 microseconds.
@@ -150,20 +81,22 @@ microseconds.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
+Parrot_io_poll_handle(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
-    ASSERT_ARGS(Parrot_io_poll)
-    if (PMC_IS_NULL(pmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Can't poll a NULL socket object");
+    ASSERT_ARGS(Parrot_io_poll_handle)
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
 
-    return PIO_POLL(interp, pmc, which, sec, usec);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't poll closed socket");
+
+    return Parrot_io_poll(interp, io->os_handle, which, sec, usec);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *socket, INTVAL fam, INTVAL
-type, INTVAL proto)>
+=item C<INTVAL Parrot_io_socket_handle(PARROT_INTERP, PMC *socket, INTVAL fam,
+INTVAL type, INTVAL proto)>
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether
@@ -177,64 +110,68 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
-Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
+Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
-    ASSERT_ARGS(Parrot_io_socket)
-    PMC *new_socket;
-
-    /* convert Parrot's family to system family */
-    if (fam < 0 || fam >= PIO_PF_MAX)
-        return -1;
-    fam = pio_pf[fam];
-    if (fam < 0)
-        return -1;
-
-    /* convert Parrot's socket type to system type */
-    if (type < 0 || type >= PIO_SOCK_MAX)
-        return -1;
-    type = pio_sock[type];
-    if (type < 0)
-        return -1;
+    ASSERT_ARGS(Parrot_io_socket_handle)
+    PMC       *new_socket;
+    PIOHANDLE  os_handle;
 
     if (PMC_IS_NULL(socket))
         new_socket = Parrot_io_new_socket_pmc(interp,
                 PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
     else
         new_socket = socket;
-    /* XXX new_socket is assigned, but never used. Probably a bug? */
 
-    return PIO_SOCKET(interp, socket, fam, type, proto);
+    os_handle = Parrot_io_socket(interp, fam, type, proto);
+
+    SETATTR_Socket_os_handle(interp, new_socket, os_handle);
+    SETATTR_Socket_family(interp, new_socket, fam);
+    SETATTR_Socket_type(interp, new_socket, type);
+    SETATTR_Socket_protocol(interp, new_socket, proto);
+
+    return 0;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_recv(PARROT_INTERP, PMC *pmc, STRING **buf)>
+=item C<STRING * Parrot_io_recv_handle(PARROT_INTERP, PMC *pmc, size_t len)>
 
-Receives a message from the connected socket C<*pmc> in C<*buf>.  Returns C<-1>
-if it fails.
+Receives a message from the connected socket C<*pmc> in C<*buf>.
 
 =cut
 
 */
 
 PARROT_EXPORT
-INTVAL
-Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_recv)
-    if (Parrot_io_socket_is_closed(interp, pmc))
-        return -1;
+    ASSERT_ARGS(Parrot_io_recv_handle)
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
+    STRING *res;
+    INTVAL  received;
 
-    return PIO_RECV(interp, pmc, buf);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't recv from closed socket");
+
+    /* This must stay ASCII to make Rakudo and UTF-8 work for now */
+    res      = Parrot_str_new_noinit(interp, len);
+    received = Parrot_io_recv(interp, io->os_handle, res->strstart, len);
+
+    res->bufused = received;
+    res->strlen  = received;
+
+    return res;
 }
 
 /*
 
-=item C<INTVAL Parrot_io_send(PARROT_INTERP, PMC *pmc, STRING *buf)>
+=item C<INTVAL Parrot_io_send_handle(PARROT_INTERP, PMC *pmc, STRING *buf)>
 
-Sends the message C<*buf> to the connected socket C<*pmc>.  Returns
-C<-1> if it cannot send the message.
+Sends the message C<*buf> to the connected socket C<*pmc>.
 
 =cut
 
@@ -243,83 +180,160 @@ C<-1> if it cannot send the message.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
+Parrot_io_send_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 {
-    ASSERT_ARGS(Parrot_io_send)
-    if (Parrot_io_socket_is_closed(interp, pmc))
-        return -1;
+    ASSERT_ARGS(Parrot_io_send_handle)
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
 
-    return PIO_SEND(interp, pmc, buf);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't send to closed socket");
+
+    return Parrot_io_send(interp, io->os_handle, buf->strstart, buf->bufused);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_connect(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<void Parrot_io_connect_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
 
-Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
+Connects C<*pmc> to C<*address>.
 
 =cut
 
 */
 
 PARROT_EXPORT
-INTVAL
-Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
+void
+Parrot_io_connect_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
-    ASSERT_ARGS(Parrot_io_connect)
-    if (Parrot_io_socket_is_closed(interp, pmc))
-        return -1;
+    ASSERT_ARGS(Parrot_io_connect_handle)
+    Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+    int i;
 
-    return PIO_CONNECT(interp, pmc, address);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't connect closed socket");
+    if (PMC_IS_NULL(address))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Address is null");
+
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
+                continue;
+
+            io->remote = sa;
+
+            Parrot_io_connect(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
+
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
+    io->remote = address;
+
+    Parrot_io_connect(interp, io->os_handle,
+            VTABLE_get_pointer(interp, address),
+            VTABLE_get_integer(interp, address));
 }
 
 /*
 
-=item C<INTVAL Parrot_io_bind(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<void Parrot_io_bind_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
 
 Binds C<*pmc>'s socket to the local address and port specified by
-C<*address>.  Returns C<-1> on failure.
+C<*address>.
 
 =cut
 
 */
 
 PARROT_EXPORT
-INTVAL
-Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
+void
+Parrot_io_bind_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
-    ASSERT_ARGS(Parrot_io_bind)
-    if (Parrot_io_socket_is_closed(interp, pmc))
-        return -1;
+    ASSERT_ARGS(Parrot_io_bind_handle)
+    Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+    int i;
 
-    return PIO_BIND(interp, pmc, address);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't bind closed socket");
+    if (PMC_IS_NULL(address))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Address is null");
+
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
+                continue;
+
+            io->local = sa;
+
+            Parrot_io_bind(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
+
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
+    io->local = address;
+
+    Parrot_io_bind(interp, io->os_handle,
+            VTABLE_get_pointer(interp, address),
+            VTABLE_get_integer(interp, address));
 }
 
 /*
 
-=item C<INTVAL Parrot_io_listen(PARROT_INTERP, PMC *pmc, INTVAL backlog)>
+=item C<void Parrot_io_listen_handle(PARROT_INTERP, PMC *pmc, INTVAL backlog)>
 
-Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
+Listens for new connections on socket C<*pmc>.
 
 =cut
 
 */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
+void
+Parrot_io_listen_handle(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
 {
-    ASSERT_ARGS(Parrot_io_listen)
-    if (Parrot_io_socket_is_closed(interp, pmc))
-        return -1;
+    ASSERT_ARGS(Parrot_io_listen_handle)
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
 
-    return PIO_LISTEN(interp, pmc, backlog);
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't listen on closed socket");
+
+    Parrot_io_listen(interp, io->os_handle, backlog);
 }
 
 /*
 
-=item C<PMC * Parrot_io_accept(PARROT_INTERP, PMC *pmc)>
+=item C<PMC * Parrot_io_accept_handle(PARROT_INTERP, PMC *pmc)>
 
 Accepts a new connection and returns a newly created C<ParrotIO> socket.
 Returns C<NULL> on failure.
@@ -330,15 +344,28 @@ Returns C<NULL> on failure.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_accept_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_accept)
+    ASSERT_ARGS(Parrot_io_accept_handle)
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
+    Parrot_Socket_attributes *new_io;
+    PMC       *new_pmc;
+
     if (Parrot_io_socket_is_closed(interp, pmc))
         return PMCNULL;
 
-    return PIO_ACCEPT(interp, pmc);
+    new_pmc = Parrot_io_new_socket_pmc(interp,
+                PIO_F_SOCKET | PIO_F_READ | PIO_F_WRITE);
+    new_io  = PARROT_SOCKET(new_pmc);
+
+    new_io->local  = io->local;
+    new_io->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+    new_io->os_handle = Parrot_io_accept(interp, io->os_handle, new_io->remote);
+
+    return new_pmc;
 }
 
 /*

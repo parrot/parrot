@@ -133,12 +133,6 @@ BEGIN {
 
 =over 4
 
-=item C<is_svn_co()>
-
-=item C<is_git_co()>
-
-Check the type of checkout.
-
 =item C<c_header_file_directories()>
 
 =item C<c_source_file_directories()>
@@ -305,26 +299,6 @@ BEGIN {
             };
         }
     }
-}
-
-=item C<is_svn_co()>
-
-Returns true if this is a subversion checkout of Parrot.
-
-=cut
-
-sub is_svn_co {
-    return shift->directory_exists_with_name('.svn');
-}
-
-=item C<is_git_co()>
-
-Returns true if this is a git checkout of Parrot.
-
-=cut
-
-sub is_git_co {
-    return shift->directory_exists_with_name('.git');
 }
 
 =item C<get_make_language_files()>
@@ -540,7 +514,8 @@ sub is_perl {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename after reading");
 
     return 1 if $line && $line =~ /^#!.*perl/;
 
@@ -608,7 +583,8 @@ sub is_pir {
     open my $file_handle, '<', $filename
         or $self->_croak("Could not open $filename for reading");
     my $line = <$file_handle>;
-    close $file_handle;
+    close $file_handle
+        or $self->_croak("Could not close $filename for reading");
 
     if ( $line && $line =~ /^#!.*parrot(?:\s|$)/ ) {
         # something that specifies a pir or pbc is probably a HLL, skip it
@@ -797,7 +773,7 @@ sub generated_files {
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
-            keys %$generated
+            keys %{$generated}
     };
 }
 
@@ -819,7 +795,7 @@ sub slurp {
         local $/;
         $buf = <$fh>;
     }
-    close $fh;
+    close $fh or die "Cannot close $path after reading: $!\n";
 
     return $buf;
 }

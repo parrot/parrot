@@ -21,10 +21,11 @@ Create or destroy a Parrot interpreter
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-#include "../compilers/imcc/imc.h"
 #include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "inter_create.str"
+
+static Interp* emergency_interp;
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -72,6 +73,57 @@ is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 
 /*
 
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
+
+Returns a new Parrot interpreter.
+
+The first created interpreter (C<parent> is C<NULL>) is the last one
+to get destroyed.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+Parrot_Interp
+Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
+{
+    ASSERT_ARGS(Parrot_new)
+    /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
+    return make_interpreter(parent, PARROT_NO_FLAGS);
+}
+
+/*
+
+=item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
+
+Initializes the new interpreter when it hasn't been initialized before.
+
+Additionally sets the stack top, so that Parrot objects created
+in inner stack frames will be visible during GC stack walking code.
+B<stack_top> should be the address of an automatic variable in the caller's
+stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
+frames so that they are not destroyed during GC runs.
+
+Use this function when you call into Parrot before entering a run loop.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
+{
+    ASSERT_ARGS(Parrot_init_stacktop)
+    interp->lo_var_ptr = stack_top;
+    Parrot_gbl_init_world_once(interp);
+}
+
+/*
+
 =item C<Parrot_Interp make_interpreter(Interp *parent, INTVAL flags)>
 
 Create the Parrot interpreter. Allocate memory and clear the registers.
@@ -88,8 +140,11 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(make_interpreter)
     int stacktop;
+    Parrot_GC_Init_Args args;
     Interp * const interp = allocate_interpreter(parent, flags);
-    initialize_interpreter(interp, (void*)&stacktop);
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
+    initialize_interpreter(interp, &args);
     return interp;
 }
 
@@ -122,30 +177,22 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* Get an empty interpreter from system memory */
     interp = mem_internal_allocate_zeroed_typed(Interp);
 
-    interp->lo_var_ptr = NULL;
-
     /* the last interpreter (w/o) parent has to cleanup globals
      * so remember parent if any */
     if (parent)
         interp->parent_interpreter = parent;
     else {
         interp->parent_interpreter = NULL;
+        emergency_interp           = interp;
 
-#if PARROT_CATCH_NULL
         PMCNULL                    = NULL;
-#endif
-
-        /*
-         * we need a global mutex to protect the interpreter array
-         */
-        MUTEX_INIT(interpreter_array_mutex);
     }
 
     /* Must initialize flags before Parrot_gc_initialize() is called
      * so the GC_DEBUG stuff is available. */
     interp->flags = flags;
 
-    interp->ctx         = PMCNULL;
+    interp->ctx         = NULL;
     interp->resume_flag = RESUME_INITIAL;
 
     interp->recursion_limit = RECURSION_LIMIT;
@@ -157,14 +204,7 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
 
-    /* Allocate IMCC info */
-    IMCC_INFO(interp) = mem_internal_allocate_zeroed_typed(imc_info_t);
-
     interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
-    interp->gc_sys->sys_type = parent
-                                    ? parent->gc_sys->sys_type
-                                    : PARROT_GC_DEFAULT_TYPE;
-    interp->gc_threshold     = GC_DYNAMIC_THRESHOLD_DEFAULT;
 
     /* Done. Return and be done with it */
     return interp;
@@ -172,7 +212,8 @@ allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 
 /*
 
-=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, void *stacktop)>
+=item C<Parrot_Interp initialize_interpreter(PARROT_INTERP, Parrot_GC_Init_Args
+*args)>
 
 Initialize previously allocated interpreter.
 
@@ -183,12 +224,12 @@ Initialize previously allocated interpreter.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
-initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
+initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(initialize_interpreter)
 
     /* Set up the memory allocation system */
-    Parrot_gc_initialize(interp, stacktop);
+    Parrot_gc_initialize(interp, args);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
@@ -201,14 +242,14 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->piodata = NULL;
     Parrot_io_init(interp);
 
+    /* use the system time as the prng seed */
+    Parrot_util_srand(Parrot_get_entropy(interp));
+
     /*
      * Set up the string subsystem
      * This also generates the constant string tables
      */
     Parrot_str_init(interp);
-
-    /* Set up MMD; MMD cache for builtins. */
-    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
 
     /* create caches structure */
     init_object_cache(interp);
@@ -219,7 +260,11 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     Parrot_vtbl_initialize_core_vtables(interp);
 
     /* create the root set registry */
-    interp->gc_registry     = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+    interp->gc_registry = Parrot_pmc_new(interp, enum_class_AddrRegistry);
+
+    /* Set up MMD; MMD cache for builtins. */
+    interp->op_mmd_cache = Parrot_mmd_cache_create(interp);
+    Parrot_pmc_gc_register(interp, interp->op_mmd_cache);
 
     Parrot_gbl_init_world_once(interp);
 
@@ -256,12 +301,7 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->initial_pf          = PackFile_new(interp, 0);
     interp->code                = NULL;
-
-    /* And a dynamic environment stack */
-    /* TODO: We should really consider removing this (TT #876) */
-    interp->dynamic_env = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;
@@ -269,9 +309,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
 
     /* setup stdio PMCs */
     Parrot_io_init(interp);
-
-    /* init IMCC compiler */
-    imcc_init(interp);
 
     /* Done. Return and be done with it */
 
@@ -285,8 +322,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(void *stacktop))
     /* all sys running, init the event and signal stuff
      * the first or "master" interpreter is handling events and signals
      */
-    interp->task_queue  = NULL;
-    interp->thread_data = NULL;
 
     Parrot_cx_init_scheduler(interp);
 
@@ -336,20 +371,22 @@ Parrot_destroy(PARROT_INTERP)
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
-Note that C<exit_code> is ignored.
-
 =cut
 
 */
 
 void
-Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
+Parrot_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_really_destroy)
+
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
-        pt_join_threads(interp);
+
+        /* Don't bother trying to provide a pir backtrace on assertion failures
+         * during global destruction.  It only works in movies. */
+        Parrot_clear_emergency_interp();
     }
 
     /* if something needs destruction (e.g. closing PIOs)
@@ -378,11 +415,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Interp_trace_CLEAR(interp, ~0);
     }
 
-    /* Destroys all PMCs, even constants and the FileHandle objects for
-     * std{in, out, err}, so don't be verbose about GC'ing. */
-    if (interp->thread_data)
-        interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -390,9 +422,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * TODO sweep constants too or special treatment - depends on how
      *      many constant PMCs we'll create
      */
-
-    /* destroy IMCC compiler */
-    imcc_destroy(interp);
 
     /* Now the PIOData gets also cleared */
     Parrot_io_finish(interp);
@@ -417,25 +446,12 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
         return;
 
-    if (interp->parent_interpreter
-    &&  interp->thread_data
-    && (interp->thread_data->state & THREAD_STATE_JOINED)) {
+    if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
-    }
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
-    /* MMD cache */
-    Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
-
-    /* copies of constant tables */
-    Parrot_destroy_constants(interp);
-
     destroy_runloop_jump_points(interp);
-
-    /* packfile */
-    if (interp->initial_pf)
-        PackFile_destroy(interp, interp->initial_pf);
 
     /* cache structure */
     destroy_object_cache(interp);
@@ -452,9 +468,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     PARROT_CORE_OPLIB_INIT(interp, 0);
 
     if (!interp->parent_interpreter) {
-        if (interp->thread_data)
-            mem_internal_free(interp->thread_data);
-
         /* get rid of ops */
         if (interp->op_hash)
             Parrot_hash_destroy(interp, interp->op_hash);
@@ -465,32 +478,57 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         /* Finalize GC */
         Parrot_gc_finalize(interp);
 
-        MUTEX_DESTROY(interpreter_array_mutex);
         mem_internal_free(interp);
-
-        /* finally free other globals */
-        mem_internal_free(interpreter_array);
-        interpreter_array = NULL;
     }
 
     else {
-        /* don't free a thread interpreter, if it isn't joined yet */
-        if (!interp->thread_data
-        || (interp->thread_data
-        && (interp->thread_data->state & THREAD_STATE_JOINED))) {
-            if (interp->thread_data) {
-                mem_internal_free(interp->thread_data);
-                interp->thread_data = NULL;
-            }
+        Parrot_vtbl_free_vtables(interp);
 
-            Parrot_vtbl_free_vtables(interp);
-
-            /* Finalyze GC */
-            Parrot_gc_finalize(interp);
-
-            mem_internal_free(interp);
-        }
+        /* Finalize GC */
+        Parrot_gc_finalize(interp);
+        mem_internal_free(interp);
     }
+}
+
+
+/*
+
+=item C<Interp* Parrot_get_emergency_interp(void)>
+
+Provide access to a (possibly) valid interp pointer.  This is intended B<only>
+for use cases when an interp is not available otherwise, which shouldn't be
+often.  There are no guarantees about what this function returns.  If you
+have access to a valid interp, use that instead.  Don't use this for anything
+other than error handling.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+Interp*
+Parrot_get_emergency_interp(void) {
+    ASSERT_ARGS(Parrot_get_emergency_interp)
+
+    return emergency_interp;
+}
+
+
+/*
+
+=item C<void Parrot_clear_emergency_interp(void)>
+
+Null the C<emergency_interp> static variable.  This is only useful when
+purposefully invalidating C<emergency_interp>.  This is not a general-purpose
+function.  Don't use it for anything other than error handling.
+
+=cut
+
+*/
+
+void
+Parrot_clear_emergency_interp(void) {
+    emergency_interp = NULL;
 }
 
 

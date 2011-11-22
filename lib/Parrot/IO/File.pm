@@ -180,52 +180,6 @@ sub modified_since {
     return $self->stat->mtime > $time;
 }
 
-=item C<svn_id()>
-
-Returns the svn C<$Id> string.
-
-=cut
-
-sub svn_id {
-    my $self    = shift;
-    my $content = $self->read;
-
-    # Break up the $Id to prevent svn messing with it.
-    my ($id) = $content =~ /((?:\$)Id:[^\$]+\$)/so;
-
-    return $id;
-}
-
-=item C<has_svn_id()>
-
-Returns whether the file has a svn C<$Id> string.
-
-=cut
-
-sub has_svn_id {
-    my $self    = shift;
-    my $content = $self->read;
-
-    # Break up the $Id to prevent svn messing with it.
-    my $has_id = $content =~ /(?:\$)Id:[^\$]+\$/so;
-
-    return $has_id;
-}
-
-=item C<svn_version()>
-
-Returns the svn version number of the file.
-
-=cut
-
-sub svn_version {
-    my $self = shift;
-    my $id   = $self->svn_id;
-    my ($version) = $id =~ /,v\s+(\S+)/s;
-
-    return $version;
-}
-
 =item C<is_hidden()>
 
 Returns whether the file is "hidden", i.e. its name starts with a dot.
@@ -235,7 +189,7 @@ Returns whether the file is "hidden", i.e. its name starts with a dot.
 sub is_hidden {
     my $self = shift;
 
-    return $self->parent eq '.SVN' or $self->name =~ /^\./o;
+    return $self->name =~ /^\./o;
 }
 
 =item C<is_generated()>
@@ -255,7 +209,6 @@ sub is_generated {
     # include/parrot/config.h
     # include/parrot/core_pmcs.h
     # include/parrot/feature.h
-    # include/parrot/platform.h
 
     # runtime/parrot/include/* (all?)
 

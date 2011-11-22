@@ -24,15 +24,28 @@ in case of test failures.
 .sub main :main
     .local pmc sock, address, conn
     .local string str
-    .local int len, status
+    .local int len, status, port
 
     sock = new 'Socket'
     sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    address = sock.'sockaddr'('localhost', 1234)
+    port = 1234
+    push_eh error
+  retry:
+    address = sock.'sockaddr'('localhost', port)
     sock.'bind'(address)
-    sock.'listen'(5)
+    goto started
+  error:
+    inc port
+    if port < 1244 goto retry
+    pop_eh
+    say "couldn't bind to a free port, exiting"
+    exit 1
 
-    say 'Server started'
+  started:
+    pop_eh
+    sock.'listen'(5)
+    print 'Server started, listening on port '
+    say port
 
     status = sock.'poll'(1, 3, 0)
     # timeout

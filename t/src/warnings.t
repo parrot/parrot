@@ -6,9 +6,12 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 plan tests => 2;
 
@@ -33,7 +36,6 @@ Hacked from t/src/basics.t
 c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 int
 main(int argc, const char* argv[])
@@ -55,7 +57,6 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 int
 main(int argc, const char* argv[])

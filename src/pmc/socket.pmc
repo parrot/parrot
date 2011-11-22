@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,6 +18,9 @@ The Socket PMC performs network I/O operations.
 */
 
 #include "../src/io/io_private.h"
+#include "pmc/pmc_sockaddr.h"
+
+#define CHUNK_SIZE      2048
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -26,6 +29,9 @@ The Socket PMC performs network I/O operations.
 pmclass Socket extends Handle provides socket auto_attrs {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
+    ATTR INTVAL  family;
+    ATTR INTVAL  type;
+    ATTR INTVAL  protocol;
     ATTR STRING *buf;
 
 /*
@@ -39,7 +45,7 @@ Initializes a newly created Socket object.
 */
 
     VTABLE void init() {
-        Parrot_Socket_attributes *data_struct =
+        Parrot_Socket_attributes * const data_struct =
                 (Parrot_Socket_attributes *) PMC_data(SELF);
 
         data_struct->local  = PMCNULL;
@@ -62,8 +68,8 @@ Create a copy of the socket handle.
 */
 
     VTABLE PMC *clone() {
-        PMC * copy = SUPER();
-        Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
+        PMC * const copy = SUPER();
+        const Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
         if (!PMC_IS_NULL(old_struct->local))
@@ -104,10 +110,10 @@ Free structures.
 */
     VTABLE void destroy() {
         if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+            Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(SELF);
 
             if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                Parrot_io_close_piohandle(INTERP, data_struct->os_handle);
+                Parrot_io_close_socket(INTERP, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
     }
@@ -142,7 +148,7 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if (Parrot_io_socket(INTERP, SELF, fam, type, proto) < 0)
+        if (Parrot_io_socket_handle(INTERP, SELF, fam, type, proto) < 0)
             RETURN(PMC * PMCNULL);
         RETURN(PMC * SELF);
     }
@@ -151,7 +157,7 @@ Returns whether the Socket is currently open.
 
 =item C<poll(INTVAL which, INTVAL sec, INTVAL usec)>
 
-Watches the socket for C<sec> seconds and C<usec> milliseconds.  C<which>
+Watches the socket for C<sec> seconds and C<usec> microseconds.  C<which>
 is a bitmask representing the states you want to watch for.  Or together 1
 for readable, two for writeable, and four for exceptions.
 
@@ -161,23 +167,82 @@ for readable, two for writeable, and four for exceptions.
 
 
     METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
-        INTVAL poll = Parrot_io_poll(INTERP, SELF, which, sec, usec);
+        const INTVAL poll = Parrot_io_poll_handle(INTERP, SELF, which, sec, usec);
         RETURN(INTVAL poll);
     }
 
 /*
 
-=item C<sockaddr(STRING * address, INTVAL port)>
+=item C<sockaddr(STRING * address, INTVAL port, INTVAL family :optional)>
 
 C<sockaddr> returns an object representing a socket address, generated
-from a port number (integer) and an address (string).
+from a port number (integer) , address (string) and an optional address
+family (integer). If no address family is given, it defaults to IPv4.
 
 =cut
 
 */
 
-    METHOD sockaddr(STRING * address, INTVAL port) {
-        PMC * res = PIO_SOCKADDR_IN(INTERP, address, port);
+    METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) {
+        PMC *array;
+        PMC *res;
+
+        if (!family)
+            family = PIO_PF_INET;
+
+        array = Parrot_io_getaddrinfo(INTERP, address, port, PIO_PROTO_TCP,
+                    family, 0);
+
+        if (VTABLE_elements(interp, array))
+            res = VTABLE_get_pmc_keyed_int(interp, array, 0);
+        else
+            res = PMCNULL;
+
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<getaddrinfo(STRING * address, INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive)>
+
+C<getaddrinfo> returns an array of Sockaddr PMCs representing the result of the
+C<getaddrinfo(3)> function which consists of multiple socket addresses,
+including family and protocol. It can be passed to C<bind()> or C<connect()>.
+
+=cut
+
+*/
+    METHOD getaddrinfo(STRING * address,
+                       INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
+        PMC * const res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<remote_address()>
+
+C<remote_address> returns the remote address of this socket PMC.
+
+=cut
+
+*/
+    METHOD remote_address() {
+        PMC * const res = PARROT_SOCKET(SELF)->remote;
+        RETURN(PMC * res);
+    }
+
+/*
+
+=item C<local_address()>
+
+C<local_address> returns the local address of this socket PMC.
+
+=cut
+
+*/
+    METHOD local_address() {
+        PMC * const res = PARROT_SOCKET(SELF)->local;
         RETURN(PMC * res);
     }
 
@@ -216,8 +281,8 @@ connected socket object.]
 */
 
     METHOD connect(PMC * address) {
-        INTVAL res = Parrot_io_connect(INTERP, SELF, address);
-        RETURN(INTVAL res);
+        Parrot_io_connect_handle(INTERP, SELF, address);
+        RETURN(INTVAL 0);
     }
 
 /*
@@ -244,7 +309,7 @@ string containing the received message.
             SET_ATTR_buf(INTERP, SELF, STRINGNULL);
         }
         else {
-            result = Parrot_io_reads(INTERP, SELF, 0);
+            result = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
         }
         RETURN(STRING * result);
     }
@@ -264,7 +329,7 @@ complete, it invokes the callback, passing it a status object.
 */
 
     METHOD send(STRING *buf) {
-        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 
@@ -273,7 +338,7 @@ complete, it invokes the callback, passing it a status object.
 =item C<bind(PMC *host)>
 
 C<bind> binds a socket object to the port and address specified by an
-address object (the packed result of C<sockaddr>).
+address object (the result of C<getaddrinfo>).
 
 The asynchronous version takes an additional final PMC callback
 argument, and only returns a status object. When the bind operation is
@@ -287,8 +352,8 @@ bound socket object.]
 */
 
     METHOD bind(PMC *host) {
-        INTVAL res = Parrot_io_bind(INTERP, SELF, host);
-        RETURN(INTVAL res);
+        Parrot_io_bind_handle(INTERP, SELF, host);
+        RETURN(INTVAL 0);
     }
 
 /*
@@ -307,8 +372,8 @@ the socket object.
 */
 
     METHOD listen(INTVAL backlog) {
-        INTVAL res = Parrot_io_listen(INTERP, SELF, backlog);
-        RETURN(INTVAL res);
+        Parrot_io_listen_handle(INTERP, SELF, backlog);
+        RETURN(INTVAL 0);
     }
 
 /*
@@ -331,7 +396,7 @@ but continues to send new connection events until the socket is closed.]
 */
 
     METHOD accept() {
-        PMC * res = Parrot_io_accept(INTERP, SELF);
+        PMC * const res = Parrot_io_accept_handle(INTERP, SELF);
         RETURN(PMC * res);
     }
 
@@ -354,10 +419,10 @@ Read the given number of bytes from the socket and return them in a string.
             RETURN(STRING * STRINGNULL);
 
         if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, 0);
+            buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
 
         while (Parrot_str_length(INTERP, buf) < nb) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
@@ -392,10 +457,10 @@ Read a line from the socket and return it in a string.
             RETURN(STRING * STRINGNULL);
 
         if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, 0);
+            buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
 
         while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
-            STRING *more = Parrot_io_reads(INTERP, SELF, 0);
+            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
                 RETURN(STRING *buf);
@@ -421,7 +486,7 @@ Print the string to the socket.
 */
 
     METHOD puts(STRING *buf) {
-        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -25,6 +25,22 @@ conversions.
 
 pmclass ResizableIntegerArray extends FixedIntegerArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
+
+/*
+
+=item C<void init_int(INTVAL size)>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init_int(INTVAL size) {
+        SUPER(size);
+        if (size > 0)
+            SET_ATTR_resize_threshold(INTERP, SELF, size);
+    }
 
 /*
 
@@ -121,7 +137,7 @@ Resizes the array to C<size> elements.
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
             else {
-                INTVAL needed = size - cur;
+                const INTVAL needed = size - cur;
                 cur          += needed + 4096;
                 cur          &= ~0xfff;
             }
@@ -225,7 +241,7 @@ Add an integer to the start of the array.
 
     VTABLE void unshift_integer(INTVAL value) {
         INTVAL *int_array;
-        INTVAL size = SELF.get_integer();
+        const INTVAL size = SELF.get_integer();
 
         SELF.set_integer_native(size + 1);
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -271,7 +287,7 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
         INTVAL  size;
-        PMC    *copy = SUPER();
+        PMC * const copy = SUPER();
 
         /* copy trimmed extra space */
         GET_ATTR_size(INTERP, SELF, size);
@@ -279,62 +295,6 @@ Creates and returns a copy of the array.
 
         return copy;
     }
-
-/*
-
-=item C<void freeze(PMC *info)>
-
-Used to archive the array.
-
-=item C<void thaw(PMC *info)>
-
-Used to unarchive the array.
-
-=cut
-
-*/
-
-    VTABLE void freeze(PMC *info) {
-        INTVAL   *int_array;
-        INTVAL    i, n, rt;
-
-        SUPER(info);
-
-        n  = SELF.get_integer();
-        GET_ATTR_resize_threshold(INTERP, SELF, rt);
-        VTABLE_push_integer(INTERP, info, n);
-        VTABLE_push_integer(INTERP, info, rt);
-
-        GET_ATTR_int_array(INTERP, SELF, int_array);
-
-        for (i = 0; i < n; ++i)
-            VTABLE_push_integer(INTERP, info, int_array[i]);
-    }
-
-    VTABLE void thaw(PMC *info) {
-        INTVAL n, rt;
-
-        SUPER(info);
-
-        n = VTABLE_shift_integer(INTERP, info);
-        rt = VTABLE_shift_integer(INTERP, info);
-
-        SET_ATTR_size(INTERP, SELF, 0);
-        SET_ATTR_resize_threshold(INTERP, SELF, rt);
-        SET_ATTR_int_array(INTERP, SELF, NULL);
-
-        if (n) {
-            INTVAL  i;
-            INTVAL *int_array;
-
-            SELF.set_integer_native(n);
-            GET_ATTR_int_array(INTERP, SELF, int_array);
-
-            for (i = 0; i < n; ++i)
-                int_array[i] = VTABLE_shift_integer(INTERP, info);
-        }
-    }
-
 
 }
 /*
@@ -344,13 +304,6 @@ Used to unarchive the array.
 =head1 SEE ALSO
 
 F<docs/pdds/pdd17_basic_types.pod>.
-
-=head1 HISTORY
-
-Initial version                  - Matt Fowles 2004-06-11
-Changed allocator to double size - Matt Fowles 2004-06-15
-Added push_integer               - Bernhard Schmalhofer 2004-10-17
-moved available size to int_val2 - Matt Fowles 2005-07-22
 
 =cut
 

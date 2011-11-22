@@ -7,8 +7,25 @@ src/pmc/os.pmc - Files and Directories PMC
 
 =head1 DESCRIPTION
 
-C<OS> is a singleton class which provides access to the filesystem
+C<OS> is a PMC type which provides access to the filesystem
 files and directories.
+
+=head2 Usage
+
+From PIR code:
+
+    loadlib "os"
+    $P0 = new 'OS'
+
+From NQP:
+
+    pir::loadlib__s("os");
+    my $os := pir::new__ps("OS");
+
+From Winxed:
+
+    loadlib("os");
+    var os = new 'OS';
 
 =head2 Methods
 
@@ -18,93 +35,60 @@ files and directories.
 
 */
 
-#if defined(_MSC_VER)
-#  include <direct.h>
-#  include <io.h>
-#  include <tchar.h>
-#  include <windows.h>
-#elif defined(__BORLANDC__)
-#  include <dir.h>
-#  include <dirent.h>
-#else
-#  include <dirent.h>
-#  include <unistd.h>
-#endif
-
-#ifdef WIN32
-/*
-
-=item C<static int win32_can_execute(PARROT_INTERP, STRING *filename)>
-
-tests if a win32 file is executable
-
-=cut
-
-*/
-
-static int
-win32_can_execute(PARROT_INTERP, STRING *filename)
-{
-    PMC * env = Parrot_pmc_new(interp, enum_class_Env);
-    STRING * const pathext_str = Parrot_str_new(interp, "PATHEXT", 7);
-    STRING * const pathext_sep = Parrot_str_new(interp, ";", 1);
-    STRING * const dot = Parrot_str_new(interp, ".", 1);
-    STRING * const pathext = VTABLE_get_string_keyed_str(interp, env, pathext_str);
-    PMC * const pathext_pmc = Parrot_str_split(interp, pathext_sep, pathext);
-    const INTVAL elems = VTABLE_elements(interp, pathext_pmc);
-    INTVAL i;
-    STRING * wo_stem = NULL;
-    STRING * ext = NULL;
-    parrot_split_path_ext(interp, filename, &wo_stem, &ext);
-    if (STRING_IS_NULL(ext) || Parrot_str_length(interp, ext) == 0)
-        return 0;
-    ext = Parrot_str_upcase(interp, ext);
-    ext = Parrot_str_concat(interp, dot, ext);
-
-    for (i = 0; i < elems; i++) {
-        STRING * const test_ext = VTABLE_get_string_keyed_int(interp, pathext_pmc, i);
-        if (Parrot_str_equal(interp, ext, test_ext))
-            return 1;
-    }
-    return 0;
-}
-#endif
-
-/* XXX Check if we need to deallocate strerror strings */
-/* XXX apparently, strerror_r is thread-safe and should be used instead.*/
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
-/* HEADERIZER END: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static PMC *OS_PMC;
-pmclass OS dynpmc singleton {
+PARROT_CANNOT_RETURN_NULL
+static PMC * stat_buf_to_array(PARROT_INTERP,
+    ARGIN(const Parrot_Stat_Buf *buf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_stat_buf_to_array __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buf))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
-=item C<void *get_pointer()>
+=item C<static PMC * stat_buf_to_array(PARROT_INTERP, const Parrot_Stat_Buf
+*buf)>
 
-=item C<void set_pointer(void *ptr)>
-
-These two functions are part of the singleton creation interface. For more
-information see F<src/pmc.c>.
+Converts a stat buffer to a Perl-like array.
 
 =cut
 
 */
 
-    void class_init() {
-        OS_PMC = NULL;
-    }
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+stat_buf_to_array(PARROT_INTERP, ARGIN(const Parrot_Stat_Buf *buf))
+{
+    ASSERT_ARGS(stat_buf_to_array)
+    PMC * const array = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
 
-    VTABLE void *get_pointer() {
-        return OS_PMC;
-    }
+    VTABLE_set_integer_native(interp, array, 13);
 
-    VTABLE void set_pointer(void *ptr) {
-        OS_PMC = (PMC *)ptr;
-    }
+    VTABLE_set_integer_keyed_int(interp, array,  0, buf->dev);
+    VTABLE_set_integer_keyed_int(interp, array,  1, buf->inode);
+    VTABLE_set_integer_keyed_int(interp, array,  2, buf->mode);
+    VTABLE_set_integer_keyed_int(interp, array,  3, buf->n_links);
+    VTABLE_set_integer_keyed_int(interp, array,  4, buf->uid);
+    VTABLE_set_integer_keyed_int(interp, array,  5, buf->gid);
+    VTABLE_set_integer_keyed_int(interp, array,  6, 0);
+    VTABLE_set_integer_keyed_int(interp, array,  7, buf->size);
+    VTABLE_set_integer_keyed_int(interp, array,  8, buf->access_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array,  9, buf->modify_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array, 10, buf->change_time.tv_sec);
+    VTABLE_set_integer_keyed_int(interp, array, 11, buf->block_size);
+    VTABLE_set_integer_keyed_int(interp, array, 12, buf->blocks);
 
+    return array;
+}
+
+pmclass OS dynpmc {
 
 /*
 
@@ -117,28 +101,8 @@ Returns the current working directory.
 */
 
     METHOD cwd() {
-        char *cwd;
-#ifdef _MSC_VER
-        cwd = _getcwd(NULL, 0);
-        /* capitalize the drive letter */
-        cwd[0] = (char)toupper((unsigned char)cwd[0]);
-#else
-#  ifdef PATH_MAX
-        cwd = getcwd(NULL, PATH_MAX+1);
-#  else
-        cwd = getcwd(NULL, 0);
-#  endif
-#endif
-        if (cwd) {
-            STRING * const scwd = Parrot_str_new(INTERP, cwd, strlen(cwd));
-            free(cwd);
-            RETURN(STRING *scwd);
-        }
-        else {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        STRING * const cwd = Parrot_file_getcwd(INTERP);
+        RETURN(STRING *cwd);
     }
 
 /*
@@ -152,19 +116,7 @@ Changes the current working directory to the one specified by C<path>.
 */
 
     METHOD chdir(STRING *path) {
-        int error;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef _MSC_VER
-        error = _chdir(cpath);
-#else
-        error = chdir(cpath);
-#endif
-        Parrot_str_free_cstring(cpath);
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_chdir(INTERP, path);
     }
 
 /*
@@ -179,38 +131,11 @@ C<path>.
 */
 
     METHOD rm(STRING *path) {
-        struct stat info;
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        int          error = stat(cpath, &info);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_str_free_cstring(cpath);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        if (S_ISDIR(info.st_mode)) {
-#ifdef _MSC_VER
-            error = _rmdir(cpath);
-#else
-            error = rmdir(cpath);
-#endif
-            Parrot_str_free_cstring(cpath);
-            if (error) {
-                const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                    errmsg);
-            }
+        if (Parrot_file_stat_intval(INTERP, path, STAT_ISDIR)) {
+            Parrot_file_rmdir(INTERP, path);
         }
         else {
-            error = remove(cpath);
-            Parrot_str_free_cstring(cpath);
-            if (error) {
-                const char * const errmsg = strerror(errno);
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                    errmsg);
-            }
+            Parrot_file_unlink(INTERP, path);
         }
     }
 
@@ -225,19 +150,7 @@ Creates a directory specified by C<path> with mode C<mode>.
 */
 
     METHOD mkdir(STRING *path, INTVAL mode) {
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        /* should we validate mode? */
-#ifdef WIN32
-        const int error = _mkdir(cpath);
-#else
-        const int error = mkdir(cpath, (mode_t)mode);
-#endif
-        Parrot_str_free_cstring(cpath);
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_mkdir(INTERP, path, mode);
     }
 
 /*
@@ -270,189 +183,61 @@ https://trac.parrot.org/parrot/ticket/849
 */
 
     METHOD stat(STRING *path) {
-        struct stat   info;
-        char  * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int     error = stat(cpath, &info);
+        Parrot_Stat_Buf  buf;
+        PMC             *array;
 
-        Parrot_str_free_cstring(cpath);
+        Parrot_file_stat(interp, path, &buf);
+        array = stat_buf_to_array(interp, &buf);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-        else {
-            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(INTERP, array, 13);
-
-            VTABLE_set_integer_keyed_int(INTERP, array,  0,
-                    (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  1,
-                    (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(INTERP, array,  2,
-                    (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(INTERP, array,  3,
-                    (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(INTERP, array,  4,
-                    (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  5,
-                    (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  6,
-                    (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  7,
-                    (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(INTERP, array,  8,
-                    (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(INTERP, array,  9,
-                    (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(INTERP, array, 10,
-                    (INTVAL)info.st_ctime);
-#ifndef WIN32
-            VTABLE_set_integer_keyed_int(INTERP, array, 11,
-                    (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(INTERP, array, 12,
-                    (INTVAL)info.st_blocks);
-#endif
-            RETURN(PMC *array);
-        }
+        RETURN(PMC *array);
     }
 
 /*
 
 =item C<fixedpmcarray *lstat(STRING *path)>
 
-Stats a file, and returns a 13 position array as in Perl:
-
-     0 dev      device number of filesystem
-     1 ino      inode number
-     2 mode     file mode  (type and permissions)
-     3 nlink    number of (hard) links to the file
-     4 uid      numeric user ID of file's owner
-     5 gid      numeric group ID of file's owner
-     6 rdev     the device identifier (special files only)
-     7 size     total size of file, in bytes
-     8 atime    last access time in seconds since the epoch
-     9 mtime    last modify time in seconds since the epoch
-    10 ctime    inode change time in seconds since the epoch (*)
-    11 blksize  preferred block size for file system I/O
-    12 blocks   actual number of blocks allocated
-
-11 and 12 are not available under Windows.
+Lstats a file, and returns a 13 position array as in Perl. See C<stat>.
 
 =cut
 
 */
 
     METHOD lstat(STRING *path) {
-        struct stat info;
+        Parrot_Stat_Buf  buf;
+        PMC             *array;
 
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-#ifdef WIN32
-        const int error = stat(cpath, &info);
-#else
-        const int error = lstat(cpath, &info);
-#endif
-        Parrot_str_free_cstring(cpath);
+        Parrot_file_stat(interp, path, &buf);
+        array = stat_buf_to_array(interp, &buf);
 
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-        else {
-            PMC * const array = Parrot_pmc_new(INTERP, enum_class_FixedPMCArray);
-            VTABLE_set_integer_native(INTERP, array, 13);
-
-            VTABLE_set_integer_keyed_int(INTERP, array,  0,
-                    (INTVAL)info.st_dev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  1,
-                    (INTVAL)info.st_ino);
-            VTABLE_set_integer_keyed_int(INTERP, array,  2,
-                    (INTVAL)info.st_mode);
-            VTABLE_set_integer_keyed_int(INTERP, array,  3,
-                    (INTVAL)info.st_nlink);
-            VTABLE_set_integer_keyed_int(INTERP, array,  4,
-                    (INTVAL)info.st_uid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  5,
-                    (INTVAL)info.st_gid);
-            VTABLE_set_integer_keyed_int(INTERP, array,  6,
-                    (INTVAL)info.st_rdev);
-            VTABLE_set_integer_keyed_int(INTERP, array,  7,
-                    (INTVAL)info.st_size);
-            VTABLE_set_integer_keyed_int(INTERP, array,  8,
-                    (INTVAL)info.st_atime);
-            VTABLE_set_integer_keyed_int(INTERP, array,  9,
-                    (INTVAL)info.st_mtime);
-            VTABLE_set_integer_keyed_int(INTERP, array, 10,
-                    (INTVAL)info.st_ctime);
-#ifndef WIN32
-            VTABLE_set_integer_keyed_int(INTERP, array, 11,
-                    (INTVAL)info.st_blksize);
-            VTABLE_set_integer_keyed_int(INTERP, array, 12,
-                    (INTVAL)info.st_blocks);
-#endif
-            RETURN(PMC *array);
-        }
+        RETURN(PMC *array);
     }
 
 /*
 
 =item C<void symlink(STRING *from, STRING *to)>
 
-Creates a symlink, where available
+Creates a symlink
 
 =cut
 
 */
 
     METHOD symlink(STRING *from, STRING *to) {
-#ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
-        char * const cto   = Parrot_str_to_cstring(INTERP, to);
-        const int error    = symlink(cfrom, cto);
-
-        Parrot_str_free_cstring(cfrom);
-        Parrot_str_free_cstring(cto);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Win32 does not support symlinks!");
-#endif
+        Parrot_file_symlink(INTERP, from, to);
     }
 
 /*
 
 =item C<void link(STRING *from, STRING *to)>
 
-Creates a hard link, where available(?)
+Creates a hard link
 
 =cut
 
 */
 
     METHOD link(STRING *from, STRING *to) {
-#ifndef WIN32
-        char * const cfrom = Parrot_str_to_cstring(INTERP, from);
-        char * const cto   = Parrot_str_to_cstring(INTERP, to);
-        const int    error = link(cfrom, cto);
-
-        Parrot_str_free_cstring(cfrom);
-        Parrot_str_free_cstring(cto);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "link() failed for OS PMC: %s\n", errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "Win32 is not POSIX. Need win32 developer!");
-#endif
+        Parrot_file_link(INTERP, from, to);
     }
 
 /*
@@ -467,14 +252,8 @@ previous one).
 */
 
     METHOD umask(INTVAL mask) {
-#ifndef _MSC_VER
-        const INTVAL old = umask((mode_t)mask);
+        const INTVAL old = Parrot_file_umask(INTERP, mask);
         RETURN(INTVAL old);
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_UNIMPLEMENTED,
-            "Win32 is not POSIX. Need Win32 developer!");
-#endif
     }
 
 /*
@@ -492,21 +271,7 @@ idea to do the same with parrot.
 */
 
     METHOD chroot(STRING *path) {
-#ifndef WIN32
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-        const int    error = chroot(cpath);
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-#else
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "Win32 is not POSIX. Need Win32 developer!");
-#endif
+        Parrot_file_chroot(INTERP, path);
     }
 
 
@@ -514,66 +279,17 @@ idea to do the same with parrot.
 
 =item C<PMC *readdir(STRING *path)>
 
-reads entries from a directory.
+Reads entries from a directory.
 
 =cut
 
 */
+
     METHOD readdir(STRING *path) {
-        PMC   * array = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
-#ifndef _MSC_VER
-        char  * const cpath = Parrot_str_to_cstring(INTERP, path);
-        DIR   * const   dir = opendir(cpath);
-        struct dirent *dirent;
-
-        Parrot_str_free_cstring(cpath);
-
-        if (!dir) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
-
-        while ((dirent = readdir(dir)) != NULL) {
-            const char *const name = dirent->d_name;
-            VTABLE_push_string(INTERP, array, Parrot_str_from_platform_cstring(INTERP, name));
-        }
-
-        closedir(dir);
-#else
-        WIN32_FIND_DATA file_find_data;
-        char * cpath;
-        HANDLE hFind = INVALID_HANDLE_VALUE;
-
-        /* Add \* to the directory name and start search. */
-        INTVAL last_char = STRING_ord(INTERP, path, -1);
-        int trailing_slash = last_char == '\\' || last_char == '/';
-        cpath = Parrot_str_to_cstring(INTERP, Parrot_str_concat(INTERP,
-                path, string_from_literal(INTERP, trailing_slash ? "*" : "\\*"), 0));
-        hFind = FindFirstFile(cpath, &file_find_data);
-        Parrot_str_free_cstring(cpath);
-        if (hFind == INVALID_HANDLE_VALUE)
-        {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "Unable to readdir");
-        }
-
-        /* Loop over all directories and add to result array. */
-        do
-        {
-            VTABLE_push_string(INTERP, array, Parrot_str_new(INTERP,
-                    file_find_data.cFileName, 0));
-        }
-        while (FindNextFile(hFind, &file_find_data) != 0);
-        if (GetLastError() != ERROR_NO_MORE_FILES)
-        {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "Error during readdir");
-        }
-        FindClose(hFind);
-#endif
+        PMC * const array = Parrot_file_readdir(INTERP, path);
         RETURN(PMC *array);
     }
+
 /*
 =item C<rename(STRING *oldpath, STRING *newpath)>
 
@@ -583,19 +299,9 @@ thrown.
 =cut
 
 */
+
     METHOD rename(STRING *oldpath, STRING *newpath) {
-        char * const coldpath = Parrot_str_to_cstring(INTERP, oldpath);
-        char * const cnewpath = Parrot_str_to_cstring(INTERP, newpath);
-        const int    ret      = rename(coldpath, cnewpath);
-
-        Parrot_str_free_cstring(coldpath);
-        Parrot_str_free_cstring(cnewpath);
-
-        if (ret < 0) {
-            const char * const errmsg = strerror(errno) ;
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "%s", errmsg);
-        }
+        Parrot_file_rename(INTERP, oldpath, newpath);
     }
 
 /*
@@ -607,21 +313,7 @@ thrown.
 */
 
     METHOD chmod(STRING *path, INTVAL mode) {
-        char * const cpath = Parrot_str_to_cstring(INTERP, path);
-
-#ifndef WIN32
-        const int    error = chmod(cpath, mode);
-#else
-        const int    error = _chmod(cpath, mode);
-#endif
-
-        Parrot_str_free_cstring(cpath);
-
-        if (error) {
-            const char * const errmsg = strerror(errno);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
-        }
+        Parrot_file_chmod(INTERP, path, mode);
     }
 
 /*
@@ -643,44 +335,42 @@ Returns the ID number of the current user. This is platform-dependent.
 
 =item C<can_execute(STRING *filename)>
 
+=item C<can_read(STRING *filename)>
+
+=item C<can_write(STRING *filename)>
+
 =cut
 
 */
 
     METHOD can_execute(STRING *filename) {
-        INTVAL can = 0;
-#ifndef WIN32
-        char * const file = Parrot_str_to_cstring(INTERP, filename);
-        can = access(file, X_OK) + 1;
-        Parrot_str_free_cstring(file);
-#else
-        can = win32_can_execute(interp, filename);
-#endif
+        const INTVAL can = Parrot_file_can_execute(INTERP, filename);
         RETURN(INTVAL can);
     }
 
     METHOD can_read(STRING *filename) {
-        char * const file = Parrot_str_to_cstring(INTERP, filename);
-        INTVAL can = 0;
-#ifndef WIN32
-        can = access(file, R_OK) + 1;
-#else
-        can = 1;
-#endif
-        Parrot_str_free_cstring(file);
+        const INTVAL can = Parrot_file_can_read(INTERP, filename);
         RETURN(INTVAL can);
     }
 
     METHOD can_write(STRING *filename) {
-        char * const file = Parrot_str_to_cstring(INTERP, filename);
-        INTVAL can = 0;
-#ifndef WIN32
-        can = access(file, W_OK) + 1;
-#else
-        /* TODO: Win32 */
-#endif
-        Parrot_str_free_cstring(file);
+        const INTVAL can = Parrot_file_can_write(INTERP, filename);
         RETURN(INTVAL can);
+    }
+
+/*
+
+=item C<exists(STRING *filename)>
+
+Determine if the file exists. Return C<1> if it exists. Return C<0> otherwise.
+
+=cut
+
+*/
+
+    METHOD exists(STRING *filename) {
+        const INTVAL e = Parrot_file_stat_intval(INTERP, filename, STAT_EXISTS);
+        RETURN(INTVAL e);
     }
 
 }
@@ -689,7 +379,7 @@ Returns the ID number of the current user. This is platform-dependent.
 
 =back
 
-=head1 SEE ALS0
+=head1 SEE ALSO
 
    chdir(2), getcwd(3), unlink(2), mkdir(2), stat(2), lstat(2),
    symlink(2), link(2), umask(2), chroot(2)

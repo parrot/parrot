@@ -184,7 +184,9 @@ int Parrot_sub_context_get_info(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_sub_Context_infostr(PARROT_INTERP, ARGIN(PMC *ctx))
+STRING* Parrot_sub_Context_infostr(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    int is_top)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

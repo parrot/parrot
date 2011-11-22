@@ -65,7 +65,16 @@ X<token>
 There are two different kinds of rules: C<rule>, which we saw above, and
 C<token>. A C<rule> performs smart whitespace matching between the various
 pieces of the pattern. The C<record> rule given previously would match
-"6355 John" or "6355      John" but not "6355John".
+
+    6355 John
+
+or
+
+    6355        John
+
+but not
+
+    6355John
 
 A C<token> matches whitespace only if you specifically request it. To get the
 same effect with a token, add the C<\s> (match a space character) and C<+>
@@ -107,7 +116,7 @@ F<Contacts.pg>:
 
 Then compile the grammar:
 
-  $ B<parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg>
+  $ parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg
 
 =for author
 
@@ -119,8 +128,8 @@ tree should be able to mangle paths appropriately.
 The path to F<parrot> and to the F<Perl6Grammar.pbc> file will vary on
 different systems. If you compiled Parrot from source, it will be:
 
-  $ B<./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \>
-        B<--output=Contacts.pir Contacts.pg>
+  $ ./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \
+        --output=Contacts.pir Contacts.pg
 
 Next, create a small PIR script to run your grammar. Save it as
 F<grammar_test.pir>:
@@ -149,7 +158,7 @@ F<grammar_test.pir>:
 
 Run the test script:
 
-  $ B<parrot grammar_test.pir>
+  $ parrot grammar_test.pir
 
 It will print out a text representation of the raw parse tree stored in the
 C<match> variable:
@@ -1334,7 +1343,7 @@ Protofunctions define operators in the optable in the same way that rules and
 tokens make up the grammar. A proto declares a rule, defined elsewhere, which
 other code may override dynamically.  In this case, PCT takes information from
 the proto declaration and fills in the details. The "dynamic overriding"
-implies that a high-level language itself itself can modify its own grammar at
+implies that a high-level language itself can modify its own grammar at
 run time, by overriding the proto definitions for its operator table. Some
 languages call this process X<operator overloading> I<operator overloading>.
 

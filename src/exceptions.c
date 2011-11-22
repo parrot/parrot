@@ -7,7 +7,7 @@ src/exceptions.c - Exceptions
 
 =head1 DESCRIPTION
 
-Define the the core subsystem for exceptions.
+Define the core subsystem for exceptions.
 
 =head2 Exception Functions
 
@@ -20,12 +20,15 @@ Define the the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "parrot/exceptions.h"
+#include "parrot/events.h"
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC * build_exception_from_args(PARROT_INTERP,
     int ex_type,
@@ -69,7 +72,7 @@ Constructs a new exception object from the passed in arguments.
 
 */
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
         long error, ARGIN_NULLOK(STRING *msg))
@@ -108,7 +111,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
-    const INTVAL   severity    = already_dying ? EXCEPT_fatal :
+    const INTVAL   severity    = already_dying ? (INTVAL)EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
     if (already_dying)
@@ -124,15 +127,15 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
         /* flush interpreter output to get things printed in order */
         if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-            Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDOUT(interp));
         if (use_perr)
-            Parrot_io_flush(interp, Parrot_io_STDERR(interp));
+            Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
 
         if (interp->pdb) {
             Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
-                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
-                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush_handle(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 
@@ -145,19 +148,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
             VTABLE_set_string_native(interp, exception, newmessage);
         }
-
     }
-
-    /*
-     * returning NULL from here returns resume address NULL to the
-     * runloop, which will terminate the thread function finally
-     *
-     * TT #1287 this check should better be in Parrot_x_exit
-     */
-
-    /* no exception handler, but this is not the main thread */
-    if (interp->thread_data && interp->thread_data->tid)
-        pt_thread_detach(interp->thread_data->tid);
 
     Parrot_x_jump_out(interp, 1);
 }
@@ -292,6 +283,7 @@ family of functions.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 build_exception_from_args(PARROT_INTERP, int ex_type,
@@ -343,15 +335,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c)
 
-    Parrot_runloop * const return_point = interp->current_runloop;
-    opcode_t *address;
-    PMC        * const handler      =
-                             Parrot_cx_find_handler_local(interp, exception);
-
-    if (PMC_IS_NULL(handler)) {
-        VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
-        die_from_exception(interp, exception);
-    }
+    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
         STRING * const exit_code = CONST_STRING(interp, "exit_code");
@@ -368,20 +352,25 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
      * Don't split line. It will break CONST_STRING handling. */
     VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CURRENT_CONTEXT(interp));
 
+    if (PMC_IS_NULL(handler))
+        die_from_exception(interp, exception);
+
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
-            (Parrot_runloop * const)VTABLE_get_pointer(interp, handler);
+            (Parrot_runloop *)VTABLE_get_pointer(interp, handler);
         jump_point->exception = exception;
         longjmp(jump_point->resume, 1);
     }
-
-    /* Run the handler. */
-    address = VTABLE_invoke(interp, handler, NULL);
-    setup_exception_args(interp, "P", exception);
-    PARROT_ASSERT(return_point->handler_start == NULL);
-    return_point->handler_start = address;
-    longjmp(return_point->resume, 2);
+    else {
+        /* Run the handler. */
+        Parrot_runloop * const return_point = interp->current_runloop;
+        opcode_t              *address = VTABLE_invoke(interp, handler, NULL);
+        setup_exception_args(interp, "P", exception);
+        PARROT_ASSERT(return_point->handler_start == NULL);
+        return_point->handler_start = address;
+        longjmp(return_point->resume, 2);
+    }
 }
 
 /*
@@ -437,7 +426,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
+Parrot_ex_throw_from_c_args(PARROT_INTERP, ARGIN_NULLOK(SHIM(void *ret_addr)),
         int exitcode, ARGIN(const char *format), ...)
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c_args)
@@ -586,6 +575,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
+    Interp *emergency_interp = Parrot_get_emergency_interp();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -624,7 +614,11 @@ Parrot_print_backtrace(void)
             fputs("Not enough memory for backtrace_symbols\n", stderr);
     }
 #  endif
-
+    fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
+    if (emergency_interp) {
+        Parrot_clear_emergency_interp();
+        PDB_backtrace(emergency_interp);
+    }
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
 }
@@ -769,6 +763,7 @@ from all previous rethrow points.
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
 {

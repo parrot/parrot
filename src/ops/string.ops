@@ -129,7 +129,7 @@ The C<PMC> versions are MMD operations.
 
 inline op repeat(out STR, in STR, in INT) :base_mem {
     if ($3 < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_NEG_REPEAT,
                 "Cannot repeat with negative arg");
         goto ADDRESS(handler);
@@ -139,7 +139,7 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
 
 inline op repeat(invar PMC, invar PMC, in INT) :base_core {
     if ($3 < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_NEG_REPEAT,
                 "Cannot repeat with negative arg");
         goto ADDRESS(handler);
@@ -149,7 +149,7 @@ inline op repeat(invar PMC, invar PMC, in INT) :base_core {
 
 inline op repeat(invar PMC, invar PMC, invar PMC) :base_core {
     if (VTABLE_get_integer(interp, $3) < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_NEG_REPEAT,
                 "Cannot repeat with negative arg");
         goto ADDRESS(handler);
@@ -261,7 +261,7 @@ inline op substr(out STR, in STR, in INT, in INT) :base_core {
 }
 
 inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
-    $1 = VTABLE_substr_str(interp, $2, $3, $4);
+    $1 = VTABLE_substr(interp, $2, $3, $4);
 }
 
 inline op replace(out STR, in STR, in INT, in INT, in STR) :base_core {
@@ -332,7 +332,8 @@ inline op new(out STR) :base_mem {
     $1 = Parrot_str_new_noinit(interp, 0);
 }
 
-inline op new(out STR, in INT) :base_mem {
+inline op new(out STR, in INT) :base_mem :deprecated {
+    Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
     $1 = Parrot_str_new_noinit(interp, $2);
 }
 
@@ -387,7 +388,7 @@ inline op stringinfo(out INT, in STR, in INT) :base_core {
             break;
           default:
             {
-                opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "stringinfo: unknown info type: %d", $3);
                 goto ADDRESS(handler);
@@ -487,7 +488,7 @@ op encodingname(out STR, in INT) :base_core {
 op find_encoding(out INT, in STR) :base_core {
     const INTVAL n = Parrot_encoding_number(interp, $2);
     if (n < 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_INVALID_ENCODING,
                 "encoding '%Ss' not found", $2);
         goto ADDRESS(handler);
@@ -585,7 +586,7 @@ op find_codepoint(out INT, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

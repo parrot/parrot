@@ -293,7 +293,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_push_eh_throw
@@ -317,7 +317,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
     .return()
 
   handler:
-    say "i am the decider"
+    diag("i am the decider")
 .end
 
 .sub test_die
@@ -525,9 +525,9 @@ _handler:
 
 .sub get_string :vtable("get_string") :method
     $P0 = new ["MyException"]
-    say "throwing"
+    diag("throwing")
     throw $P0
-    say "this didn't work!"
+    diag("this didn't work!")
     ok(0, "Oops! We shouldn't ever end up here unless finalize fails")
     exit 1
 .end

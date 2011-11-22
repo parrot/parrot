@@ -683,10 +683,10 @@ l1:
 
 .sub PMC_as_classes
     get_class $P0, "Integer"
-    ok( 1, "get_class of Integer did't croak" )
+    ok( 1, "get_class of Integer didn't croak" )
 
     get_class $P0, "Integer"
-    ok( 1, "get_class of Integer did't croak second time" )
+    ok( 1, "get_class of Integer didn't croak second time" )
 
     typeof $S0, $P0
     is( $S0, 'PMCProxy', 'typeof PMCProxy' )
@@ -1503,7 +1503,7 @@ end:
     ok(0, "'Parent isn\'t a Class' exception not thrown")
     goto end
 handler:
-    .exception_is( "Parent isn't a Class." )
+    .exception_is( "Parent 'Not a class' of 'Astronomical Object 2' isn't a Class." )
 end:
 .end
 

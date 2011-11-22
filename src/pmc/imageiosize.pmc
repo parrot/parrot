@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,17 +24,23 @@ Gets the size of an ImageIO image without the allocation costs.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static int check_seen(PARROT_INTERP, PMC *self, PMC *v)
-        __attribute__nonnull__(1);
+static int check_seen(PARROT_INTERP,
+    ARGIN(const PMC *self),
+    ARGIN(const PMC *v))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_check_seen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(v))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static int check_seen(PARROT_INTERP, PMC *self, PMC *v)>
+=item C<static int check_seen(PARROT_INTERP, const PMC *self, const PMC *v)>
 
 Check the seen hash to prevent duplicate serialization.
 
@@ -45,11 +51,12 @@ Check the seen hash to prevent duplicate serialization.
 
 PARROT_INLINE
 static int
-check_seen(PARROT_INTERP, PMC *self, PMC *v)
+check_seen(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const PMC *v))
 {
     ASSERT_ARGS(check_seen)
-    Hash       *seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
-    HashBucket *b    = Parrot_hash_get_bucket(interp, seen, v);
+    const Hash * const seen =
+        (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
+    const HashBucket * const b    = Parrot_hash_get_bucket(interp, seen, v);
     if (b)
         return 1;
     else
@@ -59,7 +66,6 @@ check_seen(PARROT_INTERP, PMC *self, PMC *v)
 pmclass ImageIOSize auto_attrs {
     ATTR PMC                        *seen; /* seen hash */
     ATTR PMC                        *todo; /* todo list */
-    ATTR struct PackFile            *pf;
     ATTR struct PackFile_ConstTable *pf_ct;
     ATTR INTVAL                      size;
 
@@ -86,7 +92,6 @@ Initializes the PMC.
 */
     VTABLE void init() {
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
         PARROT_IMAGEIOSIZE(SELF)->pf_ct = NULL;
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
 
@@ -96,7 +101,7 @@ Initializes the PMC.
 
         PObj_flag_CLEAR(private1, SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -110,7 +115,6 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
 */
     VTABLE void init_pmc(PMC *pf_ct) {
         PARROT_IMAGEIOSIZE(SELF)->todo  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PARROT_IMAGEIOSIZE(SELF)->pf    = PackFile_new(INTERP, 0);
         PARROT_IMAGEIOSIZE(SELF)->pf_ct =
             (PackFile_ConstTable *)VTABLE_get_pointer(INTERP, pf_ct);
         PARROT_IMAGEIOSIZE(SELF)->size  = 0;
@@ -121,22 +125,9 @@ Initializes the PMC with a pre-existing C<PackFile_ConstTable>.
 
         PObj_flag_SET(private1, SELF);
 
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
-
-/*
-
-=item C<void destroy()>
-
-Destroys the PMC.
-
-=cut
-
-*/
-    VTABLE void destroy() {
-        PackFile_destroy(INTERP, PARROT_IMAGEIOSIZE(SELF)->pf);
-    }
 
 /*
 
@@ -228,8 +219,8 @@ Pushes the string C<*v> onto the end of the image.
     VTABLE void push_string(STRING *v) {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
-            PackFile_ConstTable *table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
+            const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            const int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
 
             if (idx >= 0) {
                 STATICSELF.push_integer(idx);
@@ -270,8 +261,8 @@ hasn't been seen yet, it is also pushed onto the todo list.
             SELF.push_integer(0);
         else {
             INTVAL cno, idx;
-            PackFile_ConstTable *ct   = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            Hash                *seen = (Hash *)VTABLE_get_pointer(INTERP,
+            PackFile_ConstTable * const ct   = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
+            Hash                * const seen = (Hash *)VTABLE_get_pointer(INTERP,
                                                     PARROT_IMAGEIOSIZE(SELF)->seen);
 
             if (PObj_flag_TEST(private1, SELF)
@@ -297,15 +288,15 @@ hasn't been seen yet, it is also pushed onto the todo list.
     VTABLE void set_pmc(PMC *p)
     {
         if (!PObj_flag_TEST(private1, SELF)) {
-            UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
+            const UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
             PARROT_IMAGEIOSIZE(SELF)->size += header_length;
         }
 
         STATICSELF.push_pmc(p);
         {
-            PMC *todo = PARROT_IMAGEIOSIZE(SELF)->todo;
+            PMC * const todo = PARROT_IMAGEIOSIZE(SELF)->todo;
             while (VTABLE_elements(INTERP, todo)) {
-                PMC *current = VTABLE_shift_pmc(INTERP, todo);
+                PMC * const current = VTABLE_shift_pmc(INTERP, todo);
                 VTABLE_freeze(INTERP, current, SELF);
                 VTABLE_visit(INTERP,  current, SELF);
                 SELF.push_pmc(PMC_metadata(current));

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -14,7 +14,6 @@ src/gc/gc_ms2.c - Non-recursive M&S
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
-#include "parrot/sysmem.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -33,13 +32,6 @@ typedef struct string_alloc_struct {
 #define STR2PAC(p) ((string_alloc_struct *)((char*)(p) - sizeof (void *)))
 
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
-
-/* Maybe M&S. Depends on total allocated memory, memory allocated since last
-alloc, and phase of the Moon. */
-#define MAYBE_MARK_AND_SWEEP(interp, self) { \
-    if ((interp)->gc_sys->stats.mem_used_last_collect > (self)->gc_threshold) \
-        gc_ms2_mark_and_sweep((interp), 0); \
-    }
 
 /* Private information */
 typedef struct MarkSweep_GC {
@@ -60,7 +52,11 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Number of allocated objects before trigger gc */
+    /* Maximum percentage of memory wasted */
+    size_t dynamic_threshold;
+    /* Minimum GC threhshold */
+    size_t min_threshold;
+    /* Number of allocated bytes before GC is triggered */
     size_t gc_threshold;
 
     /* GC blocking */
@@ -83,15 +79,16 @@ static void failed_allocation(unsigned int line, unsigned long size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
-    SHIM(size_t size))
+static Parrot_Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGMOD(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 PARROT_CAN_RETURN_NULL
 static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
@@ -99,11 +96,12 @@ static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_allocate_memory_chunk(SHIM_INTERP, size_t size);
+static void * gc_ms2_allocate_memory_chunk(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
+static void * gc_ms2_allocate_memory_chunk_zeroed(PARROT_INTERP,
+    size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -114,20 +112,20 @@ static void* gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
+static PMC* gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_ms2_allocate_string_header(PARROT_INTERP,
-    SHIM(UINTVAL flags))
+static STRING* gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_ms2_allocate_string_storage(PARROT_INTERP,
-    ARGIN(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 static void gc_ms2_block_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -149,18 +147,17 @@ static void gc_ms2_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_ms2_free_buffer_header(PARROT_INTERP,
-    ARGFREE(Buffer *s),
-    SHIM(size_t size))
+    ARGFREE(Parrot_Buffer *s),
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_ms2_free_fixed_size_storage(PARROT_INTERP,
     size_t size,
-    ARGMOD(void *data))
+    ARGFREE_NOTNULL(void *data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*data);
+        __attribute__nonnull__(3);
 
-static void gc_ms2_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
+static void gc_ms2_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
 static void gc_ms2_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -209,43 +206,44 @@ static void gc_ms2_mark_live_objects(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
-        __attribute__nonnull__(1);
-
-static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP,
-    ARGMOD(PMC *pmc))
+static void gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+static void gc_ms2_mark_str_header(PARROT_INTERP, ARGMOD(STRING *s))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
+
+static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)
+        __attribute__nonnull__(1);
+
 static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGMOD(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_ms2_reallocate_memory_chunk(SHIM_INTERP,
+static void * gc_ms2_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_ms2_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+static void * gc_ms2_reallocate_memory_chunk_zeroed(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);
 
 static void gc_ms2_reallocate_string_storage(PARROT_INTERP,
-    ARGIN(STRING *str),
+    ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*str);
 
 static void gc_ms2_sweep_pmc_pool(PARROT_INTERP,
     ARGIN(Pool_Allocator *pool),
@@ -342,12 +340,11 @@ static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_gc_ms2_mark_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_gc_ms2_mark_pobj_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_gc_ms2_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -411,7 +408,7 @@ static void
 gc_ms2_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_compact_memory_pool)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_compact_pool(interp, &self->string_gc);
 }
 
@@ -437,11 +434,11 @@ size_t size)>
 =item C<static void gc_ms2_reallocate_string_storage(PARROT_INTERP, STRING *str,
 size_t size)>
 
-=item C<static void gc_ms2_allocate_buffer_storage(PARROT_INTERP, Buffer *str,
-size_t size)>
+=item C<static void gc_ms2_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
+*str, size_t size)>
 
-=item C<static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP, Buffer *str,
-size_t size)>
+=item C<static void gc_ms2_reallocate_buffer_storage(PARROT_INTERP,
+Parrot_Buffer *str, size_t size)>
 
 =item C<static void* gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>
@@ -460,14 +457,16 @@ static void*
 gc_ms2_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_attributes)
-    MarkSweep_GC *self      = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     const size_t  attr_size = pmc->vtable->attr_size;
 
     PMC_data(pmc)           = Parrot_gc_fixed_allocator_allocate(interp,
                                 self->fixed_size_allocator, attr_size);
 
     memset(PMC_data(pmc), 0, attr_size);
-    interp->gc_sys->stats.mem_used_last_collect += attr_size;
+
+    if (!PObj_constant_TEST(pmc))
+        interp->gc_sys->stats.memory_used += attr_size;
 
     return PMC_data(pmc);
 }
@@ -479,11 +478,12 @@ gc_ms2_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_ms2_free_pmc_attributes)
 
     if (PMC_data(pmc)) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
                 PMC_data(pmc), pmc->vtable->attr_size);
 
-        interp->gc_sys->stats.mem_used_last_collect -= pmc->vtable->attr_size;
+        if (!PObj_constant_TEST(pmc))
+            interp->gc_sys->stats.memory_used -= pmc->vtable->attr_size;
     }
 }
 
@@ -493,10 +493,9 @@ static void*
 gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_fixed_size_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    interp->gc_sys->stats.memory_allocated      += size;
-    interp->gc_sys->stats.mem_used_last_collect += size;
+    interp->gc_sys->stats.memory_used += size;
 
     return Parrot_gc_fixed_allocator_allocate(interp,
                 self->fixed_size_allocator, size);
@@ -504,14 +503,13 @@ gc_ms2_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 
 static void
-gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
+gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms2_free_fixed_size_storage)
     if (data) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-        interp->gc_sys->stats.memory_allocated      -= size;
-        interp->gc_sys->stats.mem_used_last_collect -= size;
+        interp->gc_sys->stats.memory_used -= size;
 
         Parrot_gc_fixed_allocator_free(interp, self->fixed_size_allocator,
                                          data, size);
@@ -533,10 +531,16 @@ static size_t
 gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 {
     ASSERT_ARGS(gc_ms2_get_gc_info)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (which == IMPATIENT_PMCS)
         return self->num_early_gc_PMCs;
+    if (which == TOTAL_PMCS)
+        /* It's higher than actual number of allocated PMCs */
+        return Parrot_pa_count_allocated(interp, self->objects);
+    if (which == ACTIVE_PMCS)
+        /* It's higher than actual number of allocated PMCs */
+        return Parrot_pa_count_used(interp, self->objects);
 
     return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
 }
@@ -544,7 +548,7 @@ gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
 /*
 
-=item C<void Parrot_gc_ms2_init(PARROT_INTERP)>
+=item C<void Parrot_gc_ms2_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the infinite memory collector. Installs the necessary function
 pointers into the Memory_Pools structure. The two most important are the
@@ -558,7 +562,7 @@ finalization is necessary.
 */
 
 void
-Parrot_gc_ms2_init(PARROT_INTERP)
+Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_gc_ms2_init)
     struct MarkSweep_GC *self;
@@ -590,7 +594,7 @@ Parrot_gc_ms2_init(PARROT_INTERP)
     interp->gc_sys->is_pmc_ptr                  = gc_ms2_is_pmc_ptr;
     interp->gc_sys->is_string_ptr               = gc_ms2_is_string_ptr;
     interp->gc_sys->mark_pmc_header             = gc_ms2_mark_pmc_header;
-    interp->gc_sys->mark_pobj_header            = gc_ms2_mark_pobj_header;
+    interp->gc_sys->mark_str_header             = gc_ms2_mark_str_header;
 
     interp->gc_sys->block_mark                  = gc_ms2_block_GC_mark;
     interp->gc_sys->unblock_mark                = gc_ms2_unblock_GC_mark;
@@ -640,7 +644,13 @@ Parrot_gc_ms2_init(PARROT_INTERP)
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
 
-        self->gc_threshold = Parrot_sysmem_amount(interp) / 8;
+        self->dynamic_threshold = args->dynamic_threshold
+                                ? args->dynamic_threshold
+                                : GC_DEFAULT_DYNAMIC_THRESHOLD;
+        self->min_threshold     = args->min_threshold
+                                ? args->min_threshold
+                                : GC_DEFAULT_MIN_THRESHOLD;
+        self->gc_threshold      = self->min_threshold;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -665,7 +675,7 @@ gc_ms2_finalize(PARROT_INTERP)
     ASSERT_ARGS(gc_ms2_finalize)
 
     if (!interp->parent_interpreter) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         Parrot_gc_str_finalize(interp, &self->string_gc);
 
@@ -685,20 +695,15 @@ gc_ms2_finalize(PARROT_INTERP)
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
-gc_ms2_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
+gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_pmc_header)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct *ptr;
 
-    MAYBE_MARK_AND_SWEEP(interp, self);
-
-    /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
-    ++interp->gc_sys->stats.header_allocs_since_last_collect;
-
-    interp->gc_sys->stats.memory_allocated      += sizeof (PMC);
-    interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
+    if (!(flags & PObj_constant_FLAG))
+        interp->gc_sys->stats.memory_used += sizeof (PMC);
 
     ptr = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     ptr->ptr = Parrot_pa_insert(interp, self->objects, ptr);
@@ -711,7 +716,7 @@ static void
 gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_free_pmc_header)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (pmc) {
         if (PObj_on_free_list_TEST(pmc))
@@ -723,9 +728,8 @@ gc_ms2_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
 
         Parrot_gc_pool_free(interp, self->pmc_allocator, PMC2PAC(pmc));
 
-        --interp->gc_sys->stats.header_allocs_since_last_collect;
-        interp->gc_sys->stats.memory_allocated      -= sizeof (PMC);
-        interp->gc_sys->stats.mem_used_last_collect -= sizeof (PMC);
+        if (!PObj_constant_TEST(pmc))
+            interp->gc_sys->stats.memory_used -= sizeof (PMC);
     }
 }
 
@@ -741,11 +745,11 @@ mark as grey
 */
 
 static void
-gc_ms2_mark_pmc_header(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_mark_pmc_header)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    pmc_alloc_struct  *item = PMC2PAC(pmc);
+    MarkSweep_GC      * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    pmc_alloc_struct  * const item = PMC2PAC(pmc);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_is_live_or_free_TESTALL(pmc))
@@ -776,7 +780,7 @@ static int
 gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_pmc_ptr)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return gc_ms2_is_ptr_owned(interp, ptr, self->pmc_allocator, self->objects);
 }
 
@@ -786,11 +790,11 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 =item C<gc_ms2_free_string_header()>
 
-=item C<static Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP, size_t
-size)>
+=item C<static Parrot_Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
+size_t size)>
 
-=item C<static void gc_ms2_free_buffer_header(PARROT_INTERP, Buffer *s, size_t
-size)>
+=item C<static void gc_ms2_free_buffer_header(PARROT_INTERP, Parrot_Buffer *s,
+size_t size)>
 
 Allocate/free string/buffer headers.
 
@@ -799,20 +803,16 @@ Allocate/free string/buffer headers.
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static STRING*
-gc_ms2_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
+gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_allocate_string_header)
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    Pool_Allocator   *pool = self->string_allocator;
+    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    Pool_Allocator   * const pool = self->string_allocator;
     string_alloc_struct *ptr;
     STRING           *ret;
 
-    MAYBE_MARK_AND_SWEEP(interp, self);
-
-    /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
-    ++interp->gc_sys->stats.header_allocs_since_last_collect;
-    interp->gc_sys->stats.memory_allocated      += sizeof (STRING);
-    interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
+    if (!(flags & PObj_constant_FLAG))
+        interp->gc_sys->stats.memory_used += sizeof (STRING);
 
     ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     ptr->ptr = Parrot_pa_insert(interp, self->strings, ptr);
@@ -828,39 +828,37 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 {
     ASSERT_ARGS(gc_ms2_free_string_header)
 
-    if (s
-    && !PObj_on_free_list_TEST(s)) {
-        MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    if (s && !PObj_on_free_list_TEST(s)) {
+        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         Parrot_pa_remove(interp, self->strings, STR2PAC(s)->ptr);
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp,
-                &self->string_gc, (Buffer *)s);
+                &self->string_gc, (Parrot_Buffer *)s);
 
         PObj_on_free_list_SET(s);
 
         Parrot_gc_pool_free(interp, self->string_allocator, STR2PAC(s));
 
-        --interp->gc_sys->stats.header_allocs_since_last_collect;
-        interp->gc_sys->stats.memory_allocated      -= sizeof (STRING);
-        interp->gc_sys->stats.mem_used_last_collect -= sizeof (STRING);
+        if (!PObj_constant_TEST(s))
+            interp->gc_sys->stats.memory_used -= sizeof (STRING);
     }
 }
 
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer*
+static Parrot_Buffer*
 gc_ms2_allocate_buffer_header(PARROT_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_ms2_allocate_buffer_header)
-    return (Buffer *)gc_ms2_allocate_string_header(interp, 0);
+    return (Parrot_Buffer *)gc_ms2_allocate_string_header(interp, 0);
 }
 
 
 static void
-gc_ms2_free_buffer_header(PARROT_INTERP, ARGFREE(Buffer *s), SHIM(size_t size))
+gc_ms2_free_buffer_header(PARROT_INTERP, ARGFREE(Parrot_Buffer *s), SHIM(size_t size))
 {
     ASSERT_ARGS(gc_ms2_free_buffer_header)
     gc_ms2_free_string_header(interp, (STRING*)s);
@@ -881,7 +879,7 @@ static int
 gc_ms2_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 {
     ASSERT_ARGS(gc_ms2_is_string_ptr)
-    MarkSweep_GC      *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return gc_ms2_is_ptr_owned(interp, ptr, self->string_allocator, self->strings);
 }
 
@@ -894,10 +892,10 @@ size)>
 =item C<void gc_ms_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
 size)>
 
-=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_ms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
 size)>
 
-=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_ms_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
 size)>
 
 Functions for allocating strings/buffers storage.
@@ -907,65 +905,57 @@ Functions for allocating strings/buffers storage.
 */
 
 static void
-gc_ms2_allocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+gc_ms2_allocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_string_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_string_storage(interp, &self->string_gc, str, size);
-    interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
 
 static void
-gc_ms2_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
+gc_ms2_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_reallocate_string_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_string_storage(interp, &self->string_gc, str, size);
-    interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
 
 static void
-gc_ms2_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_ms2_allocate_buffer_storage(PARROT_INTERP, ARGMOD(Parrot_Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_allocate_buffer_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_allocate_buffer_storage(interp, &self->string_gc, str, size);
-    interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
 
 static void
-gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_ms2_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Parrot_Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_ms2_reallocate_buffer_storage)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Parrot_gc_str_reallocate_buffer_storage(interp, &self->string_gc, str, size);
-    interp->gc_sys->stats.mem_used_last_collect += size;
 }
 
 
 /*
 
-=item C<static void gc_ms2_mark_pobj_header(PARROT_INTERP, PObj * obj)>
+=item C<static void gc_ms2_mark_str_header(PARROT_INTERP, STRING *s)>
 
-Marks PObj as live.
+Marks STRING as live.
 
 =cut
 
 */
 
 static void
-gc_ms2_mark_pobj_header(PARROT_INTERP, ARGIN_NULLOK(PObj * obj))
+gc_ms2_mark_str_header(SHIM_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(gc_ms2_mark_pobj_header)
-    if (obj) {
-        if (PObj_is_PMC_TEST(obj))
-            gc_ms2_mark_pmc_header(interp, (PMC *)obj);
-        else
-            PObj_live_SET(obj);
-    }
+    ASSERT_ARGS(gc_ms2_mark_str_header)
+
+    PObj_live_SET(s);
 }
 
 
@@ -988,11 +978,11 @@ gc_ms2_iterate_live_strings(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_ms2_iterate_live_strings)
 
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     POINTER_ARRAY_ITER(self->strings,
-        STRING *s = &((string_alloc_struct *)ptr)->str;
-        callback(interp, (Buffer *)s, data););
+        STRING * const s = &((string_alloc_struct *)ptr)->str;
+        callback(interp, (Parrot_Buffer *)s, data););
 }
 
 
@@ -1038,7 +1028,7 @@ gc_ms2_mark_live_objects(PARROT_INTERP, ARGIN(MarkSweep_GC *self),
     /* Additional gray objects will append to new_objects list */
     /* So, iterate over them in one go */
     POINTER_ARRAY_ITER(self->new_objects,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
         /* if object is a PMC and contains buffers or PMCs, then attach the PMC
          * to the chained mark list. */
@@ -1054,13 +1044,11 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms2_mark_and_sweep)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    GC_Statistics       *stats;
+    size_t               threshold;
 
     /* GC is blocked */
     if (self->gc_mark_block_level)
-        return;
-
-    /* Ignore calls from String GC. We know better when to trigger GC */
-    if (flags & GC_strings_cb_FLAG)
         return;
 
     /* avoid global destruction for child interps */
@@ -1092,13 +1080,46 @@ gc_ms2_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     } while (0);
 
     /* We swept all dead objects */
-    self->num_early_gc_PMCs                                = 0;
-    interp->gc_sys->stats.mem_used_last_collect            = 0;
-    interp->gc_sys->stats.header_allocs_since_last_collect = 0;
-    interp->gc_sys->stats.gc_mark_runs++;
-    self->gc_mark_block_level--;
-
     gc_ms2_compact_memory_pool(interp);
+
+    stats = &interp->gc_sys->stats;
+    stats->mem_used_last_collect = stats->memory_used;
+    stats->gc_mark_runs++;
+
+    /* The dynamic threshold is a configurable percentage of the amount of
+       memory used after the last GC */
+    threshold = (size_t)(stats->mem_used_last_collect *
+                         (0.01 * self->dynamic_threshold));
+
+    if (threshold < self->min_threshold)
+        threshold = self->min_threshold;
+
+    self->gc_threshold = stats->mem_used_last_collect + threshold;
+
+    self->gc_mark_block_level--;
+    self->num_early_gc_PMCs = 0;
+}
+
+
+/*
+
+=item C<void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
+
+Run a GC if memory used is above threshold.
+
+=cut
+
+*/
+
+void
+Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+{
+    ASSERT_ARGS(Parrot_gc_maybe_mark_and_sweep)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+    if (!self->gc_mark_block_level
+    &&   interp->gc_sys->stats.memory_used > self->gc_threshold)
+        gc_ms2_mark_and_sweep(interp, flags);
 }
 
 
@@ -1137,6 +1158,8 @@ gc_ms2_sweep_pmc_pool(PARROT_INTERP,
             if (pmc->vtable->attr_size && PMC_data(pmc))
                 Parrot_gc_free_pmc_attributes(interp, pmc);
             PMC_data(pmc) = NULL;
+
+            interp->gc_sys->stats.memory_used -= sizeof (PMC);
 
             PObj_on_free_list_SET(pmc);
             PObj_gc_CLEAR(pmc);
@@ -1192,10 +1215,10 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
 {
     ASSERT_ARGS(gc_ms2_sweep_string_pool)
 
-    MarkSweep_GC     *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     POINTER_ARRAY_ITER(list,
-        STRING *obj = &(((string_alloc_struct*)ptr)->str);
+        STRING * const obj = &(((string_alloc_struct*)ptr)->str);
 
         PARROT_ASSERT(!PObj_on_free_list_TEST(obj));
 
@@ -1206,7 +1229,9 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
         else if (!PObj_constant_TEST(obj)) {
             Parrot_pa_remove(interp, list, STR2PAC(obj)->ptr);
             if (Buffer_bufstart(obj) && !PObj_external_TEST(obj))
-                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer*)obj);
+                Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Parrot_Buffer*)obj);
+
+            interp->gc_sys->stats.memory_used -= sizeof (STRING);
 
             PObj_on_free_list_SET(obj);
 
@@ -1285,9 +1310,8 @@ static void
 gc_ms2_block_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_block_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_mark_block_level;
-    Parrot_shared_gc_block(interp);
 }
 
 
@@ -1295,11 +1319,9 @@ static void
 gc_ms2_unblock_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_unblock_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    if (self->gc_mark_block_level) {
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    if (self->gc_mark_block_level)
         --self->gc_mark_block_level;
-        Parrot_shared_gc_unblock(interp);
-    }
 }
 
 
@@ -1307,7 +1329,7 @@ static void
 gc_ms2_block_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_block_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_sweep_block_level;
 }
 
@@ -1316,7 +1338,7 @@ static void
 gc_ms2_unblock_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_unblock_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     if (self->gc_sweep_block_level)
         --self->gc_sweep_block_level;
 }
@@ -1326,7 +1348,7 @@ static unsigned int
 gc_ms2_is_blocked_GC_mark(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_is_blocked_GC_mark)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return self->gc_mark_block_level;
 }
 
@@ -1335,7 +1357,7 @@ static unsigned int
 gc_ms2_is_blocked_GC_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_ms2_is_blocked_GC_sweep)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     return self->gc_sweep_block_level;
 }
 
@@ -1463,10 +1485,10 @@ Marks a PMC as needing timely destruction.
 */
 
 static void
-gc_ms2_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
+gc_ms2_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
 {
     ASSERT_ARGS(gc_ms2_pmc_needs_early_collection)
-    MarkSweep_GC *self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
 }
 

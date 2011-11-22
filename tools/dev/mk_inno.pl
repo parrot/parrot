@@ -86,7 +86,7 @@ ${dll_section}
 Name: "{group}\\{cm:UninstallProgram,parrot}"; Filename: "{uninstallexe}"
 
 [Registry]
-Root: HKLM; SubKey: "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\"; ValueType: string; ValueName: "Path"; ValueData: "{reg:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\,Path};{app}\\bin"
+Root: HKLM; SubKey: "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\"; ValueType: expandsz; ValueName: "Path"; ValueData: "{reg:HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\,Path};{app}\\bin"
 };
 
 close $OUT;

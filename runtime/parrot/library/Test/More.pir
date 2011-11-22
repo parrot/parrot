@@ -686,11 +686,11 @@ This handles comparisons of array-like and hash-like structures.
     goto report_result
 
   compare_array:
-    ( result, diagnosis ) = compare_array( left, right, position )
+    result = compare_array( left, right, position )
     goto report_result
 
   compare_hash:
-    (result, diagnosis ) = compare_hash( left, right, position )
+    result = compare_hash( left, right, position )
     goto report_result
 
   report_result:
@@ -1164,7 +1164,7 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1225,7 +1225,7 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1289,7 +1289,7 @@ an exception that matches the pattern, fails the test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)
@@ -1348,7 +1348,7 @@ an exception that matches the pattern, fails the test otherwise.
 
     .local pmc eh
     eh = new 'ExceptionHandler'
-    set_addr eh, handler            # set handler label for exceptions
+    set_label eh, handler           # set handler label for exceptions
     push_eh eh
 
     compfun = compiler(target)

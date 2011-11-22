@@ -192,9 +192,9 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 =cut
 
 inline op div(inout INT, in INT) :base_core {
-    INTVAL den = $2;
+    const INTVAL den = $2;
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -203,9 +203,9 @@ inline op div(inout INT, in INT) :base_core {
 }
 
 inline op div(inout NUM, in NUM) :base_core {
-    FLOATVAL den = $2;
+    const FLOATVAL den = $2;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -225,9 +225,9 @@ inline op div(invar PMC, in NUM) :base_core {
     VTABLE_i_divide_float(interp, $1, $2);
 }
 inline op div(out INT, in INT, in INT) :base_core {
-    INTVAL den = $3;
+    const INTVAL den = $3;
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -236,9 +236,9 @@ inline op div(out INT, in INT, in INT) :base_core {
 }
 
 inline op div(out NUM, in NUM, in NUM) :base_core {
-    FLOATVAL den = $3;
+    const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -288,11 +288,11 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 =cut
 
 inline op fdiv(inout INT, in INT) :base_core {
-    INTVAL   den = $2;
+    const INTVAL den = $2;
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -303,9 +303,10 @@ inline op fdiv(inout INT, in INT) :base_core {
 }
 
 inline op fdiv(inout NUM, in NUM) :base_core {
-    FLOATVAL den = $2;
+    const FLOATVAL den = $2;
+
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -326,11 +327,11 @@ inline op fdiv(invar PMC, in NUM) :base_core {
 }
 
 inline op fdiv(out INT, in INT, in INT) :base_core {
-    INTVAL   den = $3;
+    const INTVAL den = $3;
     FLOATVAL f;
 
     if (den == 0) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -341,9 +342,9 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
 }
 
 inline op fdiv(out NUM, in NUM, in NUM) :base_core {
-    FLOATVAL den = $3;
+    const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO(den)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
         goto ADDRESS(handler);
@@ -382,8 +383,8 @@ inline op ceil(inout NUM) :base_core {
 }
 
 inline op ceil(out INT, in NUM) :base_core {
-    FLOATVAL f = ceil($2);
-    $1         = (INTVAL)f;
+    const FLOATVAL f = ceil($2);
+    $1 = (INTVAL)f;
 }
 
 inline op ceil(out NUM, in NUM) :base_core {
@@ -409,8 +410,8 @@ inline op floor(inout NUM) :base_core {
 }
 
 inline op floor(out INT, in NUM) :base_core {
-    FLOATVAL f = floor($2);
-    $1         = (INTVAL)f;
+    const FLOATVAL f = floor($2);
+    $1 = (INTVAL)f;
 }
 
 inline op floor(out NUM, in NUM) :base_core {
@@ -729,7 +730,7 @@ inline op sqrt(out NUM, in NUM) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

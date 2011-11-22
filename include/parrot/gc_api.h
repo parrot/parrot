@@ -31,13 +31,21 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
-#define GC_DYNAMIC_THRESHOLD_DEFAULT 25
+#define PARROT_GC_WRITE_BARRIER(i, p) do { if (PObj_GC_need_write_barrier_TEST((p))) Parrot_gc_write_barrier((i), (p)); } while(0)
+
+typedef struct _Parrot_GC_Init_Args {
+    void *stacktop;
+    const char *system;
+    Parrot_Float4 nursery_size;
+    Parrot_Int dynamic_threshold;
+    Parrot_Int min_threshold;
+} Parrot_GC_Init_Args;
 
 typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
     INF, /* infinite memory core */
-    TMS, /* tricolor mark and sweep */
-    MS2
+    MS2,
+    GMS
 } gc_sys_type_enum;
 
 /* pool iteration */
@@ -64,13 +72,15 @@ typedef int (*pool_iter_fn)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_S
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, void *);
 typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
-typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, PObj *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, ARGMOD(struct Memory_Pools *),
+                ARGIN(struct Fixed_Size_Pool *), ARGMOD(PObj *));
 
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,
+    TOTAL_MEM_USED,
     GC_MARK_RUNS,
     GC_COLLECT_RUNS,
     ACTIVE_PMCS,
@@ -86,10 +96,12 @@ typedef enum {
     CURRENT_RUNCORE,
 
     /* interpinfo_p constants */
+    CURRENT_CTX,
     CURRENT_SUB,
     CURRENT_CONT,
     CURRENT_OBJECT,
     CURRENT_LEXPAD,
+    CURRENT_TASK,
 
     /* interpinfo_s constants */
     EXECUTABLE_FULLNAME,
@@ -128,7 +140,7 @@ int Parrot_gc_active_sized_buffers(PARROT_INTERP)
 
 PARROT_EXPORT
 void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
-    ARGOUT(Buffer *buffer),
+    ARGOUT(Parrot_Buffer *buffer),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -199,7 +211,7 @@ void Parrot_gc_finalize(PARROT_INTERP)
 
 PARROT_EXPORT
 void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
-    ARGMOD(Buffer *obj),
+    ARGMOD(Parrot_Buffer *obj),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -219,10 +231,8 @@ void Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGFREE(PMC *pmc))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -245,7 +255,7 @@ UINTVAL Parrot_gc_impatient_pmcs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+void Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -277,7 +287,7 @@ size_t Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
+Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -300,7 +310,7 @@ void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_EXPORT
 void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP,
-    ARGMOD(Buffer *buffer),
+    ARGMOD(Parrot_Buffer *buffer),
     size_t newsize)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -330,11 +340,6 @@ void Parrot_gc_reallocate_string_storage(PARROT_INTERP,
         FUNC_MODIFIES(*str);
 
 PARROT_EXPORT
-void Parrot_gc_set_system_type(PARROT_INTERP, ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_gc_sys_name(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -348,12 +353,21 @@ size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+size_t Parrot_gc_total_memory_used(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 int Parrot_gc_total_pmcs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_gc_write_barrier(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 unsigned int Parrot_is_blocked_GC_mark(PARROT_INTERP)
@@ -429,8 +443,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -444,7 +457,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(stacktop))
+    , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mark_PMC_alive_fun __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -483,9 +496,6 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
-#define ASSERT_ARGS_Parrot_gc_set_system_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_gc_sys_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_copied __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -493,10 +503,15 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_total_memory_allocated \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_total_memory_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_write_barrier __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -508,16 +523,11 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
-#if defined(NDEBUG) && defined(PARROT_IN_CORE)
-#  define Parrot_gc_mark_STRING_alive(interp, obj) \
-          do if (! STRING_IS_NULL(obj)) PObj_live_SET(obj); while (0)
-#else
-#  define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
-#endif
+# define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
 
 #if defined(PARROT_IN_CORE)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj) && !PObj_live_TEST(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))

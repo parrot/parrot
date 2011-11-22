@@ -68,7 +68,7 @@ HELP
     goto L3
   L2:
     harness = new ['TAP';'Harness';'Archive']
-    harness.'archive'('parrot_test_run.tar.gz')
+    harness.'archive'('t/archive/parrot_test_run.tar.gz')
     options['merge'] = 1
     .local pmc env_data
     env_data = collect_test_environment_data()
@@ -146,12 +146,12 @@ t/compilers/imcc/*/*.t
 t/op/*.t
 t/pmc/*.t
 t/oo/*.t
+t/pir/*.t
 t/native_pbc/*.t
-t/dynpmc/*.t
-t/dynoplibs/*.t
 TEST
     .const string core_tests = <<'TEST'
 t/src/*.t
+t/src/embed/*.t
 t/run/*.t
 t/perl/*.t
 TEST
@@ -161,7 +161,12 @@ t/compilers/pge/*.t
 t/compilers/pge/p5regex/*.t
 t/compilers/pge/perl6regex/*.t
 t/compilers/tge/*.t
+t/compilers/opsc/*.t
+t/compilers/data_json/*.t
+t/dynoplibs/*.t
+t/dynpmc/*.t
 t/library/*.t
+t/ext/winxed/*.t
 t/tools/*.t
 t/profiling/*.t
 TEST
@@ -374,7 +379,7 @@ TEST
     push contents, 'report_file'
     $P0 = new 'FixedStringArray'
     set $P0, 1
-    $P0[0] = 'parrot_test_run.tar.gz'
+    $P0[0] = 't/archive/parrot_test_run.tar.gz'
     push contents, $P0
     load_bytecode 'LWP/UserAgent.pir'
     .const string url = 'http://smolder.parrot.org/app/projects/process_add_report/1'

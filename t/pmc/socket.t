@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,6 +13,9 @@ t/pmc/socket.t - test the Socket PMC
 
 Tests the Socket PMC.
 
+The IPv6-related tests in this file do not actually require an IPv6 networking
+stack, so we don't need to check if this parrot is IPv6-aware.
+
 =cut
 
 .include 'socket.pasm'
@@ -21,7 +24,7 @@ Tests the Socket PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(25)
+    plan(20)
 
     test_init()
     test_get_fd()
@@ -33,12 +36,8 @@ Tests the Socket PMC.
     test_is_closed()
     test_tcp_socket()
     test_tcp_socket6()
-    test_raw_tcp_socket()
-    test_raw_tcp_socket6()
     test_udp_socket()
     test_udp_socket6()
-    test_raw_udp_socket()
-    test_raw_udp_socket6()
     test_server()
 
 .end
@@ -102,78 +101,54 @@ Tests the Socket PMC.
     ok($I0, 'Cloned PMC has correct type TT#1820')
 .end
 
-.sub test_tcp_socket
-    .local pmc sock
+.sub test_create_socket
+    .param int pio_pf
+    .param int pio_sock
+    .param int pio_proto
+    .param string msg
+
+    .local pmc sock, ex
+    .local int r
+    r = 0
+    push_eh failed
     sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    ok(1, 'Created a TCP Socket')
+    sock.'socket'(pio_pf, pio_sock, pio_proto)
+    pop_eh
+    r = 1
+    goto check
+  failed:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    $S0 = ex['message']
+    diag($S0)
+  check:
+    is(r, 1, msg)
+.end
+
+.sub test_tcp_socket
+    test_create_socket(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a TCP Socket')
 .end
 
 .sub test_tcp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    ok(1, 'Created a IPv6 TCP Socket')
-.end
-
-.sub test_raw_tcp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-    ok(1, 'Created a raw IPv6 TCP Socket')
+    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a IPv6 TCP Socket')
 .end
 
 .sub test_udp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
-    ok(1, 'Created a IPv6 UDP Socket')
-.end
-
-.sub test_raw_udp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-    ok(1, 'Created a raw IPv6 UDP Socket')
-.end
-
-.sub test_raw_tcp_socket
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_RAW, .PIO_PROTO_TCP)
-    ok(1, 'Created a raw TCP Socket')
+    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a IPv6 UDP Socket')
 .end
 
 .sub test_udp_socket
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_UDP)
-    ok(1, 'Created a UDP Socket')
-.end
-
-.sub test_raw_udp_socket
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_RAW, .PIO_PROTO_UDP)
-    ok(1, 'Created a raw UDP Socket')
+    test_create_socket(.PIO_PF_INET, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a UDP Socket')
 .end
 
 .sub test_server
     .local pmc interp, conf, server, sock, address, result
-    .local string command, str
-    .local int status
+    .local string command, str, part
+    .local int status, port
 
     interp = getinterp
     conf = interp[.IGLOBALS_CONFIG_HASH]
-
-    str = conf['osname']
-    if str != 'MSWin32' goto run_tests
-    skip(6, 'Sockets are currently broken on Windows')
-    .return ()
 
   run_tests:
     command = '"'
@@ -189,14 +164,16 @@ Tests the Socket PMC.
     server = new 'FileHandle'
     server.'open'(command, 'rp')
     str = server.'readline'()
-    is(str, "Server started\n", 'Server process started')
+    part = substr str, 0, 34
+    is(part, 'Server started, listening on port ', 'Server process started')
+    part = substr str, 34, 4
+    port = part
 
     sock = new 'Socket'
     result = sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     ok(result, 'socket')
-    address = sock.'sockaddr'('localhost', 1234)
-    status = sock.'connect'(address)
-    nok(status, 'connect')
+    address = sock.'sockaddr'('localhost', port)
+    sock.'connect'(address)
     status = sock.'send'('test message')
     is(status, '12', 'send')
     str = sock.'recv'()

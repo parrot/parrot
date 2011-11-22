@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,12 +16,15 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(142)
+    plan(151)
 
+    init_tests()
     resize_tests()
     negative_array_size()
     set_tests()
@@ -51,12 +54,24 @@ out-of-bounds test. Checks INT and PMC keys.
     iterate_subclass_of_rpa()
     method_forms_of_unshift_etc()
     sort_with_broken_cmp()
-    addr_tests()
     equality_tests()
     sort_tailcall()
     push_to_subclasses_array()
+    test_assign_from_another()
+    test_assign_self()
+    test_assign_non_array()
+    method_reverse()
 .end
 
+.sub init_negative
+    .local pmc p
+    p = new ['ResizablePMCArray'], -1
+.end
+
+.sub init_tests
+    .const 'Sub' negative = 'init_negative'
+    throws_type(negative, .EXCEPTION_OUT_OF_BOUNDS, 'new with negative size fails')
+.end
 
 .sub resize_tests
     .local pmc p
@@ -1039,22 +1054,6 @@ end:
     .return ($I0)
 .end
 
-.sub 'addr_tests'
-    $P0 = new 'ResizablePMCArray'
-    $I0 = get_addr $P0
-    $P1 = new 'ResizablePMCArray'
-    $I1 = get_addr $P1
-
-    $I2 = $I0 != 0
-    ok($I2, 'ResizablePMCArray address is not zero')
-    $I2 = $I0 != $I1
-    ok($I2, 'Two empty RPAs do not have same address')
-
-    push $P0, 3
-    $I1 = get_addr $P0
-    is($I0, $I1, 'Adding element to RPA keeps same addr')
-.end
-
 .sub 'equality_tests'
     .local pmc array1, array2, array3, array4
     array1 = new ['ResizablePMCArray']
@@ -1148,6 +1147,74 @@ end:
 
     ok(1, "Push to subclassed array works")
 .end
+
+.sub test_assign_non_array
+    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
+    .sub main :main
+        .local pmc arr, other
+        .local int n
+        arr = new ['ResizablePMCArray']
+        other = new ['Integer']
+        assign arr, other
+    .end
+CODE
+.end
+
+.sub test_assign_self
+    .local pmc arr
+    arr = new ['ResizablePMCArray']
+    assign arr, arr
+    ok(1, 'Can assign ResizablePMCArray to itself')
+.end
+
+.sub test_assign_from_another
+    .local pmc arr1, arr2
+    .local int n
+    arr1 = new ['ResizablePMCArray']
+    arr1 = 32
+    arr2 = new ['ResizablePMCArray']
+    arr2 = 15
+    assign arr1, arr2
+    n = arr1
+    is(n,15,'assigning to ResizablePMCArray from another ResizablePMCArray')
+.end
+
+.sub method_reverse
+    .local pmc array
+    array = new ['ResizablePMCArray']
+    array."reverse"()
+    $I0 = elements array
+    is($I0, 0, "method_reverse - reverse of empty array")
+    push array, 3
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "3", "method_reverse - reverse of array with one element")
+    push array, "1"
+    array."reverse"()
+    array."reverse"()
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "1", "method_reverse - reverse of array with two elements")
+    $S0 = array[1]
+    is($S0, "3", "method_reverse - reverse of array with two elements second element")
+    push array, 4
+    array."reverse"()
+    push array, 5
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "5134", "method_reverse - four elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "4315", "method_reverse - four elements second reverse")
+    push array, 6
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "65134", "method_reverse - five elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "43156", "method_reverse - five elements second reverse")
+.end
+
 
 # don't forget to change the test plan
 

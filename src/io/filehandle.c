@@ -158,7 +158,7 @@ Parrot_io_set_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
 
 /*
 
-=item C<INTVAL Parrot_io_get_flags(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_get_flags(PARROT_INTERP, const PMC *filehandle)>
 
 Set the C<flags> attribute of the FileHandle object, which stores bitwise flags
 marking filehandle characteristics.
@@ -174,12 +174,10 @@ it can be cleanly changed later.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
+Parrot_io_get_flags(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_get_flags)
-    Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
-    INTVAL flags = handle_struct->flags;
-    return flags;
+    return PARROT_FILEHANDLE(filehandle)->flags;
 }
 
 /*
@@ -549,7 +547,7 @@ Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
         INTVAL status;
 
         GETATTR_FileHandle_process_id(interp, pmc, pid);
-        status = PIO_PIPE_WAIT(interp, pid);
+        status = Parrot_proc_waitpid(interp, pid);
         SETATTR_FileHandle_exit_status(interp, pmc, status);
     }
 

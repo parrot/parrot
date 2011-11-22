@@ -20,6 +20,7 @@ The runcore API handles running the operations.
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/runcore_profiling.h"
+#include "parrot/runcore_subprof.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/ops.h"
 #include "main.str"
@@ -37,7 +38,7 @@ The runcore API handles running the operations.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static oplib_init_f get_dynamic_op_lib_init(SHIM_INTERP,
+static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 
@@ -68,6 +69,7 @@ Parrot_runcore_init(PARROT_INTERP)
     Parrot_runcore_slow_init(interp);
     Parrot_runcore_fast_init(interp);
 
+    Parrot_runcore_subprof_init(interp);
     Parrot_runcore_exec_init(interp);
     Parrot_runcore_gc_debug_init(interp);
     Parrot_runcore_debugger_init(interp);
@@ -293,14 +295,6 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     op_lib_t     *lib;
     oplib_init_f  init_func;
 
-    if (n_interpreters > 1) {
-        /* This is not supported yet because interp->all_op_libs
-         * and interp->op_hash are shared.
-         */
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "loading a new dynoplib while "
-            "more than one thread is running is not supported.");
-    }
-
     if (!interp->all_op_libs)
         interp->all_op_libs = mem_gc_allocate_n_zeroed_typed(interp,
                 interp->n_libs + 1, op_lib_t*);
@@ -340,13 +334,15 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 
     int i;
 
+    DECL_CONST_CAST;
+
     for (i = 0; i < lib->op_count; i++) {
         op_info_t *op = &lib->op_info_table[i];
-        Parrot_hash_put(interp, interp->op_hash, (void *)op->full_name,
+        Parrot_hash_put(interp, interp->op_hash, PARROT_const_cast(char *, op->full_name),
                                                  (void *)op);
 
-        if (!Parrot_hash_exists(interp, interp->op_hash, (void *)op->name))
-            Parrot_hash_put(interp, interp->op_hash, (void *)op->name,
+        if (!Parrot_hash_exists(interp, interp->op_hash, PARROT_const_cast(char *, op->name)))
+            Parrot_hash_put(interp, interp->op_hash, PARROT_const_cast(char *, op->name),
                                                      (void *)op);
     }
 }
@@ -354,7 +350,7 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 
 /*
 
-=item C<void disable_event_checking(PARROT_INTERP)>
+=item C<void Parrot_runcore_disable_event_checking(PARROT_INTERP)>
 
 Restore old function table.
 
@@ -366,9 +362,9 @@ XXX This is only implemented for the function core at present.
 
 PARROT_EXPORT
 void
-disable_event_checking(PARROT_INTERP)
+Parrot_runcore_disable_event_checking(PARROT_INTERP)
 {
-    ASSERT_ARGS(disable_event_checking)
+    ASSERT_ARGS(Parrot_runcore_disable_event_checking)
     PackFile_ByteCode *cs = interp->code;
     /* restore func table */
     PARROT_ASSERT(cs->save_func_table);
@@ -379,7 +375,7 @@ disable_event_checking(PARROT_INTERP)
 
 /*
 
-=item C<void enable_event_checking(PARROT_INTERP)>
+=item C<void Parrot_runcore_enable_event_checking(PARROT_INTERP)>
 
 Replace func table with one that does event checking for all opcodes.
 
@@ -394,9 +390,9 @@ XXX This is only implemented for the function core at present.
 
 PARROT_EXPORT
 void
-enable_event_checking(PARROT_INTERP)
+Parrot_runcore_enable_event_checking(PARROT_INTERP)
 {
-    ASSERT_ARGS(enable_event_checking)
+    ASSERT_ARGS(Parrot_runcore_enable_event_checking)
     PackFile_ByteCode *cs = interp->code;
 
     /* only save if we're not already event checking */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ Sort this array, optionally using the provided cmp_func
         if (n > 1) {
             /* XXX Workaround for TT #218 */
             if (PObj_is_object_TEST(SELF)) {
-                PMC *parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
+                PMC * const parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
                 Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
             }
             else
@@ -67,6 +67,32 @@ Sort this array, optionally using the provided cmp_func
         }
         RETURN(PMC *SELF);
     }
+
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+    METHOD reverse() {
+        INTVAL n = SELF.elements();
+        if (n > 1) {
+            PMC *val;
+            PMC **data = PMC_array(SELF);
+            INTVAL i;
+
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
+    }
+
 
 /*
 
@@ -403,28 +429,6 @@ array.
         PMC_array(SELF) = data;
     }
 
-    VTABLE void set_pmc(PMC *value) {
-        INTVAL size;
-        INTVAL i;
-
-        if (SELF == value)
-            return;
-
-        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("Can't set self from this type"));
-
-        if (PMC_array(SELF))
-            mem_gc_free(INTERP, PMC_array(SELF));
-
-        size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
-
-        for (i = 0; i < size; ++i)
-            (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
 /*
 
 =item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
@@ -501,7 +505,7 @@ C<value>.
             SELF.set_number_keyed_int(k, value);
         }
         else {
-            PMC *box = SELF.get_pmc_keyed_int(k);
+            PMC * const box = SELF.get_pmc_keyed_int(k);
 
             if (PMC_IS_NULL(box))
                 cannot_autovivify_nested(INTERP);
@@ -582,13 +586,13 @@ Sets the PMC at index C<key> to C<value>.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC   *nextkey = Parrot_key_next(INTERP, key);
+        PMC * const nextkey = Parrot_key_next(INTERP, key);
 
         if (!nextkey) {
             SELF.set_pmc_keyed_int(k, value);
         }
         else {
-            PMC *box = SELF.get_pmc_keyed_int(k);
+            PMC * const box = SELF.get_pmc_keyed_int(k);
 
             if (PMC_IS_NULL(box))
                 cannot_autovivify_nested(INTERP);
@@ -741,9 +745,7 @@ Used to unarchive the array.
     }
 
     VTABLE void thaw(PMC *info) {
-        SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
-        /* Thawed array was created from pmc_new_noinit */
-        PObj_custom_mark_destroy_SETALL(SELF);
+        SELF.init_int(VTABLE_shift_integer(INTERP, info));
     }
 
 /*
@@ -777,13 +779,11 @@ Mark the array.
 
     VTABLE void mark() {
         PMC ** const data = PMC_array(SELF);
-        INTVAL i;
-
-        if (!data)
-            return;
-
-        for (i = PMC_size(SELF) - 1; i >= 0; --i)
-            Parrot_gc_mark_PMC_alive(INTERP, data[i]);
+        if (data) {
+            INTVAL i;
+            for (i = PMC_size(SELF) - 1; i >= 0; --i)
+                Parrot_gc_mark_PMC_alive(INTERP, data[i]);
+        }
     }
 
 
@@ -793,11 +793,15 @@ Mark the array.
 
 =back
 
-=head1 Auxiliar functions
+=head1 Auxiliary functions
 
 =over 4
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+Throw exception when trying to autovivify nested arrays
+
+=cut
 
 */
 

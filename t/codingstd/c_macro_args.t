@@ -76,6 +76,7 @@ sub check_macro_args {
 
                     # eliminate args used as types
                     $definition =~ s/\Q$arg\E[ ]+\*//g;
+                    $definition =~ s/((?:struct|union)\s+\{(?:[^}]+;\s+)*)\Q$arg\E/$1/g;
 
                     # eliminate all function argument instrumentation macros
                     next if $definition =~ m/\*@[\w ]+@\*/;
@@ -87,9 +88,6 @@ sub check_macro_args {
 
                     # eliminate macros that deal with flags, since they're special
                     next if $macro =~ m/(TEST|SET|CLEAR)$/;
-
-                    # skip those two varargs macros, already called as TRACE_PRINTF((args))
-                    next if $macro =~ m/^TRACE_PRINTF(_VAL|_ALIGN)?$/;
 
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {

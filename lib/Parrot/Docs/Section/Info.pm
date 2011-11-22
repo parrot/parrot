@@ -51,7 +51,6 @@ sub new {
             $self->new_item(
                 'Instructions for Parrot in a Win32 environment.', 'README_win32.pod'
             ),
-            $self->new_item( 'This file lists what\'s new in each version.', 'NEWS' ),
             $self->new_item( 'Where to find or put things that need doing in Parrot.', 'TODO' ),
             $self->new_item(
 'This is a description of the steps someone should follow when they have to prepare a new version for release.',
@@ -82,7 +81,7 @@ sub new {
             'People',
             '',
             $self->new_item(
-                'A list of some of the Parrot developers with SVN commit access.',
+                'A list of some of the Parrot developers with Git commit access.',
                 'RESPONSIBLE_PARTIES'
             ),
             $self->new_item(

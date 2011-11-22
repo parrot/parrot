@@ -188,7 +188,7 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
         /* Flush to next layer */
-        size_t    to_write = buffer_next - buffer_start;
+        const size_t to_write = buffer_next - buffer_start;
         size_t    wrote;
         PIOHANDLE os_handle;
 
@@ -231,8 +231,8 @@ size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_fill_readbuf)
-    unsigned char    *buf  = Parrot_io_get_buffer_start(interp, filehandle);
-    size_t            size = Parrot_io_get_buffer_size(interp, filehandle);
+    unsigned char * const buf = Parrot_io_get_buffer_start(interp, filehandle);
+    const size_t size = Parrot_io_get_buffer_size(interp, filehandle);
     size_t            got;
     PIOHANDLE         os_handle;
 
@@ -269,8 +269,7 @@ The buffer layer's C<Read> function.
 
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGMOD(char *dest), size_t len)
+Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(char *dest), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
     unsigned char *buffer_next, *buffer_end;
@@ -373,7 +372,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 =item C<INTVAL Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle)>
 
 Retrieve the next character in the buffer without modifying the stream.
-Return -1 ar EOF.
+Return -1 or EOF.
 
 =cut
 
@@ -384,7 +383,6 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_peek_buffer)
     unsigned char *buffer_next;
-    UINTVAL        len          = 1;
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
 
     /* write buffer flush */
@@ -674,7 +672,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRIN
         /* Buffering would break append semantics */
         need_flush = 1;
 
-#ifdef PIO_OS_WIN32
+#ifdef _WIN32
         /* Win32 doesn't support append */
         PIO_SEEK(interp, os_handle, 0, SEEK_END);
 #endif
@@ -765,8 +763,8 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    INTVAL    buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    PIOOFF_T  file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    const PIOOFF_T file_pos     = Parrot_io_get_file_position(interp, filehandle);
     PIOHANDLE os_handle;
 
     if (whence == SEEK_CUR) {
@@ -778,9 +776,9 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (buffer_flags & PIO_BF_READBUF
     &&  whence != SEEK_END) {
         /* Try to seek inside the read buffer */
-        unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-        unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-        unsigned char *buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+        unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
+        unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
+        unsigned char * const buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
 
         if (offset >= file_pos - (buffer_next - buffer_start)
         &&  offset <  file_pos + (buffer_end  - buffer_next)) {

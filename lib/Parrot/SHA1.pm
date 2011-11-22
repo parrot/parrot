@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,63 +20,15 @@ package Parrot::SHA1;
 
 use strict;
 use warnings;
-use File::Spec;
-
-our $cache = q{.parrot_current_sha1};
+use lib qw( lib );
 
 our $current = _get_sha1();
 
-sub update {
-    my $prev = _get_sha1();
-    my $sha1 = 1;
-    $current = _handle_update( {
-        prev    => $prev,
-        sha1    => $sha1,
-        cache   => $cache,
-        current => $current,
-    } );
-}
-
-sub _handle_update {
-    my $args = shift;
-    if (! defined $args->{sha1}) {
-        $args->{sha1} = 'unknown';
-        _print_to_cache($args->{cache}, $args->{sha1});
-        return $args->{sha1};
-    }
-    else {
-        if (defined ($args->{prev}) && ($args->{sha1} ne $args->{prev})) {
-            _print_to_cache($args->{cache}, $args->{sha1});
-            return $args->{sha1};
-        }
-        else {
-            return $args->{current};
-        }
-    }
-}
-
-sub _print_to_cache {
-    my ($cache, $sha1) = @_;
-    open my $FH, ">", $cache
-        or die "Unable to open handle to $cache for writing: $!";
-    print {$FH} "$sha1\n";
-    close $FH or die "Unable to close handle to $cache after writing: $!";
-}
-
 sub _get_sha1 {
     my $sha1 = 0;
-    if (-f $cache) {
-        open my $FH, '<', $cache
-            or die "Unable to open $cache for reading: $!";
-        chomp($sha1 = <$FH>);
-        close $FH or die "Unable to close $cache after reading: $!";
-    }
-    else {
-        if ( !$sha1 && (-d '.git') ) {
-             $sha1 = `git rev-parse HEAD`;
-             chomp($sha1);
-             _print_to_cache($cache, $sha1);
-        }
+    if ( -d '.git') {
+        $sha1 = `git rev-parse HEAD`;
+        chomp($sha1);
     }
     return $sha1;
 }

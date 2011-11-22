@@ -22,7 +22,7 @@
 
 /* &gen_from_enum(except_types.pasm) */
 typedef enum {
-    EXCEPTION_BAD_BUFFER_SIZE,
+    EXCEPTION_BAD_BUFFER_SIZE = 0x00000,
     EXCEPTION_MISSING_ENCODING_NAME,
     EXCEPTION_INVALID_STRING_REPRESENTATION,
     EXCEPTION_ICU_ERROR,
@@ -80,8 +80,10 @@ typedef enum {
     EXCEPTION_LIBRARY_NOT_LOADED,
     EXCEPTION_SYNTAX_ERROR,
     EXCEPTION_MALFORMED_PACKFILE,
+    EXCEPTION_DIE,
+    EXCEPTION_ALL = 0x0ffff,
 
-    CONTROL_RETURN,
+    CONTROL_RETURN = 0x10000,
     CONTROL_OK,
     CONTROL_BREAK,
     CONTROL_CONTINUE,
@@ -89,10 +91,12 @@ typedef enum {
     CONTROL_TAKE,
     CONTROL_LEAVE,
     CONTROL_EXIT,
-
     CONTROL_LOOP_NEXT,
     CONTROL_LOOP_LAST,
-    CONTROL_LOOP_REDO
+    CONTROL_LOOP_REDO,
+    CONTROL_ALL = 0x1ffff,
+
+    EXCEPTION_TYPE_ALL_MASK = 0xffff
 } exception_type_enum;
 
 /* &end_gen */
@@ -155,7 +159,7 @@ void Parrot_ex_add_c_handler(PARROT_INTERP, ARGIN(Parrot_runloop *jp))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_ex_build_exception(PARROT_INTERP,
     INTVAL severity,
     long error,
@@ -192,7 +196,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void Parrot_ex_throw_from_c_args(PARROT_INTERP,
-    SHIM(void *ret_addr),
+    ARGIN_NULLOK(void *ret_addr),
     int exitcode,
     ARGIN(const char *format),
     ...)
@@ -223,6 +227,7 @@ void die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP,
     ARGIN(PMC * ex))
         __attribute__nonnull__(1)

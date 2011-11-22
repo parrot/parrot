@@ -24,8 +24,6 @@ well.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(176)
-
     initial_hash_tests()
     more_than_one_hash()
     hash_key_type()
@@ -77,6 +75,11 @@ well.
     equality_tests()
 
     pmc_keys()
+    update()
+    update_mixed()
+    lexed_key()
+
+    'done_testing'()
 .end
 
 .sub initial_hash_tests
@@ -1501,6 +1504,79 @@ postit_end:
     is($I0, 3, "Got 3 different types of PMC keys")
     $I0 = types['ResizableStringArray']
     ok($I0, "Including ResizableStringArray")
+
+
+    # Check custom hashvalue vtable.
+    $P0 = newclass ['Foo']
+    addattribute $P0, "invoked"
+
+    $P0 = new ['Foo']
+    hash[$P0] = "answer"
+    $P1 = getattribute $P0, "invoked"
+    is ($P1, 42, "hashvalue was invoked")
+.end
+
+# test the update method
+.sub 'update'
+    .local pmc hash1, hash2, hash3
+    hash1 = new ['Hash']
+    hash2 = new ['Hash']
+    hash3 = new ['Hash']
+    hash1['one'] = "Hello Parrot!"
+    hash1['two'] = 1664
+    hash1['three'] = 2.718
+    hash2['three'] = "3.141"
+    hash2['four'] = "vier"
+    hash3['four'] = "vier"
+    hash3['three'] = "3.141"
+    hash3['two'] = 1664
+    hash3['one'] = "Hello Parrot!"
+    hash1."update"(hash2)
+    $I0 = elements hash1
+    is($I0, 4, "Got 4 elements in Hash after update")
+    is(hash1, hash3, 'update worked')
+.end
+
+.sub 'update_mixed'
+    .local pmc hash1, hash2, hash3
+    hash1 = new ['Hash']
+    hash1 = .Hash_key_type_int
+    hash1.'set_value_type'(.DATATYPE_INTVAL)
+    hash2 = new ['Hash']
+    hash2 = .Hash_key_type_PMC
+    hash2.'set_value_type'(.DATATYPE_STRING)
+    hash3 = new ['Hash']
+    hash3 = .Hash_key_type_int
+    hash3.'set_value_type'(.DATATYPE_INTVAL)
+    hash1[1] = "42"
+    hash1[2] = 1664
+    hash1[3] = 2.718
+    hash2["3"] = "3.141"
+    hash2["4"] = "4"
+    hash3[4] = 4
+    hash3[3] = 3
+    hash3[2] = 1664
+    hash3[1] = 42
+    hash1."update"(hash2)
+    $I0 = elements hash1
+    is($I0, 4, "Got 4 elements in Hash after update")
+    is(hash1, hash3, 'update_mixed worked')
+.end
+
+.sub 'lexed_key'
+    .lex "$key", $S0
+    $S0 = "hello"
+    $P0 = new ['Hash']
+    set $P0[$S0], "TEST"
+    $S1 = $P0["hello"]
+    is($S1, 'TEST', 'access with a lexed key works')
+.end
+
+.namespace ['Foo']
+.sub '' :method :vtable('hashvalue')
+    $P0 = box 42
+    setattribute self, "invoked", $P0
+    .return (42)
 .end
 
 # Local Variables:

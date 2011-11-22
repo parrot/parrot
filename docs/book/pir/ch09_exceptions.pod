@@ -293,10 +293,13 @@ it will handle:
 
 =begin PIR_FRAGMENT
 
-  $P0 = new 'ExceptionHandler'
-  set_addr $P0, my_handler
-  $P0.'handle_types'(1, 2)
-  push_eh $P0
+    $P0 = new 'ExceptionHandler'
+    set_addr $P0, my_handler
+    $P0.'handle_types'(1, 2)
+    push_eh $P0
+    # ...
+  my_handler:
+    # ...
 
 =end PIR_FRAGMENT
 
@@ -325,7 +328,7 @@ and file name.
 
 Create an annotation with the C<.annotate>X<.annotate directive>
 directive. Annotations consist of a key/value pair, where the key is a
-string and the value is an integer, a number, or a string.  Bytecode
+string and the value is an integer, or a string.  Bytecode
 stores annotations as constants in the compiled bytecode.  Consequently,
 you may not store PMCs.
 
@@ -333,7 +336,7 @@ you may not store PMCs.
 
   .annotate 'file', 'mysource.lang'
   .annotate 'line', 42
-  .annotate 'compiletime', 0.3456
+  .annotate 'compiletime', '0.3456'
 
 =end PIR_FRAGMENT
 

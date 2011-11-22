@@ -41,7 +41,8 @@ typedef struct string_callback_data {
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
+static const char * buffer_location(PARROT_INTERP,
+    ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -54,7 +55,7 @@ static void check_memory_system(ARGIN(const Memory_Pools *mem_pools))
 static void check_var_size_obj_pool(ARGIN(const Variable_Size_Pool *pool))
         __attribute__nonnull__(1);
 
-static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
+static void debug_print_buf(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -81,16 +82,16 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 static int sweep_cb_buf(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGFREE(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -131,7 +132,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 /*
 
-=item C<static const char * buffer_location(PARROT_INTERP, const Buffer *b)>
+=item C<static const char * buffer_location(PARROT_INTERP, const Parrot_Buffer
+*b)>
 
 Returns a constant string representing the location of the given
 Buffer C<b> in one of the PMC registers. If the PMC is not located
@@ -146,12 +148,12 @@ string C<"???">.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
+buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
 {
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-    UINTVAL i;
+    int i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
@@ -166,7 +168,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
 
 /*
 
-=item C<static void debug_print_buf(PARROT_INTERP, const Buffer *b)>
+=item C<static void debug_print_buf(PARROT_INTERP, const Parrot_Buffer *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
 
@@ -175,7 +177,7 @@ Prints a debug statement with information about the given PObj C<b>.
 */
 
 static void
-debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
+debug_print_buf(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
 {
     ASSERT_ARGS(debug_print_buf)
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
@@ -309,7 +311,7 @@ check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
                     /* should happen only once at the end */
                     --last_free_list_count;
                 else {
-                    /* next item on free list should also be flaged as free item */
+                    /* next item on free list should also be flagged as free item */
                     pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
                     PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
                 }
@@ -357,28 +359,35 @@ static void
 check_var_size_obj_pool(ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(check_var_size_obj_pool)
-    size_t count;
-    Memory_Block * block_walker;
-    count = 10000000; /*detect unendless loop just use big enough number*/
+    Memory_Block *block_walker = (Memory_Block *)pool->top_block;
 
-    block_walker = (Memory_Block *)pool->top_block;
-    while (block_walker != NULL) {
-        PARROT_ASSERT(block_walker->start == (char *)block_walker +
-            sizeof (Memory_Block));
-        PARROT_ASSERT((size_t)(block_walker->top -
-            block_walker->start) == block_walker->size - block_walker->free);
+#ifdef NDEBUG
+    while (block_walker) {
+        block_walker = block_walker->prev;
+    }
+#else
+    /* detect unendless loop with a big enough number */
+    size_t count = 10000000;
+
+    while (block_walker) {
+        PARROT_ASSERT(block_walker->start
+            == (char *)block_walker + sizeof (Memory_Block));
+        PARROT_ASSERT((size_t)(block_walker->top - block_walker->start)
+            == block_walker->size - block_walker->free);
 
         /*check the list*/
-        if (block_walker->prev != NULL)
+        if (block_walker->prev)
             PARROT_ASSERT(block_walker->prev->next == block_walker);
         block_walker = block_walker->prev;
-        PARROT_ASSERT(--count);
+        --count;
+        PARROT_ASSERT(count > 0);
     }
+#endif
 }
 
 /*
 
-=item C<void check_buffer_ptr(Buffer * pobj, Variable_Size_Pool * pool)>
+=item C<void check_buffer_ptr(Parrot_Buffer * pobj, Variable_Size_Pool * pool)>
 
 Checks wether the buffer is within the bounds of the memory pool
 
@@ -387,7 +396,7 @@ Checks wether the buffer is within the bounds of the memory pool
 */
 
 void
-check_buffer_ptr(ARGMOD(Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
+check_buffer_ptr(ARGMOD(Parrot_Buffer * pobj), ARGMOD(Variable_Size_Pool * pool))
 {
     ASSERT_ARGS(check_buffer_ptr)
     Memory_Block * cur_block = pool->top_block;

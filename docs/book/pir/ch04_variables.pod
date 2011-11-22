@@ -1310,11 +1310,11 @@ The C<shift>X<shift opcode> opcode extracts the next value from the iterator.
 Evaluating the iterator PMC as a boolean returns whether the iterator has
 reached the end of the aggregate:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
       if $P1 goto iter_repeat
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Parrot provides predefined constants for working with iterators.
 C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END> constants select whether an

@@ -11,7 +11,9 @@ use Parrot::Test;
 use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 =head1 NAME
 
@@ -34,7 +36,6 @@ plan tests => 2;
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
@@ -96,7 +97,6 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterating)" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 

@@ -373,7 +373,7 @@ Parrot_key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_key_next)
 
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
+    if (key->vtable->base_type == enum_class_Key || VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         PMC *next_key;
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
@@ -445,11 +445,9 @@ Parrot_key_mark(PARROT_INTERP, ARGIN(PMC *key))
         Parrot_gc_mark_STRING_alive(interp, str_key);
     }
 
-    /* Mark next key */
-    if ((flags == KEY_string_FLAG) || (flags == KEY_pmc_FLAG)) {
-        GETATTR_Key_next_key(interp, key, next_key);
-        Parrot_gc_mark_PMC_alive(interp, next_key);
-    }
+    /* Mark next key or PMC portion of the key */
+    GETATTR_Key_next_key(interp, key, next_key);
+    Parrot_gc_mark_PMC_alive(interp, next_key);
 
 }
 
@@ -477,7 +475,6 @@ Parrot_key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING * const quote     = CONST_STRING(interp, "'");
     STRING * const P         = CONST_STRING(interp, "P");
     STRING * const S         = CONST_STRING(interp, "S");
-    STRING * const N         = CONST_STRING(interp, "N");
     STRING * const I         = CONST_STRING(interp, "I");
     STRING        *value     = Parrot_str_new(interp, "[ ", 2);
     PMC           *next_key;

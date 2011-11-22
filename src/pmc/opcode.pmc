@@ -1,13 +1,14 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/opcode.pmc
+src/pmc/opcode.pmc - Opcode information
 
 =head1 DESCRIPTION
 
-Implements opcode VTABLEs.
+Contains information on an opcode.  Returned by various functions in the
+C<OpLib> PMC.
 
 =cut
 
@@ -23,10 +24,35 @@ pmclass Opcode auto_attrs {
     ATTR op_info_t *info;
     ATTR INTVAL op_number;
 
+/*
+
+=head2 Vtable functions
+
+=over 4
+
+=item C<void init()>
+
+Throws an exception.  Opcode PMCs are not to be created directly.
+
+=cut
+
+*/
+
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Opcode must be created from OpLib.");
     }
+
+/*
+
+=item C<void set_pointer(void *i)>
+
+Sets the C<op_info_t> this PMC gets information from.  Throws an exception if
+the pointer has already been set.  See also C<set_integer_native()>, below.
+
+=cut
+
+*/
 
     VTABLE void set_pointer(void *i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
@@ -36,12 +62,40 @@ pmclass Opcode auto_attrs {
         attrs->info = (op_info_t *)i;
     }
 
+/*
+
+=item C<INTVAL get_integer()>
+
+=item C<FLOATVAL get_number()>
+
+Returns the opcode number.
+
+=cut
+
+*/
+
     VTABLE INTVAL get_integer() {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (!attrs->info)
             return -1;
         return attrs->op_number;
     }
+
+    VTABLE FLOATVAL get_number() {
+        return STATICSELF.get_integer();
+    }
+
+/*
+
+=item C<void set_integer_native(INTVAL value)>
+
+Sets the number for this opcode.  See also C<set_pointer>, above.
+
+Throws an exception if set_pointer has already been called.
+
+=cut
+
+*/
 
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
@@ -51,6 +105,16 @@ pmclass Opcode auto_attrs {
         attrs->op_number = value;
     }
 
+/*
+
+=item C<STRING* get_string()>
+
+Returns the full name of the opcode.
+
+=cut
+
+*/
+
     VTABLE STRING* get_string() {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         const char * const name                = attrs->info->full_name;
@@ -58,26 +122,100 @@ pmclass Opcode auto_attrs {
         return Parrot_str_new(INTERP, name, len);
     }
 
+/*
+
+=item C<INTVAL elements()>
+
+Returns the number of arguments for the opcode.
+
+=cut
+
+*/
+
     VTABLE INTVAL elements() {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (!attrs->info)
             return -1;
         return attrs->info->op_count - 1;
     }
 
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL i)>
+
+Returns the type information for the C<i>th argument.  Returns -1 if the C<i>
+is out of range.
+
+The type is returned as an integer.  The value is determined by bitwise oring
+together the basic type and a number of flags:
+
+Basic Types:
+
+=over 4
+
+=item * 0 = Integer
+
+=item * 1 = String
+
+=item * 2 = PMC
+
+=item * 3 = Float
+
+=back
+
+Flags:
+
+=over 4
+
+=item * 0x10 = Constant
+
+=item * 0x20 = Keyed
+
+=back
+
+=cut
+
+*/
+
     VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
-        Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         return i < attrs->info->op_count - 1
                ? (INTVAL)attrs->info->types[i]
                : -1;
     }
 
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<STRING *family_name()>
+
+Returns the family, or short, name of the opcode.
+
+=cut
+
+*/
+
     METHOD family_name() {
         const char * const name = PARROT_OPCODE(SELF)->info->name;
         const INTVAL len = strlen(name);
-        STRING * result = Parrot_str_new(INTERP, name, len);
+        STRING * const result = Parrot_str_new(INTERP, name, len);
         RETURN(STRING *result);
     }
+
+/*
+
+=item C<INTVAL jump()>
+
+Returns the jump value for the opcode.
+
+=cut
+
+*/
 
     METHOD jump() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
@@ -85,10 +223,32 @@ pmclass Opcode auto_attrs {
         RETURN(INTVAL jump);
     }
 
+/*
+
+=item C<PMC *dirs()>
+
+Returns an array of direction information for the arguments.
+
+=over 4
+
+=item * 0 = ignored
+
+=item * 1 = in (read-only)
+
+=item * 2 = out (write-only)
+
+=item * 3 = inout (read-write)
+
+=back
+
+=cut
+
+*/
+
     METHOD dirs() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
+        const INTVAL arg_count = info->op_count - 1;
         PMC *result;
-        INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
             INTVAL i;
             result = Parrot_pmc_new_init_int(INTERP, enum_class_FixedIntegerArray, arg_count);
@@ -100,10 +260,20 @@ pmclass Opcode auto_attrs {
         RETURN(PMC *result);
     }
 
+/*
+
+=item C<labels()>
+
+Returns an array describing if each argument is a label.  (0 or 1)
+
+=cut
+
+*/
+
     METHOD labels() {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
-        PMC *result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
-        INTVAL arg_count = info->op_count - 1;
+        PMC * const result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
+        const INTVAL arg_count = info->op_count - 1;
         if (arg_count > 0) {
             INTVAL i;
             VTABLE_set_integer_native(INTERP, result, arg_count);
@@ -114,6 +284,17 @@ pmclass Opcode auto_attrs {
     }
 
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/pmc/oplib.pmc>
+
+=cut
+*/
 
 /*
  * Local variables:

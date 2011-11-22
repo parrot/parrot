@@ -76,29 +76,6 @@ Parrot_x_jump_out(PARROT_INTERP, int status)
 
 /*
 
-=item C<void Parrot_x_jump_out_error(PARROT_INTERP, int status)>
-
-Jumps out returning to the caller api function indicating an error condition.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void
-Parrot_x_jump_out_error(PARROT_INTERP, int status)
-{
-    ASSERT_ARGS(Parrot_x_jump_out_error)
-
-    interp->exit_code = status;
-    interp->final_exception = PMCNULL;
-    Parrot_x_jump_out(interp, status);
-}
-
-/*
-
 =item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
 Exit, calling any registered exit handlers.
@@ -127,7 +104,9 @@ Parrot_x_exit(PARROT_INTERP, int status)
      * and: interp->exit_handler_list is gone, after the last exit handler
      *      (Parrot_really_destroy) has run
      */
-    handler_node_t *node = interp->exit_handler_list;
+    handler_node_t *node;
+
+    node = interp->exit_handler_list;
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);

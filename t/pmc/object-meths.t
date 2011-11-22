@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1119,6 +1119,47 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "method called on non-object" );
 .end
 CODE
 /Method 'new' not found for non-object/
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading isa vtable" );
+.namespace [ 'Foo' ]
+
+.sub 'isa' :vtable("isa") :method
+    .param string role
+    .return(1)
+.end
+
+.namespace []
+
+.sub main :main
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+    $I0 = isa $P1, "no_role_i_ever_heard_of"
+    say $I0
+.end
+CODE
+1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "overloading isa_pmc vtable" );
+.namespace [ 'Foo' ]
+
+.sub 'isa_pmc' :vtable("isa_pmc") :method
+    .param string role
+    .return(1)
+.end
+
+.namespace []
+
+.sub main :main
+    $P0 = newclass "Foo"
+    $P1 = new $P0
+    $P2 = box "no_role_i_ever_heard_of"
+    $I0 = isa $P1, $P2
+    say $I0
+.end
+CODE
+1
 OUTPUT
 
 # Local Variables:

@@ -97,7 +97,7 @@ Configure.pl którego kompilatora i linkera ma użyć. Na przykład, aby
 kompilować pliki C za pomocą 'cc', pliki C++ za pomocą 'CC', a linkować
 wszystko za pomocą 'CC', należy wpisać
 
-    perl Configure.pl --cc=cc --cxx=CC --link=CC --ld=CC
+    perl Configure.pl --cc=cc --link=CC --ld=CC
 
 Uruchom "perl Configure.pl --help", aby poznać więcej opcji i do
 docs/configuration.pod po więcej szczegółów.

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -1886,7 +1886,7 @@ x ^ y = exp(y * ln x))
     METHOD pow(PMC * value) {
         PMC *l = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
-        PMC *dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         Parrot_pcc_invoke_method_from_c_args(INTERP, SELF, CONST_STRING(INTERP, "ln"),
                     "->P", &log);

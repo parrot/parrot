@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,8 +19,12 @@ GC related bugs.
 .include 'interpinfo.pasm'
 
 .sub main :main
+    # XXX HACK
+    # :main is tailcalled from prt0, but tailcaller frames aren't eliminated
+    # until get_params is called.
+    .param pmc argv
+
     .include 'test_more.pir'
-    plan(139)
 
     sweep_1()
     sweep_0()
@@ -29,6 +33,7 @@ GC related bugs.
     collect_count()
     collect_toggle()
     collect_toggle_nested()
+    "stats"()
     vanishing_singleton_PMC()
     vanishing_ret_continuation()
     regsave_marked()
@@ -41,6 +46,7 @@ GC related bugs.
     coro_context_ret_continuation()
     # END_OF_TESTS
 
+    "done_testing"()
 .end
 
 .sub sweep_1
@@ -133,6 +139,22 @@ GC related bugs.
 
 .end
 
+.sub "stats"
+    $P0 = new ['ResizablePMCArray']
+    $P0[5] = 'hello'
+
+    sweep 1
+    collect
+
+    $I0 = interpinfo .INTERPINFO_ACTIVE_PMCS
+    ok($I0, "Got non-zero number of active PMCs")
+
+    $I1 = interpinfo .INTERPINFO_TOTAL_PMCS
+    ok($I0, "Got non-zero number of total PMCs")
+
+    $I2 = $I0 < $I1
+    ok($I2, "Number of total PMCs is greater than active")
+.end
 
 .sub vanishing_singleton_PMC
     $P16 = new 'Env'
@@ -251,7 +273,7 @@ buffer_ok:
     $P1 = 0
     n = $P0."b11"($P1)
     ok(1, "recursion_and_exceptions")
-    is(n,8, "recursion_and_exceptions")
+    is(n, 8, "recursion_and_exceptions")
 .end
 .namespace ["b"]
 .sub b11 :method

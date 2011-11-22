@@ -18,8 +18,11 @@ simplest way to use it is to run
 
 in the distribution's root directory, and follow the prompts.
 
-However, if you do know how to fix the problem you encountered, then think
-about submitting a patch, or (see below) getting commit privileges.
+If you just want to use email to create the bug report, send an email to
+L<tickets@parrot.org>.
+
+If you know how to fix the problem you encountered, then think about 
+submitting a patch, or (see below) getting commit privileges.
 
 =head1 A Note on Random Failures
 
@@ -284,10 +287,10 @@ for the new ticket and can check on the progress of your submission there.
 This identifier should be used in all correspondence concerning the submission.
 
 Everyone on Trac sees the submission and can comment on it. A developer with
-git commit priveledges can commit it to git once it is clear that it is the
+git commit privileges can commit it to git once it is clear that it is the
 right thing to do.
 
-However developers with commit priveledges may not commit your changes
+However developers with commit privileges may not commit your changes
 immediately if they are large or complex, as we need time for peer review.
 
 A list of active tickets can be found here:

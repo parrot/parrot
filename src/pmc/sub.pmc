@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,6 +36,8 @@ static void print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 /*
 
 =item C<static void print_sub_name(PARROT_INTERP, PMC *sub)>
+
+static function to print the name of the sub (for tracing/debugging)
 
 =cut
 
@@ -77,7 +79,6 @@ pmclass Sub auto_attrs provides invokable {
 
     ATTR PMC               *lex_info;        /* LexInfo PMC */
     ATTR PMC               *outer_sub;       /* :outer for closures */
-    ATTR PMC               *eval_pmc;        /* eval container / NULL */
     ATTR PMC               *ctx;             /* the context this sub is in */
     ATTR UINTVAL            comp_flags;      /* compile time and additional flags */
     ATTR Parrot_sub_arginfo *arg_info;       /* Argument counts and flags. */
@@ -194,7 +195,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* comp_flags is actually UINTVAL */
         field = CONST_STRING(INTERP, "comp_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask comp flags only */
             attrs->comp_flags = flags & SUB_COMP_FLAG_MASK;
         }
@@ -202,7 +203,7 @@ surboutine is fully constructed but not attached to interpreter.
         /* In order to create Sub dynamicaly we have to set PObj flags */
         field = CONST_STRING(INTERP, "pf_flags");
         if (VTABLE_exists_keyed_str(INTERP, init, field)) {
-            UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
+            const UINTVAL flags = (UINTVAL)VTABLE_get_integer_keyed_str(INTERP, init, field);
             /* Mask Sub specific flags only */
             PObj_get_FLAGS(SELF) |= flags & SUB_FLAG_PF_MASK;
         }
@@ -234,8 +235,7 @@ surboutine is fully constructed but not attached to interpreter.
             attrs->arg_info->named_slurpy = VTABLE_get_integer_keyed_str(INTERP, tmp, CONST_STRING(INTERP, "named_slurpy"));
         }
 
-        /* C<eval_pmc> and C<ctx> are not handled here, and shouldn't be,
-         * because of run-time nature.  */
+        /* C<ctx> not handled here, and shouldn't be, because of run-time nature.  */
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -415,7 +415,7 @@ Invokes the subroutine.
         INTERP->current_cont = NULL;
 
         if (ccont == NEED_CONTINUATION) {
-            ccont = pmc_new(INTERP, enum_class_Continuation);
+            ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
             VTABLE_set_pointer(INTERP, ccont, next);
         }
 
@@ -424,8 +424,13 @@ Invokes the subroutine.
         if (PMC_IS_NULL(context))
             context = Parrot_pmc_new(INTERP, enum_class_CallContext);
 
-        CURRENT_CONTEXT(INTERP) = context;
+        Parrot_pcc_set_context(INTERP, context);
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
+
+        /* support callcontext reuse */
+        if (context == caller_ctx)
+            Parrot_pcc_free_registers(INTERP, context);
+
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
         object = Parrot_pcc_get_object(INTERP, context);
@@ -438,15 +443,17 @@ Invokes the subroutine.
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
-            Parrot_ex_throw_from_c_args(INTERP, next, CONTROL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, next, EXCEPTION_INTERNAL_PANIC,
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
+        PARROT_GC_WRITE_BARRIER(interp, ccont);
         PARROT_CONTINUATION(ccont)->from_ctx = context;
 
         /* if this is an outer sub, then we need to set sub->ctx
-         * to the new context (refcounted) */
+         * to the new context */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
+            PARROT_GC_WRITE_BARRIER(interp, SELF);
             sub->ctx = context;
         }
 
@@ -469,7 +476,9 @@ Invokes the subroutine.
             PMC *c       = context;
             PMC *outer_c = Parrot_pcc_get_outer_ctx(INTERP, c);
 
-            for (c = context; PMC_IS_NULL(outer_c); c = outer_c) {
+            for (c = context;
+                 PMC_IS_NULL(outer_c);
+                 c = outer_c, outer_c = Parrot_pcc_get_outer_ctx(INTERP, c)) {
 
                 PMC *outer_pmc;
                 Parrot_Sub_attributes *current_sub, *outer_sub;
@@ -484,7 +493,7 @@ Invokes the subroutine.
 
                 if (PMC_IS_NULL(outer_sub->ctx)) {
                     PMC * const dummy = Parrot_alloc_context(INTERP,
-                                                outer_sub->n_regs_used, NULL);
+                                                outer_sub->n_regs_used, PMCNULL);
                     Parrot_pcc_set_sub(INTERP, dummy, outer_pmc);
 
                     if (!PMC_IS_NULL(outer_sub->lex_info)) {
@@ -501,6 +510,7 @@ Invokes the subroutine.
                         Parrot_pcc_set_outer_ctx(INTERP, dummy,
                             outer_sub->outer_ctx);
 
+                    PARROT_GC_WRITE_BARRIER(interp, outer_pmc);
                     outer_sub->ctx = dummy;
                 }
 
@@ -605,13 +615,20 @@ Marks the sub as live.
         Parrot_gc_mark_STRING_alive(INTERP, sub->ns_entry_name);
 
         Parrot_gc_mark_PMC_alive(INTERP, sub->ctx);
-        Parrot_gc_mark_PMC_alive(INTERP, sub->eval_pmc);
         Parrot_gc_mark_PMC_alive(INTERP, sub->lex_info);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, sub->outer_sub);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_name);
         Parrot_gc_mark_PMC_alive(INTERP, sub->multi_signature);
         Parrot_gc_mark_PMC_alive(INTERP, sub->namespace_stash);
+
+        /* XXX
+         * Workaround for things that subclass sub but don't point into packfiles
+         * (eg: EventHandler)
+         * TODO: use inheritance properly to avoid this
+         */
+        if (sub->seg)
+            Parrot_gc_mark_PMC_alive(INTERP, sub->seg->base.pf->view);
     }
 
 /*
@@ -1015,7 +1032,7 @@ slurpy arguments).
 
         PMC_get_sub(INTERP, SELF, sub);
         /*
-        XXX Rakudo's failing with with this code on ASSERT. Why???
+        XXX Rakudo's failing with this code on ASSERT. Why???
         GET_ATTR_namespace_stash(INTERP, SELF, _namespace);
         PARROT_ASSERT(_namespace == sub->namespace_stash || !"consistency!!!");
         */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -242,7 +242,6 @@ next opcode, or examine and manipulate data from the executing program.
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_trace.h"
 #include "cores.str"
 
@@ -265,7 +264,7 @@ next opcode, or examine and manipulate data from the executing program.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_debugger_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -282,7 +281,7 @@ static opcode_t * runops_exec_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_fast_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -290,7 +289,7 @@ static opcode_t * runops_fast_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_gc_debug_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -298,7 +297,7 @@ static opcode_t * runops_gc_debug_core(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static opcode_t * runops_slow_core(PARROT_INTERP,
-    SHIM(Parrot_runcore_t *runcore),
+    Parrot_runcore_t *runcore,
     ARGIN(opcode_t *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
@@ -499,17 +498,8 @@ runops_fast_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
 {
     ASSERT_ARGS(runops_fast_core)
 
-    /* disable pc */
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
-
     while (pc) {
-        /* TODO
-         * Decide do we need check here.
-         * Fast-core cause segfaults even on test suite
-        if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "attempt to access code outside of current code segment");
-        */
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
         DO_OP(pc, interp);
     }
 
@@ -570,11 +560,12 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         /* set the top of the stack so GC can trace it for GC-able pointers
          * see trace_system_areas() in src/gc/system.c */
-        debugger->lo_var_ptr = interp->lo_var_ptr;
+        /* Chandon FIXME: debugger */
+        /* debugger->lo_var_ptr = interp->lo_var_ptr; */
 
         pio = Parrot_io_STDERR(debugger);
 
-        if (Parrot_io_is_tty(debugger, pio))
+        if (Parrot_io_is_tty_handle(debugger, pio))
             Parrot_io_setlinebuf(debugger, pio);
         else {
             /* this is essential (100 x faster!)  and should probably
@@ -608,7 +599,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         }
     }
 
-    Parrot_io_flush(debugger, Parrot_io_STDERR(debugger));
+    Parrot_io_flush_handle(debugger, Parrot_io_STDERR(debugger));
 
     return pc;
 }
@@ -799,6 +790,8 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
 /*
 
 =back
+
+=cut
 
 */
 

@@ -5,10 +5,14 @@
 BEGIN_OPS_PREAMBLE
 
 #include "parrot/dynext.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_api.h"
+#include "parrot/events.h"
+#include "pmc/pmc_exception.h"
+#include "pmc/pmc_exceptionhandler.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
+
 
 END_OPS_PREAMBLE
 
@@ -75,15 +79,19 @@ use it explicitly.
 Check the event queue and run event handlers if there are unhandled events.
 Note: Do B<not> use this opcode. It is for internal use only.
 
-=item B<wrapper__>()
-
-Internal opcode to wrap unknown ops from loaded opcode libs.
-Don't use.
-
 =item B<load_bytecode>(in STR)
 
 Load Parrot bytecode from file $1, and search the library path to locate the
-file.
+file. Automatically triggers :load functions if the file found is a .pbc. If
+it is a .pir or a .pasm, the file is compiled first and the :init subs are
+triggered instead. Nothing is returned.
+
+=item B<load_bytecode>(out PMC, in STR)
+
+Load Parrot bytecode from file $2, searching the library path to locate the
+file. Returns a new PackfileView in $1. Does not perform any automatic
+initialization. Use the PackfileView PMC interface to introspect and perform
+actions on it.
 
 =cut
 
@@ -91,27 +99,29 @@ inline op noop() :base_core {
 }
 
 inline op check_events() :base_core :flow {
-    opcode_t * const next = expr NEXT();
-    Parrot_cx_check_tasks(interp, interp->scheduler);
+    opcode_t *next = expr NEXT();
+    next = Parrot_cx_check_scheduler(interp, next);
     goto ADDRESS(next);   /* force this being a branch op */
 }
 
 inline op check_events__() :internal :flow {
     opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, _this,
+        EXCEPTION_INVALID_OPERATION,
+        "check_events__ opcode doesn't do anything useful.");
+    goto ADDRESS(handler);
     /* Restore op_func_table. */
-    disable_event_checking(interp);
-    Parrot_cx_handle_tasks(interp, interp->scheduler);
+    Parrot_runcore_disable_event_checking(interp);
+    /* Parrot_cx_handle_tasks(interp, interp->scheduler); */
     goto ADDRESS(_this);   /* force this being a branch op */
-}
-
-inline op wrapper__() :internal :flow {
-    opcode_t *pc = CUR_OPCODE;
-    DO_OP(pc, interp);
-    goto ADDRESS(pc);
 }
 
 inline op load_bytecode(in STR) :load_file {
     Parrot_load_bytecode(interp, $1);
+}
+
+inline op load_bytecode(out PMC, in STR) :load_file {
+    $1 = Parrot_pf_load_bytecode_search(interp, $2);
 }
 
 =item B<load_language>(in STR)
@@ -148,6 +158,8 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch(in LABEL) :base_loop :flow {
+    if(Parrot_cx_check_scheduler(interp, cur_opcode + $1) == 0)
+        goto ADDRESS(0);
     goto OFFSET($1);
 }
 
@@ -222,20 +234,6 @@ Jump to the address held in register $1.
 inline op jump(in LABEL) :base_loop :flow {
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
-}
-
-########################################
-
-=item B<enternative>()
-
-Internal opcode used to jump from normal bytecode into a JITted version.
-
-=cut
-
-op enternative() :flow {
-    opcode_t * const addr = run_native(interp, CUR_OPCODE,
-            interp->code->base.data);
-    goto ADDRESS(addr);
 }
 
 =back
@@ -377,7 +375,7 @@ inline op invokecc(invar PMC) :flow {
     PMC      * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -393,7 +391,7 @@ inline op invoke(invar PMC, invar PMC) :flow {
     PMC * const signature  = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
 
-    Parrot_pcc_set_pc_func(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
@@ -482,7 +480,8 @@ op set_args(inconst PMC) :flow {
     PMC * const signature = $1;
     PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
             PMCNULL, signature, raw_args);
-    const INTVAL argc = VTABLE_elements(interp, signature);
+    INTVAL argc;
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
     goto OFFSET(argc + 2);
 }
@@ -505,7 +504,7 @@ op get_params(inconst PMC) :flow {
         Parrot_pcc_dec_recursion_depth(interp, ctx);
         Parrot_pcc_set_caller_ctx(interp, ctx, Parrot_pcc_get_caller_ctx(interp, caller_ctx));
     }
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     goto OFFSET(argc + 2);
 }
 
@@ -520,23 +519,22 @@ op set_returns(inconst PMC) :flow {
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
 
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     goto OFFSET(argc + 2);
 }
 
 op get_results(inconst PMC) :flow {
     opcode_t * const raw_params  = CUR_OPCODE;
     PMC      * const signature   = $1;
-    PMC             *ctx         = CURRENT_CONTEXT(interp);
-    PMC             *ccont       = Parrot_pcc_get_continuation(interp, ctx);
-    PMC             *call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
 
     INTVAL argc;
 
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params,
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
-    argc = VTABLE_elements(interp, signature);
+    GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
     goto OFFSET(argc + 2);
 }
@@ -617,8 +615,8 @@ inline op set_addr(invar PMC, invar LABEL) {
 }
 
 inline op get_addr(out INT, invar PMC) {
-    void *ptr = VTABLE_get_pointer(interp, $2);
-    $1        = (INTVAL)ptr;
+    void * const ptr = VTABLE_get_pointer(interp, $2);
+    $1 = (INTVAL)ptr;
 }
 
 =back
@@ -715,6 +713,24 @@ Finalize exception handling, freeing any information needed to resume
 the handled exception, like inner runloops.
 $1 is the Exception handled or the ExceptionHandler that is handling it.
 
+=item B<pop_upto_eh>(in PMC)
+
+Pops all exception handlers upto the one indicated by $1. Like with the
+finalize op, $1 can either be the handled Exception or the ExceptionHandler
+handling it. Also, you should not resume Exceptions after pop_upto_eh
+or finalize has been called. This limitation may be fixed in a future
+version of parrot. Also note that the specified exception handler
+is not popped.
+
+=item B<peek_exception>(out PMC)
+
+Returns the caught exception without clearing the call object. This is
+currently needed because HLL authors use get_params to fetch the exception,
+but get_params clears the call object. So we can't use get_params in PCT
+to get the exception object without disturbing the HLL code.
+This op will be removed again when PCT offers another mechansim to get
+the exception and the HLLs switched to it.
+
 =cut
 
 inline op push_eh(inconst LABEL) {
@@ -728,16 +744,15 @@ inline op push_eh(invar PMC) {
 }
 
 inline op pop_eh() {
-    Parrot_cx_delete_handler_local(interp,
-            Parrot_str_new_constant(interp, "exception"));
+    Parrot_cx_delete_handler_local(interp);
 }
 
 inline op throw(invar PMC) :flow {
     PMC * except = $1;
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
-    PMC      * const resume = pmc_new(interp, enum_class_Continuation);
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    PMC      * const resume = Parrot_pmc_new(interp, enum_class_Continuation);
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -754,7 +769,7 @@ inline op throw(invar PMC) :flow {
 inline op throw(invar PMC, invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str))
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal,
@@ -768,7 +783,7 @@ inline op throw(invar PMC, invar PMC) :flow {
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    STRING * const exception_str = CONST_STRING(interp, "Exception");
+    STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     if (PMC_IS_NULL(except) || !VTABLE_does(interp, except, exception_str)) {
         opcode_t * const ret    = expr NEXT();
@@ -783,16 +798,15 @@ inline op rethrow(invar PMC) :flow {
 }
 
 inline op count_eh(out INT) {
-    $1 = Parrot_cx_count_handlers_local(interp,
-            Parrot_str_new_constant(interp, "exception"));
+    $1 = Parrot_cx_count_handlers_local(interp);
 }
 
 inline op die(in STR) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
-                                    CONTROL_ERROR, $1);
+                                    EXCEPTION_DIE, $1);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -805,10 +819,10 @@ inline op die(in STR) :flow {
 inline op die(in PMC) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL($1) ? NULL : VTABLE_get_string(interp, $1);
     PMC      * const exception =
-        Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+        Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, msg);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -822,10 +836,16 @@ inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
         _exit($2);
     else {
+        opcode_t        *dest;
         opcode_t * const ret       = expr NEXT();
+        PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
         PMC      * const exception = Parrot_ex_build_exception(interp, $1, $2, NULL);
-        opcode_t * const dest      = Parrot_ex_throw_from_op(interp, exception, ret);
 
+        VTABLE_set_pointer(interp, resume, ret);
+
+        VTABLE_set_attr_str(interp, exception,
+                Parrot_str_new_constant(interp, "resume"), resume);
+        dest = Parrot_ex_throw_from_op(interp, exception, ret);
         goto ADDRESS(dest);
     }
 }
@@ -833,7 +853,7 @@ inline op die(in INT, in INT) :flow {
 inline op exit(in INT) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
 
@@ -853,22 +873,22 @@ op finalize(in PMC) {
     PMC *eh = PMCNULL;
     if (!PMC_IS_NULL($1)) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
+        if ($1->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, $1, eh);
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
             eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception"))) {
-            PMC *iter = VTABLE_get_attr_str(interp,
-                                            $1, Parrot_str_new_constant(interp, "handler_iter"));
-            if (!PMC_IS_NULL(iter))
-                eh = VTABLE_get_pmc_keyed_int(interp, iter, -1);
-        }
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
     }
     if (!PMC_IS_NULL(eh)) {
         /* Get the runloop_id from the continuation and jump to it. */
         Parrot_runloop *rl = interp->current_runloop;
         INTVAL rid;
-        Parrot_pcc_invoke_method_from_c_args(interp,
-                                             eh, Parrot_str_new_constant(interp, "rid"),
-                                             "->I", &rid);
+        if (eh->vtable->base_type == enum_class_ExceptionHandler)
+            GETATTR_ExceptionHandler_runloop_id(interp, eh, rid);
+        else
+            Parrot_pcc_invoke_method_from_c_args(interp,
+                    eh, Parrot_str_new_constant(interp, "rid"), "->I", &rid);
         while (rl && rl->id != rid)
             rl = rl->prev;
         if (rl) {
@@ -883,6 +903,26 @@ op finalize(in PMC) {
     }
 }
 
+op pop_upto_eh(in PMC) {
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL($1)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if ($1->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, $1, eh);
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
+            eh = $1;
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
+    }
+    if (!PMC_IS_NULL(eh))
+        Parrot_cx_delete_upto_handler_local(interp, eh);
+}
+
+op peek_exception(out PMC) {
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    $1 = VTABLE_get_pmc_keyed_int(interp, call_object, 0);
+}
 
 =back
 
@@ -977,15 +1017,15 @@ inline op gc_debug(in INT) {
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
-The valid constants for each return value are (excluding the the .INTERPINFO_
+The valid constants for each return value are (excluding the .INTERPINFO_
 prefix):
 
 =over 4
 
 =item B<interpinfo>(out INT, in INT)
 
-TOTAL_MEM_ALLOC, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS, ACTIVE_BUFFERS,
-TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
+TOTAL_MEM_ALLOC, TOTAL_MEM_USED, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS,
+ACTIVE_BUFFERS, TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
 MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
 EXTENDED_PMCS, CURRENT_RUNCORE
 
@@ -1254,6 +1294,8 @@ Make any symbols in the library accessible to other libraries loaded.
 
 =item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
 
+=item B<dlfunc>(out PMC, invar PMC, in STR, invar PMC)
+
 Look up symbol $3 in library $2 with signature $4, and put the
 corresponding sub object in $1. Note that you need the signature so we
 can build or find an appropriate thunking function.
@@ -1297,7 +1339,7 @@ inline op loadlib(out PMC, in STR, in PMC) {
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
     void         *dl_handle = NULL;
-    void         *ptr       = NULL;
+    void         *ptr;
     funcptr_t     p;
 
     if (!PMC_IS_NULL($2)
@@ -1310,7 +1352,7 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
-        const char * err = Parrot_dlerror();
+        const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                 "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
         $1 = Parrot_pmc_new(interp, enum_class_Undef);
@@ -1321,9 +1363,35 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
     }
 }
 
+op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
+    void         *dl_handle = NULL;
+    void         *ptr;
+    funcptr_t     p;
+
+    if (!PMC_IS_NULL($2)
+    && $2->vtable->base_type == enum_class_ParrotLibrary
+    && VTABLE_defined(interp, $2)) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
+    }
+
+    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
+    p = D2FPTR(ptr);
+
+    if (p == NULLfunc) {
+        const char * const err = Parrot_dlerror();
+        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
+                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
+        $1 = Parrot_pmc_new(interp, enum_class_Undef);
+    }
+    else {
+        $1 = Parrot_pmc_new(interp, enum_class_NCI);
+        VTABLE_set_pointer_keyed(interp, $1, $4, F2DPTR(p));
+    }
+}
+
 op dlvar(out PMC, invar PMC, in STR) {
     void *        dl_handle = NULL;
-    void *        p         = NULL;
+    void *        p;
 
     if (!PMC_IS_NULL($2)
     && $2->vtable->base_type == enum_class_ParrotLibrary
@@ -1423,7 +1491,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 LICENSE
 

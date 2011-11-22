@@ -694,7 +694,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('utf8')
     say 'valid'
@@ -818,7 +818,7 @@ $code
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('utf16')
     say 'valid'
@@ -922,7 +922,7 @@ $code
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('ucs2')
     say 'valid'
@@ -1020,12 +1020,21 @@ $code
 .sub 'test_chars'
     .param string chars
     .local pmc eh, ex, bb
+    .local string aux
+    aux = escape chars
     bb = new 'ByteBuffer'
     bb = chars
     eh = new 'ExceptionHandler'
-    set_addr eh, handler
+    set_label eh, handler
     push_eh eh
     chars = bb.'get_string'('ucs4')
+    pop_eh
+    # Print some useful info in case of unexpectedly legal
+    print aux
+    print " - "
+    aux = escape chars
+    print aux
+    print " : "
     say 'valid'
     goto end
   handler:
@@ -1033,8 +1042,8 @@ $code
     .get_results (ex)
     \$S0 = ex['message']
     print \$S0
-  end:
     pop_eh
+  end:
 .end
 CODE
 Unaligned end in UCS-4 string

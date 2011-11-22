@@ -10,6 +10,8 @@ use Fatal qw(open);
 use File::Find;
 use File::Spec;
 use Test::More;
+use lib qw( lib );
+use Parrot::Config;
 
 =head1 NAME
 
@@ -55,6 +57,13 @@ find( { wanted => \&wanted, no_chdir => 1 },
 our %deps;
 
 foreach my $file (sort grep /\.[hc]$/, @incfiles) {
+    # skip pmcs - we don't handle inheritance correctly
+    next if $file =~ m{^src/(?:dyn)?pmc/};
+    next if ($file eq 'src/nci/core_thunks.c' and
+        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_CORE_NCI_THUNKS});
+    next if ($file eq 'src/nci/extra_thunks.c' and
+        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_EXTRA_NCI_THUNKS});
+
     open my $fh, '<', $file;
     my $guts;
     {
@@ -72,9 +81,6 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     $deps{$file} = [ ];
     foreach my $include (@includes) {
         my $found;
-
-        # These depend on the platform, skip for now (TT #1944)
-        next if $include =~ m'^parrot/thr_';
 
         my @include_dirs;
         push @include_dirs, (File::Spec->splitpath($file))[1];

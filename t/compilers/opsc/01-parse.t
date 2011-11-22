@@ -1,4 +1,4 @@
-#! parrot
+#! ./parrot
 # Copyright (C) 2010, Parrot Foundation.
 
 .include 't/compilers/opsc/common.pir'
@@ -110,7 +110,7 @@ END
 BEGIN_OPS_PREAMBLE
 
 #include "parrot/dynext.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "../pmc/pmc_continuation.h"
 #include "../pmc/pmc_parrotlibrary.h"

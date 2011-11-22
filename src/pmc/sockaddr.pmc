@@ -1,14 +1,14 @@
 /*
-Copyright (C) 2008-2009, Parrot Foundation.
+Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/sockaddr.pmc - sockaddr_in holder
+src/pmc/sockaddr.pmc - sockaddr_in/sockaddr_in6 holder
 
 =head1 DESCRIPTION
 
-The Sockaddr PMC holds raw c-pointer to sockaddr_in
-
+The Sockaddr PMC holds a C<sockaddr> struct and saves its length (to
+distinguish C<sockaddr_in> and C<sockaddr_in6>).
 
 =head2 Vtable Functions
 
@@ -20,37 +20,36 @@ These are the vtable functions for the Sockaddr class.
 
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-    struct sockaddr_in;
-#ifdef __cplusplus
-}
-#endif
-
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
 pmclass Sockaddr auto_attrs {
-    ATTR void   *pointer; /* The stored pointer. */
+    ATTR INTVAL  family;
+    ATTR INTVAL  type;
+    ATTR INTVAL  protocol;
+    ATTR INTVAL  len;     /* Length of the sockaddr struct */
+    ATTR void   *pointer; /* Pointer to a sockaddr struct */
 
 /*
 
 =item C<void init()>
 
-Initializes the pointer object.
+Initializes the PMC.
 
 =cut
 
 */
 
     VTABLE void init() {
-        Parrot_Sockaddr_attributes * const pdata_struct =
+        Parrot_Sockaddr_attributes * const attrs =
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
-        pdata_struct->pointer = mem_gc_allocate_zeroed_typed(INTERP,
-                struct sockaddr_in);
+        attrs->type     = 0;
+        attrs->protocol = 0;
+        attrs->pointer  = NULL;
+        attrs->len      = 0;
+
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -68,7 +67,8 @@ Destroys the PMC and frees all allocated memory.
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (data) {
-            mem_gc_free(INTERP, data->pointer);
+            if (data->pointer)
+                mem_gc_free(INTERP, data->pointer);
             data->pointer = NULL;
         }
     }
@@ -77,7 +77,8 @@ Destroys the PMC and frees all allocated memory.
 
 =item C<PMC *clone()>
 
-Creates and returns a clone of the pointer.
+Creates a new Sockaddr PMC with the same contents and length as the current
+one.
 
 =cut
 
@@ -85,42 +86,112 @@ Creates and returns a clone of the pointer.
 
     VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        memcpy(PARROT_SOCKADDR(dest)->pointer, PARROT_SOCKADDR(SELF)->pointer,
-                sizeof (struct sockaddr_in));
+        const Parrot_Sockaddr_attributes * const old_attrs = PARROT_SOCKADDR(SELF);
+        Parrot_Sockaddr_attributes * const new_attrs = PARROT_SOCKADDR(dest);
+
+        new_attrs->type     = old_attrs->type;
+        new_attrs->protocol = old_attrs->protocol;
+        new_attrs->len      = old_attrs->len;
+
+        if (old_attrs->len) {
+            new_attrs->pointer = Parrot_gc_allocate_memory_chunk(INTERP,
+                                    old_attrs->len);
+            memcpy(new_attrs->pointer, old_attrs->pointer, old_attrs->len);
+        }
+
         return dest;
+    }
+
+/*
+
+=item C<INTVAL get_bool()>
+
+Returns true if the Sockaddr is defined.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        return data->pointer ? 1 : 0;
+    }
+
+/*
+
+=item C<INTVAL get_integer()>
+
+Returns the length of the sockaddr struct.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        INTVAL len;
+
+        GET_ATTR_len(INTERP, SELF, len);
+
+        return len;
     }
 
 /*
 
 =item C<void *get_pointer()>
 
-Returns the pointer.
+Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.
 
 =cut
 
 */
 
     VTABLE void *get_pointer() {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
         return data->pointer;
     }
 
 /*
 
-=item C<void set_pointer(void *)>
+=item C<STRING *get_string()>
 
-Sets the pointer.
+Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 
 =cut
 
 */
+    VTABLE STRING *get_string() {
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        if (!data->pointer)
+            return Parrot_sprintf_c(interp, "(?)");
+
+        return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
+    }
 
 /*
-    VTABLE void set_pointer(void *value) {
-        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
-        return data->pointer;
-    }
+
+=item C<INTVAL get_integer_keyed_int(INTVAL what)>
+
+Returns family, type or protocol. Used for debugging.
+
+=cut
+
 */
+    VTABLE INTVAL get_integer_keyed_int(INTVAL what) {
+        const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        switch (what) {
+          case 0:
+            return data->family;
+          case 1:
+            return data->type;
+          case 2:
+            return data->protocol;
+          default:
+            return -1;
+        }
+    }
 
 }
 
@@ -138,4 +209,3 @@ Sets the pointer.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-

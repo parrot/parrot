@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2011, Parrot Foundation.
 ** io.ops
 */
 
@@ -44,11 +44,7 @@ items currently are:
 =cut
 
 op stat(out INT, in STR, in INT) {
-    $1 = Parrot_stat_info_intval(interp, $2, $3);
-}
-
-op stat(out INT, in INT, in INT) {
-    $1 = Parrot_fstat_info_intval(interp, $2, $3);
+    $1 = Parrot_file_stat_intval(interp, $2, $3);
 }
 
 ##########################################
@@ -144,8 +140,8 @@ INTVALS.
 
 op seek(invar PMC, in INT, in INT) :base_io {
     if ($1) {
-        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
-            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
+            opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (32bit)");
             goto ADDRESS(handler);
@@ -155,8 +151,8 @@ op seek(invar PMC, in INT, in INT) :base_io {
 
 op seek(invar PMC, in INT, in INT, in INT) :base_io {
     if ($1) {
-        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
-            opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
+            opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (64bit)");
             goto ADDRESS(handler);
@@ -181,13 +177,12 @@ Get the current file position of stream $3 in two parts of 32-bit each
 
 op tell(out INT, invar PMC) :base_io {
     if ($2)
-        $1 = (INTVAL)Parrot_io_tell(interp, $2);
+        $1 = (INTVAL)Parrot_io_tell_handle(interp, $2);
 }
 
 op tell(out INT, out INT, invar PMC) :base_io {
     if ($3) {
-        PIOOFF_T pos;
-        pos = Parrot_io_tell(interp, $3);
+        const PIOOFF_T pos = Parrot_io_tell_handle(interp, $3);
         $1 = (INTVAL)(pos >> 31);
         $2 = (INTVAL)(pos & 0xffffffff);
     }
@@ -242,24 +237,24 @@ read mode and create an IO object in $1.
 
 inline op open(out PMC, in STR, in STR) :filesys_open {
     if (STRING_IS_NULL($2) || STRING_IS_NULL($3)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open(interp, PMCNULL, $2, $3);
+        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, $3);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
 
 inline op open(out PMC, in STR) :filesys_open {
     if (STRING_IS_NULL($2)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
             EXCEPTION_UNEXPECTED_NULL, "Invalid open");
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open(interp, PMCNULL, $2, NULL);
+        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, STRINGNULL);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
@@ -273,7 +268,7 @@ Close IO object $1
 =cut
 
 inline op close(invar PMC) :base_io {
-    Parrot_io_close(interp, $1);
+    Parrot_io_close_handle(interp, $1);
 }
 
 ########################################

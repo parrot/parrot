@@ -6,11 +6,14 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
 
-plan tests => 3;
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 4;
 
 =head1 NAME
 
@@ -40,7 +43,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf" )
 #include <stdlib.h>
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
@@ -74,7 +76,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf wi
 #include <stdlib.h>
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
@@ -128,6 +129,26 @@ int main(int argc, const char **argv)
     else fail("snprintf len mismatch");
     */
     printf("THE FAILZ");
+    return 0;
+}
+CODE
+Done
+OUTPUT
+
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "PARROT_GC_WRITE_BARRIER macro" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/parrot.h"
+
+int main(int argc, const char **argv)
+{
+    PMC pmc;
+    pmc.flags = 0;
+    /* It should compile */
+    PARROT_GC_WRITE_BARRIER(NULL, &pmc);
+    printf("Done\n");
     return 0;
 }
 CODE

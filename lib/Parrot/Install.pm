@@ -224,7 +224,7 @@ sub install_files {
         }
         else {
             next unless -e $src;
-            next if $^O eq 'cygwin' and -e "$src.exe"; # stat works, copy not
+            next if ($^O eq 'cygwin' || $^O eq 'msys') and -e "$src.exe"; # stat works, copy not
             if (-l $src) {   # a link should be created
                 # check if the system supports symbolic linking
                 use Config;

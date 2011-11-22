@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -16,13 +16,12 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
+.include 'except_types.pasm'
+
 .sub main :main
     .include 'test_more.pir'
-    plan(84)
+    plan(86)
     test_setting_array_size()
-    test_assign_from_another()
-    test_assign_self()
-    test_assign_non_array()
     test_resize_exception()
     test_truthiness()
     test_tt991()
@@ -39,6 +38,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_definedness()
     test_splice_oob()
     test_get_repr()
+    test_get_string()
     test_elements()
     test_equality()
     test_multi_keys()
@@ -47,6 +47,13 @@ out-of-bounds test. Checks INT and PMC keys.
     test_exists()
     test_new_style_init()
     test_invalid_init_tt1509()
+.end
+
+.sub exists_out_of_bounds
+    .local pmc fpa
+    fpa = new ['FixedPMCArray']
+    fpa = 5
+    $I0 = exists fpa[5]
 .end
 
 .sub test_exists
@@ -64,6 +71,9 @@ out-of-bounds test. Checks INT and PMC keys.
     fpa[$P1] = 99
     $I0 = exists fpa[$P1]
     ok($I0,'FixedPMCArray element existence')
+
+    .const 'Sub' out_of_bounds = 'exists_out_of_bounds'
+    throws_type(out_of_bounds, .EXCEPTION_OUT_OF_BOUNDS, 'exists ouf of bounds')
 .end
 
 .sub test_sort
@@ -170,6 +180,22 @@ out-of-bounds test. Checks INT and PMC keys.
     is_deeply(fpa, test3 )
 .end
 
+.sub cannot_auto_num
+    $P0 = new ['FixedPMCArray']
+    $P0 = 1
+    $P0[0;0] = 1.2
+.end
+
+.sub cannot_auto_pmc
+    .local pmc matrix, row, value
+    matrix = new ['FixedPMCArray'], 1
+    #row = new ['FixedPMCArray'], 1
+    #matrix[0] = row
+    value = new ['Integer']
+    matrix[0;0] = value
+    ok(1, "Check")
+.end
+
 .sub test_multi_keys
     .local pmc    matrix, row
     .local pmc    elem_in_pmc
@@ -235,14 +261,16 @@ out-of-bounds test. Checks INT and PMC keys.
     elem_out_string = matrix[0;0]
     is(elem_out_string,128)
 
-    throws_substring(<<'CODE', 'Cannot autovivify nested arrays', 'Autovivification of nested arrays fails')
-    .sub main
-        $P0 = new ['FixedPMCArray']
-        $P0 = 1
-        $P0[0;0] = 1.2
-    .end
-CODE
+    .const 'Sub' cannot_auto_num = 'cannot_auto_num'
+    throws_type(cannot_auto_num, .EXCEPTION_INVALID_OPERATION, 'Autovivification of nested arrays fails - num')
 
+    .const 'Sub' cannot_auto_pmc = 'cannot_auto_pmc'
+    throws_type(cannot_auto_pmc, .EXCEPTION_INVALID_OPERATION, 'Autovivification of nested arrays fails - pmc')
+
+    null $P1
+    matrix[0] = $P1
+    elem_out_pmc = matrix[0; 0]
+    is_null(elem_out_pmc, 'Attempt to recurse null element gives null')
 .end
 
 .sub test_equality
@@ -281,6 +309,9 @@ CODE
 
     is(fpa1,fpa2)
 
+    .local pmc nofpa
+    nofpa = new ['FixedStringArray']
+    isnt(fpa1, nofpa, 'Not equal to a different type')
 .end
 
 .sub test_elements
@@ -324,9 +355,17 @@ CODE
 
 .sub get_repr_fpa_n
     .param int n
+    .local pmc fpa
+    .local string s
+    fpa = fpa_n(n)
+    s = get_repr fpa
+    .return(s)
+.end
+
+.sub fpa_n
+    .param int n
     .local int i
     .local pmc fpa, p
-    .local string s
     fpa = new ['FixedPMCArray']
     fpa = n
     i = 0
@@ -337,8 +376,24 @@ next:
     inc i
     goto next
 done:
-    s = get_repr fpa
-    .return(s)
+    .return (fpa)
+.end
+
+.sub test_get_string
+    .local string s, aux
+    .local pmc a
+    a = fpa_n(0)
+    s = a
+    a = fpa_n(1)
+    aux = a
+    s = concat s, aux
+    a = fpa_n(2)
+    aux = a
+    s = concat s, aux
+    a = fpa_n(3)
+    aux = a
+    s = concat s, aux
+    substring(s,'0123','get_string')
 .end
 
 .sub test_splice_oob
@@ -629,37 +684,6 @@ CODE
             set $P0,"GIGO"
         .end
 CODE
-.end
-
-.sub test_assign_non_array
-    throws_substring(<<'CODE', "Can't set self from this type",'assign from non-array')
-    .sub main :main
-        .local pmc arr, other
-        .local int n
-        arr = new ['FixedPMCArray']
-        other = new ['Integer']
-        assign arr, other
-    .end
-CODE
-.end
-
-.sub test_assign_self
-    .local pmc arr
-    arr = new ['FixedPMCArray']
-    assign arr, arr
-    ok(1, 'Can assign FixedPMCArray to itself')
-.end
-
-.sub test_assign_from_another
-    .local pmc arr1, arr2
-    .local int n
-    arr1 = new ['FixedPMCArray']
-    arr1 = 32
-    arr2 = new ['FixedPMCArray']
-    arr2 = 15
-    assign arr1, arr2
-    n = arr1
-    is(n,15,'assigning to FixedPMCArray from another FixedPMCArray')
 .end
 
 .sub test_setting_array_size

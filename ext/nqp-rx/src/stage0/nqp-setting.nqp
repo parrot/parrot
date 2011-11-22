@@ -37,7 +37,7 @@ module ResizablePMCArray {
     Return all elements joined by $sep.
     =end item
 
-    method join ($separator) {
+    method join ($separator = '') {
         pir::join($separator, self);
     }
 
@@ -54,6 +54,16 @@ module ResizablePMCArray {
         @mapped;
     }
 
+    =begin item grep
+    Return an array with elements matching code.
+    =end item
+
+    method grep (&code) {
+        my @grepped;
+        for self { @grepped.push($_) if &code($_) };
+        @grepped;
+    }
+
     =begin item reverse
     Return a reversed copy of the invocant.
     =end item
@@ -68,6 +78,7 @@ module ResizablePMCArray {
 
 our sub join ($separator, *@values) { @values.join($separator); }
 our sub map (&code, *@values) { @values.map(&code); }
+our sub grep (&code, *@values) { @values.grep(&code); }
 our sub list (*@values) { @values; }
 
 # vim: ft=perl6
@@ -217,31 +228,38 @@ our sub subst ($text, $regex, $repl, :$global?) {
 Splits C<$text> on occurences of C<$regex>
 =end item
 
-# our sub split ($regex, $text) {
-#     my $pos := 0;
-#     my @result;
-#     my $looking := 1;
-#     while $looking {
-#         my $match :=
-#             Regex::Cursor.parse($text, :rule($regex), :c($pos)) ;
-# 
-#         if ?$match {
-#             my $from := $match.from();
-#             my $to := $match.to();
-#             my $prefix := pir::substr__sPii($text, $pos, $from-$pos);
-#             @result.push($prefix);
-#             $pos := $match.to();
-#         } else {
-#             my $len := pir::length($text);
-#             if $pos < $len {
-#                 @result.push(pir::substr__ssi($text, $pos) );
-#             }
-#             $looking := 0;
-#         }
-#     }
-#     return @result;
-# }
+our multi sub split (Regex::Regex $regex, $text) {
+    my $pos := 0;
+    my @result;
+    my $looking := 1;
+    while $looking {
+        my $match :=
+            Regex::Cursor.parse($text, :rule($regex), :c($pos)) ;
 
+        if ?$match {
+            my $from := $match.from();
+            my $to := $match.to();
+            my $prefix := pir::substr__sPii($text, $pos, $from-$pos);
+            @result.push($prefix);
+            $pos := $match.to();
+        } else {
+            my $len := pir::length($text);
+            if $pos < $len {
+                @result.push(pir::substr__ssi($text, $pos) );
+            }
+            $looking := 0;
+        }
+    }
+    return @result;
+}
+
+# Use parrot's split for plain strings.
+our multi sub split($string, $text) {
+    # op split produces RSA. So, convert it to RPA.
+    my @res;
+    @res.push($_) for pir::split($string, $text);
+    @res;
+}
 
 # vim: ft=perl6
 # From src/setting/IO.pm

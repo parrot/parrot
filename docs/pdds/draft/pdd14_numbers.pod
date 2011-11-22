@@ -6,9 +6,9 @@
 
 This PDD describes Parrot's numeric data types.
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 
@@ -126,7 +126,7 @@ different PMC type.}}
 =item C<i_[add|subtract|multiply|divide|floor_divide|modulus|pow]_float(INTVAL
        b)>
 
-Add/subtract/multiply/divide/modulus/exponent an integer value with the the
+Add/subtract/multiply/divide/modulus/exponent an integer value with the
 C<Integer> PMC, and set the C<Integer> to the resulting value, morphing it to
 a C<Float>.  Note that these are multidispatched.
 

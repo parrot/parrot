@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ Initializes the PMC with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        Parrot_NativePCCMethod_attributes *attrs = PARROT_NATIVEPCCMETHOD(SELF);
+        Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
         attrs->func               = NULL;
         attrs->signature          = STRINGNULL;
@@ -146,7 +146,7 @@ Mark contained elements for GC.
 */
 
     VTABLE void mark() {
-        Parrot_NativePCCMethod_attributes *attrs = PARROT_NATIVEPCCMETHOD(SELF);
+        const Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
         Parrot_gc_mark_STRING_alive(interp, attrs->signature);
         Parrot_gc_mark_STRING_alive(interp, attrs->mmd_long_signature);
@@ -164,9 +164,9 @@ Create a clone of this PMC.
 */
 
     VTABLE PMC *clone() {
-        PMC *ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        Parrot_NativePCCMethod_attributes *self_attrs = PARROT_NATIVEPCCMETHOD(SELF);
-        Parrot_NativePCCMethod_attributes *ret_attrs  = PARROT_NATIVEPCCMETHOD(ret);
+        PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        const Parrot_NativePCCMethod_attributes * const self_attrs = PARROT_NATIVEPCCMETHOD(SELF);
+        Parrot_NativePCCMethod_attributes * const ret_attrs  = PARROT_NATIVEPCCMETHOD(ret);
 
         ret_attrs->func               = self_attrs->func;
         ret_attrs->signature          = self_attrs->signature;
@@ -174,6 +174,24 @@ Create a clone of this PMC.
         ret_attrs->mmd_multi_sig      = self_attrs->mmd_multi_sig;
 
         return ret;
+    }
+
+/*
+
+=item C<METHOD get_multisig()>
+
+Return the MMD signature PMC, if any or C<PMCNULL>.
+
+=cut
+
+*/
+
+    METHOD get_multisig() {
+        PMC *sig;
+        GET_ATTR_mmd_multi_sig(INTERP, SELF, sig);
+        if (PMC_IS_NULL(sig))
+            sig = PMCNULL;
+        RETURN(PMC *sig);
     }
 }
 

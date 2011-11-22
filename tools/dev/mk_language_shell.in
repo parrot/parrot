@@ -101,8 +101,8 @@ my $no_pmc = $with_pmc ? '' : '#';
 my $path = $ARGV[1] || $lclang;
 
 ##  now loop through the file information (see below), substituting
-##  any instances of @lang@, @lclang@, @UCLANG@, and @Id@ with
-##  the language name or the svn id tag.  If the line has the form
+##  any instances of @lang@, @lclang@, @UCLANG@ with
+##  the language name.  If the line has the form
 ##  __filepath__, then start a new file.
 my $fh;
 while (<DATA>) {
@@ -110,7 +110,6 @@ while (<DATA>) {
     s{\@lang\@}   {$lang}g;
     s{\@lclang\@} {$lclang}ig;
     s{\@UCLANG\@} {$uclang}ig;
-    s{\@Id\@}     {\$Id\$}ig;
     s{\@script\@} {$script}ig;
     s{\@rev\@}    {$rev}ig;
     s{\@no_doc\@} {$no_doc}ig;
@@ -174,7 +173,7 @@ sub start_new_file {
 ###  The name of the file to be created is given as C<__filepath__>,
 ###  and all subsequent lines up to the next C<__filepath__> are
 ###  placed in the file (performing substitutions on @lang@, @lclang@,
-###  @UCLANG@, and @Id@ as appropriate).
+###  @UCLANG@ as appropriate).
 
 __DATA__
 __README__
@@ -185,7 +184,6 @@ Language '@lang@' was created with @script@, r@rev@.
 
 __setup.pir__
 #!/usr/bin/env parrot
-# @Id@
 
 =head1 NAME
 
@@ -294,7 +292,6 @@ SOURCES
 __PARROT_REVISION__
 @rev@
 __doc/@lang@.pod__
-# @Id@
 
 =head1 @lang@
 
@@ -309,7 +306,6 @@ __doc/@lang@.pod__
 # End:
 # vim: expandtab shiftwidth=4:
 __doc/running.pod__
-# @Id@
 
 =head1 Running
 
@@ -340,7 +336,6 @@ __dynext/.ignore__
 __@lclang@/.ignore__
 
 __@lclang@.pir__
-# @Id@
 
 =head1 TITLE
 
@@ -381,7 +376,6 @@ to the @lang@ compiler.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 __src/@lclang@.pir__
-# @Id@
 
 =head1 TITLE
 
@@ -446,7 +440,7 @@ This is the grammar for @lang@ in Perl 6 rules.
 grammar @lang@::Grammar is HLL::Grammar;
 
 token TOP {
-    <statementlist>
+    <statement_list>
     [ $ || <.panic: "Syntax error"> ]
 }
 
@@ -460,7 +454,7 @@ token ws {
 
 ## Statements
 
-rule statementlist { [ <statement> | <?> ] ** ';' }
+rule statement_list { [ <statement> | <?> ] ** ';' }
 
 rule statement {
     | <statement_control>
@@ -498,10 +492,10 @@ __src/@lang@/Actions.pm__
 class @lang@::Actions is HLL::Actions;
 
 method TOP($/) {
-    make PAST::Block.new( $<statementlist>.ast , :hll<@lclang@>, :node($/) );
+    make PAST::Block.new( $<statement_list>.ast , :hll<@lclang@>, :node($/) );
 }
 
-method statementlist($/) {
+method statement_list($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> { $past.push( $_.ast ); }
     make $past;
@@ -554,7 +548,6 @@ sub say(*@args) {
 __src/pmc/@lclang@.pmc__
 /*
 Copyright (C) 20xx, Parrot Foundation.
-@Id@
 
 =head1 NAME
 
@@ -744,7 +737,6 @@ the end of the vector.
  */
 __src/ops/@lclang@.ops__
 /*
- * @id@
  * Copyright (C) 20xx, Parrot Foundation.
  */
 

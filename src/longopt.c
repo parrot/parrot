@@ -137,7 +137,7 @@ longopt_get_longopt(int argc, ARGIN(const char* argv[]),
 {
     ASSERT_ARGS(longopt_get_longopt)
     const int dex = info_buf->opt_index;
-    int optlen = 0;
+    size_t optlen = 0;
     const struct longopt_opt_decl* dptr;
 
     while (argv[dex][optlen] != '\0' && argv[dex][optlen] != '=') {
@@ -307,7 +307,7 @@ longopt_get_shortopt(int argc, ARGIN(const char* argv[]),
 
 =head1 SEE ALSO
 
-F<include/parrot/longopt.h> and F<docs/dev/longopt.dev>.
+F<include/parrot/longopt.h>, F<docs/dev/longopt.pod>
 
 =cut
 

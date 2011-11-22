@@ -172,7 +172,7 @@ Set $1 to the base 2 logarithm of $2.
 =cut
 
 op log2(out NUM, in NUM) :base_math {
-    FLOATVAL temp = log((FLOATVAL)2.0);
+    const FLOATVAL temp = log((FLOATVAL)2.0);
     $1 = log((FLOATVAL)$2) / temp;
 }
 
@@ -326,7 +326,7 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2010, Parrot Foundation.
+Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 LICENSE
 

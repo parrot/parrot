@@ -292,6 +292,24 @@ Returns the PMC value of the element at index C<*key>.
 
 /*
 
+=item C<void * get_pointer()>
+
+Return a pointer to the underlying data buffer. This is a C C<FLOATVAL*> array
+and can be treated like any other array. This array should not be resized or
+freed.
+
+=cut
+
+*/
+
+    VTABLE void * get_pointer() {
+        FLOATVAL *float_array;
+        GET_ATTR_float_array(INTERP, SELF, float_array);
+        return float_array;
+    }
+
+/*
+
 =item C<void set_integer_native(INTVAL size)>
 
 Resizes the array to C<size> elements.
@@ -446,6 +464,69 @@ C<value>.
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_pmc_keyed_int(k, value);
+    }
+
+/*
+
+=item C<STRING *get_string()>
+
+=item C<STRING *get_repo()>
+
+Returns the Parrot string representation C<key>
+
+=cut
+
+*/
+
+    VTABLE STRING *get_string() {
+        return STATICSELF.get_repr();
+    }
+
+    VTABLE STRING *get_repr() {
+        STRING *str = CONST_STRING(INTERP, "[ ");
+        STRING *comma = CONST_STRING(INTERP, ", ");
+        UINTVAL i;
+        const UINTVAL elems = SELF.elements();
+
+        if (elems > 0)
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_string_keyed_int(0));
+
+        for (i = 1; i < elems; ++i) {
+            str = Parrot_str_concat(INTERP, str, comma);
+            str = Parrot_str_concat(INTERP, str,
+                SELF.get_string_keyed_int((INTVAL)i));
+        }
+
+        str = Parrot_str_concat(INTERP, str, CONST_STRING(INTERP, " ]"));
+        return str;
+    }
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+
+    METHOD reverse() {
+        INTVAL n;
+        GET_ATTR_size(INTERP, SELF, n);
+        if (n > 1) {
+            FLOATVAL val;
+            FLOATVAL *data;
+            INTVAL i;
+
+            GET_ATTR_float_array(INTERP, SELF, data);
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
     }
 
 }

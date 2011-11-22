@@ -7,9 +7,9 @@
 This PDD describes the standard compiler API and support for
 cross-library communication between high-level languages (HLLs).
 
-=head2 Version
 
-$Revision$
+
+
 
 =head2 Description
 

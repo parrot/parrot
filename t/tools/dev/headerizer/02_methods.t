@@ -1,6 +1,5 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 # 02_methods.t
 
 use strict;
@@ -13,6 +12,7 @@ use File::Spec;
 use File::Temp qw( tempdir );
 use Test::More qw(no_plan); # tests => 46;
 use lib qw( lib );
+use Parrot::Config;
 use Parrot::Headerizer::Functions qw( read_file );
 use Parrot::Headerizer;
 use IO::CaptureOutput qw| capture |;
@@ -143,7 +143,7 @@ $self->squawk($file, $func, $error[1]);
     my $srcdir    = File::Spec->catpath( $tdir, 'src' );
     my $srcopsdir = File::Spec->catpath( $tdir, 'src', 'ops' );
     mkpath( $srcopsdir, 0, 0777 );
-    my $srcopso   = File::Spec->catfile( $srcopsdir, 'ops.o' );
+    my $srcopso   = File::Spec->catfile( $srcopsdir, "ops$PConfig{o}" );
     touchfile($srcopso);
     $self = Parrot::Headerizer->new();
     isa_ok( $self, 'Parrot::Headerizer' );
@@ -165,7 +165,7 @@ $self->squawk($file, $func, $error[1]);
 
     my $srcdir    = File::Spec->catpath( $tdir, 'src' );
     mkpath( $srcdir, 0, 0777 );
-    my $srco   = File::Spec->catfile( $srcdir, 'other.o' );
+    my $srco   = File::Spec->catfile( $srcdir, "other$PConfig{o}" );
     touchfile($srco);
     my $srcs   = File::Spec->catfile( $srcdir, 'other.s' );
     touchfile($srcs);
@@ -264,7 +264,7 @@ $self->squawk($file, $func, $error[1]);
     my $stub = 'fixedbooleanarray';
     my $srcdir    = File::Spec->catpath( $tdir, 'src', 'pmc' );
     mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub$PConfig{o}" );
     touchfile($srco);
     my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
     copy "$cwd/t/tools/dev/headerizer/testlib/${stub}_pmc.in" => $srcc
@@ -302,7 +302,7 @@ $self->squawk($file, $func, $error[1]);
     my $stub = 'nci';
     my $srcdir    = File::Spec->catpath( $tdir, 'src', 'pmc' );
     mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub$PConfig{o}" );
     touchfile($srco);
     my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
     copy "$cwd/t/tools/dev/headerizer/testlib/${stub}_pmc.in" => $srcc
@@ -700,7 +700,7 @@ sub setup_src_list_test {
     my $stub = 'list';
     my $srcdir    = File::Spec->catpath( $tdir, 'src' );
     mkpath( $srcdir, 0, 0777 );
-    my $srco      = File::Spec->catfile( $srcdir, "$stub.o" );
+    my $srco      = File::Spec->catfile( $srcdir, "$stub$PConfig{o}" );
     touchfile($srco);
     my $srcc      = File::Spec->catfile( $srcdir, "$stub.c" );
     copy "$cwd/t/tools/dev/headerizer/testlib/list.in" => $srcc
