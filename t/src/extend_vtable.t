@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 138;
+plan tests => 137;
 
 =head1 NAME
 
@@ -97,7 +97,7 @@ void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
-    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation, continuation2, nci;
+    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation, continuation2;
     Parrot_PMC key_int, key_str, hashkey, ns, object, klass;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
@@ -111,7 +111,6 @@ void dotest(Parrot_Interp interp, void *unused)
     fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
     hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
     ns           = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
-    nci          = Parrot_sub_new_from_c_func(interp, (void (*)(void))Parrot_PMC_new, "PpI");
     pmc          = Parrot_PMC_new(interp, type);
     pmc2         = Parrot_PMC_new(interp, type);
     pmc3         = Parrot_PMC_new(interp, type);
@@ -941,13 +940,6 @@ CODE
 Got non-zero hash value!
 Done!
 OUTPUT
-
-extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
-    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, nci);
-    Parrot_printf(interp,"pointer = %d\n", integer);
-    if (integer != NULL)
-        Parrot_printf(interp,"Got pointer!n");
-CODE
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");

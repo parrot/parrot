@@ -685,37 +685,6 @@ Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
 
 /*
 
-=item C<Parrot_PMC Parrot_sub_new_from_c_func(PARROT_INTERP, void (*func(void)),
-const char * signature)>
-
-Returns a PMC sub wrapper for a c function.
-
-TODO: Clean this up, move it some place more appropriate
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_PMC
-Parrot_sub_new_from_c_func(PARROT_INTERP,
-        ARGIN(void (*func)(void)), ARGIN(const char * signature))
-{
-    ASSERT_ARGS(Parrot_sub_new_from_c_func)
-
-    Parrot_String sig;
-    Parrot_PMC sub;
-
-    sig = Parrot_new_string(interp, signature, strlen(signature),
-        (char *) NULL, 0);
-
-    sub = Parrot_pmc_new(interp, enum_class_NCI);
-    VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
-    return sub;
-}
-
-/*
-
 =item C<Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)>
 
 Create a class with the type given

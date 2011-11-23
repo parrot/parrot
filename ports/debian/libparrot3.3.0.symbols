@@ -1365,7 +1365,6 @@ libparrot.so.3.3.0 libparrot3.3.0 #MINVER#
  Parrot_sub_context_get_info@Base 3.3.0
  Parrot_sub_full_sub_name@Base 3.3.0
  Parrot_sub_new_closure@Base 3.3.0
- Parrot_sub_new_from_c_func@Base 3.3.0
  Parrot_switch_to_cs@Base 3.3.0
  Parrot_sysmem_amount@Base 3.3.0
  Parrot_test_debug@Base 3.3.0

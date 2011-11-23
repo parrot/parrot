@@ -1562,8 +1562,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_str_upcase>
 
-=item C<Parrot_sub_new_from_c_func>
-
 =item C<Parrot_test_debug>
 
 =item C<Parrot_test_flag>
