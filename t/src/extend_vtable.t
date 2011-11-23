@@ -131,7 +131,7 @@ void dotest(Parrot_Interp interp, void *unused)
     string  = createstring(interp,"Object");
     Parrot_PMC_assign_string_native(interp, pmc_string, string);
 
-    object       = Parrot_PMC_newclass(interp, pmc_string);
+    object       = Parrot_oo_new_class_pmc(interp, pmc_string);
 
 
 CODE

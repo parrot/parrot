@@ -116,10 +116,6 @@ Parrot_PMC Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 Parrot_PMC Parrot_PMC_null(void);
@@ -202,8 +198,6 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_new_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_newclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_PMC_typenum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

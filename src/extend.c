@@ -685,26 +685,6 @@ Parrot_unregister_string(PARROT_INTERP, Parrot_String s)
 
 /*
 
-=item C<Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)>
-
-Create a class with the type given
-
-TODO: Clean this up, move this to src/oo.c
-
-=cut
-
-*/
-
-PARROT_EXPORT
-Parrot_PMC
-Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
-{
-    ASSERT_ARGS(Parrot_PMC_newclass)
-    return Parrot_pmc_new_init(interp, enum_class_Class, classtype);
-}
-
-/*
-
 =back
 
 =head1 SEE ALSO

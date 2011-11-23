@@ -1224,7 +1224,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_new>
 
-=item C<Parrot_PMC_newclass>
+=item C<Parrot_oo_new_class_pmc>
 
 =item C<Parrot_PMC_null>
 
