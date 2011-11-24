@@ -342,8 +342,9 @@
 .const 'Sub' WSubId_2 = "WSubId_2"
 .const 'Sub' WSubId_3 = "WSubId_3"
 .annotate 'line', 121
-    new $P1, [ 'WinxedDriverOptions' ]
-    $P1.'WinxedDriverOptions'(__ARG_1)
+    new $P12, [ 'WinxedDriverOptions' ]
+    $P12.'WinxedDriverOptions'(__ARG_1)
+    set $P1, $P12
 .annotate 'line', 123
     $P12 = $P1.'getbool'('version')
     if_null $P12, __label_1
@@ -404,11 +405,8 @@
     WSubId_2($P1, 'X', 2)
 .annotate 'line', 147
     root_new $P3, ['parrot';'Hash']
-.annotate 'line', 148
     $P3["debug"] = $I3
-.annotate 'line', 149
     $P3["noan"] = $I5
-.annotate 'line', 150
     $P3["nowarn"] = $I4
 .annotate 'line', 152
     unless $I2 goto __label_6
@@ -426,28 +424,27 @@
 .annotate 'line', 159
     set $S1, ''
   __label_9: # endif
-.annotate 'line', 160
     if $S1 == '' goto __label_12
     if $S1 == 'run' goto __label_13
     if $S1 == 'pir' goto __label_14
     if $S1 == 'include' goto __label_15
-    goto __label_11
+    goto __label_10
   __label_12: # case
   __label_13: # case
-    goto __label_10 # break
+    goto __label_11 # break
   __label_14: # case
   __label_15: # case
 .annotate 'line', 166
     set $I2, 1
 .annotate 'line', 167
     $P3["target"] = $S1
-    goto __label_10 # break
-  __label_11: # default
+    goto __label_11 # break
+  __label_10: # default
 .annotate 'line', 170
     concat $S8, "Invalid target '", $S1
     concat $S8, $S8, "'"
     die $S8
-  __label_10: # switch end
+  __label_11: # switch end
   __label_7: # endif
 .annotate 'line', 174
     isnull $I8, $S3
@@ -530,9 +527,8 @@
     $P3['output'] = $P6
   __label_25: # endif
 .annotate 'line', 208
-    concat $S7, 'function main[main](argv){', $S2
-    concat $S7, $S7, ';}'
-    set $S6, $S7
+    concat $S6, 'function main[main](argv){', $S2
+    concat $S6, $S6, ';}'
 .annotate 'line', 209
     $P5 = $P4.'compile'($S6, $P3 :flat :named)
 .annotate 'line', 211
@@ -674,7 +670,7 @@
 .annotate 'line', 267
     new $P4, 'ExceptionHandler'
     set_label $P4, __label_1
-    $P4.'handle_types_except'(64)
+    $P4.'handle_types_except'(65543)
     push_eh $P4
 .annotate 'line', 268
     $P2 = $P1(__ARG_1)

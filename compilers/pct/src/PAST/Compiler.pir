@@ -1670,6 +1670,8 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops.'push'(handlabel)
     ops.'push_pirop'('.local pmc exception')
     ops.'push_pirop'('.get_results (exception)')
+    # should probably also finalize the exception
+    ops.'push_pirop'('pop_upto_eh', 'exception')
     $S0 = self.'tempreg'('P')
     ops.'push_pirop'('getattribute', $S0, 'exception', "'type'")
     ops.'push_pirop'('eq', $S0, '.CONTROL_LOOP_NEXT', nextlabel)

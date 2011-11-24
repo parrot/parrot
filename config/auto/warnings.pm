@@ -190,6 +190,7 @@ sub _init {
         -Wunused-label
         -Wunused-value
         -Wunused-variable
+        -Wzero-as-null-pointer-constant
     ) ];
 
     $gcc->{'cage'} = $gcc_or_gpp_cage;
