@@ -116,10 +116,6 @@ Parrot_PMC Parrot_PMC_new(PARROT_INTERP, Parrot_Int type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-Parrot_PMC Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 Parrot_PMC Parrot_PMC_null(void);
@@ -158,14 +154,6 @@ void Parrot_set_strreg(PARROT_INTERP,
     Parrot_Int regnum,
     Parrot_String value)
         __attribute__nonnull__(1);
-
-PARROT_EXPORT
-Parrot_PMC Parrot_sub_new_from_c_func(PARROT_INTERP,
-    ARGIN(void (*func)(void)),
-    ARGIN(const char * signature))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
@@ -211,8 +199,6 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_PMC_newclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_PMC_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_PMC_typenum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -230,10 +216,6 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_strreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_sub_new_from_c_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_unregister_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
