@@ -1,0 +1,97 @@
+=head1 NQP - Not Quite Perl (6)
+
+NQP is Copyright (C) 2009 by Patrick R. Michaud.  See F<LICENSE>
+for licensing details.
+
+This is "Not Quite Perl" -- a compiler for quickly generating PIR
+routines from Perl6-like code.  The key feature of NQP is that it's
+designed to be a very small compiler (as compared with, say, perl6
+or Rakudo) and is focused on being a high-level way to create
+transformers for Parrot (especially hll compilers).  In addition,
+unlike Rakudo, NQP attempts to restrict itself to generating code
+that can run in Parrot without the existence of any NQP-specific
+runtime libraries.
+
+=head2 Building from source
+
+NQP comes bundled with Parrot, so if you have a recent Parrot
+distribution you likely also have a copy of NQP.  Inside of a
+Parrot installation NQP is known as C<parrot-nqp>.
+
+To build NQP from source, you'll just need a C<make> utility
+and Perl 5.8 or newer.  To automatically obtain and build Parrot
+you may also need a Git client.
+
+To obtain NQP directly from its repository:
+
+    $ git clone git://github.com/perl6/nqp-rx.git
+
+If you don't have git installed, you can get a tarball or zip
+of NQP from github by visiting http://github.com/perl6/nqp-rx/tree/master
+and clicking "Download".  Then unpack the tarball or zip.
+
+Once you have a copy of NQP, build it as follows:
+
+    $ cd nqp-rx
+    $ perl Configure.pl --gen-parrot
+    $ make
+
+This will create a "nqp" or "nqp.exe" executable in the
+current (nqp-rx) directory.  Programs can then be run from
+the build directory using a command like:
+
+    $ ./nqp hello.pl
+
+The C<--gen-parrot> option above tells Configure.pl to automatically
+download and build the most appropriate version of Parrot into a
+local "parrot/" subdirectory, install that Parrot into the
+"parrot_install/" subdirectory, and use that for building NQP.
+It's okay to use the C<--gen-parrot> option on later invocations
+of Configure.pl; the configure system will re-build Parrot only
+if a newer version is needed for whatever version of Rakudo you're
+working with.
+
+You can use C<--parrot-config=/path/to/parrot_config> instead
+of C<--gen-parrot> to use an already installed Parrot for building
+NQP.  This installed Parrot must include its development
+environment; typically this is done via Parrot's C<make install>
+target or by installing prebuilt C<parrot-devel> and/or C<libparrot-dev>
+packages.  The version of the already installed Parrot must satisfy a
+minimum specified by the NQP being built -- Configure.pl will
+verify this for you.  Released versions of NQP always build
+against the latest release of Parrot; checkouts of the HEAD revision
+from github often require a version of Parrot that is newer than
+the most recent Parrot monthly release.
+
+Once built, NQP's C<make install> target will install NQP
+and its libraries into the Parrot installation that was used to
+create it.  Until this step is performed, the "nqp" executable
+created by C<make> above can only be reliably run from the root of
+NQP's build directory.  After C<make install> is performed
+the executable can be run from any directory (as long as the
+Parrot installation that was used to create it remains intact).
+
+If the NQP compiler is invoked without an explicit script to
+run, it enters a small interactive mode that allows statements
+to be executed from the command line.  Each line entered is treated
+as a separate compilation unit, however (which means that subroutines
+are preserved after they are defined, but variables are not).
+
+=head2 Differences from previous version of NQP
+
+* Sub declarations are now lexical ("my") by default, use
+  "our sub xyz() { ... }" if you want package-scoped subroutines.
+
+* The  PIR q<...>;  construct is gone.  Use Q:PIR or pir::opcode(...)
+  instead.
+
+* The mainline code of modules is no longer tagged as ":load :init"
+  by default.  Use  INIT { ... }  for any code that you want to be
+  run automatically at startup.
+
+* Cuddled else's are no longer valid Perl 6, 'else' requires a
+  space after it.
+
+* Double-quoted strings now interpolate $-variables.
+
+

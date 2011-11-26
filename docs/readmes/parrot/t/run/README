@@ -1,0 +1,4 @@
+# Copyright (C) 2005-2007, Parrot Foundation.
+
+This directory contains tests for the options of the 'parrot' executable,
+as documented in docs/running.pod.

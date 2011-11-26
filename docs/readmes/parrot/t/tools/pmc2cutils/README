@@ -1,0 +1,19 @@
+# Copyright (C) 2003-2006, Parrot Foundation.
+README for directory t/tools/pmc2cutils/
+
+This directory contains test code for Parrot::Pmc2c::Pmc2cMain, a Perl5
+module whose publicly callable methods and other subroutines supply
+functionality to Parrot build tool 'tools/build/pmc2c.pl'.
+
+'pmc2c.pl' is invoked many times during 'make', so it is important that
+Parrot developers be able to understand and, if necessary, refactor its
+component parts.  The tests in this directory serve to illustrate those
+parts.  They should be run by any developer refactoring 'pmc2c.pl' or
+the many modules underlying that program.
+
+However, since the processes they test precede the creation of the
+'parrot' executable, failures of these tests do not necessarily indicate
+problems with that executable.  For that reason, these tests are not
+included in the 'make test' or 'make fulltest' targets.  They can,
+however, be run as part of 'make buildtools_tests' and developers are
+encouraged to do so.

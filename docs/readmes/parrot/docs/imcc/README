@@ -1,0 +1,76 @@
+IMCC
+
+imcc is the Intermediate Code Compiler for Parrot.
+The language it compiles is currently termed Parrot
+Intermediate Language (PIR).
+
+Why? Writing a compiler is a large undertaking. We are trying
+to take some of the load off of potential language designers,
+including the designers of the Perl6 compiler. We can provide a
+common back-end for Parrot that does:
+
+   Register Allocation and Spillage
+   Constant folding and expression evaluation
+   Instruction selection
+   Optimization
+   Bytecode generation
+
+This way, language designers can get right to work on
+
+   Tokenizing, parsing, type checking AST/DAG production
+
+Then they can simply feed PIR to imcc which will compile
+directly to Parrot bytecode.
+
+So far, all the compiler does is register allocation and spilling. I like
+Steve Muchnick's MIR language, and I'm taking a few things from it.
+
+I expect the IR compiler to be FAST, simple, and maintainable,
+and never develop featuritis; however I want it to be adequate
+for all languages targeting parrot. Did I mention that it
+needs to be FAST?
+
+Register Allocation
+
+  The allocator uses graph-coloring and du-chains to assign registers
+  to lexicals and symbolic temporaries. One weakness of the allocator
+  is the lack of branch analysis. A brute force method is used in the
+  du-chain computation where we assume any symbol is live from the time
+  it was first used until either the last time it was used or the last
+  branch instruction. This is being replaced with directed graphs of
+  basic blocks and flow analysis.
+
+Optimization
+
+  We break the instructions into a directed graph of basic blocks.
+  The plan is to translate to SSA form to make optimizations easier.
+
+Why C and Bison?
+
+  Until Perl6 compiles itself (and does it fast), a Bison parser is
+the easiest to maintain. An additional, important benefit, is
+C-based parsers are pretty darn fast. Currently assembling
+Parrot on the fly is still relatively slow.
+
+Instructions not known to imcc are looked up in parrot's
+op_info_table and must have the proper amount and types of
+arguments.
+
+
+Please mail parrot-dev@lists.parrot.org with bug-reports or patches.
+
+
+Original Author:
+
+Melvin Smith <melvin.smith@mindspring.com>, <melvins@us.ibm.com>
+
+Contributing Authors:
+
+Angel Faus <afaus@corp.vlex.com> ... CFG, life analysis
+Sean O'Rourke <seano@cpan.org>   ... anyop, iANY
+Leopold Toetsch <lt@toetsch.at>  ... major rewrite
+                                     numerous bugfixes/cleanup/rewrite
+                                     optimizer.c
+                                     run parrot code inside imcc
+Juergen Boemmels <boemmels@physik.uni-kl.de> Macro preprocessor
+

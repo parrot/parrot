@@ -1,0 +1,17 @@
+README for directory t/manifest/
+
+This directory holds files containing tests for the functionality used in
+tools/dev/mk_manifest_and_skip.pl, i.e., functionality in packages such as
+Parrot::Manifest, Parrot::Manifest::Files and Parrot::Manifest::Skip.
+
+If you are revising any of this functionality, you should make those revisions
+on the basis of running the tests in this directory, writing new tests as
+needed.
+
+Since the tests in this directory do not touch upon core Parrot functionality,
+it is not essential that they be included in the tests run by 'make test'.
+
+There is one other MANIFEST-related test not found in this directory:
+t/distro/manifest.t.  Since this test does sanity-checking of the MANIFEST, it
+should be run by 'make test' and, hence, has not been moved into this
+directory.

@@ -1,0 +1,15 @@
+# Copyright (C) 2005-2008, Parrot Foundation.
+
+This is an implementation of the basic calculator
+using the Parrot compiler tools.
+
+See 'perldoc abc.pir'
+
+See also:
+
+http://en.wikipedia.org/wiki/Bc_%28Unix%29
+http://www.opengroup.org/onlinepubs/000095399/utilities/bc.html
+http://www.funet.fi/pub/doc/posix/p1003.2/d11.2/4.3
+http://directory.fsf.org/gnu/bc.html
+http://www.gnu.org/software/bc/manual/html_mono/bc.html
+http://svn.lohutok.net/nam/trunk/parrot/docs/compiler_tools.pod

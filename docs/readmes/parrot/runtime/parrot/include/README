@@ -1,0 +1,10 @@
+
+This directory contains mostly generated files:
+- include files with constants defined somewhere in the interpreter
+  (see config/gen/parrot_include.pl for details)
+- configuration data (config.fpmc)
+- bytecode used at runtime (parrotlib.pbc)
+
+Additionally there are some snippets of PIR code:
+- hllmacros.pir provides some nifty PIR macros
+- test_more.pir provides boilerplate code for test scripts written in PIR

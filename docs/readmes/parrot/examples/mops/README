@@ -1,0 +1,10 @@
+README
+
+Here are example command lines:
+
+  mops.pl: perl mops.pl
+  mops.ps: gs -q -DNODISPLAY mops.ps
+  mops.py: python mops.py
+  mops.rb: ruby mops.rb
+
+

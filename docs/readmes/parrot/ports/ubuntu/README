@@ -1,0 +1,5 @@
+The Ubuntu Parrot packages are currently merged directly from Debian,
+with no added changes, so these files are unused. They are kept here
+for reference in building test packages in the Personal Package
+Archive, and in case Ubuntu-specific packages are needed in the
+future.

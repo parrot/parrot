@@ -1,0 +1,6 @@
+# Copyright (C) 2003-2006, Parrot Foundation.
+
+
+This directory contains test code for Perl5 modules used as helpers for Parrot.
+See also the documentation in ../../docs/tests.pod.
+Test of the Perl5 modules used for Parrot configuration are in ../t/configure.

@@ -1,0 +1,5 @@
+# Copyright (C) 2003-2005, Parrot Foundation.
+
+
+This directory contains test code in C.
+See also the documentation in ../../docs/tests.pod.
