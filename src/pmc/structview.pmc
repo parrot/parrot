@@ -44,6 +44,45 @@ typedef struct elt_desc_t {
 } elt_desc_t;
 END_PMC_HEADER_PREAMBLE
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_DOES_NOT_RETURN
+static void buffer_too_small(PARROT_INTERP,
+    size_t self_size,
+    size_t buf_size)
+        __attribute__nonnull__(1);
+
+static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, ARGFREE(void *ptr));
+PARROT_DOES_NOT_RETURN
+static void dereference_null(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+static void dereference_unaligned(PARROT_INTERP,
+    ARGIN(const void *base_ptr),
+    size_t align)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_DOES_NOT_RETURN
+static void index_out_of_bounds(PARROT_INTERP, INTVAL i)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_buffer_too_small __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_dereference_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_dereference_unaligned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(base_ptr))
+#define ASSERT_ARGS_index_out_of_bounds __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 #define ALIGN_UP(addr, align) (((addr) + ((align) - 1)) & ~((align) - 1))
 
 #define MAX(x, y) ((y) > (x) ? (y) : (x))
@@ -62,62 +101,27 @@ END_PMC_HEADER_PREAMBLE
     i       = Parrot_key_integer((interp), (k));                   \
     (k)     = orig_k;                                              \
     if (i < 0 || n_elts <= (size_t)i)                              \
-        Parrot_ex_throw_from_c_args((interp), NULL, 0,             \
-                "Struct index out of bounds (%d)",                 \
-                i);                                                \
+        index_out_of_bounds ((interp), i);                         \
     base_ptr = VTABLE_get_pointer((interp), ptr_pmc);              \
     ptr      = ((char *)base_ptr) + elts[i].byte_offset;           \
     /* guard against null pointer dereference */                   \
     if (!base_ptr)                                                 \
-        Parrot_ex_throw_from_c_args((interp), NULL, 0,             \
-                "Attempt to derefrence null pointer");             \
+        dereference_null((interp));                                \
     /* guard against out of bounds access */                       \
     {                                                              \
         size_t buf_size = VTABLE_get_integer((interp), ptr_pmc);   \
         size_t self_size;                                          \
         GETATTR_StructView_size((interp), (s), self_size);         \
         if (buf_size && buf_size < self_size)                      \
-            Parrot_ex_throw_from_c_args((interp), NULL, 0,         \
-                    "Buffer length too small for struct "          \
-                        "(at least %d required, got %d)",          \
-                    self_size, buf_size);                          \
+            buffer_too_small((interp), self_size, buf_size);       \
     }                                                              \
     /* guard against unaligned access */                           \
     {                                                              \
         size_t align;                                              \
         GETATTR_StructView_align((interp), (s), align);            \
         if ((size_t)base_ptr != ALIGN_UP((size_t)base_ptr, align)) \
-            Parrot_ex_throw_from_c_args((interp), NULL, 0,         \
-                    "Attempt to dereference unaligned pointer "    \
-                        "(%x, required alignment: %d)",            \
-                    base_ptr, align);                              \
+            dereference_unaligned((interp), base_ptr, align);      \
     }
-
-/* HEADERIZER HFILE: none */
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, ARGFREE(void *ptr));
-#define ASSERT_ARGS_deallocate_ptrobj __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
-/*
-
-=item C<static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)>
-
-Deallocation function to be attached to allocated instances.
-
-=cut
-
-*/
-
-static void
-deallocate_ptrobj(SHIM_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
-{
-    ASSERT_ARGS(deallocate_ptrobj)
-    mem_sys_free(ptr);
-}
 
 pmclass StructView auto_attrs {
     ATTR PARROT_DATA_TYPE  pack_type;
@@ -946,18 +950,14 @@ Return a C<Ptr> to the C<n>th element of an array of structs.
 
         /* sanity checks */
         if (!p)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "Attempt to dereference null pointer");
+            dereference_null(INTERP);
         if (array_size && array_size < (int)size * n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                     "Buffer length too small for struct array "
                         "(at least %d required, got %d)",
                     size * n, array_size);
         if ((size_t)p != ALIGN_UP((size_t)p, align))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "Attempt to dereference unaligned pointer "
-                        "(%x, required alignment: %d)",
-                    p, align);
+            dereference_unaligned(INTERP, p, align);
 
         size = ALIGN_UP(size, align);
         ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)((char *)p + size * n));
@@ -985,11 +985,9 @@ Return a C<Ptr> to the C<n>th element of a struct.
 
         /* sanity checks */
         if (n < 0 || n_elts <= (size_t)n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "Struct index out of bounds (%d)", n);
+            index_out_of_bounds(INTERP, n);
         if (!p)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                    "Attempt to dereference null pointer");
+            dereference_null(INTERP);
         {
             const size_t buf_size = VTABLE_get_integer(INTERP, array);
             size_t self_size;
@@ -1004,10 +1002,7 @@ Return a C<Ptr> to the C<n>th element of a struct.
             size_t align;
             GET_ATTR_align(INTERP, SELF, align);
             if ((size_t)p != ALIGN_UP((size_t)p, align))
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
-                        "Attempt to dereference unaligned pointer "
-                            "(%x, required alignment: %d)",
-                        p, align);
+                dereference_unaligned(INTERP, p, align);
         }
 
         p   = ((char *)p) + elts[n].byte_offset;
@@ -1117,6 +1112,76 @@ Implement the freeze/thaw API.
         VTABLE_thaw(INTERP, shape, v);
         SELF.init_pmc(shape);
     }
+}
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static void deallocate_ptrobj(PARROT_INTERP, PMC *obj, void *ptr)>
+
+Deallocation function to be attached to allocated instances.
+
+=item C<static void dereference_null(PARROT_INTERP)>
+
+=item C<static void index_out_of_bounds(PARROT_INTERP, INTVAL i)>
+
+=item C<static void buffer_too_small(PARROT_INTERP, size_t self_size, size_t
+buf_size)>
+
+=item C<static void dereference_unaligned(PARROT_INTERP, const void *base_ptr,
+size_t align)>
+
+Throw the appropiate exception.
+
+=cut
+
+*/
+
+static void
+deallocate_ptrobj(SHIM_INTERP, SHIM(PMC *obj), ARGFREE(void *ptr))
+{
+    ASSERT_ARGS(deallocate_ptrobj)
+    mem_sys_free(ptr);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+dereference_null(PARROT_INTERP)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Attempt to derefrence null pointer");
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+index_out_of_bounds(PARROT_INTERP, INTVAL i)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "Struct index out of bounds (%d)",
+            i);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+buffer_too_small(PARROT_INTERP, size_t self_size, size_t buf_size)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_BAD_BUFFER_SIZE,
+            "Buffer length too small for struct (at least %d required, got %d)",
+            self_size, buf_size);
+}
+
+PARROT_DOES_NOT_RETURN
+static void
+dereference_unaligned(PARROT_INTERP, ARGIN(const void *base_ptr), size_t align)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Attempt to dereference unaligned pointer (%x, required alignment: %d)",
+            base_ptr, align);
 }
 
 /*
