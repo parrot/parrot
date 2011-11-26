@@ -679,7 +679,8 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
             mem_sys_memcopy(s->strstart, buffer, len);
             s->bufused = len;
             STRING_scan(interp, s);
-        } else {
+        }
+        else {
             s->bufused = len;
         }
     }

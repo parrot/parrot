@@ -359,7 +359,8 @@ is_abs_path(PARROT_INTERP, ARGIN(const STRING *file))
 
 /*
 
-=item C<STRING * Parrot_lib_fix_path_slashes(PARROT_INTERP, const STRING *path)>
+=item C<STRING * Parrot_lib_fix_path_separator(PARROT_INTERP, const STRING
+*path)>
 
 Converts path separators in a path to use the current platform's separators.
 
@@ -371,18 +372,18 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_lib_fix_path_slashes(PARROT_INTERP, ARGIN(const STRING *path))
+Parrot_lib_fix_path_separator(PARROT_INTERP, ARGIN(const STRING *path))
 {
-    ASSERT_ARGS(Parrot_lib_fix_path_slashes)
+    ASSERT_ARGS(Parrot_lib_fix_path_separator)
     const UINTVAL  len = STRING_length(path);
     STRING        *res = Parrot_str_new(interp, "", path->bufused);
     String_iter    src, dst;
 #ifdef WIN32
-    const INTVAL f = path_separator;
-    const INTVAL r = win32_path_separator;
+    const INTVAL find = path_separator;
+    const INTVAL replace = win32_path_separator;
 #else
-    const INTVAL f = win32_path_separator;
-    const INTVAL r = path_separator;
+    const INTVAL find = win32_path_separator;
+    const INTVAL replace = path_separator;
 #endif
 
     res->encoding = path->encoding;
@@ -393,8 +394,8 @@ Parrot_lib_fix_path_slashes(PARROT_INTERP, ARGIN(const STRING *path))
     while (src.charpos < len) {
         INTVAL c = STRING_iter_get_and_advance(interp, path, &src);
 
-        if (c == f)
-            c = r;
+        if (c == find)
+            c = replace;
 
         STRING_iter_set_and_advance(interp, res, &dst, c);
     }
@@ -430,7 +431,7 @@ path_guarantee_trailing_separator(PARROT_INTERP, ARGIN(STRING *path))
         path = Parrot_str_concat(interp, path,
                 Parrot_str_chr(interp, path_separator));
 
-    return Parrot_lib_fix_path_slashes(interp, path);
+    return Parrot_lib_fix_path_separator(interp, path);
 }
 
 /*
@@ -458,7 +459,7 @@ path_concat(PARROT_INTERP, ARGIN(STRING *l_path),
     join = path_guarantee_trailing_separator(interp, l_path);
     join = Parrot_str_concat(interp, join, r_path);
 
-    return Parrot_lib_fix_path_slashes(interp, join);
+    return Parrot_lib_fix_path_separator(interp, join);
 }
 
 /*
@@ -479,7 +480,7 @@ static STRING*
 try_load_path(PARROT_INTERP, ARGIN(STRING* path))
 {
     ASSERT_ARGS(try_load_path)
-    path = Parrot_lib_fix_path_slashes(interp, path);
+    path = Parrot_lib_fix_path_separator(interp, path);
 
     if (Parrot_file_stat_intval(interp, path, STAT_EXISTS)) {
         return path;
@@ -590,7 +591,7 @@ Parrot_lib_add_path(PARROT_INTERP,
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
         IGLOBALS_LIB_PATHS);
     PMC * const paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
-    path_str = Parrot_lib_fix_path_slashes(interp, path_str);
+    path_str = Parrot_lib_fix_path_separator(interp, path_str);
     VTABLE_unshift_string(interp, paths, path_str);
 }
 
@@ -643,7 +644,7 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGIN(STRING *file),
     PMC    *paths;
     INTVAL  i, n;
 
-    file = Parrot_lib_fix_path_slashes(interp, file);
+    file = Parrot_lib_fix_path_separator(interp, file);
 
     /* if this is an absolute path return it as is */
     if (is_abs_path(interp, file))
@@ -772,7 +773,7 @@ Parrot_get_runtime_path(PARROT_INTERP)
         else
             result = CONST_STRING(interp, ".");
     }
-    return Parrot_lib_fix_path_slashes(interp, result);
+    return Parrot_lib_fix_path_separator(interp, result);
 }
 
 /*
