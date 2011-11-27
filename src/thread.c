@@ -79,7 +79,7 @@ PMC *
 Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 {
     ASSERT_ARGS(Parrot_thread_create)
-    PMC    * const new_interp_pmc = pmc_new(interp, type);
+    PMC    * const new_interp_pmc = Parrot_pmc_new(interp, type);
     Interp * const new_interp     = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
 
     clone_interpreter(new_interp, interp, clone_flags);
