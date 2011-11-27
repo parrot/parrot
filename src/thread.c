@@ -82,6 +82,8 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     PMC    * const new_interp_pmc = Parrot_pmc_new(interp, type);
     Interp * const new_interp     = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
 
+    /* Parrot_pmc_new sets parent_interpreter which would confuse the GC */
+    new_interp->parent_interpreter = NULL;
     clone_interpreter(new_interp, interp, clone_flags);
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
     new_interp->thread_data->tid = 0;
