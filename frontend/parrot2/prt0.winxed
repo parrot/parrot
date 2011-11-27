@@ -1,4 +1,5 @@
 $include_const "iglobals.pasm";
+$include_const "interpinfo.pasm";
 $include_const "except_severity.pasm";
 
 const int NO_FILE = 0;
@@ -39,6 +40,8 @@ function __PARROT_ENTRY_MAIN__args[anon](var args)
                 ${ shift dummy, args };
                 mode = MODE_PREPROCESS;
                 break;
+			case "--runtime-prefix":
+				__show_runtime_prefix_and_exit();
             case "-V":
                 __show_version_and_exit();
             case "-h":
@@ -150,6 +153,14 @@ function __handle_error_and_exit[anon](var exception)
     if (exit_code == 0)
         exit_code = 1;
     exit(exit_code);
+}
+
+function __show_runtime_prefix_and_exit[anon]()
+{
+	string runtime_prefix;
+	${ interpinfo runtime_prefix, INTERPINFO_RUNTIME_PREFIX };
+	say(runtime_prefix);
+	exit(0);
 }
 
 function __show_version_and_exit[anon]()
