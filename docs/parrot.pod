@@ -6,20 +6,17 @@ docs/parrot.pod - Parrot
 
 =head1 The Parrot Virtual Machine
 
-Parrot is a language-agnostic common bytecode format and an interpreter for
-dynamic languages.
+Parrot is a language-agnostic common bytecode format and an interpreter for dynamic languages.
 
 =head2 Documentation
 
-The Parrot documentation is spread across a wide range of files.  Good starting
-points are:
+The Parrot documentation is spread across a wide range of files.  Good starting points are,
 
 =over 4
 
 =item F<intro.pod>
 
-An introductory article on what Parrot is and how to do some interesting things
-with it.
+An introductory article on what Parrot is and how to do some interesting things with it.
 
 =item F<overview.pod>
 
@@ -35,41 +32,25 @@ The Parrot FAQ.
 
 =item F<glossary.pod>
 
-A guide to some of the jargon that crops up repeatedly in Parrot development
-(and in the documentation...)
+A guide to some of the jargon that crops up repeatedly in Parrot development (and in the documentation...)
 
 =back
 
-More detailed information on the design and implementation of Parrot can be
-found in:
+More detailed information on the design and implementation of Parrot can be found in:
 
 =over 4
 
 =item F<pdds/>
 
-This subdirectory contains all of the current Parrot Design Documents (PDDs).
-These are intended to be detailed guides to the design of the various Parrot
-subsystems; for instance, F<pdd03_calling_conventions.pod> specifies Parrot's
-inter-routine calling conventions.
-
-=item F<ops/>
-
-This subdirectory contains documentation files that are created from the
-corresponding opcode files at build time. These files describe what each opcode
-does and specify what arguments they take.
+This subdirectory contains all of the current Parrot Design Documents (PDDs). These are intended to be detailed guides to the design of the various Parrot subsystems; for instance, F<pdd03_calling_conventions.pod> specifies Parrot's inter-routine calling conventions.
 
 =item F<pmc/>
 
-This subdirectory contains documentation on several of the PMC types available
-to Parrot. Currently only a few of the available PMCs have been documented.
-(Patches welcome!)
+This subdirectory contains documentation on several of the PMC types available to Parrot. Currently only a few of the available PMCs have been documented. (Patches welcome!)
 
 =item F<dev/>
 
-This subdirectory contains a number of files discussing various implementation
-decisions made during the course of the development of Parrot. The intent is to
-keep discussion of implementation-specific issues separate from the basic
-design issues discussed in the PDDs.
+This subdirectory contains a number of pod files which discusses various implementation decisions made over the course of the development of Parrot. The intent is to keep discussion of implementation-specific issues separate from the basic design issues discussed in the PDDs.
 
 =item F<vtables.pod>
 
@@ -88,14 +69,6 @@ An introduction to the Parrot GC subsystem
 
 The Parrot bytecode format.
 
-=item F<packfile-perl.pod>, F<packfile-c.pod>
-
-The APIs for accessing packed bytecode files (packfiles) from Perl and C.
-
-=item F<strings.pod>
-
-A description of the string implementation.
-
 =item F<tests.pod>
 
 Hints on writing tests for the Parrot interpreter.
@@ -112,24 +85,16 @@ Documentation for C<parrot_debugger>, the Parrot debugger.
 
 =head2 Supported Platforms
 
-Parrot compiles and runs on a large number of platforms, including all common
-ones. The Parrot team is committed to supporting the following combinations as
-"core platforms": Linux (x86), Win32 (x86), OS X (x86 and PPC), Cygwin,
-FreeBSD (x86), NetBSD, OpenBSD, Solaris.
-Here x86 includes the x86_64 architecture. x86 describes that Parrot is
-supported to run on a 32-bit and 64-bit (AMD64 and Intel 64) CPU.
+Parrot compiles and runs on a large number of platforms, including all of the common ones. The Parrot team is committed to supporting the following combinations as "core platforms": Linux (x86); Win32 (x86); OS X (x86 and PPC); Cygwin; FreeBSD (x86); NetBSD; OpenBSD; and Solaris. Here 'x86' includes the 'x86_64' architecture. The 'x86' descriptor means Parrot is supported to run on both 32-bit and 64-bit (AMD64 and Intel 64) CPUs.
 
 =head2 Authors
 
-Parrot is developed and maintained by the members of the
-C<parrot-dev@lists.parrot.org> mailing list. The list is archived at:
-L<http://groups.google.com/group/parrot-dev/>
-Many people have contributed their time and expertise
-to the Parrot project; see the F<CREDITS> file for details.
+Parrot is developed and maintained by the members of the C<parrot-dev@lists.parrot.org> mailing list. The list is archived at: L<http://groups.google.com/group/parrot-dev/>
+Many people have contributed their time and their expertise to the Parrot project; I<see> the F<CREDITS> file for details.
 
 =head2 Web pages
 
-See:
+I<See>
 
 =over 4
 
