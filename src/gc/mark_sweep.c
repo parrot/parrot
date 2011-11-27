@@ -264,7 +264,7 @@ mark_interp(PARROT_INTERP)
 
 /*
 
-=item mark_code_segment()
+=item C<static void mark_code_segment(PARROT_INTERP)>
 
 Mark constants inside code segment.
 
