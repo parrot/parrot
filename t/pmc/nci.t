@@ -1913,11 +1913,22 @@ OUTPUT
     .local pmc nci_cb_D4
     nci_cb_D4 = dlfunc libnci_test, "nci_cb_D4", "vpP"
     print "loaded a function that takes a callback\n"
+    # This test might fail if we ever implement preemption of NCI calls
+    # since callbacks could start running before the 10 increments are done
     nci_cb_D4( cb_wrapped, user_data )
 
-    # Need to force reschedule to see async callbacks.
-    # Chandon TODO: Is this a bug?
-    sleep 0.001
+    # Wait till all async callbacks are done
+    .local int current
+wait:
+    # Give the scheduler a point to interrupt this Task
+    # and switch to the asynchonous callback Task
+    pass
+
+    # Usually a single pass will be enough, but on a loaded system preemption
+    # can interrupt an async callback and we would start the next test too
+    # early
+    current = int_cb_D4[0]
+    if current < 1000000000 goto wait
 
     # reset int_cb_D4 to 1
     int_cb_D4[0] = 1
