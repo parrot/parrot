@@ -160,6 +160,7 @@ static void*
 Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(Parrot_thread_outer_runloop)
+    int              lo_var_ptr;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = PMCNULL;
     Parrot_Interp    interp  =
@@ -171,7 +172,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     char dummy;
 
     /* need to set it here because argument passing can trigger GC */
-    /* interp->lo_var_ptr = &lo_var_ptr; */
+    interp->lo_var_ptr = &lo_var_ptr;
 
     do {
         while (VTABLE_get_integer(interp, scheduler) > 0) {
