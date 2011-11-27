@@ -152,6 +152,8 @@ code as the first argument.
         TASK_in_preempt_CLEAR(SELF);
 
         if (!(task->killed || PMC_IS_NULL(task->code))) {
+            const int current_depth =
+                Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
             PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
@@ -160,6 +162,9 @@ code as the first argument.
 
             /* Actually run the task */
             Parrot_ext_call(interp, task->code, "P->", task->data);
+            /* Restore recursion_depth since Parrot_Sub_invoke increments recursion_depth
+               which would not be decremented anymore if the sub is preempted */
+            Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
