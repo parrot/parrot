@@ -1277,7 +1277,7 @@ assign_default_param_value(PARROT_INTERP, INTVAL param_index, INTVAL param_flags
         *accessor->numval(interp, arg_info, param_index) = 0.0;
         break;
       case PARROT_ARG_STRING:
-        *accessor->string(interp, arg_info, param_index) = NULL;
+        *accessor->string(interp, arg_info, param_index) = STRINGNULL;
         break;
       case PARROT_ARG_PMC:
         *accessor->pmc(interp, arg_info, param_index) = PMCNULL;

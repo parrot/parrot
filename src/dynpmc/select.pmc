@@ -83,7 +83,7 @@ Initializes the PMC.
 */
 
     VTABLE void init() {
-        PMC * const fd_map = pmc_new(interp, enum_class_Hash);
+        PMC * const fd_map = Parrot_pmc_new(interp, enum_class_Hash);
         VTABLE_set_integer_native(INTERP, fd_map, Hash_key_type_int);
         SET_ATTR_fd_map(INTERP, SELF, fd_map);
         SET_ATTR_max_fd(INTERP, SELF, -1);
@@ -239,7 +239,7 @@ read before returning.
         GET_ATTR_max_fd(INTERP, SELF, maxid);
         timeouts.tv_sec  = sec;
         timeouts.tv_usec = usec;
-        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        results          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
 
         select(maxid + 1, &rdset, NULL, NULL, &timeouts);
@@ -278,7 +278,7 @@ write to before returning.
         GET_ATTR_max_fd(INTERP, SELF, maxid);
         timeouts.tv_sec  = sec;
         timeouts.tv_usec = usec;
-        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        results          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         memcpy(&wbset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
 
         select(maxid + 1, NULL, &wbset, NULL, &timeouts);
@@ -317,7 +317,7 @@ exception state before returning.
         GET_ATTR_max_fd(INTERP, SELF, maxid);
         timeouts.tv_sec  = sec;
         timeouts.tv_usec = usec;
-        results          = pmc_new(interp, enum_class_ResizablePMCArray);
+        results          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         memcpy(&ebset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));
 
         select(maxid + 1, NULL, NULL, &ebset, &timeouts);
@@ -359,10 +359,10 @@ handled.
         GET_ATTR_max_fd(INTERP, SELF, maxid);
         timeouts.tv_sec  = sec;
         timeouts.tv_usec = usec;
-        results          = pmc_new(interp, enum_class_ResizablePMCArray);
-        rresults         = pmc_new(interp, enum_class_ResizablePMCArray);
-        wresults         = pmc_new(interp, enum_class_ResizablePMCArray);
-        eresults         = pmc_new(interp, enum_class_ResizablePMCArray);
+        results          = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        rresults         = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        wresults         = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        eresults         = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         memcpy(&rdset, &PARROT_SELECT(SELF)->rb_array, sizeof (fd_set));
         memcpy(&wrset, &PARROT_SELECT(SELF)->wb_array, sizeof (fd_set));
         memcpy(&erset, &PARROT_SELECT(SELF)->eb_array, sizeof (fd_set));

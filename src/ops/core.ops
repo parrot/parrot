@@ -7,6 +7,8 @@ BEGIN_OPS_PREAMBLE
 #include "parrot/dynext.h"
 #include "parrot/runcore_api.h"
 #include "parrot/events.h"
+#include "pmc/pmc_exception.h"
+#include "pmc/pmc_exceptionhandler.h"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
@@ -711,6 +713,24 @@ Finalize exception handling, freeing any information needed to resume
 the handled exception, like inner runloops.
 $1 is the Exception handled or the ExceptionHandler that is handling it.
 
+=item B<pop_upto_eh>(in PMC)
+
+Pops all exception handlers upto the one indicated by $1. Like with the
+finalize op, $1 can either be the handled Exception or the ExceptionHandler
+handling it. Also, you should not resume Exceptions after pop_upto_eh
+or finalize has been called. This limitation may be fixed in a future
+version of parrot. Also note that the specified exception handler
+is not popped.
+
+=item B<peek_exception>(out PMC)
+
+Returns the caught exception without clearing the call object. This is
+currently needed because HLL authors use get_params to fetch the exception,
+but get_params clears the call object. So we can't use get_params in PCT
+to get the exception object without disturbing the HLL code.
+This op will be removed again when PCT offers another mechansim to get
+the exception and the HLLs switched to it.
+
 =cut
 
 inline op push_eh(inconst LABEL) {
@@ -724,15 +744,14 @@ inline op push_eh(invar PMC) {
 }
 
 inline op pop_eh() {
-    Parrot_cx_delete_handler_local(interp,
-            Parrot_str_new_constant(interp, "exception"));
+    Parrot_cx_delete_handler_local(interp);
 }
 
 inline op throw(invar PMC) :flow {
     PMC * except = $1;
     opcode_t *dest;
     opcode_t * const ret    = expr NEXT();
-    PMC      * const resume = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume = Parrot_pmc_new(interp, enum_class_Continuation);
     STRING * const exception_str = Parrot_str_new_constant(interp, "Exception");
 
     VTABLE_set_pointer(interp, resume, ret);
@@ -779,16 +798,15 @@ inline op rethrow(invar PMC) :flow {
 }
 
 inline op count_eh(out INT) {
-    $1 = Parrot_cx_count_handlers_local(interp,
-            Parrot_str_new_constant(interp, "exception"));
+    $1 = Parrot_cx_count_handlers_local(interp);
 }
 
 inline op die(in STR) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_error,
-                                    CONTROL_ERROR, $1);
+                                    EXCEPTION_DIE, $1);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -801,10 +819,10 @@ inline op die(in STR) :flow {
 inline op die(in PMC) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     STRING   * const msg       = PMC_IS_NULL($1) ? NULL : VTABLE_get_string(interp, $1);
     PMC      * const exception =
-        Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
+        Parrot_ex_build_exception(interp, EXCEPT_error, EXCEPTION_DIE, msg);
 
     VTABLE_set_pointer(interp, resume, ret);
 
@@ -820,7 +838,7 @@ inline op die(in INT, in INT) :flow {
     else {
         opcode_t        *dest;
         opcode_t * const ret       = expr NEXT();
-        PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+        PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
         PMC      * const exception = Parrot_ex_build_exception(interp, $1, $2, NULL);
 
         VTABLE_set_pointer(interp, resume, ret);
@@ -835,7 +853,7 @@ inline op die(in INT, in INT) :flow {
 inline op exit(in INT) :flow {
     opcode_t        *dest;
     opcode_t * const ret       = expr NEXT();
-    PMC      * const resume    = pmc_new(interp, enum_class_Continuation);
+    PMC      * const resume    = Parrot_pmc_new(interp, enum_class_Continuation);
     PMC      * const exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                            CONTROL_EXIT, NULL);
 
@@ -855,22 +873,22 @@ op finalize(in PMC) {
     PMC *eh = PMCNULL;
     if (!PMC_IS_NULL($1)) {
         /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
+        if ($1->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, $1, eh);
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
             eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception"))) {
-            PMC * const iter = VTABLE_get_attr_str(interp,
-                                            $1, Parrot_str_new_constant(interp, "handler_iter"));
-            if (!PMC_IS_NULL(iter))
-                eh = VTABLE_get_pmc_keyed_int(interp, iter, -1);
-        }
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
     }
     if (!PMC_IS_NULL(eh)) {
         /* Get the runloop_id from the continuation and jump to it. */
         Parrot_runloop *rl = interp->current_runloop;
         INTVAL rid;
-        Parrot_pcc_invoke_method_from_c_args(interp,
-                                             eh, Parrot_str_new_constant(interp, "rid"),
-                                             "->I", &rid);
+        if (eh->vtable->base_type == enum_class_ExceptionHandler)
+            GETATTR_ExceptionHandler_runloop_id(interp, eh, rid);
+        else
+            Parrot_pcc_invoke_method_from_c_args(interp,
+                    eh, Parrot_str_new_constant(interp, "rid"), "->I", &rid);
         while (rl && rl->id != rid)
             rl = rl->prev;
         if (rl) {
@@ -885,6 +903,26 @@ op finalize(in PMC) {
     }
 }
 
+op pop_upto_eh(in PMC) {
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL($1)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if ($1->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, $1, eh);
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
+            eh = $1;
+        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
+    }
+    if (!PMC_IS_NULL(eh))
+        Parrot_cx_delete_upto_handler_local(interp, eh);
+}
+
+op peek_exception(out PMC) {
+    PMC      * const ctx         = CURRENT_CONTEXT(interp);
+    PMC      * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    $1 = VTABLE_get_pmc_keyed_int(interp, call_object, 0);
+}
 
 =back
 

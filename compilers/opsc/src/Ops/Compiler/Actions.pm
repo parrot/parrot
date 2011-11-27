@@ -520,7 +520,7 @@ method term:sym<str> ($/) {
 
 method term:sym<float_constant_long> ($/) { # longer to work-around lack of LTM
     make PAST::Val.new(
-        :value(~$/),
+        :value(~$/[0]),
         :returns<float>
     );
 }

@@ -1,5 +1,12 @@
 ---
 -
+  name:  'Op new_si is deprecated'
+  note:  "new_si op used to create empty string with reserved capacity. In non-mutable strings world of modern parrot this doesn't make sense. new_s to create new empty string will remain"
+  tags:
+    - 'deprecated'
+    - 'Opcodes'
+  ticket:  'https://github.com/parrot/parrot/issues/203'
+-
   name:  'Experimental Select PMC'
   note:  'The Select PMC is experimental until its interface gets some exercise.  See ticket for more information.'
   tags: 
@@ -558,6 +565,9 @@
 
     PObj flag C<PObj_constant_FLAG> and related macros will be removed.
   ticket : 'https://trac.parrot.org/parrot/ticket/1875'
+  tags:
+    - 'deprecated'
+    - 'completed'
 -
   name : 'Non-const STRING* arguments'
   eligible : '3.1'

@@ -80,7 +80,7 @@ new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
 
     PMC *entry_id;
 
-    PMC * const entry = Parrot_pmc_new_constant_init_int(interp,
+    PMC * const entry = Parrot_pmc_new_init_int(interp,
             enum_class_FixedPMCArray, e_HLL_MAX);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
@@ -89,8 +89,10 @@ new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
     else
         VTABLE_push_pmc(interp, hll_info, entry);
 
-    entry_id = Parrot_pmc_new_constant_init_int(interp, enum_class_Integer, id);
+    entry_id = Parrot_pmc_new_init_int(interp, enum_class_Integer, id);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_id, entry_id);
+
+    VTABLE_push_pmc(interp, interp->HLL_entries, entry);
 
     return entry;
 }
@@ -114,7 +116,9 @@ Parrot_hll_init_HLL(PARROT_INTERP)
     interp->HLL_info      =
         Parrot_pmc_new(interp, enum_class_OrderedHash);
     interp->HLL_namespace =
-        Parrot_pmc_new_constant(interp, enum_class_ResizablePMCArray);
+        Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    interp->HLL_entries =
+        Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
     Parrot_hll_register_HLL(interp, CONST_STRING(interp, "parrot"));
 }
@@ -157,12 +161,12 @@ Parrot_hll_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     entry    = new_hll_entry(interp, hll_name);
 
     /* register HLL name */
-    name     = Parrot_pmc_new_constant(interp, enum_class_String);
+    name     = Parrot_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, hll_name);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
 
-    /* create HLL namespace using the *constant* name */
+    /* create HLL namespace */
     hll_name = Parrot_str_downcase(interp, VTABLE_get_string(interp, name));
 
     /* HLL type mappings aren't yet created, we can't create
@@ -297,7 +301,7 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
             type_array = VTABLE_get_pmc_keyed_int(interp, entry, e_HLL_typemap);
             if (PMC_IS_NULL(type_array)) {
                 int i;
-                type_array = Parrot_pmc_new_constant(interp, enum_class_FixedIntegerArray);
+                type_array = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
                 VTABLE_set_integer_native(interp, type_array, PARROT_MAX_CLASSES);
                 for (i = 0; i < PARROT_MAX_CLASSES; ++i)
                     VTABLE_set_integer_keyed_int(interp, type_array, i, i);

@@ -22,6 +22,10 @@ This is only used by the PBC dumper C<pbc_dump>.
 #include "parrot/parrot.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
+#ifdef WIN32
+PMC *PMCNULL;
+#endif
+
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
