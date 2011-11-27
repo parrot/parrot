@@ -101,7 +101,7 @@ static void index_out_of_bounds(PARROT_INTERP, INTVAL i)
     i       = Parrot_key_integer((interp), (k));                   \
     (k)     = orig_k;                                              \
     if (i < 0 || n_elts <= (size_t)i)                              \
-        index_out_of_bounds ((interp), i);                         \
+        index_out_of_bounds((interp), i);                          \
     base_ptr = VTABLE_get_pointer((interp), ptr_pmc);              \
     ptr      = ((char *)base_ptr) + elts[i].byte_offset;           \
     /* guard against null pointer dereference */                   \
