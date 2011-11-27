@@ -50,6 +50,9 @@ static void free_pmc_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*p);
 
+static void mark_code_segment(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void mark_interp(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -87,6 +90,8 @@ static Fixed_Size_Pool * new_string_pool(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_mark_code_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_mark_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -264,17 +269,17 @@ mark_interp(PARROT_INTERP)
 
 /*
 
-=item mark_code_segment()
+=item C<static void mark_code_segment(PARROT_INTERP)>
 
 Mark constants inside code segment.
 
 =cut
 
 */
-static
-void
+static void
 mark_code_segment(PARROT_INTERP)
 {
+    ASSERT_ARGS(mark_code_segment)
     int i;
     PackFile_ByteCode   *bc = Parrot_pf_get_current_code_segment(interp);
 

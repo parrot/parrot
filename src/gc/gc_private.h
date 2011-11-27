@@ -436,9 +436,6 @@ int Parrot_gc_trace_root(PARROT_INTERP,
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*mem_pools);
 
-static void mark_code_segment(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_contained_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(ptr))
@@ -472,8 +469,6 @@ static void mark_code_segment(PARROT_INTERP)
     , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool))
 #define ASSERT_ARGS_Parrot_gc_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_void mark_code_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/mark_sweep.c */
