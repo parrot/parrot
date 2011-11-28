@@ -40,6 +40,17 @@ static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void create_and_set_mapping(PARROT_INTERP,
+    ARGMOD(PackFile_Debug *debug),
+    opcode_t offset,
+    ARGIN(STRING *filename),
+    ARGIN(int *insert_pos))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*debug);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * create_seg(PARROT_INTERP,
@@ -78,6 +89,26 @@ static INTVAL find_pf_ann_idx(
     UINTVAL offs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void go_to_end_of_mapping(PARROT_INTERP,
+    ARGMOD(PackFile_Debug *debug),
+    opcode_t offset,
+    ARGIN(STRING *filename),
+    ARGIN(int *insert_pos))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*debug);
+
+PARROT_WARN_UNUSED_RESULT
+static int is_same_previous_filename(PARROT_INTERP,
+    ARGMOD(PackFile_Debug *debug),
+    ARGIN(STRING *filename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*debug);
 
 static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
@@ -164,6 +195,11 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
+#define ASSERT_ARGS_create_and_set_mapping __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(debug) \
+    , PARROT_ASSERT_ARG(filename) \
+    , PARROT_ASSERT_ARG(insert_pos))
 #define ASSERT_ARGS_create_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
@@ -178,6 +214,15 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pfa) \
     , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_go_to_end_of_mapping __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(debug) \
+    , PARROT_ASSERT_ARG(filename) \
+    , PARROT_ASSERT_ARG(insert_pos))
+#define ASSERT_ARGS_is_same_previous_filename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(debug) \
+    , PARROT_ASSERT_ARG(filename))
 #define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -1573,6 +1618,120 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
     return debug;
 }
 
+/*
+
+=item C<static int is_same_previous_filename(PARROT_INTERP, PackFile_Debug
+*debug, STRING *filename)>
+
+Only for local use of Parrot_debug_add_mapping() function;
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static int
+is_same_previous_filename(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                            ARGIN(STRING *filename))
+{
+	/* ASSERT_ARGS(is_same_previous_filename) */
+    PackFile_ConstTable * const    ct         = debug->code->const_table;
+    
+    if (debug->num_mappings) {
+        const opcode_t prev_filename_n = 
+                        debug->mappings[debug->num_mappings-1].filename;
+        if (ct->str.constants[prev_filename_n] &&
+                STRING_equal(interp, filename,
+                    ct->str.constants[prev_filename_n])) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/*
+
+=item C<static void go_to_end_of_mapping(PARROT_INTERP, PackFile_Debug *debug,
+opcode_t offset, STRING *filename, int *insert_pos)>
+
+Only for local use of Parrot_debug_add_mapping() function;
+
+=cut
+
+*/
+
+static void
+go_to_end_of_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug), opcode_t offset,
+                         ARGIN(STRING *filename), ARGIN(int *insert_pos))
+{
+    /* ASSERT_ARGS(go_to_end_of_mapping) */
+	
+     /* Can it just go on the end? */
+    if (debug->num_mappings == 0
+    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset) {
+        *insert_pos = debug->num_mappings;
+    }
+    else {
+        /* Find the right place and shift stuff that's after it. */
+        int i;
+
+        for (i = 0; i < debug->num_mappings; ++i) {
+            if (debug->mappings[i].offset > offset) {
+                *insert_pos = i;
+                memmove(debug->mappings + i + 1, debug->mappings + i,
+                    debug->num_mappings - i);
+                break;
+            }
+        }
+    }
+}
+
+/*
+
+=item C<static void create_and_set_mapping(PARROT_INTERP, PackFile_Debug *debug,
+opcode_t offset, STRING *filename, int *insert_pos)>
+
+Only for local use of Parrot_debug_add_mapping() function;
+
+=cut
+
+*/
+
+static void
+create_and_set_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug), opcode_t offset, 
+                                ARGIN(STRING *filename), ARGIN(int *insert_pos))
+{
+    /* ASSERT_ARGS(create_and_set_mapping) */
+    PackFile_ConstTable * const    ct         = debug->code->const_table;
+    
+     /* Set up new entry and insert it. */
+    PackFile_DebugFilenameMapping *mapping = debug->mappings + *insert_pos;
+    size_t count = ct->str.const_count;
+    size_t i;
+
+    mapping->offset = offset;
+
+    /* Check if there is already a constant with this filename */
+    for (i= 0; i < count; ++i) {
+       if (STRING_equal(interp, filename, ct->str.constants[i]))
+        break;
+       }
+       if (i < count) {
+           /* There is one, use it */
+           count = i;
+       }
+       else {
+           /* Not found, create a new one */
+           ct->str.const_count++;
+           ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
+                   ct->str.const_count, ct->str.const_count - 1, STRING *);
+           ct->str.constants[ct->str.const_count - 1] = filename;
+       }
+
+    /* Set the mapped value */
+    mapping->filename = count;
+    debug->num_mappings         = debug->num_mappings + 1;
+ }
 
 /*
 
@@ -1584,8 +1743,6 @@ Adds a bytecode offset to a filename mapping for a PackFile_Debug.
 Deprecated: This function should either be renamed to Parrot_pf_*, or should
 not be exposed through this API. TT #2140
 
-TODO: Refactor this function, it is too large and complicated.
-
 =cut
 
 */
@@ -1595,76 +1752,26 @@ void
 Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
                          opcode_t offset, ARGIN(STRING *filename))
 {
-    ASSERT_ARGS(Parrot_debug_add_mapping)
-    PackFile_ConstTable * const    ct         = debug->code->const_table;
+    /* ASSERT_ARGS(Parrot_debug_add_mapping) */
+   
     int                            insert_pos = 0;
-
+        
     /* If the previous mapping has the same filename, don't record it. */
-    if (debug->num_mappings) {
-        const opcode_t prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
-        if (ct->str.constants[prev_filename_n] &&
-                STRING_equal(interp, filename,
-                    ct->str.constants[prev_filename_n])) {
-            return;
-        }
+    if (is_same_previous_filename(interp, debug, filename) == 1) {
+        return;
     }
-
+	
     /* Allocate space for the extra entry. */
     debug->mappings = mem_gc_realloc_n_typed(interp,
             debug->mappings, debug->num_mappings + 1,
             PackFile_DebugFilenameMapping);
-
-    /* Can it just go on the end? */
-    if (debug->num_mappings == 0
-    ||  offset              >= debug->mappings[debug->num_mappings - 1].offset) {
-        insert_pos = debug->num_mappings;
-    }
-    else {
-        /* Find the right place and shift stuff that's after it. */
-        int i;
-
-        for (i = 0; i < debug->num_mappings; ++i) {
-            if (debug->mappings[i].offset > offset) {
-                insert_pos = i;
-                memmove(debug->mappings + i + 1, debug->mappings + i,
-                    debug->num_mappings - i);
-                break;
-            }
-        }
-    }
-
-    /* Need to put filename in constants table. */
-    {
-        /* Set up new entry and insert it. */
-        PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
-        size_t count = ct->str.const_count;
-        size_t i;
-
-        mapping->offset = offset;
-
-        /* Check if there is already a constant with this filename */
-        for (i= 0; i < count; ++i) {
-            if (STRING_equal(interp, filename, ct->str.constants[i]))
-                break;
-        }
-        if (i < count) {
-            /* There is one, use it */
-            count = i;
-       }
-       else {
-            /* Not found, create a new one */
-            ct->str.const_count++;
-            ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
-                    ct->str.const_count, ct->str.const_count - 1, STRING *);
-            ct->str.constants[ct->str.const_count - 1] = filename;
-        }
-
-        /* Set the mapped value */
-        mapping->filename = count;
-        debug->num_mappings         = debug->num_mappings + 1;
-    }
+	
+    /*Go to the end of the mapping.*/
+    go_to_end_of_mapping(interp, debug, offset, filename, &insert_pos);
+	
+    /*Create new entry and sets mapping value.*/
+    create_and_set_mapping(interp, debug, offset, filename, &insert_pos);
 }
-
 
 /*
 
