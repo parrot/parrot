@@ -206,6 +206,7 @@ parrot [Options] <file> [<program options...>]
        --gc-min-threshold=KB
        <GC GMS options>
        --gc-nursery-size=percent of sysmem  size of gen0 (default 2)
+       --mem-limit=KB  maximum amount of memory allocated by GC
        --gc-debug
        --leak-test|--destroy-at-end
     -. --wait    Read a keystroke before starting

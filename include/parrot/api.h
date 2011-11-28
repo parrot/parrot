@@ -61,6 +61,7 @@ typedef struct _Parrot_Init_Args {
     Parrot_Float4 gc_nursery_size;
     Parrot_Int gc_dynamic_threshold;
     Parrot_Int gc_min_threshold;
+    Parrot_Int gc_max_allocate;
     Parrot_UInt hash_seed;
 } Parrot_Init_Args;
 

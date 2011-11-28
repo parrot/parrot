@@ -142,6 +142,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             gc_args.nursery_size      = args->gc_nursery_size;
             gc_args.dynamic_threshold = args->gc_dynamic_threshold;
             gc_args.min_threshold     = args->gc_min_threshold;
+            gc_args.max_allocate      = args->gc_max_allocate;
 
             if (args->hash_seed)
                 interp_raw->hash_seed = args->hash_seed;

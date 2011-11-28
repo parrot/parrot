@@ -426,6 +426,7 @@ Parrot_cmd_options(void)
         { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
+        { '\0', OPT_MEM_LIMIT, OPTION_required_FLAG, { "--mem-limit" } },
         { '\0', OPT_GC_NURSERY_SIZE, OPTION_required_FLAG, { "--gc-nursery-size" } },
         { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
         { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
@@ -515,13 +516,23 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
                 exit(EXIT_FAILURE);
             }
             break;
-
           case OPT_HASH_SEED:
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {
                 initargs->hash_seed = strtoul(opt.opt_arg, NULL, 16);
             }
             else {
                 fprintf(stderr, "error: invalid hash seed specified:"
+                        "'%s'\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
+            }
+            break;
+          case OPT_MEM_LIMIT:
+            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
+                initargs->gc_max_allocate = strtoul(opt.opt_arg, NULL, 10)
+                                          * 1024;
+            }
+            else {
+                fprintf(stderr, "error: invalid memory limit specified:"
                         "'%s'\n", opt.opt_arg);
                 exit(EXIT_FAILURE);
             }
