@@ -1573,50 +1573,23 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
     return debug;
 }
 
-
 /*
 
-=item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
-opcode_t offset, STRING *filename)>
+=item C<int is_same_previous_filename(PARROT_INTERP,Packfile_Debug *debug,STRING *filename)>
 
-Adds a bytecode offset to a filename mapping for a PackFile_Debug.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
+Only for local use of Parrot_debug_add_mapping() function;
 
 =cut
 
 */
 
 PARROT_EXPORT
-void
-Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
-                         opcode_t offset, ARGIN(STRING *filename))
-{
-    ASSERT_ARGS(Parrot_debug_add_mapping)
-    PackFile_ConstTable * const    ct         = debug->code->const_table;
-    int                            insert_pos = 0;
-        
-	 /* If the previous mapping has the same filename, don't record it. */
-	if (isSameFilename(debug,filename) == 1) {
-		return;
-	}
-	
-	  /* Allocate space for the extra entry. */
-    debug->mappings = mem_gc_realloc_n_typed(interp,
-            debug->mappings, debug->num_mappings + 1,
-            PackFile_DebugFilenameMapping);
-	
-	/*Go to te end of the mapping. The fucntion returns int insert_pos which is the new insert_pos after calling this fucntion.*/
-	insert_pos=go_to_end_of_mapping(debug,offset,filename,insert_pos);
-	
-	/*Create new entry and sets mapping value.*/
-	create_and_set_mapping(debug,offset,filename,insert_pos);
-}
-
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 int
 is_same_previous_filename(PARROT_INTERP,ARGMOD(PackFile_Debug *debug),ARGIN(STRING *filename)) {
 	ASSERT_ARGS(is_same_previous_filename)
+	 PackFile_ConstTable * const    ct         = debug->code->const_table;
 	if (debug->num_mappings) {
         const opcode_t prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         if (ct->str.constants[prev_filename_n] &&
@@ -1628,15 +1601,26 @@ is_same_previous_filename(PARROT_INTERP,ARGMOD(PackFile_Debug *debug),ARGIN(STRI
 	return 0;
 }
 
-int
+/*
+
+=item C<void go_to_end_of_mapping(PARROT_INTERP, PackFile_Debug *debug, opcode_t
+offset, STRING *filename,int *insert_pos)>
+
+Only for local use of Parrot_debug_add_mapping() function;
+
+=cut
+
+*/
+PARROT_EXPORT
+void
 go_to_end_of_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
-                         opcode_t offset, ARGIN(STRING *filename),int insert_pos)
+                         opcode_t offset, ARGIN(STRING *filename),ARGIN(int *insert_pos))
 {
 	ASSERT_ARGS(go_to_end_of_mapping)
      /* Can it just go on the end? */
     if (debug->num_mappings == 0
     ||  offset              >= debug->mappings[debug->num_mappings - 1].offset) {
-        insert_pos = debug->num_mappings;
+        *insert_pos = debug->num_mappings;
     }
     else {
         /* Find the right place and shift stuff that's after it. */
@@ -1644,24 +1628,35 @@ go_to_end_of_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 
         for (i = 0; i < debug->num_mappings; ++i) {
             if (debug->mappings[i].offset > offset) {
-                insert_pos = i;
+                *insert_pos = i;
                 memmove(debug->mappings + i + 1, debug->mappings + i,
                     debug->num_mappings - i);
                 break;
             }
         }
     }
-	
-	return insert_pos;
 }
 
+/*
+
+=item C<void create_and_set_mapping(PARROT_INTERP, PackFile_Debug *debug,
+opcode_t offset, STRING *filename,int *insert_pos)>
+
+Only for local use of Parrot_debug_add_mapping() function;
+
+=cut
+
+*/
+
+PARROT_EXPORT
 void
 create_and_set_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
-                         opcode_t offset, ARGIN(STRING *filename),int insert_pos)
+                         opcode_t offset, ARGIN(STRING *filename),ARGIN(int *insert_pos))
 {
 		ASSERT_ARGS(create_and_set_mapping)
+		 PackFile_ConstTable * const    ct         = debug->code->const_table;
        /* Set up new entry and insert it. */
-       PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
+       PackFile_DebugFilenameMapping *mapping = debug->mappings + *insert_pos;
        size_t count = ct->str.const_count;
        size_t i;
 
@@ -1688,6 +1683,47 @@ create_and_set_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
        mapping->filename = count;
        debug->num_mappings         = debug->num_mappings + 1;
  }
+
+/*
+
+=item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
+opcode_t offset, STRING *filename)>
+
+Adds a bytecode offset to a filename mapping for a PackFile_Debug.
+
+Deprecated: This function should either be renamed to Parrot_pf_*, or should
+not be exposed through this API. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                         opcode_t offset, ARGIN(STRING *filename))
+{
+    ASSERT_ARGS(Parrot_debug_add_mapping)
+   
+    int                            insert_pos = 0;
+        
+	 /* If the previous mapping has the same filename, don't record it. */
+	if (is_same_previous_filename(interp,debug,filename) == 1) {
+		return;
+	}
+	
+	  /* Allocate space for the extra entry. */
+    debug->mappings = mem_gc_realloc_n_typed(interp,
+            debug->mappings, debug->num_mappings + 1,
+            PackFile_DebugFilenameMapping);
+	
+	/*Go to te end of the mapping.*/
+	go_to_end_of_mapping(interp,debug,offset,filename,&insert_pos);
+	
+	/*Create new entry and sets mapping value.*/
+	create_and_set_mapping(interp,debug,offset,filename,&insert_pos);
+}
+
 
 
 /*
