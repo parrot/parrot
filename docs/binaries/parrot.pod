@@ -1,0 +1,61 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+parrot - The Parrot Virtual Machine. 
+
+=head1 DESCRIPTION
+
+This README briefly describes the parrot executable.
+
+
+
+parrot [Options] <file> [<program options...>]
+  Options:
+    -h --help
+    -V --version
+    -I --include add path to include search
+    -L --library add path to library search
+       --hash-seed F00F  specify hex value to use as hash seed
+    -X --dynext add path to dynamic extension search
+   <Run core options>
+    -R --runcore slow|bounds|fast|subprof
+    -R --runcore trace|profiling|gcdebug
+    -t --trace [flags]
+   <VM options>
+    -D --parrot-debug[=HEXFLAGS]
+       --help-debug
+    -w --warnings
+    -G --no-gc
+    -g --gc ms2|gms|ms|inf set GC type
+       <GC MS2 options>
+       --gc-dynamic-threshold=percentage    maximum memory wasted by GC
+       --gc-min-threshold=KB
+       <GC GMS options>
+       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)
+       --gc-debug
+       --leak-test|--destroy-at-end
+    -. --wait    Read a keystroke before starting
+       --runtime-prefix
+   <Compiler options>
+    -d --imcc-debug[=HEXFLAGS]
+    -v --verbose
+    -E --pre-process-only
+    -o --output=FILE
+       --output-pbc
+    -O --optimize[=LEVEL]
+    -a --pasm
+    -c --pbc
+    -r --run-pbc
+    -y --yydebug
+   <Language options>
+see docs/running.pod for more
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=cut
