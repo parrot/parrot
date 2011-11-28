@@ -1,0 +1,47 @@
+# Copyright (C) [year]-[year], Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+[dir/]README.pod - Readme file for [...]. 
+
+=head1 DESCRIPTION
+
+This README sets out [...]. 
+
+=head2 [...] 
+
+=over 4
+
+=item * [...].
+
+=item * [...].
+
+=over 8
+
+=item * [...].
+
+=item * [...].
+
+=back
+
+=item * [...].
+
+=item * [...].
+
+=item * [...].
+
+=item * [...].
+
+=back
+
+=head2 [...]
+
+[...]
+
+=head1 COPYRIGHT
+
+Copyright (C) [year]-[year], Parrot Foundation.
+
+=cut

@@ -1,0 +1,57 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/readmes/README.pod - Readme file on how to convert the README files throughout the Parrot distribution into README.pod files. 
+
+=head1 DESCRIPTION
+
+This README sets out some general guidelines on how to convert the various 'README' files in the Parrot distribution into 'README.pod' files.  One of main reasons for this effort is to provide a uniform presentation throughout the distribution, and I<your> hard work will go a long-way towards helping us to achieve this aim.  So, first, please let us take a moment to say, "Thank you," both for your time and for your effort.
+
+The "basic" idea here is to retain the text, along with the relevant headings, already present in the 'README', but to wrap it all in the POD.  To accomplish this, please use the 'README_template.pod', included in this directory, as a guide.  For a specific example of a "properly" formatted 'README.pod' file, please I<see> the 'README.pod' in the 'docs/readmes/parrot/' directory.  To learn more about POD, please I<see> 'perlpod' (I<i.e.,> issue the command, C<perldoc perlpod> in your favorite shell or commandline program, assuming, of course, you already have Perl installed on your system) or, alternatively, you can read about POD in "Chapter 26: Plain Old Documentation" of "Programming Perl".
+
+=head2 General Guidelines
+
+=over 4
+
+=item * A copy of each 'README' file has already been placed in a directory within the 'docs/readmes/parrot' directory. To edit an assigned 'README' (I<i.e.,> a 'README' on which you have agreed to work), navigate to the directory containing the relevant 'README'; make a copy; rename it to 'README.pod'; open it in your favorite editor; and begin your edits.
+
+=item * The first line of the file must contain a commented statement of copyright I<e.g.,> '# Copyright (C) [year]-[year], Parrot Foundation'.  Please note, if the 'README' file does not include a statement of copyright or does not set out a range of years, then add the statement, using the present year as the year of copyright.
+
+=item * The second non-blank line of the file I<should> contain the C<=pod> directive.
+
+=item * Ensure all headings contain the proper POD directive, I<e.g.,> '=head1' or '=head2'. (Note: While the '=head3' and '=head4' directives are considered somewhat "experimental, I<i.e.,> available only in later versions of 'perlpod', these directives "should" work and are available if you need them.)
+
+=item * Along with the above item, remove any characters or sequence of characters, I<e.g.,> '----------', which serve to delimit or demarcate a heading.  The C<=head[n]> directives sufficiently serve this purpose.
+
+=item * As a rule, prefer C<=item *> with which to set out items or to set out an outline. 
+
+=item * Ensure the following, with, of course, the correct year or years applied, is the last heading directive and the last line of text of the 'README.pod' file,
+
+=over 8 
+
+      =head1 COPYRIGHT
+
+      Copyright (C) [year]-[year], Parrot Foundation
+
+=back
+
+For a specific example, I<see> the end of this file. 
+
+=item * And, finally, ensure the last, non-blank line of text is the C<=cut> directive. (For an example, I<see> the end of this file.) 
+
+=back
+
+The above sets out a general guideline only.  If you have questions, please I<see> the next section on "How to Get Help". 
+
+=head2 How to Get Help
+
+Read the I<Parrot Developer FAQ> in C<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011, Parrot Foundation.
+
+=cut
