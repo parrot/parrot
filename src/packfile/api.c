@@ -1598,23 +1598,44 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     ASSERT_ARGS(Parrot_debug_add_mapping)
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
+        
+	 /* If the previous mapping has the same filename, don't record it. */
+	if (isSameFilename(debug,filename) == 1) {
+		return;
+	}
+	
+	  /* Allocate space for the extra entry. */
+    debug->mappings = mem_gc_realloc_n_typed(interp,
+            debug->mappings, debug->num_mappings + 1,
+            PackFile_DebugFilenameMapping);
+	
+	/*Go to te end of the mapping. The fucntion returns int insert_pos which is the new insert_pos after calling this fucntion.*/
+	insert_pos=go_to_end_of_mapping(debug,offset,filename,insert_pos);
+	
+	/*Create new entry and sets mapping value.*/
+	create_and_set_mapping(debug,offset,filename,insert_pos);
+}
 
-    /* If the previous mapping has the same filename, don't record it. */
-    if (debug->num_mappings) {
+int
+is_same_previous_filename(PARROT_INTERP,ARGMOD(PackFile_Debug *debug),ARGIN(STRING *filename)) {
+	ASSERT_ARGS(is_same_previous_filename)
+	if (debug->num_mappings) {
         const opcode_t prev_filename_n = debug->mappings[debug->num_mappings-1].filename;
         if (ct->str.constants[prev_filename_n] &&
                 STRING_equal(interp, filename,
                     ct->str.constants[prev_filename_n])) {
-            return;
+            return 1;
         }
     }
+	return 0;
+}
 
-    /* Allocate space for the extra entry. */
-    debug->mappings = mem_gc_realloc_n_typed(interp,
-            debug->mappings, debug->num_mappings + 1,
-            PackFile_DebugFilenameMapping);
-
-    /* Can it just go on the end? */
+int
+go_to_end_of_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                         opcode_t offset, ARGIN(STRING *filename),int insert_pos)
+{
+	ASSERT_ARGS(go_to_end_of_mapping)
+     /* Can it just go on the end? */
     if (debug->num_mappings == 0
     ||  offset              >= debug->mappings[debug->num_mappings - 1].offset) {
         insert_pos = debug->num_mappings;
@@ -1632,38 +1653,43 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
             }
         }
     }
-
-    /* Need to put filename in constants table. */
-    {
-        /* Set up new entry and insert it. */
-        PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
-        size_t count = ct->str.const_count;
-        size_t i;
-
-        mapping->offset = offset;
-
-        /* Check if there is already a constant with this filename */
-        for (i= 0; i < count; ++i) {
-            if (STRING_equal(interp, filename, ct->str.constants[i]))
-                break;
-        }
-        if (i < count) {
-            /* There is one, use it */
-            count = i;
-       }
-       else {
-            /* Not found, create a new one */
-            ct->str.const_count++;
-            ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
-                    ct->str.const_count, ct->str.const_count - 1, STRING *);
-            ct->str.constants[ct->str.const_count - 1] = filename;
-        }
-
-        /* Set the mapped value */
-        mapping->filename = count;
-        debug->num_mappings         = debug->num_mappings + 1;
-    }
+	
+	return insert_pos;
 }
+
+void
+create_and_set_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                         opcode_t offset, ARGIN(STRING *filename),int insert_pos)
+{
+		ASSERT_ARGS(create_and_set_mapping)
+       /* Set up new entry and insert it. */
+       PackFile_DebugFilenameMapping *mapping = debug->mappings + insert_pos;
+       size_t count = ct->str.const_count;
+       size_t i;
+
+       mapping->offset = offset;
+
+       /* Check if there is already a constant with this filename */
+       for (i= 0; i < count; ++i) {
+           if (STRING_equal(interp, filename, ct->str.constants[i]))
+               break;
+       }
+       if (i < count) {
+           /* There is one, use it */
+           count = i;
+      }
+      else {
+           /* Not found, create a new one */
+           ct->str.const_count++;
+           ct->str.constants = mem_gc_realloc_n_typed_zeroed(interp, ct->str.constants,
+                   ct->str.const_count, ct->str.const_count - 1, STRING *);
+           ct->str.constants[ct->str.const_count - 1] = filename;
+       }
+
+       /* Set the mapped value */
+       mapping->filename = count;
+       debug->num_mappings         = debug->num_mappings + 1;
+ }
 
 
 /*
