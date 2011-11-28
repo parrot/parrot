@@ -187,6 +187,9 @@ typedef struct MarkSweep_GC {
     /* During GC phase - which generation we are collecting */
     size_t                  gen_to_collect;
 
+    /* Maximum amount of memory allocated by the GC */
+    size_t                  max_allocate;
+
     /* GC blocking */
     UINTVAL gc_mark_block_level;  /* How many outstanding GC block
                                      requests are there? */
@@ -747,6 +750,8 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
          * Configured by runtime parameter (default 2%).
          */
         self->gc_threshold = Parrot_sysmem_amount(interp) * nursery_size / 100;
+
+        self->max_allocate = args->max_allocate;
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
