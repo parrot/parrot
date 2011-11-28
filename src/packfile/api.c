@@ -1584,8 +1584,6 @@ Adds a bytecode offset to a filename mapping for a PackFile_Debug.
 Deprecated: This function should either be renamed to Parrot_pf_*, or should
 not be exposed through this API. TT #2140
 
-TODO: Refactor this function, it is too large and complicated.
-
 =cut
 
 */
