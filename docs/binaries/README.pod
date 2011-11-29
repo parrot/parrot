@@ -56,7 +56,7 @@ Below is a list of binaries in the 'docs/binaries' which need POD files:
 
 =head2 Example
 
-For an example of how to write a POD file for each of the above executables, I<see> F<docs/binaries/parrot.pod>.
+For an example of how to write a POD file for an executable, I<see> F<docs/binaries/parrot.pod>.
 
 =head2 How to Get Help
 
