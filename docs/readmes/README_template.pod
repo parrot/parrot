@@ -1,4 +1,4 @@
-# Copyright (C) [year]-[year], Parrot Foundation.
+# Copyright (C) <creation_year>-<current_year>, Parrot Foundation.
 
 =pod
 
@@ -42,6 +42,6 @@ This README sets out [...].
 
 =head1 COPYRIGHT
 
-Copyright (C) [year]-[year], Parrot Foundation.
+Copyright (C) <creation_year>-<current_year>, Parrot Foundation.
 
 =cut

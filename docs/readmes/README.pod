@@ -18,7 +18,7 @@ The "basic" idea here is to retain the text, along with the relevant headings, a
 
 =item * A copy of each 'README' file has already been placed in a directory within the 'docs/readmes/parrot' directory. To edit an assigned 'README' (I<i.e.,> a 'README' on which you have agreed to work), navigate to the directory containing the relevant 'README'; make a copy; rename it to 'README.pod'; open it in your favorite editor; and begin your edits.
 
-=item * The first line of the file must contain a commented statement of copyright I<e.g.,> '# Copyright (C) [year]-[year], Parrot Foundation'.  Please note, if the 'README' file does not include a statement of copyright or does not set out a range of years, then add the statement, using the present year as the year of copyright.
+=item * The first line of the file must contain a commented statement of copyright I<e.g.,> '# Copyright (C) <creation_year>-<current_year>, Parrot Foundation'.  Please note, if the 'README' file does not include a statement of copyright or does not set out a range of years, then add the statement, using the present year as the year of copyright.
 
 =item * The second non-blank line of the file I<should> contain the C<=pod> directive.
 
@@ -34,7 +34,7 @@ The "basic" idea here is to retain the text, along with the relevant headings, a
 
       =head1 COPYRIGHT
 
-      Copyright (C) [year]-[year], Parrot Foundation
+      Copyright (C) <creation_year>-<current_year>, Parrot Foundation
 
 =back
 
