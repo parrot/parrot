@@ -168,6 +168,7 @@
 ^/docs/packfile-c\.pod/
 ^/docs/packfile-perl\.pod$
 ^/docs/packfile-perl\.pod/
+^/docs/revisions/docs/runcores_from_cores_c\.out
 ^/editor/Makefile$
 ^/editor/Makefile/
 ^/editor/imc\.vim$
