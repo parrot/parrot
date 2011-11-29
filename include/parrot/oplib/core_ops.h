@@ -112,6 +112,8 @@ op_lib_t *Parrot_DynOp_core_3_10_0(PARROT_INTERP, long init);
  opcode_t * Parrot_errorson_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_errorsoff_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_errorsoff_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_set_runcore_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_set_runcore_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_runinterp_p_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_runinterp_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_getinterp_p(opcode_t *, PARROT_INTERP);

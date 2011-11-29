@@ -443,6 +443,8 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
+        case CURRENT_RUNCORE:
+            return interp->run_core->name;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
