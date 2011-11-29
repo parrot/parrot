@@ -54,13 +54,16 @@ typedef enum {
 
 /* &gen_from_enum(interpcores.pasm) */
 typedef enum {
-    PARROT_SLOW_CORE,                       /* slow bounds/trace/profile core */
+    PARROT_SLOW_CORE,                       /* slow bounds/trace core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
     PARROT_FAST_CORE        = 0x01,         /* fast DO_OP core */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
-    PARROT_PROFILING_CORE   = 0x160         /* used by parrot debugger */
+    PARROT_PROFILING_CORE   = 0x160,        /* used by parrot debugger */
+    PARROT_SUBPROF_SUB_CORE = 0x200,        /* sub profiler core, sub mode */
+    PARROT_SUBPROF_HLL_CORE = 0x201,        /* sub profiler core, hll mode */
+    PARROT_SUBPROF_OPS_CORE = 0x202         /* sub profiler core, ops mode */
 } Parrot_Run_core_t;
 /* &end_gen */
 
