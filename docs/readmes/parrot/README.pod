@@ -8,7 +8,7 @@ README.pod - Readme to Parrot, version 3.10.0.
 
 =head1 DESCRIPTION
 
-Parrot is a virtual machine designed to efficiently compile and execute
+Parrot is a virtual machine designed to, efficiently, compile and execute
 bytecode for dynamic languages.
 
 =head1 LICENSE
@@ -117,7 +117,7 @@ By default, this installs in '/usr/local', with the Parrot executable in '/usr/l
 
 But please note, the dynamic libs will not be found for non-standard locations unless you set the enviornment variable 'LD_LIBRARY_PATH' or something similar.
 
-For where to go from here, I<see> 'docs/parrot.pod' and I<see> 'docs/intro.pod'.  If you experience problems, please I<see> the section "How To Submit A Bug Report" in 'docs/submissions.pod'.  These documents are in POD format, and you can view them with the command,
+For where to go from here, I<see> F<docs/parrot.pod> and I<see> F<docs/intro.pod>.  If you experience problems, please I<see> the section "How To Submit A Bug Report" in F<docs/submissions.pod>.  These documents are in POD format, and you can view them with the command,
 
     perldoc -F docs/intro.pod
 
@@ -129,11 +129,11 @@ For documentation on the user-visible changes between this and previous versions
 
 The Parrot user mailing list is 'parrot-users@lists.parrot.org'. You may subscribe to the mailing list by filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-users.  There is an archive of the mailing list at http://lists.parrot.org/pipermail/parrot-users/.
 
-For development discussions, I<see> the information in 'docs/gettingstarted.pod'.
+For development discussions, I<see> the information in F<docs/gettingstarted.pod>.
 
 =head1 FEEDBACK, PATCHES, etc.
 
-For more information on how to report bugs and to submit patches, I<see> 'docs/submissions.pod'.
+For more information on how to report bugs and to submit patches, I<see> F<docs/submissions.pod>.
 
 =head1 WEB SITES
 
