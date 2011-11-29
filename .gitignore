@@ -132,6 +132,7 @@ cachegrind.out.*
 /docs/packfile-perl.pod
 /docs/book/*.html
 /docs/ops/*.pod
+/docs/revisions/docs/runcores_from_cores_c.out
 /editor/Makefile
 /editor/imc.vim
 /editor/imcc.xml
