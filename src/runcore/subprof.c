@@ -1055,6 +1055,9 @@ Returns a high-resolution number representing how long Parrot has been running.
 */
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+
+#  include <stdint.h>
+
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {

@@ -8,7 +8,6 @@
 #define PARROT_RUNCORE_SUBPROF_H_GUARD
 
 
-#include <stdint.h>
 #include "pmc/pmc_sub.h"
 
 typedef struct subprofile subprofile;
