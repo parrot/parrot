@@ -14,7 +14,7 @@ This README offers only some minimal guidance on how to write POD files for the 
 
 =item * Read all of the available, relevant documentation in the 'docs' directory regarding the executable.
 
-=item * Review the source, the comments, and any POD embedded within the source code of the executable I<See, e.g.,> the source and the POD in 'frontend/parrot/main.c'.
+=item * Review the source, the comments, and any POD embedded within the source code of the executable I<See, e.g.,> the source and the POD in F<frontend/parrot/main.c>.
 
 =over 8
 
@@ -56,11 +56,11 @@ Below is a list of binaries in the 'docs/binaries' which need POD files:
 
 =head2 Example
 
-For an example of how to write a POD file for each of the above executables, I<see> 'docs/binaries/parrot.pod'.
+For an example of how to write a POD file for each of the above executables, I<see> F<docs/binaries/parrot.pod>.
 
 =head2 How to Get Help
 
-Read the I<Parrot Developer FAQ> in C<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
+Read the I<Parrot Developer FAQ> in F<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
 
 =head1 COPYRIGHT
 
