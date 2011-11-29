@@ -26,7 +26,7 @@ The "basic" idea here is to retain the text, along with the relevant headings, a
 
 =item * Along with the above item, remove any characters or sequence of characters, I<e.g.,> '----------', which serve to delimit or demarcate a heading.  The C<=head[n]> directives sufficiently serve this purpose.
 
-=item * As a rule, prefer C<=item *> with which to set out items or to set out an outline. 
+=item * As a rule, prefer C<=item *> with which to set out items or to set out an outline.  (Unless, of course, it is an option for an installable binary.)
 
 =item * Ensure the following, with, of course, the correct year or years applied, is the last heading directive and the last line of text of the 'README.pod' file,
 
@@ -48,7 +48,7 @@ The above sets out a general guideline only.  If you have questions, please I<se
 
 =head2 How to Get Help
 
-Read the I<Parrot Developer FAQ> in C<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
+Read the I<Parrot Developer FAQ> in F<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
 
 =head1 COPYRIGHT
 
