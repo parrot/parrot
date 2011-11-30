@@ -2063,62 +2063,65 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 
 /*
 
-=item C<void Parrot_load_language(PARROT_INTERP, STRING *lang_name)>
+=item C<static void fill_path_name(PARROT_INTERP, STRING *wo_ext, STRING *file_str,
+                                    STRING *pbc)>
 
-Load the compiler libraries for a given high-level language into the
-interpreter.
+This function is only for local use of Parrot_pf_load_language();
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
+=cut
 
-TODO: Refactor this function and try to reduce the size of it. It is too big.
+*/
+static void
+fill_path_name(PARROT_INTERP, ARGIN(STRING *wo_ext), ARGIN(STRING *file_str),
+                    ARGIN(STRING *pbc))
+{
+    /* Full path to language library is "abc/abc.pbc". */
+    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
+    wo_ext   = Parrot_str_concat(interp, wo_ext, lang_name);
+    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."));
+    file_str = Parrot_str_concat(interp, file_str, pbc);
+}
+
+/*
+
+=item C<static int check_lang_load(PARROT_INTERP, PMC *is_loaded_hash, STRING *wo_ext)>
+
+This function is only for local use of Parrot_pf_load_language();
 
 =cut
 
 */
 
-PARROT_EXPORT
-void
-Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
+PARROT_WARN_UNUSED_RESULT
+static int
+check_lang_load(PARROT_INTERP, ARGIN(PMC *is_loaded_hash), ARGIN(STRING *wo_ext))
 {
-    ASSERT_ARGS(Parrot_load_language)
-    STRING *wo_ext, *file_str, *path, *pbc;
-    STRING *found_path, *found_ext;
-    INTVAL name_length;
-    enum_runtime_ft file_type;
-    PMC *is_loaded_hash;
-
-    if (STRING_IS_NULL(lang_name))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_language\" no language name");
-
-    /* Full path to language library is "abc/abc.pbc". */
-    pbc = CONST_STRING(interp, "pbc");
-    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
-    wo_ext   = Parrot_str_concat(interp, wo_ext, lang_name);
-    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."));
-    file_str = Parrot_str_concat(interp, file_str, pbc);
-
     /* Check if the language is already loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_PBC_LIBS);
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
-        return;
+        return 1;
+    return 0;
+}
 
-    file_type = PARROT_RUNTIME_FT_LANG;
 
-    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_language\" couldn't find a compiler module for the language '%Ss'", lang_name);
+/*
 
-    /* remember wo_ext => full_path mapping */
-    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
-            wo_ext, path);
+=item C<static void base_path_module(PARROT_INTERP, STRING *found_ext, STRING *lang_name)>
 
-    /* Add the include and dynext paths to the global search */
+This function is only for local use of Parrot_pf_load_language();
 
-    /* Get the base path of the located module */
+=cut
+
+*/
+
+static void
+base_path_module(PARROT_INTERP, ARGIN(STRING* found_ext), AGRIN(STRING *lang_name))
+{
+     /* Get the base path of the located module */
+    INTVAL name_length;
+    STRING *found_path;
+
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
     found_path = STRING_substr(interp, found_path, 0,
@@ -2130,11 +2133,22 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
             PARROT_LIB_PATH_DYNEXT);
     Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "library/")),
             PARROT_LIB_PATH_LIBRARY);
+}
+/*
 
+=item C<static void check_bytecode_or_source_file(PARROT_INTERP, STRING *found_ext),
+        STRING *pbc, STRING *path)>
 
-    /* Check if the file found was actually a bytecode file (.pbc extension) or
-     * a source file (.pir or .pasm extension. */
+This function is only for local use of Parrot_pf_load_language();
 
+=cut
+
+*/
+
+static void
+check_bytecode_or_source_file(PARROT_INTERP, ARGIN(STRING *found_ext),
+                             ARGIN(STRING *pbc), ARGIN(STRING *path))
+{
     push_context(interp);
 
     if (STRING_equal(interp, found_ext, pbc))
@@ -2146,6 +2160,68 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     }
 
     Parrot_pop_context(interp);
+}
+
+/*
+
+=item C<void Parrot_pf_load_language(PARROT_INTERP, STRING *lang_name)>
+
+Load the compiler libraries for a given high-level language into the
+interpreter.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
+{
+    ASSERT_ARGS(Parrot_load_language)
+    STRING *wo_ext, *file_str, *path, *pbc;
+    STRING *found_ext;
+
+    enum_runtime_ft file_type;
+    PMC *is_loaded_hash;
+
+    if (STRING_IS_NULL(lang_name))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "\"load_language\" no language name");
+
+    pbc = CONST_STRING(interp, "pbc");
+
+    /* Full path to language library is "abc/abc.pbc". */
+
+    full_path_name(interp, wo_ext, file_str, pbc);    
+
+    /* Check if the language is already loaded */
+
+    if (check_lang_load(interp, is_loaded_hash, wo_ext) == 1)
+        return;
+
+    file_type = PARROT_RUNTIME_FT_LANG;
+
+    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
+    if (!path)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "\"load_language\" couldn't find a compiler module for the language '%Ss'", lang_name);
+
+    /* remember wo_ext => full_path mapping */
+
+    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
+            wo_ext, path);
+
+    /* Add the include and dynext paths to the global search */
+
+    /* Get the base path of the located module */
+
+    base_path_module (interp, found_ext, lang_name);
+
+
+    /* Check if the file found was actually a bytecode file (.pbc extension) or
+     * a source file (.pir or .pasm extension. */
+
+    check_bytecode_or_source_file (interp, found_ext, pbc, path);
 }
 
 /*
