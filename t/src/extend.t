@@ -532,7 +532,7 @@ main(int argc, const char *argv[])
         PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -581,7 +581,7 @@ main(int argc, const char *argv[])
         PackFile * pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -649,7 +649,7 @@ main(int argc, const char *argv[])
         Parrot_String   name = Parrot_str_new_constant(interp, "foo");
         PMC            *sub, *arg;
         Parrot_Int      result;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub  = Parrot_ns_find_current_namespace_global(interp, name);
@@ -707,7 +707,7 @@ main(int argc, const char *argv[])
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub;
         Parrot_runloop  jump_point;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -795,7 +795,7 @@ main(int argc, const char *argv[])
         packfile   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
 
         if (packfile) {
-            pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+            pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
             Parrot_pf_set_current_packfile(interp, pbc);
             Parrot_runcode( interp, 1, code );
         }
@@ -855,7 +855,7 @@ main(int argc, const char *argv[])
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
-        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
         Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
@@ -884,7 +884,7 @@ main(int argc, const char *argv[])
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
-        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
         Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
