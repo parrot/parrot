@@ -1370,7 +1370,8 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 
 /*
 
-=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf, STRING
+*path)>
 
 Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
 is not important, and consuming code should not rely on any particular type
@@ -1386,7 +1387,7 @@ being returned. The only guarantees which are made by this interface are that:
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf), ARGIN(STRING *path))
 {
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC *ptr;
@@ -1402,6 +1403,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
     pf->view = ptr;
+    VTABLE_set_string_native(interp, ptr, path);
 
     Parrot_unblock_GC_mark(interp);
 
@@ -1429,7 +1431,7 @@ Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pf_get_current_packfile)
     if (interp->code)
-        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf);
+        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf, STRINGNULL);
     else
         return PMCNULL;
 }
@@ -2249,8 +2251,7 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
     else {
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf);
-        VTABLE_set_string_native(interp, pfview, path);
+        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         return pfview;
     }
@@ -2304,7 +2305,7 @@ PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
 {
     ASSERT_ARGS(PackFile_read_pbc)
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
-    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf, fullname);
     UNUSED(debug);
     return (Parrot_PackFile)pfpmc;
 }
