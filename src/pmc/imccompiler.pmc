@@ -186,7 +186,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     METHOD compile(STRING *source,
-            STRING *path   :named("path")      :optional, INTVAL has_path   :opt_flag,
+            STRING *path   :optional, INTVAL has_path   :opt_flag,
             STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
             PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
     {
@@ -217,7 +217,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     METHOD compile_file(STRING *filename,
-            STRING *path   :named("path")      :optional, INTVAL has_path   :opt_flag,
+            STRING *path   :optional, INTVAL has_path   :opt_flag,
             STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
             PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
     {
