@@ -2043,7 +2043,8 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PMC * const pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+    PMC * const pf_pmc = Parrot_pf_get_packfile_pmc(interp, pf, path);
 
     if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -2281,33 +2282,6 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
 {
     ASSERT_ARGS(PackFile_fixup_subs)
     do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
-}
-
-
-/*
-
-=item C<Parrot_PackFile PackFile_read_pbc(PARROT_INTERP, STRING *fullname, const
-int debug)>
-
-Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
-
-Deprecated: Do not use this function. Use Parrot_pf_read_pbc_file instead.
-See TT #2140 for details.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Parrot_PackFile
-PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
-{
-    ASSERT_ARGS(PackFile_read_pbc)
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
-    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf, fullname);
-    UNUSED(debug);
-    return (Parrot_PackFile)pfpmc;
 }
 
 /*

@@ -573,14 +573,6 @@ PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Parrot_PackFile PackFile_read_pbc(PARROT_INTERP,
-    ARGIN(STRING *fullname),
-    const int debug)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
     ARGMOD(PackFile *self),
@@ -801,9 +793,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
     , PARROT_ASSERT_ARG(dir))
 #define ASSERT_ARGS_PackFile_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_read_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_PackFile_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
