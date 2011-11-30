@@ -2673,6 +2673,26 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
 
 /*
 
+=item C<STRING * Parrot_pf_get_version_string(PARROT_INTERP, PMC * pbc)>
+
+Get a Major.Minor.Patch version number for the given packfile
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
+{
+    ASSERT_ARGS(Parrot_pf_get_version_string)
+    PackFile * const pf = VTABLE_get_pointer(interp, pbc);
+    return Parrot_sprintf_c(interp, "%d.%d.%d", pf->header->major, pf->header->minor, pf->header->patch);
+}
+
+/*
+
 =item C<static PackFile_Segment * create_seg(PARROT_INTERP, PackFile_Directory
 *dir, pack_file_types t, STRING *name, STRING *file_name, int add)>
 

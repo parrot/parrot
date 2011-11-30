@@ -464,6 +464,21 @@ given .pbc bytecode file.
     METHOD write_to_file(STRING *filename) {
         Parrot_pf_write_pbc_file(INTERP, SELF, filename);
     }
+
+/*
+
+=item C<METHOD get_version()>
+
+Return a stringified version number of the packfile
+
+=cut
+
+*/
+
+    METHOD get_version() {
+        STRING * const version = Parrot_pf_get_version_string(INTERP, SELF);
+        RETURN(STRING * version);
+    }
 }
 
 /*

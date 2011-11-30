@@ -665,6 +665,12 @@ PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -831,6 +837,9 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf) \
     , PARROT_ASSERT_ARG(path))
+#define ASSERT_ARGS_Parrot_pf_get_version_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_pf_load_bytecode_search \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
