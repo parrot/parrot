@@ -186,8 +186,9 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     METHOD compile(STRING *source,
-            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+            STRING *path   :named("path")      :optional, INTVAL has_path   :opt_flag,
+            STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf;
@@ -207,6 +208,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             ERROR_IMCC_COMPILE(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
+        if (has_path)
+            VTABLE_set_string_native(INTERP, pf, path);
 
         END_IMCC_COMPILE(interp);
 
@@ -214,8 +217,9 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     METHOD compile_file(STRING *filename,
-            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+            STRING *path   :named("path")      :optional, INTVAL has_path   :opt_flag,
+            STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
@@ -235,6 +239,9 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             ERROR_IMCC_COMPILE(interp);
             Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
         }
+
+        if (has_path)
+            VTABLE_set_string_native(INTERP, pf, path);
 
         END_IMCC_COMPILE(interp);
 
