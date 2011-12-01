@@ -908,7 +908,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_load_encoding>
 
-=item C<Parrot_load_language>
+=item C<Parrot_pf_load_language>
 
 =item C<Parrot_dyn_load_lib>
 

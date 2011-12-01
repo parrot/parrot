@@ -533,7 +533,7 @@ Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang))
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_load_language(interp, lang);
+    Parrot_pf_load_language(interp, lang);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

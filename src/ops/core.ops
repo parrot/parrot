@@ -132,7 +132,7 @@ locate the main compiler file in the standard locations.
 =cut
 
 inline op load_language(in STR) :load_file {
-    Parrot_load_language(interp, $1);
+    Parrot_pf_load_language(interp, $1);
 }
 
 =back
