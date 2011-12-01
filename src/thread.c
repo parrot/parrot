@@ -143,8 +143,9 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
     PMC * const   self                = (PMC*) thread;
     Parrot_Interp const thread_interp =
        (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
+    PMC * const local_task = Parrot_thread_make_local_copy(thread_interp, interp, task);
 
-    VTABLE_push_pmc(thread_interp, thread_interp->scheduler, task);
+    VTABLE_push_pmc(thread_interp, thread_interp->scheduler, local_task);
 }
 
 /*

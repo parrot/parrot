@@ -208,8 +208,9 @@ Create a copy of the task, resetting status, ID, and birthtime.
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
 
-        new_struct->code = VTABLE_clone(INTERP, old_struct->code);
-        new_struct->data = VTABLE_clone(INTERP, old_struct->data);
+        new_struct->code   = VTABLE_clone(INTERP, old_struct->code);
+        new_struct->data   = VTABLE_clone(INTERP, old_struct->data);
+        new_struct->shared = VTABLE_clone(INTERP, old_struct->shared);
 
         return copy;
     }
