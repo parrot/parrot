@@ -37,15 +37,17 @@ format of bytecode.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void base_path_module(PARROT_INTERP,
-    ARGIN(STRING *found_ext),
+    ARGOUT(STRING *found_ext),
     ARGIN(STRING *lang_name),
     ARGIN(STRING *path),
-    ARGIN(STRING *found_path))
+    ARGOUT(STRING *found_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*found_ext)
+        FUNC_MODIFIES(*found_path);
 
 static void check_bytecode_or_source_file(PARROT_INTERP,
     ARGIN(STRING *found_ext),
@@ -58,11 +60,16 @@ static void check_bytecode_or_source_file(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int check_lang_load(PARROT_INTERP,
-    ARGIN(PMC *is_loaded_hash),
-    ARGIN(STRING *wo_ext))
+    ARGIN(STRING *wo_ext),
+    ARGMOD(STRING *path),
+    ARGIN(STRING *file_str),
+    ARGIN(STRING *lang_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*path);
 
 static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
@@ -108,15 +115,17 @@ static INTVAL find_pf_ann_idx(
         __attribute__nonnull__(2);
 
 static void full_path_name(PARROT_INTERP,
-    ARGIN(STRING *wo_ext),
-    ARGIN(STRING *file_str),
+    ARGOUT(STRING *wo_ext),
+    ARGOUT(STRING *file_str),
     ARGIN(STRING *pbc),
     ARGIN(STRING *lang_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*wo_ext)
+        FUNC_MODIFIES(*file_str);
 
 static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
@@ -213,8 +222,10 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_check_lang_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(is_loaded_hash) \
-    , PARROT_ASSERT_ARG(wo_ext))
+    , PARROT_ASSERT_ARG(wo_ext) \
+    , PARROT_ASSERT_ARG(path) \
+    , PARROT_ASSERT_ARG(file_str) \
+    , PARROT_ASSERT_ARG(lang_name))
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -2146,8 +2157,8 @@ full_path_name(PARROT_INTERP, ARGOUT(STRING *wo_ext), ARGOUT(STRING *file_str),
 
 /*
 
-=item C<static int check_lang_load(PARROT_INTERP, PMC *is_loaded_hash, STRING
-*wo_ext)>
+=item C<static int check_lang_load(PARROT_INTERP, STRING *wo_ext, STRING *path,
+STRING *file_str, STRING *lang_name)>
 
 This function is only for local use of Parrot_pf_load_language();
 
@@ -2157,15 +2168,32 @@ This function is only for local use of Parrot_pf_load_language();
 
 PARROT_WARN_UNUSED_RESULT
 static int
-check_lang_load(PARROT_INTERP, ARGOUT(PMC *is_loaded_hash), ARGIN(STRING *wo_ext))
+check_lang_load(PARROT_INTERP, ARGIN_NULLOK(STRING *wo_ext), ARGOUT_NULLOK(STRING *path),
+                         ARGIN_NULLOK(STRING *file_str), ARGIN(STRING *lang_name))
 {
     //ASSERT_ARGS(check_lang_load)
+
+    enum_runtime_ft file_type;
+    PMC *is_loaded_hash;
 
     /* Check if the language is already loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_PBC_LIBS);
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return 1;
+
+    file_type = PARROT_RUNTIME_FT_LANG;
+
+    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
+    if (!path)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "\"load_language\" couldn't find a compiler module for the language '%Ss'", lang_name);
+
+    /* remember wo_ext => full_path mapping */
+
+    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
+            wo_ext, path);
+
     return 0;
 }
 
@@ -2251,9 +2279,6 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     STRING *wo_ext, *file_str, *path, *pbc;
     STRING *found_ext, *found_path;
 
-    enum_runtime_ft file_type;
-    PMC *is_loaded_hash;
-
     if (STRING_IS_NULL(lang_name))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "\"load_language\" no language name");
@@ -2266,20 +2291,8 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
     /* Check if the language is already loaded */
 
-    if (check_lang_load(interp, is_loaded_hash, wo_ext) == 1)
+    if (check_lang_load(interp, wo_ext, path, file_str, lang_name) == 1)
         return;
-
-    file_type = PARROT_RUNTIME_FT_LANG;
-
-    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_language\" couldn't find a compiler module for the language '%Ss'", lang_name);
-
-    /* remember wo_ext => full_path mapping */
-
-    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
-            wo_ext, path);
 
     /* Add the include and dynext paths to the global search */
 
