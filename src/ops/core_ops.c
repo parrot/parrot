@@ -13384,13 +13384,13 @@ Parrot_load_bytecode_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_load_language_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    Parrot_load_language(interp, SREG(1));
+    Parrot_pf_load_language(interp, SREG(1));
     return (opcode_t *)cur_opcode + 2;
 }
 
 opcode_t *
 Parrot_load_language_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    Parrot_load_language(interp, SCONST(1));
+    Parrot_pf_load_language(interp, SCONST(1));
     return (opcode_t *)cur_opcode + 2;
 }
 
