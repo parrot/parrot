@@ -39,11 +39,13 @@ format of bytecode.
 static void base_path_module(PARROT_INTERP,
     ARGIN(STRING *found_ext),
     ARGIN(STRING *lang_name),
-    ARGIN(STRING *path))
+    ARGIN(STRING *path),
+    ARGIN(STRING *found_path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 static void check_bytecode_or_source_file(PARROT_INTERP,
     ARGIN(STRING *found_ext),
@@ -202,7 +204,8 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(found_ext) \
     , PARROT_ASSERT_ARG(lang_name) \
-    , PARROT_ASSERT_ARG(path))
+    , PARROT_ASSERT_ARG(path) \
+    , PARROT_ASSERT_ARG(found_path))
 #define ASSERT_ARGS_check_bytecode_or_source_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(found_ext) \
@@ -2129,10 +2132,10 @@ This function is only for local use of Parrot_pf_load_language();
 
 */
 static void
-full_path_name(PARROT_INTERP, ARGIN(STRING *wo_ext), ARGIN(STRING *file_str),
+full_path_name(PARROT_INTERP, ARGOUT(STRING *wo_ext), ARGOUT(STRING *file_str),
                     ARGIN(STRING *pbc), ARGIN(STRING *lang_name))
 {
-    ASSERT_ARGS(full_path_name)
+    //ASSERT_ARGS(full_path_name)
 
     /* Full path to language library is "abc/abc.pbc". */
     wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
@@ -2154,9 +2157,9 @@ This function is only for local use of Parrot_pf_load_language();
 
 PARROT_WARN_UNUSED_RESULT
 static int
-check_lang_load(PARROT_INTERP, ARGIN(PMC *is_loaded_hash), ARGIN(STRING *wo_ext))
+check_lang_load(PARROT_INTERP, ARGOUT(PMC *is_loaded_hash), ARGIN(STRING *wo_ext))
 {
-    ASSERT_ARGS(check_lang_load)
+    //ASSERT_ARGS(check_lang_load)
 
     /* Check if the language is already loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
@@ -2170,7 +2173,7 @@ check_lang_load(PARROT_INTERP, ARGIN(PMC *is_loaded_hash), ARGIN(STRING *wo_ext)
 /*
 
 =item C<static void base_path_module(PARROT_INTERP, STRING *found_ext, STRING
-*lang_name, STRING *path)>
+*lang_name, STRING *path, STRING *found_path)>
 
 This function is only for local use of Parrot_pf_load_language();
 
@@ -2179,14 +2182,13 @@ This function is only for local use of Parrot_pf_load_language();
 */
 
 static void
-base_path_module(PARROT_INTERP, ARGIN(STRING *found_ext), ARGIN(STRING *lang_name),
-                       ARGIN(STRING *path))
+base_path_module(PARROT_INTERP, ARGOUT(STRING *found_ext), ARGIN(STRING *lang_name),
+                       ARGIN(STRING *path), ARGOUT(STRING *found_path))
 {
-    ASSERT_ARGS(base_path_module)
+    //ASSERT_ARGS(base_path_module)
 
      /* Get the base path of the located module */
     INTVAL name_length;
-    STRING *found_path;
 
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
@@ -2215,7 +2217,7 @@ static void
 check_bytecode_or_source_file(PARROT_INTERP, ARGIN(STRING *found_ext),
                              ARGIN(STRING *pbc), ARGIN(STRING *path))
 {
-    ASSERT_ARGS(check_bytecode_or_source_file)
+    //ASSERT_ARGS(check_bytecode_or_source_file)
 
     push_context(interp);
 
@@ -2247,7 +2249,7 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 {
     ASSERT_ARGS(Parrot_pf_load_language)
     STRING *wo_ext, *file_str, *path, *pbc;
-    STRING *found_ext;
+    STRING *found_ext, *found_path;
 
     enum_runtime_ft file_type;
     PMC *is_loaded_hash;
@@ -2283,7 +2285,7 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
     /* Get the base path of the located module */
 
-    base_path_module (interp, found_ext, lang_name, path);
+    base_path_module (interp, found_ext, lang_name, path, found_path);
 
 
     /* Check if the file found was actually a bytecode file (.pbc extension) or
