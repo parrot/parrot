@@ -209,7 +209,6 @@ void
 Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_next_task)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     PMC * const task = VTABLE_shift_pmc(interp, scheduler);
 
     interp->cur_task = task;
@@ -315,7 +314,6 @@ void
 Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_quantum)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     const FLOATVAL time_now = Parrot_floatval_time();
 
     if (Parrot_cx_preemption_enabled(interp) && time_now >= interp->quantum_done)
@@ -470,7 +468,6 @@ void
 Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
 {
     ASSERT_ARGS(Parrot_cx_schedule_immediate)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
     PMC *task;
 
     if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task"))) {
