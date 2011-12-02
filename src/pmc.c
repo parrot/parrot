@@ -363,6 +363,25 @@ Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_), U
     return pmc;
 }
 
+/*
+
+=item C<Parrot_PMC Parrot_pmc_null(void)>
+
+Returns the special C<NULL> PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+Parrot_PMC
+Parrot_pmc_null(void)
+{
+    ASSERT_ARGS(Parrot_pmc_null)
+    return PMCNULL;
+}
 
 /*
 
