@@ -15,18 +15,18 @@ winxed [option] [program] [args]
 
 =head2 Command line otions
 
-'-c' : is used to compile to pir. 
-'-e==s' : is used to evaluate.
-'-o==s' : is used to get Object name.
-'-target=s' : is used to set target type.
-'-L=s' : is used to add to parrot library search path.
-'-I=s' : is used to add to parrot include search path.
-'-X=s' : is used to add to parrot dyntex search path.
-'--debug' : is used to set debug mode.
-'--nowarn' : is used to hide warnings.
-'--noan' : is used to hide code annotations.
-'--help' : is used to show help for options.
-'--version' : is used to show the version of winxed and exit.
+    '-c' : is used to compile to pir. 
+    '-e==s' : is used to evaluate.
+    '-o==s' : is used to get Object name.
+    '-target=s' : is used to set target type.
+    '-L=s' : is used to add to parrot library search path.
+    '-I=s' : is used to add to parrot include search path.
+    '-X=s' : is used to add to parrot dyntex search path.
+    '--debug' : is used to set debug mode.
+    '--nowarn' : is used to hide warnings.
+    '--noan' : is used to hide code annotations.
+    '--help' : is used to show help for options.
+    '--version' : is used to show the version of winxed and exit.
 
 This is the available option you can use.After them you can type the name of the
 program you want to be compile.
