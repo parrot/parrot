@@ -11,7 +11,7 @@ These are the vtable functions for the ParrotInterpreter base class
 
    getinterp P0
    set P1, P0[.IGLOBALS_*]  # access interpreter globals
-   set I0, P0[x]            # interpinfo I0, x
+   set I0, P0[x]            # Parrot_interp_info I0, x
    set I0, P0[-1]           # get interpreter flags
    set P0[-1], x            # set flags on interpreter
                             # NOTE: this doesn't restart
@@ -168,7 +168,7 @@ create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
     Interp_flags flag  = PARROT_NO_FLAGS;
     Parrot_Interp new_interp;
 
-    new_interp       = make_interpreter(parent, (INTVAL)flag);
+    new_interp       = Parrot_interp_make_interpreter(parent, (INTVAL)flag);
     PMC_interp(self) = new_interp;
 
     VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
@@ -551,7 +551,7 @@ Returns the interpreter info for C<key>.
         if (key == -1)
             return (INTVAL)new_interp->flags;
 
-        return interpinfo(new_interp, key);
+        return Parrot_interp_info(new_interp, key);
     }
 
 /*
@@ -571,8 +571,8 @@ Sets the interpreter info for C<key> to C<val>.
         if (key == -1) {
             const INTVAL allowed = PARROT_BOUNDS_FLAG | PARROT_PROFILE_FLAG |
                              PARROT_GC_DEBUG_FLAG;
-            Parrot_clear_flag(new_interp, allowed);
-            Parrot_set_flag(new_interp, val & allowed);
+            Parrot_interp_clear_flag(new_interp, allowed);
+            Parrot_interp_set_flag(new_interp, val & allowed);
         }
     }
 

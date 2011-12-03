@@ -62,7 +62,7 @@ PARROT_WARN_UNUSED_RESULT
 static int
 Parrot_interp_is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 {
-    ASSERT_ARGS(is_env_var_set)
+    ASSERT_ARGS(Parrot_interp_is_env_var_set)
     int retval;
     STRING * const value = Parrot_getenv(interp, var);
     if (STRING_IS_NULL(value))
@@ -144,10 +144,10 @@ Parrot_interp_make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     ASSERT_ARGS(make_interpreter)
     int stacktop;
     Parrot_GC_Init_Args args;
-    Interp * const interp = allocate_interpreter(parent, flags);
+    Interp * const interp = Parrot_interp_allocate_interpreter(parent, flags);
     memset(&args, 0, sizeof (args));
     args.stacktop = &stacktop;
-    initialize_interpreter(interp, &args);
+    Parrot_interp_initialize_interpreter(interp, &args);
     return interp;
 }
 
@@ -272,7 +272,7 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     Parrot_gbl_init_world_once(interp);
 
     /* context data */
-    if (is_env_var_set(interp, CONST_STRING(interp, "PARROT_GC_DEBUG"))) {
+    if (Parrot_interp_is_env_var_set(interp, CONST_STRING(interp, "PARROT_GC_DEBUG"))) {
 #if ! DISABLE_GC_DEBUG
         Interp_flags_SET(interp, PARROT_GC_DEBUG_FLAG);
 #else
@@ -495,7 +495,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 
 /*
 
-=item C<Interp* Parrot_interp_get_emergency_interp(void)>
+=item C<Interp* Parrot_interp_get_emergency_interpreter(void)>
 
 Provide access to a (possibly) valid interp pointer.  This is intended B<only>
 for use cases when an interp is not available otherwise, which shouldn't be
@@ -509,7 +509,7 @@ other than error handling.
 
 PARROT_CAN_RETURN_NULL
 Interp*
-Parrot_interp_get_emergency_interp(void) {
+Parrot_interp_get_emergency_interpreter(void) {
     ASSERT_ARGS(Parrot_get_emergency_interp)
 
     return emergency_interp;
@@ -517,7 +517,7 @@ Parrot_interp_get_emergency_interp(void) {
 
 /*
 
-=item C<void Parrot_interp_clear_emergency_interp(void)>
+=item C<void Parrot_interp_clear_emergency_interpreter(void)>
 
 Null the C<emergency_interp> static variable.  This is only useful when
 purposefully invalidating C<emergency_interp>.  This is not a general-purpose
@@ -528,7 +528,7 @@ function.  Don't use it for anything other than error handling.
 */
 
 void
-Parrot_interp_clear_emergency_interp(void) {
+Parrot_interp_clear_emergency_interpreter(void) {
     emergency_interp = NULL;
 }
 
@@ -841,7 +841,7 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PMC* Parrot_interp_info_p(PARROT_INTERP, INTVAL what)>
+=item C<PMC* Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.

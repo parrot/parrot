@@ -314,7 +314,7 @@ typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
 void
-Parrot_clear_emergency_interp(void);
+Parrot_interp_clear_emergency_interpreter(void);
 
 /* HEADERIZER BEGIN: src/interp/inter_create.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -322,13 +322,13 @@ Parrot_clear_emergency_interp(void);
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp allocate_interpreter(
+Parrot_Interp Parrot_interp_allocate_interpreter(
     ARGIN_NULLOK(Interp *parent),
     INTVAL flags);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Interp initialize_interpreter(PARROT_INTERP,
+Parrot_Interp Parrot_interp_initialize_interpreter(PARROT_INTERP,
     ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -336,10 +336,10 @@ Parrot_Interp initialize_interpreter(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
+Parrot_Interp Parrot_interp_make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
 
 PARROT_EXPORT
-void Parrot_destroy(PARROT_INTERP)
+void Parrot_interp_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -350,27 +350,27 @@ void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp Parrot_new(ARGIN_NULLOK(Parrot_Interp parent));
+Parrot_Interp Parrot_interp_new(ARGIN_NULLOK(Parrot_Interp parent));
 
 PARROT_CAN_RETURN_NULL
-Interp* Parrot_get_emergency_interp(void);
+Interp* Parrot_interp_get_emergency_interpreter(void);
 
-void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)
+void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_initialize_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_initialize_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(stack_top))
-#define ASSERT_ARGS_Parrot_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_get_emergency_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_get_emergency_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_create.c */
@@ -436,19 +436,19 @@ void Parrot_run_callback(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL interpinfo(PARROT_INTERP, INTVAL what)
+INTVAL Parrot_interp_info(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* interpinfo_p(PARROT_INTERP, INTVAL what)
+PMC* Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
+STRING* Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -456,16 +456,16 @@ void Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
+void Parrot_interp_clear_flag(PARROT_INTERP, INTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
+void Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_compile_file(PARROT_INTERP,
+PMC * Parrot_interp_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
     INTVAL is_pasm)
         __attribute__nonnull__(1)
@@ -486,13 +486,13 @@ Parrot_PMC Parrot_compile_string(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
+PMC * Parrot_interp_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
+Interp * Parrot_intep_get_from_pmc(ARGIN(PMC * interp_pmc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -503,7 +503,7 @@ void Parrot_mark_method_writes(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_set_compiler(PARROT_INTERP,
+void Parrot_interp_set_compiler(PARROT_INTERP,
     ARGIN(STRING *type),
     ARGIN(PMC *compiler))
         __attribute__nonnull__(1)
@@ -520,7 +520,7 @@ void Parrot_set_executable_name(PARROT_INTERP, ARGIN(STRING * const name))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_set_flag(PARROT_INTERP, INTVAL flag)
+void Parrot_interp_set_flag(PARROT_INTERP, INTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -528,7 +528,7 @@ void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
+void Parrot_interp_set_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -551,7 +551,7 @@ Parrot_UInt Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void register_native_pcc_method_in_ns(PARROT_INTERP,
+void Parrot_interp_register_native_pcc_method_in_ns(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
     ARGIN(STRING *name),
@@ -572,35 +572,35 @@ void register_nci_method(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-#define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_interpinfo_p __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_info_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_interpinfo_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_info_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_clear_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_clear_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_Parrot_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(code) \
     , PARROT_ASSERT_ARG(error))
-#define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))
-#define ASSERT_ARGS_Parrot_int_get_interp_from_pmc \
+#define ASSERT_ARGS_Parrot_intep_get_from_pmc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc))
 #define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type) \
     , PARROT_ASSERT_ARG(compiler))
@@ -609,11 +609,11 @@ void register_nci_method(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_set_executable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_set_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_set_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_run_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_set_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_set_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_setwarnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -623,7 +623,7 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_test_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_register_native_pcc_method_in_ns \
+#define ASSERT_ARGS_Parrot_interp_register_native_pcc_method_in_ns \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(func) \
