@@ -764,6 +764,26 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
+=item C<Parrot_PMC Parrot_ns_get_root_namespace(PARROT_INTERP)>
+
+Return the root namespace
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_PMC
+Parrot_ns_get_root_namespace(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_ns_get_root_namespace)
+
+    return interp->root_namespace;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

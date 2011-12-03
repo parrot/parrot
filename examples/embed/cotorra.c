@@ -136,7 +136,7 @@ Auxiliary function to shorten Parrot String creation,
 
 Parrot_String create_string(Parrot_Interp interp, const char *name)
 {
-    return Parrot_new_string(interp, name, strlen(name), (const char *) NULL, 0);
+    return Parrot_str_new_init(interp, name, strlen(name), (const char *) NULL, 0);
 }
 
 /**********************************************************************/
@@ -224,7 +224,7 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
     }
 
     if (stname) {
-        Parrot_PMC rootns = Parrot_get_root_namespace(interp);
+        Parrot_PMC rootns = Parrot_ns_get_root_namespace(interp);
         Parrot_String parrotname = create_string(interp, "parrot");
         Parrot_PMC parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns, parrotname);
         Parrot_String name = create_string(interp, stname);
@@ -233,7 +233,7 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
             fail("start sub not found");
         if (i < argc) {
             int pos;
-            Parrot_PMC arg = Parrot_PMC_new(interp,
+            Parrot_PMC arg = Parrot_pmc_new(interp,
                     Parrot_PMC_typenum(interp, "FixedStringArray"));
             Parrot_PMC_set_integer_native(interp, arg, argc - i);
             for (pos = 0; i < argc; ++i, ++pos) {
