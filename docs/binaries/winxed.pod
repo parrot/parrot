@@ -1,40 +1,40 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 Name
 
-winxed.pod - Parrot winxed compiler driver
+winxed.pod - The Winxed Language
 
-=head1 Description of binary winxed
+=head1 Description
 
-Binary program winxed is part of Parrot. It parse command line options then 
-calls backend compiler and runs the generated program.
+This is Winxed, a High Level Language (HLL) that is packaged with Parrot
+for tool, library and language development.
 
-=head1 Usage 
+Winxed is Javascript-ish. If you are looking for something more Perl-ish,
+you want NQP.
+
+=head1 Usage
 
 winxed [option] [program] [args]
 
 =head2 Command line otions
 
-    '-c' : is used to compile to pir. 
-    '-e==s' : is used to evaluate.
-    '-o==s' : is used to get Object name.
+    '-c'        : is used to compile to pir.
+    '-e==s'     : is used to evaluate.
+    '-o==s'     : is used to get Object name.
     '-target=s' : is used to set target type.
-    '-L=s' : is used to add to parrot library search path.
-    '-I=s' : is used to add to parrot include search path.
-    '-X=s' : is used to add to parrot dyntex search path.
-    '--debug' : is used to set debug mode.
-    '--nowarn' : is used to hide warnings.
-    '--noan' : is used to hide code annotations.
-    '--help' : is used to show help for options.
+    '-L=s'      : is used to add to parrot library search path.
+    '-I=s'      : is used to add to parrot include search path.
+    '-X=s'      : is used to add to parrot dyntex search path.
+    '--debug'   : is used to set debug mode.
+    '--nowarn'  : is used to hide warnings.
+    '--noan'    : is used to hide code annotations.
+    '--help'    : is used to show help for options.
     '--version' : is used to show the version of winxed and exit.
-
-This is the available option you can use.After them you can type the name of the
-program you want to be compile.
 
 =head1 Help
 
-For more help or any other question you go to L<http://parrot.org> or 
+For more help or any other question you go to L<http://parrot.org> or
 L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
-You can also join Parrot IRC channel: #parrot.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
 
 =cut
