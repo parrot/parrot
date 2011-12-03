@@ -1,0 +1,13 @@
+# Copyright (C) 2001-2010, Parrot Foundation.
+
+=head1 Name
+winxed.pod - Parrot winxed compiler driver
+
+=head1 Description of binary winxed
+Binary program winxed is part of Parrot. It parse command line options then 
+calls backend compiler and runs the generated program.
+
+=head1 Command line options
+
+
+=cut
