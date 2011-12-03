@@ -1595,7 +1595,7 @@ src/interp/api$(O) : $(PARROT_H_HEADERS) \
 	include/imcc/embed.h \
 	include/imcc/yyscanner.h \
 	$(INC_DIR)/runcore_api.h \
-	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
     $(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
     src/gc/variable_size_pool.h
