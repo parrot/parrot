@@ -1,6 +1,7 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 Name
+
 winxed.pod - Parrot winxed compiler driver
 
 =head1 Description of binary winxed
@@ -8,7 +9,32 @@ winxed.pod - Parrot winxed compiler driver
 Binary program winxed is part of Parrot. It parse command line options then 
 calls backend compiler and runs the generated program.
 
-=head1 Command line options
+=head1 Usage 
 
+winxed [option] [program] [args]
+
+=head2 Command line otions
+
+'-c' : is used to compile to pir. 
+'-e==s' : is used to evaluate.
+'-o==s' : is used to get Object name.
+'-target=s' : is used to set target type.
+'-L=s' : is used to add to parrot library search path.
+'-I=s' : is used to add to parrot include search path.
+'-X=s' : is used to add to parrot dyntex search path.
+'--debug' : is used to set debug mode.
+'--nowarn' : is used to hide warnings.
+'--noan' : is used to hide code annotations.
+'--help' : is used to show help for options.
+'--version' : is used to show the version of winxed and exit.
+
+This is the available option you can use.After them you can type the name of the
+program you want to be compile.
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or 
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You can also join Parrot IRC channel: #parrot.
 
 =cut
