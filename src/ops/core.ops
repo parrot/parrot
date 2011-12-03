@@ -963,7 +963,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 =cut
 
 inline op bounds(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_BOUNDS_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_BOUNDS_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG); }
     restart NEXT();
 }
@@ -978,7 +978,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 =cut
 
 inline op profile(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_PROFILE_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_PROFILE_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG); }
     restart NEXT();
 }
@@ -993,8 +993,8 @@ If $1 is zero, turn off tracing. Otherwise turn trace flag $1 on.
 =cut
 
 inline op trace(in INT) :flow {
-    if ($1 != 0) { Parrot_set_trace(interp,   $1); }
-    else         { Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
+    if ($1 != 0) { Parrot_interp_set_trace(interp,   $1); }
+    else         { Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
     restart NEXT();
 }
 
@@ -1013,27 +1013,27 @@ inline op gc_debug(in INT) {
 
 ########################################
 
-=item B<interpinfo>
+=item B<Parrot_interp_info>
 
 Fetch some piece of information about the interpreter and put it in $1.
-Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
+Possible values for $2 are defined in F<runtime/parrot/include/Parrot_interp_info.pasm>.
 The valid constants for each return value are (excluding the .INTERPINFO_
 prefix):
 
 =over 4
 
-=item B<interpinfo>(out INT, in INT)
+=item B<Parrot_interp_info>(out INT, in INT)
 
 TOTAL_MEM_ALLOC, TOTAL_MEM_USED, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS,
 ACTIVE_BUFFERS, TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
 MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
 EXTENDED_PMCS, CURRENT_RUNCORE
 
-=item B<interpinfo>(out PMC, in INT)
+=item B<Parrot_interp_info>(out PMC, in INT)
 
 CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
-=item B<interpinfo>(out STR, in INT)
+=item B<Parrot_interp_info>(out STR, in INT)
 
 EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
@@ -1041,16 +1041,16 @@ EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
 =cut
 
-op interpinfo(out INT, in INT) {
-    $1 = interpinfo(interp, $2);
+op Parrot_interp_info(out INT, in INT) {
+    $1 = Parrot_interp_info(interp, $2);
 }
 
-op interpinfo(out PMC, in INT) {
-    $1 = interpinfo_p(interp, $2);
+op Parrot_interp_info(out PMC, in INT) {
+    $1 = Parrot_interp_info_pmc(interp, $2);
 }
 
-op interpinfo(out STR, in INT) {
-    STRING * const s = interpinfo_s(interp, $2);
+op Parrot_interp_info(out STR, in INT) {
+    STRING * const s = Parrot_interp_info_string(interp, $2);
     $1 = s;
 }
 
@@ -1134,7 +1134,7 @@ inline op errorsoff(in INT) {
 
 Switch the current runcore to the one with the specified name.
 Needs to be an op, as we need to restart the runops() call.
-You can get the name of the current runcore with the interpinfo op.
+You can get the name of the current runcore with the Parrot_interp_info op.
 
 =cut
 

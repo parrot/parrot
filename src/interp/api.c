@@ -160,7 +160,7 @@ initialized. Used in next cycle:
 
     allocate_interpreter
     parseflags
-    initialize_interpreter
+   Parrot_interp_initialize_interpreter
 
 for overriding subsystems (e.g. GC) which require early initialization.
 
@@ -335,7 +335,7 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
      * Threaded interpreters are destructed when the thread ends
      */
     if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
-        Parrot_x_on_exit(interp, Parrot_really_destroy, NULL);
+        Parrot_x_on_exit(interp, Parrot_interp_really_destroy, NULL);
 #endif
 
     return interp;
@@ -362,7 +362,7 @@ Parrot_interp_destroy(PARROT_INTERP)
 #ifdef ATEXIT_DESTROY
     UNUSED(interp);
 #else
-    Parrot_really_destroy(interp, 0);
+   Parrot_interp_really_destroy(interp, 0);
 #endif
 }
 
@@ -388,7 +388,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
-        Parrot_clear_emergency_interp();
+       Parrot_interp_clear_emergency_interpreter();
     }
 
     /* if something needs destruction (e.g. closing PIOs)
@@ -729,7 +729,7 @@ const char *code, Parrot_String *error)>
 
 Compiles a code string.
 
-DEPRECATED: Use Parrot_compile_file (or whatever replaces it, TT #2135).
+DEPRECATED: UseParrot_interp_compile_file (or whatever replaces it, TT #2135).
 
 =cut
 
@@ -834,7 +834,7 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in interpinfo");
+                "illegal argument in Parrot_interp_info");
     }
     return ret;
 }
@@ -880,7 +880,7 @@ Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
         break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in interpinfo");
+                "illegal argument in Parrot_interp_info");
     }
 
     /* Don't send NULL values to P registers */
@@ -953,7 +953,7 @@ Parrot_interp_info_string(PARROT_INTERP, INTVAL what)
             return interp->run_core->name;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in interpinfo");
+                "illegal argument in Parrot_interp_info");
     }
 }
 

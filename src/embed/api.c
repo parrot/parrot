@@ -150,7 +150,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
             gc_args.stacktop = &alt_stacktop;
         }
-        initialize_interpreter(interp_raw, &gc_args);
+        Parrot_interp_initialize_interpreter(interp_raw, &gc_args);
         *interp = VTABLE_get_pmc_keyed_int(
                 interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     }
@@ -317,7 +317,7 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
         if (_oldtop == NULL)
             interp->lo_var_ptr = &_oldtop;
         interp->api_jmp_buf = &env;
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
         Parrot_x_exit(interp, 0);
         /* Never reached, x_exit calls longjmp */
         return 1;
@@ -579,7 +579,7 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
 {
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_set_compiler(interp, type, compiler);
+    Parrot_interp_set_compiler(interp, type, compiler);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

@@ -116,7 +116,7 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_tailcall_p,                                 /*     28 */
   Parrot_returncc,                                   /*     29 */
   Parrot_capture_lex_p,                              /*     30 */
-  Parrot_newclosure_p_p,                             /*     31 */
+  Parrot_interp_newclosure_p_p,                             /*     31 */
   Parrot_set_args_pc,                                /*     32 */
   Parrot_get_params_pc,                              /*     33 */
   Parrot_set_returns_pc,                             /*     34 */
@@ -162,12 +162,12 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_trace_ic,                                   /*     74 */
   Parrot_gc_debug_i,                                 /*     75 */
   Parrot_gc_debug_ic,                                /*     76 */
-  Parrot_interpinfo_i_i,                             /*     77 */
-  Parrot_interpinfo_i_ic,                            /*     78 */
-  Parrot_interpinfo_p_i,                             /*     79 */
-  Parrot_interpinfo_p_ic,                            /*     80 */
-  Parrot_interpinfo_s_i,                             /*     81 */
-  Parrot_interpinfo_s_ic,                            /*     82 */
+  Parrot_interp_info_i_i,                             /*     77 */
+  Parrot_interp_info_i_ic,                            /*     78 */
+  Parrot_interp_info_pmc_i,                             /*     79 */
+  Parrot_interp_info_pmc_ic,                            /*     80 */
+  Parrot_interp_info_string_i,                             /*     81 */
+  Parrot_interp_info_string_ic,                            /*     82 */
   Parrot_warningson_i,                               /*     83 */
   Parrot_warningson_ic,                              /*     84 */
   Parrot_warningsoff_i,                              /*     85 */
@@ -206,8 +206,8 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_compreg_sc_p,                               /*    118 */
   Parrot_compreg_p_s,                                /*    119 */
   Parrot_compreg_p_sc,                               /*    120 */
-  Parrot_new_callback_p_p_p_s,                       /*    121 */
-  Parrot_new_callback_p_p_p_sc,                      /*    122 */
+  Parrot_interp_new_callback_p_p_p_s,                       /*    121 */
+  Parrot_interp_new_callback_p_p_p_sc,                      /*    122 */
   Parrot_annotations_p,                              /*    123 */
   Parrot_annotations_p_s,                            /*    124 */
   Parrot_annotations_p_sc,                           /*    125 */
@@ -630,10 +630,10 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_isa_i_p_sc,                                 /*    542 */
   Parrot_isa_i_p_p,                                  /*    543 */
   Parrot_isa_i_p_pc,                                 /*    544 */
-  Parrot_newclass_p_s,                               /*    545 */
-  Parrot_newclass_p_sc,                              /*    546 */
-  Parrot_newclass_p_p,                               /*    547 */
-  Parrot_newclass_p_pc,                              /*    548 */
+  Parrot_interp_newclass_p_s,                               /*    545 */
+  Parrot_interp_newclass_p_sc,                              /*    546 */
+  Parrot_interp_newclass_p_p,                               /*    547 */
+  Parrot_interp_newclass_p_pc,                              /*    548 */
   Parrot_subclass_p_p,                               /*    549 */
   Parrot_subclass_p_pc,                              /*    550 */
   Parrot_subclass_p_p_s,                             /*    551 */
@@ -684,18 +684,18 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_inspect_p_pc_s,                             /*    596 */
   Parrot_inspect_p_p_sc,                             /*    597 */
   Parrot_inspect_p_pc_sc,                            /*    598 */
-  Parrot_new_p_s,                                    /*    599 */
-  Parrot_new_p_sc,                                   /*    600 */
-  Parrot_new_p_s_p,                                  /*    601 */
-  Parrot_new_p_sc_p,                                 /*    602 */
-  Parrot_new_p_s_pc,                                 /*    603 */
-  Parrot_new_p_sc_pc,                                /*    604 */
-  Parrot_new_p_p,                                    /*    605 */
-  Parrot_new_p_pc,                                   /*    606 */
-  Parrot_new_p_p_p,                                  /*    607 */
-  Parrot_new_p_pc_p,                                 /*    608 */
-  Parrot_new_p_p_pc,                                 /*    609 */
-  Parrot_new_p_pc_pc,                                /*    610 */
+  Parrot_interp_new_p_s,                                    /*    599 */
+  Parrot_interp_new_p_sc,                                   /*    600 */
+  Parrot_interp_new_p_s_p,                                  /*    601 */
+  Parrot_interp_new_p_sc_p,                                 /*    602 */
+  Parrot_interp_new_p_s_pc,                                 /*    603 */
+  Parrot_interp_new_p_sc_pc,                                /*    604 */
+  Parrot_interp_new_p_p,                                    /*    605 */
+  Parrot_interp_new_p_pc,                                   /*    606 */
+  Parrot_interp_new_p_p_p,                                  /*    607 */
+  Parrot_interp_new_p_pc_p,                                 /*    608 */
+  Parrot_interp_new_p_p_pc,                                 /*    609 */
+  Parrot_interp_new_p_pc_pc,                                /*    610 */
   Parrot_root_new_p_p,                               /*    611 */
   Parrot_root_new_p_pc,                              /*    612 */
   Parrot_root_new_p_p_p,                             /*    613 */
@@ -954,9 +954,9 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_sprintf_s_s_p,                              /*    866 */
   Parrot_sprintf_s_sc_p,                             /*    867 */
   Parrot_sprintf_p_p_p,                              /*    868 */
-  Parrot_new_s,                                      /*    869 */
-  Parrot_new_s_i,                                    /*    870 */
-  Parrot_new_s_ic,                                   /*    871 */
+  Parrot_interp_new_s,                                      /*    869 */
+  Parrot_interp_new_s_i,                                    /*    870 */
+  Parrot_interp_new_s_ic,                                   /*    871 */
   Parrot_stringinfo_i_s_i,                           /*    872 */
   Parrot_stringinfo_i_sc_i,                          /*    873 */
   Parrot_stringinfo_i_s_ic,                          /*    874 */
@@ -1171,14 +1171,14 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_vivify_p_pc_s_pc,                           /*   1083 */
   Parrot_vivify_p_p_sc_pc,                           /*   1084 */
   Parrot_vivify_p_pc_sc_pc,                          /*   1085 */
-  Parrot_new_p_s_i,                                  /*   1086 */
-  Parrot_new_p_sc_i,                                 /*   1087 */
-  Parrot_new_p_s_ic,                                 /*   1088 */
-  Parrot_new_p_sc_ic,                                /*   1089 */
-  Parrot_new_p_p_i,                                  /*   1090 */
-  Parrot_new_p_pc_i,                                 /*   1091 */
-  Parrot_new_p_p_ic,                                 /*   1092 */
-  Parrot_new_p_pc_ic,                                /*   1093 */
+  Parrot_interp_new_p_s_i,                                  /*   1086 */
+  Parrot_interp_new_p_sc_i,                                 /*   1087 */
+  Parrot_interp_new_p_s_ic,                                 /*   1088 */
+  Parrot_interp_new_p_sc_ic,                                /*   1089 */
+  Parrot_interp_new_p_p_i,                                  /*   1090 */
+  Parrot_interp_new_p_pc_i,                                 /*   1091 */
+  Parrot_interp_new_p_p_ic,                                 /*   1092 */
+  Parrot_interp_new_p_pc_ic,                                /*   1093 */
   Parrot_root_new_p_p_i,                             /*   1094 */
   Parrot_root_new_p_pc_i,                            /*   1095 */
   Parrot_root_new_p_p_ic,                            /*   1096 */
@@ -1542,7 +1542,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 31 */
     "newclosure",
     "newclosure_p_p",
-    "Parrot_newclosure_p_p",
+    "Parrot_interp_newclosure_p_p",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_P },
@@ -2046,9 +2046,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 77 */
-    "interpinfo",
-    "interpinfo_i_i",
-    "Parrot_interpinfo_i_i",
+    "Parrot_interp_info",
+    "Parrot_interp_info_i_i",
+    "Parrot_interp_info_i_i",
     0,
     3,
     { PARROT_ARG_I, PARROT_ARG_I },
@@ -2057,9 +2057,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 78 */
-    "interpinfo",
-    "interpinfo_i_ic",
-    "Parrot_interpinfo_i_ic",
+    "Parrot_interp_info",
+    "Parrot_interp_info_i_ic",
+    "Parrot_interp_info_i_ic",
     0,
     3,
     { PARROT_ARG_I, PARROT_ARG_IC },
@@ -2068,9 +2068,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 79 */
-    "interpinfo",
-    "interpinfo_p_i",
-    "Parrot_interpinfo_p_i",
+    "Parrot_interp_info",
+    "Parrot_interp_info_pmc_i",
+    "Parrot_interp_info_pmc_i",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_I },
@@ -2079,9 +2079,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 80 */
-    "interpinfo",
-    "interpinfo_p_ic",
-    "Parrot_interpinfo_p_ic",
+    "Parrot_interp_info",
+    "Parrot_interp_info_pmc_ic",
+    "Parrot_interp_info_pmc_ic",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_IC },
@@ -2090,9 +2090,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 81 */
-    "interpinfo",
-    "interpinfo_s_i",
-    "Parrot_interpinfo_s_i",
+    "Parrot_interp_info",
+    "Parrot_interp_info_string_i",
+    "Parrot_interp_info_string_i",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_I },
@@ -2101,9 +2101,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 82 */
-    "interpinfo",
-    "interpinfo_s_ic",
-    "Parrot_interpinfo_s_ic",
+    "Parrot_interp_info",
+    "Parrot_interp_info_string_ic",
+    "Parrot_interp_info_string_ic",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_IC },
@@ -2532,7 +2532,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 121 */
     "new_callback",
     "new_callback_p_p_p_s",
-    "Parrot_new_callback_p_p_p_s",
+    "Parrot_interp_new_callback_p_p_p_s",
     0,
     5,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
@@ -2543,7 +2543,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 122 */
     "new_callback",
     "new_callback_p_p_p_sc",
-    "Parrot_new_callback_p_p_p_sc",
+    "Parrot_interp_new_callback_p_p_p_sc",
     0,
     5,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
@@ -7196,7 +7196,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 545 */
     "newclass",
     "newclass_p_s",
-    "Parrot_newclass_p_s",
+    "Parrot_interp_newclass_p_s",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_S },
@@ -7207,7 +7207,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 546 */
     "newclass",
     "newclass_p_sc",
-    "Parrot_newclass_p_sc",
+    "Parrot_interp_newclass_p_sc",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_SC },
@@ -7218,7 +7218,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 547 */
     "newclass",
     "newclass_p_p",
-    "Parrot_newclass_p_p",
+    "Parrot_interp_newclass_p_p",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_P },
@@ -7229,7 +7229,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 548 */
     "newclass",
     "newclass_p_pc",
-    "Parrot_newclass_p_pc",
+    "Parrot_interp_newclass_p_pc",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_PC },
@@ -7790,7 +7790,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 599 */
     "new",
     "new_p_s",
-    "Parrot_new_p_s",
+    "Parrot_interp_new_p_s",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_S },
@@ -7801,7 +7801,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 600 */
     "new",
     "new_p_sc",
-    "Parrot_new_p_sc",
+    "Parrot_interp_new_p_sc",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_SC },
@@ -7812,7 +7812,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 601 */
     "new",
     "new_p_s_p",
-    "Parrot_new_p_s_p",
+    "Parrot_interp_new_p_s_p",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_P },
@@ -7823,7 +7823,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 602 */
     "new",
     "new_p_sc_p",
-    "Parrot_new_p_sc_p",
+    "Parrot_interp_new_p_sc_p",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_P },
@@ -7834,7 +7834,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 603 */
     "new",
     "new_p_s_pc",
-    "Parrot_new_p_s_pc",
+    "Parrot_interp_new_p_s_pc",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_PC },
@@ -7845,7 +7845,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 604 */
     "new",
     "new_p_sc_pc",
-    "Parrot_new_p_sc_pc",
+    "Parrot_interp_new_p_sc_pc",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_PC },
@@ -7856,7 +7856,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 605 */
     "new",
     "new_p_p",
-    "Parrot_new_p_p",
+    "Parrot_interp_new_p_p",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_P },
@@ -7867,7 +7867,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 606 */
     "new",
     "new_p_pc",
-    "Parrot_new_p_pc",
+    "Parrot_interp_new_p_pc",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_PC },
@@ -7878,7 +7878,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 607 */
     "new",
     "new_p_p_p",
-    "Parrot_new_p_p_p",
+    "Parrot_interp_new_p_p_p",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_P },
@@ -7889,7 +7889,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 608 */
     "new",
     "new_p_pc_p",
-    "Parrot_new_p_pc_p",
+    "Parrot_interp_new_p_pc_p",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_P },
@@ -7900,7 +7900,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 609 */
     "new",
     "new_p_p_pc",
-    "Parrot_new_p_p_pc",
+    "Parrot_interp_new_p_p_pc",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_PC },
@@ -7911,7 +7911,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 610 */
     "new",
     "new_p_pc_pc",
-    "Parrot_new_p_pc_pc",
+    "Parrot_interp_new_p_pc_pc",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_PC },
@@ -10760,7 +10760,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 869 */
     "new",
     "new_s",
-    "Parrot_new_s",
+    "Parrot_interp_new_s",
     0,
     2,
     { PARROT_ARG_S },
@@ -10771,7 +10771,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 870 */
     "new",
     "new_s_i",
-    "Parrot_new_s_i",
+    "Parrot_interp_new_s_i",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_I },
@@ -10782,7 +10782,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 871 */
     "new",
     "new_s_ic",
-    "Parrot_new_s_ic",
+    "Parrot_interp_new_s_ic",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_IC },
@@ -13147,7 +13147,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1086 */
     "new",
     "new_p_s_i",
-    "Parrot_new_p_s_i",
+    "Parrot_interp_new_p_s_i",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_I },
@@ -13158,7 +13158,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1087 */
     "new",
     "new_p_sc_i",
-    "Parrot_new_p_sc_i",
+    "Parrot_interp_new_p_sc_i",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_I },
@@ -13169,7 +13169,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1088 */
     "new",
     "new_p_s_ic",
-    "Parrot_new_p_s_ic",
+    "Parrot_interp_new_p_s_ic",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_IC },
@@ -13180,7 +13180,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1089 */
     "new",
     "new_p_sc_ic",
-    "Parrot_new_p_sc_ic",
+    "Parrot_interp_new_p_sc_ic",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_IC },
@@ -13191,7 +13191,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1090 */
     "new",
     "new_p_p_i",
-    "Parrot_new_p_p_i",
+    "Parrot_interp_new_p_p_i",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_I },
@@ -13202,7 +13202,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1091 */
     "new",
     "new_p_pc_i",
-    "Parrot_new_p_pc_i",
+    "Parrot_interp_new_p_pc_i",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_I },
@@ -13213,7 +13213,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1092 */
     "new",
     "new_p_p_ic",
-    "Parrot_new_p_p_ic",
+    "Parrot_interp_new_p_p_ic",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_IC },
@@ -13224,7 +13224,7 @@ static op_info_t core_op_info_table[1103] = {
   { /* 1093 */
     "new",
     "new_p_pc_ic",
-    "Parrot_new_p_pc_ic",
+    "Parrot_interp_new_p_pc_ic",
     0,
     4,
     { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_IC },
@@ -13626,7 +13626,7 @@ Parrot_capture_lex_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_newclosure_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_newclosure_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_sub_new_closure(interp, PREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
@@ -14207,7 +14207,7 @@ Parrot_debug_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_bounds_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_BOUNDS_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_BOUNDS_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG);
@@ -14221,7 +14221,7 @@ Parrot_bounds_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_bounds_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_BOUNDS_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_BOUNDS_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG);
@@ -14235,7 +14235,7 @@ Parrot_bounds_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_profile_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_PROFILE_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_PROFILE_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG);
@@ -14249,7 +14249,7 @@ Parrot_profile_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_profile_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_PROFILE_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_PROFILE_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG);
@@ -14263,10 +14263,10 @@ Parrot_profile_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trace_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_trace(interp, IREG(1));
+        Parrot_interp_set_trace(interp, IREG(1));
     }
     else {
-        Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
+        Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
     }
 
             interp->resume_offset = REL_PC + 2; interp->resume_flag = 1;;
@@ -14277,10 +14277,10 @@ Parrot_trace_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trace_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_trace(interp, ICONST(1));
+        Parrot_interp_set_trace(interp, ICONST(1));
     }
     else {
-        Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
+        Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
     }
 
             interp->resume_offset = REL_PC + 2; interp->resume_flag = 1;;
@@ -14313,34 +14313,34 @@ Parrot_gc_debug_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_interpinfo_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = interpinfo(interp, IREG(2));
+Parrot_interp_info_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    IREG(1) = Parrot_interp_info(interp, IREG(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interpinfo_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = interpinfo(interp, ICONST(2));
+Parrot_interp_info_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    IREG(1) = Parrot_interp_info(interp, ICONST(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interpinfo_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = interpinfo_p(interp, IREG(2));
+Parrot_interp_info_pmc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = Parrot_interp_info_pmc(interp, IREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interpinfo_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = interpinfo_p(interp, ICONST(2));
+Parrot_interp_info_pmc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = Parrot_interp_info_pmc(interp, ICONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interpinfo_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    STRING  * const  s = interpinfo_s(interp, IREG(2));
+Parrot_interp_info_string_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    STRING  * const  s = Parrot_interp_info_string(interp, IREG(2));
 
     SREG(1) = s;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -14348,8 +14348,8 @@ Parrot_interpinfo_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_interpinfo_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    STRING  * const  s = interpinfo_s(interp, ICONST(2));
+Parrot_interp_info_string_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    STRING  * const  s = Parrot_interp_info_string(interp, ICONST(2));
 
     SREG(1) = s;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -14789,14 +14789,14 @@ Parrot_compreg_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_callback_p_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_callback_p_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_make_cb(interp, PREG(2), PREG(3), SREG(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
 }
 
 opcode_t *
-Parrot_new_callback_p_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_callback_p_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_make_cb(interp, PREG(2), PREG(3), SCONST(4));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 5;
@@ -18294,7 +18294,7 @@ Parrot_isa_i_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_newclass_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_newclass_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name = Parrot_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, SREG(2));
@@ -18304,7 +18304,7 @@ Parrot_newclass_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_newclass_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_newclass_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name = Parrot_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, SCONST(2));
@@ -18314,14 +18314,14 @@ Parrot_newclass_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_newclass_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_newclass_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_newclass_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_newclass_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_pmc_new_init(interp, enum_class_Class, PCONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
@@ -18945,7 +18945,7 @@ Parrot_inspect_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -18970,7 +18970,7 @@ Parrot_new_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -18995,7 +18995,7 @@ Parrot_new_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -19020,7 +19020,7 @@ Parrot_new_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -19045,7 +19045,7 @@ Parrot_new_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -19070,7 +19070,7 @@ Parrot_new_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -19095,7 +19095,7 @@ Parrot_new_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PREG(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -19120,7 +19120,7 @@ Parrot_new_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PCONST(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -19145,7 +19145,7 @@ Parrot_new_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PREG(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -19170,7 +19170,7 @@ Parrot_new_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PCONST(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -19195,7 +19195,7 @@ Parrot_new_p_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PREG(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -19220,7 +19220,7 @@ Parrot_new_p_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  name_key = PCONST(2);
     PMC  * const  _class = Parrot_oo_get_class(interp, name_key);
 
@@ -21125,14 +21125,14 @@ Parrot_sprintf_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_s(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_s(opcode_t *cur_opcode, PARROT_INTERP) {
     SREG(1) = Parrot_str_new_noinit(interp, 0);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 2;
 }
 
 opcode_t *
-Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
     Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
     SREG(1) = Parrot_str_new_noinit(interp, IREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -21140,7 +21140,7 @@ Parrot_new_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
     SREG(1) = Parrot_str_new_noinit(interp, ICONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -23572,7 +23572,7 @@ Parrot_vivify_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -23600,7 +23600,7 @@ Parrot_new_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -23628,7 +23628,7 @@ Parrot_new_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -23656,7 +23656,7 @@ Parrot_new_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
 
@@ -23684,7 +23684,7 @@ Parrot_new_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const   name_key = PREG(2);
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
@@ -23717,7 +23717,7 @@ Parrot_new_p_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const   name_key = PCONST(2);
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
@@ -23750,7 +23750,7 @@ Parrot_new_p_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const   name_key = PREG(2);
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
@@ -23783,7 +23783,7 @@ Parrot_new_p_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_interp_new_p_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const   name_key = PCONST(2);
     const INTVAL   type = Parrot_pmc_get_type(interp, name_key);
 
