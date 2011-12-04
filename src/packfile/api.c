@@ -2688,7 +2688,8 @@ Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
 {
     ASSERT_ARGS(Parrot_pf_get_version_string)
     PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pbc);
-    return Parrot_sprintf_c(interp, "%d.%d.%d", pf->header->major, pf->header->minor, pf->header->patch);
+    return Parrot_sprintf_c(interp, "%d.%d.%d",
+            pf->header->major, pf->header->minor, pf->header->patch);
 }
 
 /*
