@@ -185,7 +185,7 @@ tree as a PIR code object that can be compiled.
           .local int cpos, iscont
           $P0 = get_hll_global ['PGE'], '$!MATCH'
           (mob, cpos, target, mfrom, mpos, iscont) = $P0.'new'(mob, adverbs :flat :named)
-          $P0 = interpinfo %3
+          $P0 = Parrot_interp_info %3
           setattribute mob, '&!corou', $P0
           .local int lastpos
           lastpos = length target
