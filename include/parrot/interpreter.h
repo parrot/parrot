@@ -343,7 +343,7 @@ void Parrot_interp_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
+void Parrot_interp_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -365,7 +365,7 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
 #define ASSERT_ARGS_Parrot_interp_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(stack_top))
 #define ASSERT_ARGS_Parrot_interp_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)

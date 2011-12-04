@@ -127,7 +127,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     Parrot_GC_Init_Args gc_args;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     Parrot_jump_buff env;
-    interp_raw = allocate_interpreter(parent_raw, flags);
+    interp_raw = Parrot_interp_allocate_interpreter(parent_raw, flags);
     if (setjmp(env)) {
         interp_raw->api_jmp_buf = NULL;
         *interp = NULL;
@@ -556,7 +556,7 @@ Parrot_api_get_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *compiler = Parrot_get_compiler(interp, type);
+    *compiler = Parrot_interp_get_compiler(interp, type);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

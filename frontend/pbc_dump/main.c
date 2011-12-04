@@ -328,10 +328,10 @@ main(int argc, const char **argv)
     if (argc < 2)
         help();
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
 
     /* init and set top of stack */
-    Parrot_init_stacktop(interp, &status);
+    Parrot_interp_init_stacktop(interp, &status);
 
     while ((status = longopt_get(argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {

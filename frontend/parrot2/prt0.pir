@@ -262,7 +262,7 @@
 
 .sub '__show_runtime_prefix_and_exit' :subid('WSubId_1') :anon
     null $S1
-    interpinfo $S1, 24
+    interpinfo ($S1, 24)
     say $S1
     exit 0
 

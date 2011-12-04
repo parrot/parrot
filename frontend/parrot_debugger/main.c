@@ -169,7 +169,7 @@ main(int argc, const char *argv[])
     PDB_t *pdb;
     const char       *scriptname = NULL;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
 
     Parrot_debugger_init(interp);
     pdb = interp->pdb;
@@ -205,7 +205,7 @@ main(int argc, const char *argv[])
             Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
 
             Parrot_pf_set_current_packfile(interp, pf);
-            Parrot_compile_file(interp, str, 0);
+            Parrot_interp_compile_file(interp, str, 0);
             /*if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
 

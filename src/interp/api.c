@@ -93,9 +93,9 @@ PARROT_MALLOC
 Parrot_Interp
 Parrot_interp_new(ARGIN_NULLOK(Parrot_Interp parent))
 {
-    ASSERT_ARGS(Parrot_new)
+    ASSERT_ARGS(Parrot_interp_new)
     /* api.c:make_interpreter builds a new Parrot_Interp. */
-    return make_interpreter(parent, PARROT_NO_FLAGS);
+    return Parrot_interp_make_interpreter(parent, PARROT_NO_FLAGS);
 }
 
 /*
@@ -120,7 +120,7 @@ PARROT_EXPORT
 void
 Parrot_interp_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
 {
-    ASSERT_ARGS(Parrot_init_stacktop)
+    ASSERT_ARGS(Parrot_interp_init_stacktop)
     interp->lo_var_ptr = stack_top;
     Parrot_gbl_init_world_once(interp);
 }
@@ -141,7 +141,7 @@ PARROT_MALLOC
 Parrot_Interp
 Parrot_interp_make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
-    ASSERT_ARGS(make_interpreter)
+    ASSERT_ARGS(Parrot_interp_make_interpreter)
     int stacktop;
     Parrot_GC_Init_Args args;
     Interp * const interp = Parrot_interp_allocate_interpreter(parent, flags);
@@ -174,7 +174,7 @@ PARROT_MALLOC
 Parrot_Interp
 Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
-    ASSERT_ARGS(allocate_interpreter)
+    ASSERT_ARGS(Parrot_interp_allocate_interpreter)
     Interp *interp;
 
     /* Get an empty interpreter from system memory */
@@ -229,7 +229,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Interp
 Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
-    ASSERT_ARGS(initialize_interpreter)
+    ASSERT_ARGS(Parrot_interp_initialize_interpreter)
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, args);
@@ -358,7 +358,7 @@ PARROT_EXPORT
 void
 Parrot_interp_destroy(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_destroy)
+    ASSERT_ARGS(Parrot_interp_destroy)
 #ifdef ATEXIT_DESTROY
     UNUSED(interp);
 #else
@@ -380,7 +380,7 @@ closes any open file handles, etc.
 void
 Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 {
-    ASSERT_ARGS(Parrot_really_destroy)
+    ASSERT_ARGS(Parrot_interp_really_destroy)
 
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
@@ -510,7 +510,7 @@ other than error handling.
 PARROT_CAN_RETURN_NULL
 Interp*
 Parrot_interp_get_emergency_interpreter(void) {
-    ASSERT_ARGS(Parrot_get_emergency_interp)
+    ASSERT_ARGS(Parrot_interp_get_emergency_interpreter)
 
     return emergency_interp;
 }
@@ -551,7 +551,7 @@ void
 Parrot_interp_register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
                     ARGIN(const char *name), ARGIN(const char *proto))
 {
-    ASSERT_ARGS(register_nci_method)
+    ASSERT_ARGS(Parrot_interp_register_nci_method)
     PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
     STRING * const method_name = Parrot_str_new_init(interp, name, strlen(name),
         Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
@@ -584,7 +584,7 @@ void
 Parrot_interp_register_native_pcc_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
         ARGIN(STRING *name), ARGIN(STRING *signature))
 {
-    ASSERT_ARGS(register_native_pcc_method_in_ns)
+    ASSERT_ARGS(Parrot_interp_register_native_pcc_method_in_ns)
     PMC * method = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
 
     /* setup call func */
@@ -610,7 +610,7 @@ PARROT_EXPORT
 void
 Parrot_interp_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
-    ASSERT_ARGS(Parrot_mark_method_writes)
+    ASSERT_ARGS(Parrot_interp_mark_method_writes)
     STRING *const str_name = Parrot_str_new_constant(interp, name);
     PMC    *const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
     PMC    *const method   = VTABLE_get_pmc_keyed_str(
@@ -634,7 +634,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_interp_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
 {
-    ASSERT_ARGS(Parrot_get_compiler)
+    ASSERT_ARGS(Parrot_interp_get_compiler)
     PMC * const  hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     if (PMC_IS_NULL(hash)) {
@@ -660,7 +660,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 {
-    ASSERT_ARGS(Parrot_set_compiler)
+    ASSERT_ARGS(Parrot_interp_set_compiler)
     PMC    * const iglobals = interp->iglobals;
     PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
                               IGLOBALS_COMPREG_HASH);
@@ -695,12 +695,12 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_interp_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 {
-    ASSERT_ARGS(Parrot_compile_file)
+    ASSERT_ARGS(Parrot_interp_compile_file)
     PMC *result               = NULL;
     UINTVAL regs_used[4]      = {3, 3, 3, 3};
     PMC * const newcontext    = Parrot_push_context(interp, regs_used);
     STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
-    PMC * compiler   = Parrot_get_compiler(interp, compiler_s);
+    PMC * compiler   = Parrot_interp_get_compiler(interp, compiler_s);
     imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
 
     Parrot_block_GC_mark(interp);
@@ -742,8 +742,8 @@ Parrot_PMC
 Parrot_interp_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
         ARGOUT(Parrot_String *error))
 {
-    ASSERT_ARGS(Parrot_compile_string)
-    PMC * const compiler = Parrot_get_compiler(interp, type);
+    ASSERT_ARGS(Parrot_interp_compile_string)
+    PMC * const compiler = Parrot_interp_get_compiler(interp, type);
 
     /* XXX error is not being set */
     if (PMC_IS_NULL(compiler)) {
@@ -785,7 +785,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_interp_info(PARROT_INTERP, INTVAL what)
 {
-    ASSERT_ARGS(interpinfo)
+    ASSERT_ARGS(Parrot_interp_info)
     INTVAL ret;
 
     switch (what) {
@@ -856,7 +856,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
 {
-    ASSERT_ARGS(interpinfo_p)
+    ASSERT_ARGS(Parrot_interp_info_pmc)
 
     PMC *result;
     switch (what) {
@@ -908,7 +908,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING*
 Parrot_interp_info_string(PARROT_INTERP, INTVAL what)
 {
-    ASSERT_ARGS(interpinfo_s)
+    ASSERT_ARGS(Parrot_interp_info_string)
     switch (what) {
         case EXECUTABLE_FULLNAME: {
             PMC * const exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
@@ -975,7 +975,7 @@ PARROT_CANNOT_RETURN_NULL
 Interp *
 Parrot_interp_get_from_pmc(ARGIN(PMC * interp_pmc))
 {
-    ASSERT_ARGS(Parrot_int_get_interp_from_pmc)
+    ASSERT_ARGS(Parrot_interp_get_from_pmc)
     PARROT_ASSERT(interp_pmc->vtable->base_type == enum_class_ParrotInterpreter);
     return ((Parrot_ParrotInterpreter_attributes*)interp_pmc->data)->interp;
 }
@@ -998,7 +998,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_flag(PARROT_INTERP, INTVAL flag)
 {
-    ASSERT_ARGS(Parrot_set_flag)
+    ASSERT_ARGS(Parrot_interp_set_flag)
     /* These two macros (from interpreter.h) do exactly what they look like. */
 
     Interp_flags_SET(interp, flag);
@@ -1027,7 +1027,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_debug(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_set_debug)
+    ASSERT_ARGS(Parrot_interp_set_debug)
     interp->debug_flags |= flag;
 }
 
@@ -1047,7 +1047,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_executable_name(PARROT_INTERP, ARGIN(STRING * const name))
 {
-    ASSERT_ARGS(Parrot_set_executable_name)
+    ASSERT_ARGS(Parrot_interp_set_executable_name)
     PMC * const name_pmc = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, name_pmc, name);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
@@ -1069,7 +1069,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_trace(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_set_trace)
+    ASSERT_ARGS(Parrot_interp_set_trace)
     Parrot_pcc_trace_flags_on(interp, interp->ctx, flag);
     Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
 }
@@ -1089,7 +1089,7 @@ PARROT_EXPORT
 void
 Parrot_interp_clear_flag(PARROT_INTERP, INTVAL flag)
 {
-    ASSERT_ARGS(Parrot_clear_flag)
+    ASSERT_ARGS(Parrot_interp_clear_flag)
     Interp_flags_CLEAR(interp, flag);
 }
 
@@ -1108,7 +1108,7 @@ PARROT_EXPORT
 void
 Parrot_interp_clear_debug(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_clear_debug)
+    ASSERT_ARGS(Parrot_interp_clear_debug)
     interp->debug_flags &= ~flag;
 }
 
@@ -1127,7 +1127,7 @@ PARROT_EXPORT
 void
 Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_clear_trace)
+    ASSERT_ARGS(Parrot_interp_clear_trace)
     Parrot_pcc_trace_flags_off(interp, interp->ctx, flag);
 }
 
@@ -1147,7 +1147,7 @@ PARROT_PURE_FUNCTION
 Parrot_Int
 Parrot_interp_test_flag(PARROT_INTERP, INTVAL flag)
 {
-    ASSERT_ARGS(Parrot_test_flag)
+    ASSERT_ARGS(Parrot_interp_test_flag)
     return Interp_flags_TEST(interp, flag);
 }
 
@@ -1167,7 +1167,7 @@ PARROT_PURE_FUNCTION
 Parrot_UInt
 Parrot_interp_test_debug(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_test_debug)
+    ASSERT_ARGS(Parrot_interp_test_debug)
     return interp->debug_flags & flag;
 }
 
@@ -1187,7 +1187,7 @@ PARROT_PURE_FUNCTION
 Parrot_UInt
 Parrot_interp_test_trace(PARROT_INTERP, UINTVAL flag)
 {
-    ASSERT_ARGS(Parrot_test_trace)
+    ASSERT_ARGS(Parrot_interp_test_trace)
     return Parrot_pcc_trace_flags_test(interp, interp->ctx, flag);
 }
 
@@ -1206,7 +1206,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
 {
-    ASSERT_ARGS(Parrot_set_run_core)
+    ASSERT_ARGS(Parrot_interp_set_run_core)
     switch (core) {
       case PARROT_SLOW_CORE:
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
@@ -1256,7 +1256,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_warnings(PARROT_INTERP, Parrot_warnclass wc)
 {
-    ASSERT_ARGS(Parrot_setwarnings)
+    ASSERT_ARGS(Parrot_interp_setwarnings)
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, wc);
 }
