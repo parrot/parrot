@@ -1184,7 +1184,7 @@ EOC
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$symbol_name");
+        Parrot_interp_mark_method_writes(interp, entry, "$symbol_name");
 EOC
         }
     }

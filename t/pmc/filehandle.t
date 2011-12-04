@@ -828,7 +828,7 @@ SKIP: {
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
 .sub main :main
-    interpinfo $I0, 2    # GC mark runs
+    Parrot_interp_info $I0, 2    # GC mark runs
     $P0 = new ['FileHandle']
     $P0.'open'(temp_file, 'w')
         needs_destroy $P0

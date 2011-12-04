@@ -39,7 +39,7 @@ pin/unpin
     plan(TESTS)
 
     test_stringinfo()
-    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
+    $S0 = Parrot_interp_info .INTERPINFO_GC_SYS_NAME
     if $S0 != "ms" goto dont_run_hanging_tests
     test_pin_unpin()
     goto test_end
@@ -99,19 +99,19 @@ pin/unpin
 
     init = stringinfo $S6, .STRINGINFO_STRSTART
 
-    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I0 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
   loop1:
     collect
-    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I1 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
     before = stringinfo $S6, .STRINGINFO_STRSTART
     unpin $S6
 
-    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I0 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
   loop2:
     collect
-    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
+    $I1 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
     after = stringinfo $S6, .STRINGINFO_STRSTART

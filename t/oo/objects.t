@@ -1640,7 +1640,7 @@ end:
 .sub Foo54__set
     get_params "0,0", $P5, $S4
     ok( 1, "in Foo54__set" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     setattribute $P2, $S4, $P5
     set_returns ""
     returncc
@@ -1650,7 +1650,7 @@ end:
 .sub Foo54__get
     get_params "0", $S4
     ok( 1, "in Foo54__get" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5
     returncc
@@ -1658,7 +1658,7 @@ end:
 
 .sub Bar54__set
     get_params "0,0", $P5, $S4
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     ok( 1, "in Bar54__set" )
     setattribute $P2, $S4, $P5
     set_returns ""
@@ -1668,7 +1668,7 @@ end:
 .sub Bar54__get
     get_params "0", $S4
     ok( 1, "in Bar54__get" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5
     returncc
@@ -1758,7 +1758,7 @@ end:
 # set(obj: Pvalue, SClass, Sattr)
 .sub set
     get_params "0,0,0", $P5, $S4, $S5
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     setattribute $P2, $S5, $P5
     set_returns ""
     returncc
@@ -1767,7 +1767,7 @@ end:
 # Pattr = get(obj: SClass, Sattr)
 .sub get
     get_params "0,0", $S4, $S5
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S5
     set_returns "0", $P5
     returncc

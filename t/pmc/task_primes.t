@@ -89,7 +89,7 @@ loop:
     .local pmc cp, ct
 
     cp = get_global 'check_prime'
-    ct = interpinfo .INTERPINFO_CURRENT_TASK
+    ct = Parrot_interp_info .INTERPINFO_CURRENT_TASK
 
     $P0 = new 'Hash'
     $P0['code'] = cp

@@ -101,7 +101,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
     getinterp P0
     print "ok 1\n"
     set I0, P0[.INTERPINFO_ACTIVE_PMCS]
-    interpinfo I1, .INTERPINFO_ACTIVE_PMCS
+    Parrot_interp_info I1, .INTERPINFO_ACTIVE_PMCS
     eq I0, I1, ok2
     print "not "
   ok2:
@@ -148,12 +148,12 @@ after
 OUTPUT
 
 
-pir_output_is( <<'CODE', <<'OUTPUT', "interpinfo & getinterp: current runcore" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Parrot_interp_info & getinterp: current runcore" );
 .include 'interpinfo.pasm'
 .include 'interpcores.pasm'
 
 .sub 'test' :main
-    $I0 = interpinfo .INTERPINFO_CURRENT_RUNCORE
+    $I0 = Parrot_interp_info .INTERPINFO_CURRENT_RUNCORE
     if $I0 == .PARROT_FUNCTION_CORE   goto ok1
     if $I0 == .PARROT_FAST_CORE       goto ok1
     if $I0 == .PARROT_EXEC_CORE       goto ok1
