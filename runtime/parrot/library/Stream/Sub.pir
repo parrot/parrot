@@ -98,7 +98,7 @@ END:
     .param string str
     .local pmc cont
 .include "interpinfo.pasm"
-    cont = interpinfo .INTERPINFO_CURRENT_CONT
+    cont = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     assign self, cont
     writer(str)
 .end
@@ -117,7 +117,7 @@ END:
     $I0 = defined temp
     unless $I0 goto END
     .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
+    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     setattribute self, 'write_cont', $P0
 
     str = temp( self )

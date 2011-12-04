@@ -52,7 +52,7 @@ loop:
 
 .sub 'init' :vtable
 .include "interpinfo.pasm"
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info $P2, .INTERPINFO_CURRENT_OBJECT
     new $P10, 'Integer'
     set $P10, 10
     setattribute $P2, ".i", $P10

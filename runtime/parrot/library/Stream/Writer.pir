@@ -57,8 +57,8 @@ END:
     .local pmc mysub
     #.local pmc myself
 
-    interpinfo mysub, .INTERPINFO_CURRENT_SUB
-    #interpinfo myself, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info mysub, .INTERPINFO_CURRENT_SUB
+    #Parrot_interp_info myself, .INTERPINFO_CURRENT_OBJECT
     getprop source, "CALL", mysub
     source()
 
@@ -68,7 +68,7 @@ END:
 
     # mark it as closed
     .local pmc status
-    interpinfo self, .INTERPINFO_CURRENT_OBJECT
+    Parrot_interp_info self, .INTERPINFO_CURRENT_OBJECT
     getattribute status, self, 'status'
     status = 0
 .end
@@ -126,7 +126,7 @@ END:
     .local pmc status
 
     .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
+    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     setattribute self, 'writer', $P0
     getattribute status, self, 'status'
 
@@ -137,7 +137,7 @@ END:
 WRITE:
 
     .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
+    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     setattribute self, 'writer', $P0
 
     source = self."source"()
@@ -180,7 +180,7 @@ END_OF_STREAM:
     .local pmc cont
     .local string str
 
-    cont = interpinfo .INTERPINFO_CURRENT_CONT
+    cont = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     self."setSource"( cont )
     str = writer()
     .return(str)

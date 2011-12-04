@@ -158,7 +158,7 @@ marked as dead, in which case it is an error to attempt to resume it again.
 doit:
     ## Remember where to return when we yield.
     .local pmc cc
-    cc = interpinfo .INTERPINFO_CURRENT_CONT
+    cc = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     setattribute self, 'yield_cont', cc
 
     ## Call the entry with our args.  Most of the time, it will yield (by
@@ -197,7 +197,7 @@ passed to C<resume> are returned as the values from C<yield>.
 
     ## Remember where to go when we are resumed.
     .local pmc cc
-    cc = interpinfo .INTERPINFO_CURRENT_CONT
+    cc = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     setattribute self, 'resume_cont', cc
 
     ## Return to the coro caller.

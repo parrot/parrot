@@ -52,7 +52,7 @@ current point in the computation as a continuation and runs the next thread.
     # This gets the return continuation for the currently running sub.
     # When this continuation is invoked, it will be as if this call
     # to th_resched just returned.
-    cur_th = interpinfo .INTERPINFO_CURRENT_CONT
+    cur_th = Parrot_interp_info .INTERPINFO_CURRENT_CONT
     push ths, cur_th
 
 again:

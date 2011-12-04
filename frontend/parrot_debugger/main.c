@@ -221,7 +221,7 @@ main(int argc, const char *argv[])
         STRING *compiler = Parrot_str_new_constant(interp, "PIR");
         STRING *errstr = NULL;
         const char source []= ".sub aux :main\nexit 0\n.end\n";
-        PMC *code = Parrot_compile_string(interp, compiler, source, &errstr);
+        PMC *code = Parrot_interp_compile_string(interp, compiler, source, &errstr);
 
         if (!STRING_IS_NULL(errstr))
             Parrot_io_eprintf(interp, "%Ss\n", errstr);
