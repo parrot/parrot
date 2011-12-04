@@ -841,7 +841,7 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PMC* Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)>
+=item C<PMC* Parrot_interp_info_p(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -854,9 +854,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
+Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
 {
-    ASSERT_ARGS(Parrot_interp_info_pmc)
+    ASSERT_ARGS(Parrot_interp_info_p)
 
     PMC *result;
     switch (what) {
@@ -889,7 +889,7 @@ Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<STRING* Parrot_interp_info_string(PARROT_INTERP, INTVAL what)>
+=item C<STRING* Parrot_interp_info_s(PARROT_INTERP, INTVAL what)>
 
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
@@ -906,9 +906,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-Parrot_interp_info_string(PARROT_INTERP, INTVAL what)
+Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
 {
-    ASSERT_ARGS(Parrot_interp_info_string)
+    ASSERT_ARGS(Parrot_interp_info_s)
     switch (what) {
         case EXECUTABLE_FULLNAME: {
             PMC * const exe_name = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,

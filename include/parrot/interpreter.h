@@ -442,13 +442,13 @@ INTVAL Parrot_interp_info(PARROT_INTERP, INTVAL what)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_interp_info_pmc(PARROT_INTERP, INTVAL what)
+PMC* Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING* Parrot_interp_info_string(PARROT_INTERP, INTVAL what)
+STRING* Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -574,9 +574,9 @@ void register_nci_method(PARROT_INTERP,
 
 #define ASSERT_ARGS_Parrot_interp_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_interp_info_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_info_p __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_interp_info_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_info_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

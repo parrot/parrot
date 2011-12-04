@@ -1046,11 +1046,11 @@ op Parrot_interp_info(out INT, in INT) {
 }
 
 op Parrot_interp_info(out PMC, in INT) {
-    $1 = Parrot_interp_info_pmc(interp, $2);
+    $1 = Parrot_interp_info_p(interp, $2);
 }
 
 op Parrot_interp_info(out STR, in INT) {
-    STRING * const s = Parrot_interp_info_string(interp, $2);
+    STRING * const s = Parrot_interp_info_s(interp, $2);
     $1 = s;
 }
 
