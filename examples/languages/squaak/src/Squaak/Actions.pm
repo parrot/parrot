@@ -365,6 +365,7 @@ method quote:sym<'>($/) { make $<quote_EXPR>.ast; }
 method quote:sym<">($/) { make $<quote_EXPR>.ast; }
 
 method circumfix:sym<( )>($/) { make $<EXPR>.ast; }
+method postcircumfix:sym<( )>($/) { make $<arguments>.ast }
 
 method named_field($/) {
     my $past := $<EXPR>.ast;

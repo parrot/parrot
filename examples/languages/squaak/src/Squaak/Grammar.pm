@@ -159,6 +159,7 @@ token quote:sym<"> { <?["]> <quote_EXPR: ':qq'> }
 ## Operators
 
 INIT {
+    Squaak::Grammar.O(':prec<x>, :assoc<unary>', '%methodop');
     Squaak::Grammar.O(':prec<w>, :assoc<unary>', '%unary-negate');
     Squaak::Grammar.O(':prec<v>, :assoc<unary>', '%unary-not');
     Squaak::Grammar.O(':prec<u>, :assoc<left>',  '%multiplicative');
@@ -169,6 +170,9 @@ INIT {
 }
 
 token circumfix:sym<( )> { '(' <.ws> <EXPR> ')' }
+token postcircumfix:sym<( )> {
+    <arguments> <O( '%methodop, :pasttype<call>' )>
+}
 
 rule circumfix:sym<[ ]> {
     '[' [<EXPR> ** ',']? ']'
