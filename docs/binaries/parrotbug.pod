@@ -1,0 +1,95 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 Name
+
+parrotbug.pod - Parrot bug report
+
+=head1 Description
+
+A program to help generate bug reports about parrot, and mail them.
+It is designed to be used interactively. Normally no arguments will
+be needed.
+
+=head1 Usage
+
+parrotbug [option] [action]
+
+=head2 Comman line Options
+
+To report successful build on this system to parrot developers use :
+
+    --ok
+
+Only use B<--ok> if everything was ok.If there were any problems at all, use :
+
+    --nok
+
+It is used to Report unsuccessful build on system.
+
+To include specific summary with the message use :
+
+    --summary <summary>
+
+To include specific category to the bug report use :
+
+    --category <category>
+
+To include severity to the bug report use :
+
+    --severity <severity>
+
+To set your emal addres use :
+
+    --from <address>
+
+To open editor to use for editing the bug report use :
+
+    --editor <editor>
+
+Not to send a bug report which receive acknowledgement use :
+   
+    --ack
+    --noack
+
+To open a file containing the body of the report use :
+
+    --input-file
+
+Use this to quickly send a prepared message.
+
+To view file where parrotbug will save it's bug report use :
+
+    --output-file
+
+Note: you will be prompted if the program miss some information.
+
+=head2 Command line Actions
+
+To dump message use :
+
+    --dump
+
+To save message use :
+
+    --save
+
+To print help message and exit after that use :
+
+    --help
+
+To print version information and exit after that use :
+
+    --version
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut
+
+
+
+
+
