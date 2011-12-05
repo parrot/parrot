@@ -1,0 +1,147 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 Name
+
+plumage.pod - Parrot Plumage 
+
+=head1 Description
+
+Parrot Plumage is the Parrot Virtual Machine module ecosystem.  It includes
+tools to search metadata, handle dependencies, install modules, and so forth.
+
+=head1 Usage
+
+plumage [<options>] <command> [<arguments>]
+
+=head1 Command line options
+
+For help about options and commands you can type:
+
+    plumage usage
+
+Or to use command line option help :
+
+    plumage -h
+    plumage --help
+
+To read additional config file use :
+
+    -c
+
+Or if you want to use specific path use :
+
+   --config-file=<path>
+
+To ignore any failed build stages use :
+
+    -i
+    --ignore-fail
+
+To ignore fails only for specific stage use :
+
+    --ignore-fail=<stage>
+
+You can repeat to select more than one stage.
+Not to ignore fail in specific stage use :
+
+    --ignore-fail=<stage>=0
+
+=head1 Command line commands
+
+=head2 General commands
+
+To start interactive command-line interface (default with no commands) use :
+   
+    cli
+
+To display Plumage version and copyright statement use :
+
+    version
+
+To display help message on specific command use :
+
+    help    [<command>]
+
+=head2 Query metadata and project info
+
+To list all known projects use :
+    
+    projects
+
+To show status of specific project use :
+
+    status  [<project>]
+
+To display detailed description of specific project use :
+
+    info    <project>
+
+To dispay JSON metadata for specific project use :
+
+    metadata    <project>
+
+To Show dependencies for specific project use :
+
+    show-deps   <project>
+
+To display top directory for specific project use :
+
+    project-dir <project>
+
+=head2 Perform actions on a project
+
+To downloads source code for specific project use :
+
+    fetch   <project>
+
+To update source code for specific project use (it fall bacj to fetch) :
+
+    update  <project>
+
+To configure source code for specific project use (runs 'update' furst) :
+
+    configure   <project>
+
+To build specific project in current directory (runs 'configure' first) :
+
+    build   <project>
+
+To run test suite for specific project use (runs 'build' first) :
+
+    test    <project>
+
+To send test result po Parrot's Smolder server use (runs 'build' first) :
+
+    smoke   <project>
+
+To install specific project use (runs 'test' first) :
+
+    install <project>
+
+To uninstall specific project from system use (not always available) :
+
+    uninstall   <project>
+
+To perform basic cleanup of source tree for specific project use :
+
+    clean   <project>
+
+To remove all generated files during the build process for specific project use :
+
+    reaclean    <project>
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut
+
+
+
+
+
+
+
+
