@@ -20,7 +20,7 @@ To report successful build on this system to parrot developers use :
 
     --ok
 
-Only use 'C<--ok>' if everything was ok.If there were any problems at all, use :
+Only use  C<--ok>   if everything was ok.If there were any problems at all, use :
 
     --nok
 
