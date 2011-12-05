@@ -1,0 +1,32 @@
+# Copyright (C) 2001-2010, Parrot Foundation.
+
+=head1 Name
+
+parrot_config.pod - Prints a Parrot Configuration item.
+
+=head1 VERSION
+
+version 0.01
+
+=head1 DESCRIPTION
+
+Print out configuration items.
+
+=head1 SYNOPSIS
+
+    ./parrot_config --dump 
+
+With this it will print every available key. 
+With specific key it will print only it's corresponding value.
+
+    ./parrot_config VERSION 
+
+This for example print you the version of parrot.
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or 
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You can also join Parrot IRC channel: #parrot.
+
+=cut
