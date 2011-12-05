@@ -464,7 +464,7 @@ CODE
 
     # Get namespace from the current sub
     .include 'interpinfo.pasm'
-    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_SUB
+    $P0 = interpinfo .INTERPINFO_CURRENT_SUB
     $P1 = $P0."get_namespace"()
     $S0 = $P1
     is($S0, "parrot", "Get namespace from current sub")

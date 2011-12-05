@@ -65,7 +65,7 @@
 
     if $I0 <= 0 goto done
 
-    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_CONT
+    $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     push threads, $P0
 
 again:

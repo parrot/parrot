@@ -50,18 +50,18 @@ GC related bugs.
 .end
 
 .sub sweep_1
-    $I1 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS  # How many GC mark runs have we done already?
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS  # How many GC mark runs have we done already?
     sweep 1
-    $I2 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS  # Should be one more now
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be one more now
     $I3 = $I2 - $I1
     is($I3,1, "sweep_1")
 .end
 
 
 .sub sweep_0
-    $I1 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
     sweep 0
-    $I2 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS  # Should be same
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS  # Should be same
     $I3 = $I2 - $I1
     is($I3,0, "sweep_0")
 .end
@@ -70,10 +70,10 @@ GC related bugs.
 # sweep 0, with object that needs destroy/destroy
 .sub sweep_0_need_destroy_obj
     $P0 = new 'Undef'
-    $I1 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
     needs_destroy $P0
     sweep 0
-    $I2 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # Should be one more now
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
     $I3 = $I2 - $I1
     is($I3,1, "sweep_0_need_destroy_obj")
 .end
@@ -83,13 +83,13 @@ GC related bugs.
 .sub sweep_0_need_destroy_destroy_obj
     $P0 = new 'Undef'
     needs_destroy $P0
-    $I1 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
+    $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
     $P0 = new 'Undef'  #kill object
     sweep 0
-    $I2 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # Should be one more now
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
     $I3 = $I2 - $I1
     sweep 0
-    $I4 = Parrot_interp_info .INTERPINFO_GC_MARK_RUNS   # Should be same as last
+    $I4 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be same as last
     $I5 = $I4 - $I2
     is($I3,1, "sweep_0_need_destroy_destroy_obj")
     is($I5,0, "sweep_0_need_destroy_destroy_obj")
@@ -97,43 +97,43 @@ GC related bugs.
 
 
 .sub collect_count
-    $I1 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS   # How many garbage collections have we done already?
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS   # How many garbage collections have we done already?
     collect
-    $I2 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS  # Should be one more now
     $I3 = $I2 - $I1
     is($I3,1, "collect_count")
 .end
 
 
 .sub collect_toggle
-    $I1 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     collectoff
     collect
-    $I2 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I3 = $I2 - $I1
     is($I3,0, "collect_toggle")
 
     collecton
     collect
-    $I4 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I6 = $I4 - $I2
     is($I6,1, "collect_toggle")
 .end
 
 
 .sub collect_toggle_nested
-    $I1 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     collectoff
     collectoff
     collecton
     collect           # This shouldn't do anything...    #'
-    $I2 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I2 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I3 = $I2 - $I1
     is($I3,0, "collect_toggle_nested")
 
     collecton
     collect           # ... but this should
-    $I4 = Parrot_interp_info .INTERPINFO_GC_COLLECT_RUNS
+    $I4 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     $I6 = $I4 - $I2
     is($I6,1, "collect_toggle_nested")
 
@@ -146,10 +146,10 @@ GC related bugs.
     sweep 1
     collect
 
-    $I0 = Parrot_interp_info .INTERPINFO_ACTIVE_PMCS
+    $I0 = interpinfo .INTERPINFO_ACTIVE_PMCS
     ok($I0, "Got non-zero number of active PMCs")
 
-    $I1 = Parrot_interp_info .INTERPINFO_TOTAL_PMCS
+    $I1 = interpinfo .INTERPINFO_TOTAL_PMCS
     ok($I0, "Got non-zero number of total PMCs")
 
     $I2 = $I0 < $I1

@@ -1013,7 +1013,7 @@ inline op gc_debug(in INT) {
 
 ########################################
 
-=item B<Parrot_interp_info>
+=item B<interpinfo>
 
 Fetch some piece of information about the interpreter and put it in $1.
 Possible values for $2 are defined in F<runtime/parrot/include/Parrot_interp_info.pasm>.
@@ -1022,18 +1022,18 @@ prefix):
 
 =over 4
 
-=item B<Parrot_interp_info>(out INT, in INT)
+=item B<interpinfo>(out INT, in INT)
 
 TOTAL_MEM_ALLOC, TOTAL_MEM_USED, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS,
 ACTIVE_BUFFERS, TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
 MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
 EXTENDED_PMCS, CURRENT_RUNCORE
 
-=item B<Parrot_interp_info>(out PMC, in INT)
+=item B<interpinfo_p>(out PMC, in INT)
 
 CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
-=item B<Parrot_interp_info>(out STR, in INT)
+=item B<interpinfo_s>(out STR, in INT)
 
 EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
@@ -1041,15 +1041,15 @@ EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
 =cut
 
-op Parrot_interp_info(out INT, in INT) {
+op interpinfo(out INT, in INT) {
     $1 = Parrot_interp_info(interp, $2);
 }
 
-op Parrot_interp_info(out PMC, in INT) {
+op interpinfo_p(out PMC, in INT) {
     $1 = Parrot_interp_info_p(interp, $2);
 }
 
-op Parrot_interp_info(out STR, in INT) {
+op interpinfo_s(out STR, in INT) {
     STRING * const s = Parrot_interp_info_s(interp, $2);
     $1 = s;
 }
@@ -1134,7 +1134,7 @@ inline op errorsoff(in INT) {
 
 Switch the current runcore to the one with the specified name.
 Needs to be an op, as we need to restart the runops() call.
-You can get the name of the current runcore with the Parrot_interp_info op.
+You can get the name of the current runcore with the interpinfo op.
 
 =cut
 

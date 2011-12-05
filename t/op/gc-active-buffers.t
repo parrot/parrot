@@ -24,7 +24,7 @@ TT1603 - http://trac.parrot.org/parrot/ticket/1603
     plan(1)
 
     sweep 1
-    $I0 = Parrot_interp_info .INTERPINFO_ACTIVE_BUFFERS
+    $I0 = interpinfo .INTERPINFO_ACTIVE_BUFFERS
 
     .local int count
     count= 1000
@@ -45,7 +45,7 @@ TT1603 - http://trac.parrot.org/parrot/ticket/1603
   done:
 
     sweep 1
-    $I1 = Parrot_interp_info .INTERPINFO_ACTIVE_BUFFERS
+    $I1 = interpinfo .INTERPINFO_ACTIVE_BUFFERS
 
     $I2 = $I1 - $I0
     $S0 = $I2

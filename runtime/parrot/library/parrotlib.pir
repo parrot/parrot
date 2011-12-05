@@ -195,7 +195,7 @@ END:
     .local string path
 
 .include "interpinfo.pasm"
-    Parrot_interp_info $P1, .INTERPINFO_CURRENT_SUB
+    interpinfo $P1, .INTERPINFO_CURRENT_SUB
     getprop $P0, "path", $P1
     path = $P0
 

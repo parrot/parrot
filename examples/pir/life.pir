@@ -106,32 +106,32 @@ getout:	time $N6
         print $N1
         print " generations/sec\n"
 
-        Parrot_interp_info $I1, 1
+        interpinfo $I1, 1
         print "A total of "
         print $I1
         print " bytes were allocated\n"
 
-        Parrot_interp_info $I1, 2
+        interpinfo $I1, 2
         print "A total of "
         print $I1
         print " GC runs were made\n"
 
-        Parrot_interp_info $I1, 3
+        interpinfo $I1, 3
         print "A total of "
         print $I1
         print " collection runs were made\n"
 
-        Parrot_interp_info $I1, 10
+        interpinfo $I1, 10
         print "Copying a total of "
         print $I1
         print " bytes\n"
 
-        Parrot_interp_info $I1, 5
+        interpinfo $I1, 5
         print "There are "
         print $I1
         print " active Buffer structs\n"
 
-        Parrot_interp_info $I1, 7
+        interpinfo $I1, 7
         print "There are "
         print $I1
         print " total Buffer structs\n"

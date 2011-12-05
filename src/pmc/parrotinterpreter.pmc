@@ -11,7 +11,7 @@ These are the vtable functions for the ParrotInterpreter base class
 
    getinterp P0
    set P1, P0[.IGLOBALS_*]  # access interpreter globals
-   set I0, P0[x]            # Parrot_interp_info I0, x
+   set I0, P0[x]            # interpinfo I0, x
    set I0, P0[-1]           # get interpreter flags
    set P0[-1], x            # set flags on interpreter
                             # NOTE: this doesn't restart

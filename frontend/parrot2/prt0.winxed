@@ -158,7 +158,7 @@ function __handle_error_and_exit[anon](var exception)
 function __show_runtime_prefix_and_exit[anon]()
 {
     string runtime_prefix;
-    ${ Parrot_interp_info runtime_prefix, INTERPINFO_RUNTIME_PREFIX };
+    ${ interpinfo runtime_prefix, INTERPINFO_RUNTIME_PREFIX };
     say(runtime_prefix);
     exit(0);
 }

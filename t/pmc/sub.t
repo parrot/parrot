@@ -50,7 +50,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     dec I5
 
 .include "interpinfo.pasm"
-    Parrot_interp_info P0, .INTERPINFO_CURRENT_SUB
+    interpinfo P0, .INTERPINFO_CURRENT_SUB
     set_args "0", I5
     invokecc P0  # recursive invoke
 
@@ -787,20 +787,20 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
 .pcc_sub :main main:
     .include "interpinfo.pasm"
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
     get_global P0, "the_sub"
     invokecc P0
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
     end
 .pcc_sub the_sub:
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
-    Parrot_interp_info P1, .INTERPINFO_CURRENT_CONT
+    interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
 main
@@ -814,20 +814,20 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     noop
 .pcc_sub :main main:
     .include "interpinfo.pasm"
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
     get_global P0, "the_sub"
     invokecc P0
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
     end
 .pcc_sub the_sub:
-    Parrot_interp_info P20, .INTERPINFO_CURRENT_SUB
+    interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
-    Parrot_interp_info P1, .INTERPINFO_CURRENT_CONT
+    interpinfo P1, .INTERPINFO_CURRENT_CONT
     returncc
 CODE
 main
@@ -1036,7 +1036,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "__get_regs_used 1" );
 .sub main :main
     .local pmc m
     .include "interpinfo.pasm"
-    m = Parrot_interp_info .INTERPINFO_CURRENT_SUB
+    m = interpinfo .INTERPINFO_CURRENT_SUB
     $I0 = m."__get_regs_used"('N')
     print $I0
     $I0 = m."__get_regs_used"('I')
@@ -1059,7 +1059,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "__get_regs_used 2" );
 .sub foo
     .local pmc m
     .include "interpinfo.pasm"
-    m = Parrot_interp_info .INTERPINFO_CURRENT_SUB
+    m = interpinfo .INTERPINFO_CURRENT_SUB
     set $N0, 1.0
     set $N7, 1.0
     add $N7, $N7, $N0

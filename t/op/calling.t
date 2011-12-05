@@ -1602,7 +1602,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via continuation -> results" );
     .param string s
     .local pmc cc
     .include 'interpinfo.pasm'
-    cc = Parrot_interp_info .INTERPINFO_CURRENT_CONT
+    cc = interpinfo .INTERPINFO_CURRENT_CONT
     bar(cc, s)
 .end
 

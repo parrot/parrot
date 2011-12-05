@@ -173,32 +173,32 @@ getout:
     print GPS
     say " generations/sec"
 
-    Parrot_interp_info $I1, 1
+    interpinfo $I1, 1
     print "A total of "
     print $I1
     say " bytes were allocated"
 
-    Parrot_interp_info $I1, 2
+    interpinfo $I1, 2
     print "A total of "
     print $I1
     say " GC runs were made"
 
-    Parrot_interp_info $I1, 3
+    interpinfo $I1, 3
     print "A total of "
     print $I1
     say " collection runs were made"
 
-    Parrot_interp_info $I1, 10
+    interpinfo $I1, 10
     print "Copying a total of "
     print $I1
     say " bytes"
 
-    Parrot_interp_info $I1, 5
+    interpinfo $I1, 5
     print "There are "
     print $I1
     say " active Buffer structs"
 
-    Parrot_interp_info $I1, 7
+    interpinfo $I1, 7
     print "There are "
     print $I1
     say " total Buffer structs"

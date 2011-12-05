@@ -25,7 +25,7 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
     .include 'test_more.pir'
 
 
-    $S0 = Parrot_interp_info .INTERPINFO_GC_SYS_NAME
+    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
     if $S0 == "inf" goto dont_run_hanging_tests
 
     plan(3)
@@ -50,22 +50,22 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
     inc counter
     if counter < 1e7 goto loop
 
-    $I1 = Parrot_interp_info.INTERPINFO_GC_COLLECT_RUNS
+    $I1 = interpinfo.INTERPINFO_GC_COLLECT_RUNS
     if $I1 goto done
 
     dec cycles
     if cycles > 0 goto cycle
 
   done:
-    $I2 = Parrot_interp_info.INTERPINFO_GC_MARK_RUNS
-    $S0 = Parrot_interp_info .INTERPINFO_GC_SYS_NAME
+    $I2 = interpinfo.INTERPINFO_GC_MARK_RUNS
+    $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
     if $S0 == "gms" goto last_alloc
 
-    $I3 = Parrot_interp_info.INTERPINFO_TOTAL_MEM_ALLOC
+    $I3 = interpinfo.INTERPINFO_TOTAL_MEM_ALLOC
     goto test
 
   last_alloc:
-    $I3 = Parrot_interp_info.INTERPINFO_MEM_ALLOCS_SINCE_COLLECT
+    $I3 = interpinfo.INTERPINFO_MEM_ALLOCS_SINCE_COLLECT
 
   test:
 

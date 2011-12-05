@@ -162,12 +162,12 @@ static op_func_t core_op_func_table[1103] = {
   Parrot_trace_ic,                                   /*     74 */
   Parrot_gc_debug_i,                                 /*     75 */
   Parrot_gc_debug_ic,                                /*     76 */
-  Parrot_interp_info_i_i,                             /*     77 */
-  Parrot_interp_info_i_ic,                            /*     78 */
-  Parrot_interp_info_p_i,                             /*     79 */
-  Parrot_interp_info_p_ic,                            /*     80 */
-  Parrot_interp_info_s_i,                             /*     81 */
-  Parrot_interp_info_s_ic,                            /*     82 */
+  interpinfo_i_i,                             /*     77 */
+  interpinfo_i_ic,                            /*     78 */
+  interpinfo_p_i,                             /*     79 */
+  interpinfo_p_ic,                            /*     80 */
+  interpinfo_s_i,                             /*     81 */
+  interpinfo_s_ic,                            /*     82 */
   Parrot_warningson_i,                               /*     83 */
   Parrot_warningson_ic,                              /*     84 */
   Parrot_warningsoff_i,                              /*     85 */
@@ -2046,9 +2046,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 77 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_i_i",
-    "Parrot_interp_info_i_i",
+    "interpinfo",
+    "interpinfo_i_i",
+    "interpinfo_i_i",
     0,
     3,
     { PARROT_ARG_I, PARROT_ARG_I },
@@ -2057,9 +2057,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 78 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_i_ic",
-    "Parrot_interp_info_i_ic",
+    "interpinfo",
+    "interpinfo_i_ic",
+    "interpinfo_i_ic",
     0,
     3,
     { PARROT_ARG_I, PARROT_ARG_IC },
@@ -2068,9 +2068,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 79 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_p_i",
-    "Parrot_interp_info_p_i",
+    "interpinfo_p",
+    "interpinfo_p_i",
+    "interpinfo_p_i",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_I },
@@ -2079,9 +2079,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 80 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_p_ic",
-    "Parrot_interp_info_p_ic",
+    "interpinfo_p",
+    "interpinfo_p_ic",
+    "interpinfo_p_ic",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_IC },
@@ -2090,9 +2090,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 81 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_s_i",
-    "Parrot_interp_info_s_i",
+    "interpinfo_s",
+    "interpinfo_s_i",
+    "interpinfo_s_i",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_I },
@@ -2101,9 +2101,9 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 82 */
-    "Parrot_interp_info",
-    "Parrot_interp_info_s_ic",
-    "Parrot_interp_info_s_ic",
+    "interpinfo_s",
+    "interpinfo_s_ic",
+    "interpinfo_s_ic",
     0,
     3,
     { PARROT_ARG_S, PARROT_ARG_IC },
@@ -14313,33 +14313,33 @@ Parrot_gc_debug_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_interp_info_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
     IREG(1) = Parrot_interp_info(interp, IREG(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interp_info_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     IREG(1) = Parrot_interp_info(interp, ICONST(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interp_info_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_interp_info_p(interp, IREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interp_info_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = Parrot_interp_info_p(interp, ICONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_interp_info_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = Parrot_interp_info_s(interp, IREG(2));
 
     SREG(1) = s;
@@ -14348,7 +14348,7 @@ Parrot_interp_info_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_interp_info_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+interpinfo_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = Parrot_interp_info_s(interp, ICONST(2));
 
     SREG(1) = s;

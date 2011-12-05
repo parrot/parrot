@@ -663,7 +663,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
 
 .sub foo :method
     .include "interpinfo.pasm"
-    $P0 = Parrot_interp_info .INTERPINFO_CURRENT_OBJECT
+    $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
     eq_addr self, $P0, ok
     print "not "
 ok: print "ok\n"
