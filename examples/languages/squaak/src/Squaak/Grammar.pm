@@ -107,6 +107,10 @@ rule statement:sym<while> {
     <sym> <EXPR> 'do' <block> 'end'
 }
 
+rule statement:sym<return> {
+    <sym> <EXPR>
+}
+
 token begin_block {
     <?>
 }

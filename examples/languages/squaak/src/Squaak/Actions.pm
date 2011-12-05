@@ -258,6 +258,10 @@ method statement:sym<while>($/) {
     make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 }
 
+method statement:sym<return>($/) {
+	make PAST::Op.new( :pirop<return>, $<EXPR>.ast, :node($/) );
+}
+
 method begin_block($/) {
     our $?BLOCK;
     our @?BLOCK;
