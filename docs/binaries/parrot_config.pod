@@ -1,32 +1,36 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2011 Parrot Foundation.
 
 =head1 Name
 
-parrot_config.pod - Prints a Parrot Configuration item.
-
-=head1 VERSION
-
-version 0.01
+parrot_config - Parrot Configuration
 
 =head1 DESCRIPTION
 
-Print out configuration items.
+parrot_config can be used find out compile-time configuration information about
+the Parrot executable.
 
 =head1 SYNOPSIS
 
-    ./parrot_config --dump 
+To print every available key:
 
-With this it will print every available key. 
+    parrot_config --dump
+
 With specific key it will print only it's corresponding value.
 
-    ./parrot_config VERSION 
+To get the current version of Parrot:
 
-This for example print you the version of parrot.
+    parrot_config VERSION
+
+To get a descriptive version string that will uniquely identify
+commits which are not releases:
+
+    parrot_config git_describe
 
 =head1 Help
 
-For more help or any other question you go to L<http://parrot.org> or 
-L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
-You can also join Parrot IRC channel: #parrot.
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to
+'parrot-dev@parrot.org'.  You can also join Parrot IRC channel: #parrot
+on irc.parrot.org .
 
 =cut
