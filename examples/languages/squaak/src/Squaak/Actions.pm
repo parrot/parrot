@@ -160,10 +160,7 @@ method statement:sym<if>($/) {
 }
 
 method statement:sym<sub_call>($/) {
-    my $invocant := $<primary>.ast;
-    my $past     := $<arguments>.ast;
-    $past.unshift($invocant);
-    make $past;
+    make $<primary>.ast;
 }
 
 method arguments($/) {
@@ -330,6 +327,8 @@ method postfix_expression:sym<member>($/) {
                         :node($/) );
 }
 
+method postfix_expression:sym<call>($/) { make $<arguments>.ast }
+
 method identifier($/) {
      our @?BLOCK;
      my $name  := ~$<ident>;
@@ -369,7 +368,6 @@ method quote:sym<'>($/) { make $<quote_EXPR>.ast; }
 method quote:sym<">($/) { make $<quote_EXPR>.ast; }
 
 method circumfix:sym<( )>($/) { make $<EXPR>.ast; }
-method postcircumfix:sym<( )>($/) { make $<arguments>.ast }
 
 method named_field($/) {
     my $past := $<EXPR>.ast;

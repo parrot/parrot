@@ -77,7 +77,7 @@ rule statement:sym<if> {
 }
 
 rule statement:sym<sub_call> {
-    <primary> <arguments>
+    <primary>
 }
 
 rule arguments {
@@ -134,13 +134,15 @@ rule postfix_expression:sym<key> { '{' <EXPR> '}' }
 
 rule postfix_expression:sym<member> { '.' <identifier> }
 
+rule postfix_expression:sym<call> { <arguments> }
+
 token identifier {
     <!keyword> <ident>
 }
 
 token keyword {
-    ['and'|'catch'|'do'   |'else' |'end' |'for' |'if'
-    |'not'|'or'   |'sub'  |'throw'|'try' |'var'|'while']>>
+    ['and'|'catch' |'do' |'else' |'end'|'for'|'if'   |'not'
+    |'or' |'return'|'sub'|'throw'|'try'|'var'|'while']>>
 }
 
 token term:sym<integer_constant> { <integer> }
@@ -163,7 +165,6 @@ token quote:sym<"> { <?["]> <quote_EXPR: ':qq'> }
 ## Operators
 
 INIT {
-    Squaak::Grammar.O(':prec<x>, :assoc<unary>', '%methodop');
     Squaak::Grammar.O(':prec<w>, :assoc<unary>', '%unary-negate');
     Squaak::Grammar.O(':prec<v>, :assoc<unary>', '%unary-not');
     Squaak::Grammar.O(':prec<u>, :assoc<left>',  '%multiplicative');
@@ -174,9 +175,6 @@ INIT {
 }
 
 token circumfix:sym<( )> { '(' <.ws> <EXPR> ')' }
-token postcircumfix:sym<( )> {
-    <arguments> <O( '%methodop, :pasttype<call>' )>
-}
 
 rule circumfix:sym<[ ]> {
     '[' [<EXPR> ** ',']? ']'
