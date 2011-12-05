@@ -2068,7 +2068,7 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 79 */
-    "interpinfo_p",
+    "interpinfo",
     "interpinfo_p_i",
     "Parrot_interpinfo_p_i",
     0,
@@ -2079,7 +2079,7 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 80 */
-    "interpinfo_p",
+    "interpinfo",
     "interpinfo_p_ic",
     "Parrot_interpinfo_p_ic",
     0,
@@ -2090,7 +2090,7 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 81 */
-    "interpinfo_s",
+    "interpinfo",
     "interpinfo_s_i",
     "Parrot_interpinfo_s_i",
     0,
@@ -2101,7 +2101,7 @@ static op_info_t core_op_info_table[1103] = {
     &core_op_lib
   },
   { /* 82 */
-    "interpinfo_s",
+    "interpinfo",
     "interpinfo_s_ic",
     "Parrot_interpinfo_s_ic",
     0,

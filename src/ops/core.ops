@@ -1029,11 +1029,11 @@ ACTIVE_BUFFERS, TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
 MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
 EXTENDED_PMCS, CURRENT_RUNCORE
 
-=item B<interpinfo_p>(out PMC, in INT)
+=item B<interpinfo>(out PMC, in INT)
 
 CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
-=item B<interpinfo_s>(out STR, in INT)
+=item B<interpinfo>(out STR, in INT)
 
 EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
@@ -1045,11 +1045,11 @@ op interpinfo(out INT, in INT) {
     $1 = Parrot_interp_info(interp, $2);
 }
 
-op interpinfo_p(out PMC, in INT) {
+op interpinfo(out PMC, in INT) {
     $1 = Parrot_interp_info_p(interp, $2);
 }
 
-op interpinfo_s(out STR, in INT) {
+op interpinfo(out STR, in INT) {
     STRING * const s = Parrot_interp_info_s(interp, $2);
     $1 = s;
 }
