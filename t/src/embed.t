@@ -64,7 +64,7 @@ static Parrot_String createstring(Parrot_Interp interp, const char * value)
 
 static Parrot_Interp new_interp()
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (!interp)
         fail("Cannot create parrot interpreter");
     return interp;
@@ -90,18 +90,18 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp1, interp2;
-    interp1 = Parrot_new(NULL);
+    interp1 = Parrot_interp_new(NULL);
     if (!interp1)
         fail("Cannot create 1st parrot interpreter");
 
-    interp2 = Parrot_new(interp1);
+    interp2 = Parrot_interp_new(interp1);
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
 
     puts("Done");
-    Parrot_destroy(interp1);
-    Parrot_destroy(interp2);
+    Parrot_interp_destroy(interp1);
+    Parrot_interp_destroy(interp2);
     puts("Really done");
     return 0;
 }
@@ -110,7 +110,7 @@ Done
 Really done
 OUTPUT
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ");
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_interp_new ");
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -128,18 +128,18 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp1, interp2;
-    interp1 = Parrot_new(NULL);
+    interp1 = Parrot_interp_new(NULL);
     if (!interp1)
         fail("Cannot create 1st parrot interpreter");
 
-    interp2 = Parrot_new(NULL);
+    interp2 = Parrot_interp_new(NULL);
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
 
     puts("Done");
-    Parrot_destroy(interp1);
-    Parrot_destroy(interp2);
+    Parrot_interp_destroy(interp1);
+    Parrot_interp_destroy(interp2);
     puts("Really done");
     return 0;
 }
@@ -157,14 +157,14 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
 
     func_pmc = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -180,14 +180,14 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "Foo");
 
     func_pmc = Parrot_compile_string(interp, lang, "This doesn't matter", &err);
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -204,7 +204,7 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
@@ -212,7 +212,7 @@ int main(int argc, const char **argv)
     func_pmc = Parrot_compile_string(interp, lang, "The sleeper must awake", &err);
     Parrot_printf(interp,"Caught exception\n");
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -230,7 +230,7 @@ int main(void)
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     Parrot_printf(interp, "Hello, parrot\n");
@@ -247,7 +247,7 @@ int main(void)
     );
     Parrot_ext_call(interp, code, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -271,7 +271,7 @@ int main(void)
     Parrot_PMC sub;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -301,7 +301,7 @@ int main(void)
     /* Execute it */
     Parrot_ext_call(interp, sub, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -325,7 +325,7 @@ int main(void)
     Parrot_String retstr;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -360,7 +360,7 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->S", msg, &retstr);
     Parrot_printf(interp, "%Ss\n", retstr);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -376,7 +376,7 @@ int main(void)
     Parrot_String compiler, errstr, parrotname, subname, msg;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -415,7 +415,7 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->P", msg, &ret);
     Parrot_printf(interp, "%.1Pf is the answer. What is the question?\n", ret);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -432,7 +432,7 @@ int main(void)
     Parrot_PMC res1, res2;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -475,7 +475,7 @@ int main(void)
     Parrot_printf(interp, "%.1Pf is the answer and pi*100 = %.1Pf\n",
         res1, res2);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -499,7 +499,7 @@ int main(void)
     Parrot_Float ret;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -533,7 +533,7 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->N", msg, &ret);
     Parrot_printf(interp, "%.1f is the answer. What is the question?\n", ret);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -562,7 +562,7 @@ int main(void)
     void *discard;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -588,7 +588,7 @@ int main(void)
     /* Call it */
     Parrot_ext_call(interp, code, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -668,14 +668,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **)argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -758,14 +758,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **) argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -849,14 +849,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -939,14 +939,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -1028,14 +1028,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;

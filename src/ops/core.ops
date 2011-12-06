@@ -963,7 +963,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 =cut
 
 inline op bounds(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_BOUNDS_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_BOUNDS_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG); }
     restart NEXT();
 }
@@ -978,7 +978,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 =cut
 
 inline op profile(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_PROFILE_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_PROFILE_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG); }
     restart NEXT();
 }
@@ -993,8 +993,8 @@ If $1 is zero, turn off tracing. Otherwise turn trace flag $1 on.
 =cut
 
 inline op trace(in INT) :flow {
-    if ($1 != 0) { Parrot_set_trace(interp,   $1); }
-    else         { Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
+    if ($1 != 0) { Parrot_interp_set_trace(interp,   $1); }
+    else         { Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
     restart NEXT();
 }
 
@@ -1042,15 +1042,15 @@ EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 =cut
 
 op interpinfo(out INT, in INT) {
-    $1 = interpinfo(interp, $2);
+    $1 = Parrot_interp_info(interp, $2);
 }
 
 op interpinfo(out PMC, in INT) {
-    $1 = interpinfo_p(interp, $2);
+    $1 = Parrot_interp_info_p(interp, $2);
 }
 
 op interpinfo(out STR, in INT) {
-    STRING * const s = interpinfo_s(interp, $2);
+    STRING * const s = Parrot_interp_info_s(interp, $2);
     $1 = s;
 }
 

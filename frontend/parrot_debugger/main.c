@@ -169,7 +169,7 @@ main(int argc, const char *argv[])
     PDB_t *pdb;
     const char       *scriptname = NULL;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
 
     Parrot_debugger_init(interp);
     pdb = interp->pdb;
@@ -205,7 +205,7 @@ main(int argc, const char *argv[])
             Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
 
             Parrot_pf_set_current_packfile(interp, pf);
-            Parrot_compile_file(interp, str, 0);
+            Parrot_interp_compile_file(interp, str, 0);
             /*if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
 
@@ -221,7 +221,7 @@ main(int argc, const char *argv[])
         STRING *compiler = Parrot_str_new_constant(interp, "PIR");
         STRING *errstr = NULL;
         const char source []= ".sub aux :main\nexit 0\n.end\n";
-        PMC *code = Parrot_compile_string(interp, compiler, source, &errstr);
+        PMC *code = Parrot_interp_compile_string(interp, compiler, source, &errstr);
 
         if (!STRING_IS_NULL(errstr))
             Parrot_io_eprintf(interp, "%Ss\n", errstr);

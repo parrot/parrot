@@ -468,8 +468,7 @@ INTERP_O_FILES = \
 	src/call/pcc$(O)  \
 	src/call/args$(O)  \
 	src/interp/inter_cb$(O)  \
-	src/interp/inter_create$(O)  \
-	src/interp/inter_misc$(O)  \
+	src/interp/api$(O)  \
 	src/call/ops$(O)  \
 	src/call/context$(O) \
 	src/call/context_accessors$(O) \
@@ -685,8 +684,7 @@ STR_FILES = \
 	src/call/pcc.str \
 	src/call/args.str \
 	src/interp/inter_cb.str \
-	src/interp/inter_create.str \
-	src/interp/inter_misc.str \
+	src/interp/api.str \
 	src/io/api.str \
 	src/key.str \
 	src/library.str \
@@ -1591,21 +1589,16 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_callback.h \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
-src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
-	src/interp/inter_misc.c \
-	src/interp/inter_misc.str \
+src/interp/api$(O) : $(PARROT_H_HEADERS) \
+	src/interp/api.c \
+	src/interp/api.str \
 	include/imcc/embed.h \
 	include/imcc/yyscanner.h \
 	$(INC_DIR)/runcore_api.h \
-	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
-
-src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
-	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+    $(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
-	src/interp/inter_create.c \
-	src/interp/inter_create.str \
-	$(INC_DIR)/runcore_api.h \
-	    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_continuation.h \
