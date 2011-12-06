@@ -1016,7 +1016,7 @@ inline op gc_debug(in INT) {
 =item B<interpinfo>
 
 Fetch some piece of information about the interpreter and put it in $1.
-Possible values for $2 are defined in F<runtime/parrot/include/Parrot_interp_info.pasm>.
+Possible values for $2 are defined in F<runtime/parrot/include/interpinfo.pasm>.
 The valid constants for each return value are (excluding the .INTERPINFO_
 prefix):
 
