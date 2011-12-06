@@ -97,7 +97,6 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
     #include "parrot/parrot.h"
-    #include "parrot/embed.h"
 
     int main(int argc, char* argv[]) {
         Parrot_Interp interp;
@@ -190,7 +189,7 @@ errors if make has completed.)  You can run them with any of the following:
 
 =head2 Testing language implementations
 
-Language implementations are usually tested with 
+Language implementations are usually tested with
 C<language_output_is> and friends.
 
 =head1 Ideal tests:

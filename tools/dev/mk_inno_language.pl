@@ -56,7 +56,7 @@ my $exe = $lang eq 'rakudo'
             ? qq{Source: ".\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
             : '; no .exe'
         );
-my $pbc = <*.pbc> && ! -d $lang
+my $pbc = <*.pbc> && ! -d $lang && $lang ne 'rakudo'
         ? qq{Source: ".\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
 my $lng = -d $lang
@@ -98,7 +98,12 @@ Source: ".\nqp\NQPCORE.setting.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\li
 Source: ".\nqp\nqpmo.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\nqp.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+
 Source: ".\blib\Perl6\*.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib\Perl6"; Flags:
+Source: ".\perl6.pbc"; DestDir: "{app}\lib\parrot\languages\perl6"; Flags:
+Source: ".\*.setting.pbc"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\Test.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\Pod\To\Text.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib\Pod\To"; Flags:
 RAKUDO
 
 my $filename = 'parrot-' . $lclang . '.iss';

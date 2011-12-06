@@ -1,50 +1,75 @@
 $include_const "iglobals.pasm";
+$include_const "interpinfo.pasm";
 $include_const "except_severity.pasm";
 
 const int NO_FILE = 0;
 const int PASM_FILE = 1;
 const int PIR_FILE = 2;
 const int PBC_FILE = 3;
+const int MODE_NORMAL = 0;
+const int MODE_PREPROCESS = 1;
+const int MODE_RUNFILE = 2;
 
-function __PARROT_ENTRY_MAIN__args[anon](var sys_args, var prog_args)
+function __PARROT_ENTRY_MAIN__args[anon](var args)
 {
-    string prog_name = prog_args[0];
-    int input_file_type = __get_input_file_type(prog_name);
+    string exe_name;
+    ${ shift exe_name, args };
+    string prog_name;
+    int input_file_type = NO_FILE;
     string output_file = null;
-    if (input_file_type == 0)
-        __usage_and_exit("Invalid file type " + prog_name);
-    var exe_name = sys_args.shift();
     var packfile_pmc = null;
-    for (int i = 0; i < elements(sys_args); i++) {
-        string sys_arg = sys_args[i];
+    string dummy;
+    int mode = MODE_NORMAL;
+
+    while (elements(args) > 0) {
+        string sys_arg = args[0];
         switch (sys_arg) {
             case "-o":
-                output_file = sys_args[++i];
+                ${ shift dummy, args };
+                ${ shift output_file, args };
                 break;
             case "-c":
+                ${ shift dummy, args };
                 input_file_type = PBC_FILE;
                 break;
             case "-r":
-                output_file = __get_temporary_output_file(prog_name);
-                packfile_pmc = compreg("PIR").compile_file(prog_name);
-                packfile_pmc.write_to_file(output_file);
-                packfile_pmc = new 'PackfileView';
-                packfile_pmc.read_from_file(output_file);
-                output_file = null;
+                ${ shift dummy, args };
+                mode = MODE_RUNFILE;
                 break;
             case "-E":
-                compreg("PIR").preprocess(prog_name);
-                exit(0);
+                ${ shift dummy, args };
+                mode = MODE_PREPROCESS;
+                break;
+            case "--runtime-prefix":
+                __show_runtime_prefix_and_exit();
             case "-V":
                 __show_version_and_exit();
             case "-h":
                 __show_help_and_exit();
             default:
-                __usage_and_exit("Unknown argument " + sys_arg);
+                prog_name = sys_arg;
+                goto done_args;
         }
     }
-    if (elements(prog_args) < 1)
+  done_args:
+    if (prog_name == null || prog_name == "")
         __usage_and_exit("Missing program name");
+    if (mode == MODE_PREPROCESS) {
+        compreg("PIR").preprocess(prog_name);
+        exit(0);
+    }
+    if (input_file_type == NO_FILE) {
+        input_file_type = __get_input_file_type(prog_name);
+        if (input_file_type == NO_FILE)
+            __usage_and_exit("Invalid file type " + prog_name);
+    }
+    if (mode == MODE_RUNFILE) {
+        string temp_outfile = __get_temporary_output_file(prog_name);
+        packfile_pmc = compreg("PIR").compile_file(prog_name);
+        packfile_pmc.write_to_file(temp_outfile);
+        packfile_pmc = new 'PackfileView';
+        packfile_pmc.read_from_file(temp_outfile);
+    }
     if (packfile_pmc == null)
         packfile_pmc = __default_get_packfile(prog_name, input_file_type);
     if (output_file != null) {
@@ -56,12 +81,12 @@ function __PARROT_ENTRY_MAIN__args[anon](var sys_args, var prog_args)
     return packfile_pmc;
 }
 
-function __PARROT_ENTRY_MAIN__[anon,main](var sys_args, var prog_args)
+function __PARROT_ENTRY_MAIN__[anon,main](var args)
 {
     try [allowtailcall] {
-        var packfile_pmc = __PARROT_ENTRY_MAIN__args(sys_args, prog_args);
+        var packfile_pmc = __PARROT_ENTRY_MAIN__args(args);
         var main_sub = packfile_pmc.main_sub();
-        return main_sub(prog_args);
+        return main_sub(args);
     } catch (e) {
         __handle_error_and_exit(e);
     }
@@ -89,11 +114,13 @@ function __default_get_packfile[anon](string file_name, int file_type)
 function __get_input_file_type[anon](string file_name)
 {
     int len = length(file_name) - 4;
-    string ext = substr(file_name, len);
+    string ext = len >= 0 ? substr(file_name, len) : '';
     if (ext == ".pir") return PIR_FILE;
     if (ext == ".pbc") return PBC_FILE;
-    ext = substr(file_name, len - 1);
-    if (ext == ".pasm") return PASM_FILE;
+    if (len > 0) {
+        ext = substr(file_name, len - 1);
+        if (ext == ".pasm") return PASM_FILE;
+    }
     return PIR_FILE;
 }
 
@@ -126,6 +153,14 @@ function __handle_error_and_exit[anon](var exception)
     if (exit_code == 0)
         exit_code = 1;
     exit(exit_code);
+}
+
+function __show_runtime_prefix_and_exit[anon]()
+{
+    string runtime_prefix;
+    ${ interpinfo runtime_prefix, INTERPINFO_RUNTIME_PREFIX };
+    say(runtime_prefix);
+    exit(0);
 }
 
 function __show_version_and_exit[anon]()

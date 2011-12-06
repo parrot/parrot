@@ -62,33 +62,10 @@ static int hash_compare(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 PARROT_INLINE
-static int hash_compare_cstring(PARROT_INTERP,
-    ARGIN(const char *a),
-    ARGIN(const char *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static int hash_compare_int(PARROT_INTERP,
-    ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b));
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
 static int hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static int hash_compare_pointer(PARROT_INTERP,
-    ARGIN_NULLOK(const void *a),
-    ARGIN_NULLOK(const void *b));
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
@@ -165,15 +142,10 @@ static void parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 #define ASSERT_ARGS_hash_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
-#define ASSERT_ARGS_hash_compare_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_hash_compare_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_hash_compare_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
-#define ASSERT_ARGS_hash_compare_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_hash_compare_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(search_key) \
@@ -336,28 +308,6 @@ hash_compare_string_enc(ARGIN(const void *search_key), ARGIN(const void *bucket_
 
 /*
 
-=item C<static int hash_compare_pointer(PARROT_INTERP, const void *a, const void
-*b)>
-
-Compares the two pointers, returning 0 if they are identical
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static int
-hash_compare_pointer(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
-{
-    ASSERT_ARGS(hash_compare_pointer)
-    return a != b;
-}
-
-
-/*
-
 =item C<static size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t
 seed)>
 
@@ -391,29 +341,6 @@ key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<static int hash_compare_cstring(PARROT_INTERP, const char *a, const char
-*b)>
-
-Compares two C strings for equality, returning -1, 0, and 1 if the first string
-is less than, equal to, or greater than the second, respectively.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static int
-hash_compare_cstring(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
-{
-    ASSERT_ARGS(hash_compare_cstring)
-    return strcmp(a, b);
-}
-
-
-/*
-
 =item C<static int hash_compare_pmc(PARROT_INTERP, PMC *a, PMC *b)>
 
 Compares two PMC for equality, returning 0 if the first is equal to second.
@@ -442,28 +369,6 @@ hash_compare_pmc(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
     return !VTABLE_is_equal(interp, a, b);
 }
 
-/*
-
-=item C<static int hash_compare_int(PARROT_INTERP, const void *a, const void
-*b)>
-
-Compares two integers for equality, returning -1, 0, and 1 if the first is less
-than, equal to, or greater than the second, respectively.  Uses void pointers
-to store the integers, sadly.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_PURE_FUNCTION
-PARROT_INLINE
-static int
-hash_compare_int(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b))
-{
-    ASSERT_ARGS(hash_compare_int)
-    return a != b;
-}
 
 /*
 
@@ -1577,6 +1482,82 @@ Parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN_NULLOK(void *key))
     }
 }
 
+
+/*
+
+=item C<void Parrot_hash_update(PARROT_INTERP, Hash *hash, Hash *other)>
+
+Copies all entries from the other hash into the hash, overwriting
+entries with the same key.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_hash_update(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(Hash *other))
+{
+    ASSERT_ARGS(Parrot_hash_update)
+    if (other->entries <= 0)
+        return;
+    if (hash->key_type == other->key_type && hash->entry_type == other->entry_type) {
+        if (hash->entries <= 0) {
+            /* presize hash */
+            if (hash->buckets) {
+                if (hash->mask + 1 > SPLIT_POINT)
+                    Parrot_gc_free_memory_chunk(interp, hash->buckets);
+                else
+                    Parrot_gc_free_fixed_size_storage(interp,
+                            HASH_ALLOC_SIZE(hash->mask + 1), hash->buckets);
+            }
+            allocate_buckets(interp, hash, other->mask);
+        }
+        parrot_hash_iterate(other, Parrot_hash_put(interp, hash, _bucket->key, _bucket->value););
+    }
+    else {
+        parrot_hash_iterate(other,
+            void *key = _bucket->key;
+            void *value = _bucket->value;
+            if (hash->key_type != other->key_type) {
+                switch (hash->key_type) {
+                  case Hash_key_type_int:
+                    key = (void *)Parrot_hash_key_to_int(interp, other, key);
+                    break;
+                  case Hash_key_type_STRING:
+                  case Hash_key_type_STRING_enc:
+                    key = (void *)Parrot_hash_key_to_string(interp, other, key);
+                    break;
+                  case Hash_key_type_PMC:
+                  case Hash_key_type_PMC_ptr:
+                    key = (void *)Parrot_hash_key_to_pmc(interp, other, key);
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "unimplemented key type %i", (int)hash->key_type);
+                    break;
+                }
+            }
+            if (hash->entry_type != other->entry_type) {
+                switch (hash->entry_type) {
+                  case enum_hash_int:
+                    value = (void *)Parrot_hash_value_to_int(interp, other, value);
+                    break;
+                  case enum_hash_string:
+                    value = (void *)Parrot_hash_value_to_string(interp, other, value);
+                    break;
+                  case enum_hash_pmc:
+                    value = (void *)Parrot_hash_value_to_pmc(interp, other, value);
+                    break;
+                  default:
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "unimplemented value type %i", (int)hash->entry_type);
+                    break;
+                }
+            }
+            Parrot_hash_put(interp, hash, key, value););
+    }
+}
 
 /*
 

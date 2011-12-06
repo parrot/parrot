@@ -27,7 +27,6 @@ example compiler used by japh16.pasm
  */
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "../../src/pmc/pmc_sub.h"
 
 #define C_DEBUG 0

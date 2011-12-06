@@ -14,7 +14,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_subprof.h"
 
 #include "parrot/oplib/ops.h"
@@ -84,7 +83,9 @@ static subprofiledata * get_subprofiledata(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static __inline__ UHUGEINTVAL getticks(void);
+PARROT_INLINE
+static UHUGEINTVAL getticks(void);
+
 static UHUGEINTVAL getticks(void);
 static void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -100,8 +101,8 @@ static void popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         __attribute__nonnull__(2);
 
 static void printspname(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
-    ARGIN(subprofile *sp))
+    ARGIN(const subprofiledata *spdata),
+    ARGIN(const subprofile *sp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -146,8 +147,9 @@ static INTVAL * sptodebug(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static inline char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -279,7 +281,6 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     size_t di, op;
     opcode_t *base_pc, *debug_ops;
     size_t code_size, debug_size;
-    int i;
 
     if (!spdata->seg2debug)
         spdata->seg2debug = Parrot_hash_new_pointer_hash(interp);
@@ -292,7 +293,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
     debug_ops = sp->subattrs->seg->debugs->base.data;
     debug_size = sp->subattrs->seg->debugs->base.size;
 
-    xdebug = (INTVAL *)calloc(sizeof (INTVAL), code_size);
+    xdebug = (INTVAL *)mem_sys_allocate_zeroed(code_size * sizeof (INTVAL));
     for (di = 0, op = 0; op < code_size && di < debug_size; di++) {
         op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
         opcode_t opsize = op_info->op_count;
@@ -312,7 +313,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
 /*
 
-=item C<static inline char * str2cs(PARROT_INTERP, STRING *s)>
+=item C<static char * str2cs(PARROT_INTERP, STRING *s)>
 
 Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
@@ -320,14 +321,15 @@ Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
 */
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static inline char *
+static char *
 str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
 {
     ASSERT_ARGS(str2cs)
 
     if (s == STRINGNULL)
-        return strdup("STRNULL");
+        return mem_sys_strdup("STRNULL");
     return Parrot_str_to_cstring(interp, s);
 }
 
@@ -420,9 +422,9 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         int i, lasti;
         INTVAL *xdebug = sptodebug(interp, spdata, sp);
 
-        sp->nlines           = sp->subattrs->end_offs - sp->subattrs->start_offs;
-        sp->lines            = (lineinfo *) calloc(sizeof (lineinfo),
-                                                  (sp->nlines ? sp->nlines : 1) + 1);
+        sp->nlines  = sp->subattrs->end_offs - sp->subattrs->start_offs;
+        sp->lines   = (lineinfo *) mem_sys_allocate_zeroed(
+                ((sp->nlines ? sp->nlines : 1) + 1) * sizeof (lineinfo));
         sp->lines[0].op_offs = sp->subattrs->start_offs;    /* just in case */
 
         for (i = lasti = 0; i < sp->nlines; i++) {
@@ -455,7 +457,6 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         opcode_t              *anndata = findlineannotations(interp, spdata, sp, &cnt);
 
         if (anndata) {
-            size_t off;
             PMC    *srcfilepmc;
             size_t i, j;
 
@@ -473,11 +474,11 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
                                                      Parrot_str_new_constant(interp, "file"));
 
             if (PMC_IS_NULL(srcfilepmc))
-                sp->srcfile = strdup("???");
+                sp->srcfile = mem_sys_strdup("???");
             else
                 sp->srcfile = str2cs(interp, VTABLE_get_string(interp, srcfilepmc));
 
-            sp->lines = (lineinfo *) calloc(sizeof (lineinfo), cnt + 1);
+            sp->lines = (lineinfo *) mem_sys_allocate_zeroed((cnt + 1) * sizeof (lineinfo));
 
             for (i = j = 0; i < cnt; i++) {
                 if (j && sp->lines[j - 1].op_offs == (size_t)anndata[i * 2 + ANN_ENTRY_OFF]) {
@@ -510,7 +511,7 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
                                                            sp->subpmc,
                                                            sp->code_ops + sp->subattrs->start_offs);
         sp->srcfile          = str2cs(interp, filename);
-        sp->lines            = (lineinfo *) calloc(sizeof (lineinfo), 1 + 1);
+        sp->lines            = (lineinfo *) mem_sys_allocate_zeroed((1 + 1) * sizeof (lineinfo));
         sp->lines[0].op_offs = sp->subattrs->start_offs;
         sp->lines[1].op_offs = sp->subattrs->end_offs;
         sp->nlines           = 1;
@@ -547,7 +548,7 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
                                                                     + subattrs->start_offs));
 
     if (!sp) {
-        sp           = (subprofile *) calloc(sizeof (subprofile), 1);
+        sp           = (subprofile *) mem_sys_allocate_zeroed(sizeof (subprofile));
         sp->subattrs = subattrs;
         sp->subpmc   = subpmc;
         sp->code_ops = sp->subattrs->seg->base.data;
@@ -581,8 +582,8 @@ popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(popcallchain)
 
-    subprofile *sp  = spdata->cursp;
-    subprofile *csp = sp->caller;
+    subprofile * const sp  = spdata->cursp;
+    subprofile * const csp = sp->caller;
 
     if (sp->callerci) {
         sp->callerci->ops   += sp->callerops;
@@ -594,15 +595,14 @@ popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         csp->callerticks    += sp->callerticks;
     }
 
-    sp->ctx         = 0;
+    sp->caller      = NULL;
+    sp->callerci    = NULL;
+    sp->ctx         = NULL;
     sp->callerops   = 0;
     sp->callerticks = 0;
-    sp->caller      = 0;
-    sp->callerci    = 0;
-    sp->ctx         = 0;
 
-    spdata->cursubpmc       = csp ? csp->subpmc : 0;
-    spdata->curctx          = csp ? csp->ctx    : 0;
+    spdata->cursubpmc       = csp ? csp->subpmc : NULL;
+    spdata->curctx          = csp ? csp->ctx    : NULL;
     spdata->cursp           = csp;
 }
 
@@ -638,16 +638,16 @@ finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
             csp->callerticks    += sp->callerticks;
         }
 
+        sp->caller      = NULL;
+        sp->callerci    = NULL;
+        sp->ctx         = NULL;
         sp->callerops   = 0;
         sp->callerticks = 0;
-        sp->caller      = 0;
-        sp->callerci    = 0;
-        sp->ctx         = 0;
     }
 
-    spdata->cursp       = 0;
-    spdata->curctx      = 0;
-    spdata->cursubpmc   = 0;
+    spdata->cursp       = NULL;
+    spdata->curctx      = NULL;
+    spdata->cursubpmc   = NULL;
 }
 
 /*
@@ -676,7 +676,7 @@ buildcallchain(PARROT_INTERP,
     cctx = Parrot_pcc_get_caller_ctx(interp, ctx);
 
     if (cctx) {
-        PMC *csubpmc = Parrot_pcc_get_sub(interp, cctx);
+        PMC * const csubpmc = Parrot_pcc_get_sub(interp, cctx);
         if (spdata->curctx != cctx || spdata->cursubpmc != csubpmc)
             buildcallchain(interp, spdata, cctx, csubpmc);
     }
@@ -691,17 +691,18 @@ buildcallchain(PARROT_INTERP,
         /* recursion! */
         if (!sp->rnext) {
             subprofile *rsp;
-            rsp           = (subprofile *)calloc(sizeof (subprofile), 1);
+            rsp           = (subprofile *)mem_sys_allocate_zeroed(sizeof (subprofile));
             rsp->subattrs = sp->subattrs;
             rsp->subpmc   = sp->subpmc;
             rsp->code_ops = sp->code_ops;
             rsp->rcnt     = sp->rcnt + 1;
             rsp->srcline  = sp->srcline;
-            rsp->srcfile  = strdup(sp->srcfile);
+            rsp->srcfile  = mem_sys_strdup(sp->srcfile);
             sp->rnext     = rsp;
             if (sp->nlines) {
                 int i;
-                rsp->lines = (lineinfo *)calloc(sizeof (lineinfo), sp->nlines + 1);
+                rsp->lines = (lineinfo *)mem_sys_allocate_zeroed(
+                        (sp->nlines + 1) * sizeof (lineinfo));
                 rsp->nlines = sp->nlines;
                 for (i = 0; i < sp->nlines + 1; i++)
                     rsp->lines[i].op_offs = sp->lines[i].op_offs;
@@ -714,11 +715,10 @@ buildcallchain(PARROT_INTERP,
     sp->caller = spdata->cursp;
 
     if (sp->caller) {
-        int i;
-        subprofile *csp = sp->caller;
+        subprofile * const csp = sp->caller;
 
         /* get caller pc */
-        opcode_t *cpc_op = Parrot_pcc_get_pc(interp, csp->ctx);
+        opcode_t * const cpc_op = Parrot_pcc_get_pc(interp, csp->ctx);
         size_t cpc = cpc_op ? cpc_op - csp->code_ops : 0;
 
         if (cpc > csp->subattrs->start_offs)
@@ -726,6 +726,7 @@ buildcallchain(PARROT_INTERP,
 
         /* convert cpc into line */
         if (spdata->profile_type != SUBPROF_TYPE_OPS) {
+            int i;
             /* might do a binary seach instead */
             for (i = 0, li = csp->lines; i < csp->nlines; i++, li++)
                 if (cpc >= li->op_offs && cpc < li[1].op_offs)
@@ -750,9 +751,9 @@ buildcallchain(PARROT_INTERP,
         callinfo *ci;
 
         if (!li->calls) {
-            li->calls = (callinfo *) malloc(sizeof (*ci) * (1 + 8));
+            li->calls = (callinfo *) mem_sys_allocate((1 + 8) * sizeof (*ci));
             ci = li->calls;
-            ci->callee = 0;
+            ci->callee = NULL;
         }
         else {
             for (ci = li->calls; ci->callee; ci++)
@@ -763,7 +764,8 @@ buildcallchain(PARROT_INTERP,
                 int ncalls = ci - li->calls;
 
                 if ((ncalls & 7) == 0) {
-                    li->calls = (callinfo *) realloc(li->calls, sizeof (*ci) * (ncalls + (1 + 8)));
+                    li->calls = (callinfo *) mem_sys_realloc(
+                            li->calls, (ncalls + (1 + 8)) * sizeof (*ci));
                     ci = li->calls + ncalls;
                 }
             }
@@ -772,13 +774,13 @@ buildcallchain(PARROT_INTERP,
         if (!ci->callee) {
             memset(ci, 0, sizeof (*ci));
             ci->callee = sp;
-            ci[1].callee = 0;
+            ci[1].callee = NULL;
         }
 
         sp->callerci = ci;
     }
     else {
-        sp->callerci = 0;
+        sp->callerci = NULL;
     }
 
     spdata->cursp     = sp;
@@ -788,8 +790,8 @@ buildcallchain(PARROT_INTERP,
 
 /*
 
-=item C<static void printspname(PARROT_INTERP, subprofiledata *spdata,
-subprofile *sp)>
+=item C<static void printspname(PARROT_INTERP, const subprofiledata *spdata,
+const subprofile *sp)>
 
 Prints the name of the subprofile given in C<sp>.
 
@@ -798,18 +800,18 @@ Prints the name of the subprofile given in C<sp>.
 */
 
 static void
-printspname(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
+printspname(PARROT_INTERP, ARGIN(const subprofiledata *spdata), ARGIN(const subprofile *sp))
 {
     ASSERT_ARGS(printspname)
 
-    char *cname = str2cs(interp, sp->subattrs->name);
+    char * const cname = str2cs(interp, sp->subattrs->name);
 
     fprintf(stderr, "%p:%s", sp, cname);
 
     if (sp->rcnt)
         fprintf(stderr, "'%d", sp->rcnt);
 
-    free(cname);
+    mem_sys_free(cname);
 }
 
 /*
@@ -828,9 +830,6 @@ static void
 dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(dump_profile_data)
-
-    int    h;
-    size_t off;
 
     unsigned int totalops   = 0;
     UHUGEINTVAL  totalticks = 0;
@@ -853,8 +852,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                 totalops += sp->lines[j].ops;
                 totalticks += sp->lines[j].ticks;
             }
-        }
-    );
+        });
 
     fprintf(stderr, "events: ops ticks\n");
     fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
@@ -926,8 +924,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                             (unsigned long long) ci->ticks);
                 }
             }
-        }
-    );
+        });
 
     /* also dump profiling root if there are more than one callees */
     if (spdata->rootline.calls
@@ -976,7 +973,7 @@ free_subprofile(PARROT_INTERP, ARGIN(subprofile *sp))
     ASSERT_ARGS(free_subprofile)
 
     if (sp->srcfile)
-        free(sp->srcfile);
+        mem_sys_free(sp->srcfile);
 
     if (sp->lines) {
         int i;
@@ -985,13 +982,13 @@ free_subprofile(PARROT_INTERP, ARGIN(subprofile *sp))
             lineinfo *li = sp->lines + i;
 
             if (li->calls)
-                free(li->calls);
+                mem_sys_free(li->calls);
         }
 
-        free(sp->lines);
+        mem_sys_free(sp->lines);
     }
 
-    free(sp);
+    mem_sys_free(sp);
 }
 
 
@@ -1017,29 +1014,27 @@ free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
             for (; sp; sp = rsp) {
                 rsp = sp->rnext;
                 free_subprofile(interp, sp);
-            }
-        );
+            });
         Parrot_hash_destroy(interp, spdata->sphash);
     }
     Parrot_pmc_gc_unregister(interp, spdata->markpmcs);
     spdata->markpmcs = NULL;
 
     if (spdata->rootline.calls)
-        free(spdata->rootline.calls);
+        mem_sys_free(spdata->rootline.calls);
 
     if (spdata->seg2debug) {
         parrot_hash_iterate(spdata->seg2debug,
             INTVAL *xdebug = (INTVAL *)_bucket->value;
-            free(xdebug);
-        );
+            mem_sys_free(xdebug););
         Parrot_hash_destroy(interp, spdata->seg2debug);
     }
-    free(spdata);
+    mem_sys_free(spdata);
 }
 
 /*
 
-=item C<static __inline__ UHUGEINTVAL getticks(void)>
+=item C<static UHUGEINTVAL getticks(void)>
 
 Returns a high-resolution number representing how long Parrot has been running.
 
@@ -1060,7 +1055,11 @@ Returns a high-resolution number representing how long Parrot has been running.
 */
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
-static __inline__ UHUGEINTVAL
+
+#  include <stdint.h>
+
+PARROT_INLINE
+static UHUGEINTVAL
 getticks(void) {
     ASSERT_ARGS(getticks)
 
@@ -1095,7 +1094,6 @@ sync_callchainchange(PARROT_INTERP,
     ASSERT_ARGS(sync_callchainchange)
 
     subprofile *sp = spdata->cursp;
-    int         i;
 
     if (sp) {
         /* optimize common cases */
@@ -1146,13 +1144,12 @@ sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(o
 {
     ASSERT_ARGS(sync_hll_linechange)
 
-    subprofile *sp = spdata->cursp;
+    const subprofile * const sp = spdata->cursp;
     lineinfo   *li;
-    int         i;
-    size_t      pc;
 
     if (sp->nlines > 1) {
-        pc = pc_op ? pc_op - sp->code_ops : 0;
+        const size_t pc = pc_op ? pc_op - sp->code_ops : 0;
+        int i;
 
         for (i = 0, li = sp->lines; i < sp->nlines; i++, li++)
             if (pc >= li->op_offs && pc < li[1].op_offs)
@@ -1193,7 +1190,7 @@ get_subprofiledata(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), int type)
     subprofiledata           *spdata = core->spdata;
 
     if (!spdata) {
-        spdata               = (subprofiledata *) calloc(1, sizeof (subprofiledata));
+        spdata               = (subprofiledata *) mem_sys_allocate_zeroed(sizeof (subprofiledata));
         spdata->profile_type = type;
         spdata->interp       = interp;
         spdata->markpmcs     = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
@@ -1327,7 +1324,7 @@ Parrot_runcore_subprof_sub_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_sub");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_SUB_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_sub_core;
     coredata->prepare_run = NULL;
@@ -1360,12 +1357,13 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_HLL);
     subprofile *sp = spdata->cursp;
-    PMC *ctx, *subpmc;
-    lineinfo *curline = sp ? sp->lines : 0;
-    opcode_t *startop = 0;
-    opcode_t *endop = 0;        /* triggers pc >= endop below */
+    lineinfo *curline = sp ? sp->lines : NULL;
+    opcode_t *startop = NULL;
+    opcode_t *endop   = NULL;   /* triggers pc >= endop below */
 
     while (pc) {
+        PMC *ctx;
+        PMC *subpmc;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
@@ -1405,7 +1403,7 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
                 /* finish old ticks */
                 UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
-                    UHUGEINTVAL tickdiff = tick - spdata->starttick;
+                    const UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
                     *spdata->tickadd2        += tickdiff;
                 }
@@ -1420,7 +1418,7 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
             }
             else if (pc < startop) {
                 /* finish old ticks */
-                UHUGEINTVAL tick = getticks();
+                const UHUGEINTVAL tick = getticks();
                 if (spdata->tickadd) {
                     UHUGEINTVAL tickdiff = tick - spdata->starttick;
                     *spdata->tickadd         += tickdiff;
@@ -1463,7 +1461,7 @@ Parrot_runcore_subprof_hll_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_hll");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_HLL_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_hll_core;
     coredata->prepare_run = NULL;
@@ -1497,11 +1495,11 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
     subprofiledata *spdata = get_subprofiledata(interp, runcore, SUBPROF_TYPE_OPS);
     subprofile *sp = spdata->cursp;
-    PMC *ctx, *subpmc;
-    opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : 0;
-    UHUGEINTVAL tick;
+    opcode_t *startop = sp ? sp->code_ops + sp->subattrs->start_offs : NULL;
 
     while (pc) {
+        PMC *ctx;
+        PMC *subpmc;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
@@ -1512,9 +1510,9 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
         if (!PMC_IS_NULL(subpmc)) {
             /* finish old ticks */
-            UHUGEINTVAL tick = getticks();
+            const UHUGEINTVAL tick = getticks();
             if (spdata->tickadd) {
-                UHUGEINTVAL tickdiff = tick - spdata->starttick;
+                const UHUGEINTVAL tickdiff = tick - spdata->starttick;
                 *spdata->tickadd         += tickdiff;
                 *spdata->tickadd2        += tickdiff;
                 spdata->starttick = tick;
@@ -1561,7 +1559,7 @@ Parrot_runcore_subprof_ops_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_ops");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_OPS_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_ops_core;
     coredata->prepare_run = NULL;

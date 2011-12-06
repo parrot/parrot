@@ -29,7 +29,7 @@ IMCC helpers.
 #include <stdlib.h>
 
 #include "imc.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
@@ -553,8 +553,9 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
     PMC      * const old_packfilepmc = Parrot_pf_get_current_packfile(imcc->interp);
-    PMC      * const packfilepmc     = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
-    INTVAL           success     = 0;
+    STRING   * const pf_path = is_file ? source : STRINGNULL;
+    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw, pf_path);
+    INTVAL           success = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */

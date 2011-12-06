@@ -4,7 +4,7 @@
 
 Archive::Zip - Provide an interface to ZIP archive files.
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
     load_bytecode 'Archive/Zip.pbc'
 
@@ -21,7 +21,7 @@ Archive::Zip - Provide an interface to ZIP archive files.
     archive.'writeToFileHandle'(fh, 1)
     fh.'close'()
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Partial port of Archive::Zip (version 1.30)
 

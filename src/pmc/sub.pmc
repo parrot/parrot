@@ -415,7 +415,7 @@ Invokes the subroutine.
         INTERP->current_cont = NULL;
 
         if (ccont == NEED_CONTINUATION) {
-            ccont = pmc_new(INTERP, enum_class_Continuation);
+            ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
             VTABLE_set_pointer(INTERP, ccont, next);
         }
 
@@ -443,7 +443,7 @@ Invokes the subroutine.
 
         /* check recursion/call depth */
         if (Parrot_pcc_inc_recursion_depth(INTERP, context) > INTERP->recursion_limit)
-            Parrot_ex_throw_from_c_args(INTERP, next, CONTROL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, next, EXCEPTION_INTERNAL_PANIC,
                     "maximum recursion depth exceeded");
 
         /* and copy set context variables */
@@ -1171,6 +1171,10 @@ slurpy arguments).
 
 (Experimental) Returns Sub flags.
 
+=item C<PMC *get_packfile()>
+
+(Experimental) Returns the packfile that contains this Sub
+
 =back
 
 =cut
@@ -1189,6 +1193,16 @@ slurpy arguments).
         /* Only PF specific flags */
         INTVAL  flags = PObj_get_FLAGS(SELF) & SUB_FLAG_PF_MASK;
         RETURN(INTVAL flags);
+    }
+
+    METHOD get_packfile() {
+        Parrot_Sub_attributes *sub;
+        PMC *view;
+        PMC_get_sub(INTERP, SELF, sub);
+        view = sub->seg->base.pf->view;
+        if (!view)
+            view = PMCNULL;
+        RETURN(PMC * view);
     }
 
 }

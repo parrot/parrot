@@ -327,7 +327,7 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     }
 
     /* exception */
-    return NULL;
+    return STRINGNULL;
 }
 
 /*
@@ -1173,7 +1173,7 @@ return current Namespace
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
-            return NULL;
+            return STRINGNULL;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         return autobox_string(INTERP, &cells[key]);
@@ -1397,7 +1397,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
@@ -1464,7 +1464,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {

@@ -369,6 +369,9 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
       case CURRENT_LEXPAD:
         result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));
         break;
+      case CURRENT_TASK:
+        result = Parrot_cx_current_task(interp);
+        break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
@@ -440,6 +443,8 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
+        case CURRENT_RUNCORE:
+            return interp->run_core->name;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in interpinfo");
@@ -714,6 +719,15 @@ Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
         break;
       case PARROT_PROFILING_CORE:
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
+        break;
+      case PARROT_SUBPROF_SUB_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
+        break;
+      case PARROT_SUBPROF_HLL_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
+        break;
+      case PARROT_SUBPROF_OPS_CORE:
+        Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_ops"));
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,

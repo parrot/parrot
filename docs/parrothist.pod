@@ -11,7 +11,7 @@ This document records Parrot source code releases, and their release managers.
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
-Francois Perrad, Jonathan Leto, Michael Hind, James E Keenan.
+Francois Perrad, Jonathan "Duke" Leto, Michael Hind, James E Keenan.
 
 
 =head1 THE RECORDS
@@ -132,5 +132,7 @@ Starred release numbers indicate supported releases.
  jkeenan     3.6.0 *        2011-Jul-19     "Pájaros del Caribe"
  coke        3.7.0          2011-Aug-16     "Wanda"
  soh_cah_toa 3.8.0          2011-Sep-20     "Magrathea"
+ dukeleto    3.9.0 *        2011-Oct-18     "Archaeopteryx"
+ Whiteknight 3.10.0         2011-Nov-15     "Apple Pi"
 
 =cut

@@ -27,7 +27,7 @@ typedef struct buffer_t {
     void *     _bufstart;               /* Pointer to start of buffer data
                                            (not buffer prolog). */
     size_t     _buflen;                 /* Length of buffer data. */
-} Buffer;
+} Parrot_Buffer;
 
 typedef enum Forward_flag {
     Buffer_moved_FLAG   = 1 << 0,

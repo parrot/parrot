@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, Parrot Foundation.
+ * Copyright (C) 2009-2011, Parrot Foundation.
  */
 
 /*
@@ -54,6 +54,7 @@ Return the number of nanoseconds that each time unit from Parrot_hires_get_time 
 
 */
 
+PARROT_CONST_FUNCTION
 UINTVAL
 Parrot_hires_get_tick_duration(void)
 {
@@ -63,8 +64,6 @@ Parrot_hires_get_tick_duration(void)
     QueryPerformanceFrequency(&ticks);
     return (UINTVAL) (1000*1000*1000 / ticks.QuadPart);
 }
-
-
 
 
 /*

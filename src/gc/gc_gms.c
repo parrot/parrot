@@ -210,11 +210,12 @@ static void failed_allocation(unsigned int line, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP, size_t size)
+static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
+    size_t size)
         __attribute__nonnull__(1);
 
 static void gc_gms_allocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGIN(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -288,7 +289,7 @@ static void gc_gms_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_free_buffer_header(PARROT_INTERP,
-    ARGFREE(Buffer *s),
+    ARGFREE(Parrot_Buffer *s),
     size_t size)
         __attribute__nonnull__(1);
 
@@ -390,7 +391,7 @@ static void gc_gms_process_work_list(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
-    ARGIN(Buffer *str),
+    ARGIN(Parrot_Buffer *str),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -981,7 +982,7 @@ gc_gms_process_dirty_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_dirty_list)
 
     POINTER_ARRAY_ITER(dirty_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1008,7 +1009,7 @@ gc_gms_process_work_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_work_list)
 
     POINTER_ARRAY_ITER(work_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1020,9 +1021,9 @@ gc_gms_process_work_list(PARROT_INTERP,
 
     /* Move processed objects back to own generation */
     POINTER_ARRAY_ITER(work_list,
-        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-        PMC              *pmc  = &(item->pmc);
-        size_t            gen  = POBJ2GEN(pmc);
+        pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+        PMC              * const pmc  = &(item->pmc);
+        const size_t             gen  = POBJ2GEN(pmc);
 
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
 
@@ -1052,11 +1053,11 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
-        int move_to_old = (i + 1) != MAX_GENERATIONS;
+        const int move_to_old = (i + 1) != MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
-            pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-            PMC              *pmc  = &(item->pmc);
+            pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+            PMC              * const pmc  = &(item->pmc);
 
             PARROT_ASSERT(PObj_constant_TEST(pmc) || (int)POBJ2GEN(pmc) == i);
 
@@ -1080,7 +1081,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     }
                 }
             }
-            else if (!PObj_constant_TEST(pmc)) {
+            else {
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
@@ -1100,8 +1101,8 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
             });
 
         POINTER_ARRAY_ITER(self->strings[i],
-            string_alloc_struct *item = (string_alloc_struct *)ptr;
-            STRING *str = &(item->str);
+            string_alloc_struct * const item = (string_alloc_struct *)ptr;
+            STRING * const str = &(item->str);
 
             PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 
@@ -1115,10 +1116,11 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 }
             }
 
-            else if (!PObj_constant_TEST(str)) {
+            else {
                 Parrot_pa_remove(interp, self->strings[i], item->ptr);
                 if (Buffer_bufstart(str) && !PObj_external_TEST(str))
-                    Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Buffer*)str);
+                    Parrot_gc_str_free_buffer_storage(
+                        interp, &self->string_gc, (Parrot_Buffer*)str);
 
                 interp->gc_sys->stats.memory_used -= sizeof (STRING);
 
@@ -1153,7 +1155,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         || !"Resurrecting of dead objects is not supported");
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc))
+    if (PObj_live_TEST(pmc))
         return;
 
     /* If object too old - skip it */
@@ -1229,11 +1231,11 @@ size_t size)>
 =item C<static void gc_gms_reallocate_string_storage(PARROT_INTERP, STRING *str,
 size_t size)>
 
-=item C<static void gc_gms_allocate_buffer_storage(PARROT_INTERP, Buffer *str,
-size_t size)>
+=item C<static void gc_gms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
+*str, size_t size)>
 
-=item C<static void gc_gms_reallocate_buffer_storage(PARROT_INTERP, Buffer *str,
-size_t size)>
+=item C<static void gc_gms_reallocate_buffer_storage(PARROT_INTERP,
+Parrot_Buffer *str, size_t size)>
 
 =item C<static void* gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t
 size)>
@@ -1298,7 +1300,7 @@ gc_gms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_gms_free_fixed_size_storage)
     if (data) {
-        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        const MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         interp->gc_sys->stats.memory_used           -= size;
         interp->gc_sys->stats.mem_used_last_collect -= size;
@@ -1327,7 +1329,8 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         return self->num_early_gc_PMCs;
     if (which == TOTAL_PMCS) {
         /* It's higher than actual number of allocated PMCs */
-        size_t ret = 0, i;
+        size_t ret = 0;
+        size_t i;
         for (i = 0; i < MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_allocated(interp, self->objects[i]);
         }
@@ -1335,7 +1338,8 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
     }
     if (which == ACTIVE_PMCS) {
         /* It's higher than actual number of allocated PMCs */
-        size_t ret = 0, i;
+        size_t ret = 0;
+        size_t i;
         for (i = 0; i < MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_used(interp, self->objects[i]);
         }
@@ -1425,7 +1429,7 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (pmc) {
-        size_t gen = POBJ2GEN(pmc);
+        const size_t gen = POBJ2GEN(pmc);
 
         /* We should never free objects from dirty list directly! */
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
@@ -1499,11 +1503,11 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 =item C<gc_gms_free_string_header(PARROT_INTERP, STRING *s)>
 
-=item C<static Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP, size_t
-size)>
+=item C<static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
+size_t size)>
 
-=item C<static void gc_gms_free_buffer_header(PARROT_INTERP, Buffer *s, size_t
-size)>
+=item C<static void gc_gms_free_buffer_header(PARROT_INTERP, Parrot_Buffer *s,
+size_t size)>
 
 Allocate/free string/buffer headers.
 
@@ -1549,7 +1553,7 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
         if (Buffer_bufstart(s) && !PObj_external_TEST(s))
             Parrot_gc_str_free_buffer_storage(interp,
-                &self->string_gc, (Buffer *)s);
+                &self->string_gc, (Parrot_Buffer *)s);
 
         PObj_on_free_list_SET(s);
 
@@ -1563,15 +1567,15 @@ gc_gms_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer*
+static Parrot_Buffer*
 gc_gms_allocate_buffer_header(PARROT_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_gms_allocate_buffer_header)
-    return (Buffer*)gc_gms_allocate_string_header(interp, 0);
+    return (Parrot_Buffer*)gc_gms_allocate_string_header(interp, 0);
 }
 
 static void
-gc_gms_free_buffer_header(PARROT_INTERP, ARGFREE(Buffer *s), SHIM(size_t size))
+gc_gms_free_buffer_header(PARROT_INTERP, ARGFREE(Parrot_Buffer *s), SHIM(size_t size))
 {
     ASSERT_ARGS(gc_gms_free_buffer_header)
     gc_gms_free_string_header(interp, (STRING*)s);
@@ -1624,10 +1628,10 @@ size)>
 =item C<void gc_gms_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t
 size)>
 
-=item C<void gc_gms_allocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_gms_allocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
 size)>
 
-=item C<void gc_gms_reallocate_buffer_storage(PARROT_INTERP, Buffer *str, size_t
+=item C<void gc_gms_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer *str, size_t
 size)>
 
 Functions for allocating strings/buffers storage.
@@ -1656,7 +1660,7 @@ gc_gms_reallocate_string_storage(PARROT_INTERP, ARGIN(STRING *str), size_t size)
 }
 
 static void
-gc_gms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_gms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Parrot_Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_buffer_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -1666,7 +1670,7 @@ gc_gms_allocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
 }
 
 static void
-gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Buffer *str), size_t size)
+gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Parrot_Buffer *str), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_buffer_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -1697,7 +1701,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->strings[i],
             STRING *s = &((string_alloc_struct *)ptr)->str;
-            callback(interp, (Buffer *)s, data););
+            callback(interp, (Parrot_Buffer *)s, data););
     }
 }
 

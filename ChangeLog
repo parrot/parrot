@@ -1,3 +1,56 @@
+2011-11-15    release 3.10.0
+    - Core
+        + The mark VTABLE was added to the Select PMC
+        + The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
+            at https://github.com/parrot/parrot-embed
+        + A set_random method was added to the Integer PMC, so random numbers can
+            be generated without needing to load math dynops
+        + A new implementation of green threads was added to Parrot, in preparation
+        for a robust hybrid threading system. Green threads are currently
+        not available on Windows.
+    - Languages
+        + Winxed
+          - 'multi' modifier improved
+          - throw "string" now emits throw instead of die
+          - several optimizations in generated code
+          - improved some error dianostics
+    - Community
+        + Parrot Foundation was accepted to Google Code-In 2011. We could always use more volunteers.
+          Task ideas are on the wiki:
+             https://github.com/parrot/parrot/wiki/Google-Code-In-Task-Ideas
+    - Documentation
+    - Tests
+        + Added tests for recently-fixed bugs using return :flat and ResizableStringArrays.
+
+2011-10-18    release 3.9.0
+    - Core
+        + The whiteknight/kill_threads branch was merged, which removes the old and broken
+        thread/concurrency implementation. Better and more flexible concurrency primitives
+        are currently being worked on. This also involved removing some of the last vestiges
+        of assembly code from Parrot as well as removing the share and share_ro vtables.
+        + random_lib.pir was removed, since better alternatives already exist
+        + The freeze and thaw vtables were removed from Default PMC, because they weren't
+          useful and caused hard-to-find bugs.
+        + A new subroutine profiling runcore was added. It can be enabled with the command-line
+        argument of -R subprof . The resulting data can be analyzed with kcachegrind.
+        + Added get_string VTABLE to FixedIntegerArray and FixedFloatArray PMCs
+        + The update() method was added to the Hash PMC, which updates one Hash with the contents
+          of another. This speeds up rakudo/nqp startup time.
+    - Languages
+        + Winxed
+          - Updated snapshot to version 1.3.0
+          - Added the builtin sleep
+          - Modifier 'multi' allows some more multi functionality
+    - Community
+        + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
+          PCT in Winxed: https://github.com/parrot/PACT
+    - Documentation
+        + We are in the process to migrating our Trac wiki at http://trac.parrot.org/ to Github
+          at https://github.com/parrot/parrot/wiki
+        + Packfile PMC documentation was updated
+    - Tests
+        + Select PMC tests improved to pass on non-Linuxy platforms
+
 2011-09-20    release 3.8.0
     - Core
       + New tools/release/auto_release.pl script automates most of release

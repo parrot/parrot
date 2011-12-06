@@ -296,7 +296,7 @@ declared a plan or if you pass an invalid argument.
     .local int num_tests
     num_tests = tests
 
-    unless num_tests goto write_header
+    unless num_tests goto bail_out
 
     testplan.'set_tests'( num_tests )
 
@@ -309,6 +309,13 @@ declared a plan or if you pass an invalid argument.
     output.'write'( header )
 
     .return()
+
+  bail_out:
+    .local pmc plan_exception
+    plan_exception = new 'Exception'
+    plan_exception = 'You said to run 0 tests'
+    throw plan_exception
+
 .end
 
 =item done_testing

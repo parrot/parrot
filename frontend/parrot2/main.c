@@ -29,10 +29,8 @@ struct init_args_t {
     const char *run_core_name;
     Parrot_Int trace;
     Parrot_Int turn_gc_off;
-    const char ** sysargv;
-    const char ** progargv;
-    int sysargc;
-    int progargc;
+    const char ** argv;
+    int argc;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -133,7 +131,7 @@ The entry point from the command line into Parrot.
 int
 main(int argc, const char *argv[])
 {
-    Parrot_PMC interp, bytecodepmc, sysargs, pirargs;
+    Parrot_PMC interp, bytecodepmc, args;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
 
@@ -167,13 +165,11 @@ main(int argc, const char *argv[])
     if (!parsed_flags.turn_gc_off)
         Parrot_api_toggle_gc(interp, 1);
 
-    if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.sysargc,  parsed_flags.sysargv,
-                                            &sysargs)
-    && Parrot_api_pmc_wrap_string_array(interp, parsed_flags.progargc, parsed_flags.progargv,
-                                        &pirargs)
+    if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.argc, parsed_flags.argv,
+                                            &args)
     && Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(),
                                         &bytecodepmc)
-    && Parrot_api_run_bytecode(interp, bytecodepmc, sysargs, pirargs)))
+    && Parrot_api_run_bytecode(interp, bytecodepmc, args)))
         show_last_error_and_exit(interp);
 
     /* Clean-up after ourselves */
@@ -555,8 +551,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
     int result = 1;
-    int nsysargs = 0;
-    const char **sysargs = (const char**)calloc(argc, sizeof (char*));
+    int nargs = 0;
+    int i;
+    const char **pargs = (const char**)calloc(argc, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);
@@ -566,7 +563,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->run_core_name = "fast";
     args->trace = 0;
     args->turn_gc_off = 0;
-    sysargs[nsysargs++] = argv[argc];
+    pargs[nargs++] = argv[0];
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
@@ -606,7 +603,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             fgetc(stdin);
             break;
           case 'h':
-            sysargs[nsysargs++] = "-h";
+            pargs[nargs++] = "-h";
             break;
           case OPT_HASH_SEED:
             /* handled in parseflags_minimal */
@@ -616,29 +613,21 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             exit(EXIT_FAILURE);
             break;
           case OPT_RUNTIME_PREFIX:
-            {
-                /* TODO Can we do this in prt0.pir? */
-                Parrot_String runtimepath;
-                char * runtimepath_c;
-                Parrot_api_get_runtime_path(interp, &runtimepath);
-                Parrot_api_string_export_ascii(interp, runtimepath, &runtimepath_c);
-                fprintf(stdout, "%s", runtimepath_c);
-                Parrot_api_string_free_exported_ascii(interp, runtimepath_c);
-                exit(EXIT_SUCCESS);
-            }
+            pargs[nargs++] = "--runtime-prefix";
+            break;
           case 'V':
-            sysargs[nsysargs++] = "-V";
+            pargs[nargs++] = "-V";
             break;
           case OPT_PBC_OUTPUT:
           case 'o':
-            sysargs[nsysargs++] = "-o";
-            sysargs[nsysargs++] = opt.opt_arg;
+            pargs[nargs++] = "-o";
+            pargs[nargs++] = opt.opt_arg;
             break;
           case 'r':
-            sysargs[nsysargs++] = "-r";
+            pargs[nargs++] = "-r";
             break;
           case 'c':
-            sysargs[nsysargs++] = "-c";
+            pargs[nargs++] = "-c";
             break;
           case OPT_GC_DEBUG:
           /*
@@ -673,7 +662,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
 
           case 'E':
-            sysargs[nsysargs++] = "-E";
+            pargs[nargs++] = "-E";
             break;
           default:
             /* languages handle their arguments later (after being initialized) */
@@ -691,11 +680,11 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         usage(stderr);
         exit(EXIT_FAILURE);
     }
+    for (i = opt.opt_index; i < argc; i++)
+        pargs[nargs++] = argv[i];
 
-    args->progargv = argv + opt.opt_index;
-    args->progargc = argc - opt.opt_index;
-    args->sysargv = sysargs;
-    args->sysargc = nsysargs;
+    args->argv = pargs;
+    args->argc = nargs;
 }
 
 /*

@@ -314,8 +314,7 @@ PARROT_API
 Parrot_Int Parrot_api_run_bytecode(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
-    Parrot_PMC sysargs,
-    Parrot_PMC progargs);
+    Parrot_PMC args);
 
 PARROT_API
 Parrot_Int Parrot_api_serialize_bytecode_pmc(
@@ -484,6 +483,14 @@ Parrot_Int Parrot_api_string_import_wchar(
 
 /* HEADERIZER BEGIN: src/embed/pmc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_box_float(
+    Parrot_PMC interp_pmc,
+    Parrot_Float value,
+    ARGOUT(Parrot_PMC * float_pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* float_pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_box_integer(
@@ -717,6 +724,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* args);
 
+#define ASSERT_ARGS_Parrot_api_pmc_box_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(float_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(int_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

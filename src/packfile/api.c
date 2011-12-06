@@ -36,10 +36,6 @@ format of bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void clone_constant(PARROT_INTERP, ARGIN(PMC **c))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -96,13 +92,6 @@ static void mark_1_ct_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*ct);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile * PackFile_append_pmc(PARROT_INTERP,
-    ARGIN(PMC * const pf_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 static void PackFile_Header_read_uuid(PARROT_INTERP,
     ARGMOD(PackFile_Header *self),
@@ -162,15 +151,16 @@ static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+static PMC* set_current_sub(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static int sub_pragma(PARROT_INTERP,
     pbc_action_enum_t action,
     ARGIN(const PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(c))
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -197,9 +187,6 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_mark_1_ct_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
-#define ASSERT_ARGS_PackFile_append_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf_pmc))
 #define ASSERT_ARGS_PackFile_Header_read_uuid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -225,6 +212,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ASSERT_ARGS_read_pbc_file_packfile_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(fullname))
+#define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_sub_pragma __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc))
@@ -1381,7 +1370,8 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 
 /*
 
-=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf, STRING
+*path)>
 
 Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
 is not important, and consuming code should not rely on any particular type
@@ -1397,7 +1387,7 @@ being returned. The only guarantees which are made by this interface are that:
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf), ARGIN(STRING *path))
 {
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC *ptr;
@@ -1413,6 +1403,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
     pf->view = ptr;
+    VTABLE_set_string_native(interp, ptr, path);
 
     Parrot_unblock_GC_mark(interp);
 
@@ -1440,7 +1431,7 @@ Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pf_get_current_packfile)
     if (interp->code)
-        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf);
+        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf, STRINGNULL);
     else
         return PMCNULL;
 }
@@ -1769,41 +1760,6 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 
 /*
 
-=item C<static void clone_constant(PARROT_INTERP, PMC **c)>
-
-Clones a constant (at least, if it's a Sub PMC), returning the clone.
-
-=cut
-
-*/
-
-static void
-clone_constant(PARROT_INTERP, ARGIN(PMC **c))
-{
-    ASSERT_ARGS(clone_constant)
-    STRING * const _sub = CONST_STRING(interp, "Sub");
-
-    if (VTABLE_isa(interp, *c, _sub)) {
-        Parrot_Sub_attributes *old_sub,     *new_sub;
-
-        PMC * const old_sub_pmc = *c;
-        PMC * const new_sub_pmc = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub_pmc));
-
-        PMC_get_sub(interp, new_sub_pmc, new_sub);
-        PMC_get_sub(interp, old_sub_pmc, old_sub);
-        new_sub->seg = old_sub->seg;
-
-        /* Vtable overrides and methods were already cloned, so don't reclone them. */
-        if (new_sub->vtable_index == -1
-        && !(old_sub->comp_flags   &  SUB_COMP_FLAG_METHOD))
-            Parrot_ns_store_sub(interp, new_sub_pmc);
-
-        *c = new_sub_pmc;
-    }
-}
-
-/*
-
 =item C<static INTVAL find_pf_ann_idx(PackFile_Annotations *pfa,
 PackFile_Annotations_Key *key, UINTVAL offs)>
 
@@ -2087,7 +2043,8 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PMC * const pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+    PMC * const pf_pmc = Parrot_pf_get_packfile_pmc(interp, pf, path);
 
     if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -2189,46 +2146,6 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     }
 
     Parrot_pop_context(interp);
-}
-
-/*
-
-=item C<static PackFile * PackFile_append_pmc(PARROT_INTERP, PMC * const
-pf_pmc)>
-
-Reads and appends a PBC to the current directory.  Fixes up sub addresses in
-newly loaded bytecode and runs C<:load> subs.
-
-=cut
-
-*/
-
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PackFile *
-PackFile_append_pmc(PARROT_INTERP, ARGIN(PMC * const pf_pmc))
-{
-    ASSERT_ARGS(PackFile_append_pmc)
-    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pf_pmc);
-
-    if (pf) {
-        PackFile *current_pf = interp->code->base.pf;
-        PMC      *current_pfpmc = Parrot_pf_get_current_packfile(interp);
-        if (!interp->code) {
-            STRING * const name = CONST_STRING(interp, "dummy");
-            interp->code = Parrot_pf_create_default_segments(interp, current_pfpmc, name, 1);
-            PARROT_ASSERT(interp->code);
-        }
-
-        PackFile_add_segment(interp, &current_pf->directory,
-                &pf->directory.base);
-        PARROT_GC_WRITE_BARRIER(interp, current_pfpmc);
-
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
-    }
-
-    return pf;
 }
 
 /*
@@ -2335,8 +2252,7 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
     else {
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf);
-        VTABLE_set_string_native(interp, pfview, path);
+        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         return pfview;
     }
@@ -2366,33 +2282,6 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
 {
     ASSERT_ARGS(PackFile_fixup_subs)
     do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
-}
-
-
-/*
-
-=item C<Parrot_PackFile PackFile_read_pbc(PARROT_INTERP, STRING *fullname, const
-int debug)>
-
-Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
-
-Deprecated: Do not use this function. Use Parrot_pf_read_pbc_file instead.
-See TT #2140 for details.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Parrot_PackFile
-PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
-{
-    ASSERT_ARGS(PackFile_read_pbc)
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
-    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    UNUSED(debug);
-    return (Parrot_PackFile)pfpmc;
 }
 
 /*
@@ -2677,8 +2566,72 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 /*
 
-=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC *
-sysargs, PMC * progargs)>
+=item C<static PMC* set_current_sub(PARROT_INTERP)>
+
+Search the fixup table for a PMC matching the argument.  On a match,
+set up the appropriate context.
+
+If no match, set up a dummy PMC entry.  In either case, return a
+pointer to the PMC.
+
+DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC*
+set_current_sub(PARROT_INTERP)
+{
+    ASSERT_ARGS(set_current_sub)
+    PMC *new_sub_pmc;
+
+    PackFile_ByteCode   * const cur_cs = interp->code;
+    PackFile_ConstTable * const ct     = cur_cs->const_table;
+    STRING * const SUB = CONST_STRING(interp, "Sub");
+
+    opcode_t    i;
+
+    /*
+     * Walk the fixup table.  The first Sub-like entry should be our
+     * entry point with the address at our resume_offset.
+     */
+
+    for (i = 0; i < ct->pmc.const_count; i++) {
+        PMC * const sub_pmc = ct->pmc.constants[i];
+        if (VTABLE_isa(interp, sub_pmc, SUB)) {
+            Parrot_Sub_attributes *sub;
+
+            PMC_get_sub(interp, sub_pmc, sub);
+            if (sub->seg == cur_cs) {
+                const size_t offs = sub->start_offs;
+
+                if (offs == interp->resume_offset) {
+                    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), sub_pmc);
+                    Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
+                    return sub_pmc;
+                }
+
+                break;
+            }
+        }
+    }
+
+    /* If we didn't find anything, put a dummy PMC into current_sub.
+       The default values set by SUb.init are appropriate for the
+       dummy, don't need additional settings. */
+    new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
+    Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);
+
+    return new_sub_pmc;
+}
+
+
+/*
+
+=item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC
+*args)>
 
 Execute a PackFile* as if it were a main program. This is an entrypoint into
 executing a Parrot program, it is not intended (and can be dangerous) if you
@@ -2691,7 +2644,7 @@ try to call it from within a running Parrot program
 PARROT_EXPORT
 void
 Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
-        ARGMOD(PMC * sysargs), ARGMOD(PMC * progargs))
+        ARGMOD(PMC *args))
 {
     ASSERT_ARGS(Parrot_pf_execute_bytecode_program)
     PMC * const current_pf = Parrot_pf_get_current_packfile(interp);
@@ -2711,17 +2664,32 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
     if (!main_sub)
         main_sub = set_current_sub(interp);
 
-    if (PMC_IS_NULL(progargs)) {
-        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, sysargs);
-        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "P->", sysargs);
-    }
-    else {
-        VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, progargs);
-        Parrot_pcc_invoke_sub_from_c_args(interp, main_sub, "PP->", sysargs, progargs);
-    }
+    VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
+    Parrot_cx_begin_execution(interp, main_sub, args);
 
     if (!PMC_IS_NULL(current_pf))
         Parrot_pf_set_current_packfile(interp, current_pf);
+}
+
+/*
+
+=item C<STRING * Parrot_pf_get_version_string(PARROT_INTERP, PMC * pbc)>
+
+Get a Major.Minor.Patch version number for the given packfile
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
+{
+    ASSERT_ARGS(Parrot_pf_get_version_string)
+    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pbc);
+    return Parrot_sprintf_c(interp, "%d.%d.%d",
+            pf->header->major, pf->header->minor, pf->header->patch);
 }
 
 /*

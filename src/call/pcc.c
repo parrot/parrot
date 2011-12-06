@@ -269,6 +269,7 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
           case enum_class_Sub:
           case enum_class_MultiSub:
           case enum_class_Eval:
+          case enum_class_Continuation:
             return 1;
           case enum_class_Object:
             break;
@@ -316,7 +317,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
     opcode_t    *dest;
-    PMC * const  ret_cont = pmc_new(interp, enum_class_Continuation);
+    PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
     if (PMC_IS_NULL(call_object))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
 

@@ -54,13 +54,16 @@ typedef enum {
 
 /* &gen_from_enum(interpcores.pasm) */
 typedef enum {
-    PARROT_SLOW_CORE,                       /* slow bounds/trace/profile core */
+    PARROT_SLOW_CORE,                       /* slow bounds/trace core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
     PARROT_FAST_CORE        = 0x01,         /* fast DO_OP core */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
-    PARROT_PROFILING_CORE   = 0x160         /* used by parrot debugger */
+    PARROT_PROFILING_CORE   = 0x160,        /* used by parrot debugger */
+    PARROT_SUBPROF_SUB_CORE = 0x200,        /* sub profiler core, sub mode */
+    PARROT_SUBPROF_HLL_CORE = 0x201,        /* sub profiler core, hll mode */
+    PARROT_SUBPROF_OPS_CORE = 0x202         /* sub profiler core, ops mode */
 } Parrot_Run_core_t;
 /* &end_gen */
 
@@ -215,9 +218,11 @@ struct parrot_interp_t {
 
     PMC *HLL_info;                            /* HLL names and types */
     PMC *HLL_namespace;                       /* cache of HLL toplevel ns */
+    PMC *HLL_entries;
 
     PMC *root_namespace;                      /* namespace hash */
     PMC *scheduler;                           /* concurrency scheduler */
+    PMC *cur_task;
 
     MMD_Cache *op_mmd_cache;                  /* MMD cache for builtins. */
 
@@ -226,7 +231,6 @@ struct parrot_interp_t {
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
     Hash        *const_cstring_hash;          /* cache of const_string items */
 
-    struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
@@ -235,6 +239,9 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+
+    UINTVAL          last_alarm;              /* has an alarm triggered? */
+    FLOATVAL         quantum_done;            /* expiration of current quantum */
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
@@ -403,7 +410,7 @@ PMC* Parrot_make_cb(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_run_callback(PARROT_INTERP,
     ARGMOD(PMC* user_data),
-    ARGIN(char* external_data))
+    ARGIN(void* external_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

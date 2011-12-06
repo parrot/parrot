@@ -2,9 +2,9 @@
 
 =head1 NAME
 
-Archive/Tar - module for manipulations of tar archives
+Archive::Tar - module for manipulations of tar archives
 
-head2 SYNOPSIS
+=head1 SYNOPSIS
 
     load_bytecode 'Archive/Tar.pbc'
 
@@ -27,7 +27,7 @@ head2 SYNOPSIS
     archive.'write'(fh)                         # gzip compressed
     fh.'close'()
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Partial port of Archive::Tar (version 1.60)
 

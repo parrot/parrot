@@ -25,6 +25,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include <stdio.h>
 
 #include "parrot/parrot.h"
+#include "parrot/events.h"
 #include "private_cstring.h"
 #include "api.str"
 
@@ -558,8 +559,8 @@ Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), const UINTVAL le
 
 /*
 
-=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, Buffer *buffer, const
-UINTVAL len)>
+=item C<STRING * Parrot_str_new_from_buffer(PARROT_INTERP, Parrot_Buffer
+*buffer, const UINTVAL len)>
 
 Makes a Parrot string from a Buffer.
 
@@ -575,7 +576,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Buffer *buffer), const UINTVAL len)
+Parrot_str_new_from_buffer(PARROT_INTERP, ARGMOD(Parrot_Buffer *buffer), const UINTVAL len)
 {
     ASSERT_ARGS(Parrot_str_new_from_buffer)
 
@@ -749,7 +750,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 
         if (setjmp(jmp.resume)) {
             /* catch */
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
             retv =  Parrot_str_new_init(interp, c, strlen(c),
                                         Parrot_binary_encoding_ptr, 0);
         }
@@ -758,7 +759,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
             Parrot_ex_add_c_handler(interp, &jmp);
             retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                         Parrot_platform_encoding_ptr, 0);
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
         }
 
         return retv;

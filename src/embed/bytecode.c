@@ -20,7 +20,6 @@ with Parrot bytecode.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
 
@@ -49,7 +48,7 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, filename);
-    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
+    *pbc = Parrot_pf_get_packfile_pmc(interp, pf, filename);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -83,7 +82,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
     }
-    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -135,9 +134,9 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
 /*
 
 =item C<Parrot_Int Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC
-pbc, Parrot_PMC sysargs, Parrot_PMC progargs)>
+pbc, Parrot_PMC args)>
 
-Runs the bytecode C<pbc> passing optional C<mainargs> parameters. This function
+Runs the bytecode C<pbc> passing optional C<args> parameters. This function
 returns a true value if this call is successful and false value otherwise.
 
 =cut
@@ -147,12 +146,11 @@ returns a true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
-    Parrot_PMC sysargs, Parrot_PMC progargs)
+        Parrot_PMC args)
 {
     ASSERT_ARGS(Parrot_api_run_bytecode)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_PMC _sysargs = sysargs ? sysargs : PMCNULL;
-    Parrot_PMC _progargs = progargs ? progargs : PMCNULL;
+    Parrot_PMC _args = args ? args : PMCNULL;
 
     /* Print out information if we are debugging */
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
@@ -160,7 +158,7 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
                  interp->run_core->name);
     }
 
-    Parrot_pf_execute_bytecode_program(interp, pbc, _sysargs, _progargs);
+    Parrot_pf_execute_bytecode_program(interp, pbc, _args);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -189,7 +187,6 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
-    /* TODO: Break up the dependency with embed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }

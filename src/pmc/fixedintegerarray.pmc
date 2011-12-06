@@ -109,10 +109,7 @@ Creates and returns a copy of the array.
          */
 
         INTVAL * int_array;
-        PMC    * const dest =
-            PObj_constant_TEST(SELF)
-                ? Parrot_pmc_new_constant(INTERP, SELF->vtable->base_type)
-                : Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC    * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
@@ -269,6 +266,8 @@ Returns the Parrot string value of the element at index C<key>.
 
 /*
 
+=item C<STRING *get_string()>
+
 =item C<STRING *get_repr()>
 
 Returns the Parrot string representation C<key>.
@@ -276,6 +275,10 @@ Returns the Parrot string representation C<key>.
 =cut
 
 */
+
+    VTABLE STRING *get_string() {
+        return STATICSELF.get_repr();
+    }
 
     VTABLE STRING *get_repr() {
         STRING *res    = CONST_STRING(INTERP, "[ ");
@@ -643,6 +646,33 @@ Sort the array and return self.
                 Parrot_util_quicksort(INTERP, (void**)int_array, n, cmp_func, "II->I");
         }
         RETURN(PMC *SELF);
+    }
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+
+    METHOD reverse() {
+        INTVAL n;
+        GET_ATTR_size(INTERP, SELF, n);
+        if (n > 1) {
+            INTVAL val;
+            INTVAL *data;
+            INTVAL i;
+
+            GET_ATTR_int_array(INTERP, SELF, data);
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
     }
 
 }

@@ -406,7 +406,7 @@ I/O objects, or an Iterator role applied to I/O objects.]
 
 =begin PIR_FRAGMENT
 
-    new $P0, [ 'Iterator' ], $P1
+    iter $P0, $P1
 
 =end PIR_FRAGMENT
 

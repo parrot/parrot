@@ -45,7 +45,6 @@ sub linedirective
 ##include <string.h>
 ##include "parrot/parrot.h"
 ##include "parrot/api.h"
-##include "parrot/embed.h"
 ##include "parrot/extend.h"
 #
 #static void fail(const char *msg);
@@ -171,7 +170,7 @@ int main(void) {
     /* Step 2: Now load in the PIR and execute it */
     Parrot_api_string_import(interp, "$temp_pbc", &filename);
     Parrot_api_load_bytecode_file(interp, filename, &bytecode);
-    Parrot_api_run_bytecode(interp, bytecode, NULL, NULL);
+    Parrot_api_run_bytecode(interp, bytecode, NULL);
     return 0;
 }
 CODE
@@ -352,7 +351,7 @@ int main(void) {
     Parrot_api_toggle_gc(interp, 0);
     imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
     imcc_compile_file_api(interp, pir_compiler, filename, &bytecode);
-    Parrot_api_run_bytecode(interp, bytecode, NULL, NULL);
+    Parrot_api_run_bytecode(interp, bytecode, NULL);
 
     Parrot_api_set_warnings(interp, 0);
     Parrot_api_add_library_search_path(interp, ".");
