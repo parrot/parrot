@@ -34,7 +34,7 @@ To show failed tests use :
 To show comments use :
 
     -o
-    -comments
+    --comments
 
 To ignore exit status from test scripts use :
 
@@ -79,7 +79,7 @@ To display version use :
 
 =head2 Command line options that take arguments 
 
-To interpreter to run the tests ('' for compiled tests.) use :
+To interpreter to run the tests (' ' for compiled tests.) use :
 
     -e
     --exec
