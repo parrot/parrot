@@ -1261,7 +1261,7 @@ PARROT_EXPORT
 void
 Parrot_interp_set_warnings(PARROT_INTERP, Parrot_warnclass wc)
 {
-    ASSERT_ARGS(Parrot_interp_setwarnings)
+    ASSERT_ARGS(Parrot_interp_set_warnings)
     /* Activates the given warnings.  (Macro from warnings.h.) */
     PARROT_WARNINGS_on(interp, wc);
 }
@@ -1270,17 +1270,9 @@ Parrot_interp_set_warnings(PARROT_INTERP, Parrot_warnclass wc)
 
 =back
 
-=cut
-
-*/
-
-/*
-
-=back
-
 =head1 SEE ALSO
 
-L<include/parrot/interpreter.h>, L<src/interp/interpreter.c>.
+L<include/parrot/interpreter.h>
 
 =cut
 
