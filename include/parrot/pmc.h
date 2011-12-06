@@ -114,6 +114,11 @@ PMC * Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+Parrot_PMC Parrot_pmc_null(void);
+
+PARROT_EXPORT
 INTVAL Parrot_pmc_register_new_type(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -210,6 +215,7 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pmc_register_new_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))

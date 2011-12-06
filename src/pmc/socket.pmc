@@ -439,19 +439,24 @@ Read the given number of bytes from the socket and return them in a string.
 
 /*
 
-=item C<METHOD readline()>
+=item C<METHOD readline(STRING delimiter)>
 
-Read a line from the socket and return it in a string.
+Read a line from the socket and return it in a string. If C<delimiter> is
+present, it is used to determine line endings instead of the default C<\n>.
 
 =cut
 
 */
 
-    METHOD readline() {
+    METHOD readline(STRING *delimiter    :optional,
+                    INTVAL has_delimiter :opt_flag) {
         INTVAL idx;
         STRING *result;
         STRING *buf;
         GET_ATTR_buf(INTERP, SELF, buf);
+
+        if (!has_delimiter)
+            delimiter = CONST_STRING(INTERP, "\n");
 
         if (Parrot_io_socket_is_closed(INTERP, SELF))
             RETURN(STRING * STRINGNULL);
@@ -459,7 +464,7 @@ Read a line from the socket and return it in a string.
         if (buf == STRINGNULL)
             buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
 
-        while ((idx = Parrot_str_find_index(INTERP, buf, CONST_STRING(INTERP, "\n"), 0)) < 0) {
+        while ((idx = Parrot_str_find_index(INTERP, buf, delimiter, 0)) < 0) {
             STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
             if (Parrot_str_length(INTERP, more) == 0) {
                 SET_ATTR_buf(INTERP, SELF, STRINGNULL);
@@ -468,7 +473,7 @@ Read a line from the socket and return it in a string.
             buf = Parrot_str_concat(INTERP, buf, more);
         }
 
-        idx++;
+        idx += Parrot_str_length(INTERP, delimiter);
         result = Parrot_str_substr(INTERP, buf, 0, idx);
         buf = Parrot_str_substr(INTERP, buf, idx, Parrot_str_length(INTERP, buf) - idx);
         SET_ATTR_buf(INTERP, SELF, buf);

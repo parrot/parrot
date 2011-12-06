@@ -220,14 +220,14 @@ environment variables:
 =begin PIR
 
     .sub _ :main
-        .local pmc env, iter
+        .local pmc env, it
         .local string key, value
 
         env  = new 'Env'                    # line 3
-        iter = new 'Iterator', env          # line 4
+        it   = iter env                     # line 4
       iterloop:
-        unless iter goto iterend
-        key = shift iter                    # line 8
+        unless it goto iterend
+        key = shift it                      # line 8
         value = env[key]
         print key
         print ":"
@@ -270,7 +270,7 @@ over the command line this same way? Sure!
     .sub _ :main
         .param pmc args
         .local pmc cmdline
-        cmdline = new 'Iterator', args
+        cmdline = iter args
       loop:
         unless cmdline goto end_loop
         $S0 = shift cmdline

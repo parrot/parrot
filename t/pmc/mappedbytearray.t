@@ -90,7 +90,7 @@ Tests the MappedByteArray PMC.
     $I1 = mm."close"()
     is( $I1, 0, 'Closed and unmapped testfile' )
 
-    throws_substring(<<'CODE', 'cannot open file', 'mmap a nonexistant file')
+    throws_substring(<<'CODE', 'cannot open file', 'mmap a nonexistent file')
     .sub main
         $P0 = new ['String']
         $P0 = "wezwuyebgjuzmhewrugnjzrg"
