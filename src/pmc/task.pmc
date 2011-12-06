@@ -294,12 +294,7 @@ Return a proxy for the last shared PMC.
 */
 
     VTABLE PMC *pop_pmc() {
-        PMC * const proxy = Parrot_pmc_new_init(interp, enum_class_Proxy,
-            VTABLE_pop_pmc(interp, PARROT_TASK(SELF)->shared));
-
-        PARROT_PROXY(proxy)->interp = PARROT_TASK(SELF)->interp;
-        PARROT_GC_WRITE_BARRIER(interp, proxy);
-        return proxy;
+        return VTABLE_pop_pmc(interp, PARROT_TASK(SELF)->shared);
     }
 
 /*

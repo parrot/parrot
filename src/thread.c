@@ -24,6 +24,8 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_task.h"
+#include "pmc/pmc_proxy.h"
 #include "pmc/pmc_parrotinterpreter.h"
 
 /* HEADERIZER HFILE: include/parrot/thread.h */
@@ -91,7 +93,6 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 #else
     pipe(new_interp->thread_data->notifierfd);
 #endif
-    PARROT_GC_WRITE_BARRIER(interp, new_interp);
 
     return new_interp_pmc;
 }
@@ -140,10 +141,25 @@ void
 Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_schedule_task)
-    PMC * const   self                = (PMC*) thread;
     Parrot_Interp const thread_interp =
-       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
-    PMC * const local_task = Parrot_thread_make_local_copy(thread_interp, interp, task);
+       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(thread))->interp;
+    PMC                    * const local_task  = Parrot_pmc_new(thread_interp, enum_class_Task);
+    Parrot_Task_attributes * const new_struct  = PARROT_TASK(local_task),
+                           * const old_struct  = PARROT_TASK(task);
+    PMC                    * const shared      = old_struct->shared;
+    INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
+
+    new_struct->code = Parrot_thread_make_local_copy(thread_interp, interp, old_struct->code);
+    new_struct->data = Parrot_thread_make_local_copy(thread_interp, interp, old_struct->data);
+    PARROT_GC_WRITE_BARRIER(thread_interp, local_task);
+
+    for (i = 0; i < elements; i++) {
+        PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
+        PMC * const proxy = Parrot_pmc_new_init(thread_interp, enum_class_Proxy, data);
+        PARROT_PROXY(proxy)->interp = interp;
+
+        VTABLE_push_pmc(thread_interp, new_struct->shared, proxy);
+    }
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler, local_task);
 }
@@ -163,7 +179,6 @@ static void*
 Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(Parrot_thread_outer_runloop)
-    int              lo_var_ptr;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = PMCNULL;
     Parrot_Interp    interp  =
@@ -173,6 +188,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count;
     char dummy;
+    int              lo_var_ptr;
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
