@@ -1,0 +1,76 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 Name
+
+parrot-nqp - Not Quite Perl (6) compiler.
+
+=head1 Description
+
+This is "Not Quite Perl" -- a compiler for quickly generating PIR
+routines from Perl6-like code.  The key feature of NQP-rx is that it's
+designed to be a very small compiler (as compared with, say, perl6
+or Rakudo) and is focused on being a high-level way to create
+transformers for Parrot (especially hll compilers).
+It is based on PCT::HLLCompiler.
+
+=head1 Usage
+
+parrot-nqp <file>
+
+=head2 Command Line Usage
+
+For help use :
+
+    -h
+    --help
+
+To show version use :
+
+    -v
+    --version
+
+To display the parse tree for regular expression use  :
+    
+    --target=parse
+
+To dispaly the PIR subroutine gererated to match the regular expression use :
+
+    --target=pir
+
+For dumper use :
+
+    --dumper=s
+
+To trace use :
+
+    -t=s
+    --trace=s
+
+For encoding use :
+
+    --encoding=s
+
+To combine use :
+
+    --combine
+
+For stage stats use :
+
+    --stagestats
+
+For backtrace use :
+
+    --ll-backtrace
+
+For output use :
+
+    -o=s
+    --output=s
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut
