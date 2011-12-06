@@ -2,16 +2,20 @@
 
 =head1 Name
 
-parrot-nqp - Not Quite Perl (6) compiler.
+parrot-nqp - Not Quite Perl (6)
 
 =head1 Description
 
-This is "Not Quite Perl" -- a compiler for quickly generating PIR
-routines from Perl6-like code.  The key feature of NQP-rx is that it's
-designed to be a very small compiler (as compared with, say, perl6
-or Rakudo) and is focused on being a high-level way to create
-transformers for Parrot (especially hll compilers).
-It is based on PCT::HLLCompiler.
+This is "Not Quite Perl (6)" -- a High Level Language (HLL) which allows one to
+write Perl6-like code. The key feature of NQP is that it's designed to be an
+easy-to-parse subset of Perl 6. It is geared towards being a high-level way to
+create transformers for Parrot (especially HLL compilers).  It is based on
+PCT::HLLCompiler.
+
+NQP is used as a bootstrapping language in for Rakudo, and hence developed
+outside of the main Parrot git repository. It is occasionally snapshotted into
+the main Parrot codebase so it can be bundled with Parrot releases and be used
+by core Parrot developers as well as HLL developers.
 
 =head1 Usage
 
