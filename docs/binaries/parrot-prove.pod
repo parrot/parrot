@@ -1,0 +1,98 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 Name
+
+parrot-prove - Prove is a PIR-based TAP (Test Anything Protocol) Harness
+
+=head1 Description
+
+It eats test output (i.e. is a TAP consumer) and tells humans if the
+test suite passed, and if not, which kind of pretty colors of smoke
+came out. It is mostly equivalent to 'prove' from Perl 5.
+
+=head1 Usage
+
+parrot-prove [option] [files]
+
+=head2 Command line boolean options
+
+To print all test lines use :
+
+    -v
+    --verbose
+
+To run the tests in random order use :
+
+    -s
+    --shuffle
+
+To show failed tests use :
+
+    -f
+    --failures
+
+To show comments use :
+
+    -o
+    -comments
+
+To ignore exit status from test scripts use :
+
+    --ignore-exit
+
+To merge test scripts STDERR with their STDOUT use :
+
+    -m
+    --merge
+
+To run tests in reverse order use :
+
+    --reverse
+
+To suppress some test output while running tests use :
+
+    -q
+    --quiet
+
+To print only summary result use :
+    
+    -Q
+    --QUIET
+
+To show only results with TODO or SKIP directives use :
+
+    --directives
+
+To normalize TAP output in verbose output use :
+
+    --normalize
+
+To display help use :
+
+    -h
+    --help
+
+To display version use :
+
+    -v
+    --version
+
+=head2 Command line options that take arguments 
+
+To interpreter to run the tests ('' for compiled tests.) use :
+
+    -e
+    --exec
+
+To store the resulting TAP in an archive file use :
+
+    -a
+    --archive
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut
