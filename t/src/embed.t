@@ -13,7 +13,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 15;
+plan tests => 13;
 
 =head1 NAME
 
@@ -540,51 +540,6 @@ CODE
 42.0 is the answer. What is the question?
 OUTPUT
 
-
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub", todo => "Must explicitly set a PIR compreg" );
-
-void hello(Parrot_Interp interp);
-
-void hello(Parrot_Interp interp)
-{
-    Parrot_printf(interp, "Hello from C\n");
-}
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
-    Parrot_PMC code;
-    Parrot_PMC hellosub, pir_compiler, pasm_compiler, interp_pmc;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    imcc_get_pir_compreg_api(interp_pmc, 1, &pir_compiler);
-    imcc_get_pir_compreg_api(interp_pmc, 1, &pasm_compiler);
-
-    /* Compile pir */
-    compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
-".sub externcall :main\n"
-"  .param pmc ec\n"
-"  ec()\n"
-"\n"
-".end\n"
-"\n",
-        &errstr
-    );
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
-    Parrot_ext_call(interp, code, "P->", hellosub);
-
-    Parrot_destroy(interp);
-    return 0;
-}
-CODE
-Hello from C
-OUTPUT
-
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace", todo => "Must explicitly set a PIR compreg" );
 
 void hello(Parrot_Interp interp);
@@ -600,7 +555,6 @@ int main(void)
     Parrot_String compiler, pir_compiler;
     Parrot_String errstr;
     Parrot_PMC code;
-    Parrot_PMC hellosub;
     Parrot_PMC rootns;
     Parrot_String parrotname;
     Parrot_PMC parrotns;
@@ -628,7 +582,6 @@ int main(void)
     rootns = Parrot_get_root_namespace(interp);
     parrotname = createstring(interp, "parrot");
     parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns, parrotname);
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
     helloname = createstring(interp, "hello");
     Parrot_PMC_set_pmc_keyed_str(interp, parrotns, helloname, hellosub);
 
@@ -1092,39 +1045,6 @@ Pir compiler returned no prog
 Pir compiler returned no prog
 OUTPUT
 
-}
-
-SKIP: {
-skip 'Need extra NCI thunks',1 unless $PConfig{HAS_EXTRA_NCI_THUNKS};
-
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
-
-void test(int x);
-
-void test(int x)
-{
-    printf("Hello!\n", x);
-}
-
-int main()
-{
-    Parrot_Interp interp;
-    Parrot_PMC test_pmc;
-    int x,y;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    x = 10;
-
-    test_pmc = Parrot_sub_new_from_c_func(interp, (void (*)())& test, "i");
-    Parrot_ext_call(interp, test_pmc, "I->", x, &y);
-
-    Parrot_x_exit(interp, 0);
-}
-CODE
-Hello!
-OUTPUT
 }
 
 # Local Variables:

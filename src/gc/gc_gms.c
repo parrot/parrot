@@ -982,7 +982,7 @@ gc_gms_process_dirty_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_dirty_list)
 
     POINTER_ARRAY_ITER(dirty_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1009,7 +1009,7 @@ gc_gms_process_work_list(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_process_work_list)
 
     POINTER_ARRAY_ITER(work_list,
-        PMC *pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1021,9 +1021,9 @@ gc_gms_process_work_list(PARROT_INTERP,
 
     /* Move processed objects back to own generation */
     POINTER_ARRAY_ITER(work_list,
-        pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-        PMC              *pmc  = &(item->pmc);
-        size_t            gen  = POBJ2GEN(pmc);
+        pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+        PMC              * const pmc  = &(item->pmc);
+        const size_t             gen  = POBJ2GEN(pmc);
 
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
 
@@ -1053,11 +1053,11 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
-        int move_to_old = (i + 1) != MAX_GENERATIONS;
+        const int move_to_old = (i + 1) != MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
-            pmc_alloc_struct *item = (pmc_alloc_struct *)ptr;
-            PMC              *pmc  = &(item->pmc);
+            pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+            PMC              * const pmc  = &(item->pmc);
 
             PARROT_ASSERT(PObj_constant_TEST(pmc) || (int)POBJ2GEN(pmc) == i);
 
@@ -1081,7 +1081,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     }
                 }
             }
-            else if (!PObj_constant_TEST(pmc)) {
+            else {
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
@@ -1101,8 +1101,8 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
             });
 
         POINTER_ARRAY_ITER(self->strings[i],
-            string_alloc_struct *item = (string_alloc_struct *)ptr;
-            STRING *str = &(item->str);
+            string_alloc_struct * const item = (string_alloc_struct *)ptr;
+            STRING * const str = &(item->str);
 
             PARROT_ASSERT(!PObj_on_free_list_TEST(str));
 
@@ -1116,7 +1116,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 }
             }
 
-            else if (!PObj_constant_TEST(str)) {
+            else {
                 Parrot_pa_remove(interp, self->strings[i], item->ptr);
                 if (Buffer_bufstart(str) && !PObj_external_TEST(str))
                     Parrot_gc_str_free_buffer_storage(
@@ -1155,7 +1155,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         || !"Resurrecting of dead objects is not supported");
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
-    if (PObj_live_TEST(pmc) || PObj_constant_TEST(pmc))
+    if (PObj_live_TEST(pmc))
         return;
 
     /* If object too old - skip it */
@@ -1300,7 +1300,7 @@ gc_gms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_gms_free_fixed_size_storage)
     if (data) {
-        MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        const MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         interp->gc_sys->stats.memory_used           -= size;
         interp->gc_sys->stats.mem_used_last_collect -= size;
@@ -1329,7 +1329,8 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         return self->num_early_gc_PMCs;
     if (which == TOTAL_PMCS) {
         /* It's higher than actual number of allocated PMCs */
-        size_t ret = 0, i;
+        size_t ret = 0;
+        size_t i;
         for (i = 0; i < MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_allocated(interp, self->objects[i]);
         }
@@ -1337,7 +1338,8 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
     }
     if (which == ACTIVE_PMCS) {
         /* It's higher than actual number of allocated PMCs */
-        size_t ret = 0, i;
+        size_t ret = 0;
+        size_t i;
         for (i = 0; i < MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_used(interp, self->objects[i]);
         }
@@ -1427,7 +1429,7 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
     if (pmc) {
-        size_t gen = POBJ2GEN(pmc);
+        const size_t gen = POBJ2GEN(pmc);
 
         /* We should never free objects from dirty list directly! */
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));

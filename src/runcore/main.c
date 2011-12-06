@@ -350,7 +350,7 @@ parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
 
 /*
 
-=item C<void disable_event_checking(PARROT_INTERP)>
+=item C<void Parrot_runcore_disable_event_checking(PARROT_INTERP)>
 
 Restore old function table.
 
@@ -362,9 +362,9 @@ XXX This is only implemented for the function core at present.
 
 PARROT_EXPORT
 void
-disable_event_checking(PARROT_INTERP)
+Parrot_runcore_disable_event_checking(PARROT_INTERP)
 {
-    ASSERT_ARGS(disable_event_checking)
+    ASSERT_ARGS(Parrot_runcore_disable_event_checking)
     PackFile_ByteCode *cs = interp->code;
     /* restore func table */
     PARROT_ASSERT(cs->save_func_table);
@@ -375,7 +375,7 @@ disable_event_checking(PARROT_INTERP)
 
 /*
 
-=item C<void enable_event_checking(PARROT_INTERP)>
+=item C<void Parrot_runcore_enable_event_checking(PARROT_INTERP)>
 
 Replace func table with one that does event checking for all opcodes.
 
@@ -390,9 +390,9 @@ XXX This is only implemented for the function core at present.
 
 PARROT_EXPORT
 void
-enable_event_checking(PARROT_INTERP)
+Parrot_runcore_enable_event_checking(PARROT_INTERP)
 {
-    ASSERT_ARGS(enable_event_checking)
+    ASSERT_ARGS(Parrot_runcore_enable_event_checking)
     PackFile_ByteCode *cs = interp->code;
 
     /* only save if we're not already event checking */

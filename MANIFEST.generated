@@ -1,11 +1,11 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.9.0.dylib                   [main]lib
+blib/lib/libparrot.3.10.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.9.0                      [main]lib
+blib/lib/libparrot.so.3.10.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
 docs/ops/bit.pod                                 [doc]
@@ -35,11 +35,13 @@ include/parrot/has_header.h                      [main]include
 include/parrot/pbcversion.h                      [devel]include
 include/parrot/vtable.h                          [main]include
 include/pmc/pmc_addrregistry.h                   [devel]include
+include/pmc/pmc_alarm.h                          [devel]include
 include/pmc/pmc_arrayiterator.h                  [devel]include
 include/pmc/pmc_bigint.h                         [devel]include
 include/pmc/pmc_bignum.h                         [devel]include
 include/pmc/pmc_boolean.h                        [devel]include
 include/pmc/pmc_bytebuffer.h                     [devel]include
+include/pmc/pmc_callback.h                       [devel]include
 include/pmc/pmc_callcontext.h                    [devel]include
 include/pmc/pmc_capture.h                        [devel]include
 include/pmc/pmc_class.h                          [devel]include
@@ -103,6 +105,7 @@ include/pmc/pmc_packfilesegment.h                [devel]include
 include/pmc/pmc_packfileview.h                   [devel]include
 include/pmc/pmc_parrotinterpreter.h              [devel]include
 include/pmc/pmc_parrotlibrary.h                  [devel]include
+include/pmc/pmc_pmclist.h                        [devel]include
 include/pmc/pmc_pmcproxy.h                       [devel]include
 include/pmc/pmc_pointer.h                        [devel]include
 include/pmc/pmc_ptr.h                            [devel]include
@@ -348,11 +351,13 @@ src/nci.c                                        []
 src/null_config.c                                []
 src/parrot_config.c                              []
 src/pmc/addrregistry.dump                        [devel]src
+src/pmc/alarm.dump                               [devel]src
 src/pmc/arrayiterator.dump                       [devel]src
 src/pmc/bigint.dump                              [devel]src
 src/pmc/bignum.dump                              [devel]src
 src/pmc/boolean.dump                             [devel]src
 src/pmc/bytebuffer.dump                          [devel]src
+src/pmc/callback.dump                            [devel]src
 src/pmc/callcontext.dump                         [devel]src
 src/pmc/capture.dump                             [devel]src
 src/pmc/class.dump                               [devel]src
@@ -415,6 +420,7 @@ src/pmc/packfilesegment.dump                     [devel]src
 src/pmc/packfileview.dump                        [devel]src
 src/pmc/parrotinterpreter.dump                   [devel]src
 src/pmc/parrotlibrary.dump                       [devel]src
+src/pmc/pmclist.dump                             [devel]src
 src/pmc/pmcproxy.dump                            [devel]src
 src/pmc/pointer.dump                             [devel]src
 src/pmc/ptr.dump                                 [devel]src

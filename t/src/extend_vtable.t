@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 138;
+plan tests => 137;
 
 =head1 NAME
 
@@ -60,7 +60,7 @@ static void fail(const char *msg)
 
 static Parrot_String createstring(Parrot_Interp interp, const char * value)
 {
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+    return Parrot_str_new(interp, value, strlen(value)/*, (const char*)NULL, 0*/);
 }
 
 static Parrot_Interp new_interp()
@@ -97,42 +97,41 @@ void dotest(Parrot_Interp interp, void *unused)
 {
     Parrot_PMC pmc, pmc2, pmc3, pmc_string, pmc_string2, pmc_string3;
     Parrot_PMC pmc_float, pmc_float2;
-    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation, continuation2, nci;
+    Parrot_PMC rpa, rpa2, fpa, hash, hash_iter, continuation, continuation2;
     Parrot_PMC key_int, key_str, hashkey, ns, object, klass;
     Parrot_Int type, value, integer, integer2;
     Parrot_Float number, number2;
     Parrot_String string, string2;
 
     type         = Parrot_PMC_typenum(interp, "Integer");
-    continuation = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
-    continuation2= Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
-    rpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
-    rpa2         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
-    fpa          = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
-    hash         = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Hash"));
-    ns           = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
-    nci          = Parrot_sub_new_from_c_func(interp, (void (*)(void))Parrot_PMC_new, "PpI");
-    pmc          = Parrot_PMC_new(interp, type);
-    pmc2         = Parrot_PMC_new(interp, type);
-    pmc3         = Parrot_PMC_new(interp, type);
-    key_int      = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Key"));
+    continuation = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
+    continuation2= Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Continuation"));
+    rpa          = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    rpa2         = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "ResizablePMCArray"));
+    fpa          = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "FixedPMCArray"));
+    hash         = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Hash"));
+    ns           = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Namespace"));
+    pmc          = Parrot_pmc_new(interp, type);
+    pmc2         = Parrot_pmc_new(interp, type);
+    pmc3         = Parrot_pmc_new(interp, type);
+    key_int      = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Key"));
     type         = Parrot_PMC_typenum(interp, "Class");
-    klass        = Parrot_PMC_new(interp, type);
+    klass        = Parrot_pmc_new(interp, type);
 
     Parrot_PMC_set_integer_native(interp, key_int, 42);
 
     Parrot_PMC_push_pmc(interp, rpa2, continuation);
 
-    pmc_string  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
-    pmc_string2 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
-    pmc_string3 = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"String"));
-    pmc_float   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
-    pmc_float2  = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp,"Float"));
+    pmc_string  = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string2 = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_string3 = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp,"String"));
+    pmc_float   = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp,"Float"));
+    pmc_float2  = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp,"Float"));
 
     string  = createstring(interp,"Object");
     Parrot_PMC_assign_string_native(interp, pmc_string, string);
 
-    object       = Parrot_PMC_newclass(interp, pmc_string);
+    object       = Parrot_oo_new_class_pmc(interp, pmc_string);
 
 
 CODE
@@ -190,7 +189,7 @@ CODE
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_ext_try coverage");
     type         = Parrot_PMC_typenum(interp, "Object");
-    klass        = Parrot_PMC_new(interp, type);
+    klass        = Parrot_pmc_new(interp, type);
 CODE
 Failed!
 Exception is: type 20 severity 2 message 'Object must be created by a class.'
@@ -208,7 +207,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(get|set)_attr_str");
     type   = Parrot_PMC_typenum(interp, "Exception");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
     string = createstring(interp,"payload");
@@ -224,7 +223,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(get|set)_attr_keyed");
     type   = Parrot_PMC_typenum(interp, "Exception");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
 
     Parrot_PMC_set_attr_keyed(interp, pmc, key_int, createstring(interp, "severity"), pmc2);
@@ -519,7 +518,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_does_pmc" );
-    pmc2   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "Role"));
+    pmc2   = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "Role"));
     integer = Parrot_PMC_does_pmc(interp,pmc,pmc2);
     Parrot_printf(interp,"%d\n", (int) integer);
 CODE
@@ -597,7 +596,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_find_method");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
     string = createstring(interp,"foo");
     pmc2   = Parrot_PMC_find_method(interp, pmc, string);
     Parrot_printf(interp,"42\n");
@@ -625,7 +624,7 @@ OUTPUT
 
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_set_pointer_keyed_int");
-    hashkey   = Parrot_PMC_new(interp, Parrot_PMC_typenum(interp, "HashIteratorKey"));
+    hashkey   = Parrot_pmc_new(interp, Parrot_PMC_typenum(interp, "HashIteratorKey"));
     Parrot_PMC_set_pointer_keyed_int(interp, hashkey, 0, (void*) 42);
     Parrot_printf(interp,"42\n");
 CODE
@@ -825,7 +824,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_attribute");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
 
     string = createstring(interp,"foo");
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
@@ -842,7 +841,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_vtable_override");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
 
     string = createstring(interp,"get_bool");
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
@@ -861,7 +860,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_method");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
 
     string = createstring(interp,"foo");
     Parrot_PMC_set_integer_native(interp, pmc2, 42);
@@ -879,10 +878,10 @@ OUTPUT
 # TODO remove_role
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
 
     type   = Parrot_PMC_typenum(interp, "Role");
-    pmc2   = Parrot_PMC_new(interp, type);
+    pmc2   = Parrot_pmc_new(interp, type);
 
     Parrot_PMC_add_role(interp, pmc, pmc2);
     Parrot_printf(interp,"42\n");
@@ -908,7 +907,7 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delprop");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
 
     Parrot_PMC_delprop(interp, pmc, string);
 CODE
@@ -917,8 +916,8 @@ OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_parent");
     type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_PMC_new(interp, type);
-    pmc2    = Parrot_PMC_new(interp, type);
+    pmc    = Parrot_pmc_new(interp, type);
+    pmc2    = Parrot_pmc_new(interp, type);
 
     Parrot_PMC_add_parent(interp, pmc, pmc2);
     Parrot_printf(interp,"42\n");
@@ -941,13 +940,6 @@ CODE
 Got non-zero hash value!
 Done!
 OUTPUT
-
-extend_vtable_output_like(<<'CODE', qr/Got pointer!/, "Parrot_PMC_get_pointer");
-    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, nci);
-    Parrot_printf(interp,"pointer = %d\n", integer);
-    if (integer != NULL)
-        Parrot_printf(interp,"Got pointer!n");
-CODE
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");

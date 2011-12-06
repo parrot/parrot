@@ -27,10 +27,23 @@ static STRING * build_string(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING * build_string_from_string(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *from),
+    INTVAL pos,
+    INTVAL size,
+    ARGIN(const STR_VTABLE *encoding))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(5);
+
 PARROT_WARN_UNUSED_RESULT
 static INTVAL grow_to(INTVAL position);
 
 #define ASSERT_ARGS_build_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(encoding))
+#define ASSERT_ARGS_build_string_from_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_grow_to __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -196,7 +209,6 @@ Reset the buffer with the content of the string.
         }
         SET_ATTR_source(INTERP, SELF, new_string);
         SET_ATTR_size(INTERP, SELF, Parrot_str_byte_length(INTERP, new_string));
-        SET_ATTR_content(INTERP, SELF, (unsigned char *)new_string->strstart);
     }
 
 /*
@@ -211,10 +223,21 @@ Get the value of the byte at position or 0 if out of bounds.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL position) {
         INTVAL size;
-        unsigned char *content;
         GET_ATTR_size(INTERP, SELF, size);
-        GET_ATTR_content(INTERP, SELF, content);
-        return (position >= 0 && position < size) ? content[position] : (INTVAL) 0;
+        if (position < 0 || position >= size)
+            return 0;
+        else {
+            unsigned char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            if (content == NULL) {
+                STRING *source;
+                GET_ATTR_source(INTERP, SELF, source);
+                if (STRING_IS_NULL(source))
+                    return 0;
+                content = (unsigned char*)source->strstart;
+            }
+            return content[position];
+        }
     }
 
 /*
@@ -301,6 +324,12 @@ Return a pointer to the content. Use with care.
     VTABLE void *get_pointer() {
         unsigned char *content;
         GET_ATTR_content(INTERP, SELF, content);
+        if (content == NULL) {
+            STRING *source;
+            GET_ATTR_source(INTERP, SELF, source);
+            if (! STRING_IS_NULL(source))
+                content = (unsigned char*)source->strstart;
+        }
         return (void *)content;
     }
 
@@ -341,7 +370,13 @@ Create a string with the buffer content and the encoding specified.
         const STR_VTABLE *encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
-        result = build_string(INTERP, content, size, encoding);
+        if (content == NULL) {
+            STRING *source;
+            GET_ATTR_source(INTERP, SELF, source);
+            result = build_string_from_string(interp, source, 0, size, encoding);
+        }
+        else
+            result = build_string(INTERP, content, size, encoding);
         RETURN(STRING *result);
     }
 
@@ -364,7 +399,13 @@ as the string argument.
             STRING_IS_NULL(as) ? Parrot_default_encoding_ptr : as->encoding;
         GET_ATTR_content(INTERP, SELF, content);
         GET_ATTR_size(INTERP, SELF, size);
-        result = build_string(INTERP, content, size, encoding);
+        if (content == NULL) {
+            STRING *source;
+            GET_ATTR_source(INTERP, SELF, source);
+            result = build_string_from_string(interp, source, 0, size, encoding);
+        }
+        else
+            result = build_string(INTERP, content, size, encoding);
         RETURN(STRING *result);
     }
 
@@ -394,6 +435,12 @@ length in codepoints.
                     EXCEPTION_OUT_OF_BOUNDS,
                     "get_chars: index out of bounds");
 
+        if (content == NULL) {
+            STRING *source;
+            GET_ATTR_source(INTERP, SELF, source);
+            if (! STRING_IS_NULL(source))
+                content = (unsigned char*)source->strstart;
+        }
         result = Parrot_str_extract_chars(INTERP, (char *)content + pos,
                     size - pos, length, encoding);
         RETURN(STRING *result);
@@ -418,6 +465,11 @@ decrease the number of reallocations.
 *content, INTVAL size, const STR_VTABLE *encoding)>
 
 Build a string from the buffer content with the encoding specified.
+
+=item C<static STRING * build_string_from_string(PARROT_INTERP, STRING *from,
+INTVAL pos, INTVAL size, const STR_VTABLE *encoding)>
+
+Build a string from part of a string content with the encoding specified.
 
 =cut
 
@@ -452,6 +504,26 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
                 (const char *)content, size, encoding, 0);
         return result;
     }
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STRING *
+build_string_from_string(PARROT_INTERP, ARGIN_NULLOK(STRING *from),
+        INTVAL pos, INTVAL size, ARGIN(const STR_VTABLE *encoding))
+{
+    ASSERT_ARGS(build_string_from_string)
+    STRING *result;
+    if (STRING_IS_NULL(from))
+        result = Parrot_str_new_init(interp, NULL, 0, encoding, 0);
+    else {
+        result = Parrot_str_new_noinit(interp, size);
+        memcpy(result->strstart, from->strstart + pos, size);
+        result->bufused = size;
+        result->encoding = encoding;
+        encoding->scan(interp, result);
+    }
+    return result;
 }
 
 /*

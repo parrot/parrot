@@ -459,7 +459,7 @@ Introspection interface. C<key> can be:
             level = 1;
 
         if (level < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "No such caller depth");
 
         ctx = CURRENT_CONTEXT(INTERP);
@@ -469,7 +469,7 @@ Introspection interface. C<key> can be:
                 ctx = Parrot_pcc_get_outer_ctx(INTERP, ctx);
                 if (PMC_IS_NULL(ctx))
                     Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        CONTROL_ERROR, "No such outer depth");
+                        EXCEPTION_INVALID_OPERATION, "No such outer depth");
             }
         }
         else {
@@ -478,13 +478,13 @@ Introspection interface. C<key> can be:
 
                 if (PMC_IS_NULL(cont) || !PARROT_CONTINUATION(cont)->seg)
                     Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        CONTROL_ERROR, "No such caller depth");
+                        EXCEPTION_INVALID_OPERATION, "No such caller depth");
 
                 ctx = PARROT_CONTINUATION(cont)->to_ctx;
 
                 if (PMC_IS_NULL(Parrot_pcc_get_sub(INTERP, ctx)))
                     Parrot_ex_throw_from_c_args(INTERP, NULL,
-                        CONTROL_ERROR, "No such caller depth");
+                        EXCEPTION_INVALID_OPERATION, "No such caller depth");
             }
         }
 
@@ -745,6 +745,12 @@ support it.
     METHOD getpid() {
         const INTVAL id = Parrot_getpid();
         RETURN(INTVAL id);
+    }
+
+    METHOD current_task() {
+        Interp * const this_interp = PMC_interp(SELF);
+        PMC * const current_task = this_interp->cur_task;
+        RETURN(PMC *current_task);
     }
 
 }

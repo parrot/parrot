@@ -620,6 +620,7 @@ examples/pir/befunge/stack.pir                              [examples]
 examples/pir/befunge/t/basic.t                              [examples]
 examples/pir/befunge/test.bef                               [examples]
 examples/pir/circle.pir                                     [examples]
+examples/pir/coop_threads.pir                               [examples]
 examples/pir/euclid.pir                                     [examples]
 examples/pir/genprog.bas                                    [examples]
 examples/pir/hanoi.pir                                      [examples]
@@ -863,6 +864,7 @@ frontend/pbc_merge/main.c                                   []
 include/imcc/api.h                                          [main]include
 include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
+include/parrot/alarm.h                                      [main]include
 include/parrot/api.h                                        [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
@@ -876,6 +878,7 @@ include/parrot/disassemble.h                                [main]include
 include/parrot/dynext.h                                     [main]include
 include/parrot/encoding.h                                   [main]include
 include/parrot/enums.h                                      [main]include
+include/parrot/events.h                                     [main]include
 include/parrot/exceptions.h                                 [main]include
 include/parrot/exit.h                                       [main]include
 include/parrot/extend.h                                     [main]include
@@ -976,6 +979,7 @@ lib/Parrot/H2inc.pm                                         [devel]lib
 lib/Parrot/Harness/DefaultTests.pm                          [devel]lib
 lib/Parrot/Harness/Options.pm                               [devel]lib
 lib/Parrot/Harness/Smoke.pm                                 [devel]lib
+lib/Parrot/Harness/TestSets.pm                              [devel]lib
 lib/Parrot/Headerizer.pm                                    [devel]lib
 lib/Parrot/Headerizer/Functions.pm                          [devel]lib
 lib/Parrot/IO/Directory.pm                                  [devel]lib
@@ -1054,6 +1058,7 @@ runtime/parrot/bin/prove.pir                                [library]
 runtime/parrot/dynext/README                                []doc
 runtime/parrot/include/README                               []doc
 runtime/parrot/include/fp_equality.pasm                     [library]
+runtime/parrot/include/green_threads.pir                    [library]
 runtime/parrot/include/hllmacros.pir                        [library]
 runtime/parrot/include/test_more.pir                        [library]
 runtime/parrot/languages/parrot/parrot.pir                  [library]
@@ -1156,6 +1161,7 @@ runtime/parrot/library/postgres.declarations                [library]
 runtime/parrot/library/postgres.pir                         [library]
 runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
+src/alarm.c                                                 []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1196,6 +1202,7 @@ src/embed/bytecode.c                                        []
 src/embed/embed_private.h                                   []
 src/embed/pmc.c                                             []
 src/embed/strings.c                                         []
+src/events.c                                                []
 src/exceptions.c                                            []
 src/exit.c                                                  []
 src/extend.c                                                []
@@ -1310,11 +1317,13 @@ src/platform/win32/time.c                                   []
 src/platform/win32/uid.c                                    []
 src/pmc.c                                                   []
 src/pmc/addrregistry.pmc                                    []
+src/pmc/alarm.pmc                                           []
 src/pmc/arrayiterator.pmc                                   []
 src/pmc/bigint.pmc                                          []
 src/pmc/bignum.pmc                                          []
 src/pmc/boolean.pmc                                         []
 src/pmc/bytebuffer.pmc                                      []
+src/pmc/callback.pmc                                        []
 src/pmc/callcontext.pmc                                     []
 src/pmc/capture.pmc                                         []
 src/pmc/class.pmc                                           []
@@ -1374,6 +1383,7 @@ src/pmc/packfileview.pmc                                    []
 src/pmc/parrotinterpreter.pmc                               []
 src/pmc/parrotlibrary.pmc                                   []
 src/pmc/pmc.num                                             []
+src/pmc/pmclist.pmc                                         []
 src/pmc/pmcproxy.pmc                                        []
 src/pmc/pointer.pmc                                         []
 src/pmc/ptr.pmc                                             []
@@ -1431,6 +1441,7 @@ src/vtables.c                                               []
 src/warnings.c                                              []
 t/README.pod                                                []doc
 t/TESTS_STATUS.pod                                          [test]
+t/archive/README                                            []doc
 t/benchmark/benchmarks.t                                    [test]
 t/codingstd/c_arg_assert.t                                  [test]
 t/codingstd/c_code_coda.t                                   [test]
@@ -1658,6 +1669,7 @@ t/examples/streams.t                                        [test]
 t/examples/subs.t                                           [test]
 t/examples/tutorial.t                                       [test]
 t/ext/winxed/compreg.t                                      [test]
+t/fullharness                                               [test]
 t/harness                                                   [test]
 t/harness.pir                                               [test]
 t/include/fp_equality.t                                     [test]
@@ -1820,6 +1832,7 @@ t/pir/registernames.t                                       [test]
 t/pir/testlib/loadtest.pir                                  [test]
 t/pir/timer_exit.t                                          [test]
 t/pmc/addrregistry.t                                        [test]
+t/pmc/alarm.t                                               [test]
 t/pmc/arrayiterator.t                                       [test]
 t/pmc/bigint.t                                              [test]
 t/pmc/bignum.t                                              [test]
@@ -1898,6 +1911,7 @@ t/pmc/parrotio.t                                            [test]
 t/pmc/parrotlibrary.t                                       [test]
 t/pmc/parrotobject.t                                        [test]
 t/pmc/pmc.t                                                 [test]
+t/pmc/pmclist.t                                             [test]
 t/pmc/pmcproxy.t                                            [test]
 t/pmc/pointer.t                                             [test]
 t/pmc/prop.t                                                [test]
@@ -1909,7 +1923,6 @@ t/pmc/resizablestringarray.t                                [test]
 t/pmc/ro.t                                                  [test]
 t/pmc/role.t                                                [test]
 t/pmc/scalar.t                                              [test]
-t/pmc/scheduler.t                                           [test]
 t/pmc/schedulermessage.t                                    [test]
 t/pmc/signal.t                                              [test]
 t/pmc/sockaddr.t                                            [test]
@@ -1923,6 +1936,7 @@ t/pmc/structview.t                                          [test]
 t/pmc/sub.t                                                 [test]
 t/pmc/sys.t                                                 [test]
 t/pmc/task.t                                                [test]
+t/pmc/task_primes.t                                         [test]
 t/pmc/testfile                                              [test]
 t/pmc/testlib/annotations.pir                               [test]
 t/pmc/testlib/number.pasm                                   [test]
@@ -1952,6 +1966,7 @@ t/src/extend.t                                              [test]
 t/src/extend_vtable.t                                       [test]
 t/src/misc.t                                                [test]
 t/src/pointer_array.t                                       [test]
+t/src/threads_io.t                                          [test]
 t/src/warnings.t                                            [test]
 t/steps/auto/arch-01.t                                      [test]
 t/steps/auto/attributes-01.t                                [test]

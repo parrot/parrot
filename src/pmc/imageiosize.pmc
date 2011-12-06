@@ -54,7 +54,8 @@ static int
 check_seen(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const PMC *v))
 {
     ASSERT_ARGS(check_seen)
-    const Hash *       const seen = (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
+    const Hash * const seen =
+        (Hash *)VTABLE_get_pointer(interp, PARROT_IMAGEIOSIZE(self)->seen);
     const HashBucket * const b    = Parrot_hash_get_bucket(interp, seen, v);
     if (b)
         return 1;
