@@ -433,7 +433,7 @@ Parrot_api_pmc_box_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String str)
 =item C<Parrot_Int Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int
 value, Parrot_PMC * int_pmc)>
 
-Wraps the integer C<str> into a PMC and stores the results in C<int_pmc>. This
+Wraps the integer C<value> into a PMC and stores the results in C<int_pmc>. This
 function returns a true value if this call is successful and false value
 otherwise.
 
@@ -448,12 +448,33 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 {
     ASSERT_ARGS(Parrot_api_pmc_box_integer)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *int_pmc = Parrot_pmc_new(interp, enum_class_Integer);
-    VTABLE_set_integer_native(interp, *int_pmc, value);
+    *int_pmc = Parrot_pmc_box_integer(interp, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
-/* TODO: Box float */
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_box_float(Parrot_PMC interp_pmc, Parrot_Float
+value, Parrot_PMC * float_pmc)>
+
+Wraps the float C<value> into a PMC and stores the results in C<float_pmc>. This
+function returns a true value if this call is successful and false value
+otherwise.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_box_float(Parrot_PMC interp_pmc, Parrot_Float value,
+        ARGOUT(Parrot_PMC * float_pmc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_box_float)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *float_pmc = Parrot_pmc_box_number(interp, value);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 
 /*
 

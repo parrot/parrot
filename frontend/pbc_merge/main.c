@@ -850,7 +850,7 @@ main(int argc, const char **argv)
                 strlen(input_files[i]->filename));
         {
             PackFile * const pf = Parrot_pf_read_pbc_file(interp, pbcname);
-            pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+            pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf, pbcname);
         }
 
         /* Load the packfile and unpack it. */

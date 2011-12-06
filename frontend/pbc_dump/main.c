@@ -372,7 +372,7 @@ main(int argc, const char **argv)
         return 1;
     }
 
-    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    pfpmc = Parrot_pf_get_packfile_pmc(interp, pf, infilename);
     Parrot_pf_set_current_packfile(interp, pfpmc);
 
     if (convert) {

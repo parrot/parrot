@@ -501,7 +501,7 @@ SKIP: {
         $S2 = sprintf $S1, $P2
         print $S2
 
-        $P3 = $P1."lstat"("non-existant file")
+        $P3 = $P1."lstat"("non-existent file")
 
         end
 .end
