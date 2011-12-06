@@ -12,17 +12,17 @@ Compile bytecode to executable.
 
 pbc_to_exe [option] <file>
 
-=head2 Comman line Options
+=head2 Command line Options
 
 For help use :
 
     -h
     --help
 
-To insall use :
+To install use :
 
     -i
-    --insall
+    --install
 
 To runcore or to change runcore use :
 
@@ -34,7 +34,7 @@ For output file use :
     -o
     --output=FILE
 
-To change garbage collectro algorith use :
+To change garbage collector algorithm use :
 
     --gc=ms2|gms
 
