@@ -2,15 +2,15 @@
 
 =head1 Name
 
-parrot_nci_thunk_gen - Parrot NCI thunk library creation utility.
+parrot_nci_thunk_gen - Create Parrot NCI thunks
 
 =head1 Description
 
-It creates C file of routines suitable for use as Parrot Native Call Interface thunks.
+This utility creates C file of routines suitable for use as Parrot Native Call Interface thunks.
 
 =head1 Usage
 
-parrot_nci_thunk_gen [option] -o output_c_file.c < input_signature_list.nci
+    parrot_nci_thunk_gen [option] -o output_c_file.c < input_signature_list.nci
 
 =head2 Command line Options
 
@@ -71,14 +71,3 @@ L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.o
 You are also invited to join the #parrot IRC channel on irc.parrot.org.
 
 =cut
-
-
-
-
-
-
-
-
-
-
-
