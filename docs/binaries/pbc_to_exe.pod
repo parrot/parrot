@@ -1,12 +1,14 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2011, Parrot Foundation.
 
 =head1 Name
 
-pbc_to_exe.pod - Generate executables from Parrot bytecode
+pbc_to_exe - Generate executables from Parrot bytecode
 
 =head1 Description
 
-Compile bytecode to executable.
+This utility compiles bytecode to native executables. These are called
+"fakecutables", because they are actually just the bytecode packaged up as raw
+data inside a C skeleton.
 
 =head1 Usage
 

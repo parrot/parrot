@@ -545,6 +545,8 @@ op_lib_t *Parrot_DynOp_core_3_10_0(PARROT_INTERP, long init);
  opcode_t * Parrot_sub_p_p_n(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sub_p_p_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sqrt_n_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_is_inf_or_nan_i_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_is_inf_or_nan_i_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_p(opcode_t *, PARROT_INTERP);
