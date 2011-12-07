@@ -1177,14 +1177,14 @@ EOC
         {
             STRING * const method_name = CONST_STRING_GEN(interp, "$symbol_name");
             STRING * const signature   = CONST_STRING_GEN(interp, "$pcc_signature");
-            register_native_pcc_method_in_ns(interp, entry,
+            Parrot_interp_register_native_pcc_method_in_ns(interp, entry,
                 F2DPTR(Parrot_${classname}_${method_name}),
                 method_name, signature);
         }
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$symbol_name");
+        Parrot_interp_mark_method_writes(interp, entry, "$symbol_name");
 EOC
         }
     }

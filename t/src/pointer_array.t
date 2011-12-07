@@ -41,7 +41,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, count;
     void *pi, *pj;
@@ -102,7 +102,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterating)" );
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, j, k, count = 0;
     void *pi, *pj, *pk;

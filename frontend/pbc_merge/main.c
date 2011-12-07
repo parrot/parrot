@@ -803,7 +803,7 @@ main(int argc, const char **argv)
     int i;
     const char *output_file     = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    Interp * const interp = Parrot_new(NULL);
+    Interp * const interp = Parrot_interp_new(NULL);
     STRING * pbcname = NULL;
     PMC * pbcpmc = NULL;
 
