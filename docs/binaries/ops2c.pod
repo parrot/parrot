@@ -1,0 +1,54 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 Name
+
+ops2c - part of Parrot VM's build infrastructure.
+
+=head1 Description
+
+Translate .ops file in .c files for opcode compilation.
+
+=head1 Usage
+
+ops2c [option]
+
+=head2 Command line Options
+
+For help, use :
+
+    -h
+    --help
+
+To generate the C code for core ops (must be run from within Parrot's build directory), use :
+
+    -c
+    --core
+
+To generate the C code for dynamic ops in a single .ops file, use :
+
+    -d <file.ops>
+    --dynamic <file.ops>
+
+To suppress any non-error messages, use :
+
+    -q
+    --quiet
+
+To suppress #line directives in generated C code (line numbers are not currently supported), use :
+
+    -n
+    --no-lines
+
+For debugging option : 
+To perform all processing without writing to any files, use :
+
+    -g
+    --debug
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut
