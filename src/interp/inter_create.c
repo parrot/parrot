@@ -310,6 +310,11 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     /* setup stdio PMCs */
     Parrot_io_init(interp);
 
+    /* all sys running, init the event and signal stuff
+     */
+
+    Parrot_cx_init_scheduler(interp);
+
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
@@ -318,12 +323,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
      */
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
-
-    /* all sys running, init the event and signal stuff
-     * the first or "master" interpreter is handling events and signals
-     */
-
-    Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
     /*

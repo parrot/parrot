@@ -67,8 +67,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     /* we block GC runs while cloning since C<d> is not yet running */
     Parrot_block_GC_mark(d);
 
-    d->scheduler = Parrot_pmc_new(d, enum_class_Scheduler);
-
     /* can't copy directly, unless you want double-frees */
     if (flags & PARROT_CLONE_RUNOPS)
         Parrot_runcore_switch(d, s->run_core->name);

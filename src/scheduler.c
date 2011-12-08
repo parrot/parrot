@@ -77,9 +77,9 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
     ASSERT_ARGS(Parrot_cx_init_scheduler)
     interp->quantum_done = Parrot_floatval_time() + PARROT_TASK_SWITCH_QUANTUM;
 
-    if (!interp->parent_interpreter) {
-        interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
+    interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
 
+    if (!interp->parent_interpreter) {
         /* Make sure the program can handle alarm signals */
         Parrot_alarm_init();
     }
