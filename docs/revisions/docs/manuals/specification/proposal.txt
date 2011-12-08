@@ -1,0 +1,9 @@
+A Proposal: The Parrot Virtual Machine Specification and Reference
+Implementation 
+
+				  Alvis Yardley
+
+
+This, rather brief, document is a proposal to solicit the Parrot Development
+Team's adoption of a specification and a reference implementation of the Parrot
+Virtual Machine.  

@@ -1,0 +1,12 @@
+A Proposal: The Parrot Virtual Machine Specification and Reference
+Implementation 
+
+				  Alvis Yardley
+
+
+This, rather brief, document is a proposal to solicit the Parrot Development
+Team's adoption of a specification and a reference implementation of the Parrot
+Virtual Machine.  ....
+
+To start, we must acknowledge the obvious: As an approach to documenting the
+Parrot Virtual Machine [hereinafter PVM], Parrot Design Documents has failed.  

@@ -1,0 +1,17 @@
+NOTE - A note list file for Parrot's Documentation Revision Effort.
+
+This document contains several relevant notes about the documentation revision
+effort. 
+
+01. The directory in which this 'NOTE' file is contained, i.e., 'revisions',
+    serves, essentially, as the base directory for the documentation revision
+    effort.  Or, in other words, the 'revisions' directory is kind'a/sort'a
+    the logical equivalent of the 'docs' directory in the parrot repo.
+
+    The reason for this is, it provides us with a "base" directory from which to
+    maintain some parity with parrot's 'docs' directory, but, also, provides us
+    with a place to put the documentation files on which we are working or have
+    completed. In fact, 'revisions', itself, contains a 'docs' directory, which
+    mirrors parrot's on 'docs' structure; though, of course, not all of the
+    documents in parrot's 'docs' directory will appear in revisions' 'docs'
+    directory, but many will. --acy

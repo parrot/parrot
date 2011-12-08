@@ -5,32 +5,43 @@ revision of Parrot's Documentation Set.  Please note, by complete, we
 mean a set of documents sufficient to satisfy the goals set out in 
 'README_revisions.pod'.
 
-[Open] 0.   Solicit aid!
+[Open] 00. Solicit aid!
 
-[Done] 1.   Write a README_revision and this TODO_revision and commit them
+[Done] 01.  Write a README_revision and this TODO_revision and commit them
        	    to a new documentation branch on github.
 
-[Done] 2.   Create a new 'documentation_set' branch on github to house
+[Done] 02.  Create a new 'documentation_revisions' branch on github to house
        	    our revisions.
 
-[Done] 3.   Convert 'docs.parrot.org' to Github pages.
+[Done] 03.  Convert 'docs.parrot.org' (version 3.10.0) to Github pages.
 
-[Open] 4.   Review and revise (i.e., correct, update, and delete, where
+       	    [Open] 03a. Convert versions 3.9.0 to the same.
+       	    [Open] 03b. Convert versions 3.8.0 to the same.
+       	    [Open] 03c. Convert versions 3.7.0 to the same.
+       	    [Open] 03d. Convert versions 3.6.0 to the same.
+       	    [Open] 03e. Convert versions 3.5.0 to the same.
+       	    [Open] 03f. Convert versions 3.4.0 to the same.
+       	    [Open] 03g. Convert versions 3.3.0 to the same.
+       	    [Open] 03h. Convert versions 3.2.0 to the same.
+       	    [Open] 03i. Convert versions 3.1.0 to the same.
+       	    [Open] 03j. Convert versions 3.0.0 to the same.
+
+[Open] 04.  Review and revise (i.e., correct, update, and delete, where
        	    appropriate) each and every document in the 'docs/' directory.
 
-[Open] 5.   Add a new 'README.pod' to 'docs/', giving an overview of the 
+[Open] 05.  Add a new 'README.pod' to 'docs/', giving an overview of the 
        	    contents of each directory in 'docs/' and of the '*.pod's in
 	    'docs/'.
 
-[Open] 6.   Apply a number system to all of the docs in 'docs/' 
+[Open] 06.  Apply a number system to all of the docs in 'docs/' 
        	    (e.g., something similar to what we presently use in 
 	    'docs/book/...'). 
 
-[Open] 7.   Revise and update 'docs/parrot.pod'.
+[Open] 07.  Revise and update 'docs/parrot.pod'.
 
-[Open] 8.   Add a directory structure for the new manuals.[1]
+[Open] 08.  Add a directory structure for the new manuals.[1]
 
-[Open] 9.   Revise the PIR book contained in 'docs/book/pir'.
+[Open] 09.  Revise the PIR book contained in 'docs/book/pir'.
 
 [Open] 10.  Revise the PCT book contained in 'docs/book/pct'.[2]
 
@@ -71,7 +82,8 @@ mean a set of documents sufficient to satisfy the goals set out in
 
 [Open] 17.  Write '*.pod' pages for each of the installable binaries in
        	    Parrot's distribution.
-[Done] 17a. 'parrot.pod'
+
+	    [Done] 17a. 'parrot.pod'
 
 [Open] 18.  Write an autogen tool to run our '*.pod' pages in (17) above 
        	    through 'pod2man', converting them to '*roff' pages.
