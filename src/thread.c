@@ -129,6 +129,26 @@ Parrot_thread_run(PARROT_INTERP, ARGMOD(PMC *thread_interp_pmc), ARGIN(PMC *sub)
 
 /*
 
+=item C<PMC* Parrot_thread_create_proxy(PARROT_INTERP, Parrot_Interp const
+thread, PMC *pmc)>
+
+Create a local proxy in the thread interp for the pmc belonging to interp
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
+{
+    PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
+    PARROT_PROXY(proxy)->interp = interp;
+    return proxy;
+}
+
+/*
+
 =item C<void Parrot_thread_schedule_task(PARROT_INTERP, PMC *thread, PMC *task)>
 
 Schedule a task with the thread's scheduler.
@@ -155,10 +175,9 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
 
     for (i = 0; i < elements; i++) {
         PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
-        PMC * const proxy = Parrot_pmc_new_init(thread_interp, enum_class_Proxy, data);
-        PARROT_PROXY(proxy)->interp = interp;
 
-        VTABLE_push_pmc(thread_interp, new_struct->shared, proxy);
+        VTABLE_push_pmc(thread_interp, new_struct->shared,
+            Parrot_thread_create_proxy(interp, thread_interp, data));
     }
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler, local_task);

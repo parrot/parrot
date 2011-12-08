@@ -130,6 +130,14 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_thread_create_proxy(PARROT_INTERP,
+    ARGIN(Parrot_Interp const thread),
+    ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -178,6 +186,10 @@ PMC * Parrot_thread_transfer_sub(
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_create_proxy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_thread_get_free_threads_array_index \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
