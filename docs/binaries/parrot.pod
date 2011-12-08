@@ -1,10 +1,10 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2011, Parrot Foundation.
 
 =pod
 
 =head1 NAME
 
-parrot - The Parrot Virtual Machine. 
+parrot - Parrot Virtual Machine
 
 =head1 SYNOPSIS
 
@@ -12,7 +12,12 @@ B<parrot> [-options] <file> [arguments ...]
 
 =head1 DESCRIPTION
 
-Parrot is a virtual machine designed to, efficiently, compile and execute bytecode for dynamic languages. Parrot currently hosts a variety of language implementations in various stages of completion, including Tcl, Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, APL, and a .NET bytecode translator. Parrot is not about parrots, but we are rather fond of them, for obvious reasons.
+Parrot is a virtual machine designed to efficiently compile and execute
+bytecode for dynamic languages. Parrot currently hosts a variety of language
+implementations in various stages of completion, including Tcl, Javascript,
+Ruby, Lua, Scheme, PHP, Python, Perl 6, APL, and a .NET bytecode translator.
+Parrot is not about parrots, but we are rather fond of them, for obvious
+reasons.
 
 =head1 OPTIONS
 
@@ -189,7 +194,8 @@ Size of gen0 (default 2)
 
 =over 11
 
-This imposes some stress on the GC subsystem and can slow down, considerably, execution.
+This imposes some stress on the GC subsystem and can considerably slow
+down execution.
 
 =back
 
@@ -232,7 +238,8 @@ Print the runtime prefix path and exit.
 
 =over 11
 
-The B<-d> switch takes an optional argument, consisting of a hexadecimal value of debug bits. If no value is supplied, 'debug' is set to 1.
+The B<-d> switch takes an optional argument, consisting of a hexadecimal value
+of debug bits. If no value is supplied, 'debug' is set to 1.
 
 To list the individual bits on the command line, use the B<--help-debug> switch.
 
@@ -246,7 +253,8 @@ To produce a vary large output on F<stderr>, run C<"parrot B<-d 0ffff> ...">.
 
 =over 11
 
-a summary over register usage and optimization stats per I<subroutine>.  With two C<-v> switches, C<parrot> prints a line per individual processing step too.
+a summary over register usage and optimization stats per I<subroutine>.  With
+two C<-v> switches, C<parrot> prints a line per individual processing step too.
 
 =back
 
@@ -269,7 +277,10 @@ Preprocess source file (expand macros) and print result to C<stdout>:
 
 =over 11
 
-unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>, 'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output a PASM file, even from PASM input. This can be useful when needing to check various optimizations, including C<-Op>.
+unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>,
+'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output
+a PASM file, even from PASM input. This can be useful when needing to check
+various optimizations, including C<-Op>.
 
 =back
 
@@ -287,15 +298,15 @@ even if the output file does not end in F<.pbc>
 
 =over 11
 
-Optimize
+Optimization levels
 
- -O0 no optimization (default)
- -O1 optimizations without life info (e.g. branches)
- -O  same
- -O2 optimizations with life info
- -Op rewrite I and N PASM registers most used first
- -Ot select fastest runcore
- -Oc turns on the optional/experimental tail call optimizations
+    -O0 no optimization (default)
+    -O1 optimizations without life info (e.g. branches)
+    -O  same
+    -O2 optimizations with life info
+    -Op rewrite I and N PASM registers most used first
+    -Ot select fastest runcore
+    -Oc turns on the optional/experimental tail call optimizations
 
 I<See> F<docs/dev/optimizer.pod> for more information on the optimizer.
 
@@ -317,7 +328,8 @@ I<See> F<docs/dev/optimizer.pod> for more information on the optimizer.
 
 =over 11
 
-NOTE: If whitespace separates the B<-d> switch from the argument, the argument I<must> start with a number, I<i.e.>, a decimal digit.
+NOTE: If whitespace separates the B<-d> switch from the argument, the argument
+I<must> start with a number, I<i.e.>, a decimal digit.
 
 =back
 
@@ -327,7 +339,9 @@ NOTE: If whitespace separates the B<-d> switch from the argument, the argument I
 
 =over 11
 
-Execute the program from the compiled in-memory image. If two C<-r> options are supplied, the F<.pbc> file is read from disc and executed. This is needed, primarily, for tests.
+Execute the program from the compiled in-memory image. If two C<-r> options are
+supplied, the F<.pbc> file is read from disc and executed. This is needed,
+primarily, for tests.
 
 =back
 
@@ -341,13 +355,16 @@ Execute the program from the compiled in-memory image. If two C<-r> options are 
 
 If the file ends in F<.pbc> it will be interpreted immediately.
 
-If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is parsed as PIR code. In both cases, it will then be executed, unless the C<-o> flag was supplied.
+If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is
+parsed as PIR code. In both cases, it will then be executed, unless the C<-o>
+flag was supplied.
 
 If the C<file> is a single dash, input from C<stdin> is read.
 
 =head2 [arguments ...]
 
-Optional arguments passed to the running program as ARGV. The program is assumed to know what to do with the arguments.
+Optional arguments passed to the running program as ARGV. The program is
+assumed to know what to do with the arguments.
 
 =head1 ENVIRONMENT
 
@@ -355,7 +372,9 @@ Optional arguments passed to the running program as ARGV. The program is assumed
 
 =item PARROT_RUNTIME
 
-If this environment variable is set, parrot will use this path as its runtime prefix instead of the compiled-in path.  This is useful if you want to execute a version of parrot different from the one on the "compiled-in" path. 
+If this environment variable is set, parrot will use this path as its runtime
+prefix instead of the compiled-in path.  This is useful if you want to execute
+a version of parrot different from the one on the "compiled-in" path. 
 
 =item PARROT_GC_DEBUG
 
@@ -376,7 +395,8 @@ For information on how to submit a bug report, I<see> F<docs/submissions.pod>.
 
 =head1 AUTHORS
 
-Parrot is a product of the contributions of a great many people.  For a list of most of these people, I<see> F<CREDITS>.
+Parrot is a product of the contributions of a great many people.  For a list of
+most of these people, I<see> F<CREDITS>.
 
 =head1 COPYRIGHT
 
