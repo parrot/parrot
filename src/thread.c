@@ -149,7 +149,8 @@ Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARG
 
 /*
 
-=item C<void Parrot_thread_schedule_task(PARROT_INTERP, PMC *thread, PMC *task)>
+=item C<void Parrot_thread_schedule_task(PARROT_INTERP, Interp *thread_interp,
+PMC *task)>
 
 Schedule a task with the thread's scheduler.
 
@@ -158,11 +159,9 @@ Schedule a task with the thread's scheduler.
 */
 
 void
-Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(PMC *thread), ARGIN(PMC *task))
+Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_schedule_task)
-    Parrot_Interp const thread_interp =
-       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(thread))->interp;
     PMC                    * const local_task  = Parrot_pmc_new(thread_interp, enum_class_Task);
     Parrot_Task_attributes * const new_struct  = PARROT_TASK(local_task),
                            * const old_struct  = PARROT_TASK(task);
@@ -220,7 +219,9 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             interp->current_runloop_level = 0;
             reset_runloop_id_counter(interp);
 
+            LOCK(interp->thread_data->interp_lock);
             Parrot_cx_next_task(interp, scheduler);
+            UNLOCK(interp->thread_data->interp_lock);
 
             /* add expired alarms to the task queue */
             Parrot_cx_check_alarms(interp, interp->scheduler);
@@ -423,7 +424,7 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
 
 /*
 
-=item C<PMC** Parrot_thread_get_threads_array(PARROT_INTERP)>
+=item C<Interp** Parrot_thread_get_threads_array(PARROT_INTERP)>
 
 Returns the threads array.
 
@@ -432,7 +433,7 @@ Returns the threads array.
 */
 
 PARROT_CANNOT_RETURN_NULL
-PMC**
+Interp**
 Parrot_thread_get_threads_array(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_get_threads_array)

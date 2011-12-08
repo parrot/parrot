@@ -433,16 +433,34 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     }
 
     index = Parrot_thread_get_free_threads_array_index(interp);
-    if (index > -1) {
+    if (index > -1) { /* start a new thread */
         PMC * const thread =
             Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_DEFAULT);
         Interp * const thread_interp = (Interp *)VTABLE_get_pointer(interp, thread);
-        Parrot_thread_schedule_task(interp, thread, task);
+        Parrot_thread_schedule_task(interp, thread_interp, task);
         Parrot_thread_insert_thread(interp, thread_interp, index);
         Parrot_thread_run(interp, thread, task, NULL);
     }
     else {
-        VTABLE_push_pmc(interp, interp->scheduler, task);
+        /* find the thread with the fewest tasks */
+        Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
+        Interp * candidate = NULL;
+        int i, min_tasks = INT_MAX;
+
+        for (i = 1; i < MAX_THREADS; i++)
+            if (threads_array[i]) {
+                int const tasks = VTABLE_get_integer(threads_array[i], threads_array[i]->scheduler);
+                if (tasks < min_tasks) {
+                    min_tasks = tasks;
+                    candidate = threads_array[i];
+                }
+            }
+
+        /*TODO Check for and enable preemption on the thread first.
+         * Otherwise it may never unlock the interp_lock */
+        LOCK(candidate->thread_data->interp_lock);
+        Parrot_thread_schedule_task(interp, candidate, task);
+        UNLOCK(candidate->thread_data->interp_lock);
 
 #ifdef _WIN32
 #else

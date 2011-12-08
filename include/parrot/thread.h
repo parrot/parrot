@@ -25,7 +25,7 @@
 
 #include "parrot/atomic.h"
 
-#define MAX_THREADS 4
+#define MAX_THREADS 9
 
 #ifndef YIELD
 #  define YIELD
@@ -142,7 +142,7 @@ int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-PMC** Parrot_thread_get_threads_array(PARROT_INTERP)
+Interp** Parrot_thread_get_threads_array(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_thread_init_threads_array(PARROT_INTERP)
@@ -167,7 +167,7 @@ int Parrot_thread_run(PARROT_INTERP,
         FUNC_MODIFIES(*thread_interp_pmc);
 
 void Parrot_thread_schedule_task(PARROT_INTERP,
-    ARGIN(PMC *thread),
+    ARGIN(Interp *thread_interp),
     ARGIN(PMC *task))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -210,7 +210,7 @@ PMC * Parrot_thread_transfer_sub(
     , PARROT_ASSERT_ARG(sub))
 #define ASSERT_ARGS_Parrot_thread_schedule_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thread) \
+    , PARROT_ASSERT_ARG(thread_interp) \
     , PARROT_ASSERT_ARG(task))
 #define ASSERT_ARGS_Parrot_thread_transfer_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(destination) \
