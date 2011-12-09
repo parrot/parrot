@@ -102,28 +102,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         /* copy type registrations to keep type numbers the same */
         d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
         d->n_vtable_max = s->n_vtable_max;
-
-        if (d->n_vtable_max > d->n_vtable_alloced)
-            Parrot_vtbl_realloc_vtables(d);
-
-        last_remove = s->n_vtable_max;
-
-        for (i = s->n_vtable_max - 1; i >= start; --i) {
-            if (s->vtables[i] && s->vtables[i]->pmc_class &&
-                PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
-                STRING * const class_name =
-                    VTABLE_get_string(s, s->vtables[i]->pmc_class);
-                PARROT_ASSERT(VTABLE_exists_keyed_str(d,
-                    d->class_hash, class_name));
-
-                VTABLE_delete_keyed_str(d, d->class_hash, class_name);
-
-                if (last_remove == i + 1) {
-                    --d->n_vtable_max;
-                    last_remove = i;
-                }
-            }
-        }
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
