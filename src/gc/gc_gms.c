@@ -798,7 +798,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     4. Trace root objects. According to "0. Pre-requirements" we will ignore all
     "old" objects. All relevant objects are moved into "work_list".
     */
-    gc_gms_mark_pmc_header(interp, PMCNULL);
+    if (! interp->thread_data)
+        gc_gms_mark_pmc_header(interp, PMCNULL);
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
 
     if (interp->pdb && interp->pdb->debugger)
