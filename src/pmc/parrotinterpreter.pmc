@@ -64,15 +64,16 @@ Clones the interpreter as specified by the flags.
 void
 clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 {
-    PMC * const s_pmc = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_INTERPRETER);
+    PMC * interp_pmc;
     PMC * const s_config_hash = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_CONFIG_HASH);
 
     /* we block GC runs while cloning since C<d> is not yet running */
     Parrot_block_GC_mark(d);
 
-    /* create a proxy for the interp pmc itself, since it's created by a different thread */
-    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_INTERPRETER,
-        Parrot_thread_create_proxy(s, d, s_pmc));
+    /* create a new pmc for the interp pmc, since the existing was created by a different thread */
+    interp_pmc  = Parrot_pmc_new_noinit(d, enum_class_ParrotInterpreter);
+    VTABLE_set_pointer(d, interp_pmc, d);
+    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_INTERPRETER, interp_pmc);
 
     /* create a proxy for the config_hash */
     VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH,
