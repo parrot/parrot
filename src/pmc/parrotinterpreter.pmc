@@ -91,7 +91,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     if (flags & PARROT_CLONE_HLL) {
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
-        d->HLL_info = s->HLL_info;
+        d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
         Parrot_hll_regenerate_HLL_namespaces(d);
     }
 
