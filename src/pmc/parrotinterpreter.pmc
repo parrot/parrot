@@ -105,18 +105,9 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
-        PMC   * const libs     = VTABLE_get_pmc_keyed_int(s, s->iglobals,
-            IGLOBALS_DYN_LIBS);
-        PMC   * const lib_iter = VTABLE_get_iter(s, libs);
-        const INTVAL n         = VTABLE_elements(s, libs);
-        INTVAL i;
-
-        for (i = 0; i < n; ++i) {
-            STRING * const key     = VTABLE_shift_string(s, lib_iter);
-            PMC    * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
-            PMC    * const ignored = Parrot_dyn_clone_lib_into(d, s, lib_pmc);
-            UNUSED(ignored);
-        }
+        PMC * const s_pbc_libs = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_PBC_LIBS);
+        VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_PBC_LIBS,
+            Parrot_thread_create_proxy(s, d, s_pbc_libs));
     }
 
     if (flags & PARROT_CLONE_CLASSES) {
