@@ -51,7 +51,10 @@ reasons.
 
 =over 11
 
-Sets the hash seed to the specified value. This option is useful for debugging intermittent failures, but should I<not> be used in production.  For more information about this option, I<see> F<docs/dev/profiling.pod>, F<docs/project/hacking_tips.pod>, F<docs/running.pod>, and F<docs/submissions.pod>.
+Sets the hash seed to the specified value. This option is useful for debugging intermittent
+failures, but should I<not> be used in production.  For more information about this option,
+I<see> F<docs/dev/profiling.pod>, F<docs/project/hacking_tips.pod>, F<docs/running.pod>,
+and F<docs/submissions.pod>.
 
 =back
 
@@ -63,7 +66,8 @@ Sets the hash seed to the specified value. This option is useful for debugging i
 
 =head2 Run core options
 
-These options select the runcore, which is useful for performance tuning and debugging.  For more information about these options, I<see> the "About runcores" section in F<docs/running.pod>.
+These options select the runcore, which is useful for performance tuning and debugging.  For more
+information about these options, I<see> the "About runcores" section in F<docs/running.pod>.
 
 =over 4
 
@@ -152,7 +156,10 @@ This may prove useful for finding GC-related bugs.
 
 =over 11
 
-=item Note: Do not use this option for longer running programs: since memory is no longer recycled, it may quickly become exhausted.
+=item Note:
+
+Do not use this option for longer running programs: since memory is no longer recycled, it may
+quickly become exhausted.
 
 =back
 
@@ -314,7 +321,9 @@ I<See> F<docs/dev/optimizer.pod> for more information on the optimizer.
 
 =over 11
 
-=item Note: Optimization is currently an experimental feature and these options are likely to change.
+=item Note:
+
+Optimization is currently an experimental feature and these options are likely to change.
 
 =back
 
