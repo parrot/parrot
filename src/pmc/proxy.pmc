@@ -128,13 +128,14 @@ Don't mark target and interp since they belong to a different interpreter.
 
     VTABLE PMC *find_method(STRING *method_name)
     {
-        return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target, method_name);
+        return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target,
+                method_name);
     }
 }
 
 /*
- * Local Variables:
+ * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */

@@ -142,6 +142,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
 {
+    ASSERT_ARGS(Parrot_thread_create_proxy)
     PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
     PARROT_PROXY(proxy)->interp = interp;
     return proxy;

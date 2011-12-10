@@ -1038,6 +1038,8 @@ src/thread$(O) : \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_PMC_DIR)/pmc_scheduler.h \
+	$(INC_PMC_DIR)/pmc_task.h \
+	$(INC_PMC_DIR)/pmc_proxy.h \
 	$(INC_DIR)/runcore_api.h \
 	src/thread.c
 

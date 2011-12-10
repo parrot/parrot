@@ -250,6 +250,16 @@ config/inter/progs.pm                                       []
 config/inter/shlibs.pm                                      []
 config/inter/types.pm                                       []
 config/inter/yacc.pm                                        []
+docs/binaries/ops2c.pod                                     [doc]
+docs/binaries/parrot-nqp.pod                                [doc]
+docs/binaries/parrot-prove.pod                              [doc]
+docs/binaries/parrot.pod                                    [doc]
+docs/binaries/parrot_config.pod                             [doc]
+docs/binaries/parrot_nci_thunk_gen.pod                      [doc]
+docs/binaries/parrotbug.pod                                 [doc]
+docs/binaries/pbc_to_exe.pod                                [doc]
+docs/binaries/plumage.pod                                   [doc]
+docs/binaries/winxed.pod                                    [doc]
 docs/book/draft/README                                      []
 docs/book/draft/appa_glossary.pod                           []
 docs/book/draft/appb_patch_submission.pod                   []
@@ -1008,6 +1018,7 @@ lib/Parrot/Pmc2c/PMC.pm                                     [devel]lib
 lib/Parrot/Pmc2c/PMC/Null.pm                                [devel]lib
 lib/Parrot/Pmc2c/PMC/Object.pm                              [devel]lib
 lib/Parrot/Pmc2c/PMC/PrintTree.pm                           [devel]lib
+lib/Parrot/Pmc2c/PMC/Proxy.pm                               [devel]lib
 lib/Parrot/Pmc2c/PMC/RO.pm                                  [devel]lib
 lib/Parrot/Pmc2c/PMC/default.pm                             [devel]lib
 lib/Parrot/Pmc2c/Parser.pm                                  [devel]lib
