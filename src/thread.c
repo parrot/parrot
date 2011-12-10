@@ -41,24 +41,12 @@ static PMC * Parrot_thread_make_local_args_copy(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-static PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
-    ARGIN(Parrot_Interp from),
-    ARGIN(PMC *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_CAN_RETURN_NULL
 static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 
 #define ASSERT_ARGS_Parrot_thread_make_local_args_copy \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(source))
-#define ASSERT_ARGS_Parrot_thread_make_local_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(from) \
-    , PARROT_ASSERT_ARG(arg))
 #define ASSERT_ARGS_Parrot_thread_outer_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -145,6 +133,7 @@ Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARG
     ASSERT_ARGS(Parrot_thread_create_proxy)
     PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
     PARROT_PROXY(proxy)->interp = interp;
+    PARROT_GC_WRITE_BARRIER(thread, proxy);
     return proxy;
 }
 
@@ -325,8 +314,8 @@ Parrot_thread_transfer_sub(ARGOUT(Parrot_Interp destination),
 
 /*
 
-=item C<static PMC * Parrot_thread_make_local_copy(PARROT_INTERP, Parrot_Interp
-from, PMC *arg)>
+=item C<PMC * Parrot_thread_make_local_copy(PARROT_INTERP, Parrot_Interp from,
+PMC *arg)>
 
 Creates a local copy of the PMC. This includes workarounds for Parrot_clone()
 not doing the Right Thing with subroutines (specifically, code segments aren't
@@ -338,7 +327,7 @@ freezing).
 */
 
 PARROT_CAN_RETURN_NULL
-static PMC *
+PMC *
 Parrot_thread_make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
 {
     ASSERT_ARGS(Parrot_thread_make_local_copy)

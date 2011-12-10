@@ -2,12 +2,13 @@
 # Copyright (C) 2011, Parrot Foundation.
 
 .sub main :main
-    .local pmc task, sayer, starter, ender, number, interp
+    .local pmc task, sayer, starter, ender, number, interp, end_sub
     .local int i
     interp = getinterp
     sayer = get_global 'sayer'
     starter = new ['Integer']
     ender   = new ['Integer']
+    end_sub = get_global 'end_this'
     i = 1
     starter = 0
     ender   = 0
@@ -18,6 +19,7 @@ start:
     task = new ['Task']
     push task, starter
     push task, ender
+    push task, end_sub
     setattribute task, 'code', sayer
     setattribute task, 'data', number
     print "ok "
@@ -39,10 +41,11 @@ done:
 
 .sub sayer
     .param pmc name
-    .local pmc interp, task, starter, ender, end_sub, end_task
+    .local pmc interp, task, starter, ender, end_sub, end_task, tmp
     .local int i
     interp = getinterp
     task = interp.'current_task'()
+    end_sub = pop task
     ender = pop task
     starter = pop task
 start:
@@ -50,7 +53,6 @@ start:
     sleep 0.1
     goto start
 end:
-    end_sub = get_global 'end_this'
     end_task = new ['Task']
     setattribute end_task, 'code', end_sub
     setattribute end_task, 'data', ender
