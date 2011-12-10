@@ -148,10 +148,12 @@ code as the first argument.
                 PARROT_SCHEDULER(interp->scheduler);
         PMC * const active_tasks = sdata->all_tasks;
 
+        PARROT_ASSERT(! PMC_IS_NULL(task->code));
+
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
 
-        if (!(task->killed || PMC_IS_NULL(task->code))) {
+        if (! task->killed) {
             const int current_depth =
                 Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
