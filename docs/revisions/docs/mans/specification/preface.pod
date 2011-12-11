@@ -1,0 +1,48 @@
+# Copyright (C) 2011, Parrot Foundation
+
+=pod
+
+=head1 NAME
+
+docs/manuals/specification/preface.pod - Preface to the Parrot Virtual Machine Specification and Implementation Reference document. 
+
+=head1 DESCRIPTION
+
+This README sets out some general guidelines on how to convert the various 'README' files in the Parrot distribution into 'README.pod' files.  One of main reasons for this effort is to provide a uniform presentation throughout the distribution, and I<your> hard work will go a long-way towards helping us to achieve this aim.  So, first, please let us take a moment to say, "Thank you," both for your time and for your effort.
+
+The "basic" idea here is to retain the text, along with the relevant headings, already present in the 'README', but to wrap it all in the POD.  To accomplish this, please use the 'README_template.pod', included in this directory, as a guide.  For a specific example of a "properly" formatted 'README.pod' file, please I<see> the 'README.pod' in the 'docs/readmes/parrot/' directory.  To learn more about POD, please I<see> 'perlpod' (I<i.e.,> issue the command, C<perldoc perlpod> in your favorite shell or commandline program, assuming, of course, you already have Perl installed on your system) or, alternatively, you can read about POD in "Chapter 26: Plain Old Documentation" of "Programming Perl".
+
+=head2 General Guidelines
+
+=over 4
+
+=item * 
+
+
+
+
+The Java virtual machine specification has been written to fully document the design of the Java virtual machine. It is essential for compiler writers who wish to target the Java virtual machine and for programmers who want to implement a compatible Java virtual machine. It is also a definitive source for anyone who wants to know exactly how the Java programming language is implemented.
+
+The Java virtual machine is an abstract machine. References to the Java virtual machine throughout this specification refer to this abstract machine rather than to Sun's or any other specific implementation. This book serves as documentation for a concrete implementation of the Java virtual machine only as a blueprint documents a house. An implementation of the Java virtual machine (known as a runtime interpreter) must embody this specification, but is constrained by it only where absolutely necessary.
+
+The Java virtual machine specified here will support the Java programming language specified in The JavaTM Language Specification (Addison-Wesley, 1996). It is compatible with the Java platform implemented by Sun's JDK releases 1.0.2 and 1.1 and the JavaTM 2 platform implemented by Sun's JavaTM 2 SDK, Standard Edition, v1.2 (formerly known as JDK release 1.2).
+
+We intend that this specification should sufficiently document the Java virtual machine to make possible compatible clean-room implementations. If you are considering constructing your own Java virtual machine implementation, feel free to contact us to obtain assistance to ensure the 100% compatibility of your implementation.
+
+Send comments on this specification or questions about implementing the Java virtual machine to our electronic feedback form. To learn the latest about the Java 2 platform, or to download the latest Java 2 SDK release, visit our World Wide Web site at http://java.sun.com. For updated information about the Java Series, including errata for The JavaTM Virtual Machine Specification, and previews of forthcoming books, visit http://java.sun.com/Series.
+
+The virtual machine that evolved into the Java virtual machine was originally designed by James Gosling in 1992 to support the Oak programming language. The evolution into its present form occurred through the direct and indirect efforts of many people and spanned Sun's Green project, FirstPerson, Inc., the LiveOak project, the Java Products Group, JavaSoft, and today, Sun's Java Software. The authors are grateful to the many contributors and supporters.
+
+This book began as internal project documentation. Kathy Walrath edited that early draft, helping to give the world its first look at the internals of the Java programming language. It was then converted to HTML by Mary Campione and was made available on our Web site before being expanded into book form.
+
+The creation of The JavaTM Virtual Machine Specification owes much to the support of the Java Products Group led by General Manager Ruth Hennigar, to the efforts of series editor Lisa Friendly, and to editor Mike Hendrickson and his group at Addison-Wesley. The many criticisms and suggestions received from reviewers of early online drafts, as well as drafts of the printed book, improved its quality immensely. We owe special thanks to Richard Tuck for his careful review of the manuscript and to the authors of The JavaTM Language Specification, Addison-Wesley, 1996, for allowing us to quote extensively from that book. Particular thanks to Bill Joy whose comments, reviews, and guidance have contributed greatly to the completeness and accuracy of this book.
+
+=head1 NOTES
+
+[Notes! Notes! Notes!]
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=cut
