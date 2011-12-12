@@ -1,11 +1,4 @@
-					A Proposal:
-		 	  The Parrot Virtual Machine Specification 
-			                  and 
-		 	         Implementation Reference  
-				
-					  by
-
-				    Alvis Yardley
+		   A Proposal: The Parrot Virtual Machine Specification 
 
 
 Abstract: This brief document sets out a proposal for the Parrot Developer
@@ -13,79 +6,103 @@ Team's adoption of a Parrot Virtual Machine Specification and an Implementation
 Reference. ....
 
      The purpose of a virtual machine specification [hereinafter VM Spec] is to
-document, clearly, the design of a virtual machine.  The goal of a VM Spec is to
-serve as a reference document for compiler writers, who desire to target the
-virtual machine, and as a definitive source of information on the implementation
-of a virtual machine [hereinafer VM].  
+document, clearly, the design of a virtual machine.  The goals of a VM Spec, the
+things at which it aims, are two-fold: (1) to serve as a reference document for
+compiler writers, who wish to target the virtual machine, and (2) to serve as
+the definitive documentation source on the implementation of a virtual machine
+[hereinafer vm].  It is with this single purpose and these twin-objectives in
+mind that I propose the Parrot Development Team accept this proposal for a
+Parrot Virtual Machine Specification [hereinafter PVM Spec]. 
 
+     Unfortunately, in and of themselves, specifications often tend towards the
+abstract,[1] failing to provide certain, important particulars, e.g.,detail or
+concrete examples sufficient to enable compiler writers to achieve their
+priorities, that is, writing a compiler for a particular vm.  This proposal
+offers to correct this limitation with the inclusion of something a'kin to an
+implementation reference [hereinafter ir] of the PVM.[2]  Specifically, this
+proposal suggests the inclusion of concrete code examples, along with any
+necessary commentary, throughout the VM Spec. 
 
-It is an essential
-reference document for compiler writers who want to target the virtual machine,
-and it constitutes the definitive source of information on the implementation of
-a virtual machine [hereinafter VM].  In short, the aim of a specification is to
-bring clariy to Here, of course, the Parrot Virtual Machine
-[hereinafter PVM]. 
+     For example, where the PVM Spec addresses the structure of the PVM, it will
+also include relevant code snippets which serve to ellucidate the points addressed
+and, where it covers how to load parrot bytecode, it will contain specific code
+examples in the Winxed Programming Language on how to accomplish this feat.[2]
 
-     Specifications, however, often tend towards the abstract,[1] lacking both
-sufficient detail or concrete examples to enable compiler writers in their
-efforts.  This proposal offers to correct this limitation with the inclusion of
-an Implementation Reference [hereinafter IR] of the PVM.  Specifically, this
-proposal takes the position that an essential aspect of understanding the
-implementation of the PVM requires the inclusion of specific details and
-concrete examples. 
+     A tentative orgainzation of the PVM Spec is as follows:
 
-     As examples, where the PVM Spec addresses the structure of the PVM, it will
-also include snippets of 'C' code with which to ellucidate the point, and, where
-it covers how to load parrot bytecode, it will contain specific code examples in
-the Winxed Programming Language on how to accomplish this feat.[2]
-
-     A tentative orgainzation of the PVM Specification and Implementation
-Reference is as follows:
-
-     Preface
-     Table of Contents
-     Chapter  1: Introduction
-     Chapter  2: The Winxed Programming Language Concepts
-     Chapter  3: The Structure of the Parrot Virtual Machine
-     Chapter  4: The bytecode File Format
-     Chapter  5: Loading, Linking, and Intializing 
-     Chapter  6: The Parrot Virtual Machine Instruction Set
-     Chapter  7: Compiling for the Parrot Virtual Machine
-     Chapter  8: The Memory Internals
-     Chapter  9: The Parrot Virtual Machine Threading System
-     Chapter 10: Opcode Mnemonics by Opcode
-     Appendix A: The Parrot Intermediate Representation Language
-     Appendix B: The NQP (Not Quite Perl) Programming Language
-     Glossary
-     Bibliography
-     Index 
+       	 Preface
+     	 Table of Contents
+     	 Chapter  1: Introduction
+     	 Chapter  2: The Winxed Programming Language Concepts
+     	 Chapter  3: The Structure of the Parrot Virtual Machine
+     	 Chapter  4: The bytecode File Format
+     	 Chapter  5: Loading, Linking, and Intializing 
+     	 Chapter  6: The Parrot Virtual Machine Instruction Set
+     	 Chapter  7: Compiling for the Parrot Virtual Machine
+     	 Chapter  8: The Memory Internals
+     	 Chapter  9: The Parrot Virtual Machine Threading System
+     	 Chapter 10: Opcode Mnemonics by Opcode
+     	 Appendix A: The NQP (Not Quite Perl) Programming Language
+     	 Appendix B: The Parrot Intermediate Representation Language
+     	 Glossary
+     	 Bibliography
+     	 Index 
 
      As anyone familiar with the Java Virtual Machine Specification [hereinafter
 JVM Spec] will readily see, the above outline closely resembles the JVM Spec.
 It does so, not because the PVM closely resembles the JVM, but because the JVM
 Spec has a proven track record of serving its community of developers and
-compiler writers, and I would like the PVM Spec and IR to serve Parrot's
-community of developers and compiler writeres equally well.[3]
+compiler writers,[3] and I would like the PVM Spec serve Parrot's community of
+developers and compiler writeres equally well.[4]
 
-     At this point, I should point out two, rather significant, objections to the
-adoption of a PVM Spec and IR: (1) The PVM's relative instability and (2) the
-existence of the Parrot's Design Documents [hereinafter PDD]. 
+     The format of the PVM Spec will, of course, be in multiple POD files:
+
+     	 preface.pod
+     	 acknowledgments.pod
+     	 toc.pod
+     	 ch01_introduction.pod
+     	 ch02_winxed_programming_language.pod
+     	 ch03_structure_of_PVM.pod
+     	 ch04_parrot_bytecode_format.pod
+     	 ch05_loading_linking_initializing.pod
+     	 ch06_PVM_instruction_set.pod
+     	 ch07_compiling_for_PVM.pod
+     	 ch08_memory_internals.pod
+     	 ch09_thread_system.pod
+     	 ch10_opcode_mnemonics_by_opcode.pod
+     	 appa_nqp_programming_language.pod
+     	 appb_PIR_language.pod
+     	 bibliography.pod
+     	 glossary.pod
+     	 index.pod
+
+Which, then, can be turned into html or pdf (or any other relevant format).
+
+     At this point, I need to address two, non-trival objections to the adoption
+of a PVM Spec: (1) The PVM's relative instability and (2) the existence of the
+Parrot's Design Documents [hereinafter PDD].  
 
 
 
 
 
+Thank you, and I look forward to your comments and your criticisms.
+
+Alvis
 
 ---------------
-[1]  See, e.g., the Java Virtual Machine Specification (2d ed.), http://java.sun.com/docs/books/jvms/second_edition/html/VMSpecTOC.doc.html
+[1]  See, e.g., Tim Lindholm & Frank Yellin, "The Java Virtual Machine
+Specification" (2d ed. 1999) at http://java.sun.com/docs/books/jvms/second_edition/html/VMSpecTOC.doc.html.
 
-[2]  One point of clarification may, at this point, be necessary: Neither the
-PVM Spec nor the IR shall serve to, in any way, "drive" the development of
-Parrot or the implementation decisions of core developers.  Rather, it will
-serve only to document the existing implementation and, when and where changes
-occur, to document the changes of the "core" development team.
+[2]  I say, "of the PVM," to emphasize one important point: This proposal does
+NOT encompass the notion of "driving" the development of Parrot.  Rather, the
+PVM Spec envisions only documenting, clearly, the present implementation of
+Parrot and, of course, any necessary, future changes or corrections along the
+way.  Subject, of course, to the directions of the "core" development team.
 
-[3]  This said, I am decidely NOT wedded to this organization.  And I am very
-interested in hearing (or, rather, reading) other's suggestions about how to
-better organize the material in the PVM Spec and IR.
+[3]  There are, of course, other factors which have contributed to the success
+of the JVM Spec -- corporate sponsorship for one.
 
+[4]  This said, I am decidely NOT wedded to this organization.  And I am very
+interested in hearing (or, rather, reading) other's suggestions about how better
+to organize or to present the material in the PVM Spec.

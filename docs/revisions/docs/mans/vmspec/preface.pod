@@ -4,24 +4,17 @@
 
 =head1 NAME
 
-docs/manuals/specification/preface.pod - Preface to the Parrot Virtual Machine Specification and Implementation Reference document. 
+docs/mans/vmspec/preface.pod - Preface to the Parrot Virtual Machine Specification. 
 
 =head1 DESCRIPTION
 
-This README sets out some general guidelines on how to convert the various 'README' files in the Parrot distribution into 'README.pod' files.  One of main reasons for this effort is to provide a uniform presentation throughout the distribution, and I<your> hard work will go a long-way towards helping us to achieve this aim.  So, first, please let us take a moment to say, "Thank you," both for your time and for your effort.
-
-The "basic" idea here is to retain the text, along with the relevant headings, already present in the 'README', but to wrap it all in the POD.  To accomplish this, please use the 'README_template.pod', included in this directory, as a guide.  For a specific example of a "properly" formatted 'README.pod' file, please I<see> the 'README.pod' in the 'docs/readmes/parrot/' directory.  To learn more about POD, please I<see> 'perlpod' (I<i.e.,> issue the command, C<perldoc perlpod> in your favorite shell or commandline program, assuming, of course, you already have Perl installed on your system) or, alternatively, you can read about POD in "Chapter 26: Plain Old Documentation" of "Programming Perl".
-
-=head2 General Guidelines
-
-=over 4
-
-=item * 
+This Parrot Virtual Machine Specification [hereinafter PVM Spec] is an effort
+to document, fully, the design of the Parrot Virtual Machine [hereinafter PVM].  
+It is an essential guide for compiler writers wanting to target the PVM.  It
+is also the definitive source of documentation for anyone who wants to 
+understand how the PVM implementationd.
 
 
-
-
-The Java virtual machine specification has been written to fully document the design of the Java virtual machine. It is essential for compiler writers who wish to target the Java virtual machine and for programmers who want to implement a compatible Java virtual machine. It is also a definitive source for anyone who wants to know exactly how the Java programming language is implemented.
 
 The Java virtual machine is an abstract machine. References to the Java virtual machine throughout this specification refer to this abstract machine rather than to Sun's or any other specific implementation. This book serves as documentation for a concrete implementation of the Java virtual machine only as a blueprint documents a house. An implementation of the Java virtual machine (known as a runtime interpreter) must embody this specification, but is constrained by it only where absolutely necessary.
 
