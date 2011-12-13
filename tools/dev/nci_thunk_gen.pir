@@ -1111,8 +1111,7 @@ JSON
     compiler = compreg 'data_json'
 
     $P0 = compiler.'compile'(json_str)
-    $P1 = $P0.'main_sub'()
-    .tailcall $P1()
+    .tailcall $P0()
 .end
 
 # }}}

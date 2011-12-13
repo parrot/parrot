@@ -1307,6 +1307,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "tailcall to NCI - 2" );
 .sub main :main
     $P0 = eval("print \"Foo!\\n\"")
+    $P0 = $P0.'main_sub'()
     $P0()
     end
 .end
