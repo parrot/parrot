@@ -228,7 +228,8 @@ mark_interp(PARROT_INTERP)
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
 
     /* mark the vtables: the data, Class PMCs, etc. */
-    Parrot_vtbl_mark_vtables(interp);
+    if (! interp->thread_data)
+        Parrot_vtbl_mark_vtables(interp);
 
     /* mark the root_namespace */
     Parrot_gc_mark_PMC_alive(interp, interp->root_namespace);

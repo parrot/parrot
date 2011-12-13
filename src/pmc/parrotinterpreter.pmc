@@ -93,7 +93,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
         d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
-        Parrot_hll_regenerate_HLL_namespaces(d);
+        d->HLL_namespace = Parrot_thread_create_proxy(s, d, s->HLL_namespace);
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
@@ -103,30 +103,13 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         /* copy type registrations to keep type numbers the same */
         d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
         d->n_vtable_max = s->n_vtable_max;
+        d->vtables = s->vtables;
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
         PMC * const s_pbc_libs = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_PBC_LIBS);
         VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_PBC_LIBS,
             Parrot_thread_create_proxy(s, d, s_pbc_libs));
-    }
-
-    if (flags & PARROT_CLONE_CLASSES) {
-        INTVAL i;
-        for (i = 0; i < s->n_vtable_max; ++i) {
-            if (s->vtables[i] && s->vtables[i]->pmc_class &&
-                    PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
-                /* Cloning the class into the new interpreter ought
-                 * to be sufficient to instantiate the class.  */
-                PMC                     * const source       = s->vtables[i]->pmc_class;
-                PMC                     * const dest         = Parrot_clone(d, source);
-                Parrot_Class_attributes * const source_class = PARROT_CLASS(source);
-                Parrot_Class_attributes * const dest_class   = PARROT_CLASS(dest);
-
-                dest_class->name           = source_class->name;
-                dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
-            }
-        }
     }
 
     if (flags & PARROT_CLONE_CODE)

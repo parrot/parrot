@@ -158,8 +158,10 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
     PMC                    * const shared      = old_struct->shared;
     INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
 
-    new_struct->code = Parrot_thread_make_local_copy(thread_interp, interp, old_struct->code);
-    new_struct->data = Parrot_thread_make_local_copy(thread_interp, interp, old_struct->data);
+    new_struct->code = Parrot_clone(thread_interp, old_struct->code);
+    new_struct->data = PMC_IS_NULL(old_struct->data)
+        ? PMCNULL
+        : Parrot_clone(thread_interp, old_struct->data);
     PARROT_GC_WRITE_BARRIER(thread_interp, local_task);
 
     for (i = 0; i < elements; i++) {
