@@ -1171,6 +1171,10 @@ slurpy arguments).
 
 (Experimental) Returns Sub flags.
 
+=item C<PMC *get_packfile()>
+
+(Experimental) Returns the packfile that contains this Sub
+
 =back
 
 =cut
@@ -1189,6 +1193,16 @@ slurpy arguments).
         /* Only PF specific flags */
         INTVAL  flags = PObj_get_FLAGS(SELF) & SUB_FLAG_PF_MASK;
         RETURN(INTVAL flags);
+    }
+
+    METHOD get_packfile() {
+        Parrot_Sub_attributes *sub;
+        PMC *view;
+        PMC_get_sub(INTERP, SELF, sub);
+        view = sub->seg->base.pf->view;
+        if (!view)
+            view = PMCNULL;
+        RETURN(PMC * view);
     }
 
 }

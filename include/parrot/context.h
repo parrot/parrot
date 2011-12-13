@@ -282,6 +282,12 @@ void Parrot_pcc_set_pc_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+UINTVAL Parrot_pcc_set_recursion_depth_func(PARROT_INTERP,
+    ARGIN(const PMC *ctx),
+    const int new_depth)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pcc_set_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sig_object))
@@ -418,6 +424,9 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_recursion_depth_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -474,8 +483,9 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->pmc_constants[(idx)])
 
 #  define Parrot_pcc_get_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth)
+#  define Parrot_pcc_set_recursion_depth(i, c, d) (CONTEXT_STRUCT(c)->recursion_depth = (d))
 #  define Parrot_pcc_dec_recursion_depth(i, c) (--CONTEXT_STRUCT(c)->recursion_depth)
-#  define Parrot_pcc_inc_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth++)
+#  define Parrot_pcc_inc_recursion_depth(i, c) (++CONTEXT_STRUCT(c)->recursion_depth)
 
 #  define Parrot_pcc_warnings_on(i, c, flags)   (CONTEXT_STRUCT(c)->warns |= (flags))
 #  define Parrot_pcc_warnings_off(i, c, flags)  (CONTEXT_STRUCT(c)->warns &= ~(flags))
@@ -525,6 +535,7 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) Parrot_pcc_get_pmc_constant_func((i), (c), (idx))
 
 #  define Parrot_pcc_get_recursion_depth(i, c) Parrot_pcc_get_recursion_depth_func((i), (c))
+#  define Parrot_pcc_set_recursion_depth(i, c, d) Parrot_pcc_set_recursion_depth_func((i), (c), (d))
 #  define Parrot_pcc_dec_recursion_depth(i, c) Parrot_pcc_dec_recursion_depth_func((i), (c))
 #  define Parrot_pcc_inc_recursion_depth(i, c) Parrot_pcc_inc_recursion_depth_func((i), (c))
 

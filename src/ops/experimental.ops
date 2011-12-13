@@ -4,7 +4,6 @@
 
 BEGIN_OPS_PREAMBLE
 
-/* Chandon TODO: Should not have private header here */
 #include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
@@ -271,7 +270,7 @@ op root_new(out PMC, in PMC, in INT) {
 
 =item B<receive>(out PMC)
 
-Recieve a message sent to the current task.
+Receive a message sent to the current task.
 
 If there is no waiting message, block and wait.
 

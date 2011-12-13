@@ -192,7 +192,7 @@ main(int argc, const char *argv[])
         if (ext && STREQ(ext, ".pbc")) {
             STRING * const filename_str = Parrot_str_new(interp, filename, 0);
             PackFile * pfraw = Parrot_pf_read_pbc_file(interp, filename_str);
-            Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw);
+            Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
 
             if (!pfraw || !pf)
                 return 1;
@@ -202,7 +202,7 @@ main(int argc, const char *argv[])
         }
         else {
             STRING          *str = Parrot_str_new(interp, filename, 0);
-            Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0));
+            Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
 
             Parrot_pf_set_current_packfile(interp, pf);
             Parrot_compile_file(interp, str, 0);

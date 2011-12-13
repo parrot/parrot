@@ -1035,7 +1035,7 @@ CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
 =item B<interpinfo>(out STR, in INT)
 
-EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX
+EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 
 =back
 
@@ -1128,6 +1128,19 @@ numbers.
 
 inline op errorsoff(in INT) {
     PARROT_ERRORS_off(interp, $1);
+}
+
+=item B<set_runcore>(in STR)
+
+Switch the current runcore to the one with the specified name.
+Needs to be an op, as we need to restart the runops() call.
+You can get the name of the current runcore with the interpinfo op.
+
+=cut
+
+inline op set_runcore(in STR) {
+    Parrot_runcore_switch(interp, $1);
+    restart NEXT();
 }
 
 ########################################
