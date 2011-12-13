@@ -12,7 +12,7 @@ This Parrot Virtual Machine Specification [hereinafter PVM Spec] is an effort
 to document, fully, the design of the Parrot Virtual Machine [hereinafter PVM].  
 It is an essential guide for compiler writers wanting to target the PVM.  It
 is also the definitive source of documentation for anyone who wants to 
-understand how the PVM implementationd.
+understand the PVM implementation.
 
 
 
