@@ -674,15 +674,10 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 
     Parrot_gc_allocate_string_storage(interp, s, len);
 
-    if (len) {
-        if (buffer) {
-            mem_sys_memcopy(s->strstart, buffer, len);
-            s->bufused = len;
-            STRING_scan(interp, s);
-        }
-        else {
-            s->bufused = len;
-        }
+    if (buffer && len) {
+        mem_sys_memcopy(s->strstart, buffer, len);
+        s->bufused = len;
+        STRING_scan(interp, s);
     }
     else
         s->strlen = s->bufused = 0;

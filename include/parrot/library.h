@@ -59,14 +59,6 @@ void Parrot_lib_add_path_from_cstring(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_lib_fix_path_separator(PARROT_INTERP,
-    ARGIN(const STRING *path))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING* Parrot_lib_search_paths_as_string(PARROT_INTERP,
     enum_runtime_ft type)
@@ -119,9 +111,6 @@ void parrot_init_library_paths(PARROT_INTERP)
     , PARROT_ASSERT_ARG(path_str))
 #define ASSERT_ARGS_Parrot_lib_add_path_from_cstring \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_Parrot_lib_fix_path_separator __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_Parrot_lib_search_paths_as_string \

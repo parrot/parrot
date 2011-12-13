@@ -101,7 +101,7 @@ Returns the current working directory.
 */
 
     METHOD cwd() {
-        STRING * const cwd = Parrot_lib_fix_path_separator(INTERP, Parrot_file_getcwd(INTERP));
+        STRING * const cwd = Parrot_file_getcwd(INTERP);
         RETURN(STRING *cwd);
     }
 
