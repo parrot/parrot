@@ -1,0 +1,414 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+parrot - Parrot Virtual Machine
+
+=head1 SYNOPSIS
+
+B<parrot> [-options] <file> [arguments ...]
+
+=head1 DESCRIPTION
+
+Parrot is a virtual machine designed to efficiently compile and execute
+bytecode for dynamic languages. Parrot currently hosts a variety of language
+implementations in various stages of completion, including Tcl, Javascript,
+Ruby, Lua, Scheme, PHP, Python, Perl 6, APL, and a .NET bytecode translator.
+Parrot is not about parrots, but we are rather fond of them, for obvious
+reasons.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>
+
+=item B<--help>         Print the option summary on the command line.
+
+=item 
+
+=item B<-V>
+
+=item B<--version>      Print version information and exit.
+
+=item 
+
+=item B<-I>
+
+=item B<--include>      Add C<path> to the include search path.
+
+=item
+
+=item B<-L>
+
+=item B<--library>      Add C<path> to the library search path.
+
+=item
+
+=item B<--hash-seed> [hexnum]
+
+=over 11
+
+Sets the hash seed to the specified value. This option is useful for debugging intermittent
+failures, but should I<not> be used in production.  For more information about this option,
+I<see> F<docs/dev/profiling.pod>, F<docs/project/hacking_tips.pod>, F<docs/running.pod>,
+and F<docs/submissions.pod>.
+
+=back
+
+=item B<-X>
+
+=item B<--dynext>       Add C<path> to the dynamic extension search path.
+
+=back
+
+=head2 Run core options
+
+These options select the runcore, which is useful for performance tuning and debugging.  For more
+information about these options, I<see> the "About runcores" section in F<docs/running.pod>.
+
+=over 4
+
+=item B<-R>
+
+=item B<--runcore> [CORE]
+
+=over 11
+
+Select the runcore. The following cores are available in Parrot, but not all
+may be available on your system:
+
+  slow, bounds   bounds checking core (default)
+
+  fast           bare-bones core without bounds-checking or 
+                 context-updating
+
+  subprof        subroutine-level profiler 
+                 (see POD in 'src/runcore/subprof.c') 
+
+  trace          bounds checking core with trace info 
+                 (see 'parrot --help-debug')
+
+  profiling      see 'docs/dev/profilling.pod'
+
+  gcdebug        performs a full GC run before every op dispatch
+                 (good for debugging GC problems)
+
+=back
+
+=item B<-p>
+
+=item B<--profile>      Run with the slow core and print an execution profile.
+
+=item
+
+=item B<-t>
+
+=item B<--trace>        Run with the slow core and print trace information to B<stderr>.
+
+=over 11
+
+I<See> C<parrot --help-debug> for available flag bits.
+
+=back
+
+=back
+
+=head2 VM options
+
+=over 4
+
+=item B<-D>
+
+=item B<--parrot-debug>[=HEXFLAGS] 
+
+=over 11
+
+Turn on interpreter debug flag.  I<See> C<parrot --help-debug> for available flag bits.
+
+=back
+
+=item B<--help-debug>   Print the summary of debugging and tracing flag bits.
+
+=item
+
+=item B<-w>
+
+=item B<--warnings>     Turn on warnings.
+
+=over 11
+
+I<See> C<parrot --help-debug> for available flag bits.
+
+=back
+
+=item B<-G>
+
+=item B<--no-gc>        Turn off GC.
+
+=over 11
+
+This may prove useful for finding GC-related bugs.
+
+=back
+
+=over 11
+
+=item Note:
+
+Do not use this option for longer running programs: since memory is no longer recycled, it may
+quickly become exhausted.
+
+=back
+
+=item B<-g>
+
+=item B<--gc> [GC-type]
+
+=back
+
+=head3 GC MS2 options
+
+=over 4
+
+=item B<--gc-dynamic-threshold>=percentage
+
+=over 11
+
+Maximum memory wasted by GC
+
+=back
+
+=item B<--gc-min-threshold>=Kb
+
+=back
+
+=head3 GC GMS options
+
+=over 4
+
+=item B<--gc-nursery-size>=percent of system
+
+=over 11
+
+Size of gen0 (default 2)
+
+=back
+
+=item B<--gc-debug>     Turn on GC (Garbage Collection) debugging.
+
+=over 11
+
+This imposes some stress on the GC subsystem and can considerably slow
+down execution.
+
+=back
+
+=item B<--leak-test|--destroy-at-end> 
+
+=over 11
+
+Free all memory of the last interpreter.  This is useful when running leak
+checkers.
+
+=back
+
+=item B<-.>
+
+=item B<--wait>         Read a keystroke before starting.
+
+=over 11
+
+This is useful when you want to attach a debugger on platforms such as Windows.
+
+=back
+
+=item B<--runtime-prefix>
+
+=over 11
+
+Print the runtime prefix path and exit.
+
+=back
+
+=back
+
+=head2 Compiler options
+
+=over 4
+
+=item B<-d>
+
+=item B<--imcc-debug>=[HEXFLAGS]
+
+=over 11
+
+The B<-d> switch takes an optional argument, consisting of a hexadecimal value
+of debug bits. If no value is supplied, 'debug' is set to 1.
+
+To list the individual bits on the command line, use the B<--help-debug> switch.
+
+To produce a vary large output on F<stderr>, run C<"parrot B<-d 0ffff> ...">.
+
+=back
+
+=item B<-v>
+
+=item B<--verbose>      One C<-v> shows which files are worked on and prints
+
+=over 11
+
+a summary over register usage and optimization stats per I<subroutine>.  With
+two C<-v> switches, C<parrot> prints a line per individual processing step too.
+
+=back
+
+=item B<-E>
+
+=item B<--pre-process-only>
+
+=over 11
+
+Preprocess source file (expand macros) and print result to C<stdout>:
+
+  $> parrot -E t/op/macro_10.pasm
+  $> parrot -E t/op/macro_10.pasm | parrot -- -
+
+=back
+
+=item B<-o>
+
+=item B<--output>=FILE  Act like an assembler, but do not execute the code, 
+
+=over 11
+
+unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>,
+'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output
+a PASM file, even from PASM input. This can be useful when needing to check
+various optimizations, including C<-Op>.
+
+=back
+
+=item B<--output-pbc>   Act like an assembler, but always output bytecode, 
+
+=over 11
+
+even if the output file does not end in F<.pbc>
+
+=back
+
+=item B<-O>
+
+=item B<--optimize>[=LEVEL]
+
+=over 11
+
+Optimization levels
+
+    -O0 no optimization (default)
+    -O1 optimizations without life info (e.g. branches)
+    -O  same
+    -O2 optimizations with life info
+    -Op rewrite I and N PASM registers most used first
+    -Ot select fastest runcore
+    -Oc turns on the optional/experimental tail call optimizations
+
+I<See> F<docs/dev/optimizer.pod> for more information on the optimizer.
+
+=back
+
+=over 11
+
+=item Note:
+
+Optimization is currently an experimental feature and these options are likely to change.
+
+=back
+
+=item B<-a>
+
+=item B<--pasm>         Assume PASM input on C<stdin>.
+
+=item B<-c>
+
+=item B<--pbc>          Assume PBC file on C<stdin> and execute it.
+
+=over 11
+
+NOTE: If whitespace separates the B<-d> switch from the argument, the argument
+I<must> start with a number, I<i.e.>, a decimal digit.
+
+=back
+
+=item B<-r>
+
+=item B<--run-pbc>      Only useful after C<-o> or C<--output-pbc>.
+
+=over 11
+
+Execute the program from the compiled in-memory image. If two C<-r> options are
+supplied, the F<.pbc> file is read from disc and executed. This is needed,
+primarily, for tests.
+
+=back
+
+=item B<-y>
+
+=item B<--yydebug>      Turn on yydebug in F<yacc>/F<bison>.
+
+=back
+
+=head2 <file>
+
+If the file ends in F<.pbc> it will be interpreted immediately.
+
+If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is
+parsed as PIR code. In both cases, it will then be executed, unless the C<-o>
+flag was supplied.
+
+If the C<file> is a single dash, input from C<stdin> is read.
+
+=head2 [arguments ...]
+
+Optional arguments passed to the running program as ARGV. The program is
+assumed to know what to do with the arguments.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item PARROT_RUNTIME
+
+If this environment variable is set, parrot will use this path as its runtime
+prefix instead of the compiled-in path.  This is useful if you want to execute
+a version of parrot different from the one on the "compiled-in" path. 
+
+=item PARROT_GC_DEBUG
+
+Turn on the I<--gc-debug> flag.
+
+=back
+
+=head1 SEE ALSO
+
+'docs/running.pod'           Additional information on command line options.
+http://www.parrot.org/       The official Parrot web site.
+http://docs.parrot.org/      Parrot's official documentation site.
+http://parrot.github.com/    An alternative documentation site.
+
+=head1 REPORTING BUGS
+
+For information on how to submit a bug report, I<see> F<docs/submissions.pod>.
+
+=head1 AUTHORS
+
+Parrot is a product of the contributions of a great many people.  For a list of
+most of these people, I<see> F<CREDITS>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=cut
