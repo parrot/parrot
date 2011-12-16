@@ -150,7 +150,8 @@ Create a copy of the task coming from interp local to thread.
 
 PARROT_CANNOT_RETURN_NULL
 PMC*
-Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_interp), ARGIN(PMC *task))
+Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_interp),
+        ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_create_local_task)
 
@@ -172,7 +173,12 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
         else
             new_struct->data = Parrot_clone(thread_interp, old_struct->data);
 
+    new_struct->partner = task;
+
     PARROT_GC_WRITE_BARRIER(thread_interp, local_task);
+
+    old_struct->partner = local_task;
+    /* no write barrier needed, since partner is not GCed */
 
     for (i = 0; i < elements; i++) {
         PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);

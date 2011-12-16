@@ -35,6 +35,8 @@ pmclass Task provides invokable auto_attrs {
     ATTR PMC          *mailbox;   /* List of incoming messages */
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
     ATTR PMC          *shared;    /* List of variables shared with this task */
+    ATTR PMC          *partner;   /* Copy of this task on the other side of a GC barrier,
+                                     meaning in another thread */
 
 /*
 
@@ -63,6 +65,7 @@ Initialize a concurrency task object.
         core_struct->mailbox   = PMCNULL; /* Created lazily on demand */
         core_struct->waiters   = PMCNULL; /* Created lazily on demand */
         core_struct->shared    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->partner   = PMCNULL; /* Set by Parrot_thread_create_local_task */
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -317,6 +320,7 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->mailbox);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->waiters);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->shared);
+            /* don't mark our partner, since it belongs to another GC */
         }
     }
 
