@@ -759,21 +759,8 @@ Schedules the given task on the proxy's interpreter.
     METHOD schedule_proxied(PMC *task, PMC *proxy) {
         Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
         Interp                  * const proxied_interp = core_struct->interp;
-        Parrot_Task_attributes  * const task_struct    = PARROT_TASK(task);
-
         PMC                     * const local_task     =
-            Parrot_pmc_new(proxied_interp, enum_class_Task);
-        Parrot_Task_attributes  * const new_struct     = PARROT_TASK(local_task);
-
-        if (task_struct->code->vtable->base_type == enum_class_Proxy)
-            new_struct->code = PARROT_PROXY(task_struct->code)->target;
-        else
-            new_struct->code =
-                Parrot_thread_make_local_copy(proxied_interp, interp, task_struct->code);
-        if (task_struct->data) {
-            new_struct->data = PARROT_PROXY(task_struct->data)->target;
-        }
-        PARROT_GC_WRITE_BARRIER(proxied_interp, local_task);
+            Parrot_thread_create_local_task(INTERP, proxied_interp, task);
 
         Parrot_cx_schedule_immediate(proxied_interp, local_task);
         /*TODO: investigate why it's not neccessary to send a signal to the process here

@@ -139,6 +139,53 @@ Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARG
 
 /*
 
+=item C<PMC* Parrot_thread_create_local_task(PARROT_INTERP, Parrot_Interp const
+thread_interp, PMC *task)>
+
+Create a copy of the task coming from interp local to thread.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_interp), ARGIN(PMC *task))
+{
+    ASSERT_ARGS(Parrot_thread_create_local_task)
+
+    PMC                    * const local_task  = Parrot_pmc_new(thread_interp, enum_class_Task);
+    Parrot_Task_attributes * const new_struct  = PARROT_TASK(local_task),
+                           * const old_struct  = PARROT_TASK(task);
+    PMC                    * const shared      = old_struct->shared;
+    INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
+
+
+    if (old_struct->code->vtable->base_type == enum_class_Proxy)
+        new_struct->code = PARROT_PROXY(old_struct->code)->target;
+    else
+        new_struct->code = Parrot_clone(thread_interp, old_struct->code);
+
+    if (old_struct->data && ! PMC_IS_NULL(old_struct->data))
+        if (old_struct->data->vtable->base_type == enum_class_Proxy)
+            new_struct->data = PARROT_PROXY(old_struct->data)->target;
+        else
+            new_struct->data = Parrot_clone(thread_interp, old_struct->data);
+
+    PARROT_GC_WRITE_BARRIER(thread_interp, local_task);
+
+    for (i = 0; i < elements; i++) {
+        PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
+
+        VTABLE_push_pmc(thread_interp, new_struct->shared,
+            Parrot_thread_create_proxy(interp, thread_interp, data));
+    }
+
+    return local_task;
+}
+
+/*
+
 =item C<void Parrot_thread_schedule_task(PARROT_INTERP, Interp *thread_interp,
 PMC *task)>
 
@@ -152,24 +199,7 @@ void
 Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_schedule_task)
-    PMC                    * const local_task  = Parrot_pmc_new(thread_interp, enum_class_Task);
-    Parrot_Task_attributes * const new_struct  = PARROT_TASK(local_task),
-                           * const old_struct  = PARROT_TASK(task);
-    PMC                    * const shared      = old_struct->shared;
-    INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
-
-    new_struct->code = Parrot_clone(thread_interp, old_struct->code);
-    new_struct->data = PMC_IS_NULL(old_struct->data)
-        ? PMCNULL
-        : Parrot_clone(thread_interp, old_struct->data);
-    PARROT_GC_WRITE_BARRIER(thread_interp, local_task);
-
-    for (i = 0; i < elements; i++) {
-        PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
-
-        VTABLE_push_pmc(thread_interp, new_struct->shared,
-            Parrot_thread_create_proxy(interp, thread_interp, data));
-    }
+    PMC * const local_task  = Parrot_thread_create_local_task(interp, thread_interp, task);
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler, local_task);
 }
