@@ -174,7 +174,7 @@
 
 .sub test_x_can
     $P0 = new 'FileHandle'
-    $I0 = can $P0, "puts"
+    $I0 = can $P0, "print"
     is($I0, 1, 'x = can')
 .end
 

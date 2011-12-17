@@ -377,7 +377,7 @@ called as C<cp('foo.txt', 'bar/baz/qux/foo.txt')>.
     $P0.'open'(dst, 'w')
     pop_eh
 
-    $P0.'puts'($S0)
+    $P0.'print'($S0)
     $P0.'close'()
 
     .return ()
@@ -944,7 +944,7 @@ be verbose. If given, the string I<spew C<filename>> will be displayed.
     $P0.'open'(filename, 'w')
     pop_eh
 
-    $P0.'puts'(content)
+    $P0.'print'(content)
     $P0.'close'()
 
     .return ()
@@ -993,7 +993,7 @@ be verbose. If given, the string I<append C<filename>> will be displayed.
     $P0.'open'(filename, 'a')
     pop_eh
 
-    $P0.'puts'(content)
+    $P0.'print'(content)
     $P0.'close'()
 
     .return ()
@@ -1174,7 +1174,7 @@ For more information, see the C<gzip(1)> man page.
     $S1 = filename . '.gz'
 
     gh.'open'($S1, 'wb')
-    gh.'puts'($S0)
+    gh.'print'($S0)
     gh.'close'()
     unlink(filename)
 

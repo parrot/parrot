@@ -451,7 +451,7 @@ see http://search.cpan.org/dist/libwww-perl/
     self.'_fixup_header'(request_headers, url, proxy)
 
     $S0 = _format_request(method, fullpath, request_headers)
-    sock.'puts'($S0)
+    sock.'print'($S0)
 
     .local pmc response
     response = new ['HTTP';'Response']
@@ -461,7 +461,7 @@ see http://search.cpan.org/dist/libwww-perl/
     if null pcontent goto L11
     content = pcontent
     unless content goto L11
-    $I1 = sock.'puts'(content)
+    $I1 = sock.'print'(content)
     if $I1 >= 0 goto L11
     $P0 = box RC_INTERNAL_SERVER_ERROR
     setattribute response, 'code', $P0

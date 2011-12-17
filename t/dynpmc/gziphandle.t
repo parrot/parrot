@@ -60,7 +60,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     .const string filename = 't/dynpmc/gziphandle.t.gz'
     $P1 = new 'GzipHandle'
     $P1.'open'(filename, 'wb')
-    $P1.'puts'($S0)
+    $P1.'print'($S0)
     $P1.'print'($S0)
     $P1.'close'()
     $I1 = stat filename, .STAT_FILESIZE

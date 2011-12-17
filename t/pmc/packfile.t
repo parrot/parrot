@@ -380,7 +380,7 @@ load_error:
 
     # $P1 = new ['FileHandle']
     # $P1.'open'("/tmp/1.pbc", "w")
-    # $P1.'puts'($S0)
+    # $P1.'print'($S0)
     # $P1.'close'()
 
     pf = new 'Packfile'
