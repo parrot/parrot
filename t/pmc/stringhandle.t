@@ -247,7 +247,7 @@ ok 5 - read integer back from file
 ok 6 - read string back from file
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'puts' );
+pir_output_is( <<'CODE', <<'OUT', 'print' );
 .include 'except_types.pasm'
 .sub 'test' :main
     .local pmc sh, eh
@@ -257,10 +257,10 @@ pir_output_is( <<'CODE', <<'OUT', 'puts' );
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
     push_eh eh
 
-    # puts to SH not opened
+    # print to SH not opened
     result = 0
     set_label eh, handle1
-    sh.'puts'('something')
+    sh.'print'('something')
     result = 1
     goto done1
 handle1:
@@ -268,11 +268,11 @@ handle1:
 done1:
     say result
 
-    # puts to SH opened for reading
+    # print to SH opened for reading
     result = 0
     set_label eh, handle2
     sh.'open'('mockname', 'r')
-    sh.'puts'('something')
+    sh.'print'('something')
     result = 1
     goto done2
 handle2:
