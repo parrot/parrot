@@ -5,27 +5,28 @@ Abstract: This document, briefly, sets out a proposal for the Parrot Development
 Team's adoption of a Parrot Virtual Machine Specification.  
 
      The purpose of a virtual machine specification [hereinafter VM Spec] is to
-document, clearly, the design of a virtual machine.  The goals of a VM Spec, the
-things at which it aims, are two-fold: (1) to serve as a reference document for
-compiler writers, who wish to target the virtual machine, and (2) to serve as
-the definitive source of documentation on the implementation of a virtual machine
-[hereinafer vm].  It is with this purpose and these twin-objectives in mind that
-I propose the Parrot Development Team adoption of this proposal for a Parrot
-Virtual Machine Specification [hereinafter PVM Spec]. 
+document, clearly, the design of a virtual machine.  The goals of a VM Spec --
+that is, the things at which it aims -- are two-fold: (1) to serve as a
+reference document for compiler writers, who wish to target the virtual machine,
+and (2) to serve as the definitive source of documentation on the implementation
+of a virtual machine [hereinafter vm].  It is with this purpose and these
+twin-objectives in mind that I am propose the adoption of a Parrot Virtual
+Machine Specification [hereinafter PVM Spec]. 
 
      Unfortunately, in and of themselves, specifications tend towards the
 abstract,[1] often failing to provide important particulars, for example,
-concrete code examples sufficient to enable compiler writers to achieve their
-priorities.[2]  This proposal offers to correct this limitation with the
-inclusion of something a'kin to an implementation reference of the PVM.[3]
-Specifically, this proposal envisions the inclusion of concrete code examples
-throughout the VM Spec.  For example, where the PVM Spec addresses
-the structure of the PVM, it will also include relevant 'C' code snippets which
-serve to ellucidate the points under consideration and, where it covers how to
-load parrot bytecode, it will contain specific code examples in the 'Winxed'
-Programming Language[4] on how to accomplish this feat.
+concrete code examples sufficient to enable a compiler writer to accomplish his
+or her aim.[2]  I propose to correct this liability with the inclusion of
+something akin to an implementation reference of Parrot.[3]  Specifically, I
+envision the inclusion of concrete code examples throughout the VM Spec.  For
+example, where the PVM Spec addresses the structure of Parrot, it will also
+include relevant snippets of 'C' code to elucidate the material at-hand and,
+where it covers how to load parrot bytecode, it will include specific code
+examples, in the 'Winxed Programming Language,'[4] on how to accomplish this
+feat. 
 
-     A tentative orgainzation of the PVM Spec is as follows:[5]
+     In an effort to provide some detail, I propose the following tentative
+organization of the PVM Spec:[5]
 
        	 Preface
      	 Table of Contents
@@ -33,7 +34,7 @@ Programming Language[4] on how to accomplish this feat.
      	 Chapter  2: The Winxed Programming Language Concepts
      	 Chapter  3: The Structure of the Parrot Virtual Machine
      	 Chapter  4: The bytecode File Format
-     	 Chapter  5: Loading, Linking, and Intializing 
+     	 Chapter  5: Loading, Linking, and Initializing 
      	 Chapter  6: The Parrot Virtual Machine Instruction Set
      	 Chapter  7: Compiling for the Parrot Virtual Machine
      	 Chapter  8: The Memory Internals
@@ -45,8 +46,56 @@ Programming Language[4] on how to accomplish this feat.
      	 Bibliography
      	 Index[6] 
 
-     The format of the PVM Spec will, of course, be in multiple POD files, for
-example,  
+     Other than as an effort to bring a certain clarity to Parrot's
+documentation,[7] there is one other, sensible rationale for adopting a
+specification: Industry standards and practices.  That is to say, it is now a
+well-established, industry practice for a premier vm to include a specification
+among its documentation set.  And, while it is certainly true, much of Parrot is
+still in active development, much of this development will take place,
+"under-the-hood," so-to-speak.  Most, if not all, of the user visible features
+are, I think, sufficiently stable.[8]  Sufficient, I believe, to allow for the
+writing of a PVM Spec.
+
+     Finally, other than its lack of stability, I can think of only one, major
+objection to the adoption of a PVM Spec[9]: Parrot Design Documents
+[hereinafter PDDs].[10]  Parrot's PDDs have, for good and occasionally for
+ill,[11] well-served the Parrot community over the past (almost) decade.  But a
+PVM Spec is not, necessarily, at variance with the PDDs. A PVM Spec does not
+necessarily need to displace or to supplant the PDDs;[12] instead, we merely add a
+PVM Spec, while, at the same time, continue to maintain and to enrich the PDDs.
+In sum, there is room and reason for both.
+
+In closing, please let me take a moment to say, "thank you," both for your time
+and for your attention to this matter.  I look forward to your comments and your
+criticisms.
+
+
+Alvis
+
+---------------
+[1]  See, e.g., Tim Lindholm & Frank Yellin, "The Java Virtual Machine
+Specification" (2d ed. 1999) at http://java.sun.com/docs/books/jvms/second_edition/html/VMSpecTOC.doc.html.
+
+[2]  The consequence of which is, a compiler writer is forced to learn (or even
+to discover) all manner of things -- in which, on-the-whole, they are
+uninterested -- in order to accomplish their aim, that is, writing a compiler
+for a particular target. 
+
+[3]  I think it necessary to emphasize one, important qualification:  This
+proposal is limited in scope to a documentation project.  That is to say,
+nothing in this proposal should be construed as suggesting a PVM should somehow
+drive the development of or dictate to the "core" development team how to best
+implement any aspect of Parrot.  That is exclusively the purview of the "core"
+development team. 
+
+[4]  Or 'NQP' or 'PIR', as the case may be.
+
+[5]  Please note: I, for one, am NOT wedded to this organization.  And I am very
+interested in reading any countervailing viewpoints about how best to organize
+or to present the material in the PVM Spec.
+
+[6]  The format of the PVM Spec will, of course, be in multiple POD files,
+something like,  
 
      	 preface.pod
      	 acknowledgments.pod
@@ -67,51 +116,39 @@ example,
      	 glossary.pod
      	 index.pod
 
-All of which may then be converted into html or pdf (or any other relevant
-format).[7] 
+Which we can readily convert into html or pdf (or any other relevant formats).
 
-     At this point, I need to address two, non-trival objections to the adoption
-of a PVM Spec: (1) The PVM's relative instability and (2) the existence of the
-Parrot's Design Documents [hereinafter PDD].  
+[7]  See infra text accompanying footnote 2.
 
+[8]  See, e.g., Andrew Whitworth — Advent 1 - Parrot at
+http://planet.parrotcode.org/ (entry for December 10, 2011).
 
+     Please note: The above is just *my* best assessment given my current state
+     of understanding of the Parrot's future development.  'course, I could be
+     wrong.  
 
+[9]  Other than the rather substantial commitment of time and of effort, of
+course. 
 
+[10] In short, we don't need no stinking vm specification.  We got PDDs!  This
+was an objection -- along with the lack of stability and the uncertainty of the
+direction Parrot's design was likely to take -- when the Parrot project first
+"kicked off," so-to-speak.  At the time, Larry's Apocalypses, along with the
+opinion of a majority of the Perl5porters, held a great deal of sway over the
+original design goals of Parrot.  This, in conjunction with a general disdain
+both Java and for the JVM, militated against the adoption of a PVM Spec in favor
+of PDDs. 
 
-Thank you, and I look forward to your comments and your criticisms.
+[11] For example, even now, nine and one-half years later, fully one-third of
+the PDDs are still in draft form.  Not to mention the rather blatant
+contradictions between the PDDS and the actual implementation or the lack
+thereof.  Compare, e.g., 'docs/parrotbyte.pod' and
+'docs/pdds/draft/pdd13_bytecode.pod' and 'docs/pdds/draft/pdd31_hll.pod' and the
+lack of HLL-interoperability in Parrot.
 
-Alvis
+     Please note: Neither of these are negative criticisms, especially on this
+     later point.  HLL-interoperability is clearly a hard problem; it is one of
+     the primary drivers of m0.
 
----------------
-[1]  See, e.g., Tim Lindholm & Frank Yellin, "The Java Virtual Machine
-Specification" (2d ed. 1999) at http://java.sun.com/docs/books/jvms/second_edition/html/VMSpecTOC.doc.html.
-
-[2]  The consequence is, compiler writers are forced to learn (or, to discover
-even) all manner of things -- in which, on-the-whole, they are uninterested in
--- order to accomplish their aim: That is, writing a compiler for a particular
-target. 
-
-[3]  I say, "of the PVM," to emphasize an important point: This proposal does
-NOT encompass the notion of "driving" the development of Parrot.  Rather, the
-PVM Spec envisions only documenting, clearly, the present implementation of
-Parrot and, of course, any necessary, future changes or corrections along the
-way.  Subject, of course, to the directions of the "core" development team.
-
-[4]  Or, alternatively, 'NQP' or 'PIR'.
-
-[5]  This said, I am decidely NOT wedded to this organization.  And I am very
-interested in hearing (or, rather, reading) other's suggestions about how better
-to organize or to present the material in the PVM Spec.
-
-[5]  As anyone familiar with the Java Virtual Machine Specification [hereinafter
-JVM Spec] will readily see, the above outline closely resembles the JVM Spec.
-It does so, not because the PVM closely resembles the JVM, but because the JVM
-Spec has a proven track record of serving its community of developers and
-compiler writers, and I would like the PVM Spec serve Parrot's community of
-developers and compiler writeres equally well.
-
-     Note: There are, of course, other factors which have contributed to the
-     success of the JVM Spec -- corporate sponsorship for one.
-
-[7]  For example, a single html page or multiple html pages or, alternatively, a
-single pdf document.
+[12] Though, of course, it may.  Regardless, this is a question best left for
+another day, *after* the completion of a PVM.

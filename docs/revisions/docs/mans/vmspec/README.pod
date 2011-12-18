@@ -1,1 +1,152 @@
-# Copyright (C) 2011-2012, Parrot Foundation
+# Copyright (C) 2011, Parrot Foundation
+
+=pod
+
+=head1 NAME
+
+docs/mans/vmspec/README.pod - Readme file to the Parrot Virtual Machine 
+Specification. 
+
+=head1 DESCRIPTION
+
+This README sets out a brief overview of the Parrot Virtual Machine 
+Specification.  The purpose of this virtual machine specification is to 
+document, clearly, the design of the Parrot virtual machine.  The goals 
+of this specification are two-fold:
+
+=over 4
+
+=item * to serve as a reference document for for compiler writers, who wish to 
+target the virtual machine, and 
+
+=item * to serve as the definitive source of documentation on the implementation
+of a virtual machine.
+
+=back
+
+In order to accomplish these goals, this specification also includes something 
+akin to an implementation reference.  That is to say, this specification 
+includes -- where appropriate or useful to further elucidate the material under
+consideration -- implementation details, to include specific code examples.  
+As examples, where this specification addresses certain aspects of Parrot's 
+internal structure, it will include relevant snippets of 'C' code with which 
+to elucidate the material and where it covers the issue of how to load parrot 
+bytecode, it will also include specific code examples, in the 'Winxed' 
+programming language, on how to accomplish this feat.
+
+=head2 Organization
+
+Initially, though this is subject to change and to subsequent revision, the
+organization of this specification will be as follows:
+
+=over 4
+
+=over 8
+
+=item Preface
+
+=item Table of Contents
+
+=item Chapter  1: Introduction
+
+=item Chapter  2: The Winxed Programming Language Concepts
+
+=item Chapter  3: The Structure of the Parrot Virtual Machine
+
+=item Chapter  4: The bytecode File Format
+
+=item Chapter  5: Loading, Linking, and Initializing 
+
+=item Chapter  6: The Parrot Virtual Machine Instruction Set
+
+=item Chapter  7: Compiling for the Parrot Virtual Machine
+
+=item Chapter  8: The Memory Internals
+
+=item Chapter  9: The Parrot Virtual Machine Threading System
+
+=item Chapter 10: Opcode Mnemonics by Opcode
+
+=item Appendix A: The NQP (Not Quite Perl) Programming Language
+
+=item Appendix B: The Parrot Intermediate Representation Language
+
+=item Glossary
+
+=item Bibliography
+
+=item Index
+
+=back
+
+=back
+
+=head2 Pod
+
+The format of the specification shall be in multiple POD files, each 
+reflecting the organization of the specification as set out above, to wit:
+
+=over 4
+
+=over 8
+
+=item preface.pod
+
+=item acknowledgments.pod
+
+=item toc.pod
+
+=item ch01_introduction.pod
+
+=item ch02_winxed_programming_language.pod
+
+=item ch03_structure_of_PVM.pod
+
+=item ch04_parrot_bytecode_format.pod
+
+=item ch05_loading_linking_initializing.pod
+
+=item ch06_PVM_instruction_set.pod
+
+=item ch07_compiling_for_PVM.pod
+
+=item ch08_memory_internals.pod
+
+=item ch09_thread_system.pod
+
+=item ch10_opcode_mnemonics_by_opcode.pod
+
+=item appa_nqp_programming_language.pod
+
+=item appb_PIR_language.pod
+
+=item bibliography.pod
+
+=item glossary.pod
+
+=item index.pod
+
+=back
+
+=back
+
+All of which may readily be converted into various, alternative formats, 
+I<e.g.,> html or pdf.
+
+=head2 Notice
+
+Until such time as the Parrot Developer Team formally adopts this 
+specification, everything within the specification, to include the contents
+of the various pod files, should be considered as I<draft> only.
+
+=head1 LICENSE
+
+The Parrot Virtual Machine Specification is distributed under the same terms 
+as Parrot itself.  For more details, I<see> F<LICENSE>, a copy of which is 
+contained in the Parrot distribution.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=cut
