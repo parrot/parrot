@@ -15,16 +15,95 @@ mean a set of documents sufficient to satisfy the goals set out in
 
 [Done] 03.  Convert 'docs.parrot.org' (version 3.10.0) to Github pages.
 
-       	    [Open] 03a. Convert versions 3.9.0.
-       	    [Open] 03b. Convert versions 3.8.0.
-       	    [Open] 03c. Convert versions 3.7.0.
-       	    [Open] 03d. Convert versions 3.6.0.
-       	    [Open] 03e. Convert versions 3.5.0.
-       	    [Open] 03f. Convert versions 3.4.0.
-       	    [Open] 03g. Convert versions 3.3.0.
-       	    [Open] 03h. Convert versions 3.2.0.
-       	    [Open] 03i. Convert versions 3.1.0.
-       	    [Open] 03j. Convert versions 3.0.0.
+       	    [Done] 03a.   Convert versions 3.9.0.
+       	    [Done] 03b.   Convert versions 3.8.0.
+       	    [Done] 03c.   Convert versions 3.7.0.
+       	    [Done] 03d.   Convert versions 3.6.0.
+       	    [Done] 03e.   Convert versions 3.5.0.
+       	    [Done] 03f.   Convert versions 3.4.0.
+       	    [Done] 03g.   Convert versions 3.3.0.
+       	    [Done] 03h.   Convert versions 3.2.0.
+       	    [Done] 03i.   Convert versions 3.1.0.
+       	    [Done] 03j.   Convert versions 3.0.0.
+       	    [Done] 03k.   Convert versions 2.11.0.
+       	    [Done] 03l.   Convert versions 2.10.1.
+       	    [Done] 03m.   Convert versions 2.10.0.
+       	    [Done] 03n.   Convert versions 2.9.1.
+       	    [Done] 03o.   Convert versions 2.9.0.
+       	    [Done] 03p.   Convert versions 2.8.0.
+       	    [Done] 03q.   Convert versions 2.7.0.
+       	    [Done] 03r.   Convert versions 2.6.0.
+       	    [Done] 03s.   Convert versions 2.5.0.
+       	    [Done] 03t.   Convert versions 2.4.0.
+       	    [Done] 03u.   Convert versions 2.3.0.
+       	    [Done] 03v.   Convert versions 2.2.0.
+       	    [Done] 03w.   Convert versions 2.1.0.
+       	    [Done] 03x.   Convert versions 1.9.0.
+       	    [Done] 03y.   Convert versions 1.8.0.
+       	    [Done] 03z.   Convert versions 1.7.0.
+       	    [Done] 03z.   Convert versions 1.6.0.
+       	    [Done] 03z.   Convert versions 1.5.0.
+       	    [Done] 03z.   Convert versions 1.4.0.
+       	    [Done] 03z.   Convert versions 1.3.0.
+       	    [Done] 03z.   Convert versions 1.2.0.
+       	    [Done] 03z.   Convert versions 1.1.0.
+       	    [Done] 03z.   Convert versions 1.0.0.
+       	    [Done] 03aa.  Convert versions 0.9.1.
+       	    [Done] 03ab.  Convert versions 0.9.0.
+       	    [Done] 03ac.  Convert versions 0.8.2.
+       	    [Done] 03ad.  Convert versions 0.8.1.
+       	    [Done] 03ae.  Convert versions 0.8.0.
+       	    [Done] 03af.  Convert versions 0.7.1.
+       	    [Done] 03ag.  Convert versions 0.7.0.
+       	    [Done] 03ah.  Convert versions 0.6.4.
+       	    [Done] 03ai.  Convert versions 0.6.3.
+       	    [Done] 03aj.  Convert versions 0.6.2.
+       	    [Done] 03ak.  Convert versions 0.6.1.
+       	    [Done] 03ap.  Convert versions 0.6.0.
+       	    [Done] 03al.  Convert versions 0.5.3.
+       	    [Done] 03am.  Convert versions 0.5.2.
+       	    [Done] 03an.  Convert versions 0.5.1.
+       	    [Done] 03ao.  Convert versions 0.5.0.
+       	    [Done] 03ap.  Convert versions 0.4.17.
+       	    [Done] 03aq.  Convert versions 0.4.16.
+       	    [Done] 03ar.  Convert versions 0.4.15.
+       	    [Done] 03as.  Convert versions 0.4.14.
+       	    [Done] 03at.  Convert versions 0.4.13.
+       	    [Done] 03au.  Convert versions 0.4.12.
+       	    [Done] 03av.  Convert versions 0.4.11.
+       	    [Done] 03aw.  Convert versions 0.4.10.
+       	    [Done] 03ax.  Convert versions 0.4.9.
+       	    [Done] 03ay.  Convert versions 0.4.8.
+       	    [Done] 03az.  Convert versions 0.4.7.
+       	    [Done] 03a1.  Convert versions 0.4.6.
+       	    [Done] 03a2.  Convert versions 0.4.5.
+       	    [Done] 03a3.  Convert versions 0.4.4.
+       	    [Done] 03a4.  Convert versions 0.4.3.
+       	    [Done] 03a5.  Convert versions 0.4.2.
+       	    [Done] 03a6.  Convert versions 0.4.1.
+       	    [Done] 03a7.  Convert versions 0.4.0.
+       	    [Done] 03a8.  Convert versions 0.3.0.
+       	    [Done] 03a9.  Convert versions 0.2.3.
+       	    [Done] 03a10. Convert versions 0.2.2.
+       	    [Done] 03a11. Convert versions 0.2.1.
+       	    [Done] 03a12. Convert versions 0.2.0.
+
+       	    [Open] 03a13. Convert versions 0.3.1.  [79848a4 - 'make html' failed]
+       	    [Open] 03a15. Convert versions 0.1.2.
+       	    [Open] 03a14. Convert versions 0.1.1.
+       	    [Open] 03a16. Convert versions 0.1.0.
+       	    [Open] 03a17. Convert versions 0.0.13.
+       	    [Open] 03a18. Convert versions 0.0.11.
+       	    [Open] 03a19. Convert versions 0.0.10.
+       	    [Open] 03a20. Convert versions 0.0.8.  [9d150e9 - VERSION = 0.0.8]
+       	    [Open] 03a21. Convert versions 0.0.8.
+       	    [Open] 03a22. Convert versions 0.0.7.
+       	    [Open] 03a23. Convert versions 0.0.6.
+       	    [Open] 03a24. Convert versions 0.0.6.
+       	    [Open] 03a25. Convert versions 0.0.5. 
+
+	    Note: On the 'Open'  items above, there is some problem, e.g., 
+	    'make html' fails, which requires a separate, specific solution. 
 
 [Open] 04.  Review and revise (i.e., correct, update, and delete, where
        	    appropriate) each and every document in the 'docs/' directory.
@@ -39,7 +118,9 @@ mean a set of documents sufficient to satisfy the goals set out in
 
 [Open] 07.  Revise and update 'docs/parrot.pod'.
 
-[Open] 08.  Add a directory structure for the new manuals.[1]
+[Done] 08.  Add a directory structure for the new manuals.[1]
+       	    Note: In 'ayardley/documentation_revisions' see 
+	    'docs/revisions/docs/mans/...'
 
 [Open] 09.  Revise the PIR book contained in 'docs/book/pir'.
 
@@ -108,7 +189,7 @@ mean a set of documents sufficient to satisfy the goals set out in
        	    to ensure Parrot's code documentation comports with its internal 
 	    coding standards.
 
-[Open] 21.  Create a new, friendlier front page for 'parrot.org'.
+[Open] 21.  Create a new, friendlier front page for 'parrot.github.com'.
 
 [Open] 22.  Produce a "standard" presentation on the ParrotVM. 
 
@@ -129,6 +210,13 @@ mean a set of documents sufficient to satisfy the goals set out in
        	    after a new release.
 
 [Open] 29.  Modify 'tools/docs/make_html_docs.pl' to create new docs.
+
+[Done] 30.  Modify 'index.html' to add a link to a page of links,
+       	    'releases.html', on 'parrot.github.com'. 
+
+[Done] 31.  Write a proposal for the adoption of a PVM Specification.
+
+[Open] 32.  Write a PVM Specification, after aggreement of the "core" developers.
 
 Note: The above list is, by-no-means, complete.  We will add tasks (and 
       subtasks to the above tasks) as this revision effort comes more clearly
