@@ -2,29 +2,43 @@
 
 =head1 NAME
 
-docs/README_revisions.pod - Readme file for the revision of Parrot's Documentation 
+docs/README_revisions.pod - Readme file for the revision of Parrot's 
+Documentation 
 
 =head1 DESCRIPTION
 
-This README sets out a brief overview of the Parrot Community's effort to revise its Documentation Set.  The goal of this revision effort is to ensure Parrot's documentation meets or exceeds the highest standards of the Parrot Community, but, equally, to ensure it meets or exceeds the needs and the reasonable expectations of both Parrot's developers and Parrot's user base, to wit: Accessibility and Usability.  Efficient, effective, accessible, and usable documentation to I<aid> Parrot's developers and Parrot's users to achieve their development objective is the loadstone by which we will guide our revision efforts. 
+This README sets out a brief overview of the Parrot Community's effort to 
+revise its Documentation Set.  The goal of this revision effort is to ensure 
+Parrot's documentation meets or exceeds the highest standards of the Parrot 
+Community, but, equally, to ensure it meets or exceeds the needs and the 
+reasonable expectations of both Parrot's developers and Parrot's user base, 
+to wit: Accessibility and Usability.  Efficient, effective, accessible, and 
+usable documentation to I<aid> Parrot's developers and Parrot's users to 
+achieve their development objective is the loadstone by which we will guide 
+our revision efforts. 
 
 The principal milestones of this effort are, 
 
 =over 4
 
-=item * a thorough review and complete update of all current, relevant documentation; 
+=item * a thorough review and complete update of all current, relevant 
+documentation; 
 
-=item * the identification and the archival, where appropriate, of any and all obsolete documentation;
+=item * the identification and the archival, where appropriate, of any and 
+all obsolete documentation;
 
 =item * the completion of a three volume set, comprised of
 
 =over 8
 
-=item * a Developer Manual - consisting of an explanatory Part I and an implementation specific Part II on the Parrot VM;
+=item * a Developer Manual - consisting of an explanatory Part I and an 
+implementation specific Part II on the Parrot VM;
 
-=item * a User Manual - consisting of an explanatory Part I and a practical Part II on how to develop a High-Level Language on the Parrot VM; and
+=item * a User Manual - consisting of an explanatory Part I and a practical 
+Part II on how to develop a High-Level Language on the Parrot VM; and
 
-=item * a Reference Manual - consisting of a detailed reference on the internals of the Parrot VM. 
+=item * a Reference Manual - consisting of a detailed reference on the 
+internals of the Parrot VM. 
 
 =back
 
@@ -32,23 +46,37 @@ The principal milestones of this effort are,
 
 =item * a revision and update of the PCT book contained in C<docs/book/pct>;
 
-=item * the creation of C<Perl5 Pod> manpages, which will then be autogen-ed into C<*roff> manpages, for all of the installable binaries in the Parrot distribution;
+=item * the creation of C<Perl5 Pod> manpages, which will then be autogen-ed 
+into C<*roff> manpages, for all of the installable binaries in the Parrot 
+distribution;
 
-=item * the creation of an autogen indexer, which will generate an easy reference index, for the Parrot Documentation Set;
+=item * the creation of an autogen indexer, which will generate an easy 
+reference index, for the Parrot Documentation Set;
 
-=item * the implementation of such protocols and methodologies as are necessary to ensure Parrot's code documentation comports with Parrot's internal coding standards; and 
+=item * the implementation of such protocols and methodologies as are 
+necessary to ensure Parrot's code documentation comports with Parrot's 
+internal coding standards; and 
 
 =item * the creation of a new, friendlier front page for C<parrot.org>.
 
 =back
 
-Clearly, as the above list indicates, this revision effort is a nontrivial undertaking, and it will require the talents and the efforts of a great many people to bring it to fruition.  But, once done, Parrot's Documentation will ... I<shine>, which, after all, is what we are all after.  
+Clearly, as the above list indicates, this revision effort is a nontrivial 
+undertaking, and it will require the talents and the efforts of a great many 
+people to bring it to fruition.  But, once done, Parrot's Documentation will 
+... I<shine>, which, after all, is what we are all after.  
 
-If you are interested in contributing to this revision effort, please take a look at the below I<How to Help> section.
+If you are interested in contributing to this revision effort, please take a 
+look at the below I<How to Help> section.
 
 =head2 How to Help
 
-Read the I<Parrot Developer FAQ> in C<docs/gettingstarted.pod>.  It contains all of the information you need to get started helping out on Parrot.  Just follow the instructions on locating and subscribing to the Developer Mailing List. Or, alternatively (or in addition to), follow the instructions on how to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either way, you will find someone ready to point you in the right direction.
+Read the I<Parrot Developer FAQ> in C<docs/gettingstarted.pod>.  It contains 
+all of the information you need to get started helping out on Parrot.  Just 
+follow the instructions on locating and subscribing to the Developer Mailing 
+List. Or, alternatively (or in addition to), follow the instructions on how 
+to visit the C<#parrot> channel on the IRC server C<irc.parrot.org>.  Either 
+way, you will find someone ready to point you in the right direction.
 
 =head1 COPYRIGHT
 
