@@ -467,21 +467,20 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
-    INTVAL is_pasm)
+    ARGIN(STRING *compiler_s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_PMC Parrot_compile_string(PARROT_INTERP,
-    Parrot_String type,
     ARGIN(const char *code),
-    ARGOUT(Parrot_String *error))
+    ARGIN(STRING *compiler_s))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -586,11 +585,12 @@ void register_nci_method(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
+    , PARROT_ASSERT_ARG(fullname) \
+    , PARROT_ASSERT_ARG(compiler_s))
 #define ASSERT_ARGS_Parrot_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(code) \
-    , PARROT_ASSERT_ARG(error))
+    , PARROT_ASSERT_ARG(compiler_s))
 #define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type))

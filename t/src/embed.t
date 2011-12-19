@@ -153,17 +153,16 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_co
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
-    Parrot_String err, lang;
     Parrot_PMC func_pmc;
     char *str;
+    Parrot_String lang;
 
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
 
-    func_pmc = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
-    Parrot_printf(interp, "%Ss\n", err);
+    func_pmc = Parrot_compile_string(interp, ".sub foo\n copy\n.end", lang);
     Parrot_destroy(interp);
     return 0;
 }
@@ -176,17 +175,16 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_co
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
-    Parrot_String err, lang;
     Parrot_PMC func_pmc;
     char *str;
+    Parrot_String lang;
 
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "Foo");
 
-    func_pmc = Parrot_compile_string(interp, lang, "This doesn't matter", &err);
-    Parrot_printf(interp, "%Ss\n", err);
+    func_pmc = Parrot_compile_string(interp, "This doesn't matter", lang);
     Parrot_destroy(interp);
     return 0;
 }
@@ -200,18 +198,17 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_co
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
-    Parrot_String err, lang;
     Parrot_PMC func_pmc;
     char *str;
+    Parrot_String lang;
 
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
 
-    func_pmc = Parrot_compile_string(interp, lang, "The sleeper must awake", &err);
+    func_pmc = Parrot_compile_string(interp, "The sleeper must awake", lang);
     Parrot_printf(interp,"Caught exception\n");
-    Parrot_printf(interp, "%Ss\n", err);
     Parrot_destroy(interp);
     return 0;
 }
@@ -226,7 +223,7 @@ c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Hello wor
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, errstr;
+    Parrot_String *compiler;
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
@@ -237,13 +234,13 @@ int main(void)
 
     /* Compile and execute a pir sub */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp, 
 ".sub main :main\n"
 "  say 'Hello, pir'\n"
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
     Parrot_ext_call(interp, code, "->");
 
@@ -262,7 +259,6 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_String compiler;
-    Parrot_String errstr;
     Parrot_PMC code;
     Parrot_PMC rootns;
     Parrot_String parrotname;
@@ -277,7 +273,7 @@ int main(void)
 
     /* Compile pir code */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub main :main\n"
 "  say 'Must not be seen!'\n"
 "\n"
@@ -288,7 +284,7 @@ int main(void)
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
 
     /* Get parrot namespace */
@@ -314,7 +310,6 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_String compiler;
-    Parrot_String errstr;
     Parrot_PMC code;
     Parrot_PMC rootns;
     Parrot_String parrotname;
@@ -331,7 +326,7 @@ int main(void)
 
     /* Compile pir code */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub main :main\n"
 "  say 'Must not be seen!'\n"
 "\n"
@@ -344,7 +339,7 @@ int main(void)
 "\n"
 ".end\n"
 "\n",
-        &errstr
+       compiler
     );
 
     /* Get parrot namespace */
@@ -373,7 +368,7 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_PMC code, rootns, parrotns, sub, ret;
-    Parrot_String compiler, errstr, parrotname, subname, msg;
+    Parrot_String compiler, parrotname, subname, msg;
 
     /* Create the interpreter */
     interp = Parrot_new(NULL);
@@ -382,7 +377,7 @@ int main(void)
 
     /* Compile pir code */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub main :main\n"
 "  say 'Must not be seen!'\n"
 "\n"
@@ -398,7 +393,7 @@ int main(void)
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
 
     /* Get parrot namespace */
@@ -428,7 +423,7 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_PMC code, rootns, parrotns, sub, result;
-    Parrot_String compiler, errstr, parrotname, subname, msg;
+    Parrot_String compiler, parrotname, subname, msg;
     Parrot_PMC res1, res2;
 
     /* Create the interpreter */
@@ -438,7 +433,7 @@ int main(void)
 
     /* Compile pir code */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub main :main\n"
 "  say 'Must not be seen!'\n"
 "\n"
@@ -454,7 +449,7 @@ int main(void)
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
 
     /* Get parrot namespace */
@@ -488,7 +483,6 @@ int main(void)
 {
     Parrot_Interp interp;
     Parrot_String compiler;
-    Parrot_String errstr;
     Parrot_PMC code;
     Parrot_PMC rootns;
     Parrot_String parrotname;
@@ -505,7 +499,7 @@ int main(void)
 
     /* Compile pir code */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub main :main\n"
 "  say 'Must not be seen!'\n"
 "\n"
@@ -517,7 +511,7 @@ int main(void)
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
 
     /* Get parrot namespace */
@@ -552,8 +546,8 @@ void hello(Parrot_Interp interp)
 int main(void)
 {
     Parrot_Interp interp;
-    Parrot_String compiler, pir_compiler;
-    Parrot_String errstr;
+    Parrot_String pir_compiler;
+    Parrot_String compiler;
     Parrot_PMC code;
     Parrot_PMC rootns;
     Parrot_String parrotname;
@@ -569,13 +563,13 @@ int main(void)
 
     /* Compile pir */
     compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
+    code = Parrot_compile_string(interp,
 ".sub externcall :main\n"
 "  hello()\n"
 "\n"
 ".end\n"
 "\n",
-        &errstr
+        compiler
     );
 
     /* Create extern sub and insert in parrot namespace */
@@ -616,13 +610,12 @@ run(PARROT_INTERP, int argc, cosnt char *argv[])
     Parrot_String *src, *smain;
     PMC *prog, *entry;
     opcode_t *dest;
-    Parrot_String *error;
 
     /* get PIR compiler  - TODO API */
     PMC   *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    Parrot_String *pir    = Parrot_str_new_constant(interp, "PIR");
+    Parrot_String pir    = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp   = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
@@ -631,7 +624,7 @@ run(PARROT_INTERP, int argc, cosnt char *argv[])
     }
 
     /* compile source */
-    prog = Parrot_compile_string(interp, pir, c_src, &error);
+    prog = Parrot_compile_string(interp, c_src, pir);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         Parrot_io_eprintf(interp, "Pir compiler returned no prog");
@@ -694,9 +687,8 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 {
     Parrot_String   *smain;
     PMC      *entry;
-    Parrot_String   *error;
     opcode_t *dest;
-    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, src, type);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         Parrot_io_eprintf(interp, "Pir compiler returned no prog");
@@ -785,9 +777,8 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 {
     Parrot_String   *smain;
     PMC      *entry;
-    Parrot_String   *error;
     opcode_t *dest;
-    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, src, type);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");
@@ -876,9 +867,8 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 {
     Parrot_String   *smain;
     PMC      *entry;
-    Parrot_String   *error;
     opcode_t *dest;
-    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, src, type);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");
@@ -966,9 +956,8 @@ compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
 {
     Parrot_String   *smain;
     PMC      *entry;
-    Parrot_String   *error;
     opcode_t *dest;
-    PMC      *prog = Parrot_compile_string(interp, type, src, &error);
+    PMC      *prog = Parrot_compile_string(interp, src, type);
 
     if (PMC_IS_NULL(prog) || !Parrot_PMC_defined(interp, prog)) {
         Parrot_io_eprintf(interp, "Pir compiler returned no prog\n");

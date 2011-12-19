@@ -2009,7 +2009,8 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
     ASSERT_ARGS(compile_file)
     PackFile_ByteCode * const cur_code = interp->code;
-    PMC * const pf_pmc = Parrot_compile_file(interp, path, is_pasm);
+    STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
+    PMC * const pf_pmc = Parrot_compile_file(interp, path, compiler_s);
     PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_LOADED_PBCS);
     PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);

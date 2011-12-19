@@ -171,14 +171,10 @@ Parrot_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 
 /*
 
-=item C<PMC * Parrot_compile_file(PARROT_INTERP, STRING *fullname, INTVAL
-is_pasm)>
+=item C<PMC * Parrot_compile_file(PARROT_INTERP, STRING *fullname, STRING
+*compiler_s)>
 
 Compile code file.
-
-TODO: This should take a PMC* option for the compiler to use. Do not assume
-we have PIR/PASM compilers installed, and do not assume that the user is
-going to want to use either of these. TT #2135.
 
 =cut
 
@@ -187,13 +183,13 @@ going to want to use either of these. TT #2135.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
+Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), 
+        ARGIN(STRING *compiler_s))
 {
-    ASSERT_ARGS(Parrot_compile_file)
+    ASSERT_ARGS(Parrot_compile_file)    
     PMC *result               = NULL;
     UINTVAL regs_used[4]      = {3, 3, 3, 3};
     PMC * const newcontext    = Parrot_push_context(interp, regs_used);
-    STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
     PMC * compiler   = Parrot_get_compiler(interp, compiler_s);
     imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
 
@@ -203,7 +199,7 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 
 
     imcc_reset(imcc);
-    result = imcc_compile_file(imcc, fullname, is_pasm);
+    result = imcc_compile_file(imcc, fullname, compiler);
     if (PMC_IS_NULL(result)) {
         STRING * const msg = imcc_last_error_message(imcc);
         INTVAL code = imcc_last_error_code(imcc);
@@ -218,12 +214,10 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 
 /*
 
-=item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
-const char *code, Parrot_String *error)>
+=item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, const char *code, STRING
+*compiler_s)>
 
 Compiles a code string.
-
-DEPRECATED: Use Parrot_compile_file (or whatever replaces it, TT #2135).
 
 =cut
 
@@ -233,16 +227,15 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_PMC
-Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
-        ARGOUT(Parrot_String *error))
+Parrot_compile_string(PARROT_INTERP, ARGIN(const char *code),
+        ARGIN(STRING *compiler_s))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    PMC * const compiler = Parrot_get_compiler(interp, type);
+    PMC * const compiler = Parrot_get_compiler(interp, compiler_s);
 
-    /* XXX error is not being set */
     if (PMC_IS_NULL(compiler)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not find compiler %Ss", type);
+            "Could not find compiler %Ss", compiler_s);
     }
     else {
         PMC *result;
