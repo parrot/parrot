@@ -192,14 +192,14 @@ Parrot_compile_file(PARROT_INTERP, ARGIN(STRING *fullname),
     PMC * const newcontext    = Parrot_push_context(interp, regs_used);
     PMC * compiler   = Parrot_get_compiler(interp, compiler_s);
     imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
+    const INTVAL is_pasm  = VTABLE_get_integer(interp, compiler);
 
     Parrot_block_GC_mark(interp);
     Parrot_pcc_set_HLL(interp, newcontext, 0);
     Parrot_pcc_set_sub(interp, newcontext, 0);
 
-
     imcc_reset(imcc);
-    result = imcc_compile_file(imcc, fullname, compiler);
+    result = imcc_compile_file(imcc, fullname, is_pasm);
     if (PMC_IS_NULL(result)) {
         STRING * const msg = imcc_last_error_message(imcc);
         INTVAL code = imcc_last_error_code(imcc);
