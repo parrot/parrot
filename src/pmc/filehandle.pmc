@@ -544,7 +544,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
         const INTVAL status = Parrot_io_putps(INTERP, SELF, string_to_print);
-        
+
         RETURN(INTVAL status);
     }
 
