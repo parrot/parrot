@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.10.0",
-    "release.name"     : "Apple Pi",
+    "release.version"  : "3.11.0",
+    "release.name"     : "Duct tape",
     "release.day"      : "Tuesday",
-    "release.date"     : "15 November 2011",
-    "release.nextdate" : "20 December 2011",
+    "release.date"     : "20 December 2011",
+    "release.nextdate" : "17 January 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 December 2011",
+    "bugday.date"      : "15 January 2012",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2011_12_17",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.10.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/3.11.0/"
 }

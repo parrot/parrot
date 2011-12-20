@@ -134,5 +134,6 @@ Starred release numbers indicate supported releases.
  soh_cah_toa 3.8.0          2011-Sep-20     "Magrathea"
  dukeleto    3.9.0 *        2011-Oct-18     "Archaeopteryx"
  Whiteknight 3.10.0         2011-Nov-15     "Apple Pi"
+ cotto       3.11.0         2011-Dec-20     "Duct Tape"
 
 =cut
