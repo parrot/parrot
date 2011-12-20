@@ -76,12 +76,27 @@ sub _set_malloc_header {
 
 sub _set_ptrcast {
     my $conf = shift;
-    if ( $conf->data->get('ptrsize') == $conf->data->get('intsize') ) {
-        $conf->data->set( ptrcast => 'int' );
+
+    my $ptrsize = $conf->data->get('ptrsize');
+    my $ptrcast = $conf->data->get("int${ptrsize}_t");
+
+    # FIXME: find out if this actually does the right thing if intXX_t is
+    # not available
+    if ( defined $ptrcast ) {}
+    elsif ( $ptrsize == $conf->data->get('intsize') ) {
+        $ptrcast = 'int';
+    }
+    elsif ( $ptrsize == $conf->data->get('longsize') ) {
+        $ptrcast = 'long';
+    }
+    elsif ( $ptrsize == $conf->data->get('longlongsize') ) {
+        $ptrcast = 'long long';
     }
     else {
-        $conf->data->set( ptrcast => 'long' );
+        # TODO: fail properly
     }
+
+    $conf->data->set( ptrcast => $ptrcast );
 }
 
 sub _set_memalign {
