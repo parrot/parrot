@@ -1,19 +1,19 @@
 2011-12-20    release 3.11.0
     - Core
         + packfile api and pbc handling improvements
-        + sub profiling runcore cleanups
-        + improved recursion tracking across threads
-        + exception handling improvements via new ops
-    - Languages
-        + math builtins in winxed b2f3d1d14fc3a94fc9bfee054f71a6c56f5133b4
-        + better inline support in winxed
-        + squaak improvements (sub as expression, read() builtin)
-    - Documentation
-        + docs improvements and additions thanks to gci students
-    - Tests
-        + updates of example code
-        + coding standards fixes
+        + smarter recursion tracking across threads
+        + new "pop_upto_eh" op for finer-grained exception handling
+        + subroutine-level profiling runcore cleanups
         + improved window support
+    - Languages
+        + new math builtins in winxed (abs, sinh, cosh and tanh)
+        + better inline support in winxed
+        + squaak improvements (sub as expression, new read() builtin)
+    - Documentation
+        + many new man pages thanks to gci students
+    - Tests
+        + updated example code for FileHandle and Iterator
+        + coding standards fixes
 
 2011-11-15    release 3.10.0
     - Core
