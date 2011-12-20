@@ -1,3 +1,20 @@
+2011-12-20    release 3.11.0
+    - Core
+        + packfile api and pbc handling improvements
+        + sub profiling runcore cleanups
+        + improved recursion tracking across threads
+        + exception handling improvements via new ops
+    - Languages
+        + math builtins in winxed b2f3d1d14fc3a94fc9bfee054f71a6c56f5133b4
+        + better inline support in winxed
+        + squaak improvements (sub as expression, read() builtin)
+    - Documentation
+        + docs improvements and additions thanks to gci students
+    - Tests
+        + updates of example code
+        + coding standards fixes
+        + improved window support
+
 2011-11-15    release 3.10.0
     - Core
         + The mark VTABLE was added to the Select PMC
