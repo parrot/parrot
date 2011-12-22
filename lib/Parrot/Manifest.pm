@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use Carp;
 use File::Basename;
-use File::Slurp qw/slurp/;
+use Parrot::BuildUtil;
 
 =head1 METHODS
 
@@ -362,7 +362,7 @@ sub print_manifest_skip {
 sub _get_ignores {
     my $self      = shift;
 
-    my $gitignore = grep { !/^#/ } slurp('.gitignore');
+    my $gitignore = grep { !/^#/ } Parrot::BuildUtil::slurp_file('.gitignore');
 
     my %ignores;
     my @ignore = sort grep { $_ } split( /\n/, $gitignore );
