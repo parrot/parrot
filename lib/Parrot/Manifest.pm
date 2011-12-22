@@ -362,10 +362,10 @@ sub print_manifest_skip {
 sub _get_ignores {
     my $self      = shift;
 
-    my $gitignore = grep { !/^#/ } Parrot::BuildUtil::slurp_file('.gitignore');
+    my $gitignore = Parrot::BuildUtil::slurp_file('.gitignore');
 
     my %ignores;
-    my @ignore = sort grep { $_ } split( /\n/, $gitignore );
+    my @ignore = sort grep { $_ !~ /^#/ } split( /\n/, $gitignore );
 
     for my $ignore (@ignore) {
          my ($dirname, $basename) = (dirname($ignore), basename($ignore));

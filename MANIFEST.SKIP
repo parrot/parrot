@@ -12,6 +12,8 @@
 # ports/ should not go into release tarballs
 ^ports$
 ^ports/
+^$
+^/
 ^.*\.diff$
 ^.*\.diff/
 ^.*\.obj$
