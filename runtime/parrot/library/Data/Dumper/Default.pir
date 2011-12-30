@@ -200,11 +200,15 @@ Escape any characters in a string so we can re-use it as a literal.
     print type
     print "' "
 
+    push_eh CATCH
     $I0 = can dump, "__dump"
     if $I0 goto CAN_DUMP
+CATCH:
+    pop_eh
     print "{ ... }"
     branch END
 CAN_DUMP:
+    pop_eh
     dump."__dump"( self, name )
 END:
     .return ( 1 )
