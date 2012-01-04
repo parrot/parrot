@@ -206,8 +206,7 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
 
     if (exec) {
         Parrot_String compiler = create_string(interp, "PIR");
-        Parrot_String errstr;
-        Parrot_PMC code = Parrot_compile_string(interp, compiler, exec, &errstr);
+        Parrot_PMC code = Parrot_compile_string(interp, exec, compiler);
         Parrot_ext_call(interp, code, "->");
         return 0;
     }

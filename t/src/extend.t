@@ -821,11 +821,11 @@ main(int argc, const char *argv[])
     const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
-    Parrot_String   code_type, error, foo_name;
+    Parrot_String   code_type, foo_name;
 
     if (interp) {
         code_type = Parrot_str_new_constant( interp, "PIR" );
-        retval    = Parrot_compile_string( interp, code_type, code, &error );
+        retval    = Parrot_compile_string( interp, code, code_type );
 
         if (retval) {
             foo_name = Parrot_str_new_constant( interp, "foo" );
