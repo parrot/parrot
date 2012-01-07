@@ -12,6 +12,8 @@
 # ports/ should not go into release tarballs
 ^ports$
 ^ports/
+^$
+^/
 ^.*\.diff$
 ^.*\.diff/
 ^.*\.obj$
@@ -954,8 +956,12 @@
 ^/t/src/.*\.lib/
 ^/t/src/.*_.*\.c$
 ^/t/src/.*_.*\.c/
+^/t/src/embed.*\.o$
+^/t/src/embed.*\.o/
 ^/t/src/embed/.*\.c$
 ^/t/src/embed/.*\.c/
+^/t/src/extend.*\.o$
+^/t/src/extend.*\.o/
 ^/t/stress/.*\.out$
 ^/t/stress/.*\.out/
 ^/t/stress/.*\.pasm$

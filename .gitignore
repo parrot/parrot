@@ -435,6 +435,8 @@ cachegrind.out.*
 /t/src/*.gcov
 /t/src/*.gcdada
 /t/src/embed/*.c
+/t/src/embed*.o
+/t/src/extend*.o
 /t/stress/*.out
 /t/stress/*.pasm
 /t/stress/*.pbc

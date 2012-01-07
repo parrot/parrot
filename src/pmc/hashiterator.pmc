@@ -118,7 +118,7 @@ advance_to_next(ARGMOD(PMC *self))
     return;
 }
 
-pmclass HashIterator extends Iterator no_ro auto_attrs {
+pmclass HashIterator extends Iterator provides iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
     ATTR Hash       *parrot_hash;   /* Underlying implementation of hash */
     ATTR HashBucket *bucket;        /* Current bucket */

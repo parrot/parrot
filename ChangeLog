@@ -1,3 +1,20 @@
+2011-12-20    release 3.11.0
+    - Core
+        + packfile api and pbc handling improvements
+        + smarter recursion tracking across threads
+        + new "pop_upto_eh" op for finer-grained exception handling
+        + subroutine-level profiling runcore cleanups
+        + improved window support
+    - Languages
+        + new math builtins in winxed (abs, sinh, cosh and tanh)
+        + better inline support in winxed
+        + squaak improvements (sub as expression, new read() builtin)
+    - Documentation
+        + many new man pages thanks to gci students
+    - Tests
+        + updated example code for FileHandle and Iterator
+        + coding standards fixes
+
 2011-11-15    release 3.10.0
     - Core
         + The mark VTABLE was added to the Select PMC
