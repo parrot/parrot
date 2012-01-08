@@ -493,6 +493,7 @@ PARROT_PURE_FUNCTION
 Parrot_UInt Parrot_interp_test_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
+void Parrot_interp_clear_emergency_interpreter(void);
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_interp_get_emergency_interpreter(void);
 
@@ -577,6 +578,8 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_test_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_clear_emergency_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_get_emergency_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

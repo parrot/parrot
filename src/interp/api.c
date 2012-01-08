@@ -28,7 +28,7 @@ Functions related to managing the Parrot interpreter
 #include "parrot/has_header.h"
 #include "imcc/embed.h"
 
-static Interp* emergency_interp;
+static Interp* emergency_interp = NULL;
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -94,7 +94,7 @@ Parrot_Interp
 Parrot_interp_new(ARGIN_NULLOK(Parrot_Interp parent))
 {
     ASSERT_ARGS(Parrot_interp_new)
-    /* api.c:make_interpreter builds a new Parrot_Interp. */
+    /* api.c:Parrot_interp_make_interpreter builds a new Parrot_Interp. */
     return Parrot_interp_make_interpreter(parent, PARROT_NO_FLAGS);
 }
 
@@ -188,9 +188,10 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = parent;
     else {
         interp->parent_interpreter = NULL;
-        emergency_interp           = interp;
+        if (!emergency_interp)
+            emergency_interp = interp;
 
-        PMCNULL                    = NULL;
+        PMCNULL = NULL;
     }
 
     /* Must initialize flags before Parrot_gc_initialize() is called
@@ -209,7 +210,7 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->current_runloop_id    = 0;
     interp->current_runloop_level = 0;
 
-    interp->gc_sys           = mem_internal_allocate_zeroed_typed(GC_Subsystem);
+    interp->gc_sys = mem_internal_allocate_zeroed_typed(GC_Subsystem);
 
     /* Done. Return and be done with it */
     return interp;
@@ -512,9 +513,9 @@ other than error handling.
 
 PARROT_CAN_RETURN_NULL
 Interp*
-Parrot_interp_get_emergency_interpreter(void) {
+Parrot_interp_get_emergency_interpreter(void)
+{
     ASSERT_ARGS(Parrot_interp_get_emergency_interpreter)
-
     return emergency_interp;
 }
 
@@ -531,7 +532,9 @@ function.  Don't use it for anything other than error handling.
 */
 
 void
-Parrot_interp_clear_emergency_interpreter(void) {
+Parrot_interp_clear_emergency_interpreter(void)
+{
+    ASSERT_ARGS(Parrot_interp_clear_emergency_interpreter)
     emergency_interp = NULL;
 }
 
@@ -614,10 +617,10 @@ void
 Parrot_interp_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_interp_mark_method_writes)
-    STRING *const str_name = Parrot_str_new_constant(interp, name);
-    PMC    *const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
-    PMC    *const method   = VTABLE_get_pmc_keyed_str(
-        interp, interp->vtables[type]->_namespace, str_name);
+    STRING * const str_name = Parrot_str_new_constant(interp, name);
+    PMC    * const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
+    PMC    * const method   = VTABLE_get_pmc_keyed_str(interp,
+            interp->vtables[type]->_namespace, str_name);
     VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
 
@@ -640,10 +643,9 @@ Parrot_interp_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
     ASSERT_ARGS(Parrot_interp_get_compiler)
     PMC * const  hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
-    if (PMC_IS_NULL(hash)) {
-        /* No compiler has been registered yet */
+    /* No compiler has been registered yet */
+    if (PMC_IS_NULL(hash))
         return PMCNULL;
-    }
 
     /* Fetch the compiler */
     return VTABLE_get_pmc_keyed_str(interp, hash, type);
@@ -665,9 +667,8 @@ void
 Parrot_interp_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compiler))
 {
     ASSERT_ARGS(Parrot_interp_set_compiler)
-    PMC    * const iglobals = interp->iglobals;
-    PMC    * hash           = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
-                              IGLOBALS_COMPREG_HASH);
+    PMC * const iglobals = interp->iglobals;
+    PMC * hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
 
     if (PMC_IS_NULL(hash)) {
         hash = Parrot_pmc_new_noinit(interp, enum_class_Hash);
@@ -700,7 +701,7 @@ PMC *
 Parrot_interp_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
 {
     ASSERT_ARGS(Parrot_interp_compile_file)
-    PMC *result               = NULL;
+    PMC * result              = NULL;
     UINTVAL regs_used[4]      = {3, 3, 3, 3};
     PMC * const newcontext    = Parrot_push_context(interp, regs_used);
     STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
@@ -710,7 +711,6 @@ Parrot_interp_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pas
     Parrot_block_GC_mark(interp);
     Parrot_pcc_set_HLL(interp, newcontext, 0);
     Parrot_pcc_set_sub(interp, newcontext, 0);
-
 
     imcc_reset(imcc);
     result = imcc_compile_file(imcc, fullname, is_pasm);
@@ -949,7 +949,7 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         case RUNTIME_PREFIX:
             return Parrot_get_runtime_path(interp);
         case GC_SYS_NAME: {
-            STRING * name = Parrot_gc_sys_name(interp);
+            STRING * const name = Parrot_gc_sys_name(interp);
             Parrot_warn_experimental(interp, "GC_SYS_NAME option is experimental");
             return name;
         }
