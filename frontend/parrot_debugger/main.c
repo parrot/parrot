@@ -208,7 +208,7 @@ main(int argc, const char *argv[])
 
             Parrot_pf_set_current_packfile(interp, pf);
 
-            Parrot_interp_compile_file(interp, str, 0);
+            Parrot_interp_compile_file(interp, compiler, str);
             /*if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
 
@@ -220,18 +220,14 @@ main(int argc, const char *argv[])
     }
     else {
         /* Generate some code to be able to enter into runloop */
+        STRING * const compiler_s = Parrot_str_new_constant(interp, "PIR");
+        PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
+        STRING * const source = Parrot_str_new_constant(interp, ".sub aux :main\nexit 0\n.end\n");
+        PMC * const code = Parrot_interp_compile_string(interp, compiler, source);
 
-        STRING *compiler = Parrot_str_new_constant(interp, "PIR");
-        STRING *errstr = NULL;
-        const char source []= ".sub aux :main\nexit 0\n.end\n";
-        PMC *code = Parrot_interp_compile_string(interp, compiler, source, &errstr);
-
-        if (!STRING_IS_NULL(errstr))
-            Parrot_io_eprintf(interp, "%Ss\n", errstr);
-        else
-            if (PMC_IS_NULL(code))
-                Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
-                    "Unexpected compiler problem at debugger start");
+        if (PMC_IS_NULL(code))
+            Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                "Unexpected compiler problem at debugger start");
     }
 
     Parrot_unblock_GC_mark(interp);
