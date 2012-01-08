@@ -342,9 +342,10 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_interp_compile_file(PARROT_INTERP,
     ARGIN(STRING *fullname),
-    INTVAL is_pasm)
+    ARGIN(PMC *compiler))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
@@ -510,7 +511,8 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
+    , PARROT_ASSERT_ARG(fullname) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_interp_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(code) \

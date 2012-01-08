@@ -682,14 +682,14 @@ Parrot_interp_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compil
 
 /*
 
-=item C<PMC * Parrot_interp_compile_file(PARROT_INTERP, STRING *fullname, INTVAL
-is_pasm)>
+=item C<PMC * Parrot_interp_compile_file(PARROT_INTERP, STRING *fullname, PMC
+*compiler)>
 
-Compile code file.
+Compile code file. Take a reference to a compiler PMC. Currently only PIR and
+PASM compilers (IMCC-based) are supported
 
-TODO: This should take a PMC* option for the compiler to use. Do not assume
-we have PIR/PASM compilers installed, and do not assume that the user is
-going to want to use either of these. TT #2135.
+TODO: This should probably be deleted entirely, and higher-level compilation
+abstractions used instead.
 
 =cut
 
@@ -698,15 +698,16 @@ going to want to use either of these. TT #2135.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_interp_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), INTVAL is_pasm)
+Parrot_interp_compile_file(PARROT_INTERP, ARGIN(STRING *fullname), ARGIN(PMC *compiler))
 {
     ASSERT_ARGS(Parrot_interp_compile_file)
-    PMC * result              = NULL;
-    UINTVAL regs_used[4]      = {3, 3, 3, 3};
-    PMC * const newcontext    = Parrot_push_context(interp, regs_used);
-    STRING * const compiler_s = is_pasm ? CONST_STRING(interp, "PASM") : CONST_STRING(interp, "PIR");
-    PMC * compiler   = Parrot_interp_get_compiler(interp, compiler_s);
-    imc_info_t *imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
+    PMC * result = NULL;
+    UINTVAL regs_used[4] = {3, 3, 3, 3};
+    PMC * const newcontext = Parrot_push_context(interp, regs_used);
+    imc_info_t * const imcc = (imc_info_t *) VTABLE_get_pointer(interp, compiler);
+    const INTVAL is_pasm = VTABLE_get_integer(interp, compiler);
+
+    //fprintf(stderr, "\nParrot_interp_compile_file: is_pasm = %d\n", is_pasm);
 
     Parrot_block_GC_mark(interp);
     Parrot_pcc_set_HLL(interp, newcontext, 0);

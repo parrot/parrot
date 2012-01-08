@@ -203,8 +203,11 @@ main(int argc, const char *argv[])
         else {
             STRING          *str = Parrot_str_new(interp, filename, 0);
             Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
+            STRING * const compiler_s = Parrot_str_new(interp, "PIR", 0);
+            PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
 
             Parrot_pf_set_current_packfile(interp, pf);
+
             Parrot_interp_compile_file(interp, str, 0);
             /*if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
