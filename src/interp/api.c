@@ -728,7 +728,7 @@ Parrot_interp_compile_file(PARROT_INTERP, ARGIN(PMC *compiler), ARGIN(STRING *fu
 /*
 
 =item C<Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP, PMC * compiler,
-const char *code)>
+STRING *code)>
 
 Compiles a code string.
 
@@ -742,7 +742,7 @@ PARROT_WARN_UNUSED_RESULT
 Parrot_PMC
 Parrot_interp_compile_string(PARROT_INTERP, ARGIN(PMC * compiler), ARGIN(STRING *code))
 {
-    ASSERT_ARGS(Parrot_interp_compile_c_string)
+    ASSERT_ARGS(Parrot_interp_compile_string)
 
     PMC *result;
     imc_info_t * const imcc = (imc_info_t*) VTABLE_get_pointer(interp, compiler);

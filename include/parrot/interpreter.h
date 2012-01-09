@@ -339,20 +339,20 @@ void Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Parrot_PMC Parrot_interp_compile_c_string(PARROT_INTERP,
-    ARGIN(PMC * compiler),
-    ARGIN(const char *code))
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_interp_compile_file(PARROT_INTERP,
+    ARGIN(PMC *compiler),
+    ARGIN(STRING *fullname))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_interp_compile_file(PARROT_INTERP,
-    ARGIN(PMC *compiler),
-    ARGIN(STRING *fullname))
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP,
+    ARGIN(PMC * compiler),
+    ARGIN(STRING *code))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -507,15 +507,14 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_interp_compile_c_string \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(compiler) \
-    , PARROT_ASSERT_ARG(code))
 #define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compiler) \
     , PARROT_ASSERT_ARG(fullname))
+#define ASSERT_ARGS_Parrot_interp_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(compiler) \
+    , PARROT_ASSERT_ARG(code))
 #define ASSERT_ARGS_Parrot_interp_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
