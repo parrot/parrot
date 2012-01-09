@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -11,7 +10,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/pmc/timer.t - Timer PMCs
+t/pmc/timer.t - Timer PMC tests
 
 =head1 SYNOPSIS
 
