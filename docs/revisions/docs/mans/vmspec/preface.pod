@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-docs/mans/vmspec/preface.pod - Preface to the Parrot Virtual Machine 
+docs/mans/vmspec/preface.pod - Preface[*] to the Parrot Virtual Machine 
 Specification. 
 
 =head1 DESCRIPTION
@@ -36,7 +36,11 @@ And, finally, for more information on Parrot, I<see>
 
 =head1 NOTES
 
-[1]  I<See> http://www.parrot.org.  You may also obtain a copy of Parrot at
+[*] I will, as I get further along in the development of this specification, 
+revise this F<preface.pod> file with the appropriate prefatory information, 
+I<e.g.,> acknowledgments and credits.
+
+[1] I<See> http://www.parrot.org.  You may also obtain a copy of Parrot at
 its github repository. I<See> https://github.com/parrot/parrot.
 
 =head1 COPYRIGHT
