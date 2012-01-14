@@ -14230,7 +14230,7 @@ Parrot_debug_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_bounds_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_BOUNDS_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_BOUNDS_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG);
@@ -14244,7 +14244,7 @@ Parrot_bounds_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_bounds_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_BOUNDS_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_BOUNDS_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG);
@@ -14258,7 +14258,7 @@ Parrot_bounds_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_profile_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_PROFILE_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_PROFILE_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG);
@@ -14272,7 +14272,7 @@ Parrot_profile_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_profile_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_flag(interp, PARROT_PROFILE_FLAG);
+        Parrot_interp_set_flag(interp, PARROT_PROFILE_FLAG);
     }
     else {
         Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG);
@@ -14286,10 +14286,10 @@ Parrot_profile_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trace_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) != 0)) {
-        Parrot_set_trace(interp, IREG(1));
+        Parrot_interp_set_trace(interp, IREG(1));
     }
     else {
-        Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
+        Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
     }
 
             interp->resume_offset = REL_PC + 2; interp->resume_flag = 1;;
@@ -14300,10 +14300,10 @@ Parrot_trace_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trace_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) != 0)) {
-        Parrot_set_trace(interp, ICONST(1));
+        Parrot_interp_set_trace(interp, ICONST(1));
     }
     else {
-        Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
+        Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS);
     }
 
             interp->resume_offset = REL_PC + 2; interp->resume_flag = 1;;
@@ -14337,33 +14337,33 @@ Parrot_gc_debug_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_interpinfo_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = interpinfo(interp, IREG(2));
+    IREG(1) = Parrot_interp_info(interp, IREG(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_interpinfo_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = interpinfo(interp, ICONST(2));
+    IREG(1) = Parrot_interp_info(interp, ICONST(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_interpinfo_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = interpinfo_p(interp, IREG(2));
+    PREG(1) = Parrot_interp_info_p(interp, IREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_interpinfo_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = interpinfo_p(interp, ICONST(2));
+    PREG(1) = Parrot_interp_info_p(interp, ICONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_interpinfo_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    STRING  * const  s = interpinfo_s(interp, IREG(2));
+    STRING  * const  s = Parrot_interp_info_s(interp, IREG(2));
 
     SREG(1) = s;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -14372,7 +14372,7 @@ Parrot_interpinfo_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_interpinfo_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    STRING  * const  s = interpinfo_s(interp, ICONST(2));
+    STRING  * const  s = Parrot_interp_info_s(interp, ICONST(2));
 
     SREG(1) = s;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));

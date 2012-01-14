@@ -595,5 +595,26 @@
     
     There will not be a PASM compreg anymore.
   ticket : 'http://trac.parrot.org/parrot/ticket/1967'
+-
+  name : 'Interpreter API cleanup'
+  note :
+    All functions that were defined in parrot/interpreter.h have been renamed in order
+    to follow the project's coding standards.
 
+    Functions that began with "Parrot_" now begin with "Parrot_interp_"
+    For example, function C<Parrot_new> has been renamed to C<Parrot_interp_new>.
+
+    Also, "Parrot_interp_" has been prepended to all functions that didn't begin with
+    "Parrot_" for consistency. For example, function C<allocate_interpreter> has been
+    renamed to C<Parrot_interp_allocate_interpreter>.
+
+    Other than the above changes, the below functions were also renamed to make their
+    purpose more clear:
+        * C<interpinfo> -> C<Parrot_interp_info>
+        * C<Parrot_int_get_interp_from_pmc> -> C<Parrot_interp_get_from_pmc>
+  tags:
+    - api
+    - deprecated
+    - completed
+  ticket: 'http://trac.parrot.org/parrot/ticket/443'
 
