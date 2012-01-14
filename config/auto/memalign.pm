@@ -80,9 +80,13 @@ sub _set_ptrcast {
     my $ptrsize = $conf->data->get('ptrsize');
     my $ptrcast = $conf->data->get("int${ptrsize}_t");
 
-    # FIXME: find out if this actually does the right thing if intXX_t is
-    # not available
     if ( defined $ptrcast ) {}
+    elsif ( $ptrsize == 1 ) {
+        $ptrcast = 'signed char';
+    }
+    elsif ( $ptrsize == $conf->data->get('shortsize') ) {
+        $ptrcast = 'short';
+    }
     elsif ( $ptrsize == $conf->data->get('intsize') ) {
         $ptrcast = 'int';
     }
@@ -93,7 +97,8 @@ sub _set_ptrcast {
         $ptrcast = 'long long';
     }
     else {
-        # TODO: fail properly
+        die "Failed to determine pointer-sized integer type ".
+            "(note: pointer-size is $ptrsize)";
     }
 
     $conf->data->set( ptrcast => $ptrcast );
