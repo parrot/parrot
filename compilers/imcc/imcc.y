@@ -1081,7 +1081,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %type <t> argtype_list argtype paramtype_list paramtype
 %type <t> pcc_return_many
 %type <t> proto sub_proto sub_proto_list multi subtag multi_types outer
-%type <t> vtable instanceof subid
+%type <t> vtable subid
 %type <t> method ns_entry_name
 %type <i> instruction assignment conditional_statement labeled_inst opt_label op_assign
 %type <i> if_statement unless_statement
@@ -1544,14 +1544,6 @@ ns_entry_name:
          }
    ;
 
-instanceof:
-     SUB_INSTANCE_OF '(' STRINGC ')'
-         {
-           $$ = 0;
-           imcc->cur_unit->instance_of = $3;
-         }
-   ;
-
 subid:
      SUBID
          {
@@ -1647,7 +1639,6 @@ proto:
    | vtable
    | method
    | ns_entry_name
-   | instanceof
    | subid
    ;
 
