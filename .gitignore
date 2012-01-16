@@ -37,6 +37,9 @@ cachegrind.out.*
 /*.tmp
 # vim swap files
 /\.*sw?
+/*/*.sw?
+/*/*/*.sw?
+/*/*/*/*.sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
