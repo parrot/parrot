@@ -15,15 +15,51 @@ Tests the Timer PMC.
 
 =cut
 
+.sub tick
+    get_global $P0, 'counter'
+    inc $P0
+.end
+
 .sub main :main
     .include 'test_more.pir'
     .include "timer.pasm"
-    plan(15)
+    plan(17)
     timer_setup()
     timer_initialize()
     timer_start_stop()
     timer_repeat()
     timer_start()
+    timer_stop()
+.end
+
+.sub timer_stop
+    .local pmc timer
+    .local int t1, t2, r
+    .const 'Sub' tick = 'tick'
+    $P0 = new 'Integer'
+    set_global 'counter', $P0
+    timer = new ['Timer']
+    timer[.PARROT_TIMER_HANDLER] = tick
+    timer[.PARROT_TIMER_INTERVAL] = 0.1
+    timer[.PARROT_TIMER_REPEAT] = -1
+    timer[.PARROT_TIMER_RUNNING] = 1
+    # Allow at least two ticks
+    sleep 0.2
+    sleep 0.2
+    timer[.PARROT_TIMER_RUNNING] = 0
+    # Give a chance to run a possible pending tick
+    sleep 0.2
+    get_global $P0, 'counter'
+    t1 = $P0
+    r = isgt t1, 1
+    is(r,1,'counter = 1')
+    # Give a chance to tick to verify that is stopped
+    sleep 0.2
+    sleep 0.2
+    get_global $P0, 'counter'
+    t2 = $P0
+    r = iseq t1, t2
+    is(r,1,'counter = 1')
 .end
 
 .sub timer_start
