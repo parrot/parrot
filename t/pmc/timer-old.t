@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 3;
 use Parrot::Config;
 
 =head1 NAME
@@ -51,33 +51,6 @@ SKIP: {
     returncc
 CODE
 /ok 2/
-OUT
-
-    pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/stop" );
-.include "timer.pasm"
-    new P1, ['FixedPMCArray']
-    set P1, 6
-    set P1[0], .PARROT_TIMER_NSEC
-    set P1[1], 0.5
-    set P1[2], .PARROT_TIMER_HANDLER
-    get_global P2, "_timer_sub"
-    set P1[3], P2
-    set P1[4], .PARROT_TIMER_RUNNING
-    set P1[5], 1
-
-    new P0, ['Timer'], P1
-    print "ok 1\n"
-    # stop the timer
-    set P0[.PARROT_TIMER_RUNNING], 0
-    sleep 1
-    print "ok 2\n"
-    end
-.pcc_sub _timer_sub:
-    print "never\n"
-    returncc
-CODE
-ok 1
-ok 2
 OUT
 
     my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?

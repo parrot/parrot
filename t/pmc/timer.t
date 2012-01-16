@@ -18,9 +18,10 @@ Tests the Timer PMC.
 .sub main :main
     .include 'test_more.pir'
     .include "timer.pasm"
-    plan(5)
+    plan(7)
     timer_setup()
     timer_initialize()
+    timer_start_stop()
 .end
 
 .sub timer_setup
@@ -64,6 +65,29 @@ Tests the Timer PMC.
     $I4 += $I3
     # so we assert the sum of the above registers is 1
     is($I4,1,'PARROT_TIMER_USEC')
+.end
+
+.sub timer_start_stop
+    $P1 = new ['FixedPMCArray'], 6
+    set $P1[0], .PARROT_TIMER_NSEC
+    set $P1[1], 0.5
+    set $P1[2], .PARROT_TIMER_HANDLER
+    get_global $P2, "_timer_sub"
+    set $P1[3], $P2
+    set $P1[4], .PARROT_TIMER_RUNNING
+    set $P1[5], 1
+
+    $P0 = new ['Timer'], $P1
+    ok(1,'created Timer PMC')
+
+    set $P0[.PARROT_TIMER_RUNNING], 0
+    sleep 1
+    ok(1,'slept after stopping timer')
+.end
+
+.sub _timer_sub
+    print "never\n"
+    returncc
 .end
 
 # Local Variables:
