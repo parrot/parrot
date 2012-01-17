@@ -1499,7 +1499,26 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         }
     }
 
-    {
+    /* Do we have to create an instance of a specific type for this sub? */
+    if (unit->instance_of) {
+        /* Look it up as a class and as a PMC type. */
+        STRING * const classname = Parrot_str_new(imcc->interp,
+                unit->instance_of + 1, strlen(unit->instance_of) - 2);
+
+        PMC * const classobj = Parrot_oo_get_class_str(imcc->interp, classname);
+
+        if (!PMC_IS_NULL(classobj))
+            sub_pmc = VTABLE_instantiate(imcc->interp, classobj, PMCNULL);
+        else {
+            const INTVAL type = Parrot_pmc_get_type_str(imcc->interp, classname);
+            if (type <= 0)
+                Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_NO_CLASS,
+                    "Class '%Ss' specified in :instanceof(...) not found",
+                    classname);
+            sub_pmc = Parrot_pmc_new(imcc->interp, type);
+        }
+    }
+    else {
         /* use a possible type mapping for the Sub PMCs, and create it */
         const INTVAL type = r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub;
         const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(imcc->interp, type);

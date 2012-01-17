@@ -269,6 +269,8 @@ imc_free_unit(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
         free_sym(unit->_namespace);
     if (unit->vtable_name)
         mem_sys_free(unit->vtable_name);
+    if (unit->instance_of)
+        mem_sys_free(unit->instance_of);
 
     mem_sys_free(unit->hash.data);
     mem_sys_free(unit);
