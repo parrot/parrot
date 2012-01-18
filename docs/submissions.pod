@@ -201,7 +201,7 @@ described in this document.  This process may take weeks or months.
 
 =item 2
 
-Obtain a Trac account at L<https://trac.parrot.org/parrot>
+Obtain a github account.
 
 =item 3
 
