@@ -49,7 +49,6 @@ sub runstep {
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)',
         libparrot_shared    => $libparrot_shared,
-        blib_dir            => '.',
         libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
         inst_libparrot_ldflags => '-L' . $bindir . ' -lparrot',
         libparrot_linkflags   => '-L' . $build_dir . ' -lparrot',
