@@ -808,7 +808,7 @@ help :
 	@echo "Fetch from source repository:"
 	@echo "  update:            git pull."
 	@echo "  status:            git status."
-	@echo "  patch:             Create a patch to attach to https://trac.parrot.org/"
+	@echo "  patch:             Create a patch to attach to https://github.com/parrot/parrot/issues"
 	@echo ""
 	@echo "Development:"
 	@echo "  lint:              An alias for sunlint."
