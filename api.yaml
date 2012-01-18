@@ -63,9 +63,9 @@
     - 'PIR'
     - 'syntax'
   tickets:
-    - 'https://trac.parrot.org/parrot/ticket/1033'
-    - 'https://trac.parrot.org/parrot/ticket/1704'
-    - 'https://trac.parrot.org/parrot/ticket/1705'
+    - 'https://github.com/parrot/parrot/issues/600'
+    - 'https://github.com/parrot/parrot/issues/571'
+    - 'https://github.com/parrot/parrot/issues/578'
 -
   name:  'Action methods in rules'
   note:  'Per Synopsis 5, all regexes will have an implied {*} token at the end which cause invocation of an action method if a ":action" object is supplied.'

@@ -37,7 +37,7 @@ See https://github.com/parrot/parrot/issues/362
 (formerly https://trac.parrot.org/parrot/ticket/847).
 
 TT #848: C<spawnw()> should return something less system-dependent, and more
-object-like. See https://trac.parrot.org/parrot/ticket/848.
+object-like. See https://github.com/parrot/parrot/issues/369.
 
 =cut
 
