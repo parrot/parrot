@@ -3,6 +3,12 @@
         + Several cleanups to the interp subsystem API
         + Cleanups and documentation additions for green threads and timers
         + Iterator PMC and family now implement the "iterator" role
+        + A bug in Parrot_ext_try was fixed where it was not popping a context correctly
+    - Documentation
+        + Docs for all versions of Parrot ever released are now available
+          at http://parrot.github.com
+    - Tests
+        + Timer PMC tests were converted from PASM to PIR
 
 2011-12-20    release 3.11.0
     - Core
