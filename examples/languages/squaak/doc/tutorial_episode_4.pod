@@ -306,7 +306,7 @@ action methods.
      ## generate instruction to retrieve the exception object (and the
      ## exception message, that is passed automatically in PIR, this is stored
      ## into $S0 (but not used).
-     my $pir := "    .get_results (%r, $S0)\n"
+     my $pir := '    .get_results (%r, $S0)\n'
               ~ "    store_lex '" ~ $exc.name()
               ~ "', %r";
 
