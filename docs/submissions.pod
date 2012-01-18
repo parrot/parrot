@@ -165,22 +165,19 @@ the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
 =head1 What Happens Next?
 
-If you created a new ticket for the submission, you will be taken to the page
-for the new ticket and can check on the progress of your submission there.
-This identifier should be used in all correspondence concerning the submission.
+If you created a new issue, you will be taken to the issue page and can
+check on the progress of discussion there.  The issue number should be
+used in all out-of-band correspondence concerning the issue (e.g., in
+email to the C<parrot-dev> mailing list).  Otherwise, everyone on the
+parrot project can see the issue and can comment on it.
 
-Everyone on Trac sees the submission and can comment on it. A developer with
-git commit privileges can commit it to git once it is clear that it is the
-right thing to do.
+A developer with git commit privileges can merge your changes into the
+main parrot repository, once it is clear that this is the right thing to
+do.  However your pull request may not be processed right away if the
+changes are large or complex, as we need time for peer review.
 
-However developers with commit privileges may not commit your changes
-immediately if they are large or complex, as we need time for peer review.
-
-A list of active tickets can be found here:
-L<http://trac.parrot.org/parrot/report/1>
-
-A list of all the unresolved patches is at:
-L<http://trac.parrot.org/parrot/report/15>
+A list of open issues can be found here:
+L<https://github.com/parrot/parrot/issues?state=open>
 
 =head1 Patches for the Parrot website
 
@@ -196,12 +193,12 @@ the procedure:
 
 =item 1
 
-Submit several high quality patches (and have them committed) via the process
-described in this document.  This process may take weeks or months.
+Obtain a github account at L<http://github.com>
 
 =item 2
 
-Obtain a github account.
+Submit several high quality patches (and have them committed) via the process
+described in this document.  This process may take weeks or months.
 
 =item 3
 
