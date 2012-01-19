@@ -15,7 +15,7 @@ If you plan to get involved in development, you'll want to check out
 the source from the git repository directly. Anyone can get
 anonymous access to read the files and download a working copy to
 explore and test. For commit access, volunteers need a
-U<https://trac.parrot.org> username, and need to be approved by a
+U<https://github.com> username, and need to be approved by a
 Metacommitter. To download the most recent version from git, type this
 command into your terminal N<This is for Linux users, on Mac or
 Windows systems, follow the instructions from your git client>:
@@ -42,7 +42,7 @@ There are a number of existing language implementations for Parrot:
 Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP ("Pipp"), Lisp, Lua,
 Tcl ("partcl"), WMLScript, Forth, Scheme, Befunge, BASIC, and many
 others. These language compilers are in various stages of partial
-completion. The page L<https://trac.parrot.org/parrot/wiki/Languages>
+completion. The page L<https://github.com/parrot/parrot/wiki/Languages>
 provides meta information on these languages and where to find them.
 If you have a language you're particularly interested to see implemented
 on Parrot, you can see how far along the effort is, or you can start the
