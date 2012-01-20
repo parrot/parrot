@@ -752,7 +752,7 @@ END_OF_FUNCTION
     $P0 = '_config'()
     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
     .local string rpath, osname, build_dir, slash, icushared
-    .local string installed, libdir, versiondir
+    .local string installed, libdir, versiondir, optimize
     cc           = $P0['cc']
     link         = $P0['link']
     link_dynamic = $P0['link_dynamic']
@@ -769,6 +769,7 @@ END_OF_FUNCTION
     installed    = $P0['installed']
     libdir       = $P0['libdir']
     versiondir   = $P0['versiondir']
+    optimize     = $P0['optimize']
 
     .local string config, pathquote, exeprefix
     pathquote  = '"'
@@ -799,6 +800,7 @@ END_OF_FUNCTION
 
     unless osname == 'cygwin' goto skip_strip
     unless install goto skip_strip
+    unless optimize > '' goto skip_strip
     link .= ' -s'
  skip_strip:
     link .= ' '
