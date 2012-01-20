@@ -797,6 +797,10 @@ END_OF_FUNCTION
     config    .= o
     config    .= pathquote
 
+    unless osname == 'cygwin' goto skip_strip
+    unless install goto skip_strip
+    link .= ' -s'
+ skip_strip:
     link .= ' '
     link .= ld_out
     link .= exefile
