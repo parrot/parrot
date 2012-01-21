@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -7,9 +7,6 @@ use Carp;
 use Getopt::Long;
 use lib qw( ./lib );
 use TAP::Harness;
-use TAP::Harness::Archive 0.10;
-use TAP::Formatter::Console;
-use TAP::Parser::Aggregator;
 use Parrot::Harness::TestSets qw(
     %test_groups
     @major_test_group
@@ -71,7 +68,18 @@ if ($IN_TESTING) {
 }
 
 if ($archive) {
-    use TAP::Harness::Archive::MultipleHarnesses;
+    eval {
+        require TAP::Harness::Archive;
+        require TAP::Harness::Archive::MultipleHarnesses;
+        require TAP::Harness::ReportByDescription;
+    };
+    if ($@) {
+        my $msg = "To run make smolder_fulltest, please install \n";
+        $msg .= "  TAP::Harness::Archive and TAP::Harness::ReportByDescription from CPAN.\n";
+        $msg .= "  From the cpan shell: 'install TAP::Harness::ReportByDescription'.\n";
+        $msg .= "  With cpanminus     : cpanm TAP::Harness::ReportByDescription \n";
+        croak $msg;
+    }
     my %env_data = collect_test_environment_data();
     my $archive = TAP::Harness::Archive::MultipleHarnesses->new( {
         verbosity        => $ENV{HARNESS_VERBOSE},
@@ -86,6 +94,9 @@ if ($archive) {
     send_archive_to_smolder(%env_data) if $smolder;
 }
 else {
+    require TAP::Formatter::Console;
+    require TAP::Parser::Aggregator;
+
     my ($formatter, $aggregator);
     $formatter   = TAP::Formatter::Console->new( {
         verbosity  => $ENV{HARNESS_VERBOSE},
