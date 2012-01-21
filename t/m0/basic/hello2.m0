@@ -1,0 +1,26 @@
+.version 0
+# This defines a M0 chunk, which a triplet consisting of
+# a variable table, metadata and a bytecode segment
+# Comments like this and empty lines are ignored.
+.chunk ""
+
+# This defines our constants table
+# The space at the end of the next line is important!
+.constants 
+0 "hello world\n"
+
+# This defines our metadata.
+# The space at the end of the next line is important!
+.metadata 
+
+# This defines a textual representation of the bytecode
+# The space at the end of the next line is important!
+.bytecode 
+
+set_imm I0, 0,      0
+deref   S0, CONSTS, I0
+set_imm I0, 0,      0
+print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

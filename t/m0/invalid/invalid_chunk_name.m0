@@ -1,0 +1,20 @@
+# THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
+.version 0
+
+.chunk "FOO
+
+# This defines our constants table
+.constants
+0 "hello world"
+
+.metadata
+
+.bytecode
+
+set_imm I0, 0,      0
+deref   S0, CONSTS, I0
+set_var I0, 0,      0
+print_s I0, S0
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

@@ -781,6 +781,9 @@ help :
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
+	@echo "  m0_tests:   		Run known-good M0 tests."
+	@echo "  m0_c_tests:   		Run known-good M0 tests with C implementation."
+	@echo "  m0_cover:   		Generate code coverage of m0 with Devel::Cover
 	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
 	@echo "Smoke Testing:"
@@ -2014,6 +2017,11 @@ DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
 DYNPMC_TEST_FILES = $(DYNPMC_TESTS_DIR)/*.t
 EXAMPLES_TEST_FILES = \
     t/examples/*.t
+M0_TEST_FILES = \
+	t/m0/m0_bytecode_loading.t \
+	t/m0/m0_assembler.t \
+	t/m0/m0_run_hello_m0b.t \
+	t/m0/m0_integration.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
 LIBRARY_TEST_FILES = @library_tests@
 MANIFEST_TEST_FILES = \
@@ -2191,6 +2199,17 @@ manifest_tests :
 
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
+
+m0_tests :
+	$(PERL) t/harness $(M0_TEST_FILES)
+
+m0_c_tests :
+#IF(win32):	set M0_INTERP=.\src\m0\c\m0$(EXE) && $(PERL) t/harness $(M0_TEST_FILES)
+#UNLESS(win32):	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
+
+m0_cover :
+	PERL5OPT=-MDevel::Cover $(MAKE) m0_tests
+	cover
 
 gc_tests : test_prep
 	$(PERL) t/harness $(GC_TEST_FILES)

@@ -1,0 +1,69 @@
+.version 0
+.chunk "truffleshuffle"
+.constants
+0 "1..2\n"
+1 "n"
+2 "ok 1 convert_i_n: 99.0 == 99\n"
+3 99.0
+4 -23.0
+5 "ok 2 convert_i_n: -23.0 == -23\n"
+.metadata
+.bytecode
+
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    # I1 = 99
+    set_imm I1, 0, 99
+
+    # N1 = 99.0 (from constants segment)
+    set_imm N1, 0, 3
+    deref   N1, CONSTS, N1
+
+    # N2 = 99 (from convert_i_n)
+    convert_i_n I2, N1, x
+    sub_i   I2, I2, I1
+
+    goto_if convert_i_n_nok1, I2
+    goto    convert_i_n_ok1, x
+
+convert_i_n_nok1:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+convert_i_n_ok1:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # I1 = -23
+    set_imm I1, 0, 23
+    set_imm I2, 0, 0
+    sub_i   I1, I2, I1
+
+    # N1 = -23.0 (from constants segment)
+    set_imm N1, 0, 4
+    deref   N1, CONSTS, N1
+
+    # N2 = -23 (from convert_i_n)
+    convert_i_n I2, N1, x
+    sub_i   I2, I2, I1
+
+    goto_if convert_i_n_nok2, I2
+    goto    convert_i_n_ok2, x
+
+convert_i_n_nok2:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+convert_i_n_ok2:
+    set_imm S0, 0, 5
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

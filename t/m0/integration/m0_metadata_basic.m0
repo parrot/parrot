@@ -1,0 +1,17 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\nok 1 metadata segments gets parsed\n"
+1 "thingy"
+2 3
+.metadata
+1 2 3
+.bytecode
+
+    set_imm I0, 0, 1
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

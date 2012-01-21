@@ -1,0 +1,35 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\n"
+1 "n"
+2 "ok 1 lshr: 90 >> 2 = 22\n"
+.metadata
+.bytecode
+
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    set_imm I1, 0,  90
+    set_imm I2, 0,  2
+    lshr    I2, I1, I2
+    set_imm I3, 0,  22
+    sub_i   I3, I3, I2
+
+    goto_if lshr_nok, I3
+    goto    lshr_ok, x
+
+lshr_ok:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+lshr_nok:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

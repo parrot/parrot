@@ -1,0 +1,12 @@
+# THIS IS INVALID M0 FOR TESTING PURPOSES ONLY
+.version 0
+.chunk "invalid"
+.constants
+0 1
+1 "hello world"
+.metadata
+.bytecode
+deref S0, 0, 1, 42, 42, A, JUNK
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

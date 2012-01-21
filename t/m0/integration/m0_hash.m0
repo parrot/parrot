@@ -1,0 +1,161 @@
+.version 0
+.chunk "byte_ops_test"
+.constants
+0 "1..1\n"
+1 "ok 1 hash of jellyfish string is correct\n"
+2 "nok 1 hash of jellyfish string is not correct\n"
+3 "I wish I were a jellyfish that cannot fall down stairs."
+#3 "jellyfish"
+4 67827064
+5 "step "
+6 ": tmp = "
+7 "\n"
+8 ": hash = "
+.metadata
+.bytecode
+
+    # 'x' => 120
+    # 'quux' => 3281278855
+    # 'I wish I were a jellyfish that cannot fall down stairs.' => 67827064
+
+    set_imm I0, 0, 1
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    
+    ##################################
+    # calculate the hash of string 3 #
+    ##################################
+hash_calc_init:
+
+    # set up some constants for debugging output
+    set_imm S10, 0, 5
+    deref   S10, CONSTS, S10
+    set_imm S11, 0, 6
+    deref   S11, CONSTS, S11
+    set_imm S12, 0, 7
+    deref   S12, CONSTS, S12
+
+    set_imm S0, 0, 3
+    deref   S0, CONSTS, S0
+
+    # I1 = number of bytes in string
+    set_imm I1, 0, 0
+    get_word I1, S0, I1
+    sub_i    I1, I1, I0
+
+    # I2 = index into string (excluding header)
+    set_imm I2, 0, 0
+    # I3 = tmp
+    set_imm I3, 0, 0
+    # I4 = current hash value (hash)
+    set_imm I4, 0, 0
+    # I5 = temporary register for hash calculations
+    set_imm I5, 0, 0
+
+
+    #enable debugging output
+    set_imm I25, 0, 0
+
+    # algorithm:
+    # while (ch = *str++)
+        # hash = ch + (hash << 6) + (hash << 16) - hash;
+hash_loop_start:
+    # tmp = current character of string
+    set_imm I3, 0, 8
+    add_i   I3, I3, I2
+    get_byte I3, S0, I3
+
+    # debugging output
+    goto_if end_debug_1, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 1
+    print_i I0, I10, x
+    set_imm S11, 0, 6
+    deref   S11, CONSTS, S11
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_1:
+
+    # tmp += (hash << 6);
+    set_imm I5, 0, 6
+    shl     I5, I4, I5
+    add_i   I3, I3, I5
+
+    # debugging output
+    goto_if end_debug_2, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 2
+    print_i I0, I10, x
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_2:
+
+    # tmp += (hash << 16);
+    set_imm I5, 0, 16
+    shl     I5, I4, I5
+    add_i   I3, I3, I5    
+
+    # debugging output
+    goto_if end_debug_3, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 3
+    print_i I0, I10, x
+    print_s I0, S11, x
+    print_i I0, I3, x
+    print_s I0, S12, x
+end_debug_3:
+
+    # hash = tmp - hash;
+    sub_i   I4, I3, I4
+
+    # debugging output
+    goto_if end_debug_4, I25
+    print_s I0, S10, x
+    set_imm I10, 0, 4
+    print_i I0, I10, x
+    set_imm S11, 0, 8
+    deref   S11, CONSTS, S11
+    print_s I0, S11, x
+    print_i I0, I4, x
+    print_s I0, S12, x
+end_debug_4:
+
+    # increment the index into the string
+    set_imm I5, 0, 1
+    add_i   I2, I2, I5
+
+    # if we're at the end of the string, break
+    sub_i I5, I2, I1
+    goto_if hash_loop_start, I5
+    goto    hash_loop_end, x
+
+hash_loop_end:
+    
+    # I4 contains the calculated hash
+    # store known-good hash in I1
+    set_imm I1, 0, 4
+    deref   I1, CONSTS, I1
+
+    sub_i   I1, I1, I4
+
+    goto_if hash_test_fail, I1
+    goto    hash_test_ok, x
+
+hash_test_fail:
+    set_imm S0, 0, 2
+    print_i I0, I4, x
+    goto print_result, x
+
+hash_test_ok:
+    set_imm S0, 0, 1
+    goto print_result, x
+    
+print_result:
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

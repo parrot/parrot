@@ -1,0 +1,26 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\n"
+1 "ok 1 noop doesn't do anything\n"
+.metadata
+.bytecode
+noop    x, x, x
+# S0 = "1..1"
+set_imm S0, 0,      0
+deref   S0, CONSTS, S0
+noop    x, x, x
+# S1 = "ok 1 noop doesn't do anything"
+set_imm S1, 0, 1
+deref   S1, CONSTS, S1
+noop    x, x, x
+# I0 = 1 (stdout)
+set_imm I0, 0, 1
+noop    x, x, x
+print_s I0, S0, 42
+noop    x, x, x
+print_s I0, S1, 42
+noop    x, x, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

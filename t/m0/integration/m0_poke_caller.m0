@@ -1,0 +1,280 @@
+.version 0
+.chunk "caller"
+.constants
+0 "1..7\n"
+1 "ok 1 control flow in 'caller' at start\n"
+2 "ok 7 value of I23 is restored to 9999 (got "
+3 &callee
+4 "ok 6 caller back from goto_chunk\n"
+5 "\n"
+6 "n"
+7 "ok 2 before invocation, caller's I23 is 9999 (got "
+8 9999
+9 ")\n"
+.metadata
+.bytecode
+
+    # What this test does:
+    #
+    # This is a test to demonstrate how M0's calling conventions work in
+    # practice.  The "caller" chunk sets I23 in its call frame and verifies
+    # that it's been set.  It then creates and initializes a new call frame,
+    # activates it and jumps to the "callee" chunk.  The callee chunk then sets
+    # I23 in its own call frame, prints it and fetches I23 from the parent call
+    # frame, also printing it.  Control flow then jumps back to "caller", where
+    # the parent call frame (the one "caller" started with) is activated and
+    # its value of I23 is printed to verify that the original call frame has
+    # been properly restored.
+    #
+    # This example has the caller do the work of creating a new call frame,
+    # though future M0 calling conventions will probably have the callee do the
+    # work.
+
+    set_imm I0, 0, 1
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    # print "ok 1 control flow in 'caller' at start"
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # print value of I23
+    set_imm I23, 39, 15
+
+    # check that I23 == 9999
+    set_imm I1, 0, 8
+    deref   I1, CONSTS, I1
+    
+    sub_i   I1, I1, I23
+    goto_if preinvoke_nok, I1
+    goto    preinvoke_ok, x
+
+preinvoke_nok:
+    set_imm S1, 0, 6
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+preinvoke_ok:
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    
+    print_i I0, I23, x
+    set_imm S2, 0, 9
+    deref   S2, CONSTS, S2
+    print_s I0, S2, x
+
+    # create a new call frame
+
+    # allocate a new call frame from the gc
+alloc_cf:
+    # 2 registers needed, 3 ideal
+    set_imm  I10, 8, 0
+    set_imm  I11, 0, 0
+    gc_alloc P0, I10, I11
+
+init_cf_copy:
+    # 2 registers needed
+    # intialize P0 (the new call frame) - INTERP
+    # set P0[INTERP] to the current call frame's INTERP
+    set_imm  I9, 0,  INTERP
+    set_ref  P0, I9, INTERP
+    # set P0[CHUNK] to the current call frame's CHUNK
+    set_imm  I9, 0,  CHUNK
+    set_ref  P0, I9, CHUNK
+    # set P0[CONSTS] to the current call frame's CONSTS
+    set_imm  I9, 0,  CONSTS
+    set_ref  P0, I9, CONSTS 
+    # set P0[MDS] to the current call frame's MDS
+    set_imm  I9, 0,  MDS
+    set_ref  P0, I9, MDS
+    # set P0[BCS] to the current call frame's BCS
+    set_imm  I9, 0,  BCS
+    set_ref  P0, I9, BCS
+    # set P0[PCF] to the current call frame
+    set_imm  I9, 0,  PCF
+    set_ref  P0, I9, CF
+    # set P0[CF] to P0 (x[CF] must always be x for any valid call frame)
+    set_imm  I9, 0,  CF
+    set_ref  P0, I9, P0
+
+init_cf_zero:
+    # 2 registers needed
+    # initialize some values to zero
+    # P0[EH] = 0
+    set_imm  P2, 0,  0
+    set_imm  I9, 0,  EH
+    set_ref  P0, I9, P2
+    # P0[RETPC] = 0
+    set_imm  I9, 0,  RETPC
+    set_ref  P0, I9, P2
+    # P0[SPILLCF] = 0
+    set_imm  I9, 0,  SPILLCF
+    set_ref  P0, I9, P2
+
+init_cf_retpc:
+    # 1 register needed
+    # Set the return PC for the current cf so that control flow will resume at
+    # the 'retpc' label.
+    set_imm I13, 0, 10
+    add_i   RETPC, PC, I13
+
+init_cf_pc:
+    # 3 register needed (2x I, 1x P)
+    # Set the new call frame's PC to the 'post_set' label so that when it's
+    # activated, control flow will continue as normal.
+    set_imm I12, 0,   4
+    add_i   I12, I12, PC
+    set_imm I9,  0,   PC
+    set_ref P0,  I9,  I12
+    # activate the new call frame and goto the callee chunk
+    set     CF, P0, x
+
+post_set:
+    # put the name of the target chunk into S0
+    set_imm P0, 0, 3
+    deref   P0, CONSTS, P0
+    # put the target PC into I0
+    set_imm I0, 0, 0
+    goto_chunk P0, I0, x
+
+    # We're back, so fix the parent call frame's PC and activate it.
+    # The current CF's CHUNK, CONSTS, etc are updated by goto_chunk, so use
+    # those values to update PCF.
+
+retpc:
+restore_cf:
+    # set PCF[CHUNK] to the current call frame's CHUNK
+    set_imm  I9,  0,  CHUNK
+    set_ref  PCF, I9, CHUNK
+    # set PCF[CONSTS] to the current call frame's CONSTS
+    set_imm  I9,  0,  CONSTS 
+    set_ref  PCF, I9, CONSTS
+    # set PCF[MDS] to the current call frame's MDS
+    set_imm  I9,  0,  MDS
+    set_ref  PCF, I9, MDS
+    # set PCF[BCS] to the current call frame's BCS
+    set_imm  I9,  0,  BCS
+    set_ref  PCF, I9, BCS
+
+set_cf_pc:
+    # Set PCF[PC] to the invoke_cf + 1 so that when we invoke PCF with
+    # "set CF, PCF, x", control flow will continue at the next instruction.
+    set_imm I1,  0,  3
+    add_i   I1,  PC, I1
+    set_imm I9,  0,  PC
+    set_ref PCF, I9, I1
+
+invoke_cf:
+    set     CF, PCF, x
+
+    # print "caller at end "
+    set_imm S3, 0, 4
+    deref   S3, CONSTS, S3
+    print_s I0, S3, x
+
+    # print value I23
+    set_imm S4, 0, 2
+    deref   S4, CONSTS, S4
+    print_s I0, S4, 99
+    print_i I0, I23, x
+    print_s I0, S2, x
+
+    set_imm I1, 0, 0
+    exit    I1, x, x
+    
+.chunk "callee"
+.constants
+0 "ok 3 got to callee chunk\n"
+1 "value of I23 is "
+2 "parent call frame's value of I23 is "
+3 "OH NOES!  Contol flow misflowed!\n"
+4 "\n"
+5 &caller
+6 "ok 4 callee's I23 is 25443 (got "
+7 ")\n"
+8 25443
+9 "n"
+10 "ok 5 in callee, callee's parent's cf's I23 is 9999 (got "
+11 9999
+.metadata
+.bytecode
+
+    # print "ok 3 "...
+    set_imm I0, 0, 1
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    #print value I23
+    set_imm I23, 99, 99
+    set_imm I1,  0, 8
+    deref   I1, CONSTS, I1
+    sub_i   I1, I1, I23
+
+    goto_if callee_i23_nok, I1
+    goto    callee_i23_ok, x
+
+callee_i23_nok:
+    set_imm  S1, 0, 9
+    deref    S1, CONSTS, S1
+    print_s  I0, S1, x
+
+callee_i23_ok:
+    set_imm  S1, 0, 6
+    deref    S1, CONSTS, S1
+    print_s  I0, S1, x
+    print_i  I0, I23, x
+
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    set_imm S3, 0, 4
+    deref   S3, CONSTS, S3
+
+    # poke into the parent call frame
+    set_imm I2, 0, I23
+    deref   I2, PCF, I2
+
+    set_imm I1, 0, 11
+    deref   I1, CONSTS, I1
+    sub_i   I1, I1, I2
+
+    goto_if caller_i23_nok, I1
+    goto    caller_i23_ok, x
+
+caller_i23_nok:
+    set_imm S1, 0, 9
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+caller_i23_ok:
+    set_imm S1, 0, 10
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+    print_i I0, I2, x
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+    print_s I0, S1, x
+
+    # figure out return PC and chunk
+    # P0 is the parent call frame
+    set_imm I3, 0,  PCF
+    deref   P0, CF, I3
+    # I4 is the parent call frame's RETPC
+    set_imm I4, 0,  RETPC
+    deref   I4, P0, I4
+    # S3 is the parent call frame's CHUNK
+    set_imm I3, 0,  CHUNK
+    deref   I3, CONSTS, I3
+    goto_chunk I3, I4, x
+
+    # This code should be unreachable.
+    set_imm S0, 0, 3
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:    

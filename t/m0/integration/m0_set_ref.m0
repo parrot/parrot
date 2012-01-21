@@ -1,0 +1,38 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\n"
+1 "n"
+2 "ok 1 set_ref: CONSTS[4] = 99\n"
+3 99
+4 88
+.metadata
+.bytecode
+
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    set_imm N0, 0,  4
+    deref   N0, CONSTS, N0
+
+    set_imm N1, 0,  4
+    deref   N1, CONSTS, N1
+    sub_n   N0, N0, N1
+
+    goto_if set_ref_nok, N0
+    goto    set_ref_ok, x
+
+set_ref_nok:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+set_ref_ok:
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  
