@@ -12,6 +12,8 @@
 # ports/ should not go into release tarballs
 ^ports$
 ^ports/
+^$
+^/
 ^.*\.diff$
 ^.*\.diff/
 ^.*\.obj$
@@ -26,6 +28,12 @@
 ^.*\.rej/
 ^.*\.res$
 ^.*\.res/
+^/.*/.*/.*/.*\.sw?$
+^/.*/.*/.*/.*\.sw?/
+^/.*/.*/.*\.sw?$
+^/.*/.*/.*\.sw?/
+^/.*/.*\.sw?$
+^/.*/.*\.sw?/
 ^/.*\.core$
 ^/.*\.core/
 ^/.*\.def$
@@ -150,6 +158,8 @@
 ^/core.*/
 ^/cover_db$
 ^/cover_db/
+^/cygparrot.*\.dll$
+^/cygparrot.*\.dll/
 ^/docs/.*\.tmp$
 ^/docs/.*\.tmp/
 ^/docs/Makefile$

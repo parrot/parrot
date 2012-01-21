@@ -64,7 +64,7 @@ C<parrot-dev@lists.parrot.org> and to the IRC channel C<#parrot>. Ask whether
 there are any showstopping bugs. Check in again with the language
 project leads. It's also good to ask for updates to F<ChangeLog>, F<CREDITS>,
 F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<api.yaml> and
-L<http://trac.parrot.org/parrot/wiki/Languages>.
+L<https://github.com/parrot/parrot/wiki/Languages>.
 
 =item 6
 
@@ -513,7 +513,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with an asterisk (*) are supported releases:
 
-    - Jan 17, 2012 - 4.0.0   - whiteknight
     - Feb 21, 2012 - 4.1.0   - alvis
     - Mar 20, 2012 - 4.2.0   - dukeleto
     - Apr 17, 2012 - 4.3.0   - cotto

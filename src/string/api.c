@@ -2079,7 +2079,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 /* powl() could be used here, but it is an optional POSIX extension that
    needs to be checked for at Configure-time.
 
-   See https://trac.parrot.org/parrot/ticket/1176 for more details. */
+   See https://github.com/parrot/parrot/issues/451 for more details. */
 
 #  define POW pow
 

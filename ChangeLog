@@ -1,3 +1,22 @@
+2012-01-17    release 4.1.0
+    - Core
+        + Shared libraries and installable binaries are now stripped if built with
+          --optimize on Cygwin, which greatly reduces their size on disk
+    - Documentation
+    - Tests
+
+2012-01-17    release 4.0.0
+    - Core
+        + Several cleanups to the interp subsystem API
+        + Cleanups and documentation additions for green threads and timers
+        + Iterator PMC and family now implement the "iterator" role
+        + A bug in Parrot_ext_try was fixed where it was not popping a context correctly
+    - Documentation
+        + Docs for all versions of Parrot ever released are now available
+          at http://parrot.github.com
+    - Tests
+        + Timer PMC tests were converted from PASM to PIR
+
 2011-12-20    release 3.11.0
     - Core
         + packfile api and pbc handling improvements

@@ -37,6 +37,9 @@ cachegrind.out.*
 /*.tmp
 # vim swap files
 /\.*sw?
+/*/*.sw?
+/*/*/*.sw?
+/*/*/*/*.sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
@@ -56,6 +59,7 @@ cachegrind.out.*
 /libparrot.def
 /libparrot.dll
 /libparrot.dll.a
+/cygparrot*.dll
 /miniparrot
 /myconfig
 /ops2c

@@ -47,34 +47,9 @@ pending list-admin approval.
 
 =head2 To manage the list of Metacommitters
 
-Only existing Metacommitters can perform this activity.
+To make somebody a new metacommitter, add their github account to the "Owners"
+team at L<https://github.com/organizations/parrot/teams/>.
 
-=over 4
-
-=item 1
-
-Navigate to the Admin -> Permissions page
-L<https://trac.parrot.org/parrot/admin/general/perm> and add/remove
-"admin" users as desired.
-
-=back 
-
-=head2 To manage the list of Bug Admins.
-
-Only existing Metacommitters can perform this activity.
-
-=over 4
-
-=item 1
-
-Navigate to the Admin -> Permissions page
-L<https://trac.parrot.org/parrot/admin/general/perm> and add/remove
-"developer" users as desired.
-
-Verify that the username is the one the user intends to use to
-administer tickets. (Some bugadmins have multiple Trac accounts.)
-
-=back
 
 =head1 SEE ALSO
 

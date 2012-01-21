@@ -71,6 +71,21 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void restore_context(PARROT_INTERP,
+    ARGIN(Parrot_Context * const initialctx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_restore_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(initialctx))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /* HEADERIZER HFILE: include/parrot/extend.h */
 
 /*
@@ -167,6 +182,35 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
 
 /*
 
+=item C<static void restore_context(PARROT_INTERP, Parrot_Context * const
+initialctx)>
+
+Helper function to restore the caller context in Parrot_ext_try.
+
+=cut
+
+*/
+
+static void
+restore_context(PARROT_INTERP, ARGIN(Parrot_Context * const initialctx))
+{
+    ASSERT_ARGS(restore_context)
+    Parrot_Context *curctx = CONTEXT(interp);
+    if (curctx != initialctx) {
+        Parrot_warn((interp), PARROT_WARNINGS_NONE_FLAG,
+                "popping context in Parrot_ext_try");
+        do {
+            Parrot_pop_context(interp);
+            curctx = CONTEXT(interp);
+            if (curctx == NULL)
+                do_panic((interp), "cannot restore context",
+                    __FILE__, __LINE__);
+        } while (curctx != initialctx);
+    }
+}
+
+/*
+
 =item C<void Parrot_ext_try(PARROT_INTERP, void (*cfunction(Parrot_Interp, void
 *)), void (*chandler(Parrot_Interp, PMC *, void *)), void *data)>
 
@@ -176,16 +220,6 @@ If the function throws, the provided handler function is invoked
 =cut
 
 */
-
-#define POP_CONTEXT(interp, curctx, intialctx)                \
-        Parrot_warn((interp), PARROT_WARNINGS_NONE_FLAG,      \
-                "popping context in Parrot_ext_try");         \
-        do {                                                  \
-            if ((curctx) == NULL)                             \
-                do_panic((interp), "cannot restore context",  \
-                    __FILE__, __LINE__);                      \
-        } while (((curctx) = CONTEXT(interp)) != initialctx); \
-
 
 PARROT_EXPORT
 void
@@ -197,25 +231,18 @@ Parrot_ext_try(PARROT_INTERP,
     ASSERT_ARGS(Parrot_ext_try)
     if (cfunction) {
         Parrot_runloop jmp;
-        Parrot_Context *initialctx, *curctx;
-        initialctx = CONTEXT(interp);
+        Parrot_Context * const initialctx = CONTEXT(interp);
         switch (setjmp(jmp.resume)) {
           case 0: /* try */
             Parrot_ex_add_c_handler(interp, &jmp);
             (*cfunction)(interp, data);
-            curctx = CONTEXT(interp);
-            if (curctx != initialctx) {
-                POP_CONTEXT(interp, curctx, initialctx);
-            }
+            restore_context(interp, initialctx);
             Parrot_cx_delete_handler_local(interp);
             break;
           default: /* catch */
             {
                 PMC *exception = jmp.exception;
-                curctx = CONTEXT(interp);
-                if (curctx != initialctx) {
-                    POP_CONTEXT(interp, curctx, initialctx);
-                }
+                restore_context(interp, initialctx);
                 Parrot_cx_delete_handler_local(interp);
                 if (chandler)
                     (*chandler)(interp, exception, data);
