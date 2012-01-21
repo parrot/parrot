@@ -132,7 +132,6 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 #define DOUBLE_SIZE @doublesize@
 
 typedef Parrot_Opcode opcode_t;
-typedef size_t ptrcast_t;
 
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;

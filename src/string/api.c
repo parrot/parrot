@@ -519,7 +519,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
 
         /* Tack B on the end of A */
-        mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
+        mem_sys_memcopy(dest->strstart + a->bufused,
                 b->strstart, b->bufused);
     }
 

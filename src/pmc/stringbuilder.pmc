@@ -216,7 +216,7 @@ Append string to current buffer.
         }
 
         /* Tack s on the end of buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
+        mem_sys_memcopy((char *)buffer->_bufstart + buffer->bufused,
                 s->strstart, s->bufused);
 
         /* Update buffer */
