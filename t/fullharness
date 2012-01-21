@@ -20,19 +20,6 @@ use Parrot::Harness::Smoke qw(
     send_archive_to_smolder
 );
 
-BEGIN { eval {
-        require TAP::Harness::Archive::MultipleHarnesses;
-        require TAP::Harness::ReportByDescription;
-    };
-    if ($@) {
-        my $msg = "To run t/fullharness, make fulltest or make smolder_fulltest\n";
-        $msg .= "  please install TAP::Harness::ReportByDescription from CPAN.\n";
-        $msg .= "  From the cpan shell: 'install TAP::Harness::ReportByDescription'.\n";
-        $msg .= "  With cpanminus     : cpanm TAP::Harness::ReportByDescription \n";
-        croak $msg;
-    }
-}
-
 my ($archive, $smolder, $IN_TESTING);
 GetOptions(
     'archive'           => \$archive,
