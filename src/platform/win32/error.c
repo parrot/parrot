@@ -48,8 +48,6 @@ Parrot_platform_strerror(PARROT_INTERP, INTVAL error)
     char   *msg;
     STRING *result;
 
-    /* TODO: Support Unicode error messages */
-
     /* FormatMessage really expects a (char **) cast to a (char *) */
     len = FormatMessage(flags, NULL, error, lang_id, (LPTSTR)&msg, 0, NULL);
 
@@ -57,7 +55,7 @@ Parrot_platform_strerror(PARROT_INTERP, INTVAL error)
         result = Parrot_sprintf_c(interp, "Error code %ld", error);
     }
     else {
-        result = Parrot_str_new(interp, msg, len);
+        result = Parrot_str_from_platform_cstring(interp, msg);
 
         LocalFree(msg);
     }

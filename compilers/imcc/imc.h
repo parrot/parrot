@@ -423,7 +423,8 @@ typedef struct subs_t {
     SymHash        fixup;              /* currently set_p_pc sub names only */
     int            ins_line;           /* line number for debug */
     int            n_basic_blocks;     /* block count */
-    int            pmc_const;          /* index in const table */
+    int            pmc_const;          /* sub pmc index in const table */
+    int            lexinfo_const;      /* lexinfo pmc index in const table */
     size_t         size;               /* code size in ops */
 } subs_t;
 
@@ -457,7 +458,6 @@ struct _imc_info_t {
     STRING                *error_message;   /* The Error message */
 
     /* some values that were global... */
-    Namespace            *namespace_stack;
     SymReg               *cur_call;
     SymReg               *cur_obj;
     SymReg               *adv_named_id;

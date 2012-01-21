@@ -198,6 +198,10 @@ debugger on platforms such as Windows.
 
 Print the runtime prefix path and exit.
 
+=item -L path
+
+Add C<path> to the library search path
+
 =back
 
 =head2 <file>

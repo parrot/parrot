@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2011, Parrot Foundation.
 
 package init::hints::darwin;
 
@@ -6,7 +6,6 @@ use strict;
 use warnings;
 
 use lib qw( lib );
-use File::Spec ();
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
 
@@ -64,7 +63,7 @@ sub runstep {
     my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
     chomp $osvers;
 
-    $conf->data->set(
+    my %darwin_selections = (
         darwin              => 1,
         osx_version         => $deploy_target,
         osvers              => $osvers,
@@ -97,6 +96,14 @@ sub runstep {
             . $conf->data->get('share_ext')
             . '"'
     );
+    my $darwin_hints = "Darwin hints settings:\n";
+    for my $k (sort keys %darwin_selections) {
+        $darwin_hints .= sprintf("  %-24s => %s\n" => (
+                $k, qq|'$darwin_selections{$k}'|,
+        ) );
+    }
+    $conf->debug($darwin_hints);
+    $conf->data->set( %darwin_selections );
 }
 
 #################### INTERNAL SUBROUTINES ####################

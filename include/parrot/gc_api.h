@@ -101,6 +101,7 @@ typedef enum {
     CURRENT_CONT,
     CURRENT_OBJECT,
     CURRENT_LEXPAD,
+    CURRENT_TASK,
 
     /* interpinfo_s constants */
     EXECUTABLE_FULLNAME,
@@ -139,7 +140,7 @@ int Parrot_gc_active_sized_buffers(PARROT_INTERP)
 
 PARROT_EXPORT
 void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
-    ARGOUT(Buffer *buffer),
+    ARGOUT(Parrot_Buffer *buffer),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -210,7 +211,7 @@ void Parrot_gc_finalize(PARROT_INTERP)
 
 PARROT_EXPORT
 void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
-    ARGMOD(Buffer *obj),
+    ARGMOD(Parrot_Buffer *obj),
     size_t size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -230,10 +231,8 @@ void Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+void Parrot_gc_free_pmc_attributes(PARROT_INTERP, ARGFREE(PMC *pmc))
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -288,7 +287,7 @@ size_t Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
+Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -311,7 +310,7 @@ void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_EXPORT
 void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP,
-    ARGMOD(Buffer *buffer),
+    ARGMOD(Parrot_Buffer *buffer),
     size_t newsize)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -444,8 +443,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

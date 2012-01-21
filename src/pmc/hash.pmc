@@ -33,12 +33,6 @@ By default Hash uses string keys and PMC values. Methods C<set_key_type> and
 C<set_value_type> may be used to switch key and values type. For C<PMC> keys
 hash value is calculated using VTABLE C<get_hashvalue> function.
 
-These are the vtable functions for the Hash PMC.
-
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -79,40 +73,14 @@ static PMC* get_next_hash(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
-
-=item C<static PMC* get_next_hash(PARROT_INTERP, const Hash *hash, const void
-*key)>
-
-Get the next hash for multipart keys. Autovivify a hash if it doesn't exist.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-get_next_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
-{
-    ASSERT_ARGS(get_next_hash)
-    HashBucket *bucket;
-
-    if (hash->entry_type != enum_type_PMC)
-        entry_type_must_be_pmc(interp);
-
-    bucket = Parrot_hash_get_bucket(interp, hash, key);
-
-    if (bucket)
-        return (PMC *)bucket->value;
-    else
-        return PMCNULL;
-}
-
 pmclass Hash provides hash auto_attrs {
     ATTR Hash *hash;
 
 /*
+
+=head2 Vtable functions
+
+=over 4
 
 =item C<void init()>
 
@@ -262,71 +230,6 @@ NB: this method will destroy all old data!
 
         if (old_hash)
             Parrot_hash_destroy(INTERP, old_hash);
-    }
-
-    METHOD set_key_type(INTVAL type) {
-        SELF.set_integer_native(type);
-    }
-
-/*
-
-=item C<METHOD get_key_type()>
-
-Return type of keys in Hash.
-
-=cut
-
-*/
-    METHOD get_key_type() {
-        const INTVAL ret = ((Hash *)SELF.get_pointer())->key_type;
-        RETURN(INTVAL ret);
-    }
-
-/*
-
-=item C<METHOD set_value_type(INTVAL type)>
-
-Reset Hash to use different value-type for stored items. If there is no
-previous _hash was set defaults to STRING* keys.
-
-NB: this method will destroy all old data!
-
-=cut
-*/
-    METHOD set_value_type(INTVAL type) {
-        Hash * const old_hash = (Hash *)SELF.get_pointer();
-        Hash *new_hash;
-
-        /*
-        If someone called Hash.set_pointer with NULL pointer...
-        It will create STRING* keys hash.
-        */
-
-        if (old_hash && old_hash->entry_type == type)
-            return;
-
-        switch (type) {
-          case enum_type_INTVAL:
-          case enum_type_STRING:
-          case enum_type_PMC:
-            new_hash = Parrot_hash_create(INTERP,
-                        (PARROT_DATA_TYPE)type,
-                        old_hash ? old_hash->key_type : Hash_key_type_STRING);
-            break;
-          default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                        "Hash: unsupported entry_type %d", type);
-        }
-
-        PARROT_HASH(SELF)->hash = new_hash;
-
-        if (old_hash)
-            Parrot_hash_destroy(INTERP, old_hash);
-    }
-
-    METHOD get_value_type() {
-        const INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
-        RETURN(INTVAL ret);
     }
 
 /*
@@ -935,6 +838,30 @@ Sets C<*value> as the value for C<*key>.
 
 /*
 
+=item C<void set_pmc_keyed_int(INTVAL key, PMC *value)>
+
+Sets C<*value> as the value for C<*key>.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+
+        if (PObj_constant_TEST(SELF)
+        && (!PObj_constant_TEST((PObj *)value)))
+                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Used non-constant PMC value in constant hash.");
+
+        Parrot_hash_put(INTERP, hash,
+                Parrot_hash_key_from_int(INTERP, hash, key),
+                Parrot_hash_value_from_pmc(INTERP, hash, value));
+    }
+
+/*
+
 =item C<INTVAL exists_keyed_str(STRING *key)>
 
 =cut
@@ -1040,6 +967,19 @@ Returns whether the value for C<*key> is defined.
     VTABLE void delete_keyed_str(STRING *key) {
         Hash * const hash = (Hash *)SELF.get_pointer();
         Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key));
+    }
+
+/*
+
+=item C<void delete_keyed_int(INTVAL key)>
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed_int(INTVAL. key) {
+        Hash * const hash = (Hash *)SELF.get_pointer();
+        Parrot_hash_delete(INTERP, hash, Parrot_hash_key_from_int(INTERP, hash, key));
     }
 
 /*
@@ -1204,6 +1144,99 @@ Used to unarchive the hash.
         /* Thawed Hash was created from pmc_new_noinit */
         PObj_custom_mark_destroy_SETALL(SELF);
     }
+
+/*
+
+=back
+
+=head1 Methods
+
+=over 4
+
+=item C<METHOD set_key_type(INTVAL)>
+
+Set the type of key in the hash.
+
+=item C<METHOD get_key_type()>
+
+Return type of keys in Hash.
+
+=item C<METHOD set_value_type(INTVAL type)>
+
+Reset Hash to use different value-type for stored items. If there is no
+previous _hash was set defaults to STRING* keys.
+
+NB: this method will destroy all old data!
+
+=item C<METHOD get_value_type()>
+
+Return type of values in Hash.
+
+=item C<METHOD update(Hash *other)>
+
+Copies all entries from the other hash into the hash, overwriting
+entries with the same key.
+
+=cut
+
+*/
+
+    METHOD set_key_type(INTVAL type) {
+        SELF.set_integer_native(type);
+    }
+
+    METHOD get_key_type() {
+        const INTVAL ret = ((Hash *)SELF.get_pointer())->key_type;
+        RETURN(INTVAL ret);
+    }
+
+    METHOD set_value_type(INTVAL type) {
+        Hash * const old_hash = (Hash *)SELF.get_pointer();
+        Hash *new_hash;
+
+        /*
+        If someone called Hash.set_pointer with NULL pointer...
+        It will create STRING* keys hash.
+        */
+
+        if (old_hash && old_hash->entry_type == (PARROT_DATA_TYPE)type)
+            return;
+
+        switch (type) {
+          case enum_type_INTVAL:
+          case enum_type_STRING:
+          case enum_type_PMC:
+            new_hash = Parrot_hash_create(INTERP,
+                        (PARROT_DATA_TYPE)type,
+                        old_hash ? old_hash->key_type : Hash_key_type_STRING);
+            break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                        "Hash: unsupported entry_type %d", type);
+        }
+
+        PARROT_HASH(SELF)->hash = new_hash;
+
+        if (old_hash)
+            Parrot_hash_destroy(INTERP, old_hash);
+    }
+
+    METHOD get_value_type() {
+        const INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
+        RETURN(INTVAL ret);
+    }
+
+    METHOD update(PMC *other) {
+        if (other->vtable->base_type == SELF->vtable->base_type
+        ||  other->vtable->base_type == enum_class_Hash) {
+            Parrot_hash_update(INTERP, (Hash *)SELF.get_pointer(),
+                    (Hash *)VTABLE_get_pointer(INTERP, other));
+        }
+        else {
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+                        "Hash: don't know how to update from a non-Hash type");
+        }
+    }
 }
 
 /*
@@ -1214,9 +1247,43 @@ Used to unarchive the hash.
 
 =over 4
 
+=item C<static PMC* get_next_hash(PARROT_INTERP, const Hash *hash, const void
+*key)>
+
+Get the next hash for multipart keys. Autovivify a hash if it doesn't exist.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC*
+get_next_hash(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
+{
+    ASSERT_ARGS(get_next_hash)
+    HashBucket *bucket;
+
+    if (hash->entry_type != enum_type_PMC)
+        entry_type_must_be_pmc(interp);
+
+    bucket = Parrot_hash_get_bucket(interp, hash, key);
+
+    if (bucket)
+        return (PMC *)bucket->value;
+    else
+        return PMCNULL;
+}
+
+/*
+
 =item C<static void entry_type_must_be_pmc(PARROT_INTERP)>
 
 =item C<static void cannot_autovivify_nested(PARROT_INTERP)>
+
+Throw the appropriate exception.
+
+=cut
 
 */
 

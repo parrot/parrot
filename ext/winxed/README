@@ -1,0 +1,24 @@
+This is a snapshot of winxed compiler and driver.
+
+The pir files are generated from the winxed repository, copied here,
+and compiled to pbc during the parrot build.
+
+Winxed web site: http://winxed.org/
+
+How to update the snapshot:
+
+- Download and build the winxed release wanted.
+
+- Execute 'make preinstall' to generate the pir files used.
+
+- Copy pir/winxed_compiler.pir and pir/winxed_installed.pir from
+the winxed build tree to compiler.pir and driver.pir in this
+directory.
+
+How to choose and tag the release used:
+
+Releases are tagged like this: RELEASE_1_0_0
+
+To tag a new release switch to the appropriate branch, like version_1_0,
+verify is updated with the appropriate changes and the pir generated files
+are also updated, an tag it. Don't forget to push the tag to origin.

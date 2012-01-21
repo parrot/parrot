@@ -239,7 +239,8 @@ build_attrib_index(PARROT_INTERP, ARGIN(PMC *self))
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
     int                  cur_index    = 0;
     PMC * const          attrib_index = Parrot_pmc_new(interp, enum_class_Hash);
-    PMC * const          cache        = Parrot_pmc_new(interp, enum_class_Hash);
+    PMC * const          cache        = Parrot_pmc_new_init_int(interp,
+                                            enum_class_Hash, enum_type_INTVAL);
     const int            num_classes  = VTABLE_elements(interp, _class->all_parents);
     int                  i;
 
@@ -907,20 +908,6 @@ Adds the given sub PMC as a vtable override with the given name.
 */
     VTABLE void add_vtable_override(STRING *name, PMC *sub) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        PMC                     * const vtable =
-            VTABLE_get_pmc_keyed_str(INTERP, _class->vtable_overrides, name);
-
-        /* If we have already added a vtable override with this name... */
-        if (!PMC_IS_NULL(vtable)) {
-            if (vtable == sub)
-                return;
-
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "A vtable override named '%S' already exists in class '%S'. "
-                "It may have been supplied by a role.",
-                name, VTABLE_get_string(INTERP, SELF));
-        }
 
         /* Check that the name is actually valid as a vtable override */
         if (Parrot_get_vtable_index(INTERP, name) == -1)
@@ -1095,7 +1082,7 @@ String PMC containing the name of the class
 
 =item namespace
 
-NameSpace PMC of the the namespace attached to the class.
+NameSpace PMC of the namespace attached to the class.
 
 =item attributes
 
@@ -1375,7 +1362,9 @@ Creates a new PMC object of the type of the class and calls init().
             Parrot_Object_attributes * const objattr =
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
-            objattr->attrib_store = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+            objattr->attrib_store =
+                Parrot_pmc_new_init_int(INTERP, enum_class_ResizablePMCArray,
+                        VTABLE_elements(INTERP, _class->attrib_index));
             PARROT_GC_WRITE_BARRIER(INTERP, object);
         }
 

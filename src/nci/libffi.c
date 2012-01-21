@@ -86,9 +86,7 @@ typedef union nci_var_t {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * build_ffi_thunk(PARROT_INTERP,
-    SHIM(PMC *user_data),
-    ARGIN(PMC *sig))
+static PMC * build_ffi_thunk(PARROT_INTERP, PMC *user_data, ARGIN(PMC *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
@@ -110,7 +108,7 @@ static PMC * clone_ffi_thunk(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void free_ffi_thunk(PARROT_INTERP,
-    SHIM(void *thunk_func),
+    void *thunk_func,
     ARGFREE(void *thunk_data))
         __attribute__nonnull__(1);
 
@@ -654,7 +652,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         call_arg[1] = &call_object;
         call_arg[2] = &pcc_ret_sig;
 
-        /* populate return slot (non-existant if void) */
+        /* populate return slot (non-existent if void) */
         if (enum_type_void !=
             (arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, 0))) {
             prep_pcc_ret_arg(interp, arg_t, &pcc_retv[i], &call_arg[i + 3], return_data);

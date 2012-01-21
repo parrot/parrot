@@ -174,7 +174,7 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(PMC *info))
         len = FREEZE_BYTES_PER_ITEM;
 
     PARROT_IMAGEIOFREEZE(info)->buffer =
-        Parrot_gc_new_bufferlike_header(interp, sizeof (Buffer));
+        Parrot_gc_new_bufferlike_header(interp, sizeof (Parrot_Buffer));
     Parrot_gc_allocate_buffer_storage_aligned(interp,
         PARROT_IMAGEIOFREEZE(info)->buffer, len);
     SET_VISIT_CURSOR(info,
@@ -198,7 +198,7 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 {
     ASSERT_ARGS(ensure_buffer_size)
 
-    Buffer * const buf  = PARROT_IMAGEIOFREEZE(io)->buffer;
+    Parrot_Buffer * const buf  = PARROT_IMAGEIOFREEZE(io)->buffer;
     const size_t used   = PARROT_IMAGEIOFREEZE(io)->pos;
     const int need_free = Buffer_buflen(buf) - used - len;
 
@@ -243,7 +243,7 @@ check_seen(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *v))
 }
 
 pmclass ImageIOFreeze auto_attrs {
-    ATTR Buffer              *buffer;      /* buffer to store the image */
+    ATTR Parrot_Buffer       *buffer;      /* buffer to store the image */
     ATTR size_t               pos;         /* current read/write buf position */
     ATTR PMC                 *seen;        /* seen hash */
     ATTR PMC                 *todo;        /* todo list */

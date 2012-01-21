@@ -38,7 +38,9 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
+static char * aligned_mem(
+    ARGIN(const Parrot_Buffer *buffer),
+    ARGIN(char *mem))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -55,7 +57,8 @@ static void alloc_new_block(
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static const char * buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
+static const char * buffer_location(PARROT_INTERP,
+    ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -68,7 +71,7 @@ static void compact_pool(PARROT_INTERP,
         FUNC_MODIFIES(*stats)
         FUNC_MODIFIES(*pool);
 
-static void debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
+static void debug_print_buf(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -101,7 +104,7 @@ static void * mem_allocate(PARROT_INTERP,
         FUNC_MODIFIES(*pool);
 
 static void move_buffer_callback(PARROT_INTERP,
-    ARGIN(Buffer *b),
+    ARGIN(Parrot_Buffer *b),
     ARGIN(void *data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -109,7 +112,7 @@ static void move_buffer_callback(PARROT_INTERP,
 
 static void move_one_buffer(PARROT_INTERP,
     ARGIN(Memory_Block *pool),
-    ARGMOD(Buffer *old_buf))
+    ARGMOD(Parrot_Buffer *old_buf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -218,9 +221,9 @@ Parrot_gc_str_finalize(SHIM_INTERP, ARGMOD(String_GC *gc))
 /*
 
 =item C<void Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP, String_GC *gc,
-Buffer *buffer, size_t size)>
+Parrot_Buffer *buffer, size_t size)>
 
-Allocates a chunk of memory of at least size C<size> for the given Buffer.
+Allocates a chunk of memory of at least size C<size> for the given Parrot_Buffer.
 buffer is guaranteed to be properly aligned for things like C<FLOATVALS>,
 so the size may be rounded up or down to guarantee that this alignment holds.
 
@@ -231,7 +234,7 @@ so the size may be rounded up or down to guarantee that this alignment holds.
 void
 Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
         ARGIN(String_GC *gc),
-        ARGOUT(Buffer *buffer),
+        ARGOUT(Parrot_Buffer *buffer),
         size_t size)
 {
     ASSERT_ARGS(Parrot_gc_str_allocate_buffer_storage)
@@ -252,9 +255,9 @@ Parrot_gc_str_allocate_buffer_storage(PARROT_INTERP,
 /*
 
 =item C<void Parrot_gc_str_reallocate_buffer_storage(PARROT_INTERP, String_GC
-*gc, Buffer *buffer, size_t newsize)>
+*gc, Parrot_Buffer *buffer, size_t newsize)>
 
-Reallocate the Buffer's buffer memory to the given size. The
+Reallocate the Parrot_Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with
 L<Parrot_allocate_aligned> the new buffer will also be aligned. As with
 all reallocation, the new buffer might have moved and the additional
@@ -267,7 +270,7 @@ memory is not cleared.
 void
 Parrot_gc_str_reallocate_buffer_storage(PARROT_INTERP,
         ARGIN(String_GC *gc),
-        ARGMOD(Buffer *buffer),
+        ARGMOD(Parrot_Buffer *buffer),
         size_t newsize)
 {
     ASSERT_ARGS(Parrot_gc_str_reallocate_buffer_storage)
@@ -445,7 +448,7 @@ Parrot_gc_str_compact_pool(PARROT_INTERP, ARGIN(String_GC *gc))
 /*
 
 =item C<void Parrot_gc_str_free_buffer_storage(PARROT_INTERP, String_GC *gc,
-Buffer *b)>
+Parrot_Buffer *b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
 reuse later.
@@ -457,7 +460,7 @@ reuse later.
 void
 Parrot_gc_str_free_buffer_storage(SHIM_INTERP,
         ARGIN(String_GC *gc),
-        ARGMOD(Buffer *b))
+        ARGMOD(Parrot_Buffer *b))
 {
     ASSERT_ARGS(Parrot_gc_str_free_buffer_storage)
     Variable_Size_Pool * const mem_pool = gc->memory_pool;
@@ -654,9 +657,9 @@ mem_allocate(PARROT_INTERP,
 
 /*
 
-=item C<static char * aligned_mem(const Buffer *buffer, char *mem)>
+=item C<static char * aligned_mem(const Parrot_Buffer *buffer, char *mem)>
 
-Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
+Returns a pointer to the aligned allocated storage for Parrot_Buffer C<buffer>,
 which might not be the same as the pointer to C<buffer> because of
 memory alignment.
 
@@ -667,7 +670,7 @@ memory alignment.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
-aligned_mem(ARGIN(SHIM(const Buffer *buffer)), ARGIN(char *mem))
+aligned_mem(ARGIN(SHIM(const Parrot_Buffer *buffer)), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
     mem += sizeof (void *);
@@ -678,10 +681,11 @@ aligned_mem(ARGIN(SHIM(const Buffer *buffer)), ARGIN(char *mem))
 
 /*
 
-=item C<static const char * buffer_location(PARROT_INTERP, const Buffer *b)>
+=item C<static const char * buffer_location(PARROT_INTERP, const Parrot_Buffer
+*b)>
 
 Returns a constant string representing the location of the given
-Buffer C<b> in one of the PMC registers. If the PMC is not located
+Parrot_Buffer C<b> in one of the PMC registers. If the PMC is not located
 in one of the PMC registers of the current context, returns the
 string C<"???">.
 
@@ -693,7 +697,7 @@ string C<"???">.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
-buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
+buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
 {
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
@@ -713,7 +717,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
 
 /*
 
-=item C<static void debug_print_buf(PARROT_INTERP, const Buffer *b)>
+=item C<static void debug_print_buf(PARROT_INTERP, const Parrot_Buffer *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
 =cut
@@ -721,7 +725,7 @@ Prints a debug statement with information about the given PObj C<b>.
 */
 
 static void
-debug_print_buf(PARROT_INTERP, ARGIN(const Buffer *b))
+debug_print_buf(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
 {
     ASSERT_ARGS(debug_print_buf)
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
@@ -778,7 +782,7 @@ compact_pool(PARROT_INTERP,
     alloc_new_block(stats, total_size, pool, "inside compact");
     new_block = pool->top_block;
 
-    /* Run through all the Buffer header pools and copy */
+    /* Run through all the Parrot_Buffer header pools and copy */
     interp->gc_sys->iterate_live_strings(interp, move_buffer_callback, new_block);
 
     new_size = new_block->top - new_block->start;
@@ -797,14 +801,15 @@ compact_pool(PARROT_INTERP,
 }
 
 /*
-=item C<static void move_buffer_callback(PARROT_INTERP, Buffer *b, void *data)>
+=item C<static void move_buffer_callback(PARROT_INTERP, Parrot_Buffer *b, void
+*data)>
 
 Callback for live STRING/Buffer for compating.
 
 =cut
 */
 static void
-move_buffer_callback(PARROT_INTERP, ARGIN(Buffer *b), ARGIN(void *data))
+move_buffer_callback(PARROT_INTERP, ARGIN(Parrot_Buffer *b), ARGIN(void *data))
 {
     ASSERT_ARGS(move_buffer_callback)
     Memory_Block * const new_block = (Memory_Block *)data;
@@ -890,8 +895,8 @@ pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 
 /*
 
-=item C<static void move_one_buffer(PARROT_INTERP, Memory_Block *pool, Buffer
-*old_buf)>
+=item C<static void move_one_buffer(PARROT_INTERP, Memory_Block *pool,
+Parrot_Buffer *old_buf)>
 
 The compact_pool operation collects disjointed blocks of memory allocated on a
 given pool's free list into one large block of memory. Once the new larger
@@ -904,7 +909,7 @@ memory block to the new memory block and marks that it has been moved.
 
 static void
 move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
-        ARGMOD(Buffer *old_buf))
+        ARGMOD(Parrot_Buffer *old_buf))
 {
     ASSERT_ARGS(move_one_buffer)
 
@@ -932,7 +937,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
     if (flags && (*flags & Buffer_shared_FLAG)
               && (*flags & Buffer_moved_FLAG)) {
         /* Find out who else references our data */
-        Buffer * const hdr = *((Buffer **)Buffer_bufstart(old_buf));
+        Parrot_Buffer * const hdr = *((Parrot_Buffer **)Buffer_bufstart(old_buf));
 
         PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
@@ -954,7 +959,7 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
             PARROT_ASSERT(PObj_is_COWable_TEST(old_buf));
 
             /* Let the old buffer know how to find us */
-            *((Buffer **)Buffer_bufstart(old_buf)) = old_buf;
+            *((Parrot_Buffer **)Buffer_bufstart(old_buf)) = old_buf;
 
             /* Finally, let the tail know that we've moved, so
                 * that any other references can know to look for

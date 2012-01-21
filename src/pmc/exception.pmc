@@ -62,8 +62,9 @@ typedef enum {
     attr_exit_code,
     attr_backtrace,
     attr_handled,
-    attr_handler_iter,
+    attr_handler,
     attr_handler_ctx,
+    attr_handlers_left,
     attr_thrower,
     attr_bt_strings,
     attr_NONE = -1
@@ -86,20 +87,21 @@ static AttrEnum getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
 
 pmclass Exception provides Exception auto_attrs {
 
-    ATTR INTVAL          id;           /* The task ID in the scheduler. */
-    ATTR FLOATVAL        birthtime;    /* The creation time stamp of the exception. */
-    ATTR STRING         *message;      /* The exception message. */
-    ATTR PMC            *payload;      /* The payload for the exception. */
-    ATTR PMC            *resume;       /* Continuation for resuming after handling the exception. */
-    ATTR INTVAL          severity;     /* The severity of the exception. */
-    ATTR INTVAL          type;         /* The type of the exception. */
-    ATTR INTVAL          exit_code;    /* The exit code of the exception. */
-    ATTR PMC            *backtrace;    /* The backtrace of an exception. */
-    ATTR INTVAL          handled;      /* Whether the exception has been handled. */
-    ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
-    ATTR PMC            *handler_ctx;  /* A stored context for handler iterator. */
-    ATTR PMC            *thrower;      /* The position we were at when thrown. */
-    ATTR PMC            *bt_strings;   /* A cache of old backtraces, for rethrows */
+    ATTR INTVAL          id;            /* The task ID in the scheduler. */
+    ATTR FLOATVAL        birthtime;     /* The creation time stamp of the exception. */
+    ATTR STRING         *message;       /* The exception message. */
+    ATTR PMC            *payload;       /* The payload for the exception. */
+    ATTR PMC            *resume;        /* Continuation for resuming after exception handling. */
+    ATTR INTVAL          severity;      /* The severity of the exception. */
+    ATTR INTVAL          type;          /* The type of the exception. */
+    ATTR INTVAL          exit_code;     /* The exit code of the exception. */
+    ATTR PMC            *backtrace;     /* The backtrace of an exception. */
+    ATTR INTVAL          handled;       /* Whether the exception has been handled. */
+    ATTR PMC            *handler;       /* The last handler that caught us, for finalize. */
+    ATTR PMC            *handler_ctx;   /* The context of the handler. */
+    ATTR INTVAL          handlers_left; /* Number of handlers left in the handler array. */
+    ATTR PMC            *thrower;       /* The position we were at when thrown. */
+    ATTR PMC            *bt_strings;    /* A cache of old backtraces, for rethrows. */
 
 /*
 
@@ -125,7 +127,7 @@ Initializes the exception with default values.
         SET_ATTR_resume(INTERP, SELF, PMCNULL);
         SET_ATTR_severity(INTERP, SELF, EXCEPT_error);
         SET_ATTR_backtrace(INTERP, SELF, PMCNULL);
-        SET_ATTR_handler_iter(INTERP, SELF, PMCNULL);
+        SET_ATTR_handler(INTERP, SELF, PMCNULL);
         SET_ATTR_handler_ctx(INTERP, SELF, PMCNULL);
         SET_ATTR_thrower(INTERP, SELF, PMCNULL);
         SET_ATTR_bt_strings(INTERP, SELF, PMCNULL);
@@ -298,7 +300,7 @@ Mark any active exception data as live.
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->payload);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->resume);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->backtrace);
-        Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_iter);
+        Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->handler_ctx);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->thrower);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->bt_strings);
@@ -402,6 +404,9 @@ Returns the integer value for C<*key>.
             break;
           case attr_handled:
             GET_ATTR_handled(INTERP, SELF, result);
+            break;
+          case attr_handlers_left:
+            GET_ATTR_handlers_left(INTERP, SELF, result);
             break;
           default:
             /* If unknown attribute name, throw an exception. */
@@ -533,6 +538,9 @@ Sets the integer value for C<*key>.
             break;
           case attr_handled:
             SET_ATTR_handled(INTERP, SELF, value);
+            break;
+          case attr_handlers_left:
+            SET_ATTR_handlers_left(INTERP, SELF, value);
             break;
           default:
             /* If unknown attribute name, throw an exception. */
@@ -701,8 +709,8 @@ Retrieve an attribute value for the exception object.
           case attr_backtrace:
             GET_ATTR_backtrace(INTERP, SELF, value);
             break;
-          case attr_handler_iter:
-            GET_ATTR_handler_iter(INTERP, SELF, value);
+          case attr_handler:
+            GET_ATTR_handler(INTERP, SELF, value);
             break;
           case attr_thrower:
             GET_ATTR_thrower(INTERP, SELF, value);
@@ -773,8 +781,8 @@ Set an attribute value for the exception object.
           case attr_backtrace:
             SET_ATTR_backtrace(INTERP, SELF, value);
             break;
-          case attr_handler_iter:
-            SET_ATTR_handler_iter(INTERP, SELF, value);
+          case attr_handler:
+            SET_ATTR_handler(INTERP, SELF, value);
             break;
           case attr_thrower:
             SET_ATTR_thrower(INTERP, SELF, value);
@@ -791,39 +799,6 @@ Set an attribute value for the exception object.
                 "Can't set attribute '%S'", name);
         }
     }
-
-/*
-
-=item C<PMC *share_ro()>
-
-Set this PMC as shared.
-
-=cut
-
-*/
-
-    VTABLE PMC *share_ro() {
-        PMC *shared_self;
-        Parrot_Exception_attributes *shared_struct;
-
-        if (PObj_is_PMC_shared_TEST(SELF))
-            return SELF;
-
-        shared_self = pt_shared_fixup(INTERP, SELF);
-        shared_struct = PARROT_EXCEPTION(shared_self);
-
-        if (!PMC_IS_NULL(shared_struct->payload))
-            shared_struct->payload = pt_shared_fixup(INTERP, shared_struct->payload);
-
-        if (!PMC_IS_NULL(shared_struct->backtrace))
-            shared_struct->backtrace = pt_shared_fixup(INTERP, shared_struct->backtrace);
-
-        if (!PMC_IS_NULL(shared_struct->handler_iter))
-            shared_struct->handler_iter = pt_shared_fixup(INTERP, shared_struct->handler_iter);
-
-        return shared_self;
-    }
-
 
 /*
 
@@ -870,6 +845,13 @@ which holds the PMC representing the sub, and C<annotations> which is a hash
 of the annotations at the point where the exception was thrown for the current
 sub, or for the point of the call a level deeper for the rest.
 
+=item C<PMC *backtrace_strings>
+
+Return an array of strings representing a displayable backtrace. Each element
+in the array is the backtrace at the time when the exception was thrown.
+Rethrowing the exception adds a new entry. The first item in the list is the
+most recent throw of the Exception.
+
 =cut
 
 */
@@ -907,7 +889,7 @@ sub, or for the point of the call a level deeper for the rest.
         GET_ATTR_bt_strings(INTERP, SELF, bt_strings);
         if (PMC_IS_NULL(bt_strings))
             bt_strings = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        VTABLE_unshift_string(INTERP, bt_strings, bt);
+        VTABLE_push_string(INTERP, bt_strings, bt);
         RETURN(PMC *bt_strings);
     }
 
@@ -960,10 +942,12 @@ getAttrEnum(PARROT_INTERP, ARGIN(const STRING *name))
         r = attr_backtrace;
     else if (STRING_equal(interp, name, CONST_STRING(interp, "handled")))
         r = attr_handled;
-    else if (STRING_equal(interp, name, CONST_STRING(interp, "handler_iter")))
-        r = attr_handler_iter;
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "handler")))
+        r = attr_handler;
     else if (STRING_equal(interp, name, CONST_STRING(interp, "handler_ctx")))
         r = attr_handler_ctx;
+    else if (STRING_equal(interp, name, CONST_STRING(interp, "handlers_left")))
+        r = attr_handlers_left;
     else if (STRING_equal(interp, name, CONST_STRING(interp, "thrower")))
         r = attr_thrower;
     else if (STRING_equal(interp, name, CONST_STRING(interp, "bt_strings")))

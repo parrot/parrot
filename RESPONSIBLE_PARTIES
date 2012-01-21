@@ -16,7 +16,7 @@ Architect                       Christoph Otto
 
 Product Manager                 Andrew Whitworth
 
-Project Manager                 Jim Keenan
+Project Manager
 
 Community Manager               Jonathan "Duke" Leto
 
@@ -35,6 +35,8 @@ Release Manager                 Bob Rogers
                                 Gerd Pokorra
                                 Michael Hind
                                 Tyler Curtis
+                                James E Keenan
+                                Kevin Polulak
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
@@ -42,7 +44,7 @@ Metacommitter                   Allison Randal
                                 chromatic
                                 Jeff Horwitz
                                 Andrew Whitworth
-                                Jim Keenan
+                                James E Keenan
                                 Jonathan "Duke" Leto
                                 Julian Albo
 
@@ -79,7 +81,7 @@ Patch Monster                   chromatic
                                 Jonathan Worthington
                                 Jerry Gay
                                 Will Coleda
-                                James Keenan
+                                James E Keenan
                                 Francois Perrad
                                 Christoph Otto
                                 Julian Albo
@@ -90,7 +92,7 @@ Patch Monster                   chromatic
 Contributors
 ------------
 
-Cage Cleaner                    James Keenan
+Cage Cleaner                    James E Keenan
                                 Jerry Gay
                                 chromatic
                                 Andy Lester

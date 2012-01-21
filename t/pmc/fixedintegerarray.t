@@ -264,6 +264,8 @@ out-of-bounds test. Checks INT and PMC keys.
     a1[1] = 1
     r = get_repr a1
     is(r, '[ 7, 1 ]', 'get_repr')
+    r = a1
+    is(r, '[ 7, 1 ]', 'get_string')
 .end
 
 .sub 'test_new_style_init'

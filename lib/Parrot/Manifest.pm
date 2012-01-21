@@ -31,6 +31,7 @@ use strict;
 use warnings;
 use Carp;
 use File::Basename;
+use Parrot::BuildUtil;
 
 =head1 METHODS
 
@@ -227,7 +228,6 @@ sub _get_special {
         DEPRECATED.yaml                                  [devel]doc
         DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
-        NEWS                                            [main]doc
         PBC_COMPAT                                      [main]doc
         PLATFORMS                                       [devel]doc
         README                                          [devel]doc
@@ -362,11 +362,10 @@ sub print_manifest_skip {
 sub _get_ignores {
     my $self      = shift;
 
-    # HACK: Make this portable
-    my $gitignore = `cat .gitignore| grep -v '^#'`;
+    my $gitignore = Parrot::BuildUtil::slurp_file('.gitignore');
 
     my %ignores;
-    my @ignore = sort grep { $_ } split( /\n/, $gitignore );
+    my @ignore = sort grep { $_ !~ /^#/ } split( /\n/, $gitignore );
 
     for my $ignore (@ignore) {
          my ($dirname, $basename) = (dirname($ignore), basename($ignore));

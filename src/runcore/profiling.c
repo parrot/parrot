@@ -19,7 +19,6 @@ Functions controlling Parrot's profiling runcore.
 
 #include "parrot/runcore_api.h"
 #include "parrot/extend.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
 
@@ -977,6 +976,8 @@ init_null_output(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
 /*
 
 =back
+
+=cut
 
 */
 

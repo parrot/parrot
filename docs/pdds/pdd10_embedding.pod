@@ -108,7 +108,7 @@ do less work through the API, and more work through bytecode and the runcore.
 =item * The embed API uses a single header file: L<include/parrot/api.h>.
 Embedding applications should use only this header file and no other header
 files from Parrot. Embedding applications should NOT use
-L<include/parrot/parrot.h> or L<include/parrot/embed.h>, or any other files.
+L<include/parrot/parrot.h>, or any other files.
 
 =item * libparrot does little to no signal handling. Those are typically the
 responsibility of the embedder.
@@ -246,7 +246,7 @@ later use.
 
 Currently there are two functions to get a bytecode PMC.
 
-    Parrot_api_load_bytecode(interp, filename, *pbc)
+    Parrot_api_load_bytecode_file(interp, filename, *pbc)
     Parrot_api_load_bytecode_bytes(interp, bytecode, size, *pbc)
 
 The first function loads bytecode from a file. The second loads bytecode in

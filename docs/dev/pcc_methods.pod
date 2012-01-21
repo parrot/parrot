@@ -1,0 +1,133 @@
+# Copyright (C) 2007-2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/dev/pcc_methods.pod - Parrot Calling Conventions in C
+
+=head1 OVERVIEW
+
+A C<PCCMETHOD> is a PMC method that follows the Parrot Calling Conventions
+(a.k.a. PCC). This allows PIR code to call PMC methods using slurpy, named,
+and other types of arguments as specified in I<PDD03>. This offers flexibility
+not found in a PMC C<METHOD> or a vtable function using C calling conventions.
+
+C<PCCINVOKE> is used to call a method using the Parrot Calling Conventions.
+It uses the standard C<find_method()>/C<invoke()> approach that the
+C<callmethodcc> opcode would. You can use C<PCCINVOKE> in any PMC method
+(including vtable methods), even if they are not C<PCCMETHOD>'s. You can call
+methods that are not implemented with C<PCCMETHOD>, too.
+
+=head1 SYNTAX
+
+=head2 C<PCCMETHOD>
+
+To declare that a method in a PMC should take arguments using the Parrot
+Calling Conventions, prefix its name with the keyword C<PCCMETHOD>.
+The PCC parameter list is put where you would normally put the C
+parameter list. Do not specify a return type for C<PCCMETHOD>'s; the true
+signature of the return is specified inside the method using C<RETURN>,
+described below.
+
+  PCCMETHOD PlayRandomSong() {
+      ...
+  }
+
+  PCCMETHOD PlaySong(STRING *artist, STRING *title) {
+      ...
+  }
+
+For full details of the parameter list syntax, see L<Parameter List Syntax>.
+
+=head2 C<RETURN>
+
+To return arguments using the Parrot Calling Conventions, which you should do
+if you have implemented a C<PCCMETHOD> (unless it returns no arguments, of
+course), use the C<RETURN> keyword. This takes a signature as specified in
+the L<Parameter List Syntax> section.
+
+  RETURN(PMC *status, INTVAL count);
+
+=head2 C<PCCINVOKE>
+
+To call a method on an object using the Parrot Calling Conventions, use
+C<PCCINVOKE>. It takes 3 arguments, followed by the signature of the call
+and the arguments as specified in the L<Parameter List Syntax> section.
+
+The first three arguments, in order, are:
+
+=over 4
+
+=item *
+
+The current interpreter; use C<interp> in a PMC.
+
+=item *
+
+The object to call the method on. Use the C<SELF> macro for the
+current PMC.
+
+=item *
+
+The double-quoted name of the method to call.
+
+=back
+
+Any return arguments appear, with the return signature, to the left of the
+call and in parentheses.
+
+For example:
+
+  PCCINVOKE(interp, monkey, "eat", PMC* banana);
+
+  (PMC *pooh) = PCCINVOKE(interp, monkey, "excrete");
+
+  (PMC *status, INTVAL count) = PCCINVOKE(interp, player, "PlaySong", artist, title);
+
+  PCCINVOKE(interp, SELF, value :named("key") :optional)
+
+=head2 Parameter List Syntax
+
+The syntax for a PCC parameter list is a comma separated list of zero or more
+parameters. Each parameter takes the form:
+
+  { INTVAL | NUMVAL | STRING* | PMC* } NAME [ ADVERBS ]
+
+That is, a register type, followed by a name, optionally followed by one or
+more flags specified as adverbs. The list of supported adverbs is listed in
+F<docs/pdds/pdd03_calling_conventions.pod>, the calling conventions design
+document.
+
+Note that unlike PIR, single quotes I<cannot> be used to quote values
+in C-based PCC calls.
+
+Also note that in line with the Parrot code standards, you should put the
+pointer symbol next to the variable,
+
+  PMC *param :optional    # Good
+
+not next to the type.
+
+  PMC* param :optional    # Bad
+
+=head1 OTHER CONSIDERATIONS
+
+=head2 Performance
+
+When a C<METHOD> or vtable function is called, C<NCI> is used to map the
+arguments held in the current C<Parrot_Context> into the C calling conventions.
+That is, you still end up involving the Parrot Calling Conventions anyway,
+so there is no reason to expect a C<PCCMETHOD> to be any slower. It may well
+be faster. It's probably best to just not care. :-)
+
+It is clearly true that C<PCCINVOKE> is going to be more costly than an
+invocation of a C function from another C function, if you do the call directly
+at the C level. However, if you do that, you are ignoring any method overrides if
+you have been subclassed and you wouldn't want to do that now, would you?
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=4:

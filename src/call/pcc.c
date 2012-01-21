@@ -153,6 +153,8 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
 Adds the given PMC as an invocant to the given CallContext PMC.  You should
 never have to use this, and it should go away with interp->current_object.
 
+=cut
+
 */
 
 static void
@@ -267,6 +269,7 @@ do_run_ops(PARROT_INTERP, ARGIN(PMC *sub_obj))
           case enum_class_Sub:
           case enum_class_MultiSub:
           case enum_class_Eval:
+          case enum_class_Continuation:
             return 1;
           case enum_class_Object:
             break;
@@ -314,14 +317,14 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 
     opcode_t    *dest;
-    const UINTVAL n_regs_used[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    PMC         *ctx  = Parrot_push_context(interp, n_regs_used);
-    PMC * const  ret_cont = pmc_new(interp, enum_class_Continuation);
+    PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
+    if (PMC_IS_NULL(call_object))
+        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
 
-    Parrot_pcc_set_signature(interp, ctx, call_object);
-    Parrot_pcc_set_continuation(interp, ctx, ret_cont);
-    interp->current_cont                    = NEED_CONTINUATION;
-    PARROT_CONTINUATION(ret_cont)->from_ctx = ctx;
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_object);
+    PARROT_CONTINUATION(ret_cont)->from_ctx = call_object;
+    Parrot_pcc_set_continuation(interp, call_object, ret_cont);
+    interp->current_cont                    = ret_cont;
 
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);
@@ -335,9 +338,6 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         runops(interp, offset);
         Interp_core_SET(interp, old_core);
     }
-    Parrot_pop_context(interp);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp),
-            Parrot_pcc_get_signature(interp, ctx));
 }
 
 /*

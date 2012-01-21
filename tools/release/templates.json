@@ -37,7 +37,7 @@ instructions</a>. For those who want to hack on Parrot or languages that run on 
 we recommend <a href=\"@web.org_root@\">our organization page</a> on GitHub,
 or you can go directly to the official Parrot Git repo on <a href=\"@web.repository@\">Github</a>
 
-To clone the the Parrot Git repo into a directory called 'parrot', use the following:
+To clone the Parrot Git repo into a directory called 'parrot', use the following:
 <pre>
     git clone git://github.com/parrot/parrot.git
 </pre>

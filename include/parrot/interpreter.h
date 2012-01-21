@@ -54,13 +54,16 @@ typedef enum {
 
 /* &gen_from_enum(interpcores.pasm) */
 typedef enum {
-    PARROT_SLOW_CORE,                       /* slow bounds/trace/profile core */
+    PARROT_SLOW_CORE,                       /* slow bounds/trace core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
     PARROT_FAST_CORE        = 0x01,         /* fast DO_OP core */
     PARROT_EXEC_CORE        = 0x20,         /* TODO Parrot_exec_run variants */
     PARROT_GC_DEBUG_CORE    = 0x40,         /* run GC before each op */
     PARROT_DEBUGGER_CORE    = 0x80,         /* used by parrot debugger */
-    PARROT_PROFILING_CORE   = 0x160         /* used by parrot debugger */
+    PARROT_PROFILING_CORE   = 0x160,        /* used by parrot debugger */
+    PARROT_SUBPROF_SUB_CORE = 0x200,        /* sub profiler core, sub mode */
+    PARROT_SUBPROF_HLL_CORE = 0x201,        /* sub profiler core, hll mode */
+    PARROT_SUBPROF_OPS_CORE = 0x202         /* sub profiler core, ops mode */
 } Parrot_Run_core_t;
 /* &end_gen */
 
@@ -98,7 +101,6 @@ struct parrot_interp_t;
 
 #ifdef PARROT_IN_CORE
 
-#define Parrot_Language Parrot_Int
 #define Parrot_Vtable struct _vtable*
 
 typedef Parrot_Interp_flag Interp_flags;
@@ -135,7 +137,6 @@ typedef struct warnings_t {
     Warnings_classes classes;
 } *Warnings;
 
-struct _Thread_data;    /* in thread.h */
 struct _Caches;         /* caches .h */
 
 /* Get Context from interpreter */
@@ -148,12 +149,6 @@ struct _Caches;         /* caches .h */
  * functions to manipulate Context.
  */
 #define CURRENT_CONTEXT(interp) ((interp)->ctx)
-
-
-typedef struct _context_mem {
-    void **free_list;               /* array of free-lists, per size free slots */
-    int n_free_slots;               /* amount of allocated */
-} context_mem;
 
 struct _handler_node_t; /* forward def - exit.h */
 
@@ -193,7 +188,6 @@ struct parrot_interp_t {
     size_t             resume_offset;
 
     PackFile_ByteCode  *code;                 /* The code we are executing */
-    PMC                *current_pf;           /* Current PF  */
 
     Hash               *op_hash;              /* mapping from op names to op_info_t */
 
@@ -224,9 +218,11 @@ struct parrot_interp_t {
 
     PMC *HLL_info;                            /* HLL names and types */
     PMC *HLL_namespace;                       /* cache of HLL toplevel ns */
+    PMC *HLL_entries;
 
     PMC *root_namespace;                      /* namespace hash */
     PMC *scheduler;                           /* concurrency scheduler */
+    PMC *cur_task;
 
     MMD_Cache *op_mmd_cache;                  /* MMD cache for builtins. */
 
@@ -235,7 +231,6 @@ struct parrot_interp_t {
     STRING     **const_cstring_table;         /* CONST_STRING(x) items */
     Hash        *const_cstring_hash;          /* cache of const_string items */
 
-    struct QUEUE* task_queue;                 /* per interpreter queue */
     struct _handler_node_t *exit_handler_list;/* exit.c */
     int sleeping;                             /* used during sleep in events */
 
@@ -245,7 +240,8 @@ struct parrot_interp_t {
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
 
-    struct _Thread_data *thread_data;         /* thread specific items */
+    UINTVAL          last_alarm;              /* has an alarm triggered? */
+    FLOATVAL         quantum_done;            /* expiration of current quantum */
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
@@ -281,6 +277,7 @@ typedef enum {
     IGLOBALS_LIB_PATHS,         /* LoL of search paths and dynamic ext */
     IGLOBALS_PBC_LIBS,          /* Hash of load_bytecode cde */
     IGLOBALS_EXECUTABLE,        /* How Parrot was invoked (from argv[0]) */
+    IGLOBALS_LOADED_PBCS,       /* Hash of .pbc file -> PackfileView */
 
     IGLOBALS_SIZE
 } iglobals_enum;
@@ -317,21 +314,90 @@ typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
 void
-Parrot_clear_emergency_interp(void);
+Parrot_interp_clear_emergency_interpreter(void);
 
-/* HEADERIZER BEGIN: src/interp/inter_create.c */
+/* HEADERIZER BEGIN: src/interp/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp allocate_interpreter(
+Parrot_Interp Parrot_interp_allocate_interpreter(
     ARGIN_NULLOK(Interp *parent),
     INTVAL flags);
 
 PARROT_EXPORT
+void Parrot_interp_clear_debug(PARROT_INTERP, UINTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_clear_flag(PARROT_INTERP, INTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_Interp initialize_interpreter(PARROT_INTERP,
+PMC * Parrot_interp_compile_file(PARROT_INTERP,
+    ARGIN(PMC *compiler),
+    ARGIN(STRING *fullname))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP,
+    ARGIN(PMC * compiler),
+    ARGIN(STRING *code))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_interp_destroy(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_interp_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Interp * Parrot_interp_get_from_pmc(ARGIN(PMC * interp_pmc))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_interp_info(PARROT_INTERP, INTVAL what)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING* Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Parrot_Interp Parrot_interp_initialize_interpreter(PARROT_INTERP,
     ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -339,30 +405,187 @@ Parrot_Interp initialize_interpreter(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Parrot_Interp make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags);
+Parrot_Interp Parrot_interp_make_interpreter(
+    ARGIN_NULLOK(Interp *parent),
+    INTVAL flags);
 
 PARROT_EXPORT
-void Parrot_destroy(PARROT_INTERP)
+void Parrot_interp_mark_method_writes(PARROT_INTERP,
+    int type,
+    ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+Parrot_Interp Parrot_interp_new(ARGIN_NULLOK(Parrot_Interp parent));
+
+PARROT_EXPORT
+void Parrot_interp_register_native_pcc_method_in_ns(PARROT_INTERP,
+    const int type,
+    ARGIN(void *func),
+    ARGIN(STRING *name),
+    ARGIN(STRING *signature))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+void Parrot_interp_register_nci_method(PARROT_INTERP,
+    const int type,
+    ARGIN(void *func),
+    ARGIN(const char *name),
+    ARGIN(const char *proto))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+void Parrot_interp_set_compiler(PARROT_INTERP,
+    ARGIN(STRING *type),
+    ARGIN(PMC *compiler))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_interp_set_debug(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
+void Parrot_interp_set_executable_name(PARROT_INTERP,
+    ARGIN(STRING * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_interp_set_flag(PARROT_INTERP, INTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_set_trace(PARROT_INTERP, UINTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_interp_set_warnings(PARROT_INTERP, Parrot_warnclass wc)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_UInt Parrot_interp_test_debug(PARROT_INTERP, UINTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_Int Parrot_interp_test_flag(PARROT_INTERP, INTVAL flag)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_UInt Parrot_interp_test_trace(PARROT_INTERP, UINTVAL flag)
+        __attribute__nonnull__(1);
+
+void Parrot_interp_clear_emergency_interpreter(void);
 PARROT_CAN_RETURN_NULL
-Interp* Parrot_get_emergency_interp(void);
+Interp* Parrot_interp_get_emergency_interpreter(void);
 
-void Parrot_really_destroy(PARROT_INTERP, int exit_code, void *arg)
+void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_allocate_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_initialize_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_allocate_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_clear_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(compiler) \
+    , PARROT_ASSERT_ARG(fullname))
+#define ASSERT_ARGS_Parrot_interp_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(compiler) \
+    , PARROT_ASSERT_ARG(code))
+#define ASSERT_ARGS_Parrot_interp_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(type))
+#define ASSERT_ARGS_Parrot_interp_get_from_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp_pmc))
+#define ASSERT_ARGS_Parrot_interp_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_info_p __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_info_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_init_stacktop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(stack_top))
+#define ASSERT_ARGS_Parrot_interp_initialize_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(args))
-#define ASSERT_ARGS_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_make_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_mark_method_writes \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_Parrot_interp_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_register_native_pcc_method_in_ns \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(signature))
+#define ASSERT_ARGS_Parrot_interp_register_nci_method \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(proto))
+#define ASSERT_ARGS_Parrot_interp_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
+#define ASSERT_ARGS_Parrot_interp_set_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_get_emergency_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_interp_set_executable_name \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_Parrot_interp_set_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_set_run_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_set_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_test_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_test_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_test_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_clear_emergency_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_get_emergency_interpreter \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/interp/inter_create.c */
+/* HEADERIZER END: src/interp/api.c */
 
 /* HEADERIZER BEGIN: src/interp/inter_cb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -398,7 +621,7 @@ PMC* Parrot_make_cb(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_run_callback(PARROT_INTERP,
     ARGMOD(PMC* user_data),
-    ARGIN(char* external_data))
+    ARGIN(void* external_data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -419,132 +642,6 @@ void Parrot_run_callback(PARROT_INTERP,
     , PARROT_ASSERT_ARG(external_data))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_cb.c */
-
-/* HEADERIZER BEGIN: src/interp/inter_misc.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL interpinfo(PARROT_INTERP, INTVAL what)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* interpinfo_p(PARROT_INTERP, INTVAL what)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_compile_file(PARROT_INTERP,
-    ARGIN(STRING *fullname),
-    INTVAL is_pasm)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_compreg(PARROT_INTERP,
-    ARGIN(STRING *type),
-    ARGIN(Parrot_compiler_func_t func))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Interp * Parrot_int_get_interp_from_pmc(ARGIN(PMC * interp_pmc))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-void Parrot_mark_method_writes(PARROT_INTERP,
-    int type,
-    ARGIN(const char *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-void Parrot_set_compiler(PARROT_INTERP,
-    ARGIN(STRING *type),
-    ARGIN(PMC *compiler))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
-void register_native_pcc_method_in_ns(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(STRING *name),
-    ARGIN(STRING *signature))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-PARROT_EXPORT
-void register_nci_method(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(const char *name),
-    ARGIN(const char *proto))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-#define ASSERT_ARGS_interpinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_interpinfo_p __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_interpinfo_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
-#define ASSERT_ARGS_Parrot_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(type) \
-    , PARROT_ASSERT_ARG(func))
-#define ASSERT_ARGS_Parrot_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(type))
-#define ASSERT_ARGS_Parrot_int_get_interp_from_pmc \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp_pmc))
-#define ASSERT_ARGS_Parrot_mark_method_writes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_Parrot_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(type) \
-    , PARROT_ASSERT_ARG(compiler))
-#define ASSERT_ARGS_register_native_pcc_method_in_ns \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name) \
-    , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_register_nci_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name) \
-    , PARROT_ASSERT_ARG(proto))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/interp/inter_misc.c */
-
 
 /* parrotinterpreter.pmc */
 /* XXX Would be nice if this could live in some headerized grouping */

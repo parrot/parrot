@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2011 Parrot Foundation.
 
 =head1 NAME
 
@@ -6,13 +6,13 @@ Getting Started with the Parrot Compiler Tools
 
 =head1 DESCRIPTION
 
-This document can be considered your Number One entry point for starting to use
-the Parrot Compiler Tools (PCT). As there's a whole lot of acronyms flying
-around (see Parrot's glossary at L<http://www.parrotcode.org/glossary.html>),
-this document will get you up and running within 10 minutes (that excludes
-building Parrot). Once you begin, it's a matter of getting your hands dirty and
-get experienced using the tools. Feel free to ask questions on
-irc.parrot.org#parrot.
+This document can be considered your Number One entry point for starting to
+use the Parrot Compiler Tools (PCT). There will be a whole lot of acronyms
+flying around.  Consult L<< Parrot's glossary|http://docs.parrot.org/parrot/latest/html/docs/glossary.html >> about
+them.  This document will get you up and running within 10 minutes (that
+excludes building Parrot). Once you begin, it's a matter of getting your hands
+dirty and get experienced using the tools. Feel free to ask questions in the
+#parrot channel on irc.parrot.org .
 
 =head1 GETTING STARTED
 
@@ -43,7 +43,7 @@ write, which is why Parrot has something called PIR.
 Stands for Parrot Intermediate Representation. This is a fancy layer of
 syntactic sugar on top of PASM. If you program Parrot natively, you
 write in PIR. Other documents discuss PIR syntax, for instance
-L<http://www.parrotcode.org/docs/pdd/pdd19_pir.html>.
+L<https://github.com/parrot/parrot/blob/master/docs/pdds/pdd19_pir.pod>
 
 =item * PGE
 

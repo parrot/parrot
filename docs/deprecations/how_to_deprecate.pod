@@ -26,7 +26,8 @@ add a note to api.yaml
 
 =item *
 
-maybe post to parrot-dev and/or parrot-users depending on the nature of the change
+maybe post to parrot-dev and/or parrot-users depending on the nature of the
+change
 
 =item *
 
@@ -96,7 +97,7 @@ page (e.g. [wiki:ParrotDeprecationsFor2.6 ParrotDeprecationsFor2.6])
 
 =item *
 
-walk through the the documentation to ensure that it's sufficient for a user to
+walk through the documentation to ensure that it's sufficient for a user to
 use to upgrade his or her code
 
 =item *
@@ -111,8 +112,8 @@ Add the tag of "completed" to the entry in api.yaml
 
 =item *
 
-make sure the HLLs and libraries are ready the deprecation (and submit patches
-if not)
+make sure the HLLs and libraries are ready for the deprecation (and submit
+patches if not)
 
 =item *
 

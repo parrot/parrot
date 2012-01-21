@@ -7,7 +7,7 @@ src/pmc/mappedbytearray.pmc - Mapped byte array
 
 =head1 DESCRIPTION
 
-A memory mapped file or shared memory segment accesible as array of bytes.
+A memory mapped file or shared memory segment accessible as array of bytes.
 
 Bare minimal functionality available, only for posix platforms
 (tested on linux).
@@ -29,6 +29,7 @@ Bare minimal functionality available, only for posix platforms
 #  ifdef __MINGW32__
 #    define ENABLED
 #    define MAPW32
+#    include<Windows.h>
 #  endif
 #endif
 
@@ -135,14 +136,11 @@ Free all resources used.
         if (VTABLE_isa(INTERP, init, CONST_STRING(INTERP, "String"))) {
             unsigned long length = 0;
             STRING * const name = VTABLE_get_string(INTERP, init);
-        #  ifdef MAPW32
-        #  else
             mapping = mapfromfilename(interp, name, &length, CAN_READ);
             if (mapping == 0 || mapping == (void *)-1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "mmap failed: %s", strerror(errno));
-        #  endif
             PObj_custom_destroy_SET(SELF);
             SET_ATTR_size(INTERP, SELF, length);
             SET_ATTR_buffer(INTERP, SELF, (unsigned char*)mapping);
@@ -448,7 +446,7 @@ in codepoints.
 
 =item C<static void unavailable(PARROT_INTERP, const char *msg)>
 
-Throws appropiately for functionality not available in the current platform.
+Throws appropriately for functionality not available in the current platform.
 
 =item C<static void * mapfromfilehandle(PIOHANDLE handle, unsigned long size,
 int flag)>

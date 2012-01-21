@@ -82,6 +82,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Config qw/%PConfig/;
+use Parrot::Git::Describe;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     generate_html_smoke_report
@@ -95,7 +96,7 @@ my %SMOLDER_CONFIG = (
     username     => 'parrot-autobot',
     password     => 'qa_rocks',
     project_id   => 1,
-    report_file  => ['parrot_test_run.tar.gz'],
+    report_file  => ['t/archive/parrot_test_run.tar.gz'],
 );
 
 # language implementations must pass their respective project id
@@ -131,7 +132,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
-            revision     => $PConfig{git_describe},
+            revision     => $Parrot::Git::Describe::current || '',
         ]
     );
 

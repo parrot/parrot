@@ -42,6 +42,7 @@ undefined values) is undefined, and may be rather funky.
 
 .sub _config
     .local string prefix, conf_file
+    .local pmc ex
     prefix = interpinfo .INTERPINFO_RUNTIME_PREFIX
 
     $S0 = concat prefix, "/runtime"
@@ -58,6 +59,8 @@ undefined values) is undefined, and may be rather funky.
         $P0.'stat'($S0)
         goto L1
   file_not_found:
+    .get_results (ex)
+    finalize ex
     # Treat it as installed parrot.
     conf_file = "@libdir@@versiondir@/include/config.fpmc"
     goto L2
@@ -85,7 +88,6 @@ undefined values) is undefined, and may be rather funky.
     .return( conf_hash )
 
 error:
-    .local pmc ex
     .get_results (ex)
     $S0 = "Can't read '"
     $S0 .= conf_file

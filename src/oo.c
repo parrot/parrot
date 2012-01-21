@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
+Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,6 +21,7 @@ Handles class and object manipulation.
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_object.h"
+#include "pmc/pmc_namespace.h"
 
 #include "oo.str"
 
@@ -153,14 +154,19 @@ void
 Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(Parrot_oo_extract_methods_from_namespace)
+    Parrot_NameSpace_attributes * nsattrs;
     PMC *methods, *vtable_overrides;
 
     /* Pull in methods from the namespace, if any. */
     if (PMC_IS_NULL(ns))
         return;
 
+    nsattrs = PARROT_NAMESPACE(ns);
+
     /* Import any methods. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_methods"), "->P", &methods);*/
+    methods = nsattrs->methods;
+    nsattrs->methods = PMCNULL;
 
     if (!PMC_IS_NULL(methods)) {
         PMC * const iter = VTABLE_get_iter(interp, methods);
@@ -174,7 +180,9 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
     }
 
     /* Import any vtables. */
-    Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);
+    /*Parrot_pcc_invoke_method_from_c_args(interp, ns, CONST_STRING(interp, "get_associated_vtable_methods"), "->P", &vtable_overrides);*/
+    vtable_overrides = nsattrs->vtable;
+    nsattrs->vtable = PMCNULL;
 
     if (!PMC_IS_NULL(vtable_overrides)) {
         PMC * const iter = VTABLE_get_iter(interp, vtable_overrides);
@@ -385,8 +393,12 @@ get_pmc_proxy(PARROT_INTERP, INTVAL type)
 
         /* Create proxy if not found */
         if (PMC_IS_NULL(proxy)) {
+            /* TODO: doing direct register access is faster, but Lua (at least) seems to depend
+                     on this method call */
+            /*Parrot_NameSpace_attributes * const nsattrs = PARROT_NAMESPACE(pmc_ns); */
             proxy = Parrot_pmc_new_init_int(interp, enum_class_PMCProxy, type);
             Parrot_pcc_invoke_method_from_c_args(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
+            /*nsattrs->_class = proxy;*/
         }
         return proxy;
     }
@@ -428,6 +440,25 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         else
             return _class;
     }
+}
+
+/*
+
+=item C<PMC * Parrot_oo_new_class_pmc(PARROT_INTERP, PMC *classtype)>
+
+Create a class with the type given
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_oo_new_class_pmc(PARROT_INTERP, ARGIN(PMC *classtype))
+{
+    ASSERT_ARGS(Parrot_oo_new_class_pmc)
+    return Parrot_pmc_new_init(interp, enum_class_Class, classtype);
 }
 
 
@@ -687,22 +718,15 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
                 Parrot_str_escape(interp, classname));
     }
 
-    /* Type doesn't exist, so go ahead and register it. Lock interpreter so
-     * pt_shared_fixup() can safely do a type lookup. */
-    LOCK_INTERPRETER(interp);
-    {
-        type = Parrot_pmc_get_new_vtable_index(interp);
+    /* Type doesn't exist, so go ahead and register it. */
+    type = Parrot_pmc_get_new_vtable_index(interp);
+    if (!typeid_exists) {
+        /* set entry in name->type hash */
+        PMC * const classname_hash = interp->class_hash;
+        PMC * const item           = Parrot_pmc_new_init_int(interp,
+                enum_class_Integer, type);
+        VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
     }
-    {
-        if (!typeid_exists) {
-            /* set entry in name->type hash */
-            PMC * const classname_hash = interp->class_hash;
-            PMC * const item           = Parrot_pmc_new_init_int(interp,
-                    enum_class_Integer, type);
-            VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
-        }
-    }
-    UNLOCK_INTERPRETER(interp);
 
     return type;
 }
@@ -1209,7 +1233,7 @@ Used by the Class and Object PMCs internally to compose a role into either of
 them. The C<role> parameter is the role that we are composing into the class
 or role. C<methods_hash> is the hash of method names to invokable PMCs that
 contains the methods the class or role has. C<roles_list> is the list of roles
-the the class or method does.
+the class or method does.
 
 The C<role> parameter is only dealt with by its external interface. Whether
 this routine is usable by any other object system implemented in Parrot very

@@ -10,10 +10,6 @@ src/pmc/eval.pmc - Dynamic code evaluation
 C<Eval> extends C<Sub> to provide C<eval>-like dynamic code
 evaluation and execution.
 
-=head2 Methods
-
-=over 4
-
 =cut
 
 */
@@ -43,76 +39,29 @@ static void mark_ct(PARROT_INTERP, ARGIN(PMC *self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/*
-
-=item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
-{
-    ASSERT_ARGS(get_sub)
-
-    Parrot_Sub_attributes *sub;
-    PackFile_ByteCode     *seg;
-
-    PMC_get_sub(interp, self, sub);
-    seg = sub->seg;
-
-    if (seg) {
-        PackFile_ConstTable * const ct = seg->const_table;
-        if (ct) {
-            INTVAL i, n;
-            for (i = n = 0; i < ct->pmc.const_count; ++i) {
-                STRING * const SUB = CONST_STRING(interp, "Sub");
-                PMC * const x = ct->pmc.constants[i];
-                if (VTABLE_isa(interp, x, SUB))
-                    if (!idx--)
-                        return x;
-            }
-        }
-    }
-
-    return PMCNULL;
-}
-
-/*
-
-=item C<static void mark_ct(PARROT_INTERP, PMC *self)>
-
-=cut
-
-*/
-
-static void
-mark_ct(PARROT_INTERP, ARGIN(PMC *self))
-{
-    ASSERT_ARGS(mark_ct)
-
-    Parrot_Sub_attributes *sub;
-    PackFile_ByteCode   *seg;
-
-    PMC_get_sub(interp, self, sub);
-    seg = sub->seg;
-
-    if (seg) {
-        const PackFile_ConstTable * const ct = seg->const_table;
-        if (ct) {
-            INTVAL i;
-            for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC * const sub = ct->pmc.constants[i];
-                Parrot_gc_mark_PMC_alive(interp, sub);
-            }
-        }
-    }
-}
-
 pmclass Eval extends Sub provides invokable auto_attrs {
+
+/*
+
+=head2 Vtable functions
+
+=over 4
+
+=item C<void init()>
+
+Initializes a new empty Eval.
+
+=item C<void destroy()>
+
+Destroy the Eval and its associated bytecode.
+
+=item C<void mark()>
+
+Mark this Eval.
+
+=cut
+
+*/
 
     VTABLE void init() {
         Parrot_Sub_attributes *sub_data;
@@ -121,20 +70,6 @@ pmclass Eval extends Sub provides invokable auto_attrs {
         PMC_get_sub(INTERP, SELF, sub_data);
         sub_data->seg = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
-    }
-/*
-
-=item C<opcode_t *invoke(void *next)>
-
-Invokes the first subroutine in the eval code.
-
-=cut
-
-*/
-
-    VTABLE opcode_t *invoke(void *next) {
-        PMC * const sub = SELF.get_pmc_keyed_int(0);
-        return VTABLE_invoke(INTERP, sub, next);
     }
 
     VTABLE void destroy() {
@@ -153,7 +88,6 @@ Invokes the first subroutine in the eval code.
          * OTOH - if the global exists - this eval pmc ought
          *        to be alive and destroy isn't called.
          */
-        PackFile_Segment  *seg;
         PackFile_ByteCode *cur_cs;
         Parrot_Sub_attributes *sub_data;
 
@@ -180,6 +114,7 @@ Invokes the first subroutine in the eval code.
         }
         #endif
 
+        #if 0
         seg = (PackFile_Segment *)cur_cs->const_table;
         if (seg) {
             PackFile_Segment_destroy(INTERP, seg);
@@ -196,6 +131,7 @@ Invokes the first subroutine in the eval code.
         if (seg)
             PackFile_Segment_destroy(INTERP, seg);
 
+        #endif
         sub_data->seg = NULL;
 
         SUPER();
@@ -204,6 +140,42 @@ Invokes the first subroutine in the eval code.
     VTABLE void mark() {
         SUPER();
         mark_ct(INTERP, SELF);
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Returns the address of the associated packfile.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        Parrot_Sub_attributes *sub;
+        PMC_get_sub(INTERP, SELF, sub);
+        if (sub) {
+            const PackFile_ByteCode * const seg = sub->seg;
+            if (seg)
+                return seg->base.pf;
+        }
+        return NULL;
+    }
+
+/*
+
+=item C<opcode_t *invoke(void *next)>
+
+Invokes the first subroutine in the eval code.
+
+=cut
+
+*/
+
+    VTABLE opcode_t *invoke(void *next) {
+        PMC * const sub = SELF.get_pmc_keyed_int(0);
+        return VTABLE_invoke(INTERP, sub, next);
     }
 
 /*
@@ -321,14 +293,12 @@ Unarchives the code.
 
         SUPER(info);
         pf = PackFile_new(INTERP, 0);
-        pfpmc = Parrot_pf_get_packfile_pmc(INTERP, pf);
+        pfpmc = Parrot_pf_get_packfile_pmc(INTERP, pf, STRINGNULL);
 
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "couldn't unpack packfile");
-
-        do_sub_pragmas(INTERP, pfpmc, PBC_PBC, SELF);
 
         for (i = 0; i < pf->directory.num_segments; ++i) {
             PackFile_Segment * const seg = pf->directory.segments[i];
@@ -359,11 +329,11 @@ Unarchives the code.
         seg = sub->seg;
 
         if (seg) {
-            PackFile_ConstTable *const ct = seg->const_table;
+            const PackFile_ConstTable * const ct = seg->const_table;
             if (ct) {
                 INTVAL i;
                 STRING * const SUB = CONST_STRING(interp, "Sub");
-                for (i = n = 0; i < ct->pmc.const_count; ++i) {
+                for (i = 0; i < ct->pmc.const_count; ++i) {
                     PMC * const x = ct->pmc.constants[i];
                     if (VTABLE_isa(interp, x, SUB))
                         ++n;
@@ -372,6 +342,104 @@ Unarchives the code.
         }
 
         return n;
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<get_main()>
+
+Return the main sub, if any, null PMC otherwise.
+
+=cut
+
+*/
+
+    METHOD get_main()
+    {
+        PMC * const mainsub = Parrot_pf_get_packfile_main_sub(INTERP, SELF);
+        RETURN(PMC * mainsub);
+    }
+
+}
+
+/*
+
+=back
+
+=head2 Auxiliar functions
+
+=over 4
+
+=item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC*
+get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
+{
+    ASSERT_ARGS(get_sub)
+
+    Parrot_Sub_attributes *sub;
+    PackFile_ByteCode     *seg;
+
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
+
+    if (seg) {
+        const PackFile_ConstTable * const ct = seg->const_table;
+        if (ct) {
+            INTVAL i;
+            for (i = 0; i < ct->pmc.const_count; ++i) {
+                STRING * const SUB = CONST_STRING(interp, "Sub");
+                PMC * const x = ct->pmc.constants[i];
+                if (VTABLE_isa(interp, x, SUB))
+                    if (!idx--)
+                        return x;
+            }
+        }
+    }
+
+    return PMCNULL;
+}
+
+/*
+
+=item C<static void mark_ct(PARROT_INTERP, PMC *self)>
+
+=cut
+
+*/
+
+static void
+mark_ct(PARROT_INTERP, ARGIN(PMC *self))
+{
+    ASSERT_ARGS(mark_ct)
+
+    Parrot_Sub_attributes *sub;
+    PackFile_ByteCode   *seg;
+
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
+
+    if (seg) {
+        const PackFile_ConstTable * const ct = seg->const_table;
+        if (ct) {
+            INTVAL i;
+            for (i = 0; i < ct->pmc.const_count; ++i) {
+                PMC * const sub = ct->pmc.constants[i];
+                Parrot_gc_mark_PMC_alive(interp, sub);
+            }
+        }
     }
 }
 

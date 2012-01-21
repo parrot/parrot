@@ -1,8 +1,22 @@
 ---
 -
+  name:  'Op new_si is deprecated'
+  note:  "new_si op used to create empty string with reserved capacity. In non-mutable strings world of modern parrot this doesn't make sense. new_s to create new empty string will remain"
+  tags:
+    - 'deprecated'
+    - 'Opcodes'
+  ticket:  'https://github.com/parrot/parrot/issues/203'
+-
+  name:  'Experimental Select PMC'
+  note:  'The Select PMC is experimental until its interface gets some exercise.  See ticket for more information.'
+  tags: 
+    - 'PMC'
+    - 'experimental'
+  ticket:  'http://trac.parrot.org/parrot/ticket/2034'
+-
   name:     '"Advanced" NCI parameter types'
   eligible: '3.1'
-  ticket:   'http://trac.parrot.org/parrot/ticket/1931' 
+  ticket:   'http://trac.parrot.org/parrot/ticket/1931'
   tags:
     - 'deprecated'
     - 'completed'
@@ -17,6 +31,7 @@
   tags:
     - 'C'
     - 'deprecated'
+    - 'completed'
   ticket:  'http://trac.parrot.org/parrot/ticket/2010'
 -
   name:  '":init" Sub flag'
@@ -47,7 +62,10 @@
     - 'deprecated'
     - 'PIR'
     - 'syntax'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1705'
+  tickets:
+    - 'https://trac.parrot.org/parrot/ticket/1033'
+    - 'https://trac.parrot.org/parrot/ticket/1704'
+    - 'https://trac.parrot.org/parrot/ticket/1705'
 -
   name:  'Action methods in rules'
   note:  'Per Synopsis 5, all regexes will have an implied {*} token at the end which cause invocation of an action method if a ":action" object is supplied.'
@@ -476,3 +494,127 @@
     - 'api'
     - 'library'
   ticket:  ''
+-
+  name :  'Old Embed API Functions'
+  tags:
+    - 'deprecated'
+  ticket: 'http://trac.parrot.org/parrot/ticket/1910'
+-
+  name :  'PackfileView PMC'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2145'
+-
+  name :  'Eval PMC'
+  tags:
+    - 'deprecated'
+  ticket: 'http://trac.parrot.org/parrot/ticket/1969'
+-
+  name :  'PackFile_* API functions'
+  tags :
+    - 'deprecated'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2140'
+-
+  name :  'Parrot_compreg function'
+  tags :
+    - 'deprecated'
+    - 'completed'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1879'
+-
+  name : 'load_bytecode_p_s opcode'
+  tags :
+    - 'experimental'
+  ticket : 'http://trac.parrot.org/parrot/ticket/2146'
+-
+  name : 'FixedPMCArray.set_pmc'
+  eligible : '3.1'
+  tags :
+    - 'deprecated'
+    - 'completed'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1904'
+-
+  name : 'Scalar PMC'
+  note : 'The Scalar PMC can be removed, so long as the behaviors of PMCs which inherit from it do not change.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1754'
+  eligible : '3.1'
+-
+  name : 'encoding:charset:"" string literals'
+  note : 'This form of string literals will be removed.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1808'
+  eligible : '3.1'
+-
+  name : 'Old string_* functions'
+  eligible : '3.0'
+  note : 'The old string_* functions will be removed.'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1809'
+-
+  name : 'PIR compiler availability'
+  eligible : '3.1'
+  note : 'The PIR compiler (currently IMCC) will be extracted to a separately loadable component.'
+  ticket : 'http://trac.parrot.org/parrot/ticket/1868'
+-
+  name : '"constant" PObj'
+  eligible : '3.1'
+  note :
+    "constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
+    should be properly marked during GC.
+
+    Functions C<Parrot_pmc_new_constant>, C<Parrot_pmc_new_constant_noinit>,
+    C<Parrot_pmc_new_constant_init> and C<Parrot_pmc_new_constant_init_int>
+    will be removed.
+
+    PObj flag C<PObj_constant_FLAG> and related macros will be removed.
+  ticket : 'https://trac.parrot.org/parrot/ticket/1875'
+  tags:
+    - 'deprecated'
+    - 'completed'
+-
+  name : 'Non-const STRING* arguments'
+  eligible : '3.1'
+  note :
+    Due to the immutable nature of STRINGs we are changing the internal handling to use only
+    const STRING pointers. This will improve optimizations possibilities for compilers,
+    and make parrot const-correct.
+
+    Passing of non-const STRING* arguments is deprecated and will be changed to
+    const STRING*. This includes (but is not limited to) all string API functions,
+    VTABLEs, PCC, etc
+  ticket : 'http://trac.parrot.org/parrot/ticket/1906'
+-
+  name : 'X-to-Y native PBC reading'
+  eligible : '3.1'
+  note : 'Support for PBC files optimized for alternate platforms will be dropped in favour of a universal network PBC format.'
+  ticket : 'https://trac.parrot.org/parrot/ticket/1961'
+-
+  name : 'The PIR and PASM compreg PMCs'
+  eligible : '3.1'
+  note :
+    The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
+    it will be a new type of PMC which conforms to PDD31 and will be similar to
+    HLLCompiler.
+    
+    There will not be a PASM compreg anymore.
+  ticket : 'http://trac.parrot.org/parrot/ticket/1967'
+-
+  name : 'Interpreter API cleanup'
+  note :
+    All functions that were defined in parrot/interpreter.h have been renamed in order
+    to follow the project's coding standards.
+
+    Functions that began with "Parrot_" now begin with "Parrot_interp_"
+    For example, function C<Parrot_new> has been renamed to C<Parrot_interp_new>.
+
+    Also, "Parrot_interp_" has been prepended to all functions that didn't begin with
+    "Parrot_" for consistency. For example, function C<allocate_interpreter> has been
+    renamed to C<Parrot_interp_allocate_interpreter>.
+
+    Other than the above changes, the below functions were also renamed to make their
+    purpose more clear:
+        * C<interpinfo> -> C<Parrot_interp_info>
+        * C<Parrot_int_get_interp_from_pmc> -> C<Parrot_interp_get_from_pmc>
+  tags:
+    - api
+    - deprecated
+    - completed
+  ticket: 'http://trac.parrot.org/parrot/ticket/443'
+

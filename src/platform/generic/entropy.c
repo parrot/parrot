@@ -43,7 +43,7 @@ Parrot_get_entropy(PARROT_INTERP) {
     if (!urand_fh) {
         const char *msg = "Couldn't open /dev/urandom for reading.";
         /* This function is called during interp init, so use the GC registry
-         * as a way to figure out interp's initialziedness.
+         * as a way to figure out interp's initializedness.
          */
         if (interp->gc_registry)
             Parrot_ex_throw_from_c_args(interp, NULL, 1, msg);

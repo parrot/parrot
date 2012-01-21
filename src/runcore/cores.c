@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -242,7 +242,6 @@ next opcode, or examine and manipulate data from the executing program.
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_trace.h"
 #include "cores.str"
 
@@ -499,10 +498,8 @@ runops_fast_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
 {
     ASSERT_ARGS(runops_fast_core)
 
-    /* disable pc */
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), NULL);
-
     while (pc) {
+        Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
         DO_OP(pc, interp);
     }
 
@@ -563,7 +560,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         /* set the top of the stack so GC can trace it for GC-able pointers
          * see trace_system_areas() in src/gc/system.c */
-        debugger->lo_var_ptr = interp->lo_var_ptr;
+        /* Chandon FIXME: debugger */
+        /* debugger->lo_var_ptr = interp->lo_var_ptr; */
 
         pio = Parrot_io_STDERR(debugger);
 
@@ -792,6 +790,8 @@ runops_exec_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(opcode_t
 /*
 
 =back
+
+=cut
 
 */
 

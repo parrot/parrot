@@ -177,12 +177,12 @@ Swaps the "context".
             PMC               *ccont      = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION) {
-                ccont = pmc_new(INTERP, enum_class_Continuation);
+                ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
                 VTABLE_set_pointer(INTERP, ccont, next_op);
             }
 
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "tail call to coroutine not allowed");
 
             /* first time set current sub, cont, object */
@@ -259,7 +259,7 @@ Swaps the "context".
             GET_ATTR_yield(INTERP, SELF, yield);
 
             if (!yield)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                                "Cannot resume dead coroutine.");
 
             SET_ATTR_yield(INTERP, SELF, 0);
@@ -282,7 +282,7 @@ Swaps the "context".
                    result before we get here.  -- rgr, 7-Oct-06.
                  * This may be unneeded after the yield fix, see TT #1003
                  */
-                Parrot_ex_throw_from_c_args(INTERP, NULL, CONTROL_ERROR,
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                                "Cannot resume dead coroutine.");
             }
 

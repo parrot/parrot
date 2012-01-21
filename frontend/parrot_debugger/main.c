@@ -63,7 +63,7 @@ Disable a breakpoint.
 
 =item C<enable>
 
-Reenable a disabled breakpoint.
+Re-enable a disabled breakpoint.
 
 =item C<continue> or C<c>
 
@@ -142,7 +142,6 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include <string.h>
 #include <ctype.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
@@ -169,14 +168,8 @@ main(int argc, const char *argv[])
     Parrot_Interp     interp;
     PDB_t *pdb;
     const char       *scriptname = NULL;
-    const unsigned char * configbytes = Parrot_get_config_hash_bytes();
-    const int configlength = Parrot_get_config_hash_length();
 
-    interp = Parrot_new(NULL);
-
-    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
-
-    Parrot_set_configuration_hash_legacy(interp, configlength, configbytes);
+    interp = Parrot_interp_new(NULL);
 
     Parrot_debugger_init(interp);
     pdb = interp->pdb;
@@ -197,40 +190,44 @@ main(int argc, const char *argv[])
         const char *ext      = strrchr(filename, '.');
 
         if (ext && STREQ(ext, ".pbc")) {
-            Parrot_PackFile pf = Parrot_pbc_read(interp, filename, 0);
+            STRING * const filename_str = Parrot_str_new(interp, filename, 0);
+            PackFile * pfraw = Parrot_pf_read_pbc_file(interp, filename_str);
+            Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
 
-            if (!pf)
+            if (!pfraw || !pf)
                 return 1;
 
-            Parrot_pbc_load(interp, pf);
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+            Parrot_pf_set_current_packfile(interp, pf);
+            Parrot_pf_prepare_packfile_init(interp, pf);
         }
         else {
-            STRING          *str    = Parrot_str_new(interp, filename, 0);
-            Parrot_PackFile  pf     = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0));
+            STRING          *str = Parrot_str_new(interp, filename, 0);
+            Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
+            STRING * const compiler_s = Parrot_str_new(interp, "PIR", 0);
+            PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
 
-            Parrot_pbc_load(interp, pf);
-            Parrot_compile_file(interp, str, 0);
+            Parrot_pf_set_current_packfile(interp, pf);
+
+            Parrot_interp_compile_file(interp, compiler, str);
             /*if (errmsg)
                 Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
 
             /* load the source for debugger list */
             PDB_load_source(interp, filename);
 
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+            Parrot_pf_prepare_packfile_init(interp, pf);
         }
-
     }
     else {
         /* Generate some code to be able to enter into runloop */
+        STRING * const compiler_s = Parrot_str_new_constant(interp, "PIR");
+        PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
+        STRING * const source = Parrot_str_new_constant(interp, ".sub aux :main\nexit 0\n.end\n");
+        PMC * const code = Parrot_interp_compile_string(interp, compiler, source);
 
-        STRING *compiler = Parrot_str_new_constant(interp, "PIR");
-        STRING *errstr = NULL;
-        const char source []= ".sub aux :main\nexit 0\n.end\n";
-        Parrot_compile_string(interp, compiler, source, &errstr);
-
-        if (!STRING_IS_NULL(errstr))
-            Parrot_io_eprintf(interp, "%Ss\n", errstr);
+        if (PMC_IS_NULL(code))
+            Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                "Unexpected compiler problem at debugger start");
     }
 
     Parrot_unblock_GC_mark(interp);
@@ -270,7 +267,8 @@ PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
 
     /* Loop to avoid exiting at program end */
     do {
-        Parrot_runcode(interp, argc, argv);
+        /* TODO: Replace this with Parrot_pf_execute_bytecode_program */
+        /*Parrot_runcode(interp, argc, argv);*/
         interp->pdb->state |= PDB_STOPPED;
     } while (! (interp->pdb->state & PDB_EXIT));
     free_runloop_jump_point(interp);

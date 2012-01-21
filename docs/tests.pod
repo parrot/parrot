@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,8 +17,7 @@ The easy way to test parrot is running C<make test>. If you have updated your
 code recently and tests began failing, go for a C<make realclean> and recompile
 parrot before complaining.
 
-C<make languages-test> runs the test suite for most language implementations
-in the languages directory.
+C<make all_hll_test> runs the test suite for all known working HLLs and libraries.
 
 =head2 Submitting smolder test results
 
@@ -32,9 +31,7 @@ website.
 =head1 Location of the test files
 
 The parrot test files, the F<*.t> files, can be found in the F<t> directory.
-A quick overview over the subdirs in F<t> can be found in F<t/README>.
-
-The language implementations usually have their test files in F<languages/*/t>.
+A quick overview about each test directory in F<t> can be found in F<t/README>.
 
 New tests should be added to an existing F<*.t> file.  If a previously untested
 feature is tested, it might also make sense to create a new F<*.t> file. You
@@ -97,7 +94,6 @@ C source tests are usually located in F<t/src/*.t>.  A simple test looks like:
     c_output_is(<<'CODE', <<'OUTPUT', "name for test");
     #include <stdio.h>
     #include "parrot/parrot.h"
-    #include "parrot/embed.h"
 
     int main(int argc, char* argv[]) {
         Parrot_Interp interp;
@@ -190,7 +186,7 @@ errors if make has completed.)  You can run them with any of the following:
 
 =head2 Testing language implementations
 
-Language implementations are usually tested with 
+Language implementations are usually tested with
 C<language_output_is> and friends.
 
 =head1 Ideal tests:
@@ -238,7 +234,7 @@ See L<Test::More> on how to do that.
 L<http://qa.perl.org/>
 L<http://testanything.org/>
 L<http://en.wikipedia.org/wiki/Test_Anything_Protocol>
-F<t/TESTS.STATUS.pod>
-F<t/README>
+L<https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod>
+L<https://github.com/parrot/parrot/blob/master/t/README.pod>
 
 =cut

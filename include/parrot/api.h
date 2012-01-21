@@ -109,8 +109,9 @@ Parrot_Int Parrot_api_flag(
 PARROT_API
 Parrot_Int Parrot_api_get_compiler(
     Parrot_PMC interp_pmc,
-    Parrot_String type,
+    ARGIN(Parrot_String type),
     ARGOUT(Parrot_PMC *compiler))
+        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*compiler);
 
@@ -148,7 +149,8 @@ Parrot_Int Parrot_api_get_runtime_path(
 PARROT_API
 Parrot_Int Parrot_api_load_language(
     Parrot_PMC interp_pmc,
-    Parrot_String lang);
+    ARGIN(Parrot_String lang))
+        __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
@@ -162,13 +164,17 @@ Parrot_Int Parrot_api_make_interpreter(
 PARROT_API
 Parrot_Int Parrot_api_reset_call_signature(
     Parrot_PMC interp_pmc,
-    Parrot_PMC ctx);
+    ARGMOD(Parrot_PMC ctx))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(ctx);
 
 PARROT_API
 Parrot_Int Parrot_api_set_compiler(
     Parrot_PMC interp_pmc,
-    Parrot_String type,
-    Parrot_PMC compiler);
+    ARGIN(Parrot_String type),
+    ARGIN(Parrot_PMC compiler))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_API
 Parrot_Int Parrot_api_set_configuration_hash(
@@ -228,7 +234,8 @@ Parrot_Int Parrot_api_wrap_pointer(
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(compiler))
+       PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_api_get_exception_backtrace \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(bt))
@@ -239,12 +246,16 @@ Parrot_Int Parrot_api_wrap_pointer(
     , PARROT_ASSERT_ARG(errmsg))
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
-#define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(lang))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_reset_call_signature \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_api_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_api_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(type) \
+    , PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_Parrot_api_set_configuration_hash \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_set_executable_name \
@@ -303,7 +314,7 @@ PARROT_API
 Parrot_Int Parrot_api_run_bytecode(
     Parrot_PMC interp_pmc,
     Parrot_PMC pbc,
-    Parrot_PMC mainargs);
+    Parrot_PMC args);
 
 PARROT_API
 Parrot_Int Parrot_api_serialize_bytecode_pmc(
@@ -472,6 +483,14 @@ Parrot_Int Parrot_api_string_import_wchar(
 
 /* HEADERIZER BEGIN: src/embed/pmc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_API
+Parrot_Int Parrot_api_pmc_box_float(
+    Parrot_PMC interp_pmc,
+    Parrot_Float value,
+    ARGOUT(Parrot_PMC * float_pmc))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* float_pmc);
 
 PARROT_API
 Parrot_Int Parrot_api_pmc_box_integer(
@@ -705,6 +724,8 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* args);
 
+#define ASSERT_ARGS_Parrot_api_pmc_box_float __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(float_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(int_pmc))
 #define ASSERT_ARGS_Parrot_api_pmc_box_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

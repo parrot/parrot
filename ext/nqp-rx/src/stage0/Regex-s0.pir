@@ -1,4 +1,4 @@
-# $Id$
+# 
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ This file brings together the various Regex modules needed for Regex.pbc .
 
 ### .include 'src/Regex/Cursor.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
+# 
 
 =head1 NAME
 
@@ -954,7 +954,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/Regex/Cursor-builtins.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
+# 
 
 =head1 NAME
 
@@ -1678,7 +1678,7 @@ tokrx hash.
 
 ### .include 'src/Regex/Match.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
+# 
 
 =head1 NAME
 
@@ -1886,7 +1886,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/Regex/Method.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
+# 
 
 =head1 NAME
 
@@ -1971,7 +1971,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 ### .include 'src/Regex/Dumper.pir'
 # Copyright (C) 2005-2009, Parrot Foundation.
 # Copyright (C) 2009, The Perl Foundation.
-# $Id$
+# 
 
 =head1 TITLE
 
@@ -2178,7 +2178,7 @@ An alternate dump output for a Match object and all of its subcaptures.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/PAST/Regex.pir'
-# $Id: Regex.pir 41578 2009-09-30 14:45:23Z pmichaud $
+# $Id$
 
 =head1 NAME
 
@@ -2492,7 +2492,7 @@ Copyright (C) 2009, The Perl Foundation.
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/PAST/Compiler-Regex.pir'
-# $Id$
+# 
 
 =head1 NAME
 

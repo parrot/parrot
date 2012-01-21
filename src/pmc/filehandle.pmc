@@ -543,25 +543,10 @@ Print the passed in integer, number, string, or PMC to the filehandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        Parrot_io_putps(INTERP, SELF, string_to_print);
-    }
+        const INTVAL status = Parrot_io_putps(INTERP, SELF, string_to_print);
 
-
-/*
-
-=item C<METHOD puts(STRING *value)>
-
-Print the string to the filehandle.
-
-=cut
-
-*/
-
-    METHOD puts(STRING *to_print) {
-        const INTVAL status = Parrot_io_putps(INTERP, SELF, to_print);
         RETURN(INTVAL status);
     }
-
 
 /*
 
@@ -695,6 +680,23 @@ in the file.
         RETURN(INTVAL flags);
     }
 
+
+/*
+
+=item C<METHOD handle()>
+
+Returns the INTVAL used by the OS to identify this filehandle.
+
+=cut
+
+*/
+
+    METHOD handle() {
+        INTVAL handle;
+        GET_ATTR_os_handle(INTERP, SELF, handle);
+        RETURN(INTVAL handle);
+    }
+
 /*
 
 =item C<METHOD exit_status()>
@@ -775,11 +777,34 @@ Returns the next byte from the stream, but does not remove it.
 
 /*
 
+=item C<METHOD setasync()>
+
+=cut
+
+*/
+    METHOD setasync() {
+        Parrot_io_async(INTERP, SELF, 1);
+    }
+
+/*
+
+=item C<METHOD setblocking()>
+
+=cut
+
+*/
+    METHOD setblocking() {
+        Parrot_io_async(INTERP, SELF, 0);
+    }
+
+/*
+
 =back
 
 =cut
 
 */
+
 
 } /* end pmclass */
 

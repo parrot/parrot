@@ -29,7 +29,7 @@ IMCC helpers.
 #include <stdlib.h>
 
 #include "imc.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
@@ -43,8 +43,7 @@ extern int yydebug;
 /* defined in imcc.l */
 PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
-/* XXX non-reentrant */
-static Parrot_mutex eval_nr_lock;
+/* XXX non-reentrant because of global variables */
 static INTVAL       eval_nr  = 0;
 
 /* HEADERIZER HFILE: include/imcc/embed.h */
@@ -553,8 +552,10 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
-    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
-    INTVAL           success     = 0;
+    PMC      * const old_packfilepmc = Parrot_pf_get_current_packfile(imcc->interp);
+    STRING   * const pf_path = is_file ? source : STRINGNULL;
+    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw, pf_path);
+    INTVAL           success = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
@@ -574,16 +575,12 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
     if (imcc->error_code) {
-        imcc->error_code = IMCC_FATAL_EXCEPTION;
-        IMCC_warning(imcc, "error:imcc:%Ss", imcc->error_message);
-        /* Don't use this function. use IMCC_get_error_location instead */
-        IMCC_print_inc(imcc);
-
         yylex_destroy(yyscanner);
 
         /* XXX Parrot_pf_get_packfile_pmc registers PMC */
         Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
-
+        if (!PMC_IS_NULL(old_packfilepmc))
+            Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
         return PMCNULL;
     }
 
@@ -592,9 +589,13 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
 
+    /* TODO: Do not use this function, it is deprecated (TT #2140). Find a
+       better way to handle :immediate and :postcomp subs instead. */
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
+    if (!PMC_IS_NULL(old_packfilepmc))
+        Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
     return packfilepmc;
 }
 
@@ -674,9 +675,6 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
         mem_sys_free(imcc->globals);
 
     mem_sys_free(imcc);
-
-    if (eval_nr != 0)
-        MUTEX_DESTROY(eval_nr_lock);
 }
 
 /*

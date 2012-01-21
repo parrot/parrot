@@ -6,12 +6,15 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 use Parrot::Test::Util 'create_tempfile';
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
 
-plan tests => 3;
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 8;
 
 =head1 NAME
 
@@ -42,7 +45,6 @@ sub linedirective
 ##include <string.h>
 ##include "parrot/parrot.h"
 ##include "parrot/api.h"
-##include "parrot/embed.h"
 ##include "parrot/extend.h"
 #
 #static void fail(const char *msg);
@@ -190,6 +192,140 @@ print $PIR_FILE <<'PIR_CODE';
 .end
 PIR_CODE
 
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_runcore: invalid runcore");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    /* This should throw an exception */
+    Parrot_api_set_runcore(interp, "junk", 0);
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_call_signature");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+
+    Parrot_String callcontext_s;
+    Parrot_PMC callcontext_sp;
+    Parrot_PMC callcontext_class;
+    Parrot_PMC callcontext;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
+    Parrot_api_pmc_box_string(interp, callcontext_s, &callcontext_sp);
+    Parrot_api_pmc_get_class(interp, callcontext_sp, &callcontext_class);
+    Parrot_api_pmc_new_from_class(interp, callcontext_class, NULL, &callcontext);
+
+    Parrot_api_reset_call_signature(interp, callcontext);
+
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_set_runcore");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+#define PARROT_PROFILE_FLAG 0x08
+
+int main(void) {
+    Parrot_PMC interp;
+    Parrot_PMC pir_compiler;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_debug_flag(interp, 0x01, 0);
+
+    Parrot_api_flag(interp, PARROT_PROFILE_FLAG, 0);
+    Parrot_api_flag(interp, PARROT_PROFILE_FLAG, 1);
+
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
+    Parrot_api_set_runcore(interp, "exec", 0);
+
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_get_exception_backtrace");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_PMC interp, exception, pmc;
+    Parrot_String errmsg, backtrace, pmc_s;
+    Parrot_Int exit_code, is_error;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
+
+    Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg);
+
+    Parrot_api_get_exception_backtrace(interp, exception, &backtrace);
+
+    /* Covers code for a null exception pmc being passed in */
+    Parrot_api_get_result(interp, &is_error, &pmc, &exit_code, &errmsg);
+
+    /* Covers code for a null backtrace pmc being passed in */
+    Parrot_api_pmc_get_string(interp, pmc, &pmc_s);
+    Parrot_api_get_exception_backtrace(interp, exception, &pmc_s);
+    return 0;
+}
+CODE
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_(un)wrap_pointer");
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+int main(void) {
+    Parrot_Int wrap1, wrap2, unwrap, size;
+    Parrot_PMC interp;
+    Parrot_PMC pir_compiler;
+    Parrot_PMC ptr;
+    char *p;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+
+    imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
+
+    wrap1 = Parrot_api_wrap_pointer(interp, pir_compiler, 0, &ptr);
+
+    wrap2 = Parrot_api_wrap_pointer(interp, pir_compiler, 1, &ptr);
+
+    unwrap = Parrot_api_unwrap_pointer(interp, pir_compiler, (void**) &p, &size);
+    return 0;
+}
+CODE
+OUTPUT
+
 c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_reset_call_signature" );
 #include <stdio.h>
 #include <stdlib.h>
@@ -210,11 +346,16 @@ int main(void) {
     Parrot_PMC callcontext, myobject, mymethod;
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+    Parrot_api_set_runcore(interp, "gcdebug", 0);
     Parrot_api_string_import(interp, "$temp_pir", &filename);
     Parrot_api_toggle_gc(interp, 0);
     imcc_get_pir_compreg_api(interp, 1, &pir_compiler);
     imcc_compile_file_api(interp, pir_compiler, filename, &bytecode);
     Parrot_api_run_bytecode(interp, bytecode, NULL);
+
+    Parrot_api_set_warnings(interp, 0);
+    Parrot_api_add_library_search_path(interp, ".");
+    Parrot_api_add_dynext_search_path(interp, ".");
 
     Parrot_api_string_import_ascii(interp, "Pi->", &signature_s);
 

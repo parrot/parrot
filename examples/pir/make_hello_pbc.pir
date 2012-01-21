@@ -67,7 +67,7 @@
     $S0 = pf
     $P1 = new ['FileHandle']
     $P1.'open'("generated_hello.pbc", "w")
-    $P1.'puts'($S0)
+    $P1.'print'($S0)
     $P1.'close'()
 
     # And check it!

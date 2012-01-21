@@ -188,7 +188,7 @@ Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
      */
     if (buffer_flags & PIO_BF_WRITEBUF) {
         /* Flush to next layer */
-        size_t    to_write = buffer_next - buffer_start;
+        const size_t to_write = buffer_next - buffer_start;
         size_t    wrote;
         PIOHANDLE os_handle;
 
@@ -231,8 +231,8 @@ size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_fill_readbuf)
-    unsigned char    *buf  = Parrot_io_get_buffer_start(interp, filehandle);
-    size_t            size = Parrot_io_get_buffer_size(interp, filehandle);
+    unsigned char * const buf = Parrot_io_get_buffer_start(interp, filehandle);
+    const size_t size = Parrot_io_get_buffer_size(interp, filehandle);
     size_t            got;
     PIOHANDLE         os_handle;
 
@@ -269,8 +269,7 @@ The buffer layer's C<Read> function.
 
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGMOD(char *dest), size_t len)
+Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(char *dest), size_t len)
 {
     ASSERT_ARGS(Parrot_io_read_buffer)
     unsigned char *buffer_next, *buffer_end;
@@ -764,8 +763,8 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    INTVAL    buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    PIOOFF_T  file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    const PIOOFF_T file_pos     = Parrot_io_get_file_position(interp, filehandle);
     PIOHANDLE os_handle;
 
     if (whence == SEEK_CUR) {

@@ -5,7 +5,10 @@
          "source" : [
              "docs/pdds/*.pod",
              "docs/pdds/draft/*.pod"
-         ], 
+         ],
+         "resource" : [
+             "docs/pdds/*.png"
+         ],
          "title" : "Design Documents"
       }
    ],

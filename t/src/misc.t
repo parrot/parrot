@@ -6,9 +6,12 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 plan tests => 4;
 
@@ -40,7 +43,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf" )
 #include <stdlib.h>
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
@@ -55,13 +57,13 @@ int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
     char buf[11];
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     Parrot_snprintf(interp, buf, 11, "test%d", 123456);
     puts(buf);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -74,7 +76,6 @@ c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_vsnprintf wi
 #include <stdlib.h>
 
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/misc.h"
 
 void fail(const char *msg);
@@ -89,7 +90,7 @@ int main(int argc, const char **argv)
 {
     Parrot_Interp interp;
     char buf[] = "unchanged";
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     Parrot_snprintf(interp, buf, 0, "");
@@ -97,7 +98,7 @@ int main(int argc, const char **argv)
     if (strcmp(buf, "unchanged") == 0) puts("Done");
     else fail(buf);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE

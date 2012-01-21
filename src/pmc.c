@@ -20,6 +20,7 @@ The base vtable calling functions
 #include "parrot/parrot.h"
 #include "pmc.str"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_integer.h"
 #include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
@@ -160,6 +161,45 @@ Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
             return pmc;
         }
     }
+}
+
+/*
+
+=item C<PMC * Parrot_pmc_new_from_type(PARROT_INTERP, PMC *key)>
+
+Creates a new PMC of type C<key>. You probably do not want this function as
+it is only used by a few experimental opcodes. See C<Parrot_pmc_new()> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
+{
+    ASSERT_ARGS(Parrot_pmc_new_from_type)
+
+    PMC *pmc;
+    PMC *const classobj = Parrot_oo_get_class(interp, key);
+
+    if (!PMC_IS_NULL(classobj))
+        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
+    else {
+        const INTVAL type = Parrot_pmc_get_type(interp, key);
+
+        if (type <= 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
+                VTABLE_get_repr(interp, key));
+        }
+
+        pmc = Parrot_pmc_new(interp, type);
+    }
+
+    return pmc;
 }
 
 /*
@@ -323,6 +363,25 @@ Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_), U
     return pmc;
 }
 
+/*
+
+=item C<Parrot_PMC Parrot_pmc_null(void)>
+
+Returns the special C<NULL> PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+Parrot_PMC
+Parrot_pmc_null(void)
+{
+    ASSERT_ARGS(Parrot_pmc_null)
+    return PMCNULL;
+}
 
 /*
 
@@ -488,49 +547,6 @@ Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)>
-
-Creates a new constant PMC of type C<base_type>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
-{
-    ASSERT_ARGS(Parrot_pmc_new_constant_noinit)
-    return get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
-}
-
-
-/*
-
-=item C<PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)>
-
-Creates a new constant PMC of type C<base_type>, then calls its C<init>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)
-{
-    ASSERT_ARGS(Parrot_pmc_new_constant)
-    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
-    VTABLE_init(interp, pmc);
-    return pmc;
-}
-
-
-/*
-
 =item C<PMC * Parrot_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)>
 
 As C<Parrot_pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> vtable entry.
@@ -589,55 +605,6 @@ Parrot_pmc_new_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
 }
 
 
-
-/*
-
-=item C<PMC * Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, PMC
-*init)>
-
-As C<Parrot_pmc_new_constant>, but passes C<init> to the PMC's C<init_pmc> vtable
-entry.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_pmc_new_constant_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
-{
-    ASSERT_ARGS(Parrot_pmc_new_constant_init)
-    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
-    VTABLE_init_pmc(interp, pmc, init);
-    return pmc;
-}
-
-
-/*
-
-=item C<PMC * Parrot_pmc_new_constant_init_int(PARROT_INTERP, INTVAL base_type,
-INTVAL init)>
-
-As C<Parrot_pmc_new_constant>, but passes C<init> to the PMC's C<init_int> vtable
-entry.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC *
-Parrot_pmc_new_constant_init_int(PARROT_INTERP, INTVAL base_type, INTVAL init)
-{
-    ASSERT_ARGS(Parrot_pmc_new_constant_init_int)
-    PMC * const pmc = get_new_pmc_header(interp, base_type, PObj_constant_FLAG);
-    VTABLE_init_int(interp, pmc, init);
-    return pmc;
-}
-
-
 /*
 
 =item C<PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)>
@@ -652,7 +619,7 @@ allow the storage of any regular PMC in this PMC. Temporary PMCs do not
 participate in garbage collection, and mixing them with PMCs that are
 garbage-collected will cause bugs.
 
-If you don't know what this means means, or you can't tell if either case
+If you don't know what this means, or you can't tell if either case
 will happen as the result of any call you make on or with this PMC,
 B<DO NOT> use this function, lest you cause weird crashes and memory errors.
 Use C<Parrot_pmc_new()> instead.
@@ -786,7 +753,7 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
             if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;
             else
-                return VTABLE_get_integer(interp, item);
+                return PARROT_INTEGER(item)->iv;
         }
         else
             return -Parrot_dt_get_datatype_enum(interp, name);
@@ -811,7 +778,7 @@ PMC *
 Parrot_pmc_box_string(PARROT_INTERP, ARGIN_NULLOK(STRING *string))
 {
     ASSERT_ARGS(Parrot_pmc_box_string)
-    PMC * ret = Parrot_pmc_new(interp,
+    PMC * const ret = Parrot_pmc_new(interp,
                         Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
     VTABLE_set_string_native(interp, ret, string);
 
@@ -1132,10 +1099,8 @@ Parrot_pmc_type_does(PARROT_INTERP, ARGIN(const STRING *role), INTVAL type)
 
 =head1 SEE ALSO
 
-F<include/parrot/vtable.h>.
-
-C<5.1.0.14.2.20011008152120.02158148@pop.sidhe.org>
-(http://www.nntp.perl.org/group/perl.perl6.internals/5516).
+F<include/parrot/pmc.h>, F<include/parrot/vtable.h>,
+L<http://www.nntp.perl.org/group/perl.perl6.internals/2001/10/msg5516.html>
 
 =cut
 

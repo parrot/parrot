@@ -13,7 +13,6 @@
 
 #include "parrot/core_pmcs.h"
 #include "parrot/pobj.h"
-#include "parrot/thread.h"
 
 #define PARROT_MAX_CLASSES 100
 
@@ -90,28 +89,10 @@ PMC * Parrot_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pmc_new_constant(PARROT_INTERP, INTVAL base_type)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pmc_new_constant_init(PARROT_INTERP,
-    INTVAL base_type,
-    ARGIN_NULLOK(PMC *init))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pmc_new_constant_init_int(PARROT_INTERP,
-    INTVAL base_type,
-    INTVAL init)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_pmc_new_constant_noinit(PARROT_INTERP, INTVAL base_type)
-        __attribute__nonnull__(1);
+PMC * Parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -131,6 +112,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+Parrot_PMC Parrot_pmc_null(void);
 
 PARROT_EXPORT
 INTVAL Parrot_pmc_register_new_type(PARROT_INTERP, ARGIN(STRING *name))
@@ -219,16 +205,9 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pmc_is_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pmc_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_new_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_new_constant_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_new_constant_init_int \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pmc_new_constant_noinit \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_new_from_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pmc_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(init))
@@ -236,6 +215,7 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pmc_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_null __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pmc_register_new_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
@@ -263,24 +243,6 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
     , PARROT_ASSERT_ARG(role))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pmc.c */
-
-/* Allows compatibility with old name (see r44190) */
-#define Parrot_create_mro       Parrot_pmc_create_mro
-#define PMC_is_null             Parrot_pmc_is_null
-#define constant_pmc_new        Parrot_pmc_new_constant
-#define constant_pmc_new_init   Parrot_pmc_new_constant_init
-#define gc_register_pmc         Parrot_pmc_gc_register
-#define gc_unregister_pmc       Parrot_pmc_gc_unregister
-#define pmc_new                 Parrot_pmc_new
-#define pmc_new_init            Parrot_pmc_new_init
-#define pmc_new_noinit          Parrot_pmc_new_noinit
-#define pmc_register            Parrot_pmc_register_new_type
-#define pmc_reuse               Parrot_pmc_reuse
-#define pmc_reuse_by_class      Parrot_pmc_reuse_by_class
-#define pmc_reuse_init          Parrot_pmc_reuse_init
-#define pmc_reuse_no_init       Parrot_pmc_reuse_noinit
-#define pmc_type                Parrot_pmc_get_type_str
-#define pmc_type_p              Parrot_pmc_get_type
 
 #define PMC_IS_TYPE(p, t) ((p)->vtable->base_type == enum_class_ ## t)
 #define PMC_IS_TYPE_ENUM(p, e) ((p)->vtable->base_type == (e))

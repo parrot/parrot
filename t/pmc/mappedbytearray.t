@@ -80,12 +80,17 @@ Tests the MappedByteArray PMC.
     mm = new ['MappedByteArray'], filename
 
     $I0 = elements mm
-    is( $I0, 43, "Number of elements" )
+    # The test file is one line of text, and line ending may have been
+    # converted, so the lenght can be one byte different.
+    $I1 = $I0 == 43
+    $I2 = $I0 == 44
+    $I0 = $I1 + $I2
+    is( $I0, 1, "Number of elements" )
 
     $I1 = mm."close"()
     is( $I1, 0, 'Closed and unmapped testfile' )
 
-    throws_substring(<<'CODE', 'cannot open file', 'mmap a nonexistant file')
+    throws_substring(<<'CODE', 'cannot open file', 'mmap a nonexistent file')
     .sub main
         $P0 = new ['String']
         $P0 = "wezwuyebgjuzmhewrugnjzrg"

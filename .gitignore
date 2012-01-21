@@ -10,6 +10,10 @@
 *.patch
 *.diff
 
+# Ignore profiling files
+callgrind.out.*
+cachegrind.out.*
+
 # ports/ should not go into release tarballs
 *.obj
 *.rc
@@ -33,6 +37,9 @@
 /*.tmp
 # vim swap files
 /\.*sw?
+/*/*.sw?
+/*/*/*.sw?
+/*/*/*/*.sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
@@ -51,6 +58,7 @@
 /installable*
 /libparrot.def
 /libparrot.dll
+/libparrot.dll.a
 /miniparrot
 /myconfig
 /ops2c
@@ -73,7 +81,7 @@
 /parrot_nci_thunk_gen
 /parrot_nci_thunk_gen.c
 /parrot_nci_thunk_gen.pbc
-/parrot_test_run.tar.gz
+/parrot_old
 /pbc_disassemble
 /pbc_dump
 /pbc_info
@@ -175,42 +183,14 @@
 /examples/pir/befunge/MANIFEST
 /examples/pir/befunge/befunge
 /examples/pir/befunge/installable_befunge
-/ext/Makefile
-/ext/Parrot-Embed/*.bs
-/ext/Parrot-Embed/*.bundle
-/ext/Parrot-Embed/*.c
-/ext/Parrot-Embed/*.def
-/ext/Parrot-Embed/*.dll
-/ext/Parrot-Embed/*.dump
-/ext/Parrot-Embed/*.dylib
-/ext/Parrot-Embed/*.exe
-/ext/Parrot-Embed/*.exp
-/ext/Parrot-Embed/*.h
-/ext/Parrot-Embed/*.ilk
-/ext/Parrot-Embed/*.lib
-/ext/Parrot-Embed/*.manifest
-/ext/Parrot-Embed/*.o
-/ext/Parrot-Embed/*.obj
-/ext/Parrot-Embed/*.old
-/ext/Parrot-Embed/*.pdb
-/ext/Parrot-Embed/*.pdb
-/ext/Parrot-Embed/*.so
-/ext/Parrot-Embed/*.tmp
-/ext/Parrot-Embed/*.xs
-/ext/Parrot-Embed/Build
-/ext/Parrot-Embed/Build.bat
-/ext/Parrot-Embed/Makefile
-/ext/Parrot-Embed/Makefile.PL
-/ext/Parrot-Embed/_build
-/ext/Parrot-Embed/blib
-/ext/Parrot-Embed/dll.base
-/ext/Parrot-Embed/pm_to_blib
-/ext/Parrot-Embed/lib/Parrot/*.c
-/ext/Parrot-Embed/lib/Parrot/*.obj
-/ext/Parrot-Embed/t/*.pbc
 /ext/nqp-rx/src/stage0/nqp-setting.pir
 /frontend/parrot/main.o
+/frontend/parrot2/main.o
+/frontend/parrot2/prt0.pbc
+/frontend/parrot2/prt0.pbc.c
+/frontend/parrot2/prt0.pbc.o
 /frontend/parrot_debugger/main.o
+/frontend/pbc_disassemble/main.o
 /frontend/pbc_dump/main.o
 /frontend/pbc_dump/packdump.o
 /frontend/pbc_merge/main.o
@@ -239,6 +219,7 @@
 /runtime/parrot/dynext/*.bundle
 /runtime/parrot/dynext/*.def
 /runtime/parrot/dynext/*.dll
+/runtime/parrot/dynext/*.dll.a
 /runtime/parrot/dynext/*.dylib
 /runtime/parrot/dynext/*.exe
 /runtime/parrot/dynext/*.exp
@@ -255,6 +236,7 @@
 /runtime/parrot/include/*.pir
 /runtime/parrot/languages/JSON/JSON.pir
 /runtime/parrot/languages/data_json
+/runtime/parrot/languages/winxed
 /runtime/parrot/library/*.pbc
 /runtime/parrot/library/OpenGL_funcs.pir
 /runtime/parrot/library/PAST
@@ -312,6 +294,8 @@
 /src/parrot_config.c
 /src/parrot_config.h
 /src/platform/*/*.o
+/src/platform/*/*.gcda
+/src/platform/*/*.gcno
 /src/revision.c
 /src/atomic/*.o
 /src/call/*.o
@@ -320,6 +304,7 @@
 /src/dynoplibs/*.bundle
 /src/dynoplibs/*.c
 /src/dynoplibs/*.dll
+/src/dynoplibs/*.dll.a
 /src/dynoplibs/*.exp
 /src/dynoplibs/*.h
 /src/dynoplibs/*.ilk
@@ -335,6 +320,7 @@
 /src/dynpmc/*.c
 /src/dynpmc/*.def
 /src/dynpmc/*.dll
+/src/dynpmc/*.dll.a
 /src/dynpmc/*.dump
 /src/dynpmc/*.dylib
 /src/dynpmc/*.exe
@@ -358,7 +344,6 @@
 /src/nci/*.o
 /src/nci/*.obj
 /src/nci/*.str
-/src/ops/*.c
 /src/ops/*.o
 /src/ops/*.obj
 /src/packfile/*.o
@@ -382,6 +367,7 @@
 /src/string/charset/*.obj
 /src/string/encoding/*.o
 /src/string/encoding/*.obj
+/t/archive/parrot_test_run.tar.gz
 /t/benchmark/*.pasm
 /t/benchmark/*.pir
 /t/compilers/data_json/*.pbc
@@ -448,9 +434,14 @@
 /t/pmc/*_pbcexe*
 /t/pmc/testlib/*.pbc
 /t/src/*_*.c
+/t/src/*.exe
+/t/src/*.lib
+/t/src/*.exp
 /t/src/*.gcov
 /t/src/*.gcdada
 /t/src/embed/*.c
+/t/src/embed*.o
+/t/src/extend*.o
 /t/stress/*.out
 /t/stress/*.pasm
 /t/stress/*.pbc
@@ -525,6 +516,8 @@
 /src/string/encoding/*.gcda
 /src/string/encoding/*.gcno
 /src/string/encoding/*.gcov
+/winxed
+/winxed.*
 # Local variables:
 #   mode: text
 #   buffer-read-only: t

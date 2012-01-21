@@ -327,7 +327,7 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     }
 
     /* exception */
-    return NULL;
+    return STRINGNULL;
 }
 
 /*
@@ -1146,7 +1146,13 @@ return current Namespace
             return 0;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
-        return autobox_intval(INTERP, &cells[key]);
+        {
+            const Pcc_cell *cell = &cells[key];
+            if (CELL_TYPE_MASK(cell) == INTCELL)
+                return CELL_INT(cell);
+
+            return autobox_intval(INTERP, cell);
+        }
     }
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
@@ -1167,7 +1173,7 @@ return current Namespace
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
-            return NULL;
+            return STRINGNULL;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         return autobox_string(INTERP, &cells[key]);
@@ -1352,8 +1358,12 @@ return current Namespace
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
+            if (cell) {
+                if (CELL_TYPE_MASK(cell) == INTCELL)
+                    return CELL_INT(cell);
+
                 return autobox_intval(INTERP, cell);
+            }
         }
 
         return 0;
@@ -1387,7 +1397,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
@@ -1417,8 +1427,11 @@ return current Namespace
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
+            if (cell) {
+                if (CELL_TYPE_MASK(cell) == INTCELL)
+                    return CELL_INT(cell);
                 return autobox_intval(INTERP, cell);
+            }
         }
 
         return 0;
@@ -1451,7 +1464,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {

@@ -376,9 +376,13 @@ C<signature> are:
     # look up the nci function and save as lexical
     .local pmc func
     func = dlfunc library, name, dlsig
+    .local int isdef
+    isdef = defined func
+    unless isdef goto ret
 
     # if no transformations needed, no need to wrap!
     if dlsig != signature goto do_nciwrap
+  ret:
     .return (func)
 
   do_nciwrap:
@@ -431,6 +435,18 @@ C<signature> are:
     func = find_lex 'func'
     (retv :slurpy) = func(args :flat)
 
+    .local int rett
+    $S0 = substr signature, 0, 1
+    rett = iseq $S0, 't'
+    unless rett goto have_retv
+    .local string rets
+    retv = pop retv
+    rets = null
+    if null retv goto have_retv
+    .local string rets
+    rets = 'str_new'(interp, retv, 0)
+  have_retv:
+
   free_loop:
     unless strfreelist goto free_done
     $P0 = pop strfreelist
@@ -438,18 +454,11 @@ C<signature> are:
     goto free_loop
   free_done:
 
-    $S0 = substr signature, 0, 1
-    if $S0 == 't' goto nci_ret_t
+    if rett goto nci_ret_t
     .return (retv :flat)
 
   nci_ret_t:
-    retv = pop retv                 # get the first value out of the slurpy
-    if null retv goto nci_ret_t_null
-    $S0 = 'str_new'(interp, retv, 0)
-    .return ($S0)
-  nci_ret_t_null:
-    $S0 = null
-    .return ($S0)
+    .return (rets)
 .end
 
 

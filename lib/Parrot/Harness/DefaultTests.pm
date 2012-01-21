@@ -6,30 +6,23 @@ Parrot::Harness::DefaultTests - Tests run by default by F<t/harness>
 
 =head1 DESCRIPTION
 
-Upon request, this package exports six arrays holding various sets of paths to
+Upon request, this package exports four arrays holding glob patterns for
 directories holding test files:
 
     @runcore_tests
     @core_tests
     @library_tests
     @configure_tests
+
+The package also exports one array holding a list of test files:
+
     @developing_tests
 
-Each of these arrays holds a list of paths containing wildcards which are
-expanded by the shell when provided to programs such as F<t/harness>.  The
-paths describe directories holding test files.
+The definition of these lists is found in
+F<lib/Parrot/Harness/TestSets.pm>.
 
-Example:
-
-    @core_tests = qw(
-        t/run/*.t
-        t/src/*.t
-        t/perl/*.t
-    );
-
-
-In addition, Parrot::Harness::Default Tests exports B<by default> one
-subroutine:  C<get_default_tests()>.  In list context, C<get_default_tests()>
+In addition, Parrot::Harness::DefaultTests exports B<by default> one
+subroutine:  C<get_common_tests()>.  In list context, C<get_common_tests()>
 returns a list of shell-expandable paths to the most common tests.  In scalar
 context it returns a reference to that list.
 
@@ -56,49 +49,31 @@ our @EXPORT_OK = qw(
     @configure_tests
     @developing_tests
 );
+use lib qw( ./lib );
+use Parrot::Harness::TestSets qw(
+    %test_groups
+    @major_test_group
+    @near_core_test_group
+);
 
 # runcore tests are always run.
-@runcore_tests = qw(
-    t/compilers/imcc/*/*.t
-    t/op/*.t
-    t/pmc/*.t
-    t/oo/*.t
-    t/pir/*.t
-    t/native_pbc/*.t
-);
+@runcore_tests = @{ $test_groups{runcore} };
 
 # core tests are run unless --runcore-tests is present.  Typically
 # this list and the list above are run in response to --core-tests
-@core_tests = qw(
-    t/src/*.t
-    t/src/embed/*.t
-    t/run/*.t
-    t/perl/*.t
-);
-
+foreach my $el (@near_core_test_group) {
+    push @core_tests, @{$el};
+}
 
 # library tests are run unless --runcore-tests or --core-tests is present.
-@library_tests = qw(
-    t/compilers/pct/*.t
-    t/compilers/pge/*.t
-    t/compilers/pge/p5regex/*.t
-    t/compilers/pge/perl6regex/*.t
-    t/compilers/tge/*.t
-    t/compilers/opsc/*.t
-    t/compilers/data_json/*.t
-    t/dynoplibs/*.t
-    t/dynpmc/*.t
-    t/library/*.t
-    t/tools/*.t
-    t/profiling/*.t
-);
+foreach my $el (@major_test_group) {
+    push @library_tests, @{$el};
+}
 
 # configure tests are tests to be run at the beginning of 'make test';
-@configure_tests = qw( t/configure/*.t t/steps/*.t t/postconfigure/*.t );
+@configure_tests = @{ $test_groups{configure} };
 
-@developing_tests = (
-    ( glob 't/codingstd/*.t' ),
-);
+@developing_tests = glob("@{ $test_groups{codingstd} }");
 
 sub get_common_tests {
     my ($longopts) = @_;

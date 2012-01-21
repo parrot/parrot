@@ -9,12 +9,11 @@
  */
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-/* A Bison parser, made by GNU Bison 2.4.3.  */
+/* A Bison parser, made by GNU Bison 2.5.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2009, 2010 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2011 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -137,32 +136,33 @@
      OUTER = 343,
      NEED_LEX = 344,
      MULTI = 345,
-     VTABLE_METHOD = 346,
-     LOADLIB = 347,
-     SUB_INSTANCE_OF = 348,
-     SUBID = 349,
-     NS_ENTRY = 350,
-     LABEL = 351,
-     EMIT = 352,
-     EOM = 353,
-     IREG = 354,
-     NREG = 355,
-     SREG = 356,
-     PREG = 357,
-     IDENTIFIER = 358,
-     REG = 359,
-     MACRO = 360,
-     ENDM = 361,
-     STRINGC = 362,
-     INTC = 363,
-     FLOATC = 364,
-     USTRINGC = 365,
-     PARROT_OP = 366,
-     VAR = 367,
-     LINECOMMENT = 368,
-     FILECOMMENT = 369,
-     DOT = 370,
-     CONCAT = 371
+     SUBTAG = 346,
+     VTABLE_METHOD = 347,
+     LOADLIB = 348,
+     SUB_INSTANCE_OF = 349,
+     SUBID = 350,
+     NS_ENTRY = 351,
+     LABEL = 352,
+     EMIT = 353,
+     EOM = 354,
+     IREG = 355,
+     NREG = 356,
+     SREG = 357,
+     PREG = 358,
+     IDENTIFIER = 359,
+     REG = 360,
+     MACRO = 361,
+     ENDM = 362,
+     STRINGC = 363,
+     INTC = 364,
+     FLOATC = 365,
+     USTRINGC = 366,
+     PARROT_OP = 367,
+     VAR = 368,
+     LINECOMMENT = 369,
+     FILECOMMENT = 370,
+     DOT = 371,
+     CONCAT = 372
    };
 #endif
 /* Tokens.  */
@@ -254,32 +254,33 @@
 #define OUTER 343
 #define NEED_LEX 344
 #define MULTI 345
-#define VTABLE_METHOD 346
-#define LOADLIB 347
-#define SUB_INSTANCE_OF 348
-#define SUBID 349
-#define NS_ENTRY 350
-#define LABEL 351
-#define EMIT 352
-#define EOM 353
-#define IREG 354
-#define NREG 355
-#define SREG 356
-#define PREG 357
-#define IDENTIFIER 358
-#define REG 359
-#define MACRO 360
-#define ENDM 361
-#define STRINGC 362
-#define INTC 363
-#define FLOATC 364
-#define USTRINGC 365
-#define PARROT_OP 366
-#define VAR 367
-#define LINECOMMENT 368
-#define FILECOMMENT 369
-#define DOT 370
-#define CONCAT 371
+#define SUBTAG 346
+#define VTABLE_METHOD 347
+#define LOADLIB 348
+#define SUB_INSTANCE_OF 349
+#define SUBID 350
+#define NS_ENTRY 351
+#define LABEL 352
+#define EMIT 353
+#define EOM 354
+#define IREG 355
+#define NREG 356
+#define SREG 357
+#define PREG 358
+#define IDENTIFIER 359
+#define REG 360
+#define MACRO 361
+#define ENDM 362
+#define STRINGC 363
+#define INTC 364
+#define FLOATC 365
+#define USTRINGC 366
+#define PARROT_OP 367
+#define VAR 368
+#define LINECOMMENT 369
+#define FILECOMMENT 370
+#define DOT 371
+#define CONCAT 372
 
 
 
@@ -288,7 +289,7 @@
 typedef union YYSTYPE
 {
 
-/* Line 1685 of yacc.c  */
+/* Line 2068 of yacc.c  */
 #line 1026 "compilers/imcc/imcc.y"
 
     IdList * idlist;
@@ -299,8 +300,8 @@ typedef union YYSTYPE
 
 
 
-/* Line 1685 of yacc.c  */
-#line 293 "compilers/imcc/imcparser.h"
+/* Line 2068 of yacc.c  */
+#line 294 "compilers/imcc/imcparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -7,7 +7,7 @@ src/exceptions.c - Exceptions
 
 =head1 DESCRIPTION
 
-Define the the core subsystem for exceptions.
+Define the core subsystem for exceptions.
 
 =head2 Exception Functions
 
@@ -20,6 +20,8 @@ Define the the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "parrot/exceptions.h"
+#include "parrot/events.h"
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
@@ -146,19 +148,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
             VTABLE_set_string_native(interp, exception, newmessage);
         }
-
     }
-
-    /*
-     * returning NULL from here returns resume address NULL to the
-     * runloop, which will terminate the thread function finally
-     *
-     * TT #1287 this check should better be in Parrot_x_exit
-     */
-
-    /* no exception handler, but this is not the main thread */
-    if (interp->thread_data && interp->thread_data->tid)
-        pt_thread_detach(interp->thread_data->tid);
 
     Parrot_x_jump_out(interp, 1);
 }
@@ -585,7 +575,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
-    Interp *emergency_interp = Parrot_get_emergency_interp();
+    Interp *emergency_interp = Parrot_interp_get_emergency_interpreter();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -626,7 +616,7 @@ Parrot_print_backtrace(void)
 #  endif
     fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
     if (emergency_interp) {
-        Parrot_clear_emergency_interp();
+        Parrot_interp_clear_emergency_interpreter();
         PDB_backtrace(emergency_interp);
     }
 #  undef BACKTRACE_DEPTH

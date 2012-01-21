@@ -855,6 +855,10 @@ Generic method for compilers invoked from a shell command line.
     $I0 = adverbs['version']
     if $I0 goto version
 
+    .local string target
+    target = adverbs['target']
+    target = downcase target
+
     .local int can_backtrace, ll_backtrace
     can_backtrace = can self, 'backtrace'
     unless can_backtrace goto no_push_eh
@@ -882,6 +886,9 @@ Generic method for compilers invoked from a shell command line.
     goto save_output
   eval_line:
     result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
+    if target == '' goto save_output
+    if target == 'pir' goto save_output
+    '_dumper'(result, target)
 
   save_output:
     unless can_backtrace goto no_pop_eh
@@ -890,9 +897,6 @@ Generic method for compilers invoked from a shell command line.
     if null result goto end
     $I0 = defined result
     unless $I0 goto end
-    .local string target
-    target = adverbs['target']
-    target = downcase target
     if target != 'pir' goto end
     .local string output
     .local pmc ofh
@@ -992,7 +996,7 @@ memoize the line offsets as a C<!lineof> property on C<target>.
     # find one, mark the ending offset of the line in C<linepos>.
   linepos_loop:
     jpos = find_cclass .CCLASS_NEWLINE, s, jpos, eos
-    unless jpos < eos goto linepos_done
+    unless jpos < eos goto linepos_done_1
     $I0 = ord s, jpos
     inc jpos
     push linepos, jpos
@@ -1002,23 +1006,27 @@ memoize the line offsets as a C<!lineof> property on C<target>.
     if $I0 != 10 goto linepos_loop
     inc jpos
     goto linepos_loop
+  linepos_done_1:
   linepos_done:
 
-    # We have C<linepos>, so now we search the array for the largest
-    # element that is not greater than C<pos>.  The index of that
-    # element is the line number to be returned.
-    # (Potential optimization: use a binary search.)
-    .local int line, count
-    count = elements linepos
-    line = 0
-  line_loop:
-    if line >= count goto line_done
+    # We have C<linepos>, so now we (binary) search the array
+    # for the largest element that is not greater than C<pos>.
+    .local int lo, hi, line
+    lo = 0
+    hi = elements linepos
+  binary_loop:
+    if lo >= hi goto binary_done
+    line = lo + hi
+    line = line / 2
     $I0 = linepos[line]
-    if $I0 > pos goto line_done
-    inc line
-    goto line_loop
-  line_done:
-    .return (line)
+    if $I0 > pos goto binary_hi
+    lo = line + 1
+    goto binary_loop
+  binary_hi:
+    hi = line
+    goto binary_loop
+  binary_done:
+    .return (lo)
 .end
 
 

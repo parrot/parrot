@@ -52,8 +52,9 @@ Parrot_init_platform_encoding(PARROT_INTERP)
         else if (STREQ(codeset, "ANSI_X3.4-1968"))
             Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
         else {
-            Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
-                "Unknown codeset `%s', defaulting to ASCII", codeset);
+            /* Can't use Parrot_warn here, the interpreter is not ready */
+            fprintf(stderr,
+                "Unknown codeset `%s', defaulting to ASCII\n", codeset);
             Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
         }
     }

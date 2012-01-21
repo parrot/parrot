@@ -22,6 +22,7 @@ bounds access will very likely segfault.
 */
 
 #include "parrot/compiler.h"
+#include "parrot/string_funcs.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -809,7 +810,7 @@ pmclass UnManagedStruct auto_attrs no_ro {
 
 =back
 
-=head2 Methods
+=head2 Vtable Functions
 
 =over 4
 
@@ -911,6 +912,8 @@ Returns whether the two C<struct>s are equivalent.
 
 /*
 
+=item C<INTVAL get_bool()>
+
 =item C<INTVAL defined()>
 
 Returns whether the C<struct> is defined.
@@ -918,6 +921,10 @@ Returns whether the C<struct> is defined.
 =cut
 
 */
+
+    VTABLE INTVAL get_bool() {
+        return SELF.get_pointer() != NULL;
+    }
 
     VTABLE INTVAL defined() {
         return SELF.get_pointer() != NULL;
@@ -1207,6 +1214,29 @@ Sets the value of the element associated with key C<*key> to C<*value>.
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         set_string(INTERP, p, type, value);
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<as_string(string encodingname)>
+
+Create a string from the buffer, assumed to be a C string, with the encoding
+specified. If the encoding is omitted or null, use platform encoding.
+
+=cut
+
+*/
+
+    METHOD as_string(STRING *encodingname :optional) {
+        const char * content = (const char *)SELF.get_pointer();
+        STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
+        RETURN(STRING result);
     }
 
 }

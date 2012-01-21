@@ -271,6 +271,97 @@ Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(size_t len), ARGIN(const char 
     return retval;
 }
 
+/*
+
+=item C<int Parrot_vfprintf(PARROT_INTERP, Parrot_PMC pio, const char *s,
+va_list args)>
+
+Writes a C string format with a varargs list to a PIO.
+
+=item C<int Parrot_fprintf(PARROT_INTERP, Parrot_PMC pio, const char *s, ...)>
+
+Writes a C string format with varargs to a PIO.
+
+=item C<int Parrot_printf(NULLOK_INTERP, const char *s, ...)>
+
+Writes a C string format with varargs to C<stdout>
+
+=item C<int Parrot_eprintf(NULLOK_INTERP, const char *s, ...)>
+
+Writes a C string format with varargs to C<stderr>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), va_list args)
+{
+    ASSERT_ARGS(Parrot_vfprintf)
+    STRING * str;
+    INTVAL retval;
+
+    str = Parrot_vsprintf_c(interp, s, args);
+    retval = Parrot_io_putps(interp, pio, str);
+
+    return retval;
+}
+
+PARROT_EXPORT
+int
+Parrot_fprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
+        ARGIN(const char *s), ...)
+{
+    ASSERT_ARGS(Parrot_fprintf)
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+    retval = Parrot_vfprintf(interp, pio, s, args);
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_EXPORT
+int
+Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    ASSERT_ARGS(Parrot_printf)
+    va_list args;
+    INTVAL retval;
+    va_start(args, s);
+
+    if (interp)
+        retval = Parrot_vfprintf(interp, Parrot_io_STDOUT(interp), s, args);
+    else
+        retval = vfprintf(stdout, s, args);
+    va_end(args);
+
+    return retval;
+}
+
+PARROT_EXPORT
+int
+Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+{
+    ASSERT_ARGS(Parrot_eprintf)
+    va_list args;
+    INTVAL retval;
+
+    va_start(args, s);
+
+    if (interp)
+        retval = Parrot_vfprintf(interp, Parrot_io_STDERR(interp), s, args);
+    else
+        retval = vfprintf(stderr, s, args);
+
+    va_end(args);
+
+    return retval;
+}
 
 /*
 
@@ -278,7 +369,7 @@ Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(size_t len), ARGIN(const char 
 
 =head1 SEE ALSO
 
-F<src/misc.h>, F<src/spf_vtable.c>, F<src/spf_render.c>.
+F<src/spf_vtable.c>, F<src/spf_render.c>, F<include/parrot/misc.h>
 
 =head1 HISTORY
 

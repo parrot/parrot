@@ -4,32 +4,10 @@
 
 BEGIN_OPS_PREAMBLE
 
-PARROT_WARN_UNUSED_RESULT
-PMC *
-parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
-{
-    PMC *pmc;
-    PMC *const classobj = Parrot_oo_get_class(interp, key);
-
-    if (!PMC_IS_NULL(classobj))
-        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
-    else {
-        const INTVAL type = Parrot_pmc_get_type(interp, key);
-
-        if (type <= 0) {
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
-                VTABLE_get_repr(interp, key));
-        }
-
-        pmc = Parrot_pmc_new(interp, type);
-    }
-
-    return pmc;
-}
+#include "parrot/scheduler_private.h"
+#include "pmc/pmc_task.h"
 
 END_OPS_PREAMBLE
-
 =head1 NAME
 
 experimental.ops - Experimental Opcodes
@@ -99,6 +77,23 @@ inline op get_label(out INT, invar PMC) {
     $1 =  PTR2INTVAL(ptr);
 }
 
+=item B<get_id>(out INT, in PMC)
+
+Gets a unique(*) ID for a PMC.
+
+This may or may not be based on the pointer of the PMC, but almost certainly is
+not the raw pointer value.
+
+(*) Uniqueness of these IDs is only guarranteed within code to which this PMC is
+currently visible (ie: not across processes, or share-nothing threads, and not
+beyond the lifetime of the PMC).
+
+=cut
+
+inline op get_id(out INT, in PMC) {
+    $1 = Parrot_hash_pointer((void *)$2, interp->hash_seed);
+}
+
 =item B<fetch>(out PMC, in PMC, in PMC, in PMC)
 
 Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
@@ -114,7 +109,7 @@ inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -122,7 +117,7 @@ inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -130,7 +125,7 @@ inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -149,7 +144,7 @@ inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed(interp, $2, $3, $1);
     }
@@ -159,7 +154,7 @@ inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_int(interp, $2, $3, $1);
     }
@@ -169,7 +164,7 @@ inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_str(interp, $2, $3, $1);
     }
@@ -271,6 +266,78 @@ op root_new(out PMC, in PMC, in INT) {
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
     }
+}
+
+=item B<receive>(out PMC)
+
+Receive a message sent to the current task.
+
+If there is no waiting message, block and wait.
+
+=cut
+
+op receive(out PMC) {
+    opcode_t *const dest = expr NEXT();
+    PMC *cur_task = Parrot_cx_current_task(interp);
+    Parrot_Task_attributes *tdata = PARROT_TASK(cur_task);
+    int msg_count;
+    if (PMC_IS_NULL(tdata->mailbox)) {
+        tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+        PARROT_GC_WRITE_BARRIER(interp, cur_task);
+        msg_count = 0;
+    }
+    else
+        msg_count = VTABLE_elements(interp, tdata->mailbox);
+
+    if (msg_count > 0) {
+        $1 = VTABLE_shift_pmc(interp, tdata->mailbox);
+        goto ADDRESS(dest);
+    }
+    else {
+        TASK_recv_block_SET(cur_task);
+        (void) Parrot_cx_stop_task(interp, cur_opcode);
+        goto ADDRESS(0);
+    }
+}
+
+=item B<wait>(in PMC)
+
+Block and wait for a task to complete.
+
+=cut
+
+op wait(in PMC) {
+    opcode_t *const next = expr NEXT();
+    PMC *task = $1;
+    PMC *cur_task;
+    Parrot_Task_attributes *tdata;
+
+    if (!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Argument to wait op must be a Task.\n");
+
+    cur_task = Parrot_cx_stop_task(interp, next);
+    tdata    = PARROT_TASK(task);
+    if (PMC_IS_NULL(tdata->waiters)) {
+        tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        PARROT_GC_WRITE_BARRIER(interp, task);
+    }
+    VTABLE_push_pmc(interp, tdata->waiters, cur_task);
+
+    goto ADDRESS(0);
+}
+
+=item B<pass>()
+
+Pass the rest of the current quantum and schedule the next
+task in the task queue.
+
+=cut
+
+op pass() {
+    opcode_t *const next = expr NEXT();
+    opcode_t *const addr = Parrot_cx_preempt_task(interp, interp->scheduler, next);
+    goto ADDRESS(addr);
 }
 
 =back
