@@ -76,12 +76,32 @@ sub _set_malloc_header {
 
 sub _set_ptrcast {
     my $conf = shift;
-    if ( $conf->data->get('ptrsize') == $conf->data->get('intsize') ) {
-        $conf->data->set( ptrcast => 'int' );
+
+    my $ptrsize = $conf->data->get('ptrsize');
+    my $ptrcast = $conf->data->get("int${ptrsize}_t");
+
+    if ( defined $ptrcast ) {}
+    elsif ( $ptrsize == 1 ) {
+        $ptrcast = 'signed char';
+    }
+    elsif ( $ptrsize == $conf->data->get('shortsize') ) {
+        $ptrcast = 'short';
+    }
+    elsif ( $ptrsize == $conf->data->get('intsize') ) {
+        $ptrcast = 'int';
+    }
+    elsif ( $ptrsize == $conf->data->get('longsize') ) {
+        $ptrcast = 'long';
+    }
+    elsif ( $ptrsize == $conf->data->get('longlongsize') ) {
+        $ptrcast = 'long long';
     }
     else {
-        $conf->data->set( ptrcast => 'long' );
+        die "Failed to determine pointer-sized integer type ".
+            "(note: pointer-size is $ptrsize)";
     }
+
+    $conf->data->set( ptrcast => $ptrcast );
 }
 
 sub _set_memalign {
