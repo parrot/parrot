@@ -1,5 +1,5 @@
-/* runcore_api.h
- *  Copyright (C) 2001-2009, Parrot Foundation.
+/* runcore_profiling.h
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Functions and macros to dispatch opcodes.
  */
