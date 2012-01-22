@@ -75,32 +75,6 @@ $step = test_step_constructor_and_description($conf);
     $conf->data->set('i_malloc' => undef); # reset for next test
 }
 
-########### _set_ptrcast()  ###########
-
-{
-    $conf->data->set('ptrsize' => 2);
-    $conf->data->set('intsize' => 2);
-    ok(auto::memalign::_set_ptrcast($conf),
-        "_set_ptrcast() returned true value");
-    is($conf->data->get( 'ptrcast' ), 'int',
-        "ptrcast has expected value");
-    # reset for next test
-    $conf->data->set('ptrsize' => undef);
-    $conf->data->set('intsize' => undef);
-}
-
-{
-    $conf->data->set('ptrsize' => 2);
-    $conf->data->set('intsize' => 4);
-    ok(auto::memalign::_set_ptrcast($conf),
-        "_set_ptrcast() returned true value");
-    is($conf->data->get( 'ptrcast' ), 'long',
-        "ptrcast has expected value");
-    # reset for next test
-    $conf->data->set('ptrsize' => undef);
-    $conf->data->set('intsize' => undef);
-}
-
 ########### _set_memalign()  ###########
 
 {
