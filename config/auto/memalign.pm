@@ -41,8 +41,6 @@ sub runstep {
 
     _set_malloc_header($conf);
 
-    _set_ptrcast($conf);
-
     $conf->cc_gen('config/auto/memalign/test_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run_capture() !~ /ok/ ) {
@@ -71,16 +69,6 @@ sub _set_malloc_header {
     }
     else {
         $conf->data->set( malloc_header => 'stdlib.h' );
-    }
-}
-
-sub _set_ptrcast {
-    my $conf = shift;
-    if ( $conf->data->get('ptrsize') == $conf->data->get('intsize') ) {
-        $conf->data->set( ptrcast => 'int' );
-    }
-    else {
-        $conf->data->set( ptrcast => 'long' );
     }
 }
 
