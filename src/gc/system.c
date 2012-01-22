@@ -144,11 +144,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
         getcontext(&ucp);
         _Asm_flushrs();
 
-#    if defined(_LP64)
-        current_regstore_top = (void*)(uint64_t)_Asm_mov_from_ar(_AREG_BSP);
-#    else
-        current_regstore_top = (void*)(uint32_t)_Asm_mov_from_ar(_AREG_BSP);
-#    endif
+        current_regstore_top = (void*)(ptrcast_t)_Asm_mov_from_ar(_AREG_BSP);
 
         size_t base = 0;
         struct pst_vm_status buf;
