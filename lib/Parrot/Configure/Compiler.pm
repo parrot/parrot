@@ -488,6 +488,8 @@ sub genfile {
             my ($op, $expr, $rest);
             # allow multiple keys and nested parens here
             if (($op,$expr,$rest)=($line =~ m/^#(IF|UNLESS|ELSIF)\((.+)\):(.*)/s)) {
+#print STDERR "$line\n";
+                $conf->debug("genfile(): line: $line");
                 if (($op eq 'ELSIF') and $former_truth) {
                     next LINE;  # no useless check if former IF was true
                 }
@@ -665,9 +667,11 @@ sub cond_eval_single {
 sub cond_eval {
     my $conf = $_[0];
     my $expr = $_[1];
+#print STDERR "cond_eval expr:  $expr\n";
+    $conf->debug("cond_eval(): $expr\n");
     my @count = split /[\s!&|\(]+/, $expr; # optimizable with tr
+    my $truth = 0;
     if (@count > 1) { # multiple keys: recurse into
-        my $truth = 0;
         my $prevtruth = 0;
         my $key = next_expr($expr);
         my $op  = '';
@@ -721,9 +725,11 @@ sub cond_eval {
                 makecroak($conf, "Makefile conditional parser error in \"$_[1]\" at \"$prevexpr\"");
             }
         }
-        return $truth;
     }
-    cond_eval_single($conf, $expr);
+    else {
+        $truth = cond_eval_single($conf, $expr);
+    }
+    return $truth;
 }
 
 sub append_configure_log {
