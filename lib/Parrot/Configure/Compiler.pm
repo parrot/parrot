@@ -654,8 +654,8 @@ sub cond_eval_single {
     }
     else {
         return exists($conf->data->{c}->{$key})
-            ? ($conf->data()->get($key) ? 1 : 0)
-            : $key eq $conf->data()->get('osname');
+            ? ($conf->data->get($key) ? 1 : 0)
+            : $key eq $conf->data->get('osname');
     }
 }
 
