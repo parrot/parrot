@@ -12,6 +12,8 @@ use Parrot::Configure;
 my ($truth, $expr, $cc, $make, $key, $str, $str2, $str3);
 my $conf = Parrot::Configure->new;
 
+##### cond_eval_single() #####
+
 $truth = Parrot::Configure::Compiler::cond_eval_single($conf, $expr);
 ok(! defined $truth,
     "cond_eval_single() returns undef when second argument is not defined");
@@ -41,6 +43,8 @@ ok($truth, "cond_eval_single() identified osname");
 $expr = 'foo';
 $truth = Parrot::Configure::Compiler::cond_eval_single($conf, $expr);
 ok(! $truth, "cond_eval_single() unable to identify value or osname");
+
+##### next_expr() #####
 
 $expr = '';
 $key = Parrot::Configure::Compiler::next_expr($expr);
@@ -108,6 +112,14 @@ $key = Parrot::Configure::Compiler::next_expr($expr);
 is($key, $str,
     "next_expr() returned shortest match character as expected");
 is($expr, '', "next_expr() consumed input as expected");
+
+##### cond_eval() #####
+
+$cc = 'gcc';
+$conf->data->set( cc => $cc );
+$expr = 'cc==gcc';
+$truth = Parrot::Configure::Compiler::cond_eval($conf, $expr);
+ok($truth, "cond_eval() identified simple key-value pair");
 
 pass("Completed all tests in $0");
 
