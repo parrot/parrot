@@ -1056,14 +1056,12 @@ Returns a high-resolution number representing how long Parrot has been running.
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
 
-#  include <stdint.h>
-
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {
     ASSERT_ARGS(getticks)
 
-    uint32_t lo, hi;
+    unsigned lo, hi;
     __asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
     return (UHUGEINTVAL) hi << 32 | lo;
 }
