@@ -236,11 +236,11 @@ END_DUMMY
 
 =head1 NAME
 
-t/configure/034-step.t - tests Parrot::Configure::Compiler
+t/configure/034-genfile.t - tests Parrot::Configure::Compiler
 
 =head1 SYNOPSIS
 
-    prove t/configure/034-step.t
+    prove t/configure/034-genfile.t
 
 =head1 DESCRIPTION
 
