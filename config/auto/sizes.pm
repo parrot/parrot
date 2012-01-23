@@ -265,6 +265,8 @@ END
     else {
         $typesref->{intval} = $intptr;
         $conf->data->set( iv => $intptr );
+        $typesref->{opcode} = $intptr;
+        $conf->data->set( opcode_t => $intptr );
     }
 }
 
