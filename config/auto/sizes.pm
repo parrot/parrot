@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,7 +18,6 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Utils ':auto';
-
 
 sub _init {
     my $self = shift;
@@ -45,65 +44,40 @@ sub runstep {
         longdouble => 'long double',
     );
 
-    my %sizes = map {
-        $_, test_size($conf, $types{$_})
-    } keys %types;
+    my @std_ints   = ( 'short', 'int', 'long', 'long long' );
+    my @std_floats = ( 'float', 'double', 'long double' );
+    my @extra_ints = ( '__int16', '__int32', '__int64' );
 
-    for ( keys %sizes ) {
-        $conf->data->set( $_ . 'size' => $sizes{$_} );
+    my $sizes = _get_sizes($conf, values %types, @extra_ints);
+
+    $conf->data->set( HAS_LONGLONG => $sizes->{'long long'} ? 1 : 0 );
+
+    _handle_ptrcast(
+        $conf, \%types, $sizes, [ @std_ints, @extra_ints ]);
+
+    for ( keys %types ) {
+        $conf->data->set( $_.'size' => $sizes->{$types{$_}} );
     }
 
-    _handle_intval_ptrsize_discrepancy(\%sizes);
-    _handle_longlong($conf, \%sizes);
+    _set_intval_range($conf);
+    _set_floatval_range($conf);
 
-    # probe for 64-bit integer-types
-    foreach my $type ('int64_t', '__int64') {
-        my $size = test_size($conf, $type);
-        if ($size) {
-            $types{int64} = $type;
-            $sizes{int64} = $size;
-            last;
-        }
-    }
+    # not as portable as possible, but should cover common architectures
+    # extend list of types as necessary
 
-    # set fixed sized types
-    _set_int2($conf, \%types, \%sizes);
+    _set_fixed($conf, $sizes, 'int', 2, [ 'short', 'int', '__int16' ]);
+    _set_fixed($conf, $sizes, 'int', 4, [ 'int', 'long', '__int32' ]);
 
-    _set_int4($conf, \%types, \%sizes);
+    _handle_int64($conf, $sizes, [ 'long', 'long long', '__int64' ]);
 
-    _set_int8($conf, \%types, \%sizes);
+    _set_fixed($conf, $sizes, 'float', 4, [ 'float', 'double' ]);
+    _set_fixed($conf, $sizes, 'float', 8, [ 'double', 'long double' ]);
 
-    _set_float4($conf, \%types, \%sizes);
+    _set_huge($conf, $sizes, 'int',
+        [ reverse(@std_ints), reverse(@extra_ints), $types{intval} ] );
 
-    _set_float8($conf, \%types, \%sizes);
-
-    # get HUGEINTVAL
-    my $hiv = do {
-        my @t = ('long', 'int', 'longlong', 'int64', 'invtal');
-        my $i = maxind( @sizes{grep exists $sizes{$_}, @t} );
-        $t[$i];
-    };
-
-    $conf->data->set(
-        hugeintval     => $types{$hiv},
-        hugeintvalsize => $sizes{$hiv},
-    );
-
-    # get HUGEFLOATVAL
-    my $hfv = do {
-        my @t = ('float', 'double', 'longdouble', 'numval');
-        my $i = maxind( @sizes{@t} );
-        $t[$i];
-    };
-
-    $conf->data->set(
-        hugefloatval     => $types{$hfv},
-        hugefloatvalsize => $sizes{$hfv},
-    );
-
-    _set_intvalmaxmin($conf);
-
-    _set_floatvalmaxmin($conf);
+    _set_huge($conf, $sizes, 'float',
+        [ reverse(@std_floats), $types{numval} ] );
 
     return 1;
 }
@@ -122,161 +96,190 @@ sub test_size {
     return $ret;
 }
 
-sub maxind {
-    my $i = 0;
-    $_[$_] <= $_[$i] or $i = $_ for 0..$#_;
-    return $i;
+sub _get_sizes {
+    my $conf = shift;
+    my %sizes = map { $_ => 0 } @_;
+    $sizes{$_} = test_size($conf, $_) for keys %sizes;
+    return \%sizes;
 }
 
-sub _handle_intval_ptrsize_discrepancy {
-    my $sizesref = shift;
-    if ( $sizesref->{ptr} != $sizesref->{intval} ) {
-        print <<"END";
-
-Hmm, I see your chosen INTVAL isn't the same size as your pointers.  Parrot
-should still compile and run, but you may see a ton of warnings.
-END
+sub _find_type_eq {
+    my ($sizesref, $size, $checklist) = @_;
+    for ( @$checklist ) {
+        return $_ if $sizesref->{$_} == $size;
     }
 }
 
-sub _handle_longlong {
-    my ($conf, $sizesref) = @_;
-    $conf->data->set( HAS_LONGLONG => !!($sizesref->{longlong} > 0) );
-}
-
-sub _set_int2 {
-    my ($conf, $typesref, $sizesref) = @_;
-    if ( $sizesref->{short} == 2 ) {
-        $conf->data->set( int2_t => 'short' );
-    }
-    else {
-        $conf->data->set( int2_t => 'int' );
-        print <<'END';
-
-Can't find a int type with size 2, conversion ops might fail!
-
-END
+sub _find_type_ge {
+    my ($sizesref, $size, $checklist) = @_;
+    for ( @$checklist ) {
+        return $_ if $sizesref->{$_} >= $size;
     }
 }
 
-sub _set_int4 {
-    my ($conf, $typesref, $sizesref) = @_;
-    foreach my $type (qw[ short int long ]) {
-        if ( $sizesref->{$type} == 4 ) {
-            $conf->data->set( int4_t => $typesref->{$type} );
-            return;
+sub _find_type_max {
+    my ($sizesref, $checklist) = @_;
+    my $size = 0;
+    my $type;
+
+    for ( @$checklist ) {
+        if ( $sizesref->{$_} > $size ) {
+            $type = $_;
+            $size = $sizesref->{$_};
         }
     }
 
-    $conf->data->set( int4_t => 'int' );
-    print <<'END';
-
-Can't find a int type with size 4, conversion ops might fail!
-
-END
+    return $type;
 }
 
-sub _set_int8 {
-    my ($conf, $typesref, $sizesref) = @_;
-    foreach my $type (qw[ int long longlong int64 ]) {
-        if ( $sizesref->{$type} == 8 ) {
-            $conf->data->set(
-                int8_t       => $typesref->{$type},
-                HAS_INT64 => 1,
-            );
-            return;
-        }
-    }
+sub _set_fixed {
+    my ($conf, $sizesref, $kind, $size, $checklist) = @_;
+    my $type = _find_type_eq($sizesref, $size, $checklist);
+    my $name = $kind.$size.'_t';
 
-    $conf->data->set( HAS_INT64 => 0 );
-    print <<'END';
-
-Can't find an int type with size 8, 64-bit support dissabled.
-
-END
-}
-
-sub _set_float4 {
-    my ($conf, $typesref, $sizesref) = @_;
-    if ( $sizesref->{float} == 4 ) {
-        $conf->data->set( float4_t => 'float' );
+    if ( defined $type ) {
+        $conf->data->set( $name => $type );
+        return 1;
     }
     else {
-        $conf->data->set( float4_t => 'double' );
-        print <<'END';
+        $conf->data->set( $name => $checklist->[0] );
+        print <<END;
 
-Can't find a float type with size 4, conversion ops might fail!
+Can't find $kind type with size $size, conversion ops might fail!
 
 END
+        return 0;
     }
 }
 
-sub _set_float8 {
-    my ($conf, $typesref, $sizesref) = @_;
-    if ( $sizesref->{double} == 8 ) {
-        $conf->data->set( float8_t => 'double' );
-    }
-    else {
-        $conf->data->set( float8_t => 'double' );
-        print <<'END';
+sub _set_huge {
+    my ($conf, $sizesref, $kind, $checklist) = @_;
+    my $type = _find_type_max($sizesref, $checklist);
+    my $size = $sizesref->{$type};
 
-Can't find a float type with size 8, conversion ops might fail!
-
-END
-    }
+    $conf->data->set(
+        'huge'.$kind.'val'     => $type,
+        'huge'.$kind.'valsize' => $size
+    );
 }
 
-sub _set_intvalmaxmin {
+sub _set_intval_range {
     my $conf = shift;
     my $ivmin;
     my $ivmax;
-    my $iv = $conf->data->get(qw(iv));
+    my $iv = $conf->data->get('iv');
 
-    if ( $iv eq "int" ) {
+    if ( ( $iv eq 'short' ) || ( $iv eq 'short int' ) ) {
+        $ivmin = 'SHRT_MIN';
+        $ivmax = 'SHRT_MAX';
+    }
+    elsif ( $iv eq 'int' ) {
         $ivmin = 'INT_MIN';
         $ivmax = 'INT_MAX';
     }
-    elsif ( ( $iv eq "long" ) || ( $iv eq "long int" ) ) {
+    elsif ( ( $iv eq 'long' ) || ( $iv eq 'long int' ) ) {
         $ivmin = 'LONG_MIN';
         $ivmax = 'LONG_MAX';
     }
-    elsif ( ( $iv eq "long long" ) || ( $iv eq "long long int" ) ) {
+    elsif ( ( $iv eq 'long long' ) || ( $iv eq 'long long int' ) ) {
         # The assumption is that a compiler that have the long long type
-        # also provides his limit macros.
+        # also provides its limit macros.
         $ivmin = 'LLONG_MIN';
         $ivmax = 'LLONG_MAX';
     }
     else {
-        die qq{Configure.pl:  Cannot find limits for type '$iv'\n};
+        my $size = $conf->data->get('intvalsize');
+        my $n = 8 * $size;
+
+        $ivmin = -2 ** ($n - 1);
+        $ivmax = 2 ** ($n - 1) - 1;
+
+        print <<END;
+
+Your chosen integer type '$iv' does not look like a standard type.
+The range of representable values has been computed assuming a padding-free,
+two's complement representation and CHAR_BIT == 8.
+
+END
     }
 
     $conf->data->set( intvalmin   => $ivmin );
     $conf->data->set( intvalmax   => $ivmax );
 }
 
-sub _set_floatvalmaxmin {
+sub _set_floatval_range {
     my $conf = shift;
     my $nvmin;
     my $nvmax;
-    my $nv = $conf->data->get(qw(nv));
+    my $nv = $conf->data->get('nv');
 
-    if ( $nv eq "double" ) {
+    if ( $nv eq  'float') {
+        $nvmin = 'FLT_MIN';
+        $nvmax = 'FLT_MAX';
+    }
+    elsif ( $nv eq 'double' ) {
         $nvmin = 'DBL_MIN';
         $nvmax = 'DBL_MAX';
     }
-    elsif ( $nv eq "long double" ) {
-
-        # Stay way from long double for now (it may be 64 or 80 bits)
-        # die "long double not supported at this time, use double.";
+    elsif ( $nv eq 'long double' ) {
         $nvmin = 'LDBL_MIN';
         $nvmax = 'LDBL_MAX';
     }
     else {
-        die qq{Configure.pl:  Cannot find limits for type '$nv'\n};
+        print <<END;
+
+Your chosen numeric type '$nv' does not look like a standard type.
+The range of representable values cannot be computed for arbitrary
+floating-point types.
+
+END
+        die "Configure.pl: Cannot find limits for type '$nv'\n";
     }
 
     $conf->data->set( floatvalmin => $nvmin );
     $conf->data->set( floatvalmax => $nvmax );
+}
+
+sub _handle_ptrcast {
+    my ($conf, $typesref, $sizesref, $checklist) = @_;
+    my $intvalsize = $sizesref->{$typesref->{'intval'}};
+    my $ptrsize = $sizesref->{$typesref->{'ptr'}};
+    my $intptr = _find_type_ge($sizesref, $ptrsize, $checklist);
+
+    if ( defined $intptr ) {
+        $conf->data->set( ptrcast => 'unsigned '.$intptr );
+    }
+    else {
+        die "Configure.pl: No int type of at least pointer size found.\n";
+    }
+
+    return if $intvalsize >= $ptrsize;
+    if ( $conf->options->get('intval') or $conf->options->get('ask') ) {
+        print <<END;
+
+Hmm, I see your chosen INTVAL is of smaller size than your pointers. Parrot
+should still compile and run, but you may see a ton of warnings.
+
+END
+    }
+    else {
+        $typesref->{intval} = $intptr;
+        $conf->data->set( iv => $intptr );
+    }
+}
+
+sub _handle_int64 {
+    my ($conf, $sizesref, $checklist) = @_;
+    my $has_int64 = _set_fixed($conf, $sizesref, 'int', 8, $checklist);
+
+    $conf->data->set( HAS_INT64 => $has_int64 );
+
+    if ( not $has_int64 ) {
+        print <<'END';
+64-bit support disabled.
+
+END
+    }
 }
 
 1;
