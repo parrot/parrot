@@ -649,7 +649,7 @@ sub cond_eval {
     my $conf = $_[0];
     my $expr = $_[1];
     $conf->debug("cond_eval(): $expr\n");
-    my @count = split /[\s!&|\(]+/, $expr; # optimizable with tr
+    my @count = split /[\s!&|(]+/, $expr; # optimizable with tr
     my $truth = 0;
     if (@count > 1) { # multiple keys: recurse into
         my $prevtruth = 0;
