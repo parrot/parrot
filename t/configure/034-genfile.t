@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More qw(no_plan); # tests => 15;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
@@ -231,6 +231,63 @@ END_DUMMY
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
 }
+
+my $options = {};
+my $target;
+
+$target = 'my.makefile';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'makefile',
+    "_set_file_type_option(): Identified makefile");
+$options = {};
+
+$target = 'market.mak';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'makefile',
+    "_set_file_type_option(): Identified makefile");
+$options = {};
+
+$target = 'perlscript.pl';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'perl',
+    "_set_file_type_option(): Identified perl");
+$options = {};
+
+$target = 'MyModule.pm';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'perl',
+    "_set_file_type_option(): Identified perl");
+$options = {};
+
+$target = 'heavily_macroized.c';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'c',
+    "_set_file_type_option(): Identified c");
+$options = {};
+
+$target = 'heavily_macroized.h';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'c',
+    "_set_file_type_option(): Identified c");
+$options = {};
+
+$target = 'parrot_magic_cookie.pmc';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'pmc',
+    "_set_file_type_option(): Identified pmc");
+$options = {};
+
+$target = 'parrot_intermediate_representation.pir';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+is($options->{file_type}, 'pir',
+    "_set_file_type_option(): Identified pir");
+$options = {};
+
+$options->{file_type} = 'none';
+$target = 'foobar';
+$options = Parrot::Configure::Compiler::_set_file_type_option($options, $target);
+ok(! exists $options->{file_type},
+    "_set_file_type_option(): option deleted when it was 'none'");
 
 ################### DOCUMENTATION ###################
 
