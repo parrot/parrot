@@ -1,11 +1,12 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 # auto/sizes-01.t
 
 use strict;
 use warnings;
-use Test::More qw(no_plan); # tests => 43;
+use Test::More tests =>  8;
 use Carp;
+#use Data::Dumper;$Data::Dumper::Indent=1;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::sizes');
 use Parrot::Configure::Options qw( process_options );
@@ -15,8 +16,6 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw | capture |;
 
-
-########## _handle_intval_ptrsize_discrepancy() ##########
 
 my ($args, $step_list_ref) = process_options(
     {
@@ -37,6 +36,22 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
+
+{
+    my $nv = 'foobar';
+    $conf->data->set( nv => $nv );
+    my ($stdout, $stderr);
+    capture(
+        sub { eval { auto::sizes::_set_floatval_range($conf); };},
+        \$stdout,
+        \$stderr,
+    );
+    like($stdout,
+        qr/Your chosen numeric type '$nv' does not look like a standard type/,
+        "_set_floatval_range(): got expected explanatory message");
+    like($@, qr/Configure\.pl: Cannot find limits for type '$nv'/,
+        "_set_floatval_range(): got expected die message");
+}
 
 pass("Completed all tests in $0");
 
