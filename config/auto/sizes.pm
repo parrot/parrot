@@ -265,6 +265,10 @@ END
     else {
         $typesref->{intval} = $intptr;
         $conf->data->set( iv => $intptr );
+
+        # FIXME: workaround for issue #705
+        $typesref->{opcode} = $intptr;
+        $conf->data->set( opcode_t => $intptr );
     }
 }
 
