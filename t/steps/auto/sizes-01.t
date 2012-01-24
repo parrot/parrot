@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  8;
+use Test::More tests => 25;
 use Carp;
 #use Data::Dumper;$Data::Dumper::Indent=1;
 use lib qw( lib t/configure/testlib );
@@ -36,6 +36,129 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
+
+{
+    $conf->data->set('iv' => 'short');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'SHRT_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'SHRT_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'short int');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'SHRT_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'SHRT_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'int');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'INT_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'INT_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'long');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'LONG_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'LONG_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'long int');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'LONG_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'LONG_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'long long');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'LLONG_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'LLONG_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('iv' => 'long long int');
+    auto::sizes::_set_intval_range($conf);
+    is( $conf->data->get( 'intvalmin' ), 'LLONG_MIN',
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 'LLONG_MAX',
+        "_set_intval_range(): got expected intvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    my $intvalsize = 2;
+    my $iv = 'foobar';
+    $conf->data->set('iv' => $iv);
+    $conf->data->set('intvalsize' => $intvalsize);
+    my ($stdout, $stderr);
+    capture(
+        sub { auto::sizes::_set_intval_range($conf); },
+        \$stdout,
+        \$stderr,
+    );
+    is( $conf->data->get( 'intvalmin' ), -2 ** 15,
+        "_set_intval_range(): got expected intvalmin" );
+    is( $conf->data->get( 'intvalmax' ), 2 ** 15 - 1,
+        "_set_intval_range(): got expected intvalmax" );
+    like($stdout,
+        qr/Your chosen integer type '$iv' does not look like a standard type/s,
+        "_set_intval_range(): got expected explanatory message");
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
 
 {
     my $nv = 'foobar';
