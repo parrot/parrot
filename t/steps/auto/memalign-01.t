@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 # auto/memalign-01.t
 
 use strict;
