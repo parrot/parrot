@@ -228,6 +228,7 @@ foreach my $page (keys %pages) {
         }
         print $out_fh "</ul>\n\n";
     }
+
     # Note: This is a'bit of a hack to output html links directly into the
     #       "index.html" file.
     print $out_fh Parrot::Docs::HTMLPage->body('<h2>Development Languages</h2>',
