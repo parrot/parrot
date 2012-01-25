@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 31;
 use Carp;
 #use Data::Dumper;$Data::Dumper::Indent=1;
 use lib qw( lib t/configure/testlib );
@@ -36,6 +36,8 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
+
+##### _set_intval_range #####
 
 {
     $conf->data->set('iv' => 'short');
@@ -153,6 +155,50 @@ ok( $ret, "runstep() returned true value" );
     like($stdout,
         qr/Your chosen integer type '$iv' does not look like a standard type/s,
         "_set_intval_range(): got expected explanatory message");
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+##### _set_floatval_range #####
+
+{
+    $conf->data->set('nv' => 'float');
+    auto::sizes::_set_floatval_range($conf);
+    is( $conf->data->get( 'floatvalmin' ), 'FLT_MIN',
+        "_set_floatval_range(): got expected floatvalmin" );
+    is( $conf->data->get( 'floatvalmax' ), 'FLT_MAX',
+        "_set_floatval_range(): got expected floatvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('nv' => 'double');
+    auto::sizes::_set_floatval_range($conf);
+    is( $conf->data->get( 'floatvalmin' ), 'DBL_MIN',
+        "_set_floatval_range(): got expected floatvalmin" );
+    is( $conf->data->get( 'floatvalmax' ), 'DBL_MAX',
+        "_set_floatval_range(): got expected floatvalmax" );
+
+    # prepare for next set of tests
+    $conf->data->set( iv => undef );
+    $conf->data->set( intvalmin   => undef );
+    $conf->data->set( intvalmax   => undef );
+}
+
+{
+    $conf->data->set('nv' => 'long double');
+    auto::sizes::_set_floatval_range($conf);
+    is( $conf->data->get( 'floatvalmin' ), 'LDBL_MIN',
+        "_set_floatval_range(): got expected floatvalmin" );
+    is( $conf->data->get( 'floatvalmax' ), 'LDBL_MAX',
+        "_set_floatval_range(): got expected floatvalmax" );
 
     # prepare for next set of tests
     $conf->data->set( iv => undef );
