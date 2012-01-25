@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-tools/docs/make_html_docs.pl - Write HTML documentation
+tools/docs/mk_html_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/make_html_docs.pl [--version=VERSION]
+    % perl tools/docs/mk_html_docs.pl [--version=VERSION]
 
 =head1 DESCRIPTION
 
@@ -228,6 +228,12 @@ foreach my $page (keys %pages) {
         }
         print $out_fh "</ul>\n\n";
     }
+    # Note: This is a'bit of a hack to output html links directly into the
+    #       "index.html" file.
+    print $out_fh Parrot::Docs::HTMLPage->body('<h2>Development Languages</h2>',
+					       '<ul><li><a href="http://whiteknight.github.com/Rosella/winxed/index.html">The Winxed Programming Language</a></li>',
+					       '<li><a href="https://github.com/perl6/nqp">The NQP Programming Language</a></li></ul>');
+
     # output footer
     print $out_fh Parrot::Docs::HTMLPage->footer('', $resource_dir, $version);
 }
