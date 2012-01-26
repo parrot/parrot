@@ -148,7 +148,7 @@ work with in C<code>.
 
 =cut
 
-# TT #911 - the unlikely to conflict variable names here must be
+# GH #174 - the unlikely to conflict variable names here must be
 # replaced with the .macro_local syntax.
 .macro Foreach(name, array, code)
     .local int __Foreach__local__i

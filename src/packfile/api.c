@@ -810,7 +810,7 @@ Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
 alive by living subs.
 
 This function and the entire underlying mechanism should be deprecated and
-removed. See TT #2144 for details.
+removed. See GH #428 for details.
 
 =cut
 
