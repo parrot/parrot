@@ -61,17 +61,15 @@ say "first"
 .end
 
 END_PIR
-is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
-is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
-$expected_preprocesses_pir, 'option --pre-process-only' );
+for my $e ('-E', '--pre-process-only') {
+    is( `"$PARROT" $e "$first_pir_file" $redir`, $expected_preprocesses_pir, "option $e" );
+}
 
 # Test the trace option
-is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
-is( `"$PARROT" --trace "$first_pir_file" $redir`, "first\n", 'option --trace' );
-is( `"$PARROT" -t "$first_pir_file" "$second_pir_file" $redir`, "second\n",
-'option -t with flags' );
-is( `"$PARROT" --trace "$first_pir_file" "$second_pir_file" $redir`,
-"second\n", 'option --trace with flags' );
+for my $t ('-t', '--trace') {
+    is( `"$PARROT" $t "$first_pir_file" $redir`, "first\n", "option $t" );
+    is( `"$PARROT" $t "$first_pir_file" "$second_pir_file" $redir`, "second\n", "option $t with flags" );
+}
 
 ## test the -R & --runcore options
 {
