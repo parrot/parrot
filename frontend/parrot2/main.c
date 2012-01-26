@@ -554,8 +554,10 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int nargs = 0;
     int i;
 
-    // Any option with an argument we handle may split an argument
-    // into two.  So be pessimistic with the allocation.
+    /*
+     * Any option with an argument we handle may split an argument
+     * into two.  So be pessimistic with the allocation.
+     */
     int pargs_size = argc * 2;
     const char **pargs = (const char**)calloc(pargs_size, sizeof (char*));
 
@@ -687,7 +689,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     for (i = opt.opt_index; i < argc; i++)
         pargs[nargs++] = argv[i];
 
-    // Make sure we don't overrun the end of the array
+    /* Make sure we don't overrun the end of the array */
     PARROT_ASSERT(nargs <= pargs_size);
 
     args->argv = pargs;
