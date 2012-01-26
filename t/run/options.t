@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 38;
+use Test::More tests => 42;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -85,11 +85,13 @@ for my $val (qw/ slow fast bounds trace /) {
     }
 }
 
-$cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" $redir};
-is( qx{$cmd}, "second\n", "-r option <$cmd>" );
+for my $d8 ('-D 8', '--parrot-debug 8', '--parrot-debug=8') {
+    $cmd = qq{"$PARROT" $d8 -R slow "$second_pir_file" $redir};
+    is( qx{$cmd}, "second\n", "$d8 doesn't touch STDOUT" );
 
-$cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
-like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
+    $cmd = qq{"$PARROT" $d8 -R slow "$second_pir_file" 2>&1};
+    like( qx{$cmd}, qr/Parrot VM: slow core/, "$d8 prints runcore name" );
+}
 }
 
 # Test --runtime-prefix
@@ -153,8 +155,6 @@ for my $version ('-V', '--version') {
 
 ## GH #346 test remaining options
 
-# TODO: Add tests for long options
-# -D --parrot-debug
 # TODO: Add tests for attached options
 # Basically all long options
 # See runcore tests for good way to do it
