@@ -3,7 +3,7 @@
         + Shared libraries and installable binaries are now stripped if built with
           --optimize on Cygwin, which greatly reduces their size on disk
     - Documentation
-	+ Revised 'docs/project/release_manager_guid.pod'
+	+ Revised 'docs/project/release_manager_guide.pod'
     - Tests
 
 2012-01-17    release 4.0.0
