@@ -96,24 +96,18 @@ for my $d8 ('-D 8', '--parrot-debug 8', '--parrot-debug=8') {
 like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
 # TT #1797: check for warning error and mask off "did it crash?" bits
-my $output = qx{$PARROT --gc-dynamic-threshold 2>&1 };
-my $exit   = $? & 127;
-like( $output, qr/--gc-dynamic-threshold needs an argument/,
-             '--gc-dynamic-threshold needs argument warning' );
-is( $exit, 0, '... and should not crash' );
+needs_an_argument('--gc-dynamic-threshold');
 
 # GC nursery-size check for warning error and mask off "did it crash?" bits
-$output = qx{$PARROT --gc-nursery-size 2>&1 };
-$exit   = $? & 127;
-like( $output, qr/--gc-nursery-size needs an argument/,
-                 '--gc-nursery-size needs argument warning' );
-is( $exit, 0, '... and should not crash' );
+needs_an_argument('--gc-nursery-size');
 
-$output = qx{$PARROT --gc-nursery-size=51 2>&1 };
-$exit   = $? & 127;
-like( $output, qr/maximum GC nursery size is 50%/,
-                 '--gc-nursery-size max warning' );
-is( $exit, 0, '... and should not crash' );
+{
+    my $output = qx{$PARROT --gc-nursery-size=51 2>&1 };
+    my $exit   = $? & 127;
+    like( $output, qr/maximum GC nursery size is 50%/,
+                     '--gc-nursery-size max warning' );
+    is( $exit, 0, '... and should not crash' );
+}
 
 
 # Test --leak-test
@@ -141,6 +135,16 @@ END_PIR
 
     return $filename;
 }
+
+# Check that an option checks for its argument
+sub needs_an_argument {
+    my $arg    = shift;
+    my $output = qx{$PARROT $arg 2>&1 };
+    my $exit   = $? & 127;
+    like( $output, qr/$arg needs an argument/, "$arg needs argument warning" );
+    is( $exit, 0, '... and should not crash' );
+}
+
 
 #make sure that VERSION matches the output of --version
 open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
