@@ -109,9 +109,19 @@ needs_an_argument('--gc-nursery-size');
     is( $exit, 0, '... and should not crash' );
 }
 
-
 # Test --leak-test
 is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
+
+#make sure that VERSION matches the output of --version
+open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
+my $file_version = <$version_fh>;
+chomp($file_version);
+close($version_fh);
+for my $version ('-V', '--version') {
+    like( qx{$PARROT $version}, qr/.*${file_version}.*/, "VERSION matches $version" );
+}
+
+
 
 # clean up temporary files
 unlink $first_pir_file;
@@ -145,15 +155,6 @@ sub needs_an_argument {
     is( $exit, 0, '... and should not crash' );
 }
 
-
-#make sure that VERSION matches the output of --version
-open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
-my $file_version = <$version_fh>;
-chomp($file_version);
-close($version_fh);
-for my $version ('-V', '--version') {
-    like( qx{$PARROT $version}, qr/.*${file_version}.*/, "VERSION matches $version" );
-}
 
 ## GH #346 test remaining options
 
