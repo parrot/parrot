@@ -1,7 +1,6 @@
 before_script: 
     - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev
-    - ./configure --ccflags="-g"
-script: "make test"
+script: "./configure --ccflags='-g' && make test"
 # branches:
 #   only:
 #     - master
