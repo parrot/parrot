@@ -90,8 +90,6 @@ $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
 like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
 }
 
-## GH #346 test remaining options
-
 # Test --runtime-prefix
 like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );
 
@@ -149,10 +147,52 @@ chomp($file_version);
 close($version_fh);
 like( qx{$PARROT --version}, qr/.*${file_version}.*/, "VERSION matches --version" );
 
+## GH #346 test remaining options
+
+# TODO: Add tests for short options
+# -h --help
+# -V --version
+# TODO: Add tests for long options
+# -D --parrot-debug
+# TODO: Add tests for attached options
+# Basically all long options
+# See runcore tests for good way to do it
+
+# TODO: Add tests for more options
+# -I --include PATH
+# -L --library PATH
+# -X --dynext PATH
+#    --hash-seed HEX
+#    --help-debug
+# -w --warnings
+# -G --no-gc
+# -h --gc ms2|gms|ms|inf
+#    --gc-min-threshold
+#    --gc-debug
+#    --destroy-at-end (is this same as --leak-test?)
+# -. --wait
+# FILE  (.pasm, .pir, .pbc)
+
+# These are IMCC options.  Add tests here or in t/compilers/imcc ?
+# -d --imcc-debug HEX
+# -v --verbose
+# -o --output FILE
+#        .pasm, .pbc, .o endings
+#    --output-pbc
+# -O --optimize INT
+# -a --pasm
+# -c --pbc
+# -r --run-pbc
+# -y --yydebug
+# -p --profile (in docs/running.pod, not in --help)
+
+# These IMCC options are tested here.  Move them?
+# -E --pre-process-only
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
+
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
