@@ -72,6 +72,21 @@ sub header {
 HEADER
 }
 
+=item C<body(@html_tags)>
+
+=cut
+
+sub body {
+    my $self = shift;
+
+    my $body;
+    foreach(@_) {
+	$body .= $_;
+    }
+
+    return $body;
+}
+
 =item C<footer($navigation, $resources)>
 
 Returns the page footer.
