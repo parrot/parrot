@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 50;
+use Test::More tests => 53;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -31,6 +31,14 @@ for my $help ('-h', '--help') {
     my $help_message = `$PARROT $help`;
     is( substr( $help_message, 0, 23 ), 'parrot [Options] <file>', "Start of $help message" );
     ok( index( $help_message, '-t --trace [flags]' ) > 0, '$help for --trace' );
+}
+
+# looking at the debug help message
+{
+    my $help_message = `"$PARROT" --help-debug`;
+    ok( index( $help_message, '--imcc-debug' ) >= 0, '--help-debug for --imcc-debug' );
+    ok( index( $help_message, '--parrot-debug' ) >= 0, '--help-debug for --parrot-debug' );
+    ok( index( $help_message, '--trace' ) >= 0, '--help-debug for --trace' );
 }
 
 # setup PIR files for tests below
@@ -176,7 +184,6 @@ sub needs_an_argument {
 # -I --include PATH
 # -L --library PATH
 # -X --dynext PATH
-#    --help-debug
 # -w --warnings
 # -G --no-gc
 # -h --gc ms2|gms|ms|inf
