@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 42;
+use Test::More tests => 50;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -121,7 +121,20 @@ for my $version ('-V', '--version') {
     like( qx{$PARROT $version}, qr/.*${file_version}.*/, "VERSION matches $version" );
 }
 
+# Test --hash-seed
+needs_an_argument('--hash-seed');
 
+for my $hash ('--hash-seed ', '--hash-seed=') {
+    my $arg = 'xyz';
+    my $output = qx{"$PARROT" $hash$arg 2>&1};
+    my $exit = $? & 127;
+    like( $output, qr/invalid hash seed/, "$hash rejects bad hash" );
+    is( $exit, 0, '... and should not crash' );
+
+    $arg = 'f00';
+    is( qx{"$PARROT" $hash$arg "$first_pir_file" $redir}, "first\n",
+        "$hash takes a hex value" );
+}
 
 # clean up temporary files
 unlink $first_pir_file;
@@ -158,15 +171,11 @@ sub needs_an_argument {
 
 ## GH #346 test remaining options
 
-# TODO: Add tests for attached options
-# Basically all long options
-# See runcore tests for good way to do it
-
 # TODO: Add tests for more options
+# Make sure you include attached versions
 # -I --include PATH
 # -L --library PATH
 # -X --dynext PATH
-#    --hash-seed HEX
 #    --help-debug
 # -w --warnings
 # -G --no-gc
