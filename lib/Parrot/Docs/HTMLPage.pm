@@ -72,7 +72,11 @@ sub header {
 HEADER
 }
 
-=item C<body(@html_tags)>
+=item C<body(@html)>
+
+Returns the html code, I<e.g.,> links, passed to it.
+
+C<@html> is a simple array to hold the html links passed to this subroutine.
 
 =cut
 

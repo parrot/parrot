@@ -229,11 +229,18 @@ foreach my $page (keys %pages) {
         print $out_fh "</ul>\n\n";
     }
 
-    # Note: This is a'bit of a hack to output html links directly into the
-    #       "index.html" file.
-    print $out_fh Parrot::Docs::HTMLPage->body('<h2>Development Languages</h2>',
-					       '<ul><li><a href="http://whiteknight.github.com/Rosella/winxed/index.html">The Winxed Programming Language</a></li>',
-					       '<li><a href="https://github.com/perl6/nqp">The NQP Programming Language</a></li></ul>');
+    # ========================================================================#
+    # Note: The below is a bit of a hack to output html links directly into   #
+    #       the 'index.html' file.  The reason for this hackery is, this      #
+    #       script uses json formatted files to pull in various *.pod files   #
+    #       in order to create the 'index.html' (along with other *.html      #
+    #       pages.  Unfortunately, there is no simple way to insert html      #
+    #       markup directly into the 'index.html' file; hence, the below bit  #
+    #       of code.  -- acy 01/25/12                                         #
+    # ========================================================================#
+    print $out_fh Parrot::Docs::HTMLPage->body("<h2>Development Languages</h2>\n\n",
+					       "<ul><li><a href=\"http://whiteknight.github.com/Rosella/winxed/index.html\">The Winxed Programming Language</a></li>\n",
+					       "<li><a href=\"https://github.com/perl6/nqp\">The NQP Programming Language</a></li>\n</ul>\n\n");
 
     # output footer
     print $out_fh Parrot::Docs::HTMLPage->footer('', $resource_dir, $version);
