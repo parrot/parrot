@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 35;
+use Test::More tests => 38;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -27,9 +27,11 @@ use File::Spec;
 my $PARROT = ".$PConfig{slash}$PConfig{test_prog}";
 
 # looking at the help message
-my $help_message = `$PARROT --help`;
-is( substr( $help_message, 0, 23 ), 'parrot [Options] <file>', 'Start of help message' );
-ok( index( $help_message, '-t --trace [flags]' ) > 0, 'help for --trace' );
+for my $help ('-h', '--help') {
+    my $help_message = `$PARROT $help`;
+    is( substr( $help_message, 0, 23 ), 'parrot [Options] <file>', "Start of $help message" );
+    ok( index( $help_message, '-t --trace [flags]' ) > 0, '$help for --trace' );
+}
 
 # setup PIR files for tests below
 my $first_pir_file  = create_pir_file('first');
@@ -145,13 +147,12 @@ open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
 my $file_version = <$version_fh>;
 chomp($file_version);
 close($version_fh);
-like( qx{$PARROT --version}, qr/.*${file_version}.*/, "VERSION matches --version" );
+for my $version ('-V', '--version') {
+    like( qx{$PARROT $version}, qr/.*${file_version}.*/, "VERSION matches $version" );
+}
 
 ## GH #346 test remaining options
 
-# TODO: Add tests for short options
-# -h --help
-# -V --version
 # TODO: Add tests for long options
 # -D --parrot-debug
 # TODO: Add tests for attached options
