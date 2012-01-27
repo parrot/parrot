@@ -1,6 +1,6 @@
 before_script:
-    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev
-script: "perl Configure.pl --optimize --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make fulltest"
+    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev clang
+script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
 # branches:
 #   only:
 #     - master
@@ -11,7 +11,13 @@ notifications:
     on_success: change
     on_failure: always
 env:
-    - CC="ccache gcc"
-    - CC="ccache g++"
-    - CC="gcc"
-    - CC="g++"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="clang"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="clang"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="ccache gcc"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="ccache g++"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="gcc"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="g++"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="ccache gcc"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="ccache g++"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="gcc"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="g++"
