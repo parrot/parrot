@@ -7,6 +7,7 @@
 # See docs/submissions.pod and the documentation in
 # tools/dev/mk_manifest_and_skip.pl.
 .gitignore                                                  []
+.travis.yml                                                 []
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
 Configure.pl                                                []
