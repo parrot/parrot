@@ -418,10 +418,11 @@ on which type of release this is.
 Update L<http://docs.parrot.org>. Run C<make html> in a release copy of Parrot,
 and save the F<resources/> and F<html/> directories created in F<docs/>. Use
 SSH to login to L<< <username>@parrot.org >> and expand these into a release
-directory (e.g. 3.8.0) in the webroot for L<http://docs.parrot.org>. In
-C<< <webroot>/parrot >>, there are symbolic links for C<latest>, C<supported>,
-and C<devel>. Update the C<latest> symlink to point to your new directory. If
-this is a supported release, also update the C<supported> symlink. Do not
+directory (e.g. 3.8.0) in the webroot, (I<i.e.,> 
+F</var/www/docs.parrot.org/htdocs/parrot>) for L<http://docs.parrot.org>. In 
+C<< <webroot>/parrot >>, there are symbolic links for C<latest>, C<supported>, 
+and C<devel>. Update the C<latest> symlink to point to your new directory. If 
+this is a supported release, also update the C<supported> symlink. Do not 
 delete any old copies of the docs and don't update the other symlinks.
 
 =item 7
