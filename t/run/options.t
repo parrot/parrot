@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 53;
+use Test::More tests => 56;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -143,6 +143,31 @@ for my $hash ('--hash-seed ', '--hash-seed=') {
     is( qx{"$PARROT" $hash$arg "$first_pir_file" $redir}, "first\n",
         "$hash takes a hex value" );
 }
+
+# Test -w/--warnings
+{
+    # Create a simple file that throws an Undef warning.
+    my ($fh, $filename) = tempfile( UNLINK => 0, SUFFIX => '.pir', UNLINK => 1 );
+    print $fh <<'END_PIR';
+.sub 'main' :main
+   $P0 = new 'Undef'
+   $S0 = $P0
+.end
+END_PIR
+    close $fh;
+
+    unlike( qx{"$PARROT" "$filename" 2>&1}, qr/Undef/,
+        'no complaint without warning flag' );
+
+    for my $w ('-w', '--warnings') {
+        like( qx{"$PARROT" $w "$filename" 2>&1}, qr/Undef/,
+            "$w warns about Undef" );
+    }
+    
+    unlink $filename;
+}
+
+
 
 # clean up temporary files
 unlink $first_pir_file;
