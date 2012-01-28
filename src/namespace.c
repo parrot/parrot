@@ -668,7 +668,7 @@ Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
 =item C<PMC * Parrot_ns_find_named_item(PARROT_INTERP, STRING *name, void
 *next)>
 
-TT #1223 - THIS IS BROKEN - it doesn't walk up the scopes yet
+GH #563 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
@@ -692,7 +692,7 @@ Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), ARGIN(SHIM(void *n
     if (!PMC_IS_NULL(lex_pad)) {
         g = VTABLE_get_pmc_keyed_str(interp, lex_pad, name);
 
-        /* TT #1223 - walk up the scopes!  duh!! */
+        /* GH #563 - walk up the scopes!  duh!! */
         if (!PMC_IS_NULL(g))
             return g;
     }
@@ -760,6 +760,26 @@ Parrot_ns_store_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
     /* restore HLL_id */
     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), cur_id);
+}
+
+/*
+
+=item C<Parrot_PMC Parrot_ns_get_root_namespace(PARROT_INTERP)>
+
+Return the root namespace
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+Parrot_PMC
+Parrot_ns_get_root_namespace(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_ns_get_root_namespace)
+
+    return interp->root_namespace;
 }
 
 /*

@@ -1,0 +1,17 @@
+before_script:
+    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev
+script: "perl Configure.pl --optimize --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make fulltest"
+# branches:
+#   only:
+#     - master
+notifications:
+  recipients:
+    - duke@leto.net
+  email:
+    on_success: change
+    on_failure: always
+env:
+    - CC="ccache gcc"
+    - CC="ccache g++"
+    - CC="gcc"
+    - CC="g++"

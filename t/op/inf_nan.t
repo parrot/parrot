@@ -17,12 +17,13 @@ Tests for mathematical operations with Inf and Nan.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(37)
+    plan(42)
 
     test_basic_arith()
     test_sqrt()
     test_neg()
     test_mix_nan_inf()
+    test_is_inf_or_nan()
     test_rounding_n()
     test_rounding_i()
     test_nan_complex()
@@ -118,7 +119,27 @@ Tests for mathematical operations with Inf and Nan.
     is($N2, '-Inf', '... ceil -Inf')
 .end
 
-#pir_output_is(<<'CODE',<<OUTPUT, "TT #370 Rounding inf/nan");
+.sub test_is_inf_or_nan
+    $N0 = 'NaN'
+    $I0 = is_inf_or_nan $N0
+    ok($I0, 'is_inf_or_nan NaN')
+    $N0 = 'Inf'
+    $I0 = is_inf_or_nan $N0
+    ok($I0, 'is_inf_or_nan Inf')
+    $N0 = '-Inf'
+    $I0 = is_inf_or_nan $N0
+    ok($I0, 'is_inf_or_nan -Inf')
+    $N0 = 0
+    $I0 = is_inf_or_nan $N0
+    $I1 = not $I0
+    ok($I1, 'is_inf_or_nan 0')
+    $N0 = 123.4e5
+    $I0 = is_inf_or_nan $N0
+    $I1 = not $I0
+    ok($I1, 'is_inf_or_nan 123.4e5')
+.end
+
+#pir_output_is(<<'CODE',<<OUTPUT, "GH #422 Rounding inf/nan");
 .sub test_rounding_i
     $N0 = 'Inf'
     $I0 = floor $N0

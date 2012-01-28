@@ -48,7 +48,7 @@ Parrot_api_load_bytecode_file(Parrot_PMC interp_pmc,
     ASSERT_ARGS(Parrot_api_load_bytecode_file)
     EMBED_API_CALLIN(interp_pmc, interp)
     PackFile * const pf = Parrot_pf_read_pbc_file(interp, filename);
-    *pbc = Parrot_pf_get_packfile_pmc(interp, pf);
+    *pbc = Parrot_pf_get_packfile_pmc(interp, pf, filename);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
@@ -82,7 +82,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");
     }
-    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+    *pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
     Parrot_unblock_GC_mark(interp);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -187,7 +187,6 @@ Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
             "Could not get packfile.");
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
-    /* TODO: Break up the dependency with embed.c */
     Parrot_disassemble(interp, outfile, (Parrot_disassemble_options)opts);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }

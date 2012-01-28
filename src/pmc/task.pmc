@@ -149,11 +149,15 @@ code as the first argument.
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
 
+#ifndef WIN32
         if (setjmp(task->abort_jump)) {
             /* do nothing, we're back where we want to be */
         }
+#endif
 
         if (!(task->killed || PMC_IS_NULL(task->code))) {
+            const int current_depth =
+                Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
             PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
@@ -162,6 +166,9 @@ code as the first argument.
 
             /* Actually run the task */
             Parrot_ext_call(interp, task->code, "P->", task->data);
+            /* Restore recursion_depth since Parrot_Sub_invoke increments recursion_depth
+               which would not be decremented anymore if the sub is preempted */
+            Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
@@ -390,7 +397,6 @@ Send a message to this task.
 
     METHOD code(PMC * code :optional, INTVAL has_code :opt_flag) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
-        PMC * code;
         if (has_code) {
             tdata->code = code;
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
@@ -401,7 +407,6 @@ Send a message to this task.
 
     METHOD data(PMC * data :optional, INTVAL has_data :opt_flag) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
-        PMC * data;
         if (has_data) {
             tdata->data = data;
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);

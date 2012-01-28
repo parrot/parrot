@@ -32,8 +32,8 @@ See F<runtime/library/distutils.pir>.
     $P0['license_uri'] = 'http://www.perlfoundation.org/artistic_license_2_0'
     $P0['copyright_holder'] = 'Parrot Foundation'
     $P0['checkout_uri'] = 'https://github.com/parrot/parrot/tree/master/examples/languages/abc'
-    $P0['browser_uri'] = 'http://trac.parrot.org/parrot/browser/trunk/examples/languages/abc'
-    $P0['project_uri'] = 'http://trac.parrot.org/parrot/browser/trunk/examples/languages/abc'
+    $P0['browser_uri'] = 'https://github.com/parrot/parrot/tree/master/examples/languages/abc'
+    $P0['project_uri'] = 'https://github.com/parrot/parrot/tree/master/examples/languages/abc'
 
     # build
     $P1 = new 'Hash'

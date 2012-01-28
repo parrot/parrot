@@ -241,17 +241,6 @@ filehandle. The argument can be an integer, number, string, or PMC.
 
 =end PIR_FRAGMENT
 
-=head3 puts
-
-The C<puts>X<puts method> method is similar to C<print>, but it only
-takes a string argument.
-
-=begin PIR_FRAGMENT
-
-  $P0.'puts'('Hello!')
-
-=end PIR_FRAGMENT
-
 =head3 read
 
 The C<read>X<read method> method reads a specified number of bytes from the filehandle

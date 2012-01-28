@@ -194,4 +194,4 @@ See F<docs/submissions.pod> for details.
 =head2 What other useful resources are there for developers?
 
 A number of other useful resources that can be found via on the Parrot
-wiki, located at L<http://trac.parrot.org/parrot/wiki>.
+wiki, located at L<https://github.com/parrot/parrot/wiki>

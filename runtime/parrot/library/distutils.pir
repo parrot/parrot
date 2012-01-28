@@ -2185,7 +2185,7 @@ the default value is "t/*.t"
 .sub 'sort_strings'
     .param pmc array
     # currently, FixedStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     $I0 = elements array
     $P0 = new 'FixedPMCArray'
     set $P0, $I0
@@ -3123,7 +3123,7 @@ the default value is setup.pir
     inc $I0
     $P0 = new 'FixedPMCArray'
     # currently, FixedStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     set $P0, $I0
     $I0 = 0
     $P0[$I0] = 'MANIFEST'
@@ -3918,7 +3918,7 @@ TEMPLATE
     .param pmc kv :slurpy :named
     $P0 = new 'ResizablePMCArray'
     # currently, ResizableStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     $P1 = get_install_files(kv :flat :named)
     $P2 = iter $P1
   L1:

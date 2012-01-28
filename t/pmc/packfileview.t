@@ -190,11 +190,11 @@ __EOCODE__
 .end
 
 .sub 'test_method_read_from_file'
-    # TODO: Would really like temporary files for this. TT #955
+    # TODO: Would really like temporary files for this. GH #517
 .end
 
 .sub 'test_method_write_to_file'
-    # TODO: Would really like temporary files for this. TT #955
+    # TODO: Would really like temporary files for this. GH #517
 .end
 
 # Subs with :tag syntax

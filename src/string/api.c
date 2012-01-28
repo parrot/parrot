@@ -750,7 +750,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
 
         if (setjmp(jmp.resume)) {
             /* catch */
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
             retv =  Parrot_str_new_init(interp, c, strlen(c),
                                         Parrot_binary_encoding_ptr, 0);
         }
@@ -759,7 +759,7 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
             Parrot_ex_add_c_handler(interp, &jmp);
             retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                         Parrot_platform_encoding_ptr, 0);
-            Parrot_cx_delete_handler_local(interp, STRINGNULL);
+            Parrot_cx_delete_handler_local(interp);
         }
 
         return retv;
@@ -2079,7 +2079,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 /* powl() could be used here, but it is an optional POSIX extension that
    needs to be checked for at Configure-time.
 
-   See https://trac.parrot.org/parrot/ticket/1176 for more details. */
+   See https://github.com/parrot/parrot/issues/451 for more details. */
 
 #  define POW pow
 

@@ -4,7 +4,6 @@
 
 BEGIN_OPS_PREAMBLE
 
-/* Chandon TODO: Should not have private header here */
 #include "parrot/scheduler_private.h"
 #include "pmc/pmc_task.h"
 
@@ -22,8 +21,8 @@ This file contains experimental opcodes.
 These opcodes should be considered implicitly deprecated - that is, they
 may be removed in any release.
 
-If you rely on any of these opcodes, please open a
-Trac ticket at L<https://trac.parrot.org/>.
+If you rely on any of these opcodes, please open an issue at
+L<https://github.com/parrot/parrot/issues>
 
 When making changes to any ops file, run C<make bootstrap-ops> to regenerate
 all generated ops files.
@@ -271,7 +270,7 @@ op root_new(out PMC, in PMC, in INT) {
 
 =item B<receive>(out PMC)
 
-Recieve a message sent to the current task.
+Receive a message sent to the current task.
 
 If there is no waiting message, block and wait.
 

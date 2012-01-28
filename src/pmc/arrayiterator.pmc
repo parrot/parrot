@@ -63,7 +63,7 @@ static void out_of_bounds(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-pmclass ArrayIterator extends Iterator no_ro auto_attrs {
+pmclass ArrayIterator extends Iterator provides iterator no_ro auto_attrs {
     ATTR PMC    *array;     /* the array which this Iterator iterates */
     ATTR INTVAL  pos;       /* Current position of iterator for forward iterator */
                             /* Previous position of iterator for reverse iterator */

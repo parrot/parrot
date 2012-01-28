@@ -1,9 +1,9 @@
 {
-    "release.version"  : "3.9.0",
-    "release.name"     : "Archaeopteryx",
+    "release.version"  : "4.0.0",
+    "release.name"     : "Hyperstasis",
     "release.day"      : "Tuesday",
-    "release.date"     : "18 October 2011",
-    "release.nextdate" : "15 November 2011",
+    "release.date"     : "17 January 2012",
+    "release.nextdate" : "21 February 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "15 October 2011",
+    "bugday.date"      : "19 February 2012",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2011_10_15",
+    "wiki.bugday"      : "bug_day_2012_02_19",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/3.9.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/4.0.0/"
 }

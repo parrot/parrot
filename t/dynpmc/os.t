@@ -355,7 +355,7 @@ CODE
 }
 else {
   SKIP: {
-    skip 'broken test TT #457', 1 if $solaris;
+    skip 'broken test GH #457', 1 if $solaris;
 
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
@@ -481,7 +481,7 @@ my $lstat;
 
 SKIP: {
     skip 'lstat not on Win32', 1 if $MSWin32;
-    skip 'broken test TT #457', 1 if $solaris;
+    skip 'broken test GH #457', 1 if $solaris;
 
     my @s = lstat('xpto');
     $s[6] = 0; # Parrot does this internally
@@ -501,7 +501,7 @@ SKIP: {
         $S2 = sprintf $S1, $P2
         print $S2
 
-        $P3 = $P1."lstat"("non-existant file")
+        $P3 = $P1."lstat"("non-existent file")
 
         end
 .end

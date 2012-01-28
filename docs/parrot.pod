@@ -100,8 +100,6 @@ I<See>
 
 =item * L<http://www.parrot.org/>
 
-=item * L<https://trac.parrot.org/>
-
 =item * L<http://github.com/parrot/parrot>
 
 =back

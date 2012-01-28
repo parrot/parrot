@@ -573,14 +573,6 @@ PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Parrot_PackFile PackFile_read_pbc(PARROT_INTERP,
-    ARGIN(STRING *fullname),
-    const int debug)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 opcode_t PackFile_unpack(PARROT_INTERP,
     ARGMOD(PackFile *self),
@@ -664,7 +656,16 @@ void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP,
+    ARGIN(PackFile *pf),
+    ARGIN(STRING *path))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -798,9 +799,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
     , PARROT_ASSERT_ARG(dir))
 #define ASSERT_ARGS_PackFile_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_PackFile_read_pbc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_PackFile_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -837,7 +835,11 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf))
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(path))
+#define ASSERT_ARGS_Parrot_pf_get_version_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_pf_load_bytecode_search \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

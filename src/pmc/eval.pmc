@@ -293,7 +293,7 @@ Unarchives the code.
 
         SUPER(info);
         pf = PackFile_new(INTERP, 0);
-        pfpmc = Parrot_pf_get_packfile_pmc(INTERP, pf);
+        pfpmc = Parrot_pf_get_packfile_pmc(INTERP, pf, STRINGNULL);
 
         if (!PackFile_unpack(INTERP, pf, (opcode_t *)packed->strstart,
                 packed->strlen))

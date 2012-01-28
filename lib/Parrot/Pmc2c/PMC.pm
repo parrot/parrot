@@ -1103,23 +1103,23 @@ EOC
         vt->isa_hash     = Parrot_${classname}_get_isa(interp, NULL);
 EOC
 
-    for my $k ( keys %extra_vt ) {
+    for my $k ( sort keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
+        my $var = "vt_$k";
         $cout .= <<"EOC";
         {
-            VTABLE                   *vt_$k;
-            vt_${k}                 = Parrot_${classname}_${k}_get_vtable(interp);
-            vt_${k}->base_type      = $enum_name;
-            vt_${k}->flags          = $k_flags;
+            VTABLE * const $var         = Parrot_${classname}_${k}_get_vtable(interp);
+            ${var}->base_type           = $enum_name;
+            ${var}->flags               = $k_flags;
 
-            vt_${k}->attribute_defs = attr_defs;
+            ${var}->attribute_defs      = attr_defs;
 
-            vt_${k}->base_type           = entry;
-            vt_${k}->whoami              = vt->whoami;
-            vt_${k}->provides_str        = vt->provides_str;
-            vt->${k}_variant_vtable      = vt_${k};
-            vt_${k}->${k}_variant_vtable = vt;
-            vt_${k}->isa_hash            = vt->isa_hash;
+            ${var}->base_type           = entry;
+            ${var}->whoami              = vt->whoami;
+            ${var}->provides_str        = vt->provides_str;
+            vt->${k}_variant_vtable     = ${var};
+            ${var}->${k}_variant_vtable = vt;
+            ${var}->isa_hash            = vt->isa_hash;
         }
 
 EOC
@@ -1177,14 +1177,14 @@ EOC
         {
             STRING * const method_name = CONST_STRING_GEN(interp, "$symbol_name");
             STRING * const signature   = CONST_STRING_GEN(interp, "$pcc_signature");
-            register_native_pcc_method_in_ns(interp, entry,
+            Parrot_interp_register_native_pcc_method_in_ns(interp, entry,
                 F2DPTR(Parrot_${classname}_${method_name}),
                 method_name, signature);
         }
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$symbol_name");
+        Parrot_interp_mark_method_writes(interp, entry, "$symbol_name");
 EOC
         }
     }

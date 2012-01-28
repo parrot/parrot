@@ -191,7 +191,7 @@ Now we need to modify our TOP rule to call begin_TOP.
 
  rule TOP {
      <.begin_TOP>
-     <statementlist>
+     <statement_list>
      [ $ || <.panic: "Syntax error"> ]
  }
 
@@ -210,7 +210,7 @@ action for TOP.
  method TOP($/, $key) {
      our @?BLOCK;
      my $past := @?BLOCK.shift();
-     $past.push($<statementlist>.ast);
+     $past.push($<statement_list>.ast);
      make $past;
  }
 

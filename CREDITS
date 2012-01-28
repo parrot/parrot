@@ -77,10 +77,10 @@ E: allison@parrot.org
 U: allison
 
 N: Alvis Yardley
-D: Documentation Shephard
+D: Documentation Shepherd (3.9.0 - Present)
 E: ac.yardley@gmail.com
 U: alvis
-S: Stephenville, TX
+S: Ft. Worth, Texas
 
 N: Amir Karger
 U: amirkarger
@@ -113,7 +113,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0 and 3.3.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0 and 4.0.0
 E: wknight8111@gmail.com
 U: Whiteknight
 

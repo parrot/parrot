@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # 008-file_based_configuration.t
 
 use strict;
@@ -11,7 +11,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 30;
+use Test::More tests => 31;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 
@@ -20,22 +20,22 @@ use Parrot::Configure::Options qw| process_options |;
     my ($args, $steps_list_ref) = _test_good_config_file($configfile);
 
     ok(! defined $args->{maintainer},
-        "Configuring from testfoobar: 'maintainer' not defined, as expected");
+        "Configuring from $configfile: 'maintainer' not defined, as expected");
     is($args->{'verbose-step'}, 'init::hints',
-        "Configuring from testfoobar: 'init::hints' is verbose step");
+        "Configuring from $configfile: 'init::hints' is verbose step");
     is($args->{'fatal-step'}, 'init::hints',
-        "Configuring from testfoobar: 'init::hints' is fatal step");
+        "Configuring from $configfile: 'init::hints' is fatal step");
     ok($args->{nomanicheck},
-        "Configuring from testfoobar: will omit check of MANIFEST");
+        "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
-        "Configuring from testfoobar: config file correctly stored");
+        "Configuring from $configfile: config file correctly stored");
     ok($args->{debugging},
-        "Configuring from testfoobar: debugging turned on");
+        "Configuring from $configfile: debugging turned on");
     my %steps_seen = map {$_ => 1} @{ $steps_list_ref };
     ok(exists $steps_seen{'init::manifest'},
-        "Configuring from testfoobar: init::manifest is in list even though it will be skipped");
+        "Configuring from $configfile: init::manifest is in list even though it will be skipped");
     ok(! exists $steps_seen{'auto::perldoc'},
-        "Configuring from testfoobar: auto::perldoc not in list");
+        "Configuring from $configfile: auto::perldoc not in list");
 }
 
 {
@@ -44,52 +44,55 @@ use Parrot::Configure::Options qw| process_options |;
 
     my $c_compiler = '/usr/bin/gcc';
     my $cplusplus_compiler = '/usr/bin/g++';
+    my $intval_setting = 'long long';
     ok(! defined $args->{maintainer},
-        "Configuring from yourfoobar: 'maintainer' not defined as expected");
+        "Configuring from $configfile: 'maintainer' not defined as expected");
     is($args->{'verbose-step'}, 'init::hints',
-        "Configuring from yourfoobar: 'init::hints' is verbose step");
+        "Configuring from $configfile: 'init::hints' is verbose step");
     ok($args->{nomanicheck},
-        "Configuring from yourfoobar: will omit check of MANIFEST");
+        "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
-        "Configuring from yourfoobar: config file correctly stored");
+        "Configuring from $configfile: config file correctly stored");
     ok($args->{debugging},
-        "Configuring from yourfoobar: debugging turned on");
+        "Configuring from $configfile: debugging turned on");
     is($args->{cc}, $c_compiler,
-        "Configuring from yourfoobar: C compiler is $c_compiler");
+        "Configuring from $configfile: C compiler is $c_compiler");
     is($args->{link}, $cplusplus_compiler,
-        "Configuring from yourfoobar: linker is $cplusplus_compiler");
+        "Configuring from $configfile: linker is $cplusplus_compiler");
     is($args->{ld}, $cplusplus_compiler,
-        "Configuring from yourfoobar: shared library loader is $cplusplus_compiler");
+        "Configuring from $configfile: shared library loader is $cplusplus_compiler");
+    is($args->{intval}, $intval_setting,
+        "Configuring from $configfile: 'intval' setting is $intval_setting");
 
     my %steps_seen = map {$_ => 1} @{ $steps_list_ref };
 
     ok(exists $steps_seen{'init::manifest'},
-        "Configuring from yourfoobar: init::manifest is in list even though it will be skipped");
+        "Configuring from $configfile: init::manifest is in list even though it will be skipped");
     ok(! exists $steps_seen{'auto::perldoc'},
-        "Configuring from yourfoobar: auto::perldoc not in list");
+        "Configuring from $configfile: auto::perldoc not in list");
 }
 
 {
-    my $configfile = q{t/configure/testlib/verbosefoobar};
+    my $configfile = q{examples/config/file/configverbose};
     my ($args, $steps_list_ref) = _test_good_config_file($configfile);
 
     ok(! defined $args->{maintainer},
-        "Configuring from verbosefoobar: 'maintainer' not defined as expected");
+        "Configuring from $configfile: 'maintainer' not defined as expected");
     ok($args->{nomanicheck},
-        "Configuring from verbosefoobar: will omit check of MANIFEST");
+        "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
-        "Configuring from verbosefoobar: config file correctly stored");
+        "Configuring from $configfile: config file correctly stored");
     ok($args->{debugging},
-        "Configuring from verbosefoobar: debugging turned on");
+        "Configuring from $configfile: debugging turned on");
     is($args->{verbose}, 1,
-        "Configuring from verbosefoobar: verbose output is on");
+        "Configuring from $configfile: verbose output is on");
 
     my %steps_seen = map {$_ => 1} @{ $steps_list_ref };
 
     ok(exists $steps_seen{'init::manifest'},
-        "Configuring from verbosefoobar: init::manifest is in list even though it will be skipped");
+        "Configuring from $configfile: init::manifest is in list even though it will be skipped");
     ok(! exists $steps_seen{'auto::perldoc'},
-        "Configuring from verbosefoobar: auto::perldoc not in list");
+        "Configuring from $configfile: auto::perldoc not in list");
 }
 
 {

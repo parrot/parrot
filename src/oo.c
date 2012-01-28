@@ -442,6 +442,25 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
     }
 }
 
+/*
+
+=item C<PMC * Parrot_oo_new_class_pmc(PARROT_INTERP, PMC *classtype)>
+
+Create a class with the type given
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_oo_new_class_pmc(PARROT_INTERP, ARGIN(PMC *classtype))
+{
+    ASSERT_ARGS(Parrot_oo_new_class_pmc)
+    return Parrot_pmc_new_init(interp, enum_class_Class, classtype);
+}
+
 
 /*
 

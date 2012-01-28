@@ -269,7 +269,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 bc_seg->main_sub = in_seg->main_sub + inputs[i]->pmc.const_start;
             /*
             XXX hide incessant warning messages triggered by implicit :main
-            this can be added when TT #1704 is implemented
+            this can be added when GH #571 is implemented
 
             else
                 Parrot_io_eprintf(interp,
@@ -803,7 +803,7 @@ main(int argc, const char **argv)
     int i;
     const char *output_file     = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    Interp * const interp = Parrot_new(NULL);
+    Interp * const interp = Parrot_interp_new(NULL);
     STRING * pbcname = NULL;
     PMC * pbcpmc = NULL;
 
@@ -850,7 +850,7 @@ main(int argc, const char **argv)
                 strlen(input_files[i]->filename));
         {
             PackFile * const pf = Parrot_pf_read_pbc_file(interp, pbcname);
-            pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf);
+            pbcpmc = Parrot_pf_get_packfile_pmc(interp, pf, pbcname);
         }
 
         /* Load the packfile and unpack it. */

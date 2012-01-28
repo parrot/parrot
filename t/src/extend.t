@@ -16,7 +16,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 24;
+plan tests => 20;
 
 =head1 NAME
 
@@ -48,13 +48,13 @@ c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_Interp interp  = Parrot_interp_new(NULL);
     Parrot_PMC    pmcnull;
 
     /* Interpreter set-up */
     if (interp) {
-        pmcnull  = Parrot_PMC_null();
-        Parrot_destroy(interp);
+        pmcnull  = Parrot_pmc_null();
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -70,50 +70,22 @@ c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)registe
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_Interp interp  = Parrot_interp_new(NULL);
     Parrot_PMC    ns;
 
     /* Interpreter set-up */
     if (interp) {
-        ns  = Parrot_get_root_namespace(interp);
-        Parrot_register_pmc(interp, ns);
-        Parrot_unregister_pmc(interp, ns);
+        ns  = Parrot_ns_get_root_namespace(interp);
+        Parrot_pmc_gc_register(interp, ns);
+        Parrot_pmc_gc_unregister(interp, ns);
 
         Parrot_printf(interp,"%P\n", ns);
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
 CODE
 
-OUTPUT
-
-c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp  = Parrot_new(NULL);
-    Parrot_Int    parrot_reg = 0;
-    Parrot_Int    value      = 42;
-    Parrot_Int    new_value;
-
-    /* Interpreter set-up */
-    if (interp) {
-        Parrot_set_intreg(interp, parrot_reg, value);
-        new_value = Parrot_get_intreg(interp, parrot_reg);
-
-        printf("%d\n", (int)new_value);
-        Parrot_destroy(interp);
-    }
-    return 0;
-}
-
-CODE
-42
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_fprintf');
@@ -126,7 +98,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_PMC pio;
-    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_Interp interp  = Parrot_interp_new(NULL);
     pio = Parrot_io_STDOUT(interp);
 
     /* Interpreter set-up */
@@ -158,54 +130,25 @@ CODE
 42
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'set/get_numreg' );
-
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp     = Parrot_new(NULL);
-    Parrot_Int    parrot_reg = 1;
-    Parrot_Float  value       = 2.5;
-    Parrot_Float  new_value;
-
-    /* Interpreter set-up */
-    if (interp) {
-        Parrot_set_numreg(interp, parrot_reg, value);
-        new_value = Parrot_get_numreg(interp, parrot_reg);
-
-        printf("%.1f\n", (double)new_value);
-
-        Parrot_destroy(interp);
-    }
-    return 0;
-}
-
-CODE
-2.5
-OUTPUT
-
 c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
+#include "parrot/misc.h"
 
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_String output, output2;
 
     /* Interpreter set-up */
     if (interp) {
-        output = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
+        output = Parrot_str_new(interp, "Test", 4/*, "iso-8859-1", 0*/);
         Parrot_eprintf(interp, "%S\n", output);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -223,19 +166,19 @@ c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string/Parrot_(un)register_string
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_String output, output2;
 
     /* Interpreter set-up */
     if (interp) {
-        output = Parrot_new_string(interp, "Test_reg_unreg", 14, "iso-8859-1", 0);
+        output = Parrot_str_new(interp, "Test_reg_unreg", 14/*, "iso-8859-1", 0*/);
 
-        Parrot_register_string(interp, output);
-        Parrot_unregister_string(interp, output);
+        Parrot_str_gc_register(interp, output);
+        Parrot_str_gc_unregister(interp, output);
 
         Parrot_eprintf(interp, "%S\n", output);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -244,35 +187,6 @@ CODE
 Test_reg_unreg
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
-
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp     = Parrot_new(NULL);
-    Parrot_Int    parrot_reg = 2;
-    Parrot_String value, new_value;
-
-    /* Interpreter set-up */
-    if (interp) {
-        value = Parrot_new_string(interp, "Test", 4, "iso-8859-1", 0);
-        Parrot_set_strreg(interp, parrot_reg, value);
-
-        new_value = Parrot_get_strreg(interp, parrot_reg);
-        Parrot_eprintf(interp, "%S\n", new_value);
-
-        Parrot_destroy(interp);
-    }
-    return 0;
-}
-
-CODE
-Test
-OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer' );
 
@@ -283,7 +197,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_Int    value  = 101010;
     Parrot_PMC    testpmc;
     Parrot_Int    type, new_value;
@@ -291,14 +205,14 @@ main(int argc, const char *argv[])
     /* Interpreter set-up */
     if (interp) {
         type    = Parrot_PMC_typenum(interp, "Integer");
-        testpmc = Parrot_PMC_new(interp, type);
+        testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_integer_native(interp, testpmc, value);
         new_value = Parrot_PMC_get_integer(interp, testpmc);
 
         printf("%ld\n", (long)new_value);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -324,12 +238,12 @@ static void fail(const char *msg)
 
 static Parrot_String createstring(Parrot_Interp interp, const char * value)
 {
-    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+    return Parrot_str_new(interp, value, strlen(value));
 }
 
 static Parrot_Interp new_interp()
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (!interp)
         fail("Cannot create parrot interpreter");
     return interp;
@@ -350,7 +264,7 @@ int main(int argc, const char **argv)
 
     Parrot_free_cstring(str);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -366,12 +280,12 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
 
     /* Interpreter set-up */
     if (interp) {
         Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
-        Parrot_PMC array = Parrot_PMC_new(interp, type);
+        Parrot_PMC array = Parrot_pmc_new(interp, type);
         Parrot_Int value = 12345;
         Parrot_Int key   = 10;
         Parrot_Int new_value;
@@ -381,50 +295,12 @@ main(int argc, const char *argv[])
         new_value = Parrot_PMC_get_integer_keyed_int(interp, array, key);
 
         printf("%ld\n", (long)new_value);
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
 CODE
 12345
-OUTPUT
-
-c_output_is( <<'CODE', <<'OUTPUT', 'set/get_pmcreg' );
-
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-int
-main(int argc, const char *argv[])
-{
-    Parrot_Interp interp     = Parrot_new(NULL);
-    Parrot_Int    value      = -123;
-    Parrot_Int    parrot_reg =  31;
-    Parrot_Int    type, new_value;
-    Parrot_PMC    testpmc, newpmc;
-
-    /* Interpreter set-up */
-    if (interp) {
-        type    = Parrot_PMC_typenum(interp, "Integer");
-        testpmc = Parrot_PMC_new(interp, type);
-
-        Parrot_PMC_set_integer_native(interp, testpmc, value);
-
-        parrot_reg = 31;
-        Parrot_set_pmcreg(interp, parrot_reg, testpmc);
-
-        newpmc    = Parrot_get_pmcreg(interp, parrot_reg);
-        new_value = Parrot_PMC_get_integer(interp, newpmc);
-
-        printf("%d\n", (int)new_value);
-
-        Parrot_destroy(interp);
-    }
-    return 0;
-}
-CODE
--123
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_number' );
@@ -436,7 +312,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_number' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_Float  value  = 3.1415927;
     Parrot_Int    type;
     Parrot_Float  new_value;
@@ -445,14 +321,14 @@ main(int argc, const char *argv[])
     /* Interpreter set-up */
     if (interp) {
         type    = Parrot_PMC_typenum(interp, "Float");
-        testpmc = Parrot_PMC_new(interp, type);
+        testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_number_native(interp, testpmc, value);
         new_value = Parrot_PMC_get_number(interp, testpmc);
 
         printf("%.7f\n", (double)new_value);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -469,7 +345,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_string' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_Int    type;
     Parrot_String value, new_value;
     Parrot_PMC    testpmc;
@@ -477,15 +353,15 @@ main(int argc, const char *argv[])
     /* Interpreter set-up */
     if (interp) {
         type    = Parrot_PMC_typenum(interp, "String");
-        testpmc = Parrot_PMC_new(interp, type);
+        testpmc = Parrot_pmc_new(interp, type);
 
-        value     = Parrot_new_string(interp, "Pumpking", 8, "iso-8859-1", 0);
+        value     = Parrot_str_new(interp, "Pumpking", 8/*, "iso-8859-1", 0*/);
         Parrot_PMC_set_string_native(interp, testpmc, value);
         new_value = Parrot_PMC_get_string(interp, testpmc);
 
         Parrot_eprintf(interp, "%S\n", new_value);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -526,13 +402,13 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -552,7 +428,7 @@ main(int argc, const char *argv[])
         Parrot_ext_call(interp, sub, "P->", arg);
         Parrot_eprintf(interp, "back\\n");
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -575,13 +451,13 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub using the unified interfac
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         PackFile * pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub, *arg;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -601,7 +477,7 @@ main(int argc, const char *argv[])
         Parrot_ext_call(interp, sub, "P->", arg);
         Parrot_eprintf(interp, "back\\n");
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -642,14 +518,14 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub and return an integer' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "foo");
         PMC            *sub, *arg;
         Parrot_Int      result;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub  = Parrot_ns_find_current_namespace_global(interp, name);
@@ -662,7 +538,7 @@ main(int argc, const char *argv[])
         Parrot_eprintf(interp, "result %d\\n", result);
         Parrot_eprintf(interp, "back\\n");
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -700,14 +576,14 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub, catch exception' );
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         PackFile* pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
         Parrot_String   name = Parrot_str_new_constant(interp, "_sub1");
         PMC            *sub;
         Parrot_runloop  jump_point;
-        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        Parrot_PMC      pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
 
         Parrot_pf_set_current_packfile(interp, pbc);
         sub = Parrot_ns_find_current_namespace_global(interp, name);
@@ -725,7 +601,7 @@ main(int argc, const char *argv[])
 
         Parrot_eprintf(interp, "back\\n");
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -789,18 +665,18 @@ main(int argc, const char *argv[])
     const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
     Parrot_PMC pbc;
 
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         packfile   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
 
         if (packfile) {
-            pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+            pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
             Parrot_pf_set_current_packfile(interp, pbc);
             Parrot_runcode( interp, 1, code );
         }
 
-        Parrot_destroy( interp );
+        Parrot_interp_destroy( interp );
     }
     return 0;
 }
@@ -816,7 +692,7 @@ c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986', 
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp   interp    = Parrot_new(NULL);
+    Parrot_Interp   interp    = Parrot_interp_new(NULL);
     const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
     Parrot_PMC      retval;
     Parrot_PMC      sub;
@@ -832,7 +708,7 @@ main(int argc, const char *argv[])
 
             Parrot_ext_call(interp, sub, "->");
         }
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -850,18 +726,18 @@ main(int argc, const char *argv[])
     Parrot_Int      result;
     Parrot_PMC      sub, pbc;
     PackFile* pf;
-    Parrot_Interp   interp = Parrot_new(NULL);
+    Parrot_Interp   interp = Parrot_interp_new(NULL);
 
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
-        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
         Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
         Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
         printf( "Result is %d.\\n", result );
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -879,18 +755,18 @@ main(int argc, const char *argv[])
     Parrot_Int      result;
     Parrot_PMC      sub, pbc;
     PackFile* pf;
-    Parrot_Interp   interp = Parrot_new(NULL);
+    Parrot_Interp   interp = Parrot_interp_new(NULL);
 
     if (interp) {
         Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
         pf   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
-        pbc  = Parrot_pf_get_packfile_pmc(interp, pf);
+        pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
         Parrot_pf_set_current_packfile(interp, pbc);
 
         sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
         Parrot_ext_call( interp, sub, "II->I", 100, 200, &result );
         printf( "Result is %d.\\n", result );
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -898,13 +774,13 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_new/Parrot_x_exit cycles' );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
 
 /* this is Parrot_x_exit without the exit()
- * it will call Parrot_really_destroy() as an exit handler
+ * it will call Parrot_interp_really_destroy() as an exit handler
  */
 void interp_cleanup(Parrot_Interp, int);
 
@@ -932,9 +808,9 @@ main(int argc, const char *argv[])
     for (i = 1; i <= niter; i++) {
         printf("Starting interp %d\n", i);
         fflush(stdout);
-        interp = Parrot_new(NULL);
+        interp = Parrot_interp_new(NULL);
         if (interp) {
-            Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
+            Parrot_interp_set_flag(interp, PARROT_DESTROY_FLAG);
 
             printf("Destroying interp %d\n", i);
             fflush(stdout);

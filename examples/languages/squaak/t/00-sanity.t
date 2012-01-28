@@ -1,5 +1,5 @@
 
-print("1..25")
+print("1..26")
 
 # test global variable
 g = 1
@@ -110,4 +110,11 @@ while j < 5 do
     j = j + 1
 end
 
+# test return and sub as expression
 
+sub ret(x)
+    return x
+end
+if ret(1) == 1 then
+    print("ok 26")
+end

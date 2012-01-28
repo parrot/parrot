@@ -68,7 +68,7 @@ method build_pir_profile() {
 
     my $fh := pir::new__p_sc('FileHandle');
     $fh.open($tmp_pir, "w");
-    $fh.puts(self<pir_code>);
+    $fh.print(self<pir_code>);
     $fh.close();
 
     my $parrot_exe := %config<prefix> ~ %config<slash> ~ %config<test_prog>;

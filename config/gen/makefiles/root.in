@@ -468,8 +468,7 @@ INTERP_O_FILES = \
 	src/call/pcc$(O)  \
 	src/call/args$(O)  \
 	src/interp/inter_cb$(O)  \
-	src/interp/inter_create$(O)  \
-	src/interp/inter_misc$(O)  \
+	src/interp/api$(O)  \
 	src/call/ops$(O)  \
 	src/call/context$(O) \
 	src/call/context_accessors$(O) \
@@ -549,7 +548,7 @@ INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
 #IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
-#IF(win32 or msys):LIBPARROT_SHARED  = @libparrot_shared@
+#IF(win32 or msys or cygwin):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
 # This line controls whether a static or shared library is built
@@ -685,8 +684,7 @@ STR_FILES = \
 	src/call/pcc.str \
 	src/call/args.str \
 	src/interp/inter_cb.str \
-	src/interp/inter_create.str \
-	src/interp/inter_misc.str \
+	src/interp/api.str \
 	src/io/api.str \
 	src/key.str \
 	src/library.str \
@@ -810,7 +808,7 @@ help :
 	@echo "Fetch from source repository:"
 	@echo "  update:            git pull."
 	@echo "  status:            git status."
-	@echo "  patch:             Create a patch to attach to https://trac.parrot.org/"
+	@echo "  patch:             Create a patch to attach to https://github.com/parrot/parrot/issues"
 	@echo ""
 	@echo "Development:"
 	@echo "  lint:              An alias for sunlint."
@@ -922,6 +920,7 @@ $(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/lon
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+#IF(cygwin and optimize):$(INSTALLABLEPARROT) : LINK += -s
 $(INSTALLABLEPARROT) : frontend/parrot2/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/install_config$(O) src/longopt$(O) \
 	frontend/parrot2/prt0.pbc$(O) $(PARROT)
@@ -1014,6 +1013,8 @@ src/events$(O) : \
 	$(INC_DIR)/events.h \
 	src/events.c \
 	src/events.str \
+	$(INC_PMC_DIR)/pmc_arrayiterator.h \
+	$(INC_PMC_DIR)/pmc_exception.h \
 	$(INC_DIR)/runcore_api.h
 
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
@@ -1062,6 +1063,7 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
+#IF(cygwin and optimize):		-s \
 #IF(cygwin):		-Wl,--out-implib=libparrot.dll.a \
 #IF(win32 and cc==gcc):		-Wl,--out-implib=libparrot.lib \
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
@@ -1100,6 +1102,7 @@ $(PDB) : frontend/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+#IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
 $(INSTALLABLEPDB) : frontend/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
 	frontend/parrot_debugger/main$(O) \
@@ -1124,6 +1127,7 @@ $(DIS) : frontend/pbc_disassemble/main$(O) $(LIBPARROT)
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+#IF(cygwin and optimize):$(INSTALLABLEDIS) : LINK += -s
 $(INSTALLABLEDIS) : frontend/pbc_disassemble/main$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1154,6 +1158,7 @@ frontend/pbc_dump/main$(O) : \
 	$(INC_DIR)/runcore_api.h \
 	frontend/pbc_dump/main.c
 
+#IF(cygwin and optimize):$(INSTALLABLEPDUMP) : LINK += -s
 $(INSTALLABLEPDUMP) : frontend/pbc_dump/main$(O) frontend/pbc_dump/packdump$(O) \
 	src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1177,6 +1182,7 @@ $(PBC_MERGE) : frontend/pbc_merge/main$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+#IF(cygwin and optimize):$(INSTALLABLEPBC_MERGE) : LINK += -s
 $(INSTALLABLEPBC_MERGE) : frontend/pbc_merge/main$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 	$(LINK) @ld_out@$@ \
 	frontend/pbc_merge/main$(O) \
@@ -1589,21 +1595,16 @@ src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_callback.h \
 	src/interp/inter_cb.str src/interp/inter_cb.c
 
-src/interp/inter_misc$(O) : $(PARROT_H_HEADERS) \
-	src/interp/inter_misc.c \
-	src/interp/inter_misc.str \
+src/interp/api$(O) : $(PARROT_H_HEADERS) \
+	src/interp/api.c \
+	src/interp/api.str \
 	include/imcc/embed.h \
 	include/imcc/yyscanner.h \
 	$(INC_DIR)/runcore_api.h \
-	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
-
-src/interp/inter_create$(O) : $(PARROT_H_HEADERS) \
-	$(INC_DIR)/oplib/core_ops.h \
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+    $(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \
-	src/interp/inter_create.c \
-	src/interp/inter_create.str \
-	$(INC_DIR)/runcore_api.h \
-	    src/gc/variable_size_pool.h
+    src/gc/variable_size_pool.h
 
 src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_continuation.h \
@@ -1978,6 +1979,8 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h \
 	$(INC_PMC_DIR)/pmc_continuation.h \
+	$(INC_PMC_DIR)/pmc_exception.h \
+	$(INC_PMC_DIR)/pmc_exceptionhandler.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
 	$(INC_PMC_DIR)/pmc_task.h \

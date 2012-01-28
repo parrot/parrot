@@ -810,7 +810,7 @@ Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
 alive by living subs.
 
 This function and the entire underlying mechanism should be deprecated and
-removed. See TT #2144 for details.
+removed. See GH #428 for details.
 
 =cut
 
@@ -1370,7 +1370,8 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 
 /*
 
-=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf)>
+=item C<PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP, PackFile *pf, STRING
+*path)>
 
 Get a new PMC to hold the PackFile* structure. The exact type of PMC returned
 is not important, and consuming code should not rely on any particular type
@@ -1386,7 +1387,7 @@ being returned. The only guarantees which are made by this interface are that:
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
+Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf), ARGIN(STRING *path))
 {
     ASSERT_ARGS(Parrot_pf_get_packfile_pmc)
     PMC *ptr;
@@ -1402,6 +1403,7 @@ Parrot_pf_get_packfile_pmc(PARROT_INTERP, ARGIN(PackFile *pf))
     ptr = Parrot_pmc_new(interp, enum_class_PackfileView);
     VTABLE_set_pointer(interp, ptr, pf);
     pf->view = ptr;
+    VTABLE_set_string_native(interp, ptr, path);
 
     Parrot_unblock_GC_mark(interp);
 
@@ -1429,7 +1431,7 @@ Parrot_pf_get_current_packfile(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pf_get_current_packfile)
     if (interp->code)
-        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf);
+        return Parrot_pf_get_packfile_pmc(interp, interp->code->base.pf, STRINGNULL);
     else
         return PMCNULL;
 }
@@ -2007,21 +2009,28 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
     ASSERT_ARGS(compile_file)
     PackFile_ByteCode * const cur_code = interp->code;
-    PMC * const pf_pmc = Parrot_compile_file(interp, path, is_pasm);
-    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
-        interp->iglobals, IGLOBALS_LOADED_PBCS);
-    PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
-    PackFile_ByteCode * const cs = pf->cur_cs;
+    PMC * compiler;
+    if (is_pasm)
+        compiler = Parrot_interp_get_compiler(interp, CONST_STRING(interp, "PASM"));
+    else
+        compiler = Parrot_interp_get_compiler(interp, CONST_STRING(interp, "PIR"));
+    {
+        PMC * const pf_pmc = Parrot_interp_compile_file(interp, compiler, path);
+        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_LOADED_PBCS);
+        PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
+        PackFile_ByteCode * const cs = pf->cur_cs;
 
-    if (cs) {
-        interp->code = cur_code;
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
-    }
-    else {
-        interp->code = cur_code;
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                "compiler returned NULL ByteCode '%Ss'", path);
+        if (cs) {
+            interp->code = cur_code;
+            VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
+            do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
+        }
+        else {
+            interp->code = cur_code;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                    "compiler returned NULL ByteCode '%Ss'", path);
+        }
     }
 }
 
@@ -2041,7 +2050,8 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 {
     ASSERT_ARGS(load_file)
 
-    PMC * const pf_pmc = PackFile_read_pbc(interp, path, 0);
+    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+    PMC * const pf_pmc = Parrot_pf_get_packfile_pmc(interp, pf, path);
 
     if (!pf_pmc)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -2249,8 +2259,7 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
     else {
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf);
-        VTABLE_set_string_native(interp, pfview, path);
+        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         return pfview;
     }
@@ -2280,33 +2289,6 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
 {
     ASSERT_ARGS(PackFile_fixup_subs)
     do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
-}
-
-
-/*
-
-=item C<Parrot_PackFile PackFile_read_pbc(PARROT_INTERP, STRING *fullname, const
-int debug)>
-
-Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
-
-Deprecated: Do not use this function. Use Parrot_pf_read_pbc_file instead.
-See TT #2140 for details.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Parrot_PackFile
-PackFile_read_pbc(PARROT_INTERP, ARGIN(STRING *fullname), const int debug)
-{
-    ASSERT_ARGS(PackFile_read_pbc)
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, fullname);
-    PMC * const pfpmc = Parrot_pf_get_packfile_pmc(interp, pf);
-    UNUSED(debug);
-    return (Parrot_PackFile)pfpmc;
 }
 
 /*
@@ -2694,6 +2676,27 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
 
     if (!PMC_IS_NULL(current_pf))
         Parrot_pf_set_current_packfile(interp, current_pf);
+}
+
+/*
+
+=item C<STRING * Parrot_pf_get_version_string(PARROT_INTERP, PMC * pbc)>
+
+Get a Major.Minor.Patch version number for the given packfile
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
+{
+    ASSERT_ARGS(Parrot_pf_get_version_string)
+    PackFile * const pf = (PackFile *) VTABLE_get_pointer(interp, pbc);
+    return Parrot_sprintf_c(interp, "%d.%d.%d",
+            pf->header->major, pf->header->minor, pf->header->patch);
 }
 
 /*

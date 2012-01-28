@@ -29,8 +29,9 @@ BEGIN { eval {
     };
     if ($@) {
         my $msg = "To run t/fullharness, make fulltest or make smolder_fulltest\n";
-        $msg .= "  please install TAP-Harness-Multiple from CPAN.\n";
-        $msg .= "  From cpan shell: 'install TAP::Harness::ReportByDescription' should work.\n";
+        $msg .= "  please install TAP::Harness::ReportByDescription from CPAN.\n";
+        $msg .= "  From the cpan shell: 'install TAP::Harness::ReportByDescription'.\n";
+        $msg .= "  With cpanminus     : cpanm TAP::Harness::ReportByDescription \n";
         croak $msg;
     }
 }
@@ -99,7 +100,10 @@ else {
         # rewrite environment
         &{$set->{rule}} if defined $set->{rule};
         print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
-        my $harness = TAP::Harness->new( { formatter => $formatter } );
+        my $harness = TAP::Harness->new( {
+            formatter => $formatter,
+            jobs      => $ENV{TEST_JOBS} || 1,
+        } );
         $harness->aggregate_tests($aggregator, @{$set->{tests}});
     }
     $aggregator->stop();

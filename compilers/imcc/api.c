@@ -43,7 +43,7 @@ static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#define GET_RAW_INTERP(p) Parrot_int_get_interp_from_pmc(p)
+#define GET_RAW_INTERP(p) Parrot_interp_get_from_pmc(p)
 #define GET_INTERP(p) (PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p))
 
 #define IMCC_API_CALLIN(p, i)                    \
@@ -142,7 +142,7 @@ get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
     PMC * const comp = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
     if (add_compreg) {
         STRING * const name = VTABLE_get_string(interp, comp);
-        Parrot_set_compiler(interp, name, comp);
+        Parrot_interp_set_compiler(interp, name, comp);
     }
     return comp;
 }

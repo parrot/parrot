@@ -133,6 +133,27 @@ Parrot_pcc_get_recursion_depth_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 
 /*
 
+=item C<UINTVAL Parrot_pcc_set_recursion_depth_func(PARROT_INTERP, const PMC
+*ctx, const int new_depth)>
+
+Set recursion depth of the current context to new_depth.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+UINTVAL
+Parrot_pcc_set_recursion_depth_func(SHIM_INTERP, ARGIN(const PMC *ctx),
+        const int new_depth)
+{
+    ASSERT_ARGS(Parrot_pcc_set_recursion_depth_func)
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    return CONTEXT_STRUCT(ctx)->recursion_depth = new_depth;
+}
+
+/*
+
 =item C<UINTVAL Parrot_pcc_inc_recursion_depth_func(PARROT_INTERP, PMC *ctx)>
 
 Increase recursion depth. Returns previous recursion_depth value.
@@ -147,7 +168,7 @@ Parrot_pcc_inc_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_inc_recursion_depth_func)
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    return CONTEXT_STRUCT(ctx)->recursion_depth++;
+    return ++CONTEXT_STRUCT(ctx)->recursion_depth;
 }
 
 /*
@@ -166,7 +187,7 @@ Parrot_pcc_dec_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_dec_recursion_depth_func)
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    return CONTEXT_STRUCT(ctx)->recursion_depth--;
+    return --CONTEXT_STRUCT(ctx)->recursion_depth;
 }
 
 /*
