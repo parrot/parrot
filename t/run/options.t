@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 56;
+use Test::More tests => 57;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -117,8 +117,10 @@ needs_an_argument('--gc-nursery-size');
     is( $exit, 0, '... and should not crash' );
 }
 
-# Test --leak-test
-is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
+# Test --leak-test/--destroy-at-end
+for my $leak ( '--leak-test', '--destroy-at-end' ) {
+    is( qx{$PARROT $leak "$first_pir_file"}, "first\n", '--leak-test' );
+}
 
 #make sure that VERSION matches the output of --version
 open(my $version_fh, "<", "VERSION") or die "couldn't open VERSION: $!";
@@ -209,12 +211,10 @@ sub needs_an_argument {
 # -I --include PATH
 # -L --library PATH
 # -X --dynext PATH
-# -w --warnings
 # -G --no-gc
 # -h --gc ms2|gms|ms|inf
 #    --gc-min-threshold
 #    --gc-debug
-#    --destroy-at-end (is this same as --leak-test?)
 # -. --wait
 # FILE  (.pasm, .pir, .pbc)
 
