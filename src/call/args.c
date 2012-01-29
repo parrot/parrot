@@ -683,12 +683,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
     PMC         *call_object;
 
-    if (PMC_IS_NULL(signature))
-        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
-    else {
-        call_object = signature;
-        VTABLE_morph(interp, call_object, PMCNULL);
-    }
+    call_object = Parrot_pmc_new(interp, enum_class_CallContextFromC);
 
     set_call_from_varargs(interp, call_object, sig, args);
 
@@ -717,7 +712,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
     PMC         * arg_flags         = PMCNULL;
-    PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContextFromC);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
     int          append_pi          = 1;
