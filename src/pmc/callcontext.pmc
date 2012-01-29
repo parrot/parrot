@@ -728,6 +728,9 @@ stored.)
             Parrot_hash_destroy(INTERP, hash);
             SET_ATTR_hash(INTERP, SELF, NULL);
         }
+
+
+        SET_ATTR_current_arg(INTERP, SELF, 0);
     }
 
     VTABLE void destroy() {
@@ -1002,10 +1005,12 @@ Caller has to to autoboxing.
         int       do_restart = 0;
 
         GET_ATTR_param(INTERP, SELF, ret);
+        GET_ATTR_state(INTERP, SELF, state);
+
+        PARROT_ASSERT(state != param_finished || !"Holy sheet");
 
         GET_ATTR_current_arg(INTERP, SELF, current_arg);
         GET_ATTR_arg_flags(INTERP, SELF, signature);
-        GET_ATTR_state(INTERP, SELF, state);
         GET_ATTR_from_context(INTERP, SELF, ctx);
         GET_ATTR_raw_args(INTERP, SELF, raw_args);
 
