@@ -1147,22 +1147,22 @@ Caller has to to autoboxing.
         return ret;
     }
 
-    VTABLE INTVAL shift_integer(INTVAL key) {
+    VTABLE INTVAL shift_integer() {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2int(INTERP, p) : 0;
     }
 
-    VTABLE FLOATVAL shift_float(INTVAL key) {
+    VTABLE FLOATVAL shift_float() {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2num(INTERP, p) : 0.0;
     }
 
-    VTABLE STRING * shift_string(INTVAL key) {
+    VTABLE STRING * shift_string() {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2str(INTERP, p) : STRINGNULL;
     }
 
-    VTABLE PMC * shift_pmc(INTVAL key) {
+    VTABLE PMC * shift_pmc() {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2pmc(INTERP, p) : PMCNULL;
     }
