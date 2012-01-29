@@ -393,6 +393,88 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 
 /*
 
+=item ccp2int
+
+=item ccp2num
+
+=item ccp2str
+
+=item ccp2pmc
+
+Convert call_context_param to expected value.
+
+=cut
+
+*/
+
+static INTVAL
+ccp2int(PARROT_INTERP, ARGIN(call_context_param *p)) {
+    switch (p->type) {
+      case PARROT_ARG_INTVAL:
+        return p->v.i;
+      case PARROT_ARG_FLOATVAL:
+        return (INTVAL)p->v.n;
+      case PARROT_ARG_STRING:
+        return p->v.s ? Parrot_str_to_int(interp, p->v.s) : 0;
+      case PARROT_ARG_PMC:
+        return VTABLE_get_integer(interp, p->v.p);
+      default:
+        return 0;
+    }
+}
+
+static FLOATVAL
+ccp2num(PARROT_INTERP, ARGIN(call_context_param *p)) {
+    switch (p->type) {
+      case PARROT_ARG_INTVAL:
+        return p->v.i;
+      case PARROT_ARG_FLOATVAL:
+        return p->v.n;
+      case PARROT_ARG_STRING:
+        return p->v.s ? Parrot_str_to_num(interp, p->v.s) : 0;
+      case PARROT_ARG_PMC:
+        return VTABLE_get_number(interp, p->v.p);
+      default:
+        return 0;
+    }
+}
+
+static STRING*
+ccp2str(PARROT_INTERP, ARGIN(call_context_param *p)) {
+    switch (p->type) {
+      case PARROT_ARG_INTVAL:
+        return Parrot_str_from_int(interp, p->v.i);
+      case PARROT_ARG_FLOATVAL:
+        return Parrot_str_from_num(interp, p->v.n);
+      case PARROT_ARG_STRING:
+        return p->v.s;
+      case PARROT_ARG_PMC:
+        return VTABLE_get_string(interp, p->v.p);
+      default:
+        return STRINGNULL;
+    }
+}
+
+static PMC*
+ccp2pmc(PARROT_INTERP, ARGIN(call_context_param *p)) {
+    switch (p->type) {
+      case PARROT_ARG_INTVAL:
+        return Parrot_pmc_box_integer(interp, p->v.i);
+      case PARROT_ARG_FLOATVAL:
+        return Parrot_pmc_box_number(interp, p->v.n);
+      case PARROT_ARG_STRING:
+        return Parrot_pmc_box_string(interp, p->v.s);
+      case PARROT_ARG_PMC:
+        return p->v.p;
+      default:
+        return PMCNULL;
+    }
+}
+
+
+
+/*
+
 =item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
 
 =cut
@@ -1140,7 +1222,8 @@ Caller has to to autoboxing.
         Pcc_cell *cells;
         INTVAL    num_pos;
 
-        call_context_param *p = SELF.get_pointer();
+        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        //return p ? ccp2int(INTEPR, p) : 0;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
