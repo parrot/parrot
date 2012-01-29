@@ -28,6 +28,18 @@ typedef enum param_processing_state {
     param_dissect_hash
 } param_processing_state;
 
+/* Structure used to return next param */
+typedef struct call_context_param {
+    union v {
+        PMC     *p;
+        STRING  *s;
+        INTVAL   i;
+        FLOATVAL n;
+    } v;
+    INTVAL  type;
+    STRING *name;       /* Optional name of parameter */
+} call_context_param;
+
 END_PMC_HEADER_PREAMBLE
 
 typedef struct Pcc_cell
@@ -532,6 +544,9 @@ pmclass CallContext extends CallContextBase auto_attrs {
 
     ATTR PMC                   *current_aggregate;
 
+    ATTR struct call_context_param *param; /* Last fetched param */
+                                           /* TODO Fix pmc2c to avoid useless alloc */
+
 /*
 
 =item C<void init()>
@@ -549,6 +564,8 @@ Initializes a newly created CallContext object.
         SET_ATTR_state(INTERP, SELF, param_positional);
         SET_ATTR_current_arg(INTERP, SELF, 0);
 
+        SET_ATTR_param(INTERP, SELF,
+                (call_context_param*) mem_sys_allocate_zeroed(sizeof (call_context_param)));
 
         SUPER();
     }
@@ -613,11 +630,15 @@ stored.)
     }
 
     VTABLE void destroy() {
-        INTVAL    allocated_positionals;
-        Hash     *hash;
+        INTVAL               allocated_positionals;
+        Hash                *hash;
+        call_context_param  *param;
 
         if (!PMC_data(SELF))
             return;
+
+        GET_ATTR_param(INTERP, SELF, param);
+        mem_sys_free(param);
 
         GET_ATTR_hash(INTERP, SELF, hash);
         GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
@@ -958,10 +979,20 @@ return current Namespace
         return retval;
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
+/*
 
+=item get_pointer
+
+All logic of handling parameters unpacking sitting in here.
+
+Returns pointer to preallocated call_context_param. Or NULL if exausted.
+
+Caller has to to autoboxing.
+
+=cut
+
+*/
+    VTABLE void* get_pointer() {
         INTVAL    current_arg;
         PMC      *signature;
         param_processing_state state;
@@ -970,35 +1001,71 @@ return current Namespace
         INTVAL    raw_index;
         PMC      *ctx;
 
+        struct call_context_param *ret;
+
         int       is_constant;
         int       do_restart = 0;
-        INTVAL    ret;
+
+        GET_ATTR_param(INTERP, SELF, ret);
 
         GET_ATTR_current_arg(INTERP, SELF, current_arg);
         GET_ATTR_arg_flags(INTERP, SELF, signature);
         GET_ATTR_state(INTERP, SELF, state);
         GET_ATTR_from_context(INTERP, SELF, ctx);
         GET_ATTR_raw_args(INTERP, SELF, raw_args);
-        raw_index = (INTVAL)*raw_args;
-
 
       restart:
         /* Get flags for current param */
+        raw_index = (INTVAL)*raw_args;
         arg_flags = VTABLE_get_integer_keyed_int(INTERP, signature, current_arg);
         is_constant = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
         do_restart = 0;
 
+        /* Huge hand-crafted FSM to unpack arguments */
         switch (state) {
           case param_positional:
             switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
               case PARROT_ARG_INTVAL:
-                ret = is_constant
+                ret->type   = PARROT_ARG_INTVAL;
+                ret->v.i    = is_constant
                     ? raw_index
                     : CTX_REG_INT(interp, ctx, raw_index);
                 /* Keep state */
                 raw_args++;
                 current_arg++;
                 break;
+
+              case PARROT_ARG_FLOATVAL:
+                ret->type   = PARROT_ARG_FLOATVAL;
+                ret->v.n    = is_constant
+                    ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
+                    : CTX_REG_NUM(interp, ctx, raw_index);
+                /* Keep state */
+                raw_args++;
+                current_arg++;
+                break;
+
+              case PARROT_ARG_STRING:
+                {
+                    STRING * const string_value = is_constant
+                        ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
+                        : CTX_REG_STR(interp, ctx, raw_index);
+
+                    if (arg_flags & PARROT_ARG_NAME) {
+                        // FIXME Switch to handle named parameters.
+                    }
+                    else {
+                        /* Just plain old string */
+                        ret->type   = PARROT_ARG_STRING;
+                        ret->v.s    = string_value;
+                        raw_args++;
+                        current_arg++;
+                    }
+
+                    break;
+                }
+                break;
+
               case PARROT_ARG_PMC:
                 {
                     PMC * const pmc_value = is_constant
@@ -1015,7 +1082,8 @@ return current Namespace
                                 VTABLE_get_iter(INTERP, pmc_value));
                     }
                     else {
-                        ret = VTABLE_get_integer(INTERP, pmc_value);
+                        ret->type = PARROT_ARG_PMC;
+                        ret->v.p  = pmc_value;
                         raw_args++;
                         current_arg++;
                     }
@@ -1028,12 +1096,15 @@ return current Namespace
                 break;
             }
             break;
+
           case param_dissect_array:
             {
                 PMC *iter;
                 GET_ATTR_current_aggregate(INTERP, SELF, iter);
                 if (VTABLE_get_bool(INTERP, iter)) {
-                    ret = VTABLE_shift_integer(INTERP, iter);
+                    /* FIXME We can optimize useless boxing here */
+                    ret->type   = PARROT_ARG_PMC;
+                    ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
                 }
                 else {
                     /* Aggregate is exausted. Switch to next _positional_ arg */
@@ -1050,10 +1121,9 @@ return current Namespace
 
           case param_named:
             /* fall through */
+            break;
+
           case param_dissect_hash:
-            /* Die horribly */
-            PARROT_FAILURE("Can't handle positional argument after named");
-            /* XXX Throw an exception here */
             break;
         }
         if (do_restart) goto restart;
@@ -1062,6 +1132,15 @@ return current Namespace
         /* Move to next one */
         SET_ATTR_current_arg(INTERP, SELF, current_arg);
         SET_ATTR_raw_args(INTERP, SELF, raw_args);
+
+        return ret;
+    }
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        Pcc_cell *cells;
+        INTVAL    num_pos;
+
+        call_context_param *p = SELF.get_pointer();
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
