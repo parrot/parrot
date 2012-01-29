@@ -805,6 +805,9 @@ Set raw signature and start FSM
                     SET_ATTR_state(INTERP, SELF, param_positional);
                     SET_ATTR_raw_args(INTERP, SELF, ++raw_args);
                     SET_ATTR_current_arg(INTERP, SELF, 1);
+                    if (VTABLE_get_integer(INTERP, pmc) == 1) {
+                        SET_ATTR_state(INTERP, SELF, param_finished);
+                    }
                 }
             }
         }
