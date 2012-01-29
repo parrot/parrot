@@ -171,7 +171,7 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
     ASSERT_ARGS(ensure_positionals_storage)
     INTVAL allocated_positionals;
 
-    GETATTR_CallContext_allocated_positionals(interp, self, allocated_positionals);
+    GETATTR_CallContextFromC_allocated_positionals(interp, self, allocated_positionals);
 
     if (size <= allocated_positionals)
         return;
@@ -199,7 +199,7 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     if (size < 8)
         size = 8;
 
-    GETATTR_CallContext_positionals(interp, self, array);
+    GETATTR_CallContextFromC_positionals(interp, self, array);
 
     if (size > 8)
         new_array = (Pcc_cell *)Parrot_gc_allocate_memory_chunk(interp,
@@ -209,7 +209,7 @@ ensure_positionals_storage_ap(PARROT_INTERP,
                 size * sizeof (Pcc_cell));
 
     if (array) {
-        GETATTR_CallContext_num_positionals(interp, self, num_positionals);
+        GETATTR_CallContextFromC_num_positionals(interp, self, num_positionals);
         memcpy(new_array, array, num_positionals * sizeof (Pcc_cell));
 
         if (allocated_positionals > 8)
@@ -219,8 +219,8 @@ ensure_positionals_storage_ap(PARROT_INTERP,
                 allocated_positionals * sizeof (Pcc_cell), array);
     }
 
-    SETATTR_CallContext_allocated_positionals(interp, self, size);
-    SETATTR_CallContext_positionals(interp, self, new_array);
+    SETATTR_CallContextFromC_allocated_positionals(interp, self, size);
+    SETATTR_CallContextFromC_positionals(interp, self, new_array);
 }
 
 /*
@@ -238,7 +238,7 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
     ASSERT_ARGS(get_cell_at)
     Pcc_cell *cells;
     ensure_positionals_storage(interp, self, key + 1);
-    GETATTR_CallContext_positionals(interp, self, cells);
+    GETATTR_CallContextFromC_positionals(interp, self, cells);
     return &cells[key];
 }
 
@@ -382,14 +382,14 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     ASSERT_ARGS(get_hash)
     Hash   *hash;
 
-    GETATTR_CallContext_hash(interp, SELF, hash);
+    GETATTR_CallContextFromC_hash(interp, SELF, hash);
 
     if (!hash) {
         hash = Parrot_hash_create(interp,
             enum_type_ptr,
             Hash_key_type_STRING);
 
-        SETATTR_CallContext_hash(interp, SELF, hash);
+        SETATTR_CallContextFromC_hash(interp, SELF, hash);
     }
 
     return hash;
@@ -438,12 +438,12 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
     ASSERT_ARGS(mark_positionals)
     INTVAL size;
 
-    GETATTR_CallContext_num_positionals(interp, self, size);
+    GETATTR_CallContextFromC_num_positionals(interp, self, size);
 
     if (size) {
         Pcc_cell *cells;
         INTVAL i;
-        GETATTR_CallContext_positionals(interp, self, cells);
+        GETATTR_CallContextFromC_positionals(interp, self, cells);
 
         for (i = 0; i < size; ++i)
             mark_cell(interp, &cells[i]);
@@ -483,7 +483,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     ASSERT_ARGS(get_named_names)
     Hash *hash;
 
-    GETATTR_CallContext_hash(interp, SELF, hash);
+    GETATTR_CallContextFromC_hash(interp, SELF, hash);
 
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
@@ -1195,7 +1195,7 @@ return current Namespace
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1214,7 +1214,7 @@ return current Namespace
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1230,7 +1230,7 @@ return current Namespace
 
     VTABLE STRING * get_string_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1245,7 +1245,7 @@ return current Namespace
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1264,7 +1264,7 @@ return current Namespace
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1282,7 +1282,7 @@ return current Namespace
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1297,7 +1297,7 @@ return current Namespace
 
     VTABLE STRING * get_string_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1312,7 +1312,7 @@ return current Namespace
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1331,7 +1331,7 @@ return current Namespace
 
     VTABLE INTVAL exists_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1343,7 +1343,7 @@ return current Namespace
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = Parrot_hash_key_from_string(INTERP, hash, key);
