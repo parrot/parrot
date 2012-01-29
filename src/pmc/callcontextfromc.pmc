@@ -809,6 +809,10 @@ return current Namespace
         return num_positionals;
     }
 
+    VTABLE INTVAL get_bool() {
+        return SELF.elements() != 0;
+    }
+
     VTABLE void push_integer(INTVAL value) {
         Pcc_cell *cells;
         INTVAL    num_pos, allocated_positionals;
@@ -926,6 +930,48 @@ return current Namespace
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         retval = autobox_string(INTERP, &cells[0]);
+
+        for (i = 1; i < size; ++i)
+            cells[i - 1] = cells[i];
+
+        SET_ATTR_num_positionals(INTERP, SELF, size - 1);
+        return retval;
+    }
+
+    VTABLE INTVAL shift_integer() {
+        Pcc_cell *cells;
+        INTVAL    retval;
+        const INTVAL size = STATICSELF.elements();
+        INTVAL    i;
+
+        if (size < 1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Cannot shift INTVAL from empty CallContext");
+
+        GET_ATTR_positionals(INTERP, SELF, cells);
+        retval = autobox_intval(INTERP, &cells[0]);
+
+        for (i = 1; i < size; ++i)
+            cells[i - 1] = cells[i];
+
+        SET_ATTR_num_positionals(INTERP, SELF, size - 1);
+        return retval;
+    }
+
+    VTABLE FLOATVAL shift_float() {
+        Pcc_cell *cells;
+        FLOATVAL  retval;
+        const INTVAL size = STATICSELF.elements();
+        INTVAL    i;
+
+        if (size < 1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Cannot shift INTVAL from empty CallContext");
+
+        GET_ATTR_positionals(INTERP, SELF, cells);
+        retval = autobox_floatval(INTERP, &cells[0]);
 
         for (i = 1; i < size; ++i)
             cells[i - 1] = cells[i];
