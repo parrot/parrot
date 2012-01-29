@@ -1015,7 +1015,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                     || !Parrot_hash_exists(interp, named_used_list, name)) {
 
                         VTABLE_set_pmc_keyed_str(interp, collect_named, name,
-                                VTABLE_get_pmc_keyed_str(interp, call_object, name));
+                                (PMC *)Parrot_hash_get(interp, named_params, name));
 
                         /* Mark the name as used, cannot be filled again. */
                         if (named_used_list==NULL) /* Only created if needed. */
