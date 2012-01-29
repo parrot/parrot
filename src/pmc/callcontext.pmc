@@ -22,7 +22,6 @@ BEGIN_PMC_HEADER_PREAMBLE
 
 /* FSM for parameters processing */
 typedef enum param_processing_state {
-    param_not_started,
     param_positional,
     param_dissect_array,
     param_named,
@@ -990,8 +989,6 @@ return current Namespace
         do_restart = 0;
 
         switch (state) {
-          case param_not_started:
-            break;
           case param_positional:
             switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
               case PARROT_ARG_INTVAL:
