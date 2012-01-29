@@ -18,6 +18,19 @@ information for a call from C.
 
 */
 
+BEGIN_PMC_HEADER_PREAMBLE
+
+/* FSM for parameters processing */
+typedef enum param_processing_state {
+    param_not_started,
+    param_positional,
+    param_dissect_array,
+    param_named,
+    param_dissect_hash
+} param_processing_state;
+
+END_PMC_HEADER_PREAMBLE
+
 typedef struct Pcc_cell
 {
     union u {
@@ -512,6 +525,14 @@ pmclass CallContext extends CallContextBase auto_attrs {
                                           avoid enforcing "All parameters has
                                           unique names" policy */
 
+    ATTR INTVAL                 current_arg; /* Currently processed arg */
+    ATTR param_processing_state state; /* FSM state */
+    ATTR opcode_t              *raw_args;
+
+    ATTR PMC                   *from_context;
+
+    ATTR PMC                   *current_aggregate;
+
 /*
 
 =item C<void init()>
@@ -525,6 +546,10 @@ Initializes a newly created CallContext object.
     VTABLE void init() {
         SET_ATTR_positionals(INTERP, SELF, NULL);
         SET_ATTR_num_positionals(INTERP, SELF, 0);
+
+        SET_ATTR_state(INTERP, SELF, param_positional);
+        SET_ATTR_current_arg(INTERP, SELF, 0);
+
 
         SUPER();
     }
@@ -937,6 +962,109 @@ return current Namespace
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         Pcc_cell *cells;
         INTVAL    num_pos;
+
+        INTVAL    current_arg;
+        PMC      *signature;
+        param_processing_state state;
+        INTVAL    arg_flags;
+        opcode_t *raw_args;
+        INTVAL    raw_index;
+        PMC      *ctx;
+
+        int       is_constant;
+        int       do_restart = 0;
+        INTVAL    ret;
+
+        GET_ATTR_current_arg(INTERP, SELF, current_arg);
+        GET_ATTR_arg_flags(INTERP, SELF, signature);
+        GET_ATTR_state(INTERP, SELF, state);
+        GET_ATTR_from_context(INTERP, SELF, ctx);
+        GET_ATTR_raw_args(INTERP, SELF, raw_args);
+        raw_index = (INTVAL)*raw_args;
+
+
+      restart:
+        /* Get flags for current param */
+        arg_flags = VTABLE_get_integer_keyed_int(INTERP, signature, current_arg);
+        is_constant = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
+        do_restart = 0;
+
+        switch (state) {
+          case param_not_started:
+            break;
+          case param_positional:
+            switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
+              case PARROT_ARG_INTVAL:
+                ret = is_constant
+                    ? raw_index
+                    : CTX_REG_INT(interp, ctx, raw_index);
+                /* Keep state */
+                raw_args++;
+                current_arg++;
+                break;
+              case PARROT_ARG_PMC:
+                {
+                    PMC * const pmc_value = is_constant
+                            ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
+                            : CTX_REG_PMC(interp, ctx, raw_index);
+
+                    if (arg_flags & PARROT_ARG_FLATTEN) {
+                        /* Switch to dissecting array */
+                        state = param_dissect_array;
+                        SET_ATTR_state(INTERP, SELF, state);
+                        do_restart = 1;
+                        // FIXME We are creating too much GC pressure here...
+                        SET_ATTR_current_aggregate(INTERP, SELF,
+                                VTABLE_get_iter(INTERP, pmc_value));
+                    }
+                    else {
+                        ret = VTABLE_get_integer(INTERP, pmc_value);
+                        raw_args++;
+                        current_arg++;
+                    }
+
+                    break;
+                }
+
+              default:
+                //PARROT_FAILURE("NYI");
+                break;
+            }
+            break;
+          case param_dissect_array:
+            {
+                PMC *iter;
+                GET_ATTR_current_aggregate(INTERP, SELF, iter);
+                if (VTABLE_get_bool(INTERP, iter)) {
+                    ret = VTABLE_shift_integer(INTERP, iter);
+                }
+                else {
+                    /* Aggregate is exausted. Switch to next _positional_ arg */
+                    state = param_positional;
+                    SET_ATTR_state(INTERP, SELF, state);
+                    raw_args++;
+                    current_arg++;
+                    do_restart = 1;
+                }
+            }
+
+            break;
+
+
+          case param_named:
+            /* fall through */
+          case param_dissect_hash:
+            /* Die horribly */
+            PARROT_FAILURE("Can't handle positional argument after named");
+            /* XXX Throw an exception here */
+            break;
+        }
+        if (do_restart) goto restart;
+
+
+        /* Move to next one */
+        SET_ATTR_current_arg(INTERP, SELF, current_arg);
+        SET_ATTR_raw_args(INTERP, SELF, raw_args);
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
