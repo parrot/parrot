@@ -1128,6 +1128,7 @@ Caller has to to autoboxing.
             break;
 
           case param_finished:
+          default:
             ret = NULL;
             break;
         }
