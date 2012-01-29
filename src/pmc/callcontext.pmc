@@ -25,7 +25,8 @@ typedef enum param_processing_state {
     param_positional,
     param_dissect_array,
     param_named,
-    param_dissect_hash
+    param_dissect_hash,
+    param_finished
 } param_processing_state;
 
 /* Structure used to return next param */
@@ -654,6 +655,24 @@ Initializes a newly created CallContext object.
 
 /*
 
+=item
+
+Set raw signature and start FSM
+
+=cut
+*/
+    VTABLE void set_pmc(PMC *pmc) {
+        SET_ATTR_arg_flags(INTERP, SELF, pmc);
+        if (!PMC_IS_NULL(pmc) && VTABLE_get_bool(INTERP, pmc)) {
+            SET_ATTR_state(INTERP, SELF, param_positional);
+        }
+        else {
+            /* We have empty signature */
+            SET_ATTR_state(INTERP, SELF, param_finished);
+        }
+    }
+/*
+
 =item C<void mark()>
 
 Mark any referenced strings and PMCs.
@@ -926,75 +945,25 @@ return current Namespace
     }
 
     VTABLE INTVAL elements() {
-        INTVAL num_positionals;
-
-        if (!PMC_data(SELF))
-            return 0;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
-
-        return num_positionals;
+        param_processing_state state;
+        GET_ATTR_state(INTERP, SELF, state);
+        return (state == param_positional) || (state == param_dissect_array);
     }
 
     VTABLE void push_integer(INTVAL value) {
-        Pcc_cell *cells;
-        INTVAL    num_pos, allocated_positionals;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
-
-        if (num_pos + 1 > allocated_positionals)
-            ensure_positionals_storage_ap(INTERP, SELF, num_pos + 1, allocated_positionals);
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        cells[num_pos].u.i      = value;
-        cells[num_pos].type     = INTCELL;
-        SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void push_float(FLOATVAL value) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        ensure_positionals_storage(INTERP, SELF, num_pos + 1);
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        cells[num_pos].u.n      = value;
-        cells[num_pos].type     = FLOATCELL;
-        SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void push_string(STRING *value) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        ensure_positionals_storage(INTERP, SELF, num_pos + 1);
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        cells[num_pos].u.s      = value;
-        cells[num_pos].type     = STRINGCELL;
-        SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void push_pmc(PMC *value) {
-        Pcc_cell *cells;
-        INTVAL    num_pos, allocated_positionals;
-
-        PARROT_ASSERT(!PObj_on_free_list_TEST(value)
-                || !"Push dead object into CallContext!");
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
-
-        if (num_pos + 1 > allocated_positionals)
-            ensure_positionals_storage_ap(INTERP, SELF, num_pos + 1, allocated_positionals);
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        cells[num_pos].u.p      = value;
-        cells[num_pos].type     = PMCCELL;
-        SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     /*
@@ -1003,65 +972,8 @@ return current Namespace
     */
 
     VTABLE void unshift_pmc(PMC *value) {
-        Pcc_cell *cells;
-        const INTVAL size = STATICSELF.elements();
-        INTVAL    i;
-
-        assert(0);
-        ensure_positionals_storage(INTERP, SELF, size + 1);
-        GET_ATTR_positionals(INTERP, SELF, cells);
-
-        for (i = size; i; --i)
-            cells[i] = cells[i - 1];
-
-        cells[0].u.p    = value;
-        cells[0].type   = PMCCELL;
-        SET_ATTR_num_positionals(INTERP, SELF, size + 1);
+        PARROT_FAILURE("EPIC FAIL");
     }
-
-    VTABLE PMC * shift_pmc() {
-        Pcc_cell *cells;
-        PMC      *retval;
-        const INTVAL size = STATICSELF.elements();
-        INTVAL    i, type;
-
-        if (size < 1)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Cannot shift PMC from empty CallContext");
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        type   = CELL_TYPE_MASK(&cells[0]);
-        retval = autobox_pmc(INTERP, &cells[0], type);
-
-        for (i = 1; i < size; ++i)
-            cells[i - 1] = cells[i];
-
-        SET_ATTR_num_positionals(INTERP, SELF, size - 1);
-        return retval;
-    }
-
-    VTABLE STRING * shift_string() {
-        Pcc_cell *cells;
-        STRING   *retval;
-        const INTVAL size = STATICSELF.elements();
-        INTVAL    i;
-
-        if (size < 1)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION,
-                "Cannot shift PMC from empty CallContext");
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        retval = autobox_string(INTERP, &cells[0]);
-
-        for (i = 1; i < size; ++i)
-            cells[i - 1] = cells[i];
-
-        SET_ATTR_num_positionals(INTERP, SELF, size - 1);
-        return retval;
-    }
-
 /*
 
 =item get_pointer
@@ -1208,6 +1120,10 @@ Caller has to to autoboxing.
 
           case param_dissect_hash:
             break;
+
+          case param_finished:
+            ret = NULL;
+            break;
         }
         if (do_restart) goto restart;
 
@@ -1216,25 +1132,31 @@ Caller has to to autoboxing.
         SET_ATTR_current_arg(INTERP, SELF, current_arg);
         SET_ATTR_raw_args(INTERP, SELF, raw_args);
 
+        /* Check that we didn't overrun */
+        if (current_arg >= VTABLE_get_integer(INTERP, signature)) {
+            state = param_finished;
+            SET_ATTR_state(INTERP, SELF, state);
+        }
+
         return ret;
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL shift_integer(INTVAL key) {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2int(INTERP, p) : 0;
     }
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL shift_float(INTVAL key) {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2num(INTERP, p) : 0.0;
     }
 
-    VTABLE STRING * get_string_keyed_int(INTVAL key) {
+    VTABLE STRING * shift_string(INTVAL key) {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2str(INTERP, p) : STRINGNULL;
     }
 
-    VTABLE PMC * get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC * shift_pmc(INTVAL key) {
         call_context_param *p = (call_context_param *)SELF.get_pointer();
         return p ? ccp2pmc(INTERP, p) : PMCNULL;
     }
