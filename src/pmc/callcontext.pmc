@@ -1053,6 +1053,7 @@ Caller has to to autoboxing.
 
                     if (arg_flags & PARROT_ARG_NAME) {
                         // FIXME Switch to handle named parameters.
+                        PARROT_FAILURE("NYI");
                     }
                     else {
                         /* Just plain old string */
