@@ -37,7 +37,7 @@ typedef struct call_context_param {
         INTVAL   i;
         FLOATVAL n;
     } v;
-    INTVAL  type;
+    INTVAL  type;       /* -1 mean empty ret */
     STRING *name;       /* Optional name of parameter */
 } call_context_param;
 
@@ -1005,6 +1005,7 @@ Caller has to to autoboxing.
         int       do_restart = 0;
 
         GET_ATTR_param(INTERP, SELF, ret);
+        ret->type = -1; /* Empty for now */
         GET_ATTR_state(INTERP, SELF, state);
 
         PARROT_ASSERT(state != param_finished || !"Holy sheet");
@@ -1108,12 +1109,17 @@ Caller has to to autoboxing.
                     ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
                 }
                 else {
-                    /* Aggregate is exausted. Switch to next _positional_ arg */
-                    state = param_positional;
-                    SET_ATTR_state(INTERP, SELF, state);
+                    /* Aggregate is exausted. Switch to next _positional_ arg or stop */
                     raw_args++;
                     current_arg++;
-                    do_restart = 1;
+                    if (current_arg >= VTABLE_elements(INTERP, signature)) {
+                        state = param_finished;
+                    }
+                    else {
+                        state = param_positional;
+                        do_restart = 1;
+                    }
+                    SET_ATTR_state(INTERP, SELF, state);
                 }
             }
 
@@ -1145,26 +1151,26 @@ Caller has to to autoboxing.
             SET_ATTR_state(INTERP, SELF, state);
         }
 
-        return ret;
+        return ret->type == -1 ? NULL : ret;
     }
 
     VTABLE INTVAL shift_integer() {
-        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
         return p ? ccp2int(INTERP, p) : 0;
     }
 
     VTABLE FLOATVAL shift_float() {
-        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
         return p ? ccp2num(INTERP, p) : 0.0;
     }
 
     VTABLE STRING * shift_string() {
-        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
         return p ? ccp2str(INTERP, p) : STRINGNULL;
     }
 
     VTABLE PMC * shift_pmc() {
-        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
         return p ? ccp2pmc(INTERP, p) : PMCNULL;
     }
 
