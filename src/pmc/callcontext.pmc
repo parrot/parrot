@@ -1185,12 +1185,24 @@ Caller has to to autoboxing.
 
                     if (arg_flags & PARROT_ARG_FLATTEN) {
                         /* Switch to dissecting array */
-                        state = param_dissect_array;
-                        SET_ATTR_state(INTERP, SELF, state);
-                        do_restart = 1;
                         // FIXME We are creating too much GC pressure here...
-                        SET_ATTR_current_aggregate(INTERP, SELF,
-                                VTABLE_get_iter(INTERP, pmc_value));
+                        PMC *iter = VTABLE_get_iter(INTERP, pmc_value);
+
+                        if (VTABLE_get_bool(INTERP, iter)) {
+                            SET_ATTR_current_aggregate(INTERP, SELF, iter);
+                            state = param_dissect_array;
+                            do_restart = 1;
+                        }
+                        else {
+                            /* We have empty aggregate. Skip it */
+                            current_arg++;
+                            raw_index++;
+                            state = current_arg >= VTABLE_elements(interp, signature)
+                                    ? param_finished
+                                    : param_positional;
+                            do_restart = state != param_finished;
+                        }
+                        SET_ATTR_state(INTERP, SELF, state);
                     }
                     else {
                         ret->type = PARROT_ARG_PMC;
@@ -1212,12 +1224,11 @@ Caller has to to autoboxing.
             {
                 PMC *iter;
                 GET_ATTR_current_aggregate(INTERP, SELF, iter);
-                if (VTABLE_get_bool(INTERP, iter)) {
-                    /* FIXME We can optimize useless boxing here */
-                    ret->type   = PARROT_ARG_PMC;
-                    ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
-                }
-                else {
+                /* FIXME We can optimize useless boxing here */
+                ret->type   = PARROT_ARG_PMC;
+                ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
+
+                if (!VTABLE_get_bool(INTERP, iter)) {
                     /* Aggregate is exausted. Switch to next _positional_ arg or stop */
                     raw_args++;
                     current_arg++;
