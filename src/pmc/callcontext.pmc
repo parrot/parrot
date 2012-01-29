@@ -102,6 +102,22 @@ static STRING * autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static INTVAL ccp2int(PARROT_INTERP, ARGIN(call_context_param *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static FLOATVAL ccp2num(PARROT_INTERP, ARGIN(call_context_param *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PMC* ccp2pmc(PARROT_INTERP, ARGIN(call_context_param *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static STRING* ccp2str(PARROT_INTERP, ARGIN(call_context_param *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void ensure_positionals_storage(PARROT_INTERP,
     ARGIN(PMC *self),
     INTVAL size)
@@ -114,6 +130,19 @@ static void ensure_positionals_storage_ap(PARROT_INTERP,
     INTVAL allocated_positionals)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static void extract_named_arg_from_op(PARROT_INTERP,
+    ARGMOD(call_context_param *param),
+    ARGIN(PMC *ctx),
+    ARGIN(PMC *raw_sig),
+    INTVAL arg_index,
+    ARGIN(opcode_t *raw_args))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(6)
+        FUNC_MODIFIES(*param);
 
 PARROT_CANNOT_RETURN_NULL
 static Pcc_cell* get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
@@ -154,12 +183,30 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 #define ASSERT_ARGS_autobox_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cell))
+#define ASSERT_ARGS_ccp2int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_ccp2num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_ccp2pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p))
+#define ASSERT_ARGS_ccp2str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_ensure_positionals_storage_ap __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_extract_named_arg_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(param) \
+    , PARROT_ASSERT_ARG(ctx) \
+    , PARROT_ASSERT_ARG(raw_sig) \
+    , PARROT_ASSERT_ARG(raw_args))
 #define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -605,6 +652,61 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     return PMCNULL;
 }
 
+/*
+
+=item C<static void extract_named_arg_from_op(PARROT_INTERP, call_context_param
+*param, PMC *ctx, PMC *raw_sig, INTVAL arg_index, opcode_t *raw_args)>
+
+Pulls in the next argument from a set_args opcode, and sets it as the
+value of a named argument in the CallContext PMC.
+
+=cut
+
+*/
+
+static void
+extract_named_arg_from_op(PARROT_INTERP, ARGMOD(call_context_param *param),
+        ARGIN(PMC *ctx), ARGIN(PMC *raw_sig), INTVAL arg_index, ARGIN(opcode_t *raw_args))
+{
+    ASSERT_ARGS(extract_named_arg_from_op)
+    const INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, arg_index);
+    const int is_constant  = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
+    const INTVAL raw_index = *raw_args;
+
+    switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
+      case PARROT_ARG_INTVAL:
+        param->type = PARROT_ARG_INTVAL;
+        param->v.i  = is_constant
+                    ? raw_index
+                    : CTX_REG_INT(interp, ctx, raw_index);
+        break;
+
+      case PARROT_ARG_FLOATVAL:
+        param->type = PARROT_ARG_FLOATVAL;
+        param->v.n  = is_constant
+                ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
+                : CTX_REG_NUM(interp, ctx, raw_index);
+        break;
+
+      case PARROT_ARG_STRING:
+        param->type = PARROT_ARG_STRING;
+        param->v.s  = is_constant
+                    ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
+                    : CTX_REG_STR(interp, ctx, raw_index);
+        break;
+
+      case PARROT_ARG_PMC:
+        param->type = PARROT_ARG_PMC;
+        param->v.p  = is_constant
+                ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
+                : CTX_REG_PMC(interp, ctx, raw_index);
+        break;
+
+      default:
+        PARROT_FAILURE("Impossible");
+        break;
+    }
+}
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
 
@@ -664,7 +766,11 @@ Set raw signature and start FSM
     VTABLE void set_pmc(PMC *pmc) {
         SET_ATTR_arg_flags(INTERP, SELF, pmc);
         if (!PMC_IS_NULL(pmc) && VTABLE_get_bool(INTERP, pmc)) {
-            SET_ATTR_state(INTERP, SELF, param_positional);
+            INTVAL arg_flags = VTABLE_get_integer_keyed_int(INTERP, pmc, 0);
+            if (arg_flags & PARROT_ARG_NAME)
+                SET_ATTR_state(INTERP, SELF, param_named);
+            else
+                SET_ATTR_state(INTERP, SELF, param_positional);
         }
         else {
             /* We have empty signature */
@@ -1008,7 +1114,8 @@ Caller has to to autoboxing.
         ret->type = -1; /* Empty for now */
         GET_ATTR_state(INTERP, SELF, state);
 
-        PARROT_ASSERT(state != param_finished || !"Holy sheet");
+        if (state == param_finished)
+            return NULL;
 
         GET_ATTR_current_arg(INTERP, SELF, current_arg);
         GET_ATTR_arg_flags(INTERP, SELF, signature);
@@ -1053,8 +1160,10 @@ Caller has to to autoboxing.
                         : CTX_REG_STR(interp, ctx, raw_index);
 
                     if (arg_flags & PARROT_ARG_NAME) {
-                        // FIXME Switch to handle named parameters.
-                        PARROT_FAILURE("NYI");
+                        /* Switch to handle named parameters. */
+                        state = param_named;
+                        SET_ATTR_state(INTERP, SELF, state);
+                        do_restart = 1;
                     }
                     else {
                         /* Just plain old string */
@@ -1127,7 +1236,17 @@ Caller has to to autoboxing.
 
 
           case param_named:
-            /* fall through */
+            /* We have pair (name, value) in 2 sequential params */
+            ret->name = is_constant
+                ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
+                : CTX_REG_STR(interp, ctx, raw_index);
+            current_arg++;
+            raw_args++;
+
+            extract_named_arg_from_op(INTERP, ret, ctx, signature, current_arg, raw_args);
+            current_arg++;
+            raw_args++;
+
             break;
 
           case param_dissect_hash:
