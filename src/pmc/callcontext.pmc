@@ -1232,13 +1232,9 @@ Caller has to to autoboxing.
                     /* Aggregate is exausted. Switch to next _positional_ arg or stop */
                     raw_args++;
                     current_arg++;
-                    if (current_arg >= VTABLE_elements(INTERP, signature)) {
-                        state = param_finished;
-                    }
-                    else {
-                        state = param_positional;
-                        do_restart = 1;
-                    }
+                    state = current_arg >= VTABLE_elements(INTERP, signature)
+                        ? param_finished
+                        : param_positional;
                     SET_ATTR_state(INTERP, SELF, state);
                 }
             }
