@@ -1007,6 +1007,7 @@ return current Namespace
         const INTVAL size = STATICSELF.elements();
         INTVAL    i;
 
+        assert(0);
         ensure_positionals_storage(INTERP, SELF, size + 1);
         GET_ATTR_positionals(INTERP, SELF, cells);
 
@@ -1219,219 +1220,71 @@ Caller has to to autoboxing.
     }
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
-
         call_context_param *p = (call_context_param *)SELF.get_pointer();
-        //return p ? ccp2int(INTEPR, p) : 0;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        if (key >= num_pos || key < 0)
-            return 0;
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        {
-            const Pcc_cell *cell = &cells[key];
-            if (CELL_TYPE_MASK(cell) == INTCELL)
-                return CELL_INT(cell);
-
-            return autobox_intval(INTERP, cell);
-        }
+        return p ? ccp2int(INTERP, p) : 0;
     }
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        if (key >= num_pos || key < 0)
-            return 0.0;
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        return autobox_floatval(INTERP, &cells[key]);
+        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        return p ? ccp2num(INTERP, p) : 0.0;
     }
 
     VTABLE STRING * get_string_keyed_int(INTVAL key) {
-        Pcc_cell *cells;
-        INTVAL    num_pos;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        if (key >= num_pos || key < 0)
-            return STRINGNULL;
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        return autobox_string(INTERP, &cells[key]);
+        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        return p ? ccp2str(INTERP, p) : STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed_int(INTVAL key) {
-        Pcc_cell *cells;
-        INTVAL    num_pos, type;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_pos);
-        if (key >= num_pos || key < 0)
-            return PMCNULL;
-
-        GET_ATTR_positionals(INTERP, SELF, cells);
-        type = CELL_TYPE_MASK(&cells[key]);
-        if (type == PMCCELL)
-            return CELL_PMC(&cells[key]);
-        return autobox_pmc(INTERP, &cells[key], type);
+        call_context_param *p = (call_context_param *)SELF.get_pointer();
+        return p ? ccp2pmc(INTERP, p) : PMCNULL;
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
-        INTVAL    pos;
-
-        cell->u.i   = value;
-        cell->type  = INTCELL;
-
-        GET_ATTR_num_positionals(INTERP, SELF, pos);
-        if (pos <= key)
-            SET_ATTR_num_positionals(INTERP, SELF, key + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
-        INTVAL    pos;
-
-        cell->u.n   = value;
-        cell->type  = FLOATCELL;
-
-        GET_ATTR_num_positionals(INTERP, SELF, pos);
-        if (pos <= key)
-            SET_ATTR_num_positionals(INTERP, SELF, key + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
-        INTVAL    pos;
-
-        cell->u.s   = value;
-        cell->type  = STRINGCELL;
-
-        GET_ATTR_num_positionals(INTERP, SELF, pos);
-        if (pos <= key)
-            SET_ATTR_num_positionals(INTERP, SELF, key + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        INTVAL    pos;
-        Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
-
-        cell->u.p   = value;
-        cell->type  = PMCCELL;
-
-        GET_ATTR_num_positionals(INTERP, SELF, pos);
-        if (pos <= key)
-            SET_ATTR_num_positionals(INTERP, SELF, key + 1);
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, (void *)key, (void *)cell);
-        }
-
-        cell->u.i       = value;
-        cell->type      = INTCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, (void *)key, (void *)cell);
-        }
-
-        cell->u.n       = value;
-        cell->type      = FLOATCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, (void *)key, (void *)cell);
-        }
-
-        cell->u.s       = value;
-        cell->type      = STRINGCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, (void *)key, (void *)cell);
-        }
-
-        cell->u.p       = value;
-        cell->type      = PMCCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, k, (void *)cell);
-        }
-
-        cell->u.i       = value;
-        cell->type      = INTCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, k, (void *)cell);
-        }
-
-        cell->u.n       = value;
-        cell->type      = FLOATCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, k, (void *)cell);
-        }
-
-        cell->u.s       = value;
-        cell->type      = STRINGCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        Hash     * const hash = get_hash(INTERP, SELF);
-        void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-        Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-        if (!cell) {
-            cell = ALLOC_CELL(INTERP);
-            Parrot_hash_put(INTERP, hash, k, (void *)cell);
-        }
-
-        cell->u.p       = value;
-        cell->type      = PMCCELL;
+        PARROT_FAILURE("Wrong!");
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
