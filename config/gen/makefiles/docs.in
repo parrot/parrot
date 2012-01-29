@@ -37,7 +37,7 @@ help :
 clean: htmlhelp-clean html-clean
 
 html:
-	$(PERL) -I../lib ../tools/docs/make_html_docs.pl --version=$(VERSION)
+	$(PERL) -I../lib ../tools/docs/mk_html_docspl --version=$(VERSION)
 html-clean:
 	$(RM_RF) html
 
