@@ -727,6 +727,7 @@ pmclass CallContext extends CallContextBase auto_attrs {
 
     ATTR PMC                   *from_context;
 
+    ATTR PMC                   *current_iter;
     ATTR PMC                   *current_aggregate;
 
     ATTR struct call_context_param *param; /* Last fetched param */
@@ -764,18 +765,55 @@ Set raw signature and start FSM
 =cut
 */
     VTABLE void set_pmc(PMC *pmc) {
+        PMC *iter, *aggr;
+        param_processing_state state;
         SET_ATTR_arg_flags(INTERP, SELF, pmc);
+
         if (!PMC_IS_NULL(pmc) && VTABLE_get_bool(INTERP, pmc)) {
+            /* Look ahead to setup current state properly */
+            /* Basically it's transition from (start) state. */
             INTVAL arg_flags = VTABLE_get_integer_keyed_int(INTERP, pmc, 0);
             if (arg_flags & PARROT_ARG_NAME)
-                SET_ATTR_state(INTERP, SELF, param_named);
-            else
-                SET_ATTR_state(INTERP, SELF, param_positional);
+                if (arg_flags & PARROT_ARG_SLURPY_ARRAY) {
+                    state = param_dissect_hash;
+                }
+                else {
+                    state = param_named;
+                }
+            else {
+                if (arg_flags & PARROT_ARG_SLURPY_ARRAY) {
+                    /* Dissecting array */
+                    state = param_dissect_array;
+                }
+                else {
+                    state = param_positional;
+                }
+            }
+
+            SET_ATTR_state(INTERP, SELF, state);
+            if (state == param_dissect_array || state == param_dissect_hash) {
+                opcode_t *raw_args;
+                GET_ATTR_raw_args(INTERP, SELF, raw_args);
+                /* We can't have constant here */
+                aggr = REG_PMC(INTERP, *raw_args);
+                SET_ATTR_current_aggregate(INTERP, SELF, aggr);
+
+                iter = VTABLE_get_iter(INTERP, aggr);
+                SET_ATTR_current_iter(INTERP, SELF, iter);
+                /* It can be empty. Skip it */
+                if (!VTABLE_get_bool(INTERP, iter)) {
+                    SET_ATTR_state(INTERP, SELF, param_positional);
+                    SET_ATTR_raw_args(INTERP, SELF, ++raw_args);
+                    SET_ATTR_current_arg(INTERP, SELF, 1);
+                }
+            }
         }
         else {
             /* We have empty signature */
             SET_ATTR_state(INTERP, SELF, param_finished);
         }
+
+
     }
 /*
 
@@ -1189,8 +1227,11 @@ Caller has to to autoboxing.
                         PMC *iter = VTABLE_get_iter(INTERP, pmc_value);
 
                         if (VTABLE_get_bool(INTERP, iter)) {
-                            SET_ATTR_current_aggregate(INTERP, SELF, iter);
-                            state = param_dissect_array;
+                            SET_ATTR_current_aggregate(INTERP, SELF, pmc_value);
+                            SET_ATTR_current_iter(INTERP, SELF, iter);
+                            state = arg_flags & PARROT_ARG_NAME
+                                    ? param_dissect_hash
+                                    : param_dissect_array;
                             do_restart = 1;
                         }
                         else {
@@ -1223,7 +1264,7 @@ Caller has to to autoboxing.
           case param_dissect_array:
             {
                 PMC *iter;
-                GET_ATTR_current_aggregate(INTERP, SELF, iter);
+                GET_ATTR_current_iter(INTERP, SELF, iter);
                 /* FIXME We can optimize useless boxing here */
                 ret->type   = PARROT_ARG_PMC;
                 ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
@@ -1257,6 +1298,26 @@ Caller has to to autoboxing.
             break;
 
           case param_dissect_hash:
+            {
+                PMC *iter, *hash;
+                GET_ATTR_current_aggregate(INTERP, SELF, hash);
+                GET_ATTR_current_iter(INTERP, SELF, iter);
+                /* FIXME We can optimize useless boxing here */
+                ret->type = PARROT_ARG_PMC;
+                ret->name = VTABLE_shift_string(INTERP, iter);
+                ret->v.p  = VTABLE_get_pmc_keyed_str(INTERP, hash, ret->name);
+
+                if (!VTABLE_get_bool(INTERP, iter)) {
+                    /* Aggregate is exausted. Switch to next _positional_ arg or stop */
+                    raw_args++;
+                    current_arg++;
+                    state = current_arg >= VTABLE_elements(INTERP, signature)
+                        ? param_finished
+                        : param_positional;
+                    SET_ATTR_state(INTERP, SELF, state);
+                }
+            }
+
             break;
 
           case param_finished:
