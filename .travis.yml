@@ -1,5 +1,8 @@
 before_script:
-    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev clang
+    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev clang liblocal-lib-perl
+    - `perl -Mlocal::lib`
+    - curl -L http://cpanmin.us | sudo perl - --self-upgrade
+    - cpanm TAP::Harness::Archive TAP::Harness::Multiple TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
 # branches:
 #   only:
@@ -11,13 +14,13 @@ notifications:
     on_success: change
     on_failure: always
 env:
-    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="clang"
-    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="clang"
-    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="ccache gcc"
-    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="ccache g++"
-    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="gcc"
-    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="fulltest" CC="g++"
-    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="ccache gcc"
-    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="ccache g++"
-    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="gcc"
-    - PARROT_OPTIMIZE=""           PARROT_TEST="fulltest" CC="g++"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="ccache gcc"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="ccache g++"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="gcc"
+    - PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="g++"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="ccache gcc"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="ccache g++"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="gcc"
+    - PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="g++"
