@@ -157,6 +157,7 @@ Caller has to to autoboxing.
 static int
 fetch_and_advance(PARROT_INTERP, ARGIN(PMC *self), ARGIN(call_context_param *ret))
 {
+    Parrot_CallContext_attributes *attrs = (Parrot_CallContext_attributes*)PMC_data(self);
     INTVAL    current_arg;
     param_processing_state state;
     INTVAL    arg_flags;
@@ -177,11 +178,11 @@ fetch_and_advance(PARROT_INTERP, ARGIN(PMC *self), ARGIN(call_context_param *ret
     if (state == param_finished)
         return 0;
 
-    GETATTR_CallContext_current_arg(interp, self, current_arg);
-    GETATTR_CallContext_from_context(interp, self, ctx);
-    GETATTR_CallContext_raw_args(interp, self, raw_args);
-    GETATTR_CallContext_args_flags(interp, self, args_flags);
-    GETATTR_CallContext_args_flags_size(interp, self, args_flags_size);
+    current_arg = attrs->current_arg; //GETATTR_CallContext_current_arg(interp, self, current_arg);
+    ctx         = attrs->from_context; //GETATTR_CallContext_from_context(interp, self, ctx);
+    raw_args    = attrs->raw_args; //GETATTR_CallContext_raw_args(interp, self, raw_args);
+    args_flags  = attrs->args_flags; //GETATTR_CallContext_args_flags(interp, self, args_flags);
+    args_flags_size = attrs->args_flags_size; //GETATTR_CallContext_args_flags_size(interp, self, args_flags_size);
 
 restart:
     /* Get flags for current param */
@@ -223,7 +224,7 @@ restart:
                 if (arg_flags & PARROT_ARG_NAME) {
                     /* Switch to handle named parameters. */
                     state = param_named;
-                    SETATTR_CallContext_state(interp, self, state);
+                    attrs->state = state; //SETATTR_CallContext_state(interp, self, state);
                     do_restart = 1;
                 }
                 else {
@@ -250,8 +251,8 @@ restart:
                     PMC *iter = VTABLE_get_iter(interp, pmc_value);
 
                     if (VTABLE_get_bool(interp, iter)) {
-                        SETATTR_CallContext_current_aggregate(interp, self, pmc_value);
-                        SETATTR_CallContext_current_iter(interp, self, iter);
+                        attrs->current_aggregate = pmc_value; //SETATTR_CallContext_current_aggregate(interp, self, pmc_value);
+                        attrs->current_iter = iter; //SETATTR_CallContext_current_iter(interp, self, iter);
                         state = arg_flags & PARROT_ARG_NAME
                             ? param_dissect_hash
                             : param_dissect_array;
@@ -266,7 +267,7 @@ restart:
                             : param_positional;
                         do_restart = state != param_finished;
                     }
-                    SETATTR_CallContext_state(interp, self, state);
+                    attrs->state = state; //SETATTR_CallContext_state(interp, self, state);
                 }
                 else {
                     ret->type = PARROT_ARG_PMC;
@@ -299,7 +300,7 @@ restart:
                 state = current_arg >= args_flags_size
                     ? param_finished
                     : param_positional;
-                SETATTR_CallContext_state(interp, self, state);
+                attrs->state = state; //SETATTR_CallContext_state(interp, self, state);
             }
         }
 
@@ -342,7 +343,7 @@ restart:
                 state = current_arg >= args_flags_size
                     ? param_finished
                     : param_positional;
-                SETATTR_CallContext_state(interp, self, state);
+                attrs->state = state; //SETATTR_CallContext_state(interp, self, state);
             }
         }
 
@@ -357,13 +358,13 @@ restart:
 
 
     /* Move to next one */
-    SETATTR_CallContext_current_arg(interp, self, current_arg);
-    SETATTR_CallContext_raw_args(interp, self, raw_args);
+    attrs->current_arg = current_arg; //SETATTR_CallContext_current_arg(interp, self, current_arg);
+    attrs->raw_args = raw_args; //SETATTR_CallContext_raw_args(interp, self, raw_args);
 
     /* Check that we didn't overrun */
     if (current_arg >= args_flags_size) {
         state = param_finished;
-        SETATTR_CallContext_state(interp, self, state);
+        attrs->state = state; //SETATTR_CallContext_state(interp, self, state);
     }
 
     return ret->type != -1;
@@ -824,8 +825,9 @@ return current Namespace
     }
 
     VTABLE INTVAL elements() {
-        param_processing_state state;
-        GET_ATTR_state(INTERP, SELF, state);
+        param_processing_state state = ((Parrot_CallContext_attributes*)PMC_data(SELF))->state;
+        //GET_ATTR_state(INTERP, SELF, state);
+
         return (state == param_positional) || (state == param_dissect_array);
     }
 
