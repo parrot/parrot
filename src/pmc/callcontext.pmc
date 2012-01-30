@@ -1159,6 +1159,8 @@ Caller has to to autoboxing.
 
         GET_ATTR_param(INTERP, SELF, ret);
         ret->type = -1; /* Empty for now */
+        ret->name = NULL;
+
         GET_ATTR_state(INTERP, SELF, state);
 
         if (state == param_finished)
@@ -1293,6 +1295,11 @@ Caller has to to autoboxing.
 
 
           case param_named:
+            if (!(arg_flags & PARROT_ARG_NAME))
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "named arguments must follow all positional arguments");
+
             /* We have pair (name, value) in 2 sequential params */
             ret->name = is_constant
                 ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
