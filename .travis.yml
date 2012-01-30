@@ -4,7 +4,8 @@ before_script:
     - export CI_USER=$USER
     - env
     - sudo chown -R $CI_USER ~/.cpanm
-    - cpanm TAP::Harness::Archive TAP::Harness::Multiple TAP::Harness::ReportByDescription
+# No, we are not going ot run the tests for all these dependencies on every commit
+    - cpanm -n TAP::Harness::Archive TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
 # branches:
 #   only:
