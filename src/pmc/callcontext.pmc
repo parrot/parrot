@@ -43,6 +43,8 @@ typedef struct call_context_param {
 
 END_PMC_HEADER_PREAMBLE
 
+#include "pmc/pmc_fixedintegerarray.h"
+
 typedef struct Pcc_cell
 {
     union u {
@@ -84,28 +86,6 @@ typedef struct Pcc_cell
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static FLOATVAL autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static INTVAL autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CANNOT_RETURN_NULL
-static STRING * autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static INTVAL ccp2int(PARROT_INTERP, ARGIN(call_context_param *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static FLOATVAL ccp2num(PARROT_INTERP, ARGIN(call_context_param *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -118,23 +98,10 @@ static STRING* ccp2str(PARROT_INTERP, ARGIN(call_context_param *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void ensure_positionals_storage(PARROT_INTERP,
-    ARGIN(PMC *self),
-    INTVAL size)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void ensure_positionals_storage_ap(PARROT_INTERP,
-    ARGIN(PMC *self),
-    INTVAL size,
-    INTVAL allocated_positionals)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void extract_named_arg_from_op(PARROT_INTERP,
     ARGMOD(call_context_param *param),
     ARGIN(PMC *ctx),
-    ARGIN(PMC *raw_sig),
+    ARGIN(INTVAL *raw_sig),
     INTVAL arg_index,
     ARGIN(opcode_t *raw_args))
         __attribute__nonnull__(1)
@@ -144,48 +111,13 @@ static void extract_named_arg_from_op(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*param);
 
-PARROT_CANNOT_RETURN_NULL
-static Pcc_cell* get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
+static int fetch_and_advance(PARROT_INTERP,
+    ARGIN(PMC *self),
+    ARGIN(call_context_param *ret))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
-static Hash * get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_CAN_RETURN_NULL
-static PMC * get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void mark_hash(PARROT_INTERP, ARGIN(Hash *h))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_autobox_floatval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cell))
-#define ASSERT_ARGS_autobox_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cell))
-#define ASSERT_ARGS_autobox_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cell))
-#define ASSERT_ARGS_autobox_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(cell))
-#define ASSERT_ARGS_ccp2int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_ccp2num __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(p))
@@ -195,248 +127,246 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 #define ASSERT_ARGS_ccp2str __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(p))
-#define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_ensure_positionals_storage_ap __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_extract_named_arg_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(param) \
     , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(raw_sig) \
     , PARROT_ASSERT_ARG(raw_args))
-#define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_fetch_and_advance __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_get_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(SELF))
-#define ASSERT_ARGS_get_named_names __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(SELF))
-#define ASSERT_ARGS_mark_cell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(c))
-#define ASSERT_ARGS_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(h))
-#define ASSERT_ARGS_mark_positionals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(ret))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
 
-=item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL
-size)>
+=item fetch_and_advance
+
+All logic of handling parameters unpacking sitting in here.
+
+Fill passed call_context_param with data.
+
+Caller has to to autoboxing.
 
 =cut
 
 */
 
-static void
-ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
+static int
+fetch_and_advance(PARROT_INTERP, ARGIN(PMC *self), ARGIN(call_context_param *ret))
 {
-    ASSERT_ARGS(ensure_positionals_storage)
-    INTVAL allocated_positionals;
+    INTVAL    current_arg;
+    param_processing_state state;
+    INTVAL    arg_flags;
+    opcode_t *raw_args;
+    INTVAL    raw_index;
+    PMC      *ctx;
+    INTVAL   *args_flags;
+    INTVAL    args_flags_size;
 
-    GETATTR_CallContext_allocated_positionals(interp, self, allocated_positionals);
+    int       is_constant;
+    int       do_restart = 0;
 
-    if (size <= allocated_positionals)
-        return;
+    ret->type = -1; /* Empty for now */
+    ret->name = NULL;
 
-    ensure_positionals_storage_ap(interp, self, size, allocated_positionals);
-}
+    GETATTR_CallContext_state(interp, self, state);
 
-/*
+    if (state == param_finished)
+        return 0;
 
-=item C<static void ensure_positionals_storage_ap(PARROT_INTERP, PMC *self,
-INTVAL size, INTVAL allocated_positionals)>
+    GETATTR_CallContext_current_arg(interp, self, current_arg);
+    GETATTR_CallContext_from_context(interp, self, ctx);
+    GETATTR_CallContext_raw_args(interp, self, raw_args);
+    GETATTR_CallContext_args_flags(interp, self, args_flags);
+    GETATTR_CallContext_args_flags_size(interp, self, args_flags_size);
 
-=cut
+restart:
+    /* Get flags for current param */
+    raw_index = (INTVAL)*raw_args;
+    arg_flags = args_flags[current_arg];
+    is_constant = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
+    do_restart = 0;
 
-*/
+    /* Huge hand-crafted FSM to unpack arguments */
+    switch (state) {
+      case param_positional:
+        switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
+          case PARROT_ARG_INTVAL:
+            ret->type   = PARROT_ARG_INTVAL;
+            ret->v.i    = is_constant
+                ? raw_index
+                : CTX_REG_INT(interp, ctx, raw_index);
+            /* Keep state */
+            raw_args++;
+            current_arg++;
+            break;
 
-static void
-ensure_positionals_storage_ap(PARROT_INTERP,
-                              ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
-{
-    ASSERT_ARGS(ensure_positionals_storage_ap)
-    INTVAL num_positionals;
-    Pcc_cell *array, *new_array;
+          case PARROT_ARG_FLOATVAL:
+            ret->type   = PARROT_ARG_FLOATVAL;
+            ret->v.n    = is_constant
+                ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
+                : CTX_REG_NUM(interp, ctx, raw_index);
+            /* Keep state */
+            raw_args++;
+            current_arg++;
+            break;
 
-    if (size < 8)
-        size = 8;
+          case PARROT_ARG_STRING:
+            {
+                STRING * const string_value = is_constant
+                    ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
+                    : CTX_REG_STR(interp, ctx, raw_index);
 
-    GETATTR_CallContext_positionals(interp, self, array);
+                if (arg_flags & PARROT_ARG_NAME) {
+                    /* Switch to handle named parameters. */
+                    state = param_named;
+                    SETATTR_CallContext_state(interp, self, state);
+                    do_restart = 1;
+                }
+                else {
+                    /* Just plain old string */
+                    ret->type   = PARROT_ARG_STRING;
+                    ret->v.s    = string_value;
+                    raw_args++;
+                    current_arg++;
+                }
 
-    if (size > 8)
-        new_array = (Pcc_cell *)Parrot_gc_allocate_memory_chunk(interp,
-                size * sizeof (Pcc_cell));
-    else
-        new_array = (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage(interp,
-                size * sizeof (Pcc_cell));
+                break;
+            }
+            break;
 
-    if (array) {
-        GETATTR_CallContext_num_positionals(interp, self, num_positionals);
-        memcpy(new_array, array, num_positionals * sizeof (Pcc_cell));
+          case PARROT_ARG_PMC:
+            {
+                PMC * const pmc_value = is_constant
+                    ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
+                    : CTX_REG_PMC(interp, ctx, raw_index);
 
-        if (allocated_positionals > 8)
-            Parrot_gc_free_memory_chunk(interp, array);
-        else
-            Parrot_gc_free_fixed_size_storage(interp,
-                allocated_positionals * sizeof (Pcc_cell), array);
-    }
+                if (arg_flags & PARROT_ARG_FLATTEN) {
+                    /* Switch to dissecting array */
+                    // FIXME We are creating too much GC pressure here...
+                    PMC *iter = VTABLE_get_iter(interp, pmc_value);
 
-    SETATTR_CallContext_allocated_positionals(interp, self, size);
-    SETATTR_CallContext_positionals(interp, self, new_array);
-}
+                    if (VTABLE_get_bool(interp, iter)) {
+                        SETATTR_CallContext_current_aggregate(interp, self, pmc_value);
+                        SETATTR_CallContext_current_iter(interp, self, iter);
+                        state = arg_flags & PARROT_ARG_NAME
+                            ? param_dissect_hash
+                            : param_dissect_array;
+                        do_restart = 1;
+                    }
+                    else {
+                        /* We have empty aggregate. Skip it */
+                        current_arg++;
+                        raw_index++;
+                        state = current_arg >= args_flags_size
+                            ? param_finished
+                            : param_positional;
+                        do_restart = state != param_finished;
+                    }
+                    SETATTR_CallContext_state(interp, self, state);
+                }
+                else {
+                    ret->type = PARROT_ARG_PMC;
+                    ret->v.p  = pmc_value;
+                    raw_args++;
+                    current_arg++;
+                }
 
-/*
+                break;
+            }
 
-=item C<static Pcc_cell* get_cell_at(PARROT_INTERP, PMC *self, INTVAL key)>
+          default:
+            //PARROT_FAILURE("NYI");
+            break;
+        }
+        break;
 
-=cut
+      case param_dissect_array:
+        {
+            PMC *iter;
+            GETATTR_CallContext_current_iter(interp, self, iter);
+            /* FIXME We can optimize useless boxing here */
+            ret->type   = PARROT_ARG_PMC;
+            ret->v.p    = VTABLE_shift_pmc(interp, iter);
 
-*/
+            if (!VTABLE_get_bool(interp, iter)) {
+                /* Aggregate is exausted. Switch to next _positional_ arg or stop */
+                raw_args++;
+                current_arg++;
+                state = current_arg >= args_flags_size
+                    ? param_finished
+                    : param_positional;
+                SETATTR_CallContext_state(interp, self, state);
+            }
+        }
 
-PARROT_CANNOT_RETURN_NULL
-static Pcc_cell*
-get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
-{
-    ASSERT_ARGS(get_cell_at)
-    Pcc_cell *cells;
-    ensure_positionals_storage(interp, self, key + 1);
-    GETATTR_CallContext_positionals(interp, self, cells);
-    return &cells[key];
-}
+        break;
 
-/*
 
-=item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
+      case param_named:
+        if (!(arg_flags & PARROT_ARG_NAME))
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "named arguments must follow all positional arguments");
 
-=cut
+        /* We have pair (name, value) in 2 sequential params */
+        ret->name = is_constant
+            ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
+            : CTX_REG_STR(interp, ctx, raw_index);
+        current_arg++;
+        raw_args++;
 
-*/
+        extract_named_arg_from_op(interp, ret, ctx, args_flags, current_arg, raw_args);
+        current_arg++;
+        raw_args++;
 
-static INTVAL
-autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-{
-    ASSERT_ARGS(autobox_intval)
-    switch (CELL_TYPE_MASK(cell)) {
-      case INTCELL:
-        return CELL_INT(cell);
-      case FLOATCELL:
-        return (INTVAL)CELL_FLOAT(cell);
-      case STRINGCELL:
-        return CELL_STRING(cell) ? Parrot_str_to_int(interp, CELL_STRING(cell)) : 0;
-      case PMCCELL:
-        return VTABLE_get_integer(interp, CELL_PMC(cell));
+        break;
+
+      case param_dissect_hash:
+        {
+            PMC *iter, *hash;
+            GETATTR_CallContext_current_aggregate(interp, self, hash);
+            GETATTR_CallContext_current_iter(interp, self, iter);
+            /* FIXME We can optimize useless boxing here */
+            ret->type = PARROT_ARG_PMC;
+            ret->name = VTABLE_shift_string(interp, iter);
+            ret->v.p  = VTABLE_get_pmc_keyed_str(interp, hash, ret->name);
+
+            if (!VTABLE_get_bool(interp, iter)) {
+                /* Aggregate is exausted. Switch to next _positional_ arg or stop */
+                raw_args++;
+                current_arg++;
+                state = current_arg >= args_flags_size
+                    ? param_finished
+                    : param_positional;
+                SETATTR_CallContext_state(interp, self, state);
+            }
+        }
+
+        break;
+
+      case param_finished:
       default:
+        ret = NULL;
         break;
     }
+    if (do_restart) goto restart;
 
-    /* exception */
-    return 0;
-}
 
-/*
+    /* Move to next one */
+    SETATTR_CallContext_current_arg(interp, self, current_arg);
+    SETATTR_CallContext_raw_args(interp, self, raw_args);
 
-=item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
-
-=cut
-
-*/
-
-static FLOATVAL
-autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-{
-    ASSERT_ARGS(autobox_floatval)
-    switch (CELL_TYPE_MASK(cell)) {
-      case INTCELL:
-        return (FLOATVAL)CELL_INT(cell);
-      case FLOATCELL:
-        return CELL_FLOAT(cell);
-      case STRINGCELL:
-        return CELL_STRING(cell) ? Parrot_str_to_num(interp, CELL_STRING(cell)) : 0.0;
-      case PMCCELL:
-        return VTABLE_get_number(interp, CELL_PMC(cell));
-      default:
-        break;
+    /* Check that we didn't overrun */
+    if (current_arg >= args_flags_size) {
+        state = param_finished;
+        SETATTR_CallContext_state(interp, self, state);
     }
 
-    /* exception */
-    return 0.0;
-}
-
-/*
-
-=item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
-{
-    ASSERT_ARGS(autobox_string)
-    switch (CELL_TYPE_MASK(cell)) {
-      case INTCELL:
-        return Parrot_str_from_int(interp, CELL_INT(cell));
-      case FLOATCELL:
-        return Parrot_str_from_num(interp, CELL_FLOAT(cell));
-      case STRINGCELL:
-        return CELL_STRING(cell);
-      case PMCCELL:
-        return VTABLE_get_string(interp, CELL_PMC(cell));
-      default:
-        break;
-    }
-
-    /* exception */
-    return STRINGNULL;
-}
-
-/*
-
-=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static PMC *
-autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
-{
-    ASSERT_ARGS(autobox_pmc)
-    PMC *result = PMCNULL;
-
-    switch (type) {
-      case INTCELL:
-        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_Integer));
-        VTABLE_set_integer_native(interp, result, CELL_INT(cell));
-        break;
-      case FLOATCELL:
-        result = Parrot_pmc_new(interp, HLL_TYPE(enum_class_Float));
-        VTABLE_set_number_native(interp, result, CELL_FLOAT(cell));
-        break;
-      case STRINGCELL:
-        result = Parrot_pmc_box_string(interp, CELL_STRING(cell));
-        break;
-      case PMCCELL:
-        result = CELL_PMC(cell);
-      default:
-        /* exception */
-        break;
-    }
-
-    return result;
+    return ret->type != -1;
 }
 
 /*
@@ -520,142 +450,10 @@ ccp2pmc(PARROT_INTERP, ARGIN(call_context_param *p)) {
 }
 
 
-
-/*
-
-=item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static Hash *
-get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
-{
-    ASSERT_ARGS(get_hash)
-    Hash   *hash;
-
-    GETATTR_CallContext_hash(interp, SELF, hash);
-
-    if (!hash) {
-        hash = Parrot_hash_create(interp,
-            enum_type_ptr,
-            Hash_key_type_STRING);
-
-        SETATTR_CallContext_hash(interp, SELF, hash);
-    }
-
-    return hash;
-}
-
-/*
-
-=item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
-
-=cut
-
-*/
-
-static void
-mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
-{
-    ASSERT_ARGS(mark_cell)
-    switch (CELL_TYPE_MASK(c)) {
-        case STRINGCELL:
-            if (CELL_STRING(c))
-                Parrot_gc_mark_STRING_alive(interp, CELL_STRING(c));
-            break;
-        case PMCCELL:
-            if (!PMC_IS_NULL(CELL_PMC(c)))
-                Parrot_gc_mark_PMC_alive(interp, CELL_PMC(c));
-            break;
-        case INTCELL:
-        case FLOATCELL:
-        default:
-            break;
-    }
-
-}
-
-/*
-
-=item C<static void mark_positionals(PARROT_INTERP, PMC *self)>
-
-=cut
-
-*/
-
-static void
-mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
-{
-    ASSERT_ARGS(mark_positionals)
-    INTVAL size;
-
-    GETATTR_CallContext_num_positionals(interp, self, size);
-
-    if (size) {
-        Pcc_cell *cells;
-        INTVAL i;
-        GETATTR_CallContext_positionals(interp, self, cells);
-
-        for (i = 0; i < size; ++i)
-            mark_cell(interp, &cells[i]);
-    }
-}
-
-/*
-
-=item C<static void mark_hash(PARROT_INTERP, Hash *h)>
-
-=cut
-
-*/
-
-/* don't look now, but here goes encapsulation.... */
-static void
-mark_hash(PARROT_INTERP, ARGIN(Hash *h))
-{
-    ASSERT_ARGS(mark_hash)
-    parrot_hash_iterate(h,
-        Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key);
-        mark_cell(interp, (Pcc_cell *)_bucket->value););
-}
-
-/*
-
-=item C<static PMC * get_named_names(PARROT_INTERP, PMC *SELF)>
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-static PMC *
-get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
-{
-    ASSERT_ARGS(get_named_names)
-    Hash *hash;
-
-    GETATTR_CallContext_hash(interp, SELF, hash);
-
-    /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
-    if (hash && hash->entries) {
-        UINTVAL j = 0;
-        PMC * const result =
-            Parrot_pmc_new_init_int(interp, enum_class_FixedStringArray, hash->entries);
-        parrot_hash_iterate(hash,
-            VTABLE_set_string_keyed_int(interp, result, j++, (STRING *)_bucket->key););
-        return result;
-    }
-
-    return PMCNULL;
-}
-
 /*
 
 =item C<static void extract_named_arg_from_op(PARROT_INTERP, call_context_param
-*param, PMC *ctx, PMC *raw_sig, INTVAL arg_index, opcode_t *raw_args)>
+*param, PMC *ctx, INTVAL *raw_sig, INTVAL arg_index, opcode_t *raw_args)>
 
 Pulls in the next argument from a set_args opcode, and sets it as the
 value of a named argument in the CallContext PMC.
@@ -666,10 +464,10 @@ value of a named argument in the CallContext PMC.
 
 static void
 extract_named_arg_from_op(PARROT_INTERP, ARGMOD(call_context_param *param),
-        ARGIN(PMC *ctx), ARGIN(PMC *raw_sig), INTVAL arg_index, ARGIN(opcode_t *raw_args))
+        ARGIN(PMC *ctx), ARGIN(INTVAL *raw_sig), INTVAL arg_index, ARGIN(opcode_t *raw_args))
 {
     ASSERT_ARGS(extract_named_arg_from_op)
-    const INTVAL arg_flags = VTABLE_get_integer_keyed_int(interp, raw_sig, arg_index);
+    const INTVAL arg_flags = raw_sig[arg_index];
     const int is_constant  = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
     const INTVAL raw_index = *raw_args;
 
@@ -707,19 +505,15 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(call_context_param *param),
         break;
     }
 }
+
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_fixedintegerarray.h"
 
 pmclass CallContext extends CallContextBase auto_attrs {
-    /* Storage for arguments */
-    ATTR struct Pcc_cell *positionals; /* array of positionals */
-    ATTR INTVAL  num_positionals;      /* count of used positionals */
-    ATTR INTVAL  allocated_positionals;/* count of allocated positionals */
-
-    ATTR Hash   *hash;                 /* Hash of named arguments */
-                                       /* FIXME It should be list of Pairs to
-                                          avoid enforcing "All parameters has
-                                          unique names" policy */
+    /* "Inlined" FIA to avoid VTABLE calls */
+    ATTR INTVAL                 args_flags_size;
+    ATTR INTVAL                *args_flags;
 
     ATTR INTVAL                 current_arg; /* Currently processed arg */
     ATTR param_processing_state state; /* FSM state */
@@ -729,9 +523,6 @@ pmclass CallContext extends CallContextBase auto_attrs {
 
     ATTR PMC                   *current_iter;
     ATTR PMC                   *current_aggregate;
-
-    ATTR struct call_context_param *param; /* Last fetched param */
-                                           /* TODO Fix pmc2c to avoid useless alloc */
 
 /*
 
@@ -744,16 +535,10 @@ Initializes a newly created CallContext object.
 */
 
     VTABLE void init() {
-        SET_ATTR_positionals(INTERP, SELF, NULL);
-        SET_ATTR_num_positionals(INTERP, SELF, 0);
+        SUPER();
 
         SET_ATTR_state(INTERP, SELF, param_positional);
         SET_ATTR_current_arg(INTERP, SELF, 0);
-
-        SET_ATTR_param(INTERP, SELF,
-                (call_context_param*) mem_sys_allocate_zeroed(sizeof (call_context_param)));
-
-        SUPER();
     }
 
 /*
@@ -762,17 +547,27 @@ Initializes a newly created CallContext object.
 
 Set raw signature and start FSM
 
+Args is FIA. We do poke inside it for speed.
+
 =cut
 */
     VTABLE void set_pmc(PMC *pmc) {
-        PMC *iter, *aggr;
-        param_processing_state state;
+        PMC                    *iter, *aggr;
+        param_processing_state  state;
+        INTVAL                  args_flags_size;
+        INTVAL                 *args_flags;
+
         SET_ATTR_arg_flags(INTERP, SELF, pmc);
 
-        if (!PMC_IS_NULL(pmc) && VTABLE_get_bool(INTERP, pmc)) {
+        GETATTR_FixedIntegerArray_size(INTERP, pmc, args_flags_size);
+        GETATTR_FixedIntegerArray_int_array(INTERP, pmc, args_flags);
+        SET_ATTR_args_flags_size(INTERP, SELF, args_flags_size);
+        SET_ATTR_args_flags(INTERP, SELF, args_flags);
+
+        if (args_flags_size) {
             /* Look ahead to setup current state properly */
             /* Basically it's transition from (start) state. */
-            INTVAL arg_flags = VTABLE_get_integer_keyed_int(INTERP, pmc, 0);
+            INTVAL arg_flags = args_flags[0];
             if (arg_flags & PARROT_ARG_NAME)
                 if (arg_flags & PARROT_ARG_SLURPY_ARRAY) {
                     state = param_dissect_hash;
@@ -805,7 +600,8 @@ Set raw signature and start FSM
                     SET_ATTR_state(INTERP, SELF, param_positional);
                     SET_ATTR_raw_args(INTERP, SELF, ++raw_args);
                     SET_ATTR_current_arg(INTERP, SELF, 1);
-                    if (VTABLE_get_integer(INTERP, pmc) == 1) {
+
+                    if (args_flags_size == 1) {
                         SET_ATTR_state(INTERP, SELF, param_finished);
                     }
                 }
@@ -815,31 +611,6 @@ Set raw signature and start FSM
             /* We have empty signature */
             SET_ATTR_state(INTERP, SELF, param_finished);
         }
-
-
-    }
-/*
-
-=item C<void mark()>
-
-Mark any referenced strings and PMCs.
-
-=cut
-
-*/
-    VTABLE void mark() {
-        Hash     *hash;
-
-        if (!PMC_data(SELF))
-            return;
-
-        mark_positionals(INTERP, SELF);
-
-        GET_ATTR_hash(INTERP, SELF, hash);
-        if (hash)
-            mark_hash(INTERP, hash);
-
-        SUPER();
     }
 
 /*
@@ -864,54 +635,7 @@ stored.)
         SET_ATTR_return_flags(INTERP, SELF, PMCNULL);
         SET_ATTR_type_tuple(INTERP, SELF, PMCNULL);
 
-        /* Don't free positionals. Just reuse them */
-        SET_ATTR_num_positionals(INTERP, SELF, 0);
-
-        GET_ATTR_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            parrot_hash_iterate(hash,
-               FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
-            Parrot_hash_destroy(INTERP, hash);
-            SET_ATTR_hash(INTERP, SELF, NULL);
-        }
-
-
         SET_ATTR_current_arg(INTERP, SELF, 0);
-    }
-
-    VTABLE void destroy() {
-        INTVAL               allocated_positionals;
-        Hash                *hash;
-        call_context_param  *param;
-
-        if (!PMC_data(SELF))
-            return;
-
-        GET_ATTR_param(INTERP, SELF, param);
-        mem_sys_free(param);
-
-        GET_ATTR_hash(INTERP, SELF, hash);
-        GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
-
-        if (allocated_positionals) {
-            Pcc_cell *c;
-
-            GET_ATTR_positionals(INTERP, SELF, c);
-            if (allocated_positionals > 8)
-                Parrot_gc_free_memory_chunk(INTERP, c);
-            else
-                Parrot_gc_free_fixed_size_storage(INTERP,
-                    allocated_positionals * sizeof (Pcc_cell), c);
-        }
-
-        if (hash) {
-            parrot_hash_iterate(hash,
-                FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
-            Parrot_hash_destroy(INTERP, hash);
-        }
-
-        SUPER();
     }
 
 
@@ -935,6 +659,8 @@ Returns the short signature for the CallContext.
         if (res)
             return res;
 
+#if 0
+        FIXME
         GET_ATTR_positionals(INTERP, SELF, c);
         GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
 
@@ -963,6 +689,7 @@ Returns the short signature for the CallContext.
         /* After fixind build_MMD_type_tuple to use raw arguments instead of signature */
 
         SET_ATTR_short_sig(INTERP, SELF, res);
+#endif
 
         return res;
     }
@@ -985,6 +712,7 @@ CallContext.
         GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
 
         if (PMC_IS_NULL(type_tuple)) {
+            /* FIXME
             Pcc_cell *c;
             INTVAL    num_positionals;
             INTVAL    i = 0;
@@ -1017,6 +745,7 @@ CallContext.
             }
 
             SET_ATTR_type_tuple(INTERP, SELF, type_tuple);
+            */
         }
 
         return type_tuple;
@@ -1089,7 +818,7 @@ return current Namespace
 
     VTABLE PMC *get_attr_str(STRING *key) {
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "named")))
-            return get_named_names(INTERP, SELF);
+            return PMCNULL; /* FIXME */
 
         return SUPER(key);
     }
@@ -1130,251 +859,33 @@ return current Namespace
     VTABLE void unshift_pmc(PMC *value) {
         PARROT_FAILURE("EPIC FAIL");
     }
-/*
-
-=item get_pointer
-
-All logic of handling parameters unpacking sitting in here.
-
-Returns pointer to preallocated call_context_param. Or NULL if exausted.
-
-Caller has to to autoboxing.
-
-=cut
-
-*/
-    VTABLE void* get_pointer() {
-        INTVAL    current_arg;
-        PMC      *signature;
-        param_processing_state state;
-        INTVAL    arg_flags;
-        opcode_t *raw_args;
-        INTVAL    raw_index;
-        PMC      *ctx;
-
-        struct call_context_param *ret;
-
-        int       is_constant;
-        int       do_restart = 0;
-
-        GET_ATTR_param(INTERP, SELF, ret);
-        ret->type = -1; /* Empty for now */
-        ret->name = NULL;
-
-        GET_ATTR_state(INTERP, SELF, state);
-
-        if (state == param_finished)
-            return NULL;
-
-        GET_ATTR_current_arg(INTERP, SELF, current_arg);
-        GET_ATTR_arg_flags(INTERP, SELF, signature);
-        GET_ATTR_from_context(INTERP, SELF, ctx);
-        GET_ATTR_raw_args(INTERP, SELF, raw_args);
-
-      restart:
-        /* Get flags for current param */
-        raw_index = (INTVAL)*raw_args;
-        arg_flags = VTABLE_get_integer_keyed_int(INTERP, signature, current_arg);
-        is_constant = 0 != PARROT_ARG_CONSTANT_ISSET(arg_flags);
-        do_restart = 0;
-
-        /* Huge hand-crafted FSM to unpack arguments */
-        switch (state) {
-          case param_positional:
-            switch (PARROT_ARG_TYPE_MASK_MASK(arg_flags)) {
-              case PARROT_ARG_INTVAL:
-                ret->type   = PARROT_ARG_INTVAL;
-                ret->v.i    = is_constant
-                    ? raw_index
-                    : CTX_REG_INT(interp, ctx, raw_index);
-                /* Keep state */
-                raw_args++;
-                current_arg++;
-                break;
-
-              case PARROT_ARG_FLOATVAL:
-                ret->type   = PARROT_ARG_FLOATVAL;
-                ret->v.n    = is_constant
-                    ? Parrot_pcc_get_num_constant(interp, ctx, raw_index)
-                    : CTX_REG_NUM(interp, ctx, raw_index);
-                /* Keep state */
-                raw_args++;
-                current_arg++;
-                break;
-
-              case PARROT_ARG_STRING:
-                {
-                    STRING * const string_value = is_constant
-                        ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                        : CTX_REG_STR(interp, ctx, raw_index);
-
-                    if (arg_flags & PARROT_ARG_NAME) {
-                        /* Switch to handle named parameters. */
-                        state = param_named;
-                        SET_ATTR_state(INTERP, SELF, state);
-                        do_restart = 1;
-                    }
-                    else {
-                        /* Just plain old string */
-                        ret->type   = PARROT_ARG_STRING;
-                        ret->v.s    = string_value;
-                        raw_args++;
-                        current_arg++;
-                    }
-
-                    break;
-                }
-                break;
-
-              case PARROT_ARG_PMC:
-                {
-                    PMC * const pmc_value = is_constant
-                            ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
-                            : CTX_REG_PMC(interp, ctx, raw_index);
-
-                    if (arg_flags & PARROT_ARG_FLATTEN) {
-                        /* Switch to dissecting array */
-                        // FIXME We are creating too much GC pressure here...
-                        PMC *iter = VTABLE_get_iter(INTERP, pmc_value);
-
-                        if (VTABLE_get_bool(INTERP, iter)) {
-                            SET_ATTR_current_aggregate(INTERP, SELF, pmc_value);
-                            SET_ATTR_current_iter(INTERP, SELF, iter);
-                            state = arg_flags & PARROT_ARG_NAME
-                                    ? param_dissect_hash
-                                    : param_dissect_array;
-                            do_restart = 1;
-                        }
-                        else {
-                            /* We have empty aggregate. Skip it */
-                            current_arg++;
-                            raw_index++;
-                            state = current_arg >= VTABLE_elements(interp, signature)
-                                    ? param_finished
-                                    : param_positional;
-                            do_restart = state != param_finished;
-                        }
-                        SET_ATTR_state(INTERP, SELF, state);
-                    }
-                    else {
-                        ret->type = PARROT_ARG_PMC;
-                        ret->v.p  = pmc_value;
-                        raw_args++;
-                        current_arg++;
-                    }
-
-                    break;
-                }
-
-              default:
-                //PARROT_FAILURE("NYI");
-                break;
-            }
-            break;
-
-          case param_dissect_array:
-            {
-                PMC *iter;
-                GET_ATTR_current_iter(INTERP, SELF, iter);
-                /* FIXME We can optimize useless boxing here */
-                ret->type   = PARROT_ARG_PMC;
-                ret->v.p    = VTABLE_shift_pmc(INTERP, iter);
-
-                if (!VTABLE_get_bool(INTERP, iter)) {
-                    /* Aggregate is exausted. Switch to next _positional_ arg or stop */
-                    raw_args++;
-                    current_arg++;
-                    state = current_arg >= VTABLE_elements(INTERP, signature)
-                        ? param_finished
-                        : param_positional;
-                    SET_ATTR_state(INTERP, SELF, state);
-                }
-            }
-
-            break;
-
-
-          case param_named:
-            if (!(arg_flags & PARROT_ARG_NAME))
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "named arguments must follow all positional arguments");
-
-            /* We have pair (name, value) in 2 sequential params */
-            ret->name = is_constant
-                ? Parrot_pcc_get_string_constant(interp, ctx, raw_index)
-                : CTX_REG_STR(interp, ctx, raw_index);
-            current_arg++;
-            raw_args++;
-
-            extract_named_arg_from_op(INTERP, ret, ctx, signature, current_arg, raw_args);
-            current_arg++;
-            raw_args++;
-
-            break;
-
-          case param_dissect_hash:
-            {
-                PMC *iter, *hash;
-                GET_ATTR_current_aggregate(INTERP, SELF, hash);
-                GET_ATTR_current_iter(INTERP, SELF, iter);
-                /* FIXME We can optimize useless boxing here */
-                ret->type = PARROT_ARG_PMC;
-                ret->name = VTABLE_shift_string(INTERP, iter);
-                ret->v.p  = VTABLE_get_pmc_keyed_str(INTERP, hash, ret->name);
-
-                if (!VTABLE_get_bool(INTERP, iter)) {
-                    /* Aggregate is exausted. Switch to next _positional_ arg or stop */
-                    raw_args++;
-                    current_arg++;
-                    state = current_arg >= VTABLE_elements(INTERP, signature)
-                        ? param_finished
-                        : param_positional;
-                    SET_ATTR_state(INTERP, SELF, state);
-                }
-            }
-
-            break;
-
-          case param_finished:
-          default:
-            ret = NULL;
-            break;
-        }
-        if (do_restart) goto restart;
-
-
-        /* Move to next one */
-        SET_ATTR_current_arg(INTERP, SELF, current_arg);
-        SET_ATTR_raw_args(INTERP, SELF, raw_args);
-
-        /* Check that we didn't overrun */
-        if (current_arg >= VTABLE_get_integer(INTERP, signature)) {
-            state = param_finished;
-            SET_ATTR_state(INTERP, SELF, state);
-        }
-
-        return ret->type == -1 ? NULL : ret;
-    }
 
     VTABLE INTVAL shift_integer() {
-        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
-        return p ? ccp2int(INTERP, p) : 0;
+        call_context_param p;
+        if (fetch_and_advance(INTERP, SELF, &p))
+            return ccp2int(INTERP, &p);
+        return 0;
     }
 
     VTABLE FLOATVAL shift_float() {
-        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
-        return p ? ccp2num(INTERP, p) : 0.0;
+        call_context_param p;
+        if (fetch_and_advance(INTERP, SELF, &p))
+            return ccp2num(INTERP, &p);
+        return 0.0;
     }
 
     VTABLE STRING * shift_string() {
-        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
-        return p ? ccp2str(INTERP, p) : STRINGNULL;
+        call_context_param p;
+        if (fetch_and_advance(INTERP, SELF, &p))
+            return ccp2str(INTERP, &p);
+        return STRINGNULL;
     }
 
     VTABLE PMC * shift_pmc() {
-        call_context_param *p = (call_context_param *)STATICSELF.get_pointer();
-        return p ? ccp2pmc(INTERP, p) : PMCNULL;
+        call_context_param p;
+        if (fetch_and_advance(INTERP, SELF, &p))
+            return ccp2pmc(INTERP, &p);
+        return PMCNULL;
     }
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
@@ -1426,173 +937,47 @@ Caller has to to autoboxing.
     }
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell) {
-                if (CELL_TYPE_MASK(cell) == INTCELL)
-                    return CELL_INT(cell);
-
-                return autobox_intval(INTERP, cell);
-            }
-        }
-
         return 0;
     }
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell)
-                return autobox_floatval(INTERP, cell);
-        }
-
         return 0.0;
     }
 
 
     VTABLE STRING * get_string_keyed_str(STRING *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell)
-                return autobox_string(INTERP, cell);
-        }
-
         return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell) {
-                const INTVAL type = CELL_TYPE_MASK(cell);
-                if (type == PMCCELL)
-                    return CELL_PMC(cell);
-                return autobox_pmc(INTERP, cell, type);
-            }
-        }
-
         return PMCNULL;
     }
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell) {
-                if (CELL_TYPE_MASK(cell) == INTCELL)
-                    return CELL_INT(cell);
-                return autobox_intval(INTERP, cell);
-            }
-        }
-
         return 0;
     }
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell)
-                return autobox_floatval(INTERP, cell);
-        }
-
         return 0.0;
     }
 
     VTABLE STRING * get_string_keyed(PMC *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell)
-                return autobox_string(INTERP, cell);
-        }
-
         return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
-            Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
-
-            if (cell) {
-                const INTVAL type = CELL_TYPE_MASK(cell);
-                if (type == PMCCELL)
-                    return CELL_PMC(cell);
-                return autobox_pmc(INTERP, cell, type);
-            }
-        }
-
         return PMCNULL;
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void * const k = Parrot_hash_key_from_pmc(INTERP, hash, key);
-            return Parrot_hash_exists(INTERP, hash, k);
-        }
-
         return 0;
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            void * const k = Parrot_hash_key_from_string(INTERP, hash, key);
-            return Parrot_hash_exists(INTERP, hash, k);
-        }
-
         return 0;
     }
 
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
-        INTVAL num_positionals;
-
-        GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
-
-        if (num_positionals)
-            return key < num_positionals;
-
         return 0;
     }
 
@@ -1607,27 +992,8 @@ Creates and returns a clone of the signature.
 */
     VTABLE PMC *clone() {
         PMC * const  dest = SUPER();
-        INTVAL       num;
-        Pcc_cell    *our_cells, *dest_cells;
-        Hash        *hash;
 
-        GET_ATTR_num_positionals(INTERP, SELF, num);
-        /* Copy positionals */
-        ensure_positionals_storage(INTERP, dest, num);
-        GET_ATTR_positionals(INTERP, SELF, our_cells);
-        GET_ATTR_positionals(INTERP, dest, dest_cells);
-        memcpy(dest_cells, our_cells, num * sizeof (Pcc_cell));
-        SET_ATTR_num_positionals(INTERP, dest, num);
-
-        GET_ATTR_hash(INTERP, SELF, hash);
-        if (hash) {
-            Hash *dest_hash = get_hash(INTERP, dest);
-            Parrot_hash_clone(INTERP, hash, dest_hash);
-            parrot_hash_iterate(dest_hash,
-                Pcc_cell *tmp;
-                CLONE_CELL(INTERP, (Pcc_cell *)_bucket->value, tmp);
-                _bucket->value = tmp;);
-        }
+        /* FIXME */
 
         return dest;
     }
