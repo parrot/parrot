@@ -1100,6 +1100,12 @@ return current Namespace
         return (state == param_positional) || (state == param_dissect_array);
     }
 
+    VTABLE INTVAL get_bool() {
+        param_processing_state state;
+        GET_ATTR_state(INTERP, SELF, state);
+        return (state != param_finished);
+    }
+
     VTABLE void push_integer(INTVAL value) {
         PARROT_FAILURE("Wrong!");
     }

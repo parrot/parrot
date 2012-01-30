@@ -1142,32 +1142,64 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
     /* Double check that all named arguments were assigned to parameters. */
     if (err_check) {
-        Hash *h = NULL;
-        /* Early exit to avoid vtable call */
-        if (call_object)
-            GETATTR_CallContext_hash(interp, call_object, h);
-        if (!h || !h->entries) {
-            if (named_used_list != NULL)
-                Parrot_hash_destroy(interp, named_used_list);
+        if (!named_params || !named_used_list->entries) {
+            do_cleanup(interp, named_params, named_used_list);
             return;
         }
 
-        if (named_used_list == NULL || (int)h->entries > named_count)
-            named_argument_arity_error(interp, h->entries,
-                                       named_used_list, h);
+        if (named_used_list == NULL || (int)named_params->entries > named_count)
+            named_argument_arity_error(interp, named_params->entries,
+                                       named_used_list, named_params);
     }
-    if (named_used_list != NULL)
-        Parrot_hash_destroy(interp, named_used_list);
+
+    do_cleanup(interp, named_params, named_used_list);
 }
 
+/*
+=item C<static void do_cleanup(PARROT_INTERP, Hash *h1, Hash *h2)>
+
+Free temporary allocated resources.
+
+=cut
+*/
+
+static void
+do_cleanup(PARROT_INTERP, ARGIN_NULLOK(Hash *h1), ARGIN_NULLOK(Hash *h2))
+{
+    if (h1 != NULL)
+        Parrot_hash_destroy(interp, h1);
+    if (h2 != NULL)
+        Parrot_hash_destroy(interp, h2);
+}
+
+/*
+
+=item C<static Hash* collect_named_params(PARROT_INTERP, PMC *call_object)>
+
+Collect all named parameters into Hash. Caller must free result.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
 static Hash*
-collect_named_params(PARROT_INTERP, ARGIN(PMC *call_object)) {
-    Hash *hash;
+collect_named_params(PARROT_INTERP, ARGIN(PMC *call_object))
+{
+    Hash *hash = NULL;
 
     if (call_object->vtable->base_type == enum_class_CallContext) {
         call_context_param *p;
+        if (!VTABLE_get_bool(interp, call_object))
+            return NULL;
+
         hash = Parrot_hash_new(interp);
         while ((p = (call_context_param*)VTABLE_get_pointer(interp, call_object))) {
+            if (!p->name)
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "named arguments must follow all positional arguments");
+
             switch(p->type) {
                 case PARROT_ARG_INTVAL:
                   Parrot_hash_put(interp, hash, p->name,
@@ -1188,7 +1220,10 @@ collect_named_params(PARROT_INTERP, ARGIN(PMC *call_object)) {
         }
     }
     else {
-        GETATTR_CallContextFromC_hash(interp, call_object, hash);
+        Hash *tmp;
+        GETATTR_CallContextFromC_hash(interp, call_object, tmp);
+        if (tmp != NULL)
+            Parrot_hash_clone(interp, tmp, hash);
     }
 
     return hash;

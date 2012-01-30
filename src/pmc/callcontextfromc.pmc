@@ -810,7 +810,10 @@ return current Namespace
     }
 
     VTABLE INTVAL get_bool() {
-        return SELF.elements() != 0;
+        Hash   *hash;
+        GETATTR_CallContextFromC_hash(INTERP, SELF, hash);
+
+        return (hash != NULL) && hash->entries;
     }
 
     VTABLE void push_integer(INTVAL value) {
