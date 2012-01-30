@@ -1,6 +1,5 @@
 before_script:
     - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev clang liblocal-lib-perl
-    - `perl -Mlocal::lib`
     - curl -L http://cpanmin.us | sudo perl - --self-upgrade
     - cpanm TAP::Harness::Archive TAP::Harness::Multiple TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
