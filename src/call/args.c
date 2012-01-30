@@ -59,6 +59,7 @@ static void assign_default_param_value(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
+PARROT_CAN_RETURN_NULL
 static Hash* collect_named_params(PARROT_INTERP, ARGIN(PMC *call_object))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -70,6 +71,11 @@ static void dissect_aggregate_arg(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*call_object);
+
+static void do_cleanup(PARROT_INTERP,
+    ARGIN_NULLOK(Hash *h1),
+    ARGIN_NULLOK(Hash *h2))
+        __attribute__nonnull__(1);
 
 static void extract_named_arg_from_op(PARROT_INTERP,
     ARGMOD(PMC *call_object),
@@ -209,6 +215,8 @@ static STRING** string_param_from_op(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(call_object) \
     , PARROT_ASSERT_ARG(aggregate))
+#define ASSERT_ARGS_do_cleanup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_extract_named_arg_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(call_object) \
@@ -994,8 +1002,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         /* All remaining parameters must be named. */
         if (!(param_flags & PARROT_ARG_NAME)) {
-            if (named_used_list != NULL)
-                Parrot_hash_destroy(interp, named_used_list);
+            do_cleanup(interp, named_params, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
                 "named parameters must follow all positional parameters");
@@ -1034,8 +1041,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
         /* Store the name. */
         if (!(param_flags & PARROT_ARG_STRING)) {
-            if (named_used_list != NULL)
-                Parrot_hash_destroy(interp, named_used_list);
+            do_cleanup(interp, named_params, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                EXCEPTION_INVALID_OPERATION,
                "named parameters must have a name specified");
@@ -1083,8 +1089,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
                         value;
                     break;
                   default:
-                    if (named_used_list != NULL)
-                        Parrot_hash_destroy(interp, named_used_list);
+                    do_cleanup(interp, named_params, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION, "invalid parameter type");
                     break;
@@ -1122,8 +1127,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
              * optional, so it's an error. */
             else {
                 if (err_check) {
-                    if (named_used_list != NULL)
-                        Parrot_hash_destroy(interp, named_used_list);
+                    do_cleanup(interp, named_params, named_used_list);
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
                         "too few named arguments: "
@@ -1222,14 +1226,14 @@ named_argument_arity_error(PARROT_INTERP, int named_arg_count,
         STRING * const name = (STRING *)_bucket->key;
 
         if (!Parrot_hash_exists(interp, named_used_list, name)) {
-            Parrot_hash_destroy(interp, named_used_list);
+            do_cleanup(interp, named_arg_list, named_used_list);
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "too many named arguments: '%S' not used",
                     name);
         };);
 
-    Parrot_hash_destroy(interp, named_used_list);
+    do_cleanup(interp, named_arg_list, named_used_list);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
         "Invalid named arguments, unspecified error");
 }
