@@ -132,6 +132,27 @@ sub _find_type_max {
     return $type;
 }
 
+sub _find_type_min {
+    my ($sizesref, $checklist) = @_;
+    my $size = 1024; # magic number greater than size of any scalar C type
+    my $type;
+
+    for ( @$checklist ) {
+        if ( $sizesref->{$_} < $size ) {
+            $type = $_;
+            $size = $sizesref->{$_};
+        }
+    }
+
+    return $type;
+}
+
+sub _find_type_min_ge {
+    my ($sizesref, $size, $checklist) = @_;
+    my @reduced_checklist = grep { $sizesref->{$_} >= $size } @$checklist;
+    return _find_type_min($sizesref, \@reduced_checklist);
+}
+
 sub _set_fixed {
     my ($conf, $sizesref, $kind, $size, $checklist) = @_;
     my $type = _find_type_eq($sizesref, $size, $checklist);
@@ -244,7 +265,7 @@ sub _handle_ptrcast {
     my ($conf, $typesref, $sizesref, $checklist) = @_;
     my $intvalsize = $sizesref->{$typesref->{'intval'}};
     my $ptrsize = $sizesref->{$typesref->{'ptr'}};
-    my $intptr = _find_type_ge($sizesref, $ptrsize, $checklist);
+    my $intptr = _find_type_min_ge($sizesref, $ptrsize, $checklist);
 
     if ( defined $intptr ) {
         $conf->data->set( ptrcast => 'unsigned '.$intptr );
