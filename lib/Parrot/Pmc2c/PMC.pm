@@ -745,7 +745,7 @@ sub post_method_gen {
                          split (/,/, $method->parameters);
         $body .= $method->full_method_name($self->name) . "_orig($parameters);\n";
 
-        $body .= "PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+        $body .= "PARROT_GC_WRITE_BARRIER(interp, _self);\n" unless $self->vtable_method_has_manual_wb($method->name);
         $body .= "return result;" if $need_result;
 
         $method->body(Parrot::Pmc2c::Emitter->text($body) );
