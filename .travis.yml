@@ -9,7 +9,7 @@ before_script:
     - sudo chown -R $CI_USER ~/perl5
 # No, we are not going to run the tests for all these dependencies on every commit
     - cpanm -n TAP::Harness::Archive TAP::Harness::ReportByDescription
-script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
+script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
 # branches:
 #   only:
 #     - master
