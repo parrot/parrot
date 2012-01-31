@@ -173,7 +173,7 @@ fetch_and_advance(PARROT_INTERP, ARGIN(PMC *self), ARGIN(call_context_param *ret
     ret->type = -1; /* Empty for now */
     ret->name = NULL;
 
-    GETATTR_CallContext_state(interp, self, state);
+    state = attrs->state; //GETATTR_CallContext_state(interp, self, state);
 
     if (state == param_finished)
         return 0;
@@ -626,17 +626,14 @@ stored.)
 
 */
     VTABLE void morph(PMC *type) {
-        Hash     *hash;
+        Parrot_CallContext_attributes *attrs = (Parrot_CallContext_attributes*)PMC_data(SELF);
 
-        if (!PMC_data(SELF))
-            return;
+        attrs->short_sig = NULL; //SET_ATTR_short_sig(INTERP, SELF, NULL);
+        attrs->arg_flags = PMCNULL; //SET_ATTR_arg_flags(INTERP, SELF, PMCNULL);
+        attrs->return_flags = PMCNULL; //SET_ATTR_return_flags(INTERP, SELF, PMCNULL);
+        attrs->type_tuple = PMCNULL; //SET_ATTR_type_tuple(INTERP, SELF, PMCNULL);
 
-        SET_ATTR_short_sig(INTERP, SELF, NULL);
-        SET_ATTR_arg_flags(INTERP, SELF, PMCNULL);
-        SET_ATTR_return_flags(INTERP, SELF, PMCNULL);
-        SET_ATTR_type_tuple(INTERP, SELF, PMCNULL);
-
-        SET_ATTR_current_arg(INTERP, SELF, 0);
+        attrs->current_arg = 0; //SET_ATTR_current_arg(INTERP, SELF, 0);
     }
 
 
