@@ -1,10 +1,9 @@
 before_script:
-    - sudo apt-get install ccache libffi-dev libicu-dev libgmp3-dev clang liblocal-lib-perl zlib1g-dev
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev
     - curl -L http://cpanmin.us | sudo perl - --self-upgrade
     - export CI_USER=$USER
-    - env
-    - mkdir ~/perl5
-    - perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
+#    - env
+    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
     - sudo chown -R $CI_USER ~/.cpanm
     - sudo chown -R $CI_USER ~/perl5
 # No, we are not going to run the tests for all these dependencies on every commit
