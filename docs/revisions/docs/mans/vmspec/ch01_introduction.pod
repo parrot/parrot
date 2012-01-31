@@ -1,1 +1,17 @@
-# Copyright (C) 2011-2012, Parrot Foundation
+# Copyright (C) 2012, Parrot Foundation
+
+=pod
+
+=head1 NAME
+
+docs/mans/vmspec/ch01_introduction.pod - Introduction. 
+
+=head1 DESCRIPTION
+
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2011, Parrot Foundation.
+
+=cut

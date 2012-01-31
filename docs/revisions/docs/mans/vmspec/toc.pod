@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2012, Parrot Foundation
+# Copyright (C) 2011, Parrot Foundation
 
 =pod
 
@@ -15,29 +15,37 @@ Specification.
 
 =item Table of Contents
 
-=item Chapter  1: Introduction
+=item 1.  Introduction
 
-=item Chapter  2: The Winxed Programming Language Concepts
+=over 3
 
-=item Chapter  3: The Structure of the Parrot Virtual Machine
+=item 1.1: History
 
-=item Chapter  4: The bytecode File Format
+=item 1.2: Overview
 
-=item Chapter  5: Loading, Linking, and Initializing 
+=back
 
-=item Chapter  6: The Parrot Virtual Machine Instruction Set
+=item 2.  The Winxed Programming Language Concepts
 
-=item Chapter  7: Compiling for the Parrot Virtual Machine
+=item 3.  The Structure of the Parrot Virtual Machine
 
-=item Chapter  8: The Memory Internals
+=item 4.  The bytecode File Format
 
-=item Chapter  9: The Parrot Virtual Machine Threading System
+=item 5.  Loading, Linking, and Initializing 
 
-=item Chapter 10: Opcode Mnemonics by Opcode
+=item 6.  The Parrot Virtual Machine Instruction Set
 
-=item Appendix A: The NQP (Not Quite Perl) Programming Language
+=item 7.  Compiling for the Parrot Virtual Machine
 
-=item Appendix B: The Parrot Intermediate Representation Language
+=item 8.  The Memory Internals
+
+=item 9.  The Parrot Virtual Machine Threading System
+
+=item 10. Opcode Mnemonics by Opcode
+
+=item Appendix A. The NQP (Not Quite Perl) Programming Language
+
+=item Appendix B. The Parrot Intermediate Representation Language
 
 =item Glossary
 

@@ -36,8 +36,8 @@ programming language, on how to accomplish this feat.
 
 =head2 Organization
 
-Initially, though this is subject to change and to subsequent revision, the
-organization of this specification will be as follows:
+Roughly, though subject to revision, the organization of this specification 
+is as follows:
 
 =over 4
 
@@ -47,29 +47,29 @@ organization of this specification will be as follows:
 
 =item Table of Contents
 
-=item Chapter  1: Introduction
+=item 1.  Introduction
 
-=item Chapter  2: The Winxed Programming Language Concepts
+=item 2.  The Winxed Programming Language Concepts
 
-=item Chapter  3: The Structure of the Parrot Virtual Machine
+=item 3.  The Structure of the Parrot Virtual Machine
 
-=item Chapter  4: The bytecode File Format
+=item 4.  The bytecode File Format
 
-=item Chapter  5: Loading, Linking, and Initializing 
+=item 5.  Loading, Linking, and Initializing 
 
-=item Chapter  6: The Parrot Virtual Machine Instruction Set
+=item 6.  The Parrot Virtual Machine Instruction Set
 
-=item Chapter  7: Compiling for the Parrot Virtual Machine
+=item 7.  Compiling for the Parrot Virtual Machine
 
-=item Chapter  8: The Memory Internals
+=item 8.  The Memory Internals
 
-=item Chapter  9: The Parrot Virtual Machine Threading System
+=item 9.  The Parrot Virtual Machine Threading System
 
-=item Chapter 10: Opcode Mnemonics by Opcode
+=item 10. Opcode Mnemonics by Opcode
 
-=item Appendix A: The NQP (Not Quite Perl) Programming Language
+=item Appendix A. The NQP (Not Quite Perl) Programming Language
 
-=item Appendix B: The Parrot Intermediate Representation Language
+=item Appendix B. The Parrot Intermediate Representation Language
 
 =item Glossary
 
@@ -83,8 +83,7 @@ organization of this specification will be as follows:
 
 =head2 Pod
 
-The format of the specification shall be in multiple POD files, each 
-reflecting the organization of the specification as set out above, to wit:
+The format of this specification shall be in multiple POD files, to wit:
 
 =over 4
 
@@ -131,7 +130,7 @@ reflecting the organization of the specification as set out above, to wit:
 =back
 
 All of which may readily be converted into various, alternative formats, 
-I<e.g.,> html or pdf.
+I<e.g.,> html, pdf, *roff, etc.
 
 =head2 Notice
 
