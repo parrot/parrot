@@ -862,28 +862,28 @@ return current Namespace
         PARROT_FAILURE("EPIC FAIL");
     }
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         call_context_param p;
         if (fetch_and_advance(INTERP, SELF, &p))
             return ccp2int(INTERP, &p);
         return 0;
     }
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :manual_wb {
         call_context_param p;
         if (fetch_and_advance(INTERP, SELF, &p))
             return ccp2num(INTERP, &p);
         return 0.0;
     }
 
-    VTABLE STRING * shift_string() {
+    VTABLE STRING * shift_string() :manual_wb {
         call_context_param p;
         if (fetch_and_advance(INTERP, SELF, &p))
             return ccp2str(INTERP, &p);
         return STRINGNULL;
     }
 
-    VTABLE PMC * shift_pmc() {
+    VTABLE PMC * shift_pmc() :manual_wb {
         call_context_param p;
         if (fetch_and_advance(INTERP, SELF, &p))
             return ccp2pmc(INTERP, &p);
