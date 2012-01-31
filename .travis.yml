@@ -3,8 +3,11 @@ before_script:
     - curl -L http://cpanmin.us | sudo perl - --self-upgrade
     - export CI_USER=$USER
     - env
+    - mkdir ~/perl5
+    - perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
     - sudo chown -R $CI_USER ~/.cpanm
-# No, we are not going ot run the tests for all these dependencies on every commit
+    - sudo chown -R $CI_USER ~/perl5
+# No, we are not going to run the tests for all these dependencies on every commit
     - cpanm -n TAP::Harness::Archive TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make $PARROT_TEST"
 # branches:
