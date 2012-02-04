@@ -652,7 +652,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         call_arg[1] = &call_object;
         call_arg[2] = &pcc_ret_sig;
 
-        /* populate return slot (non-existant if void) */
+        /* populate return slot (non-existent if void) */
         if (enum_type_void !=
             (arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, 0))) {
             prep_pcc_ret_arg(interp, arg_t, &pcc_retv[i], &call_arg[i + 3], return_data);

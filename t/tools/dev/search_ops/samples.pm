@@ -18,7 +18,7 @@ $core = q{
 BEGIN_OPS_PREAMBLE
 
 #include "parrot/dynext.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "../interp/interp_guts.h"
 
 END_OPS_PREAMBLE

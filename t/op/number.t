@@ -612,7 +612,7 @@ Tests the use of Parrot floating-point number registers.
     .return ()
 
   negative_zero_todoed:
-    todo(0, '-0.0 not implemented, TT #313')
+    todo(0, '-0.0 not implemented, GH #366')
 .end
 
 .sub test_mul_n_n

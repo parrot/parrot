@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_4_0_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -85,6 +85,9 @@ op_lib_t *Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init);
  opcode_t * Parrot_exit_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_finalize_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_pop_upto_eh_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_pop_upto_eh_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_peek_exception_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_debug_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_debug_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_bounds_i(opcode_t *, PARROT_INTERP);
@@ -109,6 +112,8 @@ op_lib_t *Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init);
  opcode_t * Parrot_errorson_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_errorsoff_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_errorsoff_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_set_runcore_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_set_runcore_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_runinterp_p_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_runinterp_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_getinterp_p(opcode_t *, PARROT_INTERP);
@@ -540,6 +545,8 @@ op_lib_t *Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init);
  opcode_t * Parrot_sub_p_p_n(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sub_p_p_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_sqrt_n_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_is_inf_or_nan_i_n(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_is_inf_or_nan_i_nc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_callmethodcc_p_p(opcode_t *, PARROT_INTERP);
@@ -1123,6 +1130,10 @@ op_lib_t *Parrot_DynOp_core_3_9_0(PARROT_INTERP, long init);
  opcode_t * Parrot_flatten_hash_into_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_slurp_array_from_p_p_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_slurp_array_from_p_p_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_receive_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_wait_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_wait_pc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_pass(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */

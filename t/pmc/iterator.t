@@ -34,7 +34,7 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "new iter fails (init)" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "old-style Iterator now disallowed" );
 .pcc_sub :main main:
     push_eh THROWN
     new P0, ['ResizablePMCArray']

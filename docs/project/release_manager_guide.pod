@@ -2,9 +2,9 @@
 
 =head1 RELEASE MANAGER GUIDE
 
-The need for this document arised after a couple of improperly assembled
-releases. The intent of this guide is to describe what must be done to
-prepare for a release so that such mistakes won't happen again.
+This guide lays out, in detail, the steps necessary to prepare, to assemble,
+and to publish a parrot release.  Please ensure you carefully follow each 
+step in the process, and, as always, if you have any questions, please ask.
 
 =head2 I. Preparations During the Month Before a Release
 
@@ -12,48 +12,51 @@ prepare for a release so that such mistakes won't happen again.
 
 =item 1
 
-As soon as you become the release manager, review the goals for the release on
-the Parrot roadmap (L<http://trac.parrot.org/parrot/roadmap>) and announce the
-tasks to the C<parrot-dev> mailing list. Make sure everyone knows what they've
-committed to accomplish in time for the release.
+As soon as you become the release manager, review any goals for the release.
+Presently, the best way to determine this is to ask on C<#parrot> or, 
+alternatively, email a query to the C<parrot-dev> mailing list.  If there are 
+goals for the release, please annouce them on C<parrot-dev>. As well, please 
+ensure everyone understands what they've committed to accomplish in time for
+the release.
 
 =item 2
 
-Right after the release preceding your release, it is a good idea to start
-tracking Parrot news in F<ChangeLog>. A good resource are the individual reports
-posted in the weekly IRC meeting on C<#parrotsketch>. A complete log of these
-meetings is available at L<http://irclog.perlgeek.de/parrotsketch/>.
+Shortly after the release preceding to your release, it is a good idea to start
+tracking Parrot news in F<ChangeLog>. A good resource is the individual reports
+posted in the weekly IRC meeting on C<#parrotsketch>. You may obtain a complete
+log of these meetings at L<http://irclog.perlgeek.de/parrotsketch/>.
 
 =item 3
 
-A couple of weeks in advance, ask people to run C<make fulltest> and
-report (and hopefully fix!) any problems they find. Check in with language
-project leaders (e.g. Rakudo) for potential release blockers to allow time to
-fix them. Also ask people to review the tickets targeted for the upcoming
-release (L<https://trac.parrot.org/parrot/roadmap>).
+A couple of weeks in advance of the release, ask people to run C<make fulltest>
+and report (and hopefully fix!) any problems they discover. Check-in with 
+language project leaders (I<e.g.,> Rakudo) for any potential release blockers.
+This will, hopefully, afford them sufficient time apply any fixes. Also,
+please ask people to review any issues targeted for the upcoming release at
+L<https://github.com/parrot/parrot/issues>.
 
 =item 4
 
 During the course of the release process, you will need to be able to log in
-and operate on two different servers. To oversimplify a bit, you will need to be
-able to execute these two commands and their C<scp> equivalents.
+and operate on two different servers. To oversimplify a bit, you will need to 
+be able to execute these two commands and their C<scp> equivalents.
 
 =over 4
 
 =item * C<ssh parrot@ftp-osl.osuosl.org>
 
-Make sure your public SSH key(s) have been added to the FTP server
-L<ftp-osl.osuosl.org>. You can open a support ticket for this by sending
-an email to C<support@osuosl.org> with your public SSH keys as attachments.
-Without them, you won't be able to ship the release.
+In order to do this, please ensure your public SSH key(s) have been added to 
+the FTP server L<ftp-osl.osuosl.org>. You can open a support ticket for this by
+sending an email to C<support@osuosl.org> with your public SSH keys as 
+attachments. Without them, you will not be able to ship the release.
 
 =item * C<ssh E<lt>usernameE<gt>@parrot.org>
 
-Set up your account on L<http://parrot.org/>. Any previous release manager may
-be able to help you but you may also need to open a support ticket at
-C<support@osuosl.org> in order to be added to the C<parrot> group. The C<parrot>
-group has permissions to create the new directories needed to hold documentation
-for new releases.
+Also, set up your account on L<http://parrot.org/>. Any previous release 
+manager should be able to help you, but you may also need to open a support 
+ticket at C<support@osuosl.org> in order to be added to the C<parrot> group. 
+The C<parrot> group has permissions to create the new directories necessary to
+contain documentation for new releases.
 
 =back
 
@@ -61,24 +64,23 @@ for new releases.
 
 A couple of days in advance, announce the new release to
 C<parrot-dev@lists.parrot.org> and to the IRC channel C<#parrot>. Ask whether
-there are any showstopping bugs. Check in again with the language
-project leads. It's also good to ask for updates to F<ChangeLog>, F<CREDITS>,
+there are any showstopping bugs. Check-in again with the language project 
+leads. It's also good to ask for updates to F<ChangeLog>, F<CREDITS>, 
 F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<api.yaml> and
-L<http://trac.parrot.org/parrot/wiki/Languages>.
+L<https://github.com/parrot/parrot/wiki/Languages>.
 
 =item 6
 
-On the Saturday before a release, you should notify other developers to stop
-committing non-release related code to the master branch. This will help avoid
-complications. They are of course free to commit to branches as much as
-they like. You might also set the topic in C<#parrot>, announcing the
-time when you plan on starting the release procedure. This will help
-the committers with timing their last minute commits.
+On the Saturday before the release, you should notify other developers to stop
+committing non-release related code to the master branch. This will help to 
+avoid complications. They are, of course, free to commit to branches as much 
+as they want. You may also set the topic in C<#parrot>, announcing the
+time you plan to start the release procedure. This will aid the committers.
 
 =item 7
 
-You might also select a name (and optionally a quote) for your release.
-For example, you could select a name from
+You may also select a name (and optionally a quote) for your release. For 
+example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
 =item 8
@@ -90,73 +92,73 @@ subsequent steps.
 
 =head2 II. Get the Most Recent Changes
 
-The day of the release has come. Make sure you have the most recent version of
-the master branch checked out:
+The day of the release has arrived. Please ensure you have checked out the most 
+recent version of the master branch:
 
     git checkout master
     git pull --rebase
 
-Also, make sure you do not have any local commits that have not yet been pushed
-and tested thoroughly. You can do so by running:
+Also, ensure you do not have any local commits which have not yet been pushed 
+and thoroughly tested. You can do so with the following command:
 
     git log origin/master..
 
-If there is no output from that command, then your local master and the remote
-master are in sync.
+If this produces no output, then your local master and the remote master are 
+in sync.
 
 =head2 III. Update the Release Version
 
-Update files with version-specific information but before doing so, you
-should already have configured Parrot (C<perl Configure.pl>) and ran C<make>
-with the old version.
+First, ensure you have configured Parrot (C<perl Configure.pl>) and ran C<make>
+with the old version of Parrot.  Next, update files with the following version-
+specific information.
 
 =over 4
 
-=item 1
+=item 1. 
 
 =over 4
 
-=item a
+=item a. 
 
-Use C<tools/release/update_version.pl> to update the version string in
-several files:
+Use C<tools/release/update_version.pl> to update the version string in several
+files. For example,
 
   perl tools/release/update_version.pl 3.8.0
 
 B<IMPORTANT:> The version change you just made by running
 F<tools/release/update_version.pl> invalidates any existing generated bytecode.
-Assuming that it was run in a directory with an existing build, you must now
+Assuming you ran it in a directory with an existing build, you must now
 run C<make reconfig> to clear out any invalid bytecode.
 
-=item c
+=item b. 
 
-Update the version number, date, and your name in F<docs/parrothist.pod>.
+Update the version number, the date, and your name in F<docs/parrothist.pod>.
 
-=item d
+=item c. 
 
-Update this file (F<docs/project/release_manager_guide.pod>) to remove the
+Update this file (F<docs/project/release_manager_guide.pod>) to remove the 
 pending release you're currently building.
 
 =back
 
 =item 2
 
-Update F<ChangeLog> with the new version number and any other changes that have
-occurred since the last release. Hopefully, these files are being updated as
-committers work. If not, it's probably a good idea to gather the updates weekly
-rather than waiting until the day of the release.
+Update F<ChangeLog> with the new version number and any other changes which 
+have occurred since the last release. Hopefully, the committers are updating
+these files as they work. But, if not, then it's probably a good idea to gather
+the updates weekly rather than wait until the day of the release.
 
 =item 3
 
-Update release-related information in F<tools/release/release.json>. This will
-be used later when making release announcements. There are a few essential
-fields that must be updated at each release:
+Update release-related information in F<tools/release/release.json>. You will 
+use this later for the release announcements. There are a few, essential 
+fields which must be updated at each release:
 
 =over 4
 
 =item C<release.*>
 
-The date of the next release (see
+The date of the next release (I<see>
 L<Appendix 1|"Appendix 1 - Upcoming Releases">).
 
 =item C<bugday.date>
@@ -184,28 +186,28 @@ Give yourself credit for the release in F<CREDITS>.
 =item 6
 
 Configure Parrot and run C<make distro_tests>. Then either fix what those
-tests complain about or fix the tests so that they don't complain.
+tests complain about or fix the tests so they don't complain.
 
 =item 7
 
 B<NOTE:> You may skip the following step if this is a developer release or
-there have been no new entries to F<PBC_COMPAT>.
+if there have been no new entries to F<PBC_COMPAT>.
 
 If this is a supported release and new entries to F<PBC_COMPAT> have been
 added since the last supported release, add a new entry with a new major
-version number for this release at the top of the list:
+version number for this release at the top of the list. For example, 
 
   3.0     2007.10.17      coke    released 0.4.17
 
-Delete all minor version numbers since the last major bytecode version number
-as these are only used in development and not relevant to the bytecode support
-policy. Those changes are all included within the major version number
+Delete all minor version numbers since the last major bytecode version number,
+as these are used only in development and are not relevant to the bytecode 
+support policy. Those changes are all included within the major version number
 increase for the supported release.
 
 Once you've updated F<PBC_COMPAT> - running C<sh tools/dev/mk_packfile_pbc> if
 necessary - then run C<sh tools/dev/mk_native_pbc> to update the PBC files used
-in the native PBC tests. Note that you must have Parrot already built for this
-to work and that this script will reconfigure and rebuild Parrot with various
+in the native PBC tests. Note: Parrot must already have built Parrot for this
+to work, and this script will reconfigure and rebuild Parrot with various
 primitive size options.
 
 =item 8
@@ -236,16 +238,16 @@ switch:
 
     git commit -a -m "awesome and informative commit message"
 
-Be careful with C<git commit -a> as it could add files that you do not mean to
-include. Verify that the contents of your most recent commit look sane with:
+Be careful with C<git commit -a> as it could add files you do not mean to
+include. Verify the contents of your most recent commit look sane with:
 
     git show
 
-If you want, you can note the SHA-1 digest from this commit by running:
+If you want, you can note the SHA-1 digest from this commit by running,
 
     git rev-parse master > SHA1_TO_REMEMBER
 
-Update repository on GitHub:
+Update the repository on GitHub with,
 
     git push origin master
 
@@ -256,21 +258,21 @@ using C<make release> or using C<make release_check>.
 
 =over 4
 
-=item 1 Via C<make release>
+=item 1. Using C<make release>
 
 =over 4
 
-=item a
+=item a. 
 
 Begin by running:
 
     make release VERSION=a.b.c
 
-where a.b.c is the version number (e.g. C<3.8.0>). This will create the tarball
-named F<parrot-a.b.c.tar.gz>. The F<DEVELOPING> file is automatically excluded
-from the release tarball.
+where a.b.c is the version number (I<e.g.,> C<3.8.0>). This will create the 
+tarball named F<parrot-a.b.c.tar.gz>. The F<DEVELOPING> file is automatically 
+excluded from the release tarball.
 
-=item b
+=item b. 
 
 Extract F<parrot-a.b.c.tar.gz> into another directory:
 
@@ -278,7 +280,7 @@ Extract F<parrot-a.b.c.tar.gz> into another directory:
     cd ~/another/directory
     tar -xvzf parrot-a.b.c.tar.gz
 
-=item c
+=item c. 
 
 Verify that the build process runs smoothly:
 
@@ -288,7 +290,7 @@ Verify that the build process runs smoothly:
 
 =back
 
-=item 2 Via C<make release_check>
+=item 2. Using C<make release_check>
 
 As an alternative, you can package the release by running:
 
@@ -301,8 +303,8 @@ into a temporary directory, and then reconfigure, rebuild, re-test
 
 =back
 
-Whichever of these two approaches you take, verify that the version is correct
-and B<does not> contain the suffix C<devel>:
+Whichever of these two approaches you use, verify the version is correct and 
+B<does not> contain the suffix C<devel>:
 
     ./parrot -V
 
@@ -356,19 +358,19 @@ only take a few minutes for the mirrors to sync.
 =head2 VIII. Release Announcement
 
 Compose the release announcement. Use F<tools/release/crow.pir> to make this
-part easier. You can specify the format of your announcements like so:
+part easier. You can specify the format of your announcements like so,
 
     ./parrot tools/release/crow.pir --type=text
     ./parrot tools/release/crow.pir --type=html
 
 Copy the output and paste it into the application you need. HTML works well for
-Perl and PerlMonks, and text for the rest. It's a good idea (although not
-necessary) to add a "highlights" section to draw attention to major new
-features. If you do, be sure to say the same thing in both text and HTML
-versions.
+Perl and PerlMonks and text works well for the rest. It's a good idea (although 
+not necessary) to add a "highlights" section to draw attention to major new
+features. If you do, be sure to say the same thing in both the text and the 
+HTML versions.
 
-Be sure to include the SHA256 sums of the tarballs in the release announcement
-which are automatically generated by C<make release>.
+Please ensure you include the SHA256 sums of the tarballs in the release 
+announcement which are automatically generated by C<make release>.
 
 =head2 IX. Update the Website
 
@@ -416,10 +418,11 @@ on which type of release this is.
 Update L<http://docs.parrot.org>. Run C<make html> in a release copy of Parrot,
 and save the F<resources/> and F<html/> directories created in F<docs/>. Use
 SSH to login to L<< <username>@parrot.org >> and expand these into a release
-directory (e.g. 3.8.0) in the webroot for L<http://docs.parrot.org>. In
-C<< <webroot>/parrot >>, there are symbolic links for C<latest>, C<supported>,
-and C<devel>. Update the C<latest> symlink to point to your new directory. If
-this is a supported release, also update the C<supported> symlink. Do not
+directory (e.g. 3.8.0) in the webroot (I<i.e.,> 
+F</var/www/docs.parrot.org/htdocs/parrot>) for L<http://docs.parrot.org>. In 
+C<< <webroot>/parrot >>, there are symbolic links for C<latest>, C<supported>, 
+and C<devel>. Update the C<latest> symlink to point to your new directory. If 
+this is a supported release, also update the C<supported> symlink. Do not 
 delete any old copies of the docs and don't update the other symlinks.
 
 =item 7
@@ -431,7 +434,12 @@ Preview the new page, and submit it.
 The old release announcement may be edited to uncheck I<Promoted to front page>
 to keep the main page fresh.
 
-=head2 X. Publicity
+=head2 X. Update parrot.github.com and any Relevant parrot-docsx Repositories
+
+Please read and follow the instructions in F<README_release.pod> at 
+L<https://github.com/parrot/parrot.github.com>
+
+=head2 XI. Publicity
 
 Publicize the release by publishing the announcement through the following
 channels (and any others you can think of):
@@ -471,25 +479,6 @@ Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
 
 =back
 
-=head2 XI. Changes to Trac
-
-=over 4
-
-=item 1
-
-Add the latest version to Trac so that new bug reports can be filed against the
-release. L<https://trac.parrot.org/parrot/admin/ticket/versions>.
-
-=item 2
-
-Make the latest version the default version for new reports.
-
-=item 3
-
-Remove any sufficiently old versions listed there.
-
-=back
-
 =head2 XII. Finish
 
 You're done! Help yourself to a beer, cola, or other delicious celebratory drink.
@@ -513,12 +502,9 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Versions with an asterisk (*) are supported releases:
 
-    - Nov 15, 2011 - 3.10.0  - Whiteknight
-    - Dec 20, 2011 - 3.11.0  - cotto
-    - Jan 17, 2012 - 4.0.0   - ??
-    - Feb 21, 2012 - 4.1.0   - ??
-    - Mar 20, 2012 - 4.2.0   - ??
-    - Apr 17, 2012 - 4.3.0   - ??
+    - Feb 21, 2012 - 4.1.0   - alvis
+    - Mar 20, 2012 - 4.2.0   - dukeleto
+    - Apr 17, 2012 - 4.3.0   - cotto
     - May 15, 2012 - 4.4.0   - ??
     - Jun 19, 2012 - 4.5.0   - ??
     - Jul 17, 2012 - 4.6.0   - ??

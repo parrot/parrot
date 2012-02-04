@@ -273,7 +273,7 @@ buffer_ok:
     $P1 = 0
     n = $P0."b11"($P1)
     ok(1, "recursion_and_exceptions")
-    is(n, 8, "recursion_and_exceptions")
+    is(n, 7, "recursion_and_exceptions")
 .end
 .namespace ["b"]
 .sub b11 :method

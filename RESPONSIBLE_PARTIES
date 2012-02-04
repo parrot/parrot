@@ -6,7 +6,7 @@ commit access, just those who have a role they've taken responsibility
 for.
 
 See docs/project/roles_responsibilities.pod for role definitions, and
-https://trac.parrot.org/parrot/wiki/Languages for language authors/maintainers.
+https://github.com/parrot/parrot/wiki/Languages for language authors/maintainers.
 
 
 Project Team

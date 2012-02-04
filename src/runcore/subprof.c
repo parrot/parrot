@@ -14,7 +14,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_subprof.h"
 
 #include "parrot/oplib/ops.h"
@@ -1056,6 +1055,9 @@ Returns a high-resolution number representing how long Parrot has been running.
 */
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+
+#  include <stdint.h>
+
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {
@@ -1322,7 +1324,7 @@ Parrot_runcore_subprof_sub_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_sub");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_SUB_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_sub_core;
     coredata->prepare_run = NULL;
@@ -1459,7 +1461,7 @@ Parrot_runcore_subprof_hll_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_hll");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_HLL_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_hll_core;
     coredata->prepare_run = NULL;
@@ -1557,7 +1559,7 @@ Parrot_runcore_subprof_ops_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_ops");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_OPS_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_ops_core;
     coredata->prepare_run = NULL;

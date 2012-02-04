@@ -458,6 +458,13 @@ for the purpose of setting environmental variables used in options, like this:
 ... you would now place the assignments to C<CC> and C<CX> in the
 I<=variables> section of the configuration file (as above).
 
+In addition, should you wish to use an option whose value contains whitespace
+and would, if presented on the command-line, require quoting, you may
+assign that string to a variable and then use the variable in the C<general>
+section below.
+
+    LONGLONG=long long
+
 =back
 
 =item * general
@@ -484,6 +491,14 @@ I<option=value> pairs or be options which will be assigned a true value.
 
 Note that when the value is a variable defined in the I<=variables> section,
 it must be preceded by a C<$> sign.
+
+    intval=$LONGLONG
+
+Alternatively, if assignment of a value to an option on the command-line would
+require quoting due to the presence of whitespace in the value, you may assign
+it to a value in the I<=general> section by double-quoting the value.
+
+    intval="long long"
 
 =item *
 

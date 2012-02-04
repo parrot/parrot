@@ -49,7 +49,7 @@ appropriate type.
         }
         else {
             PMC * const clone   = VTABLE_clone(INTERP, other);
-            void       *attrs   = PMC_data(clone);
+            void * const attrs  = PMC_data(clone);
             PMC * const meta    = PMC_metadata(clone);
 
             /* now swap memory without leaking it */

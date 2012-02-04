@@ -22,7 +22,7 @@ Tests the ExceptionHandler PMC.
     .include 'test_more.pir'
 
     # If test exited with "bad plan" MyHandlerCan.can_handle wasn't invoked.
-    plan(19)
+    plan(25)
 
     test_bool()
     test_int()
@@ -103,6 +103,8 @@ Tests the ExceptionHandler PMC.
     pop_eh
 
     test_handle_types_except()
+    test_init_pmc_with_key()
+    test_all_types()
 
     goto init_int
 
@@ -313,6 +315,101 @@ Tests the ExceptionHandler PMC.
     pop_eh
     pop_eh
     ok(i, 'type in except is list is not caught')
+.end
+
+.sub 'test_init_pmc_with_key'
+    .const int TYPEUSED = .EXCEPTION_UNEXPECTED_NULL
+    .const int TYPEOTHER = .EXCEPTION_SYNTAX_ERROR
+    .local int i
+    .local pmc eh, ex
+    i = 0
+    eh = new [ 'ExceptionHandler' ], [ TYPEUSED ]
+    set_label eh, catch1
+    push_eh eh
+    ex = new ['Exception']
+    ex['type'] = TYPEUSED
+    throw ex
+    goto report1
+  catch1:
+    finalize eh
+    i = 1
+  report1:
+    ok(i, 'exception handler created with one key caught exception')
+    pop_eh
+    push_eh report2
+    push_eh eh
+    i = 1
+    set_label eh, catch2
+    ex = new ['Exception']
+    ex['type'] = TYPEOTHER
+    throw ex
+    goto report2
+  catch2:
+    i = 0
+  report2:
+    ok(i, 'exception handler created with one key die not catch wrong exception')
+    pop_eh
+    pop_eh
+    i = 0
+    eh = new ['ExceptionHandler'], [ TYPEUSED ; TYPEOTHER ]
+    set_label eh, catch3
+    push_eh eh
+    ex = new ['Exception']
+    ex['type'] = TYPEUSED
+    throw ex
+    goto report3
+  catch3:
+    finalize eh
+    i = 1
+  report3:
+    ok(i, 'exception handler created with two keys caught first exception')
+    i = 0
+    set_label eh, catch4
+    ex = new ['Exception']
+    ex['type'] = TYPEOTHER
+    throw ex
+    goto report4
+  catch4:
+    finalize eh
+    i = 1
+  report4:
+    ok(i, 'exception handler created with two keys caught second exception')
+    pop_eh
+.end
+
+.sub 'test_all_types'
+    .const int TYPEUSED = .EXCEPTION_UNEXPECTED_NULL
+    .const int CTRLTYPEUSED = .CONTROL_RETURN
+    .local int i
+    .local pmc eh, ex
+    i = 0
+    eh = new [ 'ExceptionHandler' ], [ .EXCEPTION_ALL]
+    set_label eh, catch1
+    push_eh eh
+    ex = new ['Exception']
+    ex['type'] = TYPEUSED
+    throw ex
+    goto report1
+  catch1:
+    finalize eh
+    i = 1
+  report1:
+    ok(i, 'exception handler for EXCEPTION_ALL caught')
+    pop_eh
+    push_eh report2
+    push_eh eh
+    i = 1
+    set_label eh, catch2
+    ex = new ['Exception']
+    ex['type'] = CTRLTYPEUSED
+    throw ex
+    goto report2
+  catch2:
+    i = 0
+  report2:
+    ok(i, 'exception handler for EXCEPTION_ALL did not catch control exception')
+    pop_eh
+    pop_eh
 .end
 
 # Local Variables:

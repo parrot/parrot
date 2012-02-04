@@ -553,7 +553,13 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int result = 1;
     int nargs = 0;
     int i;
-    const char **pargs = (const char**)calloc(argc, sizeof (char*));
+
+    /*
+     * Any option with an argument we handle may split an argument
+     * into two.  So be pessimistic with the allocation.
+     */
+    int pargs_size = argc * 2;
+    const char **pargs = (const char**)calloc(pargs_size, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);
@@ -613,16 +619,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             exit(EXIT_FAILURE);
             break;
           case OPT_RUNTIME_PREFIX:
-            {
-                /* TODO Can we do this in prt0.pir? */
-                Parrot_String runtimepath;
-                char * runtimepath_c;
-                Parrot_api_get_runtime_path(interp, &runtimepath);
-                Parrot_api_string_export_ascii(interp, runtimepath, &runtimepath_c);
-                fprintf(stdout, "%s", runtimepath_c);
-                Parrot_api_string_free_exported_ascii(interp, runtimepath_c);
-                exit(EXIT_SUCCESS);
-            }
+            pargs[nargs++] = "--runtime-prefix";
+            break;
           case 'V':
             pargs[nargs++] = "-V";
             break;
@@ -690,6 +688,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     }
     for (i = opt.opt_index; i < argc; i++)
         pargs[nargs++] = argv[i];
+
+    /* Make sure we don't overrun the end of the array */
+    PARROT_ASSERT(nargs <= pargs_size);
 
     args->argv = pargs;
     args->argc = nargs;

@@ -117,15 +117,11 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     Parrot_Pointer_Array_Chunk   *chunk;
     void                         *ret;
 
-    /* If there is no free chunks */
-    if (self->current_chunk >= self->total_chunks)
-         allocate_more_chunks(interp, self);
-
     /* Reuse removed cell */
     if (self->next_free) {
         /* FIXME. Cast to UINTVAL is wrong. */
         /* We have to provide parrot version of uintptr_t due lack of it in C89 */
-        /* See TT #1855 */
+        /* See GH #378 */
         void **next      = (void**)((UINTVAL)*self->next_free & ~1);
         ret = self->next_free;
         *self->next_free = ptr;
@@ -133,7 +129,9 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
         return ret;
     }
 
-    if (!self->chunks[self->current_chunk]->num_free)
+    /* If there is no free chunks */
+    if (self->current_chunk >= self->total_chunks
+            || !self->chunks[self->current_chunk]->num_free)
         allocate_more_chunks(interp, self);
 
     chunk = self->chunks[self->current_chunk];

@@ -1024,19 +1024,19 @@ handler:
     .return()
 
 todo:
-    .complex_pow_todo( "2", "0.500000-0.000000i", -1, 'TT #313' )
-    .complex_pow_todo( "2", "0.250000-0.000000i", -2, 'TT #313' )
-    .complex_pow_todo( "-0.5", "0.250000-0.000000i", 2, 'TT #313' )
-    .complex_pow_todo( "-0.5", "-2.000000-0.000000i", -1, 'TT #313' )
-    .complex_pow_todo( "-2", "4.000000-0.000000i", 2, 'TT #313' )
-    .complex_pow_todo( "-2", "-0.500000-0.000000i", -1, 'TT #313' )
-    .complex_pow_todo( "0.5", "2.000000-0.000000i", -1, 'TT #313' )
-    .complex_pow_todo( "0.5", "4.000000-0.000000i", -2, 'TT #313' )
-    .complex_pow_todo( "0.5", "5.656854-0.000000i", -2.5, 'TT #313' )
-    .complex_pow_todo( "3i", "-0.111111-0.000000i", -2, 'TT #313' )
-    .complex_pow_todo( "-0.5-0.5i", "1.000000-0.000000i", 0, 'TT #313' )
-    .complex_pow_todo( "-0.5-0.5i", "-0.000000+0.500000i", 2, 'TT #313' )
-    .complex_pow_todo( "-0.5-0.5i", "-0.000000-2.000000i", -2, 'TT #313' )
+    .complex_pow_todo( "2", "0.500000-0.000000i", -1, 'GH #366' )
+    .complex_pow_todo( "2", "0.250000-0.000000i", -2, 'GH #366' )
+    .complex_pow_todo( "-0.5", "0.250000-0.000000i", 2, 'GH #366' )
+    .complex_pow_todo( "-0.5", "-2.000000-0.000000i", -1, 'GH #366' )
+    .complex_pow_todo( "-2", "4.000000-0.000000i", 2, 'GH #366' )
+    .complex_pow_todo( "-2", "-0.500000-0.000000i", -1, 'GH #366' )
+    .complex_pow_todo( "0.5", "2.000000-0.000000i", -1, 'GH #366' )
+    .complex_pow_todo( "0.5", "4.000000-0.000000i", -2, 'GH #366' )
+    .complex_pow_todo( "0.5", "5.656854-0.000000i", -2.5, 'GH #366' )
+    .complex_pow_todo( "3i", "-0.111111-0.000000i", -2, 'GH #366' )
+    .complex_pow_todo( "-0.5-0.5i", "1.000000-0.000000i", 0, 'GH #366' )
+    .complex_pow_todo( "-0.5-0.5i", "-0.000000+0.500000i", 2, 'GH #366' )
+    .complex_pow_todo( "-0.5-0.5i", "-0.000000-2.000000i", -2, 'GH #366' )
     .return()
 .end
 
@@ -1300,8 +1300,8 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("0-2i", "-0.000000-0.909297i", 'sinh', 'TT #313' )
-    .complex_op_todo("0+2i", "-0.000000+0.909297i", 'sinh', 'TT #313' )
+    .complex_op_todo("0-2i", "-0.000000-0.909297i", 'sinh', 'GH #366' )
+    .complex_op_todo("0+2i", "-0.000000+0.909297i", 'sinh', 'GH #366' )
     .return()
 .end
 
@@ -1431,10 +1431,10 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("0-1i", "-0.000000-1.570796i", 'asinh', 'TT #313' )
-    .complex_op_todo("0-0.5i", "-0.000000-0.523599i", 'asinh', 'TT #313' )
-    .complex_op_todo("0+0.5i", "-0.000000+0.523599i", 'asinh', 'TT #313' )
-    .complex_op_todo("0+1i", "-0.000000+1.570796i", 'asinh', 'TT #313' )
+    .complex_op_todo("0-1i", "-0.000000-1.570796i", 'asinh', 'GH #366' )
+    .complex_op_todo("0-0.5i", "-0.000000-0.523599i", 'asinh', 'GH #366' )
+    .complex_op_todo("0+0.5i", "-0.000000+0.523599i", 'asinh', 'GH #366' )
+    .complex_op_todo("0+1i", "-0.000000+1.570796i", 'asinh', 'GH #366' )
     .return()
 .end
 
@@ -1447,16 +1447,16 @@ todo:
 
     .complex_op_is("-2+0i", "1.316958+3.141593i", 'acosh' )
     .complex_op_is("2+0i", "-1.316958+0.000000i", 'acosh' )
-    .complex_op_todo("0-2i", "1.443635-1.570796i", 'acosh', "TT #1891" )
-    .complex_op_todo("0-1i", "0.881374-1.570796i", 'acosh', "TT #1891" )
-    .complex_op_todo("0-0.5i", "0.481212-1.570796i", 'acosh', "TT #1891" )
+    .complex_op_todo("0-2i", "1.443635-1.570796i", 'acosh', "GH #455" )
+    .complex_op_todo("0-1i", "0.881374-1.570796i", 'acosh', "GH #455" )
+    .complex_op_todo("0-0.5i", "0.481212-1.570796i", 'acosh', "GH #455" )
     .complex_op_is("0+0.5i", "0.481212+1.570796i", 'acosh' )
     .complex_op_is("0+1i", "0.881374+1.570796i", 'acosh' )
     .complex_op_is("0+2i", "1.443635+1.570796i", 'acosh' )
     .complex_op_is("2+3i", "1.983387+1.000144i", 'acosh' )
-    .complex_op_todo("2-3i", "1.983387-1.000144i", 'acosh', "TT #1891" )
+    .complex_op_todo("2-3i", "1.983387-1.000144i", 'acosh', "GH #455" )
     .complex_op_is("-2+3i", "1.983387+2.141449i", 'acosh' )
-    .complex_op_todo("-2-3i", "1.983387-2.141449i", 'acosh', "TT #1891" )
+    .complex_op_todo("-2-3i", "1.983387-2.141449i", 'acosh', "GH #455" )
 
     unless has_negative_zero goto todo
     .complex_op_is("-1+0i", "-0.000000+3.141593i", 'acosh' )
@@ -1466,10 +1466,10 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'acosh', 'TT #313' )
-    .complex_op_todo("-0.5+0i", "-0.000000+2.094395i", 'acosh', 'TT #313' )
-    .complex_op_todo("0.5+0i", "-0.000000+1.047198i", 'acosh', 'TT #313' )
-    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'acosh', 'TT #313' )
+    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'acosh', 'GH #366' )
+    .complex_op_todo("-0.5+0i", "-0.000000+2.094395i", 'acosh', 'GH #366' )
+    .complex_op_todo("0.5+0i", "-0.000000+1.047198i", 'acosh', 'GH #366' )
+    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'acosh', 'GH #366' )
     .return()
 .end
 
@@ -1480,7 +1480,7 @@ todo:
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
     has_negative_zero = config_hash["has_negative_zero"]
 
-    .complex_op_todo("-2+0i", "-0.549306+1.570796i", 'atanh', "TT #1891" )
+    .complex_op_todo("-2+0i", "-0.549306+1.570796i", 'atanh', "GH #455" )
     .complex_op_is("-0.5+0i", "-0.549306+0.000000i", 'atanh' )
     .complex_op_is("0.5+0i", "0.549306+0.000000i", 'atanh' )
     .complex_op_is("1+0i", "Inf+0.000000i", 'atanh' )
@@ -1500,12 +1500,12 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("0-2i", "-0.000000-1.107149i", 'atanh', 'TT #313' )
-    .complex_op_todo("0-1i", "-0.000000-0.785398i", 'atanh', 'TT #313' )
-    .complex_op_todo("0-0.5i", "-0.000000-0.463648i", 'atanh', 'TT #313' )
-    .complex_op_todo("0+0.5i", "-0.000000+0.463648i", 'atanh', 'TT #313' )
-    .complex_op_todo("0+1i", "-0.000000+0.785398i", 'atanh', 'TT #313' )
-    .complex_op_todo("0+2i", "-0.000000+1.107149i", 'atanh', 'TT #313' )
+    .complex_op_todo("0-2i", "-0.000000-1.107149i", 'atanh', 'GH #366' )
+    .complex_op_todo("0-1i", "-0.000000-0.785398i", 'atanh', 'GH #366' )
+    .complex_op_todo("0-0.5i", "-0.000000-0.463648i", 'atanh', 'GH #366' )
+    .complex_op_todo("0+0.5i", "-0.000000+0.463648i", 'atanh', 'GH #366' )
+    .complex_op_todo("0+1i", "-0.000000+0.785398i", 'atanh', 'GH #366' )
+    .complex_op_todo("0+2i", "-0.000000+1.107149i", 'atanh', 'GH #366' )
     .return()
 .end
 
@@ -1517,7 +1517,7 @@ todo:
     has_negative_zero = config_hash["has_negative_zero"]
 
     .complex_op_is("-2+0i", "-0.549306+0.000000i", 'acoth' )
-    .complex_op_todo("-0.5+0i", "-0.549306+1.570796i", 'acoth', "TT #1891" )
+    .complex_op_todo("-0.5+0i", "-0.549306+1.570796i", 'acoth', "GH #455" )
     .complex_op_is("0.5+0i", "0.549306-1.570796i", 'acoth' )
     .complex_op_is("1+0i", "Inf+0.000000i", 'acoth' )
     .complex_op_is("2+0i", "0.549306+0.000000i", 'acoth' )
@@ -1536,12 +1536,12 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("0-2i", "-0.000000+0.463648i", 'acoth', 'TT #313' )
-    .complex_op_todo("0-1i", "-0.000000+0.785398i", 'acoth', 'TT #313' )
-    .complex_op_todo("0-0.5i", "-0.000000+1.107149i", 'acoth', 'TT #313' )
-    .complex_op_todo("0+0.5i", "-0.000000-1.107149i", 'acoth', 'TT #313' )
-    .complex_op_todo("0+1i", "-0.000000-0.785398i", 'acoth', 'TT #313' )
-    .complex_op_todo("0+2i", "-0.000000-0.463648i", 'acoth', 'TT #313' )
+    .complex_op_todo("0-2i", "-0.000000+0.463648i", 'acoth', 'GH #366' )
+    .complex_op_todo("0-1i", "-0.000000+0.785398i", 'acoth', 'GH #366' )
+    .complex_op_todo("0-0.5i", "-0.000000+1.107149i", 'acoth', 'GH #366' )
+    .complex_op_todo("0+0.5i", "-0.000000-1.107149i", 'acoth', 'GH #366' )
+    .complex_op_todo("0+1i", "-0.000000-0.785398i", 'acoth', 'GH #366' )
+    .complex_op_todo("0+2i", "-0.000000-0.463648i", 'acoth', 'GH #366' )
     .return()
 .end
 
@@ -1573,10 +1573,10 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("0+1i", "-0.000000-1.570796i", 'acsch', 'TT #313' )
-    .complex_op_todo("0+2i", "-0.000000-0.523599i", 'acsch', 'TT #313' )
-    .complex_op_todo("0-2i", "-0.000000+0.523599i", 'acsch', 'TT #313' )
-    .complex_op_todo("0-1i", "-0.000000+1.570796i", 'acsch', 'TT #313' )
+    .complex_op_todo("0+1i", "-0.000000-1.570796i", 'acsch', 'GH #366' )
+    .complex_op_todo("0+2i", "-0.000000-0.523599i", 'acsch', 'GH #366' )
+    .complex_op_todo("0-2i", "-0.000000+0.523599i", 'acsch', 'GH #366' )
+    .complex_op_todo("0-1i", "-0.000000+1.570796i", 'acsch', 'GH #366' )
     .return()
 .end
 
@@ -1588,16 +1588,16 @@ todo:
     has_negative_zero = config_hash["has_negative_zero"]
 
     .complex_op_is("-0.5+0i", "1.316958+3.141593i", 'asech' )
-    .complex_op_todo("0.5+0i", "1.316958+0.000000i", 'asech', "TT #1891" )
+    .complex_op_todo("0.5+0i", "1.316958+0.000000i", 'asech', "GH #455" )
     .complex_op_is("0-2i", "0.481212+1.570796i", 'asech' )
     .complex_op_is("0-1i", "0.881374+1.570796i", 'asech' )
     .complex_op_is("0-0.5i", "1.443635+1.570796i", 'asech' )
-    .complex_op_todo("0+0.5i", "1.443635-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("0+1i", "0.881374-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("0+2i", "0.481212-1.570796i", 'asech', "TT #1891" )
-    .complex_op_todo("2+3i", "0.231335-1.420411i", 'asech', "TT #1891" )
+    .complex_op_todo("0+0.5i", "1.443635-1.570796i", 'asech', "GH #455" )
+    .complex_op_todo("0+1i", "0.881374-1.570796i", 'asech', "GH #455" )
+    .complex_op_todo("0+2i", "0.481212-1.570796i", 'asech', "GH #455" )
+    .complex_op_todo("2+3i", "0.231335-1.420411i", 'asech', "GH #455" )
     .complex_op_is("2-3i", "0.231335+1.420411i", 'asech' )
-    .complex_op_todo("-2+3i", "0.231335-1.721182i", 'asech', "TT #1891" )
+    .complex_op_todo("-2+3i", "0.231335-1.721182i", 'asech', "GH #455" )
     .complex_op_is("-2-3i", "0.231335+1.721182i", 'asech' )
 
     unless has_negative_zero goto todo
@@ -1608,10 +1608,10 @@ todo:
     .return()
 
 todo:
-    .complex_op_todo("-2+0i", "-0.000000+2.094395i", 'asech', 'TT #313' )
-    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'asech', 'TT #313' )
-    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'asech', 'TT #313' )
-    .complex_op_todo("2+0i", "-0.000000+1.047198i", 'asech', 'TT #313' )
+    .complex_op_todo("-2+0i", "-0.000000+2.094395i", 'asech', 'GH #366' )
+    .complex_op_todo("-1+0i", "-0.000000+3.141593i", 'asech', 'GH #366' )
+    .complex_op_todo("1+0i", "-0.000000+0.000000i", 'asech', 'GH #366' )
+    .complex_op_todo("2+0i", "-0.000000+1.047198i", 'asech', 'GH #366' )
     .return()
 .end
 
@@ -1643,7 +1643,7 @@ todo:
     $S0 = concat $S1, ' != '
     $S1 = expected
     $S0 = concat $S0, $S1
-    $S0 = concat $S0, ' - subclassing Complex add returns 0+0i - TT #562'
+    $S0 = concat $S0, ' - subclassing Complex add returns 0+0i - GH #548'
     $I0 = not $I0    # invert $I0 so todo does not pass
     todo( $I0, $S0 )
 .end

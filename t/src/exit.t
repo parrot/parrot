@@ -32,7 +32,6 @@ Tests C<Parrot_x_exit()> and C<Parrot_x_on_exit()> functions.
 c_output_is( <<'CODE', <<'OUTPUT', "on_exit - interpreter" );
 #include <stdio.h>
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 void
 ex1(PARROT_INTERP, int x, void*p)
@@ -57,7 +56,7 @@ main(int argc, char* argv[])
 {
     Interp *interp;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_x_on_exit(interp, ex1, 0);
         Parrot_x_on_exit(interp, ex2, 0);

@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 103;
+use Parrot::Test tests => 104;
 
 =head1 NAME
 
@@ -256,6 +256,28 @@ ok 2
 ok 3
 back
 OUTPUT
+
+pir_error_output_like( <<'CODE', qr/Invalid operation on null string/, "return :flat" );
+.sub main :main
+  .local string s, r
+  .local pmc arr
+
+  say "get"
+  s = s_get()
+  r = substr s, 0, 1
+  print "'"
+  print r
+  print "'"
+  say " done"
+.end
+
+.sub s_get
+  .local pmc arr
+  arr = new ["ResizableStringArray"]
+  # push arr, "xy"
+  .return(arr :flat )
+.end
+CODE
 
 pir_output_is( <<'CODE', <<'OUTPUT', "use it in PIR" );
 .sub main :main
@@ -2451,7 +2473,7 @@ CODE
 2
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'TT #1033' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'GH #600' );
 .sub main :main
   foo(1)
 .end
@@ -2494,7 +2516,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .sub 'main' :main
     $P0   = new ['Undef']
     ($P0) = foo()
+    unless null $P0 goto L1
+    $S0 = "PMCNULL"
+    goto L2
+  L1:
     $S0   = typeof $P0
+  L2:
     say $S0
 .end
 
@@ -2506,7 +2533,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Handling :flat of empty arguments" );
 .end
 CODE
 ResizablePMCArray
-Undef
+PMCNULL
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Tailcall from vtable" );

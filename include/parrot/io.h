@@ -456,7 +456,7 @@ INTVAL Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_read_buffer(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    ARGMOD(char *dest),
+    ARGOUT(char *dest),
     size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

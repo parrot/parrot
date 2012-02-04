@@ -16,15 +16,19 @@ F<docs/submissions.pod>.
 
 =head1 WHAT ABOUT TRAC?
 
-Our preferred method of bug tracking at this point is trac:
-L<https://trac.parrot.org/>
+Our preferred method of bug tracking at this point is github issues:
+L<https://github.com/parrot/parrot/issues/>
 
 All Parrot developers are expected to pitch in and help keep the ticket tracker
 in a healthy state.  I<This means you!> Most of the document below still makes
 sense in terms of activities in trac, but the specifics are of course different
 with the new system.
 
-Our previous bug tracking system was RT.  In November 2009 all remaining RT
+Our previous bug tracking system was trac, hosted at
+L<https://trac.parrot.org/>. In January 2012 the trac tickets have been
+migrated to github issues.
+
+The bug tracking system before trac was RT.  In November 2009 all remaining RT
 tickets were closed, with many being reopened in Trac.  No new issues should
 be opened in RT, but the old system is available at L<https://rt.perl.org>.
 The Parrot issues are in the queue I<parrot>.

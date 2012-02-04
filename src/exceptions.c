@@ -20,6 +20,8 @@ Define the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "parrot/exceptions.h"
+#include "parrot/events.h"
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
@@ -573,7 +575,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
-    Interp *emergency_interp = Parrot_get_emergency_interp();
+    Interp *emergency_interp = Parrot_interp_get_emergency_interpreter();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -614,7 +616,7 @@ Parrot_print_backtrace(void)
 #  endif
     fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
     if (emergency_interp) {
-        Parrot_clear_emergency_interp();
+        Parrot_interp_clear_emergency_interpreter();
         PDB_backtrace(emergency_interp);
     }
 #  undef BACKTRACE_DEPTH

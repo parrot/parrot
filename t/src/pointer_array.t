@@ -36,13 +36,12 @@ plan tests => 2;
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, count;
     void *pi, *pj;
@@ -98,13 +97,12 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterating)" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, j, k, count = 0;
     void *pi, *pj, *pk;

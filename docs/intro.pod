@@ -131,9 +131,9 @@ with. When this completes, you will have a working C<parrot> executable.
 
 Please report any problems that you encounter while building Parrot so the
 developers can fix them. You can do this by creating a login and opening
-a new ticket at L<https://trac.parrot.org>.  Please include the F<myconfig>
-file that was generated as part of the build process and any errors that you
-observed.
+a new ticket at L<https://github.com/parrot/parrot/issues/new>.  Please
+include the F<myconfig> file that was generated as part of the build
+process and any errors that you observed.
 
 =head2 The Parrot test suite
 

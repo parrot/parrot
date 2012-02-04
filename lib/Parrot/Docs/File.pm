@@ -287,7 +287,7 @@ If a file contains plain text rather than POD it may be directly linked to.
 sub is_docs_link {
     my $self = shift;
 
-    # TT #1241 - This needs more thought. I'm trying to work out which files
+    # GH #626 - This needs more thought. I'm trying to work out which files
     # it's sensible to link directly to. Suffixes other than txt are a
     # problem (for me at least) because the browser thinks it should
     # download the file.

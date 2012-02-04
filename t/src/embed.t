@@ -13,7 +13,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 16;
+plan tests => 13;
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/extend_vtable.h"
 #include "imcc/api.h"
@@ -64,7 +64,7 @@ static Parrot_String createstring(Parrot_Interp interp, const char * value)
 
 static Parrot_Interp new_interp()
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (!interp)
         fail("Cannot create parrot interpreter");
     return interp;
@@ -73,40 +73,11 @@ static Parrot_Interp new_interp()
 
 CODE
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "parrot/embed.h"
-
-void fail(const char *msg);
-
-void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-int main(int argc, const char **argv)
-{
-    Parrot_Interp interp;
-    interp = Parrot_new(NULL);
-    if (! interp)
-        fail("Cannot create parrot interpreter");
-
-    puts("Done");
-    Parrot_destroy(interp);
-    return 0;
-}
-CODE
-Done
-OUTPUT
-
 c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps" );
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 void fail(const char *msg);
 
@@ -119,18 +90,18 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp1, interp2;
-    interp1 = Parrot_new(NULL);
+    interp1 = Parrot_interp_new(NULL);
     if (!interp1)
         fail("Cannot create 1st parrot interpreter");
 
-    interp2 = Parrot_new(interp1);
+    interp2 = Parrot_interp_new(interp1);
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
 
     puts("Done");
-    Parrot_destroy(interp1);
-    Parrot_destroy(interp2);
+    Parrot_interp_destroy(interp1);
+    Parrot_interp_destroy(interp2);
     puts("Really done");
     return 0;
 }
@@ -139,12 +110,12 @@ Done
 Really done
 OUTPUT
 
-c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_new ");
+c_output_is(linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Minimal embed, create multiple interps without giving 1st interp to Parrot_interp_new ");
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 void fail(const char *msg);
 
@@ -157,18 +128,18 @@ void fail(const char *msg)
 int main(int argc, const char **argv)
 {
     Parrot_Interp interp1, interp2;
-    interp1 = Parrot_new(NULL);
+    interp1 = Parrot_interp_new(NULL);
     if (!interp1)
         fail("Cannot create 1st parrot interpreter");
 
-    interp2 = Parrot_new(NULL);
+    interp2 = Parrot_interp_new(NULL);
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
 
     puts("Done");
-    Parrot_destroy(interp1);
-    Parrot_destroy(interp2);
+    Parrot_interp_destroy(interp1);
+    Parrot_interp_destroy(interp2);
     puts("Really done");
     return 0;
 }
@@ -186,14 +157,14 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
 
     func_pmc = Parrot_compile_string(interp, lang, ".sub foo\n copy\n.end", &err);
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -209,14 +180,14 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "Foo");
 
     func_pmc = Parrot_compile_string(interp, lang, "This doesn't matter", &err);
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -233,7 +204,7 @@ int main(int argc, const char **argv)
     Parrot_PMC func_pmc;
     char *str;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     lang = createstring(interp, "PIR");
@@ -241,7 +212,7 @@ int main(int argc, const char **argv)
     func_pmc = Parrot_compile_string(interp, lang, "The sleeper must awake", &err);
     Parrot_printf(interp,"Caught exception\n");
     Parrot_printf(interp, "%Ss\n", err);
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -259,7 +230,7 @@ int main(void)
     Parrot_PMC code;
 
     /* Create the interpreter and show a message using parrot io */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
     Parrot_printf(interp, "Hello, parrot\n");
@@ -276,7 +247,7 @@ int main(void)
     );
     Parrot_ext_call(interp, code, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -300,7 +271,7 @@ int main(void)
     Parrot_PMC sub;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -330,7 +301,7 @@ int main(void)
     /* Execute it */
     Parrot_ext_call(interp, sub, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -354,7 +325,7 @@ int main(void)
     Parrot_String retstr;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -389,7 +360,7 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->S", msg, &retstr);
     Parrot_printf(interp, "%Ss\n", retstr);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -405,7 +376,7 @@ int main(void)
     Parrot_String compiler, errstr, parrotname, subname, msg;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -444,7 +415,7 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->P", msg, &ret);
     Parrot_printf(interp, "%.1Pf is the answer. What is the question?\n", ret);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -461,7 +432,7 @@ int main(void)
     Parrot_PMC res1, res2;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -504,7 +475,7 @@ int main(void)
     Parrot_printf(interp, "%.1Pf is the answer and pi*100 = %.1Pf\n",
         res1, res2);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -528,7 +499,7 @@ int main(void)
     Parrot_Float ret;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -562,56 +533,11 @@ int main(void)
     Parrot_ext_call(interp, sub, "S->N", msg, &ret);
     Parrot_printf(interp, "%.1f is the answer. What is the question?\n", ret);
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
 42.0 is the answer. What is the question?
-OUTPUT
-
-
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "External sub", todo => "Must explicitly set a PIR compreg" );
-
-void hello(Parrot_Interp interp);
-
-void hello(Parrot_Interp interp)
-{
-    Parrot_printf(interp, "Hello from C\n");
-}
-
-int main(void)
-{
-    Parrot_Interp interp;
-    Parrot_String compiler;
-    Parrot_String errstr;
-    Parrot_PMC code;
-    Parrot_PMC hellosub, pir_compiler, pasm_compiler, interp_pmc;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    imcc_get_pir_compreg_api(interp_pmc, 1, &pir_compiler);
-    imcc_get_pir_compreg_api(interp_pmc, 1, &pasm_compiler);
-
-    /* Compile pir */
-    compiler = createstring(interp, "PIR");
-    code = Parrot_compile_string(interp, compiler,
-".sub externcall :main\n"
-"  .param pmc ec\n"
-"  ec()\n"
-"\n"
-".end\n"
-"\n",
-        &errstr
-    );
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
-    Parrot_ext_call(interp, code, "P->", hellosub);
-
-    Parrot_destroy(interp);
-    return 0;
-}
-CODE
-Hello from C
 OUTPUT
 
 c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Insert external sub in namespace", todo => "Must explicitly set a PIR compreg" );
@@ -629,7 +555,6 @@ int main(void)
     Parrot_String compiler, pir_compiler;
     Parrot_String errstr;
     Parrot_PMC code;
-    Parrot_PMC hellosub;
     Parrot_PMC rootns;
     Parrot_String parrotname;
     Parrot_PMC parrotns;
@@ -637,7 +562,7 @@ int main(void)
     void *discard;
 
     /* Create the interpreter */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
 
@@ -657,14 +582,13 @@ int main(void)
     rootns = Parrot_get_root_namespace(interp);
     parrotname = createstring(interp, "parrot");
     parrotns = Parrot_PMC_get_pmc_keyed_str(interp, rootns, parrotname);
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
     helloname = createstring(interp, "hello");
     Parrot_PMC_set_pmc_keyed_str(interp, parrotns, helloname, hellosub);
 
     /* Call it */
     Parrot_ext_call(interp, code, "->");
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     return 0;
 }
 CODE
@@ -682,7 +606,7 @@ SKIP: {
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static opcode_t *
 run(PARROT_INTERP, int argc, cosnt char *argv[])
@@ -744,14 +668,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **)argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -762,7 +686,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple Calls" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -834,14 +758,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, (char **) argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -853,7 +777,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 1st bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -925,14 +849,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -944,7 +868,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple 2nd bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -1015,14 +939,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -1034,7 +958,7 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Multiple bad PIR" );
 
 #include <stdio.h>
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 
 static void
 compile_run(PARROT_INTERP, const char *src, Parrot_String *type, int argc,
@@ -1104,14 +1028,14 @@ main(int margc, const char *margv[])
     PackFile_Segment *seg;
 
     /* Interpreter set-up */
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp == NULL)
         return 1;
 
     /* dummy pf and segment to get things started */
     pf = PackFile_new_dummy(interp, "test_code");
 
-    /* Parrot_set_flag(interp, PARROT_TRACE_FLAG); */
+    /* Parrot_interp_set_flag(interp, PARROT_TRACE_FLAG); */
     run(interp, argc, argv);
     Parrot_x_exit(interp, 0);
     return 0;
@@ -1121,39 +1045,6 @@ Pir compiler returned no prog
 Pir compiler returned no prog
 OUTPUT
 
-}
-
-SKIP: {
-skip 'Need extra NCI thunks',1 unless $PConfig{HAS_EXTRA_NCI_THUNKS};
-
-c_output_is($common . linedirective(__LINE__) . <<'CODE', <<'OUTPUT', "Parrot_sub_new_from_c_func");
-
-void test(int x);
-
-void test(int x)
-{
-    printf("Hello!\n", x);
-}
-
-int main()
-{
-    Parrot_Interp interp;
-    Parrot_PMC test_pmc;
-    int x,y;
-
-    /* Create the interpreter */
-    interp = new_interp();
-
-    x = 10;
-
-    test_pmc = Parrot_sub_new_from_c_func(interp, (void (*)())& test, "i");
-    Parrot_ext_call(interp, test_pmc, "I->", x, &y);
-
-    Parrot_x_exit(interp, 0);
-}
-CODE
-Hello!
-OUTPUT
 }
 
 # Local Variables:

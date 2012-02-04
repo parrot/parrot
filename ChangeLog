@@ -1,10 +1,63 @@
+2012-01-17    release 4.1.0
+    - Core
+        + Shared libraries and installable binaries are now stripped if built with
+          --optimize on Cygwin, which greatly reduces their size on disk
+    - Documentation
+	+ Revised 'docs/project/release_manager_guide.pod'
+    - Tests
+
+2012-01-17    release 4.0.0
+    - Core
+        + Several cleanups to the interp subsystem API
+        + Cleanups and documentation additions for green threads and timers
+        + Iterator PMC and family now implement the "iterator" role
+        + A bug in Parrot_ext_try was fixed where it was not popping a context correctly
+    - Documentation
+        + Docs for all versions of Parrot ever released are now available
+          at http://parrot.github.com
+    - Tests
+        + Timer PMC tests were converted from PASM to PIR
+
+2011-12-20    release 3.11.0
+    - Core
+        + packfile api and pbc handling improvements
+        + smarter recursion tracking across threads
+        + new "pop_upto_eh" op for finer-grained exception handling
+        + subroutine-level profiling runcore cleanups
+        + improved window support
+    - Languages
+        + new math builtins in winxed (abs, sinh, cosh and tanh)
+        + better inline support in winxed
+        + squaak improvements (sub as expression, new read() builtin)
+    - Documentation
+        + many new man pages thanks to gci students
+    - Tests
+        + updated example code for FileHandle and Iterator
+        + coding standards fixes
+
 2011-11-15    release 3.10.0
     - Core
         + The mark VTABLE was added to the Select PMC
+        + The Parrot::Embed Perl 5 module was removed from parrot.git and now lives
+            at https://github.com/parrot/parrot-embed
+        + A set_random method was added to the Integer PMC, so random numbers can
+            be generated without needing to load math dynops
+        + A new implementation of green threads was added to Parrot, in preparation
+        for a robust hybrid threading system. Green threads are currently
+        not available on Windows.
     - Languages
+        + Winxed
+          - 'multi' modifier improved
+          - throw "string" now emits throw instead of die
+          - several optimizations in generated code
+          - improved some error dianostics
     - Community
+        + Parrot Foundation was accepted to Google Code-In 2011. We could always use more volunteers.
+          Task ideas are on the wiki:
+             https://github.com/parrot/parrot/wiki/Google-Code-In-Task-Ideas
     - Documentation
     - Tests
+        + Added tests for recently-fixed bugs using return :flat and ResizableStringArrays.
 
 2011-10-18    release 3.9.0
     - Core
@@ -29,7 +82,7 @@
         + New repo for the Parrot Alternate Compiler Toolkit, a re-implementation of
           PCT in Winxed: https://github.com/parrot/PACT
     - Documentation
-        + We are in the process to migrating our Trac wiki at http://trac.parrot.org/ to Github 
+        + We are in the process to migrating our Trac wiki at http://trac.parrot.org/ to Github
           at https://github.com/parrot/parrot/wiki
         + Packfile PMC documentation was updated
     - Tests

@@ -128,6 +128,80 @@ Set the name of the annotation.
 
 /*
 
+=item C<PMC *get_pmc_value()>
+
+Fetch the PMC value of the annotation.
+
+=cut
+
+*/
+    METHOD get_pmc_value() {
+        const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_PMC)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Trying to fetch wrong type of value from annotation");
+        RETURN(PMC * attrs->pmc_value);
+    }
+
+
+/*
+
+=item C<void set_pmc_value(PMC *value)>
+
+Set the PMC value of the annotation.
+
+=cut
+
+*/
+    METHOD set_pmc_value(PMC * value) {
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        attrs->value_type = PF_ANNOTATION_KEY_TYPE_PMC;
+        attrs->pmc_value  = value;
+    }
+
+
+/*
+
+=item C<INTVAL get_type()>
+
+Get the type of the annotation.
+
+=over 4
+
+=item * 0 = Integer
+
+=item * 1 = String
+
+=item * 2 = PMC
+
+=back
+
+=cut
+
+*/
+    METHOD get_type() {
+        /* These values were chosen to match the type values for opcodes */
+        Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
+        INTVAL ret;
+
+        switch (attrs->value_type) {
+          case PF_ANNOTATION_KEY_TYPE_INT:
+            ret = 0;
+            break;
+          case PF_ANNOTATION_KEY_TYPE_STR:
+            ret = 1;
+            break;
+          case PF_ANNOTATION_KEY_TYPE_PMC:
+            ret = 2;
+            break;
+        }
+
+        RETURN(INTVAL ret);
+    }
+
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Fetch the integer value of the annotation.

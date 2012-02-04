@@ -76,6 +76,12 @@ D: Architect (0.4.6 - 2.8.0) & Lead Developer
 E: allison@parrot.org
 U: allison
 
+N: Alvis Yardley
+D: Documentation Shepherd (3.9.0 - Present)
+E: ac.yardley@gmail.com
+U: alvis
+S: Ft. Worth, Texas
+
 N: Amir Karger
 U: amirkarger
 D: editor bugfixes
@@ -107,7 +113,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0 and 3.3.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0 and 4.0.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -1057,6 +1063,13 @@ N: Stefan O'Rear
 E: stefanor@cox.net
 D: Perl 5 interoperability, Blizkost
 U: sorear
+
+N: Stefan Seifert
+U: nine
+E: nine@detonation.org
+D: Continuation of Chandler's work on tasks
+S: Linz, Austria
+W: http://niner.name
 
 N: Stéphane Payrard
 D: Various code fixes and improvements

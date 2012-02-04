@@ -77,6 +77,7 @@ well.
     pmc_keys()
     update()
     update_mixed()
+    lexed_key()
 
     'done_testing'()
 .end
@@ -1560,6 +1561,15 @@ postit_end:
     $I0 = elements hash1
     is($I0, 4, "Got 4 elements in Hash after update")
     is(hash1, hash3, 'update_mixed worked')
+.end
+
+.sub 'lexed_key'
+    .lex "$key", $S0
+    $S0 = "hello"
+    $P0 = new ['Hash']
+    set $P0[$S0], "TEST"
+    $S1 = $P0["hello"]
+    is($S1, 'TEST', 'access with a lexed key works')
 .end
 
 .namespace ['Foo']
