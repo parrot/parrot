@@ -1,7 +1,9 @@
 # Copyright (C) 2010, Parrot Foundation.
 
 $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT): src/dynpmc/dynlexpad$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) src/dynpmc/dynlexpad$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/dynlexpad$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -21,7 +23,9 @@ src/dynpmc/dynlexpad.dump: src/dynpmc/dynlexpad.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/file$(LOAD_EXT): src/dynpmc/file$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/file$(LOAD_EXT) src/dynpmc/file$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/file$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/file$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -42,7 +46,9 @@ src/dynpmc/file.dump: src/dynpmc/file.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/foo_group$(LOAD_EXT): $(DYNPMC_FOO_OBJS) src/dynpmc/foo_group$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/foo_group$(LOAD_EXT) src/dynpmc/foo_group$(O) $(DYNPMC_FOO_OBJS) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/foo_group$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/foo_group$(O) $(DYNPMC_FOO_OBJS) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -91,7 +97,9 @@ src/dynpmc/foo2.dump: src/dynpmc/foo2.pmc src/dynpmc/foo.dump vtable.dump $(CLAS
 
 
 $(DYNEXT_DIR)/gziphandle$(LOAD_EXT): src/dynpmc/gziphandle$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/gziphandle$(LOAD_EXT) src/dynpmc/gziphandle$(O) $(LINKARGS) $(LIB_ZLIB)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/gziphandle$(O) $(LINKARGS) $(LIB_ZLIB)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -113,7 +121,9 @@ src/dynpmc/gziphandle.dump: src/dynpmc/gziphandle.pmc vtable.dump $(CLASS_O_FILE
 
 
 $(DYNEXT_DIR)/os$(LOAD_EXT): src/dynpmc/os$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/os$(LOAD_EXT) src/dynpmc/os$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/os$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/os$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -134,7 +144,9 @@ src/dynpmc/os.dump: src/dynpmc/os.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT): src/dynpmc/pccmethod_test$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT) src/dynpmc/pccmethod_test$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/pccmethod_test$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 src/dynpmc/pmc_pccmethod_test.h : src/dynpmc/pccmethod_test.c
@@ -154,7 +166,9 @@ src/dynpmc/pccmethod_test.dump: src/dynpmc/pccmethod_test.pmc vtable.dump $(CLAS
 
 
 $(DYNEXT_DIR)/rotest$(LOAD_EXT): src/dynpmc/rotest$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/rotest$(LOAD_EXT) src/dynpmc/rotest$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/rotest$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/rotest$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -177,7 +191,9 @@ src/dynpmc/rotest.dump: src/dynpmc/rotest.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/rational$(LOAD_EXT): src/dynpmc/rational$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/rational$(LOAD_EXT) src/dynpmc/rational$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/rational$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/rational$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -198,7 +214,9 @@ src/dynpmc/rational.dump: src/dynpmc/rational.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/subproxy$(LOAD_EXT): src/dynpmc/subproxy$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/subproxy$(LOAD_EXT) src/dynpmc/subproxy$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/subproxy$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/subproxy$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 
@@ -218,7 +236,9 @@ src/dynpmc/subproxy.dump: src/dynpmc/subproxy.pmc vtable.dump $(CLASS_O_FILES)
 
 
 $(DYNEXT_DIR)/select$(LOAD_EXT): src/dynpmc/select$(O)
-	$(LD)  @ld_out@$(DYNEXT_DIR)/select$(LOAD_EXT) src/dynpmc/select$(O) $(LINKARGS)
+	$(LD)  @ld_out@$(DYNEXT_DIR)/select$(LOAD_EXT) \
+#IF(cygwin and optimize):		-s \
+		src/dynpmc/select$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
 

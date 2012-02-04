@@ -2,13 +2,14 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.3.10.0.dylib                   [main]lib
+blib/lib/libparrot.4.0.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.3.10.0                      [main]lib
+blib/lib/libparrot.so.4.0.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
+cygparrot4_0_0.dll                               [main]bin
 docs/ops/bit.pod                                 [doc]
 docs/ops/cmp.pod                                 [doc]
 docs/ops/core.pod                                [doc]
@@ -161,6 +162,7 @@ lib/Parrot/Config/Generated.pm                   [devel]lib
 lib/Parrot/PMC.pm                                [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
 libparrot.dll                                    [main]bin
+libparrot.dll.a                                  [main]lib
 libparrot.lib                                    [main]bin
 runtime/parrot/dynext/bit_ops.bundle             [library]
 runtime/parrot/dynext/bit_ops.dll                [library]

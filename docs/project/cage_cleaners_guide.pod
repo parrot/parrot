@@ -367,6 +367,6 @@ Paul Cochrane a.k.a. ptc; original document by Andy Lester
 =head1 SEE ALSO
 
 F<docs/project/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
-and the list of Cage items in Trac L<http://trac.parrot.org>.
+and the list of Cage items in github L<https://github.com/parrot/parrot/issues?labels=cage&state=open>.
 
 =cut

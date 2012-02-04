@@ -90,7 +90,7 @@ expected
 IF NCI-RELATED THINGS START BREAKING WHEN YOU UPDATE WINDOWS, THIS IS A VERY
 GOOD PLACE TO LOOK FOR THE CAUSE OF THE FAILURES.
 
-Visit TT #2150 to register a complaint.
+Visit GH #449 to register a complaint.
 
 =cut
 
@@ -112,7 +112,7 @@ Parrot_dlsym(void *handle, const char *symbol)
        compatible for most versions of windows. It's not pretty, however, and
        it would be awesome if we could find a better, documented way to
        perform module lookups.
-       See TT #2150 for more insults about this code. */
+       See GH #449 for more insults about this code. */
     if (handle == NULL) {
         void * proc = NULL;
         handle = find_hmodule_from_func(Parrot_dlsym);

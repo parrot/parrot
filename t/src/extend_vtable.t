@@ -65,7 +65,7 @@ static Parrot_String createstring(Parrot_Interp interp, const char * value)
 
 static Parrot_Interp new_interp()
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     if (!interp)
         fail("Cannot create parrot interpreter");
     return interp;
@@ -144,7 +144,7 @@ sub extend_vtable_output_like
         $common . linedirective(__LINE__) . <<CODE,
 $code
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     printf("Done!\\n");
 }
 
@@ -169,7 +169,7 @@ sub extend_vtable_output_is
         $common . linedirective(__LINE__) . <<CODE,
 $code
 
-    Parrot_destroy(interp);
+    Parrot_interp_destroy(interp);
     printf("Done!\\n");
 }
 

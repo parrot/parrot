@@ -151,7 +151,7 @@ Testing Perl 6 objects.
     $I0 = $P0.'can'(rpaobj, 'foo')
     ok($I0, '< ResizablePMCArray_obj.^can("foo") >')
     $I0 = $P0.'isa'(rpaobj, listproto)
-    todo($I0, '< ResizablePMCArray_obj.^isa(List) >', 'unimplemented: TT #1617')
+    todo($I0, '< ResizablePMCArray_obj.^isa(List) >', 'unimplemented: GH #403')
 
     ##  create class with a different proto name
     .local pmc myobjectproto

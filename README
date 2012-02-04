@@ -1,4 +1,4 @@
-This is Parrot, version 3.10.0
+This is Parrot, version 4.0.0
 ------------------------------
 
 Parrot is Copyright (C) 2001-2011, Parrot Foundation.
@@ -170,8 +170,8 @@ WEB SITES
 
 The following web sites have all the information you need about Parrot:
     http://www.parrot.org/
-    http://trac.parrot.org/
     http://docs.parrot.org/
+    https://github.com/parrot/parrot/
 
 Have fun,
    The Parrot Team.

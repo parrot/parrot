@@ -2473,7 +2473,7 @@ CODE
 2
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'TT #1033' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo=> 'GH #600' );
 .sub main :main
   foo(1)
 .end

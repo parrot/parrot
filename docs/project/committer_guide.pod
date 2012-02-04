@@ -43,7 +43,7 @@ C<make codetest>. This target runs only the file metadata and the
 basic coding standards tests.
 
 In case you want to check the POD of your changed file, you can run
-C<perl t/doc/pod.t path/to/my/file >.
+C<perl t/codingstd/pod_syntax.t path/to/my/file >.
 
 =head1 License
 

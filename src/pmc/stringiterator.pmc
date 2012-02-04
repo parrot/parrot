@@ -25,7 +25,7 @@ Implementation of Iterator for String PMC.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass StringIterator auto_attrs extends Iterator {
+pmclass StringIterator auto_attrs extends Iterator provides iterator {
     ATTR STRING      *str_val;   /* String to iterate over */
     ATTR String_iter  iter;      /* String iterator */
     ATTR INTVAL       reverse;   /* Direction of iteration. 1 - for reverse iteration */

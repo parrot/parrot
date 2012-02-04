@@ -76,7 +76,7 @@ method emit_c_op_funcs_header_part($fh) {
 
 method access_arg($type, $num) {
     my $access := self<arg_maps>{$type};
-    die("unrecognized arg type '$type'") unless $access;
+    die("unrecognized arg type '$type' (register \$$num)") unless $access;
     subst($access, /NUM/, $num);
 }
 
