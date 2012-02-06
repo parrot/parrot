@@ -19,9 +19,9 @@ Specification.
 
 =over 3
 
-=item 1.1: History
+=item 1.1. History
 
-=item 1.2: Overview
+=item 1.2. Overview
 
 =back
 
