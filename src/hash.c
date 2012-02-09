@@ -2225,8 +2225,7 @@ Parrot_hash_flatten_hash_into(PARROT_INTERP, ARGMOD(PMC * const dest),
         parrot_hash_iterate(src_hash,
             VTABLE_set_pmc_keyed_str(interp, dest,
                 (STRING *)_bucket->key,
-                Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value));
-        );
+                Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value)));
     }
     else {
         parrot_hash_iterate(src_hash,
@@ -2234,8 +2233,7 @@ Parrot_hash_flatten_hash_into(PARROT_INTERP, ARGMOD(PMC * const dest),
             if (!VTABLE_exists_keyed_str(interp, dest, key)) {
                 PMC * const value = Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value);
                 VTABLE_set_pmc_keyed_str(interp, dest, key, value);
-            }
-        );
+            });
     }
 }
 
