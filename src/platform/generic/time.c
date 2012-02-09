@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010, Parrot Foundation.
+ * Copyright (C) 2004-2012, Parrot Foundation.
  */
 
 /*
@@ -10,7 +10,7 @@ src/platform/generic/time.c
 
 =head1 DESCRIPTION
 
-Parrot time-related functions.
+Parrot time-related functions which are not specific to any platform.
 
 =head2 Functions
 
@@ -109,7 +109,7 @@ Sleep for the specified number of seconds.
 void
 Parrot_floatval_sleep(FLOATVAL time)
 {
-    if (time > 1000) {
+    if (time >= 1000) {
         /* prevent integer overflow when converting to microseconds */
         const int seconds = floor(time);
         Parrot_sleep(seconds);
