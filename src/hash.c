@@ -2227,7 +2227,8 @@ Parrot_hash_flatten_hash_into(PARROT_INTERP, ARGMOD(PMC * const dest),
                 (STRING *)_bucket->key,
                 Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value));
         );
-    } else {
+    }
+    else {
         parrot_hash_iterate(src_hash,
             STRING * const key = (STRING *)_bucket->key;
             if (!VTABLE_exists_keyed_str(interp, dest, key)) {
