@@ -276,13 +276,12 @@ Hash * Parrot_hash_create_sized(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 void Parrot_hash_flatten_hash_into(PARROT_INTERP,
-    ARGMOD(PMC * const dest),
+    ARGIN(PMC * const dest),
     ARGIN(PMC * const src),
     INTVAL overwrite)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* const dest);
+        __attribute__nonnull__(3);
 
 void Parrot_hash_freeze(PARROT_INTERP,
     ARGIN(const Hash *hash),

@@ -2217,7 +2217,7 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
 }
 
 void
-Parrot_hash_flatten_hash_into(PARROT_INTERP, ARGMOD(PMC * const dest),
+Parrot_hash_flatten_hash_into(PARROT_INTERP, ARGIN(PMC * const dest),
         ARGIN(PMC * const src), INTVAL overwrite)
 {
     const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
