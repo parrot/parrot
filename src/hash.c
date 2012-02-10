@@ -2227,6 +2227,7 @@ void
 Parrot_hash_flatten_hash_into(
         PARROT_INTERP, ARGIN(PMC * const dest), ARGIN(PMC * const src), INTVAL overwrite)
 {
+    ASSERT_ARGS(Parrot_hash_flatten_hash_into)
     const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
     if (overwrite) {
         parrot_hash_iterate(src_hash,
