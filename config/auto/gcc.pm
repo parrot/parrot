@@ -90,9 +90,13 @@ sub _evaluate_gcc {
     # sneaky check for g++
     my $gpp = (index($conf->data->get('cc'), '++') > 0) ? 1 : 0;
 
+    # even sneakier check for clang
+    my $clang = $conf->data->get('cc') =~ /clang/ ? 1 : 0;
+
     $conf->data->set(
         gccversion => $gccversion,
         'g++'      => $gpp,
+        clang      => $clang
     );
     return 1;
 }
