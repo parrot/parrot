@@ -20,15 +20,25 @@ http://www.perl.com/pub/a/2001/04/01/parrot.htm.
 
 =item The Parrot Interpreter
 
-This document is an introduction to the structure of and the concepts used by the Parrot shared bytecode compiler/interpreter system. We will primarily concern ourselves with the interpreter, since this is the target platform for which all compiler frontends should compile their code.
+This document is an introduction to the structure of and the concepts used by 
+the Parrot shared bytecode compiler/interpreter system. We will primarily 
+concern ourselves with the interpreter, since this is the target platform for 
+which all compiler frontends should compile their code.
 
 =item The Software CPU
 
-Like all interpreter systems of its kind, the Parrot interpreter is a virtual machine; this is another way of saying that it is a software CPU. However, unlike other VMs, the Parrot interpreter is designed to more closely mirror hardware CPUs.
+Like all interpreter systems of its kind, the Parrot interpreter is a virtual 
+machine; this is another way of saying it is a software CPU. However, unlike 
+other VMs, the Parrot interpreter is designed to more closely resemble hardware 
+CPUs.
 
-For instance, the Parrot VM will have a register architecture, rather than a stack architecture. It will also have extremely low-level operations, more similar to Java's than the medium-level ops of Perl and Python and the like.
+For instance, the Parrot VM employs a register-based architecture, rather than 
+a stack-based architecture. It also has very low-level operations, more similar 
+to Java's than to the medium-level ops of Perl, Python, and the like.
 
-The reasoning for this decision is primarily that by resembling the underlying hardware to some extent, it's possible to compile down Parrot bytecode to efficient native machine language.
+The reasoning behind this decision is, by resembling the underlying hardware 
+to some extent, it's possible to compile down Parrot bytecode to efficient 
+native machine language.
 
 Moreover, many programs in high-level languages consist of nested function and method calls, sometimes with lexical variables to hold intermediate results. Under non-JIT settings, a stack-based VM will be popping and then pushing the same operands many times, while a register-based VM will simply allocate the right amount of registers and operate on them, which can significantly reduce the amount of operations and CPU time.
 
