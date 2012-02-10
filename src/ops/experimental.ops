@@ -268,13 +268,25 @@ op root_new(out PMC, in PMC, in INT) {
     }
 }
 
+=item B<get_context>(out PMC)
+
+=cut
+
 op get_context(out PMC) {
     $1 = CURRENT_CONTEXT(interp);
 }
 
+=item B<new_call_context>(out PMC)
+
+=cut
+
 op new_call_context(out PMC) {
     $1 = Parrot_pmc_new(interp, enum_class_CallContext);
 }
+
+=item B<invokecc>(invar PMC, invar PMC)
+
+=cut
 
 inline op invokecc(invar PMC, invar PMC) :flow {
     PMC      * const p     = $1;
@@ -291,6 +303,10 @@ inline op invokecc(invar PMC, invar PMC) :flow {
     goto ADDRESS(dest);
 }
 
+=item B<flatten_array_into>(invar PMC, invar PMC, in INT)
+
+=cut
+
 op flatten_array_into(invar PMC, invar PMC, in INT) {
     PMC * const dest = $1;
     PMC * const src = $2;
@@ -304,12 +320,20 @@ op flatten_array_into(invar PMC, invar PMC, in INT) {
     }
 }
 
+=item B<flatten_hash_into>(invar PMC, invar PMC, in INT)
+
+=cut
+
 op flatten_hash_into(invar PMC, invar PMC, in INT) {
     PMC * const dest = $1;
     PMC * const src = $2;
     const INTVAL overwrite = $3;
     Parrot_hash_flatten_hash_into(interp, dest, src, overwrite);
 }
+
+=item B<slurp_array_from>(out PMC, invar PMC, in INT)
+
+=cut
 
 op slurp_array_from(out PMC, invar PMC, in INT) {
     PMC * const dest = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
