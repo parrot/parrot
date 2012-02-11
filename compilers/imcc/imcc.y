@@ -1061,7 +1061,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
 %token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI SUBTAG VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
-%token <t> NS_ENTRY
+%token <t> NS_ENTRY MANUAL_ARGS
 %token <s> LABEL
 %token <t> EMIT EOM
 %token <s> IREG NREG SREG PREG IDENTIFIER REG MACRO ENDM
@@ -1647,6 +1647,7 @@ proto:
    | vtable
    | method
    | ns_entry_name
+   | MANUAL_ARGS { $$ = P_MANUAL_ARGS; }
    | instanceof
    | subid
    ;

@@ -404,7 +404,8 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
             self->type = VTIDENTIFIER;
         }
 
-        unshift_self(imcc, sub, self);
+        if ((sub->pcc_sub->pragma & P_MANUAL_ARGS) == 0)
+            unshift_self(imcc, sub, self);
     }
 
     /* Don't generate any parameter checking code if there

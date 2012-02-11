@@ -9,11 +9,13 @@
  */
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-/* A Bison parser, made by GNU Bison 2.5.  */
 
-/* Bison interface for Yacc-like parsers in C
+/* A Bison parser, made by GNU Bison 2.4.1.  */
+
+/* Skeleton interface for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989-1990, 2000-2011 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -142,27 +144,28 @@
      SUB_INSTANCE_OF = 349,
      SUBID = 350,
      NS_ENTRY = 351,
-     LABEL = 352,
-     EMIT = 353,
-     EOM = 354,
-     IREG = 355,
-     NREG = 356,
-     SREG = 357,
-     PREG = 358,
-     IDENTIFIER = 359,
-     REG = 360,
-     MACRO = 361,
-     ENDM = 362,
-     STRINGC = 363,
-     INTC = 364,
-     FLOATC = 365,
-     USTRINGC = 366,
-     PARROT_OP = 367,
-     VAR = 368,
-     LINECOMMENT = 369,
-     FILECOMMENT = 370,
-     DOT = 371,
-     CONCAT = 372
+     MANUAL_ARGS = 352,
+     LABEL = 353,
+     EMIT = 354,
+     EOM = 355,
+     IREG = 356,
+     NREG = 357,
+     SREG = 358,
+     PREG = 359,
+     IDENTIFIER = 360,
+     REG = 361,
+     MACRO = 362,
+     ENDM = 363,
+     STRINGC = 364,
+     INTC = 365,
+     FLOATC = 366,
+     USTRINGC = 367,
+     PARROT_OP = 368,
+     VAR = 369,
+     LINECOMMENT = 370,
+     FILECOMMENT = 371,
+     DOT = 372,
+     CONCAT = 373
    };
 #endif
 /* Tokens.  */
@@ -260,27 +263,28 @@
 #define SUB_INSTANCE_OF 349
 #define SUBID 350
 #define NS_ENTRY 351
-#define LABEL 352
-#define EMIT 353
-#define EOM 354
-#define IREG 355
-#define NREG 356
-#define SREG 357
-#define PREG 358
-#define IDENTIFIER 359
-#define REG 360
-#define MACRO 361
-#define ENDM 362
-#define STRINGC 363
-#define INTC 364
-#define FLOATC 365
-#define USTRINGC 366
-#define PARROT_OP 367
-#define VAR 368
-#define LINECOMMENT 369
-#define FILECOMMENT 370
-#define DOT 371
-#define CONCAT 372
+#define MANUAL_ARGS 352
+#define LABEL 353
+#define EMIT 354
+#define EOM 355
+#define IREG 356
+#define NREG 357
+#define SREG 358
+#define PREG 359
+#define IDENTIFIER 360
+#define REG 361
+#define MACRO 362
+#define ENDM 363
+#define STRINGC 364
+#define INTC 365
+#define FLOATC 366
+#define USTRINGC 367
+#define PARROT_OP 368
+#define VAR 369
+#define LINECOMMENT 370
+#define FILECOMMENT 371
+#define DOT 372
+#define CONCAT 373
 
 
 
@@ -289,8 +293,8 @@
 typedef union YYSTYPE
 {
 
-/* Line 2068 of yacc.c  */
-#line 1026 "compilers/imcc/imcc.y"
+/* Line 1676 of yacc.c  */
+#line 1032 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;
@@ -300,8 +304,8 @@ typedef union YYSTYPE
 
 
 
-/* Line 2068 of yacc.c  */
-#line 294 "compilers/imcc/imcparser.h"
+/* Line 1676 of yacc.c  */
+#line 298 "compilers/imcc/imcparser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
