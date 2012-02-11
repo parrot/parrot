@@ -18,6 +18,9 @@ notifications:
   email:
     on_success: change
     on_failure: always
+  irc:
+      - "irc.parrot.org#parrot"
+      - "irc.freenode.net#perl6"
 env:
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
