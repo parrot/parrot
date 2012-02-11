@@ -2,6 +2,7 @@
     - Core
         + Shared libraries and installable binaries are now stripped if built with
           --optimize on Cygwin, which greatly reduces their size on disk
+        + New experimental PCC-related ops added to core.
     - Documentation
 	+ Revised 'docs/project/release_manager_guide.pod'
     - Tests
