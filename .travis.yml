@@ -1,5 +1,5 @@
 before_script:
-    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev gcc-multilib
     - curl -L http://cpanmin.us | sudo perl - --self-upgrade
     - export CI_USER=$USER
 #    - env
@@ -18,6 +18,9 @@ notifications:
   email:
     on_success: change
     on_failure: always
+  irc:
+      - "irc.parrot.org#parrot"
+#      - "irc.freenode.net#perl6"
 env:
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
