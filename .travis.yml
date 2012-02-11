@@ -14,7 +14,7 @@ script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --c
 #     - master
 notifications:
   recipients:
-    - duke@leto.net
+    - parrot-dev@lists.parrot.org
   email:
     on_success: change
     on_failure: always
