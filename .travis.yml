@@ -1,5 +1,5 @@
 before_script:
-    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev gcc-multilib
     - curl -L http://cpanmin.us | sudo perl - --self-upgrade
     - export CI_USER=$USER
 #    - env
