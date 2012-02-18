@@ -4,8 +4,13 @@
           --optimize on Cygwin, which greatly reduces their size on disk
         + New experimental PCC-related ops added to core.
     - Documentation
-	+ Revised 'docs/project/release_manager_guide.pod'
+    + Revised 'docs/project/release_manager_guide.pod'
     - Tests
+        + Parrot now has Continuous Integration (CI) with Travis CI http://travis-ci.org
+          Every commit of parrot is now compiled and tested on gcc, g++ and clang with
+          various Configure.pl options. If anything fails, notifications are sent to
+          parrot-dev and the #parrot IRC channel
+        + Rakudo spec tests are also hooked up to Travis
 
 2012-01-17    release 4.0.0
     - Core
