@@ -547,6 +547,8 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC    *return_flags;         /* Integer array of return flags */
     ATTR Hash   *hash;                 /* Hash of named arguments */
 
+    ATTR PMC    *continuation;          /* Reusable continuation */
+
 /*
 
 =item C<void init()>

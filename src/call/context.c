@@ -821,6 +821,14 @@ Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
     set_context(interp, ctx);
 }
 
+PARROT_EXPORT
+void
+Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN(opcode_t *next))
+{
+    ASSERT_ARGS(Parrot_pcc_reuse_continuation)
+    interp->current_cont = NEED_CONTINUATION;
+}
+
 /*
 
 =item C<static void set_context(PARROT_INTERP, PMC *ctx)>
