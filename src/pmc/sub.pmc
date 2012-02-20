@@ -414,6 +414,7 @@ Invokes the subroutine.
         pc                   = sub->seg->base.data + sub->start_offs;
         INTERP->current_cont = NULL;
 
+        PARROT_ASSERT(ccont != NEED_CONTINUATION);
         if (ccont == NEED_CONTINUATION) {
             ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
             VTABLE_set_pointer(INTERP, ccont, next);

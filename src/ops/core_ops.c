@@ -13695,7 +13695,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
 
-    interp->current_cont = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }

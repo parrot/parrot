@@ -17,6 +17,7 @@ Parrot_Context functions.
 #include "parrot/call.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_continuation.h"
 
 /*
 
@@ -826,7 +827,22 @@ void
 Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
-    interp->current_cont = NEED_CONTINUATION;
+    Parrot_CallContext_attributes *c = CONTEXT_STRUCT(call_context);
+    INTVAL reuse = 0;
+    if (!PMC_IS_NULL(c->continuation)) {
+        PMC     *cont = c->continuation;
+        INTVAL   invoked;
+        GETATTR_Continuation_invoked(interp, cont, invoked);
+        /* Reuse if invoked */
+        reuse = invoked;
+    }
+
+    if (!reuse) {
+        c->continuation = Parrot_pmc_new(interp, enum_class_Continuation);
+    }
+
+    VTABLE_set_pointer(interp, c->continuation, next);
+    interp->current_cont = c->continuation;
 }
 
 /*
