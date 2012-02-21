@@ -833,8 +833,8 @@ Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN(opc
         PMC     *cont = c->continuation;
         INTVAL   invoked;
         GETATTR_Continuation_invoked(interp, cont, invoked);
-        /* Reuse if invoked */
-        reuse = invoked;
+        /* Reuse if invoked. And not tailcalled? */
+        reuse = invoked && !(PObj_get_FLAGS(cont) |= SUB_FLAG_TAILCALL);
     }
 
     if (!reuse) {
