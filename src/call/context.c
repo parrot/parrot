@@ -822,9 +822,20 @@ Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
     set_context(interp, ctx);
 }
 
+/*
+
+=item C<void Parrot_pcc_reuse_continuation(PARROT_INTERP, PMC *call_context,
+opcode_t *next)>
+
+Try to reuse old Continuation for subsequent calls from same CallContext.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
-Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN(opcode_t *next))
+Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
     Parrot_CallContext_attributes *c = CONTEXT_STRUCT(call_context);
