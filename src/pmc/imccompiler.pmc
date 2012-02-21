@@ -150,7 +150,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
         /* Handle the case where we we've been tailcalled into. See NCI.invoke
            for more details */
-        if (cont && cont != NEED_CONTINUATION
+        if (!PMC_IS_NULL(cont)
         && (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
             cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
             next = VTABLE_invoke(INTERP, cont, next);

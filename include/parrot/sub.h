@@ -103,12 +103,6 @@ typedef enum {
 #define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
 /*
- * a flag to signal a Sub that a new Continuation should be created
- */
-
-#define NEED_CONTINUATION ((PMC *)1)
-
-/*
  * maximum sub recursion depth
  */
 

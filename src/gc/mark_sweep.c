@@ -214,14 +214,11 @@ static void
 mark_interp(PARROT_INTERP)
 {
     ASSERT_ARGS(mark_interp)
-    PObj *obj;
     /* mark the list of iglobals */
     Parrot_gc_mark_PMC_alive(interp, interp->iglobals);
 
     /* mark the current continuation */
-    obj = (PObj *)interp->current_cont;
-    if (obj && obj != (PObj *)NEED_CONTINUATION)
-        Parrot_gc_mark_PMC_alive(interp, (PMC *)obj);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_cont);
 
     /* mark the current context. */
     Parrot_gc_mark_PMC_alive(interp, interp->cur_task);
