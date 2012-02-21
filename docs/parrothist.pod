@@ -137,6 +137,6 @@ Starred release numbers indicate supported releases.
  cotto       3.11.0         2011-Dec-20     "Duct Tape"
 
  Whiteknight 4.0.0 *        2011-Jan-17     "Hyperstasis"
-
+ alvis       4.1.0          2011-Feb-21     "Black-headed Parrot"
 
 =cut
