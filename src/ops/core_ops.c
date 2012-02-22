@@ -13695,7 +13695,7 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
 
-    interp->current_cont = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }
@@ -18160,7 +18160,7 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        interp->current_cont = NEED_CONTINUATION;
+        Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
@@ -18194,7 +18194,7 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
             Parrot_pcc_set_object(interp, signature, object);
         }
 
-        interp->current_cont = NEED_CONTINUATION;
+        Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
@@ -18223,7 +18223,7 @@ Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, PREG(1));
     }
 
-    interp->current_cont = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
     dest = VTABLE_invoke(interp, PREG(2), next);
     return (opcode_t *)dest;
 }
@@ -24123,7 +24123,7 @@ Parrot_invokecc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_pcc_set_object(interp, signature, NULL);
     }
 
-    interp->current_cont = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }

@@ -255,6 +255,7 @@ destination to continue execution.
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);
+        SET_ATTR_invoked(INTERP, SELF, 1);
 
         Parrot_sub_continuation_check(INTERP, SELF);
         Parrot_sub_continuation_rewind_environment(INTERP, SELF);

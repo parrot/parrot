@@ -63,7 +63,7 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
         if (!PMC_IS_NULL(signature))
             Parrot_pcc_set_object(interp, signature, object);
 
-        interp->current_cont = NEED_CONTINUATION;
+        Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest                 = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
@@ -94,7 +94,7 @@ op callmethodcc(invar PMC, invar PMC) :object_base :flow {
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, $1);
-    interp->current_cont   = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
     dest                   = VTABLE_invoke(interp, $2, next);
 
     goto ADDRESS(dest);
