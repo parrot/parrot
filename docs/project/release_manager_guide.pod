@@ -460,9 +460,11 @@ client lets you.
 
 =item 3
 
-Modify the topic on C<#parrot>:
+Modify the topic on C<#parrot>, for example,
 
-    /topic #parrot Parrot 0.4.8 Released | http://parrot.org/
+    /topic #parrot Parrot 4.0.0 "[Name of Parrot Release]" | 
+    http://parrot.org/ | Log: http://irclog.perlgeek.de/parrot | 
+    #parrotsketch meeting Tuesday 19:30 UTC
 
 =item 4
 
