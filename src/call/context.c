@@ -17,6 +17,7 @@ Parrot_Context functions.
 #include "parrot/call.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_continuation.h"
 
 /*
 
@@ -819,6 +820,40 @@ Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
     ASSERT_ARGS(Parrot_pcc_set_context_func)
 
     set_context(interp, ctx);
+}
+
+/*
+
+=item C<void Parrot_pcc_reuse_continuation(PARROT_INTERP, PMC *call_context,
+opcode_t *next)>
+
+Try to reuse old Continuation for subsequent calls from same CallContext.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NULLOK(opcode_t *next))
+{
+    ASSERT_ARGS(Parrot_pcc_reuse_continuation)
+    Parrot_CallContext_attributes *c = CONTEXT_STRUCT(call_context);
+    INTVAL reuse = 0;
+    if (!PMC_IS_NULL(c->continuation)) {
+        PMC     *cont = c->continuation;
+        INTVAL   invoked;
+        GETATTR_Continuation_invoked(interp, cont, invoked);
+        /* Reuse if invoked. And not tailcalled? */
+        reuse = invoked && !(PObj_get_FLAGS(cont) |= SUB_FLAG_TAILCALL);
+    }
+
+    if (!reuse) {
+        c->continuation = Parrot_pmc_new(interp, enum_class_Continuation);
+    }
+
+    VTABLE_set_pointer(interp, c->continuation, next);
+    interp->current_cont = c->continuation;
 }
 
 /*

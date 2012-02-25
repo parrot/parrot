@@ -71,9 +71,9 @@ Integer
 }
 OUT
 
-## TT #1476: test that return() is taken from the type of value when not specified
+## GH #573: test that return() is taken from the type of value when not specified
 
-## TT #1476: check the rest of the PAST::Var attributes
+## GH #573: check the rest of the PAST::Var attributes
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'

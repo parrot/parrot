@@ -1251,7 +1251,7 @@ Could not find sub nok/
 OUT
 
 
-pir_output_is( <<'CODE', <<'OUT', 'HLL_map on namespace', todo => 'TT #867');
+pir_output_is( <<'CODE', <<'OUT', 'HLL_map on namespace', todo => 'GH #404');
 .HLL 'tcl'
 
 .sub 'foo' :anon :init

@@ -120,7 +120,7 @@ HELP
   L2:
     nb = elements files
     # currently, FixedStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     $P0 = new 'FixedPMCArray'
     set $P0, nb
     $I0 = 0

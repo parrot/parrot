@@ -139,7 +139,7 @@ Tests for mathematical operations with Inf and Nan.
     ok($I1, 'is_inf_or_nan 123.4e5')
 .end
 
-#pir_output_is(<<'CODE',<<OUTPUT, "TT #370 Rounding inf/nan");
+#pir_output_is(<<'CODE',<<OUTPUT, "GH #422 Rounding inf/nan");
 .sub test_rounding_i
     $N0 = 'Inf'
     $I0 = floor $N0

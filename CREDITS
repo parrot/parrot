@@ -78,6 +78,7 @@ U: allison
 
 N: Alvis Yardley
 D: Documentation Shepherd (3.9.0 - Present)
+D: Release manger for 4.1.0
 E: ac.yardley@gmail.com
 U: alvis
 S: Ft. Worth, Texas
@@ -527,7 +528,7 @@ D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
 
-N: Jay Emmerson
+N: Jay Emerson
 E: john.emerson@yale.edu
 U: jay
 
@@ -599,8 +600,8 @@ S: Ohio, USA
 
 N: Jonathan "Duke" Leto
 E: jonathan@leto.net
-W: http://leto.net
-D: Release manager for 1.7.0
+W: http://dukeleto.pl
+D: Release manager for 1.7.0, 3.9.0, GCI/GSoC Org Admin/Mentor
 U: dukeleto
 A: leto
 A: Duke Leto

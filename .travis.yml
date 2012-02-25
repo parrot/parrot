@@ -1,0 +1,33 @@
+before_script:
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev gcc-multilib
+    - curl -L http://cpanmin.us | sudo perl - --self-upgrade
+    - export CI_USER=$USER
+#    - env
+    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
+    - sudo chown -R $CI_USER ~/.cpanm
+    - sudo chown -R $CI_USER ~/perl5
+# No, we are not going to run the tests for all these dependencies on every commit
+    - cpanm -n TAP::Harness::Archive TAP::Harness::ReportByDescription
+script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+# branches:
+#   only:
+#     - master
+notifications:
+  recipients:
+    - parrot-dev@lists.parrot.org
+  email:
+    on_success: change
+    on_failure: always
+  irc:
+      - "irc.parrot.org#parrot"
+#      - "irc.freenode.net#perl6"
+env:
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="gcc"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="gcc"
+    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="gcc"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="g++"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="g++"
+    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="g++"

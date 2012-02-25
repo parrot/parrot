@@ -1587,7 +1587,9 @@ src/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
 	$(INC_PMC_DIR)/pmc_key.h $(INC_PMC_DIR)/pmc_continuation.h
 
 src/call/context$(O) : $(PARROT_H_HEADERS) \
-	$(INC_PMC_DIR)/pmc_sub.h src/call/context.c
+	src/call/context.c \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \

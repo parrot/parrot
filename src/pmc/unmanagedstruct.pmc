@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -695,7 +695,6 @@ calc_align(PARROT_INTERP, ARGIN(PMC *type_pmc), int type, size_t offs)
         INTVAL i;
         const INTVAL n = (size_t)VTABLE_elements(interp, nested_init);
         int    a_max   = 0;
-        int    new_offs;
 
         if (n % 3)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -706,8 +705,7 @@ calc_align(PARROT_INTERP, ARGIN(PMC *type_pmc), int type, size_t offs)
                     nested_init, i);
             const int nested_type     = (int)VTABLE_get_integer(interp,
                 nested_type_pmc);
-            new_offs             = calc_align(interp,
-                    nested_type_pmc, nested_type, offs);
+            const int new_offs = calc_align(interp, nested_type_pmc, nested_type, offs);
 
             if (new_offs > a_max)
                 a_max = new_offs;
@@ -988,7 +986,7 @@ Returns the integer value associated with C<*key>.
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         int   type;
-        char * const p = char_offset_key(INTERP, SELF, key, &type);
+        const char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_int(INTERP, p, type);
     }
 
@@ -1235,7 +1233,7 @@ specified. If the encoding is omitted or null, use platform encoding.
 
     METHOD as_string(STRING *encodingname :optional) {
         const char * content = (const char *)SELF.get_pointer();
-        STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
+        STRING * const result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
         RETURN(STRING result);
     }
 
