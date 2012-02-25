@@ -404,7 +404,8 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
             self->type = VTIDENTIFIER;
         }
 
-        unshift_self(imcc, sub, self);
+        if (sub->pcc_sub->nargs == 0 || STRNEQ(sub->pcc_sub->args[0]->name, "self"))
+            unshift_self(imcc, sub, self);
     }
 
     /* Don't generate any parameter checking code if there

@@ -173,8 +173,6 @@ create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
 
     VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
         (INTVAL) IGLOBALS_INTERPRETER, self);
-
-    new_interp->current_cont = NEED_CONTINUATION;
 }
 
 pmclass ParrotInterpreter no_ro manual_attrs provides invokable {

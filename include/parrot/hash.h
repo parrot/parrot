@@ -72,7 +72,7 @@ struct _hash {
 /* Utility macros - use them, do not reinvent the wheel */
 
 #define parrot_hash_iterate_linear(_hash, _code)                            \
-{                                                                           \
+do {                                                                        \
     HashBucket *_bucket = (_hash)->buckets;                                 \
     UINTVAL     _found  = 0;                                                \
     while (_found < (_hash)->entries){                                      \
@@ -82,10 +82,10 @@ struct _hash {
         }                                                                   \
        _bucket++;                                                           \
     }                                                                       \
-}
+} while (0)
 
 #define parrot_hash_iterate_indexed(_hash, _code)                           \
-{                                                                           \
+do {                                                                        \
     if ((_hash)->entries) {                                                 \
         UINTVAL _loc;                                                       \
         for (_loc = 0; _loc <= (_hash)->mask; ++_loc) {                     \
@@ -96,16 +96,16 @@ struct _hash {
             }                                                               \
         }                                                                   \
     }                                                                       \
-}
+} while (0)
 
 #define parrot_hash_iterate(_hash, _code)                                   \
 do {                                                                        \
     if ((_hash)->key_type == Hash_key_type_int                              \
     ||  (_hash)->key_type == Hash_key_type_cstring                          \
     ||  (_hash)->key_type == Hash_key_type_ptr)                             \
-        parrot_hash_iterate_indexed((_hash), _code)                         \
+        parrot_hash_iterate_indexed((_hash), _code);                        \
     else                                                                    \
-        parrot_hash_iterate_linear((_hash), _code)                          \
+        parrot_hash_iterate_linear((_hash), _code);                         \
 } while (0)
 
 typedef void (*value_free)(ARGFREE(void *));
@@ -274,6 +274,14 @@ Hash * Parrot_hash_create_sized(PARROT_INTERP,
     Hash_key_type hkey_type,
     UINTVAL size)
         __attribute__nonnull__(1);
+
+void Parrot_hash_flatten_hash_into(PARROT_INTERP,
+    ARGIN(PMC * const dest),
+    ARGIN(PMC * const src),
+    INTVAL overwrite)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void Parrot_hash_freeze(PARROT_INTERP,
     ARGIN(const Hash *hash),
@@ -454,6 +462,10 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hash_create_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_hash_flatten_hash_into __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_Parrot_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \

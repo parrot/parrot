@@ -1022,7 +1022,7 @@ PF_fetch_integer(ARGIN(PackFile *pf), ARGIN(const opcode_t **stream))
     /* XXX assume sizeof (opcode_t) == sizeof (INTVAL) on the
      * machine producing this PBC.
      *
-     * TODO TT #364 on Sparc 64bit: On pbc wordsize=4 but native ptrsize=8 and
+     * TODO GH #415 on Sparc 64bit: On pbc wordsize=4 but native ptrsize=8 and
      * ptr_alignment=8 the advance by 4 will signal BUS (invalid address alignment)
      * in PF_fetch_integer and elsewhere.
      */

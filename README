@@ -1,7 +1,7 @@
-This is Parrot, version 4.0.0
+This is Parrot, version 4.1.0
 ------------------------------
 
-Parrot is Copyright (C) 2001-2011, Parrot Foundation.
+Parrot is Copyright (C) 2001-2012, Parrot Foundation.
 
 
 LICENSE INFORMATION
@@ -37,9 +37,13 @@ I.  Install Git.
 Linux:
 The method depends on your distribution. To install you should execute (as root or sudo <cmd>):
 
-On Ubuntu/Debian (apt-based):
+On Ubuntu/Debian (old versions, apt-based):
 
     apt-get install git-core
+
+On Ubuntu/Debian (new versions, apt-based):
+
+    apt-get install git
 
 On Red Hat, Fedora (rpm-based):
 

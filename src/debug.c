@@ -1752,7 +1752,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
             condition->type |= PDB_cond_const;
         }
         else if (condition->type & PDB_cond_pmc) {
-            /* TT #1259: Need to figure out what to do in this case.
+            /* GH #671: Need to figure out what to do in this case.
              * For the time being, we just bail. */
             Parrot_io_eprintf(interp->pdb->debugger, "Can't compare PMC with constant\n");
             mem_gc_free(interp, condition);
@@ -2504,7 +2504,7 @@ PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
           default:
             /* Hide non-ascii chars that may come from utf8 or latin-1
              * strings in constant strings.
-             * Workaround for TT #1557
+             * Workaround for GH #326
              */
             if ((unsigned char)*string > 127)
                 *(fill++) = '?';

@@ -19,7 +19,7 @@
 #include "parrot/runcore_api.h"
 
 PARROT_EXPORT
-op_lib_t *Parrot_DynOp_core_4_0_0(PARROT_INTERP, long init);
+op_lib_t *Parrot_DynOp_core_4_1_0(PARROT_INTERP, long init);
 
  opcode_t * Parrot_end(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_noop(opcode_t *, PARROT_INTERP);
@@ -1121,6 +1121,15 @@ op_lib_t *Parrot_DynOp_core_4_0_0(PARROT_INTERP, long init);
  opcode_t * Parrot_root_new_p_pc_i(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_root_new_p_pc_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_get_context_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_new_call_context_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_invokecc_p_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_flatten_array_into_p_p_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_flatten_array_into_p_p_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_flatten_hash_into_p_p_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_flatten_hash_into_p_p_ic(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_slurp_array_from_p_p_i(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_slurp_array_from_p_p_ic(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_receive_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_wait_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_wait_pc(opcode_t *, PARROT_INTERP);

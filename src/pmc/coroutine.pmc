@@ -176,10 +176,7 @@ Swaps the "context".
             PMC               *ctx        = Parrot_pcc_get_signature(INTERP, caller_ctx);
             PMC               *ccont      = INTERP->current_cont;
 
-            if (ccont == NEED_CONTINUATION) {
-                ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
-                VTABLE_set_pointer(INTERP, ccont, next_op);
-            }
+            PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

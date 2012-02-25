@@ -416,6 +416,13 @@ PMC* Parrot_pcc_get_sub(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_pcc_reuse_continuation(PARROT_INTERP,
+    ARGIN(PMC *call_context),
+    ARGIN_NULLOK(opcode_t *next))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -515,6 +522,9 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_reuse_continuation __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(call_context))
 #define ASSERT_ARGS_Parrot_pcc_set_context_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))

@@ -201,7 +201,7 @@ CODE
 
 .end
 
-# TT #1178
+# GH #465
 .sub 'getfd_fdopen'
     getstdout $P0
     $I0 = $P0.'get_fd'()

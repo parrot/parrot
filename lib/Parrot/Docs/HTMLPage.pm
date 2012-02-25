@@ -72,6 +72,25 @@ sub header {
 HEADER
 }
 
+=item C<body(@html)>
+
+Returns the html code, I<e.g.,> links, passed to it.
+
+C<@html> is a simple array to hold the html links passed to this subroutine.
+
+=cut
+
+sub body {
+    my $self = shift;
+
+    my $body;
+    foreach(@_) {
+      $body .= $_;
+    }
+
+    return $body;
+}
+
 =item C<footer($navigation, $resources)>
 
 Returns the page footer.
