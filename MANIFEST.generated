@@ -8,7 +8,7 @@ blib/lib/libparrot.so                            [main]lib
 blib/lib/libparrot.so.4.1.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
-cygparrot4.1.0.dll                               [main]bin
+cygparrot4_1_0.dll                               [main]bin
 docs/ops/bit.pod                                 [doc]
 docs/ops/cmp.pod                                 [doc]
 docs/ops/core.pod                                [doc]
