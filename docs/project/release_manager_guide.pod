@@ -143,10 +143,16 @@ pending release you're currently building.
 
 =item 2
 
-Update F<ChangeLog> with the new version number and any other changes which 
-have occurred since the last release. Hopefully, the committers are updating
-these files as they work. But, if not, then it's probably a good idea to gather
-the updates weekly rather than wait until the day of the release.
+Run
+
+    perl tools/dev/new_changelog_skeleton.pl
+
+to update F<ChangeLog> with the new version number and a skeleton announcement.
+
+Add any other changes which have occurred since the last release. Hopefully,
+the committers are updating these files as they work. But, if not, then it's
+probably a good idea to gather the updates weekly rather than wait until the
+day of the release.
 
 =item 3
 
