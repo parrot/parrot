@@ -1,3 +1,9 @@
+2012-03-20    release 4.2.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
 2012-02-21    release 4.1.0
     - Core
         + Shared libraries and installable binaries are now stripped if
