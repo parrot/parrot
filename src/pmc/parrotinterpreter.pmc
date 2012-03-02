@@ -759,10 +759,15 @@ Schedules the given task on the proxy's interpreter.
     METHOD schedule_proxied(PMC *task, PMC *proxy) {
         Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
         Interp                  * const proxied_interp = core_struct->interp;
-        PMC                     * const local_task     =
-            Parrot_thread_create_local_task(INTERP, proxied_interp, task);
 
-        Parrot_cx_schedule_immediate(proxied_interp, local_task);
+        /* don't run GC from the wrong thread since GC involves stack walking and we
+         * don't want the foreign GC to find our objects */
+        Parrot_block_GC_mark(proxied_interp);
+
+        Parrot_cx_schedule_immediate(proxied_interp,
+            Parrot_thread_create_local_task(INTERP, proxied_interp, task));
+
+        Parrot_unblock_GC_mark(proxied_interp);
         /*TODO: investigate why it's not neccessary to send a signal to the process here
           in theory the main thread could be pause()ing but in practice it seems to work anyway */
     }

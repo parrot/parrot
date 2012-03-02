@@ -205,9 +205,19 @@ void
 Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_thread_schedule_task)
-    PMC * const local_task  = Parrot_thread_create_local_task(interp, thread_interp, task);
 
-    VTABLE_push_pmc(thread_interp, thread_interp->scheduler, local_task);
+    /* don't run GC from the wrong thread since GC involves stack walking and we
+     * don't want the foreign GC to find our objects */
+    Parrot_block_GC_mark(thread_interp);
+
+    VTABLE_push_pmc(thread_interp, thread_interp->scheduler,
+        Parrot_thread_create_local_task(interp, thread_interp, task));
+
+    Parrot_unblock_GC_mark(thread_interp);
+
+    /* put the task in a list for GC */
+    /* TODO get them out again when finished */
+    VTABLE_push_pmc(interp, PARROT_SCHEDULER(interp->scheduler)->foreign_tasks, task);
 }
 
 /*
