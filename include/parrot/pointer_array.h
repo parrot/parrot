@@ -121,7 +121,7 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
     if (self->next_free) {
         /* FIXME. Cast to UINTVAL is wrong. */
         /* We have to provide parrot version of uintptr_t due lack of it in C89 */
-        /* See TT #1855 */
+        /* See GH #378 */
         void **next      = (void**)((UINTVAL)*self->next_free & ~1);
         ret = self->next_free;
         *self->next_free = ptr;

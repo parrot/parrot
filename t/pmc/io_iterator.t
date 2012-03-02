@@ -24,7 +24,7 @@ Tests the I/O Iterator PMC described in PDD22.
 # L<PDD22/I\/O Iterator PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P99 = 1 # TT #1242 replace with io object
+    $P99 = 1 # GH #633 replace with io object
     $P0 = iter $P99
     say "ok 1 - $P0 = iter $P1"
 .end
@@ -33,9 +33,9 @@ ok 1 - $P0 = iter $P1
 OUT
 
 # L<PDD22/I\/O Iterator PMC API/=item shift>
-pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented: TT #1206' );
+pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented: GH #549' );
 .sub 'test' :main
-    $P99 = 1 # TT #1242 replace with io object
+    $P99 = 1 # GH #633 replace with io object
     $P0 = iter $P99
 
     $S0 = shift $P0
@@ -45,7 +45,7 @@ pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented: TT #120
   ok_1:
     say 'ok 1 - $S0 = shift $P1 # success'
 
-    # TT #1206  test more return values, including end of file
+    # GH #549  test more return values, including end of file
 .end
 CODE
 ok 1 - $I0 = shift $P1 # success
@@ -54,7 +54,7 @@ OUT
 # L<PDD22/I\/O Iterator PMC API/=item get_bool (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P99 = 1 # TT #1242 replace with io object
+    $P99 = 1 # GH #633 replace with io object
     $P0 = iter $P99
 
     # empty i/o object
@@ -63,7 +63,7 @@ pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemen
   ok_1:
     say 'ok 1 - $P0 # empty i/o object returns false'
 
-    # TT #1242 setup i/o object with two lines
+    # GH #633 setup i/o object with two lines
     if $P0 got ok_2
     print 'not '
   ok_2:

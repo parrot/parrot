@@ -1,3 +1,26 @@
+2012-03-20    release 4.2.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
+2012-02-21    release 4.1.0
+    - Core
+        + Shared libraries and installable binaries are now stripped if
+          built with --optimize on Cygwin, which greatly reduces their
+          size on disk
+        + New experimental PCC-related ops added to core.
+    - Documentation
+        + Revised 'docs/project/release_manager_guide.pod'
+    - Tests
+        + Parrot now uses Travis CI http://travis-ci.org
+        + Parrot Continuous Integration (CI) with Travis CI means
+          every commit of Parrot is now compiled and tested on gcc,
+          g++ and clang with various Configure.pl options.
+        + CI Notifications are sent to parrot-dev, the #parrot
+          IRC channel and Smolder
+        + Cardinal and Rakudo spec tests also on Travis CI
+
 2012-01-17    release 4.0.0
     - Core
         + Several cleanups to the interp subsystem API

@@ -129,14 +129,14 @@ Starred release numbers indicate supported releases.
  Gerd        3.4.0          2011-May-17     "Pacific Parakeet"
  cotto       3.5.0          2011-Jun-21     "Menelaus"
 
- jkeenan     3.6.0 *        2011-Jul-19     "Pájaros del Caribe"
+ jkeenan     3.6.0 *        2011-Jul-19     "PÃ¡jaros del Caribe"
  coke        3.7.0          2011-Aug-16     "Wanda"
  soh_cah_toa 3.8.0          2011-Sep-20     "Magrathea"
  dukeleto    3.9.0 *        2011-Oct-18     "Archaeopteryx"
  Whiteknight 3.10.0         2011-Nov-15     "Apple Pi"
  cotto       3.11.0         2011-Dec-20     "Duct Tape"
 
- Whiteknight 4.0.0          2011-Jan-17     "Hyperstasis"
-
+ Whiteknight 4.0.0 *        2012-Jan-17     "Hyperstasis"
+ alvis       4.1.0          2012-Feb-21     "Black-headed Parrot"
 
 =cut

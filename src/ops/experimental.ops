@@ -21,8 +21,8 @@ This file contains experimental opcodes.
 These opcodes should be considered implicitly deprecated - that is, they
 may be removed in any release.
 
-If you rely on any of these opcodes, please open a
-Trac ticket at L<https://trac.parrot.org/>.
+If you rely on any of these opcodes, please open an issue at
+L<https://github.com/parrot/parrot/issues>
 
 When making changes to any ops file, run C<make bootstrap-ops> to regenerate
 all generated ops files.
@@ -266,6 +266,85 @@ op root_new(out PMC, in PMC, in INT) {
             "Class '%Ss' not found", VTABLE_get_repr(interp, name_key));
         goto ADDRESS(dest);
     }
+}
+
+=item B<get_context>(out PMC)
+
+=cut
+
+op get_context(out PMC) {
+    $1 = CURRENT_CONTEXT(interp);
+}
+
+=item B<new_call_context>(out PMC)
+
+=cut
+
+op new_call_context(out PMC) {
+    $1 = Parrot_pmc_new(interp, enum_class_CallContext);
+}
+
+=item B<invokecc>(invar PMC, invar PMC)
+
+=cut
+
+inline op invokecc(invar PMC, invar PMC) :flow {
+    PMC      * const p     = $1;
+    opcode_t *dest         = expr NEXT();
+    PMC      * const signature = $2;
+
+    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+
+    if (!PMC_IS_NULL(signature))
+        Parrot_pcc_set_object(interp, signature, NULL);
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
+    dest                   = VTABLE_invoke(interp, p, dest);
+
+    goto ADDRESS(dest);
+}
+
+=item B<flatten_array_into>(invar PMC, invar PMC, in INT)
+
+=cut
+
+op flatten_array_into(invar PMC, invar PMC, in INT) {
+    PMC * const dest = $1;
+    PMC * const src = $2;
+    const INTVAL overwrite = $3;
+    INTVAL i;
+    INTVAL start_idx = overwrite ? 0 : VTABLE_elements(interp, dest);
+    INTVAL src_elems = VTABLE_elements(interp, src);
+    for (i = 0; i < src_elems; i++) {
+        PMC * const val = VTABLE_get_pmc_keyed_int(interp, dest, i);
+        VTABLE_set_pmc_keyed_int(interp, dest, i + start_idx, val);
+    }
+}
+
+=item B<flatten_hash_into>(invar PMC, invar PMC, in INT)
+
+=cut
+
+op flatten_hash_into(invar PMC, invar PMC, in INT) {
+    PMC * const dest = $1;
+    PMC * const src = $2;
+    const INTVAL overwrite = $3;
+    Parrot_hash_flatten_hash_into(interp, dest, src, overwrite);
+}
+
+=item B<slurp_array_from>(out PMC, invar PMC, in INT)
+
+=cut
+
+op slurp_array_from(out PMC, invar PMC, in INT) {
+    PMC * const dest = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC * const src = $2;
+    const INTVAL src_elems = VTABLE_elements(interp, src);
+    INTVAL i;
+    for (i = $3; i < src_elems; i++) {
+        PMC * const value = VTABLE_get_pmc_keyed_int(interp, src, i);
+        VTABLE_push_pmc(interp, src, value);
+    }
+    $1 = dest;
 }
 
 =item B<receive>(out PMC)

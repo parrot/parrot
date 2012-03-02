@@ -10,7 +10,9 @@ DYNOP_O_DEPS = \
 #########################
 
 $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/obscure_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/obscure_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -25,7 +27,9 @@ src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops $(OPS2C)
 #########################
 
 $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/math_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/math_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -40,7 +44,9 @@ src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 #########################
 
 $(DYNEXT_DIR)/trans_ops$(LOAD_EXT): src/dynoplibs/trans_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/trans_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/trans_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -55,7 +61,9 @@ src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops $(OPS2C)
 #########################
 
 $(DYNEXT_DIR)/bit_ops$(LOAD_EXT): src/dynoplibs/bit_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/bit_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/bit_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -70,7 +78,9 @@ src/dynoplibs/bit_ops.c: src/dynoplibs/bit.ops $(OPS2C)
 #########################
 
 $(DYNEXT_DIR)/debug_ops$(LOAD_EXT): src/dynoplibs/debug_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/debug_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/debug_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -85,7 +95,9 @@ src/dynoplibs/debug_ops.c: src/dynoplibs/debug.ops $(OPS2C)
 #########################
 
 $(DYNEXT_DIR)/sys_ops$(LOAD_EXT): src/dynoplibs/sys_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/sys_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/sys_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 
@@ -100,7 +112,9 @@ src/dynoplibs/sys_ops.c: src/dynoplibs/sys.ops $(OPS2C)
 #########################
 
 $(DYNEXT_DIR)/io_ops$(LOAD_EXT): src/dynoplibs/io_ops$(O) $(LIBPARROT)
-	$(LD) @ld_out@$@ src/dynoplibs/io_ops$(O) $(LINKARGS)
+	$(LD) @ld_out@$@ \
+#IF(cygwin and optimize):		-s \
+		src/dynoplibs/io_ops$(O) $(LINKARGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 

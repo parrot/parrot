@@ -90,7 +90,7 @@ $cmd = qq{"$PARROT" -D 8 -R slow "$second_pir_file" 2>&1};
 like( qx{$cmd}, qr/Parrot VM: slow core/, "-r option <$cmd>" );
 }
 
-## TT #1150 test remaining options
+## GH #346 test remaining options
 
 # Test --runtime-prefix
 like( qx{$PARROT --runtime-prefix}, qr/^.+$/, "--runtime-prefix" );

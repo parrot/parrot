@@ -9,6 +9,7 @@ CX=/usr/bin/g++
 cc=$CC
 link=$CX
 ld=/usr/bin/g++
+intval="long long"
 
 =steps
 
