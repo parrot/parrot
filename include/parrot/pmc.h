@@ -159,6 +159,11 @@ PMC * Parrot_pmc_reuse_init(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pmc);
 
+void Parrot_pmc_delprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -167,9 +172,29 @@ void Parrot_pmc_free_temporary(PARROT_INTERP, ARGMOD(PMC *pmc))
 INTVAL Parrot_pmc_get_new_vtable_index(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_pmc_getprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_pmc_getprops(PARROT_INTERP, ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pmc_new_temporary(PARROT_INTERP, INTVAL base_type)
         __attribute__nonnull__(1);
+
+void Parrot_pmc_setprop(PARROT_INTERP,
+    ARGIN(PMC *pmc),
+    ARGIN(STRING *key),
+    ARGIN(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 INTVAL Parrot_pmc_type_does(PARROT_INTERP,
     ARGIN(const STRING *role),
@@ -230,14 +255,30 @@ INTVAL Parrot_pmc_type_does(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(init))
+#define ASSERT_ARGS_Parrot_pmc_delprop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pmc_free_temporary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_pmc_get_new_vtable_index \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_getprop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_Parrot_pmc_getprops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_pmc_new_temporary __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pmc_setprop __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(key) \
+    , PARROT_ASSERT_ARG(value))
 #define ASSERT_ARGS_Parrot_pmc_type_does __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(role))
