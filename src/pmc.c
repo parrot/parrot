@@ -1162,6 +1162,7 @@ NULL PMC is returned.
 
 */
 
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_pmc_getprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key))
@@ -1184,6 +1185,7 @@ Sets the property for C<*key> to C<*value>.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_pmc_setprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key), ARGIN(PMC *value))
 {
@@ -1207,6 +1209,7 @@ Deletes the property for C<*key>.
 
 */
 
+PARROT_EXPORT
 void
 Parrot_pmc_delprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key))
 {
@@ -1225,6 +1228,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
 
 */
 
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_pmc_getprops(PARROT_INTERP, ARGIN(PMC *pmc))
