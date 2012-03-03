@@ -26,11 +26,11 @@ Jonathan "Duke" Leto
 
 =cut
 
-sub read_changelog() {
+sub read_changelog {
     my ($x,$y,$z);
     my ($year, $month, $day);
 
-    open (my $fh, "<ChangeLog") or die $!;
+    open (my $fh, '<', 'ChangeLog') or die $!;
     for my $line (<$fh>) {
         if ($line =~ m/(\d+)-(\d+)-(\d+).*release (\d+)\.(\d+)\.(\d+)/) {
             ($year, $month, $day, $x,$y,$z) = ($1,$2,$3,$4,$5,$6);
@@ -38,7 +38,7 @@ sub read_changelog() {
         }
     }
     close $fh;
-    return undef;
+    return;
 }
 
 sub run {
@@ -51,7 +51,7 @@ sub run {
     $y     eq '11' ? ($x++, $y = 0, $z =0 ) : $y++;
 
     local $/;
-    open (my $fh, "<ChangeLog") or die $!;
+    open (my $fh, '<', 'ChangeLog') or die $!;
     my $changelog = <$fh>;
     my $skeleton =<<SKELETON;
 $year-$month-XX    release $x.$y.$z
@@ -62,7 +62,7 @@ $year-$month-XX    release $x.$y.$z
 
 SKELETON
 
-    open (my $wfh, ">ChangeLog") or die $!;
+    open (my $wfh, '>', 'ChangeLog') or die $!;
     print $wfh $skeleton, $changelog;
     close $wfh;
 }
