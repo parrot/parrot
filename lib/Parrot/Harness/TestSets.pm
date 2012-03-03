@@ -53,6 +53,9 @@ our %test_groups = (
         t/manifest/*.t
         t/tools/install/*.t
     ) ],
+    m0 => [ qw(
+        t/m0/*.t t/m0/*/*.t
+    ) ],
     miscellaneous => [ qw(
         t/ext/winxed/*.t
         t/tools/*.t
@@ -84,7 +87,7 @@ our %test_groups = (
 # GROUPS OF BASIC GROUPS
 
 our @major_test_group = map { $test_groups{$_} }
-    ( qw| compilers dynoplibs dynpmc library miscellaneous | );
+    ( qw| m0 compilers dynoplibs dynpmc library miscellaneous | );
 
 our @near_core_test_group = map { $test_groups{$_} }
     ( qw| src run perl | );
