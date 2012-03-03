@@ -621,7 +621,7 @@ Parrot_interp_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name
     PMC    * const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
     PMC    * const method   = VTABLE_get_pmc_keyed_str(interp,
             interp->vtables[type]->_namespace, str_name);
-    VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
+    Parrot_pmc_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
 
 /*

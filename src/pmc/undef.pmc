@@ -63,7 +63,7 @@ appropriate type.
                 while (VTABLE_get_bool(INTERP, iter)) {
                     STRING * const key = VTABLE_shift_string(INTERP, iter);
                     PMC * const value  = VTABLE_get_pmc_keyed_str(INTERP, meta, key);
-                    VTABLE_setprop(INTERP, SELF, key, value);
+                    Parrot_pmc_setprop(INTERP, SELF, key, value);
                 }
             }
             PMC_data(clone) = NULL;

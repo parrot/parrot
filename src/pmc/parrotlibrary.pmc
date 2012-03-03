@@ -120,7 +120,7 @@ Returns the name of the loaded library.
 
     VTABLE STRING *get_string() {
         STRING * const key  = CONST_STRING(INTERP, "_filename");
-        PMC    * const prop = VTABLE_getprop(INTERP, SELF, key);
+        PMC    * const prop = Parrot_pmc_getprop(INTERP, SELF, key);
 
         return VTABLE_get_string(INTERP, prop);
     }

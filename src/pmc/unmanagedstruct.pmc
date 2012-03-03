@@ -310,7 +310,7 @@ char_offset_key(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key), ARGOUT(int *typ
         /* the struct PMC is hanging off the initializer element
          * as property "_struct" */
         PMC * const ptr = VTABLE_get_pmc_keyed_int(interp, init, ix);
-        init            = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
+        init            = Parrot_pmc_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
 
         PARROT_ASSERT(init
             && (init->vtable->base_type == enum_class_UnManagedStruct
@@ -532,7 +532,7 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
         /* now check if initializer has a signature attached */
         if (PMC_metadata(ptr)) {
             STRING *signature_str = CONST_STRING(interp, "_signature");
-            PMC * const sig = VTABLE_getprop(interp, ptr, signature_str);
+            PMC * const sig = Parrot_pmc_getprop(interp, ptr, signature_str);
             if (VTABLE_defined(interp, sig)) {
                 STRING * const sig_str = VTABLE_get_string(interp, sig);
                 ret             = Parrot_pmc_new(interp, enum_class_NCI);
@@ -547,7 +547,7 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
 
         /* grab the struct from the metadata */
         if (PMC_metadata(ptr))
-            ret = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
+            ret = Parrot_pmc_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
         else {
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
@@ -688,7 +688,7 @@ calc_align(PARROT_INTERP, ARGIN(PMC *type_pmc), int type, size_t offs)
     if (type == enum_type_struct || type == enum_type_struct_ptr) {
         /* a nested structs alignment is the biggest item in it
          * so go through that struct and check */
-        nested = VTABLE_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
+        nested = Parrot_pmc_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
         nested_init = PARROT_UNMANAGEDSTRUCT(nested)->init;
     }
     if (type == enum_type_struct) {
@@ -775,15 +775,15 @@ calc_offsets(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *value), size_t toff)
             toff = offs;
 
         if (type == enum_type_struct) {
-            PMC * const nested = VTABLE_getprop(interp, type_pmc, _struct);
+            PMC * const nested = Parrot_pmc_getprop(interp, type_pmc, _struct);
             size        = VTABLE_get_integer(interp, nested);
         }
         else if (type == enum_type_struct_ptr) {
-            PMC * const nested = VTABLE_getprop(interp, type_pmc, _struct);
+            PMC * const nested = Parrot_pmc_getprop(interp, type_pmc, _struct);
 
             /* must clone this struct so as not to share its memory */
             if (nested->vtable->base_type == enum_class_ManagedStruct)
-                VTABLE_setprop(interp, type_pmc, _struct,
+                Parrot_pmc_setprop(interp, type_pmc, _struct,
                     VTABLE_clone(interp, nested));
 
             size = data_types[type - enum_first_type].size;

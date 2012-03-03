@@ -94,9 +94,9 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
 
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
-    VTABLE_setprop(interp, user_data, sc, interp_pmc);
+    Parrot_pmc_setprop(interp, user_data, sc, interp_pmc);
     sc = CONST_STRING(interp, "_sub");
-    VTABLE_setprop(interp, user_data, sc, sub);
+    Parrot_pmc_setprop(interp, user_data, sc, sub);
     /* only ASCII signatures are supported */
     if (STRING_length(cb_signature) == 3) {
         /* Callback return type ignored */
@@ -117,7 +117,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     cb_sig = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, cb_sig, cb_signature);
     sc = CONST_STRING(interp, "_signature");
-    VTABLE_setprop(interp, user_data, sc, cb_sig);
+    Parrot_pmc_setprop(interp, user_data, sc, cb_sig);
     /*
      * We are going to be passing the user_data PMC to external code, but
      * it may go out of scope until the callback is called -- we don't know
@@ -182,7 +182,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
 
     /* Fetch original interpreter from prop */
     sc          = CONST_STRING(interp, "_interpreter");
-    interp_pmc  = VTABLE_getprop(interp, user_data, sc);
+    interp_pmc  = Parrot_pmc_getprop(interp, user_data, sc);
     GETATTR_ParrotInterpreter_interp(interp, interp_pmc, interp);
     if (!interp)
         PANIC(interp, "interpreter not found for callback");
@@ -230,12 +230,12 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
      * 3) check interpreter ...
      */
     sc = CONST_STRING(interp, "_interpreter");
-    passed_interp = VTABLE_getprop(interp, user_data, sc);
+    passed_interp = Parrot_pmc_getprop(interp, user_data, sc);
     if (VTABLE_get_pointer(interp, passed_interp) != interp)
         PANIC(interp, "callback gone to wrong interpreter");
 
     sc = CONST_STRING(interp, "_synchronous");
-    passed_synchronous = VTABLE_getprop(interp, user_data, sc);
+    passed_synchronous = Parrot_pmc_getprop(interp, user_data, sc);
     if (!PMC_IS_NULL(passed_synchronous) &&
             VTABLE_get_bool(interp, passed_synchronous))
         synchronous = 1;
@@ -300,9 +300,9 @@ Parrot_run_callback(PARROT_INTERP,
     STRING  *sc;
 
     sc        = CONST_STRING(interp, "_sub");
-    sub       = VTABLE_getprop(interp, user_data, sc);
+    sub       = Parrot_pmc_getprop(interp, user_data, sc);
     sc        = CONST_STRING(interp, "_signature");
-    signature = VTABLE_getprop(interp, user_data, sc);
+    signature = Parrot_pmc_getprop(interp, user_data, sc);
     sig_str   = VTABLE_get_string(interp, signature);
 
     pasm_sig[0] = 'P';
