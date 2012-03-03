@@ -19818,45 +19818,45 @@ Parrot_splice_p_p_ic_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_setprop_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    VTABLE_setprop(interp, PREG(1), SREG(2), PREG(3));
+    Parrot_pmc_setprop(interp, PREG(1), SREG(2), PREG(3));
     return (opcode_t *)cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_setprop_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    VTABLE_setprop(interp, PREG(1), SCONST(2), PREG(3));
+    Parrot_pmc_setprop(interp, PREG(1), SCONST(2), PREG(3));
     return (opcode_t *)cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_getprop_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = VTABLE_getprop(interp, PREG(3), SREG(2));
+    PREG(1) = Parrot_pmc_getprop(interp, PREG(3), SREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_getprop_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = VTABLE_getprop(interp, PREG(3), SCONST(2));
+    PREG(1) = Parrot_pmc_getprop(interp, PREG(3), SCONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_delprop_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    VTABLE_delprop(interp, PREG(1), SREG(2));
+    Parrot_pmc_delprop(interp, PREG(1), SREG(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_delprop_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    VTABLE_delprop(interp, PREG(1), SCONST(2));
+    Parrot_pmc_delprop(interp, PREG(1), SCONST(2));
     return (opcode_t *)cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_prophash_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = VTABLE_getprops(interp, PREG(2));
+    PREG(1) = Parrot_pmc_getprops(interp, PREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
 }
@@ -20577,7 +20577,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     }
     else {
         PMC    * const  clone = VTABLE_clone(interp, PREG(2));
-        PMC    * const  meta = VTABLE_getprops(interp, PREG(1));
+        PMC    * const  meta = Parrot_pmc_getprops(interp, PREG(1));
         const Parrot_UInt   gc_flags = (PREG(1)->flags & PObj_GC_all_FLAGS);
 
         Parrot_pmc_destroy(interp, PREG(1));
@@ -20594,7 +20594,7 @@ Parrot_copy_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
                 STRING  * const  key = VTABLE_shift_string(interp, iter);
                 PMC  * const  value = VTABLE_get_pmc_keyed_str(interp, meta, key);
 
-                VTABLE_setprop(interp, PREG(1), key, value);
+                Parrot_pmc_setprop(interp, PREG(1), key, value);
             }
 
         }
