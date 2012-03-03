@@ -789,6 +789,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     const PackFile_ConstTable * const ct = bc->const_table;
+    if (!ct || !ct->pmc.constants || bc->main_sub < 0)
+        return PMCNULL;
     return ct->pmc.constants[bc->main_sub];
 }
 
