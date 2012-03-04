@@ -17,7 +17,7 @@ This module provides the default output style of C<Data::Dumper>.
 
 =cut
 
-.sub __library_data_dumper_default_onload :load
+.sub __library_data_dumper_default_onload :tag('load')
     .local pmc ddb_class
     ddb_class = get_class ['Data'; 'Dumper'; 'Default']
     if null ddb_class goto create_ddb

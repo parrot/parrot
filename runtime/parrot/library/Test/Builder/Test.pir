@@ -17,7 +17,7 @@ This class provides the following methods:
 
 .namespace [ 'Test'; 'Builder'; 'Test' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     .local pmc tbtb_class
 
     newclass     tbtb_class, [ 'Test'; 'Builder'; 'Test'; 'Base' ]

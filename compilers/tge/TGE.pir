@@ -80,7 +80,7 @@ applies to a child of the current node (generally inherited attributes).
 
 .namespace [ 'TGE' ]
 
-.sub '__onload_first' :load
+.sub '__onload_first' :tag('load')
     # use other modules
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
@@ -92,7 +92,7 @@ applies to a child of the current node (generally inherited attributes).
 .include "compilers/tge/TGE/Grammar.pir"
 .include "compilers/tge/TGE/Compiler.pir"
 
-.sub '__onload_last' :load
+.sub '__onload_last' :tag('load')
     # make sure we execute this sub only once
     $P0 = get_global '$!tge_loaded'
     unless null $P0 goto end

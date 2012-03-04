@@ -21,7 +21,7 @@ is not subclassed further.
 
 .namespace ["Tetris::Block"]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::Block"
     unless null $P0 goto END
     load_bytecode "examples/sdl/tetris/blockdata.pir"

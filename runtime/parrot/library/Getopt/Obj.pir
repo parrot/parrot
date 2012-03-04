@@ -68,7 +68,7 @@ the attributes they'll use.
 
 =cut
 
-.sub __load :anon :load
+.sub __load :anon :tag('load')
     .local pmc obj, spec, pns, ns
     obj = newclass ['Getopt';'Obj']
     addattribute obj, "Specs"

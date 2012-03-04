@@ -76,7 +76,7 @@ this will tend to make the toolkit init function much happier.
 .include 'datatypes.pasm'
 
 # TODO: this crashes rakudo
-# .sub _init_nci_utils :load
+# .sub _init_nci_utils :tag('load')
 #     # Mark all functions for export
 #     .local pmc parrot
 #     load_language 'parrot'
@@ -316,7 +316,7 @@ are freed after the call. Return strings belong to the C library and are not fre
 
 ### ncifunc
 
-.sub '' :load :init
+.sub '' :tag('load') :tag('init')
     .local pmc str_to_cstring, str_free_cstring, str_new
     null $P0
     str_to_cstring   = dlfunc $P0, 'Parrot_str_to_cstring',   'ppS'

@@ -12,7 +12,7 @@ and opcode syntax tree (POST) nodes in the Parrot Compiler Toolkit.
 
 .namespace [ 'PCT';'Node' ]
 
-.sub 'onload' :anon :load :init
+.sub 'onload' :anon :tag('load') :tag('init')
     ##   create the PCT::Node base class
     .local pmc p6meta
     p6meta = new 'P6metaclass'

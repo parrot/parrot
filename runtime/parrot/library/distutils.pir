@@ -17,7 +17,7 @@ A module author just must write a script C<setup.pir> or C<setup.nqp>.
 
 A setup script can be as simple as this:
 
-    pir::load_bytecode('distutils.pir');
+    pir::tag('load')_bytecode('distutils.pir');
     setup( @steps,
         ... many key/values here ...
     );
@@ -205,7 +205,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 .loadlib 'sys_ops'
 .include 'errors.pasm'
 
-.sub '__onload' :load :init :anon
+.sub '__onload' :tag('load') :tag('init') :anon
     load_bytecode 'osutils.pbc'
     $P0 = new 'Hash'
     set_global '%step', $P0

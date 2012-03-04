@@ -12,7 +12,7 @@ This file implements match objects returned by the Parrot Grammar Engine.
 
 .namespace [ 'PGE';'Match' ]
 
-.sub '' :load
+.sub '' :tag('load')
     load_bytecode 'P6object.pbc'
     load_bytecode 'PGE/Dumper.pir'                 # FIXME, XXX, etc.
     .local pmc p6meta

@@ -58,7 +58,7 @@ The subsystem initializers include:
     set_hll_global ['SDL'; 'NCI'], .func_name, c_function
 .endm
 
-.sub _sdl_init :load
+.sub _sdl_init :tag('load')
     _init_video()
 
     .local pmc layouts

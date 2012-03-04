@@ -16,7 +16,7 @@ also.)
 
 .include "cclass.pasm"
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc p6meta
     p6meta = get_hll_global 'P6metaclass'
     p6meta.'new_class'('PGE::Text', 'parent'=>'PGE::Grammar')

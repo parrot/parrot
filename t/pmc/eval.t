@@ -277,7 +277,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string" );
   pir_compiler = compreg "PIR"
   code = ".sub "
   code .= name
-  code .= " :load\\n"
+  code .= " :tag('load')\\n"
   code .= "print \\""
   code .= printme
   code .= "\\\\n\\"\\n"
@@ -352,7 +352,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
   pir_compiler = compreg "PIR"
   code = ".sub "
   code .= name
-  code .= " :load\\n"
+  code .= " :tag('load')\\n"
   code .= "print \\""
   code .= printme
   code .= "\\\\n\\"\\n"

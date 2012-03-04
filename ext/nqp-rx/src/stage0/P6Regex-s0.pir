@@ -9,7 +9,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 =cut
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'HLL.pbc'
 .end
 
@@ -39,7 +39,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "" :load :init :subid("post175") :outer("10_1309998843.21663")
+.sub "" :tag('load') :tag('init') :subid("post175") :outer("10_1309998843.21663")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998843.21663" 
     .local pmc block
@@ -9085,7 +9085,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.sub "_block1464" :load :anon :subid("173_1309998843.21663")
+.sub "_block1464" :tag('load') :anon :subid("173_1309998843.21663")
 .annotate 'line', 3
     .const 'Sub' $P1466 = "11_1309998843.21663" 
     $P100 = $P1466()
@@ -9094,7 +9094,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "_block1467" :load :anon :subid("174_1309998843.21663")
+.sub "_block1467" :tag('load') :anon :subid("174_1309998843.21663")
 .annotate 'line', 1
     .const 'Sub' $P1469 = "10_1309998843.21663" 
     $P100 = $P1469()
@@ -9127,7 +9127,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "" :load :init :subid("post95") :outer("10_1309998845.12722")
+.sub "" :tag('load') :tag('init') :subid("post95") :outer("10_1309998845.12722")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998845.12722" 
     .local pmc block
@@ -9294,7 +9294,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "" :load :init :subid("post96") :outer("11_1309998845.12722")
+.sub "" :tag('load') :tag('init') :subid("post96") :outer("11_1309998845.12722")
 .annotate 'line', 4
     .const 'Sub' $P1003 = "11_1309998845.12722" 
     .local pmc block
@@ -14164,7 +14164,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.sub "_block1646" :load :anon :subid("93_1309998845.12722")
+.sub "_block1646" :tag('load') :anon :subid("93_1309998845.12722")
 .annotate 'line', 4
     .const 'Sub' $P1648 = "11_1309998845.12722" 
     $P109 = $P1648()
@@ -14173,7 +14173,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace []
-.sub "_block1650" :load :anon :subid("94_1309998845.12722")
+.sub "_block1650" :tag('load') :anon :subid("94_1309998845.12722")
 .annotate 'line', 1
     .const 'Sub' $P1652 = "10_1309998845.12722" 
     $P100 = $P1652()
@@ -14184,7 +14184,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 .namespace ['Regex';'P6Regex';'Compiler']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     .local pmc p6meta, p6regex
     p6meta = get_hll_global 'P6metaclass'
     p6regex = p6meta.'new_class'('Regex::P6Regex::Compiler', 'parent'=>'HLL::Compiler')

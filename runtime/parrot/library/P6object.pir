@@ -60,7 +60,7 @@ P6metamodel.  It supplies the C<.WHAT> and C<.HOW> methods.
 
 =over 4
 
-=item onload() :anon :init :load
+=item onload() :anon :tag('init') :tag('load')
 
 Initializes the P6object system.  Builds protoobjects for
 C<P6object> and C<P6metaclass>.
@@ -69,7 +69,7 @@ C<P6object> and C<P6metaclass>.
 
 .namespace ['P6object']
 
-.sub 'onload' :anon :init :load
+.sub 'onload' :anon :tag('init') :tag('load')
     $P0 = newclass 'P6protoobject'
 
     $P0 = newclass 'P6object'

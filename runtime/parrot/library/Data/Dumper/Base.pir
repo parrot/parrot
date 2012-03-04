@@ -25,7 +25,7 @@ A Data::Dumper::Base object has the following methods:
 
 =cut
 
-.sub __library_data_dumper_base_onload :load
+.sub __library_data_dumper_base_onload :tag('load')
     .local pmc ddb_class
     ddb_class = get_class ['Data'; 'Dumper'; 'Base']
     if null ddb_class goto create_ddb

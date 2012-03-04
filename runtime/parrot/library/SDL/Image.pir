@@ -34,7 +34,7 @@ An SDL::Image object has the following methods:
 
 .namespace [ 'SDL'; 'Image' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     .local pmc image_class
 
     image_class = get_class ['SDL'; 'Image']

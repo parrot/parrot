@@ -16,7 +16,7 @@ PIR or an Eval PMC (bytecode).
 
 .namespace [ 'POST';'Compiler' ]
 
-.sub '__onload' :load :init
+.sub '__onload' :tag('load') :tag('init')
     .local pmc p6meta, cproto
     p6meta = new 'P6metaclass'
     cproto = p6meta.'new_class'('POST::Compiler', 'parent'=>'PCT::HLLCompiler')

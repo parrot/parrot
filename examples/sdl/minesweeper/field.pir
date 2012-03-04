@@ -951,7 +951,7 @@ This method is called automatically when this module is loaded.
 
 =cut
 
-.sub __onload :load
+.sub __onload :tag('load')
     .local pmc class
     class = get_class "Mines::Field"
     unless null class goto END

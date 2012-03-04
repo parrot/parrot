@@ -120,7 +120,7 @@ Performs the initialization of Tcl bridge, namely instantiates TclLibrary class
 
 =cut
 
-.sub _init :load :init
+.sub _init :tag('load') :tag('init')
     .local pmc tclclass
     tclclass = newclass ['TclLibrary']
     addattribute tclclass, 'interp'

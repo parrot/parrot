@@ -30,7 +30,7 @@ it parent classes nor is it subclassed.
 .include "timer.pasm"
 .namespace ["Tetris::App"]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::App"
     unless null $P0 goto END
 

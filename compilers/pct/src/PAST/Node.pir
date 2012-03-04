@@ -12,7 +12,7 @@ for compiling programs in Parrot.
 
 .namespace [ 'PAST';'Node' ]
 
-.sub 'onload' :anon :load :init
+.sub 'onload' :anon :tag('load') :tag('init')
     ##   create the PAST::Node base class
     .local pmc p6meta, base
     p6meta = new 'P6metaclass'

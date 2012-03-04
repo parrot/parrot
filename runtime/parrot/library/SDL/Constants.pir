@@ -25,7 +25,7 @@ This library declares the following constants:
 
 .namespace [ 'SDL'; 'Constants' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
 
 	# load the constants
 	_load_key_names()

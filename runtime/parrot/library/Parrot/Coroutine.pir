@@ -4,7 +4,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 
 =head1 SYNOPSIS
 
-    .sub onload :load
+    .sub onload :tag('load')
         load_bytecode 'Parrot/Coroutine.pbc'
     .end
 
@@ -78,7 +78,7 @@ in pure PIR using continuations.
 
 =cut
 
-.sub onload_create_class :load
+.sub onload_create_class :tag('load')
     $P0 = get_class ['Parrot'; 'Coroutine']
     unless null $P0 goto END
     $P0 = newclass ['Parrot'; 'Coroutine']

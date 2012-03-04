@@ -135,7 +135,7 @@
 
 .end # WinxedCompilerError
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     addattribute $P0, 'type'
     addattribute $P0, 'filename'
@@ -505,7 +505,7 @@
 
 .end # show
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Token' ]
     addattribute $P0, 'file'
     addattribute $P0, 'line'
@@ -530,7 +530,7 @@
 
 .end # viewable
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Token' ]
     addparent $P0, $P1
@@ -561,7 +561,7 @@
 
 .end # viewable
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Token' ]
     addparent $P0, $P1
@@ -583,7 +583,7 @@
 
 .end # iscomment
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -616,7 +616,7 @@
 
 .end # checkop
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenOp' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -662,7 +662,7 @@
 
 .end # iskeyword
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -681,7 +681,7 @@
 
 .end # rawstring
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenString' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -774,7 +774,7 @@
 
 .end # getPirString
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenString' ]
     addparent $P0, $P1
@@ -927,7 +927,7 @@
 
 .end # getPirString
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenSingleQuoted' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenString' ]
     addparent $P0, $P1
@@ -956,7 +956,7 @@
 
 .end # getintvalue
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -985,7 +985,7 @@
 
 .end # getfloatvalue
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
     addparent $P0, $P1
@@ -1739,7 +1739,7 @@
 
 .end # unget
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     addattribute $P0, 'warnings'
     addattribute $P0, 'h'
@@ -2292,7 +2292,7 @@
 
 .end # emitstore_lex
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Emit' ]
     addattribute $P0, 'handle'
     addattribute $P0, 'file'
@@ -2585,7 +2585,7 @@
 
 .end # invoke
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin_frombody' ]
     addattribute $P0, 'body'
     addattribute $P0, 'typeresult'
@@ -2763,7 +2763,7 @@
 
 .end # expand
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
     addattribute $P0, 'name'
     addattribute $P0, 'body'
@@ -2788,7 +2788,7 @@
 
 .end # BuiltinFunction
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
     addparent $P0, $P1
@@ -2815,7 +2815,7 @@
 
 .end # iscompileevaluable
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
     addparent $P0, $P1
@@ -2879,7 +2879,7 @@
 
 .end # invoke
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
     addattribute $P0, 'type'
 .end
@@ -4066,7 +4066,7 @@
 
 .end # dowarnings
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addattribute $P0, 'start'
     addattribute $P0, 'owner'
@@ -4111,7 +4111,7 @@
 
 .end # add
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
     addattribute $P0, 'owner'
     addattribute $P0, 'e'
@@ -4239,7 +4239,7 @@
 
 .end # emitargs
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
     addattribute $P0, 'args'
 .end
@@ -4302,7 +4302,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Modifier' ]
     addattribute $P0, 'name'
     addattribute $P0, 'args'
@@ -4401,7 +4401,7 @@
 
 .end # pick
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addattribute $P0, 'list'
 .end
@@ -4860,7 +4860,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Statement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -4899,7 +4899,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -4938,7 +4938,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
     addattribute $P0, 'statements'
 .end
@@ -5027,7 +5027,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
     addparent $P0, $P1
@@ -5211,7 +5211,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'PiropStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5258,7 +5258,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ExternStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5318,7 +5318,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StaticStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5421,7 +5421,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'UsingStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5476,7 +5476,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'UsingNamespaceStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5586,7 +5586,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ExprStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -5677,7 +5677,7 @@
 
 .end # issubid
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarData' ]
     addattribute $P0, 'type'
     addattribute $P0, 'reg'
@@ -5701,7 +5701,7 @@
 
 .end # get_string
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConstantInternalFail' ]
     addattribute $P0, 'name'
 .end
@@ -5737,7 +5737,7 @@
 
 .end # setvalue
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarData_const' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarData' ]
     addparent $P0, $P1
@@ -5923,7 +5923,7 @@
 
 .end # makelexicalself
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addattribute $P0, 'locals'
     addattribute $P0, 'usednamespaces'
@@ -5938,7 +5938,7 @@
 
 .end # BlockStatement
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addparent $P0, $P1
@@ -6177,7 +6177,7 @@
 
 .end # emit_assign_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Expr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -6189,7 +6189,7 @@
 
 .end # issimple
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -6205,7 +6205,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -6277,7 +6277,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -6419,7 +6419,7 @@
 
 .end # emit_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Condition' ]
     addattribute $P0, 'condexpr'
 .end
@@ -6442,7 +6442,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Literal' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     addparent $P0, $P1
@@ -6526,7 +6526,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
@@ -6616,7 +6616,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
@@ -6688,7 +6688,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
@@ -6775,7 +6775,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -6812,7 +6812,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -7192,7 +7192,7 @@
 
 .end # emit_assign_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     addparent $P0, $P1
@@ -7315,7 +7315,7 @@
 
 .end # emit_store
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -7330,7 +7330,7 @@
 
 .end # initop
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -7376,7 +7376,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpNamespaceExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
@@ -7471,7 +7471,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpClassExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
@@ -7515,7 +7515,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
@@ -7604,7 +7604,7 @@
 
 .end # emit_intright
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpExpr' ]
     addparent $P0, $P1
@@ -7643,7 +7643,7 @@
 
 .end # optimize
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -7655,7 +7655,7 @@
 
 .end # checkresult
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
@@ -7710,7 +7710,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDeleteExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
     addparent $P0, $P1
@@ -7750,7 +7750,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpExistsExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
     addparent $P0, $P1
@@ -7835,7 +7835,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpUnaryMinusExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
@@ -7943,7 +7943,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpNotExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
@@ -8021,7 +8021,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinNotExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
@@ -8046,7 +8046,7 @@
 
 .end # iflexical
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpUnaryExpr' ]
     addparent $P0, $P1
@@ -8072,7 +8072,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
@@ -8111,7 +8111,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreIncExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
     addparent $P0, $P1
@@ -8150,7 +8150,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPreDecExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpPreIncDec' ]
     addparent $P0, $P1
@@ -8248,7 +8248,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPostIncExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
@@ -8347,7 +8347,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpPostDecExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpIncDec' ]
     addparent $P0, $P1
@@ -8440,7 +8440,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -8476,7 +8476,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAssignExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8536,7 +8536,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAssignToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8617,7 +8617,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAddToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8683,7 +8683,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSubToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8729,7 +8729,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpMulToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8761,7 +8761,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDivToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8793,7 +8793,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpModToExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseAssignExpr' ]
     addparent $P0, $P1
@@ -8973,7 +8973,7 @@
 
 .end # emit_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -9003,7 +9003,7 @@
 
 .end # negated
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Negable' ]
     addattribute $P0, 'positive'
 .end
@@ -9033,7 +9033,7 @@
 
 .end # checkresult
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -9115,7 +9115,7 @@
 
 .end # emit_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
     addparent $P0, $P1
@@ -9196,7 +9196,7 @@
 
 .end # emit_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CheckerExpr' ]
     addparent $P0, $P1
@@ -9419,7 +9419,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpEqualExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9537,7 +9537,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSameExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9606,7 +9606,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpLessExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9672,7 +9672,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpGreaterExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9738,7 +9738,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpLessEqualExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9804,7 +9804,7 @@
 
 .end # emitop_else
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpGreaterEqualExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
     addparent $P0, $P1
@@ -9832,7 +9832,7 @@
 
 .end # checkresult
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -10013,7 +10013,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBoolAndExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
     addparent $P0, $P1
@@ -10194,13 +10194,13 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBoolOrExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBoolExpr' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
@@ -10252,7 +10252,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinAndExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
@@ -10304,7 +10304,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinOrExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
@@ -10348,7 +10348,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpBinXorExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBaseBinExpr' ]
     addparent $P0, $P1
@@ -10565,7 +10565,7 @@
 
 .end # emit_concat_to
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -10610,7 +10610,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RepeatString' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -10839,7 +10839,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpAddExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -11008,7 +11008,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpSubExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -11252,7 +11252,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpMulExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -11373,7 +11373,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpDivExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -11425,7 +11425,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpModExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
@@ -11474,7 +11474,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpCModExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryExpr' ]
     addparent $P0, $P1
@@ -11526,7 +11526,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpShiftleftExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
@@ -11578,7 +11578,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpShiftrightExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
@@ -11630,7 +11630,7 @@
 
 .end # do_op
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpShiftlrightExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
     addparent $P0, $P1
@@ -11716,7 +11716,7 @@
 
 .end # emitmodifiers
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArgumentModifierList' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
@@ -11758,7 +11758,7 @@
 
 .end # hascompilevalue
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Argument' ]
     addattribute $P0, 'arg'
     addattribute $P0, 'modifiers'
@@ -11980,7 +11980,7 @@
 
 .end # emitargs
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
     addattribute $P0, 'owner'
     addattribute $P0, 'start'
@@ -12261,7 +12261,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -12642,7 +12642,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -12673,7 +12673,7 @@
 
 .end # emitcall
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallSubid' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     addparent $P0, $P1
@@ -12755,7 +12755,7 @@
 
 .end # emitcall
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     addparent $P0, $P1
@@ -12806,7 +12806,7 @@
 
 .end # emitcall
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     addparent $P0, $P1
@@ -12830,7 +12830,7 @@
 
 .end # emit_left_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -13101,7 +13101,7 @@
 
 .end # emit_assign_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
     addparent $P0, $P1
@@ -13220,7 +13220,7 @@
 
 .end # emit_assign_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MemberExprBase' ]
     addparent $P0, $P1
@@ -13268,7 +13268,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringIndexExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -13489,7 +13489,7 @@
 
 .end # emit_assign_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -13665,7 +13665,7 @@
 
 .end # emit_init
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -13837,7 +13837,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'HashExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -13911,7 +13911,7 @@
 
 .end # emit_constructor
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -14148,7 +14148,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
@@ -14219,7 +14219,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewIndexedExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
@@ -14278,7 +14278,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
     addparent $P0, $P1
@@ -14408,7 +14408,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpInstanceOfExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -14596,7 +14596,7 @@
 
 .end # emit_void
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'OpConditionalExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Expr' ]
     addparent $P0, $P1
@@ -15549,7 +15549,7 @@
 
 .end # getbreaklabel
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Breakable' ]
     addattribute $P0, 'brlabel'
 .end
@@ -15584,7 +15584,7 @@
 
 .end # getcontinuelabel
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Continuable' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Breakable' ]
     addparent $P0, $P1
@@ -15660,7 +15660,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -15683,7 +15683,7 @@
 
 .end # emitret
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ReturnStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
     addparent $P0, $P1
@@ -15713,7 +15713,7 @@
 
 .end # emitret
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'YieldStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ReturnYieldStatement' ]
     addparent $P0, $P1
@@ -15822,7 +15822,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'InlineReturnStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -15882,7 +15882,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LabelStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -15924,7 +15924,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Reflabel' ]
     addattribute $P0, 'owner'
     addattribute $P0, 'label'
@@ -15970,7 +15970,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'GotoStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -15998,7 +15998,7 @@
 
 .end # parsecondition
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -16115,7 +16115,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IfStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ConditionalStatement' ]
     addparent $P0, $P1
@@ -16154,7 +16154,7 @@
 
 .end # emit_infinite
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Continuable' ]
     addparent $P0, $P1
@@ -16238,7 +16238,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
@@ -16336,7 +16336,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DoStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
@@ -16385,7 +16385,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ContinueStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -16432,7 +16432,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BreakStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -16716,7 +16716,7 @@
 
 .end # optimize_cases
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Breakable' ]
     addparent $P0, $P1
@@ -17007,7 +17007,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
     addparent $P0, $P1
@@ -17144,7 +17144,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SwitchCaseStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SwitchBaseStatement' ]
     addparent $P0, $P1
@@ -17396,7 +17396,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ForStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
@@ -17548,7 +17548,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'LoopStatement' ]
     addparent $P0, $P1
@@ -17669,7 +17669,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ThrowStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -17760,7 +17760,7 @@
 
 .end # emitmodifiers
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TryModifierList' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
@@ -17929,7 +17929,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TryStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
@@ -17955,7 +17955,7 @@
 
 .end # initvarbase
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarBaseStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -17983,7 +17983,7 @@
 
 .end # DeclareBase
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -18170,7 +18170,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
     addparent $P0, $P1
@@ -18353,7 +18353,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareBase' ]
     addparent $P0, $P1
@@ -18437,7 +18437,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
@@ -18461,7 +18461,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntArrayStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
@@ -18524,7 +18524,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
@@ -18548,7 +18548,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatArrayStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
@@ -18611,7 +18611,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareSingleStatement' ]
     addparent $P0, $P1
@@ -18635,7 +18635,7 @@
 
 .end # clone
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'StringArrayStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'DeclareArrayStatement' ]
     addparent $P0, $P1
@@ -18769,7 +18769,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ConstStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -18971,7 +18971,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarBaseStatement' ]
     addparent $P0, $P1
@@ -19012,7 +19012,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ResizableVarStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     addparent $P0, $P1
@@ -19071,7 +19071,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FixedVarStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
     addparent $P0, $P1
@@ -19288,7 +19288,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'MultiStatementBase' ]
     addparent $P0, $P1
@@ -19365,7 +19365,7 @@
 
 .end # freetemps
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
     addattribute $P0, 'type'
     addattribute $P0, 'nreg'
@@ -19467,7 +19467,7 @@
 
 .end # emitmodifiers
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
@@ -19552,7 +19552,7 @@
 
 .end # get_type
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionParameter' ]
     addattribute $P0, 'func'
     addattribute $P0, 'name'
@@ -19599,7 +19599,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -19676,7 +19676,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionModifierList' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
     addparent $P0, $P1
@@ -20316,7 +20316,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
@@ -20498,7 +20498,7 @@
 
 .end # emit_extra_modifiers
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     addparent $P0, $P1
@@ -20717,7 +20717,7 @@
 
 .end # getvar
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'LocalFunctionStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionBase' ]
     addparent $P0, $P1
@@ -20738,7 +20738,7 @@
 
 .end # ismethod
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MethodStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     addparent $P0, $P1
@@ -20806,7 +20806,7 @@
 
 .end # gettype
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'InlineParam' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -20894,7 +20894,7 @@
 
 .end # createreg
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
@@ -21222,7 +21222,7 @@
 
 .end # emit_get
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'InlinedBlock' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'BlockStatement' ]
     addparent $P0, $P1
@@ -21282,7 +21282,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'InlineRef' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -21336,7 +21336,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'CallInlineExpr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
     addparent $P0, $P1
@@ -21401,7 +21401,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameter' ]
     addattribute $P0, 'name'
     addattribute $P0, 'modifiers'
@@ -21452,7 +21452,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameterList' ]
     addattribute $P0, 'params'
 .end
@@ -21499,7 +21499,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'MultiAssignStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Statement' ]
     addparent $P0, $P1
@@ -21530,7 +21530,7 @@
 
 .end # annotate
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -21564,7 +21564,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierStr' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
@@ -21681,7 +21681,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
@@ -21821,7 +21821,7 @@
 
 .end # emit_new
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassSpecifier' ]
     addparent $P0, $P1
@@ -21855,7 +21855,7 @@
 
 .end # getclasskey
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'CommonBase' ]
     addparent $P0, $P1
@@ -21905,7 +21905,7 @@
 
 .end # find
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
     addattribute $P0, 'functions'
 .end
@@ -22080,7 +22080,7 @@
   __label_4: # endfor
   __label_2:
   __label_1:
-    __ARG_1.'say'('.sub Winxed_class_init :anon :load :init')
+    __ARG_1.'say'('.sub Winxed_class_init :anon :tag('load') :tag('init')')
     $P8 = self.'getclasskey'()
     __ARG_1.'say'('    ', 'newclass $P0, ', $P8)
     set $I1, 1
@@ -22118,7 +22118,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'ClassStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
     addparent $P0, $P1
@@ -22153,7 +22153,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'DeclareClassStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'ClassBase' ]
     addparent $P0, $P1
@@ -22531,7 +22531,7 @@
         .param pmc __ARG_1
 .lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_16 = "WSubId_16"
-    __ARG_1.'say'(".sub 'importextern' :anon :load :init\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
+    __ARG_1.'say'(".sub 'importextern' :anon :tag('load') :tag('init')\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
     getattribute $P4, self, 'module'
     join $S1, "'; '", $P4
     concat $S2, "['parrot'; '", $S1
@@ -22561,7 +22561,7 @@
 
 .end # WSubId_16
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'External' ]
     addattribute $P0, 'module'
     addattribute $P0, 'names'
@@ -22812,7 +22812,7 @@
 
 .end # emit_get_global
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespacePath' ]
     addattribute $P0, 'hll'
     addattribute $P0, 'path'
@@ -23546,7 +23546,7 @@
 
 .end # emit_base
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'VarContainer' ]
     addparent $P0, $P1
@@ -23705,7 +23705,7 @@
 
 .end # emit
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'NamespaceStatement' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
     addparent $P0, $P1
@@ -23884,7 +23884,7 @@
   __label_10:
     set $P12, $P17
     join $S2, "\n", $P12
-    $P12 = WSubId_45(".sub initial_load_bytecode :anon :load :init\n%0\n.end\n", $S2)
+    $P12 = WSubId_45(".sub initial_load_bytecode :anon :tag('load') :tag('init')\n%0\n.end\n", $S2)
     __ARG_1.'say'($P12)
   __label_9: # endif
     isnull $I1, $P2
@@ -23934,7 +23934,7 @@
 
 .end # emitinclude
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'NamespaceBase' ]
     addparent $P0, $P1
@@ -23974,7 +23974,7 @@
 
 .end # addvariant
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin' ]
     addattribute $P0, 'name'
     addattribute $P0, 'variants'
@@ -24028,7 +24028,7 @@
 
 .end # put
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinBuilder' ]
     addattribute $P0, 'entries'
 .end
@@ -24115,7 +24115,7 @@
 
 .end # emitinclude
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
     addattribute $P0, 'rootns'
     addattribute $P0, 'warnings'
@@ -24302,12 +24302,12 @@
 
 .end # compile_from_file
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'initializer' :init :load
+.sub 'initializer' :tag('init') :tag('load')
     new $P1, [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
     compreg 'winxed', $P1
 

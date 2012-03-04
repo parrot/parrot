@@ -37,7 +37,7 @@ An SDL::LCD object has the following methods:
 
 .namespace ['SDL'; 'LCD']
 
-.sub __onload :load
+.sub __onload :tag('load')
     .local pmc class
     class = get_class ['SDL'; 'LCD']
     if_null class, create_class

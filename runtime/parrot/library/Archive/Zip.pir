@@ -41,7 +41,7 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 
 .namespace ['Archive';'Zip';'Base']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = getinterp
     $P1 = $P0[.IGLOBALS_CONFIG_HASH]
     $I0 = $P1['has_zlib']
@@ -129,7 +129,7 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 
 .namespace ['Archive';'Zip';'Member']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['Archive';'Zip';'Base'], ['Archive';'Zip';'Member']
     $P0.'add_attribute'('fileName')
     $P0.'add_attribute'('externalFileName')
@@ -574,7 +574,7 @@ to something different than the given 'fileName'.
 
 .namespace ['Archive';'Zip';'FileMember']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['Archive';'Zip';'Member'], ['Archive';'Zip';'FileMember']
     $P0.'add_attribute'('fh')
 .end
@@ -618,7 +618,7 @@ to something different than the given 'fileName'.
 
 .namespace ['Archive';'Zip';'NewFileMember']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['Archive';'Zip';'FileMember'], ['Archive';'Zip';'NewFileMember']
 .end
 
@@ -693,7 +693,7 @@ Make a new, empty zip archive.
 
 .namespace ['Archive';'Zip']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['Archive';'Zip';'Base'], ['Archive';'Zip']
     $P0.'add_attribute'('members')
     $P0.'add_attribute'('zipfileComment')

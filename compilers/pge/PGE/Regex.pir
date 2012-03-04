@@ -16,7 +16,7 @@ a number of built-in rules.
 .include 'cclass.pasm'
 .include 'interpinfo.pasm'
 
-.sub '__onload' :load
+.sub '__onload' :tag('load')
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PGE::Grammar', 'parent'=>'PGE::Match')

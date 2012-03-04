@@ -163,7 +163,7 @@ CODE
 
 .namespace ['MyFalseClass']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :init
     $P0 = newclass ['MyFalseClass']
 .end
 
@@ -177,7 +177,7 @@ CODE
 
 .namespace ['MyTrueClass']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :init
     $P0 = newclass ['MyTrueClass']
 .end
 

@@ -19,7 +19,7 @@ PGE::Exp - base class for expressions
 .const int PGE_BACKTRACK_EAGER = 2
 .const int PGE_BACKTRACK_NONE = 3
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc optable
     .local pmc term
 

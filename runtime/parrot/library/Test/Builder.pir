@@ -46,7 +46,7 @@ This class defines the following methods:
 
 .namespace [ 'Test'; 'Builder' ]
 
-.sub '_initialize' :load
+.sub '_initialize' :tag('load')
     load_bytecode 'Test/Builder/Test.pbc'
     load_bytecode 'Test/Builder/Output.pbc'
     load_bytecode 'Test/Builder/TestPlan.pbc'

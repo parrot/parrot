@@ -20,7 +20,7 @@ This is the base class of the Board class.
 
 .namespace ["Tetris::BoardData"]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::BoardData"
     unless null $P0 goto END
     newclass $P0, "Tetris::BoardData"

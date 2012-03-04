@@ -75,7 +75,7 @@
 
 .const int PGE_INF = 2147483647
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc optable
 
     optable = new ['PGE';'OPTable']

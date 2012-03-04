@@ -18,7 +18,7 @@ parrotlib's interface functions.
 
 =cut
 
-.sub __onload :load
+.sub __onload :tag('load')
     .local pmc paths
     .local pmc includes
     .local string root

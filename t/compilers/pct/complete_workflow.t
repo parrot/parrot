@@ -325,7 +325,7 @@ sub test_pct
 
 .namespace [ 'TestGrammar'; 'Compiler' ]
 
-.sub 'onload' :anon :load :init
+.sub 'onload' :anon :tag('load') :init
     load_bytecode 'PCT.pbc'
 .end
 

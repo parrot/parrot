@@ -20,7 +20,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Parser';'Result']
     $P0.'add_attribute'('raw')
     $P0.'add_attribute'('directive')
@@ -99,7 +99,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Bailout']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Bailout']
 .end
 
@@ -120,7 +120,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Comment']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Comment']
     $P0.'add_attribute'('comment')
 .end
@@ -131,7 +131,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Plan']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Plan']
     $P0.'add_attribute'('plan')
     $P0.'add_attribute'('tests_planned')
@@ -145,7 +145,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Test']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Test']
     $P0.'add_attribute'('ok')
     $P0.'add_attribute'('test_num')
@@ -248,7 +248,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Unknown']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Unknown']
 .end
 
@@ -258,7 +258,7 @@ Base class for TAP::Parser output objects
 
 .namespace ['TAP';'Parser';'Result';'Version']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Parser';'Result'], ['TAP';'Parser';'Result';'Version']
     $P0.'add_attribute'('version')
 .end
@@ -274,7 +274,7 @@ subclasses to represent the tokens.
 
 .namespace ['TAP';'Parser';'Grammar']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Parser';'Grammar']
 .end
 
@@ -532,7 +532,7 @@ and C<TAP;Harness> ie. callback support.
 
 .namespace ['TAP';'Base']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Base']
     $P0.'add_attribute'('code_for')
     $P0.'add_attribute'('ok_callbacks')
@@ -619,7 +619,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
 
 .namespace ['TAP';'Parser']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'osutils.pbc'
 
     $P0 = subclass ['TAP';'Base'], ['TAP';'Parser']
@@ -1366,7 +1366,7 @@ reporting/querying their aggregate results.
 
 .namespace ['TAP';'Parser';'Aggregator']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Parser';'Aggregator']
     $P0.'add_attribute'('parser_for')
     $P0.'add_attribute'('parse_order')

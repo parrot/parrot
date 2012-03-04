@@ -42,7 +42,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 .HLL 'parrot'
 .const int CONNECTION_OK = 0
 
-.sub __load :load
+.sub __load :tag('load')
     .local pmc cl
     load_bytecode 'postgres.pbc'
     cl = newclass 'Pg'       # Pg connection constructor

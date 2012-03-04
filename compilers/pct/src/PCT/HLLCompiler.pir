@@ -13,7 +13,7 @@ running compilers from a command line.
 
 =cut
 
-.sub 'onload' :anon :load :init
+.sub 'onload' :anon :tag('load') :tag('init')
     load_bytecode 'P6object.pbc'
     load_bytecode 'Parrot/Exception.pbc'
     $P0 = new 'P6metaclass'

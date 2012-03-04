@@ -34,7 +34,7 @@ An SDL::Rect object has the following methods:
 
 .namespace [ 'SDL'; 'Rect' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     .local pmc class
     class = get_class ['SDL'; 'Rect']
     if_null class, create_class

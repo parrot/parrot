@@ -26,7 +26,7 @@ Both classes support the following methods.
 
 .namespace [ 'Test'; 'Builder'; 'TestPlan' ]
 
-.sub '_initialize' :load
+.sub '_initialize' :tag('load')
     .local pmc tbtp_class
     newclass     tbtp_class, [ 'Test'; 'Builder'; 'TestPlan' ]
     addattribute tbtp_class, 'plan'

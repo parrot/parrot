@@ -14,7 +14,7 @@ TGE::Grammar - The base class for all tree grammars.
 
 .namespace [ 'TGE'; 'Grammar' ]
 
-.sub '__onload' :load
+.sub '__onload' :tag('load')
     # define the class
     .local pmc base
     newclass base, ['TGE';'Grammar']

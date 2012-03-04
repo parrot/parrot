@@ -405,13 +405,13 @@ OUT
 ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .pcc_sub :load _sub1:
+  .pcc_sub :tag('load') _sub1:
   say "in sub1"
   returncc
 EOF
 close $TEMP;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load')' );
 .pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
@@ -428,13 +428,13 @@ OUTPUT
 print $TEMP <<'EOF';
   .pcc_sub _error:
   say "error"
-  .pcc_sub :load _sub1:
+  .pcc_sub :tag('load') _sub1:
   say "in sub1"
   returncc
 EOF
 close $TEMP;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') second sub' );
 .pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
@@ -448,7 +448,7 @@ OUTPUT
 
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load in pbc' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') in pbc' );
 .pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pbc"
@@ -463,7 +463,7 @@ OUTPUT
 ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .pcc_sub :load _sub1:
+  .pcc_sub :tag('load') _sub1:
   say "in sub1"
   returncc
   .pcc_sub _sub2:
@@ -514,7 +514,7 @@ print $TEMP <<'EOF';
   .pcc_sub _sub1:
   say "in sub1"
   returncc
-  .pcc_sub :load _sub2:
+  .pcc_sub :tag('load') _sub2:
   print "in sub2\n"
   returncc
 EOF
@@ -559,10 +559,10 @@ OUTPUT
 ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .pcc_sub :load _sub1:
+  .pcc_sub :tag('load') _sub1:
   say "in sub1"
   returncc
-  .pcc_sub :load _sub2:
+  .pcc_sub :tag('load') _sub2:
   print "in sub2\n"
   returncc
 EOF
@@ -662,14 +662,14 @@ OUTPUT
 
 ($TEMP, $temp_pasm) = create_tempfile(UNLINK => 1);
 print $TEMP <<'EOF';
-.sub _sub1 :load
+.sub _sub1 :tag('load')
   say "in sub1"
   returncc
 .end
 EOF
 close $TEMP;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load first sub - pir' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') first sub - pir' );
 .pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
@@ -687,16 +687,16 @@ print $TEMP <<'EOF';
   print "error\n"
 .end
 
-# :load or other pragmas are only evaluated on the first
+# :tag('load') or other pragmas are only evaluated on the first
 # instruction of a subroutine
-.sub _sub1 :load
+.sub _sub1 :tag('load')
   say "in sub1"
   returncc
 .end
 EOF
 close $TEMP;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub - pir' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') second sub - pir' );
 .pcc_sub :main main:
     say "main"
     load_bytecode "$temp_pasm"
@@ -721,7 +721,7 @@ print $TEMP <<'EOF';
 EOF
 close $TEMP;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode no :load - pir' );
+pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode no :tag('load') - pir' );
 .pcc_sub :main _main:
     say "main"
     load_bytecode "$temp_pir"
@@ -942,11 +942,11 @@ OUTPUT
 (my $l1_pbc         = $l1_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
-.sub l11 :load
+.sub l11 :tag('load')
     print "l11\n"
 .end
 
-.sub l12 :load
+.sub l12 :tag('load')
     print "l12\n"
 .end
 EOF
@@ -956,11 +956,11 @@ close $TEMP;
 (my $l2_pbc         = $l2_pir) =~ s/\.pir/.pbc/;
 
 print $TEMP <<'EOF';
-.sub l21 :load
+.sub l21 :tag('load')
     print "l21\n"
 .end
 
-.sub l22 :load
+.sub l22 :tag('load')
     print "l22\n"
 .end
 EOF
@@ -969,7 +969,7 @@ close $TEMP;
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $l1_pbc, $l1_pir);
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $l2_pbc, $l2_pir);
 
-pir_output_is( <<"CODE", <<'OUTPUT', 'multiple :load' );
+pir_output_is( <<"CODE", <<'OUTPUT', 'multiple :tag('load')' );
 .sub main :main
     say "main 1"
     load_bytecode "$l1_pir"

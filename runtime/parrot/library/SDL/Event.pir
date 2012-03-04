@@ -40,7 +40,7 @@ The SDL::Event object has the following methods:
 
 .namespace [ 'SDL'; 'Event' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     .local pmc   event_class
 
     newclass     event_class, ['SDL'; 'Event']

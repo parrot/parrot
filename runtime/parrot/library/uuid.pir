@@ -22,7 +22,7 @@ For discussion about the source of entropy, see TT #64.
 
 .loadlib 'math_ops'
 
-.sub '__onload' :anon :load :init
+.sub '__onload' :anon :tag('load') :tag('init')
     $P0 = subclass 'FixedIntegerArray', 'uuid'
 .end
 

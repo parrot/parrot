@@ -28,7 +28,7 @@ object.
 
 .namespace []
 
-.sub '' :anon :load
+.sub '' :anon :tag('load')
     load_bytecode 'HLL.pbc'
 
     .local pmc hllns, parrotns, imports

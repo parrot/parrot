@@ -35,7 +35,7 @@ Currently implemented only for Array type PMCs. Expect Hash support shortly.
 
 .namespace ['Iter']
 
-.sub '__onload' :load
+.sub '__onload' :tag('load')
     $P0 = get_class 'Undef'
     $P1 = subclass $P0, 'Iter'
     addattribute $P1, 'aggregate'

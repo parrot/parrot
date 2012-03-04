@@ -366,7 +366,7 @@ OUT
 # "-o code.pbc -r -r" command line params.
 # Strangely, the same output is written
 pir_output_like( <<'CODE', <<'OUT', "more pragmas, syntax only" );
-.sub _main :main :load :postcomp
+.sub _main :main :tag('load') :postcomp
     print "ok\n"
 .end
 CODE

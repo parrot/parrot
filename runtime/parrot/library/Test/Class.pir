@@ -63,7 +63,7 @@ everything.
 
 .namespace [ 'Test'; 'Class' ]
 
-.sub '__init__' :load
+.sub '__init__' :tag('load')
     load_bytecode 'Test/More.pbc'
 
     .local pmc class

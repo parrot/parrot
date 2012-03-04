@@ -8,7 +8,7 @@ NQP::Compiler - NQP compiler
 
 =cut
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'P6Regex.pbc'
 .end
 
@@ -38,7 +38,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "" :load :init :subid("post378") :outer("10_1309998847.42912")
+.sub "" :tag('load') :tag('init') :subid("post378") :outer("10_1309998847.42912")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998847.42912" 
     .local pmc block
@@ -387,7 +387,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "" :load :init :subid("post379") :outer("11_1309998847.42912")
+.sub "" :tag('load') :tag('init') :subid("post379") :outer("11_1309998847.42912")
 .annotate 'line', 4
     .const 'Sub' $P1003 = "11_1309998847.42912" 
     .local pmc block
@@ -20490,7 +20490,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.sub "_block1963" :load :anon :subid("376_1309998847.42912")
+.sub "_block1963" :tag('load') :anon :subid("376_1309998847.42912")
 .annotate 'line', 4
     .const 'Sub' $P1965 = "11_1309998847.42912" 
     $P101 = $P1965()
@@ -20499,7 +20499,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "_block1967" :load :anon :subid("377_1309998847.42912")
+.sub "_block1967" :tag('load') :anon :subid("377_1309998847.42912")
 .annotate 'line', 1
     .const 'Sub' $P1969 = "10_1309998847.42912" 
     $P100 = $P1969()
@@ -20532,7 +20532,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "" :load :init :subid("post150") :outer("10_1309998850.8808")
+.sub "" :tag('load') :tag('init') :subid("post150") :outer("10_1309998850.8808")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998850.8808" 
     .local pmc block
@@ -20822,7 +20822,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "" :load :init :subid("post151") :outer("11_1309998850.8808")
+.sub "" :tag('load') :tag('init') :subid("post151") :outer("11_1309998850.8808")
 .annotate 'line', 3
     .const 'Sub' $P1003 = "11_1309998850.8808" 
     .local pmc block
@@ -21399,7 +21399,7 @@ NQP::Compiler - NQP compiler
     find_lex $P117, "$unit"
     $P118 = $P115."new"($P117 :named("value"))
     $P119 = $P114."new"($P118, "call" :named("pasttype"))
-    $P120 = $P113."new"($P119, ":load" :named("pirflags"), 0 :named("lexical"), "" :named("namespace"))
+    $P120 = $P113."new"($P119, ":tag('load')" :named("pirflags"), 0 :named("lexical"), "" :named("namespace"))
 .annotate 'line', 67
     $P112."push"($P120)
 .annotate 'line', 72
@@ -28282,7 +28282,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.sub "_block2005" :load :anon :subid("147_1309998850.8808")
+.sub "_block2005" :tag('load') :anon :subid("147_1309998850.8808")
 .annotate 'line', 3
     .const 'Sub' $P2007 = "11_1309998850.8808" 
     $P111 = $P2007()
@@ -28291,7 +28291,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace []
-.sub "_block2013" :load :anon :subid("149_1309998850.8808")
+.sub "_block2013" :tag('load') :anon :subid("149_1309998850.8808")
 .annotate 'line', 1
     .const 'Sub' $P2015 = "10_1309998850.8808" 
     $P100 = $P2015()
@@ -28345,7 +28345,7 @@ NQP::Compiler - NQP compiler
     print "\n"
 .end
 
-.sub '' :anon :init :load
+.sub '' :anon :tag('init') :tag('load')
     $P0 = box 0
     set_global '$test_counter', $P0
 .end
@@ -28354,7 +28354,7 @@ NQP::Compiler - NQP compiler
 
 .namespace ['NQP';'Compiler']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     .local pmc p6meta, nqpproto
     p6meta = get_hll_global 'P6metaclass'
     nqpproto = p6meta.'new_class'('NQP::Compiler', 'parent'=>'HLL::Compiler')

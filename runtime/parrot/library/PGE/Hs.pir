@@ -54,7 +54,7 @@ whole thing may be taken out or refactored away at any moment.
 
 .const string PGE_FAIL = "PGE_Fail"
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc load
     $P0 = get_class ['PGE';'Match']
 .end

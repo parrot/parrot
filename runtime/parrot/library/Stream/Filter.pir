@@ -21,7 +21,7 @@ TBD
 
 =cut
 
-.sub onload :load :anon
+.sub onload :tag('load') :anon
     .local int i
     .local pmc base
     .local pmc filter

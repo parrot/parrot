@@ -7,7 +7,7 @@
 .endm
 
 .namespace ['Curses']
-.sub __ncurses_init :load
+.sub __ncurses_init :tag('load')
 
 loadlib $P1, 'libform'
 if $P1 goto has_lib

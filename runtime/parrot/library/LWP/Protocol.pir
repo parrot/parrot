@@ -17,7 +17,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['LWP';'Protocol']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'osutils.pbc'
     load_bytecode 'HTTP/Message.pbc'
     $P0 = newclass ['LWP';'Protocol']
@@ -88,7 +88,7 @@ see http://search.cpan.org/dist/libwww-perl/
 .loadlib 'io_ops'
 .include 'stat.pasm'
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']
     .globalconst int RC_OK = 200
     .globalconst int RC_BAD_REQUEST = 400
@@ -281,7 +281,7 @@ see http://search.cpan.org/dist/libwww-perl/
 .include 'socket.pasm'
 .include 'cclass.pasm'
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
 .end
 

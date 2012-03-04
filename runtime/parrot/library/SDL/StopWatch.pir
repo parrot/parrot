@@ -34,7 +34,7 @@ An SDL::StopWatch object has the following methods:
 .include "iterator.pasm"
 .namespace ['SDL'; 'StopWatch']
 
-.sub __onload :load
+.sub __onload :tag('load')
     .local pmc class
     class = get_class ['SDL'; 'StopWatch']
     if_null class, create_class
@@ -250,7 +250,7 @@ It is drawn onto the screen consigned to the constructor.
 
 .namespace ['SDL'; 'StopWatch'; 'Timer']
 
-.sub __onload :load
+.sub __onload :tag('load')
     # XXX: an old array will be overwritten when loading this file again
     $P0 = new 'ResizablePMCArray'
     store_global ['SDL'; 'StopWatch'; 'Timer'], "array", $P0

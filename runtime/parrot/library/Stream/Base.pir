@@ -23,7 +23,7 @@ TBD
 
 .namespace ['Stream'; 'Base']
 
-.sub onload :load :anon
+.sub onload :tag('load') :anon
     $P0 = get_class ['Stream'; 'Base']
     unless null $P0 goto END
 

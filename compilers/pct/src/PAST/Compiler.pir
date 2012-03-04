@@ -51,7 +51,7 @@ any value type.
 .const int UNIQUE_BASE  = 1000
 
 
-.sub 'onload' :anon :load :init
+.sub 'onload' :anon :tag('load') :tag('init')
     load_bytecode 'PCT/HLLCompiler.pbc'
     .local pmc p6meta, cproto
     p6meta = new 'P6metaclass'
@@ -1220,7 +1220,7 @@ Return the POST representation of a C<PAST::Block>.
     unless $I0 goto loadinit_done
     .local pmc lisub
     $P0 = get_hll_global ['POST'], 'Sub'
-    lisub = $P0.'new'('outer'=>bpost, 'pirflags'=>':load :init')
+    lisub = $P0.'new'('outer'=>bpost, 'pirflags'=>':tag('load') :tag('init')')
     lisub.'push_pirop'(blockref)
     lisub.'push_pirop'('.local pmc', 'block')
     lisub.'push_pirop'('set', 'block', blockreg)

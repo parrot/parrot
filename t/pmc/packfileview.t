@@ -86,11 +86,11 @@
     is($P2, main_sub,"packfileview.main_sub returns the actual main sub")
 .end
 
-# We are executing this file as a program, so :load functions shouldn't be
+# We are executing this file as a program, so :tag('load') functions shouldn't be
 # triggered automatically. In the 'test_method_subs_by_tag' test, we do it
 # manually.
-.sub '__onload' :load
-    ok(1, "can manually trigger :load")
+.sub '__onload' :tag('load')
+    ok(1, "can manually trigger :tag('load')")
 .end
 .sub 'test_method_subs_by_tag'
     $P0 = getinterp

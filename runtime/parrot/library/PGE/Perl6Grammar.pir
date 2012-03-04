@@ -70,7 +70,7 @@ the output to the correct output file.
 .end
 
 
-.sub '__onload' :load :init
+.sub '__onload' :tag('load') :tag('init')
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Text.pbc'
     load_bytecode 'PGE/Util.pbc'
@@ -211,7 +211,7 @@ the output to the correct output file.
     .local pmc out
     out = new 'StringBuilder'
     if initpir == '' goto out_rule
-    out.'append_format'("      .sub '__onload' :load :init\n")
+    out.'append_format'("      .sub '__onload' :tag('load') :tag('init')\n")
     out.'append_format'("          .local pmc optable\n")
     out .= initpir
     out.'append_format'("          .return ()\n")

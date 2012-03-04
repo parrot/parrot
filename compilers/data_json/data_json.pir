@@ -31,7 +31,7 @@ the documentation at L<http://www.json.org/>.
 
 .HLL 'data_json'
 
-.sub '__onload' :load
+.sub '__onload' :tag('load')
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
     load_bytecode 'TGE.pbc'

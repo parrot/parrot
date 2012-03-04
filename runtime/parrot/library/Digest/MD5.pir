@@ -62,7 +62,7 @@ The MD5 class defines the following subroutines, which are very similar to the s
 # Interface definition
 
 # Export subroutines to globals
-.sub onload :load
+.sub onload :tag('load')
     .local pmc f
     f = get_hll_global ['Digest'], '_md5sum'
     set_global "_md5sum", f
@@ -75,7 +75,7 @@ The MD5 class defines the following subroutines, which are very similar to the s
 .namespace ['Digest';'MD5']
 
 # Create Object Oriented interface
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['Digest';'MD5']
     $P0.'add_attribute'('context')
 .end

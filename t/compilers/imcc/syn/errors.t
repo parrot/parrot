@@ -92,7 +92,7 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'warn about failing .loadl
     say "WTF"
 .end
 END_PIR
-/error:imcc:loadlib.*nosuch/
+/error:imcc:tag('load')lib.*nosuch/
 END_EXPECTED
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "Multi-stage rethrows produce an informative backtrace");

@@ -25,7 +25,7 @@ object.
 
 .HLL 'abc'
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :init
     load_bytecode 'PCT.pbc'
     load_bytecode 'P6Regex.pbc'
     load_bytecode 'nqp-rx.pbc'
@@ -55,7 +55,7 @@ object.
 
 .namespace [ 'abc'; 'Compiler' ]
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :init
     .local pmc abc
     $P0 = get_root_global ['parrot'], 'P6metaclass'
     abc = $P0.'new_class'('abc::Compiler', 'parent'=>'HLL::Compiler')

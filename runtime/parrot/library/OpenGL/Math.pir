@@ -60,7 +60,7 @@ order.
 
 =cut
 
-.sub _opengl_math_init :load
+.sub _opengl_math_init :tag('load')
     _create_classes()
 .end
 

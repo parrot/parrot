@@ -86,7 +86,7 @@ order.
 
 =cut
 
-.sub _opengl_init :load
+.sub _opengl_init :tag('load')
     load_bytecode 'OpenGL_funcs.pbc'
     _load_opengl_libs()
     _wrap_opengl_entry_points()
@@ -331,7 +331,7 @@ this library.
 Marks all OpenGL/GLU/GLUT functions as exported (to the default export tags,
 currently ALL and DEFAULT).  Unmangles callback names, so that the importing
 namespaces see the standard names instead of the mangled versions.  Called
-at :load time by _opengl_init().
+at :tag('load') time by _opengl_init().
 
 =cut
 

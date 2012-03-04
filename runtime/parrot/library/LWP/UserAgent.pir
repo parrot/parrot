@@ -17,7 +17,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['LWP';'UserAgent']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'URI.pbc'
     load_bytecode 'HTTP/Message.pbc'
     load_bytecode 'LWP/Protocol.pbc'

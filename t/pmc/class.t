@@ -804,7 +804,7 @@ t_class_meth:
 
 .namespace ["tt1497_Object"]
 
-.sub '__tt1497_init' :anon :load :init
+.sub '__tt1497_init' :anon :tag('load') :init
     $P0 = newclass "tt1497_Object"
     addattribute $P0, "state"
 .end

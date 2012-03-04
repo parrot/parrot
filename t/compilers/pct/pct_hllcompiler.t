@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .namespace [ 'NoneBuilder' ]
 
-.sub 'init' :anon :load :init
+.sub 'init' :anon :tag('load') :init
     load_bytecode 'P6object.pbc'
     $P0 = get_hll_global 'P6metaclass'
     $P1 = $P0.'new_class'('NoneBuilder', 'attr' => 'text')
@@ -79,7 +79,7 @@ pir_output_is( <<'CODE', <<'OUT', 'one complete start-to-end compiler' );
 
 .namespace [ 'NoneGrammar' ]
 
-.sub 'init' :anon :load :init
+.sub 'init' :anon :tag('load') :init
     load_bytecode 'P6object.pbc'
     $P0 = get_hll_global 'P6metaclass'
     $P1 = $P0.'new_class'('NoneGrammar')

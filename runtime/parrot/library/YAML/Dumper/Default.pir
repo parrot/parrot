@@ -17,7 +17,7 @@ This module provides the default output style of C<YAML::Dumper>.
 
 =cut
 
-.sub __library_data_dumper_default_onload :load
+.sub __library_data_dumper_default_onload :tag('load')
     .local pmc ydb_class
     ydb_class = get_class ['YAML'; 'Dumper'; 'Default']
     if null ydb_class goto create_ydb

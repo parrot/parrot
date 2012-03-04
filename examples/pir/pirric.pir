@@ -68,7 +68,7 @@
 .const int PIRRIC_ERROR_GOTO = 2
 
 #-----------------------------------------------------------------------
-.sub init :load :init
+.sub init :tag('load') :init
 
     warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 

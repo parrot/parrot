@@ -15,7 +15,7 @@ A basic class to hold defined attribute grammar rules.
 # Possibly better named "type", "name", "parent", "action/exec",
 # "copy/value"
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc base
     newclass base, ['TGE';'Rule']
     addattribute base, "type"   # node type that this rule applies to

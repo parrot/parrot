@@ -1,4 +1,4 @@
-# 
+#
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ This file brings together the various Regex modules needed for Regex.pbc .
 
 ### .include 'src/Regex/Cursor.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# 
+#
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ grammars.
 
 .namespace ['Regex';'Cursor']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'P6object.pbc'
     .local pmc p6meta
     p6meta = new 'P6metaclass'
@@ -360,7 +360,7 @@ provided, then the new cursor has the same type as lang.
     pos    = box CURSOR_FAIL
 
     setattribute cur, '$!from', from
-    setattribute cur, '$!pos', pos 
+    setattribute cur, '$!pos', pos
     setattribute cur, '$!target', target
     setattribute cur, '$!debug', debug
     if null cstack goto cstack_done
@@ -882,7 +882,7 @@ and the longest match is returned.
 =item !INTERPOLATE_REGEX(var)
 
 Same as C<!INTERPOLATE> above, except that any non-regex values
-are first compiled to regexes prior to being matched.  
+are first compiled to regexes prior to being matched.
 
 =cut
 
@@ -917,7 +917,7 @@ are first compiled to regexes prior to being matched.
   done:
     .tailcall self.'!INTERPOLATE'(var)
 .end
-    
+
 
 =back
 
@@ -954,7 +954,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/Regex/Cursor-builtins.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# 
+#
 
 =head1 NAME
 
@@ -1678,7 +1678,7 @@ tokrx hash.
 
 ### .include 'src/Regex/Match.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# 
+#
 
 =head1 NAME
 
@@ -1692,7 +1692,7 @@ This file implements Match objects for the regex engine.
 
 .namespace ['Regex';'Match']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'P6object.pbc'
     .local pmc p6meta
     p6meta = new 'P6metaclass'
@@ -1886,7 +1886,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/Regex/Method.pir'
 # Copyright (C) 2009, The Perl Foundation.
-# 
+#
 
 =head1 NAME
 
@@ -1894,14 +1894,14 @@ Regex::Regex, Regex::Method - Regex subs
 
 =head1 DESCRIPTION
 
-This file implements the Regex::Method and Regex::Regex types, used as 
+This file implements the Regex::Method and Regex::Regex types, used as
 containers for Regex subs that need .ACCEPTS and other regex attributes.
 
 =cut
 
 .namespace ['Regex';'Method']
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'P6object.pbc'
     .local pmc p6meta, mproto, rproto
     p6meta = new 'P6metaclass'
@@ -1971,7 +1971,7 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 ### .include 'src/Regex/Dumper.pir'
 # Copyright (C) 2005-2009, Parrot Foundation.
 # Copyright (C) 2009, The Perl Foundation.
-# 
+#
 
 =head1 TITLE
 
@@ -2195,7 +2195,7 @@ for regular expressions.
 
 .namespace ['PAST';'Regex']
 
-.sub '' :init :load
+.sub '' :tag('init') :tag('load')
     load_bytecode 'PCT/PAST.pbc'
     .local pmc p6meta
     p6meta = get_hll_global 'P6metaclass'
@@ -2492,7 +2492,7 @@ Copyright (C) 2009, The Perl Foundation.
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
 ### .include 'src/PAST/Compiler-Regex.pir'
-# 
+#
 
 =head1 NAME
 
@@ -3248,7 +3248,7 @@ character list.
 
     ops.'push_pirop'('inline', negate, subtype, 'inline'=>'  # rx enumcharlist negate=%0 %1')
 
-    if zerowidth goto skip_zero_1 
+    if zerowidth goto skip_zero_1
     ops.'push_pirop'('ge', pos, eos, fail)
   skip_zero_1:
     ops.'push_pirop'('sub', '$I10', pos, off)

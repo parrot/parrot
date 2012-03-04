@@ -23,7 +23,7 @@ automatically aggregated and output to STDOUT.
 
 .namespace ['TAP';'Harness']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'TAP/Parser.pbc'
     load_bytecode 'TAP/Formatter.pbc'
     $P0 = subclass ['TAP';'Base'], ['TAP';'Harness']
@@ -245,7 +245,7 @@ files or streams into an archive file (C<.tar.gz>).
 
 .namespace ['TAP';'Harness';'Archive']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Harness'], ['TAP';'Harness';'Archive']
     $P0.'add_attribute'('archive_file')
     $P0.'add_attribute'('archive_extra_files')

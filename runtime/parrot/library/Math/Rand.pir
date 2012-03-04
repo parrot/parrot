@@ -50,7 +50,7 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
 
 .namespace [ 'Math'; 'Rand' ]
 
-.sub '__onload' :anon :load
+.sub '__onload' :anon :tag('load')
     $P0 = box 1
     set_global 'next', $P0
 .end

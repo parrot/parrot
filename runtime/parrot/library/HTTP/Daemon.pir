@@ -47,7 +47,7 @@ at the pio.
 
 =cut
 
-.sub '_onload' :load
+.sub '_onload' :tag('load')
     .local pmc cl
     # server clsass
     cl = newclass ['HTTP'; 'Daemon']

@@ -1,7 +1,7 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
 # Begin generated code
 
-.sub initial_load_bytecode :anon :load :init
+.sub initial_load_bytecode :anon :tag('load') :tag('init')
     load_bytecode 'Getopt/Obj.pbc'
 .end
 
@@ -177,7 +177,7 @@
 
 .end # showhelp
 
-.sub Winxed_class_init :anon :load :init
+.sub Winxed_class_init :anon :tag('load') :tag('init')
     newclass $P0, [ 'WinxedDriverOptions' ]
     get_class $P1, [ 'Getopt'; 'Obj' ]
     addparent $P0, $P1

@@ -102,7 +102,7 @@ close $INC1;
 open my $INC2, '>', "inc_b.pir";
 print $INC2 <<'EOF';
 .namespace [ 'TclConst' ]
-.sub class_init :anon :load
+.sub class_init :anon :tag('load')
     $P0 = get_class 'String'
 .end
 EOF
@@ -111,7 +111,7 @@ close $INC2;
 open my $INC3, '>', "inc_c.pir";
 print $INC3 <<'EOF';
 .namespace [ 'TclDict' ]
-.sub class_init :anon :load :main
+.sub class_init :anon :tag('load') :main
     say "wut"
 .end
 EOF

@@ -3,7 +3,7 @@
 # Copyright (C) 2010, Parrot Foundation.
 
 INIT {
-    pir::load_bytecode('ProfTest.pbc');
+    pir::tag('load')_bytecode('ProfTest.pbc');
     Q:PIR{ .include "test_more.pir" };
 }
 

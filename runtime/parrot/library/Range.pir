@@ -32,13 +32,13 @@ L<http://perlcabal.org/syn/S03.html#Range_semantics>
   setattribute self, 'exhausted', exhausted
 .endm
 
-=head1 :load
+=head1 :tag('load')
 
 Create the class, with attributes, when this PBC is loaded.
 
 =cut
 
-.sub class_init :anon :load
+.sub class_init :anon :tag('load')
 
   $P1 = newclass 'Range'
 

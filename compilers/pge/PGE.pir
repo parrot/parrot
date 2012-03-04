@@ -8,7 +8,7 @@ PGE - the Parrot/Perl Grammar Engine
 
 This is the base file for the grammar engine.  It basically combines
 (via .include) each of the separate PGE modules into a single compilation
-unit, calling the subroutines marked with the C<:load> subpragma for each.
+unit, calling the subroutines marked with the C<:tag('load')> subpragma for each.
 
 =cut
 

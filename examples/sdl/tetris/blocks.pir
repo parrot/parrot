@@ -7,7 +7,7 @@ blocks.pir - tetris block classes
 
 .namespace ["Tetris::Blocks"]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::Block::1"
     unless null $P0 goto END
 

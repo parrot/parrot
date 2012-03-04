@@ -704,7 +704,7 @@ __src/@lang@.pir__
 
 .namespace []
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :init
     load_bytecode 'HLL.pbc'
 
     .local pmc hllns, parrotns, imports

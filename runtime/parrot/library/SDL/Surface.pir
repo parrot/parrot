@@ -33,7 +33,7 @@ All SDL::Surface objects have the following methods:
 
 .namespace [ 'SDL'; 'Surface' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     .local pmc class
     class = get_class ['SDL'; 'Surface']
     if_null class, create_class

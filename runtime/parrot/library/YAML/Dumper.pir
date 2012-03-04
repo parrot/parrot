@@ -1,6 +1,6 @@
 # Copyright (C) 2008-2009, Parrot Foundation.
 
-.sub __library_data_dumper_onload :load
+.sub __library_data_dumper_onload :tag('load')
     .local pmc yd_class
     yd_class = get_class ['YAML'; 'Dumper']
     if null yd_class goto load_library

@@ -1,7 +1,7 @@
 #! ./parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
 
-pir::load_bytecode("opsc.pbc");
+pir::tag('load')_bytecode("opsc.pbc");
 
 plan(22);
 

@@ -74,7 +74,7 @@ This class defines the following functions:
 
 .namespace [ 'Test'; 'More' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
     load_bytecode 'Test/Builder.pbc'
 
     .local pmc test

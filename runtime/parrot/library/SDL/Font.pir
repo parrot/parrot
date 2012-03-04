@@ -36,7 +36,7 @@ All SDL::Font objects have the following methods:
 
 .namespace [ 'SDL'; 'Font' ]
 
-.sub _sdl_init :load
+.sub _sdl_init :tag('load')
     .local pmc init_ttf
     init_ttf = get_hll_global ['SDL'], '_init_ttf'
     init_ttf()

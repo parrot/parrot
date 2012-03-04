@@ -72,7 +72,7 @@ consumption which should be resolved soon.
 
 # Export function entries to globals
 
-.sub onload :load
+.sub onload :tag('load')
 
     .local pmc f
     f = get_hll_global ['Digest'], '_sha256sum'
@@ -86,7 +86,7 @@ consumption which should be resolved soon.
 .namespace ['Digest';'SHA256']
 
 # Create Object Oriented interface
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['Digest';'SHA256']
     $P0.'add_attribute'('context')
 .end

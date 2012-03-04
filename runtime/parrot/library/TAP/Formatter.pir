@@ -20,7 +20,7 @@ Base class for harness output delegates
 
 .namespace ['TAP';'Formatter';'Base']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Formatter';'Base']
     $P0.'add_attribute'('verbosity')
     $P0.'add_attribute'('normalize')
@@ -404,7 +404,7 @@ Abstract base class for harness output delegate
 
 .namespace ['TAP';'Formatter';'Session']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['TAP';'Formatter';'Session']
     $P0.'add_attribute'('name')
     $P0.'add_attribute'('formatter')
@@ -567,7 +567,7 @@ Harness output delegate for default console output
 
 .namespace ['TAP';'Formatter';'Console']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Formatter';'Base'], ['TAP';'Formatter';'Console']
 .end
 
@@ -635,7 +635,7 @@ Harness output delegate for default console output
 
 .namespace ['TAP';'Formatter';'Console';'Session']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['TAP';'Formatter';'Session'], ['TAP';'Formatter';'Console';'Session']
     $P0.'add_attribute'('plan')
     $P0.'add_attribute'('newline_printed')

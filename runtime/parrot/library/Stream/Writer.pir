@@ -32,7 +32,7 @@ version 0.1
 .include "interpinfo.pasm"
 .namespace ['Stream'; 'Writer']
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class ['Stream'; 'Writer']
     unless null $P0 goto END
 

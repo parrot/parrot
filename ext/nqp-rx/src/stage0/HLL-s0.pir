@@ -13,7 +13,7 @@ and HLL::Grammar.
 
 =cut
 
-.sub '' :anon :load :init
+.sub '' :anon :tag('load') :tag('init')
     load_bytecode 'Regex.pbc'
 .end
 
@@ -194,7 +194,7 @@ memoize the line offsets as a C<!lineof> property on C<target>.
 # context and hash are then made available via package
 # variables.
 .namespace []
-.sub '&interactive_outer' :lex :init :load
+.sub '&interactive_outer' :lex :tag('init') :tag('load')
     .local pmc ctx, pad
     $P0 = getinterp
     ctx = $P0['context']
@@ -231,7 +231,7 @@ src/cheats/hll-grammar.pir -- Additional HLL::Grammar methods
 
 .namespace ['HLL';'Grammar']
 
-.sub '' :load :init
+.sub '' :tag('load') :tag('init')
     .local pmc brackets
     brackets = box unicode:"<>[](){}\xab\xbb\u0f3a\u0f3b\u0f3c\u0f3d\u169b\u169c\u2045\u2046\u207d\u207e\u208d\u208e\u2329\u232a\u2768\u2769\u276a\u276b\u276c\u276d\u276e\u276f\u2770\u2771\u2772\u2773\u2774\u2775\u27c5\u27c6\u27e6\u27e7\u27e8\u27e9\u27ea\u27eb\u2983\u2984\u2985\u2986\u2987\u2988\u2989\u298a\u298b\u298c\u298d\u298e\u298f\u2990\u2991\u2992\u2993\u2994\u2995\u2996\u2997\u2998\u29d8\u29d9\u29da\u29db\u29fc\u29fd\u3008\u3009\u300a\u300b\u300c\u300d\u300e\u300f\u3010\u3011\u3014\u3015\u3016\u3017\u3018\u3019\u301a\u301b\u301d\u301e\ufd3e\ufd3f\ufe17\ufe18\ufe35\ufe36\ufe37\ufe38\ufe39\ufe3a\ufe3b\ufe3c\ufe3d\ufe3e\ufe3f\ufe40\ufe41\ufe42\ufe43\ufe44\ufe47\ufe48\ufe59\ufe5a\ufe5b\ufe5c\ufe5d\ufe5e\uff08\uff09\uff3b\uff3d\uff5b\uff5d\uff5f\uff60\uff62\uff63"
     set_global '$!brackets', brackets
@@ -1016,7 +1016,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "" :load :init :subid("post108") :outer("10_1309998840.89449")
+.sub "" :tag('load') :tag('init') :subid("post108") :outer("10_1309998840.89449")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998840.89449" 
     .local pmc block
@@ -5551,7 +5551,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.sub "_block1231" :load :anon :subid("106_1309998840.89449")
+.sub "_block1231" :tag('load') :anon :subid("106_1309998840.89449")
 .annotate 'line', 5
     .const 'Sub' $P1233 = "11_1309998840.89449" 
     $P100 = $P1233()
@@ -5560,7 +5560,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "_block1234" :load :anon :subid("107_1309998840.89449")
+.sub "_block1234" :tag('load') :anon :subid("107_1309998840.89449")
 .annotate 'line', 1
     .const 'Sub' $P1236 = "10_1309998840.89449" 
     $P100 = $P1236()
@@ -5593,7 +5593,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "" :load :init :subid("post56") :outer("10_1309998841.74923")
+.sub "" :tag('load') :tag('init') :subid("post56") :outer("10_1309998841.74923")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998841.74923" 
     .local pmc block
@@ -7504,7 +7504,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.sub "_block1260" :load :anon :subid("54_1309998841.74923")
+.sub "_block1260" :tag('load') :anon :subid("54_1309998841.74923")
 .annotate 'line', 3
     .const 'Sub' $P1262 = "11_1309998841.74923" 
     $P100 = $P1262()
@@ -7513,7 +7513,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "_block1263" :load :anon :subid("55_1309998841.74923")
+.sub "_block1263" :tag('load') :anon :subid("55_1309998841.74923")
 .annotate 'line', 1
     .const 'Sub' $P1265 = "10_1309998841.74923" 
     $P100 = $P1265()
@@ -7546,7 +7546,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "" :load :init :subid("post37") :outer("10_1309998842.32047")
+.sub "" :tag('load') :tag('init') :subid("post37") :outer("10_1309998842.32047")
 .annotate 'line', 0
     .const 'Sub' $P1001 = "10_1309998842.32047" 
     .local pmc block
@@ -7600,7 +7600,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.sub "" :load :init :subid("post38") :outer("11_1309998842.32047")
+.sub "" :tag('load') :tag('init') :subid("post38") :outer("11_1309998842.32047")
 .annotate 'line', 6
     .const 'Sub' $P1003 = "11_1309998842.32047" 
     .local pmc block
@@ -8971,7 +8971,7 @@ An operator precedence parser.
 
 
 .namespace []
-.sub "_block1189" :load :anon :subid("36_1309998842.32047")
+.sub "_block1189" :tag('load') :anon :subid("36_1309998842.32047")
 .annotate 'line', 1
     .const 'Sub' $P1191 = "10_1309998842.32047" 
     $P100 = $P1191()

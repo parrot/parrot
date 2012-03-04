@@ -58,7 +58,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['HTTP';'Headers']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass 'Hash', ['HTTP';'Headers']
 .end
 
@@ -87,7 +87,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['HTTP';'Message']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['HTTP';'Message']
     $P0.'add_attribute'('headers')
     $P0.'add_attribute'('content')
@@ -170,7 +170,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .include 'cclass.pasm'
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'URI.pbc'
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Request']
     $P0.'add_attribute'('method')
@@ -505,7 +505,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['HTTP';'Response']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Response']
     $P0.'add_attribute'('code')
     $P0.'add_attribute'('message')

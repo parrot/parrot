@@ -33,7 +33,7 @@ open my $S, '>', "$temp_a.pir" or die "Can't write $temp_a.pir";
 print $S <<'EOF';
 .HLL "Foo"
 .namespace ["Foo_A"]
-.sub loada :load
+.sub loada :tag('load')
     $P0 = get_global ["Foo_A"], "A"
     print "ok 1\n"
     load_bytecode "temp_b.pbc"
@@ -47,7 +47,7 @@ close $S;
 open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
 print $S <<'EOF';
 .namespace ["Foo_B"]
-.sub loadb :load
+.sub loadb :tag('load')
     $P0 = get_global ["Foo_B"], "B"
     print "ok 2\n"
 .end
@@ -126,7 +126,7 @@ OUTPUT
     print $S <<'EOF';
 .HLL 'eek'
 
-.sub foo :load :anon
+.sub foo :tag('load') :anon
   $P1 = new ['String']
   $P1 = "3.14\n"
   set_global '$whee', $P1

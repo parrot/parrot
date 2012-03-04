@@ -3,7 +3,7 @@
 .HLL 'parrot'
 .namespace ['Parrot';'Compiler']
 
-.sub 'load' :anon :load :init
+.sub 'load' :anon :tag('load') :tag('init')
     # I'm not sure if this is completely right...
     .local pmc p6meta, c
     load_bytecode 'PCT.pbc'
@@ -158,7 +158,7 @@ Parrot-hosted languages
 
     # NameSpace MUST match path!
     .namespace ['Foo']
-    .sub 'load' :anon :load :init
+    .sub 'load' :anon :tag('load') :tag('init')
         .local pmc c
         load_language 'parrot'
         c = compreg 'parrot'

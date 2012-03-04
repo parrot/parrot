@@ -1,6 +1,6 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
-.sub __library_data_dumper_onload :load
+.sub __library_data_dumper_onload :tag('load')
     .local pmc dd_class
     dd_class = get_class ['Data'; 'Dumper']
     if null dd_class goto load_library

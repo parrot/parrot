@@ -4,8 +4,8 @@
 # "Comprehensive" test for creating PAST for C macros.
 # Parse single op and check various aspects of created PAST.
 
-pir::load_bytecode('opsc.pbc');
-pir::load_bytecode('dumper.pbc');
+pir::tag('load')_bytecode('opsc.pbc');
+pir::tag('load')_bytecode('dumper.pbc');
 
 Q:PIR{ .include "test_more.pir" };
 

@@ -42,7 +42,7 @@ An SDL::Button object has the following methods:
 
 .namespace ['SDL'; 'Button']
 
-.sub __onload :load
+.sub __onload :tag('load')
     .local pmc class
     class = get_class ['SDL'; 'Button']
     if_null class, define_class

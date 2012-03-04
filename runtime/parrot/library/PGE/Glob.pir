@@ -84,7 +84,7 @@ or the resulting PIR code (target='PIR').
 .end
 
 
-.sub '__onload' :load :init
+.sub '__onload' :tag('load') :tag('init')
     .local pmc optable
     load_bytecode 'PGE.pbc'
 

@@ -7,7 +7,7 @@ eventhandler.pir - a tetris event handler class
 
 .namespace ["Tetris::EventHandler"]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::EventHandler"
     unless null $P0 goto END
     load_bytecode "library/SDL/EventHandler.pir"

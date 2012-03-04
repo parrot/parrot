@@ -18,7 +18,7 @@ eventually handle indexing for faster tree searches.
 
 .namespace [ 'TGE'; 'Tree' ]
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     # define the class
     .local pmc base
     newclass base, ['TGE';'Tree']

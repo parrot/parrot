@@ -19,7 +19,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass 'String', 'URI'
 .end
 
@@ -106,7 +106,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI';'_generic']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['URI'], ['URI';'_generic']
 .end
 
@@ -245,7 +245,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI';'file']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['URI';'_generic'], ['URI';'file']
 .end
 
@@ -275,7 +275,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI';'_server']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['URI';'_generic'], ['URI';'_server']
 .end
 
@@ -356,7 +356,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI';'http']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['URI';'_server'], ['URI';'http']
 .end
 
@@ -370,7 +370,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 .namespace ['URI';'https']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['URI';'http'], ['URI';'https']
 .end
 

@@ -36,7 +36,7 @@ also included.
 
 .namespace [ 'PCT';'Grammar' ]
 
-.sub 'onload' :anon :init :load
+.sub 'onload' :anon :tag('init') :tag('load')
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Util.pbc'
     .local pmc p6meta

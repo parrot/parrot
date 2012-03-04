@@ -44,7 +44,7 @@ A SDL::Sprite object has the following methods:
 
 .namespace [ 'SDL'; 'Sprite' ]
 
-.sub _initialize :load
+.sub _initialize :tag('load')
 
     .local   pmc sprite_class
     newclass     sprite_class, ['SDL'; 'Sprite']

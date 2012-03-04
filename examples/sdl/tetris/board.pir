@@ -19,7 +19,7 @@ board.pir - a tetris board class.
 .namespace ["Tetris::Board"]
 .loadlib 'math_ops'
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class "Tetris::Board"
     unless null $P0 goto END
 

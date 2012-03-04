@@ -10,7 +10,7 @@ Branch - a sample branch node for Language::AttributeGrammar
 
 .namespace [ "Branch" ]
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc base
     newclass base, "Branch"
     addattribute base, "left"            # left child

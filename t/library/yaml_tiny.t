@@ -2,7 +2,7 @@
 
 # Testing of basic document structures
 
-pir::load_bytecode("YAML/Tiny.pbc");
+pir::tag('load')_bytecode("YAML/Tiny.pbc");
 
 Q:PIR {
         # We want Test::More features for testing. Not NQP's builtin.

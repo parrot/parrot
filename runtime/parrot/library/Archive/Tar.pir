@@ -46,7 +46,7 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
 
 .namespace ['Archive';'Tar';'File']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     load_bytecode 'osutils.pbc' # splitpath
     $P0 = newclass ['Archive';'Tar';'File']
     $P0.'add_attribute'('name')
@@ -382,7 +382,7 @@ Returns a new ['Archive';'Tar'] object.
 
 .namespace ['Archive';'Tar']
 
-.sub '' :init :load :anon
+.sub '' :tag('init') :tag('load') :anon
     $P0 = newclass ['Archive';'Tar']
     $P0.'add_attribute'('data')
 .end

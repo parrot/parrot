@@ -166,7 +166,7 @@ open my $OUTPUT, '>', "$to_file"   or die "Can't open up $to_file, error $!";
 
 # Have the library initialized on load
 print $OUTPUT <<EOR;
-.sub '' :anon :load
+.sub '' :anon :tag('load')
   .local pmc lib, nci
 EOR
 

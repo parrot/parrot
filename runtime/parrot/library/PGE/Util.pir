@@ -17,7 +17,7 @@ parsing tasks using PGE.
 
 .include 'cclass.pasm'
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PGE::Util', 'parent'=>'PGE::Grammar')

@@ -25,7 +25,7 @@ A YAML::Dumper::Base object has the following methods:
 
 =cut
 
-.sub __library_data_dumper_base_onload :load
+.sub __library_data_dumper_base_onload :tag('load')
     .local pmc ydb_class
     ydb_class = get_class ['YAML'; 'Dumper'; 'Base']
     if null ydb_class goto create_ydb

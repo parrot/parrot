@@ -10,7 +10,7 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 
 .namespace [ 'TGE'; 'Compiler' ]
 
-.sub __onload :load
+.sub __onload :tag('load')
     $P0 = get_class [ 'TGE'; 'Grammar' ]
     $P1 = subclass $P0, [ 'TGE'; 'Compiler' ]
 .end
@@ -408,7 +408,7 @@ loop_end:
     code .= type_key
   no_type:
     code .= "\n\n"
-    code .= ".sub '__onload' :load :init\n"
+    code .= ".sub '__onload' :tag('load') :tag('init')\n"
     code .= "    load_bytecode 'TGE.pbc'\n"
     code .= "    push_eh class_loaded\n"
     code .= "    $P1 = subclass "

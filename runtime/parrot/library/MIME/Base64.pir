@@ -46,7 +46,7 @@ then a warning is generated if perl is running under -w.
 
 .namespace [ "MIME"; "Base64" ]
 
-.sub init :load
+.sub init :tag('load')
 
     # Base64 encoded strings are made of printable 8bit long chars,
     # of which each carries 6 bit worth of information

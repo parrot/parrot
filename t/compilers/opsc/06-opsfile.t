@@ -1,8 +1,8 @@
 #!./parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
 
-pir::load_bytecode("opsc.pbc");
-pir::load_bytecode("nqp-setting.pbc");
+pir::tag('load')_bytecode("opsc.pbc");
+pir::tag('load')_bytecode("nqp-setting.pbc");
 
 Q:PIR {
     .include "test_more.pir"

@@ -12,7 +12,7 @@ for compiling programs in Parrot.
 
 .namespace [ 'POST' ]
 
-.sub '__onload' :load :init
+.sub '__onload' :tag('load') :tag('init')
     .local pmc p6meta, base
 
     ##  create POST classes

@@ -35,7 +35,7 @@ By using C<clone>, you can read data from a stream as often as you want.
 
 .namespace ['Stream'; 'Replay']
 
-.sub onload :load :anon
+.sub onload :tag('load') :anon
     $P0 = get_class ['Stream'; 'Replay']
     unless null $P0 goto END
 

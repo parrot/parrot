@@ -10,7 +10,7 @@ Leaf - a sample leaf node for Language::AttributeGrammar
 
 .namespace [ "Leaf" ]
 
-.sub "__onload" :load
+.sub "__onload" :tag('load')
     .local pmc base
     newclass base, "Leaf"
     addattribute base, "value"   # the value of the leaf node

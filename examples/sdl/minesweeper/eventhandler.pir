@@ -19,7 +19,7 @@ This is a simple SDL event handler class.
 
 .namespace ["Mines::EventHandler"]
 
-.sub __onload :load
+.sub __onload :tag('load')
 
     $P0 = get_class "Mines::EventHandler"
     unless null $P0 goto END
