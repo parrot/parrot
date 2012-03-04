@@ -87,10 +87,15 @@ sub _generate_proxy_method {
         map { s/.*\b(\w+)/$1/; $_ } split /,\s*/, $method->parameters;
     my $call = 'VTABLE_' . $method->name . "($parameters)";
 
-    $call = "Parrot_pmc_new_init(PARROT_PROXY(SELF)->interp, enum_class_Proxy,\n"
-        . "        $call)" if $method->return_type eq 'PMC*';
+    my $body = $method->return_type eq 'PMC*'
+        ? <<BODY
+    PMC * result = $call;
 
-    my $body = "    return $call;\n";
+    return (PMC_IS_NULL(result)
+        ? PMCNULL
+        : Parrot_pmc_new_init(PARROT_PROXY(SELF)->interp, enum_class_Proxy, result));
+BODY
+        : "    return $call;\n";
 
     $clone->body( Parrot::Pmc2c::Emitter->text($body));
 
