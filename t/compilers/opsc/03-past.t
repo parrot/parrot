@@ -5,8 +5,8 @@
 # "Comprehensive" test for creating PAST for op.
 # Parse single op and check various aspects of created PAST.
 
-pir::tag('load')_bytecode('opsc.pbc');
-pir::tag('load')_bytecode('dumper.pbc');
+pir::load_bytecode('opsc.pbc');
+pir::load_bytecode('dumper.pbc');
 
 Q:PIR{ .include "test_more.pir" };
 

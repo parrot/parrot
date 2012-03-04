@@ -17,7 +17,7 @@ A module author just must write a script C<setup.pir> or C<setup.nqp>.
 
 A setup script can be as simple as this:
 
-    pir::tag('load')_bytecode('distutils.pir');
+    pir::load_bytecode('distutils.pir');
     setup( @steps,
         ... many key/values here ...
     );

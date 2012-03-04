@@ -430,7 +430,7 @@ sub _parse($c, $buf) {
 }
 
 INIT {
-    pir::tag('load')_bytecode("dumper.pbc");
+    pir::load_bytecode("dumper.pbc");
 }
 
 # vim: ft=perl6

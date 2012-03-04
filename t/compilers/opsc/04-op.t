@@ -3,7 +3,7 @@
 
 # Checking Ops::Op
 
-pir::tag('load')_bytecode("opsc.pbc");
+pir::load_bytecode("opsc.pbc");
 
 plan(7);
 
