@@ -22080,7 +22080,7 @@
   __label_4: # endfor
   __label_2:
   __label_1:
-    __ARG_1.'say'('.sub Winxed_class_init :anon :tag('load') :tag('init')')
+    __ARG_1.'say'('.sub Winxed_class_init :anon :tag("load") :tag("init")')
     $P8 = self.'getclasskey'()
     __ARG_1.'say'('    ', 'newclass $P0, ', $P8)
     set $I1, 1

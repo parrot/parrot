@@ -640,8 +640,7 @@ Sort the array and return self.
             INTVAL *int_array;
             GET_ATTR_int_array(INTERP, SELF, int_array);
             if (PMC_IS_NULL(cmp_func))
-                qsort(int_array, n, sizeof (INTVAL),
-                        (int (*)(const void *, const void*))auxcmpfunc);
+                Parrot_util_quicksort_intarray(INTERP, SELF, int_array, n);
             else
                 Parrot_util_quicksort(INTERP, (void**)int_array, n, cmp_func, "II->I");
         }
@@ -675,30 +674,6 @@ Reverse the contents of the array.
         }
     }
 
-}
-
-/*
-
-=back
-
-=head2 Auxiliary functions
-
-=over 4
-
-=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
-
-INTVAL compare function for qsort usage.
-
-=cut
-
-*/
-
-PARROT_PURE_FUNCTION
-static int
-auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
-{
-    ASSERT_ARGS(auxcmpfunc)
-    return *i - *j;
 }
 
 /*

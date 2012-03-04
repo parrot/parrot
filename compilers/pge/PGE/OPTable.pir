@@ -33,6 +33,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .sub '__onload' :tag('load')
     .local pmc p6meta
+
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PGE::OPTable', 'parent'=>'Hash', 'attr'=>'%!key %!klen &!ws')
 

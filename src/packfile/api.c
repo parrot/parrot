@@ -402,6 +402,8 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
         opcode_t flag_idx = -1;
+        PMC * const indices = Parrot_pmc_new(interp, enum_class_ResizableIntegerArray);
+        INTVAL num_indices;
 
         int bottom_lo, bottom_hi, top_lo, top_hi, cur;
         int i;
@@ -453,7 +455,13 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 
       done_find_bounds:
         for (i = bottom_lo; i < top_hi; i++)
-            VTABLE_push_pmc(interp, subs, ct->pmc.constants[ct->tag_map[i].const_idx]);
+            VTABLE_push_integer(interp, indices, ct->tag_map[i].const_idx);
+        num_indices = VTABLE_elements(interp, indices);
+        Parrot_util_quicksort_intarray(interp, indices, NULL, num_indices);
+        for (i = 0; i < num_indices; i++) {
+            const INTVAL idx = VTABLE_get_integer_keyed_int(interp, indices, i);
+            VTABLE_push_pmc(interp, subs, ct->pmc.constants[idx]);
+        }
     }
     return subs;
 }

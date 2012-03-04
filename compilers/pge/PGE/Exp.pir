@@ -22,8 +22,8 @@ PGE::Exp - base class for expressions
 .sub "__onload" :tag('load')
     .local pmc optable
     .local pmc term
-
     .local pmc p6meta, expproto
+
     p6meta = get_hll_global 'P6metaclass'
     expproto = p6meta.'new_class'('PGE::Exp', 'parent'=>'PGE::Match')
     p6meta.'new_class'('PGE::Exp::Literal',      'parent'=>expproto)
@@ -44,9 +44,28 @@ PGE::Exp - base class for expressions
     p6meta.'new_class'('PGE::Exp::Closure',      'parent'=>expproto)
     p6meta.'new_class'('PGE::Exp::Action',       'parent'=>expproto)
 
-    load_bytecode 'PGE/Util.pbc'
+    '__load_bytecode'('PGE/Util.pbc', 'load')
 .end
 
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tag
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+.end
 
 =over 4
 

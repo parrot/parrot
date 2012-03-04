@@ -13,9 +13,29 @@ running compilers from a command line.
 
 =cut
 
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tag
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+.end
+
 .sub 'onload' :anon :tag('load') :tag('init')
-    load_bytecode 'P6object.pbc'
-    load_bytecode 'Parrot/Exception.pbc'
+    '__load_bytecode'('P6object.pbc', 'load')
+    '__load_bytecode'('Parrot/Exception.pbc', 'load')
     $P0 = new 'P6metaclass'
     $S0 = '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version $compiler_progname'
     $P0.'new_class'('PCT::HLLCompiler', 'attr'=>$S0)
@@ -782,7 +802,7 @@ Performs option processing of command-line args
 .sub 'process_args' :method
     .param pmc args
 
-    load_bytecode 'Getopt/Obj.pbc'
+    '__load_bytecode'('Getopt/Obj.pbc', 'load')
 
     .local string arg0
     arg0 = shift args
@@ -827,8 +847,8 @@ Generic method for compilers invoked from a shell command line.
     exit 0
   not_harness:
 
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
+    '__load_bytecode'('dumper.pbc', 'load')
+    '__load_bytecode'('PGE/Dumper.pbc', 'load')
 
     ##  get the name of the program
     .local string arg0
@@ -1046,7 +1066,7 @@ Dump C<obj> with C<name> according to C<options>.
     .tailcall '_dumper'(obj, name)
 
   load_dumper:
-    load_bytecode 'PCT/Dumper.pbc'
+    '__load_bytecode'('PCT/Dumper.pbc', 'load')
     $S0 = downcase $S0
     $P0 = get_hll_global ['PCT';'Dumper'], $S0
     .tailcall $P0(obj, name)

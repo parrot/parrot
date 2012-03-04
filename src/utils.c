@@ -20,6 +20,7 @@ Opcode helper functions that don't really fit elsewhere.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_resizableintegerarray.h"
 
 typedef unsigned short _rand_buf[3];
 
@@ -60,6 +61,11 @@ static INTVAL COMPARE(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 static void next_rand(_rand_buf X);
+PARROT_PURE_FUNCTION
+static int ria_auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS__drand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS__erand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS__jrand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -74,6 +80,9 @@ static void next_rand(_rand_buf X);
     , PARROT_ASSERT_ARG(cmp) \
     , PARROT_ASSERT_ARG(cmp_signature))
 #define ASSERT_ARGS_next_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_ria_auxcmpfunc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(i) \
+    , PARROT_ASSERT_ARG(j))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -753,6 +762,38 @@ Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n,
             n = ln;
         }
     }
+}
+
+void
+Parrot_util_quicksort_intarray(PARROT_INTERP, ARGMOD_NULLOK(PMC * ria_pmc),
+    ARGMOD_NULLOK(INTVAL *int_array), INTVAL n)
+{
+    if (!int_array && !PMC_IS_NULL(ria_pmc))
+        GETATTR_ResizableIntegerArray_int_array(interp, ria_pmc, int_array);
+
+    if (!int_array || n == 0)
+        return;
+
+    qsort(int_array, n, sizeof (INTVAL),
+                        (int (*)(const void *, const void*))ria_auxcmpfunc);
+}
+
+/*
+
+=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
+
+INTVAL compare function for qsort usage.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+static int
+ria_auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+{
+    //ASSERT_ARGS(auxcmpfunc)
+    return *i - *j;
 }
 
 /*

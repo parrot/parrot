@@ -9,7 +9,29 @@ NQP::Compiler - NQP compiler
 =cut
 
 .sub '' :anon :tag('load') :tag('init')
-    load_bytecode 'P6Regex.pbc'
+    '__load_bytecode'('P6object.pbc', 'load')
+    '__load_bytecode'('P6Regex.pbc', 'load')
+.end
+
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
 .end
 
 ### .include 'gen/nqp-grammar.pir'
@@ -17,7 +39,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "_block1000"  :anon :subid("10_1309998847.42912")
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1309998847.42912" 
+    .const 'Sub' $P1003 = "11_1309998847.42912"
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -27,12 +49,12 @@ NQP::Compiler - NQP compiler
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 4
-    .const 'Sub' $P1003 = "11_1309998847.42912" 
+    .const 'Sub' $P1003 = "11_1309998847.42912"
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1968 = "377_1309998847.42912" 
+    .const 'Sub' $P1968 = "377_1309998847.42912"
     .return ($P1968)
 .end
 
@@ -40,7 +62,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "" :tag('load') :tag('init') :subid("post378") :outer("10_1309998847.42912")
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1309998847.42912" 
+    .const 'Sub' $P1001 = "10_1309998847.42912"
     .local pmc block
     set block, $P1001
     $P1970 = get_root_global ["parrot"], "P6metaclass"
@@ -51,323 +73,323 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "_block1002"  :subid("11_1309998847.42912") :outer("10_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1911 = "355_1309998847.42912" 
+    .const 'Sub' $P1911 = "355_1309998847.42912"
     capture_lex $P1911
-    .const 'Sub' $P1901 = "354_1309998847.42912" 
+    .const 'Sub' $P1901 = "354_1309998847.42912"
     capture_lex $P1901
-    .const 'Sub' $P1896 = "352_1309998847.42912" 
+    .const 'Sub' $P1896 = "352_1309998847.42912"
     capture_lex $P1896
-    .const 'Sub' $P1891 = "350_1309998847.42912" 
+    .const 'Sub' $P1891 = "350_1309998847.42912"
     capture_lex $P1891
-    .const 'Sub' $P1886 = "348_1309998847.42912" 
+    .const 'Sub' $P1886 = "348_1309998847.42912"
     capture_lex $P1886
-    .const 'Sub' $P1881 = "346_1309998847.42912" 
+    .const 'Sub' $P1881 = "346_1309998847.42912"
     capture_lex $P1881
-    .const 'Sub' $P1876 = "344_1309998847.42912" 
+    .const 'Sub' $P1876 = "344_1309998847.42912"
     capture_lex $P1876
-    .const 'Sub' $P1871 = "342_1309998847.42912" 
+    .const 'Sub' $P1871 = "342_1309998847.42912"
     capture_lex $P1871
-    .const 'Sub' $P1866 = "340_1309998847.42912" 
+    .const 'Sub' $P1866 = "340_1309998847.42912"
     capture_lex $P1866
-    .const 'Sub' $P1861 = "338_1309998847.42912" 
+    .const 'Sub' $P1861 = "338_1309998847.42912"
     capture_lex $P1861
-    .const 'Sub' $P1856 = "336_1309998847.42912" 
+    .const 'Sub' $P1856 = "336_1309998847.42912"
     capture_lex $P1856
-    .const 'Sub' $P1852 = "334_1309998847.42912" 
+    .const 'Sub' $P1852 = "334_1309998847.42912"
     capture_lex $P1852
-    .const 'Sub' $P1847 = "332_1309998847.42912" 
+    .const 'Sub' $P1847 = "332_1309998847.42912"
     capture_lex $P1847
-    .const 'Sub' $P1842 = "330_1309998847.42912" 
+    .const 'Sub' $P1842 = "330_1309998847.42912"
     capture_lex $P1842
-    .const 'Sub' $P1837 = "328_1309998847.42912" 
+    .const 'Sub' $P1837 = "328_1309998847.42912"
     capture_lex $P1837
-    .const 'Sub' $P1832 = "326_1309998847.42912" 
+    .const 'Sub' $P1832 = "326_1309998847.42912"
     capture_lex $P1832
-    .const 'Sub' $P1827 = "324_1309998847.42912" 
+    .const 'Sub' $P1827 = "324_1309998847.42912"
     capture_lex $P1827
-    .const 'Sub' $P1822 = "322_1309998847.42912" 
+    .const 'Sub' $P1822 = "322_1309998847.42912"
     capture_lex $P1822
-    .const 'Sub' $P1817 = "320_1309998847.42912" 
+    .const 'Sub' $P1817 = "320_1309998847.42912"
     capture_lex $P1817
-    .const 'Sub' $P1812 = "318_1309998847.42912" 
+    .const 'Sub' $P1812 = "318_1309998847.42912"
     capture_lex $P1812
-    .const 'Sub' $P1807 = "316_1309998847.42912" 
+    .const 'Sub' $P1807 = "316_1309998847.42912"
     capture_lex $P1807
-    .const 'Sub' $P1802 = "314_1309998847.42912" 
+    .const 'Sub' $P1802 = "314_1309998847.42912"
     capture_lex $P1802
-    .const 'Sub' $P1797 = "312_1309998847.42912" 
+    .const 'Sub' $P1797 = "312_1309998847.42912"
     capture_lex $P1797
-    .const 'Sub' $P1792 = "310_1309998847.42912" 
+    .const 'Sub' $P1792 = "310_1309998847.42912"
     capture_lex $P1792
-    .const 'Sub' $P1787 = "308_1309998847.42912" 
+    .const 'Sub' $P1787 = "308_1309998847.42912"
     capture_lex $P1787
-    .const 'Sub' $P1782 = "306_1309998847.42912" 
+    .const 'Sub' $P1782 = "306_1309998847.42912"
     capture_lex $P1782
-    .const 'Sub' $P1777 = "304_1309998847.42912" 
+    .const 'Sub' $P1777 = "304_1309998847.42912"
     capture_lex $P1777
-    .const 'Sub' $P1772 = "302_1309998847.42912" 
+    .const 'Sub' $P1772 = "302_1309998847.42912"
     capture_lex $P1772
-    .const 'Sub' $P1767 = "300_1309998847.42912" 
+    .const 'Sub' $P1767 = "300_1309998847.42912"
     capture_lex $P1767
-    .const 'Sub' $P1762 = "298_1309998847.42912" 
+    .const 'Sub' $P1762 = "298_1309998847.42912"
     capture_lex $P1762
-    .const 'Sub' $P1757 = "296_1309998847.42912" 
+    .const 'Sub' $P1757 = "296_1309998847.42912"
     capture_lex $P1757
-    .const 'Sub' $P1752 = "294_1309998847.42912" 
+    .const 'Sub' $P1752 = "294_1309998847.42912"
     capture_lex $P1752
-    .const 'Sub' $P1747 = "292_1309998847.42912" 
+    .const 'Sub' $P1747 = "292_1309998847.42912"
     capture_lex $P1747
-    .const 'Sub' $P1742 = "290_1309998847.42912" 
+    .const 'Sub' $P1742 = "290_1309998847.42912"
     capture_lex $P1742
-    .const 'Sub' $P1737 = "288_1309998847.42912" 
+    .const 'Sub' $P1737 = "288_1309998847.42912"
     capture_lex $P1737
-    .const 'Sub' $P1732 = "286_1309998847.42912" 
+    .const 'Sub' $P1732 = "286_1309998847.42912"
     capture_lex $P1732
-    .const 'Sub' $P1727 = "284_1309998847.42912" 
+    .const 'Sub' $P1727 = "284_1309998847.42912"
     capture_lex $P1727
-    .const 'Sub' $P1722 = "282_1309998847.42912" 
+    .const 'Sub' $P1722 = "282_1309998847.42912"
     capture_lex $P1722
-    .const 'Sub' $P1717 = "280_1309998847.42912" 
+    .const 'Sub' $P1717 = "280_1309998847.42912"
     capture_lex $P1717
-    .const 'Sub' $P1712 = "278_1309998847.42912" 
+    .const 'Sub' $P1712 = "278_1309998847.42912"
     capture_lex $P1712
-    .const 'Sub' $P1707 = "276_1309998847.42912" 
+    .const 'Sub' $P1707 = "276_1309998847.42912"
     capture_lex $P1707
-    .const 'Sub' $P1702 = "274_1309998847.42912" 
+    .const 'Sub' $P1702 = "274_1309998847.42912"
     capture_lex $P1702
-    .const 'Sub' $P1697 = "272_1309998847.42912" 
+    .const 'Sub' $P1697 = "272_1309998847.42912"
     capture_lex $P1697
-    .const 'Sub' $P1692 = "270_1309998847.42912" 
+    .const 'Sub' $P1692 = "270_1309998847.42912"
     capture_lex $P1692
-    .const 'Sub' $P1687 = "268_1309998847.42912" 
+    .const 'Sub' $P1687 = "268_1309998847.42912"
     capture_lex $P1687
-    .const 'Sub' $P1682 = "266_1309998847.42912" 
+    .const 'Sub' $P1682 = "266_1309998847.42912"
     capture_lex $P1682
-    .const 'Sub' $P1677 = "264_1309998847.42912" 
+    .const 'Sub' $P1677 = "264_1309998847.42912"
     capture_lex $P1677
-    .const 'Sub' $P1672 = "262_1309998847.42912" 
+    .const 'Sub' $P1672 = "262_1309998847.42912"
     capture_lex $P1672
-    .const 'Sub' $P1667 = "260_1309998847.42912" 
+    .const 'Sub' $P1667 = "260_1309998847.42912"
     capture_lex $P1667
-    .const 'Sub' $P1663 = "258_1309998847.42912" 
+    .const 'Sub' $P1663 = "258_1309998847.42912"
     capture_lex $P1663
-    .const 'Sub' $P1659 = "256_1309998847.42912" 
+    .const 'Sub' $P1659 = "256_1309998847.42912"
     capture_lex $P1659
-    .const 'Sub' $P1655 = "254_1309998847.42912" 
+    .const 'Sub' $P1655 = "254_1309998847.42912"
     capture_lex $P1655
-    .const 'Sub' $P1651 = "252_1309998847.42912" 
+    .const 'Sub' $P1651 = "252_1309998847.42912"
     capture_lex $P1651
-    .const 'Sub' $P1647 = "250_1309998847.42912" 
+    .const 'Sub' $P1647 = "250_1309998847.42912"
     capture_lex $P1647
-    .const 'Sub' $P1643 = "248_1309998847.42912" 
+    .const 'Sub' $P1643 = "248_1309998847.42912"
     capture_lex $P1643
-    .const 'Sub' $P1639 = "246_1309998847.42912" 
+    .const 'Sub' $P1639 = "246_1309998847.42912"
     capture_lex $P1639
-    .const 'Sub' $P1635 = "244_1309998847.42912" 
+    .const 'Sub' $P1635 = "244_1309998847.42912"
     capture_lex $P1635
-    .const 'Sub' $P1629 = "242_1309998847.42912" 
+    .const 'Sub' $P1629 = "242_1309998847.42912"
     capture_lex $P1629
-    .const 'Sub' $P1625 = "240_1309998847.42912" 
+    .const 'Sub' $P1625 = "240_1309998847.42912"
     capture_lex $P1625
-    .const 'Sub' $P1621 = "238_1309998847.42912" 
+    .const 'Sub' $P1621 = "238_1309998847.42912"
     capture_lex $P1621
-    .const 'Sub' $P1617 = "236_1309998847.42912" 
+    .const 'Sub' $P1617 = "236_1309998847.42912"
     capture_lex $P1617
-    .const 'Sub' $P1611 = "234_1309998847.42912" 
+    .const 'Sub' $P1611 = "234_1309998847.42912"
     capture_lex $P1611
-    .const 'Sub' $P1605 = "232_1309998847.42912" 
+    .const 'Sub' $P1605 = "232_1309998847.42912"
     capture_lex $P1605
-    .const 'Sub' $P1601 = "230_1309998847.42912" 
+    .const 'Sub' $P1601 = "230_1309998847.42912"
     capture_lex $P1601
-    .const 'Sub' $P1597 = "228_1309998847.42912" 
+    .const 'Sub' $P1597 = "228_1309998847.42912"
     capture_lex $P1597
-    .const 'Sub' $P1593 = "226_1309998847.42912" 
+    .const 'Sub' $P1593 = "226_1309998847.42912"
     capture_lex $P1593
-    .const 'Sub' $P1589 = "224_1309998847.42912" 
+    .const 'Sub' $P1589 = "224_1309998847.42912"
     capture_lex $P1589
-    .const 'Sub' $P1585 = "222_1309998847.42912" 
+    .const 'Sub' $P1585 = "222_1309998847.42912"
     capture_lex $P1585
-    .const 'Sub' $P1581 = "220_1309998847.42912" 
+    .const 'Sub' $P1581 = "220_1309998847.42912"
     capture_lex $P1581
-    .const 'Sub' $P1577 = "218_1309998847.42912" 
+    .const 'Sub' $P1577 = "218_1309998847.42912"
     capture_lex $P1577
-    .const 'Sub' $P1573 = "216_1309998847.42912" 
+    .const 'Sub' $P1573 = "216_1309998847.42912"
     capture_lex $P1573
-    .const 'Sub' $P1569 = "214_1309998847.42912" 
+    .const 'Sub' $P1569 = "214_1309998847.42912"
     capture_lex $P1569
-    .const 'Sub' $P1565 = "212_1309998847.42912" 
+    .const 'Sub' $P1565 = "212_1309998847.42912"
     capture_lex $P1565
-    .const 'Sub' $P1556 = "208_1309998847.42912" 
+    .const 'Sub' $P1556 = "208_1309998847.42912"
     capture_lex $P1556
-    .const 'Sub' $P1551 = "206_1309998847.42912" 
+    .const 'Sub' $P1551 = "206_1309998847.42912"
     capture_lex $P1551
-    .const 'Sub' $P1547 = "204_1309998847.42912" 
+    .const 'Sub' $P1547 = "204_1309998847.42912"
     capture_lex $P1547
-    .const 'Sub' $P1542 = "202_1309998847.42912" 
+    .const 'Sub' $P1542 = "202_1309998847.42912"
     capture_lex $P1542
-    .const 'Sub' $P1538 = "200_1309998847.42912" 
+    .const 'Sub' $P1538 = "200_1309998847.42912"
     capture_lex $P1538
-    .const 'Sub' $P1531 = "198_1309998847.42912" 
+    .const 'Sub' $P1531 = "198_1309998847.42912"
     capture_lex $P1531
-    .const 'Sub' $P1525 = "196_1309998847.42912" 
+    .const 'Sub' $P1525 = "196_1309998847.42912"
     capture_lex $P1525
-    .const 'Sub' $P1521 = "194_1309998847.42912" 
+    .const 'Sub' $P1521 = "194_1309998847.42912"
     capture_lex $P1521
-    .const 'Sub' $P1516 = "192_1309998847.42912" 
+    .const 'Sub' $P1516 = "192_1309998847.42912"
     capture_lex $P1516
-    .const 'Sub' $P1506 = "188_1309998847.42912" 
+    .const 'Sub' $P1506 = "188_1309998847.42912"
     capture_lex $P1506
-    .const 'Sub' $P1495 = "186_1309998847.42912" 
+    .const 'Sub' $P1495 = "186_1309998847.42912"
     capture_lex $P1495
-    .const 'Sub' $P1488 = "184_1309998847.42912" 
+    .const 'Sub' $P1488 = "184_1309998847.42912"
     capture_lex $P1488
-    .const 'Sub' $P1482 = "180_1309998847.42912" 
+    .const 'Sub' $P1482 = "180_1309998847.42912"
     capture_lex $P1482
-    .const 'Sub' $P1478 = "178_1309998847.42912" 
+    .const 'Sub' $P1478 = "178_1309998847.42912"
     capture_lex $P1478
-    .const 'Sub' $P1474 = "176_1309998847.42912" 
+    .const 'Sub' $P1474 = "176_1309998847.42912"
     capture_lex $P1474
-    .const 'Sub' $P1466 = "174_1309998847.42912" 
+    .const 'Sub' $P1466 = "174_1309998847.42912"
     capture_lex $P1466
-    .const 'Sub' $P1454 = "172_1309998847.42912" 
+    .const 'Sub' $P1454 = "172_1309998847.42912"
     capture_lex $P1454
-    .const 'Sub' $P1448 = "170_1309998847.42912" 
+    .const 'Sub' $P1448 = "170_1309998847.42912"
     capture_lex $P1448
-    .const 'Sub' $P1443 = "168_1309998847.42912" 
+    .const 'Sub' $P1443 = "168_1309998847.42912"
     capture_lex $P1443
-    .const 'Sub' $P1436 = "166_1309998847.42912" 
+    .const 'Sub' $P1436 = "166_1309998847.42912"
     capture_lex $P1436
-    .const 'Sub' $P1425 = "162_1309998847.42912" 
+    .const 'Sub' $P1425 = "162_1309998847.42912"
     capture_lex $P1425
-    .const 'Sub' $P1415 = "160_1309998847.42912" 
+    .const 'Sub' $P1415 = "160_1309998847.42912"
     capture_lex $P1415
-    .const 'Sub' $P1410 = "158_1309998847.42912" 
+    .const 'Sub' $P1410 = "158_1309998847.42912"
     capture_lex $P1410
-    .const 'Sub' $P1405 = "156_1309998847.42912" 
+    .const 'Sub' $P1405 = "156_1309998847.42912"
     capture_lex $P1405
-    .const 'Sub' $P1399 = "152_1309998847.42912" 
+    .const 'Sub' $P1399 = "152_1309998847.42912"
     capture_lex $P1399
-    .const 'Sub' $P1394 = "150_1309998847.42912" 
+    .const 'Sub' $P1394 = "150_1309998847.42912"
     capture_lex $P1394
-    .const 'Sub' $P1390 = "148_1309998847.42912" 
+    .const 'Sub' $P1390 = "148_1309998847.42912"
     capture_lex $P1390
-    .const 'Sub' $P1384 = "146_1309998847.42912" 
+    .const 'Sub' $P1384 = "146_1309998847.42912"
     capture_lex $P1384
-    .const 'Sub' $P1379 = "144_1309998847.42912" 
+    .const 'Sub' $P1379 = "144_1309998847.42912"
     capture_lex $P1379
-    .const 'Sub' $P1374 = "142_1309998847.42912" 
+    .const 'Sub' $P1374 = "142_1309998847.42912"
     capture_lex $P1374
-    .const 'Sub' $P1369 = "140_1309998847.42912" 
+    .const 'Sub' $P1369 = "140_1309998847.42912"
     capture_lex $P1369
-    .const 'Sub' $P1361 = "136_1309998847.42912" 
+    .const 'Sub' $P1361 = "136_1309998847.42912"
     capture_lex $P1361
-    .const 'Sub' $P1355 = "134_1309998847.42912" 
+    .const 'Sub' $P1355 = "134_1309998847.42912"
     capture_lex $P1355
-    .const 'Sub' $P1350 = "132_1309998847.42912" 
+    .const 'Sub' $P1350 = "132_1309998847.42912"
     capture_lex $P1350
-    .const 'Sub' $P1344 = "128_1309998847.42912" 
+    .const 'Sub' $P1344 = "128_1309998847.42912"
     capture_lex $P1344
-    .const 'Sub' $P1340 = "126_1309998847.42912" 
+    .const 'Sub' $P1340 = "126_1309998847.42912"
     capture_lex $P1340
-    .const 'Sub' $P1331 = "124_1309998847.42912" 
+    .const 'Sub' $P1331 = "124_1309998847.42912"
     capture_lex $P1331
-    .const 'Sub' $P1323 = "122_1309998847.42912" 
+    .const 'Sub' $P1323 = "122_1309998847.42912"
     capture_lex $P1323
-    .const 'Sub' $P1318 = "120_1309998847.42912" 
+    .const 'Sub' $P1318 = "120_1309998847.42912"
     capture_lex $P1318
-    .const 'Sub' $P1314 = "118_1309998847.42912" 
+    .const 'Sub' $P1314 = "118_1309998847.42912"
     capture_lex $P1314
-    .const 'Sub' $P1310 = "116_1309998847.42912" 
+    .const 'Sub' $P1310 = "116_1309998847.42912"
     capture_lex $P1310
-    .const 'Sub' $P1306 = "114_1309998847.42912" 
+    .const 'Sub' $P1306 = "114_1309998847.42912"
     capture_lex $P1306
-    .const 'Sub' $P1297 = "111_1309998847.42912" 
+    .const 'Sub' $P1297 = "111_1309998847.42912"
     capture_lex $P1297
-    .const 'Sub' $P1293 = "109_1309998847.42912" 
+    .const 'Sub' $P1293 = "109_1309998847.42912"
     capture_lex $P1293
-    .const 'Sub' $P1289 = "107_1309998847.42912" 
+    .const 'Sub' $P1289 = "107_1309998847.42912"
     capture_lex $P1289
-    .const 'Sub' $P1285 = "105_1309998847.42912" 
+    .const 'Sub' $P1285 = "105_1309998847.42912"
     capture_lex $P1285
-    .const 'Sub' $P1281 = "103_1309998847.42912" 
+    .const 'Sub' $P1281 = "103_1309998847.42912"
     capture_lex $P1281
-    .const 'Sub' $P1277 = "101_1309998847.42912" 
+    .const 'Sub' $P1277 = "101_1309998847.42912"
     capture_lex $P1277
-    .const 'Sub' $P1273 = "99_1309998847.42912" 
+    .const 'Sub' $P1273 = "99_1309998847.42912"
     capture_lex $P1273
-    .const 'Sub' $P1268 = "97_1309998847.42912" 
+    .const 'Sub' $P1268 = "97_1309998847.42912"
     capture_lex $P1268
-    .const 'Sub' $P1263 = "95_1309998847.42912" 
+    .const 'Sub' $P1263 = "95_1309998847.42912"
     capture_lex $P1263
-    .const 'Sub' $P1258 = "93_1309998847.42912" 
+    .const 'Sub' $P1258 = "93_1309998847.42912"
     capture_lex $P1258
-    .const 'Sub' $P1251 = "89_1309998847.42912" 
+    .const 'Sub' $P1251 = "89_1309998847.42912"
     capture_lex $P1251
-    .const 'Sub' $P1246 = "87_1309998847.42912" 
+    .const 'Sub' $P1246 = "87_1309998847.42912"
     capture_lex $P1246
-    .const 'Sub' $P1239 = "83_1309998847.42912" 
+    .const 'Sub' $P1239 = "83_1309998847.42912"
     capture_lex $P1239
-    .const 'Sub' $P1234 = "81_1309998847.42912" 
+    .const 'Sub' $P1234 = "81_1309998847.42912"
     capture_lex $P1234
-    .const 'Sub' $P1229 = "79_1309998847.42912" 
+    .const 'Sub' $P1229 = "79_1309998847.42912"
     capture_lex $P1229
-    .const 'Sub' $P1222 = "75_1309998847.42912" 
+    .const 'Sub' $P1222 = "75_1309998847.42912"
     capture_lex $P1222
-    .const 'Sub' $P1217 = "73_1309998847.42912" 
+    .const 'Sub' $P1217 = "73_1309998847.42912"
     capture_lex $P1217
-    .const 'Sub' $P1212 = "71_1309998847.42912" 
+    .const 'Sub' $P1212 = "71_1309998847.42912"
     capture_lex $P1212
-    .const 'Sub' $P1202 = "69_1309998847.42912" 
+    .const 'Sub' $P1202 = "69_1309998847.42912"
     capture_lex $P1202
-    .const 'Sub' $P1196 = "67_1309998847.42912" 
+    .const 'Sub' $P1196 = "67_1309998847.42912"
     capture_lex $P1196
-    .const 'Sub' $P1186 = "64_1309998847.42912" 
+    .const 'Sub' $P1186 = "64_1309998847.42912"
     capture_lex $P1186
-    .const 'Sub' $P1179 = "62_1309998847.42912" 
+    .const 'Sub' $P1179 = "62_1309998847.42912"
     capture_lex $P1179
-    .const 'Sub' $P1173 = "58_1309998847.42912" 
+    .const 'Sub' $P1173 = "58_1309998847.42912"
     capture_lex $P1173
-    .const 'Sub' $P1169 = "56_1309998847.42912" 
+    .const 'Sub' $P1169 = "56_1309998847.42912"
     capture_lex $P1169
-    .const 'Sub' $P1163 = "52_1309998847.42912" 
+    .const 'Sub' $P1163 = "52_1309998847.42912"
     capture_lex $P1163
-    .const 'Sub' $P1159 = "50_1309998847.42912" 
+    .const 'Sub' $P1159 = "50_1309998847.42912"
     capture_lex $P1159
-    .const 'Sub' $P1155 = "48_1309998847.42912" 
+    .const 'Sub' $P1155 = "48_1309998847.42912"
     capture_lex $P1155
-    .const 'Sub' $P1149 = "46_1309998847.42912" 
+    .const 'Sub' $P1149 = "46_1309998847.42912"
     capture_lex $P1149
-    .const 'Sub' $P1144 = "44_1309998847.42912" 
+    .const 'Sub' $P1144 = "44_1309998847.42912"
     capture_lex $P1144
-    .const 'Sub' $P1139 = "42_1309998847.42912" 
+    .const 'Sub' $P1139 = "42_1309998847.42912"
     capture_lex $P1139
-    .const 'Sub' $P1134 = "40_1309998847.42912" 
+    .const 'Sub' $P1134 = "40_1309998847.42912"
     capture_lex $P1134
-    .const 'Sub' $P1130 = "38_1309998847.42912" 
+    .const 'Sub' $P1130 = "38_1309998847.42912"
     capture_lex $P1130
-    .const 'Sub' $P1125 = "36_1309998847.42912" 
+    .const 'Sub' $P1125 = "36_1309998847.42912"
     capture_lex $P1125
-    .const 'Sub' $P1111 = "33_1309998847.42912" 
+    .const 'Sub' $P1111 = "33_1309998847.42912"
     capture_lex $P1111
-    .const 'Sub' $P1105 = "31_1309998847.42912" 
+    .const 'Sub' $P1105 = "31_1309998847.42912"
     capture_lex $P1105
-    .const 'Sub' $P1100 = "29_1309998847.42912" 
+    .const 'Sub' $P1100 = "29_1309998847.42912"
     capture_lex $P1100
-    .const 'Sub' $P1063 = "26_1309998847.42912" 
+    .const 'Sub' $P1063 = "26_1309998847.42912"
     capture_lex $P1063
-    .const 'Sub' $P1049 = "23_1309998847.42912" 
+    .const 'Sub' $P1049 = "23_1309998847.42912"
     capture_lex $P1049
-    .const 'Sub' $P1039 = "21_1309998847.42912" 
+    .const 'Sub' $P1039 = "21_1309998847.42912"
     capture_lex $P1039
-    .const 'Sub' $P1028 = "19_1309998847.42912" 
+    .const 'Sub' $P1028 = "19_1309998847.42912"
     capture_lex $P1028
-    .const 'Sub' $P1022 = "17_1309998847.42912" 
+    .const 'Sub' $P1022 = "17_1309998847.42912"
     capture_lex $P1022
-    .const 'Sub' $P1016 = "15_1309998847.42912" 
+    .const 'Sub' $P1016 = "15_1309998847.42912"
     capture_lex $P1016
-    .const 'Sub' $P1011 = "13_1309998847.42912" 
+    .const 'Sub' $P1011 = "13_1309998847.42912"
     capture_lex $P1011
-    .const 'Sub' $P1004 = "12_1309998847.42912" 
+    .const 'Sub' $P1004 = "12_1309998847.42912"
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -376,12 +398,12 @@ NQP::Compiler - NQP compiler
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 575
-    .const 'Sub' $P1911 = "355_1309998847.42912" 
+    .const 'Sub' $P1911 = "355_1309998847.42912"
     capture_lex $P1911
     $P100 = $P1911()
 .annotate 'line', 4
     .return ($P100)
-    .const 'Sub' $P1964 = "376_1309998847.42912" 
+    .const 'Sub' $P1964 = "376_1309998847.42912"
     .return ($P1964)
 .end
 
@@ -389,7 +411,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "" :tag('load') :tag('init') :subid("post379") :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1003 = "11_1309998847.42912" 
+    .const 'Sub' $P1003 = "11_1309998847.42912"
     .local pmc block
     set block, $P1003
 .annotate 'line', 456
@@ -529,8 +551,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 4
     .return ($P103)
   control_1005:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -584,7 +606,7 @@ NQP::Compiler - NQP compiler
     set_addr $I10, rxquantr1015_done
     rx1012_cur."!mark_push"(0, rx1012_pos, $I10)
   rxquantr1015_loop:
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1012_pos, rx1012_eos, rx1012_fail
     sub $I10, rx1012_pos, rx1012_off
     substr $S10, rx1012_tgt, $I10, 1
@@ -1197,7 +1219,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "unv"  :subid("23_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1056 = "25_1309998847.42912" 
+    .const 'Sub' $P1056 = "25_1309998847.42912"
     capture_lex $P1056
     .local string rx1050_tgt
     .local int rx1050_pos
@@ -1249,7 +1271,7 @@ NQP::Compiler - NQP compiler
   rxanchor1054_done:
   # rx subrule "before" subtype=zerowidth negate=
     rx1050_cur."!cursor_pos"(rx1050_pos)
-    .const 'Sub' $P1056 = "25_1309998847.42912" 
+    .const 'Sub' $P1056 = "25_1309998847.42912"
     capture_lex $P1056
     $P10 = rx1050_cur."before"($P1056)
     unless $P10, rx1050_fail
@@ -1454,7 +1476,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "pod_comment"  :subid("26_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1093 = "28_1309998847.42912" 
+    .const 'Sub' $P1093 = "28_1309998847.42912"
     capture_lex $P1093
     .local string rx1064_tgt
     .local int rx1064_pos
@@ -1950,7 +1972,7 @@ NQP::Compiler - NQP compiler
   rxanchor1091_done:
   # rx subrule "before" subtype=zerowidth negate=
     rx1064_cur."!cursor_pos"(rx1064_pos)
-    .const 'Sub' $P1093 = "28_1309998847.42912" 
+    .const 'Sub' $P1093 = "28_1309998847.42912"
     capture_lex $P1093
     $P10 = rx1064_cur."before"($P1093)
     unless $P10, rx1064_fail
@@ -2399,7 +2421,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "statement"  :subid("33_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1116 = "35_1309998847.42912" 
+    .const 'Sub' $P1116 = "35_1309998847.42912"
     capture_lex $P1116
     .local string rx1112_tgt
     .local int rx1112_pos
@@ -2440,7 +2462,7 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 96
   # rx subrule "before" subtype=zerowidth negate=1
     rx1112_cur."!cursor_pos"(rx1112_pos)
-    .const 'Sub' $P1116 = "35_1309998847.42912" 
+    .const 'Sub' $P1116 = "35_1309998847.42912"
     capture_lex $P1116
     $P10 = rx1112_cur."before"($P1116)
     if $P10, rx1112_fail
@@ -2610,7 +2632,7 @@ NQP::Compiler - NQP compiler
   alt1119_0:
     set_addr $I10, alt1119_1
     rx1117_cur."!mark_push"(0, rx1117_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1117_pos, rx1117_eos, rx1117_fail
     sub $I10, rx1117_pos, rx1117_off
     substr $S10, rx1117_tgt, $I10, 1
@@ -3963,7 +3985,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "statement_control:sym<unless>"  :subid("64_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1193 = "66_1309998847.42912" 
+    .const 'Sub' $P1193 = "66_1309998847.42912"
     capture_lex $P1193
     .local string rx1187_tgt
     .local int rx1187_pos
@@ -4057,7 +4079,7 @@ NQP::Compiler - NQP compiler
     rx1187_pos = $P10."pos"()
   # rx subrule "before" subtype=zerowidth negate=1
     rx1187_cur."!cursor_pos"(rx1187_pos)
-    .const 'Sub' $P1193 = "66_1309998847.42912" 
+    .const 'Sub' $P1193 = "66_1309998847.42912"
     capture_lex $P1193
     $P10 = rx1187_cur."before"($P1193)
     if $P10, rx1187_fail
@@ -6374,7 +6396,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "term:sym<multi_declarator>"  :subid("111_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1302 = "113_1309998847.42912" 
+    .const 'Sub' $P1302 = "113_1309998847.42912"
     capture_lex $P1302
     .local string rx1298_tgt
     .local int rx1298_pos
@@ -6414,7 +6436,7 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 231
   # rx subrule "before" subtype=zerowidth negate=
     rx1298_cur."!cursor_pos"(rx1298_pos)
-    .const 'Sub' $P1302 = "113_1309998847.42912" 
+    .const 'Sub' $P1302 = "113_1309998847.42912"
     capture_lex $P1302
     $P10 = rx1298_cur."before"($P1302)
     unless $P10, rx1298_fail
@@ -7213,7 +7235,7 @@ NQP::Compiler - NQP compiler
   # rx subcapture "desigilname"
     set_addr $I10, rxcap_1339_fail
     rx1332_cur."!mark_push"(0, rx1332_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1332_pos, rx1332_eos, rx1332_fail
     sub $I10, rx1332_pos, rx1332_off
     substr $S10, rx1332_tgt, $I10, 1
@@ -7313,7 +7335,7 @@ NQP::Compiler - NQP compiler
     rx1341_cur."!mark_push"(0, rx1341_pos, $I10)
   rxscan1343_done:
 .annotate 'line', 255
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1341_pos, rx1341_eos, rx1341_fail
     sub $I10, rx1341_pos, rx1341_off
     substr $S10, rx1341_tgt, $I10, 1
@@ -7397,7 +7419,7 @@ NQP::Compiler - NQP compiler
     rx1345_cur."!mark_push"(0, rx1345_pos, $I10)
   rxscan1347_done:
 .annotate 'line', 257
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1345_pos, rx1345_eos, rx1345_fail
     sub $I10, rx1345_pos, rx1345_off
     substr $S10, rx1345_tgt, $I10, 1
@@ -9994,7 +10016,7 @@ NQP::Compiler - NQP compiler
   # rx subcapture "name"
     set_addr $I10, rxcap_1473_fail
     rx1467_cur."!mark_push"(0, rx1467_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1467_pos, rx1467_eos, rx1467_fail
     sub $I10, rx1467_pos, rx1467_off
     substr $S10, rx1467_tgt, $I10, 1
@@ -19327,8 +19349,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 569
     .return ($P101)
   control_1902:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -19337,23 +19359,23 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Regex"]
 .sub "_block1910"  :subid("355_1309998847.42912") :outer("11_1309998847.42912")
 .annotate 'line', 575
-    .const 'Sub' $P1959 = "374_1309998847.42912" 
+    .const 'Sub' $P1959 = "374_1309998847.42912"
     capture_lex $P1959
-    .const 'Sub' $P1955 = "372_1309998847.42912" 
+    .const 'Sub' $P1955 = "372_1309998847.42912"
     capture_lex $P1955
-    .const 'Sub' $P1945 = "369_1309998847.42912" 
+    .const 'Sub' $P1945 = "369_1309998847.42912"
     capture_lex $P1945
-    .const 'Sub' $P1936 = "366_1309998847.42912" 
+    .const 'Sub' $P1936 = "366_1309998847.42912"
     capture_lex $P1936
-    .const 'Sub' $P1932 = "364_1309998847.42912" 
+    .const 'Sub' $P1932 = "364_1309998847.42912"
     capture_lex $P1932
-    .const 'Sub' $P1924 = "361_1309998847.42912" 
+    .const 'Sub' $P1924 = "361_1309998847.42912"
     capture_lex $P1924
-    .const 'Sub' $P1920 = "359_1309998847.42912" 
+    .const 'Sub' $P1920 = "359_1309998847.42912"
     capture_lex $P1920
-    .const 'Sub' $P1912 = "356_1309998847.42912" 
+    .const 'Sub' $P1912 = "356_1309998847.42912"
     capture_lex $P1912
-    .const 'Sub' $P1959 = "374_1309998847.42912" 
+    .const 'Sub' $P1959 = "374_1309998847.42912"
     capture_lex $P1959
     .return ($P1959)
 .end
@@ -19362,7 +19384,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Regex"]
 .sub "metachar:sym<:my>"  :subid("356_1309998847.42912") :method :outer("355_1309998847.42912")
 .annotate 'line', 575
-    .const 'Sub' $P1917 = "358_1309998847.42912" 
+    .const 'Sub' $P1917 = "358_1309998847.42912"
     capture_lex $P1917
     .local string rx1913_tgt
     .local int rx1913_pos
@@ -19409,7 +19431,7 @@ NQP::Compiler - NQP compiler
     add rx1913_pos, 1
   # rx subrule "before" subtype=zerowidth negate=
     rx1913_cur."!cursor_pos"(rx1913_pos)
-    .const 'Sub' $P1917 = "358_1309998847.42912" 
+    .const 'Sub' $P1917 = "358_1309998847.42912"
     capture_lex $P1917
     $P10 = rx1913_cur."before"($P1917)
     unless $P10, rx1913_fail
@@ -19628,7 +19650,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Regex"]
 .sub "metachar:sym<nqpvar>"  :subid("361_1309998847.42912") :method :outer("355_1309998847.42912")
 .annotate 'line', 575
-    .const 'Sub' $P1929 = "363_1309998847.42912" 
+    .const 'Sub' $P1929 = "363_1309998847.42912"
     capture_lex $P1929
     .local string rx1925_tgt
     .local int rx1925_pos
@@ -19673,7 +19695,7 @@ NQP::Compiler - NQP compiler
     lt $I11, 0, rx1925_fail
   # rx subrule "before" subtype=zerowidth negate=
     rx1925_cur."!cursor_pos"(rx1925_pos)
-    .const 'Sub' $P1929 = "363_1309998847.42912" 
+    .const 'Sub' $P1929 = "363_1309998847.42912"
     capture_lex $P1929
     $P10 = rx1925_cur."before"($P1929)
     unless $P10, rx1925_fail
@@ -19883,7 +19905,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Regex"]
 .sub "assertion:sym<?{ }>"  :subid("366_1309998847.42912") :method :outer("355_1309998847.42912")
 .annotate 'line', 575
-    .const 'Sub' $P1941 = "368_1309998847.42912" 
+    .const 'Sub' $P1941 = "368_1309998847.42912"
     capture_lex $P1941
     .local string rx1937_tgt
     .local int rx1937_pos
@@ -19924,7 +19946,7 @@ NQP::Compiler - NQP compiler
   # rx subcapture "zw"
     set_addr $I10, rxcap_1944_fail
     rx1937_cur."!mark_push"(0, rx1937_pos, $I10)
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1937_pos, rx1937_eos, rx1937_fail
     sub $I10, rx1937_pos, rx1937_off
     substr $S10, rx1937_tgt, $I10, 1
@@ -19933,7 +19955,7 @@ NQP::Compiler - NQP compiler
     inc rx1937_pos
   # rx subrule "before" subtype=zerowidth negate=
     rx1937_cur."!cursor_pos"(rx1937_pos)
-    .const 'Sub' $P1941 = "368_1309998847.42912" 
+    .const 'Sub' $P1941 = "368_1309998847.42912"
     capture_lex $P1941
     $P10 = rx1937_cur."before"($P1941)
     unless $P10, rx1937_fail
@@ -20065,7 +20087,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Regex"]
 .sub "assertion:sym<name>"  :subid("369_1309998847.42912") :method :outer("355_1309998847.42912")
 .annotate 'line', 575
-    .const 'Sub' $P1952 = "371_1309998847.42912" 
+    .const 'Sub' $P1952 = "371_1309998847.42912"
     capture_lex $P1952
     .local string rx1946_tgt
     .local int rx1946_pos
@@ -20123,7 +20145,7 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 599
   # rx subrule "before" subtype=zerowidth negate=
     rx1946_cur."!cursor_pos"(rx1946_pos)
-    .const 'Sub' $P1952 = "371_1309998847.42912" 
+    .const 'Sub' $P1952 = "371_1309998847.42912"
     capture_lex $P1952
     $P10 = rx1946_cur."before"($P1952)
     unless $P10, rx1946_fail
@@ -20492,7 +20514,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Grammar"]
 .sub "_block1963" :tag('load') :anon :subid("376_1309998847.42912")
 .annotate 'line', 4
-    .const 'Sub' $P1965 = "11_1309998847.42912" 
+    .const 'Sub' $P1965 = "11_1309998847.42912"
     $P101 = $P1965()
     .return ($P101)
 .end
@@ -20501,7 +20523,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "_block1967" :tag('load') :anon :subid("377_1309998847.42912")
 .annotate 'line', 1
-    .const 'Sub' $P1969 = "10_1309998847.42912" 
+    .const 'Sub' $P1969 = "10_1309998847.42912"
     $P100 = $P1969()
     .return ($P100)
 .end
@@ -20511,7 +20533,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "_block1000"  :anon :subid("10_1309998850.8808")
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1309998850.8808" 
+    .const 'Sub' $P1003 = "11_1309998850.8808"
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -20521,12 +20543,12 @@ NQP::Compiler - NQP compiler
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 3
-    .const 'Sub' $P1003 = "11_1309998850.8808" 
+    .const 'Sub' $P1003 = "11_1309998850.8808"
     capture_lex $P1003
     $P112 = $P1003()
 .annotate 'line', 1
     .return ($P112)
-    .const 'Sub' $P2014 = "149_1309998850.8808" 
+    .const 'Sub' $P2014 = "149_1309998850.8808"
     .return ($P2014)
 .end
 
@@ -20534,7 +20556,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "" :tag('load') :tag('init') :subid("post150") :outer("10_1309998850.8808")
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1309998850.8808" 
+    .const 'Sub' $P1001 = "10_1309998850.8808"
     .local pmc block
     set block, $P1001
     $P2016 = get_root_global ["parrot"], "P6metaclass"
@@ -20545,221 +20567,221 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Actions"]
 .sub "_block1002"  :subid("11_1309998850.8808") :outer("10_1309998850.8808")
 .annotate 'line', 3
-    .const 'Sub' $P2009 = "148_1309998850.8808" 
+    .const 'Sub' $P2009 = "148_1309998850.8808"
     capture_lex $P2009
-    .const 'Sub' $P1964 = "139_1309998850.8808" 
+    .const 'Sub' $P1964 = "139_1309998850.8808"
     capture_lex $P1964
-    .const 'Sub' $P1959 = "138_1309998850.8808" 
+    .const 'Sub' $P1959 = "138_1309998850.8808"
     capture_lex $P1959
-    .const 'Sub' $P1955 = "137_1309998850.8808" 
+    .const 'Sub' $P1955 = "137_1309998850.8808"
     capture_lex $P1955
-    .const 'Sub' $P1951 = "136_1309998850.8808" 
+    .const 'Sub' $P1951 = "136_1309998850.8808"
     capture_lex $P1951
-    .const 'Sub' $P1947 = "135_1309998850.8808" 
+    .const 'Sub' $P1947 = "135_1309998850.8808"
     capture_lex $P1947
-    .const 'Sub' $P1943 = "134_1309998850.8808" 
+    .const 'Sub' $P1943 = "134_1309998850.8808"
     capture_lex $P1943
-    .const 'Sub' $P1939 = "133_1309998850.8808" 
+    .const 'Sub' $P1939 = "133_1309998850.8808"
     capture_lex $P1939
-    .const 'Sub' $P1935 = "132_1309998850.8808" 
+    .const 'Sub' $P1935 = "132_1309998850.8808"
     capture_lex $P1935
-    .const 'Sub' $P1930 = "131_1309998850.8808" 
+    .const 'Sub' $P1930 = "131_1309998850.8808"
     capture_lex $P1930
-    .const 'Sub' $P1926 = "130_1309998850.8808" 
+    .const 'Sub' $P1926 = "130_1309998850.8808"
     capture_lex $P1926
-    .const 'Sub' $P1921 = "129_1309998850.8808" 
+    .const 'Sub' $P1921 = "129_1309998850.8808"
     capture_lex $P1921
-    .const 'Sub' $P1916 = "128_1309998850.8808" 
+    .const 'Sub' $P1916 = "128_1309998850.8808"
     capture_lex $P1916
-    .const 'Sub' $P1904 = "127_1309998850.8808" 
+    .const 'Sub' $P1904 = "127_1309998850.8808"
     capture_lex $P1904
-    .const 'Sub' $P1899 = "126_1309998850.8808" 
+    .const 'Sub' $P1899 = "126_1309998850.8808"
     capture_lex $P1899
-    .const 'Sub' $P1894 = "125_1309998850.8808" 
+    .const 'Sub' $P1894 = "125_1309998850.8808"
     capture_lex $P1894
-    .const 'Sub' $P1889 = "124_1309998850.8808" 
+    .const 'Sub' $P1889 = "124_1309998850.8808"
     capture_lex $P1889
-    .const 'Sub' $P1884 = "123_1309998850.8808" 
+    .const 'Sub' $P1884 = "123_1309998850.8808"
     capture_lex $P1884
-    .const 'Sub' $P1879 = "122_1309998850.8808" 
+    .const 'Sub' $P1879 = "122_1309998850.8808"
     capture_lex $P1879
-    .const 'Sub' $P1874 = "121_1309998850.8808" 
+    .const 'Sub' $P1874 = "121_1309998850.8808"
     capture_lex $P1874
-    .const 'Sub' $P1863 = "120_1309998850.8808" 
+    .const 'Sub' $P1863 = "120_1309998850.8808"
     capture_lex $P1863
-    .const 'Sub' $P1855 = "119_1309998850.8808" 
+    .const 'Sub' $P1855 = "119_1309998850.8808"
     capture_lex $P1855
-    .const 'Sub' $P1850 = "118_1309998850.8808" 
+    .const 'Sub' $P1850 = "118_1309998850.8808"
     capture_lex $P1850
-    .const 'Sub' $P1845 = "117_1309998850.8808" 
+    .const 'Sub' $P1845 = "117_1309998850.8808"
     capture_lex $P1845
-    .const 'Sub' $P1840 = "116_1309998850.8808" 
+    .const 'Sub' $P1840 = "116_1309998850.8808"
     capture_lex $P1840
-    .const 'Sub' $P1835 = "115_1309998850.8808" 
+    .const 'Sub' $P1835 = "115_1309998850.8808"
     capture_lex $P1835
-    .const 'Sub' $P1830 = "114_1309998850.8808" 
+    .const 'Sub' $P1830 = "114_1309998850.8808"
     capture_lex $P1830
-    .const 'Sub' $P1820 = "113_1309998850.8808" 
+    .const 'Sub' $P1820 = "113_1309998850.8808"
     capture_lex $P1820
-    .const 'Sub' $P1808 = "112_1309998850.8808" 
+    .const 'Sub' $P1808 = "112_1309998850.8808"
     capture_lex $P1808
-    .const 'Sub' $P1803 = "111_1309998850.8808" 
+    .const 'Sub' $P1803 = "111_1309998850.8808"
     capture_lex $P1803
-    .const 'Sub' $P1798 = "110_1309998850.8808" 
+    .const 'Sub' $P1798 = "110_1309998850.8808"
     capture_lex $P1798
-    .const 'Sub' $P1788 = "109_1309998850.8808" 
+    .const 'Sub' $P1788 = "109_1309998850.8808"
     capture_lex $P1788
-    .const 'Sub' $P1780 = "108_1309998850.8808" 
+    .const 'Sub' $P1780 = "108_1309998850.8808"
     capture_lex $P1780
-    .const 'Sub' $P1775 = "107_1309998850.8808" 
+    .const 'Sub' $P1775 = "107_1309998850.8808"
     capture_lex $P1775
-    .const 'Sub' $P1743 = "104_1309998850.8808" 
+    .const 'Sub' $P1743 = "104_1309998850.8808"
     capture_lex $P1743
-    .const 'Sub' $P1738 = "103_1309998850.8808" 
+    .const 'Sub' $P1738 = "103_1309998850.8808"
     capture_lex $P1738
-    .const 'Sub' $P1726 = "102_1309998850.8808" 
+    .const 'Sub' $P1726 = "102_1309998850.8808"
     capture_lex $P1726
-    .const 'Sub' $P1708 = "101_1309998850.8808" 
+    .const 'Sub' $P1708 = "101_1309998850.8808"
     capture_lex $P1708
-    .const 'Sub' $P1701 = "100_1309998850.8808" 
+    .const 'Sub' $P1701 = "100_1309998850.8808"
     capture_lex $P1701
-    .const 'Sub' $P1697 = "99_1309998850.8808" 
+    .const 'Sub' $P1697 = "99_1309998850.8808"
     capture_lex $P1697
-    .const 'Sub' $P1684 = "98_1309998850.8808" 
+    .const 'Sub' $P1684 = "98_1309998850.8808"
     capture_lex $P1684
-    .const 'Sub' $P1652 = "95_1309998850.8808" 
+    .const 'Sub' $P1652 = "95_1309998850.8808"
     capture_lex $P1652
-    .const 'Sub' $P1637 = "93_1309998850.8808" 
+    .const 'Sub' $P1637 = "93_1309998850.8808"
     capture_lex $P1637
-    .const 'Sub' $P1632 = "92_1309998850.8808" 
+    .const 'Sub' $P1632 = "92_1309998850.8808"
     capture_lex $P1632
-    .const 'Sub' $P1624 = "91_1309998850.8808" 
+    .const 'Sub' $P1624 = "91_1309998850.8808"
     capture_lex $P1624
-    .const 'Sub' $P1617 = "90_1309998850.8808" 
+    .const 'Sub' $P1617 = "90_1309998850.8808"
     capture_lex $P1617
-    .const 'Sub' $P1572 = "87_1309998850.8808" 
+    .const 'Sub' $P1572 = "87_1309998850.8808"
     capture_lex $P1572
-    .const 'Sub' $P1544 = "83_1309998850.8808" 
+    .const 'Sub' $P1544 = "83_1309998850.8808"
     capture_lex $P1544
-    .const 'Sub' $P1520 = "80_1309998850.8808" 
+    .const 'Sub' $P1520 = "80_1309998850.8808"
     capture_lex $P1520
-    .const 'Sub' $P1492 = "77_1309998850.8808" 
+    .const 'Sub' $P1492 = "77_1309998850.8808"
     capture_lex $P1492
-    .const 'Sub' $P1487 = "76_1309998850.8808" 
+    .const 'Sub' $P1487 = "76_1309998850.8808"
     capture_lex $P1487
-    .const 'Sub' $P1482 = "75_1309998850.8808" 
+    .const 'Sub' $P1482 = "75_1309998850.8808"
     capture_lex $P1482
-    .const 'Sub' $P1458 = "73_1309998850.8808" 
+    .const 'Sub' $P1458 = "73_1309998850.8808"
     capture_lex $P1458
-    .const 'Sub' $P1453 = "72_1309998850.8808" 
+    .const 'Sub' $P1453 = "72_1309998850.8808"
     capture_lex $P1453
-    .const 'Sub' $P1445 = "71_1309998850.8808" 
+    .const 'Sub' $P1445 = "71_1309998850.8808"
     capture_lex $P1445
-    .const 'Sub' $P1437 = "70_1309998850.8808" 
+    .const 'Sub' $P1437 = "70_1309998850.8808"
     capture_lex $P1437
-    .const 'Sub' $P1429 = "69_1309998850.8808" 
+    .const 'Sub' $P1429 = "69_1309998850.8808"
     capture_lex $P1429
-    .const 'Sub' $P1424 = "68_1309998850.8808" 
+    .const 'Sub' $P1424 = "68_1309998850.8808"
     capture_lex $P1424
-    .const 'Sub' $P1419 = "67_1309998850.8808" 
+    .const 'Sub' $P1419 = "67_1309998850.8808"
     capture_lex $P1419
-    .const 'Sub' $P1414 = "66_1309998850.8808" 
+    .const 'Sub' $P1414 = "66_1309998850.8808"
     capture_lex $P1414
-    .const 'Sub' $P1403 = "65_1309998850.8808" 
+    .const 'Sub' $P1403 = "65_1309998850.8808"
     capture_lex $P1403
-    .const 'Sub' $P1382 = "64_1309998850.8808" 
+    .const 'Sub' $P1382 = "64_1309998850.8808"
     capture_lex $P1382
-    .const 'Sub' $P1377 = "63_1309998850.8808" 
+    .const 'Sub' $P1377 = "63_1309998850.8808"
     capture_lex $P1377
-    .const 'Sub' $P1352 = "61_1309998850.8808" 
+    .const 'Sub' $P1352 = "61_1309998850.8808"
     capture_lex $P1352
-    .const 'Sub' $P1341 = "60_1309998850.8808" 
+    .const 'Sub' $P1341 = "60_1309998850.8808"
     capture_lex $P1341
-    .const 'Sub' $P1334 = "59_1309998850.8808" 
+    .const 'Sub' $P1334 = "59_1309998850.8808"
     capture_lex $P1334
-    .const 'Sub' $P1329 = "58_1309998850.8808" 
+    .const 'Sub' $P1329 = "58_1309998850.8808"
     capture_lex $P1329
-    .const 'Sub' $P1324 = "57_1309998850.8808" 
+    .const 'Sub' $P1324 = "57_1309998850.8808"
     capture_lex $P1324
-    .const 'Sub' $P1319 = "56_1309998850.8808" 
+    .const 'Sub' $P1319 = "56_1309998850.8808"
     capture_lex $P1319
-    .const 'Sub' $P1314 = "55_1309998850.8808" 
+    .const 'Sub' $P1314 = "55_1309998850.8808"
     capture_lex $P1314
-    .const 'Sub' $P1309 = "54_1309998850.8808" 
+    .const 'Sub' $P1309 = "54_1309998850.8808"
     capture_lex $P1309
-    .const 'Sub' $P1304 = "53_1309998850.8808" 
+    .const 'Sub' $P1304 = "53_1309998850.8808"
     capture_lex $P1304
-    .const 'Sub' $P1299 = "52_1309998850.8808" 
+    .const 'Sub' $P1299 = "52_1309998850.8808"
     capture_lex $P1299
-    .const 'Sub' $P1294 = "51_1309998850.8808" 
+    .const 'Sub' $P1294 = "51_1309998850.8808"
     capture_lex $P1294
-    .const 'Sub' $P1289 = "50_1309998850.8808" 
+    .const 'Sub' $P1289 = "50_1309998850.8808"
     capture_lex $P1289
-    .const 'Sub' $P1284 = "49_1309998850.8808" 
+    .const 'Sub' $P1284 = "49_1309998850.8808"
     capture_lex $P1284
-    .const 'Sub' $P1279 = "48_1309998850.8808" 
+    .const 'Sub' $P1279 = "48_1309998850.8808"
     capture_lex $P1279
-    .const 'Sub' $P1274 = "47_1309998850.8808" 
+    .const 'Sub' $P1274 = "47_1309998850.8808"
     capture_lex $P1274
-    .const 'Sub' $P1269 = "46_1309998850.8808" 
+    .const 'Sub' $P1269 = "46_1309998850.8808"
     capture_lex $P1269
-    .const 'Sub' $P1264 = "45_1309998850.8808" 
+    .const 'Sub' $P1264 = "45_1309998850.8808"
     capture_lex $P1264
-    .const 'Sub' $P1256 = "44_1309998850.8808" 
+    .const 'Sub' $P1256 = "44_1309998850.8808"
     capture_lex $P1256
-    .const 'Sub' $P1248 = "43_1309998850.8808" 
+    .const 'Sub' $P1248 = "43_1309998850.8808"
     capture_lex $P1248
-    .const 'Sub' $P1242 = "42_1309998850.8808" 
+    .const 'Sub' $P1242 = "42_1309998850.8808"
     capture_lex $P1242
-    .const 'Sub' $P1235 = "41_1309998850.8808" 
+    .const 'Sub' $P1235 = "41_1309998850.8808"
     capture_lex $P1235
-    .const 'Sub' $P1228 = "40_1309998850.8808" 
+    .const 'Sub' $P1228 = "40_1309998850.8808"
     capture_lex $P1228
-    .const 'Sub' $P1223 = "39_1309998850.8808" 
+    .const 'Sub' $P1223 = "39_1309998850.8808"
     capture_lex $P1223
-    .const 'Sub' $P1213 = "38_1309998850.8808" 
+    .const 'Sub' $P1213 = "38_1309998850.8808"
     capture_lex $P1213
-    .const 'Sub' $P1201 = "37_1309998850.8808" 
+    .const 'Sub' $P1201 = "37_1309998850.8808"
     capture_lex $P1201
-    .const 'Sub' $P1194 = "36_1309998850.8808" 
+    .const 'Sub' $P1194 = "36_1309998850.8808"
     capture_lex $P1194
-    .const 'Sub' $P1188 = "35_1309998850.8808" 
+    .const 'Sub' $P1188 = "35_1309998850.8808"
     capture_lex $P1188
-    .const 'Sub' $P1168 = "33_1309998850.8808" 
+    .const 'Sub' $P1168 = "33_1309998850.8808"
     capture_lex $P1168
-    .const 'Sub' $P1162 = "32_1309998850.8808" 
+    .const 'Sub' $P1162 = "32_1309998850.8808"
     capture_lex $P1162
-    .const 'Sub' $P1157 = "31_1309998850.8808" 
+    .const 'Sub' $P1157 = "31_1309998850.8808"
     capture_lex $P1157
-    .const 'Sub' $P1150 = "30_1309998850.8808" 
+    .const 'Sub' $P1150 = "30_1309998850.8808"
     capture_lex $P1150
-    .const 'Sub' $P1145 = "29_1309998850.8808" 
+    .const 'Sub' $P1145 = "29_1309998850.8808"
     capture_lex $P1145
-    .const 'Sub' $P1140 = "28_1309998850.8808" 
+    .const 'Sub' $P1140 = "28_1309998850.8808"
     capture_lex $P1140
-    .const 'Sub' $P1134 = "27_1309998850.8808" 
+    .const 'Sub' $P1134 = "27_1309998850.8808"
     capture_lex $P1134
-    .const 'Sub' $P1104 = "25_1309998850.8808" 
+    .const 'Sub' $P1104 = "25_1309998850.8808"
     capture_lex $P1104
-    .const 'Sub' $P1085 = "23_1309998850.8808" 
+    .const 'Sub' $P1085 = "23_1309998850.8808"
     capture_lex $P1085
-    .const 'Sub' $P1078 = "22_1309998850.8808" 
+    .const 'Sub' $P1078 = "22_1309998850.8808"
     capture_lex $P1078
-    .const 'Sub' $P1067 = "21_1309998850.8808" 
+    .const 'Sub' $P1067 = "21_1309998850.8808"
     capture_lex $P1067
-    .const 'Sub' $P1062 = "20_1309998850.8808" 
+    .const 'Sub' $P1062 = "20_1309998850.8808"
     capture_lex $P1062
-    .const 'Sub' $P1056 = "19_1309998850.8808" 
+    .const 'Sub' $P1056 = "19_1309998850.8808"
     capture_lex $P1056
-    .const 'Sub' $P1044 = "18_1309998850.8808" 
+    .const 'Sub' $P1044 = "18_1309998850.8808"
     capture_lex $P1044
-    .const 'Sub' $P1037 = "17_1309998850.8808" 
+    .const 'Sub' $P1037 = "17_1309998850.8808"
     capture_lex $P1037
-    .const 'Sub' $P1029 = "16_1309998850.8808" 
+    .const 'Sub' $P1029 = "16_1309998850.8808"
     capture_lex $P1029
-    .const 'Sub' $P1014 = "13_1309998850.8808" 
+    .const 'Sub' $P1014 = "13_1309998850.8808"
     capture_lex $P1014
-    .const 'Sub' $P1006 = "12_1309998850.8808" 
+    .const 'Sub' $P1006 = "12_1309998850.8808"
     capture_lex $P1006
     get_global $P1004, "@BLOCK"
     unless_null $P1004, vivify_153
@@ -20767,32 +20789,32 @@ NQP::Compiler - NQP compiler
     set_global "@BLOCK", $P1004
   vivify_153:
 .annotate 'line', 9
-    .const 'Sub' $P1006 = "12_1309998850.8808" 
+    .const 'Sub' $P1006 = "12_1309998850.8808"
     newclosure $P1012, $P1006
     set $P1005, $P1012
     .lex "xblock_immediate", $P1005
 .annotate 'line', 14
-    .const 'Sub' $P1014 = "13_1309998850.8808" 
+    .const 'Sub' $P1014 = "13_1309998850.8808"
     newclosure $P1027, $P1014
     set $P1013, $P1027
     .lex "block_immediate", $P1013
 .annotate 'line', 24
-    .const 'Sub' $P1029 = "16_1309998850.8808" 
+    .const 'Sub' $P1029 = "16_1309998850.8808"
     newclosure $P1035, $P1029
     set $P1028, $P1035
     .lex "vivitype", $P1028
 .annotate 'line', 43
-    .const 'Sub' $P1037 = "17_1309998850.8808" 
+    .const 'Sub' $P1037 = "17_1309998850.8808"
     newclosure $P1042, $P1037
     set $P1036, $P1042
     .lex "colonpair_str", $P1036
 .annotate 'line', 224
-    .const 'Sub' $P1044 = "18_1309998850.8808" 
+    .const 'Sub' $P1044 = "18_1309998850.8808"
     newclosure $P1054, $P1044
     set $P1043, $P1054
     .lex "push_block_handler", $P1043
 .annotate 'line', 863
-    .const 'Sub' $P1056 = "19_1309998850.8808" 
+    .const 'Sub' $P1056 = "19_1309998850.8808"
     newclosure $P1061, $P1056
     set $P1055, $P1061
     .lex "control", $P1055
@@ -20811,12 +20833,12 @@ NQP::Compiler - NQP compiler
     find_lex $P110, "push_block_handler"
     find_lex $P110, "control"
 .annotate 'line', 881
-    .const 'Sub' $P1964 = "139_1309998850.8808" 
+    .const 'Sub' $P1964 = "139_1309998850.8808"
     capture_lex $P1964
     $P110 = $P1964()
 .annotate 'line', 3
     .return ($P110)
-    .const 'Sub' $P2006 = "147_1309998850.8808" 
+    .const 'Sub' $P2006 = "147_1309998850.8808"
     .return ($P2006)
 .end
 
@@ -20824,11 +20846,11 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Actions"]
 .sub "" :tag('load') :tag('init') :subid("post151") :outer("11_1309998850.8808")
 .annotate 'line', 3
-    .const 'Sub' $P1003 = "11_1309998850.8808" 
+    .const 'Sub' $P1003 = "11_1309998850.8808"
     .local pmc block
     set block, $P1003
 .annotate 'line', 5
-    .const 'Sub' $P2009 = "148_1309998850.8808" 
+    .const 'Sub' $P2009 = "148_1309998850.8808"
     capture_lex $P2009
     $P2009()
     $P2012 = get_root_global ["parrot"], "P6metaclass"
@@ -20844,7 +20866,7 @@ NQP::Compiler - NQP compiler
     $P2010 = root_new ['parrot';'ResizablePMCArray']
     set_global "@BLOCK", $P2010
   vivify_152:
- $P2011 = new ['ResizablePMCArray'] 
+ $P2011 = new ['ResizablePMCArray']
     set_global "@BLOCK", $P2011
 .annotate 'line', 5
     .return ($P2011)
@@ -20880,8 +20902,8 @@ NQP::Compiler - NQP compiler
     find_lex $P100, "$xblock"
     .return ($P100)
   control_1007:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -20892,7 +20914,7 @@ NQP::Compiler - NQP compiler
 .sub "block_immediate"  :subid("13_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1017
 .annotate 'line', 14
-    .const 'Sub' $P1021 = "14_1309998850.8808" 
+    .const 'Sub' $P1021 = "14_1309998850.8808"
     capture_lex $P1021
     new $P1016, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1016, control_1015
@@ -20913,7 +20935,7 @@ NQP::Compiler - NQP compiler
     set $P102, $P106
   unless_1019_end:
     if $P102, unless_1018_end
-    .const 'Sub' $P1021 = "14_1309998850.8808" 
+    .const 'Sub' $P1021 = "14_1309998850.8808"
     capture_lex $P1021
     $P1021()
   unless_1018_end:
@@ -20921,8 +20943,8 @@ NQP::Compiler - NQP compiler
     find_lex $P102, "$block"
     .return ($P102)
   control_1015:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, "payload"
     .return ($P103)
 .end
@@ -20932,7 +20954,7 @@ NQP::Compiler - NQP compiler
 .include "except_types.pasm"
 .sub "_block1020"  :anon :subid("14_1309998850.8808") :outer("13_1309998850.8808")
 .annotate 'line', 16
-    .const 'Sub' $P1024 = "15_1309998850.8808" 
+    .const 'Sub' $P1024 = "15_1309998850.8808"
     capture_lex $P1024
 .annotate 'line', 17
     new $P107, "Undef"
@@ -20956,19 +20978,19 @@ NQP::Compiler - NQP compiler
     unless $P108, loop1026_done
     shift $P111, $P108
   loop1026_redo:
-    .const 'Sub' $P1024 = "15_1309998850.8808" 
+    .const 'Sub' $P1024 = "15_1309998850.8808"
     capture_lex $P1024
     $P1024($P111)
   loop1026_next:
     goto loop1026_test
   loop1026_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, 'type'
     eq $P113, .CONTROL_LOOP_NEXT, loop1026_next
     eq $P113, .CONTROL_LOOP_REDO, loop1026_redo
   loop1026_done:
-    pop_eh 
+    pop_eh
   for_undef_157:
 .annotate 'line', 19
     find_lex $P108, "$stmts"
@@ -21031,8 +21053,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 24
     .return ($P104)
   control_1030:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P105, exception, "payload"
     .return ($P105)
 .end
@@ -21069,8 +21091,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 43
     .return ($P106)
   control_1038:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P107, exception, "payload"
     .return ($P107)
 .end
@@ -21186,8 +21208,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 224
     .return ($P126)
   control_1045:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P108, exception, "payload"
     .return ($P108)
 .end
@@ -21218,8 +21240,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 863
     .return ($P116)
   control_1057:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P109, exception, "payload"
     .return ($P109)
 .end
@@ -21248,8 +21270,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1063:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -21337,8 +21359,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 35
     .return ($P127)
   control_1068:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -21413,8 +21435,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 49
     .return ($P114)
   control_1079:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -21425,7 +21447,7 @@ NQP::Compiler - NQP compiler
 .sub "statementlist"  :subid("23_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1088
 .annotate 'line', 76
-    .const 'Sub' $P1094 = "24_1309998850.8808" 
+    .const 'Sub' $P1094 = "24_1309998850.8808"
     capture_lex $P1094
     new $P1087, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1087, control_1086
@@ -21470,19 +21492,19 @@ NQP::Compiler - NQP compiler
     unless $P112, loop1103_done
     shift $P114, $P112
   loop1103_redo:
-    .const 'Sub' $P1094 = "24_1309998850.8808" 
+    .const 'Sub' $P1094 = "24_1309998850.8808"
     capture_lex $P1094
     $P1094($P114)
   loop1103_next:
     goto loop1103_test
   loop1103_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P118, exception, 'type'
     eq $P118, .CONTROL_LOOP_NEXT, loop1103_next
     eq $P118, .CONTROL_LOOP_REDO, loop1103_redo
   loop1103_done:
-    pop_eh 
+    pop_eh
   for_undef_182:
   if_1090_end:
 .annotate 'line', 87
@@ -21492,8 +21514,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 76
     .return ($P113)
   control_1086:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -21571,7 +21593,7 @@ NQP::Compiler - NQP compiler
     .param pmc param_1108 :optional
     .param int has_param_1108 :opt_flag
 .annotate 'line', 90
-    .const 'Sub' $P1113 = "26_1309998850.8808" 
+    .const 'Sub' $P1113 = "26_1309998850.8808"
     capture_lex $P1113
     new $P1106, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1106, control_1105
@@ -21630,7 +21652,7 @@ NQP::Compiler - NQP compiler
     goto if_1110_end
   if_1110:
 .annotate 'line', 92
-    .const 'Sub' $P1113 = "26_1309998850.8808" 
+    .const 'Sub' $P1113 = "26_1309998850.8808"
     capture_lex $P1113
     $P1113()
   if_1110_end:
@@ -21641,8 +21663,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 90
     .return ($P114)
   control_1105:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -21859,8 +21881,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 118
     .return ($P119)
   control_1135:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -21891,8 +21913,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 122
     .return ($P113)
   control_1141:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -21923,8 +21945,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 126
     .return ($P113)
   control_1146:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -21981,8 +22003,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 130
     .return ($P114)
   control_1151:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -22016,8 +22038,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 139
     .return ($P115)
   control_1158:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22055,8 +22077,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 144
     .return ($P112)
   control_1163:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22067,7 +22089,7 @@ NQP::Compiler - NQP compiler
 .sub "statement_control:sym<if>"  :subid("33_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1171
 .annotate 'line', 151
-    .const 'Sub' $P1182 = "34_1309998850.8808" 
+    .const 'Sub' $P1182 = "34_1309998850.8808"
     capture_lex $P1182
     new $P1170, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1170, control_1169
@@ -22153,19 +22175,19 @@ NQP::Compiler - NQP compiler
     isgt $I100, $N100, 0.0
     unless $I100, loop1187_done
   loop1187_redo:
-    .const 'Sub' $P1182 = "34_1309998850.8808" 
+    .const 'Sub' $P1182 = "34_1309998850.8808"
     capture_lex $P1182
     $P1182()
   loop1187_next:
     goto loop1187_test
   loop1187_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P115, exception, 'type'
     eq $P115, .CONTROL_LOOP_NEXT, loop1187_next
     eq $P115, .CONTROL_LOOP_REDO, loop1187_redo
   loop1187_done:
-    pop_eh 
+    pop_eh
 .annotate 'line', 164
     find_lex $P112, "$/"
     find_lex $P113, "$past"
@@ -22173,8 +22195,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 151
     .return ($P114)
   control_1169:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -22255,8 +22277,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 167
     .return ($P113)
   control_1189:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -22306,8 +22328,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 173
     .return ($P113)
   control_1195:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -22409,8 +22431,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 179
     .return ($P114)
   control_1202:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -22491,8 +22513,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 193
     .return ($P114)
   control_1214:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -22526,8 +22548,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 206
     .return ($P117)
   control_1224:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22585,8 +22607,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 210
     .return ($P115)
   control_1229:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -22644,8 +22666,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 217
     .return ($P115)
   control_1236:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -22690,8 +22712,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 261
     .return ($P114)
   control_1243:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22768,8 +22790,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 266
     .return ($P113)
   control_1249:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -22827,8 +22849,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 289
     .return ($P119)
   control_1257:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22857,8 +22879,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1265:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22887,8 +22909,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1270:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22917,8 +22939,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1275:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22947,8 +22969,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1280:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -22977,8 +22999,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1285:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23007,8 +23029,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1290:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23037,8 +23059,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1295:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23067,8 +23089,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1300:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23097,8 +23119,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1305:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23127,8 +23149,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1310:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23157,8 +23179,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1315:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23187,8 +23209,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1320:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23217,8 +23239,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1325:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23247,8 +23269,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1330:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23297,8 +23319,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 316
     .return ($P113)
   control_1335:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -23379,8 +23401,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 322
     .return ($P113)
   control_1342:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -23391,7 +23413,7 @@ NQP::Compiler - NQP compiler
 .sub "variable"  :subid("61_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1355
 .annotate 'line', 330
-    .const 'Sub' $P1361 = "62_1309998850.8808" 
+    .const 'Sub' $P1361 = "62_1309998850.8808"
     capture_lex $P1361
     new $P1354, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1354, control_1353
@@ -23415,7 +23437,7 @@ NQP::Compiler - NQP compiler
   vivify_333:
     if $P111, if_1357
 .annotate 'line', 336
-    .const 'Sub' $P1361 = "62_1309998850.8808" 
+    .const 'Sub' $P1361 = "62_1309998850.8808"
     capture_lex $P1361
     $P1361()
     goto if_1357_end
@@ -23444,8 +23466,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 330
     .return ($P113)
   control_1353:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -23644,8 +23666,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1378:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23804,8 +23826,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 369
     .return ($P115)
   control_1383:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -23883,8 +23905,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 392
     .return ($P113)
   control_1404:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -23913,8 +23935,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1415:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23943,8 +23965,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1420:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -23973,8 +23995,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1425:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24031,8 +24053,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 403
     .return ($P118)
   control_1430:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24089,8 +24111,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 409
     .return ($P118)
   control_1438:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24142,8 +24164,8 @@ NQP::Compiler - NQP compiler
     $P118 = $P110."!make"($P111)
     .return ($P118)
   control_1446:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24172,8 +24194,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1454:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24184,7 +24206,7 @@ NQP::Compiler - NQP compiler
 .sub "variable_declarator"  :subid("73_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1461
 .annotate 'line', 419
-    .const 'Sub' $P1477 = "74_1309998850.8808" 
+    .const 'Sub' $P1477 = "74_1309998850.8808"
     capture_lex $P1477
     new $P1460, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1460, control_1459
@@ -24269,7 +24291,7 @@ NQP::Compiler - NQP compiler
     iseq $I100, $S100, "has"
     if $I100, if_1471
 .annotate 'line', 436
-    .const 'Sub' $P1477 = "74_1309998850.8808" 
+    .const 'Sub' $P1477 = "74_1309998850.8808"
     capture_lex $P1477
     $P1477()
     goto if_1471_end
@@ -24321,8 +24343,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 419
     .return ($P117)
   control_1459:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P114, exception, "payload"
     .return ($P114)
 .end
@@ -24414,8 +24436,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1483:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24444,8 +24466,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1488:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -24456,9 +24478,9 @@ NQP::Compiler - NQP compiler
 .sub "routine_def"  :subid("77_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1495
 .annotate 'line', 450
-    .const 'Sub' $P1517 = "79_1309998850.8808" 
+    .const 'Sub' $P1517 = "79_1309998850.8808"
     capture_lex $P1517
-    .const 'Sub' $P1502 = "78_1309998850.8808" 
+    .const 'Sub' $P1502 = "78_1309998850.8808"
     capture_lex $P1502
     new $P1494, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1494, control_1493
@@ -24503,7 +24525,7 @@ NQP::Compiler - NQP compiler
     new $P112, "Undef"
   vivify_431:
     unless $P112, if_1499_end
-    .const 'Sub' $P1502 = "78_1309998850.8808" 
+    .const 'Sub' $P1502 = "78_1309998850.8808"
     capture_lex $P1502
     $P1502()
   if_1499_end:
@@ -24552,19 +24574,19 @@ NQP::Compiler - NQP compiler
     unless $P114, loop1519_done
     shift $P117, $P114
   loop1519_redo:
-    .const 'Sub' $P1517 = "79_1309998850.8808" 
+    .const 'Sub' $P1517 = "79_1309998850.8808"
     capture_lex $P1517
     $P1517($P117)
   loop1519_next:
     goto loop1519_test
   loop1519_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P119, exception, 'type'
     eq $P119, .CONTROL_LOOP_NEXT, loop1519_next
     eq $P119, .CONTROL_LOOP_REDO, loop1519_redo
   loop1519_done:
-    pop_eh 
+    pop_eh
   for_undef_450:
 .annotate 'line', 467
     set $P112, $P114
@@ -24572,8 +24594,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 450
     .return ($P112)
   control_1493:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -24694,9 +24716,9 @@ NQP::Compiler - NQP compiler
 .sub "method_def"  :subid("80_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1523
 .annotate 'line', 473
-    .const 'Sub' $P1541 = "82_1309998850.8808" 
+    .const 'Sub' $P1541 = "82_1309998850.8808"
     capture_lex $P1541
-    .const 'Sub' $P1531 = "81_1309998850.8808" 
+    .const 'Sub' $P1531 = "81_1309998850.8808"
     capture_lex $P1531
     new $P1522, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1522, control_1521
@@ -24763,7 +24785,7 @@ NQP::Compiler - NQP compiler
     new $P111, "Undef"
   vivify_458:
     unless $P111, if_1528_end
-    .const 'Sub' $P1531 = "81_1309998850.8808" 
+    .const 'Sub' $P1531 = "81_1309998850.8808"
     capture_lex $P1531
     $P1531()
   if_1528_end:
@@ -24827,19 +24849,19 @@ NQP::Compiler - NQP compiler
     unless $P113, loop1543_done
     shift $P115, $P113
   loop1543_redo:
-    .const 'Sub' $P1541 = "82_1309998850.8808" 
+    .const 'Sub' $P1541 = "82_1309998850.8808"
     capture_lex $P1541
     $P1541($P115)
   loop1543_next:
     goto loop1543_test
   loop1543_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P118, exception, 'type'
     eq $P118, .CONTROL_LOOP_NEXT, loop1543_next
     eq $P118, .CONTROL_LOOP_REDO, loop1543_redo
   loop1543_done:
-    pop_eh 
+    pop_eh
   for_undef_469:
 .annotate 'line', 489
     set $P111, $P113
@@ -24847,8 +24869,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 473
     .return ($P111)
   control_1521:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -24904,9 +24926,9 @@ NQP::Compiler - NQP compiler
 .sub "signature"  :subid("83_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1547
 .annotate 'line', 495
-    .const 'Sub' $P1558 = "85_1309998850.8808" 
+    .const 'Sub' $P1558 = "85_1309998850.8808"
     capture_lex $P1558
-    .const 'Sub' $P1553 = "84_1309998850.8808" 
+    .const 'Sub' $P1553 = "84_1309998850.8808"
     capture_lex $P1553
     new $P1546, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1546, control_1545
@@ -24950,19 +24972,19 @@ NQP::Compiler - NQP compiler
     unless $P111, loop1555_done
     shift $P113, $P111
   loop1555_redo:
-    .const 'Sub' $P1553 = "84_1309998850.8808" 
+    .const 'Sub' $P1553 = "84_1309998850.8808"
     capture_lex $P1553
     $P1553($P113)
   loop1555_next:
     goto loop1555_test
   loop1555_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P115, exception, 'type'
     eq $P115, .CONTROL_LOOP_NEXT, loop1555_next
     eq $P115, .CONTROL_LOOP_REDO, loop1555_redo
   loop1555_done:
-    pop_eh 
+    pop_eh
   for_undef_475:
 .annotate 'line', 501
     find_dynamic_lex $P112, "$*MULTINESS"
@@ -24979,7 +25001,7 @@ NQP::Compiler - NQP compiler
     set $P111, $I100
     goto if_1556_end
   if_1556:
-    .const 'Sub' $P1558 = "85_1309998850.8808" 
+    .const 'Sub' $P1558 = "85_1309998850.8808"
     capture_lex $P1558
     $P113 = $P1558()
     set $P111, $P113
@@ -24987,8 +25009,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 495
     .return ($P111)
   control_1545:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -25011,7 +25033,7 @@ NQP::Compiler - NQP compiler
 .include "except_types.pasm"
 .sub "_block1557"  :anon :subid("85_1309998850.8808") :outer("83_1309998850.8808")
 .annotate 'line', 501
-    .const 'Sub' $P1562 = "86_1309998850.8808" 
+    .const 'Sub' $P1562 = "86_1309998850.8808"
     capture_lex $P1562
 .annotate 'line', 502
     $P1560 = root_new ['parrot';'ResizablePMCArray']
@@ -25033,19 +25055,19 @@ NQP::Compiler - NQP compiler
     unless $P113, loop1570_done
     shift $P117, $P113
   loop1570_redo:
-    .const 'Sub' $P1562 = "86_1309998850.8808" 
+    .const 'Sub' $P1562 = "86_1309998850.8808"
     capture_lex $P1562
     $P1562($P117)
   loop1570_next:
     goto loop1570_test
   loop1570_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P120, exception, 'type'
     eq $P120, .CONTROL_LOOP_NEXT, loop1570_next
     eq $P120, .CONTROL_LOOP_REDO, loop1570_redo
   loop1570_done:
-    pop_eh 
+    pop_eh
   for_undef_478:
 .annotate 'line', 507
     get_global $P1571, "@BLOCK"
@@ -25115,7 +25137,7 @@ NQP::Compiler - NQP compiler
 .sub "parameter"  :subid("87_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1575
 .annotate 'line', 511
-    .const 'Sub' $P1606 = "88_1309998850.8808" 
+    .const 'Sub' $P1606 = "88_1309998850.8808"
     capture_lex $P1606
     new $P1574, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1574, control_1573
@@ -25343,7 +25365,7 @@ NQP::Compiler - NQP compiler
     new $P112, "Undef"
   vivify_510:
     unless $P112, if_1603_end
-    .const 'Sub' $P1606 = "88_1309998850.8808" 
+    .const 'Sub' $P1606 = "88_1309998850.8808"
     capture_lex $P1606
     $P1606()
   if_1603_end:
@@ -25354,8 +25376,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 511
     .return ($P114)
   control_1573:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -25365,7 +25387,7 @@ NQP::Compiler - NQP compiler
 .include "except_types.pasm"
 .sub "_block1605"  :anon :subid("88_1309998850.8808") :outer("87_1309998850.8808")
 .annotate 'line', 542
-    .const 'Sub' $P1614 = "89_1309998850.8808" 
+    .const 'Sub' $P1614 = "89_1309998850.8808"
     capture_lex $P1614
 .annotate 'line', 543
     $P1608 = root_new ['parrot';'ResizablePMCArray']
@@ -25405,19 +25427,19 @@ NQP::Compiler - NQP compiler
     unless $P113, loop1616_done
     shift $P115, $P113
   loop1616_redo:
-    .const 'Sub' $P1614 = "89_1309998850.8808" 
+    .const 'Sub' $P1614 = "89_1309998850.8808"
     capture_lex $P1614
     $P1614($P115)
   loop1616_next:
     goto loop1616_test
   loop1616_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P118, exception, 'type'
     eq $P118, .CONTROL_LOOP_NEXT, loop1616_next
     eq $P118, .CONTROL_LOOP_REDO, loop1616_redo
   loop1616_done:
-    pop_eh 
+    pop_eh
   for_undef_516:
 .annotate 'line', 545
     find_lex $P113, "$past"
@@ -25489,8 +25511,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 551
     .return ($P114)
   control_1618:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -25543,8 +25565,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 559
     .return ($P113)
   control_1625:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -25575,8 +25597,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 565
     .return ($P113)
   control_1633:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -25587,7 +25609,7 @@ NQP::Compiler - NQP compiler
 .sub "trait_mod:sym<is>"  :subid("93_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1640
 .annotate 'line', 569
-    .const 'Sub' $P1648 = "94_1309998850.8808" 
+    .const 'Sub' $P1648 = "94_1309998850.8808"
     capture_lex $P1648
     new $P1639, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1639, control_1638
@@ -25657,7 +25679,7 @@ NQP::Compiler - NQP compiler
   unless_1646_end:
 .annotate 'line', 574
     find_lex $P113, "$/"
-    .const 'Sub' $P1648 = "94_1309998850.8808" 
+    .const 'Sub' $P1648 = "94_1309998850.8808"
     newclosure $P1650, $P1648
     $P114 = $P113."!make"($P1650)
 .annotate 'line', 571
@@ -25666,8 +25688,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 569
     .return ($P111)
   control_1638:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -25698,9 +25720,9 @@ NQP::Compiler - NQP compiler
     .param pmc param_1656 :optional
     .param int has_param_1656 :opt_flag
 .annotate 'line', 581
-    .const 'Sub' $P1680 = "97_1309998850.8808" 
+    .const 'Sub' $P1680 = "97_1309998850.8808"
     capture_lex $P1680
-    .const 'Sub' $P1667 = "96_1309998850.8808" 
+    .const 'Sub' $P1667 = "96_1309998850.8808"
     capture_lex $P1667
     new $P1654, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1654, control_1653
@@ -25727,7 +25749,7 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 582
 
         $P1661 = get_hll_global ['Regex';'P6Regex';'Actions'], '@MODIFIERS'
-    
+
     store_lex "@MODIFIERS", $P1661
 .annotate 'line', 585
     find_lex $P1662, "$/"
@@ -25761,13 +25783,13 @@ NQP::Compiler - NQP compiler
     iseq $I100, $S100, "open"
     if $I100, if_1665
 .annotate 'line', 627
-    .const 'Sub' $P1680 = "97_1309998850.8808" 
+    .const 'Sub' $P1680 = "97_1309998850.8808"
     capture_lex $P1680
     $P1680()
     goto if_1665_end
   if_1665:
 .annotate 'line', 614
-    .const 'Sub' $P1667 = "96_1309998850.8808" 
+    .const 'Sub' $P1667 = "96_1309998850.8808"
     capture_lex $P1667
     $P1667()
   if_1665_end:
@@ -25816,8 +25838,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 581
     .return ($P115)
   control_1653:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -25942,7 +25964,7 @@ NQP::Compiler - NQP compiler
 
             $P0 = find_lex '$name'
             set_hll_global ['Regex';'P6Regex';'Actions'], '$REGEXNAME', $P0
-        
+
 .annotate 'line', 623
     get_global $P1677, "@BLOCK"
     unless_null $P1677, vivify_549
@@ -26066,8 +26088,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 645
     .return ($P113)
   control_1685:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -26091,8 +26113,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 654
     .return ($P113)
   control_1698:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26141,8 +26163,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 658
     .return ($P113)
   control_1702:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -26263,8 +26285,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 664
     .return ($P115)
   control_1709:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -26340,7 +26362,7 @@ NQP::Compiler - NQP compiler
         $P0 = split '__', $S0
         $S0 = join ' ', $P0
         $P1737 = box $S0
-    
+
     store_lex "$pirop", $P1737
 .annotate 'line', 688
     find_lex $P112, "$past"
@@ -26356,8 +26378,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 678
     .return ($P114)
   control_1727:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -26386,8 +26408,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1739:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26398,7 +26420,7 @@ NQP::Compiler - NQP compiler
 .sub "arglist"  :subid("104_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1746
 .annotate 'line', 695
-    .const 'Sub' $P1753 = "105_1309998850.8808" 
+    .const 'Sub' $P1753 = "105_1309998850.8808"
     capture_lex $P1753
     new $P1745, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1745, control_1744
@@ -26432,7 +26454,7 @@ NQP::Compiler - NQP compiler
     new $P113, "Undef"
   vivify_588:
     unless $P113, if_1750_end
-    .const 'Sub' $P1753 = "105_1309998850.8808" 
+    .const 'Sub' $P1753 = "105_1309998850.8808"
     capture_lex $P1753
     $P1753()
   if_1750_end:
@@ -26565,13 +26587,13 @@ NQP::Compiler - NQP compiler
   loop1774_next:
     goto loop1774_test
   loop1774_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P117, exception, 'type'
     eq $P117, .CONTROL_LOOP_NEXT, loop1774_next
     eq $P117, .CONTROL_LOOP_REDO, loop1774_redo
   loop1774_done:
-    pop_eh 
+    pop_eh
 .annotate 'line', 717
     find_lex $P113, "$/"
     find_lex $P114, "$past"
@@ -26579,8 +26601,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 695
     .return ($P115)
   control_1744:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -26590,7 +26612,7 @@ NQP::Compiler - NQP compiler
 .include "except_types.pasm"
 .sub "_block1752"  :anon :subid("105_1309998850.8808") :outer("104_1309998850.8808")
 .annotate 'line', 697
-    .const 'Sub' $P1759 = "106_1309998850.8808" 
+    .const 'Sub' $P1759 = "106_1309998850.8808"
     capture_lex $P1759
 .annotate 'line', 698
     new $P114, "Undef"
@@ -26644,19 +26666,19 @@ NQP::Compiler - NQP compiler
     unless $P121, loop1761_done
     shift $P124, $P121
   loop1761_redo:
-    .const 'Sub' $P1759 = "106_1309998850.8808" 
+    .const 'Sub' $P1759 = "106_1309998850.8808"
     capture_lex $P1759
     $P1759($P124)
   loop1761_next:
     goto loop1761_test
   loop1761_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P127, exception, 'type'
     eq $P127, .CONTROL_LOOP_NEXT, loop1761_next
     eq $P127, .CONTROL_LOOP_REDO, loop1761_redo
   loop1761_done:
-    pop_eh 
+    pop_eh
   for_undef_591:
 .annotate 'line', 699
     set $P115, $P121
@@ -26701,8 +26723,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1776:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26757,8 +26779,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 723
     .return ($P119)
   control_1781:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26834,8 +26856,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 729
     .return ($P113)
   control_1789:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -26864,8 +26886,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1799:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26894,8 +26916,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1804:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -26973,8 +26995,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 747
     .return ($P113)
   control_1809:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -27053,8 +27075,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 755
     .return ($P118)
   control_1821:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -27083,8 +27105,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1831:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27120,8 +27142,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 764
     .return ($P117)
   control_1836:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27157,8 +27179,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 770
     .return ($P117)
   control_1841:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27194,8 +27216,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 776
     .return ($P117)
   control_1846:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27226,8 +27248,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 782
     .return ($P113)
   control_1851:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27281,8 +27303,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 786
     .return ($P118)
   control_1856:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27360,8 +27382,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 790
     .return ($P115)
   control_1864:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -27390,8 +27412,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1875:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27420,8 +27442,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1880:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27450,8 +27472,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1885:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27480,8 +27502,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1890:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27510,8 +27532,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1895:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27546,8 +27568,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 801
     .return ($P118)
   control_1900:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27587,7 +27609,7 @@ NQP::Compiler - NQP compiler
 
             null $P0
             set_hll_global ['Regex';'P6Regex';'Actions'], '$REGEXNAME', $P0
-        
+
 .annotate 'line', 813
     get_global $P1912, "@BLOCK"
     unless_null $P1912, vivify_673
@@ -27657,8 +27679,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 807
     .return ($P115)
   control_1905:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, "payload"
     .return ($P113)
 .end
@@ -27687,8 +27709,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1917:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27725,8 +27747,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 831
     .return ($P118)
   control_1922:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27746,8 +27768,8 @@ NQP::Compiler - NQP compiler
     $P111 = $P110."!make"("\e")
     .return ($P111)
   control_1927:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27776,8 +27798,8 @@ NQP::Compiler - NQP compiler
     $P113 = $P110."!make"($P112)
     .return ($P113)
   control_1931:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27806,8 +27828,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 842
     .return ($P114)
   control_1936:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27836,8 +27858,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 848
     .return ($P114)
   control_1940:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27866,8 +27888,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 854
     .return ($P117)
   control_1944:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27887,8 +27909,8 @@ NQP::Compiler - NQP compiler
     $P111 = "control"($P110, "CONTROL_LOOP_NEXT")
     .return ($P111)
   control_1948:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27908,8 +27930,8 @@ NQP::Compiler - NQP compiler
     $P111 = "control"($P110, "CONTROL_LOOP_LAST")
     .return ($P111)
   control_1952:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27929,8 +27951,8 @@ NQP::Compiler - NQP compiler
     $P111 = "control"($P110, "CONTROL_LOOP_REDO")
     .return ($P111)
   control_1956:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27955,8 +27977,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 876
     .return ($P114)
   control_1960:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -27965,22 +27987,22 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"RegexActions"]
 .sub "_block1963"  :subid("139_1309998850.8808") :outer("11_1309998850.8808")
 .annotate 'line', 881
-    .const 'Sub' $P1997 = "146_1309998850.8808" 
+    .const 'Sub' $P1997 = "146_1309998850.8808"
     capture_lex $P1997
-    .const 'Sub' $P1992 = "145_1309998850.8808" 
+    .const 'Sub' $P1992 = "145_1309998850.8808"
     capture_lex $P1992
-    .const 'Sub' $P1986 = "144_1309998850.8808" 
+    .const 'Sub' $P1986 = "144_1309998850.8808"
     capture_lex $P1986
-    .const 'Sub' $P1981 = "143_1309998850.8808" 
+    .const 'Sub' $P1981 = "143_1309998850.8808"
     capture_lex $P1981
-    .const 'Sub' $P1976 = "142_1309998850.8808" 
+    .const 'Sub' $P1976 = "142_1309998850.8808"
     capture_lex $P1976
-    .const 'Sub' $P1971 = "141_1309998850.8808" 
+    .const 'Sub' $P1971 = "141_1309998850.8808"
     capture_lex $P1971
-    .const 'Sub' $P1965 = "140_1309998850.8808" 
+    .const 'Sub' $P1965 = "140_1309998850.8808"
     capture_lex $P1965
 .annotate 'line', 915
-    .const 'Sub' $P1997 = "146_1309998850.8808" 
+    .const 'Sub' $P1997 = "146_1309998850.8808"
     newclosure $P2004, $P1997
 .annotate 'line', 881
     .return ($P2004)
@@ -28021,8 +28043,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 883
     .return ($P117)
   control_1966:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P111, exception, "payload"
     .return ($P111)
 .end
@@ -28056,8 +28078,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 889
     .return ($P117)
   control_1972:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -28091,8 +28113,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 894
     .return ($P117)
   control_1977:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -28126,8 +28148,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 899
     .return ($P117)
   control_1982:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -28173,8 +28195,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 904
     .return ($P118)
   control_1987:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -28208,8 +28230,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 910
     .return ($P117)
   control_1993:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, "payload"
     .return ($P110)
 .end
@@ -28274,8 +28296,8 @@ NQP::Compiler - NQP compiler
 .annotate 'line', 915
     .return ($P114)
   control_1998:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P112, exception, "payload"
     .return ($P112)
 .end
@@ -28284,7 +28306,7 @@ NQP::Compiler - NQP compiler
 .namespace ["NQP";"Actions"]
 .sub "_block2005" :tag('load') :anon :subid("147_1309998850.8808")
 .annotate 'line', 3
-    .const 'Sub' $P2007 = "11_1309998850.8808" 
+    .const 'Sub' $P2007 = "11_1309998850.8808"
     $P111 = $P2007()
     .return ($P111)
 .end
@@ -28293,7 +28315,7 @@ NQP::Compiler - NQP compiler
 .namespace []
 .sub "_block2013" :tag('load') :anon :subid("149_1309998850.8808")
 .annotate 'line', 1
-    .const 'Sub' $P2015 = "10_1309998850.8808" 
+    .const 'Sub' $P2015 = "10_1309998850.8808"
     $P100 = $P2015()
     .return ($P100)
 .end

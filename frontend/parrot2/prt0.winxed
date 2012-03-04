@@ -244,3 +244,16 @@ function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
     stderr.print("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
     exit(1);
 }
+
+/*
+function load_bytecode(string name, string tagname)
+{
+    var pf = load_packfile(name);
+    if (!pf.is_initialized(tagname)) {
+        for (var load_sub in pf.subs_by_tag(tagname))
+            load_sub();
+        pf.mark_initialized(tagname);
+    }
+    return pf;
+}
+*/

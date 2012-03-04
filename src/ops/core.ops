@@ -116,6 +116,12 @@ inline op check_events__() :internal :flow {
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
+inline op load_bytecode(in STR) :load_file {
+    Parrot_ex_throw_from_op_args(interp, CUR_OPCODE,
+        EXCEPTION_INVALID_OPERATION,
+        "use of deprecated load_bytecode_s opcode");
+}
+
 inline op load_bytecode(out PMC, in STR) :load_file {
     $1 = Parrot_pf_load_bytecode_search(interp, $2);
 }
