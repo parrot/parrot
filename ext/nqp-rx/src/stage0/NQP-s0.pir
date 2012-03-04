@@ -28376,7 +28376,8 @@ NQP::Compiler - NQP compiler
 
 .namespace ['NQP';'Compiler']
 
-.sub '' :anon :tag('load') :tag('init')
+.sub '' :anon :tag('load', 'init')
+    say 'HERE'
     .local pmc p6meta, nqpproto
     p6meta = get_hll_global 'P6metaclass'
     nqpproto = p6meta.'new_class'('NQP::Compiler', 'parent'=>'HLL::Compiler')

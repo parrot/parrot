@@ -1,4 +1,4 @@
-# 
+#
 
 =head1 NAME
 
@@ -13,8 +13,28 @@ and HLL::Grammar.
 
 =cut
 
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tag
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+.end
+
 .sub '' :anon :tag('load') :tag('init')
-    load_bytecode 'Regex.pbc'
+    '__load_bytecode'('Regex.pbc', 'load')
 .end
 
 ### .include 'src/cheats/hll-compiler.pir'
@@ -995,7 +1015,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1000"  :anon :subid("10_1309998840.89449")
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1309998840.89449" 
+    .const 'Sub' $P1003 = "11_1309998840.89449"
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -1005,12 +1025,12 @@ An operator precedence parser.
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 5
-    .const 'Sub' $P1003 = "11_1309998840.89449" 
+    .const 'Sub' $P1003 = "11_1309998840.89449"
     capture_lex $P1003
     $P101 = $P1003()
 .annotate 'line', 1
     .return ($P101)
-    .const 'Sub' $P1235 = "107_1309998840.89449" 
+    .const 'Sub' $P1235 = "107_1309998840.89449"
     .return ($P1235)
 .end
 
@@ -1018,7 +1038,7 @@ An operator precedence parser.
 .namespace []
 .sub "" :tag('load') :tag('init') :subid("post108") :outer("10_1309998840.89449")
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1309998840.89449" 
+    .const 'Sub' $P1001 = "10_1309998840.89449"
     .local pmc block
     set block, $P1001
     $P1237 = get_root_global ["parrot"], "P6metaclass"
@@ -1029,81 +1049,81 @@ An operator precedence parser.
 .namespace ["HLL";"Grammar"]
 .sub "_block1002"  :subid("11_1309998840.89449") :outer("10_1309998840.89449")
 .annotate 'line', 5
-    .const 'Sub' $P1223 = "103_1309998840.89449" 
+    .const 'Sub' $P1223 = "103_1309998840.89449"
     capture_lex $P1223
-    .const 'Sub' $P1218 = "101_1309998840.89449" 
+    .const 'Sub' $P1218 = "101_1309998840.89449"
     capture_lex $P1218
-    .const 'Sub' $P1207 = "98_1309998840.89449" 
+    .const 'Sub' $P1207 = "98_1309998840.89449"
     capture_lex $P1207
-    .const 'Sub' $P1190 = "93_1309998840.89449" 
+    .const 'Sub' $P1190 = "93_1309998840.89449"
     capture_lex $P1190
-    .const 'Sub' $P1185 = "91_1309998840.89449" 
+    .const 'Sub' $P1185 = "91_1309998840.89449"
     capture_lex $P1185
-    .const 'Sub' $P1181 = "89_1309998840.89449" 
+    .const 'Sub' $P1181 = "89_1309998840.89449"
     capture_lex $P1181
-    .const 'Sub' $P1176 = "87_1309998840.89449" 
+    .const 'Sub' $P1176 = "87_1309998840.89449"
     capture_lex $P1176
-    .const 'Sub' $P1171 = "85_1309998840.89449" 
+    .const 'Sub' $P1171 = "85_1309998840.89449"
     capture_lex $P1171
-    .const 'Sub' $P1167 = "83_1309998840.89449" 
+    .const 'Sub' $P1167 = "83_1309998840.89449"
     capture_lex $P1167
-    .const 'Sub' $P1163 = "81_1309998840.89449" 
+    .const 'Sub' $P1163 = "81_1309998840.89449"
     capture_lex $P1163
-    .const 'Sub' $P1159 = "79_1309998840.89449" 
+    .const 'Sub' $P1159 = "79_1309998840.89449"
     capture_lex $P1159
-    .const 'Sub' $P1155 = "77_1309998840.89449" 
+    .const 'Sub' $P1155 = "77_1309998840.89449"
     capture_lex $P1155
-    .const 'Sub' $P1151 = "75_1309998840.89449" 
+    .const 'Sub' $P1151 = "75_1309998840.89449"
     capture_lex $P1151
-    .const 'Sub' $P1147 = "73_1309998840.89449" 
+    .const 'Sub' $P1147 = "73_1309998840.89449"
     capture_lex $P1147
-    .const 'Sub' $P1143 = "71_1309998840.89449" 
+    .const 'Sub' $P1143 = "71_1309998840.89449"
     capture_lex $P1143
-    .const 'Sub' $P1139 = "69_1309998840.89449" 
+    .const 'Sub' $P1139 = "69_1309998840.89449"
     capture_lex $P1139
-    .const 'Sub' $P1132 = "65_1309998840.89449" 
+    .const 'Sub' $P1132 = "65_1309998840.89449"
     capture_lex $P1132
-    .const 'Sub' $P1120 = "63_1309998840.89449" 
+    .const 'Sub' $P1120 = "63_1309998840.89449"
     capture_lex $P1120
-    .const 'Sub' $P1114 = "61_1309998840.89449" 
+    .const 'Sub' $P1114 = "61_1309998840.89449"
     capture_lex $P1114
-    .const 'Sub' $P1109 = "59_1309998840.89449" 
+    .const 'Sub' $P1109 = "59_1309998840.89449"
     capture_lex $P1109
-    .const 'Sub' $P1103 = "57_1309998840.89449" 
+    .const 'Sub' $P1103 = "57_1309998840.89449"
     capture_lex $P1103
-    .const 'Sub' $P1098 = "55_1309998840.89449" 
+    .const 'Sub' $P1098 = "55_1309998840.89449"
     capture_lex $P1098
-    .const 'Sub' $P1092 = "53_1309998840.89449" 
+    .const 'Sub' $P1092 = "53_1309998840.89449"
     capture_lex $P1092
-    .const 'Sub' $P1087 = "51_1309998840.89449" 
+    .const 'Sub' $P1087 = "51_1309998840.89449"
     capture_lex $P1087
-    .const 'Sub' $P1081 = "49_1309998840.89449" 
+    .const 'Sub' $P1081 = "49_1309998840.89449"
     capture_lex $P1081
-    .const 'Sub' $P1076 = "47_1309998840.89449" 
+    .const 'Sub' $P1076 = "47_1309998840.89449"
     capture_lex $P1076
-    .const 'Sub' $P1071 = "45_1309998840.89449" 
+    .const 'Sub' $P1071 = "45_1309998840.89449"
     capture_lex $P1071
-    .const 'Sub' $P1065 = "43_1309998840.89449" 
+    .const 'Sub' $P1065 = "43_1309998840.89449"
     capture_lex $P1065
-    .const 'Sub' $P1059 = "41_1309998840.89449" 
+    .const 'Sub' $P1059 = "41_1309998840.89449"
     capture_lex $P1059
-    .const 'Sub' $P1055 = "40_1309998840.89449" 
+    .const 'Sub' $P1055 = "40_1309998840.89449"
     capture_lex $P1055
-    .const 'Sub' $P1051 = "38_1309998840.89449" 
+    .const 'Sub' $P1051 = "38_1309998840.89449"
     capture_lex $P1051
-    .const 'Sub' $P1047 = "36_1309998840.89449" 
+    .const 'Sub' $P1047 = "36_1309998840.89449"
     capture_lex $P1047
-    .const 'Sub' $P1042 = "34_1309998840.89449" 
+    .const 'Sub' $P1042 = "34_1309998840.89449"
     capture_lex $P1042
-    .const 'Sub' $P1038 = "32_1309998840.89449" 
+    .const 'Sub' $P1038 = "32_1309998840.89449"
     capture_lex $P1038
-    .const 'Sub' $P1034 = "30_1309998840.89449" 
+    .const 'Sub' $P1034 = "30_1309998840.89449"
     capture_lex $P1034
-    .const 'Sub' $P1030 = "28_1309998840.89449" 
+    .const 'Sub' $P1030 = "28_1309998840.89449"
     capture_lex $P1030
-    .const 'Sub' $P1010 = "14_1309998840.89449" 
+    .const 'Sub' $P1010 = "14_1309998840.89449"
     capture_lex $P1010
-    .const 'Sub' $P1004 = "12_1309998840.89449" 
+    .const 'Sub' $P1004 = "12_1309998840.89449"
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -1111,10 +1131,10 @@ An operator precedence parser.
     unless $I0 goto ctxsave_done
     $P0."ctxsave"()
   ctxsave_done:
-    .const 'Sub' $P1223 = "103_1309998840.89449" 
+    .const 'Sub' $P1223 = "103_1309998840.89449"
     capture_lex $P1223
     .return ($P1223)
-    .const 'Sub' $P1232 = "106_1309998840.89449" 
+    .const 'Sub' $P1232 = "106_1309998840.89449"
     .return ($P1232)
 .end
 
@@ -1982,8 +2002,8 @@ An operator precedence parser.
   unless_1058_end:
     .return ($P100)
   control_1056:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -3510,7 +3530,7 @@ An operator precedence parser.
     rx1133_cur."!mark_push"(0, rx1133_pos, $I10)
   rxscan1135_done:
 .annotate 'line', 77
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1133_pos, rx1133_eos, rx1133_fail
     sub $I10, rx1133_pos, rx1133_off
     substr $S10, rx1133_tgt, $I10, 1
@@ -4719,11 +4739,11 @@ An operator precedence parser.
 .namespace ["HLL";"Grammar"]
 .sub "quote_escape:sym<misc>"  :subid("93_1309998840.89449") :method :outer("11_1309998840.89449")
 .annotate 'line', 5
-    .const 'Sub' $P1204 = "97_1309998840.89449" 
+    .const 'Sub' $P1204 = "97_1309998840.89449"
     capture_lex $P1204
-    .const 'Sub' $P1199 = "96_1309998840.89449" 
+    .const 'Sub' $P1199 = "96_1309998840.89449"
     capture_lex $P1199
-    .const 'Sub' $P1195 = "95_1309998840.89449" 
+    .const 'Sub' $P1195 = "95_1309998840.89449"
     capture_lex $P1195
     .local string rx1191_tgt
     .local int rx1191_pos
@@ -4765,7 +4785,7 @@ An operator precedence parser.
     find_lex $P101, unicode:"$\x{a2}"
     $P102 = $P101."MATCH"()
     store_lex "$/", $P102
-    .const 'Sub' $P1195 = "95_1309998840.89449" 
+    .const 'Sub' $P1195 = "95_1309998840.89449"
     capture_lex $P1195
     $P103 = $P1195()
   # rx literal  "\\"
@@ -4791,7 +4811,7 @@ An operator precedence parser.
 .annotate 'line', 104
   # rx subrule $P1199 subtype=capture negate=
     rx1191_cur."!cursor_pos"(rx1191_pos)
-    .const 'Sub' $P1199 = "96_1309998840.89449" 
+    .const 'Sub' $P1199 = "96_1309998840.89449"
     capture_lex $P1199
     $P10 = rx1191_cur.$P1199()
     unless $P10, rx1191_fail
@@ -4825,7 +4845,7 @@ An operator precedence parser.
     find_lex $P104, unicode:"$\x{a2}"
     $P105 = $P104."MATCH"()
     store_lex "$/", $P105
-    .const 'Sub' $P1204 = "97_1309998840.89449" 
+    .const 'Sub' $P1204 = "97_1309998840.89449"
     capture_lex $P1204
     $P106 = $P1204()
   alt1197_end:
@@ -4989,7 +5009,7 @@ An operator precedence parser.
 .namespace ["HLL";"Grammar"]
 .sub "charname"  :subid("98_1309998840.89449") :method :outer("11_1309998840.89449")
 .annotate 'line', 5
-    .const 'Sub' $P1215 = "100_1309998840.89449" 
+    .const 'Sub' $P1215 = "100_1309998840.89449"
     capture_lex $P1215
     .local string rx1208_tgt
     .local int rx1208_pos
@@ -5041,7 +5061,7 @@ An operator precedence parser.
     goto alt1211_end
   alt1211_1:
 .annotate 'line', 113
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1208_pos, rx1208_eos, rx1208_fail
     sub $I10, rx1208_pos, rx1208_off
     substr $S10, rx1208_tgt, $I10, 1
@@ -5053,7 +5073,7 @@ An operator precedence parser.
     rx1208_cur."!mark_push"(0, rx1208_pos, $I10)
     goto rxquantf1212_done
   rxquantf1212_loop:
-  # rx enumcharlist negate=1 
+  # rx enumcharlist negate=1
     ge rx1208_pos, rx1208_eos, rx1208_fail
     sub $I10, rx1208_pos, rx1208_off
     substr $S10, rx1208_tgt, $I10, 1
@@ -5063,7 +5083,7 @@ An operator precedence parser.
     set_addr $I10, rxquantf1212_loop
     rx1208_cur."!mark_push"(rx1208_rep, rx1208_pos, $I10)
   rxquantf1212_done:
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1208_pos, rx1208_eos, rx1208_fail
     sub $I10, rx1208_pos, rx1208_off
     substr $S10, rx1208_tgt, $I10, 1
@@ -5073,7 +5093,7 @@ An operator precedence parser.
 .annotate 'line', 114
   # rx subrule "before" subtype=zerowidth negate=
     rx1208_cur."!cursor_pos"(rx1208_pos)
-    .const 'Sub' $P1215 = "100_1309998840.89449" 
+    .const 'Sub' $P1215 = "100_1309998840.89449"
     capture_lex $P1215
     $P10 = rx1208_cur."before"($P1215)
     unless $P10, rx1208_fail
@@ -5209,7 +5229,7 @@ An operator precedence parser.
     sub $I10, rx1216_pos, rx1216_off
     find_not_cclass $I11, 32, rx1216_tgt, $I10, rx1216_eos
     add rx1216_pos, rx1216_off, $I11
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1216_pos, rx1216_eos, rx1216_fail
     sub $I10, rx1216_pos, rx1216_off
     substr $S10, rx1216_tgt, $I10, 1
@@ -5353,7 +5373,7 @@ An operator precedence parser.
 .namespace ["HLL";"Grammar"]
 .sub "charspec"  :subid("103_1309998840.89449") :method :outer("11_1309998840.89449")
 .annotate 'line', 5
-    .const 'Sub' $P1230 = "105_1309998840.89449" 
+    .const 'Sub' $P1230 = "105_1309998840.89449"
     capture_lex $P1230
     .local string rx1224_tgt
     .local int rx1224_pos
@@ -5455,7 +5475,7 @@ An operator precedence parser.
     set_addr $I10, alt1227_3
     rx1224_cur."!mark_push"(0, rx1224_pos, $I10)
 .annotate 'line', 121
-  # rx enumcharlist negate=0 
+  # rx enumcharlist negate=0
     ge rx1224_pos, rx1224_eos, rx1224_fail
     sub $I10, rx1224_pos, rx1224_off
     substr $S10, rx1224_tgt, $I10, 1
@@ -5469,7 +5489,7 @@ An operator precedence parser.
     find_lex $P102, unicode:"$\x{a2}"
     $P103 = $P102."MATCH"()
     store_lex "$/", $P103
-    .const 'Sub' $P1230 = "105_1309998840.89449" 
+    .const 'Sub' $P1230 = "105_1309998840.89449"
     capture_lex $P1230
     $P104 = $P1230()
   alt1227_end:
@@ -5553,7 +5573,7 @@ An operator precedence parser.
 .namespace ["HLL";"Grammar"]
 .sub "_block1231" :tag('load') :anon :subid("106_1309998840.89449")
 .annotate 'line', 5
-    .const 'Sub' $P1233 = "11_1309998840.89449" 
+    .const 'Sub' $P1233 = "11_1309998840.89449"
     $P100 = $P1233()
     .return ($P100)
 .end
@@ -5562,7 +5582,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1234" :tag('load') :anon :subid("107_1309998840.89449")
 .annotate 'line', 1
-    .const 'Sub' $P1236 = "10_1309998840.89449" 
+    .const 'Sub' $P1236 = "10_1309998840.89449"
     $P100 = $P1236()
     .return ($P100)
 .end
@@ -5572,7 +5592,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1000"  :anon :subid("10_1309998841.74923")
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1309998841.74923" 
+    .const 'Sub' $P1003 = "11_1309998841.74923"
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -5582,12 +5602,12 @@ An operator precedence parser.
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 3
-    .const 'Sub' $P1003 = "11_1309998841.74923" 
+    .const 'Sub' $P1003 = "11_1309998841.74923"
     capture_lex $P1003
     $P101 = $P1003()
 .annotate 'line', 1
     .return ($P101)
-    .const 'Sub' $P1264 = "55_1309998841.74923" 
+    .const 'Sub' $P1264 = "55_1309998841.74923"
     .return ($P1264)
 .end
 
@@ -5595,7 +5615,7 @@ An operator precedence parser.
 .namespace []
 .sub "" :tag('load') :tag('init') :subid("post56") :outer("10_1309998841.74923")
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1309998841.74923" 
+    .const 'Sub' $P1001 = "10_1309998841.74923"
     .local pmc block
     set block, $P1001
     $P1266 = get_root_global ["parrot"], "P6metaclass"
@@ -5606,73 +5626,73 @@ An operator precedence parser.
 .namespace ["HLL";"Actions"]
 .sub "_block1002"  :subid("11_1309998841.74923") :outer("10_1309998841.74923")
 .annotate 'line', 3
-    .const 'Sub' $P1252 = "53_1309998841.74923" 
+    .const 'Sub' $P1252 = "53_1309998841.74923"
     capture_lex $P1252
-    .const 'Sub' $P1242 = "51_1309998841.74923" 
+    .const 'Sub' $P1242 = "51_1309998841.74923"
     capture_lex $P1242
-    .const 'Sub' $P1233 = "50_1309998841.74923" 
+    .const 'Sub' $P1233 = "50_1309998841.74923"
     capture_lex $P1233
-    .const 'Sub' $P1225 = "49_1309998841.74923" 
+    .const 'Sub' $P1225 = "49_1309998841.74923"
     capture_lex $P1225
-    .const 'Sub' $P1221 = "48_1309998841.74923" 
+    .const 'Sub' $P1221 = "48_1309998841.74923"
     capture_lex $P1221
-    .const 'Sub' $P1216 = "47_1309998841.74923" 
+    .const 'Sub' $P1216 = "47_1309998841.74923"
     capture_lex $P1216
-    .const 'Sub' $P1207 = "46_1309998841.74923" 
+    .const 'Sub' $P1207 = "46_1309998841.74923"
     capture_lex $P1207
-    .const 'Sub' $P1198 = "45_1309998841.74923" 
+    .const 'Sub' $P1198 = "45_1309998841.74923"
     capture_lex $P1198
-    .const 'Sub' $P1194 = "44_1309998841.74923" 
+    .const 'Sub' $P1194 = "44_1309998841.74923"
     capture_lex $P1194
-    .const 'Sub' $P1190 = "43_1309998841.74923" 
+    .const 'Sub' $P1190 = "43_1309998841.74923"
     capture_lex $P1190
-    .const 'Sub' $P1186 = "42_1309998841.74923" 
+    .const 'Sub' $P1186 = "42_1309998841.74923"
     capture_lex $P1186
-    .const 'Sub' $P1182 = "41_1309998841.74923" 
+    .const 'Sub' $P1182 = "41_1309998841.74923"
     capture_lex $P1182
-    .const 'Sub' $P1178 = "40_1309998841.74923" 
+    .const 'Sub' $P1178 = "40_1309998841.74923"
     capture_lex $P1178
-    .const 'Sub' $P1174 = "39_1309998841.74923" 
+    .const 'Sub' $P1174 = "39_1309998841.74923"
     capture_lex $P1174
-    .const 'Sub' $P1169 = "38_1309998841.74923" 
+    .const 'Sub' $P1169 = "38_1309998841.74923"
     capture_lex $P1169
-    .const 'Sub' $P1165 = "37_1309998841.74923" 
+    .const 'Sub' $P1165 = "37_1309998841.74923"
     capture_lex $P1165
-    .const 'Sub' $P1158 = "36_1309998841.74923" 
+    .const 'Sub' $P1158 = "36_1309998841.74923"
     capture_lex $P1158
-    .const 'Sub' $P1138 = "34_1309998841.74923" 
+    .const 'Sub' $P1138 = "34_1309998841.74923"
     capture_lex $P1138
-    .const 'Sub' $P1119 = "31_1309998841.74923" 
+    .const 'Sub' $P1119 = "31_1309998841.74923"
     capture_lex $P1119
-    .const 'Sub' $P1115 = "30_1309998841.74923" 
+    .const 'Sub' $P1115 = "30_1309998841.74923"
     capture_lex $P1115
-    .const 'Sub' $P1111 = "29_1309998841.74923" 
+    .const 'Sub' $P1111 = "29_1309998841.74923"
     capture_lex $P1111
-    .const 'Sub' $P1107 = "28_1309998841.74923" 
+    .const 'Sub' $P1107 = "28_1309998841.74923"
     capture_lex $P1107
-    .const 'Sub' $P1103 = "27_1309998841.74923" 
+    .const 'Sub' $P1103 = "27_1309998841.74923"
     capture_lex $P1103
-    .const 'Sub' $P1099 = "26_1309998841.74923" 
+    .const 'Sub' $P1099 = "26_1309998841.74923"
     capture_lex $P1099
-    .const 'Sub' $P1094 = "25_1309998841.74923" 
+    .const 'Sub' $P1094 = "25_1309998841.74923"
     capture_lex $P1094
-    .const 'Sub' $P1089 = "24_1309998841.74923" 
+    .const 'Sub' $P1089 = "24_1309998841.74923"
     capture_lex $P1089
-    .const 'Sub' $P1084 = "23_1309998841.74923" 
+    .const 'Sub' $P1084 = "23_1309998841.74923"
     capture_lex $P1084
-    .const 'Sub' $P1079 = "22_1309998841.74923" 
+    .const 'Sub' $P1079 = "22_1309998841.74923"
     capture_lex $P1079
-    .const 'Sub' $P1074 = "21_1309998841.74923" 
+    .const 'Sub' $P1074 = "21_1309998841.74923"
     capture_lex $P1074
-    .const 'Sub' $P1033 = "18_1309998841.74923" 
+    .const 'Sub' $P1033 = "18_1309998841.74923"
     capture_lex $P1033
-    .const 'Sub' $P1018 = "15_1309998841.74923" 
+    .const 'Sub' $P1018 = "15_1309998841.74923"
     capture_lex $P1018
-    .const 'Sub' $P1015 = "14_1309998841.74923" 
+    .const 'Sub' $P1015 = "14_1309998841.74923"
     capture_lex $P1015
-    .const 'Sub' $P1010 = "13_1309998841.74923" 
+    .const 'Sub' $P1010 = "13_1309998841.74923"
     capture_lex $P1010
-    .const 'Sub' $P1004 = "12_1309998841.74923" 
+    .const 'Sub' $P1004 = "12_1309998841.74923"
     capture_lex $P1004
     $P0 = find_dynamic_lex "$*CTXSAVE"
     if null $P0 goto ctxsave_done
@@ -5681,11 +5701,11 @@ An operator precedence parser.
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 225
-    .const 'Sub' $P1252 = "53_1309998841.74923" 
+    .const 'Sub' $P1252 = "53_1309998841.74923"
     newclosure $P1259, $P1252
 .annotate 'line', 3
     .return ($P1259)
-    .const 'Sub' $P1261 = "54_1309998841.74923" 
+    .const 'Sub' $P1261 = "54_1309998841.74923"
     .return ($P1261)
 .end
 
@@ -5732,12 +5752,12 @@ An operator precedence parser.
 	src.'panic'('Invalid radix conversion of "', char, '"')
       str_done:
         $P1009 = box result
-    
+
 .annotate 'line', 3
     .return ($P1009)
   control_1005:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -5773,12 +5793,12 @@ An operator precedence parser.
         result = chr $I0
       ints_done:
         $P1014 = box result
-    
+
 .annotate 'line', 37
     .return ($P1014)
   control_1011:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -5807,8 +5827,8 @@ An operator precedence parser.
 .annotate 'line', 62
     .return ($P102)
   control_1016:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -5819,7 +5839,7 @@ An operator precedence parser.
 .sub "SET_BLOCK_OUTER_CTX"  :subid("15_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1021
 .annotate 'line', 76
-    .const 'Sub' $P1026 = "16_1309998841.74923" 
+    .const 'Sub' $P1026 = "16_1309998841.74923"
     capture_lex $P1026
     new $P1020, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1020, control_1019
@@ -5854,7 +5874,7 @@ An operator precedence parser.
     set $P101, $I100
     goto if_1024_end
   if_1024:
-    .const 'Sub' $P1026 = "16_1309998841.74923" 
+    .const 'Sub' $P1026 = "16_1309998841.74923"
     capture_lex $P1026
     $P104 = $P1026()
     set $P101, $P104
@@ -5862,8 +5882,8 @@ An operator precedence parser.
 .annotate 'line', 76
     .return ($P101)
   control_1019:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -5873,7 +5893,7 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1025"  :anon :subid("16_1309998841.74923") :outer("15_1309998841.74923")
 .annotate 'line', 78
-    .const 'Sub' $P1030 = "17_1309998841.74923" 
+    .const 'Sub' $P1030 = "17_1309998841.74923"
     capture_lex $P1030
 .annotate 'line', 79
     $P1028 = root_new ['parrot';'ResizablePMCArray']
@@ -5904,19 +5924,19 @@ An operator precedence parser.
     unless $P103, loop1032_done
     shift $P106, $P103
   loop1032_redo:
-    .const 'Sub' $P1030 = "17_1309998841.74923" 
+    .const 'Sub' $P1030 = "17_1309998841.74923"
     capture_lex $P1030
     $P1030($P106)
   loop1032_next:
     goto loop1032_test
   loop1032_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P108, exception, 'type'
     eq $P108, .CONTROL_LOOP_NEXT, loop1032_next
     eq $P108, .CONTROL_LOOP_REDO, loop1032_redo
   loop1032_done:
-    pop_eh 
+    pop_eh
   for_undef_61:
 .annotate 'line', 78
     .return ($P103)
@@ -5945,9 +5965,9 @@ An operator precedence parser.
     .param pmc param_1037 :optional
     .param int has_param_1037 :opt_flag
 .annotate 'line', 89
-    .const 'Sub' $P1070 = "20_1309998841.74923" 
+    .const 'Sub' $P1070 = "20_1309998841.74923"
     capture_lex $P1070
-    .const 'Sub' $P1061 = "19_1309998841.74923" 
+    .const 'Sub' $P1061 = "19_1309998841.74923"
     capture_lex $P1061
     new $P1035, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1035, control_1034
@@ -6082,7 +6102,7 @@ An operator precedence parser.
     find_lex $P103, "$past"
     $P104 = $P103."name"()
     if $P104, unless_1059_end
-    .const 'Sub' $P1061 = "19_1309998841.74923" 
+    .const 'Sub' $P1061 = "19_1309998841.74923"
     capture_lex $P1061
     $P1061()
   unless_1059_end:
@@ -6106,19 +6126,19 @@ An operator precedence parser.
     unless $P103, loop1073_done
     shift $P106, $P103
   loop1073_redo:
-    .const 'Sub' $P1070 = "20_1309998841.74923" 
+    .const 'Sub' $P1070 = "20_1309998841.74923"
     capture_lex $P1070
     $P1070($P106)
   loop1073_next:
     goto loop1073_test
   loop1073_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P109, exception, 'type'
     eq $P109, .CONTROL_LOOP_NEXT, loop1073_next
     eq $P109, .CONTROL_LOOP_REDO, loop1073_redo
   loop1073_done:
-    pop_eh 
+    pop_eh
   for_undef_84:
 .annotate 'line', 108
     goto if_1067_end
@@ -6143,8 +6163,8 @@ An operator precedence parser.
 .annotate 'line', 89
     .return ($P104)
   control_1034:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -6171,7 +6191,7 @@ An operator precedence parser.
                 $S0 = $P0
                 $S0 = downcase $S0
                 $P1064 = box $S0
-            
+
     concat $P106, $P1064, ":<"
 .annotate 'line', 103
     find_lex $P1065, "$/"
@@ -6247,8 +6267,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1075:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6277,8 +6297,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1080:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6295,12 +6315,12 @@ An operator precedence parser.
     .lex "self", self
     .lex "$/", param_1087
     find_lex $P100, "$/"
- $P1088 = new ['Undef'] 
+ $P1088 = new ['Undef']
     $P101 = $P100."!make"($P1088)
     .return ($P101)
   control_1085:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6329,8 +6349,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1090:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6359,8 +6379,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1095:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6382,8 +6402,8 @@ An operator precedence parser.
     $P102 = $P100."!make"($N100)
     .return ($P102)
   control_1100:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6405,8 +6425,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1104:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6428,8 +6448,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1108:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6451,8 +6471,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1112:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6474,8 +6494,8 @@ An operator precedence parser.
     $P103 = $P100."!make"($P102)
     .return ($P103)
   control_1116:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6486,7 +6506,7 @@ An operator precedence parser.
 .sub "quote_EXPR"  :subid("31_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1122
 .annotate 'line', 129
-    .const 'Sub' $P1128 = "32_1309998841.74923" 
+    .const 'Sub' $P1128 = "32_1309998841.74923"
     capture_lex $P1128
     new $P1121, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1121, control_1120
@@ -6518,7 +6538,7 @@ An operator precedence parser.
     $P106 = $P104."ACCEPTS"($P105)
     if $P106, if_1126
 .annotate 'line', 135
-    .const 'Sub' $P1128 = "32_1309998841.74923" 
+    .const 'Sub' $P1128 = "32_1309998841.74923"
     capture_lex $P1128
     $P1128()
     goto if_1126_end
@@ -6549,8 +6569,8 @@ An operator precedence parser.
 .annotate 'line', 129
     .return ($P103)
   control_1120:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -6560,7 +6580,7 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1127"  :anon :subid("32_1309998841.74923") :outer("31_1309998841.74923")
 .annotate 'line', 135
-    .const 'Sub' $P1133 = "33_1309998841.74923" 
+    .const 'Sub' $P1133 = "33_1309998841.74923"
     capture_lex $P1133
 .annotate 'line', 136
     $P1130 = root_new ['parrot';'ResizablePMCArray']
@@ -6612,19 +6632,19 @@ An operator precedence parser.
     unless $P109, loop1135_done
     shift $P111, $P109
   loop1135_redo:
-    .const 'Sub' $P1133 = "33_1309998841.74923" 
+    .const 'Sub' $P1133 = "33_1309998841.74923"
     capture_lex $P1133
     $P1133($P111)
   loop1135_next:
     goto loop1135_test
   loop1135_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P113, exception, 'type'
     eq $P113, .CONTROL_LOOP_NEXT, loop1135_next
     eq $P113, .CONTROL_LOOP_REDO, loop1135_redo
   loop1135_done:
-    pop_eh 
+    pop_eh
   for_undef_99:
 .annotate 'line', 137
     set $P107, $P109
@@ -6651,7 +6671,7 @@ An operator precedence parser.
 .sub "quote_delimited"  :subid("34_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1141
 .annotate 'line', 152
-    .const 'Sub' $P1148 = "35_1309998841.74923" 
+    .const 'Sub' $P1148 = "35_1309998841.74923"
     capture_lex $P1148
     new $P1140, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1140, control_1139
@@ -6696,19 +6716,19 @@ An operator precedence parser.
     unless $P102, loop1154_done
     shift $P104, $P102
   loop1154_redo:
-    .const 'Sub' $P1148 = "35_1309998841.74923" 
+    .const 'Sub' $P1148 = "35_1309998841.74923"
     capture_lex $P1148
     $P1148($P104)
   loop1154_next:
     goto loop1154_test
   loop1154_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P108, exception, 'type'
     eq $P108, .CONTROL_LOOP_NEXT, loop1154_next
     eq $P108, .CONTROL_LOOP_REDO, loop1154_redo
   loop1154_done:
-    pop_eh 
+    pop_eh
   for_undef_102:
 .annotate 'line', 169
     find_lex $P102, "$lastlit"
@@ -6752,13 +6772,13 @@ An operator precedence parser.
 .annotate 'line', 171
     goto loop1157_test
   loop1157_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P104, exception, 'type'
     eq $P104, .CONTROL_LOOP_NEXT, loop1157_next
     eq $P104, .CONTROL_LOOP_REDO, loop1157_redo
   loop1157_done:
-    pop_eh 
+    pop_eh
 .annotate 'line', 174
     find_lex $P102, "$/"
     find_lex $P103, "$past"
@@ -6766,8 +6786,8 @@ An operator precedence parser.
 .annotate 'line', 152
     .return ($P104)
   control_1139:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -6885,8 +6905,8 @@ An operator precedence parser.
 .annotate 'line', 177
     .return ($P106)
   control_1159:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6906,8 +6926,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\\")
     .return ($P101)
   control_1166:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6936,8 +6956,8 @@ An operator precedence parser.
     $P102 = $P100."!make"($S100)
     .return ($P102)
   control_1170:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6957,8 +6977,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\b")
     .return ($P101)
   control_1175:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6978,8 +6998,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\n")
     .return ($P101)
   control_1179:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -6999,8 +7019,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\r")
     .return ($P101)
   control_1183:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7020,8 +7040,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\t")
     .return ($P101)
   control_1187:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7041,8 +7061,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\f")
     .return ($P101)
   control_1191:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7062,8 +7082,8 @@ An operator precedence parser.
     $P101 = $P100."!make"("\e")
     .return ($P101)
   control_1195:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7120,8 +7140,8 @@ An operator precedence parser.
 .annotate 'line', 191
     .return ($P106)
   control_1199:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7178,8 +7198,8 @@ An operator precedence parser.
 .annotate 'line', 195
     .return ($P106)
   control_1208:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7210,8 +7230,8 @@ An operator precedence parser.
 .annotate 'line', 199
     .return ($P103)
   control_1217:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7233,8 +7253,8 @@ An operator precedence parser.
 .annotate 'line', 203
     .return ($P101)
   control_1222:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7291,8 +7311,8 @@ An operator precedence parser.
 .annotate 'line', 207
     .return ($P108)
   control_1226:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7365,8 +7385,8 @@ An operator precedence parser.
 .annotate 'line', 211
     .return ($P103)
   control_1234:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -7377,7 +7397,7 @@ An operator precedence parser.
 .sub "charnames"  :subid("51_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1245
 .annotate 'line', 219
-    .const 'Sub' $P1249 = "52_1309998841.74923" 
+    .const 'Sub' $P1249 = "52_1309998841.74923"
     capture_lex $P1249
     new $P1244, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1244, control_1243
@@ -7411,19 +7431,19 @@ An operator precedence parser.
     unless $P101, loop1251_done
     shift $P103, $P101
   loop1251_redo:
-    .const 'Sub' $P1249 = "52_1309998841.74923" 
+    .const 'Sub' $P1249 = "52_1309998841.74923"
     capture_lex $P1249
     $P1249($P103)
   loop1251_next:
     goto loop1251_test
   loop1251_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P105, exception, 'type'
     eq $P105, .CONTROL_LOOP_NEXT, loop1251_next
     eq $P105, .CONTROL_LOOP_REDO, loop1251_redo
   loop1251_done:
-    pop_eh 
+    pop_eh
   for_undef_137:
 .annotate 'line', 222
     find_lex $P101, "$/"
@@ -7432,8 +7452,8 @@ An operator precedence parser.
 .annotate 'line', 219
     .return ($P103)
   control_1243:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -7496,8 +7516,8 @@ An operator precedence parser.
 .annotate 'line', 225
     .return ($P106)
   control_1253:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P100, exception, "payload"
     .return ($P100)
 .end
@@ -7506,7 +7526,7 @@ An operator precedence parser.
 .namespace ["HLL";"Actions"]
 .sub "_block1260" :tag('load') :anon :subid("54_1309998841.74923")
 .annotate 'line', 3
-    .const 'Sub' $P1262 = "11_1309998841.74923" 
+    .const 'Sub' $P1262 = "11_1309998841.74923"
     $P100 = $P1262()
     .return ($P100)
 .end
@@ -7515,7 +7535,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1263" :tag('load') :anon :subid("55_1309998841.74923")
 .annotate 'line', 1
-    .const 'Sub' $P1265 = "10_1309998841.74923" 
+    .const 'Sub' $P1265 = "10_1309998841.74923"
     $P100 = $P1265()
     .return ($P100)
 .end
@@ -7525,7 +7545,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1000"  :anon :subid("10_1309998842.32047")
 .annotate 'line', 0
-    .const 'Sub' $P1003 = "11_1309998842.32047" 
+    .const 'Sub' $P1003 = "11_1309998842.32047"
     capture_lex $P1003
 .annotate 'line', 1
     $P0 = find_dynamic_lex "$*CTXSAVE"
@@ -7535,24 +7555,45 @@ An operator precedence parser.
     $P0."ctxsave"()
   ctxsave_done:
 .annotate 'line', 6
-    .const 'Sub' $P1003 = "11_1309998842.32047" 
+    .const 'Sub' $P1003 = "11_1309998842.32047"
     capture_lex $P1003
     $P102 = $P1003()
 .annotate 'line', 1
     .return ($P102)
-    .const 'Sub' $P1190 = "36_1309998842.32047" 
+    .const 'Sub' $P1190 = "36_1309998842.32047"
     .return ($P1190)
 .end
 
 
 .namespace []
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
 .sub "" :tag('load') :tag('init') :subid("post37") :outer("10_1309998842.32047")
 .annotate 'line', 0
-    .const 'Sub' $P1001 = "10_1309998842.32047" 
+    .const 'Sub' $P1001 = "10_1309998842.32047"
     .local pmc block
     set block, $P1001
 .annotate 'line', 2
-    load_bytecode "PCT/HLLCompiler.pbc"
+    '__load_bytecode'("PCT/HLLCompiler.pbc", 'load')
 .annotate 'line', 1
     $P1192 = get_root_global ["parrot"], "P6metaclass"
     new $P101, "ResizablePMCArray"
@@ -7564,35 +7605,35 @@ An operator precedence parser.
 .namespace ["HLL";"Compiler"]
 .sub "_block1002"  :subid("11_1309998842.32047") :outer("10_1309998842.32047")
 .annotate 'line', 6
-    .const 'Sub' $P1184 = "35_1309998842.32047" 
+    .const 'Sub' $P1184 = "35_1309998842.32047"
     capture_lex $P1184
-    .const 'Sub' $P1167 = "33_1309998842.32047" 
+    .const 'Sub' $P1167 = "33_1309998842.32047"
     capture_lex $P1167
-    .const 'Sub' $P1107 = "26_1309998842.32047" 
+    .const 'Sub' $P1107 = "26_1309998842.32047"
     capture_lex $P1107
-    .const 'Sub' $P1102 = "25_1309998842.32047" 
+    .const 'Sub' $P1102 = "25_1309998842.32047"
     capture_lex $P1102
-    .const 'Sub' $P1075 = "20_1309998842.32047" 
+    .const 'Sub' $P1075 = "20_1309998842.32047"
     capture_lex $P1075
-    .const 'Sub' $P1059 = "18_1309998842.32047" 
+    .const 'Sub' $P1059 = "18_1309998842.32047"
     capture_lex $P1059
-    .const 'Sub' $P1054 = "17_1309998842.32047" 
+    .const 'Sub' $P1054 = "17_1309998842.32047"
     capture_lex $P1054
-    .const 'Sub' $P1048 = "16_1309998842.32047" 
+    .const 'Sub' $P1048 = "16_1309998842.32047"
     capture_lex $P1048
-    .const 'Sub' $P1012 = "13_1309998842.32047" 
+    .const 'Sub' $P1012 = "13_1309998842.32047"
     capture_lex $P1012
-    .const 'Sub' $P1005 = "12_1309998842.32047" 
+    .const 'Sub' $P1005 = "12_1309998842.32047"
     capture_lex $P1005
 .annotate 'line', 14
-    .const 'Sub' $P1005 = "12_1309998842.32047" 
+    .const 'Sub' $P1005 = "12_1309998842.32047"
     newclosure $P1011, $P1005
     set $P1004, $P1011
     .lex "value_type", $P1004
 .annotate 'line', 6
     find_lex $P102, "value_type"
 .annotate 'line', 165
-    .const 'Sub' $P1184 = "35_1309998842.32047" 
+    .const 'Sub' $P1184 = "35_1309998842.32047"
     newclosure $P1188, $P1184
 .annotate 'line', 6
     .return ($P1188)
@@ -7602,7 +7643,7 @@ An operator precedence parser.
 .namespace ["HLL";"Compiler"]
 .sub "" :tag('load') :tag('init') :subid("post38") :outer("11_1309998842.32047")
 .annotate 'line', 6
-    .const 'Sub' $P1003 = "11_1309998842.32047" 
+    .const 'Sub' $P1003 = "11_1309998842.32047"
     .local pmc block
     set block, $P1003
 .annotate 'line', 11
@@ -7648,8 +7689,8 @@ An operator precedence parser.
 .annotate 'line', 14
     .return ($P100)
   control_1006:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P101, exception, "payload"
     .return ($P101)
 .end
@@ -7663,9 +7704,9 @@ An operator precedence parser.
     .param pmc param_1016 :optional :named("tagset")
     .param int has_param_1016 :opt_flag
 .annotate 'line', 20
-    .const 'Sub' $P1042 = "15_1309998842.32047" 
+    .const 'Sub' $P1042 = "15_1309998842.32047"
     capture_lex $P1042
-    .const 'Sub' $P1034 = "14_1309998842.32047" 
+    .const 'Sub' $P1034 = "14_1309998842.32047"
     capture_lex $P1034
     new $P1014, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1014, control_1013
@@ -7773,19 +7814,19 @@ An operator precedence parser.
     unless $P104, loop1047_done
     shift $P106, $P104
   loop1047_redo:
-    .const 'Sub' $P1042 = "15_1309998842.32047" 
+    .const 'Sub' $P1042 = "15_1309998842.32047"
     capture_lex $P1042
     $P1042($P106)
   loop1047_next:
     goto loop1047_test
   loop1047_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, 'type'
     eq $P110, .CONTROL_LOOP_NEXT, loop1047_next
     eq $P110, .CONTROL_LOOP_REDO, loop1047_redo
   loop1047_done:
-    pop_eh 
+    pop_eh
   for_undef_43:
 .annotate 'line', 38
     goto if_1032_end
@@ -7803,27 +7844,27 @@ An operator precedence parser.
     unless $P104, loop1040_done
     shift $P106, $P104
   loop1040_redo:
-    .const 'Sub' $P1034 = "14_1309998842.32047" 
+    .const 'Sub' $P1034 = "14_1309998842.32047"
     capture_lex $P1034
     $P1034($P106)
   loop1040_next:
     goto loop1040_test
   loop1040_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P110, exception, 'type'
     eq $P110, .CONTROL_LOOP_NEXT, loop1040_next
     eq $P110, .CONTROL_LOOP_REDO, loop1040_redo
   loop1040_done:
-    pop_eh 
+    pop_eh
   for_undef_46:
   if_1032_end:
 .annotate 'line', 20
     find_lex $P103, "%exports"
     .return ($P103)
   control_1013:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P104, exception, "payload"
     .return ($P104)
 .end
@@ -7936,8 +7977,8 @@ An operator precedence parser.
 .annotate 'line', 47
     .return ($P103)
   control_1049:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P102, exception, "payload"
     .return ($P102)
 .end
@@ -7979,19 +8020,40 @@ An operator precedence parser.
   vivify_53:
     .return ($P104)
   control_1055:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, "payload"
     .return ($P103)
 .end
 
 
 .namespace ["HLL";"Compiler"]
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
 .include "except_types.pasm"
 .sub "load_module"  :subid("18_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1062
 .annotate 'line', 61
-    .const 'Sub' $P1066 = "19_1309998842.32047" 
+    .const 'Sub' $P1066 = "19_1309998842.32047"
     capture_lex $P1066
     new $P1061, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1061, control_1060
@@ -8019,7 +8081,7 @@ An operator precedence parser.
     assign $P104, 0
     store_lex "$loaded", $P104
 .annotate 'line', 64
-    .const 'Sub' $P1066 = "19_1309998842.32047" 
+    .const 'Sub' $P1066 = "19_1309998842.32047"
     capture_lex $P1066
     $P1066()
 .annotate 'line', 65
@@ -8028,7 +8090,7 @@ An operator precedence parser.
     find_lex $P105, "$base"
     concat $P106, $P105, ".pir"
     set $S100, $P106
-    load_bytecode $S100
+    '__load_bytecode'($S100, 'load')
     new $P105, "Integer"
     assign $P105, 1
     store_lex "$loaded", $P105
@@ -8040,14 +8102,36 @@ An operator precedence parser.
 .annotate 'line', 61
     .return ($P106)
   control_1060:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P104, exception, "payload"
     .return ($P104)
 .end
 
 
 .namespace ["HLL";"Compiler"]
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
+
 .include "except_types.pasm"
 .sub "_block1065"  :anon :subid("19_1309998842.32047") :outer("18_1309998842.32047")
 .annotate 'line', 64
@@ -8058,15 +8142,15 @@ An operator precedence parser.
     find_lex $P104, "$base"
     concat $P105, $P104, ".pbc"
     set $S100, $P105
-    load_bytecode $S100
+    '__load_bytecode'($S100, 'load')
     new $P104, "Integer"
     assign $P104, 1
     store_lex "$loaded", $P104
-    pop_eh 
+    pop_eh
     goto skip_handler_1067
   control_1068:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     new $P1072, 'Integer'
     set $P1072, 1
     set exception["handled"], $P1072
@@ -8087,7 +8171,7 @@ An operator precedence parser.
     .param pmc param_1078
     .param pmc param_1079
 .annotate 'line', 69
-    .const 'Sub' $P1081 = "21_1309998842.32047" 
+    .const 'Sub' $P1081 = "21_1309998842.32047"
     capture_lex $P1081
     new $P1077, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1077, control_1076
@@ -8108,25 +8192,25 @@ An operator precedence parser.
     unless $P102, loop1101_done
     shift $P104, $P102
   loop1101_redo:
-    .const 'Sub' $P1081 = "21_1309998842.32047" 
+    .const 'Sub' $P1081 = "21_1309998842.32047"
     capture_lex $P1081
     $P1081($P104)
   loop1101_next:
     goto loop1101_test
   loop1101_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P108, exception, 'type'
     eq $P108, .CONTROL_LOOP_NEXT, loop1101_next
     eq $P108, .CONTROL_LOOP_REDO, loop1101_redo
   loop1101_done:
-    pop_eh 
+    pop_eh
   for_undef_54:
 .annotate 'line', 69
     .return ($P102)
   control_1076:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, "payload"
     .return ($P103)
 .end
@@ -8137,11 +8221,11 @@ An operator precedence parser.
 .sub "_block1080"  :anon :subid("21_1309998842.32047") :outer("20_1309998842.32047")
     .param pmc param_1085
 .annotate 'line', 70
-    .const 'Sub' $P1097 = "24_1309998842.32047" 
+    .const 'Sub' $P1097 = "24_1309998842.32047"
     capture_lex $P1097
-    .const 'Sub' $P1093 = "23_1309998842.32047" 
+    .const 'Sub' $P1093 = "23_1309998842.32047"
     capture_lex $P1093
-    .const 'Sub' $P1088 = "22_1309998842.32047" 
+    .const 'Sub' $P1088 = "22_1309998842.32047"
     capture_lex $P1088
 .annotate 'line', 71
     new $P105, "Undef"
@@ -8191,19 +8275,19 @@ An operator precedence parser.
     unless $P118, loop1100_done
     shift $P120, $P118
   loop1100_redo:
-    .const 'Sub' $P1097 = "24_1309998842.32047" 
+    .const 'Sub' $P1097 = "24_1309998842.32047"
     capture_lex $P1097
     $P1097($P120)
   loop1100_next:
     goto loop1100_test
   loop1100_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P123, exception, 'type'
     eq $P123, .CONTROL_LOOP_NEXT, loop1100_next
     eq $P123, .CONTROL_LOOP_REDO, loop1100_redo
   loop1100_done:
-    pop_eh 
+    pop_eh
   for_undef_55:
 .annotate 'line', 79
     set $P112, $P118
@@ -8223,19 +8307,19 @@ An operator precedence parser.
     unless $P117, loop1095_done
     shift $P119, $P117
   loop1095_redo:
-    .const 'Sub' $P1093 = "23_1309998842.32047" 
+    .const 'Sub' $P1093 = "23_1309998842.32047"
     capture_lex $P1093
     $P1093($P119)
   loop1095_next:
     goto loop1095_test
   loop1095_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P121, exception, 'type'
     eq $P121, .CONTROL_LOOP_NEXT, loop1095_next
     eq $P121, .CONTROL_LOOP_REDO, loop1095_redo
   loop1095_done:
-    pop_eh 
+    pop_eh
   for_undef_57:
 .annotate 'line', 76
     set $P112, $P117
@@ -8257,19 +8341,19 @@ An operator precedence parser.
     unless $P111, loop1090_done
     shift $P113, $P111
   loop1090_redo:
-    .const 'Sub' $P1088 = "22_1309998842.32047" 
+    .const 'Sub' $P1088 = "22_1309998842.32047"
     capture_lex $P1088
     $P1088($P113)
   loop1090_next:
     goto loop1090_test
   loop1090_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P115, exception, 'type'
     eq $P115, .CONTROL_LOOP_NEXT, loop1090_next
     eq $P115, .CONTROL_LOOP_REDO, loop1090_redo
   loop1090_done:
-    pop_eh 
+    pop_eh
   for_undef_58:
 .annotate 'line', 73
     set $P106, $P111
@@ -8376,8 +8460,8 @@ An operator precedence parser.
 .annotate 'line', 85
     .return ($P102)
   control_1103:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, "payload"
     .return ($P103)
 .end
@@ -8388,7 +8472,7 @@ An operator precedence parser.
 .sub "interactive"  :subid("26_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1110 :slurpy :named
 .annotate 'line', 90
-    .const 'Sub' $P1120 = "27_1309998842.32047" 
+    .const 'Sub' $P1120 = "27_1309998842.32047"
     capture_lex $P1120
     new $P1109, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1109, control_1108
@@ -8478,24 +8562,24 @@ An operator precedence parser.
     assign $P106, 1
     unless $P106, loop1166_done
   loop1166_redo:
-    .const 'Sub' $P1120 = "27_1309998842.32047" 
+    .const 'Sub' $P1120 = "27_1309998842.32047"
     capture_lex $P1120
     $P1120()
   loop1166_next:
     goto loop1166_test
   loop1166_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P114, exception, 'type'
     eq $P114, .CONTROL_LOOP_NEXT, loop1166_next
     eq $P114, .CONTROL_LOOP_REDO, loop1166_redo
   loop1166_done:
-    pop_eh 
+    pop_eh
 .annotate 'line', 90
     .return ($P106)
   control_1108:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P107, exception, "payload"
     .return ($P107)
 .end
@@ -8505,7 +8589,7 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1119"  :anon :subid("27_1309998842.32047") :outer("26_1309998842.32047")
 .annotate 'line', 102
-    .const 'Sub' $P1133 = "28_1309998842.32047" 
+    .const 'Sub' $P1133 = "28_1309998842.32047"
     capture_lex $P1133
 .annotate 'line', 105
     new $P107, "Undef"
@@ -8577,7 +8661,7 @@ An operator precedence parser.
     set $P112, $P113
     goto if_1131_end
   if_1131:
-    .const 'Sub' $P1133 = "28_1309998842.32047" 
+    .const 'Sub' $P1133 = "28_1309998842.32047"
     capture_lex $P1133
     $P116 = $P1133()
     set $P112, $P116
@@ -8591,9 +8675,9 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1132"  :anon :subid("28_1309998842.32047") :outer("27_1309998842.32047")
 .annotate 'line', 115
-    .const 'Sub' $P1156 = "31_1309998842.32047" 
+    .const 'Sub' $P1156 = "31_1309998842.32047"
     capture_lex $P1156
-    .const 'Sub' $P1136 = "29_1309998842.32047" 
+    .const 'Sub' $P1136 = "29_1309998842.32047"
     capture_lex $P1136
 .annotate 'line', 117
     new $P114, "Undef"
@@ -8606,7 +8690,7 @@ An operator precedence parser.
 .annotate 'line', 115
     find_lex $P115, "$output"
 .annotate 'line', 118
-    .const 'Sub' $P1136 = "29_1309998842.32047" 
+    .const 'Sub' $P1136 = "29_1309998842.32047"
     capture_lex $P1136
     $P1136()
 .annotate 'line', 125
@@ -8619,7 +8703,7 @@ An operator precedence parser.
   vivify_67:
     defined $I100, $P115
     unless $I100, if_1154_end
-    .const 'Sub' $P1156 = "31_1309998842.32047" 
+    .const 'Sub' $P1156 = "31_1309998842.32047"
     capture_lex $P1156
     $P1156()
   if_1154_end:
@@ -8674,7 +8758,7 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1135"  :anon :subid("29_1309998842.32047") :outer("28_1309998842.32047")
 .annotate 'line', 118
-    .const 'Sub' $P1143 = "30_1309998842.32047" 
+    .const 'Sub' $P1143 = "30_1309998842.32047"
     capture_lex $P1143
     new $P1139, 'ExceptionHandler'
     set_label $P1139, control_1138
@@ -8688,13 +8772,13 @@ An operator precedence parser.
     $P119 = $P115."eval"($P116, $P118 :flat, $P117 :named("outer_ctx"))
     store_lex "$output", $P119
 .annotate 'line', 118
-    pop_eh 
+    pop_eh
     goto skip_handler_1137
   control_1138:
 .annotate 'line', 120
-    .local pmc exception 
-    .get_results (exception) 
-    .const 'Sub' $P1143 = "30_1309998842.32047" 
+    .local pmc exception
+    .get_results (exception)
+    .const 'Sub' $P1143 = "30_1309998842.32047"
     newclosure $P1151, $P1143
     $P1151(exception)
     new $P1152, 'Integer'
@@ -8739,7 +8823,7 @@ An operator precedence parser.
 .include "except_types.pasm"
 .sub "_block1155"  :anon :subid("31_1309998842.32047") :outer("28_1309998842.32047")
 .annotate 'line', 125
-    .const 'Sub' $P1159 = "32_1309998842.32047" 
+    .const 'Sub' $P1159 = "32_1309998842.32047"
     capture_lex $P1159
 .annotate 'line', 126
     get_global $P116, "$interactive_ctx"
@@ -8776,19 +8860,19 @@ An operator precedence parser.
     unless $P117, loop1162_done
     shift $P120, $P117
   loop1162_redo:
-    .const 'Sub' $P1159 = "32_1309998842.32047" 
+    .const 'Sub' $P1159 = "32_1309998842.32047"
     capture_lex $P1159
     $P1159($P120)
   loop1162_next:
     goto loop1162_test
   loop1162_handler:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P123, exception, 'type'
     eq $P123, .CONTROL_LOOP_NEXT, loop1162_next
     eq $P123, .CONTROL_LOOP_REDO, loop1162_redo
   loop1162_done:
-    pop_eh 
+    pop_eh
   for_undef_73:
 .annotate 'line', 131
     get_global $P117, "$interactive_ctx"
@@ -8826,7 +8910,7 @@ An operator precedence parser.
     .param pmc param_1171 :slurpy
     .param pmc param_1172 :slurpy :named
 .annotate 'line', 146
-    .const 'Sub' $P1178 = "34_1309998842.32047" 
+    .const 'Sub' $P1178 = "34_1309998842.32047"
     capture_lex $P1178
     new $P1169, ['ExceptionHandler'], .CONTROL_RETURN
     set_label $P1169, control_1168
@@ -8873,7 +8957,7 @@ An operator precedence parser.
     set $P103, $I102
   if_1175_end:
     unless $P103, if_1174_end
-    .const 'Sub' $P1178 = "34_1309998842.32047" 
+    .const 'Sub' $P1178 = "34_1309998842.32047"
     capture_lex $P1178
     $P1178()
   if_1174_end:
@@ -8881,8 +8965,8 @@ An operator precedence parser.
     find_lex $P103, "$output"
     .return ($P103)
   control_1168:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P104, exception, "payload"
     .return ($P104)
 .end
@@ -8954,7 +9038,7 @@ An operator precedence parser.
 
                 $P0 = getinterp
                 $P1187 = $P0['context';1]
-            
+
     store_dynamic_lex "$*MAIN_CTX", $P1187
 .annotate 'line', 171
     new $P102, "Integer"
@@ -8963,8 +9047,8 @@ An operator precedence parser.
 .annotate 'line', 165
     .return ($P102)
   control_1185:
-    .local pmc exception 
-    .get_results (exception) 
+    .local pmc exception
+    .get_results (exception)
     getattribute $P103, exception, "payload"
     .return ($P103)
 .end
@@ -8973,7 +9057,7 @@ An operator precedence parser.
 .namespace []
 .sub "_block1189" :tag('load') :anon :subid("36_1309998842.32047")
 .annotate 'line', 1
-    .const 'Sub' $P1191 = "10_1309998842.32047" 
+    .const 'Sub' $P1191 = "10_1309998842.32047"
     $P100 = $P1191()
     .return ($P100)
 .end

@@ -38,8 +38,30 @@ grammars.
 
 .namespace ['Regex';'Cursor']
 
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
+
 .sub '' :anon :tag('load') :tag('init')
-    load_bytecode 'P6object.pbc'
+    '__load_bytecode'('P6object.pbc', 'load')
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     $P0 = p6meta.'new_class'('Regex::Cursor', 'attr'=>'$!target $!from $!pos $!match $!names $!debug @!bstack @!cstack @!caparray &!regex')
@@ -1691,9 +1713,30 @@ This file implements Match objects for the regex engine.
 =cut
 
 .namespace ['Regex';'Match']
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
 
 .sub '' :anon :tag('load') :tag('init')
-    load_bytecode 'P6object.pbc'
+    '__load_bytecode'('P6object.pbc', 'load')
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     $P0 = p6meta.'new_class'('Regex::Match', 'parent'=>'Capture', 'attr'=>'$!cursor $!target $!from $!to $!ast')
@@ -1900,9 +1943,30 @@ containers for Regex subs that need .ACCEPTS and other regex attributes.
 =cut
 
 .namespace ['Regex';'Method']
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
 
 .sub '' :anon :tag('load') :tag('init')
-    load_bytecode 'P6object.pbc'
+    '__load_bytecode'('P6object.pbc', 'load')
     .local pmc p6meta, mproto, rproto
     p6meta = new 'P6metaclass'
     mproto = p6meta.'new_class'('Regex::Method', 'parent'=>'parrot;Sub')
@@ -2194,9 +2258,30 @@ for regular expressions.
 =cut
 
 .namespace ['PAST';'Regex']
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tagname
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tagname)
+  done_initialization:
+.end
+
 
 .sub '' :tag('init') :tag('load')
-    load_bytecode 'PCT/PAST.pbc'
+    '__load_bytecode'('PCT/PAST.pbc', 'load')
     .local pmc p6meta
     p6meta = get_hll_global 'P6metaclass'
     p6meta.'new_class'('PAST::Regex', 'parent'=>'PAST::Node')
