@@ -689,6 +689,8 @@ op_lib_t *Parrot_DynOp_core_4_1_0(PARROT_INTERP, long init);
  opcode_t * Parrot_setprop_p_sc_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_getprop_p_s_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_getprop_p_sc_p(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getprop_p_p_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_getprop_p_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_delprop_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_delprop_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_prophash_p_p(opcode_t *, PARROT_INTERP);
