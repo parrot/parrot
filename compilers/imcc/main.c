@@ -444,8 +444,6 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
             case CONCAT_ASSIGN: printf(".= ");break;
 
             case MAIN:          printf(":main");break;
-            case LOAD:          printf(":load");break;
-            case INIT:          printf(":init");break;
             case IMMEDIATE:     printf(":immediate");break;
             case POSTCOMP:      printf(":postcomp");break;
             case ANON:          printf(":anon");break;

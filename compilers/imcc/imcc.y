@@ -1059,7 +1059,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %token <t> COMMA ESUB DOTDOT
 %token <t> PCC_BEGIN PCC_END PCC_CALL PCC_SUB PCC_BEGIN_RETURN PCC_END_RETURN
 %token <t> PCC_BEGIN_YIELD PCC_END_YIELD INVOCANT
-%token <t> MAIN LOAD INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
+%token <t> MAIN  INIT IMMEDIATE POSTCOMP METHOD ANON OUTER NEED_LEX
 %token <t> MULTI SUBTAG VTABLE_METHOD LOADLIB SUB_INSTANCE_OF SUBID
 %token <t> NS_ENTRY
 %token <s> LABEL
@@ -1620,22 +1620,6 @@ sub_proto_list:
    ;
 
 proto:
-     LOAD   {
-                $$ = P_LOAD;
-                /*
-                SymReg * const r = mk_const(imcc, "load", 'S');
-                add_pcc_flag_str(imcc, imcc->cur_call, r);
-                $$ = r;
-                */
-            }
-   | INIT   {
-                $$ = P_INIT;
-                /*
-                SymReg * const r = mk_const(imcc, "load", 'S');
-                add_pcc_flag_str(imcc, imcc->cur_call, r);
-                $$ = r;
-                */
-            }
    | MAIN      { $$ = P_MAIN; }
    | IMMEDIATE { $$ = P_IMMEDIATE; }
    | POSTCOMP  { $$ = P_POSTCOMP; }

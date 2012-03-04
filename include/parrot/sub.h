@@ -25,12 +25,10 @@ typedef enum {
     SUB_FLAG_IS_OUTER     = PObj_private1_FLAG,
     SUB_FLAG_PF_ANON      = PObj_private3_FLAG,
     SUB_FLAG_PF_MAIN      = PObj_private4_FLAG,
-    SUB_FLAG_PF_LOAD      = PObj_private5_FLAG,
     SUB_FLAG_PF_IMMEDIATE = PObj_private6_FLAG,
     SUB_FLAG_PF_POSTCOMP  = PObj_private7_FLAG,
 
     SUB_FLAG_PF_MASK      = SUB_FLAG_PF_ANON
-                          | SUB_FLAG_PF_LOAD
                           | SUB_FLAG_PF_IMMEDIATE
                           | SUB_FLAG_PF_POSTCOMP
 } sub_flags_enum;
@@ -64,7 +62,6 @@ typedef enum {
     SUB_COMP_FLAG_BIT_8     = SUB_FLAG(8),
     SUB_COMP_FLAG_BIT_9     = SUB_FLAG(9),
     SUB_COMP_FLAG_BIT_10    = SUB_FLAG(10),
-    SUB_COMP_FLAG_PF_INIT   = SUB_COMP_FLAG_BIT_10,
     SUB_COMP_FLAG_BIT_11    = SUB_FLAG(11),
     SUB_COMP_FLAG_NSENTRY   = SUB_COMP_FLAG_BIT_11,
     SUB_COMP_FLAG_BIT_12    = SUB_FLAG(12),
@@ -86,7 +83,7 @@ typedef enum {
     SUB_COMP_FLAG_BIT_28    = SUB_FLAG(28),
     SUB_COMP_FLAG_BIT_29    = SUB_FLAG(29),
     SUB_COMP_FLAG_BIT_30    = SUB_FLAG(30),
-    SUB_COMP_FLAG_MASK      = SUB_COMP_FLAG_VTABLE | SUB_COMP_FLAG_METHOD | SUB_COMP_FLAG_NSENTRY | SUB_COMP_FLAG_PF_INIT
+    SUB_COMP_FLAG_MASK      = SUB_COMP_FLAG_VTABLE | SUB_COMP_FLAG_METHOD | SUB_COMP_FLAG_NSENTRY
 } sub_comp_flags_enum;
 #undef SUB_FLAG
 
@@ -97,10 +94,6 @@ typedef enum {
 
 #define Sub_comp_flags_SETTO(o, f) Sub_comp_get_FLAGS(o) = (f)
 #define Sub_comp_flags_CLEARALL(o) Sub_comp_flags_SETTO((o), 0)
-
-#define Sub_comp_INIT_TEST(o) Sub_comp_flag_TEST(PF_INIT, o)
-#define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)
-#define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
 /*
  * maximum sub recursion depth
