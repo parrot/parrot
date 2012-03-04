@@ -116,10 +116,6 @@ inline op check_events__() :internal :flow {
     goto ADDRESS(_this);   /* force this being a branch op */
 }
 
-inline op load_bytecode(in STR) :load_file {
-    Parrot_load_bytecode(interp, $1);
-}
-
 inline op load_bytecode(out PMC, in STR) :load_file {
     $1 = Parrot_pf_load_bytecode_search(interp, $2);
 }

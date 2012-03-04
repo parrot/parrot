@@ -198,7 +198,7 @@ main(int argc, const char *argv[])
                 return 1;
 
             Parrot_pf_set_current_packfile(interp, pf);
-            Parrot_pf_prepare_packfile_init(interp, pf);
+            //Parrot_pf_prepare_packfile_init(interp, pf);
         }
         else {
             STRING          *str = Parrot_str_new(interp, filename, 0);
@@ -215,7 +215,7 @@ main(int argc, const char *argv[])
             /* load the source for debugger list */
             PDB_load_source(interp, filename);
 
-            Parrot_pf_prepare_packfile_init(interp, pf);
+            //Parrot_pf_prepare_packfile_init(interp, pf);
         }
     }
     else {

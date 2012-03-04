@@ -85,7 +85,6 @@ get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
     sub_data->start_offs = 0;
     sub_data->end_offs = pf->cur_cs->base.size;
     sub_data->name = Parrot_sprintf_c(interp, "EVAL_%d", current_eval);
-    Parrot_pf_prepare_packfile_init(interp, eval_pmc);
     return eval_pmc;
 }
 

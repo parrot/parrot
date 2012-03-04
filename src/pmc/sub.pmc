@@ -59,15 +59,17 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 }
 
 pmclass Sub auto_attrs provides invokable {
-    ATTR PackFile_ByteCode *seg;        /* bytecode segment */
-    ATTR size_t             start_offs; /* sub entry in ops from seg->base.data */
+    ATTR PackFile_ByteCode *seg;             /* bytecode segment */
+    ATTR size_t             start_offs;      /* entry in ops from seg->base.data */
     ATTR size_t             end_offs;
+    ATTR PMC               *owner_pf;        /* Packfile or similar PMC which owns
+                                               this */
 
-    ATTR INTVAL             HLL_id;         /* see src/hll.c XXX or per segment? */
-    ATTR PMC               *namespace_name; /* where this Sub is in - this is either
-                                             * a String or a [Key] and describes
-                                             * the relative path in the NameSpace
-                                             */
+    ATTR INTVAL             HLL_id;          /* see src/hll.c XXX or per segment? */
+    ATTR PMC               *namespace_name;  /* where this Sub is in - this is either
+                                              * a String or a [Key] and describes
+                                              * the relative path in the NameSpace
+                                              */
     ATTR PMC               *namespace_stash; /* the actual hash, HLL::namespace */
     ATTR STRING            *name;            /* name of the sub */
     ATTR STRING            *method_name;     /* method name of the sub */

@@ -508,14 +508,6 @@ void PackFile_ConstTable_dump(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void do_sub_pragmas(PARROT_INTERP,
-    ARGIN(PMC *pfpmc),
-    pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
     ARGMOD(PackFile_Segment *seg))
@@ -551,12 +543,6 @@ PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     int sub_dir)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
-
-PARROT_EXPORT
-void PackFile_fixup_subs(PARROT_INTERP,
-    pbc_action_enum_t what,
-    ARGIN_NULLOK(PMC *eval))
-        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 INTVAL PackFile_map_segments(PARROT_INTERP,
@@ -601,11 +587,6 @@ STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
     opcode_t pc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_load_bytecode(PARROT_INTERP,
-    ARGIN_NULLOK(Parrot_String file_str))
-        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
@@ -682,18 +663,6 @@ PackFile * Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_pf_prepare_packfile_init(PARROT_INTERP,
-    ARGIN(PMC * const pfpmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_pf_prepare_packfile_load(PARROT_INTERP,
-    ARGIN(PMC * const pfpmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP,
     ARGIN_NULLOK(STRING * const fullname))
@@ -725,6 +694,11 @@ PMC * Parrot_pf_subs_by_tag(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+void Parrot_pf_verify_packfile(PARROT_INTERP, ARGIN(PMC * const pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pf_write_pbc_file(PARROT_INTERP,
     ARGIN(PMC *pf_pmc),
     ARGIN(STRING *filename))
@@ -748,6 +722,9 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN_NULLOK(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void Parrot_load_bytecode(PARROT_INTERP, STRING * whatever)
+        __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -775,9 +752,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_PackFile_add_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
@@ -792,8 +766,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_find_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
-#define ASSERT_ARGS_PackFile_fixup_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_map_segments __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir))
@@ -810,8 +782,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_debug_pc_to_filename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(debug))
-#define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_new_debug_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -846,14 +816,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
     , PARROT_ASSERT_ARG(file))
 #define ASSERT_ARGS_Parrot_pf_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_pf_prepare_packfile_init \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pfpmc))
-#define ASSERT_ARGS_Parrot_pf_prepare_packfile_load \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_read_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_serialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -870,6 +832,9 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pfpmc) \
     , PARROT_ASSERT_ARG(flag))
+#define ASSERT_ARGS_Parrot_pf_verify_packfile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc) \
@@ -880,6 +845,8 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_get_current_code_segment \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

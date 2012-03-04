@@ -100,6 +100,14 @@ static struct _imc_info_t* prepare_reentrant_compile(
     ARGIN(imc_info_t *imcc))
         __attribute__nonnull__(1);
 
+static void trigger_immediate_subs(
+    ARGMOD(imc_info_t *imcc),
+    ARGMOD(PackFile * pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*imcc)
+        FUNC_MODIFIES(* pf);
+
 #define ASSERT_ARGS_do_pre_process __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sourcefile))
@@ -118,6 +126,9 @@ static struct _imc_info_t* prepare_reentrant_compile(
     , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_prepare_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_trigger_immediate_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(pf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -589,14 +600,41 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
 
-    /* TODO: Do not use this function, it is deprecated (TT #2140). Find a
-       better way to handle :immediate and :postcomp subs instead. */
-    PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
-    PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
+    trigger_immediate_subs(imcc, pf_raw);
 
     if (!PMC_IS_NULL(old_packfilepmc))
         Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
     return packfilepmc;
+}
+
+static void
+trigger_immediate_subs(ARGMOD(imc_info_t *imcc), ARGMOD(PackFile * pf))
+{
+    PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+    STRING * const sub_str = Parrot_str_new(imcc->interp, "Sub", 0);
+    opcode_t i;
+
+    for (i = 0; i < ct->pmc.const_count; ++i) {
+        PMC * const sub_pmc = ct->pmc.constants[i];
+        Parrot_Sub_attributes *sub;
+        int pragmas;
+
+        if (!VTABLE_isa(imcc->interp, sub_pmc, sub_str))
+            continue;
+
+        PMC_get_sub(imcc->interp, sub_pmc, sub);
+        pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK & ~SUB_FLAG_IS_OUTER;
+        if (pragmas & SUB_FLAG_PF_IMMEDIATE) {
+            PMC * result = PMCNULL;
+            Parrot_pcc_invoke_sub_from_c_args(imcc->interp, sub_pmc, "->P", &result);
+            ct->pmc.constants[i] = result;
+            PARROT_GC_WRITE_BARRIER(imcc->interp, pf->view);
+        }
+        else if (pragmas & SUB_FLAG_PF_POSTCOMP) {
+            Parrot_pcc_invoke_sub_from_c_args(imcc->interp, sub_pmc, "->");
+        }
+    }
+    imcc->interp->resume_flag = RESUME_INITIAL;
 }
 
 /*

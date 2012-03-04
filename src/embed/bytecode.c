@@ -125,7 +125,7 @@ Parrot_api_ready_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     if (pf->cur_cs)
         Parrot_pf_set_current_packfile(interp, pbc);
 
-    Parrot_pf_prepare_packfile_init(interp, pbc);
+    Parrot_pf_verify_packfile(interp, pbc);
     *main_sub = Parrot_pf_get_packfile_main_sub(interp, pbc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }

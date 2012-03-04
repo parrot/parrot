@@ -54,15 +54,6 @@ static PackFile_Segment * create_seg(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*dir);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* do_1_sub_pragma(PARROT_INTERP,
-    ARGMOD(PMC *sub_pmc),
-    pbc_action_enum_t action)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*sub_pmc);
-
 static INTVAL find_const_iter(PARROT_INTERP,
     ARGMOD(PackFile_Segment *seg),
     ARGIN_NULLOK(void *user_data))
@@ -155,12 +146,6 @@ PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static int sub_pragma(PARROT_INTERP,
-    pbc_action_enum_t action,
-    ARGIN(const PMC *sub_pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -169,9 +154,6 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(dir) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(file_name))
-#define ASSERT_ARGS_do_1_sub_pragma __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sub_pmc))
 #define ASSERT_ARGS_find_const_iter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg))
@@ -214,9 +196,6 @@ static int sub_pragma(PARROT_INTERP,
     , PARROT_ASSERT_ARG(fullname))
 #define ASSERT_ARGS_set_current_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_sub_pragma __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sub_pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -476,171 +455,8 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
         for (i = bottom_lo; i < top_hi; i++)
             VTABLE_push_pmc(interp, subs, ct->pmc.constants[ct->tag_map[i].const_idx]);
     }
-
-    /* Backwards compatibility. :load is equivalent to "load" tag. :init is
-       equivalent to "init" tag */
-    if (mode == 1 || mode == 2) {
-        PackFile_ByteCode   * const self = pf->cur_cs;
-        PackFile_ConstTable * const ct = self->const_table;
-        STRING * const SUB = CONST_STRING(interp, "Sub");
-        opcode_t i;
-
-        for (i = 0; i < ct->pmc.const_count; ++i) {
-            PMC * const sub_pmc = ct->pmc.constants[i];
-            Parrot_Sub_attributes *sub;
-            int pragmas;
-
-            if (!VTABLE_isa(interp, sub_pmc, SUB))
-                continue;
-            PMC_get_sub(interp, sub_pmc, sub);
-            pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK & ~SUB_FLAG_IS_OUTER;
-
-            if (mode == 1 && (pragmas & SUB_FLAG_PF_LOAD))
-                VTABLE_push_pmc(interp, subs, sub_pmc);
-            else if (mode == 2 && Sub_comp_INIT_TEST(sub))
-                VTABLE_push_pmc(interp, subs, sub_pmc);
-        }
-    }
     return subs;
 }
-
-/*
-
-=item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
-*sub_pmc)>
-
-Checks B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.)
-returning 1 if the sub should be run for C<action>, a C<pbc_action_enum_t>.
-
-=cut
-
-*/
-
-static int
-sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
-{
-    ASSERT_ARGS(sub_pragma)
-
-    /* Note: the const casting is only needed because of the
-     * internal details of the Sub_comp macros.
-     * The assumption is that the TEST versions are in fact const,
-     * so the casts are safe.
-     * These casts are a quick fix to allow parrot build with c++,
-     * a refactor of the macros will be a cleaner solution.  */
-    DECL_CONST_CAST;
-    Parrot_Sub_attributes *sub;
-    int         todo    = 0;
-    const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
-                                                  & ~SUB_FLAG_IS_OUTER;
-    PMC_get_sub(interp, PARROT_const_cast(PMC *, sub_pmc), sub);
-    if (!pragmas && !Sub_comp_INIT_TEST(sub))
-        return 0;
-
-    switch (action) {
-      case PBC_MAIN:
-        /* denote MAIN entry in first loaded PASM */
-        if (interp->resume_flag & RESUME_INITIAL)
-            todo = 1;
-
-        /* :init functions need to be called at MAIN time, so return 1 */
-        /* symreg.h:P_INIT */
-        if (Sub_comp_INIT_TEST(sub))
-            todo = 1;
-
-        break;
-      case PBC_LOADED:
-        /* symreg.h:P_LOAD */
-        if (pragmas & SUB_FLAG_PF_LOAD)
-            todo = 1;
-        break;
-      default:
-        break;
-    }
-
-    if (pragmas & (SUB_FLAG_PF_IMMEDIATE | SUB_FLAG_PF_POSTCOMP))
-        todo = 1;
-
-    return todo;
-}
-
-/*
-
-=item C<static PMC* do_1_sub_pragma(PARROT_INTERP, PMC *sub_pmc,
-pbc_action_enum_t action)>
-
-Runs autoloaded or immediate bytecode, marking the MAIN subroutine entry.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
-{
-    ASSERT_ARGS(do_1_sub_pragma)
-    Parrot_Sub_attributes *sub;
-    PMC_get_sub(interp, sub_pmc, sub);
-
-    switch (action) {
-      case PBC_IMMEDIATE:
-        /* run IMMEDIATE sub */
-        if (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_IMMEDIATE) {
-            void * const lo_var_ptr = interp->lo_var_ptr;
-            PMC  *result = PMCNULL;
-
-            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_IMMEDIATE;
-            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->P", &result);
-
-            /* reset initial flag so MAIN detection works
-             * and reset lo_var_ptr to prev */
-            interp->resume_flag = RESUME_INITIAL;
-            interp->lo_var_ptr  = lo_var_ptr;
-            return result;
-        }
-        break;
-      case PBC_POSTCOMP:
-        /* run POSTCOMP sub */
-        if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_POSTCOMP) {
-            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_POSTCOMP;
-            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
-
-            /* reset initial flag so MAIN detection works */
-            interp->resume_flag = RESUME_INITIAL;
-            return NULL;
-        }
-        break;
-
-      case PBC_LOADED:
-        if (PObj_get_FLAGS(sub_pmc) &   SUB_FLAG_PF_LOAD) {
-            /* only run :init/:load subs once */
-            Sub_comp_INIT_CLEAR(sub);
-            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
-
-            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
-        }
-        break;
-
-      case PBC_MAIN:
-        /* run :init/:load tagged functions */
-        if (Sub_comp_INIT_TEST(sub)) {
-            /* only run :init/:load subs once */
-            Sub_comp_INIT_CLEAR(sub);
-            PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
-
-            Parrot_pcc_invoke_sub_from_c_args(interp, sub_pmc, "->");
-            interp->resume_flag = RESUME_INITIAL;
-        }
-        break;
-
-      default:
-        break;
-    }
-
-    return NULL;
-}
-
 
 /*
 
@@ -792,82 +608,6 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
     if (!ct || !ct->pmc.constants || bc->main_sub < 0)
         return PMCNULL;
     return ct->pmc.constants[bc->main_sub];
-}
-
-/*
-
-=item C<void do_sub_pragmas(PARROT_INTERP, PMC *pfpmc, pbc_action_enum_t action,
-PMC *eval_pmc)>
-
-C<action> is one of C<PBC_LOADED>, C<PBC_INIT>, or C<PBC_MAIN>.
-These determine which subs get executed at this point. Some rules:
-
- :immediate subs always execute immediately
- :postcomp subs always execute immediately
- :main subs execute when we have the PBC_MAIN action
- :init subs execute when :main does
- :load subs execute on PBC_LOAD
-
-Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
-alive by living subs.
-
-This function and the entire underlying mechanism should be deprecated and
-removed. See GH #428 for details.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
-               pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
-{
-    ASSERT_ARGS(do_sub_pragmas)
-    PackFile            * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
-    PackFile_ByteCode   * const self = pf->cur_cs;
-    PackFile_ConstTable * const ct = self->const_table;
-    opcode_t i;
-
-    for (i = 0; i < ct->pmc.const_count; ++i) {
-        STRING * const SUB = CONST_STRING(interp, "Sub");
-        PMC * const sub_pmc = ct->pmc.constants[i];
-
-        if (VTABLE_isa(interp, sub_pmc, SUB)) {
-            Parrot_Sub_attributes *sub;
-
-            PMC_get_sub(interp, sub_pmc, sub);
-
-            if (action == 0)
-                continue;
-            if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
-            ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
-            &&    sub_pragma(interp, action, sub_pmc)) {
-                PMC * const result = do_1_sub_pragma(interp, sub_pmc, action);
-
-                /* replace Sub PMC with computation results */
-                if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
-                    ct->pmc.constants[i] = result;
-                    PARROT_GC_WRITE_BARRIER(interp, pfpmc);
-                }
-            }
-        }
-    }
-
-    if (interp->resume_flag & RESUME_INITIAL) {
-        if (action == PBC_MAIN) {
-            if (self->main_sub < 0)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                    "No main sub found");
-            {
-                PMC *      const mainsub = packfile_main(self);
-                opcode_t * const ptr     = (opcode_t *)VTABLE_get_pointer(interp, mainsub);
-                Parrot_Sub_attributes *main_attrs;
-                PMC_get_sub(interp, mainsub, main_attrs);
-                interp->resume_offset = (ptr - main_attrs->seg->base.data);
-            }
-        }
-    }
 }
 
 /*
@@ -1041,7 +781,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 opcode_t
 PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
-    ARGIN(const opcode_t *packed), size_t packed_size)
+        ARGIN(const opcode_t *packed), size_t packed_size)
 {
     ASSERT_ARGS(PackFile_unpack)
     PackFile_Header * const header = self->header;
@@ -2026,7 +1766,6 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         if (cs) {
             interp->code = cur_code;
             VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-            do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
         }
         else {
             interp->code = cur_code;
@@ -2066,8 +1805,12 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
         Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
                 load_str);
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
     }
+}
+
+void
+Parrot_load_bytecode(PARROT_INTERP, STRING * whatever)
+{
 }
 
 /*
@@ -2159,81 +1902,6 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 /*
 
-=item C<void Parrot_load_bytecode(PARROT_INTERP, Parrot_String file_str)>
-
-Load a bytecode, PIR, or PASM file into the interpreter.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
-TODO: We need to cleanup the way bytecode is loaded. This probably needs some
-major changes.
-
-=cut
-
-*/
-
-/* intermediate hook during changes */
-PARROT_EXPORT
-void
-Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
-{
-    ASSERT_ARGS(Parrot_load_bytecode)
-    STRING         *wo_ext, *ext, *pbc, *path;
-    STRING         *found_path, *found_ext;
-    PMC            *is_loaded_hash;
-    enum_runtime_ft file_type;
-
-    if (STRING_IS_NULL(file_str))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_bytecode\" no file name");
-
-    parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
-
-    /* check if wo_ext is loaded */
-    is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
-        interp->iglobals, IGLOBALS_PBC_LIBS);
-
-    if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
-        return;
-
-
-
-    pbc = CONST_STRING(interp, "pbc");
-
-    if (STRING_equal(interp, ext, pbc))
-        file_type = PARROT_RUNTIME_FT_PBC;
-    else
-        file_type = PARROT_RUNTIME_FT_SOURCE;
-
-    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_bytecode\" couldn't find file '%Ss'", file_str);
-
-    /* remember wo_ext => full_path mapping */
-    VTABLE_set_string_keyed_str(interp, is_loaded_hash, wo_ext, path);
-
-    parrot_split_path_ext(interp, path, &found_path, &found_ext);
-
-    /* Check if the file found was actually a bytecode file (.pbc
-     * extension) or a source file (.pir or .pasm extension). */
-
-    push_context(interp);
-
-    if (STRING_equal(interp, found_ext, pbc))
-        load_file(interp, path);
-    else {
-        const STRING * pasm_s = CONST_STRING(interp, "pasm");
-        const INTVAL is_pasm = STRING_equal(interp, ext, pasm_s);
-        compile_file(interp, path, is_pasm);
-    }
-
-    Parrot_pop_context(interp);
-}
-
-/*
-
 =item C<PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, STRING *file)>
 
 Load a .pbc bytecode by short name, looking in standard search paths. Return
@@ -2269,33 +1937,7 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
 
 /*
 
-=item C<void PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC
-*eval)>
-
-Calls C<:load>, C<:init>, C<:main>, C<:immediate> and/or C<:postcomp>
-subroutines in the current packfile, depending on the value of C<action>.
-See C<do_sub_pragmas> for more details.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140. Use Parrot_pf_prepare_packfile_init
-and Parrot_pf_prepare_packfile_load (and any other variants we need to create
-in the future) instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
-{
-    ASSERT_ARGS(PackFile_fixup_subs)
-    do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
-}
-
-/*
-
-=item C<void Parrot_pf_prepare_packfile_init(PARROT_INTERP, PMC * const pfpmc)>
+=item C<void Parrot_pf_verify_packfile(PARROT_INTERP, PMC * const pfpmc)>
 
 Ready a PackFile which has just been loaded in to Parrot. Sort out the
 C<:main> function and trigger C<:init> functions. This is for packfiles which
@@ -2307,9 +1949,9 @@ are intended to be executed as a program.
 
 PARROT_EXPORT
 void
-Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
+Parrot_pf_verify_packfile(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
-    ASSERT_ARGS(Parrot_pf_prepare_packfile_init)
+    ASSERT_ARGS(Parrot_pf_verify_packfile)
     if (PMC_IS_NULL(pfpmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile: Invalid PMC");
@@ -2318,37 +1960,6 @@ Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
-        if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_MAIN, pfpmc);
-    }
-}
-
-/*
-
-=item C<void Parrot_pf_prepare_packfile_load(PARROT_INTERP, PMC * const pfpmc)>
-
-Ready a PackFile which has just been loaded in to Parrot. Trigger any C<:load>
-functions. This is for packfiles which are intended to be used as libraries.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
-{
-    ASSERT_ARGS(Parrot_pf_prepare_packfile_load)
-    if (PMC_IS_NULL(pfpmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "Could not load packfile: Invalid PMC");
-    else {
-        PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pfpmc);
-        if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                "Could not load packfile: Invalid Pointer");
-        if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_LOADED, NULL);
     }
 }
 
@@ -2642,9 +2253,9 @@ set_current_sub(PARROT_INTERP)
 =item C<void Parrot_pf_execute_bytecode_program(PARROT_INTERP, PMC *pbc, PMC
 *args)>
 
-Execute a PackFile* as if it were a main program. This is an entrypoint into
+Execute a PackFile* as if it were a main program. This is an entry point into
 executing a Parrot program, it is not intended (and can be dangerous) if you
-try to call it from within a running Parrot program
+try to call it from within a running Parrot program.
 
 =cut
 
@@ -2665,13 +2276,21 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
             "Could not get packfile.");
 
     Parrot_pf_set_current_packfile(interp, pbc);
-    Parrot_pf_prepare_packfile_init(interp, pbc);
+
+    Parrot_pf_verify_packfile(interp, pbc);
     main_sub = packfile_main(pf->cur_cs);
-
-    /* if no sub was marked being :main, we create a dummy sub with offset 0 */
-
     if (!main_sub)
         main_sub = set_current_sub(interp);
+
+    // Setup the interp. Since this is a top-level call-in routine, we can
+    // initialize interp fields
+    interp->resume_flag = RESUME_INITIAL;
+    {
+        opcode_t * const ptr = (opcode_t *)VTABLE_get_pointer(interp, main_sub);
+        Parrot_Sub_attributes *main_attrs;
+        PMC_get_sub(interp, main_sub, main_attrs);
+        interp->resume_offset = (ptr - main_attrs->seg->base.data);
+    }
 
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_ARGV_LIST, args);
     Parrot_cx_begin_execution(interp, main_sub, args);
