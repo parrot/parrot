@@ -9,6 +9,9 @@ before_script:
 # No, we are not going to run the tests for all these dependencies on every commit
     - cpanm -n TAP::Harness::Archive TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+branches
+  except:
+    - remove_sub_flags
 # branches:
 #   only:
 #     - master
