@@ -484,7 +484,7 @@ Set property $2 to value $3 for PMC $1.
 =cut
 
 op setprop(invar PMC, in STR, invar PMC) {
-    VTABLE_setprop(interp, $1, $2, $3);
+    Parrot_pmc_setprop(interp, $1, $2, $3);
 }
 
 ########################################
@@ -496,7 +496,7 @@ Get property $2 of PMC $3 and put it in $1.
 =cut
 
 op getprop(out PMC, in STR, invar PMC) {
-    $1 = VTABLE_getprop(interp, $3, $2);
+    $1 = Parrot_pmc_getprop(interp, $3, $2);
 }
 
 ########################################
@@ -508,7 +508,7 @@ Delete property $2 from PMC $1.
 =cut
 
 op delprop(invar PMC, in STR) {
-    VTABLE_delprop(interp, $1, $2);
+    Parrot_pmc_delprop(interp, $1, $2);
 }
 
 ########################################
@@ -521,7 +521,7 @@ hash doesn't exist, the C<Null> PMC is returned.
 =cut
 
 op prophash(out PMC, invar PMC) {
-    $1 = VTABLE_getprops(interp, $2);
+    $1 = Parrot_pmc_getprops(interp, $2);
 }
 
 =back

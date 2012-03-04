@@ -59,7 +59,7 @@ static  PMC *
 Parrot_default_ro_find_method(PARROT_INTERP, ARGMOD(PMC *_self), ARGMOD(STRING *method_name)) {
     /* Use non-readonly find_method. Current vtable is ro variant. So ro_variant contains non-ro variant */
     PMC *const method = _self->vtable->ro_variant_vtable->find_method(interp, _self, method_name);
-    if (!PMC_IS_NULL(VTABLE_getprop(interp, method, CONST_STRING_GEN(interp, "write"))))
+    if (!PMC_IS_NULL(Parrot_pmc_getprop(interp, method, CONST_STRING_GEN(interp, "write"))))
         return PMCNULL;
     else
         return method;

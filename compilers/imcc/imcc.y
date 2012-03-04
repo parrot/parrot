@@ -1019,7 +1019,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
     /* TODO: This is very ugly and heavily nested. Can we avoid this? */
     if (!STRING_equal(imcc->interp,
             VTABLE_get_string(imcc->interp,
-                VTABLE_getprop(imcc->interp, lib_pmc,
+                Parrot_pmc_getprop(imcc->interp, lib_pmc,
                     Parrot_str_new_constant(imcc->interp, "_type"))),
             Parrot_str_new_constant(imcc->interp, "Ops")))
         imcc_pbc_add_libdep(imcc, s);
