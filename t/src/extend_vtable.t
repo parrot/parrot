@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 137;
+plan tests => 134;
 
 =head1 NAME
 
@@ -400,13 +400,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa");
 CODE
 1
 0
-Done!
-OUTPUT
-
-# TODO: Improve this test
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_getprops");
-    pmc = Parrot_PMC_getprops(interp, continuation);
-CODE
 Done!
 OUTPUT
 
@@ -891,26 +884,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_role");
     */
 CODE
 42
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_setprop");
-    string = createstring(interp, "_struct");
-    Parrot_PMC_set_integer_native(interp, pmc, 42);
-    Parrot_PMC_setprop(interp,continuation , string, pmc);
-    pmc2 = Parrot_PMC_getprop(interp,continuation ,string);
-    Parrot_printf(interp,"%P\n",pmc2);
-CODE
-42
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delprop");
-    type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_pmc_new(interp, type);
-
-    Parrot_PMC_delprop(interp, pmc, string);
-CODE
 Done!
 OUTPUT
 
