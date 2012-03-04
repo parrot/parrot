@@ -1,6 +1,6 @@
 language: "perl"
 perl:
-    - "5.10"
+#    - "5.10"
     - "5.14"
 install: "echo"
 before_script:
@@ -14,9 +14,9 @@ before_script:
 # No, we are not going to run the tests for all these dependencies on every commit
      - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
-# branches:
-#   only:
-#     - master
+branches:
+   only:
+     - master
 notifications:
   recipients:
     - parrot-dev@lists.parrot.org
