@@ -1,7 +1,7 @@
 language: "perl"
 perl:
-    - 5.10
-    - 5.14
+    - "5.10"
+    - "5.14"
 before_script:
 # This stuff used to be required, but was rolled into the Travis CI perl support.
 #    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev gcc-multilib
