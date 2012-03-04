@@ -493,10 +493,21 @@ op setprop(invar PMC, in STR, invar PMC) {
 
 Get property $2 of PMC $3 and put it in $1.
 
+Deprecated.
+
+=item B<getprop>(out PMC, invar PMC, in STR)
+
+Get property $3 of PMC $2 and put it in $1.
+
 =cut
 
-op getprop(out PMC, in STR, invar PMC) {
+op getprop(out PMC, in STR, invar PMC) :deprecated {
+    Parrot_warn_deprecated(interp, "getprop_p_s_p is deprecated. Use getprop_p_p_s instead");
     $1 = Parrot_pmc_getprop(interp, $3, $2);
+}
+
+op getprop(out PMC, invar PMC, in STR) {
+    $1 = Parrot_pmc_getprop(interp, $2, $3);
 }
 
 ########################################
