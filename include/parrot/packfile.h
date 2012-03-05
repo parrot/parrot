@@ -308,21 +308,6 @@ typedef enum {
 } pbc_action_enum_t;
 
 
-/* HEADERIZER BEGIN: src/packdump.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-void PackFile_ConstTable_dump(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_PackFile_ConstTable_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/packdump.c */
-
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
