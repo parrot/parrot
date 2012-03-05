@@ -1371,9 +1371,9 @@ create a new one and return it.
     # new one.
     .local pmc parrotclass, prototable
     parrotclass = typeof self
-    prototable = getprop '%!prototable', parrotclass
+    prototable = getprop parrotclass, '%!prototable'
     if null prototable goto make_prototable
-    $P0 = getprop '$!generation', prototable
+    $P0 = getprop prototable, '$!generation'
     $I0 = issame $P0, generation
     if $I0 goto have_prototable
   make_prototable:
