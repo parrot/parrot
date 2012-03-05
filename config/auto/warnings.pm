@@ -182,6 +182,7 @@ sub _init {
         -Wno-format-extra-args
         -Wno-import
         -Wredundant-decls
+        -Wstrict-overflow=5
         -Wsuggest-attribute=const
         -Wsuggest-attribute=noreturn
         -Wsuggest-attribute=pure
