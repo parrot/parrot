@@ -250,7 +250,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "methods: self" );
     .local pmc B
 
     print "A::foo\n"
-    getprop B, "B", self
+    getprop B, self, "B"
 
     self."blah"()
     B."blah"()

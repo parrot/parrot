@@ -163,7 +163,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
     set I11, P10
     print I11
     print "\n"
-    getprop P12, "answer", P10
+    getprop P12, P10, "answer"
     print P12
     print "\n"
     end
@@ -200,7 +200,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
     set P13, P10[1]
     print P13
     print "\n"
-    getprop P12, "answer", P12
+    getprop P12, P12, "answer"
     print P12
     print "\n"
     end

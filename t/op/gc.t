@@ -223,7 +223,7 @@ GC related bugs.
 .namespace ['Source']
 .sub get_string :method :vtable # buffer
     $P4  = self
-    $P2 = getprop "buffer", $P4
+    $P2 = getprop $P4, "buffer"
     sweep 1
     unless_null $P2, buffer_ok
     $P2 = new ['Source'; 'Buffer']
@@ -239,7 +239,7 @@ buffer_ok:
 .sub get_string :method :vtable
     $P4 = self
     sweep 1
-    $P2 = getprop "buf", $P4
+    $P2 = getprop $P4, "buf"
     $S0 = $P2
     .return($S0)
 .end
