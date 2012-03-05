@@ -87,10 +87,10 @@ our %test_groups = (
 # GROUPS OF BASIC GROUPS
 
 our @major_test_group = map { $test_groups{$_} }
-    ( qw| m0 compilers dynoplibs dynpmc library miscellaneous | );
+    ( qw| compilers dynoplibs dynpmc library miscellaneous | );
 
 our @near_core_test_group = map { $test_groups{$_} }
-    ( qw| src run perl | );
+    ( qw| m0 src run perl | );
 
 # EXPORT FUNCTIONALITY
 
