@@ -19,6 +19,8 @@ Lower bit in cell masked to indicate pointer-to-free-cell.
 #ifndef PARROT_POINTER_ARRAY_H_GUARD
 #define PARROT_POINTER_ARRAY_H_GUARD
 
+#include <parrot/memory.h>
+
 /* Calculate size of chunk data     "header"  */
 #define CHUNK_SIZE 4096
 #define CELL_PER_CHUNK ((CHUNK_SIZE - 2 * sizeof(size_t)) / sizeof (void *))
@@ -90,10 +92,10 @@ allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
     ASSERT_ARGS(allocate_more_chunks)
 
     self->current_chunk = self->total_chunks++;
-    mem_realloc_n_typed(self->chunks,
+    mem_internal_realloc_n_typed(self->chunks,
             self->total_chunks,
             Parrot_Pointer_Array_Chunk*);
-    self->chunks[self->current_chunk] = mem_allocate_typed(Parrot_Pointer_Array_Chunk);
+    self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
     self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
     self->chunks[self->current_chunk]->next_free = 0;
 }
