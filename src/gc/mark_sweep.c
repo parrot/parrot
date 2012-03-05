@@ -344,7 +344,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
 
                 add_free_object(interp, mem_pools, pool, b);
             }
-next:
             b = (PObj *)((char *)b + object_size);
         }
     }
