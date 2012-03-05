@@ -139,7 +139,7 @@ you have little reason to use it directly.
     .local pmc pixels_entry
 
     pixels_entry  = layout[ 'pixels' ]
-    pixels_struct = getprop '_struct', pixels_entry
+    pixels_struct = getprop pixels_entry, '_struct'
     pixels_layout = new 'OrderedHash'
 
     if bpp ==  8 goto eight_bits

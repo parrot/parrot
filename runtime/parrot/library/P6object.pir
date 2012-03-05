@@ -102,7 +102,7 @@ Return the C<P6metaclass> of the invocant.
 
 .sub 'HOW' :method :nsentry
     $P0 = typeof self
-    $P1 = getprop 'metaclass', $P0
+    $P1 = getprop $P0, 'metaclass'
     .return ($P1)
 .end
 
@@ -141,7 +141,7 @@ Return the package for the object.
 
 .sub 'WHO' :method :nsentry
     $P0 = typeof self
-    $P0 = getprop 'metaclass', $P0
+    $P0 = getprop $P0, 'metaclass'
     $P0 = getattribute $P0, 'parrotclass'
     $P0 = $P0.'get_namespace'()
     .return ($P0)

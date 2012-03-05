@@ -59,7 +59,7 @@ END:
 
     interpinfo mysub, .INTERPINFO_CURRENT_SUB
     #interpinfo myself, .INTERPINFO_CURRENT_OBJECT
-    getprop source, "CALL", mysub
+    getprop source, mysub, "CALL"
     source()
 
     # close the source

@@ -196,7 +196,7 @@ END:
 
 .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
-    getprop $P0, "path", $P1
+    getprop $P0, $P1, "path"
     path = $P0
 
     $S0 = concat path, name
