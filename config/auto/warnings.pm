@@ -172,8 +172,10 @@ sub _init {
     $gpp->{'basic'} = [ @gcc_or_gpp ];
 
     my @gcc_or_gpp_cage = qw(
+        -pedantic
         -std=c89
         -Werror=implicit-function-declaration
+        -Wfloat-equal
         -Wformat=2
         -Wlarger-than-4096
         -Wlong-long
@@ -182,11 +184,15 @@ sub _init {
         -Wno-format-extra-args
         -Wno-import
         -Wredundant-decls
+        -Wshadow
         -Wstrict-overflow=5
         -Wsuggest-attribute=const
         -Wsuggest-attribute=noreturn
         -Wsuggest-attribute=pure
+        -Wtraditional
+        -Wtrampolines
         -Wunreachable-code
+        -Wunsafe-loop-optimizations
         -Wunused
         -Wunused-function
         -Wunused-label
