@@ -5,14 +5,14 @@ perl:
 install: "echo"
 before_script:
     - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
+# No, we are not going to run the tests for all these dependencies on every commit
+    - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription
 # This stuff used to be required, but was rolled into the Travis CI perl support.
 #    - curl -L http://cpanmin.us | sudo perl - --self-upgrade
 #    - export CI_USER=$USER
 #    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
 #    - sudo chown -R $CI_USER ~/.cpanm
 #    - sudo chown -R $CI_USER ~/perl5
-# No, we are not going to run the tests for all these dependencies on every commit
-     - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription
 script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
 branches:
    only:
