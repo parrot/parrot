@@ -152,11 +152,8 @@ sub _init {
         -Wstack-usage=500
     );
 
-    $gcc->{'basic'} = [ @gcc_or_gpp ];
-    $gpp->{'basic'} = [ @gcc_or_gpp ];
-
-    # Add some gcc-only warnings that would break g++
-    push @{$gcc->{'basic'}}, qw(
+    # gcc-only warnings that would break g++
+    my @gcc_basic = qw(
         -Wc++-compat
         -Wdeclaration-after-statement
         -Werror=declaration-after-statement
@@ -171,7 +168,10 @@ sub _init {
         -Wstrict-prototypes
     );
 
-    my $gcc_or_gpp_cage = [ qw(
+    $gcc->{'basic'} = [ @gcc_or_gpp, @gcc_basic ];
+    $gpp->{'basic'} = [ @gcc_or_gpp ];
+
+    my @gcc_or_gpp_cage = qw(
         -std=c89
         -Werror=implicit-function-declaration
         -Wformat=2
@@ -181,6 +181,7 @@ sub _init {
         -Wdeprecated-declarations
         -Wno-format-extra-args
         -Wno-import
+        -Wredundant-decls
         -Wsuggest-attribute=const
         -Wsuggest-attribute=noreturn
         -Wsuggest-attribute=pure
@@ -190,10 +191,15 @@ sub _init {
         -Wunused-label
         -Wunused-value
         -Wunused-variable
-    ) ];
+        -Wvolatile-register-var
+    );
 
-    $gcc->{'cage'} = $gcc_or_gpp_cage;
-    $gpp->{'cage'} = $gcc_or_gpp_cage;
+    my @gpp_cage = qw(
+        -Weffc++
+    );
+
+    $gcc->{'cage'} = [ @gcc_or_gpp_cage ];
+    $gpp->{'cage'} = [ @gcc_or_gpp_cage, @gpp_cage ];
 
     $gcc->{'todo'} = $gpp->{'todo'} = {
         '-Wformat-nonliteral' => [ qw(
