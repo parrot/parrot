@@ -118,12 +118,12 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     self->src = cursor;
 
     /* Pack the fixed part of the header */
-    mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
+    memcpy(cursor, self->header, PACKFILE_HEADER_BYTES);
     byte_cursor += PACKFILE_HEADER_BYTES;
 
     /* Pack the UUID. */
     if (self->header->uuid_size > 0)
-        mem_sys_memcopy(byte_cursor, self->header->uuid_data,
+        memcpy(byte_cursor, self->header->uuid_data,
             self->header->uuid_size);
 
     /* Padding. */

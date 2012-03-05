@@ -876,9 +876,9 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
 
     /* copy buckets and index */
-    mem_sys_memcopy(new_buckets, hash->buckets,
+    memcpy(new_buckets, hash->buckets,
             N_BUCKETS(old_size) * sizeof (HashBucket));
-    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket *));
+    memcpy(new_index, hash->index, old_size * sizeof (HashBucket *));
 
     /* free */
     if (old_size > SPLIT_POINT)

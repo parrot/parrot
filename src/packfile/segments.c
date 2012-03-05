@@ -791,7 +791,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
-        mem_sys_memcopy(self->data, cursor, self->size * sizeof (opcode_t));
+        memcpy(self->data, cursor, self->size * sizeof (opcode_t));
         cursor += self->size;
     }
     else {

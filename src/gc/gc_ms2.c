@@ -632,7 +632,7 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self = (MarkSweep_GC*)interp->parent_interpreter->gc_sys->gc_private;
     }
     else {
-        self = mem_allocate_zeroed_typed(MarkSweep_GC);
+        self = mem_internal_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (pmc_alloc_struct));

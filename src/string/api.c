@@ -352,7 +352,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
         /* and copy it over */
-        mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+        memcpy(result->strstart, s->strstart, alloc_size);
     }
 
     result->bufused  = alloc_size;
@@ -498,7 +498,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         PObj_is_string_copy_CLEAR(dest);
 
         /* Append b */
-        mem_sys_memcopy(dest->strstart + dest->bufused,
+        memcpy(dest->strstart + dest->bufused,
                 b->strstart, b->bufused);
 
         dest->encoding = enc;
@@ -516,10 +516,10 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         dest->encoding = enc;
 
         /* Copy A first */
-        mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
+        memcpy(dest->strstart, a->strstart, a->bufused);
 
         /* Tack B on the end of A */
-        mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
+        memcpy((void *)((ptrcast_t)dest->strstart + a->bufused),
                 b->strstart, b->bufused);
     }
 
@@ -675,7 +675,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     Parrot_gc_allocate_string_storage(interp, s, len);
 
     if (buffer && len) {
-        mem_sys_memcopy(s->strstart, buffer, len);
+        memcpy(s->strstart, buffer, len);
         s->bufused = len;
         STRING_scan(interp, s);
     }
@@ -1029,7 +1029,7 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         char *             destpos = dest->strstart;
         const char * const srcpos  = s->strstart;
         for (i = 0; i < num; ++i) {
-            mem_sys_memcopy(destpos, srcpos, length);
+            memcpy(destpos, srcpos, length);
             destpos += length;
         }
 
@@ -1285,14 +1285,14 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     dest->bufused = buf_size;
 
     /* Copy begin of string */
-    mem_sys_memcopy(dest->strstart, src->strstart, start_byte);
+    memcpy(dest->strstart, src->strstart, start_byte);
 
     /* Copy the replacement in */
-    mem_sys_memcopy((char *)dest->strstart + start_byte, rep->strstart,
+    memcpy((char *)dest->strstart + start_byte, rep->strstart,
             rep->bufused);
 
     /* Copy the end of old string */
-    mem_sys_memcopy((char *)dest->strstart + start_byte + rep->bufused,
+    memcpy((char *)dest->strstart + start_byte + rep->bufused,
             (char *)src->strstart + end_byte,
             src->bufused - end_byte);
 
@@ -2271,7 +2271,7 @@ Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
     const size_t size = Buffer_buflen(s);
     char * const memory = (char *)mem_internal_allocate(size);
 
-    mem_sys_memcopy(memory, Buffer_bufstart(s), size);
+    memcpy(memory, Buffer_bufstart(s), size);
     Buffer_bufstart(s) = memory;
     s->strstart        = memory;
 
@@ -2317,7 +2317,7 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
     Parrot_block_GC_sweep(interp);
     Parrot_gc_allocate_string_storage(interp, s, size);
     Parrot_unblock_GC_sweep(interp);
-    mem_sys_memcopy(Buffer_bufstart(s), memory, size);
+    memcpy(Buffer_bufstart(s), memory, size);
 
     /* Mark the memory as neither immobile nor system allocated */
     PObj_sysmem_CLEAR(s);
@@ -2533,7 +2533,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             dp = result->strstart;
         }
 
-        mem_sys_memcopy(dp + i, hex_buf, hex_len);
+        memcpy(dp + i, hex_buf, hex_len);
 
         /* adjust our insert idx */
         i += hex_len;

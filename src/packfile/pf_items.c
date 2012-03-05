@@ -1143,7 +1143,7 @@ PF_store_number(ARGOUT(opcode_t *cursor), ARGIN(const FLOATVAL *val))
     ASSERT_ARGS(PF_store_number)
     opcode_t padded_size  = (sizeof (FLOATVAL) + sizeof (opcode_t) - 1) /
         sizeof (opcode_t);
-    mem_sys_memcopy(cursor, val, sizeof (FLOATVAL));
+    memcpy(cursor, val, sizeof (FLOATVAL));
     cursor += padded_size;
     return cursor;
 }
@@ -1230,7 +1230,7 @@ PF_store_buf(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
     if (s->strstart) {
         char *charcursor = (char *) cursor;
-        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        memcpy(charcursor, s->strstart, s->bufused);
         charcursor += s->bufused;
 
         /* Pad up to wordsize boundary. */
@@ -1376,7 +1376,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     charcursor = (char *)cursor;
 
     if (s->strstart) {
-        mem_sys_memcopy(charcursor, s->strstart, s->bufused);
+        memcpy(charcursor, s->strstart, s->bufused);
         charcursor += s->bufused;
         /* Pad up to sizeof (opcode_t) boundary. */
         while ((unsigned long) (charcursor - (char *) cursor) % sizeof (opcode_t)) {

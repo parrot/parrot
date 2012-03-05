@@ -855,7 +855,7 @@ Return a clone of this PMC.
     VTABLE PMC *clone() {
         PMC * const clone = Parrot_pmc_new(INTERP, enum_class_UnManagedStruct);
 
-        mem_sys_memmove(PMC_data(clone), PMC_data(SELF),
+        memmove(PMC_data(clone), PMC_data(SELF),
                 sizeof (Parrot_UnManagedStruct_attributes));
         PARROT_UNMANAGEDSTRUCT(clone)->init =
             VTABLE_clone(INTERP, PARROT_UNMANAGEDSTRUCT(SELF)->init);

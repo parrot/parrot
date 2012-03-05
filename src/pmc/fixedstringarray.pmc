@@ -101,7 +101,7 @@ Creates and returns a copy of the array.
             mem_size = size * sizeof (STRING *);
 
             dest_str_array = mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *);
-            mem_sys_memcopy(dest_str_array, my_str_array, mem_size);
+            memcpy(dest_str_array, my_str_array, mem_size);
             SET_ATTR_str_array(INTERP, dest, dest_str_array);
             SET_ATTR_size(INTERP, dest, size);
 

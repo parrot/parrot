@@ -364,7 +364,7 @@ canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
                         ? len - non0_pos
                         : exp_digits + (len - last_pos - 1);
 
-        mem_sys_memmove(&tc[sign_pos+1], &tc[len - keep], keep+1);
+        memmove(&tc[sign_pos+1], &tc[len - keep], keep+1);
         len = sign_pos + 1 + keep;
 
         /* If it's a fixed-width field and we're too short now,
@@ -381,7 +381,7 @@ canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
             }
             else {
                 size_t i;
-                mem_sys_memmove(&tc[info->width - len], &tc[0], len+1);
+                memmove(&tc[info->width - len], &tc[0], len+1);
                 for (i = 0; i < info->width - len; ++i)
                     tc[i] = (info->flags & FLAG_ZERO) ? '0' : ' ';
             }
