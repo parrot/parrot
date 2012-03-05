@@ -4,8 +4,8 @@ perl:
     - "5.14"
 install: "echo"
 before_script:
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
 # This stuff used to be required, but was rolled into the Travis CI perl support.
-#    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev liblocal-lib-perl zlib1g-dev gcc-multilib
 #    - curl -L http://cpanmin.us | sudo perl - --self-upgrade
 #    - export CI_USER=$USER
 #    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
@@ -26,8 +26,8 @@ notifications:
   irc:
       - "irc.parrot.org#parrot"
 env:
-#    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
-#    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
     - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="gcc"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="gcc"
