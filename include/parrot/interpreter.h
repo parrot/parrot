@@ -313,9 +313,6 @@ typedef opcode_t *(*native_func_t)(PARROT_INTERP,
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
-void
-Parrot_interp_clear_emergency_interpreter(void);
-
 /* HEADERIZER BEGIN: src/interp/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
