@@ -141,15 +141,16 @@ static opcode_t * runops_subprof_sub_core(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static INTVAL * sptodebug(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
-    ARGIN(subprofile *sp))
+    ARGMOD(subprofiledata *spdata),
+    ARGIN(const subprofile *sp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*spdata);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -261,7 +262,7 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 
 /*
 
-=item C<static INTVAL * sptodebug(PARROT_INTERP, subprofiledata *spdata,
+=item C<static INTVAL * sptodebug(PARROT_INTERP, subprofiledata *spdata, const
 subprofile *sp)>
 
 Unpacks the debug segment data into an array indexed by the opcode offset.
@@ -273,7 +274,7 @@ Hashes the result in spdata->seg2debug.
 
 PARROT_CANNOT_RETURN_NULL
 static INTVAL *
-sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
+sptodebug(PARROT_INTERP, ARGMOD(subprofiledata *spdata), ARGIN(const subprofile *sp))
 {
     ASSERT_ARGS(sptodebug)
 
@@ -295,7 +296,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
     xdebug = (INTVAL *)mem_sys_allocate_zeroed(code_size * sizeof (INTVAL));
     for (di = 0, op = 0; op < code_size && di < debug_size; di++) {
-        op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
+        const op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
         opcode_t opsize = op_info->op_count;
         ADD_OP_VAR_PART(interp, sp->subattrs->seg, base_pc, opsize);
         base_pc += opsize;
@@ -306,14 +307,14 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         debug_ops++;
     }
     while (op < code_size)
-      xdebug[op++] = -2;
+        xdebug[op++] = -2;
     Parrot_hash_put(interp, spdata->seg2debug, (void*)sp->subattrs->seg, (void*)xdebug);
     return xdebug;
 }
 
 /*
 
-=item C<static char * str2cs(PARROT_INTERP, STRING *s)>
+=item C<static char * str2cs(PARROT_INTERP, const STRING *s)>
 
 Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
@@ -324,7 +325,7 @@ Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static char *
-str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(str2cs)
 
