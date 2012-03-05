@@ -3650,17 +3650,15 @@ static STRING *
 PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(PDB_get_continuation_backtrace)
-    PMC    *output     = Parrot_pmc_new(interp, enum_class_StringBuilder);
-    int     rec_level  = 0;
-    int     is_top;
-    int     loop_count;
-    PMC    *prev_ctx;
+    PMC * const output = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    UINTVAL rec_level  = 0;
+    UINTVAL loop_count = 0;
+    PMC    *prev_ctx   = PMCNULL;
+    int     is_top     = 1;
 
     /* backtrace: follow the continuation chain */
-    for (prev_ctx = PMCNULL, loop_count = 0, is_top = 1;
-        ctx && loop_count < RECURSION_LIMIT;
-        loop_count++, is_top = 0, prev_ctx = ctx, ctx = Parrot_pcc_get_caller_ctx(interp, ctx)) {
-        STRING *info_str = Parrot_sub_Context_infostr(interp, ctx, is_top);
+    while ( ctx && (loop_count < RECURSION_LIMIT) ) {
+        STRING * const info_str = Parrot_sub_Context_infostr(interp, ctx, is_top);
         if (!info_str)
             break;
 
@@ -3682,22 +3680,22 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
 
         /* print the context description */
         if (rec_level == 0) {
-            PMC               *sub = Parrot_pcc_get_sub(interp, ctx);
-            PackFile_ByteCode *seg = PARROT_SUB(sub)->seg;
+            const PMC * const sub               = Parrot_pcc_get_sub(interp, ctx);
+            const PackFile_ByteCode * const seg = PARROT_SUB(sub)->seg;
             VTABLE_push_string(interp, output, info_str);
             if (seg->annotations) {
-                PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                PMC * const annot = PackFile_Annotations_lookup(interp, seg->annotations,
                         Parrot_pcc_get_pc(interp, ctx) - seg->base.data,
                         NULL);
 
                 if (!PMC_IS_NULL(annot)) {
-                    PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
+                    PMC * const pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "file"));
-                    PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
+                    PMC * const pline = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "line"));
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
-                        STRING *file = VTABLE_get_string(interp, pfile);
-                        INTVAL line = VTABLE_get_integer(interp, pline);
+                        STRING * const file = VTABLE_get_string(interp, pfile);
+                        const INTVAL line   = VTABLE_get_integer(interp, pline);
                         STRING * const fmt =
                             Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
                         VTABLE_push_string(interp, output, fmt);
@@ -3706,6 +3704,10 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
             }
             VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
+        ++loop_count;
+        is_top   = 0;
+        prev_ctx = ctx;
+        ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
     }
 
     if (rec_level != 0) {
@@ -3759,7 +3761,7 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
                that we have string registers when we actually don't */
             string = (char *) SREG(n);
 
-            if (string == '\0')
+            if (string == NULL)
                 return Parrot_str_new(interp, "", 0);
             else
                 return SREG(n);
