@@ -87,7 +87,7 @@ any value type.
     piropsig['find_dynamic_lex'] = 'Ps'
     piropsig['find_name']  = 'Ps'
     piropsig['getinterp']  = 'P'
-    piropsig['getprop']    = 'P~P'
+    piropsig['getprop']    = 'PP~'
     piropsig['getstderr']  = 'P'
     piropsig['getstdin']   = 'P'
     piropsig['getstdout']  = 'P'
