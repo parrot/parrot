@@ -286,13 +286,11 @@ sub runstep {
 
     my $compiler = '';
     if ( defined $conf->data->get('gccversion') ) {
-        $compiler = $conf->data->get('g++') ? 'g++' : 'gcc';
+        $compiler = $conf->data->get('g++') ? 'g++' :
+            $conf->data->get('clang') ? 'clang' : 'gcc';
     }
     elsif ( $conf->option_or_data('cc') =~ /icc/ ) {
         $compiler = 'icc';
-    }
-    elsif ( $conf->option_or_data('cc') =~ /clang/ ) {
-        $compiler = 'clang';
     }
 
     if ($compiler eq '') {
