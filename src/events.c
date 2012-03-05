@@ -130,7 +130,6 @@ Parrot_cx_count_handlers_local(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_count_handlers_local)
     PMC * const handlers = Parrot_pcc_get_handlers(interp, interp->ctx);
-    INTVAL elements;
 
     if (PMC_IS_NULL(handlers))
         return 0;
