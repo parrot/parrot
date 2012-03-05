@@ -38,9 +38,9 @@ Tests property access on PMCs.
     set $P2, "zehn"
     setprop $P0, "de", $P2
     is($P0, "10", "setprop is ok")
-    getprop $P3, "en", $P0
+    getprop $P3, $P0, "en"
     is($P3, "ten", "getprop is ok")
-    getprop $P3, "de", $P0
+    getprop $P3, $P0, "de"
     is($P3, "zehn", "getprop is ok")
 .end
 
@@ -57,9 +57,9 @@ Tests property access on PMCs.
     set $P1, "No"
     setprop $P0, $S0, $P1
     new $P2, ['String']
-    getprop $P2, "Black", $P0
+    getprop $P2, $P0, "Black"
     is($P2, "No", "'Black' property refers to right string")
-    getprop $P2, "Brown", $P0
+    getprop $P2, $P0, "Brown"
     is($P2, "No", "'Brown' property refers to same string as 'Black'")
 .end
 
@@ -72,11 +72,11 @@ Tests property access on PMCs.
     set $S0, "Type"
     set $P1, "Integer"
     setprop $P0, $S0, $P1
-    getprop $P2, $S0, $P0
+    getprop $P2, $P0, $S0
     is($P2, "Integer", "'Type' property successfully set to Integer'")
     set $P3, "Float"
     setprop $P0, $S0, $P3
-    getprop $P2, $S0, $P0
+    getprop $P2, $P0, $S0
     is($P2, "Float", "'Type' property successfully changed to Float'")
 .end
 
@@ -84,7 +84,7 @@ Tests property access on PMCs.
     new $P1, ['Float']
     new $P2, ['Integer']
 
-    getprop $P2, "Wibble", $P1
+    getprop $P2, $P1, "Wibble"
     defined $I2, $P2
     is($I2, 0, "unset property isn't defined")
 .end
@@ -99,12 +99,12 @@ Tests property access on PMCs.
     set $P2, "zehn"
     setprop $P0, "de", $P2
     is($P0, "10", "ok")
-    getprop $P3, "en", $P0
+    getprop $P3, $P0, "en"
     is($P3, "ten", "ok")
-    getprop $P3, "de", $P0
+    getprop $P3, $P0, "de"
     is($P3, "zehn", "ok")
     delprop $P0, "de"
-    getprop $P3, "de", $P0
+    getprop $P3, $P0, "de"
     if_null $P3, ok
     ok(0, "'de' property not deleted")
     goto end
