@@ -136,7 +136,7 @@ Returns the application object to which this board belongs to.
 .sub application :method
     .local pmc app
 
-    getprop app, "app", self
+    getprop app, self, "app"
 
     .return (app)
 .end
@@ -151,7 +151,7 @@ in the preview window.
 .sub getNextBlock :method
     .local pmc block
 
-    getprop block, "nextblock", self
+    getprop block, self, "nextblock"
 
     # return the block
     .return (block)
@@ -249,7 +249,7 @@ This method returns the block that is now falling down.
 SKIP_SET_ID:
 
     # get the 'next block' and store it as the current one
-    getprop block, "nextblock", self
+    getprop block, self, "nextblock"
 
     # create a new 'next block'
     $P0 = self."blockID"( id )
@@ -275,7 +275,7 @@ This method returns nothing.
 .sub fall :method
     .local pmc block
 
-    getprop block, "block", self
+    getprop block, self, "block"
     block."fall"()
 
     .return ()
@@ -292,7 +292,7 @@ Returns 1 if the current block is falling down fast, 0 otherwise.
     .local pmc block
     .local int ret
 
-    getprop block, "block", self
+    getprop block, self, "block"
     ret = block."falling"()
 
     .return (ret)
@@ -307,7 +307,7 @@ Returns the currently falling block.
 .sub currentBlock :method
     .local pmc block
 
-    getprop block, "block", self
+    getprop block, self, "block"
 
     .return (block)
 .end
@@ -325,7 +325,7 @@ measured in pixels.
     .local pmc temp
     .local int i
 
-    getprop temp, "blocksize", self
+    getprop temp, self, "blocksize"
     set i, temp
 
     .return (i)
@@ -619,7 +619,7 @@ This method returns nothing.
     blocksize = self."blockSize"()
 
     # get the field cache
-    getprop cache, "cache", self
+    getprop cache, self, "cache"
 
     # clear the field cache
     unless full goto NO_CLEAR_CACHE
@@ -712,8 +712,8 @@ LOOPend:
     #
     # draw the next block
     #
-    getprop cache, "nextblockcache", self
-    getprop temp, "nextblock", self
+    getprop cache, self, "nextblockcache"
+    getprop temp, self, "nextblock"
     eq_addr cache, temp, SKIP_NEXTBLOCK
     setprop self, "nextblockcache", temp
     set xp, w
@@ -747,7 +747,7 @@ LOOPend:
     temp = new ['SDL'; 'Rect'], rect
     color = palette[0]
     surface."fill_rect"( temp, color )
-    getprop temp, "nextblock", self
+    getprop temp, self, "nextblock"
     temp."draw"( surface, xp, yp, blocksize )
 SKIP_NEXTBLOCK:
     .return ()
@@ -785,7 +785,7 @@ one unit.
     .local pmc temp
     .local num ret
 
-    getprop temp, "FallInterval", self
+    getprop temp, self, "FallInterval"
     set ret, temp
 
     .return (ret)
@@ -802,7 +802,7 @@ the next unit.
     .local pmc temp
     .local num ret
 
-    getprop temp, "NextFallTime", self
+    getprop temp, self, "NextFallTime"
     set ret, temp
 
     .return (ret)
@@ -821,7 +821,7 @@ This method returns nothing.
     .param num val
     .local pmc temp
 
-    getprop temp, "NextFallTime", self
+    getprop temp, self, "NextFallTime"
     set temp, val
 
     .return ()
@@ -839,9 +839,9 @@ left top corner.
     .local int ypos
     .local pmc temp
 
-    getprop temp, "xpos", self
+    getprop temp, self, "xpos"
     set xpos, temp
-    getprop temp, "ypos", self
+    getprop temp, self, "ypos"
     set ypos, temp
 
     .return (xpos, ypos)
@@ -858,9 +858,9 @@ This method returns nothing.
     .param int ypos
     .local pmc temp
 
-    getprop temp, "xpos", self
+    getprop temp, self, "xpos"
     set temp, xpos
-    getprop temp, "ypos", self
+    getprop temp, self, "ypos"
     set temp, ypos
 
     .return ()
