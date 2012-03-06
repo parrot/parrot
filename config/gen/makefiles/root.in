@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 ###############################################################################
 #
@@ -1682,7 +1682,6 @@ src/packfile/output$(O) : \
 
 src/packfile/pf_items$(O) : \
 	$(PARROT_H_HEADERS) \
-	src/packfile/byteorder.h \
 	src/packfile/pf_items.str \
 	src/packfile/pf_items.c
 
