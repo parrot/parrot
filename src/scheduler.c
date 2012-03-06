@@ -262,7 +262,7 @@ opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
+    const Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -351,7 +351,7 @@ and then we jump all the way back to the task scheduling loop.
 =cut
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t*
 Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {

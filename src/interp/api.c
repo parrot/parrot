@@ -727,7 +727,7 @@ Parrot_interp_compile_file(PARROT_INTERP, ARGIN(PMC *compiler), ARGIN(STRING *fu
 
 /*
 
-=item C<Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP, PMC * compiler,
+=item C<Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP, PMC *compiler,
 STRING *code)>
 
 Compiles a code string.
