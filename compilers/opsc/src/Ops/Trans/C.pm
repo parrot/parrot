@@ -353,9 +353,10 @@ static void hop_init(PARROT_INTERP)
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP * const hop_buckets =
-        mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
-    HOP *hops = hop_buckets;
+    HOP *hops;
+
+    hop_buckets = mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
+    hops = hop_buckets;
 
     opcode_t i;
 
