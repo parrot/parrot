@@ -360,7 +360,7 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *nex
     PMC * const task = Parrot_cx_stop_task(interp, next);
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
-    return (opcode_t*) 0;
+    return (opcode_t*)NULL;
 }
 
 /*
