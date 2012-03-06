@@ -13,7 +13,12 @@ before_script:
 #    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
 #    - sudo chown -R $CI_USER ~/.cpanm
 #    - sudo chown -R $CI_USER ~/perl5
-script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+
+# Don't run Configure.pl tests, for now
+#script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+
+script: "perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+
 branches:
    only:
      - master
