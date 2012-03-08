@@ -723,9 +723,6 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_load_bytecode(PARROT_INTERP, STRING * whatever)
-        __attribute__nonnull__(1);
-
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
@@ -746,7 +743,7 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
         FUNC_MODIFIES(* pf);
 
 void Parrot_pf_mark_packfile_initialized(PARROT_INTERP,
-    PMC *pf_pbc,
+    PMC *pf_pmc,
     STRING *mark)
         __attribute__nonnull__(1);
 
@@ -850,8 +847,6 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_get_current_code_segment \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

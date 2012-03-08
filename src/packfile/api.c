@@ -1818,9 +1818,8 @@ Parrot_pf_mark_packfile_initialized(PARROT_INTERP, PMC *pf_pmc, STRING *mark)
 }
 
 void
-Parrot_load_bytecode(PARROT_INTERP, STRING * whatever)
-{
-}
+Parrot_load_bytecode(PARROT_INTERP, STRING *whatever)
+{}
 
 /*
 
