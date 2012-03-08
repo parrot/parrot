@@ -3657,7 +3657,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
     int     is_top     = 1;
 
     /* backtrace: follow the continuation chain */
-    while ( ctx && (loop_count < RECURSION_LIMIT) ) {
+    while (ctx && (loop_count < RECURSION_LIMIT)) {
         STRING * const info_str = Parrot_sub_Context_infostr(interp, ctx, is_top);
         if (!info_str)
             break;
