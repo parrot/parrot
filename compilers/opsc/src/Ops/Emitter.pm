@@ -23,7 +23,8 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
 
     if !%flags<core> {
         $base := subst( $file, /.ops$$/, '');
-        $base := subst( $base, /.*\//, '');
+        $base := subst( $base, /.*\//, ''); # Unix slash
+        $base := subst( $base, /.*\\/, ''); # Win backslash
     }
 
     my $base_ops_stub := $base ~ '_ops' ~ $suffix;
