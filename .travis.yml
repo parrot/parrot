@@ -24,7 +24,7 @@ branches:
      - master
 notifications:
   recipients:
-    - parrot-dev@lists.parrot.org
+    - parrot-ci@lists.parrot.org
   email:
     on_success: change
     on_failure: always
