@@ -223,7 +223,8 @@ main(int argc, const char *argv[])
     }
 
     if (parsed_flags.execute_packfile) {
-        if (!Parrot_api_run_bytecode(interp, bytecodepmc, argsarray))
+        if (!(Parrot_api_legacy_trigger_init_subs(interp, bytecodepmc) &&
+              Parrot_api_run_bytecode(interp, bytecodepmc, argsarray)))
             show_last_error_and_exit(interp);
     }
 
