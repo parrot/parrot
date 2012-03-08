@@ -162,6 +162,25 @@ Parrot_api_run_bytecode(Parrot_PMC interp_pmc, Parrot_PMC pbc,
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
+PARROT_API
+Parrot_Int
+Parrot_api_legacy_trigger_init_subs(Parrot_PMC interp_pmc, Parrot_PMC pbc)
+{
+    ASSERT_ARGS(Parrot_api_legacy_trigger_init_subs);
+    EMBED_API_CALLIN(interp_pmc, interp)
+    STRING * const init_str = Parrot_str_new(interp, "init", 0);
+    PMC * const init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
+    int i = 0;
+    int num_subs = VTABLE_elements(interp, init_subs);
+    for (; i < num_subs; i++) {
+        PMC * const sub = VTABLE_get_pmc_keyed_int(interp, init_subs, i);
+        Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
+    }
+    Parrot_pf_mark_packfile_initialized(interp, pbc, init_str);
+
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
+
 /*
 
 =item C<Parrot_Int Parrot_api_disassemble_bytecode(Parrot_PMC interp_pmc,

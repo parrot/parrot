@@ -284,6 +284,11 @@ Parrot_Int Parrot_api_disassemble_bytecode(
     Parrot_Int opts);
 
 PARROT_API
+Parrot_Int Parrot_api_legacy_trigger_init_subs(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC pbc);
+
+PARROT_API
 Parrot_Int Parrot_api_load_bytecode_bytes(
     Parrot_PMC interp_pmc,
     ARGIN(const unsigned char * const pbc),
@@ -331,6 +336,8 @@ Parrot_Int Parrot_api_write_bytecode_to_file(
     Parrot_String filename);
 
 #define ASSERT_ARGS_Parrot_api_disassemble_bytecode \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_legacy_trigger_init_subs \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_load_bytecode_bytes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

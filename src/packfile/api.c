@@ -389,16 +389,11 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 {
     ASSERT_ARGS(Parrot_pf_subs_by_tag)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
-    int mode = 0;
     PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
-
-    if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
-        mode = 1;
-    else if (STRING_equal(interp, flag, CONST_STRING(interp, "init")))
-        mode = 2;
+    else
     {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
         opcode_t flag_idx = -1;
@@ -1808,12 +1803,18 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     else {
         PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
             interp->iglobals, IGLOBALS_LOADED_PBCS);
-        STRING * const method = CONST_STRING(interp, "mark_initialized");
+
         STRING * const load_str = CONST_STRING(interp, "load");
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-        Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
-                load_str);
+        Parrot_pf_mark_packfile_initialized(interp, pf_pmc, load_str);
     }
+}
+
+void
+Parrot_pf_mark_packfile_initialized(PARROT_INTERP, PMC *pf_pmc, STRING *mark)
+{
+    STRING * const method = CONST_STRING(interp, "mark_initialized");
+    Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->", mark);
 }
 
 void

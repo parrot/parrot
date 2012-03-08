@@ -745,6 +745,11 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* pf);
 
+void Parrot_pf_mark_packfile_initialized(PARROT_INTERP,
+    PMC *pf_pbc,
+    STRING *mark)
+        __attribute__nonnull__(1);
+
 void Parrot_pf_tag_constant(PARROT_INTERP,
     ARGIN(PackFile_ConstTable *ct),
     const int tag_idx,
@@ -858,6 +863,9 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_pf_mark_packfile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pf_mark_packfile_initialized \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_tag_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
