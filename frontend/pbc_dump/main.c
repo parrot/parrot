@@ -120,7 +120,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
         Parrot_io_printf(interp, " %04x:  ", (int)(pc - self->data));
 
         for (j = 0; j < 6; ++j) {
-            if (n < n)
+            if (j < n)
                 Parrot_io_printf(interp, "%08lx ", (unsigned long)pc[j]);
             else
                 Parrot_io_printf(interp, "         ");
