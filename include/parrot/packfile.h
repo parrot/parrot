@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2011, Parrot Foundation.
+ * Copyright (C) 2001-2012, Parrot Foundation.
  */
 
 /* packfile.h
@@ -374,6 +374,7 @@ PARROT_CONST_FUNCTION
 size_t PF_size_number(void);
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 size_t PF_size_opcode(void);
 
 PARROT_PURE_FUNCTION

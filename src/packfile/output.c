@@ -24,7 +24,7 @@ This file implements various functions for creating and writing packfiles.
 #include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: src/packfile/pf_private.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -64,7 +64,7 @@ PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 {
     ASSERT_ARGS(PackFile_pack_size)
     size_t size;
-    size_t header_size = 0;
+    size_t header_size;
     PackFile_Directory * const dir = &self->directory;
 
     header_size = PACKFILE_HEADER_BYTES;
