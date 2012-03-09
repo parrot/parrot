@@ -172,7 +172,6 @@ sub _init {
     $gpp->{'basic'} = [ @gcc_or_gpp ];
 
     my @gcc_or_gpp_cage = qw(
-        -pedantic
         -std=c89
         -Werror=implicit-function-declaration
         -Wfloat-equal
