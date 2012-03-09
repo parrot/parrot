@@ -312,6 +312,7 @@ sub is_list_same {
         $exp_msg .= "$file($exp{$file})\n";
     }
 
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     is ($got_msg, $exp_msg, $test);
     return;
 }
