@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,7 +62,7 @@ Dump the constant table.
 */
 
 static void
-const_dump(PARROT_INTERP, const PackFile_Segment *segp)
+const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
 {
     Parrot_io_printf(interp, "%Ss => [\n", segp->name);
     PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
@@ -92,7 +92,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
 
     for (i = 0; i < map->n_libs; i++) {
 
-        INTVAL j, lib_num, table_num;
+        INTVAL j;
         PackFile_ByteCode_OpMappingEntry *entry = &map->libs[i];
         Parrot_io_printf(interp, "  map #%d => [\n", i);
         Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
@@ -103,8 +103,8 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
                 entry->n_ops);
 
         for (j = 0; j < map->libs[i].n_ops; j++) {
-            lib_num    = entry->lib_ops[j];
-            table_num  = entry->table_ops[j];
+            const INTVAL lib_num   = entry->lib_ops[j];
+            const INTVAL table_num = entry->table_ops[j];
             Parrot_io_printf(interp, "    %08lx => %08lx (%s)\n", table_num, lib_num,
                     entry->lib->op_info_table[lib_num].full_name);
         }
@@ -114,16 +114,17 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
     while (pc < self->data + self->size) {
         /* n can't be const; the ADD_OP_VAR_PART macro increments it */
         size_t n = (size_t)interp->code->op_info_table[*pc]->op_count;
-        size_t i;
+        size_t j;
 
         /* trace_op_dump(interp, self->pf->src, pc); */
         Parrot_io_printf(interp, " %04x:  ", (int)(pc - self->data));
 
-        for (i = 0; i < 6; ++i)
-            if (i < n)
-                Parrot_io_printf(interp, "%08lx ", (unsigned long)pc[i]);
+        for (j = 0; j < 6; ++j) {
+            if (n < n)
+                Parrot_io_printf(interp, "%08lx ", (unsigned long)pc[j]);
             else
                 Parrot_io_printf(interp, "         ");
+        }
 
         Parrot_io_printf(interp, "%s\n",
                 interp->code->op_info_table[*pc]->full_name);
@@ -376,7 +377,7 @@ main(int argc, const char **argv)
     Parrot_pf_set_current_packfile(interp, pfpmc);
 
     if (convert) {
-        size_t   size  = PackFile_pack_size(interp,
+        const size_t size = PackFile_pack_size(interp,
                             interp->code->base.pf) * sizeof (opcode_t);
         opcode_t *pack = (opcode_t *)Parrot_gc_allocate_memory_chunk(interp,
                                         size);
