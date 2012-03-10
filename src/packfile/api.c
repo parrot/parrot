@@ -36,6 +36,13 @@ format of bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void add_language_search_paths(PARROT_INTERP,
+    ARGIN(STRING *lang_name),
+    ARGIN(STRING *path))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -146,6 +153,10 @@ PARROT_CANNOT_RETURN_NULL
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_add_language_search_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lang_name) \
+    , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -1818,10 +1829,6 @@ Parrot_pf_mark_packfile_initialized(PARROT_INTERP, PMC *pf_pmc, STRING *mark)
     Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->", mark);
 }
 
-void
-Parrot_load_bytecode(PARROT_INTERP, STRING *whatever)
-{}
-
 /*
 
 =item C<void Parrot_load_language(PARROT_INTERP, STRING *lang_name)>
@@ -1909,6 +1916,63 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     Parrot_pop_context(interp);
 }
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
+{
+    ASSERT_ARGS(Parrot_pf_load_language)
+    const enum_runtime_ft file_type = PARROT_RUNTIME_FT_LANG;
+    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+            interp->iglobals, IGLOBALS_LOADED_PBCS);
+    STRING *wo_ext, *file_str, *pbc;
+
+    /* Full path to language library is "abc/abc.pbc". */
+    pbc = CONST_STRING(interp, "pbc");
+    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
+    wo_ext   = Parrot_str_concat(interp, wo_ext, lang_name);
+    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."));
+    file_str = Parrot_str_concat(interp, file_str, pbc);
+
+    STRING * const path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
+    if (STRING_IS_NULL(path))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+            "Cannot find language %Ss", lang_name);
+
+    if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
+        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+    else {
+        INTVAL name_length;
+        PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
+
+        add_language_search_paths(interp, lang_name, path);
+
+        return pfview;
+    }
+}
+
+static void
+add_language_search_paths(PARROT_INTERP, ARGIN(STRING *lang_name),
+        ARGIN(STRING *path))
+{
+    STRING *found_path, *found_ext;
+    INTVAL name_length;
+
+    parrot_split_path_ext(interp, path, &found_path, &found_ext);
+    name_length = Parrot_str_length(interp, lang_name);
+    found_path = STRING_substr(interp, found_path, 0,
+            Parrot_str_length(interp, found_path) - name_length);
+
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "include/")),
+            PARROT_LIB_PATH_INCLUDE);
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "dynext/")),
+            PARROT_LIB_PATH_DYNEXT);
+    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "library/")),
+            PARROT_LIB_PATH_LIBRARY);
+}
+
 /*
 
 =item C<PMC * Parrot_pf_load_bytecode_search(PARROT_INTERP, STRING *file)>
@@ -1942,6 +2006,11 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         return pfview;
     }
+}
+
+void
+Parrot_load_bytecode(PARROT_INTERP, STRING *whatever)
+{
 }
 
 /*

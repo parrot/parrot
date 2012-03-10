@@ -137,6 +137,10 @@ inline op load_language(in STR) :load_file {
     Parrot_load_language(interp, $1);
 }
 
+inline op load_language(out PMC, in STR) :load_file {
+    $1 = Parrot_pf_load_language(interp, $2);
+}
+
 =back
 
 =cut
