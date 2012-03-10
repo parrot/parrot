@@ -107,6 +107,25 @@ F<docs/pdds/pdd16_native_call.pod>.
     die "signatures not yet implemented"
 .end
 
+.sub 'load_bytecode'
+    .param string pbcname
+    .param string tagname
+
+    $P0 = load_bytecode pbcname
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initializing
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'(tagname)
+  done_initializing:
+.end
+
 # getopt stuff {{{
 
 .macro_const OUTPUT                 'output'
@@ -120,7 +139,7 @@ F<docs/pdds/pdd16_native_call.pod>.
 .sub 'get_options'
     .param pmc argv
 
-    load_bytecode 'Getopt/Obj.pbc'
+    'load_bytecode'('Getopt/Obj.pbc', 'load')
 
     .local pmc getopt
     getopt = new ['Getopt';'Obj']
@@ -851,12 +870,12 @@ ERROR
 .sub 'read_one_sig'
     .param pmc fh
 
-    load_bytecode 'String/Utils.pbc'
+    'load_bytecode'('String/Utils.pbc', 'load')
     .local pmc chomp
     chomp = get_global ['String';'Utils'], 'chomp'
 
     # init pcre
-    load_bytecode 'pcre.pbc'
+    'load_bytecode'('pcre.pbc', 'load')
     $P0 = get_global ['PCRE'], 'init'
     $P0()
 
@@ -1248,7 +1267,7 @@ JSON
 .end
 
 .sub 'native_file_separator'
-    load_bytecode 'config.pbc'
+    'load_bytecode'('config.pbc', 'load')
     $P0 = '_config'()
     $S0 = $P0['slash']
     .return ($S0)

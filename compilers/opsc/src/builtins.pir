@@ -47,13 +47,32 @@ Variour helper builtins.
     .return ($S0)
 .end
 
+.sub 'load_bytecode'
+    .param string pbcname
+    .param string tagname
+
+    $P0 = load_bytecode pbcname
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initializing
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'(tagname)
+  done_initializing:
+.end
+
 .sub 'match'
     .param string pattern
     .param string subject
 
     .local pmc recomp, resub, match, recache
 
-    load_bytecode 'PGE.pbc'
+    'load_bytecode'('PGE.pbc')
 
     #hash cache mapping patterns to subs, avoiding unneeded recompilation
     recache = get_hll_global ['Ops';'Op'], '%recache'

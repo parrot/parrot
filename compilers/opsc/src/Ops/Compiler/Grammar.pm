@@ -1,7 +1,13 @@
 #! nqp
 # Copyright (C) 2009-2011, Parrot Foundation.
 
-INIT { pir::load_bytecode('HLL.pbc'); }
+INIT {
+    my $pbc := pir::load_bytecode__ps('HLL.pbc');
+    if (!$pbc.is_initialized('load')) {
+        for $pbc.subs_by_tag('load') -> $sub { $sub(); };
+        $pbc.mark_initialized('load');
+    }
+}
 
 grammar Ops::Compiler::Grammar is HLL::Grammar;
 

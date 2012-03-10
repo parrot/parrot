@@ -7,7 +7,11 @@ our $OP;
 our $OPLIB;
 
 INIT {
-    pir::load_bytecode("nqp-setting.pbc");
+    my $pbc := pir::load_bytecode__ps('nqp-setting.pbc');
+    if (!$pbc.is_initialized('load')) {
+        for $pbc.subs_by_tag('load') -> $sub { $sub(); };
+        $pbc.mark_initialized('load');
+    }
     $OPLIB := 0;
 }
 

@@ -52,7 +52,6 @@ static void show_last_error_and_exit(Parrot_PMC interp);
 static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
 static void setup_pir_compregs(Parrot_PMC interp);
 static PMC * get_class_pmc(Parrot_PMC interp, const char *name);
-static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm);
 
 
     #define TRACE 0
@@ -174,8 +173,11 @@ HEADER
         setup_pir_compregs(Parrot_PMC interp)
         {
             Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
-            get_imcc_compiler_pmc(interp, class_pmc, 0);
-            get_imcc_compiler_pmc(interp, class_pmc, 1);
+            Parrot_PMC pir_compreg = NULL;
+            Parrot_PMC pasm_compreg = NULL;
+
+            imcc_get_pir_compreg_api(interp, 1, &pir_compreg);
+            imcc_get_pasm_compreg_api(interp, 1, &pasm_compreg);
         }
 
         PARROT_CANNOT_RETURN_NULL
@@ -190,24 +192,6 @@ HEADER
                   Parrot_api_pmc_get_class(interp, name_pmc, &class_pmc)))
                 show_last_error_and_exit(interp);
             return class_pmc;
-        }
-
-        PARROT_CANNOT_RETURN_NULL
-        static void
-        get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
-        {
-            Parrot_PMC is_pasm_pmc = NULL;
-            Parrot_PMC compiler_pmc = NULL;
-            const char *name = is_pasm ? "PASM" : "PIR";
-            Parrot_String name_s = NULL;
-
-            if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
-                show_last_error_and_exit(interp);
-            if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
-                show_last_error_and_exit(interp);
-            if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
-                  Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
-                show_last_error_and_exit(interp);
         }
 
 MAIN
@@ -368,6 +352,7 @@ HELP
 .sub '__load_bytecode' :anon
     .param string pbc_name
     .param string tag
+    push_eh display_error
     $P0 = load_bytecode pbc_name
     $I0 = $P0.'is_initialized'(tag)
     if $I0 goto done_initialization
@@ -383,6 +368,15 @@ HELP
 
     $P0.'mark_initialized'(tag)
   done_initialization:
+    .return()
+  display_error:
+    .get_results($P0)
+
+    print "could not load bytecode "
+    say pbc_name
+    say $P0
+    pop_eh
+    exit 1
 .end
 
 .sub 'determine_code_type'

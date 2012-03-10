@@ -66,7 +66,11 @@ Op Type:
 class Ops::Op is PAST::Block;
 
 INIT {
-    pir::load_bytecode("dumper.pbc");
+    my $pbc := pir::load_bytecode__ps('dumper.pbc');
+    if (!$pbc.is_initialized('load')) {
+        for $pbc.subs_by_tag('load') -> $sub { $sub(); };
+        $pbc.mark_initialized('load');
+    }
 }
 
 =begin

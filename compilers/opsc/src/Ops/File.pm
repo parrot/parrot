@@ -165,7 +165,13 @@ parentheses and add a space around the argument, like so:
 
 class Ops::File is Hash;
 
-pir::load_bytecode('config.pbc');
+{
+    my $config_pbc := pir::load_bytecode__ps('config.pbc');
+    if (!$config_pbc.is_initialized('load')) {
+        for $config_pbc.subs_by_tag('load') -> $sub { $sub(); };
+        $config_pbc.mark_initialized('load');
+    }
+}
 
 =begin
 

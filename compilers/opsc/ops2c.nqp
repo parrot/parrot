@@ -11,8 +11,8 @@ Q:PIR {
 };
 
 sub MAIN() {
-    pir::load_bytecode("opsc.pbc");
-    pir::load_bytecode("Getopt/Obj.pbc");
+    load_bytecode("opsc.pbc", 'load');
+    load_bytecode("Getopt/Obj.pbc", 'load');
 
     my $opts := get_options();
 
@@ -73,6 +73,15 @@ sub MAIN() {
         $emitter.print_c_header_files();
         $emitter.print_c_source_file();
     }
+}
+
+sub load_bytecode($lib, $tag) {
+    my $pbc := pir::load_bytecode__ps($lib);
+    if (!$pbc.is_initialized(~$tag)) {
+        for $pbc.subs_by_tag(~$tag) -> $sub { $sub(); };
+        $pbc.mark_initialized(~$tag);
+    }
+    $pbc;
 }
 
 sub get_options() {
