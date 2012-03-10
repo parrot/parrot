@@ -44,7 +44,7 @@ push_handle_entry(void *handle)
 {
     struct handle_entry *e;
 
-    e = malloc(sizeof(struct handle_entry));
+    e = (handle_entry *) malloc(sizeof(struct handle_entry));
     if (!e) { return; }
     e->handle = handle;
     e->next = handle_list;
