@@ -51,7 +51,7 @@ typedef struct pbc_merge_input {
     const char *filename;       /* name of the input file */
     PackFile   *pf;             /* loaded packfile struct */
     opcode_t    code_start;     /* where the bytecode is located in the merged
-    packfile */
+                                   packfile */
     struct {
         opcode_t  const_start;  /* where the const table is located within the
                                    merged table */
@@ -307,6 +307,10 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 {
     ASSERT_ARGS(pbc_merge_constants)
 
+    /* STRING -> idx mapping for all strings */
+    Hash *all_seen_strings = Parrot_hash_create(interp, enum_type_INTVAL,
+                                                Hash_key_type_STRING);
+
     FLOATVAL  *num_constants = mem_gc_allocate_typed(interp, FLOATVAL);
     STRING   **str_constants = mem_gc_allocate_typed(interp, STRING *);
     PMC      **pmc_constants = mem_gc_allocate_typed(interp, PMC *);
@@ -353,12 +357,14 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         if (in_seg->num.const_count > 0)
             num_constants = mem_gc_realloc_n_typed(interp, num_constants,
                                 num_cursor + in_seg->num.const_count, FLOATVAL);
-        if (in_seg->str.const_count > 0)
-            str_constants = mem_gc_realloc_n_typed(interp, str_constants,
-                                str_cursor + in_seg->str.const_count, STRING *);
         if (in_seg->pmc.const_count > 0)
             pmc_constants = mem_gc_realloc_n_typed(interp, pmc_constants,
                                 pmc_cursor + in_seg->pmc.const_count, PMC *);
+        /* Allocate enough space for all strings, even though de-duplication
+           may mean some slots are not filled */
+        if (in_seg->str.const_count > 0)
+            str_constants = mem_gc_realloc_n_typed(interp, str_constants,
+                                str_cursor + in_seg->str.const_count, STRING *);
 
         /* Loop over the constants and copy them to the output PBC. */
         for (j = 0; j < in_seg->num.const_count; j++) {
@@ -368,7 +374,14 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         }
 
         for (j = 0; j < in_seg->str.const_count; j++) {
-            str_constants[str_cursor] = in_seg->str.constants[j];
+            STRING * const str = in_seg->str.constants[j];
+            if (Parrot_hash_exists(interp, all_seen_strings, str)) {
+                opcode_t new_idx = (opcode_t)Parrot_hash_get(interp, all_seen_strings, str);
+                inputs[i]->str.const_map[j] = new_idx;
+                continue;
+            }
+            str_constants[str_cursor] = str;
+            Parrot_hash_put(interp, all_seen_strings, str, (void *)str_cursor);
             inputs[i]->str.const_map[j] = str_cursor;
             str_cursor++;
         }
@@ -391,9 +404,18 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         /* Loop over the tags, inserting tags into the tag_map, keeping them
            ordered by tag name */
         for (j = 0; j < in_seg->ntags; j++) {
-            Parrot_pf_tag_constant(interp, const_seg,
-                in_seg->tag_map[j].tag_idx + str_cursor_start,
-                in_seg->tag_map[j].const_idx + pmc_cursor_start);
+            opcode_t old_tag_idx = in_seg->tag_map[j].tag_idx;
+            opcode_t new_tag_idx = inputs[i]->str.const_map[old_tag_idx];
+            opcode_t old_pmc_idx = in_seg->tag_map[j].const_idx;
+            opcode_t new_pmc_idx = inputs[i]->pmc.const_map[old_pmc_idx];
+
+            /*
+            Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
+                old_tag_idx, new_tag_idx, in_seg->str.constants[old_tag_idx], str_constants[new_tag_idx],
+                in_seg->tag_map[j].const_idx, in_seg->tag_map[j].const_idx + pmc_cursor_start);
+            */
+
+            Parrot_pf_tag_constant(interp, const_seg, new_tag_idx, new_pmc_idx);
             tag_cursor++;
         }
     }
@@ -875,7 +897,7 @@ main(int argc, const char **argv)
             Parrot_io_eprintf(interp,
                 "PBC Merge: Unknown error while reading and unpacking %s\n",
                 *argv);
-            Parrot_x_exit(interp, 1);
+            exit(1);
         }
 
         /* Next file. */
@@ -889,7 +911,7 @@ main(int argc, const char **argv)
     pbc_merge_write(interp, merged, output_file);
 
     /* Finally, we're done. */
-    Parrot_x_exit(interp, 0);
+    exit(0);
 }
 
 
