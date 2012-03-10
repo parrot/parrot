@@ -1058,6 +1058,7 @@ Memory from this function must be freed.
 
 */
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Hash *

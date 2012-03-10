@@ -172,8 +172,13 @@ Parrot_api_legacy_trigger_init_subs(Parrot_PMC interp_pmc, Parrot_PMC pbc)
     PMC * const init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
     int i = 0;
     int num_subs = VTABLE_elements(interp, init_subs);
+
+    Parrot_pf_verify_packfile(interp, pbc);
+    Parrot_pf_set_current_packfile(interp, pbc);
+
     for (; i < num_subs; i++) {
         PMC * const sub = VTABLE_get_pmc_keyed_int(interp, init_subs, i);
+        interp->resume_flag = RESUME_INITIAL;
         Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
     }
     Parrot_pf_mark_packfile_initialized(interp, pbc, init_str);
