@@ -51,6 +51,7 @@ the documentation at L<http://www.json.org/>.
 .end
 
 .sub '__onload' :tag('load')
+    'load_bytecode'('P6object.pbc', 'load')
     'load_bytecode'('PGE.pbc', 'load')
     'load_bytecode'('PGE/Util.pbc', 'load')
     'load_bytecode'('TGE.pbc', 'load')

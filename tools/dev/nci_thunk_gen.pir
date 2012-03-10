@@ -1122,11 +1122,30 @@ JSON
     set_global .SIG_TABLE_GLOBAL_NAME, table
 .end
 
+.sub 'load_language'
+    .param string langname
+    .param string tagname
+
+    $P0 = load_language langname
+    $I0 = $P0.'is_initialized'(tagname)
+    if $I0 goto done_initializing
+    $P1 = $P0.'subs_by_tag'(tagname)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'(tagname)
+  done_initializing:
+.end
+
 .sub 'from_json'
     .param string json_str
 
     .local pmc compiler
-    load_language 'data_json'
+    'load_language'('data_json', 'load')
     compiler = compreg 'data_json'
 
     $P0 = compiler.'compile'(json_str)

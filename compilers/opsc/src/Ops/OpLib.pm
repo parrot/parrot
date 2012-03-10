@@ -2,7 +2,11 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
 
 INIT {
-    pir::load_bytecode("dumper.pbc");
+    my $pbc := pir::load_bytecode__ps("dumper.pbc");
+    if (!$pbc.is_initialized('load')) {
+        for $pbc.subs_by_tag('load') -> $sub { $sub(); }
+        $pbc.mark_initialized('load');
+    }
 };
 
 class Ops::OpLib is Hash;
