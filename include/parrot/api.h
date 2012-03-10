@@ -149,8 +149,11 @@ Parrot_Int Parrot_api_get_runtime_path(
 PARROT_API
 Parrot_Int Parrot_api_load_language(
     Parrot_PMC interp_pmc,
-    ARGIN(Parrot_String lang))
-        __attribute__nonnull__(2);
+    ARGIN(Parrot_String lang),
+    ARGOUT(Parrot_PMC *pbc))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pbc);
 
 PARROT_API
 Parrot_Int Parrot_api_make_interpreter(
@@ -247,7 +250,8 @@ Parrot_Int Parrot_api_wrap_pointer(
 #define ASSERT_ARGS_Parrot_api_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(runtime))
 #define ASSERT_ARGS_Parrot_api_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(lang))
+       PARROT_ASSERT_ARG(lang) \
+    , PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_Parrot_api_make_interpreter __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_api_reset_call_signature \

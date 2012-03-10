@@ -589,10 +589,6 @@ STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
@@ -740,6 +736,9 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
 void Parrot_load_bytecode(PARROT_INTERP, STRING *whatever)
         __attribute__nonnull__(1);
 
+void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
+        __attribute__nonnull__(1);
+
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
@@ -794,8 +793,6 @@ void Parrot_pf_mark_packfile_initialized(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_debug_pc_to_filename __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(debug))
-#define ASSERT_ARGS_Parrot_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_new_debug_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(cs))
@@ -863,6 +860,8 @@ void Parrot_pf_mark_packfile_initialized(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_load_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_load_language __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pf_get_current_code_segment \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

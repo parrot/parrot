@@ -43,10 +43,6 @@ static void add_language_search_paths(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment * create_seg(PARROT_INTERP,
@@ -74,10 +70,6 @@ static INTVAL find_pf_ann_idx(
     ARGIN(PackFile_Annotations *pfa),
     ARGIN(PackFile_Annotations_Key *key),
     UINTVAL offs)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void load_file(PARROT_INTERP, ARGIN(STRING *path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -157,9 +149,6 @@ static PMC* set_current_sub(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lang_name) \
     , PARROT_ASSERT_ARG(path))
-#define ASSERT_ARGS_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_create_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(dir) \
@@ -171,9 +160,6 @@ static PMC* set_current_sub(PARROT_INTERP)
 #define ASSERT_ARGS_find_pf_ann_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pfa) \
     , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_load_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_mark_1_bc_seg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(bc))
@@ -1746,82 +1732,6 @@ push_context(PARROT_INTERP)
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 }
 
-/*
-
-=item C<static void compile_file(PARROT_INTERP, STRING *path, INTVAL is_pasm)>
-
-Compile a PIR or PASM file from source.
-
-Deprecate: Do not use this. The packfile subsystem should not be in the
-business of compiling things, and should absolutely not default to any one
-particular compiler object (which might not exist). Use compreg opcode to get
-a compiler object and the interface there to get a packfile or equivalent.
-
-=cut
-
-*/
-
-static void
-compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
-{
-    ASSERT_ARGS(compile_file)
-    PackFile_ByteCode * const cur_code = interp->code;
-    PMC * compiler;
-    if (is_pasm)
-        compiler = Parrot_interp_get_compiler(interp, CONST_STRING(interp, "PASM"));
-    else
-        compiler = Parrot_interp_get_compiler(interp, CONST_STRING(interp, "PIR"));
-    {
-        PMC * const pf_pmc = Parrot_interp_compile_file(interp, compiler, path);
-        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_LOADED_PBCS);
-        PackFile * const pf = (PackFile*) VTABLE_get_pointer(interp, pf_pmc);
-        PackFile_ByteCode * const cs = pf->cur_cs;
-
-        if (cs) {
-            interp->code = cur_code;
-            VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-        }
-        else {
-            interp->code = cur_code;
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                    "compiler returned NULL ByteCode '%Ss'", path);
-        }
-    }
-}
-
-
-/*
-
-=item C<static void load_file(PARROT_INTERP, STRING *path)>
-
-Load a bytecode file and append it to the current packfile directory.
-
-=cut
-
-*/
-
-static void
-load_file(PARROT_INTERP, ARGIN(STRING *path))
-{
-    ASSERT_ARGS(load_file)
-
-    PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-    PMC * const pf_pmc = Parrot_pf_get_packfile_pmc(interp, pf, path);
-
-    if (!pf_pmc)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "Unable to load PBC file %Ss", path);
-    else {
-        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_LOADED_PBCS);
-
-        STRING * const load_str = CONST_STRING(interp, "load");
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-        Parrot_pf_mark_packfile_initialized(interp, pf_pmc, load_str);
-    }
-}
-
 void
 Parrot_pf_mark_packfile_initialized(PARROT_INTERP, PMC *pf_pmc, STRING *mark)
 {
@@ -1831,89 +1741,20 @@ Parrot_pf_mark_packfile_initialized(PARROT_INTERP, PMC *pf_pmc, STRING *mark)
 
 /*
 
-=item C<void Parrot_load_language(PARROT_INTERP, STRING *lang_name)>
+=item C<PMC * Parrot_pf_load_language(PARROT_INTERP, STRING *lang_name)>
 
 Load the compiler libraries for a given high-level language into the
-interpreter.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
-TODO: Refactor this function and try to reduce the size of it. It is too big.
+interpreter. Add the search paths for the language to the interpreter.
+Return the PackfileView for the main library file.
 
 =cut
 
 */
 
-PARROT_EXPORT
+
 void
 Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 {
-    ASSERT_ARGS(Parrot_load_language)
-    STRING *wo_ext, *file_str, *path, *pbc;
-    STRING *found_path, *found_ext;
-    INTVAL name_length;
-    enum_runtime_ft file_type;
-    PMC *is_loaded_hash;
-
-    if (STRING_IS_NULL(lang_name))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_language\" no language name");
-
-    /* Full path to language library is "abc/abc.pbc". */
-    pbc = CONST_STRING(interp, "pbc");
-    wo_ext   = Parrot_str_concat(interp, lang_name, CONST_STRING(interp, "/"));
-    wo_ext   = Parrot_str_concat(interp, wo_ext, lang_name);
-    file_str = Parrot_str_concat(interp, wo_ext, CONST_STRING(interp, "."));
-    file_str = Parrot_str_concat(interp, file_str, pbc);
-
-    /* Check if the language is already loaded */
-    is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
-        interp->iglobals, IGLOBALS_PBC_LIBS);
-    if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
-        return;
-
-    file_type = PARROT_RUNTIME_FT_LANG;
-
-    path = Parrot_locate_runtime_file_str(interp, file_str, file_type);
-    if (!path)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "\"load_language\" couldn't find a compiler module for the language '%Ss'", lang_name);
-
-    /* remember wo_ext => full_path mapping */
-    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
-            wo_ext, path);
-
-    /* Add the include and dynext paths to the global search */
-
-    /* Get the base path of the located module */
-    parrot_split_path_ext(interp, path, &found_path, &found_ext);
-    name_length = Parrot_str_length(interp, lang_name);
-    found_path = STRING_substr(interp, found_path, 0,
-            Parrot_str_length(interp, found_path)-name_length);
-
-    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "include/")),
-            PARROT_LIB_PATH_INCLUDE);
-    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "dynext/")),
-            PARROT_LIB_PATH_DYNEXT);
-    Parrot_lib_add_path(interp, Parrot_str_concat(interp, found_path, CONST_STRING(interp, "library/")),
-            PARROT_LIB_PATH_LIBRARY);
-
-
-    /* Check if the file found was actually a bytecode file (.pbc extension) or
-     * a source file (.pir or .pasm extension. */
-
-    push_context(interp);
-
-    if (STRING_equal(interp, found_ext, pbc))
-        load_file(interp, path);
-    else {
-        const STRING * pasm_s = CONST_STRING(interp, "pasm");
-        const INTVAL is_pasm = STRING_equal(interp, found_ext, pasm_s);
-        compile_file(interp, path, is_pasm);
-    }
-
-    Parrot_pop_context(interp);
 }
 
 PARROT_EXPORT

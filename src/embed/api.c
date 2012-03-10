@@ -517,9 +517,10 @@ Parrot_api_set_configuration_hash(Parrot_PMC interp_pmc, Parrot_PMC confighash)
 /*
 
 =item C<Parrot_Int Parrot_api_load_language(Parrot_PMC interp_pmc, Parrot_String
-lang)>
+lang, Parrot_PMC *pbc)>
 
-Loads the HLL compiler libraries for C<lang> into the C<interp_pmc>. This
+Loads the HLL compiler libraries for C<lang> into the C<interp_pmc>. Store the
+PackfileView PMC in C<*pbc>. This
 function returns a true value if this call is successful and false value
 otherwise.
 
@@ -529,11 +530,12 @@ otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang))
+Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang),
+        ARGOUT(Parrot_PMC *pbc))
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_load_language(interp, lang);
+    *pbc = Parrot_pf_load_language(interp, lang);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
