@@ -187,7 +187,8 @@ help(void)
 }
 
 static void
-ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib) {
+ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
+{
     size_t i;
     for (i = 0; i < bc->n_libdeps; i++) {
         if (Parrot_str_equal(interp, bc->libdeps[i], lib)) {
@@ -232,9 +233,8 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             &pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, 1);
 
     if (!bc_seg) {
-        Parrot_io_eprintf(interp,
-            "PBC Merge: Error creating bytecode segment.");
-        Parrot_x_exit(interp, 1);
+        Parrot_io_eprintf(interp, "PBC Merge: Can not create bytecode segment");
+        exit(1);
     }
 
     /* Loop over input files. */
@@ -245,7 +245,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate bytecode segment in %s",
                 inputs[i]->filename);
-            Parrot_x_exit(interp, 1);
+            exit(1);
         }
 
         /* Re-allocate the current buffer. */
@@ -310,12 +310,14 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     FLOATVAL  *num_constants = mem_gc_allocate_typed(interp, FLOATVAL);
     STRING   **str_constants = mem_gc_allocate_typed(interp, STRING *);
     PMC      **pmc_constants = mem_gc_allocate_typed(interp, PMC *);
+    PackFile_ConstTagPair *tags = mem_gc_allocate_typed(interp, PackFile_ConstTagPair);
 
     opcode_t num_cursor = 0;
     opcode_t str_cursor = 0;
     opcode_t pmc_cursor = 0;
+    opcode_t tag_cursor = 0;
 
-    int      i, j;
+    int i, j;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable *)
@@ -325,11 +327,13 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     if (const_seg == NULL) {
         Parrot_io_eprintf(interp,
             "PBC Merge: Error creating constant table segment.");
-        Parrot_x_exit(interp, 1);
+        exit(1);
     }
 
     /* Loop over input files. */
     for (i = 0; i < num_inputs; ++i) {
+        opcode_t str_cursor_start = str_cursor;
+        opcode_t pmc_cursor_start = pmc_cursor;
 
         /* Get the constant table segment from the input file. */
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
@@ -337,7 +341,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate constant table segment in %s\n",
                 inputs[i]->filename);
-            Parrot_x_exit(interp, 1);
+            exit(1);
         }
 
         /* Store cursor as position where constant table starts. */
@@ -374,15 +378,27 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             inputs[i]->pmc.const_map[j] = pmc_cursor;
             pmc_cursor++;
         }
+
+        /* Update the pointers and counts here, so we have that information when
+           we add tags*/
+        const_seg->num.const_count = num_cursor;
+        const_seg->num.constants   = num_constants;
+        const_seg->str.const_count = str_cursor;
+        const_seg->str.constants   = str_constants;
+        const_seg->pmc.const_count = pmc_cursor;
+        const_seg->pmc.constants   = pmc_constants;
+
+        /* Loop over the tags, inserting tags into the tag_map, keeping them
+           ordered by tag name */
+        for (j = 0; j < in_seg->ntags; j++) {
+            Parrot_pf_tag_constant(interp, const_seg,
+                in_seg->tag_map[j].tag_idx + str_cursor_start,
+                in_seg->tag_map[j].const_idx + pmc_cursor_start);
+            tag_cursor++;
+        }
     }
 
-    /* Stash merged constants table and count and return the new segment. */
-    const_seg->num.const_count = num_cursor;
-    const_seg->num.constants   = num_constants;
-    const_seg->str.const_count = str_cursor;
-    const_seg->str.constants   = str_constants;
-    const_seg->pmc.const_count = pmc_cursor;
-    const_seg->pmc.constants   = pmc_constants;
+    /* Return the merged segment */
     return const_seg;
 }
 
