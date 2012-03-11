@@ -38,7 +38,20 @@ If the data is not valid, an exception will be thrown.
 
     # Convert the text to an object and return it.
     .local pmc json, code
-    load_language 'data_json'
+    $P0 = load_language 'data_json'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'('load')
+  done_initialization:
     json = compreg 'data_json'
     code = json.'compile'(text)
     .tailcall code()
@@ -71,7 +84,21 @@ the rendered JSON will not be formatted. The default is false.
     expanded = not compact
 
     # render the object as a string.
-    load_bytecode 'JSON.pbc'
+    $P0 = load_bytecode 'JSON.pbc'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'('load')
+  done_initialization:
+
     .local string output
     output = _json( config, expanded )
 

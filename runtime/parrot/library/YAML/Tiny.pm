@@ -410,8 +410,10 @@ sub debug($message, *@params) {
 sub length($s) { pir::length($s) }
 
 INIT {
-    pir::load_bytecode("nqp-setting.pbc");
-    pir::load_bytecode("dumper.pbc");
+    my $pbc := pir::load_bytecode__ps("nqp-setting.pbc");
+    for $pbc.subs_by_tag('load') -> $sub { $sub(); }
+    $pbc := pir::load_bytecode__ps("dumper.pbc");
+    for $pbc.subs_by_tag('load') -> $sub { $sub(); }
 }
 
 # vim: ft=perl6

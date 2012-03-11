@@ -36,9 +36,28 @@ also included.
 
 .namespace [ 'PCT';'Grammar' ]
 
+.sub 'load_bytecode' :anon
+    .param string libname
+    $P0 = load_bytecode libname
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
+.end
+
 .sub 'onload' :anon :tag('init') :tag('load')
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pbc'
+    'load_bytecode'('PGE.pbc')
+    'load_bytecode'('PGE/Util.pbc')
     .local pmc p6meta
     p6meta = new 'P6metaclass'
     p6meta.'new_class'('PCT::Grammar', 'parent'=>'PGE::Grammar')
