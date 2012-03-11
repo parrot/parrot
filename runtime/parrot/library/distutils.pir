@@ -140,7 +140,7 @@ Inno Setup
     .sub 'main' :main
         .param pmc args
         $S0 = shift args
-        load_bytecode 'distutils.pbc'
+        '__load_bytecode'('distutils.pbc', 'load')
 
         $P0 = new 'Hash'
         $P1 = new 'Hash'
@@ -206,7 +206,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 .include 'errors.pasm'
 
 .sub '__onload' :tag('load') :tag('init') :anon
-    load_bytecode 'osutils.pbc'
+    '__load_bytecode'('osutils.pbc', 'load')
     $P0 = new 'Hash'
     set_global '%step', $P0
 
@@ -2149,7 +2149,7 @@ the default value is "t/*.t"
     .param pmc kv :slurpy :named
     run_step('build', kv :flat :named)
 
-    load_bytecode 'TAP/Harness.pbc'
+    '__load_bytecode'('TAP/Harness.pbc', 'load')
     .local pmc opts, files, harness, aggregate
     opts = new 'Hash'
     $I0 = exists kv['prove_exec']
@@ -2249,7 +2249,7 @@ the server. The default is "parrot-autobot:qa_rocks"
     .param pmc kv :slurpy :named
     run_step('build', kv :flat :named)
 
-    load_bytecode 'TAP/Harness.pbc'
+    '__load_bytecode'('TAP/Harness.pbc', 'load')
     .local pmc opts, files, harness, aggregate
     opts = new 'Hash'
     $I0 = exists kv['prove_exec']
@@ -2352,7 +2352,7 @@ the server. The default is "parrot-autobot:qa_rocks"
     $P1 = $P0[1]
     push contents, 'password'
     push contents, $P1
-    load_bytecode 'LWP/UserAgent.pir'
+    '__load_bytecode'('LWP/UserAgent.pir', 'load')
     .local pmc ua, response
     ua = new ['LWP';'UserAgent']
     ua.'env_proxy'()
@@ -3232,7 +3232,7 @@ the default value is setup.pir
     .param pmc kv :slurpy :named
     run_step('manifest', kv :flat :named)
 
-    load_bytecode 'Archive/Tar.pbc'
+    '__load_bytecode'('Archive/Tar.pbc', 'load')
     $S0 = slurp('MANIFEST')
     $P0 = split "\n", $S0
     $S0 = pop $P0
@@ -4861,7 +4861,7 @@ SOURCE_C
 .sub 'runtests' :multi()
     .param pmc files :slurpy
     .param pmc opts :slurpy :named
-    load_bytecode 'TAP/Harness.pbc'
+    '__load_bytecode'('TAP/Harness.pbc', 'load')
     .local pmc harness
     harness = new ['TAP';'Harness']
     harness.'process_args'(opts)
@@ -4883,6 +4883,33 @@ SOURCE_C
     .param pmc hash
     .tailcall runtests(array :flat, hash :flat :named)
 .end
+
+=item __load_bytecode
+
+=cut
+
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tag
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+    .return()
+.end
+
 
 =back
 

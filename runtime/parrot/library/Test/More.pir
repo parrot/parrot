@@ -75,7 +75,7 @@ This class defines the following functions:
 .namespace [ 'Test'; 'More' ]
 
 .sub _initialize :tag('load')
-    load_bytecode 'Test/Builder.pbc'
+    '__load_bytecode'('Test/Builder.pbc')
 
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
@@ -1425,10 +1425,10 @@ optional test description in C<description>.
     get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local pmc p6rule_compile
-    load_bytecode "PGE.pbc"
-    load_bytecode "PGE/Dumper.pbc"
-    load_bytecode "PGE/Text.pbc"
-    load_bytecode "PGE/Util.pbc"
+    '__load_bytecode'("PGE.pbc")
+    '__load_bytecode'("PGE/Dumper.pbc")
+    '__load_bytecode'("PGE/Text.pbc")
+    '__load_bytecode'("PGE/Util.pbc")
     p6rule_compile = compreg "PGE::Perl6Regex"
 
     .local pmc diagnostic
@@ -1613,6 +1613,28 @@ Bad input: "C<test that the return from Foo is correct type>"
 
     $S0 = diagnostic
     .return( $S0 )
+.end
+
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .param string tag
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+    .return()
 .end
 
 =back

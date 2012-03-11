@@ -103,7 +103,21 @@ LIB_CYGWIN:
 LIB_LOADED:
     set_hll_global ['PCRE'], 'lib', libpcre
 
-    load_bytecode 'libpcre.pbc'
+    $P0 = load_bytecode 'libpcre.pbc'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto pbc_done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  pbc_loop_top:
+    unless $P2 goto pbc_loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto pbc_loop_top
+  pbc_loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  pbc_done_initialization:
 
     # pcre *pcre_compile(const char *pattern, int options,
     #            const char **errptr, int *erroffset,

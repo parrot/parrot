@@ -2,7 +2,21 @@
 # Begin generated code
 
 .sub initial_load_bytecode :anon :tag('load') :tag('init')
-    load_bytecode 'Getopt/Obj.pbc'
+    $P0 = load_bytecode 'Getopt/Obj.pbc'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
 .end
 
 # end libs
@@ -236,7 +250,23 @@
     new $P2, 'ExceptionHandler'
     set_label $P2, __label_1
     push_eh $P2
-    load_language 'winxed'
+
+    $P0 = load_language 'winxed'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
+
     compreg $P1, 'winxed'
     pop_eh
     goto __label_2

@@ -655,7 +655,7 @@ $(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/
 
 $(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
+$(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(LIBRARY_DIR)/libpcre.pbc
 
 $(LIBRARY_DIR)/uuid.pbc: $(DYNEXT_DIR)/math_ops$(LOAD_EXT)
 
@@ -3021,7 +3021,7 @@ src/glut_callbacks$(O): \
 	$(EXTEND_HEADERS) \
 	src/glut_callbacks.c
 
-src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
+src/glut_nci_thunks.c: $(NCI_THUNK_GEN) runtime/parrot/library/String/Utils.pbc
 	$(NCI_THUNK_GEN) \
 		--loader-name=Parrot_glut_nci_loader \
 		--loader-storage-class=PARROT_DYNEXT_EXPORT \

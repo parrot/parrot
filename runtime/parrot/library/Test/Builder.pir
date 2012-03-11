@@ -46,10 +46,12 @@ This class defines the following methods:
 
 .namespace [ 'Test'; 'Builder' ]
 
+
+
 .sub '_initialize' :tag('load')
-    load_bytecode 'Test/Builder/Test.pbc'
-    load_bytecode 'Test/Builder/Output.pbc'
-    load_bytecode 'Test/Builder/TestPlan.pbc'
+    '__load_bytecode'('Test/Builder/Test.pbc')
+    '__load_bytecode'('Test/Builder/Output.pbc')
+    '__load_bytecode'('Test/Builder/TestPlan.pbc')
 
     .local pmc tb_class
 
@@ -587,6 +589,29 @@ also calls C<exit>.
     report = test.'report'()
 
     output.'write'( report )
+.end
+
+.sub '__load_bytecode' :anon
+    .param string pbc_name
+    .local string tag
+    tag = "load"
+
+    $P0 = load_bytecode pbc_name
+    $I0 = $P0.'is_initialized'(tag)
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'(tag)
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'(tag)
+  done_initialization:
+    .return()
 .end
 
 =back
