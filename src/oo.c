@@ -955,17 +955,30 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
             method_hash = VTABLE_inspect_str(interp, ns, methods_str);
         else
             method_hash = VTABLE_inspect_str(interp, class_obj, methods_str);
+        fprintf(stderr, "method_hash: %p\n", method_hash);
+//        PARROT_ASSERT((method_hash)->orig_interp == interp);
 
         if (!PMC_IS_NULL(method_hash))
             method = VTABLE_get_pmc_keyed_str(interp, method_hash, method_name);
+        fprintf(stderr, "method out of method_hash: %p\n", method);
 
         if (PMC_IS_NULL(method))
             method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
+        fprintf(stderr, "method out of ns: %p\n", method);
 
         TRACE_FM(interp, _class_i, method_name, method);
 
-        if (!PMC_IS_NULL(method))
+        if (!PMC_IS_NULL(method)) {
+            if (interp->thread_data != NULL)
+                method = VTABLE_clone(interp, method);
+            PARROT_ASSERT((method)->orig_interp == interp);
+            //if (method->orig_interp != interp)
+                //return Parrot_thread_create_proxy(method->orig_interp, interp, method);
             return method;
+        }
+        else {
+            fprintf(stderr, "PMCNULL for %s\n", method_name);
+        }
     }
 
     TRACE_FM(interp, _class, method_name, NULL);

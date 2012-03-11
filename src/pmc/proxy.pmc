@@ -109,6 +109,8 @@ pmclass Proxy auto_attrs {
         /* Set flags for custom GC mark. */
         PObj_custom_mark_SET(SELF);
 
+        PARROT_ASSERT(!PMC_IS_NULL(target));
+        PARROT_ASSERT(target->vtable->base_type != enum_class_Proxy);
         core_struct->target = target;
         core_struct->interp = INTERP;
     }
@@ -131,10 +133,18 @@ Don't mark target and interp since they belong to a different interpreter.
         return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target,
                 method_name);
     }
+    
+/*    VTABLE opcode_t *invoke(void *next)
+    {
+        /* invoke should really run in this interp's context */
+/*        return VTABLE_invoke(interp, PARROT_PROXY(_self)->target, next);
+    } */
 
     VTABLE PMC *instantiate(PMC *init) {
         PMC * const _class = PARROT_PROXY(_self)->target;
         /*TODO will fail if the class has not been instantiated in the main thread before */
+
+        PARROT_ASSERT(_class->vtable->base_type != enum_class_Proxy);
         return VTABLE_instantiate(INTERP, _class, init);
     }
 }

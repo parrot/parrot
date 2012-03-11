@@ -922,6 +922,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         size_t            gen  = POBJ2GEN(pmc);
 
         self->youngest_child = gen;
+        PARROT_ASSERT(PMC_IS_NULL(pmc) || pmc->orig_interp == interp);
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -980,6 +981,7 @@ gc_gms_process_dirty_list(PARROT_INTERP,
 
     POINTER_ARRAY_ITER(dirty_list,
         PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PARROT_ASSERT(PMC_IS_NULL(pmc) || pmc->orig_interp == interp);
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1007,6 +1009,7 @@ gc_gms_process_work_list(PARROT_INTERP,
 
     POINTER_ARRAY_ITER(work_list,
         PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
+        PARROT_ASSERT(PMC_IS_NULL(pmc) || pmc->orig_interp == interp);
 
         if (PObj_custom_mark_TEST(pmc))
             VTABLE_mark(interp, pmc);
@@ -1023,6 +1026,7 @@ gc_gms_process_work_list(PARROT_INTERP,
         const size_t             gen  = POBJ2GEN(pmc);
 
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
+        PARROT_ASSERT(PMC_IS_NULL(pmc) || pmc->orig_interp == interp);
 
         Parrot_pa_remove(interp, work_list, item->ptr);
         item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
@@ -1150,6 +1154,8 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
         || !"Resurrecting of dead objects is not supported");
+
+    PARROT_ASSERT(PMC_IS_NULL(pmc) || pmc->orig_interp == interp);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_live_TEST(pmc))

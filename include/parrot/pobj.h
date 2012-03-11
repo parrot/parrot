@@ -102,6 +102,7 @@ struct PMC {
     VTABLE         *vtable;             /* Pointer to vtable. */
     DPOINTER       *data;               /* Pointer to attribute structure. */
     PMC            *_metadata;          /* Pointer to metadata PMC. */
+    Parrot_Interp  *orig_interp;
 };
 
 /* Use these macros to access the data and metadata. */

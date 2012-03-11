@@ -98,6 +98,7 @@ sub _generate_proxy_method {
 
     Parrot_unblock_GC_mark(proxied_interp);
 
+    PARROT_ASSERT(interp != PARROT_PROXY(SELF)->interp);
     return (PMC_IS_NULL(result)
         ? PMCNULL
         : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result));

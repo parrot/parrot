@@ -319,6 +319,7 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
     pmc->vtable         = NULL;
     PMC_data(pmc)       = NULL;
     PMC_metadata(pmc)   = PMCNULL;
+    pmc->orig_interp    = interp;
 
     return pmc;
 }

@@ -274,7 +274,9 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
 
-    Parrot_thread_notify_threads(interp);
+    if (interp->thread_data == NULL)
+        Parrot_thread_notify_threads(interp);
+
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 
@@ -658,6 +660,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     PMC * const task = Parrot_cx_stop_task(interp, next);
 
     adata->alarm_time = done_time;
+    PARROT_ASSERT(interp == task->orig_interp);
     adata->alarm_task = task;
     PARROT_GC_WRITE_BARRIER(interp, alarm);
     (void) VTABLE_invoke(interp, alarm, NULL);

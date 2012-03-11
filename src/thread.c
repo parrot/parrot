@@ -132,6 +132,7 @@ Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARG
 {
     ASSERT_ARGS(Parrot_thread_create_proxy)
     PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
+    PARROT_ASSERT(interp != thread);
     PARROT_PROXY(proxy)->interp = interp;
     PARROT_GC_WRITE_BARRIER(thread, proxy);
     return proxy;
@@ -165,13 +166,15 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
     if (old_struct->code->vtable->base_type == enum_class_Proxy)
         new_struct->code = PARROT_PROXY(old_struct->code)->target;
     else
+        /* clone does not do much (it's makes a shallow copy) so this is probably not enough */
         new_struct->code = Parrot_clone(thread_interp, old_struct->code);
 
-    if (old_struct->data && ! PMC_IS_NULL(old_struct->data))
+    if (old_struct->data && ! PMC_IS_NULL(old_struct->data)) {
         if (old_struct->data->vtable->base_type == enum_class_Proxy)
             new_struct->data = PARROT_PROXY(old_struct->data)->target;
         else
             new_struct->data = Parrot_clone(thread_interp, old_struct->data);
+    }
 
     new_struct->partner = task;
 
