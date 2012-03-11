@@ -100,7 +100,7 @@ sub _generate_proxy_method {
 
     return (PMC_IS_NULL(result)
         ? PMCNULL
-        : Parrot_pmc_new_init(PARROT_PROXY(SELF)->interp, enum_class_Proxy, result));
+        : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result));
 BODY
         : "    return $call;\n";
 
