@@ -97,10 +97,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
-        INTVAL i, last_remove;
-        const INTVAL start = d->n_vtable_max;
-
-        /* copy type registrations to keep type numbers the same */
         d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
         d->n_vtable_max = s->n_vtable_max;
         d->vtables = s->vtables;
