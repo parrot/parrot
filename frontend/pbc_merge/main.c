@@ -90,6 +90,21 @@ static void pbc_fixup_constants(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+static PackFile_Annotations* pbc_merge_annotations(PARROT_INTERP,
+    ARGMOD(pbc_merge_input **inputs),
+    int num_inputs,
+    ARGMOD(PackFile *pf),
+    ARGMOD(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*inputs)
+        FUNC_MODIFIES(*pf)
+        FUNC_MODIFIES(*bc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PackFile* pbc_merge_begin(PARROT_INTERP,
     ARGMOD(pbc_merge_input **inputs),
     int num_inputs)
@@ -149,6 +164,11 @@ static void pbc_merge_write(PARROT_INTERP,
 #define ASSERT_ARGS_pbc_fixup_constants __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
+#define ASSERT_ARGS_pbc_merge_annotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(inputs) \
+    , PARROT_ASSERT_ARG(pf) \
+    , PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_pbc_merge_begin __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(inputs))
@@ -246,6 +266,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     for (i = 0; i < num_inputs; ++i) {
         /* Get the bytecode segment from the input file. */
         PackFile_ByteCode * const in_seg = inputs[i]->pf->cur_cs;
+
         if (in_seg == NULL) {
             Parrot_io_eprintf(interp,
                 "PBC Merge: Cannot locate bytecode segment in %s",
@@ -427,6 +448,64 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Return the merged segment */
     return const_seg;
+}
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PackFile_Annotations*
+pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
+        int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
+{
+    int i, j, k;
+    int num_anns = 0;
+    PackFile_Annotations * const merged = Parrot_pf_get_annotations_segment(interp, pf, bc);
+    int key_cursor = 0;
+
+    for (i = 0; i < num_inputs; i++) {
+        PackFile_ByteCode * const in_bc = inputs[i]->pf->cur_cs;
+        PackFile_Annotations * const in_ann =
+            Parrot_pf_get_annotations_segment(interp, inputs[i]->pf, in_bc);
+
+        for (j = 0; j < in_ann->num_keys; j++) {
+            const opcode_t old_name_idx = in_ann->keys[j].name;
+            const opcode_t new_name_idx = inputs[i]->str.const_map[old_name_idx];
+            const opcode_t old_len = in_ann->keys[j].len;
+            const opcode_t old_start = in_ann->keys[j].start;
+            const opcode_t new_key = inputs[i]->str.const_map[in_ann->keys[j].name];
+
+            for (k = 0; k < old_len; k++) {
+                const opcode_t idx = (old_start + k) * 2;
+                const opcode_t old_offset = in_ann->base.data[idx];
+                const opcode_t old_value = in_ann->base.data[idx + 1];
+                opcode_t new_value;
+
+                switch (in_ann->keys[j].type) {
+                    case PF_ANNOTATION_KEY_TYPE_INT:
+                        new_value = old_value;
+                        break;
+                    case PF_ANNOTATION_KEY_TYPE_STR:
+                        new_value = inputs[i]->str.const_map[old_value];
+                        break;
+                    case PF_ANNOTATION_KEY_TYPE_PMC:
+                        new_value = inputs[i]->pmc.const_map[old_value];
+                        break;
+                    default:
+                        Parrot_io_eprintf(interp, "Cannot find annotation type %d",
+                            in_ann->keys[j].type);
+                        exit(1);
+                }
+
+                PackFile_Annotations_add_entry(interp, merged,
+                    old_offset + inputs[i]->code_start,
+                    new_key,
+                    in_ann->keys[j].type,
+                    new_value
+                );
+            }
+            key_cursor++;
+        }
+    }
+    return merged;
 }
 
 
@@ -727,9 +806,10 @@ static PackFile*
 pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 {
     ASSERT_ARGS(pbc_merge_begin)
-    PackFile_ByteCode   *bc;
-    PackFile_ConstTable *ct;
-    int                  i;
+    PackFile_ByteCode    *bc;
+    PackFile_ConstTable  *ct;
+    PackFile_Annotations *an;
+    int                   i;
 
     /* Create a new empty packfile. */
     PackFile * const merged = PackFile_new(interp, 0);
@@ -759,6 +839,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     /* Merge the various stuff. */
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged);
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
+    an = pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
     bc->const_table = ct;
     ct->code        = bc;
     interp->code    = bc;
@@ -809,11 +890,11 @@ pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename)
     PackFile_pack(interp, pf, pack);
     if ((fp = fopen(filename, "wb")) == 0) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't open %s\n", filename);
-        Parrot_x_exit(interp, 1);
+        exit(1);
     }
     if ((1 != fwrite(pack, size, 1, fp))) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't write %s\n", filename);
-        Parrot_x_exit(interp, 1);
+        exit(1);
     }
     fclose(fp);
     mem_gc_free(interp, pack);

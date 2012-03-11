@@ -1709,6 +1709,29 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     }
 }
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Annotations *
+Parrot_pf_get_annotations_segment(PARROT_INTERP, ARGMOD(PackFile *pf),
+        ARGMOD_NULLOK(PackFile_ByteCode *bc))
+{
+    ASSERT_ARGS(Parrot_pf_get_annotations_segment)
+    if (bc == NULL)
+        bc = pf->cur_cs;
+    if (bc->annotations != NULL)
+        return bc->annotations;
+    else {
+        STRING * const name = Parrot_str_concat(interp, bc->base.name, CONST_STRING(interp, "_ANN"));
+        PackFile_Directory * const dir = bc->base.dir ? bc->base.dir :
+                    &pf->directory;
+        PackFile_Annotations * const annotations = (PackFile_Annotations *)
+            PackFile_Segment_new_seg(interp, dir, PF_ANNOTATIONS_SEG, name, 1);
+        bc->annotations = annotations;
+        annotations->code = bc;
+        return annotations;
+    }
+}
+
 /*
 
 =item C<static void push_context(PARROT_INTERP)>

@@ -2357,18 +2357,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         int annotation_type;
 
         /* Add annotations seg if we're missing one. */
-        if (!interp_code->annotations) {
-            /* Create segment. "_ANN" is added to the name */
-            STRING *name = Parrot_sprintf_c(imcc->interp, "%Ss_ANN",
-                interp_code->base.name);
-            int      add = interp_code->base.dir ? 1 : 0;
-            PackFile_Directory * const dir  = add ? interp_code->base.dir :
-                    &interp_pf->directory;
-            interp_code->annotations = (PackFile_Annotations *)
-                    PackFile_Segment_new_seg(imcc->interp, dir,
-                        PF_ANNOTATIONS_SEG, name, 1);
-            interp_code->annotations->code = interp_code;
-        }
+        if (!interp_code->annotations)
+            Parrot_pf_get_annotations_segment(imcc->interp, interp_pf, interp_code);
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {

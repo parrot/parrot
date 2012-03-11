@@ -633,6 +633,16 @@ void Parrot_pf_execute_bytecode_program(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PackFile_Annotations * Parrot_pf_get_annotations_segment(PARROT_INTERP,
+    ARGMOD(PackFile *pf),
+    ARGMOD_NULLOK(PackFile_ByteCode *bc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pf)
+        FUNC_MODIFIES(*bc);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_pf_get_packfile_pmc(PARROT_INTERP,
     ARGIN(PackFile *pf),
     ARGIN(STRING *path))
@@ -812,6 +822,10 @@ void Parrot_pf_mark_packfile_initialized(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pbc) \
     , PARROT_ASSERT_ARG(args))
+#define ASSERT_ARGS_Parrot_pf_get_annotations_segment \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_Parrot_pf_get_packfile_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf) \
