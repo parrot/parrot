@@ -108,9 +108,11 @@ in sync.
 
 =head2 III. Update the Release Version
 
-First, ensure you have configured Parrot (C<perl Configure.pl>) and ran C<make>
-with the old version of Parrot.  Next, update files with the following version-
-specific information.
+First, ensure you have configured Parrot (C<perl Configure.pl>) and ran
+C<make> and C<make html> with the old version of Parrot. Second, save a copy
+of the entire 'docs/' directory to some temporary location; you will need
+them later in I<Section X> below. Next, update files with the following
+version-specific information.
 
 =over 4
 
@@ -442,8 +444,8 @@ to keep the main page fresh.
 
 =head2 X. Update parrot.github.com and any Relevant parrot-docsx Repositories
 
-Please read and follow the instructions in F<README_release.pod> at 
-L<https://github.com/parrot/parrot.github.com>
+Please read and follow the instructions in 
+F<docs/project/release_parrot_github_guide.pod>.
 
 =head2 XI. Publicity
 
