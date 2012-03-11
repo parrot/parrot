@@ -89,7 +89,14 @@ sub _generate_proxy_method {
 
     my $body = $method->return_type eq 'PMC*'
         ? <<BODY
-    PMC * result = $call;
+    PMC * result;
+   
+    /* otherwise the GC could find foreign PMCs on the stack */
+    Parrot_block_GC_mark(proxied_interp);
+
+    result = $call;
+
+    Parrot_unblock_GC_mark(proxied_interp);
 
     return (PMC_IS_NULL(result)
         ? PMCNULL
