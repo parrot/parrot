@@ -146,10 +146,24 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
-static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 const unsigned char * Parrot_get_config_hash_bytes(void);
 int Parrot_get_config_hash_length(void);
+
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void PDB_printwelcome(void);
+static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_PDB_printwelcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PDB_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 

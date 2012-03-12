@@ -51,6 +51,44 @@ efficiency on reading non-native PBCs.
 #include "parrot/oplib/ops.h"
 #include "parrot/oplib/core_ops.h"
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)
+        __attribute__nonnull__(1);
+
+static void help(void);
+static void null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
+        __attribute__nonnull__(1);
+
+static void null_dump(PARROT_INTERP, const PackFile_Segment *self);
+static void nums_dump(PARROT_INTERP, const PackFile_Segment *self)
+        __attribute__nonnull__(1);
+
+static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_const_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(segp))
+#define ASSERT_ARGS_disas_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_null_dir_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_null_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_nums_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_PackFile_header_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 
 =item C<static void const_dump(PARROT_INTERP, const PackFile_Segment *segp)>
@@ -266,7 +304,8 @@ Print out the user help info.
 
 */
 
-static void help(void)
+static void
+help(void)
 {
     printf("pbc_dump - dump or convert parrot bytecode (PBC) files\n");
     printf("usage:\n");

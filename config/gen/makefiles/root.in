@@ -3105,9 +3105,17 @@ cagecritic:
 
 HEADERIZER_O_FILES = \
 	$(O_FILES) \
+	\
+	frontend/parrot_debugger/main$(O) \
+	\
 	frontend/parrot2/main$(O) \
+	\
+	frontend/pbc_disassemble/main$(O) \
+	\
 	frontend/pbc_dump/packdump$(O) \
-	frontend/pbc_merge/main$(O) \
+	frontend/pbc_dump/main$(O) \
+	\
+	frontend/pbc_merge/main$(O)
 
 headerizer : src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y
