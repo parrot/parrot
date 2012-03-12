@@ -102,6 +102,7 @@ int main(int argc, const char **argv)
     Parrot_PMC interpmc = NULL;
     Parrot_PMC apmc = NULL;
     Parrot_PMC bpmc = NULL;
+    Parrot_PMC lang_pbc = NULL;
     Parrot_String s_teststr = NULL, s_outstr = NULL;
     int a;
 
@@ -109,7 +110,8 @@ int main(int argc, const char **argv)
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 
     Parrot_api_string_import_ascii(interpmc, "PIR", &s_teststr);
-    Parrot_api_load_language(interpmc, s_teststr);
+    Parrot_api_load_language(interpmc, s_teststr, &lang_pbc);
+    Parrot_api_legacy_trigger_init_subs(interpmc, lang_pbc);
 
     Parrot_api_get_compiler(interpmc, s_teststr, &apmc);
     Parrot_api_set_compiler(interpmc, s_teststr, apmc);

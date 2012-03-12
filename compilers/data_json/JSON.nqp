@@ -41,7 +41,7 @@ INIT {
     my $pbc := pir::load_bytecode__ps('P6Regex.pbc');
     if (!$pbc.is_initialized('load')) {
         for $pbc.subs_by_tag('load') -> $sub { $sub(); };
-        $pbc.mark_initialized(;load');
+        $pbc.mark_initialized('load');
     }
 }
 
