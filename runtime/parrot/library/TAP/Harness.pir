@@ -24,8 +24,9 @@ automatically aggregated and output to STDOUT.
 .namespace ['TAP';'Harness']
 
 .sub '' :tag('init') :tag('load') :anon
-    load_bytecode 'TAP/Parser.pbc'
-    load_bytecode 'TAP/Formatter.pbc'
+    $P9 = get_global ['TAP';'Harness';'Utility'], '__load_bytecode'
+    $P9('TAP/Parser.pbc')
+    $P9('TAP/Formatter.pbc')
     $P0 = subclass ['TAP';'Base'], ['TAP';'Harness']
     $P0.'add_attribute'('formatter')
     $P0.'add_attribute'('exec')
@@ -293,7 +294,8 @@ files or streams into an archive file (C<.tar.gz>).
 
 .sub 'runtests' :method
     .param pmc files
-    load_bytecode 'Archive/Tar.pbc'
+    $P9 = get_global ['TAP';'Harness';'Utility'], '__load_bytecode'
+    $P9('Archive/Tar.pbc')
     $P0 = getattribute self, 'archive_file'
     unless null $P0 goto L1
     die "You must provide the name of the archive to create!"
@@ -390,6 +392,27 @@ files or streams into an archive file (C<.tar.gz>).
   L5:
     push $P0, "\n"
     .return ($P0)
+.end
+
+.namespace ['TAP';'Harness';'Utility']
+
+.sub '__load_bytecode'
+    .param string pbcname
+    $P0 = load_bytecode pbcname
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
 .end
 
 =back

@@ -171,7 +171,8 @@ see http://search.cpan.org/dist/libwww-perl/
 .include 'cclass.pasm'
 
 .sub '' :tag('init') :tag('load') :anon
-    load_bytecode 'URI.pbc'
+    $P9 = get_global ["HTTP";"Utility"], "__load_bytecode"
+    $P9('URI.pbc')
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Request']
     $P0.'add_attribute'('method')
     $P0.'add_attribute'('uri')
@@ -406,7 +407,8 @@ see http://search.cpan.org/dist/libwww-perl/
     .local string content
     content = ''
     if file == '' goto L8
-    load_bytecode 'osutils.pbc'
+    $P9 = get_global ["HTTP";"Utility"], "__load_bytecode"
+    $P9('osutils.pbc')
     content = slurp(file, 'binary' :named('encoding'))
     $I0 = exists h['Content-Type']
     if $I0 goto L8
@@ -458,8 +460,9 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .sub 'boundary'
     .param int size
-    load_bytecode 'MIME/Base64.pbc'
-    load_bytecode 'Math/Rand.pbc'
+    $P9 = get_global ["HTTP";"Utility"], "__load_bytecode"
+    $P9('MIME/Base64.pbc')
+    $P9('Math/Rand.pbc')
     .local pmc srand
     srand = get_hll_global ['Math';'Rand'], 'srand'
     time $I0
@@ -644,6 +647,28 @@ see http://search.cpan.org/dist/libwww-perl/
     $I0 = 1
   L1:
     .return ($I0)
+.end
+
+.namespace ["HTTP";"Utility"]
+
+.sub '__load_bytecode'
+    .param string pbcname
+
+    $P0 = load_bytecode pbcname
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
 .end
 
 =back

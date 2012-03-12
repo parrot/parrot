@@ -153,7 +153,21 @@ This module defines the following public functions:
 .namespace [ 'Test'; 'Builder'; 'Tester' ]
 
 .sub _initialize :tag('load')
-    load_bytecode 'Test/Builder.pbc'
+    $P0 = load_bytecode 'Test/Builder.pbc'
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
 
     .local pmc test
     .local pmc output

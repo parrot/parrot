@@ -275,11 +275,11 @@ set_global 'ncurses::inchnstr', $P2
 dlfunc $P2, $P1, 'inchstr', 'i4'
 set_global 'ncurses::inchstr', $P2
 dlfunc $P2, $P1, 'initscr', 'p'
-set_global 'ncurses::tag('init')scr', $P2
+set_global 'ncurses::initscr', $P2
 dlfunc $P2, $P1, 'init_color', 'issss'
-set_global 'ncurses::tag('init')_color', $P2
+set_global 'ncurses::init_color', $P2
 dlfunc $P2, $P1, 'init_pair', 'isss'
-set_global 'ncurses::tag('init')_pair', $P2
+set_global 'ncurses::init_pair', $P2
 dlfunc $P2, $P1, 'innstr', 'iti'
 set_global 'ncurses::innstr', $P2
 dlfunc $P2, $P1, 'insstr', 'it'

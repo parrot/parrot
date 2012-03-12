@@ -87,7 +87,7 @@ order.
 =cut
 
 .sub _opengl_init :tag('load')
-    load_bytecode 'OpenGL_funcs.pbc'
+    '__load_bytecode'('OpenGL_funcs.pbc')
     _load_opengl_libs()
     _wrap_opengl_entry_points()
     _load_nci_thunks()
@@ -290,7 +290,7 @@ alternating function names and Parrot NCI signatures.
     .param pmc    func
     .param string cstrings
     $P0 = split ',', cstrings
-    load_bytecode 'NCI/Utils.pbc'
+    '__load_bytecode'('NCI/Utils.pbc')
     $P1 = get_root_global ['parrot';'NCI';'Utils'], 'call_with_cstring'
     func = $P1(func, $P0 :flat)
     .return (func)
@@ -372,7 +372,7 @@ at :tag('load') time by _opengl_init().
 
     # Mark all symbols and renames for export
     .local pmc parrot
-    load_language 'parrot'
+    '__load_language'('parrot')
     parrot = compreg 'parrot'
     parrot.'export'(export_list)
     parrot.'export'(export_renames)
@@ -436,6 +436,45 @@ caller's namespace is assumed.
     gl_namespace.'export_to'(to_namespace, export_renames)
 .end
 
+.sub '__load_bytecode' :anon
+    .param string pbcname
+
+    $P0 = load_bytecode pbcname
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
+.end
+
+.sub '__load_language' :anon
+    .param string pbcname
+
+    $P0 = load_language pbcname
+    $I0 = $P0.'is_initialized'('load')
+    if $I0 goto done_initialization
+
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+
+    $P0.'mark_initialized'('load')
+  done_initialization:
+.end
 
 =back
 
