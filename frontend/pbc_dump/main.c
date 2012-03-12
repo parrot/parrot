@@ -59,16 +59,22 @@ static void const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void disas_dump(PARROT_INTERP, const PackFile_Segment *self)
-        __attribute__nonnull__(1);
+static void disas_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void help(void);
-static void null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
-        __attribute__nonnull__(1);
+static void null_dir_dump(PARROT_INTERP,
+    ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-static void null_dump(PARROT_INTERP, const PackFile_Segment *self);
-static void nums_dump(PARROT_INTERP, const PackFile_Segment *self)
-        __attribute__nonnull__(1);
+static void null_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(2);
+
+static void nums_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static void PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
         __attribute__nonnull__(1)
@@ -78,13 +84,17 @@ static void PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(segp))
 #define ASSERT_ARGS_disas_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_null_dir_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_null_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_null_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_nums_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_PackFile_header_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf))
@@ -121,10 +131,10 @@ Disassemble and dump.
 */
 
 static void
-disas_dump(PARROT_INTERP, const PackFile_Segment *self)
+disas_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     const opcode_t *pc = self->data;
-    const PackFile_ByteCode_OpMapping *map = &((const PackFile_ByteCode *)self)->op_mapping;
+    const PackFile_ByteCode_OpMapping * const map = &((const PackFile_ByteCode *)self)->op_mapping;
     INTVAL i;
 
     Parrot_io_printf(interp, "%Ss => [ # %d ops at offs 0x%x\n",
@@ -133,7 +143,7 @@ disas_dump(PARROT_INTERP, const PackFile_Segment *self)
     for (i = 0; i < map->n_libs; i++) {
 
         INTVAL j;
-        PackFile_ByteCode_OpMappingEntry *entry = &map->libs[i];
+        const PackFile_ByteCode_OpMappingEntry * const entry = &map->libs[i];
         Parrot_io_printf(interp, "  map #%d => [\n", i);
         Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
                 entry->lib->name,
@@ -188,7 +198,7 @@ Disassembles and dumps op names and line numbers only.
 */
 
 static void
-nums_dump(PARROT_INTERP, const PackFile_Segment *self)
+nums_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     const STRING           *debug_name = Parrot_str_concat(interp, self->name,
             Parrot_str_new_constant(interp, "_DB"));
@@ -223,7 +233,7 @@ Produces no output for the given segment type.
 */
 
 static void
-null_dump(SHIM_INTERP, const PackFile_Segment *self)
+null_dump(SHIM_INTERP, ARGIN(const PackFile_Segment *self))
 {
     UNUSED(self);
 }
@@ -241,7 +251,7 @@ output for the directory itself.
 */
 
 static void
-null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
+null_dir_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     const PackFile_Directory * const dir = (const PackFile_Directory *)self;
     size_t i;
