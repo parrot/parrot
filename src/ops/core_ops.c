@@ -13466,7 +13466,7 @@ Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_load_bytecode_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  pbc = Parrot_pf_load_bytecode_search(interp, SREG(1));
-    STRING  * const  init_str = Parrot_str_new(interp, "init", 0);
+    STRING  * const  init_str = Parrot_str_new(interp, "load", 0);
     PMC  * const  init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
     int   num_subs = VTABLE_elements(interp, init_subs);
     int   i;
@@ -13484,7 +13484,7 @@ Parrot_load_bytecode_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_load_bytecode_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  pbc = Parrot_pf_load_bytecode_search(interp, SCONST(1));
-    STRING  * const  init_str = Parrot_str_new(interp, "init", 0);
+    STRING  * const  init_str = Parrot_str_new(interp, "load", 0);
     PMC  * const  init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
     int   num_subs = VTABLE_elements(interp, init_subs);
     int   i;
