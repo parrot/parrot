@@ -173,6 +173,7 @@ sub _init {
 
     my @gcc_or_gpp_cage = qw(
         -std=c89
+        -Werror=declaration-after-statement
         -Werror=implicit-function-declaration
         -Wfloat-equal
         -Wformat=2
