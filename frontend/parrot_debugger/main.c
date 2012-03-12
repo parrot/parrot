@@ -155,12 +155,14 @@ int Parrot_get_config_hash_length(void);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
-        __attribute__nonnull__(1);
+static void PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_PDB_printwelcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_PDB_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -274,8 +276,10 @@ Runs the code, catching exceptions if they are left unhandled.
 */
 
 static void
-PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
+    UNUSED(argc);
+
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {
         free_runloop_jump_point(interp);
