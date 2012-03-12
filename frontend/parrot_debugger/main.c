@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -191,12 +192,12 @@ main(int argc, const char *argv[])
         if (ext && STREQ(ext, ".pbc")) {
             STRING *   const filename_str = Parrot_str_new(interp, filename, 0);
             PackFile * const pfraw        = Parrot_pf_read_pbc_file(interp, filename_str);
+            Parrot_PackFile pf;
 
             if (pfraw == NULL)
                 return 1;
 
-            const Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
-
+            pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
             if (pf == NULL)
                 return 1;
 
