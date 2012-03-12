@@ -179,20 +179,19 @@ main(int argc, const char *argv[])
     Parrot_block_GC_sweep(interp);
 
     nextarg = 1;
-    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0)
-    {
+    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0) {
         scriptname = argv [++nextarg];
         ++nextarg;
     }
 
     if (argv[nextarg]) {
-        const char *filename = argv[nextarg];
-        const char *ext      = strrchr(filename, '.');
+        const char * const filename = argv[nextarg];
+        const char * const ext      = strrchr(filename, '.');
 
         if (ext && STREQ(ext, ".pbc")) {
-            STRING * const filename_str = Parrot_str_new(interp, filename, 0);
-            PackFile * pfraw = Parrot_pf_read_pbc_file(interp, filename_str);
-            Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
+            STRING *   const filename_str = Parrot_str_new(interp, filename, 0);
+            PackFile * const pfraw        = Parrot_pf_read_pbc_file(interp, filename_str);
+            const Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
 
             if (!pfraw || !pf)
                 return 1;
@@ -201,7 +200,7 @@ main(int argc, const char *argv[])
             Parrot_pf_prepare_packfile_init(interp, pf);
         }
         else {
-            STRING          *str = Parrot_str_new(interp, filename, 0);
+            STRING * const str = Parrot_str_new(interp, filename, 0);
             Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
             STRING * const compiler_s = Parrot_str_new(interp, "PIR", 0);
             PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
