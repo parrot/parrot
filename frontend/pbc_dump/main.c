@@ -70,8 +70,9 @@ static void null_dump(PARROT_INTERP, const PackFile_Segment *self);
 static void nums_dump(PARROT_INTERP, const PackFile_Segment *self)
         __attribute__nonnull__(1);
 
-static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)
-        __attribute__nonnull__(1);
+static void PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_const_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -85,7 +86,8 @@ static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 #define ASSERT_ARGS_nums_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PackFile_header_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pf))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -251,7 +253,7 @@ null_dir_dump(PARROT_INTERP, const PackFile_Segment *self)
 
 /*
 
-=item C<static void PackFile_header_dump(PARROT_INTERP, PackFile *pf)>
+=item C<static void PackFile_header_dump(PARROT_INTERP, const PackFile *pf)>
 
 Dump the header.
 
@@ -260,27 +262,30 @@ Dump the header.
 */
 
 static void
-PackFile_header_dump(PARROT_INTERP, PackFile *pf)
+PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
 {
+    const PackFile_Header * const header = pf->header;
+
     Parrot_io_printf(interp, "HEADER => [\n");
-    Parrot_io_printf(interp, "\twordsize  = %d", pf->header->wordsize);
+    Parrot_io_printf(interp, "\twordsize  = %d", header->wordsize);
     Parrot_io_printf(interp, "\t(interpreter's wordsize/INTVAL = %d/%d)\n",
                      sizeof (opcode_t), sizeof (INTVAL));
-    Parrot_io_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
+    Parrot_io_printf(interp, "\tbyteorder = %d", header->byteorder);
     Parrot_io_printf(interp, "\t(interpreter's byteorder       = %d)\n",
             PARROT_BIGENDIAN);
-    Parrot_io_printf(interp, "\tfloattype = %d", pf->header->floattype);
+    Parrot_io_printf(interp, "\tfloattype = %d", header->floattype);
     Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE     = %d)\n",
             NUMVAL_SIZE);
     Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, "
             "bytecode-version %d.%d\n",
-            pf->header->major, pf->header->minor, pf->header->patch,
-            pf->header->bc_major, pf->header->bc_minor);
-    Parrot_io_printf(interp, "\tUUID: type = %d, size = %d",
-            pf->header->uuid_type, pf->header->uuid_size);
+            header->major, header->minor, header->patch,
+            header->bc_major, header->bc_minor);
 
-    if (pf->header->uuid_size)
-        Parrot_io_printf(interp, ", '%s'\n", pf->header->uuid_data);
+    Parrot_io_printf(interp, "\tUUID: type = %d, size = %d",
+            header->uuid_type, header->uuid_size);
+
+    if (header->uuid_size > 0)
+        Parrot_io_printf(interp, ", '%s'\n", header->uuid_data);
     else
         Parrot_io_printf(interp, "\n");
 
@@ -289,7 +294,7 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
             pf->need_wordsize  ? "**need**" : "no",
             pf->fetch_nv       ? "**need**" : "no");
 
-    Parrot_io_printf(interp, "\tdirformat = %d\n", pf->header->dir_format);
+    Parrot_io_printf(interp, "\tdirformat = %d\n", header->dir_format);
     Parrot_io_printf(interp, "]\n");
 }
 
