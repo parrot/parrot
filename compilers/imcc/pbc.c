@@ -1903,8 +1903,8 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
         ARGIN(STRING *s))
 {
     ASSERT_ARGS(init_fixedintegerarray_from_string)
-    INTVAL  n, elem, i, l;
-    char   *src, *chr, *start;
+    INTVAL  n, elem, l;
+    char   *src, *chr, *start, *end;
     int     base;
 
     if (STRING_max_bytes_per_codepoint(s) != 1)
@@ -1916,68 +1916,96 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
     if (!l)
         return;
 
-    chr = src = Parrot_str_to_cstring(imcc->interp, s);
+    start = src = Parrot_str_to_cstring(imcc->interp, s);
+    end = src + l - 1;
 
-    /* "()" - no args */
-    if (l <= 2 && *src == '(') {
+    /* Skip leading whitespace and ( */
+    while (*start == ' ' || *start == '\t' || *start == '(') { ++start; }
+
+    /* Skip trailing whitespace and ) */
+    while (end >= src && (*end == ' ' || *end == '\t' || *end == ')')) {
+        --end;
+    }
+    ++end;
+
+    /* no content */
+    if (start == end) {
         Parrot_str_free_cstring(src);
         return;
     }
 
     /* count commas */
-    n = 0;
-    while (*chr) {
+    for (chr = start, n = 0; chr < end; chr++) {
         if (*chr == ',')
             n++;
-        chr++;
     }
 
     /* presize the array */
     VTABLE_set_integer_native(imcc->interp, p, n + 1);
 
     /* parse string */
-    chr = src;
+    for (chr = start, n = 0; chr < end;) {
+        /* Check for comma */
+        if (n > 0) {
+            if (*chr == ',') {
+                ++chr;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "expected ',' in FixedIntegerArray initialization");
+            }
+        }
 
-    for (i = l, n = 0; i; --i, ++chr) {
+        /* Skip value-leading whitespace */
+        while (*chr == ' ' || *chr == '\t') { ++chr; }
+
+        /* Leading 0, 0b, 0x */
+        base = 10;
+        if (*chr == '0') {
+            ++chr;
+            switch (*chr) {
+              case 'b':
+              case 'B':
+                base = 2;
+                ++chr;
+                break;
+              case 'x':
+              case 'X':
+                base = 16;
+                ++chr;
+                break;
+              default:
+                base = 8;
+            }
+        }
+
+        /* Store value */
+        elem = strtoul(chr, &chr, base);
+        VTABLE_set_integer_keyed_int(imcc->interp, p, n++, elem);
+
+        /* See if there are any garbage characters after the number */
         switch (*chr) {
           case ' ':
-            continue;
           case '\t':
-            continue;
-          case '(':
-            continue;
           case ')':
+          case '\0':
+            ++chr;
             break;
           case ',':
-            n++;
+            /* Hold onto the , for the test at the start of the loop */
             break;
           default:
-            base = 10;
-            if (*chr == '0') {
-                ++chr;
-                --i;
-                if (*chr == 'b' || *chr == 'B') {
-                    base = 2;
-                    ++chr;
-                    --i;
-                }
-                else if (*chr == 'x' || *chr == 'X') {
-                    base = 16;
-                    ++chr;
-                    --i;
-                }
-            }
-            start = chr;
-            elem  = strtoul(chr, &chr, base);
-            --chr;
-            i -= (chr - start);
-            VTABLE_set_integer_keyed_int(imcc->interp, p, n, elem);
-            break;
+            Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "invalid number in FixedIntegerArray initialization");
         }
+
+        /* Skip value-trailing whitespace */
+        while (*chr == ' ' || *chr == '\t') { ++chr; }
     }
 
     Parrot_str_free_cstring(src);
-
 }
 
 /*
