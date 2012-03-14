@@ -114,6 +114,7 @@ Dump the constant table.
 static void
 const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
 {
+    ASSERT_ARGS(const_dump)
     Parrot_io_printf(interp, "%Ss => [\n", segp->name);
     PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
     Parrot_io_printf(interp, "],\n");
@@ -133,6 +134,7 @@ Disassemble and dump.
 static void
 disas_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
+    ASSERT_ARGS(disas_dump)
     const opcode_t *pc = self->data;
     const PackFile_ByteCode_OpMapping * const map = &((const PackFile_ByteCode *)self)->op_mapping;
     INTVAL i;
@@ -200,6 +202,7 @@ Disassembles and dumps op names and line numbers only.
 static void
 nums_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
+    ASSERT_ARGS(nums_dump)
     const STRING           *debug_name = Parrot_str_concat(interp, self->name,
             Parrot_str_new_constant(interp, "_DB"));
     const PackFile_Segment *debug      = PackFile_find_segment(interp,
@@ -235,6 +238,7 @@ Produces no output for the given segment type.
 static void
 null_dump(SHIM_INTERP, ARGIN(const PackFile_Segment *self))
 {
+    ASSERT_ARGS(null_dump)
     UNUSED(self);
 }
 
@@ -253,6 +257,7 @@ output for the directory itself.
 static void
 null_dir_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
+    ASSERT_ARGS(null_dir_dump)
     const PackFile_Directory * const dir = (const PackFile_Directory *)self;
     size_t i;
 
@@ -274,6 +279,7 @@ Dump the header.
 static void
 PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
 {
+    ASSERT_ARGS(PackFile_header_dump)
     const PackFile_Header * const header = pf->header;
 
     Parrot_io_printf(interp, "HEADER => [\n");
