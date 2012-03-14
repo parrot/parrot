@@ -13471,6 +13471,7 @@ Parrot_load_bytecode_s(opcode_t *cur_opcode, PARROT_INTERP) {
     int   num_subs = VTABLE_elements(interp, load_subs);
     int   i;
 
+    fprintf(stderr, "IN load_bytecode_s %d\n", num_subs);
     for (; (i < num_subs); (i++)) {
         PMC  * const  sub = VTABLE_get_pmc_keyed_int(interp, load_subs, i);
 
@@ -24318,7 +24319,7 @@ op_lib_t core_op_lib = {
   1111,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*

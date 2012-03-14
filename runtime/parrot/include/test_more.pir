@@ -13,7 +13,19 @@ simple test file written in parrot.
 
 =cut
 
-    load_bytecode 'Test/More.pbc'
+    $P99 = load_bytecode 'Test/More.pbc'
+    $I0 = $P99.'is_initialized'('load')
+    if $I0 goto __test_more_done_initialization
+    $P98 = $P99.'subs_by_tag'('load')
+    $P98 = iter $P98
+  __test_more_init_top:
+    unless $P98 goto __test_more_init_bottom
+    $P97 = shift $P98
+    $P97()
+    goto __test_more_init_top
+  __test_more_init_bottom:
+    $P99.'mark_initialized'('load')
+  __test_more_done_initialization:
 
     # get the testing functions
     .local pmc exports, curr_namespace, test_namespace
