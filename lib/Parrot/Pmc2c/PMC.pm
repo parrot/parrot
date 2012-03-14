@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -598,9 +598,8 @@ in the PMC's C header file.
 sub hdecls {
     my ($self) = @_;
 
-    my $hout;
-    my $name    = $self->name;
-    my $lc_name = $self->name;
+    my $hout = '';
+    my $name = $self->name;
 
     # generate decls for all vtables in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
