@@ -111,15 +111,16 @@ inline op check_events__() :internal :flow {
 
 inline op load_bytecode(in STR) :load_file {
     PMC * const pbc = Parrot_pf_load_bytecode_search(interp, $1);
-    STRING * const init_str = Parrot_str_new(interp, "load", 0);
-    PMC * const init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
-    int num_subs = VTABLE_elements(interp, init_subs);
+    STRING * const load_str = Parrot_str_new(interp, "load", 0);
+    PMC * const load_subs = Parrot_pf_subs_by_tag(interp, pbc, load_str);
+    int num_subs = VTABLE_elements(interp, load_subs);
     int i;
     for (; i < num_subs; i++) {
-        PMC * const sub = VTABLE_get_pmc_keyed_int(interp, init_subs, i);
+        PMC * const sub = VTABLE_get_pmc_keyed_int(interp, load_subs, i);
+        fprintf(stderr, "executing load sub %d\n", i);
         Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
     }
-    Parrot_pf_mark_packfile_initialized(interp, pbc, init_str);
+    Parrot_pf_mark_packfile_initialized(interp, pbc, load_str);
 }
 
 inline op load_bytecode(out PMC, in STR) :load_file {

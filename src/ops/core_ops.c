@@ -13466,36 +13466,38 @@ Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_load_bytecode_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  pbc = Parrot_pf_load_bytecode_search(interp, SREG(1));
-    STRING  * const  init_str = Parrot_str_new(interp, "load", 0);
-    PMC  * const  init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
-    int   num_subs = VTABLE_elements(interp, init_subs);
+    STRING  * const  load_str = Parrot_str_new(interp, "load", 0);
+    PMC  * const  load_subs = Parrot_pf_subs_by_tag(interp, pbc, load_str);
+    int   num_subs = VTABLE_elements(interp, load_subs);
     int   i;
 
     for (; (i < num_subs); (i++)) {
-        PMC  * const  sub = VTABLE_get_pmc_keyed_int(interp, init_subs, i);
+        PMC  * const  sub = VTABLE_get_pmc_keyed_int(interp, load_subs, i);
 
+        fprintf(stderr, "executing load sub %d\n", i);
         Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
     }
 
-    Parrot_pf_mark_packfile_initialized(interp, pbc, init_str);
+    Parrot_pf_mark_packfile_initialized(interp, pbc, load_str);
     return (opcode_t *)cur_opcode + 2;
 }
 
 opcode_t *
 Parrot_load_bytecode_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  pbc = Parrot_pf_load_bytecode_search(interp, SCONST(1));
-    STRING  * const  init_str = Parrot_str_new(interp, "load", 0);
-    PMC  * const  init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
-    int   num_subs = VTABLE_elements(interp, init_subs);
+    STRING  * const  load_str = Parrot_str_new(interp, "load", 0);
+    PMC  * const  load_subs = Parrot_pf_subs_by_tag(interp, pbc, load_str);
+    int   num_subs = VTABLE_elements(interp, load_subs);
     int   i;
 
     for (; (i < num_subs); (i++)) {
-        PMC  * const  sub = VTABLE_get_pmc_keyed_int(interp, init_subs, i);
+        PMC  * const  sub = VTABLE_get_pmc_keyed_int(interp, load_subs, i);
 
+        fprintf(stderr, "executing load sub %d\n", i);
         Parrot_pcc_invoke_sub_from_c_args(interp, sub, "->");
     }
 
-    Parrot_pf_mark_packfile_initialized(interp, pbc, init_str);
+    Parrot_pf_mark_packfile_initialized(interp, pbc, load_str);
     return (opcode_t *)cur_opcode + 2;
 }
 
