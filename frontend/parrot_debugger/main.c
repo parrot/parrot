@@ -278,6 +278,7 @@ Runs the code, catching exceptions if they are left unhandled.
 static void
 PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
+    ASSERT_ARGS(PDB_run_code)
     UNUSED(argc);
 
     new_runloop_jump_point(interp);
@@ -310,6 +311,7 @@ Prints out the welcome string.
 static void
 PDB_printwelcome(void)
 {
+    ASSERT_ARGS(PDB_printwelcome)
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
         "(Please note: the debugger is currently under reconstruction)\n");
