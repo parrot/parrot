@@ -600,6 +600,7 @@ sub hdecls {
 
     my $hout = '';
     my $name = $self->name;
+    my $lc_name = lc($name);
 
     # generate decls for all vtables in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
