@@ -51,8 +51,6 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 */
 
-void Parrot_alarm_callback(SHIM(int sig_number));
-
 void
 Parrot_alarm_init(void)
 {
