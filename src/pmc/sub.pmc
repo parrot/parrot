@@ -380,7 +380,8 @@ Invokes the subroutine.
 
         /* plain subroutine call
          * create new context, place it in interpreter */
-        PMC *context    = Parrot_pcc_get_signature(INTERP, caller_ctx);
+        PMC *signature  = Parrot_pcc_get_signature(INTERP, caller_ctx);
+        PMC *context    = Parrot_pmc_new(INTERP, enum_class_CallContext);
 
         Parrot_Sub_attributes *sub;
         opcode_t              *pc;
@@ -416,9 +417,6 @@ Invokes the subroutine.
 
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
-        if (PMC_IS_NULL(context))
-            context = Parrot_pmc_new(INTERP, enum_class_CallContext);
-
         Parrot_pcc_set_context(INTERP, context);
         Parrot_pcc_set_caller_ctx(INTERP, context, caller_ctx);
 
@@ -428,7 +426,7 @@ Invokes the subroutine.
 
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
         /* Preserve object */
-        object = Parrot_pcc_get_object(INTERP, context);
+        object = Parrot_pcc_get_object(INTERP, signature);
         Parrot_pcc_init_context(INTERP, context, caller_ctx);
         Parrot_pcc_set_object(INTERP, context, object);
 
