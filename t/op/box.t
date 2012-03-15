@@ -107,7 +107,7 @@ Tests all box operators.
 
 .HLL 'for_test'
 
-.sub anon :anon :init
+.sub anon :anon :tag('init')
   .local pmc interp
   .local pmc cint, myint
   .local pmc cstr, mystr

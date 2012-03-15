@@ -352,6 +352,13 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".tailcall into an NCI" );
 .sub main :main
     say "A"
     $P0 = 'Foo'("C")
+
+    say "D"
+    # TODO: Use this when IMCCompiler.invoke returns a PackfileView instead of Eval
+    #$P1 = $P0.'subs_by_tag'('init')
+    #$P2 = $P1[0]
+    #$P2()
+
     $S0 = typeof $P0
     $P1 = $P0[0]
     $P1 = 'Bar'($P1, "F")
@@ -370,7 +377,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".tailcall into an NCI" );
         .return("G")
     .end
 
-    .sub 'Fie' :init
+    .sub 'Fie' :tag('init')
         say "D"
     .end
 

@@ -11,7 +11,7 @@ use Parrot::Test tests => 2;
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using PMC)" );
 
 .HLL 'misc'
-.sub anon :anon :init
+.sub anon :anon :tag('init')
   .local pmc interp
   .local pmc rpa,rsa
   interp = getinterp
@@ -52,7 +52,7 @@ pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)" );
 .end
 
 .HLL 'misc'
-.sub anon :anon :init
+.sub anon :anon :tag('init')
   .local pmc interp
   .local pmc rpa,stack
   interp = getinterp
