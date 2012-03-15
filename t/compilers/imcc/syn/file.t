@@ -12,7 +12,7 @@ use Test::More;
 
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -176,7 +176,7 @@ system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc' );
 .sub _sub1 :main
     say "sub1"
-    load_bytecode "$temp_pbc"
+    \$P9 = load_bytecode "$temp_pbc"
     say "loaded"
     \$P0 = get_global "_sub2"
     .begin_call
@@ -210,7 +210,7 @@ system_or_die( $PARROT, '-o', $temp_pbc, $temp_pir );
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc, return' );
 .sub _sub1 :main
     say "sub1"
-    load_bytecode "$temp_pbc"
+    \$P9 = load_bytecode "$temp_pbc"
     say "loaded"
     \$P0 = get_global "_sub2"
     .begin_call
@@ -247,7 +247,7 @@ system($PARROT, '-o', $temp_pbc, $temp_pir);
 pir_output_is( <<"CODE", <<'OUT', 'call sub in external pbc with 2 subs' );
 .sub _sub1 :main
     say "sub1"
-    load_bytecode "$temp_pbc"
+    \$P9 = load_bytecode "$temp_pbc"
     say "loaded"
     \$P0 = get_global "_sub2"
     .begin_call
@@ -259,38 +259,6 @@ CODE
 sub1
 loaded
 sub2
-OUT
-
-# write sub2
-open $FOO, '>', "$temp_pir" or die "Can't write $temp_pir: $!\n";
-print $FOO <<'ENDF';
-.sub _sub2
-    print "sub2\n"
-   .begin_return
-   .end_return
-.end
-ENDF
-close $FOO;
-
-# compile it
-
-pir_output_is( <<"CODE", <<'OUT', 'call sub in external pir, return' );
-.sub _sub1 :main
-    say "sub1"
-    load_bytecode "$temp_pir"
-    say "loaded"
-    \$P0 = get_global "_sub2"
-    .begin_call
-    .call \$P0
-    ret:
-    .end_call
-    say "back"
-.end
-CODE
-sub1
-loaded
-sub2
-back
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'call internal sub like external' );
@@ -410,7 +378,7 @@ SKIP:
     pir_output_is( <<'CODE', <<'OUT', 'twice call sub in external pir, return' );
 .sub _sub1
     print "sub1\n"
-    load_bytecode "$temp_pir"
+    \$P9 = load_bytecode "$temp_pir"
     print "loaded\n"
     $P0 = get_global "_sub2"
     .begin_call
@@ -419,7 +387,7 @@ SKIP:
     .end_call
     print "back\n"
     print "sub1 again\n"
-    load_bytecode "$temp_pir"
+    \$P9 = load_bytecode "$temp_pir"
     print "loaded again\n"
     $P0 = get_global "_sub2"
     .begin_call
@@ -459,36 +427,6 @@ SKIP:
 .end
 TEMP_PIR
     }
-
-    pir_output_is( <<"CODE", <<'OUT', 'load PIR from added paths, minding slash' );
-  .include 'iglobals.pasm'
-  .include 'libpaths.pasm'
-
-  .sub main :main
-      .local pmc interp
-      getinterp interp
-
-      .local pmc lib_paths
-      lib_paths = interp[.IGLOBALS_LIB_PATHS]
-
-      .local pmc include_paths
-      include_paths = lib_paths[.PARROT_LIB_PATH_LIBRARY]
-
-      unshift include_paths, '$temp_dir'
-      load_bytecode 'with_slash.pir'
-
-      .local pmc dummy
-      dummy = shift include_paths
-      unshift include_paths, '$td2'
-      load_bytecode 'without_slash.pir'
-
-      with_slash()
-      without_slash()
-  .end
-CODE
-with_slash() called!
-without_slash() called!
-OUT
 }
 unlink(@temp_files);
 $ended_ok = 1;
