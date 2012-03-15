@@ -425,8 +425,10 @@ Invokes the subroutine.
             Parrot_pcc_free_registers(INTERP, context);
 
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
-        /* Preserve object */
-        object = Parrot_pcc_get_object(INTERP, signature);
+        /* Preserve object. If any. XXX We should always have it... */
+        if (!PMC_IS_NULL(signature))
+            object = Parrot_pcc_get_object(INTERP, signature);
+
         Parrot_pcc_init_context(INTERP, context, caller_ctx);
         Parrot_pcc_set_object(INTERP, context, object);
 
