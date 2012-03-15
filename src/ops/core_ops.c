@@ -13767,7 +13767,7 @@ opcode_t *
 Parrot_set_args_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  raw_args = CUR_OPCODE;
     PMC  * const  signature = PCONST(1);
-    PMC  * const  call_sig = Parrot_pcc_build_sig_object_from_op(interp, PMCNULL, signature, raw_args);
+    PMC  * const  call_sig = Parrot_pcc_build_sig_object_from_op(interp, CURRENT_CONTEXT(interp), signature, raw_args);
     INTVAL   argc;
 
     GETATTR_FixedIntegerArray_size(interp, signature, argc);

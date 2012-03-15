@@ -479,7 +479,7 @@ op set_args(inconst PMC) :flow {
     opcode_t * const raw_args = CUR_OPCODE;
     PMC * const signature = $1;
     PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
-            PMCNULL, signature, raw_args);
+            CURRENT_CONTEXT(interp), signature, raw_args);
     INTVAL argc;
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
