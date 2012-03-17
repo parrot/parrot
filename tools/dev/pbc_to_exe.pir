@@ -489,7 +489,7 @@ END_OF_FUNCTION
 
     .local int size
 
-    print outfh, "const char * program_code =\n"
+    print outfh, "const char program_code[] =\n"
     print outfh, '"'
     size = 0
 
