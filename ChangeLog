@@ -2,7 +2,14 @@
     - Core
         + Winxed snapshot updated to 1.6.devel 44a04cfa7b
         + Improved the detection of Clang-ish compilers during configuration
+        + Fixed a possible segfault bug when reading packfiles with no
+         constants or main_sub
+        + By default, Parrot has now elevates these GCC warnings to errors
+          during compile-time:
+            implicit-function-declaration, undef, missing-braces,
+            nested externs, old-style-definition, strict-prototypes,
     - Documentation
+        + New document on pushing new release docs to parrot.github.com
     - Tests
     - Community
         + Parrot was accepted to Google Summer of Code 2012!
