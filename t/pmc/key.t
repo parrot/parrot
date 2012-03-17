@@ -184,7 +184,7 @@ code
 .HLL '_Tcl'
 .namespace []
 
-.sub prepare_lib :init
+.sub prepare_lib :tag('init')
   $P0 = get_class 'Sub'
   $P1 = subclass $P0, 'TclProc'
   $P1 = new ['ResizablePMCArray']

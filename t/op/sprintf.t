@@ -62,7 +62,16 @@ tag C<all> is allowed for todo tests that should fail on any system.
 #.loadlib 'io_ops'
 
 .sub main :main
-    load_bytecode 'Test/Builder.pbc'
+    $P9 = load_bytecode 'Test/Builder.pbc'
+    $P10 = $P9.'subs_by_tag'('load')
+    $P10 = iter $P10
+  load_loop_top:
+    unless $P10 goto load_loop_bottom
+    $P11 = shift $P10
+    $P11()
+    goto load_loop_top
+  load_loop_bottom:
+
     .include "iglobals.pasm"
     .include "sysinfo.pasm"
 

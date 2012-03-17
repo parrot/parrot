@@ -19,6 +19,9 @@ t/op/load_bytecode.t - loading bytecode tests
 
 Tests the C<load_bytecode> operation.
 
+TODO: Can we find a way to test this stuff without regex matching on error
+message literals?
+
 =cut
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on NULL" );
@@ -26,7 +29,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on NULL" );
     load_bytecode $S0
 .end
 CODE
-/no file name/
+/No file name/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on directory" );
@@ -34,7 +37,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on directory" );
     load_bytecode 't'
 .end
 CODE
-/t' is a directory/
+/is not a regular file/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on non-existent file" );
@@ -42,7 +45,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "load_bytecode on non-existent file
         load_bytecode 'no_file_by_this_name'
 .end
 CODE
-/"load_bytecode" couldn't find file 'no_file_by_this_name'/
+/Cannot find bytecode file/
 OUTPUT
 
 # Local Variables:

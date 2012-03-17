@@ -535,7 +535,12 @@ Parrot_api_load_language(Parrot_PMC interp_pmc, ARGIN(Parrot_String lang),
 {
     ASSERT_ARGS(Parrot_api_load_language)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *pbc = Parrot_pf_load_language(interp, lang);
+    PMC * const pfpbc = Parrot_pf_load_language(interp, lang);
+    PARROT_ASSERT(pfpbc);
+    *pbc = pfpbc;
+    printf("LOAD LANGUAGE: pbc: %p, *pbc: %p\n", pbc, *pbc);
+    PARROT_ASSERT(*pbc);
+    PARROT_ASSERT(pbc);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

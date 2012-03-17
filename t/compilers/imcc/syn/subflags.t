@@ -18,7 +18,7 @@ test flags on PIR subs
 .namespace ['FlagTest']
 
 .sub 'main' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace

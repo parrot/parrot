@@ -169,6 +169,7 @@ Parrot_api_legacy_trigger_init_subs(Parrot_PMC interp_pmc, Parrot_PMC pbc)
     ASSERT_ARGS(Parrot_api_legacy_trigger_init_subs)
     EMBED_API_CALLIN(interp_pmc, interp)
 
+    PARROT_ASSERT(pbc);
     STRING * const init_str = Parrot_str_new(interp, "init", 0);
     PMC * const init_subs = Parrot_pf_subs_by_tag(interp, pbc, init_str);
     int i = 0;

@@ -1803,8 +1803,11 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
             "Cannot find language %Ss", lang_name);
 
-    if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
-        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+    if (VTABLE_exists_keyed_str(interp, pbc_cache, path)) {
+        PMC * const p = VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+        PARROT_ASSERT(p);
+        return p;
+    }
     else {
         INTVAL name_length;
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
@@ -1813,8 +1816,10 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
         add_language_search_paths(interp, lang_name, path);
 
+        PARROT_ASSERT(pfview);
         return pfview;
     }
+    fprintf(stderr, "HEREHEREHERE\n");
 }
 
 static void
@@ -1854,21 +1859,26 @@ PMC *
 Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
 {
     ASSERT_ARGS(Parrot_pf_load_bytecode_search)
-    const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
-    PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_LOADED_PBCS);
-    STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
-    if (STRING_IS_NULL(path))
+    if (STRING_IS_NULL(file))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-            "Cannot find library %Ss", file);
-
-    if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
-        return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+            "No file name to load");
     else {
-        PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
-        PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
-        return pfview;
+        const enum_runtime_ft file_type = PARROT_RUNTIME_FT_PBC;
+        PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,
+                interp->iglobals, IGLOBALS_LOADED_PBCS);
+        STRING * const path = Parrot_locate_runtime_file_str(interp, file, file_type);
+        if (STRING_IS_NULL(path))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                "Cannot find bytecode file '%Ss'", file);
+
+        if (VTABLE_exists_keyed_str(interp, pbc_cache, path))
+            return VTABLE_get_pmc_keyed_str(interp, pbc_cache, path);
+        else {
+            PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
+            PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
+            VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
+            return pfview;
+        }
     }
 }
 

@@ -111,6 +111,7 @@ int main(int argc, const char **argv)
 
     Parrot_api_string_import_ascii(interpmc, "PIR", &s_teststr);
     Parrot_api_load_language(interpmc, s_teststr, &lang_pbc);
+    PARROT_ASSERT(lang_pbc);
     Parrot_api_legacy_trigger_init_subs(interpmc, lang_pbc);
 
     Parrot_api_get_compiler(interpmc, s_teststr, &apmc);

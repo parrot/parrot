@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 15;
 
 =head1 NAME
 
@@ -254,19 +254,25 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string" );
 .sub main :main
 
   .local pmc f1, f2
-  .local pmc io
+  .local pmc io, pbc, subs
   f1 = compi("foo_1", "hello from foo_1")
   \$S0 = f1
   io = new ['FileHandle']
   io.'open'("$temp_pbc", 'w')
   print io, \$S0
   io.'close'()
-  load_bytecode "$temp_pbc"
+  pbc = load_bytecode "$temp_pbc"
+  subs = pbc.'subs_by_tag'('load')
+  subs = subs[0]
+  subs()
   f2 = compi("foo_2", "hello from foo_2")
   io.'open'("$temp2_pbc", 'w')
   print io, f2
   io.'close'()
-  load_bytecode "$temp2_pbc"
+  pbc = load_bytecode "$temp2_pbc"
+  subs = pbc.'subs_by_tag'('load')
+  subs = subs[0]
+  subs()
 .end
 
 .sub compi
@@ -296,74 +302,30 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "check loaded lib hash" );
 .sub main :main
-  load_bytecode "$temp_pbc"
-  load_bytecode "$temp2_pbc"
+  .local pmc pbc, subs
+  pbc = load_bytecode "$temp_pbc"
+  subs = pbc.'subs_by_tag'('load')
+  subs = subs[0]
+  subs()
+  pbc = load_bytecode "$temp2_pbc"
+  subs = pbc.'subs_by_tag'('load')
+  subs = subs[0]
+  subs()
   .local pmc pbc_hash, interp
   .include 'iglobals.pasm'
   interp = getinterp
-  pbc_hash = interp[.IGLOBALS_PBC_LIBS]
+  pbc_hash = interp[.IGLOBALS_LOADED_PBCS]
   \$I0 = elements pbc_hash
-  print \$I0
-  print ' '
-  \$I1 = exists pbc_hash['$temp_name']
-  print \$I1
-  print ' '
-  \$I2 = exists pbc_hash['$temp2_name']
-  print \$I2
-  print ' '
-  \$S0 = pbc_hash['$temp2_name']
-  # print \$S0          not portable
-  \$I3 = index \$S0, '$temp2_name'
-  \$I4 = isgt \$I3, -1
-  say \$I4
+  say \$I0
 .end
 CODE
 hello from foo_1
 hello from foo_2
-2 1 1 1
+2
 OUTPUT
 
 (my $fh, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
 close $fh;
-
-pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
-.sub main :main
-  .local pmc f1, f2
-  .local pmc io, os
-  f1 = compi("foo_1", "hello from foo_1")
-  \$S0 = f1
-  io = new ['FileHandle']
-  io.'open'("$temp_pbc", 'w')
-  print io, \$S0
-  io.'close'()
-  load_bytecode "$temp_pbc"
-  f2 = compi("foo_2", "hello from foo_2")
-  io.'open'("$temp_pbc", 'w')
-  print io, f2
-  io.'close'()
-  load_bytecode "$temp_pbc"
-.end
-
-.sub compi
-  .param string name
-  .param string printme
-  .local string code
-  .local pmc pir_compiler, retval
-  pir_compiler = compreg "PIR"
-  code = ".sub "
-  code .= name
-  code .= " :tag('load')\\n"
-  code .= "print \\""
-  code .= printme
-  code .= "\\\\n\\"\\n"
-  code .= ".end\\n"
-
-  retval = pir_compiler(code)
-  .return (retval)
-.end
-CODE
-hello from foo_1
-OUTPUT
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
@@ -542,38 +504,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err" );
 EPIR
      $P0 = $P2($S0)
      $P0()
-     end
-handler:
-     print "ok\n"
-.end
-CODE
-ok
-OUTPUT
-
-my ($TEMP, $filename) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-
-print $TEMP <<PIR;
-  .sub foo
-     print a typo
-  .end
-PIR
-close $TEMP;
-
-pir_error_output_like( <<"CODE", <<'OUTPUT', "compile err in load_bytecode" );
-.sub main :main
-     load_bytecode "$filename"
-     print "never\\n"
-     end
-.end
-CODE
-/undefined identifier/
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err in load_bytecode" );
-.sub main :main
-     push_eh handler
-     load_bytecode "$filename"
-     print "never\n"
      end
 handler:
      print "ok\n"
