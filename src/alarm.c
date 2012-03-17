@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,6 +24,9 @@ static volatile FLOATVAL alarm_set_to = 0.0;
 #else
 #  include <sys/time.h>
 #  include <signal.h>
+#  ifdef PARROT_HAS_HEADER_PTHREAD
+#    include <pthread.h>
+#  endif
 #endif
 #include <errno.h>
 
