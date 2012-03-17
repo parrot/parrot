@@ -503,14 +503,12 @@ To make a monthly release schedule possible, we spread the burden of releases
 across multiple release managers. Releases are scheduled for the 3rd Tuesday of
 each month.
 
-The starred releases are Parrot's quarterly supported releases, see
+To learn more about our support policy, see
 F<docs/project/support_policy.pod>.
 
 The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
-
-Versions with an asterisk (*) are supported releases:
 
     - Mar 20, 2012 - 4.2.0   - dukeleto
     - Apr 17, 2012 - 4.3.0   - cotto
