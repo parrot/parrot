@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 RELEASE MANAGER GUIDE
 
@@ -519,7 +519,7 @@ Versions with an asterisk (*) are supported releases:
     - Jul 17, 2012 - 4.6.0   - ??
     - Aug 21, 2012 - 4.7.0   - ??
     - Sep 18, 2012 - 4.8.0   - ??
-    - Oct 16, 2012 - 4.9.0   - ??
+    - Oct 16, 2012 - 4.9.0   - dukeleto
     - Nov 20, 2012 - 4.10.0  - ??
     - Dec 18, 2012 - 4.11.0  - ??
 =cut
