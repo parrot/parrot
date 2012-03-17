@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 45;
 
 =head1 NAME
 
@@ -204,38 +204,6 @@ CODE
 ok 1
 ok 2
 -42
-OUTPUT
-
-my ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-.sub Integer_divide_Integer
-    .param pmc left
-    .param pmc right
-    .param pmc lhs
-    lhs = 42
-    .return(lhs)
-.end
-EOF
-close $TEMP;
-
-pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub", todo => 'TT #452' );
-.sub _main :main
-    .local pmc divide
-    load_bytecode "$temp_pir"
-    divide = get_global "Integer_divide_Integer"
-    add_multi "divide", "Integer,Integer,Integer", divide
-
-    \$P0 = new ['Integer']
-    \$P1 = new ['Integer']
-    \$P2 = new ['Integer']
-    \$P1 = 10
-    \$P2 = 3
-    \$P0 = \$P1 / \$P2
-    say \$P0
-.end
-CODE
-42
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', "first dynamic MMD call" );
@@ -836,41 +804,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses, add" );
     d = new ['Integer']
     d = 2
     .return(d)
-.end
-CODE
-62
-2
-OUTPUT
-
-($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-.namespace ["AInt"]
-.sub add :multi(AInt, Integer, PMC)
-    .param pmc l
-    .param pmc r
-    .param pmc d
-    print l
-    print r
-    print "\n"
-    d = new ['Integer']
-    d = 2
-    .return(d)
-.end
-EOF
-close $TEMP;
-
-pir_output_is( <<"CODE", <<'OUTPUT', "override builtin add" );
-.sub main :main
-    load_bytecode "$temp_pir"
-    \$P0 = subclass "Integer", "AInt"
-    \$P0 = new ['AInt']
-    \$P1 = new ['Integer']
-    set \$P0, 6
-    set \$P1, 2
-
-    \$P2 = add \$P0, \$P1
-    say \$P2
 .end
 CODE
 62

@@ -31,7 +31,7 @@
 .sub 'test_interp_same_after_compile'
     $P0 = getinterp
     $P2 = compreg "PIR"
-    $S0 = ".sub __init :anon :init\nok(1, 'init function executed on demand')\n.end"
+    $S0 = ".sub __init :anon :tag('init')\nok(1, 'init function executed on demand')\n.end"
     $P5 = $P2.'compile'($S0)
     $P1 = getinterp
     is_same($P0, $P1, "interp['packfile'] does not change over IMCC invocation")
@@ -102,7 +102,7 @@
     $P4()
 
     $P2 = compreg "PIR"
-    $S0 = ".sub __init :anon :init\nok(1, 'init function executed on demand')\n.end"
+    $S0 = ".sub __init :anon :tag('init')\nok(1, 'init function executed on demand')\n.end"
     $P5 = $P2.'compile'($S0)
     $P3 = $P5.'subs_by_tag'("init")
     $I0 = elements $P3
@@ -127,27 +127,22 @@
     $I0 = elements $P2
     is($I0, 2, "Can get subs marked 'tag-c'")
 
-    # For upgrade, verify that :init is the same as :tag("init")
     $P2 = compreg "PIR"
     $S0 = <<'__EOCODE__'
 
-.sub __init_old :init
-    .return("init_old")
-.end
+        .sub __init_tag :tag("init")
+            .return("init_tag")
+        .end
 
-.sub __init_tag :tag("init")
-    .return("init_tag")
-.end
-
-.sub __not_init :tag("something-else")
-    .return("not_init")
-.end
+        .sub __not_init :tag("something-else")
+            .return("not_init")
+        .end
 __EOCODE__
 
     $P1 = $P2.'compile'($S0)
     $P3 = $P1.'subs_by_tag'("init")
     $I0 = elements $P3
-    is($I0, 2)
+    is($I0, 1)
 .end
 
 .sub 'test_method_serialized_size'

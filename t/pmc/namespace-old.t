@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 32;
 use Parrot::Config;
 
 =head1 NAME
@@ -28,49 +28,6 @@ my $temp_b = "temp_b";
 END {
     unlink( "$temp_a.pir", "$temp_a.pbc", "$temp_b.pir", "$temp_b.pbc" );
 }
-
-open my $S, '>', "$temp_a.pir" or die "Can't write $temp_a.pir";
-print $S <<'EOF';
-.HLL "Foo"
-.namespace ["Foo_A"]
-.sub loada :tag('load')
-    $P0 = get_global ["Foo_A"], "A"
-    print "ok 1\n"
-    load_bytecode "temp_b.pbc"
-.end
-
-.sub A
-.end
-EOF
-close $S;
-
-open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
-print $S <<'EOF';
-.namespace ["Foo_B"]
-.sub loadb :tag('load')
-    $P0 = get_global ["Foo_B"], "B"
-    print "ok 2\n"
-.end
-
-.sub B
-.end
-EOF
-
-close $S;
-
-system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_a.pbc $temp_a.pir");
-system(".$PConfig{slash}parrot$PConfig{exe} -o $temp_b.pbc $temp_b.pir");
-
-pir_output_is( <<'CODE', <<'OUTPUT', "HLL and load_bytecode - #38888" );
-.sub main :main
-    load_bytecode "temp_a.pbc"
-    print "ok 3\n"
-.end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "HLL and vars" );
 # initial storage of _tcl global variable...
@@ -115,47 +72,6 @@ CODE
 tcl
 OUTPUT
 
-{
-    my $temp_a = "temp_a.pir";
-
-    END {
-        unlink($temp_a);
-    }
-
-    open $S, '>', $temp_a or die "Can't write $temp_a";
-    print $S <<'EOF';
-.HLL 'eek'
-
-.sub foo :tag('load') :anon
-  $P1 = new ['String']
-  $P1 = "3.14\n"
-  set_global '$whee', $P1
-.end
-
-.sub bark
-  $P0 = get_global '$whee'
-  print $P0
-.end
-EOF
-    close $S;
-
-    pir_output_is( <<'CODE', <<'OUTPUT', ":anon subs still get default namespace" );
-.HLL 'cromulent'
-
-.sub what :main
-   load_bytecode 'temp_a.pir'
-  .local pmc var
-   var = get_root_namespace
-   var = var['eek']
-   var = var['bark']
-
-    var()
-.end
-CODE
-3.14
-OUTPUT
-}
-
 SKIP:
 {
     skip( "immediate test, doesn't with --run-pbc", 1 )
@@ -181,111 +97,6 @@ CODE
 ok
 OUTPUT
 }
-
-open $S, '>', "$temp_b.pir" or die "Can't write $temp_b.pir";
-print $S <<'EOF';
-.HLL 'B'
-.sub b_foo
-    print "b_foo\n"
-.end
-EOF
-close $S;
-
-pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with array" );
-.HLL 'A'
-.sub main :main
-    a_foo()
-    load_bytecode "$temp_b.pir"
-    .local pmc nsr, nsa, nsb, ar
-    ar = new ['ResizableStringArray']
-    push ar, "b_foo"
-    nsr = get_root_namespace
-    nsa = nsr['a']
-    nsb = nsr['b']
-    nsb."export_to"(nsa, ar)
-    b_foo()
-.end
-
-.sub a_foo
-    print "a_foo\\n"
-.end
-CODE
-a_foo
-b_foo
-OUTPUT
-
-pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (empty value)" );
-.HLL 'A'
-.sub main :main
-    a_foo()
-    load_bytecode "$temp_b.pir"
-    .local pmc nsr, nsa, nsb, ar
-    ar = new ['Hash']
-    ar["b_foo"] = ""
-    nsr = get_root_namespace
-    nsa = nsr['a']
-    nsb = nsr['b']
-    nsb."export_to"(nsa, ar)
-    b_foo()
-.end
-
-.sub a_foo
-    print "a_foo\\n"
-.end
-CODE
-a_foo
-b_foo
-OUTPUT
-
-pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (null value)" );
-.HLL 'A'
-.sub main :main
-    a_foo()
-    load_bytecode "$temp_b.pir"
-    .local pmc nsr, nsa, nsb, ar, nul
-    nul = new ['Null']
-    ar  = new ['Hash']
-    ar["b_foo"] = nul
-    nsr = get_root_namespace
-    nsa = nsr['a']
-    nsb = nsr['b']
-    nsb."export_to"(nsa, ar)
-    b_foo()
-.end
-
-.sub a_foo
-    print "a_foo\\n"
-.end
-CODE
-a_foo
-b_foo
-OUTPUT
-
-pir_error_output_like( <<"CODE", <<'OUTPUT', "export_to -- success with hash (and value)" );
-.HLL 'A'
-.sub main :main
-    a_foo()
-    load_bytecode "$temp_b.pir"
-    .local pmc nsr, nsa, nsb, ar
-    ar = new ['Hash']
-    ar["b_foo"] = "c_foo"
-    nsr = get_root_namespace
-    nsa = nsr['a']
-    nsb = nsr['b']
-    nsb."export_to"(nsa, ar)
-    c_foo()
-    b_foo()
-.end
-
-.sub a_foo
-    print "a_foo\\n"
-.end
-CODE
-/^a_foo
-b_foo
-Could not find sub b_foo/
-OUTPUT
-
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_parent" );
 .sub main :main
