@@ -1,5 +1,11 @@
 2012-03-20    release 4.2.0
+    - API Changes
+        + The signature of getprop was changed from (PMC,String,PMC) to
+          (PMC, PMC,String) for consistency
     - Core
+        + Parrot Calling Conventions (pcc) now reuses Continuation PMCs
+          internally, which reduces GC work by 25% and improves
+          the fib.pir benchmark by 6%
         + Winxed snapshot updated to 1.6.devel 44a04cfa7b
         + Improved the detection of Clang-ish compilers during configuration
         + Fixed a possible segfault bug when reading packfiles with no
@@ -8,6 +14,11 @@
           during compile-time:
             implicit-function-declaration, undef, missing-braces,
             nested externs, old-style-definition, strict-prototypes,
+        + The OS Dynamic PMC now has separate functions to unlink a file
+          and remove an empty directory (rmdir)
+        + Fix building on Cygwin due to an improperly named DLL file
+        + Various small bug fixes pointed out by static and dynamic analysis
+          tools
     - Documentation
         + New document on pushing new release docs to parrot.github.com
     - Tests
