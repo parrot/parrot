@@ -19,6 +19,13 @@
         + Fix building on Cygwin due to an improperly named DLL file
         + Various small bug fixes pointed out by static and dynamic analysis
           tools
+    - Branches
+        + Work on M0 continues now in the m0 branch, which contains both
+          implementations (currently C and Perl) and specification.
+        + Good progress has been made on the threads branch which builds
+          on the green_threads branch. This gets Parrot much closer to
+          being able to utilize multiple CPU cores seemlessly. More details
+          at http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
     - Documentation
         + New document on pushing new release docs to parrot.github.com
     - Tests
