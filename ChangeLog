@@ -1,8 +1,11 @@
 2012-03-20    release 4.2.0
     - Core
+        + Winxed snapshot updated to 1.6.devel 44a04cfa7b
+        + Improved the detection of Clang-ish compilers during configuration
     - Documentation
     - Tests
     - Community
+        + Parrot was accepted to Google Summer of Code 2012!
 
 2012-02-21    release 4.1.0
     - Core
