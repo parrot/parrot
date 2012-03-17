@@ -1,5 +1,6 @@
 #! parrot
-# Copyright (C) 2009-2011, Parrot Foundation.
+
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,7 +47,6 @@ Compile bytecode to executable.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/api.h"
-const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);

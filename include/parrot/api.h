@@ -1,5 +1,5 @@
 /* api.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Parrot's external embedding API. This functionality is only to be used
  *     by embedding applications, and only this functionality may be used by
@@ -16,6 +16,16 @@
 #include "parrot/core_types.h"
 
 typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+const void* get_program_code(void);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+size_t get_program_code_size(void);
 
 /* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
 PARROT_EXPORT

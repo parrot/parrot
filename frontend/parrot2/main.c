@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2007-2011, Parrot Foundation.
+
+Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,8 +35,6 @@ struct init_args_t {
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
-extern const unsigned char * get_program_code(void);
-size_t get_program_code_size(void);
 
 /* HEADERIZER HFILE: none */
 
