@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
 
 package init::hints::mswin32;
 
@@ -19,10 +19,10 @@ sub runstep {
     # We do one bit of its work early here, because we need the result now.
     $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
-    my $is_msvc  = $cc =~ m/\bcl(?:\.exe)?/i;
-    my $is_intel = $cc =~ m/\bicl(?:\.exe)?/i;
-    my $is_mingw = $cc =~ m/\bgcc(?:\.exe)?/i;
-    my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/i;
+    my $is_msvc  = $cc =~ m/\bcl\b/i;
+    my $is_intel = $cc =~ m/\bicl\b/i;
+    my $is_mingw = $cc =~ m/\b(?:gcc|g\+\+|clang)\b/i;
+    my $is_bcc   = $cc =~ m/\bbcc32\b/i;
 
     $conf->data->set(
         win32  => 1,
