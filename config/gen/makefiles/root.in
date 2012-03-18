@@ -865,10 +865,10 @@ runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
 	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
 
-frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
+frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir
 	$(MINIPARROT) -Iruntime/parrot/include -o frontend/parrot2/prt0.pbc frontend/parrot2/prt0.pir
 
-frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir $(MINIPARROT)
+frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir
 	$(MINIPARROT) frontend/parrot2/build.pir frontend/parrot2/prt0.pbc
 
 frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c \
