@@ -920,7 +920,7 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
-$(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
+$(MINIPARROT) : frontend/parrot/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
 	src/null_config$(O) src/longopt$(O)
 	$(LINK) @ld_out@$@ frontend/parrot/main$(O) src/null_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
