@@ -28,10 +28,6 @@ Functions controlling Parrot's profiling runcore.
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_namespace.h"
 
-#ifdef WIN32
-#  define getpid _getpid
-#endif
-
 #define PPROF_VERSION 2
 
 #define code_start interp->code->base.data

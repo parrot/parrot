@@ -25,10 +25,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-#ifdef WIN32
-#  define getpid _getpid
-#endif
-
 /* HEADERIZER HFILE: include/parrot/runcore_subprof.h */
 
 /* HEADERIZER BEGIN: static */

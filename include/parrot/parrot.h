@@ -53,6 +53,11 @@
 #  include <unistd.h>
 #endif /* PARROT_HAS_HEADER_UNISTD */
 
+#ifdef PARROT_HAS_HEADER_PROCESS
+#  include <process.h>
+#  define getpid _getpid
+#endif /* PARROT_HAS_HEADER_PROCESS */
+
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
 #  ifndef MAP_FAILED
