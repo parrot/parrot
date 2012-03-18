@@ -484,21 +484,9 @@ which in this example is a FixedIntegerArrray.
 
 =item :postcomp
 
-Execute immediately after being compiled, but only if the subroutine is in the
-initial file (i.e. not in PIR compiled as result of a C<load_bytecode>
-instruction from another file).
+Execute immediately after being compiled.
 
-As an example, suppose file C<main.pir> contains:
-
-=begin PIR
-
-    .sub main
-        load_bytecode 'foo.pir'
-    .end
-
-=end PIR
-
-and the file C<foo.pir> contains:
+As an example, the file C<foo.pir> contains:
 
 =begin PIR
 
@@ -512,10 +500,13 @@ and the file C<foo.pir> contains:
 
 =end PIR
 
-Executing C<foo.pir> will run both C<foo> and C<bar>.  On the other hand,
-executing C<main.pir> will run only C<foo>.  If C<foo.pir> is compiled to
-bytecode, only C<foo> will be run, and loading C<foo.pbc> will not run either
-C<foo> or C<bar>.
+Executing C<foo.pir> will run both C<foo> and C<bar>. If C<foo.pir> is compiled
+to bytecode both subs will be executed during compilation. If the resulting
+bytecode is loaded by another program, neither Sub will rub.
+
+Note that C<:immediate> and C<:postcomp> routines execute together in IMCC, and
+may execute in any order. Other compiler frontends may have different semantics
+for these flags or may remove them all together.
 
 =item :method
 

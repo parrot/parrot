@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 78;
+use Parrot::Test tests => 52;
 use Parrot::Config;
 
 =head1 NAME
@@ -169,66 +169,8 @@ in next sub
 back
 OUTPUT
 
-my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-print $TEMP <<'EOF';
-  .pcc_sub _sub1:
-  say "in sub1"
-  end
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    defined I0, P0
-    if I0, ok1
-    print "not "
-ok1:
-    say "found sub"
-    invokecc P0
-    say "never"
-    end
-CODE
-main
-loaded
-found sub
-in sub1
-OUTPUT
-
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub _sub1:
-  say "in sub1"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub, ret" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    defined I0, P0
-    if I0, ok1
-    print "not "
-ok1:
-    say "found sub"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-loaded
-found sub
-in sub1
-back
-OUTPUT
-
+my $TEMP;
+my $temp_pasm;
 ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $TEMP <<'EOF';
@@ -240,101 +182,19 @@ print $TEMP <<'EOF';
   returncc
 EOF
 close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call different subs, ret" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    defined I0, P0
-    if I0, ok1
-    print "not "
-ok1:
-    say "found sub1"
-    set P10, P0
-    invokecc P0
-    say "back"
-    get_global P0, "_sub2"
-    defined I0, P0
-    if I0, ok2
-    print "not "
-ok2:
-    say "found sub2"
-    invokecc P0
-    say "back"
-    set P0, P10
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-loaded
-found sub1
-in sub1
-back
-found sub2
-in sub2
-back
-in sub1
-back
-OUTPUT
-
 my (undef, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
-
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode Sx" );
 .sub main :main
-    \$S0 = '$temp_pasm'
-    load_bytecode \$S0
-    _sub1()
     \$S0 = '$temp_pbc'
-    load_bytecode \$S0
+    \$P0 = load_bytecode \$S0
+    _sub1()
     _sub2()
 .end
 CODE
 in sub1
 in sub2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode PBC call different subs, ret" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    defined I0, P0
-    if I0, ok1
-    print "not "
-ok1:
-    say "found sub1"
-    set P10, P0
-    invokecc P0
-    say "back"
-    get_global P0, "_sub2"
-    defined I0, P0
-    if I0, ok2
-    print "not "
-ok2:
-    say "found sub2"
-    invokecc P0
-    say "back"
-    set P0, P10
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-loaded
-found sub1
-in sub1
-back
-found sub2
-in sub2
-back
-in sub1
-back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "equality of closures" );
@@ -402,210 +262,6 @@ CODE
 ok
 OUT
 
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub :tag('load') _sub1:
-  say "in sub1"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load')' );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "back"
-    end
-CODE
-main
-in sub1
-back
-OUTPUT
-
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub _error:
-  say "error"
-  .pcc_sub :tag('load') _sub1:
-  say "in sub1"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') second sub' );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "back"
-    end
-CODE
-main
-in sub1
-back
-OUTPUT
-
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') in pbc' );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pbc"
-    say "back"
-    end
-CODE
-main
-in sub1
-back
-OUTPUT
-
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub :tag('load') _sub1:
-  say "in sub1"
-  returncc
-  .pcc_sub _sub2:
-  print "in sub2\n"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub2"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub1
-loaded
-in sub2
-back
-OUTPUT
-
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first in pbc" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pbc"
-    say "loaded"
-    get_global P0, "_sub2"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub1
-loaded
-in sub2
-back
-OUTPUT
-
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub _sub1:
-  say "in sub1"
-  returncc
-  .pcc_sub :tag('load') _sub2:
-  print "in sub2\n"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub2
-loaded
-in sub1
-back
-OUTPUT
-
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second in pbc" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pbc"
-    say "loaded"
-    get_global P0, "_sub1"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub2
-loaded
-in sub1
-back
-OUTPUT
-
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-  .pcc_sub :tag('load') _sub1:
-  say "in sub1"
-  returncc
-  .pcc_sub :tag('load') _sub2:
-  print "in sub2\n"
-  returncc
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "loaded"
-    get_global P0, "_sub1"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub1
-in sub2
-loaded
-in sub1
-back
-OUTPUT
-
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm );
-
-pasm_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both in pbc" );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pbc"
-    say "loaded"
-    get_global P0, "_sub1"
-    invokecc P0
-    say "back"
-    end
-CODE
-main
-in sub1
-in sub2
-loaded
-in sub1
-back
-OUTPUT
-
 pasm_output_is( <<'CODE', <<'OUTPUT', ':main pragma' );
 .pcc_sub _first:
     print "first\n"
@@ -660,77 +316,12 @@ CODE
 /too few positional arguments: 1 passed, 2 \(or more\) expected/
 OUTPUT
 
-($TEMP, $temp_pasm) = create_tempfile(UNLINK => 1);
-print $TEMP <<'EOF';
-.sub _sub1 :tag('load')
-  say "in sub1"
-  returncc
-.end
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') first sub - pir' );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "back"
-    end
-CODE
-main
-in sub1
-back
-OUTPUT
 
 ($TEMP, $temp_pasm) = create_tempfile(UNLINK => 1);
 print $TEMP <<'EOF';
 .sub _foo
   print "error\n"
 .end
-
-# :tag('load') or other pragmas are only evaluated on the first
-# instruction of a subroutine
-.sub _sub1 :tag('load')
-  say "in sub1"
-  returncc
-.end
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :tag('load') second sub - pir' );
-.pcc_sub :main main:
-    say "main"
-    load_bytecode "$temp_pasm"
-    say "back"
-    end
-CODE
-main
-in sub1
-back
-OUTPUT
-
-($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
-
-print $TEMP <<'EOF';
-.sub _foo
-  print "error\n"
-.end
-.sub _sub1
-  say "in sub1"
-  returncc
-.end
-EOF
-close $TEMP;
-
-pasm_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode no :tag('load') - pir' );
-.pcc_sub :main _main:
-    say "main"
-    load_bytecode "$temp_pir"
-    say "back"
-    end
-CODE
-main
-back
-OUTPUT
 
 pir_output_like( <<'CODE', '/Stringifying an Undef PMC/', 'warn on in main' );
 .sub _main :main
@@ -966,31 +557,6 @@ print $TEMP <<'EOF';
 EOF
 close $TEMP;
 
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $l1_pbc, $l1_pir);
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $l2_pbc, $l2_pir);
-
-pir_output_is( <<"CODE", <<'OUTPUT', 'multiple :tag('load')' );
-.sub main :main
-    say "main 1"
-    load_bytecode "$l1_pir"
-    load_bytecode "$l2_pir"
-    say "main 2"
-    load_bytecode "$l1_pbc" # these have to be ignored
-    load_bytecode "$l2_pbc"
-    say "main 3"
-.end
-CODE
-main 1
-l11
-l12
-l21
-l22
-main 2
-main 3
-OUTPUT
-
-unlink( $l1_pbc, $l2_pbc );
-
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
 .sub make_phi :immediate :anon
     $N0 = sqrt 5
@@ -1132,33 +698,6 @@ CODE
 /Stringifying an Undef PMC/
 OUTPUT
 
-SKIP: {
-    skip ':immediate/:postcomp only happen on compilation', 1 if $testr;
-    pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
-.sub main :main
-    say 'main'
-.end
-.sub pc :postcomp
-    say 'pc'
-.end
-.sub im :immediate
-    say 'im'
-.end
-.sub pc2 :postcomp
-    say 'pc2'
-.end
-.sub im2 :immediate
-    say 'im2'
-.end
-CODE
-im
-im2
-pc
-pc2
-main
-OUTPUT
-}
-
 # see also #38964
 pir_output_is( <<'CODE', <<'OUTPUT', 'unicode sub names, compilation' );
 .sub utf8:"\u7777" :main
@@ -1239,7 +778,7 @@ pir_error_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null
 CODE
 
 pir_output_is( <<'CODE', <<'OUTPUT', ":init" );
-.sub a :init
+.sub a :tag('init')
     print "in inited\n"
 .end
 
@@ -1608,19 +1147,19 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'use of :init sub pointed to by a :outer in compreg' );
 .sub 'comptest' :main
     $S0 = <<'PIR'
-.sub 'MAIN' :main
-    say 'MAIN'
-    .return ()
-.end
-.namespace ['XYZ']
-.sub 'BEGIN' :init
-    say 'XYZ::BEGIN'
-    .return ()
-.end
-.sub 'foo' :outer('BEGIN')
-    say 'XYZ::foo'
-    .return ()
-.end
+        .sub 'MAIN' :main
+            say 'MAIN'
+            .return ()
+        .end
+        .namespace ['XYZ']
+        .sub 'BEGIN' :tag('init')
+            say 'XYZ::BEGIN'
+            .return ()
+        .end
+        .sub 'foo' :outer('BEGIN')
+            say 'XYZ::foo'
+            .return ()
+        .end
 PIR
     $P0 = compreg 'PIR'
     say "got compiler"
@@ -1631,7 +1170,6 @@ PIR
 .end
 CODE
 got compiler
-XYZ::BEGIN
 compiled
 MAIN
 lived
