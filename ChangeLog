@@ -10,8 +10,8 @@
         + Improved the detection of Clang-ish compilers during configuration
         + Fixed a possible segfault bug when reading packfiles with no
          constants or main_sub
-        + By default, Parrot has now elevates these GCC warnings to errors
-          during compile-time:
+        + By default, Parrot has now elevated these GCC warnings to errors
+          during compile time:
             implicit-function-declaration, undef, missing-braces,
             nested externs, old-style-definition, strict-prototypes,
         + The OS Dynamic PMC now has separate functions to unlink a file
