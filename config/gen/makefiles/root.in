@@ -60,6 +60,7 @@ RELEASE_TOOLS_DIR = tools/release
 # directories for header files
 INC_DIR         = include/parrot
 INC_PMC_DIR     = include/pmc
+RUN_INC_DIR     = runtime/parrot/include
 
 # directories with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
@@ -67,7 +68,7 @@ LIBRARY_DIR     = runtime/parrot/library
 # directories for frontend
 FR_DIR          = frontend
 FRP_DIR         = $(FR_DIR)/parrot
-FRPTWO_DIR        = $(FR_DIR)/parrot2
+FRPTWO_DIR      = $(FR_DIR)/parrot2
 
 ###############################################################################
 #
@@ -171,7 +172,7 @@ GEN_CONFIGS = \
 	src/exec_dep.h \
 	lib/Parrot/Config/Generated.pm \
 	lib/Parrot/PMC.pm \
-	runtime/parrot/include/config.fpmc \
+	$(RUN_INC_DIR)/config.fpmc \
 	$(LIBRARY_DIR)/config.pir \
 #IF(has_opengl):    src/glut_nci_thunks.nci \
 #IF(has_glut):    src/glut_callbacks.c \
@@ -181,36 +182,36 @@ GEN_CONFIGS = \
 	compilers/imcc/imcc.l.flag
 
 GEN_PASM_INCLUDES = \
-	runtime/parrot/include/cclass.pasm \
-	runtime/parrot/include/datatypes.pasm \
-	runtime/parrot/include/iterator.pasm \
-	runtime/parrot/include/call_bits.pasm \
-	runtime/parrot/include/timer.pasm \
-	runtime/parrot/include/except_types.pasm \
-	runtime/parrot/include/except_severity.pasm \
-	runtime/parrot/include/hash_key_type.pasm \
-	runtime/parrot/include/interpflags.pasm \
-	runtime/parrot/include/interpdebug.pasm \
-	runtime/parrot/include/interptrace.pasm \
-	runtime/parrot/include/interpcores.pasm \
-	runtime/parrot/include/cloneflags.pasm \
-	runtime/parrot/include/iglobals.pasm \
-	runtime/parrot/include/sysinfo.pasm \
-	runtime/parrot/include/stdio.pasm \
-	runtime/parrot/include/socket.pasm \
-	runtime/parrot/include/libpaths.pasm \
-	runtime/parrot/include/dlopenflags.pasm \
-	runtime/parrot/include/longopt.pasm \
-	runtime/parrot/include/packfile_segments.pasm \
-	runtime/parrot/include/packfile_annotation_key_type.pasm \
-	runtime/parrot/include/stat.pasm \
-	runtime/parrot/include/stringinfo.pasm \
-	runtime/parrot/include/warnings.pasm \
-	runtime/parrot/include/errors.pasm \
-	runtime/parrot/include/interpinfo.pasm \
-	runtime/parrot/include/tm.pasm \
-	runtime/parrot/include/pmctypes.pasm \
-	runtime/parrot/include/parrot_version.pir
+	$(RUN_INC_DIR)/cclass.pasm \
+	$(RUN_INC_DIR)/datatypes.pasm \
+	$(RUN_INC_DIR)/iterator.pasm \
+	$(RUN_INC_DIR)/call_bits.pasm \
+	$(RUN_INC_DIR)/timer.pasm \
+	$(RUN_INC_DIR)/except_types.pasm \
+	$(RUN_INC_DIR)/except_severity.pasm \
+	$(RUN_INC_DIR)/hash_key_type.pasm \
+	$(RUN_INC_DIR)/interpflags.pasm \
+	$(RUN_INC_DIR)/interpdebug.pasm \
+	$(RUN_INC_DIR)/interptrace.pasm \
+	$(RUN_INC_DIR)/interpcores.pasm \
+	$(RUN_INC_DIR)/cloneflags.pasm \
+	$(RUN_INC_DIR)/iglobals.pasm \
+	$(RUN_INC_DIR)/sysinfo.pasm \
+	$(RUN_INC_DIR)/stdio.pasm \
+	$(RUN_INC_DIR)/socket.pasm \
+	$(RUN_INC_DIR)/libpaths.pasm \
+	$(RUN_INC_DIR)/dlopenflags.pasm \
+	$(RUN_INC_DIR)/longopt.pasm \
+	$(RUN_INC_DIR)/packfile_segments.pasm \
+	$(RUN_INC_DIR)/packfile_annotation_key_type.pasm \
+	$(RUN_INC_DIR)/stat.pasm \
+	$(RUN_INC_DIR)/stringinfo.pasm \
+	$(RUN_INC_DIR)/warnings.pasm \
+	$(RUN_INC_DIR)/errors.pasm \
+	$(RUN_INC_DIR)/interpinfo.pasm \
+	$(RUN_INC_DIR)/tm.pasm \
+	$(RUN_INC_DIR)/pmctypes.pasm \
+	$(RUN_INC_DIR)/parrot_version.pir
 
 GEN_PM_INCLUDES = \
 	lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
@@ -224,9 +225,9 @@ CONFIGURE_GENERATED_FILES = \
 	.parrot_current_rev \
 	.parrot_current_sha1 \
 	.parrot_current_git_describe \
-#IF(has_opengl):    runtime/parrot/include/opengl_defines.pasm \
+#IF(has_opengl):    $(RUN_INC_DIR)/opengl_defines.pasm \
 #IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
-	runtime/parrot/include/signal.pasm \
+	$(RUN_INC_DIR)/signal.pasm \
 	tools/dev/mk_language_shell.pl
 
 
@@ -349,7 +350,7 @@ FLUID_FILES_2 = \
 	$(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	$(LIBRARY_DIR)/ProfTest/Want.pbc \
 	$(LIBRARY_DIR)/YAML/Tiny.pbc \
-	runtime/parrot/include/parrotlib.pbc \
+	$(RUN_INC_DIR)/parrotlib.pbc \
 	$(FRPTWO_DIR)/prt0.pbc*
 
 ###############################################################################
@@ -642,8 +643,8 @@ corevm : \
 	PARROT_LIBS \
 	$(PARROT) \
         $(PARROTOLD) \
-	runtime/parrot/include/parrotlib.pbc \
-	runtime/parrot/include/config.fpmc \
+	$(RUN_INC_DIR)/parrotlib.pbc \
+	$(RUN_INC_DIR)/config.fpmc \
 #IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
 	$(LIBRARY_DIR)/Test/More.pbc
 
@@ -853,20 +854,20 @@ bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
 	$(MAKE_C) .
 
-runtime/parrot/include/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
+$(RUN_INC_DIR)/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
 
-runtime/parrot/include/parrot_version.pir:
-	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
+$(RUN_INC_DIR)/parrot_version.pir:
+	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 
-runtime/parrot/include/config.fpmc : myconfig config_lib.pir \
-	runtime/parrot/include/datatypes.pasm $(MINIPARROT)
+$(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
+	$(RUN_INC_DIR)/datatypes.pasm $(MINIPARROT)
 # always rebuid parrot_version.pir when building config.fpmc
-	$(PERL) tools/build/gen_version.pl >runtime/parrot/include/parrot_version.pir
-	$(MINIPARROT) -Iruntime/parrot/include config_lib.pir > $@
+	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
+	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
 
 $(FRPTWO_DIR)/prt0.pbc : $(FRPTWO_DIR)/prt0.pir
-	$(MINIPARROT) -Iruntime/parrot/include -o $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/prt0.pir
+	$(MINIPARROT) -I$(RUN_INC_DIR) -o $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/prt0.pir
 
 $(FRPTWO_DIR)/prt0.pbc.c : $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/build.pir
 	$(MINIPARROT) $(FRPTWO_DIR)/build.pir $(FRPTWO_DIR)/prt0.pbc
@@ -908,8 +909,8 @@ parrot_nci_thunk_gen.pbc : \
 	$(DATA_JSON_LIB_PBCS) $(PARROT) \
 	$(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
 	$(LIBRARY_DIR)/pcre.pbc \
-	runtime/parrot/include/hash_key_type.pasm \
-	runtime/parrot/include/datatypes.pasm
+	$(RUN_INC_DIR)/hash_key_type.pasm \
+	$(RUN_INC_DIR)/datatypes.pasm
 	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
@@ -945,7 +946,7 @@ $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 $(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h
 
-src/parrot_config.c :  runtime/parrot/include/config.fpmc \
+src/parrot_config.c :  $(RUN_INC_DIR)/config.fpmc \
 	$(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > \
 	src/parrot_config.c
@@ -1258,82 +1259,82 @@ $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 ###############################################################################
 
 
-runtime/parrot/include/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/interpdebug.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpdebug.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/interptrace.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interptrace.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/interpcores.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpcores.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/cloneflags.pasm  : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/cloneflags.pasm  : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/iglobals.pasm    : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/iglobals.pasm    : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-runtime/parrot/include/sysinfo.pasm     : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/sysinfo.pasm     : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
 
-runtime/parrot/include/interpinfo.pasm : $(INC_DIR)/gc_api.h $(H2INC)
+$(RUN_INC_DIR)/interpinfo.pasm : $(INC_DIR)/gc_api.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/gc_api.h $@
 
-runtime/parrot/include/timer.pasm : $(INC_DIR)/scheduler.h $(H2INC)
+$(RUN_INC_DIR)/timer.pasm : $(INC_DIR)/scheduler.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/scheduler.h $@
 
-runtime/parrot/include/pmctypes.pasm : $(INC_DIR)/core_pmcs.h $(H2INC)
+$(RUN_INC_DIR)/pmctypes.pasm : $(INC_DIR)/core_pmcs.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/core_pmcs.h $@
 
-runtime/parrot/include/stdio.pasm  : $(INC_DIR)/io.h $(H2INC)
+$(RUN_INC_DIR)/stdio.pasm  : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
-runtime/parrot/include/socket.pasm : $(INC_DIR)/io.h $(H2INC)
+$(RUN_INC_DIR)/socket.pasm : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
 
-runtime/parrot/include/hash_key_type.pasm : $(INC_DIR)/hash.h $(H2INC)
+$(RUN_INC_DIR)/hash_key_type.pasm : $(INC_DIR)/hash.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/hash.h $@
 
-runtime/parrot/include/iterator.pasm : $(INC_DIR)/enums.h $(H2INC)
+$(RUN_INC_DIR)/iterator.pasm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
-runtime/parrot/include/call_bits.pasm : $(INC_DIR)/enums.h $(H2INC)
+$(RUN_INC_DIR)/call_bits.pasm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
 
-runtime/parrot/include/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
+$(RUN_INC_DIR)/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
 
-runtime/parrot/include/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+$(RUN_INC_DIR)/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
-runtime/parrot/include/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
+$(RUN_INC_DIR)/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-runtime/parrot/include/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+$(RUN_INC_DIR)/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
-runtime/parrot/include/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
+$(RUN_INC_DIR)/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
 
-runtime/parrot/include/longopt.pasm : $(INC_DIR)/longopt.h $(H2INC)
+$(RUN_INC_DIR)/longopt.pasm : $(INC_DIR)/longopt.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/longopt.h $@
 
-runtime/parrot/include/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
+$(RUN_INC_DIR)/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
 
-runtime/parrot/include/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
+$(RUN_INC_DIR)/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
-runtime/parrot/include/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
+$(RUN_INC_DIR)/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 
-runtime/parrot/include/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
+$(RUN_INC_DIR)/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
-runtime/parrot/include/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
+$(RUN_INC_DIR)/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
 
-runtime/parrot/include/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
+$(RUN_INC_DIR)/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
-runtime/parrot/include/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
+$(RUN_INC_DIR)/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
 
-runtime/parrot/include/tm.pasm : src/utils.c $(H2INC)
+$(RUN_INC_DIR)/tm.pasm : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
 
 
