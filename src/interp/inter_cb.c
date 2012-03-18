@@ -315,7 +315,7 @@ Parrot_run_callback(PARROT_INTERP,
         break;
       case 'l':
         // FIXME: issue #742
-        i_param = (INTVAL) external_data;
+        i_param = (INTVAL)(long)(INTVAL) external_data;
         goto case_I;
       case 'i':
         // FIXME: issue #742
