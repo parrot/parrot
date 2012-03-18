@@ -52,17 +52,22 @@ BUILD_DIR = @build_dir@
 # programs, templates, configuration files invoked by 'make all'
 # (with or without command-line options)
 BUILD_TOOLS_DIR = tools/build
-# directory for developers' tools
+# directories for developers' tools
 # programs, templates, configuration files NOT invoked by 'make all'
 DEV_TOOLS_DIR = tools/dev
 RELEASE_TOOLS_DIR = tools/release
 
-# directory for header files
+# directories for header files
 INC_DIR         = include/parrot
 INC_PMC_DIR     = include/pmc
 
-# directory with Parrot modules
+# directories with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
+
+# directories for frontend
+FR_DIR          = frontend
+FRP_DIR         = frontend/parrot
+FRP2_DIR        = frontend/parrot2
 
 ###############################################################################
 #
@@ -877,11 +882,11 @@ frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c \
 bootstrap-prt0: $(WINXED) frontend/parrot2/prt0.winxed
 	$(WINXED) --noan -c frontend/parrot2/prt0.winxed
 
-$(PARROTOLD) : frontend/parrot/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
 	$(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-	frontend/parrot/main$(O) src/parrot_config$(O) src/longopt$(O) \
+	$(FRP_DIR)/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -920,9 +925,9 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
-$(MINIPARROT) : frontend/parrot/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
+$(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
 	src/null_config$(O) src/longopt$(O)
-	$(LINK) @ld_out@$@ frontend/parrot/main$(O) src/null_config$(O) src/longopt$(O) \
+	$(LINK) @ld_out@$@ $(FRP_DIR)/main$(O) src/null_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
@@ -1644,7 +1649,7 @@ frontend/parrot2/main$(O) : \
 	include/imcc/api.h \
 	frontend/parrot2/main.c
 
-frontend/parrot/main$(O) : \
+$(FRP_DIR)/main$(O) : \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/config.h \
@@ -1653,7 +1658,7 @@ frontend/parrot/main$(O) : \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/longopt.h \
 	include/imcc/api.h \
-	frontend/parrot/main.c
+	$(FRP_DIR)/main.c
 
 src/multidispatch$(O) : \
 	src/multidispatch.c \
