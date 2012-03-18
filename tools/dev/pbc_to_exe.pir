@@ -489,7 +489,7 @@ END_OF_FUNCTION
 
     .local int size
 
-    print outfh, "const char program_code[] =\n"
+    print outfh, "const unsigned char program_code[] =\n"
     print outfh, '"'
     size = 0
 
@@ -530,7 +530,7 @@ END_OF_FUNCTION
     print outfh, ";\n"
 
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             return program_code;
         }

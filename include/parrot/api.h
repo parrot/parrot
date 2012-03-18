@@ -20,7 +20,7 @@ typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const cha
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
-const void* get_program_code(void);
+const unsigned char * get_program_code(void);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
