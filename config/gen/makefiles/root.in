@@ -866,7 +866,13 @@ frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
 frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir $(MINIPARROT)
 	$(MINIPARROT) frontend/parrot2/build.pir frontend/parrot2/prt0.pbc
 
-frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c
+frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c \
+	$(INC_DIR)/feature.h \
+	$(INC_DIR)/core_types.h \
+	$(INC_DIR)/compiler.h \
+	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/config.h
 
 bootstrap-prt0: $(WINXED) frontend/parrot2/prt0.winxed
 	$(WINXED) --noan -c frontend/parrot2/prt0.winxed
