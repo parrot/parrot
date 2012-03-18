@@ -314,16 +314,20 @@ Parrot_run_callback(PARROT_INTERP,
         pasm_sig[1] = 'v';
         break;
       case 'l':
-        i_param = (INTVAL)(long) external_data;
+        // FIXME: issue #742
+        i_param = (INTVAL) external_data;
         goto case_I;
       case 'i':
-        i_param = (INTVAL)(int)(long) external_data;
+        // FIXME: issue #742
+        i_param = (INTVAL)(int)(INTVAL) external_data;
         goto case_I;
       case 's':
-        i_param = (INTVAL)(short)(long) external_data;
+        // FIXME: issue #742
+        i_param = (INTVAL)(short)(INTVAL) external_data;
         goto case_I;
       case 'c':
-        i_param = (INTVAL)(char)(long)external_data;
+        // FIXME: issue #742
+        i_param = (INTVAL)(char)(INTVAL) external_data;
 case_I:
         pasm_sig[1] = 'I';
         param = (void*) i_param;
