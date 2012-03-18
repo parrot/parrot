@@ -235,6 +235,14 @@ sub runstep {
                 optimize  => '',
             );
         }
+        elsif ( $make =~ /gmake/i ) {
+            # also Strawberry Perl
+            $conf->data->set(
+                ccflags   => "-DWINVER=$winver ",
+                make      => 'gmake',
+                make_c    => 'gmake -C',
+            );
+        }
         elsif ( $make =~ /mingw32-make/i ) {
             ; # Vanilla Perl
             $conf->data->set(
