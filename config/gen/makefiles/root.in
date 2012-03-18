@@ -226,7 +226,7 @@ CONFIGURE_GENERATED_FILES = \
 	.parrot_current_sha1 \
 	.parrot_current_git_describe \
 #IF(has_opengl):    $(RUN_INC_DIR)/opengl_defines.pasm \
-#IF(has_opengl):    runtime/parrot/library/OpenGL_funcs.pir \
+#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pir \
 	$(RUN_INC_DIR)/signal.pasm \
 	tools/dev/mk_language_shell.pl
 
@@ -854,8 +854,8 @@ bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
 	$(MAKE_C) .
 
-$(RUN_INC_DIR)/parrotlib.pbc: runtime/parrot/library/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
-	$(PARROT) -o $@ runtime/parrot/library/parrotlib.pir
+$(RUN_INC_DIR)/parrotlib.pbc: $(LIBRARY_DIR)/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
+	$(PARROT) -o $@ $(LIBRARY_DIR)/parrotlib.pir
 
 $(RUN_INC_DIR)/parrot_version.pir:
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
@@ -900,7 +900,7 @@ $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
-$(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir runtime/parrot/library/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
+$(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
@@ -3026,7 +3026,7 @@ $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
 	@ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
-# for use by runtime/parrot/library/OpenGL.pir
+# for use by $(LIBRARY_DIR)/OpenGL.pir
 src/glut_callbacks$(O): \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
@@ -3143,7 +3143,7 @@ malloclist: src/core_pmcs.c src/extend_vtable.c
 
 include src/dynpmc/Rules.mak
 include src/dynoplibs/Rules.mak
-include runtime/parrot/library/Rules.mak
+include $(LIBRARY_DIR)/Rules.mak
 include compilers/imcc/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
