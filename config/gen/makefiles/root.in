@@ -3143,7 +3143,7 @@ malloclist: src/core_pmcs.c src/extend_vtable.c
 
 include src/dynpmc/Rules.mak
 include src/dynoplibs/Rules.mak
-include $(LIBRARY_DIR)/Rules.mak
+include runtime/parrot/library/Rules.mak
 include compilers/imcc/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
