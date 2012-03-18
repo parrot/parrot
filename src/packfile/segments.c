@@ -854,7 +854,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
             Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
         Parrot_io_printf(interp, "%08lx ", (unsigned long)
-                self->data ? self->data[i] : self->pf->src[i]);
+                (self->data ? self->data[i] : self->pf->src[i]));
     }
 
     Parrot_io_printf(interp, "\n]\n");
