@@ -63,6 +63,7 @@ INC_PMC_DIR     = include/pmc
 
 # directory with Parrot modules
 LIBRARY_DIR     = runtime/parrot/library
+LANGUAGES_DIR   = runtime/parrot/languages
 
 ###############################################################################
 #
@@ -330,7 +331,8 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/YAML/Dumper.pbc \
 	$(LIBRARY_DIR)/STM.pbc \
 	$(LIBRARY_DIR)/libpcre.pbc \
-	$(LIBRARY_DIR)/postgres.pbc
+	$(LIBRARY_DIR)/postgres.pbc \
+	$(LANGUAGES_DIR)/parrot/parrot.pbc
 
 FLUID_FILES_1 = \
 	$(GEN_HEADERS) \
@@ -1885,6 +1887,7 @@ src/misc$(O) : $(PARROT_H_HEADERS) src/misc.c
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_resizableintegerarray.h \
 	src/utils.c \
 	$(EXTEND_HEADERS)
 

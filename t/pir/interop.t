@@ -17,11 +17,20 @@ Tests for HLL interoperability from PIR.
 
 
 .sub main :main
-
     .include 'test_more.pir'
     plan(3)
 
-    load_language 'parrot'
+    $P0 = load_language 'parrot'
+    $P1 = $P0.'subs_by_tag'('load')
+    $P2 = iter $P1
+  loop_top:
+    unless $P2 goto loop_bottom
+    $P3 = shift $P2
+    $P3()
+    goto loop_top
+  loop_bottom:
+    $P0.'mark_initialized'('load')
+
     ok(1, 'loaded parrot language')
     .local pmc c
     c = compreg 'parrot'

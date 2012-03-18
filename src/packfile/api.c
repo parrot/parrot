@@ -1809,17 +1809,15 @@ Parrot_pf_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
         return p;
     }
     else {
-        INTVAL name_length;
         PackFile * const pf = Parrot_pf_read_pbc_file(interp, path);
         PMC * const pfview = Parrot_pf_get_packfile_pmc(interp, pf, path);
-        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
 
+        VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pfview);
         add_language_search_paths(interp, lang_name, path);
 
         PARROT_ASSERT(pfview);
         return pfview;
     }
-    fprintf(stderr, "HEREHEREHERE\n");
 }
 
 static void

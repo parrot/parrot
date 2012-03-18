@@ -32,6 +32,7 @@ standard Parrot Compiler Toolkit.
 .end
 
 .sub '__onload' :tag('load') :tag('init')
+    'load_bytecode'('P6object.pbc')
     'load_bytecode'('PCT/Grammar.pbc')
     'load_bytecode'('PCT/PAST.pbc')
     #  we don't need to explicitly load HLLCompiler, because

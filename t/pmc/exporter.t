@@ -291,7 +291,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'import - null destination' );
 .include 'except_types.pasm'
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src, dest, excep
     exporter = new ['Exporter']
     src = get_namespace [ 'Test'; 'More' ]
@@ -340,7 +340,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as string' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src
 
     src      = get_namespace [ 'Test'; 'More' ]
@@ -357,7 +357,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals with source passed separately' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src
 
     src      = get_namespace [ 'Test'; 'More' ]
@@ -375,7 +375,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src, globals
 
     src     = get_namespace [ 'Test'; 'More' ]
@@ -395,7 +395,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - null + empty string' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src, globals, nul
 
     nul     = new ['Null']
@@ -416,7 +416,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - with dest names (latin)' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src, globals
 
     src     = get_namespace [ 'Test'; 'More' ]
@@ -436,7 +436,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
 .sub 'test' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
     .local pmc exporter, src, dest, globals
 
     src     = get_namespace [ 'Test'; 'More' ]

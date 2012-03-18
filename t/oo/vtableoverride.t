@@ -124,7 +124,7 @@ CODE
 
 .namespace [ 'MyObject' ]
 
-.sub '__onload' :anon :init
+.sub '__onload' :anon :tag('init')
     $P0 = newclass "MyObject"
     addattribute $P0, "message"
 .end
@@ -170,7 +170,7 @@ yes:
 
 .namespace [ 'MySubObject' ]
 
-.sub '__onload' :anon :init
+.sub '__onload' :anon :tag('init')
     $P1 = get_class 'ResizablePMCArray'
     $P0 = subclass $P1, 'MySubObject'
     addattribute $P0, "submessage"
@@ -191,7 +191,7 @@ yes:
 
 .namespace [ 'MyVtableObject' ]
 
-.sub '__onload' :anon :init
+.sub '__onload' :anon :tag('init')
   $P1 = get_class 'String'
   $P2 = subclass $P1, 'MyVtableObject'
 .end

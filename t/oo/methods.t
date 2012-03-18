@@ -15,16 +15,16 @@ Tests features related to the creation, addition, and execution of OO methods.
 
 =cut
 
-.const string library_file = "method_library.pir"
+.const string library_file = "method_library.pbc"
 
 .sub main :main
     .include 'test_more.pir'
 
     create_library()
 
-    plan(6)
+    plan(4)
 
-    loading_methods_from_file()
+    #loading_methods_from_file()
     loading_methods_from_eval()
     overridden_find_method()
 
@@ -35,11 +35,6 @@ Tests features related to the creation, addition, and execution of OO methods.
 .end
 
 .sub create_library
-    .local pmc file
-
-    file = new ['FileHandle']
-    file.'open'(library_file, 'w')
-
     $S0 = <<'END'
     .namespace['Foo']
     .sub 'bar_method' :method
@@ -47,9 +42,9 @@ Tests features related to the creation, addition, and execution of OO methods.
     .end
 END
 
-    print file, $S0
-    file.'close'()
-
+    $P0 = compreg 'PIR'
+    $P1 = $P0.'compile'($S0)
+    $P1.'write_to_file'(library_file)
 .end
 
 .sub try_delete_library
@@ -66,18 +61,18 @@ END
     diag($S1)
 .end
 
-.sub loading_methods_from_file
-    $P0 = newclass 'Foo'
-    $P1 = new 'Foo'
-    $I0 = $P1.'foo_method'()
-    ok ($I0, 'calling foo_method')
-
-    load_bytecode library_file
-    $P1 = new 'Foo'
-    $I0 = $P1.'bar_method'()
-    ok ($I0, 'calling bar_method')
-    $P0 = null
-.end
+#.sub loading_methods_from_file
+#    $P0 = newclass 'Foo'
+#    $P1 = new 'Foo'
+#    $I0 = $P1.'foo_method'()
+#    ok ($I0, 'calling foo_method')
+#
+#    $P0 = load_bytecode library_file
+#    $P1 = new 'Foo'
+#    $I0 = $P1.'bar_method'()
+#    ok ($I0, 'calling bar_method')
+#    $P0 = null
+#.end
 
 .namespace ['Foo']
 .sub 'foo_method' :method
