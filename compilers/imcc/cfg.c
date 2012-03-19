@@ -447,11 +447,11 @@ build_cfg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     /* Decouple unreachable blocks (not the first block, with no predecessors)
      * from the CFG */
     do {
-        unsigned int i;
+        unsigned int j;
         changes = 0;
 
-        for (i = 1; i < unit->n_basic_blocks; i++) {
-            Basic_block * const bb = unit->bb_list[i];
+        for (j = 1; j < unit->n_basic_blocks; j++) {
+            Basic_block * const bb = unit->bb_list[j];
 
             if (!bb->pred_list) {
                 /* Remove all successor edges of block bb */
