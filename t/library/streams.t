@@ -31,19 +31,21 @@ for my $a (@streams) {
     #
     pir_output_is( <<"CODE", <<"OUT", "load and create a Stream;$a" );
 
-.sub _main :main
-    print "loading '$a'...\\n"
-    load_bytecode 'Stream/$a.pbc'
-    print "loaded\\n"
+        .include 'load_bytecode.pir'
 
-    \$P0 = new ['Stream'; '$a']
+        .sub _main :main
+            print "loading '$a'...\\n"
+            '__load_bytecode'('Stream/$a.pbc')
+            print "loaded\\n"
 
-    \$S0 = typeof \$P0
-    print "class name: '"
-    print \$S0
-    print "'\\ndone\\n"
-    end
-.end
+            \$P0 = new ['Stream'; '$a']
+
+            \$S0 = typeof \$P0
+            print "class name: '"
+            print \$S0
+            print "'\\ndone\\n"
+            end
+        .end
 CODE
 loading '$a'...
 loaded
@@ -58,38 +60,40 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream;Sub" );
 
-.sub _main :main
-    .local pmc stream
+    .include 'load_bytecode.pir'
 
-    load_bytecode 'Stream/Sub.pbc'
+    .sub _main :main
+        .local pmc stream
 
-    stream = new ['Stream'; 'Sub']
+        '__load_bytecode'('Stream/Sub.pbc')
 
-    # set the stream's source sub   #'
-    .const 'Sub' temp = "_hello"
-    assign stream, temp
+        stream = new ['Stream'; 'Sub']
 
-    # dump the stream
-    stream."dump"()
-    # read again to see if read returns null
-    $S0 = stream."read"()
-    if_null $S0, OK
-    print "error: read returned '"
-    print $S0
-    print "' instead of (null)\n"
-OK:
-    print "done\n"
-    sweep 1
-    collect
-    print "finished\n"
-    end
-.end
-.sub _hello :method
-    self."write"( "hello" )
-    self."write"( "world!" )
-    self."write"( "parrot" )
-    self."write"( "is cool" )
-.end
+        # set the stream's source sub   #'
+        .const 'Sub' temp = "_hello"
+        assign stream, temp
+
+        # dump the stream
+        stream."dump"()
+        # read again to see if read returns null
+        $S0 = stream."read"()
+        if_null $S0, OK
+        print "error: read returned '"
+        print $S0
+        print "' instead of (null)\n"
+    OK:
+        print "done\n"
+        sweep 1
+        collect
+        print "finished\n"
+        end
+    .end
+    .sub _hello :method
+        self."write"( "hello" )
+        self."write"( "world!" )
+        self."write"( "parrot" )
+        self."write"( "is cool" )
+    .end
 CODE
 read:[hello]
 read:[world!]
@@ -104,11 +108,13 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::read_bytes" );
 
+.include 'load_bytecode.pir'
+
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Sub.pbc'
-    load_bytecode 'Stream/Replay.pbc'
+    '__load_bytecode'('Stream/Sub.pbc')
+    '__load_bytecode'('Stream/Replay.pbc')
 
     $P0 = new ['Stream'; 'Sub']
     # set the stream's source sub      #'
@@ -178,15 +184,15 @@ OUT
 # 11
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
-
+.include 'load_bytecode.pir'
 .sub _main :main
     .local pmc counter
     .local pmc text
     .local pmc combined
 
-    load_bytecode 'Stream/Base.pbc'
-    load_bytecode 'Stream/Combiner.pbc'
-    load_bytecode 'Stream/Sub.pbc'
+    '__load_bytecode'('Stream/Base.pbc')
+    '__load_bytecode'('Stream/Combiner.pbc')
+    '__load_bytecode'('Stream/Sub.pbc')
 
     # create the counter stream
     counter = new ['Stream'; 'Sub']
@@ -266,12 +272,13 @@ OUT
 # 12
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Coroutine" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Base.pbc'
-    load_bytecode 'Stream/Coroutine.pbc'
+    '__load_bytecode'('Stream/Base.pbc')
+    '__load_bytecode'('Stream/Coroutine.pbc')
 
     # create the coroutine stream
     stream = new ['Stream'; 'Coroutine']
@@ -333,6 +340,8 @@ OUT
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
+.include 'load_bytecode.pir'
+
 .sub _main :main
     .local pmc file
     .local pmc lines
@@ -342,10 +351,10 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
     name = "t/library/perlhistory.txt"
 
-    load_bytecode 'Stream/ParrotIO.pbc'
-    load_bytecode 'Stream/Lines.pbc'
-    load_bytecode 'Stream/Sub.pbc'
-    load_bytecode 'Stream/Combiner.pbc'
+    '__load_bytecode'('Stream/ParrotIO.pbc')
+    '__load_bytecode'('Stream/Lines.pbc')
+    '__load_bytecode'('Stream/Sub.pbc')
+    '__load_bytecode'('Stream/Combiner.pbc')
 
     # create a file stream
     file = new ['Stream'; 'ParrotIO']
@@ -698,13 +707,14 @@ OUT
 # 14
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
     .local pmc filter
 
-    load_bytecode 'Stream/Sub.pbc'
-    load_bytecode 'Stream/Filter.pbc'
+    '__load_bytecode'('Stream/Sub.pbc')
+    '__load_bytecode'('Stream/Filter.pbc')
 
     # create the counter stream
     stream = new ['Stream'; 'Sub']
@@ -784,11 +794,12 @@ OUT
 # 15
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::include" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Sub.pbc'
+    '__load_bytecode'('Stream/Sub.pbc')
 
     stream = new ['Stream'; 'Sub']
 
@@ -889,13 +900,14 @@ OUT
 # 16
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Lines" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
     .local pmc lines
 
-    load_bytecode 'Stream/Sub.pbc'
-    load_bytecode 'Stream/Lines.pbc'
+    '__load_bytecode'('Stream/Sub.pbc')
+    '__load_bytecode'('Stream/Lines.pbc')
 
     # create a text stream
     stream = new ['Stream'; 'Sub']
@@ -936,12 +948,13 @@ OUT
 # 17
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
     .local pmc temp
 
-    load_bytecode 'Stream/ParrotIO.pbc'
+    '__load_bytecode'('Stream/ParrotIO.pbc')
 
     # create the ParrotIO stream
     stream = new ['Stream'; 'ParrotIO']
@@ -1252,11 +1265,12 @@ SKIP:
     skip( "broken method invocation", 1 );
     pir_output_is( <<'CODE', <<'OUT', "Stream::Replay" );
 
+.include 'load_bytecode.pir'
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Writer.pbc'
-    load_bytecode 'Stream/Replay.pbc'
+    '__load_bytecode'('Stream/Writer.pbc')
+    '__load_bytecode'('Stream/Replay.pbc')
 
     stream = new ['Stream'; 'Writer']
     P0 = global "_reader"
@@ -1352,12 +1366,12 @@ OUT
 # 19 #'
 #
 pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
-
+.include 'load_bytecode.pir'
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Base.pbc'
-    load_bytecode 'Stream/Sub.pbc'
+    '__load_bytecode'('Stream/Base.pbc')
+    '__load_bytecode'('Stream/Sub.pbc')
 
     stream = new ['Stream'; 'Sub']
 
@@ -1413,11 +1427,12 @@ SKIP:
 {
     skip( "broken method invocation", 1 );
     pir_output_is( <<'CODE', <<'OUT', "Stream::Write" );
+.include 'load_bytecode.pir'
 
 .sub _main :main
     .local pmc stream
 
-    load_bytecode 'Stream/Writer.pbc'
+    '__load_bytecode'('Stream/Writer.pbc')
 
     stream = new ['Stream'; 'Writer']
 

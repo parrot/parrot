@@ -2,14 +2,18 @@
 
 # Testing of basic document structures
 
-pir::load_bytecode("YAML/Tiny.pbc");
+my $pbc := pir::load_bytecode__ps("YAML/Tiny.pbc");
+for $pbc.subs_by_tag('load') -> $sub { $sub(); }
+$pbc.mark_initialized('load');
 
 Q:PIR {
-        # We want Test::More features for testing. Not NQP's builtin.
-        .include "test_more.pir"
-        load_bytecode "dumper.pbc"
+    # We want Test::More features for testing. Not NQP's builtin.
+    .include "test_more.pir"
 };
 
+$pbc := pir::load_bytecode__ps("dumper.pbc");
+for $pbc.subs_by_tag('load') -> $sub { $sub(); }
+$pbc.mark_initialized('load');
 
 #####################################################################
 # Sample Testing

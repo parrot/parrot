@@ -57,7 +57,7 @@ version 0.1
 
     addattribute $P1, "writer"
     addattribute $P1, "status"
-END:
+  END:
 .end
 
 =head1 METHODS

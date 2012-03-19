@@ -52,7 +52,7 @@ The stream will be disconnected automatically if the provided sub returns.
 
 =cut
 
-.sub onload :tag('load') :anon
+.sub onload :tag('load')
     .local int i
     .local pmc base
     .local pmc sub
@@ -80,7 +80,7 @@ The stream will be disconnected automatically if the provided sub returns.
     subclass sub, base, ['Stream'; 'Sub']
 
     addattribute sub, "write_cont"
-END:
+  END:
 .end
 
 .namespace ['Stream'; 'Sub']

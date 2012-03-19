@@ -15,8 +15,10 @@ uuid library tests
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode 'uuid.pbc'
+    '__load_bytecode'('uuid.pbc')
 
     .include 'test_more.pir'
     plan(20)
