@@ -83,16 +83,6 @@ static Instruction* pcc_get_args(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-static int pcc_reg_mov(
-    ARGMOD(imc_info_t * imcc),
-    unsigned char d,
-    unsigned char s,
-    ARGMOD(void *vinfo))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(* imcc)
-        FUNC_MODIFIES(*vinfo);
-
 static void unshift_self(
     ARGMOD(imc_info_t * imcc),
     ARGIN(SymReg *sub),
@@ -118,9 +108,6 @@ static void unshift_self(
     , PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins) \
     , PARROT_ASSERT_ARG(op_name))
-#define ASSERT_ARGS_pcc_reg_mov __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(vinfo))
 #define ASSERT_ARGS_unshift_self __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(sub) \
@@ -503,82 +490,6 @@ typedef struct move_info_t {
     SymReg      **dest;
     SymReg      **src;
 } move_info_t;
-
-/*
-
-=item C<static int pcc_reg_mov(imc_info_t * imcc, unsigned char d, unsigned char
-s, void *vinfo)>
-
-Callback for C<Parrot_util_register_move>. Inserts move instructions in stead of
-actually moving the registers.
-
-=cut
-
-*/
-
-static int
-pcc_reg_mov(ARGMOD(imc_info_t * imcc), unsigned char d, unsigned char s,
-        ARGMOD(void *vinfo))
-{
-    ASSERT_ARGS(pcc_reg_mov)
-    static const char types[] = "INSP";
-    /* XXX non-reentrant */
-    static SymReg    *temps[4];
-    move_info_t      *info    = (move_info_t *)vinfo;
-    SymReg           *src     = NULL;
-    SymReg           *dest    = NULL;
-    SymReg           *regs[3];
-
-    if (d == 255) {
-        int t;
-
-        /* handle temp use/create temp of src type */
-        PARROT_ASSERT(s != 255);
-        PARROT_ASSERT(s < 2 * info->n);
-
-        src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
-
-        for (t = 0; t < 4; ++t) {
-            if (types[t] == src->set) {
-                if (temps[t])
-                    dest = temps[t];
-                else {
-                    dest = temps[t] = mk_temp_reg(imcc, src->set);
-                }
-                break;
-            }
-
-        }
-    }
-    else if (s == 255) {
-        int t;
-        /* handle temp use/create temp of dest type */
-        PARROT_ASSERT(d < 2 * info->n);
-
-        dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
-
-        for (t = 0; t < 4; ++t) {
-            if (types[t] == dest->set) {
-                if (!temps[t])
-                    temps[t] = mk_temp_reg(imcc, dest->set);
-                src = temps[t];
-                break;
-            }
-        }
-    }
-
-    if (!dest)
-        dest = d < info->n ? info->dest[(int)d] : info->src[(int)d - info->n];
-
-    if (!src)
-        src = s < info->n ? info->dest[(int)s] : info->src[(int)s - info->n];
-
-    regs[0]   = dest;
-    regs[1]   = src;
-    info->ins = insINS(imcc, info->unit, info->ins, "set", regs, 2);
-
-    return 1;
-}
 
 /*
 
