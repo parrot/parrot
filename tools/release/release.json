@@ -1,9 +1,9 @@
 {
-    "release.version"  : "4.1.0",
-    "release.name"     : "Black-headed Parrot",
+    "release.version"  : "4.2.0",
+    "release.name"     : "Ornithopter",
     "release.day"      : "Tuesday",
-    "release.date"     : "21 February 2012",
     "release.nextdate" : "20 March 2012",
+    "release.nextdate" : "17 April 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -17,5 +17,5 @@
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2012_03_17",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.1.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.2.0/"
 }

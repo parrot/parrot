@@ -13,9 +13,7 @@ step in the process, and, as always, if you have any questions, please ask.
 =item 1
 
 As soon as you become the release manager, review any goals for the release.
-Presently, the best way to determine this is to ask on C<#parrot> or, 
-alternatively, email a query to the C<parrot-dev> mailing list.  If there are 
-goals for the release, please annouce them on C<parrot-dev>. As well, please 
+Presently, the best way to determine this is to ask on C<#parrot> or, alternatively, email a query to the C<parrot-dev> mailing list.  If there are goals for the release, please annouce them on C<parrot-dev>. As well, please 
 ensure everyone understands what they've committed to accomplish in time for
 the release.
 
@@ -510,7 +508,6 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Mar 20, 2012 - 4.2.0   - dukeleto
     - Apr 17, 2012 - 4.3.0   - cotto
     - May 15, 2012 - 4.4.0   - ??
     - Jun 19, 2012 - 4.5.0   - ??

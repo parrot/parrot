@@ -139,5 +139,6 @@ Starred release numbers indicate supported releases.
 
  Whiteknight 4.0.0 *        2012-Jan-17     "Hyperstasis"
  alvis       4.1.0          2012-Feb-21     "Black-headed Parrot"
+ dukeleto    4.2.0          2012-Mar-20     "Ornithopter"
 
 =cut
