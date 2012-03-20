@@ -36,6 +36,8 @@ This file implements a native call frame (thunk) factory using libffi.
 #  define ffi_type_parrot_numval ffi_type_double
 #elif(NUMVAL_SIZE == 12)
 #  define ffi_type_parrot_numval ffi_type_longdouble
+#elif(NUMVAL_SIZE == 16)
+#  define ffi_type_parrot_numval ffi_type_longdouble
 #else
 #  error "unhandled NUMVAL_SIZE value"
 #endif
