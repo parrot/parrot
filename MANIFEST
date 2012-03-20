@@ -1728,6 +1728,7 @@ t/manifest/03-regenerate_skip.t                             [test]
 t/manifest/04-alt_file.t                                    [test]
 t/manifest/05-alt_skip.t                                    [test]
 t/manifest/README                                           []doc
+t/native_pbc/annotations.pbc                                [test]
 t/native_pbc/header.t                                       [test]
 t/native_pbc/integer.pbc                                    [test]
 t/native_pbc/integer.t                                      [test]
