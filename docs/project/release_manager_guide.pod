@@ -13,7 +13,9 @@ step in the process, and, as always, if you have any questions, please ask.
 =item 1
 
 As soon as you become the release manager, review any goals for the release.
-Presently, the best way to determine this is to ask on C<#parrot> or, alternatively, email a query to the C<parrot-dev> mailing list.  If there are goals for the release, please annouce them on C<parrot-dev>. As well, please 
+Presently, the best way to determine this is to ask on C<#parrot> or,
+alternatively, email a query to the C<parrot-dev> mailing list.  If there are
+goals for the release, please annouce them on C<parrot-dev>. As well, please
 ensure everyone understands what they've committed to accomplish in time for
 the release.
 
