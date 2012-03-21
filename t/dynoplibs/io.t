@@ -16,6 +16,7 @@ Tests various io opcodes.
 =cut
 
 .loadlib 'io_ops'
+.include 'load_bytecode.pir'
 
 .sub 'main' :main
     .include 'test_more.pir'
@@ -45,7 +46,7 @@ Tests various io opcodes.
 .end
 
 .sub open_delegates_to_filehandle_pmc
-    load_bytecode 'P6object.pbc'
+    '__load_bytecode'('P6object.pbc')
 
     .local pmc p6meta, interp, classes, classid
     p6meta = get_root_global ["parrot"], "P6metaclass"

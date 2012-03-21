@@ -17,6 +17,8 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['LWP';'UserAgent']
 
+.include 'load_bytecode.pir'
+
 .sub '' :tag('init') :tag('load') :anon
     '__load_bytecode'('URI.pbc')
     '__load_bytecode'('HTTP/Message.pbc')
@@ -537,26 +539,6 @@ see http://search.cpan.org/dist/libwww-perl/
     $P0 = box $S0
     setattribute response, 'content', $P0
     .return (response)
-.end
-
-.sub '__load_bytecode' :anon
-    .param string pbcname
-
-    $P0 = load_bytecode pbcname
-    $I0 = $P0.'is_initialized'('load')
-    if $I0 goto done_initialization
-
-    $P1 = $P0.'subs_by_tag'('load')
-    $P2 = iter $P1
-  loop_top:
-    unless $P2 goto loop_bottom
-    $P3 = shift $P2
-    $P3()
-    goto loop_top
-  loop_bottom:
-
-    $P0.'mark_initialized'('load')
-  done_initialization:
 .end
 
 =back

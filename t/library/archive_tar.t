@@ -15,10 +15,12 @@ Test the Archive/Tar library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'Archive/Tar.pir'
+    '__load_bytecode'('Archive/Tar.pbc')
 
     plan(12)
     test_new()

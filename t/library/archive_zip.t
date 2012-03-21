@@ -15,6 +15,8 @@ Test the Archive/Zip library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
     .include 'test_more.pir'
     .include 'iglobals.pasm'
@@ -26,7 +28,7 @@ Test the Archive/Zip library
     unless $S0 goto no_zlib
 
     plan(14)
-    load_bytecode 'Archive/Zip.pir'
+    '__load_bytecode'('Archive/Zip.pbc')
     test_new()
     test_pack()
     .return()

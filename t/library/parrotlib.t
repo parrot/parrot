@@ -18,8 +18,10 @@ expected absolute filenames.
 
 # Common code in the test files
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode 'runtime/parrot/include/parrotlib.pbc'
+    '__load_bytecode'('runtime/parrot/include/parrotlib.pbc')
 
     .include 'test_more.pir'
     plan(6)

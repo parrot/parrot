@@ -16,13 +16,16 @@ Test cases taken from base64.t of MIME::Base64.
 
 =cut
 
+.include 'load_bytecode.pir'
+.include 'load_language.pir'
+
 .sub test :main
-    load_bytecode "dumper.pbc"
-    load_bytecode 'Test/More.pbc'
-    load_bytecode 'MIME/Base64.pbc'
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_language 'data_json'
+    '__load_bytecode'("dumper.pbc")
+    '__load_bytecode'('Test/More.pbc')
+    '__load_bytecode'('MIME/Base64.pbc')
+    '__load_bytecode'('PGE.pbc')
+    '__load_bytecode'('PGE/Util.pbc')
+    '__load_language'('data_json')
 
     .local pmc plan, is, ok
     plan = get_hll_global [ 'Test'; 'More' ], 'plan'

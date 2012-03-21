@@ -15,8 +15,10 @@ Test the distutils library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
-    load_bytecode 'distutils.pir'
+    '__load_bytecode'('distutils.pbc')
 
     .const 'Sub' prebuild = 'prebuild'
     register_step_before('build', prebuild)

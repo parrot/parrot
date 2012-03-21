@@ -15,8 +15,10 @@ Test the Math::Rand PBC
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode 'Math/Rand.pbc'
+    '__load_bytecode'('Math/Rand.pbc')
 
     .include 'test_more.pir'
     plan(7)

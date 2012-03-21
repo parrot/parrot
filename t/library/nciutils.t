@@ -16,9 +16,10 @@ Testing Perl 6 objects.
 =cut
 
 .include 'iglobals.pasm'
+.include 'load_bytecode.pir'
 
 .sub 'main' :main
-    load_bytecode 'Test/More.pbc'
+    .include 'test_more.pir'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -42,7 +43,7 @@ Testing Perl 6 objects.
 
     ##  make sure we can load the NCI::Utils library
     push_eh load_fail
-    load_bytecode 'NCI/Utils.pbc'
+    '__load_bytecode'('NCI/Utils.pbc')
     pop_eh
     ok(1, 'load_bytecode')
     goto load_success

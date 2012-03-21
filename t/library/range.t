@@ -15,9 +15,11 @@ Tests the Range class.
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
     .include 'test_more.pir'
-    load_bytecode 'Range.pbc'
+    '__load_bytecode'('Range.pbc')
 
     plan(78)
 

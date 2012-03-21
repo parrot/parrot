@@ -1,8 +1,10 @@
 #!./parrot
 # Copyright (C) 2005-2008, Parrot Foundation.
 
+.include 'load_bytecode.pir'
+
 .sub _main :main
-   load_bytecode 'Test/Builder/Tester.pbc'
+   '__load_bytecode'('Test/Builder/Tester.pbc')
 
    .local pmc tb_args
    tb_args = new 'Hash'

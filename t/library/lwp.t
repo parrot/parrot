@@ -15,11 +15,13 @@ Test the LWP library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'LWP/UserAgent.pir'
-    load_bytecode 'osutils.pbc'
+    '__load_bytecode'('LWP/UserAgent.pbc')
+    '__load_bytecode'('osutils.pbc')
 
     plan(48)
     test_new()

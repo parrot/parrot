@@ -15,10 +15,12 @@ Test the TAP/Parser library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'TAP/Parser.pir'
+    '__load_bytecode'('TAP/Parser.pbc')
 
     plan(203)
     test_grammar_plan()

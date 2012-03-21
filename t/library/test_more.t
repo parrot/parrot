@@ -1,9 +1,11 @@
 #!./parrot
 # Copyright (C) 2005-2010, Parrot Foundation.
 
+.include 'load_bytecode.pir'
+
 .sub _main :main
-    load_bytecode 'Test/Builder/Tester.pbc'
-    load_bytecode 'Test/More.pbc'
+    '__load_bytecode'('Test/Builder/Tester.pbc')
+    '__load_bytecode'('Test/More.pbc')
 
     .local pmc tb_args
     tb_args = new 'Hash'
@@ -163,7 +165,7 @@ CODE
 
 .namespace ['MyFalseClass']
 
-.sub '' :anon :tag('load') :init
+.sub '' :anon :tag('load', 'init')
     $P0 = newclass ['MyFalseClass']
 .end
 
@@ -177,7 +179,7 @@ CODE
 
 .namespace ['MyTrueClass']
 
-.sub '' :anon :tag('load') :init
+.sub '' :anon :tag('load', 'init')
     $P0 = newclass ['MyTrueClass']
 .end
 

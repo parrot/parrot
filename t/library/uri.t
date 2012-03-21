@@ -15,10 +15,12 @@ Test the URI library
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
     .include 'test_more.pir'
 
-    load_bytecode 'URI.pir'
+    '__load_bytecode'('URI.pbc')
 
     plan(60)
     test_new()

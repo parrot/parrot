@@ -17,10 +17,11 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['LWP';'Protocol']
 
+.include 'load_bytecode.pir'
+
 .sub '' :tag('init') :tag('load') :anon
-    $P9 = get_global ['LWP';'Protocol';'Utility'], "__load_bytecode"
-    $P9('osutils.pbc')
-    $P9('HTTP/Message.pbc')
+    '__load_bytecode'('osutils.pbc')
+    '__load_bytecode'('HTTP/Message.pbc')
     $P0 = newclass ['LWP';'Protocol']
     $P0.'add_attribute'('scheme')
     $P0.'add_attribute'('ua')
@@ -282,6 +283,8 @@ see http://search.cpan.org/dist/libwww-perl/
 .include 'socket.pasm'
 .include 'cclass.pasm'
 
+.include 'load_bytecode.pir'
+
 .sub '' :tag('init') :tag('load') :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']
 .end
@@ -313,8 +316,7 @@ see http://search.cpan.org/dist/libwww-perl/
     host = substr host, $I1
     $S0 = headers['Authorization']
     unless $S0 == '' goto L1
-    $P9 = get_global ['LWP';'Protocol';'Utility'], "__load_bytecode"
-    $P9('MIME/Base64.pbc')
+    '__load_bytecode'('MIME/Base64.pbc')
     $P0 = get_hll_global ['MIME';'Base64'], 'encode_base64'
     $S0 = $P0(userinfo)
     $S0 = 'Basic ' . $S0
@@ -533,29 +535,6 @@ see http://search.cpan.org/dist/libwww-perl/
     sock.'close'()
     .return (response)
 .end
-
-.namespace ['LWP';'Protocol';'Utility']
-
-.sub '__load_bytecode'
-    .param string pbcname
-
-    $P0 = load_bytecode pbcname
-    $I0 = $P0.'is_initialized'('load')
-    if $I0 goto done_initialization
-
-    $P1 = $P0.'subs_by_tag'('load')
-    $P2 = iter $P1
-  loop_top:
-    unless $P2 goto loop_bottom
-    $P3 = shift $P2
-    $P3()
-    goto loop_top
-  loop_bottom:
-
-    $P0.'mark_initialized'('load')
-  done_initialization:
-.end
-
 
 =back
 

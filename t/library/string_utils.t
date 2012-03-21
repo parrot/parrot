@@ -17,8 +17,10 @@ Tests for String/Utils.pbc
 
 .const string TESTS = '29'
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode 'Test/Builder.pbc'
+    '__load_bytecode'('Test/Builder.pbc')
 
     .local pmc test       # the test harness object.
                test = new [ 'Test'; 'Builder' ]
@@ -27,7 +29,7 @@ Tests for String/Utils.pbc
 
     test.'plan'(TESTS)
 
-    load_bytecode 'String/Utils.pbc'
+    '__load_bytecode'('String/Utils.pbc')
     test.'ok'(1, 'loaded String/Utils.pbc')
 
     $P0 = get_hll_global ['String';'Utils'], 'chomp'

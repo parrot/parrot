@@ -25,8 +25,10 @@ regressions in the parrot VM, JIT and GC
 ##############################
 # Stress parrot using MD5 library
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode "Digest/MD5.pbc"
+    '__load_bytecode'("Digest/MD5.pbc")
 
     .include 'test_more.pir'
     plan(518)

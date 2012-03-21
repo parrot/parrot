@@ -25,6 +25,7 @@
     'ResizablePMCArray_3elem'()
 .end
 
+.include 'load_bytecode.pir'
 
 # test library loading
 .sub 'load'
@@ -32,7 +33,7 @@
   T1:
     push_eh err_load_bytecode
     $S0 = 'Iter.pbc'
-    load_bytecode $S0
+    '__load_bytecode'($S0)
     pop_eh
     $S1 = 'loaded '
     $S1 .= $S0

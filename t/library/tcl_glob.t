@@ -15,8 +15,10 @@ test tcl-style globs
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
-    load_bytecode 'Test/More.pbc'
+    '__load_bytecode'('Test/More.pbc')
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -30,7 +32,7 @@ test tcl-style globs
 
     # make sure we can load the library
     push_eh load_failed
-      load_bytecode 'Tcl/Glob.pbc'
+      '__load_bytecode'('Tcl/Glob.pbc')
     pop_eh
     ok(1, 'load_bytecode')
 

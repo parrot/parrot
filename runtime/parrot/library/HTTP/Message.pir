@@ -169,10 +169,10 @@ see http://search.cpan.org/dist/libwww-perl/
 .namespace ['HTTP';'Request']
 
 .include 'cclass.pasm'
+.include 'load_bytecode.pir'
 
 .sub '' :tag('init') :tag('load') :anon
-    $P9 = get_global ["HTTP";"Utility"], "__load_bytecode"
-    $P9('URI.pbc')
+    '__load_bytecode'('URI.pbc')
     $P0 = subclass ['HTTP';'Message'], ['HTTP';'Request']
     $P0.'add_attribute'('method')
     $P0.'add_attribute'('uri')

@@ -22,8 +22,10 @@ regressions in the parrot VM, JIT and GC
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode "Digest/sha256.pbc"
+    '__load_bytecode'("Digest/sha256.pbc")
 
     .include 'test_more.pir'
     plan(7)

@@ -26,8 +26,10 @@ table, which should be created by your sysadmin.
 .const int PGRES_COMMAND_OK = 1
 .const int PGRES_TUPLES_OK = 2
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    '__load_bytecode'('Test/Builder.pbc')
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
     $P0 = getinterp

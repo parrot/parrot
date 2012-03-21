@@ -689,9 +689,11 @@ sub json_dump_is {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return pir_output_is( <<"END_PIR", $dumped, $reason, %args );
 
+.include 'load_bytecode.pir'
+.include 'load_language.pir'
 .sub test :main
-    load_language 'data_json'
-    load_bytecode 'dumper.pbc'
+    '__load_language'('data_json')
+    '__load_bytecode'('dumper.pbc')
 
     .local pmc JSON, eval, result
     JSON = compreg 'data_json'
@@ -711,8 +713,9 @@ sub json_isnt {
 
     return pir_error_output_like( <<"END_PIR", qr/not a valid JSON value/, $reason, %args );
 
+.include 'load_language.pir'
 .sub test :main
-    load_language 'data_json'
+    '__load_language'('data_json')
 
     .local pmc JSON, eval, result
 

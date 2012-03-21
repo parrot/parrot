@@ -1,8 +1,10 @@
 #!./parrot
 # Copyright (C) 2008-2010, Parrot Foundation.
 
+.include 'load_bytecode.pir'
+
 .sub 'init_test_builder_tester'
-    load_bytecode 'Test/Builder/Tester.pbc'
+    '__load_bytecode'('Test/Builder/Tester.pbc')
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -12,7 +14,7 @@
 .end
 
 .sub 'init_test_more'
-    load_bytecode 'runtime/parrot/library/Test/More.pbc'
+    '__load_bytecode'('runtime/parrot/library/Test/More.pbc')
 
     # get the testing functions
     .local pmc exports, curr_namespace, test_namespace
@@ -24,7 +26,7 @@
 .end
 
 .sub 'init_test_class'
-    load_bytecode 'Test/Class.pbc'
+    '__load_bytecode'('Test/Class.pbc')
 .end
 
 .sub 'main' :main

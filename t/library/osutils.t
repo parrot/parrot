@@ -16,12 +16,13 @@ Tests the C<osutils> runtime library.
 =cut
 
 .loadlib 'io_ops'
+.include 'load_bytecode.pir'
 
 .sub 'main' :main
     .include 'test_more.pir'
     .include 'stat.pasm'
 
-    load_bytecode 'osutils.pir'
+    '__load_bytecode'('osutils.pbc')
 
     ######################################################################
     # NOTE: Do not change the order in which these functions are called! #
