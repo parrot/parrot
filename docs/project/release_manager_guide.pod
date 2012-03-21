@@ -6,6 +6,13 @@ This guide lays out, in detail, the steps necessary to prepare, to assemble,
 and to publish a parrot release.  Please ensure you carefully follow each 
 step in the process, and, as always, if you have any questions, please ask.
 
+NOTE: You can use the newish/experimental script auto_release.pl to automate
+much of his guide (up to section IX):
+
+    perl tool/release/auto_release.pl X.Y.Z
+
+Run perldoc on the tool to get more documentation.
+
 =head2 I. Preparations During the Month Before a Release
 
 =over 4
