@@ -637,8 +637,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG
-            /* Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, */
-            Parrot_warn(interp, 0xFFFF,
+            Parrot_warn(interp, 0xFFFF, // PARROT_WARNINGS_ALL_FLAG,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
