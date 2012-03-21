@@ -489,7 +489,7 @@ will not affect the file that it points to.
     new $P0, 'OS'
 
     push_eh _handler
-    $P0.'rm'(filename)
+    $P0.'unlink'(filename)
     pop_eh
   L1:
     .return ()
@@ -576,12 +576,12 @@ be verbose. If given, the string I<rmtree C<path>> will be displayed.
     rmtree($S1)
     goto L3
   L5:
-    $P0.'rm'($S1)
+    $P0.'unlink'($S1)
     goto L3
   L4:
     push_eh _handler
     $S1 = path
-    $P0.'rm'($S1)
+    $P0.'rmdir'($S1)
     pop_eh
   L1:
     .return ()
