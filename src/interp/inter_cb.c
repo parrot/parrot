@@ -314,19 +314,19 @@ Parrot_run_callback(PARROT_INTERP,
         pasm_sig[1] = 'v';
         break;
       case 'l':
-        // FIXME: issue #742
+        /* FIXME: issue #742 */
         i_param = (INTVAL)(long)(INTVAL) external_data;
         goto case_I;
       case 'i':
-        // FIXME: issue #742
+        /* FIXME: issue #742 */
         i_param = (INTVAL)(int)(INTVAL) external_data;
         goto case_I;
       case 's':
-        // FIXME: issue #742
+        /* FIXME: issue #742 */
         i_param = (INTVAL)(short)(INTVAL) external_data;
         goto case_I;
       case 'c':
-        // FIXME: issue #742
+        /* FIXME: issue #742 */
         i_param = (INTVAL)(char)(INTVAL) external_data;
 case_I:
         pasm_sig[1] = 'I';

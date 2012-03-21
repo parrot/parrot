@@ -674,7 +674,7 @@ aligned_mem(ARGIN(SHIM(const Parrot_Buffer *buffer)), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
     mem += sizeof (void *);
-    // FIXME: issue #378
+    /* FIXME: issue #378 */
     mem  = (char *)(((UINTVAL)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
 
     return mem;
