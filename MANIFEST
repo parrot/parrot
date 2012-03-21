@@ -1754,6 +1754,7 @@ t/native_pbc/string_1.pbc                                   [test]
 t/native_pbc/string_2.pbc                                   [test]
 t/native_pbc/string_3.pbc                                   [test]
 t/native_pbc/string_4.pbc                                   [test]
+t/native_pbc/string_5.pbc                                   [test]
 t/native_pbc/string_6.pbc                                   [test]
 t/native_pbc/string_7.pbc                                   [test]
 t/native_pbc/testdata/README                                []doc
