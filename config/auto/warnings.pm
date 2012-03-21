@@ -161,7 +161,7 @@ sub _init {
         -Wmissing-prototypes
         -Werror=nested-externs
         -Werror=old-style-definition
-        -Wstrict-prototypes
+        -Werror=strict-prototypes
     );
 
     $gcc->{'basic'} = [ @gcc_or_gpp_basic, @gcc_basic ];
