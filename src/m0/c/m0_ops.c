@@ -165,6 +165,25 @@ m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
         frame->registers[ops[3]];
 }
 
+static void
+m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char value  = frame->registers[ops[3]];
+    const int  offset = frame->registers[ops[2]];
+    char      *target = (char*) frame->registers[ops[1]];
+    target[offset] = value;
+}
+
+static void
+m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char *src   = (char*)frame->registers[ops[3]];
+    const int  offset = frame->registers[ops[2]];
+    char      *target = (char*)&frame->registers[ops[1]];
+    *target = (char)src[offset];
+}
+
+
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
@@ -256,6 +275,14 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_GOTO_CHUNK):
                     m0_op_goto_chunk( interp ,cf, &ops[pc] );
+                break;
+
+                case (M0_SET_BYTE):
+                    m0_op_set_byte( cf, &ops[pc] );
+                break;
+
+                case (M0_GET_BYTE):
+                    m0_op_get_byte( cf, &ops[pc] );
                 break;
 
 				case (M0_EXIT):
