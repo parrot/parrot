@@ -133,13 +133,31 @@ Don't mark target and interp since they belong to a different interpreter.
         return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target,
                 method_name);
     }
-    
-/*    VTABLE opcode_t *invoke(void *next)
-    {
-        /* invoke should really run in this interp's context */
-/*        return VTABLE_invoke(interp, PARROT_PROXY(_self)->target, next);
-    } */
 
+    VTABLE void *get_pointer_keyed_str(STRING *key)
+    {
+        void * result;
+        PARROT_ASSERT(interp != PARROT_PROXY(SELF)->interp);
+
+        /* block the GC to prevent it from finding foreign PMCs on the stack */
+        Parrot_block_GC_mark(interp);
+
+        result = VTABLE_get_pointer_keyed_str(interp, PARROT_PROXY(_self)->target, key);
+
+        Parrot_unblock_GC_mark(interp);
+
+        /* workaround for TT #1219, see Parrot_ns_find_namespace_global */
+        if (VTABLE_isa(interp, PARROT_PROXY(_self)->target, CONST_STRING(interp, "NameSpace"))) {
+            return (PMC_IS_NULL((PMC*)result)
+                ? PMCNULL
+                : ((PMC*)result)->orig_interp == interp
+                    ? result
+                    : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, (PMC*)result));
+        }
+        else
+            return result;
+    }
+    
     VTABLE PMC *instantiate(PMC *init) {
         PMC * const _class = PARROT_PROXY(_self)->target;
         /*TODO will fail if the class has not been instantiated in the main thread before */
