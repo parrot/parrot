@@ -65,9 +65,13 @@ contain documentation for new releases.
 A couple of days in advance, announce the new release to
 C<parrot-dev@lists.parrot.org> and to the IRC channel C<#parrot>. Ask whether
 there are any showstopping bugs. Check-in again with the language project 
-leads. It's also good to ask for updates to F<ChangeLog>, F<CREDITS>, 
-F<PLATFORMS>, F<RESPONSIBLE_PARTIES>, F<api.yaml> and
-L<https://github.com/parrot/parrot/wiki/Languages>.
+leads. It's also good to ask for updates to
+L<http://github.com/parrot/parrot/blob/master/ChangeLog>,
+L<http://github.com/parrot/parrot/blob/master/CREDITS>,
+L<http://github.com/parrot/parrot/blob/master/PLATFORMS>.
+L<http://github.com/parrot/parrot/blob/master/RESPONSIBLE_PARTIES>,
+L<http://github.com/parrot/parrot/blob/master/api.yaml>,
+and L<https://github.com/parrot/parrot/wiki/Languages>.
 
 =item 6
 
@@ -134,12 +138,13 @@ run C<make reconfig> to clear out any invalid bytecode.
 
 =item b. 
 
-Update the version number, the date, and your name in F<docs/parrothist.pod>.
+Update the version number, the date, and your name in L<http://github.com/parrot/parrot/blob/master/docs/parrothist.pod>.
 
 =item c. 
 
-Update this file (F<docs/project/release_manager_guide.pod>) to remove the 
-pending release you're currently building.
+Update this file
+(L<http://github.com/parrot/parrot/blob/master/docs/project/release_manager_guide.pod>)
+to remove the pending release you're currently building.
 
 =back
 
@@ -445,7 +450,7 @@ to keep the main page fresh.
 =head2 X. Update parrot.github.com and any Relevant parrot-docsx Repositories
 
 Please read and follow the instructions in 
-F<docs/project/release_parrot_github_guide.pod>.
+L<http://github.com/parrot/parrot/blob/master/docs/project/release_parrot_github_guide.pod>.
 
 =head2 XI. Publicity
 
@@ -495,7 +500,8 @@ You're done! Help yourself to a beer, cola, or other delicious celebratory drink
 
 =head1 SEE ALSO
 
-F<README>, F<RESPONSIBLE_PARTIES>.
+L<http://github.com/parrot/parrot/blob/master/README>,
+L<http://github.com/parrot/parrot/blob/master/RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1 - Upcoming Releases
 
@@ -504,7 +510,7 @@ across multiple release managers. Releases are scheduled for the 3rd Tuesday of
 each month.
 
 To learn more about our support policy, see
-F<docs/project/support_policy.pod>.
+L<http://github.com/parrot/parrot/blob/master/docs/project/support_policy.pod>.
 
 The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
