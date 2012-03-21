@@ -135,18 +135,18 @@ static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
-	M0_Chunk *chunk = interp->first_chunk;
-	while(chunk) {
-		if(	strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
+    M0_Chunk *chunk = interp->first_chunk;
+    while(chunk) {
+        if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
             frame->registers[CHUNK]  = (uint64_t)chunk;
             frame->registers[CONSTS] = (uint64_t)chunk->constants;
             frame->registers[MDS]    = (uint64_t)chunk->metadata;
             frame->registers[BCS]    = (uint64_t)chunk->bytecode;
             frame->registers[PC]     = (uint64_t)new_pc;
-			break;
-		}
-		chunk = chunk->next;
-	}
+            break;
+        }
+        chunk = chunk->next;
+    }
     if(chunk == NULL) {
         // TODO error handling
     }
@@ -155,7 +155,7 @@ m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *op
 static void
 m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-	exit((int)frame->registers[ops[1]]);
+    exit((int)frame->registers[ops[1]]);
 }
 
 static void
@@ -285,9 +285,9 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_get_byte( cf, &ops[pc] );
                 break;
 
-				case (M0_EXIT):
-					m0_op_exit( interp, cf, &ops[pc]);
-				break;
+                case (M0_EXIT):
+                    m0_op_exit( interp, cf, &ops[pc]);
+                break;
 
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
