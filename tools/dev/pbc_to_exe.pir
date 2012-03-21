@@ -90,7 +90,7 @@ HEADER
 
             initargs->gc_system = GCCORE;
 
-            program_code_addr = (const unsigned char *)get_program_code();
+            program_code_addr = get_program_code();
 
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
@@ -434,7 +434,7 @@ HELP
     print outfh, $S0
     print outfh, ";\n"
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             return program_code;
         }
@@ -627,7 +627,7 @@ END_OF_DEFINES
     print outfh, ";\n"
 
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             HRSRC   hResource;
             DWORD   size;
