@@ -29,7 +29,10 @@ notifications:
     on_success: change
     on_failure: always
   irc:
+    channels:
       - "irc.parrot.org#parrot"
+    on_success: change
+    on_failure: change
 env:
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smoke" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smoke" CC="clang"
