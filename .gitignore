@@ -59,6 +59,7 @@ cachegrind.out.*
 /libparrot.def
 /libparrot.dll
 /libparrot.dll.a
+/cygparrot*.dll
 /miniparrot
 /myconfig
 /ops2c

@@ -7,10 +7,10 @@ Parrot::Configure::Compiler - C-Related methods for configuration and more
 =head1 DESCRIPTION
 
 The Parrot::Configure::Compiler module provides methods inherited by
-Parrot::Configure which prepare and/or run C programs during
-compilation. Also other files like makefiles will be generated with methods
-from this module by replacing entries like C<@key@> with C<key>'s value from
-the configuration system's data.
+Parrot::Configure which prepare and/or run C programs during compilation.
+Other methods from this module will be used to generate makefiles and other
+files.  Template entries of the form C<@key@> will be replaced with C<key>'s
+value from the configuration system's data.
 
 =head2 Methods
 
@@ -255,19 +255,18 @@ replacement syntax assumes the source text is on a single line.)
 
 =item file_type
 
-If set to a C<makefile>, C<c> or C<perl> value, C<comment_type> will be set
-to corresponding value.
-Moreover, when set to a C<makefile> value, it will enable
-C<conditioned_lines>.
+If set to a C<makefile>, C<c> or C<perl> value, C<comment_type> will be set to
+corresponding value.  Moreover, when set to a C<makefile> value, it will
+enable C<conditioned_lines>.
 
 Its value will be detected automatically by target file name unless you set
 it to a special value C<none>.
 
 =item conditioned_lines #IF #UNLESS #ELSIF #ELSE
 
-If conditioned_lines is true, then lines beginning in #IF, #UNLESS, #ELSIF, and
-#ELSE are evaluated conditionally, and the content after the C<:> is included
-or excluded, dependending on the evaluation of the expression.
+If conditioned_lines is true, then lines beginning in C<#IF>, C<#UNLESS>,
+C<#ELSIF>, and C<#ELSE> are evaluated conditionally, and the content after the
+C<:> is included or excluded, depending on the evaluation of the expression.
 
 Lines beginning with C<#IF(expr):> are skipped if the expr condition is false,
 otherwise the content after the C<:> is inserted. Lines beginning with
@@ -275,17 +274,32 @@ C<#UNLESS(expr):> are skipped if the expr condition is true, otherwise the
 content after the C<:> is inserted. Lines beginning with C<#ELSIF(expr):> or
 C<#ELSE:> are evaluated if the preceding C<#IF(expr):> evaluated to false.
 
-A condition expr may be:
+A condition C<expr> may be:
 
-  * A single key, which is true if a config key is true,
-  * Equal to the platform name or the osname - case-sensitive,
-  * A C<key==value> expression, which is true if the config key has the
-    expected value, or
-  * A logical combination of C<|>, C<OR>, C<&>, C<AND>, C<!>, C<NOT>.
+=over 4
 
-A key must only consist of the characters A-Z a-z 0-9 _ -, and is checked
+=item *
+
+A single key, which is true if a config key is true,
+
+=item *
+
+Equal to the platform name or the osname - case-sensitive,
+
+=item *
+
+A C<key==value> expression, which is true if the config key has the expected
+value, or
+
+=item *
+
+A logical combination of C<|>, C<OR>, C<&>, C<AND>, C<!>, C<NOT>.
+
+=back
+
+A key must only consist of the characters C<A-Z a-z 0-9 _ ->, and is checked
 case-sensitively against the configuration key or the platform name. Truth is
-defined as any value that is not 0, an empty string, or C<undef>.
+defined as any value that is not C<0>, an empty string, or C<undef>.
 
 The value in C<key==value> expressions may not contain spaces. Quotes in
 values are not supported.

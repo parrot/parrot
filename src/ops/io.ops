@@ -53,7 +53,7 @@ inline op print(in NUM) :base_io {
 #ifdef PARROT_HAS_NEGATIVE_ZERO
     Parrot_io_printf(interp, FLOATVAL_FMT, $1);
 #else
-    /* Workaround for older msvcrt and openbsd. TT #313 */
+    /* Workaround for older msvcrt and openbsd. GH #366 */
     if (Parrot_is_nzero($1)) {
         Parrot_io_printf(interp, "-0");
     }
@@ -96,7 +96,7 @@ inline op say(in NUM) :base_io {
 #ifdef PARROT_HAS_NEGATIVE_ZERO
     Parrot_io_printf(interp, FLOATVAL_FMT "\n", $1);
 #else
-    /* Workaround for older msvcrt and openbsd. TT #313 */
+    /* Workaround for older msvcrt and openbsd. GH #366 */
     if (Parrot_is_nzero($1)) {
         Parrot_io_printf(interp, "-0\n");
     }

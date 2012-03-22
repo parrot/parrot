@@ -169,7 +169,7 @@ CODE
 ok
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'new with a native type, no string constant', todo => 'TT #1323 not done yet' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'new with a native type, no string constant', todo => 'GH #335 not done yet' );
 .sub test :main
         $P1 = new INTVAL
     print "never\n"

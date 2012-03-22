@@ -381,7 +381,7 @@ CODE
 Successful
 OUTPUT
 
-# TT #1178
+# GH #465
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
 .sub main :main
     $P99 = getinterp

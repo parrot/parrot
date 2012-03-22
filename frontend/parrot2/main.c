@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2007-2011, Parrot Foundation.
+
+Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,8 +35,6 @@ struct init_args_t {
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
-extern const unsigned char * get_program_code(void);
-size_t get_program_code_size(void);
 
 /* HEADERIZER HFILE: none */
 
@@ -553,7 +552,13 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     int result = 1;
     int nargs = 0;
     int i;
-    const char **pargs = (const char**)calloc(argc, sizeof (char*));
+
+    /*
+     * Any option with an argument we handle may split an argument
+     * into two.  So be pessimistic with the allocation.
+     */
+    int pargs_size = argc * 2;
+    const char **pargs = (const char**)calloc(pargs_size, sizeof (char*));
 
     if (argc == 1) {
         usage(stderr);
@@ -632,7 +637,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG
-            // Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
@@ -682,6 +686,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     }
     for (i = opt.opt_index; i < argc; i++)
         pargs[nargs++] = argv[i];
+
+    /* Make sure we don't overrun the end of the array */
+    PARROT_ASSERT(nargs <= pargs_size);
 
     args->argv = pargs;
     args->argc = nargs;

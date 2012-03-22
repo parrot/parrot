@@ -179,9 +179,7 @@ the instruction if used on PMC registers.
 In all cases, the letters x, y, and z refer to register numbers. The letter t
 refers to a generic register (P, S, I, or N). A lowercase p, s, i, or n means
 either a register or constant of the appropriate type (PMC, string, integer,
-or number)
-
-L<docs/ops> for a list of current parrot opcodes, 
+or number).
 
 =head2 References
 

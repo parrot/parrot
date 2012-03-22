@@ -36,7 +36,7 @@ Parrot_Pointer_Array *
 Parrot_pa_new(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pa_new)
-    Parrot_Pointer_Array * const res = mem_allocate_zeroed_typed(Parrot_Pointer_Array);
+    Parrot_Pointer_Array * const res = mem_internal_allocate_zeroed_typed(Parrot_Pointer_Array);
     return res;
 }
 

@@ -313,9 +313,6 @@ typedef opcode_t *(*native_func_t)(PARROT_INTERP,
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
-void
-Parrot_interp_clear_emergency_interpreter(void);
-
 /* HEADERIZER BEGIN: src/interp/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -351,7 +348,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP,
-    ARGIN(PMC * compiler),
+    ARGIN(PMC *compiler),
     ARGIN(STRING *code))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

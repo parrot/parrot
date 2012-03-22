@@ -387,7 +387,7 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         }
     }
 
-    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+    memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
                     ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
     ct->tag_map[cur].tag_idx   = tag_idx;
     ct->tag_map[cur].const_idx = const_idx;
@@ -789,6 +789,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     const PackFile_ConstTable * const ct = bc->const_table;
+    if (!ct || !ct->pmc.constants || bc->main_sub < 0)
+        return PMCNULL;
     return ct->pmc.constants[bc->main_sub];
 }
 
@@ -810,7 +812,7 @@ Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
 alive by living subs.
 
 This function and the entire underlying mechanism should be deprecated and
-removed. See TT #2144 for details.
+removed. See GH #428 for details.
 
 =cut
 
@@ -1877,7 +1879,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
                             (self->base.size + 2) * sizeof (opcode_t));
-    mem_sys_memmove(&self->base.data[idx + 2], &self->base.data[idx],
+    memmove(&self->base.data[idx + 2], &self->base.data[idx],
             (self->base.size - idx) * sizeof (opcode_t));
     self->base.size += 2;
     for (i = key_id + 1; i < self->num_keys; i++)

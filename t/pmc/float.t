@@ -432,7 +432,7 @@ Tests the Float PMC.
     .return ()
 
   negative_zero_todoed:
-    todo(0, '-0.0 not implemented, TT #313')
+    todo(0, '-0.0 not implemented, GH #366')
 .end
 
 .sub 'equality'

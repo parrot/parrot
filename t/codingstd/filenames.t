@@ -74,7 +74,8 @@ foreach my $file ( @files ) {
     # check for multiple dots in filenames
     my $num_dots = grep(m/\./g, split( m//, $file));
     if ( $num_dots > 1 ) {
-        push @multi_dots, $file . "\n";
+        # this file is not used to build Parrot, so VMS can just deal with it
+        push @multi_dots, $file . "\n" unless $file eq '.travis.yml';
     }
 
     # check the characters used in filenames

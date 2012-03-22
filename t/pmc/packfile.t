@@ -35,7 +35,7 @@ Tests the Packfile PMC.
     'test_pack_fresh_packfile'()
     'test_pack'()
 
-    skip(2, "test_synonyms crash on many platforms. See TT #545")
+    skip(2, "test_synonyms crash on many platforms. See GH #514")
     # 'test_synonyms'()
 
 .end

@@ -158,6 +158,8 @@
 ^/core.*/
 ^/cover_db$
 ^/cover_db/
+^/cygparrot.*\.dll$
+^/cygparrot.*\.dll/
 ^/docs/.*\.tmp$
 ^/docs/.*\.tmp/
 ^/docs/Makefile$

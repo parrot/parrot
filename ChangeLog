@@ -1,3 +1,55 @@
+2012-03-20    release 4.2.0
+    - API Changes
+        + The signature of getprop was changed from (PMC,String,PMC) to
+          (PMC, PMC,String) for consistency
+    - Core
+        + Parrot Calling Conventions (pcc) now reuses Continuation PMCs
+          internally, which reduces GC work by 25% and improves
+          the fib.pir benchmark by 6%
+        + Winxed snapshot updated to 1.6.devel 44a04cfa7b
+        + Improved the detection of Clang-ish compilers during configuration
+        + Fixed a possible segfault bug when reading packfiles with no
+         constants or main_sub
+        + By default, Parrot has now elevated these GCC warnings to errors
+          during compile time:
+            implicit-function-declaration, undef, missing-braces,
+            nested externs, old-style-definition, strict-prototypes,
+        + The OS Dynamic PMC now has separate functions to unlink a file
+          and remove an empty directory (rmdir)
+        + Fix building on Cygwin due to an improperly named DLL file
+        + Various small bug fixes pointed out by static and dynamic analysis
+          tools
+    - Branches
+        + Work on M0 continues now in the m0 branch, which contains both
+          implementations (currently C and Perl) and specification.
+        + Good progress has been made on the threads branch which builds
+          on the green_threads branch. This gets Parrot much closer to
+          being able to utilize multiple CPU cores seemlessly. More details
+          at http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
+    - Documentation
+        + New release manager documentation for parrot.github.com :
+            http://git.io/parrot-github-guide
+    - Community
+        + Parrot was accepted to Google Summer of Code 2012!
+          Ideas Page: http://git.io/parrot-gsoc-2012
+
+2012-02-21    release 4.1.0
+    - Core
+        + Shared libraries and installable binaries are now stripped if
+          built with --optimize on Cygwin, which greatly reduces their
+          size on disk
+        + New experimental PCC-related ops added to core.
+    - Documentation
+        + Revised 'docs/project/release_manager_guide.pod'
+    - Tests
+        + Parrot now uses Travis CI http://travis-ci.org
+        + Parrot Continuous Integration (CI) with Travis CI means
+          every commit of Parrot is now compiled and tested on gcc,
+          g++ and clang with various Configure.pl options.
+        + CI Notifications are sent to parrot-dev, the #parrot
+          IRC channel and Smolder
+        + Cardinal and Rakudo spec tests also on Travis CI
+
 2012-01-17    release 4.0.0
     - Core
         + Several cleanups to the interp subsystem API

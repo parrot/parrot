@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-tools/docs/make_html_docs.pl - Write HTML documentation
+tools/docs/mk_html_docs.pl - Write HTML documentation
 
 =head1 SYNOPSIS
 
-    % perl tools/docs/make_html_docs.pl [--version=VERSION]
+    % perl tools/docs/mk_html_docs.pl [--version=VERSION]
 
 =head1 DESCRIPTION
 
@@ -228,6 +228,26 @@ foreach my $page (keys %pages) {
         }
         print $out_fh "</ul>\n\n";
     }
+
+    # ========================================================================#
+    # Note: The below is a'bit of a hack to output html links directly into   #
+    #       the 'index.html' file.  The reason for this hackery is, this      #
+    #       script uses json formatted files to pull in various *.pod files   #
+    #       in order to create the 'index.html' (along with other *.html      #
+    #       pages.  Unfortunately, there is no simple way to insert html      #
+    #       markup directly into the 'index.html' file; hence, the below      #
+    #       bits.  -- acy 01/25/12                                            #
+    #                                                                         #
+    # Note: We only want to do this with the 'index.html' page, and NOT any   #
+    #       of the others pages (e.g., 'ops.html' ... 'pct_tutorial.html').   #
+    # ========================================================================#
+    if ($outfilename eq "index") {
+      my $title = "<h2>Development Languages</h2>\n\n";
+      my $lang1 = "<ul><li><a href=\"http://whiteknight.github.com/Rosella/winxed/index.html\">The Winxed Programming Language</a></li>\n";
+      my $lang2 = "<li><a href=\"https://github.com/perl6/nqp\">The NQP Programming Language</a></li>\n</ul>\n\n";
+      print $out_fh Parrot::Docs::HTMLPage->body($title, $lang1, $lang2);
+    }
+
     # output footer
     print $out_fh Parrot::Docs::HTMLPage->footer('', $resource_dir, $version);
 }

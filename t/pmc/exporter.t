@@ -52,7 +52,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
     say 'ok 1 - source() returns PMCNULL upon Exporter init'
 
     # get a NameSpace PMC for testing
-    # TT #1233 replace with make_namespace, when implemented
+    # GH #591 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -83,7 +83,7 @@ pir_output_is( <<'CODE', <<'OUT', 'source' );
 .end
 
 
-# TT #1233 replace with make_namespace, when implemented
+# GH #591 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -110,7 +110,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
     say 'ok 2 - ...which is current namespace at first'
 
     # get a NameSpace PMC for testing
-    # TT #1233 replace with make_namespace, when implemented
+    # GH #591 replace with make_namespace, when implemented
     .local pmc ns
     ns = get_namespace ['Eponymous']
 
@@ -141,7 +141,7 @@ pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .end
 
 
-# TT #1233 replace with make_namespace, when implemented
+# GH #591 replace with make_namespace, when implemented
 .namespace ['Eponymous']
 .sub 'Eponymous' :anon
 .end
@@ -462,7 +462,7 @@ CODE
 ok 1
 OUT
 
-# Test exporting mmd subs: TT #1205
+# Test exporting mmd subs: GH #542
 # https://github.com/parrot/parrot/issues/542
 
 # Local Variables:

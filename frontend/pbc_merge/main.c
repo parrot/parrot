@@ -269,7 +269,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 bc_seg->main_sub = in_seg->main_sub + inputs[i]->pmc.const_start;
             /*
             XXX hide incessant warning messages triggered by implicit :main
-            this can be added when TT #1704 is implemented
+            this can be added when GH #571 is implemented
 
             else
                 Parrot_io_eprintf(interp,

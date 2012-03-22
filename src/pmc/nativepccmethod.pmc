@@ -125,7 +125,7 @@ Call the function pointer.
         {
             PMC *cont = INTERP->current_cont;
 
-            if (cont && cont != NEED_CONTINUATION
+            if (!PMC_IS_NULL(cont)
             && (PObj_get_FLAGS(cont) & SUB_FLAG_TAILCALL)) {
                 cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
                 next = VTABLE_invoke(INTERP, cont, next);
