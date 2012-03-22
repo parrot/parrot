@@ -48,6 +48,7 @@ For other architectures, this is a C<noop>.
 =cut
 
 op trap() :deprecated {
+    UNUSED(interp);
 #if defined(__GNUC__) && defined(i386)
     __asm__("int3");       /* opcode 0xcc */
 #endif
