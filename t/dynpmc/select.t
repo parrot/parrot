@@ -16,11 +16,13 @@ it to become ready for an I/O operation.
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
-    load_bytecode 'osutils.pbc'
+    '__load_bytecode'('osutils.pbc')
 
     plan(14)
 

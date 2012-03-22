@@ -50,7 +50,7 @@ my $loadlib = <<'EOC';
 .loadlib "dynlexpad"
 
 .HLL "Some"
-.sub load :anon :init
+.sub load :anon :tag('init')
   .local pmc interp, lexpad, dynlexpad
   interp = getinterp
   lexpad = get_class 'LexPad'
