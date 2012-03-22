@@ -2312,7 +2312,8 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
             Parrot_pcc_invoke_sub_from_c_args(imcc->interp, sub_pmc, "->P", &result);
         );
 
-        update_const_table_pmc(imcc, pf, k, result);
+        if (!PMC_IS_NULL(result))
+            update_const_table_pmc(imcc, pf, k, result);
     }
 }
 
