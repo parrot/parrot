@@ -73,6 +73,7 @@ struct IMC_Unit {
     SymReg           *subid;            /* Unique subroutine id */
 
     struct            imcc_ostat ostat;
+    opcode_t          sub_const_index;  /* Index of the sub in the constants table */
 };
 
 

@@ -751,7 +751,8 @@ void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
+PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP,
+    ARGIN_NULLOK(PackFile *pf))
         __attribute__nonnull__(1);
 
 PARROT_PURE_FUNCTION

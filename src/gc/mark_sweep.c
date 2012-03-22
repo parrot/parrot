@@ -278,11 +278,11 @@ static void
 mark_code_segment(PARROT_INTERP)
 {
     ASSERT_ARGS(mark_code_segment)
-    int i;
-    PackFile_ByteCode   *bc = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode * const bc = Parrot_pf_get_current_code_segment(interp, NULL);
 
     if (bc != NULL) {
-        PackFile_ConstTable *ct = bc->const_table;
+        int i;
+        PackFile_ConstTable * const ct = bc->const_table;
 
         for (i = 0; i < ct->pmc.const_count; i++) {
             Parrot_gc_mark_PMC_alive(interp, ct->pmc.constants[i]);

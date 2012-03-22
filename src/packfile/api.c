@@ -1181,7 +1181,8 @@ Parrot_pf_get_current_packfile(PARROT_INTERP)
 
 /*
 
-=item C<PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)>
+=item C<PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP,
+PackFile *pf)>
 
 Get's the interpreter's currently active bytecode segment
 
@@ -1192,10 +1193,12 @@ Get's the interpreter's currently active bytecode segment
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode *
-Parrot_pf_get_current_code_segment(PARROT_INTERP)
+Parrot_pf_get_current_code_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_get_current_code_segment)
-    return interp->code;
+    if (pf == NULL)
+        return interp->code;
+    return pf->cur_cs;
 }
 
 /*
