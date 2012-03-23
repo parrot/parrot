@@ -260,8 +260,7 @@ PMC * Parrot_thread_transfer_sub(
 #define Parrot_thread_maybe_create_proxy(i, thread, pmc) ( \
         (pmc)->vtable->base_type == enum_class_Proxy \
         ? (PARROT_PROXY(pmc)->interp == (thread) ? PARROT_PROXY(pmc)->target : (pmc)) \
-        : Parrot_thread_create_proxy((i), (thread), (pmc)) \
-    )
+        : Parrot_thread_create_proxy((i), (thread), (pmc)))
 
 #endif /* PARROT_THREAD_H_GUARD */
 
