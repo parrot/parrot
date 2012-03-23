@@ -9,414 +9,199 @@ release process
 
 =head1 SYNOPSIS
 
-    $ perl tools/release/auto_release.pl [OPTION]... VERSION
+    $ perl tools/release/parrot_github_release.pl [OPTIONS]
 
 =head1 DESCRIPTION
 
-This script automates most, if not all, of the packaging of the
-'parrot.github.com' repo and the supporting 'parrot-docsx' gh-pages
-repositories.
+This script automates the packaging of the 'parrot.github.com' repository and
+the archiving of the previous documentation release into the appropriate
+'parrot-docsx' repository.
 
-If you are familiar with the Release Manager Guide
-(F<docs/project/release_manager_guide.pod>), this script can take care of
-everything up until section IX.
+In short, this script automates the process in Section X of the Release
+Manager Guide (F<docs/project/release_manager_guide.pod>) and outlined in the
+Release Parrot Github Guide (F<docs/project/release_parrot_github_guide.pod>).
 
 =head1 OPTIONS
 
 =over 4
 
+=item B<-d>, B<--docs-path>=I<[/path/to_previous/docs_release/]>
+
+The path on your local file system in which to clone the 'parrot.github.com'
+and the 'parrot-docsx' repositories.
+
+=item B<-r>, B<--repo-path>=I<[/path/in_which/to_clone/the_repos/]>
+
+The path on your local file system in which to clone the 'parrot.github.com'
+and the 'parrot-docsx' repositories.
+
 =item B<-h>, B<--help>
 
-Displays help message and exits.
+Displays this help message and exits.
 
-=item B<-d>, B<--developer>
+=item B<-v>, B<--version>
 
-Builds a developer release. Cannot be used in conjunction with C<-s>.
-
-Specifying the C<-d> switch is a bit redundant as C<auto_release.pl> builds a
-developer release by default. It's merely provided for the sake of consistency.
-
-=item B<-s>, B<--supported>
-
-Builds a supported release. Cannot be used in conjunction with C<-d>.
-
-=item B<-t>, B<--test-jobs>=I<n>
-
-Represents the number of test harnesses to run simultaneously when the test
-suite is being run. If given, it's value will override the one in the
-C<$TEST_JOBS> environment variable.
-
-If not given, it will default to 1 unless C<$TEST_JOBS> is defined; in which
-case, C<$TEST_JOBS> will be used as a default.
-
-Using the C<-t> switch (or C<$TEST_JOBS>) is strongly recommended as it can
-significantly reduce the amount of time spent on running the test suite which
-can take up to several minutes.
-
-=item B<-v>, B<--version>=I<a.b.c>
-
-Specifies the new release version. Must be a string of the form a.b.c (e.g.
-3.8.0).
-
-The release version passed to C<-v> always takes precedence over the one given
-as C<VERSION> (if any).
+Displays the version and copyright information and exits.
 
 =back
 
+=head1 NOTE
+
+This script makes an important assumption: That you are the Release Manager,
+working on Section X of the Release Manger Guide, and have, therefore, already
+cut the new Parrot release.
+
 =head1 HISTORY
 
-* [2011-09-20] Initial version written by Kevin Polulak <kpolulak@gmail.com>
+* [2012-03-21] Initial version written by Alvis Yardley <ac.yardley@gmail.com>
 
 =head1 SEE ALSO
 
 F<docs/project/release_manager_guide.pod>
 
+F<docs/project/release_parrot_github_guide.pod>
+
 =cut
 
-use 5.008;
 use strict;
 use warnings;
 
 use Getopt::Long;
 use Pod::Usage;
+use File::Spec;
 use System::Command;
 
-# TODO Migrate code from update_version.pl
-# TODO Edit '== ==' strings so that newlines are on top and bottom
-
 # Switches
-my $version;          # Version number
-my $developer;        # Developer release
-my $supported;        # Supported release
-my $test_jobs = 1;    # Number of parallel test harnesses
 my $help;             # Displays help message
+my $version;          # Displays version and copyright information
+my $docs_path;        # Path to the previous docs release
+my $repo_path;        # Path in which to clone the repos
 
-my $type;             # Developer or supported release
-
-my $result = GetOptions('v|version=s'   => \$version,
-                        'd|developer'   => \$developer,
-                        's|supported'   => \$supported,
-                        't|test-jobs=i' => \$test_jobs,
-                        'h|help'        => \$help);
+my $result = GetOptions('h|help'        => \$help,
+			'v|version'     => \$version,
+			'd|docs-path=s' => \$docs_path,
+			'r|repo-path=s' => \$repo_path);
 
 # Catch unrecognized switches
 pod2usage() unless $result;
 
-# Display help message if -h was given
+# Display help message if '-h' was given
 pod2usage(0) if $help;
 
-# Determine whether to build a developer or supported release
-set_release_type(\$developer, \$supported, \$type);
+# Display version and copyright information if '-v' was given
+version() && exit(0) if $version;
 
-# Don't run without a release version
-$version = shift unless defined $version;
-stop('You must specify the release version') unless $version;
+# Get 'docs/' directory if not supplied
+get_docs_directory() unless $docs_path;
+
+# Get the directory in which to clone the repos if not supplied
+get_repo_directory() unless $repo_path;
+
+# Get VERSION
+open my $VERSION, "<VERSION" or stop("I'm unable to open the 'VERSION' file");
+$version = <$VERSION>;
+close $VERSION;
 
 # Parse version number
-stop('Release version must be of the form a.b.c (e.g. 3.8.0)')
-    if $version !~ /^(\d+)\.(\d+)\.(\d+)$/;
+my ($major, $minor, $patch) = ($1, $2, $3) if $version =~ /^(\d+)\.(\d+)\.(\d+)$/;
+stop("There is some (unkonw) problem with the major or the minor release numbers")
+  unless $major and $minor;
 
-# Prompt user to begin packaging release
-while (1) {
-    print "Begin building $version $type release? [y/n] ";
-
-    my $answer = <>;
-
-    chomp $answer;
-
-    if ($answer eq 'y') {
-        last;
-    }
-    elsif ($answer eq 'n') {
-        exit 1;
-    }
+# Set to the previous release version
+if ($minor == 0) {
+    $minor = 11;
+    $major -= 1;
+}
+else {
+    $minor -= 1;
 }
 
+# Get the current working directory
+my $parrot_dir = File::Spec->curdir();
+
 # Begin release process
-get_recent_version();
-check_local_commits();
-build_old_version();
-update_version($version);
-distro_tests();
-
-update_pbc_compat() unless $developer;
-
-build_and_run_tests();
-commit_changes();
-prepare_tarball();
-verify_new_version($version, $type);
-tag_release($version);
-push_to_ftp_server($version, $type);
-crow();
+# get_parrot_github();
+# get_parrot_docsx();
+archive_parrot_docsx();
 
 ##########################
 # Subroutine definitions #
 ##########################
 
-# Rebuilds Parrot and runs the full test suite
-sub build_and_run_tests {
-    print "== BUILDING NEW VERSION ==\n";
-
-    system('make', 'realclean')              == 0 or stop();
-    system('perl', 'Configure.pl', '--test') == 0 or stop();
-
-    # XXX Use separate filehandles to redirect stderr/stdout to log file
-    system('make', 'world', 'html') == 0 or stop();
-
-    #_edit('make_world_html.log');
-
-    print "== RUNNING FULL TEST SUITE ==\n";
-
-    # XXX Use separate filehandles to redirect stderr/stdout to log file
-    if (defined $ENV{'TEST_JOBS'}) {
-        system('make', 'fulltest', $ENV{'TEST_JOBS'}) == 0 or stop();
-    }
-    else {
-        system('make', 'fulltest', $test_jobs)        == 0 or stop();
-    }
-
-    #_edit('make_fulltest.log');
-}
-
-# Builds an old version of Parrot so that ops can be bootstrapped
-sub build_old_version {
-    print "== REBUILDING PARROT ==\n";
-
-    system('perl', 'Configure.pl') == 0 or stop();
-    system('make')                 == 0 or stop();
-}
-
-# Verifies that there aren't any uncommitted local changes
-sub check_local_commits {
-    my $ret = `git log origin/master..`;
-
-    stop('Uncommitted local changes were found. '
-       . 'Please push all changes before continuing') if $ret;
-}
-
-# Pushes changes to master branch
-sub commit_changes {
-    print "== PREPARING COMMIT ==\n";
-
+# Get 'docs/' directory
+sub get_docs_directory {
     while (1) {
-        print "Do you want to review the diff patch before pushing to master? "
-            . "[y/n] ";
+	print "What is the path to the previous documentation release? ",
+	  "(e.g.,[/home/[user]/path_to_docs/]) ";
+	$docs_path = <>;
+	chomp $docs_path;
 
-        my $answer = <>;
-
-        chomp $answer;
-
-        if ($answer eq 'y') {
-            system('git', 'diff') == 0 or stop();
-            last;
-        }
-        elsif ($answer eq 'n') {
-            last;
-        }
+	last if -d $docs_path;
     }
+}
 
-    my $msg;
-
-    # Set commit message
-    print "Please enter the commit message (default: 'Released $version'): ";
-
-    $msg = <>;
-
-    chomp $msg;
-
-    # XXX Should I use global $version or pass it as an argument?
-    $msg = "Released $version" if length $msg == 0;
-
-    print "== COMMITTING LOCAL CHANGES ==\n";
-
-    system('git', 'commit', '-a', "-m $msg") == 0 or stop();
-
-    # Get SHA-1 digest for commit
-    open my $REV_PARSE, '-|', 'git rev-parse master' or stop();
-
-    my $commit = <$REV_PARSE>;
-    close $REV_PARSE;
-
-    chomp $commit;
-    $commit = substr $commit, 0, 7;
-
+# Get the directory in which to clone the repos
+sub get_repo_directory {
     while (1) {
-        print "Do you want to review commit $commit? [y/n] ";
+	print "What is the path in which to clone the 'parrot.github.com' ",
+	  "and the 'parrot-docsx' repositories? ",
+	  "(e.g.,[/home/[user]/path_to_clone/]) ";
+	$repo_path = <>;
+	chomp $repo_path;
 
-        my $answer = <>;
-
-        chomp $answer;
-
-        if ($answer eq 'y') {
-            system('git', 'show') == 0 or stop();
-            last;
-        }
-        elsif ($answer eq 'n') {
-            last;
-        }
-    }
-
-    print "== PUSHING COMMIT TO MASTER BRANCH ==\n";
-
-    system('git', 'push', 'origin', 'master') == 0 or stop();
-}
-
-# Generates release announcement using `crow.pir`
-sub crow {
-    my $announcement = 'release_announcement.txt';
-
-    print "== GENERATING ANNOUNCEMENT MESSAGE ==\n";
-
-    open my $CROW,        '-|', './parrot tools/release/crow.pir --type=text' or stop();
-    open my $CROW_OUTPUT, '>',  $announcement                                 or stop();
-
-    while (<$CROW>) {
-        print $CROW_OUTPUT $_;
-    }
-
-    close $CROW;
-    close $CROW_OUTPUT;
-
-    _edit($announcement);
-}
-
-# Runs distribution tests
-sub distro_tests {
-    print "== RUNNING DISTRIBUTION TESTS ==\n";
-
-    if (defined $ENV{'TEST_JOBS'}) {
-        system('make', 'distro_tests', $ENV{'TEST_JOBS'}) == 0 or stop();
-    }
-    else {
-        system('make', 'distro_tests', $test_jobs)        == 0 or stop();
+	last if -d $repo_path;
     }
 }
 
-# Clones a local copy of 'master' branch
-sub get_recent_version {
-    print "== CLONING MOST RECENT VERSION OF MASTER ==\n";
+# Clone a local copy of 'master' branch of 'parrot.github.com'
+sub get_parrot_github {
+    chdir $repo_path;
 
-    system('git', 'checkout', 'master')   == 0 or stop();
-    system('git', 'pull',     '--rebase') == 0 or stop();
+    print "\n== CLONING 'PARROT.GITHUB.COM' ==\n";
+    system('git', 'clone', 'git@github.com:parrot/parrot.github.com.git') == 0
+      or stop();
+
+    chdir $parrot_dir;
 }
 
-# Creates release tarball and verifies that it builds properly after extracting
-sub prepare_tarball {
-    # XXX Should this be `make reconfig` instead? If so, update guide
-    system('perl', 'Configure.pl')  == 0 or stop();
-    system('make', 'release_check') == 0 or stop();
+# Clone a local copy of 'master' branch of 'parrot.github.com'
+sub get_parrot_docsx {
+    my $parrot_docsx = 'git@github.com:parrot/parrot-docs' . $major . '.git';
+    chdir $repo_path;
+
+    print "\n== CLONING 'PARROT-DOCSX' ==\n";
+    system('git', 'clone', $parrot_docsx) == 0 or
+      stop("Please ensure the correct 'parrot-docsx' repo exists");
+
+    chdir $parrot_dir;
 }
 
-# Opens an SSH connection parrot@ftp-osl.osuosl.org and copies tarball
-sub push_to_ftp_server {
-    my ($ver, $type) = @_;
+# Archive the 'parrot-docsx' repository
+sub archive_parrot_docsx {
+    my $parrot_docsx = $repo_path . 'parrot-docs' . $major . '/';
+    chdir $parrot_docsx;
 
-    my $server       = 'parrot@ftp-osl.osuosl.org';
-    my $remote_dir   = '~/ftp/releases';
+    print "\n== CHECKING OUT GH-PAGES BRANCH ==\n";
+    system('git', 'checkout', 'gh-pages') == 0 or
+      stop("Unable to switch to the 'gh-pages' branch");
 
-    # Wait for user input so commands don't start running without permission
-    while (1) {
-        print "Do you want to push the tarballs to $server? [y/n] ";
+    my $previous = $major . '.' . $minor . '.' . $patch;
+    my $copy_to = $parrot_docsx . $previous . '/';
 
-        my $answer = <>;
+    print "\n== MAKING NEW DIRECTORY  ==\n";
+    system('mkdir', "$previous") or stop("Unable to make new directory");
 
-        chomp $answer;
+    my $copy_from = $docs_path . '*';
 
-        if ($answer eq 'y') {
-            last;
-        }
-        elsif ($answer eq 'n') {
-            return;
-        }
-    }
+    print "\n== COPYING DOCS TO PARROT-DOCSX ==\n";
+    system('cp', '-r', "$copy_from", "$copy_to") or
+      stop("Unable to copy 'docs/'");
 
-    # Create tarball filenames (gzip and bzip2)
-    my $sha256       = '.sha256';
-    my $gz           = '.gz';
-    my $bz2          = '.bz2';
+    print "\n== PUSHING PARROT-DOCSX ==\n";
+#   system('git', 'push', 'origin master') or
+#     stop("Unable to push parrot-docx master");
 
-    my $gz_tarball   = "parrot-$ver" . $gz;
-    my $bz2_tarball  = "parrot-$ver" . $bz2;
-
-    my $gz_sha256    = $gz_tarball   . $sha256;
-    my $bz2_sha256   = $bz2_tarball  . $sha256;
-
-    my $ssh;
-    my $ssh_stdin;
-
-    print "== CONNECTING TO OSUOSL FTP SERVER ==\n";
-
-    # SSH into FTP server to create new directory for tarball
-    $ssh       = System::Command->new('ssh', $server) or stop();
-    $ssh_stdin = $ssh->stdin;
-
-    # Wait for user to enter password
-    sleep 6;
-
-    # Determine pathname based on release type
-    if ($type eq 'developer') {
-        $remote_dir .= "/devel/$ver";
-    }
-    else {
-        $remote_dir .= "/supported/$ver";
-    }
-
-    print $ssh_stdin "mkdir $remote_dir";
-
-    $ssh->close;
-
-    stop("Failed to login to $server") unless $ssh->exit == 0;
-
-    my $scp;
-    my $scp_files = "$gz_tarball $bz2_tarball $gz_sha256 $bz2_sha256";
-    my $scp_dir   = "$server:$remote_dir";
-
-    print "== COPYING TARBALLS TO OSUOSL FTP SERVER ==\n";
-
-    # Copy tarballs into newly created directories on FTP server
-    $scp = System::Command->new('scp', $scp_files, $scp_dir) or stop();
-    $scp->close;
-
-    stop("Failed to copy tarballs to $server") unless $scp->exit == 0;
-
-    my $trigger;
-    my $trigger_stdin;
-
-    print "== PUSHING CHANGES TO OSUOSL FTP MIRRORS ==\n";
-
-    # Run `trigger-parrot` to push changes to all FTP mirrors
-    $trigger       = System::Command->('ssh', $server) or stop();
-    $trigger_stdin = $trigger->stdin;
-
-    sleep 6;
-
-    print $trigger_stdin "~/trigger-parrot";
-
-    $trigger->close;
-
-    stop("Failed to push changes to FTP mirrors") unless $trigger->exit == 0;
-}
-
-# Determines the type of release: developer or supported
-sub set_release_type {
-    my ($dev, $supp, $type) = @_;
-
-    # Fail if both -d and -s were given
-    stop('You may not use both the -d and -s switches. '
-       . 'Use one or the other') if $$dev and $$supp;
-
-    # Set type to supported if -s was given
-    if ($$supp) {
-        $$type = "supported";
-
-        return;
-    }
-
-    # Default to developer release if -d or -s weren't given
-    if (!($$dev and $$supp)) {
-        $$dev  = 1;
-        $$type = "developer";
-    }
+    chdir $parrot_dir;
 }
 
 # Customized version of die() for more consistent diagnostics
@@ -445,102 +230,18 @@ sub stop {
     exit 1;
 }
 
-# Adds a lightweight tag to the Git repository for the new release
-sub tag_release {
-    my $ver = shift;
-
-    print "== TAGGING NEW RELEASE ==\n";
-
-    # Transform version number so that it's of the form 'RELEASE_a_b_c'
-    $ver = 'RELEASE_' . $ver;
-    $ver =~ s/\./_/g;
-
-    system('git', 'tag',  "$ver")   == 0 or stop();
-    system('git', 'push', '--tags') == 0 or stop();
-}
-
-# Prompts user to edit PBC_COMPAT and regenerates bytecode
-sub update_pbc_compat {
-    _edit('PBC_COMPAT');
-
-    print "== UPDATING PBC FILES ==\n";
-
-    system('sh', 'tools/dev/mk_packfile_pbc') == 0 or stop();
-    system('sh', 'tools/dev/mk_native_pbc')   == 0 or stop();
-}
-
-# Updates version-specific information in particular files
-sub update_version {
-    my $ver = shift;
-
-    print "== UPDATING VERSION INFORMATION ==\n";
-
-    system('perl', 'tools/release/update_version.pl', "$ver") == 0 or stop();
-
-    _edit('docs/parrothist.pod');
-    _edit('docs/project/release_manager_guide.pod');
-    _edit('ChangeLog');
-    _edit('tools/release/release.json');
-    _edit('RESPONSIBLE_PARTIES');
-    _edit('CREDITS');
-}
-
-sub verify_new_version {
-    my ($ver, $type) = @_;
-
-    print "== VERIFYING NEW VERSION ==\n";
-
-    open my $PARROT, '-|', './parrot -V' or stop();
-
-    my @output = <$PARROT>;
-
-    close $PARROT;
-
-    # XXX There has got to be a better way to do this
-    if ($type eq 'developer') {
-        # Avoid using regex in void context
-        if ($output[0] ~~ /(?=This is Parrot version )\d+\.\d+\.\d+(?=-devel)/) { }
-
-        stop("Version $ver could not be verified. Found $& instead") if $& ne $ver;
-    }
-    else {
-        # Avoid using regex in void context
-        if ($output[0] ~~ /(?=This is Parrot version )\d+\.\d+\.\d+/) { }
-
-        stop("Version $ver could not be verified. Found $& instead") if $& ne $ver;
-    }
-}
-
 #######################
 # Private subroutines #
 #######################
 
-# Prompts the user to edit a file
-sub _edit {
-    my $doc = shift;
+sub version {
+    (my $version = <<VERSION_END) =~ s/^\S+//gm;
+  This is parrot_github_release.pl, v1.0
 
-    while (1) {
-        print "Do you want to edit $doc? [y/n] ";
+  Copyright (C) 2001-2012, Parrot Foundation.
 
-        my $answer = <>;
-
-        chomp $answer;
-
-        # XXX Use an OS-dependent solution (with $^O) for the default editor
-        if ($answer eq 'y') {
-            if (defined $ENV{'EDITOR'}) {
-                system("$ENV{'EDITOR'} $doc") == 0 or stop();
-            }
-            else {
-                system("vim $doc")            == 0 or stop();
-            }
-
-            last;
-        }
-        elsif ($answer eq 'n') {
-            last;
-        }
-    }
+VERSION_END
+    print "\n$version";
 }
 
 ###################
