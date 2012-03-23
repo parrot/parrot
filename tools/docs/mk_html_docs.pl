@@ -242,10 +242,10 @@ foreach my $page (keys %pages) {
     #       of the others pages (e.g., 'ops.html' ... 'pct_tutorial.html').   #
     # ========================================================================#
     if ($outfilename eq "index") {
-	my $title = "<h2>Development Languages</h2>\n\n";
-	my $lang1 = "<ul><li><a href=\"http://whiteknight.github.com/Rosella/winxed/index.html\">The Winxed Programming Language</a></li>\n";
-	my $lang2 = "<li><a href=\"https://github.com/perl6/nqp\">The NQP Programming Language</a></li>\n</ul>\n\n";
-	print $out_fh Parrot::Docs::HTMLPage->body($title, $lang1, $lang2);
+      my $title = "<h2>Development Languages</h2>\n\n";
+      my $lang1 = "<ul><li><a href=\"http://whiteknight.github.com/Rosella/winxed/index.html\">The Winxed Programming Language</a></li>\n";
+      my $lang2 = "<li><a href=\"https://github.com/perl6/nqp\">The NQP Programming Language</a></li>\n</ul>\n\n";
+      print $out_fh Parrot::Docs::HTMLPage->body($title, $lang1, $lang2);
     }
 
     # output footer

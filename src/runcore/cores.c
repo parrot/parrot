@@ -252,10 +252,6 @@ next opcode, or examine and manipulate data from the executing program.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-#ifdef WIN32
-#  define getpid _getpid
-#endif
-
 /* HEADERIZER HFILE: include/parrot/runcore_api.h */
 
 /* HEADERIZER BEGIN: static */

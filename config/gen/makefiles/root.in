@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 ###############################################################################
 #
@@ -877,7 +877,13 @@ frontend/parrot2/prt0.pbc : frontend/parrot2/prt0.pir $(MINIPARROT)
 frontend/parrot2/prt0.pbc.c : frontend/parrot2/prt0.pbc frontend/parrot2/build.pir $(MINIPARROT)
 	$(MINIPARROT) frontend/parrot2/build.pir frontend/parrot2/prt0.pbc
 
-frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c
+frontend/parrot2/prt0.pbc$(O) : frontend/parrot2/prt0.pbc.c \
+	$(INC_DIR)/feature.h \
+	$(INC_DIR)/core_types.h \
+	$(INC_DIR)/compiler.h \
+	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/api.h \
+	$(INC_DIR)/config.h
 
 bootstrap-prt0: $(WINXED) frontend/parrot2/prt0.winxed
 	$(WINXED) --noan -c frontend/parrot2/prt0.winxed
@@ -925,7 +931,7 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
-$(MINIPARROT) : frontend/parrot/main$(O) include/parrot/api.h include/parrot/longopt.h $(LIBPARROT) \
+$(MINIPARROT) : frontend/parrot/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
 	src/null_config$(O) src/longopt$(O)
 	$(LINK) @ld_out@$@ frontend/parrot/main$(O) src/null_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
@@ -1609,7 +1615,9 @@ src/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
 	$(INC_PMC_DIR)/pmc_key.h $(INC_PMC_DIR)/pmc_continuation.h
 
 src/call/context$(O) : $(PARROT_H_HEADERS) \
-	$(INC_PMC_DIR)/pmc_sub.h src/call/context.c
+	src/call/context.c \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
@@ -1702,7 +1710,6 @@ src/packfile/output$(O) : \
 
 src/packfile/pf_items$(O) : \
 	$(PARROT_H_HEADERS) \
-	src/packfile/byteorder.h \
 	src/packfile/pf_items.str \
 	src/packfile/pf_items.c
 
@@ -3128,9 +3135,17 @@ cagecritic:
 
 HEADERIZER_O_FILES = \
 	$(O_FILES) \
+	\
+	frontend/parrot_debugger/main$(O) \
+	\
 	frontend/parrot2/main$(O) \
+	\
+	frontend/pbc_disassemble/main$(O) \
+	\
 	frontend/pbc_dump/packdump$(O) \
-	frontend/pbc_merge/main$(O) \
+	frontend/pbc_dump/main$(O) \
+	\
+	frontend/pbc_merge/main$(O)
 
 headerizer : src/core_pmcs.c src/extend_vtable.c
 	$(HEADERIZER) $(HEADERIZER_O_FILES) compilers/imcc/imcc.y

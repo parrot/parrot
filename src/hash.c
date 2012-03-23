@@ -876,9 +876,9 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
 
     /* copy buckets and index */
-    mem_sys_memcopy(new_buckets, hash->buckets,
+    memcpy(new_buckets, hash->buckets,
             N_BUCKETS(old_size) * sizeof (HashBucket));
-    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket *));
+    memcpy(new_index, hash->index, old_size * sizeof (HashBucket *));
 
     /* free */
     if (old_size > SPLIT_POINT)
@@ -2214,6 +2214,35 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
                     "Hash: unsupported entry_type");
     }
     return ret;
+}
+
+/*
+
+=item C<void Parrot_hash_flatten_hash_into( PARROT_INTERP, PMC * const dest, PMC
+* const src, INTVAL overwrite)>
+
+*/
+
+void
+Parrot_hash_flatten_hash_into(
+        PARROT_INTERP, ARGIN(PMC * const dest), ARGIN(PMC * const src), INTVAL overwrite)
+{
+    ASSERT_ARGS(Parrot_hash_flatten_hash_into)
+    const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
+    if (overwrite) {
+        parrot_hash_iterate(src_hash,
+            VTABLE_set_pmc_keyed_str(interp, dest,
+                (STRING *)_bucket->key,
+                Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value)););
+    }
+    else {
+        parrot_hash_iterate(src_hash,
+            STRING * const key = (STRING *)_bucket->key;
+            if (!VTABLE_exists_keyed_str(interp, dest, key)) {
+                PMC * const value = Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value);
+                VTABLE_set_pmc_keyed_str(interp, dest, key, value);
+            });
+    }
 }
 
 /*

@@ -367,7 +367,7 @@ and then we jump all the way back to the task scheduling loop.
 =cut
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t*
 Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
@@ -375,7 +375,7 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *nex
     PMC * const task = Parrot_cx_stop_task(interp, next);
     VTABLE_push_pmc(interp, scheduler, task);
 
-    return (opcode_t*) 0;
+    return (opcode_t*)NULL;
 }
 
 /*

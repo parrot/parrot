@@ -793,7 +793,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
-        mem_sys_memcopy(self->data, cursor, self->size * sizeof (opcode_t));
+        memcpy(self->data, cursor, self->size * sizeof (opcode_t));
         cursor += self->size;
     }
     else {
@@ -856,7 +856,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
             Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
         Parrot_io_printf(interp, "%08lx ", (unsigned long)
-                self->data ? self->data[i] : self->pf->src[i]);
+                (self->data ? self->data[i] : self->pf->src[i]));
     }
 
     Parrot_io_printf(interp, "\n]\n");

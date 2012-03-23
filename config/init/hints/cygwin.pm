@@ -25,8 +25,8 @@ sub runstep {
     $libparrot_shared =~ s/^lib/cyg/g;
     # force the dll versioning
     my @parrot_version = Parrot::BuildUtil::parrot_version();
-    my $dllsuffix = join("_",@parrot_version);
-    $libparrot_shared =~ s/parrot\.dll/parrot$dllsuffix\.dll/;
+    my $dllsuffix = join('.', @parrot_version);
+    $libparrot_shared =~ s/parrot\.dll/parrot-$dllsuffix\.dll/;
 
     # An old note about building shared libraries: Perl5 used the 'ld2' tool until
     # 5.8.8-4, which is installed as part of the perl5 installation. So far, it

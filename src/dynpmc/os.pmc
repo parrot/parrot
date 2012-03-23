@@ -121,6 +121,35 @@ Changes the current working directory to the one specified by C<path>.
 
 /*
 
+=item C<void unlink(STRING *file)>
+
+Removes file C<file> from the file system.
+
+=cut
+
+*/
+
+   METHOD unlink(STRING *file) {
+       Parrot_file_unlink(INTERP, file);
+   }
+
+/*
+
+=item C<void rmdir(STRING *path)>
+
+Removes directory C<path> from the file system, if it is empty.
+
+=cut
+
+*/
+
+   METHOD rmdir(STRING *path) {
+       Parrot_file_rmdir(INTERP, path);
+   }
+
+/*
+/*
+
 =item C<void rm(STRING *path)>
 
 Calls C<remove> to remove the file or empty directory specified by

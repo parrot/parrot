@@ -96,6 +96,8 @@ actions on it.
 =cut
 
 inline op noop() :base_core {
+    UNUSED(interp);
+    UNUSED(CUR_OPCODE);
 }
 
 inline op check_events() :base_core :flow {
@@ -379,7 +381,7 @@ inline op invokecc(invar PMC) :flow {
 
     if (!PMC_IS_NULL(signature))
         Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest                   = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);
@@ -1504,7 +1506,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -1519,5 +1521,3 @@ as the Parrot interpreter itself.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
-

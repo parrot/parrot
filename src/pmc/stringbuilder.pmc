@@ -198,7 +198,7 @@ Append string to current buffer.
                     buffer->bufused  = new_buffer->bufused;
                     buffer->encoding = new_buffer->encoding;
 
-                    mem_sys_memcopy(buffer->strstart, new_buffer->strstart,
+                    memcpy(buffer->strstart, new_buffer->strstart,
                             new_buffer->bufused);
                 }
             }
@@ -216,7 +216,7 @@ Append string to current buffer.
         }
 
         /* Tack s on the end of buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
+        memcpy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
                 s->strstart, s->bufused);
 
         /* Update buffer */
@@ -278,7 +278,7 @@ Set content of buffer to passed string or PMC
         }
 
         /* Tack s on the buffer */
-        mem_sys_memcopy((void *)((char*)buffer->_bufstart),
+        memcpy((void *)((char*)buffer->_bufstart),
                 s->strstart, s->bufused);
 
         /* Update buffer */

@@ -85,7 +85,7 @@ sub body {
 
     my $body;
     foreach(@_) {
-	$body .= $_;
+      $body .= $_;
     }
 
     return $body;

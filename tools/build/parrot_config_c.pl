@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use warnings;
 use strict;
@@ -81,12 +81,14 @@ else {
 print << "EOF";
 }; /* parrot_config */
 
+PARROT_CONST_FUNCTION
 const unsigned char *
 Parrot_get_config_hash_bytes(void)
 {
     return parrot_config;
 }
 
+PARROT_CONST_FUNCTION
 int
 Parrot_get_config_hash_length(void)
 {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -151,6 +151,7 @@ void
 reset_runloop_id_counter(PARROT_INTERP)
 {
     ASSERT_ARGS(reset_runloop_id_counter)
+    UNUSED(interp);
     runloop_id_counter = 0;
 }
 

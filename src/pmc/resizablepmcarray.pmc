@@ -66,7 +66,7 @@ do_shift(ARGIN(PMC *arr))
     PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
-    mem_sys_memmove(item, item + 1, size * sizeof (PMC *));
+    memmove(item, item + 1, size * sizeof (PMC *));
     item[size] = PMCNULL;
 }
 
@@ -80,7 +80,7 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
     VTABLE_set_integer_native(interp, arr, size + 1);
     item = PMC_array(arr);
-    mem_sys_memmove(item + 1, item, size * sizeof (PMC *));
+    memmove(item + 1, item, size * sizeof (PMC *));
     item[0] = val;
 }
 
@@ -670,7 +670,7 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         if (tail > 0 && count > elems1) {
             /* we're shrinking the array, so first move the tail left */
-            mem_sys_memmove(item + offset + elems1, item + offset + count,
+            memmove(item + offset + elems1, item + offset + count,
                  tail * sizeof (PMC *));
         }
 
@@ -680,7 +680,7 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         if (tail > 0 && count < elems1) {
             /* the array grew, so move the tail to the right */
-            mem_sys_memmove(item + offset + elems1, item + offset + count,
+            memmove(item + offset + elems1, item + offset + count,
                  tail * sizeof (PMC *));
         }
 

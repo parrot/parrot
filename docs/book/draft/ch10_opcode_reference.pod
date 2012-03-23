@@ -1088,11 +1088,11 @@ I<Arguments: SR>
 
 X<getprop opcode (PASM)>
 
-  getprop R<DEST>, R<NAME>, R<PMC>
+  getprop R<DEST>, R<PMC>, R<NAME>
 
 Return the value of a named property on a PMC.
 
-I<Arguments: P, S, P>
+I<Arguments: P, P, S>
 
 See also: C<setprop> and C<prophash>.
 
