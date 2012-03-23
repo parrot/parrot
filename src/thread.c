@@ -134,11 +134,58 @@ PMC*
 Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_thread_create_proxy)
-    PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
+    if (pmc->vtable->base_type == enum_class_Sub) {
+        return Parrot_thread_create_local_sub(interp, thread, pmc);
+    }
+    else {
+        PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
+        PARROT_ASSERT(interp != thread);
+        PARROT_PROXY(proxy)->interp = interp;
+        PARROT_GC_WRITE_BARRIER(thread, proxy);
+        return proxy;
+    }
+}
+
+/*
+
+=item C<PMC* Parrot_thread_create_local_sub(PARROT_INTERP, Parrot_Interp const
+thread, PMC *pmc)>
+
+Create a local sub in the thread interp for the pmc belonging to interp
+
+=cut
+
+*/
+PARROT_CANNOT_RETURN_NULL
+PMC*
+Parrot_thread_create_local_sub(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_thread_create_local_sub)
+
+    PMC                   * const local_sub       = Parrot_clone(thread, pmc);
+    Parrot_Sub_attributes * const local_sub_attrs = PARROT_SUB(local_sub);
+    Parrot_Sub_attributes * const sub_attrs       = PARROT_SUB(pmc);
+
     PARROT_ASSERT(interp != thread);
-    PARROT_PROXY(proxy)->interp = interp;
-    PARROT_GC_WRITE_BARRIER(thread, proxy);
-    return proxy;
+
+    local_sub_attrs->namespace_name  = sub_attrs->namespace_name ?
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->namespace_name) : NULL;
+    local_sub_attrs->namespace_stash =
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->namespace_stash);
+    local_sub_attrs->multi_signature = sub_attrs->multi_signature ?
+        Parrot_thread_create_proxy(interp, thread, sub_attrs->multi_signature) : NULL;
+    local_sub_attrs->lex_info        = sub_attrs->lex_info ?
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->lex_info) : NULL;
+    local_sub_attrs->outer_sub       = sub_attrs->outer_sub ?
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->outer_sub) : NULL;
+    local_sub_attrs->ctx             = sub_attrs->ctx ?
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->ctx) : NULL;
+    local_sub_attrs->outer_ctx       = sub_attrs->outer_ctx ?
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->outer_ctx) : NULL;
+
+    PARROT_GC_WRITE_BARRIER(thread, local_sub);
+
+    return local_sub;
 }
 
 /*
@@ -166,17 +213,20 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
     INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
 
 
-    if (old_struct->code->vtable->base_type == enum_class_Proxy)
+    if (old_struct->code->vtable->base_type == enum_class_Proxy) {
         new_struct->code = PARROT_PROXY(old_struct->code)->target;
+        PARROT_ASSERT(new_struct->code->orig_interp == thread_interp);
+    }
     else
-        /* clone does not do much (it's makes a shallow copy) so this is probably not enough */
-        new_struct->code = Parrot_clone(thread_interp, old_struct->code);
+        new_struct->code = Parrot_thread_create_local_sub(interp, thread_interp, old_struct->code);
 
     if (old_struct->data && ! PMC_IS_NULL(old_struct->data)) {
-        if (old_struct->data->vtable->base_type == enum_class_Proxy)
+        if (old_struct->data->vtable->base_type == enum_class_Proxy) {
             new_struct->data = PARROT_PROXY(old_struct->data)->target;
+            PARROT_ASSERT(new_struct->data->orig_interp == thread_interp);
+        }
         else
-            new_struct->data = Parrot_clone(thread_interp, old_struct->data);
+            new_struct->data = Parrot_thread_create_proxy(interp, thread_interp, old_struct->data);
     }
 
     new_struct->partner = task;
@@ -190,7 +240,7 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
         PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
 
         VTABLE_push_pmc(thread_interp, new_struct->shared,
-            Parrot_thread_create_proxy(interp, thread_interp, data));
+            Parrot_thread_maybe_create_proxy(interp, thread_interp, data));
     }
 
     return local_task;

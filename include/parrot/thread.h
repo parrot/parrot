@@ -131,6 +131,14 @@ PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_thread_create_local_sub(PARROT_INTERP,
+    ARGIN(Parrot_Interp const thread),
+    ARGIN(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_CANNOT_RETURN_NULL
 PMC* Parrot_thread_create_local_task(PARROT_INTERP,
     ARGIN(Parrot_Interp const thread_interp),
     ARGIN(PMC *task))
@@ -202,6 +210,11 @@ PMC * Parrot_thread_transfer_sub(
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_create_local_sub \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(thread) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_thread_create_local_task \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -243,6 +256,12 @@ PMC * Parrot_thread_transfer_sub(
     , PARROT_ASSERT_ARG(sub))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
+
+#define Parrot_thread_maybe_create_proxy(interp, thread, pmc) ( \
+        (pmc)->vtable->base_type == enum_class_Proxy \
+        ? (PARROT_PROXY(pmc)->interp == thread ? PARROT_PROXY(pmc)->target : (pmc)) \
+        : Parrot_thread_create_proxy(interp, thread, (pmc)) \
+    )
 
 #endif /* PARROT_THREAD_H_GUARD */
 
