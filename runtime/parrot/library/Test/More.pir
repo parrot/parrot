@@ -1368,6 +1368,18 @@ an exception that matches the pattern, fails the test otherwise.
     .get_results (ex)
     pop_eh
     error_msg = ex
+
+# When you want to see the contents of the exception, uncomment this
+#    diag(error_msg)
+#    $P0 = ex.'backtrace_strings'()
+#    $P1 = iter $P0
+#  loop_top:
+#    unless $P1 goto loop_bottom
+#    $S0 = shift $P1
+#    diag($S0)
+#    goto loop_top
+#  loop_bottom:
+
     substring(error_msg, text, description)
 
   done:

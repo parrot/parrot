@@ -182,14 +182,16 @@ equal:
 	.return (1)
 .end
 
+.include 'load_bytecode.pir'
+
 .sub main :main
-	load_bytecode 'Test/Builder.pbc'
+	'__load_bytecode'('Test/Builder.pbc')
 	.local pmc test
 	test = new [ 'Test'; 'Builder' ]
 	test.'plan'(N_TESTS)
 
 	push_eh cant_load
-	load_bytecode 'Parrot/Coroutine.pbc'
+	'__load_bytecode'('Parrot/Coroutine.pbc')
 	pop_eh
 	test.'ok'(1, 'loaded bytecode')
 

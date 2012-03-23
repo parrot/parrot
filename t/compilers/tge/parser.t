@@ -15,8 +15,9 @@ TGE::Parser tests
 
 =cut
 
+.include 'load_bytecode.pir'
 .sub main :main
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
     .include 'test_more.pir'
     plan(2)
 
@@ -59,7 +60,6 @@ GRAMMAR
     $S0 = "Syntax error at line 4, near \"transform \"\n"
     throws_substring(<<'CODE', $S0, 'parse failure')
 .sub main
-    load_bytecode 'TGE.pbc'
     .local string source
     source = <<'GRAMMAR'
     transform min (Leaf) {

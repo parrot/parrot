@@ -1,7 +1,9 @@
 #! ./parrot-nqp
 # Copyright (C) 2011, Parrot Foundation.
 
-pir::load_bytecode("opsc.pbc");
+my $pbc := pir::load_bytecode__ps("opsc.pbc");
+for $pbc.subs_by_tag('load') -> $sub { $sub(); }
+
 Q:PIR{ .include "test_more.pir" };
 
 my $compiler := pir::compreg__Ps('Ops');

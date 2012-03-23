@@ -24,8 +24,10 @@ testing a few basic components of TGE::Grammar and TGE::Tree
      test_malformed_string_in_r11890_under_linux_i386()
 .end
 
+.include 'load_bytecode.pir'
+
 .sub test_build_up_a_basic_rule_in_a_grammar
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
 
     .local pmc AG
     AG = new ['TGE';'Grammar']
@@ -43,7 +45,7 @@ testing a few basic components of TGE::Grammar and TGE::Tree
 .end
 
 .sub test_agid_hash
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
     .local pmc tree
     tree = new ['TGE';'Tree']
     .local int id
@@ -70,7 +72,7 @@ testing a few basic components of TGE::Grammar and TGE::Tree
 .sub test_malformed_string_in_r11890_under_linux_i386
     lives_ok(<<'CODE', '"Malformed string" in r11890 under Linux i386')
 .sub main :main
-    load_bytecode "TGE.pbc"
+    $P0 = load_bytecode "TGE.pbc"
     .return ()
 .end
 CODE

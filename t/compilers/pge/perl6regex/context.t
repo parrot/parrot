@@ -24,12 +24,13 @@ ver. 8, in the B<'Return values from matches'> section
 =cut
 
 my $PRE = <<PRE;
+.include 'load_bytecode.pir'
 .sub 'main' :main
-    load_bytecode "PGE.pbc"
-    load_bytecode "dumper.pbc"
-    load_bytecode "PGE/Dumper.pbc"
-    load_bytecode "PGE/Glob.pbc"
-    load_bytecode "PGE/Text.pbc"
+    '__load_bytecode'("PGE.pbc")
+    '__load_bytecode'("dumper.pbc")
+    '__load_bytecode'("PGE/Dumper.pbc")
+    '__load_bytecode'("PGE/Glob.pbc")
+    '__load_bytecode'("PGE/Text.pbc")
     .local string target, pattern
     .local pmc perl6regex, rulesub, pir, match
     perl6regex = compreg 'PGE::Perl6Regex'

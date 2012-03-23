@@ -3,10 +3,12 @@
 
 .include 't/compilers/opsc/common.pir'
 
+.include 'load_bytecode.pir'
+
 .sub 'main' :main
 
     .include 'test_more.pir'
-    load_bytecode 'opsc.pbc'
+    '__load_bytecode'('opsc.pbc')
 
     plan(12)
 

@@ -21,11 +21,13 @@ PGE regression tests
 
 =cut
 
+.include 'load_bytecode.pir'
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pir' );
 .sub main :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pir'
-    load_bytecode 'PGE/Dumper.pir'
+    '__load_bytecode'('PGE.pbc')
+    '__load_bytecode'('dumper.pir')
+    '__load_bytecode'('PGE/Dumper.pir')
 
     $P0 = compreg 'PGE::P5Regex'
     $P1 = $P0('aabb*')
@@ -39,9 +41,9 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'load_bytecode with .pbc' );
 .sub main :main
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'dumper.pbc'
-    load_bytecode 'PGE/Dumper.pbc'
+    '__load_bytecode'('PGE.pbc')
+    '__load_bytecode'('dumper.pir')
+    '__load_bytecode'('PGE/Dumper.pir')
 
     $P0 = compreg 'PGE::P5Regex'
     $P1 = $P0('aabb*')

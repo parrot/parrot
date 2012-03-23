@@ -1,10 +1,11 @@
 #! ./parrot-nqp
 
 Q:PIR {
-    # We want Test::More features for testing. Not NQP's builtin.
     .include "test_more.pir"
-    load_bytecode "opsc.pbc"
 };
+
+my $pbc := pir::load_bytecode__ps("opsc.pbc");
+for $pbc.subs_by_tag('load') -> $sub { $sub(); }
 
 my $c := pir::compreg__ps('Ops');
 
@@ -430,7 +431,7 @@ sub _parse($c, $buf) {
 }
 
 INIT {
-    pir::load_bytecode("dumper.pbc");
+    __load_bytecode("dumper.pbc");
 }
 
 # vim: ft=perl6

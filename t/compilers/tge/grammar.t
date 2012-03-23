@@ -26,8 +26,9 @@ tree of the specified type.
 
 pir_output_is( <<'CODE', <<'OUT', 'test compiling anonymous and named grammars' );
 
+.include 'load_bytecode.pir'
 .sub _main :main
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
 
     # Compile a grammar from the source
     .local pmc grammar
@@ -73,11 +74,11 @@ TreeMin2
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'complete example: Branch/Leaf tree grammar' );
-
+.include 'load_bytecode.pir'
 .sub _main :main
     .param pmc argv
 
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
 
     # Load the grammar in a string
     .local string source
@@ -277,9 +278,9 @@ TODO: {
 
     pir_output_is(
         <<'CODE', <<'OUT', 'two rules of the same name can apply to the same node, when called with a different dummy type' );
-
+.include 'load_bytecode.pir'
 .sub _main :main
-    load_bytecode 'TGE.pbc'
+    '__load_bytecode'('TGE.pbc')
 
     # Load the grammar in a string
     .local string source

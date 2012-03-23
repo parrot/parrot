@@ -3,7 +3,8 @@
 
 # Checking for OpLib num and skip files parsing.
 
-pir::load_bytecode("opsc.pbc");
+my $pbc := pir::load_bytecode__ps("opsc.pbc");
+for $pbc.subs_by_tag('load') -> $sub { $sub(); }
 
 plan(2);
 

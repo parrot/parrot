@@ -16,9 +16,11 @@ module F<runtime/parrot/library/Getopt/Obj.pir>.
 
 =cut
 
+.include 'load_bytecode.pir'
+
 .sub main :main
     .include 'test_more.pir'
-    load_bytecode "Getopt/Obj.pbc"
+    '__load_bytecode'("Getopt/Obj.pbc")
     plan(49)
 
     test_basic_long_options()
