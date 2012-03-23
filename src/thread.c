@@ -85,6 +85,11 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     fcntl(new_interp->thread_data->notifierfd[1], F_SETFL, O_NONBLOCK);
 #endif
 
+    if (! interp->thread_data) { /* first time we go multi threaded */
+        interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
+        interp->thread_data->tid = 0;
+    }
+
     return new_interp_pmc;
 }
 
