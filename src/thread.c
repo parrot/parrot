@@ -336,7 +336,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 #endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
-    } while (alarm_count);
+    } while (1);
 
     return ret_val;
 }
