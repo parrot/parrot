@@ -181,7 +181,7 @@ init_world(PARROT_INTERP)
     PMC *iglobals, *self, *pmc;
 
     /* Check assumptions about our config */
-    PARROT_STATIC_ASSERT( sizeof(INTVAL) == sizeof(opcode_t) );
+    PARROT_STATIC_ASSERT(sizeof (INTVAL) == sizeof (opcode_t));
 
     Parrot_platform_init_code();
 
