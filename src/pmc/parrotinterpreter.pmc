@@ -53,7 +53,7 @@ static void create_interp(
 
 /*
 
-=item C<void clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)>
+=item C<PMC * clone_interpreter(Parrot_Interp s, INTVAL flags)>
 
 Clones the interpreter as specified by the flags.
 
@@ -61,19 +61,66 @@ Clones the interpreter as specified by the flags.
 
 */
 
-void
-clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
+PARROT_CANNOT_RETURN_NULL
+PMC *
+clone_interpreter(Parrot_Interp s, INTVAL flags)
 {
+    /* have to pass a parent to allocate_interpreter to prevent PMCNULL from being set to NULL */
+    Parrot_Interp d = Parrot_interp_allocate_interpreter(s, flags);
+    int stacktop;
+    Parrot_GC_Init_Args args;
+
     PMC * interp_pmc;
     PMC * const s_config_hash = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_CONFIG_HASH);
 
-    /* we block GC runs while cloning since C<d> is not yet running */
-    Parrot_block_GC_mark(d);
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
 
-    /* create a new pmc for the interp pmc, since the existing was created by a different thread */
+    /* Set up the memory allocation system */
+    Parrot_gc_initialize(d, &args);
+    Parrot_block_GC_mark(d);
+    Parrot_block_GC_sweep(d);
+
+    d->ctx         = PMCNULL;
+    d->resume_flag = RESUME_INITIAL;
+
+    d->recursion_limit = RECURSION_LIMIT;
+
+    /* PANIC will fail until this is done */
+    d->piodata = NULL;
+    Parrot_io_init(d);
+
+    /*
+     * Set up the string subsystem
+     * This also generates the constant string tables
+     * Do this before unsetting parent_interpreter to copy its hash_seed and constant string table
+     */
+    Parrot_str_init(d);
+
+    /* create caches structure */
+    init_object_cache(d);
+
+    d->n_vtable_max = s->n_vtable_max;
+    d->vtables = s->vtables;
+    d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
+
+    Parrot_cx_init_scheduler(d);
+
+    d->parent_interpreter = NULL;
+
+    /* create the root set registry */
+    d->gc_registry = Parrot_pmc_new(d, enum_class_AddrRegistry);
+
     interp_pmc  = Parrot_pmc_new_noinit(d, enum_class_ParrotInterpreter);
     VTABLE_set_pointer(d, interp_pmc, d);
+
+    /* init the interpreter globals array */
+    d->iglobals = Parrot_pmc_new_init_int(d, enum_class_FixedPMCArray, (INTVAL)IGLOBALS_SIZE);
+
     VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_INTERPRETER, interp_pmc);
+
+    /* initialize built-in runcores */
+    Parrot_runcore_init(d);
 
     /* create a proxy for the config_hash */
     VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH,
@@ -89,6 +136,8 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         d->debug_flags = s->debug_flags;
     }
 
+    d->root_namespace = Parrot_thread_create_proxy(s, d, s->root_namespace);
+
     if (flags & PARROT_CLONE_HLL) {
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
@@ -97,9 +146,6 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
-        d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
-        d->n_vtable_max = s->n_vtable_max;
-        d->vtables = s->vtables;
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
@@ -108,10 +154,18 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
             Parrot_thread_create_proxy(s, d, s_pbc_libs));
     }
 
+    create_initial_context(d);
+
     if (flags & PARROT_CLONE_CODE)
         Parrot_clone_code(d, s);
 
+    /* setup stdio PMCs */
+    Parrot_io_init(d);
+
+    Parrot_unblock_GC_sweep(d);
     Parrot_unblock_GC_mark(d);
+
+    return interp_pmc;
 }
 
 
@@ -554,10 +608,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-
-        clone_interpreter(PMC_interp(dest),
-                          PMC_interp(SELF), PARROT_CLONE_DEFAULT);
+        PMC * const dest = clone_interpreter(PMC_interp(SELF), PARROT_CLONE_DEFAULT);
 
         return dest;
     }

@@ -647,7 +647,7 @@ void Parrot_run_callback(PARROT_INTERP,
 
 /* parrotinterpreter.pmc */
 /* XXX Would be nice if this could live in some headerized grouping */
-void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);
+PMC * clone_interpreter(Parrot_Interp self, INTVAL flags);
 
 #else /* !PARROT_IN_CORE */
 
