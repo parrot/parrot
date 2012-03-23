@@ -83,25 +83,27 @@ sub _generate_proxy_method {
     # take care to mark the parameters as unused
     # to avoid compiler warnings
     my $parameters = $method->parameters;
-    $parameters = join ', ', 'PARROT_PROXY(SELF)->interp', 'PARROT_PROXY(SELF)->target',
+    $parameters = join ', ', 'interp', 'PARROT_PROXY(SELF)->target',
         map { s/.*\b(\w+)/$1/; $_ } split /,\s*/, $method->parameters;
     my $call = 'VTABLE_' . $method->name . "($parameters)";
 
     my $body = $method->return_type eq 'PMC*'
         ? <<BODY
     PMC * result;
-   
-    /* otherwise the GC could find foreign PMCs on the stack */
-    Parrot_block_GC_mark(proxied_interp);
+
+    /* block the GC to prevent it from finding foreign PMCs on the stack */
+    Parrot_block_GC_mark(interp);
 
     result = $call;
 
-    Parrot_unblock_GC_mark(proxied_interp);
+    Parrot_unblock_GC_mark(interp);
 
     PARROT_ASSERT(interp != PARROT_PROXY(SELF)->interp);
     return (PMC_IS_NULL(result)
         ? PMCNULL
-        : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result));
+        : result->orig_interp == interp
+            ? result
+            : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result));
 BODY
         : "    return $call;\n";
 
