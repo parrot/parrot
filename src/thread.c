@@ -79,6 +79,9 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
 #ifdef _WIN32
 #else
     pipe(new_interp->thread_data->notifierfd);
+    /* Don't block on writing to the notifierfd. If the pipe is full,
+     * we don't need to notify again anyway */
+    fcntl(new_interp->thread_data->notifierfd[1], F_SETFL, O_NONBLOCK);
 #endif
 
     return new_interp_pmc;
