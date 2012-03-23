@@ -419,6 +419,8 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         PMC      * const pmc  = self->pmc.constants[i]
                               = VTABLE_get_pmc_keyed_int(interp, self->pmc.constants[i], 0);
 
+        PObj_is_shared_SET(pmc); /* packfile constants will be shared among threads */
+
         /* magically place subs into namespace stashes
          * XXX make this explicit with :load subs in PBC */
         if (VTABLE_isa(interp, pmc, sub_str))

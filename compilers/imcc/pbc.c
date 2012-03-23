@@ -439,6 +439,7 @@ add_const_table_pmc(ARGMOD(imc_info_t * imcc), ARGIN(PMC *pmc))
             mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->pmc.constants,
                 ct->pmc.const_count + 1, ct->pmc.const_count, PMC *);
 
+    PObj_is_shared_SET(pmc); /* packfile constants will be shared among threads */
 
     ct->pmc.constants[ct->pmc.const_count++] = pmc;
 

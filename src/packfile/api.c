@@ -845,6 +845,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
 
                 /* replace Sub PMC with computation results */
                 if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
+                    PObj_is_shared_SET(result); /* packfile constants are shared among threads */
                     ct->pmc.constants[i] = result;
                     PARROT_GC_WRITE_BARRIER(interp, pfpmc);
                 }
