@@ -257,10 +257,10 @@ PMC * Parrot_thread_transfer_sub(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
 
-#define Parrot_thread_maybe_create_proxy(interp, thread, pmc) ( \
+#define Parrot_thread_maybe_create_proxy(i, thread, pmc) ( \
         (pmc)->vtable->base_type == enum_class_Proxy \
-        ? (PARROT_PROXY(pmc)->interp == thread ? PARROT_PROXY(pmc)->target : (pmc)) \
-        : Parrot_thread_create_proxy(interp, thread, (pmc)) \
+        ? (PARROT_PROXY(pmc)->interp == (thread) ? PARROT_PROXY(pmc)->target : (pmc)) \
+        : Parrot_thread_create_proxy((i), (thread), (pmc)) \
     )
 
 #endif /* PARROT_THREAD_H_GUARD */
