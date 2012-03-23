@@ -627,7 +627,7 @@ Marks the sub as live.
          * (eg: EventHandler)
          * TODO: use inheritance properly to avoid this
          */
-        if (sub->seg && ! INTERP->thread_data)
+        if (sub->seg && ! Interp_flags_TEST(interp, PARROT_IS_THREAD))
             Parrot_gc_mark_PMC_alive(INTERP, sub->seg->base.pf->view);
     }
 

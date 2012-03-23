@@ -76,6 +76,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     new_interp->parent_interpreter = NULL;
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
     new_interp->thread_data->tid = 0;
+    Interp_flags_SET(new_interp, PARROT_IS_THREAD);
 #ifdef _WIN32
 #else
     pipe(new_interp->thread_data->notifierfd);

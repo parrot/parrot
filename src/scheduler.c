@@ -274,7 +274,7 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
 
-    if (interp->thread_data == NULL)
+    if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
         Parrot_thread_notify_threads(interp);
 
     Parrot_cx_check_alarms(interp, scheduler);

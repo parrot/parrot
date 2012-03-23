@@ -228,7 +228,7 @@ mark_interp(PARROT_INTERP)
     Parrot_gc_mark_PMC_alive(interp, CURRENT_CONTEXT(interp));
 
     /* mark the vtables: the data, Class PMCs, etc. */
-    if (! interp->thread_data)
+    if (! Interp_flags_TEST(interp, PARROT_IS_THREAD))
         Parrot_vtbl_mark_vtables(interp);
 
     /* mark the root_namespace */
@@ -267,7 +267,7 @@ mark_interp(PARROT_INTERP)
 
     /* code should be read only and is currently not cloned into other threads
      * so only mark it in the main thread */
-    if (! interp->thread_data)
+    if (! Interp_flags_TEST(interp, PARROT_IS_THREAD))
         mark_code_segment(interp);
 }
 
