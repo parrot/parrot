@@ -139,6 +139,9 @@ PMC*
 Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_thread_create_proxy)
+    if (PMC_IS_NULL(pmc))
+        return pmc;
+
     if (pmc->vtable->base_type == enum_class_Sub) {
         return Parrot_thread_create_local_sub(interp, thread, pmc);
     }
@@ -178,7 +181,7 @@ Parrot_thread_create_local_sub(PARROT_INTERP, ARGIN(Parrot_Interp const thread),
     local_sub_attrs->namespace_stash =
         Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->namespace_stash);
     local_sub_attrs->multi_signature = sub_attrs->multi_signature ?
-        Parrot_thread_create_proxy(interp, thread, sub_attrs->multi_signature) : NULL;
+        Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->multi_signature) : NULL;
     local_sub_attrs->lex_info        = sub_attrs->lex_info ?
         Parrot_thread_maybe_create_proxy(interp, thread, sub_attrs->lex_info) : NULL;
     local_sub_attrs->outer_sub       = sub_attrs->outer_sub ?
