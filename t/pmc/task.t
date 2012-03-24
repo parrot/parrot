@@ -18,6 +18,8 @@
 
     plan(3)
 
+    ok(1, "initialized")
+
     tasks_run()
 #    task_send_recv() # send and receive NYI
 #    task_kill()      # kill NYI
@@ -43,15 +45,15 @@
 .end
 
 .sub task1
-    ok(1, "task1 ran")
+    say "ok 2 task1 ran"
 .end
 
 .sub sub1
-    ok(1, "sub1 ran")
+    say "ok 3 sub1 ran"
 .end
 
 .sub task2
-    ok(1, "task2 ran")
+    say "ok 4 task2 ran"
 .end
 
 .sub task_send_recv
