@@ -14,20 +14,12 @@ script: "perl Configure.pl --test=build $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --c
 #     - master
 notifications:
   recipients:
-    - parrot-dev@lists.parrot.org
+    - duke@leto.net
   email:
     on_success: change
-    on_failure: always
+    on_failure: change
   irc:
       - "irc.parrot.org#parrot"
-#      - "irc.freenode.net#perl6"
 env:
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="clang"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="clang"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="clang"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="gcc"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="gcc"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="gcc"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smolder_fulltest" CC="g++"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smolder_fulltest" CC="g++"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smolder_fulltest" CC="g++"
+    - M0_INTERP=./src/m0/c/m0              PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="m0_test" CC="clang"
+    - M0_INTERP=./src/m0/perl/m0_interp.pl PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="m0_test" CC="clang"
