@@ -1,5 +1,5 @@
-#! perl
-# Copyright (C) 2011, Parrot Foundation.
+#! /usr/bin/env perl
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 

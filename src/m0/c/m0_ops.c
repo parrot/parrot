@@ -1,3 +1,7 @@
+/*
+Copyright (C) 2011-2012, Parrot Foundation.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,6 +64,18 @@ m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->registers[ops[1]] = frame->registers[ops[2]] -
         frame->registers[ops[3]];
+}
+
+static void
+m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = (int) frame->registers[ops[2]];
+}
+
+static void
+m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = (double) frame->registers[ops[2]];
 }
 
 static void
