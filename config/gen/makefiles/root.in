@@ -866,11 +866,12 @@ $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
 
-$(FRPTWO_DIR)/prt0.pbc : $(FRPTWO_DIR)/prt0.pir
+$(FRPTWO_DIR)/prt0.pbc : $(FRPTWO_DIR)/prt0.pir $(MINIPARROT)
 	$(MINIPARROT) -I$(RUN_INC_DIR) -o $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/prt0.pir
 
-$(FRPTWO_DIR)/prt0.pbc.c : $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/build.pir
+$(FRPTWO_DIR)/prt0.pbc.c : $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/build.pir $(MINIPARROT)
 	$(MINIPARROT) $(FRPTWO_DIR)/build.pir $(FRPTWO_DIR)/prt0.pbc
+
 
 $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/feature.h \
