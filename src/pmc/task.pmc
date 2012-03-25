@@ -34,6 +34,7 @@ pmclass Task provides invokable auto_attrs {
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
     ATTR PMC          *mailbox;   /* List of incoming messages */
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
+    ATTR Parrot_mutex waiters_lock;
     ATTR PMC          *shared;    /* List of variables shared with this task */
     ATTR PMC          *partner;   /* Copy of this task on the other side of a GC barrier,
                                      meaning in another thread */
@@ -65,7 +66,9 @@ Initialize a concurrency task object.
         core_struct->mailbox   = PMCNULL; /* Created lazily on demand */
         core_struct->waiters   = PMCNULL; /* Created lazily on demand */
         core_struct->shared    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        core_struct->partner   = PMCNULL; /* Set by Parrot_thread_create_local_task */
+        core_struct->partner   = NULL; /* Set by Parrot_thread_create_local_task */
+
+        MUTEX_INIT(core_struct->waiters_lock);
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -157,7 +160,7 @@ code as the first argument.
         TASK_in_preempt_CLEAR(SELF);
 
         if (! task->killed) {
-            const int current_depth =
+            const INTVAL current_depth =
                 Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
             PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
@@ -176,11 +179,12 @@ code as the first argument.
             /* The task is done. */
             /* Remove it from the set of active Tasks */
 
-            int i, n = 0;
+            INTVAL i, n = 0;
             PMC * const task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
             TASK_active_CLEAR(SELF);
             VTABLE_delete_keyed(interp, active_tasks, task_id);
+            task->killed = 1;
 
             /* schedule any waiters. */
             if (!PMC_IS_NULL(task->waiters))
@@ -189,6 +193,22 @@ code as the first argument.
             for (i = 0; i < n; ++i) {
                 PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
                 Parrot_cx_schedule_task(interp, wtask);
+            }
+
+            if (task->partner) { /* TODO how can we know if the partner's still alive? */
+                Parrot_Task_attributes * const partner_task = PARROT_TASK(task->partner);
+                LOCK(partner_task->waiters_lock);
+                partner_task->killed = 1;
+
+                if (!PMC_IS_NULL(partner_task->waiters)) {
+                    n = VTABLE_get_integer(interp, partner_task->waiters);
+                }
+
+                for (i = 0; i < n; ++i) {
+                    PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
+                    Parrot_cx_schedule_immediate(partner_task->interp, wtask);
+                }
+                UNLOCK(partner_task->waiters_lock);
             }
         }
 

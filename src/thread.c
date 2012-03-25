@@ -251,6 +251,9 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
             Parrot_thread_maybe_create_proxy(interp, thread_interp, data));
     }
 
+    /* put the task in a list for GC and for the main thread to know there's still active tasks */
+    VTABLE_push_pmc(interp, PARROT_SCHEDULER(interp->scheduler)->foreign_tasks, task);
+
     return local_task;
 }
 
@@ -278,10 +281,6 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
         Parrot_thread_create_local_task(interp, thread_interp, task));
 
     Parrot_unblock_GC_mark(thread_interp);
-
-    /* put the task in a list for GC */
-    /* TODO get them out again when finished */
-    VTABLE_push_pmc(interp, PARROT_SCHEDULER(interp->scheduler)->foreign_tasks, task);
 }
 
 /*

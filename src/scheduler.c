@@ -143,7 +143,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     ASSERT_ARGS(Parrot_cx_outer_runloop)
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count;
+    INTVAL alarm_count, foreign_count, i;
 
     do {
         while (VTABLE_get_integer(interp, scheduler) > 0) {
@@ -163,18 +163,29 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
 
+        foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
+        for (i = 0; i < foreign_count; i++) {
+            PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
+            if (PARROT_TASK(task)->killed) {
+                VTABLE_delete_keyed_int(interp, sched->foreign_tasks, i);
+                i--;
+                foreign_count--;
+            }
+        }
+
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
-        if (alarm_count > 0) {
+        if (alarm_count > 0 || foreign_count > 0) {
 #ifdef _WIN32
             /* TODO: Implement on Windows */
 #else
             /* Nothing to do except to wait for the next alarm to expire */
-            pause();
+            if (alarm_count > 0)
+                pause();
             Parrot_thread_notify_threads(interp);
 #endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
-    } while (alarm_count);
+    } while (alarm_count || foreign_count);
 }
 
 /*

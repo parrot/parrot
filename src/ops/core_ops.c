@@ -24272,14 +24272,21 @@ Parrot_wait_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task.\n");
     }
 
-    cur_task = Parrot_cx_stop_task(interp, next);
     tdata = PARROT_TASK(task);
+    LOCK(tdata->waiters_lock);
+    if (tdata->killed) {
+        UNLOCK(tdata->waiters_lock);
+        return (opcode_t *)next;
+    }
+
+    cur_task = Parrot_cx_stop_task(interp, next);
     if (PMC_IS_NULL(tdata->waiters)) {
         tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         PARROT_GC_WRITE_BARRIER(interp, task);
     }
 
     VTABLE_push_pmc(interp, tdata->waiters, cur_task);
+    UNLOCK(tdata->waiters_lock);
     return (opcode_t *)0;
     return (opcode_t *)cur_opcode + 2;
 }
@@ -24295,14 +24302,21 @@ Parrot_wait_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task.\n");
     }
 
-    cur_task = Parrot_cx_stop_task(interp, next);
     tdata = PARROT_TASK(task);
+    LOCK(tdata->waiters_lock);
+    if (tdata->killed) {
+        UNLOCK(tdata->waiters_lock);
+        return (opcode_t *)next;
+    }
+
+    cur_task = Parrot_cx_stop_task(interp, next);
     if (PMC_IS_NULL(tdata->waiters)) {
         tdata->waiters = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
         PARROT_GC_WRITE_BARRIER(interp, task);
     }
 
     VTABLE_push_pmc(interp, tdata->waiters, cur_task);
+    UNLOCK(tdata->waiters_lock);
     return (opcode_t *)0;
     return (opcode_t *)cur_opcode + 2;
 }

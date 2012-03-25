@@ -62,7 +62,7 @@ Initializes a concurrency scheduler object.
         core_struct->handlers      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->messages      = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->task_queue    = Parrot_pmc_new(INTERP, enum_class_PMCList);
-        core_struct->foreign_tasks = Parrot_pmc_new(INTERP, enum_class_PMCList);
+        core_struct->foreign_tasks = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->alarms        = Parrot_pmc_new(INTERP, enum_class_PMCList);
         core_struct->all_tasks     = Parrot_pmc_new(INTERP, enum_class_Hash);
         core_struct->next_task_id  = 0;

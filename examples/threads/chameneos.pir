@@ -1,10 +1,14 @@
 # Copyright (C) 2011 Parrot Foundation.
 
 .sub 'main' :main
-    .local pmc colors, start_colors, at_most_two, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy
+    .local pmc colors, start_colors, at_most_two, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
     .local int i
 
     dummy = new ['Continuation'] # workaround, see TODO in Proxy instantiate
+
+    count = new 'Integer'
+    count = 0
+    set_global 'count', count
 
     colors = new ['ResizableStringArray']
     colors = 3
@@ -63,6 +67,7 @@ init_chameneos:
     say "going to sleep"
     sleep 10
     say "woke up just in time for exit"
+    exit 0
 .end
 
 .sub chameneos_code
@@ -136,7 +141,8 @@ start:
         setattribute call_task, 'code', call_core
         setattribute call_task, 'data', color
         interp.'schedule_proxied'(call_task, b_color)
-        sleep 0.1
+        wait call_task
+
         other_color = a_color
         sem_unlock(sem_priv)
         goto done
@@ -148,7 +154,7 @@ start:
         setattribute call_task, 'code', call_core
         setattribute call_task, 'data', color
         interp.'schedule_proxied'(call_task, a_color)
-        sleep 0.1
+        wait call_task
 
         sem_unlock(mutex)
         sem_wait(sem_priv)
@@ -177,7 +183,7 @@ done:
 
 .sub second_call_core
     .param pmc data
-    .local pmc interp, task, b_color, first_call
+    .local pmc interp, task, b_color, first_call, count
     .local int b_color_int
     interp = getinterp
     task = interp.'current_task'()
@@ -188,6 +194,9 @@ done:
     first_call = 1
     b_color_int = data
     b_color     = b_color_int
+    count = get_global 'count'
+    inc count
+    say count
 .end
 
 .sub sem_unlock
@@ -210,27 +219,18 @@ done:
     interp = getinterp
     sem_wait_core = get_global 'sem_wait_core'
 
-    waiter = new ['Continuation']
-    set_label waiter, got_lock
-
     sem_wait_task = new ['Task']
     setattribute sem_wait_task, 'code', sem_wait_core
     setattribute sem_wait_task, 'data', sem
-    push sem_wait_task, waiter
     interp.'schedule_proxied'(sem_wait_task, sem)
-    terminate
-got_lock:
+    wait sem_wait_task
     returncc
 .end
 
 .sub sem_wait_core
     .param pmc data
-    .local pmc interp, task, sem, waiter, resume_task
-    interp = getinterp
-    task = interp.'current_task'()
-
+    .local pmc sem
     sem = data
-    waiter = pop task
 test:
     #disablepreemption
     if sem > 0 goto lock
@@ -240,10 +240,6 @@ test:
 lock:
     dec sem
     #enablepreemption
-
-    resume_task = new ['Task']
-    setattribute resume_task, 'code', waiter
-    interp.'schedule_proxied'(resume_task, waiter)
 .end
 
 .sub sem_unlock_core
