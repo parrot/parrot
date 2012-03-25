@@ -7,6 +7,9 @@
 # This makefile makes use of specific .dummy targets (rather than .PHONY
 # or .VIRTUAL targets) in an effort to work with various flavors of make.
 #
+# When revising this makefile template, please make sure to have changes
+# tested with both 'make' and 'make -jN' (where N > 1) on multi-core machines.
+#
 ###############################################################################
 
 ###############################################################################
