@@ -621,7 +621,7 @@ first_avail(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit), int reg_set,
         for (r = hsh->data[i]; r; r = r->next) {
             if (r->set == reg_set)
                 if (REG_NEEDS_ALLOC(r))
-                    if (r->color >= (int)0)
+                    if (r->color >= 0)
                         set_add(allocated, (unsigned int)r->color);
         }
     }
