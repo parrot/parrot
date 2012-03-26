@@ -69,13 +69,13 @@ m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = (int) frame->registers[ops[2]];
+    frame->registers[ops[1]] = (double)(frame->registers[ops[2]]);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = (double) frame->registers[ops[2]];
+    frame->registers[ops[1]] = (int)(frame->registers[ops[2]]);
 }
 
 static void
@@ -222,6 +222,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 case (M0_SET_IMM):
                     m0_op_set_imm( cf, &ops[pc] );
                 break;
+
                 case (M0_DEREF):
                     m0_op_deref( cf, &ops[pc] );
                 break;
@@ -299,6 +300,14 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_GET_BYTE):
                     m0_op_get_byte( cf, &ops[pc] );
+                break;
+
+                case (M0_ITON):
+                    m0_op_convert_i_n( cf, &ops[pc] );
+                break;
+
+                case (M0_NTOI):
+                    m0_op_convert_n_i( cf, &ops[pc] );
                 break;
 
                 case (M0_EXIT):
