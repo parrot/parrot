@@ -152,13 +152,13 @@ void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-int Parrot_pa_is_owned(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self),
-    ARGIN(void *orig),
-    ARGIN_NULLOK(void *ref))
+PARROT_WARN_UNUSED_RESULT
+int Parrot_pa_is_owned(
+    ARGIN(const Parrot_Pointer_Array *self),
+    ARGIN(const void *orig),
+    ARGIN_NULLOK(const void *ref))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_MALLOC
@@ -182,8 +182,7 @@ size_t Parrot_pa_count_used(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
 #define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
