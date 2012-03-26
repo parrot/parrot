@@ -416,6 +416,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
+	$(INC_DIR)/signature.h \
 	$(INC_PMC_DIR)/pmc_callcontext.h
 
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
@@ -481,6 +482,7 @@ INTERP_O_FILES = \
 	src/call/ops$(O)  \
 	src/call/context$(O) \
 	src/call/context_accessors$(O) \
+	src/call/signature$(O) \
 	src/key$(O) \
 	src/library$(O) \
 	src/list$(O) \
@@ -1607,6 +1609,9 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 	src/call/context.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_PMC_DIR)/pmc_continuation.h
+
+src/call/signature$(O) : $(PARROT_H_HEADERS) \
+	src/call/signature.c
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
