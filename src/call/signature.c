@@ -77,7 +77,7 @@ static INTVAL autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
+static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -317,15 +317,15 @@ Parrot_pcc_signature_push_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *self),
 
 /*
 =item C<INTVAL Parrot_pcc_signature_get_integer(PARROT_INTERP, Parrot_Signature
-*, INTVAL key)>
+*self, INTVAL key)>
 
 =item C<FLOATVAL Parrot_pcc_signature_get_number(PARROT_INTERP, Parrot_Signature
-*, INTVAL key)>
+*self, INTVAL key)>
 
 =item C<STRING* Parrot_pcc_signature_get_string(PARROT_INTERP, Parrot_Signature
-*, INTVAL key)>
+*self, INTVAL key)>
 
-=item C<PMC* Parrot_pcc_signature_get_pmc(PARROT_INTERP, Parrot_Signature *,
+=item C<PMC* Parrot_pcc_signature_get_pmc(PARROT_INTERP, Parrot_Signature *self,
 INTVAL key)>
 
 Get positional argument at position with autoboxing.
@@ -334,41 +334,45 @@ Get positional argument at position with autoboxing.
 */
 
 INTVAL
-Parrot_pcc_signature_get_integer(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+Parrot_pcc_signature_get_integer(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        INTVAL key)
 {
     if (key >= self->num_positionals || key < 0)
         return 0;
 
-    return autobox_intval(INTERP, &self->positionals[key]);
+    return autobox_intval(interp, &self->positionals[key]);
 }
 
 FLOATVAL
-Parrot_pcc_signature_get_number(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+Parrot_pcc_signature_get_number(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        INTVAL key)
 {
     if (key >= self->num_positionals || key < 0)
         return 0.0;
 
-    return autobox_floatval(INTERP, &self->positionals[key]);
+    return autobox_floatval(interp, &self->positionals[key]);
 }
 
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_pcc_signature_get_string(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+Parrot_pcc_signature_get_string(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        INTVAL key)
 {
     if (key >= self->num_positionals || key < 0)
         return STRINGNULL;
 
-    return autobox_string(INTERP, &self->positionals[key]);
+    return autobox_string(interp, &self->positionals[key]);
 }
 
 PARROT_CAN_RETURN_NULL
 PMC*
-Parrot_pcc_signature_get_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+Parrot_pcc_signature_get_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        INTVAL key)
 {
     if (key >= self->num_positionals || key < 0)
         return PMCNULL;
 
-    return autobox_pmc(INTERP, &self->positionals[key], type);
+    return autobox_pmc(interp, &self->positionals[key]);
 }
 
 
@@ -430,6 +434,93 @@ Parrot_pcc_signature_push_pmc_named(PARROT_INTERP,
     cell->type      = PMCCELL;
 }
 
+/*
+=item C<INTVAL Parrot_pcc_signature_get_integer_named(PARROT_INTERP,
+Parrot_Signature *self, STRING *key)>
+
+=item C<FLOATVAL Parrot_pcc_signature_get_number_named(PARROT_INTERP,
+Parrot_Signature *self, STRING *key)>
+
+=item C<STRING * Parrot_pcc_signature_get_string_named(PARROT_INTERP,
+Parrot_Signature *, STRING *key)>
+
+=item C<PMC * Parrot_pcc_signature_get_pmc_named(PARROT_INTERP, Parrot_Signature
+*self, STRING *key)>
+
+Get single named parameter with autoboxing.
+
+=cut
+*/
+
+INTVAL
+Parrot_pcc_signature_get_integer_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    if (self->hash) {
+        void     * const k    = Parrot_hash_key_from_string(interp, self->hash, key);
+        Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(interp, self->hash, k);
+
+        if (cell) {
+            if (CELL_TYPE_MASK(cell) == INTCELL)
+                return CELL_INT(cell);
+
+            return autobox_intval(interp, cell);
+        }
+    }
+
+    return 0;
+}
+
+FLOATVAL
+Parrot_pcc_signature_get_number_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    if (self->hash) {
+        void     * const k    = Parrot_hash_key_from_string(interp, self->hash, key);
+        Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(interp, self->hash, k);
+
+        if (cell)
+            return autobox_floatval(interp, cell);
+    }
+
+    return 0.0;
+}
+
+PARROT_CAN_RETURN_NULL
+STRING *
+Parrot_pcc_signature_get_string_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    if (self->hash) {
+        void     * const k    = Parrot_hash_key_from_string(interp, self->hash, key);
+        Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(interp, self->hash, k);
+
+        if (cell)
+            return autobox_string(interp, cell);
+    }
+
+    return STRINGNULL;
+}
+
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_pcc_signature_get_pmc_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    if (self->hash) {
+        void     * const k    = Parrot_hash_key_from_string(interp, self->hash, key);
+        Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(interp, self->hash, k);
+
+        if (cell) {
+            if (CELL_TYPE_MASK(cell) == PMCCELL)
+                return CELL_PMC(cell);
+
+            return autobox_pmc(interp, cell);
+        }
+    }
+
+    return PMCNULL;
+}
 
 /*
 
@@ -525,7 +616,7 @@ get_cell_named(PARROT_INTERP, ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
 
 =item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
 
-=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
+=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell)>
 
 Autobox stored value to required value.
 
@@ -598,12 +689,12 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
+autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_pmc)
     PMC *result = PMCNULL;
 
-    switch (type) {
+    switch (CELL_TYPE_MASK(cell)) {
       case INTCELL:
         result = Parrot_pmc_box_integer(interp, CELL_INT(cell));
         break;
