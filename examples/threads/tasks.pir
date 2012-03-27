@@ -16,6 +16,7 @@
     schedule $P0
     schedule $P1
     sleep 10
+    exit 0
 .end
 
 .sub task
