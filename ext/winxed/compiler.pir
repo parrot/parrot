@@ -19487,6 +19487,16 @@
 .end # FunctionParameter
 
 
+.sub 'optimize' :method
+    getattribute $P1, self, 'defaultexpr'
+    if_null $P1, __label_1
+    $P1.'optimize'()
+  __label_1: # endif
+    .return(self)
+
+.end # optimize
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_136 = "WSubId_136"
@@ -19561,6 +19571,14 @@
     setattribute self, 'expr', $P2
 
 .end # FunctionParameterDefault
+
+
+.sub 'optimize' :method
+    getattribute $P3, self, 'expr'
+    $P2 = $P3.'optimize'()
+    setattribute self, 'expr', $P2
+
+.end # optimize
 
 
 .sub 'emit' :method
@@ -19990,25 +20008,43 @@
     $P2 = $P1.'pick'('multi')
     if_null $P2, __label_2
     self.'setmulti'()
-    $P7 = WSubId_138(self, $P2)
-    setattribute self, 'multi_sig', $P7
+    $P8 = WSubId_138(self, $P2)
+    setattribute self, 'multi_sig', $P8
   __label_2: # endif
   __label_1: # endif
-    getattribute $P3, self, 'usednamespaces'
-    $P4 = WSubId_5("fixnamespaces")
+    getattribute $P3, self, 'params'
     if_null $P3, __label_5
-    iter $P8, $P3
-    set $P8, 0
-  __label_4: # for iteration
-    unless $P8 goto __label_5
-    shift $P5, $P8
-    $P4($P5)
+    elements $I1, $P3
     goto __label_4
-  __label_5: # endfor
+  __label_5:
+    null $I1
+  __label_4:
+    null $I2
+  __label_8: # for condition
+    ge $I2, $I1, __label_7
+    $P8 = $P3[$I2]
+    $P7 = $P8.'optimize'()
+    $P3[$I2] = $P7
+  __label_6: # for iteration
+    inc $I2
+    goto __label_8
+  __label_7: # for end
   __label_3:
-    getattribute $P9, self, 'body'
-    $P7 = $P9.'optimize'()
-    setattribute self, 'body', $P7
+    getattribute $P4, self, 'usednamespaces'
+    $P5 = WSubId_5("fixnamespaces")
+    if_null $P4, __label_11
+    iter $P9, $P4
+    set $P9, 0
+  __label_10: # for iteration
+    unless $P9 goto __label_11
+    shift $P6, $P9
+    $P5($P6)
+    goto __label_10
+  __label_11: # endfor
+  __label_9:
+    getattribute $P10, self, 'body'
+    $P8 = $P10.'optimize'()
+    setattribute self, 'body', $P8
     .return(self)
 
 .end # optimize
@@ -24193,9 +24229,9 @@
     new $P1, ['FixedIntegerArray'], 3
     set $I1, 1
     $P1[0] = $I1
-    set $I1, 6
+    set $I1, 7
     $P1[1] = $I1
-    null $I1
+    set $I1, -1
     $P1[2] = $I1
     .return($P1)
 
