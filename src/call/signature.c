@@ -235,6 +235,22 @@ Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 }
 
 /*
+=item C<INTVAL Parrot_pcc_signature_num_positionals(PARROT_INTERP,
+Parrot_Signature *self)>
+
+Get number of positional arguments.
+
+=cut
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_pcc_signature_num_positionals(PARROT_INTERP, ARGIN(Parrot_Signature *self))
+{
+    return self->num_positionals;
+}
+
+/*
 =back
 
 =head1 ACCESSOR FUNCTIONS
@@ -442,7 +458,7 @@ Parrot_Signature *self, STRING *key)>
 Parrot_Signature *self, STRING *key)>
 
 =item C<STRING * Parrot_pcc_signature_get_string_named(PARROT_INTERP,
-Parrot_Signature *, STRING *key)>
+Parrot_Signature *self, STRING *key)>
 
 =item C<PMC * Parrot_pcc_signature_get_pmc_named(PARROT_INTERP, Parrot_Signature
 *self, STRING *key)>
@@ -520,6 +536,28 @@ Parrot_pcc_signature_get_pmc_named(PARROT_INTERP,
     }
 
     return PMCNULL;
+}
+
+/*
+=item C<INTVAL Parrot_pcc_signature_exists_named(PARROT_INTERP, Parrot_Signature
+*self, STRING *key)>
+
+Check named parameter for existance.
+
+=cut
+*/
+
+INTVAL
+Parrot_pcc_signature_exists_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    if (self->hash) {
+        void     * const k    = Parrot_hash_key_from_string(interp, self->hash, key);
+
+        return Parrot_hash_exists(interp, self->hash, k);
+    }
+
+    return 0;
 }
 
 /*

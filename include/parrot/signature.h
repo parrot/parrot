@@ -29,10 +29,23 @@ Parrot_Signature* Parrot_pcc_signature_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+INTVAL Parrot_pcc_signature_num_positionals(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pcc_signature_reset(PARROT_INTERP,
     ARGIN(Parrot_Signature *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+INTVAL Parrot_pcc_signature_exists_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 INTVAL Parrot_pcc_signature_get_integer(PARROT_INTERP,
     ARGIN(Parrot_Signature *self),
@@ -84,7 +97,7 @@ STRING* Parrot_pcc_signature_get_string(PARROT_INTERP,
 
 PARROT_CAN_RETURN_NULL
 STRING * Parrot_pcc_signature_get_string_named(PARROT_INTERP,
-    ARGIN(Parrot_Signature *),
+    ARGIN(Parrot_Signature *self),
     ARGIN(STRING *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -150,9 +163,18 @@ void Parrot_pcc_signature_push_string_named(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pcc_signature_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pcc_signature_num_positionals \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pcc_signature_reset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_exists_named \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pcc_signature_get_integer \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -186,7 +208,7 @@ void Parrot_pcc_signature_push_string_named(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_signature_get_string_named \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(Parrot_Signature *) \
+    , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pcc_signature_push_float \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
