@@ -65,6 +65,90 @@ typedef struct Parrot_Signature {
     Hash   *hash;                   /* Hash of named arguments */
 } Parrot_Signature ;
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static FLOATVAL autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void ensure_positionals_storage(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    INTVAL size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static Pcc_cell* get_cell_at(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    INTVAL key)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static Hash * get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_hash(PARROT_INTERP, ARGIN(Hash *h))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void mark_positionals(PARROT_INTERP, ARGIN(Parrot_Signature *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_autobox_floatval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
+#define ASSERT_ARGS_autobox_intval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
+#define ASSERT_ARGS_autobox_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
+#define ASSERT_ARGS_autobox_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(cell))
+#define ASSERT_ARGS_ensure_positionals_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(SELF))
+#define ASSERT_ARGS_mark_cell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(c))
+#define ASSERT_ARGS_mark_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(h))
+#define ASSERT_ARGS_mark_positionals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /*
 =item C<Parrot_Signature* Parrot_pcc_signature_new(PARROT_INTERP)>
 
@@ -79,7 +163,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Signature*
 Parrot_pcc_signature_new(PARROT_INTERP)
 {
-    Parrot_Signature *sig = Parrot_gc_allocate_fixed_size_storage(interp, sizeof(Parrot_Signature));
+    Parrot_Signature *sig = (Parrot_Signature *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof(Parrot_Signature));
 
     return sig;
 }
@@ -98,6 +182,297 @@ Parrot_pcc_signature_free(PARROT_INTERP, ARGFREE(Parrot_Signature *sig))
 {
     Parrot_gc_free_fixed_size_storage(interp, sizeof(Parrot_Signature), sig);
 }
+
+/*
+=item C<void Parrot_pcc_signature_reset(PARROT_INTERP, Parrot_Signature *sig)>
+
+Reset Signature for reuse.
+
+=cut
+*/
+PARROT_EXPORT
+void
+Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *sig))
+{
+}
+
+
+/*
+
+=item C<static void ensure_positionals_storage(PARROT_INTERP, Parrot_Signature
+*self, INTVAL size)>
+
+=cut
+
+*/
+
+static void
+ensure_positionals_storage(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL size)
+{
+    ASSERT_ARGS(ensure_positionals_storage)
+    Pcc_cell *array, *new_array;
+
+    if (size <= self->allocated_positionals)
+        return;
+
+    if (size < 8)
+        size = 8;
+
+    if (size > 8)
+        new_array = (Pcc_cell *)Parrot_gc_allocate_memory_chunk(interp,
+                size * sizeof (Pcc_cell));
+    else
+        new_array = (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage(interp,
+                size * sizeof (Pcc_cell));
+
+    if (self->positionals) {
+        memcpy(new_array, array, self->num_positionals * sizeof (Pcc_cell));
+
+        if (self->allocated_positionals > 8)
+            Parrot_gc_free_memory_chunk(interp, array);
+        else
+            Parrot_gc_free_fixed_size_storage(interp,
+                self->allocated_positionals * sizeof (Pcc_cell), array);
+    }
+
+    self->allocated_positionals = size;
+    self->positionals           = new_array;
+}
+
+/*
+
+=item C<static Pcc_cell* get_cell_at(PARROT_INTERP, Parrot_Signature *self,
+INTVAL key)>
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static Pcc_cell*
+get_cell_at(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL key)
+{
+    ASSERT_ARGS(get_cell_at)
+    ensure_positionals_storage(interp, self, key + 1);
+    return &self->positionals[key];
+}
+
+/*
+
+=item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
+
+=cut
+
+*/
+
+static INTVAL
+autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+{
+    ASSERT_ARGS(autobox_intval)
+    switch (CELL_TYPE_MASK(cell)) {
+      case INTCELL:
+        return CELL_INT(cell);
+      case FLOATCELL:
+        return (INTVAL)CELL_FLOAT(cell);
+      case STRINGCELL:
+        return CELL_STRING(cell) ? Parrot_str_to_int(interp, CELL_STRING(cell)) : 0;
+      case PMCCELL:
+        return VTABLE_get_integer(interp, CELL_PMC(cell));
+      default:
+        break;
+    }
+
+    /* exception */
+    return 0;
+}
+
+/*
+
+=item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
+
+=cut
+
+*/
+
+static FLOATVAL
+autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+{
+    ASSERT_ARGS(autobox_floatval)
+    switch (CELL_TYPE_MASK(cell)) {
+      case INTCELL:
+        return (FLOATVAL)CELL_INT(cell);
+      case FLOATCELL:
+        return CELL_FLOAT(cell);
+      case STRINGCELL:
+        return CELL_STRING(cell) ? Parrot_str_to_num(interp, CELL_STRING(cell)) : 0.0;
+      case PMCCELL:
+        return VTABLE_get_number(interp, CELL_PMC(cell));
+      default:
+        break;
+    }
+
+    /* exception */
+    return 0.0;
+}
+
+/*
+
+=item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+{
+    ASSERT_ARGS(autobox_string)
+    switch (CELL_TYPE_MASK(cell)) {
+      case INTCELL:
+        return Parrot_str_from_int(interp, CELL_INT(cell));
+      case FLOATCELL:
+        return Parrot_str_from_num(interp, CELL_FLOAT(cell));
+      case STRINGCELL:
+        return CELL_STRING(cell);
+      case PMCCELL:
+        return VTABLE_get_string(interp, CELL_PMC(cell));
+      default:
+        break;
+    }
+
+    /* exception */
+    return STRINGNULL;
+}
+
+/*
+
+=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
+{
+    ASSERT_ARGS(autobox_pmc)
+    PMC *result = PMCNULL;
+
+    switch (type) {
+      case INTCELL:
+        result = Parrot_pmc_box_integer(interp, CELL_INT(cell));
+        break;
+      case FLOATCELL:
+        result = Parrot_pmc_box_number(interp, CELL_FLOAT(cell));
+        break;
+      case STRINGCELL:
+        result = Parrot_pmc_box_string(interp, CELL_STRING(cell));
+        break;
+      case PMCCELL:
+        result = CELL_PMC(cell);
+      default:
+        /* exception */
+        break;
+    }
+
+    return result;
+}
+
+/*
+
+=item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static Hash *
+get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
+{
+    ASSERT_ARGS(get_hash)
+    Hash   *hash;
+
+    GETATTR_CallContext_hash(interp, SELF, hash);
+
+    if (!hash) {
+        hash = Parrot_hash_create(interp,
+            enum_type_ptr,
+            Hash_key_type_STRING);
+
+        SETATTR_CallContext_hash(interp, SELF, hash);
+    }
+
+    return hash;
+}
+
+/*
+
+=item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
+
+=cut
+
+*/
+
+static void
+mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
+{
+    ASSERT_ARGS(mark_cell)
+    switch (CELL_TYPE_MASK(c)) {
+        case STRINGCELL:
+            if (CELL_STRING(c))
+                Parrot_gc_mark_STRING_alive(interp, CELL_STRING(c));
+            break;
+        case PMCCELL:
+            if (!PMC_IS_NULL(CELL_PMC(c)))
+                Parrot_gc_mark_PMC_alive(interp, CELL_PMC(c));
+            break;
+        case INTCELL:
+        case FLOATCELL:
+        default:
+            break;
+    }
+
+}
+
+/*
+
+=item C<static void mark_positionals(PARROT_INTERP, Parrot_Signature *self)>
+
+=cut
+
+*/
+
+static void
+mark_positionals(PARROT_INTERP, ARGIN(Parrot_Signature *self))
+{
+    ASSERT_ARGS(mark_positionals)
+    INTVAL i;
+
+    for (i = 0; i < self->num_positionals; ++i)
+        mark_cell(interp, &self->positionals[i]);
+}
+
+/*
+
+=item C<static void mark_hash(PARROT_INTERP, Hash *h)>
+
+=cut
+
+*/
+
+/* don't look now, but here goes encapsulation.... */
+static void
+mark_hash(PARROT_INTERP, ARGIN(Hash *h))
+{
+    ASSERT_ARGS(mark_hash)
+    parrot_hash_iterate(h,
+        Parrot_gc_mark_STRING_alive(interp, (STRING *)_bucket->key);
+        mark_cell(interp, (Pcc_cell *)_bucket->value););
+}
+
 
 /*
 

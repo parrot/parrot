@@ -28,10 +28,18 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Signature* Parrot_pcc_signature_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
+void Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *sig))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_pcc_signature_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pcc_signature_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pcc_signature_reset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(sig))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/call/signature.c */
 
