@@ -170,7 +170,7 @@ Parrot_pcc_signature_new(PARROT_INTERP)
 }
 
 /*
-=item C<void Parrot_pcc_signature_free(PARROT_INTERP, Parrot_Signature *sig)>
+=item C<void Parrot_pcc_signature_free(PARROT_INTERP, Parrot_Signature *self)>
 
 Free Signature
 
@@ -201,7 +201,7 @@ Parrot_pcc_signature_free(PARROT_INTERP, ARGFREE(Parrot_Signature *self))
 }
 
 /*
-=item C<void Parrot_pcc_signature_reset(PARROT_INTERP, Parrot_Signature *sig)>
+=item C<void Parrot_pcc_signature_reset(PARROT_INTERP, Parrot_Signature *self)>
 
 Reset Signature for reuse.
 
@@ -225,8 +225,16 @@ Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 
 /*
 
+=back
+
+=head1 INTERNAL FUNCTIONS
+
+=over 4
+
 =item C<static void ensure_positionals_storage(PARROT_INTERP, Parrot_Signature
 *self, INTVAL size)>
+
+Ensure that we have enough space to store C<size> amount of positional elements.
 
 =cut
 
@@ -266,12 +274,12 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL 
 }
 
 /*
-
 =item C<static Pcc_cell* get_cell_at(PARROT_INTERP, Parrot_Signature *self,
 INTVAL key)>
 
-=cut
+Get cell at index with reallocating if nessesary.
 
+=cut
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -284,11 +292,17 @@ get_cell_at(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL key)
 }
 
 /*
-
 =item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
 
-=cut
+=item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
 
+=item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
+
+=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
+
+Autobox stored value to required value.
+
+=cut
 */
 
 static INTVAL
@@ -312,14 +326,6 @@ autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     return 0;
 }
 
-/*
-
-=item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
-
-=cut
-
-*/
-
 static FLOATVAL
 autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
@@ -340,14 +346,6 @@ autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     /* exception */
     return 0.0;
 }
-
-/*
-
-=item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
-
-=cut
-
-*/
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -370,14 +368,6 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     /* exception */
     return STRINGNULL;
 }
-
-/*
-
-=item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
-
-=cut
-
-*/
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -407,11 +397,11 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 }
 
 /*
-
 =item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
 
-=cut
+Lazily allocated Hash for named parameters.
 
+=cut
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -435,11 +425,11 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 }
 
 /*
-
 =item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
 
-=cut
+Helper function for marking.
 
+=cut
 */
 
 static void
@@ -464,11 +454,11 @@ mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 }
 
 /*
-
 =item C<static void mark_positionals(PARROT_INTERP, Parrot_Signature *self)>
 
-=cut
+Helper function to mark positional arguments.
 
+=cut
 */
 
 static void
@@ -482,11 +472,11 @@ mark_positionals(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 }
 
 /*
-
 =item C<static void mark_hash(PARROT_INTERP, Hash *h)>
 
-=cut
+Helper to mark named parameters.
 
+=cut
 */
 
 /* don't look now, but here goes encapsulation.... */

@@ -20,7 +20,7 @@ typedef struct Parrot_Signature Parrot_Signature;
 
 PARROT_EXPORT
 void Parrot_pcc_signature_free(PARROT_INTERP,
-    ARGFREE(Parrot_Signature *sig))
+    ARGFREE(Parrot_Signature *self))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -29,7 +29,8 @@ Parrot_Signature* Parrot_pcc_signature_new(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *sig))
+void Parrot_pcc_signature_reset(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -39,7 +40,7 @@ void Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *sig))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pcc_signature_reset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sig))
+    , PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/call/signature.c */
 
