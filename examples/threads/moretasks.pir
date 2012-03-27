@@ -26,7 +26,7 @@ start:
     push tasks, task
     schedule task
     inc i
-    if i > 5000 goto run
+    if i > 50000 goto run
     goto start
 run:
     starter = 1
@@ -34,7 +34,7 @@ check_results:
     pass
     num_results = results
     say num_results
-    if num_results >= 5000 goto end
+    if num_results >= 50000 goto end
     goto check_results
 end:
     goto init

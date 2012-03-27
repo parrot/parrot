@@ -153,11 +153,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             interp->current_runloop_level = 0;
             reset_runloop_id_counter(interp);
 
-            if (interp->thread_data)
-                LOCK(interp->thread_data->interp_lock);
             Parrot_cx_next_task(interp, scheduler);
-            if (interp->thread_data)
-                UNLOCK(interp->thread_data->interp_lock);
 
             /* add expired alarms to the task queue */
             Parrot_cx_check_alarms(interp, interp->scheduler);
@@ -473,11 +469,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
                 }
             }
 
-        /*TODO Check for and enable preemption on the thread first.
-         * Otherwise it may never unlock the interp_lock */
-        LOCK(candidate->thread_data->interp_lock);
         Parrot_thread_schedule_task(interp, candidate, task);
-        UNLOCK(candidate->thread_data->interp_lock);
 
 #ifdef _WIN32
 #else

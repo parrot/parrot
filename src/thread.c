@@ -275,7 +275,9 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
 
     /* don't run GC from the wrong thread since GC involves stack walking and we
      * don't want the foreign GC to find our objects */
+    LOCK(interp->thread_data->interp_lock); /* wait for a running GC to finish */
     Parrot_block_GC_mark(thread_interp);
+    UNLOCK(interp->thread_data->interp_lock);
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler,
         Parrot_thread_create_local_task(interp, thread_interp, task));
@@ -320,9 +322,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             interp->current_runloop_level = 0;
             reset_runloop_id_counter(interp);
 
-            LOCK(interp->thread_data->interp_lock);
             Parrot_cx_next_task(interp, scheduler);
-            UNLOCK(interp->thread_data->interp_lock);
 
             /* add expired alarms to the task queue */
             Parrot_cx_check_alarms(interp, interp->scheduler);

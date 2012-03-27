@@ -758,17 +758,20 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
 
+    if (interp->thread_data != NULL)
+        LOCK(interp->thread_data->interp_lock);
+
     /* GC is blocked */
     if (self->gc_mark_block_level)
-        return;
+        goto DONE;
 
     /* Ignore it. Will cleanup in gc_gms_finalize */
     if (flags & GC_finish_FLAG)
-        return;
+        goto DONE;
 
     /* Ignore calls from String GC. We know better when to trigger GC */
     if (flags & GC_strings_cb_FLAG)
-        return;
+        goto DONE;
 
     /* Block further GC calls */
     ++self->gc_mark_block_level;
@@ -853,6 +856,10 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     self->work_list = NULL;
 
     gc_gms_validate_objects(interp);
+
+DONE:
+    if (interp->thread_data != NULL)
+        UNLOCK(interp->thread_data->interp_lock);
 }
 
 /*
@@ -1259,12 +1266,16 @@ gc_gms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_gms_allocate_pmc_attributes)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     const size_t  attr_size = pmc->vtable->attr_size;
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
     PMC_data(pmc) = Parrot_gc_fixed_allocator_allocate(interp,
                         self->fixed_size_allocator, attr_size);
     memset(PMC_data(pmc), 0, attr_size);
 
     interp->gc_sys->stats.memory_used           += attr_size;
     interp->gc_sys->stats.mem_used_last_collect += attr_size;
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 
     return PMC_data(pmc);
 }
@@ -1413,6 +1424,9 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_maybe_mark_and_sweep(interp);
 
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
+
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
 
@@ -1421,6 +1435,9 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
+
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 
     return &(item->pmc);
 }
@@ -1440,6 +1457,9 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         if (PObj_on_free_list_TEST(pmc))
             return;
 
+        if (interp->thread_data)
+            LOCK(interp->thread_data->interp_lock);
+
         Parrot_pa_remove(interp, self->objects[gen], PMC2PAC(pmc)->ptr);
         PObj_on_free_list_SET(pmc);
 
@@ -1450,6 +1470,9 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_used           -= sizeof (PMC);
         interp->gc_sys->stats.mem_used_last_collect -= sizeof (PMC);
+
+        if (interp->thread_data)
+            UNLOCK(interp->thread_data->interp_lock);
     }
 }
 
