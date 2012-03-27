@@ -228,10 +228,9 @@ Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 =head1 ACCESSOR FUNCTIONS
 
 =over 4
-*/
 
-/*
-=item C<Parrot_pcc_signature_push_interger>
+=item C<void Parrot_pcc_signature_push_integer(PARROT_INTERP, Parrot_Signature
+*self, INTVAL value)>
 
 =item C<void Parrot_pcc_signature_push_float(PARROT_INTERP, Parrot_Signature
 *self, FLOATVAL value)>
@@ -325,7 +324,7 @@ static void
 ensure_positionals_storage(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL size)
 {
     ASSERT_ARGS(ensure_positionals_storage)
-    Pcc_cell *array, *new_array;
+    Pcc_cell *new_array;
 
     if (size <= self->allocated_positionals)
         return;
@@ -341,13 +340,13 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL 
                 size * sizeof (Pcc_cell));
 
     if (self->positionals) {
-        memcpy(new_array, array, self->num_positionals * sizeof (Pcc_cell));
+        memcpy(new_array, self->positionals, self->num_positionals * sizeof (Pcc_cell));
 
         if (self->allocated_positionals > 8)
-            Parrot_gc_free_memory_chunk(interp, array);
+            Parrot_gc_free_memory_chunk(interp, self->positionals);
         else
             Parrot_gc_free_fixed_size_storage(interp,
-                self->allocated_positionals * sizeof (Pcc_cell), array);
+                self->allocated_positionals * sizeof (Pcc_cell), self->positionals);
     }
 
     self->allocated_positionals = size;
