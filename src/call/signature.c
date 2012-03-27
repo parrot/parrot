@@ -316,6 +316,63 @@ Parrot_pcc_signature_push_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *self),
 }
 
 /*
+=item C<INTVAL Parrot_pcc_signature_get_integer(PARROT_INTERP, Parrot_Signature
+*, INTVAL key)>
+
+=item C<FLOATVAL Parrot_pcc_signature_get_number(PARROT_INTERP, Parrot_Signature
+*, INTVAL key)>
+
+=item C<STRING* Parrot_pcc_signature_get_string(PARROT_INTERP, Parrot_Signature
+*, INTVAL key)>
+
+=item C<PMC* Parrot_pcc_signature_get_pmc(PARROT_INTERP, Parrot_Signature *,
+INTVAL key)>
+
+Get positional argument at position with autoboxing.
+
+=cut
+*/
+
+INTVAL
+Parrot_pcc_signature_get_integer(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+{
+    if (key >= self->num_positionals || key < 0)
+        return 0;
+
+    return autobox_intval(INTERP, &self->positionals[key]);
+}
+
+FLOATVAL
+Parrot_pcc_signature_get_number(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+{
+    if (key >= self->num_positionals || key < 0)
+        return 0.0;
+
+    return autobox_floatval(INTERP, &self->positionals[key]);
+}
+
+PARROT_CAN_RETURN_NULL
+STRING*
+Parrot_pcc_signature_get_string(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+{
+    if (key >= self->num_positionals || key < 0)
+        return STRINGNULL;
+
+    return autobox_string(INTERP, &self->positionals[key]);
+}
+
+PARROT_CAN_RETURN_NULL
+PMC*
+Parrot_pcc_signature_get_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *), INTVAL key)
+{
+    if (key >= self->num_positionals || key < 0)
+        return PMCNULL;
+
+    return autobox_pmc(INTERP, &self->positionals[key], type);
+}
+
+
+/*
 =item C<void Parrot_pcc_signature_push_integer_named(PARROT_INTERP,
 Parrot_Signature *self, STRING *key, INTVAL value)>
 
