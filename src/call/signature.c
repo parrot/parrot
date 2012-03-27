@@ -164,6 +164,7 @@ Parrot_Signature*
 Parrot_pcc_signature_new(PARROT_INTERP)
 {
     Parrot_Signature *sig = (Parrot_Signature *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof(Parrot_Signature));
+    memset(sig, 1, sizeof (Parrot_Signature));
 
     return sig;
 }
@@ -178,9 +179,25 @@ Free Signature
 
 PARROT_EXPORT
 void
-Parrot_pcc_signature_free(PARROT_INTERP, ARGFREE(Parrot_Signature *sig))
+Parrot_pcc_signature_free(PARROT_INTERP, ARGFREE(Parrot_Signature *self))
 {
-    Parrot_gc_free_fixed_size_storage(interp, sizeof(Parrot_Signature), sig);
+    if (self->allocated_positionals) {
+        Pcc_cell *c;
+
+        if (self->allocated_positionals > 8)
+            Parrot_gc_free_memory_chunk(interp, self->positionals);
+        else
+            Parrot_gc_free_fixed_size_storage(interp,
+                self->allocated_positionals * sizeof (Pcc_cell), self->positionals);
+    }
+
+    if (self->hash) {
+        parrot_hash_iterate(self->hash,
+            FREE_CELL(interp, (Pcc_cell *)_bucket->value););
+        Parrot_hash_destroy(interp, self->hash);
+    }
+
+    Parrot_gc_free_fixed_size_storage(interp, sizeof(Parrot_Signature), self);
 }
 
 /*
@@ -192,8 +209,17 @@ Reset Signature for reuse.
 */
 PARROT_EXPORT
 void
-Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *sig))
+Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 {
+    /* Don't free positionals. Just reuse them */
+    self->num_positionals = 0;
+
+    if (self->hash) {
+        parrot_hash_iterate(self->hash,
+           FREE_CELL(interp, (Pcc_cell *)_bucket->value););
+        Parrot_hash_destroy(interp, self->hash);
+        self->hash = NULL;
+    }
 }
 
 
