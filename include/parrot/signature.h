@@ -34,11 +34,50 @@ void Parrot_pcc_signature_reset(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_pcc_signature_push_float(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    FLOATVAL value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_pcc_signature_push_integer(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    INTVAL value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_pcc_signature_push_pmc(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN_NULLOK(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void Parrot_pcc_signature_push_string(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN_NULLOK(STRING *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_Parrot_pcc_signature_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pcc_signature_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pcc_signature_reset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_float \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_integer \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_string \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

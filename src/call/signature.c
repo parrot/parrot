@@ -222,6 +222,87 @@ Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
     }
 }
 
+/*
+=back
+
+=head1 ACCESSOR FUNCTIONS
+
+=over 4
+*/
+
+/*
+=item C<Parrot_pcc_signature_push_interger>
+
+=item C<void Parrot_pcc_signature_push_float(PARROT_INTERP, Parrot_Signature
+*self, FLOATVAL value)>
+
+=item C<void Parrot_pcc_signature_push_string(PARROT_INTERP, Parrot_Signature
+*self, STRING *value)>
+
+=item C<void Parrot_pcc_signature_push_pmc(PARROT_INTERP, Parrot_Signature
+*self, PMC *value)>
+
+Append positional parameter to Signature.
+
+=cut
+*/
+
+
+void
+Parrot_pcc_signature_push_integer(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        INTVAL value)
+{
+    INTVAL num_pos = self->num_positionals;
+
+    ensure_positionals_storage(interp, self, num_pos + 1);
+
+    self->positionals[num_pos].u.i  = value;
+    self->positionals[num_pos].type = INTCELL;
+    self->num_positionals++;
+}
+
+void
+Parrot_pcc_signature_push_float(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        FLOATVAL value)
+{
+    INTVAL num_pos = self->num_positionals;
+
+    ensure_positionals_storage(interp, self, num_pos + 1);
+
+    self->positionals[num_pos].u.n  = value;
+    self->positionals[num_pos].type = FLOATCELL;
+    self->num_positionals++;
+}
+
+void
+Parrot_pcc_signature_push_string(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        ARGIN_NULLOK(STRING *value))
+{
+    INTVAL num_pos = self->num_positionals;
+
+    ensure_positionals_storage(interp, self, num_pos + 1);
+
+    self->positionals[num_pos].u.s      = value;
+    self->positionals[num_pos].type     = STRINGCELL;
+    self->num_positionals++;
+}
+
+void
+Parrot_pcc_signature_push_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *self),
+        ARGIN_NULLOK(PMC *value))
+{
+    INTVAL num_pos = self->num_positionals;
+
+    PARROT_ASSERT(!PObj_on_free_list_TEST(value)
+            || !"Push dead object into CallContext!");
+
+
+    ensure_positionals_storage(interp, self, num_pos + 1);
+
+    self->positionals[num_pos].u.p      = value;
+    self->positionals[num_pos].type     = PMCCELL;
+    self->num_positionals++;
+}
 
 /*
 
