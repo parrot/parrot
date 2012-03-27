@@ -46,17 +46,49 @@ void Parrot_pcc_signature_push_integer(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_pcc_signature_push_integer_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key),
+    INTVAL value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void Parrot_pcc_signature_push_number_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key),
+    FLOATVAL value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 void Parrot_pcc_signature_push_pmc(PARROT_INTERP,
     ARGIN(Parrot_Signature *self),
     ARGIN_NULLOK(PMC *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_pcc_signature_push_pmc_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key),
+    ARGIN_NULLOK(PMC *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 void Parrot_pcc_signature_push_string(PARROT_INTERP,
     ARGIN(Parrot_Signature *self),
     ARGIN_NULLOK(STRING *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+void Parrot_pcc_signature_push_string_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key),
+    ARGIN_NULLOK(STRING *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_pcc_signature_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -73,13 +105,33 @@ void Parrot_pcc_signature_push_string(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_integer_named \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_number_named \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pcc_signature_push_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_pmc_named \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_Parrot_pcc_signature_push_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pcc_signature_push_string_named \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/call/signature.c */
 

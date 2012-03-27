@@ -100,6 +100,14 @@ static Pcc_cell* get_cell_at(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
+static Pcc_cell* get_cell_named(PARROT_INTERP,
+    ARGIN(Parrot_Signature *self),
+    ARGIN(STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_CANNOT_RETURN_NULL
 static Hash * get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -134,6 +142,10 @@ static void mark_positionals(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 #define ASSERT_ARGS_get_cell_at __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_cell_named __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(key))
 #define ASSERT_ARGS_get_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(SELF))
@@ -304,6 +316,65 @@ Parrot_pcc_signature_push_pmc(PARROT_INTERP, ARGIN(Parrot_Signature *self),
 }
 
 /*
+=item C<void Parrot_pcc_signature_push_integer_named(PARROT_INTERP,
+Parrot_Signature *self, STRING *key, INTVAL value)>
+
+=item C<void Parrot_pcc_signature_push_number_named(PARROT_INTERP,
+Parrot_Signature *self, STRING *key, FLOATVAL value)>
+
+=item C<void Parrot_pcc_signature_push_string_named(PARROT_INTERP,
+Parrot_Signature *self, STRING *key, STRING *value)>
+
+=item C<void Parrot_pcc_signature_push_pmc_named(PARROT_INTERP, Parrot_Signature
+*self, STRING *key, PMC *value)>
+
+Append single named parameter to Signature.
+
+=cut
+*/
+
+void
+Parrot_pcc_signature_push_integer_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key), INTVAL value)
+{
+    Pcc_cell *cell = get_cell_named(interp, self, key);
+
+    cell->u.i       = value;
+    cell->type      = INTCELL;
+}
+
+void
+Parrot_pcc_signature_push_number_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key), FLOATVAL value)
+{
+    Pcc_cell *cell = get_cell_named(interp, self, key);
+
+    cell->u.n       = value;
+    cell->type      = FLOATCELL;
+}
+
+void
+Parrot_pcc_signature_push_string_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key), ARGIN_NULLOK(STRING *value))
+{
+    Pcc_cell *cell = get_cell_named(interp, self, key);
+
+    cell->u.s       = value;
+    cell->type      = STRINGCELL;
+}
+
+void
+Parrot_pcc_signature_push_pmc_named(PARROT_INTERP,
+        ARGIN(Parrot_Signature *self), ARGIN(STRING *key), ARGIN_NULLOK(PMC *value))
+{
+    Pcc_cell *cell = get_cell_named(interp, self, key);
+
+    cell->u.p       = value;
+    cell->type      = PMCCELL;
+}
+
+
+/*
 
 =back
 
@@ -357,6 +428,9 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL 
 =item C<static Pcc_cell* get_cell_at(PARROT_INTERP, Parrot_Signature *self,
 INTVAL key)>
 
+=item C<static Pcc_cell* get_cell_named(PARROT_INTERP, Parrot_Signature *self,
+STRING *key)>
+
 Get cell at index with reallocating if nessesary.
 
 =cut
@@ -370,6 +444,22 @@ get_cell_at(PARROT_INTERP, ARGIN(Parrot_Signature *self), INTVAL key)
     ensure_positionals_storage(interp, self, key + 1);
     return &self->positionals[key];
 }
+
+PARROT_CANNOT_RETURN_NULL
+static Pcc_cell*
+get_cell_named(PARROT_INTERP, ARGIN(Parrot_Signature *self), ARGIN(STRING *key))
+{
+    ASSERT_ARGS(get_cell_named)
+    Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(interp, self->hash, (void *)key);
+
+    if (!cell) {
+        cell = ALLOC_CELL(interp);
+        Parrot_hash_put(interp, self->hash, (void *)key, (void *)cell);
+    }
+
+    return cell;
+}
+
 
 /*
 =item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
