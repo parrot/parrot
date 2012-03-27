@@ -613,7 +613,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 {
     ASSERT_ARGS(Parrot_str_new_constant)
     DECL_CONST_CAST;
-    Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
+    Hash   * const cstring_cache = interp->const_cstring_hash;
     STRING *s                    = (STRING *)Parrot_hash_get(interp,
                                         cstring_cache, buffer);
 
