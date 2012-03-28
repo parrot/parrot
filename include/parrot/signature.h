@@ -12,8 +12,48 @@
 #ifndef PARROT_SIGNATURE_H_GUARD
 #define PARROT_SIGNATURE_H_GUARD
 
-/* Forward declaration of Signature */
-typedef struct Parrot_Signature Parrot_Signature;
+typedef struct Pcc_cell
+{
+    union u {
+        PMC     *p;
+        STRING  *s;
+        INTVAL   i;
+        FLOATVAL n;
+    } u;
+    INTVAL type;
+} Pcc_cell;
+
+#define NOCELL     0
+#define INTCELL    1
+#define FLOATCELL  2
+#define STRINGCELL 3
+#define PMCCELL    4
+
+#define ALLOC_CELL(i) \
+    (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage((i), sizeof (Pcc_cell))
+
+#define FREE_CELL(i, c) \
+    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
+
+#define CLONE_CELL(i, c, c_new) do { \
+    (c_new)  = ALLOC_CELL(i); \
+    *(c_new) = *(c); \
+} while (0)
+
+#define CELL_TYPE_MASK(c) (c)->type
+
+#define CELL_INT(c)     (c)->u.i
+#define CELL_FLOAT(c)   (c)->u.n
+#define CELL_STRING(c)  (c)->u.s
+#define CELL_PMC(c)     (c)->u.p
+
+typedef struct Parrot_Signature {
+    struct  Pcc_cell *positionals;  /* array of positionals */
+    INTVAL  num_positionals;        /* count of used positionals */
+    INTVAL  allocated_positionals;  /* count of allocated positionals */
+
+    Hash   *hash;                   /* Hash of named arguments */
+} Parrot_Signature ;
 
 /* HEADERIZER BEGIN: src/call/signature.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
