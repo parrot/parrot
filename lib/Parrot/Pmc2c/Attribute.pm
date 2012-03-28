@@ -243,7 +243,9 @@ EOA
 EOA
     }
 
-    my $assertion = ($attrtype =~ $isptrtopmc and not $isfuncptr) ? 'PARROT_ASSERT((value) == NULL || PMC_IS_NULL(value) || PObj_is_shared_TEST((PMC *)(value)) || ((PMC *)(value))->orig_interp == interp);' : '';
+    my $assertion = ($attrtype =~ $isptrtopmc and not $isfuncptr)
+        ? 'PARROT_ASSERT_INTERP((PMC *)(value), interp);'
+        : '';
     $decl .= <<"EOA";
         } \\
         else {\\

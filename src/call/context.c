@@ -272,7 +272,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;
         ctx->current_HLL       = old->current_HLL;
-        PARROT_ASSERT(PMC_IS_NULL(old->current_namespace) || PObj_is_shared_TEST(old->current_namespace) || old->current_namespace->orig_interp == pmcctx->orig_interp);
+        PARROT_ASSERT_INTERP(old->current_namespace, pmcctx->orig_interp);
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;

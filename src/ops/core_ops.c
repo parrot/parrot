@@ -22571,7 +22571,7 @@ Parrot_get_global_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC  * const  result = Parrot_ns_find_global_from_op(interp, cur_ns, name,  cur_opcode + 3);
 
-    PARROT_ASSERT((PObj_is_shared_TEST(result) || (result->orig_interp == interp)));
+    PARROT_ASSERT_INTERP(result, interp);
     PREG(1) = result;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;
@@ -22583,7 +22583,7 @@ Parrot_get_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC  * const  result = Parrot_ns_find_global_from_op(interp, cur_ns, name,  cur_opcode + 3);
 
-    PARROT_ASSERT((PObj_is_shared_TEST(result) || (result->orig_interp == interp)));
+    PARROT_ASSERT_INTERP(result, interp);
     PREG(1) = result;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return (opcode_t *)cur_opcode + 3;

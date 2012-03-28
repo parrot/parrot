@@ -154,12 +154,16 @@ Don't mark target and interp since they belong to a different interpreter.
                 return PMCNULL;
 
             if (PObj_is_new_TEST((PMC*)result)) {
+#ifdef THREAD_DEBUG
                 PARROT_ASSERT(((PMC *)result)->orig_interp == interp);
+#endif
                 abort();
                 PObj_is_new_CLEAR((PMC*)result);
             }
             else {
+#ifdef THREAD_DEBUG
                 PARROT_ASSERT(((PMC *)result)->orig_interp != interp);
+#endif
                 return Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, (PMC*)result);
             }
         }

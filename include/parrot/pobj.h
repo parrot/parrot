@@ -102,7 +102,9 @@ struct PMC {
     VTABLE         *vtable;             /* Pointer to vtable. */
     DPOINTER       *data;               /* Pointer to attribute structure. */
     PMC            *_metadata;          /* Pointer to metadata PMC. */
+#ifdef THREAD_DEBUG
     Parrot_Interp  orig_interp;
+#endif
 };
 
 /* Use these macros to access the data and metadata. */
@@ -341,6 +343,14 @@ typedef enum PObj_enum {
     &= ~PObj_custom_destroy_FLAG \
      & ~PObj_custom_mark_FLAG \
      & ~PObj_live_FLAG)
+
+/* Thread debugging aid for catching PMCs ending up on the wrong interp */
+
+#ifdef THREAD_DEBUG
+#define PARROT_ASSERT_INTERP(pmc, interp) PARROT_ASSERT((pmc) == NULL || PMC_IS_NULL(pmc) || PObj_is_shared_TEST(pmc) || (pmc)->orig_interp == (interp))
+#else
+#define PARROT_ASSERT_INTERP(pmc, interp)
+#endif
 
 #endif /* PARROT_POBJ_H_GUARD */
 

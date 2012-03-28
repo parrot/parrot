@@ -223,7 +223,7 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
 
     if (old_struct->code->vtable->base_type == enum_class_Proxy) {
         new_struct->code = PARROT_PROXY(old_struct->code)->target;
-        PARROT_ASSERT(new_struct->code->orig_interp == thread_interp);
+        PARROT_ASSERT_INTERP(new_struct->code, interp);
     }
     else
         new_struct->code = Parrot_thread_create_local_sub(interp, thread_interp, old_struct->code);
@@ -231,7 +231,7 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
     if (old_struct->data && ! PMC_IS_NULL(old_struct->data)) {
         if (old_struct->data->vtable->base_type == enum_class_Proxy) {
             new_struct->data = PARROT_PROXY(old_struct->data)->target;
-            PARROT_ASSERT(new_struct->data->orig_interp == thread_interp);
+            PARROT_ASSERT_INTERP(new_struct->data, interp);
         }
         else
             new_struct->data = Parrot_thread_create_proxy(interp, thread_interp, old_struct->data);

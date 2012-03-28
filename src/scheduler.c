@@ -667,7 +667,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     PMC * const task = Parrot_cx_stop_task(interp, next);
 
     adata->alarm_time = done_time;
-    PARROT_ASSERT(interp == task->orig_interp);
+    PARROT_ASSERT_INTERP(task, interp);
     adata->alarm_task = task;
     PARROT_GC_WRITE_BARRIER(interp, alarm);
     (void) VTABLE_invoke(interp, alarm, NULL);

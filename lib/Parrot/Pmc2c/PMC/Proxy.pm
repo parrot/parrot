@@ -103,12 +103,16 @@ sub _generate_proxy_method {
 
     if (!PMC_IS_NULL(result)) {
         if (PObj_is_new_TEST(result)) {
+#ifdef THREAD_DEBUG
             PARROT_ASSERT(result->orig_interp == interp);
+#endif
             abort();
             PObj_is_new_CLEAR(result);
         }
         else {
+#ifdef THREAD_DEBUG
             PARROT_ASSERT(result->orig_interp != interp);
+#endif
             return Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result);
         }
     }
