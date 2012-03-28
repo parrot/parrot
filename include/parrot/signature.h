@@ -53,6 +53,12 @@ typedef struct Parrot_Signature {
     INTVAL  allocated_positionals;  /* count of allocated positionals */
 
     Hash   *hash;                   /* Hash of named arguments */
+
+    PMC    *type_tuple;             /* Cached argument types for MDD */
+    STRING *short_sig;              /* Simple string sig args & returns */
+    PMC    *arg_flags;              /* Integer array of argument flags */
+    PMC    *return_flags;           /* Integer array of return flags */
+
 } Parrot_Signature ;
 
 /* HEADERIZER BEGIN: src/call/signature.c */
