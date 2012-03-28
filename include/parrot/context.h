@@ -564,6 +564,7 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
         PARROT_GC_WRITE_BARRIER((i), (c));              \
     } while (0)
 #  define Parrot_pcc_set_namespace(i, c, value) do {    \
+        PARROT_ASSERT((value)->orig_interp == i);       \
         CONTEXT_STRUCT(c)->current_namespace = (value); \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
     } while (0)

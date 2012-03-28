@@ -1181,6 +1181,7 @@ Sets the class or role PMC that is associated with this namespace.
 */
 
     METHOD set_class(PMC *class_or_role) {
+        PARROT_ASSERT(class_or_role->orig_interp == interp);
         PARROT_NAMESPACE(SELF)->_class = class_or_role;
     }
 

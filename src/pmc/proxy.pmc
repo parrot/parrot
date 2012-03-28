@@ -163,7 +163,7 @@ Don't mark target and interp since they belong to a different interpreter.
         /*TODO will fail if the class has not been instantiated in the main thread before */
 
         PARROT_ASSERT(_class->vtable->base_type != enum_class_Proxy);
-        return VTABLE_instantiate(INTERP, _class, init);
+        return VTABLE_instantiate(interp, _class, init);
     }
 }
 

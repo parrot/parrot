@@ -155,6 +155,7 @@ Parrot_str_init(PARROT_INTERP)
 
     interp->const_cstring_table =
         mem_gc_allocate_n_zeroed_typed(interp, n_parrot_cstrings, STRING *);
+    PARROT_ASSERT(interp->const_cstring_table != NULL);
 
     for (i = 0; i < n_parrot_cstrings; ++i) {
         DECL_CONST_CAST;

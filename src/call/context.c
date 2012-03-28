@@ -175,6 +175,7 @@ Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 
         c->current_pc        = subattr->seg->base.data + subattr->start_offs;
         c->current_HLL       = subattr->HLL_id;
+        //PARROT_ASSERT(PObj_is_shared_TEST(sub) || subattr->namespace_stash->orig_interp == interp);
         c->current_namespace = subattr->namespace_stash;
     }
 }
@@ -271,6 +272,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;
         ctx->current_HLL       = old->current_HLL;
+        PARROT_ASSERT(PMC_IS_NULL(old->current_namespace) || PObj_is_shared_TEST(old->current_namespace) || old->current_namespace->orig_interp == pmcctx->orig_interp);
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;

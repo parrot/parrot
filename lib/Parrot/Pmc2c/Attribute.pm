@@ -243,10 +243,13 @@ EOA
 EOA
     }
 
+    my $assertion = ($attrtype =~ $isptrtopmc and not $isfuncptr) ? 'PARROT_ASSERT((value) == NULL || PMC_IS_NULL(value) || PObj_is_shared_TEST((PMC *)(value)) || ((PMC *)(value))->orig_interp == interp);' : '';
     $decl .= <<"EOA";
         } \\
-        else \\
+        else {\\
+            $assertion \\
             ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
+        } \\
     } while (0)
 
 EOA
