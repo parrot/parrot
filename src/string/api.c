@@ -1094,7 +1094,7 @@ Parrot_str_iter_substr(PARROT_INTERP,
     ASSERT_ARGS(Parrot_str_iter_substr)
     STRING * const dest = Parrot_str_copy(interp, str);
 
-    dest->strstart = (char *)dest->strstart + l->bytepos;
+    dest->strstart += l->bytepos;
 
     if (r == NULL) {
         dest->bufused = str->bufused - l->bytepos;
@@ -1288,12 +1288,12 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     memcpy(dest->strstart, src->strstart, start_byte);
 
     /* Copy the replacement in */
-    memcpy((char *)dest->strstart + start_byte, rep->strstart,
+    memcpy(dest->strstart + start_byte, rep->strstart,
             rep->bufused);
 
     /* Copy the end of old string */
-    memcpy((char *)dest->strstart + start_byte + rep->bufused,
-            (char *)src->strstart + end_byte,
+    memcpy(dest->strstart + start_byte + rep->bufused,
+            src->strstart + end_byte,
             src->bufused - end_byte);
 
     dest->strlen  = src->strlen - (end_char - start_char) + rep->strlen;
