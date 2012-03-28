@@ -17,9 +17,9 @@
 .sub 'bindfirst' :subid('WSubId_1')
         .param pmc __ARG_1
         .param pmc __ARG_2 :slurpy
+.const 'Sub' WSubId_2 = "WSubId_2"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', __ARG_2
-.const 'Sub' WSubId_2 = "WSubId_2"
     newclosure $P1, WSubId_2
     .return($P1)
 
@@ -38,9 +38,9 @@
 .sub 'bindlast' :subid('WSubId_3')
         .param pmc __ARG_1
         .param pmc __ARG_2 :slurpy
+.const 'Sub' WSubId_4 = "WSubId_4"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', __ARG_2
-.const 'Sub' WSubId_4 = "WSubId_4"
     newclosure $P1, WSubId_4
     .return($P1)
 
@@ -58,8 +58,8 @@
 
 .sub 'bindmethod' :subid('WSubId_5')
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
+.lex '__WLEX_1', __ARG_1
     newclosure $P1, WSubId_6
     .return($P1)
 
@@ -79,9 +79,9 @@
 .sub 'method_fun' :subid('WSubId_7')
         .param pmc __ARG_1
         .param string __ARG_2
+.const 'Sub' WSubId_8 = "WSubId_8"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', $P1
-.const 'Sub' WSubId_8 = "WSubId_8"
     find_method $P1, __ARG_1, __ARG_2
     newclosure $P2, WSubId_8
     .return($P2)
@@ -100,8 +100,8 @@
 
 .sub 'addprefix' :subid('WSubId_9')
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_10 = "WSubId_10"
+.lex '__WLEX_1', __ARG_1
     newclosure $P1, WSubId_10
     .return($P1)
 
@@ -16416,8 +16416,8 @@
 .sub 'cloneswitchto' :subid('WSubId_11') :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.lex '__WLEX_1', __ARG_2
 .const 'Sub' WSubId_12 = "WSubId_12"
+.lex '__WLEX_1', __ARG_2
     getattribute $P17, self, 'start'
     __ARG_1.'Statement'($P17, __ARG_2)
     getattribute $P1, self, 'case_value'
@@ -20242,8 +20242,8 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_45 = "WSubId_45"
 .const 'Sub' WSubId_139 = "WSubId_139"
+.const 'Sub' WSubId_45 = "WSubId_45"
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
     getattribute $P22, self, 'name'
@@ -20315,75 +20315,75 @@
   __label_15: # endfor
   __label_13:
   __label_12:
-    if_null $P4, __label_17
-    iter $P25, $P4
-    set $P25, 0
-  __label_16: # for iteration
-    unless $P25 goto __label_17
-    shift $P5, $P25
-    $P6 = $P5.'get_default'()
-    if_null $P6, __label_18
-    $P6.'emit'(__ARG_1)
-  __label_18: # endif
+    getattribute $P15, self, 'usedsubids'
+    root_new $P16, ['parrot';'ResizablePMCArray']
+    set $P17, WSubId_139
+    if_null $P15, __label_18
+    iter $P26, $P15
+    set $P26, 0
+  __label_17: # for iteration
+    unless $P26 goto __label_18
+    shift $P18, $P26
+    $P22 = $P17($P18)
+    push $P16, $P22
+    goto __label_17
+  __label_18: # endfor
+    set $P25, $P16
     goto __label_16
-  __label_17: # endfor
+  __label_16:
+    set $P22, $P25
+    join $S4, "", $P22
+    __ARG_1.'print'($S4)
+    if_null $P4, __label_20
+    iter $P27, $P4
+    set $P27, 0
+  __label_19: # for iteration
+    unless $P27 goto __label_20
+    shift $P5, $P27
+    $P6 = $P5.'get_default'()
+    if_null $P6, __label_21
+    $P6.'emit'(__ARG_1)
+  __label_21: # endif
+    goto __label_19
+  __label_20: # endfor
     getattribute $P7, self, 'lexicals'
     getattribute $P8, self, 'usedlexicals'
     isnull $I2, $P7
     not $I2
-    if $I2 goto __label_20
+    if $I2 goto __label_23
     isnull $I2, $P8
     not $I2
-  __label_20:
-    unless $I2 goto __label_19
+  __label_23:
+    unless $I2 goto __label_22
     getattribute $P22, self, 'start'
     __ARG_1.'annotate'($P22)
-    if_null $P7, __label_22
-    iter $P26, $P7
-    set $P26, 0
-  __label_21: # for iteration
-    unless $P26 goto __label_22
-    shift $S2, $P26
+    if_null $P7, __label_25
+    iter $P28, $P7
+    set $P28, 0
+  __label_24: # for iteration
+    unless $P28 goto __label_25
+    shift $S2, $P28
     $P23 = $P7[$S2]
     $P22 = WSubId_45(".lex '%0', %1", $P23, $S2)
     __ARG_1.'say'($P22)
-    goto __label_21
-  __label_22: # endfor
-    if_null $P8, __label_24
-    iter $P27, $P8
-    set $P27, 0
-  __label_23: # for iteration
-    unless $P27 goto __label_24
-    shift $S3, $P27
+    goto __label_24
+  __label_25: # endfor
+    if_null $P8, __label_27
+    iter $P29, $P8
+    set $P29, 0
+  __label_26: # for iteration
+    unless $P29 goto __label_27
+    shift $S3, $P29
     substr $S4, $S3, 0, 1
-    eq $S4, '$', __label_25
+    eq $S4, '$', __label_28
     concat $S5, "    .local pmc ", $S3
     __ARG_1.'say'($S5)
-  __label_25: # endif
+  __label_28: # endif
     $P22 = $P8[$S3]
     __ARG_1.'emitfind_lex'($S3, $P22)
-    goto __label_23
-  __label_24: # endfor
-  __label_19: # endif
-    getattribute $P15, self, 'usedsubids'
-    root_new $P16, ['parrot';'ResizablePMCArray']
-    set $P17, WSubId_139
-    if_null $P15, __label_28
-    iter $P29, $P15
-    set $P29, 0
-  __label_27: # for iteration
-    unless $P29 goto __label_28
-    shift $P18, $P29
-    $P22 = $P17($P18)
-    push $P16, $P22
-    goto __label_27
-  __label_28: # endfor
-    set $P28, $P16
     goto __label_26
-  __label_26:
-    set $P22, $P28
-    join $S4, "", $P22
-    __ARG_1.'print'($S4)
+  __label_27: # endfor
+  __label_22: # endif
     $P22 = __ARG_1.'getDebug'()
     set $I1, $P22
     getattribute $P9, self, 'body'
@@ -22632,8 +22632,8 @@
 
 .sub 'emit' :subid('WSubId_15') :method
         .param pmc __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_16 = "WSubId_16"
+.lex '__WLEX_1', __ARG_1
     __ARG_1.'say'(".sub 'importextern' :anon :load :init\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
     getattribute $P4, self, 'module'
     join $S1, "'; '", $P4
@@ -22969,10 +22969,10 @@
 
 
 .sub 'fixnamespaces' :subid('WSubId_17') :method
-.lex '__WLEX_1', $P1
 .const 'Sub' WSubId_5 = "WSubId_5"
 .const 'Sub' WSubId_7 = "WSubId_7"
 .const 'Sub' WSubId_18 = "WSubId_18"
+.lex '__WLEX_1', $P1
     getattribute $P2, self, 'namespaces'
     $P3 = WSubId_5("fixnamespaces")
     if_null $P2, __label_3
@@ -23089,8 +23089,8 @@
 
 .sub 'getusedns' :subid('WSubId_19') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_20 = "WSubId_20"
+.lex '__WLEX_1', __ARG_1
     getattribute $P1, self, 'usednamespaces'
     newclosure $P2, WSubId_20
     if_null $P1, __label_3
@@ -23130,8 +23130,8 @@
 
 .sub 'getlocalns' :subid('WSubId_21') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_22 = "WSubId_22"
+.lex '__WLEX_1', __ARG_1
     getattribute $P2, self, 'namespaces'
     newclosure $P3, WSubId_22
     if_null $P2, __label_3
@@ -23194,8 +23194,8 @@
 
 .sub 'checkclass_base' :subid('WSubId_23') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_24 = "WSubId_24"
+.lex '__WLEX_1', __ARG_1
     getattribute $P3, self, 'classes'
     newclosure $P4, WSubId_24
     if_null $P3, __label_3
