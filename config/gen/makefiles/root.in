@@ -824,7 +824,7 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
-	@echo "  headerizer:        Recreate header files for C-source files"
+	@echo "  headerizer:        Rebuild function declarations in .h files and static declarations in .c files."
 	@echo "  apilist:           Show list of PARROT_API functions"
 	@echo "  exportlist:        Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
