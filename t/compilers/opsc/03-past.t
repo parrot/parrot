@@ -1,5 +1,5 @@
 #! ./parrot-nqp
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 
 # "Comprehensive" test for creating PAST for op.
@@ -101,7 +101,7 @@ ok( $op.arg_types.join('_') eq 'i_pc_nc', "Second variant correct");
 
 # Check body munching.
 $op := @ops[0];
-ok( $op.get_body($trans) ~~ /'return (opcode_t *)cur_opcode + 1'/ , "goto NEXT appended for non :flow ops");
+ok( $op.get_body($trans) ~~ /'return cur_opcode + 1'/ , "goto NEXT appended for non :flow ops");
 
 # Check write barriers.
 ok( !$op.need_write_barrier, "Write Barrier is not required");
