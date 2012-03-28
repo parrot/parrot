@@ -166,6 +166,9 @@ typedef enum PObj_enum {
     /* For debugging, report when this buffer gets moved around */
     PObj_report_FLAG            = POBJ_FLAG(20),
 
+    /* used by Proxy PMC to identify PMCs created on the current interp */
+    PObj_is_new_FLAG            = POBJ_FLAG(21),
+
     /* Flags used by generation GC to determine generation object belong */
     PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
     PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
@@ -293,6 +296,10 @@ typedef enum PObj_enum {
 #define PObj_is_shared_TEST(o) PObj_flag_TEST(is_shared, o)
 #define PObj_is_shared_SET(o)  PObj_flag_SET(is_shared, o)
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
+
+#define PObj_is_new_TEST(o) PObj_flag_TEST(is_new, o)
+#define PObj_is_new_SET(o)  PObj_flag_SET(is_new, o)
+#define PObj_is_new_CLEAR(o) PObj_flag_CLEAR(is_new, o)
 
 #define PObj_GC_on_dirty_list_TEST(o)  PObj_flag_TEST(GC_on_dirty_list, o)
 #define PObj_GC_on_dirty_list_SET(o)   PObj_flag_SET(GC_on_dirty_list, o)

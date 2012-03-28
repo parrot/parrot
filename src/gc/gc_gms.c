@@ -758,9 +758,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
 
-    if (interp->thread_data != NULL)
-        LOCK(interp->thread_data->interp_lock);
-
     /* GC is blocked */
     if (self->gc_mark_block_level)
         goto DONE;
@@ -858,8 +855,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_gms_validate_objects(interp);
 
 DONE:
-    if (interp->thread_data != NULL)
-        UNLOCK(interp->thread_data->interp_lock);
+    return;
 }
 
 /*
@@ -1424,9 +1420,6 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_maybe_mark_and_sweep(interp);
 
-    if (interp->thread_data)
-        LOCK(interp->thread_data->interp_lock);
-
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
 
@@ -1435,9 +1428,6 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
-
-    if (interp->thread_data)
-        UNLOCK(interp->thread_data->interp_lock);
 
     return &(item->pmc);
 }
@@ -1550,6 +1540,9 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     string_alloc_struct *item;
     STRING              *ret;
 
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
+
     gc_gms_maybe_mark_and_sweep(interp);
 
     /* Increase used memory.
@@ -1560,6 +1553,9 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 
     item = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     item->ptr = Parrot_pa_insert(interp, self->strings[0], item);
+
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 
     ret = &(item->str);
     memset(ret, 0, sizeof (STRING));

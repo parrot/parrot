@@ -90,20 +90,30 @@ sub _generate_proxy_method {
     my $body = $method->return_type eq 'PMC*'
         ? <<BODY
     PMC * result;
+    PARROT_ASSERT(interp != PARROT_PROXY(SELF)->interp);
 
     /* block the GC to prevent it from finding foreign PMCs on the stack */
     Parrot_block_GC_mark(interp);
 
+    Interp_flags_SET(interp, PARROT_THR_FLAG_NEW_PMC);
     result = $call;
+    Interp_flags_CLEAR(interp, PARROT_THR_FLAG_NEW_PMC);
 
     Parrot_unblock_GC_mark(interp);
 
-    PARROT_ASSERT(interp != PARROT_PROXY(SELF)->interp);
-    return (PMC_IS_NULL(result)
-        ? PMCNULL
-        : result->orig_interp == interp
-            ? result
-            : Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result));
+    if (!PMC_IS_NULL(result)) {
+        if (PObj_is_new_TEST(result)) {
+            PARROT_ASSERT(result->orig_interp == interp);
+            abort();
+            PObj_is_new_CLEAR(result);
+        }
+        else {
+            PARROT_ASSERT(result->orig_interp != interp);
+            return Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result);
+        }
+    }
+
+    return result;
 BODY
         : "    return $call;\n";
 
