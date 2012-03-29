@@ -58,7 +58,6 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC      *current_object;     /* current object if a method call */
     ATTR PMC      *current_namespace;  /* The namespace we're currently in */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
-    ATTR PMC      *current_sig;        /* temporary CallContext PMC for active call */
 
     /* deref the constants - we need them all the time */
     ATTR FLOATVAL *num_constants;
