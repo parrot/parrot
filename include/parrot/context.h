@@ -187,7 +187,8 @@ UINTVAL Parrot_pcc_get_recursion_depth_func(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_signature_func(PARROT_INTERP, ARGIN(const PMC *ctx))
+Parrot_Signature* Parrot_pcc_get_signature_func(PARROT_INTERP,
+    ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -290,7 +291,7 @@ UINTVAL Parrot_pcc_set_recursion_depth_func(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_pcc_set_signature_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
-    ARGIN_NULLOK(PMC *sig_object))
+    ARGIN_NULLOK(Parrot_Signature *sig))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

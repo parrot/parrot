@@ -429,10 +429,11 @@ Parrot_pcc_set_continuation_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PM
 
 /*
 
-=item C<PMC* Parrot_pcc_get_signature_func(PARROT_INTERP, const PMC *ctx)>
+=item C<Parrot_Signature* Parrot_pcc_get_signature_func(PARROT_INTERP, const PMC
+*ctx)>
 
-=item C<void Parrot_pcc_set_signature_func(PARROT_INTERP, PMC *ctx, PMC
-*sig_object)>
+=item C<void Parrot_pcc_set_signature_func(PARROT_INTERP, PMC *ctx,
+Parrot_Signature *sig)>
 
 Get/set call signature object of Context (in sub/method call).
 
@@ -443,22 +444,22 @@ Get/set call signature object of Context (in sub/method call).
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC*
+Parrot_Signature*
 Parrot_pcc_get_signature_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_signature_func)
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    return CONTEXT_STRUCT(ctx)->current_sig;
+    return CONTEXT_STRUCT(ctx)->signature;
 }
 
 PARROT_EXPORT
 void
-Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sig_object))
+Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(Parrot_Signature *sig))
 {
     ASSERT_ARGS(Parrot_pcc_set_signature_func)
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
-    CONTEXT_STRUCT(ctx)->current_sig = sig_object;
+    CONTEXT_STRUCT(ctx)->signature = sig_object;
 }
 
 /*
