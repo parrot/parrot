@@ -69,8 +69,7 @@ the Release Manger Guide, and have, therefore, already cut the new Parrot
 release.
 
 2. You must use fully qualified paths for both the '-d' and the '-r' options.
-Similarly, if you use the query system instead. For example,
-C</home/user/path_to/docs/>
+This is equally true for the query system as well.
 
 =head1 HISTORY
 
