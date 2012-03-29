@@ -133,6 +133,13 @@ PMC* Parrot_pcc_get_namespace_func(PARROT_INTERP, ARGIN(const PMC *ctx))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
+Parrot_Signature* Parrot_pcc_get_next_context(PARROT_INTERP,
+    ARGIN(const PMC *ctx))
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
 FLOATVAL Parrot_pcc_get_num_constant_func(PARROT_INTERP,
     ARGIN(const PMC *ctx),
     INTVAL idx)
@@ -261,6 +268,13 @@ void Parrot_pcc_set_namespace_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_pcc_set_next_context(PARROT_INTERP,
+    ARGIN(PMC *ctx),
+    ARGIN_NULLOK(PMC *context))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void Parrot_pcc_set_object_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *object))
@@ -358,6 +372,8 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_get_next_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_num_constant_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
@@ -413,6 +429,9 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(lex_pad))
 #define ASSERT_ARGS_Parrot_pcc_set_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_next_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

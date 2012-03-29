@@ -73,6 +73,7 @@ pmclass CallContext provides array provides hash auto_attrs {
 
     /* Storage for arguments */
     ATTR Parrot_Signature *signature;
+    ATTR PMC              *temporary_context; /* CallContext for next call */
 
     ATTR PMC    *continuation;          /* Reusable continuation */
 

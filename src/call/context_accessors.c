@@ -462,6 +462,27 @@ Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(Parro
     CONTEXT_STRUCT(ctx)->signature = sig_object;
 }
 
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+Parrot_Signature*
+Parrot_pcc_get_next_context(SHIM_INTERP, ARGIN(const PMC *ctx))
+{
+    ASSERT_ARGS(Parrot_pcc_get_signature_func)
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    return CONTEXT_STRUCT(ctx)->temporary_context;
+}
+
+PARROT_EXPORT
+void
+Parrot_pcc_set_next_context(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *context))
+{
+    ASSERT_ARGS(Parrot_pcc_set_signature_func)
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_GC_WRITE_BARRIER(interp, ctx);
+    CONTEXT_STRUCT(ctx)->temporary_context = context;
+}
+
 /*
 
 =item C<PMC* Parrot_pcc_get_object_func(PARROT_INTERP, const PMC *ctx)>
