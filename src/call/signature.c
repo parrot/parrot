@@ -204,7 +204,26 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_Signature *
 Parrot_pcc_signature_clone(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 {
-    PARROT_ASSERT(!"NYI");
+    Parrot_Signature *dest = Parrot_pcc_signature_new(interp);
+
+    /* Copy positionals */
+    ensure_positionals_storage(interp, dest, self->num_positionals);
+    memcpy(dest->positionals, self->positionals, self->num_positionals * sizeof (Pcc_cell));
+    dest->num_positionals = self->num_positionals;
+
+    dest->type_tuple    = VTABLE_clone(interp, self->type_tuple);
+    dest->short_sig     = interp, self->short_sig;
+    dest->arg_flags     = VTABLE_clone(interp, self->arg_flags);
+    dest->return_flags  = VTABLE_clone(interp, self->return_flags);
+
+    if (self->hash) {
+        Hash *dest_hash = get_hash(interp, dest);
+        Parrot_hash_clone(interp, hash, dest_hash);
+        parrot_hash_iterate(dest_hash,
+            Pcc_cell *tmp;
+            CLONE_CELL(INTERP, (Pcc_cell *)_bucket->value, tmp);
+            _bucket->value = tmp;);
+    }
 }
 
 /*
