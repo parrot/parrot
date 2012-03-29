@@ -192,6 +192,22 @@ Parrot_pcc_signature_reset(PARROT_INTERP, ARGIN(Parrot_Signature *self))
 }
 
 /*
+=item C<Parrot_Signature * Parrot_pcc_signature_clone(PARROT_INTERP,
+Parrot_Signature *self)>
+
+Clone Signature.
+
+=cut
+*/
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Parrot_Signature *
+Parrot_pcc_signature_clone(PARROT_INTERP, ARGIN(Parrot_Signature *self))
+{
+    PARROT_ASSERT(!"NYI");
+}
+
+/*
 =item C<INTVAL Parrot_pcc_signature_num_positionals(PARROT_INTERP,
 Parrot_Signature *self)>
 
