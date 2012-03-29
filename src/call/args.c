@@ -1572,8 +1572,8 @@ Parrot_pcc_parse_signature_string(PARROT_INTERP, ARGIN(STRING *signature),
 
 /*
 
-=item C<void Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, PMC *parent,
-PMC *tailcall)>
+=item C<void Parrot_pcc_merge_context_for_tailcall(PARROT_INTERP, PMC
+*parent_ctx, PMC *tailcall_ctx)>
 
 merge in signatures for tailcall
 
@@ -1582,22 +1582,22 @@ merge in signatures for tailcall
 */
 
 void
-Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGMOD(PMC *tailcall))
+Parrot_pcc_merge_context_for_tailcall(PARROT_INTERP,
+        ARGIN(PMC *parent_ctx), ARGMOD(PMC *tailcall_ctx))
 {
     ASSERT_ARGS(Parrot_pcc_merge_signature_for_tailcall)
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall))
         return;
     else {
-        /* Broke encapuslation. Direct poking into CallContext is much faster */
-        PMC * temp;
+        Parrot_Signature *parent_sig = Parrot_pcc_get_signature(interp, parent);
+        Parrot_Signature *tailcall_sig = Parrot_pcc_get_signature(interp, tailcall);
 
         /* Store raw signature */
-        GETATTR_CallContext_return_flags(interp, parent, temp);
-        SETATTR_CallContext_return_flags(interp, tailcall, temp);
+        tailcall_sig->return_flags = parent_sig->return_flags;
 
-        GETATTR_CallContext_current_cont(interp, parent, temp);
-        SETATTR_CallContext_current_cont(interp, tailcall, temp);
-        PARROT_GC_WRITE_BARRIER(interp, tailcall);
+        /* Store Continuation. We will return to parent context */
+        GETATTR_CallContext_current_cont(interp, parent_ctx, temp);
+        SETATTR_CallContext_current_cont(interp, tailcall_ctx, temp);
     }
 }
 
