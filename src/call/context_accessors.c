@@ -465,7 +465,7 @@ Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(Parro
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-Parrot_Signature*
+PMC*
 Parrot_pcc_get_next_context(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_signature_func)

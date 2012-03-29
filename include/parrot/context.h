@@ -133,8 +133,7 @@ PMC* Parrot_pcc_get_namespace_func(PARROT_INTERP, ARGIN(const PMC *ctx))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-Parrot_Signature* Parrot_pcc_get_next_context(PARROT_INTERP,
-    ARGIN(const PMC *ctx))
+PMC* Parrot_pcc_get_next_context(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
