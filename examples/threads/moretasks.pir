@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
 .sub main :main
     .local pmc task, sayer, starter, number, interp, tasks, results
@@ -123,3 +123,9 @@ loop:
     if i >= 1000000 goto start
     goto loop
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

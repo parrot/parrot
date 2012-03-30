@@ -529,8 +529,7 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #ifdef THREAD_DEBUG
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
       do if (!PMC_IS_NULL(obj) \
-          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD)) \
-        ) { \
+          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
             PARROT_ASSERT((obj)->orig_interp == (interp)); \
             Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
         } \
@@ -538,8 +537,9 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
       do if (!PMC_IS_NULL(obj) \
-          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD)) \
-        ) { Parrot_gc_mark_PMC_alive_fun((interp), (obj)); } \
+          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
+          Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+        } \
       while (0)
 #endif
 #else

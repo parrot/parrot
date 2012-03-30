@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
 .sub 'main' :main
     .local pmc colors, start_colors, at_most_two, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
@@ -254,4 +254,3 @@ lock:
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
