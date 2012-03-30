@@ -44,8 +44,11 @@ push_handle_entry(void *handle)
 {
     struct handle_entry *e;
 
-    e = (handle_entry *) malloc(sizeof(struct handle_entry));
-    if (!e) { return; }
+    e = (struct handle_entry *) malloc(sizeof (struct handle_entry));
+    if (!e) {
+        return;
+    }
+
     e->handle = handle;
     e->next = handle_list;
     handle_list = e;
@@ -56,10 +59,11 @@ find_handle_entry(void *handle)
 {
     struct handle_entry *e;
 
-    for(e = handle_list; e; e = e->next) {
-    if (e->handle == handle)
-        return handle;
+    for (e = handle_list; e; e = e->next) {
+        if (e->handle == handle)
+            return handle;
     }
+
     return NULL;
 }
 
@@ -69,18 +73,19 @@ remove_handle_entry(void *handle)
     struct handle_entry *cur, *prev, *p;
 
     if (handle_list) {
-    if (handle_list->handle == handle) {
-        p = handle_list;
-        handle_list = p->next;
-        free(p);
-    } else {
-        for (cur = handle_list; cur; prev = cur, cur = cur->next) {
-        if (cur->handle == handle) {
-            prev->next = cur->next;
-            free(cur);
+        if (handle_list->handle == handle) {
+            p = handle_list;
+            handle_list = p->next;
+            free(p);
         }
+        else {
+            for (cur = handle_list; cur; prev = cur, cur = cur->next) {
+                if (cur->handle == handle) {
+                    prev->next = cur->next;
+                    free(cur);
+                }
+            }
         }
-    }
     }
 }
 #endif /* PARROT_HAS_HEADER_DLFCN */
