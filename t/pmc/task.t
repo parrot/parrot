@@ -21,7 +21,7 @@
     ok(1, "initialized")
 
     tasks_run()
-#    task_send_recv() # send and receive NYI
+    task_send_recv()
 #    task_kill()      # kill NYI
 #    task_wait()
 #    preempt_and_exit()
@@ -60,7 +60,7 @@
     $P0 = get_global 'recv_msg1'
     $P1 = new 'Task', $P0
     schedule $P1
-    pass
+    sleep 0.1
 
     $P2 = new 'String'
     $P2 = "Hai 1"
@@ -85,14 +85,20 @@
     $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 1"
-    is($P0, $P1, "Got message after block")
+    if $P0 == $P1 goto ok
+    returncc
+ok:
+    say "ok 5 Got message after block"
 .end
 
 .sub recv_msg2
     $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 2"
-    is($P0, $P1, "Got existing message")
+    if $P0 == $P1 goto ok
+    returncc
+ok:
+    say "ok 6 Got exisintg message"
 .end
 
 .sub task_kill

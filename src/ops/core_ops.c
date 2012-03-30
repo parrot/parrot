@@ -24236,29 +24236,62 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
     Parrot_Task_attributes  * tdata = PARROT_TASK(cur_task);
     int   msg_count;
 
-    if (PMC_IS_NULL(tdata->mailbox)) {
-        tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
-        PARROT_GC_WRITE_BARRIER(interp, cur_task);
-        msg_count = 0;
-    }
-    else {
-        msg_count = VTABLE_elements(interp, tdata->mailbox);
-    }
+    if (tdata->partner) {
+        Parrot_Task_attributes  * const  pdata = PARROT_TASK(tdata->partner);
 
-    if ((msg_count > 0)) {
-        PREG(1) = VTABLE_shift_pmc(interp, tdata->mailbox);
-        {
-            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
-            return (opcode_t *)dest;
+        LOCK(pdata->mailbox_lock);
+        if (PMC_IS_NULL(pdata->mailbox)) {
+            msg_count = 0;
+        }
+        else {
+            msg_count = VTABLE_elements(interp, pdata->mailbox);
+        }
+
+        if ((msg_count > 0)) {
+            PREG(1) = VTABLE_shift_pmc(interp, pdata->mailbox);
+            UNLOCK(pdata->mailbox_lock);
+            {
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+                return (opcode_t *)dest;
+            }
+
+        }
+        else {
+            TASK_recv_block_SET(cur_task);
+            (void)Parrot_cx_stop_task(interp, cur_opcode);
+            UNLOCK(pdata->mailbox_lock);
+            {
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+                return (opcode_t *)0;
+            }
+
         }
 
     }
     else {
-        TASK_recv_block_SET(cur_task);
-        (void)Parrot_cx_stop_task(interp, cur_opcode);
-        {
-            PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
-            return (opcode_t *)0;
+        if (PMC_IS_NULL(tdata->mailbox)) {
+            msg_count = 0;
+        }
+        else {
+            msg_count = VTABLE_elements(interp, tdata->mailbox);
+        }
+
+        if ((msg_count > 0)) {
+            PREG(1) = VTABLE_shift_pmc(interp, tdata->mailbox);
+            {
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+                return (opcode_t *)dest;
+            }
+
+        }
+        else {
+            TASK_recv_block_SET(cur_task);
+            (void)Parrot_cx_stop_task(interp, cur_opcode);
+            {
+                PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+                return (opcode_t *)0;
+            }
+
         }
 
     }

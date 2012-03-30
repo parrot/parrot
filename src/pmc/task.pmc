@@ -33,6 +33,7 @@ pmclass Task provides invokable auto_attrs {
     ATTR PMC          *data;      /* Additional data for the task */
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
     ATTR PMC          *mailbox;   /* List of incoming messages */
+    ATTR Parrot_mutex mailbox_lock;
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
     ATTR Parrot_mutex waiters_lock;
     ATTR PMC          *shared;    /* List of variables shared with this task */
@@ -68,6 +69,7 @@ Initialize a concurrency task object.
         core_struct->shared    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         core_struct->partner   = NULL; /* Set by Parrot_thread_create_local_task */
 
+        MUTEX_INIT(core_struct->mailbox_lock);
         MUTEX_INIT(core_struct->waiters_lock);
 
         /* Assign a unique ID */
@@ -438,9 +440,21 @@ Send a message to this task.
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
         VTABLE_push_pmc(interp, tdata->mailbox, message);
 
-        if (TASK_recv_block_TEST(SELF)) {
-            TASK_recv_block_CLEAR(SELF);
-            Parrot_cx_schedule_task(interp, SELF);
+        if (tdata->partner) {
+            PMC *                    const partner = tdata->partner;
+            Parrot_Task_attributes * const pdata = PARROT_TASK(partner);
+            LOCK(tdata->mailbox_lock);
+            if (TASK_recv_block_TEST(partner)) {
+                TASK_recv_block_CLEAR(partner);
+                Parrot_cx_schedule_immediate(pdata->interp, partner);
+            }
+            UNLOCK(tdata->mailbox_lock);
+        }
+        else {
+            if (TASK_recv_block_TEST(SELF)) {
+                TASK_recv_block_CLEAR(SELF);
+                Parrot_cx_schedule_task(interp, SELF);
+            }
         }
     }
 
