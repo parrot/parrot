@@ -189,9 +189,8 @@ Parrot_dlclose(void *handle)
         rv = dlclose(handle);
         return rv;
     }
-#else
-    return -1;
 #endif
+    return -1;
 }
 
 /*
