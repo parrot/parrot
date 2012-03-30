@@ -37,9 +37,8 @@ and the 'parrot-docsx' repositories.
 
 =item B<--delete>
 
-After committing the changes, delete the 'parrot.github.com' and the
-'parrot-docsx' repositories. The default is to keep the repositories on your
-local file system.
+The default is to retain both the 'parrot.github.com' and the 'parrot-docsx'
+repositories. This option deletes the repositories after pushing the updates.
 
 =item B<-h>, B<--help>
 
@@ -53,14 +52,13 @@ Displays the version and copyright information and exits.
 
 =head1 QUERY SYSTEM
 
-If you do not want to use the above options, you may simply execute the script
-without options and it will invoke the query system, which will ask you to input
-the answers instead.
+If you do not apply the above options on the command-line, the script will
+invoke a rather minimal query system with which to obtain the necessary
+information.
 
 =head1 LIMITATIONS
 
-Because this script directly employs *nix file separators, I<i.e.,> '/', it
-will execute only on *nix (and related) file systems.
+This script is limited to *nix (and related) systems.
 
 =head1 NOTES
 
@@ -69,7 +67,7 @@ the Release Manger Guide, and have, therefore, already cut the new Parrot
 release.
 
 2. You must use fully qualified paths for both the '-d' and the '-r' options.
-This is equally true for the query system as well.
+This is true for the query system as well.
 
 =head1 HISTORY
 
@@ -124,9 +122,6 @@ get_docs_directory() unless $docs;
 # Get the directory in which to clone the repos if not supplied
 get_repo_directory() unless $repos;
 
-# Ask user whether or not to keep the repos if not supplied
-query_delete() unless $delete;
-
 # Get VERSION
 open FH, "<VERSION" or stop("I'm unable to open the 'VERSION' file");
 $version = <FH>;
@@ -138,7 +133,7 @@ $version = '4.3.0';
 
 # Parse version number
 my ($major, $minor, $patch) = ($1, $2, $3) if $version =~ /^(\d+)\.(\d+)\.(\d+)$/;
-stop("There is some (unkonw) problem with the major or the minor release numbers")
+stop("There is some (unkown) problem with the major or the minor release numbers")
   unless $major and $minor;
 
 # Set to the previous release version
@@ -158,6 +153,7 @@ get_parrot_github();
 get_parrot_docsx();
 archive_parrot_docsx();
 update_parrot_github();
+delete_repos() if $delete;
 exit(0);
 
 ##########################
@@ -167,11 +163,10 @@ exit(0);
 # Minimal query system
 sub query_system {
     my $questions;
-    if ((!defined $docs and !defined $repos and !defined $delete) or
-        (!defined $docs and !defined $repos and  defined $delete) or
-        (!defined $docs and  defined $repos and !defined $delete) or
-        ( defined $docs and !defined $repos and !defined $delete)) {
-	$questions = "some questions";
+    if ((!defined $docs and !defined $repos) or
+        (!defined $docs and  defined $repos) or
+        ( defined $docs and !defined $repos))) {
+	$questions = "a couple of questions";
     }
     else {
 	$questions = "a question";
@@ -207,24 +202,6 @@ sub get_repo_directory {
     }
 
     $repos .= '/' if $repos =~ /[a-zA-Z0-9]$/;
-}
-
-# Keep repos?
-sub query_delete {
-    while (1) {
-	print "Do you want to delete the 'parrot.github.com' and the ",
-	  "'parrot-docsx' repositories on your local file system? [Y|n] ";
-	$delete = <>;
-	chomp $delete;
-
-	if ($delete eq "") {
-	    $delete = 'Y';
-	    last
-	}
-	elsif ($delete =~ /^Y|y|N|n/) {
-	    last;
-	}
-    }
 }
 
 # Clone a local copy of 'parrot.github.com'
@@ -318,7 +295,7 @@ sub update_parrot_github {
       stop("Unable to restore 'README.pod'");
     system('cp', "$tmp/index.html", '.') == 0 or
       stop("Unable to restore 'index.html'");
-    system('cp', "$tmp/releases.html", '.') == 0 or
+     system('cp', "$tmp/releases.html", '.') == 0 or
       stop("Unable to restore 'releases.html'");
 
     update_index_html();
@@ -386,6 +363,20 @@ sub update_releases_html {
     print FH $buffer       or stop("Unable to print out 'releases.html'");
     truncate(FH, tell(FH)) or stop("Unable to truncate 'releases.html'");
     close FH               or stop("Unable to close 'releases.html'");
+}
+
+# Delete the downloaded repositories
+sub delete_repos {
+    my $parrot_docsx = $repos . 'parrot-docs' . $major . '/';
+    my $parrot_github = $repos . 'parrot.github.com' . '/';
+
+    print "\n== DELETING PARROT-DOCSX ==\n";
+    system('rm', '-rf', $parrot_docsx) == 0 or
+      stop("Unable to delete the 'parrot-docsx' repo");
+
+    print "\n== DELETING PARROT.GITHUB.COM ==\n";
+    system('rm', '-rf', $parrot_github) == 0 or
+      stop("Unable to delete the 'parrot.github.com' repo");
 }
 
 # Customized version of die() for more consistent diagnostics
