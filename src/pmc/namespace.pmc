@@ -1161,7 +1161,7 @@ Returns the class or role PMC that is associated with this namespace.
 */
 
     METHOD get_class() {
-        Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC              *ret_class     = nsinfo->_class;
 
         if (PMC_IS_NULL(ret_class))

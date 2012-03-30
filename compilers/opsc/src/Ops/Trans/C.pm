@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 class Ops::Trans::C is Ops::Trans;
 
@@ -90,7 +90,7 @@ method restart_offset($offset) {
 
 method goto_address($addr) { "return (opcode_t *)$addr"; }
 
-method goto_offset($offset) { "return (opcode_t *)cur_opcode + $offset"; }
+method goto_offset($offset) { "return cur_opcode + $offset"; }
 
 method expr_address($addr) { $addr; }
 

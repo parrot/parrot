@@ -17,9 +17,9 @@
 .sub 'bindfirst' :subid('WSubId_1')
         .param pmc __ARG_1
         .param pmc __ARG_2 :slurpy
+.const 'Sub' WSubId_2 = "WSubId_2"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', __ARG_2
-.const 'Sub' WSubId_2 = "WSubId_2"
     newclosure $P1, WSubId_2
     .return($P1)
 
@@ -38,9 +38,9 @@
 .sub 'bindlast' :subid('WSubId_3')
         .param pmc __ARG_1
         .param pmc __ARG_2 :slurpy
+.const 'Sub' WSubId_4 = "WSubId_4"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', __ARG_2
-.const 'Sub' WSubId_4 = "WSubId_4"
     newclosure $P1, WSubId_4
     .return($P1)
 
@@ -58,8 +58,8 @@
 
 .sub 'bindmethod' :subid('WSubId_5')
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_6 = "WSubId_6"
+.lex '__WLEX_1', __ARG_1
     newclosure $P1, WSubId_6
     .return($P1)
 
@@ -79,9 +79,9 @@
 .sub 'method_fun' :subid('WSubId_7')
         .param pmc __ARG_1
         .param string __ARG_2
+.const 'Sub' WSubId_8 = "WSubId_8"
 .lex '__WLEX_1', __ARG_1
 .lex '__WLEX_2', $P1
-.const 'Sub' WSubId_8 = "WSubId_8"
     find_method $P1, __ARG_1, __ARG_2
     newclosure $P2, WSubId_8
     .return($P2)
@@ -100,8 +100,8 @@
 
 .sub 'addprefix' :subid('WSubId_9')
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_10 = "WSubId_10"
+.lex '__WLEX_1', __ARG_1
     newclosure $P1, WSubId_10
     .return($P1)
 
@@ -16416,8 +16416,8 @@
 .sub 'cloneswitchto' :subid('WSubId_11') :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.lex '__WLEX_1', __ARG_2
 .const 'Sub' WSubId_12 = "WSubId_12"
+.lex '__WLEX_1', __ARG_2
     getattribute $P17, self, 'start'
     __ARG_1.'Statement'($P17, __ARG_2)
     getattribute $P1, self, 'case_value'
@@ -19476,7 +19476,7 @@
     if_null $P2, __label_5
     unless $P2 goto __label_5
     new $P5, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
-    $P5.'FunctionParameterDefault'(__ARG_2, self)
+    $P5.'FunctionParameterDefault'(__ARG_2, __ARG_1, self)
     set $P4, $P5
     setattribute self, 'defaultexpr', $P4
     goto __label_6
@@ -19487,37 +19487,62 @@
 .end # FunctionParameter
 
 
+.sub 'optimize' :method
+    getattribute $P1, self, 'defaultexpr'
+    if_null $P1, __label_1
+    $P1.'optimize'()
+    $P3 = self.'getvar'()
+    $P2 = $P3.'getreg'()
+    set $S1, $P2
+    concat $S2, "__opt_flag", $S1
+    $P1.'setoptflag'($S2)
+  __label_1: # endif
+    .return(self)
+
+.end # optimize
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_136 = "WSubId_136"
     getattribute $P1, self, 'func'
-    getattribute $P4, self, 'name'
+    getattribute $P5, self, 'name'
     null $S1
-    if_null $P4, __label_1
-    set $S1, $P4
+    if_null $P5, __label_1
+    set $S1, $P5
   __label_1:
     $P2 = self.'getvar'()
-    $P5 = $P2.'gettype'()
-    $P4 = WSubId_136($P5)
+    $P6 = $P2.'gettype'()
+    $P5 = WSubId_136($P6)
     null $S2
-    if_null $P4, __label_2
-    set $S2, $P4
+    if_null $P5, __label_2
+    set $S2, $P5
   __label_2:
-    $P4 = $P2.'getreg'()
-    __ARG_1.'print'('        .param ', $S2, ' ', $P4)
+    $P5 = $P2.'getreg'()
+    __ARG_1.'print'('        .param ', $S2, ' ', $P5)
     getattribute $P3, self, 'modifiers'
     if_null $P3, __label_3
-    getattribute $P4, $P1, 'start'
-    $P3.'emitmodifiers'(__ARG_1, $P4, $S1)
+    getattribute $P5, $P1, 'start'
+    $P3.'emitmodifiers'(__ARG_1, $P5, $S1)
   __label_3: # endif
     getattribute $P4, self, 'defaultexpr'
     if_null $P4, __label_4
-    $P5 = $P2.'getreg'()
-    __ARG_1.'print'(" :optional\n        .param int __opt_flag", $P5, " :opt_flag")
+    $P5 = $P4.'getoptflag'()
+    __ARG_1.'print'(" :optional\n        .param int ", $P5, " :opt_flag")
   __label_4: # endif
     __ARG_1.'say'('')
 
 .end # emit
+
+
+.sub 'emitdefault' :method
+        .param pmc __ARG_1
+    getattribute $P1, self, 'defaultexpr'
+    if_null $P1, __label_1
+    $P1.'emit'(__ARG_1)
+  __label_1: # endif
+
+.end # emitdefault
 
 
 .sub 'get_type' :method
@@ -19534,13 +19559,6 @@
 
 .end # getvar
 
-
-.sub 'get_default' :method
-    getattribute $P1, self, 'defaultexpr'
-    .return($P1)
-
-.end # get_default
-
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionParameter' ]
     addattribute $P0, 'func'
@@ -19554,55 +19572,91 @@
 .sub 'FunctionParameterDefault' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
+        .param pmc __ARG_3
 .const 'Sub' WSubId_68 = "WSubId_68"
-    setattribute self, 'param', __ARG_2
-    getattribute $P3, __ARG_2, 'func'
-    $P2 = WSubId_68(__ARG_1, $P3)
+    setattribute self, 'owner', __ARG_2
+    setattribute self, 'param', __ARG_3
+    $P2 = WSubId_68(__ARG_1, __ARG_2)
     setattribute self, 'expr', $P2
 
 .end # FunctionParameterDefault
 
 
+.sub 'optimize' :method
+    getattribute $P4, self, 'expr'
+    $P3 = $P4.'optimize'()
+    setattribute self, 'expr', $P3
+    getattribute $P2, self, 'param'
+    $P1 = $P2.'getvar'()
+
+.end # optimize
+
+
+.sub 'setoptflag' :method
+        .param string __ARG_1
+    box $P1, __ARG_1
+    setattribute self, 'reg', $P1
+
+.end # setoptflag
+
+
+.sub 'getoptflag' :method
+.const 'Sub' WSubId_30 = "WSubId_30"
+    getattribute $P1, self, 'reg'
+    unless_null $P1, __label_1
+    getattribute $P2, self, 'param'
+    WSubId_30("Invalid parameter default usage", $P2)
+  __label_1: # endif
+    set $S1, $P1
+    .return($S1)
+
+.end # getoptflag
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
     getattribute $P1, self, 'expr'
-    $P4 = $P1.'isnull'()
-    isfalse $I1, $P4
+    $P5 = $P1.'isnull'()
+    isfalse $I1, $P5
     unless $I1 goto __label_1
     getattribute $P2, self, 'param'
-    getattribute $P5, $P2, 'func'
-    $P4 = $P5.'genlabel'()
+    $P3 = $P2.'getvar'()
+    getattribute $P6, self, 'owner'
+    $P5 = $P6.'genlabel'()
     null $S1
-    if_null $P4, __label_2
-    set $S1, $P4
+    if_null $P5, __label_2
+    set $S1, $P5
   __label_2:
-    $P5 = $P2.'getvar'()
-    $P4 = $P5.'getreg'()
+    $P5 = self.'getoptflag'()
     null $S2
-    if_null $P4, __label_3
-    set $S2, $P4
+    if_null $P5, __label_3
+    set $S2, $P5
   __label_3:
-    concat $S4, "__opt_flag", $S2
-    __ARG_1.'emitif'($S4, $S1)
-    $P4 = $P2.'get_type'()
+    __ARG_1.'emitif'($S2, $S1)
+    $P5 = $P3.'getreg'()
     null $S3
-    if_null $P4, __label_4
-    set $S3, $P4
+    if_null $P5, __label_4
+    set $S3, $P5
   __label_4:
-    $P4 = $P1.'checkresult'()
-    set $S4, $P4
-    ne $S3, $S4, __label_5
-    $P1.'emit_init'(__ARG_1, $S2)
-    goto __label_6
-  __label_5: # else
-    $P3 = $P1.'emit_get'(__ARG_1)
-    ne $S3, 'P', __label_7
-    __ARG_1.'emitbox'($S2, $P3)
-    goto __label_8
-  __label_7: # else
-    __ARG_1.'emitset'($S2, $P3)
-  __label_8: # endif
-  __label_6: # endif
+    $P5 = $P3.'gettype'()
+    null $S4
+    if_null $P5, __label_5
+    set $S4, $P5
+  __label_5:
+    $P5 = $P1.'checkresult'()
+    set $S5, $P5
+    ne $S4, $S5, __label_6
+    $P1.'emit_init'(__ARG_1, $S3)
+    goto __label_7
+  __label_6: # else
+    $P4 = $P1.'emit_get'(__ARG_1)
+    ne $S4, 'P', __label_8
+    __ARG_1.'emitbox'($S3, $P4)
+    goto __label_9
+  __label_8: # else
+    __ARG_1.'emitset'($S3, $P4)
+  __label_9: # endif
+  __label_7: # endif
     __ARG_1.'emitlabel'($S1)
   __label_1: # endif
 
@@ -19610,8 +19664,10 @@
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
+    addattribute $P0, 'owner'
     addattribute $P0, 'param'
     addattribute $P0, 'expr'
+    addattribute $P0, 'reg'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
@@ -19990,25 +20046,43 @@
     $P2 = $P1.'pick'('multi')
     if_null $P2, __label_2
     self.'setmulti'()
-    $P7 = WSubId_138(self, $P2)
-    setattribute self, 'multi_sig', $P7
+    $P8 = WSubId_138(self, $P2)
+    setattribute self, 'multi_sig', $P8
   __label_2: # endif
   __label_1: # endif
-    getattribute $P3, self, 'usednamespaces'
-    $P4 = WSubId_5("fixnamespaces")
+    getattribute $P3, self, 'params'
     if_null $P3, __label_5
-    iter $P8, $P3
-    set $P8, 0
-  __label_4: # for iteration
-    unless $P8 goto __label_5
-    shift $P5, $P8
-    $P4($P5)
+    elements $I1, $P3
     goto __label_4
-  __label_5: # endfor
+  __label_5:
+    null $I1
+  __label_4:
+    null $I2
+  __label_8: # for condition
+    ge $I2, $I1, __label_7
+    $P8 = $P3[$I2]
+    $P7 = $P8.'optimize'()
+    $P3[$I2] = $P7
+  __label_6: # for iteration
+    inc $I2
+    goto __label_8
+  __label_7: # for end
   __label_3:
-    getattribute $P9, self, 'body'
-    $P7 = $P9.'optimize'()
-    setattribute self, 'body', $P7
+    getattribute $P4, self, 'usednamespaces'
+    $P5 = WSubId_5("fixnamespaces")
+    if_null $P4, __label_11
+    iter $P9, $P4
+    set $P9, 0
+  __label_10: # for iteration
+    unless $P9 goto __label_11
+    shift $P6, $P9
+    $P5($P6)
+    goto __label_10
+  __label_11: # endfor
+  __label_9:
+    getattribute $P10, self, 'body'
+    $P8 = $P10.'optimize'()
+    setattribute self, 'body', $P8
     .return(self)
 
 .end # optimize
@@ -20206,36 +20280,36 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_45 = "WSubId_45"
 .const 'Sub' WSubId_139 = "WSubId_139"
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
-    getattribute $P22, self, 'name'
+.const 'Sub' WSubId_45 = "WSubId_45"
+    getattribute $P23, self, 'name'
     null $S1
-    if_null $P22, __label_1
-    set $S1, $P22
+    if_null $P23, __label_1
+    set $S1, $P23
   __label_1:
     __ARG_1.'say'()
     __ARG_1.'print'(".sub ")
-    $P22 = self.'isanonymous'()
-    if_null $P22, __label_2
-    unless $P22 goto __label_2
+    $P23 = self.'isanonymous'()
+    if_null $P23, __label_2
+    unless $P23 goto __label_2
     __ARG_1.'print'("'' :anon")
     goto __label_3
   __label_2: # else
     __ARG_1.'print'("'", $S1, "'")
   __label_3: # endif
-    getattribute $P22, self, 'subid'
-    if_null $P22, __label_4
     getattribute $P23, self, 'subid'
-    __ARG_1.'print'(" :subid('", $P23, "')")
+    if_null $P23, __label_4
+    getattribute $P24, self, 'subid'
+    __ARG_1.'print'(" :subid('", $P24, "')")
   __label_4: # endif
     getattribute $P1, self, 'outer'
     isnull $I2, $P1
     not $I2
     unless $I2 goto __label_6
-    getattribute $P22, self, 'usedlexicals'
-    isnull $I2, $P22
+    getattribute $P23, self, 'usedlexicals'
+    isnull $I2, $P23
     not $I2
   __label_6:
     unless $I2 goto __label_5
@@ -20244,9 +20318,9 @@
     __ARG_1.'print'(" :outer('", $P2, "')")
   __label_7: # endif
   __label_5: # endif
-    $P22 = self.'ismethod'()
-    if_null $P22, __label_8
-    unless $P22 goto __label_8
+    $P23 = self.'ismethod'()
+    if_null $P23, __label_8
+    unless $P23 goto __label_8
     __ARG_1.'print'(' :method')
   __label_8: # endif
     getattribute $P3, self, 'modifiers'
@@ -20261,99 +20335,100 @@
     self.'emit_extra_modifiers'(__ARG_1)
     __ARG_1.'say'()
     getattribute $P4, self, 'params'
-    set $P10, __ARG_1
-    set $P11, $P4
+    set $P8, __ARG_1
+    set $P9, $P4
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
-    set $P12, $P11
-    $P22 = WSubId_5("emit")
-    $P13 = WSubId_3($P22, $P10)
-    if_null $P12, __label_15
-    iter $P24, $P12
-    set $P24, 0
+    set $P10, $P9
+    $P23 = WSubId_5("emit")
+    $P11 = WSubId_3($P23, $P8)
+    if_null $P10, __label_15
+    iter $P25, $P10
+    set $P25, 0
   __label_14: # for iteration
-    unless $P24 goto __label_15
-    shift $P14, $P24
-    $P13($P14)
+    unless $P25 goto __label_15
+    shift $P12, $P25
+    $P11($P12)
     goto __label_14
   __label_15: # endfor
   __label_13:
   __label_12:
-    if_null $P4, __label_17
-    iter $P25, $P4
-    set $P25, 0
-  __label_16: # for iteration
-    unless $P25 goto __label_17
-    shift $P5, $P25
-    $P6 = $P5.'get_default'()
-    if_null $P6, __label_18
-    $P6.'emit'(__ARG_1)
-  __label_18: # endif
-    goto __label_16
-  __label_17: # endfor
-    getattribute $P7, self, 'lexicals'
-    getattribute $P8, self, 'usedlexicals'
-    isnull $I2, $P7
-    not $I2
-    if $I2 goto __label_20
-    isnull $I2, $P8
-    not $I2
-  __label_20:
-    unless $I2 goto __label_19
-    getattribute $P22, self, 'start'
-    __ARG_1.'annotate'($P22)
-    if_null $P7, __label_22
-    iter $P26, $P7
-    set $P26, 0
-  __label_21: # for iteration
-    unless $P26 goto __label_22
-    shift $S2, $P26
-    $P23 = $P7[$S2]
-    $P22 = WSubId_45(".lex '%0', %1", $P23, $S2)
-    __ARG_1.'say'($P22)
-    goto __label_21
-  __label_22: # endfor
-    if_null $P8, __label_24
-    iter $P27, $P8
+    getattribute $P13, self, 'usedsubids'
+    root_new $P14, ['parrot';'ResizablePMCArray']
+    set $P15, WSubId_139
+    if_null $P13, __label_18
+    iter $P27, $P13
     set $P27, 0
-  __label_23: # for iteration
-    unless $P27 goto __label_24
-    shift $S3, $P27
+  __label_17: # for iteration
+    unless $P27 goto __label_18
+    shift $P16, $P27
+    $P23 = $P15($P16)
+    push $P14, $P23
+    goto __label_17
+  __label_18: # endfor
+    set $P26, $P14
+    goto __label_16
+  __label_16:
+    set $P23, $P26
+    join $S4, "", $P23
+    __ARG_1.'print'($S4)
+    set $P17, $P4
+    $P23 = WSubId_5("emitdefault")
+    $P18 = WSubId_3($P23, __ARG_1)
+    if_null $P17, __label_21
+    iter $P28, $P17
+    set $P28, 0
+  __label_20: # for iteration
+    unless $P28 goto __label_21
+    shift $P19, $P28
+    $P18($P19)
+    goto __label_20
+  __label_21: # endfor
+  __label_19:
+    getattribute $P5, self, 'lexicals'
+    getattribute $P6, self, 'usedlexicals'
+    isnull $I2, $P5
+    not $I2
+    if $I2 goto __label_23
+    isnull $I2, $P6
+    not $I2
+  __label_23:
+    unless $I2 goto __label_22
+    getattribute $P23, self, 'start'
+    __ARG_1.'annotate'($P23)
+    if_null $P5, __label_25
+    iter $P29, $P5
+    set $P29, 0
+  __label_24: # for iteration
+    unless $P29 goto __label_25
+    shift $S2, $P29
+    $P24 = $P5[$S2]
+    $P23 = WSubId_45(".lex '%0', %1", $P24, $S2)
+    __ARG_1.'say'($P23)
+    goto __label_24
+  __label_25: # endfor
+    if_null $P6, __label_27
+    iter $P30, $P6
+    set $P30, 0
+  __label_26: # for iteration
+    unless $P30 goto __label_27
+    shift $S3, $P30
     substr $S4, $S3, 0, 1
-    eq $S4, '$', __label_25
+    eq $S4, '$', __label_28
     concat $S5, "    .local pmc ", $S3
     __ARG_1.'say'($S5)
-  __label_25: # endif
-    $P22 = $P8[$S3]
-    __ARG_1.'emitfind_lex'($S3, $P22)
-    goto __label_23
-  __label_24: # endfor
-  __label_19: # endif
-    getattribute $P15, self, 'usedsubids'
-    root_new $P16, ['parrot';'ResizablePMCArray']
-    set $P17, WSubId_139
-    if_null $P15, __label_28
-    iter $P29, $P15
-    set $P29, 0
-  __label_27: # for iteration
-    unless $P29 goto __label_28
-    shift $P18, $P29
-    $P22 = $P17($P18)
-    push $P16, $P22
-    goto __label_27
-  __label_28: # endfor
-    set $P28, $P16
+  __label_28: # endif
+    $P23 = $P6[$S3]
+    __ARG_1.'emitfind_lex'($S3, $P23)
     goto __label_26
-  __label_26:
-    set $P22, $P28
-    join $S4, "", $P22
-    __ARG_1.'print'($S4)
-    $P22 = __ARG_1.'getDebug'()
-    set $I1, $P22
-    getattribute $P9, self, 'body'
-    $P22 = $P9.'isempty'()
-    if_null $P22, __label_29
-    unless $P22 goto __label_29
+  __label_27: # endfor
+  __label_22: # endif
+    $P23 = __ARG_1.'getDebug'()
+    set $I1, $P23
+    getattribute $P7, self, 'body'
+    $P23 = $P7.'isempty'()
+    if_null $P23, __label_29
+    unless $P23 goto __label_29
     unless $I1 goto __label_31
     __ARG_1.'comment'('Empty body')
   __label_31: # endif
@@ -20362,21 +20437,21 @@
     unless $I1 goto __label_32
     __ARG_1.'comment'('Body')
   __label_32: # endif
-    $P9.'emit'(__ARG_1)
-    $P22 = $P9.'getend'()
-    __ARG_1.'annotate'($P22)
+    $P7.'emit'(__ARG_1)
+    $P23 = $P7.'getend'()
+    __ARG_1.'annotate'($P23)
   __label_30: # endif
     __ARG_1.'say'("\n.end # ", $S1, "\n")
-    getattribute $P19, self, 'localfun'
-    $P22 = WSubId_5("emit")
-    $P20 = WSubId_3($P22, __ARG_1)
-    if_null $P19, __label_35
-    iter $P30, $P19
-    set $P30, 0
+    getattribute $P20, self, 'localfun'
+    $P23 = WSubId_5("emit")
+    $P21 = WSubId_3($P23, __ARG_1)
+    if_null $P20, __label_35
+    iter $P31, $P20
+    set $P31, 0
   __label_34: # for iteration
-    unless $P30 goto __label_35
-    shift $P21, $P30
-    $P20($P21)
+    unless $P31 goto __label_35
+    shift $P22, $P31
+    $P21($P22)
     goto __label_34
   __label_35: # endfor
   __label_33:
@@ -21416,6 +21491,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_27 = "WSubId_27"
 .const 'Sub' WSubId_127 = "WSubId_127"
+    setattribute self, 'owner', __ARG_2
     $P1 = __ARG_1.'get'()
     $P4 = $P1.'isidentifier'()
     isfalse $I1, $P4
@@ -21448,31 +21524,79 @@
     $P7.'ParameterModifierList'(__ARG_1, self)
     set $P6, $P7
     setattribute self, 'modifiers', $P6
-    goto __label_5
-  __label_4: # else
+    $P2 = __ARG_1.'get'()
+  __label_4: # endif
+    $P4 = $P2.'isop'('=')
+    if_null $P4, __label_5
+    unless $P4 goto __label_5
+    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
+    $P7.'FunctionParameterDefault'(__ARG_1, __ARG_2, self)
+    set $P6, $P7
+    setattribute self, 'defaultexpr', $P6
+    goto __label_6
+  __label_5: # else
     __ARG_1.'unget'($P2)
-  __label_5: # endif
+  __label_6: # endif
 
 .end # SigParameter
 
 
+.sub 'getvar' :method
+    getattribute $P1, self, 'owner'
+    getattribute $P3, self, 'name'
+    $P2 = $P3.'getidentifier'()
+    .tailcall $P1.'getvar'($P2)
+
+.end # getvar
+
+
+.sub 'optimize' :method
+    getattribute $P1, self, 'defaultexpr'
+    if_null $P1, __label_1
+    $P1.'optimize'()
+    getattribute $P3, self, 'owner'
+    $P2 = $P3.'createreg'('I')
+    $P1.'setoptflag'($P2)
+  __label_1: # endif
+    .return(self)
+
+.end # optimize
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
-    getattribute $P3, self, 'reg'
-    __ARG_1.'print'($P3)
+    getattribute $P4, self, 'reg'
+    __ARG_1.'print'($P4)
     getattribute $P1, self, 'modifiers'
     if_null $P1, __label_1
     getattribute $P2, self, 'name'
     $P1.'emitmodifiers'(__ARG_1, $P2, $P2)
   __label_1: # endif
+    getattribute $P3, self, 'defaultexpr'
+    if_null $P3, __label_2
+    $P4 = $P3.'getoptflag'()
+    __ARG_1.'print'(" :optional, ", $P4, " :opt_flag")
+  __label_2: # endif
 
 .end # emit
 
+
+.sub 'emitdefault' :method
+        .param pmc __ARG_1
+    getattribute $P1, self, 'defaultexpr'
+    if_null $P1, __label_1
+    $P1.'emit'(__ARG_1)
+  __label_1: # endif
+
+.end # emitdefault
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameter' ]
+    addattribute $P0, 'owner'
     addattribute $P0, 'name'
     addattribute $P0, 'modifiers'
     addattribute $P0, 'reg'
+    addattribute $P0, 'defaultexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
@@ -21499,6 +21623,29 @@
 .end # SigParameterList
 
 
+.sub 'optimize' :method
+    getattribute $P1, self, 'params'
+    if_null $P1, __label_3
+    elements $I1, $P1
+    goto __label_2
+  __label_3:
+    null $I1
+  __label_2:
+    null $I2
+  __label_6: # for condition
+    ge $I2, $I1, __label_5
+    $P3 = $P1[$I2]
+    $P2 = $P3.'optimize'()
+    $P1[$I2] = $P2
+  __label_4: # for iteration
+    inc $I2
+    goto __label_6
+  __label_5: # for end
+  __label_1:
+
+.end # optimize
+
+
 .sub 'emit' :method
         .param pmc __ARG_1
     __ARG_1.'print'('(')
@@ -21518,6 +21665,22 @@
     __ARG_1.'print'(')')
 
 .end # emit
+
+
+.sub 'emitdefaults' :method
+        .param pmc __ARG_1
+    getattribute $P2, self, 'params'
+    if_null $P2, __label_2
+    iter $P3, $P2
+    set $P3, 0
+  __label_1: # for iteration
+    unless $P3 goto __label_2
+    shift $P1, $P3
+    $P1.'emitdefault'(__ARG_1)
+    goto __label_1
+  __label_2: # endfor
+
+.end # emitdefaults
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'SigParameterList' ]
@@ -21541,6 +21704,8 @@
     getattribute $P3, self, 'expr'
     $P2 = $P3.'optimize'()
     setattribute self, 'expr', $P2
+    getattribute $P1, self, 'params'
+    $P1.'optimize'()
     .return(self)
 
 .end # optimize
@@ -21557,12 +21722,13 @@
   __label_1: # endif
     $P2 = $P1.'emitcall'(__ARG_1)
     $P1.'prepareargs'(__ARG_1)
-    __ARG_1.'print'('    ')
     getattribute $P3, self, 'params'
+    __ARG_1.'print'('    ')
     $P3.'emit'(__ARG_1)
     __ARG_1.'print'(' = ', $P2)
     $P1.'emitargs'(__ARG_1)
     __ARG_1.'say'()
+    $P3.'emitdefaults'(__ARG_1)
 
 .end # emit
 
@@ -22596,8 +22762,8 @@
 
 .sub 'emit' :subid('WSubId_15') :method
         .param pmc __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_16 = "WSubId_16"
+.lex '__WLEX_1', __ARG_1
     __ARG_1.'say'(".sub 'importextern' :anon :load :init\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
     getattribute $P4, self, 'module'
     join $S1, "'; '", $P4
@@ -22933,10 +23099,10 @@
 
 
 .sub 'fixnamespaces' :subid('WSubId_17') :method
-.lex '__WLEX_1', $P1
 .const 'Sub' WSubId_5 = "WSubId_5"
 .const 'Sub' WSubId_7 = "WSubId_7"
 .const 'Sub' WSubId_18 = "WSubId_18"
+.lex '__WLEX_1', $P1
     getattribute $P2, self, 'namespaces'
     $P3 = WSubId_5("fixnamespaces")
     if_null $P2, __label_3
@@ -23053,8 +23219,8 @@
 
 .sub 'getusedns' :subid('WSubId_19') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_20 = "WSubId_20"
+.lex '__WLEX_1', __ARG_1
     getattribute $P1, self, 'usednamespaces'
     newclosure $P2, WSubId_20
     if_null $P1, __label_3
@@ -23094,8 +23260,8 @@
 
 .sub 'getlocalns' :subid('WSubId_21') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_22 = "WSubId_22"
+.lex '__WLEX_1', __ARG_1
     getattribute $P2, self, 'namespaces'
     newclosure $P3, WSubId_22
     if_null $P2, __label_3
@@ -23158,8 +23324,8 @@
 
 .sub 'checkclass_base' :subid('WSubId_23') :method
         .param string __ARG_1
-.lex '__WLEX_1', __ARG_1
 .const 'Sub' WSubId_24 = "WSubId_24"
+.lex '__WLEX_1', __ARG_1
     getattribute $P3, self, 'classes'
     newclosure $P4, WSubId_24
     if_null $P3, __label_3
@@ -24193,9 +24359,9 @@
     new $P1, ['FixedIntegerArray'], 3
     set $I1, 1
     $P1[0] = $I1
-    set $I1, 6
+    set $I1, 7
     $P1[1] = $I1
-    null $I1
+    set $I1, -1
     $P1[2] = $I1
     .return($P1)
 

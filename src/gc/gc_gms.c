@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -1504,7 +1504,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
+    if (Parrot_pa_is_owned(self->objects[POBJ2GEN(obj)], item, item->ptr)) {
         if (POBJ2GEN(obj) == 0)
             PObj_GC_soil_root_SET(obj);
         return 1;
@@ -1636,7 +1636,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
-    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
+    if (Parrot_pa_is_owned(self->strings[POBJ2GEN(obj)], item, item->ptr))
         return 1;
 
     return 0;

@@ -65,10 +65,10 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 #endif /* NDEBUG */
 
 /* Static assertions are checked at compile type */
-#define PARROT_STATIC_ASSERT_HELPER(COND,MSG) typedef char static_assertion_##MSG[(!!(COND))*2-1]
-#define PARROT_STATIC_ASSERT3(X,L)            PARROT_STATIC_ASSERT_HELPER(X,at_line_##L)
-#define PARROT_STATIC_ASSERT2(X,L)            PARROT_STATIC_ASSERT3(X,L)
-#define PARROT_STATIC_ASSERT(X)               PARROT_STATIC_ASSERT2(X,__LINE__)
+#define PARROT_STATIC_ASSERT_HELPER(COND, MSG)  typedef char static_assertion_##MSG[(!!(COND))*2-1]
+#define PARROT_STATIC_ASSERT3(X, L)             PARROT_STATIC_ASSERT_HELPER(X, at_line_##L)
+#define PARROT_STATIC_ASSERT2(X, L)             PARROT_STATIC_ASSERT3(X, L)
+#define PARROT_STATIC_ASSERT(X)                 PARROT_STATIC_ASSERT2((X), __LINE__)
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;

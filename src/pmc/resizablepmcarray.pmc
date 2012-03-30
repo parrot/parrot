@@ -331,9 +331,9 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
 /*
 
-=item C<void delete_pmc_keyed_int(INTVAL key)>
+=item C<void delete_keyed_int(INTVAL key)>
 
-=item C<void delete_pmc_keyed(PMC *key)>
+=item C<void delete_keyed(PMC *key)>
 
 Delete the element at index C<key>.
 

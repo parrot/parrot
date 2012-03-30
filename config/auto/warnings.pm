@@ -198,6 +198,7 @@ sub _init {
         -Weffc++
         -Wstrict-null-sentinel
         -Wtraditional
+        -Wuseless-cast
     );
 
     $gcc->{'cage'} = [ @gcc_or_gpp_cage ];
