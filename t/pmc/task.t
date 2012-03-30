@@ -16,16 +16,14 @@
     exit 0
   run_unix_tests:
 
-    plan(3)
+    plan(6)
 
     ok(1, "initialized")
 
     tasks_run()
     task_send_recv()
 #    task_kill()      # kill NYI
-#    task_wait()
 #    preempt_and_exit()
-    sleep 1
 .end
 
 .sub tasks_run
@@ -35,25 +33,27 @@
     $P0 = get_global 'task1'
     $P1 = new 'Task', $P0
     schedule $P1
-
-    $P0 = get_global 'sub1'
-    schedule $P0
+    wait $P1
 
     $P0 = get_global 'task2'
     $P1 = new 'Task', $P0
     schedule $P1
+    wait $P1
+
+    $P0 = get_global 'sub1'
+    schedule $P0
 .end
 
 .sub task1
     say "ok 2 task1 ran"
 .end
 
-.sub sub1
-    say "ok 3 sub1 ran"
+.sub task2
+    say "ok 3 task2 ran"
 .end
 
-.sub task2
-    say "ok 4 task2 ran"
+.sub sub1
+    say "ok 4 sub1 ran"
 .end
 
 .sub task_send_recv
@@ -98,7 +98,7 @@ ok:
     if $P0 == $P1 goto ok
     returncc
 ok:
-    say "ok 6 Got exisintg message"
+    say "ok 6 Got existing message"
 .end
 
 .sub task_kill
@@ -117,19 +117,6 @@ ok:
     ok(0, "task_to_kill wasn't killed")
 .end
 
-.sub task_wait
-    $P0 = get_global 'wait_sub1'
-    $P1 = new 'Task', $P0
-    schedule $P1
-
-    wait $P1
-    ok(1, "After wait")
-.end
-
-.sub wait_sub1
-    ok(1, "in wait_sub1")
-.end
-
 .sub preempt_and_exit
     $P0 = get_global 'exit0'
     $P1 = new 'Task', $P0
@@ -140,7 +127,7 @@ again:
 .end
 
 .sub exit0
-    ok(1, "Pre-empt and exit")
+    say "ok 7 Pre-empt and exit"
     exit 0
 .end
 

@@ -162,11 +162,13 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
         foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
         for (i = 0; i < foreign_count; i++) {
             PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
+            LOCK(PARROT_TASK(task)->waiters_lock);
             if (PARROT_TASK(task)->killed) {
                 VTABLE_delete_keyed_int(interp, sched->foreign_tasks, i);
                 i--;
                 foreign_count--;
             }
+            UNLOCK(PARROT_TASK(task)->waiters_lock);
         }
 
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
@@ -181,7 +183,7 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
 #endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
-    } while (alarm_count || foreign_count);
+    } while (alarm_count || foreign_count || VTABLE_get_integer(interp, scheduler) > 0);
 }
 
 /*
