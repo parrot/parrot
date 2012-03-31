@@ -52,9 +52,12 @@ Returns a string representation of a Rational-PMC to a certain base.
 =cut
 
 */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
   #ifdef PARROT_HAS_GMP
-    char * const cstr   = mpq_get_str(NULL, (int) base, RT(self));
+    char * const cstr   = mpq_get_str(NULL, base, RT(self));
     STRING * const pstr = Parrot_str_new(interp, cstr, 0);
     Parrot_str_free_cstring(cstr);
     return pstr;
@@ -75,8 +78,9 @@ Adds an integer "value" to a Rational-PMC inplace.
 static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
+
     mpq_init(t);
-    mpq_set_si(t, (int) value, 1);
+    mpq_set_si(t, value, 1);
     mpq_add(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -99,7 +103,7 @@ static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
     mpq_t t;
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, value);
     mpq_add(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -285,6 +289,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_integer_native(INTVAL value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_set_si(RT(SELF), (signed int) value, 1);
         mpq_canonicalize(RT(SELF));
       #else
@@ -301,6 +306,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_number_native(FLOATVAL value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_set_d(RT(SELF), (double) value);
         mpq_canonicalize(RT(SELF));
       #else
@@ -397,6 +403,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE INTVAL get_bool() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         if (mpq_cmp_si(RT(SELF), 0, 1) == 0)
             return 0;
         else
@@ -444,6 +451,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void increment() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpz_add(mpq_numref(RT(SELF)), mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         mpq_canonicalize(RT(SELF));
       #else
@@ -851,6 +859,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI void i_divide(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_div(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -937,6 +946,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE void i_neg() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_neg(RT(SELF), RT(SELF));
       #else
         RAISE_EXCEPTION
