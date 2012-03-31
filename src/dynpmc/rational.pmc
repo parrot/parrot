@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =pod
 
@@ -54,7 +54,7 @@ Returns a string representation of a Rational-PMC to a certain base.
 */
 static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
   #ifdef PARROT_HAS_GMP
-    char * const cstr   = mpq_get_str(NULL, (int) base, RT(self));
+    char * const cstr   = mpq_get_str(NULL, base, RT(self));
     STRING * const pstr = Parrot_str_new(interp, cstr, 0);
     Parrot_str_free_cstring(cstr);
     return pstr;
@@ -72,11 +72,11 @@ Adds an integer "value" to a Rational-PMC inplace.
 =cut
 
 */
-static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
+static void rat_add_integer(PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
     mpq_init(t);
-    mpq_set_si(t, (int) value, 1);
+    mpq_set_si(t, value, 1);
     mpq_add(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -94,12 +94,12 @@ rational using GMPs mpq_set_d-function. This is meant to be exact.
 =cut
 
 */
-static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
+static void rat_add_float(PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, value);
     mpq_add(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -116,7 +116,7 @@ Multiplies a Rational-PMC with an integer "value" in-place.
 =cut
 
 */
-static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value) {
+static void rat_multiply_integer(PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
     mpz_mul_ui(mpq_numref(RT(self)), mpq_numref(RT(self)), (unsigned int) value);
   #else
@@ -133,12 +133,12 @@ Multiplies a Rational-PMC with a float "value" in-place.
 =cut
 
 */
-static void rat_multiply_float(PARROT_INTERP, PMC *self, double value) {
+static void rat_multiply_float(PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, value);
     mpq_mul(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -155,12 +155,12 @@ Divides a Rational-PMC through an integer "value" in-place.
 =cut
 
 */
-static void rat_divide_integer(PARROT_INTERP, PMC *self, int value) {
+static void rat_divide_integer(PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
 
     mpq_init(t);
-    mpq_set_si(t, (int) value, 1);
+    mpq_set_si(t, value, 1);
     mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -177,12 +177,12 @@ Divides a Rational-PMC through a float "value" in-place.
 =cut
 
 */
-static void rat_divide_float(PARROT_INTERP, PMC *self, double value) {
+static void rat_divide_float(PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
     mpq_t t;
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, value);
     mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -285,6 +285,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_integer_native(INTVAL value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_set_si(RT(SELF), (signed int) value, 1);
         mpq_canonicalize(RT(SELF));
       #else
@@ -301,6 +302,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_number_native(FLOATVAL value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_set_d(RT(SELF), (double) value);
         mpq_canonicalize(RT(SELF));
       #else
@@ -382,6 +384,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE FLOATVAL get_number() {
       #ifdef PARROT_HAS_GMP
         const double d = mpq_get_d(RT(SELF));
+        UNUSED(INTERP)
         return (FLOATVAL) d;
       #else
         RAISE_EXCEPTION
@@ -444,6 +447,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void increment() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpz_add(mpq_numref(RT(SELF)), mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         mpq_canonicalize(RT(SELF));
       #else
@@ -460,6 +464,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void decrement() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpz_sub(mpq_numref(RT(SELF)), mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         mpq_canonicalize(RT(SELF));
       #else
@@ -478,13 +483,13 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI PMC *add(Integer value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_integer(INTERP, dest, VTABLE_get_integer(INTERP, value));
+        rat_add_integer(dest, VTABLE_get_integer(INTERP, value));
         return dest;
     }
 
     MULTI PMC *add(Float value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_float(INTERP, dest, VTABLE_get_number(INTERP, value));
+        rat_add_float(dest, VTABLE_get_number(INTERP, value));
         return dest;
     }
 
@@ -512,11 +517,11 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     MULTI void i_add(Integer value) {
-        rat_add_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+        rat_add_integer(SELF, (int) VTABLE_get_integer(INTERP, value));
     }
 
     MULTI void i_add(Float value) {
-        rat_add_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+        rat_add_float(SELF, (double) VTABLE_get_number(INTERP, value));
     }
 
     MULTI void i_add(Rational value) {
@@ -541,7 +546,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE PMC *add_int(INTVAL value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_integer(INTERP, dest, (int) value);
+        rat_add_integer(dest, (int) value);
         return dest;
     }
 
@@ -553,7 +558,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_add_int(INTVAL value) {
-        rat_add_integer(INTERP, SELF, (int) value);
+        rat_add_integer(SELF, (int) value);
     }
 
 /*
@@ -565,7 +570,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE PMC *add_float(FLOATVAL value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_float(INTERP, dest, (double) value);
+        rat_add_float(dest, (double) value);
         return dest;
     }
 
@@ -577,7 +582,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_add_float(FLOATVAL value) {
-        rat_add_float(INTERP, SELF, (double) value);
+        UNUSED(INTERP)
+        rat_add_float(SELF, (double) value);
     }
 
 /*
@@ -589,13 +595,13 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI PMC *subtract(Integer value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_integer(INTERP, dest, -((int) VTABLE_get_integer(INTERP, value)));
+        rat_add_integer(dest, -((int) VTABLE_get_integer(INTERP, value)));
         return dest;
     }
 
     MULTI PMC *subtract(Float value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_add_float(INTERP, dest, - ((double) VTABLE_get_number(INTERP, value)));
+        rat_add_float(dest, - ((double) VTABLE_get_number(INTERP, value)));
         return dest;
     }
 
@@ -622,15 +628,18 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     MULTI void i_subtract(Integer value) {
-        rat_add_integer(INTERP, SELF, -((int) VTABLE_get_integer(INTERP, value)));
+        UNUSED(INTERP)
+        rat_add_integer(SELF, -((int) VTABLE_get_integer(INTERP, value)));
     }
 
     MULTI void i_subtract(Float value) {
-        rat_add_float(INTERP, SELF, - ((double) VTABLE_get_number(INTERP, value)));
+        UNUSED(INTERP)
+        rat_add_float(SELF, - ((double) VTABLE_get_number(INTERP, value)));
     }
 
     MULTI void i_subtract(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_sub(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -650,8 +659,9 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *subtract_int(INTVAL value, PMC* dest) {
+        UNUSED(INTERP)
         dest = STATICSELF.clone();
-        rat_add_integer(INTERP, dest, -((int) value));
+        rat_add_integer(dest, -((int) value));
         return dest;
     }
 
@@ -663,7 +673,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_subtract_int(INTVAL value) {
-        rat_add_integer(INTERP, SELF, -((int) value));
+        UNUSED(INTERP)
+        rat_add_integer(SELF, -((int) value));
     }
 
 /*
@@ -674,8 +685,9 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *subtract_float(FLOATVAL value, PMC* dest) {
+        UNUSED(INTERP)
         dest = STATICSELF.clone();
-        rat_add_float(INTERP, dest, -((double) value));
+        rat_add_float(dest, -((double) value));
         return dest;
     }
 
@@ -687,7 +699,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_subtract_float(FLOATVAL value) {
-        rat_add_float(INTERP, SELF, -((double) value));
+        UNUSED(INTERP)
+        rat_add_float(SELF, -((double) value));
     }
 
 /*
@@ -699,13 +712,13 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI PMC *multiply(Integer value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_multiply_integer(INTERP, dest, (int) VTABLE_get_integer(INTERP, value));
+        rat_multiply_integer(dest, (int) VTABLE_get_integer(INTERP, value));
         return dest;
     }
 
     MULTI PMC *multiply(Float value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_multiply_float(INTERP, dest, (double) VTABLE_get_number(INTERP, value));
+        rat_multiply_float(dest, (double) VTABLE_get_number(INTERP, value));
         return dest;
     }
 
@@ -732,11 +745,11 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     MULTI void i_multiply(Integer value) {
-        rat_multiply_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+        rat_multiply_integer(SELF, (int) VTABLE_get_integer(INTERP, value));
     }
 
     MULTI void i_multiply(Float value) {
-        rat_multiply_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+        rat_multiply_float(SELF, (double) VTABLE_get_number(INTERP, value));
     }
 
     MULTI void i_multiply(Rational value) {
@@ -760,8 +773,9 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *multiply_int(INTVAL value, PMC* dest) {
+        UNUSED(INTERP)
         dest = STATICSELF.clone();
-        rat_multiply_integer(INTERP, dest, (int) value);
+        rat_multiply_integer(dest, (int) value);
         return dest;
     }
 
@@ -773,7 +787,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_multiply_int(INTVAL value) {
-        rat_multiply_integer(INTERP, SELF, (int) value);
+        UNUSED(INTERP)
+        rat_multiply_integer(SELF, (int) value);
     }
 
 /*
@@ -784,8 +799,9 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *multiply_float(FLOATVAL value, PMC* dest) {
+        UNUSED(INTERP)
         dest = STATICSELF.clone();
-        rat_multiply_float(INTERP, dest, (double) value);
+        rat_multiply_float(dest, (double) value);
         return dest;
     }
 
@@ -797,7 +813,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_multiply_float(FLOATVAL value) {
-        rat_multiply_float(INTERP, SELF, (double) value);
+        UNUSED(INTERP)
+        rat_multiply_float(SELF, (double) value);
     }
 
 /*
@@ -809,13 +826,13 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI PMC *divide(Integer value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_divide_integer(INTERP, dest, (int) VTABLE_get_integer(INTERP, value));
+        rat_divide_integer(dest, (int) VTABLE_get_integer(INTERP, value));
         return dest;
     }
 
     MULTI PMC *divide(Float value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_divide_float(INTERP, dest, (double) VTABLE_get_number(INTERP, value));
+        rat_divide_float(dest, (double) VTABLE_get_number(INTERP, value));
         return dest;
     }
 
@@ -842,15 +859,18 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     MULTI void i_divide(Integer value) {
-        rat_divide_integer(INTERP, SELF, (int) VTABLE_get_integer(INTERP, value));
+        UNUSED(INTERP)
+        rat_divide_integer(SELF, (int) VTABLE_get_integer(INTERP, value));
     }
 
     MULTI void i_divide(Float value) {
-        rat_divide_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value));
+        UNUSED(INTERP)
+        rat_divide_float(SELF, (double) VTABLE_get_number(INTERP, value));
     }
 
     MULTI void i_divide(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_div(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -871,7 +891,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE PMC *divide_int(INTVAL value, PMC* dest) {
         dest = STATICSELF.clone();
-        rat_divide_integer(INTERP, dest, (int) value);
+        rat_divide_integer(dest, (int) value);
         return dest;
     }
 
@@ -883,7 +903,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_divide_int(INTVAL value) {
-        rat_divide_integer(INTERP, SELF, (int) value);
+        UNUSED(INTERP)
+        rat_divide_integer(SELF, (int) value);
     }
 
 /*
@@ -894,8 +915,9 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE PMC *divide_float(FLOATVAL value, PMC* dest) {
+        UNUSED(INTERP)
         dest = STATICSELF.clone();
-        rat_divide_float(INTERP, dest, (double) value);
+        rat_divide_float(dest, (double) value);
         return dest;
     }
 
@@ -907,7 +929,8 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
 */
     VTABLE void i_divide_float(FLOATVAL value) {
-        rat_divide_float(INTERP, SELF, (double) value);
+        UNUSED(INTERP)
+        rat_divide_float(SELF, (double) value);
     }
 
 /*
@@ -937,6 +960,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE void i_neg() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_neg(RT(SELF), RT(SELF));
       #else
         RAISE_EXCEPTION
@@ -970,6 +994,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE void i_absolute() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_abs(RT(SELF), RT(SELF));
       #else
         RAISE_EXCEPTION
@@ -1002,6 +1027,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI INTVAL cmp(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         return (INTVAL) mpq_cmp(RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -1022,7 +1048,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI INTVAL is_equal(Integer value) {
       #ifdef PARROT_HAS_GMP
-        INTVAL eq = 0;
+        INTVAL eq;
         mpq_t t;
         mpq_init(t);
         mpq_set_ui(t, VTABLE_get_integer(INTERP, value), 1);
