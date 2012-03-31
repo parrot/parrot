@@ -3,7 +3,7 @@
 
 .sub main :main
     .local pmc task, sayer, starter, number, interp, tasks, results
-    .local int i, num_results
+    .local int i, num_results, results_rem
     interp = getinterp
     sayer = get_global 'sayer'
 init:
@@ -33,7 +33,10 @@ run:
 check_results:
     pass
     num_results = results
+    results_rem = num_results % 1000
+    if results_rem != 0 goto skip_say
     say num_results
+skip_say:
     if num_results >= 50000 goto end
     goto check_results
 end:

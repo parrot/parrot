@@ -132,7 +132,7 @@ maybe_prime:
     nt = make_checker()
 
 ship_it:
-    # More syncrhonous message passing to the
+    # More synchronous message passing to the
     # next task.
     nt.'send'(M)
     M = receive

@@ -568,10 +568,8 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     if (interp->thread_data)
         LOCK(interp->thread_data->interp_lock);
 
-    if (Interp_flags_TEST(interp, PARROT_THR_FLAG_NEW_PMC)) {
+    if (Interp_flags_TEST(interp, PARROT_THR_FLAG_NEW_PMC))
         flags |= PObj_is_new_FLAG;
-        abort();
-    }
 
     newpmc         = Parrot_gc_new_pmc_header(interp, flags);
     newpmc->vtable = vtable;
