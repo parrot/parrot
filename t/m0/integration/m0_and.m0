@@ -18,16 +18,16 @@
     set_imm I3, 0,  8
     sub_i   I3, I3, I2
 
-    goto_if xor_nok, I3
-    goto    xor_ok,   x
+    goto_if and_nok, I3
+    goto    and_ok,   x
 
-xor_ok:
-    set_imm S0, 0, 2
+and_nok:
+    set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-xor_nok:
-    set_imm S0, 0, 1
+and_ok:
+    set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 

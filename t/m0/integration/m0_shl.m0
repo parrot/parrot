@@ -21,13 +21,13 @@
     goto_if shl_nok, I3
     goto    shl_ok,   x
 
-shl_ok:
-    set_imm S0, 0, 2
+shl_nok:
+    set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-shl_nok:
-    set_imm S0, 0, 1
+shl_ok:
+    set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
