@@ -117,7 +117,7 @@ Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
     push_handle_entry(h);
     return h;
 #else
-    return 0;
+    return NULL;
 #endif
 }
 
@@ -139,7 +139,7 @@ Parrot_dlerror(void)
 #ifdef PARROT_HAS_HEADER_DLFCN
     return dlerror();
 #else
-    return 0;
+    return NULL;
 #endif
 }
 
