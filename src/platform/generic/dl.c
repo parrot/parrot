@@ -55,13 +55,13 @@ push_handle_entry(void *handle)
 }
 
 static void *
-find_handle_entry(void *handle)
+find_handle_entry(const void *handle)
 {
-    struct handle_entry *e;
+    const struct handle_entry *e;
 
     for (e = handle_list; e; e = e->next) {
         if (e->handle == handle)
-            return handle;
+            return e->handle;
     }
 
     return NULL;
@@ -70,15 +70,14 @@ find_handle_entry(void *handle)
 static void
 remove_handle_entry(void *handle)
 {
-    struct handle_entry *cur, *prev, *p;
-
     if (handle_list) {
         if (handle_list->handle == handle) {
-            p = handle_list;
+            struct handle_entry * const p = handle_list;
             handle_list = p->next;
             free(p);
         }
         else {
+            struct handle_entry *cur, *prev;
             for (cur = handle_list; cur; prev = cur, cur = cur->next) {
                 if (cur->handle == handle) {
                     prev->next = cur->next;
