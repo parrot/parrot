@@ -99,9 +99,7 @@ sub _generate_proxy_method {
     result = $call;
     Interp_flags_CLEAR(interp, PARROT_THR_FLAG_NEW_PMC);
 
-    Parrot_unblock_GC_mark(interp);
-
-    if (!PMC_IS_NULL(result)) {
+    if (! PMC_IS_NULL(result)) {
         if (PObj_is_new_TEST(result)) {
 #ifdef THREAD_DEBUG
             PARROT_ASSERT(result->orig_interp == interp);
@@ -113,9 +111,11 @@ sub _generate_proxy_method {
 #ifdef THREAD_DEBUG
             PARROT_ASSERT(result->orig_interp != interp);
 #endif
-            return Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result);
+            result = Parrot_thread_create_proxy(PARROT_PROXY(SELF)->interp, interp, result);
         }
     }
+
+    Parrot_unblock_GC_mark(interp);
 
     return result;
 BODY
