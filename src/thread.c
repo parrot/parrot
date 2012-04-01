@@ -275,14 +275,12 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
 
     /* don't run GC from the wrong thread since GC involves stack walking and we
      * don't want the foreign GC to find our objects */
-    LOCK(thread_interp->thread_data->interp_lock); /* wait for a running GC to finish */
-    Parrot_block_GC_mark(thread_interp);
-    UNLOCK(thread_interp->thread_data->interp_lock);
+    Parrot_block_GC_mark_locked(thread_interp);
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler,
         Parrot_thread_create_local_task(interp, thread_interp, task));
 
-    Parrot_unblock_GC_mark(thread_interp);
+    Parrot_unblock_GC_mark_locked(thread_interp);
 }
 
 /*

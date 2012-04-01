@@ -127,6 +127,10 @@ void Parrot_block_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_block_GC_mark_locked(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -382,10 +386,16 @@ void Parrot_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_unblock_GC_mark_locked(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_block_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -517,6 +527,8 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_unblock_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

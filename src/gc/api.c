@@ -939,6 +939,16 @@ Blocks the GC from performing its mark phase.
 
 Unblocks the GC mark.
 
+=item C<void Parrot_block_GC_mark_locked(PARROT_INTERP)>
+
+Blocks the GC from performing its mark phase.
+To be used from threads other than PARROT_INTERP.
+
+=item C<void Parrot_unblock_GC_mark_locked(PARROT_INTERP)>
+
+Unblocks the GC mark.
+To be used from threads other than PARROT_INTERP.
+
 =item C<void Parrot_block_GC_sweep(PARROT_INTERP)>
 
 Blocks the GC from performing its sweep phase.
@@ -980,6 +990,24 @@ Parrot_unblock_GC_mark(PARROT_INTERP)
     ASSERT_ARGS(Parrot_unblock_GC_mark)
     if (interp->gc_sys->unblock_mark)
         interp->gc_sys->unblock_mark(interp);
+}
+
+PARROT_EXPORT
+void
+Parrot_block_GC_mark_locked(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_block_GC_mark_locked)
+    if (interp->gc_sys->block_mark_locked)
+        interp->gc_sys->block_mark_locked(interp);
+}
+
+PARROT_EXPORT
+void
+Parrot_unblock_GC_mark_locked(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_unblock_GC_mark_locked)
+    if (interp->gc_sys->unblock_mark_locked)
+        interp->gc_sys->unblock_mark_locked(interp);
 }
 
 PARROT_EXPORT

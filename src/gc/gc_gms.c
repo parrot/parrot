@@ -190,6 +190,8 @@ typedef struct MarkSweep_GC {
     /* GC blocking */
     UINTVAL gc_mark_block_level;  /* How many outstanding GC block
                                      requests are there? */
+    UINTVAL gc_mark_block_level_locked;  /* How many outstanding GC block
+                                     requests are there from other threads? */
     UINTVAL gc_sweep_block_level; /* How many outstanding GC block
                                      requests are there? */
 
@@ -257,6 +259,9 @@ static void gc_gms_allocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void gc_gms_block_GC_mark(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void gc_gms_block_GC_mark_locked(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_block_GC_sweep(PARROT_INTERP)
@@ -435,6 +440,9 @@ static void gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 static void gc_gms_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_gms_unblock_GC_mark_locked(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_gms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -484,6 +492,8 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_block_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -592,6 +602,8 @@ static int gen2flags(int gen);
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_gms_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_unblock_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unseal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -680,7 +692,9 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->gc_sys->mark_str_header             = gc_gms_mark_str_header;
 
     interp->gc_sys->block_mark                  = gc_gms_block_GC_mark;
+    interp->gc_sys->block_mark_locked           = gc_gms_block_GC_mark_locked;
     interp->gc_sys->unblock_mark                = gc_gms_unblock_GC_mark;
+    interp->gc_sys->unblock_mark_locked         = gc_gms_unblock_GC_mark_locked;
     interp->gc_sys->is_blocked_mark             = gc_gms_is_blocked_GC_mark;
 
     interp->gc_sys->block_sweep                 = gc_gms_block_GC_sweep;
@@ -759,7 +773,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     int gen = -1;
 
     /* GC is blocked */
-    if (self->gc_mark_block_level)
+    if (self->gc_mark_block_level || self->gc_mark_block_level_locked)
         goto DONE;
 
     /* Ignore it. Will cleanup in gc_gms_finalize */
@@ -1740,6 +1754,16 @@ Blocks the GC from performing its mark phase.
 
 Unblocks the GC mark.
 
+=item C<static void gc_gms_block_GC_mark_locked(PARROT_INTERP)>
+
+Blocks the GC from performing its mark phase.
+To be used from threads other than PARROT_INTERP.
+
+=item C<static void gc_gms_unblock_GC_mark_locked(PARROT_INTERP)>
+
+Unblocks the GC mark.
+To be used from threads other than PARROT_INTERP.
+
 =item C<static void gc_gms_block_GC_sweep(PARROT_INTERP)>
 
 Blocks the GC from performing its sweep phase.
@@ -1775,6 +1799,27 @@ gc_gms_unblock_GC_mark(PARROT_INTERP)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     if (self->gc_mark_block_level)
         --self->gc_mark_block_level;
+}
+
+static void
+gc_gms_block_GC_mark_locked(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_block_GC_mark_locked)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    LOCK(interp->thread_data->interp_lock);
+    ++self->gc_mark_block_level_locked;
+    UNLOCK(interp->thread_data->interp_lock);
+}
+
+static void
+gc_gms_unblock_GC_mark_locked(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_gms_unblock_GC_mark_locked)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    LOCK(interp->thread_data->interp_lock);
+    if (self->gc_mark_block_level)
+        --self->gc_mark_block_level_locked;
+    UNLOCK(interp->thread_data->interp_lock);
 }
 
 static void
