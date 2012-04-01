@@ -283,6 +283,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_sub_i( cf, &ops[pc] );
                 break;
 
+                case (M0_SUB_N):
+                    m0_op_sub_n( cf, &ops[pc] );
+                break;
+
                 case (M0_GOTO):
                     m0_op_goto( cf, &ops[pc] );
                 break;
