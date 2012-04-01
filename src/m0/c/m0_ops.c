@@ -62,15 +62,37 @@ m0_op_print_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] +
-        frame->registers[ops[3]];
+    const uint64_t result = *(uint64_t *) frame->registers[ops[2]] +
+       *(uint64_t *)frame->registers[ops[3]];
+
+    frame->registers[ops[1]] = &result;
+}
+
+static void
+m0_op_add_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const double result = *(double *) frame->registers[ops[2]] +
+       *(double *)frame->registers[ops[3]];
+
+    frame->registers[ops[1]] = &result;
 }
 
 static void
 m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] -
-        frame->registers[ops[3]];
+    const uint64_t result = *(uint64_t *) frame->registers[ops[2]] +
+       *(uint64_t *)frame->registers[ops[3]];
+
+    frame->registers[ops[1]] = &result;
+}
+
+static void
+m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const double result = *(double *) frame->registers[ops[2]] -
+       *(double *)frame->registers[ops[3]];
+
+    frame->registers[ops[1]] = &result;
 }
 
 static void
@@ -251,6 +273,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_ADD_I):
                     m0_op_add_i( cf, &ops[pc] );
+                break;
+
+                case (M0_ADD_N):
+                    m0_op_add_n( cf, &ops[pc] );
                 break;
 
                 case (M0_SUB_I):
