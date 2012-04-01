@@ -121,19 +121,18 @@ m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    int *r2 = (int*) &(frame->registers[ops[2]]);
+    int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
     float *r1 = (float*) &(frame->registers[ops[1]]);
     frame->registers[ops[1]] = (uint64_t)0;
-    *r1 = (float)(*r2);
+    *r1 = (*r2);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
     float *r2 = (float*) &(frame->registers[ops[2]]);
-    int *r1 = (int*) &(frame->registers[ops[1]]);
-    frame->registers[ops[1]] = (uint64_t)0;
-    *r1 = (int)(*r2);
+    int64_t *r1 = (int64_t*) &(frame->registers[ops[1]]);
+    *r1 = *r2;
 }
 
 static void
