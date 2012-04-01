@@ -197,6 +197,8 @@ typedef struct MarkSweep_GC {
 
     UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
 
+    UINTVAL locked;               /* is the GC lock already taken? */
+
 } MarkSweep_GC;
 
 /* Callback to destroy PMC or free string storage */
@@ -307,6 +309,12 @@ static void gc_gms_free_fixed_size_storage(PARROT_INTERP,
 
 static void gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
 static void gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
+
+static void gc_gms_free_pmc_attributes_locked(PARROT_INTERP,
+    ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
@@ -524,6 +532,10 @@ static int gen2flags(int gen);
 #define ASSERT_ARGS_gc_gms_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_gms_free_pmc_attributes_locked \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_free_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -684,7 +696,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->gc_sys->free_bufferlike_header      = gc_gms_free_buffer_header;
 
     interp->gc_sys->allocate_pmc_attributes     = gc_gms_allocate_pmc_attributes;
-    interp->gc_sys->free_pmc_attributes         = gc_gms_free_pmc_attributes;
+    interp->gc_sys->free_pmc_attributes         = gc_gms_free_pmc_attributes_locked;
 
     interp->gc_sys->is_pmc_ptr                  = gc_gms_is_pmc_ptr;
     interp->gc_sys->is_string_ptr               = gc_gms_is_string_ptr;
@@ -771,6 +783,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     ASSERT_ARGS(gc_gms_mark_and_sweep)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
+
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
 
     /* GC is blocked */
     if (self->gc_mark_block_level || self->gc_mark_block_level_locked)
@@ -869,7 +884,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_gms_validate_objects(interp);
 
 DONE:
-    return;
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 }
 
 /*
@@ -1109,7 +1125,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     VTABLE_destroy(interp, pmc);
 
                 if (pmc->vtable->attr_size && PMC_data(pmc))
-                    Parrot_gc_free_pmc_attributes(interp, pmc);
+                    gc_gms_free_pmc_attributes(interp, pmc);
                 PMC_data(pmc) = NULL;
 
                 PObj_on_free_list_SET(pmc);
@@ -1243,6 +1259,8 @@ flags)>
 
 =item C<static void* gc_gms_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
+=item C<static void gc_gms_free_pmc_attributes_locked(PARROT_INTERP, PMC *pmc)>
+
 =item C<static void gc_gms_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
 =item C<static void gc_gms_allocate_string_storage(PARROT_INTERP, STRING *str,
@@ -1276,18 +1294,38 @@ gc_gms_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_gms_allocate_pmc_attributes)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     const size_t  attr_size = pmc->vtable->attr_size;
+
     if (interp->thread_data)
         LOCK(interp->thread_data->interp_lock);
+
     PMC_data(pmc) = Parrot_gc_fixed_allocator_allocate(interp,
                         self->fixed_size_allocator, attr_size);
     memset(PMC_data(pmc), 0, attr_size);
 
     interp->gc_sys->stats.memory_used           += attr_size;
     interp->gc_sys->stats.mem_used_last_collect += attr_size;
+
     if (interp->thread_data)
         UNLOCK(interp->thread_data->interp_lock);
 
     return PMC_data(pmc);
+}
+
+static void
+gc_gms_free_pmc_attributes_locked(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(gc_gms_free_pmc_attributes_locked)
+    if (PMC_data(pmc)) {
+        MarkSweep_GC * const self   = (MarkSweep_GC *)interp->gc_sys->gc_private;
+
+        if (interp->thread_data && ! self->locked)
+            LOCK(interp->thread_data->interp_lock);
+
+        gc_gms_free_pmc_attributes(interp, pmc);
+
+        if (interp->thread_data && ! self->locked)
+            UNLOCK(interp->thread_data->interp_lock);
+    }
 }
 
 static void
@@ -1434,6 +1472,9 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     gc_gms_maybe_mark_and_sweep(interp);
 
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
+
     /* Increase used memory. Not precisely accurate due Pool_Allocator paging */
     ++interp->gc_sys->stats.header_allocs_since_last_collect;
 
@@ -1442,6 +1483,9 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
 
     item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
     item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
+
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 
     return &(item->pmc);
 }
@@ -1464,6 +1508,8 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         if (interp->thread_data)
             LOCK(interp->thread_data->interp_lock);
 
+        self->locked = 1;
+
         Parrot_pa_remove(interp, self->objects[gen], PMC2PAC(pmc)->ptr);
         PObj_on_free_list_SET(pmc);
 
@@ -1474,6 +1520,8 @@ gc_gms_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc))
         --interp->gc_sys->stats.header_allocs_since_last_collect;
         interp->gc_sys->stats.memory_used           -= sizeof (PMC);
         interp->gc_sys->stats.mem_used_last_collect -= sizeof (PMC);
+
+        self->locked = 0;
 
         if (interp->thread_data)
             UNLOCK(interp->thread_data->interp_lock);
@@ -1554,10 +1602,10 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     string_alloc_struct *item;
     STRING              *ret;
 
+    gc_gms_maybe_mark_and_sweep(interp);
+
     if (interp->thread_data)
         LOCK(interp->thread_data->interp_lock);
-
-    gc_gms_maybe_mark_and_sweep(interp);
 
     /* Increase used memory.
      * Not precisely accurate due to Pool_Allocator paging.  */
