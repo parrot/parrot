@@ -279,6 +279,12 @@ m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]];
+}
+
+static void
 m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
     const char *src   = (char*)frame->registers[ops[3]];
@@ -404,6 +410,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_SET_BYTE):
                     m0_op_set_byte( cf, &ops[pc] );
+                break;
+
+                case (M0_SET):
+                    m0_op_set( cf, &ops[pc] );
                 break;
 
                 case (M0_GET_BYTE):
