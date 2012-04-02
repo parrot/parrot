@@ -54,6 +54,8 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 */
 
+static Parrot_mutex alarm_lock;
+
 void
 Parrot_alarm_init(void)
 {
@@ -72,6 +74,8 @@ Parrot_alarm_init(void)
     }
 
     Parrot_alarm_unmask(NULL);
+
+    MUTEX_INIT(alarm_lock);
 #endif
 }
 
@@ -222,16 +226,21 @@ Parrot_alarm_set(FLOATVAL when)
 #ifdef _WIN32
     /* TODO: Implement on Windows */
 #else
-    FLOATVAL now = Parrot_floatval_time();
+    FLOATVAL now;
+    LOCK(alarm_lock);
+    now = Parrot_floatval_time();
 
     /* Better late than early */
     when += 0.0001;
 
-    if (alarm_set_to > now && alarm_set_to < when)
+    if (alarm_set_to > now && alarm_set_to < when) {
+        UNLOCK(alarm_lock);
         return;
+    }
 
     alarm_set_to = when;
-    posix_alarm_set(when - now);
+    posix_alarm_set(when > now ? when - now : 0);
+    UNLOCK(alarm_lock);
 #endif
 }
 
