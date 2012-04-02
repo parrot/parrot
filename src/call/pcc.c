@@ -319,12 +319,13 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     opcode_t    *dest;
     PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
+    PMC * const  ctx      = Parrot_pcc_allocate_empty_context(interp, CURRENT_CONTEXT(interp));
     if (PMC_IS_NULL(call_object))
         call_object = Parrot_pmc_new(interp, enum_class_CallSignature);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_object);
-    PARROT_CONTINUATION(ret_cont)->from_ctx = call_object;
-    Parrot_pcc_set_continuation(interp, call_object, ret_cont);
+    PARROT_CONTINUATION(ret_cont)->from_ctx = ctx;
+    Parrot_pcc_set_continuation(interp, ctx, ret_cont);
     interp->current_cont                    = ret_cont;
 
     /* Invoke the function */
