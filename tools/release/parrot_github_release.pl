@@ -25,12 +25,12 @@ Github Guide (F<docs/project/release_parrot_github_guide.pod>).
 
 =over 4
 
-=item B<-d>, B<--docs>=I<[/path_to/previous/docs/]>
+=item B<-d>, B<--docs>=[/path_to/previous/docs/]
 
 The path to the directory which contains the previous documentation release.
 Specifically, the 'docs/' directory of the previous release of parrot.
 
-=item B<-r>, B<--repos>=I<[/path_to/clone/repos/]>
+=item B<-r>, B<--repos>=[/path_to/clone/repos/]
 
 The path on your local file system in which to clone the 'parrot.github.com'
 and the 'parrot-docsx' repositories.
@@ -127,12 +127,8 @@ open my $FH, '<', 'VERSION' or stop("Unable to open 'VERSION' file");
 $version = <$FH>;
 close $FH;
 
-########## For testing purposes only! ##########
-$version = '4.3.0';
-########## For testing purposes only! ##########
-
 # Parse version number
-my ($major, $minor, $patch);
+my ($major, $minor, $patch); # Quiet perlcritic
 ($major, $minor, $patch) = ($1, $2, $3) if $version =~ /^(\d+)\.(\d+)\.(\d+)$/;
 stop("There is some problem with the major or the minor release numbers")
   unless $major and $minor;
@@ -166,7 +162,7 @@ sub query_system {
     my $questions;
     if ((!defined $docs and !defined $repos) or
         (!defined $docs and  defined $repos) or
-        ( defined $docs and !defined $repos))) {
+        ( defined $docs and !defined $repos)) {
         $questions = "a couple of questions";
     }
     else {
@@ -258,8 +254,8 @@ sub archive_parrot_docsx {
       stop("Unable to commit to 'parrot-docsx'");
 
     print "\n== PUSHING 'PARROT-DOCSX' ==\n";
-#    system('git', 'push', 'origin master') == 0 or
-#      stop("Unable to push updates to 'parrot-docsx' master");
+    system('git', 'push', 'origin master') == 0 or
+      stop("Unable to push updates to 'parrot-docsx' master");
 
     chdir $parrot_dir;
 }
@@ -317,8 +313,8 @@ sub update_parrot_github {
       stop("Unable to commit to 'parrot.github.com'");
 
     print "\n== PUSHING ('PARROT.GITHUB.COM') ==\n";
-#    system('git', 'push', 'origin master') == 0 or
-#      stop("Unable to push updates to 'parrot.github.com' master");
+    system('git', 'push', 'origin master') == 0 or
+      stop("Unable to push updates to 'parrot.github.com' master");
 
     chdir $parrot_dir;
 }
