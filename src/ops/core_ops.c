@@ -22595,6 +22595,7 @@ Parrot_get_global_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC  * const  result = Parrot_ns_find_global_from_op(interp, cur_ns, name,  cur_opcode + 3);
 
+    PARROT_ASSERT_INTERP(cur_ns, interp);
     PARROT_ASSERT_INTERP(result, interp);
     PREG(1) = result;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -22607,6 +22608,7 @@ Parrot_get_global_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SCONST(2);
     PMC  * const  result = Parrot_ns_find_global_from_op(interp, cur_ns, name,  cur_opcode + 3);
 
+    PARROT_ASSERT_INTERP(cur_ns, interp);
     PARROT_ASSERT_INTERP(result, interp);
     PREG(1) = result;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -24264,6 +24266,7 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_Task_attributes  * const  pdata = PARROT_TASK(tdata->partner);
 
         LOCK(pdata->mailbox_lock);
+        Parrot_block_GC_mark(interp);
         if (PMC_IS_NULL(pdata->mailbox)) {
             msg_count = 0;
         }
@@ -24273,6 +24276,7 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
         if ((msg_count > 0)) {
             PREG(1) = VTABLE_shift_pmc(interp, pdata->mailbox);
+            Parrot_unblock_GC_mark(interp);
             UNLOCK(pdata->mailbox_lock);
             {
                 PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
@@ -24281,6 +24285,7 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
         }
         else {
+            Parrot_unblock_GC_mark(interp);
             TASK_recv_block_SET(cur_task);
             (void)Parrot_cx_stop_task(interp, cur_opcode);
             UNLOCK(pdata->mailbox_lock);
