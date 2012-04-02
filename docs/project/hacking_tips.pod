@@ -98,6 +98,23 @@ tools/dev/reconfigure.pl exists for that purpose:
 
   perl tools/dev/reconfigure.pl --step=gen::makefile
 
+When hacking on Makefile template files such as
+F<config/gen/makefiles/root.in>, please:
+
+=over 4
+
+=item *
+
+Pay attention to situations where F<make> rules require hard-tabs rather than
+wordspaces.
+
+=item *
+
+Make sure you test your code revisions with both F<make> and, on multi-core
+machines, F<make -jN> (where C<N E<gt> 1>).
+
+=back
+
 =cut
 
 __END__

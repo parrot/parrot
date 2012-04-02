@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,8 +28,7 @@ This file implements functions of the Parrot embedding interface.
 /*
 
 =item C<Parrot_Int Parrot_api_get_result(Parrot_PMC interp_pmc, Parrot_Int
-*is_error, Parrot_PMC * exception, Parrot_Int *exit_code, Parrot_String *
-errmsg)>
+*is_error, Parrot_PMC *exception, Parrot_Int *exit_code, Parrot_String *errmsg)>
 
 Gets the results of the last API function call and stores the results in
 C<is_error>, C<exception>, C<exit_code> and C<errmsg>. This function returns
@@ -52,8 +51,8 @@ C<errmsg> contains an string with the last error message.
 PARROT_API
 Parrot_Int
 Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
-        ARGOUT(Parrot_PMC * exception), ARGOUT(Parrot_Int *exit_code),
-        ARGOUT(Parrot_String * errmsg))
+        ARGOUT(Parrot_PMC *exception), ARGOUT(Parrot_Int *exit_code),
+        ARGOUT(Parrot_String *errmsg))
 {
     ASSERT_ARGS(Parrot_api_get_result)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -65,7 +64,7 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
     }
     else {
         STRING * const severity_str = Parrot_str_new(interp, "severity", 0);
-        INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
+        const INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
         *is_error = (severity != EXCEPT_exit);
         *errmsg = VTABLE_get_string(interp, *exception);
     }
@@ -77,7 +76,7 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
 /*
 
 =item C<Parrot_Int Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
-Parrot_PMC exception, Parrot_String * bt)>
+Parrot_PMC exception, Parrot_String *bt)>
 
 Gets the backtrace of the interpreter's call chain for the given exception
 C<expcetion> and stores the results in string C<bt>. This function returns a
@@ -90,7 +89,7 @@ true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
-        Parrot_PMC exception, ARGOUT(Parrot_String * bt))
+        Parrot_PMC exception, ARGOUT(Parrot_String *bt))
 {
     ASSERT_ARGS(Parrot_api_get_exception_backtrace)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -265,7 +264,7 @@ Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 /*
 
 =item C<Parrot_Int Parrot_api_set_executable_name(Parrot_PMC interp_pmc, const
-char * name)>
+char *name)>
 
 Sets the executable name for the C<interp_pmc> interpreter. This function returns
 a true value if this call is successful and false value otherwise.
@@ -276,7 +275,7 @@ a true value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
+Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp)

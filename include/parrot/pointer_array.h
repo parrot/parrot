@@ -67,40 +67,10 @@ Inline functions for faster access.
 
 */
 
-#define ASSERT_ARGS_allocate_more_chunks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-     , PARROT_ASSERT_ARG(self))
 
 /*
 
 =over 4
-
-=item C<static void allocate_more_chunks(PARROT_INTERP, Parrot_Pointer_Array
-*self)>
-
-allocate more chunks
-
-=cut
-
-*/
-
-static
-PARROT_INLINE
-void
-allocate_more_chunks(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self))
-{
-    ASSERT_ARGS(allocate_more_chunks)
-
-    self->current_chunk = self->total_chunks++;
-    mem_internal_realloc_n_typed(self->chunks,
-            self->total_chunks,
-            Parrot_Pointer_Array_Chunk*);
-    self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
-    self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
-    self->chunks[self->current_chunk]->next_free = 0;
-}
-
-/*
 
 =item C<static void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array
 *self, void *ptr)>
@@ -133,8 +103,15 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 
     /* If there is no free chunks */
     if (self->current_chunk >= self->total_chunks
-            || !self->chunks[self->current_chunk]->num_free)
-        allocate_more_chunks(interp, self);
+            || !self->chunks[self->current_chunk]->num_free) {
+        self->current_chunk = self->total_chunks++;
+        mem_internal_realloc_n_typed(self->chunks,
+                self->total_chunks,
+                Parrot_Pointer_Array_Chunk*);
+        self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
+        self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
+        self->chunks[self->current_chunk]->next_free = 0;
+    }
 
     chunk = self->chunks[self->current_chunk];
     --chunk->num_free;
@@ -177,13 +154,13 @@ void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-int Parrot_pa_is_owned(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self),
-    ARGIN(void *orig),
-    ARGIN_NULLOK(void *ref))
+PARROT_WARN_UNUSED_RESULT
+int Parrot_pa_is_owned(
+    ARGIN(const Parrot_Pointer_Array *self),
+    ARGIN(const void *orig),
+    ARGIN_NULLOK(const void *ref))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_MALLOC
@@ -207,8 +184,7 @@ size_t Parrot_pa_count_used(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
+       PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
 #define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

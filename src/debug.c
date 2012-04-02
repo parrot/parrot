@@ -3373,7 +3373,7 @@ PDB_list(PARROT_INTERP, ARGIN(const char *command))
     }
 
     start_line = get_ulong(&command, 1);
-    pdb->file->list_line = (unsigned long) start_line;
+    pdb->file->list_line = start_line;
 
     line_count = get_ulong(&command, 20);
 

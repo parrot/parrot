@@ -838,10 +838,11 @@ void
 Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
-    Parrot_CallContext_attributes *c = CONTEXT_STRUCT(call_context);
+    Parrot_CallContext_attributes * const c = CONTEXT_STRUCT(call_context);
     INTVAL reuse = 0;
+
     if (!PMC_IS_NULL(c->continuation)) {
-        PMC     *cont = c->continuation;
+        PMC * const cont = c->continuation;
         INTVAL   invoked;
         GETATTR_Continuation_invoked(interp, cont, invoked);
         /* Reuse if invoked. And not tailcalled? */

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =pod
 
@@ -25,7 +25,7 @@ add a new step unless that component I<clearly> belongs in a current step. For
 example, if you added a new user-configurable type called C<FOOVAL>, you would
 add the code used to determine its size in F<config/auto/sizes.pm>.  However,
 if you were determining what dynaloading capabilities are available, you would
-create a new step.  It is strongly recommended that you file a Trac ticket in
+create a new step.  It is strongly recommended that you file a Github issue in
 which you state the rationale for adding a new configuration step and sketch
 out what the code in the step would look like.
 

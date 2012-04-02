@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -1272,7 +1272,7 @@ gc_ms2_is_ptr_owned(PARROT_INTERP,
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    return Parrot_pa_is_owned(interp, list, item, item->ptr);
+    return Parrot_pa_is_owned(list, item, item->ptr);
 }
 
 

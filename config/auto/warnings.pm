@@ -189,7 +189,6 @@ sub _init {
         -Wunused
         -Wunused-function
         -Wunused-label
-        -Wunused-local-typedefs
         -Wunused-value
         -Wunused-variable
         -Wvolatile-register-var
@@ -199,6 +198,7 @@ sub _init {
         -Weffc++
         -Wstrict-null-sentinel
         -Wtraditional
+        -Wuseless-cast
     );
 
     $gcc->{'cage'} = [ @gcc_or_gpp_cage ];

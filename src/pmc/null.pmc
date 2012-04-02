@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -45,20 +45,24 @@ Overrides the default to do nothing.
 
     VTABLE void init() {
         UNUSED(INTERP)
+        UNUSED(SELF)
     }
 
     VTABLE void *get_pointer() {
         UNUSED(INTERP)
+        UNUSED(SELF)
         return PMCNULL;
     }
 
     VTABLE void set_pointer(void *p) {
         UNUSED(INTERP)
+        UNUSED(SELF)
         PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {
         UNUSED(INTERP)
+        UNUSED(SELF)
         UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;
@@ -74,6 +78,8 @@ Returns true if value is also a null PMC, false otherwise.
 
 */
     VTABLE INTVAL is_same(PMC *value) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return PMC_IS_NULL(value);
     }
 
@@ -88,6 +94,7 @@ Gives a more informative message than the automaticaly generated version.
 */
 
     VTABLE PMC *find_method(STRING *method_name) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_NULL_REG_ACCESS,
                 "Null PMC access in find_method('%Ss')",
                 method_name);
@@ -99,7 +106,7 @@ Gives a more informative message than the automaticaly generated version.
 
 =back
 
-=head2 Auxiliar functions
+=head2 Auxiliary functions
 
 =over 4
 
