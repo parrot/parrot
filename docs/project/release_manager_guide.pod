@@ -454,9 +454,18 @@ Preview the new page, and submit it.
 The old release announcement may be edited to uncheck I<Promoted to front page>
 to keep the main page fresh.
 
-=head2 X. Update parrot.github.com and any Relevant parrot-docsx Repositories
+=head2 X. Update parrot.github.com and the Relevant parrot-docsx Repository
 
-Please read and follow the instructions in 
+To update both the C<parrot.github.com> and the relevant C<parrot-docsx> repositories,
+execute the following command: 
+
+    perl tools/release/parrot_github_release.pl
+
+Please note: To review the available options, use the C<-h | --help> option.
+In addition, you may also want to review the pod with,
+C<perldoc tools/release/parrot_github_release.pl>.
+
+For more information about the update process, I<see> 
 L<http://github.com/parrot/parrot/blob/master/docs/project/release_parrot_github_guide.pod>.
 
 =head2 XI. Publicity
