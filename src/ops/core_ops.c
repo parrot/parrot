@@ -77,13 +77,13 @@ extern op_lib_t core_op_lib;
 
 
 
-INTVAL core_numops = 1114;
+INTVAL core_numops = 1116;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1114] = {
+static op_func_t core_op_func_table[1116] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -1197,6 +1197,8 @@ static op_func_t core_op_func_table[1114] = {
   Parrot_wait_p,                                     /*   1110 */
   Parrot_wait_pc,                                    /*   1111 */
   Parrot_pass,                                       /*   1112 */
+  Parrot_disable_preemption,                         /*   1113 */
+  Parrot_enable_preemption,                          /*   1114 */
 
   NULL /* NULL function pointer */
 };
@@ -1207,7 +1209,7 @@ static op_func_t core_op_func_table[1114] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1114] = {
+static op_info_t core_op_info_table[1116] = {
   { /* 0 */
     "end",
     "end",
@@ -13451,6 +13453,28 @@ static op_info_t core_op_info_table[1114] = {
     { 0 },
     &core_op_lib
   },
+  { /* 1113 */
+    "disable_preemption",
+    "disable_preemption",
+    "Parrot_disable_preemption",
+    0,
+    1,
+    { (arg_type_t) 0 },
+    { (arg_dir_t) 0 },
+    { 0 },
+    &core_op_lib
+  },
+  { /* 1114 */
+    "enable_preemption",
+    "enable_preemption",
+    "Parrot_enable_preemption",
+    0,
+    1,
+    { (arg_type_t) 0 },
+    { (arg_dir_t) 0 },
+    { 0 },
+    &core_op_lib
+  },
 
 };
 
@@ -24369,6 +24393,18 @@ Parrot_pass(opcode_t *cur_opcode, PARROT_INTERP) {
     return cur_opcode + 1;
 }
 
+opcode_t *
+Parrot_disable_preemption(opcode_t *cur_opcode, PARROT_INTERP) {
+    Parrot_cx_disable_preemption(interp);
+    return cur_opcode + 1;
+}
+
+opcode_t *
+Parrot_enable_preemption(opcode_t *cur_opcode, PARROT_INTERP) {
+    Parrot_cx_enable_preemption(interp);
+    return cur_opcode + 1;
+}
+
 
 /*
 ** op lib descriptor:
@@ -24383,7 +24419,7 @@ op_lib_t core_op_lib = {
   4,    /* major_version */
   2,    /* minor_version */
   0,    /* patch_version */
-  1113,             /* op_count */
+  1115,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 

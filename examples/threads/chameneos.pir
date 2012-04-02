@@ -232,14 +232,14 @@ done:
     .local pmc sem
     sem = data
 test:
-    #disablepreemption
+    disable_preemption
     if sem > 0 goto lock
-    #enablepreemption
+    enable_preemption
     pass
     goto test
 lock:
     dec sem
-    #enablepreemption
+    enable_preemption
 .end
 
 .sub sem_unlock_core

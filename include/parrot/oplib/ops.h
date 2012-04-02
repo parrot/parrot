@@ -1127,7 +1127,9 @@ typedef enum {
     PARROT_OP_receive_p,                       /* 1109 */
     PARROT_OP_wait_p,                          /* 1110 */
     PARROT_OP_wait_pc,                         /* 1111 */
-    PARROT_OP_pass                             /* 1112 */
+    PARROT_OP_pass,                            /* 1112 */
+    PARROT_OP_disable_preemption,              /* 1113 */
+    PARROT_OP_enable_preemption                /* 1114 */
 
 } parrot_opcode_enums;
 

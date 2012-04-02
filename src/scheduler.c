@@ -37,19 +37,9 @@ exceptions, async I/O, and concurrent tasks (threads).
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void Parrot_cx_disable_preemption(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static void Parrot_cx_enable_preemption(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 static int Parrot_cx_preemption_enabled(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_cx_disable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_cx_enable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_preemption_enabled __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -687,7 +677,7 @@ Functions that are used by the scheduler itself.
 
 =over 4
 
-=item C<static void Parrot_cx_enable_preemption(PARROT_INTERP)>
+=item C<void Parrot_cx_enable_preemption(PARROT_INTERP)>
 
 Enable preemption. Used when more than one task is runnable.
 
@@ -695,7 +685,7 @@ Enable preemption. Used when more than one task is runnable.
 
 */
 
-static void
+void
 Parrot_cx_enable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_enable_preemption)
@@ -711,7 +701,7 @@ Parrot_cx_enable_preemption(PARROT_INTERP)
 
 /*
 
-=item C<static void Parrot_cx_disable_preemption(PARROT_INTERP)>
+=item C<void Parrot_cx_disable_preemption(PARROT_INTERP)>
 
 Disable preemption. Used when only one task is runnable.
 
@@ -719,7 +709,7 @@ Disable preemption. Used when only one task is runnable.
 
 */
 
-static void
+void
 Parrot_cx_disable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_disable_preemption)

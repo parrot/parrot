@@ -86,6 +86,12 @@ PARROT_PURE_FUNCTION
 PMC* Parrot_cx_current_task(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_cx_disable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_cx_enable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -148,6 +154,10 @@ void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(next))
 #define ASSERT_ARGS_Parrot_cx_current_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_disable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_enable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_init_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

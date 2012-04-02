@@ -1127,6 +1127,8 @@ enum OPS_ENUM {
     enum_ops_wait_p                        = 1110,
     enum_ops_wait_pc                       = 1111,
     enum_ops_pass                          = 1112,
+    enum_ops_disable_preemption            = 1113,
+    enum_ops_enable_preemption             = 1114,
 };
 
 

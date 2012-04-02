@@ -451,6 +451,26 @@ op pass() {
     goto ADDRESS(addr);
 }
 
+=item B<disable_preemption>()
+
+Disables preemption so the current task can run uninterrupted through a critical section.
+
+=cut
+
+op disable_preemption() {
+    Parrot_cx_disable_preemption(interp);
+}
+
+=item B<enable_preemption>()
+
+Enables preemption. To be called after the current task has finished executing a critical section.
+
+=cut
+
+op enable_preemption() {
+    Parrot_cx_enable_preemption(interp);
+}
+
 =back
 
 =head1 COPYRIGHT

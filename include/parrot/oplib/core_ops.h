@@ -1134,6 +1134,8 @@ op_lib_t *Parrot_DynOp_core_4_2_0(PARROT_INTERP, long init);
  opcode_t * Parrot_wait_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_wait_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_pass(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_disable_preemption(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_enable_preemption(opcode_t *, PARROT_INTERP);
 
 
 #endif /* PARROT_OPLIB_CORE_OPS_H_GUARD */
