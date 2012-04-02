@@ -14,7 +14,7 @@ Copyright (C) 2011-2012, Parrot Foundation.
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
-    frame->registers[ops[1]] = ops[2] * 256 + ops[3];
+    frame->regs_ni.i[ops[1]] = ops[2] * 256 + ops[3];
 }
 
 static void
@@ -23,15 +23,16 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
     unsigned char ref = ops[2];
 
     switch (ref) {
-        case CONSTS:
+        case CONST:
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ ref ];
             unsigned long         offset = frame->registers[ ops[3] ];
 
-            frame->registers[ ops[1] ]   = (uint64_t)consts->consts[ offset ];
+            frame->regs_ni.n[ ops[1] ]   = (uint64_t)consts->consts[ offset ];
             break;
         }
+
         default:
             /* XXX: the rest of the system has non-uniform array handling */
             break;
@@ -49,50 +50,42 @@ static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", *(int *)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%d", frame->regs_ni.i[ ops[2] ] );
 }
 
 static void
 m0_op_print_n( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%.15g", *(double *)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%.15g", frame->regs_ni.n[ ops[2] ] );
 }
 
 static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const uint64_t result = *(uint64_t *) frame->registers[ops[2]] +
-       *(uint64_t *)frame->registers[ops[3]];
-
-    frame->registers[ops[1]] = &result;
+    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] +
+       frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_add_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const double result = *(double *) frame->registers[ops[2]] +
-       *(double *)frame->registers[ops[3]];
-
-    frame->registers[ops[1]] = &result;
+    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] +
+       frame->regs_ni.n[ops[3]];
 }
 
 static void
 m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const uint64_t result = *(uint64_t *) frame->registers[ops[2]] +
-       *(uint64_t *)frame->registers[ops[3]];
-
-    frame->registers[ops[1]] = &result;
+    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] -
+       frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const double result = *(double *) frame->registers[ops[2]] -
-       *(double *)frame->registers[ops[3]];
-
-    frame->registers[ops[1]] = &result;
+    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] -
+       frame->regs_ni.n[ops[3]];
 }
 
 static void

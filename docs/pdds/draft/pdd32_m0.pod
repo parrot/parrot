@@ -175,7 +175,7 @@ of M0 ops.
 
 In descriptions, C<$1> refers to the value of the first argument to an op,
 C<$2> to the second and C<$3> to the third.  Any op can operate on any
-register; types are only by convention.  As far as an M0 VM is conerned, the
+register; types are only by convention.  As far as an M0 VM is concerned, the
 256 ops are nothing more than an array of 256 int32-sized chunks of data.
 
 Note that this documentation uses a C-like syntax to differentiate between a
