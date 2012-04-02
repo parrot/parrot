@@ -438,8 +438,11 @@ Send a message to this task.
 
     METHOD send(PMC *message) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
-        if (PMC_IS_NULL(tdata->mailbox))
+        if (PMC_IS_NULL(tdata->mailbox)) {
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+            PARROT_GC_WRITE_BARRIER(interp, SELF);
+        }
+
         VTABLE_push_pmc(interp, tdata->mailbox, message);
 
         if (tdata->partner) {
