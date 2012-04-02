@@ -32,5 +32,16 @@ enum CF_NAMED_REGS {
     SPILLCF
 };
 
+typedef enum {
+    INVALID,
+    NAMED,
+    INTEGER,
+    NUMBER,
+    STRING,
+    POINTER
+} M0_RegisterType;
+
+
+
 #   define M0_INTERP_STRUCTURES_H 1
 #endif
