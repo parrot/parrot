@@ -104,7 +104,6 @@ sub _generate_proxy_method {
 #ifdef THREAD_DEBUG
             PARROT_ASSERT(result->orig_interp == interp);
 #endif
-            abort();
             PObj_is_new_CLEAR(result);
         }
         else {
