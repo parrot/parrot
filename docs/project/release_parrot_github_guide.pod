@@ -15,7 +15,12 @@ I<see> '/docs/project/release_manager_guide.pod', laying out how to publish
 Parrot's documentation to the 'parrot.github.com' repository and how to
 archive the previous release of Parrot's documentation in the gh-pages branch
 of the supporting parrot-docx' repositories. While none of this is particularly
-difficult, it is a'bit tricky; hence, this guide.[1]
+difficult, it is a'bit tricky; hence, this guide.
+
+Please note: The auto-tool, F<tools/release/parrot_github_release.pl> has,
+largely, superceded the functionality contained within this document.[1]
+I<See> F<docs/projects/release_manager_guide.pod> I<and>
+F<tools/release/parrot_github_release.pl>.
 
 =head2 Assumptions
 
@@ -185,7 +190,7 @@ and F<releases.html>, back to 'parrot.github.com'.
 
 =back
 
-Now, you need to hand-edit both F<index.html> and F<releases.html>.[5] Open
+Now, you need to hand-edit both F<index.html> and F<releases.html>. Open
 F<index.html> in your favorite editor and update the header and footer to
 reflect the present release version. That is, edit, for example, the line
 
@@ -293,26 +298,21 @@ If everything works correctly, congratulations, you're done with both the
 
 =head1 FOOTNOTES
 
-[1] Hopefully, soon, we will develop a script to handle most, if not all, of
-the steps outlined in this guide.  At which time we will either re-write this
-guide or eliminate it entirely.
+[1] For the present, we have elected to retain this document, primarily, for
+historical purposes and as a reference document for future release managers.
 
 [2] If you are working with a release of Parrot's documentation greater than
 v4.x.x and you do not have, for example, a 'parrot-docs5' repository, you will
-need to contact an "owner" and ask them to create a new repository.  You will,
-then, need to follow all of the steps outlined in Github's gh-pages guide at
-'http://pages.github.com/' to set up the repository.
+need to contact an "owner" and ask him or her to create a new repository.  You
+will, then, need to follow all of the steps outlined in Github's gh-pages guide
+at 'http://pages.github.com/' to set up the repository.
 
-[3] You do NOT need to worry with any optimizations when configuring Parrot
-because you only need the previous documentation release. 
+[3] Here, you do NOT need to worry with any optimizations when configuring
+Parrot because you only need the previous documentation release. 
 
 [4] Unless there is good reason to do otherwise, please name the newly created
 directory after the F<VERSION> of the Parrot distribution you are archiving in
-the repo. Here, in our guide example, C<4.0.0>.
-
-[5] This next handful of steps screams out for an auto-tool, and we will write
-one soon. (But, for now, you will have to settle for the detail steps in this
-guide.)
+the repo. Here, in our example, C<4.0.0>.
 
 =head1 COPYRIGHT
 
