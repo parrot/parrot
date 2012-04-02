@@ -20,7 +20,6 @@
 #define PARSER_MAIN
 #include "imc.h"
 #include "parrot/dynext.h"
-#include "pmc/pmc_callcontext.h"
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"

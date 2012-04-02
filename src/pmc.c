@@ -21,7 +21,6 @@ The base vtable calling functions
 #include "pmc.str"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_integer.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
 

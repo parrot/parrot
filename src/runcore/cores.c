@@ -250,7 +250,6 @@ next opcode, or examine and manipulate data from the executing program.
 #include "parrot/dynext.h"
 
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/runcore_api.h */
 

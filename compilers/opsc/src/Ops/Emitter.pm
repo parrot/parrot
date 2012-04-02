@@ -213,7 +213,6 @@ method _emit_source_preamble($fh) {
     $fh.print(qq|
 #include "{self<include>}"
 #include "pmc/pmc_parrotlibrary.h"
-#include "pmc/pmc_callcontext.h"
 
 {self.trans.defines(self)}
 

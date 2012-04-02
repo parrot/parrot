@@ -3,11 +3,11 @@ Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/callcontext.pmc - CallContext PMC
+src/pmc/callsignature.pmc - CallSignature PMC
 
 =head1 DESCRIPTION
 
-The CallContext PMC is used to store the argument list and argument meta
+The CallSignature PMC is used to store the argument list and argument meta
 information for a multiple dispatch call.
 
 =head2 Functions
@@ -171,7 +171,7 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
     ASSERT_ARGS(ensure_positionals_storage)
     INTVAL allocated_positionals;
 
-    GETATTR_CallContext_allocated_positionals(interp, self, allocated_positionals);
+    GETATTR_CallSignature_allocated_positionals(interp, self, allocated_positionals);
 
     if (size <= allocated_positionals)
         return;
@@ -199,7 +199,7 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     if (size < 8)
         size = 8;
 
-    GETATTR_CallContext_positionals(interp, self, array);
+    GETATTR_CallSignature_positionals(interp, self, array);
 
     if (size > 8)
         new_array = (Pcc_cell *)Parrot_gc_allocate_memory_chunk(interp,
@@ -209,7 +209,7 @@ ensure_positionals_storage_ap(PARROT_INTERP,
                 size * sizeof (Pcc_cell));
 
     if (array) {
-        GETATTR_CallContext_num_positionals(interp, self, num_positionals);
+        GETATTR_CallSignature_num_positionals(interp, self, num_positionals);
         memcpy(new_array, array, num_positionals * sizeof (Pcc_cell));
 
         if (allocated_positionals > 8)
@@ -219,8 +219,8 @@ ensure_positionals_storage_ap(PARROT_INTERP,
                 allocated_positionals * sizeof (Pcc_cell), array);
     }
 
-    SETATTR_CallContext_allocated_positionals(interp, self, size);
-    SETATTR_CallContext_positionals(interp, self, new_array);
+    SETATTR_CallSignature_allocated_positionals(interp, self, size);
+    SETATTR_CallSignature_positionals(interp, self, new_array);
 }
 
 /*
@@ -238,7 +238,7 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
     ASSERT_ARGS(get_cell_at)
     Pcc_cell *cells;
     ensure_positionals_storage(interp, self, key + 1);
-    GETATTR_CallContext_positionals(interp, self, cells);
+    GETATTR_CallSignature_positionals(interp, self, cells);
     return &cells[key];
 }
 
@@ -382,14 +382,14 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
     ASSERT_ARGS(get_hash)
     Hash   *hash;
 
-    GETATTR_CallContext_hash(interp, SELF, hash);
+    GETATTR_CallSignature_hash(interp, SELF, hash);
 
     if (!hash) {
         hash = Parrot_hash_create(interp,
             enum_type_ptr,
             Hash_key_type_STRING);
 
-        SETATTR_CallContext_hash(interp, SELF, hash);
+        SETATTR_CallSignature_hash(interp, SELF, hash);
     }
 
     return hash;
@@ -438,12 +438,12 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
     ASSERT_ARGS(mark_positionals)
     INTVAL size;
 
-    GETATTR_CallContext_num_positionals(interp, self, size);
+    GETATTR_CallSignature_num_positionals(interp, self, size);
 
     if (size) {
         Pcc_cell *cells;
         INTVAL i;
-        GETATTR_CallContext_positionals(interp, self, cells);
+        GETATTR_CallSignature_positionals(interp, self, cells);
 
         for (i = 0; i < size; ++i)
             mark_cell(interp, &cells[i]);
@@ -483,7 +483,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
     ASSERT_ARGS(get_named_names)
     Hash *hash;
 
-    GETATTR_CallContext_hash(interp, SELF, hash);
+    GETATTR_CallSignature_hash(interp, SELF, hash);
 
     /* yes, this *looks* risky, but it's a Parrot STRING hash internally */
     if (hash && hash->entries) {
@@ -501,41 +501,7 @@ get_named_names(PARROT_INTERP, ARGIN(PMC *SELF))
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
 
-pmclass CallContext provides array provides hash auto_attrs {
-    /* Context attributes */
-    ATTR PMC      *caller_ctx;         /* caller context */
-
-    ATTR void     *registers;          /* pointer to allocated registers */
-    ATTR Regs_ni   bp;                 /* pointers to FLOATVAL & INTVAL */
-    ATTR Regs_ps   bp_ps;              /* pointers to PMC & STR */
-
-    ATTR UINTVAL   n_regs_used[4];     /* INSP in PBC points to Sub */
-    ATTR PMC      *lex_pad;            /* LexPad PMC */
-    ATTR PMC      *outer_ctx;          /* outer context, if a closure */
-
-    /* new call scheme and introspective variables */
-    ATTR PMC      *current_sub;        /* the Sub we are executing */
-
-    /* for now use a return continuation PMC */
-    ATTR PMC      *handlers;           /* local handlers for the context */
-    ATTR PMC      *current_cont;       /* the return continuation PMC */
-    ATTR PMC      *current_object;     /* current object if a method call */
-    ATTR PMC      *current_namespace;  /* The namespace we're currently in */
-    ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
-    ATTR PMC      *current_sig;        /* temporary CallContext PMC for active call */
-
-    /* deref the constants - we need them all the time */
-    ATTR FLOATVAL *num_constants;
-    ATTR STRING  **str_constants;
-    ATTR PMC     **pmc_constants;
-
-    ATTR INTVAL    current_HLL;        /* see also src/hll.c */
-
-    ATTR UINTVAL   warns;              /* Keeps track of activated warnings */
-    ATTR UINTVAL   errors;             /* fatals that can be turned off */
-    ATTR UINTVAL   trace_flags;
-    ATTR UINTVAL   recursion_depth;    /* Sub call recursion depth */
-
+pmclass CallSignature provides array provides hash auto_attrs {
     /* Storage for arguments */
     ATTR struct Pcc_cell *positionals; /* array of positionals */
     ATTR INTVAL  num_positionals;      /* count of used positionals */
@@ -547,13 +513,11 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC    *return_flags;         /* Integer array of return flags */
     ATTR Hash   *hash;                 /* Hash of named arguments */
 
-    ATTR PMC    *continuation;          /* Reusable continuation */
-
 /*
 
 =item C<void init()>
 
-Initializes a newly created CallContext object.
+Initializes a newly created CallSignature object.
 
 =cut
 
@@ -579,15 +543,9 @@ Mark any referenced strings and PMCs.
 */
     VTABLE void mark() {
         Hash     *hash;
-        PMC      *tmp;
-        STRING   *short_sig;
-        UINTVAL  *n_regs_used;
 
         if (!PMC_data(SELF))
             return;
-
-        GET_ATTR_short_sig(INTERP, SELF, short_sig);
-        Parrot_gc_mark_STRING_alive(INTERP, short_sig);
 
         mark_positionals(INTERP, SELF);
 
@@ -595,68 +553,6 @@ Mark any referenced strings and PMCs.
         if (hash)
             mark_hash(INTERP, hash);
 
-        GET_ATTR_arg_flags(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_return_flags(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_type_tuple(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_caller_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_lex_pad(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_outer_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_sub(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_handlers(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_cont(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_object(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_namespace(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_sig(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        /* We don't keep reusable continuation alive. It will keep too many
-           other things alive as well. Just NULL it */
-        SET_ATTR_continuation(INTERP, SELF, PMCNULL);
-
-        GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
-
-        if (n_regs_used) {
-            Regs_ps         bp_ps;
-            const UINTVAL   regs_p = n_regs_used[REGNO_PMC];
-            const UINTVAL   regs_s = n_regs_used[REGNO_STR];
-            UINTVAL         i;
-
-            GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
-            for (i = 0; i < regs_p; ++i) {
-                PMC * const p = bp_ps.regs_p[-1L-(i)];
-                /* Original code from CTX_REG_PMC */
-                if (p)
-                    Parrot_gc_mark_PMC_alive(INTERP, p);
-            }
-
-            for (i = 0; i < regs_s; ++i) {
-                STRING * const s = bp_ps.regs_s[i];
-                if (s)
-                    Parrot_gc_mark_STRING_alive(INTERP, s);
-            }
-        }
     }
 
 /*
@@ -720,15 +616,13 @@ stored.)
                 FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
             Parrot_hash_destroy(INTERP, hash);
         }
-
-        Parrot_pcc_free_registers(INTERP, SELF);
     }
 
 /*
 
 =item C<void set_string_native(STRING *value)>
 
-Sets the short signature for the CallContext.
+Sets the short signature for the CallSignature.
 
 =cut
 
@@ -742,7 +636,7 @@ Sets the short signature for the CallContext.
 
 =item C<STRING *get_string()>
 
-Returns the short signature for the CallContext.
+Returns the short signature for the CallSignature.
 
 =cut
 
@@ -794,7 +688,7 @@ Returns the short signature for the CallContext.
 
 =item C<void set_pmc(PMC *value)>
 
-Sets a fixed-size array of integer types (a type tuple) for the CallContext.
+Sets a fixed-size array of integer types (a type tuple) for the CallSignature.
 
 =cut
 
@@ -809,7 +703,7 @@ Sets a fixed-size array of integer types (a type tuple) for the CallContext.
 =item C<PMC *get_pmc()>
 
 Returns a fixed-size array of integer types (a type tuple) for the
-CallContext.
+CallSignature.
 
 =cut
 
@@ -974,32 +868,6 @@ return current Namespace
             GET_ATTR_arg_flags(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "return_flags")))
             GET_ATTR_return_flags(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "caller_ctx")))
-            GET_ATTR_caller_ctx(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "lex_pad")))
-            GET_ATTR_lex_pad(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "outer_ctx")))
-            GET_ATTR_outer_ctx(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_sub")))
-            GET_ATTR_current_sub(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
-            GET_ATTR_current_cont(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
-            GET_ATTR_current_object(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
-            GET_ATTR_current_namespace(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
-            GET_ATTR_handlers(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_HLL"))) {
-            GET_ATTR_current_HLL(INTERP, SELF, hll);
-            value = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Integer));
-            VTABLE_set_integer_native(interp, value, hll);
-        }
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_hll"))) {
-            GET_ATTR_current_HLL(INTERP, SELF, hll);
-            value = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
-            VTABLE_set_string_native(interp, value, Parrot_hll_get_HLL_name(INTERP, hll));
-        }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
@@ -1065,7 +933,7 @@ return current Namespace
         INTVAL    num_pos, allocated_positionals;
 
         PARROT_ASSERT(!PObj_on_free_list_TEST(value)
-                || !"Push dead object into CallContext!");
+                || !"Push dead object into CallSignature!");
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         GET_ATTR_allocated_positionals(INTERP, SELF, allocated_positionals);
@@ -1109,7 +977,7 @@ return current Namespace
         if (size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Cannot shift PMC from empty CallContext");
+                "Cannot shift PMC from empty CallSignature");
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         type   = CELL_TYPE_MASK(&cells[0]);
@@ -1131,7 +999,7 @@ return current Namespace
         if (size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Cannot shift PMC from empty CallContext");
+                "Cannot shift PMC from empty CallSignature");
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         retval = autobox_string(INTERP, &cells[0]);
@@ -1358,7 +1226,7 @@ return current Namespace
 
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1377,7 +1245,7 @@ return current Namespace
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1393,7 +1261,7 @@ return current Namespace
 
     VTABLE STRING * get_string_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1408,7 +1276,7 @@ return current Namespace
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1427,7 +1295,7 @@ return current Namespace
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1445,7 +1313,7 @@ return current Namespace
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1460,7 +1328,7 @@ return current Namespace
 
     VTABLE STRING * get_string_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1475,7 +1343,7 @@ return current Namespace
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1494,7 +1362,7 @@ return current Namespace
 
     VTABLE INTVAL exists_keyed(PMC *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = Parrot_hash_key_from_pmc(INTERP, hash, key);
@@ -1506,7 +1374,7 @@ return current Namespace
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
         Hash *hash;
-        GETATTR_CallContext_hash(INTERP, SELF, hash);
+        GET_ATTR_hash(INTERP, SELF, hash);
 
         if (hash) {
             void * const k = Parrot_hash_key_from_string(INTERP, hash, key);
@@ -1583,68 +1451,6 @@ Creates and returns a clone of the signature.
         return dest;
     }
 
-/*
-
-=item C<PMC *backtrace>
-
-Gets a representation of the backtrace starting from this Context.
-Returns an array of hashes. Each array element represents a caller in
-the backtrace, the most recent caller first. The hash has two keys: C<sub>,
-which holds the PMC representing the sub, and C<annotations> which is a hash
-of the annotations at the point where the exception was thrown for the current
-sub, or for the point of the call a level deeper for the rest.
-
-=cut
-
-*/
-
-    METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
-        PMC *result  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PMC *cur_ctx = SELF;
-        Parrot_Continuation_attributes * const cont = has_resume ? PMC_cont(resume) : NULL;
-
-        /* Get starting context, then loop over them. */
-        while (cur_ctx) {
-            PMC        * const frame       = Parrot_pmc_new(INTERP, enum_class_Hash);
-            PMC        *annotations = NULL;
-            Parrot_Sub_attributes *sub;
-
-            /* Get sub and put it in the hash. */
-            PMC *sub_pmc = Parrot_pcc_get_sub(INTERP, cur_ctx);
-
-            if (!sub_pmc)
-                sub_pmc = PMCNULL;
-
-            VTABLE_set_pmc_keyed_str(INTERP, frame, CONST_STRING(INTERP, "sub"), sub_pmc);
-
-            /* Look up any annotations and put them in the hash. */
-            if (!PMC_IS_NULL(sub_pmc)) {
-                PMC_get_sub(INTERP, sub_pmc, sub);
-
-                if (sub->seg->annotations) {
-                    PackFile_ByteCode * const seg = sub->seg;
-                    opcode_t          * const pc  = cont && cur_ctx == cont->to_ctx
-                                             ? cont->address
-                                             : Parrot_pcc_get_pc(INTERP, cur_ctx);
-
-                    annotations = PackFile_Annotations_lookup(INTERP,
-                        seg->annotations, pc - seg->base.data,
-                        NULL);
-                }
-            }
-
-            if (!annotations)
-                annotations = Parrot_pmc_new(INTERP, enum_class_Hash);
-
-            VTABLE_set_pmc_keyed_str(INTERP, frame, CONST_STRING(INTERP, "annotations"), annotations);
-
-            /* Push frame and go to next caller. */
-            VTABLE_push_pmc(INTERP, result, frame);
-            cur_ctx = Parrot_pcc_get_caller_ctx(INTERP, cur_ctx);
-        }
-
-        RETURN(PMC *result);
-    }
 /*
 
 =back

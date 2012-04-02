@@ -416,7 +416,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/core_pmcs.h \
 	$(INC_DIR)/compiler.h \
 	$(INC_DIR)/cclass.h \
-	$(INC_PMC_DIR)/pmc_callcontext.h
+	$(INC_PMC_DIR)/pmc_context.h
 
 CLASS_PMC_FILES   = @TEMP_pmc_classes_pmc@
 CLASS_O_FILES     = @TEMP_pmc_classes_o@
@@ -945,7 +945,7 @@ $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
+$(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_context.h
 
 $(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $(INC_DIR)/pbcversion.h

@@ -12,7 +12,7 @@
 
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_parrotlibrary.h"
-#include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_context.h"
 
 
 /* defines - Ops::Trans::C */
@@ -24110,7 +24110,7 @@ Parrot_get_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_new_call_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = Parrot_pmc_new(interp, enum_class_CallContext);
+    PREG(1) = Parrot_pmc_new(interp, enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 2;
 }

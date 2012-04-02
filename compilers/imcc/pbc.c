@@ -7,7 +7,6 @@
 #include "parrot/packfile.h"
 #include "parrot/pmc_freeze.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_key.h"
 

@@ -16,7 +16,6 @@ Common routines for storing and finding elements in namespaces
 #include "parrot/parrot.h"
 #include "namespace.str"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/namespace.h */
 /* HEADERIZER BEGIN: static */

@@ -508,7 +508,7 @@ sub generate_c_file {
 
     # The PCC code needs Continuation-related macros from these headers.
     $c->emit("#include \"pmc_continuation.h\"\n");
-    $c->emit("#include \"pmc_callcontext.h\"\n");
+    $c->emit("#include \"pmc_context.h\"\n");
 
     $c->emit( $self->preamble );
 

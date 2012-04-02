@@ -16,7 +16,7 @@ Parrot_Context functions.
 #include "parrot/parrot.h"
 #include "parrot/call.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_context.h"
 #include "pmc/pmc_continuation.h"
 
 /*
@@ -230,9 +230,9 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ASSERT_ARGS(init_context)
     Parrot_Context * const ctx = CONTEXT_STRUCT(pmcctx);
 
-    PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
+    PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null Context");
 
-    PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_Context);
 
     /*
      * FIXME Invoking corotine shouldn't initialise context. So just
@@ -393,7 +393,7 @@ static void
 allocate_registers(PARROT_INTERP, ARGIN(PMC *pmcctx), ARGIN(const UINTVAL *number_regs_used))
 {
     ASSERT_ARGS(allocate_registers)
-    Parrot_CallContext_attributes *ctx = PARROT_CALLCONTEXT(pmcctx);
+    Parrot_Context_attributes *ctx = PARROT_CONTEXT(pmcctx);
 
     const size_t size_i = sizeof (INTVAL)   * number_regs_used[REGNO_INT];
     const size_t size_n = sizeof (FLOATVAL) * number_regs_used[REGNO_NUM];
@@ -502,7 +502,7 @@ void
 Parrot_pcc_free_registers(PARROT_INTERP, ARGIN(PMC *pmcctx))
 {
     ASSERT_ARGS(Parrot_pcc_free_registers)
-    Parrot_CallContext_attributes * const ctx = PARROT_CALLCONTEXT(pmcctx);
+    Parrot_Context_attributes * const ctx = PARROT_CONTEXT(pmcctx);
 
     const size_t reg_size =
         Parrot_pcc_calculate_registers_size(interp, ctx->n_regs_used);
@@ -535,7 +535,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const UINTVAL *number_regs_used),
     ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_alloc_context)
-    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_Context);
 
     allocate_registers(interp, pmcctx, number_regs_used);
     return init_context(pmcctx, old);
@@ -559,7 +559,7 @@ PMC *
 Parrot_pcc_allocate_empty_context(PARROT_INTERP, ARGIN_NULLOK(PMC *old))
 {
     ASSERT_ARGS(Parrot_pcc_allocate_empty_context)
-    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC * const pmcctx = Parrot_pmc_new(interp, enum_class_Context);
 
     return init_context(pmcctx, old);
 }
@@ -838,7 +838,7 @@ void
 Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
-    Parrot_CallContext_attributes * const c = CONTEXT_STRUCT(call_context);
+    Parrot_Context_attributes * const c = PARROT_CONTEXT(call_context);
     INTVAL reuse = 0;
 
     if (!PMC_IS_NULL(c->continuation)) {

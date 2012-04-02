@@ -964,7 +964,7 @@ An operator precedence parser.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 ### .include 'src/cheats/parrot-callcontext.pir'
-.namespace ['CallContext']
+.namespace ['Context']
 .sub 'lexpad_full' :method
     .local pmc ctx, lexall, lexpad, lexpad_it
     ctx = self

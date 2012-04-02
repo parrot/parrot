@@ -23,7 +23,8 @@ passing to and from subroutines following the Parrot Calling Conventions.
 #include "args.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_fixedintegerarray.h"
-#include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_callsignature.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -318,7 +319,7 @@ static STRING** string_param_from_op(PARROT_INTERP,
 PMC *raw_sig, opcode_t *raw_args)>
 
 Take a raw signature and argument list from a set_args opcode and
-convert it to a CallContext PMC.
+convert it to a CallSignature PMC.
 
 =cut
 
@@ -340,7 +341,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_named_count = 0;
 
     if (PMC_IS_NULL(signature))
-        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+        call_object = Parrot_pmc_new(interp, enum_class_CallSignature);
     else {
         call_object = signature;
         VTABLE_morph(interp, call_object, PMCNULL);
@@ -348,7 +349,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
     PARROT_GC_WRITE_BARRIER(interp, call_object);
-    SETATTR_CallContext_arg_flags(interp, call_object, raw_sig);
+    SETATTR_CallSignature_arg_flags(interp, call_object, raw_sig);
     GETATTR_FixedIntegerArray_size(interp, raw_sig, arg_count);
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, int_array);
 
@@ -428,7 +429,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
 STRING *name, PMC *raw_sig, opcode_t *raw_args, INTVAL arg_index)>
 
 Pulls in the next argument from a set_args opcode, and sets it as the
-value of a named argument in the CallContext PMC.
+value of a named argument in the CallSignature PMC.
 
 =cut
 
@@ -476,7 +477,7 @@ extract_named_arg_from_op(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(STRING 
 *aggregate)>
 
 Takes an aggregate PMC and splits it up into individual arguments,
-adding each one to the CallContext PMC. If the aggregate is an array,
+adding each one to the CallSignature PMC. If the aggregate is an array,
 its elements are added as positional arguments. If the aggregate is a
 hash, its key/value pairs are added as named arguments.
 
@@ -515,8 +516,8 @@ dissect_aggregate_arg(PARROT_INTERP, ARGMOD(PMC *call_object), ARGIN(PMC *aggreg
 =item C<void Parrot_pcc_set_call_from_c_args(PARROT_INTERP, PMC *signature,
 const char *sig, ...)>
 
-Converts a variable list of C args into an existent CallContext PMC.
-The CallContext stores the original short signature string and an array of
+Converts a variable list of C args into an existent CallSignature PMC.
+The CallSignature stores the original short signature string and an array of
 integer types to pass on to the multiple dispatch search.
 
 =cut
@@ -541,8 +542,8 @@ Parrot_pcc_set_call_from_c_args(PARROT_INTERP,
 =item C<PMC* Parrot_pcc_build_call_from_c_args(PARROT_INTERP, PMC *signature,
 const char *sig, ...)>
 
-Converts a variable list of C args into a CallContext PMC, creating a new one
-if needed. The CallContext stores the original short signature string and an
+Converts a variable list of C args into a CallSignature PMC, creating a new one
+if needed. The CallSignature stores the original short signature string and an
 array of integer types to pass on to the multiple dispatch search.
 
 =cut
@@ -587,7 +588,7 @@ set_call_from_varargs(PARROT_INTERP,
     INTVAL       i            = 0;
 
     parse_signature_string(interp, sig, &arg_flags);
-    SETATTR_CallContext_arg_flags(interp, signature, arg_flags);
+    SETATTR_CallSignature_arg_flags(interp, signature, arg_flags);
 
     /* Process the varargs list */
     for (; sig[i] != '\0'; ++i) {
@@ -643,8 +644,8 @@ set_call_from_varargs(PARROT_INTERP,
 =item C<void Parrot_pcc_set_call_from_varargs(PARROT_INTERP, PMC *signature,
 const char *sig, va_list *args)>
 
-Coverts a varargs list into an existent CallContext PMC.
-The CallContext stores the original short signature string and an array of
+Coverts a varargs list into an existent CallSignature PMC.
+The CallSignature stores the original short signature string and an array of
 integer types to pass on to the multiple dispatch search.
 
 =cut
@@ -668,8 +669,8 @@ Parrot_pcc_set_call_from_varargs(PARROT_INTERP,
 =item C<PMC* Parrot_pcc_build_call_from_varargs(PARROT_INTERP, PMC *signature,
 const char *sig, va_list *args)>
 
-Converts a varargs list into a CallContext PMC, creating a new one if needed.
-The CallContext stores the original short signature string and an array of
+Converts a varargs list into a CallSignature PMC, creating a new one if needed.
+The CallSignature stores the original short signature string and an array of
 integer types to pass on to the multiple dispatch search.
 
 =cut
@@ -688,7 +689,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
     PMC         *call_object;
 
     if (PMC_IS_NULL(signature))
-        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+        call_object = Parrot_pmc_new(interp, enum_class_CallSignature);
     else {
         call_object = signature;
         VTABLE_morph(interp, call_object, PMCNULL);
@@ -704,7 +705,7 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
 =item C<PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, PMC *obj,
 const char *sig, va_list args)>
 
-Converts a varargs list into a CallContext PMC. The CallContext stores the
+Converts a varargs list into a CallSignature PMC. The CallSignature stores the
 original short signature string and an array of integer types to pass on to the
 multiple dispatch search.
 
@@ -721,7 +722,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
     PMC         * arg_flags         = PMCNULL;
-    PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+    PMC         * const call_object = Parrot_pmc_new(interp, enum_class_CallSignature);
     INTVAL       in_return_sig      = 0;
     INTVAL       i;
     int          append_pi          = 1;
@@ -731,7 +732,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
         return call_object;
 
     parse_signature_string(interp, sig, &arg_flags);
-    SETATTR_CallContext_arg_flags(interp, call_object, arg_flags);
+    SETATTR_CallSignature_arg_flags(interp, call_object, arg_flags);
 
     /* Process the varargs list */
     for (i = 0; sig[i] != '\0'; ++i) {
@@ -839,7 +840,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         call_object = NULL;  /* so we don't need to use PMC_IS_NULL below */
     }
     else {
-        GETATTR_CallContext_num_positionals(interp, call_object, positional_args);
+        GETATTR_CallSignature_num_positionals(interp, call_object, positional_args);
     }
 
     GETATTR_FixedIntegerArray_int_array(interp, raw_sig, raw_params);
@@ -1058,7 +1059,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
             Hash *h = NULL;
             /* Early exit to avoid vtable call */
             if (call_object)
-                GETATTR_CallContext_hash(interp, call_object, h);
+                GETATTR_CallSignature_hash(interp, call_object, h);
 
             if (h && h->entries) {
                 /* Named argument iteration. */
@@ -1193,7 +1194,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
         Hash *h = NULL;
         /* Early exit to avoid vtable call */
         if (call_object)
-            GETATTR_CallContext_hash(interp, call_object, h);
+            GETATTR_CallSignature_hash(interp, call_object, h);
         if (!h || !h->entries) {
             if (named_used_list != NULL)
                 Parrot_hash_destroy(interp, named_used_list);
@@ -1588,15 +1589,15 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGM
     if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall))
         return;
     else {
-        /* Broke encapuslation. Direct poking into CallContext is much faster */
+        /* Broke encapuslation. Direct poking into CallSignature is much faster */
         PMC * temp;
 
         /* Store raw signature */
-        GETATTR_CallContext_return_flags(interp, parent, temp);
-        SETATTR_CallContext_return_flags(interp, tailcall, temp);
+        GETATTR_CallSignature_return_flags(interp, parent, temp);
+        SETATTR_CallSignature_return_flags(interp, tailcall, temp);
 
-        GETATTR_CallContext_current_cont(interp, parent, temp);
-        SETATTR_CallContext_current_cont(interp, tailcall, temp);
+        // FIXME GETATTR_CallSignature_current_cont(interp, parent, temp);
+        // FIXME SETATTR_CallSignature_current_cont(interp, tailcall, temp);
         PARROT_GC_WRITE_BARRIER(interp, tailcall);
     }
 }

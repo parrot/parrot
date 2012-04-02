@@ -21,7 +21,6 @@ Functions related to managing the Parrot interpreter
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
-#include "pmc/pmc_callcontext.h"
 #include "../gc/gc_private.h"
 #include "api.str"
 #include "pmc/pmc_parrotinterpreter.h"

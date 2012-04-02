@@ -29,7 +29,6 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/runcore_trace.h"
 #include "debug.str"
 #include "pmc/pmc_continuation.h"
-#include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_sub.h"
 #include "parrot/oplib/core_ops.h"
 

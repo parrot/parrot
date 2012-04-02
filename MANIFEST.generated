@@ -43,7 +43,8 @@ include/pmc/pmc_bignum.h                         [devel]include
 include/pmc/pmc_boolean.h                        [devel]include
 include/pmc/pmc_bytebuffer.h                     [devel]include
 include/pmc/pmc_callback.h                       [devel]include
-include/pmc/pmc_callcontext.h                    [devel]include
+include/pmc/pmc_callsignature.h                  [devel]include
+include/pmc/pmc_context.h                        [devel]include
 include/pmc/pmc_capture.h                        [devel]include
 include/pmc/pmc_class.h                          [devel]include
 include/pmc/pmc_codestring.h                     [devel]include

@@ -44,7 +44,6 @@ them, with default behaviour.
 #include "pmc/pmc_nci.h"
 #include "pmc/pmc_nativepccmethod.h"
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/multidispatch.h */
 

@@ -22,7 +22,6 @@ individual action vtable (freeze/thaw) is then called for all todo-PMCs.
 */
 
 #include "parrot/parrot.h"
-#include "pmc/pmc_callcontext.h"
 #include "object_serialization.str"
 
 /* when thawing a string longer then this size, we first do a GC run and then

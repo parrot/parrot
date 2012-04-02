@@ -30,7 +30,6 @@ feature.
 
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
-#include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_fixedintegerarray.h"
 #include "hll.str"
 

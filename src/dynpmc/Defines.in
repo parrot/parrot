@@ -72,7 +72,7 @@ DYNPMC_H_FILES_MIN =                    \
     include/parrot/vtable.h             \
     include/parrot/vtables.h            \
     include/parrot/warnings.h           \
-    include/pmc/pmc_callcontext.h
+    include/pmc/pmc_context.h
 
 DYNPMC_H_FILES =                   \
     $(DYNPMC_H_FILES_MIN)          \

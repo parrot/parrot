@@ -429,7 +429,8 @@ include/parrot/packfile.h
 include/parrot/exceptions.h
 include/parrot/string_funcs.h
 include/parrot/compiler.h
-include/pmc/pmc_callcontext.h
+include/pmc/pmc_context.h
+include/pmc/pmc_callsignature.h
 include/pmc/pmc_continuation.h
 
 # Local Variables:

@@ -27,7 +27,6 @@ The runcore API handles running the operations.
 
 #include "parrot/dynext.h"
 #include "pmc/pmc_parrotlibrary.h"
-#include "pmc/pmc_callcontext.h"
 
 
 /* HEADERIZER HFILE: include/parrot/runcore_api.h */

@@ -92,7 +92,7 @@ PMC **
 Parrot_pcc_get_pmc_constants_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_pmc_constants_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->pmc_constants;
 }
 
@@ -104,7 +104,7 @@ Parrot_pcc_set_constants_func(SHIM_INTERP, ARGIN(PMC *ctx),
 {
     ASSERT_ARGS(Parrot_pcc_set_constants_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     c->num_constants = ct->num.constants;
     c->str_constants = ct->str.constants;
     c->pmc_constants = ct->pmc.constants;
@@ -127,7 +127,7 @@ UINTVAL
 Parrot_pcc_get_recursion_depth_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_recursion_depth_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->recursion_depth;
 }
 
@@ -148,7 +148,7 @@ Parrot_pcc_set_recursion_depth_func(SHIM_INTERP, ARGIN(const PMC *ctx),
         const int new_depth)
 {
     ASSERT_ARGS(Parrot_pcc_set_recursion_depth_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->recursion_depth = new_depth;
 }
 
@@ -167,7 +167,7 @@ UINTVAL
 Parrot_pcc_inc_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_inc_recursion_depth_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return ++CONTEXT_STRUCT(ctx)->recursion_depth;
 }
 
@@ -186,7 +186,7 @@ UINTVAL
 Parrot_pcc_dec_recursion_depth_func(SHIM_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_dec_recursion_depth_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return --CONTEXT_STRUCT(ctx)->recursion_depth;
 }
 
@@ -210,7 +210,7 @@ PMC*
 Parrot_pcc_get_caller_ctx_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_caller_ctx_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->caller_ctx;
 }
 
@@ -219,8 +219,8 @@ void
 Parrot_pcc_set_caller_ctx_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *caller_ctx))
 {
     ASSERT_ARGS(Parrot_pcc_set_caller_ctx_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    PARROT_ASSERT(caller_ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
+    PARROT_ASSERT(caller_ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->caller_ctx = caller_ctx;
 }
@@ -245,7 +245,7 @@ PMC*
 Parrot_pcc_get_outer_ctx_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_outer_ctx_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->outer_ctx;
 }
 
@@ -254,8 +254,8 @@ void
 Parrot_pcc_set_outer_ctx_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *outer_ctx))
 {
     ASSERT_ARGS(Parrot_pcc_set_outer_ctx_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    PARROT_ASSERT(outer_ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
+    PARROT_ASSERT(outer_ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->outer_ctx = outer_ctx;
 }
@@ -279,7 +279,7 @@ PMC*
 Parrot_pcc_get_lex_pad_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_lex_pad_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->lex_pad;
 }
 
@@ -288,7 +288,7 @@ void
 Parrot_pcc_set_lex_pad_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *lex_pad))
 {
     ASSERT_ARGS(Parrot_pcc_set_lex_pad_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->lex_pad = lex_pad;
 }
@@ -313,7 +313,7 @@ PMC*
 Parrot_pcc_get_namespace_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_namespace_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_namespace;
 }
 
@@ -322,7 +322,7 @@ void
 Parrot_pcc_set_namespace_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *_namespace))
 {
     ASSERT_ARGS(Parrot_pcc_set_namespace_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->current_namespace = _namespace;
 }
@@ -345,7 +345,7 @@ INTVAL
 Parrot_pcc_get_HLL_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_HLL_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_HLL;
 }
 
@@ -354,7 +354,7 @@ void
 Parrot_pcc_set_HLL_func(SHIM_INTERP, ARGIN(PMC *ctx), INTVAL hll)
 {
     ASSERT_ARGS(Parrot_pcc_set_HLL_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->current_HLL = hll;
 }
 
@@ -378,7 +378,7 @@ PMC*
 Parrot_pcc_get_handlers_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_handlers_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->handlers;
 }
 
@@ -388,7 +388,7 @@ void
 Parrot_pcc_set_handlers_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN(PMC *handlers))
 {
     ASSERT_ARGS(Parrot_pcc_set_handlers_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->handlers = handlers;
 }
@@ -413,7 +413,7 @@ PMC*
 Parrot_pcc_get_continuation_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_continuation_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_cont;
 }
 
@@ -422,7 +422,7 @@ void
 Parrot_pcc_set_continuation_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *_continuation))
 {
     ASSERT_ARGS(Parrot_pcc_set_continuation_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->current_cont = _continuation;
 }
@@ -447,7 +447,7 @@ PMC*
 Parrot_pcc_get_signature_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_signature_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_sig;
 }
 
@@ -456,7 +456,7 @@ void
 Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sig_object))
 {
     ASSERT_ARGS(Parrot_pcc_set_signature_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->current_sig = sig_object;
 }
@@ -480,7 +480,7 @@ PMC*
 Parrot_pcc_get_object_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_object;
 }
 
@@ -489,7 +489,7 @@ void
 Parrot_pcc_set_object_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *object))
 {
     ASSERT_ARGS(Parrot_pcc_set_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     CONTEXT_STRUCT(ctx)->current_object = object;
 }
@@ -514,7 +514,7 @@ opcode_t*
 Parrot_pcc_get_pc_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_pc_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->current_pc;
 }
 
@@ -523,7 +523,7 @@ void
 Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(const PMC *ctx), ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(Parrot_pcc_set_pc_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->current_pc = pc;
 }
 
@@ -544,7 +544,7 @@ Parrot_pcc_warnings_on_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_warnings_on_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     c->warns |= flags;
     return c->warns;
 }
@@ -567,7 +567,7 @@ Parrot_pcc_warnings_off_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_warnings_off_func)
     Parrot_Context * const c = CONTEXT_STRUCT(ctx);
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     c->warns &= ~flags;
 }
 
@@ -589,7 +589,7 @@ UINTVAL
 Parrot_pcc_warnings_test_func(SHIM_INTERP, ARGIN(const PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_warnings_test_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->warns & flags;
 }
 
@@ -608,7 +608,7 @@ void
 Parrot_pcc_errors_on_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_errors_on_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->errors |= flags;
 }
 
@@ -628,7 +628,7 @@ void
 Parrot_pcc_errors_off_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_errors_off_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->errors &= ~flags;
 }
 
@@ -649,7 +649,7 @@ UINTVAL
 Parrot_pcc_errors_test_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_errors_test_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->errors & flags;
 }
 
@@ -669,7 +669,7 @@ void
 Parrot_pcc_trace_flags_on_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_trace_flags_on_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->trace_flags |= flags;
 }
 
@@ -690,7 +690,7 @@ void
 Parrot_pcc_trace_flags_off_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_trace_flags_off_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     CONTEXT_STRUCT(ctx)->trace_flags &= ~flags;
 }
 
@@ -711,7 +711,7 @@ UINTVAL
 Parrot_pcc_trace_flags_test_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_pcc_trace_flags_test_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->trace_flags & flags;
 }
 
@@ -740,7 +740,7 @@ FLOATVAL
 Parrot_pcc_get_num_constant_func(SHIM_INTERP, ARGIN(const PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_num_constant_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->num_constants[idx];
 }
 
@@ -751,7 +751,7 @@ STRING*
 Parrot_pcc_get_string_constant_func(SHIM_INTERP, ARGIN(const PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_string_constant_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->str_constants[idx];
 }
 
@@ -762,7 +762,7 @@ PMC*
 Parrot_pcc_get_pmc_constant_func(SHIM_INTERP, ARGIN(const PMC *ctx), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_pmc_constant_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
     return CONTEXT_STRUCT(ctx)->pmc_constants[idx];
 }
 

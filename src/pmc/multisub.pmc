@@ -18,7 +18,6 @@ Sub PMCs with the same short name, but different long names.
 
 */
 
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */

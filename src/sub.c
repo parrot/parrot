@@ -23,6 +23,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_continuation.h"
 #include "parrot/oplib/core_ops.h"
+#include "pmc/pmc_context.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
@@ -346,7 +347,7 @@ Parrot_sub_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(PMC *ctx))
         if (PMC_IS_NULL(outer))
             return lex_pad;
 
-        PARROT_ASSERT(outer->vtable->base_type == enum_class_CallContext);
+        PARROT_ASSERT(outer->vtable->base_type == enum_class_Context);
 
         if (!PMC_IS_NULL(lex_pad))
             if (VTABLE_exists_keyed_str(interp, lex_pad, lex_name))

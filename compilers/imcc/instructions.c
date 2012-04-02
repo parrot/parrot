@@ -8,7 +8,6 @@
 #include "imc.h"
 #include "pbc.h"
 #include "optimizer.h"
-#include "pmc/pmc_callcontext.h"
 #include "parrot/oplib/core_ops.h"
 
 /*

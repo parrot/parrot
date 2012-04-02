@@ -182,15 +182,8 @@ Swaps the "context".
                         "tail call to coroutine not allowed");
 
             /* first time set current sub, cont, object */
-            if (PMC_IS_NULL(ctx))
-                ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
-
-            Parrot_pcc_set_context(INTERP, ctx);
-
             GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
-            Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
-            Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
-            Parrot_pcc_init_context(INTERP, ctx, caller_ctx);
+            ctx     = Parrot_set_new_context(INTERP, n_regs_used);
 
             SET_ATTR_ctx(INTERP, SELF, ctx);
 

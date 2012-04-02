@@ -23,7 +23,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 #include "subprof.str"
 
 #include "pmc/pmc_sub.h"
-#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/runcore_subprof.h */
 

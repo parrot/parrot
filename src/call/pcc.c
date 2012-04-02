@@ -24,6 +24,7 @@ value passing to and from subroutines.
 #include "pcc.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_callsignature.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -162,7 +163,7 @@ Parrot_pcc_add_invocant(PARROT_INTERP, ARGIN(PMC *call_obj), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pcc_add_invocant)
     PMC *arg_flags;
-    GETATTR_CallContext_arg_flags(interp, call_obj, arg_flags);
+    GETATTR_CallSignature_arg_flags(interp, call_obj, arg_flags);
 
     VTABLE_unshift_integer(interp, arg_flags,
           PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
@@ -319,7 +320,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     opcode_t    *dest;
     PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
     if (PMC_IS_NULL(call_object))
-        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+        call_object = Parrot_pmc_new(interp, enum_class_CallSignature);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_object);
     PARROT_CONTINUATION(ret_cont)->from_ctx = call_object;
