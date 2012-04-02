@@ -99,10 +99,10 @@ my $help;             # Displays help message
 my $version;          # Displays version and copyright information
 
 my $result = GetOptions('d|docs=s'  => \$docs,
-			'r|repos=s' => \$repos,
-		        'delete'    => \$delete,
-			'h|help'    => \$help,
-			'v|version' => \$version);
+                        'r|repos=s' => \$repos,
+                        'delete'    => \$delete,
+                        'h|help'    => \$help,
+                        'v|version' => \$version);
 
 # Catch unrecognized switches
 pod2usage() unless $result;
@@ -166,10 +166,10 @@ sub query_system {
     if ((!defined $docs and !defined $repos) or
         (!defined $docs and  defined $repos) or
         ( defined $docs and !defined $repos))) {
-	$questions = "a couple of questions";
+        $questions = "a couple of questions";
     }
     else {
-	$questions = "a question";
+        $questions = "a question";
     }
 
     print "\nHello. I am the parrot_github_release.pl script. Because you ",
@@ -180,11 +180,11 @@ sub query_system {
 # Get 'docs/' directory
 sub get_docs_directory {
     while (1) {
-	print "What is the path to the previous documentation release? ";
-	$docs = <>;
-	chomp $docs;
+        print "What is the path to the previous documentation release? ";
+        $docs = <>;
+        chomp $docs;
 
-	last if -d $docs;
+        last if -d $docs;
     }
 
     $docs .= '/' if $docs =~ /[a-zA-Z0-9]$/;
@@ -193,12 +193,12 @@ sub get_docs_directory {
 # Get the directory in which to clone the repos
 sub get_repo_directory {
     while (1) {
-	print "What is the path in which to clone the 'parrot.github.com' ",
-	  "and the 'parrot-docsx' repositories? ";
-	$repos = <>;
-	chomp $repos;
+        print "What is the path in which to clone the 'parrot.github.com' ",
+          "and the 'parrot-docsx' repositories? ";
+        $repos = <>;
+        chomp $repos;
 
-	last if -d $repos;
+        last if -d $repos;
     }
 
     $repos .= '/' if $repos =~ /[a-zA-Z0-9]$/;
@@ -327,11 +327,11 @@ sub update_index_html {
     my $buffer = '';
     open FH, "+< index.html"  or stop("Unable to open 'index.html'");
     while (<FH>) {
-	s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
-	s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
-	s/$1/$major\.$minor\.$patch/
-	  if /Parrot Documentation Releases \((\d.\d.\d) - 0.1.1\)/;
-	$buffer .= $_;
+        s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
+        s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
+        s/$1/$major\.$minor\.$patch/
+          if /Parrot Documentation Releases \((\d.\d.\d) - 0.1.1\)/;
+        $buffer .= $_;
     }
     seek(FH, 0, 0)         or stop("Unable to seek to start of 'index.html'");
     print FH $buffer       or stop("Unable to print out 'index.html'");
@@ -350,14 +350,14 @@ sub update_releases_html {
 
     open FH, "+< releases.html" or stop("Unable to open 'releases.html'");
     while (<FH>) {
-	s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
-	s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
-	if (/<ul>/) {
-	    $buffer .= $_;
-	    $buffer .= $li;
-	    next; # So we don't duplicate the '<ul>' tag.
-	}
-	$buffer .= $_;
+        s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
+        s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
+        if (/<ul>/) {
+            $buffer .= $_;
+            $buffer .= $li;
+            next; # So we don't duplicate the '<ul>' tag.
+        }
+        $buffer .= $_;
     }
     seek(FH, 0, 0)         or stop("Unable to seek to start of 'releases.html'");
     print FH $buffer       or stop("Unable to print out 'releases.html'");
