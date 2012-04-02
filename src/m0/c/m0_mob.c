@@ -304,14 +304,11 @@ read_from_stream( FILE *stream, size_t bytes ) {
     else {
         void *data = malloc( bytes );
 
-fprintf(stdout, "M %d\n",  *(int *)data);
-//fprintf(stdout, "M %.15g\n",  *(double*)data);
         if (fread(data, 1, bytes, stream) != bytes) {
             free( data );
             return NULL;
         }
-//fprintf(stdout, "A %.15g\n", * (double *)data);
-fprintf(stdout, "A %d\n", * (int *)data);
+
         return data;
     }
 }
