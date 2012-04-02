@@ -1865,7 +1865,7 @@ gc_gms_unblock_GC_mark_locked(PARROT_INTERP)
     ASSERT_ARGS(gc_gms_unblock_GC_mark_locked)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     LOCK(interp->thread_data->interp_lock);
-    if (self->gc_mark_block_level)
+    if (self->gc_mark_block_level_locked)
         --self->gc_mark_block_level_locked;
     UNLOCK(interp->thread_data->interp_lock);
 }
