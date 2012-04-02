@@ -123,17 +123,18 @@ get_docs_directory() unless $docs;
 get_repo_directory() unless $repos;
 
 # Get VERSION
-open FH, "<VERSION" or stop("I'm unable to open the 'VERSION' file");
-$version = <FH>;
-close FH;
+open my $FH, '<', 'VERSION' or stop("Unable to open 'VERSION' file");
+$version = <$FH>;
+close $FH;
 
 ########## For testing purposes only! ##########
 $version = '4.3.0';
 ########## For testing purposes only! ##########
 
 # Parse version number
-my ($major, $minor, $patch) = ($1, $2, $3) if $version =~ /^(\d+)\.(\d+)\.(\d+)$/;
-stop("There is some (unkown) problem with the major or the minor release numbers")
+my ($major, $minor, $patch);
+($major, $minor, $patch) = ($1, $2, $3) if $version =~ /^(\d+)\.(\d+)\.(\d+)$/;
+stop("There is some problem with the major or the minor release numbers")
   unless $major and $minor;
 
 # Set to the previous release version
@@ -325,18 +326,18 @@ sub update_parrot_github {
 # Update the link to 'Parrot Documentation Releases' in 'index.html'
 sub update_index_html {
     my $buffer = '';
-    open FH, "+< index.html"  or stop("Unable to open 'index.html'");
-    while (<FH>) {
+    open my $FH, '+<', 'index.html' or stop("Unable to open 'index.html'");
+    while (<$FH>) {
         s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
         s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
         s/$1/$major\.$minor\.$patch/
           if /Parrot Documentation Releases \((\d.\d.\d) - 0.1.1\)/;
         $buffer .= $_;
     }
-    seek(FH, 0, 0)         or stop("Unable to seek to start of 'index.html'");
-    print FH $buffer       or stop("Unable to print out 'index.html'");
-    truncate(FH, tell(FH)) or stop("Unable to truncate 'index.html'");
-    close FH               or stop("Unable to close 'index.html'");
+    seek($FH, 0, 0)          or stop("Unable to seek start of 'index.html'");
+    print $FH $buffer        or stop("Unable to print out 'index.html'");
+    truncate($FH, tell($FH)) or stop("Unable to truncate 'index.html'");
+    close $FH                or stop("Unable to close 'index.html'");
 }
 
 # Update 'releases.html' to point to the newly archived documents in
@@ -348,8 +349,8 @@ sub update_releases_html {
       $minor . '.' . $patch . '/html/index.html">Release ' . $major . '.' .
       $minor . '.' . $patch . '</a></li>';
 
-    open FH, "+< releases.html" or stop("Unable to open 'releases.html'");
-    while (<FH>) {
+    open my $FH, '+<', 'releases.html' or stop("Unable to open 'releases.html'");
+    while (<$FH>) {
         s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
         s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
         if (/<ul>/) {
@@ -359,10 +360,10 @@ sub update_releases_html {
         }
         $buffer .= $_;
     }
-    seek(FH, 0, 0)         or stop("Unable to seek to start of 'releases.html'");
-    print FH $buffer       or stop("Unable to print out 'releases.html'");
-    truncate(FH, tell(FH)) or stop("Unable to truncate 'releases.html'");
-    close FH               or stop("Unable to close 'releases.html'");
+    seek($FH, 0, 0)          or stop("Unable to seek to start of 'releases.html'");
+    print $FH $buffer        or stop("Unable to print out 'releases.html'");
+    truncate($FH, tell($FH)) or stop("Unable to truncate 'releases.html'");
+    close $FH                or stop("Unable to close 'releases.html'");
 }
 
 # Delete the downloaded repositories
