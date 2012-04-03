@@ -40,15 +40,12 @@ static void * find_handle_entry(ARGIN(const void *handle))
 static void push_handle_entry(ARGIN(void *handle))
         __attribute__nonnull__(1);
 
-static void remove_handle_entry(ARGIN(void *handle))
-        __attribute__nonnull__(1);
-
+static void remove_handle_entry(ARGIN_NULLOK(void *handle));
 #define ASSERT_ARGS_find_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_push_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_remove_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_remove_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -99,7 +96,7 @@ find_handle_entry(ARGIN(const void *handle))
 }
 
 static void
-remove_handle_entry(ARGIN(void *handle))
+remove_handle_entry(ARGIN_NULLOK(void *handle))
 {
     ASSERT_ARGS(remove_handle_entry)
 
