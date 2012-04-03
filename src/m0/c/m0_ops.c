@@ -75,7 +75,7 @@ m0_op_add_iii( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_add_iIi( M0_CallFrame *frame, const unsigned char *ops )
+m0_op_add_iiI( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] +
        ops[3];
@@ -102,7 +102,7 @@ m0_op_add_nnn( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_add_nNn( M0_CallFrame *frame, const unsigned char *ops )
+m0_op_add_nnN( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] + ops[3];
 }
@@ -128,7 +128,7 @@ m0_op_sub_iii( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_sub_iIi( M0_CallFrame *frame, const unsigned char *ops )
+m0_op_sub_iiI( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] - ops[3];
 }
@@ -154,7 +154,7 @@ m0_op_sub_nnn( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_sub_nNn( M0_CallFrame *frame, const unsigned char *ops )
+m0_op_sub_nnN( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] - ops[3];
 }
