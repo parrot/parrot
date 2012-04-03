@@ -480,8 +480,9 @@ PMC*
 Parrot_pcc_get_object_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 {
     ASSERT_ARGS(Parrot_pcc_get_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
-    return CONTEXT_STRUCT(ctx)->current_object;
+    return PMCNULL;
+//    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
+//    return CONTEXT_STRUCT(ctx)->current_object;
 }
 
 PARROT_EXPORT
@@ -489,9 +490,9 @@ void
 Parrot_pcc_set_object_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *object))
 {
     ASSERT_ARGS(Parrot_pcc_set_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
-    PARROT_GC_WRITE_BARRIER(interp, ctx);
-    CONTEXT_STRUCT(ctx)->current_object = object;
+//    PARROT_ASSERT(ctx->vtable->base_type == enum_class_Context);
+//    PARROT_GC_WRITE_BARRIER(interp, ctx);
+//    CONTEXT_STRUCT(ctx)->current_object = object;
 }
 
 /*
