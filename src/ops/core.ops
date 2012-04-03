@@ -379,8 +379,6 @@ inline op invokecc(invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest                   = VTABLE_invoke(interp, p, dest);
 
@@ -395,8 +393,6 @@ inline op invoke(invar PMC, invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
     interp->current_cont   = $2;
 
     dest = VTABLE_invoke(interp, p, dest);
