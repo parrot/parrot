@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
     Parrot_api_string_import_ascii(interpmc, "replace", &s_teststr);
     Parrot_api_pmc_find_method(interpmc, p_pmc, s_teststr, &p_method);
     if(p_method != NULL) {
-        Parrot_api_string_import_ascii(interpmc, "CallContext", &s_classname);
+        Parrot_api_string_import_ascii(interpmc, "CallSignature", &s_classname);
         Parrot_api_pmc_box_string(interpmc, s_classname, &p_classname);
         Parrot_api_pmc_get_class(interpmc, p_classname, &p_call_class);
         Parrot_api_pmc_new_from_class(interpmc, p_call_class, NULL, &p_signature);
