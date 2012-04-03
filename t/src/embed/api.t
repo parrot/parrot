@@ -227,7 +227,7 @@ int main(void) {
 
     Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
 
-    Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
+    Parrot_api_string_import_ascii(interp, "CallSignature", &callcontext_s);
     Parrot_api_pmc_box_string(interp, callcontext_s, &callcontext_sp);
     Parrot_api_pmc_get_class(interp, callcontext_sp, &callcontext_class);
     Parrot_api_pmc_new_from_class(interp, callcontext_class, NULL, &callcontext);
@@ -359,7 +359,7 @@ int main(void) {
 
     Parrot_api_string_import_ascii(interp, "Pi->", &signature_s);
 
-    Parrot_api_string_import_ascii(interp, "CallContext", &callcontext_s);
+    Parrot_api_string_import_ascii(interp, "CallSignature", &callcontext_s);
     Parrot_api_pmc_box_string(interp, callcontext_s, &callcontext_sp);
     Parrot_api_pmc_get_class(interp, callcontext_sp, &callcontext_class);
     Parrot_api_pmc_new_from_class(interp, callcontext_class, NULL, &callcontext);
