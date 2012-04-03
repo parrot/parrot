@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-t/pmc/callcontext.t - test CallSignature PMC
+t/pmc/callsignature.t - test CallSignature PMC
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/callcontext.t
+    % prove t/pmc/callsignature.t
 
 =head1 DESCRIPTION
 

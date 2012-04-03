@@ -121,7 +121,7 @@ sub diagnosis {
 
 __DATA__
 src/pmc/bigint.pmc
-src/pmc/callcontext.pmc
+src/pmc/callsignature.pmc
 src/pmc/class.pmc
 src/pmc/complex.pmc
 src/pmc/eval.pmc
