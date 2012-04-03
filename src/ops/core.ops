@@ -472,13 +472,14 @@ to the elements of the signature array.
 
 
 op set_args(inconst PMC) :flow {
-    opcode_t * const raw_args = CUR_OPCODE;
-    PMC * const signature = $1;
-    PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
-            PMCNULL, signature, raw_args);
+    opcode_t * const raw_args   = CUR_OPCODE;
+    PMC * const ctx             = CURRENT_CONTEXT(interp);
+    PMC * const signature       = $1;
+    PMC * const call_sig        = Parrot_pcc_build_sig_object_from_op(interp,
+            Parrot_pcc_get_signature(interp, ctx), signature, raw_args);
     INTVAL argc;
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+    Parrot_pcc_set_signature(interp, ctx, call_sig);
     goto OFFSET(argc + 2);
 }
 
@@ -531,7 +532,6 @@ op get_results(inconst PMC) :flow {
             PARROT_ERRORS_RESULT_COUNT_FLAG);
 
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
     goto OFFSET(argc + 2);
 }
 

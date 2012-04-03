@@ -12,7 +12,6 @@
 
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_parrotlibrary.h"
-#include "pmc/pmc_context.h"
 
 
 /* defines - Ops::Trans::C */
@@ -13693,7 +13692,6 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
@@ -13706,7 +13704,6 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-
     interp->current_cont = PREG(2);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
@@ -13760,12 +13757,13 @@ Parrot_newclosure_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_set_args_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  raw_args = CUR_OPCODE;
+    PMC  * const  ctx = CURRENT_CONTEXT(interp);
     PMC  * const  signature = PCONST(1);
-    PMC  * const  call_sig = Parrot_pcc_build_sig_object_from_op(interp, PMCNULL, signature, raw_args);
+    PMC  * const  call_sig = Parrot_pcc_build_sig_object_from_op(interp, Parrot_pcc_get_signature(interp, ctx), signature, raw_args);
     INTVAL   argc;
 
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);
+    Parrot_pcc_set_signature(interp, ctx, call_sig);
     return cur_opcode + (argc + 2);
 }
 
@@ -13812,7 +13810,6 @@ Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params, PARROT_ERRORS_RESULT_COUNT_FLAG);
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), PMCNULL);
     return cur_opcode + (argc + 2);
 }
 
@@ -18205,7 +18202,6 @@ Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
-
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
     dest = VTABLE_invoke(interp, PREG(2), next);
     return (opcode_t *)dest;
@@ -18225,7 +18221,6 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-
         interp->current_cont = PREG(3);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18320,7 +18315,6 @@ Parrot_tailcallmethod_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
-
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     return (opcode_t *)dest;
 }
@@ -24081,7 +24075,6 @@ Parrot_invokecc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  signature = PREG(2);
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
