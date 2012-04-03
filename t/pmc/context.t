@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/pmc/context.t - test CallContext PMC
+t/pmc/context.t - test Context PMC
 
 =head1 SYNOPSIS
 
@@ -11,9 +11,9 @@ t/pmc/context.t - test CallContext PMC
 
 =head1 DESCRIPTION
 
-Tests the CallContext PMC.
+Tests the Context PMC.
 
-TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibutes.
+TODO: Implement real tests when Context PMC will be migrated to use ATTRibutes.
 
 =cut
 
@@ -35,9 +35,9 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
 .end
 
 .sub 'test_new'
-    $P0 = new ['CallContext']
+    $P0 = new ['Context']
     sweep 1
-    ok(1, 'Instantiated .CallContext')
+    ok(1, 'Instantiated .Context')
 .end
 
 # Put test_inspect into Namespace, as method, with outer, etc.
@@ -58,37 +58,37 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $P0 = getinterp
     ctx = $P0['context']
     $I0 = defined ctx
-    ok($I0, "Got CallContext")
+    ok($I0, "Got Context")
 
     # Check current_sub first. Other tests relying on it
     $P0 = getattribute ctx, 'current_sub'
-    is($P0, 'test_inspect', 'Got CallContext.current_sub')
+    is($P0, 'test_inspect', 'Got Context.current_sub')
 
     $P0 = getattribute ctx, 'caller_ctx'
-    $I0 = isa $P0, 'CallContext'
-    ok($I0, 'Got CallContext.caller_ctx')
+    $I0 = isa $P0, 'Context'
+    ok($I0, 'Got Context.caller_ctx')
     $P0 = getattribute $P0, 'current_sub'
     is($P0, 'main', '... from proper Sub')
 
     $P0 = getattribute ctx, 'outer_ctx'
-    $I0 = isa $P0, 'CallContext'
-    ok($I0, 'Got CallContext.outer_ctx')
+    $I0 = isa $P0, 'Context'
+    ok($I0, 'Got Context.outer_ctx')
     $P0 = getattribute $P0, 'current_sub'
     is($P0, 'load', '... from proper Sub')
 
     $P0 = getattribute ctx, 'lex_pad'
     $I0 = isa $P0, 'LexPad'
-    ok($I0, 'Got CallContext.lex_pad')
+    ok($I0, 'Got Context.lex_pad')
     $P1 = $P0['foo_ctx']
     $I0 = defined $P1
     ok($I0, '... with proper content')
 
     $P0 = getattribute ctx, 'current_cont'
     $I0 = isa $P0, 'Continuation'
-    ok($I0, 'Got CallContext.current_cont')
+    ok($I0, 'Got Context.current_cont')
 
     $P0 = getattribute ctx, 'current_namespace'
-    ok($P0, 'Got CallContext.current_namespace')
+    ok($P0, 'Got Context.current_namespace')
     $P1 = $P0['test_inspect']
     is($P1, 'test_inspect', '... with proper content')
 
@@ -102,7 +102,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $P0 = getattribute ctx, 'handlers'
     $I1 = elements $P0
     dec $I1
-    is($I0, $I1, 'Got CallContext.handlers')
+    is($I0, $I1, 'Got Context.handlers')
 
     # Check absurd fields
     $I0 = 1
@@ -110,15 +110,15 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $I0 = 0
   caught:
     pop_eh
-    ok($I0, "No world domination in this CallContext")
+    ok($I0, "No world domination in this Context")
 
     # Current HLL shouldn't be zero
     $P0 = getattribute ctx, 'current_HLL'
     $I0 = $P0
-    ok($I0, 'Got CallContext.current_HLL')
+    ok($I0, 'Got Context.current_HLL')
 
     $P0 = getattribute ctx, 'current_hll'
-    is($P0, 'FOO', 'Got CallContext.current_hll')
+    is($P0, 'FOO', 'Got Context.current_hll')
 
   done:
     pop_eh
@@ -131,7 +131,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     .local pmc bt
     bt = 'test_bt1'()
     $I0 = defined bt
-    ok($I0, "Got CallContext.backtrace()")
+    ok($I0, "Got Context.backtrace()")
 
     # We should have more than 3 elements
     $I0 = elements bt
