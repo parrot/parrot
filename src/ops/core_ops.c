@@ -13728,11 +13728,9 @@ Parrot_tailcall_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t    * dest =  cur_opcode + 2;
     PMC  * const  ctx = CURRENT_CONTEXT(interp);
     PMC  * const  parent_ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
-    PMC  * const  this_call_sig = Parrot_pcc_get_signature(interp, ctx);
-    PMC  * const  parent_call_sig = Parrot_pcc_get_signature(interp, parent_ctx);
 
     interp->current_cont = Parrot_pcc_get_continuation(interp, ctx);
-    Parrot_pcc_merge_signature_for_tailcall(interp, parent_call_sig, this_call_sig);
+    Parrot_pcc_merge_signature_for_tailcall(interp, parent_ctx, ctx);
     SUB_FLAG_TAILCALL_SET(interp->current_cont);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;

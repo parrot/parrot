@@ -168,7 +168,6 @@ pmclass CallSignature provides array provides hash auto_attrs {
     ATTR PMC    *type_tuple;           /* Cached argument types for MDD */
     ATTR STRING *short_sig;            /* Simple string sig args & returns */
     ATTR PMC    *arg_flags;            /* Integer array of argument flags */
-    ATTR PMC    *return_flags;         /* Integer array of return flags */
     ATTR Hash   *hash;                 /* Hash of named arguments */
 
 /*
@@ -200,7 +199,9 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() {
-        Hash     *hash;
+        Hash    *hash;
+        PMC     *tmp;
+        STRING  *str;
 
         if (!PMC_data(SELF))
             return;
@@ -211,6 +212,14 @@ Mark any referenced strings and PMCs.
         if (hash)
             mark_hash(INTERP, hash);
 
+        GET_ATTR_type_tuple(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_arg_flags(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_short_sig(INTERP, SELF, str);
+        Parrot_gc_mark_STRING_alive(INTERP, str);
     }
 
 /*
@@ -232,7 +241,6 @@ stored.)
 
         SET_ATTR_short_sig(INTERP, SELF, NULL);
         SET_ATTR_arg_flags(INTERP, SELF, PMCNULL);
-        SET_ATTR_return_flags(INTERP, SELF, PMCNULL);
         SET_ATTR_type_tuple(INTERP, SELF, PMCNULL);
 
         /* Don't free positionals. Just reuse them */
@@ -428,11 +436,6 @@ Stores the return signature, an array of PMCs.
 Stores a set of flags for the call signature arguments, an array of
 integers.
 
-=item return_flags
-
-Stores a set of flags for the call signature return arguments, an array
-of integers.
-
 =back
 
 =cut
@@ -443,9 +446,6 @@ of integers.
 
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "arg_flags"))) {
             SET_ATTR_arg_flags(INTERP, SELF, value);
-        }
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "return_flags"))) {
-            SET_ATTR_return_flags(INTERP, SELF, value);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -469,46 +469,9 @@ Retrieves the return signature, an array of PMCs.
 Retrieves the flags for the call signature arguments, an array of
 integers.
 
-=item return_flags
-
-Retrieves the flags for the call signature return arguments, an array of
-integers.
-
 =item named
 
 Retrieves the hash of named arguments.
-
-=item caller_ctx
-
-return Caller Context
-
-=item lex_pad
-
-return LexPad
-
-=item outer_ctx
-
-return Outer Context
-
-=item current_sub
-
-return current Sub
-
-=item handlers
-
-return list of ExceptioHandlers
-
-=item current_cont
-
-return current Continuation
-
-=item current_object
-
-return current Object (if in method call)
-
-=item current_namespace
-
-return current Namespace
 
 =back
 
@@ -524,8 +487,6 @@ return current Namespace
             value = get_named_names(INTERP, SELF);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "arg_flags")))
             GET_ATTR_arg_flags(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "return_flags")))
-            GET_ATTR_return_flags(INTERP, SELF, value);
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
@@ -1064,7 +1025,7 @@ Creates and returns a clone of the signature.
 */
     VTABLE PMC *clone() {
         STRING      *short_sig;
-        PMC         *type_tuple, *arg_flags, *return_flags;
+        PMC         *type_tuple, *arg_flags;
         PMC * const  dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL       num;
         Pcc_cell    *our_cells, *dest_cells;
@@ -1081,7 +1042,6 @@ Creates and returns a clone of the signature.
         GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
         GET_ATTR_short_sig(INTERP, SELF, short_sig);
         GET_ATTR_arg_flags(INTERP, SELF, arg_flags);
-        GET_ATTR_return_flags(INTERP, SELF, return_flags);
 
         GET_ATTR_hash(INTERP, SELF, hash);
 
@@ -1093,9 +1053,6 @@ Creates and returns a clone of the signature.
 
         if (!PMC_IS_NULL(arg_flags))
             SET_ATTR_arg_flags(INTERP, dest, VTABLE_clone(INTERP, arg_flags));
-
-        if (!PMC_IS_NULL(return_flags))
-            SET_ATTR_return_flags(INTERP, dest, VTABLE_clone(INTERP, return_flags));
 
         if (hash) {
             Hash *dest_hash = get_hash(INTERP, dest);

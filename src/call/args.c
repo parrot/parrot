@@ -1590,11 +1590,11 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGM
         PMC * temp;
 
         /* Store raw signature */
-        GETATTR_CallSignature_return_flags(interp, parent, temp);
-        SETATTR_CallSignature_return_flags(interp, tailcall, temp);
+        GETATTR_Context_return_flags(interp, parent, temp);
+        SETATTR_Context_return_flags(interp, tailcall, temp);
 
-        // FIXME GETATTR_CallSignature_current_cont(interp, parent, temp);
-        // FIXME SETATTR_CallSignature_current_cont(interp, tailcall, temp);
+        // FIXME GETATTR_Context_current_cont(interp, parent, temp);
+        // FIXME SETATTR_Context_current_cont(interp, tailcall, temp);
         PARROT_GC_WRITE_BARRIER(interp, tailcall);
     }
 }

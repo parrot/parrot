@@ -65,6 +65,8 @@ pmclass Context provides array provides hash auto_attrs {
 
     ATTR PMC    *continuation;          /* Reusable continuation */
 
+    ATTR PMC    *return_flags;         /* Integer array of return flags */
+
 /*
 
 =item C<void init()>
@@ -118,6 +120,9 @@ Mark any referenced strings and PMCs.
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_sig(INTERP, SELF, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        GET_ATTR_return_flags(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         /* We don't keep reusable continuation alive. It will keep too many
@@ -211,6 +216,8 @@ return current Namespace
             GET_ATTR_current_cont(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
             GET_ATTR_current_namespace(INTERP, SELF, value);
+        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "return_flags")))
+            GET_ATTR_return_flags(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
             GET_ATTR_handlers(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_HLL"))) {
@@ -228,6 +235,34 @@ return current Namespace
                 EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
 
         return value;
+    }
+
+/*
+
+=item C<void set_attr_str(STRING *key, PMC *value)>
+
+Set a PMC value for an attribute by string name.
+
+=over
+
+=item return_flags
+
+Stores a set of flags for the call signature return arguments, an array
+of integers.
+
+=back
+
+=cut
+
+*/
+
+    VTABLE void set_attr_str(STRING *key, PMC *value) {
+        if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "return_flags"))) {
+            SET_ATTR_return_flags(INTERP, SELF, value);
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
     }
 
 /*
