@@ -37,18 +37,12 @@ PARROT_CAN_RETURN_NULL
 static void * find_handle_entry(ARGIN(const void *handle))
         __attribute__nonnull__(1);
 
-static void push_handle_entry(ARGIN(void *handle))
-        __attribute__nonnull__(1);
-
-static void remove_handle_entry(ARGIN(void *handle))
-        __attribute__nonnull__(1);
-
+static void push_handle_entry(ARGIN_NULLOK(void *handle));
+static void remove_handle_entry(ARGIN_NULLOK(void *handle));
 #define ASSERT_ARGS_find_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_push_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_remove_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_push_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_remove_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -65,8 +59,10 @@ struct handle_entry {
 struct handle_entry *handle_list = NULL;
 
 static void
-push_handle_entry(ARGIN(void *handle))
+push_handle_entry(ARGIN_NULLOK(void *handle))
 {
+    ASSERT_ARGS(push_handle_entry)
+
     struct handle_entry *e;
 
     e = (struct handle_entry *) malloc(sizeof (struct handle_entry));
@@ -84,6 +80,8 @@ PARROT_CAN_RETURN_NULL
 static void *
 find_handle_entry(ARGIN(const void *handle))
 {
+    ASSERT_ARGS(find_handle_entry)
+
     const struct handle_entry *e;
 
     for (e = handle_list; e; e = e->next) {
@@ -95,8 +93,10 @@ find_handle_entry(ARGIN(const void *handle))
 }
 
 static void
-remove_handle_entry(ARGIN(void *handle))
+remove_handle_entry(ARGIN_NULLOK(void *handle))
 {
+    ASSERT_ARGS(remove_handle_entry)
+
     if (handle_list) {
         if (handle_list->handle == handle) {
             struct handle_entry * const p = handle_list;

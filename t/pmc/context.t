@@ -22,7 +22,7 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
 .sub main :main
     .include 'test_more.pir'
 
-    plan(20)
+    plan(19)
 
     test_new()
 
@@ -86,10 +86,6 @@ TODO: Implement real tests when CallContext PMC will be migrated to use ATTRibut
     $P0 = getattribute ctx, 'current_cont'
     $I0 = isa $P0, 'Continuation'
     ok($I0, 'Got CallContext.current_cont')
-
-    $P0 = getattribute ctx, 'current_object'
-    $I0 = isa $P0, 'Foo'
-    ok($I0, 'Got CallContext.current_object')
 
     $P0 = getattribute ctx, 'current_namespace'
     ok($P0, 'Got CallContext.current_namespace')

@@ -47,7 +47,6 @@ pmclass Context provides array provides hash auto_attrs {
     /* for now use a return continuation PMC */
     ATTR PMC      *handlers;           /* local handlers for the context */
     ATTR PMC      *current_cont;       /* the return continuation PMC */
-    ATTR PMC      *current_object;     /* current object if a method call */
     ATTR PMC      *current_namespace;  /* The namespace we're currently in */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR PMC      *current_sig;        /* temporary CallContext PMC for active call */
@@ -113,9 +112,6 @@ Mark any referenced strings and PMCs.
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_cont(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_object(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_namespace(INTERP, SELF, tmp);
@@ -189,10 +185,6 @@ return list of ExceptioHandlers
 
 return current Continuation
 
-=item current_object
-
-return current Object (if in method call)
-
 =item current_namespace
 
 return current Namespace
@@ -217,8 +209,6 @@ return current Namespace
             GET_ATTR_current_sub(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
             GET_ATTR_current_cont(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
-            GET_ATTR_current_object(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
             GET_ATTR_current_namespace(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -643,30 +643,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "same method name in two namespaces" );
 .namespace []
 .sub _main :main
     print "ok\n"
-.end
-CODE
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
-
-.sub _main :main
-    .local pmc A
-
-    newclass A, "A"
-    new A, ['A']
-    A."foo"()
-    end
-.end
-
-.namespace ["A"]
-
-.sub foo :method
-    .include "interpinfo.pasm"
-    $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
-    eq_addr self, $P0, ok
-    print "not "
-ok: print "ok\n"
 .end
 CODE
 ok

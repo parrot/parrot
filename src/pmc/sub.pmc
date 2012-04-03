@@ -376,7 +376,6 @@ Invokes the subroutine.
     VTABLE opcode_t *invoke(void *next) {
         PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
-        PMC *object;
 
         /* plain subroutine call
          * create new context, place it in interpreter */
@@ -418,10 +417,6 @@ Invokes the subroutine.
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
         context = Parrot_set_new_context(INTERP, sub->n_regs_used);
-
-        /* Preserve object */
-        // FIXME object = Parrot_pcc_get_object(INTERP, signature);
-        // Parrot_pcc_set_object(INTERP, context, object);
 
         Parrot_pcc_set_sub(INTERP, context, SELF);
         Parrot_pcc_set_continuation(INTERP, context, ccont);
