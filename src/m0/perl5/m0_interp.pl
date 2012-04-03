@@ -256,9 +256,9 @@ sub i {
 sub n {
     if (scalar(@_) == 2) {
         my ($cf, $reg) = @_;
-        return unpack('f', $cf->[$reg]);
+        return unpack('d', $cf->[$reg]);
     }
-    return pack('f', $_[0] );
+    return pack('d', $_[0] );
 }
 
 
