@@ -1591,6 +1591,7 @@ src/call/args$(O) : \
 	src/call/args.c \
 	src/call/args.str \
 	$(INC_PMC_DIR)/pmc_key.h \
+	$(INC_PMC_DIR)/pmc_callsignature.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h
 
 src/call/context_accessors$(O): $(PARROT_H_HEADERS) \
@@ -1601,7 +1602,9 @@ src/call/pcc$(O) : $(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h \
 	src/call/pcc.c \
 	src/call/pcc.str \
-	$(INC_PMC_DIR)/pmc_key.h $(INC_PMC_DIR)/pmc_continuation.h
+	$(INC_PMC_DIR)/pmc_key.h \
+	$(INC_PMC_DIR)/pmc_callsignature.h \
+	$(INC_PMC_DIR)/pmc_continuation.h
 
 src/call/context$(O) : $(PARROT_H_HEADERS) \
 	src/call/context.c \
