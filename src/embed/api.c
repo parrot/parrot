@@ -626,13 +626,11 @@ Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, ARGMOD(Parrot_PMC ctx))
 {
     ASSERT_ARGS(Parrot_api_reset_call_signature)
     EMBED_API_CALLIN(interp_pmc, interp)
-/* FIXME
-    STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
+    STRING * const callcontext = Parrot_str_new(interp, "CallSignature", 0);
     if (!VTABLE_isa(interp, ctx, callcontext))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Not a valid CallContext");
+            "Not a valid CallSignature");
     VTABLE_morph(interp, ctx, PMCNULL);
-*/
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
