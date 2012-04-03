@@ -376,7 +376,6 @@ Invokes the subroutine.
     VTABLE opcode_t *invoke(void *next) {
         PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
-        PMC *object;
 
         /* plain subroutine call
          * create new context, place it in interpreter */
