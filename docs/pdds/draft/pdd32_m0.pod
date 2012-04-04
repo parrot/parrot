@@ -352,22 +352,22 @@ Set C<*$1> to whatever is in C<*$2>.  C<$3> is ignored.
 
 Set C<*$1> to C<$2> * 256 + C<$3>.
 
-=item * deref_i - dereference a integer register
+=item * deref_i - dereference a register to a integer register
 
 Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
 whatever's at C<*$2[ *$3 ]>.
 
-=item * deref_n - dereference a numeric register
+=item * deref_n - dereference a register to a numeric register
 
 Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
 whatever's at C<*$2[ *$3 ]>.
 
-=item * deref_s - dereference a string register
+=item * deref_s - dereference a register to a string register
 
 Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
 whatever's at C<*$2[ *$3 ]>.
 
-=item * deref_p - dereference a pointer register
+=item * deref_p - dereference a register to a pointer register
 
 Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
 whatever's at C<*$2[ *$3 ]>.
