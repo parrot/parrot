@@ -10,15 +10,15 @@
 .bytecode
 
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     set_imm I0, 0, 1
     print_s I0, S0, x
 
     set_imm N0, 0,  4
-    deref   N0, CONSTS, N0
+    deref_n N0, CONSTS, N0
 
     set_imm N1, 0,  4
-    deref   N1, CONSTS, N1
+    deref_n N1, CONSTS, N1
     sub_i   N0, N0, N1
 
     goto_if set_ref_nok, N0
@@ -26,12 +26,12 @@
 
 set_ref_nok:
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 set_ref_ok:
     set_imm S0, 0, 2
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 # This code isn't really PASM, but the highlighting works well.

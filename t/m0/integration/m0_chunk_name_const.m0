@@ -9,15 +9,15 @@
     set_imm I0, 0, 1
     set_imm I1, 0, 0
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     set_imm S1, 0, 2
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     set_imm P0, 0, 0
-    deref   P0, CONSTS, P0
+    deref_p P0, CONSTS, P0
     goto_chunk P0, I1, x
 
 .chunk "the_second_chunk"
@@ -27,11 +27,11 @@
 .metadata
 .bytecode
     set_imm S1, 0, 1
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     set_imm P0, 0, 0
-    deref   P0, CONSTS, P0
+    deref_p P0, CONSTS, P0
     goto_chunk P0, I1, x
 
 .chunk "chunk3"
@@ -41,11 +41,11 @@
 .metadata
 .bytecode
     set_imm S1, 0, 1
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     set_imm P0, 0, 0
-    deref   P0, CONSTS, P0
+    deref_p P0, CONSTS, P0
     goto_chunk P0, I1, x
 
 .chunk "4thchunk"
@@ -54,7 +54,7 @@
 .metadata
 .bytecode
     set_imm S1, 0, 0
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     exit    I1, x, x

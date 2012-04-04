@@ -20,7 +20,7 @@
 
     set_imm I0, 0, 1
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     
     ##################################
@@ -30,14 +30,14 @@ hash_calc_init:
 
     # set up some constants for debugging output
     set_imm S10, 0, 5
-    deref   S10, CONSTS, S10
+    deref_s S10, CONSTS, S10
     set_imm S11, 0, 6
-    deref   S11, CONSTS, S11
+    deref_s S11, CONSTS, S11
     set_imm S12, 0, 7
-    deref   S12, CONSTS, S12
+    deref_s S12, CONSTS, S12
 
     set_imm S0, 0, 3
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
 
     # I1 = number of bytes in string
     set_imm I1, 0, 0
@@ -72,7 +72,7 @@ hash_loop_start:
     set_imm I10, 0, 1
     print_i I0, I10, x
     set_imm S11, 0, 6
-    deref   S11, CONSTS, S11
+    deref_s S11, CONSTS, S11
     print_s I0, S11, x
     print_i I0, I3, x
     print_s I0, S12, x
@@ -117,7 +117,7 @@ end_debug_3:
     set_imm I10, 0, 4
     print_i I0, I10, x
     set_imm S11, 0, 8
-    deref   S11, CONSTS, S11
+    deref_s S11, CONSTS, S11
     print_s I0, S11, x
     print_i I0, I4, x
     print_s I0, S12, x
@@ -137,7 +137,7 @@ hash_loop_end:
     # I4 contains the calculated hash
     # store known-good hash in I1
     set_imm I1, 0, 4
-    deref   I1, CONSTS, I1
+    deref_i I1, CONSTS, I1
 
     sub_i   I1, I1, I4
 
@@ -154,7 +154,7 @@ hash_test_ok:
     goto print_result, x
     
 print_result:
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 # This code isn't really PASM, but the highlighting works well.

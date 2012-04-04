@@ -8,11 +8,11 @@
 noop    x, x, x
 # S0 = "1..1"
 set_imm S0, 0,      0
-deref   S0, CONSTS, S0
+deref_s S0, CONSTS, S0
 noop    x, x, x
 # S1 = "ok 1 noop doesn't do anything"
 set_imm S1, 0, 1
-deref   S1, CONSTS, S1
+deref_s S1, CONSTS, S1
 noop    x, x, x
 # I0 = 1 (stdout)
 set_imm I0, 0, 1

@@ -8,7 +8,7 @@
 .bytecode
 
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     set_imm I0, 0, 1
     print_s I0, S0, x
 
@@ -23,12 +23,12 @@
 
 multi_nok:
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 multi_ok:
     set_imm S0, 0, 2
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     

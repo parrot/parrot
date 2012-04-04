@@ -9,9 +9,9 @@
 label0:
 label333:
 label1:   set_imm S0, 0, 0
-          deref   S0, CONSTS, S0
+          deref_s S0, CONSTS, S0
 label2:   set_imm S1, 0, 1
-          deref   S1, CONSTS, S1
+          deref_s S1, CONSTS, S1
           set_imm I0, 0, 1
 label_99: print_s I0, S0, 42
 label:    print_s I0, S1, 42

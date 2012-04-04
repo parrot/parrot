@@ -12,12 +12,12 @@
 
     set_imm I0, 0, 0
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     # I1 is the arg count 
     set_imm I1, 0, ARGC
-    deref   I1, INTERP, I1
+    deref_i I1, INTERP, I1
 
     # I2 is the expected arg count
     set_imm I2, 0, 6
@@ -28,13 +28,13 @@
 
 argc_nok:
     set_imm S0, 0, 3
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     goto    argv_test, x
 
 argc_ok:
     set_imm S0, 0, 2
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     goto    argv_test, x
 
@@ -44,20 +44,20 @@ argv_test:
     set_imm I0, 0, 0
     set_imm I1, 0, 1
     set_imm S0, 0, ARGV
-    deref   S0, INTERP, S0
-    deref   S0, S0, I1
+    deref_s S0, INTERP, S0
+    deref_s S0, S0, I1
 
     # TODO: test S0 eq 'kittens'
 
 argv_nok:
     set_imm S0, 0, 5
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     goto    end, x
 
 argv_ok:
     set_imm S0, 0, 4
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     goto    end, x
 

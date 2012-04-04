@@ -32,11 +32,11 @@
 
     set_imm I0, 0, 1
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
     # print "ok 1 control flow in 'caller' at start"
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     # print value of I23
@@ -44,7 +44,7 @@
 
     # check that I23 == 9999
     set_imm I1, 0, 8
-    deref   I1, CONSTS, I1
+    deref_i I1, CONSTS, I1
     
     sub_i   I1, I1, I23
     goto_if preinvoke_nok, I1
@@ -52,17 +52,17 @@
 
 preinvoke_nok:
     set_imm S1, 0, 6
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
 preinvoke_ok:
     set_imm S1, 0, 7
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
     
     print_i I0, I23, x
     set_imm S2, 0, 9
-    deref   S2, CONSTS, S2
+    deref_s S2, CONSTS, S2
     print_s I0, S2, x
 
     # create a new call frame
@@ -134,7 +134,7 @@ init_cf_pc:
 post_set:
     # put the name of the target chunk into S0
     set_imm P0, 0, 3
-    deref   P0, CONSTS, P0
+    deref_p P0, CONSTS, P0
     # put the target PC into I0
     set_imm I0, 0, 0
     goto_chunk P0, I0, x
@@ -171,12 +171,12 @@ invoke_cf:
 
     # print "caller at end "
     set_imm S3, 0, 4
-    deref   S3, CONSTS, S3
+    deref_s S3, CONSTS, S3
     print_s I0, S3, x
 
     # print value I23
     set_imm S4, 0, 2
-    deref   S4, CONSTS, S4
+    deref_s S4, CONSTS, S4
     print_s I0, S4, 99
     print_i I0, I23, x
     print_s I0, S2, x
@@ -204,42 +204,42 @@ invoke_cf:
     # print "ok 3 "...
     set_imm I0, 0, 1
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     #print value I23
     set_imm I23, 99, 99
     set_imm I1,  0, 8
-    deref   I1, CONSTS, I1
+    deref_i I1, CONSTS, I1
     sub_i   I1, I1, I23
 
     goto_if callee_i23_nok, I1
     goto    callee_i23_ok, x
 
 callee_i23_nok:
-    set_imm  S1, 0, 9
-    deref    S1, CONSTS, S1
-    print_s  I0, S1, x
+    set_imm S1, 0, 9
+    deref_s S1, CONSTS, S1
+    print_s I0, S1, x
 
 callee_i23_ok:
-    set_imm  S1, 0, 6
-    deref    S1, CONSTS, S1
-    print_s  I0, S1, x
-    print_i  I0, I23, x
+    set_imm S1, 0, 6
+    deref_s S1, CONSTS, S1
+    print_s I0, S1, x
+    print_i I0, I23, x
 
     set_imm S1, 0, 7
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     set_imm S3, 0, 4
-    deref   S3, CONSTS, S3
+    deref_s S3, CONSTS, S3
 
     # poke into the parent call frame
     set_imm I2, 0, I23
-    deref   I2, PCF, I2
+    deref_i I2, PCF, I2
 
     set_imm I1, 0, 11
-    deref   I1, CONSTS, I1
+    deref_i I1, CONSTS, I1
     sub_i   I1, I1, I2
 
     goto_if caller_i23_nok, I1
@@ -247,28 +247,28 @@ callee_i23_ok:
 
 caller_i23_nok:
     set_imm S1, 0, 9
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
 caller_i23_ok:
     set_imm S1, 0, 10
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
     print_i I0, I2, x
     set_imm S1, 0, 7
-    deref   S1, CONSTS, S1
+    deref_s S1, CONSTS, S1
     print_s I0, S1, x
 
     # figure out return PC and chunk
     # P0 is the parent call frame
     set_imm I3, 0,  PCF
-    deref   P0, CF, I3
+    deref_p P0, CF, I3
     # I4 is the parent call frame's RETPC
     set_imm I4, 0,  RETPC
-    deref   I4, P0, I4
+    deref_i I4, P0, I4
     # S3 is the parent call frame's CHUNK
     set_imm I3, 0,  CHUNK
-    deref   I3, CONSTS, I3
+    deref_i I3, CONSTS, I3
     goto_chunk I3, I4, x
 
     # This code should be unreachable.

@@ -11,7 +11,7 @@
 .bytecode
 
     set_imm S0, 0, 0
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     set_imm I0, 0, 1
     print_s I0, S0, x
 
@@ -20,7 +20,7 @@
 
     # N1 = 99.0 (from constants segment)
     set_imm N1, 0, 3
-    deref   N1, CONSTS, N1
+    deref_n N1, CONSTS, N1
 
     # N2 = 99 (from convert_i_n)
     convert_i_n I2, N1, x
@@ -31,12 +31,12 @@
 
 convert_i_n_nok1:
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 convert_i_n_ok1:
     set_imm S0, 0, 2
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
     # I1 = -23
@@ -46,7 +46,7 @@ convert_i_n_ok1:
 
     # N1 = -23.0 (from constants segment)
     set_imm N1, 0, 4
-    deref   N1, CONSTS, N1
+    deref_n N1, CONSTS, N1
 
     # N2 = -23 (from convert_i_n)
     convert_i_n I2, N1, x
@@ -57,12 +57,12 @@ convert_i_n_ok1:
 
 convert_i_n_nok2:
     set_imm S0, 0, 1
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 convert_i_n_ok2:
     set_imm S0, 0, 5
-    deref   S0, CONSTS, S0
+    deref_s S0, CONSTS, S0
     print_s I0, S0, x
 
 # This code isn't really PASM, but the highlighting works well.
