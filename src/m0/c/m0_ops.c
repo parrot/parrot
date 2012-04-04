@@ -457,11 +457,11 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
 
                 case (M0_ITON):
-                    m0_op_convert_i_n( cf, &ops[pc] );
+                    m0_op_convert_n_i( cf, &ops[pc] );
                 break;
 
                 case (M0_NTOI):
-                    m0_op_convert_n_i( cf, &ops[pc] );
+                    m0_op_convert_i_n( cf, &ops[pc] );
                 break;
 
                 case (M0_EXIT):
