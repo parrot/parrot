@@ -21,6 +21,7 @@
     # N1 = 99.0 (from constants segment)
     set_imm N1, 0, 3
     deref   N1, CONSTS, N1
+    deref   N1, N1, 0
 
     # N2 = 99 (from convert_i_n)
     convert_i_n I2, N1, x
@@ -47,6 +48,7 @@ convert_i_n_ok1:
     # N1 = -23.0 (from constants segment)
     set_imm N1, 0, 4
     deref   N1, CONSTS, N1
+    deref   N1, N1, 0
 
     # N2 = -23 (from convert_i_n)
     convert_i_n I2, N1, x

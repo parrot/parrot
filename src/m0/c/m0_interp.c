@@ -69,6 +69,9 @@ new_interp() {
 M0_CallFrame *
 new_call_frame( M0_Interp *interp ) {
     M0_CallFrame *frame = malloc( sizeof (M0_CallFrame) );
+    unsigned int i;
+    for(i = 0; i < 256; i++)
+        frame->registers[i] = (uint64_t)0;
 
     /* this is a silly minimal hack for now */
     frame->registers[CHUNK]  = (uint64_t)interp->first_chunk;

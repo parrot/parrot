@@ -16,9 +16,11 @@
 
     set_imm N0, 0,  4
     deref   N0, CONSTS, N0
+    deref   N0, N0, 0
 
     set_imm N1, 0,  4
     deref   N1, CONSTS, N1
+    deref   N1, N1, 0
     sub_i   N0, N0, N1
 
     goto_if set_ref_nok, N0

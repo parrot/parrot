@@ -15,6 +15,7 @@
 
     set_imm N0, 0,  3
     deref   N0, CONSTS, N0
+    deref   N0, N0, 0
     set     N1, N0, x
     set_imm N0, 0,  99
     sub_i   N0, N0, N1

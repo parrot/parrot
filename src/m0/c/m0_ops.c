@@ -11,25 +11,10 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
-M0_RegisterType get_register_type(const unsigned int register_number) {
-    M0_RegisterType reg_type = INVALID;
-    if (register_number <= 11)
-        reg_type = NAMED;
-    else if (12 <= register_number && register_number <= 72)
-        reg_type = INTEGER;
-    else if (73 <= register_number && register_number <= 133)
-        reg_type = NUMBER;
-    else if (134 <= register_number && register_number <= 194)
-        reg_type = STRING;
-    else if (195 <= register_number && register_number <= 255)
-        reg_type = POINTER;
-    return reg_type;
-}
-
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
-    frame->registers[ops[1]] = ops[2] * 256 + ops[3];
+    frame->registers[ops[1]] = (uint64_t)(ops[2] * 256 + ops[3]);
 }
 
 static void
@@ -43,28 +28,13 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ ref ];
             unsigned long         offset = frame->registers[ ops[3] ];
-            size_t size = sizeof(uint64_t);
-            int use_address = 0;
-            switch ( get_register_type(ops[1])) {
-              case STRING:
-              case POINTER:
-                use_address = 1;
-                break;
-              case NUMBER:
-                size = 4;
-                break;
-              default:
-                break;
-            }
-
-            frame->registers[ ops[1] ] = (uint64_t)0;
-            if (use_address)
-                memcpy(&frame->registers[ ops[1] ], &(consts->consts[offset]), size);
-            else
-                memcpy(&frame->registers[ ops[1] ], (consts->consts[offset]), size);
+            frame->registers[ ops[1] ] = (uint64_t)consts->consts[offset];
             break;
         }
         default:
+            if( ops[3] == 0) {
+                frame->registers[ ops[1] ] = (*(uint64_t*)(frame->registers[ ops[2] ]));
+            }
             /* XXX: the rest of the system has non-uniform array handling */
             break;
     }
@@ -81,56 +51,59 @@ static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", (int)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%d", (unsigned int)frame->registers[ ops[2] ] );
 }
 
 static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] +
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 + r3;
 }
 
 static void
 m0_op_add_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
-    float *r3 = (float*) &(frame->registers[ops[3]]);
-    float *result = (float*) &(frame->registers[ops[1]]);
-    frame->registers[ops[1]] = (uint64_t)0;
-    *result = *r2 + *r3;
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 + r3;
 }
 
 static void
 m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] -
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    unsigned int temp_result = r2 - r3;
+    frame->registers[ops[1]] = (uint16_t)0;
+    *result = temp_result;
 }
 
 static void
 m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
-    float *r3 = (float*) &(frame->registers[ops[3]]);
-    float *result = (float*) &(frame->registers[ops[1]]);
-    frame->registers[ops[1]] = (uint64_t)0;
-    *result = *r2 - *r3;
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 - r3;
 }
 
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
-    float *r1 = (float*) &(frame->registers[ops[1]]);
-    frame->registers[ops[1]] = (uint64_t)0;
+    double *r1 = (double*) &(frame->registers[ops[1]]);
     *r1 = (*r2);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
+    double *r2 = (double*) &(frame->registers[ops[2]]);
     int64_t *r1 = (int64_t*) &(frame->registers[ops[1]]);
     *r1 = *r2;
 }
@@ -151,52 +124,55 @@ m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_mult_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] *
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 * r3;
 }
 
 static void
 m0_op_mult_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
-    float *r3 = (float*) &(frame->registers[ops[3]]);
-    float *result = (float*) &(frame->registers[ops[1]]);
-    frame->registers[ops[1]] = (uint64_t)0;
-    *result = *r2 * *r3;
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 * r3;
 }
 
 static void
 m0_op_div_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] /
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
 }
 
 static void
 m0_op_div_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
-    float *r3 = (float*) &(frame->registers[ops[3]]);
-    float *result = (float*) &(frame->registers[ops[1]]);
-	frame->registers[ops[1]] = (uint64_t)0;
-	*result = *r2 / *r3;
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
 }
 
 static void
 m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] %
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 % r3;
 }
 
 static void
 m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    float *r2 = (float*) &(frame->registers[ops[2]]);
-    float *r3 = (float*) &(frame->registers[ops[3]]);
-    float *result = (float*) &(frame->registers[ops[1]]);
-	frame->registers[ops[1]] = (uint64_t)0;
-	*result = (int)(*r2) % (int)(*r3);
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+	*result = (int)(r2) % (int)(r3);
 }
 
 static void
