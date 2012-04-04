@@ -200,7 +200,7 @@ m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = (uint64_t)frame->regs_ni.n[ops[2]] %
+    frame->regs_ni.n[ops[1]] = (uint64_t)frame->regs_ni.n[ops[2]] %
         (uint64_t)frame->regs_ni.n[ops[3]];
 }
 

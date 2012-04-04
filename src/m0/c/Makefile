@@ -38,6 +38,7 @@ test: ../../../t/m0/integration/*.m0b
 
 clean:
 	rm -f *.o m0
+	rm ../../../t/m0/integration/*.m0b
 
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
