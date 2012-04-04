@@ -27,9 +27,102 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ ref ];
-            unsigned long         offset = frame->registers[ ops[3] ];
+            unsigned long         offset = frame->regs_ni.i[ ops[3] ];
 
-            frame->regs_ni.n[ ops[1] ]   = (uint64_t)consts->consts[ offset ];
+            frame->regs_ni.i[ ops[1] ]   = *(uint64_t *)consts->consts[ offset ];
+            //memcpy(&frame->regs_ni.i[ops[1]], (uint64_t *)consts->consts[ offset ], sizeof(uint64_t));
+            break;
+        }
+
+        default:
+            /* XXX: the rest of the system has non-uniform array handling */
+            break;
+    }
+}
+
+static void
+m0_op_deref_iii( M0_CallFrame *frame, const unsigned char *ops )
+{
+    unsigned char ref = ops[2];
+
+    switch (ref) {
+        case CONSTS:
+        {
+            M0_Constants_Segment *consts =
+                (M0_Constants_Segment *)frame->registers[ref];
+            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+
+            frame->regs_ni.i[ops[1]]     = *(uint64_t *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (uint64_t *)consts->consts[offset], sizeof(uint64_t));
+            break;
+        }
+
+        default:
+            /* XXX: the rest of the system has non-uniform array handling */
+            break;
+    }
+}
+
+static void
+m0_op_deref_iiI( M0_CallFrame *frame, const unsigned char *ops )
+{
+    unsigned char ref = ops[2];
+
+    switch (ref) {
+        case CONSTS:
+        {
+            M0_Constants_Segment *consts =
+                (M0_Constants_Segment *)frame->registers[ref];
+            const unsigned long   offset = (unsigned long)ops[3];
+ 
+            frame->regs_ni.i[ops[1]]     = *(uint64_t *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (uint64_t *)consts->consts[offset], sizeof(uint64_t));
+            break;
+        }
+
+        default:
+            /* XXX: the rest of the system has non-uniform array handling */
+            break;
+    }
+}
+
+static void
+m0_op_deref_Nii( M0_CallFrame *frame, const unsigned char *ops )
+{
+    unsigned char ref = ops[2];
+
+    switch (ref) {
+        case CONSTS:
+        {
+            M0_Constants_Segment *consts =
+                (M0_Constants_Segment *)frame->registers[ref];
+            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+
+            frame->regs_ni.n[ops[1]]     = *(double *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(uint64_t));
+            break;
+        }
+
+        default:
+            /* XXX: the rest of the system has non-uniform array handling */
+            break;
+    }
+}
+
+static void
+m0_op_deref_NiI( M0_CallFrame *frame, const unsigned char *ops )
+{
+    unsigned char ref = ops[2];
+
+    switch (ref) {
+        case CONSTS:
+        {
+            M0_Constants_Segment *consts =
+                (M0_Constants_Segment *)frame->registers[ref];
+            const unsigned long   offset = (unsigned long)ops[3];
+
+            frame->regs_ni.n[ops[1]]     = *(double *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(uint64_t));
             break;
         }
 
