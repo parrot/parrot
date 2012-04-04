@@ -18,6 +18,12 @@ m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 }
 
 static void
+m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops  )
+{
+//    frame->regs_ni.i[ops[1]] = ops[2] * 256 + ops[3];
+}
+
+static void
 m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     unsigned char ref = ops[2];
@@ -77,6 +83,29 @@ m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
             const unsigned long   offset = frame->regs_ni.i[ops[3]];
 
             frame->regs_ps.s[ops[1]]     = (char *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (char *)consts->consts[offset], sizeof(char));
+            break;
+        }
+
+        default:
+            /* XXX: the rest of the system has non-uniform array handling */
+            break;
+    }
+}
+
+static void
+m0_op_deref_p( M0_CallFrame *frame, const unsigned char *ops )
+{
+    unsigned char ref = ops[2];
+
+    switch (ref) {
+        case CONSTS:
+        {
+            M0_Constants_Segment *consts =
+                (M0_Constants_Segment *)frame->registers[ref];
+            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+
+            frame->regs_ps.s[ops[1]]     = consts->consts[offset];
             //memcpy(&frame->regs_ni.i[ops[1]], (char *)consts->consts[offset], sizeof(char));
             break;
         }
@@ -321,6 +350,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_set_imm( cf, &ops[pc] );
                 break;
 
+                case (M0_SET_REF):
+                    m0_op_set_ref( cf, &ops[pc] );
+                break;
+
                 case (M0_DEREF_I):
                     m0_op_deref_i( cf, &ops[pc] );
                 break;
@@ -331,6 +364,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_DEREF_S):
                     m0_op_deref_s( cf, &ops[pc] );
+                break;
+
+                case (M0_DEREF_P):
+                    m0_op_deref_p( cf, &ops[pc] );
                 break;
 
                 case (M0_PRINT_S):

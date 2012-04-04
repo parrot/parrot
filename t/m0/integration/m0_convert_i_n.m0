@@ -19,8 +19,8 @@
     set_imm I1, 0, 99
 
     # N1 = 99.0 (from constants segment)
-    set_imm I1, 0, 3
-    deref_n N1, CONSTS, I1
+    set_imm I2, 0, 3
+    deref_n N1, CONSTS, I2
 
     # N2 = 99 (from convert_i_n)
     convert_i_n I2, N1, x

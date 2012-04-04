@@ -34,6 +34,7 @@ enum M0_OPS {
     M0_DEREF_I,
     M0_DEREF_N,
     M0_DEREF_S,
+    M0_DEREF_P,
     M0_SET_REF,
     M0_SET_BYTE,
     M0_GET_BYTE,

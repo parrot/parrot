@@ -657,6 +657,7 @@ set_imm
 deref_i
 deref_n
 deref_s
+deref_p
 set_ref
 set_byte
 get_byte
