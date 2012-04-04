@@ -29,8 +29,8 @@ m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
                 (M0_Constants_Segment *)frame->registers[ref];
             const unsigned long   offset = frame->regs_ni.i[ops[3]];
 
-            frame->regs_ni.i[ops[1]]     = *(uint64_t *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (uint64_t *)consts->consts[offset], sizeof(uint64_t));
+            frame->regs_ni.i[ops[1]]     = *(int64_t *)consts->consts[offset];
+            //memcpy(&frame->regs_ni.i[ops[1]], (int64_t *)consts->consts[offset], sizeof(int64_t));
             break;
         }
 
@@ -276,7 +276,7 @@ m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char *value = frame->regs_ps.s[ops[3]];
+    const char value  = *frame->regs_ps.s[ops[3]];
     const int  offset = frame->regs_ni.i[ops[2]];
     char      *target = frame->regs_ps.s[ops[1]];
     target[offset] = value;

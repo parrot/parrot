@@ -24,6 +24,18 @@ m0 : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 m0-debug : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug m0_mob.c m0_interp.c m0_ops.c
 
+test: ../../../t/m0/integration/*.m0b
+	for file in `ls ../../../t/m0/integration/*.m0b`; \
+	do \
+	./m0 $$file; \
+	done
+
+../../../t/m0/integration/*.m0b: ../../../t/m0/integration/*.m0
+	for file in `ls ../../../t/m0/integration/*.m0`; \
+	do \
+	../perl5/m0_assembler.pl $$file; \
+	done
+
 clean:
 	rm -f *.o m0
 
