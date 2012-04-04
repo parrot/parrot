@@ -654,7 +654,9 @@ sys_free
 copy_mem
 set
 set_imm
-deref
+deref_i
+deref_n
+deref_s
 set_ref
 set_byte
 get_byte

@@ -18,29 +18,6 @@ m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 }
 
 static void
-m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
-{
-    unsigned char ref = ops[2];
-
-    switch (ref) {
-        case CONSTS:
-        {
-            M0_Constants_Segment *consts =
-                (M0_Constants_Segment *)frame->registers[ ref ];
-            unsigned long         offset = frame->regs_ni.i[ ops[3] ];
-
-            frame->regs_ni.i[ ops[1] ]   = *(uint64_t *)consts->consts[ offset ];
-            //memcpy(&frame->regs_ni.i[ops[1]], (uint64_t *)consts->consts[ offset ], sizeof(uint64_t));
-            break;
-        }
-
-        default:
-            /* XXX: the rest of the system has non-uniform array handling */
-            break;
-    }
-}
-
-static void
 m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     unsigned char ref = ops[2];
@@ -77,7 +54,7 @@ m0_op_deref_n( M0_CallFrame *frame, const unsigned char *ops )
             const unsigned long   offset = frame->regs_ni.i[ops[3]];
 
             frame->regs_ni.n[ops[1]]     = *(double *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(uint64_t));
+            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(double));
             break;
         }
 
@@ -100,7 +77,7 @@ m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
             const unsigned long   offset = frame->regs_ni.i[ops[3]];
 
             frame->regs_ps.s[ops[1]]     = (char *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(uint64_t));
+            //memcpy(&frame->regs_ni.i[ops[1]], (char *)consts->consts[offset], sizeof(char));
             break;
         }
 
@@ -121,7 +98,7 @@ static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", frame->regs_ni.i[ops[2]] );
+    fprintf( stdout, "%ld", frame->regs_ni.i[ops[2]] );
 }
 
 static void
@@ -299,7 +276,7 @@ m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char value  = frame->regs_ps.s[ops[3]];
+    const char *value = frame->regs_ps.s[ops[3]];
     const int  offset = frame->regs_ni.i[ops[2]];
     char      *target = frame->regs_ps.s[ops[1]];
     target[offset] = value;
@@ -344,8 +321,16 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_set_imm( cf, &ops[pc] );
                 break;
 
-                case (M0_DEREF):
-                    m0_op_deref( cf, &ops[pc] );
+                case (M0_DEREF_I):
+                    m0_op_deref_i( cf, &ops[pc] );
+                break;
+
+                case (M0_DEREF_N):
+                    m0_op_deref_n( cf, &ops[pc] );
+                break;
+
+                case (M0_DEREF_S):
+                    m0_op_deref_s( cf, &ops[pc] );
                 break;
 
                 case (M0_PRINT_S):
