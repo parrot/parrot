@@ -114,14 +114,14 @@ static void
 m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%s", (char *)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%s", frame->regs_ps.s[ops[2]] );
 }
 
 static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", frame->regs_ni.i[ ops[2] ] );
+    fprintf( stdout, "%d", frame->regs_ni.i[ops[2]] );
 }
 
 static void
@@ -181,7 +181,7 @@ m0_op_goto( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
 {
-    if( frame->registers[ops[3]] )
+    if( frame->regs_ni.i[ops[3]] )
         frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
 }
 
@@ -263,6 +263,13 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]] <<
+        frame->registers[ops[3]];
+}
+
+static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
@@ -286,22 +293,15 @@ m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *op
 static void
 m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    exit((int)frame->registers[ops[1]]);
-}
-
-static void
-m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
-{
-    frame->registers[ops[1]] = frame->registers[ops[2]] <<
-        frame->registers[ops[3]];
+    exit(frame->regs_ni.i[ops[1]]);
 }
 
 static void
 m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char value  = frame->registers[ops[3]];
-    const int  offset = frame->registers[ops[2]];
-    char      *target = (char*) frame->registers[ops[1]];
+    const char value  = frame->regs_ps.s[ops[3]];
+    const int  offset = frame->regs_ni.i[ops[2]];
+    char      *target = frame->regs_ps.s[ops[1]];
     target[offset] = value;
 }
 
