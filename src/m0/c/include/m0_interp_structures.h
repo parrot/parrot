@@ -20,7 +20,7 @@ typedef union {
 
 typedef union {
     double       n[128];
-    long         i[128];
+    int64_t      i[128];
 } Regs_ni;
 
 typedef struct {

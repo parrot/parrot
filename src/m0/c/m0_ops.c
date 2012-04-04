@@ -169,7 +169,7 @@ m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = (int)frame->regs_ni.n[ops[2]];
+    frame->regs_ni.i[ops[1]] = (int64_t)frame->regs_ni.n[ops[2]];
 }
 
 static void
@@ -230,36 +230,36 @@ m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_and( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] &
-        frame->registers[ops[3]];
+    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] &
+        frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_or( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] |
-        frame->registers[ops[3]];
+    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] |
+        frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_xor( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] ^
-        frame->registers[ops[3]];
+    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] ^
+        frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] >>
-        frame->registers[ops[3]];
+    frame->regs_ni.i[ops[1]] = (uint64_t)frame->regs_ni.i[ops[2]] >>
+        frame->regs_ni.i[ops[3]];
 }
 
 static void
 m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = (int)frame->registers[ops[2]] >>
-        frame->registers[ops[3]];
+    frame->regs_ni.i[ops[1]] = (int64_t)frame->regs_ni.i[ops[2]] >>
+        frame->regs_ni.i[ops[3]];
 }
 
 static void
