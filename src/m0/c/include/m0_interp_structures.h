@@ -13,7 +13,11 @@ typedef struct {
     M0_Chunk       *last_chunk;
 } M0_Interp;
 
-/* TODO: it would be better if we bollow parrot's allocate_registers algorithm from src/call/context.c, and so ps and ni won't fight.
+/* TODO: it would be better if we bollow parrot's allocate_registers
+algorithm from src/call/context.c, and so ps and ni won't fight.
+Or just change union to struct for simplification. And I still likes
+Parrot's dynamic allocating registers, instead of a fixed size
+number 128. */
 typedef union {
     void        *p[128];
     char        *s[128];
