@@ -254,7 +254,7 @@ sub archive_parrot_docsx {
       stop("Unable to commit to 'parrot-docsx'");
 
     print "\n== PUSHING 'PARROT-DOCSX' ==\n";
-    system('git', 'push', 'origin master') == 0 or
+    system('git', 'push', 'origin gh-pages') == 0 or
       stop("Unable to push updates to 'parrot-docsx' master");
 
     chdir $parrot_dir;
