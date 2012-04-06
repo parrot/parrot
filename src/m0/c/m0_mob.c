@@ -220,18 +220,13 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
 
         for (i = 0; i < const_count; i++) {
             const unsigned long length   = read_long_from_stream( stream );
-			const char         *constant = NULL;
-			if (length <= 8) {
-				constant = read_from_stream( stream, length );
-			} else {
-				int string_len = read_long_from_stream(stream);
-				int encoding   = read_long_from_stream(stream);
-				if (encoding == 0) {
-					constant = (char *)read_from_stream(stream, string_len);
-				} else {
-					constant = read_from_stream(stream, string_len);
-				}
-			}
+            const char         *constant = (char *) read_from_stream( stream, length);
+            if (length > 8) {
+                int encoding   = *(long *)&(constant[4]);
+                if (encoding == 0) {
+                    constant = (char *) &(constant[8]);
+                }
+            }
 
             if (constant)
                 segment->consts[i] = constant;

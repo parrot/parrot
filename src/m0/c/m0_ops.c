@@ -44,7 +44,7 @@ static void
 m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%s", (char *)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%s", (char *)(frame->registers[ ops[2] ] + 8 ));
 }
 
 static void
