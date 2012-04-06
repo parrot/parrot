@@ -287,6 +287,13 @@ m0_op_get_word( M0_CallFrame *frame, const unsigned char *ops )
     memcpy(target, &src[offset * 4], 4*sizeof(char));
 }
 
+static void
+m0_op_gc_alloc( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const int  bytes = frame->registers[ops[2]];
+    void *ptr    = malloc( sizeof(char) * bytes );
+    frame->registers[ops[1]] = (uint64_t) ptr;
+}
 
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
@@ -420,12 +427,17 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 case (M0_GET_WORD):
                     m0_op_get_word( cf, &ops[pc] );
                 break;
+
                 case (M0_ITON):
                     m0_op_convert_i_n( cf, &ops[pc] );
                 break;
 
                 case (M0_NTOI):
                     m0_op_convert_n_i( cf, &ops[pc] );
+                break;
+
+                case (M0_GC_ALLOC):
+                    m0_op_gc_alloc( cf, &ops[pc]);
                 break;
 
                 case (M0_EXIT):
