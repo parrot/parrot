@@ -254,6 +254,15 @@ m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_set_word( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char* value  = (char*)&frame->registers[ops[3]];
+    const int  offset = frame->registers[ops[2]];
+    char      *target = (char*) frame->registers[ops[1]];
+    memcpy(&target[4*offset],value,4*sizeof(char));
+}
+
+static void
 m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
 {
     frame->registers[ops[1]] = frame->registers[ops[2]];
@@ -266,6 +275,16 @@ m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
     const int  offset = frame->registers[ops[2]];
     char      *target = (char*)&frame->registers[ops[1]];
     *target = (char)src[offset];
+}
+
+static void
+m0_op_get_word( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char *src   = (char*)frame->registers[ops[2]];
+    const int  offset = frame->registers[ops[3]];
+    char      *target = (char*)&frame->registers[ops[1]];
+    frame->registers[ops[1]] = (uint64_t)0;
+    memcpy(target, &src[offset * 4], 4*sizeof(char));
 }
 
 
@@ -387,6 +406,9 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_set_byte( cf, &ops[pc] );
                 break;
 
+                case (M0_SET_WORD):
+                    m0_op_set_word( cf, &ops[pc] );
+                break;
                 case (M0_SET):
                     m0_op_set( cf, &ops[pc] );
                 break;
@@ -395,6 +417,9 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_get_byte( cf, &ops[pc] );
                 break;
 
+                case (M0_GET_WORD):
+                    m0_op_get_word( cf, &ops[pc] );
+                break;
                 case (M0_ITON):
                     m0_op_convert_i_n( cf, &ops[pc] );
                 break;
