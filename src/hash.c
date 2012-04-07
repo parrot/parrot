@@ -224,10 +224,11 @@ Parrot_hash_pointer(ARGIN_NULLOK(const void * const p), size_t hashval)
 
     {
         unsigned char *c = (unsigned char *)&hashval;
-        unsigned int i, j;
+        unsigned int i;
         for (i = 0; i < sizeof hashval; i++) {
             /* swap bitsex of every byte */
             unsigned char tmp = 0;
+            unsigned int j;
             for (j = 0; j < CHAR_BIT; j++)
                 tmp |= (0x1 & c[i] >> j) << (CHAR_BIT - j - 1);
             c[i] = tmp;
@@ -1629,7 +1630,7 @@ Parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
           case enum_type_undef:
           case enum_type_ptr:
           case enum_type_INTVAL:
-            valtmp = (void *)_bucket->value;
+            valtmp = _bucket->value;
             break;
 
           default:
