@@ -40,7 +40,7 @@ main( int argc, const char *argv[]) {
         exit(1);
 
     (*interp)[ARGC] = argc - 1;
-    (*interp)[ARGV] = (uint64_t)argv;
+    (*interp)[ARGV] = (uint64_t)&(argv[1]);
 
     if (argc < 2) {
         fprintf( stderr, "Usage: m0 <filename.mob>\n" );
