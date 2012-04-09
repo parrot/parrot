@@ -118,7 +118,7 @@ validate_mob_version( M0_Interp *interp, FILE *stream ) {
     int version = read_int_from_stream( stream );
 
     if (version == 0) {
-        ((uint64_t*)(*interp)[CONFIG])[CFG_M0V] = 0;
+        ((uint64_t*)(*interp)[CONFIG])[CFG_M0V] = (uint64_t)0;
         return 1;
     }
 
