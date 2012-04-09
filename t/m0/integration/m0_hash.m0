@@ -138,7 +138,8 @@ hash_loop_end:
     # store known-good hash in I1
     set_imm I1, 0, 4
     deref   I1, CONSTS, I1
-    deref   I1, I1, 0
+    set_imm I2,  0, 0
+    deref   I1, I1, I2
 
     sub_i   I1, I1, I4
 
