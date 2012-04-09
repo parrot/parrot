@@ -273,8 +273,8 @@ m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char *src   = (char*)frame->registers[ops[3]];
-    const int  offset = frame->registers[ops[2]];
+    const char *src   = (char*)frame->registers[ops[2]];
+    const int  offset = frame->registers[ops[3]];
     char      *target = (char*)&frame->registers[ops[1]];
     *target = (char)src[offset];
 }
