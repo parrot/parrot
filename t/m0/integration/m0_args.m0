@@ -4,9 +4,10 @@
 0 "1..2\n"
 1 "\n"
 2 "ok 1 - arg count: got 6 arguments!\n"
-3 "not ok 1 -  arg count: didn't get 6 arguments\n"
+3 "not ok 1 -  arg count: didn't get 6 arguments (got "
 4 "ok 2 - arg contents: first argument was 'kittens'\n"
 5 "not ok 2 - arg contents: first argument was 'kittens' # TODO M0 doesn't support this yet \n"
+6 " arguments)\n"
 .metadata
 .bytecode
 
@@ -21,13 +22,18 @@
 
     # I2 is the expected arg count
     set_imm I2, 0, 6
-    sub_i   I1, I2, I1
+    sub_i   I2, I2, I1
     
-    goto_if argc_nok, I1   
+    goto_if argc_nok, I2
     goto    argc_ok, x
 
 argc_nok:
     set_imm S0, 0, 3
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    print_i I0, I1, x
+
+    set_imm S0, 0, 6
     deref   S0, CONSTS, S0
     print_s I0, S0, x
     goto    argv_test, x
