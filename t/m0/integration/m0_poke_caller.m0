@@ -45,7 +45,8 @@
     # check that I23 == 9999
     set_imm I1, 0, 8
     deref   I1, CONSTS, I1
-    deref   I1, I1, 0
+    set_imm I2, 0, 0
+    deref   I1, I1, I2
     
     sub_i   I1, I1, I23
     goto_if preinvoke_nok, I1
@@ -212,6 +213,8 @@ invoke_cf:
     set_imm I23, 99, 99
     set_imm I1,  0, 8
     deref   I1, CONSTS, I1
+    set_imm I2, 0, 0
+    deref   I1, I1, I2
     sub_i   I1, I1, I23
 
     goto_if callee_i23_nok, I1
@@ -241,6 +244,8 @@ callee_i23_ok:
 
     set_imm I1, 0, 11
     deref   I1, CONSTS, I1
+    set_imm I3, 0, 0
+    deref   I1, I1, I3
     sub_i   I1, I1, I2
 
     goto_if caller_i23_nok, I1
