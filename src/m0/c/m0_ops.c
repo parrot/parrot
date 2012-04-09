@@ -213,9 +213,10 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
+m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
+    M0_Interp *interp = (M0_Interp *)frame->registers[INTERP];
     M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
     while(chunk) {
         if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
@@ -234,7 +235,7 @@ m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *op
 }
 
 static void
-m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
+m0_op_exit(M0_CallFrame *frame, const unsigned char *ops )
 {
     exit((int)frame->registers[ops[1]]);
 }
@@ -416,7 +417,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
 
                 case (M0_GOTO_CHUNK):
-                    m0_op_goto_chunk( interp ,cf, &ops[pc] );
+                    m0_op_goto_chunk( cf, &ops[pc] );
                 break;
 
                 case (M0_SET_BYTE):
@@ -426,6 +427,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 case (M0_SET_WORD):
                     m0_op_set_word( cf, &ops[pc] );
                 break;
+
                 case (M0_SET):
                     m0_op_set( cf, &ops[pc] );
                 break;
@@ -453,8 +455,9 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 case (M0_SET_REF):
                     m0_op_set_ref( cf, &ops[pc]);
                 break;
+
                 case (M0_EXIT):
-                    m0_op_exit( interp, cf, &ops[pc]);
+                    m0_op_exit( cf, &ops[pc]);
                 break;
 
                 default:
