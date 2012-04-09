@@ -19,9 +19,10 @@ parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
 static int
 parse_mob_chunks(    M0_Interp *interp, FILE *stream );
 
-static void
+static M0_Interp *
 add_chunk( M0_Interp     *interp,   const    char *name,
-           unsigned long  chunk_id, unsigned long  name_length );
+           unsigned long  chunk_id, unsigned long  name_length,
+           M0_Chunk      *chunk);
 
 static M0_Constants_Segment *
 parse_mob_constants_segment( M0_Interp *interp, FILE *stream );
@@ -117,7 +118,7 @@ validate_mob_version( M0_Interp *interp, FILE *stream ) {
     int version = read_int_from_stream( stream );
 
     if (version == 0) {
-        interp->mob_version = 0;
+        ((uint64_t*)(*interp)[CONFIG])[CFG_M0V] = 0;
         return 1;
     }
 
@@ -127,11 +128,11 @@ validate_mob_version( M0_Interp *interp, FILE *stream ) {
 
 int
 parse_header_config( M0_Interp *interp, FILE *stream ) {
-    interp->ireg_size     = read_int_from_stream( stream );
-    interp->nreg_size     = read_int_from_stream( stream );
-    interp->opcode_t_size = read_int_from_stream( stream );
-    interp->pointer_size  = read_int_from_stream( stream );
-    interp->endianness    = read_int_from_stream( stream );
+    ((uint64_t*)(*interp)[CONFIG])[CFG_IREGSZ]     = read_int_from_stream( stream );
+    ((uint64_t*)(*interp)[CONFIG])[CFG_NREGSZ]     = read_int_from_stream( stream );
+    ((uint64_t*)(*interp)[CONFIG])[CFG_OPCODESZ]   = read_int_from_stream( stream );
+    ((uint64_t*)(*interp)[CONFIG])[CFG_PTRSZ]      = read_int_from_stream( stream );
+    ((uint64_t*)(*interp)[CONFIG])[CFG_ENDIANNESS] = read_int_from_stream( stream );
 
     return 1;
 }
@@ -144,6 +145,7 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
         const unsigned long seg_entry_count = read_long_from_stream( stream );
         const unsigned long seg_byte_count  = read_long_from_stream( stream );
         unsigned long       chunks_found    = 0;
+        M0_Chunk *last_chunk                = NULL;
         UNUSED(seg_byte_count);
 
         for (; chunks_found < seg_entry_count; chunks_found++) {
@@ -154,7 +156,7 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
 
             UNUSED(seg_offset);
 
-            add_chunk( interp, name, chunks_found, name_length);
+            last_chunk = add_chunk( interp, name, chunks_found, name_length, last_chunk);
         }
     }
 
@@ -162,23 +164,25 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
     return 1;
 }
 
-void
+M0_Interp *
 add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
-                                                unsigned long name_length) {
-    M0_Chunk *chunk    = malloc( sizeof (M0_Chunk) );
+                                                unsigned long name_length,
+                                                M0_Chunk *chunk) {
+    if (!chunk) {
+        chunk       = malloc( sizeof (M0_Chunk) );
+    } else {
+        chunk->next = malloc( sizeof (M0_Chunk) );
+        chunk       = chunk->next;
+    }
     chunk->id          = chunk_id;
     chunk->name        = name;
     chunk->name_length = name_length;
     chunk->next        = NULL;
 
-    if (!interp->first_chunk) {
-        interp->first_chunk = chunk;
-        interp->last_chunk  = chunk;
+    if (!(*interp)[CHUNKS]) {
+        (*interp)[CHUNKS] = (uint64_t)chunk;
     }
-    else {
-        interp->last_chunk->next = chunk;
-        interp->last_chunk       = chunk;
-    }
+    return chunk;
 }
 
 int
@@ -190,7 +194,7 @@ validate_segment_identifier( M0_Interp *interp, FILE *stream,
 
 int
 parse_mob_chunks( M0_Interp *interp, FILE *stream ) {
-    M0_Chunk *chunk = interp->first_chunk;
+    M0_Chunk *chunk = (M0_Chunk*)(*interp)[CHUNKS];
 
     while (chunk) {
         chunk->constants = parse_mob_constants_segment( interp, stream );

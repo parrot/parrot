@@ -32,11 +32,13 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
             break;
         }
         default:
-            if( ops[3] == 0) {
-                frame->registers[ ops[1] ] = (*(uint64_t*)(frame->registers[ ops[2] ]));
-            }
+        {
+            unsigned long         offset = frame->registers[ ops[3] ];
+            uint64_t * src = (uint64_t*)(frame->registers[ ops[2] ]);
+            frame->registers[ ops[1] ] = src[offset];
             /* XXX: the rest of the system has non-uniform array handling */
             break;
+        }
     }
 }
 
@@ -214,7 +216,7 @@ static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
-    M0_Chunk *chunk = interp->first_chunk;
+    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
     while(chunk) {
         if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
             frame->registers[CHUNK]  = (uint64_t)chunk;
@@ -293,6 +295,14 @@ m0_op_gc_alloc( M0_CallFrame *frame, const unsigned char *ops )
     const int  bytes = frame->registers[ops[2]];
     void *ptr    = malloc( sizeof(char) * bytes );
     frame->registers[ops[1]] = (uint64_t) ptr;
+}
+
+static void
+m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops )
+{
+    uint64_t *ptr    = (uint64_t *)frame->registers[ops[1]];
+    const int  offset = frame->registers[ops[2]];
+    ptr[offset] = frame->registers[ops[3]];
 }
 
 int
@@ -440,6 +450,9 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_gc_alloc( cf, &ops[pc]);
                 break;
 
+                case (M0_SET_REF):
+                    m0_op_set_ref( cf, &ops[pc]);
+                break;
                 case (M0_EXIT):
                     m0_op_exit( interp, cf, &ops[pc]);
                 break;
@@ -450,7 +463,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
             }
         }
-
+        cf = (M0_CallFrame*)cf->registers[CF];
         /* only branching ops definitely change the pc */
         if (pc == (const unsigned long)cf->registers[PC])
             cf->registers[PC] += 4;
