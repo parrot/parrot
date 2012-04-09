@@ -174,7 +174,7 @@ m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
     double r2 = *(double*)&frame->registers[ops[2]];
     double r3 = *(double*)&frame->registers[ops[3]];
     double *result = (double*) &(frame->registers[ops[1]]);
-	*result = (int)(r2) % (int)(r3);
+    *result = (int)(r2) % (int)(r3);
 }
 
 static void
