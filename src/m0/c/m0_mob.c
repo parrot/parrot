@@ -19,7 +19,7 @@ parse_mob_dirseg(    M0_Interp *interp, FILE *stream );
 static int
 parse_mob_chunks(    M0_Interp *interp, FILE *stream );
 
-static M0_Interp *
+static M0_Chunk *
 add_chunk( M0_Interp     *interp,   const    char *name,
            unsigned long  chunk_id, unsigned long  name_length,
            M0_Chunk      *chunk);
@@ -164,7 +164,7 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
     return 1;
 }
 
-M0_Interp *
+M0_Chunk *
 add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
                                                 unsigned long name_length,
                                                 M0_Chunk *chunk) {
