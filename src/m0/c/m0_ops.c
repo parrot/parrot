@@ -471,3 +471,6 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
     return 0;
 }
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

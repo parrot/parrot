@@ -52,3 +52,6 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf );
 
 #   define M0_OPS_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

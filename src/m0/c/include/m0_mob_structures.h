@@ -33,3 +33,6 @@ typedef struct M0_Chunk {
 
 #   define M0_MOB_STRUCTURES_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

@@ -8,3 +8,6 @@
 
 #   define M0_COMPILER_DEFINES_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

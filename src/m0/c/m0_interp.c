@@ -164,3 +164,6 @@ m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode )
 
     free( bytecode );
 }
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

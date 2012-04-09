@@ -1,5 +1,6 @@
 #ifndef M0_INTERP_STRUCTURES_H
 #   include "m0_mob_structures.h"
+#   include  "m0_debug_structures.h"
 #   include <stdint.h>
 
 typedef uint64_t M0_Config[8];
@@ -60,3 +61,6 @@ typedef enum {
 
 #   define M0_INTERP_STRUCTURES_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

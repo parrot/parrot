@@ -4,3 +4,6 @@
 
 #   define M0_INTERP_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/
