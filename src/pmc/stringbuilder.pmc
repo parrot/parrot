@@ -505,6 +505,7 @@ calculate_capacity(SHIM_INTERP, size_t needed)
 static void
 convert_encoding(PARROT_INTERP, STR_VTABLE * dest_encoding, STRING * buffer, size_t size_to_add)
 {
+    ASSERT_ARGS(convert_encoding)
     STRING * new_buffer;
     size_t total_size;
 
