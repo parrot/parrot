@@ -28,14 +28,19 @@ PARROT_CONST_FUNCTION
 static size_t calculate_capacity(PARROT_INTERP, size_t needed);
 
 static void convert_encoding(PARROT_INTERP,
-    STR_VTABLE * dest_encoding,
-    STRING * buffer,
+    ARGIN(STR_VTABLE *dest_encoding),
+    ARGMOD(STRING *buffer),
     size_t size_to_add)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer);
 
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_convert_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest_encoding) \
+    , PARROT_ASSERT_ARG(buffer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -482,8 +487,6 @@ Returns length of currently built string.
 
 Calculate capacity for string. We allocate double the amount needed.
 
-=back
-
 =cut
 
 */
@@ -502,8 +505,23 @@ calculate_capacity(SHIM_INTERP, size_t needed)
     return needed;
 }
 
+/*
+
+=item C<static void convert_encoding(PARROT_INTERP, STR_VTABLE *dest_encoding,
+STRING *buffer, size_t size_to_add)>
+
+Convert buffer content to the encoding specified and increase its size,
+reallocating it if needed.
+
+=back
+
+=cut
+
+*/
+
 static void
-convert_encoding(PARROT_INTERP, STR_VTABLE * dest_encoding, STRING * buffer, size_t size_to_add)
+convert_encoding(PARROT_INTERP, ARGIN(STR_VTABLE *dest_encoding),
+        ARGMOD(STRING *buffer), size_t size_to_add)
 {
     ASSERT_ARGS(convert_encoding)
     STRING * new_buffer;
