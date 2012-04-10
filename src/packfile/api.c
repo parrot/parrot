@@ -2502,7 +2502,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
                     "Could not reallocate buffer while reading packfile from PIO.\n");
         }
 
-        cursor = (char *)(program_code + program_size);
+        cursor = program_code + program_size;
     }
 
     return program_code;
