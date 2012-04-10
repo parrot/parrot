@@ -274,7 +274,7 @@ PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 
 /*
 
-=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile * pf)>
+=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile *pf)>
 
 Returns the size, in bytes, that a packfile will be if serialized
 
@@ -292,7 +292,7 @@ Deserialize a packfile which is stored in a STRING buffer
 
 PARROT_EXPORT
 INTVAL
-Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
+Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_serialized_size)
     return PackFile_pack_size(interp, pf);

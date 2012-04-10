@@ -692,9 +692,10 @@ STRING * Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
+INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
@@ -1023,7 +1024,8 @@ void PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
+void PackFile_Segment_dump(PARROT_INTERP,
+    ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
