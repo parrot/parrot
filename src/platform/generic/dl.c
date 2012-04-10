@@ -51,6 +51,20 @@ static void remove_handle_entry(ARGIN_NULLOK(void *handle));
 
 #ifdef PARROT_HAS_HEADER_DLFCN
 
+/*
+
+=item C<static void push_handle_entry(void *handle)>
+
+=item C<static void * find_handle_entry(const void *handle)>
+
+=item C<static void remove_handle_entry(void *handle)>
+
+Helper functions to load and unload libraries.
+
+=cut
+
+*/
+
 struct handle_entry {
     void *handle;
     struct handle_entry *next;
