@@ -11,16 +11,16 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
-#define CONST(i) ops[(i)]
-#define IREG(i) frame->regs_i[ops[(i)]]
-#define NREG(i) frame->regs_n[ops[(i)]]
-#define SREG(i) frame->regs_s[ops[(i)]]
-#define PREG(i) frame->regs_p[ops[(i)]]
+#define CONST(i) ops[i]
+#define IREG(i) frame->regs_i[ops[i]]
+#define NREG(i) frame->regs_n[ops[i]]
+#define SREG(i) frame->regs_s[ops[i]]
+#define PREG(i) frame->regs_p[ops[i]]
 
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
-    IREG(1) = ops[2] * 256 + ops[3];
+    IREG(1) = CONST(2) * 256 + CONST(3);
 }
 
 static void
@@ -32,7 +32,7 @@ m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops  )
 static void
 m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned char ref = ops[2];
+    unsigned char ref = CONST(2);
 
     switch (ref) {
         case CONSTS:
@@ -55,7 +55,7 @@ m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_deref_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned char ref = ops[2];
+    unsigned char ref = CONST(2);
 
     switch (ref) {
         case CONSTS:
@@ -77,7 +77,7 @@ m0_op_deref_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned char ref = ops[2];
+    unsigned char ref = CONST(2);
 
     switch (ref) {
         case CONSTS:
@@ -99,7 +99,7 @@ m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_deref_p( M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned char ref = ops[2];
+    unsigned char ref = CONST(2);
 
     switch (ref) {
         case CONSTS:
