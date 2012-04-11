@@ -264,7 +264,7 @@ m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    INT new_pc = IREG(2);
+    UINT new_pc = (UINT)IREG(2);
     M0_Chunk *chunk = interp->first_chunk;
     while(chunk) {
         if(strncmp( chunk->name, SREG(1), chunk->name_length) == 0) {
