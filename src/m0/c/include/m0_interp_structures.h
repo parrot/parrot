@@ -13,25 +13,18 @@ typedef struct {
     M0_Chunk       *last_chunk;
 } M0_Interp;
 
-/* TODO: it would be better if we bollow parrot's allocate_registers
-algorithm from src/call/context.c, and so ps and ni won't fight.
-Or just change union to struct for simplification. And I still likes
-Parrot's dynamic allocating registers, instead of a fixed size
-number 128. */
-typedef union {
-    void        *p[128];
-    char        *s[128];
-} Regs_ps;
+typedef long INT;
+typedef double NUM;
+typedef char * STRING;
+typedef void * POINTER;
 
-typedef union {
-    double       n[128];
-    int64_t      i[128];
-} Regs_ni;
-
+/* TODO: should change registers to context or any better name */
 typedef struct {
     uint64_t registers[12];
-    Regs_ni  regs_ni;
-    Regs_ps  regs_ps;
+    INT regs_i[256];
+    NUM regs_n[256];
+    STRING regs_s[256];
+    POINTER regs_p[256];
 } M0_CallFrame;
 
 enum CF_NAMED_REGS {

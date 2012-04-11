@@ -11,16 +11,22 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
+#define CONST(i) ops[(i)]
+#define IREG(i) frame->regs_i[ops[(i)]]
+#define NREG(i) frame->regs_n[ops[(i)]]
+#define SREG(i) frame->regs_s[ops[(i)]]
+#define PREG(i) frame->regs_p[ops[(i)]]
+
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
-    frame->regs_ni.i[ops[1]] = ops[2] * 256 + ops[3];
+    IREG(1) = ops[2] * 256 + ops[3];
 }
 
 static void
 m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops  )
 {
-//    frame->regs_ni.i[ops[1]] = ops[2] * 256 + ops[3];
+//    IREG(1) = ops[2] * 256 + ops[3];
 }
 
 static void
@@ -33,10 +39,9 @@ m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ref];
-            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+            const unsigned long   offset = IREG(3);
 
-            frame->regs_ni.i[ops[1]]     = *(int64_t *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (int64_t *)consts->consts[offset], sizeof(int64_t));
+            IREG(1)     = *(int64_t *)consts->consts[offset];
             break;
         }
 
@@ -57,10 +62,9 @@ m0_op_deref_n( M0_CallFrame *frame, const unsigned char *ops )
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ref];
-            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+            const unsigned long   offset = IREG(3);
 
-            frame->regs_ni.n[ops[1]]     = *(double *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (double *)consts->consts[offset], sizeof(double));
+            NREG(1)     = *(double *)consts->consts[offset];
             break;
         }
 
@@ -80,10 +84,9 @@ m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ref];
-            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+            const unsigned long   offset = IREG(3);
 
-            frame->regs_ps.s[ops[1]]     = (char *)consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (char *)consts->consts[offset], sizeof(char));
+            SREG(1)     = (char *)consts->consts[offset];
             break;
         }
 
@@ -103,10 +106,9 @@ m0_op_deref_p( M0_CallFrame *frame, const unsigned char *ops )
         {
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ref];
-            const unsigned long   offset = frame->regs_ni.i[ops[3]];
+            const unsigned long   offset = IREG(3);
 
-            frame->regs_ps.s[ops[1]]     = consts->consts[offset];
-            //memcpy(&frame->regs_ni.i[ops[1]], (char *)consts->consts[offset], sizeof(char));
+            PREG(1)     = consts->consts[offset];
             break;
         }
 
@@ -120,168 +122,152 @@ static void
 m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%s", frame->regs_ps.s[ops[2]] );
+    fprintf( stdout, "%s", SREG(2) );
 }
 
 static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%ld", frame->regs_ni.i[ops[2]] );
+    fprintf( stdout, "%ld", IREG(2) );
 }
 
 static void
 m0_op_print_n( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%.15g", frame->regs_ni.n[ ops[2] ] );
+    fprintf( stdout, "%.15g", NREG(2) );
 }
 
 static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] +
-       frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) + IREG(3);
 }
 
 static void
 m0_op_add_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] +
-       frame->regs_ni.n[ops[3]];
+    NREG(1) = NREG(2) + NREG(3);
 }
 
 static void
 m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] -
-       frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) - IREG(3);
 }
 
 static void
 m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] -
-       frame->regs_ni.n[ops[3]];
+    NREG(1) = NREG(2) - NREG(3);
 }
 
 
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = (double)frame->regs_ni.i[ops[2]];
+    NREG(1) = (double)IREG(2);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = (int64_t)frame->regs_ni.n[ops[2]];
+    IREG(1) = (int64_t)NREG(2);
 }
 
 static void
 m0_op_goto( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+    frame->registers[PC] = 4 * (256 * CONST(1) + CONST(2));
 }
 
 static void
 m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
 {
-    if( frame->regs_ni.i[ops[3]] )
-        frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+    if(IREG(3))
+        frame->registers[PC] = 4 * (256 * CONST(1) + CONST(2));
 }
 
 static void
 m0_op_mult_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] *
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) * IREG(3);
 }
 
 static void
 m0_op_mult_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] *
-        frame->regs_ni.n[ops[3]];
+    NREG(1) = NREG(2) * NREG(3);
 }
 
 static void
 m0_op_div_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] /
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) / IREG(3);
 }
 
 static void
 m0_op_div_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = frame->regs_ni.n[ops[2]] /
-        frame->regs_ni.n[ops[3]];
+    NREG(1) = NREG(2) / NREG(3);
 }
 
 static void
 m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] %
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) % IREG(3);
 }
 
 static void
 m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.n[ops[1]] = (uint64_t)frame->regs_ni.n[ops[2]] %
-        (uint64_t)frame->regs_ni.n[ops[3]];
+    NREG(1) = (uint64_t)NREG(2) % (uint64_t)NREG(3);
 }
 
 static void
 m0_op_and( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] &
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) & IREG(3);
 }
 
 static void
 m0_op_or( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] |
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) | IREG(3);
 }
 
 static void
 m0_op_xor( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = frame->regs_ni.i[ops[2]] ^
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = IREG(2) ^ IREG(3);
 }
 
 static void
 m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = (uint64_t)frame->regs_ni.i[ops[2]] >>
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = (uint64_t)IREG(2) >> IREG(3);
 }
 
 static void
 m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->regs_ni.i[ops[1]] = (int64_t)frame->regs_ni.i[ops[2]] >>
-        frame->regs_ni.i[ops[3]];
+    IREG(1) = (int64_t)IREG(2) >> IREG(3);
 }
 
 static void
 m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] <<
-        frame->registers[ops[3]];
+    IREG(1) = (int64_t)IREG(2) << IREG(3);
 }
 
 static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    uint64_t new_pc = frame->registers[ops[2]];
+    uint64_t new_pc = IREG(2);
     M0_Chunk *chunk = interp->first_chunk;
     while(chunk) {
-        if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
+        if(strncmp( chunk->name, SREG(1), chunk->name_length) == 0) {
             frame->registers[CHUNK]  = (uint64_t)chunk;
             frame->registers[CONSTS] = (uint64_t)chunk->constants;
             frame->registers[MDS]    = (uint64_t)chunk->metadata;
@@ -299,22 +285,40 @@ m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *op
 static void
 m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    exit(frame->regs_ni.i[ops[1]]);
+    exit(IREG(1));
 }
 
 static void
 m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char value  = *frame->regs_ps.s[ops[3]];
-    const int  offset = frame->regs_ni.i[ops[2]];
-    char      *target = frame->regs_ps.s[ops[1]];
+    const char value  = *frame->regs_s[ops[3]];
+    const int  offset = IREG(2);
+    char      *target = SREG(1);
     target[offset] = value;
 }
 
 static void
-m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
+m0_op_set_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]];
+    IREG(1) = IREG(2);
+}
+
+static void
+m0_op_set_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    NREG(1) = NREG(2);
+}
+
+static void
+m0_op_set_s( M0_CallFrame *frame, const unsigned char *ops )
+{
+    SREG(1) = SREG(2);
+}
+
+static void
+m0_op_set_p( M0_CallFrame *frame, const unsigned char *ops )
+{
+    PREG(1) = PREG(2);
 }
 
 static void
@@ -465,8 +469,20 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     m0_op_set_byte( cf, &ops[pc] );
                 break;
 
-                case (M0_SET):
-                    m0_op_set( cf, &ops[pc] );
+                case (M0_SET_I):
+                    m0_op_set_i( cf, &ops[pc] );
+                break;
+
+                case (M0_SET_N):
+                    m0_op_set_n( cf, &ops[pc] );
+                break;
+
+                case (M0_SET_S):
+                    m0_op_set_s( cf, &ops[pc] );
+                break;
+
+                case (M0_SET_P):
+                    m0_op_set_p( cf, &ops[pc] );
                 break;
 
                 case (M0_GET_BYTE):

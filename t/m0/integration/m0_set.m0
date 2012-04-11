@@ -13,9 +13,9 @@
     set_imm I0, 0, 1
     print_s I0, S0, x
 
-    set_imm N0, 0,  3
-    deref_n N0, CONSTS, N0
-    set     N1, N0, x
+    set_imm I0, 0,  3
+    deref_n N0, CONSTS, I0
+    set_n   N1, N0, x
     set_imm N0, 0,  99
     sub_n   N0, N0, N1
 

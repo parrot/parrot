@@ -652,7 +652,10 @@ gc_alloc
 sys_alloc
 sys_free
 copy_mem
-set
+set_i
+set_n
+set_s
+set_p
 set_imm
 deref_i
 deref_n

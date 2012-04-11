@@ -24,7 +24,7 @@ m0 : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 m0-debug : include/m0.h m0_interp.c m0_mob.c m0_ops.c
 	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug m0_mob.c m0_interp.c m0_ops.c
 
-test: ../../../t/m0/integration/*.m0b
+test: all ../../../t/m0/integration/*.m0b
 	for file in `ls ../../../t/m0/integration/*.m0b`; \
 	do \
 	echo $$file; \
