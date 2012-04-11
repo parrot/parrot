@@ -41,7 +41,7 @@ m0_op_deref_i( M0_CallFrame *frame, const unsigned char *ops )
                 (M0_Constants_Segment *)frame->registers[ref];
             const unsigned long   offset = IREG(3);
 
-            IREG(1)     = *(int64_t *)consts->consts[offset];
+            IREG(1)     = *(INT *)consts->consts[offset];
             break;
         }
 
@@ -64,7 +64,7 @@ m0_op_deref_n( M0_CallFrame *frame, const unsigned char *ops )
                 (M0_Constants_Segment *)frame->registers[ref];
             const unsigned long   offset = IREG(3);
 
-            NREG(1)     = *(double *)consts->consts[offset];
+            NREG(1)     = *(NUM *)consts->consts[offset];
             break;
         }
 
@@ -86,7 +86,7 @@ m0_op_deref_s( M0_CallFrame *frame, const unsigned char *ops )
                 (M0_Constants_Segment *)frame->registers[ref];
             const unsigned long   offset = IREG(3);
 
-            SREG(1)     = (char *)consts->consts[offset];
+            SREG(1)     = (STRING)consts->consts[offset];
             break;
         }
 
@@ -167,13 +167,13 @@ m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    NREG(1) = (double)IREG(2);
+    NREG(1) = (NUM)IREG(2);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    IREG(1) = (int64_t)NREG(2);
+    IREG(1) = (INT)NREG(2);
 }
 
 static void
@@ -222,7 +222,7 @@ m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    NREG(1) = (uint64_t)NREG(2) % (uint64_t)NREG(3);
+    NREG(1) = (UINT)NREG(2) % (UINT)NREG(3);
 }
 
 static void
@@ -246,33 +246,33 @@ m0_op_xor( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_lshr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    IREG(1) = (uint64_t)IREG(2) >> IREG(3);
+    IREG(1) = (UINT)IREG(2) >> IREG(3);
 }
 
 static void
 m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 {
-    IREG(1) = (int64_t)IREG(2) >> IREG(3);
+    IREG(1) = (INT)IREG(2) >> IREG(3);
 }
 
 static void
 m0_op_shl( M0_CallFrame *frame, const unsigned char *ops )
 {
-    IREG(1) = (int64_t)IREG(2) << IREG(3);
+    IREG(1) = IREG(2) << IREG(3);
 }
 
 static void
 m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
 {
-    uint64_t new_pc = IREG(2);
+    INT new_pc = IREG(2);
     M0_Chunk *chunk = interp->first_chunk;
     while(chunk) {
         if(strncmp( chunk->name, SREG(1), chunk->name_length) == 0) {
-            frame->registers[CHUNK]  = (uint64_t)chunk;
-            frame->registers[CONSTS] = (uint64_t)chunk->constants;
-            frame->registers[MDS]    = (uint64_t)chunk->metadata;
-            frame->registers[BCS]    = (uint64_t)chunk->bytecode;
-            frame->registers[PC]     = (uint64_t)new_pc;
+            frame->registers[CHUNK]  = (UINT)chunk;
+            frame->registers[CONSTS] = (UINT)chunk->constants;
+            frame->registers[MDS]    = (UINT)chunk->metadata;
+            frame->registers[BCS]    = (UINT)chunk->bytecode;
+            frame->registers[PC]     = (UINT)new_pc;
             break;
         }
         chunk = chunk->next;

@@ -1,6 +1,5 @@
 #ifndef M0_INTERP_STRUCTURES_H
 #   include "m0_mob_structures.h"
-#   include <stdint.h>
 
 typedef struct {
     unsigned short  mob_version;
@@ -14,13 +13,14 @@ typedef struct {
 } M0_Interp;
 
 typedef long INT;
+typedef unsigned long UINT;
 typedef double NUM;
 typedef char * STRING;
 typedef void * POINTER;
 
 /* TODO: should change registers to context or any better name */
 typedef struct {
-    uint64_t registers[12];
+    UINT registers[12];
     INT regs_i[256];
     NUM regs_n[256];
     STRING regs_s[256];
