@@ -149,7 +149,7 @@ This is the central data structure at the M0 level.  The call frame graph
 contains most of the state that is needed to execute M0 bytecode.  A pointer to
 the current call frame will be passed to each op as the implicit first
 argument, though this pointer (or equivalent) will not be stored in bytecode.
-It layout is described in detail in the C<Register Types and Call Frame
+It layout is described in detail in the L<Register Types and Call Frame
 Structure> section.
 
 Call frames were previously referred to as contexts.  The name "call frame" was
