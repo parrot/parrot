@@ -447,8 +447,43 @@ Get iterator for declared lexicals.
         return VTABLE_get_iter(INTERP, lexinfo);
     }
 
-}
+/*
 
+=item C<INTVAL register_type(STRING *name)>
+
+Returns a number based on the type of the variable named name.
+
+=over 4
+
+=item * -1 = Not Found
+
+=item * 0 = Integer
+
+=item * 1 = Num
+
+=item * 2 = String
+
+=item * 3 = PMC
+
+=back
+
+=cut
+
+*/
+
+    METHOD INTVAL register_type(STRING *name) {
+        PMC *info;
+        HashBucket *b;
+        INTVAL ret = -1;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        b = register_bucket(INTERP, info, name);
+        if (b)
+            ret = (INTVAL) b->value & 3;
+        RETURN(INTVAL ret);
+    }
+
+}
 
 /*
 
