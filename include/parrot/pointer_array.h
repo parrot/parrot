@@ -72,8 +72,7 @@ Inline functions for faster access.
 
 =over 4
 
-=item C<static void * Parrot_pa_insert(PARROT_INTERP, Parrot_Pointer_Array
-*self, void *ptr)>
+=item C<static void * Parrot_pa_insert(Parrot_Pointer_Array *self, void *ptr)>
 
 Insert pointer into the array.
 
