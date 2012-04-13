@@ -388,6 +388,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE FLOATVAL get_number() {
       #ifdef PARROT_HAS_GMP
         const double d = mpq_get_d(RT(SELF));
+        UNUSED(INTERP)
         return (FLOATVAL) d;
       #else
         RAISE_EXCEPTION
@@ -468,6 +469,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void decrement() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpz_sub(mpq_numref(RT(SELF)), mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         mpq_canonicalize(RT(SELF));
       #else
@@ -529,6 +531,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI void i_add(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_add(RT(SELF), RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -980,6 +983,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     VTABLE void i_absolute() {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         mpq_abs(RT(SELF), RT(SELF));
       #else
         RAISE_EXCEPTION
@@ -1012,6 +1016,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI INTVAL cmp(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         return (INTVAL) mpq_cmp(RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
@@ -1032,7 +1037,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 */
     MULTI INTVAL is_equal(Integer value) {
       #ifdef PARROT_HAS_GMP
-        INTVAL eq = 0;
+        INTVAL eq;
         mpq_t t;
         mpq_init(t);
         mpq_set_ui(t, VTABLE_get_integer(INTERP, value), 1);
@@ -1055,6 +1060,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 
     MULTI INTVAL is_equal(Rational value) {
       #ifdef PARROT_HAS_GMP
+        UNUSED(INTERP)
         return (INTVAL) mpq_equal(RT(SELF), RT(value));
       #else
         RAISE_EXCEPTION
