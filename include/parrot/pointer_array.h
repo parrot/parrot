@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -84,10 +84,9 @@ Insert pointer into the array.
 static
 PARROT_INLINE
 void *
-Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
+Parrot_pa_insert(ARGMOD(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    Parrot_Pointer_Array_Chunk   *chunk;
-    void                         *ret;
+    void *ret;
 
     /* Reuse removed cell */
     if (self->next_free) {
@@ -98,27 +97,29 @@ Parrot_pa_insert(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
         ret = self->next_free;
         *self->next_free = ptr;
         self->next_free = next;
-        return ret;
     }
+    else {
+        Parrot_Pointer_Array_Chunk *chunk;
 
-    /* If there is no free chunks */
-    if (self->current_chunk >= self->total_chunks
-            || !self->chunks[self->current_chunk]->num_free) {
-        self->current_chunk = self->total_chunks++;
-        mem_internal_realloc_n_typed(self->chunks,
-                self->total_chunks,
-                Parrot_Pointer_Array_Chunk*);
-        self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
-        self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
-        self->chunks[self->current_chunk]->next_free = 0;
+        /* If there is no free chunks */
+        if (self->current_chunk >= self->total_chunks
+                || !self->chunks[self->current_chunk]->num_free) {
+            self->current_chunk = self->total_chunks++;
+            mem_internal_realloc_n_typed(self->chunks,
+                    self->total_chunks,
+                    Parrot_Pointer_Array_Chunk*);
+            self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
+            self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
+            self->chunks[self->current_chunk]->next_free = 0;
+        }
+
+        chunk = self->chunks[self->current_chunk];
+        --chunk->num_free;
+        /* Invariant: all chunks after chunk->next_free are free */
+        /* We handle previously freed chunks early */
+        ret = &chunk->data[chunk->next_free];
+        chunk->data[chunk->next_free++] = ptr;
     }
-
-    chunk = self->chunks[self->current_chunk];
-    --chunk->num_free;
-    /* Invariant: all chunks after chunk->next_free are free */
-    /* We handle previously freed chunks early */
-    ret = &chunk->data[chunk->next_free];
-    chunk->data[chunk->next_free++] = ptr;
     return ret;
 }
 
