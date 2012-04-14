@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -211,7 +211,7 @@ BEGIN {
             perl => {
                 file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,
-                shebang_ext => qr/.t$/,
+                shebang_ext => qr/\.t$/,
             },
             python => { file_exts => ['py'] },
         },
