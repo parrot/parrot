@@ -143,6 +143,7 @@ clone_interpreter(Parrot_Interp s, INTVAL flags)
            if it doesn't have one already */
         d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
         d->HLL_namespace = Parrot_thread_create_proxy(s, d, s->HLL_namespace);
+        d->HLL_entries   = Parrot_thread_create_proxy(s, d, s->HLL_entries);
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
