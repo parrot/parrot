@@ -153,7 +153,6 @@ Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARG
         PMC * const proxy = Parrot_pmc_new_init(thread, enum_class_Proxy, pmc);
         PARROT_ASSERT(interp != thread);
         PARROT_PROXY(proxy)->interp = interp;
-        PARROT_GC_WRITE_BARRIER(thread, proxy);
         return proxy;
     }
 }
