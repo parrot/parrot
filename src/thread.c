@@ -76,6 +76,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     new_interp->parent_interpreter = NULL;
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
     new_interp->thread_data->tid = 0;
+    new_interp->thread_data->main_interp = interp;
     Interp_flags_SET(new_interp, PARROT_IS_THREAD);
 #ifdef _WIN32
 #else
@@ -88,6 +89,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     if (! interp->thread_data) { /* first time we go multi threaded */
         interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
         interp->thread_data->tid = 0;
+        interp->thread_data->main_interp = interp;
     }
 
     return new_interp_pmc;

@@ -53,11 +53,8 @@ typedef enum {
 typedef struct _Thread_data {
     Parrot_thread       thread;          /* pthread_t or such */
     INTVAL              state;
-    int                 wants_shared_gc; /* therad is trying to
-                                            do a shared GC run */
     UINTVAL             tid;             /* 0.. n-1 idx in interp array */
-
-    Parrot_Interp       joiner;          /* thread that is trying to join this */
+    Parrot_Interp       main_interp;
 
     /* for wr access to interpreter e.g. for GC
      * if only used for GC the lock could be in the arena
@@ -70,9 +67,6 @@ typedef struct _Thread_data {
      * of sleeping
      */
     Parrot_cond  interp_cond;
-
-    /* COW'd constant tables */
-    Hash             *const_tables;
 
 #ifdef _WIN32
 #else

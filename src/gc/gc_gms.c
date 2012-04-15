@@ -2043,23 +2043,37 @@ static void
 gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_write_barrier)
-    MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    const size_t             gen  = POBJ2GEN(pmc);
-    pmc_alloc_struct * const item = PMC2PAC(pmc);
 
-    if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
-        return;
+    if (PObj_is_shared_TEST(pmc) && Interp_flags_TEST(interp, PARROT_IS_THREAD)) {
+        return gc_gms_write_barrier(interp->thread_data->main_interp, pmc);
+    }
 
-    if (!gen)
-        return;
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
 
-    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+    {
+        MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+        const size_t             gen  = POBJ2GEN(pmc);
+        pmc_alloc_struct * const item = PMC2PAC(pmc);
 
-    pmc->flags |= PObj_GC_on_dirty_list_FLAG;
+        if (pmc->flags & PObj_GC_on_dirty_list_FLAG)
+            goto DONE;
 
-    /* We don't need it anymore */
-    gc_gms_unseal_object(interp, pmc);
+        if (!gen)
+            goto DONE;
+
+        Parrot_pa_remove(interp, self->objects[gen], item->ptr);
+        item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+
+        pmc->flags |= PObj_GC_on_dirty_list_FLAG;
+
+        /* We don't need it anymore */
+        gc_gms_unseal_object(interp, pmc);
+    }
+
+DONE:
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
 }
 
 /*
