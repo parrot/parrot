@@ -140,8 +140,7 @@ Execution Environments" [TBC].
 =head2 Scope of This Document
 
 This document only covers M0 and the minimum VM necessary to support it.
-Anything beyond that, e.g. the meta-object model or in-memory layout of call
-frames, is beyond its scope.
+Anything beyond that, e.g. the meta-object model, is beyond its scope.
 
 =head2 Call Frames
 
