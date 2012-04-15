@@ -1047,10 +1047,11 @@ data.
     0       OP_FUNCS     array of functions that implement ops
     1       CHUNKS       array of all loaded chunks
     2       CHUNK_INFO   array of chunk metadata (currently just names)
-    3       CALL_FRAMES  array of all initial call frames
-    4       CONFIG       static global config data
-    5       ARGC         number of elements in ARGV
-    6       ARGV         array of command-line arguments passed to the m0 program
+    3       CHUNK_MAP
+    4       CALL_FRAMES  array of all initial call frames
+    5       CONFIG       static global config data
+    6       ARGC         number of elements in ARGV
+    7       ARGV         array of command-line arguments passed to the m0 program
 
 C<CONFIG> should have at least the following values:
 
