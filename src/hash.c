@@ -224,10 +224,11 @@ Parrot_hash_pointer(ARGIN_NULLOK(const void * const p), size_t hashval)
 
     {
         unsigned char *c = (unsigned char *)&hashval;
-        unsigned int i, j;
+        unsigned int i;
         for (i = 0; i < sizeof hashval; i++) {
             /* swap bitsex of every byte */
             unsigned char tmp = 0;
+            unsigned int j;
             for (j = 0; j < CHAR_BIT; j++)
                 tmp |= (0x1 & c[i] >> j) << (CHAR_BIT - j - 1);
             c[i] = tmp;
@@ -876,9 +877,9 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     new_index   = (HashBucket **)(new_buckets + N_BUCKETS(new_size));
 
     /* copy buckets and index */
-    mem_sys_memcopy(new_buckets, hash->buckets,
+    memcpy(new_buckets, hash->buckets,
             N_BUCKETS(old_size) * sizeof (HashBucket));
-    mem_sys_memcopy(new_index, hash->index, old_size * sizeof (HashBucket *));
+    memcpy(new_index, hash->index, old_size * sizeof (HashBucket *));
 
     /* free */
     if (old_size > SPLIT_POINT)
@@ -1344,8 +1345,10 @@ parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(const Hash *hash),
                 if ((STRING_byte_length(s) == STRING_byte_length(s2))
                 && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
                     break;
-            } else if (STRING_equal(interp, s, s2))
-                    break;
+            }
+            else if (STRING_equal(interp, s, s2)) {
+                break;
+            }
         }
         bucket = bucket->next;
     }
@@ -1627,7 +1630,7 @@ Parrot_hash_clone_prunable(PARROT_INTERP, ARGIN(const Hash *hash),
           case enum_type_undef:
           case enum_type_ptr:
           case enum_type_INTVAL:
-            valtmp = (void *)_bucket->value;
+            valtmp = _bucket->value;
             break;
 
           default:
@@ -2214,6 +2217,35 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
                     "Hash: unsupported entry_type");
     }
     return ret;
+}
+
+/*
+
+=item C<void Parrot_hash_flatten_hash_into( PARROT_INTERP, PMC * const dest, PMC
+* const src, INTVAL overwrite)>
+
+*/
+
+void
+Parrot_hash_flatten_hash_into(
+        PARROT_INTERP, ARGIN(PMC * const dest), ARGIN(PMC * const src), INTVAL overwrite)
+{
+    ASSERT_ARGS(Parrot_hash_flatten_hash_into)
+    const Hash * const src_hash = (Hash *)VTABLE_get_pointer(interp, src);
+    if (overwrite) {
+        parrot_hash_iterate(src_hash,
+            VTABLE_set_pmc_keyed_str(interp, dest,
+                (STRING *)_bucket->key,
+                Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value)););
+    }
+    else {
+        parrot_hash_iterate(src_hash,
+            STRING * const key = (STRING *)_bucket->key;
+            if (!VTABLE_exists_keyed_str(interp, dest, key)) {
+                PMC * const value = Parrot_hash_value_to_pmc(interp, src_hash, _bucket->value);
+                VTABLE_set_pmc_keyed_str(interp, dest, key, value);
+            });
+    }
 }
 
 /*

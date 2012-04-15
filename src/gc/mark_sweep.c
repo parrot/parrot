@@ -169,7 +169,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
     ASSERT_ARGS(Parrot_gc_trace_root)
 
     /* note: adding locals here did cause increased GC runs */
-    Parrot_sub_mark_context_start();
 
     if (trace == GC_TRACE_SYSTEM_ONLY) {
         trace_system_areas(interp, mem_pools);
@@ -214,14 +213,11 @@ static void
 mark_interp(PARROT_INTERP)
 {
     ASSERT_ARGS(mark_interp)
-    PObj *obj;
     /* mark the list of iglobals */
     Parrot_gc_mark_PMC_alive(interp, interp->iglobals);
 
     /* mark the current continuation */
-    obj = (PObj *)interp->current_cont;
-    if (obj && obj != (PObj *)NEED_CONTINUATION)
-        Parrot_gc_mark_PMC_alive(interp, (PMC *)obj);
+    Parrot_gc_mark_PMC_alive(interp, interp->current_cont);
 
     /* mark the current context. */
     Parrot_gc_mark_PMC_alive(interp, interp->cur_task);
@@ -347,7 +343,6 @@ Parrot_gc_sweep_pool(PARROT_INTERP,
 
                 add_free_object(interp, mem_pools, pool, b);
             }
-next:
             b = (PObj *)((char *)b + object_size);
         }
     }

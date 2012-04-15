@@ -274,7 +274,7 @@ PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 
 /*
 
-=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile * pf)>
+=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile *pf)>
 
 Returns the size, in bytes, that a packfile will be if serialized
 
@@ -292,7 +292,7 @@ Deserialize a packfile which is stored in a STRING buffer
 
 PARROT_EXPORT
 INTVAL
-Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
+Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_serialized_size)
     return PackFile_pack_size(interp, pf);
@@ -387,7 +387,7 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         }
     }
 
-    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+    memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
                     ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
     ct->tag_map[cur].tag_idx   = tag_idx;
     ct->tag_map[cur].const_idx = const_idx;
@@ -789,6 +789,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     const PackFile_ConstTable * const ct = bc->const_table;
+    if (!ct || !ct->pmc.constants || bc->main_sub < 0)
+        return PMCNULL;
     return ct->pmc.constants[bc->main_sub];
 }
 
@@ -1877,7 +1879,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
                             (self->base.size + 2) * sizeof (opcode_t));
-    mem_sys_memmove(&self->base.data[idx + 2], &self->base.data[idx],
+    memmove(&self->base.data[idx + 2], &self->base.data[idx],
             (self->base.size - idx) * sizeof (opcode_t));
     self->base.size += 2;
     for (i = key_id + 1; i < self->num_keys; i++)
@@ -2500,7 +2502,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
                     "Could not reallocate buffer while reading packfile from PIO.\n");
         }
 
-        cursor = (char *)(program_code + program_size);
+        cursor = program_code + program_size;
     }
 
     return program_code;

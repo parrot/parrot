@@ -312,7 +312,7 @@ check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
                     --last_free_list_count;
                 else {
                     /* next item on free list should also be flagged as free item */
-                    pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
+                    pobj_walker = pobj_walker->next_ptr;
                     PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
                 }
             }
@@ -336,7 +336,7 @@ check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
         PARROT_ASSERT(pool->end_arena_memory > (size_t)pobj_walker);
         PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
         --free_objects;
-        pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
+        pobj_walker = pobj_walker->next_ptr;
         PARROT_ASSERT(--count);
     }
 

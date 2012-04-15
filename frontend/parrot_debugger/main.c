@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -145,10 +146,26 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
-static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 const unsigned char * Parrot_get_config_hash_bytes(void);
 int Parrot_get_config_hash_length(void);
+
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void PDB_printwelcome(void);
+static void PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_PDB_printwelcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PDB_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 
@@ -179,29 +196,32 @@ main(int argc, const char *argv[])
     Parrot_block_GC_sweep(interp);
 
     nextarg = 1;
-    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0)
-    {
+    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0) {
         scriptname = argv [++nextarg];
         ++nextarg;
     }
 
     if (argv[nextarg]) {
-        const char *filename = argv[nextarg];
-        const char *ext      = strrchr(filename, '.');
+        const char * const filename = argv[nextarg];
+        const char * const ext      = strrchr(filename, '.');
 
         if (ext && STREQ(ext, ".pbc")) {
-            STRING * const filename_str = Parrot_str_new(interp, filename, 0);
-            PackFile * pfraw = Parrot_pf_read_pbc_file(interp, filename_str);
-            Parrot_PackFile pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
+            STRING *   const filename_str = Parrot_str_new(interp, filename, 0);
+            PackFile * const pfraw        = Parrot_pf_read_pbc_file(interp, filename_str);
+            Parrot_PackFile pf;
 
-            if (!pfraw || !pf)
+            if (pfraw == NULL)
+                return 1;
+
+            pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
+            if (pf == NULL)
                 return 1;
 
             Parrot_pf_set_current_packfile(interp, pf);
             Parrot_pf_prepare_packfile_init(interp, pf);
         }
         else {
-            STRING          *str = Parrot_str_new(interp, filename, 0);
+            STRING * const str = Parrot_str_new(interp, filename, 0);
             Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
             STRING * const compiler_s = Parrot_str_new(interp, "PIR", 0);
             PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
@@ -256,8 +276,11 @@ Runs the code, catching exceptions if they are left unhandled.
 */
 
 static void
-PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
+    ASSERT_ARGS(PDB_run_code)
+    UNUSED(argc);
+
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {
         free_runloop_jump_point(interp);
@@ -288,6 +311,7 @@ Prints out the welcome string.
 static void
 PDB_printwelcome(void)
 {
+    ASSERT_ARGS(PDB_printwelcome)
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
         "(Please note: the debugger is currently under reconstruction)\n");

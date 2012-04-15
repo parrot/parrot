@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ Raises an exception if the distribution root is not found.
 
         while ( $self = $self->SUPER::new($path) ) {
             if (    $self->file_exists_with_name($file)
-                and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
+                and $self->file_with_name($file)->read =~ m/^This is Parrot/s )
             {
                 $dist = $self;
                 last;
@@ -211,7 +211,7 @@ BEGIN {
             perl => {
                 file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,
-                shebang_ext => qr/.t$/,
+                shebang_ext => qr/\.t$/,
             },
             python => { file_exts => ['py'] },
         },
@@ -645,7 +645,7 @@ sub perl_script_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
-    $name .= '.pl' unless $name =~ /\.pl$/o;
+    $name .= '.pl' unless $name =~ /\.pl$/;
 
     foreach my $dir ( $self->perl_script_file_directories ) {
         return $dir->file_with_name($name)
@@ -692,7 +692,7 @@ sub perl_module_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
-    $name .= '.pm' unless $name =~ /\.pm$/o;
+    $name .= '.pm' unless $name =~ /\.pm$/;
 
     foreach my $dir ( $self->perl_module_file_directories ) {
         return $dir->file_with_name($name)

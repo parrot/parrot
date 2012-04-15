@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -263,9 +263,9 @@ sub _get_current_files {
     while ( my $line = <$FILE> ) {
         chomp $line;
 
-        next if $line =~ /^\s*$/o;
+        next if $line =~ /^\s*$/;
 
-        next if $line =~ /^#/o;
+        next if $line =~ /^#/;
 
         my ($file) = split /\s+/, $line;
         $current_files{ $file }++;
@@ -425,8 +425,8 @@ sub _get_current_skips {
         or die "Unable to open $self->{skip} for reading";
     while ( my $line = <$SKIP> ) {
         chomp $line;
-        next if $line =~ /^\s*$/o;
-        next if $line =~ /^#/o;
+        next if $line =~ /^\s*$/;
+        next if $line =~ /^#/;
         $current_skips{$line}++;
     }
     close $SKIP or die "Unable to close $self->{skip} after reading";
@@ -441,8 +441,8 @@ sub _get_proposed_skips {
     my @proposed_lines = split /\n/, $print_str;
     my %proposed_skips = ();
     for my $line (@proposed_lines) {
-        next if $line =~ /^\s*$/o;
-        next if $line =~ /^#/o;
+        next if $line =~ /^\s*$/;
+        next if $line =~ /^#/;
         $proposed_skips{$line}++;
     }
 

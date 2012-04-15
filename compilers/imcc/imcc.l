@@ -788,8 +788,10 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     if (frame->heredoc_rest) {
         mem_sys_free(frame->heredoc_rest);
         frame->heredoc_rest = NULL;
-    } else
+    }
+    else {
         ret = frame->s.line;
+    }
 
     mem_sys_free(frame);
 

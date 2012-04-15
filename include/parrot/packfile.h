@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2011, Parrot Foundation.
+ * Copyright (C) 2001-2012, Parrot Foundation.
  */
 
 /* packfile.h
@@ -308,21 +308,6 @@ typedef enum {
 } pbc_action_enum_t;
 
 
-/* HEADERIZER BEGIN: src/packdump.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-void PackFile_ConstTable_dump(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_PackFile_ConstTable_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/packdump.c */
-
 /* HEADERIZER BEGIN: src/packfile/pf_items.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -389,6 +374,7 @@ PARROT_CONST_FUNCTION
 size_t PF_size_number(void);
 
 PARROT_CONST_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 size_t PF_size_opcode(void);
 
 PARROT_PURE_FUNCTION
@@ -706,9 +692,10 @@ STRING * Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
+INTVAL Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pf);
 
 PARROT_EXPORT
 void Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
@@ -1037,7 +1024,8 @@ void PackFile_Segment_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
+void PackFile_Segment_dump(PARROT_INTERP,
+    ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

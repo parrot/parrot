@@ -419,12 +419,18 @@ $conf->data->set( ccflags => $status ); # re-set for next test
    );
 
    if ($icuheaders =~ /\s/) {
-       like($stdout, qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
-           "Got expected verbose output");
+       like(
+           $stdout,
+           qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
+           "Got expected verbose output"
+       );
    }
    else {
-       like($stdout, qr/Adding -I \Q$icuheaders\E to ccflags for icu headers/,
-           "Got expected verbose output");
+       like(
+           $stdout,
+           qr/Adding -isystem \"\Q$icuheaders\E\" to ccflags for icu headers/,
+           "Got expected verbose output"
+       );
    }
 }
 if ($icuheaders =~ /\s/) {
@@ -435,7 +441,7 @@ if ($icuheaders =~ /\s/) {
 }
 else {
     like($conf->data->get( 'ccflags' ),
-        qr/-I \Q$icuheaders\E/,
+        qr/-isystem \"\Q$icuheaders\E\"/,
         "ccflags augmented as expected"
     );
 }
@@ -469,7 +475,7 @@ if ($icuheaders =~ /\s/) {
 }
 else {
     like($conf->data->get( 'ccflags'),
-        qr/-I \Q$icuheaders\E/,
+        qr/-isystem \"\Q$icuheaders\E\"/,
         "ccflags augmented as expected"
     );
 }

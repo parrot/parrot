@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -722,7 +722,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     else {
         size_t i;
 
-        self = mem_allocate_zeroed_typed(MarkSweep_GC);
+        self = mem_internal_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (pmc_alloc_struct));
@@ -937,7 +937,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
             PObj_live_CLEAR(pmc);
             PObj_GC_on_dirty_list_CLEAR(pmc);
             Parrot_pa_remove(interp, dirty_list, item->ptr);
-            item->ptr = Parrot_pa_insert(interp, self->objects[gen], item);
+            item->ptr = Parrot_pa_insert(self->objects[gen], item);
             gc_gms_seal_object(interp, pmc);
         }
         else {
@@ -1028,7 +1028,7 @@ gc_gms_process_work_list(PARROT_INTERP,
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc));
 
         Parrot_pa_remove(interp, work_list, item->ptr);
-        item->ptr = Parrot_pa_insert(interp, self->objects[gen], item););
+        item->ptr = Parrot_pa_insert(self->objects[gen], item););
 
 }
 
@@ -1071,12 +1071,12 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     Parrot_pa_remove(interp, self->objects[i], item->ptr);
                     /* If this was freshly allocated object in C stack - move it to dirty list */
                     if (PObj_GC_soil_root_TEST(pmc)) {
-                        item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+                        item->ptr = Parrot_pa_insert(self->dirty_list, item);
                         PObj_GC_soil_root_CLEAR(pmc);
                         PObj_GC_on_dirty_list_SET(pmc);
                     }
                     else {
-                        item->ptr = Parrot_pa_insert(interp, self->objects[i + 1], item);
+                        item->ptr = Parrot_pa_insert(self->objects[i + 1], item);
                         gc_gms_seal_object(interp, pmc);
                     }
                 }
@@ -1111,7 +1111,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 PObj_live_CLEAR(str);
                 if (move_to_old) {
                     Parrot_pa_remove(interp, self->strings[i], item->ptr);
-                    item->ptr = Parrot_pa_insert(interp, self->strings[i + 1], item);
+                    item->ptr = Parrot_pa_insert(self->strings[i + 1], item);
                     SET_GEN_FLAGS(str, i + 1);
                 }
             }
@@ -1170,7 +1170,7 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     PObj_live_SET(pmc);
 
     Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->work_list, item);
+    item->ptr = Parrot_pa_insert(self->work_list, item);
 }
 
 /*
@@ -1417,7 +1417,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
     interp->gc_sys->stats.mem_used_last_collect += sizeof (PMC);
 
     item         = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    item->ptr    = Parrot_pa_insert(interp, self->objects[0], item);
+    item->ptr    = Parrot_pa_insert(self->objects[0], item);
 
     return &(item->pmc);
 }
@@ -1488,7 +1488,7 @@ gc_gms_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    if (Parrot_pa_is_owned(interp, self->objects[POBJ2GEN(obj)], item, item->ptr)) {
+    if (Parrot_pa_is_owned(self->objects[POBJ2GEN(obj)], item, item->ptr)) {
         if (POBJ2GEN(obj) == 0)
             PObj_GC_soil_root_SET(obj);
         return 1;
@@ -1533,7 +1533,7 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     interp->gc_sys->stats.mem_used_last_collect += sizeof (STRING);
 
     item = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    item->ptr = Parrot_pa_insert(interp, self->strings[0], item);
+    item->ptr = Parrot_pa_insert(self->strings[0], item);
 
     ret = &(item->str);
     memset(ret, 0, sizeof (STRING));
@@ -1614,7 +1614,7 @@ gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
     if (POBJ2GEN(&item->str) > self->gen_to_collect)
         return 0;
 
-    if (Parrot_pa_is_owned(interp, self->strings[POBJ2GEN(obj)], item, item->ptr))
+    if (Parrot_pa_is_owned(self->strings[POBJ2GEN(obj)], item, item->ptr))
         return 1;
 
     return 0;
@@ -1854,7 +1854,7 @@ static void *
 gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk_zeroed)
-    void * const ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
@@ -1939,7 +1939,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
         return;
 
     Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(interp, self->dirty_list, item);
+    item->ptr = Parrot_pa_insert(self->dirty_list, item);
 
     pmc->flags |= PObj_GC_on_dirty_list_FLAG;
 

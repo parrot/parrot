@@ -98,7 +98,7 @@ sub _init {
     my $gpp = {};
     my $icc = {};
 
-    my @gcc_or_gpp = qw(
+    my @gcc_or_gpp_basic = qw(
         -falign-functions=16
         -funit-at-a-time
         -fexcess-precision=standard
@@ -127,7 +127,8 @@ sub _init {
         -Winvalid-pch
         -Wjump-misses-init
         -Wlogical-op
-        -Wmissing-braces
+        -Werror=missing-braces
+        -Wmissing-declarations
         -Wmissing-field-initializers
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
@@ -144,7 +145,7 @@ sub _init {
         -Wswitch
         -Wswitch-default
         -Wtrigraphs
-        -Wundef
+        -Werror=undef
         -Wno-unused
         -Wunknown-pragmas
         -Wvariadic-macros
@@ -152,28 +153,23 @@ sub _init {
         -Wstack-usage=500
     );
 
-    $gcc->{'basic'} = [ @gcc_or_gpp ];
-    $gpp->{'basic'} = [ @gcc_or_gpp ];
-
-    # Add some gcc-only warnings that would break g++
-    push @{$gcc->{'basic'}}, qw(
+    # gcc-only warnings that would break g++
+    my @gcc_basic = qw(
         -Wc++-compat
-        -Wdeclaration-after-statement
         -Werror=declaration-after-statement
-        -Wimplicit-function-declaration
-        -Wimplicit-int
-        -Wmain
-        -Wmissing-declarations
+        -Werror=implicit-function-declaration
         -Wmissing-prototypes
-        -Wnested-externs
-        -Wnonnull
-        -Wold-style-definition
-        -Wstrict-prototypes
+        -Werror=nested-externs
+        -Werror=old-style-definition
+        -Werror=strict-prototypes
     );
 
-    my $gcc_or_gpp_cage = [ qw(
+    $gcc->{'basic'} = [ @gcc_or_gpp_basic, @gcc_basic ];
+    $gpp->{'basic'} = [ @gcc_or_gpp_basic ];
+
+    my @gcc_or_gpp_cage = qw(
         -std=c89
-        -Werror=implicit-function-declaration
+        -Wfloat-equal
         -Wformat=2
         -Wlarger-than-4096
         -Wlong-long
@@ -181,20 +177,32 @@ sub _init {
         -Wdeprecated-declarations
         -Wno-format-extra-args
         -Wno-import
+        -Wredundant-decls
+        -Wshadow
+        -Wstrict-overflow=5
         -Wsuggest-attribute=const
         -Wsuggest-attribute=noreturn
         -Wsuggest-attribute=pure
+        -Wtrampolines
         -Wunreachable-code
+        -Wunsafe-loop-optimizations
         -Wunused
         -Wunused-function
         -Wunused-label
         -Wunused-value
         -Wunused-variable
-        -Wzero-as-null-pointer-constant
-    ) ];
+        -Wvolatile-register-var
+    );
 
-    $gcc->{'cage'} = $gcc_or_gpp_cage;
-    $gpp->{'cage'} = $gcc_or_gpp_cage;
+    my @gpp_cage = qw(
+        -Weffc++
+        -Wstrict-null-sentinel
+        -Wtraditional
+        -Wuseless-cast
+    );
+
+    $gcc->{'cage'} = [ @gcc_or_gpp_cage ];
+    $gpp->{'cage'} = [ @gcc_or_gpp_cage, @gpp_cage ];
 
     $gcc->{'todo'} = $gpp->{'todo'} = {
         '-Wformat-nonliteral' => [ qw(
@@ -280,13 +288,11 @@ sub runstep {
 
     my $compiler = '';
     if ( defined $conf->data->get('gccversion') ) {
-        $compiler = $conf->data->get('g++') ? 'g++' : 'gcc';
+        $compiler = $conf->data->get('g++') ? 'g++' :
+            $conf->data->get('clang') ? 'clang' : 'gcc';
     }
     elsif ( $conf->option_or_data('cc') =~ /icc/ ) {
         $compiler = 'icc';
-    }
-    elsif ( $conf->option_or_data('cc') =~ /clang/ ) {
-        $compiler = 'clang';
     }
 
     if ($compiler eq '') {

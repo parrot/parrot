@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -622,20 +622,20 @@ sub next_expr {
     my $s = $_[0];
     return "" unless $s;
     # start of a subexpression?
-    if ($s =~ /^\((.+)\)\s*(.*)/o) {    # longest match to matching closing paren
+    if ($s =~ /^\((.+)\)\s*(.*)/) {     # longest match to matching closing paren
         $_[0] = $2 ? $2 : "";           # modify the 2nd arg
         return $1;
     }
     else {
         $s =~ s/^\s+//;                 # left-trim to make it more robust
-        if ($s =~ m/^([-\w=]+)\s*(.*)?/o) { # shortest match to next non-word char
+        if ($s =~ /^([-\w=]+)\s*(.*)?/) { # shortest match to next non-word char
             # start with word expr
             $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
             return $1;
         }
         else {
             # special case: start with non-word op (perl-syntax only)
-            $s =~ m/^([|&!])\s*(.*)?/o; # shortest match to next word char
+            $s =~ /^([|&!])\s*(.*)?/;   # shortest match to next word char
             $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
             return $1;
         }

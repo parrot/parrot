@@ -27,7 +27,20 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
 static size_t calculate_capacity(PARROT_INTERP, size_t needed);
 
+static void convert_encoding(PARROT_INTERP,
+    ARGIN(STR_VTABLE *dest_encoding),
+    ARGMOD(STRING *buffer),
+    size_t size_to_add)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer);
+
 #define ASSERT_ARGS_calculate_capacity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_convert_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(dest_encoding) \
+    , PARROT_ASSERT_ARG(buffer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -183,24 +196,8 @@ Append string to current buffer.
                 if (s->encoding != Parrot_utf8_encoding_ptr)
                     s = Parrot_utf8_encoding_ptr->to_encoding(interp, s);
 
-                if (buffer->encoding != Parrot_utf8_encoding_ptr) {
-                    /* Create new temporary string */
-                    STRING * new_buffer;
-
-                    new_buffer = Parrot_utf8_encoding_ptr->to_encoding(interp, buffer);
-                    total_size = new_buffer->bufused + s->bufused;
-
-                    if (total_size > buffer->_buflen) {
-                        /* Reallocate */
-                        total_size = calculate_capacity(INTERP, total_size);
-                        Parrot_gc_reallocate_string_storage(INTERP, buffer, total_size);
-                    }
-                    buffer->bufused  = new_buffer->bufused;
-                    buffer->encoding = new_buffer->encoding;
-
-                    mem_sys_memcopy(buffer->strstart, new_buffer->strstart,
-                            new_buffer->bufused);
-                }
+                if (buffer->encoding != Parrot_utf8_encoding_ptr)
+                    convert_encoding(INTERP, Parrot_utf8_encoding_ptr, buffer, s->bufused);
             }
         }
 
@@ -216,7 +213,7 @@ Append string to current buffer.
         }
 
         /* Tack s on the end of buffer */
-        mem_sys_memcopy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
+        memcpy((void *)((ptrcast_t)buffer->_bufstart + buffer->bufused),
                 s->strstart, s->bufused);
 
         /* Update buffer */
@@ -226,6 +223,32 @@ Append string to current buffer.
         buffer->hashval  = 0; /* hash is invalid */
 
         PARROT_ASSERT(buffer->bufused <= Buffer_buflen(buffer));
+    }
+
+    VTABLE void push_integer(INTVAL value) {
+        STRING * s = PARROT_STRINGBUILDER(SELF)->buffer;
+        String_iter iter;
+        size_t total_size;
+
+        if (s->encoding != Parrot_utf8_encoding_ptr && value > 0x7F) {
+            if (s->strlen == 0)
+                s->encoding = Parrot_utf8_encoding_ptr;
+            else
+                convert_encoding(INTERP, Parrot_utf8_encoding_ptr, s, sizeof (INTVAL));
+        }
+
+        total_size = s->bufused + sizeof (INTVAL);
+        if (total_size > s->_buflen) {
+            total_size = calculate_capacity(INTERP, total_size);
+            Parrot_gc_reallocate_string_storage(INTERP, s, total_size);
+        }
+
+        STRING_ITER_INIT(INTERP, &iter);
+        iter.charpos = s->strlen;
+        iter.bytepos = s->bufused;
+        STRING_iter_set_and_advance(INTERP, s, &iter, value);
+        s->strlen = iter.charpos;
+        s->bufused = iter.bytepos;
     }
 
 /*
@@ -278,7 +301,7 @@ Set content of buffer to passed string or PMC
         }
 
         /* Tack s on the buffer */
-        mem_sys_memcopy((void *)((char*)buffer->_bufstart),
+        memcpy((void *)((char*)buffer->_bufstart),
                 s->strstart, s->bufused);
 
         /* Update buffer */
@@ -464,8 +487,6 @@ Returns length of currently built string.
 
 Calculate capacity for string. We allocate double the amount needed.
 
-=back
-
 =cut
 
 */
@@ -482,6 +503,43 @@ calculate_capacity(SHIM_INTERP, size_t needed)
     needed  = (needed + 15) & ~15;
 
     return needed;
+}
+
+/*
+
+=item C<static void convert_encoding(PARROT_INTERP, STR_VTABLE *dest_encoding,
+STRING *buffer, size_t size_to_add)>
+
+Convert buffer content to the encoding specified and increase its size,
+reallocating it if needed.
+
+=back
+
+=cut
+
+*/
+
+static void
+convert_encoding(PARROT_INTERP, ARGIN(STR_VTABLE *dest_encoding),
+        ARGMOD(STRING *buffer), size_t size_to_add)
+{
+    ASSERT_ARGS(convert_encoding)
+    STRING * new_buffer;
+    size_t total_size;
+
+    new_buffer = dest_encoding->to_encoding(interp, buffer);
+    total_size = new_buffer->bufused + size_to_add;
+
+    if (total_size > buffer->_buflen) {
+        /* Reallocate */
+        total_size = calculate_capacity(interp, total_size);
+        Parrot_gc_reallocate_string_storage(interp, buffer, total_size);
+    }
+    buffer->bufused  = new_buffer->bufused;
+    buffer->encoding = new_buffer->encoding;
+
+    memcpy(buffer->strstart, new_buffer->strstart,
+            new_buffer->bufused);
 }
 
 /*

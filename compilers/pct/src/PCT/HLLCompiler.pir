@@ -978,7 +978,7 @@ memoize the line offsets as a C<!lineof> property on C<target>.
 
     # If we've previously cached C<linepos> for target, we use it.
     unless cache goto linepos_build
-    linepos = getprop '!linepos', target
+    linepos = getprop target, '!linepos'
     unless null linepos goto linepos_done
 
     # calculate a new linepos array.

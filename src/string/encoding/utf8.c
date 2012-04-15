@@ -577,7 +577,9 @@ utf8_iter_set_and_advance(PARROT_INTERP,
     i->charpos += 1;
     i->bytepos += end - ptr;
 
-    PARROT_ASSERT(i->bytepos <= str->bufused);
+    /* Commenting this out allows us to iterate and assemble strings in empty
+       (but pre-allocated) buffers. */
+    /* PARROT_ASSERT(i->bytepos <= str->bufused); */
 }
 
 
