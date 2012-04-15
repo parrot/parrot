@@ -115,7 +115,8 @@ Now, the interpreter should build.  If you are building the ICU library (this
 is the default on most systems), you need to use 'GNU make' instead (or 
 something compatible with it).
 
-You can test Parrot by running 'make test'. You can run the tests in parallel with 'make TEST_JOBS=3 test'.
+You can test Parrot by running 'make test'. You can run the tests in parallel
+with 'make TEST_JOBS=3 test'.
 
 You can run the full test suite with
 
