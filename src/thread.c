@@ -75,6 +75,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     /* Parrot_pmc_new sets parent_interpreter which would confuse the GC */
     new_interp->parent_interpreter = NULL;
     new_interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
+    MUTEX_INIT(new_interp->thread_data->interp_lock);
     new_interp->thread_data->tid = 0;
     new_interp->thread_data->main_interp = interp;
     Interp_flags_SET(new_interp, PARROT_IS_THREAD);
@@ -90,6 +91,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
         interp->thread_data->tid = 0;
         interp->thread_data->main_interp = interp;
+        MUTEX_INIT(interp->thread_data->interp_lock);
     }
 
     return new_interp_pmc;
