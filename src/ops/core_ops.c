@@ -24275,7 +24275,7 @@ Parrot_receive_p(opcode_t *cur_opcode, PARROT_INTERP) {
         }
 
         if ((msg_count > 0)) {
-            PREG(1) = VTABLE_shift_pmc(interp, pdata->mailbox);
+            PREG(1) = VTABLE_shift_pmc(pdata->interp, pdata->mailbox);
             Parrot_unblock_GC_mark(interp);
             UNLOCK(pdata->mailbox_lock);
             {
