@@ -200,18 +200,22 @@ code as the first argument.
             if (task->partner) { /* TODO how can we know if the partner's still alive? */
                 Parrot_Task_attributes * const partner_task = PARROT_TASK(task->partner);
                 LOCK(partner_task->waiters_lock);
-                Parrot_block_GC_mark_locked(partner_task->interp);
-                partner_task->killed = 1;
 
                 if (!PMC_IS_NULL(partner_task->waiters)) {
-                    n = VTABLE_get_integer(interp, partner_task->waiters);
-                }
+                    Parrot_block_GC_mark_locked(partner_task->interp);
+                    partner_task->killed = 1;
 
-                for (i = 0; i < n; ++i) {
-                    PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
-                    Parrot_cx_schedule_immediate(partner_task->interp, wtask);
+                    n = VTABLE_get_integer(interp, partner_task->waiters);
+
+                    for (i = 0; i < n; ++i) {
+                        PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
+                        Parrot_cx_schedule_immediate(partner_task->interp, wtask);
+                    }
+                    Parrot_unblock_GC_mark_locked(partner_task->interp);
                 }
-                Parrot_unblock_GC_mark_locked(partner_task->interp);
+                else
+                    partner_task->killed = 1;
+
                 UNLOCK(partner_task->waiters_lock);
             }
         }
