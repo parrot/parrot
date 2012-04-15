@@ -176,7 +176,7 @@ Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
         c->current_pc        = subattr->seg->base.data + subattr->start_offs;
         c->current_HLL       = subattr->HLL_id;
 #ifdef THREAD_DEBUG
-        PARROT_ASSERT(PObj_is_shared_TEST(sub) || subattr->namespace_stash->orig_interp == interp);
+        PARROT_ASSERT(PObj_is_shared_TEST(sub) || subattr->namespace_stash == NULL || subattr->namespace_stash->orig_interp == interp);
 #endif
         c->current_namespace = subattr->namespace_stash;
     }
