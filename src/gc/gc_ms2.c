@@ -702,7 +702,7 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         interp->gc_sys->stats.memory_used += sizeof (PMC);
 
     ptr = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr = Parrot_pa_insert(interp, self->objects, ptr);
+    ptr->ptr = Parrot_pa_insert(self->objects, ptr);
 
     return &ptr->pmc;
 }
@@ -756,7 +756,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     if (!PObj_constant_TEST(pmc)) {
         Parrot_pa_remove(interp, self->objects, item->ptr);
-        item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+        item->ptr = Parrot_pa_insert(self->new_objects, item);
     }
 
 }
@@ -811,7 +811,7 @@ gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         interp->gc_sys->stats.memory_used += sizeof (STRING);
 
     ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr = Parrot_pa_insert(interp, self->strings, ptr);
+    ptr->ptr = Parrot_pa_insert(self->strings, ptr);
 
     ret = &ptr->str;
     memset(ret, 0, sizeof (STRING));

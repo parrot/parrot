@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -140,7 +140,7 @@ sub name_without_suffix {
     my $self = shift;
     my $name = $self->name;
 
-    $name =~ s/\.[^\.]*$//o;
+    $name =~ s/\.[^\.]*$//;
 
     return $name;
 }

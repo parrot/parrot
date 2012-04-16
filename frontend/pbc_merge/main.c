@@ -700,9 +700,9 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
         PackFile_Directory *pf_dir = &inputs[i]->pf->directory;
         unsigned int j = 0;
         for (j = 0; j < pf_dir->num_segments; ++j) {
-            PackFile_Segment *seg = (PackFile_Segment *)pf_dir->segments[j];
+            const PackFile_Segment * const seg = pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                PackFile_ConstTable *ct = (PackFile_ConstTable *)seg;
+                const PackFile_ConstTable * const ct = (PackFile_ConstTable *)seg;
                 inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, ct->num.const_count,
                                                                     opcode_t);
                 inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, ct->str.const_count,

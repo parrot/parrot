@@ -28,9 +28,42 @@ Parrot functions which wrap around standard library functions for handling dynam
 #  include <dlfcn.h>
 #endif
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void * find_handle_entry(ARGIN(const void *handle))
+        __attribute__nonnull__(1);
+
+static void push_handle_entry(ARGIN_NULLOK(void *handle));
+static void remove_handle_entry(ARGIN_NULLOK(void *handle));
+#define ASSERT_ARGS_find_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_push_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_remove_handle_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
 #ifdef PARROT_HAS_HEADER_DLFCN
+
+/*
+
+=item C<static void push_handle_entry(void *handle)>
+
+=item C<static void * find_handle_entry(const void *handle)>
+
+=item C<static void remove_handle_entry(void *handle)>
+
+Helper functions to load and unload libraries.
+
+=cut
+
+*/
 
 struct handle_entry {
     void *handle;
@@ -40,8 +73,10 @@ struct handle_entry {
 struct handle_entry *handle_list = NULL;
 
 static void
-push_handle_entry(void *handle)
+push_handle_entry(ARGIN_NULLOK(void *handle))
 {
+    ASSERT_ARGS(push_handle_entry)
+
     struct handle_entry *e;
 
     e = (struct handle_entry *) malloc(sizeof (struct handle_entry));
@@ -54,31 +89,36 @@ push_handle_entry(void *handle)
     handle_list = e;
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static void *
-find_handle_entry(void *handle)
+find_handle_entry(ARGIN(const void *handle))
 {
-    struct handle_entry *e;
+    ASSERT_ARGS(find_handle_entry)
+
+    const struct handle_entry *e;
 
     for (e = handle_list; e; e = e->next) {
         if (e->handle == handle)
-            return handle;
+            return e->handle;
     }
 
     return NULL;
 }
 
 static void
-remove_handle_entry(void *handle)
+remove_handle_entry(ARGIN_NULLOK(void *handle))
 {
-    struct handle_entry *cur, *prev, *p;
+    ASSERT_ARGS(remove_handle_entry)
 
     if (handle_list) {
         if (handle_list->handle == handle) {
-            p = handle_list;
+            struct handle_entry * const p = handle_list;
             handle_list = p->next;
             free(p);
         }
         else {
+            struct handle_entry *cur, *prev;
             for (cur = handle_list; cur; prev = cur, cur = cur->next) {
                 if (cur->handle == handle) {
                     prev->next = cur->next;
@@ -92,8 +132,6 @@ remove_handle_entry(void *handle)
 
 
 
-/* HEADERIZER HFILE: none */
-
 /*
 
 =item C<void * Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)>
@@ -105,6 +143,7 @@ argument and returns a handle to it.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
@@ -117,7 +156,7 @@ Parrot_dlopen(const char *filename, Parrot_dlopen_flags flags)
     push_handle_entry(h);
     return h;
 #else
-    return 0;
+    return NULL;
 #endif
 }
 
@@ -132,6 +171,7 @@ failure in use of C<Parrot_dlopen>, C<Parrot_dlclose> or C<Parrot_dlsym>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const char *
 Parrot_dlerror(void)
@@ -139,7 +179,7 @@ Parrot_dlerror(void)
 #ifdef PARROT_HAS_HEADER_DLFCN
     return dlerror();
 #else
-    return 0;
+    return NULL;
 #endif
 }
 
@@ -154,6 +194,7 @@ returns address where symbol is located.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
 Parrot_dlsym(void *handle, const char *symbol)
@@ -178,6 +219,7 @@ by argument.  Returns C<0> on success and C<-1> on failure.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 int
 Parrot_dlclose(void *handle)
 {
@@ -189,9 +231,8 @@ Parrot_dlclose(void *handle)
         rv = dlclose(handle);
         return rv;
     }
-#else
-    return -1;
 #endif
+    return -1;
 }
 
 /*

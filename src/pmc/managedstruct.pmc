@@ -49,6 +49,7 @@ Initializes an empty struct.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -85,10 +86,12 @@ Otherwise, mem_gc_free() is used.
         if (ptr) {
             const custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
             if (free_func) {
-                void *free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
+                void * const free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
                 free_func(INTERP, ptr, free_data);
-            } else
+            }
+            else {
                 mem_gc_free(INTERP, ptr);
+            }
         }
     }
 

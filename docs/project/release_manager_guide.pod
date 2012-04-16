@@ -454,9 +454,18 @@ Preview the new page, and submit it.
 The old release announcement may be edited to uncheck I<Promoted to front page>
 to keep the main page fresh.
 
-=head2 X. Update parrot.github.com and any Relevant parrot-docsx Repositories
+=head2 X. Update parrot.github.com and the Relevant parrot-docsx Repository
 
-Please read and follow the instructions in 
+To update both the C<parrot.github.com> and the relevant C<parrot-docsx> repositories,
+execute the following command: 
+
+    perl tools/release/parrot_github_release.pl
+
+Please note: To review the available options, use the C<-h | --help> option.
+In addition, you may also want to review the pod with,
+C<perldoc tools/release/parrot_github_release.pl>.
+
+For more information about the update process, I<see> 
 L<http://github.com/parrot/parrot/blob/master/docs/project/release_parrot_github_guide.pod>.
 
 =head2 XI. Publicity
@@ -524,8 +533,8 @@ calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
     - Apr 17, 2012 - 4.3.0   - cotto
-    - May 15, 2012 - 4.4.0   - ??
-    - Jun 19, 2012 - 4.5.0   - ??
+    - May 15, 2012 - 4.4.0   - whiteknight
+    - Jun 19, 2012 - 4.5.0   - alvis 
     - Jul 17, 2012 - 4.6.0   - ??
     - Aug 21, 2012 - 4.7.0   - ??
     - Sep 18, 2012 - 4.8.0   - ??

@@ -169,7 +169,6 @@ Parrot_gc_trace_root(PARROT_INTERP,
     ASSERT_ARGS(Parrot_gc_trace_root)
 
     /* note: adding locals here did cause increased GC runs */
-    Parrot_sub_mark_context_start();
 
     if (trace == GC_TRACE_SYSTEM_ONLY) {
         trace_system_areas(interp, mem_pools);
