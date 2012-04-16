@@ -1,6 +1,6 @@
 2012-04-17    release 4.3.0
     - Core
-        + Winxed snapshot updated to 375562d
+        + Winxed snapshot updated to 1.7.0
 	+ New 'tools/release/parrot_github_release.pl' script to automate
 	  updates to the 'parrot.github.com' and 'parrot-docsx' repositories.
     - Documentation
