@@ -208,7 +208,8 @@ code as the first argument.
                     n = VTABLE_get_integer(interp, partner_task->waiters);
 
                     for (i = 0; i < n; ++i) {
-                        PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
+                        PMC * const wtask =
+                            VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
                         Parrot_cx_schedule_immediate(partner_task->interp, wtask);
                     }
                     Parrot_unblock_GC_mark_locked(partner_task->interp);

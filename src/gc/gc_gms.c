@@ -112,7 +112,8 @@ TBD
 #define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
 
 #ifdef THREAD_DEBUG
-#  define PARROT_GC_ASSERT_INTERP(pmc, interp) PARROT_ASSERT((pmc) == NULL || (pmc)->orig_interp == (interp))
+#  define PARROT_GC_ASSERT_INTERP(pmc, interp) \
+    PARROT_ASSERT((pmc) == NULL || (pmc)->orig_interp == (interp))
 #else
 #  define PARROT_GC_ASSERT_INTERP(pmc, interp)
 #endif
