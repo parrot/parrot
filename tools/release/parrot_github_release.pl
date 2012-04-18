@@ -124,7 +124,7 @@ get_repo_directory() unless $repos;
 
 # Get VERSION
 open my $FH, '<', 'VERSION' or stop("Unable to open 'VERSION' file");
-$version = <$FH>;
+chomp($version = <$FH>);
 close $FH;
 
 # Parse version number
