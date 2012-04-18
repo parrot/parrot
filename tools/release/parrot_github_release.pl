@@ -253,9 +253,13 @@ sub archive_parrot_docsx {
     system('git', 'commit', '-m', "'Archiving documentation release'") == 0 or
       stop("Unable to commit to 'parrot-docsx'");
 
+    print "\n== CHECKING OUT MASTER ==\n";
+    system('git', 'checkout', 'master') == 0 or
+      stop("Unable to switch to 'master'");
+
     print "\n== PUSHING 'PARROT-DOCSX' ==\n";
-    system('git', 'push', 'gh-pages') == 0 or
-      stop("Unable to push updates to 'parrot-docsx' master");
+    system('git', 'push', 'origin', 'gh-pages') == 0 or
+      stop("Unable to push updates to 'parrot-docsx'");
 
     chdir $parrot_dir;
 }
@@ -313,7 +317,7 @@ sub update_parrot_github {
       stop("Unable to commit to 'parrot.github.com'");
 
     print "\n== PUSHING ('PARROT.GITHUB.COM') ==\n";
-    system('git', 'push', 'origin master') == 0 or
+    system('git', 'push', 'origin', 'master') == 0 or
       stop("Unable to push updates to 'parrot.github.com' master");
 
     chdir $parrot_dir;
