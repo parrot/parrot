@@ -1,13 +1,19 @@
 2012-04-17    release 4.3.0
     - Core
         + Winxed snapshot updated to 1.7.0
-	+ New 'tools/release/parrot_github_release.pl' script to automate
-	  updates to the 'parrot.github.com' and 'parrot-docsx' repositories.
+        + Add type introspection to lexical variables.
+        + New 'tools/release/parrot_github_release.pl' script to automate
+          updates to the 'parrot.github.com' and 'parrot-docsx' repositories.
+        + Numerous casting and consting fixes thanks to GCC 4.8 .
     - Documentation
-	+ Updated 'docs/projects/release_manager_guide.pod'
-	+ Updated 'docs/projects/release_parrot_github_guide.pod'
+        + Updated 'docs/projects/release_manager_guide.pod'
+        + Updated 'docs/projects/release_parrot_github_guide.pod'
+        + Improved function documentation.
     - Tests
     - Community
+    - Platforms
+        + Fixed alignment issues on ia64, sparc and mipsel.
+        + Fixed a platform-specific issue with dlclose().
 
 2012-03-20    release 4.2.0
     - API Changes
