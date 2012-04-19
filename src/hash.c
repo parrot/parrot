@@ -219,7 +219,7 @@ size_t
 Parrot_hash_pointer(ARGIN_NULLOK(const void * const p), size_t hashval)
 {
     ASSERT_ARGS(Parrot_hash_pointer)
-    size_t x = (size_t)p;
+    const size_t x = (size_t)p;
     hashval ^= x;
 
     {
