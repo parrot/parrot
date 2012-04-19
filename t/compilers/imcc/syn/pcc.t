@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 ##############################
 # Parrot Calling Conventions
@@ -622,6 +622,20 @@ pir_output_is( <<'CODE', <<'OUT', ':named should default to param name');
 .end
 CODE
 4
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'Explicit self param should not conflict');
+.sub foo :method
+    .param pmc self
+    say self
+.end
+
+.sub main :main
+    $P0 = box 'hello'
+    'foo'($P0)
+.end
+CODE
+hello
 OUT
 
 # Local Variables:

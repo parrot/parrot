@@ -8,7 +8,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
 #use Parrot::Test tests => 6;
 
 =head1 NAME
@@ -120,7 +120,7 @@ sub test_pbc_string {
             $todo_msg = "$cvt $todo_msg"
         }
         else {
-            $todo_msg = "$cvt yet untested, TT #357. "
+            $todo_msg = "$cvt yet untested, GH #394. "
                        . "Please report success."
         }
         pbc_output_is( undef, $output, "$cvt $desc",

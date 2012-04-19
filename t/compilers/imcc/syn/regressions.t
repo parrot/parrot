@@ -36,7 +36,7 @@ ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'fold symbolic constants (TT #1652)');
+pir_output_is( <<'CODE', <<'OUT', 'fold symbolic constants (GH #473)');
 .sub main :main
     .const int SECONDS_PER_MINUTE = 60
     $I0 = 30 * SECONDS_PER_MINUTE

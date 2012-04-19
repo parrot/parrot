@@ -1474,7 +1474,7 @@ I can has outer from eval?
 OUTPUT
 
 @todo = $testr
-    ? ( todo => 'lexicals not thawed properly from PBC, TT #1171' )
+    ? ( todo => 'lexicals not thawed properly from PBC, GH #430' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
 .sub 'main' :main
@@ -1669,7 +1669,7 @@ bar
 bazsubid
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See TT #132' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'Thaw PIR subclass', todo => 'See GH #276' );
 .sub main :main
 
   $P0 = get_class 'Sub'

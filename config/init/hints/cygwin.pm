@@ -18,15 +18,15 @@ sub runstep {
 
     my $build_dir = $conf->data->get('build_dir');
     $build_dir =~ s/ /\\ /g;
-    my $bindir = $conf->data->get('bindir');
-    $bindir =~ s/ /\\ /g;
+    my $libdir = $conf->data->get('libdir');
+    $libdir =~ s/ /\\ /g;
     my $libparrot_shared = $conf->data->get('libparrot_shared');
     # force cyg prefix
     $libparrot_shared =~ s/^lib/cyg/g;
     # force the dll versioning
     my @parrot_version = Parrot::BuildUtil::parrot_version();
-    my $dllsuffix = join("_",@parrot_version);
-    $libparrot_shared =~ s/parrot\.dll/parrot$dllsuffix\.dll/;
+    my $dllsuffix = join('.', @parrot_version);
+    $libparrot_shared =~ s/parrot\.dll/parrot-$dllsuffix\.dll/;
 
     # An old note about building shared libraries: Perl5 used the 'ld2' tool until
     # 5.8.8-4, which is installed as part of the perl5 installation. So far, it
@@ -49,11 +49,10 @@ sub runstep {
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)',
         libparrot_shared    => $libparrot_shared,
-        blib_dir            => '.',
         libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
-        inst_libparrot_ldflags => '-L' . $bindir . ' -lparrot',
+        inst_libparrot_ldflags => '-L' . $libdir . ' -lparrot',
         libparrot_linkflags   => '-L' . $build_dir . ' -lparrot',
-        inst_libparrot_linkflags => '-L' . $bindir . ' -lparrot',
+        inst_libparrot_linkflags => '-L' . $libdir . ' -lparrot',
     );
 
     # inet_aton needs to be defined on Cygwin.

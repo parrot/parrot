@@ -63,6 +63,9 @@ sub runstep {
             $hints_used++;
         }
     }
+    elsif ( $conf->options->get('hintsfile') ) {
+        die "No $hints_file found";
+    }
     else {
         $conf->debug("No $hints_file found.  ");
     }

@@ -381,7 +381,7 @@ CODE
 Successful
 OUTPUT
 
-# TT #1178
+# GH #465
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
 .sub main :main
     $P99 = getinterp
@@ -409,34 +409,34 @@ ok 2
 ok 3
 OUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'puts method' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'print method' );
 .sub main :main
     $P0 = getinterp
     $P2 = $P0.'stdout_handle'()
-    can $I0, $P2, "puts"
+    can $I0, $P2, "print"
     if $I0, ok1
     print "not "
 ok1:   print "ok 1\n"
     set_args "0,0", $P2, "ok 2\n"
-    callmethodcc $P2, "puts"
+    callmethodcc $P2, "print"
 .end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'puts method - PIR' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'print method - PIR' );
 .sub main :main
    .local string s
    s = "ok 2\n"
    .local pmc io
    $P0 = getinterp
    io = $P0.'stdout_handle'()
-   $I0 = can io, "puts"
+   $I0 = can io, "print"
    if $I0 goto ok1
    print "not "
 ok1:   print "ok 1\n"
-   io."puts"(s)
+   io."print"(s)
 .end
 
 CODE
@@ -444,14 +444,14 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod puts' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod print' );
 .pcc_sub :main main:
     getinterp P0                 # invocant
     set_args "0", P0
     callmethodcc P0, "stderr_handle"
     get_results "0", P2          # STDERR
 
-    set S0, "puts"               # method
+    set S0, "print"              # method
     set S5, "ok 1\n"             # 2nd param
     set_args "0,0", P2, S5
     callmethodcc P2, S0

@@ -476,7 +476,8 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
                 "creating socket failed: %Ss",
                 Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
 
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &value, sizeof (value));
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&value,
+            sizeof (value));
 
 #ifdef IPV6_V6ONLY
     if (fam == AF_INET6)

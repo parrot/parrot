@@ -204,7 +204,7 @@ Read the given number of bytes from the gziphandle and return them in a string.
         int result;
         gzFile file;
         STRING *str = STRINGNULL;
-        char * const buf = mem_allocate_n_zeroed_typed(length, char);
+        char * const buf = mem_internal_allocate_n_zeroed_typed(length, char);
         GET_ATTR_file(INTERP, SELF, file);
         result = gzread(file, buf, length);
         if (result > 0) {
@@ -251,7 +251,7 @@ Returns a string with the zlib version.
 
         srcLen = Parrot_str_byte_length(INTERP, str);
         dstLen = 12 + srcLen + srcLen / 1000;
-        buf    = mem_allocate_n_zeroed_typed(dstLen, char);
+        buf    = mem_internal_allocate_n_zeroed_typed(dstLen, char);
 
         if (!buf) {
             Parrot_str_free_cstring(src);
@@ -303,7 +303,7 @@ Returns a string with the zlib version.
         srcLen = Parrot_str_byte_length(INTERP, str);
         dstLen = 2 * srcLen;
     REDO:
-        buf = mem_allocate_n_zeroed_typed(dstLen, char);
+        buf = mem_internal_allocate_n_zeroed_typed(dstLen, char);
 
         if (!buf) {
             Parrot_str_free_cstring(src);

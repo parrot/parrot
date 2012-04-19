@@ -205,7 +205,7 @@ sub process_code_start_token {
 
     my $text = $next->text;
 
-    if ( $text =~ /^Parrot::/o ) {
+    if ( $text =~ /^Parrot::/ ) {
 
         my $href = $self->href_for_perl_module($text);
 
@@ -247,7 +247,7 @@ sub process_file_start_token {
             $dist->relative_path_is_file($text)
 
             # A little bit of a hack to avoid config template files.
-            and $text !~ /\.in$/o and $dist->file_with_relative_path($text)->contains_pod
+            and $text !~ /\.in$/ and $dist->file_with_relative_path($text)->contains_pod
             )
         {
             my $path = $self->append_html_suffix($text);
@@ -505,7 +505,7 @@ sub resolve_pod_page_link {
     my $to      = shift;
     my $section = shift;
 
-    if ( $to =~ /^Parrot::/o ) {
+    if ( $to =~ /^Parrot::/ ) {
         my $href = $self->href_for_perl_module($to);
 
         # This gets corrupted somewhere down the line, with

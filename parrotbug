@@ -584,9 +584,8 @@ sub save_report {
 
     print <<TRAC;
 Message saved. Please go to
-  https://trac.parrot.org/parrot/newticket
-  and either paste content of saved file into 'Description'
-  or attach file to ticket.
+  https://github.com/parrot/parrot/issues
+  and paste content of saved file into 'Description'
 TRAC
 }
 

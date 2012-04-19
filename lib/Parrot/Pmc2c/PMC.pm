@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -598,9 +598,9 @@ in the PMC's C header file.
 sub hdecls {
     my ($self) = @_;
 
-    my $hout;
-    my $name    = $self->name;
-    my $lc_name = $self->name;
+    my $hout = '';
+    my $name = $self->name;
+    my $lc_name = lc($name);
 
     # generate decls for all vtables in this PMC
     foreach my $vt_method_name ( @{ $self->vtable->names } ) {
@@ -1177,14 +1177,14 @@ EOC
         {
             STRING * const method_name = CONST_STRING_GEN(interp, "$symbol_name");
             STRING * const signature   = CONST_STRING_GEN(interp, "$pcc_signature");
-            register_native_pcc_method_in_ns(interp, entry,
+            Parrot_interp_register_native_pcc_method_in_ns(interp, entry,
                 F2DPTR(Parrot_${classname}_${method_name}),
                 method_name, signature);
         }
 EOC
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
-        Parrot_mark_method_writes(interp, entry, "$symbol_name");
+        Parrot_interp_mark_method_writes(interp, entry, "$symbol_name");
 EOC
         }
     }

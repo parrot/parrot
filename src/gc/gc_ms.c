@@ -1415,7 +1415,7 @@ static void *
 gc_ms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk_zeroed)
-    void * const ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif

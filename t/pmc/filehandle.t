@@ -167,7 +167,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
-    $P1 = # TT #1204 create a callback here
+    $P1 = # GH #535 create a callback here
     $P0 = new ['FileHandle']
 
     $P0.'open'('README')
@@ -384,9 +384,9 @@ ok 1 - read 10,000 lines
 OUT
 
 
-# TT #1204 test reading long chunks, eof, and across newlines
+# GH #535 test reading long chunks, eof, and across newlines
 
-# TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
+# GH #535 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
@@ -488,9 +488,9 @@ ok 2 - $S0 = $P1.buffer_type() # line-buffered
 ok 3 - $S0 = $P1.buffer_type() # full-buffered
 OUT
 
-# TT #1204 test effects of buffer_type, not just set/get
+# GH #535 test effects of buffer_type, not just set/get
 
-# TT #1177
+# GH #458
 # L<PDD22/I\/O PMC API/=item buffer_size>
 # NOTES: try setting positive, zero, negative int
 # perform print and read ops
@@ -823,7 +823,7 @@ expect 1 exit status: 1
 OUTPUT
 
 SKIP: {
-    skip 'Timely destruction is deprecated. TT#1800' => 1;
+    skip 'Timely destruction is deprecated. GH #278' => 1;
 
 pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', "timely destruction" );
 .const string temp_file = '%s'
@@ -1070,7 +1070,7 @@ CODE
 1
 OUT
 
-# TT #1178
+# GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
 

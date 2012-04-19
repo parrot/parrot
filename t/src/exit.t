@@ -56,7 +56,7 @@ main(int argc, char* argv[])
 {
     Interp *interp;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_x_on_exit(interp, ex1, 0);
         Parrot_x_on_exit(interp, ex2, 0);

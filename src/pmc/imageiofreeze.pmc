@@ -518,7 +518,7 @@ Sets the constant table of this ImageIO PMC.
             PObj_custom_destroy_SET(SELF);
 
             ensure_buffer_size(INTERP, SELF, header_length);
-            mem_sys_memcopy(GET_VISIT_CURSOR(SELF),
+            memcpy(GET_VISIT_CURSOR(SELF),
                 PARROT_IMAGEIOFREEZE(SELF)->pf->header, PACKFILE_HEADER_BYTES);
             INC_VISIT_CURSOR(SELF, header_length);
         }

@@ -472,22 +472,22 @@ Write the in-memory archive to disk. The argument is already opened filehandle.
     entry = shift $P1
     .local string header
     header = entry.'_format_tar_entry'()
-    fh.'puts'(header)
+    fh.'print'(header)
     $S0 = entry.'data'()
-    fh.'puts'($S0)
+    fh.'print'($S0)
     $I0 = length $S0
     $I0 %= BLOCK
     unless $I0 goto L1
     .local string TAR_PAD
     $I0 = BLOCK - $I0
     TAR_PAD = repeat "\0", $I0
-    fh.'puts'(TAR_PAD)
+    fh.'print'(TAR_PAD)
     goto L1
   L2:
     .local string TAR_END
     $I0 = 2 * BLOCK
     TAR_END = repeat "\0", $I0
-    fh.'puts'(TAR_END)
+    fh.'print'(TAR_END)
 .end
 
 .sub '_error' :method

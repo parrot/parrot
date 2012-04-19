@@ -24,7 +24,7 @@ Implementation of Iterator for OrderedHash.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass OrderedHashIterator extends Iterator no_ro auto_attrs {
+pmclass OrderedHashIterator extends Iterator provides iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
     ATTR PMC        *next_entry;    /* Next entry to shift/pop */
     ATTR INTVAL      pos;           /* */

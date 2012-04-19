@@ -65,12 +65,12 @@ our %second_analysis_subs = (
                         t/tools/dev/search_ops/samples\.pm
                         | languages/pod/test\.pod
                         | examples/config/file/configcompiler
-                        | t/configure/testlib/verbosefoobar
+                        | examples/config/file/configwithfatalstep
+                        | examples/config/file/configverbose
                         | t/configure/testlib/ddefectivefoobar
                         | t/configure/testlib/adefectivefoobar
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
-                        | examples/config/file/configwithfatalstep
                         | compilers/opsc
                     }x
                 ) {

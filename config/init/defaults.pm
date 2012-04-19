@@ -260,7 +260,7 @@ sub runstep {
         coveragedir => $conf->options->get('coveragedir') || $build_dir,
     );
 
-    # TT #855:  Profiling options are too specific to GCC
+    # GH #383:  Profiling options are too specific to GCC
     if ( $conf->options->get('profile') ) {
         $conf->data->set(
             cc_debug => " -pg ",
