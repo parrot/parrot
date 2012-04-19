@@ -622,13 +622,13 @@ trigger_immediate_subs(ARGMOD(imc_info_t *imcc), ARGMOD(PackFile * pf))
 
         PMC_get_sub(imcc->interp, sub_pmc, sub);
         pragmas = PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK & ~SUB_FLAG_IS_OUTER;
-        if (pragmas & SUB_FLAG_PF_IMMEDIATE) {
+        /*if (pragmas & SUB_FLAG_PF_IMMEDIATE) {
             PMC * result = PMCNULL;
             Parrot_pcc_invoke_sub_from_c_args(imcc->interp, sub_pmc, "->P", &result);
             ct->pmc.constants[i] = result;
             PARROT_GC_WRITE_BARRIER(imcc->interp, pf->view);
         }
-        else if (pragmas & SUB_FLAG_PF_POSTCOMP) {
+        else*/ if (pragmas & SUB_FLAG_PF_POSTCOMP) {
             Parrot_pcc_invoke_sub_from_c_args(imcc->interp, sub_pmc, "->");
         }
     }
