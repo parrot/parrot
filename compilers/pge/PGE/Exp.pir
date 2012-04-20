@@ -90,6 +90,7 @@ C<target> adverbs.
   bytecode:
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
+    $P1 = $P1.'main_sub'()
   make_grammar:
     if grammar == '' goto end
     .local pmc p6meta
