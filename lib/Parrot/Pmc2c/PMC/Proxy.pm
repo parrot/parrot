@@ -118,7 +118,9 @@ sub _generate_proxy_method {
 
     return result;
 BODY
-        : "    return $call;\n";
+        : $method->return_type eq 'void'
+            ? "    $call;\n"
+            : "    return $call;\n";
 
     $clone->body( Parrot::Pmc2c::Emitter->text($body));
 
