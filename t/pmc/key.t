@@ -173,6 +173,7 @@ code
   .local pmc pir_compiler
   pir_compiler = compreg 'PIR'
   $P0 = pir_compiler($S0)
+  $P0 = $P0.'all_subs'()
   $P0 = $P0[0]
   $P1 = new ['TclProc']
   assign $P1, $P0

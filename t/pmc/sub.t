@@ -1464,9 +1464,11 @@ PIR
 
     $P3 = new 'ParrotInterpreter'
     $P3 = $P3['sub']
-    $P2 = $P1[0]
+    $P2 = $P1.'all_subs'()
+    $P2 = $P2[0]
     $P2.'set_outer'($P3)
 
+    $P1 = $P1.'main_sub'()
     $P1()
 .end
 CODE
@@ -1625,7 +1627,11 @@ PIR
     $P0 = compreg 'PIR'
     say "got compiler"
     $P1 = $P0($S0)
+    $P2 = $P1.'subs_by_tag'('init')
+    $P2 = $P2[0]
+    $P2()
     say "compiled"
+    $P1 = $P1.'main_sub'()
     $P1()
     say "lived"
 .end

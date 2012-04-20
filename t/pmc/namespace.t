@@ -543,6 +543,7 @@ CODE
 CODE
     $P0 = compreg "PIR"
     $P1 = $P0($S0)
+    $P1 = $P1.'main_sub'()
     $P2 = $P1()
     $S0 = typeof $P2
     is($S0, "NameSpace", "get_namespace from anon sub")
@@ -574,6 +575,7 @@ CODE
 CODE
     $P0 = compreg "PIR"
     $P1 = $P0($S0)
+    $P1 = $P1.'main_sub'()
     $I0 = $P1()
     is($I0, 1, "find_name sub with sigil in namespace")
 .end
