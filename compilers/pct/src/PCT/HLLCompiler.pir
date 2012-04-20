@@ -555,6 +555,7 @@ Transform PAST C<source> into POST.
 
     $P0 = compreg 'PIR'
     $P1 = $P0(source)
+    $P1 = $P1.'main_sub'()
     .return($P1)
 .end
 

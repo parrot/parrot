@@ -178,6 +178,7 @@ CODE
     push_eh eh
 
     f = comp(s)
+    f = f."main_sub"()
     f()
 
     pop_eh
