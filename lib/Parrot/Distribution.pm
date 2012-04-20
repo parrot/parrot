@@ -301,6 +301,20 @@ BEGIN {
     }
 }
 
+=item C<get_all_files()>
+
+Returns all the files in the distro.
+
+=cut
+
+sub get_all_files {
+    my ($self) = @_;
+
+    return sort
+        map  { $self->file_with_name($_) }
+        $self->_dist_files;
+}
+
 =item C<get_make_language_files()>
 
 Returns the Make language source files within Parrot.
