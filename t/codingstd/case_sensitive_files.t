@@ -21,7 +21,7 @@ t/codingstd/case_sensitive_files.t - Checks for name conflicts on case-insensiti
 =head1 DESCRIPTION
 
 Checks that there are no files in the distribution that would conflict
-with other files on case-insensitive files.
+with other files on case-insensitive filesystems.
 
 If we have a F<readme.pod> in the distro, and then we add a F<README.pod>
 in the same directory, that's a problem.  The creator F<README.pod>
