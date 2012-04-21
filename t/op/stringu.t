@@ -310,8 +310,6 @@ CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
-SKIP: {
-    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
     pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
 .sub main :main
     .local string str
@@ -363,7 +361,6 @@ OUTPUT
 CODE
 T\x{d6}TSCH
 OUTPUT
-}
 
 # Tests for .CCLASS_WHITESPACE
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
