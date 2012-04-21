@@ -471,6 +471,16 @@ op enable_preemption() {
     Parrot_cx_enable_preemption(interp);
 }
 
+=item B<terminate>()
+
+Terminate the current task immediately.
+
+=cut
+
+op terminate() {
+    goto ADDRESS(0);
+}
+
 =back
 
 =head1 COPYRIGHT

@@ -1,7 +1,7 @@
 # Copyright (C) 2012, Parrot Foundation.
 
 .sub 'main' :main
-    .local pmc colors, start_colors, at_most_two, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
+    .local pmc colors, start_colors, at_most_two, at_most_two_waiters, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
     .local int i
 
     dummy = new ['Continuation'] # workaround, see TODO in Proxy instantiate
@@ -24,6 +24,7 @@
     start_colors[3] = 0
 
     # init cooperation
+    at_most_two_waiters = new ['ResizablePMCArray']
     at_most_two = new ['Integer']
     at_most_two = 2
     mutex       = new ['Integer']
@@ -56,6 +57,7 @@ init_chameneos:
     push chameneo, a_color
     push chameneo, first_call
     push chameneo, at_most_two
+    push chameneo, at_most_two_waiters
     push chameneo, mutex
     push chameneo, sem_priv
     push chameneo, colors
@@ -72,7 +74,7 @@ init_chameneos:
 
 .sub chameneos_code
     .param pmc data
-    .local pmc interp, task, number, color, colors, at_most_two, mutex, sem_priv, cooperation, first_call, a_color, b_color, other_color
+    .local pmc interp, task, number, color, colors, at_most_two, at_most_two_waiters, mutex, sem_priv, cooperation, first_call, a_color, b_color, other_color
     .local int old_color, other_color_int, color_int
     .local string color_name
 
@@ -81,6 +83,7 @@ init_chameneos:
     colors      = pop task
     sem_priv    = pop task
     mutex       = pop task
+    at_most_two_waiters = pop task
     at_most_two = pop task
     first_call  = pop task
     a_color     = pop task
@@ -100,7 +103,7 @@ start:
     print " and I'm "
     say color_name
 
-    other_color = cooperation(number, color, sem_priv, mutex, at_most_two, first_call, a_color, b_color)
+    other_color = cooperation(number, color, sem_priv, mutex, at_most_two, at_most_two_waiters, first_call, a_color, b_color)
     other_color_int = other_color
 
     color_int = color
@@ -121,6 +124,7 @@ start:
     .param pmc sem_priv
     .param pmc mutex
     .param pmc at_most_two
+    .param pmc at_most_two_waiters
     .param pmc first_call
     .param pmc a_color
     .param pmc b_color
@@ -130,7 +134,7 @@ start:
     sem_wait    = get_global 'sem_wait'
     sem_unlock  = get_global 'sem_unlock'
 
-    sem_wait(at_most_two)
+    sem_ackquire(at_most_two, at_most_two_waiters)
     sem_wait(mutex)
 
     if first_call == 1 goto first
@@ -160,8 +164,8 @@ start:
         sem_wait(sem_priv)
         other_color = b_color
         sem_unlock(mutex)
-        sem_unlock(at_most_two)
-        sem_unlock(at_most_two)
+        sem_release(at_most_two, at_most_two_waiters)
+        sem_release(at_most_two, at_most_two_waiters)
 done:
     .return(other_color)
 .end
@@ -247,6 +251,81 @@ lock:
     .local pmc sem
     sem = data
     inc sem
+.end
+
+.sub sem_ackquire
+    .param pmc sem
+    .param pmc sem_waiters
+    .local pmc interp, waiter, sem_wait_task, sem_ackquire_core
+
+    interp = getinterp
+    sem_ackquire_core = get_global 'sem_ackquire_core'
+
+    sem_wait_task = new ['Task']
+    setattribute sem_wait_task, 'code', sem_ackquire_core
+    setattribute sem_wait_task, 'data', sem
+    push sem_wait_task, sem_waiters
+    interp.'schedule_proxied'(sem_wait_task, sem)
+    wait sem_wait_task
+    returncc
+.end
+
+.sub sem_ackquire_core
+    .param pmc data
+    .local pmc sem, sem_waiters, interp, task, cont
+
+    interp = getinterp
+    task = interp.'current_task'()
+    sem_waiters = pop task
+
+    disable_preemption
+    sem = data
+
+    if sem > 0 goto lock
+    cont = new ['Continuation']
+    set_label cont, lock
+    setattribute task, 'code', cont
+    push sem_waiters, task
+    enable_preemption
+    terminate
+lock:
+    dec sem
+    enable_preemption
+.end
+
+.sub sem_release
+    .param pmc sem
+    .param pmc sem_waiters
+    .local pmc interp, sem_release_task, sem_release_core
+
+    interp = getinterp
+    sem_release_core = get_global 'sem_release_core'
+    sem_release_task = new ['Task']
+    setattribute sem_release_task, 'code', sem_release_core
+    setattribute sem_release_task, 'data', sem
+    push sem_release_task, sem_waiters
+
+    interp.'schedule_proxied'(sem_release_task, sem)
+.end
+
+.sub sem_release_core
+    .param pmc data
+    .local pmc sem, sem_waiters, interp, task, waiter
+    .local int waiters_count
+
+    interp = getinterp
+    task = interp.'current_task'()
+    sem_waiters = pop task
+
+    disable_preemption
+    sem = data
+    inc sem
+    waiters_count = sem_waiters
+    if waiters_count <= 0 goto done
+    waiter = pop sem_waiters
+    schedule_local waiter
+done:
+    enable_preemption
 .end
 
 # Local Variables:
