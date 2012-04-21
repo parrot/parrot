@@ -486,9 +486,10 @@
 .end # process_args
 
 
-.sub 'main' :main
+.sub '__PARROT_ENTRY_WINXED_main' :main
         .param pmc __ARG_1
 .const 'Sub' WSubId_4 = "WSubId_4"
+.const 'Sub' WSubId_5 = "WSubId_5"
     $P1 = WSubId_4(__ARG_1)
     null $I1
     new $P4, 'ExceptionHandler'
@@ -505,22 +506,75 @@
     .get_results($P3)
     finalize $P3
     pop_eh
-    $S1 = $P3['message']
-    isnull $I2, $S1
-    not $I2
-    unless $I2 goto __label_5
-    isne $I2, $S1, ''
-  __label_5:
-    unless $I2 goto __label_4
-    getstderr $P0
-    print $P0, $S1
-    print $P0, "\n"
-
-  __label_4: # endif
-    set $I1, 1
+    WSubId_5($P3)
   __label_2:
     exit $I1
 
-.end # main
+.end # __PARROT_ENTRY_WINXED_main
+
+
+.sub 'fail' :subid('WSubId_5') :anon
+        .param pmc __ARG_1
+    getstderr $P1
+    getattribute $P3, __ARG_1, 'message'
+    null $S1
+    if_null $P3, __label_1
+    set $S1, $P3
+  __label_1:
+    isnull $I3, $S1
+    if $I3 goto __label_3
+    iseq $I3, $S1, ""
+  __label_3:
+    unless $I3 goto __label_2
+    set $S1, "No exception handler and no message"
+  __label_2: # endif
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    assign $P3, 1
+    $P3[0] = $S1
+    sprintf $S5, "%s\n", $P3
+    $P1.'print'($S5)
+    set $S2, ""
+    $P2 = __ARG_1.'backtrace_strings'()
+    elements $I3, $P2
+    sub $I1, $I3, 1
+  __label_6: # for condition
+    lt $I1, 0, __label_5
+    $S3 = $P2[$I1]
+    split $P3, "\n", $S3
+    if_null $P3, __label_8
+    iter $P4, $P3
+    set $P4, 0
+  __label_7: # for iteration
+    unless $P4 goto __label_8
+    shift $S4, $P4
+    index $I3, $S4, "__PARROT_ENTRY"
+    lt $I3, 0, __label_9
+    goto __label_7 # continue
+  __label_9: # endif
+    root_new $P3, ['parrot';'ResizablePMCArray']
+    assign $P3, 2
+    $P3[0] = $S2
+    $P3[1] = $S4
+    sprintf $S5, "%s%s", $P3
+    $P1.'print'($S5)
+    set $S2, "\n"
+    goto __label_7
+  __label_8: # endfor
+    set $S2, "\nthrown from\n"
+  __label_4: # for iteration
+    dec $I1
+    goto __label_6
+  __label_5: # for end
+    getattribute $P3, __ARG_1, 'exit_code'
+    set $I2, $P3
+    unless $I2 goto __label_11
+    set $I3, $I2
+    goto __label_10
+  __label_11:
+    set $I3, 1
+  __label_10:
+    exit $I3
+
+.end # fail
 
 # End generated code
