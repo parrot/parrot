@@ -343,6 +343,7 @@ loop_end:
     code = $S1 . code
   named_grammar:
     libloader = compiler(code)
+    libloader = libloader.'main_sub'()
     libloader()
 
     new_grammar = new grammarname

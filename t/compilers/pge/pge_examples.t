@@ -96,6 +96,7 @@ END_FASTA
     ( code ) = p6grammar.'compile'(fasta_grammar, 'target'=>'PIR')
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
+    $P1 = $P1.'main_sub'()
     $P1()
     # print code
 
