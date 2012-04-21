@@ -99,7 +99,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC *main), ARGIN(PMC *argv))
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     PMC * const main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const tdata = PARROT_TASK(main_task);
-    INTVAL task_count  = 1;
+    INTVAL task_count;
 
     tdata->code = main;
     tdata->data = argv;
