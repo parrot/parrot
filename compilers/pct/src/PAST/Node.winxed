@@ -9,6 +9,7 @@ This file implements the various abstract syntax tree nodes
 for compiling programs in Parrot.
 
 =cut
+
 */
 
 class P6metaclass;
@@ -66,6 +67,7 @@ Other node attributes are generally defined by subclasses of C<PAST::Node>.
 Accessor method -- sets/returns the return type for the invocant.
 
 =cut
+
 */
 
     function returns[method](var value [optional], int has_value [opt_flag]) {
@@ -79,6 +81,7 @@ Accessor method -- sets/returns the arity (number of expected arguments)
 for the node.
 
 =cut
+
 */
 
     function arity[method](var value [optional], int has_value [opt_flag]) {
@@ -92,6 +95,7 @@ Accessor method -- for named arguments, sets/returns the name to be
 associated with the argument.
 
 =cut
+
 */
 
     function named[method](var value [optional], int has_value [opt_flag]) {
@@ -104,6 +108,7 @@ associated with the argument.
 Accessor method -- sets/returns the "flatten" flag on arguments.
 
 =cut
+
 */
 
     function flat[method](var value [optional], int has_value [opt_flag]) {
@@ -117,6 +122,7 @@ Accessor method -- sets/returns handlers associated with this node.
 Handlers can be used for PAST::Block and PAST::Stmts nodes.
 
 =cut
+
 */
 
     function handlers[method](var value [optional], int has_value [opt_flag]) {
@@ -132,6 +138,7 @@ handler, the node is a PAST::Control node, or the node is
 a PAST::Op node of type 'try'.
 
 =cut
+
 */
 
     function handle_types[method](var value [optional], int has_value [opt_flag]) {
@@ -146,6 +153,7 @@ does not handle. Same as handle_types, but all exceptions not
 matching the specified ones will be caught.
 
 =cut
+
 */
 
     function handle_types_except[method](var value [optional], int has_value [opt_flag]) {
@@ -159,6 +167,7 @@ Get/set the C<lvalue> attribute, which indicates whether this
 variable is being used in an lvalue context.
 
 =cut
+
 */
 
     function lvalue[method](var value [optional], int has_value [opt_flag]) {
@@ -172,6 +181,7 @@ Get/set the signature to be used for evaluating any
 children nodes.
 
 =cut
+
 */
 
     function signature[method](var value [optional], int has_value [opt_flag]) {
@@ -187,6 +197,7 @@ children are evaluated last-to-first, otherwise they're
 evaluated first-to-last.
 
 =cut
+
 */
 
     function childorder[method](var value [optional], int has_value [opt_flag]) {
@@ -196,6 +207,9 @@ evaluated first-to-last.
 
 namespace PAST.Val {
 /*
+
+=back
+
 =head2 PAST::Val
 
 C<PAST::Val> nodes represent constant values in the abstract
@@ -210,6 +224,7 @@ Get/set the constant value for this node.
 
 =cut
 
+
 */
 
     function value[method](var value [optional], int has_value [opt_flag]) {
@@ -222,6 +237,7 @@ Get/set the constant value for this node.
 Throw an exception if we try to make a PAST::Val into an lvalue.
 
 =cut
+
 */
 
     function lvalue[method](var value [optional], int has_value [opt_flag]) {
@@ -233,6 +249,9 @@ Throw an exception if we try to make a PAST::Val into an lvalue.
 
 namespace PAST.Var {
 /*
+
+=back
+
 =head2 PAST::Var
 
 C<PAST::Var> nodes represent variables within the abstract
@@ -250,6 +269,7 @@ HLL global, lexical, block parameter, array/hash variables, object
 members and (optionally named) Parrot registers respectively.
 
 =cut
+
 */
 
     function scope[method](var value [optional], int has_value [opt_flag]) {
@@ -265,6 +285,7 @@ this node is to be created within the current lexical scope.
 Otherwise, the node refers to a lexical variable from an outer scope.
 
 =cut
+
 */
 
     function isdecl[method](var value [optional], int has_value [opt_flag]) {
@@ -281,6 +302,7 @@ through the lexpad. Otherwise, find_lex/store_lex instructions will be used
 for retrieval and storage.
 
 =cut
+
 */
 
     function directaccess[method](var value [optional], int has_value [opt_flag]) {
@@ -295,6 +317,7 @@ given by C<namespace>.  Useful only for variables with a C<scope>
 of 'package'.
 
 =cut
+
 */
 
     function namespace[method](var value [optional], int has_value [opt_flag]) {
@@ -310,6 +333,7 @@ node is to be created as a slurpy parameter (consuming all remaining arguments
 passed in).
 
 =cut
+
 */
 
     function slurpy[method](var value [optional], int has_value [opt_flag]) {
@@ -325,6 +349,7 @@ node is to be created as a C<:call_sig> parameter. If you use this, it should be
 the only parameter.
 
 =cut
+
 */
 
     function call_sig[method](var value [optional], int has_value [opt_flag]) {
@@ -339,6 +364,7 @@ either the type of the value to create for the node or (future
 implementation) a PAST tree to create the value.
 
 =cut
+
 */
 
     function viviself[method](var value [optional], int has_value [opt_flag]) {
@@ -353,6 +379,7 @@ create for the base if the base doesn't specify its own 'viviself'
 attribute.
 
 =cut
+
 */
 
     function vivibase[method](var value [optional], int has_value [opt_flag]) {
@@ -365,6 +392,7 @@ attribute.
 Get/set MMD type of Var when used as parameter of Block.
 
 =cut
+
 */
 
     function multitype[method](var value [optional], int has_value [opt_flag]) {
@@ -374,6 +402,9 @@ Get/set MMD type of Var when used as parameter of Block.
 
 namespace PAST.Op {
 /*
+
+=back
+
 =head2 PAST::Op
 
 C<PAST::Op> nodes represent the operations in an abstract syntax
@@ -445,6 +476,7 @@ assumes "pirop" if its C<pirop> attribute is set, otherwise it
 assumes "call".
 
 =cut
+
 */
 
     function pasttype[method](var value [optional], int has_value [opt_flag]) {
@@ -463,6 +495,7 @@ whenever it isn't certain what else to do.)  The table of
 PIR opcodes that PAST "knows" about is in F<POST.pir>.
 
 =cut
+
 */
 
     function pirop[method](var value [optional], int has_value [opt_flag]) {
@@ -498,6 +531,7 @@ given by "%r", "%t", or "%u" in the C<code> string:
          of this operation.
 
 =cut
+
 */
 
     function inline[method](var value [optional], int has_value [opt_flag]) {
@@ -513,6 +547,7 @@ precedence table, and the attributes being set correspond
 to traits in the grammar.
 
 =cut
+
 */
 
     function opattr[method](var hash) {
@@ -525,6 +560,7 @@ to traits in the grammar.
 }
 
 /*
+
 =back
 
 =head2 PAST::Stmt
@@ -559,6 +595,7 @@ executed when it is evaluated in the AST (e.g., the immediate
 blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 =cut
+
 */
 
 namespace PAST.Block {
@@ -575,6 +612,7 @@ any block reference returned by the node is to a clone of the
 block that has captured the current lexical context.
 
 =cut
+
 */
 
     function closure[method](var value [optional], int has_value [opt_flag]) {
@@ -589,6 +627,7 @@ The exception handler can be any PAST tree.  The special (string)
 value "return_pir" generates code to handle C<CONTROL_RETURN> exceptions.
 
 =cut
+
 */
 
     function control[method](var value [optional], int has_value [opt_flag]) {
@@ -610,6 +649,7 @@ automatically initialized to refer to the block itself
 storing in a symbol table, etc.).
 
 =cut
+
 */
 
     function loadinit[method](var value [optional], int has_value [opt_flag]) {
@@ -628,6 +668,7 @@ Get/set the namespace for this block.  The C<namespace> argument
 can be either a string or an array of strings.
 
 =cut
+
 */
 
     function namespace[method](var value [optional], int has_value [opt_flag]) {
@@ -641,6 +682,7 @@ Get/set the multi signature for this block.  The C<multi> argument
 can be either a string or an array of strings.
 
 =cut
+
 */
 
     function multi[method](var value [optional], int has_value [opt_flag]) {
@@ -653,6 +695,7 @@ can be either a string or an array of strings.
 Get/set the C<hll> for this block.
 
 =cut
+
 */
 
     function hll[method](var value [optional], int has_value [opt_flag]) {
@@ -666,6 +709,7 @@ Get/set the libraries to be loaded at startup. EXPERIMENTAL (not subject to
 deprecation policy, yet).
 
 =cut
+
 */
 
     function loadlibs[method](var libs [slurpy]) {
@@ -679,6 +723,7 @@ deprecation policy, yet).
 Get/set the C<nsentry> for this block.
 
 =cut
+
 */
 
     function nsentry[method](var value [optional], int has_value [opt_flag]) {
@@ -698,6 +743,7 @@ If no named arguments are given, returns the current
 attribute hash for symbol C<name>.
 
 =cut
+
 */
 
     function symbol[method](string name, attr [slurpy, named]) {
@@ -729,6 +775,7 @@ store the default attributes, but it's probably not safe
 to rely on this behavior in the future.
 
 =cut
+
 */
 
     function symbol_defaults[method](attr [slurpy, named]) {
@@ -742,6 +789,7 @@ Get/set the symbol table for the block.  May be deprecated in
 favor of the C<symbol> method above.
 
 =cut
+
 */
 
     function symtable[method](var value [optional], int has_value [opt_flag]) {
@@ -755,6 +803,7 @@ Get/set whether the block is lexically nested within
 the block that contains it.
 
 =cut
+
 */
 
     function lexical[method](var value [optional], int has_value [opt_flag]) {
@@ -769,6 +818,7 @@ compiled using compiler C<name> instead of the standard
 PAST compiler.
 
 =cut
+
 */
 
     function compiler[method](var value [optional], int has_value [opt_flag]) {
@@ -783,6 +833,7 @@ through the compiler attribute. Not used if compiler is
 not set.
 
 =cut
+
 */
 
     function compiler_args[method](value [named, slurpy]) {
@@ -798,6 +849,7 @@ Returns the current subid for the block, generating a unique
 subid for the block if one does not already exist.
 
 =cut
+
 */
 
     function subid[method](var value [optional], int has_value [opt_flag]) {
@@ -822,6 +874,7 @@ subid for the block if one does not already exist.
 Get/set any pirflags for this block.
 
 =cut
+
 */
 
     function pirflags[method](var value [optional], int has_value [opt_flag]) {
@@ -837,6 +890,7 @@ the block uses the same temporary register bank as its
 outer statement.
 
 =cut
+
 */
 
     function tempregs[method](var value [optional], int has_value [opt_flag]) {
@@ -853,6 +907,7 @@ namespace PAST.VarList {
 }
 
 /*
+
 =back
 
 =head1 AUTHOR
@@ -874,4 +929,5 @@ Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>
 Copyright (C) 2006-2012, Parrot Foundation.
 
 =cut
+
 */
