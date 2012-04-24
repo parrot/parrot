@@ -60,6 +60,9 @@ compilers/pct/src/PAST/Compiler.pbc : compilers/pct/src/PAST/Compiler.pir $(PARR
 compilers/pct/src/POST/Node.pbc : compilers/pct/src/POST/Node.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/POST/Node.pir
 
+compilers/pct/src/POST/Node.pir : compilers/pct/src/POST/Node.winxed $(WINXED)
+	$(WINXED) -c -o $@ $<
+
 compilers/pct/src/POST/Compiler.pbc : compilers/pct/src/POST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir
 

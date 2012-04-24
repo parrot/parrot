@@ -1,0 +1,275 @@
+/*
+=head1 NAME
+
+POST - Parrot opcode syntax tree
+
+=head1 DESCRIPTION
+
+This file implements the various opcode syntax tree nodes
+for compiling programs in Parrot.
+
+=cut
+*/
+
+class P6metaclass;
+class POST.Node;
+class POST.Op;
+class POST.Ops;
+class POST.Label;
+class POST.Sub;
+
+namespace POST {
+    function __onload[load, init]() {
+        // Create POST classes
+        var p6meta = new P6metaclass;
+        var base = p6meta.new_class('POST::Node', 'PCT::Node':[named('parent')]);
+        p6meta.new_class('POST::Op', base:[named('parent')]);
+        p6meta.new_class('POST::Ops', base:[named('parent')]);
+        p6meta.new_class('POST::Label', base:[named('parent')]);
+        p6meta.new_class('POST::Sub', base:[named('parent')]);
+
+        var sub = namespace POST.Sub;
+        sub['%!paramfmt'] = [
+            "    .param pmc %0\n",
+            "    .param pmc %0 :optional\n    .param int has_%0 :opt_flag\n",
+            "    .param pmc %0 :slurpy\n",
+            "    .param pmc %0 :slurpy\n",
+            "    .param pmc %0 :named(%1)\n",
+            "    .param pmc %0 :optional :named(%1)\n    .param int has_%0 :opt_flag\n",
+            "    .param pmc %0 :slurpy :named\n",
+            "    .param pmc %0 :slurpy :named\n",
+            "    .param pmc %0 :call_sig\n"
+        ];
+
+        return;
+    }
+}
+
+/*
+=head1 POST Node types
+
+=head2 POST::Node
+
+C<POST::Node> is the base class for all POST nodes.  It's derived from class
+C<PCT::Node> (see F<compilers/pct/src/PCT/Node.pir>).
+
+=over 4
+
+=cut
+*/
+
+namespace POST.Node {
+/*
+=item result([value])
+
+Get or set the result value of this node.  If the result value
+is set to another POST node, then that node's result is used
+as the result of the current node.
+
+=cut
+*/
+
+    function result[method](var value [optional], int has_value [opt_flag]) {
+        if (has_value) {
+            self['result'] = value;
+            return value;
+        }
+
+        value = self['result'];
+        if (value == null)
+            return '';
+        if (value instanceof POST.Node)
+            return value.result();
+        return value;
+    }
+
+/*
+=item get_string()
+
+Returns the result of the current node as a string.
+
+=cut
+*/
+
+    function get_string[vtable, method]() {
+        return string(self.result());
+    }
+
+/*
+=item push_pirop(pirop [,arglist :slurpy] [,adverbs :slurpy :named])
+
+Shortcut for creating and adding a new POST::Op node with opcode
+C<pirop> and any supplied arguments or options.  Returns the
+newly created node.
+
+=cut
+*/
+
+    function push_pirop[method](var pirop, arglist [slurpy], adverbs [slurpy, named]) {
+        adverbs['pirop'] = pirop;
+        using POST.Op;
+        var ret = Op.new(arglist:[flat], adverbs:[flat, named]);
+        self.push(ret);
+        return ret;
+    }
+
+/*
+=item escape(str)
+
+Return C<str> as a PIR constant string.  (Deprecated in favor of
+C<POST::Compiler.escape>.)
+=cut
+*/
+
+    function escape[method](string str) {
+        using PAST.Compiler;
+        return Compiler.escape(str);
+    }
+}
+
+/*
+=back
+
+=head2 POST::Op
+
+C<POST::Op> nodes represents any PIR opcodes.
+
+=over 4
+
+=item pirop([opcode])
+
+Get/set the opcode type for this node.
+
+=cut
+*/
+
+namespace POST.Op {
+    function pirop[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('pirop', value, has_value);
+    }
+
+    function inline[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('inline', value, has_value);
+    }
+}
+
+namespace POST.Label {
+    function result[method](var value [optional], int has_value [opt_flag]) {
+        if (!has_value) {
+            value = self['result'];
+            if (value != null)
+                goto end;
+            :(string name) = self.name();
+            value = self.unique(name);
+        }
+        self['result'] = value;
+    end:
+        return value;
+    }
+}
+
+namespace POST.Sub {
+    function blocktype[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('blocktype', value, has_value);
+    }
+
+    function namespace[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('namespace', value, has_value);
+    }
+
+    function hll[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('hll', value, has_value);
+    }
+
+    function loadlibs[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('loadlibs', value, has_value);
+    }
+
+    function outer[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('outer', value, has_value);
+    }
+
+    function multi[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('multi', value, has_value);
+    }
+
+    function subid[method](var value [optional], int has_value [opt_flag]) {
+        if (!has_value && !exists self['subid']) {
+            value = self.unique('post');
+            has_value = 1;
+        }
+        return self.attr('subid', value, has_value);
+    }
+
+    function pirflags[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('pirflags', value, has_value);
+    }
+
+    function compiler[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('compiler', value, has_value);
+    }
+
+    function compiler_args[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('compiler_args', value, has_value);
+    }
+
+    function add_param[method](var pname, adverbs [slurpy, named]) {
+        int optional = adverbs['optional'];
+        int slurpy = adverbs['slurpy'];
+        string named = adverbs['named'];
+        int call_sig = adverbs['call_sig'];
+
+        int paramseq = optional != 0;
+        if (slurpy)
+            paramseq += 2;
+        if (named)
+            paramseq += 4;
+        if (call_sig)
+            paramseq += 8;
+
+        var paramlist = self['paramlist'];
+        if (paramlist == null)
+            self['paramlist'] = paramlist = [];
+
+        var code = paramlist[paramseq];
+        if (code == null)
+            paramlist[paramseq] = code = new 'StringBuilder';
+
+        var paramfmt;
+        ${ get_hll_global paramfmt, ['POST', 'Sub'], '%!paramfmt' };
+        named = self.escape(named);
+        code.append_format(paramfmt[paramseq], pname, named);
+
+        return;
+    }
+
+    function add_directive[method](string line) {
+        string dlist = self['directives'];
+        if (indexof(dlist, line) < 0)
+            self['directives'] = dlist + line + "\n";
+        return;
+    }
+}
+
+/*
+=back
+
+=head1 AUTHOR
+
+Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
+Please send patches and suggestions to the Parrot porters or
+Perl 6 compilers mailing lists.
+
+Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>.
+
+=head1 HISTORY
+
+2007-11-21  Significant refactor as part of Parrot Compiler Toolkit
+2012-04-24  Rewritten in Winxed
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006-2012, Parrot Foundation.
+
+=cut
+*/
