@@ -1,0 +1,321 @@
+/*
+=head1 NAME
+
+PCT::Node - base class for PAST and POST nodes
+
+=head1 DESCRIPTION
+
+This file implements the base class for abstract syntax tree (PAST)
+and opcode syntax tree (POST) nodes in the Parrot Compiler Toolkit.
+
+=cut
+*/
+
+class P6metaclass;
+class PGE.Match;
+class PCT.Node;
+
+namespace PCT.Node {
+    function onload[load, init]() {
+        // create the PCT::Node base class
+        var p6meta = new P6metaclass;
+        p6meta.new_class('PCT::Node', 'Capture':[named('parent')]);
+
+        var node = namespace PCT.Node;
+        node['$!serno'] = var(10);
+
+        return;
+    }
+
+/*
+=head1 PCT::Node
+
+C<PCT::Node> is the base class for all PAST and POST nodes.  It's
+derived from class C<Capture>, so that it has both array and hash
+components.  The array component is used to maintain a node's children,
+while the hash component contains the attributes of the node.  In general
+we provide and use accessor methods for a node's attributes, instead
+of accessing the hash component directly.
+
+Every PAST/POST node has C<name>, C<source>, and C<pos> attributes.
+The C<name> attribute is the node's name, if any, while C<source>
+and C<pos> are used to identify the location in the original source
+code for the node.  The C<source> and C<pos> values are generally
+set by the C<node> method below.
+
+Other node attributes are generally defined by subclasses of C<PCT::Node>.
+
+=over 4
+
+=item init([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ... ])
+
+Initialize a node with the given children and attributes.
+Adds each child to the node (using the C<append> method, below) and
+calls the appropriate accessor method for each attribute.
+And returns the node.
+
+=cut
+*/
+
+    function init[method](children [slurpy], adverbs [slurpy, named]) {
+        if (elements(children))
+            self.list().append(children);
+
+        for (string key in adverbs)
+            self.*key(adverbs[key]);
+
+        return self;
+    }
+
+/*
+=item new([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
+
+Create a new PAST node of initialized with the given
+children and attributes.  Returns the newly created node.
+
+=cut
+*/
+
+    function new[method](children [slurpy], adverbs [slurpy, named]) {
+        var klass = self.HOW().parrotclass;
+        return (new klass).init(children : [flat], adverbs : [flat, named]);
+    }
+
+/*
+=item clone()
+
+Clone the node.
+
+=cut
+*/
+
+    function clone[method]() {
+        return Winxed_Builtins.clone(self);
+    }
+
+/*
+=item unshift(child)
+
+Add C<child> to the beginning of the invocant's list of children.
+
+=item shift()
+
+Remove the first child from the invocant's list of children.
+Returns the child.
+
+=item push(child)
+
+Add C<child> to the end of the invocant's list of children.
+
+=item pop()
+
+Remove the last child from the invocant's list of children.
+Returns the child.
+
+=cut
+*/
+
+    function unshift[method](var value) {
+        Winxed_Builtins.unshift(self, value);
+    }
+
+    function shift[method]() {
+        return Winxed_Builtins.shift(self);
+    }
+
+    function push[method](var value) {
+        Winxed_Builtins.push(self, value);
+    }
+
+    function pop[method]() {
+        return Winxed_Builtins.pop(self);
+    }
+
+/*
+=item push_new(class, [child1, child2, ..., ] [attr1=>val1, attr2=>val2, ...])
+
+(Deprecated.)  Creates a new node of type C<class>, initializes it with the
+given children and attributes, and adds it to the end of the invocant's
+array of children.  Returns the newly created node.
+
+=cut
+*/
+
+    function push_new[method](string klass, children [slurpy], adverbs [slurpy, named]) {
+        var klass_key = split('::', klass);
+        var ret = new klass_key;
+        ret.init(children : [flat], adverbs : [flat, named]);
+        Winxed_Builtins.push(self, ret);
+        return ret;
+    }
+
+/*
+=item iterator( )
+
+Returns a newly initialized iterator for the invocant's list of
+children.
+
+=cut
+*/
+
+    function iterator[method]() {
+        var it;
+        ${ iter it, self.list() };
+        return it;
+    }
+
+/*
+=item node([val])
+
+Sets the invocant's C<source> and C<pos> attributes to those
+of C<val>.  If C<val> is another PAST node, then C<source> and C<pos>
+are simply copied from that node, otherwise C<val> is assumed to be
+a C<Match> object and obtains source/position information from that.
+
+=cut
+*/
+
+    function node[method](var node) {
+        if (node == null) return;
+
+        var source;
+        var pos;
+        switch {
+        case node instanceof PGE.Match:
+            source = node.*'$.target';
+            pos = node.from();
+            break;
+
+        case node instanceof PCT.Node:
+            source = node['source'];
+            pos = node['pos'];
+            break;
+
+        default:
+            int can_orig, can_from;
+            ${ can can_orig, node, 'orig' };
+            ${ can can_from, node, 'from' };
+            if (!can_orig || !can_from)
+                die("Don't know how to save info from node of type " + string(typeof(node)));
+
+            source = node.orig();
+            pos    = node.from();
+        }
+
+        self['source'] = source;
+        self['pos'] = pos;
+        return;
+    }
+
+/*
+=item name([value])
+
+Accessor method -- sets/returns the C<name> attribute of the invocant.
+
+=cut
+*/
+
+    function name[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('name', value, has_value);
+    }
+
+/*
+=item attr(STR attrname, PMC value, INT has_value)
+
+Helper method for accessors.  If C<has_value> is true then set
+the invocant's value of C<attrname> to C<value>.  Returns the
+(resulting) value of C<attrname> in the invocant.
+
+=cut
+*/
+
+    function attr[method](string attrname,
+                          var value, int has_value,
+                          var def [optional], int has_def [opt_flag]) {
+        if (has_value) {
+            self[attrname] = value;
+            return value;
+        }
+
+        value = self[attrname];
+        if (value == null) {
+            if (has_def)
+                return def;
+
+            value = new 'Undef';
+        }
+        return value;
+    }
+
+/*
+=item unique([STR fmt])
+
+Generate a unique number that can be used as an identifier.
+If C<fmt> is provided, then it will be used as a prefix to the
+unique number.
+
+=cut
+*/
+
+    function unique[method](string fmt [optional], int has_fmt [opt_flag]) {
+        if (!has_fmt) fmt = '';
+
+        var serno;
+        ${ get_global serno, '$!serno' };
+
+        string ret = fmt + string(serno);
+        serno++;
+
+        return ret;
+    }
+
+/*
+=item isa([type])
+
+Ask the current object's metaclass if C<self> is a C<type>, through its C<isa>
+method. If so, return 1, else return 0.
+
+=cut
+*/
+
+    function isa[method](var type) {
+        return int(self.HOW().isa(self, type));
+    }
+
+/*
+=item VTABLE get_bool()
+
+Return true since the node is defined.
+
+=cut
+*/
+
+    function get_bool[method, vtable]() {
+        return 1;
+    }
+}
+
+/*
+=back
+
+=head1 AUTHOR
+
+Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
+Please send patches and suggestions to the Parrot porters or
+Perl 6 compilers mailing lists.
+
+Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>.
+
+=head1 HISTORY
+
+2006-11-20  Patrick Michaud added first draft of POD documentation.
+2007-11-21  Re-implementation with pdd26 compliance, compiler toolkit
+2007-12-07  Refactor PAST::Node into separate PCT::Node component.
+2012-04-24  Converted to Winxed
+
+=head1 COPYRIGHT
+
+Copyright (C) 2006-2012, Parrot Foundation.
+
+=cut
+*/

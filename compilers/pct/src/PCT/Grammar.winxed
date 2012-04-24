@@ -1,0 +1,213 @@
+/* Copyright (C) 2007-2008, Parrot Foundation.
+
+=head1 NAME
+
+PCT::Grammar - base grammar with useful rules
+
+=head1 SYNOPSIS
+
+    grammar MyGrammar is PCT::Grammar;
+
+    rule abc { [ word | <panic: word not found> ] }
+
+    rule quote {
+        [ \' <string_literal: '> \'
+        | \" <string_literal: "> \"
+        ]
+    }
+
+=head1 DESCRIPTION
+
+This file implements C<PCT::Grammar>, which is a basic grammar object
+with a few useful methods for parsing thrown in.
+
+=head2 Methods
+
+=over 4
+
+=item panic(match [, message, ...] )
+
+Throws an exception at the current point of the match, with message
+as part of the exception payload.  The message doesn't end with
+a newline, then the line number and offset of the match are
+also included.
+
+=cut
+*/
+
+// Predeclarations
+class P6metaclass;
+class PCT.Grammar;
+class PGE.Match;
+class PGE.Util;
+
+// Includes
+$include_const 'cclass.pasm';
+
+namespace PCT.Grammar {
+    function onload[init, load]() {
+        load_bytecode('PGE.pbc');
+        load_bytecode('PGE/Util.pbc');
+
+        var p6meta = new P6metaclass;
+        p6meta.new_class('PCT::Grammar', 'PGE::Grammar':[named('parent')]);
+
+        using PGE.Util.die;
+        PCT.Grammar.add_method('panic', die);
+    }
+
+/*
+=item FAILGOAL($goal [, 'dba'=>dba])
+
+Invoked when goal matching fails to find the goal.  Builds an appropriate
+error message and delegates the rest to C<panic>.
+
+=cut
+*/
+    function FAILGOAL[method](string goal, options [named, slurpy]) {
+        string dba = options['dba'];
+        if (dba != null)
+            dba = getinterp()['sub', 1];
+        return self.panic("Unable to parse", dba, "; couldn't find final ", goal);
+    }
+
+/*
+=item item()
+
+Here we overload the item() method from PGE::Match to
+throw an exception if a result object hasn't been set.
+
+=cut
+*/
+    function ast[method]() {
+        var obj = self.*'$!ast';
+
+        if (obj == null)
+            die('No result object');
+
+        return obj;
+    }
+
+/*
+=item ww()
+
+Special-purpose rule to return true if we're in the middle
+of a word -- i.e., if the previous and next character are
+both "word characters".  This is roughly equivalent to
+C<< <?after \w><?before \w> >> except it's much quicker.
+In particular, C<< <!ww> >> can be used by :sigspace rules
+to enforce whitespace between lexical words.
+
+=cut
+*/
+    function ww[method](adverbs [slurpy, named]) {
+        :(var mob, int pos, string target) = PGE.Match.new(self);
+
+        if (pos == 0) goto fail;
+        if (!is_cclass(CCLASS_WORD, target, pos)) goto fail;
+        if (!is_cclass(CCLASS_WORD, target, pos - 1)) goto fail;
+        mob.to(pos);
+
+    fail:
+        return mob;
+    }
+
+    function string_literal[method](string stop, adverbs [slurpy, named]) {
+        // create a new match object, get the new match position
+        :(var mob, int pos, string target) = self.new(self);
+        int lastpos = length(target);
+        int stoplen = length(stop);
+        string escapechars = '\\' + substr(stop, 0, 1);
+
+        // leave space for close delimiter
+        lastpos -= stoplen;
+
+        // now initialize and loop through target
+        string literal = '';
+        string litchar;
+
+        for(;;) {
+            // if we're beyond the last possible position, fail
+            if (pos > lastpos) goto fail;
+
+            // if ending delimiter, then we're done
+            if (substr(target, pos, stoplen) == stop) {
+                mob.to(pos);
+                mob.*'!make'(literal);
+                return mob;
+            }
+
+            // get next character in literal
+            litchar = substr(target, pos++, 1);
+
+            // add non-escape characters to literal
+            if (litchar != '\\') {
+                literal += litchar;
+                continue;
+            }
+
+            // look at the next character, if it's always escaped, add it and
+            // move on
+            string escaped = substr(target, pos, 1);
+            if (index(escapechars, escaped) >= 0) {
+                ++pos;
+                literal += escaped;
+            }
+
+            // if not double-quoted delim, no interpolation
+            if (stop != '"') {
+                literal += litchar;
+                continue;
+            }
+
+            ++pos;
+            int i = index("abefnrt0xdo", escaped);
+            if (i < 0) {
+                literal += escaped;
+                continue;
+            }
+
+            // if it's one of "xdo" then handle that specially
+            if (i < 8) {
+                literal += substr("\a\b\e\f\n\r\t\0", i, 1);
+                continue;
+            }
+
+            // handle \x, \d, and \o escapes.  start by converting
+            // the 'o', 'd', or 'x' into 8, 10, or 16 (yes, it's hack
+            // but it works).  Then loop through the characters that
+            // follow to compute the integer value of the codepoint,
+            // and add that codepoint to our literal.
+            int base = index('        o d     x', escaped);
+            int codepoint = 0;
+            int isbracketed = substr(target, pos, 1) == '[';
+            pos += isbracketed;
+
+            for(;;) {
+                string s;
+                for(;;) {
+                    s = substr(target, pos, 1);
+                    i = index('0123456789abcdef', s);
+                    if (i < 0 || i >= base) break;
+                    codepoint *= base;
+                    codepoint += i;
+                    ++pos;
+                }
+
+                literal += chr(codepoint);
+
+                if (!isbracketed || s == ']') break;
+
+                if (s != ',') goto fail;
+                ++pos;
+                codepoint = 0;
+            }
+
+            pos += isbracketed;
+        }
+
+    fail:
+        mob.to(-1);
+        return mob;
+    }
+}

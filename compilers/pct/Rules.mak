@@ -22,6 +22,9 @@ $(LIBRARY_DIR)/PCT/Grammar.pbc : compilers/pct/src/PCT/Grammar.pir $(PARROT) \
     $(LIBRARY_DIR)/PGE.pbc $(LIBRARY_DIR)/PGE/Util.pbc
 	$(PARROT) -o $@ compilers/pct/src/PCT/Grammar.pir
 
+compilers/pct/src/PCT/Grammar.pir : compilers/pct/src/PCT/Grammar.winxed $(WINXED)
+	$(WINXED) -c -o $@ $<
+
 $(LIBRARY_DIR)/PCT/HLLCompiler.pbc : compilers/pct/src/PCT/HLLCompiler.pir \
     $(PARROT) \
     $(LIBRARY_DIR)/PGE/Dumper.pbc \
@@ -36,8 +39,14 @@ $(LIBRARY_DIR)/PCT/HLLCompiler.pbc : compilers/pct/src/PCT/HLLCompiler.pir \
 $(LIBRARY_DIR)/PCT/Dumper.pbc : compilers/pct/src/PCT/Dumper.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PCT/Dumper.pir
 
+compilers/pct/src/PCT/Dumper.pir : compilers/pct/src/PCT/Dumper.winxed $(WINXED)
+	$(WINXED) -c -o $@ $<
+
 compilers/pct/src/PCT/Node.pbc : compilers/pct/src/PCT/Node.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PCT/Node.pir
+
+compilers/pct/src/PCT/Node.pir : compilers/pct/src/PCT/Node.winxed $(WINXED)
+	$(WINXED) -c -o $@ $<
 
 compilers/pct/src/PAST/Node.pbc : compilers/pct/src/PAST/Node.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PAST/Node.pir

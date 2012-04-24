@@ -1,0 +1,66 @@
+/* Copyright (C) 2012, Parrot Foundation
+
+=head1 NAME
+
+PCT::Dumper - various dumper formats for PCT
+
+=head1 DESCRIPTION
+
+This file implements a dumper that attempts to output PAST,
+Match, and Capture objects in a format that can be easily
+consumed by syntax highlighters (such as Padre).
+Yes, the code is probably much uglier and convoluted than
+it should be.  No, I'm not proud of it, but it works for now.
+
+=cut
+*/
+
+// Predeclarations
+class PGE.Match;
+class ResizablePMCArray;
+
+
+namespace PCT.Dumper {
+    function padre(var obj, string name, var options [slurpy, named]) {
+        padre_item(obj, name);
+    }
+
+    function padre_item(var obj, var name) { /* nothing */ }
+
+    function padre_item[multi(class PGE.Match, var)](obj, name) {
+        :(string str) = obj.Str();
+
+        if (length(str) >= 48)
+            str = substr(str, 0, 48) + '...';
+        str = escape(str);
+
+        string s0 = obj['type'];
+        if (s0)
+            name = s0;
+
+        :(int from) = obj.from();
+        :(int to) = obj.to();
+        say(sprintf(' %4d %4d %-20s "%s"', [from, to - from, name, str]));
+
+        var hash = obj.hash();
+        for (string key in hash)
+            padre_item(hash[key], key);
+
+        padre_item(obj.list(), name);
+    }
+
+    function padre_item[multi(class ResizablePMCArray, var)](obj, name) {
+        for (var key in obj)
+            padre_item(key, name);
+    }
+}
+
+/*
+=head1 AUTHOR
+
+Patrick R. Michaud <pmichaud@pobox.com>
+
+Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>
+
+=cut
+*/
