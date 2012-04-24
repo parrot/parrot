@@ -34,7 +34,9 @@
     first_call  = new ['Integer']
     first_call  = 1
     a_color     = new ['Integer']
+    a_color     = -1
     b_color     = new ['Integer']
+    b_color     = -1
 
     code = get_global 'chameneos_code'
     chameneos = new ['ResizablePMCArray']
@@ -69,6 +71,7 @@ init_chameneos:
     say "going to sleep"
     sleep 10
     say "woke up just in time for exit"
+    say count
     exit 0
 .end
 
@@ -98,10 +101,10 @@ init_chameneos:
 
 start:
     color_name  = colors[color]
-    print 'This is '
-    print number
-    print " and I'm "
-    say color_name
+    #print 'This is '
+    #print number
+    #print " and I'm "
+    #say color_name
 
     other_color = cooperation(number, color, sem_priv, mutex, at_most_two, at_most_two_waiters, first_call, a_color, b_color)
     other_color_int = other_color
@@ -128,35 +131,22 @@ start:
     .param pmc first_call
     .param pmc a_color
     .param pmc b_color
-    .local pmc interp, sem_wait, sem_unlock, call_core, call_task, other_color
+    .local pmc interp, sem_wait, sem_unlock, call_core, call_task
+    .local int other_color
 
     interp      = getinterp
     sem_wait    = get_global 'sem_wait'
     sem_unlock  = get_global 'sem_unlock'
 
-    sem_ackquire(at_most_two, at_most_two_waiters)
+    call_task = new ['Task']
+    setattribute call_task, 'data', color
+    push call_task, b_color
+    push call_task, a_color
+
     sem_wait(mutex)
-
-    if first_call == 1 goto first
-        call_core = get_global 'second_call_core'
-        call_task = new ['Task']
-        push call_task, first_call
-        push call_task, b_color
-        setattribute call_task, 'code', call_core
-        setattribute call_task, 'data', color
-        interp.'schedule_proxied'(call_task, b_color)
-        wait call_task
-
-        other_color = a_color
-        sem_unlock(sem_priv)
-        goto done
-    first:
+    if a_color > -1 goto second
         call_core = get_global 'first_call_core'
-        call_task = new ['Task']
-        push call_task, first_call
-        push call_task, a_color
         setattribute call_task, 'code', call_core
-        setattribute call_task, 'data', color
         interp.'schedule_proxied'(call_task, a_color)
         wait call_task
 
@@ -164,43 +154,51 @@ start:
         sem_wait(sem_priv)
         other_color = b_color
         sem_unlock(mutex)
-        sem_release(at_most_two, at_most_two_waiters)
-        sem_release(at_most_two, at_most_two_waiters)
+        goto done
+    second:
+        other_color = a_color
+
+        call_core = get_global 'second_call_core'
+        setattribute call_task, 'code', call_core
+        interp.'schedule_proxied'(call_task, b_color)
+        wait call_task
+
+        sem_unlock(sem_priv)
 done:
     .return(other_color)
 .end
 
 .sub first_call_core
     .param pmc data
-    .local pmc interp, task, a_color, first_call
+    .local pmc interp, task, a_color, b_color
     .local int a_color_int
     interp = getinterp
     task = interp.'current_task'()
 
-    a_color    = pop task
-    first_call = pop task
+    a_color = pop task
+    b_color = pop task
 
     a_color_int = data
     a_color     = a_color_int
-    first_call  = 0
+    b_color     = -1
 .end
 
 .sub second_call_core
     .param pmc data
-    .local pmc interp, task, b_color, first_call, count
+    .local pmc interp, task, b_color, a_color, count
     .local int b_color_int
     interp = getinterp
     task = interp.'current_task'()
 
-    b_color    = pop task
-    first_call = pop task
+    a_color = pop task
+    b_color = pop task
 
-    first_call = 1
     b_color_int = data
     b_color     = b_color_int
+    a_color     = -1
     count = get_global 'count'
     inc count
-    say count
+    #say count
 .end
 
 .sub sem_unlock
