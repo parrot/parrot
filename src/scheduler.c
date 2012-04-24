@@ -32,6 +32,10 @@ exceptions, async I/O, and concurrent tasks (threads).
 
 #include "scheduler.str"
 
+#ifndef _WIN32
+#    include <signal.h>
+#endif
+
 /* HEADERIZER HFILE: include/parrot/scheduler.h */
 
 /* HEADERIZER BEGIN: static */
@@ -134,6 +138,11 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count, foreign_count, i;
+#ifndef _WIN32
+    sigset_t set, old_set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGALRM);
+#endif
 
     do {
         while (VTABLE_get_integer(interp, scheduler) > 0) {
@@ -161,18 +170,20 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             UNLOCK(PARROT_TASK(task)->waiters_lock);
         }
 
-        alarm_count = VTABLE_get_integer(interp, sched->alarms);
-        if (alarm_count > 0 || foreign_count > 0) {
 #ifdef _WIN32
-            /* TODO: Implement on Windows */
 #else
+        sigprocmask(SIG_BLOCK, &set, &old_set);
+        Parrot_cx_check_alarms(interp, interp->scheduler);
+        alarm_count = VTABLE_get_integer(interp, sched->alarms);
+        if (VTABLE_get_integer(interp, scheduler) == 0 && (alarm_count > 0 || foreign_count > 0)) {
+            /* TODO: Implement on Windows */
             /* Nothing to do except to wait for the next alarm to expire */
-            if (alarm_count > 0)
-                pause();
+            sigsuspend(&old_set);
             Parrot_thread_notify_threads(interp);
-#endif
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
+        sigprocmask(SIG_SETMASK, &old_set, (sigset_t *)0);
+#endif
     } while (alarm_count || foreign_count || VTABLE_get_integer(interp, scheduler) > 0);
 }
 
