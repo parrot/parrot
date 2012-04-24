@@ -217,8 +217,9 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
         unsigned long         i           = 0;
         M0_Constants_Segment *segment     =
                 malloc( sizeof( M0_Constants_Segment ) );
-        segment->consts = malloc( sizeof ( char * ) * const_count );
-        segment->count  = const_count;
+        segment->consts   = calloc(const_count, sizeof ( uint64_t ));
+        segment->pointers = calloc(const_count, sizeof ( unsigned int));
+        segment->count    = const_count;
 
         UNUSED( byte_count );
 
@@ -230,10 +231,15 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
                 if (encoding == 0) {
                     constant = (char *) &(constant[8]);
                 }
+                if (constant) {
+                    segment->consts[i]   = (uint64_t)constant;
+                    segment->pointers[i] = 1;
+                }
+            } else {
+                if (constant)
+                    segment->consts[i] = *(uint64_t*)constant;
             }
 
-            if (constant)
-                segment->consts[i] = constant;
         }
 
         return segment;

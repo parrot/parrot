@@ -133,7 +133,7 @@ m0_chunk_free_constants( M0_Constants_Segment *constants )
     unsigned       long i     = 0;
 
     for (i = 0; i < count; i++) {
-        if ( constants->consts[i] )
+        if ( constants->consts[i] && constants->pointers[i])
             free( (void *)constants->consts[i] );
     }
 

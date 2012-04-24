@@ -1,7 +1,9 @@
 #ifndef M0_MOB_STRUCTURES_H
+#   include <stdint.h>
 
 typedef struct M0_Constants_Segment {
-    const char    **consts;
+    uint64_t       *consts;
+    unsigned int   *pointers;
     unsigned long   count;
 } M0_Constants_Segment;
 
