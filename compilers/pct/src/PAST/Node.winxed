@@ -1,4 +1,4 @@
-
+/*
 =head1 NAME
 
 PAST - Parrot abstract syntax tree
@@ -9,27 +9,37 @@ This file implements the various abstract syntax tree nodes
 for compiling programs in Parrot.
 
 =cut
+*/
 
-.namespace [ 'PAST';'Node' ]
+class P6metaclass;
+class PAST.Node;
+class PAST.Op;
+class PAST.Stmts;
+class PAST.Stmt;
+class PAST.Val;
+class PAST.Var;
+class PAST.Block;
+class PAST.Control;
+class PAST.VarList;
 
-.sub 'onload' :anon :load :init
-    ##   create the PAST::Node base class
-    .local pmc p6meta, base
-    p6meta = new 'P6metaclass'
-    base = p6meta.'new_class'('PAST::Node', 'parent'=>'PCT::Node')
+namespace PAST.Node {
+    function onload[load, init]() {
+        var p6meta = new P6metaclass;
+        var base = p6meta.new_class('PAST::Node', 'PCT::Node':[named('parent')]);
 
-    p6meta.'new_class'('PAST::Op', 'parent'=>base)
-    p6meta.'new_class'('PAST::Stmts', 'parent'=>base)
-    p6meta.'new_class'('PAST::Stmt', 'parent'=>base)
-    p6meta.'new_class'('PAST::Val', 'parent'=>base)
-    p6meta.'new_class'('PAST::Var', 'parent'=>base)
-    p6meta.'new_class'('PAST::Block', 'parent'=>base)
-    p6meta.'new_class'('PAST::Control', 'parent'=>base)
-    p6meta.'new_class'('PAST::VarList', 'parent'=>base)
+        p6meta.new_class('PAST::Op', base:[named('parent')]);
+        p6meta.new_class('PAST::Stmts', base:[named('parent')]);
+        p6meta.new_class('PAST::Stmt', base:[named('parent')]);
+        p6meta.new_class('PAST::Val', base:[named('parent')]);
+        p6meta.new_class('PAST::Var', base:[named('parent')]);
+        p6meta.new_class('PAST::Block', base:[named('parent')]);
+        p6meta.new_class('PAST::Control', base:[named('parent')]);
+        p6meta.new_class('PAST::VarList', base:[named('parent')]);
 
-    .return ()
-.end
+        return;
+    }
 
+/*
 =head1 PAST Node types
 
 =head2 PAST::Node
@@ -56,69 +66,64 @@ Other node attributes are generally defined by subclasses of C<PAST::Node>.
 Accessor method -- sets/returns the return type for the invocant.
 
 =cut
+*/
 
-.sub 'returns' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('returns', value, has_value)
-.end
+    function returns[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('returns', value, has_value);
+    }
 
-
+/*
 =item arity([value])
 
 Accessor method -- sets/returns the arity (number of expected arguments)
 for the node.
 
 =cut
+*/
 
-.sub 'arity' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('arity', value, has_value)
-.end
+    function arity[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('arity', value, has_value);
+    }
 
-
+/*
 =item named([value])
 
 Accessor method -- for named arguments, sets/returns the name to be
 associated with the argument.
 
 =cut
+*/
 
-.sub 'named' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('named', value, has_value)
-.end
+    function named[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('named', value, has_value);
+    }
 
-
+/*
 =item flat([value])
 
 Accessor method -- sets/returns the "flatten" flag on arguments.
 
 =cut
+*/
 
-.sub 'flat' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('flat', value, has_value)
-.end
+    function flat[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('flat', value, has_value);
+    }
 
-
+/*
 =item handlers([node array])
 
 Accessor method -- sets/returns handlers associated with this node.
 Handlers can be used for PAST::Block and PAST::Stmts nodes.
 
 =cut
+*/
 
-.sub 'handlers' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('handlers', value, has_value)
-.end
+    function handlers[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('handlers', value, has_value);
+    }
 
-
+/*
 =item handle_types([value])
 
 Accessor method -- sets/returns the exception types this node
@@ -127,14 +132,13 @@ handler, the node is a PAST::Control node, or the node is
 a PAST::Op node of type 'try'.
 
 =cut
+*/
 
-.sub 'handle_types' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('handle_types', value, has_value)
-.end
+    function handle_types[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('handle_types', value, has_value);
+    }
 
-
+/*
 =item handle_types_except([value])
 
 Accessor method -- sets/returns the exception types this node
@@ -142,42 +146,39 @@ does not handle. Same as handle_types, but all exceptions not
 matching the specified ones will be caught.
 
 =cut
+*/
 
-.sub 'handle_types_except' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('handle_types_except', value, has_value)
-.end
+    function handle_types_except[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('handle_types_except', value, has_value);
+    }
 
-
+/*
 =item lvalue([flag])
 
 Get/set the C<lvalue> attribute, which indicates whether this
 variable is being used in an lvalue context.
 
 =cut
+*/
 
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('lvalue', value, has_value)
-.end
+    function lvalue[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('lvalue', value, has_value);
+    }
 
-
+/*
 =item signature([signature])
 
 Get/set the signature to be used for evaluating any
 children nodes.
 
 =cut
+*/
 
-.sub 'signature' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('signature', value, has_value)
-.end
+    function signature[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('signature', value, has_value);
+    }
 
-
+/*
 =item childorder([order])
 
 Get/set the order in which children nodes should be evaluated
@@ -186,15 +187,15 @@ children are evaluated last-to-first, otherwise they're
 evaluated first-to-last.
 
 =cut
+*/
 
-.sub 'childorder' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('childorder', value, has_value)
-.end
+    function childorder[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('childorder', value, has_value);
+    }
+}
 
-=back
-
+namespace PAST.Val {
+/*
 =head2 PAST::Val
 
 C<PAST::Val> nodes represent constant values in the abstract
@@ -209,32 +210,29 @@ Get/set the constant value for this node.
 
 =cut
 
-.namespace [ 'PAST';'Val' ]
+*/
 
-.sub 'value' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('value', value, has_value)
-.end
+    function value[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('value', value, has_value);
+    }
 
+/*
 =item lvalue([value])
 
 Throw an exception if we try to make a PAST::Val into an lvalue.
 
 =cut
+*/
 
-.sub 'lvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    unless has_value goto normal
-    unless value goto normal
-    die "Unable to set lvalue on PAST::Val node"
-  normal:
-    .tailcall self.'attr'('lvalue', value, has_value)
-.end
+    function lvalue[method](var value [optional], int has_value [opt_flag]) {
+        if (has_value && value)
+            die('Unable to set lvalue on PAST::Val node');
+        return self.attr('lvalue', value, has_value);
+    }
+}
 
-=back
-
+namespace PAST.Var {
+/*
 =head2 PAST::Var
 
 C<PAST::Var> nodes represent variables within the abstract
@@ -252,16 +250,13 @@ HLL global, lexical, block parameter, array/hash variables, object
 members and (optionally named) Parrot registers respectively.
 
 =cut
+*/
 
-.namespace [ 'PAST';'Var' ]
+    function scope[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('scope', value, has_value);
+    }
 
-.sub 'scope' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('scope', value, has_value)
-.end
-
-
+/*
 =item isdecl([flag])
 
 Get/set the node's C<isdecl> attribute (for lexical variables) to C<flag>.
@@ -270,14 +265,13 @@ this node is to be created within the current lexical scope.
 Otherwise, the node refers to a lexical variable from an outer scope.
 
 =cut
+*/
 
-.sub 'isdecl' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('isdecl', value, has_value)
-.end
+    function isdecl[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('isdecl', value, has_value);
+    }
 
-
+/*
 =item directaccess([flag])
 
 Get/set the node's C<directaccess> attribute (for lexical variables) to C<flag>.
@@ -287,14 +281,13 @@ through the lexpad. Otherwise, find_lex/store_lex instructions will be used
 for retrieval and storage.
 
 =cut
+*/
 
-.sub 'directaccess' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('directaccess', value, has_value)
-.end
+    function directaccess[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('directaccess', value, has_value);
+    }
 
-
+/*
 =item namespace([namespace])
 
 Get/set the variable's namespace attribute to the array of strings
@@ -302,14 +295,13 @@ given by C<namespace>.  Useful only for variables with a C<scope>
 of 'package'.
 
 =cut
+*/
 
-.sub 'namespace' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('namespace', value, has_value)
-.end
+    function namespace[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('namespace', value, has_value);
+    }
 
-
+/*
 =item slurpy([flag])
 
 Get/set the node's C<slurpy> attribute (for parameter variables) to C<flag>.
@@ -318,14 +310,13 @@ node is to be created as a slurpy parameter (consuming all remaining arguments
 passed in).
 
 =cut
+*/
 
-.sub 'slurpy' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('slurpy', value, has_value)
-.end
+    function slurpy[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('slurpy', value, has_value);
+    }
 
-
+/*
 =item call_sig([flag])
 
 Get/set the node's C<call_sig> attribute (for parameter variables) to C<flag>.
@@ -334,14 +325,13 @@ node is to be created as a C<:call_sig> parameter. If you use this, it should be
 the only parameter.
 
 =cut
+*/
 
-.sub 'call_sig' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('call_sig', value, has_value)
-.end
+    function call_sig[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('call_sig', value, has_value);
+    }
 
-
+/*
 =item viviself([type])
 
 If the variable needs to be instantiated, then C<type> indicates
@@ -349,14 +339,13 @@ either the type of the value to create for the node or (future
 implementation) a PAST tree to create the value.
 
 =cut
+*/
 
-.sub 'viviself' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('viviself', value, has_value)
-.end
+    function viviself[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('viviself', value, has_value);
+    }
 
-
+/*
 =item vivibase([type])
 
 For keyed nodes, C<type> indicates the type of aggregate to
@@ -364,28 +353,27 @@ create for the base if the base doesn't specify its own 'viviself'
 attribute.
 
 =cut
+*/
 
-.sub 'vivibase' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('vivibase', value, has_value)
-.end
+    function vivibase[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('vivibase', value, has_value);
+    }
 
+/*
 =item multitype([type])
 
 Get/set MMD type of Var when used as parameter of Block.
 
 =cut
+*/
 
-.sub 'multitype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('multitype', value, has_value)
-.end
+    function multitype[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('multitype', value, has_value);
+    }
+}
 
-
-=back
-
+namespace PAST.Op {
+/*
 =head2 PAST::Op
 
 C<PAST::Op> nodes represent the operations in an abstract syntax
@@ -457,16 +445,13 @@ assumes "pirop" if its C<pirop> attribute is set, otherwise it
 assumes "call".
 
 =cut
+*/
 
-.namespace [ 'PAST';'Op' ]
+    function pasttype[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('pasttype', value, has_value);
+    }
 
-.sub 'pasttype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('pasttype', value, has_value)
-.end
-
-
+/*
 =item pirop([opcode])
 
 Get/set the PIR opcode to be executed for this node.  The PAST
@@ -478,14 +463,13 @@ whenever it isn't certain what else to do.)  The table of
 PIR opcodes that PAST "knows" about is in F<POST.pir>.
 
 =cut
+*/
 
-.sub 'pirop' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('pirop', value, has_value)
-.end
+    function pirop[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('pirop', value, has_value);
+    }
 
-
+/*
 =item lvalue([flag])
 
 Get/set whether this node is an lvalue, or treats its first
@@ -514,14 +498,13 @@ given by "%r", "%t", or "%u" in the C<code> string:
          of this operation.
 
 =cut
+*/
 
-.sub 'inline' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('inline', value, has_value)
-.end
+    function inline[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('inline', value, has_value);
+    }
 
-
+/*
 =item opattr(hash)
 
 Set a variety of C<PAST::Op> attributes based on entries
@@ -530,24 +513,18 @@ precedence table, and the attributes being set correspond
 to traits in the grammar.
 
 =cut
+*/
 
-.sub 'opattr' :method
-    .param pmc hash
+    function opattr[method](var hash) {
+        for (string key in split(' ', "pasttype pirop inline lvalue")) {
+            var value = hash[key];
+            if (value != null)
+                self.*key(value);
+        }
+    }
+}
 
-    $P0 = split ' ', "pasttype pirop inline lvalue"
-    $P1 = iter $P0
-  iter_loop:
-    unless $P1 goto iter_end
-    $S0 = shift $P1
-    $P2 = hash[$S0]
-    if null $P2 goto iter_loop
-    $P3 = find_method self, $S0
-    self.$P3($P2)
-    goto iter_loop
-  iter_end:
-.end
-
-
+/*
 =back
 
 =head2 PAST::Stmt
@@ -582,16 +559,15 @@ executed when it is evaluated in the AST (e.g., the immediate
 blocks in Perl6 C<if>, C<while>, and other similar statements).
 
 =cut
+*/
 
-.namespace [ 'PAST';'Block' ]
+namespace PAST.Block {
 
-.sub 'blocktype' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('blocktype', value, has_value)
-.end
+    function blocktype[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('blocktype', value, has_value);
+    }
 
-
+/*
 =item closure([value])
 
 Get/set the closure flag for the block to C<value>.  If set,
@@ -599,14 +575,13 @@ any block reference returned by the node is to a clone of the
 block that has captured the current lexical context.
 
 =cut
+*/
 
-.sub 'closure' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('closure', value, has_value)
-.end
+    function closure[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('closure', value, has_value);
+    }
 
-
+/*
 =item control([value])
 
 Get/set the control exception handler for this block to C<value>.
@@ -614,14 +589,13 @@ The exception handler can be any PAST tree.  The special (string)
 value "return_pir" generates code to handle C<CONTROL_RETURN> exceptions.
 
 =cut
+*/
 
-.sub 'control' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('control', value, has_value)
-.end
+    function control[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('control', value, has_value);
+    }
 
-
+/*
 =item loadinit([past])
 
 Get/set the "load initializer" for this block to C<past>.
@@ -636,89 +610,82 @@ automatically initialized to refer to the block itself
 storing in a symbol table, etc.).
 
 =cut
+*/
 
-.sub 'loadinit' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    if has_value goto getset_value
-    $I0 = exists self['loadinit']
-    if $I0 goto getset_value
-    $P0 = get_hll_global ['PAST'], 'Stmts'
-    value = $P0.'new'()
-    has_value = 1
-  getset_value:
-    .tailcall self.'attr'('loadinit', value, has_value)
-.end
+    function loadinit[method](var value [optional], int has_value [opt_flag]) {
+        if (!has_value && !exists self['loadinit']) {
+            using PAST.Stmts;
+            value = Stmts.new();
+            has_value = 1;
+        }
+        return self.attr('loadinit', value, has_value);
+    }
 
-
+/*
 =item namespace([namespace])
 
 Get/set the namespace for this block.  The C<namespace> argument
 can be either a string or an array of strings.
 
 =cut
+*/
 
-.sub 'namespace' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('namespace', value, has_value)
-.end
+    function namespace[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('namespace', value, has_value);
+    }
 
+/*
 =item multi([multi])
 
 Get/set the multi signature for this block.  The C<multi> argument
 can be either a string or an array of strings.
 
 =cut
+*/
 
-.sub 'multi' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('multi', value, has_value)
-.end
+    function multi[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('multi', value, has_value);
+    }
 
-
+/*
 =item hll([hll])
 
 Get/set the C<hll> for this block.
 
 =cut
+*/
 
-.sub 'hll' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('hll', value, has_value)
-.end
+    function hll[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('hll', value, has_value);
+    }
 
-
+/*
 =item loadlibs([lib1, lib2, ...])
 
 Get/set the libraries to be loaded at startup. EXPERIMENTAL (not subject to
 deprecation policy, yet).
 
 =cut
+*/
 
-.sub 'loadlibs' :method
-    .param pmc libs :slurpy
-    .local int has_value
-    has_value = elements libs
-    .tailcall self.'attr'('loadlibs', libs, has_value)
-.end
+    function loadlibs[method](var libs [slurpy]) {
+        int has_value = elements(libs);
+        return self.attr('loadlibs', libs, has_value);
+    }
 
-
+/*
 =item nsentry([nsentry])
 
 Get/set the C<nsentry> for this block.
 
 =cut
+*/
 
-.sub 'nsentry' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('nsentry', value, has_value)
-.end
+    function nsentry[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('nsentry', value, has_value);
+    }
 
-
+/*
 =item symbol(name [, attr1 => val1, attr2 => val2, ...])
 
 If called with named arguments, sets the symbol hash corresponding
@@ -731,38 +698,26 @@ If no named arguments are given, returns the current
 attribute hash for symbol C<name>.
 
 =cut
+*/
 
-.sub 'symbol' :method
-    .param string name
-    .param pmc attr            :slurpy :named
-    .local pmc symtable
-    symtable = self['symtable']
-    unless null symtable goto have_symtable
-    symtable = new 'Hash'
-    self['symtable'] = symtable
-  have_symtable:
-    .local pmc symbol
-    symbol = symtable[name]
-    if null symbol goto symbol_empty
-    unless attr goto attr_done
-    .local pmc it
-    it = iter attr
-  attr_loop:
-    unless it goto attr_done
-    $S0 = shift it
-    $P0 = attr[$S0]
-    symbol[$S0] = $P0
-    goto attr_loop
-  attr_done:
-    .return (symbol)
-  symbol_empty:
-    unless attr goto symbol_done
-    symtable[name] = attr
-  symbol_done:
-    .return (attr)
-.end
+    function symbol[method](string name, attr [slurpy, named]) {
+        var symtable = self['symtable'];
+        if (symtable == null)
+            self['symtable'] = symtable = {};
 
+        var symbol = symtable[name];
+        if (symbol == null) {
+            if (attr)
+                symtable[name] = attr;
+            return attr;
+        }
 
+        for (string key in attr)
+            symbol[key] = attr[key];
+        return symbol;
+    }
+
+/*
 =item symbol_defaults([attr1 => val1, attr2 => val2, ... ])
 
 Set default attributes for non-existent symbols in the
@@ -774,41 +729,39 @@ store the default attributes, but it's probably not safe
 to rely on this behavior in the future.
 
 =cut
+*/
 
-.sub 'symbol_defaults' :method
-    .param pmc attr            :slurpy :named
-    .tailcall self.'symbol'('', attr :flat :named)
-.end
+    function symbol_defaults[method](attr [slurpy, named]) {
+        return self.symbol('', attr:[flat, named]);
+    }
 
-
+/*
 =item symtable([value])
 
 Get/set the symbol table for the block.  May be deprecated in
 favor of the C<symbol> method above.
 
 =cut
+*/
 
-.sub 'symtable' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('symtable', value, has_value)
-.end
+    function symtable[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('symtable', value, has_value);
+    }
 
-
+/*
 =item lexical([flag])
 
 Get/set whether the block is lexically nested within
 the block that contains it.
 
 =cut
+*/
 
-.sub 'lexical' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('lexical', value, has_value, 1)
-.end
+    function lexical[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('lexical', value, has_value, 1);
+    }
 
-
+/*
 =item compiler([name])
 
 Indicate that the children nodes of this block are to be
@@ -816,13 +769,13 @@ compiled using compiler C<name> instead of the standard
 PAST compiler.
 
 =cut
+*/
 
-.sub 'compiler' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('compiler', value, has_value)
-.end
+    function compiler[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('compiler', value, has_value);
+    }
 
+/*
 =item compiler_args()
 
 Specify named arguments to be passed to the compiler set
@@ -830,14 +783,14 @@ through the compiler attribute. Not used if compiler is
 not set.
 
 =cut
+*/
 
-.sub 'compiler_args' :method
-    .param pmc value           :named :slurpy
-    .local int have_value
-    have_value = elements value
-    .tailcall self.'attr'('compiler_args', value, have_value)
-.end
+    function compiler_args[method](value [named, slurpy]) {
+        int has_value = elements(value);
+        return self.attr('compiler_args', value, has_value);
+    }
 
+/*
 =item subid([subid])
 
 If C<subid> is provided, then sets the subid for this block.
@@ -845,43 +798,37 @@ Returns the current subid for the block, generating a unique
 subid for the block if one does not already exist.
 
 =cut
+*/
 
-.sub 'subid' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    if has_value goto getset_value
-    $I0 = exists self['subid']
-    if $I0 goto getset_value
-    value = self.'unique'()
-    .local pmc suffix
-    suffix = get_global '$!subid_suffix'
-    unless null suffix goto have_suffix
-    $N0 = time
-    $S0 = $N0
-    $S0 = concat '_', $S0
-    suffix = box $S0
-    set_global '$!subid_suffix', suffix
-  have_suffix:
-    value .= suffix
-    has_value = 1
-  getset_value:
-    .tailcall self.'attr'('subid', value, has_value)
-.end
+    function subid[method](var value [optional], int has_value [opt_flag]) {
+        if (!has_value && !exists self['subid']) {
+            value = self.unique();
+            var suffix;
+            ${ get_global suffix, '$!subid_suffix' };
+            if (suffix == null) {
+                suffix = '_' + string(time());
+                ${ set_global '$!subid_suffix', suffix };
+            }
+            value = string(value) + string(suffix);
+            has_value = 1;
+        }
 
+        return self.attr('subid', value, has_value);
+    }
 
+/*
 =item pirflags([pirflags])
 
 Get/set any pirflags for this block.
 
 =cut
+*/
 
-.sub 'pirflags' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('pirflags', value, has_value)
-.end
+    function pirflags[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('pirflags', value, has_value);
+    }
 
-
+/*
 =item tempregs([tempregs])
 
 Get/set whether this block is allowed to create a fresh
@@ -890,23 +837,22 @@ the block uses the same temporary register bank as its
 outer statement.
 
 =cut
+*/
 
-.sub 'tempregs' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('tempregs', value, has_value)
-.end
+    function tempregs[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('tempregs', value, has_value);
+    }
+}
 
+namespace PAST.VarList {
 
-.namespace [ 'PAST';'VarList' ]
+    function bindvalue[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('bindvalue', value, has_value);
+    }
 
-.sub 'bindvalue' :method
-    .param pmc value           :optional
-    .param int has_value       :opt_flag
-    .tailcall self.'attr'('bindvalue', value, has_value)
-.end
+}
 
-
+/*
 =back
 
 =head1 AUTHOR
@@ -915,19 +861,17 @@ Patrick Michaud <pmichaud@pobox.com> is the author and maintainer.
 Please send patches and suggestions to the Parrot porters or
 Perl 6 compilers mailing lists.
 
+Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>
+
 =head1 HISTORY
 
 2006-11-20  Patrick Michaud added first draft of POD documentation.
 2007-11-21  Re-implementation with pdd26 compliance, compiler toolkit
+2012-04-24  Converted to Winxed
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2011, Parrot Foundation.
+Copyright (C) 2006-2012, Parrot Foundation.
 
 =cut
-
-# Local Variables:
-#   mode: pir
-#   fill-column: 100
-# End:
-# vim: expandtab shiftwidth=4 ft=pir:
+*/
