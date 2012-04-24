@@ -27,6 +27,11 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "pmc/pmc_task.h"
 #include "pmc/pmc_proxy.h"
 #include "pmc/pmc_parrotinterpreter.h"
+#ifdef _WIN32
+#else
+#   include <signal.h>
+#   include <unistd.h>
+#endif
 
 /* HEADERIZER HFILE: include/parrot/thread.h */
 
@@ -79,13 +84,10 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     new_interp->thread_data->tid = 0;
     new_interp->thread_data->main_interp = interp;
     Interp_flags_SET(new_interp, PARROT_IS_THREAD);
-#ifdef _WIN32
-#else
-    pipe(new_interp->thread_data->notifierfd);
-    /* Don't block on writing to the notifierfd. If the pipe is full,
-     * we don't need to notify again anyway */
-    fcntl(new_interp->thread_data->notifierfd[1], F_SETFL, O_NONBLOCK);
-#endif
+
+    new_interp->wake_up = 0;
+    COND_INIT(new_interp->sleep_cond);
+    MUTEX_INIT(new_interp->sleep_mutex);
 
     if (! interp->thread_data) { /* first time we go multi threaded */
         interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
@@ -283,6 +285,8 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler,
         Parrot_thread_create_local_task(interp, thread_interp, task));
 
+    Parrot_thread_notify_thread(thread_interp);
+
     Parrot_unblock_GC_mark_locked(thread_interp);
 }
 
@@ -329,19 +333,58 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
 
-        alarm_count = VTABLE_get_integer(interp, sched->alarms);
-        if (alarm_count > 0) {
-#ifdef _WIN32
-            /* TODO: Implement on Windows */
-#else
-            /* Nothing to do except to wait for the next alarm to expire */
-            read(interp->thread_data->notifierfd[0], &dummy, 1);
-#endif
-            Parrot_cx_check_alarms(interp, interp->scheduler);
-        }
+        /* Nothing to do except to wait for the next alarm to expire */
+        Parrot_thread_wait_for_notification(interp);
+        Parrot_cx_check_alarms(interp, interp->scheduler);
     } while (1);
 
     return ret_val;
+}
+
+/*
+
+=item C<void Parrot_thread_wait_for_notification(PARROT_INTERP)>
+
+Sleep till notified by another thread or a signal.
+
+=cut
+
+*/
+
+void
+Parrot_thread_wait_for_notification(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_wait_for_notification)
+
+    LOCK(interp->sleep_mutex);
+    while (interp->wake_up == 0)
+        COND_WAIT(interp->sleep_cond, interp->sleep_mutex);
+    interp->wake_up = 0;
+    UNLOCK(interp->sleep_mutex);
+}
+
+/*
+
+=item C<void Parrot_thread_notify_thread(PARROT_INTERP)>
+
+Poke the thread in case it's sleeping (waiting for a new task)
+
+=cut
+
+*/
+
+void
+Parrot_thread_notify_thread(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_notify_thread)
+    if (Interp_flags_TEST(interp, PARROT_IS_THREAD)) {
+        LOCK(interp->sleep_mutex);
+        interp->wake_up = 1;
+        COND_SIGNAL(interp->sleep_cond);
+        UNLOCK(interp->sleep_mutex);
+    }
+    else
+        kill(getpid(), SIGALRM);
 }
 
 /*
@@ -358,18 +401,15 @@ void
 Parrot_thread_notify_threads(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_notify_threads)
-#ifdef _WIN32
-#else
     int i;
-    char dummy = 0;
     Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
 
     for (i = 1; i < MAX_THREADS; i++)
-        if (threads_array[i]) {
-            write(threads_array[i]->thread_data->notifierfd[1], &dummy, 1);
-        }
-#endif
+        if (threads_array[i])
+            Parrot_thread_notify_thread(threads_array[i]);
 }
+
+
 
 /*
 

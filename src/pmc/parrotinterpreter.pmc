@@ -814,8 +814,6 @@ Schedules the given task on the proxy's interpreter.
             Parrot_thread_create_local_task(INTERP, proxied_interp, task));
 
         Parrot_unblock_GC_mark_locked(proxied_interp);
-        /*TODO: investigate why it's not neccessary to send a signal to the process here
-          in theory the main thread could be pause()ing but in practice it seems to work anyway */
     }
 
 }

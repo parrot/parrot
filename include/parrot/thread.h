@@ -67,11 +67,6 @@ typedef struct _Thread_data {
      * of sleeping
      */
     Parrot_cond  interp_cond;
-
-#ifdef _WIN32
-#else
-    int notifierfd[2];
-#endif
 } Thread_data;
 
 #  define LOCK_INTERPRETER(interp) \
@@ -172,6 +167,9 @@ PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+void Parrot_thread_notify_thread(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_thread_notify_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -200,6 +198,9 @@ PMC * Parrot_thread_transfer_sub(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(destination);
+
+void Parrot_thread_wait_for_notification(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -234,6 +235,8 @@ PMC * Parrot_thread_transfer_sub(
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(from) \
     , PARROT_ASSERT_ARG(arg))
+#define ASSERT_ARGS_Parrot_thread_notify_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_notify_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -248,6 +251,9 @@ PMC * Parrot_thread_transfer_sub(
        PARROT_ASSERT_ARG(destination) \
     , PARROT_ASSERT_ARG(source) \
     , PARROT_ASSERT_ARG(sub))
+#define ASSERT_ARGS_Parrot_thread_wait_for_notification \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/thread.c */
 

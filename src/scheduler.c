@@ -462,6 +462,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             }
 
         Parrot_thread_schedule_task(interp, candidate, task);
+        Parrot_thread_notify_thread(candidate);
 
 #ifdef _WIN32
 #else
@@ -507,6 +508,7 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     VTABLE_unshift_pmc(interp, interp->scheduler, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
     SCHEDULER_resched_requested_SET(interp->scheduler);
+    Parrot_thread_notify_thread(interp);
 }
 
 /*

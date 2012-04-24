@@ -132,6 +132,7 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/multidispatch.h"
 #include "parrot/call.h"
 #include "parrot/gc_api.h"
+#include "parrot/thread.h"
 
 typedef struct warnings_t {
     Warnings_classes classes;
@@ -244,6 +245,9 @@ struct parrot_interp_t {
     FLOATVAL         quantum_done;            /* expiration of current quantum */
 
     struct _Thread_data *thread_data;         /* thread specific items */
+    int          wake_up;
+    Parrot_cond  sleep_cond;
+    Parrot_mutex sleep_mutex;
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
