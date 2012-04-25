@@ -387,8 +387,10 @@ sub _handle_ccflags_status {
     }
     else {
         my $icuheaders = $arg->{icuheaders};
+        my $incflag = defined $conf->data->get('gccversion') ?
+            '-isystem' : '-I';
 
-        my $icuflags = qq{-isystem "$icuheaders"};
+        my $icuflags = qq{$incflag "$icuheaders"};
         $conf->debug( "Adding $icuflags to ccflags for icu headers.\n");
         $conf->data->add( ' ', ccflags => $icuflags );
     }
