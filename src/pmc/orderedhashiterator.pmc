@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -78,6 +78,8 @@ Marks the hash as live.
 
 */
     VTABLE PMC* clone() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return PMCNULL;
     }
 
@@ -122,6 +124,7 @@ Returns this Iterator's Hash.
 
 */
     VTABLE PMC* get_pmc() {
+        UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
     }
 
@@ -150,10 +153,12 @@ Returns the number of remaining elements in the Hash.
 */
 
     VTABLE INTVAL elements() {
+        UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->elements;
     }
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
         return SELF.elements();
     }
 
