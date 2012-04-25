@@ -113,14 +113,14 @@ m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_goto( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+    frame->registers[PC] = 256 * ops[1] + ops[2];
 }
 
 static void
 m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
 {
     if( frame->registers[ops[3]] )
-        frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+        frame->registers[PC] = 256 * ops[1] + ops[2];
 }
 
 static void
@@ -320,156 +320,156 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
         const unsigned long        op_count = bytecode->op_count;
 
         /* XXX: access violation -- so produce an error? */
-        if (pc / 4 >= op_count)
+        if (pc >= op_count)
             return 0;
         else {
-            const unsigned char op = ops[pc];
+            const unsigned char op = ops[4*pc];
             switch (op) {
                 case (M0_SET_IMM):
-                    m0_op_set_imm( cf, &ops[pc] );
+                    m0_op_set_imm( cf, &ops[4*pc] );
                 break;
 
                 case (M0_DEREF):
-                    m0_op_deref( cf, &ops[pc] );
+                    m0_op_deref( cf, &ops[4*pc] );
                 break;
 
                 case (M0_PRINT_S):
-                    m0_op_print_s( cf, &ops[pc] );
+                    m0_op_print_s( cf, &ops[4*pc] );
                 break;
 
                 case (M0_PRINT_I):
-                    m0_op_print_i( cf, &ops[pc] );
+                    m0_op_print_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_NOOP):
                 break;
 
                 case (M0_ADD_I):
-                    m0_op_add_i( cf, &ops[pc] );
+                    m0_op_add_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_ADD_N):
-                    m0_op_add_n( cf, &ops[pc] );
+                    m0_op_add_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SUB_I):
-                    m0_op_sub_i( cf, &ops[pc] );
+                    m0_op_sub_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SUB_N):
-                    m0_op_sub_n( cf, &ops[pc] );
+                    m0_op_sub_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO):
-                    m0_op_goto( cf, &ops[pc] );
+                    m0_op_goto( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO_IF):
-                    m0_op_goto_if( cf, &ops[pc] );
+                    m0_op_goto_if( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MULT_I):
-                    m0_op_mult_i( cf, &ops[pc] );
+                    m0_op_mult_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MULT_N):
-                    m0_op_mult_n( cf, &ops[pc] );
+                    m0_op_mult_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_DIV_I):
-                    m0_op_div_i( cf, &ops[pc] );
+                    m0_op_div_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_DIV_N):
-                    m0_op_div_n( cf, &ops[pc] );
+                    m0_op_div_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MOD_I):
-                    m0_op_mod_i( cf, &ops[pc] );
+                    m0_op_mod_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MOD_N):
-                    m0_op_mod_n( cf, &ops[pc] );
+                    m0_op_mod_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_AND):
-                    m0_op_and( cf, &ops[pc] );
+                    m0_op_and( cf, &ops[4*pc] );
                 break;
 
                 case (M0_OR):
-                    m0_op_or( cf, &ops[pc] );
+                    m0_op_or( cf, &ops[4*pc] );
                 break;
 
                 case (M0_XOR):
-                    m0_op_xor( cf, &ops[pc] );
+                    m0_op_xor( cf, &ops[4*pc] );
                 break;
 
                 case (M0_LSHR):
-                    m0_op_lshr( cf, &ops[pc] );
+                    m0_op_lshr( cf, &ops[4*pc] );
                 break;
 
                 case (M0_ASHR):
-                    m0_op_ashr( cf, &ops[pc] );
+                    m0_op_ashr( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SHL):
-                    m0_op_shl( cf, &ops[pc] );
+                    m0_op_shl( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO_CHUNK):
-                    m0_op_goto_chunk( cf, &ops[pc] );
+                    m0_op_goto_chunk( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SET_BYTE):
-                    m0_op_set_byte( cf, &ops[pc] );
+                    m0_op_set_byte( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SET_WORD):
-                    m0_op_set_word( cf, &ops[pc] );
+                    m0_op_set_word( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SET):
-                    m0_op_set( cf, &ops[pc] );
+                    m0_op_set( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GET_BYTE):
-                    m0_op_get_byte( cf, &ops[pc] );
+                    m0_op_get_byte( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GET_WORD):
-                    m0_op_get_word( cf, &ops[pc] );
+                    m0_op_get_word( cf, &ops[4*pc] );
                 break;
 
                 case (M0_ITON):
-                    m0_op_convert_i_n( cf, &ops[pc] );
+                    m0_op_convert_i_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_NTOI):
-                    m0_op_convert_n_i( cf, &ops[pc] );
+                    m0_op_convert_n_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GC_ALLOC):
-                    m0_op_gc_alloc( cf, &ops[pc]);
+                    m0_op_gc_alloc( cf, &ops[4*pc]);
                 break;
 
                 case (M0_SET_REF):
-                    m0_op_set_ref( cf, &ops[pc]);
+                    m0_op_set_ref( cf, &ops[4*pc]);
                 break;
 
                 case (M0_EXIT):
-                    m0_op_exit( cf, &ops[pc]);
+                    m0_op_exit( cf, &ops[4*pc]);
                 break;
 
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
-                        op, ops[pc + 1], ops[pc + 2], ops[pc + 3] );
+                        op, ops[4*pc + 1], ops[4*pc + 2], ops[4*pc + 3] );
                 break;
             }
         }
         cf = (M0_CallFrame*)cf->registers[CF];
         /* only branching ops definitely change the pc */
         if (pc == (const unsigned long)cf->registers[PC])
-            cf->registers[PC] += 4;
+            cf->registers[PC]++;
     }
 
     return 0;

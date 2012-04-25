@@ -117,14 +117,14 @@ init_cf_retpc:
     # 1 register needed
     # Set the return PC for the current cf so that control flow will resume at
     # the 'retpc' label.
-    set_imm I13, 0, 40
+    set_imm I13, 0, 10
     add_i   RETPC, PC, I13
 
 init_cf_pc:
     # 3 register needed (2x I, 1x P)
     # Set the new call frame's PC to the 'post_set' label so that when it's
     # activated, control flow will continue as normal.
-    set_imm I12, 0,   12
+    set_imm I12, 0,   3
     add_i   I12, I12, PC
     set_imm I9,  0,   PC
     set_ref P0,  I9,  I12
@@ -161,7 +161,7 @@ restore_cf:
 set_cf_pc:
     # Set PCF[PC] to the invoke_cf + 1 so that when we invoke PCF with
     # "set CF, PCF, x", control flow will continue at the next instruction.
-    set_imm I1,  0,  20
+    set_imm I1,  0,  5
     add_i   I1,  PC, I1
     set_imm I9,  0,  PC
     set_ref PCF, I9, I1
