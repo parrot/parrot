@@ -893,7 +893,7 @@ runloop does need to accomplish the following:
 
 =item * execute the instruction
 
-=item * increment the pc, if needed
+=item * increment the pc by one, if needed
 
 =back
 
