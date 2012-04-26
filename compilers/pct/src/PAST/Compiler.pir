@@ -24,28 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-=item unique([STR fmt])
-
-Generate a unique number that can be used as an identifier.
-If C<fmt> is provided, then it will be used as a prefix to the
-unique number.
-
-=cut
-
-.sub 'unique' :method
-    .param string fmt          :optional
-    .param int has_fmt         :opt_flag
-
-    if has_fmt goto unique_1
-    fmt = ''
-  unique_1:
-    $P0 = get_global '$!serno'
-    $S0 = $P0
-    $S0 = concat fmt, $S0
-    inc $P0
-    .return ($S0)
-.end
-
 =item uniquereg(rtype)
 
 Generate a unique register based on C<rtype>, where C<rtype>

@@ -231,6 +231,25 @@ Return C<str> as a PIR constant string.
         return estr;
     }
 
+/*
+=item unique([STR fmt])
+
+Generate a unique number that can be used as an identifier.
+If C<fmt> is provided, then it will be used as a prefix to the
+unique number.
+
+=cut
+
+*/
+    function unique[method](string fmt [optional], int has_fmt [opt_flag]) {
+        if (!has_fmt)
+            fmt = '';
+        var serno;
+        ${ get_global serno, '$!serno' };
+        string ret = fmt + string(serno);
+        ++serno;
+        return ret;
+    }
 
 }
 
