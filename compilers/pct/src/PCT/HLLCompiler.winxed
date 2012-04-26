@@ -57,7 +57,7 @@ inline find_cclass(int cclass, string str, int pos, int count) return int {
     return ret;
 }
 
-function onload[load, init]() {
+function onload[anon, load, init]() {
     load_bytecode('P6object.pbc');
     load_bytecode('Parrot/Exception.pbc');
 

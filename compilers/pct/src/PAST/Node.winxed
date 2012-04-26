@@ -24,7 +24,7 @@ class PAST.Control;
 class PAST.VarList;
 
 namespace PAST.Node {
-    function onload[load, init]() {
+    function onload[anon, load, init]() {
         var p6meta = new P6metaclass;
         var base = p6meta.new_class('PAST::Node', 'PCT::Node':[named('parent')]);
 

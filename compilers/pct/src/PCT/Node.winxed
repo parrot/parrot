@@ -16,7 +16,7 @@ class PGE.Match;
 class PCT.Node;
 
 namespace PCT.Node {
-    function onload[load, init]() {
+    function onload[anon, load, init]() {
         // create the PCT::Node base class
         var p6meta = new P6metaclass;
         p6meta.new_class('PCT::Node', 'Capture':[named('parent')]);

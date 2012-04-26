@@ -19,7 +19,7 @@ class POST.Label;
 class POST.Sub;
 
 namespace POST {
-    function __onload[load, init]() {
+    function __onload[anon, load, init]() {
         // Create POST classes
         var p6meta = new P6metaclass;
         var base = p6meta.new_class('POST::Node', 'PCT::Node':[named('parent')]);

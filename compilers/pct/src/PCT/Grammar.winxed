@@ -45,7 +45,7 @@ class PGE.Util;
 $include_const 'cclass.pasm';
 
 namespace PCT.Grammar {
-    function onload[init, load]() {
+    function onload[anon, init, load]() {
         load_bytecode('PGE.pbc');
         load_bytecode('PGE/Util.pbc');
 
