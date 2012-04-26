@@ -2,6 +2,10 @@
 
 PAST::Compiler - PAST Compiler
 
+=head2 Compiler methods
+
+=over 4
+
 =cut
 
 .include "Compiler-gen.pir"
@@ -19,48 +23,6 @@ PAST::Compiler - PAST Compiler
 
 
 .namespace [ 'PAST';'Compiler' ]
-
-=head2 Compiler methods
-
-=over 4
-
-=item to_post(node [, 'option'=>option, ...])
-
-Compile the abstract syntax tree given by C<past> into POST.
-
-=cut
-
-.sub 'to_post' :method
-    .param pmc past
-    .param pmc options         :slurpy :named
-
-    .local pmc symtable
-    symtable = new 'Hash'
-    setattribute self, '%!symtable', symtable
-
-    .local pmc blockpast
-    blockpast = get_global '@?BLOCK'
-    unless null blockpast goto have_blockpast
-    blockpast = new 'ResizablePMCArray'
-    set_global '@?BLOCK', blockpast
-  have_blockpast:
-    .lex '@*BLOCKPAST', blockpast
-    null $P99
-    .lex '$*SUB', $P99
-    null $P98
-    .lex '%*LEXREGS', $P98
-
-    .local pmc tempregs
-    tempregs = find_dynamic_lex '%*TEMPREGS'
-    unless null tempregs goto have_tempregs
-    tempregs = self.'tempreg_frame'()
-  have_tempregs:
-    .lex '%*TEMPREGS', tempregs
-
-    $P1 = self.'as_post'(past, 'rtype'=>'v')
-
-    .return ($P1)
-.end
 
 =item escape(str)
 

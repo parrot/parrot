@@ -173,6 +173,44 @@ namespace PAST.Compiler {
 
         return;
     }
+
+/*
+=head2 Compiler methods
+
+=over 4
+
+=item to_post(node [, 'option'=>option, ...])
+
+Compile the abstract syntax tree given by C<past> into POST.
+
+=cut
+
+*/
+
+    function to_post[method](var past, options [slurpy, named]) {
+        self.*'%!symtable' = {};
+
+        var blockpast;
+        ${ get_global blockpast, '@?BLOCK' };
+        if (blockpast == null) {
+            blockpast = [];
+            ${ set_global '@?BLOCK', blockpast };
+        }
+        ${ .lex '@*BLOCKPAST', blockpast };
+        var sub;
+        ${ .lex '$*SUB', sub };
+        var lexregs;
+        ${ .lex '%*LEXREGS', lexregs };
+
+        var tempregs;
+        ${ find_dynamic_lex tempregs, '%*TEMPREGS' };
+        if (tempregs == null)
+            tempregs = self.tempreg_frame();
+        ${ .lex '%*TEMPREGS', tempregs };
+
+        var ret = self.as_post(past, 'v':[named('rtype')]);
+        return ret;
+    }
 }
 
 /*
