@@ -45,7 +45,7 @@ Searches up the file system tree from the current working directory
 looking for the distribution directory, and returns it if it finds it.
 The search is only performed once.
 
-The criterion is that there should be a F<README> file beginning with
+The criterion is that there should be a F<README.pod> file beginning with
 the words "This is Parrot" in the directory.
 
 Raises an exception if the distribution root is not found.
@@ -68,7 +68,7 @@ Raises an exception if the distribution root is not found.
     sub _initialize {
         my ($self) = @_;
 
-        my $file = 'README';
+        my $file = 'README.pod';
         my $path = '.';
 
         while ( $self = $self->SUPER::new($path) ) {
