@@ -149,7 +149,7 @@ to enforce whitespace between lexical words.
             // look at the next character, if it's always escaped, add it and
             // move on
             string escaped = substr(target, pos, 1);
-            if (index(escapechars, escaped) >= 0) {
+            if (indexof(escapechars, escaped) >= 0) {
                 ++pos;
                 literal += escaped;
             }
@@ -161,7 +161,7 @@ to enforce whitespace between lexical words.
             }
 
             ++pos;
-            int i = index("abefnrt0xdo", escaped);
+            int i = indexof("abefnrt0xdo", escaped);
             if (i < 0) {
                 literal += escaped;
                 continue;
@@ -178,7 +178,7 @@ to enforce whitespace between lexical words.
             // but it works).  Then loop through the characters that
             // follow to compute the integer value of the codepoint,
             // and add that codepoint to our literal.
-            int base = index('        o d     x', escaped);
+            int base = indexof('        o d     x', escaped);
             int codepoint = 0;
             int isbracketed = substr(target, pos, 1) == '[';
             pos += isbracketed;
@@ -187,7 +187,7 @@ to enforce whitespace between lexical words.
                 string s;
                 for(;;) {
                     s = substr(target, pos, 1);
-                    i = index('0123456789abcdef', s);
+                    i = indexof('0123456789abcdef', s);
                     if (i < 0 || i >= base) break;
                     codepoint *= base;
                     codepoint += i;
