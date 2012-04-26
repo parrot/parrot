@@ -24,29 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-=item escape(str)
-
-Return C<str> as a PIR constant string.
-
-=cut
-
-.sub 'escape' :method
-    .param string str
-    .local string estr
-    estr = escape str
-    $I0 = index estr, "\\x"
-    if $I0 >= 0 goto unicode_prefix
-    $I0 = index estr, "\\u"
-    if $I0 >= 0 goto unicode_prefix
-    estr = concat '"', estr
-    goto done
-  unicode_prefix:
-    estr = concat 'unicode:"', estr
-  done:
-    estr = concat estr, '"'
-    .return (estr)
-.end
-
 =item unique([STR fmt])
 
 Generate a unique number that can be used as an identifier.

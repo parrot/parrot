@@ -211,6 +211,27 @@ Compile the abstract syntax tree given by C<past> into POST.
         var ret = self.as_post(past, 'v':[named('rtype')]);
         return ret;
     }
+
+/*
+=item escape(str)
+
+Return C<str> as a PIR constant string.
+
+=cut
+
+*/
+
+    function escape[method](string str) {
+        string estr = Winxed_Builtins.escape(str);
+        if (indexof(estr, "\\x") >= 0 || indexof(estr, "\\u") >= 0)
+            estr = 'unicode:"' + estr;
+        else
+            estr = '"' + estr;
+        estr += '"';
+        return estr;
+    }
+
+
 }
 
 /*
