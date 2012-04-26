@@ -3,7 +3,7 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot/main.c - The PIR compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -33,7 +33,6 @@ struct init_args_t {
     Parrot_Int execute_packfile;
     Parrot_Int write_packfile;
     Parrot_Int have_pbc_file;
-    Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
     Parrot_Int preprocess_only;
 };
@@ -249,18 +248,15 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
 {
     ASSERT_ARGS(run_imcc)
     Parrot_PMC pir_compiler = NULL;
-    Parrot_PMC pasm_compiler = NULL;;
 
-    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
-          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
+    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler)))
         show_last_error_and_exit(interp);
     if (flags->preprocess_only) {
         Parrot_Int r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
         exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
     }
     else {
-        const Parrot_Int pasm_mode = flags->have_pasm_file;
-        const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
+        const Parrot_PMC compiler = pir_compiler;
         Parrot_PMC pbc;
 
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
@@ -289,10 +285,8 @@ load_bytecode_file(Parrot_PMC interp, Parrot_String filename)
 
     /* set up all the compregs */
     Parrot_PMC pir_compiler;
-    Parrot_PMC pasm_compiler;
 
-    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
-          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
+    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler)))
         show_last_error_and_exit(interp);
 
     if (!Parrot_api_load_bytecode_file(interp, filename, &bytecode))
@@ -540,7 +534,6 @@ help(void)
     "    -o --output=FILE\n"
     "       --output-pbc\n"
     "    -O --optimize[=LEVEL]\n"
-    "    -a --pasm\n"
     "    -c --pbc\n"
     "    -r --run-pbc\n"
     "    -y --yydebug\n"
@@ -589,7 +582,6 @@ Parrot_cmd_options(void)
                                      { "--leak-test", "--destroy-at-end" } },
         { 'o', 'o', OPTION_required_FLAG, { "--output" } },
         { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
         { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
         { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
         { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
@@ -740,7 +732,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->write_packfile = 0;
     args->execute_packfile = 1;
     args->have_pbc_file = 0;
-    args->have_pasm_file = 0;
     args->trace = 0;
     args->turn_gc_off = 0;
     args->outfile = NULL;
@@ -894,8 +885,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         if (ext) {
             if (strcmp(ext, ".pbc") == 0)
                 args->have_pbc_file = 1;
-            else if (strcmp(ext, ".pasm") == 0)
-                args->have_pasm_file = 1;
         }
     }
     verify_file_names(sourcefile, outfile);
