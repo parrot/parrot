@@ -12,9 +12,8 @@ Set the number of tests to be run like this:
 
 Write individual tests like this:
 
-    pasm_output_is(<<'CODE', <<'OUTPUT', "description of test");
-    print "this is ok\n"
-    end
+    pir_output_is(<<'CODE', <<'OUTPUT', "description of test");
+    say "this is ok"
     CODE
     this is ok
     OUTPUT
@@ -86,43 +85,6 @@ non-zero.
 Runs a language test and passes the test if a string comparison
 of the output with the unexpected result is false. For
 C<language_error_output_isnt()>, the exit code also has to be non-zero.
-
-=item C<pasm_output_is($code, $expected, $description)>
-
-Runs the PASM code and passes the test if a string comparison of
-the output with the expected result is true.
-
-=item C<pasm_error_output_is($code, $expected, $description)>
-
-Runs the PASM code and passes the test if a string comparison of
-the output with the expected result is true I<and> if Parrot exits with a
-non-zero exit code.
-
-=item C<pasm_output_like($code, $expected, $description)>
-
-Runs the PASM code and passes the test if the output matches
-C<$expected>.
-
-=item C<pasm_error_output_like($code, $expected, $description)>
-
-Runs the PASM code and passes the test if the output matches
-C<$expected> I<and> if Parrot exits with a non-zero exit code.
-
-=item C<pasm_output_isnt($code, $unexpected, $description)>
-
-Runs the PASM code and passes the test if a string comparison of
-the output with the unexpected result is false.
-
-=item C<pasm_error_output_isnt($code, $unexpected, $description)>
-
-Runs the PASM code and passes the test if a string comparison of
-the output with the unexpected result is false I<and> if Parrot exits with a
-non-zero exit code.
-
-=item C<pasm_exit_code_is($code, $exit_code, $description)>
-
-Runs the PASM code and passes the test if the exit code equals $exit_code,
-fails the test otherwise.
 
 =item C<pir_output_is($code, $expected, $description)>
 
@@ -680,9 +642,6 @@ sub _run_test_file {
     if ( $func =~ m/^pir_(exit_code|.*?output)/ ) {
         $code_f = per_test( '.pir', $test_no );
     }
-    elsif ( $func =~ m/^pasm_(exit_code|.*?output_)/ ) {
-        $code_f = per_test( '.pasm', $test_no );
-    }
     elsif ( $func =~ m/^pbc_(exit_code|.*?output_)/ ) {
         $code_f = per_test( '.pbc', $test_no );
     }
@@ -787,7 +746,7 @@ sub _generate_test_functions {
         $_ . '_error_output_like'   => 'like',
         $_ . '_output_unlike'       => 'unlike',
         $_ . '_error_output_unlike' => 'unlike',
-    } qw( pasm pbc pir );
+    } qw( pbc pir );
     for my $func ( keys %parrot_test_map ) {
         push @EXPORT, $func;
 
@@ -854,7 +813,6 @@ sub _generate_test_functions {
     ##### 2: Language test map #####
     my %builtin_language_prefix = (
         PIR_IMCC  => 'pir',
-        PASM_IMCC => 'pasm',
     );
 
     my %language_test_map = (
@@ -933,12 +891,11 @@ sub _generate_test_functions {
             my ( $example_f, $expected, @options ) = @_;
 
             my %lang_for_extension = (
-                pasm => 'PASM_IMCC',
                 pir  => 'PIR_IMCC',
             );
 
             my ($extension) = $example_f =~ m{ [.]                    # introducing extension
-                                               ( pasm | pir )         # match and capture the extension
+                                               ( pir )                # match and capture the extension
                                                \z                     # at end of string
                                              }ixms;
             if ( defined $extension ) {
