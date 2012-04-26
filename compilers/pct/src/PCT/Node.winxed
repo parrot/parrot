@@ -279,7 +279,8 @@ method. If so, return 1, else return 0.
 */
 
     function isa[method](var type) {
-        return int(self.HOW().isa(self, type));
+        :(int ret) = self.HOW().isa(self, type);
+        return ret;
     }
 
 /*
