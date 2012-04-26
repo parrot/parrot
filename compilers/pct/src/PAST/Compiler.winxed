@@ -271,6 +271,68 @@ is one of the signature flags described above.
             rtype = substr('SSSNNNII', i, 1);
         return self.unique('$' + rtype);
     }
+
+/*
+=item tempreg_frame()
+
+Create a new temporary register frame, using register
+identifiers TEMPREG_BASE up to UNIQUE_BASE.
+
+=cut
+
+*/
+    function tempreg_frame[method]() {
+        return {
+            'i': TEMPREG_BASE,
+            'n': TEMPREG_BASE,
+            's': TEMPREG_BASE,
+            'p': TEMPREG_BASE
+        };
+    }
+
+/*
+=item tempreg(rtype)
+
+Generate a unique register by allocating from the temporary
+register pool frame in %*TEMPREGS.  %*TEMPREGS is a hash that
+has the next register identifier to be used for I, N, S, and
+P registers.  It also contains the names of any registers
+that have been "reserved" in the current frame (e.g. because
+they hold the return value from a PAST::Stmt node).
+
+If there are no temporary registers available, allocate and
+return a permanent one instead (similar to C<uniquereg> above).
+
+=cut
+
+*/
+    function tempreg[method](string rtype) {
+        if (!rtype)
+            return self.panic('rtype not set');
+        if (rtype == 'v')
+            return '';
+        int i = indexof('Ss~Nn+Ii', rtype);
+        rtype = 'P';
+        if (i >= 0)
+            rtype = substr('SSSNNNII', i, 1);
+        var tempregs;
+        ${ find_dynamic_lex tempregs, '%*TEMPREGS' };
+        // if we don't have a temporary register pool, just make a unique one
+        if (tempregs != null && tempregs) {
+            int rnum = tempregs[rtype];
+            // If we've run out of temporary registers, just make a unique one
+            while (rnum < UNIQUE_BASE) {
+                string reg = rnum++;
+                tempregs[rtype] = rnum;
+                reg = '$' + rtype + reg;
+                if (!int(tempregs[reg]))
+                    return reg;
+            }
+        }
+
+        // fall back to returning a globally allocated register
+        return self.unique('$' + rtype);
+    }
 }
 
 /*
