@@ -5,7 +5,7 @@ revision of Parrot's Documentation Set.  Please note, by complete, we
 mean a set of documents sufficient to satisfy the goals set out in 
 'README_revisions.pod'.
 
-[Open] 00. Solicit aid!
+[Done] 00.  Solicit aid! (But none's been forthcoming :(
 
 [Done] 01.  Write a README_revision and this TODO_revision and commit them
        	    to a new documentation branch on github.
@@ -15,6 +15,7 @@ mean a set of documents sufficient to satisfy the goals set out in
 
 [Done] 03.  Convert 'docs.parrot.org' (version 3.10.0) to Github pages.
 
+            [Done] Note:  All done now. (See, e.g., 'parrot.github.com')
        	    [Done] 03a.   Convert versions 3.9.0.
        	    [Done] 03b.   Convert versions 3.8.0.
        	    [Done] 03c.   Convert versions 3.7.0.
