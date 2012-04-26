@@ -36,6 +36,9 @@ $(LIBRARY_DIR)/PCT/HLLCompiler.pbc : compilers/pct/src/PCT/HLLCompiler.pir \
     $(LIBRARY_DIR)/PCT/Dumper.pbc
 	$(PARROT) -o $@ compilers/pct/src/PCT/HLLCompiler.pir
 
+compilers/pct/src/PCT/HLLCompiler.pir : compilers/pct/src/PCT/HLLCompiler.winxed $(WINXED)
+	$(WINXED) -c -o $@ $<
+
 $(LIBRARY_DIR)/PCT/Dumper.pbc : compilers/pct/src/PCT/Dumper.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/PCT/Dumper.pir
 

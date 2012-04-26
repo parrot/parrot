@@ -1,0 +1,904 @@
+/* Copyright (C) 2006-2010, Parrot Foundation.
+
+=head1 NAME
+
+PCT::HLLCompiler - base class for compiler objects
+
+=head1 DESCRIPTION
+
+This file implements a C<HLLCompiler> class of objects used for
+creating HLL compilers.  It provides the standard methods required
+for all compilers, as well as some standard scaffolding for
+running compilers from a command line.
+
+=cut
+
+*/
+
+class Class;
+class Exception;
+class FileHandle;
+class Getopt.Obj;
+class NameSpace;
+class P6metaclass;
+class P6protoobject;
+class PAST.Node;
+class String;
+class Undef;
+
+// Useful pirops
+inline can(var obj, string meth) return int {
+    int ret;
+    ${ can ret, obj, meth };
+    return ret;
+}
+
+inline does(var obj, string role) return int {
+    int ret;
+    ${ does ret, obj, role };
+    return ret;
+}
+
+inline defined(var obj) return int {
+    int ret;
+    ${ defined ret, obj };
+    return ret;
+}
+
+inline is_cclass(int cclass, string str, int pos) return int {
+    int ret;
+    ${ is_cclass ret, cclass, str, pos };
+    return ret;
+}
+
+inline find_cclass(int cclass, string str, int pos, int count) return int {
+    int ret;
+    ${ find_cclass ret, cclass, str, pos, count };
+    return ret;
+}
+
+function onload[load, init]() {
+    load_bytecode('P6object.pbc');
+    load_bytecode('Parrot/Exception.pbc');
+
+    var p = new P6metaclass;
+    p.new_class('PCT::HLLCompiler', '@stages $parsegrammar $parseactions $astgrammar $commandline_banner $commandline_prompt @cmdoptions $usage $version $compiler_progname':[named('attr')]);
+}
+
+$include_const 'cclass.pasm';
+$include_const 'iglobals.pasm';
+
+namespace PCT.HLLCompiler {
+    function init[vtable, method]() {
+        self.*'@stages' = split(' ', 'parse past post pir evalpmc');
+
+        var options = split(' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v stagestats ll-backtrace');
+        self.*'@cmdoptions' = options;
+        
+        string usage = <<:USAGE
+  This compiler is based on PCT::HLLCompiler.
+
+  Options:
+USAGE:>>
+        ;
+        for (var opt in options)
+            usage += "   " + string(opt) + "\n";
+        self.*'$usage' = var(usage);
+
+        string version = 'This compiler is built with the Parrot Compiler Toolkit, parrot ';
+        var config = getinterp()[IGLOBALS_CONFIG_HASH];
+        version += string(config['VERSION']);
+        string describe = string(config['git_describe']);
+        if (describe)
+            version += ' revision ' + describe;
+        self.*'$version' = var(version);
+    }
+
+/*
+=head2 Methods
+
+=over 4
+
+=item attr(string attrname, pmc value, int has_value)
+
+Helper method for accessors -- gets/sets an attribute given
+by C<attrname> based on C<has_value>.
+
+=cut
+
+*/
+
+    function attr[method](string attrname, var value, int has_value) {
+        if (has_value) {
+            self.*attrname = value;
+        } else {
+            value = self.*attrname;
+            if (value == null)
+                value = new Undef;
+        }
+
+        return value;
+    }
+
+/*
+=item panic(message :slurpy)
+
+Helper method to throw an exception (with a message).
+
+=cut
+
+*/
+
+    function panic[method](args [slurpy]) {
+        die(join('', args));
+    }
+
+/*
+=item language(string name)
+
+Register this object as the compiler for C<name> using the
+C<compreg> opcode.
+
+=cut
+
+*/
+
+    function language[method](string name) {
+        compreg(name, self);
+        return;
+    }
+
+/*
+=item stages([stages])
+
+Accessor for the C<stages> attribute.
+
+=item parsegrammar([string grammar])
+
+Accessor for the C<parsegrammar> attribute.
+
+=item parseactions([actions])
+
+Accessor for the C<parseactions> attribute.
+
+=item astgrammar([grammar])
+
+Accessor for the C<astgrammar> attribute.
+
+=item commandline_banner([string value])
+
+Set the command-line banner for this compiler to C<value>.
+The banner is displayed at the beginning of interactive mode.
+
+=item commandline_prompt([string value])
+
+Set the command-line prompt for this compiler to C<value>.
+The prompt is displayed in interactive mode at each point where
+the compiler is ready for code to be compiled and executed.
+
+=item compiler_progname([string name])
+
+Accessor for the C<compiler_progname>, which is often the filename of
+the compiler's program entry point, like C<perl6.pbc>.
+
+=cut
+
+*/
+
+    function stages[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('@stages', value, has_value);
+    }
+
+    function parsegrammar[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$parsegrammar', value, has_value);
+    }
+
+    function parseactions[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$parseactions', value, has_value);
+    }
+
+    function astgrammar[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$astgrammar', value, has_value);
+    }
+
+    function commandline_banner[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$commandline_banner', value, has_value);
+    }
+
+    function commandline_prompt[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$commandline_prompt', value, has_value);
+    }
+
+    function compiler_progname[method](var value [optional], int has_value [opt_flag]) {
+        return self.attr('$compiler_progname', value, has_value);
+    }
+
+/*
+=item removestage(string stagename)
+
+Delete a stage from the compilation process queue.
+
+=cut
+
+*/
+
+    function removestage[method](string stagename) {
+        var stages = self.*'@stages';
+        var newstages = [];
+        for (var current in stages) {
+            if (current == stagename)
+                continue;
+            push(newstages, current);
+        }
+        self.*'@stages' = newstages;
+    }
+
+/*
+=item addstage(string stagename [, "option" => value, ... ])
+
+Add a stage to the compilation process queue. Takes either a "before" or
+"after" named argument, which gives the relative ordering of the stage
+to be added. If "before" and "after" aren't specified, the new stage is
+inserted at the end of the queue.
+
+It's possible to add multiple stages of the same name: for example, you
+might repeat a stage like "optimize_tree" or "display_benchmarks" after
+each transformation. If you have multiple stages of the same name, and
+add a new stage before or after that repeated stage, the new stage will
+be added at every instance of the repeated stage.
+
+=cut
+
+*/
+
+    function addstage[method](string stagename, adverbs[slurpy, named]) {
+        var stages = self.*'@stages';
+        string position, target;
+
+        if (exists adverbs['before']) {
+            position = 'before';
+            target = adverbs['before'];
+        } else if (exists adverbs['after']) {
+            position = 'after';
+            target = adverbs['after'];
+        } else {
+            push(stages, stagename);
+            return;
+        }
+
+        var newstages = [];
+        for (var current in stages) {
+            if (current == target && position == 'before')
+                push(newstages, stagename);
+
+            push(newstages, current);
+
+            if (current == target && position == 'after')
+                push(newstages, stagename);
+        }
+        self.*'@stages' = newstages;
+    }
+
+/*
+=item compile(pmc code [, "option" => value, ... ])
+
+Compile C<source> (possibly modified by any provided options)
+by iterating through any stages identified for this compiler.
+If a C<target> option is provided, then halt the iteration
+when the stage corresponding to target has been reached.
+
+=cut
+
+*/
+
+    function compile[method](var source, adverbs [slurpy, named]) {
+        var compiling = {};
+        ${ .lex '%*COMPILING', compiling };
+        compiling['%?OPTIONS'] = adverbs;
+
+        string target = downcase(string(adverbs['target']));
+
+        string stagestats = adverbs['stagestats'];
+
+        var result = source;
+        var stages = self.*'@stages';
+
+        if (stagestats) {
+            // stagestats_loop
+            for (string stagename in stages) {
+                float start = time();
+                result = self.*stagename(result, adverbs:[flat, named]);
+                float end = time();
+                var stderr = getinterp().stderr_handle();
+                stderr.print("Stage '");
+                stderr.print(stagename);
+                stderr.print("': ");
+                stderr.print(sprintf("%.3f", [end - start]));
+                stderr.print(" sec\n");
+                if (target == stagename)
+                    break;
+            }
+        } else {
+            // iter_loop
+            for (string stagename in stages) {
+                result = self.*stagename(result, adverbs:[flat, named]);
+                if (target == stagename)
+                    break;
+            }
+        }
+
+        return result;
+    }
+
+/*
+=item parse(source [, "option" => value, ...])
+
+Parse C<source> using the compiler's C<parsegrammar> according
+to any options and return the resulting parse tree.
+
+=cut
+
+*/
+
+    function parse[method](var source, adverbs [slurpy, named]) {
+        string tcode = adverbs['transcode'];
+        if (tcode) {
+            for (tcode in split(' ', tcode)) {
+                try {
+                    source =: trans_encoding(source, tcode);
+                } catch () {
+                    continue;
+                }
+                break;
+            }
+        }
+
+        string target = downcase(string(adverbs['target']));
+        var parsegrammar = self.parsegrammar();
+        var top;
+        if (can(parsegrammar, 'TOP')) {
+            top = find_method(parsegrammar, 'TOP');
+        } else if (typeof(parsegrammar) == 'NameSpace') {
+            top = parsegrammar['TOP'];
+            if (top == null) goto err_notop;
+        } else {
+            var p0 = self.parse_name(parsegrammar);
+            string s0;
+            ${ pop s0, p0 };
+            var p1;
+            ${ get_hll_global p1, p0, s0 };
+            if (can(p1, 'TOP')) {
+                top = find_method(p1, 'TOP');
+            } else {
+                p0 = self.parse_name(parsegrammar);
+                ${ get_hll_global top, p0, 'TOP' };
+                if (top == null) goto err_notop;
+            }
+        }
+        goto have_top;
+
+    err_notop:
+        self.panic('Cannot find TOP regex in ', parsegrammar);
+    have_top:
+
+        var action;
+        if (target != 'parse') {
+            var parseactions = self.parseactions();
+            var klass;
+            switch {
+            case parseactions instanceof Undef:
+                break;
+            case parseactions instanceof NameSpace:
+                klass = get_class(parseactions);
+                action = new klass;
+                break;
+            case parseactions instanceof String:
+                // Try the string itself, if that fails try splitting on '::'
+                klass = get_class(parseactions);
+                if (klass == null) {
+                    parseactions = split('::', parseactions);
+                    try {
+                        klass = get_class(parseactions);
+                    } catch () {
+                        klass = null;
+                    }
+                    if (klass == null) {
+                        self.panic('Unable to find action grammar ', self.parseactions());
+                        return;
+                    }
+                }
+                // fall through
+            // if parseactions is a Class or array, make action directly from that
+            case does(parseactions, 'array'):
+            case parseactions instanceof Class:
+                action = new parseactions;
+                break;
+            // if parseactions is a protoobject, use it directly
+            case parseactions instanceof P6protoobject:
+            default:
+                action = parseactions;
+            }
+        }
+        var match = top(source, parsegrammar:[named('grammar')], action:[named('action')]);
+        if (!match) {
+            self.panic('Failed to parse source');
+            return;
+        }
+        return match;
+    }
+
+/*
+=item past(source [, "option" => value, ...])
+
+Transform C<source> into PAST using the compiler's
+C<astgrammar> according to any options, and return the
+resulting ast.
+
+=cut
+
+*/
+
+    function past[method](var source, adverbs [slurpy, named]) {
+        var astgrammar_name = self.astgrammar();
+        var astgrammar;
+        var astbuilder;
+        if (typeof(astgrammar_name) == 'NameSpace') {
+            var klass = get_class(astgrammar_name);
+            astgrammar = new klass;
+            astbuilder = astgrammar.apply(source);
+            return astbuilder.get('past');
+        } else if (astgrammar_name) {
+            var astgrammar_namelist = self.parse_name(astgrammar_name);
+            if (!astgrammar_namelist)
+                goto err_past;
+            astgrammar = new astgrammar_namelist;
+            astbuilder = astgrammar.apply(source);
+            return astbuilder.get('past');
+        } else {
+            var ast = source.ast();
+            if (!(ast instanceof PAST.Node))
+                goto err_past;
+            return ast;
+        }
+
+    err_past:
+        return self.panic('Unable to obtain PAST from ', typeof(source));
+    }
+
+/*
+=item post(source [, adverbs :slurpy :named])
+
+Transform PAST C<source> into POST.
+
+=cut
+
+*/
+
+    function post[method](var source, adverbs [slurpy, named]) {
+        return compreg('PAST').to_post(source, adverbs:[flat, named]);
+    }
+
+    function pir[method](var source, adverbs [slurpy, named]) {
+        return compreg('POST').to_pir(source, adverbs:[flat, named]);
+    }
+
+    function evalpmc[method](var source, adverbs [slurpy, named]) {
+        return compreg('PIR')(source);
+    }
+
+/*
+=item eval(code [, "option" => value, ...])
+
+Compile and execute the given C<code> taking into account any
+options provided.
+
+=cut
+
+*/
+
+    function eval[method](var code, args [slurpy], adverbs [slurpy, named]) {
+        if (args == null)
+            args = [];
+        if (adverbs == null)
+            adverbs = {};
+
+        var ret = self.compile(code, adverbs:[flat, named]);
+        if (!(ret instanceof String)) {
+            string target = adverbs['target'];
+            if (target == '') {
+                var outer_ctx = adverbs['outer_ctx'];
+                if (outer_ctx != null) {
+                    var outer = outer_ctx['current_sub'];
+                    ret[0].set_outer(outer);
+                }
+                ${ trace int(adverbs['trace']) };
+                ret = ret(args:[flat]);
+                ${ trace 0 };
+            }
+        }
+        return ret;
+    }
+
+/*
+=item interactive(["encoding" => encoding] [, "option" => value, ...])
+
+Runs an interactive compilation session -- reads lines of input
+from the standard input and evaluates each.  The C<encoding> option
+specifies the encoding to use for the input (e.g., "utf8").
+
+=cut
+
+*/
+
+    function interactive[method](adverbs [slurpy, named]) {
+        string target = downcase(string(adverbs['target']));
+
+        // on startup show the welcome message
+        getinterp().stderr_handle().print(self.commandline_banner());
+
+        var stdin = getinter().stdin_handle();
+        string encoding = adverbs['encoding'];
+        if (encoding != 'fixed_8' && encoding)
+            stdin.encoding(encoding);
+
+        while (stdin) {
+            string prompt = '> ';
+            var maybe_prompt = self.commandline_prompt();
+            if (defined(maybe_prompt))
+                prompt = maybe_prompt;
+
+            // display a prompt ourselves if readline isn't present
+            var code = stdin.readline_interactive(prompt);
+            if (code == null)
+                break;
+            if (!code)
+                continue;
+            ${ concat code, code, "\n" };
+            var p0;
+            try {
+                p0 = self.eval(code, adverbs:[flat, named]);
+            } catch (e) {
+                string s0 = e;
+                if (s0 != '' && is_cclass(CCLASS_NEWLINE, substr(s0,-1,1), 0)) {
+                    s0 += "\n";
+                }
+                print(s0);
+                continue;
+            }
+            if (p0 == null || target)
+                continue;
+            if (target == 'pir') {
+                say(p0);
+                continue;
+            }
+            self.dumper(p0, target, adverbs:[flat, named]);
+        }
+        return;
+    }
+
+/*
+=item EXPORTALL(source, destination)
+
+Export all namespace entries from the default export namespace for source
+(source::EXPORT::ALL) to the destination namespace.
+
+=cut
+
+*/
+
+    function EXPORTALL[method](var source, var dest) {
+        source = source['EXPORT'];
+        if (!source)
+            goto no_namespace_error;
+        source = source['ALL'];
+        if (!source)
+            goto no_namespace_error;
+
+        var export_list = [];
+        for (var item in source)
+            push(export_list, item);
+
+        source.export_to(dest, export_list);
+        return;
+
+    no_namespace_error:
+        var e = new Exception;
+        e =: 'Missing EXPORT::ALL NameSpace';
+        throw e;
+        return;
+    }
+
+/*
+=item evalfiles(files [, args] [, "encoding" => encoding] [, "option" => value, ...])
+
+Compile and evaluate a file or files.  The C<files> argument may
+be either a single filename or an array of files to be processed
+as a single compilation unit.  The C<encoding> option specifies
+the encoding to use when reading the files, and any remaining
+options are passed to the evaluator.
+
+=cut
+
+*/
+
+    function evalfiles[method](var files, args [slurpy], adverbs [slurpy, named]) {
+        if (adverbs == null)
+            adverbs = {};
+        string target = downcase(string(adverbs['target']));
+        string encoding = adverbs['encoding'];
+        if (!does(files, 'array')) {
+            files = [files];
+        }
+        string code = '';
+        for (string iname in files) {
+            var ifh = new FileHandle;
+            if (encoding == 'utf8')
+                ifh.encoding(encoding);
+            :(string content) = ifh.readall(iname);
+            code += content;
+            ifh.close();
+        }
+        var files_lex = join(' ', files);
+        ${ .lex '$?FILES', files_lex };
+        var ret = self.eval(code, args:[flat], adverbs:[flat, named]);
+        if (target != '' && target != 'pir')
+            self.dumper(ret, target, adverbs:[flat, named]);
+        return ret;
+    }
+
+/*
+=item process_args(PMC args)
+
+Performs option processing of command-line args
+
+=cut
+
+*/
+
+    function process_args[method](var args) {
+        load_bytecode('Getopt/Obj.pbc');
+
+        string arg0;
+        ${ shift arg0, args };
+        var getopts = new Getopt.Obj;
+        getopts.notOptStop(1);
+        for (string opt in self.*'@cmdoptions')
+            push(getopts, opt);
+        return getopts.get_options(args);
+    }
+
+/*
+=item command_line(PMC args)
+
+Generic method for compilers invoked from a shell command line.
+
+=cut
+
+*/
+
+$include_const 'except_severity.pasm';
+    function command_line[method](var args, adverbs [slurpy, named]) {
+        // this bizarre piece of code causes the compiler to
+        // immediately abort if it looks like it's being run
+        // from Perl's Test::Harness.  (Test::Harness versions 2.64
+        // and earlier have a hardwired commandline option that is
+        // always passed to an initial run of the interpreter binary,
+        // whether you want it or not.)  We expect to remove this
+        // check eventually (or make it a lot smarter than it is here).
+        if (indexof(string(args[2]), '@INC') >= 0)
+            exit(0);
+
+        load_bytecode('dumper.pbc');
+        load_bytecode('PGE/Dumper.pbc');
+
+        // get the name of the program
+        string arg0 = args[0];
+
+        // perform option processing of command-line args
+        var opts = self.process_args(args);
+
+        // merge command-line args with defaults passed in from caller
+        for (string opt in opts)
+            adverbs[opt] = opts[opt];
+
+        if (adverbs['help']) {
+            self.usage(arg0);
+            return;
+        }
+
+        if (adverbs['version']) {
+            self.version();
+            return;
+        }
+
+        string target = downcase(string(adverbs['target']));
+
+        int can_backtrace = can(self, 'backtrace');
+        int ll_backtrace  = adverbs['ll-backtrace'];
+        if (can_backtrace && !ll_backtrace)
+            ${ push_eh :uncaught_exception };
+
+        var result;
+        if (exists adverbs['e']) {
+            result = self.eval(string(adverbs['e']), '-e', args:[flat], adverbs:[flat, named]);
+            if (target != '' && target != 'pir')
+                _dumper(result, target);
+        } else {
+            result = '';
+            if (args) {
+                if (int(adverbs['combine']))
+                    result = self.evalfiles(args, adverbs:[flat, named]);
+                else
+                    result = self.evalfiles(args[0], args:[flat], adverbs:[flat, named]);
+            } else
+                self.interactive(args:[flat], adverbs:[flat, named]);
+        }
+
+        if (can_backtrace)
+            ${ pop_eh };
+        if (result == null || !defined(result) || target != 'pir')
+            return;
+        var ofh = getinterp().stdout_handle();
+        string output = adverbs['output'];
+        if (output != '' && output != '-') {
+            ofh = new FileHandle;
+            ofh.open(output, 'w');
+            if (!ofh)
+                return self.panic('Error: file cannot be written: ', output);
+        }
+        ${ print ofh, result };
+        ofh.close();
+        return;
+
+        // If we get an uncaught exception in the program and the HLL provides
+        // a backtrace method, we end up here. We pass it the exception object
+        // so it can render a backtrace, unless the severity is exit or warning
+        // in which case it needs special handling.
+    uncaught_exception:
+        var e;
+        ${ get_results '0', e };
+        ${ pop_eh };
+        var stderr = getinterp().stderr_handle();
+        int severity = e['severity'];
+        if (severity == EXCEPT_EXIT)
+            exit(int(e['exit_code']));
+        ${ print stderr, self.backtrace(e) };
+        if (severity > EXCEPT_WARNING)
+            exit(1);
+        ${ push_eh :uncaught_exception }; // Otherwise we get errors about no handler to delete
+        e['resume']();
+    }
+
+/*
+=item parse_name(string name)
+
+Split C<name> into its component namespace parts, as
+required by pdd21.  The default is simply to split the name
+based on double-colon separators.
+
+=cut
+
+*/
+
+    function parse_name[method](string name) {
+        return split('::', name);
+    }
+
+/*
+=item lineof(target, pos [, cache :named('cache')])
+
+Return the line number of offset C<pos> within C<target>.  The return
+value uses zero for the first line.  If C<cache> is true, then
+memoize the line offsets as a C<!lineof> property on C<target>.
+
+=cut
+
+*/
+
+    function lineof[method](var target, int pos, int cache [optional, named]) {
+        var linepos;
+        // If we've previously cached C<linepos> for target, we use it
+        if (cache)
+            ${ getprop linepos, target, '!linepos' };
+
+        // calculate a new linepos array
+        if (linepos == null) {
+            linepos = [];
+            if (cache)
+                ${ setprop target, '!linepos', linepos };
+            string s = target;
+            int eos = length(s);
+            int jpos = 0;
+            // Search for all of the newline markers in C<target>.  When we
+            // find one, mark the ending offset of the line in C<linepos>.
+            while ((jpos = find_cclass(CCLASS_NEWLINE, s, jpos, eos)) < eos) {
+                int char = ord(s, jpos++);
+                push(linepos, jpos);
+                // Treat \r\n as a single logical newline
+                if (char == 13) {
+                    char = ord(s, jpos);
+                    if (char == 10)
+                        ++jpos;
+                }
+            }
+        }
+
+        // We have C<linepos>, so now we (binary) search the array
+        // for the largest element that is not greater than C<pos>
+        int lo = 0;
+        int hi = elements(linepos);
+        while (lo < hi) {
+            int line = (lo + hi) / 2;
+            if (int(linepos[line]) > pos)
+                hi = line;
+            else
+                lo = line + 1;
+        }
+        return lo;
+    }
+
+/*
+=item dumper(obj, name, options)
+
+Dump C<obj> with C<name> according to C<options>.
+
+=cut
+
+*/
+
+    function dumper[method](var obj, string name, options [slurpy, named]) {
+        string dumper = options['dumper'];
+        if (dumper) {
+            load_bytecode('PCT/Dumper.pbc');
+            var func;
+            ${ get_hll_global func, ['PCT','Dumper'], downcase(dumper) };
+            return func(obj, name);
+        }
+
+        return _dumper(obj, name);
+    }
+
+/*
+=item usage()
+
+A usage method.
+
+=cut
+
+*/
+
+    function usage[method](string name [optional], int has_name [opt_flag]) {
+        if (has_name)
+            say(name);
+        say(self.*'$usage');
+        exit(0);
+    }
+
+/*
+=item version()
+
+Display compiler version information.
+
+=cut
+
+*/
+
+    function version[method]() {
+        say(self.*'$version');
+        exit(0);
+    }
+}
+
+/*
+
+=back
+
+=head1 AUTHOR
+
+Patrick R. Michaud <pmichaud@pobox.com>
+
+Converted to Winxed by Brian Gernhardt <brian@gernhardtsoftware.com>
+
+=cut
+
+*/
