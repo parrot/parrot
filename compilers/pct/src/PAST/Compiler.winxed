@@ -251,6 +251,26 @@ unique number.
         return ret;
     }
 
+/*
+=item uniquereg(rtype)
+
+Generate a unique register based on C<rtype>, where C<rtype>
+is one of the signature flags described above.
+
+=cut
+
+*/
+    function uniquereg[method](string rtype) {
+        if (!rtype)
+            return self.panic('rtype not set');
+        if (rtype == 'v')
+            return '';
+        int i = indexof('Ss~Nn+Ii', rtype);
+        rtype = 'P';
+        if (i >= 0)
+            rtype = substr('SSSNNNII', i, 1);
+        return self.unique('$' + rtype);
+    }
 }
 
 /*

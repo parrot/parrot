@@ -24,32 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-=item uniquereg(rtype)
-
-Generate a unique register based on C<rtype>, where C<rtype>
-is one of the signature flags described above.
-
-=cut
-
-.sub 'uniquereg' :method
-    .param string rtype
-    unless rtype goto err_nortype
-    if rtype == 'v' goto reg_void
-    .local string reg
-    $I0 = index 'Ss~Nn+Ii', rtype
-    rtype = 'P'
-    if $I0 < 0 goto have_rtype
-    rtype = substr 'SSSNNNII', $I0, 1
-  have_rtype:
-    reg = concat '$', rtype
-    .tailcall self.'unique'(reg)
-  reg_void:
-    .return ('')
-  err_nortype:
-    self.'panic'('rtype not set')
-.end
-
-
 =item tempreg_frame()
 
 Create a new temporary register frame, using register
