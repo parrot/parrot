@@ -52,8 +52,9 @@ namespace PCT.Grammar {
         var p6meta = new P6metaclass;
         p6meta.new_class('PCT::Grammar', 'PGE::Grammar':[named('parent')]);
 
+        var klass = get_class(split('::', 'PCT::Grammar'));
         using PGE.Util.die;
-        PCT.Grammar.add_method('panic', die);
+        klass.add_method('panic', die);
     }
 
 /*
