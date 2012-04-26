@@ -1,14 +1,16 @@
 # Copyright (C) 2001-2010, Parrot Foundation.
 
-=head1 [DRAFT] PDD 6: Parrot Assembly Language (PASM)
+=head1 [DEPRECATED] PDD 6: Parrot Assembly Language (PASM)
+
+=head2 NOTE
+
+PASM is deprecated; Parrot core developers have been pushing
+users towards PIR as an assembly language (plus a bit more)
+for some time now.
 
 =head2 Abstract
 
 The format of Parrot's bytecode assembly language.
-
-
-
-
 
 =head2 Description
 
