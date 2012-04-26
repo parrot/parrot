@@ -20,7 +20,7 @@ change the version numbers found in B<these 5 files only>:
 
     VERSION
     MANIFEST.generated
-    README
+    README.pod
     include/parrot/oplib/core_ops.h
     src/ops/core_ops.c
 
@@ -56,7 +56,7 @@ croak "'$new_version' is not a proper version number; must be n.n.n"
 my @simple_files = (
     'VERSION',
     'MANIFEST.generated',
-    'README',
+    'README.pod',
 );
 
 foreach my $f ( @simple_files ) {
