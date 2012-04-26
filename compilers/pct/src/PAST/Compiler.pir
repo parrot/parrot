@@ -1,49 +1,16 @@
-
 =head1 NAME
 
 PAST::Compiler - PAST Compiler
 
-=head1 DESCRIPTION
-
-PAST::Compiler implements a basic compiler for PAST nodes.
-By default PAST::Compiler transforms a PAST tree into POST.
-
-=head2 Signature Flags
-
-Throughout the compiler PAST uses a number of 1-character
-"flags" to indicate allowable register types and conversions.
-This helps the compiler generate more efficient code and know
-what sorts of conversions are allowed (or desired).  The
-basic flags are:
-
-    P,S,I,N   PMC, string, int, or num register
-    Q         keyed PMC, next flag indicates type of key
-    s         string register or constant
-    i         int register or constant
-    n         num register or constant
-    r         any register result
-    v         void (no result)
-    *         any result type except void
-    +         PMC, int register, num register, or numeric constant
-    ~         PMC, string register, or string constant
-    :         argument (same as '*'), possibly with :named or :flat
-    0-9       use the nth input operand as the output result of this operation
-
-These flags are used to describe signatures and desired return
-types for various operations.  For example, if an opcode is
-specified with a signature of C<I~P*>, then the opcode places
-its result in an int register, its first child is coerced into
-some sort of string value, its second child is coerced into a
-PMC register, and the third and subsequent children can return
-any value type.
-
 =cut
+
+.include "Compiler-gen.pir"
+
+# Constants must be removed last, since they may still be used in the code.
 
 .include "cclass.pasm"
 .include "except_types.pasm"
 .include "interpinfo.pasm"
-
-.namespace [ 'PAST';'Compiler' ]
 
 # TEMPREG_BASE and UNIQUE_BASE identify the base location for
 # the temporary register set and unique registers
@@ -51,129 +18,7 @@ any value type.
 .const int UNIQUE_BASE  = 1000
 
 
-.sub 'onload' :anon :load :init
-    load_bytecode 'PCT/HLLCompiler.pbc'
-    .local pmc p6meta, cproto
-    p6meta = new 'P6metaclass'
-    cproto = p6meta.'new_class'('PAST::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'%!symtable')
-    cproto.'language'('PAST')
-    $P1 = split ' ', 'post pir evalpmc'
-    cproto.'stages'($P1)
-
-    ##  %piropsig is a table of common opcode signatures
-    .local pmc piropsig
-    piropsig = new 'Hash'
-    piropsig['add']        = 'PP+'
-    piropsig['band']       = 'PPP'
-    piropsig['bxor']       = 'PPP'
-    piropsig['bnot']       = 'PP'
-    piropsig['bor']        = 'PPP'
-    piropsig['can']        = 'IPs'
-    piropsig['chr']        = 'Si'
-    piropsig['clone']      = 'PP'
-    piropsig['concat']     = 'PP~'
-    piropsig['copy']       = '0PP'
-    piropsig['defined']    = 'IP'
-    piropsig['delete']     = 'vQ*'
-    piropsig['die']        = 'v~'
-    piropsig['div']        = 'PP+'
-    piropsig['does']       = 'IPs'
-    piropsig['downcase']   = 'Ss'
-    piropsig['elements']   = 'IP'
-    piropsig['exists']     = 'IQ*'
-    piropsig['exit']       = 'vi'
-    piropsig['fdiv']       = 'PP+'
-    piropsig['find_codepoint']   = 'Is'
-    piropsig['find_dynamic_lex'] = 'Ps'
-    piropsig['find_name']  = 'Ps'
-    piropsig['getinterp']  = 'P'
-    piropsig['getprop']    = 'PP~'
-    piropsig['getstderr']  = 'P'
-    piropsig['getstdin']   = 'P'
-    piropsig['getstdout']  = 'P'
-    piropsig['index']      = 'Issi'
-    piropsig['isa']        = 'IP~'
-    piropsig['isfalse']    = 'IP'
-    piropsig['isnull']     = 'IP'
-    piropsig['issame']     = 'IPP'
-    piropsig['istrue']     = 'IP'
-    piropsig['join']       = 'SsP'
-    piropsig['length']     = 'Is'
-    piropsig['load_bytecode'] = 'vs'
-    piropsig['load_language'] = 'vs'
-    piropsig['loadlib']    = 'P~'
-    piropsig['mod']        = 'PP+'
-    piropsig['mul']        = 'PP+'
-    piropsig['neg']        = 'PP'
-    piropsig['new']        = 'P~'
-    piropsig['newclosure'] = 'PP'
-    piropsig['not']        = 'PP'
-    piropsig['ord']        = 'Isi'
-    piropsig['pop']        = 'PP'
-    piropsig['pow']        = 'NN+'
-    piropsig['print']      = 'v*'
-    piropsig['printerr']   = 'v*'
-    piropsig['push']       = '0P*'
-    piropsig['repeat']     = 'Ssi'
-    piropsig['replace']    = 'Ssiis'
-    piropsig['say']        = 'v*'
-    piropsig['set']        = 'PP'
-    piropsig['setprop']    = '0P~P'
-    piropsig['setattribute'] = '0P~P'
-    piropsig['shift']      = 'PP'
-    piropsig['shl']        = 'PP+'
-    piropsig['shr']        = 'PP+'
-    piropsig['sleep']      = 'v+'
-    piropsig['splice']     = '0PPii'
-    piropsig['split']      = 'Pss'
-    piropsig['sub']        = 'PP+'
-    piropsig['substr']     = 'Ssii'
-    piropsig['titlecase']  = 'Ss'
-    piropsig['trace']      = 'vi'
-    piropsig['typeof']     = 'SP'
-    piropsig['unshift']    = '0P*'
-    piropsig['upcase']     = 'Ss'
-    set_global '%piropsig', piropsig
-
-    ##  %valflags specifies when PAST::Val nodes are allowed to
-    ##  be used as a constant.  The 'e' flag indicates that the
-    ##  value must be quoted+escaped in PIR code.
-    .local pmc valflags
-    valflags = new 'Hash'
-    valflags['String']   = 's~*:e'
-    valflags['Integer']  = 'i+*:'
-    valflags['Float']    = 'n+*:'
-    valflags['!macro_const']     = 'i+*:c'
-    valflags['!cclass']          = 'i+*:c'
-    valflags['!except_severity'] = 'i+*:c'
-    valflags['!except_types']    = 'i+*:c'
-    valflags['!iterator']        = 'i+*:c'
-    valflags['!socket']          = 'i+*:c'
-    set_global '%valflags', valflags
-
-    ##  %!controltypes holds the list of exception types for each
-    ##  type of exception handler we support
-    .local pmc controltypes
-    controltypes = new 'Hash'
-    controltypes['CONTROL']  = '.CONTROL_ALL'
-    controltypes['RETURN']   = '.CONTROL_RETURN'
-    controltypes['OK']       = '.CONTROL_OK'
-    controltypes['BREAK']    = '.CONTROL_BREAK'
-    controltypes['CONTINUE'] = '.CONTROL_CONTINUE'
-    controltypes['ERROR']    = '.CONTROL_ERROR'
-    controltypes['GATHER']   = '.CONTROL_TAKE'
-    controltypes['LEAVE']    = '.CONTROL_LEAVE'
-    controltypes['EXIT']     = '.CONTROL_EXIT'
-    controltypes['NEXT']     = '.CONTROL_NEXT'
-    controltypes['LAST']     = '.CONTROL_LAST'
-    controltypes['REDO']     = '.CONTROL_REDO'
-    set_global '%!controltypes', controltypes
-
-    $P0 = box UNIQUE_BASE
-    set_global '$!serno', $P0
-
-    .return ()
-.end
+.namespace [ 'PAST';'Compiler' ]
 
 =head2 Compiler methods
 

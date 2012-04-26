@@ -1,0 +1,182 @@
+/*
+=head1 NAME
+
+PAST::Compiler - PAST Compiler
+
+=head1 DESCRIPTION
+
+PAST::Compiler implements a basic compiler for PAST nodes.
+By default PAST::Compiler transforms a PAST tree into POST.
+
+=head2 Signature Flags
+
+Throughout the compiler PAST uses a number of 1-character
+"flags" to indicate allowable register types and conversions.
+This helps the compiler generate more efficient code and know
+what sorts of conversions are allowed (or desired).  The
+basic flags are:
+
+    P,S,I,N   PMC, string, int, or num register
+    Q         keyed PMC, next flag indicates type of key
+    s         string register or constant
+    i         int register or constant
+    n         num register or constant
+    r         any register result
+    v         void (no result)
+    *         any result type except void
+    +         PMC, int register, num register, or numeric constant
+    ~         PMC, string register, or string constant
+    :         argument (same as '*'), possibly with :named or :flat
+    0-9       use the nth input operand as the output result of this operation
+
+These flags are used to describe signatures and desired return
+types for various operations.  For example, if an opcode is
+specified with a signature of C<I~P*>, then the opcode places
+its result in an int register, its first child is coerced into
+some sort of string value, its second child is coerced into a
+PMC register, and the third and subsequent children can return
+any value type.
+
+=cut
+
+*/
+
+$include_const 'cclass.pasm';
+$include_const 'except_types.pasm';
+$include_const 'interpinfo.pasm';
+
+class P6metaclass;
+
+namespace PAST.Compiler {
+    // TEMPREG_BASE and UNIQUE_BASE identify the base location for
+    // the temporary register set and unique registers
+    const int TEMPREG_BASE = 100;
+    const int UNIQUE_BASE  = 1000;
+
+    function onload[anon, load, init]() {
+        load_bytecode('PCT/HLLCompiler.pbc');
+        var p6meta = new P6metaclass;
+        var cproto = p6meta.new_class('PAST::Compiler', 'PCT::HLLCompiler':[named('parent')], '%!symtable':[named('attr')]);
+        cproto.language('PAST');
+        cproto.stages(split(' ', 'post pir evalpmc'));
+
+        // %piropsig is a table of common opcode signatures
+        var piropsig = {
+            'add':        'PP+',
+            'band':       'PPP',
+            'bxor':       'PPP',
+            'bnot':       'PP',
+            'bor':        'PPP',
+            'can':        'IPs',
+            'chr':        'Si',
+            'clone':      'PP',
+            'concat':     'PP~',
+            'copy':       '0PP',
+            'defined':    'IP',
+            'delete':     'vQ*',
+            'die':        'v~',
+            'div':        'PP+',
+            'does':       'IPs',
+            'downcase':   'Ss',
+            'elements':   'IP',
+            'exists':     'IQ*',
+            'exit':       'vi',
+            'fdiv':       'PP+',
+            'find_codepoint':   'Is',
+            'find_dynamic_lex': 'Ps',
+            'find_name':  'Ps',
+            'getinterp':  'P',
+            'getprop':    'PP~',
+            'getstderr':  'P',
+            'getstdin':   'P',
+            'getstdout':  'P',
+            'index':      'Issi',
+            'isa':        'IP~',
+            'isfalse':    'IP',
+            'isnull':     'IP',
+            'issame':     'IPP',
+            'istrue':     'IP',
+            'join':       'SsP',
+            'length':     'Is',
+            'load_bytecode': 'vs',
+            'load_language': 'vs',
+            'loadlib':    'P~',
+            'mod':        'PP+',
+            'mul':        'PP+',
+            'neg':        'PP',
+            'new':        'P~',
+            'newclosure': 'PP',
+            'not':        'PP',
+            'ord':        'Isi',
+            'pop':        'PP',
+            'pow':        'NN+',
+            'print':      'v*',
+            'printerr':   'v*',
+            'push':       '0P*',
+            'repeat':     'Ssi',
+            'replace':    'Ssiis',
+            'say':        'v*',
+            'set':        'PP',
+            'setprop':    '0P~P',
+            'setattribute': '0P~P',
+            'shift':      'PP',
+            'shl':        'PP+',
+            'shr':        'PP+',
+            'sleep':      'v+',
+            'splice':     '0PPii',
+            'split':      'Pss',
+            'sub':        'PP+',
+            'substr':     'Ssii',
+            'titlecase':  'Ss',
+            'trace':      'vi',
+            'typeof':     'SP',
+            'unshift':    '0P*',
+            'upcase':     'Ss'
+        };
+        ${ set_global '%piropsig', piropsig };
+
+        // %valflags specifies when PAST::Val nodes are allowed to
+        // be used as a constant.  The 'e' flag indicates that the
+        // value must be quoted+escaped in PIR code.
+        var valflags = {
+            'String':   's~*:e',
+            'Integer':  'i+*:',
+            'Float':    'n+*:',
+            '!macro_const':     'i+*:c',
+            '!cclass':          'i+*:c',
+            '!except_severity': 'i+*:c',
+            '!except_types':    'i+*:c',
+            '!iterator':        'i+*:c',
+            '!socket':          'i+*:c'
+        };
+        ${ set_global '%valflags', valflags };
+
+        // %!controltypes holds the list of exception types for each
+        // type of exception handler we support
+        var controltypes = {
+            'CONTROL':  '.CONTROL_ALL',
+            'RETURN':   '.CONTROL_RETURN',
+            'OK':       '.CONTROL_OK',
+            'BREAK':    '.CONTROL_BREAK',
+            'CONTINUE': '.CONTROL_CONTINUE',
+            'ERROR':    '.CONTROL_ERROR',
+            'GATHER':   '.CONTROL_TAKE',
+            'LEAVE':    '.CONTROL_LEAVE',
+            'EXIT':     '.CONTROL_EXIT',
+            'NEXT':     '.CONTROL_NEXT',
+            'LAST':     '.CONTROL_LAST',
+            'REDO':     '.CONTROL_REDO'
+        };
+        ${ set_global '%!controltypes', controltypes };
+
+        ${ set_global '$!serno', var(UNIQUE_BASE) };
+
+        return;
+    }
+}
+
+/*
+
+=back
+
+*/

@@ -87,6 +87,7 @@ compilers/pct/README.pod                                    []doc
 compilers/pct/Rules.mak                                     [pct]
 compilers/pct/src/PAST.pir                                  [pct]
 compilers/pct/src/PAST/Compiler.pir                         [pct]
+compilers/pct/src/PAST/Compiler.winxed                      [pct]
 compilers/pct/src/PAST/Node.winxed                          [pct]
 compilers/pct/src/PCT/Dumper.winxed                         [pct]
 compilers/pct/src/PCT/Grammar.winxed                        [pct]

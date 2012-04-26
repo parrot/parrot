@@ -13,6 +13,7 @@ PCT_CLEANUPS = $(PCT_LIB_PBCS) \
 	compilers/pct/src/PAST/Node.pbc \
 	compilers/pct/src/PAST/Node.pir \
 	compilers/pct/src/PAST/Compiler.pbc \
+	compilers/pct/src/PAST/Compiler-gen.pir \
 	compilers/pct/src/POST/Node.pbc \
 	compilers/pct/src/POST/Node.pir \
 	compilers/pct/src/POST/Compiler.pbc
