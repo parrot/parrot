@@ -99,9 +99,6 @@ function __default_get_packfile[anon](string file_name, int file_type)
             var pir_compiler = compreg("PIR");
             var pf = pir_compiler.compile_file(file_name);
             return pf;
-        case PASM_FILE:
-            var pasm_compiler = compreg("PASM");
-            return pasm_compiler.compile_file(file_name);
         case PBC_FILE:
             var packfile_pmc = new 'PackfileView';
             packfile_pmc.read_from_file(file_name);
@@ -115,12 +112,7 @@ function __get_input_file_type[anon](string file_name)
 {
     int len = length(file_name) - 4;
     string ext = len >= 0 ? substr(file_name, len) : '';
-    if (ext == ".pir") return PIR_FILE;
     if (ext == ".pbc") return PBC_FILE;
-    if (len > 0) {
-        ext = substr(file_name, len - 1);
-        if (ext == ".pasm") return PASM_FILE;
-    }
     return PIR_FILE;
 }
 
@@ -217,7 +209,6 @@ parrot [Options] <file> [<program options...>]
     -o --output=FILE
        --output-pbc
     -O --optimize[=LEVEL]
-    -a --pasm
     -c --pbc
     -r --run-pbc
     -y --yydebug

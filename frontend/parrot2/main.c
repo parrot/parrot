@@ -4,7 +4,7 @@ Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
-frontend/parrot2/main.c - The alternate PIR/PASM compiler frontend to libparrot
+frontend/parrot2/main.c - The alternate PIR compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -192,10 +192,8 @@ setup_imcc(Parrot_PMC interp)
 {
     ASSERT_ARGS(setup_imcc)
     Parrot_PMC pir_compiler = NULL;
-    Parrot_PMC pasm_compiler = NULL;;
 
-    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler) &&
-          imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
+    if (!(imcc_get_pir_compreg_api(interp, 1, &pir_compiler)))
         show_last_error_and_exit(interp);
 }
 
@@ -435,7 +433,6 @@ Parrot_cmd_options(void)
                                      { "--leak-test", "--destroy-at-end" } },
         { 'o', 'o', OPTION_required_FLAG, { "--output" } },
         { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
-        { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
         { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
         { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
         { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },

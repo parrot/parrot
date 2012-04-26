@@ -141,23 +141,19 @@
         .param string __ARG_1
         .param int __ARG_2
     if __ARG_2 == 2 goto __label_3
-    if __ARG_2 == 1 goto __label_4
-    if __ARG_2 == 3 goto __label_5
+    if __ARG_2 == 3 goto __label_4
     goto __label_1
   __label_3: # case
     compreg $P1, "PIR"
     $P2 = $P1.'compile_file'(__ARG_1)
     .return($P2)
   __label_4: # case
-    compreg $P3, "PASM"
-    .tailcall $P3.'compile_file'(__ARG_1)
-  __label_5: # case
-    new $P4, [ 'PackfileView' ]
-    $P4.'read_from_file'(__ARG_1)
-    .return($P4)
+    new $P3, [ 'PackfileView' ]
+    $P3.'read_from_file'(__ARG_1)
+    .return($P3)
   __label_1: # default
-    null $P5
-    .return($P5)
+    null $P4
+    .return($P4)
   __label_2: # switch end
 
 .end # __default_get_packfile
@@ -173,19 +169,9 @@
   __label_2:
     set $S1, ''
   __label_1:
-    ne $S1, ".pir", __label_3
-    .return(2)
-  __label_3: # endif
-    ne $S1, ".pbc", __label_4
+    ne $S1, ".pbc", __label_3
     .return(3)
-  __label_4: # endif
-    le $I1, 0, __label_5
-    sub $I2, $I1, 1
-    substr $S1, __ARG_1, $I2
-    ne $S1, ".pasm", __label_6
-    .return(1)
-  __label_6: # endif
-  __label_5: # endif
+  __label_3: # endif
     .return(2)
 
 .end # __get_input_file_type
@@ -292,7 +278,7 @@
 
 
 .sub '__show_help_and_exit' :subid('WSubId_3') :anon
-    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
+    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
     say $S1
     exit 0
 
