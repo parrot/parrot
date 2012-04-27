@@ -4,7 +4,8 @@
 
 =head1 NAME
 
-README.pod - Readme to a series of draft documents on Parrot development. 
+docs/book/draft/README.pod - Readme to a series of draft documents on Parrot
+development. 
 
 =head1 DESCRIPTION
 
