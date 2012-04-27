@@ -108,7 +108,7 @@ Melvin Smith <melvin.smith@mindspring.com>, <melvins@us.ibm.com>
 
 =back
 
-=head1 NOTES
+=head1 NOTE
 
 [*] So far, all the compiler does is register allocation and spilling. I like
 Steve Muchnick's MIR language, and I'm taking a few things from it.
