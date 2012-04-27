@@ -1,3 +1,13 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+README.pod - Readme to a series of draft documents on Parrot development. 
+
+=head1 DESCRIPTION
+
 The book will have the following chapters.
 
 1) Overview
@@ -22,3 +32,9 @@ Appendix E) Source Code
 Top-level headings in each chapter (the chapter title) are level 1 headings.
 All sub-headings in the chapter are level 2 and below. All chapter files should
 contain the VIM suffix (which is a codingstd for all of the Parrot repo).
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut
