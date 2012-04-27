@@ -1,0 +1,36 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\n"
+1 "n"
+2 "ok 1 first test\n"
+.metadata
+.bytecode
+
+    # print the plan
+    set_imm S0, 0, 0
+    deref   S0, CONSTS, S0
+    set_imm I0, 0, 1
+    print_s I0, S0, x
+
+    # load "n" into S0
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+
+    # load "ok...." into S1
+    set_imm S1, 0, 2
+    deref   S1, CONSTS, S1
+
+    # skip ahead 2 instructions
+    set_imm I1, 0, 2
+    add_i PC, PC, I1
+
+    # print "n"
+    print_s I0, S0, x
+
+op_spacing_ok:
+    # print "ok ..."
+    print_s I0, S1, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  
