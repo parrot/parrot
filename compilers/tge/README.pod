@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-README.pod - TGE - Tree Grammar Engine
+compilers/tge/README.pod - Tree Grammar Engine (TGE)
 
 =head1 DESCRIPTION
 
