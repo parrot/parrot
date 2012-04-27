@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-README.pod - Readme file for the 'examples/' directory. 
+examples/README.pod - Readme file for the directory. 
 
 =head1 DESCRIPTION
 
