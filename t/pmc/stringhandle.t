@@ -149,20 +149,21 @@ pir_output_is(
     $P0 = new ['StringHandle']
     $P0.'open'('README.pod', 'w')
 
-    $P0.'print'("This is Parrot, version")
+    $P0.'print'("# Copyright (C) 2001-2012, Parrot Foundation.")
 
     $P0.'close'()
 
     $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -178,19 +179,20 @@ pir_output_is(
     $P0 = new ['StringHandle']
     $P0.'open'('README.pod', 'w')
 
-    print $P0, "This is Parrot, version"
+    print $P0, "# Copyright (C) 2001-2012, Parrot Foundation."
     $P0.'close'()
 
     $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'

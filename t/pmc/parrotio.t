@@ -123,14 +123,15 @@ pir_output_is(
     $P0 = new ['FileHandle']
     $P0.open('README.pod')
 
-    $S0 = $P0.read(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.read(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.read(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.read(12)  # throw away bytes
+    $S0 = $P0.read(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2)     # again on same stream'
