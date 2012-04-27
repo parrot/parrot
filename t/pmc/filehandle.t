@@ -40,7 +40,7 @@ pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
     .local int i
     \$P1 = new ['FileHandle']
-    \$P1.'open'('README')
+    \$P1.'open'('README.pod')
     say 'ok 1 - \$P1.open(\$S1)'
 
     \$P1.'close'()
@@ -127,10 +127,10 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
 
     i = 0
     set_label eh, catchreopen
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = 1
     # Open already opened
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = 0
     goto reportreopen
   catchreopen:
@@ -152,7 +152,7 @@ pir_output_is( <<'CODE', <<'OUT', 'isatty' );
     i = fh.'isatty'()
     print i
     say ' unopened FileHandle is not a tty'
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = fh.'isatty'()
     print i
     say ' regular file is not a tty'
@@ -170,13 +170,13 @@ SKIP: {
     $P1 = # GH #535 create a callback here
     $P0 = new ['FileHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.'close'()
     say 'ok 2 - $P0.close($P1)'
 
-    $P0.'open'('README', 'rw')
+    $P0.'open'('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2)'
 
     $P0.'close'()
@@ -199,7 +199,7 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read - synchronous' );
 .sub 'test' :main
     $P0 = new ['FileHandle']
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
     $S0 = $P0.'read'(14) # bytes
     if $S0 == 'This is Parrot' goto ok_1
@@ -224,7 +224,7 @@ pir_output_is(
     .local pmc fh, bb
 
     fh = new ['FileHandle']
-    fh.'open'('README')
+    fh.'open'('README.pod')
 
     bb = fh.'read_bytes'(14)
     $S0 = bb.'get_string'('ascii')
@@ -618,7 +618,7 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 .sub 'test' :main
     $P0 = new ['FileHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     $S0 = $P0.'mode'()
 
     if $S0 == 'r' goto ok_1
@@ -639,7 +639,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehand
     .local string line1, line2
 
     fh = new ['FileHandle']
-    fh.'open'('README')
+    fh.'open'('README.pod')
 
     line1 = fh.'readline'()
 
@@ -726,9 +726,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     say 'caught unopened'
   test2:
     set_label eh, catch2
-    fh.'open'('README')
+    fh.'open'('README.pod')
     # Using opened FileHandle with the filepath option
-    fh.'readall'('README')
+    fh.'readall'('README.pod')
     say 'should never happen'
     goto end
   catch2:

@@ -73,7 +73,7 @@ Raises an exception if the distribution root is not found.
 
         while ( $self = $self->SUPER::new($path) ) {
             if (    $self->file_exists_with_name($file)
-                and $self->file_with_name($file)->read =~ m/^This is Parrot/s )
+                and $self->file_with_name($file)->read =~ m/^README.pod - Readme to Parrot/s )
             {
                 $dist = $self;
                 last;

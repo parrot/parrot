@@ -35,13 +35,13 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not yet implemented' );
 .sub 'test' :main
     $P0 = new ['FileHandle']
-    $P0.open('README')
+    $P0.open('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.close()
     say 'ok 2 - $P0.close()'
 
-    $P0.open('README', 'rw')
+    $P0.open('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2) # rw mode'
 
     $P0.close()
@@ -88,13 +88,13 @@ SKIP: {
     $P1 = # GH #535 create a callback here
     $P0 = new ['FileHandle']
 
-    $P0.open('README')
+    $P0.open('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.close()
     say 'ok 2 - $P0.close($P1)'
 
-    $P0.open('README', 'rw')
+    $P0.open('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2)'
 
     $P0.close()
@@ -121,7 +121,7 @@ pir_output_is(
                chomp = get_global ['String';'Utils'], 'chomp'
 
     $P0 = new ['FileHandle']
-    $P0.open('README')
+    $P0.open('README.pod')
 
     $S0 = $P0.read(14) # bytes
     if $S0 == 'This is Parrot' goto ok_1
