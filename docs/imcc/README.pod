@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-README.pod - Readme file for IMCC. 
+docs/imcc/README.pod - Readme file for IMCC. 
 
 =head1 DESCRIPTION
 
