@@ -494,68 +494,59 @@ third and subsequent children can be any value they wish.
             namedargs = new 'ResizableStringArray';
 
         var iter = node.iterator();
-        int sigidx = 1;
-        string rtype = substr(signature, sigidx, 1);
-        while (iter) { // iter_loop
-            if (rtype == 'Q') goto keyed_pos;
+        int sigidx = 0;
+        string rtype;
+        while (iter) {
+            if (sigidx < sigmax)
+                rtype = substr(signature, ++sigidx, 1);
             var cpast = shift_var(iter);
-            var cpost = self.as_post(cpast, rtype:[named('rtype')]);
-            cpost = self.coerce(cpost, rtype);
-            if (!(cpast instanceof PAST.Node))
-                goto cpost_pos;
-            var isflat = cpast.flat();
-            if (rtype != ':') goto iter_pos;
-            var npast = cpast.named();
-            if (!npast) goto iter_pos;
-            string s0 = cpost;
-            if (isflat) {
-                s0 += ' :named :flat';
+            var cpost;
+            string arg;
+            if (rtype != 'Q') {
+                cpost = self.as_post(cpast, rtype:[named('rtype')]);
+                cpost = self.coerce(cpost, rtype);
+                if (cpast instanceof PAST.Node) {
+                    var isflat = cpast.flat();
+                    var npast  = cpast.named();
+                    arg = cpost;
+                    if (rtype == ':' && npast) {
+                        if (isflat) {
+                            arg += ' :named :flat';
+                        } else {
+                            var npost = self.as_post(npast, '~':[named('rtype')]);
+                            cpost = ops.new(cpost);
+                            cpost.push(npost);
+                            arg += ' :named(' + string(npost) + ')';
+                        }
+                        push(namedargs, arg);
+                    } else {
+                        if (isflat)
+                            arg += ' :flat';
+                        push(posargs, arg);
+                    }
+                } else {
+                    push(posargs, cpost);
+                }
+                ops.*pushop(cpost);
             } else {
-                var npost = self.as_post(npast, '~':[named('rtype')]);
-                cpost = ops.new(cpost);
-                cpost.push(npost);
-                s0 += ' :named(' + string(npost) + ')';
+                // rtype is 'Q', so construct a keyed pmc argument
+                // first, get the base PMC
+                cpost = self.as_post(cpast, 'P':[named('rtype')]);
+                cpost = self.coerce(cpost, 'P');
+                // now process the key arg
+                if (!iter) break;
+                var kpast = shift_var(iter);
+                rtype = substr(signature, ++sigidx, 1);
+                var kpost = self.as_post(kpast, rtype:[named('rtype')]);
+                kpost = self.coerce(kpost, rtype);
+                // now construct the keyed PMC
+                arg = string(cpost) + '[' + string(kpost) + ']';
+                kpost = ops.new(kpost);
+                kpost.push(cpost);
+                push(posargs, arg);
+                ops.*pushop(kpost);
             }
-            ops.*pushop(cpost);
-            push(namedargs, s0);
-            goto iter_rtype;
-        iter_pos:
-            if (isflat) goto flat_pos;
-        cpost_pos:
-            ops.*pushop(cpost);
-            push(posargs, cpost);
-            goto iter_rtype;
-        flat_pos:
-            s0 = string(cpost) + ' :flat';
-            ops.*pushop(cpost);
-            push(posargs, s0);
-        iter_rtype:
-            if (sigidx >= sigmax)
-                continue;
-            ++sigidx;
-            rtype = substr(signature, sigidx, 1);
-            continue;
-        keyed_pos:
-            // rtype is 'Q', so construct a keyed pmc argument
-            // first, get the base PMC
-            cpast = shift_var(iter);
-            cpost = self.as_post(cpast, 'P':[named('rtype')]);
-            cpost = self.coerce(cpost, 'P');
-            // now process the key arg
-            if (!iter) break;
-            var kpast = shift_var(iter);
-            ++sigidx;
-            rtype = substr(signature, sigidx, 1);
-            var kpost = self.as_post(kpast, rtype:[named('rtype')]);
-            kpost = self.coerce(kpost, rtype);
-            // now construct the keyed PMC
-            s0 = string(cpost) + '[' + string(kpost) + ']';
-            kpost = ops.new(kpost);
-            kpost.push(cpost);
-            ops.*pushop(kpost);
-            push(posargs, s0);
-            goto iter_rtype;
-        } // iter_end
+        }
         return ops, posargs, namedargs;
     }
 }
