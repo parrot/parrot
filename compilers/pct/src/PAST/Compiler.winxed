@@ -46,6 +46,7 @@ $include_const 'except_types.pasm';
 $include_const 'interpinfo.pasm';
 
 class P6metaclass;
+class PAST.Node;
 
 inline is_cclass(int cclass, string str, int pos) return int {
     int ret;
@@ -457,6 +458,105 @@ forced into that register (with conversions as needed).
 
     end:
         return post;
+    }
+
+/*
+=item post_children(node [, 'signature'=>signature] )
+
+Return the POST representation of evaluating all of C<node>'s
+children in sequence.  The C<signature> option is a string of
+flags as described in "Signature Flags" above.  Since we're
+just evaluating children nodes, the first character of
+C<signature> (return value type) is ignored.  Thus a C<signature>
+of C<v~P*> says that the first child needs to be something
+in string context, the second child should be a PMC, and the
+third and subsequent children can be any value they wish.
+
+=cut
+
+*/
+    function post_children[method]( var node, options [slurpy, named] ) {
+        using POST.Ops;
+        var ops = Ops.new(node:[named('node')]);
+
+        string pushop = (node.childorder() == 'right') ? 'unshift' : 'push';
+
+        // get any conversion types
+        string signature = options['signature'];
+        if (!signature) signature = '**';
+        int sigmax = length(signature) - 1;
+
+        // if the signature contains a ':', then we're doing
+        // flagged arguments (:flat, :named)
+        var posargs = new 'ResizableStringArray';
+        var namedargs;
+        if (indexof(signature, ':') >= 0)
+            namedargs = new 'ResizableStringArray';
+
+        var iter = node.iterator();
+        int sigidx = 1;
+        string rtype = substr(signature, sigidx, 1);
+        while (iter) { // iter_loop
+            if (rtype == 'Q') goto keyed_pos;
+            var cpast = shift_var(iter);
+            var cpost = self.as_post(cpast, rtype:[named('rtype')]);
+            cpost = self.coerce(cpost, rtype);
+            if (!(cpast instanceof PAST.Node))
+                goto cpost_pos;
+            var isflat = cpast.flat();
+            if (rtype != ':') goto iter_pos;
+            var npast = cpast.named();
+            if (!npast) goto iter_pos;
+            string s0 = cpost;
+            if (isflat) {
+                s0 += ' :named :flat';
+            } else {
+                var npost = self.as_post(npast, '~':[named('rtype')]);
+                cpost = ops.new(cpost);
+                cpost.push(npost);
+                s0 += ' :named(' + string(npost) + ')';
+            }
+            ops.*pushop(cpost);
+            push(namedargs, s0);
+            goto iter_rtype;
+        iter_pos:
+            if (isflat) goto flat_pos;
+        cpost_pos:
+            ops.*pushop(cpost);
+            push(posargs, cpost);
+            goto iter_rtype;
+        flat_pos:
+            s0 = string(cpost) + ' :flat';
+            ops.*pushop(cpost);
+            push(posargs, s0);
+        iter_rtype:
+            if (sigidx >= sigmax)
+                continue;
+            ++sigidx;
+            rtype = substr(signature, sigidx, 1);
+            continue;
+        keyed_pos:
+            // rtype is 'Q', so construct a keyed pmc argument
+            // first, get the base PMC
+            cpast = shift_var(iter);
+            cpost = self.as_post(cpast, 'P':[named('rtype')]);
+            cpost = self.coerce(cpost, 'P');
+            // now process the key arg
+            if (!iter) break;
+            var kpast = shift_var(iter);
+            ++sigidx;
+            rtype = substr(signature, sigidx, 1);
+            var kpost = self.as_post(kpast, rtype:[named('rtype')]);
+            kpost = self.coerce(kpost, rtype);
+            // now construct the keyed PMC
+            s0 = string(cpost) + '[' + string(kpost) + ']';
+            kpost = ops.new(kpost);
+            kpost.push(cpost);
+            ops.*pushop(kpost);
+            push(posargs, s0);
+            goto iter_rtype;
+        } // iter_end
+        return ops, posargs, namedargs;
     }
 }
 
