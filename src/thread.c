@@ -308,7 +308,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count;
+    INTVAL alarm_count, foreign_count, i;
     char dummy;
     int              lo_var_ptr;
 
@@ -324,6 +324,18 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
             reset_runloop_id_counter(interp);
 
             Parrot_cx_next_task(interp, scheduler);
+
+            foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
+            for (i = 0; i < foreign_count; i++) {
+                PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
+                LOCK(PARROT_TASK(task)->waiters_lock);
+                if (PARROT_TASK(task)->killed) {
+                    VTABLE_delete_keyed_int(interp, sched->foreign_tasks, i);
+                    i--;
+                    foreign_count--;
+                }
+                UNLOCK(PARROT_TASK(task)->waiters_lock);
+            }
 
             /* add expired alarms to the task queue */
             Parrot_cx_check_alarms(interp, interp->scheduler);
