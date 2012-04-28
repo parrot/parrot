@@ -49,7 +49,7 @@ typedef HANDLE Parrot_thread;
        --(c).m_lWaiters; \
      } while (0)
 
-#  define COND_TIMED_WAIT(c, m, t) \
+#  define COND_TIMED_WAIT(c, m, t, rc) \
      do { \
        FLOATVAL now; \
        time_t sec; \
@@ -63,7 +63,7 @@ typedef HANDLE Parrot_thread;
          ++(c).m_lWaiters; \
          UNLOCK(m); \
          diff = (DWORD)(((t)->tv_sec - sec)*1000L + ((t)->tv_nsec - nsec)/1000000L); \
-         WaitForSingleObject((c).m_hSema, diff); \
+         (rc) |= WaitForSingleObject((c).m_hSema, diff); \
          LOCK(m); \
          --(c).m_lWaiters; \
        } \

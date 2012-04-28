@@ -88,7 +88,7 @@ Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
             ts.tv_nsec = (long)((alarm_set_to - ts.tv_sec) * 1000.0f) * 1000000L;
             rc = 0;
             while (alarm == alarm_set_to && rc == 0)
-                rc = COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts);
+                COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts, rc);
         }
         else { /* no alarms set, just wait for new alarms */
             while (alarm == alarm_set_to)

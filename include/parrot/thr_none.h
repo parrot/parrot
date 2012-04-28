@@ -8,7 +8,7 @@
 #define LOCK(m)
 #define UNLOCK(m)
 #define COND_WAIT(c, m)
-#define COND_TIMED_WAIT(c, m, t)
+#define COND_TIMED_WAIT(c, m, t, rc)
 #define COND_SIGNAL(c)
 #define COND_BROADCAST(c)
 
