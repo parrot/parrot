@@ -1358,11 +1358,20 @@ gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_fixed_size_storage)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    void *storage;
+
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
 
     interp->gc_sys->stats.memory_used           += size;
     interp->gc_sys->stats.mem_used_last_collect += size;
 
-    return Parrot_gc_fixed_allocator_allocate(interp, self->fixed_size_allocator, size);
+    storage = Parrot_gc_fixed_allocator_allocate(interp, self->fixed_size_allocator, size);
+
+    if (interp->thread_data)
+        UNLOCK(interp->thread_data->interp_lock);
+
+    return storage;
 }
 
 static void
