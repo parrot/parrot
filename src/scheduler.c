@@ -32,10 +32,6 @@ exceptions, async I/O, and concurrent tasks (threads).
 
 #include "scheduler.str"
 
-#ifndef _WIN32
-#    include <signal.h>
-#endif
-
 /* HEADERIZER HFILE: include/parrot/scheduler.h */
 
 /* HEADERIZER BEGIN: static */
@@ -138,11 +134,6 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count, foreign_count, i;
-#ifndef _WIN32
-    sigset_t set, old_set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGALRM);
-#endif
 
     do {
         while (VTABLE_get_integer(interp, scheduler) > 0) {
@@ -170,20 +161,12 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             UNLOCK(PARROT_TASK(task)->waiters_lock);
         }
 
-#ifdef _WIN32
-#else
-        sigprocmask(SIG_BLOCK, &set, &old_set);
-        Parrot_cx_check_alarms(interp, interp->scheduler);
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
         if (VTABLE_get_integer(interp, scheduler) == 0 && (alarm_count > 0 || foreign_count > 0)) {
-            /* TODO: Implement on Windows */
             /* Nothing to do except to wait for the next alarm to expire */
-            sigsuspend(&old_set);
-            Parrot_thread_notify_threads(interp);
+            Parrot_thread_wait_for_notification(interp);
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
-        sigprocmask(SIG_SETMASK, &old_set, (sigset_t *)0);
-#endif
     } while (alarm_count || foreign_count || VTABLE_get_integer(interp, scheduler) > 0);
 }
 
@@ -231,14 +214,10 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Found a non-Task in the task queue.\n");
 
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
     if (VTABLE_get_integer(interp, scheduler) > 0)
         Parrot_cx_enable_preemption(interp);
     else
         Parrot_cx_disable_preemption(interp);
-#endif
 
     Parrot_ext_call(interp, task, "->");
 }
@@ -288,9 +267,6 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
 
-    if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
-        Parrot_thread_notify_threads(interp);
-
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
 
@@ -304,14 +280,10 @@ Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *ne
             return Parrot_cx_preempt_task(interp, scheduler, next);
     }
 
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
     /* Some alarm seems to have fired, but not the scheduler's.
      * Re-set the scheduler alarm */
     if (Parrot_cx_preemption_enabled(interp))
         Parrot_alarm_set(interp->quantum_done);
-#endif
 
     return next;
 }
@@ -475,12 +447,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         Parrot_thread_schedule_task(interp, candidate, task);
         Parrot_thread_notify_thread(candidate);
 
-#ifdef _WIN32
-#else
         /* going from single to multi tasking? */
         if (VTABLE_get_integer(interp, interp->scheduler) == 1)
             Parrot_cx_enable_preemption(interp);
-#endif
     }
 }
 
@@ -703,13 +672,9 @@ Parrot_cx_enable_preemption(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_cx_enable_preemption)
 
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
     PMC * const scheduler = interp->scheduler;
     SCHEDULER_enable_preemption_SET(scheduler);
     Parrot_cx_set_scheduler_alarm(interp);
-#endif
 }
 
 /*

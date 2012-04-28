@@ -27,11 +27,6 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "pmc/pmc_task.h"
 #include "pmc/pmc_proxy.h"
 #include "pmc/pmc_parrotinterpreter.h"
-#ifdef _WIN32
-#else
-#   include <signal.h>
-#   include <unistd.h>
-#endif
 
 /* HEADERIZER HFILE: include/parrot/thread.h */
 
@@ -225,7 +220,6 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
     PMC                    * const shared      = old_struct->shared;
     INTVAL                         i, elements = VTABLE_get_integer(interp, shared);
 
-
     if (old_struct->code->vtable->base_type == enum_class_Proxy) {
         new_struct->code = PARROT_PROXY(old_struct->code)->target;
         PARROT_ASSERT_INTERP(new_struct->code, interp);
@@ -385,14 +379,10 @@ void
 Parrot_thread_notify_thread(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_notify_thread)
-    if (Interp_flags_TEST(interp, PARROT_IS_THREAD)) {
-        LOCK(interp->sleep_mutex);
-        interp->wake_up = 1;
-        COND_SIGNAL(interp->sleep_cond);
-        UNLOCK(interp->sleep_mutex);
-    }
-    else
-        kill(getpid(), SIGALRM);
+    LOCK(interp->sleep_mutex);
+    interp->wake_up = 1;
+    COND_SIGNAL(interp->sleep_cond);
+    UNLOCK(interp->sleep_mutex);
 }
 
 /*
@@ -406,13 +396,13 @@ Give all threads a chance to check their alarms.
 */
 
 void
-Parrot_thread_notify_threads(PARROT_INTERP)
+Parrot_thread_notify_threads(ARGIN_NULLOK(PARROT_INTERP))
 {
     ASSERT_ARGS(Parrot_thread_notify_threads)
     int i;
     Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
 
-    for (i = 1; i < MAX_THREADS; i++)
+    for (i = 0; i < MAX_THREADS; i++)
         if (threads_array[i])
             Parrot_thread_notify_thread(threads_array[i]);
 }
@@ -584,7 +574,7 @@ Returns the threads array.
 
 PARROT_CANNOT_RETURN_NULL
 Interp**
-Parrot_thread_get_threads_array(PARROT_INTERP)
+Parrot_thread_get_threads_array(ARGIN_NULLOK(PARROT_INTERP))
 {
     ASSERT_ARGS(Parrot_thread_get_threads_array)
 
