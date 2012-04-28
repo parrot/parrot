@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -236,7 +236,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
         /* it's a C exception handler */
         Parrot_runloop * const jump_point = (Parrot_runloop *)address;
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
 
     /* return the address of the handler */
@@ -360,7 +360,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         Parrot_runloop * const jump_point =
             (Parrot_runloop *)VTABLE_get_pointer(interp, handler);
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
     else {
         /* Run the handler. */
@@ -369,7 +369,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         setup_exception_args(interp, "P", exception);
         PARROT_ASSERT(return_point->handler_start == NULL);
         return_point->handler_start = address;
-        longjmp(return_point->resume, 2);
+        longjmp(return_point->resume, PARROT_JMP_EXCEPTION_FROM_C);
     }
 }
 

@@ -896,7 +896,7 @@ op finalize(in PMC) {
         if (rl) {
             if (rl != interp->current_runloop) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
         }
         else

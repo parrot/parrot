@@ -14171,7 +14171,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if (rl) {
             if ((rl != interp->current_runloop)) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
 
         }
@@ -14226,7 +14226,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if (rl) {
             if ((rl != interp->current_runloop)) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
 
         }

@@ -1,5 +1,5 @@
 /* interpreter.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     The interpreter API handles running the operations
  */
@@ -89,6 +89,11 @@ typedef enum {
     PARROT_CLONE_DEFAULT = 0x7f /* everything but CC */
 } Parrot_clone_flags;
 /* &end_gen */
+
+/* Codes used by long jumps to runloop */
+#define PARROT_JMP_EXCEPTION_HANDLED   1
+#define PARROT_JMP_EXCEPTION_FROM_C    2
+#define PARROT_JMP_EXCEPTION_FINALIZED 3
 
 struct parrot_interp_t;
 
