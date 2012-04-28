@@ -88,11 +88,11 @@ executing the following command in the Parrot distribution's root directory:
 
 To view the HTML documentation, start with the F<docs/html/index.html> page.
 
-There are a few categories of documentation, each with different intents. It'll
-probably help to be aware of them before you go digging in. I highly suggest
-you check out F</docs/pdds/pdd07_codingstd.pod> for guidelines on how
-documentation is supposed to be laid out. For now, here's the executive
-summary:
+We have several categories of documentation, each with a different purpose. It
+will, probably, prove useful to you if you are aware of them I<before> you go
+digging around in them. We strongly suggest you review
+F</docs/pdds/pdd07_codingstd.pod> for guidance on how best to layout the
+documentation. But for now, here's the executive summary:
 
 =over 4
 
