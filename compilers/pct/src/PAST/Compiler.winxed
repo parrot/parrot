@@ -47,6 +47,12 @@ $include_const 'interpinfo.pasm';
 
 class P6metaclass;
 
+inline is_cclass(int cclass, string str, int pos) return int {
+    int ret;
+    ${ is_cclass ret, cclass, str, pos };
+    return ret;
+}
+
 namespace PAST.Compiler {
     // TEMPREG_BASE and UNIQUE_BASE identify the base location for
     // the temporary register set and unique registers
@@ -332,6 +338,125 @@ return a permanent one instead (similar to C<uniquereg> above).
 
         // fall back to returning a globally allocated register
         return self.unique('$' + rtype);
+    }
+
+/*
+=item coerce(post, rtype)
+
+Return a POST tree that coerces the result of C<post> to have a
+return value compatible with C<rtype>.  C<rtype> can also be
+a specific register, in which case the result of C<post> is
+forced into that register (with conversions as needed).
+
+=cut
+
+*/
+
+    function coerce[method](var post, string rtype) {
+        if (!rtype)
+            return self.panic('rtype note set');
+
+        string pmctype;
+        string result;
+        string rrtype;
+
+        // if rtype is a register, then set result and use the register
+        // type as rtype
+        if (substr(rtype, 0, 1) == '$') {
+            result = rtype;
+            rtype = substr(result, 1, 1);
+        }
+
+        // these rtypes allow any return value, so no coercion needed.
+        if (indexof('v*:', rtype) >= 0) goto end;
+
+        // figure out what type of result we already have
+        :(string source) = post.result();
+        switch (substr(source, 0, 1)) {
+
+        case '$': // source_reg
+            // source is some sort of register
+            // if a register is all we need, we're done
+            if (rtype == 'r') goto end;
+            string s0 = substr(source, 1, 1);
+            // if we have the correct register type already, we're done
+            if (s0 == rtype) {
+                if (!result) goto end;
+                break;
+            }
+            s0 = downcase(s0);
+            if (s0 == rtype) goto end;
+            // figure it out based on the register type
+            if (s0 == 's') goto source_str;
+            if (rtype == '+') goto end;
+            if (s0 == 'i') goto source_int;
+            if (s0 == 'n') goto source_num;
+        source_pmc:
+            if (indexof('SINsin', rtype) < 0) goto end;
+            break;
+
+        case '"':
+        source_str:
+            if (rtype == '~' || rtype == 's') goto end;
+            rrtype = 'S';
+            pmctype = "'String'";
+            break;
+
+        case '.': // source_int_num_or_const
+            if (!is_cclass(CCLASS_ALPHABETIC, source, 1))
+                goto source_int_or_num;
+            if (indexof('ins+~', rtype) >= 0) goto end;
+            rrtype = 'P';
+            break;
+
+        case '-':
+        source_int_or_num:
+            if (rtype == '+') goto end;
+            // existence of an 'e' or '.' implies num
+            if (indexof(source, '.') >= 0) goto source_num;
+            if (indexof(source, 'E') >= 0) goto source_num;
+
+        source_int:
+            if (rtype == 'i') goto end;
+            rrtype = 'I';
+            pmctype = "'Integer'";
+            break;
+
+        source_num:
+            if (rtype == 'n') goto end;
+            rrtype = 'N';
+            pmctype = "'Float'";
+            break;
+
+        default:
+            if (is_cclass(CCLASS_NUMERIC, source, 0))
+                goto source_int_or_num;
+            if (substr(source, 0, 8) == 'unicode:')
+                goto source_str;
+            // assume that whatever is left acts like a PMC
+            goto source_pmc;
+        }
+
+        // okay, we know we have to do a coercion.
+        // If we just need the value in a register (rtype == 'r'),
+        // then create result based on the preferred register type (rrtype).
+        if (rtype == 'r')
+            result = self.tempreg(rrtype);
+        // if we haven't set the result target yet, then generate one
+        // based on rtype.  (The case of rtype =='r' was handled above.)
+        if (!result)
+            result = self.tempreg(rtype);
+        // create a new ops node to hold the coersion, put C<post> in it.
+        using POST.Ops;
+        post = Ops.new(post, result:[named('result')]);
+        // if we need a new pmc (rtype == 'P' && pmctype defined), create it
+        if (rtype == 'P' && pmctype)
+            post.push_pirop('new', result, pmctype);
+        // store the value into the target register
+        post.push_pirop('set', result, source);
+
+    end:
+        return post;
     }
 }
 
