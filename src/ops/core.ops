@@ -872,16 +872,7 @@ inline op exit(in INT) :flow {
 op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
-    PMC *eh = PMCNULL;
-    if (!PMC_IS_NULL($1)) {
-        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if ($1->vtable->base_type == enum_class_Exception)
-            GETATTR_Exception_handler(interp, $1, eh);
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
-            eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
-            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
-    }
+    PMC *eh = Parrot_ex_get_current_handler(interp, $1);
     if (!PMC_IS_NULL(eh)) {
         /* Get the runloop_id from the continuation and jump to it. */
         Parrot_runloop *rl = interp->current_runloop;
@@ -906,16 +897,7 @@ op finalize(in PMC) {
 }
 
 op pop_upto_eh(in PMC) {
-    PMC *eh = PMCNULL;
-    if (!PMC_IS_NULL($1)) {
-        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if ($1->vtable->base_type == enum_class_Exception)
-            GETATTR_Exception_handler(interp, $1, eh);
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
-            eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
-            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
-    }
+    PMC *eh = Parrot_ex_get_current_handler(interp, $1);
     if (!PMC_IS_NULL(eh))
         Parrot_cx_delete_upto_handler_local(interp, eh);
 }

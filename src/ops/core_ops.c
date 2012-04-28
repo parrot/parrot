@@ -14132,26 +14132,7 @@ Parrot_exit_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  dest =  cur_opcode + 2;
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PREG(1)))) {
-        if ((PREG(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PREG(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PREG(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PREG(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PREG(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_runloop  * rl = interp->current_runloop;
@@ -14187,26 +14168,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  dest =  cur_opcode + 2;
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PCONST(1)))) {
-        if ((PCONST(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PCONST(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PCONST(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PCONST(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PCONST(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_runloop  * rl = interp->current_runloop;
@@ -14241,26 +14203,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_pop_upto_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PREG(1)))) {
-        if ((PREG(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PREG(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PREG(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PREG(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PREG(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_cx_delete_upto_handler_local(interp, eh);
@@ -14271,26 +14214,7 @@ Parrot_pop_upto_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_pop_upto_eh_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PCONST(1)))) {
-        if ((PCONST(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PCONST(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PCONST(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PCONST(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PCONST(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_cx_delete_upto_handler_local(interp, eh);

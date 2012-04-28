@@ -20,6 +20,7 @@ Define the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_exception.h"
 #include "parrot/exceptions.h"
 #include "parrot/events.h"
 
@@ -503,6 +504,38 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_mark_unhandled)
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "handled"), -1);
+}
+
+/*
+
+=item C<PMC * Parrot_ex_get_current_handler(PARROT_INTERP, PMC *expmc)>
+
+Get the current exception handler from expmc.
+If expmc is an exception handler, return itself.
+If it's an exception, return its active handler.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_ex_get_current_handler(PARROT_INTERP, ARGIN_NULLOK(PMC *expmc))
+{
+    ASSERT_ARGS(Parrot_ex_get_current_handler)
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL(expmc)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if (expmc->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, expmc, eh);
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "ExceptionHandler")))
+            eh = expmc;
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, expmc, CONST_STRING(interp, "handler"));
+    }
+    return eh;
 }
 
 /*
