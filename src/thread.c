@@ -400,11 +400,11 @@ Parrot_thread_notify_threads(ARGIN_NULLOK(PARROT_INTERP))
 {
     ASSERT_ARGS(Parrot_thread_notify_threads)
     int i;
-    Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
+    Interp ** const tarray = Parrot_thread_get_threads_array(interp);
 
     for (i = 0; i < MAX_THREADS; i++)
-        if (threads_array[i])
-            Parrot_thread_notify_thread(threads_array[i]);
+        if (tarray[i])
+            Parrot_thread_notify_thread(tarray[i]);
 }
 
 
