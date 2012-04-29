@@ -302,7 +302,6 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count, foreign_count, i;
-    char dummy;
     int lo_var_ptr;
 
     /* need to set it here because argument passing can trigger GC */

@@ -25,7 +25,7 @@ typedef struct Windows_cond {
 } Parrot_cond;
 typedef HANDLE Parrot_thread;
 
-#  define MUTEX_INIT(m) InitializeCriticalSection((PCRITICAL_SECTION)&(m))
+#  define MUTEX_INIT(m) InitializeCriticalSectionAndSpinCount((PCRITICAL_SECTION)&(m), 4000)
 #  define MUTEX_DESTROY(m) DeleteCriticalSection((PCRITICAL_SECTION)&(m))
 
 #  define COND_INIT(c) \
@@ -36,7 +36,7 @@ typedef HANDLE Parrot_thread;
 
 #  define COND_DESTROY(c) CloseHandle((c).m_hSema)
 
-#  define LOCK(m) EnterCriticalSection((PCRITICAL_SECTION)&(m))
+#  define LOCK(m) TryEnterCriticalSection((PCRITICAL_SECTION)&(m))
 #  define UNLOCK(m) LeaveCriticalSection((PCRITICAL_SECTION)&(m))
 
 #  define COND_WAIT(c, m) \
