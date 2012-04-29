@@ -628,6 +628,32 @@ generating a constant or an appropriate register setting.
         return self.coerce(Ops.new(value:[named('result')]), options['rtype']);
     }
 
+/*
+=item as_vivipost(String class)
+
+Generate POST to create a new object of type C<class>.  This
+is typically invoked by the various vivification methods below
+(e.g., in a PAST::Var node to default a variable to a given type).
+
+=cut
+
+*/
+    function as_vivipost[method, multi('_', 'String')](var node, options [slurpy, named]) {
+        using POST.Op;
+        :(string result)  = self.tempreg('P');
+        :(string escaped) = self.escape(node);
+        return Op.new(result, escaped, 'new':[named('pirop')], result:[named('result')]);
+    }
+
+/*
+=item as_vivipost(PAST::Node node)
+
+=cut
+
+*/
+    function as_vivipost[method, multi('_', '_')](var node, options [slurpy, named]) {
+        return self.as_post(node, options:[flat, named]);
+    }
 }
 
 /*

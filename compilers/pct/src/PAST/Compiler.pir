@@ -24,35 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-=item as_vivipost(String class)
-
-Generate POST to create a new object of type C<class>.  This
-is typically invoked by the various vivification methods below
-(e.g., in a PAST::Var node to default a variable to a given type).
-
-=cut
-
-.sub 'as_vivipost' :method :multi(_, String)
-    .param pmc node
-    .param pmc options         :slurpy :named
-
-    .local string result
-    $P0 = get_hll_global ['POST'], 'Op'
-    result = self.'tempreg'('P')
-    $S0 = self.'escape'(node)
-    .tailcall $P0.'new'(result, $S0, 'pirop'=>'new', 'result'=>result)
-.end
-
-=item as_vivipost(PAST::Node node)
-
-=cut
-
-.sub 'as_vivipost' :method :multi(_, _)
-    .param pmc node
-    .param pmc options         :slurpy :named
-    .tailcall self.'as_post'(node, options :flat :named)
-.end
-
 =item as_post(PAST::Node node)
 
 Return the POST representation of executing C<node>'s children in
