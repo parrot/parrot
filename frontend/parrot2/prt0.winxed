@@ -1,4 +1,4 @@
-$include_const "iglobals.pasm";
+$include_const "iglobals.pir";
 $include_const "interpinfo.pasm";
 $include_const "except_severity.pasm";
 

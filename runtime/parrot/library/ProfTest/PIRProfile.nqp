@@ -98,7 +98,7 @@ method build_pir_profile() {
 
 method get_config() {
     return Q:PIR {
-        .include 'iglobals.pasm'
+        .include 'iglobals.pir'
         .local pmc i
         i = getinterp
         %r = i[.IGLOBALS_CONFIG_HASH]

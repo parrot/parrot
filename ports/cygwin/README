@@ -721,7 +721,7 @@ Files included in the =parrot-devel= package:
  /usr/lib/parrot/1.0.0/include/except_severity.pasm
  /usr/lib/parrot/1.0.0/include/except_types.pasm
  /usr/lib/parrot/1.0.0/include/hllmacros.pir
- /usr/lib/parrot/1.0.0/include/iglobals.pasm
+ /usr/lib/parrot/1.0.0/include/iglobals.pir
  /usr/lib/parrot/1.0.0/include/interpcores.pasm
  /usr/lib/parrot/1.0.0/include/interpdebug.pasm
  /usr/lib/parrot/1.0.0/include/interpflags.pasm
