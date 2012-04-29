@@ -184,36 +184,36 @@ GEN_CONFIGS = \
 	compilers/imcc/imcc.y.flag \
 	compilers/imcc/imcc.l.flag
 
-GEN_PASM_INCLUDES = \
-	$(RUN_INC_DIR)/cclass.pasm \
-	$(RUN_INC_DIR)/datatypes.pasm \
-	$(RUN_INC_DIR)/iterator.pasm \
-	$(RUN_INC_DIR)/call_bits.pasm \
-	$(RUN_INC_DIR)/timer.pasm \
-	$(RUN_INC_DIR)/except_types.pasm \
-	$(RUN_INC_DIR)/except_severity.pasm \
-	$(RUN_INC_DIR)/hash_key_type.pasm \
-	$(RUN_INC_DIR)/interpflags.pasm \
-	$(RUN_INC_DIR)/interpdebug.pasm \
-	$(RUN_INC_DIR)/interptrace.pasm \
-	$(RUN_INC_DIR)/interpcores.pasm \
-	$(RUN_INC_DIR)/cloneflags.pasm \
-	$(RUN_INC_DIR)/iglobals.pasm \
-	$(RUN_INC_DIR)/sysinfo.pasm \
-	$(RUN_INC_DIR)/stdio.pasm \
-	$(RUN_INC_DIR)/socket.pasm \
-	$(RUN_INC_DIR)/libpaths.pasm \
-	$(RUN_INC_DIR)/dlopenflags.pasm \
-	$(RUN_INC_DIR)/longopt.pasm \
-	$(RUN_INC_DIR)/packfile_segments.pasm \
-	$(RUN_INC_DIR)/packfile_annotation_key_type.pasm \
-	$(RUN_INC_DIR)/stat.pasm \
-	$(RUN_INC_DIR)/stringinfo.pasm \
-	$(RUN_INC_DIR)/warnings.pasm \
-	$(RUN_INC_DIR)/errors.pasm \
-	$(RUN_INC_DIR)/interpinfo.pasm \
-	$(RUN_INC_DIR)/tm.pasm \
-	$(RUN_INC_DIR)/pmctypes.pasm \
+GEN_PIR_INCLUDES = \
+	$(RUN_INC_DIR)/cclass.pir \
+	$(RUN_INC_DIR)/datatypes.pir \
+	$(RUN_INC_DIR)/iterator.pir \
+	$(RUN_INC_DIR)/call_bits.pir \
+	$(RUN_INC_DIR)/timer.pir \
+	$(RUN_INC_DIR)/except_types.pir \
+	$(RUN_INC_DIR)/except_severity.pir \
+	$(RUN_INC_DIR)/hash_key_type.pir \
+	$(RUN_INC_DIR)/interpflags.pir \
+	$(RUN_INC_DIR)/interpdebug.pir \
+	$(RUN_INC_DIR)/interptrace.pir \
+	$(RUN_INC_DIR)/interpcores.pir \
+	$(RUN_INC_DIR)/cloneflags.pir \
+	$(RUN_INC_DIR)/iglobals.pir \
+	$(RUN_INC_DIR)/sysinfo.pir \
+	$(RUN_INC_DIR)/stdio.pir \
+	$(RUN_INC_DIR)/socket.pir \
+	$(RUN_INC_DIR)/libpaths.pir \
+	$(RUN_INC_DIR)/dlopenflags.pir \
+	$(RUN_INC_DIR)/longopt.pir \
+	$(RUN_INC_DIR)/packfile_segments.pir \
+	$(RUN_INC_DIR)/packfile_annotation_key_type.pir \
+	$(RUN_INC_DIR)/stat.pir \
+	$(RUN_INC_DIR)/stringinfo.pir \
+	$(RUN_INC_DIR)/warnings.pir \
+	$(RUN_INC_DIR)/errors.pir \
+	$(RUN_INC_DIR)/interpinfo.pir \
+	$(RUN_INC_DIR)/tm.pir \
+	$(RUN_INC_DIR)/pmctypes.pir \
 	$(RUN_INC_DIR)/parrot_version.pir
 
 GEN_PM_INCLUDES = \
@@ -651,7 +651,7 @@ corevm : \
 #IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
 	$(LIBRARY_DIR)/Test/More.pbc
 
-$(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
+$(GEN_LIBRARY) : $(PARROT) $(GEN_PIR_INCLUDES)
 
 $(LIBRARY_DIR)/Digest/MD5.pbc: $(DYNEXT_DIR)/bit_ops$(LOAD_EXT)
 
@@ -1263,82 +1263,82 @@ $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 ###############################################################################
 
 
-$(RUN_INC_DIR)/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpflags.pir : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/interpdebug.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpdebug.pir : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/interptrace.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interptrace.pir : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/interpcores.pasm : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/interpcores.pir : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/cloneflags.pasm  : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/cloneflags.pir  : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/iglobals.pasm    : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/iglobals.pir    : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
-$(RUN_INC_DIR)/sysinfo.pasm     : $(INC_DIR)/interpreter.h $(H2INC)
+$(RUN_INC_DIR)/sysinfo.pir     : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
 
-$(RUN_INC_DIR)/interpinfo.pasm : $(INC_DIR)/gc_api.h $(H2INC)
+$(RUN_INC_DIR)/interpinfo.pir : $(INC_DIR)/gc_api.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/gc_api.h $@
 
-$(RUN_INC_DIR)/timer.pasm : $(INC_DIR)/scheduler.h $(H2INC)
+$(RUN_INC_DIR)/timer.pir : $(INC_DIR)/scheduler.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/scheduler.h $@
 
-$(RUN_INC_DIR)/pmctypes.pasm : $(INC_DIR)/core_pmcs.h $(H2INC)
+$(RUN_INC_DIR)/pmctypes.pir : $(INC_DIR)/core_pmcs.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/core_pmcs.h $@
 
-$(RUN_INC_DIR)/stdio.pasm  : $(INC_DIR)/io.h $(H2INC)
+$(RUN_INC_DIR)/stdio.pir  : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
-$(RUN_INC_DIR)/socket.pasm : $(INC_DIR)/io.h $(H2INC)
+$(RUN_INC_DIR)/socket.pir : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
 
-$(RUN_INC_DIR)/hash_key_type.pasm : $(INC_DIR)/hash.h $(H2INC)
+$(RUN_INC_DIR)/hash_key_type.pir : $(INC_DIR)/hash.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/hash.h $@
 
-$(RUN_INC_DIR)/iterator.pasm : $(INC_DIR)/enums.h $(H2INC)
+$(RUN_INC_DIR)/iterator.pir : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
-$(RUN_INC_DIR)/call_bits.pasm : $(INC_DIR)/enums.h $(H2INC)
+$(RUN_INC_DIR)/call_bits.pir : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
 
-$(RUN_INC_DIR)/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
+$(RUN_INC_DIR)/libpaths.pir : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
 
-$(RUN_INC_DIR)/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+$(RUN_INC_DIR)/dlopenflags.pir : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
-$(RUN_INC_DIR)/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
+$(RUN_INC_DIR)/datatypes.pir : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
 
-$(RUN_INC_DIR)/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
+$(RUN_INC_DIR)/stat.pir : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
 
-$(RUN_INC_DIR)/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
+$(RUN_INC_DIR)/stringinfo.pir : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
 
-$(RUN_INC_DIR)/longopt.pasm : $(INC_DIR)/longopt.h $(H2INC)
+$(RUN_INC_DIR)/longopt.pir : $(INC_DIR)/longopt.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/longopt.h $@
 
-$(RUN_INC_DIR)/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
+$(RUN_INC_DIR)/cclass.pir : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
 
-$(RUN_INC_DIR)/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
+$(RUN_INC_DIR)/packfile_segments.pir : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
-$(RUN_INC_DIR)/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
+$(RUN_INC_DIR)/packfile_annotation_key_type.pir : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 
-$(RUN_INC_DIR)/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
+$(RUN_INC_DIR)/except_types.pir : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
-$(RUN_INC_DIR)/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
+$(RUN_INC_DIR)/except_severity.pir : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
 
-$(RUN_INC_DIR)/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
+$(RUN_INC_DIR)/warnings.pir : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
-$(RUN_INC_DIR)/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
+$(RUN_INC_DIR)/errors.pir : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
 
-$(RUN_INC_DIR)/tm.pasm : src/utils.c $(H2INC)
+$(RUN_INC_DIR)/tm.pir : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
 
 
