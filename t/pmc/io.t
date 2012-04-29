@@ -444,23 +444,22 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'callmethod print' );
-.pcc_sub :main main:
-    getinterp P0                 # invocant
-    set_args "0", P0
-    callmethodcc P0, "stderr_handle"
-    get_results "0", P2          # STDERR
+pir_output_is( <<'CODE', <<'OUTPUT', 'callmethod print' );
+.sub test
+    getinterp $P0                 # invocant
+    set_args "0", $P0
+    callmethodcc $P0, "stderr_handle"
+    get_results "0", $P2          # STDERR
 
-    set S0, "print"              # method
-    set S5, "ok 1\n"             # 2nd param
-    set_args "0,0", P2, S5
-    callmethodcc P2, S0
+    set $S0, "print"              # method
+    set $S5, "ok 1\n"             # 2nd param
+    set_args "0,0", $P2, $S5
+    callmethodcc $P2, $S0
 
-    set S5, "ok 2\n"
-    set_args "0,0", P2, S5
-    callmethodcc P2, S0
-
-    end
+    set $S5, "ok 2\n"
+    set_args "0,0", $P2, $S5
+    callmethodcc $P2, $S0
+.end
 CODE
 ok 1
 ok 2
