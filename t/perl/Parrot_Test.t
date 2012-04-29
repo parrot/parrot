@@ -30,7 +30,7 @@ BEGIN {
         plan( skip_all => "Test::Builder::Tester not installed\n" );
         exit 0;
     }
-    plan( tests => 112 );
+    plan( tests => 94 );
 }
 
 use lib qw( . lib ../lib ../../lib );
@@ -59,10 +59,6 @@ can_ok( 'Parrot::Test', $_ ) for ( qw/
     language_error_output_like
     language_output_is              language_output_isnt
     language_output_like
-    pasm_error_output_is            pasm_error_output_isnt
-    pasm_error_output_like          pasm_error_output_unlike
-    pasm_output_is                  pasm_output_isnt
-    pasm_output_like                pasm_output_unlike
     pbc_error_output_is             pbc_error_output_isnt
     pbc_error_output_like           pbc_error_output_unlike
     pbc_output_is                   pbc_output_isnt
@@ -87,107 +83,6 @@ is( Parrot::Test::per_test( 0,     undef ), undef, 'per_test() invalid second ar
 is( Parrot::Test::per_test( undef, undef ), undef, 'per_test() two invalid args' );
 
 my ( $desc, $err, $line );
-
-# PASM
-$desc = 'pasm_output_is: success';
-test_out("ok 1 - $desc");
-pasm_output_is( <<'CODE', <<'OUTPUT', $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-foo
-OUTPUT
-test_test($desc);
-
-$desc = 'pasm_output_is: failure';
-test_out("not ok 1 - $desc");
-test_fail(+9);
-$err = <<"ERR";
-#          got: 'foo
-# '
-#     expected: 'bar
-# '
-ERR
-chomp $err;
-test_err($err);
-pasm_output_is( <<'CODE', <<"OUTPUT", $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-bar
-OUTPUT
-test_test($desc);
-
-
-$desc = 'pasm_output_isnt: success';
-test_out("ok 1 - $desc");
-pasm_output_isnt( <<'CODE', <<"OUTPUT", $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-bar
-OUTPUT
-test_test($desc);
-
-
-# The exact error output for pasm_output_isnt() depends on the version of
-# Test::Builder.  So, in order to avoid version dependent failures, be content
-# with checking the standard output.
-
-$desc = 'pasm_output_isnt: failure';
-test_out("not ok 1 - $desc");
-test_fail(+10);
-$err = <<"ERR";
-#     'foo
-# '
-#         ne
-#     'foo
-# '
-ERR
-chomp $err;
-test_err( $err );
-pasm_output_isnt( <<'CODE', <<'OUTPUT', $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-foo
-OUTPUT
-test_test(title => $desc, skip_err => 1);
-
-$desc = 'pasm_output_like: success';
-test_out("ok 1 - $desc");
-pasm_output_like( <<'CODE', <<'OUTPUT', $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-/foo/
-OUTPUT
-test_test($desc);
-
-$desc = 'pasm_output_like: failure';
-test_out("not ok 1 - $desc");
-test_fail(+9);
-$err = <<"ERR";
-#                   'foo
-# '
-#     doesn't match '/bar/
-# '
-ERR
-chomp $err;
-test_err($err);
-pasm_output_like( <<'CODE', <<"OUTPUT", $desc );
-.pcc_sub :main main:
-    print "foo\n"
-    end
-CODE
-/bar/
-OUTPUT
-test_test($desc);
 
 # PIR
 $desc = 'pir_output_is: success';
@@ -614,20 +509,6 @@ undef $err;
 undef $chdir;
 
 
-SKIP: {
-    skip 'feature not DWIMming even though test passes',
-    1;
-$desc = '';
-test_out("ok 1 - $desc");
-pasm_output_is( <<'CODE', <<'OUTPUT', $desc );
-    print "foo\n"
-    end
-CODE
-foo
-OUTPUT
-test_test($desc);
-}
-
 my $outfile = File::Spec->catfile( qw| t perl Parrot_Test_1.out | );
 {
     unlink $outfile;
@@ -673,7 +554,7 @@ unless ( $ENV{POSTMORTEM} ) {
     my $tdir = q{t/perl};
     opendir my $DIRH, $tdir or croak "Unable to open $tdir for reading: $!";
     my @need_cleanup =
-        grep { m/Parrot_Test_\d+\.(?:pir|pasm|out|c|o|build)$/ }
+        grep { m/Parrot_Test_\d+\.(?:pir|out|c|o|build)$/ }
         readdir $DIRH;
     closedir $DIRH or croak "Unable to close $tdir after reading: $!";
     for my $f (@need_cleanup) {
