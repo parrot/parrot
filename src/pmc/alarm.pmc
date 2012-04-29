@@ -48,7 +48,7 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
-        Parrot_Alarm_attributes *data = PARROT_ALARM(SELF);
+        Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
         data->alarm_time = 0.0;
         data->alarm_task = PMCNULL;
 
@@ -66,13 +66,13 @@ Create a copy of the alarm.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
-        Parrot_Alarm_attributes *new_struct = PARROT_ALARM(copy);
-        Parrot_Alarm_attributes *old_struct = PARROT_ALARM(SELF);
+        Parrot_Alarm_attributes * const new_struct = PARROT_ALARM(copy);
+        Parrot_Alarm_attributes * const old_struct = PARROT_ALARM(SELF);
 
         new_struct->alarm_time = old_struct->alarm_time;
-        new_struct->alarm_task  = old_struct->alarm_task;
+        new_struct->alarm_task = old_struct->alarm_task;
 
         return copy;
     }
@@ -141,9 +141,8 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        if (key == PARROT_ALARM_TASK) {
+        if (key == PARROT_ALARM_TASK)
             SET_ATTR_alarm_task(INTERP, SELF, value);
-        }
     }
 
 /*
@@ -172,9 +171,8 @@ Sets the floating-point value associated with C<key> to C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        if (key == PARROT_ALARM_TIME) {
+        if (key == PARROT_ALARM_TIME)
             SET_ATTR_alarm_time(INTERP, SELF, value);
-        }
     }
 
 /*
@@ -206,10 +204,6 @@ Required functions for GC and Freeze / Thaw.
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
 }
-
-
-
-
 
 /*
 

@@ -110,7 +110,6 @@ Some data that will be passed to C<code> when invoked.
 */
 
     VTABLE void init_pmc(PMC *data) {
-        PMC         *elem;
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         SELF.init();
@@ -119,7 +118,7 @@ Some data that will be passed to C<code> when invoked.
             core_struct->code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
-            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
+            PMC * elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
             if (! PMC_IS_NULL(elem))
                 core_struct->birthtime = VTABLE_get_number(INTERP, elem);
 
@@ -165,7 +164,7 @@ code as the first argument.
             const INTVAL current_depth =
                 Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
-            PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
+            PMC * const task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
             VTABLE_set_pmc_keyed(interp, active_tasks, task_id, SELF);
             TASK_active_SET(SELF);
@@ -223,7 +222,6 @@ code as the first argument.
 
         return (opcode_t*) next;
     }
-
 
 /*
 
