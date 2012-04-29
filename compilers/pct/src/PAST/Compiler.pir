@@ -2826,14 +2826,14 @@ to have a PMC generated containing the constant value.
     value = self.'escape'(value)
   escape_done:
 
-    # See if this is a pasm constant type
+    # See if this is a pir constant type
     $I0 = index valflags, 'c'
     if $I0 < 0 goto const_done
     # Add the directive for the appropriate .include statement.
     $S0 = returns
     if $S0 == '!macro_const' goto include_done
     $S0 = replace $S0, 0, 1, '.include "'
-    $S0 = concat $S0, '.pasm"'
+    $S0 = concat $S0, '.pir"'
     $P0 = find_dynamic_lex '$*SUB'
     $P0.'add_directive'($S0)
   include_done:
