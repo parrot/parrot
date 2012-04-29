@@ -181,136 +181,111 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
-.pcc_sub :main main:
-    set S0, "x\uy"
-    print "never\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u' );
+.sub test
+    set $S0, "x\uy"
+.end
 CODE
 /Illegal escape sequence/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
-.pcc_sub :main main:
-    set S0, "x\u123y"
-    print "never\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, 'illegal \u123' );
+.sub test
+    set $S0, "x\u123y"
+.end
 CODE
 /Illegal escape sequence/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
-.pcc_sub :main main:
-    set S0, "x\U123y"
-    print "never\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, 'illegal \U123' );
+.sub test
+    set $S0, "x\U123y"
+.end
 CODE
 /Illegal escape sequence/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
-.pcc_sub :main main:
-    set S0, "x\xy"
-    print "never\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, 'illegal \x' );
+.sub test
+    set $S0, "x\xy"
+.end
 CODE
 /Illegal escape sequence/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
-.pcc_sub :main main:
-    set S0, utf8:"«"
-    length I0, S0
-    print I0
-    print "\n"
-    print S0
-    print "\n"
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "UTF8 literals" );
+.sub test
+    set $S0, utf8:"«"
+    length $I0, $S0
+    say $I0
+    say $S0
+.end
 CODE
 1
 \xc2\xab
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
-.pcc_sub :main main:
-    set S0, ascii:"«"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "UTF8 as malformed ascii" );
+.sub test
+    set $S0, ascii:"«"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-8" );
-.pcc_sub :main main:
-    set S0, utf8:"\x{D888}"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-8" );
+.sub test
+    set $S0, utf8:"\x{D888}"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
-.pcc_sub :main main:
-    set S0, utf16:"\x{FDDA}"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+.sub test
+    set $S0, utf16:"\x{FDDA}"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
-.pcc_sub :main main:
-    set S0, utf16:"\x{3FFFE}"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UTF-16" );
+.sub test
+    set $S0, utf16:"\x{3FFFE}"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-2" );
-.pcc_sub :main main:
-    set S0, ucs2:"\x{12345}"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-2" );
+.sub test
+    set $S0, ucs2:"\x{12345}"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-4" );
-.pcc_sub :main main:
-    set S0, ucs4:"\x{130000}"
-    length I0, S0
-    print I0
-    print "\n"
-    end
+pir_error_output_like( <<'CODE', <<OUTPUT, "invalid char escape in UCS-4" );
+.sub test
+    set $S0, ucs4:"\x{130000}"
+.end
 CODE
 /Invalid character/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
-.pcc_sub :main main:
-    set S0, "AAAAAAAAAA\\u666"
-    set I0, 0x666
-    chr S1, I0
-    replace S0, S0, 10, 5, S1
-    print S0
-    print "\n"
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "substr with a UTF8 replacement #36794" );
+.sub test
+    set $S0, "AAAAAAAAAA\\u666"
+    set $I0, 0x666
+    chr $S1, $I0
+    replace $S0, $S0, 10, 5, $S1
+    say $S0
+.end
 CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
-    pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
+pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
 .sub main :main
     .local string str
     .local string rest
