@@ -244,7 +244,6 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
-    ctx->current_object    = NULL;
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
     ctx->current_sig       = PMCNULL;

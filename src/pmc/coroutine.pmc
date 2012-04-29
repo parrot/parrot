@@ -198,7 +198,6 @@ Swaps the "context".
 
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
-            Parrot_pcc_set_object(INTERP, ctx, PMCNULL);
 
             INTERP->current_cont   = PMCNULL;
 
