@@ -1,7 +1,7 @@
 /* thr_pthread.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
  *  Overview:
- *     POSIS pthread interface
+ *     POSIX pthread interface
  *  Data Structure and Algorithms:
  *  History:
  *     2003.12.14  Initial rev by leo

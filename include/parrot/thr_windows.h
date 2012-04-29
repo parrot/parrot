@@ -19,11 +19,10 @@
 #  undef CONST
 
 typedef CRITICAL_SECTION Parrot_mutex;
-typedef struct Windows_cond
-  {
+typedef struct Windows_cond {
     HANDLE m_hSema;
     LONG m_lWaiters;
-  } Parrot_cond;
+} Parrot_cond;
 typedef HANDLE Parrot_thread;
 
 #  define MUTEX_INIT(m) InitializeCriticalSection((PCRITICAL_SECTION)&(m))
