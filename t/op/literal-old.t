@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -29,24 +29,6 @@ More tests are welcome.
 L<https://rt.perl.org/rt3/Ticket/Display.html?id=31197>
 
 =cut
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "integer literals in PASM" );
-.pcc_sub :main main:
-        print 0x2A
-        print "\n"
-        print 0X2A
-        print "\n"
-        print 0b101010
-        print "\n"
-        print 0B101010
-        print "\n"
-        end
-CODE
-42
-42
-42
-42
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "integer literals in PIR" );
 .sub test :main
