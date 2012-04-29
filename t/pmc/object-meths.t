@@ -21,52 +21,52 @@ Tests PMC object methods.
 
 =cut
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
-.pcc_sub :main main:
-    newclass P2, "Foo"
-    set S0, "nada"
-    callmethodcc P2, S0
+pir_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
+.sub test
+    newclass $P2, "Foo"
+    set $S0, "nada"
+    callmethodcc $P2, $S0
     print "should never reach here\n"
-    end
+.end
 CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
-.pcc_sub :main main:
-    newclass P2, "Foo"
-    set S1, "nada"
-    callmethod P2, S1, P1
+pir_error_output_like( <<'CODE', <<'OUTPUT', "callmethod (STR) - unknown method" );
+.sub test
+    newclass $P2, "Foo"
+    set $S1, "nada"
+    callmethod $P2, $S1, $P1
     print "should never reach here\n"
-    end
+.end
 CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
-.pcc_sub :main main:
-    newclass P2, "Foo"
-    set S0, "nada"
-    callmethodcc P2, S0
+pir_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc - unknown method" );
+.sub test
+    newclass $P2, "Foo"
+    set $S0, "nada"
+    callmethodcc $P2, $S0
     print "should never reach here\n"
-    end
+.end
 CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
-.pcc_sub :main main:
-    newclass P2, "Foo"
-    set S1, "nada"
-    callmethodcc P2, S1
+pir_error_output_like( <<'CODE', <<'OUTPUT', "callmethodcc (STR) - unknown method" );
+.sub test
+    newclass $P2, "Foo"
+    set $S1, "nada"
+    callmethodcc $P2, $S1
     print "should never reach here\n"
-    end
+.end
 CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
-.sub main :main
+.sub test
     $P2 = newclass "Foo"
     $P3 = new $P2
     set $S0, "meth"
@@ -74,7 +74,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "callmethod 1" );
     print "main\n"
     $P3.'meth'()
     print "back\n"
-    end
 .end
 
 .namespace ["Foo"]
@@ -459,13 +458,13 @@ CbA
 1
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
-.pcc_sub :main main:
-    newclass P2, "Foo"
-    set S0, "nada"
-    find_method P0, P2, S0
+pir_error_output_like( <<'CODE', <<'OUTPUT', "find_method - unknown method" );
+.sub test
+    newclass $P2, "Foo"
+    set $S0, "nada"
+    find_method $P0, $P2, $S0
     print "nope\n"
-    end
+.end
 CODE
 /Method 'nada' not found for invocant of class 'Foo'/
 OUTPUT
