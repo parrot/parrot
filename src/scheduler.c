@@ -29,6 +29,9 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "pmc/pmc_alarm.h"
 #include "pmc/pmc_pmclist.h"
 #include "pmc/pmc_continuation.h"
+#ifndef _WIN32
+#  include <unistd.h>
+#endif
 
 #include "scheduler.str"
 
@@ -634,6 +637,7 @@ opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
+#ifdef HAS_THREADS
     const FLOATVAL now_time  = Parrot_floatval_time();
     const FLOATVAL done_time = now_time + time;
     PMC * const alarm = Parrot_pmc_new(interp, enum_class_Alarm);
@@ -647,6 +651,14 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     (void) VTABLE_invoke(interp, alarm, NULL);
 
     return (opcode_t*) NULL;
+#else
+#  ifdef _WIN32
+    Sleep(time * 1000);
+#  else
+    usleep(time * 1000000);
+#  endif
+    return next;
+#endif
 }
 
 /*
