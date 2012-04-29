@@ -291,7 +291,7 @@ PARROT_DATA PMC *PMCNULL;    /* Holds single null PMC */
 
 #define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
-/* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
+/* &gen_from_def(sysinfo.pir) prefix(SYSINFO_) */
 
 #define PARROT_INTSIZE               1
 #define PARROT_FLOATSIZE             2

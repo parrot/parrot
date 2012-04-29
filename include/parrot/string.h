@@ -60,7 +60,7 @@
 
 /* stringinfo parameters */
 
-/* &gen_from_def(stringinfo.pasm) */
+/* &gen_from_def(stringinfo.pir) */
 
 #define STRINGINFO_HEADER   1
 #define STRINGINFO_STRSTART 2

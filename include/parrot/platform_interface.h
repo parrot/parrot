@@ -115,7 +115,7 @@ INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
  * Files and directories
  */
 
-/* &gen_from_def(stat.pasm) */
+/* &gen_from_def(stat.pir) */
 
 #define STAT_EXISTS               0
 #define STAT_FILESIZE             1

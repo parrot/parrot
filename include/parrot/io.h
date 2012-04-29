@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-/* &gen_from_def(stdio.pasm) */
+/* &gen_from_def(stdio.pir) */
 
 #define PIO_STDIN_FILENO 0
 #define PIO_STDOUT_FILENO 1
