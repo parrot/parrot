@@ -36,7 +36,7 @@ typedef HANDLE Parrot_thread;
 
 #  define COND_DESTROY(c) CloseHandle((c).m_hSema)
 
-#  define LOCK(m) TryEnterCriticalSection((PCRITICAL_SECTION)&(m))
+#  define LOCK(m) EnterCriticalSection((PCRITICAL_SECTION)&(m))
 #  define UNLOCK(m) LeaveCriticalSection((PCRITICAL_SECTION)&(m))
 
 #  define COND_WAIT(c, m) \
