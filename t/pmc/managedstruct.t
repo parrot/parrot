@@ -41,7 +41,6 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     is($I0, 2, "non-empty ManagedStruct has correct size")
 .end
 
-#pasm_output_is( <<'CODE', <<'OUTPUT', "element access - float, double" );
 .sub element_access
 
     #element access - float, double
@@ -153,7 +152,6 @@ finally:
     pop_eh
 .end
 
-#pasm_output_is( <<'CODE', <<'OUTPUT', "nested struct offsets" );
 .sub nested_struct_offsets
 
     # the nested structure
