@@ -21,6 +21,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "parrot/extend.h"
 #include "parrot/thread.h"
 #include "parrot/atomic.h"
+#include "parrot/alarm.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_scheduler.h"
 #include "pmc/pmc_sub.h"
@@ -356,11 +357,15 @@ Parrot_thread_wait_for_notification(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_wait_for_notification)
 
+#ifdef HAS_THREADS
     LOCK(interp->sleep_mutex);
     while (interp->wake_up == 0)
         COND_WAIT(interp->sleep_cond, interp->sleep_mutex);
     interp->wake_up = 0;
     UNLOCK(interp->sleep_mutex);
+#else
+    Parrot_alarm_wait_for_next_alarm(interp);
+#endif
 }
 
 /*

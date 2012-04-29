@@ -1056,6 +1056,7 @@ src/thread$(O) : \
 	$(INC_PMC_DIR)/pmc_task.h \
 	$(INC_PMC_DIR)/pmc_proxy.h \
 	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/alarm.h \
 	src/thread.c
 
 src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c

@@ -130,6 +130,7 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
     ASSERT_ARGS(Parrot_alarm_check)
 
+#ifdef HAS_THREADS
     if (*last_serial == alarm_serial) {
         return 0;
     }
@@ -137,6 +138,9 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
         *last_serial = alarm_serial;
         return 1;
     }
+#else
+    return (alarm_set_to <= Parrot_floatval_time());
+#endif
 }
 
 /*
@@ -167,6 +171,34 @@ Parrot_alarm_set(FLOATVAL when)
     alarm_set_to = when;
     COND_SIGNAL(sleep_cond);
     UNLOCK(alarm_lock);
+}
+
+/*
+
+=item C<void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)>
+
+Sleep till the next alarm expires.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_alarm_wait_for_next_alarm)
+
+    FLOATVAL const now_time  = Parrot_floatval_time();
+    FLOATVAL const time = alarm_set_to - now_time;
+
+    if (time > 0) {
+#ifdef _WIN32
+        Sleep(time * 1000);
+#else
+        usleep(time * 1000000);
+#endif
+    }
 }
 
 /*

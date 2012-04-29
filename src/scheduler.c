@@ -423,6 +423,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
+#ifdef HAS_THREADS
     index = Parrot_thread_get_free_threads_array_index(interp);
     if (index > -1) { /* start a new thread */
         PMC * const thread =
@@ -454,6 +455,13 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         if (VTABLE_get_integer(interp, interp->scheduler) == 1)
             Parrot_cx_enable_preemption(interp);
     }
+#else
+    VTABLE_push_pmc(interp, interp->scheduler, task);
+
+    /* going from single to multi tasking? */
+    if (VTABLE_get_integer(interp, interp->scheduler) == 1)
+        Parrot_cx_enable_preemption(interp);
+#endif
 }
 
 /*
@@ -637,7 +645,6 @@ opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_schedule_sleep)
-#ifdef HAS_THREADS
     const FLOATVAL now_time  = Parrot_floatval_time();
     const FLOATVAL done_time = now_time + time;
     PMC * const alarm = Parrot_pmc_new(interp, enum_class_Alarm);
@@ -651,14 +658,6 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     (void) VTABLE_invoke(interp, alarm, NULL);
 
     return (opcode_t*) NULL;
-#else
-#  ifdef _WIN32
-    Sleep(time * 1000);
-#  else
-    usleep(time * 1000000);
-#  endif
-    return next;
-#endif
 }
 
 /*
