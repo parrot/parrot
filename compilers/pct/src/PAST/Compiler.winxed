@@ -549,6 +549,85 @@ third and subsequent children can be any value they wish.
         }
         return ops, posargs, namedargs;
     }
+
+/*
+
+=back
+
+=head2 Methods on C<PAST::Node> arguments
+
+The methods below are used to transform PAST nodes into their
+POST equivalents.
+
+=head3 Defaults
+
+=over 4
+
+=item as_post(node) (General)
+
+Return a POST representation of C<node>.  Note that C<post> is
+a multimethod based on the type of its first argument, this is
+the method that is called when no other methods match.
+
+=item as_post(Any)
+
+This is the "fallback" method for any unrecognized node types.
+We use this to throw a more useful exception in case any non-PAST
+nodes make it into the tree.
+
+=cut
+
+*/
+    function as_post[method, multi('_','_')](var node, options [slurpy, named]) {
+        if (node == null)
+            return self.panic("PAST::Compiler can't compiler a null node");
+
+        self.panic("PAST::Compiler can't compile node of type ", string(typeof(node)));
+    }
+
+/*
+=item as_post(Undef)
+
+Return an empty POST node that can be used to hold a (PMC) result.
+
+=cut
+
+*/
+    function as_post[method, multi('_', 'Undef')](var node, options [slurpy, named]) {
+        using POST.Ops;
+        :(string result) = self.tempreg('P');
+        return Ops.new(result:[named('result')]);
+    }
+
+/*
+=item as_post(Integer)
+
+=item as_post(Float)
+
+=item as_post(String)
+
+Handle Integer, Float, and String nodes in the PAST tree, by
+generating a constant or an appropriate register setting.
+
+=cut
+
+*/
+    function as_post[method, multi('_', 'Integer')](var node, options [slurpy, named]) {
+        using POST.Ops;
+        return self.coerce(Ops.new(node:[named('result')]), options['rtype']);
+    }
+
+    function as_post[method, multi('_', 'Float')](var node, options [slurpy, named]) {
+        using POST.Ops;
+        return self.coerce(Ops.new(node:[named('result')]), options['rtype']);
+    }
+
+    function as_post[method, multi('_', 'String')](var node, options [slurpy, named]) {
+        using POST.Ops;
+        :(string value) = self.escape(node);
+        return self.coerce(Ops.new(value:[named('result')]), options['rtype']);
+    }
+
 }
 
 /*
