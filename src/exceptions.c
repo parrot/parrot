@@ -492,8 +492,6 @@ Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 Mark an exception as unhandled, as part of rethrowing it.
 
-=back
-
 =cut
 
 */
@@ -513,6 +511,8 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 Get the current exception handler from expmc.
 If expmc is an exception handler, return itself.
 If it's an exception, return its active handler.
+
+=back
 
 =cut
 
