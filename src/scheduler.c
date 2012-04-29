@@ -29,9 +29,6 @@ exceptions, async I/O, and concurrent tasks (threads).
 #include "pmc/pmc_alarm.h"
 #include "pmc/pmc_pmclist.h"
 #include "pmc/pmc_continuation.h"
-#ifndef _WIN32
-#  include <unistd.h>
-#endif
 
 #include "scheduler.str"
 

@@ -192,13 +192,8 @@ Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)
     FLOATVAL const now_time  = Parrot_floatval_time();
     FLOATVAL const time = alarm_set_to - now_time;
 
-    if (time > 0) {
-#ifdef _WIN32
-        Sleep(time * 1000);
-#else
-        usleep(time * 1000000);
-#endif
-    }
+    if (time > 0)
+        Parrot_usleep(time * 1000000);
 }
 
 /*
