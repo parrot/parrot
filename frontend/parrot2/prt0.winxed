@@ -1,6 +1,6 @@
 $include_const "iglobals.pir";
-$include_const "interpinfo.pasm";
-$include_const "except_severity.pasm";
+$include_const "interpinfo.pir";
+$include_const "except_severity.pir";
 
 const int NO_FILE = 0;
 const int PASM_FILE = 1;

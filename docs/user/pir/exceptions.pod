@@ -17,7 +17,7 @@ You usually want to at least set a descriptive message about what went
 wrong.
 
 You also usually want to set a severity and sometimes a type.  You can
-find these in L<runtime/parrot/include/except_severity.pasm>.
+find these in L<runtime/parrot/include/except_severity.pir>.
 
 You actually throw the exception by using the C<throw> op.
 
