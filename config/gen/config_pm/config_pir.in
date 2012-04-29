@@ -38,7 +38,7 @@ undefined values) is undefined, and may be rather funky.
 
 =cut
 
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 
 .sub _config
     .local string prefix, conf_file
