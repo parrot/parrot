@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 18;
+use Parrot::Test tests => 13;
 
 =head1 NAME
 
@@ -20,110 +20,9 @@ t/pmc/eval.t - Dynamic Code Evaluation
 
 =head1 DESCRIPTION
 
-Tests on-the-fly PASM, PIR and PAST compilation and invocation.
+Tests on-the-fly PIR and PAST compilation and invocation.
 
 =cut
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "eval_sc" );
-.pcc_sub :main main:
-    compreg P1, "PASM"	# get compiler
-    set_args "0", "print \"in eval\\n\"\nset_returns \"()\"\nreturncc\n"
-    invokecc P1			# compile
-    get_results "0", P0
-    invokecc P0			# eval code P0
-    print "back again\n"
-    end
-CODE
-in eval
-back again
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "call subs in evaled code " );
-.pcc_sub :main main:
-    set S5, ".pcc_sub _foo:\n"
-    concat S5, S5, "print \"foo\\n\"\n"
-    concat S5, S5, "set_returns \"()\"\n"
-    concat S5, S5, "returncc\n"
-    compreg P1, "PASM"
-    set_args "0", S5
-    invokecc P1
-    get_results "0", P2
-    elements I0, P2
-    say I0
-    get_global P0, "_foo"
-    invokecc P0
-    print "back\n"
-    end
-CODE
-1
-foo
-back
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "call 2 subs in evaled code " );
-.pcc_sub :main main:
-    set S5, ".pcc_sub _foo:\n"
-    concat S5, S5, "print \"foo\\n\"\n"
-    concat S5, S5, "set_returns \"()\"\n"
-    concat S5, S5, "returncc\n"
-    concat S5, S5, ".pcc_sub _bar:\n"
-    concat S5, S5, "print \"bar\\n\"\n"
-    concat S5, S5, "set_returns \"()\"\n"
-    concat S5, S5, "returncc\n"
-    compreg P1, "PASM"
-    set_args "0", S5
-    invokecc P1
-    get_results "0", P6
-    get_global P2, "_foo"
-    invokecc P2
-    print "back\n"
-    get_global P2, "_bar"
-    invokecc P2
-    print "fin\n"
-    end
-CODE
-foo
-back
-bar
-fin
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
-
-.sub test :main
-    .local pmc compiler
-    get_global compiler, "xcompile"
-    compreg "XPASM", compiler
-    .local pmc my_compiler
-    my_compiler = compreg "XPASM"
-    .local pmc the_sub
-    .local string code
-    code = "print \"ok\\n\"\n"
-    code .= "set_returns \"()\"\n"
-    code .= "returncc\n"
-    the_sub = my_compiler("_foo", code)
-    the_sub()
-    the_sub = get_global "_foo"
-    the_sub()
-.end
-
-.sub xcompile
-    .param string sub_name
-    .param string code
-    $S0 = ".pcc_sub "
-    $S0 .= sub_name
-    $S0 .= ":\n"
-    $S0 .= code
-    .local pmc pasm_compiler
-    pasm_compiler = compreg "PASM"
-    # print $S0
-    $P0 = pasm_compiler($S0)
-    .return($P0)
-.end
-CODE
-ok
-ok
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "bug #31467" );
 
@@ -156,45 +55,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bug #31467" );
 CODE
 dynamic
 builtin
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PASM" );
-.sub main :main
-  register_compiler()
-
-  .local pmc compiler, invokable
-  compiler = compreg "PUTS"
-
-  invokable = compiler("ok 1")
-  invokable()
-
-.end
-
-.sub register_compiler
-  $P0 = get_global "puts"
-  compreg "PUTS", $P0
-.end
-
-.sub puts
-  .param string printme
-
-  .local pmc pasm_compiler, retval
-  pasm_compiler = compreg "PASM"
-
-  .local string code
-
-  code = "print \""
-  code .= printme
-  code .= "\\n\"\n"
-  code .= "set_returns \"()\"\n"
-  code .= "returncc\n"
-
-  retval = pasm_compiler( code )
-
-  .return (retval)
-.end
-CODE
-ok 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub PIR" );
