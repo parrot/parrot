@@ -295,16 +295,15 @@ static void*
 Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(Parrot_thread_outer_runloop)
-    PMC * const      self    = (PMC*) arg;
-    PMC             *ret_val = PMCNULL;
-    Parrot_Interp    interp  =
-       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
+    PMC * const   self    = (PMC*) arg;
+    PMC          *ret_val = PMCNULL;
+    Interp * const interp = PARROT_PARROTINTERPRETER(self)->interp;
 
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count, foreign_count, i;
     char dummy;
-    int              lo_var_ptr;
+    int lo_var_ptr;
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
