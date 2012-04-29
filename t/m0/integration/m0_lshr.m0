@@ -21,13 +21,13 @@
     goto_if lshr_nok, I3
     goto    lshr_ok, x
 
-lshr_ok:
-    set_imm S0, 0, 2
+lshr_nok:
+    set_imm S0, 0, 1
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 
-lshr_nok:
-    set_imm S0, 0, 1
+lshr_ok:
+    set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
 

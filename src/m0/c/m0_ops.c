@@ -14,7 +14,7 @@ Copyright (C) 2011-2012, Parrot Foundation.
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
-    frame->registers[ops[1]] = ops[2] * 256 + ops[3];
+    frame->registers[ops[1]] = (uint64_t)(ops[2] * 256 + ops[3]);
 }
 
 static void
@@ -28,13 +28,17 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
             M0_Constants_Segment *consts =
                 (M0_Constants_Segment *)frame->registers[ ref ];
             unsigned long         offset = frame->registers[ ops[3] ];
-
-            frame->registers[ ops[1] ]   = (uint64_t)consts->consts[ offset ];
+            frame->registers[ ops[1] ] = (uint64_t)consts->consts[offset];
             break;
         }
         default:
+        {
+            unsigned long         offset = frame->registers[ ops[3] ];
+            uint64_t * src = (uint64_t*)(frame->registers[ ops[2] ]);
+            frame->registers[ ops[1] ] = src[offset];
             /* XXX: the rest of the system has non-uniform array handling */
             break;
+        }
     }
 }
 
@@ -42,74 +46,135 @@ static void
 m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%s", (char *)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%s", (char *)(frame->registers[ ops[2] ] + 8 ));
 }
 
 static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", (int)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%d", (unsigned int)frame->registers[ ops[2] ] );
 }
 
 static void
 m0_op_add_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] +
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 + r3;
+}
+
+static void
+m0_op_add_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 + r3;
 }
 
 static void
 m0_op_sub_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] -
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    unsigned int temp_result = r2 - r3;
+    frame->registers[ops[1]] = (uint16_t)0;
+    *result = temp_result;
+}
+
+static void
+m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 - r3;
 }
 
 static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = (double)(frame->registers[ops[2]]);
+    int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
+    double *r1 = (double*) &(frame->registers[ops[1]]);
+    *r1 = (*r2);
 }
 
 static void
 m0_op_convert_i_n( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = (int)(frame->registers[ops[2]]);
+    double *r2 = (double*) &(frame->registers[ops[2]]);
+    int64_t *r1 = (int64_t*) &(frame->registers[ops[1]]);
+    *r1 = *r2;
 }
 
 static void
 m0_op_goto( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+    frame->registers[PC] = 256 * ops[1] + ops[2];
 }
 
 static void
 m0_op_goto_if( M0_CallFrame *frame, const unsigned char *ops )
 {
     if( frame->registers[ops[3]] )
-        frame->registers[PC] = 4*(256 * ops[1] + ops[2]);
+        frame->registers[PC] = 256 * ops[1] + ops[2];
 }
 
 static void
 m0_op_mult_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] *
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 * r3;
+}
+
+static void
+m0_op_mult_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 * r3;
 }
 
 static void
 m0_op_div_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] /
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
+}
+
+static void
+m0_op_div_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
 }
 
 static void
 m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
 {
-    frame->registers[ops[1]] = frame->registers[ops[2]] %
-        frame->registers[ops[3]];
+    unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
+    unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
+    unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
+    *result = r2 % r3;
+}
+
+static void
+m0_op_mod_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double r2 = *(double*)&frame->registers[ops[2]];
+    double r3 = *(double*)&frame->registers[ops[3]];
+    double *result = (double*) &(frame->registers[ops[1]]);
+    *result = (int)(r2) % (int)(r3);
 }
 
 static void
@@ -148,10 +213,11 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
-m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
+m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
-    M0_Chunk *chunk = interp->first_chunk;
+    M0_Interp *interp = (M0_Interp *)frame->registers[INTERP];
+    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
     while(chunk) {
         if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
             frame->registers[CHUNK]  = (uint64_t)chunk;
@@ -169,7 +235,7 @@ m0_op_goto_chunk(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *op
 }
 
 static void
-m0_op_exit(M0_Interp *interp, M0_CallFrame *frame, const unsigned char *ops )
+m0_op_exit(M0_CallFrame *frame, const unsigned char *ops )
 {
     exit((int)frame->registers[ops[1]]);
 }
@@ -191,14 +257,54 @@ m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_set_word( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char* value  = (char*)&frame->registers[ops[3]];
+    const int  offset = frame->registers[ops[2]];
+    char      *target = (char*) frame->registers[ops[1]];
+    memcpy(&target[4*offset],value,4*sizeof(char));
+}
+
+static void
+m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
+{
+    frame->registers[ops[1]] = frame->registers[ops[2]];
+}
+
+static void
 m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char *src   = (char*)frame->registers[ops[3]];
-    const int  offset = frame->registers[ops[2]];
+    const char *src   = (char*)frame->registers[ops[2]];
+    const int  offset = frame->registers[ops[3]];
     char      *target = (char*)&frame->registers[ops[1]];
     *target = (char)src[offset];
 }
 
+static void
+m0_op_get_word( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const char *src   = (char*)frame->registers[ops[2]];
+    const int  offset = frame->registers[ops[3]];
+    char      *target = (char*)&frame->registers[ops[1]];
+    frame->registers[ops[1]] = (uint64_t)0;
+    memcpy(target, &src[offset * 4], 4*sizeof(char));
+}
+
+static void
+m0_op_gc_alloc( M0_CallFrame *frame, const unsigned char *ops )
+{
+    const int  bytes = frame->registers[ops[2]];
+    void *ptr    = malloc( sizeof(char) * bytes );
+    frame->registers[ops[1]] = (uint64_t) ptr;
+}
+
+static void
+m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops )
+{
+    uint64_t *ptr    = (uint64_t *)frame->registers[ops[1]];
+    const int  offset = frame->registers[ops[2]];
+    ptr[offset] = frame->registers[ops[3]];
+}
 
 int
 run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
@@ -214,117 +320,160 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
         const unsigned long        op_count = bytecode->op_count;
 
         /* XXX: access violation -- so produce an error? */
-        if (pc / 4 >= op_count)
+        if (pc >= op_count)
             return 0;
         else {
-            const unsigned char op = ops[pc];
+            const unsigned char op = ops[4*pc];
             switch (op) {
                 case (M0_SET_IMM):
-                    m0_op_set_imm( cf, &ops[pc] );
+                    m0_op_set_imm( cf, &ops[4*pc] );
                 break;
 
                 case (M0_DEREF):
-                    m0_op_deref( cf, &ops[pc] );
+                    m0_op_deref( cf, &ops[4*pc] );
                 break;
 
                 case (M0_PRINT_S):
-                    m0_op_print_s( cf, &ops[pc] );
+                    m0_op_print_s( cf, &ops[4*pc] );
                 break;
 
                 case (M0_PRINT_I):
-                    m0_op_print_i( cf, &ops[pc] );
+                    m0_op_print_i( cf, &ops[4*pc] );
                 break;
 
                 case (M0_NOOP):
                 break;
 
                 case (M0_ADD_I):
-                    m0_op_add_i( cf, &ops[pc] );
+                    m0_op_add_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_ADD_N):
+                    m0_op_add_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SUB_I):
-                    m0_op_sub_i( cf, &ops[pc] );
+                    m0_op_sub_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_SUB_N):
+                    m0_op_sub_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO):
-                    m0_op_goto( cf, &ops[pc] );
+                    m0_op_goto( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO_IF):
-                    m0_op_goto_if( cf, &ops[pc] );
+                    m0_op_goto_if( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MULT_I):
-                    m0_op_mult_i( cf, &ops[pc] );
+                    m0_op_mult_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_MULT_N):
+                    m0_op_mult_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_DIV_I):
-                    m0_op_div_i( cf, &ops[pc] );
+                    m0_op_div_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_DIV_N):
+                    m0_op_div_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_MOD_I):
-                    m0_op_mod_i( cf, &ops[pc] );
+                    m0_op_mod_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_MOD_N):
+                    m0_op_mod_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_AND):
-                    m0_op_and( cf, &ops[pc] );
+                    m0_op_and( cf, &ops[4*pc] );
                 break;
 
                 case (M0_OR):
-                    m0_op_or( cf, &ops[pc] );
+                    m0_op_or( cf, &ops[4*pc] );
                 break;
 
                 case (M0_XOR):
-                    m0_op_xor( cf, &ops[pc] );
+                    m0_op_xor( cf, &ops[4*pc] );
                 break;
 
                 case (M0_LSHR):
-                    m0_op_lshr( cf, &ops[pc] );
+                    m0_op_lshr( cf, &ops[4*pc] );
                 break;
 
                 case (M0_ASHR):
-                    m0_op_ashr( cf, &ops[pc] );
+                    m0_op_ashr( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SHL):
-                    m0_op_shl( cf, &ops[pc] );
+                    m0_op_shl( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GOTO_CHUNK):
-                    m0_op_goto_chunk( interp ,cf, &ops[pc] );
+                    m0_op_goto_chunk( cf, &ops[4*pc] );
                 break;
 
                 case (M0_SET_BYTE):
-                    m0_op_set_byte( cf, &ops[pc] );
+                    m0_op_set_byte( cf, &ops[4*pc] );
+                break;
+
+                case (M0_SET_WORD):
+                    m0_op_set_word( cf, &ops[4*pc] );
+                break;
+
+                case (M0_SET):
+                    m0_op_set( cf, &ops[4*pc] );
                 break;
 
                 case (M0_GET_BYTE):
-                    m0_op_get_byte( cf, &ops[pc] );
+                    m0_op_get_byte( cf, &ops[4*pc] );
+                break;
+
+                case (M0_GET_WORD):
+                    m0_op_get_word( cf, &ops[4*pc] );
                 break;
 
                 case (M0_ITON):
-                    m0_op_convert_i_n( cf, &ops[pc] );
+                    m0_op_convert_i_n( cf, &ops[4*pc] );
                 break;
 
                 case (M0_NTOI):
-                    m0_op_convert_n_i( cf, &ops[pc] );
+                    m0_op_convert_n_i( cf, &ops[4*pc] );
+                break;
+
+                case (M0_GC_ALLOC):
+                    m0_op_gc_alloc( cf, &ops[4*pc]);
+                break;
+
+                case (M0_SET_REF):
+                    m0_op_set_ref( cf, &ops[4*pc]);
                 break;
 
                 case (M0_EXIT):
-                    m0_op_exit( interp, cf, &ops[pc]);
+                    m0_op_exit( cf, &ops[4*pc]);
                 break;
 
                 default:
                     fprintf( stderr, "Unimplemented op: %d (%d, %d, %d)\n",
-                        op, ops[pc + 1], ops[pc + 2], ops[pc + 3] );
+                        op, ops[4*pc + 1], ops[4*pc + 2], ops[4*pc + 3] );
                 break;
             }
         }
-
+        cf = (M0_CallFrame*)cf->registers[CF];
         /* only branching ops definitely change the pc */
         if (pc == (const unsigned long)cf->registers[PC])
-            cf->registers[PC] += 4;
+            cf->registers[PC]++;
     }
 
     return 0;
 }
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

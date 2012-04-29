@@ -39,6 +39,9 @@ main( int argc, const char *argv[]) {
     if (!interp)
         exit(1);
 
+    (*interp)[ARGC] = argc - 1;
+    (*interp)[ARGV] = (uint64_t)&(argv[1]);
+
     if (argc < 2) {
         fprintf( stderr, "Usage: m0 <filename.mob>\n" );
         interp_free( interp );
@@ -63,17 +66,28 @@ main( int argc, const char *argv[]) {
 
 M0_Interp *
 new_interp() {
-    return calloc( 1, sizeof (M0_Interp) );
+    M0_Interp *interp      = calloc( 1, sizeof (M0_Interp) );
+    M0_Config *config      = calloc( 1, sizeof (M0_Config) );
+    (*config)[CFG_REGSZ]      = 8;
+    (*config)[CFG_CFSZ]       = sizeof( M0_CallFrame );
+
+    (*interp)[CONFIG]         = (uint64_t)config;
+    return interp;
 }
 
 M0_CallFrame *
 new_call_frame( M0_Interp *interp ) {
     M0_CallFrame *frame = malloc( sizeof (M0_CallFrame) );
+    unsigned int i;
+    for(i = 0; i < 256; i++)
+        frame->registers[i] = (uint64_t)0;
 
     /* this is a silly minimal hack for now */
-    frame->registers[CHUNK]  = (uint64_t)interp->first_chunk;
+    frame->registers[CHUNK]  = (uint64_t)(*interp)[CHUNKS];
     frame->registers[PC]     = (uint64_t)0;
-    frame->registers[CONSTS] = (uint64_t)interp->first_chunk->constants;
+    frame->registers[CONSTS] = (uint64_t)((M0_Chunk*) ((*interp)[CHUNKS]))->constants;
+    frame->registers[CF]	 = (uint64_t)frame;
+    frame->registers[INTERP] = (uint64_t)interp;
 
     return frame;
 }
@@ -86,14 +100,14 @@ call_frame_free( M0_Interp *interp, M0_CallFrame *cf ) {
 
 void
 interp_free( M0_Interp *interp ) {
-    M0_Chunk *chunk = interp->first_chunk;
+    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
 
     while (chunk) {
         M0_Chunk *next = chunk->next;
         m0_chunk_free( chunk );
         chunk = next;
     }
-
+    free( ((void *)(*interp)[CONFIG]) );
     free( interp );
 }
 
@@ -119,7 +133,7 @@ m0_chunk_free_constants( M0_Constants_Segment *constants )
     unsigned       long i     = 0;
 
     for (i = 0; i < count; i++) {
-        if ( constants->consts[i] )
+        if ( constants->consts[i] && constants->pointers[i])
             free( (void *)constants->consts[i] );
     }
 
@@ -150,3 +164,6 @@ m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode )
 
     free( bytecode );
 }
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

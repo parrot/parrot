@@ -7,3 +7,6 @@
 
 #   define M0_CONSTANTS_H 1
 #endif
+
+/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+*/

@@ -331,7 +331,7 @@ sub m0b_constants_seg {
             m0_say "adding I constant $value to constants segment";
         }
         elsif ($type eq 'N') {
-            $bytecode .= pack("if", 4, $value + 0.0);
+            $bytecode .= pack("id", 8, $value + 0.0);
             m0_say "adding N constant $value to constants segment";
         }
         elsif ($type eq 'S' || $type eq '&') {

@@ -140,8 +140,7 @@ Execution Environments" [TBC].
 =head2 Scope of This Document
 
 This document only covers M0 and the minimum VM necessary to support it.
-Anything beyond that, e.g. the meta-object model or in-memory layout of call
-frames, is beyond its scope.
+Anything beyond that, e.g. the meta-object model, is beyond its scope.
 
 =head2 Call Frames
 
@@ -149,7 +148,7 @@ This is the central data structure at the M0 level.  The call frame graph
 contains most of the state that is needed to execute M0 bytecode.  A pointer to
 the current call frame will be passed to each op as the implicit first
 argument, though this pointer (or equivalent) will not be stored in bytecode.
-It layout is described in detail in the C<Register Types and Call Frame
+It layout is described in detail in the L<Register Types and Call Frame
 Structure> section.
 
 Call frames were previously referred to as contexts.  The name "call frame" was
@@ -793,14 +792,16 @@ are not require to have any defined semantics.
     0x1D set_ref
     0x1E set_byte
     0x1F get_byte
-    0x20 csym
-    0x21 ccall_arg
-    0x22 ccall_ret
-    0x23 ccall
-    0x24 print_s
-    0x25 print_i
-    0x25 print_n
-    0x26 exit
+    0x20 set_word
+    0x21 get_word
+    0x22 csym
+    0x23 ccall_arg
+    0x24 ccall_ret
+    0x25 ccall
+    0x26 print_s
+    0x27 print_i
+    0x28 print_n
+    0x29 exit
 
 =head2 Chunk Name Constants and Bytecode Loading
 
@@ -892,7 +893,7 @@ runloop does need to accomplish the following:
 
 =item * execute the instruction
 
-=item * increment the pc, if needed
+=item * increment the pc by one, if needed
 
 =back
 
@@ -1045,10 +1046,11 @@ data.
     0       OP_FUNCS     array of functions that implement ops
     1       CHUNKS       array of all loaded chunks
     2       CHUNK_INFO   array of chunk metadata (currently just names)
-    3       CALL_FRAMES  array of all initial call frames
-    4       CONFIG       static global config data
-    5       ARGC         number of elements in ARGV
-    6       ARGV         array of command-line arguments passed to the m0 program
+    3       CHUNK_MAP
+    4       CALL_FRAMES  array of all initial call frames
+    5       CONFIG       static global config data
+    6       ARGC         number of elements in ARGV
+    7       ARGV         array of command-line arguments passed to the m0 program
 
 C<CONFIG> should have at least the following values:
 

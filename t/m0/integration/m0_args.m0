@@ -4,9 +4,11 @@
 0 "1..2\n"
 1 "\n"
 2 "ok 1 - arg count: got 6 arguments!\n"
-3 "not ok 1 -  arg count: didn't get 6 arguments\n"
+3 "not ok 1 -  arg count: didn't get 6 arguments (got "
 4 "ok 2 - arg contents: first argument was 'kittens'\n"
 5 "not ok 2 - arg contents: first argument was 'kittens' # TODO M0 doesn't support this yet \n"
+6 " arguments)\n"
+7 "kittens"
 .metadata
 .bytecode
 
@@ -21,13 +23,18 @@
 
     # I2 is the expected arg count
     set_imm I2, 0, 6
-    sub_i   I1, I2, I1
+    sub_i   I2, I2, I1
     
-    goto_if argc_nok, I1   
+    goto_if argc_nok, I2
     goto    argc_ok, x
 
 argc_nok:
     set_imm S0, 0, 3
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    print_i I0, I1, x
+
+    set_imm S0, 0, 6
     deref   S0, CONSTS, S0
     print_s I0, S0, x
     goto    argv_test, x
@@ -45,7 +52,29 @@ argv_test:
     set_imm I1, 0, 1
     set_imm S0, 0, ARGV
     deref   S0, INTERP, S0
-    deref   S0, S0, I1
+    set_imm I2, 0, 1
+    get_word S0, S0, I2
+
+    set_imm S1, 0, 7
+    deref   S1, CONSTS, S1
+
+    # I2 = number of bytes in string
+    get_word I2, S1, I0
+    sub_i    I2, I2, I1
+
+string_cmp_loop:
+    sub_i    I2, I2, I1
+    get_byte I3, S0, I2
+
+    set_imm  I5,  0,  8
+    add_i    I5, I2, I5
+    get_byte I4, S1, I5
+
+    sub_i    I3, I3, I4
+    goto_if  argv_nok, I3
+
+    goto_if  string_cmp_loop, I2
+    goto     argv_ok, x
 
     # TODO: test S0 eq 'kittens'
 
