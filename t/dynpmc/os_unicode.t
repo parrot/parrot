@@ -19,7 +19,7 @@ Tests the C<OS> PMC with Unicode filenames.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc config_hash, interp
     .local int enc1, enc2
 

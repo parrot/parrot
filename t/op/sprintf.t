@@ -63,8 +63,8 @@ tag C<all> is allowed for todo tests that should fail on any system.
 
 .sub main :main
     load_bytecode 'Test/Builder.pbc'
-    .include "iglobals.pasm"
-    .include "sysinfo.pasm"
+    .include "iglobals.pir"
+    .include "sysinfo.pir"
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.

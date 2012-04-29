@@ -16,8 +16,8 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-.include 'except_types.pasm'
-.include 'fp_equality.pasm'
+.include 'except_types.pir'
+.include 'fp_equality.pir'
 
 .sub main :main
 

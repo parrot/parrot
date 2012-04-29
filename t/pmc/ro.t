@@ -17,7 +17,7 @@ Tests automatically generated read-only PMC support.
 
 .namespace []
 
-.include "except_types.pasm"
+.include "except_types.pir"
 
 .sub make_readonly
     .param pmc arg

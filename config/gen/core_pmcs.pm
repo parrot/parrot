@@ -55,7 +55,7 @@ sub generate_h {
 #ifndef PARROT_CORE_PMCS_H_GUARD
 #define PARROT_CORE_PMCS_H_GUARD
 
-/* &gen_from_enum(pmctypes.pasm) subst(s/enum_class_(\w+)/$1/e) */
+/* &gen_from_enum(pmctypes.pir) subst(s/enum_class_(\w+)/$1/e) */
 enum {
 END_H
 

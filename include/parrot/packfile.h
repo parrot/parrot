@@ -59,7 +59,7 @@
 
 /* Packfile segment types */
 
-/* &gen_from_enum(packfile_segments.pasm) */
+/* &gen_from_enum(packfile_segments.pir) */
 
 typedef enum {
     PF_DIR_SEG          = 0,

@@ -97,7 +97,7 @@ CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
 .pcc_sub :main main:
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     getinterp P0
     print "ok 1\n"
     set I0, P0[.INTERPINFO_ACTIVE_PMCS]
@@ -115,7 +115,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "access argv" );
 .pcc_sub :main main:
     get_params "0", P5
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     getinterp P1
     set P2, P1[.IGLOBALS_ARGV_LIST]
     set I0, P5
@@ -149,8 +149,8 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', "interpinfo & getinterp: current runcore" );
-.include 'interpinfo.pasm'
-.include 'interpcores.pasm'
+.include 'interpinfo.pir'
+.include 'interpcores.pir'
 
 .sub 'test' :main
     $I0 = interpinfo .INTERPINFO_CURRENT_RUNCORE

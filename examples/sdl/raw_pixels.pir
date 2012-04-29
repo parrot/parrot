@@ -12,7 +12,7 @@ To run this file, run the following command from the Parrot directory:
 
 =cut
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 .sub _main :main
 	# first load the necessary libraries

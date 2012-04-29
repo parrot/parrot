@@ -20,7 +20,7 @@ Compile bytecode to executable.
 
 =cut
 
-.include 'interpcores.pasm'
+.include 'interpcores.pir'
 
 .sub 'main' :main
     .param pmc    argv

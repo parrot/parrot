@@ -15,7 +15,7 @@ see L<http://search.cpan.org/~gaas/URI/>
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .namespace ['URI']
 

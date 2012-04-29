@@ -1,7 +1,7 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
 
-.include "interpinfo.pasm"
-.include "iterator.pasm"
+.include "interpinfo.pir"
+.include "iterator.pir"
 
 #
 # dump all namespaces and the contents recursively

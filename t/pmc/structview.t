@@ -1,7 +1,7 @@
 #!./parrot
 # Copyright (C) 2011, Parrot Foundation.
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 .sub 'main' :main
     .include 'test_more.pir'

@@ -100,7 +100,7 @@ to enforce whitespace between lexical words.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'ww' :method
     .param pmc adverbs         :slurpy :named

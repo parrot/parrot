@@ -461,8 +461,8 @@ TEMP_PIR
     }
 
     pir_output_is( <<"CODE", <<'OUT', 'load PIR from added paths, minding slash' );
-  .include 'iglobals.pasm'
-  .include 'libpaths.pasm'
+  .include 'iglobals.pir'
+  .include 'libpaths.pir'
 
   .sub main :main
       .local pmc interp

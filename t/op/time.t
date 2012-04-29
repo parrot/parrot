@@ -85,7 +85,7 @@ t/op/time.t - Time and Sleep
 .end
 
 .sub test_tm_pasm
-    .include "tm.pasm"
+    .include "tm.pir"
     is(.TM_SEC, 0, "TM_SEC ok")
     is(.TM_MIN, 1, "TM_MIN ok")
     is(.TM_HOUR, 2, "TM_HOUR ok")

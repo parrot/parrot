@@ -23,7 +23,7 @@ Tests Parrot calling conventions for parameter matching and mismatching.
 
 my $t_testbody = <<'TESTBODY';
 .sub 'test' :main
-    .include 'errors.pasm'
+    .include 'errors.pir'
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     errorson .PARROT_ERRORS_RESULT_COUNT_FLAG
 

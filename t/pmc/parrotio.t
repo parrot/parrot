@@ -172,7 +172,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item buffer_type>
 pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' );
 .sub 'test' :main
-    .include 'io_buffer_types.pasm'
+    .include 'io_buffer_types.pir'
 
     $P0 = new ['FileHandle']
 

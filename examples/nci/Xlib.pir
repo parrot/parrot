@@ -21,7 +21,7 @@ alignment.
 
 ########################################################################
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 #-----------------------------------------------------------------------
 .sub fail
@@ -565,7 +565,7 @@ failed:
     if $I0 goto done
 
     # Check native type sizes
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc config_hash, interp
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]

@@ -35,7 +35,7 @@ Copyright (C) 2004-2009, Parrot Foundation.
     if argc < 2 goto usage
     .local pmc interp, conf_hash
     .local string key
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     interp = getinterp
     conf_hash = interp[.IGLOBALS_CONFIG_HASH]
     .local int i

@@ -24,7 +24,7 @@ For a more complex and well-behaved example, try F<shapes.pir>.
 
 =cut
 
-.include 'opengl_defines.pasm'
+.include 'opengl_defines.pir'
 
 .sub main :main
     .param pmc argv

@@ -40,7 +40,7 @@ PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
     say ''
 .end
 
-.include "errors.pasm"
+.include "errors.pir"
 
 =head1 FUNCTIONS
 

@@ -40,7 +40,7 @@ version 0.10
     say ''
 .end
 
-.include "errors.pasm"
+.include "errors.pir"
 
 =head1 FUNCTIONS
 

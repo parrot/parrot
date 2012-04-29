@@ -31,7 +31,7 @@ Tests the transcendental mathematical operations.
 pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 1.0
         sinh N2, N1
         .fp_eq_pasm  (N2, 1.175201, EQ1)
@@ -53,7 +53,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 1.0
         tanh N2, N1
         .fp_eq_pasm  (N2, 0.761594, EQ1)
@@ -75,7 +75,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 1.0
         sech N2, N1
         .fp_eq_pasm  (N2, 0.648054, EQ1)
@@ -97,7 +97,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N0, 0.0
         set I0, 0
         set N1, 1.0
@@ -209,7 +209,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         atan N4, -0.0, -0.0
         .fp_eq_pasm   (N4, -3.1415926, EQ1)
         print "not "
@@ -222,7 +222,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 10.0
         log2 N2, N1
         .fp_eq_pasm  (N2, 3.321928, EQ1)
@@ -244,7 +244,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 15.0
         log10 N2, N1
         .fp_eq_pasm  (N2, 1.176091, EQ1)
@@ -266,7 +266,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 10.0
         ln N2, N1
         .fp_eq_pasm  (N2, 2.302585, EQ1)
@@ -287,7 +287,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 10.0
         exp N2, N1
         .fp_eq_pasm  (N2, 22026.465795, EQ1)
@@ -308,7 +308,7 @@ OUTPUT
 pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
 .pcc_sub :main main:
         .loadlib 'trans_ops'
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         set N1, 3.0
         set I1, 3
         set N2, 5.0
@@ -420,7 +420,7 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sqrt" );
 .pcc_sub :main main:
-       .include 'fp_equality.pasm'
+       .include 'fp_equality.pir'
        set N1, 9.0
        sqrt N2, N1
        .fp_eq_pasm  (N2, 3.0, EQ1)

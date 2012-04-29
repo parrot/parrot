@@ -15,7 +15,7 @@ Tests Parrot string registers and operations.
 
 =cut
 
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .sub main :main
     .include 'test_more.pir'
@@ -1379,7 +1379,7 @@ WHILE:
 
 
 .sub correct_precision_for_sprintf_x
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
 
     # Create the string via concat
     .local pmc interp     # a handle to our interpreter object.

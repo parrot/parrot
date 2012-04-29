@@ -92,7 +92,7 @@ END:
 
 .namespace ['Parrot'; 'Coroutine']
 
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 
 =head2 METHODS
 

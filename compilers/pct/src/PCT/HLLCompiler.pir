@@ -23,8 +23,8 @@ running compilers from a command line.
 
 .namespace [ 'PCT';'HLLCompiler' ]
 
-.include 'cclass.pasm'
-.include 'iglobals.pasm'
+.include 'cclass.pir'
+.include 'iglobals.pir'
 
 .sub 'init' :vtable :method
     $P0 = split ' ', 'parse past post pir evalpmc'
@@ -804,7 +804,7 @@ Generic method for compilers invoked from a shell command line.
 
 =cut
 
-.include 'except_severity.pasm'
+.include 'except_severity.pir'
 .sub 'command_line' :method
     .param pmc args
     .param pmc adverbs         :slurpy :named

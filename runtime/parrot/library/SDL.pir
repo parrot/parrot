@@ -49,7 +49,7 @@ The subsystem initializers include:
 
 .namespace [ 'SDL' ]
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 .loadlib 'io_ops'
 
 .macro store_nci_func( func_name, signature )

@@ -338,7 +338,7 @@ STRING * Parrot_getenv(PARROT_INTERP, STRING *name);
  * All flags will be ignored on platforms for which they are inapplicable.
  */
 
-/* &gen_from_enum(dlopenflags.pasm) */
+/* &gen_from_enum(dlopenflags.pir) */
 typedef enum Parrot_dlopen_enum {
     /*
      * Activates RTLD_GLOBAL on *NIX systems, making symbols from the newly

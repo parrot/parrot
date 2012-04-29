@@ -17,8 +17,8 @@ Tests the Complex PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'fp_equality.pasm'
-    .include "iglobals.pasm"
+    .include 'fp_equality.pir'
+    .include "iglobals.pir"
 
     plan(632)
 

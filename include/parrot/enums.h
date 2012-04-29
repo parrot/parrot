@@ -30,7 +30,7 @@ typedef enum {
 } Stack_chunk_flags;
 
 
-/* &gen_from_enum(iterator.pasm) */
+/* &gen_from_enum(iterator.pir) */
 typedef enum {
     ITERATE_FROM_START,
     ITERATE_FROM_START_KEYS,
@@ -41,7 +41,7 @@ typedef enum {
 
 /* &end_gen */
 
-/* &gen_from_enum(call_bits.pasm lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm) */
+/* &gen_from_enum(call_bits.pir lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm) */
 typedef enum {
     /* 4 low bits are argument types */
     PARROT_ARG_INTVAL           = 0x0000,  /* 0 */

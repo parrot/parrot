@@ -97,7 +97,7 @@ eh3:
 finally3:
     pop_eh
 
-    .include "datatypes.pasm"
+    .include "datatypes.pir"
     push $P1, 0
     push $P1, 0
 

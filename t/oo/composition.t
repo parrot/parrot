@@ -16,7 +16,7 @@ Tests role composition in the OO implementation.
 =cut
 
 .sub main :main
-    .include 'except_types.pasm'
+    .include 'except_types.pir'
     .include 'test_more.pir'
     plan(45)
 

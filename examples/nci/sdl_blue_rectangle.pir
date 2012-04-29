@@ -7,10 +7,10 @@
 .end
 
 .include "library/sdl_types.pir"
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub _init
-    .include "library/sdl.pasm"
+    .include "library/sdl.pir"
     _init_SDL_types()
     .begin_return
     .end_return

@@ -184,7 +184,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -210,7 +210,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -272,7 +272,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -334,7 +334,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -360,7 +360,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -396,7 +396,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'nci_s - return a short in an INTEGER register' );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -427,7 +427,7 @@ SKIP:
 
         pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -738,7 +738,7 @@ OUTPUT
   invokecc P0
   get_results "0", P5
   new P2, ['ResizablePMCArray']
-.include "datatypes.pasm"
+.include "datatypes.pir"
   push P2, .DATATYPE_INT
   push P2, 2    # 2 elem array
   push P2, 0
@@ -771,7 +771,7 @@ OUTPUT
   invokecc P0
   get_results "0", P5
   new P2, ['ResizablePMCArray']
-.include "datatypes.pasm"
+.include "datatypes.pir"
   push P2, .DATATYPE_FLOAT
   push P2, 2    # 2 elem array
   push P2, 0
@@ -804,7 +804,7 @@ OUTPUT
   invokecc P0
   get_results "0", P5
   new P2, ['ResizablePMCArray']
-.include "datatypes.pasm"
+.include "datatypes.pir"
   push P2, .DATATYPE_CHAR
   push P2, 0
   push P2, 0
@@ -839,7 +839,7 @@ OUTPUT
   invokecc P0
   get_results "0", P5
   new P2, ['ResizablePMCArray']
-.include "datatypes.pasm"
+.include "datatypes.pir"
   push P2, .DATATYPE_CSTR
   push P2, 0
   push P2, 0
@@ -867,7 +867,7 @@ OUTPUT
   set_args "0", 4
   invokecc P0
   get_results "0", P5
-.include "datatypes.pasm"
+.include "datatypes.pir"
   # the contained structure
   new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_INT
@@ -922,7 +922,7 @@ OUTPUT
   set_args "0", 8
   invokecc P0
   get_results "0", P5
-.include "datatypes.pasm"
+.include "datatypes.pir"
   # the contained structure pointer
   new  P6, 'OrderedHash'
   set  P6[ 'i' ], .DATATYPE_INT
@@ -987,7 +987,7 @@ CODE
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature" );
-.include "datatypes.pasm"
+.include "datatypes.pir"
 .sub main :main
     .local pmc struct_ptr
     $P1      = loadlib "libnci_test"
@@ -1029,7 +1029,7 @@ OUTPUT
   set_args "0", 6
   invokecc P0
   get_results "0", P5
-.include "datatypes.pasm"
+.include "datatypes.pir"
   # the nested structure
   new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_INT
@@ -1085,7 +1085,7 @@ OUTPUT
   set_args "0", 7
   invokecc P0
   get_results "0", P5
-.include "datatypes.pasm"
+.include "datatypes.pir"
   # the nested structure
   new P3, ['ResizablePMCArray']
   push P3, .DATATYPE_CHAR
@@ -1141,7 +1141,7 @@ OUTPUT
   set_args "0", 7
   invokecc P0
   get_results "0", P5
-.include "datatypes.pasm"
+.include "datatypes.pir"
   # the nested structure
   new P3, ['OrderedHash']
   set P3["i"], .DATATYPE_CHAR
@@ -1191,7 +1191,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - int" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -1234,7 +1234,7 @@ OUTPUT
   # { double d; float f; int i; char*}
   # and returns the sum of these values
   new P2, ['ResizablePMCArray']
-.include "datatypes.pasm"
+.include "datatypes.pir"
   push P2, .DATATYPE_DOUBLE
   push P2, 0
   push P2, 0
@@ -1266,7 +1266,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - null" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -1503,7 +1503,7 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR" );
 
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -1784,7 +1784,7 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR" );
 
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -1872,7 +1872,7 @@ OUTPUT
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks" );
 
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -1986,7 +1986,7 @@ OUTPUT
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pip - array of structs' );
 .pcc_sub :main main:
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
   new P3, ['OrderedHash']
   set  P3["x"], .DATATYPE_INT
   push P3, 0
@@ -2059,7 +2059,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 .pcc_sub :main main:
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
   new  P8, 'OrderedHash'
   set  P8[ 'y' ],      .DATATYPE_INT
   push P8, 0
@@ -2116,7 +2116,7 @@ OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_piiii - nested array in a struct' );
 .pcc_sub :main main:
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_piiii", "piiii"
@@ -2178,7 +2178,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -2236,7 +2236,7 @@ SKIP:
 
         pir_output_is( << 'CODE', << 'OUTPUT', "nci_vv and nci_dlvar_int" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -2297,7 +2297,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -2327,7 +2327,7 @@ OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .sub test :main
 
@@ -2422,7 +2422,7 @@ OUTPUT
 
 pir_output_is(
     << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 .sub 'test' :main
     .local string library_name

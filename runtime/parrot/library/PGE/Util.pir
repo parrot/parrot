@@ -15,7 +15,7 @@ parsing tasks using PGE.
 
 .namespace [ 'PGE';'Util' ]
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub "__onload" :load
     .local pmc p6meta

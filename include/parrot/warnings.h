@@ -8,7 +8,7 @@
 /* These should be visible to embedders. */
 
 /* Warning flags */
-/* &gen_from_enum(warnings.pasm)  */
+/* &gen_from_enum(warnings.pir)  */
 typedef enum {
     PARROT_WARNINGS_ALL_FLAG          = 0xFF,
     PARROT_WARNINGS_NONE_FLAG         = 0x00,
@@ -26,7 +26,7 @@ typedef Warnings_classes Parrot_warnclass;
 /* &end_gen */
 
 /* error flags */
-/* &gen_from_enum(errors.pasm)  */
+/* &gen_from_enum(errors.pir)  */
 typedef enum {
     PARROT_ERRORS_NONE_FLAG         = 0x00,
     PARROT_ERRORS_OVERFLOW_FLAG     = 0x02,

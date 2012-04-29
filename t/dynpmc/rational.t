@@ -17,7 +17,7 @@ Tests the Rational PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc config_hash, interp
 
     interp = getinterp

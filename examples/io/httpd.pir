@@ -90,9 +90,9 @@ The code was heavily hacked by bernhard and leo.
 
 .const string SERVER_NAME = "Parrot-httpd/0.1"
 
-.include "stat.pasm"
-.include 'except_types.pasm'
-.include 'socket.pasm'
+.include "stat.pir"
+.include 'except_types.pir'
+.include 'socket.pir'
 
 .loadlib 'io_ops'
 .loadlib 'sys_ops'

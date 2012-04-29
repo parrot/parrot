@@ -57,7 +57,7 @@ Description of the test.
     load_bytecode 'Test/Builder.pbc'
     load_bytecode 'P6Regex.pbc'
     load_bytecode 'String/Utils.pbc'
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.

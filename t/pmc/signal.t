@@ -130,7 +130,7 @@ SKIP: {
     print "never\n"
     end
 _handler:
-.include "signal.pasm"
+.include "signal.pir"
     print "catched "
     set I0, P5["type"]
     neg I0, I0

@@ -292,7 +292,7 @@ needed for compiling regexes.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .namespace [ 'PGE';'Perl6Regex' ]
 

@@ -15,7 +15,7 @@ Tests the C<String> PMC.
 
 =cut
 
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .sub main :main
     .include 'test_more.pir'
@@ -136,7 +136,7 @@ Tests the C<String> PMC.
 .end
 
 .sub setting_numbers
-        .include 'fp_equality.pasm'
+        .include 'fp_equality.pir'
         new $P0, ['String']
         set $P0, "1"
         set $N0, $P0

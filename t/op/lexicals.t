@@ -106,7 +106,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'api parsing' );
     store_lex 'a', $P0
     $P0 = find_lex 'a'
     print "ok\n"
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
     load_bytecode 'pcore.pbc'      # TODO autoload/preload
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
@@ -122,7 +122,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo' );
 .sub main :main
     .lex '$a', $P0
     .lex '$b', $P9
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
     $S0 = typeof $P2
@@ -137,7 +137,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexinfo - no lexicals' );
 .sub main :main
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
     if null $P2 goto ok
@@ -370,7 +370,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer' );
     foo()
 .end
 .sub foo :outer('main')
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1."get_outer"()
     print $P2
@@ -388,7 +388,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_outer 2' );
     bar()
 .end
 .sub bar   :outer('foo')
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1."get_outer"()
     print $P2
@@ -595,7 +595,7 @@ the_end:
      .lex 'try', try
      #print "In choose\n"
      old_fail = find_lex "fail"
-     .include "interpinfo.pasm"
+     .include "interpinfo.pir"
      $P1 = interpinfo .INTERPINFO_CURRENT_CONT
      store_lex  "cc", $P1
      .const 'Sub' tr_sub = "_try"

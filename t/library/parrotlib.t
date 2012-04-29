@@ -72,7 +72,7 @@ expected absolute filenames.
 # Testing dynext_location
 
 .sub test_dynext_location
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc config_hash, interp
     .local pmc    location_sub
     .local string location

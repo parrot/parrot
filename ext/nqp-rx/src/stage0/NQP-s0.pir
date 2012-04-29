@@ -444,7 +444,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "TOP"  :subid("12_1309998847.42912") :method :outer("11_1309998847.42912")
 .annotate 'line', 4
     new $P1006, ['ExceptionHandler'], .CONTROL_RETURN
@@ -19281,7 +19281,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Grammar"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "smartmatch"  :subid("354_1309998847.42912") :method :outer("11_1309998847.42912")
     .param pmc param_1904
 .annotate 'line', 569
@@ -20852,7 +20852,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "xblock_immediate"  :subid("12_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1009
 .annotate 'line', 9
@@ -20888,7 +20888,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "block_immediate"  :subid("13_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1017
 .annotate 'line', 14
@@ -20929,7 +20929,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1020"  :anon :subid("14_1309998850.8808") :outer("13_1309998850.8808")
 .annotate 'line', 16
     .const 'Sub' $P1024 = "15_1309998850.8808" 
@@ -20991,7 +20991,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "vivitype"  :subid("16_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1032
 .annotate 'line', 24
@@ -21039,7 +21039,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "colonpair_str"  :subid("17_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1040
 .annotate 'line', 43
@@ -21077,7 +21077,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "push_block_handler"  :subid("18_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1047
     .param pmc param_1048
@@ -21194,7 +21194,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "control"  :subid("19_1309998850.8808") :outer("11_1309998850.8808")
     .param pmc param_1059
     .param pmc param_1060
@@ -21226,7 +21226,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "TOP"  :subid("20_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1065
 .annotate 'line', 33
@@ -21256,7 +21256,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "deflongname"  :subid("21_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1070
 .annotate 'line', 35
@@ -21345,7 +21345,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "comp_unit"  :subid("22_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1081
 .annotate 'line', 49
@@ -21421,7 +21421,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statementlist"  :subid("23_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1088
 .annotate 'line', 76
@@ -21565,7 +21565,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement"  :subid("25_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1107
     .param pmc param_1108 :optional
@@ -21823,7 +21823,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "xblock"  :subid("27_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1137
 .annotate 'line', 118
@@ -21867,7 +21867,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "pblock"  :subid("28_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1143
 .annotate 'line', 122
@@ -21899,7 +21899,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "block"  :subid("29_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1148
 .annotate 'line', 126
@@ -21931,7 +21931,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "blockoid"  :subid("30_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1153
 .annotate 'line', 130
@@ -21989,7 +21989,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "newpad"  :subid("31_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1160
 .annotate 'line', 139
@@ -22024,7 +22024,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "outerctx"  :subid("32_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1165
 .annotate 'line', 144
@@ -22063,7 +22063,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<if>"  :subid("33_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1171
 .annotate 'line', 151
@@ -22221,7 +22221,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<unless>"  :subid("35_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1191
 .annotate 'line', 167
@@ -22263,7 +22263,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<while>"  :subid("36_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1197
 .annotate 'line', 173
@@ -22314,7 +22314,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<repeat>"  :subid("37_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1204
 .annotate 'line', 179
@@ -22417,7 +22417,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<for>"  :subid("38_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1216
 .annotate 'line', 193
@@ -22499,7 +22499,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<return>"  :subid("39_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1226
 .annotate 'line', 206
@@ -22534,7 +22534,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<CATCH>"  :subid("40_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1231
 .annotate 'line', 210
@@ -22593,7 +22593,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_control:sym<CONTROL>"  :subid("41_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1238
 .annotate 'line', 217
@@ -22652,7 +22652,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_prefix:sym<INIT>"  :subid("42_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1245
 .annotate 'line', 261
@@ -22698,7 +22698,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_prefix:sym<try>"  :subid("43_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1251
 .annotate 'line', 266
@@ -22776,7 +22776,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "blorst"  :subid("44_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1259
 .annotate 'line', 289
@@ -22835,7 +22835,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_mod_cond:sym<if>"  :subid("45_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1267
 .annotate 'line', 297
@@ -22865,7 +22865,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_mod_cond:sym<unless>"  :subid("46_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1272
 .annotate 'line', 298
@@ -22895,7 +22895,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_mod_loop:sym<while>"  :subid("47_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1277
 .annotate 'line', 300
@@ -22925,7 +22925,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "statement_mod_loop:sym<until>"  :subid("48_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1282
 .annotate 'line', 301
@@ -22955,7 +22955,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<fatarrow>"  :subid("49_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1287
 .annotate 'line', 305
@@ -22985,7 +22985,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<colonpair>"  :subid("50_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1292
 .annotate 'line', 306
@@ -23015,7 +23015,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<variable>"  :subid("51_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1297
 .annotate 'line', 307
@@ -23045,7 +23045,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<package_declarator>"  :subid("52_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1302
 .annotate 'line', 308
@@ -23075,7 +23075,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<scope_declarator>"  :subid("53_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1307
 .annotate 'line', 309
@@ -23105,7 +23105,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<routine_declarator>"  :subid("54_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1312
 .annotate 'line', 310
@@ -23135,7 +23135,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<multi_declarator>"  :subid("55_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1317
 .annotate 'line', 311
@@ -23165,7 +23165,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<regex_declarator>"  :subid("56_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1322
 .annotate 'line', 312
@@ -23195,7 +23195,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<statement_prefix>"  :subid("57_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1327
 .annotate 'line', 313
@@ -23225,7 +23225,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<lambda>"  :subid("58_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1332
 .annotate 'line', 314
@@ -23255,7 +23255,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "fatarrow"  :subid("59_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1337
 .annotate 'line', 316
@@ -23305,7 +23305,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "colonpair"  :subid("60_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1344
 .annotate 'line', 322
@@ -23387,7 +23387,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "variable"  :subid("61_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1355
 .annotate 'line', 330
@@ -23622,7 +23622,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "package_declarator:sym<module>"  :subid("63_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1380
 .annotate 'line', 368
@@ -23652,7 +23652,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "package_declarator:sym<class>"  :subid("64_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1385
 .annotate 'line', 369
@@ -23812,7 +23812,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "package_def"  :subid("65_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1406
 .annotate 'line', 392
@@ -23891,7 +23891,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "scope_declarator:sym<my>"  :subid("66_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1417
 .annotate 'line', 399
@@ -23921,7 +23921,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "scope_declarator:sym<our>"  :subid("67_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1422
 .annotate 'line', 400
@@ -23951,7 +23951,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "scope_declarator:sym<has>"  :subid("68_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1427
 .annotate 'line', 401
@@ -23981,7 +23981,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "scoped"  :subid("69_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1432
 .annotate 'line', 403
@@ -24039,7 +24039,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "declarator"  :subid("70_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1440
 .annotate 'line', 409
@@ -24097,7 +24097,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "multi_declarator:sym<multi>"  :subid("71_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1448
 .annotate 'line', 415
@@ -24150,7 +24150,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "multi_declarator:sym<null>"  :subid("72_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1456
 .annotate 'line', 416
@@ -24180,7 +24180,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "variable_declarator"  :subid("73_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1461
 .annotate 'line', 419
@@ -24392,7 +24392,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "routine_declarator:sym<sub>"  :subid("75_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1485
 .annotate 'line', 447
@@ -24422,7 +24422,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "routine_declarator:sym<method>"  :subid("76_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1490
 .annotate 'line', 448
@@ -24452,7 +24452,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "routine_def"  :subid("77_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1495
 .annotate 'line', 450
@@ -24690,7 +24690,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "method_def"  :subid("80_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1523
 .annotate 'line', 473
@@ -24900,7 +24900,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "signature"  :subid("83_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1547
 .annotate 'line', 495
@@ -25008,7 +25008,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1557"  :anon :subid("85_1309998850.8808") :outer("83_1309998850.8808")
 .annotate 'line', 501
     .const 'Sub' $P1562 = "86_1309998850.8808" 
@@ -25111,7 +25111,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "parameter"  :subid("87_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1575
 .annotate 'line', 511
@@ -25362,7 +25362,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1605"  :anon :subid("88_1309998850.8808") :outer("87_1309998850.8808")
 .annotate 'line', 542
     .const 'Sub' $P1614 = "89_1309998850.8808" 
@@ -25442,7 +25442,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "param_var"  :subid("90_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1620
 .annotate 'line', 551
@@ -25497,7 +25497,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "named_param"  :subid("91_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1627
 .annotate 'line', 559
@@ -25551,7 +25551,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "trait"  :subid("92_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1635
 .annotate 'line', 565
@@ -25583,7 +25583,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "trait_mod:sym<is>"  :subid("93_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1640
 .annotate 'line', 569
@@ -25692,7 +25692,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "regex_declarator"  :subid("95_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1655
     .param pmc param_1656 :optional
@@ -25876,7 +25876,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1666"  :anon :subid("96_1309998850.8808") :outer("95_1309998850.8808")
 .annotate 'line', 615
     $P1669 = root_new ['parrot';'Hash']
@@ -25976,7 +25976,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "dotty"  :subid("98_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1687
 .annotate 'line', 645
@@ -26074,7 +26074,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<self>"  :subid("99_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1700
 .annotate 'line', 654
@@ -26099,7 +26099,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<identifier>"  :subid("100_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1704
 .annotate 'line', 658
@@ -26149,7 +26149,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<name>"  :subid("101_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1711
 .annotate 'line', 664
@@ -26271,7 +26271,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<pir::op>"  :subid("102_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1729
 .annotate 'line', 678
@@ -26364,7 +26364,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "args"  :subid("103_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1741
 .annotate 'line', 693
@@ -26394,7 +26394,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "arglist"  :subid("104_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1746
 .annotate 'line', 695
@@ -26587,7 +26587,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1752"  :anon :subid("105_1309998850.8808") :outer("104_1309998850.8808")
 .annotate 'line', 697
     .const 'Sub' $P1759 = "106_1309998850.8808" 
@@ -26679,7 +26679,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<value>"  :subid("107_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1778
 .annotate 'line', 721
@@ -26709,7 +26709,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "circumfix:sym<( )>"  :subid("108_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1783
 .annotate 'line', 723
@@ -26765,7 +26765,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "circumfix:sym<[ ]>"  :subid("109_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1791
 .annotate 'line', 729
@@ -26842,7 +26842,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "circumfix:sym<ang>"  :subid("110_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1801
 .annotate 'line', 744
@@ -26872,7 +26872,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub unicode:"circumfix:sym<\x{ab} \x{bb}>"  :subid("111_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1806
 .annotate 'line', 745
@@ -26902,7 +26902,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "circumfix:sym<{ }>"  :subid("112_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1811
 .annotate 'line', 747
@@ -26981,7 +26981,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "circumfix:sym<sigil>"  :subid("113_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1823
 .annotate 'line', 755
@@ -27061,7 +27061,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "semilist"  :subid("114_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1833
 .annotate 'line', 762
@@ -27091,7 +27091,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postcircumfix:sym<[ ]>"  :subid("115_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1838
 .annotate 'line', 764
@@ -27128,7 +27128,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postcircumfix:sym<{ }>"  :subid("116_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1843
 .annotate 'line', 770
@@ -27165,7 +27165,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postcircumfix:sym<ang>"  :subid("117_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1848
 .annotate 'line', 776
@@ -27202,7 +27202,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postcircumfix:sym<( )>"  :subid("118_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1853
 .annotate 'line', 782
@@ -27234,7 +27234,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "value"  :subid("119_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1858
 .annotate 'line', 786
@@ -27289,7 +27289,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "number"  :subid("120_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1866
 .annotate 'line', 790
@@ -27368,7 +27368,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<apos>"  :subid("121_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1877
 .annotate 'line', 796
@@ -27398,7 +27398,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<dblq>"  :subid("122_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1882
 .annotate 'line', 797
@@ -27428,7 +27428,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<qq>"  :subid("123_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1887
 .annotate 'line', 798
@@ -27458,7 +27458,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<q>"  :subid("124_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1892
 .annotate 'line', 799
@@ -27488,7 +27488,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<Q>"  :subid("125_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1897
 .annotate 'line', 800
@@ -27518,7 +27518,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym<Q:PIR>"  :subid("126_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1902
 .annotate 'line', 801
@@ -27554,7 +27554,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote:sym</ />"  :subid("127_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1907
     .param pmc param_1908 :optional
@@ -27665,7 +27665,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<$>"  :subid("128_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1919
 .annotate 'line', 830
@@ -27695,7 +27695,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<{ }>"  :subid("129_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1924
 .annotate 'line', 831
@@ -27733,7 +27733,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<esc>"  :subid("130_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1929
 .annotate 'line', 836
@@ -27754,7 +27754,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postfix:sym<.>"  :subid("131_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1933
 .annotate 'line', 840
@@ -27784,7 +27784,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postfix:sym<++>"  :subid("132_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1938
 .annotate 'line', 842
@@ -27814,7 +27814,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "postfix:sym<-->"  :subid("133_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1942
 .annotate 'line', 848
@@ -27844,7 +27844,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "prefix:sym<make>"  :subid("134_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1946
 .annotate 'line', 854
@@ -27874,7 +27874,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<next>"  :subid("135_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1950
 .annotate 'line', 872
@@ -27895,7 +27895,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<last>"  :subid("136_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1954
 .annotate 'line', 873
@@ -27916,7 +27916,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<redo>"  :subid("137_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1958
 .annotate 'line', 874
@@ -27937,7 +27937,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "infix:sym<~~>"  :subid("138_1309998850.8808") :method :outer("11_1309998850.8808")
     .param pmc param_1962
 .annotate 'line', 876
@@ -27988,7 +27988,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<:my>"  :subid("140_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1968
 .annotate 'line', 883
@@ -28029,7 +28029,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<{ }>"  :subid("141_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1974
 .annotate 'line', 889
@@ -28064,7 +28064,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<nqpvar>"  :subid("142_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1979
 .annotate 'line', 894
@@ -28099,7 +28099,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<{ }>"  :subid("143_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1984
 .annotate 'line', 899
@@ -28134,7 +28134,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<?{ }>"  :subid("144_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1989
 .annotate 'line', 904
@@ -28181,7 +28181,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<var>"  :subid("145_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_1995
 .annotate 'line', 910
@@ -28216,7 +28216,7 @@ NQP::Compiler - NQP compiler
 
 
 .namespace ["NQP";"RegexActions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "codeblock"  :subid("146_1309998850.8808") :method :outer("139_1309998850.8808")
     .param pmc param_2000
 .annotate 'line', 915

@@ -19,7 +19,7 @@ Test handling 3-arg C<pow> on PMCs.
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
 
     plan (4)
 

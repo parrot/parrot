@@ -31,9 +31,9 @@ See L<http://search.cpan.org/dist/Archive-Zip/>
 
 .loadlib 'sys_ops'
 .loadlib 'io_ops'
-.include 'iglobals.pasm'
-.include 'stat.pasm'
-.include 'tm.pasm'
+.include 'iglobals.pir'
+.include 'stat.pir'
+.include 'tm.pir'
 
 =head3 Class Archive;Zip;Base
 

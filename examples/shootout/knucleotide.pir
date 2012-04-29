@@ -55,7 +55,7 @@ endfor:
 	print "\n"
 .end
 
-.include "iterator.pasm"
+.include "iterator.pir"
 .sub sort_n_print
 	.param pmc table
 	.param int seqlen

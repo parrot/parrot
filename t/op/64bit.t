@@ -17,7 +17,7 @@ Tests are skipped on other platforms.
 =cut
 
 .sub main :main
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .include 'test_more.pir'
 
     # Check to see if this is 64 bit

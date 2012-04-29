@@ -20,7 +20,7 @@ see http://search.cpan.org/dist/libwww-perl/
 .namespace ['HTTP';'Date']
 
 .loadlib 'sys_ops'
-.include 'tm.pasm'
+.include 'tm.pir'
 
 .sub 'time2str'
     .param int time
@@ -168,7 +168,7 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['HTTP';'Request']
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub '' :init :load :anon
     load_bytecode 'URI.pbc'

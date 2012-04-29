@@ -16,7 +16,7 @@ TT1603 - http://trac.parrot.org/parrot/ticket/1603
 
 =cut
 
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
 
 .sub _main :main
     .include 'test_more.pir'

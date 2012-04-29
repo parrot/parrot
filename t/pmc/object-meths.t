@@ -661,7 +661,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
 .namespace ["A"]
 
 .sub foo :method
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
     eq_addr self, $P0, ok
     print "not "

@@ -79,7 +79,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<OUT, "iterate" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -267,7 +267,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<OUT, "delete" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -334,7 +334,7 @@ OUTPUT
 
 pasm_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"
@@ -359,7 +359,7 @@ CODE
 
 pasm_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['OrderedHash']
     new P1, ['String']
     set P1, "ok 1\n"

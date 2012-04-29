@@ -8,8 +8,8 @@ is now a Parrot test.
 
 =cut
 
-.include 'interpinfo.pasm'
-.include 'sysinfo.pasm'
+.include 'interpinfo.pir'
+.include 'sysinfo.pir'
 .loadlib 'sys_ops'
 
 .sub main

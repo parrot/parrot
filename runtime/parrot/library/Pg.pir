@@ -37,7 +37,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 =cut
 
 ## TODO generate includes from libpq-fe.h
-## .include 'postgres.pasm'
+## .include 'postgres.pir'
 
 .HLL 'parrot'
 .const int CONNECTION_OK = 0
@@ -194,7 +194,7 @@ Execute the SQL command and return a Pg;Result object.
     .tailcall mk_res(res)
 .end
 
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 =item res = con.'execParams'(str, val, ...)
 

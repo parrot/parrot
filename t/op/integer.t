@@ -749,7 +749,7 @@ Tests the use of Parrot integer registers.
 # minimum integer + 1. This should be true because we are assuming a
 # two's-complement machine.
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 .sub test_negate_max_integer
     .local int max, min
 

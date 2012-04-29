@@ -18,7 +18,7 @@ number types.
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
 
     plan(80)
 

@@ -82,7 +82,7 @@ Returns the exit status of the C<cmd> command.
 .end
 
 .loadlib 'io_ops'
-.include 'stat.pasm'
+.include 'stat.pir'
 
 =item B<file_exists(string filename)>
 
@@ -289,7 +289,7 @@ displayed.
 
 =cut
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'install'
     .param string src
@@ -723,7 +723,7 @@ newline characters from C<str>.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'chomp'
     .param string str

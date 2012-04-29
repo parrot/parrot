@@ -1,8 +1,8 @@
 #!./parrot
 # Copyright (C) 2010-2011, Parrot Foundation.
 
-.include 'timer.pasm'
-.include 'sysinfo.pasm'
+.include 'timer.pir'
+.include 'sysinfo.pir'
 .loadlib 'sys_ops'
 
 .sub main

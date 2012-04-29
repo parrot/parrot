@@ -14,8 +14,8 @@
 
 # common pbc loading function
 .sub '_pbc'
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
+    .include "stat.pir"
+    .include "interpinfo.pir"
     .local pmc pf, pio
     pf   = new ['Packfile']
     $S0  = '_filename'()

@@ -13,8 +13,8 @@ a number of built-in rules.
 
 .namespace [ 'PGE'; 'Match' ]
 
-.include 'cclass.pasm'
-.include 'interpinfo.pasm'
+.include 'cclass.pir'
+.include 'interpinfo.pir'
 
 .sub '__onload' :load
     .local pmc p6meta

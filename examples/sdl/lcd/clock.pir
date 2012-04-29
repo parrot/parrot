@@ -17,8 +17,8 @@ This example demonstrates the SDL::LCD object. It shows a simple clock.
 
 =cut
 
-.include "tm.pasm"
-.include "timer.pasm"
+.include "tm.pir"
+.include "timer.pir"
 .loadlib 'sys_ops'
 .loadlib 'math_ops'
 

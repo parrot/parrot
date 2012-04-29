@@ -18,8 +18,8 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 
 =cut
 
-.include 'socket.pasm'
-.include 'iglobals.pasm'
+.include 'socket.pir'
+.include 'iglobals.pir'
 
 .sub main :main
     .include 'test_more.pir'

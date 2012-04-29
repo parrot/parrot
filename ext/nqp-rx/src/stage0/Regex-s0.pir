@@ -26,7 +26,7 @@ grammars.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 ### .include 'src/Regex/constants.pir'
 .const int CURSOR_FAIL = -1
 .const int CURSOR_FAIL_GROUP = -2
@@ -962,7 +962,7 @@ Regex::Cursor-builtins - builtin regexes for Cursor objects
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .namespace ['Regex';'Cursor']
 
@@ -2517,7 +2517,7 @@ Return the POST representation of the regex AST rooted by C<node>.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 ### .include 'src/Regex/constants.pir'
 .const int CURSOR_FAIL = -1
 .const int CURSOR_FAIL_GROUP = -2

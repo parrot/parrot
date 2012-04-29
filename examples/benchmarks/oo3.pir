@@ -25,7 +25,7 @@ loop:
 .end
 
 .sub init :vtable
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     $P10 = new 'Integer'
     $P10 = 10

@@ -15,8 +15,8 @@ Tests the C<StringIterator> PMC. Iterate over string in both directions.
 
 =cut
 
-.include 'iterator.pasm'
-.include 'except_types.pasm'
+.include 'iterator.pir'
+.include 'except_types.pir'
 
 .sub main :main
     .include 'test_more.pir'

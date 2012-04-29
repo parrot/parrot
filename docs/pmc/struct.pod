@@ -65,7 +65,7 @@ can be declared with this initializer:
 =begin PIR_FRAGMENT_INVALID
 
   new P2, 'ResizablePMCArray'
-  .include "datatypes.pasm"
+  .include "datatypes.pir"
   push P2, .DATATYPE_DOUBLE
   push P2, 0	# no array i.e. 1 element
   push P2, 0	# calculate offset by just adding item size
@@ -90,7 +90,7 @@ and by index:
 =begin PIR_FRAGMENT_INVALID
 
   new P2, 'OrderedHash'
-  .include "datatypes.pasm"
+  .include "datatypes.pir"
   set P2["d"], .DATATYPE_DOUBLE
   push P2, 0	# no array i.e. 1 element
   push P2, 0	# calculate offset by just adding item size

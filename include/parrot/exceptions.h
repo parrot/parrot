@@ -20,7 +20,7 @@
  * names.
  */
 
-/* &gen_from_enum(except_types.pasm) */
+/* &gen_from_enum(except_types.pir) */
 typedef enum {
     EXCEPTION_BAD_BUFFER_SIZE = 0x00000,
     EXCEPTION_MISSING_ENCODING_NAME,
@@ -101,7 +101,7 @@ typedef enum {
 
 /* &end_gen */
 
-/* &gen_from_enum(except_severity.pasm) subst(s/(\w+)/uc($1)/e) */
+/* &gen_from_enum(except_severity.pir) subst(s/(\w+)/uc($1)/e) */
 
 typedef enum {
     EXCEPT_normal  = 0,

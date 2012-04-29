@@ -15,9 +15,9 @@ Tests C<ByteBuffer> PMC..
 
 =cut
 
-.include 'iglobals.pasm'
-.include 'iterator.pasm'
-.include 'except_types.pasm'
+.include 'iglobals.pir'
+.include 'iterator.pir'
+.include 'except_types.pir'
 
 .sub 'main' :main
     .include 'test_more.pir'

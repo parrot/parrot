@@ -18,7 +18,7 @@ Tests the Packfile PMC.
 =cut
 
 .include 't/pmc/testlib/packfile_common.pir'
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .sub main :main
 .include 'test_more.pir'

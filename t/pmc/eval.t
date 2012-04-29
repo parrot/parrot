@@ -159,7 +159,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "check loaded lib hash" );
   load_bytecode "$temp_pbc"
   load_bytecode "$temp2_pbc"
   .local pmc pbc_hash, interp
-  .include 'iglobals.pasm'
+  .include 'iglobals.pir'
   interp = getinterp
   pbc_hash = interp[.IGLOBALS_PBC_LIBS]
   \$I0 = elements pbc_hash

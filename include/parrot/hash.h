@@ -24,7 +24,7 @@ typedef UINTVAL BucketIndex;
 #define HASH_ALLOC_SIZE(n) (N_BUCKETS(n) * sizeof (HashBucket) + \
                                      (n) * sizeof (HashBucket *))
 
-/* &gen_from_enum(hash_key_type.pasm) */
+/* &gen_from_enum(hash_key_type.pir) */
 typedef enum {
     Hash_key_type_int,
     Hash_key_type_cstring,

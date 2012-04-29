@@ -26,8 +26,8 @@ F<docs/pdds/pdd16_native_call.pod>.
 =cut
 
 .loadlib 'bit_ops'
-.include 'hash_key_type.pasm'
-.include 'datatypes.pasm'
+.include 'hash_key_type.pir'
+.include 'datatypes.pir'
 
 .macro_const VERSION 0.01
 

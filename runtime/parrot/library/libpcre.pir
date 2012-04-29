@@ -113,7 +113,7 @@ RETURN:
     struct = new 'FixedPMCArray'
     struct = 3
 
-    .include "datatypes.pasm"
+    .include "datatypes.pir"
 
     struct[0] = .DATATYPE_INT
     $I0 = ok * 2

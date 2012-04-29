@@ -153,7 +153,7 @@ For discussion about the source of entropy, see TT #64.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'parse'
     .param string target

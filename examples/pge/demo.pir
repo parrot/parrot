@@ -1,6 +1,6 @@
 # Copyright (C) 2005-2010, Parrot Foundation.
 
-.include "errors.pasm"
+.include "errors.pir"
 .sub _main
     .local string x
     .local string pattern

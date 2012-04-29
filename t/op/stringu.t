@@ -365,7 +365,7 @@ OUTPUT
 # Tests for .CCLASS_WHITESPACE
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );
 .sub main :main
-    .include 'cclass.pasm'
+    .include 'cclass.pir'
     .local string s
     s = utf8:" \t\u207babc\n\u2000\u2009"
     $I9 = length s
@@ -392,7 +392,7 @@ OUTPUT
 # Tests for .CCLASS_ANY
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_ANY in unicode" );
 .sub main :main
-    .include 'cclass.pasm'
+    .include 'cclass.pir'
     .local string s
     s = utf8:" \t\u207babc\n\u2000\u2009"
     $I9 = length s
@@ -424,7 +424,7 @@ SKIP: {
     # Tests for .CCLASS_NUMERIC
     pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_NUMERIC in unicode" );
 .sub main :main
-    .include 'cclass.pasm'
+    .include 'cclass.pir'
     .local string s
     s = utf8:"01\u207bxyz\u0660\u17e1\u19d9"
     $I9 = length s

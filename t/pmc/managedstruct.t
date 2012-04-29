@@ -45,7 +45,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
     #element access - float, double
     new $P2, ['ResizablePMCArray']
-    .include "datatypes.pasm"
+    .include "datatypes.pir"
     push $P2, .DATATYPE_FLOAT
     push $P2, 2	# 2 elem array
     push $P2, 0

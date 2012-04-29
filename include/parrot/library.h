@@ -23,7 +23,7 @@ typedef enum {
     PARROT_RUNTIME_FT_SOURCE  = 0x0F00
 } enum_runtime_ft;
 
-/* &gen_from_enum(libpaths.pasm) */
+/* &gen_from_enum(libpaths.pir) */
 typedef enum {
     PARROT_LIB_PATH_INCLUDE,            /* .include "foo" */
     PARROT_LIB_PATH_LIBRARY,            /* load_bytecode "bar" */

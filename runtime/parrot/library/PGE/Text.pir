@@ -14,7 +14,7 @@ also.)
 
 .namespace [ 'PGE';'Text' ]
 
-.include "cclass.pasm"
+.include "cclass.pir"
 
 .sub "__onload" :load
     .local pmc p6meta

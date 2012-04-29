@@ -27,7 +27,7 @@ it parent classes nor is it subclassed.
 =cut
 
 
-.include "timer.pasm"
+.include "timer.pir"
 .namespace ["Tetris::App"]
 
 .sub __onload :load

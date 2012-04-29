@@ -28,7 +28,7 @@ Tests math.ops
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     plan(66)
     ok(1, "load math_ops")
     rand $I0

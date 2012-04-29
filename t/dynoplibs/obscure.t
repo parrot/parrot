@@ -19,7 +19,7 @@ Tests obscure.ops
 .loadlib 'trans_ops'    # needed for atan
 
 .sub main :main
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     .include 'test_more.pir'
     plan(70)
     ok(1,"load obscure_ops")

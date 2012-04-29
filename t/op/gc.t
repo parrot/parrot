@@ -16,7 +16,7 @@ GC related bugs.
 
 =cut
 
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
 
 .sub main :main
     # XXX HACK

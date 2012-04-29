@@ -97,7 +97,7 @@ END:
     .param pmc writer
     .param string str
     .local pmc cont
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     cont = interpinfo .INTERPINFO_CURRENT_CONT
     assign self, cont
     writer(str)
@@ -116,7 +116,7 @@ END:
     temp = self."source"()
     $I0 = defined temp
     unless $I0 goto END
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, 'write_cont', $P0
 

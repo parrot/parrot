@@ -109,7 +109,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "is_whitespace" );
 .pcc_sub :main main:
     set S0, iso-8859-1:"a\t\n \xa0" # is 0xa0 a whitespace in iso-8859-1??
-    .include "cclass.pasm"
+    .include "cclass.pir"
     is_cclass I0, .CCLASS_WHITESPACE, S0, 0
     is_cclass I1, .CCLASS_WHITESPACE, S0, 1
     is_cclass I2, .CCLASS_WHITESPACE, S0, 2
@@ -142,7 +142,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_wordchar" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
@@ -159,7 +159,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_digit" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
@@ -176,7 +176,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_punctuation" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "az019-,._"
     length I1, S0
     set I2, 0
@@ -193,7 +193,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_newline" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "a\n"
     is_cclass I0, .CCLASS_NEWLINE, S0, 0
     print I0
@@ -207,7 +207,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_wordchar" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "_ ab 09"
     set I0, 0
     length I1, S0
@@ -227,7 +227,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_digit" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "_ ab 09"
     set I0, 0
     length I1, S0
@@ -247,7 +247,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "find_punctuation" );
 .pcc_sub :main main:
-    .include "cclass.pasm"
+    .include "cclass.pir"
     set S0, "_ .b ,9"
     set I0, 0
     length I1, S0
@@ -648,7 +648,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "chopn utf8" );
     length I0, S1
     print I0
     print ' '
-    .include "stringinfo.pasm"
+    .include "stringinfo.pir"
     stringinfo I0, S1, .STRINGINFO_BUFUSED
     print I0
     print "\n"
@@ -666,7 +666,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 append" );
     length I0, S1
     print I0
     print ' '
-    .include "stringinfo.pasm"
+    .include "stringinfo.pir"
     stringinfo I0, S1, .STRINGINFO_BUFUSED
     print I0
     print "\n"
@@ -689,7 +689,7 @@ pasm_output_is( <<'CODE', <<"OUTPUT", "utf16 concat" );
     length I0, S2
     print I0
     print ' '
-    .include "stringinfo.pasm"
+    .include "stringinfo.pir"
     stringinfo I0, S2, .STRINGINFO_BUFUSED
     print I0
     print "\n"

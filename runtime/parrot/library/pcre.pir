@@ -45,8 +45,8 @@ and is additionally stored as global 'PCRE', 'lib'.
 =cut
 
 .loadlib 'sys_ops'
-.include "sysinfo.pasm"
-.include 'datatypes.pasm'
+.include "sysinfo.pir"
+.include 'datatypes.pir'
 
 .sub init
     .local pmc libpcre

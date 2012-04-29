@@ -10,7 +10,7 @@
 /* These should be visible to embedders. */
 
 /* General flags */
-/* &gen_from_enum(interpflags.pasm) */
+/* &gen_from_enum(interpflags.pir) */
 typedef enum {
     PARROT_NO_FLAGS         = 0x00,
     PARROT_BOUNDS_FLAG      = 0x04,  /* We're tracking byte code bounds */
@@ -27,7 +27,7 @@ typedef enum {
 } Parrot_Interp_flag;
 /* &end_gen */
 
-/* &gen_from_enum(interpdebug.pasm) */
+/* &gen_from_enum(interpdebug.pir) */
 typedef enum {
     PARROT_NO_DEBUG                 = 0x00,
     PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
@@ -42,7 +42,7 @@ typedef enum {
 } Parrot_debug_flags;
 /* &end_gen */
 
-/* &gen_from_enum(interptrace.pasm) */
+/* &gen_from_enum(interptrace.pir) */
 typedef enum {
     PARROT_NO_TRACE                 = 0x00,
     PARROT_TRACE_OPS_FLAG           = 0x01,  /* op execution trace */
@@ -52,7 +52,7 @@ typedef enum {
 } Parrot_trace_flags;
 /* &end_gen */
 
-/* &gen_from_enum(interpcores.pasm) */
+/* &gen_from_enum(interpcores.pir) */
 typedef enum {
     PARROT_SLOW_CORE,                       /* slow bounds/trace core */
     PARROT_FUNCTION_CORE    = PARROT_SLOW_CORE,
@@ -67,7 +67,7 @@ typedef enum {
 } Parrot_Run_core_t;
 /* &end_gen */
 
-/* &gen_from_enum(cloneflags.pasm) */
+/* &gen_from_enum(cloneflags.pir) */
 typedef enum {
     PARROT_CLONE_CODE = 0x1,        /* active code segments
                                      * XXX interaction with lexicals
@@ -263,7 +263,7 @@ typedef enum {
     RESUME_INITIAL      = 0x04
 } resume_flag_enum;
 
-/* &gen_from_enum(iglobals.pasm) */
+/* &gen_from_enum(iglobals.pir) */
 typedef enum {
     IGLOBALS_CLASSNAME_HASH,
     IGLOBALS_COMPREG_HASH,

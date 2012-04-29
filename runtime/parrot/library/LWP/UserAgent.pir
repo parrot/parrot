@@ -463,7 +463,7 @@ see http://search.cpan.org/dist/libwww-perl/
   L2:
 .end
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'trim' :anon
     .param string str

@@ -871,7 +871,7 @@ INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
  * socket_unix.c and socket_win32.c for the mappings.
  */
 
-/* &gen_from_enum(socket.pasm) */
+/* &gen_from_enum(socket.pir) */
 typedef enum {
     PIO_PF_LOCAL    = 0,
     PIO_PF_UNIX     = 1,

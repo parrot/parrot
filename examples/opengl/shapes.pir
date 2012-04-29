@@ -24,8 +24,8 @@ ASCII key.
 
 
 .loadlib 'math_ops'
-.include 'datatypes.pasm'
-.include 'opengl_defines.pasm'
+.include 'datatypes.pir'
+.include 'opengl_defines.pir'
 
 .sub main :main
     .param pmc argv

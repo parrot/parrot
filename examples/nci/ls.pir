@@ -46,7 +46,7 @@ In this encarnation it works on linux i386 and amd64 systems.
 opened:
      .local pmc entry
 
-     .include "datatypes.pasm"
+     .include "datatypes.pir"
      new $P2, 'OrderedHash'
      set $P2["d_fileno"], .DATATYPE_LONG
      push $P2, 0

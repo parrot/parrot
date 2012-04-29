@@ -17,7 +17,7 @@ structure (a common vector length, especially for graphics).
 =cut
 
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 .sub main :main
     .param pmc argv

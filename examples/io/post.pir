@@ -1,7 +1,7 @@
 #!parrot
 # Copyright (C) 2010, Parrot Foundation.
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'send_archive_to_smolder' :main
     .local pmc config

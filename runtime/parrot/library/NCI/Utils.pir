@@ -73,7 +73,7 @@ this will tend to make the toolkit init function much happier.
 
 .namespace ['NCI'; 'Utils']
 
-.include 'datatypes.pasm'
+.include 'datatypes.pir'
 
 # TODO: this crashes rakudo
 # .sub _init_nci_utils :load

@@ -16,7 +16,7 @@ Tests OO features related to instantiating new objects.
 =cut
 
 .sub main :main
-    .include 'except_types.pasm'
+    .include 'except_types.pir'
     .include 'test_more.pir'
     plan(111)
 

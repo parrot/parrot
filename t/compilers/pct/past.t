@@ -153,7 +153,7 @@ pir_output_is( <<'CODE', <<'OUT', 'PAST::Val constant nodes' );
 CODE
 
 .namespace []
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "xyz"  :subid("xyz")
 .annotate 'line', 0
     .return (.CONTROL_NEXT)

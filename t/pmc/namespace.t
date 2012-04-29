@@ -51,7 +51,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
 =cut
 
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .namespace []
 
@@ -463,7 +463,7 @@ CODE
     is($S0, "Foo", "Get the namespace from a Sub in the NameSpace")
 
     # Get namespace from the current sub
-    .include 'interpinfo.pasm'
+    .include 'interpinfo.pir'
     $P0 = interpinfo .INTERPINFO_CURRENT_SUB
     $P1 = $P0."get_namespace"()
     $S0 = $P1

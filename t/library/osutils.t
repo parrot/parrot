@@ -19,7 +19,7 @@ Tests the C<osutils> runtime library.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    .include 'stat.pasm'
+    .include 'stat.pir'
 
     load_bytecode 'osutils.pir'
 

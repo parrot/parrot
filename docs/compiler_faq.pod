@@ -627,7 +627,7 @@ Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
 
 =begin PIR_FRAGMENT
 
-  .include 'except_severity.pasm'
+  .include 'except_severity.pir'
   # ...
   handler:
     .get_results ($P0)
@@ -758,7 +758,7 @@ Create a new C<Env> PMC and access it like a hash.
 
 =begin PIR_FRAGMENT
 
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc interp, cfg
     interp = getinterp
     cfg = interp[.IGLOBALS_CONFIG_HASH]

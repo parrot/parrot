@@ -75,7 +75,7 @@ Tests the Integer PMC.
 
     code = <<'CODE'
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .sub aux_get_max
     .local int m
     .local pmc pm
@@ -186,9 +186,9 @@ CODE
     throws_substring(<<'CODE', 'Integer overflow', 'mul integer overflow')
 
     .sub main :main
-        .include 'errors.pasm'
+        .include 'errors.pir'
         errorson .PARROT_ERRORS_OVERFLOW_FLAG
-        .include 'sysinfo.pasm'
+        .include 'sysinfo.pir'
         $I0 = sysinfo .SYSINFO_PARROT_INTMAX
 
         $P0 = new ['Integer']

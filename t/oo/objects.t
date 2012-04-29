@@ -17,8 +17,8 @@ Tests the object/class subsystem.
 
 .sub main :main
     .include 'test_more.pir'
-    .include "iglobals.pasm"
-    .include "interpinfo.pasm"
+    .include "iglobals.pir"
+    .include "interpinfo.pir"
 
     plan(191)
 

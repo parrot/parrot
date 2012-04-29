@@ -17,7 +17,7 @@ received the buffer is printed and the program is terminated.
 
 =cut
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 .loadlib 'io_ops'
 
 .sub "example" :main

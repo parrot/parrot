@@ -59,7 +59,7 @@ Column 6, if present, contains a description of what is being tested.
     load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
 
     # Variable declarations, initializations
     .local pmc test       # the test harness object.

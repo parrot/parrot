@@ -173,7 +173,7 @@ work with in C<code>.
 
 "Hello, world!" is so mundane, make it more fun.
 
-    .include "tm.pasm"
+    .include "tm.pir"
     .include "hllmacros.pir"
     .sub main :main
         $I0 = time

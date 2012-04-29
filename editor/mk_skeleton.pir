@@ -4,7 +4,7 @@
 # intended for people who hack on parrot itself, not users of parrot.
 
 .loadlib 'sys_ops'
-.include 'tm.pasm'
+.include 'tm.pir'
 
 .sub 'main' :main
     .local pmc timeArray

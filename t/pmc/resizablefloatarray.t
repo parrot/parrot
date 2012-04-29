@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'test' :main
     .include 'test_more.pir'
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
 
     plan(TESTS)
 

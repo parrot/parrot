@@ -278,7 +278,7 @@ subclasses to represent the tokens.
     $P0 = newclass ['TAP';'Parser';'Grammar']
 .end
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'trim' :anon
     .param string str
@@ -934,7 +934,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     rethrow ex
 .end
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub '_get_exec' :anon
     .param string line

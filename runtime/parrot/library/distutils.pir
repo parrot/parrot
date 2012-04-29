@@ -203,7 +203,7 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
 =cut
 
 .loadlib 'sys_ops'
-.include 'errors.pasm'
+.include 'errors.pir'
 
 .sub '__onload' :load :init :anon
     load_bytecode 'osutils.pbc'
@@ -4374,7 +4374,7 @@ Return the whole config
 
 =cut
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'get_config'
     $P0 = getinterp

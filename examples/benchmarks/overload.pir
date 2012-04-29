@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2009, Parrot Foundation.
 
 .sub bench :main
-.include "pmctypes.pasm"
+.include "pmctypes.pir"
    .local int i
    .local pmc r
    .local pmc a

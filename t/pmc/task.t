@@ -1,7 +1,7 @@
 #!./parrot
 # Copyright (C) 2010-2011, Parrot Foundation.
 
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .loadlib 'sys_ops'
 
 .sub main

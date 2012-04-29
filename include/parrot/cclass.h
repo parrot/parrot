@@ -11,7 +11,7 @@
 #ifndef PARROT_CCLASS_H_GUARD
 #define PARROT_CCLASS_H_GUARD
 
-/* &gen_from_enum(cclass.pasm) subst(s/enum_cclass_(\w+)/uc("CCLASS_$1")/e) */
+/* &gen_from_enum(cclass.pir) subst(s/enum_cclass_(\w+)/uc("CCLASS_$1")/e) */
 typedef enum {                           /* ASCII characters matching this class: */
 enum_cclass_any = 0xffff,                /* all */
 enum_cclass_none = 0x0000,               /* none */

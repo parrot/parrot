@@ -3595,7 +3595,7 @@ DO_QUINE:
 .sub print_code_as_data
 
     .param string program_name
-    .include "stat.pasm"
+    .include "stat.pir"
 
     .local pmc code_fh
     .local int size
@@ -3628,7 +3628,7 @@ DO_QUINE:
 
     .param pmc data
 
-   .include "iterator.pasm"
+   .include "iterator.pir"
    .local pmc it
    .local int char_int
 
@@ -3648,7 +3648,7 @@ DO_QUINE:
 
     .param pmc data
 
-   .include "iterator.pasm"
+   .include "iterator.pir"
 
    .local pmc it
     it = iter data

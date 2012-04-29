@@ -353,7 +353,7 @@ To access a sub's C<:outer> subroutine, use the C<get_outer()> method:
 
 =begin PIR_FRAGMENT
 
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1."get_outer"()
 

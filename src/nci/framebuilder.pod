@@ -44,7 +44,7 @@ Thunks are generated lazily on demand and cached. Generally, only one thunk will
 NCI signature. The cache is held in C<iglobals> under C<NCI_FUNCS>. This cache can be operated on
 directly, for example, clearing the cache is possible by running the following PIR code:
 
-  .include 'iglobals.pasm'
+  .include 'iglobals.pir'
   .sub 'clear-nci-cache'
     $P0 = getinterp
     $P0 = $P0[.IGLOBALS_NCI_FUNCS]

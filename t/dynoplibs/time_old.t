@@ -32,7 +32,7 @@ pasm_output_is( <<'CODE', $year, "decodelocaltime" );
 .loadlib 'sys_ops'
     time I0
     decodelocaltime P0, I0
-    .include "tm.pasm"
+    .include "tm.pir"
     set I0, P0[.TM_YEAR]
     print I0
     end

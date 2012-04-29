@@ -121,7 +121,7 @@ endfor:
 
 	#####################################################
 	# Final replace to make the sequence a p5 style regex
-	.include "iterator.pasm"
+	.include "iterator.pir"
 	it = iter iub
 	set it, .ITERATE_FROM_START
 	matches = new 'ResizablePMCArray'

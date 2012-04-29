@@ -177,7 +177,7 @@ void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
 /* HEADERIZER END: src/scheduler.c */
 
 /* Timer PMC interface constants */
-/* &gen_from_enum(timer.pasm) */
+/* &gen_from_enum(timer.pir) */
 typedef enum {
     PARROT_TIMER_SEC,
     PARROT_TIMER_USEC,
@@ -193,7 +193,7 @@ typedef enum {
 /* &end_gen */
 
 /* Alarm PMC interface constants */
-/* &gen_from_enum(alarm.pasm) */
+/* &gen_from_enum(alarm.pir) */
 /* TODO: Figure out how to actually gen alarm.pasm
 typedef enum {
     PARROT_ALARM_TIME,

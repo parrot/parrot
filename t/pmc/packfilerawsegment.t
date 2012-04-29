@@ -22,7 +22,7 @@ Tests the PackfileRawSegment PMC.
 # get_integer_keyed_int doesn't return all zeroes either.
 
 .include 't/pmc/testlib/packfile_common.pir'
-.include 'packfile_segments.pasm'
+.include 'packfile_segments.pir'
 .sub 'main' :main
 .include 'test_more.pir'
     plan(7)

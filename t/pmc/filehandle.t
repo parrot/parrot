@@ -105,7 +105,7 @@ is_closed after close: 1
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .sub main :main
     .local pmc fh, eh
@@ -709,7 +709,7 @@ ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
-.include 'except_types.pasm'
+.include 'except_types.pir'
 .sub main :main
     .local pmc fh, eh
     fh = new ['FileHandle']
@@ -777,7 +777,7 @@ utf8
 OUTPUT
 
 pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 .sub 'main' :main
     .local pmc pipe, conf, interp
     .local string cmd

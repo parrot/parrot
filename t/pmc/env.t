@@ -112,7 +112,7 @@ loopend:
     #skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
 .sub exists_delete
 
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc config_hash, interp
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]

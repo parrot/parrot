@@ -23,7 +23,7 @@ Tests find_cclass find_not_cclass, is_cclass.
 =cut
 
 pir_output_is( <<'CODE', <<'OUT', "find_cclass, ascii" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
@@ -55,7 +55,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "find_not_cclass, ascii" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S0 = ascii:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
@@ -87,7 +87,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "find_cclass, iso-8859-1" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
@@ -119,7 +119,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "find_not_cclass, iso-8859-1" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S0 = iso-8859-1:"test_func(1)"
     test( .CCLASS_WORD, $S0 )
@@ -151,7 +151,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "is_cclass, ascii" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S1 = ascii:"ab\nC_X34.\0 \t!"
     test1( $S1 )
@@ -214,7 +214,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "is_cclass, iso-8859-1" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S1 = iso-8859-1:"ab\nC_X34.\0 \t!"
     test1( $S1 )
@@ -318,7 +318,7 @@ SKIP: {
         unless $PConfig{has_icu};
     pir_output_is( <<"CODE", <<'OUT', "unicode is_cclass whitespace" );
 .sub main :main
-.include "cclass.pasm"
+.include "cclass.pir"
    .local int result, char, len, i
    .local string s
    s = $all_ws
@@ -345,7 +345,7 @@ OUT
 
     pir_output_is( <<"CODE", <<'OUT', "unicode find_ccclass whitespace" );
 .sub main :main
-.include "cclass.pasm"
+.include "cclass.pir"
    .local int result, char, len, i
    .local string s
    s = $all_ws
@@ -361,7 +361,7 @@ OUT
 
     pir_output_is( <<"CODE", <<'OUT', "unicode find_not_ccclass whitespace" );
 .sub main :main
-.include "cclass.pasm"
+.include "cclass.pir"
    .local int result, char, len, i
    .local string s
    s = $all_ws
@@ -381,7 +381,7 @@ OUT
 # The following should pass even if ICU is unavailable  (pmichaud, 2005-11-3)
 pir_output_is( <<"CODE", <<'OUT', "unicode 0-127 find_*_cclass whitespace" );
 .sub main :main
-.include "cclass.pasm"
+.include "cclass.pir"
    .local int result, char, len, i
    .local string s
    s = utf8:"abc   def"
@@ -400,7 +400,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "is_cclass, unicode first codepage" );
-.include "cclass.pasm"
+.include "cclass.pir"
 .sub main :main
     $S1 = utf8:"ab\nC_X34.\0 \t!"
     test1( $S1 )

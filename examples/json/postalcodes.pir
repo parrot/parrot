@@ -16,7 +16,7 @@ places with that code from around the world.
 
 =cut
 
-.include 'socket.pasm'
+.include 'socket.pir'
 .loadlib 'io_ops'
 
 .sub _main :main

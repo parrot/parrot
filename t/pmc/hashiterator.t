@@ -17,8 +17,8 @@ well.
 
 =cut
 
-.include 'hash_key_type.pasm'
-.include 'except_types.pasm'
+.include 'hash_key_type.pir'
+.include 'except_types.pir'
 
 .sub main :main
     .include 'test_more.pir'

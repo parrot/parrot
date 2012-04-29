@@ -121,8 +121,8 @@ pir_output_is( <<'CODE', <<'OUT', 'Generate directives' );
     .local pmc node
     node = new ['POST';'Sub']
     node.'name'('foo')
-    node.'add_directive'('.include "cclass.pasm"')
-    node.'add_directive'('.include "exception_types.pasm"')
+    node.'add_directive'('.include "cclass.pir"')
+    node.'add_directive'('.include "exception_types.pir"')
 
     .local pmc compiler
     compiler = new ['POST';'Compiler']
@@ -133,8 +133,8 @@ pir_output_is( <<'CODE', <<'OUT', 'Generate directives' );
 CODE
 
 .namespace []
-.include "cclass.pasm"
-.include "exception_types.pasm"
+.include "cclass.pir"
+.include "exception_types.pir"
 .sub "foo"  :subid("post10")
 .end
 

@@ -15,7 +15,7 @@ for parrot code in
 =begin PIR_FRAGMENT
 
   $P0 = getinterp
-  .include 'iglobals.pasm'
+  .include 'iglobals.pir'
   $P1 = $P0[.IGLOBALS_CONFIG_HASH]
   $P2 = $P1["byteorder"]
 

@@ -18,7 +18,7 @@ this is stored in a global.
 
 =cut
 
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
 
 .sub th_init
     $P0 = new 'ResizablePMCArray'

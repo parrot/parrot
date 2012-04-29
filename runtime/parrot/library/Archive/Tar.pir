@@ -35,7 +35,7 @@ See L<http://search.cpan.org/dist/Archive-Tar/>
 
 =cut
 
-.include 'stat.pasm'
+.include 'stat.pir'
 .loadlib 'io_ops'
 
 =head3 Class Archive;Tar;File
@@ -89,7 +89,7 @@ Returns a new ['Archive';'Tar';'File'] object from an existing file.
 
 =cut
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'new_from_file'
     .param string path

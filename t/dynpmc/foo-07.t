@@ -5,7 +5,7 @@
     .include 'test_more.pir'
     plan(3)
 
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc config_hash, interp
     .local pmc d, l, r
     interp = getinterp

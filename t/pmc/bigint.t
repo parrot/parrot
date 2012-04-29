@@ -56,9 +56,9 @@ Tests the BigInt PMC.
   done:
 .end
 
-.include 'iglobals.pasm'
-.include 'fp_equality.pasm'
-.include 'errors.pasm'
+.include 'iglobals.pir'
+.include 'fp_equality.pir'
+.include 'errors.pir'
 
 .sub check_libgmp_good
     # check libgmp included in Parrot build

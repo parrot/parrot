@@ -19,8 +19,8 @@ table, which should be created by your sysadmin.
 .const int N_TESTS = 43
 
 ## XXX
-## .include 'postgres.pasm'
-.include 'iglobals.pasm'
+## .include 'postgres.pir'
+.include 'iglobals.pir'
 .const int CONNECTION_OK = 0
 
 .const int PGRES_COMMAND_OK = 1

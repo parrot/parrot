@@ -18,7 +18,7 @@ it to become ready for an I/O operation.
 
 .sub main :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
 
     load_bytecode 'osutils.pbc'
 

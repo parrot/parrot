@@ -201,7 +201,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Grammar"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "obs"  :subid("12_1309998843.21663") :method :outer("11_1309998843.21663")
     .param pmc param_1007
     .param pmc param_1008
@@ -9310,7 +9310,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "buildsub"  :subid("12_1309998845.12722") :outer("11_1309998845.12722")
     .param pmc param_1009
     .param pmc param_1010 :optional
@@ -9412,7 +9412,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "capnames"  :subid("13_1309998845.12722") :outer("11_1309998845.12722")
     .param pmc param_1024
     .param pmc param_1025
@@ -9559,7 +9559,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1108"  :anon :subid("24_1309998845.12722") :outer("13_1309998845.12722")
 .annotate 'line', 579
     .const 'Sub' $P1114 = "25_1309998845.12722" 
@@ -9642,7 +9642,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1083"  :anon :subid("21_1309998845.12722") :outer("13_1309998845.12722")
 .annotate 'line', 562
     .const 'Sub' $P1100 = "23_1309998845.12722" 
@@ -9834,7 +9834,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1068"  :anon :subid("19_1309998845.12722") :outer("13_1309998845.12722")
 .annotate 'line', 549
     .const 'Sub' $P1076 = "20_1309998845.12722" 
@@ -9942,7 +9942,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1052"  :anon :subid("17_1309998845.12722") :outer("13_1309998845.12722")
     .param pmc param_1056
 .annotate 'line', 541
@@ -10040,7 +10040,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1030"  :anon :subid("14_1309998845.12722") :outer("13_1309998845.12722")
 .annotate 'line', 527
     .const 'Sub' $P1034 = "15_1309998845.12722" 
@@ -10088,7 +10088,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1033"  :anon :subid("15_1309998845.12722") :outer("14_1309998845.12722")
     .param pmc param_1037
 .annotate 'line', 529
@@ -10224,7 +10224,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backmod"  :subid("26_1309998845.12722") :outer("11_1309998845.12722")
     .param pmc param_1125
     .param pmc param_1126
@@ -10298,7 +10298,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "arg"  :subid("27_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1136
 .annotate 'line', 14
@@ -10354,7 +10354,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "arglist"  :subid("28_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1144
 .annotate 'line', 18
@@ -10434,7 +10434,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "TOP"  :subid("30_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1154
 .annotate 'line', 24
@@ -10477,7 +10477,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "nibbler"  :subid("31_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1160
     .param pmc param_1161 :optional
@@ -10600,7 +10600,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1164"  :anon :subid("32_1309998845.12722") :outer("31_1309998845.12722")
 .annotate 'line', 32
     $P1167 = root_new ['parrot';'Hash']
@@ -10656,7 +10656,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "termconj"  :subid("34_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1183
 .annotate 'line', 52
@@ -10773,7 +10773,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "termish"  :subid("36_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1197
 .annotate 'line', 66
@@ -10978,7 +10978,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quantified_atom"  :subid("38_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1220
 .annotate 'line', 87
@@ -11140,7 +11140,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "atom"  :subid("40_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1244
 .annotate 'line', 102
@@ -11219,7 +11219,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quantifier:sym<*>"  :subid("41_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1255
 .annotate 'line', 112
@@ -11260,7 +11260,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quantifier:sym<+>"  :subid("42_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1261
 .annotate 'line', 117
@@ -11301,7 +11301,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quantifier:sym<?>"  :subid("43_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1267
 .annotate 'line', 122
@@ -11346,7 +11346,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quantifier:sym<**>"  :subid("44_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1273
 .annotate 'line', 128
@@ -11560,7 +11560,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<ws>"  :subid("46_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1301
 .annotate 'line', 157
@@ -11613,7 +11613,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<[ ]>"  :subid("47_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1309
 .annotate 'line', 166
@@ -11645,7 +11645,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<( )>"  :subid("48_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1314
 .annotate 'line', 170
@@ -11695,7 +11695,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<'>"  :subid("49_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1321
 .annotate 'line', 177
@@ -11770,7 +11770,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<\">"  :subid("50_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1332
 .annotate 'line', 185
@@ -11845,7 +11845,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<.>"  :subid("51_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1343
 .annotate 'line', 193
@@ -11877,7 +11877,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<^>"  :subid("52_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1348
 .annotate 'line', 198
@@ -11909,7 +11909,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<^^>"  :subid("53_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1353
 .annotate 'line', 203
@@ -11941,7 +11941,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<$>"  :subid("54_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1358
 .annotate 'line', 208
@@ -11973,7 +11973,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<$$>"  :subid("55_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1363
 .annotate 'line', 213
@@ -12005,7 +12005,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<:::>"  :subid("56_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1368
 .annotate 'line', 218
@@ -12037,7 +12037,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<lwb>"  :subid("57_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1373
 .annotate 'line', 223
@@ -12069,7 +12069,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<rwb>"  :subid("58_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1378
 .annotate 'line', 228
@@ -12101,7 +12101,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<bs>"  :subid("59_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1383
 .annotate 'line', 233
@@ -12133,7 +12133,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<mod>"  :subid("60_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1388
 .annotate 'line', 237
@@ -12165,7 +12165,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<assert>"  :subid("61_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1393
 .annotate 'line', 241
@@ -12197,7 +12197,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<~>"  :subid("62_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1398
 .annotate 'line', 245
@@ -12259,7 +12259,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<{*}>"  :subid("63_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1405
 .annotate 'line', 258
@@ -12321,7 +12321,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<var>"  :subid("64_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1414
 .annotate 'line', 265
@@ -12485,7 +12485,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "metachar:sym<PIR>"  :subid("65_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1433
 .annotate 'line', 285
@@ -12524,7 +12524,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<w>"  :subid("66_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1438
 .annotate 'line', 293
@@ -12592,7 +12592,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<b>"  :subid("67_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1447
 .annotate 'line', 299
@@ -12636,7 +12636,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<e>"  :subid("68_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1453
 .annotate 'line', 305
@@ -12680,7 +12680,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<f>"  :subid("69_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1459
 .annotate 'line', 311
@@ -12724,7 +12724,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<h>"  :subid("70_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1465
 .annotate 'line', 317
@@ -12768,7 +12768,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<r>"  :subid("71_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1471
 .annotate 'line', 323
@@ -12812,7 +12812,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<t>"  :subid("72_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1477
 .annotate 'line', 329
@@ -12856,7 +12856,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<v>"  :subid("73_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1483
 .annotate 'line', 335
@@ -12900,7 +12900,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<o>"  :subid("74_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1489
 .annotate 'line', 342
@@ -12984,7 +12984,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<x>"  :subid("75_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1500
 .annotate 'line', 351
@@ -13068,7 +13068,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<c>"  :subid("76_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1511
 .annotate 'line', 360
@@ -13103,7 +13103,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "backslash:sym<misc>"  :subid("77_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1516
 .annotate 'line', 364
@@ -13137,7 +13137,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<?>"  :subid("78_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1521
 .annotate 'line', 370
@@ -13198,7 +13198,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<!>"  :subid("79_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1529
 .annotate 'line', 380
@@ -13267,7 +13267,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<method>"  :subid("80_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1537
 .annotate 'line', 393
@@ -13311,7 +13311,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<name>"  :subid("81_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1543
 .annotate 'line', 400
@@ -13539,7 +13539,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "assertion:sym<[>"  :subid("84_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1571
 .annotate 'line', 434
@@ -13718,7 +13718,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "cclass_elem"  :subid("86_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1589
 .annotate 'line', 461
@@ -13970,7 +13970,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "mod_internal"  :subid("90_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1619
 .annotate 'line', 499
@@ -14070,7 +14070,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "subrule_alias"  :subid("91_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1635
     .param pmc param_1636
@@ -14115,7 +14115,7 @@ Regex::P6Regex - Parser/compiler for Perl 6 regexes
 
 
 .namespace ["Regex";"P6Regex";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "named_assertion"  :subid("92_1309998845.12722") :method :outer("11_1309998845.12722")
     .param pmc param_1641
 .annotate 'line', 603

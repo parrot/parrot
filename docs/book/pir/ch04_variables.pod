@@ -1328,7 +1328,7 @@ iterator PMC to the value of the constant:
 
 =begin PIR_FRAGMENT
 
-      .include "iterator.pasm"
+      .include "iterator.pir"
 
       # ...
 
@@ -1343,7 +1343,7 @@ checks the boolean value of the iterator and another unconditional C<goto>:
 
 =begin PIR_FRAGMENT
 
-      .include "iterator.pasm"
+      .include "iterator.pir"
       $P2 = new "ResizablePMCArray"
       push $P2, "a"
       push $P2, "b"

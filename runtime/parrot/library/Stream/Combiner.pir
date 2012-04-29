@@ -49,7 +49,7 @@ END:
     .return(ret)
 .end
 
-.include "iterator.pasm"
+.include "iterator.pir"
 
 .namespace ['Stream'; 'Combiner']
 

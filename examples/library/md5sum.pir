@@ -49,7 +49,7 @@ next_iter:
     if $I1 > $I0 goto iter_done
     .local string file
     file = args[$I1]
-    .include "stat.pasm"
+    .include "stat.pir"
     # Get size of file
     .local pmc os, stat_buf
     os = new ['OS']

@@ -76,7 +76,7 @@ typedef void (*gc_object_fn_type)(PARROT_INTERP, ARGMOD(struct Memory_Pools *),
                 ARGIN(struct Fixed_Size_Pool *), ARGMOD(PObj *));
 
 
-/* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
+/* &gen_from_enum(interpinfo.pir) prefix(INTERPINFO_) */
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,

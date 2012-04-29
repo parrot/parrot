@@ -19,7 +19,7 @@ TT1465 - http://trac.parrot.org/parrot/ticket/1465 .
 
 # 20:57 <chromatic> For every million PMCs allocated, see that the GC has performed a mark/sweep.
 
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
 
 .sub _main :main
     .include 'test_more.pir'

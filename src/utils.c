@@ -512,7 +512,7 @@ Parrot_util_srand(INTVAL seed)
 }
 
 
-/* &gen_from_enum(tm.pasm) */
+/* &gen_from_enum(tm.pir) */
 typedef enum {
     TM_SEC,
     TM_MIN,

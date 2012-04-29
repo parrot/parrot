@@ -154,7 +154,7 @@ ok 5 - destination() with non-namespace arg throws exception
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'globals - invalid' );
-.include 'except_types.pasm'
+.include 'except_types.pir'
 .sub 'test' :main
     $P0 = new ['Exporter']
     $P1 = new ['Undef']
@@ -289,7 +289,7 @@ CODE
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'import - null destination' );
-.include 'except_types.pasm'
+.include 'except_types.pir'
 .sub 'test' :main
     load_bytecode 'Test/More.pbc'
     .local pmc exporter, src, dest, excep

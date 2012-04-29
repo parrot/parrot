@@ -248,7 +248,7 @@ ok 6 - read string back from file
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'print' );
-.include 'except_types.pasm'
+.include 'except_types.pir'
 .sub 'test' :main
     .local pmc sh, eh
     .local int result

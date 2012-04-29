@@ -22,7 +22,7 @@ Tests the C<Coroutine> PMC.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     new P10, ['Integer']
@@ -106,7 +106,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
@@ -145,7 +145,7 @@ catch main
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
@@ -184,7 +184,7 @@ catch coro
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
@@ -220,7 +220,7 @@ catch main
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm

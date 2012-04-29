@@ -484,7 +484,7 @@ Tests various transcendental operations
 .end
 
 .sub integer_overflow_with_pow
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
 
     # Check that we aren't 32-bit INTVALs without GMP
     .local pmc interp     # a handle to our interpreter object.

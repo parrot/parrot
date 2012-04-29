@@ -458,7 +458,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too few" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new 'String'
     $P0 = "hello\n"
@@ -477,7 +477,7 @@ OUTPUT
 pir_output_like(
     <<'CODE', <<'OUTPUT', "argc mismatch, too many - no getparams", todo => 'no get_params at all' );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     foo(5)
 .end
@@ -493,7 +493,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - force ge
     get_params '()'
 .endm
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     foo(5)
 .end
@@ -507,7 +507,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new 'String'
     $P0 = "hello\n"
@@ -525,7 +525,7 @@ OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, too many - catch exception" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new 'String'
     $P0 = "hello\n"
@@ -553,7 +553,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P0 = new 'String'
     $P0 = "hello\n"
@@ -576,7 +576,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch, optional" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     .local pmc ar
     ar = new 'ResizableIntegerArray'
@@ -1186,7 +1186,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "right number of args via :flat" );
     print "\n"
 .end
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P30 = new 'Integer'
     $P30 = 2
@@ -1219,7 +1219,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args via :flat" );
     print "\n"
 .end
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P30 = new 'Integer'
     $P30 = 2
@@ -1245,7 +1245,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too many args and :optional" );
     .param int have_opt   :opt_flag
 .end
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P35 = _fn1(1, 2, 3, 4)
 .end
@@ -1269,7 +1269,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "too few args via :flat" );
     print "\n"
 .end
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
     $P30 = new 'Integer'
     $P30 = 2
@@ -1601,7 +1601,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_args via continuation -> results" );
 .sub foo
     .param string s
     .local pmc cc
-    .include 'interpinfo.pasm'
+    .include 'interpinfo.pir'
     cc = interpinfo .INTERPINFO_CURRENT_CONT
     bar(cc, s)
 .end
@@ -2171,7 +2171,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', qr/too few named arguments/, "argc mismatch - missing named" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
         foo ('b'=>10)
         print "ok\n"
@@ -2189,7 +2189,7 @@ CODE
 
 pir_error_output_like( <<'CODE', qr/too few named arguments/, "argc mismatch - missing named" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
         foo ('a'=>10)
         print "ok\n"
@@ -2207,7 +2207,7 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - too many named" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
         foo ('a'=>10, 'b'=>20, 'c'=>30)
         print "ok\n"
@@ -2227,7 +2227,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "argc mismatch - duplicate named" );
 .sub main :main
-    .include "errors.pasm"
+    .include "errors.pir"
     errorson .PARROT_ERRORS_PARAM_COUNT_FLAG
         foo ('a'=>10, 'b'=>20, 'a'=>30)
         print "ok\n"

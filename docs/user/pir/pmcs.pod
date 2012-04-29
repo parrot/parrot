@@ -318,7 +318,7 @@ distribution (parrot/docs)
 
 =begin PIR
 
-    .include 'timer.pasm'                   # for the timer constants
+    .include 'timer.pir'                   # for the timer constants
 
     .sub expired
        say 'Timer has expired!'

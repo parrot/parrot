@@ -15,9 +15,9 @@ IPv6-related tests for the Socket PMC.
 
 =cut
 
-.include 'socket.pasm'
-.include 'iglobals.pasm'
-.include 'errors.pasm'
+.include 'socket.pir'
+.include 'iglobals.pir'
+.include 'errors.pir'
 
 
 

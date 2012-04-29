@@ -19,7 +19,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    .include 'iglobals.pasm'
+    .include 'iglobals.pir'
     .local pmc config_hash, interp
 
     interp = getinterp
@@ -49,7 +49,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     ok($I0, 'isa Handle')
 .end
 
-.include 'stat.pasm'
+.include 'stat.pir'
 
 .sub 'test_stream'
     $P0 = new 'FileHandle'

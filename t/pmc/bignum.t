@@ -137,7 +137,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "clone equality" );
 .pcc_sub :main main:
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     new P0, ['BigNum']
     set P0, 56.743
     clone P1, P0
@@ -153,7 +153,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "inc/dec" );
 .pcc_sub :main main:
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     new P0, ['BigNum']
     set P0, 5.5
     inc P0
@@ -176,7 +176,7 @@ OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
 .pcc_sub :main main:
-     .include 'fp_equality.pasm'
+     .include 'fp_equality.pir'
      new P0, ['BigNum']
      set P0, 999999
      set N1, P0
@@ -439,7 +439,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i_subtract routine with immediate values' );
 .pcc_sub :main main:
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     new P0, ['BigNum']
     new P1, ['BigNum']
     set P0, 400
@@ -723,7 +723,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_divide" );
 .pcc_sub :main main:
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     new P0, ['BigNum']
     new P1, ['BigNum']
     set P0, 10000000000
@@ -778,7 +778,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "floor_divide", todo => 'undiagnosed bug in floor division; no floor division is actually done.' );
 .pcc_sub :main main:
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     new P0, ['BigNum']
     new P1, ['Integer']
     set P0, 10
@@ -890,7 +890,7 @@ exception thrown
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "pow method" );
-.include 'fp_equality.pasm'
+.include 'fp_equality.pir'
 .sub main :main
     $P0 = new ['BigNum']
     $P1 = new ['Integer']

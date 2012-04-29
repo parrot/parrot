@@ -49,7 +49,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
     eq I5, 0, endfunc
     dec I5
 
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     interpinfo P0, .INTERPINFO_CURRENT_SUB
     set_args "0", I5
     invokecc P0  # recursive invoke
@@ -734,7 +734,7 @@ OUTPUT
 
 pir_output_like( <<'CODE', '/Stringifying an Undef PMC/', 'warn on in main' );
 .sub _main :main
-.include "warnings.pasm"
+.include "warnings.pir"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f1()
 .end
@@ -746,7 +746,7 @@ CODE
 
 pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub" );
 .sub _main :main
-.include "warnings.pasm"
+.include "warnings.pir"
     _f1()
     $P0 = new ['Undef']
     print $P0
@@ -761,7 +761,7 @@ OUTPUT
 
 pir_output_like( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
 .sub _main :main
-.include "warnings.pasm"
+.include "warnings.pir"
     _f1()
     $P0 = new ['Undef']
     say "back"
@@ -786,7 +786,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
 .pcc_sub :main main:
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
@@ -813,7 +813,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     print "never\n"
     noop
 .pcc_sub :main main:
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     interpinfo P20, .INTERPINFO_CURRENT_SUB
     print P20
     print "\n"
@@ -837,7 +837,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
 .sub main :main
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     # this test will fail when run with -Oc
     # as the call chain is cut down with tail calls
     foo()
@@ -1035,7 +1035,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "__get_regs_used 1" );
 .sub main :main
     .local pmc m
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     m = interpinfo .INTERPINFO_CURRENT_SUB
     $I0 = m."__get_regs_used"('N')
     print $I0
@@ -1058,7 +1058,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "__get_regs_used 2" );
 .end
 .sub foo
     .local pmc m
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     m = interpinfo .INTERPINFO_CURRENT_SUB
     set $N0, 1.0
     set $N7, 1.0
@@ -1083,7 +1083,7 @@ OUTPUT
 
 pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main' );
 .sub 'test' :main
-.include "warnings.pasm"
+.include "warnings.pir"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
     _f1()
 .end
@@ -1097,7 +1097,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
 .sub 'test' :main
-.include "warnings.pasm"
+.include "warnings.pir"
     _f1()
     \$P0 = new ['Undef']
     print \$P0
@@ -1112,7 +1112,7 @@ OUTPUT
 
 pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2' );
 .sub 'test' :main
-.include "warnings.pasm"
+.include "warnings.pir"
     _f1()
     \$P0 = new ['Undef']
     say "back"

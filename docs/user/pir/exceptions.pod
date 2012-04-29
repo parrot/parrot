@@ -25,8 +25,8 @@ Put all together, it looks like this:
 
 =begin PIR_FRAGMENT
 
-    .include 'except_types.pasm'
-    .include 'except_severity.pasm'
+    .include 'except_types.pir'
+    .include 'except_severity.pir'
 
     .local pmc ex
     ex = new 'Exception'
@@ -91,7 +91,7 @@ an appropriate log message before exiting.
 
 =begin PIR
 
-    .include 'except_severity.pasm'
+    .include 'except_severity.pir'
 
     .sub 'dostuff'
         .local pmc eh

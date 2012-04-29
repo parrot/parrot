@@ -19,7 +19,7 @@ Test some simple grammars.
     load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Perl6Grammar.pbc'
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
 
     .local pmc test, todo_tests, todo_desc, grammar, expr, description, test_num
 

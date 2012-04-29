@@ -83,8 +83,8 @@ at the pio.
 .const string LFLF     = "\n\n"
 .const string CRCR     = "\r\r"
 
-.include "stat.pasm"
-.include 'io_thr_msg.pasm'
+.include "stat.pir"
+.include 'io_thr_msg.pir'
 
 =back
 

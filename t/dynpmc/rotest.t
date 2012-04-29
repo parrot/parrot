@@ -22,7 +22,7 @@ Tests automatically generated read-only PMC support.
 =cut
 
 my $library = <<'CODE';
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub make_readonly
     .param pmc arg
     .local pmc one

@@ -6,7 +6,7 @@
     plan(1)
 
     ## get load_ext in $S0.
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     $P11 = getinterp
     $P12 = $P11[.IGLOBALS_CONFIG_HASH]
     $S0 = $P12["load_ext"]

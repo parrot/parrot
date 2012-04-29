@@ -86,7 +86,7 @@ see http://search.cpan.org/dist/libwww-perl/
 .namespace ['LWP';'Protocol';'file']
 
 .loadlib 'io_ops'
-.include 'stat.pasm'
+.include 'stat.pir'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'file']
@@ -278,8 +278,8 @@ see http://search.cpan.org/dist/libwww-perl/
 
 .namespace ['LWP';'Protocol';'http']
 
-.include 'socket.pasm'
-.include 'cclass.pasm'
+.include 'socket.pir'
+.include 'cclass.pir'
 
 .sub '' :init :load :anon
     $P0 = subclass ['LWP';'Protocol'], ['LWP';'Protocol';'http']

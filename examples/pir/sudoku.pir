@@ -321,7 +321,7 @@ n_deb:
     .return (opt)
 .end
 
-.include "iterator.pasm"
+.include "iterator.pir"
 
 # return one of the builtin games
 .sub builtin_game

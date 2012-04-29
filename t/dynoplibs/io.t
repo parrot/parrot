@@ -109,7 +109,7 @@ CODE
 .sub 'tt661_todo_test' :anon
     # As of r41963, these tests need to be todo'ed at least on Win32. Add new
     # platforms known to fail.
-    .include 'sysinfo.pasm'
+    .include 'sysinfo.pir'
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto tt661_todo
 
@@ -119,7 +119,7 @@ CODE
     .return (1)
 .end
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'open_pipe_for_reading'
     .local pmc interp
@@ -401,7 +401,7 @@ CODE
 .end
 
 .sub 'test_peek'
-    .include 'stat.pasm'
+    .include 'stat.pir'
 
     $I0 = stat 'README', .STAT_FILESIZE
     $P0 = open 'README', 'r'
@@ -535,7 +535,7 @@ OUTPUT
 
 .sub 'stat_tests'
     .const string description = 'stat failed'
-    .include "stat.pasm"
+    .include "stat.pir"
 
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto run_win32_stat_tests

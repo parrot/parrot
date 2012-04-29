@@ -28,8 +28,8 @@ pin/unpin
 
 =cut
 
-.include 'stringinfo.pasm'
-.include 'interpinfo.pasm'
+.include 'stringinfo.pir'
+.include 'interpinfo.pir'
 
 .const int TESTS = 7
 

@@ -15,7 +15,7 @@ Testing Perl 6 objects.
 
 =cut
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'main' :main
     load_bytecode 'Test/More.pbc'

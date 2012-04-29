@@ -38,7 +38,7 @@ Pure PIR, without any dependencies.
 =cut
 
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 
 .sub 'genfile'
     .param string tmpl
@@ -317,7 +317,7 @@ Pure PIR, without any dependencies.
     .tailcall idf(str, pos, end, config)
 .end
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub 'idf' :anon
     .param string str

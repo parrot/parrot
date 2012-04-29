@@ -22,7 +22,7 @@ keyboard handling has been removed.
 =cut
 
 
-.include 'opengl_defines.pasm'
+.include 'opengl_defines.pir'
 
 .sub main :main
     .param pmc argv

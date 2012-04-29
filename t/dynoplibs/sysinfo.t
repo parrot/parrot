@@ -98,7 +98,7 @@ end
 CODE
         pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .sub main :main
     \$I0 = sysinfo .$_->{pir_key}
     print \$I0
@@ -121,7 +121,7 @@ end
 CODE
         pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .sub main :main
     \$S0 = sysinfo .$_->{pir_key}
     print \$S0
@@ -179,7 +179,7 @@ TODO:
 
     pasm_output_is( <<'CODE', "$PConfig{archname}$PConfig{archname}", "sysinfo CPU Model" );
    .loadlib 'sys_ops'
-   .include 'sysinfo.pasm'
+   .include 'sysinfo.pir'
    sysinfo_s_ic S1, .SYSINFO_CPU_TYPE
    print S1
    set I0, .SYSINFO_CPU_TYPE
@@ -198,7 +198,7 @@ SKIP:
 
     pir_output_like( <<'CODE', '/^-[1-9][0-9]*\n[1-9][0-9]*\n-[1-9][0-9]*\n[1-9][0-9]*\n$/', 'INTVAL min and max values');
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .sub main :main
     $I0 = sysinfo .SYSINFO_PARROT_INTMIN
     say $I0
@@ -216,7 +216,7 @@ CODE
 
 pir_output_is(<<'CODE', <<OUTPUT, 'INTVAL min and max coherence');
 .loadlib 'sys_ops'
-.include 'sysinfo.pasm'
+.include 'sysinfo.pir'
 .sub 'main' :main
     # assumes 2's compliment integer math
     .include 'test_more.pir'

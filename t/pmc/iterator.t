@@ -218,7 +218,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['ResizablePMCArray']    # empty array
     new P2, ['ResizablePMCArray']    # array with 2 elements
     push P2, 10
@@ -295,7 +295,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['Hash']    # empty Hash
     new P2, ['Hash']    # Hash with 2 elements
     set P2["ab"], 100
@@ -350,7 +350,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['Hash']    # empty Hash
     new P2, ['Hash']    # Hash with 2 elements
     set P2["ab"], 100
@@ -405,7 +405,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P0, ['Hash']    # Hash for iteration
     new P2, ['Hash']    # for test
 
@@ -446,7 +446,7 @@ ok 2
 OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P2, ['String']
     set P2, "parrot"
     iter P1, P2
@@ -468,7 +468,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P2, ['String']
     set P2, "parrot"
     iter P1, P2
@@ -490,7 +490,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P2, ['String']
     set P2, "ABC"
     iter P1, P2
@@ -512,7 +512,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
 .pcc_sub :main main:
-.include "iterator.pasm"
+.include "iterator.pir"
     new P2, ['String']
     set P2, "ABC"
     iter P1, P2
@@ -534,7 +534,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
 
-.include "iterator.pasm"
+.include "iterator.pir"
 .sub _main :main
     .local pmc string_1
     string_1 = new ['String']
@@ -571,7 +571,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Index access for Iterator on String" );
 
-.include "iterator.pasm"
+.include "iterator.pir"
 .sub _main :main
     .local pmc string_1
     string_1 = new ['String']
@@ -621,7 +621,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "Index access for Iterator on ResizablePMCArray" );
 
-.include "iterator.pasm"
+.include "iterator.pir"
 .sub _main :main
     .local pmc array_1
     array_1 = new ['ResizablePMCArray']
@@ -729,7 +729,7 @@ OUTPUT
 TODO: {
     pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
     .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
 
     new P2, ['ResizablePMCArray']    # array with 4 elements
     push P2, 10
@@ -777,7 +777,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
 .pcc_sub :main main:
-   .include "iterator.pasm"
+   .include "iterator.pir"
    new P0, ['ResizablePMCArray']
    push P0, 100
    push P0, 200
@@ -813,7 +813,7 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
 .pcc_sub :main main:
-    .include "iterator.pasm"
+    .include "iterator.pir"
     new P2, ['String']
     set P2, "parrot"
     iter P1, P2

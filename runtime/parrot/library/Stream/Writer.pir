@@ -29,7 +29,7 @@ version 0.1
 
 =cut
 
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
 .namespace ['Stream'; 'Writer']
 
 .sub __onload :load
@@ -125,7 +125,7 @@ END:
     .local pmc source
     .local pmc status
 
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, 'writer', $P0
     getattribute status, self, 'status'
@@ -136,7 +136,7 @@ END:
     self."write"( "" )
 WRITE:
 
-    .include "interpinfo.pasm"
+    .include "interpinfo.pir"
     $P0 = interpinfo .INTERPINFO_CURRENT_CONT
     setattribute self, 'writer', $P0
 

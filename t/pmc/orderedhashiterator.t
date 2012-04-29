@@ -16,8 +16,8 @@ t/pmc/orderedhash.t.
 
 =cut
 
-.include 'iterator.pasm'
-.include 'except_types.pasm'
+.include 'iterator.pir'
+.include 'except_types.pir'
 
 .sub 'main' :main
     .include 'test_more.pir'

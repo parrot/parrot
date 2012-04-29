@@ -39,9 +39,9 @@ any value type.
 
 =cut
 
-.include "cclass.pasm"
-.include "except_types.pasm"
-.include "interpinfo.pasm"
+.include "cclass.pir"
+.include "except_types.pir"
+.include "interpinfo.pir"
 
 .namespace [ 'PAST';'Compiler' ]
 
@@ -908,7 +908,7 @@ Return the POST representation of a C<PAST::Control>.
     $S0 = concat '[', $S0
     $S0 = concat $S0, ']'
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'", $S0)
-    subpost.'add_directive'('.include "except_types.pasm"')
+    subpost.'add_directive'('.include "except_types.pir"')
     goto handle_types_done
   no_handle_types:
     ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
@@ -920,7 +920,7 @@ Return the POST representation of a C<PAST::Control>.
     unless extype, handle_types_except_done
     $P0 = split ',', extype
     ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
-    subpost.'add_directive'('.include "except_types.pasm"')
+    subpost.'add_directive'('.include "except_types.pir"')
   handle_types_except_done:
     ops.'push_pirop'('push_eh', ehreg)
     .return ()
@@ -1163,7 +1163,7 @@ Return the POST representation of a C<PAST::Block>.
     bpost.'push_pirop'('new', $S0, "'ExceptionHandler'", '[.CONTROL_RETURN]')
     bpost.'push_pirop'('set_label', $S0, ctrllabel)
     bpost.'push_pirop'('push_eh', $S0)
-    bpost.'add_directive'('.include "except_types.pasm"')
+    bpost.'add_directive'('.include "except_types.pir"')
 
   children_past:
     ##  all children but last are void context, last returns anything
@@ -1639,7 +1639,7 @@ Generate a standard loop with NEXT/LAST/REDO exception handling.
     ops = $P0.'new'()
 
     $P0 = find_dynamic_lex '$*SUB'
-    $P0.'add_directive'('.include "except_types.pasm"')
+    $P0.'add_directive'('.include "except_types.pir"')
 
     .local string handreg
     handreg = self.'tempreg'('P')
@@ -1915,7 +1915,7 @@ a return value.
     ops.'push_pirop'('new', exreg, '"Exception"')
     ops.'push_pirop'('set', extype, '.CONTROL_RETURN')
     $P0 = find_dynamic_lex '$*SUB'
-    $P0.'add_directive'('.include "except_types.pasm"')
+    $P0.'add_directive'('.include "except_types.pir"')
 
     .local pmc cpast, cpost
     cpast = node[0]

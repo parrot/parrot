@@ -414,7 +414,7 @@ follows:
 =begin PIR_FRAGMENT
 
     ## This is what defines .INTERPINFO_CURRENT_CONT.
-    .include 'interpinfo.pasm'
+    .include 'interpinfo.pir'
     ## Store our return continuation as exit_cont.
     .local pmc exit_cont
     exit_cont = interpinfo .INTERPINFO_CURRENT_CONT

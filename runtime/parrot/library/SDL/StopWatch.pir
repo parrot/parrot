@@ -30,8 +30,8 @@ An SDL::StopWatch object has the following methods:
 
 =cut
 
-.include "timer.pasm"
-.include "iterator.pasm"
+.include "timer.pir"
+.include "iterator.pir"
 .namespace ['SDL'; 'StopWatch']
 
 .sub __onload :load

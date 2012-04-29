@@ -15,7 +15,7 @@
  */
 typedef const char* longopt_string_t;
 
-/* &gen_from_enum(longopt.pasm) subst(s/(\w+)/uc($1)/e) */
+/* &gen_from_enum(longopt.pir) subst(s/(\w+)/uc($1)/e) */
 typedef enum {
     OPTION_required_FLAG = 0x1,
     OPTION_optional_FLAG = 0x2

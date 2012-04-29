@@ -17,9 +17,9 @@ well.
 
 =cut
 
-.include 'except_types.pasm'
-.include 'datatypes.pasm'
-.include 'hash_key_type.pasm'
+.include 'except_types.pir'
+.include 'datatypes.pir'
+.include 'hash_key_type.pir'
 
 .sub main :main
     .include 'test_more.pir'
@@ -1251,7 +1251,7 @@ lp:
 
 ## thx to azuroth on irc
 .sub broken_delete
-  .include "iterator.pasm"
+  .include "iterator.pir"
   .local string result
   result = ""
 
@@ -1336,7 +1336,7 @@ postit_end:
 
 # Switch to use integer keys instead of strings.
 .sub integer_keys
-    .include "hash_key_type.pasm"
+    .include "hash_key_type.pir"
     .local pmc hash
     hash = new ['Hash']
     hash = .Hash_key_type_int
@@ -1469,7 +1469,7 @@ postit_end:
 
 # Switch to use PMC keys instead of strings.
 .sub 'pmc_keys'
-    .include "hash_key_type.pasm"
+    .include "hash_key_type.pir"
     .local pmc hash
     hash = new ['Hash']
     hash = .Hash_key_type_PMC

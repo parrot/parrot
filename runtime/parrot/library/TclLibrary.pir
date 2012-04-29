@@ -22,7 +22,7 @@ This module implements Tcl/Tk interface for Parrot.
 =cut
 
 .include "hllmacros.pir"
-.include "datatypes.pasm"
+.include "datatypes.pir"
 
 .namespace ['TclLibrary']
 

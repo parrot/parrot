@@ -190,7 +190,7 @@ TEST
     .return ($P0)
 .end
 
-.include 'iglobals.pasm'
+.include 'iglobals.pir'
 
 .sub 'collect_test_environment_data' :anon
     .local pmc config, env
@@ -298,7 +298,7 @@ TEST
     .return ($S0)
 .end
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .sub '_add_git_info' :anon
     .param pmc hash

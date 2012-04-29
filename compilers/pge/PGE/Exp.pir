@@ -8,8 +8,8 @@ PGE::Exp - base class for expressions
 
 .namespace [ 'PGE';'Exp' ]
 
-.include "interpinfo.pasm"
-.include "cclass.pasm"
+.include "interpinfo.pir"
+.include "cclass.pir"
 .const int PGE_INF = 2147483647
 .const int PGE_CUT_GROUP = -1
 .const int PGE_CUT_RULE = -2

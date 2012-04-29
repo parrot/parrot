@@ -26,7 +26,7 @@ loop:
     end
 
 .pcc_sub __init:
-.include "interpinfo.pasm"
+.include "interpinfo.pir"
     interpinfo P2, .INTERPINFO_CURRENT_OBJECT
     new P10, 'Integer'
     set P10, 10

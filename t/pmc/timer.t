@@ -22,7 +22,7 @@ Tests the Timer PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    .include "timer.pasm"
+    .include "timer.pir"
     plan(17)
     timer_setup()
     timer_initialize()

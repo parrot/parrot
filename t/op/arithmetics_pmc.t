@@ -17,7 +17,7 @@ Test handling C<dest> arg in 3-args arithmetic.
 
 .sub main :main
     .include 'test_more.pir'
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
 
     plan(40)
 

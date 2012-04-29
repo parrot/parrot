@@ -16,7 +16,7 @@ type combinations.
 
 =cut
 
-.include 'fp_equality.pasm'
+.include 'fp_equality.pir'
 
 .sub main :main
     .include 'test_more.pir'

@@ -20,7 +20,7 @@ and HLL::Grammar.
 ### .include 'src/cheats/hll-compiler.pir'
 # we have to overload PCT::HLLCompiler's parse method to support P6Regex grammars
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 
 .namespace ['HLL';'Compiler']
 
@@ -219,7 +219,7 @@ src/cheats/hll-grammar.pir -- Additional HLL::Grammar methods
 =cut
 
 
-.include 'cclass.pasm'
+.include 'cclass.pir'
 ### .include 'src/Regex/constants.pir'
 .const int CURSOR_FAIL = -1
 .const int CURSOR_FAIL_GROUP = -2
@@ -1963,7 +1963,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Grammar"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "nulltermish"  :subid("40_1309998840.89449") :method :outer("11_1309998840.89449")
 .annotate 'line', 33
     new $P1057, ['ExceptionHandler'], .CONTROL_RETURN
@@ -5691,7 +5691,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "string_to_int"  :subid("12_1309998841.74923") :outer("11_1309998841.74923")
     .param pmc param_1007
     .param pmc param_1008
@@ -5744,7 +5744,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "ints_to_string"  :subid("13_1309998841.74923") :outer("11_1309998841.74923")
     .param pmc param_1013
 .annotate 'line', 37
@@ -5785,7 +5785,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "CTXSAVE"  :subid("14_1309998841.74923") :method :outer("11_1309998841.74923")
 .annotate 'line', 62
     new $P1017, ['ExceptionHandler'], .CONTROL_RETURN
@@ -5815,7 +5815,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "SET_BLOCK_OUTER_CTX"  :subid("15_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1021
 .annotate 'line', 76
@@ -5870,7 +5870,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1025"  :anon :subid("16_1309998841.74923") :outer("15_1309998841.74923")
 .annotate 'line', 78
     .const 'Sub' $P1030 = "17_1309998841.74923" 
@@ -5939,7 +5939,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "EXPR"  :subid("18_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1036
     .param pmc param_1037 :optional
@@ -6225,7 +6225,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "term:sym<circumfix>"  :subid("21_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1077
 .annotate 'line', 114
@@ -6255,7 +6255,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "termish"  :subid("22_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1082
 .annotate 'line', 116
@@ -6285,7 +6285,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "nullterm"  :subid("23_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1087
 .annotate 'line', 117
@@ -6307,7 +6307,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "nullterm_alt"  :subid("24_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1092
 .annotate 'line', 118
@@ -6337,7 +6337,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "integer"  :subid("25_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1097
 .annotate 'line', 120
@@ -6367,7 +6367,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "dec_number"  :subid("26_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1102
 .annotate 'line', 122
@@ -6390,7 +6390,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "decint"  :subid("27_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1106
 .annotate 'line', 124
@@ -6413,7 +6413,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "hexint"  :subid("28_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1110
 .annotate 'line', 125
@@ -6436,7 +6436,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "octint"  :subid("29_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1114
 .annotate 'line', 126
@@ -6459,7 +6459,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "binint"  :subid("30_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1118
 .annotate 'line', 127
@@ -6482,7 +6482,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_EXPR"  :subid("31_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1122
 .annotate 'line', 129
@@ -6557,7 +6557,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1127"  :anon :subid("32_1309998841.74923") :outer("31_1309998841.74923")
 .annotate 'line', 135
     .const 'Sub' $P1133 = "33_1309998841.74923" 
@@ -6647,7 +6647,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_delimited"  :subid("34_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1141
 .annotate 'line', 152
@@ -6844,7 +6844,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_atom"  :subid("36_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1161
 .annotate 'line', 177
@@ -6893,7 +6893,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<backslash>"  :subid("37_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1168
 .annotate 'line', 181
@@ -6914,7 +6914,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<stopper>"  :subid("38_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1172
 .annotate 'line', 182
@@ -6944,7 +6944,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<bs>"  :subid("39_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1177
 .annotate 'line', 184
@@ -6965,7 +6965,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<nl>"  :subid("40_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1181
 .annotate 'line', 185
@@ -6986,7 +6986,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<cr>"  :subid("41_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1185
 .annotate 'line', 186
@@ -7007,7 +7007,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<tab>"  :subid("42_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1189
 .annotate 'line', 187
@@ -7028,7 +7028,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<ff>"  :subid("43_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1193
 .annotate 'line', 188
@@ -7049,7 +7049,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<esc>"  :subid("44_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1197
 .annotate 'line', 189
@@ -7070,7 +7070,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<hex>"  :subid("45_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1201
 .annotate 'line', 191
@@ -7128,7 +7128,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<oct>"  :subid("46_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1210
 .annotate 'line', 195
@@ -7186,7 +7186,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<chr>"  :subid("47_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1219
 .annotate 'line', 199
@@ -7218,7 +7218,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<0>"  :subid("48_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1224
 .annotate 'line', 203
@@ -7241,7 +7241,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "quote_escape:sym<misc>"  :subid("49_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1228
 .annotate 'line', 207
@@ -7299,7 +7299,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "charname"  :subid("50_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1236
 .annotate 'line', 211
@@ -7373,7 +7373,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "charnames"  :subid("51_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1245
 .annotate 'line', 219
@@ -7454,7 +7454,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Actions"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "charspec"  :subid("53_1309998841.74923") :method :outer("11_1309998841.74923")
     .param pmc param_1255
 .annotate 'line', 225
@@ -7612,7 +7612,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "value_type"  :subid("12_1309998842.32047") :outer("11_1309998842.32047")
     .param pmc param_1008
 .annotate 'line', 14
@@ -7656,7 +7656,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "get_exports"  :subid("13_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1015
     .param pmc param_1017 :slurpy
@@ -7903,7 +7903,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "get_module"  :subid("16_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1051
 .annotate 'line', 47
@@ -7944,7 +7944,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "language"  :subid("17_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1057 :optional
     .param int has_param_1057 :opt_flag
@@ -7987,7 +7987,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "load_module"  :subid("18_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1062
 .annotate 'line', 61
@@ -8048,7 +8048,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1065"  :anon :subid("19_1309998842.32047") :outer("18_1309998842.32047")
 .annotate 'line', 64
     new $P1069, 'ExceptionHandler'
@@ -8082,7 +8082,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "import"  :subid("20_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1078
     .param pmc param_1079
@@ -8133,7 +8133,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1080"  :anon :subid("21_1309998842.32047") :outer("20_1309998842.32047")
     .param pmc param_1085
 .annotate 'line', 70
@@ -8341,7 +8341,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "autoprint"  :subid("25_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1105
 .annotate 'line', 85
@@ -8384,7 +8384,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "interactive"  :subid("26_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1110 :slurpy :named
 .annotate 'line', 90
@@ -8502,7 +8502,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1119"  :anon :subid("27_1309998842.32047") :outer("26_1309998842.32047")
 .annotate 'line', 102
     .const 'Sub' $P1133 = "28_1309998842.32047" 
@@ -8588,7 +8588,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1132"  :anon :subid("28_1309998842.32047") :outer("27_1309998842.32047")
 .annotate 'line', 115
     .const 'Sub' $P1156 = "31_1309998842.32047" 
@@ -8671,7 +8671,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1135"  :anon :subid("29_1309998842.32047") :outer("28_1309998842.32047")
 .annotate 'line', 118
     .const 'Sub' $P1143 = "30_1309998842.32047" 
@@ -8713,7 +8713,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1142"  :anon :subid("30_1309998842.32047") :outer("29_1309998842.32047")
     .param pmc param_1144
 .annotate 'line', 120
@@ -8736,7 +8736,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "_block1155"  :anon :subid("31_1309998842.32047") :outer("28_1309998842.32047")
 .annotate 'line', 125
     .const 'Sub' $P1159 = "32_1309998842.32047" 
@@ -8820,7 +8820,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "eval"  :subid("33_1309998842.32047") :method :outer("11_1309998842.32047")
     .param pmc param_1170
     .param pmc param_1171 :slurpy
@@ -8943,7 +8943,7 @@ An operator precedence parser.
 
 
 .namespace ["HLL";"Compiler"]
-.include "except_types.pasm"
+.include "except_types.pir"
 .sub "ctxsave"  :subid("35_1309998842.32047") :method :outer("11_1309998842.32047")
 .annotate 'line', 165
     new $P1186, ['ExceptionHandler'], .CONTROL_RETURN

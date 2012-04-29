@@ -8,7 +8,7 @@ src/pmc/alarm.pmc - Alarm
 
 =head1 SYNOPSIS
 
-    .include 'alarm.pasm'
+    .include 'alarm.pir'
 
     new P0, 'Alarm'
     set P0[.PARROT_ALARM_TIME], N_time   # A FLOATVAL

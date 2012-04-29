@@ -16,7 +16,7 @@ You should be running the echo service on your box (port 7).
 
 =cut
 
-.include 'socket.pasm'
+.include 'socket.pir'
 
 .sub example :main
     .local pmc sock

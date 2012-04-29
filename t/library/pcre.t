@@ -54,8 +54,8 @@ SKIP: {
 ## diganose the failure otherwise.
     pir_output_is(<<"CODE", <<'OUT', 'libpcre loading');
 
-.include 'iglobals.pasm'
-.include 'libpaths.pasm'
+.include 'iglobals.pir'
+.include 'libpaths.pir'
 
 .sub main :main
     .local pmc interp
@@ -109,8 +109,8 @@ OUT
     @todo = ( todo => '3..5 fail on Win32' ) if $^O =~ /MSWin32/;
     pir_output_is( <<"CODE", <<'OUT', 'soup to nuts', @todo );
 
-.include 'iglobals.pasm'
-.include 'libpaths.pasm'
+.include 'iglobals.pir'
+.include 'libpaths.pir'
 
 .sub main :main
     .local pmc interp

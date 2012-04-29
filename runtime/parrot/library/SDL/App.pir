@@ -65,7 +65,7 @@ The SDL::App object has the following methods:
 
 .sub _initialize :load
 
-    .include 'datatypes.pasm'
+    .include 'datatypes.pir'
     load_bytecode 'SDL.pir'
     load_bytecode 'SDL/Surface.pir'
     load_bytecode 'SDL/Constants.pir'

@@ -19,7 +19,7 @@ in case of test failures.
 
 =cut
 
-.include 'socket.pasm'
+.include 'socket.pir'
 
 .sub main :main
     .local pmc sock, address, conn

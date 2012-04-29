@@ -251,7 +251,7 @@ get:
     h2 = h / 2
     thr = new 'ParrotThread'
     .const 'Sub' raw_calc_f = 'raw_calc'
-    .include 'cloneflags.pasm'
+    .include 'cloneflags.pir'
     .local int flags
     flags  = .PARROT_CLONE_CODE
     flags |= .PARROT_CLONE_CLASSES

@@ -41,12 +41,12 @@
 # -p all remaining arguments are executed as PRINT instructions
 #-----------------------------------------------------------------------
 
-.include 'iterator.pasm'
-.include 'except_severity.pasm'
-.include 'except_types.pasm'
-.include 'cclass.pasm'
+.include 'iterator.pir'
+.include 'except_severity.pir'
+.include 'except_types.pir'
+.include 'cclass.pir'
 
-.include 'warnings.pasm'
+.include 'warnings.pir'
 
 .loadlib 'io_ops'
 .loadlib 'debug_ops'

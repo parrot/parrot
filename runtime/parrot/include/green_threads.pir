@@ -27,8 +27,8 @@ Exit the current green thread.
 =cut
 
 
-.include 'interpinfo.pasm'
-.include 'timer.pasm'
+.include 'interpinfo.pir'
+.include 'timer.pir'
 
 .macro_const GT_QUANTUM 0.5
 

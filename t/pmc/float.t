@@ -92,7 +92,7 @@ Tests the Float PMC.
     done_testing()
 .end
 
-.include 'fp_equality.pasm'
+.include 'fp_equality.pir'
 
 .sub 'basic_assignment'
     # Assignments can morph to other PMC type,

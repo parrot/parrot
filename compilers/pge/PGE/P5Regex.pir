@@ -71,7 +71,7 @@
 .end
 
 
-.include "cclass.pasm"
+.include "cclass.pir"
 
 .const int PGE_INF = 2147483647
 

@@ -25,7 +25,7 @@ Tests the parrot config interface.
 
 pir_output_is( <<'CODE', <<'OUT', "get config hash" );
 .sub main :main
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc config_hash, interp
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
@@ -40,7 +40,7 @@ OUT
 pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd), "prefix" );
 .sub main :main
     load_bytecode "config.pbc"
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc config_hash, interp, cfg
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]

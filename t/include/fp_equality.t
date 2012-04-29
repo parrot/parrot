@@ -16,7 +16,7 @@ Tests fp_* functions.
 =cut
 
 .sub main :main
-    .include 'fp_equality.pasm'
+    .include 'fp_equality.pir'
     .include 'test_more.pir'
     .local num epsilon, zplus, zminus
     .local num oplus, ominus

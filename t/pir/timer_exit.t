@@ -1,7 +1,7 @@
 #!./parrot
 # Copyright (C) 2010, Parrot Foundation.
 
-.include 'timer.pasm'
+.include 'timer.pir'
 
 .sub main :main
    say "1..1"

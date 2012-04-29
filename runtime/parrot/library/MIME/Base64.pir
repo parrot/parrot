@@ -42,7 +42,7 @@ then a warning is generated if perl is running under -w.
 
 =cut
 
-.include "iterator.pasm"
+.include "iterator.pir"
 
 .namespace [ "MIME"; "Base64" ]
 

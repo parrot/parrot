@@ -21,7 +21,7 @@ t/pmc/oplib.t - OpLib PMC
 # Never have an op with this name:
 .const string TESTED_NOSUCHOP = 'hopeweneverhaveopcodesnamedlikethis'
 
-.include 'except_types.pasm'
+.include 'except_types.pir'
 
 .sub main :main
     .include 'test_more.pir'

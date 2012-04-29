@@ -29,7 +29,7 @@ PGE::OPTable - PGE operator precedence table and parser
 
 .const int PGE_OPTABLE_STOP_SUB      = -1
 
-.include "cclass.pasm"
+.include "cclass.pir"
 
 .sub '__onload' :load
     .local pmc p6meta

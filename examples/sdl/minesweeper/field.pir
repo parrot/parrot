@@ -33,7 +33,7 @@ An Mines::Field object has the following methods:
 
 =cut
 
-.include "iterator.pasm"
+.include "iterator.pir"
 .loadlib 'math_ops'
 .namespace ["Mines::Field"]
 

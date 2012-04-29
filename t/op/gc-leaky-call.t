@@ -16,7 +16,7 @@ function calls.
 
 =cut
 
-.include 'interpinfo.pasm'
+.include 'interpinfo.pir'
 
 .sub _main :main
     .include 'test_more.pir'
