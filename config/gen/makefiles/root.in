@@ -864,7 +864,7 @@ $(RUN_INC_DIR)/parrot_version.pir:
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 
 $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
-	$(RUN_INC_DIR)/datatypes.pasm $(MINIPARROT)
+	$(RUN_INC_DIR)/datatypes.pir $(MINIPARROT)
 # always rebuid parrot_version.pir when building config.fpmc
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
@@ -913,8 +913,8 @@ parrot_nci_thunk_gen.pbc : \
 	$(DATA_JSON_LIB_PBCS) $(PARROT) \
 	$(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
 	$(LIBRARY_DIR)/pcre.pbc \
-	$(RUN_INC_DIR)/hash_key_type.pasm \
-	$(RUN_INC_DIR)/datatypes.pasm
+	$(RUN_INC_DIR)/hash_key_type.pir \
+	$(RUN_INC_DIR)/datatypes.pir
 	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
 
 $(NCI_THUNK_GEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE)
