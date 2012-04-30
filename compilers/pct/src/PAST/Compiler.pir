@@ -24,53 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-=back
-
-=head3 C<PAST::Control>
-
-=over 4
-
-=item as_post(PAST::Control node)
-
-Return the POST representation of a C<PAST::Control>.
-
-=cut
-
-.sub 'as_post' :method :multi(_, ['PAST';'Control'])
-    .param pmc node
-    .param pmc options         :slurpy :named
-
-     # Probably not safe to use tempregs in an exception handler
-    .local pmc tempregs
-    null tempregs
-    .lex '%*TEMPREGS', tempregs
-
-    .local pmc ops, children, ishandled
-    .local string handled
-    $P0 = get_hll_global ['POST'], 'Label'
-    $S0 = self.'unique'('handled_')
-    ishandled = $P0.'new'('result'=>$S0)
-    $P0 = get_hll_global ['POST'], 'Ops'
-    ops = $P0.'new'('node'=>node)
-    .local string rtype
-    rtype = options['rtype']
-    $P0 = node.'list'()
-    $I0 = elements $P0
-    $S0 = repeat 'v', $I0
-    $S0 = concat $S0, rtype
-    ops.'push_pirop'('.local pmc exception')
-    ops.'push_pirop'('.get_results (exception)')
-    children = self.'post_children'(node, 'signature'=>$S0)
-    ops.'push'(children)
-    handled = self.'uniquereg'('I')
-    ops.'push_pirop'('set', handled, 'exception["handled"]')
-    ops.'push_pirop'('eq', handled, 1, ishandled)
-    ops.'push_pirop'('rethrow', 'exception')
-    ops.'push'(ishandled)
-    ops.'result'('exception')
-    .return (ops)
-.end
-
 .sub 'push_exception_handler' :method
     .param pmc node
     .param pmc ops

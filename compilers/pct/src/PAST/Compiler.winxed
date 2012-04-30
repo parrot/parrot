@@ -47,6 +47,7 @@ $include_const 'interpinfo.pasm';
 
 class P6metaclass;
 class PAST.Node;
+class PAST.Control;
 class PAST.Stmt;
 
 inline is_cclass(int cclass, string str, int pos) return int {
@@ -741,6 +742,44 @@ defines the boundaries of temporary register allocations.
         }
 
         return post;
+    }
+/*
+
+=back
+
+=head3 C<PAST::Control>
+
+=over 4
+
+=item as_post(PAST::Control node)
+
+Return the POST representation of a C<PAST::Control>.
+
+=cut
+
+*/
+    function as_post[method, multi('_', class PAST.Control)](var node, options [slurpy, named]) {
+        // Probably not safe to use tempregs in an exception handler
+        var tempregs;
+        ${ .lex '%*TEMPREGS', tempregs };
+
+        using POST.Label;
+        var ishandled = Label.new(string(self.unique('handled_')):[named('result')]);
+        using POST.Ops;
+        var ops = Ops.new(node:[named('node')]);
+        string rtype = options['rtype'];
+        string signature = repeat('v', elements(node.list())) + rtype;
+        ops.push_pirop('.local pmc exception');
+        ops.push_pirop('.get_results (exception)');
+        var children = self.post_children(node, signature:[named('signature')]);
+        ops.push(children);
+        string handled = self.uniquereg('I');
+        ops.push_pirop('set', handled, 'exception["handled"]');
+        ops.push_pirop('eq', handled, 1, ishandled);
+        ops.push_pirop('rethrow', 'exception');
+        ops.push(ishandled);
+        ops.result('exception');
+        return ops;
     }
 }
 
