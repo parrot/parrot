@@ -13,7 +13,7 @@ $ENV{TEST_PROG_ARGS} ||= '';
 plan( skip_all => 'lexicals not thawed properly from PBC, GH #430' )
     if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
-plan( tests => 54 );
+plan( tests => 50 );
 
 =head1 NAME
 
@@ -28,15 +28,6 @@ t/op/lexicals.t - Lexical Ops
 Tests various lexical scratchpad operations, as described in PDD20.
 
 =cut
-
-pasm_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PASM (\'$a\') succeeds' );
-.pcc_sub :main main:
-    .lex "$a", P0
-    print "ok\n"
-    end
-CODE
-ok
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PIR' );
 .sub main :main
@@ -64,22 +55,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', '.lex parsing - PIR, local var' );
     print "ok\n"
 .end
 CODE
-ok
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', '.lex - same PMC twice (PASM)' );
-.pcc_sub :main main:
-    .lex '$a', P0
-    .lex '$b', P0
-    new P0, 'String'
-    set P0, "ok\n"
-    find_lex P1, '$a'
-    print P1
-    find_lex P2, '$a'
-    print P2
-    end
-CODE
-ok
 ok
 OUTPUT
 
@@ -251,32 +226,12 @@ CODE
 13013
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PASM' );
-.pcc_sub :main main:
-    print "ok\n"
-    end
-.pcc_sub :lex foo:
-    returncc
-CODE
-ok
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', ':lex parsing - PIR' );
 .sub main :main
     print "ok\n"
 .end
 .sub foo :lex
 .end
-CODE
-ok
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', ':outer parsing - PASM' );
-.pcc_sub :main main:
-    print "ok\n"
-    end
-.pcc_sub :outer('main') foo:
-    returncc
 CODE
 ok
 OUTPUT
