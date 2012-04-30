@@ -90,9 +90,7 @@ CODE
 /ok/
 OUTPUT
 
-SKIP: {
-    skip("This test is failing for no apparent reason on windows", 1);
-    pir_stdin_output_like( <<'INPUT', <<'CODE', qr/[(]pdb[)] (print I0\n)?1/, "debug_break" );
+pir_stdin_output_like( <<'INPUT', <<'CODE', qr/[(]pdb[)] (print I0\n)?1/, "debug_break" );
 print I0
 quit
 INPUT
@@ -103,7 +101,6 @@ INPUT
     debug_break
 .end
 CODE
-}
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main :main
