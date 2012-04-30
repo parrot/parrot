@@ -12,6 +12,7 @@
 .metadata
 .bytecode
 
+    # print 1..2
     set_imm I0, 0, 0
     set_imm S0, 0, 0
     deref   S0, CONSTS, S0
@@ -29,25 +30,34 @@
     goto    argc_ok, x
 
 argc_nok:
+    
+    # print "nok 1 "...
     set_imm S0, 0, 3
     deref   S0, CONSTS, S0
     print_s I0, S0, x
+
+    # print the actual arg count
     print_i I0, I1, x
 
+    # finish printing the nok message, continue to the argv test
     set_imm S0, 0, 6
     deref   S0, CONSTS, S0
     print_s I0, S0, x
     goto    argv_test, x
 
 argc_ok:
+
+    # print "ok 1"...
     set_imm S0, 0, 2
     deref   S0, CONSTS, S0
     print_s I0, S0, x
+    
+    # continue to the argv test
     goto    argv_test, x
 
 argv_test:
 
-    # S0 is the first arg
+    # put argv[1] into S0 (argv[0] is the name of this file)
     set_imm I0, 0, 0
     set_imm I1, 0, 1
     set_imm S0, 0, ARGV
@@ -55,24 +65,35 @@ argv_test:
     set_imm I2, 0, 1
     get_word S0, S0, I2
 
+    # put the expected value of argv[1] into S1 ("kittens")
     set_imm S1, 0, 7
     deref   S1, CONSTS, S1
 
-    # I2 = number of bytes in string
+    # put the number of bytes in string into I2
+    # (number of bytes in a string is in the first word of the string)
     get_word I2, S1, I0
+    # subtract 1 to avoid comparing the terminal null
     sub_i    I2, I2, I1
 
+    # check the strings in S0 and S1 for equality, 
 string_cmp_loop:
+
+    # put number of characters remaining into I2
     sub_i    I2, I2, I1
     get_byte I3, S0, I2
 
+    # store S1[I2 + 8] in I4
+    # skip past the string header
     set_imm  I5,  0,  8
     add_i    I5, I2, I5
+    # store the value of the current char in I4
     get_byte I4, S1, I5
 
+    # if i3 != i4 (the two characters from the string differ), fail
     sub_i    I3, I3, I4
     goto_if  argv_nok, I3
 
+    # if there are more characters to compare, continue
     goto_if  string_cmp_loop, I2
     goto     argv_ok, x
 
