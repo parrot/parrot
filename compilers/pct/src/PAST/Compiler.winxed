@@ -55,6 +55,12 @@ inline is_cclass(int cclass, string str, int pos) return int {
     return ret;
 }
 
+inline repeat(string str, int times) return string {
+    string ret;
+    ${ repeat ret, str, times };
+    return ret;
+}
+
 namespace PAST.Compiler {
     // TEMPREG_BASE and UNIQUE_BASE identify the base location for
     // the temporary register set and unique registers
@@ -667,10 +673,8 @@ Common code for as_post(PAST::Node) and as_post(PAST::Stmts)
     function node_as_post[method](var node, options [slurpy, named]) {
         string rtype = options['rtype'];
         :(string signature) = node.signature();
-        if (!signature) {
-            ${ repeat signature, 'v', elements(node.list()) };
-            signature += rtype;
-        }
+        if (!signature)
+            signature = repeat('v', elements(node.list())) + rtype;
         var ops = self.post_children(node, signature:[named('signature')]);
         var result = ops[-1];
         int i = indexof('0123456789', substr(signature, 0, 1));
