@@ -1063,7 +1063,7 @@ parrotbug                                                   []
 runtime/parrot/bin/prove.pir                                [library]
 runtime/parrot/dynext/README                                []doc
 runtime/parrot/include/README                               []doc
-runtime/parrot/include/fp_equality.pasm                     [library]
+runtime/parrot/include/fp_equality.pir                      [library]
 runtime/parrot/include/green_threads.pir                    [library]
 runtime/parrot/include/hllmacros.pir                        [library]
 runtime/parrot/include/test_more.pir                        [library]
