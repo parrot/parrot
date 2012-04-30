@@ -877,22 +877,22 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
+.sub 'main'
         print "ok 1\n"
         print "ok 2\n"
-        end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
-.pcc_sub :main main:
-        set I0, 16
+pir_output_is( <<'CODE', <<'OUTPUT', "2 non jit" );
+.sub 'main'
+        set $I0, 16
         print "ok 1\n"
         print "ok 2\n"
-        end
+.end
 CODE
 ok 1
 ok 2
