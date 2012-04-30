@@ -8,8 +8,6 @@ use Test::More;
 use Parrot::Test tests => 12;
 use Parrot::Config;
 
-use Parrot::Test::Util 'create_tempfile';
-
 =head1 NAME
 
 t/op/debuginfo.t - Debugging Info
