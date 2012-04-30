@@ -22,76 +22,76 @@ Tests basic string and branching operations.
 =cut
 
 # It would be very embarrassing if these didnt work...
-pasm_output_is( <<'CODE', '', "noop, end" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', '', "noop, end" );
+.sub 'main'
         noop
-        end
+.end
 CODE
 
-pasm_output_is( <<'CODE', '1', "print 1" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', '1', "print 1" );
+.sub 'main'
         print   1
-        end
+.end
 CODE
 
-pasm_output_is( <<'CODE', 'Parrot flies', "print string" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', 'Parrot flies', "print string" );
+.sub 'main'
         print 'Parrot flies'
-        end
+.end
 CODE
 
-pasm_output_is( <<'CODE', 'Parrot flies', "print double-quoted string" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', 'Parrot flies', "print double-quoted string" );
+.sub 'main'
        print "Parrot flies"
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', "Parrot\tflies", "print double-quoted string, tabs" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', "Parrot\tflies", "print double-quoted string, tabs" );
+.sub 'main'
        print "Parrot\tflies"
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', q('Parrot' flies), "print double-quoted string, nested single" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', q('Parrot' flies), "print double-quoted string, nested single" );
+.sub 'main'
        print "'Parrot' flies"
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', q("Parrot" flies), "print single-quoted string, nested double" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', q("Parrot" flies), "print single-quoted string, nested double" );
+.sub 'main'
        print '"Parrot" flies'
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escape" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escape" );
+.sub 'main'
        print "Parrot\x20flies"
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', q(Parrot flies), "escaped non-special" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', q(Parrot flies), "escaped non-special" );
+.sub 'main'
        print "Parrot fl\ies"
-       end
+.end
 CODE
 
-pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
+.sub 'main'
        print "Parrot flies\n"
-       end
+.end
 CODE
 Parrot flies
 OUTPUT
 
-pasm_output_is( <<'CODE', '42', "branch_ic" );
-.pcc_sub :main main:
-        set     I4, 42
+pir_output_is( <<'CODE', '42', "branch_ic" );
+.sub 'main'
+        set     $I4, 42
         branch  HERE
-        set     I4, 1234
+        set     $I4, 1234
 HERE:
-        print   I4
-        end
+        print   $I4
+.end
 CODE
 
 pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
