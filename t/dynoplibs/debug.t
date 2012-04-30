@@ -27,9 +27,6 @@ $ENV{TEST_PROG_ARGS} ||= '';
 my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? "\\(unknown file\\)\n-1" : "debug_\\d+\\.pasm\n\\d";
 
-#SKIP: {
-#skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/;
-
 pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .loadlib 'debug_ops'
 .pcc_sub :main main:
