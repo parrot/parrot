@@ -27,852 +27,852 @@ should just be the same.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-add I0,I1,I2
-print I0
-print I1
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2,3 mapped" );
+.sub 'main'
+    set $I0, 0
+    set $I1, 1
+    set $I2, 2
+    add $I0, $I1, $I2
+    print $I0
+    print $I1
+    print $I2
+    print "\n"
+.end
 CODE
 312
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I0,I1,I4
-print I0
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0, 0
+    set $I1, 1
+    set $I2, 2
+    set $I3, 3
+    set $I4, 4
+    set $I0, $I1
+    set $I2, $I3
+    set $I0, $I1
+    set $I2, $I3
+    add $I0, $I1, $I4
+    print $I0
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 514
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I0,I4,I1
-print I0
-print I4
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1,3 mapped" );
+.sub 'main'
+    set $I0, 0
+    set $I1, 1
+    set $I2, 2
+    set $I3, 3
+    set $I4, 4
+    set $I0, $I1
+    set $I2, $I3
+    set $I0, $I1
+    set $I2, $I3
+    add $I0, $I4, $I1
+    print $I0
+    print $I4
+    print $I1
+    print "\n"
+.end
 CODE
 541
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I4,I0,I1
-print I4
-print I0
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2,3 mapped" );
+.sub 'main'
+    set $I0, 0
+    set $I1, 1
+    set $I2, 2
+    set $I3, 3
+    set $I4, 4
+    set $I0, $I1
+    set $I2, $I3
+    set $I0, $I1
+    set $I2, $I3
+    add $I4, $I0, $I1
+    print $I4
+    print $I0
+    print $I1
+    print "\n"
+.end
 CODE
 211
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I1,I5,I4
-print I1
-print I5
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 1 mapped" );
+.sub 'main'
+    set $I0, 0
+    set $I1, 1
+    set $I2, 2
+    set $I3, 3
+    set $I4, 4
+    set $I5, 0
+    set $I0, $I1
+    set $I2, $I3
+    set $I0, $I1
+    set $I2, $I3
+    add $I1, $I5, $I4
+    print $I1
+    print $I5
+    print $I4
+    print "\n"
+.end
 CODE
 404
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I5,I1,I4
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0, $I1
+    set $I2, $I3
+    set $I0, $I1
+    set $I2, $I3
+    add $I5, $I1, $I4
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 514
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I5,I4,I1
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    add $I5,$I4,$I1
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 514
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I6,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-add I5,I6,I4
-print I5
-print I6
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "add_i_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I6,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    add $I5,$I6,$I4
+    print $I5
+    print $I6
+    print $I4
+    print "\n"
+.end
 CODE
 404
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-sub I0,I1,I2
-print I0
-print I1
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    sub $I0,$I1,$I2
+    print $I0
+    print $I1
+    print $I2
+    print "\n"
+.end
 CODE
 -112
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I0,I1,I4
-print I0
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I0,$I1,$I4
+    print $I0
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 -314
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I0,I4,I1
-print I0
-print I4
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I0,$I4,$I1
+    print $I0
+    print $I4
+    print $I1
+    print "\n"
+.end
 CODE
 341
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I4,I0,I1
-print I4
-print I0
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I4,$I0,$I1
+    print $I4
+    print $I0
+    print $I1
+    print "\n"
+.end
 CODE
 011
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I1,I5,I4
-print I1
-print I5
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 1 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I1,$I5,$I4
+    print $I1
+    print $I5
+    print $I4
+    print "\n"
+.end
 CODE
 -404
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I5,I1,I4
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I5,$I1,$I4
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 -314
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I5,I4,I1
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I5,$I4,$I1
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 314
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I5, 2
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_ic 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I5, 2
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 -214
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I6,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-sub I5,I6,I4
-print I5
-print I6
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "sub_i_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I6,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    sub $I5,$I6,$I4
+    print $I5
+    print $I6
+    print $I4
+    print "\n"
+.end
 CODE
 -404
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-mul I0,I1,I2
-print I0
-print I1
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    mul $I0,$I1,$I2
+    print $I0
+    print $I1
+    print $I2
+    print "\n"
+.end
 CODE
 212
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I0,I1,I4
-print I0
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I0,$I1,$I4
+    print $I0
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 414
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I0,I4,I1
-print I0
-print I4
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I0,$I4,$I1
+    print $I0
+    print $I4
+    print $I1
+    print "\n"
+.end
 CODE
 441
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I4,I1,I3
-print I4
-print I1
-print I3
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I4,$I1,$I3
+    print $I4
+    print $I1
+    print $I3
+    print "\n"
+.end
 CODE
 313
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I1,I5,I4
-print I1
-print I5
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 1 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I1,$I5,$I4
+    print $I1
+    print $I5
+    print $I4
+    print "\n"
+.end
 CODE
 004
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I5,I1,I4
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I5,$I1,$I4
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 414
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I5,I4,I1
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I5,$I4,$I1
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 414
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I6,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I5,I6,I4
-print I5
-print I6
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I6,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I5,$I6,$I4
+    print $I5
+    print $I6
+    print $I4
+    print "\n"
+.end
 CODE
 004
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I2, I3
-print I2
-print I3
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I2, $I3
+    print $I2
+    print $I3
+    print "\n"
+.end
 CODE
 93
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I2, I4
-print I2
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 1 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I2, $I4
+    print $I2
+    print $I4
+    print "\n"
+.end
 CODE
 124
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I4, I2
-print I4
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I4, $I2
+    print $I4
+    print $I2
+    print "\n"
+.end
 CODE
 123
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-mul I4, I5
-print I4
-print I5
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "mul_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    mul $I4, $I5
+    print $I4
+    print $I5
+    print "\n"
+.end
 CODE
 00
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,6
-set I2,2
-div I0,I1,I2
-print I0
-print I1
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,6
+    set $I2,2
+    div $I0,$I1,$I2
+    print $I0
+    print $I1
+    print $I2
+    print "\n"
+.end
 CODE
 362
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,8
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I0,I1,I4
-print I0
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,8
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I0,$I1,$I4
+    print $I0
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 284
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I0,I4,I1
-print I0
-print I4
-print I1
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I0,$I4,$I1
+    print $I0
+    print $I4
+    print $I1
+    print "\n"
+.end
 CODE
 441
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,9
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I4,I1,I3
-print I4
-print I1
-print I3
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2,3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,9
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I4,$I1,$I3
+    print $I4
+    print $I1
+    print $I3
+    print "\n"
+.end
 CODE
 393
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I1,I5,I4
-print I1
-print I5
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 1 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I1,$I5,$I4
+    print $I1
+    print $I5
+    print $I4
+    print "\n"
+.end
 CODE
 004
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,8
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I5,I1,I4
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,8
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I5,$I1,$I4
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 284
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I5,I4,I1
-print I5
-print I1
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 3 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I5,$I4,$I1
+    print $I5
+    print $I1
+    print $I4
+    print "\n"
+.end
 CODE
 414
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I6,0
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I5,I6,I4
-print I5
-print I6
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I6,0
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I5,$I6,$I4
+    print $I5
+    print $I6
+    print $I4
+    print "\n"
+.end
 CODE
 004
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,9
-set I3,9
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I2, I3
-print I2
-print I3
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1,2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,9
+    set $I3,9
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I2, $I3
+    print $I2
+    print $I3
+    print "\n"
+.end
 CODE
 19
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,8
-set I3,8
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I2, I4
-print I2
-print I4
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i 1 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,8
+    set $I3,8
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I2, $I4
+    print $I2
+    print $I4
+    print "\n"
+.end
 CODE
 24
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 2 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,2
-set I4,4
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I4, I2
-print I4
-print I2
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i 2 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,2
+    set $I4,4
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I4, $I2
+    print $I4
+    print $I2
+    print "\n"
+.end
 CODE
 22
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "div_i_i 0 mapped" );
-.pcc_sub :main main:
-set I0,0
-set I1,1
-set I2,2
-set I3,3
-set I4,4
-set I5,1
-set I0,I1
-set I2,I3
-set I0,I1
-set I2,I3
-div I4, I5
-print I4
-print I5
-print "\n"
-end
+pir_output_is( <<'CODE', <<'OUTPUT', "div_i_i 0 mapped" );
+.sub 'main'
+    set $I0,0
+    set $I1,1
+    set $I2,2
+    set $I3,3
+    set $I4,4
+    set $I5,1
+    set $I0,$I1
+    set $I2,$I3
+    set $I0,$I1
+    set $I2,$I3
+    div $I4, $I5
+    print $I4
+    print $I5
+    print "\n"
+.end
 CODE
 41
 OUTPUT
 
 # tests for JIT CGP
-pasm_output_is( <<'CODE', <<'OUTPUT', "1 non jit" );
-.pcc_sub :main main:
-        set I0, 16
+pir_output_is( <<'CODE', <<'OUTPUT', "1 non jit" );
+.sub 'main'
+        set $I0, 16
         print "ok 1\n"
-        end
+.end
 CODE
 ok 1
 OUTPUT
