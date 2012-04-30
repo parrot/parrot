@@ -369,26 +369,28 @@ CODE
 Pumpking
 OUTPUT
 
-my ($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+my ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .pcc_sub _sub1:
+.sub _sub1
   get_params ""
-  print "in sub1\n"
+  say "in sub1"
   set_returns ""
   returncc
-  .pcc_sub _sub2:
-  get_params "0", P5
-  print P5
-  print "in sub2\n"
+.end
+.sub _sub2
+  get_params "0", $P5
+  print $P5
+  say "in sub2"
   set_returns ""
   returncc
+.end
 EOF
 close $TEMP;
 
 # compile to pbc
 my (undef, $temp_pbc) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
+system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
 
@@ -396,7 +398,7 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub' );
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
 
-/* also both the test PASM and the_test() print to stderr
+/* also both the test PIR and the_test() print to stderr
  * so that buffering in PIO is not an issue */
 
 int
@@ -445,7 +447,7 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub using the unified interfac
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
 
-/* also both the test PASM and the_test() print to stderr
+/* also both the test PIR and the_test() print to stderr
  * so that buffering in PIO is not an issue */
 
 int
@@ -489,7 +491,7 @@ hello in sub2
 back
 OUTPUT
 
-($TEMP, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
   .sub foo
@@ -512,7 +514,7 @@ c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub and return an integer' );
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
 
-/* also both the test PASM and the_test() print to stderr
+/* also both the test PIR and the_test() print to stderr
  * so that buffering in PIO is not an issue */
 
 int
@@ -549,28 +551,29 @@ result 42
 back
 OUTPUT
 
-($TEMP, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
+($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .pcc_sub _sub1:
+.sub _sub1
   get_params ""
-  print "in sub1\n"
-  set I1, 0                             # Divide by 0 to force exception.
-  div I2, I1, 0
-  print "never\n"
+  say "in sub1"
+  set $I1, 0                             # Divide by 0 to force exception.
+  div $I2, $I1, 0
+  say "never"
   returncc
+.end
 EOF
 close $TEMP;
 
 # compile to pbc
-system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pasm);
+system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call a parrot sub, catch exception' );
 
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
 
-/* also both the test PASM and the_test() print to stderr
+/* also both the test PIR and the_test() print to stderr
  * so that buffering in PIO is not an issue */
 
 int
