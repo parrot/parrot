@@ -569,7 +569,7 @@ sub m0_opfunc_print_i {
     my $handle = $$cf->[$a1];
     my $var    = i($$cf,$a2);
     # TODO: print to $handle instead of stdout
-    print $var."\n";
+    print $var;
 }
 
 sub m0_opfunc_print_n {
