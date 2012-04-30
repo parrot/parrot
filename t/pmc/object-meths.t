@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 38;
 
 =head1 NAME
 
@@ -385,37 +385,6 @@ B::blah
 A::blah
 B::foo
 OUTPUT
-
-SKIP: {
-    skip( "currently broken", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', "exceptions and different runloops" );
-.pcc_sub :main main:
-_main:
-    push_eh eh
-
-    newclass P0, "Foo"
-
-    print "new\n"
-    new P2, ['Foo']
-eh:
-    print "back in main\n"
-    end
-
-.namespace ["Foo"]
-.pcc_sub __init:
-    print "in __init\n"
-
-    # raise an exception
-    callmethodcc self, "qux"
-
-    print "never\n"
-    returncc
-CODE
-new
-in __init
-back in main
-OUTPUT
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "find_method" );
 .sub main :main
