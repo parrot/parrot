@@ -24,51 +24,6 @@ PAST::Compiler - PAST Compiler
 
 .namespace [ 'PAST';'Compiler' ]
 
-.sub 'push_exception_handler' :method
-    .param pmc node
-    .param pmc ops
-    .param pmc label
-
-    .local string type, extype
-    type = node.'handle_types'()
-    extype = node.'handle_types_except'()
-    if type goto handler_need_exhandler
-    if extype goto handler_need_exhandler
-    ops.'push_pirop'('push_eh', label)
-    .return ()
-
-  handler_need_exhandler:
-    .local pmc controltypes, subpost
-    .local string ehreg
-    subpost = find_dynamic_lex '$*SUB'
-    ehreg = self.'uniquereg'('P')
-    unless type, no_handle_types
-    controltypes = get_global '%!controltypes'
-    type = controltypes[type]
-    unless type, no_handle_types
-    $P0 = split ',', type
-    $S0 = join ';', $P0
-    $S0 = concat '[', $S0
-    $S0 = concat $S0, ']'
-    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'", $S0)
-    subpost.'add_directive'('.include "except_types.pasm"')
-    goto handle_types_done
-  no_handle_types:
-    ops.'push_pirop'('new', ehreg, "'ExceptionHandler'")
-  handle_types_done:
-    ops.'push_pirop'('set_label', ehreg, label)
-    unless extype, handle_types_except_done
-    controltypes = get_global '%!controltypes'
-    extype = controltypes[extype]
-    unless extype, handle_types_except_done
-    $P0 = split ',', extype
-    ops.'push_pirop'('callmethod', '"handle_types_except"', ehreg, $P0 :flat)
-    subpost.'add_directive'('.include "except_types.pasm"')
-  handle_types_except_done:
-    ops.'push_pirop'('push_eh', ehreg)
-    .return ()
-.end
-
 .sub 'wrap_handlers' :method
     .param pmc child
     .param pmc ehs

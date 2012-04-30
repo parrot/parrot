@@ -781,6 +781,32 @@ Return the POST representation of a C<PAST::Control>.
         ops.result('exception');
         return ops;
     }
+
+    function push_exception_handler[method](var node, var ops, var label) {
+        :(string type)   = node.handle_types();
+        :(string extype) = node.handle_types_except();
+        if (!type && !extype) {
+            ops.push_pirop('push_eh', label);
+            return;
+        }
+
+        var controltypes;
+        ${ get_global controltypes, '%!controltypes' };
+        var subpost;
+        ${ find_dynamic_lex subpost, '$*SUB' };
+        :(string ehreg) = self.uniquereg('P');
+        if (type && (type = controltypes[type]))
+            ops.push_pirop('new', ehreg, "'ExceptionHandler'", '[' + join(';', split(',', type)) + ']');
+        else
+            ops.push_pirop('new', ehreg, "'ExceptionHandler'");
+        ops.push_pirop('set_label', ehreg, label);
+        if (extype && (extype = controltypes[extype])) {
+            ops.push_pirop('callmethod', '"handle_types_except"', ehreg, split(',', extype):[flat]);
+            subpost.add_directive('.include "except_types.pasm"');
+        }
+        ops.push_pirop('push_eh', ehreg);
+        return;
+    }
 }
 
 /*
