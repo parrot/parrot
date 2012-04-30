@@ -121,28 +121,28 @@ SKIP:
         $osname = 'WinXP' if $osname =~ m/^WinXP/;
         TODO: {
             local $TODO = "Not Currently Implemented";
-            pasm_output_is( <<'CODE', "$osname$osname", "sysinfo OS version string" );
-    .pcc_sub :main main:
+            pir_output_is( <<'CODE', "$osname$osname", "sysinfo OS version string" );
+.sub 'main'
     .loadlib 'sys_ops'
-    sysinfo_s_ic S1, 5
-    print S1
-    set I0, 5
-    sysinfo_s_i S2, 5
-    print S2
-end
+    sysinfo $S1, 5
+    print $S1
+    set $I0, 5
+    sysinfo $S2, 5
+    print $S2
+.end
 CODE
 
             my ( $osvername, $major, $minor, $id ) = Win32::GetOSVersion();
 
-            pasm_output_is( <<'CODE', "$major.$minor$major.$minor", "sysinfo OS version number string" );
-    .pcc_sub :main main:
+            pir_output_is( <<'CODE', "$major.$minor$major.$minor", "sysinfo OS version number string" );
+.sub 'main'
     .loadlib 'sys_ops'
-    sysinfo_s_ic S1, 6
-    print S1
-    set I0, 6
-    sysinfo_s_i S2, 6
-    print S2
-end
+    sysinfo $S1, 6
+    print $S1
+    set $I0, 6
+    sysinfo $S2, 6
+    print $S2
+.end
 CODE
         } # END todo block
     } # END inner SKIP block
@@ -152,15 +152,15 @@ TODO:
 {
     local $TODO = "not currently implemented in parrot";
 
-    pasm_output_is( <<'CODE', "$PConfig{archname}$PConfig{archname}", "sysinfo CPU Model" );
+    pir_output_is( <<'CODE', "$PConfig{archname}$PConfig{archname}", "sysinfo CPU Model" );
    .loadlib 'sys_ops'
    .include 'sysinfo.pir'
-   sysinfo_s_ic S1, .SYSINFO_CPU_TYPE
-   print S1
-   set I0, .SYSINFO_CPU_TYPE
-   sysinfo_s_i S1, I0
-   print S1
-end
+   sysinfo $S1, .SYSINFO_CPU_TYPE
+   print $S1
+   set $I0, .SYSINFO_CPU_TYPE
+   sysinfo $S1, $I0
+   print $S1
+.end
 CODE
 }
 
