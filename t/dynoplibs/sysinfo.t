@@ -10,7 +10,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Config;
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 11;
 use Parrot::Config;
 
 
@@ -53,31 +53,26 @@ Tests for basic system information.
 
 my @setup = (
     { pconfig_key => 'intvalsize',
-      pasm_key    => 1,
       pir_key     => 'SYSINFO_PARROT_INTSIZE',
       desc        => 'integer size',
       reg_type    => 'I',
     },
     { pconfig_key => 'doublesize',
-      pasm_key    => 2,
       pir_key     => 'SYSINFO_PARROT_FLOATSIZE',
       desc        => 'float size',
       reg_type    => 'I',
     },
     { pconfig_key => 'ptrsize',
-      pasm_key    => 3,
       pir_key     => 'SYSINFO_PARROT_POINTERSIZE',
       desc        => 'pointer size',
       reg_type    => 'I',
     },
     { pconfig_key => 'osname',
-      pasm_key    => 4,
       pir_key     => 'SYSINFO_PARROT_OS',
       desc        => 'osname',
       reg_type    => 'S',
     },
     { pconfig_key => 'cpuarch',
-      pasm_key    => 7,
       pir_key     => 'SYSINFO_CPU_ARCH',
       desc        => 'CPU Arch Family',
       reg_type    => 'S',
@@ -86,16 +81,6 @@ my @setup = (
 
 foreach ( @setup ) {
     if ( $_->{reg_type} eq 'I' ) {
-        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PASM sysinfo  $_->{desc}" );
-    .pcc_sub :main main:
-    .loadlib 'sys_ops'
-    sysinfo_i_ic I1, $_->{pasm_key}
-    print I1
-    set I3, $_->{pasm_key}
-    sysinfo_i_i I2, I3
-    print I2
-end
-CODE
         pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
 .include 'sysinfo.pir'
@@ -109,16 +94,6 @@ CODE
 CODE
     }
     else {
-        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PASM sysinfo  $_->{desc}" );
-    .pcc_sub :main main:
-    .loadlib 'sys_ops'
-    sysinfo_s_ic S1, $_->{pasm_key}
-    print S1
-    set I1, $_->{pasm_key}
-    sysinfo_s_i S2, I1
-    print S2
-end
-CODE
         pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
 .include 'sysinfo.pir'
