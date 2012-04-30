@@ -66,17 +66,17 @@ OUTPUT
 # Need to disable GC while trace is on, as there's a non-zero chance that a
 # GC sweep would occur, causing a bonus "GC mark" line in the output, which makes
 # the test fail.
-pasm_output_like( <<'CODE', <<'OUTPUT', "restart trace" );
-.pcc_sub :main main:
+pir_output_like( <<'CODE', <<'OUTPUT', "restart trace" );
+.sub 'main'
     print "ok 1\n"
     sweepoff
-    set I0, 1
-    trace I0
-    dec I0
-    trace I0
+    set $I0, 1
+    trace $I0
+    dec $I0
+    trace $I0
     sweepon
     print "ok 2\n"
-    end
+.end
 CODE
 /^ok\s1\n
 (?:0+8.*)?\n
@@ -84,29 +84,29 @@ CODE
 ok\s2\n$/x
 OUTPUT
 
-pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
-.pcc_sub :main main:
-    new P0, 'Undef'
-    set I0, P0
+pir_output_is( <<'CODE', 'nada:', 'interp - warnings' );
+.sub 'main'
+    new $P0, 'Undef'
+    set $I0, $P0
     print "nada:"
     warningson 1
-    new P1, 'Undef'
-    set I0, P1
-    end
+    new $P1, 'Undef'
+    set $I0, $P1
+.end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
-.pcc_sub :main main:
-    .include "interpinfo.pir"
-    getinterp P0
+pir_output_is( <<'CODE', <<'OUTPUT', "getinterp" );
+.include "interpinfo.pir"
+.sub 'main'
+    getinterp $P0
     print "ok 1\n"
-    set I0, P0[.INTERPINFO_ACTIVE_PMCS]
-    interpinfo I1, .INTERPINFO_ACTIVE_PMCS
-    eq I0, I1, ok2
+    set $I0, $P0[.INTERPINFO_ACTIVE_PMCS]
+    interpinfo $I1, .INTERPINFO_ACTIVE_PMCS
+    eq $I0, $I1, ok2
     print "not "
   ok2:
     print "ok 2\n"
-    end
+.end
 CODE
 ok 1
 ok 2
