@@ -5,8 +5,8 @@
 1 "\n"
 2 "ok 1 - arg count: got 6 arguments!\n"
 3 "not ok 1 -  arg count: didn't get 6 arguments (got "
-4 "ok 2 - arg contents: first argument was 'kittens'\n"
-5 "not ok 2 - arg contents: first argument was 'kittens' # TODO M0 doesn't support this yet \n"
+4 "ok 2 - arg contents: second argument was 'kittens'\n"
+5 "not ok 2 - arg contents: second argument was 'kittens' # TODO M0 doesn't support this yet \n"
 6 " arguments)\n"
 7 "kittens"
 .metadata
@@ -62,6 +62,7 @@ argv_test:
     set_imm I1, 0, 1
     set_imm S0, 0, ARGV
     deref   S0, INTERP, S0
+    deref   S0, S0, I1
     set_imm I2, 0, 1
     get_word S0, S0, I2
 

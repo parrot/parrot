@@ -1,0 +1,52 @@
+.version 0
+.chunk "args_test"
+.constants
+0 "arg count: "
+1 "\n"
+2 "printing arg 1...\n"
+3 "done\n"
+.metadata
+.bytecode
+
+    # I1 is the arg count 
+
+    # print "arg count "
+    set_imm S0, 0, 0
+    set_imm I0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # print arg count value
+    set_imm I1, 0, ARGC
+    print_i I0, I1, x
+
+    # load/print newline
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # load/print  "printing arg 1..."
+    set_imm S0, 0, 2
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # put argv[1] into S0 (argv[0] is the name of this file)
+    set_imm S0, 0, ARGV
+    deref   S0, INTERP, S0
+    set_imm I1, 0, 1
+    deref   S0, S0, I1
+    print_s I0, S0, x
+
+    # load/print newline
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+    # load/print  "done"
+    set_imm S0, 0, 3
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    exit    I0, x, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm: 

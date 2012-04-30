@@ -35,12 +35,28 @@ m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode );
 int
 main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
+    int        i;
+    char**     interp_argv;
 
     if (!interp)
         exit(1);
 
     (*interp)[ARGC] = argc - 1;
-    (*interp)[ARGV] = (uint64_t)&(argv[1]);
+    interp_argv = (char**) malloc((argc-1) * sizeof(char*));
+
+    // encode cli arguments as M0 strings, skipping the first (name of the interp)
+    for (i = 1; i < argc; i++) {
+        const char *arg = argv[i];
+        uint64_t    m0_arg_const_len = strlen(arg) + 4 + 4 + 1; // byte count + encoding + string bytes + terminal null
+        uint64_t    m0_arg_len       = strlen(arg) + 1;
+        uint64_t    m0_arg_encoding  = 0;
+        char       *m0_arg_const     = (char*) malloc(m0_arg_const_len * sizeof(char));
+        memcpy(&(m0_arg_const[0]), &m0_arg_len, sizeof(uint64_t));
+        memcpy(&(m0_arg_const[4]), &m0_arg_encoding, sizeof(uint64_t));
+        memcpy(&(m0_arg_const[8]), arg, m0_arg_len * sizeof(char));
+        interp_argv[i-1] = m0_arg_const;
+    }
+    (*interp)[ARGV] = interp_argv;
 
     if (argc < 2) {
         fprintf( stderr, "Usage: m0 <filename.mob>\n" );
