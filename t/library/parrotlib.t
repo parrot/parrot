@@ -39,15 +39,15 @@ expected absolute filenames.
     .local pmc    location_sub
     .local string location
     location_sub = get_global ["_parrotlib"], "include_file_location"
-    location     = location_sub( 'datatypes.pasm' )
-    is(location,'runtime/parrot/include/datatypes.pasm', 'include file location' )
+    location     = location_sub( 'datatypes.pir' )
+    is(location,'runtime/parrot/include/datatypes.pir', 'include file location' )
 .end
 
 .sub test_include_file_location_non_existent
     .local pmc    location_sub
     .local string location
     location_sub = get_global ['_parrotlib'], "include_file_location"
-    location     = location_sub( 'nonexistent.pasm' )
+    location     = location_sub( 'nonexistent.pir' )
     is(location, '', 'include file location non-existent')
 .end
 
