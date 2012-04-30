@@ -807,6 +807,70 @@ Return the POST representation of a C<PAST::Control>.
         ops.push_pirop('push_eh', ehreg);
         return;
     }
+
+    function wrap_handlers[method](var child, var ehs, options [slurpy, named]) {
+        string rtype  = options['rtype'];
+        int addreturn = options['addreturn'];
+        string result;
+        if (!addreturn)
+            :(result) = self.tempreg(rtype);
+
+        // Probably not safe to use tempregs in an exception handler
+        var tempregs;
+        ${ .lex '%*TEMPREGS', tempregs };
+
+        using POST.Ops;
+        var node;
+        var ops =  Ops.new(node:[named('node')]);
+        var tail = Ops.new(node:[named('node')]);
+        using POST.Label;
+        var skip = Label.new(string(self.unique('skip_handler_')):[named('result')]);
+
+        ops.result(result);
+        if (result)
+            child = self.coerce(child, result);
+
+        int depth = 0;
+        var it;
+        ${ iter it, ehs };
+        while (it) {
+            node = shift_var(it);
+            var label = Label.new(string(self.unique('control_')):[named('result')]);
+            self.push_exception_handler(node, ops, label);
+            ++depth;
+
+            // Push the handler itself
+            tail.push(label);
+            :(string exceptreg) = self.uniquereg('P');
+            tail.push_pirop('peek_exception', exceptreg);
+            var ehpir = self.as_post(node, rtype:[named('rtype')]);
+            if (result)
+                ehpir = self.coerce(ehpir, result);
+            tail.push(ehpir);
+            tail.push_pirop('finalize', exceptreg);
+            if (addreturn) {
+                var retval = ehpir.result();
+                tail.push_pirop('return', retval);
+                continue;
+            }
+            tail.push_pirop('pop_upto_eh', exceptreg);
+            int i = depth;
+            do {
+                tail.push_pirop('pop_eh');
+            } while(--i);
+            if (it)
+                tail.push_pirop('goto', skip);
+        }
+
+        ops.push(child);
+        for(int i = depth; i; --i)
+            ops.push_pirop('pop_eh');
+        ops.push_pirop('goto', skip);
+        ops.push(tail);
+        ops.push(skip);
+
+        return ops;
+    }
 }
 
 /*
