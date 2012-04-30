@@ -27,15 +27,15 @@ $year += 1900;
 
 # don't run this test 1 tick before the year changes #'
 
-pasm_output_is( <<'CODE', $year, "decodelocaltime" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', $year, "decodelocaltime" );
 .loadlib 'sys_ops'
-    time I0
-    decodelocaltime P0, I0
+.sub test
+    time $I0
+    decodelocaltime $P0, $I0
     .include "tm.pir"
-    set I0, P0[.TM_YEAR]
-    print I0
-    end
+    set $I0, $P0[.TM_YEAR]
+    print $I0
+.end
 CODE
 
 
