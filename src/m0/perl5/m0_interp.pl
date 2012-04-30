@@ -155,7 +155,15 @@ sub new_interp {
 
     # make cli arguments accessible to M0 code
     $interp->[M0_ARGC] = i($#ARGV + 1);
-    $interp->[M0_ARGV] = \@ARGV;
+    my $m0_argv = [];
+    # encode cli arguments as M0 strings
+    foreach my $arg (@ARGV) {
+        my $const_length = bytes::length($arg) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
+        my $string_length = bytes::length($arg) + 1; # byte count + terminal null
+        my $encoding = 0;
+        push @$m0_argv, pack("iiia[$string_length]", $const_length, $string_length, $encoding, $arg);
+    }
+    $interp->[M0_ARGV] = $m0_argv;
 
     return $interp;
 }
@@ -561,7 +569,7 @@ sub m0_opfunc_print_i {
     my $handle = $$cf->[$a1];
     my $var    = i($$cf,$a2);
     # TODO: print to $handle instead of stdout
-    print $var;
+    print $var."\n";
 }
 
 sub m0_opfunc_print_n {
