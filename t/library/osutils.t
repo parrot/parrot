@@ -92,15 +92,15 @@ Tests the C<osutils> runtime library.
     $I0 = newer('runtime/parrot/library/osutils.pir', 'runtime/parrot/library/osutils.pir')
     nok($I0, "newer('osutils.pir', 'osutils.pir')")
 
-    $P0 = split ' ', 'runtime/parrot/library/osutils.pir runtime/parrot/include/stat.pasm'
+    $P0 = split ' ', 'runtime/parrot/library/osutils.pir runtime/parrot/include/stat.pir'
     $I0 = newer('runtime/parrot/library/osutils.pbc', $P0)
-    ok($I0, "newer('osutils.pbc', ['osutils.pir', 'stat.pasm'])")
+    ok($I0, "newer('osutils.pbc', ['osutils.pir', 'stat.pir'])")
 
     $I0 = newer('runtime/parrot/library/osutils.no_file', $P0)
-    nok($I0, "newer('osutils.no_file', ['osutils.pir', 'stat.pasm'])")
+    nok($I0, "newer('osutils.no_file', ['osutils.pir', 'stat.pir'])")
 
     $I0 = newer('runtime/parrot/library/osutils.pir', $P0)
-    nok($I0, "newer('osutils.pir', ['osutils.pir', 'stat.pasm'])")
+    nok($I0, "newer('osutils.pir', ['osutils.pir', 'stat.pir'])")
 .end
 
 .sub 'test_rindex'
