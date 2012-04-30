@@ -47,6 +47,7 @@ $include_const 'interpinfo.pasm';
 
 class P6metaclass;
 class PAST.Node;
+class PAST.Stmt;
 
 inline is_cclass(int cclass, string str, int pos) return int {
     int ret;
@@ -653,6 +654,89 @@ is typically invoked by the various vivification methods below
 */
     function as_vivipost[method, multi('_', '_')](var node, options [slurpy, named]) {
         return self.as_post(node, options:[flat, named]);
+    }
+
+/*
+=item node_as_post(node)
+
+Common code for as_post(PAST::Node) and as_post(PAST::Stmts)
+
+=cut
+
+*/
+    function node_as_post[method](var node, options [slurpy, named]) {
+        string rtype = options['rtype'];
+        :(string signature) = node.signature();
+        if (!signature) {
+            ${ repeat signature, 'v', elements(node.list()) };
+            signature += rtype;
+        }
+        var ops = self.post_children(node, signature:[named('signature')]);
+        var result = ops[-1];
+        int i = indexof('0123456789', substr(signature, 0, 1));
+        if (i >= 0)
+            result = ops[i];
+        ops.result(result);
+        if (rtype)
+            ops = self.coerce(ops, rtype);
+        var eh = node.handlers();
+        if (eh)
+            ops = self.wrap_handlers(ops, eh, rtype:[named('rtype')]);
+        return ops;
+    }
+
+/*
+=item as_post(PAST::Node node)
+
+Return the POST representation of executing C<node>'s children in
+sequence.  The result of the final child is used as the result
+of this node.
+
+=cut
+
+*/
+    function as_post[method, multi('_', class PAST.Node)](var node, options [slurpy, named]) {
+        // Original PIR labeled this method with subid('Node.as_post')
+        return self.node_as_post(node, options:[flat, named]);
+    }
+
+/*
+
+=back
+
+=head3 C<PAST::Stmt>
+
+=over 4
+
+=item as_post(PAST::Stmt node)
+
+Return the POST representation of a C<PAST::Stmt>.  This is
+essentially the same as for C<PAST::Node> above, but also
+defines the boundaries of temporary register allocations.
+
+=cut
+
+*/
+    function as_post[method, multi('_', class PAST.Stmt)](var node, options [slurpy, named]) {
+        var outerregs;
+        ${ find_dynamic_lex outerregs, '%*TEMPREGS' };
+        var tempregs;
+        if (outerregs != null)
+            tempregs = clone(outerregs);
+        ${ .lex '%*TEMPREGS', tempregs };
+
+        var post = self.node_as_post(node, options:[flat, named]);
+
+        if (outerregs != null) {
+            string rtype = options['rtype'];
+            if (rtype != 'v') {
+                :(string result) = post.result();
+                if (substr(result, 0, 1) == '$')
+                    outerregs[result] = 1;
+            }
+        }
+
+        return post;
     }
 }
 
