@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
-use Math::Trig qw( tan sec atan asin acos asec cosh sinh tanh sech );
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -22,171 +21,110 @@ Tests the transcendental mathematical operations.
 
 =cut
 
-# This defines two macros:
-# fp_eq N, N, LABEL
-# fp_ne N, N, LABEL
-# which will conditionally branch
-# to LABEL if abs(n,n) < epsilon
+# simple tests of "result = opcode val"
+test_opcode("sinh", 1, 1.175201);
+test_opcode("tanh", 1, 0.761594);
+test_opcode("sech", 1, 0.648054);
+test_opcode("sqrt", 9, 3);
+test_opcode("log2", 10, 3.321928);
+test_opcode("log10", 15, 1.176091);
+test_opcode("ln", 10, 2.302585);
+test_opcode("exp", 10, 22026.465795);
 
-pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
+# more complicated tests
+pir_output_is( <<'CODE', <<OUTPUT, 'atan2' );
+.loadlib 'trans_ops'
+.sub test
         .include 'fp_equality.pir'
-        set N1, 1.0
-        sinh N2, N1
-        .fp_eq_pasm  (N2, 1.175201, EQ1)
+        set $N0, 0.0
+        set $I0, 0
+        set $N1, 1.0
+        set $I1, 1
+        set $N2, 1.0
+        set $I2, 1
+        set $I3, -1
+        set $N3, -1.0
+
+        atan $N4, $N1, $N2
+        .fp_eq  ($N4, 0.785398, EQ1)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ1:    say "ok 1"
 
-        set I1, 1
-        sinh N2, I1
-        .fp_eq_pasm  (N2, 1.175201, EQ2)
+        atan $N4, $N1, $I2
+        .fp_eq  ($N4, 0.785398, EQ2)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ2:    say "ok 2"
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 1.0
-        tanh N2, N1
-        .fp_eq_pasm  (N2, 0.761594, EQ1)
+        atan $N4, $I1, $N2
+        .fp_eq  ($N4, 0.785398, EQ3)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ3:    say "ok 3"
 
-        set I1, 1
-        tanh N2, I1
-        .fp_eq_pasm  (N2, 0.761594, EQ2)
+        atan $N4, $I1, $I2
+        .fp_eq  ($N4, 0.785398, EQ4)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ4:    say "ok 4"
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "sech" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 1.0
-        sech N2, N1
-        .fp_eq_pasm  (N2, 0.648054, EQ1)
+        atan $N4, $N3, 1.0
+        .fp_eq   ($N4, -0.785398, EQ5)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ5:    say "ok 5"
 
-        set I1, 1
-        sech N2, I1
-        .fp_eq_pasm  (N2, 0.648054, EQ2)
+        atan $N4, $N1, 0
+        .fp_eq   ($N4, 1.570796, EQ6)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ6:    say "ok 6"
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N0, 0.0
-        set I0, 0
-        set N1, 1.0
-        set I1, 1
-        set N2, 1.0
-        set I2, 1
-        set I3, -1
-        set N3, -1.0
-
-        atan N4, N1, N2
-        .fp_eq_pasm  (N4, 0.785398, EQ1)
+        atan $N4, $I3, 0.0
+        .fp_eq   ($N4, -1.570796, EQ7)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ7:    say "ok 7"
 
-        atan N4, N1, I2
-        .fp_eq_pasm  (N4, 0.785398, EQ2)
+        atan $N4, $I3, -1
+        .fp_eq   ($N4, -2.356194, EQ8)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ8:    say "ok 8"
 
-        atan N4, I1, N2
-        .fp_eq_pasm  (N4, 0.785398, EQ3)
+        atan $N4, 1.0, $N3
+        .fp_eq   ($N4, 2.356194, EQ9)
         print "not "
-EQ3:    print "ok 3\\n"
+EQ9:    say "ok 9"
 
-        atan N4, I1, I2
-        .fp_eq_pasm  (N4, 0.785398, EQ4)
+        atan $N4, 1.0, $I0
+        .fp_eq   ($N4, 1.570796, EQ10)
         print "not "
-EQ4:    print "ok 4\\n"
+EQ10:   say "ok 10"
 
-        atan N4, N3, 1.0
-        .fp_eq_pasm   (N4, -0.785398, EQ5)
+        atan $N4, 1, $N1
+        .fp_eq   ($N4, 0.785398, EQ11)
         print "not "
-EQ5:    print "ok 5\\n"
+EQ11:   say "ok 11"
 
-        atan N4, N1, 0
-        .fp_eq_pasm   (N4, 1.570796, EQ6)
+        atan $N4, 1, $I1
+        .fp_eq   ($N4, 0.785398, EQ12)
         print "not "
-EQ6:    print "ok 6\\n"
+EQ12:   say "ok 12"
 
-        atan N4, I3, 0.0
-        .fp_eq_pasm   (N4, -1.570796, EQ7)
+        atan $N4, 0.0, 1.0
+        .fp_eq   ($N4, 0.000000, EQ13)
         print "not "
-EQ7:    print "ok 7\\n"
+EQ13:   say "ok 13"
 
-        atan N4, I3, -1
-        .fp_eq_pasm   (N4, -2.356194, EQ8)
+        atan $N4, -1.0, 0
+        .fp_eq   ($N4, -1.570796, EQ14)
         print "not "
-EQ8:    print "ok 8\\n"
+EQ14:   say "ok 14"
 
-        atan N4, 1.0, N3
-        .fp_eq_pasm   (N4, 2.356194, EQ9)
+        atan $N4, 1, -1.0
+        .fp_eq   ($N4, 2.356194, EQ15)
         print "not "
-EQ9:    print "ok 9\\n"
+EQ15:   say "ok 15"
 
-        atan N4, 1.0, I0
-        .fp_eq_pasm   (N4, 1.570796, EQ10)
+        atan $N4, 0, 1
+        .fp_eq   ($N4, 0.000000, EQ16)
         print "not "
-EQ10:   print "ok 10\\n"
-
-        atan N4, 1, N1
-        .fp_eq_pasm   (N4, 0.785398, EQ11)
-        print "not "
-EQ11:   print "ok 11\\n"
-
-        atan N4, 1, I1
-        .fp_eq_pasm   (N4, 0.785398, EQ12)
-        print "not "
-EQ12:   print "ok 12\\n"
-
-        atan N4, 0.0, 1.0
-        .fp_eq_pasm   (N4, 0.000000, EQ13)
-        print "not "
-EQ13:   print "ok 13\\n"
-
-        atan N4, -1.0, 0
-        .fp_eq_pasm   (N4, -1.570796, EQ14)
-        print "not "
-EQ14:   print "ok 14\\n"
-
-        atan N4, 1, -1.0
-        .fp_eq_pasm   (N4, 2.356194, EQ15)
-        print "not "
-EQ15:   print "ok 15\\n"
-
-        atan N4, 0, 1
-        .fp_eq_pasm   (N4, 0.000000, EQ16)
-        print "not "
-EQ16:   print "ok 16\\n"
-        end
+EQ16:   say "ok 16"
+.end
 CODE
 ok 1
 ok 2
@@ -206,199 +144,114 @@ ok 15
 ok 16
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'atan, part 2' );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
+pir_output_is( <<'CODE', <<'OUTPUT', 'atan, part 2' );
+.loadlib 'trans_ops'
+.sub test
         .include 'fp_equality.pir'
-        atan N4, -0.0, -0.0
-        .fp_eq_pasm   (N4, -3.1415926, EQ1)
+        atan $N4, -0.0, -0.0
+        .fp_eq   ($N4, -3.1415926, EQ1)
         print "not "
-EQ1:    print "ok 1\\n"
-        end
+EQ1:    say "ok 1"
+.end
 CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "log2" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
+
+pir_output_is( <<'CODE', <<OUTPUT, "pow" );
+.loadlib 'trans_ops'
+.sub test
         .include 'fp_equality.pir'
-        set N1, 10.0
-        log2 N2, N1
-        .fp_eq_pasm  (N2, 3.321928, EQ1)
+        set $N1, 3.0
+        set $I1, 3
+        set $N2, 5.0
+        set $I2, 5
+        pow $N3, $N1, $N2
+        .fp_eq  ($N3, 243.0, EQ1)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ1:    say "ok 1"
 
-        set I1, 10
-        log2 N2, I1
-        .fp_eq_pasm  (N2, 3.321928, EQ2)
+        pow $N3, $N1, $I2
+        .fp_eq  ($N3, 243.0, EQ2)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ2:    say "ok 2"
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "log10" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 15.0
-        log10 N2, N1
-        .fp_eq_pasm  (N2, 1.176091, EQ1)
+        pow $N3, $I1, $N2
+        .fp_eq  ($N3, 243.0, EQ3)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ3:    say "ok 3"
 
-        set I1, 15
-        log10 N2, I1
-        .fp_eq_pasm  (N2, 1.176091, EQ2)
+        pow $N3, $I1, $I2
+        .fp_eq  ($N3, 243.0, EQ4)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ4:    say "ok 4"
 
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<"CODE", <<OUTPUT, "ln" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 10.0
-        ln N2, N1
-        .fp_eq_pasm  (N2, 2.302585, EQ1)
+        set $N0, 0.0
+        set $I0, 0
+        set $N1, 1.0
+        set $I1, 1
+        set $N2, 4.0
+        set $I2, 4
+        pow $N3, $N2, 2.5
+        .fp_eq  ($N3, 32.0, EQ5)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ5:    say "ok 5"
 
-        set I1, 10
-        ln N2, I1
-        .fp_eq_pasm  (N2, 2.302585, EQ2)
+        pow $N3, $N2, -2
+        .fp_eq  ($N3, 0.0625, EQ6)
         print "not "
-EQ2:    print "ok 2\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+EQ6:    say "ok 6"
 
-pasm_output_is( <<"CODE", <<OUTPUT, "exp" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 10.0
-        exp N2, N1
-        .fp_eq_pasm  (N2, 22026.465795, EQ1)
+        pow $N3, $I2, 0.5
+        .fp_eq  ($N3, 2.0, EQ7)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ7:    say "ok 7"
 
-        set I1, 10
-        exp N2, I1
-        .fp_eq_pasm (N2, 22026.465795, EQ2)
+        pow $N3, $I2, 0
+        .fp_eq  ($N3, 1.0, EQ8)
         print "not "
-EQ2:    print "ok 2\\n"
-        end
-CODE
-ok 1
-ok 2
-OUTPUT
+EQ8:    say "ok 8"
 
-pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
-.pcc_sub :main main:
-        .loadlib 'trans_ops'
-        .include 'fp_equality.pir'
-        set N1, 3.0
-        set I1, 3
-        set N2, 5.0
-        set I2, 5
-        pow N3, N1, N2
-        .fp_eq_pasm  (N3, 243.0, EQ1)
+        pow $N3, 0.0, $N2
+        .fp_eq  ($N3, 0.0, EQ9)
         print "not "
-EQ1:    print "ok 1\\n"
+EQ9:    say "ok 9"
 
-        pow N3, N1, I2
-        .fp_eq_pasm  (N3, 243.0, EQ2)
+        pow $N3, 2.5, 0.0
+        .fp_eq  ($N3, 1.0, EQ10)
         print "not "
-EQ2:    print "ok 2\\n"
+EQ10:   say "ok 10"
 
-        pow N3, I1, N2
-        .fp_eq_pasm  (N3, 243.0, EQ3)
+        pow $N3, 2.5, $I2
+        .fp_eq  ($N3, 39.0625, EQ11)
         print "not "
-EQ3:    print "ok 3\\n"
+EQ11:   say "ok 11"
 
-        pow N3, I1, I2
-        .fp_eq_pasm  (N3, 243.0, EQ4)
+        pow $N3, 2.0, -4
+        .fp_eq  ($N3, 0.0625, EQ12)
         print "not "
-EQ4:    print "ok 4\\n"
+EQ12:   say "ok 12"
 
-        set N0, 0.0
-        set I0, 0
-        set N1, 1.0
-        set I1, 1
-        set N2, 4.0
-        set I2, 4
-        pow N3, N2, 2.5
-        .fp_eq_pasm  (N3, 32.0, EQ5)
+        pow $N3, 0, $N2
+        .fp_eq  ($N3, 0.0, EQ13)
         print "not "
-EQ5:    print "ok 5\\n"
+EQ13:   say "ok 13"
 
-        pow N3, N2, -2
-        .fp_eq_pasm  (N3, 0.0625, EQ6)
+        pow $N3, 4, -0.5
+        .fp_eq  ($N3, 0.5, EQ14)
         print "not "
-EQ6:    print "ok 6\\n"
+EQ14:   say "ok 14"
 
-        pow N3, I2, 0.5
-        .fp_eq_pasm  (N3, 2.0, EQ7)
+        pow $N3, 4, $I2
+        .fp_eq  ($N3, 256.0, EQ15)
         print "not "
-EQ7:    print "ok 7\\n"
+EQ15:   say "ok 15"
 
-        pow N3, I2, 0
-        .fp_eq_pasm  (N3, 1.0, EQ8)
+        pow $N3, 4, -1
+        .fp_eq  ($N3, 0.25, EQ16)
         print "not "
-EQ8:    print "ok 8\\n"
-
-        pow N3, 0.0, N2
-        .fp_eq_pasm  (N3, 0.0, EQ9)
-        print "not "
-EQ9:    print "ok 9\\n"
-
-        pow N3, 2.5, 0.0
-        .fp_eq_pasm  (N3, 1.0, EQ10)
-        print "not "
-EQ10:   print "ok 10\\n"
-
-        pow N3, 2.5, I2
-        .fp_eq_pasm  (N3, 39.0625, EQ11)
-        print "not "
-EQ11:   print "ok 11\\n"
-
-        pow N3, 2.0, -4
-        .fp_eq_pasm  (N3, 0.0625, EQ12)
-        print "not "
-EQ12:   print "ok 12\\n"
-
-        pow N3, 0, N2
-        .fp_eq_pasm  (N3, 0.0, EQ13)
-        print "not "
-EQ13:   print "ok 13\\n"
-
-        pow N3, 4, -0.5
-        .fp_eq_pasm  (N3, 0.5, EQ14)
-        print "not "
-EQ14:   print "ok 14\\n"
-
-        pow N3, 4, I2
-        .fp_eq_pasm  (N3, 256.0, EQ15)
-        print "not "
-EQ15:   print "ok 15\\n"
-
-        pow N3, 4, -1
-        .fp_eq_pasm  (N3, 0.25, EQ16)
-        print "not "
-EQ16:   print "ok 16\\n"
-        end
+EQ16:   say "ok 16"
+.end
 CODE
 ok 1
 ok 2
@@ -418,69 +271,37 @@ ok 15
 ok 16
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "sqrt" );
-.pcc_sub :main main:
-       .include 'fp_equality.pir'
-       set N1, 9.0
-       sqrt N2, N1
-       .fp_eq_pasm  (N2, 3.0, EQ1)
-       print "not "
-EQ1:   print "ok 1\\n"
 
-       set I1, 9
-       sqrt N2, I1
-       .fp_eq_pasm  (N2, 3.0, EQ2)
-       print "not "
-EQ2:   print "ok 2\\n"
-
-       end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
-.pcc_sub :main main:
-    .loadlib 'trans_ops'
-    set N0, 2.0
-    pow N1, N0, 0
-    print N1
-    print "\n"
-    pow N1, N0, 1
-    print N1
-    print "\n"
-    pow N1, N0, 2
-    print N1
-    print "\n"
-    pow N1, N0, 3
-    print N1
-    print "\n"
-    pow N1, N0, 4
-    print N1
-    print "\n"
-    pow N1, N0, 5
-    print N1
-    print "\n"
-    pow N1, N0, 6
-    print N1
-    print "\n"
-    pow N1, N0, 7
-    print N1
-    print "\n"
-    pow N1, N0, -1
-    print N1
-    print "\n"
-    pow N1, N0, -2
-    print N1
-    print "\n"
-    pow N1, N0, -3
-    print N1
-    print "\n"
-    pow N1, N0, -4
-    print N1
-    print "\n"
-    pow N1, N0, -5
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "pow_n_n_ic" );
+.loadlib 'trans_ops'
+.sub test
+    set $N0, 2.0
+    pow $N1, $N0, 0
+    say $N1
+    pow $N1, $N0, 1
+    say $N1
+    pow $N1, $N0, 2
+    say $N1
+    pow $N1, $N0, 3
+    say $N1
+    pow $N1, $N0, 4
+    say $N1
+    pow $N1, $N0, 5
+    say $N1
+    pow $N1, $N0, 6
+    say $N1
+    pow $N1, $N0, 7
+    say $N1
+    pow $N1, $N0, -1
+    say $N1
+    pow $N1, $N0, -2
+    say $N1
+    pow $N1, $N0, -3
+    say $N1
+    pow $N1, $N0, -4
+    say $N1
+    pow $N1, $N0, -5
+.end
 CODE
 1
 2
@@ -496,63 +317,50 @@ CODE
 0.0625
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
-.pcc_sub :main main:
-    .loadlib 'trans_ops'
-    set N0, 2.0
-    set I0, 0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    inc I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    set I0, -1
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    dec I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    dec I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    dec I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    dec I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    dec I0
-    pow N1, N0, I0
-    print N1
-    print "\n"
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "pow_n_n_i" );
+.loadlib 'trans_ops'
+.sub test
+    set $N0, 2.0
+    set $I0, 0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    inc $I0
+    pow $N1, $N0, $I0
+    say $N1
+    set $I0, -1
+    pow $N1, $N0, $I0
+    say $N1
+    dec $I0
+    pow $N1, $N0, $I0
+    say $N1
+    dec $I0
+    pow $N1, $N0, $I0
+    say $N1
+    dec $I0
+    pow $N1, $N0, $I0
+    say $N1
+    dec $I0
+    pow $N1, $N0, $I0
+    say $N1
+    dec $I0
+    pow $N1, $N0, $I0
+    say $N1
+.end
 CODE
 1
 2
@@ -568,6 +376,42 @@ CODE
 0.03125
 0.015625
 OUTPUT
+
+sub test_opcode {
+    my $operator = shift;
+    my $input    = shift;
+    my $value    = shift;
+
+    pir_output_is( <<"CODE", "good", "$operator float" );
+
+.loadlib 'trans_ops'
+.sub test
+    .include 'fp_equality.pir'
+    set \$N1, ${input}.0
+    $operator \$N2, \$N1
+    .fp_eq (\$N2, $value, EQ)
+    print "not "
+EQ:
+    print "good"
+.end
+CODE
+
+    pir_output_is( <<"CODE", "good", "$operator int" );
+
+.loadlib 'trans_ops'
+.sub test
+    .include 'fp_equality.pir'
+    set \$I1, ${input}
+    $operator \$N2, \$I1
+    .fp_eq (\$N2, $value, EQ)
+    print "not "
+EQ:
+    print "good"
+.end
+CODE
+
+}
+
 
 # Local Variables:
 #   mode: cperl
