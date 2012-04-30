@@ -184,15 +184,15 @@ pir_output_is( <<'CODE', 'foo', 'constant defined and used' );
 .end
 CODE
 
-pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
-.pcc_sub :main main:
-.macro_const FOO S0
+pir_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
+.macro_const FOO $S0
+.sub test
 .macro answer (bar)
   print .bar
 .endm
   set .FOO,"foo"
   .answer(.FOO)
-  end
+.end
 CODE
 
 
@@ -228,19 +228,19 @@ CODE
 
 open my $FOO, '>', "macro.tempfile_$$";
 print $FOO <<'ENDF';
-  set S0, "Betelgeuse\n"
+  set $S0, "Betelgeuse\n"
 ENDF
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'basic include macro' );
-.pcc_sub :main main:
+pir_output_is( <<"CODE", <<'OUTPUT', 'basic include macro' );
+.sub test
 .include "macro.tempfile_$$"
-  print S0
+  print \$S0
 
-  set S0, "Rigel"
+  set \$S0, "Rigel"
 .include "macro.tempfile_$$"
-  print S0
-  end
+  print \$S0
+.end
 CODE
 Betelgeuse
 Betelgeuse
@@ -249,23 +249,22 @@ OUTPUT
 open $FOO, '>', "macro.tempfile_$$";    # Clobber previous
 print $FOO <<'ENDF';
 .macro multiply(A,B)
-    new P0, 'Float'
-    set P0, .A
-    new P1, 'Float'
-    set P1, .B
-    new P2, 'Float'
-    mul P2, P1, P0
+    new $P0, 'Float'
+    set $P0, .A
+    new $P1, 'Float'
+    set $P1, .B
+    new $P2, 'Float'
+    mul $P2, $P1, $P0
 .endm
 ENDF
 close $FOO;
 
-pasm_output_is( <<"CODE", <<'OUTPUT', 'include a file defining a macro' );
-.pcc_sub :main main:
+pir_output_is( <<"CODE", <<'OUTPUT', 'include a file defining a macro' );
 .include "macro.tempfile_$$"
+.sub test
  .multiply(12,13)
- print P2
- print "\\n"
- end
+ say \$P2
+.end
 CODE
 156
 OUTPUT
