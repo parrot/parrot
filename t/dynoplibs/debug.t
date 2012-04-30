@@ -25,16 +25,16 @@ as well as backtrace tests.
 
 $ENV{TEST_PROG_ARGS} ||= '';
 my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
-    ? "\\(unknown file\\)\n-1" : "debug_\\d+\\.pasm\n\\d";
+    ? "\\(unknown file\\)\n-1" : "debug_\\d+\\.pir\n\\d";
 
-pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
+pir_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .loadlib 'debug_ops'
-.pcc_sub :main main:
-    getfile S0
-    getline I0
-    say S0
-    say I0
-end
+.sub test
+    getfile $S0
+    getline $I0
+    say $S0
+    say $I0
+.end
 CODE
 /$nolineno/
 OUTPUT
