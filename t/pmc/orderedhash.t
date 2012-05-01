@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -468,7 +468,7 @@ CODE
 14
 OUTPUT
 
-# actually $Parrot_OrderedHash_set_string_keyed is used, why ?
+# actually Parrot_OrderedHash_set_string_keyed is used, why ?
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str" );
 .sub _main :main
     .local pmc hash1
@@ -641,7 +641,7 @@ CODE
 0012
 OUTPUT
 
-# actually $Parrot_OrderedHash_delete_keyed is used
+# actually Parrot_OrderedHash_delete_keyed is used
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
 .sub _main :main
     .local pmc hash1

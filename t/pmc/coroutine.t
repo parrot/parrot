@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -21,27 +21,29 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pir"
-.pcc_sub :main _main:
-    .const 'Sub' P0 = "_coro"
-    new P10, ['Integer']
-    set P10, 2
-    set_global "i", P10
+.sub _main main:
+    .const 'Sub' $P0 = "_coro"
+    new $P10, ['Integer']
+    set $P10, 2
+    set_global "i", $P10
 lp:
-    invokecc P0
+    invokecc $P0
     print "back "
-    print P10
+    print $P10
     print "\n"
-    if P10, lp
+    if $P10, lp
     print "done\n"
     end
-.pcc_sub _coro:
+.end
+.sub _coro:
 loop:
-    get_global P11, "i"
-    dec P11
+    get_global $P11, "i"
+    dec $P11
     yield
     branch loop
+.end
 CODE
 back 1
 back 0
@@ -49,8 +51,7 @@ done
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
-
-.sub __main__ :main
+.sub _main :main
     .local pmc return
     .local pmc counter
     .const 'Sub' itr = "_iterator"
@@ -105,155 +106,161 @@ CODE
 10 0
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 .include "interpinfo.pir"
-.pcc_sub :main _main:
-    .const 'Sub' P0 = "_coro"
+.sub _main main:
+    .const 'Sub' $P0 = "_coro"
     push_eh _catchm
-    new P16, ['Integer']
-    set P16, 2
-    set_global "i", P16
+    new $P16, ['Integer']
+    set $P16, 2
+    set_global "i", $P16
 lp:
-    invokecc P0
+    invokecc $P0
     print "back "
-    print P16
+    print $P16
     print "\n"
-    null S0
-    get_global P17, S0
-    if P16, lp
+    null $S0
+    get_global $P17, $S0
+    if $P16, lp
     print "done\n"
     end
 _catchm:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch main\n"
     end
+.end
 
-.pcc_sub _coro:
+.sub _coro:
     push_eh _catchc
 corolp:
-    get_global P17, "i"
-    dec P17
+    get_global $P17, "i"
+    dec $P17
     yield
     branch corolp
 _catchc:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch coro\n"
     end
+.end
 CODE
 back 1
 catch main
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 .include "interpinfo.pir"
-.pcc_sub :main _main:
-    .const 'Sub' P0 = "_coro"
+.sub _main main:
+    .const 'Sub' $P0 = "_coro"
     push_eh _catchm
-    new P16, ['Integer']
-    set P16, 2
-    set_global "i", P16
+    new $P16, ['Integer']
+    set $P16, 2
+    set_global "i", $P16
 lp:
-    invokecc P0
+    invokecc $P0
     print "back "
-    print P16
+    print $P16
     print "\n"
-    if P16, lp
+    if $P16, lp
     print "done\n"
     end
 _catchm:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch main\n"
     end
-
-.pcc_sub _coro:
+.end
+.sub _coro:
     push_eh _catchc
 corolp:
-    get_global P17, "i"
-    dec P17
+    get_global $P17, "i"
+    dec $P17
     yield
-    null S0
-    get_global P17, S0
+    null $S0
+    get_global $P17, $S0
     branch corolp
 _catchc:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch coro\n"
     end
+.end
 CODE
 back 1
 catch coro
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
 .include "interpinfo.pir"
-.pcc_sub :main _main:
-    .const 'Sub' P0 = "_coro"
+.sub _main main:
+    .const 'Sub' $P0 = "_coro"
     push_eh _catchm
-    new P16, ['Integer']
-    set P16, 2
-    set_global "i", P16
+    new $P16, ['Integer']
+    set $P16, 2
+    set_global "i", $P16
 lp:
-    invokecc P0
+    invokecc $P0
     print "back "
-    print P16
+    print $P16
     print "\n"
-    if P16, lp
+    if $P16, lp
     print "done\n"
     end
 _catchm:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch main\n"
     end
-.pcc_sub _coro:
+.end
+.sub _coro:
 corolp:
-    get_global P17, "i"
-    dec P17
+    get_global $P17, "i"
+    dec $P17
     yield
-    null S0
-    get_global P17, S0
+    null $S0
+    get_global $P17, $S0
     branch corolp
 _catchc:
     print "catch coro\n"
     end
+.end
 CODE
 back 1
 catch main
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
+pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 .include "interpinfo.pir"
-.pcc_sub :main _main:
-    .const 'Sub' P0 = "_coro"
+.sub _main main:
+    .const 'Sub' $P0 = "_coro"
     push_eh _catchm
-    new P16, ['Integer']
-    set P16, 2
-    set_global "i", P16
+    new $P16, ['Integer']
+    set $P16, 2
+    set_global "i", $P16
 lp:
-    invokecc P0
+    invokecc $P0
     print "back "
-    print P16
+    print $P16
     print "\n"
-    if P16, lp
+    if $P16, lp
     print "done\n"
     end
 _catchm:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch main\n"
     end
-
-.pcc_sub _coro:
+.end
+.sub _coro:
     push_eh _catchc
 corolp:
-    get_global P17, "i"
-    dec P17
+    get_global $P17, "i"
+    dec $P17
     yield
-    null S0
-    get_global P17, S0
+    null $S0
+    get_global $P17, $S0
     branch corolp
 _catchc:
-    get_results '0', P5
+    get_results '0', $P5
     print "catch coro\n"
-    rethrow P5
+    rethrow $P5
     end
+.end
 CODE
 back 1
 catch coro
@@ -261,8 +268,7 @@ catch main
 OUTPUT
 
 pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
-
-.sub main :main
+.sub _main :main
     .local pmc c
     c = get_global "coro"
     typeof $S0, c
@@ -280,8 +286,7 @@ pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 CODE
 
 pir_output_is( <<'CODE', '01234', "Coro new - yield" );
-
-.sub main :main
+.sub _main :main
     .local pmc c
     c = get_global "coro"
 loop:
@@ -308,7 +313,7 @@ CODE
 
 pir_output_like(
     <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far TT #1003' );
-.sub main :main
+.sub _main :main
     .local pmc c
     c = get_global "coro"
 loop:
@@ -330,7 +335,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
 .sub _main :main
     .local pmc pmc1
     pmc1 = new ['Coroutine']
@@ -350,7 +354,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "re-entering coro from another sub" );
 
-.sub main :main
+.sub _main :main
     .local int z
     .const 'Sub' corou = "_coroufn"
     corou("from main")
