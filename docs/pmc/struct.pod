@@ -21,7 +21,8 @@ initializer or with the B<assign> opcode to define the struct elements.
 
 =item Datatype
 
-The datatype is defined by constants declared in F<datatypes.pasm>.
+The datatype is defined by constants declared in
+F<runtime/parrot/include/datatypes.pir>.
 
 =item Array Size
 

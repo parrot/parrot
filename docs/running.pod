@@ -68,9 +68,7 @@ Print debugging and tracing flag bits summary.
 =item -o outputfile, --output=outputfile
 
 Act like an assembler. Don't run code, unless B<-r> is given too. If the
-outputfile ends with F<.pbc>, a PBC file is written. If it ends with F<.pasm>,
-a PASM output is generated, even from PASM input. This can be handy to check
-various optimizations, including C<-Op>.
+outputfile ends with F<.pbc>, a PBC file is written.
 
 =item --output-pbc
 

@@ -156,8 +156,8 @@ L<http://oss.software.ibm.com/icu/index.html>
 
 =item IMCC
 
-Intermediate Code Compiler: the component of parrot that compiles PASM
-and PIR into bytecode.
+Intermediate Code Compiler: the component of parrot that compiles PIR into
+bytecode.
 
 See also L<"PIR">.
 
@@ -193,7 +193,7 @@ See also L<"PCT">.
 =item PBC
 
 Parrot Bytecode. The name for the "executable" files that can be passed to the
-Parrot interpreter for immediate execution (although PASM and IMC files can be
+Parrot interpreter for immediate execution (although PIR files can be
 executed directly, too).
 
 See also L<"Packfile">.

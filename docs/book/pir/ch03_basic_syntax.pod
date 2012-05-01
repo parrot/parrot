@@ -293,19 +293,6 @@ You now know everything you need to know about PIR. Everything else you
 read or learn about PIR will use one of these fundamental language
 structures. The rest is vocabulary.
 
-=begin sidebar Parrot Assembly Language
-
-Parrot Assembly Language (PASM) is another low-level language native to the
-virtual machine. PASM is a pure assembly language, with none of the syntactic
-sugar that makes PIR friendly for library development.  PASM's primary purpose
-is to act as a plain English representation of the bytecode format. Its
-typical use is for debugging, rather than for writing libraries. Use PIR or a
-higher-level language for development tasks.
-
-PASM files use the F<.pasm> file extension.
-
-=end sidebar
-
 =cut
 
 # Local variables:
