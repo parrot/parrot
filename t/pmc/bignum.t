@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -72,29 +72,31 @@ if ( $PConfig{gmp} ) {
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "create" );
-.pcc_sub :main main:
-   new P0, ['BigNum']
+.sub _main :main
+   new $P0, ['BigNum']
    say "ok"
    end
+.end
 CODE
 ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 999999
-   set I1, P0
-   say I1
-   get_repr S0, P0
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 999999
+   set $I1, $P0
+   say $I1
+   get_repr $S0, $P0
+   say $S0
 
-   new P1, ['BigNum']
-   set P1, 22.2
-   setref P0, P1
-   set N0, P0
-   say N0
+   new $P1, ['BigNum']
+   set $P1, 22.2
+   setref $P0, $P1
+   set $N0, $P0
+   say $N0
    end
+.end
 CODE
 999999
 999999N
@@ -102,20 +104,21 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get keyed string" );
-.pcc_sub :main main:
-    new P0, ['BigNum']
-    set P0, 14
-    set S0, P0[16]
-    say S0
+.sub _main :main
+    new $P0, ['BigNum']
+    set $P0, 14
+    set $S0, $P0[16]
+    say $S0
 
-    set P0, 26
-    set S0, P0[8]
-    say S0
+    set $P0, 26
+    set $S0, $P0[8]
+    say $S0
 
-    set P0[16], "1F"
-    set S0, P0
-    say S0
+    set $P0[16], "1F"
+    set $S0, $P0
+    say $S0
     end
+.end
 CODE
 e
 32
@@ -123,85 +126,89 @@ e
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "destroy on copy" );
-.pcc_sub :main main:
-    new P0, ['BigNum']
-    new P1, ['BigNum']
-    set P0, 4183
-    set P1, 33
-    copy P0, P1
-    say P0
+.sub _main :main
+    new $P0, ['BigNum']
+    new $P1, ['BigNum']
+    set $P0, 4183
+    set $P1, 33
+    copy $P0, $P1
+    say $P0
     end
+.end
 CODE
 33
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "clone equality" );
-.pcc_sub :main main:
+.sub _main :main
     .include 'fp_equality.pir'
-    new P0, ['BigNum']
-    set P0, 56.743
-    clone P1, P0
-    set N0, P0
-    set N1, P1
-    .fp_eq_pasm(N0, N1, OK1)
+    new $P0, ['BigNum']
+    set $P0, 56.743
+    clone $P1, $P0
+    set $N0, $P0
+    set $N1, $P1
+    .fp_eq_pasm(N0, $N1, OK1)
     print "not "
 OK1:print "ok\n"
     end
+.end
 CODE
 ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "inc/dec" );
-.pcc_sub :main main:
+.sub _main :main
     .include 'fp_equality.pir'
-    new P0, ['BigNum']
-    set P0, 5.5
-    inc P0
-    set N0, P0
+    new $P0, ['BigNum']
+    set $P0, 5.5
+    inc $P0
+    set $N0, $P0
     .fp_eq_pasm(N0, 6.5, OK1)
     print "not "
 OK1:say "ok 1"
 
-    set P0, 5.5
-    dec P0
-    set N0, P0
+    set $P0, 5.5
+    dec $P0
+    set $N0, $P0
     .fp_eq_pasm(N0, 4.5, OK2)
     print "not "
 OK2:say "ok 2"
     end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
-pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
-.pcc_sub :main main:
+pasm_output_is( <<'CODE', <<'OUT', "set int, get double" );
+.sub _main :main
      .include 'fp_equality.pir'
-     new P0, ['BigNum']
-     set P0, 999999
-     set N1, P0
+     new $P0, ['BigNum']
+     set $P0, 999999
+     set $N1, $P0
      .fp_eq_pasm(N1, 999999.0, OK1)
      print "not "
 OK1: say "ok 1"
 
-     set P0, -999999
-     set N1, P0
+     set $P0, -999999
+     set $N1, $P0
      .fp_eq_pasm(N1, -999999.0, OK2)
      print "not "
 OK2: say "ok 2"
 
-     set P0, 2147483646
-     set N1, P0
+     set $P0, 2147483646
+     set $N1, $P0
      .fp_eq_pasm(N1, 2.147483646e9, OK3)
      print "not "
 OK3: say "ok 3"
 
-     set P0, -2147483646
-     set N1, P0
+     set $P0, -2147483646
+     set $N1, $P0
      .fp_eq_pasm(N1, -2.147483646e9, OK4)
      print "not "
 OK4: say "ok 4"
      end
+.end
 CODE
 ok 1
 ok 2
@@ -211,51 +218,53 @@ OUT
 
 my @todo_str = ( todo => "bignum strings");
 pasm_output_is( <<'CODE', <<'OUT', "set double, get str", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 1.23e12
-   say P0
-   set P0, "1230000000000.0000000000000000122"
-   say P0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 1.23e12
+   say $P0
+   set $P0, "1230000000000.0000000000000000122"
+   say $P0
    end
+.end
 CODE
 1230000000000
 1230000000000.0000000000000000122
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add", @todo_str);
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 999999.5
-   new P1, ['BigNum']
-   set P1, 1000000.5
-   new P2, ['BigNum']
-   add P2, P0, P1
-   set S0, P2
-   say S0
-   set P0, "12345678987654321"
-   set P1, "10000000000000000"
-   add P2, P1, P0
-   set S0, P2
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 999999.5
+   new $P1, ['BigNum']
+   set $P1, 1000000.5
+   new $P2, ['BigNum']
+   add $P2, $P0, $P1
+   set $S0, $P2
+   say $S0
+   set $P0, "12345678987654321"
+   set $P1, "10000000000000000"
+   add $P2, $P1, $P0
+   set $S0, $P2
+   say $S0
 
-   new P1, ['Integer']
-   set P0, 942
-   set P1, -2
-   add P0, P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['Integer']
+   set $P0, 942
+   set $P1, -2
+   add $P0, $P0, $P1
+   set $S0, $P0
+   say $S0
 
    push_eh THROWN
-   new P1, ['BigInt']
-   set P0, 100
-   set P1, 100
-   add P0, P0, P1
+   new $P1, ['BigInt']
+   set $P0, 100
+   set $P1, 100
+   add $P0, $P0, $P1
    print "no "
 THROWN:
    pop_eh
    say "exception thrown"
    end
+.end
 CODE
 2000000
 22345678987654321
@@ -264,47 +273,48 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_add", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   new P1, ['Float']
-   set P0, 400
-   set P1, 3.75
-   add P0, P1
-   set S0, P0
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   new $P1, ['Float']
+   set $P0, 400
+   set $P1, 3.75
+   add $P0, $P1
+   set $S0, $P0
+   say $S0
 
-   new P1, ['BigNum']
-   set P0, 300
-   set P1, -200
-   add P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['BigNum']
+   set $P0, 300
+   set $P1, -200
+   add $P0, $P1
+   set $S0, $P0
+   say $S0
 
-   new P1, ['Integer']
-   set P0, 300
-   set P1, -250
-   add P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['Integer']
+   set $P0, 300
+   set $P1, -250
+   add $P0, $P1
+   set $S0, $P0
+   say $S0
 
    push_eh THROWN
-   new P1, ['BigInt']
-   set P1, 3
-   add P0, P1
+   new $P1, ['BigInt']
+   set $P1, 3
+   add $P0, $P1
    print "no "
 THROWN:
    say "exception thrown"
 
-   set P0, 200
-   add P0, 5
-   set S0, P0
-   say S0
+   set $P0, 200
+   add $P0, 5
+   set $S0, $P0
+   say $S0
 
-   set P0, 200
-   add P0, 200.4
-   set S0, P0
-   say S0
+   set $P0, 200
+   add $P0, 200.4
+   set $S0, $P0
+   say $S0
    end
+.end
 CODE
 403.75
 100
@@ -315,49 +325,51 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add_int", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 999999
-   new P2, ['BigNum']
-   add P2, P0, 1000000
-   set S0, P2
-   say S0
-   set P0, "100000000000000000000.01"
-   add P2, P0, 1000000
-   set S0, P2
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 999999
+   new $P2, ['BigNum']
+   add $P2, $P0, 1000000
+   set $S0, $P2
+   say $S0
+   set $P0, "100000000000000000000.01"
+   add $P2, $P0, 1000000
+   set $S0, $P2
+   say $S0
    end
+.end
 CODE
 1999999
 100000000000001000000.01
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub bignum" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, 12345678
-     new P1, ['BigNum']
-     set P1, 5678
-     new P2, ['BigNum']
-     sub P2, P0, P1
-     set I0, P2
-     eq I0, 12340000, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, 12345678
+     new $P1, ['BigNum']
+     set $P1, 5678
+     new $P2, ['BigNum']
+     sub $P2, $P0, $P1
+     set $I0, $P2
+     eq $I0, 12340000, OK1
      print "not "
 OK1: say "ok 1"
-     set P0, "123456789012345678"
-     sub P2, P0, P1
-     new P3, ['BigNum']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
+     set $P0, "123456789012345678"
+     sub $P2, $P0, $P1
+     new $P3, ['BigNum']
+     set $P3, "123456789012340000"
+     eq $P2, $P3, OK2
      print "not "
 OK2: say "ok 2"
-     set P1, "223456789012345678"
-     sub P2, P0, P1
-     set P3, "-100000000000000000"
-     eq P2, P3, OK3
+     set $P1, "223456789012345678"
+     sub $P2, $P0, $P1
+     set $P3, "-100000000000000000"
+     eq $P2, $P3, OK3
      print "not "
 OK3: say "ok 3"
      end
+.end
 CODE
 ok 1
 ok 2
@@ -365,70 +377,72 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, 12345678
-     new P2, ['BigNum']
-     sub P2, P0, 5678
-     set I0, P2
-     eq I0, 12340000, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, 12345678
+     new $P2, ['BigNum']
+     sub $P2, $P0, 5678
+     set $I0, $P2
+     eq $I0, 12340000, OK1
      print "not "
 OK1: say "ok 1"
-     set P0, "123456789012345678"
-     sub P2, P0, 5678
-     new P3, ['BigNum']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
+     set $P0, "123456789012345678"
+     sub $P2, $P0, 5678
+     new $P3, ['BigNum']
+     set $P3, "123456789012340000"
+     eq $P2, $P3, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, 12345678
-     new P1, ['Integer']
-     set P1, 5678
-     new P2, ['BigNum']
-     sub P2, P0, P1
-     set I0, P2
-     eq I0, 12340000, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, 12345678
+     new $P1, ['Integer']
+     set $P1, 5678
+     new $P2, ['BigNum']
+     sub $P2, $P0, $P1
+     set $I0, $P2
+     eq $I0, 12340000, OK1
      print "not "
 OK1: say "ok 1"
-     set P0, "123456789012345678"
-     sub P2, P0, P1
-     new P3, ['BigNum']
-     set P3, "123456789012340000"
-     eq P2, P3, OK2
+     set $P0, "123456789012345678"
+     sub $P2, $P0, $P1
+     new $P3, ['BigNum']
+     set $P3, "123456789012340000"
+     eq $P2, $P3, OK2
      print "not "
 OK2: say "ok 2"
-     set P0, 9876543
-     new P4, ['Integer']
-     set P4, 44
-     sub P2, P0, P4
-     set I0, P2
-     eq I0, 9876499, OK3
+     set $P0, 9876543
+     new $P4, ['Integer']
+     set $P4, 44
+     sub $P2, $P0, $P4
+     set $I0, $P2
+     eq $I0, 9876499, OK3
      print "not "
 OK3: say "ok 3"
-     set P0, "9876543219876543"
-     sub P2, P0, P4
-     set P3, "9876543219876499"
-     eq P3, P2, OK4
+     set $P0, "9876543219876543"
+     sub $P2, $P0, $P4
+     set $P3, "9876543219876499"
+     eq $P3, $P2, OK4
      print "not "
 OK4: say "ok 4"
      push_eh THROWN
-     new P1, ['BigInt']
-     set P0, 3
-     set P1, 3
-     sub P0, P0, P1
+     new $P1, ['BigInt']
+     set $P0, 3
+     set $P1, 3
+     sub $P0, $P0, $P1
      print "not "
 THROWN:
      say "ok 5"
      end
+.end
 CODE
 ok 1
 ok 2
@@ -438,59 +452,60 @@ ok 5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i_subtract routine with immediate values' );
-.pcc_sub :main main:
+.sub _main :main
     .include 'fp_equality.pir'
-    new P0, ['BigNum']
-    new P1, ['BigNum']
-    set P0, 400
-    set P1, 99.5
-    sub P0, P1
-    set N0, P0
+    new $P0, ['BigNum']
+    new $P1, ['BigNum']
+    set $P0, 400
+    set $P1, 99.5
+    sub $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 300.5, OK1)
     print "not "
 OK1:say "ok 1"
 
-    new P1, ['Integer']
-    set P0, 100
-    set P1, -50
-    sub P0, P1
-    set N0, P0
+    new $P1, ['Integer']
+    set $P0, 100
+    set $P1, -50
+    sub $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 150.0, OK2)
     print "not "
 OK2:say "ok 2"
 
-    new P1, ['Float']
-    set P0, 50
-    set P1, 24.5
-    sub P0, P1
-    set N0, P0
+    new $P1, ['Float']
+    set $P0, 50
+    set $P1, 24.5
+    sub $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 25.5, OK3)
     print "not "
 OK3:say "ok 3"
 
     push_eh THROWN
-    new P1, ['BigInt']
-    set P1, 10
-    sub P0, P1
+    new $P1, ['BigInt']
+    set $P1, 10
+    sub $P0, $P1
     print "not "
 THROWN:
     pop_eh
     say "ok 4"
 
-    set P0, 40
-    sub P0, 4
-    set N0, P0
+    set $P0, 40
+    sub $P0, 4
+    set $N0, $P0
     .fp_eq_pasm(N0, 36.0, OK5)
     print "not "
 OK5:say "ok 5"
 
-    set P0, 40
-    sub P0, 1.0
-    set N0, P0
+    set $P0, 40
+    sub $P0, 1.0
+    set $N0, $P0
     .fp_eq_pasm(N0, 39.0, OK6)
     print "not "
 OK6:say "ok 6"
     end
+.end
 CODE
 ok 1
 ok 2
@@ -501,37 +516,38 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 999.999
-   new P1, ['BigNum']
-   set P1, 10.000005
-   new P2, ['BigNum']
-   mul P2, P0, P1
-   set S0, P2
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 999.999
+   new $P1, ['BigNum']
+   set $P1, 10.000005
+   new $P2, ['BigNum']
+   mul $P2, $P0, $P1
+   set $S0, $P2
+   say $S0
 
-   new P1, ['Integer']
-   set P0, 444
-   set P1, 2
-   mul P0, P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['Integer']
+   set $P0, 444
+   set $P1, 2
+   mul $P0, $P0, $P1
+   set $S0, $P0
+   say $S0
 
    push_eh THROWN
-   new P1, ['BigInt']
-   set P1, 3
-   mul P0, P0, P1
+   new $P1, ['BigInt']
+   set $P1, 3
+   mul $P0, $P0, $P1
    print "no "
 THROWN:
    pop_eh
    say "exception thrown"
 
-   set P0, 3
-   mul P0, P0, 2
-   set S0, P0
-   say S0
+   set $P0, 3
+   mul $P0, $P0, 2
+   set $S0, $P0
+   say $S0
    end
+.end
 CODE
 9999.994999995
 888
@@ -540,49 +556,50 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_multiply", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 50
-   new P1, ['BigNum']
-   set P1, 2
-   mul P0, P1
-   set S0, P0
-   say S0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 50
+   new $P1, ['BigNum']
+   set $P1, 2
+   mul $P0, $P1
+   set $S0, $P0
+   say $S0
 
-   new P1, ['Float']
-   set P0, 3
-   set P1, 5.5
-   mul P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['Float']
+   set $P0, 3
+   set $P1, 5.5
+   mul $P0, $P1
+   set $S0, $P0
+   say $S0
 
-   new P1, ['Integer']
-   set P0, 2
-   set P1, 4
-   mul P0, P1
-   set S0, P0
-   say S0
+   new $P1, ['Integer']
+   set $P0, 2
+   set $P1, 4
+   mul $P0, $P1
+   set $S0, $P0
+   say $S0
 
    push_eh THROWN
-   new P1, ['BigInt']
-   set P1, 3
-   mul P0, P1
+   new $P1, ['BigInt']
+   set $P1, 3
+   mul $P0, $P1
    print "no "
 THROWN:
    pop_eh
    say "exception thrown"
 
-   new P0, ['BigNum']
-   set P0, 3
-   mul P0, 2
-   set S0, P0
-   say S0
+   new $P0, ['BigNum']
+   set $P0, 3
+   mul $P0, 2
+   set $S0, $P0
+   say $S0
 
-   set P0, 2
-   mul P0, 2.5
-   set N0, P0
-   say N0
+   set $P0, 2
+   mul $P0, 2.5
+   set $N0, $P0
+   say $N0
    end
+.end
 CODE
 100
 16.5
@@ -593,51 +610,53 @@ exception thrown
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul_float", @todo_str);
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, 999.999
-   mul P2, P0, 10.000005
-   say P2
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, 999.999
+   mul $P2, $P0, 10.000005
+   say $P2
    end
+.end
 CODE
 9999.994999995
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div bignum" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, "100000000000000000000"
-     new P1, ['BigNum']
-     set P1, "100000000000000000000"
-     new P2, ['BigNum']
-     div P2, P0, P1
-     set I0, P2
-     eq I0, 1, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, "100000000000000000000"
+     new $P1, ['BigNum']
+     set $P1, "100000000000000000000"
+     new $P2, ['BigNum']
+     div $P2, $P0, $P1
+     set $I0, $P2
+     eq $I0, 1, OK1
      print "not "
 OK1: say "ok 1"
 
-     new P3, ['BigNum']
-     set P3, "10000000000000"
-     set P1, 10000000
-     div P2, P0, P1
-     eq  P2, P3, OK2
+     new $P3, ['BigNum']
+     set $P3, "10000000000000"
+     set $P1, 10000000
+     div $P2, $P0, $P1
+     eq  $P2, $P3, OK2
      print "not "
 OK2: say "ok 2"
 
-     set P1, 10
-     set P3, "10000000000000000000"
-     div P2, P0, P1
-     eq  P2, P3, OK3
+     set $P1, 10
+     set $P3, "10000000000000000000"
+     div $P2, $P0, $P1
+     eq  $P2, $P3, OK3
      print "not "
 OK3: say "ok 3"
 
-     set P1, -1
-     set P3, "-100000000000000000000"
-     div P2, P0, P1
-     eq  P2, P3, OK4
+     set $P1, -1
+     set $P3, "-100000000000000000000"
+     div $P2, $P0, $P1
+     eq  $P2, $P3, OK4
      print "not "
 OK4: say "ok 4"
      end
+.end
 CODE
 ok 1
 ok 2
@@ -646,128 +665,132 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div native int" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, "100000000000000000000"
-     new P1, ['BigNum']
-     div P1, P0, 10
-     new P2, ['BigNum']
-     set P2, "10000000000000000000"
-     eq P1, P2, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, "100000000000000000000"
+     new $P1, ['BigNum']
+     div $P1, $P0, 10
+     new $P2, ['BigNum']
+     set $P2, "10000000000000000000"
+     eq $P1, $P2, OK1
      print "not "
 OK1: say "ok 1"
 
-     set P0, "100000000000000"
-     div P1, P0, 10000000
-     set P2, 10000000
-     eq  P1, P2, OK2
+     set $P0, "100000000000000"
+     div $P1, $P0, 10000000
+     set $P2, 10000000
+     eq  $P1, $P2, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div other int" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, "100000000000000000000"
-     new P1, ['BigNum']
-     new P3, ['Integer']
-     set P3, 10
-     div P1, P0, P3
-     new P2, ['BigNum']
-     set P2, "10000000000000000000"
-     eq P1, P2, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, "100000000000000000000"
+     new $P1, ['BigNum']
+     new $P3, ['Integer']
+     set $P3, 10
+     div $P1, $P0, $P3
+     new $P2, ['BigNum']
+     set $P2, "10000000000000000000"
+     eq $P1, $P2, OK1
      print "not "
 OK1: say "ok 1"
 
-     set P0, "100000000000000"
-     new P4, ['Integer']
-     set P4, 10000000
-     div P1, P0, P4
-     set P2, 10000000
-     eq  P1, P2, OK2
+     set $P0, "100000000000000"
+     new $P4, ['Integer']
+     set $P4, 10000000
+     div $P1, $P0, $P4
+     set $P2, 10000000
+     eq  $P1, $P2, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div float" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, "100000000000000000000"
-     new P1, ['BigNum']
-     div P1, P0, 10.0
-     new P2, ['BigNum']
-     set P2, "10000000000000000000"
-     eq P1, P2, OK1
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, "100000000000000000000"
+     new $P1, ['BigNum']
+     div $P1, $P0, 10.0
+     new $P2, ['BigNum']
+     set $P2, "10000000000000000000"
+     eq $P1, $P2, OK1
      print "not "
 OK1: say "ok 1"
 
-     set P0, "100000000000000"
-     div P1, P0, -10.0
-     set P2, "-10000000000000"
-     eq  P1, P2, OK2
+     set $P0, "100000000000000"
+     div $P1, $P0, -10.0
+     set $P2, "-10000000000000"
+     eq  $P1, $P2, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "i_divide" );
-.pcc_sub :main main:
+.sub _main :main
     .include 'fp_equality.pir'
-    new P0, ['BigNum']
-    new P1, ['BigNum']
-    set P0, 10000000000
-    set P1,  5000000000
-    div P0, P1
-    set N0, P0
+    new $P0, ['BigNum']
+    new $P1, ['BigNum']
+    set $P0, 10000000000
+    set $P1,  5000000000
+    div $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 2.0, OK1)
     print "not "
 OK1:say "ok 1"
 
-    new P1, ['Integer']
-    set P0, 10
-    set P1, 4
-    div P0, P1
-    set N0, P0
+    new $P1, ['Integer']
+    set $P0, 10
+    set $P1, 4
+    div $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 2.5, OK2)
     print "not "
 OK2:say "ok 2"
 
-    new P1, ['Float']
-    set P0, 6
-    set P1, 1.5
-    div P0, P1
-    set N0, P0
+    new $P1, ['Float']
+    set $P0, 6
+    set $P1, 1.5
+    div $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 4.0, OK3)
     print "not "
 OK3:say "ok 3"
 
     push_eh THROWN
-    new P1, ['BigInt']
-    set P1, 3
-    div P0, P1
+    new $P1, ['BigInt']
+    set $P1, 3
+    div $P0, $P1
     print "no "
 THROWN:
     pop_eh
     say "exception thrown"
 
-    set P0, 10
-    div P0, -5
-    set N0, P0
+    set $P0, 10
+    div $P0, -5
+    set $N0, $P0
     .fp_eq_pasm(N0, -2.0, OK4)
     print "not "
 OK4:say "ok 4"
     end
+.end
 CODE
 ok 1
 ok 2
@@ -777,67 +800,68 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "floor_divide", todo => 'undiagnosed bug in floor division; no floor division is actually done.' );
-.pcc_sub :main main:
+.sub _main :main
     .include 'fp_equality.pir'
-    new P0, ['BigNum']
-    new P1, ['Integer']
-    set P0, 10
-    set P1, 4
-    fdiv P0, P0, P1
-    set N0, P0
+    new $P0, ['BigNum']
+    new $P1, ['Integer']
+    set $P0, 10
+    set $P1, 4
+    fdiv $P0, $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 2.0, OK1)
     print "not "
 OK1:say "ok 1"
 
     push_eh THROWN
-    new P1, ['Float']
-    set P1, 3.0
-    fdiv P0, P0, P1
+    new $P1, ['Float']
+    set $P1, 3.0
+    fdiv $P0, $P0, $P1
     print "no "
 THROWN:
     say "exception thrown"
 
-    set P0, 10
-    fdiv P0, P0, -4
-    set N0, P0
-    say N0
+    set $P0, 10
+    fdiv $P0, $P0, -4
+    set $N0, $P0
+    say $N0
     .fp_eq_pasm(N0, -2.0, OK2)
     print "not "
 OK2:say "ok 2"
 
-    new P1, ['BigNum']
-    set P0, 10
-    set P1, 4
-    fdiv P0, P1
-    set N0, P0
+    new $P1, ['BigNum']
+    set $P0, 10
+    set $P1, 4
+    fdiv $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 2.0, OK3)
     print "not "
 OK3:say "ok 3"
 
-    new P1, ['Integer']
-    set P0, 22
-    set P1, 4
-    fdiv P0, P1
-    set N0, P0
+    new $P1, ['Integer']
+    set $P0, 22
+    set $P1, 4
+    fdiv $P0, $P1
+    set $N0, $P0
     .fp_eq_pasm(N0, 5.0, OK4)
     print "not "
 OK4:say "ok 4"
 
     push_eh THROWN2
-    new P1, ['Float']
-    set P1, 3.0
-    fdiv P0, P1
+    new $P1, ['Float']
+    set $P1, 3.0
+    fdiv $P0, $P1
     print "no "
 THROWN2:
     say "exception thrown"
 
-    set P0, 10
-    fdiv P0, 4
-    set N0, P0
+    set $P0, 10
+    fdiv $P0, 4
+    set $N0, $P0
     .fp_eq_pasm(N0, 2.0, OK5)
     print "not "
 OK5:say "ok 5"
     end
+.end
 CODE
 ok 1
 exception thrown
@@ -849,38 +873,39 @@ ok 5
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "equality and comparison" );
-.pcc_sub :main main:
-    new P0, ['BigNum']
-    new P1, ['BigNum']
-    set P0, 3
-    set P1, 5
-    cmp I0, P0, P1
-    say I0
+.sub _main :main
+    new $P0, ['BigNum']
+    new $P1, ['BigNum']
+    set $P0, 3
+    set $P1, 5
+    cmp $I0, $P0, $P1
+    say $I0
 
-    set P1, 2
-    cmp I0, P0, P1
-    say I0
+    set $P1, 2
+    cmp $I0, $P0, $P1
+    say $I0
 
-    set P1, 3
-    cmp I0, P0, P1
-    say I0
+    set $P1, 3
+    cmp $I0, $P0, $P1
+    say $I0
 
     push_eh THROWN1
-    new P1, ['Float']
-    set P1, 3.3
-    iseq I0, P0, P1
+    new $P1, ['Float']
+    set $P1, 3.3
+    iseq $I0, $P0, $P1
     print "no "
 THROWN1:
     pop_eh
     say "exception thrown"
 
     push_eh THROWN2
-    cmp I0, P0, P1
+    cmp $I0, $P0, $P1
     print "no "
 THROWN2:
     pop_eh
     say "exception thrown"
     end
+.end
 CODE
 -1
 1
@@ -974,28 +999,29 @@ OUTPUT
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }
 
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-    .pcc_sub :main main:
-   new P0, ['Integer']
-   set P0, $a
-   new P1, ['Integer']
-   set P1, $b
-   new P2, ['Integer']
-   new P3, ['BigNum']
-   set I3, 3
+    pasm_output_is( <<'CODE', <<OUT, "add overflow Integer" );
+    .sub _main :main
+   new $P0, ['Integer']
+   set $P0, $a
+   new $P1, ['Integer']
+   set $P1, $b
+   new $P2, ['Integer']
+   new $P3, ['BigNum']
+   set $I3, 3
 lp:
-   add P2, P0, P1
-   set S0, P2
-   print S0
+   add $P2, $P0, $P1
+   set $S0, $P2
+   print $S0
    print " "
-   typeof S1, P2
-   say S1
-   add P1, $b
-   dec I3
-   if I3, lp
+   typeof $S1, $P2
+   say $S1
+   add $P1, $b
+   dec $I3
+   if $I3, lp
    say "ok"
 ex:
    end
+.end
 CODE
 $c Integer
 $d BigInt
@@ -1003,28 +1029,29 @@ $e BigInt
 ok
 OUT
 
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-    .pcc_sub :main main:
-   new P0, ['Integer']
-   set P0, $a
-   new P1, ['Integer']
-   set P1, $b
-   new P2, ['Integer']
-   new P3, ['BigNum']
-   set I3, 3.0
+    pasm_output_is( <<'CODE', <<OUT, "add overflow Integer" );
+    .sub _main :main
+   new $P0, ['Integer']
+   set $P0, $a
+   new $P1, ['Integer']
+   set $P1, $b
+   new $P2, ['Integer']
+   new $P3, ['BigNum']
+   set $I3, 3.0
 lp:
-   add P2, P0, P1
-   set S0, P2
-   print S0
+   add $P2, $P0, $P1
+   set $S0, $P2
+   print $S0
    print " "
-   typeof S1, P2
-   say S1
-   add P1, $b
-   dec I3
-   if I3, lp
+   typeof $S1, $P2
+   say $S1
+   add $P1, $b
+   dec $I3
+   if $I3, lp
    say "ok"
 ex:
    end
+.end
 CODE
 $c Integer
 $d BigInt
@@ -1032,33 +1059,35 @@ $e BigInt
 ok
 OUT
 
-    pasm_output_is( <<"CODE", <<'OUT', "set overflow Integer" );
-    .pcc_sub :main main:
+    pasm_output_is( <<'CODE', <<'OUT', "set overflow Integer" );
+    .sub _main :main
    push_eh THROWN
-   new P0, ['BigNum']
-   set P0, $d
-   set I0, P0
+   new $P0, ['BigNum']
+   set $P0, $d
+   set $I0, $P0
    print "not "
 THROWN:
    pop_eh
    say "ok"
    end
+.end
 CODE
 ok
 OUT
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "abs", @todo_str );
-.pcc_sub :main main:
-   new P0, ['BigNum']
-   set P0, "-1230000000000"
-   new P1, ['Undef']
-   abs P1, P0
-   say P1
-   say P0
-   abs P0
-   say P0
+.sub _main :main
+   new $P0, ['BigNum']
+   set $P0, "-1230000000000"
+   new $P1, ['Undef']
+   abs $P1, $P0
+   say $P1
+   say $P0
+   abs $P0
+   say $P0
    end
+.end
 CODE
 1230000000000
 -1230000000000
@@ -1082,40 +1111,42 @@ CODE
 0
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     set P0, "123456789123456789"
-     if P0, OK1
+pasm_output_is( <<'CODE', <<'OUTPUT', "Truth" );
+.sub _main :main
+     new $P0, ['BigNum']
+     set $P0, "123456789123456789"
+     if $P0, OK1
      print "not "
 OK1: say "ok 1"
-     set P0, 0
-     unless P0, OK2
+     set $P0, 0
+     unless $P0, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
-.pcc_sub :main main:
-     new P0, ['BigNum']
-     new P1, ['BigNum']
-     set P0, "123456789123456789"
-     neg P0
-     set P1, "-123456789123456789"
-     eq P0, P1, OK1
+pasm_output_is( <<'CODE', <<'OUTPUT', "neg" );
+.sub _main :main
+     new $P0, ['BigNum']
+     new $P1, ['BigNum']
+     set $P0, "123456789123456789"
+     neg $P0
+     set $P1, "-123456789123456789"
+     eq $P0, $P1, OK1
      print "not "
 OK1: say "ok 1"
 
-     set P0, "123456789123456789"
-     neg P0, P0
-     eq P0, P1, OK2
+     set $P0, "123456789123456789"
+     neg $P0, $P0
+     eq $P0, $P1, OK2
      print "not "
 OK2: say "ok 2"
      end
+.end
 CODE
 ok 1
 ok 2
