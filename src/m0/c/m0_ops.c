@@ -11,6 +11,8 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
+#define M0_EXEC_OP(name, cf, ops, pc) m0_op_##name( cf, &ops[4*pc] )
+
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
 {
@@ -326,138 +328,138 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
             const unsigned char op = ops[4*pc];
             switch (op) {
                 case (M0_SET_IMM):
-                    m0_op_set_imm( cf, &ops[4*pc] );
+                    M0_EXEC_OP(set_imm, cf, ops, pc);
                 break;
 
                 case (M0_DEREF):
-                    m0_op_deref( cf, &ops[4*pc] );
+                    M0_EXEC_OP(deref, cf, ops, pc);
                 break;
 
                 case (M0_PRINT_S):
-                    m0_op_print_s( cf, &ops[4*pc] );
+                    M0_EXEC_OP(print_s, cf, ops, pc);
                 break;
 
                 case (M0_PRINT_I):
-                    m0_op_print_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(print_i, cf, ops, pc);
                 break;
 
                 case (M0_NOOP):
                 break;
 
                 case (M0_ADD_I):
-                    m0_op_add_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(add_i, cf, ops, pc);
                 break;
 
                 case (M0_ADD_N):
-                    m0_op_add_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(add_n, cf, ops, pc);
                 break;
 
                 case (M0_SUB_I):
-                    m0_op_sub_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(sub_i, cf, ops, pc);
                 break;
 
                 case (M0_SUB_N):
-                    m0_op_sub_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(sub_n, cf, ops, pc);
                 break;
 
                 case (M0_GOTO):
-                    m0_op_goto( cf, &ops[4*pc] );
+                    M0_EXEC_OP(goto, cf, ops, pc);
                 break;
 
                 case (M0_GOTO_IF):
-                    m0_op_goto_if( cf, &ops[4*pc] );
+                    M0_EXEC_OP(goto_if, cf, ops, pc);
                 break;
 
                 case (M0_MULT_I):
-                    m0_op_mult_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(mult_i, cf, ops, pc);
                 break;
 
                 case (M0_MULT_N):
-                    m0_op_mult_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(mult_n, cf, ops, pc);
                 break;
 
                 case (M0_DIV_I):
-                    m0_op_div_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(div_i, cf, ops, pc);
                 break;
 
                 case (M0_DIV_N):
-                    m0_op_div_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(div_n, cf, ops, pc);
                 break;
 
                 case (M0_MOD_I):
-                    m0_op_mod_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(mod_i, cf, ops, pc);
                 break;
 
                 case (M0_MOD_N):
-                    m0_op_mod_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(mod_n, cf, ops, pc);
                 break;
 
                 case (M0_AND):
-                    m0_op_and( cf, &ops[4*pc] );
+                    M0_EXEC_OP(and, cf, ops, pc);
                 break;
 
                 case (M0_OR):
-                    m0_op_or( cf, &ops[4*pc] );
+                    M0_EXEC_OP(or, cf, ops, pc);
                 break;
 
                 case (M0_XOR):
-                    m0_op_xor( cf, &ops[4*pc] );
+                    M0_EXEC_OP(xor, cf, ops, pc);
                 break;
 
                 case (M0_LSHR):
-                    m0_op_lshr( cf, &ops[4*pc] );
+                    M0_EXEC_OP(lshr, cf, ops, pc);
                 break;
 
                 case (M0_ASHR):
-                    m0_op_ashr( cf, &ops[4*pc] );
+                    M0_EXEC_OP(ashr, cf, ops, pc);
                 break;
 
                 case (M0_SHL):
-                    m0_op_shl( cf, &ops[4*pc] );
+                    M0_EXEC_OP(shl, cf, ops, pc);
                 break;
 
                 case (M0_GOTO_CHUNK):
-                    m0_op_goto_chunk( cf, &ops[4*pc] );
+                    M0_EXEC_OP(goto_chunk, cf, ops, pc);
                 break;
 
                 case (M0_SET_BYTE):
-                    m0_op_set_byte( cf, &ops[4*pc] );
+                    M0_EXEC_OP(set_byte, cf, ops, pc);
                 break;
 
                 case (M0_SET_WORD):
-                    m0_op_set_word( cf, &ops[4*pc] );
+                    M0_EXEC_OP(set_word, cf, ops, pc);
                 break;
 
                 case (M0_SET):
-                    m0_op_set( cf, &ops[4*pc] );
+                    M0_EXEC_OP(set, cf, ops, pc);
                 break;
 
                 case (M0_GET_BYTE):
-                    m0_op_get_byte( cf, &ops[4*pc] );
+                    M0_EXEC_OP(get_byte, cf, ops, pc);
                 break;
 
                 case (M0_GET_WORD):
-                    m0_op_get_word( cf, &ops[4*pc] );
+                    M0_EXEC_OP(get_word, cf, ops, pc);
                 break;
 
                 case (M0_ITON):
-                    m0_op_convert_i_n( cf, &ops[4*pc] );
+                    M0_EXEC_OP(convert_i_n, cf, ops, pc);
                 break;
 
                 case (M0_NTOI):
-                    m0_op_convert_n_i( cf, &ops[4*pc] );
+                    M0_EXEC_OP(convert_n_i, cf, ops, pc);
                 break;
 
                 case (M0_GC_ALLOC):
-                    m0_op_gc_alloc( cf, &ops[4*pc]);
+                    M0_EXEC_OP(gc_alloc, cf, ops, pc);
                 break;
 
                 case (M0_SET_REF):
-                    m0_op_set_ref( cf, &ops[4*pc]);
+                    M0_EXEC_OP(set_ref, cf, ops, pc);
                 break;
 
                 case (M0_EXIT):
-                    m0_op_exit( cf, &ops[4*pc]);
+                    M0_EXEC_OP(exit, cf, ops, pc);
                 break;
 
                 default:
