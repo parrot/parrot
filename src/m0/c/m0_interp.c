@@ -47,12 +47,12 @@ main( int argc, const char *argv[]) {
     // encode cli arguments as M0 strings, skipping the first (name of the interp)
     for (i = 1; i < argc; i++) {
         const char *arg = argv[i];
-        uint64_t    m0_arg_const_len = strlen(arg) + 4 + 4 + 1; // byte count + encoding + string bytes + terminal null
-        uint64_t    m0_arg_len       = strlen(arg) + 1;
-        uint64_t    m0_arg_encoding  = 0;
+        uint32_t    m0_arg_const_len = strlen(arg) + 4 + 4 + 1; // byte count + encoding + string bytes + terminal null
+        uint32_t    m0_arg_len       = strlen(arg) + 1;
+        uint32_t    m0_arg_encoding  = 0;
         char       *m0_arg_const     = (char*) malloc(m0_arg_const_len * sizeof(char));
-        memcpy(&(m0_arg_const[0]), &m0_arg_len, sizeof(uint64_t));
-        memcpy(&(m0_arg_const[4]), &m0_arg_encoding, sizeof(uint64_t));
+        memcpy(&(m0_arg_const[0]), &m0_arg_len, sizeof(uint32_t));
+        memcpy(&(m0_arg_const[4]), &m0_arg_encoding, sizeof(uint32_t));
         memcpy(&(m0_arg_const[8]), arg, m0_arg_len * sizeof(char));
         interp_argv[i-1] = m0_arg_const;
     }
