@@ -32,7 +32,7 @@ Test negative return codes.
 
 =head1 SEE ALSO
 
-The special variable \$? in Perl 5.
+The special variable $? in Perl 5.
 
 =head1 AUTHOR
 
@@ -79,7 +79,7 @@ OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', "exit code: 3" );
 .sub _main :main
-        set     \$S1, '\$perl -e "exit(3)"'
+        set     \$S1, '$perl -e "exit(3)"'
         set     \$I1, 99
         spawnw  \$I1, \$S1
         shr     \$I2, \$I1, 8
@@ -98,7 +98,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "exit code: 0" );
 .sub _main :main
         new     \$P0, 'ResizablePMCArray'
         set     \$P0, 3
-        set     \$P0[0], '\$perl'
+        set     \$P0[0], '$perl'
         set     \$P0[1], "-e"
         set     \$P0[2], "exit(0)"
         set     \$I1, 99
@@ -117,7 +117,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "exit code: 123" );
 .sub _main :main
         new     \$P0, 'ResizablePMCArray'
         set     \$P0, 3
-        set     \$P0[0], '\$perl'
+        set     \$P0[0], '$perl'
         set     \$P0[1], "-e"
         set     \$P0[2], "exit(123)"
         set     \$I1, 99
@@ -136,7 +136,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "exit code: 3" );
 .sub _main :main
         new     \$P0, 'ResizablePMCArray'
         set     \$P0, 3
-        set     \$P0[0], '\$perl'
+        set     \$P0[0], '$perl'
         set     \$P0[1], "-e"
         set     \$P0[2], "exit(3)"
         set     \$I1, 99
@@ -165,7 +165,7 @@ loop:
 end:
         \$S0 = concat \$S0, "}) / 100"
         new args, 'ResizablePMCArray'
-        push args, '\$perl'
+        push args, '$perl'
         push args, "-e"
         push args, \$S0
         \$I0 = spawnw args
