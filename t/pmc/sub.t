@@ -30,13 +30,13 @@ $ENV{TEST_PROG_ARGS} ||= '';
 my $testr = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 my @todo;
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
+pir_output_is( <<'CODE', <<'OUTPUT', "pir subs - invokecc" );
 .sub _main main:
     .const 'Sub' $P0 = "func"
 
     set $I5, 3
     set_args "0", $I5
-    invokecc $P0
+    $P0()
     print $I5
     print "\n"
     end
@@ -52,7 +52,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM subs - invokecc" );
 .include "interpinfo.pir"
     interpinfo $P0, .INTERPINFO_CURRENT_SUB
     set_args "0", $I5
-    invokecc $P0  # recursive invoke
+    $P0()  # recursive invoke
 
 endfunc:
     returncc
@@ -82,7 +82,7 @@ endcont:
     set_global "foo", $P4
     print "going to cont\n"
     clone $P0, $P1
-    invokecc $P0
+    $P0()
 done:
     print "done\n"
     end
@@ -128,7 +128,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pcc sub" );
     print "not "
 ok:
     print "ok 1\n"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -150,7 +150,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pcc sub, tail call" );
     print "not "
 ok:
     print "ok 1\n"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -196,7 +196,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub" );
     print "not "
 ok1:
     say "found sub"
-    invokecc $P0
+    $P0()
     say "never"
     end
 .end
@@ -228,7 +228,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub, ret" );
     print "not "
 ok1:
     say "found sub"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -265,7 +265,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call different subs, ret" );
 ok1:
     say "found sub1"
     set $P10, $P0
-    invokecc $P0
+    $P0()
     say "back"
     get_global $P0, "_sub2"
     defined $I0, $P0
@@ -273,10 +273,10 @@ ok1:
     print "not "
 ok2:
     say "found sub2"
-    invokecc $P0
+    $P0()
     say "back"
     set $P0, $P10
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -323,7 +323,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode $PBC call different subs, re
 ok1:
     say "found sub1"
     set $P10, $P0
-    invokecc $P0
+    $P0()
     say "back"
     get_global $P0, "_sub2"
     defined $I0, $P0
@@ -331,10 +331,10 @@ ok1:
     print "not "
 ok2:
     say "found sub2"
-    invokecc $P0
+    $P0()
     say "back"
     set $P0, $P10
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -506,7 +506,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first" );
     load_bytecode "$temp_pir"
     say "loaded"
     get_global $P0, "_sub2"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -526,7 +526,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first in pbc" );
     load_bytecode "$temp_pbc"
     say "loaded"
     get_global $P0, "_sub2"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -557,7 +557,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second" );
     load_bytecode "$temp_pir"
     say "loaded"
     get_global $P0, "_sub1"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -577,7 +577,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second in pbc" );
     load_bytecode "$temp_pbc"
     say "loaded"
     get_global $P0, "_sub1"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -609,7 +609,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both" );
     load_bytecode "$temp_pir"
     say "loaded"
     get_global $P0, "_sub1"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -630,7 +630,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both in pbc" );
     load_bytecode "$temp_pbc"
     say "loaded"
     get_global $P0, "_sub1"
-    invokecc $P0
+    $P0()
     say "back"
     end
 .end
@@ -684,9 +684,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':main pragma call subs' );
 .sub _main main:
     say "main"
     get_global $P0, "_first"
-    invokecc $P0
+    $P0()
     get_global $P0, "_second"
-    invokecc $P0
+    $P0()
     end
 .end
 CODE
@@ -838,7 +838,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names" );
     print $P20
     print "\n"
     get_global $P0, "the_sub"
-    invokecc $P0
+    $P0()
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
     print "\n"
@@ -866,7 +866,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     print $P20
     print "\n"
     get_global $P0, "the_sub"
-    invokecc $P0
+    $P0()
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
     print "\n"
