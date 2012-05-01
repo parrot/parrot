@@ -348,7 +348,6 @@ src/call_list.txt                                [devel]src
 src/glut_callbacks.c                             []
 src/install_config.o                             [main]lib
 src/install_config.obj                           [main]lib
-src/jit_emit.h                                   []
 src/nci.c                                        []
 src/null_config.c                                []
 src/parrot_config.c                              []

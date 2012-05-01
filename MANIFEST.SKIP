@@ -710,12 +710,6 @@
 ^/src/io/.*\.obj/
 ^/src/io/.*\.str$
 ^/src/io/.*\.str/
-^/src/jit_cpu\.c$
-^/src/jit_cpu\.c/
-^/src/jit_defs\.c$
-^/src/jit_defs\.c/
-^/src/jit_emit\.h$
-^/src/jit_emit\.h/
 ^/src/nci/.*\.gcda$
 ^/src/nci/.*\.gcda/
 ^/src/nci/.*\.gcno$
