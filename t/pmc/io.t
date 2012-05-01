@@ -76,13 +76,14 @@ OUTPUT
 
 SKIP: {
     skip( "clone not finished yet", 1 );
-    pasm_output_is( <<"CODE", <<'OUTPUT', "clone" );
-    .pcc_sub :main main:
-    open P0, "$temp_file", 'r'
-    clone P1, P0
-    read S0, P1, 1024
-    print S0
+    pir_output_is( <<"CODE", <<'OUTPUT', "clone" );
+    .sub _main :main
+    open $P0, "$temp_file", 'r'
+    clone $P1, $P0
+    read $S0, $P1, 1024
+    print $S0
     end
+.end
 CODE
 a line
 OUTPUT
