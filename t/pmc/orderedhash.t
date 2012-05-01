@@ -21,52 +21,54 @@ Tests the C<OrderedHash> PMC.
 
 =cut
 
-pasm_output_is( <<'CODE', <<OUT, "init" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
+pir_output_is( <<'CODE', <<OUT, "init" );
+.sub _main :main
+    new $P0, ['OrderedHash']
     print "ok 1\n"
-    set I0, P0
-    eq I0, 0, ok2
+    set $I0, $P0
+    eq $I0, 0, ok2
     print "not "
 ok2:print "ok 2\n"
     end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "set keys, get idx" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P0["j"], P1
+pir_output_is( <<'CODE', <<OUT, "set keys, get idx" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P0["j"], $P1
 
-    set I0, P0
-    eq I0, 3, ok
+    set $I0, $P0
+    eq $I0, 3, ok
     print "not "
 ok: print "ok\n"
 
-    set P3, P0[0]
-    print P3
-    set P3, P0[1]
-    print P3
-    set P3, P0[2]
-    print P3
+    set $P3, $P0[0]
+    print $P3
+    set $P3, $P0[1]
+    print $P3
+    set $P3, $P0[2]
+    print $P3
 
-    set P3, P0["j"]
-    print P3
-    set P3, P0["x"]
-    print P3
-    set P3, P0["a"]
-    print P3
+    set $P3, $P0["j"]
+    print $P3
+    set $P3, $P0["x"]
+    print $P3
+    set $P3, $P0["a"]
+    print $P3
     end
+.end
 CODE
 ok
 ok 1
@@ -77,39 +79,40 @@ ok 1
 ok 2
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "iterate" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUT, "iterate" );
+.sub _main :main
     .include "iterator.pir"
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P0["j"], P1
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P0["j"], $P1
 
-    iter P2, P0
-    set P2, .ITERATE_FROM_START
+    iter $P2, $P0
+    set $P2, .ITERATE_FROM_START
 iter_loop:
-    unless P2, end_iter
-    shift P3, P2
-    set P4, P0[P3]
-    print P4
+    unless $P2, end_iter
+    shift $P3, $P2
+    set $P4, $P0[$P3]
+    print $P4
     branch iter_loop
 end_iter:
 
-    set P2, .ITERATE_FROM_END
+    set $P2, .ITERATE_FROM_END
 iter_loop2:
-    unless P2, end_iter2
-    pop P3, P2
-    set P4, P0[P3]
-    print P4
+    unless $P2, end_iter2
+    pop $P3, $P2
+    set $P4, $P0[$P3]
+    print $P4
     branch iter_loop2
 end_iter2:
     end
+.end
 CODE
 ok 1
 ok 2
@@ -119,68 +122,69 @@ ok 2
 ok 1
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "idx only" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0[0], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0[1], P1
+pir_output_is( <<'CODE', <<OUT, "idx only" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0[0], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0[1], $P1
 
-    set P2, P0[0]
-    print P2
-    set P2, P0[1]
-    print P2
+    set $P2, $P0[0]
+    print $P2
+    set $P2, $P0[1]
+    print $P2
     end
+.end
 CODE
 ok 1
 ok 2
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "set keys, get idx - cloned" );
-.pcc_sub :main main:
-    new P10, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P10["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P10["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P10["j"], P1
+pir_output_is( <<'CODE', <<OUT, "set keys, get idx - cloned" );
+.sub _main :main
+    new $P10, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P10["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P10["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P10["j"], $P1
 
-    clone P0, P10
+    clone $P0, $P10
 
-    set I0, P0
-    eq I0, 3, ok
+    set $I0, $P0
+    eq $I0, 3, ok
     print "not "
 ok: print "ok\n"
 
-    set P3, P0[0]
-    print P3
-    set P3, P0[1]
-    print P3
-    set P3, P0[2]
-    print P3
+    set $P3, $P0[0]
+    print $P3
+    set $P3, $P0[1]
+    print $P3
+    set $P3, $P0[2]
+    print $P3
 
-    set P3, P0["j"]
-    print P3
-    set P3, P0["x"]
-    print P3
-    set P3, P0["a"]
-    print P3
+    set $P3, $P0["j"]
+    print $P3
+    set $P3, $P0["x"]
+    print $P3
+    set $P3, $P0["a"]
+    print $P3
 
-    set P3, P0[-1]
-    print P3
-    set P3, P0[-2]
-    print P3
-    set P3, P0[-3]
-    print P3
+    set $P3, $P0[-1]
+    print $P3
+    set $P3, $P0[-2]
+    print $P3
+    set $P3, $P0[-3]
+    print $P3
     end
-
+.end
 CODE
 ok
 ok 1
@@ -194,190 +198,194 @@ ok 2
 ok 1
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "exists_keyed" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    new P1, ['Integer']
-    set P0["key"], P1
-    exists I0, P0["key"]
-    print I0
-    exists I0, P0[0]
-    print I0
-    exists I0, P0["nokey"]
-    print I0
-    exists I0, P0[1]
-    print I0
-    new P1, ['Key']
-    set P1, 0
-    exists I0, P0[P1]
-    print I0
-    set P1, 1
-    exists I0, P0[P1]
-    print I0
+pir_output_is( <<'CODE', <<OUT, "exists_keyed" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    new $P1, ['Integer']
+    set $P0["key"], $P1
+    exists $I0, $P0["key"]
+    print $I0
+    exists $I0, $P0[0]
+    print $I0
+    exists $I0, $P0["nokey"]
+    print $I0
+    exists $I0, $P0[1]
+    print $I0
+    new $P1, ['Key']
+    set $P1, 0
+    exists $I0, $P0[$P1]
+    print $I0
+    set $P1, 1
+    exists $I0, $P0[$P1]
+    print $I0
     print "\n"
     end
+.end
 CODE
 110010
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "defined_keyed" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    new P1, ['Undef']
-    set P0["key"], P1
-    defined I0, P0["key"]
-    print I0
-    defined I0, P0[0]
-    print I0
-    defined I0, P0["nokey"]
-    print I0
-    defined I0, P0[1]
-    print I0
-    new P2, ['Key']
-    set P2, 0
-    defined I0, P0[P2]
-    print I0
-    set P2, 1
-    defined I0, P0[P2]
-    print I0
+pir_output_is( <<'CODE', <<OUT, "defined_keyed" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    new $P1, ['Undef']
+    set $P0["key"], $P1
+    defined $I0, $P0["key"]
+    print $I0
+    defined $I0, $P0[0]
+    print $I0
+    defined $I0, $P0["nokey"]
+    print $I0
+    defined $I0, $P0[1]
+    print $I0
+    new $P2, ['Key']
+    set $P2, 0
+    defined $I0, $P0[$P2]
+    print $I0
+    set $P2, 1
+    defined $I0, $P0[$P2]
+    print $I0
 
-    set P1, 0
-    defined I0, P0["key"]
-    print I0
-    defined I0, P0[0]
-    print I0
-    new P3, ['Key']
-    set P3, 0
-    defined I0, P0[P3]
-    print I0
-    set P3, 1
-    defined I0, P0[P3]
-    print I0
+    set $P1, 0
+    defined $I0, $P0["key"]
+    print $I0
+    defined $I0, $P0[0]
+    print $I0
+    new $P3, ['Key']
+    set $P3, 0
+    defined $I0, $P0[$P3]
+    print $I0
+    set $P3, 1
+    defined $I0, $P0[$P3]
+    print $I0
 
-    null P1
-    set P0[1], P1
-    defined I0, P0[1]
-    print I0
+    null $P1
+    set $P0[1], $P1
+    defined $I0, $P0[1]
+    print $I0
 
     print "\n"
     end
+.end
 CODE
 00000011100
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "delete" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUT, "delete" );
+.sub _main :main
     .include "iterator.pir"
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P0["j"], P1
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P0["j"], $P1
 
-    delete P0["a"]
+    delete $P0["a"]
 
-    delete P0["idontexist"]
+    delete $P0["idontexist"]
 
-    iter P2, P0
-    set P2, .ITERATE_FROM_START_KEYS
+    iter $P2, $P0
+    set $P2, .ITERATE_FROM_START_KEYS
 iter_loop:
-    unless P2, end_iter
-    shift S3, P2
-    set P3, P2[S3]
-    print P3
+    unless $P2, end_iter
+    shift $S3, $P2
+    set $P3, $P2[S3]
+    print $P3
     branch iter_loop
 end_iter:
 
-    delete P0[0]
+    delete $P0[0]
 
-    set P2, .ITERATE_FROM_START_KEYS
+    set $P2, .ITERATE_FROM_START_KEYS
 iter_loop2:
-    unless P2, end_iter2
-    shift S3, P2
-    set P3, P2[S3]
-    print P3
+    unless $P2, end_iter2
+    shift $S3, $P2
+    set $P3, $P2[S3]
+    print $P3
     branch iter_loop2
 end_iter2:
     end
-
+.end
 CODE
 ok 1
 ok 3
 ok 3
 OUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "delete with int keys" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    set P0["abc"], "Foo"
-    set P0["def"], 12.6
-    set P0["ghi"], 5
-    new P1, ['Key']
-    set P1, 1
-    delete P0[P1]
-    exists I0, P0["abc"]
-    print I0
-    exists I0, P0["def"]
-    print I0
-    exists I0, P0["ghi"]
-    print I0
+pir_output_is( <<'CODE', <<'OUTPUT', "delete with int keys" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    set $P0["abc"], "Foo"
+    set $P0["def"], 12.6
+    set $P0["ghi"], 5
+    new $P1, ['Key']
+    set $P1, 1
+    delete $P0[$P1]
+    exists $I0, $P0["abc"]
+    print $I0
+    exists $I0, $P0["def"]
+    print $I0
+    exists $I0, $P0["ghi"]
+    print $I0
     print "\n"
     end
+.end
 CODE
 101
 OUTPUT
 
-pasm_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
-.pcc_sub :main main:
+pir_output_like( <<'CODE', '/[axj]/', "iterate over keys" );
+.sub _main :main
     .include "iterator.pir"
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P0["j"], P1
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P0["j"], $P1
 
-    iter P2, P0
-    set P2, .ITERATE_FROM_START_KEYS
+    iter $P2, $P0
+    set $P2, .ITERATE_FROM_START_KEYS
 iter_loop:
-    unless P2, end_iter
-    shift S3, P2
-    print S3
+    unless $P2, end_iter
+    shift $S3, $P2
+    print $S3
     branch iter_loop
 end_iter:
     end
+.end
 CODE
 
-pasm_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
-.pcc_sub :main main:
+pir_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
+.sub _main :main
     .include "iterator.pir"
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "ok 1\n"
-    set P0["x"], P1
-    new P1, ['String']
-    set P1, "ok 2\n"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "ok 3\n"
-    set P0["j"], P1
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "ok 1\n"
+    set $P0["x"], $P1
+    new $P1, ['String']
+    set $P1, "ok 2\n"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "ok 3\n"
+    set $P0["j"], $P1
 
-    iter P2, P0
-    set P2, .ITERATE_FROM_START_KEYS
+    iter $P2, $P0
+    set $P2, .ITERATE_FROM_START_KEYS
 iter_loop:
-    unless P2, end_iter
-    shift S3, P2
-    set P3, P2[S3]
-    print P3
+    unless $P2, end_iter
+    shift $S3, $P2
+    set $P3, $P2[S3]
+    print $P3
     branch iter_loop
 end_iter:
     end
@@ -388,7 +396,6 @@ ok \d/
 OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash in PIR with PMC value" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -409,7 +416,6 @@ U
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_integer_keyed" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -427,7 +433,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -447,7 +452,6 @@ U
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -464,9 +468,8 @@ CODE
 14
 OUTPUT
 
-# actually Parrot_OrderedHash_set_string_keyed is used, why ?
+# actually $Parrot_OrderedHash_set_string_keyed is used, why ?
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_str" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -487,7 +490,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -508,7 +510,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_integer" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -542,34 +543,34 @@ CODE
 3
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "delete and access remaining" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    new P1, ['String']
-    set P1, "A"
-    set P0["a"], P1
-    new P1, ['String']
-    set P1, "B"
-    set P0["b"], P1
+pir_output_is( <<'CODE', <<'OUTPUT', "delete and access remaining" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    new $P1, ['String']
+    set $P1, "A"
+    set $P0["a"], $P1
+    new $P1, ['String']
+    set $P1, "B"
+    set $P0["b"], $P1
 
-    set P3, P0["b"]
+    set $P3, $P0["b"]
     print 'P0["b"]: '
-    print P3
+    print $P3
     print "\n"
-    delete P0["a"]
-    set P4, P0["b"]
+    delete $P0["a"]
+    set $P4, $P0["b"]
     print 'P0["b"]: '
-    print P4
+    print $P4
     print "\n"
 
     end
+.end
 CODE
 P0["b"]: B
 P0["b"]: B
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_string_keyed_int" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -588,7 +589,6 @@ hello
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_number_keyed_int" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -607,7 +607,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash set_pmc_keyed_int (negative index)" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -642,9 +641,8 @@ CODE
 0012
 OUTPUT
 
-# actually Parrot_OrderedHash_delete_keyed is used
+# actually $Parrot_OrderedHash_delete_keyed is used
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash delete_keyed_str" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -666,7 +664,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_string" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -686,7 +683,6 @@ alpha
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash push_float" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -706,7 +702,6 @@ CODE
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_string_keyed" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -727,7 +722,6 @@ hello
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "OrderedHash get_number" );
-
 .sub _main :main
     .local pmc hash1
     hash1 = new ['OrderedHash']
@@ -749,7 +743,6 @@ SKIP: {
     skip( "odd, tightly-coupled, defacto behaviour is not worth testing", 1 );
 
     pir_output_is( << 'CODE', << 'OUTPUT', "set, get, exists compound keys" );
-
 .sub _main :main
     .local pmc hash, hash_inside
     hash = new ['OrderedHash']
@@ -829,7 +822,6 @@ OUTPUT
 }
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-
 .sub _main :main
     .local pmc pmc1
     pmc1 = new ['OrderedHash']
@@ -855,24 +847,25 @@ CODE
 0
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "get_integer_keyed" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    set P0["Foo"], 10
-    set P0["Bar"], 20
-    set I0, P0["Bar"]
-    print I0
+pir_output_is( <<'CODE', <<'OUTPUT', "get_integer_keyed" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    set $P0["Foo"], 10
+    set $P0["Bar"], 20
+    set $I0, $P0["Bar"]
+    print $I0
     print "\n"
-    set I1, P0["Foo"]
-    print I1
+    set $I1, $P0["Foo"]
+    print $I1
     print "\n"
-    set I2, P0[0]
-    print I2
+    set $I2, $P0[0]
+    print $I2
     print "\n"
-    set I3, P0[1]
-    print I3
+    set $I3, $P0[1]
+    print $I3
     print "\n"
     end
+.end
 CODE
 20
 10
@@ -880,30 +873,31 @@ CODE
 20
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "get_number_keyed" );
-.pcc_sub :main main:
-     new P0, ['OrderedHash']
-     set N0, 12.3
-     set N1, 45.1
-     set P0["Foo"], N0
-     set P0["ooF"], N1
-     set N2, P0["ooF"]
-     eq N1, N2, OK1
+pir_output_is( <<'CODE', <<'OUTPUT', "get_number_keyed" );
+.sub _main :main
+     new $P0, ['OrderedHash']
+     set $N0, 12.3
+     set $N1, 45.1
+     set $P0["Foo"], $N0
+     set $P0["ooF"], $N1
+     set $N2, $P0["ooF"]
+     eq $N1, $N2, OK1
      print "not "
 OK1: print "ok 1\n"
-     set N3, P0["Foo"]
-     eq N0, N3, OK2
+     set $N3, $P0["Foo"]
+     eq $N0, $N3, OK2
      print "not "
 OK2: print "ok 2\n"
-     set N4, P0[0]
-     eq N4, N0, OK3
+     set $N4, $P0[0]
+     eq $N4, $N0, OK3
      print "not "
 OK3: print "ok 3\n"
-     set N5, P0[1]
-     eq N5, N1, OK4
+     set $N5, $P0[1]
+     eq $N5, $N1, OK4
      print "not "
 OK4: print "ok 4\n"
      end
+.end
 CODE
 ok 1
 ok 2
@@ -911,24 +905,25 @@ ok 3
 ok 4
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
-.pcc_sub :main main:
-    new P0, ['OrderedHash']
-    set P0["a"], "Foo\n"
-    set P0["b"], "Bar\n"
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw 1" );
+.sub _main :main
+    new $P0, ['OrderedHash']
+    set $P0["a"], "Foo\n"
+    set $P0["b"], "Bar\n"
 
-    freeze S0, P0
-    thaw P1, S0
-    set P2, P1["a"]
-    print P2
-    set P2, P1[0]
-    print P2
-    set P2, P1["b"]
-    print P2
-    set P2, P1[1]
-    print P2
+    freeze $S0, $P0
+    thaw $P1, $S0
+    set $P2, $P1["a"]
+    print $P2
+    set $P2, $P1[0]
+    print $P2
+    set $P2, $P1["b"]
+    print $P2
+    set $P2, $P1[1]
+    print $P2
 
     end
+.end
 CODE
 Foo
 Foo
