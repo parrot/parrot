@@ -4,12 +4,11 @@
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 2;
 
 pir_output_is( <<'CODE', <<'OUT', "alligator" );
 # if the side-effect of set_label/continuation isn't
 # detected this program prints "Hi\nalligator\n"
-
 .sub main :main
     $P0 = new 'String'
     $P0 = "Hi\n"
