@@ -23,8 +23,8 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh label - pop_eh" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh label - pop_eh" );
+.sub _main :main
     push_eh _handler
     print "ok 1\n"
     pop_eh
@@ -32,78 +32,83 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh label - pop_eh" );
     end
 _handler:
     end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - pop_eh" );
-.pcc_sub :main main:
-    new P29, 'ExceptionHandler'
-    push_eh P29
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - pop_eh" );
+.sub _main :main
+    new $P29, 'ExceptionHandler'
+    push_eh $P29
     print "ok 1\n"
     pop_eh
     print "ok 2\n"
     end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
+.sub _main :main
     print "main\n"
     push_eh _handler
-    new P30, 'Exception'
-    throw P30
+    new $P30, 'Exception'
+    throw $P30
     print "not reached\n"
     end
 _handler:
     print "caught it\n"
     end
+.end
 CODE
 main
 caught it
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh eh - throw" );
+.sub _main :main
     print "main\n"
-    new P29, 'ExceptionHandler'
-    set_label P29, _handler
-    push_eh P29
-    new P30, 'Exception'
-    throw P30
+    new $P29, 'ExceptionHandler'
+    set_label $P29, _handler
+    push_eh $P29
+    new $P30, 'Exception'
+    throw $P30
     print "not reached\n"
     end
 _handler:
     print "caught it\n"
     end
+.end
 CODE
 main
 caught it
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "get_results" );
+.sub _main :main
     print "main\n"
     push_eh handler
-    new P1, 'Exception'
-    set P1, "just pining"
-    throw P1
+    new $P1, 'Exception'
+    set $P1, "just pining"
+    throw $P1
     print "not reached\n"
     end
 handler:
-    get_results "0", P0
-    set S0, P0
+    get_results "0", $P0
+    set $S0, $P0
     print "caught it\n"
-    typeof S1, P0
-    print S1
+    typeof $S1, $P0
+    print $S1
     print "\n"
-    print S0
+    print $S0
     print "\n"
-    null P5
+    null $P5
     end
+.end
 
 CODE
 main
@@ -112,22 +117,23 @@ Exception
 just pining
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
+.sub _main :main
 # see also #38459
     print "main\n"
-    new P0, 'Integer'
+    new $P0, 'Integer'
     push_eh handler
-    new P1, 'Exception'
-    set P1, "just pining"
-    throw P1
+    new $P1, 'Exception'
+    set $P1, "just pining"
+    throw $P1
     print "not reached\n"
     end
 handler:
-    get_results "0", P1
-    inc P0
+    get_results "0", $P1
+    inc $P0
     print "ok\n"
     end
+.end
 
 CODE
 main
@@ -163,121 +169,127 @@ Exception
 just pining
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
+.sub _main :main
     print "main\n"
     push_eh _handler
 
-    new P30, 'Exception'
-    set P30, "something happened"
-    throw P30
+    new $P30, 'Exception'
+    set $P30, "something happened"
+    throw $P30
     print "not reached\n"
     end
 _handler:
-    get_results "0", P5
-    set S0, P5
+    get_results "0", $P5
+    set $S0, $P5
     print "caught it\n"
-    print S0
+    print $S0
     print "\n"
     end
+.end
 CODE
 main
 caught it
 something happened
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
-.pcc_sub :main main:
-    new P0, 'Exception'
-    set P0, "something happened"
-    throw P0
+pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
+.sub _main :main
+    new $P0, 'Exception'
+    set $P0, "something happened"
+    throw $P0
     print "not reached\n"
     end
+.end
 CODE
 /something happened/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
-.pcc_sub :main main:
+pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+.sub _main :main
     push_eh _handler
-    new P0, 'Exception'
+    new $P0, 'Exception'
     pop_eh
-    throw P0
+    throw $P0
     print "not reached\n"
     end
 _handler:
     end
+.end
 CODE
 /No exception handler and no message/
 OUTPUT
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
-.pcc_sub :main main:
-    new P0, 'Exception'
-    throw P0
+pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
+.sub _main :main
+    new $P0, 'Exception'
+    throw $P0
     print "not reached\n"
     end
+.end
 CODE
 /No exception handler and no message/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
+.sub _main :main
     print "main\n"
     push_eh _handler1
     push_eh _handler2
 
-    new P30, 'Exception'
-    set P30, "something happened"
-    throw P30
+    new $P30, 'Exception'
+    set $P30, "something happened"
+    throw $P30
     print "not reached\n"
     end
 _handler1:
-    get_results "0", P5
-    set S0, P5
+    get_results "0", $P5
+    set $S0, $P5
     print "caught it in 1\n"
-    print S0
+    print $S0
     print "\n"
     end
 _handler2:
-    get_results "0", P0
-    set S0, P0
+    get_results "0", $P0
+    set $S0, $P0
     print "caught it in 2\n"
-    print S0
+    print $S0
     print "\n"
     end
+.end
 CODE
 main
 caught it in 2
 something happened
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
+.sub _main :main
     print "main\n"
     push_eh _handler1
     push_eh _handler2
 
-    new P30, 'Exception'
-    set P30, "something happened"
-    throw P30
+    new $P30, 'Exception'
+    set $P30, "something happened"
+    throw $P30
     print "not reached\n"
     end
 _handler1:
-    get_results "0", P5
-    set S0, P5
+    get_results "0", $P5
+    set $S0, $P5
     print "caught it in 1\n"
-    print S0
+    print $S0
     print "\n"
     end
 _handler2:
-    get_results "0", P5
-    set S0, P5
+    get_results "0", $P5
+    set $S0, $P5
     print "caught it in 2\n"
-    print S0
+    print $S0
     print "\n"
-    rethrow P5
+    rethrow $P5
     end
+.end
 CODE
 main
 caught it in 2
@@ -286,8 +298,8 @@ caught it in 1
 something happened
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUT, "die" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUT, "die" );
+.sub _main :main
     push_eh _handler
     die 3, 100
     print "not reached\n"
@@ -295,61 +307,66 @@ pasm_output_is( <<'CODE', <<OUT, "die" );
 _handler:
     print "caught it\n"
     end
+.end
 CODE
 caught it
 OUT
 
-pasm_output_is( <<'CODE', <<OUT, "die, error, severity" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUT, "die, error, severity" );
+.sub _main :main
     push_eh _handler
     die 3, 100
     print "not reached\n"
     end
 _handler:
-    get_results "0", P5
+    get_results "0", $P5
     print "caught it\n"
-    set I0, P5['severity']
+    set $I0, $P5['severity']
     print "severity "
-    print I0
+    print $I0
     print "\n"
     end
+.end
 CODE
 caught it
 severity 3
 OUT
 
-pasm_error_output_like( <<'CODE', <<OUT, "die - no handler" );
-.pcc_sub :main main:
+pir_error_output_like( <<'CODE', <<OUT, "die - no handler" );
+.sub _main :main
     die 3, 100
     print "not reached\n"
     end
 _handler:
     print "caught it\n"
     end
+.end
 CODE
 /No exception handler and no message/
 OUT
 
-pasm_output_is( <<'CODE', '', "exit exception" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', '', "exit exception" );
+.sub _main :main
     noop
     exit 0
     print "not reached\n"
     end
+.end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
+.sub _main :main
     print "main\n"
     push_eh handler
     print "ok\n"
-    new P30, 'Exception'
-    throw P30
+    new $P30, 'Exception'
+    throw $P30
     print "not reached\n"
     end
 handler:
     print "caught it\n"
     end
+.end
 CODE
 main
 ok
