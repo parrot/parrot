@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,18 +24,19 @@ C<interpinfo> opcode.
 =cut
 
 # we probably shouldn't just run a label, but this catches a potential seggie
-pasm_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
-.pcc_sub :main main:
-    new P0, 'ParrotInterpreter'
+pir_output_is( <<'CODE', <<'OUTPUT', "runinterp - new style" );
+.sub _main :main
+    new $P0, 'ParrotInterpreter'
     say 'calling'
     # set_addr/invoke ?
-    runinterp P0, foo
+    runinterp $P0, foo
     say 'ending'
     end
     say 'bad things!'
   foo:
     say 'In 2'
     end
+.end
 CODE
 calling
 In 2
@@ -43,20 +44,20 @@ ending
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
-.sub 'test' :main
+.sub _main :main
     .local string actual
     .local pmc test_interp
                test_interp = new 'ParrotInterpreter'
 
     print "uno\n"
-    runinterp test_interp, pasm
+    runinterp test_interp, pir
     print "dos\n"
-    goto pasm_end
+    goto pir_end
 
-  pasm:
+  pir:
     noop
     end
-  pasm_end:
+  pir_end:
 .end
 CODE
 uno
@@ -112,36 +113,38 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "access argv" );
-.pcc_sub :main main:
-    get_params "0", P5
+pir_output_is( <<'CODE', <<'OUTPUT', "access argv" );
+.sub _main :main
+    get_params "0", $P5
     .include "iglobals.pir"
-    getinterp P1
-    set P2, P1[.IGLOBALS_ARGV_LIST]
-    set I0, P5
-    set I1, P2
-    eq I0, I1, ok1
+    getinterp $P1
+    set $P2, $P1[.IGLOBALS_ARGV_LIST]
+    set $I0, $P5
+    set $I1, $P2
+    eq $I0, $I1, ok1
     print "not "
   ok1:
     print "ok 1\n"
-    set S0, P5[0]
-    set S1, P2[0]
-    eq S0, S1, ok2
+    set $S0, $P5[0]
+    set $S1, $P2[0]
+    eq $S0, $S1, ok2
     print "not "
   ok2:
     print "ok 2\n"
     end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "check_events" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "check_events" );
+.sub _main :main
     print "before\n"
     check_events
     print "after\n"
     end
+.end
 CODE
 before
 after
