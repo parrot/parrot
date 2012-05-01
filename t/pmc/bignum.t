@@ -24,7 +24,7 @@ Tests the BigNum PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 45;
+    plan tests => 44;
 }
 else {
     plan skip_all => "No BigNum PMC enabled";
@@ -70,16 +70,6 @@ if ( $PConfig{gmp} ) {
     diag $warn if $warn;
     unlink $test;
 }
-
-pir_output_is( <<'CODE', <<'OUT', "create" );
-.sub _main :main
-   new $P0, ['BigNum']
-   say "ok"
-   end
-.end
-CODE
-ok
-OUT
 
 pir_output_is( <<'CODE', <<'OUT', "set/get int" );
 .sub _main :main
