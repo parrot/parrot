@@ -89,12 +89,14 @@ sub check_running {
 
 send_SIGHUP;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - sleep" );
+pir_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - sleep" );
+.sub _main :main
     print "start\n"
     # no exception handler - parrot should die silently
     sleep 2
     print "never\n"
     end
+.end
 CODE
 start
 OUTPUT
@@ -104,15 +106,17 @@ OUTPUT
 send_SIGHUP;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - loop" );
+.sub _main :main
     bounds 1 # no JIT
     print "start\n"
     # no exception handler - parrot should die silently
 
-lp: dec I20
-    if I20, lp
+lp: dec $I20
+    if $I20, lp
     # if 4G loops take less then 1 second, this will fail :)
     print "never\n"
     end
+.end
 CODE
 start
 OUTPUT
@@ -124,6 +128,7 @@ SKIP: {
     send_SIGHUP;
 
     pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch" );
+.sub _main :main
     push_eh _handler
     print "start\n"
     sleep 2
@@ -132,17 +137,18 @@ SKIP: {
 _handler:
 .include "signal.pir"
     print "catched "
-    set I0, P5["type"]
-    neg I0, I0
-    ne I0, .SIGHUP, nok
+    set $I0, $P5["type"]
+    neg $I0, $I0
+    ne $I0, .SIGHUP, nok
     print "SIGHUP\n"
     end
 nok:
     print "something _type = "
-    neg I0, I0
-    print I0
+    neg $I0, $I0
+    print $I0
     print "\n"
     end
+.end
 
 CODE
 start
