@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 23;
+use Parrot::Test tests => 22;
 
 =head1 NAME
 
@@ -94,54 +94,57 @@ HERE:
 .end
 CODE
 
-pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
-.pcc_sub :main main:
-        set     I4, 42
+pir_output_is( <<'CODE', '42', "branch_ic (backward)" );
+.sub _main :main
+        set     $I4, 42
         branch  one
 two:    branch  three
-        set     I4, 1234
-        add     I4, I4, I4
+        set     $I4, 1234
+        add     $I4, $I4, $I4
 one:
         branch  two
 three:
-        print   I4
+        print   $I4
         end
+.end
 CODE
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
+.sub _main :main
         print    "start\n"
 
-        new P0, 'ResizableIntegerArray'
+        new $P0, 'ResizableIntegerArray'
 
-        local_branch P0, LAB1
+        local_branch $P0, LAB1
 
         print    "done\n"
         end
 
 LAB1:   print    "lab 1\n"
-        local_return P0
+        local_return $P0
+.end
 CODE
 start
 lab 1
 done
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
-.pcc_sub :main main:
-       set_addr I1, FOO
-       jump I1
+pir_output_is( <<'CODE', <<'OUTPUT', "set_addr" );
+.sub _main :main
+       set_addr $I1, FOO
+       jump $I1
        print "Jump failed\n"
        end
 
 FOO:   print "Jump succeeded\n"
        end
+.end
 CODE
 Jump succeeded
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "multiple labels" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "multiple labels" );
+.sub _main :main
      if 0,FOO
      if 1,BAR
      print "not "
@@ -149,16 +152,10 @@ FOO:
 BAR:
      print "ok 1\n"
      end
+.end
 CODE
 ok 1
 OUTPUT
-
-pasm_output_is( <<'CODE', 32, "Predeclared opcodes" );
-.pcc_sub :main main:
-     set_i_ic I0,32
-     print I0
-     end
-CODE
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pir syntax with marker - is" );
 
