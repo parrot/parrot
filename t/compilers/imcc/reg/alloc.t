@@ -22,12 +22,12 @@ lab:
     set_label $P1, lab
     $P2 = find_name "alligator"
     set_args "0", $P1
-    invokecc $P2
+    $P2()
 ex:
 .end
 .sub alligator
     get_params "0", $P0
-    invokecc $P0
+    $P0()
 .end
 CODE
 Hi
@@ -60,84 +60,6 @@ pir_output_is( <<'CODE', <<'OUT', "alligator 2 - r9629" );
 CODE
 abc
 def
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PIR" );
-.sub main :main
-  $S32 = "ok\n"
-  print $S32
-.end
-CODE
-ok
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PIR" );
-.sub main :main
-  $N32 = 3.8
-  print $N32
-  print "\n"
-.end
-CODE
-3.8
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PIR" );
-.sub main :main
-  $I32 = 123
-  print $I32
-  print "\n"
-.end
-CODE
-123
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PIR" );
-.sub main :main
-  $P32 = new 'String'
-  $P32 = "ok\n"
-  print $P32
-.end
-CODE
-ok
-OUT
-
-pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: S, PASM" );
-.pcc_sub :main main:
-  set S32, "ok\n"
-  print S32
-  end
-CODE
-ok
-OUT
-
-pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: N, PASM" );
-.pcc_sub :main main:
-  set N32, 3.8
-  print N32
-  print "\n"
-  end
-CODE
-3.8
-OUT
-
-pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: I, PASM" );
-.pcc_sub :main main:
-  set I32, 123
-  print I32
-  print "\n"
-  end
-CODE
-123
-OUT
-
-pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PASM" );
-.pcc_sub :main main:
-  new P32, 'String'
-  set P32, "ok\n"
-  print P32
-  end
-CODE
-ok
 OUT
 
 # Local Variables:
