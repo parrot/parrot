@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -34,27 +34,12 @@ pir_exit_code_is( <<'CODE', 1, 'pir exit with failure' );
 .end
 CODE
 
-pasm_exit_code_is( <<'CODE', 1, 'pasm exit with failure' );
-.pcc_sub :main main:
-    exit 1
-CODE
-
-pasm_exit_code_is( <<'CODE', 0, 'pasm exit without failure' );
-.pcc_sub :main main:
-    exit 0
-CODE
-
 # If you know of a better place to put these tests, please put them there
 
 pir_exit_code_is( <<'CODE', 0, 'pir exits with success by default' );
 .sub main :main
     $S0 = "cheese"
 .end
-CODE
-
-pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
-    set I0, 0
-    end
 CODE
 
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
