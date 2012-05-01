@@ -24,186 +24,193 @@ Tests the freeze/thaw archiving subsystem.
 
 END { unlink "temp.fpmc"; }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer" );
-.pcc_sub :main main:
-    new P1, ['Integer']
-    set P1, 777
-    freeze S0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer" );
+.sub _main :main
+    new $P1, ['Integer']
+    set $P1, 777
+    freeze $S0, $P1
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    print P10
+    print $P10
     print "\n"
     end
+.end
 CODE
 Integer 777
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a String" );
-.pcc_sub :main main:
-    new P1, ['String']
-    set P1, "foo"
-    freeze S0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a String" );
+.sub _main :main
+    new $P1, ['String']
+    set $P1, "foo"
+    freeze $S0, $P1
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    print P10
+    print $P10
     print "\n"
 
-    null S1
-    new P1, ['String']
-    set P1, S1
-    freeze S0, P1
-    thaw P10, S0
-    set S10, P10
-    isnull I0, S10
-    say I0
+    null $S1
+    new $P1, ['String']
+    set $P1, $S1
+    freeze $S0, $P1
+    thaw $P10, $S0
+    set $S10, $P10
+    isnull $I0, $S10
+    say $I0
     end
+.end
 CODE
 String foo
 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
-.pcc_sub :main main:
-    new P1, ['Float']
-    set P1, 3.14159
-    freeze S0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
+.sub _main :main
+    new $P1, ['Float']
+    set $P1, 3.14159
+    freeze $S0, $P1
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    print P10
+    print $P10
     print "\n"
     end
+.end
 CODE
 Float 3.14159
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
-.pcc_sub :main main:
-    new P1, ['Integer']
-    set P1, 666
-    new P0, ['Hash']
-    set P0["k1"], P1
-    new P1, ['Integer']
-    set P1, 777
-    set P0["k2"], P1
-    freeze S0, P0
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
+.sub _main :main
+    new $P1, ['Integer']
+    set $P1, 666
+    new $P0, ['Hash']
+    set $P0["k1"], $P1
+    new $P1, ['Integer']
+    set $P1, 777
+    set $P0["k2"], $P1
+    freeze $S0, $P0
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    set I11, P10
-    print I11
+    set $I11, $P10
+    print $I11
     print "\n"
-    set P12, P10["k1"]
-    print P12
+    set $P12, $P10["k1"]
+    print $P12
     print "\n"
-    set P12, P10["k2"]
-    print P12
+    set $P12, $P10["k2"]
+    print $P12
     print "\n"
     end
+.end
 CODE
 Hash 2
 666
 777
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
-.pcc_sub :main main:
-    new P1, ['Integer']
-    set P1, 666
-    new P0, ['Hash']
-    set P0["k1"], P1
-    new P1, ['Integer']
-    set P1, 777
-    set P0["k2"], P1
-    freeze S0, P0
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
+.sub _main :main
+    new $P1, ['Integer']
+    set $P1, 666
+    new $P0, ['Hash']
+    set $P0["k1"], $P1
+    new $P1, ['Integer']
+    set $P1, 777
+    set $P0["k2"], $P1
+    freeze $S0, $P0
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    set I11, P10
-    print I11
+    set $I11, $P10
+    print $I11
     print "\n"
-    set P12, P10["k1"]
-    print P12
+    set $P12, $P10["k1"]
+    print $P12
     print "\n"
-    set P12, P10["k2"]
-    print P12
+    set $P12, $P10["k2"]
+    print $P12
     print "\n"
     end
+.end
 CODE
 Hash 2
 666
 777
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
-.pcc_sub :main main:
-    new P1, ['Integer']
-    set P1, 666
-    new P2, ['Integer']
-    set P2, 42
-    setprop P1, "answer", P2
-    freeze S0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
+.sub _main :main
+    new $P1, ['Integer']
+    set $P1, 666
+    new $P2, ['Integer']
+    set $P2, 42
+    setprop $P1, "answer", $P2
+    freeze $S0, $P1
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    set I11, P10
-    print I11
+    set $I11, $P10
+    print $I11
     print "\n"
-    getprop P12, P10, "answer"
-    print P12
+    getprop $P12, $P10, "answer"
+    print $P12
     print "\n"
     end
+.end
 CODE
 Integer 666
 42
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
-.pcc_sub :main main:
-    new P0, ['ResizablePMCArray']
-    new P1, ['Integer']
-    set P1, 666
-    push P0, P1
-    new P2, ['Integer']
-    set P2, 777
-    push P0, P2
-    new P3, ['Integer']
-    set P3, 42
-    setprop P1, "answer", P3
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
+.sub _main :main
+    new $P0, ['ResizablePMCArray']
+    new $P1, ['Integer']
+    set $P1, 666
+    push $P0, $P1
+    new $P2, ['Integer']
+    set $P2, 777
+    push $P0, $P2
+    new $P3, ['Integer']
+    set $P3, 42
+    setprop $P1, "answer", $P3
 
-    freeze S0, P0
+    freeze $S0, $P0
 
-    thaw P10, S0
-    typeof S10, P10
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10
+    print $S10
     print " "
-    set I11, P10
-    print I11
+    set $I11, $P10
+    print $I11
     print "\n"
-    set P12, P10[0]
-    print P12
+    set $P12, $P10[0]
+    print $P12
     print "\n"
-    set P13, P10[1]
-    print P13
+    set $P13, $P10[1]
+    print $P13
     print "\n"
-    getprop P12, P12, "answer"
-    print P12
+    getprop $P12, $P12, "answer"
+    print $P12
     print "\n"
     end
+.end
 CODE
 ResizablePMCArray 2
 666
@@ -211,109 +218,114 @@ ResizablePMCArray 2
 42
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc" );
-.pcc_sub :main main:
-    null P0
-    freeze S0, P0
-    thaw P10, S0
-    defined I0, P10
-    unless I0, ok
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a NULL pmc" );
+.sub _main :main
+    null $P0
+    freeze $S0, $P0
+    thaw $P10, $S0
+    defined $I0, $P10
+    unless $I0, ok
     print "not "
 ok: print "ok\n"
     end
+.end
 CODE
 ok
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc" );
-.pcc_sub :main main:
-    new P0, ['ResizablePMCArray']
-    null P1
-    push P0, P1
-    new P1, ['Integer']
-    set P1, 10
-    push P0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc" );
+.sub _main :main
+    new $P0, ['ResizablePMCArray']
+    null $P1
+    push $P0, $P1
+    new $P1, ['Integer']
+    set $P1, 10
+    push $P0, $P1
 
-    freeze S0, P0
-    thaw P10, S0
+    freeze $S0, $P0
+    thaw $P10, $S0
 
-    typeof S10, P10
-    print S10
+    typeof $S10, $P10
+    print $S10
     print " "
-    set I11, P10
-    print I11
+    set $I11, $P10
+    print $I11
     print "\n"
-    set P11, P10[0]
-    defined I0, P11
-    unless I0, ok
+    set $P11, $P10[0]
+    defined $I0, $P11
+    unless $I0, ok
     print "not "
 ok: print "ok\n"
-    set P11, P10[1]
-    print P11
+    set $P11, $P10[1]
+    print $P11
     print "\n"
     end
+.end
 CODE
 ResizablePMCArray 2
 ok
 10
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Sub" );
-.pcc_sub :main main:
-    get_global P1, "_foo"
-    freeze S0, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Sub" );
+.sub _main :main
+    get_global $P1, "_foo"
+    freeze $S0, $P1
 
-    thaw P0, S0
-    typeof S10, P0
-    print S10
+    thaw $P0, $S0
+    typeof $S10, $P0
+    print $S10
     print "\n"
-    invokecc P0
+    invokecc $P0
     print "back\n"
     end
-.pcc_sub _foo:
+.end
+.sub _foo
     print "in sub _foo\n"
     returncc
+.end
 CODE
 Sub
 in sub _foo
 back
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
-.pcc_sub :main main:
-    new P0, ['FixedPMCArray']
-    set P0, 3
-    new P1, ['Integer']
-    set P1, 666
-    set P0[0], P1
-    new P2, ['Integer']
-    set P2, 777
-    set P0[1], P2
-    new P1, ['Integer']
-    set P1, 666
-    set P0[2], P1
-    freeze S0, P0
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
+.sub _main :main
+    new $P0, ['FixedPMCArray']
+    set $P0, 3
+    new $P1, ['Integer']
+    set $P1, 666
+    set $P0[0], $P1
+    new $P2, ['Integer']
+    set $P2, 777
+    set $P0[1], $P2
+    new $P1, ['Integer']
+    set $P1, 666
+    set $P0[2], $P1
+    freeze $S0, $P0
 
-    thaw P10, S0
-    typeof S10, P10 # type
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10 # type
+    print $S10
     print " "
-    set I11, P10    # elements
-    print I11
+    set $I11, $P10    # elements
+    print $I11
     print "\n"
-    set P12, P10[0]
-    print P12
+    set $P12, $P10[0]
+    print $P12
     print "\n"
-    set P13, P10[1]
-    print P13
+    set $P13, $P10[1]
+    print $P13
     print "\n"
-    set P14, P10[2]
-    print P14
+    set $P14, $P10[2]
+    print $P14
     print "\n"
-    ne_addr P12, P14, ok
+    ne_addr $P12, $P14, ok
     print "not "
 ok: print "ok diff\n"
     end
+.end
 CODE
 FixedPMCArray 3
 666
@@ -322,39 +334,40 @@ FixedPMCArray 3
 ok diff
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
-.pcc_sub :main main:
-    new P0, ['FixedPMCArray']
-    set P0, 3
-    new P1, ['Integer']
-    set P1, 666
-    set P0[0], P1
-    new P2, ['Integer']
-    set P2, 777
-    set P0[1], P2
-    set P0[2], P1
-    freeze S0, P0
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
+.sub _main :main
+    new $P0, ['FixedPMCArray']
+    set $P0, 3
+    new $P1, ['Integer']
+    set $P1, 666
+    set $P0[0], $P1
+    new $P2, ['Integer']
+    set $P2, 777
+    set $P0[1], $P2
+    set $P0[2], $P1
+    freeze $S0, $P0
 
-    thaw P10, S0
-    typeof S10, P10 # type
-    print S10
+    thaw $P10, $S0
+    typeof $S10, $P10 # type
+    print $S10
     print " "
-    set I11, P10    # elements
-    print I11
+    set $I11, $P10    # elements
+    print $I11
     print "\n"
-    set P12, P10[0]
-    print P12
+    set $P12, $P10[0]
+    print $P12
     print "\n"
-    set P13, P10[1]
-    print P13
+    set $P13, $P10[1]
+    print $P13
     print "\n"
-    set P14, P10[2]
-    print P14
+    set $P14, $P10[2]
+    print $P14
     print "\n"
-    eq_addr P12, P14, ok
+    eq_addr $P12, $P14, ok
     print "not "
 ok: print "ok same\n"
     end
+.end
 CODE
 FixedPMCArray 3
 666
@@ -365,7 +378,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze class" );
 .const string fpmc = 'temp.fpmc'
-.sub 'main' :main
+.sub _main :main
     $P10 = newclass "Foo"
     $S10 = $P10
     print $S10
@@ -387,7 +400,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thaw class into new interpreter" );
 .const string fpmc = "temp.fpmc"
-.sub 'main' :main
+.sub _main :main
     $P0 = new ['FileHandle']
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
@@ -413,20 +426,21 @@ ok 2
 Foo
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
-.pcc_sub :main main:
-    newclass P10, "Foo"
-    set S10, P10
-    print S10
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw simple class" );
+.sub _main :main
+    newclass $P10, "Foo"
+    set $S10, $P10
+    print $S10
     print "\n"
-    freeze S11, P10
+    freeze $S11, $P10
 
-    thaw P4, S11
+    thaw $P4, $S11
     print "ok\n"
-    set S12, P4
-    print S12
+    set $S12, $P4
+    print $S12
     print "\n"
     end
+.end
 CODE
 Foo
 ok
@@ -435,7 +449,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze class w attr" );
 .const string fpmc = 'temp.fpmc'
-.sub 'main' :main
+.sub _main :main
     $P10 = newclass "Foo"
     addattribute $P10, ".aa"
     $S10 = $P10
@@ -458,7 +472,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr into new interpreter" );
 .const string fpmc = "temp.fpmc"
-.sub 'main' :main
+.sub _main :main
     $P0 = new ['FileHandle']
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
@@ -503,7 +517,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
 .const string fpmc = 'temp.fpmc'
-.sub 'main' :main
+.sub _main :main
     $P10 = newclass "Foo"
     addattribute $P10, ".aa"
     addattribute $P10, ".bb"
@@ -555,7 +569,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter" );
 .const string fpmc = 'temp.fpmc'
-.sub 'main' :main
+.sub _main :main
     $P10 = newclass "Foo"
     addattribute $P10, ".aa"
     addattribute $P10, ".bb"
@@ -601,7 +615,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into new interpreter" );
 .const string fpmc = 'temp.fpmc'
-.sub 'main' :main
+.sub _main :main
     $P0 = new ['FileHandle']
     $P0.'open'(fpmc, 'rb')
     if $P0 goto ok1
@@ -645,33 +659,34 @@ ok 5
 ok 6
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "freeze Key" );
-.pcc_sub :main main:
-    new P0, ['Hash']
-    new P1, ['FixedPMCArray']
-    set P1, 2
-    set P1[1], P0
-    set P0["foo"], "ok\n"
-    set S0, P1[1; "foo"]
-    print S0
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze Key" );
+.sub _main :main
+    new $P0, ['Hash']
+    new $P1, ['FixedPMCArray']
+    set $P1, 2
+    set $P1[1], $P0
+    set $P0["foo"], "ok\n"
+    set $S0, $P1[1; "foo"]
+    print $S0
 
-    new P3, ['Key']
-    set P3, 1
-    new P4, ['Key']
-    set P4, "foo"
-    push P3, P4
+    new $P3, ['Key']
+    set $P3, 1
+    new $P4, ['Key']
+    set $P4, "foo"
+    push $P3, $P4
 
-    set S0, P1[P3]
-    print S0
+    set $S0, $P1[$P3]
+    print $S0
 
-    freeze S0, P3
+    freeze $S0, $P3
     print "ok 1\n"
-    thaw P5, S0
+    thaw $P5, $S0
     print "ok 2\n"
 
-    set S0, P1[P5]
-    print S0
+    set $S0, $P1[$P5]
+    print $S0
     end
+.end
 CODE
 ok
 ok
@@ -810,7 +825,7 @@ three.14
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
-.sub main :main
+.sub _main :main
     .local pmc cl, o
     cl = newclass 'Conure'
     addattribute cl, 'temperature'
@@ -832,7 +847,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
-.sub main :main
+.sub _main :main
     .local pmc cl, o
     #cl = subclass 'Hash', 'OPTable'
     cl = newclass 'OPTable'
