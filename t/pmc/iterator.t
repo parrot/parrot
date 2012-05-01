@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,70 +24,73 @@ Tests the C<Iterator> PMC.
 
 # TT #1478: Split this test into aggregate specific one.
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "new iter" );
-.pcc_sub :main main:
-    new P2, ['ResizablePMCArray']
-    iter P1, P2
+pir_output_is( <<'CODE', <<'OUTPUT', "new iter" );
+.sub _main main:
+    new $P2, ['ResizablePMCArray']
+    iter $P1, $P2
     print "ok 1\n"
     end
+.end
 CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "old-style Iterator now disallowed" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "old-style Iterator now disallowed" );
+.sub _main main:
     push_eh THROWN
-    new P0, ['ResizablePMCArray']
-    new P1, ['Iterator'], P0
+    new $P0, ['ResizablePMCArray']
+    new $P1, ['Iterator'], $P0
     print "not "
 THROWN:
     pop_eh
     print "ok 1\n"
     end
+.end
 CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "keyed access on String and Hash PMCs" );
-.pcc_sub :main main:
-    new P0, ['String']
-    set P0, "I am a very long string."
-    new P2, ['Integer']
-    set P2, 1
-    iter P1, P0
-    set I0, P1[P2]
-    eq I0, 32, OK1
+pir_output_is( <<'CODE', <<'OUTPUT', "keyed access on String and Hash PMCs" );
+.sub _main main:
+    new $P0, ['String']
+    set $P0, "I am a very long string."
+    new $P2, ['Integer']
+    set $P2, 1
+    iter $P1, $P0
+    set $I0, $P1[P2]
+    eq $I0, 32, OK1
     print "not "
 OK1:print "ok 1\n"
 
-    set P2, 0
-    set I0, P1[P2]
-    eq I0, 73, OK2
+    set $P2, 0
+    set $I0, $P1[P2]
+    eq $I0, 73, OK2
     print "not "
 OK2:print "ok 2\n"
 
-    set P2, 5
-    set S0, P1[P2]
-    eq S0, 'a', OK3
+    set $P2, 5
+    set $S0, $P1[P2]
+    eq $S0, 'a', OK3
     print "not "
 OK3:print "ok 3\n"
 
-    new P0, ['Hash']
-    set P0['derp'], 3.257
-    set P0['herp'], 2
-    iter P1, P0
-    set P2, 'herp'
-    set N0, P1[P2]
-    eq N0, 2, OK4
+    new $P0, ['Hash']
+    set $P0['derp'], 3.257
+    set $P0['herp'], 2
+    iter $P1, $P0
+    set $P2, 'herp'
+    set $N0, $P1[P2]
+    eq $N0, 2, OK4
     print "not "
 OK4:print "ok 4\n"
 
-    set P2, 'derp'
-    set N0, P1[P2]
-    eq N0, 3.257, OK5
+    set $P2, 'derp'
+    set $N0, $P1[P2]
+    eq $N0, 3.257, OK5
     print "not "
 OK5:print "ok 5\n"
     end
+.end
 CODE
 ok 1
 ok 2
@@ -96,47 +99,48 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "keyed exist and defined on String and Hash PMCs" );
-.pcc_sub :main main:
-    new P0, ['String']
-    set P0, 'somelongstring'
-    iter P1, P0
+pir_output_is( <<'CODE', <<'OUTPUT', "keyed exist and defined on String and Hash PMCs" );
+.sub _main main:
+    new $P0, ['String']
+    set $P0, 'somelongstring'
+    iter $P1, $P0
 
-    new P2, ['Integer']
-    set P2, 2
-    exists I0, P1[P2]
-    eq I0, 1, OK1
+    new $P2, ['Integer']
+    set $P2, 2
+    exists $I0, $P1[P2]
+    eq $I0, 1, OK1
     print "not "
 OK1:print "ok 1\n"
 
-    set P2, 20
-    exists I0, P1[P2]
-    eq I0, 0, OK2
+    set $P2, 20
+    exists $I0, $P1[P2]
+    eq $I0, 0, OK2
     print "not "
 OK2:print "ok 2\n"
 
-    defined I0, P1
-    eq I0, 1, OK3
+    defined $I0, $P1
+    eq $I0, 1, OK3
     print "not "
 OK3:print "ok 3\n"
 
 
-    new P0, ['Hash']
-    set P0['something'], 'stringg'
-    set P0['nothing'], 'something'
-    iter P1, P0
-    set P2, 'something'
-    defined I0, P1[P2]
-    eq I0, 1, OK4
+    new $P0, ['Hash']
+    set $P0['something'], 'stringg'
+    set $P0['nothing'], 'something'
+    iter $P1, $P0
+    set $P2, 'something'
+    defined $I0, $P1[P2]
+    eq $I0, 1, OK4
     print "not "
 OK4:print "ok 4\n"
 
-    set P2, 'somenothing'
-    defined I0, P1[P2]
-    eq I0, 0, OK5
+    set $P2, 'somenothing'
+    defined $I0, $P1[P2]
+    eq $I0, 0, OK5
     print "not "
 OK5:print "ok 5\n"
     end
+.end
 CODE
 ok 1
 ok 2
@@ -145,18 +149,19 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
-.pcc_sub :main main:
-    new P0, ['ResizableIntegerArray']
-    push P0, 20
-    iter P1, P0
-    iter P2, P1
+pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
+.sub _main main:
+    new $P0, ['ResizableIntegerArray']
+    push $P0, 20
+    iter $P1, $P0
+    iter $P2, $P1
 
-    issame I0, P1, P2
-    eq I0, 1, OK
+    issame $I0, $P1, $P2
+    eq $I0, 1, OK
     print "not "
 OK: print "ok\n"
     end
+.end
 CODE
 ok
 OUTPUT
@@ -216,68 +221,68 @@ ok
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "int test" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "int test" );
+.sub _main main:
     .include "iterator.pir"
-    new P0, ['ResizablePMCArray']    # empty array
-    new P2, ['ResizablePMCArray']    # array with 2 elements
-    push P2, 10
-    push P2, 20
-    set I0, P2
-    iter P1, P2
+    new $P0, ['ResizablePMCArray']    # empty array
+    new $P2, ['ResizablePMCArray']    # array with 2 elements
+    push $P2, 10
+    push $P2, 20
+    set $I0, $P2
+    iter $P1, $P2
     print "ok 1\n"
-    set I1, P1
-    eq I0, I1, ok2        # iter.length() == array.length()
+    set $I1, $P1
+    eq $I0, $I1, ok2        # iter.length() == array.length()
     print "not "
 ok2:    print "ok 2\n"
-    iter P1, P0
-    set P1, .ITERATE_FROM_START
+    iter $P1, $P0
+    set $P1, .ITERATE_FROM_START
     print "ok 3\n"
-    unless P1, ok4        # if(iter) == false on empty
+    unless $P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
-    if P1, ok5        # if(iter) == true on non empty
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
+    if $P1, ok5        # if(iter) == true on non empty
     print "not "
 ok5:    print "ok 5\n"
-    # now iterate over P2
+    # now iterate over $P2
     # while (P1) { element = shift(P1) }
-    unless P1, nok6
-        shift I3, P1
-    eq I3, 10, ok6
+    unless $P1, nok6
+        shift $I3, $P1
+    eq $I3, 10, ok6
 nok6:    print "not "
 ok6:    print "ok 6\n"
-    unless P1, nok7
-        shift I3, P1
-    eq I3, 20, ok7
+    unless $P1, nok7
+        shift $I3, $P1
+    eq $I3, 20, ok7
 nok7:    print "not "
 ok7:    print "ok 7\n"
-    unless P1, ok8        # if(iter) == false after last
+    unless $P1, ok8        # if(iter) == false after last
     print "not "
 ok8:    print "ok 8\n"
 
     # now iterate from end
-    set P1, .ITERATE_FROM_END
-    if P1, ok9        # if(iter) == true on non empty
+    set $P1, .ITERATE_FROM_END
+    if $P1, ok9        # if(iter) == true on non empty
     print "not "
 ok9:    print "ok 9\n"
     # while (P1) { element = pop(P1) }
-    unless P1, nok10
-        pop I3, P1
-    eq I3, 20, ok10
+    unless $P1, nok10
+        pop $I3, $P1
+    eq $I3, 20, ok10
 nok10:    print "not "
 ok10:    print "ok 10\n"
-    unless P1, nok11
-        pop I3, P1
-    eq I3, 10, ok11
+    unless $P1, nok11
+        pop $I3, $P1
+    eq $I3, 10, ok11
 nok11:    print "not "
 ok11:    print "ok 11\n"
-    unless P1, ok12        # if(iter) == false after last
+    unless $P1, ok12        # if(iter) == false after last
     print "not "
 ok12:    print "ok 12\n"
     end
-
+.end
 CODE
 ok 1
 ok 2
@@ -293,49 +298,50 @@ ok 11
 ok 12
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
+.sub _main main:
     .include "iterator.pir"
-    new P0, ['Hash']    # empty Hash
-    new P2, ['Hash']    # Hash with 2 elements
-    set P2["ab"], 100
-    set P2["xy"], "value"
-    set I0, P2
-    iter P1, P2
+    new $P0, ['Hash']    # empty Hash
+    new $P2, ['Hash']    # Hash with 2 elements
+    set $P2["ab"], 100
+    set $P2["xy"], "value"
+    set $I0, $P2
+    iter $P1, $P2
     print "ok 1\n"
-    set I1, P1
-    eq I0, I1, ok2        # iter.length() == hash.length()
+    set $I1, $P1
+    eq $I0, $I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    iter P1, P0
-    set P1, .ITERATE_FROM_START
+    iter $P1, $P0
+    set $P1, .ITERATE_FROM_START
     print "ok 3\n"
-    unless P1, ok4        # if(iter) == false on empty
+    unless $P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
-    if P1, ok5        # if(iter) == true on non empty
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
+    if $P1, ok5        # if(iter) == true on non empty
     print "not "
 ok5:    print "ok 5\n"
-    # now iterate over P2
+    # now iterate over $P2
     # while (P1) { key = shift(P1) }
-    unless P1, nok6
-        shift S3, P1        # get hash.key
-    eq S3, "ab", ok6
-    eq S3, "xy", ok6
+    unless $P1, nok6
+        shift $S3, $P1        # get hash.key
+    eq $S3, "ab", ok6
+    eq $S3, "xy", ok6
 nok6:    print " not "
 ok6:    print "ok 6\n"
-    unless P1, nok7
-        shift S3, P1
-    eq S3, "ab", ok7
-    eq S3, "xy", ok7
+    unless $P1, nok7
+        shift $S3, $P1
+    eq $S3, "ab", ok7
+    eq $S3, "xy", ok7
 nok7:    print "not "
 ok7:    print "ok 7\n"
-    unless P1, ok8        # if(iter) == false after last
+    unless $P1, ok8        # if(iter) == false after last
     print "not "
 ok8:    print "ok 8\n"
     end
+.end
 
 CODE
 ok 1
@@ -348,49 +354,50 @@ ok 7
 ok 8
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
+.sub _main main:
     .include "iterator.pir"
-    new P0, ['Hash']    # empty Hash
-    new P2, ['Hash']    # Hash with 2 elements
-    set P2["ab"], 100
-    set P2["xy"], "value"
-    set I0, P2
-    iter P1, P2
+    new $P0, ['Hash']    # empty Hash
+    new $P2, ['Hash']    # Hash with 2 elements
+    set $P2["ab"], 100
+    set $P2["xy"], "value"
+    set $I0, $P2
+    iter $P1, $P2
     print "ok 1\n"
-    set I1, P1
-    eq I0, I1, ok2        # iter.length() == hash.length()
+    set $I1, $P1
+    eq $I0, $I1, ok2        # iter.length() == hash.length()
     print "not "
 ok2:    print "ok 2\n"
-    iter P1, P0
-    set P1, .ITERATE_FROM_START
+    iter $P1, $P0
+    set $P1, .ITERATE_FROM_START
     print "ok 3\n"
-    unless P1, ok4        # if(iter) == false on empty
+    unless $P1, ok4        # if(iter) == false on empty
     print "not "
 ok4:    print "ok 4\n"
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
-    if P1, ok5        # if(iter) == true on non empty
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
+    if $P1, ok5        # if(iter) == true on non empty
     print "not "
 ok5:    print "ok 5\n"
-    # now iterate over P2
+    # now iterate over $P2
     # while (P1) { key = shift(P1) }
-    unless P1, nok6
-        shift S3, P1        # get hash.key
-    eq S3, "ab", ok6
-    eq S3, "xy", ok6
+    unless $P1, nok6
+        shift $S3, $P1        # get hash.key
+    eq $S3, "ab", ok6
+    eq $S3, "xy", ok6
 nok6:    print " not "
 ok6:    print "ok 6\n"
-    unless P1, nok7
-        shift S3, P1
-    eq S3, "ab", ok7
-    eq S3, "xy", ok7
+    unless $P1, nok7
+        shift $S3, $P1
+    eq $S3, "ab", ok7
+    eq $S3, "xy", ok7
 nok7:    print "not "
 ok7:    print "ok 7\n"
-    unless P1, ok8        # if(iter) == false after last
+    unless $P1, ok8        # if(iter) == false after last
     print "not "
 ok8:    print "ok 8\n"
     end
+.end
 
 CODE
 ok 1
@@ -403,136 +410,141 @@ ok 7
 ok 8
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
+.sub _main main:
     .include "iterator.pir"
-    new P0, ['Hash']    # Hash for iteration
-    new P2, ['Hash']    # for test
+    new $P0, ['Hash']    # Hash for iteration
+    new $P2, ['Hash']    # for test
 
-    set I0, 65
-    set I1, 35
-    set I10, I1
+    set $I0, 65
+    set $I1, 35
+    set $I10, $I1
 fill:
-    chr S0, I0
-    set P0[S0], I0
-    inc I0
-    dec I1
-    if I1, fill
+    chr $S0, $I0
+    set $P0[S0], $I0
+    inc $I0
+    dec $I1
+    if $I1, fill
 
-    iter P1, P0
-    set I0, P1
-    eq I0, I10, ok1
+    iter $P1, $P0
+    set $I0, $P1
+    eq $I0, $I10, ok1
     print "not "
 ok1:
     print "ok 1\n"
-    set P1, .ITERATE_FROM_START
+    set $P1, .ITERATE_FROM_START
 get:
-    unless P1, done
-        shift S3, P1        # get hash.key
-    set I0, P0[S3]        # and value
-    set P2[S3], I0
+    unless $P1, done
+        shift $S3, $P1        # get hash.key
+    set $I0, $P0[S3]        # and value
+    set $P2[S3], $I0
     branch get
 
 done:
-    set I0, P2
-    eq I0, I10, ok2
+    set $I0, $P2
+    eq $I0, $I10, ok2
     print "not "
 ok2:
     print "ok 2\n"
     end
+.end
 CODE
 ok 1
 ok 2
 OUTPUT
-pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
+.sub _main main:
     .include "iterator.pir"
-    new P2, ['String']
-    set P2, "parrot"
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
+    new $P2, ['String']
+    set $P2, "parrot"
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
 iter_loop:
-        unless P1, iter_end        # while (entries) ...
-    shift S1, P1
-    print S1
+        unless $P1, iter_end        # while (entries) ...
+    shift $S1, $P1
+    print $S1
     branch iter_loop
 iter_end:
     print "\n"
-    print P2
+    print $P2
     print "\n"
     end
+.end
 CODE
 parrot
 parrot
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
+.sub _main main:
     .include "iterator.pir"
-    new P2, ['String']
-    set P2, "parrot"
-    iter P1, P2
-    set P1, .ITERATE_FROM_END
+    new $P2, ['String']
+    set $P2, "parrot"
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_END
 iter_loop:
-        unless P1, iter_end        # while (entries) ...
-    pop S1, P1
-    print S1
+        unless $P1, iter_end        # while (entries) ...
+    pop $S1, $P1
+    print $S1
     branch iter_loop
 iter_end:
     print "\n"
-    print P2
+    print $P2
     print "\n"
     end
+.end
 CODE
 torrap
 parrot
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
+.sub _main main:
     .include "iterator.pir"
-    new P2, ['String']
-    set P2, "ABC"
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
+    new $P2, ['String']
+    set $P2, "ABC"
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
 iter_loop:
-        unless P1, iter_end        # while (entries) ...
-    shift I1, P1
-    print I1
+        unless $P1, iter_end        # while (entries) ...
+    shift $I1, $P1
+    print $I1
     branch iter_loop
 iter_end:
     print "\n"
-    print P2
+    print $P2
     print "\n"
     end
+.end
 CODE
 656667
 ABC
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
+.sub _main main:
 .include "iterator.pir"
-    new P2, ['String']
-    set P2, "ABC"
-    iter P1, P2
-    set P1, .ITERATE_FROM_END
+    new $P2, ['String']
+    set $P2, "ABC"
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_END
 iter_loop:
-        unless P1, iter_end        # while (entries) ...
-    pop I1, P1
-    print I1
+        unless $P1, iter_end        # while (entries) ...
+    pop $I1, $P1
+    print $I1
     branch iter_loop
 iter_end:
     print "\n"
-    print P2
+    print $P2
     print "\n"
     end
+.end
 CODE
 676665
 ABC
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
+pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in $PIR" );
 
 .include "iterator.pir"
 .sub _main :main
@@ -548,11 +560,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', "String iterator in PIR" );
 
     .local int code_point_1
 ITER_LOOP:
-    unless iter_1 goto ITER_END
+    unless iter_1 goto $ITER_END
     shift code_point_1, iter_1
     print code_point_1
     print "\n"
-    branch ITER_LOOP
+    branch $ITER_LOOP
 ITER_END:
     print "reached end\n"
     end
@@ -727,43 +739,44 @@ Iterator get_integer: 7
 OUTPUT
 
 TODO: {
-    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
-    .pcc_sub :main main:
+    pir_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
+    .sub _main main:
     .include "iterator.pir"
 
-    new P2, ['ResizablePMCArray']    # array with 4 elements
-    push P2, 10
-    push P2, 20
-    push P2, 30
-    push P2, 40
-    iter P1, P2
-    set P1, .ITERATE_FROM_START
+    new $P2, ['ResizablePMCArray']    # array with 4 elements
+    push $P2, 10
+    push $P2, 20
+    push $P2, 30
+    push $P2, 40
+    iter $P1, $P2
+    set $P1, .ITERATE_FROM_START
 
-    set I0, P1        # arr.length
-    eq I0, 4, ok1
-    print I0
+    set $I0, $P1        # arr.length
+    eq $I0, 4, ok1
+    print $I0
     print " not "
 ok1:    print "ok 1\n"
 
-    shift I0, P1        # get one
-    eq I0, 10, ok2
+    shift $I0, $P1        # get one
+    eq $I0, 10, ok2
     print "not "
 ok2:    print "ok 2\n"
 
-    shift I0, P1        # get one
-    eq I0, 20, ok3
+    shift $I0, $P1        # get one
+    eq $I0, 20, ok3
     print "not "
 ok3:    print "ok 3\n"
 
-    set I0, P1        # arr.length of rest
-    eq I0, 2, ok6
-    print I0
+    set $I0, $P1        # arr.length of rest
+    eq $I0, 2, ok6
+    print $I0
     print " not "
 ok6:    print "ok 6\n"
 
-    print I0
+    print $I0
     print "\n"
     end
+.end
 CODE
 ok 1
 ok 2
@@ -775,29 +788,30 @@ OUTPUT
 
 
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
+.sub _main main:
    .include "iterator.pir"
-   new P0, ['ResizablePMCArray']
-   push P0, 100
-   push P0, 200
-   push P0, 300
-   push P0, 400
-   push P0, 500
-   push P0, 600
-   push P0, 700
-   push P0, 800
-   iter P2, P0
+   new $P0, ['ResizablePMCArray']
+   push $P0, 100
+   push $P0, 200
+   push $P0, 300
+   push $P0, 400
+   push $P0, 500
+   push $P0, 600
+   push $P0, 700
+   push $P0, 800
+   iter $P2, $P0
    print "ok 1\n"
 lp:
-   unless P2, ex
-   shift I0, P2
-   print I0
+   unless $P2, ex
+   shift $I0, $P2
+   print $I0
    print "\n"
    branch lp
 ex:
    print "ok 2\n"
    end
+.end
 CODE
 ok 1
 100
@@ -811,22 +825,23 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
-.pcc_sub :main main:
+pir_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
+.sub _main main:
     .include "iterator.pir"
-    new P2, ['String']
-    set P2, "parrot"
-    iter P1, P2
+    new $P2, ['String']
+    set $P2, "parrot"
+    iter $P1, $P2
 iter_loop:
-        unless P1, iter_end        # while (entries) ...
-    shift S1, P1
-    print S1
+        unless $P1, iter_end        # while (entries) ...
+    shift $S1, $P1
+    print $S1
     branch iter_loop
 iter_end:
     print "\n"
-    print P2
+    print $P2
     print "\n"
     end
+.end
 CODE
 parrot
 parrot
