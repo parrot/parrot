@@ -63,8 +63,9 @@ argv_test:
     set_imm S0, 0, ARGV
     deref   S0, INTERP, S0
     deref   S0, S0, I1
-    set_imm I2, 0, 1
-    get_word S0, S0, I2
+    # put the number of bytes in argv[1] string into I3
+    # (number of bytes in a string is in the first word of the string)
+    get_word I3, S0, I1
 
     # put the expected value of argv[1] into S1 ("kittens")
     set_imm S1, 0, 7
@@ -73,6 +74,11 @@ argv_test:
     # put the number of bytes in string into I2
     # (number of bytes in a string is in the first word of the string)
     get_word I2, S1, I0
+
+    # test if argv[1] and the reference string are the same length
+    sub_i    I1, I1, I2
+    goto_if  argv_nok, I1
+
     # subtract 1 to avoid comparing the terminal null
     sub_i    I2, I2, I1
 
