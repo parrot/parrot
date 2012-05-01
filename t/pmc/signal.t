@@ -105,7 +105,7 @@ OUTPUT
 
 send_SIGHUP;
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - loop" );
+pir_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - loop" );
 .sub _main :main
     bounds 1 # no JIT
     print "start\n"
@@ -127,7 +127,7 @@ SKIP: {
     skip( "works standalone but not in test", 1 );
     send_SIGHUP;
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - sleep, catch" );
 .sub _main :main
     push_eh _handler
     print "start\n"
