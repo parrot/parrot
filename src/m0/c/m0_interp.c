@@ -36,13 +36,13 @@ int
 main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
     int        i;
-    char**     interp_argv;
+    uint64_t*     interp_argv;
 
     if (!interp)
         exit(1);
 
     (*interp)[ARGC] = argc - 1;
-    interp_argv = (char**) malloc((argc-1) * sizeof(char*));
+    interp_argv = (uint64_t*) malloc((argc-1) * sizeof(uint64_t));
 
     // encode cli arguments as M0 strings, skipping the first (name of the interp)
     for (i = 1; i < argc; i++) {
