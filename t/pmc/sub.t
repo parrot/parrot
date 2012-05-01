@@ -31,7 +31,7 @@ my $testr = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 my @todo;
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pir subs - invokecc" );
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "func"
 
     set $I5, 3
@@ -66,7 +66,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Continuation" );
-.sub _main main:
+.sub _main :main
     new $P5, ['Integer']
     set $P5, 3
     set_global "foo", $P5
@@ -99,7 +99,7 @@ done
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "definedness of Continuation" );
-.sub _main main:
+.sub _main :main
     new $P1, ['Continuation']
     defined $I1, $P1
     print $I1
@@ -121,7 +121,7 @@ CODE
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pcc sub" );
-.sub _main main:
+.sub _main :main
     get_global $P0, "_the_sub"
     defined $I0, $P0
     if $I0, ok
@@ -143,7 +143,7 @@ back
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "pcc sub, tail call" );
-.sub _main main:
+.sub _main :main
     get_global $P0, "_the_sub"
     defined $I0, $P0
     if $I0, ok
@@ -186,17 +186,17 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    defined $I0, $P0
-    if $I0, ok1
+    get_global \$P0, "_sub1"
+    defined \$I0, \$P0
+    if \$I0, ok1
     print "not "
 ok1:
     say "found sub"
-    $P0()
+    \$P0()
     say "never"
     end
 .end
@@ -218,17 +218,17 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call sub, ret" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    defined $I0, $P0
-    if $I0, ok1
+    get_global \$P0, "_sub1"
+    defined \$I0, \$P0
+    if \$I0, ok1
     print "not "
 ok1:
     say "found sub"
-    $P0()
+    \$P0()
     say "back"
     end
 .end
@@ -254,29 +254,29 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode call different subs, ret" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    defined $I0, $P0
-    if $I0, ok1
+    get_global \$P0, "_sub1"
+    defined \$I0, \$P0
+    if \$I0, ok1
     print "not "
 ok1:
     say "found sub1"
-    set $P10, $P0
-    $P0()
+    set \$P10, \$P0
+    \$P0()
     say "back"
-    get_global $P0, "_sub2"
-    defined $I0, $P0
-    if $I0, ok2
+    get_global \$P0, "_sub2"
+    defined \$I0, \$P0
+    if \$I0, ok2
     print "not "
 ok2:
     say "found sub2"
-    $P0()
+    \$P0()
     say "back"
-    set $P0, $P10
-    $P0()
+    set \$P0, \$P10
+    \$P0()
     say "back"
     end
 .end
@@ -311,30 +311,30 @@ in sub1
 in sub2
 OUTPUT
 
-pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode $PBC call different subs, ret" );
-.sub _main main:
+pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode PBC call different subs, ret" );
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    defined $I0, $P0
-    if $I0, ok1
+    get_global \$P0, "_sub1"
+    defined \$I0, \$P0
+    if \$I0, ok1
     print "not "
 ok1:
     say "found sub1"
-    set $P10, $P0
-    $P0()
+    set \$P10, \$P0
+    \$P0()
     say "back"
-    get_global $P0, "_sub2"
-    defined $I0, $P0
-    if $I0, ok2
+    get_global \$P0, "_sub2"
+    defined \$I0, \$P0
+    if \$I0, ok2
     print "not "
 ok2:
     say "found sub2"
-    $P0()
+    \$P0()
     say "back"
-    set $P0, $P10
-    $P0()
+    set \$P0, \$P10
+    \$P0()
     say "back"
     end
 .end
@@ -352,7 +352,7 @@ back
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "equality of closures" );
-.sub _main main:
+.sub _main :main
       .const 'Sub' $P3 = "f1"
       newclosure $P0, $P3
       clone $P1, $P0
@@ -384,7 +384,7 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "equality of subs" );
-.sub _main main:
+.sub _main :main
       .const 'Sub' $P0 = "f1"
       clone $P1, $P0
       eq $P0, $P1, OK1
@@ -415,7 +415,7 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', "MAIN pragma, syntax only" );
-.sub _main main:
+.sub _main :main
     print "ok\n"
     end
 .end
@@ -434,7 +434,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -460,7 +460,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -475,7 +475,7 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load in pbc' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pbc"
     say "back"
@@ -501,12 +501,12 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub2"
-    $P0()
+    get_global \$P0, "_sub2"
+    \$P0()
     say "back"
     end
 .end
@@ -521,12 +521,12 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun first in pbc" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
-    get_global $P0, "_sub2"
-    $P0()
+    get_global \$P0, "_sub2"
+    \$P0()
     say "back"
     end
 .end
@@ -552,12 +552,12 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    $P0()
+    get_global \$P0, "_sub1"
+    \$P0()
     say "back"
     end
 .end
@@ -572,12 +572,12 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun second in pbc" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
-    get_global $P0, "_sub1"
-    $P0()
+    get_global \$P0, "_sub1"
+    \$P0()
     say "back"
     end
 .end
@@ -604,12 +604,12 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "loaded"
-    get_global $P0, "_sub1"
-    $P0()
+    get_global \$P0, "_sub1"
+    \$P0()
     say "back"
     end
 .end
@@ -625,12 +625,12 @@ OUTPUT
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir );
 
 pir_output_is( <<"CODE", <<'OUTPUT', "load_bytecode autorun both in pbc" );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pbc"
     say "loaded"
-    get_global $P0, "_sub1"
-    $P0()
+    get_global \$P0, "_sub1"
+    \$P0()
     say "back"
     end
 .end
@@ -647,7 +647,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':main pragma' );
 .sub _first:
     print "first\n"
     returncc
-.sub _main main:
+.sub _main :main
     say "main"
     end
 .end
@@ -660,7 +660,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'two :main pragmas' );
     print "first\n"
     returncc
 .end
-.sub _main main:
+.sub _main :main
     say "main"
     end
 .end
@@ -681,7 +681,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':main pragma call subs' );
     print "second\n"
     returncc
 .end
-.sub _main main:
+.sub _main :main
     say "main"
     get_global $P0, "_first"
     $P0()
@@ -714,7 +714,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load first sub - pir' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -742,7 +742,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load second sub - pir' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -768,7 +768,7 @@ EOF
 close $TEMP;
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode no :load - pir' );
-.sub _main main:
+.sub _main :main
     say "main"
     load_bytecode "$temp_pir"
     say "back"
@@ -779,7 +779,7 @@ main
 back
 OUTPUT
 
-pir_output_like( <<'CODE', '/Stringifying an Undef $PMC/', 'warn on in main' );
+pir_output_like( <<'CODE', '/Stringifying an Undef PMC/', 'warn on in main' );
 .sub _main :main
 .include "warnings.pir"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -825,14 +825,14 @@ pir_output_like( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG
 .end
 CODE
-/Stringifying an Undef $PMC
+/Stringifying an Undef PMC
 .*
 back
 ok/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "sub names" );
-.sub _main main:
+.sub _main :main
     .include "interpinfo.pir"
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
@@ -860,7 +860,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     print "never\n"
     noop
 .end
-.sub _main main:
+.sub _main :main
     .include "interpinfo.pir"
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
@@ -1142,7 +1142,7 @@ pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main' );
     print \$P0
 .end
 CODE
-/Stringifying an Undef $PMC/
+/Stringifying an Undef PMC/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
@@ -1179,7 +1179,7 @@ pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2' );
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG
 .end
 CODE
-/Stringifying an Undef $PMC/
+/Stringifying an Undef PMC/
 OUTPUT
 
 SKIP: {
@@ -1281,7 +1281,7 @@ CODE
 ok
 OUTPUT
 
-pir_error_output_like( <<'CODE', qr/Null $PMC access in invoke()/, 'invoking null pmc' );
+pir_error_output_like( <<'CODE', qr/Null PMC access in invoke()/, 'invoking null pmc' );
 .sub main :main
     null $P0
     $P0()
@@ -1524,7 +1524,7 @@ I can has outer from eval?
 OUTPUT
 
 @todo = $testr
-    ? ( todo => 'lexicals not thawed properly from $PBC, GH #430' )
+    ? ( todo => 'lexicals not thawed properly from PBC, GH #430' )
     : ();
 pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
 .sub 'main' :main

@@ -25,7 +25,7 @@ Tests the C<Iterator> PMC.
 # TT #1478: Split this test into aggregate specific one.
 
 pir_output_is( <<'CODE', <<'OUTPUT', "new iter" );
-.sub _main main:
+.sub _main :main
     new $P2, ['ResizablePMCArray']
     iter $P1, $P2
     print "ok 1\n"
@@ -36,7 +36,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "old-style Iterator now disallowed" );
-.sub _main main:
+.sub _main :main
     push_eh THROWN
     new $P0, ['ResizablePMCArray']
     new $P1, ['Iterator'], $P0
@@ -51,7 +51,7 @@ ok 1
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "keyed access on String and Hash PMCs" );
-.sub _main main:
+.sub _main :main
     new $P0, ['String']
     set $P0, "I am a very long string."
     new $P2, ['Integer']
@@ -100,7 +100,7 @@ ok 5
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "keyed exist and defined on String and Hash PMCs" );
-.sub _main main:
+.sub _main :main
     new $P0, ['String']
     set $P0, 'somelongstring'
     iter $P1, $P0
@@ -150,7 +150,7 @@ ok 5
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
-.sub _main main:
+.sub _main :main
     new $P0, ['ResizableIntegerArray']
     push $P0, 20
     iter $P1, $P0
@@ -222,7 +222,7 @@ OUTPUT
 }
 
 pir_output_is( <<'CODE', <<'OUTPUT', "int test" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P0, ['ResizablePMCArray']    # empty array
     new $P2, ['ResizablePMCArray']    # array with 2 elements
@@ -299,7 +299,7 @@ ok 12
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P0, ['Hash']    # empty Hash
     new $P2, ['Hash']    # Hash with 2 elements
@@ -355,7 +355,7 @@ ok 8
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 1" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P0, ['Hash']    # empty Hash
     new $P2, ['Hash']    # Hash with 2 elements
@@ -411,7 +411,7 @@ ok 8
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Hash iter 2" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P0, ['Hash']    # Hash for iteration
     new $P2, ['Hash']    # for test
@@ -453,7 +453,7 @@ ok 1
 ok 2
 OUTPUT
 pir_output_is( <<'CODE', <<OUTPUT, "string iteration forward" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P2, ['String']
     set $P2, "parrot"
@@ -476,7 +476,7 @@ parrot
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "string iteration backward" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P2, ['String']
     set $P2, "parrot"
@@ -499,7 +499,7 @@ parrot
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "string iteration forward get ord" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P2, ['String']
     set $P2, "ABC"
@@ -522,7 +522,7 @@ ABC
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "string iteration backward get ord" );
-.sub _main main:
+.sub _main :main
 .include "iterator.pir"
     new $P2, ['String']
     set $P2, "ABC"
@@ -740,7 +740,7 @@ OUTPUT
 
 TODO: {
     pir_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
-    .sub _main main:
+    .sub _main :main
     .include "iterator.pir"
 
     new $P2, ['ResizablePMCArray']    # array with 4 elements
@@ -789,7 +789,7 @@ OUTPUT
 
 
 pir_output_is( <<'CODE', <<'OUTPUT', "iter vtable" );
-.sub _main main:
+.sub _main :main
    .include "iterator.pir"
    new $P0, ['ResizablePMCArray']
    push $P0, 100
@@ -826,7 +826,7 @@ ok 2
 OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "string iteration with get_iter" );
-.sub _main main:
+.sub _main :main
     .include "iterator.pir"
     new $P2, ['String']
     set $P2, "parrot"

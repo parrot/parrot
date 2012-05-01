@@ -23,7 +23,7 @@ Tests the C<Coroutine> PMC.
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pir"
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "_coro"
     new $P10, ['Integer']
     set $P10, 2
@@ -108,7 +108,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 .include "interpinfo.pir"
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "_coro"
     push_eh _catchm
     new $P16, ['Integer']
@@ -149,7 +149,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 .include "interpinfo.pir"
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "_coro"
     push_eh _catchm
     new $P16, ['Integer']
@@ -189,7 +189,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler" );
 .include "interpinfo.pir"
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "_coro"
     push_eh _catchm
     new $P16, ['Integer']
@@ -227,7 +227,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 .include "interpinfo.pir"
-.sub _main main:
+.sub _main :main
     .const 'Sub' $P0 = "_coro"
     push_eh _catchm
     new $P16, ['Integer']
