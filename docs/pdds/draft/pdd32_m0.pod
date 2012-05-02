@@ -520,6 +520,10 @@ C<deref> op by deferencing from CONSTS.  Any constant data used by the metadata
 segment and the bytecode segment will be stored here.  Constants denoted by
 ampersand followed by the name of a chunk can be used at runtime to find the
 index of a chunk.
+
+At runtime, all offsets of CONSTS are fixed-width.  Entries in the constants
+table which contain P and S values need to be dereferenced with C<deref>.
+
 see also L<Chunk Name Constants and Bytecode Loading>
 
   .constants
