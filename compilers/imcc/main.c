@@ -72,8 +72,7 @@ PARROT_CAN_RETURN_NULL
 static PMC * imcc_run_compilation_internal(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *source),
-    int is_file,
-    int is_pasm)
+    int is_file)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
@@ -83,8 +82,7 @@ PARROT_CAN_RETURN_NULL
 static PMC * imcc_run_compilation_reentrant(
     ARGMOD(imc_info_t *imcc),
     ARGIN(STRING *fullname),
-    int is_file,
-    int is_pasm)
+    int is_file)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
@@ -441,8 +439,7 @@ do_pre_process(ARGMOD(imc_info_t *imcc), ARGIN(STRING * sourcefile),
 
 /*
 
-=item C<PMC * imcc_compile_string(imc_info_t *imcc, STRING *source, int
-is_pasm)>
+=item C<PMC * imcc_compile_string(imc_info_t *imcc, STRING *source)>
 
 Compile a string of PIR or PASM (set by C<is_pasm>).
 
@@ -452,16 +449,15 @@ Compile a string of PIR or PASM (set by C<is_pasm>).
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm)
+imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source))
 {
     ASSERT_ARGS(imcc_compile_string)
-    return imcc_run_compilation_reentrant(imcc, source, 0, is_pasm);
+    return imcc_run_compilation_reentrant(imcc, source, 0);
 }
 
 /*
 
-=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
-is_pasm)>
+=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname)>
 
 Compile a file containing PIR or PASM (set by C<is_pasm>).
 
@@ -472,16 +468,16 @@ Compile a file containing PIR or PASM (set by C<is_pasm>).
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname), int is_pasm)
+imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname))
 {
     ASSERT_ARGS(imcc_compile_file)
-    return imcc_run_compilation_reentrant(imcc, fullname, 1, is_pasm);
+    return imcc_run_compilation_reentrant(imcc, fullname, 1);
 }
 
 /*
 
 =item C<static PMC * imcc_run_compilation_reentrant(imc_info_t *imcc, STRING
-*fullname, int is_file, int is_pasm)>
+*fullname, int is_file)>
 
 run a compilation over an input sequence, allowing for some reentrancy. This
 may be a recursive compilation inside an existing compilation sequence.
@@ -494,11 +490,11 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
 imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
-        int is_file, int is_pasm)
+        int is_file)
 {
     ASSERT_ARGS(imcc_run_compilation_reentrant)
     struct _imc_info_t * const imcc_use = prepare_reentrant_compile(imcc);
-    PMC * const result = imcc_run_compilation_internal(imcc_use, fullname, is_file, is_pasm);
+    PMC * const result = imcc_run_compilation_internal(imcc_use, fullname, is_file);
     exit_reentrant_compile(imcc, imcc_use);
     return result;
 }
@@ -506,7 +502,7 @@ imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname)
 /*
 
 =item C<static PMC * imcc_run_compilation_internal(imc_info_t *imcc, STRING
-*source, int is_file, int is_pasm)>
+*source, int is_file)>
 
 Perform an actual compilation. The input is either a string or a file
 (determined by C<is_file>), and is in either PIR or PASM format (determined by
@@ -522,7 +518,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
 imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
-        int is_file, int is_pasm)
+        int is_file)
 {
     ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
@@ -545,9 +541,9 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
     Parrot_pf_set_current_packfile(imcc->interp, packfilepmc);
 
-    IMCC_push_parser_state(imcc, source, is_file, is_pasm);
+    IMCC_push_parser_state(imcc, source, is_file, 0);
 
-    success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
+    success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file);
 
     if (imcc->error_code) {
         yylex_destroy(yyscanner);
