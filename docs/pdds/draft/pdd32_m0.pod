@@ -516,9 +516,10 @@ either an integer, a floating point number, a quote-delimited utf-8 string,
 arbitrary data in hex notation or the name of a chunk.  For simplicity's sake,
 strings will only support escaping double-quotes and newlines.  Any other data
 should be stored as a hex string.  This data is accessible through the
-C<load_const> op.  Any constant data used by the metadata segment and the
-bytecode segment will be stored here.  Constants denoted by ampersand followed
-by the name of a chunk can be used at runtime to find the index of a chunk.
+C<deref> op by deferencing from CONSTS.  Any constant data used by the metadata
+segment and the bytecode segment will be stored here.  Constants denoted by
+ampersand followed by the name of a chunk can be used at runtime to find the
+index of a chunk.
 see also L<Chunk Name Constants and Bytecode Loading>
 
   .constants
@@ -855,8 +856,9 @@ In addition to object strings, M0 supports primitive strings.  These are the
 low-level strings used when interacting directly with external code.  The
 layout of a primitive string in M0 is as follows:
 
-  int32  - number of bytes in the string body int32  - encoding char.. - string
-body
+  int32  - number of bytes in the string body
+  int32  - encoding 
+  char.. - string body
 
 =head4 Primitive String Encoding
 
