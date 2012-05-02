@@ -66,7 +66,7 @@ FIN:
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/addit.pl>, F<examples/benchmarks/addit.pasm>,
+F<examples/benchmarks/addit.pl>,
 F<examples/benchmarks/addit2.pir>.
 
 =cut
