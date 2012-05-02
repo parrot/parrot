@@ -11,7 +11,14 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
-#define M0_EXEC_OP(name, cf, ops, pc) m0_op_##name( cf, &ops[4*pc] )
+#define M0_DEBUG 0
+#define M0_ARG(n) (unsigned char)(ops[(4*pc)*(n)])
+#define M0_EXEC_OP(name, cf, ops, pc) { \
+      if (M0_DEBUG) { \
+        fprintf(stderr, "pc = %d, op: " #name "\n", (char)pc);      \
+      } \
+      m0_op_##name( cf, &ops[4*pc] ); \
+  }
 
 static void
 m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
