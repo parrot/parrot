@@ -161,7 +161,7 @@ sub new_interp {
         my $const_length = bytes::length($arg) + 4 + 4 + 1; # byte count + encoding + string bytes + terminal null
         my $string_length = bytes::length($arg) + 1; # byte count + terminal null
         my $encoding = 0;
-        push @$m0_argv, pack("iiia[$string_length]", $const_length, $string_length, $encoding, $arg);
+        push @$m0_argv, pack("iia[$string_length]", $string_length, $encoding, $arg);
     }
     $interp->[M0_ARGV] = $m0_argv;
 
