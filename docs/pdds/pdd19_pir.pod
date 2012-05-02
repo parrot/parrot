@@ -708,7 +708,7 @@ of the exception object.
 
 =head3 Syntactic Sugar
 
-Any PASM opcode is a valid PIR instruction. In addition, PIR defines some
+Any parrot opcode is a valid PIR instruction. In addition, PIR defines some
 syntactic shortcuts. These are provided for ease of use by humans producing
 and maintaining PIR code.
 
@@ -742,7 +742,7 @@ Unless I<var> evaluates as null, jump to the named I<identifier>.
 
 The I<relop> can be: C<E<lt>, E<lt>=, ==, != E<gt>= E<gt>>.
  which translate
-to the PASM opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If
+to the opcodes C<lt>, C<le>, C<eq>, C<ne>, C<ge> or C<gt>. If
 I<var1 relop var2> evaluates as true, jump to the named I<identifier>.
 
 =item unless <var1> <relop> <var2> goto <identifier>

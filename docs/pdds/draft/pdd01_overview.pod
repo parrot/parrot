@@ -47,11 +47,10 @@ compilation process between the common transformation stages.
 The intermediate code compiler (IMCC) is the main F<parrot> executable,
 and encapsulates several core low-level components.
 
-=head4 PASM & PIR parser
+=head4 PIR parser
 
-This Bison and Flex based parser/lexer handles Parrot's assembly
-language, PASM, and the slightly higher-level language, PIR (Parrot
-Intermediate Representation).
+This Bison and Flex based parser/lexer handles Parrot's slightly-higher-
+than-assembly language, PIR (Parrot Intermediate Representation).
 
 =head4 Bytecode compiler
 
@@ -60,7 +59,7 @@ unoptimized stream of bytecode. This code is suitable for passing straight to
 the interpreter, though it is probably not going to be very fast.
 
 Note that currently, the only way to generate bytecode is by first
-generating PASM or PIR.
+generating PIR.
 
 =head4 Optimizer
 

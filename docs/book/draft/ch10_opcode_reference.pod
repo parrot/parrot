@@ -5,9 +5,7 @@
 Z<CHP-10>
 
 This chapter contains a condensed reference to the Parrot virtual
-machine's native instruction set, generally called opcodes. All opcodes
-are valid in both PIR and PASM, and correspond to the bytecode
-instructions.
+machine's native instruction set, generally called opcodes.
 
 For complete details on each opcode and the latest changes, read the
 documentation in F<docs/ops/>, or look at all the C<.ops> files in the
@@ -1650,7 +1648,7 @@ X<new_callback opcode>
 
   new_callback R<DEST>, R<SUB>, R<DATA>, R<SIG>
 
-Create a callback stub R<DEST> for a PASM subroutine R<SUB> with user
+Create a callback stub R<DEST> for a subroutine R<SUB> with user
 data R<DATA> and function signature R<SIG>.
 
 I<Arguments: P, P, P, S>

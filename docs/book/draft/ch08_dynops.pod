@@ -32,7 +32,7 @@ C<dynops>, as needed.
 
 =head3 Opcode naming
 
-To the PIR and PASM programmers, opcodes appear to be polymorphic. That
+To the PIR programmers, opcodes appear to be polymorphic. That
 is, some opcodes appear to have multiple allowable argument formats. This is
 just an illusion, however. Parrot opcodes are not polymorphic, although
 certain features enable them to appear that way to the PIR programmer.
@@ -77,7 +77,6 @@ and C<inout> keywords respectively. Here is an example:
 This opcode could be called like this:
 
   $I0 = Foo $N0     # in PIR syntax
-  Foo I0, N0        # in PASM syntax
 
 When Parrot parses through the file and sees the C<Foo> operation, it
 converts it to the real name C<Foo_i_n>. The real name of an opcode
@@ -136,7 +135,7 @@ A basic key value that uses only integer values C<[1 ; 2 ; 3 ]>.
 
 =item * LABEL
 
-A label value, which represents a named statement in PIR or PASM code.
+A label value, which represents a named statement in PIR code.
 
 =back
 

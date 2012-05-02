@@ -77,7 +77,7 @@ F<parrot-python> but not F<python>).
 
 The languages directories may have subdirectories, including F<library> for
 their own set of libraries, and F<dynext> for dynamic pmcs and ops, and
-F<include> for PIR or PASM includes.
+F<include> for PIR includes.
 
 It is recommended that languages follow a standard pattern in installing their
 libraries so a bytecode compiled version of a module in the C<mylang> HLL
