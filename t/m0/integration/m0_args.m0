@@ -6,11 +6,18 @@
 2 "ok 1 - arg count: got 6 arguments!\n"
 3 "not ok 1 -  arg count: didn't get 6 arguments (got "
 4 "ok 2 - arg contents: second argument was 'kittens'\n"
-5 "not ok 2 - arg contents: second argument was 'kittens' # TODO M0 doesn't support this yet \n"
+5 "nok 2 - arg contents: second argument was not 'kittens'\n"
 6 " arguments)\n"
 7 "kittens"
+8 "looping\n"
+9 "nok 2 - arg contents: second argument isn't 8 characters long\n"
 .metadata
 .bytecode
+
+    set_imm S2, 0, 8
+    deref   S2, CONSTS, S2
+    set_imm S3, 0, 1
+    deref   S3, CONSTS, S3
 
     # print 1..2
     set_imm I0, 0, 0
@@ -65,7 +72,7 @@ argv_test:
     deref   S0, S0, I1
     # put the number of bytes in argv[1] string into I3
     # (number of bytes in a string is in the first word of the string)
-    get_word I3, S0, I1
+    get_word I3, S0, I0
 
     # put the expected value of argv[1] into S1 ("kittens")
     set_imm S1, 0, 7
@@ -75,9 +82,17 @@ argv_test:
     # (number of bytes in a string is in the first word of the string)
     get_word I2, S1, I0
 
+    # because debugging m0 is hard
+    goto skip_print_92, x
+print_s I0, S2, x
+print_i I0, I3, x
+print_s I0, S3, x
+print_i I0, I2, x
+print_s I0, S3, x
+skip_print_92:
     # test if argv[1] and the reference string are the same length
-    sub_i    I1, I1, I2
-    goto_if  argv_nok, I1
+    sub_i    I3, I3, I2
+    goto_if  argv_nok_size, I3
 
     # subtract 1 to avoid comparing the terminal null
     sub_i    I2, I2, I1
@@ -88,7 +103,7 @@ string_cmp_loop:
     # put number of characters remaining into I2
     sub_i    I2, I2, I1
 
-    # store S1[I2 + 8] in I4
+    # store the char at S1[I2 + 8] in I4
     # skip past the string header
     set_imm  I5,  0,  8
     add_i    I5, I2, I5
@@ -96,16 +111,32 @@ string_cmp_loop:
     get_byte I4, S1, I5
     get_byte I3, S0, I5
 
+    goto skip_print_121, x
+print_s I0, S2, x
+print_i I0, I2, x
+print_s I0, S3, x
+print_i I0, I3, x
+print_s I0, S3, x
+print_i I0, I4, x
+print_s I0, S3, x
+skip_print_121:
+
     # if i3 != i4 (the two characters from the string differ), fail
     sub_i    I3, I3, I4
-    goto_if  argv_nok, I3
+    goto_if  argv_nok_chars, I3
 
     # if there are more characters to compare, continue
     goto_if  string_cmp_loop, I2
     goto     argv_ok, x
 
-argv_nok:
+argv_nok_chars:
     set_imm S0, 0, 5
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+    goto    end, x
+
+argv_nok_size:
+    set_imm S0, 0, 9
     deref   S0, CONSTS, S0
     print_s I0, S0, x
     goto    end, x
