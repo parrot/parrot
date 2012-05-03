@@ -738,7 +738,7 @@ string filename or an integer argument of a UNIX file descriptor [or an
 already opened stream object?], and an integer flag for the type of
 information requested. It returns an integer containing the requested
 information.  The following constants are defined for the type of
-information requested (see F<runtime/parrot/include/stat.pasm>):
+information requested (see F<runtime/parrot/include/stat.pir>):
 
   0    STAT_EXISTS
            Whether the file exists.

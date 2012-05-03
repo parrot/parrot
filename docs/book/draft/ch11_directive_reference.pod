@@ -6,9 +6,7 @@ Z<CHP-13-SECT-2>
 
 X<PIR (Parrot intermediate representation);quick reference;directives>
 This is a summary of PIR directives. Directives are preprocessed by the
-Parrot interpreter. Since PIR and PASM run on the same interpreter, many
-of the directives listed here are also valid in PASM code.
-
+Parrot interpreter. 
 
 =head3 .arg
 
@@ -33,15 +31,7 @@ X<.macro_const directive>
   .macro_const R<NAME>R<VALUE>
 
 Define a named macro that expands to a given value. Macros are called
-as directives, i.e. .R<NAME> (PASM code only).
-
-=head3 .emit
-
-X<.emit directive>
-
-  .emit
-
-Define a block of PASM code. Always paired with C<.eom>.
+as directives, i.e. .R<NAME>
 
 =head3 .end
 
@@ -58,14 +48,6 @@ X<.endm directive>
   .endm
 
 End a macro definition. Always paired with C<.macro>.
-
-=head3 .eom
-
-X<.eom directive>
-
-  .eom
-
-End a block of PASM code. Always paired with C<.emit>.
 
 =head3 .flatten_arg
 
@@ -159,15 +141,6 @@ X<.call directive>
   .call R<SUB>, R<RETCONT>
 
 Create a subroutine call.
-
-=head3 .pcc_sub
-
-X<.pcc_sub directive>
-
-  .pcc_sub R<_LABEL>
-
-Create a symbol entry for subroutine at the _LABEL. This directive is
-for PASM code only.
 
 =head3 .result
 

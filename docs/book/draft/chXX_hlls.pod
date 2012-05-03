@@ -70,10 +70,9 @@ be stored using the following C<compreg> syntax:
 
 =end PIR_FRAGMENT
 
-There are two built-in compiler objects: One for PIR and one for PASM. These
-two don't need to be stored first, they can simply be retrieved and used.
-The PIR and PASM compiler objects are Sub PMCs that take a single string
-argument and return an array PMC containing a list of all the compiled
+There is one built-in compiler objects, for PIR.
+The PIR compiler objects is a Sub PMC that takes a single string
+argument and returns an array PMC containing a list of all the compiled
 subroutines from the string. Other compiler objects might be different
 entirely, and may need to be used in different ways. A common convention is
 for a compiler to be an object with a C<compile> method. This is done with

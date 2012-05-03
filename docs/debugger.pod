@@ -37,7 +37,7 @@ To start the debugger type:
   parrot_debugger file.pbc
 
 That is, F<parrot_debugger> takes exactly one argument, which is the Parrot file that
-you're going to debug. This file may be Parrot bytecode (*.pbc), PASM source code (*.pasm)
+you're going to debug. This file may be Parrot bytecode (*.pbc)
 or PIR (*.pir). F<parrot_debugger> will automatically load and disassemble the
 bytecode file for you.
 

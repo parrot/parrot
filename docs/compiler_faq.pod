@@ -766,7 +766,7 @@ Create a new C<Env> PMC and access it like a hash.
 
 =end PIR_FRAGMENT
 
-See F<config_lib.pasm> for all the keys in the config hash - or iterate over
+See F<config_lib.pir> for all the keys in the config hash - or iterate over
 the config hash.
 
 =cut

@@ -284,10 +284,7 @@ Preprocess source file (expand macros) and print result to C<stdout>:
 
 =over 11
 
-unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>,
-'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output
-a PASM file, even from PASM input. This can be useful when needing to check
-various optimizations, including C<-Op>.
+unless the B<-r> is supplied as well.
 
 =back
 

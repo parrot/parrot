@@ -20,8 +20,8 @@ Z<CHP-7-SECT-1>
 X<testing Parrot>
 Parrot is volunteer-driven, and contributions from new users are always
 welcome. Contributing tests is a good place for a new developer to start.
-You don't have to understand the code behind a PASM opcodeN<Or PIR
-instruction, or whatever.> to test it, you only have to understand
+You don't have to understand the code behind a PIR
+instruction. To test it, you only have to understand
 the desired behavior. If you're working on some code and it doesn't do
 what the documentation claims, you can isolate the problem in a test or
 series of tests and send them to the bug tracking system. There's a
@@ -37,7 +37,7 @@ X<Parrot::Test module>
 The Perl 5 testing framework is at the core of Parrot tests,
 particularly F<Test::Builder>. Parrot's F<Parrot::Test> module is an
 interface to F<Test::Builder> and implements the extra features needed
-for testing Parrot, like the fact that PASM and PIR code has to be
+for testing Parrot, like the fact that PIR code has to be
 compiled to bytecode before it runs. F<Parrot::Test> handles the
 compilation and running of the test code, and collects the output for
 verification.
@@ -53,7 +53,7 @@ script:
 
   $ perl t/harness t/op/string.t t/op/integer.t
 
-X<set opcode (PASM);test example>
+X<set opcode ;test example>
 Here's a simple example that tests the C<set> opcode with integer
 registers, taken from F<t/op/integer.t>:
 

@@ -5,9 +5,7 @@
 Z<CHP-10>
 
 This chapter contains a condensed reference to the Parrot virtual
-machine's native instruction set, generally called opcodes. All opcodes
-are valid in both PIR and PASM, and correspond to the bytecode
-instructions.
+machine's native instruction set, generally called opcodes.
 
 For complete details on each opcode and the latest changes, read the
 documentation in F<docs/ops/>, or look at all the C<.ops> files in the
@@ -22,7 +20,7 @@ for the combinations allowed with a particular operation.
 
 =head3 abs
 
-X<abs opcode (PASM)>
+X<abs opcode>
 
   abs R<DEST>
   abs R<DEST>, R<VAL>
@@ -34,7 +32,7 @@ I<Arguments: IR or NR or IR, I or IR, N or NR, I or NR, N>
 
 =head3 acos
 
-X<acos opcode (PASM)>
+X<acos opcode>
 
   acos R<DEST>, R<VAL>
 
@@ -44,7 +42,7 @@ I<Arguments: NR, N or NR, I>
 
 =head3 add
 
-X<add opcode (PASM)>
+X<add opcode>
 
   add R<DEST>, R<VAL>
   add R<DEST>, R<VAL>, R<VAL>
@@ -57,7 +55,7 @@ or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 addattribute
 
-X<addattribute opcode (PASM)>
+X<addattribute opcode>
 
   addattribute R<CLASS>, R<ATTR>
 
@@ -67,7 +65,7 @@ I<Arguments: P, S>
 
 =head3 addparent
 
-X<addparent opcode (PASM)>
+X<addparent opcode>
 
   addparent R<CLASS1>, R<CLASS2>
 
@@ -77,7 +75,7 @@ I<Arguments: P, P>
 
 =head3 and
 
-X<and opcode (PASM)>
+X<and opcode>
 
   and R<DEST>, R<VAL1>, R<VAL2>
 
@@ -87,7 +85,7 @@ I<Arguments: IR, I, I or P, P, P>
 
 =head3 asec
 
-X<asec opcode (PASM)>
+X<asec opcode>
 
   asec R<DEST>, R<VAL>
 
@@ -97,7 +95,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 asin
 
-X<asin opcode (PASM)>
+X<asin opcode>
 
   asin R<DEST>, R<VAL>
 
@@ -107,7 +105,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 assign
 
-X<assign opcode (PASM)>
+X<assign opcode>
 
   assign R<DEST>, R<VAL>
 
@@ -117,7 +115,7 @@ I<Arguments: SR, S or P, I or P, N or P, S or P, P>
 
 =head3 atan
 
-X<atan opcode (PASM)>
+X<atan opcode>
 
   atan R<DEST>, R<VAL>
   atan R<DEST>, R<VAL1>, R<VAL2>
@@ -130,7 +128,7 @@ N, N>
 
 =head3 band
 
-X<band opcode (PASM)>
+X<band opcode>
 
   band R<DEST>, R<VAL>
   band R<DEST>, R<VAL>, R<VAL>
@@ -142,7 +140,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bands
 
-X<bands opcode (PASM)>
+X<bands opcode>
 
   bands R<DEST>, R<VAL>
   bands R<DEST>, R<VAL>, R<VAL>
@@ -154,7 +152,7 @@ I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 bnot
 
-X<bnot opcode (PASM)>
+X<bnot opcode>
 
   bnot R<DEST>, R<VAL>
 
@@ -164,7 +162,7 @@ I<Arguments: IR, I or P, P>
 
 =head3 bnots
 
-X<bnots opcode (PASM)>
+X<bnots opcode>
 
   bnots R<DEST>, R<VAL>
 
@@ -174,7 +172,7 @@ I<Arguments: SR, S or P, P>
 
 =head3 bor
 
-X<bor opcode (PASM)>
+X<bor opcode>
 
   bor R<DEST>, R<VAL>, R<VAL>
 
@@ -185,7 +183,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bors
 
-X<bors opcode (PASM)>
+X<bors opcode>
 
   bors R<DEST>, R<VAL>, R<VAL>
 
@@ -196,7 +194,7 @@ I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 bounds
 
-X<bounds opcode (PASM)>
+X<bounds opcode>
 
   bounds R<INT>
 
@@ -207,7 +205,7 @@ I<Arguments: I>
 
 =head3 branch
 
-X<branch opcode (PASM)>
+X<branch opcode>
 
   branch R<LABEL>
 
@@ -217,7 +215,7 @@ I<Arguments: I>
 
 =head3 bxor
 
-X<bxor opcode (PASM)>
+X<bxor opcode>
 
   bxor R<DEST>, R<VAL>
   bxor R<DEST>, R<VAL>, R<VAL>
@@ -229,7 +227,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bxors
 
-X<bxors opcode (PASM)>
+X<bxors opcode>
 
   bxors R<DEST>, R<VAL>
   bxors R<DEST>, R<VAL>, R<VAL>
@@ -241,7 +239,7 @@ I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 callmethod
 
-X<callmethod opcode (PASM)>
+X<callmethod opcode>
 
   callmethod
   callmethod R<METHODNAME>
@@ -254,7 +252,7 @@ I<Arguments: S>
 
 =head3 callmethodcc
 
-X<callmethodcc opcode (PASM)>
+X<callmethodcc opcode>
 
   callmethodcc
   callmethodcc R<METHODNAME>
@@ -268,7 +266,7 @@ I<Arguments: S>
 
 =head3 can
 
-X<can opcode (PASM)>
+X<can opcode>
 
   can R<DEST>, R<OBJECT>, R<METHODNAME>
 
@@ -279,7 +277,7 @@ I<Arguments: IR, P, S>
 
 =head3 ceil
 
-X<ceil opcode (PASM)>
+X<ceil opcode>
 
   ceil R<DEST>
   ceil R<DEST>, R<VAL>
@@ -291,7 +289,7 @@ I<Arguments: NR or IR, N or NR, N>
 
 =head3 checkevents
 
-X<checkevents opcode (PASM)>
+X<checkevents opcode>
 
   checkevents
 
@@ -300,7 +298,7 @@ event handlers.
 
 =head3 chopn
 
-X<chopn opcode (PASM)>
+X<chopn opcode>
 
   chopn R<DEST>, R<VAL1>
   chopn R<DEST>, R<VAL1>, R<VAL2>
@@ -312,7 +310,7 @@ I<Arguments: SR, I or SR, S, I>
 
 =head3 chr
 
-X<chr opcode (PASM)>
+X<chr opcode>
 
   chr R<DEST>, R<INT>
 
@@ -322,7 +320,7 @@ I<Arguments: SR, I>
 
 =head3 class
 
-X<class opcode (PASM)>
+X<class opcode>
 
   class R<CLASS>, R<OBJECT>
 
@@ -342,10 +340,10 @@ See also: C<set_eh>, C<throw>.
 
 =head3 clearX
 
-X<cleari opcode (PASM)>
-X<clearn opcode (PASM)>
-X<clearp opcode (PASM)>
-X<clears opcode (PASM)>
+X<cleari opcode>
+X<clearn opcode>
+X<clearp opcode>
+X<clears opcode>
 
   cleari
   clearn
@@ -358,7 +356,7 @@ and PMC registers clear to NULL.
 
 =head3 clone
 
-X<clone opcode (PASM)>
+X<clone opcode>
 
   clone R<DEST>, R<VAL>
 
@@ -368,7 +366,7 @@ I<Arguments: SR, S or P, P>
 
 =head3 close
 
-X<close opcode (PASM)>
+X<close opcode>
 
   close R<DEST>
 
@@ -378,7 +376,7 @@ I<Arguments: P>
 
 =head3 cmod
 
-X<cmod opcode (PASM)>
+X<cmod opcode>
 
   cmod R<DEST>, R<VAL1>, R<VAL2>
 
@@ -390,7 +388,7 @@ I<Arguments: IR, I, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 cmp
 
-X<cmp (comparison);opcode (PASM)>
+X<cmp (comparison);opcode>
 
   cmp R<DEST>, R<VAL1>, R<VAL2>
 
@@ -403,7 +401,7 @@ IR, P, S or IR, P, P>
 
 =head3 cmp_num
 
-X<cmp_num opcode (PASM)>
+X<cmp_num opcode>
 
   cmp_num R<DEST>, R<VAL1>, R<VAL2>
 
@@ -413,7 +411,7 @@ I<Arguments: IR, P, P>
 
 =head3 cmp_str
 
-X<cmp_str opcode (PASM)>
+X<cmp_str opcode>
 
   cmp_str R<DEST>, R<VAL1>, R<VAL2>
 
@@ -423,7 +421,7 @@ I<Arguments: IR, P, P>
 
 =head3 cmp_pmc
 
-X<cmp_pmc opcode (PASM)>
+X<cmp_pmc opcode>
 
   cmp_pmc R<DEST>, R<VAL1>, R<VAL2>
 
@@ -434,7 +432,7 @@ I<Arguments: P, P, P>
 
 =head3 collect
 
-X<collect opcode (PASM)>
+X<collect opcode>
 
   collect
 
@@ -442,7 +440,7 @@ Trigger a garbage collection (GC) run.
 
 =head3 collectoff
 
-X<collectoff opcode (PASM)>
+X<collectoff opcode>
 
   collectoff
 
@@ -450,7 +448,7 @@ Disable garbage collection runs (nestable).
 
 =head3 collecton
 
-X<collecton opcode (PASM)>
+X<collecton opcode>
 
   collecton
 
@@ -458,7 +456,7 @@ Re-enable garbage collection runs.
 
 =head3 compile
 
-X<compile opcode (PASM)>
+X<compile opcode>
 
   compile R<DEST>, R<COMPILER>, R<SOURCE>
 
@@ -469,7 +467,7 @@ I<Arguments: P, P, S>
 
 =head3 compreg
 
-X<compreg opcode (PASM)>
+X<compreg opcode>
 
   compreg R<DEST>, R<TYPE>
 
@@ -485,7 +483,7 @@ I<Arguments: S, P>
 
 =head3 concat
 
-X<concat opcode (PASM)>
+X<concat opcode>
 
   concat R<DEST>, R<VAL>
   concat R<DEST>, R<VAL>, R<VAL>
@@ -497,7 +495,7 @@ I<Arguments: SR, S or SR, S, S or P, P, S or P, P, P>
 
 =head3 cos
 
-X<cos opcode (PASM)>
+X<cos opcode>
 
   cos R<DEST>, R<VAL>
 
@@ -507,7 +505,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 cosh
 
-X<cosh opcode (PASM)>
+X<cosh opcode>
 
   cosh R<DEST>, R<VAL>
 
@@ -517,7 +515,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 debug
 
-X<debug opcode (PASM)>
+X<debug opcode>
 
   debug R<FLAG>
 
@@ -527,7 +525,7 @@ I<Arguments: I>
 
 =head3 dec
 
-X<dec opcode (PASM)>
+X<dec opcode>
 
   dec R<DEST>
 
@@ -537,7 +535,7 @@ I<Arguments: I or N or P>
 
 =head3 decodelocaltime
 
-X<decodelocaltime opcode (PASM)>
+X<decodelocaltime opcode>
 
   decodelocaltime R<DEST>, R<VAL>
 
@@ -548,7 +546,7 @@ I<Arguments: P, I>
 
 =head3 decodetime
 
-X<decodetime opcode (PASM)>
+X<decodetime opcode>
 
   decodetime R<DEST>, R<VAL>
 
@@ -559,7 +557,7 @@ I<Arguments: P, I>
 
 =head3 defined
 
-X<defined opcode (PASM)>
+X<defined opcode>
 
   defined R<DEST>, R<PMC>
   defined R<DEST>, R<PMC>[R<KEY>]
@@ -571,7 +569,7 @@ I<Arguments: IR, P>
 
 =head3 delete
 
-X<delete opcode (PASM)>
+X<delete opcode>
 
   delete R<DEST>[R<KEY>]
 
@@ -581,7 +579,7 @@ I<Arguments: P>
 
 =head3 delprop
 
-X<delprop opcode (PASM)>
+X<delprop opcode>
 
   delprop R<PMC>, R<NAME>
 
@@ -593,7 +591,7 @@ See also: C<setprop> and C<getprop>.
 
 =head3 deref
 
-X<deref opcode (PASM)>
+X<deref opcode>
 
   deref R<DEST>, R<REF>
 
@@ -603,7 +601,7 @@ I<Arguments: P, P>
 
 =head3 die_hard
 
-X<die_hard opcode (PASM)>
+X<die_hard opcode>
 
   die_hard R<LEVEL>, R<ERROR>
 
@@ -615,7 +613,7 @@ See also: C<exit>.
 
 =head3 div
 
-X<div opcode (PASM)>
+X<div opcode>
 
   div R<DEST>, R<VAL>
   div R<DEST>, R<VAL1>, R<VAL2>
@@ -628,7 +626,7 @@ or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 dlfunc
 
-X<dlfunc opcode (PASM)>
+X<dlfunc opcode>
 
   dlfunc R<DEST>, R<LIBRARY>, R<SYMBOL>, R<SIGNATURE>
 
@@ -639,7 +637,7 @@ I<Arguments: P, P, S, S>
 
 =head3 dlvar
 
-X<dlvar opcode (PASM)>
+X<dlvar opcode>
 
   dlvar R<DEST>, R<LIBRARY>, R<SYMBOL>
 
@@ -650,7 +648,7 @@ I<Arguments: P, P, S>
 
 =head3 does
 
-X<does opcode (PASM)>
+X<does opcode>
 
   does R<DEST>, R<OBJECT>, R<VAL>
 
@@ -661,7 +659,7 @@ I<Arguments: I, P, S>
 
 =head3 downcase
 
-X<downcase opcode (PASM)>
+X<downcase opcode>
 
   downcase R<DEST>
   downcase R<DEST>, R<VAL>
@@ -676,7 +674,7 @@ See also: C<upcase>, C<titlecase>.
 
 =head3 end
 
-X<end opcode (PASM)>
+X<end opcode>
 
   end
 
@@ -685,7 +683,7 @@ if in the main code segment.
 
 =head3 eq
 
-X<eq opcode (PASM)>
+X<eq opcode>
 
   eq R<VAL>, R<VAL>, R<LABEL>
 
@@ -696,7 +694,7 @@ or P, S, IC or P, P, IC>
 
 =head3 eq_addr
 
-X<eq_addr opcode (PASM)>
+X<eq_addr opcode>
 
   eq_addr R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -708,7 +706,7 @@ I<Arguments: S, S, IC or P, P, IC>
 
 =head3 eq_num
 
-X<eq_num opcode (PASM)>
+X<eq_num opcode>
 
   eq_num R<VAL>, R<VAL>, R<LABEL>
 
@@ -718,7 +716,7 @@ I<Arguments: P, P, IC>
 
 =head3 eq_str
 
-X<eq_str opcode (PASM)>
+X<eq_str opcode>
 
   eq_str R<VAL>, R<VAL>, R<LABEL>
 
@@ -728,7 +726,7 @@ I<Arguments: P, P, IC>
 
 =head3 err
 
-X<err opcode (PASM)>
+X<err opcode>
 
   err R<DEST>
   err R<DEST>, R<CODE>
@@ -741,7 +739,7 @@ I<Arguments: IR or SR or SR, I>
 
 =head3 errorsoff
 
-X<errorsoff opcode (PASM)>
+X<errorsoff opcode>
 
   errorsoff R<VAL>
 
@@ -751,7 +749,7 @@ I<Arguments: I>
 
 =head3 errorson
 
-X<errorson opcode (PASM)>
+X<errorson opcode>
 
   errorson R<VAL>
 
@@ -761,7 +759,7 @@ I<Arguments: I>
 
 =head3 exchange
 
-X<exchange opcode (PASM)>
+X<exchange opcode>
 
   exchange R<REG>, R<REG>
 
@@ -771,7 +769,7 @@ I<Arguments: IR, IR or NR, NR or SR, SR or P, P>
 
 =head3 exists
 
-X<exists opcode (PASM)>
+X<exists opcode>
 
   exists R<DEST>, R<PMC>[R<KEY>]
 
@@ -781,7 +779,7 @@ I<Arguments: IR, P>
 
 =head3 exit
 
-X<exit opcode (PASM)>
+X<exit opcode>
 
   exit R<STATUS>
 
@@ -794,7 +792,7 @@ See also: C<throw>, C<die_hard>.
 
 =head3 exp
 
-X<exp opcode (PASM)>
+X<exp opcode>
 
   exp R<DEST>, R<VAL>
 
@@ -804,7 +802,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 exsec
 
-X<exsec opcode (PASM)>
+X<exsec opcode>
 
   exsec R<DEST>, R<VAL>
 
@@ -814,7 +812,7 @@ I<Arguments: NR, N>
 
 =head3 fact
 
-X<fact opcode (PASM)>
+X<fact opcode>
 
   fact R<DEST>, R<INT>
 
@@ -824,7 +822,7 @@ I<Arguments: IR, I or NR, I>
 
 =head3 fdopen
 
-X<fdopen opcode (PASM)>
+X<fdopen opcode>
 
   fdopen R<DEST>, R<INT>, R<MODE>
 
@@ -834,7 +832,7 @@ I<Arguments: P, I, S>
 
 =head3 find_chartype
 
-X<find_chartype opcode (PASM)>
+X<find_chartype opcode>
 
   find_chartype R<DEST>, R<NAME>
 
@@ -845,7 +843,7 @@ I<Arguments: IR, S>
 =head3 find_encoding
 
 X<strings;encoding>
-X<find_encoding opcode (PASM)>
+X<find_encoding opcode>
 
   find_encoding R<DEST>, R<NAME>
 
@@ -855,7 +853,7 @@ I<Arguments: IR, S>
 
 =head3 find_global
 
-X<find_global opcode (PASM)>
+X<find_global opcode>
 
   find_global R<DEST>, R<NAME>
 
@@ -873,7 +871,7 @@ See also: C<store_global>.
 
 =head3 find_lex
 
-X<find_lex opcode (PASM)>
+X<find_lex opcode>
 
   find_lex R<DEST>, R<NAME>
   find_lex R<DEST>, R<DEPTH>, R<NAME>
@@ -890,7 +888,7 @@ See also: C<store_lex>.
 
 =head3 find_method
 
-X<find_method opcode (PASM)>
+X<find_method opcode>
 
   find_method R<DEST>, R<PMC>, R<NAME>
 
@@ -900,7 +898,7 @@ I<Arguments: P, P, S>
 
 =head3 find_type
 
-X<find_type opcode (PASM)>
+X<find_type opcode>
 
   find_type R<DEST>, R<NAME>
 
@@ -912,7 +910,7 @@ See also: C<typeof>.
 
 =head3 findclass
 
-X<findclass opcode (PASM)>
+X<findclass opcode>
 
   findclass R<DEST>, R<NAME>
 
@@ -924,7 +922,7 @@ See also: C<typeof>.
 
 =head3 floor
 
-X<floor opcode (PASM)>
+X<floor opcode>
 
   floor R<DEST>
   floor R<DEST>, R<VAL>
@@ -936,7 +934,7 @@ I<Arguments: NR or IR, N or NR, N>
 
 =head3 foldup
 
-X<foldup opcode (PASM)>
+X<foldup opcode>
 
   foldup R<DEST>
   foldup R<DEST>, R<SKIP>
@@ -948,7 +946,7 @@ I<Arguments: P or P, I>
 
 =head3 freeze
 
-X<freeze opcode (PASM)>
+X<freeze opcode>
 
   freeze R<DEST>, R<VAL>
 
@@ -960,7 +958,7 @@ See also: C<thaw>.
 
 =head3 gc_debug
 
-X<gc_debug opcode (PASM)>
+X<gc_debug opcode>
 
   gc_debug R<INT>
 
@@ -971,7 +969,7 @@ I<Arguments: I>
 
 =head3 gcd
 
-X<gcd opcode (PASM)>
+X<gcd opcode>
 
   gcd R<DEST>, R<VAL>, R<VAL>
 
@@ -981,7 +979,7 @@ I<Arguments: IR, I, I or IR, N, N>
 
 =head3 ge
 
-X<ge (greater than or equal);opcode (PASM)>
+X<ge (greater than or equal);opcode>
 
   ge R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -992,7 +990,7 @@ or P, S, IC or P, P, IC>
 
 =head3 ge_num
 
-X<ge_num opcode (PASM)>
+X<ge_num opcode>
 
   ge_num R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1002,7 +1000,7 @@ I<Arguments: P, P, IC>
 
 =head3 ge_str
 
-X<ge_str opcode (PASM)>
+X<ge_str opcode>
 
   ge_str R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1012,7 +1010,7 @@ I<Arguments: P, P, IC>
 
 =head3 get_addr
 
-X<get_addr opcode (PASM)>
+X<get_addr opcode>
 
   get_addr R<DEST>, R<SUB>
 
@@ -1024,7 +1022,7 @@ See also: C<set_addr>.
 
 =head3 getattribute
 
-X<getattribute opcode (PASM)>
+X<getattribute opcode>
 
   getattribute R<DEST>, R<OBJECT>, R<OFFS>
 
@@ -1036,7 +1034,7 @@ See also: C<setattribute>, C<classoffset>.
 
 =head3 get_class
 
-X<get_class opcode (PASM)>
+X<get_class opcode>
 
   get_class R<DEST>, R<NAME>
 
@@ -1046,7 +1044,7 @@ I<Arguments: P, S>
 
 =head3 getfile
 
-X<getfile opcode (PASM)>
+X<getfile opcode>
 
   getfile R<DEST>
 
@@ -1056,7 +1054,7 @@ I<Arguments: SR>
 
 =head3 getinterp
 
-X<getinterp opcode (PASM)>
+X<getinterp opcode>
 
   getinterp R<DEST>
 
@@ -1066,7 +1064,7 @@ I<Arguments: P>
 
 =head3 getline
 
-X<getline opcode (PASM)>
+X<getline opcode>
 
   getline R<DEST>
 
@@ -1076,7 +1074,7 @@ I<Arguments: IR>
 
 =head3 getpackage
 
-X<getpackage opcode (PASM)>
+X<getpackage opcode>
 
   getpackage R<DEST>
 
@@ -1086,7 +1084,7 @@ I<Arguments: SR>
 
 =head3 getprop
 
-X<getprop opcode (PASM)>
+X<getprop opcode>
 
   getprop R<DEST>, R<PMC>, R<NAME>
 
@@ -1098,9 +1096,9 @@ See also: C<setprop> and C<prophash>.
 
 =head3 getstd*
 
-X<getstderr opcode (PASM)>
-X<getstdin opcode (PASM)>
-X<getstdout opcode (PASM)>
+X<getstderr opcode>
+X<getstdin opcode>
+X<getstdout opcode>
 
   getstderr R<DEST>
   getstdin R<DEST>
@@ -1112,7 +1110,7 @@ I<Arguments: P>
 
 =head3 gmtime
 
-X<gmtime opcode (PASM)>
+X<gmtime opcode>
 
   gmtime R<DEST>, R<VAL>
 
@@ -1125,7 +1123,7 @@ See also: C<localtime>.
 
 =head3 gt
 
-X<gt opcode (PASM)>
+X<gt opcode>
 
   gt R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1136,7 +1134,7 @@ P, S, IC or P, P, IC>
 
 =head3 gt_num
 
-X<gt_num opcode (PASM)>
+X<gt_num opcode>
 
   gt_num R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1146,7 +1144,7 @@ I<Arguments: P, P, IC>
 
 =head3 gt_str
 
-X<gt_str opcode (PASM)>
+X<gt_str opcode>
 
   gt_str R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1156,7 +1154,7 @@ I<Arguments: P, P, IC>
 
 =head3 hav
 
-X<hav opcode (PASM)>
+X<hav opcode>
 
   hav R<DEST>, R<VAL>
 
@@ -1166,7 +1164,7 @@ I<Arguments: NR, N>
 
 =head3 if
 
-X<if (conditional);opcode (PASM)>
+X<if (conditional);opcode>
 
   if R<CONDITION>, R<LABEL>
 
@@ -1176,7 +1174,7 @@ I<Arguments: I, IC or N, IC or S, IC or P, IC>
 
 =head3 inc
 
-X<inc opcode (PASM)>
+X<inc opcode>
 
   inc R<DEST>
 
@@ -1186,7 +1184,7 @@ I<Arguments: IR or NR or P>
 
 =head3 index
 
-X<index opcode (PASM)>
+X<index opcode>
 
   index R<DEST>, R<STRING>, R<SEARCH>
   index R<DEST>, R<STRING>, R<SEARCH>, R<POS>
@@ -1199,7 +1197,7 @@ I<Arguments: IR, S, S or IR, S, S, I>
 
 =head3 interpinfo
 
-X<interpinfo opcode (PASM)>
+X<interpinfo opcode>
 
   interpinfo R<DEST>, R<FLAG>
 
@@ -1287,7 +1285,7 @@ I<Arguments: IR, I>
 
 =head3 invoke
 
-X<invoke opcode (PASM)>
+X<invoke opcode>
 
   invoke
   invoke R<SUB>
@@ -1301,7 +1299,7 @@ I<Arguments: P>
 
 =head3 invokecc
 
-X<invokecc opcode (PASM)>
+X<invokecc opcode>
 
   invokecc
   invokecc R<SUB>
@@ -1315,7 +1313,7 @@ See also: C<updatecc>.
 
 =head3 isa
 
-X<isa opcode (PASM)>
+X<isa opcode>
 
   isa R<DEST>, R<OBJECT>, R<CLASS>
 
@@ -1326,7 +1324,7 @@ I<Arguments: IR, P, S>
 
 =head3 isnull
 
-X<isnull opcode (PASM)>
+X<isnull opcode>
 
   isnull R<VAL>, R<LABEL>
 
@@ -1336,7 +1334,7 @@ I<Arguments: P, IC>
 
 =head3 join
 
-X<join opcode (PASM)>
+X<join opcode>
 
   join R<DEST>, R<DELIM>, R<ARRAY>
 
@@ -1347,7 +1345,7 @@ I<Arguments: SR, S, P>
 
 =head3 jsr
 
-X<jsr opcode (PASM)>
+X<jsr opcode>
 
   jsr R<ADDRESS>
 
@@ -1358,7 +1356,7 @@ I<Arguments: I>
 
 =head3 jump
 
-X<jump opcode (PASM)>
+X<jump opcode>
 
   jump R<ADDRESS>
 
@@ -1370,7 +1368,7 @@ See also: C<set_addr>.
 
 =head3 lcm
 
-X<lcm opcode (PASM)>
+X<lcm opcode>
 
   lcm R<DEST>, R<VAL>, R<VAL>
 
@@ -1380,7 +1378,7 @@ I<Arguments: IR, I, I or NR, I, I>
 
 =head3 le
 
-X<le (less than or equal);opcode (PASM)>
+X<le (less than or equal);opcode>
 
   le R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1391,7 +1389,7 @@ P, S, IC or P, P, IC>
 
 =head3 le_num
 
-X<le_num opcode (PASM)>
+X<le_num opcode>
 
   le_num R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1401,7 +1399,7 @@ I<Arguments: P, P, IC>
 
 =head3 le_str
 
-X<le_str opcode (PASM)>
+X<le_str opcode>
 
   le_str R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1411,7 +1409,7 @@ I<Arguments: P, P, IC>
 
 =head3 length
 
-X<length opcode (PASM)>
+X<length opcode>
 
   length R<DEST>, R<STRING>
 
@@ -1421,7 +1419,7 @@ I<Arguments: IR, S>
 
 =head3 ln
 
-X<ln opcode (PASM)>
+X<ln opcode>
 
   ln R<DEST>, R<VAL>
 
@@ -1441,7 +1439,7 @@ I<Arguments: S>
 
 =head3 loadlib
 
-X<loadlib opcode (PASM)>
+X<loadlib opcode>
 
   loadlib R<DEST>, R<LIBRARY>
 
@@ -1453,7 +1451,7 @@ See also: C<dlfunc>.
 
 =head3 localtime
 
-X<localtime opcode (PASM)>
+X<localtime opcode>
 
   localtime R<DEST>, R<VAL>
 
@@ -1466,7 +1464,7 @@ See also: C<gmtime>.
 
 =head3 log10
 
-X<log10 opcode (PASM)>
+X<log10 opcode>
 
   log10 R<DEST>, R<VAL>
 
@@ -1476,7 +1474,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 log2
 
-X<log2 opcode (PASM)>
+X<log2 opcode>
 
   log2 R<DEST>, R<VAL>
 
@@ -1486,7 +1484,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 lsr
 
-X<lsr opcode (PASM)>
+X<lsr opcode>
 
   lsr R<DEST>, R<BITS>
   lsr R<DEST>, R<VAL>, R<BITS>
@@ -1497,7 +1495,7 @@ I<Arguments: IR, I or IR, I, I>
 
 =head3 lt
 
-X<lt (less than);opcode (PASM)>
+X<lt (less than);opcode>
 
   lt R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1508,7 +1506,7 @@ P, S, IC or P, P, IC>
 
 =head3 lt_num
 
-X<lt_num opcode (PASM)>
+X<lt_num opcode>
 
   lt_num R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1518,7 +1516,7 @@ I<Arguments: P, P, IC>
 
 =head3 lt_str
 
-X<lt_str opcode (PASM)>
+X<lt_str opcode>
 
   lt_str R<VAL1>, R<VAL2>, R<LABEL>
 
@@ -1528,7 +1526,7 @@ I<Arguments: P, P, IC>
 
 =head3 mod
 
-X<mod opcode (PASM)>
+X<mod opcode>
 
   mod R<DEST>, R<VAL>
   mod R<DEST>, R<VAL1>, R<VAL2>
@@ -1544,7 +1542,7 @@ See also: C<cmod>.
 
 =head3 mul
 
-X<mul opcode (PASM)>
+X<mul opcode>
 
   mul R<DEST>, R<VAL>
   mul R<DEST>, R<VAL>, R<VAL>
@@ -1557,7 +1555,7 @@ I or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 ne
 
-X<ne (not equal);opcode (PASM)>
+X<ne (not equal);opcode>
 
   ne R<VAL>, R<VAL>, R<LABEL>
 
@@ -1568,7 +1566,7 @@ P, S, IC or P, P, IC>
 
 =head3 ne_addr
 
-X<ne_addr opcode (PASM)>
+X<ne_addr opcode>
 
   ne_addr R<VAL>, R<VAL>, R<LABEL>
 
@@ -1579,7 +1577,7 @@ I<Arguments: S, S, IC or P, P, IC>
 
 =head3 ne_num
 
-X<ne_num opcode (PASM)>
+X<ne_num opcode>
 
   ne_num R<VAL>, R<VAL>, R<LABEL>
 
@@ -1589,7 +1587,7 @@ I<Arguments: P, P, IC>
 
 =head3 ne_str
 
-X<ne_str opcode (PASM)>
+X<ne_str opcode>
 
   ne_str R<VAL>, R<VAL>, R<LABEL>
 
@@ -1599,7 +1597,7 @@ I<Arguments: P, P, IC>
 
 =head3 needs_destroy
 
-X<needs_destroy opcode (PASM)>
+X<needs_destroy opcode>
 
   needs_destroy R<PMC>
 
@@ -1611,7 +1609,7 @@ See also: C<sweep>.
 
 =head3 neg
 
-X<neg opcode (PASM)>
+X<neg opcode>
 
   neg R<DEST>
   neg R<DEST>, R<VAL>
@@ -1623,7 +1621,7 @@ I<Arguments: IR or NR or P or IR, I or NR, N or P, P>
 
 =head3 new
 
-X<new opcode (PASM)>
+X<new opcode>
 
   new R<DEST>, R<TYPE>
   new R<DEST>, R<TYPE>, R<INITIALIZE>
@@ -1646,18 +1644,18 @@ I<Arguments: SR or SR, I or SR, I, I or SR, I, I, I>
 
 =head3 new_callback
 
-X<new_callback opcode (PASM)>
+X<new_callback opcode>
 
   new_callback R<DEST>, R<SUB>, R<DATA>, R<SIG>
 
-Create a callback stub R<DEST> for a PASM subroutine R<SUB> with user
+Create a callback stub R<DEST> for a subroutine R<SUB> with user
 data R<DATA> and function signature R<SIG>.
 
 I<Arguments: P, P, P, S>
 
 =head3 new_pad
 
-X<new_pad opcode (PASM)>
+X<new_pad opcode>
 
   new_pad R<DEPTH>
   new_pad R<DEST>, R<DEPTH>
@@ -1671,7 +1669,7 @@ I<Arguments: I or P, I>
 
 =head3 newclass
 
-X<newclass opcode (PASM)>
+X<newclass opcode>
 
   newclass R<DEST>, R<NAME>
 
@@ -1681,7 +1679,7 @@ I<Arguments: P, S>
 
 =head3 newsub
 
-X<newsub opcode (PASM)>
+X<newsub opcode>
 
   newsub R<DEST>, R<CLASS>, R<LABEL>
 
@@ -1701,7 +1699,7 @@ I<Arguments: I, I, IC, IC>
 
 =head3 noop
 
-X<noop opcode (PASM)>
+X<noop opcode>
 
   noop
 
@@ -1709,7 +1707,7 @@ Do nothing.
 
 =head3 not
 
-X<not opcode (PASM)>
+X<not opcode>
 
   not R<DEST>, R<VAL>
 
@@ -1719,7 +1717,7 @@ I<Arguments: IR, I or P, P>
 
 =head3 null
 
-X<null opcode (PASM)>
+X<null opcode>
 
   null R<DEST>
 
@@ -1730,7 +1728,7 @@ I<Arguments: IR or NR or SR or P>
 
 =head3 open
 
-X<open opcode (PASM)>
+X<open opcode>
 
   open R<DEST>, R<FILENAME>
   open R<DEST>, R<FILENAME>, R<MODE>
@@ -1742,7 +1740,7 @@ I<Arguments: P, S, S or P, S>
 
 =head3 or
 
-X<or opcode (PASM)>
+X<or opcode>
 
   or R<DEST>, R<VAL1>, R<VAL2>
 
@@ -1752,7 +1750,7 @@ I<Arguments: IR, I, I or P, P, P>
 
 =head3 ord
 
-X<ord opcode (PASM)>
+X<ord opcode>
 
   ord R<DEST>, R<STRING>
   ord R<DEST>, R<STRING>, R<POS>
@@ -1764,7 +1762,7 @@ I<Arguments: IR, S or IR, S, I>
 
 =head3 peek
 
-X<peek opcode (PASM)>
+X<peek opcode>
 
   peek R<DEST>
   peek R<DEST>, R<PIO>
@@ -1776,7 +1774,7 @@ I<Arguments: SR or SR, P>
 
 =head3 peek_pad
 
-X<peek_pad opcode (PASM)>
+X<peek_pad opcode>
 
   peek_pad R<DEST>
 
@@ -1786,7 +1784,7 @@ I<Arguments: P>
 
 =head3 pin
 
-X<pin opcode (PASM)>
+X<pin opcode>
 
   pin R<DEST>
 
@@ -1800,7 +1798,7 @@ See also: C<unpin>.
 
 =head3 pop
 
-X<pop opcode (PASM)>
+X<pop opcode>
 
   pop R<DEST>, R<PMC>
 
@@ -1810,7 +1808,7 @@ I<Arguments: IR, P or NR, P or SR, P or P, P>
 
 =head3 pop_pad
 
-X<pop_pad opcode (PASM)>
+X<pop_pad opcode>
 
   pop_pad
 
@@ -1820,10 +1818,10 @@ See also: C<peek_pad>.
 
 =head3 popX
 
-X<popi opcode (PASM)>
-X<popn opcode (PASM)>
-X<popp opcode (PASM)>
-X<pops opcode (PASM)>
+X<popi opcode>
+X<popn opcode>
+X<popp opcode>
+X<pops opcode>
 
   popi
   popn
@@ -1851,7 +1849,7 @@ See also: C<push>R<X>.
 
 =head3 pow
 
-X<pow opcode (PASM)>
+X<pow opcode>
 
   pow R<DEST>, R<VAL1>, R<VAL2>
 
@@ -1861,7 +1859,7 @@ I<Arguments: NR, I, I or NR, I, N or NR, N, I or NR, N, N>
 
 =head3 print
 
-X<print opcode (PASM)>
+X<print opcode>
 
   print R<VAL>
   print R<IO>, R<VAL>
@@ -1873,7 +1871,7 @@ I<Arguments: I or N or S or P or P, I or P, N or P, S or P, P>
 
 =head3 printerr
 
-X<printerr opcode (PASM)>
+X<printerr opcode>
 
   printerr R<VAL>
 
@@ -1883,7 +1881,7 @@ I<Arguments: I or N or S or P>
 
 =head3 profile
 
-X<profile opcode (PASM)>
+X<profile opcode>
 
   profile R<INT>
 
@@ -1893,7 +1891,7 @@ I<Arguments: I>
 
 =head3 prophash
 
-X<prophash opcode (PASM)>
+X<prophash opcode>
 
   prophash R<DEST>, R<PMC>
 
@@ -1905,7 +1903,7 @@ See also: C<getprop>.
 
 =head3 push
 
-X<push opcode (PASM)>
+X<push opcode>
 
   push R<PMC>, R<VAL>
 
@@ -1915,7 +1913,7 @@ I<Arguments: P, I or P, N or P, S or P, P>
 
 =head3 push_pad
 
-X<push_pad opcode (PASM)>
+X<push_pad opcode>
 
   push_pad R<PAD>
 
@@ -1925,10 +1923,10 @@ I<Arguments: P>
 
 =head3 pushX
 
-X<pushi opcode (PASM)>
-X<pushn opcode (PASM)>
-X<pushp opcode (PASM)>
-X<pushs opcode (PASM)>
+X<pushi opcode>
+X<pushn opcode>
+X<pushp opcode>
+X<pushs opcode>
 
   pushi
   pushn
@@ -1954,7 +1952,7 @@ Push registers 16..31.
 
 =head3 read
 
-X<read opcode (PASM)>
+X<read opcode>
 
   read R<DEST>, R<BYTES>
   read R<DEST>, R<IO>, R<BYTES>
@@ -1966,7 +1964,7 @@ I<Arguments: SR, I or SR, P, I>
 
 =head3 readline
 
-X<readline opcode (PASM)>
+X<readline opcode>
 
   readline R<DEST>, R<IO>
 
@@ -1976,7 +1974,7 @@ I<Arguments: SR, P>
 
 =head3 register
 
-X<register opcode (PASM)>
+X<register opcode>
 
   register R<PMC>
 
@@ -1989,7 +1987,7 @@ See also: C<unregister>.
 
 =head3 removeparent
 
-X<removeparent opcode (PASM)>
+X<removeparent opcode>
 
   removeparent R<CLASS1>, R<CLASS2>
 
@@ -1999,7 +1997,7 @@ I<Arguments: P, P>
 
 =head3 repeat
 
-X<repeat opcode (PASM)>
+X<repeat opcode>
 
   repeat R<DEST>, R<VAL>, R<REPEAT>
 
@@ -2009,7 +2007,7 @@ I<Arguments: SR, S, I or P, P, I or P, P, P>
 
 =head3 restoretop
 
-X<restoretop opcode (PASM)>
+X<restoretop opcode>
 
   restoretop
 
@@ -2019,7 +2017,7 @@ See also: C<savetop>.
 
 =head3 rethrow
 
-X<rethrow opcode (PASM)>
+X<rethrow opcode>
 
   rethrow R<EXCEPTION>
 
@@ -2031,7 +2029,7 @@ See also: C<throw>
 
 =head3 runinterp
 
-X<runinterp opcode (PASM)>
+X<runinterp opcode>
 
   runinterp R<INTERPRETER>, R<OFFSET>
 
@@ -2044,7 +2042,7 @@ See also: C<newinterp>.
 
 =head3 say
 
-X<say opcode (PASM)>
+X<say opcode>
 
   say R<VAL>
 
@@ -2054,7 +2052,7 @@ I<Arguments: I or N or S or P>
 
 =head3 sec
 
-X<sec opcode (PASM)>
+X<sec opcode>
 
   sec R<DEST>, R<VAL>
 
@@ -2064,7 +2062,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 sech
 
-X<sech opcode (PASM)>
+X<sech opcode>
 
   sech R<DEST>, R<VAL>
 
@@ -2074,7 +2072,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 seek
 
-X<seek opcode (PASM)>
+X<seek opcode>
 
   seek R<DEST>, R<IO>, R<OFFSET>, R<STARTFLAG>
   seek R<DEST>, R<IO>, R<UPPER32>, R<LOWER32>, R<STARTFLAG>
@@ -2091,7 +2089,7 @@ I<Arguments: P, I, I or P, I, I, I>
 
 =head3 set
 
-X<set opcode (PASM)>
+X<set opcode>
 
   set R<DEST>, R<VAL>
 
@@ -2115,10 +2113,10 @@ I<Arguments: I, P or N, P or S, P or P, P>
 
 =head3 setX_ind
 
-X<seti_ind opcode (PASM)>
-X<setn_ind opcode (PASM)>
-X<sets_ind opcode (PASM)>
-X<setp_ind opcode (PASM)>
+X<seti_ind opcode>
+X<setn_ind opcode>
+X<sets_ind opcode>
+X<setp_ind opcode>
 
   seti_ind R<REG>, R<VAL>
   setn_ind R<REG>, R<VAL>
@@ -2132,7 +2130,7 @@ I<Arguments: I, I or I, S or I, N or I, P>
 
 =head3 set_addr
 
-X<set_addr opcode (PASM)>
+X<set_addr opcode>
 
   set_addr R<DEST>, R<LABEL>
 
@@ -2149,7 +2147,7 @@ I<Arguments: P, I>
 
 =head3 set_chartype
 
-X<set_chartype opcode (PASM)>
+X<set_chartype opcode>
 
   set_chartype R<STRING>, R<CHARTYPE>
 
@@ -2159,7 +2157,7 @@ I<Arguments: S, I>
 
 =head3 set_eh
 
-X<set_eh opcode (PASM)>
+X<set_eh opcode>
 
   set_eh R<HANDLER>
 
@@ -2171,7 +2169,7 @@ See also: C<clear_eh>, C<throw>.
 
 =head3 set_encoding
 
-X<set_encoding opcode (PASM)>
+X<set_encoding opcode>
 X<strings;encoding>
 
   set_encoding R<STRING>, R<ENCODING>
@@ -2182,7 +2180,7 @@ I<Arguments: S, I>
 
 =head3 setattribute
 
-X<setattribute opcode (PASM)>
+X<setattribute opcode>
 
   setattribute R<OBJECT>, R<OFFSET>, R<ATTRIBUTE>
 
@@ -2194,7 +2192,7 @@ See also: C<getattribute>, C<classoffset>.
 
 =head3 setprop
 
-X<setprop opcode (PASM)>
+X<setprop opcode>
 
   setprop R<PMC>, R<NAME>, R<VALUE>
 
@@ -2206,9 +2204,9 @@ See also: C<getprop> and C<delprop>.
 
 =head3 setstd*
 
-X<setstderr opcode (PASM)>
-X<setstdin  opcode (PASM)>
-X<setstdout opcode (PASM)>
+X<setstderr opcode>
+X<setstdin  opcode>
+X<setstdout opcode>
 
   setstderr R<DEST>
   setstdin  R<DEST>
@@ -2220,7 +2218,7 @@ I<Arguments: P>
 
 =head3 shift
 
-X<shift opcode (PASM)>
+X<shift opcode>
 
   shift R<DEST>, R<PMC>
 
@@ -2230,7 +2228,7 @@ I<Arguments: IR, P or NR, P or SR, P or P, P>
 
 =head3 shl
 
-X<shl opcode (PASM)>
+X<shl opcode>
 
   shl R<DEST>, R<VAL>, R<BITS>
 
@@ -2240,7 +2238,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 shr
 
-X<shr opcode (PASM)>
+X<shr opcode>
 
   shr R<DEST>, R<VAL>, R<BITS>
 
@@ -2250,7 +2248,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 sin
 
-X<sin opcode (PASM)>
+X<sin opcode>
 
   sin R<DEST>, R<VAL>
 
@@ -2260,7 +2258,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 singleton
 
-X<singleton opcode (PASM)>
+X<singleton opcode>
 
   singleton R<DEST>
 
@@ -2270,7 +2268,7 @@ I<Arguments: P>
 
 =head3 sinh
 
-X<sinh opcode (PASM)>
+X<sinh opcode>
 
   sinh R<DEST>, R<VAL>
 
@@ -2280,7 +2278,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 sizeof
 
-X<sizeof opcode (PASM)>
+X<sizeof opcode>
 
   sizeof R<DEST>, R<TYPE>
 
@@ -2290,7 +2288,7 @@ I<Arguments: IR, I>
 
 =head3 sleep
 
-X<sleep opcode (PASM)>
+X<sleep opcode>
 
   sleep R<SECONDS>
 
@@ -2300,7 +2298,7 @@ I<Arguments: I or N>
 
 =head3 spawnw
 
-X<spawnw opcode (PASM)>
+X<spawnw opcode>
 
   spawnw R<DEST>, R<COMMAND>
 
@@ -2311,7 +2309,7 @@ I<Arguments: IR, S>
 
 =head3 splice
 
-X<splice opcode (PASM)>
+X<splice opcode>
 
   splice R<DEST>, R<REPLACE>, R<OFFSET>, R<COUNT>
 
@@ -2322,7 +2320,7 @@ I<Arguments: P, P, I, I>
 
 =head3 sprintf
 
-X<sprintf opcode (PASM)>
+X<sprintf opcode>
 
   sprintf R<DEST>, R<FORMAT>, R<ARGS>
 
@@ -2332,7 +2330,7 @@ I<Arguments: SR, S, P or P, P, P>
 
 =head3 stat
 
-X<stat opcode (PASM)>
+X<stat opcode>
 
   stat R<DEST>, R<VAL>, R<VAL>
 
@@ -2449,7 +2447,7 @@ Z<CHP-10-TABLE-2>
 
 =head3 store_global
 
-X<store_global opcode (PASM)>
+X<store_global opcode>
 
   store_global R<NAME>, R<OBJECT>
   store_global R<NAME>, R<NAMESPACE>, R<OBJECT>
@@ -2462,7 +2460,7 @@ See also: C<find_global>.
 
 =head3 store_lex
 
-X<store_lex opcode (PASM)>
+X<store_lex opcode>
 
   store_lex R<NAME>, R<OBJECT>
   store_lex R<DEPTH>, R<NAME>, R<OBJECT>
@@ -2481,7 +2479,7 @@ See also: C<find_lex>.
 
 =head3 string_chartype
 
-X<string_chartype opcode (PASM)>
+X<string_chartype opcode>
 
   string_chartype R<DEST>, R<STRING>
 
@@ -2491,7 +2489,7 @@ I<Arguments: IR, S>
 
 =head3 string_encoding
 
-X<string_encoding opcode (PASM)>
+X<string_encoding opcode>
 X<strings;encoding>
 
   string_encoding R<DEST>, R<STRING>
@@ -2502,7 +2500,7 @@ I<Arguments: IR, S>
 
 =head3 stringinfo
 
-X<stringinfo opcode (PASM)>
+X<stringinfo opcode>
 
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
@@ -2565,7 +2563,7 @@ I<Arguments: IR, S, I>
 
 =head3 sub
 
-X<sub opcode (PASM)>
+X<sub opcode>
 
   sub R<DEST>, R<VAL>
   sub R<DEST>, R<VAL1>, R<VAL2>
@@ -2578,7 +2576,7 @@ I or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 subclass
 
-X<subclass opcode (PASM)>
+X<subclass opcode>
 
   subclass R<DEST>, R<CLASS>
   subclass R<DEST>, R<CLASS>, R<NAME>
@@ -2590,7 +2588,7 @@ I<Arguments: P, S or P, P or P, S, S or P, P, S>
 
 =head3 substr
 
-X<substr opcode (PASM)>
+X<substr opcode>
 
   substr R<DEST>, R<STRING>, R<OFFSET>
   substr R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>
@@ -2616,7 +2614,7 @@ I<Arguments: SR, I, I, S>
 
 =head3 substr_r
 
-X<substr_r opcode (PASM)>
+X<substr_r opcode>
 
   substr_r R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>
 
@@ -2627,7 +2625,7 @@ I<Arguments: SR, S, I, I>
 
 =head3 sweep
 
-X<sweep opcode (PASM)>
+X<sweep opcode>
 
   sweep R<LAZY>
 
@@ -2638,7 +2636,7 @@ I<Arguments: IC>
 
 =head3 sweepoff
 
-X<sweepoff opcode (PASM)>
+X<sweepoff opcode>
 
   sweepoff
 
@@ -2646,7 +2644,7 @@ Disable GC mark runs (nestable).
 
 =head3 sweepon
 
-X<sweepon opcode (PASM)>
+X<sweepon opcode>
 
   sweepon
 
@@ -2654,7 +2652,7 @@ Re-enable GC mark runs.
 
 =head3 sysinfo
 
-X<sysinfo opcode (PASM)>
+X<sysinfo opcode>
 
   sysinfo R<DEST>, R<ITEM>
 
@@ -2664,7 +2662,7 @@ I<Arguments: IR, I or SR, I>
 
 =head3 tan
 
-X<tan opcode (PASM)>
+X<tan opcode>
 
   tan R<DEST>, R<VAL>
 
@@ -2674,7 +2672,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 tanh
 
-X<tanh opcode (PASM)>
+X<tanh opcode>
 
   tanh R<DEST>, R<VAL>
 
@@ -2684,7 +2682,7 @@ I<Arguments: NR, I or NR, N>
 
 =head3 tell
 
-X<tell opcode (PASM)>
+X<tell opcode>
 
   tell R<DEST>, R<PIO>
   tell R<UPPER32>, R<LOWER32>, R<PIO>
@@ -2697,7 +2695,7 @@ See also: C<seek>.
 
 =head3 thaw
 
-X<thaw opcode (PASM)>
+X<thaw opcode>
 
   thaw R<DEST>, R<STR>
 
@@ -2709,7 +2707,7 @@ See also: C<freeze>.
 
 =head3 throw
 
-X<throw opcode (PASM)>
+X<throw opcode>
 
   throw R<EXCEPTION>
 
@@ -2721,7 +2719,7 @@ See also: C<rethrow>, C<set_eh>, C<clear_eh>
 
 =head3 time
 
-X<time opcode (PASM)>
+X<time opcode>
 
   time R<DEST>
 
@@ -2731,7 +2729,7 @@ I<Arguments: IR or NR>
 
 =head3 titlecase
 
-X<titlecase opcode (PASM)>
+X<titlecase opcode>
 
   titlecase R<DEST>
   titlecase R<DEST>, R<VAL>
@@ -2746,7 +2744,7 @@ See also: C<upcase>, C<downcase>.
 
 =head3 trace
 
-X<trace opcode (PASM)>
+X<trace opcode>
 
   trace R<INT>
 
@@ -2756,7 +2754,7 @@ I<Arguments: I>
 
 =head3 transcode
 
-X<transcode opcode (PASM)>
+X<transcode opcode>
 
   transcode R<DEST>, R<ENCODING>
   transcode R<DEST>, R<SOURCE>, R<ENCODING>
@@ -2769,7 +2767,7 @@ I<Arguments: SR, I or SR, S, I or SR, S, I, I>
 
 =head3 typeof
 
-X<typeof opcode (PASM)>
+X<typeof opcode>
 
   typeof R<DEST>, R<VAL>
   typeof R<DEST>, R<PMC[KEY]>
@@ -2781,7 +2779,7 @@ I<Arguments: IR, P or SR, I or SR, P>
 
 =head3 unless
 
-X<unless (conditional);opcode (PASM)>
+X<unless (conditional);opcode>
 
   unless R<CONDITION>, R<LABEL>
 
@@ -2791,7 +2789,7 @@ I<Arguments: I, IC or N, IC or S, IC or P, IC>
 
 =head3 unpin
 
-X<unpin opcode (PASM)>
+X<unpin opcode>
 
   unpin R<DEST>
 
@@ -2804,7 +2802,7 @@ I<Arguments: SR>
 
 =head3 unregister
 
-X<unregister opcode (PASM)>
+X<unregister opcode>
 
   unregister R<PMC>
 
@@ -2816,7 +2814,7 @@ See also: C<register>.
 
 =head3 unshift
 
-X<unshift opcode (PASM)>
+X<unshift opcode>
 
   unshift R<DEST>, R<VAL>
 
@@ -2826,7 +2824,7 @@ I<Arguments: P, I or P, N or P, S or P, P>
 
 =head3 upcase
 
-X<upcase opcode (PASM)>
+X<upcase opcode>
 
   upcase R<DEST>
   upcase R<DEST>, R<VAL>
@@ -2855,7 +2853,7 @@ I<Arguments: IR, I>
 
 =head3 vers
 
-X<vers opcode (PASM)>
+X<vers opcode>
 
   vers R<DEST>, R<VAL>
 
@@ -2865,7 +2863,7 @@ I<Arguments: NR, N>
 
 =head3 warningsoff
 
-X<warningsoff opcode (PASM)>
+X<warningsoff opcode>
 
   warningsoff R<CATEGORY>
 
@@ -2877,7 +2875,7 @@ I<Arguments: I>
 
 =head3 warningson
 
-X<warningson opcode (PASM)>
+X<warningson opcode>
 
   warningson R<CATEGORY>
 
@@ -2896,7 +2894,7 @@ I<Arguments: I>
 
 =head3 xor
 
-X<xor opcode (PASM)>
+X<xor opcode>
 
   xor R<DEST>, R<VAL1>, R<VAL2>
 
