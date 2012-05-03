@@ -21,7 +21,10 @@ typedef struct _imc_info_t imc_info_t;
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname))
+PMC * imcc_compile_file(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *fullname),
+    int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
@@ -83,7 +86,10 @@ imc_info_t * exit_reentrant_compile(
         FUNC_MODIFIES(*new_info);
 
 PARROT_CANNOT_RETURN_NULL
-PMC * imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source))
+PMC * imcc_compile_string(
+    ARGMOD(imc_info_t *imcc),
+    ARGIN(STRING *source),
+    int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);

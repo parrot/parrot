@@ -93,10 +93,25 @@ get_packfile_eval_pmc(PARROT_INTERP, ARGIN(PMC *pf_pmc), INTVAL current_eval)
 
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR void *imcc_info;
+    ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
     ATTR INTVAL current_eval;
 
     VTABLE void init() {
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
+    }
+
+    VTABLE void init_pmc(PMC *init) {
+        const INTVAL type = VTABLE_get_integer(INTERP, init);
+        VTABLE_init_int(INTERP, SELF, type);
+    }
+
+    VTABLE void init_int(INTVAL is_pasm) {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (is_pasm != 0 && is_pasm != 1)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
+        attrs->is_pasm = is_pasm;
         attrs->imcc_info = (void*) imcc_new(INTERP);
         attrs->current_eval = 0;
     }
@@ -121,7 +136,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
         Parrot_pcc_fill_params_from_c_args(INTERP, call_object, "S", &code);
         imcc_reset(imcc);
-        result = imcc_compile_string(imcc, code);
+        result = imcc_compile_string(imcc, code, attrs->is_pasm);
         if (PMC_IS_NULL(result)) {
             STRING * const msg = imcc_last_error_message(imcc);
             const INTVAL code = imcc_last_error_code(imcc);
@@ -151,8 +166,17 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         return attrs->imcc_info;
     }
 
-    VTABLE STRING *get_string() { 
-        return CONST_STRING(INTERP, "PIR");
+    VTABLE INTVAL get_integer() {
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        return attrs->is_pasm;
+    }
+
+    VTABLE STRING *get_string() {
+        const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        if (attrs->is_pasm)
+            return CONST_STRING(INTERP, "PASM");
+        else
+            return CONST_STRING(INTERP, "PIR");
     }
 
     VTABLE void destroy() {
@@ -177,7 +201,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         BEGIN_IMCC_COMPILE(interp);
 
         /* TODO: Handle outer_ctx */
-        pf = imcc_compile_string(imcc, source);
+        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
             STRING * const msg = imcc_last_error_message(imcc);
             INTVAL code = imcc_last_error_code(imcc);
@@ -208,7 +232,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         BEGIN_IMCC_COMPILE(interp);
 
         /* TODO: Handle outer_ctx */
-        pf = imcc_compile_file(imcc, filename);
+        pf = imcc_compile_file(imcc, filename, attrs->is_pasm);
         if (PMC_IS_NULL(pf)) {
             STRING * const msg = imcc_last_error_message(imcc);
             const INTVAL code = imcc_last_error_code(imcc);

@@ -35,7 +35,7 @@ IMCC call-in routines for use with the Parrot embedding API
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC * get_compreg_pmc(PARROT_INTERP, int add_compreg)
+static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_get_compreg_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -90,7 +90,7 @@ imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_P
 {
     ASSERT_ARGS(imcc_get_pir_compreg_api)
     IMCC_API_CALLIN(interp_pmc, interp)
-    *compiler = get_compreg_pmc(interp, add_compreg);
+    *compiler = get_compreg_pmc(interp, 0, add_compreg);
     if (PMC_IS_NULL(*compiler))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Could not create PIR compiler PMC");
@@ -99,7 +99,33 @@ imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_P
 
 /*
 
-=item C<static PMC * get_compreg_pmc(PARROT_INTERP, int add_compreg)>
+=item C<Parrot_Int imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int
+add_compreg, Parrot_PMC *compiler)>
+
+Get a registerable compiler object for the "PASM" language. If C<add_compreg>
+is 1, register that compiler with Parrot under the name "PASM".
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_Int
+imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_PMC *compiler))
+{
+    ASSERT_ARGS(imcc_get_pasm_compreg_api)
+    IMCC_API_CALLIN(interp_pmc, interp)
+    *compiler = get_compreg_pmc(interp, 1, add_compreg);
+    if (PMC_IS_NULL(*compiler))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Could not create PASM compiler PMC");
+    IMCC_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<static PMC * get_compreg_pmc(PARROT_INTERP, int is_pasm, int
+add_compreg)>
 
 Get an IMCC compiler PMC. Register it under its preferred name if
 C<add_compreg> is 1.
@@ -110,10 +136,10 @@ C<add_compreg> is 1.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC *
-get_compreg_pmc(PARROT_INTERP, int add_compreg)
+get_compreg_pmc(PARROT_INTERP, int is_pasm, int add_compreg)
 {
     ASSERT_ARGS(get_compreg_pmc)
-    PMC * const comp = Parrot_pmc_new(interp, enum_class_IMCCompiler);
+    PMC * const comp = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
     if (add_compreg) {
         STRING * const name = VTABLE_get_string(interp, comp);
         Parrot_interp_set_compiler(interp, name, comp);

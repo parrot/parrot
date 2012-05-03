@@ -41,7 +41,7 @@ extern void compile_file(imc_info_t *imcc, PIOHANDLE file, void *);
 extern void compile_string(imc_info_t *imcc, const char *, void *);
 extern INTVAL imcc_run_compilation(imc_info_t *imcc, void *);
 extern INTVAL imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc),
-        yyscan_t yyscanner, ARGIN(STRING *source), int is_file);
+        yyscan_t yyscanner, ARGIN(STRING *source), int is_file, int is_pasm);
 
 int at_eof(yyscan_t yyscanner);
 
