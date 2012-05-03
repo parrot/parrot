@@ -35,24 +35,22 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir subs - invokecc" );
     .const 'Sub' $P0 = "func"
 
     set $I5, 3
-    set_args "0", $I5
-    $P0()
+    $P0($I5)
     print $I5
     print "\n"
     end
 .end
-.sub func:
-    get_params "0", $I5
-    print $I5
+.sub func
+    .param int i
+    print i 
     print "\n"
 
-    eq $I5, 0, endfunc
-    dec $I5
+    eq i, 0, endfunc
+    dec i
 
 .include "interpinfo.pir"
     interpinfo $P0, .INTERPINFO_CURRENT_SUB
-    set_args "0", $I5
-    $P0()  # recursive invoke
+    $P0(i)  # recursive invoke
 
 endfunc:
     returncc
@@ -132,7 +130,7 @@ ok:
     say "back"
     end
 .end
-.sub _the_sub:
+.sub _the_sub
     print "in sub\n"
     returncc
 .end
@@ -155,7 +153,7 @@ ok:
     end
 .end
 
-.sub _the_sub:
+.sub _the_sub
     print "in sub\n"
     get_global $P0, "_next_sub"
     get_label $I0, $P0
@@ -163,7 +161,7 @@ ok:
     print "never here\n"
 .end
 
-.sub _next_sub:
+.sub _next_sub
     print "in next sub\n"
     returncc
     print "never here\n"
@@ -178,7 +176,7 @@ OUTPUT
 
 my ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 print $TEMP <<'EOF';
-  .sub _sub1:
+  .sub _sub1
   say "in sub1"
   end
 .end
@@ -210,7 +208,7 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _sub1:
+  .sub _sub1
   say "in sub1"
   returncc
 .end
@@ -243,10 +241,11 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _sub1:
+  .sub _sub1
   say "in sub1"
   returncc
-  .sub _sub2:
+  .end
+  .sub _sub2
   say "in sub2"
   returncc
 .end
@@ -369,12 +368,12 @@ OK2:  print "ok 2\n"
       end
 .end
 
-.sub :outer(main) f1:
+.sub f1 :outer(_main) 
       print "Test\n"
       end
 .end
 
-.sub :outer(main) f2:
+.sub f2 :outer(_main) 
       new $P1, ['Undef']
       end
 .end
@@ -400,12 +399,12 @@ OK2:  print "ok 2\n"
       end
 .end
 
-.sub f1:
+.sub f1
       print "Test\n"
       end
 .end
 
-.sub f2:
+.sub f2
       new $P1, ['Undef']
       end
 .end
@@ -426,10 +425,10 @@ OUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub :load _sub1:
-  say "in sub1"
-  returncc
-.end
+  .sub _sub1 :load
+     say "in sub1"
+     returncc
+  .end
 EOF
 close $TEMP;
 
@@ -438,7 +437,6 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'load_bytecode :load' );
     say "main"
     load_bytecode "$temp_pir"
     say "back"
-    end
 .end
 CODE
 main
@@ -449,10 +447,10 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _error:
+  .sub _error
   say "error"
 .end
-  .sub :load _sub1:
+  .sub _sub1 :load 
   say "in sub1"
   returncc
 .end
@@ -490,10 +488,11 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub :load _sub1:
+  .sub _sub1 :load 
   say "in sub1"
   returncc
-  .sub _sub2:
+.end
+  .sub _sub2
   print "in sub2\n"
   returncc
 .end
@@ -541,10 +540,11 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _sub1:
+  .sub _sub1
   say "in sub1"
   returncc
-  .sub :load _sub2:
+  .end
+  .sub _sub2 :load 
   print "in sub2\n"
   returncc
 .end
@@ -592,11 +592,11 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub :load _sub1:
+  .sub _sub1 :load 
   say "in sub1"
   returncc
   .end
-  .sub :load _sub2:
+  .sub _sub2 :load 
   print "in sub2\n"
   returncc
   .end
@@ -644,9 +644,10 @@ back
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':main pragma' );
-.sub _first:
+.sub _first
     print "first\n"
     returncc
+.end
 .sub _main :main
     say "main"
     end
@@ -656,15 +657,14 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'two :main pragmas' );
-.sub _first:
+.sub _first
     print "first\n"
     returncc
 .end
 .sub _main :main
     say "main"
-    end
 .end
-.sub _main _second:
+.sub _second :main
     print "second\n"
     returncc
 .end
@@ -673,11 +673,11 @@ main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':main pragma call subs' );
-.sub _first:
+.sub _first
     print "first\n"
     returncc
 .end
-.sub _second:
+.sub _second
     print "second\n"
     returncc
 .end
@@ -843,20 +843,22 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names" );
     print $P20
     print "\n"
     end
-.sub the_sub:
+.end
+.sub the_sub
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
     print "\n"
     interpinfo $P1, .INTERPINFO_CURRENT_CONT
     returncc
+.end
 CODE
-main
+_main
 the_sub
-main
+_main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
-.sub dummy:
+.sub dummy
     print "never\n"
     noop
 .end
@@ -872,7 +874,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     print "\n"
     end
 .end
-.sub the_sub:
+.sub the_sub
     interpinfo $P20, .INTERPINFO_CURRENT_SUB
     print $P20
     print "\n"
@@ -880,9 +882,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "sub names w MAIN" );
     returncc
 .end
 CODE
-main
+_main
 the_sub
-main
+_main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "caller introspection via interp" );
