@@ -20,13 +20,12 @@ lab:
     new $P1, 'Continuation'
     set_label $P1, lab
     $P2 = find_name "alligator"
-    set_args "0", $P1
-    $P2()
+    $P2($P1)
 ex:
 .end
 .sub alligator
-    get_params "0", $P0
-    $P0()
+    .param pmc func 
+    func()
 .end
 CODE
 Hi
