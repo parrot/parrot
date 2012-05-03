@@ -137,7 +137,7 @@ pir_output_is( <<'CODE', <<'OUT', "clone equality" );
     clone $P1, $P0
     set $N0, $P0
     set $N1, $P1
-    .fp_eq_pir(N0, $N1, OK1)
+    .fp_eq_pir($N0, $N1, OK1)
     print "not "
 OK1:print "ok\n"
     end
@@ -153,14 +153,14 @@ pir_output_is( <<'CODE', <<'OUT', "inc/dec" );
     set $P0, 5.5
     inc $P0
     set $N0, $P0
-    .fp_eq_pir(N0, 6.5, OK1)
+    .fp_eq_pir($N0, 6.5, OK1)
     print "not "
 OK1:say "ok 1"
 
     set $P0, 5.5
     dec $P0
     set $N0, $P0
-    .fp_eq_pir(N0, 4.5, OK2)
+    .fp_eq_pir($N0, 4.5, OK2)
     print "not "
 OK2:say "ok 2"
     end
@@ -176,25 +176,25 @@ pir_output_is( <<'CODE', <<'OUT', "set int, get double" );
      new $P0, ['BigNum']
      set $P0, 999999
      set $N1, $P0
-     .fp_eq_pir(N1, 999999.0, OK1)
+     .fp_eq_pir($N1, 999999.0, OK1)
      print "not "
 OK1: say "ok 1"
 
      set $P0, -999999
      set $N1, $P0
-     .fp_eq_pir(N1, -999999.0, OK2)
+     .fp_eq_pir($N1, -999999.0, OK2)
      print "not "
 OK2: say "ok 2"
 
      set $P0, 2147483646
      set $N1, $P0
-     .fp_eq_pir(N1, 2.147483646e9, OK3)
+     .fp_eq_pir($N1, 2.147483646e9, OK3)
      print "not "
 OK3: say "ok 3"
 
      set $P0, -2147483646
      set $N1, $P0
-     .fp_eq_pir(N1, -2.147483646e9, OK4)
+     .fp_eq_pir($N1, -2.147483646e9, OK4)
      print "not "
 OK4: say "ok 4"
      end
@@ -450,7 +450,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i
     set $P1, 99.5
     sub $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 300.5, OK1)
+    .fp_eq_pir($N0, 300.5, OK1)
     print "not "
 OK1:say "ok 1"
 
@@ -459,7 +459,7 @@ OK1:say "ok 1"
     set $P1, -50
     sub $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 150.0, OK2)
+    .fp_eq_pir($N0, 150.0, OK2)
     print "not "
 OK2:say "ok 2"
 
@@ -468,7 +468,7 @@ OK2:say "ok 2"
     set $P1, 24.5
     sub $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 25.5, OK3)
+    .fp_eq_pir($N0, 25.5, OK3)
     print "not "
 OK3:say "ok 3"
 
@@ -484,14 +484,14 @@ THROWN:
     set $P0, 40
     sub $P0, 4
     set $N0, $P0
-    .fp_eq_pir(N0, 36.0, OK5)
+    .fp_eq_pir($N0, 36.0, OK5)
     print "not "
 OK5:say "ok 5"
 
     set $P0, 40
     sub $P0, 1.0
     set $N0, $P0
-    .fp_eq_pir(N0, 39.0, OK6)
+    .fp_eq_pir($N0, 39.0, OK6)
     print "not "
 OK6:say "ok 6"
     end
@@ -742,7 +742,7 @@ pir_output_is( <<'CODE', <<'OUT', "i_divide" );
     set $P1,  5000000000
     div $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 2.0, OK1)
+    .fp_eq_pir($N0, 2.0, OK1)
     print "not "
 OK1:say "ok 1"
 
@@ -751,7 +751,7 @@ OK1:say "ok 1"
     set $P1, 4
     div $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 2.5, OK2)
+    .fp_eq_pir($N0, 2.5, OK2)
     print "not "
 OK2:say "ok 2"
 
@@ -760,7 +760,7 @@ OK2:say "ok 2"
     set $P1, 1.5
     div $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 4.0, OK3)
+    .fp_eq_pir($N0, 4.0, OK3)
     print "not "
 OK3:say "ok 3"
 
@@ -776,7 +776,7 @@ THROWN:
     set $P0, 10
     div $P0, -5
     set $N0, $P0
-    .fp_eq_pir(N0, -2.0, OK4)
+    .fp_eq_pir($N0, -2.0, OK4)
     print "not "
 OK4:say "ok 4"
     end
@@ -798,7 +798,7 @@ pir_output_is( <<'CODE', <<'OUT', "floor_divide", todo => 'undiagnosed bug in fl
     set $P1, 4
     fdiv $P0, $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 2.0, OK1)
+    .fp_eq_pir($N0, 2.0, OK1)
     print "not "
 OK1:say "ok 1"
 
@@ -814,7 +814,7 @@ THROWN:
     fdiv $P0, $P0, -4
     set $N0, $P0
     say $N0
-    .fp_eq_pir(N0, -2.0, OK2)
+    .fp_eq_pir($N0, -2.0, OK2)
     print "not "
 OK2:say "ok 2"
 
@@ -823,7 +823,7 @@ OK2:say "ok 2"
     set $P1, 4
     fdiv $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 2.0, OK3)
+    .fp_eq_pir($N0, 2.0, OK3)
     print "not "
 OK3:say "ok 3"
 
@@ -832,7 +832,7 @@ OK3:say "ok 3"
     set $P1, 4
     fdiv $P0, $P1
     set $N0, $P0
-    .fp_eq_pir(N0, 5.0, OK4)
+    .fp_eq_pir($N0, 5.0, OK4)
     print "not "
 OK4:say "ok 4"
 
@@ -847,7 +847,7 @@ THROWN2:
     set $P0, 10
     fdiv $P0, 4
     set $N0, $P0
-    .fp_eq_pir(N0, 2.0, OK5)
+    .fp_eq_pir($N0, 2.0, OK5)
     print "not "
 OK5:say "ok 5"
     end
@@ -989,25 +989,25 @@ OUTPUT
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }
 
-    pir_output_is( <<'CODE', <<OUT, "add overflow Integer" );
+    pir_output_is( <<"CODE", <<OUT, "add overflow Integer" );
     .sub _main :main
-   new $P0, ['Integer']
-   set $P0, $a
-   new $P1, ['Integer']
-   set $P1, $b
-   new $P2, ['Integer']
-   new $P3, ['BigNum']
-   set $I3, 3
+   new \$P0, ['Integer']
+   set \$P0, $a
+   new \$P1, ['Integer']
+   set \$P1, $b
+   new \$P2, ['Integer']
+   new \$P3, ['BigNum']
+   set \$I3, 3
 lp:
-   add $P2, $P0, $P1
-   set $S0, $P2
-   print $S0
+   add \$P2, \$P0, \$P1
+   set \$S0, \$P2
+   print \$S0
    print " "
-   typeof $S1, $P2
-   say $S1
-   add $P1, $b
-   dec $I3
-   if $I3, lp
+   typeof \$S1, \$P2
+   say \$S1
+   add \$P1, $b
+   dec \$I3
+   if \$I3, lp
    say "ok"
 ex:
    end
@@ -1019,25 +1019,25 @@ $e BigInt
 ok
 OUT
 
-    pir_output_is( <<'CODE', <<OUT, "add overflow Integer" );
+    pir_output_is( <<"CODE", <<OUT, "add overflow Integer" );
     .sub _main :main
-   new $P0, ['Integer']
-   set $P0, $a
-   new $P1, ['Integer']
-   set $P1, $b
-   new $P2, ['Integer']
-   new $P3, ['BigNum']
-   set $I3, 3.0
+   new \$P0, ['Integer']
+   set \$P0, $a
+   new \$P1, ['Integer']
+   set \$P1, $b
+   new \$P2, ['Integer']
+   new \$P3, ['BigNum']
+   set \$I3, 3.0
 lp:
-   add $P2, $P0, $P1
-   set $S0, $P2
-   print $S0
+   add \$P2, \$P0, \$P1
+   set \$S0, \$P2
+   print \$S0
    print " "
-   typeof $S1, $P2
-   say $S1
-   add $P1, $b
-   dec $I3
-   if $I3, lp
+   typeof \$S1, \$P2
+   say \$S1
+   add \$P1, $b
+   dec \$I3
+   if \$I3, lp
    say "ok"
 ex:
    end
@@ -1049,12 +1049,12 @@ $e BigInt
 ok
 OUT
 
-    pir_output_is( <<'CODE', <<'OUT', "set overflow Integer" );
+    pir_output_is( <<"CODE", <<'OUT', "set overflow Integer" );
     .sub _main :main
    push_eh THROWN
-   new $P0, ['BigNum']
-   set $P0, $d
-   set $I0, $P0
+   new \$P0, ['BigNum']
+   set \$P0, $d
+   set \$I0, \$P0
    print "not "
 THROWN:
    pop_eh
