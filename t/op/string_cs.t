@@ -121,25 +121,25 @@ pir_output_is( <<'CODE', <<OUTPUT, "is_whitespace" );
     is_cclass $I1, .CCLASS_WHITESPACE, $S0, 1
     is_cclass $I2, .CCLASS_WHITESPACE, $S0, 2
     is_cclass $I3, .CCLASS_WHITESPACE, $S0, 3
-    set I4, 4
-    is_cclass I4, .CCLASS_WHITESPACE, $S0, I4
+    set $I4, 4
+    is_cclass $I4, .CCLASS_WHITESPACE, $S0, $I4
     print $I0
     print $I1
     print $I2
     print $I3
-    print I4
+    print $I4
     print "\n"
     set $S0, ascii:"a\t\n "
     is_cclass $I0, .CCLASS_WHITESPACE, $S0, 0
     is_cclass $I1, .CCLASS_WHITESPACE, $S0, 1
     is_cclass $I2, .CCLASS_WHITESPACE, $S0, 2
     is_cclass $I3, .CCLASS_WHITESPACE, $S0, 3
-    is_cclass I4, .CCLASS_WHITESPACE, $S0, 4 # access past string boundary: not a whitespace
+    is_cclass $I4, .CCLASS_WHITESPACE, $S0, 4 # access past string boundary: not a whitespace
     print $I0
     print $I1
     print $I2
     print $I3
-    print I4
+    print $I4
     print "\n"
     end
 .end
