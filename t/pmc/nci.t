@@ -724,7 +724,7 @@ OUTPUT
   set $I5, 10
   set $I6, 20
   set $I7, 30
-  set_args "0,0,0", $I5,I6,I7
+  set_args "0,0,0", $I5, $I6, $I7
   invokecc $P0
   get_results "0", $I5
   print $I5
@@ -1362,8 +1362,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $S5
   print "in callback\n"
   print "user data: "
@@ -1496,8 +1497,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $I5
   print "in callback\n"
   print "user data: "
@@ -1644,8 +1646,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $S5
   print "in callback\n"
   print "user data: "
@@ -1704,8 +1707,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $I5
   print "in callback\n"
   print "user data: "

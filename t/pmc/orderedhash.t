@@ -294,7 +294,7 @@ pir_output_is( <<'CODE', <<OUT, "delete" );
 iter_loop:
     unless $P2, end_iter
     shift $S3, $P2
-    set $P3, $P2[S3]
+    set $P3, $P2[$S3]
     print $P3
     branch iter_loop
 end_iter:
@@ -305,7 +305,7 @@ end_iter:
 iter_loop2:
     unless $P2, end_iter2
     shift $S3, $P2
-    set $P3, $P2[S3]
+    set $P3, $P2[$S3]
     print $P3
     branch iter_loop2
 end_iter2:
@@ -384,7 +384,7 @@ pir_output_like( <<'CODE', <<'OUT', "iterate over keys, get value" );
 iter_loop:
     unless $P2, end_iter
     shift $S3, $P2
-    set $P3, $P2[S3]
+    set $P3, $P2[$S3]
     print $P3
     branch iter_loop
 end_iter:
