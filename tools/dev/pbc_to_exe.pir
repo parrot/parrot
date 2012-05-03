@@ -52,7 +52,7 @@ static void show_last_error_and_exit(Parrot_PMC interp);
 static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
 static void setup_pir_compregs(Parrot_PMC interp);
 static PMC * get_class_pmc(Parrot_PMC interp, const char *name);
-static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm);
+static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc);
 
 
     #define TRACE 0
@@ -173,8 +173,7 @@ HEADER
         setup_pir_compregs(Parrot_PMC interp)
         {
             Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
-            get_imcc_compiler_pmc(interp, class_pmc, 0);
-            get_imcc_compiler_pmc(interp, class_pmc, 1);
+            get_imcc_compiler_pmc(interp, class_pmc);
         }
 
         PARROT_CANNOT_RETURN_NULL
@@ -193,16 +192,13 @@ HEADER
 
         PARROT_CANNOT_RETURN_NULL
         static void
-        get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
+        get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc)
         {
-            Parrot_PMC is_pasm_pmc = NULL;
             Parrot_PMC compiler_pmc = NULL;
-            const char *name = is_pasm ? "PASM" : "PIR";
+            const char *name = "PIR";
             Parrot_String name_s = NULL;
 
-            if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
-                show_last_error_and_exit(interp);
-            if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
+            if (!Parrot_api_pmc_new_from_class(interp, class_pmc, NULL, &compiler_pmc))
                 show_last_error_and_exit(interp);
             if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
                   Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
