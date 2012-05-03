@@ -151,7 +151,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         return attrs->imcc_info;
     }
 
-    VTABLE STRING *get_string() { 
+    VTABLE STRING *get_string() {
         return CONST_STRING(INTERP, "PIR");
     }
 
