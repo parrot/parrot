@@ -610,9 +610,9 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 }
 
                 /* cache last byte (for restoring hi bits) */
-		if (bits > 1) {
+                if (bits > 1) {
                    tempc    = cptr[(bits + elts[i].bit_offset - 1)/8];
-		}
+                }
 
                 /* write hi bits of first byte */
                 n        = 8 - elts[i].bit_offset;
