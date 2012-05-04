@@ -686,7 +686,8 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
             found = 1;
             c = ins->symregs[1];
             o = ins->symregs[0];
-        } else if (STREQ(ins->opname, "null") && ins->symregs[0]->set == 'I') {
+        }
+        else if (STREQ(ins->opname, "null") && ins->symregs[0]->set == 'I') {
             found = 1;
             c = mk_const(imcc, "0", 'I');
             o = ins->symregs[0];
@@ -1374,12 +1375,13 @@ branch_cond_loop(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                     /* no good if it's an unconditional branch*/
                     if (cond->type & IF_goto && STREQ(cond->opname, "branch")) {
                         break;
-                    } else if (cond->type & ITPCCRET || cond->type & ITPCCSUB
-                            || cond->type & ITCALL) {
+                    }
+                    else if ((cond->type & ITPCCRET) || (cond->type & ITPCCSUB)
+                            || (cond->type & ITCALL)) {
                         break;
                         /* just until we can copy set_args et al */
-                    } else if (cond->type & ITBRANCH &&
-                               get_branch_regno(cond) >= 0) {
+                    }
+                    else if ((cond->type & ITBRANCH) && (get_branch_regno(cond) >= 0)) {
                         found = 1;
                         break;
                     }

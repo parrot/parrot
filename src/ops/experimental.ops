@@ -48,6 +48,7 @@ For other architectures, this is a C<noop>.
 =cut
 
 op trap() :deprecated {
+    UNUSED(interp);
 #if defined(__GNUC__) && defined(i386)
     __asm__("int3");       /* opcode 0xcc */
 #endif
@@ -295,9 +296,7 @@ inline op invokecc(invar PMC, invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest                   = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);

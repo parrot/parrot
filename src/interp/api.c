@@ -298,7 +298,6 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     /* clear context introspection vars */
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
     Parrot_pcc_set_continuation(interp, CURRENT_CONTEXT(interp), NULL); /* TODO Use PMCNULL */
-    Parrot_pcc_set_object(interp, CURRENT_CONTEXT(interp), NULL);
 
     /* initialize built-in runcores */
     Parrot_runcore_init(interp);
@@ -621,7 +620,7 @@ Parrot_interp_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name
     PMC    * const pmc_true = Parrot_pmc_new_init_int(interp, enum_class_Integer, 1);
     PMC    * const method   = VTABLE_get_pmc_keyed_str(interp,
             interp->vtables[type]->_namespace, str_name);
-    VTABLE_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
+    Parrot_pmc_setprop(interp, method, CONST_STRING(interp, "write"), pmc_true);
 }
 
 /*
@@ -727,7 +726,7 @@ Parrot_interp_compile_file(PARROT_INTERP, ARGIN(PMC *compiler), ARGIN(STRING *fu
 
 /*
 
-=item C<Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP, PMC * compiler,
+=item C<Parrot_PMC Parrot_interp_compile_string(PARROT_INTERP, PMC *compiler,
 STRING *code)>
 
 Compiles a code string.
@@ -740,7 +739,7 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Parrot_PMC
-Parrot_interp_compile_string(PARROT_INTERP, ARGIN(PMC * compiler), ARGIN(STRING *code))
+Parrot_interp_compile_string(PARROT_INTERP, ARGIN(PMC *compiler), ARGIN(STRING *code))
 {
     ASSERT_ARGS(Parrot_interp_compile_string)
 
@@ -751,11 +750,11 @@ Parrot_interp_compile_string(PARROT_INTERP, ARGIN(PMC * compiler), ARGIN(STRING 
     Parrot_block_GC_mark(interp);
     result = imcc_compile_string(imcc, code, is_pasm);
     if (PMC_IS_NULL(result)) {
-        STRING * const msg = imcc_last_error_message(imcc);
-        const INTVAL code  = imcc_last_error_code(imcc);
+        STRING * const msg      = imcc_last_error_message(imcc);
+        const INTVAL error_code = imcc_last_error_code(imcc);
 
         Parrot_unblock_GC_mark(interp);
-        Parrot_ex_throw_from_c_args(interp, NULL, code, "%Ss", msg);
+        Parrot_ex_throw_from_c_args(interp, NULL, error_code, "%Ss", msg);
     }
     Parrot_unblock_GC_mark(interp);
     return result;
@@ -859,9 +858,6 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         break;
       case CURRENT_CONT:
         result = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-        break;
-      case CURRENT_OBJECT:
-        result = Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
         break;
       case CURRENT_LEXPAD:
         result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -293,10 +293,10 @@ sub is_docs_link {
     # download the file.
 
     if ( $self->has_suffix ) {
-        return 0 if $self->suffix !~ m/[Tt][Xx][Tt]/o;
+        return 0 if $self->suffix !~ m/txt/i;
     }
     else {
-        return 1 if $self->name =~ m/^[[:upper:]]+$/o;
+        return 1 if $self->name =~ m/^[[:upper:]]+$/;
     }
 
     return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
@@ -327,14 +327,14 @@ sub title {
     $text = $1;
 
     # Tidy it up a bit.
-    $text =~ s/^\s+//o;
-    $text =~ s/\s+$//o;
-    $text =~ s/\s*-$//o;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+$//;
+    $text =~ s/\s*-$//;
 
     # There was not text, just another POD command (=head2 probably).
-    return '' if $text =~ /^=\w/o;
+    return '' if $text =~ /^=\w/;
 
-    return $text unless $text =~ /-/o;
+    return $text unless $text =~ /-/;
 
     # There has to be some space each side of the dash.
     my ( $path, $desc ) = split /\s+--?\s+/, $text, 2;

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -189,7 +189,7 @@ Returns whether the file is "hidden", i.e. its name starts with a dot.
 sub is_hidden {
     my $self = shift;
 
-    return $self->name =~ /^\./o;
+    return $self->name =~ /^\./;
 }
 
 =item C<is_generated()>
@@ -215,9 +215,9 @@ sub is_generated {
     # lib/Parrot/Config.pm
 
     return 1
-        if $self->suffix =~ /^(?:dump|html|flag|o)$/o
+        if $self->suffix =~ /^(?:dump|html|flag|o)$/
             or $self->name =~
-/^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/o
+/^(?:perl6-config|libparrot.def|CFLAGS|myconfig|(?:core_pmcs|exec_(?:cpu|dep)|fingerprint|jit_(?:cpu|emit)|nci|platform(?:_interface)?)\.[ch]|(?:charclass|feature)\.h)$/
             or $self->parent->name eq 'ops' and $self->suffix =~ /^(?:c|pod)$/;
 
     return 0;

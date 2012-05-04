@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2011, Parrot Foundation.
+Copyright (C) 2003-2012, Parrot Foundation.
  */
 
 /*
@@ -21,6 +21,7 @@ pmclass SubProxy dynpmc extends Sub auto_attrs {
     }
 
     VTABLE void set_pmc(PMC *key) {
+        UNUSED(INTERP)
         PMC_data(SELF) = key;
     }
 

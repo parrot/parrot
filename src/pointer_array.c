@@ -36,7 +36,7 @@ Parrot_Pointer_Array *
 Parrot_pa_new(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pa_new)
-    Parrot_Pointer_Array * const res = mem_allocate_zeroed_typed(Parrot_Pointer_Array);
+    Parrot_Pointer_Array * const res = mem_internal_allocate_zeroed_typed(Parrot_Pointer_Array);
     return res;
 }
 
@@ -104,8 +104,8 @@ Parrot_pa_count_used(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 
 /*
 
-=item C<int Parrot_pa_is_owned(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*orig, void *ref)>
+=item C<int Parrot_pa_is_owned(const Parrot_Pointer_Array *self, const void
+*orig, const void *ref)>
 
 Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
@@ -113,9 +113,10 @@ Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
 */
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
-Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
-        ARGIN(void *orig), ARGIN_NULLOK(void *ref))
+Parrot_pa_is_owned(ARGIN(const Parrot_Pointer_Array *self),
+        ARGIN(const void *orig), ARGIN_NULLOK(const void *ref))
 {
     ASSERT_ARGS(Parrot_pa_is_owned)
     size_t i;
@@ -132,7 +133,7 @@ Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
             continue;
         if (PTR2UINTVAL(ref) > PTR2UINTVAL(chunk) + CHUNK_SIZE)
             continue;
-        return (*(void **)ref == orig);
+        return (*(void * const *)ref == orig);
     }
 
     return 0;

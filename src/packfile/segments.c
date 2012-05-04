@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -88,6 +88,8 @@ static opcode_t * default_pack(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t default_packed_size(ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1);
 
@@ -791,7 +793,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
-        mem_sys_memcopy(self->data, cursor, self->size * sizeof (opcode_t));
+        memcpy(self->data, cursor, self->size * sizeof (opcode_t));
         cursor += self->size;
     }
     else {
@@ -854,7 +856,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
             Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
         Parrot_io_printf(interp, "%08lx ", (unsigned long)
-                self->data ? self->data[i] : self->pf->src[i]);
+                (self->data ? self->data[i] : self->pf->src[i]));
     }
 
     Parrot_io_printf(interp, "\n]\n");
@@ -1122,7 +1124,7 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
 
 /*
 
-=item C<void PackFile_Segment_dump(PARROT_INTERP, PackFile_Segment *self)>
+=item C<void PackFile_Segment_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Dumps the segment C<self>.
 
@@ -1132,7 +1134,7 @@ Dumps the segment C<self>.
 
 PARROT_EXPORT
 void
-PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
+PackFile_Segment_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     ASSERT_ARGS(PackFile_Segment_dump)
     self->pf->PackFuncs[self->type].dump(interp, self);
@@ -1634,6 +1636,8 @@ Returns the default size of the segment C<self>.
 
 */
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t
 default_packed_size(ARGIN(const PackFile_Segment *self))
 {

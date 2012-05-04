@@ -376,7 +376,6 @@ Invokes the subroutine.
     VTABLE opcode_t *invoke(void *next) {
         PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
-        PMC *object;
 
         /* plain subroutine call
          * create new context, place it in interpreter */
@@ -414,11 +413,6 @@ Invokes the subroutine.
         pc                   = sub->seg->base.data + sub->start_offs;
         INTERP->current_cont = NULL;
 
-        if (ccont == NEED_CONTINUATION) {
-            ccont = Parrot_pmc_new(INTERP, enum_class_Continuation);
-            VTABLE_set_pointer(INTERP, ccont, next);
-        }
-
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
         if (PMC_IS_NULL(context))
@@ -432,10 +426,7 @@ Invokes the subroutine.
             Parrot_pcc_free_registers(INTERP, context);
 
         Parrot_pcc_allocate_registers(INTERP, context, sub->n_regs_used);
-        /* Preserve object */
-        object = Parrot_pcc_get_object(INTERP, context);
         Parrot_pcc_init_context(INTERP, context, caller_ctx);
-        Parrot_pcc_set_object(INTERP, context, object);
 
         Parrot_pcc_set_sub(INTERP, context, SELF);
         Parrot_pcc_set_continuation(INTERP, context, ccont);

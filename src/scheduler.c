@@ -99,7 +99,7 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC *main), ARGIN(PMC *argv))
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     PMC * const main_task = Parrot_pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const tdata = PARROT_TASK(main_task);
-    INTVAL task_count  = 1;
+    INTVAL task_count;
 
     tdata->code = main;
     tdata->data = argv;
@@ -262,7 +262,7 @@ opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_cx_run_scheduler)
-    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
+    const Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(interp->scheduler);
 
     Parrot_cx_check_alarms(interp, scheduler);
     Parrot_cx_check_quantum(interp, scheduler);
@@ -351,7 +351,7 @@ and then we jump all the way back to the task scheduling loop.
 =cut
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t*
 Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {
@@ -360,7 +360,7 @@ Parrot_cx_preempt_task(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *nex
     PMC * const task = Parrot_cx_stop_task(interp, next);
     VTABLE_push_pmc(interp, sched->task_queue, task);
 
-    return (opcode_t*) 0;
+    return (opcode_t*)NULL;
 }
 
 /*
