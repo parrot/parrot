@@ -435,8 +435,10 @@ areas.
 
 */
 
-#if defined(__clang__) && defined(__has_feature) && __has_feature(address_sanitizer)
+#if defined(__clang__) && defined(__has_feature)
+#if __has_feature(address_sanitizer)
 __attribute__((no_address_safety_analysis))
+#endif
 #endif
 static void
 trace_mem_block(PARROT_INTERP,
