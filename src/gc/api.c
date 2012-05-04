@@ -394,7 +394,8 @@ Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)>
+=item C<Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t
+size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
@@ -408,7 +409,7 @@ to create ListChunk objects in src/list.c.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Buffer *
+Parrot_Buffer *
 Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(Parrot_gc_new_bufferlike_header)
@@ -417,8 +418,8 @@ Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<void Parrot_gc_free_bufferlike_header(PARROT_INTERP, Buffer *obj, size_t
-size)>
+=item C<void Parrot_gc_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer *obj,
+size_t size)>
 
 Free a bufferlike header that is not being used, so that Parrot can recycle
 it and use it again.
@@ -429,7 +430,7 @@ it and use it again.
 
 PARROT_EXPORT
 void
-Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
+Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Parrot_Buffer *obj),
     size_t size)
 {
     ASSERT_ARGS(Parrot_gc_free_bufferlike_header)
@@ -438,10 +439,10 @@ Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Buffer *obj),
 
 /*
 
-=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP, Buffer
-*buffer, size_t size)>
+=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
+Parrot_Buffer *buffer, size_t size)>
 
-Allocates a chunk of memory of at least size C<size> for the given Buffer.
+Allocates a chunk of memory of at least size C<size> for the given Parrot_Buffer.
 buffer is guaranteed to be properly aligned for things like C<FLOATVALS>,
 so the size may be rounded up or down to guarantee that this alignment holds.
 
@@ -452,7 +453,7 @@ so the size may be rounded up or down to guarantee that this alignment holds.
 PARROT_EXPORT
 void
 Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
-    ARGOUT(Buffer *buffer), size_t size)
+    ARGOUT(Parrot_Buffer *buffer), size_t size)
 {
     ASSERT_ARGS(Parrot_gc_allocate_buffer_storage_aligned)
     interp->gc_sys->allocate_buffer_storage(interp, buffer, size);
@@ -460,10 +461,10 @@ Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Buffer *buffer,
-size_t newsize)>
+=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Parrot_Buffer
+*buffer, size_t newsize)>
 
-Reallocate the Buffer's buffer memory to the given size. The
+Reallocate the Parrot_Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with
 L<Parrot_allocate_aligned> the new buffer will also be aligned. As with
 all reallocation, the new buffer might have moved and the additional
@@ -475,7 +476,7 @@ memory is not cleared.
 
 PARROT_EXPORT
 void
-Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
+Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Parrot_Buffer *buffer),
     size_t newsize)
 {
     ASSERT_ARGS(Parrot_gc_reallocate_buffer_storage)
@@ -551,7 +552,7 @@ Parrot_gc_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<void Parrot_gc_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-Deallocates an attibutes structure from a PMC if it has the auto_attrs
+Deallocates an attributes structure from a PMC if it has the auto_attrs
 flag set.
 
 =cut

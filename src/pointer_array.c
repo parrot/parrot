@@ -17,20 +17,6 @@ src/pointer_array.c - Implementation Pointer Array storage.
 
 /* HEADERIZER HFILE: include/parrot/pointer_array.h */
 
-/* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-static void allocate_more_chunks(PARROT_INTERP,
-    ARGIN(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_allocate_more_chunks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: static */
-
 /*
 
 =over 4
@@ -50,7 +36,7 @@ Parrot_Pointer_Array *
 Parrot_pa_new(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_pa_new)
-    Parrot_Pointer_Array * const res = mem_allocate_zeroed_typed(Parrot_Pointer_Array);
+    Parrot_Pointer_Array * const res = mem_internal_allocate_zeroed_typed(Parrot_Pointer_Array);
     return res;
 }
 
@@ -118,8 +104,8 @@ Parrot_pa_count_used(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 
 /*
 
-=item C<int Parrot_pa_is_owned(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*orig, void *ref)>
+=item C<int Parrot_pa_is_owned(const Parrot_Pointer_Array *self, const void
+*orig, const void *ref)>
 
 Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
@@ -127,9 +113,10 @@ Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
 */
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
-Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
-        ARGIN(void *orig), ARGIN_NULLOK(void *ref))
+Parrot_pa_is_owned(ARGIN(const Parrot_Pointer_Array *self),
+        ARGIN(const void *orig), ARGIN_NULLOK(const void *ref))
 {
     ASSERT_ARGS(Parrot_pa_is_owned)
     size_t i;
@@ -146,7 +133,7 @@ Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
             continue;
         if (PTR2UINTVAL(ref) > PTR2UINTVAL(chunk) + CHUNK_SIZE)
             continue;
-        return (*(void **)ref == orig);
+        return (*(void * const *)ref == orig);
     }
 
     return 0;

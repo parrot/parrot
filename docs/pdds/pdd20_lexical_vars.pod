@@ -197,7 +197,7 @@ variable, an exception is thrown.
 If an inner subroutine is invoked that hasn't had a
 C<capture_lex> operation performed on it, then Parrot
 will attempt to dynamically perform the lexical capture
-using the call from from its outer sub.  If the outer sub
+using the call from its outer sub.  If the outer sub
 doesn't have a call frame, as might occur when jumping
 directly to the inner sub without previously invoking the
 outer, then Parrot creates a dummy call frame for the

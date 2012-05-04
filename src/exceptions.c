@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,7 +7,7 @@ src/exceptions.c - Exceptions
 
 =head1 DESCRIPTION
 
-Define the the core subsystem for exceptions.
+Define the core subsystem for exceptions.
 
 =head2 Exception Functions
 
@@ -20,6 +20,9 @@ Define the the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_exception.h"
+#include "parrot/exceptions.h"
+#include "parrot/events.h"
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
@@ -146,19 +149,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
             STRING * const newmessage = CONST_STRING(interp, "No exception handler and no message\n");
             VTABLE_set_string_native(interp, exception, newmessage);
         }
-
     }
-
-    /*
-     * returning NULL from here returns resume address NULL to the
-     * runloop, which will terminate the thread function finally
-     *
-     * TT #1287 this check should better be in Parrot_x_exit
-     */
-
-    /* no exception handler, but this is not the main thread */
-    if (interp->thread_data && interp->thread_data->tid)
-        pt_thread_detach(interp->thread_data->tid);
 
     Parrot_x_jump_out(interp, 1);
 }
@@ -246,7 +237,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
         /* it's a C exception handler */
         Parrot_runloop * const jump_point = (Parrot_runloop *)address;
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
 
     /* return the address of the handler */
@@ -370,7 +361,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         Parrot_runloop * const jump_point =
             (Parrot_runloop *)VTABLE_get_pointer(interp, handler);
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
     else {
         /* Run the handler. */
@@ -379,7 +370,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         setup_exception_args(interp, "P", exception);
         PARROT_ASSERT(return_point->handler_start == NULL);
         return_point->handler_start = address;
-        longjmp(return_point->resume, 2);
+        longjmp(return_point->resume, PARROT_JMP_EXCEPTION_FROM_C);
     }
 }
 
@@ -501,8 +492,6 @@ Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 Mark an exception as unhandled, as part of rethrowing it.
 
-=back
-
 =cut
 
 */
@@ -513,6 +502,40 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_mark_unhandled)
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "handled"), -1);
+}
+
+/*
+
+=item C<PMC * Parrot_ex_get_current_handler(PARROT_INTERP, PMC *expmc)>
+
+Get the current exception handler from expmc.
+If expmc is an exception handler, return itself.
+If it's an exception, return its active handler.
+
+=back
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_ex_get_current_handler(PARROT_INTERP, ARGIN_NULLOK(PMC *expmc))
+{
+    ASSERT_ARGS(Parrot_ex_get_current_handler)
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL(expmc)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if (expmc->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, expmc, eh);
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "ExceptionHandler")))
+            eh = expmc;
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, expmc, CONST_STRING(interp, "handler"));
+    }
+    return eh;
 }
 
 /*
@@ -585,7 +608,7 @@ Parrot_print_backtrace(void)
 #  ifndef PARROT_HAS_DLINFO
 #    define BACKTRACE_VERBOSE
 #  endif
-    Interp *emergency_interp = Parrot_get_emergency_interp();
+    Interp *emergency_interp = Parrot_interp_get_emergency_interpreter();
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;
@@ -626,7 +649,7 @@ Parrot_print_backtrace(void)
 #  endif
     fprintf(stderr, "Attempting to get PIR backtrace.  No guarantees.  Here goes...\n");
     if (emergency_interp) {
-        Parrot_clear_emergency_interp();
+        Parrot_interp_clear_emergency_interpreter();
         PDB_backtrace(emergency_interp);
     }
 #  undef BACKTRACE_DEPTH

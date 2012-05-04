@@ -148,12 +148,6 @@ FLOATVAL * Parrot_pcc_get_num_constants_func(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_object_func(PARROT_INTERP, ARGIN(const PMC *ctx))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
 PMC* Parrot_pcc_get_outer_ctx_func(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
@@ -260,13 +254,6 @@ void Parrot_pcc_set_namespace_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_object_func(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    ARGIN_NULLOK(PMC *object))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_pcc_set_outer_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *outer_ctx))
@@ -279,6 +266,12 @@ void Parrot_pcc_set_pc_func(PARROT_INTERP,
     ARGIN(const PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+UINTVAL Parrot_pcc_set_recursion_depth_func(PARROT_INTERP,
+    ARGIN(const PMC *ctx),
+    const int new_depth)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -357,8 +350,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_get_num_constants_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -408,9 +399,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx) \
@@ -418,6 +406,9 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_set_recursion_depth_func \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_signature_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
@@ -455,7 +446,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_continuation(i, c) (CONTEXT_STRUCT(c)->current_cont)
 #  define Parrot_pcc_get_caller_ctx(i, c) (CONTEXT_STRUCT(c)->caller_ctx)
 #  define Parrot_pcc_get_namespace(i, c) (CONTEXT_STRUCT(c)->current_namespace)
-#  define Parrot_pcc_get_object(i, c) (CONTEXT_STRUCT(c)->current_object)
 #  define Parrot_pcc_get_lex_pad(i, c) (CONTEXT_STRUCT(c)->lex_pad)
 #  define Parrot_pcc_get_handlers(i, c) (CONTEXT_STRUCT(c)->handlers)
 
@@ -474,8 +464,9 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) (CONTEXT_STRUCT(c)->pmc_constants[(idx)])
 
 #  define Parrot_pcc_get_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth)
+#  define Parrot_pcc_set_recursion_depth(i, c, d) (CONTEXT_STRUCT(c)->recursion_depth = (d))
 #  define Parrot_pcc_dec_recursion_depth(i, c) (--CONTEXT_STRUCT(c)->recursion_depth)
-#  define Parrot_pcc_inc_recursion_depth(i, c) (CONTEXT_STRUCT(c)->recursion_depth++)
+#  define Parrot_pcc_inc_recursion_depth(i, c) (++CONTEXT_STRUCT(c)->recursion_depth)
 
 #  define Parrot_pcc_warnings_on(i, c, flags)   (CONTEXT_STRUCT(c)->warns |= (flags))
 #  define Parrot_pcc_warnings_off(i, c, flags)  (CONTEXT_STRUCT(c)->warns &= ~(flags))
@@ -525,6 +516,7 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) Parrot_pcc_get_pmc_constant_func((i), (c), (idx))
 
 #  define Parrot_pcc_get_recursion_depth(i, c) Parrot_pcc_get_recursion_depth_func((i), (c))
+#  define Parrot_pcc_set_recursion_depth(i, c, d) Parrot_pcc_set_recursion_depth_func((i), (c), (d))
 #  define Parrot_pcc_dec_recursion_depth(i, c) Parrot_pcc_dec_recursion_depth_func((i), (c))
 #  define Parrot_pcc_inc_recursion_depth(i, c) Parrot_pcc_inc_recursion_depth_func((i), (c))
 
@@ -554,10 +546,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     } while (0)
 #  define Parrot_pcc_set_namespace(i, c, value) do {    \
         CONTEXT_STRUCT(c)->current_namespace = (value); \
-        PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while (0)
-#  define Parrot_pcc_set_object(i, c, value) do {       \
-        CONTEXT_STRUCT(c)->current_object = (value);    \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
     } while (0)
 #  define Parrot_pcc_set_lex_pad(i, c, value) do {      \

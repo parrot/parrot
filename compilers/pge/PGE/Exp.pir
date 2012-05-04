@@ -1272,6 +1272,7 @@ tree as a PIR code object that can be compiled.
           dec rep
           goto %L_2
         CODE
+    .return (1)
 
 .end
 

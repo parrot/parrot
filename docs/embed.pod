@@ -12,8 +12,8 @@ for the newer API is located at F<docs/embed_new.pod>.
 
 =head1 SYNOPSIS
 
-    #include <parrot/embed.h>
-    #include <parrot/extend.h>
+    #include "parrot/parrot.h"
+    #include "parrot/extend.h"
 
     int main(int argc, char* argv[])
     {
@@ -38,8 +38,6 @@ for the newer API is located at F<docs/embed_new.pod>.
 =head1 FILES
 
 =over 4
-
-=item F<include/parrot/embed.h>
 
 =item F<include/parrot/extend.h>
 
@@ -462,7 +460,6 @@ performing both compiling and linking in one step.
 =head2 Load bytecode as a library and run a single subroutine
 
     #include <parrot/parrot.h>
-    #include <parrot/embed.h>
     #include <parrot/extend.h>
 
     int main(int argc, char *argv[])
@@ -1227,7 +1224,7 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_PMC_new>
 
-=item C<Parrot_PMC_newclass>
+=item C<Parrot_oo_new_class_pmc>
 
 =item C<Parrot_PMC_null>
 
@@ -1564,8 +1561,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_str_unpin>
 
 =item C<Parrot_str_upcase>
-
-=item C<Parrot_sub_new_from_c_func>
 
 =item C<Parrot_test_debug>
 

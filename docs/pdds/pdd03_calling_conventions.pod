@@ -116,7 +116,7 @@ contents of the aggregate, rather than the aggregate itself, will be passed.
 
 If the C<NAMED> bit is also set, the aggregate will be used as a hash; its
 contents, as key/value pairs, will be passed as named arguments.  The PMC
-must implement the full hash interface.  {{ TT #1288: Limit the required
+must implement the full hash interface.  {{ GH #252: Limit the required
 interface. }}
 
 If the C<NAMED> bit is not set, the aggregate will be used as an array; its

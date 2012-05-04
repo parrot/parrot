@@ -26,8 +26,10 @@ the C-library.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "pmc/pmc_parrotinterpreter.h"
+#include "pmc/pmc_callback.h"
 #include "inter_cb.str"
 
+static Interp * default_interp = NULL;
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
 
@@ -79,6 +81,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC *cb, *cb_sig;
     int type = 0;
     STRING *sc;
+
     /*
      * we stuff all the information into the user_data PMC and pass that
      * on to the external sub
@@ -86,11 +89,14 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     PMC * const interp_pmc = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL) IGLOBALS_INTERPRETER);
 
+    if (default_interp == NULL)
+        default_interp = interp;
+
     /* be sure __LINE__ is consistent */
     sc = CONST_STRING(interp, "_interpreter");
-    VTABLE_setprop(interp, user_data, sc, interp_pmc);
+    Parrot_pmc_setprop(interp, user_data, sc, interp_pmc);
     sc = CONST_STRING(interp, "_sub");
-    VTABLE_setprop(interp, user_data, sc, sub);
+    Parrot_pmc_setprop(interp, user_data, sc, sub);
     /* only ASCII signatures are supported */
     if (STRING_length(cb_signature) == 3) {
         /* Callback return type ignored */
@@ -111,7 +117,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     cb_sig = Parrot_pmc_new(interp, enum_class_String);
     VTABLE_set_string_native(interp, cb_sig, cb_signature);
     sc = CONST_STRING(interp, "_signature");
-    VTABLE_setprop(interp, user_data, sc, cb_sig);
+    Parrot_pmc_setprop(interp, user_data, sc, cb_sig);
     /*
      * We are going to be passing the user_data PMC to external code, but
      * it may go out of scope until the callback is called -- we don't know
@@ -156,7 +162,7 @@ static void
 verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
 {
     ASSERT_ARGS(verify_CD)
-    PARROT_INTERP = NULL;
+    PARROT_INTERP = default_interp;
     PMC    *interp_pmc;
     STRING *sc;
 
@@ -175,14 +181,9 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
         PANIC(interp, "user_data doesn't look like a pointer");
 
     /* Fetch original interpreter from prop */
-    LOCK(interpreter_array_mutex);
-
-    interp      = interpreter_array[0];
     sc          = CONST_STRING(interp, "_interpreter");
-    interp_pmc  = VTABLE_getprop(interp, user_data, sc);
+    interp_pmc  = Parrot_pmc_getprop(interp, user_data, sc);
     GETATTR_ParrotInterpreter_interp(interp, interp_pmc, interp);
-
-    UNLOCK(interpreter_array_mutex);
     if (!interp)
         PANIC(interp, "interpreter not found for callback");
 
@@ -229,12 +230,12 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
      * 3) check interpreter ...
      */
     sc = CONST_STRING(interp, "_interpreter");
-    passed_interp = VTABLE_getprop(interp, user_data, sc);
+    passed_interp = Parrot_pmc_getprop(interp, user_data, sc);
     if (VTABLE_get_pointer(interp, passed_interp) != interp)
         PANIC(interp, "callback gone to wrong interpreter");
 
     sc = CONST_STRING(interp, "_synchronous");
-    passed_synchronous = VTABLE_getprop(interp, user_data, sc);
+    passed_synchronous = Parrot_pmc_getprop(interp, user_data, sc);
     if (!PMC_IS_NULL(passed_synchronous) &&
             VTABLE_get_bool(interp, passed_synchronous))
         synchronous = 1;
@@ -261,13 +262,18 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
          * then wait for the CB_EVENT_xx to finish and return the
          * result
          */
-        Parrot_cx_schedule_callback(interp, user_data, external_data);
+        PMC * const callback = Parrot_pmc_new(interp, enum_class_Callback);
+        Parrot_Callback_attributes * const cb_data = PARROT_CALLBACK(callback);
+        cb_data->user_data     = user_data;
+        cb_data->external_data = (PMC*) external_data;
+
+        Parrot_cx_schedule_immediate(interp, callback);
     }
 }
 
 /*
 
-=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char*
+=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, void*
 external_data)>
 
 Run a callback function. The PMC* user_data holds all
@@ -280,7 +286,7 @@ necessary items in its properties.
 PARROT_EXPORT
 void
 Parrot_run_callback(PARROT_INTERP,
-        ARGMOD(PMC* user_data), ARGIN(char* external_data))
+        ARGMOD(PMC* user_data), ARGIN(void* external_data))
 {
     ASSERT_ARGS(Parrot_run_callback)
     PMC     *signature;
@@ -294,9 +300,9 @@ Parrot_run_callback(PARROT_INTERP,
     STRING  *sc;
 
     sc        = CONST_STRING(interp, "_sub");
-    sub       = VTABLE_getprop(interp, user_data, sc);
+    sub       = Parrot_pmc_getprop(interp, user_data, sc);
     sc        = CONST_STRING(interp, "_signature");
-    signature = VTABLE_getprop(interp, user_data, sc);
+    signature = Parrot_pmc_getprop(interp, user_data, sc);
     sig_str   = VTABLE_get_string(interp, signature);
 
     pasm_sig[0] = 'P';
@@ -308,16 +314,20 @@ Parrot_run_callback(PARROT_INTERP,
         pasm_sig[1] = 'v';
         break;
       case 'l':
-        i_param = (INTVAL)(long) external_data;
+        /* FIXME: issue #742 */
+        i_param = (INTVAL)(long)(INTVAL) external_data;
         goto case_I;
       case 'i':
-        i_param = (INTVAL)(int)(long) external_data;
+        /* FIXME: issue #742 */
+        i_param = (INTVAL)(int)(INTVAL) external_data;
         goto case_I;
       case 's':
-        i_param = (INTVAL)(short)(long) external_data;
+        /* FIXME: issue #742 */
+        i_param = (INTVAL)(short)(INTVAL) external_data;
         goto case_I;
       case 'c':
-        i_param = (INTVAL)(char)(long)external_data;
+        /* FIXME: issue #742 */
+        i_param = (INTVAL)(char)(INTVAL) external_data;
 case_I:
         pasm_sig[1] = 'I';
         param = (void*) i_param;
@@ -331,7 +341,7 @@ case_I:
         break;
       case 't':
         pasm_sig[1] = 'S';
-        param = Parrot_str_new(interp, external_data, 0);
+        param = Parrot_str_new(interp, (const char*)external_data, 0);
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, 1,

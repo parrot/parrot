@@ -6,9 +6,12 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
+use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 plan tests => 1;
 
@@ -29,7 +32,6 @@ Tests C<Parrot_x_exit()> and C<Parrot_x_on_exit()> functions.
 c_output_is( <<'CODE', <<'OUTPUT', "on_exit - interpreter" );
 #include <stdio.h>
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 
 void
 ex1(PARROT_INTERP, int x, void*p)
@@ -54,7 +56,7 @@ main(int argc, char* argv[])
 {
     Interp *interp;
 
-    interp = Parrot_new(NULL);
+    interp = Parrot_interp_new(NULL);
     if (interp) {
         Parrot_x_on_exit(interp, ex1, 0);
         Parrot_x_on_exit(interp, ex2, 0);

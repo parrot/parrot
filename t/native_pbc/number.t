@@ -8,7 +8,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
 #use Parrot::Test tests => 7;
 
 =head1 NAME
@@ -86,7 +86,7 @@ into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
-# TT #357: testmatrix for coverage overview
+# GH #394: testmatrix for coverage overview
 # float conversion src: left-side (pbc) to dest: upper-side (platform)
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
 # Note that the corresponding cvt_num* functions in F<pf_items.c> have odd names.
@@ -219,7 +219,7 @@ sub test_pbc_number {
             $todo_msg = "$cvt $todo_msg"
         }
         else {
-            $todo_msg = "$cvt yet untested, TT #357. "
+            $todo_msg = "$cvt yet untested, GH #394. "
                        . "Please report success."
         }
         pbc_output_is( undef, $expected, "$cvt $desc",

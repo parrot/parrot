@@ -1,0 +1,73 @@
+# Copyright (C) 2001-2011, Parrot Foundation.
+
+=head1 Name
+
+parrot_nci_thunk_gen - Create Parrot NCI thunks
+
+=head1 Description
+
+This utility creates C file of routines suitable for use as Parrot Native Call Interface thunks.
+
+=head1 Usage
+
+    parrot_nci_thunk_gen [option] -o output_c_file.c < input_signature_list.nci
+
+=head2 Command line Options
+
+To print help message and exit use :
+
+    --help
+
+To print version number of this utility use :
+
+    --version
+
+Not to complain about duplicated signatures (default is to warn) use :
+
+    -f
+    --no-warn-dups
+
+To output a thunk file suitable for inclusion in Parrot core (default is no) use :
+
+    --core
+
+To use default values for loader-name, loader-storage-class, and target suitable
+for use in Parrot dyntex library use :
+
+    --dyntex    
+
+To specify output file use :
+
+    -o
+    --output <file>
+
+To select what to output (valid operation are 'head', 'thunks', 'loader', 
+'loader-dyntex', 'coda', 'all', 'all-dyntex', 'names' and 'signatures') 
+(default is 'all') use :
+
+    --target <target>
+
+To set storage class used for the thunks (default value is static) use :
+
+    --thunk-storage-class <storage class>
+
+To set the prototype used for the thunk function names.Must be a printf
+format with arity 1 (default value is 'pcf_%s') use :
+
+    --thunk-name-proto <printf prototype>
+
+To set the storage class used for the loader funtion (default value is none) use :
+
+    --loader-storage-class
+
+To set the name used for the leader function (default value is 'Parrot_load_nci_thunks') use :
+
+    --loader-name
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut

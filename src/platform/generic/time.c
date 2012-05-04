@@ -98,6 +98,28 @@ Parrot_usleep(unsigned int microseconds)
 
 /*
 
+=item C<void Parrot_floatval_sleep(FLOATVAL time)>
+
+Sleep for the specified number of seconds.
+
+=cut
+
+*/
+
+void
+Parrot_floatval_sleep(FLOATVAL time)
+{
+    if (time > 1000) {
+        /* prevent integer overflow when converting to microseconds */
+        const int seconds = floor(time);
+        Parrot_sleep(seconds);
+        time -= seconds;
+    }
+    Parrot_usleep((UINTVAL) time*1000000);
+}
+
+/*
+
 =item C<struct tm * Parrot_gmtime_r(const time_t *t, struct tm *tm)>
 
 Parrot wrapper around standard library C<gmtime_r()> function.

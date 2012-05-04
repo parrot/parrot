@@ -19,3 +19,12 @@ sub print(*@args) {
     pir::say(pir::join('', @args));
     pir::return();
 }
+
+our $STDIN;
+INIT {
+	$STDIN := pir::getinterp().stdin_handle();
+}
+
+sub read() {
+	+$STDIN.readline();
+}

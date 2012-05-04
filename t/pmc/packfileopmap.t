@@ -93,6 +93,15 @@ Tests the PackfileOpMap PMC.
   invalid_op_name:
     ok(1, 'caught invalid op name')
     pop_eh
+
+    .local pmc oplibs
+    oplibs = opmap.'oplibs'()
+    $I0 = isa oplibs, 'Hash'
+    ok($I0, 'oplibs gave a hash')
+
+    $P0 = oplibs['core_ops']
+    $I0 = defined $P0
+    ok($I0, 'oplib contains core_ops')
 .end
 
 .sub 'load_lib'

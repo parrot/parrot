@@ -104,7 +104,9 @@ Parrot_x_exit(PARROT_INTERP, int status)
      * and: interp->exit_handler_list is gone, after the last exit handler
      *      (Parrot_really_destroy) has run
      */
-    handler_node_t *node = interp->exit_handler_list;
+    handler_node_t *node;
+
+    node = interp->exit_handler_list;
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);

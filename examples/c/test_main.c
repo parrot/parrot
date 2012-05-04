@@ -21,7 +21,7 @@ sample up to date with respect to the latest parrot functionality.
 
 */
 
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 #include <stdio.h>
 #include <stdlib.h>

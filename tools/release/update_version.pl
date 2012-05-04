@@ -65,7 +65,7 @@ foreach my $f ( @simple_files ) {
     open my $OUT, '>', $new or croak "Unable to open $new for writing";
     while (<$IN>) {
         chomp;
-        s/$old_version/$new_version/g;
+        s/\Q$old_version\E/$new_version/g;
         print $OUT "$_\n";
     }
     close $OUT or croak "Unable to close $new after writing";

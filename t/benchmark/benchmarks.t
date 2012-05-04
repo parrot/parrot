@@ -151,7 +151,6 @@ FixedPMCArray:\s\d+\.\d+s\n
     q{oo1.pir}      => qq(10\n),
     q{oo2.pir}      => qq(10\n),
     q{oo3.pir}      => qq(10\n),
-    q{oo4.pasm}     => qq(500000\n),
     q{oo5.pir}      => qq(10\n),
     q{oo6.pir}      => qq(500000\n),
     q{oofib.pir}    => qr/^fib\(24\)\s=\s46368\s\d+\.\d+s$/x,

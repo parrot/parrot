@@ -8,7 +8,7 @@
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
     description (D), main username (U), alias usernames (A)
-    and snail-mail address (S).
+    and geographic location (S).
 
         Thanks,
 
@@ -18,6 +18,13 @@
         PPPS: To turn this file into a author map for git-svn, see tools/dev/mk_author_map.pl
 
 ----------
+N: Aaron Faanes
+E: dafrito@gmail.com
+W: http://www.dafrito.com
+D: make_html_docs revisions
+U: dafrito
+S: Richardson, TX
+
 N: Aaron Sherman
 U: ajs
 E: ajs@ajs.com
@@ -69,6 +76,13 @@ D: Architect (0.4.6 - 2.8.0) & Lead Developer
 E: allison@parrot.org
 U: allison
 
+N: Alvis Yardley
+D: Documentation Shepherd (3.9.0 - Present)
+D: Release manger for 4.1.0
+E: ac.yardley@gmail.com
+U: alvis
+S: Ft. Worth, Texas
+
 N: Amir Karger
 U: amirkarger
 D: editor bugfixes
@@ -100,7 +114,7 @@ E: yDNA@cpan.org
 N: Andrew Whitworth
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0 and 3.3.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0 and 4.0.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -447,6 +461,12 @@ A: gerd
 E: pokorra@uni-siegen.de
 D: Release manager for 1.9.0, 2.3.0, 2.5.0, 2.8.0, 2.9.0, 3.2.0 and 3.4.0
 
+N: Gerhard R.
+U: gerdr
+A: not_gerd
+W: http://gerdr.github.com/on-parrot/
+D: MSYS fixes
+
 N: Goplat
 D: Win98 and other fixes.
 
@@ -508,7 +528,7 @@ D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
 
-N: Jay Emmerson
+N: Jay Emerson
 E: john.emerson@yale.edu
 U: jay
 
@@ -572,10 +592,16 @@ D: coding standard tests
 N: John Paul Wallington
 D: pir-mode.el: fix for xemacs plus bugfixes and cleanups
 
+N: Jonathan Gentle
+E: atrodo@atrodo.org
+U: atrodo
+A: atrodo
+S: Ohio, USA
+
 N: Jonathan "Duke" Leto
 E: jonathan@leto.net
-W: http://leto.net
-D: Release manager for 1.7.0
+W: http://dukeleto.pl
+D: Release manager for 1.7.0, 3.9.0,4.2.0 GCI/GSoC Org Admin/Mentor
 U: dukeleto
 A: leto
 A: Duke Leto
@@ -655,7 +681,7 @@ N: Kevin Falcone
 N: Kevin Polulak
 U: soh_cah_toa
 E: kpolulak@gmail.com
-D: HBDB debugger
+D: HBDB debugger, release manager for 3.8.0
 S: New Jersey, USA
 
 N: Kevin Tew
@@ -796,6 +822,11 @@ D: tracwiki additions
 D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
 
+N: Michael Schroeder
+U: mls
+D: subprof profiling runcore
+E: mls@suse.de
+
 N: Michael G. Schwern
 
 N: Michael Scott
@@ -929,6 +960,9 @@ D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
 W: http://www.bofh.org.uk:8080/
 
+N: Piotr Fusik
+D: Fixed typos
+
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
@@ -1030,6 +1064,13 @@ N: Stefan O'Rear
 E: stefanor@cox.net
 D: Perl 5 interoperability, Blizkost
 U: sorear
+
+N: Stefan Seifert
+U: nine
+E: nine@detonation.org
+D: Continuation of Chandler's work on tasks
+S: Linz, Austria
+W: http://niner.name
 
 N: Stéphane Payrard
 D: Various code fixes and improvements

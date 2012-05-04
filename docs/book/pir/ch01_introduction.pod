@@ -69,14 +69,13 @@ Parrot in real time.
 
 =head3 Issue Tracking & Wiki
 
-X<trac.parrot.org website>
-X<issue tracking (trac.parrot.org)>
+X<github.com wiki>
+X<issue tracking (github.com)>
 
-Parrot developers track bugs, feature requests, and roadmap tasks at
-U<https://trac.parrot.org/>, the open source Trac issue tracker. Users
-can submit new tickets and track the status of existing tickets.  The
-site also includes a wiki used in project development, a source code
-browser, and the project roadmap.
+Parrot developers track issues using the Github issues system at
+L<https://github.com/parrot/parrot/issues/> Users can submit new tickets and
+track the status of existing tickets.  Github also provides a wiki used in
+project development and a source code browser.
 
 =head2 Parrot Development
 

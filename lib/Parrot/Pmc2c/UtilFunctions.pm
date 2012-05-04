@@ -159,7 +159,7 @@ EOC
     int pass;
 
     /* create a library PMC */
-    pmc = Parrot_pmc_new_constant(interp, enum_class_ParrotLibrary);
+    pmc = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
 
     /* TODO: stuff some info into this PMC's props */
 

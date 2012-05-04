@@ -23,13 +23,29 @@ This is a subclass of L<Pod::Simple::Methody> and inherits all its
 methods. The implementation is entirely different than
 L<Pod::Simple::HTML>, but it largely preserves the same interface.
 
+=head2 Minimal code
+
+  use Pod::Simple::XHTML;
+  my $psx = Pod::Simple::XHTML->new;
+  $psx->output_string(\my $html);
+  $psx->parse_file('path/to/Module/Name.pm');
+  open my $out, '>', 'out.html' or die "Cannot open 'out.html': $!\n";
+  print $out $html;
+
+You can also control the character encoding and entities. For example, if
+you're sure that the POD is properly encoded (using the C<=encoding> command),
+you can prevent high-bit characters from being encoded as HTML entities and
+declare the output character set as UTF-8 before parsing, like so:
+
+  $psx->html_charset('UTF-8');
+  $psx->html_encode_chars('&<>">');
+
 =cut
 
 package Pod::Simple::XHTML;
 use strict;
 use vars qw( $VERSION @ISA $HAS_HTML_ENTITIES );
-$VERSION = '3.04';
-use Carp ();
+$VERSION = '3.19';
 use Pod::Simple::Methody ();
 @ISA = ('Pod::Simple::Methody');
 
@@ -76,6 +92,16 @@ to put before the "Foo%3a%3aBar". The default value is
 What to put after "Foo%3a%3aBar" in the URL. This option is not set by
 default.
 
+=head2 man_url_prefix
+
+In turning C<< L<crontab(5)> >> into http://whatever/man/1/crontab, what
+to put before the "1/crontab". The default value is
+"http://man.he.net/man".
+
+=head2 man_url_postfix
+
+What to put after "1/crontab" in the URL. This option is not set by default.
+
 =head2 title_prefix, title_postfix
 
 What to put before and after the title in the head. The values should
@@ -106,6 +132,12 @@ default value is just a content type header tag:
 
 Add additional meta tags here, or blocks of inline CSS or JavaScript
 (wrapped in the appropriate tags).
+
+=head2 html_h_level
+
+This is the level of HTML "Hn" element to which a Pod "head1" corresponds.  For
+example, if C<html_h_level> is set to 2, a head1 will produce an H2, a head2
+will produce an H3, and so on.
 
 =head2 default_title
 
@@ -148,8 +180,10 @@ index for the sake of tradition).
 __PACKAGE__->_accessorize(
  'perldoc_url_prefix',
  'perldoc_url_postfix',
+ 'man_url_prefix',
+ 'man_url_postfix',
  'title_prefix',  'title_postfix',
- 'html_css', 
+ 'html_css',
  'html_javascript',
  'html_doctype',
  'html_header_tags',
@@ -199,7 +233,7 @@ want to override this if you are adding a custom element type that does
 more than just display formatted text. Perhaps adding a way to generate
 HTML tables from an extended version of POD.
 
-So, let's say you want add a custom element called 'foo'. In your
+So, let's say you want to add a custom element called 'foo'. In your
 subclass's C<new> method, after calling C<SUPER::new> you'd call:
 
   $new->accept_targets_as_text( 'foo' );
@@ -378,23 +412,57 @@ __END__
 
 =head1 SEE ALSO
 
-L<Pod::Simple>, L<Pod::Simple::Methody>
+L<Pod::Simple>, L<Pod::Simple::Text>, L<Pod::Spell>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
+
+Questions or discussion about POD and Pod::Simple should be sent to the
+pod-people@perl.org mail list. Send an empty email to
+pod-people-subscribe@perl.org to subscribe.
+
+This module is managed in an open GitHub repository,
+L<http://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
+to clone L<git://github.com/theory/pod-simple.git> and send patches!
+
+Patches against Pod::Simple are welcome. Please send bug reports to
+<bug-pod-simple@rt.cpan.org>.
+
+=head1 COPYRIGHT AND DISCLAIMERS
 
 Copyright (c) 2003-2005 Allison Randal.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. The full text of the license
-can be found in the LICENSE file included with this module.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
-This library is distributed in the hope that it will be useful, but
+This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to L<Hurricane Electric|http://he.net/> for permission to use its
+L<Linux man pages online|http://man.he.net/> site for man page links.
+
+Thanks to L<search.cpan.org|http://search.cpan.org/> for permission to use the
+site for Perl module links.
+
 =head1 AUTHOR
 
-Allison Randal <allison@perl.org>
+Pod::Simpele::XHTML was created by Allison Randal <allison@perl.org>.
+
+Pod::Simple was created by Sean M. Burke <sburke@cpan.org>.
+But don't bother him, he's retired.
+
+Pod::Simple is maintained by:
+
+=over
+
+=item * Allison Randal C<allison@perl.org>
+
+=item * Hans Dieter Pearcey C<hdp@cpan.org>
+
+=item * David E. Wheeler C<dwheeler@cpan.org>
+
+=back
 
 =cut
-

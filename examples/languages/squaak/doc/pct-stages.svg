@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="New document 1">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="425.2069"
+     inkscape:cy="867.09127"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="998"
+     inkscape:window-x="1680"
+     inkscape:window-y="26"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3840"
+       transform="matrix(0.60064991,0,0,0.60064991,273.91129,-140.7631)"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180">
+      <rect
+         ry="7.4978929"
+         y="336.51437"
+         x="37.738514"
+         height="62.629436"
+         width="225.26402"
+         id="rect2991"
+         style="fill:#80e5ff;fill-opacity:1;stroke:#000000;stroke-linejoin:round;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3761"
+         y="382.12598"
+         x="46.972088"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="382.12598"
+           x="46.972088"
+           id="tspan3763"
+           sodipodi:role="line">Parse Tree</tspan><tspan
+           id="tspan3765"
+           y="432.12598"
+           x="46.972088"
+           sodipodi:role="line" /></text>
+    </g>
+    <g
+       id="g3824"
+       transform="matrix(0.60064991,0,0,0.60064991,389.90727,-113.08616)"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180">
+      <rect
+         ry="7.4978929"
+         y="437.40118"
+         x="78.851021"
+         height="62.629436"
+         width="225.26402"
+         id="rect2991-1"
+         style="fill:#80ff99;fill-opacity:1;stroke:#000000;stroke-linejoin:round;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3761-6"
+         y="483.29599"
+         x="158.23108"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="483.29599"
+           x="158.23108"
+           sodipodi:role="line"
+           id="tspan3818">PIR</tspan><tspan
+           id="tspan3765-9"
+           y="533.29602"
+           x="158.23108"
+           sodipodi:role="line" /></text>
+    </g>
+    <g
+       id="g3923"
+       transform="matrix(0.60064991,0,0,0.60064991,107.33786,-66.187576)"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180">
+      <rect
+         style="fill:#ffe080;fill-opacity:1;stroke:#000000;stroke-linejoin:round;stroke-opacity:1"
+         id="rect2991-4"
+         width="225.26402"
+         height="62.629436"
+         x="80.830597"
+         y="212.92668"
+         ry="7.4978929" />
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         x="124.4587"
+         y="258.80194"
+         id="text3761-3"
+         sodipodi:linespacing="125%"><tspan
+           id="tspan3859"
+           sodipodi:role="line"
+           x="124.4587"
+           y="258.80194">Source</tspan><tspan
+           sodipodi:role="line"
+           x="124.4587"
+           y="308.80194"
+           id="tspan3765-7" /></text>
+    </g>
+    <g
+       transform="matrix(0.60064991,0,0,0.60064991,257.10013,-96.125229)"
+       id="g3840-8"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180">
+      <rect
+         ry="7.4978929"
+         y="336.2507"
+         x="65.726799"
+         height="62.629436"
+         width="225.26402"
+         id="rect2991-6"
+         style="fill:#80e5ff;fill-opacity:1;stroke:#000000;stroke-linejoin:round;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3761-32"
+         y="382.12598"
+         x="126.97209"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="382.12598"
+           x="126.97209"
+           id="tspan3763-0"
+           sodipodi:role="line">PAST</tspan><tspan
+           id="tspan3765-3"
+           y="432.12598"
+           x="126.97209"
+           sodipodi:role="line" /></text>
+    </g>
+    <g
+       transform="matrix(0.60064991,0,0,0.60064991,257.10013,-51.645763)"
+       id="g3840-8-3"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180">
+      <rect
+         ry="7.4978929"
+         y="336.2507"
+         x="65.726799"
+         height="62.629436"
+         width="225.26402"
+         id="rect2991-6-2"
+         style="fill:#80e5ff;fill-opacity:1;stroke:#000000;stroke-linejoin:round;stroke-opacity:1" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text3761-32-4"
+         y="382.12598"
+         x="126.97209"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="382.12598"
+           x="126.97209"
+           id="tspan3763-0-9"
+           sodipodi:role="line">POST</tspan><tspan
+           id="tspan3765-3-4"
+           y="432.12598"
+           x="126.97209"
+           sodipodi:role="line" /></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.60064989px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 364.23133,98.982594 0,6.861126"
+       id="path3929"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="3"
+       inkscape:connection-start="#g3840"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3840-8"
+       inkscape:connection-end-point="d4"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.60064989px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 364.23133,143.46209 0,6.8611"
+       id="path3931"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="3"
+       inkscape:connection-start="#g3840-8"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3840-8-3"
+       inkscape:connection-end-point="d4"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.60064989px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 431.88374,168.80329 5.38539,-0.0262"
+       id="path3933"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="3"
+       inkscape:connection-start="#g3840-8-3"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3824"
+       inkscape:connection-end-point="d4"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.60064989px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 291.19357,80.351262 5.38536,-0.01311"
+       id="path3935"
+       inkscape:connector-type="polyline"
+       inkscape:connector-curvature="3"
+       inkscape:connection-start="#g3923"
+       inkscape:connection-start-point="d4"
+       inkscape:connection-end="#g3840"
+       inkscape:connection-end-point="d4"
+       inkscape:export-filename="/home/dafrito/parse-process.png"
+       inkscape:export-xdpi="180"
+       inkscape:export-ydpi="180" />
+  </g>
+</svg>

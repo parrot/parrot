@@ -7,7 +7,7 @@
 
     loadlib $P1, 'foo_group'
     sweep 1
-    $P2 = getprop '_type', $P1
+    $P2 = getprop $P1, '_type'
     $S0 = $P2
     is($S0, 'PMC', 'ParrotLibrary props survive GC')
 .end

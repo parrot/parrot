@@ -4,7 +4,7 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/packfileopmap.pmc - Packfile Debug Segment PMC
+src/pmc/packfileopmap.pmc - Packfile Op Map PMC
 
 =head1 DESCRIPTION
 
@@ -222,7 +222,7 @@ Marks the object as live.
 
 =item C<INTVAL get_integer()>
 
-Get the number of filename mappings.
+Get the number of opcode mappings.
 
 =cut
 
@@ -342,6 +342,44 @@ Construct PackFile_ByteCode_OpMapping.
         }
 
         return m;
+    }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<PMC *oplibs()>
+
+Returns an hash of name to C<OpLib> PMCs for all oplibs loaded in the map.
+
+=cut
+
+*/
+
+    METHOD oplibs() {
+        STRING *oplib_str  = CONST_STRING(INTERP, "oplib");
+        STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
+        PMC *op_maps, *result;
+        INTVAL i, size;
+
+        GET_ATTR_op_maps(INTERP, SELF, op_maps);
+
+        result = Parrot_pmc_new(INTERP, enum_class_Hash);
+
+        size = VTABLE_elements(INTERP, op_maps);
+        for (i = 0; i < size; ++i) {
+            PMC * const op_map  = VTABLE_get_pmc_keyed_int(INTERP, op_maps, i);
+            PMC * const oplib   = VTABLE_get_pmc_keyed_str(INTERP, op_map, oplib_str);
+            STRING * const name = VTABLE_get_string_keyed_str(INTERP, op_map, oplib_name);
+
+            VTABLE_set_pmc_keyed_str(INTERP, result, name, oplib);
+        }
+
+        RETURN(PMC *result);
     }
 
 }

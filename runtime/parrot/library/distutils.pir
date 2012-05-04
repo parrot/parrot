@@ -61,7 +61,7 @@ Update from the repository.
 
 Output a skeleton for Plumage
 
-=item sdist, sdist_gztar, sdist_zip, sdist_rpm, manifest
+=item sdist, sdist_gztar, sdist_rpm, manifest
 
 Create a source distribution or a source RPM package
 
@@ -271,8 +271,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_man_pod)
     .const 'Sub' _clean_gztar = '_clean_gztar'
     register_step_after('clean', _clean_gztar)
-    .const 'Sub' _clean_zip = '_clean_zip'
-    register_step_after('clean', _clean_zip)
     .const 'Sub' _clean_smoke = '_clean_smoke'
     register_step_after('clean', _clean_smoke)
 
@@ -304,8 +302,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step('sdist', _sdist)
     .const 'Sub' _sdist_gztar = '_sdist_gztar'
     register_step('sdist_gztar', _sdist_gztar)
-    .const 'Sub' _sdist_zip = '_sdist_zip'
-    register_step('sdist_zip', _sdist_zip)
     .const 'Sub' _manifest = '_manifest'
     register_step('manifest', _manifest)
     .const 'Sub' _sdist_rpm = '_sdist_rpm'
@@ -336,7 +332,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     .const 'Sub' _no_zlib = '_no_zlib'
     register_step('smoke', _no_zlib)
     register_step('sdist_gztar', _no_zlib)
-    register_step('sdist_zip', _no_zlib)
     register_step('bdist_rpm', _no_zlib)
   L2:
 .end
@@ -1828,11 +1823,11 @@ the value is the POD pathname, for example 'src/prog.pir'
     unless $P0 goto L2
     bin = shift $P0
     pbc = hash[bin]
-    $S1 = _mk_path_exe(pbc, exe)
+    $S1 = concat bin, exe
     unlink($S1, 1 :named('verbose'))
-    $S1 = _mk_path_exe(pbc, '.c')
+    $S1 = concat bin, '.c'
     unlink($S1, 1 :named('verbose'))
-    $S1 = _mk_path_exe(pbc, obj)
+    $S1 = concat bin, obj
     unlink($S1, 1 :named('verbose'))
     goto L1
   L2:
@@ -2190,7 +2185,7 @@ the default value is "t/*.t"
 .sub 'sort_strings'
     .param pmc array
     # currently, FixedStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     $I0 = elements array
     $P0 = new 'FixedPMCArray'
     set $P0, $I0
@@ -2457,6 +2452,11 @@ the default value is man
     .local int has_zlib
     $P0 = get_config()
     has_zlib = $P0['has_zlib']
+    $S0 = $P0['osname']
+    unless $S0 == 'MSWin32' goto L8
+    has_zlib = 0
+  L8:
+
     $P0 = get_install_gzfiles(kv :flat :named)
     $P1 = iter $P0
   L5:
@@ -3123,7 +3123,7 @@ the default value is setup.pir
     inc $I0
     $P0 = new 'FixedPMCArray'
     # currently, FixedStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     set $P0, $I0
     $I0 = 0
     $P0[$I0] = 'MANIFEST'
@@ -3217,17 +3217,10 @@ the default value is setup.pir
 
 =head3 Step sdist
 
-On Windows calls sdist_zip, otherwise sdist_gztar
-
 =cut
 
 .sub '_sdist' :anon
     .param pmc kv :slurpy :named
-    $P0 = get_config()
-    $S0 = $P0['osname']
-    unless $S0 == 'MSWin32' goto L1
-    .tailcall run_step('sdist_zip', kv :flat :named)
-  L1:
     .tailcall run_step('sdist_gztar', kv :flat :named)
 .end
 
@@ -3291,49 +3284,6 @@ On Windows calls sdist_zip, otherwise sdist_gztar
     $S0 .= $S1
     $S0 .= ext
     .return ($S0)
-.end
-
-=head3 Step sdist_zip
-
-=cut
-
-.sub '_sdist_zip' :anon
-    .param pmc kv :slurpy :named
-    run_step('manifest', kv :flat :named)
-
-    load_bytecode 'Archive/Zip.pbc'
-    $S0 = slurp('MANIFEST')
-    $P0 = split "\n", $S0
-    $S0 = pop $P0
-    .local string archive_file
-    archive_file = get_tarname('.zip', kv :flat :named)
-    $I0 = newer(archive_file, $P0)
-    if $I0 goto L1
-    .local pmc archive
-    archive = new ['Archive';'Zip']
-    .local string dirname
-    $S0 = get_tarname('', kv :flat :named)
-    dirname = $S0 . '/'
-    $P1 = iter $P0
-  L2:
-    unless $P1 goto L3
-    $S0 = shift $P1
-    $S1 = dirname . $S0
-    archive.'addFile'($S0, $S1)
-    goto L2
-  L3:
-    archive.'writeToFileNamed'(archive_file)
-    print "creat "
-    say archive_file
-  L1:
-.end
-
-.sub '_clean_zip' :anon
-    .param pmc kv :slurpy :named
-
-    $S0 = get_tarname('.zip', kv :flat :named)
-    unlink($S0, 1 :named('verbose'))
-    unlink('MANIFEST', 1 :named('verbose'))
 .end
 
 =head3 Step sdist_rpm
@@ -3968,7 +3918,7 @@ TEMPLATE
     .param pmc kv :slurpy :named
     $P0 = new 'ResizablePMCArray'
     # currently, ResizableStringArray hasn't the method sort.
-    # see TT #1356
+    # see GH #384
     $P1 = get_install_files(kv :flat :named)
     $P2 = iter $P1
   L1:

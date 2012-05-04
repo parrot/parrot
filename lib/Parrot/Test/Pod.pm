@@ -62,15 +62,15 @@ our %second_analysis_subs = (
                 # skip file which includes malformed POD for
                 # other testing purposes
                 if ($full_file =~ m{
-                        t/tools/dev/searchops/samples\.pm
+                        t/tools/dev/search_ops/samples\.pm
                         | languages/pod/test\.pod
                         | examples/config/file/configcompiler
-                        | t/configure/testlib/verbosefoobar
+                        | examples/config/file/configwithfatalstep
+                        | examples/config/file/configverbose
                         | t/configure/testlib/ddefectivefoobar
                         | t/configure/testlib/adefectivefoobar
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
-                        | examples/config/file/configwithfatalstep
                         | compilers/opsc
                     }x
                 ) {

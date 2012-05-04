@@ -11,7 +11,7 @@ t/op/literal.t - Testing the PIR lexer
 
 =head1 DESCRIPTION
 
-Tests the lexing of literal numbers.  Taken from from the 2nd
+Tests the lexing of literal numbers.  Taken from the 2nd
 aoudad book (page 127).
 
 =cut

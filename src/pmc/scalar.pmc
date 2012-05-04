@@ -832,32 +832,6 @@ C<offset>.
         return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
                 offset, length);
     }
-
-/*
-
-=item C<void share_ro()>
-
-Sets this PMC as shared and read-only.
-
-=cut
-
-*/
-    VTABLE PMC *share_ro() {
-        PMC * const ret   = pt_shared_fixup(INTERP, SELF);
-        PMC * const _true = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, 1);
-
-        /* first set readonly */
-        VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
-
-        /* We're sharing this, so make sure it has a PMC_sync */
-        PObj_is_PMC_shared_SET(ret);
-
-        /* XXX FIXME workaround lack of metadata sharing*/
-        PMC_metadata(SELF) = NULL;
-
-        return ret;
-    }
-
 }
 
 /*

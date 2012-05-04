@@ -728,18 +728,6 @@ characters, other digit representations aren't allowed.
         }
     }
 
-    VTABLE PMC *share_ro() {
-        STRING       *str_val;
-        PMC   * const ret    = SUPER();
-
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        if (!STRING_IS_NULL(str_val)) {
-            /* prevent wrong garbage collection */
-            PObj_is_shared_SET(str_val);
-        }
-        return ret;
-    }
-
     VTABLE STRING* get_repr() {
         return VTABLE_get_string(INTERP, SELF);
     }

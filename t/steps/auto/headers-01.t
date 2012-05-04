@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # auto/headers-01.t
 
 use strict;
 use warnings;
-use Test::More tests =>  20;
+use Test::More tests =>  21;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::headers');
@@ -85,8 +85,10 @@ ok(! $conf->data->get('i_niin'), "Mapping made correctly");
     $conf->data->set( OSNAME_provisional => $os );
     my %extra_headers =
         map {$_, 1} auto::headers::_list_extra_headers($conf);
-    ok($extra_headers{'sysmman.h'}, "Special header set for $os");
-    ok($extra_headers{'netdb.h'}, "Special header set for $os");
+    my @special_headers = qw(sysmman.h netdb.h sys/utsname.h);
+    foreach my $h (@special_headers) {
+        ok($extra_headers{$h}, "Special header $h set for $os");
+    }
 }
 
 {

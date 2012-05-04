@@ -16,12 +16,6 @@ void mark()
 void destroy()
 PMC* get_namespace()
 
-# XXX FIXME should this be marked as writing?
-PMC* getprop(STRING* key)
-void setprop(STRING* key, PMC* value) :write
-void delprop(STRING* key) :write
-PMC* getprops()
-
 INTVAL type()
 
 STRING* name()
@@ -267,9 +261,5 @@ void freeze(PMC* info)
 void thaw(PMC* info) :write
 void thawfinish(PMC* info) :write
 void visit(PMC* info)
-
-void share()
-
-PMC* share_ro()
 
 void init_int(INTVAL initializer) :write

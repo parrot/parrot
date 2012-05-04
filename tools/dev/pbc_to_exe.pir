@@ -1,5 +1,6 @@
 #! parrot
-# Copyright (C) 2009-2011, Parrot Foundation.
+
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,7 +47,6 @@ Compile bytecode to executable.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/api.h"
-const void * get_program_code(void);
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
@@ -80,15 +80,18 @@ HEADER
     print outfh, <<'MAIN'
         int main(int argc, const char *argv[])
         {
-            PMC * interp;
-            PMC * pbc;
-            PMC * argsarray;
+            PMC                 *interp;
+            PMC                 *pbc;
+            PMC                 *argsarray;
             const unsigned char *program_code_addr;
-            Parrot_Init_Args *initargs;
+
+            Parrot_Init_Args    *initargs;
             GET_INIT_STRUCT(initargs);
+
             initargs->gc_system = GCCORE;
 
-            program_code_addr = (const unsigned char *)get_program_code();
+            program_code_addr = get_program_code();
+
             if (!program_code_addr)
                 exit(EXIT_FAILURE);
 
@@ -106,15 +109,24 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not build args array");
                 show_last_error_and_exit(interp);
             }
-            if (!Parrot_api_load_bytecode_bytes(interp, program_code_addr, bytecode_size, &pbc)) {
+
+            if (!Parrot_api_load_bytecode_bytes(interp,
+                                                program_code_addr,
+                                                (Parrot_Int) bytecode_size,
+                                                &pbc)) {
                 fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
+
             if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
                 show_last_error_and_exit(interp);
             }
 
-            Parrot_api_destroy_interpreter(interp);
+            if (!Parrot_api_destroy_interpreter(interp)) {
+                fprintf(stderr, "PARROT VM: Could not destroy interpreter\n");
+                show_last_error_and_exit(interp);
+            }
+
             exit(EXIT_SUCCESS);
         }
 
@@ -127,6 +139,7 @@ HEADER
 
             if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
                 exit(EXIT_FAILURE);
+
             if (is_error) {
                 if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
                     exit(EXIT_FAILURE);
@@ -140,13 +153,19 @@ HEADER
         static void
         print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
         {
-            char * msg_raw;
+            char *msg_raw;
+
             if (!str)
                 return;
-            Parrot_api_string_export_ascii(interp, str, &msg_raw);
+
+            if (!Parrot_api_string_export_ascii(interp, str, &msg_raw))
+                show_last_error_and_exit(interp);
+
             if (msg_raw) {
                 fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
-                Parrot_api_string_free_exported_ascii(interp, msg_raw);
+
+                if (!Parrot_api_string_free_exported_ascii(interp, msg_raw))
+                    show_last_error_and_exit(interp);
             }
         }
 
@@ -178,7 +197,7 @@ HEADER
         {
             Parrot_PMC is_pasm_pmc = NULL;
             Parrot_PMC compiler_pmc = NULL;
-            const char *name = is_pasm ? "PASM" : "PIR";
+            const char * const name = is_pasm ? "PASM" : "PIR";
             Parrot_String name_s = NULL;
 
             if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
@@ -415,7 +434,7 @@ HELP
     print outfh, $S0
     print outfh, ";\n"
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             return program_code;
         }
@@ -470,7 +489,7 @@ END_OF_FUNCTION
 
     .local int size
 
-    print outfh, "const char * program_code =\n"
+    print outfh, "const unsigned char program_code[] =\n"
     print outfh, '"'
     size = 0
 
@@ -511,7 +530,7 @@ END_OF_FUNCTION
     print outfh, ";\n"
 
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             return program_code;
         }
@@ -608,7 +627,7 @@ END_OF_DEFINES
     print outfh, ";\n"
 
     print outfh, <<'END_OF_FUNCTION'
-        const void * get_program_code(void)
+        const unsigned char * get_program_code(void)
         {
             HRSRC   hResource;
             DWORD   size;
@@ -733,7 +752,7 @@ END_OF_FUNCTION
     $P0 = '_config'()
     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
     .local string rpath, osname, build_dir, slash, icushared
-    .local string installed, libdir, versiondir
+    .local string installed, libdir, versiondir, optimize
     cc           = $P0['cc']
     link         = $P0['link']
     link_dynamic = $P0['link_dynamic']
@@ -750,6 +769,7 @@ END_OF_FUNCTION
     installed    = $P0['installed']
     libdir       = $P0['libdir']
     versiondir   = $P0['versiondir']
+    optimize     = $P0['optimize']
 
     .local string config, pathquote, exeprefix
     pathquote  = '"'
@@ -778,6 +798,11 @@ END_OF_FUNCTION
     config    .= o
     config    .= pathquote
 
+    unless osname == 'cygwin' goto skip_strip
+    unless install goto skip_strip
+    unless optimize > '' goto skip_strip
+    link .= ' -s'
+ skip_strip:
     link .= ' '
     link .= ld_out
     link .= exefile

@@ -1,0 +1,36 @@
+# Copyright (C) 2011 Parrot Foundation.
+
+=head1 Name
+
+parrot_config - Parrot Configuration
+
+=head1 DESCRIPTION
+
+parrot_config can be used find out compile-time configuration information about
+the Parrot executable.
+
+=head1 SYNOPSIS
+
+To print every available key:
+
+    parrot_config --dump
+
+With specific key it will print only it's corresponding value.
+
+To get the current version of Parrot:
+
+    parrot_config VERSION
+
+To get a descriptive version string that will uniquely identify
+commits which are not releases:
+
+    parrot_config git_describe
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to
+'parrot-dev@parrot.org'.  You can also join Parrot IRC channel: #parrot
+on irc.parrot.org .
+
+=cut

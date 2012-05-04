@@ -19,6 +19,11 @@ GC related bugs.
 .include 'interpinfo.pasm'
 
 .sub main :main
+    # XXX HACK
+    # :main is tailcalled from prt0, but tailcaller frames aren't eliminated
+    # until get_params is called.
+    .param pmc argv
+
     .include 'test_more.pir'
 
     sweep_1()
@@ -218,7 +223,7 @@ GC related bugs.
 .namespace ['Source']
 .sub get_string :method :vtable # buffer
     $P4  = self
-    $P2 = getprop "buffer", $P4
+    $P2 = getprop $P4, "buffer"
     sweep 1
     unless_null $P2, buffer_ok
     $P2 = new ['Source'; 'Buffer']
@@ -234,7 +239,7 @@ buffer_ok:
 .sub get_string :method :vtable
     $P4 = self
     sweep 1
-    $P2 = getprop "buf", $P4
+    $P2 = getprop $P4, "buf"
     $S0 = $P2
     .return($S0)
 .end
@@ -268,7 +273,7 @@ buffer_ok:
     $P1 = 0
     n = $P0."b11"($P1)
     ok(1, "recursion_and_exceptions")
-    is(n,8, "recursion_and_exceptions")
+    is(n, 7, "recursion_and_exceptions")
 .end
 .namespace ["b"]
 .sub b11 :method

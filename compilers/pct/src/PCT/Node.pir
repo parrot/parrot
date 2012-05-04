@@ -46,7 +46,7 @@ Other node attributes are generally defined by subclasses of C<PCT::Node>.
 =item init([child1, child2, ..., ] [attr1=>val1, attr2=>val2, ... ])
 
 Initialize a node with the given children and attributes.
-Adds each child to the node (using the C<push> method, below) and
+Adds each child to the node (using the C<append> method, below) and
 calls the appropriate accessor method for each attribute.
 And returns the node.
 
@@ -56,15 +56,13 @@ And returns the node.
     .param pmc children        :slurpy
     .param pmc adverbs         :slurpy :named
 
-    .local pmc it
-    it = iter children
-  children_loop:
-    unless it goto children_end
-    $P0 = shift it
-    push self, $P0
-    goto children_loop
+    $I0 = elements children
+    unless $I0 goto children_end
+    $P0 = self.'list'()
+    $P0.'append'(children)
   children_end:
 
+    .local pmc it
     it = iter adverbs
   adverbs_loop:
     unless it goto adverbs_end
@@ -74,7 +72,6 @@ And returns the node.
     self.$P1($P0)
     goto adverbs_loop
   adverbs_end:
-  end:
     .return (self)
 .end
 

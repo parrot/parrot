@@ -24,7 +24,7 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 7;
+plan tests => 8;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
@@ -342,6 +342,47 @@ int main(int argc, char* argv[])
 CODE
 Frozen and thawed: I am a string.
 I am a string.
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Test pmc_box and pmc_get" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_str = NULL, p_float = NULL, p_int = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL;
+    Parrot_Float outfloat = 0.0;
+    Parrot_Int outint = 0;
+    char *c_outstr = NULL;
+    int answer = 0;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "The answer is", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
+    Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    printf("%s ", c_outstr);
+
+    Parrot_api_pmc_box_float(interpmc, 10.5, &p_float);
+    Parrot_api_pmc_get_float(interpmc, p_float, &outfloat);
+
+    Parrot_api_pmc_box_integer(interpmc, 21, &p_int);
+    Parrot_api_pmc_get_integer(interpmc, p_int, &outint);
+
+    answer = (int)(2 * outfloat) + (int)outint;
+    printf("%i.\n", answer);
+
+    return 0;
+}
+
+CODE
+The answer is 42.
 OUTPUT
 
 # Local Variables:

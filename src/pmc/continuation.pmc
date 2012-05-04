@@ -285,6 +285,7 @@ destination to continue execution.
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);
+        SET_ATTR_invoked(INTERP, SELF, 1);
 
         Parrot_sub_continuation_check(INTERP, SELF);
         Parrot_sub_continuation_rewind_environment(INTERP, SELF);
@@ -314,7 +315,7 @@ Experimental: returns caller info as a STRING.
         PMC *to_ctx;
 
         GET_ATTR_to_ctx(INTERP, SELF, to_ctx);
-        return Parrot_sub_Context_infostr(INTERP, to_ctx);
+        return Parrot_sub_Context_infostr(INTERP, to_ctx, 0);
     }
 
 
@@ -369,7 +370,7 @@ Experimental: return callers PMC or PMCNULL if none.
 
 =item C<PMC *continuation()>
 
-Experimental: returns continuation PMC of this Continuation or PMCNULL if none.
+Experimental: fetches the return continuation PMC of this Continuation or PMCNULL if none.
 
 =cut
 

@@ -42,7 +42,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(47)
+    plan(55)
 
     test_does_interfaces()
 
@@ -74,6 +74,7 @@ Coverage plan:
     test_iterator()
     test_clone()
     test_freeze()
+    method_reverse()
 .end
 
 .sub test_does_interfaces
@@ -605,6 +606,42 @@ k0:
     s = freeze ria
     th = thaw s
     is( ria, th, 'freeze/thaw copy is equal to original' )
+.end
+
+.sub method_reverse
+    .local pmc array
+    array = new ['ResizableIntegerArray']
+    array."reverse"()
+    $I0 = elements array
+    is($I0, 0, "method_reverse - reverse of empty array")
+    push array, 3
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "3", "method_reverse - reverse of array with one element")
+    push array, 1
+    array."reverse"()
+    array."reverse"()
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "1", "method_reverse - reverse of array with two elements")
+    $S0 = array[1]
+    is($S0, "3", "method_reverse - reverse of array with two elements second element")
+    push array, 4
+    array."reverse"()
+    push array, 5
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "5134", "method_reverse - four elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "4315", "method_reverse - four elements second reverse")
+    push array, 6
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "65134", "method_reverse - five elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "43156", "method_reverse - five elements second reverse")
 .end
 
 # Local Variables:

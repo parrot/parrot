@@ -22,7 +22,7 @@
 
 /* &gen_from_enum(except_types.pasm) */
 typedef enum {
-    EXCEPTION_BAD_BUFFER_SIZE,
+    EXCEPTION_BAD_BUFFER_SIZE = 0x00000,
     EXCEPTION_MISSING_ENCODING_NAME,
     EXCEPTION_INVALID_STRING_REPRESENTATION,
     EXCEPTION_ICU_ERROR,
@@ -80,8 +80,10 @@ typedef enum {
     EXCEPTION_LIBRARY_NOT_LOADED,
     EXCEPTION_SYNTAX_ERROR,
     EXCEPTION_MALFORMED_PACKFILE,
+    EXCEPTION_DIE,
+    EXCEPTION_ALL = 0x0ffff,
 
-    CONTROL_RETURN,
+    CONTROL_RETURN = 0x10000,
     CONTROL_OK,
     CONTROL_BREAK,
     CONTROL_CONTINUE,
@@ -89,10 +91,12 @@ typedef enum {
     CONTROL_TAKE,
     CONTROL_LEAVE,
     CONTROL_EXIT,
-
     CONTROL_LOOP_NEXT,
     CONTROL_LOOP_LAST,
-    CONTROL_LOOP_REDO
+    CONTROL_LOOP_REDO,
+    CONTROL_ALL = 0x1ffff,
+
+    EXCEPTION_TYPE_ALL_MASK = 0xffff
 } exception_type_enum;
 
 /* &end_gen */
@@ -160,6 +164,12 @@ PMC * Parrot_ex_build_exception(PARROT_INTERP,
     INTVAL severity,
     long error,
     ARGIN_NULLOK(STRING *msg))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_ex_get_current_handler(PARROT_INTERP, ARGIN_NULLOK(PMC *expmc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -243,6 +253,8 @@ void Parrot_print_backtrace(void);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(jp))
 #define ASSERT_ARGS_Parrot_ex_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_ex_get_current_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ex_mark_unhandled __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

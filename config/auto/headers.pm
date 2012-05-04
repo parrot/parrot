@@ -101,7 +101,7 @@ sub _list_extra_headers {
 
     # more extra_headers needed on mingw/msys; *BSD fails if they are present
     if ( $conf->data->get('OSNAME_provisional') eq "msys" ) {
-        push @extra_headers, qw(sysmman.h netdb.h);
+        push @extra_headers, qw(sysmman.h netdb.h sys/utsname.h);
     }
 
     if ( $conf->data->get('OSNAME_provisional') eq "MSWin32" ) {
@@ -110,7 +110,7 @@ sub _list_extra_headers {
         # annotation language (SAL), introduced with Visual C++ 8.0.  See
         # <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
         # <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
-        push @extra_headers, qw(sal.h);
+        push @extra_headers, qw(sal.h process.h);
     }
 
     return @extra_headers;

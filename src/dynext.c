@@ -150,10 +150,10 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
 {
     ASSERT_ARGS(set_cstring_prop)
     STRING * const key  = Parrot_str_new_constant(interp, what);
-    PMC    * const prop = Parrot_pmc_new_constant(interp, enum_class_String);
+    PMC    * const prop = Parrot_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, prop, name);
-    VTABLE_setprop(interp, lib_pmc, key, prop);
+    Parrot_pmc_setprop(interp, lib_pmc, key, prop);
 }
 
 
@@ -336,19 +336,27 @@ get_path(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), Parrot_dlopen_flags flags,
      * [shouldn't this happen in Parrot_locate_runtime_file instead?]
      */
 #ifdef WIN32
-    if (STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
-        *handle = Parrot_dlopen((char *)lib->strstart + 3, 0);
+    if (STRING_length(lib) >= 3
+    &&  STRING_ord(interp, lib, 0) == 'l'
+    &&  STRING_ord(interp, lib, 1) == 'i'
+    &&  STRING_ord(interp, lib, 2) == 'b') {
+        path = STRING_substr(interp, lib, 3, STRING_length(lib) - 3);
+
+        *handle = dlopen_string(interp, flags, path);
 
         if (*handle)
-            return STRING_substr(interp, lib, 3, lib->strlen - 3);
+            return path;
     }
 #endif
 
     /* And on cygwin replace a leading "lib" by "cyg". */
 #ifdef __CYGWIN__
-    if (STRING_length(lib) >= 3 && memcmp(lib->strstart, "lib", 3) == 0) {
+    if (STRING_length(lib) >= 3
+    &&  STRING_ord(interp, lib, 0) == 'l'
+    &&  STRING_ord(interp, lib, 1) == 'i'
+    &&  STRING_ord(interp, lib, 2) == 'b') {
         path = Parrot_str_concat(interp, CONST_STRING(interp, "cyg"),
-            STRING_substr(interp, lib, 3, lib->strlen - 3));
+            STRING_substr(interp, lib, 3, STRING_length(lib) - 3));
 
         *handle = dlopen_string(interp, flags, path);
 
@@ -404,7 +412,7 @@ Parrot_dyn_init_lib(PARROT_INTERP,
 
     /* seems to be a native/NCI lib */
     if (!load_func || !lib_pmc)
-        lib_pmc = Parrot_pmc_new_constant(interp, enum_class_ParrotLibrary);
+        lib_pmc = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
 
     /*  Call init, if it exists */
     if (init_func)
@@ -563,12 +571,12 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
     STRING * const ops      = CONST_STRING(s, "Ops");
 
     STRING * const wo_ext = clone_string_into(d, s,
-        VTABLE_getprop(s, lib_pmc, filename));
+        Parrot_pmc_getprop(s, lib_pmc, filename));
     STRING * const lib_name = clone_string_into(d, s,
-        VTABLE_getprop(s, lib_pmc, libname));
+        Parrot_pmc_getprop(s, lib_pmc, libname));
     void * const handle = VTABLE_get_pointer(s, lib_pmc);
     STRING * const type =
-        VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
+        VTABLE_get_string(s, Parrot_pmc_getprop(s, lib_pmc, type_str));
 
     if (STRING_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
@@ -577,13 +585,12 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
-         PMC * const new_lib_pmc = Parrot_pmc_new_constant(d,
-                                        enum_class_ParrotLibrary);
+         PMC * const new_lib_pmc = Parrot_pmc_new(d, enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), Parrot_pmc_box_string(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), Parrot_pmc_box_string(d, ops));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), Parrot_pmc_box_string(d, lib_name));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), Parrot_pmc_box_string(d, ops));
 
         /* fixup d->all_op_libs, if necessary */
         if (d->n_libs != s->n_libs) {

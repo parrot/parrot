@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -11,7 +11,9 @@ use Parrot::Test;
 use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
+
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 =head1 NAME
 
@@ -34,13 +36,12 @@ plan tests => 2;
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, count;
     void *pi, *pj;
@@ -53,7 +54,7 @@ int main(int argc, char* argv[])
     printf("ok 1\n");
 
     /* Push first pointer */
-    pi = Parrot_pa_insert(interp, pa, &i);
+    pi = Parrot_pa_insert(pa, &i);
 
     if (pa->total_chunks != 1) {
         printf("Fail to allocate 1 chunk");
@@ -69,7 +70,7 @@ int main(int argc, char* argv[])
 
     /* Insert many pointers */
     for (count = CELL_PER_CHUNK * 2; count; count--) {
-        pi = Parrot_pa_insert(interp, pa, &i);
+        pi = Parrot_pa_insert(pa, &i);
     }
     if (pa->total_chunks < 2) {
         printf("Fail to allocate more chunks");
@@ -96,21 +97,20 @@ OUTPUT
 c_output_is( <<'CODE', <<'OUTPUT', "Pointer array (iterating)" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/pointer_array.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    Interp *interp = Parrot_new(NULL);
+    Interp *interp = Parrot_interp_new(NULL);
     Parrot_Pointer_Array *pa = Parrot_pa_new(interp);
     int i, j, k, count = 0;
     void *pi, *pj, *pk;
 
     /* Push first pointer */
-    pi = Parrot_pa_insert(interp, pa, &i);
-    pj = Parrot_pa_insert(interp, pa, &j);
-    pk = Parrot_pa_insert(interp, pa, &k);
+    pi = Parrot_pa_insert(pa, &i);
+    pj = Parrot_pa_insert(pa, &j);
+    pk = Parrot_pa_insert(pa, &k);
 
     POINTER_ARRAY_ITER(pa,
         if (ptr == &i)
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
         else if (ptr == &k)
             ++count;
         else {
-            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            printf("Unknown pointer! %p - %p %p %p", ptr, pi, pj, pk);
             return EXIT_FAILURE;
         }
     );
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         else if (ptr == &k)
             ++count;
         else {
-            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            printf("Unknown pointer! %p - %p %p %p", ptr, pi, pj, pk);
             return EXIT_FAILURE;
         }
     );
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
         if (ptr == &j)
             ++count;
         else {
-            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            printf("Unknown pointer! %p - %p %p %p", ptr, pi, pj, pk);
             return EXIT_FAILURE;
         }
     );
@@ -167,10 +167,10 @@ int main(int argc, char* argv[])
     printf("ok 4\n");
 
     /* Push stuff back. Twice. */
-    pi = Parrot_pa_insert(interp, pa, &i);
-    pi = Parrot_pa_insert(interp, pa, &i);
-    pk = Parrot_pa_insert(interp, pa, &k);
-    pk = Parrot_pa_insert(interp, pa, &k);
+    pi = Parrot_pa_insert(pa, &i);
+    pi = Parrot_pa_insert(pa, &i);
+    pk = Parrot_pa_insert(pa, &k);
+    pk = Parrot_pa_insert(pa, &k);
     POINTER_ARRAY_ITER(pa,
         if (ptr == &i)
             ++count;
@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
         else if (ptr == &k)
             ++count;
         else {
-            printf("Unkown poiner! %p - %p %p %p", ptr, pi, pj, pk);
+            printf("Unknown pointer! %p - %p %p %p", ptr, pi, pj, pk);
             return EXIT_FAILURE;
         }
     );

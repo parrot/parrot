@@ -29,7 +29,7 @@ IMCC helpers.
 #include <stdlib.h>
 
 #include "imc.h"
-#include "parrot/embed.h"
+#include "parrot/parrot.h"
 #include "parrot/longopt.h"
 #include "parrot/runcore_api.h"
 #include "pmc/pmc_callcontext.h"
@@ -43,8 +43,7 @@ extern int yydebug;
 /* defined in imcc.l */
 PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
-/* XXX non-reentrant */
-static Parrot_mutex eval_nr_lock;
+/* XXX non-reentrant because of global variables */
 static INTVAL       eval_nr  = 0;
 
 /* HEADERIZER HFILE: include/imcc/embed.h */
@@ -63,12 +62,6 @@ static void do_pre_process(
 static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
-
-static void imcc_destroy_scanner(
-    ARGMOD(imc_info_t *imcc),
-    yyscan_t yyscanner)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
 
 static yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
@@ -106,8 +99,6 @@ static struct _imc_info_t* prepare_reentrant_compile(
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_get_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -294,23 +285,6 @@ imcc_get_scanner(ARGMOD(imc_info_t *imcc))
     yyscan_t yyscanner;
     yylex_init_extra(imcc, &yyscanner);
     return yyscanner;
-}
-
-/*
-
-=item C<static void imcc_destroy_scanner(imc_info_t *imcc, yyscan_t yyscanner)>
-
-Cleanup and destroy a bison scanner object
-
-=cut
-
-*/
-
-static void
-imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
-{
-    ASSERT_ARGS(imcc_destroy_scanner)
-    yylex_destroy(yyscanner);
 }
 
 /*
@@ -553,8 +527,10 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     ASSERT_ARGS(imcc_run_compilation_internal)
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
-    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
-    INTVAL           success     = 0;
+    PMC      * const old_packfilepmc = Parrot_pf_get_current_packfile(imcc->interp);
+    STRING   * const pf_path = is_file ? source : STRINGNULL;
+    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw, pf_path);
+    INTVAL           success = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
@@ -578,7 +554,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
         /* XXX Parrot_pf_get_packfile_pmc registers PMC */
         Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
-
+        if (!PMC_IS_NULL(old_packfilepmc))
+            Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
         return PMCNULL;
     }
 
@@ -592,6 +569,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, packfilepmc);
     PackFile_fixup_subs(imcc->interp, PBC_POSTCOMP, packfilepmc);
 
+    if (!PMC_IS_NULL(old_packfilepmc))
+        Parrot_pf_set_current_packfile(imcc->interp, old_packfilepmc);
     return packfilepmc;
 }
 
@@ -671,9 +650,6 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
         mem_sys_free(imcc->globals);
 
     mem_sys_free(imcc);
-
-    if (eval_nr != 0)
-        MUTEX_DESTROY(eval_nr_lock);
 }
 
 /*

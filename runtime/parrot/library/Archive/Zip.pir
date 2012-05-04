@@ -4,7 +4,7 @@
 
 Archive::Zip - Provide an interface to ZIP archive files.
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
     load_bytecode 'Archive/Zip.pbc'
 
@@ -21,7 +21,7 @@ Archive::Zip - Provide an interface to ZIP archive files.
     archive.'writeToFileHandle'(fh, 1)
     fh.'close'()
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Partial port of Archive::Zip (version 1.30)
 
@@ -282,7 +282,7 @@ to something different than the given 'fileName'.
 .sub '_writeLocalFileHeader' :method
     .param pmc fh
     .const string LOCAL_FILE_HEADER_SIGNATURE = "PK\x03\x04"
-    $I0 = fh.'puts'(LOCAL_FILE_HEADER_SIGNATURE)
+    $I0 = fh.'print'(LOCAL_FILE_HEADER_SIGNATURE)
     if $I0 goto L1
     .tailcall self.'_ioError'('writing local header signature')
   L1:
@@ -317,17 +317,17 @@ to something different than the given 'fileName'.
     $I0 = length localExtraField
     $S0 = self.'pack_v'($I0)
     header .= $S0
-    $I0 = fh.'puts'(header)
+    $I0 = fh.'print'(header)
     if $I0 goto L2
     .tailcall self.'_ioError'('writing local header')
   L2:
     if fileName == '' goto L3
-    $I0 = fh.'puts'(fileName)
+    $I0 = fh.'print'(fileName)
     if $I0 goto L3
     .tailcall self.'_ioError'('writing local header filename')
   L3:
     if localExtraField == '' goto L4
-    $I0 = fh.'puts'(localExtraField)
+    $I0 = fh.'print'(localExtraField)
     if $I0 goto L4
     .tailcall self.'_ioError'('writing local extra field')
   L4:
@@ -337,7 +337,7 @@ to something different than the given 'fileName'.
 .sub '_writeCentralDirectoryFileHeader' :method
     .param pmc fh
     .const string CENTRAL_DIRECTORY_FILE_HEADER_SIGNATURE = "PK\x01\x02"
-    $I0 = fh.'puts'(CENTRAL_DIRECTORY_FILE_HEADER_SIGNATURE)
+    $I0 = fh.'print'(CENTRAL_DIRECTORY_FILE_HEADER_SIGNATURE)
     if $I0 goto L1
     .tailcall self.'_ioError'('writing central directory header signature')
   L1:
@@ -394,22 +394,22 @@ to something different than the given 'fileName'.
     $P0 = getattribute self, 'writeLocalHeaderRelativeOffset'
     $S0 = self.'pack_V'($P0)
     header .= $S0
-    $I0 = fh.'puts'(header)
+    $I0 = fh.'print'(header)
     if $I0 goto L2
     .tailcall self.'_ioError'('writing central directory header')
   L2:
     unless fileNameLength goto L3
-    $I0 = fh.'puts'(fileName)
+    $I0 = fh.'print'(fileName)
     if $I0 goto L3
     .tailcall self.'_ioError'('writing central directory filename')
   L3:
     unless extraFieldLength goto L4
-    $I0 = fh.'puts'(cdExtraField)
+    $I0 = fh.'print'(cdExtraField)
     if $I0 goto L4
     .tailcall self.'_ioError'('writing central directory extra field')
   L4:
     unless fileCommentLength goto L5
-    $I0 = fh.'puts'(fileComment)
+    $I0 = fh.'print'(fileComment)
     if $I0 goto L5
     .tailcall self.'_ioError'('writing central directory file comment')
   L5:
@@ -455,7 +455,7 @@ to something different than the given 'fileName'.
     $I0 = length localExtraField
     $S0 = self.'pack_v'($I0)
     header .= $S0
-    $I0 = fh.'puts'(header)
+    $I0 = fh.'print'(header)
     if $I0 goto L2
     .tailcall self.'_ioError'('re-writing local header')
   L2:
@@ -551,7 +551,7 @@ to something different than the given 'fileName'.
     if $I0 == AZ_OK goto L4
     .return ($I0)
   L4:
-    writeFh.'puts'($S0)
+    writeFh.'print'($S0)
     $I0 = length $S0
     compressedSize += $I0
     goto L2
@@ -839,7 +839,7 @@ The second arg tells whether or not to try to seek backwards to re-write headers
     .param int CDoffset
     .param int EOCDoffset
     .const string END_OF_CENTRAL_DIRECTORY_SIGNATURE_STRING = "PK\x05\x06"
-    $I0 = fh.'puts'(END_OF_CENTRAL_DIRECTORY_SIGNATURE_STRING)
+    $I0 = fh.'print'(END_OF_CENTRAL_DIRECTORY_SIGNATURE_STRING)
     if $I0 goto L1
     .tailcall self.'_ioError'('writing EOCD Signature')
   L1:
@@ -864,12 +864,12 @@ The second arg tells whether or not to try to seek backwards to re-write headers
     header .= $S0
     $S0 = self.'pack_v'(zipfileCommentLength)
     header .= $S0
-    $I0 = fh.'puts'(header)
+    $I0 = fh.'print'(header)
     if $I0 goto L2
     .tailcall self.'_ioError'('writing EOCD header')
   L2:
     unless zipfileCommentLength goto L3
-    $I0 = fh.'puts'(zipfileComment)
+    $I0 = fh.'print'(zipfileComment)
     if $I0 goto L3
     .tailcall self.'_ioError'('writing zipfile comment')
   L3:

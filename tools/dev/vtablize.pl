@@ -223,8 +223,6 @@ s/^(\s*)(void\s+freeze\(visit_info\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+thaw\(visit_info\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+thaw_finish\(visit_info\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+visit\(visit_info\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(void\s+share\(\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*share_ro\(\)\s+{)/$1VTABLE $2/;
 
 # Local Variables:
 #   mode: cperl

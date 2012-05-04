@@ -19,7 +19,6 @@ Functions controlling Parrot's profiling runcore.
 
 #include "parrot/runcore_api.h"
 #include "parrot/extend.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
 
@@ -28,10 +27,6 @@ Functions controlling Parrot's profiling runcore.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_namespace.h"
-
-#ifdef WIN32
-#  define getpid _getpid
-#endif
 
 #define PPROF_VERSION 2
 

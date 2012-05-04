@@ -16,7 +16,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-.const int TESTS = 55
+.const int TESTS = 63
 .const num PRECISION = 1e-6
 
 .sub 'test' :main
@@ -49,6 +49,7 @@ out-of-bounds test. Checks INT and PMC keys.
     check_interface()
     get_iter()
     'clone'()
+    method_reverse()
 .end
 
 .sub 'creation'
@@ -456,6 +457,42 @@ out-of-bounds test. Checks INT and PMC keys.
 
   clone_evil:
     nok(0, 'clone made an evil clone')
+.end
+
+.sub method_reverse
+    .local pmc array
+    array = new ['ResizableFloatArray']
+    array."reverse"()
+    $I0 = elements array
+    is($I0, 0, "method_reverse - reverse of empty array")
+    push array, 3.
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "3", "method_reverse - reverse of array with one element")
+    push array, 1.
+    array."reverse"()
+    array."reverse"()
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "1", "method_reverse - reverse of array with two elements")
+    $S0 = array[1]
+    is($S0, "3", "method_reverse - reverse of array with two elements second element")
+    push array, 4.5
+    array."reverse"()
+    push array, 5.
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "5134.5", "method_reverse - four elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "4.5315", "method_reverse - four elements second reverse")
+    push array, 6.
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "65134.5", "method_reverse - five elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "4.53156", "method_reverse - five elements second reverse")
 .end
 
 # Local Variables:

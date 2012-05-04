@@ -24,7 +24,7 @@ This file implements various functions for creating and writing packfiles.
 #include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: src/packfile/pf_private.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -64,7 +64,7 @@ PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 {
     ASSERT_ARGS(PackFile_pack_size)
     size_t size;
-    size_t header_size = 0;
+    size_t header_size;
     PackFile_Directory * const dir = &self->directory;
 
     header_size = PACKFILE_HEADER_BYTES;
@@ -118,12 +118,12 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     self->src = cursor;
 
     /* Pack the fixed part of the header */
-    mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
+    memcpy(cursor, self->header, PACKFILE_HEADER_BYTES);
     byte_cursor += PACKFILE_HEADER_BYTES;
 
     /* Pack the UUID. */
     if (self->header->uuid_size > 0)
-        mem_sys_memcopy(byte_cursor, self->header->uuid_data,
+        memcpy(byte_cursor, self->header->uuid_data,
             self->header->uuid_size);
 
     /* Padding. */
@@ -225,6 +225,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+    size += 1 + (self->ntags * 2);
 
     return size;
 }
@@ -276,6 +277,12 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+
+    *cursor++ = self->ntags;
+    for (i = 0; i < self->ntags; i++) {
+        *cursor++ = self->tag_map[i].tag_idx;
+        *cursor++ = self->tag_map[i].const_idx;
+    }
 
     return cursor;
 }

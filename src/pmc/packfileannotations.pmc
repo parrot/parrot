@@ -52,6 +52,7 @@ Initialize PackfileAnnotations.
         Parrot_PackfileAnnotations_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotations_attributes*);
 
+        SUPER();
         attrs->annotations = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         /*
         Don't initialize C<const_table>. It will be set to NULL bu auto_attrs
@@ -180,8 +181,11 @@ PackfileAnnotationKeys.
     METHOD set_directory(PMC *directory) {
         Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
-
         PMC * const iter = VTABLE_get_iter(INTERP, directory);
+
+        /* This should be SUPER(directory), but that doesn't work. */
+        attrs->directory = directory;
+
         while (VTABLE_get_bool(INTERP, iter)) {
             STRING * const name = VTABLE_shift_string(INTERP, iter);
             PMC * const segment = VTABLE_get_pmc_keyed_str(INTERP, directory, name);

@@ -722,6 +722,16 @@ inline op sqrt(out NUM, in NUM) :base_core {
     $1 = sqrt((FLOATVAL)$2);
 }
 
+=item B<is_inf_or_nan>(out INT, in NUM)
+
+Set $1 to 1 if $2 is Inf, -Inf or NaN, and 0 otherwise
+
+=cut
+
+inline op is_inf_or_nan(out INT, in NUM) :base_core {
+    $1 = PARROT_FLOATVAL_IS_INF_OR_NAN($2)
+}
+
 =back
 
 =cut

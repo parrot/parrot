@@ -59,7 +59,7 @@ END:
 
     interpinfo mysub, .INTERPINFO_CURRENT_SUB
     #interpinfo myself, .INTERPINFO_CURRENT_OBJECT
-    getprop source, "CALL", mysub
+    getprop source, mysub, "CALL"
     source()
 
     # close the source
@@ -68,7 +68,6 @@ END:
 
     # mark it as closed
     .local pmc status
-    interpinfo self, .INTERPINFO_CURRENT_OBJECT
     getattribute status, self, 'status'
     status = 0
 .end

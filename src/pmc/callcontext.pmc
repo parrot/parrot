@@ -327,7 +327,7 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
     }
 
     /* exception */
-    return NULL;
+    return STRINGNULL;
 }
 
 /*
@@ -519,7 +519,6 @@ pmclass CallContext provides array provides hash auto_attrs {
     /* for now use a return continuation PMC */
     ATTR PMC      *handlers;           /* local handlers for the context */
     ATTR PMC      *current_cont;       /* the return continuation PMC */
-    ATTR PMC      *current_object;     /* current object if a method call */
     ATTR PMC      *current_namespace;  /* The namespace we're currently in */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR PMC      *current_sig;        /* temporary CallContext PMC for active call */
@@ -546,6 +545,8 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC    *arg_flags;            /* Integer array of argument flags */
     ATTR PMC    *return_flags;         /* Integer array of return flags */
     ATTR Hash   *hash;                 /* Hash of named arguments */
+
+    ATTR PMC    *continuation;          /* Reusable continuation */
 
 /*
 
@@ -620,14 +621,15 @@ Mark any referenced strings and PMCs.
         GET_ATTR_current_cont(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
-        GET_ATTR_current_object(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
         GET_ATTR_current_namespace(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_sig(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
+
+        /* We don't keep reusable continuation alive. It will keep too many
+           other things alive as well. Just NULL it */
+        SET_ATTR_continuation(INTERP, SELF, PMCNULL);
 
         GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
 
@@ -944,10 +946,6 @@ return list of ExceptioHandlers
 
 return current Continuation
 
-=item current_object
-
-return current Object (if in method call)
-
 =item current_namespace
 
 return current Namespace
@@ -978,8 +976,6 @@ return current Namespace
             GET_ATTR_current_sub(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
             GET_ATTR_current_cont(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
-            GET_ATTR_current_object(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
             GET_ATTR_current_namespace(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))
@@ -1146,7 +1142,13 @@ return current Namespace
             return 0;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
-        return autobox_intval(INTERP, &cells[key]);
+        {
+            const Pcc_cell *cell = &cells[key];
+            if (CELL_TYPE_MASK(cell) == INTCELL)
+                return CELL_INT(cell);
+
+            return autobox_intval(INTERP, cell);
+        }
     }
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
@@ -1167,7 +1169,7 @@ return current Namespace
 
         GET_ATTR_num_positionals(INTERP, SELF, num_pos);
         if (key >= num_pos || key < 0)
-            return NULL;
+            return STRINGNULL;
 
         GET_ATTR_positionals(INTERP, SELF, cells);
         return autobox_string(INTERP, &cells[key]);
@@ -1352,8 +1354,12 @@ return current Namespace
             void     * const k    = Parrot_hash_key_from_string(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
+            if (cell) {
+                if (CELL_TYPE_MASK(cell) == INTCELL)
+                    return CELL_INT(cell);
+
                 return autobox_intval(INTERP, cell);
+            }
         }
 
         return 0;
@@ -1387,7 +1393,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed_str(STRING *key) {
@@ -1417,8 +1423,11 @@ return current Namespace
             void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
             Pcc_cell * const cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
 
-            if (cell)
+            if (cell) {
+                if (CELL_TYPE_MASK(cell) == INTCELL)
+                    return CELL_INT(cell);
                 return autobox_intval(INTERP, cell);
+            }
         }
 
         return 0;
@@ -1451,7 +1460,7 @@ return current Namespace
                 return autobox_string(INTERP, cell);
         }
 
-        return NULL;
+        return STRINGNULL;
     }
 
     VTABLE PMC * get_pmc_keyed(PMC *key) {
