@@ -1,0 +1,67 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 Name
+
+pbc_to_exe - Generate executables from Parrot bytecode
+
+=head1 Description
+
+This utility compiles bytecode to native executables. These are called
+"fakecutables", because they are actually just the bytecode packaged up as raw
+data inside a C skeleton.
+
+=head1 Usage
+
+pbc_to_exe [option] <file>
+
+=head2 Command line Options
+
+For help use :
+
+    -h
+    --help
+
+To install use :
+
+    -i
+    --install
+
+To runcore or to change runcore use :
+
+    -R
+    --runcore=slow|fast
+
+For output file use :
+
+    -o
+    --output=FILE
+
+To change garbage collector algorithm use :
+
+    --gc=ms2|gms
+
+C<gms>  is default. C<ms2> is older and slower
+
+=head2 Synopsis
+
+    pbc_to_exe my.pbc
+
+Will generate : 
+
+    my.exe
+
+And 
+ 
+    pbc_to_exe my.pbc --install
+
+Will generate :
+
+    installable_my.exe
+
+=head1 Help
+
+For more help or any other question you go to L<http://parrot.org> or
+L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.
+You are also invited to join the #parrot IRC channel on irc.parrot.org.
+
+=cut

@@ -212,7 +212,7 @@ sub _probe_for_fink {
         my %addl_flags = (
             linkflags => "-L$fink_lib_dir",
             ldflags   => "-L$fink_lib_dir",
-            ccflags   => "-I$fink_include_dir",
+            ccflags   => "-isystem $fink_include_dir",
         );
         return \%addl_flags;
     }
@@ -235,7 +235,7 @@ sub _probe_for_macports {
         my %addl_flags = (
             linkflags => "-L$ports_lib_dir",
             ldflags   => "-L$ports_lib_dir",
-            ccflags   => "-I$ports_include_dir",
+            ccflags   => "-isystem $ports_include_dir",
         );
         return \%addl_flags;
     }

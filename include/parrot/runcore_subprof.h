@@ -1,5 +1,5 @@
-/* runcore_api.h
- *  Copyright (C) 2001-2009, Parrot Foundation.
+/* runcore_subprof.h
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Functions and macros to dispatch opcodes.
  */
@@ -8,7 +8,6 @@
 #define PARROT_RUNCORE_SUBPROF_H_GUARD
 
 
-#include <stdint.h>
 #include "pmc/pmc_sub.h"
 
 typedef struct subprofile subprofile;

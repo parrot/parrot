@@ -1,4 +1,4 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 .sub 'main' :main
     .param pmc args
@@ -13,7 +13,8 @@
     ifh.'open'(infile, 'rb')
     outfh = new ['FileHandle']
     outfh.'open'(outfile, 'wb')
-    print outfh, "#include <stdlib.h>\n\n"
+    print outfh, "#include <stdlib.h>\n"
+    print outfh, "#include \"parrot/api.h\"\n"
     print outfh, "static const unsigned char program_code[] = {"
     size = 0
 

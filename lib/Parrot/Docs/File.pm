@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -287,16 +287,16 @@ If a file contains plain text rather than POD it may be directly linked to.
 sub is_docs_link {
     my $self = shift;
 
-    # TT #1241 - This needs more thought. I'm trying to work out which files
+    # GH #626 - This needs more thought. I'm trying to work out which files
     # it's sensible to link directly to. Suffixes other than txt are a
     # problem (for me at least) because the browser thinks it should
     # download the file.
 
     if ( $self->has_suffix ) {
-        return 0 if $self->suffix !~ m/[Tt][Xx][Tt]/o;
+        return 0 if $self->suffix !~ m/txt/i;
     }
     else {
-        return 1 if $self->name =~ m/^[[:upper:]]+$/o;
+        return 1 if $self->name =~ m/^[[:upper:]]+$/;
     }
 
     return $self->type =~ /Licence|info|docu|Text|TODO|status|MANIFEST|README/;
@@ -327,14 +327,14 @@ sub title {
     $text = $1;
 
     # Tidy it up a bit.
-    $text =~ s/^\s+//o;
-    $text =~ s/\s+$//o;
-    $text =~ s/\s*-$//o;
+    $text =~ s/^\s+//;
+    $text =~ s/\s+$//;
+    $text =~ s/\s*-$//;
 
     # There was not text, just another POD command (=head2 probably).
-    return '' if $text =~ /^=\w/o;
+    return '' if $text =~ /^=\w/;
 
-    return $text unless $text =~ /-/o;
+    return $text unless $text =~ /-/;
 
     # There has to be some space each side of the dash.
     my ( $path, $desc ) = split /\s+--?\s+/, $text, 2;

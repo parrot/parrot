@@ -29,26 +29,6 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-=item C<void Parrot_sub_mark_context_start(void)>
-
-Indicate that a new round of context marking is about to take place.
-
-=cut
-
-*/
-
-static int context_gc_mark = 0;
-
-void
-Parrot_sub_mark_context_start(void)
-{
-    ASSERT_ARGS(Parrot_sub_mark_context_start)
-    if (++context_gc_mark == 0) context_gc_mark = 1;
-}
-
-
-/*
-
 =item C<STRING* Parrot_sub_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
 
 Return namespace, name, and location of subroutine.

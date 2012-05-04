@@ -12,7 +12,7 @@
   tags: 
     - 'PMC'
     - 'experimental'
-  ticket:  'http://trac.parrot.org/parrot/ticket/2034'
+  ticket:  'https://github.com/parrot/parrot/issues/651'
 -
   name:     '"Advanced" NCI parameter types'
   eligible: '3.1'
@@ -23,7 +23,7 @@
 -
   name:     'Pointer, UnManagedStruct, and ManagedStruct'
   eligible: '3.4'
-  ticket:   'http://trac.parrot.org/parrot/ticket/2035'
+  ticket:   'https://github.com/parrot/parrot/issues/657'
 -
   name:  'add write barrier to all PMCs that write in unusual VTABLE functions'
   eligible:  '3.4'
@@ -44,7 +44,7 @@
   detection:
     regex:
       pir: '^ ".sub" .+ ":init"'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1896'
+  ticket:  'https://github.com/parrot/parrot/issues/469'
 -
   name:  '":load" and ":init" Sub flags doing different things'
   eligible:  '3.1'
@@ -63,9 +63,9 @@
     - 'PIR'
     - 'syntax'
   tickets:
-    - 'https://trac.parrot.org/parrot/ticket/1033'
-    - 'https://trac.parrot.org/parrot/ticket/1704'
-    - 'https://trac.parrot.org/parrot/ticket/1705'
+    - 'https://github.com/parrot/parrot/issues/600'
+    - 'https://github.com/parrot/parrot/issues/571'
+    - 'https://github.com/parrot/parrot/issues/578'
 -
   name:  'Action methods in rules'
   note:  'Per Synopsis 5, all regexes will have an implied {*} token at the end which cause invocation of an action method if a ":action" object is supplied.'
@@ -79,7 +79,7 @@
   tags:
     - 'library'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1598'
+  ticket:  'https://github.com/parrot/parrot/issues/375'
 -
   name:  'Assigning to registers in parrot_debugger'
   tags:
@@ -112,13 +112,13 @@
   detection:
     regex:
       pir: 'new\s\[?\''Complex\''\]?'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1892'
+  ticket:  'https://github.com/parrot/parrot/issues/462'
 -
   name:  'Cross-HLL library loading'
   tags:
     - 'library'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/754'
+  ticket:  'https://github.com/parrot/parrot/issues/266'
 -
   name:  'GC timely destruction'
   eligible:  '3.1'
@@ -126,14 +126,14 @@
   tags:
     - 'deprecated'
     - 'functions'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1800'
+  ticket:  'https://github.com/parrot/parrot/issues/278'
 -
   name:  'GC_SYS_NAME option to interpinfo_s_i'
   note:  'Ability to get the string name of the current GC core from the interpinfo_s_i. See r43900 and r43904 for details.'
   tags:
     - 'Opcodes'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1581'
+  ticket:  'https://github.com/parrot/parrot/issues/347'
 -
   name:  'IPv6 Support'
   tags:
@@ -146,13 +146,13 @@
   tags:
     - 'deprecated'
     - 'library'
-  ticket:  'https://trac.parrot.org/parrot/ticket/508'
+  ticket:  'https://github.com/parrot/parrot/issues/494'
 -
   name:  'LWP, https::Message, URI & URI::Escape'
   tags:
     - 'library'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1637'
+  ticket:  'https://github.com/parrot/parrot/issues/431'
 -
   name:  'ManagedStruct reallocations based on shape changes'
   eligible:  '2.4'
@@ -160,13 +160,13 @@
   tags:
     - 'deprecated'
     - 'PMC'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1554'
+  ticket:  'https://github.com/parrot/parrot/issues/319'
 -
   name:  'MappedByteArray PMC'
   tags:
     - 'PMC'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1877'
+  ticket:  'https://github.com/parrot/parrot/issues/420'
 -
   name:  'Meta-model implementation used by PCT'
   eligible:  '2.7'
@@ -189,7 +189,7 @@
   tags:
     - 'opcodes'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1582'
+  ticket:  'https://github.com/parrot/parrot/issues/354'
 -
   name:  'OpenGL bindings and libraries'
   tags:
@@ -227,7 +227,7 @@
   tags:
     - 'deprecated'
     - 'compiler'
-  ticket:  'https://trac.parrot.org/parrot/ticket/463'
+  ticket:  'https://github.com/parrot/parrot/issues/464'
 -
   name:  'PCT::HLLCompiler stages'
   eligible:  '1.1'
@@ -256,7 +256,7 @@
   tags:
     - 'PMC'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1599'
+  ticket:  'https://github.com/parrot/parrot/issues/382'
 -
   name:  'Parrot_load_bytecode_file'
   note:  'Load a .pbc file into the interpreter. Experimental.'
@@ -310,7 +310,7 @@
   tags:
     - 'deprecated'
     - 'PMC'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1553'
+  ticket:  'https://github.com/parrot/parrot/issues/311'
 -
   name:  'UnManagedStruct handling nested structure'
   eligible:  '2.4'
@@ -318,7 +318,7 @@
   tags:
     - 'PMC'
     - 'deprecated'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1551'
+  ticket:  'https://github.com/parrot/parrot/issues/298'
 -
   name:  'UnManagedStruct initializer structure'
   eligible:  '2.4'
@@ -326,7 +326,7 @@
   tags:
     - 'deprecated'
     - 'PMC'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1552'
+  ticket:  'https://github.com/parrot/parrot/issues/305'
 -
   name:  'charset, charsetname, find_charset, trans_charset'
   eligible:  '2.10'
@@ -352,7 +352,7 @@
   tags:
     - 'deprecated'
     - 'opcodes'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1565'
+  ticket:  'https://github.com/parrot/parrot/issues/340'
 -
   name:  'finalize'
   note:  'Finalize exception handler, unrolling inner runloops if needed.'
@@ -377,7 +377,7 @@
   tags:
     - 'deprecated'
     - 'opcodes'
-  ticket:  'https://trac.parrot.org/parrot/ticket/218'
+  ticket:  'https://github.com/parrot/parrot/issues/303'
 -
   name:  'get_results opcode order and features'
   eligible:  '2.1'
@@ -411,7 +411,7 @@
   tags:
     - 'opcodes'
     - 'experimental'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1583'
+  ticket:  'https://github.com/parrot/parrot/issues/361'
 -
   name:  'logical PMC ops'
   eligible:  '2.7'
@@ -434,7 +434,7 @@
   tags:
     - 'deprecated'
     - 'functions'
-  ticket:  'https://trac.parrot.org/parrot/ticket/907'
+  ticket:  'https://github.com/parrot/parrot/issues/460'
 -
   name:  'multiple dispatch within core PMC'
   eligible:  '1.1'
@@ -449,7 +449,7 @@
   tags:
     - 'deprecated'
     - 'opcodes'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1548'
+  ticket:  'https://github.com/parrot/parrot/issues/291'
 -
   name:  'opcode numbering'
   tags:
@@ -464,7 +464,7 @@
   tags:
     - 'deprecated'
     - 'opcodes'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1697'
+  ticket:  'https://github.com/parrot/parrot/issues/550'
 -
   name:  'packfile structure'
   tags:
@@ -486,7 +486,7 @@
   tags:
     - 'experimental'
     - 'functions'
-  ticket:  'https://trac.parrot.org/parrot/ticket/1996'
+  ticket:  'https://github.com/parrot/parrot/issues/602'
 -
   name:  'LANG search path with -L'
   tags:
@@ -508,7 +508,7 @@
   name :  'Eval PMC'
   tags:
     - 'deprecated'
-  ticket: 'http://trac.parrot.org/parrot/ticket/1969'
+  ticket: 'https://github.com/parrot/parrot/issues/567'
 -
   name :  'PackFile_* API functions'
   tags :
@@ -524,7 +524,7 @@
   name : 'load_bytecode_p_s opcode'
   tags :
     - 'experimental'
-  ticket : 'http://trac.parrot.org/parrot/ticket/2146'
+  ticket : 'https://github.com/parrot/parrot/issues/435'
 -
   name : 'FixedPMCArray.set_pmc'
   eligible : '3.1'
@@ -535,7 +535,7 @@
 -
   name : 'Scalar PMC'
   note : 'The Scalar PMC can be removed, so long as the behaviors of PMCs which inherit from it do not change.'
-  ticket : 'https://trac.parrot.org/parrot/ticket/1754'
+  ticket : 'https://github.com/parrot/parrot/issues/672'
   eligible : '3.1'
 -
   name : 'encoding:charset:"" string literals'
@@ -551,11 +551,11 @@
   name : 'PIR compiler availability'
   eligible : '3.1'
   note : 'The PIR compiler (currently IMCC) will be extracted to a separately loadable component.'
-  ticket : 'http://trac.parrot.org/parrot/ticket/1868'
+  ticket : 'https://github.com/parrot/parrot/issues/406'
 -
   name : '"constant" PObj'
   eligible : '3.1'
-  note :
+  note: 
     "constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
     should be properly marked during GC.
 
@@ -571,7 +571,7 @@
 -
   name : 'Non-const STRING* arguments'
   eligible : '3.1'
-  note :
+  note : 
     Due to the immutable nature of STRINGs we are changing the internal handling to use only
     const STRING pointers. This will improve optimizations possibilities for compilers,
     and make parrot const-correct.
@@ -579,12 +579,12 @@
     Passing of non-const STRING* arguments is deprecated and will be changed to
     const STRING*. This includes (but is not limited to) all string API functions,
     VTABLEs, PCC, etc
-  ticket : 'http://trac.parrot.org/parrot/ticket/1906'
+  ticket : 'https://github.com/parrot/parrot/issues/483'
 -
   name : 'X-to-Y native PBC reading'
   eligible : '3.1'
   note : 'Support for PBC files optimized for alternate platforms will be dropped in favour of a universal network PBC format.'
-  ticket : 'https://trac.parrot.org/parrot/ticket/1961'
+  ticket : 'https://github.com/parrot/parrot/issues/553'
 -
   name : 'The PIR and PASM compreg PMCs'
   eligible : '3.1'
@@ -595,5 +595,26 @@
     
     There will not be a PASM compreg anymore.
   ticket : 'http://trac.parrot.org/parrot/ticket/1967'
+-
+  name : 'Interpreter API cleanup'
+  note :
+    All functions that were defined in parrot/interpreter.h have been renamed in order
+    to follow the project's coding standards.
 
+    Functions that began with "Parrot_" now begin with "Parrot_interp_"
+    For example, function C<Parrot_new> has been renamed to C<Parrot_interp_new>.
+
+    Also, "Parrot_interp_" has been prepended to all functions that didn't begin with
+    "Parrot_" for consistency. For example, function C<allocate_interpreter> has been
+    renamed to C<Parrot_interp_allocate_interpreter>.
+
+    Other than the above changes, the below functions were also renamed to make their
+    purpose more clear:
+        * C<interpinfo> -> C<Parrot_interp_info>
+        * C<Parrot_int_get_interp_from_pmc> -> C<Parrot_interp_get_from_pmc>
+  tags:
+    - api
+    - deprecated
+    - completed
+  ticket: 'http://trac.parrot.org/parrot/ticket/443'
 

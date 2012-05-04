@@ -45,7 +45,7 @@ Tests the metamodel for the OO implementation.
     $P1 = attributes['tail']
     $S1 = $P1['type']
     $I0 = iseq $S1, 'Str'
-    todo($I0, "tail attribute has a type", "not implemented: TT #1618")
+    todo($I0, "tail attribute has a type", "not implemented: GH #410")
 #    is($S1,'Str', "tail attribute has a type")
     goto end_tail_attrib_test
   no_tail_attribute:

@@ -402,7 +402,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
     else {
         PMC   * const clone = VTABLE_clone(interp, $2);
         /* Preserve the metadata on the destination. */
-        PMC   * const meta  = VTABLE_getprops(interp, $1);
+        PMC   * const meta  = Parrot_pmc_getprops(interp, $1);
         /* We have to preserve GC flags of original PMC */
         const Parrot_UInt gc_flags = $1->flags & PObj_GC_all_FLAGS;
 
@@ -428,7 +428,7 @@ inline op copy(inout PMC, invar PMC) :base_mem {
             while (VTABLE_get_bool(interp, iter)) {
                 STRING * const key = VTABLE_shift_string(interp, iter);
                 PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
-                VTABLE_setprop(interp, $1, key, value);
+                Parrot_pmc_setprop(interp, $1, key, value);
             }
         }
     }

@@ -1,31 +1,31 @@
-# Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2010-2012, Parrot Foundation.
 
-#=head1 green_threads.pir
-#
-#Provides an implementation of preempting green threads in pure PIR.#
-#
-#=head1 Summary
-#
-# include 'green_threads.pir'
-# gt_init()
-# gt_spawn(sub1, arg1)
-# gt_spawn(sub2, arg1, arg2)
-#
-#=head2 gt_init ()
-#
-# Initialize green threads so they'll actually work.
-#
-#=head2 gt_spawn (my_sub, ...)
-#
-# Asyncronously run my_sub(...)
-#
-#=head2 gt_exit ()
-#
-# Exit the current green thread.
-#
-#=cut
-#
+=head1 green_threads.pir
+
+Provides an implementation of preempting green threads in pure PIR.
+
+=head1 Summary
+
+    include 'green_threads.pir'
+
+    gt_init()
+    gt_spawn(sub1, arg1)
+    gt_spawn(sub2, arg1, arg2)
+
+=head2 gt_init ()
+
+Initialize green threads so they'll actually work.
+
+=head2 gt_spawn (my_sub, ...)
+
+Asyncronously run my_sub(...)
+
+=head2 gt_exit ()
+
+Exit the current green thread.
+
+=cut
+
 
 .include 'interpinfo.pasm'
 .include 'timer.pasm'

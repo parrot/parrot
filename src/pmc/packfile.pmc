@@ -507,7 +507,7 @@ start of the packfile.
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);
-        PMC * const view = Parrot_pf_get_packfile_pmc(INTERP, pf);
+        PMC * const view = Parrot_pf_get_packfile_pmc(INTERP, pf, STRINGNULL);
         RETURN(PMC * view);
     }
 

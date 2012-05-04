@@ -103,12 +103,6 @@ typedef enum {
 #define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
 /*
- * a flag to signal a Sub that a new Continuation should be created
- */
-
-#define NEED_CONTINUATION ((PMC *)1)
-
-/*
  * maximum sub recursion depth
  */
 
@@ -241,7 +235,6 @@ INTVAL Parrot_sub_get_line_from_pc(PARROT_INTERP,
     ARGIN_NULLOK(opcode_t *pc))
         __attribute__nonnull__(1);
 
-void Parrot_sub_mark_context_start(void);
 #define ASSERT_ARGS_Parrot_get_sub_pmc_from_subclass \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -281,7 +274,6 @@ void Parrot_sub_mark_context_start(void);
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_sub_get_line_from_pc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_sub_mark_context_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/sub.c */
 

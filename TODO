@@ -1,9 +1,9 @@
 
-All todo items should have a corresponding trac ticket. See the current list:
+All todo items should have a corresponding github issue. See the current list:
 
- https://trac.parrot.org/parrot/report/9
+ https://github.com/parrot/parrot/issues?labels=todo
 
 To open a new todo ticket, use
 
- https://trac.parrot.org/
+ https://github.com/parrot/parrot/issues/new
 

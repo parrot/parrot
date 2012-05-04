@@ -292,6 +292,10 @@ To run parrot under Valgrind, the following argument set should be helpful:
 
 (adapted from a post to C<parrot-porters> by chromatic).
 
+See also the F<tools/dev/vgp> and F<tools/dev/parrot.supp> files. C<vgp>
+is a wrapper around running parrot with valgrind and uses a custom set
+of "valgrind suppressions".
+
 =head2 IMCC cleanup
 
 From #parrot:
@@ -367,6 +371,6 @@ Paul Cochrane a.k.a. ptc; original document by Andy Lester
 =head1 SEE ALSO
 
 F<docs/project/roles_responsibilities.pod>, F<RESPONSIBLE_PARTIES>
-and the list of Cage items in Trac L<http://trac.parrot.org>.
+and the list of Cage items in github L<https://github.com/parrot/parrot/issues?labels=cage&state=open>.
 
 =cut

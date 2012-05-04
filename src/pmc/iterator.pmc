@@ -60,7 +60,7 @@ in that aggregate.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass Iterator no_ro {
+pmclass Iterator no_ro provides iterator {
 
 /*
 

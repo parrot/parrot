@@ -40,13 +40,13 @@ c_output_is( <<'CODE', <<'OUTPUT', "print_pbc_location" );
 int
 main(int argc, const char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     int error_val;
 
     if (interp) {
         print_pbc_location(interp);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
     }
     return 0;
 }
@@ -61,7 +61,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Parrot_warn" );
 int
 main(int argc, const char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     int error_val;
 
     if (interp) {
@@ -89,7 +89,7 @@ main(int argc, const char* argv[])
         error_val = Parrot_warn(interp, 0, "eek"); /* should return error */
         Parrot_io_eprintf(interp, "%d\n", error_val);
 
-        Parrot_destroy(interp);
+        Parrot_interp_destroy(interp);
    }
    return 0;
 }

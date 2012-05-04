@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -73,6 +73,12 @@ static void throw_illegal_escape(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+  Buffer size for hexadecimal conversions:
+  Expected at most 8 characters plus room for some prefixes and suffixes.
+*/
+#define HEX_BUF_SIZE 16
 
 /*
 
@@ -352,7 +358,7 @@ Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         Parrot_gc_allocate_string_storage(interp, result, alloc_size);
 
         /* and copy it over */
-        mem_sys_memcopy(result->strstart, s->strstart, alloc_size);
+        memcpy(result->strstart, s->strstart, alloc_size);
     }
 
     result->bufused  = alloc_size;
@@ -498,7 +504,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         PObj_is_string_copy_CLEAR(dest);
 
         /* Append b */
-        mem_sys_memcopy(dest->strstart + dest->bufused,
+        memcpy(dest->strstart + dest->bufused,
                 b->strstart, b->bufused);
 
         dest->encoding = enc;
@@ -516,10 +522,10 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         dest->encoding = enc;
 
         /* Copy A first */
-        mem_sys_memcopy(dest->strstart, a->strstart, a->bufused);
+        memcpy(dest->strstart, a->strstart, a->bufused);
 
         /* Tack B on the end of A */
-        mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + a->bufused),
+        memcpy((void *)((ptrcast_t)dest->strstart + a->bufused),
                 b->strstart, b->bufused);
     }
 
@@ -613,7 +619,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 {
     ASSERT_ARGS(Parrot_str_new_constant)
     DECL_CONST_CAST;
-    Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
+    Hash   * const cstring_cache = interp->const_cstring_hash;
     STRING *s                    = (STRING *)Parrot_hash_get(interp,
                                         cstring_cache, buffer);
 
@@ -675,7 +681,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
     Parrot_gc_allocate_string_storage(interp, s, len);
 
     if (buffer && len) {
-        mem_sys_memcopy(s->strstart, buffer, len);
+        memcpy(s->strstart, buffer, len);
         s->bufused = len;
         STRING_scan(interp, s);
     }
@@ -1029,7 +1035,7 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         char *             destpos = dest->strstart;
         const char * const srcpos  = s->strstart;
         for (i = 0; i < num; ++i) {
-            mem_sys_memcopy(destpos, srcpos, length);
+            memcpy(destpos, srcpos, length);
             destpos += length;
         }
 
@@ -1094,7 +1100,7 @@ Parrot_str_iter_substr(PARROT_INTERP,
     ASSERT_ARGS(Parrot_str_iter_substr)
     STRING * const dest = Parrot_str_copy(interp, str);
 
-    dest->strstart = (char *)dest->strstart + l->bytepos;
+    dest->strstart += l->bytepos;
 
     if (r == NULL) {
         dest->bufused = str->bufused - l->bytepos;
@@ -1285,15 +1291,15 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     dest->bufused = buf_size;
 
     /* Copy begin of string */
-    mem_sys_memcopy(dest->strstart, src->strstart, start_byte);
+    memcpy(dest->strstart, src->strstart, start_byte);
 
     /* Copy the replacement in */
-    mem_sys_memcopy((char *)dest->strstart + start_byte, rep->strstart,
+    memcpy(dest->strstart + start_byte, rep->strstart,
             rep->bufused);
 
     /* Copy the end of old string */
-    mem_sys_memcopy((char *)dest->strstart + start_byte + rep->bufused,
-            (char *)src->strstart + end_byte,
+    memcpy(dest->strstart + start_byte + rep->bufused,
+            src->strstart + end_byte,
             src->bufused - end_byte);
 
     dest->strlen  = src->strlen - (end_char - start_char) + rep->strlen;
@@ -2079,7 +2085,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 /* powl() could be used here, but it is an optional POSIX extension that
    needs to be checked for at Configure-time.
 
-   See https://trac.parrot.org/parrot/ticket/1176 for more details. */
+   See https://github.com/parrot/parrot/issues/451 for more details. */
 
 #  define POW pow
 
@@ -2271,7 +2277,7 @@ Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
     const size_t size = Buffer_buflen(s);
     char * const memory = (char *)mem_internal_allocate(size);
 
-    mem_sys_memcopy(memory, Buffer_bufstart(s), size);
+    memcpy(memory, Buffer_bufstart(s), size);
     Buffer_bufstart(s) = memory;
     s->strstart        = memory;
 
@@ -2317,7 +2323,7 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
     Parrot_block_GC_sweep(interp);
     Parrot_gc_allocate_string_storage(interp, s, size);
     Parrot_unblock_GC_sweep(interp);
-    mem_sys_memcopy(Buffer_bufstart(s), memory, size);
+    memcpy(Buffer_bufstart(s), memory, size);
 
     /* Mark the memory as neither immobile nor system allocated */
     PObj_sysmem_CLEAR(s);
@@ -2430,7 +2436,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     STRING      *result;
     UINTVAL      i, len, charlen;
     String_iter  iter;
-    char         hex_buf[16];
+    char         hex_buf[HEX_BUF_SIZE];
     char        *dp;
 
     if (STRING_IS_NULL(src))
@@ -2444,8 +2450,8 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     /* expect around 2x the chars */
     charlen = 2 * len;
 
-    if (charlen < 16)
-        charlen = 16;
+    if (charlen < HEX_BUF_SIZE)
+        charlen = HEX_BUF_SIZE;
 
     /* create ascii result */
     result = Parrot_str_new_init(interp, NULL, charlen,
@@ -2463,7 +2469,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             /* process ASCII chars */
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
-                charlen += len * 2 + 16;
+                charlen += len * 2 + HEX_BUF_SIZE;
                 result->bufused = i;
                 Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
@@ -2517,23 +2523,23 @@ Parrot_str_escape_truncate(PARROT_INTERP,
         /* escape by appending either \uhhhh or \x{hh...} */
 
         if (c < 0x0100 || c >= 0x10000)
-            hex_len = snprintf(hex_buf, 15, "\\x{%x}", c);
+            hex_len = snprintf(hex_buf, HEX_BUF_SIZE - 1, "\\x{%x}", c);
         else
-            hex_len = snprintf(hex_buf, 15, "\\u%04x", c);
+            hex_len = snprintf(hex_buf, HEX_BUF_SIZE - 1, "\\u%04x", c);
 
         if (hex_len < 0)
             hex_len = 0;
 
         if (i + hex_len > charlen) {
             /* resize - still len codepoints to go */
-            charlen += len * 2 + 16;
+            charlen += len * 2 + HEX_BUF_SIZE;
             result->bufused = i;
             Parrot_gc_reallocate_string_storage(interp, result, charlen);
             /* start can change */
             dp = result->strstart;
         }
 
-        mem_sys_memcopy(dp + i, hex_buf, hex_len);
+        memcpy(dp + i, hex_buf, hex_len);
 
         /* adjust our insert idx */
         i += hex_len;

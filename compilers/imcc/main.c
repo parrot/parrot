@@ -63,12 +63,6 @@ static void imcc_destroy_macro_values(ARGMOD(void *value))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*value);
 
-static void imcc_destroy_scanner(
-    ARGMOD(imc_info_t *imcc),
-    yyscan_t yyscanner)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*imcc);
-
 static yyscan_t imcc_get_scanner(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
@@ -105,8 +99,6 @@ static struct _imc_info_t* prepare_reentrant_compile(
     , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_destroy_macro_values __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_imcc_destroy_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_get_scanner __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_run_compilation_internal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -293,23 +285,6 @@ imcc_get_scanner(ARGMOD(imc_info_t *imcc))
     yyscan_t yyscanner;
     yylex_init_extra(imcc, &yyscanner);
     return yyscanner;
-}
-
-/*
-
-=item C<static void imcc_destroy_scanner(imc_info_t *imcc, yyscan_t yyscanner)>
-
-Cleanup and destroy a bison scanner object
-
-=cut
-
-*/
-
-static void
-imcc_destroy_scanner(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner)
-{
-    ASSERT_ARGS(imcc_destroy_scanner)
-    yylex_destroy(yyscanner);
 }
 
 /*
@@ -553,8 +528,9 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     yyscan_t yyscanner = imcc_get_scanner(imcc);
     PackFile * const pf_raw      = PackFile_new(imcc->interp, 0);
     PMC      * const old_packfilepmc = Parrot_pf_get_current_packfile(imcc->interp);
-    PMC      * const packfilepmc     = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw);
-    INTVAL           success     = 0;
+    STRING   * const pf_path = is_file ? source : STRINGNULL;
+    PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw, pf_path);
+    INTVAL           success = 0;
 
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */

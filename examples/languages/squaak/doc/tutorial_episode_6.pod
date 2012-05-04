@@ -89,7 +89,7 @@ And we need to add it to rule stat_or_def:
      | <sub_definition>
  }
 
-Appropriately modifying the action method is simple. It's analogous to the action method for
+Update the stat_or_def action method yourself now. It's analogous to the action method for
 expression.
 
 "**" is the repetition specifier; "<identifier> ** ','" matches <identifier> separated by commas.

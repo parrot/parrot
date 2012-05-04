@@ -25,10 +25,6 @@ src/runcore/subprof.c - Parrot's subroutine-level profiler
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-#ifdef WIN32
-#  define getpid _getpid
-#endif
-
 /* HEADERIZER HFILE: include/parrot/runcore_subprof.h */
 
 /* HEADERIZER BEGIN: static */
@@ -141,15 +137,16 @@ static opcode_t * runops_subprof_sub_core(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static INTVAL * sptodebug(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
-    ARGIN(subprofile *sp))
+    ARGMOD(subprofiledata *spdata),
+    ARGIN(const subprofile *sp))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*spdata);
 
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
-static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -261,7 +258,7 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 
 /*
 
-=item C<static INTVAL * sptodebug(PARROT_INTERP, subprofiledata *spdata,
+=item C<static INTVAL * sptodebug(PARROT_INTERP, subprofiledata *spdata, const
 subprofile *sp)>
 
 Unpacks the debug segment data into an array indexed by the opcode offset.
@@ -273,7 +270,7 @@ Hashes the result in spdata->seg2debug.
 
 PARROT_CANNOT_RETURN_NULL
 static INTVAL *
-sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
+sptodebug(PARROT_INTERP, ARGMOD(subprofiledata *spdata), ARGIN(const subprofile *sp))
 {
     ASSERT_ARGS(sptodebug)
 
@@ -295,7 +292,7 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
     xdebug = (INTVAL *)mem_sys_allocate_zeroed(code_size * sizeof (INTVAL));
     for (di = 0, op = 0; op < code_size && di < debug_size; di++) {
-        op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
+        const op_info_t * const op_info  = sp->subattrs->seg->op_info_table[*base_pc];
         opcode_t opsize = op_info->op_count;
         ADD_OP_VAR_PART(interp, sp->subattrs->seg, base_pc, opsize);
         base_pc += opsize;
@@ -306,14 +303,14 @@ sptodebug(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
         debug_ops++;
     }
     while (op < code_size)
-      xdebug[op++] = -2;
+        xdebug[op++] = -2;
     Parrot_hash_put(interp, spdata->seg2debug, (void*)sp->subattrs->seg, (void*)xdebug);
     return xdebug;
 }
 
 /*
 
-=item C<static char * str2cs(PARROT_INTERP, STRING *s)>
+=item C<static char * str2cs(PARROT_INTERP, const STRING *s)>
 
 Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 
@@ -324,7 +321,7 @@ Convert a STRING* to a char*, or a STRINGNULL to "STRINGNULL".
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static char *
-str2cs(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(str2cs)
 
@@ -1055,6 +1052,9 @@ Returns a high-resolution number representing how long Parrot has been running.
 */
 
 #if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+
+#  include <stdint.h>
+
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {
@@ -1321,7 +1321,7 @@ Parrot_runcore_subprof_sub_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_sub");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_SUB_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_sub_core;
     coredata->prepare_run = NULL;
@@ -1458,7 +1458,7 @@ Parrot_runcore_subprof_hll_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_hll");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_HLL_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_hll_core;
     coredata->prepare_run = NULL;
@@ -1556,7 +1556,7 @@ Parrot_runcore_subprof_ops_init(PARROT_INTERP)
     Parrot_subprof_runcore_t * const coredata
                           = mem_gc_allocate_zeroed_typed(interp, Parrot_subprof_runcore_t);
     coredata->name        = CONST_STRING(interp, "subprof_ops");
-    coredata->id          = PARROT_SLOW_CORE;
+    coredata->id          = PARROT_SUBPROF_OPS_CORE;
     coredata->opinit      = PARROT_CORE_OPLIB_INIT;
     coredata->runops      = runops_subprof_ops_core;
     coredata->prepare_run = NULL;

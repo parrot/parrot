@@ -368,7 +368,7 @@ done:
     s = concat s, ':'
     aux = join '-', arr
     s = concat s, aux
-    is(s, 'ssRPA:z-p-a', "sort works in a pir subclass, TT #218")
+    is(s, 'ssRPA:z-p-a', "sort works in a pir subclass, GH #303")
 .end
 
 .sub compare_reverse

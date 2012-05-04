@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,6 +24,9 @@ static volatile FLOATVAL alarm_set_to = 0.0;
 #else
 #  include <sys/time.h>
 #  include <signal.h>
+#  ifdef PARROT_HAS_HEADER_PTHREAD
+#    include <pthread.h>
+#  endif
 #endif
 #include <errno.h>
 
@@ -50,8 +53,6 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 =cut
 
 */
-
-void Parrot_alarm_callback(SHIM(int sig_number));
 
 void
 Parrot_alarm_init(void)

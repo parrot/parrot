@@ -96,7 +96,7 @@ void Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 void Parrot_cx_outer_runloop(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
     ARGIN(PMC *scheduler),
     ARGIN(opcode_t *next))
