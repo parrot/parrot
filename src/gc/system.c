@@ -435,6 +435,9 @@ areas.
 
 */
 
+#if defined(__clang__) && defined(__has_feature) && __has_feature(address_sanitizer)
+__attribute__((no_address_safety_analysis))
+#endif
 static void
 trace_mem_block(PARROT_INTERP,
         ARGIN_NULLOK(const Memory_Pools *mem_pools),
