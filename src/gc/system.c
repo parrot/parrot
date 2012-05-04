@@ -57,6 +57,7 @@ static size_t get_min_pmc_address(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 static void trace_mem_block(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools),
     size_t lo_var_ptr,
@@ -435,11 +436,7 @@ areas.
 
 */
 
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(address_sanitizer)
-__attribute__((no_address_safety_analysis))
-#endif
-#endif
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 static void
 trace_mem_block(PARROT_INTERP,
         ARGIN_NULLOK(const Memory_Pools *mem_pools),
