@@ -102,7 +102,7 @@ Parrot_api_string_export_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
         cstr = Parrot_str_to_cstring(interp, string);
         len = strlen(cstr);
 
-        wstrout = (wchar_t *) malloc(sizeof (wchar_t) * len + 1);
+        wstrout = (wchar_t *) malloc(sizeof (wchar_t) * (len + 1));
         mbstowcs(wstrout, cstr, len);
         wstrout[len] = L'\0';
 
