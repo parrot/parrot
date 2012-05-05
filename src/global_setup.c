@@ -24,6 +24,7 @@ I<What are these global variables?>
 #include "parrot/parrot.h"
 #include "parrot/oplib/core_ops.h"
 #include "global_setup.str"
+#include "parrot/api.h"
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
@@ -179,6 +180,9 @@ init_world(PARROT_INTERP)
     ASSERT_ARGS(init_world)
     PMC *iglobals, *self, *pmc;
 
+    /* Check assumptions about our config */
+    PARROT_STATIC_ASSERT(sizeof (INTVAL) == sizeof (opcode_t));
+
     Parrot_platform_init_code();
 
     /* Call base vtable class constructor methods */
@@ -214,10 +218,10 @@ init_world(PARROT_INTERP)
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pointer(interp, pmc, Parrot_hash_create(interp, enum_type_PMC, Hash_key_type_PMC));
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_NCI_FUNCS, pmc);
-#if PARROT_HAS_CORE_NCI_THUNKS
+#ifdef PARROT_HAS_CORE_NCI_THUNKS
     Parrot_nci_load_core_thunks(interp);
 #endif
-#if PARROT_HAS_EXTRA_NCI_THUNKS
+#ifdef PARROT_HAS_EXTRA_NCI_THUNKS
     Parrot_nci_load_extra_thunks(interp);
 #endif
 #ifdef PARROT_HAS_LIBFFI
@@ -248,7 +252,7 @@ Parrot_gbl_setup_2(PARROT_INTERP)
         interp->op_hash = interp->parent_interpreter->op_hash;
     }
     else {
-        op_lib_t  *core_ops = PARROT_CORE_OPLIB_INIT(interp, 1);
+        op_lib_t * const core_ops = PARROT_CORE_OPLIB_INIT(interp, 1);
         interp->op_hash     = Parrot_hash_create_sized(interp, enum_type_ptr,
                                     Hash_key_type_cstring, core_ops->op_count);
         parrot_hash_oplib(interp, core_ops);

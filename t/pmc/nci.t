@@ -1306,11 +1306,7 @@ ok
 got null
 OUTPUT
 
-  # Tests with callback functions
-  my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
-    ( todo => 'TT #1316, add scheduler tasks to JIT' ) : ();
-
-  pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM', @todo );
+  pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
 .pcc_sub :main main:
 
   # we need a flag if the call_back is already done
@@ -1370,7 +1366,7 @@ external data: succeeded
 done.
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR", @todo );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR" );
 
 .sub test :main
 
@@ -1444,7 +1440,7 @@ external data: succeeded
 the callback has run
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM', @todo );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM' );
 .pcc_sub :main main:
   # we need a flag if the call_back is already done
   new P10, ['Integer']
@@ -1504,7 +1500,7 @@ external data: 77
 done.
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR", @todo );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR" );
 
 
 .include "datatypes.pasm"
@@ -1591,7 +1587,7 @@ external data: 99
 the callback has run
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM', @todo );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM' );
 .pcc_sub :main main:
 
   # we need a flag if the call_back is already done
@@ -1651,7 +1647,7 @@ external data: succeeded
 done.
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PASM', @todo );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PASM' );
 .pcc_sub :main main:
   # we need a flag if the call_back is already done
   new P10, ['Integer']
@@ -1711,7 +1707,7 @@ external data: 88
 done.
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR", @todo );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR" );
 
 .sub test :main
 
@@ -1785,7 +1781,7 @@ external data: 88
 the callback has run
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR", @todo );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR" );
 
 
 .include "datatypes.pasm"

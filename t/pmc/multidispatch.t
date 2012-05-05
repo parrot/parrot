@@ -640,7 +640,7 @@ PSt ok 3
 String ok 4
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo => 'TT #1320' );
+pir_output_is( <<'CODE', <<'OUT', "MMD on PMC types - Any", todo => 'GH #328' );
 
 .sub main :main
     $P0 = new ['String']
@@ -726,7 +726,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "add as method - inherited", todo => 'TT #1320' );
+pir_output_is( <<'CODE', <<'OUTPUT', "add as method - inherited", todo => 'GH #328' );
 .sub main :main
     .local pmc d, l, r
     .local pmc pint

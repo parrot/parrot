@@ -90,7 +90,17 @@ sub _set_general {
     my ($data, $substitutions, $general, $optsref) = @_;
     my @general = split /\n/, $general;
     foreach my $g (@general) {
-        next unless $g =~ m/^([-\w]+)(?:=(\$?[^\s\$]+))?$/;
+        next unless ( $g =~ m/^
+            ([-\w]+)
+            (?:=(
+                \S+     # Usual case: regular identifier; no spaces allowed in identifier
+                |
+                \$\S+   # Variable substitution; no spaces allowed in identifier
+                )
+            )?
+           $/x )
+            or
+        ( $g =~ m/^([-\w]+)="([^"]+)"$/ );  # Double-quoted string; spaces allowed
         my ($k, $v, $prov, $var);
         if ($2) {
             ($k, $prov) = ($1, $2);

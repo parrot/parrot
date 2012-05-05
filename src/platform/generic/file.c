@@ -24,7 +24,7 @@ This file implements OS-specific file functions for generic UNIX platforms.
 
 #include "parrot/parrot.h"
 
-/* TT #1050 apparently, strerror_r is thread-safe and should be used instead.*/
+/* GH #655 apparently, strerror_r is thread-safe and should be used instead.*/
 #define THROW(msg) Parrot_ex_throw_from_c_args(interp, NULL, \
     EXCEPTION_EXTERNAL_ERROR, "%s failed: %s", (msg), strerror(errno))
 

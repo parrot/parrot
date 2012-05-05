@@ -320,21 +320,12 @@ inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
 
 =item B<new>(out STR)
 
-=item B<new>(out STR, in INT)
-
-Allocate a new empty string of length $2 (optional).
-
-XXX: Do these ops make sense with immutable strings?
+Allocate a new empty string.
 
 =cut
 
 inline op new(out STR) :base_mem {
     $1 = Parrot_str_new_noinit(interp, 0);
-}
-
-inline op new(out STR, in INT) :base_mem :deprecated {
-    Parrot_warn_deprecated(interp, "new_s_i op is deprecated");
-    $1 = Parrot_str_new_noinit(interp, $2);
 }
 
 

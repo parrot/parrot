@@ -163,7 +163,7 @@ number types.
     goto End_test1
 Todo_test1:
     $I0 = $S0 == "-0"
-    todo($I0, 'negative zero, TT #313')
+    todo($I0, 'negative zero, GH #366')
 End_test1:
 
     set $N0, -0.0
@@ -185,7 +185,7 @@ End_test1:
     goto End_test4
 Todo_test4:
     $I0 = $S0 == "-0"
-    todo($I0, 'negative zero, TT #313')
+    todo($I0, 'negative zero, GH #366')
 End_test4:
 .end
 

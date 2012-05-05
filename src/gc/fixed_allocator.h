@@ -28,11 +28,12 @@ src/gc/fixed_allocator.h - implementation of allocator for small-size objects.
 
 typedef struct Pool_Allocator_Free_List {
     struct Pool_Allocator_Free_List * next;
-
+    char *dummy; /* fix alignment on ia64, mipsel and sparc, similar to gh issue #603 */
 } Pool_Allocator_Free_List;
 
 typedef struct Pool_Allocator_Arena {
     struct Pool_Allocator_Arena * next;
+    char *dummy; /* fix alignment on ia64, mipsel and sparc, similar to gh issue #603 */
 } Pool_Allocator_Arena;
 
 typedef struct Pool_Allocator {

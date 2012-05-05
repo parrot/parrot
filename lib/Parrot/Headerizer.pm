@@ -1,5 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
-#
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 package Parrot::Headerizer;
 
@@ -123,6 +122,8 @@ sub new {
         PARROT_COLD
 
         PARROT_API
+
+        PARROT_NO_ADDRESS_SAFETY_ANALYSIS
         )
     };
     return bless $args, $class;

@@ -1593,6 +1593,11 @@ Returns whether the class does the given C<*role>.
         return VTABLE_isa_pmc(INTERP, SELF, role);
     }
 
+    VTABLE INTVAL is_equal(PMC * p)
+    {
+        return p == SELF;
+    }
+
 /*
 
 =item C<INTVAL type()>

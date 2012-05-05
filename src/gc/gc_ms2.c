@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -632,7 +632,7 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self = (MarkSweep_GC*)interp->parent_interpreter->gc_sys->gc_private;
     }
     else {
-        self = mem_allocate_zeroed_typed(MarkSweep_GC);
+        self = mem_internal_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (pmc_alloc_struct));
@@ -706,7 +706,7 @@ gc_ms2_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
         interp->gc_sys->stats.memory_used += sizeof (PMC);
 
     ptr = (pmc_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr = Parrot_pa_insert(interp, self->objects, ptr);
+    ptr->ptr = Parrot_pa_insert(self->objects, ptr);
 
     return &ptr->pmc;
 }
@@ -760,7 +760,7 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     if (!PObj_constant_TEST(pmc)) {
         Parrot_pa_remove(interp, self->objects, item->ptr);
-        item->ptr = Parrot_pa_insert(interp, self->new_objects, item);
+        item->ptr = Parrot_pa_insert(self->new_objects, item);
     }
 
 }
@@ -815,7 +815,7 @@ gc_ms2_allocate_string_header(PARROT_INTERP, UINTVAL flags)
         interp->gc_sys->stats.memory_used += sizeof (STRING);
 
     ptr = (string_alloc_struct *)Parrot_gc_pool_allocate(interp, pool);
-    ptr->ptr = Parrot_pa_insert(interp, self->strings, ptr);
+    ptr->ptr = Parrot_pa_insert(self->strings, ptr);
 
     ret = &ptr->str;
     memset(ret, 0, sizeof (STRING));
@@ -1272,7 +1272,7 @@ gc_ms2_is_ptr_owned(PARROT_INTERP,
         return 0;
 
     /* Pool.is_owned isn't precise enough (yet) */
-    return Parrot_pa_is_owned(interp, list, item, item->ptr);
+    return Parrot_pa_is_owned(list, item, item->ptr);
 }
 
 

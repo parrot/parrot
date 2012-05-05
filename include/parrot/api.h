@@ -1,5 +1,5 @@
 /* api.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Parrot's external embedding API. This functionality is only to be used
  *     by embedding applications, and only this functionality may be used by
@@ -16,6 +16,16 @@
 #include "parrot/core_types.h"
 
 typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+const unsigned char * get_program_code(void);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+size_t get_program_code_size(void);
 
 /* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
 PARROT_EXPORT
@@ -54,6 +64,11 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 
 #endif /* NDEBUG */
 
+/* Static assertions are checked at compile type */
+#define PARROT_STATIC_ASSERT_HELPER(COND, MSG)  typedef char static_assertion_##MSG[(!!(COND))*2-1]
+#define PARROT_STATIC_ASSERT3(X, L)             PARROT_STATIC_ASSERT_HELPER(X, at_line_##L)
+#define PARROT_STATIC_ASSERT2(X, L)             PARROT_STATIC_ASSERT3(X, L)
+#define PARROT_STATIC_ASSERT(X)                 PARROT_STATIC_ASSERT2((X), __LINE__)
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
@@ -119,25 +134,25 @@ PARROT_API
 Parrot_Int Parrot_api_get_exception_backtrace(
     Parrot_PMC interp_pmc,
     Parrot_PMC exception,
-    ARGOUT(Parrot_String * bt))
+    ARGOUT(Parrot_String *bt))
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* bt);
+        FUNC_MODIFIES(*bt);
 
 PARROT_API
 Parrot_Int Parrot_api_get_result(
     Parrot_PMC interp_pmc,
     ARGOUT(Parrot_Int *is_error),
-    ARGOUT(Parrot_PMC * exception),
+    ARGOUT(Parrot_PMC *exception),
     ARGOUT(Parrot_Int *exit_code),
-    ARGOUT(Parrot_String * errmsg))
+    ARGOUT(Parrot_String *errmsg))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*is_error)
-        FUNC_MODIFIES(* exception)
+        FUNC_MODIFIES(*exception)
         FUNC_MODIFIES(*exit_code)
-        FUNC_MODIFIES(* errmsg);
+        FUNC_MODIFIES(*errmsg);
 
 PARROT_API
 Parrot_Int Parrot_api_get_runtime_path(
@@ -184,7 +199,7 @@ Parrot_Int Parrot_api_set_configuration_hash(
 PARROT_API
 Parrot_Int Parrot_api_set_executable_name(
     Parrot_PMC interp_pmc,
-    ARGIN(const char * name))
+    ARGIN(const char *name))
         __attribute__nonnull__(2);
 
 PARROT_API

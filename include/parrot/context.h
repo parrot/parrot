@@ -148,12 +148,6 @@ FLOATVAL * Parrot_pcc_get_num_constants_func(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-PMC* Parrot_pcc_get_object_func(PARROT_INTERP, ARGIN(const PMC *ctx))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
 PMC* Parrot_pcc_get_outer_ctx_func(PARROT_INTERP, ARGIN(const PMC *ctx))
         __attribute__nonnull__(2);
 
@@ -260,13 +254,6 @@ void Parrot_pcc_set_namespace_func(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_pcc_set_object_func(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    ARGIN_NULLOK(PMC *object))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_pcc_set_outer_ctx_func(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(PMC *outer_ctx))
@@ -363,8 +350,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_get_num_constants_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_get_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_get_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -414,9 +399,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_namespace_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))
-#define ASSERT_ARGS_Parrot_pcc_set_object_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_outer_ctx_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx) \
@@ -464,7 +446,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_continuation(i, c) (CONTEXT_STRUCT(c)->current_cont)
 #  define Parrot_pcc_get_caller_ctx(i, c) (CONTEXT_STRUCT(c)->caller_ctx)
 #  define Parrot_pcc_get_namespace(i, c) (CONTEXT_STRUCT(c)->current_namespace)
-#  define Parrot_pcc_get_object(i, c) (CONTEXT_STRUCT(c)->current_object)
 #  define Parrot_pcc_get_lex_pad(i, c) (CONTEXT_STRUCT(c)->lex_pad)
 #  define Parrot_pcc_get_handlers(i, c) (CONTEXT_STRUCT(c)->handlers)
 
@@ -565,10 +546,6 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     } while (0)
 #  define Parrot_pcc_set_namespace(i, c, value) do {    \
         CONTEXT_STRUCT(c)->current_namespace = (value); \
-        PARROT_GC_WRITE_BARRIER((i), (c));              \
-    } while (0)
-#  define Parrot_pcc_set_object(i, c, value) do {       \
-        CONTEXT_STRUCT(c)->current_object = (value);    \
         PARROT_GC_WRITE_BARRIER((i), (c));              \
     } while (0)
 #  define Parrot_pcc_set_lex_pad(i, c, value) do {      \

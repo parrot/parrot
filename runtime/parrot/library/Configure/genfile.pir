@@ -97,7 +97,7 @@ Pure PIR, without any dependencies.
     push_eh _handler
     $P0.'open'(filename, 'w')
     pop_eh
-    $P0.'puts'(content)
+    $P0.'print'(content)
     $P0.'close'()
     .return ()
   _handler:

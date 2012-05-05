@@ -168,7 +168,7 @@ Resizes the array to C<size> elements.
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF,
-                    (unsigned char *)mem_sys_memmove(
+                    (unsigned char *)memmove(
                         new_store, old_store, copy_size));
             mem_gc_free(INTERP, old_store);
         }
@@ -260,7 +260,7 @@ beginning.
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
             old_mem_size = ROUND_BYTES(tail_pos);
-            mem_sys_memmove(new_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
+            memmove(new_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
                     old_bit_array, old_mem_size);
 
             /* Replace old array with new array, and free old array */
@@ -321,7 +321,7 @@ Removes and returns the first element.
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
             GET_ATTR_bit_array(INTERP, SELF, old_bit_array);
-            mem_sys_memmove(new_bit_array, old_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
+            memmove(new_bit_array, old_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
                 new_mem_size);
 
             /* Replace old array with new array, and free old array */
@@ -392,7 +392,7 @@ Returns a copy of the array.
         if (my_bit_array) {
             const size_t size_in_bits = tail_pos / BITS_PER_CHAR + 1;
             dest_bit_array = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, size_in_bits);
-            mem_sys_memcopy(dest_bit_array, my_bit_array, size_in_bits);
+            memcpy(dest_bit_array, my_bit_array, size_in_bits);
         }
         else
             dest_bit_array = NULL;

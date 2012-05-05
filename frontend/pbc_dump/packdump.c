@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
@@ -165,7 +165,7 @@ pobj_flag_dump(PARROT_INTERP, long flags)
             if (printed_flag_p)
                 Parrot_io_printf(interp, ",");
             Parrot_io_printf(interp, "%s", flag_bit_names[idx]);
-            ++printed_flag_p;
+            printed_flag_p = 1;
         }
         ++idx;
         flags >>= 1;

@@ -252,7 +252,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
 
     # This value must be hardcoded here, update the test if the
     # vtable numbers change
-    .const int I_VTABLE_GET_STRING = 76
+    .const int I_VTABLE_GET_STRING = 75
     $P0 = get_namespace ["WithVtable"]
     $P1 = $P0[I_VTABLE_GET_STRING]
     $I0 = isnull $P1

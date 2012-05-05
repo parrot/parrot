@@ -96,6 +96,8 @@ actions on it.
 =cut
 
 inline op noop() :base_core {
+    UNUSED(interp);
+    UNUSED(CUR_OPCODE);
 }
 
 inline op check_events() :base_core :flow {
@@ -377,9 +379,7 @@ inline op invokecc(invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
-    interp->current_cont   = NEED_CONTINUATION;
+    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest                   = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);
@@ -393,8 +393,6 @@ inline op invoke(invar PMC, invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
     interp->current_cont   = $2;
 
     dest = VTABLE_invoke(interp, p, dest);
@@ -870,16 +868,7 @@ inline op exit(in INT) :flow {
 op finalize(in PMC) {
     /* Go to the next op after loop unrolling */
     opcode_t * const dest = expr NEXT();
-    PMC *eh = PMCNULL;
-    if (!PMC_IS_NULL($1)) {
-        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if ($1->vtable->base_type == enum_class_Exception)
-            GETATTR_Exception_handler(interp, $1, eh);
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
-            eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
-            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
-    }
+    PMC *eh = Parrot_ex_get_current_handler(interp, $1);
     if (!PMC_IS_NULL(eh)) {
         /* Get the runloop_id from the continuation and jump to it. */
         Parrot_runloop *rl = interp->current_runloop;
@@ -894,7 +883,7 @@ op finalize(in PMC) {
         if (rl) {
             if (rl != interp->current_runloop) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
         }
         else
@@ -904,16 +893,7 @@ op finalize(in PMC) {
 }
 
 op pop_upto_eh(in PMC) {
-    PMC *eh = PMCNULL;
-    if (!PMC_IS_NULL($1)) {
-        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
-        if ($1->vtable->base_type == enum_class_Exception)
-            GETATTR_Exception_handler(interp, $1, eh);
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "ExceptionHandler")))
-            eh = $1;
-        else if (VTABLE_isa(interp, $1, Parrot_str_new_constant(interp, "Exception")))
-            eh = VTABLE_get_attr_str(interp, $1, Parrot_str_new_constant(interp, "handler"));
-    }
+    PMC *eh = Parrot_ex_get_current_handler(interp, $1);
     if (!PMC_IS_NULL(eh))
         Parrot_cx_delete_upto_handler_local(interp, eh);
 }
@@ -963,7 +943,7 @@ If $1 is zero, turn off byte code bounds checking. Otherwise turn it on.
 =cut
 
 inline op bounds(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_BOUNDS_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_BOUNDS_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_BOUNDS_FLAG); }
     restart NEXT();
 }
@@ -978,7 +958,7 @@ If $1 is zero, turn off profiling. Otherwise turn it on.
 =cut
 
 inline op profile(in INT) :flow {
-    if ($1 != 0) { Parrot_set_flag(interp,   PARROT_PROFILE_FLAG); }
+    if ($1 != 0) { Parrot_interp_set_flag(interp,   PARROT_PROFILE_FLAG); }
     else         { Interp_flags_CLEAR(interp, PARROT_PROFILE_FLAG); }
     restart NEXT();
 }
@@ -993,8 +973,8 @@ If $1 is zero, turn off tracing. Otherwise turn trace flag $1 on.
 =cut
 
 inline op trace(in INT) :flow {
-    if ($1 != 0) { Parrot_set_trace(interp,   $1); }
-    else         { Parrot_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
+    if ($1 != 0) { Parrot_interp_set_trace(interp,   $1); }
+    else         { Parrot_interp_clear_trace(interp, PARROT_ALL_TRACE_FLAGS); }
     restart NEXT();
 }
 
@@ -1042,15 +1022,15 @@ EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
 =cut
 
 op interpinfo(out INT, in INT) {
-    $1 = interpinfo(interp, $2);
+    $1 = Parrot_interp_info(interp, $2);
 }
 
 op interpinfo(out PMC, in INT) {
-    $1 = interpinfo_p(interp, $2);
+    $1 = Parrot_interp_info_p(interp, $2);
 }
 
 op interpinfo(out STR, in INT) {
-    STRING * const s = interpinfo_s(interp, $2);
+    STRING * const s = Parrot_interp_info_s(interp, $2);
     $1 = s;
 }
 
@@ -1504,7 +1484,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -1519,5 +1499,3 @@ as the Parrot interpreter itself.
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
-
