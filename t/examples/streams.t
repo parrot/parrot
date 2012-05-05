@@ -21,10 +21,6 @@ t/examples/streams.t - Test examples in F<examples/streams>
 
 Test the examples in F<examples/streams>.
 
-=head1 SEE ALSO
-
-F<t/examples/pasm.t>
-
 =head1 AUTHOR
 
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
