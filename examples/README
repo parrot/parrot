@@ -19,8 +19,6 @@ mops       - Million ops per second
 
 nci        - Native call interface
 
-pasm       - Examples in Parrot Assembler, PASM
-
 past       - Examples of PAST, Parrot Abstract Syntax Tree, see pdd26_ast
 
 pge        - Parrot grammar engine
