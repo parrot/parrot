@@ -68,7 +68,7 @@ END_EXPECTED
 5.61
 END_EXPECTED
 
-    '12_math_ops_pasm.pir' => << 'END_EXPECTED',
+    '12_math_ops.pir' => << 'END_EXPECTED',
 5
 121
 END_EXPECTED

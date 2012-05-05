@@ -175,7 +175,6 @@ CODE
     command .= aux
     .local string filename
     filename .= command
-    filename .= 'examples/pasm/cat.pasm'
     aux = conf['test_prog']
     command .= aux
     aux = conf['exe']

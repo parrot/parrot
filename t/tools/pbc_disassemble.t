@@ -61,10 +61,6 @@ disassemble_raw_output_like( "--help", $helpregex, "pbc_disassemble help message
 disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassemble bad option");
 disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
 
-my $errorregex = <<OUTPUT;
-/Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
-OUTPUT
-
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main
     \$N3 = 3.14159
