@@ -23,7 +23,7 @@ The Parrot debugger
 
 Disassemble the bytecode.
 
-Use this if you have a PBC file but not the PASM.
+Use this if you have a PBC file but not the PIR.
 
 =item C<load>
 
@@ -171,7 +171,7 @@ static void PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 
 =item C<int main(int argc, const char *argv[])>
 
-Reads the PIR, PASM, or PBC file from argv[1], loads it, and then calls
+Reads the PIR or PBC file from argv[1], loads it, and then calls
 Parrot_debug().
 
 =cut
