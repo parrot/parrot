@@ -652,7 +652,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
                         : GC_DEFAULT_NURSERY_SIZE;
 
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
-    interp->gc_sys->finalize_gc_system = NULL; /* gc_gms_finalize; */
+    interp->gc_sys->finalize_gc_system          = gc_gms_finalize;
 
     interp->gc_sys->do_gc_mark                  = gc_gms_mark_and_sweep;
     interp->gc_sys->compact_string_pool         = gc_gms_compact_memory_pool;

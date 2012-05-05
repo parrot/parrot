@@ -364,6 +364,10 @@ void Parrot_interp_destroy(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_interp_get_compiler(PARROT_INTERP, ARGIN(STRING *type))
@@ -498,9 +502,6 @@ void Parrot_interp_clear_emergency_interpreter(void);
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_interp_get_emergency_interpreter(void);
 
-void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_Parrot_interp_allocate_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -518,6 +519,9 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
     , PARROT_ASSERT_ARG(compiler) \
     , PARROT_ASSERT_ARG(code))
 #define ASSERT_ARGS_Parrot_interp_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_destroy_for_exit \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_get_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -584,8 +588,6 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_get_emergency_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_interp_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/api.c */
 

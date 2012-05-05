@@ -35,18 +35,26 @@ static Interp* emergency_interp = NULL;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void interp_destroy_core(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static void interp_free_resources(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 static int Parrot_interp_is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_interp_destroy_core __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_interp_free_resources __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_is_env_var_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(var))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#define ATEXIT_DESTROY
 
 /*
 
@@ -330,16 +338,6 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 
     Parrot_cx_init_scheduler(interp);
 
-#ifdef ATEXIT_DESTROY
-    /*
-     * if this is not a threaded interpreter, push the interpreter
-     * destruction.
-     * Threaded interpreters are destructed when the thread ends
-     */
-    if (!Interp_flags_TEST(interp, PARROT_IS_THREAD))
-        Parrot_x_on_exit(interp, Parrot_interp_really_destroy, NULL);
-#endif
-
     return interp;
 }
 
@@ -347,10 +345,12 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 
 =item C<void Parrot_interp_destroy(PARROT_INTERP)>
 
-Does nothing if C<ATEXIT_DESTROY> is defined. Otherwise calls
-C<Parrot_really_destroy()> with exit code 0.
+Destroys the interpreter and frees resources. Not preferred.
 
-This function is not currently used.
+=item C<void Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)>
+
+Destroys the interpreter and frees resources, calling at-exit handlers first
+with the given return code. This is the preferred function to use.
 
 =cut
 
@@ -361,30 +361,22 @@ void
 Parrot_interp_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_interp_destroy)
-#ifdef ATEXIT_DESTROY
-    UNUSED(interp);
-#else
-   Parrot_interp_really_destroy(interp, 0);
-#endif
+    interp_destroy_core(interp);
 }
 
-/*
-
-=item C<void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void
-*arg)>
-
-Waits for any threads to complete, then frees all allocated memory, and
-closes any open file handles, etc.
-
-=cut
-
-*/
-
+PARROT_EXPORT
 void
-Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
+Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)
 {
-    ASSERT_ARGS(Parrot_interp_really_destroy)
+    ASSERT_ARGS(Parrot_interp_destroy)
+    Parrot_x_execute_on_exit_handlers(interp, exit_code);
+    interp_destroy_core(interp);
+    interp_free_resources(interp);
+}
 
+static void
+interp_destroy_core(PARROT_INTERP)
+{
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
@@ -434,23 +426,11 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
     /* deinit runcores and dynamic op_libs */
     if (!interp->parent_interpreter)
         Parrot_runcore_destroy(interp);
+}
 
-    /*
-     * now all objects that need timely destruction should be finalized
-     * so terminate the event loop
-     */
- /*   if (!interp->parent_interpreter) {
-        PIO_internal_shutdown(interp);
-        Parrot_kill_event_loop(interp);
-    }
-  */
-
-    /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given */
-    if (! (interp->parent_interpreter
-    ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
-        return;
-
+static void
+interp_free_resources(PARROT_INTERP)
+{
     if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
 
@@ -485,7 +465,6 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 
         mem_internal_free(interp);
     }
-
     else {
         Parrot_vtbl_free_vtables(interp);
 
@@ -494,7 +473,6 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
         mem_internal_free(interp);
     }
 }
-
 
 /*
 
