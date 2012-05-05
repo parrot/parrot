@@ -1344,42 +1344,6 @@ $(RUN_INC_DIR)/tm.pir : src/utils.c $(H2INC)
 
 ###############################################################################
 #
-# Examples (Assembly):
-#
-###############################################################################
-
-examples-clean:
-	$(RM_F) \
-	examples/mops/mops$(O) \
-	examples/mops/mops$(EXE) \
-	examples/pasm/hello.pbc \
-	examples/pasm/hello.c \
-	examples/pasm/hello$(O) \
-	examples/pasm/hello$(EXE) \
-	generated_hello.pbc
-
-# hello
-hello: test_prep examples/pasm/hello$(EXE)
-	.@slash@examples@slash@pasm@slash@hello$(EXE) "from your friendly makefile"
-
-examples/pasm/hello.pbc: examples/pasm/hello.pasm
-	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm
-
-# The -o option of parrot did not work with the object file extension ".o"
-# so as work around pbc_to_exe is used and the original commands are only
-# commented out so it can easily switched back.
-#examples/pasm/hello$(O): examples/pasm/hello.pbc
-#	$(PARROT) -o examples/pasm/hello$(O) examples/pasm/hello.pbc
-#
-#examples/pasm/hello$(EXE): examples/pasm/hello$(O)
-#	$(MAKE_C) . EXEC=examples/pasm/hello exec
-examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
-	$(PBC_TO_EXE) examples/pasm/hello.pbc
-
-
-
-###############################################################################
-#
 # Dependencies:
 #
 ###############################################################################
@@ -2141,8 +2105,8 @@ GC_TEST_FILES = \
 # not needed for build, hence this target is not included in 'all'
 pbctestfiles: $(PBC_TEST_FILES)
 
-t/pmc/testlib/number.pbc: $(PARROT) t/pmc/testlib/number.pasm
-	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
+t/pmc/testlib/number.pbc: $(PARROT) t/pmc/testlib/number.pir
+	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pir
 
 t/pmc/testlib/annotations.pbc: $(PARROT) t/pmc/testlib/annotations.pir
 	$(PARROT) -o t/pmc/testlib/annotations.pbc t/pmc/testlib/annotations.pir

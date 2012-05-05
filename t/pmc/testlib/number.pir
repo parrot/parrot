@@ -2,6 +2,7 @@
 
 # This file is used from Packfile PMCs tests
 
+.sub _main :main
         set     N0, 1.0
         set     N1, 4.0
         set     N2, 16.0
@@ -81,7 +82,7 @@
         print   "\n"
         print   N25
         print   "\n"
-        returncc
+.end
 
 # Local Variables:
 #   mode: pir
