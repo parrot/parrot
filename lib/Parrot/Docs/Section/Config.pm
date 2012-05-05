@@ -79,7 +79,7 @@ which they are performed.',
             'Library',
             '',
             $self->new_item(
-                'PASM/IMC access to Parrot configuration data.',
+                'PIR access to Parrot configuration data.',
                 'runtime/parrot/library/config.pir'
             )
         ),
