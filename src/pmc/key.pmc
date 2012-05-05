@@ -61,7 +61,7 @@ Creates and returns a clone of the key.
         PMC *key         = SELF;
 
         for (; key ;) {
-            switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+            switch (KEY_get_FLAGS(key)) {
               case KEY_integer_FLAG:
               case KEY_integer_FLAG | KEY_register_FLAG:
                 Parrot_key_set_integer(INTERP, dkey, Parrot_key_integer(INTERP, key));
@@ -130,7 +130,7 @@ Returns the Parrot string value of the key.
 
     VTABLE STRING *get_string() {
         /* Parrot_key_string() is only useful if this PMC has a key type */
-        if (PObj_get_FLAGS(SELF) & KEY_type_FLAGS)
+        if (KEY_get_FLAGS(SELF))
             return Parrot_key_string(INTERP, SELF);
 
         return CONST_STRING(INTERP, "");
@@ -272,10 +272,11 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
         for (size = 0, k = SELF; k; size++)
             GET_ATTR_next_key(interp, k, k);
+
         VTABLE_push_integer(INTERP, info, size);
 
         for (k = SELF; k;) {
-            const INTVAL flags  = (PObj_get_FLAGS(k) & KEY_type_FLAGS);
+            const INTVAL flags = KEY_get_FLAGS(k);
             VTABLE_push_integer(INTERP, info, flags);
 
             switch (flags) {
