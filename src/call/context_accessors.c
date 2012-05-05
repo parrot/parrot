@@ -461,38 +461,6 @@ Parrot_pcc_set_signature_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *
     CONTEXT_STRUCT(ctx)->current_sig = sig_object;
 }
 
-/*
-
-=item C<PMC* Parrot_pcc_get_object_func(PARROT_INTERP, const PMC *ctx)>
-
-=item C<void Parrot_pcc_set_object_func(PARROT_INTERP, PMC *ctx, PMC *object)>
-
-Get object of Context (in method call).
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_PURE_FUNCTION
-PARROT_CAN_RETURN_NULL
-PMC*
-Parrot_pcc_get_object_func(SHIM_INTERP, ARGIN(const PMC *ctx))
-{
-    ASSERT_ARGS(Parrot_pcc_get_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    return CONTEXT_STRUCT(ctx)->current_object;
-}
-
-PARROT_EXPORT
-void
-Parrot_pcc_set_object_func(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *object))
-{
-    ASSERT_ARGS(Parrot_pcc_set_object_func)
-    PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
-    PARROT_GC_WRITE_BARRIER(interp, ctx);
-    CONTEXT_STRUCT(ctx)->current_object = object;
-}
 
 /*
 

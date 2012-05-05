@@ -99,7 +99,6 @@ typedef enum {
     CURRENT_CTX,
     CURRENT_SUB,
     CURRENT_CONT,
-    CURRENT_OBJECT,
     CURRENT_LEXPAD,
     CURRENT_TASK,
 

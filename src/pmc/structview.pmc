@@ -594,8 +594,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
             {
                 UINTVAL        ux = x;
                 size_t         bits, n;
-                unsigned char  tempc;
-                unsigned char *cptr = (unsigned char *)ptr;
+                unsigned char  tempc = 0;
+                unsigned char *cptr  = (unsigned char *)ptr;
 
                 switch (elts[i].type) {
                   case enum_type_uint1:
@@ -610,7 +610,9 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 }
 
                 /* cache last byte (for restoring hi bits) */
-                tempc    = cptr[(bits + elts[i].bit_offset)/8];
+                if (bits > 1) {
+                   tempc    = cptr[(bits + elts[i].bit_offset - 1)/8];
+                }
 
                 /* write hi bits of first byte */
                 n        = 8 - elts[i].bit_offset;

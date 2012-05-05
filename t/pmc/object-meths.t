@@ -616,30 +616,6 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "self - CURRENT_OBJECT" );
-
-.sub _main :main
-    .local pmc A
-
-    newclass A, "A"
-    new A, ['A']
-    A."foo"()
-    end
-.end
-
-.namespace ["A"]
-
-.sub foo :method
-    .include "interpinfo.pir"
-    $P0 = interpinfo .INTERPINFO_CURRENT_OBJECT
-    eq_addr self, $P0, ok
-    print "not "
-ok: print "ok\n"
-.end
-CODE
-ok
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', "Bug in method calling with nonconst keys" );
 
 .sub _main :main

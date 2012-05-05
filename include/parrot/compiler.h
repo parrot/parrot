@@ -244,6 +244,14 @@
     /* entirely in terms of the provided annotations. */
 #define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
+#define PARROT_NO_ADDRESS_SAFETY_ANALYSIS
+#if defined(__clang__) && defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    undef PARROT_NO_ADDRESS_SAFETY_ANALYSIS
+#    define PARROT_NO_ADDRESS_SAFETY_ANALYSIS __attribute__((no_address_safety_analysis))
+#  endif
+#endif
+
 #endif /* PARROT_COMPILER_H_GUARD */
 
 /*
