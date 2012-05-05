@@ -115,10 +115,10 @@ PIR
 
 =head2 disassemble_output_like
 
-    disassemble_output_like(<<PASM, "pasm", "some output", "running $file");
+    disassemble_output_like(<<PIR, "pir", "some output", "running $file");
 
 Takes 3-4 arguments: a file to run,
-the filename-extension of the file (probably "pir" or "pasm"),
+the filename-extension of the file (probably "pir"),
 an arrayref or single regex string to match within pbc_disassemble's output,
 and the optional test diagnostic.
 

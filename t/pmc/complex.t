@@ -697,7 +697,7 @@ handler:
     set $I6, 20
     get_class $P2, "Complex"
     # instantiate $P1
-    is( $P1, "10+20i", 'instantiate pasm i' )
+    is( $P1, "10+20i", 'instantiate pir i' )
 .end
 
 .sub instantiate__pir__n

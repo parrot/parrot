@@ -30,7 +30,7 @@ BEGIN {
         plan( skip_all => "Test::Builder::Tester not installed\n" );
         exit 0;
     }
-    plan( tests => 94 );
+    plan( tests => 93 );
 }
 
 use lib qw( . lib ../lib ../../lib );
@@ -250,11 +250,6 @@ CODE
 OUTPUT
     test_test($desc);
 }
-
-
-my $file = q{t/perl/testlib/hello.pasm};
-my $expected = qq{Hello World\n};
-example_output_is( $file, $expected );
 
 $expected = qq{Goodbye World\n};
 example_output_isnt( $file, $expected );
