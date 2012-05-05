@@ -7,21 +7,17 @@
 =head1 Writing PIR
 
 PIR (Parrot Intermediate Representation) is a way to program the
-parrot virtual machine that is easier to use than PASM (Parrot
-Assembler). PASM notation is like any other assembler-like format and
-can be used directly, but it is more verbose and gives too much power
-to the user. PIR abstracts common operations and conventions into a
-syntax that more closely resembles a high-level language. PIR allows
-the programmer to write code that more naturally expresses their
-intent without worrying about setting up the exact details that PASM
-requires to function properly.
+parrot virtual machine. It corresponds closely to parrot bytecode,
+and, while it provides direct access to the opcodes, it also
+abstracts common operations and conventions into a
+syntax that more closely resembles a high-level language.
 
 This article will show the basics on programming in PIR. More advanced
 topics will appear in later articles.
 
 =head2 Getting Parrot
 
-In order to test the PIR and PASM code in this article, a parrot virtual
+In order to test the PIR code in this article, a parrot virtual
 machine is needed (henceforth just "parrot"). Parrot is available from
 L<http://parrot.org>. Just download the latest release, or checkout
 the current development version from the Git repository. The programs in this
@@ -48,30 +44,28 @@ registers. The register types are:
 
 =over 4
 
-=item I - integer
+=item $I - integer
 
-=item N - floating point
+=item $N - floating point
 
-=item S - string
+=item $S - string
 
-=item P - polymorphic container (PMC)
+=item $P - polymorphic container (PMC)
 
 =back
 
-In order to designate a register in PASM, use the character indicating
-the type (C<I>, C<N>, C<S> or C<P>) and the register number. For instance,
-in order to use register 10 of type integer, you'd write C<I10>. In this
-series of articles, we will mainly focus on programming PIR.
-
-In PIR, you would type the C<$> character in front of the register, to
-indicate a I<virtual> register. For instance, the integer registers are
+Each register name begins with the prefix above and is followed by a number.
+For instance, the integer registers are
 C<$I0>, C<$I1> and so on. The PMC registers hold arbitrary data objects
 and are parrot's mechanism for implementing more complex behavior than the
 ones that can be expressed using the other 3 register types alone.
 
-A virtual register is mapped to an actual register by the register allocator.
-You can use as many registers as you want, and the register allocator will
-allocate them as needed.
+If you examine the bytecode generated from compiling PIR, you may notice
+that the register number in the bytecode may not correspond directly to
+the register number you specified in PIR - don't worry about it - You can
+use as many registers as you want, and the register allocator will
+allocate them as needed, and handle mapping the $ registers to the actual
+slots in the VM.
 
 PMCs will be covered in more detail in a future article. Examples in
 this article will focus on the first 3 register types.
@@ -109,9 +103,9 @@ executing the first subroutine in the source file.
 The full set of pragmas are defined in L<docs/pdds/pdd19_pir.pod>.
 
 Before going into more details about subroutines and calling
-conventions, let's compare some PIR syntax to the equivalent PASM.
+conventions, let's compare some different PIR syntax.
 
-If I want to add two integer registers using PASM I would use the
+If I want to add two integer registers using opcodes directly I would use the
 Parrot C<set> opcode to put values into registers, and the C<add>
 opcode to add them, like this:
 
@@ -123,7 +117,7 @@ opcode to add them, like this:
 
 =end PIR_FRAGMENT
 
-PIR includes infix operators for these common opcodes. I could write
+PIR includes infix operators for these common opcodes. You could write
 this same code as
 
 =begin PIR_FRAGMENT
@@ -177,17 +171,17 @@ Then, use C<pbc_disassemble> in order to disassemble it:
 
 =head2 Branching
 
-Another simplification of PASM are branches. Basically, when I want to
-test a condition and jump to another place in the code, I would write
-the following PASM code:
+Another simplification is branches. Basically, when I want to
+test a condition and jump to another place in the code, I could write
+the following code:
 
-=begin PASM
+=begin PIR_FRAGMENT
 
    le I1, I2, LESS_EQ
    # ...
  LESS_EQ:
 
-=end PASM
+=end PIR_FRAGMENT
 
 Meaning, if C<$I1> is less or equal than C<$I2>, jump to label
 C<LESS_EQ>. In PIR I would write it in a more legible way:
@@ -239,7 +233,6 @@ keyword to define the parameters C<hello> can handle:
   .end
 
 =end PIR
-
 
 If I need more parameters I just need to add more C<.param> lines.
 
@@ -404,8 +397,7 @@ And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 =head2 Concluding
 
 To conclude this first article on PIR and to let you test what you
-learned, let me show you how to do input on PASM (hence, also in
-PIR). There is a C<read> opcode to read from standard input.  Just
+learned, let me show you how to do read input from the user.  Just
 pass it a string register or variable where you wish the characters
 read to be placed and the number of characters you wish to read:
 
@@ -434,7 +426,7 @@ With the PIR syntax shown in this article you should be able to start
 writing simple programs. Next article we will look into available
 Polymorphic Containers (PMCs), and how they can be used.
 
-=head2 Author
+=head2 Original Author
 
 Alberto Simões
 
