@@ -81,11 +81,7 @@ subroutine name) in different namespaces. The following creates invalid code:
 =end PIR
 
 Local labels in different I<compilation units> with the same name are
-allowed, though assembling the generated PASM doesn't work. However,
-running this code inside imcc is ok. This will probably change in the
-future so that local labels are mangled to be unique.
-
-
+allowed. 
 
 =head1 REGISTER ALLOCATION
 
