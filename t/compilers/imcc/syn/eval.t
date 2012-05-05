@@ -6,27 +6,10 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 SKIP: {
     skip( "changed eval semantics - see t/pmc/eval.t", 7 );
-
-##############################
-    pir_output_is( <<'CODE', <<'OUT', "eval pasm" );
-.sub test :main
-        $S0 = 'set S1, "in eval\n"'
-        concat $S0, "\n"
-        concat $S0, "print S1\nend\n"
-        compreg $P0, "PASM"
-        compile P0, $P0, $S0
-        invoke
-        print "back\n"
-        end
-.end
-CODE
-in eval
-back
-OUT
 
     pir_output_is( <<'CODE', <<'OUT', "eval pir" );
 .sub test :main

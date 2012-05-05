@@ -223,10 +223,10 @@ dump_raw_output_like("" . $pbc_file, qr/I REGISTER.*S REGISTER/s, "pbc_dump pack
 
 =head2 dump_output_like
 
-    dump_output_like(<<PASM, "pasm", "some output", "running $file");
+    dump_output_like(<<PIR, "pir", "some output", "running $file");
 
 Takes 3-4 arguments: a file to run,
-the filename-extension of the file (probably "pir" or "pasm"),
+the filename-extension of the file (probably "pir"),
 an arrayref or single regex string to match within pbc_dump's output,
 and the optional test diagnostic.
 

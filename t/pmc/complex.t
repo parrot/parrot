@@ -47,7 +47,7 @@ Tests the Complex PMC.
     test_is_equal()
     test_complex_abs()
     check_whether_interface_is_done()
-    instantiate__pasm__i()
+    instantiate__pir__i()
     instantiate__pir__n()
     instantiate__pir__p()
     instantiate__pir__s()
@@ -684,7 +684,7 @@ handler:
     nok( bool1, 'Complex !does no_interface' )
 .end
 
-.sub instantiate__pasm__i
+.sub instantiate__pir__i
     skip( 1, 'instantiate n/y' )
     .return()
 
