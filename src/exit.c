@@ -54,7 +54,8 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
 
 =item C<void Parrot_x_jump_out(PARROT_INTERP, int status)>
 
-Jumps out returning to the caller api function.
+Jumps out returning to the caller api function. Do not execute registered
+on-exit handlers.
 
 =cut
 
@@ -91,23 +92,33 @@ void
 Parrot_x_exit(PARROT_INTERP, int status)
 {
     ASSERT_ARGS(Parrot_x_exit)
+    Parrot_x_execute_on_exit_handlers(interp, status);
+    Parrot_x_jump_out(interp, status);
+}
+
+/*
+
+=item C<void Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)>
+
+Execute all registered on-exit callback functions. This must be done before
+the interpreter is destroyed.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_COLD
+void
+Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
+{
     /* call all the exit handlers */
-    /* we are well "below" the runloop now, where lo_var_ptr
-     * is set usually - exit handlers may run some resource-hungry
-     * stuff like printing profile stats - a GC run would kill
-     * resources
-     * http://rt.perl.org/rt3/Ticket/Display.html?id=46405 (resolved)
-     */
-    /*
-     * we don't allow new exit_handlers being installed inside exit handlers
-     * - do we?
-     * and: interp->exit_handler_list is gone, after the last exit handler
-     *      (Parrot_really_destroy) has run
-     */
     handler_node_t *node;
 
     node = interp->exit_handler_list;
 
+    /* Block GC. We don't want any shenanigans while we are executing our
+       callbacks */
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
@@ -120,8 +131,12 @@ Parrot_x_exit(PARROT_INTERP, int status)
     }
 
     interp->exit_handler_list = NULL;
-    Parrot_x_jump_out(interp, status);
+
+    /* Re-enable GC, which we will want if GC finalizes */
+    Parrot_unblock_GC_mark(interp);
+    Parrot_unblock_GC_sweep(interp);
 }
+
 
 /*
 
