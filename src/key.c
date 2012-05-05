@@ -286,7 +286,6 @@ Parrot_key_string(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(Parrot_key_string)
 
     switch (KEY_get_FLAGS(key)) {
-        /* remember to COW strings instead of returning them directly */
       case KEY_string_FLAG:
         {
             STRING *s;

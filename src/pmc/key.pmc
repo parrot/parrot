@@ -424,6 +424,93 @@ Aggregate interface.
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_pmc(INTERP, SELF);
     }
+
+    METHOD make_register_key(STRING * set, INTVAL idx)
+    {
+        INTVAL first_char = Parrot_str_indexed(INTERP, set, 0);
+        KEY_flags key_type;
+        switch (first_char) {
+            case 'S':
+                key_type = KEY_string_FLAG;
+                break;
+            case 'I':
+                key_type = KEY_integer_FLAG;
+                break;
+            case 'P':
+                key_type = KEY_pmc_FLAG;
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Key: Unknown register set %Ss", set);
+        }
+        Parrot_key_set_register(INTERP, SELF, idx, (INTVAL)key_type);
+    }
+
+    METHOD is_register_reference()
+    {
+        INTVAL is_reg_ref = KEY_register_TEST(SELF) ? 1 : 0;
+        RETURN(INTVAL is_reg_ref);
+    }
+
+    METHOD get_register_idx()
+    {
+        if (!KEY_register_TEST(SELF))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                "Key: Key is not a register reference");
+        else {
+            const INTVAL idx = Parrot_key_integer(INTERP, SELF);
+            RETURN(INTVAL idx);
+        }
+    }
+
+    METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag)
+    {
+        INTVAL int_key;
+        if (!KEY_register_TEST(SELF))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                "Key: Key is not a register reference");
+
+        GETATTR_Key_int_key(interp, SELF, int_key);
+        if (!has_ctx || PMC_IS_NULL(ctx)) {
+            switch (KEY_get_FLAGS(SELF)) {
+                case KEY_string_FLAG | KEY_register_FLAG: {
+                    STRING * const str_val =  REG_STR(interp, int_key);
+                    RETURN(STRING *str_val);
+                }
+                case KEY_pmc_FLAG | KEY_register_FLAG: {
+                    PMC * const pmc_val = REG_PMC(interp, int_key);
+                    RETURN(PMC *pmc_val);
+                }
+                case KEY_integer_FLAG | KEY_register_FLAG: {
+                    const INTVAL int_val = REG_INT(interp, int_key);
+                    RETURN(INTVAL int_val);
+                }
+                default:
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
+            }
+        }
+        else {
+            switch (KEY_get_FLAGS(SELF)) {
+                case KEY_string_FLAG | KEY_register_FLAG: {
+                    STRING * const str_val =  *Parrot_pcc_get_STRING_reg(INTERP, ctx, int_key);
+                    RETURN(STRING *str_val);
+                }
+                case KEY_pmc_FLAG | KEY_register_FLAG: {
+                    PMC * const pmc_val = *Parrot_pcc_get_PMC_reg(INTERP, ctx, int_key);
+                    RETURN(PMC *pmc_val);
+                }
+                case KEY_integer_FLAG | KEY_register_FLAG: {
+                    const INTVAL int_val = *Parrot_pcc_get_INTVAL_reg(INTERP, ctx, int_key);
+                    RETURN(INTVAL int_val);
+                }
+                default:
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                        "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
+            }
+        }
+
+    }
 }
 
 /*
