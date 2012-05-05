@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 35;
+use Test::More tests => 32;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -45,23 +45,6 @@ is( `"$PARROT" "$first_pir_file" "asdf"`,             "first\n", 'ignore nonsens
 
 # redirect STDERR to avoid warnings
 my $redir = '2>' . File::Spec->devnull();
-
-# --pre-process-only
-# This is just sanity testing
-my $expected_preprocesses_pir = <<'END_PIR';
-
-.macro 
-
-.sub main :main
-
-say "first" 
-
-.end
-
-END_PIR
-is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
-is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
-$expected_preprocesses_pir, 'option --pre-process-only' );
 
 # Test the trace option
 is( `"$PARROT" -t "$first_pir_file" $redir`, "first\n", 'option -t' );
@@ -115,9 +98,6 @@ like( $output, qr/maximum GC nursery size is 50%/,
                  '--gc-nursery-size max warning' );
 is( $exit, 0, '... and should not crash' );
 
-
-# Test --leak-test
-is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
 
 # clean up temporary files
 unlink $first_pir_file;

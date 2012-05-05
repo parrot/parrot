@@ -810,7 +810,6 @@ main(int argc, const char *argv[])
         fflush(stdout);
         interp = Parrot_interp_new(NULL);
         if (interp) {
-            Parrot_interp_set_flag(interp, PARROT_DESTROY_FLAG);
 
             printf("Destroying interp %d\n", i);
             fflush(stdout);

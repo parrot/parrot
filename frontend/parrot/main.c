@@ -530,7 +530,6 @@ help(void)
     "       <GC GMS options>\n"
     "       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n"
     "       --gc-debug\n"
-    "       --leak-test|--destroy-at-end\n"
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
@@ -585,8 +584,6 @@ Parrot_cmd_options(void)
         { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
         { 'V', 'V', (OPTION_flags)0, { "--version" } },
         { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
-        { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
-                                     { "--leak-test", "--destroy-at-end" } },
         { 'o', 'o', OPTION_required_FLAG, { "--output" } },
         { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
         { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
@@ -840,10 +837,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             */
             /* Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1); */
             result = Parrot_api_flag(interp, 0x10, 1);
-            break;
-          case OPT_DESTROY_FLAG:
-            /* Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1); */
-            result = Parrot_api_flag(interp, 0x200, 1);
             break;
           case 'I':
             result = Parrot_api_add_include_search_path(interp, opt.opt_arg);

@@ -18,7 +18,6 @@ typedef enum {
     PARROT_GC_DEBUG_FLAG    = 0x10,  /* debugging memory management */
 
     PARROT_EXTERN_CODE_FLAG = 0x100, /* reusing another interp's code */
-    PARROT_DESTROY_FLAG     = 0x200, /* the last interpreter shall cleanup */
 
     PARROT_IS_THREAD        = 0x1000, /* interpreter is a thread */
     PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */

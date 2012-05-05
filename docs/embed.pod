@@ -168,10 +168,6 @@ True if debugging memory management.
 
 True if reusing another interpreters code.
 
-=item PARROT_DESTROY_FLAG
-
-True if the last interpreter shall cleanup.
-
 =item PARROT_IS_THREAD
 
 True if interpreter is a thread.
@@ -483,7 +479,7 @@ performing both compiling and linking in one step.
         sub = Parrot_ns_find_current_namespace_global(interp, pstr);
 
         /* run foo(), which returns nothing */
-	Parrot_ext_call(interp, sub, "->");
+    Parrot_ext_call(interp, sub, "->");
 
         Parrot_destroy(interp);
 
