@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 37;
 
 =head1 NAME
 
