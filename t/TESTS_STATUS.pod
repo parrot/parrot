@@ -69,18 +69,6 @@ B<Good>.
 
 =back
 
-=head3 Optimizer
-
-This rearranges B<PASM> code to make it run faster.
-
-=over 4
-
-=item Status
-
-Untested. IMCC no longer has the ability to output PASM code, only PBC.
-
-=back
-
 =head3 Interpreter
 
 This is the core of Parrot. It comprises the various runcores, input/output,
