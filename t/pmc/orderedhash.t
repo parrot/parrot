@@ -388,7 +388,7 @@ iter_loop:
     print $P3
     branch iter_loop
 end_iter:
-    end
+.end
 CODE
 /ok \d
 ok \d
