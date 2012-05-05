@@ -1,0 +1,40 @@
+.version 0
+.chunk "noop"
+.constants
+0 "1..1\n"
+1 "n"
+2 "ok 1 aliases work\n"
+.metadata
+.bytecode
+
+    .alias ess_zero = S0
+    .alias potatoes = I0
+    .alias zero = 0
+    .alias eye_too = I2
+
+    set_imm ess_zero, 0, 0
+    deref   S0, CONSTS, ess_zero
+    set_imm I0, 0, 1
+    print_s I0, ess_zero, x
+
+    set_imm I1, zero,  9
+    set_imm eye_too, 0,  90
+    add_i   I2, eye_too, I1
+    set_imm I3, 0,  99
+    sub_i   I3, I3, I2
+       
+    goto_if addi_nok, I3   
+    goto    addi_ok, x
+
+addi_nok:
+    set_imm S0, 0, 1
+    deref   S0, CONSTS, S0
+    print_s I0, S0, x
+
+addi_ok:
+    set_imm S0, 0, 2
+    deref   ess_zero, CONSTS, S0
+    print_s I0, ess_zero, x
+
+# This code isn't really PASM, but the highlighting works well.
+# vim: expandtab shiftwidth=4 ft=pasm:  

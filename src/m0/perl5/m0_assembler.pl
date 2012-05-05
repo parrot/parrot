@@ -151,25 +151,27 @@ sub register_name_to_num {
         return $register;
     }
 
-    if($register !~ /^[INSP]\d+$/){
+    if ($register !~ /^[INSP]\d+$/){
         my $number = $symbols->{$register};
-        die "Invalid register name: $register" unless exists $symbols->{$register};
-        return $number;
+        return $symbols->{$register} // "";
     }
 
     if( length $register > 3 ){
-       die "Invalid register name: $register";
+       m0_say "Invalid register name: $register";
+       return "";
     }
 
     my $num  = substr($register, 1, 2);
     my $type = substr($register, 0, 1);
 
     unless ( defined $num && $num >= 0 && $num <= 61 ) {
-       die "Invalid register number: $register";
+       m0_say "Invalid register number: $register";
+       return ""
     }
 
     unless ( $type =~ m/^[INSP]$/ ) {
-        die "Invalid register type $type in register $register";
+        m0_say "Invalid register type $type in register $register";
+        return "";
     }
 
     my $reg_table = {
@@ -182,17 +184,18 @@ sub register_name_to_num {
 }
 
 sub to_bytecode {
-    my ($ops,$op)      = @_;
-    my $opnumber       = opname_to_num($ops, $op->{opname});
-    my ($a1, $a2, $a3) = map { $op->{"arg" . $_} } (1 .. 3);
-    my $bytecode       = pack('C', $opnumber);
+    my ($ops, $regname_map, $op) = @_;
+    my $opnumber                 = opname_to_num($ops, $op->{opname});
+    my ($a1, $a2, $a3)           = map { $op->{"arg" . $_} } (1 .. 3);
+    my $bytecode                 = pack('C', $opnumber);
 
     # We need to convert the symbolic register names into numbers
     # as described in "Register Types and Context Structure" in the M0 spec
 
     map {
-        my $reg = register_name_to_num($_);
-        die "Invalid register '$reg'" if ($reg !~ /^\d+$/);
+        my $reg = $regname_map->{$_} // register_name_to_num($_);
+        m0_say "mapping $_ to $reg";
+        die "Invalid register '$_'" if ($reg !~ /^\d+$/);
         $bytecode .= pack('C', $reg );
     } ($a1, $a2, $a3);
 
@@ -243,11 +246,13 @@ sub m0b_bytecode_seg {
     my $word_count = $op_count * 4;
     my $bytecode = '';
     my $pc = 0;
-    my %label_map;
+    my (%label_map, %regname_map);
     my @lines = split /\n/, $chunk->{bytecode};
 
     # calculate addresses of labels
     for my $line (@lines) {
+        # skip directives
+        next if ($line =~ /^\s*\..*/);
         if ($line =~ /(?<!#)\w[,\s]+\w/) {
             $pc++;
             $op_count++;
@@ -265,10 +270,22 @@ sub m0b_bytecode_seg {
     $bytecode .= pack('i', $word_count);
 
     for my $line (@lines) {
-        if ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
-            m0_say "adding op $+{opname} to bytecode seg";
-            $bytecode .= to_bytecode($ops,\%+);
+
+        # register name alias
+        if ($line =~ m/^\s*\.alias\s+(?<regname>[a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(?<reg>[A-Z0-9]+)\s*$/) {
+            my ($regname, $reg) = ($+{regname}, $+{reg});
+            my $reg_num = register_name_to_num($reg);
+            die "Invalid register name '$reg' in register name alias" if $reg_num !~ m/^\d+$/;
+            m0_say "adding register name alias: $regname maps to register $reg ($reg_num)";
+            $regname_map{$regname} = $reg_num;
         }
+
+        # normal instruction, possibly with a label
+        elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*(?<opname>[A-z_]+)\s+(?<arg1>\w+)\s*,\s*(?<arg2>\w+)\s*,\s*(?<arg3>\w+)\s*$/) {
+            m0_say "adding op $+{opname} to bytecode seg";
+            $bytecode .= to_bytecode($ops, \%regname_map, \%+);
+        }
+
         # special case for goto with a label
         elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto\s+(?<target_label>\w+)\s*(,\s*\w+\s*)?$/) {
             m0_say "adding op goto to bytecode seg";
@@ -284,8 +301,10 @@ sub m0b_bytecode_seg {
             m0_say "goto arg2 is ".$x{arg2};
             $x{target_label} = $+{target_label};
             m0_say "adding op goto to bytecode seg";
-            $bytecode .= to_bytecode($ops,\%x);
+            $bytecode .= to_bytecode($ops, \%regname_map, \%x);
         }
+
+        # special case for goto_if with a label
         elsif ($line =~ m/^((?<label>[a-zA-Z][a-zA-Z0-9_]+):)?\s*goto_if\s+(?<target_label>[a-zA-Z][a-zA-Z0-9_]*)\s*,\s*(?<arg3>\w+)\s*$/) {
             m0_say "adding op goto_if to bytecode seg";
             if (!exists $label_map{ $+{target_label} } ) {
@@ -297,7 +316,7 @@ sub m0b_bytecode_seg {
             $x{arg3} = $+{arg3};
             $x{opname} = 'goto_if';
             m0_say "adding op goto_if to bytecode seg";
-            $bytecode .= to_bytecode($ops,\%x);
+            $bytecode .= to_bytecode($ops, \%regname_map, \%x);
         } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
             # ignore
         } elsif ($line =~ m/^\s*#/) {
@@ -427,6 +446,8 @@ sub m0b_bc_seg_length {
         $line =~ s/^[a-zA-Z][a-zA-Z0-9_]+://;
         # strip out comments
         $line =~ s/^\s*#.*$//;
+        # strip out directives
+        $line =~ s/^\s*\..*$//;
         # count any remaining non-empty lines
         $op_count++ if $line =~ /\w/;
     }
