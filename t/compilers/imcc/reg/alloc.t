@@ -24,7 +24,7 @@ lab:
 ex:
 .end
 .sub alligator
-    .param pmc func 
+    .param pmc func
     func()
 .end
 CODE

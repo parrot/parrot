@@ -12,7 +12,7 @@ examples/pir/mandel.pir - Print the Mandelbrot set
 
 This prints an ASCII-art representation of the Mandelbrot set.
 
-Translated from C code by Glenn Rhoads to Parrot by 
+Translated from C code by Glenn Rhoads to Parrot by
 Leon Brocard <acme@astray.com> and Bernhard Schmalhofer.
 
 The C code is:

@@ -42,7 +42,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "pir subs - invokecc" );
 .end
 .sub func
     .param int i
-    print i 
+    print i
     print "\n"
 
     eq i, 0, endfunc
@@ -368,12 +368,12 @@ OK2:  print "ok 2\n"
       end
 .end
 
-.sub f1 :outer(_main) 
+.sub f1 :outer(_main)
       print "Test\n"
       end
 .end
 
-.sub f2 :outer(_main) 
+.sub f2 :outer(_main)
       new $P1, ['Undef']
       end
 .end
@@ -450,7 +450,7 @@ print $TEMP <<'EOF';
   .sub _error
   say "error"
 .end
-  .sub _sub1 :load 
+  .sub _sub1 :load
   say "in sub1"
   returncc
 .end
@@ -488,7 +488,7 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _sub1 :load 
+  .sub _sub1 :load
   say "in sub1"
   returncc
 .end
@@ -544,7 +544,7 @@ print $TEMP <<'EOF';
   say "in sub1"
   returncc
   .end
-  .sub _sub2 :load 
+  .sub _sub2 :load
   print "in sub2\n"
   returncc
 .end
@@ -592,11 +592,11 @@ OUTPUT
 ($TEMP, $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $TEMP <<'EOF';
-  .sub _sub1 :load 
+  .sub _sub1 :load
   say "in sub1"
   returncc
   .end
-  .sub _sub2 :load 
+  .sub _sub2 :load
   print "in sub2\n"
   returncc
   .end
