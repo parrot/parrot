@@ -88,7 +88,7 @@ CODE
 3
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin 10 / 3 = 42", todo => 'TT #452' );
+pir_output_is( <<'CODE', <<'OUTPUT', "divide - override builtin 10 / 3 = 42", todo => 'TT #452' );
 
 .sub _main :main
     .local pmc divide
@@ -219,7 +219,7 @@ print $TEMP <<'EOF';
 EOF
 close $TEMP;
 
-pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub", todo => 'TT #452' );
+pir_output_is( <<"CODE", <<'OUTPUT', "MMD divide - loaded sub", todo => 'TT #452' );
 .sub _main :main
     .local pmc divide
     load_bytecode "$temp_pir"
