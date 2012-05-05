@@ -486,7 +486,7 @@ libnci_test was successfully loaded
 OUTPUT
     }
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PIR' );
 .sub _main :main
   loadlib $P1, "libnci_test"
   print "loaded\n"
@@ -1325,7 +1325,7 @@ ok
 got null
 OUTPUT
 
-  pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
+  pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PIR' );
 .sub _main :main
 
   # we need a flag if the call_back is already done
@@ -1461,7 +1461,7 @@ external data: succeeded
 the callback has run
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PIR' );
 .sub _main :main
   # we need a flag if the call_back is already done
   new $P10, ['Integer']
@@ -1609,7 +1609,7 @@ external data: 99
 the callback has run
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PIR' );
 .sub _main :main
 
   # we need a flag if the call_back is already done
@@ -1671,7 +1671,7 @@ external data: succeeded
 done.
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PIR' );
 .sub _main :main
   # we need a flag if the call_back is already done
   new $P10, ['Integer']
