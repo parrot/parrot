@@ -9,7 +9,7 @@ use Parrot::Test tests => 1;
 
 =head1 NAME
 
-t/op/literal.t - Testing the PIR and PASM lexer
+t/op/literal.t - Testing the PIR lexer
 
 =head1 SYNOPSIS
 

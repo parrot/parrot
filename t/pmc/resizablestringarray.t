@@ -1207,9 +1207,9 @@ exception:
 .end
 
 #
-# a test with a sparse array. this converted from PASM from the original
-# ResizableStringArray tests.
+# a test with a sparse array.
 #
+
 .sub sparse
     .local pmc array
     array = new ['ResizableStringArray']
