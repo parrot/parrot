@@ -2297,7 +2297,6 @@ clean : \
 	prog-clean \
 	dynext-clean \
 #IF(has_perldoc):    html-clean \
-	examples-clean \
 	ext-clean \
 #UNLESS(win32):    cover-clean \
 	editor-clean
