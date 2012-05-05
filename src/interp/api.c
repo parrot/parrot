@@ -368,7 +368,7 @@ PARROT_EXPORT
 void
 Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)
 {
-    ASSERT_ARGS(Parrot_interp_destroy)
+    ASSERT_ARGS(Parrot_interp_destroy_for_exit)
     Parrot_x_execute_on_exit_handlers(interp, exit_code);
     interp_destroy_core(interp);
     interp_free_resources(interp);
@@ -377,6 +377,7 @@ Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)
 static void
 interp_destroy_core(PARROT_INTERP)
 {
+    ASSERT_ARGS(interp_destroy_core)
     /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
         Parrot_cx_runloop_end(interp);
@@ -431,6 +432,7 @@ interp_destroy_core(PARROT_INTERP)
 static void
 interp_free_resources(PARROT_INTERP)
 {
+    ASSERT_ARGS(interp_free_resources)
     if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
 
@@ -514,8 +516,6 @@ Parrot_interp_clear_emergency_interpreter(void)
     ASSERT_ARGS(Parrot_interp_clear_emergency_interpreter)
     emergency_interp = NULL;
 }
-
-
 
 /*
 
