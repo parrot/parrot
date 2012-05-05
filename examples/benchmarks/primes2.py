@@ -58,10 +58,6 @@ if __name__ == "__main__":
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/primes.c>,
-F<examples/benchmarks/primes.pasm>,
-F<examples/benchmarks/primes.pl>,
-F<examples/benchmarks/primes2_p.pasm>,
 F<examples/benchmarks/primes2.c>,
 F<examples/benchmarks/primes2.pir>,
 F<examples/benchmarks/primes2.py>.
