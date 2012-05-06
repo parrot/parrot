@@ -55,8 +55,14 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     $P0 = new 'FileHandle'
     $S0 = $P0.'readall'('t/dynpmc/gziphandle.t')
     $I0 = length $S0
-    mul $I0, 2
+
+    # Fudge factor! factor of 2, this test passes everywhere
+    # but OS X. 3 is enough to satisfy OS X. This is the amount
+    # of data we try to read in on the gzipp'd handle later to force
+    # an EOF condition.
+    mul $I0, 3
     diag($I0)
+
     .const string filename = 't/dynpmc/gziphandle.t.gz'
     $P1 = new 'GzipHandle'
     $P1.'open'(filename, 'wb')
