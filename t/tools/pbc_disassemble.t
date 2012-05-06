@@ -44,7 +44,7 @@ BEGIN {
         plan skip_all => "pbc_disassemble hasn't been built. Run make parrot_utils";
         exit(0);
     }
-    plan tests => 10;
+    plan tests => 9;
 }
 
 my $helpregex = <<OUTPUT;
@@ -52,6 +52,7 @@ my $helpregex = <<OUTPUT;
 
 Usage:
 pbc_disassemble .* [[]file.pbc[]]
+pbc_disassemble -o file.txt file.pbc
 
 \\s+(-.{1},\\s+--.*(["]\\w+["])?\\s+.*
 )+/m

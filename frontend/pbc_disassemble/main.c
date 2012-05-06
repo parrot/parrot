@@ -12,8 +12,8 @@ pbc_disassemble [-bh?] [--bare|--header-only] [-o outfile] [file.pbc]
 
 =head1 DESCRIPTION
 
-C<pbc_disassemble> translates Parrot bytecode (C<PBC>) into Parrot assembly
-language (C<PASM>).
+C<pbc_disassemble> translates Parrot bytecode (C<PBC>) into an opcode
+listing. This listing closely resembles PIR, but isn't runnable directly.
 
 C<file.pbc> is the bytecode file to disassemble. If a file is not specified, the
 bytecode will be read from C<stdin>. Additionally, if the C<-o> switch is not
@@ -29,7 +29,7 @@ Displays usage and help information.
 
 =item B<-b>, B<--bare>
 
-Displays bare PASM without the header and left column.
+Displays bare opcodes without the header and left column.
 
 =item B<-h>, B<--header-only>
 
@@ -185,10 +185,10 @@ help(void)
 
     puts("Usage:");
     puts("pbc_disassemble [-bh] [file.pbc]");
-    puts("pbc_disassemble -o file.pasm file.pbc\n");
+    puts("pbc_disassemble -o file.txt file.pbc\n");
 
     puts("    -?, --help                   Displays help information");
-    puts("    -b, --bare                   Displays bare PASM without header and left column");
+    puts("    -b, --bare                   Displays bare opcodes without header and left column");
     puts("    -h, --header-only            Dumps only the constants table header");
     puts("    -o, --output \"filename\"      Writes output to \"filename\"");
 
