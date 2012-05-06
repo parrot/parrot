@@ -471,7 +471,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             const opcode_t new_name_idx = inputs[i]->str.const_map[old_name_idx];
             const opcode_t old_len = in_ann->keys[j].len;
             const opcode_t old_start = in_ann->keys[j].start;
-            const opcode_t new_key = inputs[i]->str.const_map[in_ann->keys[j].name];
+            const opcode_t new_key = inputs[i]->str.const_map[old_name_idx];
 
             for (k = 0; k < old_len; k++) {
                 const opcode_t idx = (old_start + k) * 2;
@@ -560,7 +560,7 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
             STRUCT_COPY_FROM_STRUCT(mapping, in_seg->mappings[j]);
             mapping->offset   += num_lines;
-            mapping->filename += inputs[i]->str.const_start;
+            mapping->filename = inputs[i]->str.const_map[mapping->filename];
         }
 
         num_lines    += in_seg->base.size - 1;
