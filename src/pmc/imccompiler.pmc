@@ -248,19 +248,6 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         RETURN(PMC *pf);
     }
 
-    /*METHOD eval(STRING *source,
-            STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
-    {
-        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
-        PMC * pf = PMCNULL;
-        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
-        if (has_target)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "IMCCompiler: compiler does not support the target option");
-        pf = imcc_compile_string(imcc, source, attrs->is_pasm);
-    }*/
-
     METHOD preprocess(STRING *code) {
         const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
