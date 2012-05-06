@@ -37,7 +37,7 @@ lp:
     print "done\n"
     end
 .end
-.sub _coro:
+.sub _coro
 loop:
     get_global $P11, "i"
     dec $P11
@@ -130,7 +130,7 @@ _catchm:
     end
 .end
 
-.sub _coro:
+.sub _coro
     push_eh _catchc
 corolp:
     get_global $P17, "i"
@@ -168,7 +168,7 @@ _catchm:
     print "catch main\n"
     end
 .end
-.sub _coro:
+.sub _coro
     push_eh _catchc
 corolp:
     get_global $P17, "i"
@@ -208,7 +208,7 @@ _catchm:
     print "catch main\n"
     end
 .end
-.sub _coro:
+.sub _coro
 corolp:
     get_global $P17, "i"
     dec $P17
@@ -246,7 +246,7 @@ _catchm:
     print "catch main\n"
     end
 .end
-.sub _coro:
+.sub _coro
     push_eh _catchc
 corolp:
     get_global $P17, "i"

@@ -10,7 +10,7 @@ compilers/pge/PGE.pir                                       [pge]
 docs/gettingstarted.pod                                     [main]doc
 docs/resources/phony_resource                               [main]doc
 include/parrot/charset.h                                    [main]include
-runtime/parrot/include/sockets.pasm                         [library]
+runtime/parrot/include/sockets.pir                          [library]
 # Local variables:
 #   mode: text
 # End:

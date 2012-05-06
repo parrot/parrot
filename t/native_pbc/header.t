@@ -27,18 +27,18 @@ Tests the layout of the PBC header.
 =cut
 
 # idea stolen from t/pmc/sub.t
-my $tmppasm = File::Temp->new( UNLINK => 1, SUFFIX => '.pasm', CLEANUP => 1 );
-print $tmppasm <<END;
-set I0, 0
+my $tmppir = File::Temp->new( UNLINK => 1, SUFFIX => '.pir', CLEANUP => 1 );
+print $tmppir <<END;
+set \$I0, 0
 END
-$tmppasm->flush;
+$tmppir->flush;
 my $out_f = File::Temp->new( UNLINK => 1, SUFFIX => '.pbc', CLEANUP => 1 );
 my $path_to_parrot = Parrot::Test::path_to_parrot();
 my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 my $args = $ENV{TEST_PROG_ARGS} || '';
 Parrot::Test::run_command
   (
-   qq{$parrot $args -o $out_f $tmppasm},
+   qq{$parrot $args -o $out_f $tmppir},
    CD     => $path_to_parrot,
    STDOUT => $out_f,
    STDERR => $out_f,

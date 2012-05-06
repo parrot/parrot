@@ -56,9 +56,9 @@ flag. This flag makes garbage collection occur as frequently as possible, which
 maximizes the probability that any newborn objects will run afoul of the
 garbage collector.
 
-=head1 PIR AND PASM CODE
+=head1 PIR CODE
 
-Let's say you have written (or generated) a huge .pasm or .pir file.  It's not
+Let's say you have written (or generated) a huge PIR file.  It's not
 working. You'd like some help in figuring out why.
 
 =head2 parrot_debugger

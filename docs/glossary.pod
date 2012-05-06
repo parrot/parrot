@@ -178,8 +178,8 @@ L<http://oss.software.ibm.com/icu/index.html>
 
 =item IMCC
 
-Intermediate Code Compiler: the component of parrot that compiles PASM
-and PIR into bytecode.
+Intermediate Code Compiler: the component of parrot that compiles PIR into
+bytecode.
 
 See also L<"PIR">.
 
@@ -218,14 +218,14 @@ See also L<"PCT">.
 
 =item PASM
 
-Parrot Assembly Language is the lowest level language before being translated
-in to bytecode.  Generally PIR is used.
+B<Obsolete:> Parrot Assembly Language used to be the original low level
+language used to generate bytecode. It has been replaced by PIR.
 
 =item PBC
 
 Parrot bytecode. The name for the "executable" files that can be passed to the
-Parrot interpreter for immediate execution (although PASM and IMC files can be
-executed directly, too).
+Parrot interpreter for immediate execution (PIR files can be passed to the
+parrot executable - they are then immediately compiled to PBC and run.)
 
 See also L<"Packfile">.
 
@@ -257,27 +257,12 @@ Parrot Grammar Engine.
 
 See also L<"PCT">.
 
-=item PIL
-
-Pugs' Intermediate Language.
-
 =item PIR
 
 Parrot Intermediate Representation: A medium-level assembly language for Parrot
 that hides messy details like register allocation so language compiler writers
 who target Parrot don't have to roll their own. Files have the
 extension C<.pir>.
-
-=item PIRATE
-
-PIRATE is Parrot's next generation compiler, and is currently under development.  
-IMCC is still the current compiler.
-
-=item PIRC
-
-Parrot Intermediate Representation Compiler.  It is an experimental attempt
-to replace IMCC, but could the PIR for IMCC.  Work on PIRC is incomplete,
-and the next generation compiler is PIRATE.
 
 =item PMC
 

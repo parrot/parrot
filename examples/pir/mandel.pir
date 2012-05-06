@@ -12,9 +12,8 @@ examples/pir/mandel.pir - Print the Mandelbrot set
 
 This prints an ASCII-art representation of the Mandelbrot set.
 
-Translated from C code by Glenn Rhoads into Parrot assembler
-by Leon Brocard <acme@astray.com>.
-Translated from PASM to PIR by Bernhard Schmalhofer.
+Translated from C code by Glenn Rhoads to Parrot by
+Leon Brocard <acme@astray.com> and Bernhard Schmalhofer.
 
 The C code is:
 

@@ -32,16 +32,10 @@ The acronyms you will encounter, are:
 
 =over 4
 
-=item * PASM
-
-Stands for Parrot Assembly language, and is a textual form of the bytecodes
-that Parrot is running. PASM's syntax is very primitive, which is a pain to
-write, which is why Parrot has something called PIR.
-
 =item * PIR
 
 Stands for Parrot Intermediate Representation. This is a fancy layer of
-syntactic sugar on top of PASM. If you program Parrot natively, you
+syntactic sugar on top of Parrot Bytecode. If you program Parrot natively, you
 write in PIR. Other documents discuss PIR syntax, for instance
 L<https://github.com/parrot/parrot/blob/master/docs/pdds/pdd19_pir.pod>
 

@@ -13693,9 +13693,6 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, NULL);
-    }
 
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);
@@ -13709,9 +13706,6 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, NULL);
-    }
 
     interp->current_cont = PREG(2);
     dest = VTABLE_invoke(interp, p, dest);
@@ -14132,26 +14126,7 @@ Parrot_exit_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  dest =  cur_opcode + 2;
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PREG(1)))) {
-        if ((PREG(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PREG(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PREG(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PREG(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PREG(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_runloop  * rl = interp->current_runloop;
@@ -14171,7 +14146,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
         if (rl) {
             if ((rl != interp->current_runloop)) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
 
         }
@@ -14187,26 +14162,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  dest =  cur_opcode + 2;
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PCONST(1)))) {
-        if ((PCONST(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PCONST(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PCONST(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PCONST(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PCONST(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_runloop  * rl = interp->current_runloop;
@@ -14226,7 +14182,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
         if (rl) {
             if ((rl != interp->current_runloop)) {
                 rl->handler_start = dest;
-                longjmp(rl->resume, 3);
+                longjmp(rl->resume, PARROT_JMP_EXCEPTION_FINALIZED);
             }
 
         }
@@ -14241,26 +14197,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_pop_upto_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PREG(1)))) {
-        if ((PREG(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PREG(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PREG(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PREG(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PREG(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PREG(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_cx_delete_upto_handler_local(interp, eh);
@@ -14271,26 +14208,7 @@ Parrot_pop_upto_eh_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_pop_upto_eh_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * eh = PMCNULL;
-
-    if ((!PMC_IS_NULL(PCONST(1)))) {
-        if ((PCONST(1)->vtable->base_type == enum_class_Exception)) {
-            GETATTR_Exception_handler(interp, PCONST(1), eh);
-        }
-        else {
-            if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "ExceptionHandler"))) {
-                eh = PCONST(1);
-            }
-            else {
-                if (VTABLE_isa(interp, PCONST(1), Parrot_str_new_constant(interp, "Exception"))) {
-                    eh = VTABLE_get_attr_str(interp, PCONST(1), Parrot_str_new_constant(interp, "handler"));
-                }
-
-            }
-
-        }
-
-    }
+    PMC  * eh = Parrot_ex_get_current_handler(interp, PCONST(1));
 
     if ((!PMC_IS_NULL(eh))) {
         Parrot_cx_delete_upto_handler_local(interp, eh);
@@ -18158,9 +18076,6 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!PMC_IS_NULL(method_pmc))) {
         PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
 
         Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
@@ -18192,10 +18107,6 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((!PMC_IS_NULL(method_pmc))) {
         PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
-
         Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18221,9 +18132,6 @@ Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, PREG(1));
-    }
 
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
     dest = VTABLE_invoke(interp, PREG(2), next);
@@ -18244,9 +18152,6 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
 
         interp->current_cont = PREG(3);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
@@ -18269,9 +18174,6 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
 
         interp->current_cont = PREG(3);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
@@ -18289,9 +18191,6 @@ Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, object);
-    }
 
     interp->current_cont = PREG(3);
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
@@ -18313,9 +18212,6 @@ Parrot_tailcallmethod_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
         (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
 
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18338,9 +18234,6 @@ Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     else {
         interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
         (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
-        if ((!PMC_IS_NULL(signature))) {
-            Parrot_pcc_set_object(interp, signature, object);
-        }
 
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18358,9 +18251,6 @@ Parrot_tailcallmethod_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, object);
-    }
 
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     return (opcode_t *)dest;
@@ -24122,9 +24012,6 @@ Parrot_invokecc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  signature = PREG(2);
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-    if ((!PMC_IS_NULL(signature))) {
-        Parrot_pcc_set_object(interp, signature, NULL);
-    }
 
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest = VTABLE_invoke(interp, p, dest);

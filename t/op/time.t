@@ -17,7 +17,7 @@ t/op/time.t - Time and Sleep
     test_sleep_i_negative()
     test_sleep_n()
     test_sleep_n_negative()
-    test_tm_pasm()
+    test_tm_pir()
 .end
 
 .sub test_time_i
@@ -84,7 +84,7 @@ t/op/time.t - Time and Sleep
     ok(1, "Cannot sleep_n backwards")
 .end
 
-.sub test_tm_pasm
+.sub test_tm_pir
     .include "tm.pir"
     is(.TM_SEC, 0, "TM_SEC ok")
     is(.TM_MIN, 1, "TM_MIN ok")

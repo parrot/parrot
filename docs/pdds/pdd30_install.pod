@@ -77,7 +77,7 @@ F<parrot-python> but not F<python>).
 
 The languages directories may have subdirectories, including F<library> for
 their own set of libraries, and F<dynext> for dynamic pmcs and ops, and
-F<include> for PIR or PASM includes.
+F<include> for PIR includes.
 
 It is recommended that languages follow a standard pattern in installing their
 libraries so a bytecode compiled version of a module in the C<mylang> HLL
@@ -135,7 +135,7 @@ packaging by installing into a separate install tree and creating a tarball
 from that tree.
 
 The B<configuration hash> is the return value of the global function
-C<_config()>, generated in F<config_lib.pasm>, and either defined in
+C<_config()>, generated in F<config_lib.pir>, and either defined in
 F<library/config.pir>, or as frozen PMC embedded in the test executable
 (F<config.fpmc>), the installable executable (F<install_config.fpmc>) or empty
 for miniparrot (F<null_config.fpmc>).

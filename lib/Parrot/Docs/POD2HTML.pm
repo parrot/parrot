@@ -36,7 +36,7 @@ use Parrot::Distribution;
 
 =item C<new()>
 
-Extend C<Pod::Simple::HTML> method to accept PIR and PASM sections that
+Extend C<Pod::Simple::HTML> method to accept PIR sections that
 contain example code, which will be put into a <pre> HTML element.
 
 =cut
@@ -45,9 +45,8 @@ sub new {
     my $new = shift->SUPER::new(@_);
 
     $new->accept_targets(qw(
-        PIR PASM PIR_FRAGMENT
+        PIR PIR_FRAGMENT
         PIR_INVALID PIR_TODO
-        PASM_INVALID PASM_TODO
         PIR_FRAGMENT_INVALID
     ));
     delete(@{$new->{'Tagmap'}}{'Data','/Data'});
@@ -349,7 +348,7 @@ sub process_for_start_token {
     my $token = shift;
     my $target = $token->attr("target");
 
-    if ($target =~ m/^(PIR|PASM)/) {
+    if ($target =~ m/^(PIR)/) {
         print { $self->{'output_fh'} } '<pre>';
         $self->{IN_CODE_BLOCK} = 1;
     }

@@ -183,7 +183,7 @@ output with the unexpected result is false. Valid options are
 
 =item C<example_output_isnt($example_f, $expected, @todo)>
 
-Determines the language, PIR or PASM, from the extension of C<$example_f> and runs
+Determines the language from the extension of C<$example_f> and runs
 the appropriate C<language_output_(is|like|isnt)> subroutine. C<$example_f> is
 used as a description, so don't pass one.
 

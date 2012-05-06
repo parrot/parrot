@@ -67,7 +67,7 @@ then throw an appropriate exception.
 =head2 The interpreter event checking code
 
 We cannot interrupt the interpreter at arbitrary points and run some different
-code (e.g. a PASM subroutine handling timer events). So when an event is put
+code (e.g. a subroutine handling timer events). So when an event is put
 into the interpreter's B<task_queue> the opcode dispatch table for the
 interpreter is changed.
 

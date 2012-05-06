@@ -12,7 +12,7 @@ use Test::More;
 
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Config;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 12;
 
 =head1 NAME
 
@@ -32,48 +32,7 @@ my $PERL5  = $PConfig{perl};
 
 my $ended_ok = 0;
 
-#my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
-my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $FOO <<'ENDF';
-  .macro_const BAR 42
-ENDF
-close $FOO;
-
-pir_output_is( <<"CODE", <<'OUT', 'include pasm' );
-.sub test :main
-    say "before"
-    .include "$temp_pasm"
-    print .BAR
-    say "\\nafter"
-.end
-CODE
-before
-42
-after
-OUT
-
-($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
-
-print $FOO <<'ENDF';
-  .macro_const BAR 42
-ENDF
-close $FOO;
-
-pir_output_is( <<"CODE", <<'OUT', 'include pasm (absolute path)' );
-.sub test :main
-    say "before"
-    .include '$temp_pasm'
-    say .BAR
-    say "after"
-.end
-CODE
-before
-42
-after
-OUT
-
-($FOO, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+my ($FOO, my $temp_pir) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .const int BAR = 42

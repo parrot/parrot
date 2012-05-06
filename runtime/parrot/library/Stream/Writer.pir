@@ -68,7 +68,6 @@ END:
 
     # mark it as closed
     .local pmc status
-    interpinfo self, .INTERPINFO_CURRENT_OBJECT
     getattribute status, self, 'status'
     status = 0
 .end

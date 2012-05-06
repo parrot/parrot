@@ -10,13 +10,6 @@
 # python oo2.py                               2.9 (first time)
 # python oo2.py                               2.4
 
-# parrot -R jit oo2.pasm            -g           -O3
-#   with reuse regsave mem                    6.1
-# anchor P1                                   6.5
-# Dan's new object layout                     4.9
-
-# parrot -R jit oo2-prop.pasm                     2.6
-
 .namespace [ "Foo" ]
 .sub 'main' :main
     newclass $P1, "Foo"
@@ -38,13 +31,13 @@ loop:
 
 .sub 'init' :vtable
 .include "interpinfo.pir"
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    .param pmc self
     $P10 = new 'Integer'
     $P10 = 10
-    setattribute $P2, ".i", $P10
+    setattribute self, ".i", $P10
     $P10 = new 'Integer'
     $P10 = 20
-    setattribute $P2, ".j", $P10
+    setattribute self, ".j", $P10
     .return ()
 .end
 

@@ -46,20 +46,21 @@ the Parrot developer tools as well:
 
 =head2 Running Parrot
 
-Once you've installed Parrot, run it.  Create a test file called F<news.pasm>.
-C<.pasm> files contain Parrot Assembly Language (PASM) instructions; this is a
+Once you've installed Parrot, run it.  Create a test file called F<news.pir>.
+C<.pir> files contain PIR (Parrot Intermediate Representation); this is a
 low-level language native to the Parrot virtual machine.
 
-=begin PASM
+=begin PIR
 
+.sub "main"
   say "Here is the news for Parrots."
-  end
+.end
 
-=end PASM
+=end PIR
 
 Now run this file with:
 
-  $ B<parrot news.pasm>
+  $ B<parrot news.pir>
 
 which will print:
 
@@ -140,7 +141,7 @@ operations, control flow, object orientation, exception handling, and more.
 
 =item Chapter 11, I<Directive Reference>
 
-Parrot supports directives used within PIR and PASM code to change the behavior
+Parrot supports directives used within PIR code to change the behavior
 of code and to control what happens in bytecode.
 
 =item Chapter 13, I<Operator Reference>

@@ -105,7 +105,7 @@ sub get_samples {
                 $code .= $line;
             }
         }
-        elsif ( $line =~ /^=begin ((PIR|PASM)(_(.*))?)$/ ) {
+        elsif ( $line =~ /^=begin ((PIR)(_(.*))?)$/ ) {
             $in_code = 1;
             $snippet->{file} = $file;
             $snippet->{line} = $.;
@@ -143,13 +143,15 @@ test output.
 To test a snippet of parrot code, wrap it in C<=begin> and C<=end> blocks
 like:
 
- =begin PASM
+ =begin PIR
 
-   set I0, 0
+   .sub 'foo'
+     set $I0, 3
+   .end
 
- =end PASM
+ =end PIR
 
-C<PASM> and C<PIR> are both valid target languages.
+C<PIR> is the only valid target language.
 
 Additionally, you can add the following modifiers (prepending with an
 underscore).

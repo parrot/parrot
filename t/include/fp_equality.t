@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/include/fp_equality.t - Test runtime/parrot/include/fp_equality.pasm
+t/include/fp_equality.t - Test runtime/parrot/include/fp_equality.pir
 
 =head1 SYNOPSIS
 

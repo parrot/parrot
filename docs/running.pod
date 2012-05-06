@@ -37,10 +37,6 @@ Turn on the I<--gc-debug> flag.
 
 =over 4
 
-=item -a, --pasm
-
-Assume PASM input on stdin.
-
 =item -c, --pbc
 
 Assume PBC file on stdin, run it.
@@ -68,9 +64,7 @@ Print debugging and tracing flag bits summary.
 =item -o outputfile, --output=outputfile
 
 Act like an assembler. Don't run code, unless B<-r> is given too. If the
-outputfile ends with F<.pbc>, a PBC file is written. If it ends with F<.pasm>,
-a PASM output is generated, even from PASM input. This can be handy to check
-various optimizations, including C<-Op>.
+outputfile ends with F<.pbc>, a PBC file is written.
 
 =item --output-pbc
 
@@ -206,11 +200,9 @@ Add C<path> to the library search path
 
 =head2 <file>
 
-If the file ends in F<.pbc> it will be interpreted immediately.
-
-If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is
-parsed as PIR code. In both cases, it will then be run, unless the C<-o> flag
-was given.
+If the file ends in F<.pbc> it will be interpreted immediately.  Otherwise, it
+is parsed as PIR code. In both cases, it will then be run, unless the C<-o>
+flag was given.
 
 If the C<file> is a single dash, input from C<stdin> is read.
 

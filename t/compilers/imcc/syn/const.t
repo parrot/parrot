@@ -144,15 +144,16 @@ ok 2
 ok 3
 OUT
 
-pasm_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
-.pcc_sub :main main:
-    set I0, 2.0
-    print I0
+pir_output_is( <<'CODE', <<'OUT', "const I/N mismatch" );
+.sub _main :main
+    set $I0, 2.0
+    print $I0
     print "\n"
-    set N0, 2
-    print N0
+    set $N0, 2
+    print $N0
     print "\nok\n"
     end
+.end
 CODE
 2
 2

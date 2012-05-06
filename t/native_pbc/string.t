@@ -45,8 +45,6 @@ native pbcs.
 
 =begin comment
 
-The PBC is generated from t/op/string_133.pasm for different architectures.
-
 For adding tests, see the comments in t/native_pbc/number.t
 
 =cut

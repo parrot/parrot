@@ -1923,7 +1923,7 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
     while (*start == ' ' || *start == '\t' || *start == '(') { ++start; }
 
     /* Skip trailing whitespace and ) */
-    while (end >= src && (*end == ' ' || *end == '\t' || *end == ')')) {
+    while (end >= start && (*end == ' ' || *end == '\t' || *end == ')')) {
         --end;
     }
     ++end;
@@ -1989,8 +1989,9 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
           case ' ':
           case '\t':
           case ')':
-          case '\0':
             ++chr;
+            /* Fallthrough */
+          case '\0':
             break;
           case ',':
             /* Hold onto the , for the test at the start of the loop */

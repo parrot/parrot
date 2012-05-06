@@ -304,7 +304,7 @@ sub build_index_chm {
         $index .= qq{\t<LI> <OBJECT type="text/sitemap">\n};
         $index .= qq{\t\t<param name="Keyword" value="$key">\n};
         foreach my $ref (@{$source->{_INDEX}{$key}}) {
-            (my $shortkey = $key) =~ s/( opcode \(PASM\)| directive| \(.*\)| \(.*\) instruction (PIR))//;
+            (my $shortkey = $key) =~ s/( directive| \(.*\)| \(.*\) instruction (PIR))//;
              $index .= qq{\t\t<param name="Local" value="$ref.html#$shortkey">\n};
         }
         $index .= qq{\t\t</OBJECT>\n};

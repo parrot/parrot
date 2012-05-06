@@ -78,10 +78,10 @@ SKIP: {
     skip( "clone not finished yet", 1 );
     pir_output_is( <<"CODE", <<'OUTPUT', "clone" );
     .sub _main :main
-    open $P0, "$temp_file", 'r'
-    clone $P1, $P0
-    read $S0, $P1, 1024
-    print $S0
+    open \$P0, "$temp_file", 'r'
+    clone \$P1, \$P0
+    read \$S0, \$P1, 1024
+    print \$S0
     end
 .end
 CODE

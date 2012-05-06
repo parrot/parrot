@@ -385,11 +385,6 @@ indentation, doing some of the typing for you (with Abbrev mode) and by
 showing keywords, comments, strings etc. in different faces (with Font
 Lock mode on terminals that support it).
 
-PIR (Parrot Intermediate Representation) is a friendlier way of
-programming parrot than raw PASM (Parrot Assembly). In general,
-compilers (and certainly humans) should code in PIR and let Parrot
-handle register allocation and all that good stuff.
-
 To find out more, hie thee to `http://www.parrot.org/'.
 
 Type \\[list-abbrevs] to display the built in abbrevs for PIR

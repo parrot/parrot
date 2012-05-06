@@ -41,7 +41,6 @@ sub new {
         'Examples',
         'examples.html',
         '',
-        $self->new_group( 'PASM and PIR',          '', 'examples/pasm' ),
         $self->new_group( 'PIR',                   '', 'examples/pir' ),
         $self->new_group( 'Subroutines',           '', 'examples/subs' ),
         $self->new_group( 'Streams',               '', 'examples/streams' ),

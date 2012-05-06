@@ -209,7 +209,7 @@ backwards-incompatible change requires deprecation:
 
 =item * C<PARROT_API> function changes
 
-=item * PIR or PASM syntax changes
+=item * PIR syntax changes
 
 =item * API changes in the compiler tools
 

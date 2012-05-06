@@ -7,7 +7,7 @@ start with the first.
 =head2 Throwing exceptions
 
 If you're going to be using exceptions, you probably want to start by
-including two pasm files that define constants for exception type and
+including two PIR files that define constants for exception type and
 severity.
 
 You create exceptions just like you create any other object, with

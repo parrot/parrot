@@ -56,17 +56,17 @@ is($conf->data->get( 'has_setitimer'), 'define',
 is($conf->data->get( 'has_sig_atomic_t'), 'define',
     "Got expected value for has_sig_atomic_t");
 
-########### _print_signalpasm() ###########
+########### _print_signalpir() ###########
 
 my $cwd = cwd();
 {
     my $tdir = tempdir( CLEANUP => 1);
     chdir $tdir or croak "Unable to change to $tdir";
-    my $signalpasm = q{signal.pasm};
-    ok(auto::signal::_print_signalpasm($conf, $signalpasm),
-        "_print_signalpasm returned true value");
-    ok(-s $signalpasm, "File with nonzero size created");
-    unlink $signalpasm or croak "Unable to delete file after testing";
+    my $signalpir = q{signal.pir};
+    ok(auto::signal::_print_signalpir($conf, $signalpir),
+        "_print_signalpir returned true value");
+    ok(-s $signalpir, "File with nonzero size created");
+    unlink $signalpir or croak "Unable to delete file after testing";
     chdir $cwd or croak "Unable to change back to $cwd";
 }
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 3;
 use Parrot::Config;
 
 =head1 NAME
@@ -22,30 +22,12 @@ Test the examples in F<examples/subs>.
 
 =head1 SEE ALSO
 
-F<t/examples/japh.t>
-F<t/examples/pasm.t>
 F<t/examples/pir.t>
 
 =cut
 
 # Set up expected output for examples
 my %expected = (
-    'coroutine.pasm' => << 'END_EXPECTED',
-Calling 1st co-routine
-Entry
-Resumed
-Done
-Calling 2nd co-routine
-Entry
-Resumed
-Done
-END_EXPECTED
-
-    'pasm_sub1.pasm' => << 'END_EXPECTED',
-Hello from subroutine
-Hello from main
-END_EXPECTED
-
     'single_retval.pir' => << 'END_EXPECTED',
 7 8 nine 10
 return: 10

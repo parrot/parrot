@@ -52,7 +52,6 @@ my $helpregex = <<OUTPUT;
 
 Usage:
 pbc_disassemble .* [[]file.pbc[]]
-pbc_disassemble -o file[.]pasm file[.]pbc
 
 \\s+(-.{1},\\s+--.*(["]\\w+["])?\\s+.*
 )+/m
@@ -61,12 +60,6 @@ OUTPUT
 disassemble_raw_output_like( "--help", $helpregex, "pbc_disassemble help message");
 disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassemble bad option");
 disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
-
-my $errorregex = <<OUTPUT;
-/Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
-OUTPUT
-
-disassemble_raw_output_like( "-o del.pasm pbc_disassemble$PConfig{exe}", $errorregex, "pbc_disassemble bad bytecode file");
 
 disassemble_output_like( <<PIR, "pir", qr/PMC_CONST.*set_n_nc.*print_n/ms, 'pbc_disassemble numeric ops');
 .sub main :main
@@ -118,10 +111,10 @@ PIR
 
 =head2 disassemble_output_like
 
-    disassemble_output_like(<<PASM, "pasm", "some output", "running $file");
+    disassemble_output_like(<<PIR, "pir", "some output", "running $file");
 
 Takes 3-4 arguments: a file to run,
-the filename-extension of the file (probably "pir" or "pasm"),
+the filename-extension of the file (probably "pir"),
 an arrayref or single regex string to match within pbc_disassemble's output,
 and the optional test diagnostic.
 

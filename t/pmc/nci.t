@@ -486,7 +486,7 @@ libnci_test was successfully loaded
 OUTPUT
     }
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PIR' );
 .sub _main :main
   loadlib $P1, "libnci_test"
   print "loaded\n"
@@ -724,7 +724,7 @@ OUTPUT
   set $I5, 10
   set $I6, 20
   set $I7, 30
-  set_args "0,0,0", $I5,I6,I7
+  set_args "0,0,0", $I5, $I6, $I7
   invokecc $P0
   get_results "0", $I5
   print $I5
@@ -1325,7 +1325,7 @@ ok
 got null
 OUTPUT
 
-  pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
+  pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PIR' );
 .sub _main :main
 
   # we need a flag if the call_back is already done
@@ -1362,8 +1362,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $S5
   print "in callback\n"
   print "user data: "
@@ -1460,7 +1461,7 @@ external data: succeeded
 the callback has run
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PIR' );
 .sub _main :main
   # we need a flag if the call_back is already done
   new $P10, ['Integer']
@@ -1496,8 +1497,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $I5
   print "in callback\n"
   print "user data: "
@@ -1607,7 +1609,7 @@ external data: 99
 the callback has run
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PIR' );
 .sub _main :main
 
   # we need a flag if the call_back is already done
@@ -1644,8 +1646,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $S5
   print "in callback\n"
   print "user data: "
@@ -1668,7 +1671,7 @@ external data: succeeded
 done.
 OUTPUT
 
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PASM' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D2 - PIR' );
 .sub _main :main
   # we need a flag if the call_back is already done
   new $P10, ['Integer']
@@ -1704,8 +1707,9 @@ fin:
 err:
   print "cb didnt run\n"
   end
+.end
 
-.pcc_sub _call_back:
+.sub _call_back
   get_params "0,0", $P5, $I5
   print "in callback\n"
   print "user data: "

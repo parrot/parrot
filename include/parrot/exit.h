@@ -26,6 +26,11 @@ typedef struct _handler_node_t {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_COLD
+void Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void Parrot_x_exit(PARROT_INTERP, int status)
@@ -44,6 +49,9 @@ void Parrot_x_on_exit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_Parrot_x_execute_on_exit_handlers \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

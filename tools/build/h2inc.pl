@@ -6,7 +6,7 @@ tools/build/h2inc.pl
 
 =head1 DESCRIPTION
 
-Generate C<.pasm> and C<.pm> files with constants based on C<.h> files.
+Generate C<.pir> and C<.pm> files with constants based on C<.h> files.
 
 Invoked by F<make>.  Imports functions from Parrot::H2inc.
 

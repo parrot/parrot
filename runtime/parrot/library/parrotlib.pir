@@ -194,7 +194,7 @@ END:
     .param string name
     .local string path
 
-.include "interpinfo.pir"
+    .include "interpinfo.pir"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     getprop $P0, $P1, "path"
     path = $P0
