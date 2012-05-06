@@ -1969,6 +1969,17 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
     }
 }
 
+/*
+
+=item C<PackFile_Annotations * Parrot_pf_get_annotations_segment(PARROT_INTERP,
+PackFile *pf, PackFile_ByteCode *bc)>
+
+TK: Whiteknight please fill in.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Annotations *
