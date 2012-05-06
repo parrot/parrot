@@ -251,10 +251,11 @@ OUTPUT
     test_test($desc);
 }
 
-$expected = qq{Goodbye World\n};
+my $file     = q{t/perl/testlib/answer.pir};
+my $expected = qq{Hello World};
 example_output_isnt( $file, $expected );
 
-$expected = qr{Hello World};
+$expected = qr{42\nsays Parrot};
 example_output_like( $file, $expected );
 
 $file = q{t/perl/testlib/answer.pir};
