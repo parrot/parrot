@@ -214,6 +214,7 @@ help(void)
 static void
 ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
 {
+    ASSERT_ARGS(ensure_libdep)
     size_t i;
     for (i = 0; i < bc->n_libdeps; i++) {
         if (Parrot_str_equal(interp, bc->libdeps[i], lib)) {
@@ -456,6 +457,7 @@ static PackFile_Annotations*
 pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
+    ASSERT_ARGS(pbc_merge_annotations)
     int i, j, k;
     int num_anns = 0;
     PackFile_Annotations * const merged = Parrot_pf_get_annotations_segment(interp, pf, bc);
