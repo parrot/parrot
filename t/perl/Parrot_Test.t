@@ -30,7 +30,7 @@ BEGIN {
         plan( skip_all => "Test::Builder::Tester not installed\n" );
         exit 0;
     }
-    plan( tests => 93 );
+    plan( tests => 96 );
 }
 
 use lib qw( . lib ../lib ../../lib );
