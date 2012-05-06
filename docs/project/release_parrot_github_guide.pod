@@ -4,9 +4,7 @@
 
 =head1 NAME
 
-docs/project/release_parrot_github_guide.pod - Readme file on how to update
-the github pages of the 'parrot.github.com' repository and the supporting
-gh-pages branches of the 'parrot-docsx' repositories.
+docs/project/release_parrot_github_guide.pod - Parrot Github Release Guide.
 
 =head1 DESCRIPTION
 
