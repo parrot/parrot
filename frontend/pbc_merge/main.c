@@ -435,11 +435,11 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             opcode_t old_pmc_idx = in_seg->tag_map[j].const_idx;
             opcode_t new_pmc_idx = inputs[i]->pmc.const_map[old_pmc_idx];
 
-            /*
-            Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
-                old_tag_idx, new_tag_idx, in_seg->str.constants[old_tag_idx], str_constants[new_tag_idx],
-                in_seg->tag_map[j].const_idx, in_seg->tag_map[j].const_idx + pmc_cursor_start);
-            */
+/*
+Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
+    old_tag_idx, new_tag_idx, in_seg->str.constants[old_tag_idx], str_constants[new_tag_idx],
+    in_seg->tag_map[j].const_idx, in_seg->tag_map[j].const_idx + pmc_cursor_start);
+*/
 
             Parrot_pf_tag_constant(interp, const_seg, new_tag_idx, new_pmc_idx);
             tag_cursor++;
@@ -499,8 +499,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     old_offset + inputs[i]->code_start,
                     new_key,
                     in_ann->keys[j].type,
-                    new_value
-                );
+                    new_value);
             }
             key_cursor++;
         }
