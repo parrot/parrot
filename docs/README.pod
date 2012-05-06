@@ -1,0 +1,1 @@
+I really want to rename 'parrot.pod' to 'README.pod' and add some additional information to the file.
