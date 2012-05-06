@@ -211,6 +211,17 @@ help(void)
     exit(0);
 }
 
+/*
+
+=item C<static void ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING
+*lib)>
+
+TK: Whiteknight please fill in.
+
+=cut
+
+*/
+
 static void
 ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
 {
@@ -450,6 +461,17 @@ Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
     /* Return the merged segment */
     return const_seg;
 }
+
+/*
+
+=item C<static PackFile_Annotations* pbc_merge_annotations(PARROT_INTERP,
+pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
+
+TK: Whiteknight please fill in.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -1001,6 +1023,11 @@ main(int argc, const char **argv)
     exit(0);
 }
 
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:
