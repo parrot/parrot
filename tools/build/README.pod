@@ -1,4 +1,12 @@
-README for tools/build/
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+tools/build/README.pod - Readme file for the 'tools/build/' directory. 
+
+=head1 DESCRIPTION
 
 This directory is intended to hold programs, templates and configuration files
 invoked by the default 'make' target ('make all'), with or without
@@ -8,5 +16,11 @@ Programs, templates and configuration files invoked by 'make install' or
 'make install-dev' should be placed in tools/release/.
 
 Other things being equal, programs, templates and configuration files invoked
-by all other 'make' targets (e.g., 'make headerizer') should be placed in
+by all other 'make' targets (I<e.g.>, 'make headerizer') should be placed in
 tools/dev/.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut
