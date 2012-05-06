@@ -216,7 +216,7 @@ help(void)
 =item C<static void ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING
 *lib)>
 
-TK: Whiteknight please fill in.
+Ensures that the libdep C<lib> is in the libdeps list for C<bc>.
 
 =cut
 
@@ -447,11 +447,16 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             opcode_t old_pmc_idx = in_seg->tag_map[j].const_idx;
             opcode_t new_pmc_idx = inputs[i]->pmc.const_map[old_pmc_idx];
 
-/*
-Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
-    old_tag_idx, new_tag_idx, in_seg->str.constants[old_tag_idx], str_constants[new_tag_idx],
-    in_seg->tag_map[j].const_idx, in_seg->tag_map[j].const_idx + pmc_cursor_start);
-*/
+            /*
+            Parrot_io_eprintf(interp,
+                "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
+                old_tag_idx,
+                new_tag_idx,
+                in_seg->str.constants[old_tag_idx],
+                str_constants[new_tag_idx],
+                in_seg->tag_map[j].const_idx,
+                in_seg->tag_map[j].const_idx + pmc_cursor_start);
+            */
 
             Parrot_pf_tag_constant(interp, const_seg, new_tag_idx, new_pmc_idx);
             tag_cursor++;
@@ -467,7 +472,9 @@ Parrot_io_eprintf(interp, "\nmerging tag [%d->%d '%S','%S'] = %d->%d\n",
 =item C<static PackFile_Annotations* pbc_merge_annotations(PARROT_INTERP,
 pbc_merge_input **inputs, int num_inputs, PackFile *pf, PackFile_ByteCode *bc)>
 
-TK: Whiteknight please fill in.
+Merge Annotations segments from C<inputs> into a new C<PackFile_Annotations>
+segment. Returns the new merged segment (which is also already appended to
+the directory in C<pf>).
 
 =cut
 
