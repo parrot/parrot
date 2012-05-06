@@ -112,6 +112,8 @@ PARROT_COLD
 void
 Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 {
+    ASSERT_ARGS(Parrot_x_execute_on_exit_handlers)
+
     /* call all the exit handlers */
     handler_node_t *node;
 
