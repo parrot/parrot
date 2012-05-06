@@ -15,7 +15,7 @@ The pir files are generated from the winxed repository, copied here,
 and compiled to pbc during the parrot build process. I<See> The Winxed web
 site: http://winxed.org/
 
-=head2 How to Update the Snapshot
+=head2 How to update the snapshot
 
 =over 4
 
@@ -29,7 +29,7 @@ directory.
 
 =back
 
-=head2 How to Choose and Tag the Release Used
+=head2 How to choose and tag the release used
 
 Releases are tagged like this: RELEASE_1_0_0
 
