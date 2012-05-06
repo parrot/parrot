@@ -41,7 +41,7 @@ extern void *flush_reg_store(void);
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
 #define REPLENISH_LEVEL_FACTOR                 0.5
 
-/* this factor is totally arbitrary, but gives good timings for stress.pasm */
+/* this factor is totally arbitrary */
 #define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
 
 #define POOL_MAX_BYTES                         (65536 * 128)
