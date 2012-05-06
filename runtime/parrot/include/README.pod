@@ -1,0 +1,39 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+runtime/parrot/include/README.pod - Readme file for the runtime/parrot/include
+directory. 
+
+=head1 DESCRIPTION
+
+This directory contains mostly generated files:
+
+=over 4
+
+=item include files with constants defined somewhere in the interpreter
+(I<see> F<config/gen/parrot_include.pl> for details)
+
+=item configuration data (config.fpmc)
+
+=item bytecode used at runtime (parrotlib.pbc)
+
+=back
+
+Additionally there are some snippets of PIR code:
+
+=over 4
+
+=item hllmacros.pir provides some nifty PIR macros
+
+=item test_more.pir provides boilerplate code for test scripts written in PIR
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut
