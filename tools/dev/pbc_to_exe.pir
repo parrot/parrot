@@ -174,7 +174,6 @@ HEADER
         {
             Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
             get_imcc_compiler_pmc(interp, class_pmc, 0);
-            get_imcc_compiler_pmc(interp, class_pmc, 1);
         }
 
         PARROT_CANNOT_RETURN_NULL
