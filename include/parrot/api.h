@@ -27,6 +27,13 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CONST_FUNCTION
 size_t get_program_code_size(void);
 
+/* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int line);
+
 #define PARROT_API PARROT_EXPORT
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
@@ -392,14 +399,14 @@ Parrot_Int Parrot_api_string_export_wchar(
 PARROT_API
 Parrot_Int Parrot_api_string_free_exported_ascii(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGIN(char *str))
+    ARGIN(char * const str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_API
 Parrot_Int Parrot_api_string_free_exported_wchar(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGIN(wchar_t *str))
+    ARGIN(wchar_t * const str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -439,7 +446,7 @@ Parrot_Int Parrot_api_string_import_binary(
 PARROT_API
 Parrot_Int Parrot_api_string_import_wchar(
     ARGIN(Parrot_PMC interp_pmc),
-    ARGIN(const wchar_t *str),
+    ARGIN(wchar_t * str),
     ARGOUT(Parrot_String * out))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

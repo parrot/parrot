@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010, Parrot Foundation.
 
 =head1 NAME
 
@@ -53,7 +53,7 @@ Parrot_api_string_export_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
 /*
 
 =item C<Parrot_Int Parrot_api_string_free_exported_ascii(Parrot_PMC interp_pmc,
-char *str)>
+char * const str)>
 
 Releases the allocated memory for C<str>. This function returns a true value if
 this call is successful and false value otherwise.
@@ -64,7 +64,7 @@ this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_string_free_exported_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(char *str))
+Parrot_api_string_free_exported_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(char * const str))
 {
     ASSERT_ARGS(Parrot_api_string_free_exported_ascii)
     EMBED_API_CALLIN(interp_pmc, interp);
@@ -112,7 +112,7 @@ Parrot_api_string_export_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
 /*
 
 =item C<Parrot_Int Parrot_api_string_free_exported_wchar(Parrot_PMC interp_pmc,
-wchar_t *str)>
+wchar_t * const str)>
 
 Releases the allocated memory for C<str>. This function returns a true value if
 this call is successful and false value otherwise.
@@ -123,7 +123,7 @@ this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_string_free_exported_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t *str))
+Parrot_api_string_free_exported_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * const str))
 {
     ASSERT_ARGS(Parrot_api_string_free_exported_wchar)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -182,8 +182,8 @@ Parrot_api_string_import_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(const char * 
 
 /*
 
-=item C<Parrot_Int Parrot_api_string_import_wchar(Parrot_PMC interp_pmc, const
-wchar_t *str, Parrot_String * out)>
+=item C<Parrot_Int Parrot_api_string_import_wchar(Parrot_PMC interp_pmc, wchar_t
+* str, Parrot_String * out)>
 
 Transforms wchar string C<str> into a Parrot_String and stores the result in
 C<out>. This function returns a true value if this call is successful and false
@@ -195,7 +195,7 @@ value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_string_import_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(const wchar_t *str),
+Parrot_api_string_import_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * str),
         ARGOUT(Parrot_String * out))
 {
     ASSERT_ARGS(Parrot_api_string_import_wchar)
