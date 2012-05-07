@@ -223,7 +223,7 @@ Ensures that the libdep C<lib> is in the libdeps list for C<bc>.
 */
 
 static void
-ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
+ensure_libdep(PARROT_INTERP, ARGMOD(PackFile_ByteCode *bc), ARGIN(STRING *lib))
 {
     ASSERT_ARGS(ensure_libdep)
     size_t i;
