@@ -193,7 +193,8 @@ given method $3.
 =cut
 
 inline op can(out INT, invar PMC, in STR) :object_base {
-    $1 = VTABLE_can(interp, $2, $3);
+    PMC * const meth = VTABLE_find_method(interp, $2, $3);
+    $1 = !PMC_IS_NULL(meth);
 }
 
 

@@ -18270,13 +18270,15 @@ Parrot_addmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_can_i_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = VTABLE_can(interp, PREG(2), SREG(3));
+    PMC * meth = VTABLE_find_method(interp, PREG(2), SREG(3));
+    IREG(1) = !PMC_IS_NULL(meth);
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_can_i_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = VTABLE_can(interp, PREG(2), SCONST(3));
+    PMC * meth = VTABLE_find_method(interp, PREG(2), SCONST(3));
+    IREG(1) = !PMC_IS_NULL(meth);
     return cur_opcode + 4;
 }
 
@@ -24220,7 +24222,7 @@ op_lib_t core_op_lib = {
   1113,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
-  get_op          /* op_code() */ 
+  get_op          /* op_code() */
 };
 
 /*
