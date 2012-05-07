@@ -8,8 +8,8 @@ blib/README.pod - Readme file for the 'blib/' top-level directory.
 
 =head1 DESCRIPTION
 
-The 'blib' I<i.e.,> "binary library," contains the libparrot static and
-dynamic libraries.
+The 'blib' I<i.e.,> "binary library," directory contains the libparrot static
+and dynamic libraries.
 
 It also contains a "pretty printer" Python script for GDB. I<See>
 F<lib/GDBPrettyPrint.py>.
