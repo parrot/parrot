@@ -1,13 +1,36 @@
-# Parrot Developer Tools
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-This directory is intended to hold programs, templates and configuration files
-found useful by Parrot developers other than those:
+=pod
 
- * invoked by the default 'make' target ('make all')
- * invoked by 'make install'
+=head1 NAME
+
+tools/dev/README.pod - Readme file for the Parrot Developer Tools directory.
+
+=head1 DESCRIPTION
+
+This directory is intended to hold programs, templates, and configuration
+files found useful to Parrot developers, excluding those 
+
+=over 4
+
+=item invoked by the default 'make' target ('make all')
+
+=item invoked by 'make install'
+
+=back
 
 They will sometimes require additional dependencies to fully function, such as
 CPAN modules or third-party programs, like valgrind.
+
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011-2012, Parrot Foundation.
+
+=cut
+
+# Parrot Developer Tools
 
 Below is a list of Parrot Developer Tools and a short description of what they do:
 
