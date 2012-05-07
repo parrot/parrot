@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -65,8 +65,13 @@ typedef struct pbc_merge_input {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
-        __attribute__nonnull__(1);
+static void ensure_libdep(PARROT_INTERP,
+    ARGMOD(PackFile_ByteCode *bc),
+    ARGIN(STRING *lib))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bc);
 
 PARROT_DOES_NOT_RETURN
 static void help(void);
@@ -155,7 +160,9 @@ static void pbc_merge_write(PARROT_INTERP,
         FUNC_MODIFIES(*pf);
 
 #define ASSERT_ARGS_ensure_libdep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc) \
+    , PARROT_ASSERT_ARG(lib))
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -838,7 +845,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode    *bc;
     PackFile_ConstTable  *ct;
-    PackFile_Annotations *an;
     int                   i;
 
     /* Create a new empty packfile. */
@@ -869,7 +875,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     /* Merge the various stuff. */
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged);
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    an = pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
     bc->const_table = ct;
     ct->code        = bc;
     interp->code    = bc;
