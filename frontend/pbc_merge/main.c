@@ -359,14 +359,13 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     FLOATVAL  *num_constants = mem_gc_allocate_typed(interp, FLOATVAL);
     STRING   **str_constants = mem_gc_allocate_typed(interp, STRING *);
     PMC      **pmc_constants = mem_gc_allocate_typed(interp, PMC *);
-    PackFile_ConstTagPair *tags = mem_gc_allocate_typed(interp, PackFile_ConstTagPair);
 
     opcode_t num_cursor = 0;
     opcode_t str_cursor = 0;
     opcode_t pmc_cursor = 0;
     opcode_t tag_cursor = 0;
 
-    int i, j;
+    int i;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable *)
@@ -381,8 +380,8 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Loop over input files. */
     for (i = 0; i < num_inputs; ++i) {
-        opcode_t str_cursor_start = str_cursor;
         opcode_t pmc_cursor_start = pmc_cursor;
+        int j;
 
         /* Get the constant table segment from the input file. */
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
@@ -494,8 +493,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_annotations)
-    int i, j, k;
-    int num_anns = 0;
+    int i;
     PackFile_Annotations * const merged = Parrot_pf_get_annotations_segment(interp, pf, bc);
     int key_cursor = 0;
 
@@ -503,13 +501,14 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         PackFile_ByteCode * const in_bc = inputs[i]->pf->cur_cs;
         PackFile_Annotations * const in_ann =
             Parrot_pf_get_annotations_segment(interp, inputs[i]->pf, in_bc);
+        int j;
 
         for (j = 0; j < in_ann->num_keys; j++) {
             const opcode_t old_name_idx = in_ann->keys[j].name;
-            const opcode_t new_name_idx = inputs[i]->str.const_map[old_name_idx];
             const opcode_t old_len = in_ann->keys[j].len;
             const opcode_t old_start = in_ann->keys[j].start;
             const opcode_t new_key = inputs[i]->str.const_map[old_name_idx];
+            int k;
 
             for (k = 0; k < old_len; k++) {
                 const opcode_t idx = (old_start + k) * 2;
