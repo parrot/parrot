@@ -697,8 +697,6 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_fixup_bytecode)
-    int        cur_arg;
-    opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
@@ -709,6 +707,8 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         op_info_t *op;
         opcode_t   op_num;
         op_func_t  op_func;
+        opcode_t  *op_ptr;
+        int        cur_arg;
 
         /* Keep track of the current input file. */
         if (cur_input + 1 < num_inputs &&
@@ -860,7 +860,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
         for (j = 0; j < pf_dir->num_segments; ++j) {
             const PackFile_Segment * const seg = pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                const PackFile_ConstTable * const ct = (PackFile_ConstTable *)seg;
+                const PackFile_ConstTable * const ct = (const PackFile_ConstTable *)seg;
                 inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, ct->num.const_count,
                                                                     opcode_t);
                 inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, ct->str.const_count,
