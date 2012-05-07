@@ -1,0 +1,21 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+blib/README.pod - Readme file for the 'blib/' top-level directory. 
+
+=head1 DESCRIPTION
+
+The 'blib' I<i.e.,> "binary library," contains the libparrot static and
+dynamic libraries.
+
+It also contains a "pretty printer" Python script for GDB. I<See>
+F<lib/GDBPrettyPrint.py>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut
