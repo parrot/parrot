@@ -34,6 +34,26 @@ typedef enum {
 
 } KEY_flags;
 
+#define KEY_get_FLAGS(p) (PObj_get_FLAGS(p) & KEY_type_FLAGS)
+#define KEY_flags_CLEARALL(p) ((p)->flags &= ~KEY_type_FLAGS)
+#define KEY_set_flag(p, i) ((p)->flags |= (i))
+
+#define KEY_integer_SET(p)   PObj_flag_SET(private0, (p))
+#define KEY_integer_TEST(p)  PObj_flag_TEST(private0, (p))
+#define KEY_integer_CLEAR(p) PObj_flag_CLEAR(private0, (p))
+
+#define KEY_string_SET(p)   PObj_flag_SET(private2, (p))
+#define KEY_string_TEST(p)  PObj_flag_TEST(private2, (p))
+#define KEY_string_CLEAR(p) PObj_flag_CLEAR(private2, (p))
+
+#define KEY_pmc_SET(p)   PObj_flag_SET(private3, (p))
+#define KEY_pmc_TEST(p)  PObj_flag_TEST(private3, (p))
+#define KEY_pmc_CLEAR(p) PObj_flag_CLEAR(private3, (p))
+
+#define KEY_register_SET(p)   PObj_flag_SET(private4, (p))
+#define KEY_register_TEST(p)  PObj_flag_TEST(private4, (p))
+#define KEY_register_CLEAR(p) PObj_flag_CLEAR(private4, (p))
+
 /* HEADERIZER BEGIN: src/key.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

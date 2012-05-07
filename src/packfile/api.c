@@ -348,6 +348,7 @@ Tag a constant PMC with a constant STRING
 
 */
 
+PARROT_EXPORT
 void
 Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         const int tag_idx, const int const_idx)
@@ -1965,6 +1966,40 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
             Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "unexpected annotation type found");
             return PMCNULL;
         }
+    }
+}
+
+/*
+
+=item C<PackFile_Annotations * Parrot_pf_get_annotations_segment(PARROT_INTERP,
+PackFile *pf, PackFile_ByteCode *bc)>
+
+TK: Whiteknight please fill in.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Annotations *
+Parrot_pf_get_annotations_segment(PARROT_INTERP, ARGMOD(PackFile *pf),
+        ARGMOD_NULLOK(PackFile_ByteCode *bc))
+{
+    ASSERT_ARGS(Parrot_pf_get_annotations_segment)
+    if (bc == NULL)
+        bc = pf->cur_cs;
+    if (bc->annotations != NULL)
+        return bc->annotations;
+    else {
+        STRING * const name = Parrot_str_concat(interp, bc->base.name, CONST_STRING(interp, "_ANN"));
+        PackFile_Directory * const dir = bc->base.dir ? bc->base.dir :
+                    &pf->directory;
+        PackFile_Annotations * const annotations = (PackFile_Annotations *)
+            PackFile_Segment_new_seg(interp, dir, PF_ANNOTATIONS_SEG, name, 1);
+        bc->annotations = annotations;
+        annotations->code = bc;
+        return annotations;
     }
 }
 

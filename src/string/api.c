@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -73,6 +73,12 @@ static void throw_illegal_escape(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+  Buffer size for hexadecimal conversions:
+  Expected at most 8 characters plus room for some prefixes and suffixes.
+*/
+#define HEX_BUF_SIZE 16
 
 /*
 
@@ -2430,7 +2436,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     STRING      *result;
     UINTVAL      i, len, charlen;
     String_iter  iter;
-    char         hex_buf[16];
+    char         hex_buf[HEX_BUF_SIZE];
     char        *dp;
 
     if (STRING_IS_NULL(src))
@@ -2444,8 +2450,8 @@ Parrot_str_escape_truncate(PARROT_INTERP,
     /* expect around 2x the chars */
     charlen = 2 * len;
 
-    if (charlen < 16)
-        charlen = 16;
+    if (charlen < HEX_BUF_SIZE)
+        charlen = HEX_BUF_SIZE;
 
     /* create ascii result */
     result = Parrot_str_new_init(interp, NULL, charlen,
@@ -2463,7 +2469,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             /* process ASCII chars */
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
-                charlen += len * 2 + 16;
+                charlen += len * 2 + HEX_BUF_SIZE;
                 result->bufused = i;
                 Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
@@ -2517,16 +2523,16 @@ Parrot_str_escape_truncate(PARROT_INTERP,
         /* escape by appending either \uhhhh or \x{hh...} */
 
         if (c < 0x0100 || c >= 0x10000)
-            hex_len = snprintf(hex_buf, 15, "\\x{%x}", c);
+            hex_len = snprintf(hex_buf, HEX_BUF_SIZE - 1, "\\x{%x}", c);
         else
-            hex_len = snprintf(hex_buf, 15, "\\u%04x", c);
+            hex_len = snprintf(hex_buf, HEX_BUF_SIZE - 1, "\\u%04x", c);
 
         if (hex_len < 0)
             hex_len = 0;
 
         if (i + hex_len > charlen) {
             /* resize - still len codepoints to go */
-            charlen += len * 2 + 16;
+            charlen += len * 2 + HEX_BUF_SIZE;
             result->bufused = i;
             Parrot_gc_reallocate_string_storage(interp, result, charlen);
             /* start can change */

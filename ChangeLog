@@ -1,14 +1,9 @@
 2012-05-15    release 4.4.0
     - Core
-    - Documentation
-	+ Removed 'README' and added 'README.pod'
-	+ Updated the various dependencies, e.g.,
-	'lib/Parrot/Distribution.pm'.  
-    - Tests
-	+ Update various tests to pull from 'README.pod' rather than
-	'README'.
-    - Community
-    - Platforms
+    - Tools
+        + pbc_merge has been fixed to deduplicate constant strings and
+          merge annotations segments
+
 2012-04-17    release 4.3.0
     - Core
         + Winxed snapshot updated to 1.7.0

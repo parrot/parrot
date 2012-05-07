@@ -31,6 +31,7 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
     $P0 = loadlib 'gziphandle'
     test_handle()
     test_stream()
+    test_bad()
     test_version()
     test_basic()
     .return()
@@ -52,43 +53,65 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 .include 'stat.pasm'
 
 .sub 'test_stream'
+    # Use this file (repeated twice) as test data
+    .local string orig
     $P0 = new 'FileHandle'
-    $S0 = $P0.'readall'('t/dynpmc/gziphandle.t')
-    $I0 = length $S0
-    mul $I0, 2
-    diag($I0)
+    orig = $P0.'readall'('t/dynpmc/gziphandle.t')
+
+    # Save the data size
+    .local int size
+    size = length orig
+    size = mul size, 2
+    diag(size)
+
+    # Create the test file
+    .local pmc file
     .const string filename = 't/dynpmc/gziphandle.t.gz'
-    $P1 = new 'GzipHandle'
-    $P1.'open'(filename, 'wb')
-    $P1.'print'($S0)
-    $P1.'print'($S0)
-    $P1.'close'()
-    $I1 = stat filename, .STAT_FILESIZE
-    diag($I1)
-    $I2 = $I1 < $I0
-    ok($I2, "compressed")
-    $P2 = new 'GzipHandle'
-    $P2.'open'(filename)
-    $I2 = $P2.'isatty'()
-    is($I2, 0, 'isatty')
-    $S1 = $P2.'read'($I0)
+    file = new 'GzipHandle'
+    file.'open'(filename, 'wb')
+    file.'print'(orig)
+    file.'print'(orig) # write the same data again
+    file.'close'()
 
-    $I1 = $P2.'eof'()
-    is($I1, 1, "is at eof")
+    $I0 = stat filename, .STAT_FILESIZE
+    diag($I0)
+    $I0 = $I0 < size
+    ok($I0, "file is smaller than original data")
 
-    $I1 = isfalse $P2
-    ok($I1, "gziphandle at eof is false")
+    # Open the test file for reading
+    file = new 'GzipHandle'
+    file.'open'(filename)
 
-    $I1 = $P2.'flush'()
-    is($I1, -2, "cannot flush gziphandle at eof")
+    $I0 = file.'isatty'()
+    is($I0, 0, 'not a tty')
 
-    $P2.'close'()
-    $S0 = repeat $S0, 2
-    is($S1, $S0, "gzip stream")
+    # Read the data back in
+    # OS X 10.7.3 + gcc 4.2.1 + zlib 1.2.6 seems to have an issue
+    # with the EOF test, so read one extra byte
+    .local string result
+    $I0 = size + 1
+    result = file.'read'($I0)
+
+    orig = repeat orig, 2
+    is(result, orig, "data read is the same as data written")
+
+    $I0 = file.'eof'()
+    is($I0, 1, "gziphandle is at eof")
+
+    $I0 = isfalse file
+    ok($I0, "gziphandle at eof is false")
+
+    $I0 = file.'flush'()
+    is($I0, -2, "cannot flush gziphandle at eof")
+
+    # Clean up after ourselves
+    file.'close'()
     $P0 = loadlib 'os'
     $P0 = new 'OS'
     $P0.'rm'(filename)
+.end
 
+.sub 'test_bad'
 throws_substring(<<"CODE", "gzopen fails", "gzopen non-existent file")
     .sub main
         $P3 = new 'GzipHandle'

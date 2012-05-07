@@ -81,18 +81,18 @@ help us fix them, or let us know where we should fix them. Luckily, all of the
 current Parrot documentation is included along with the Parrot distribution, in
 the /docs/ directory.
 
-There is also some experimental auto-generated HTML documentation available by
-running the following command in the Parrot distribution's root directory:
+We also have auto-generated HTML documentation, which is available through
+executing the following command in the Parrot distribution's root directory:
 
     % make html
 
-To view the HTML documentation start with the page F<docs/html/index.html>.
+To view the HTML documentation, start with the F<docs/html/index.html> page.
 
-There are a few categories of documentation, each with different intents. It'll
-probably help to be aware of them before you go digging in. I highly suggest
-you check out F</docs/pdds/pdd07_codingstd.pod> for guidelines on how
-documentation is supposed to be laid out. For now, here's the executive
-summary:
+We have several categories of documentation, each with a different purpose. It
+will, probably, prove useful to you if you are aware of them I<before> you go
+digging around in them. We strongly suggest you review
+F</docs/pdds/pdd07_codingstd.pod> for guidance on how best to layout the
+documentation. But for now, here's the executive summary:
 
 =over 4
 
