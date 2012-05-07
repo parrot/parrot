@@ -149,11 +149,6 @@ sub no_init {
     return $self->flag('no_init');
 }
 
-sub singleton {
-    my ($self) = @_;
-    return $self->flag('singleton');
-}
-
 sub abstract {
     my ($self) = @_;
     return $self->flag('abstract');
@@ -651,11 +646,11 @@ Initializes the instance.
 sub init {
     my ($self) = @_;
 
-    #!( singleton or abstract ) everything else gets readonly version of
+    #!( abstract ) everything else gets readonly version of
     # methods too.
 
     $self->ro( Parrot::Pmc2c::PMC::RO->new($self) )
-        unless $self->abstract or $self->singleton;
+        unless $self->abstract;
 }
 
 =item C<gen_includes()>
@@ -897,7 +892,6 @@ sub vtable_flags {
     my ($self) = @_;
 
     my $vtbl_flag = 0;
-    $vtbl_flag .= '|VTABLE_PMC_IS_SINGLETON'  if $self->flag('singleton');
     $vtbl_flag .= '|VTABLE_IS_SHARED_FLAG'    if $self->flag('is_shared');
     $vtbl_flag .= '|VTABLE_IS_READONLY_FLAG'  if $self->flag('is_ro');
     $vtbl_flag .= '|VTABLE_HAS_READONLY_FLAG' if $self->flag('has_ro');

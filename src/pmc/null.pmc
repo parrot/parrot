@@ -27,7 +27,11 @@ static void null_pmc_access(PARROT_INTERP, int index)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-pmclass Null singleton {
+pmclass Null {
+
+    void class_init() {
+        PMCNULL = Parrot_pmc_new_noinit(interp, entry);
+    }
 
 /*
 
@@ -46,18 +50,6 @@ Overrides the default to do nothing.
     VTABLE void init() {
         UNUSED(INTERP)
         UNUSED(SELF)
-    }
-
-    VTABLE void *get_pointer() {
-        UNUSED(INTERP)
-        UNUSED(SELF)
-        return PMCNULL;
-    }
-
-    VTABLE void set_pointer(void *p) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
-        PMCNULL = (PMC *)p;
     }
 
     VTABLE INTVAL does(STRING *what) {

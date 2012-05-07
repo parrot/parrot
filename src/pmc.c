@@ -348,7 +348,7 @@ Parrot_pmc_reuse_noinit(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL new_type)
         const Parrot_UInt gc_flags = pmc->flags & PObj_GC_all_FLAGS;
         VTABLE * const new_vtable  = interp->vtables[new_type];
 
-        /* Singleton/const PMCs/types are not eligible */
+        /* const PMCs/types are not eligible */
         check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
         /* Free the old PMC resources. */
@@ -401,7 +401,7 @@ Parrot_pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(PMC *class_), U
     if (pmc->vtable->base_type != new_type) {
         VTABLE * const new_vtable = interp->vtables[new_type];
 
-        /* Singleton/const PMCs/types are not eligible */
+        /* const PMCs/types are not eligible */
         check_pmc_reuse_flags(interp, pmc->vtable->flags, new_vtable->flags);
 
         Parrot_pmc_destroy(interp, pmc);
@@ -447,7 +447,7 @@ UINTVAL destflags)>
 
 We're converting one PMC type to another, either in C<pmc_reuse> or
 C<pmc_reuse_by_class>. Check to make sure that neither the existing PMC
-or the intended target PMC type are singletons or constants. We throw an
+or the intended target PMC type are constants. We throw an
 exception if we are attempting an illegal operation.
 
 =cut
@@ -458,25 +458,13 @@ static void
 check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags, UINTVAL destflags)
 {
     ASSERT_ARGS(check_pmc_reuse_flags)
-    if ((srcflags | destflags) & (VTABLE_PMC_IS_SINGLETON | VTABLE_IS_CONST_FLAG))
+    if ((srcflags | destflags) & VTABLE_IS_CONST_FLAG)
     {
-        /* First, is the destination a singleton? No joy for us there */
-        if (destflags & VTABLE_PMC_IS_SINGLETON)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't turn to a singleton type!\n");
-
         /* Is the destination a constant? No joy for us there */
         if (destflags & VTABLE_IS_CONST_FLAG)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_ALLOCATION_ERROR,
                 "Parrot VM: Can't turn to a constant type!\n");
-
-        /* Is the source a singleton? */
-        if (srcflags & VTABLE_PMC_IS_SINGLETON)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't modify a singleton\n");
 
         /* Is the source constant? */
         if (srcflags & VTABLE_IS_CONST_FLAG)
@@ -492,8 +480,7 @@ check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags, UINTVAL destflags)
 flags)>
 
 Gets a new PMC header of the given integer type. Initialize the pmc if
-necessary. In the case of singleton PMC types, get the existing singleton
-instead of allocating a new one.
+necessary.
 
 =cut
 
@@ -517,30 +504,6 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
         PANIC(interp, "Null vtable used; did you add a new PMC?");
 
     vtable_flags = vtable->flags;
-
-    /* we only have one global Env object, living in the interp */
-    if (vtable_flags & VTABLE_PMC_IS_SINGLETON) {
-        /*
-         * singletons (monadic objects) exist only once
-         * the interface * with the class is:
-         * - get_pointer: return NULL or a pointer to the single instance
-         * - set_pointer: set the only instance once
-         *
-         * - singletons are created in the constant pmc pool
-         */
-        PMC *pmc = (PMC *)(vtable->get_pointer)(interp, NULL);
-
-        /* LOCK */
-        if (!pmc) {
-            pmc = Parrot_gc_new_pmc_header(interp, PObj_constant_FLAG);
-            PARROT_ASSERT(pmc);
-
-            pmc->vtable    = vtable;
-            VTABLE_set_pointer(interp, pmc, pmc);
-        }
-
-        return pmc;
-    }
 
     if (vtable_flags & VTABLE_IS_CONST_PMC_FLAG)
         flags |= PObj_constant_FLAG;
@@ -969,19 +932,10 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
      *
      * create a constant PMC
      */
-    PMC * const _class = get_new_pmc_header(interp, type,
-                                           PObj_constant_FLAG);
+    PMC * const _class = get_new_pmc_header(interp, type, PObj_constant_FLAG);
 
-    /* If we are a second thread, we may get the same object as the
-     * original because we have a singleton. Just set the singleton to
-     * be our class object, but don't mess with its vtable.  */
-    if ((interp->vtables[type]->flags & VTABLE_PMC_IS_SINGLETON)
-    &&  (_class == _class->vtable->pmc_class))
-        interp->vtables[type]->pmc_class = _class;
-    else {
-        PObj_is_PMC_shared_CLEAR(_class);
-        interp->vtables[type]->pmc_class = _class;
-    }
+    PObj_is_PMC_shared_CLEAR(_class);
+    interp->vtables[type]->pmc_class = _class;
 
     return _class;
 }
