@@ -52,11 +52,11 @@ from $2 and $3.
 
 =cut
 
-inline op band(inout INT, in INT) :base_core {
+inline op band(inout INT, in INT)  {
     $1 &= $2;
 }
 
-inline op band(out INT, in INT, in INT) :base_core {
+inline op band(out INT, in INT, in INT)  {
     $1 = $2 & $3;
 }
 
@@ -74,11 +74,11 @@ from $2 and $3.
 
 =cut
 
-inline op bor(inout INT, in INT) :base_core {
+inline op bor(inout INT, in INT)  {
     $1 |= $2;
 }
 
-inline op bor(out INT, in INT, in INT) :base_core {
+inline op bor(out INT, in INT, in INT)  {
     $1 = $2 | $3;
 }
 
@@ -94,11 +94,11 @@ Set $1 to the value of $2 shifted left by $3 bits.
 
 =cut
 
-inline op shl(inout INT, in INT) :base_core {
+inline op shl(inout INT, in INT)  {
     $1 = bit_shift_left($1, $2);
 }
 
-inline op shl(out INT, in INT, in INT) :base_core {
+inline op shl(out INT, in INT, in INT)  {
     $1 = bit_shift_left($2, $3);
 }
 
@@ -114,12 +114,12 @@ Set $1 to the value of $2 shifted right by $3 bits.
 
 =cut
 
-inline op shr(inout INT, in INT) :base_core {
+inline op shr(inout INT, in INT)  {
     const INTVAL signed_shift = -$2;
     $1 = bit_shift_left($1, signed_shift);
 }
 
-inline op shr(out INT, in INT, in INT) :base_core {
+inline op shr(out INT, in INT, in INT)  {
     const INTVAL signed_shift = -$3;
     $1 = bit_shift_left($2, signed_shift);
 }
@@ -136,13 +136,13 @@ Set $1 to the value of $2 logically shifted right by $3 bits.
 
 =cut
 
-inline op lsr(out INT, in INT) :base_core {
+inline op lsr(out INT, in INT)  {
     const UINTVAL a = (UINTVAL)$1;
     const UINTVAL b = a >> $2;
     $1 = (INTVAL)b;
 }
 
-inline op lsr(out INT, in INT, in INT) :base_core {
+inline op lsr(out INT, in INT, in INT)  {
     $1 = (INTVAL)((UINTVAL)$2 >> $3);
 }
 
@@ -160,11 +160,11 @@ from $2 and $3.
 
 =cut
 
-inline op bxor(inout INT, in INT) :base_core {
+inline op bxor(inout INT, in INT)  {
     $1 ^= $2;
 }
 
-inline op bxor(out INT, in INT, in INT) :base_core {
+inline op bxor(out INT, in INT, in INT)  {
     $1 = $2 ^ $3;
 }
 

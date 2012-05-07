@@ -57,7 +57,7 @@ Halts the interpreter. See also B<exit>.
 
 =cut
 
-inline op end() :base_core :check_event :flow {
+inline op end()  :check_event :flow {
     goto ADDRESS(0);
 }
 
@@ -95,12 +95,12 @@ actions on it.
 
 =cut
 
-inline op noop() :base_core {
+inline op noop()  {
     UNUSED(interp);
     UNUSED(CUR_OPCODE);
 }
 
-inline op check_events() :base_core :flow {
+inline op check_events()  :flow {
     opcode_t *next = expr NEXT();
     next = Parrot_cx_check_scheduler(interp, next);
     goto ADDRESS(next);   /* force this being a branch op */
@@ -175,7 +175,7 @@ the stack passed in $1 for later returning.
 
 =cut
 
-inline op local_branch(invar PMC, in LABEL) :base_core :check_event :flow {
+inline op local_branch(invar PMC, in LABEL)  :check_event :flow {
     INTVAL return_addr;
     opcode_t * const dest = expr NEXT();
 
