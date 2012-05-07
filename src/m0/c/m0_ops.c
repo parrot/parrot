@@ -11,6 +11,10 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_interp_structures.h"
 #include "include/m0_compiler_defines.h"
 
+#ifdef M0_DEBUGGER
+#   include "include/m0_debugger.h"
+#endif
+
 #define M0_DEBUG 0
 #define M0_ARG(n) (unsigned char)(ops[(4*pc)*(n)])
 #define M0_EXEC_OP(name, cf, ops, pc) { \
@@ -327,6 +331,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
         const unsigned long        pc       =
             (const unsigned long)cf->registers[PC];
         const unsigned long        op_count = bytecode->op_count;
+
+#ifdef M0_DEBUGGER
+        debugger(cf, ops, pc);
+#endif
 
         /* XXX: access violation -- so produce an error? */
         if (pc >= op_count)
