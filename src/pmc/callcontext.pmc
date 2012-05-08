@@ -496,6 +496,8 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 
 =item C<static PMC * get_named_names(PARROT_INTERP, PMC *SELF)>
 
+Return all named arguments in a FixedStringArray.
+
 =cut
 
 */
