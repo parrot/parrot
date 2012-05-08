@@ -378,6 +378,8 @@ Return the main sub, if any, null PMC otherwise.
 
 =item C<static PMC* get_sub(PARROT_INTERP, PMC *self, int idx)>
 
+Get the C<idx>th Sub PMC from the constants table.
+
 =cut
 
 */
@@ -415,6 +417,8 @@ get_sub(PARROT_INTERP, ARGIN(PMC *self), int idx)
 /*
 
 =item C<static void mark_ct(PARROT_INTERP, PMC *self)>
+
+Mark the bytecode segment pointed to by this Eval for GC.
 
 =cut
 
