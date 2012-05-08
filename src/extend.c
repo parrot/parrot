@@ -111,26 +111,6 @@ Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
 
 /*
 
-=item C<void Parrot_free_cstring(char *string)>
-
-Deallocate a C string that the interpreter has handed to you.
-
-DEPRECATED. Use Parrot_str_free_cstring instead.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_free_cstring(ARGFREE(char *string))
-{
-    ASSERT_ARGS(Parrot_free_cstring)
-    Parrot_str_free_cstring(string);
-}
-
-/*
-
 =item C<void Parrot_ext_call(PARROT_INTERP, Parrot_PMC sub_pmc, const char
 *signature, ...)>
 

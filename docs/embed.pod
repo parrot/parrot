@@ -483,7 +483,7 @@ performing both compiling and linking in one step.
         sub = Parrot_ns_find_current_namespace_global(interp, pstr);
 
         /* run foo(), which returns nothing */
-	Parrot_ext_call(interp, sub, "->");
+    Parrot_ext_call(interp, sub, "->");
 
         Parrot_destroy(interp);
 
@@ -713,8 +713,6 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_fprintf>
 
 =item C<Parrot_free_context>
-
-=item C<Parrot_free_cstring>
 
 =item C<Parrot_freeze>
 
