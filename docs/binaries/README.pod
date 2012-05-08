@@ -8,40 +8,14 @@ docs/binaries/README.pod - Readme file for the 'docs/binaries/' directory.
 
 =head1 DESCRIPTION
 
-This README sets out [...]. 
+This directory contains the *.pod files to the installable binaries in the
+Parrot distribution. These files are also (or soon will be) used to generate
+*roff pages.[1]
 
-I really want to rename 'parrot.pod' to 'README.pod' and add some additional
-information to the file.
+=head1 NOTES
 
-=head2 [...] 
-
-=over 4
-
-=item * [...].
-
-=item * [...].
-
-=over 8
-
-=item * [...].
-
-=item * [...].
-
-=back
-
-=item * [...].
-
-=item * [...].
-
-=item * [...].
-
-=item * [...].
-
-=back
-
-=head2 [...]
-
-[...]
+[1] The probable location and name of the conversion script will be,
+F<tools/docs/mk_pod2man.pl>
 
 =head1 COPYRIGHT
 
