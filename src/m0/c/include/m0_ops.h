@@ -3,6 +3,7 @@
 #   include "m0_interp_structures.h"
 
 enum M0_OPS {
+    /* gen_c_opnames_enum_from(m0.ops) template('    M0_UC_OP,') */
     M0_NOOP,
     M0_GOTO,
     M0_GOTO_IF,
@@ -45,6 +46,7 @@ enum M0_OPS {
     M0_PRINT_I,
     M0_PRINT_N,
     M0_EXIT
+    /* end_gen */
 };                    
                       
 int

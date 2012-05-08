@@ -13,6 +13,7 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_debugger.h"
 
 const char *M0_OPS_NAMES[] = {
+    /* gen_c_opnames_enum_from(m0.ops) template('    "M0_UC_OP",') */
     "M0_NOOP",
     "M0_GOTO",
     "M0_GOTO_IF",
@@ -55,6 +56,7 @@ const char *M0_OPS_NAMES[] = {
     "M0_PRINT_I",
     "M0_PRINT_N",
     "M0_EXIT"
+    /* end_gen */
 };
 
 static char *M0_REGISTER_NAMES[] = {
