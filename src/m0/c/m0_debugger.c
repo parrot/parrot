@@ -326,8 +326,12 @@ get_db_user_input(char *cmd, char *arg) {
     char input[100], *p;
     p = gets(input);
     if (p) {
+        char *tok = NULL;
         cmd[0] = input[0];
-        arg = strtok (input+2, " ");
+        if ( ' ' != input[1])
+            cmd[1] = input[1];
+        tok = strtok (input+2, " ");
+        strcpy(arg,tok);
     }
 }
 
@@ -343,14 +347,39 @@ char * register_to_name(const unsigned char reg) {
     return reg_name;
 }
 
+unsigned int name_to_register_id(const char *name) {
+    unsigned int reg = -1;
+    unsigned int i   =  0;
+    for ( ; i < 256; i++) {
+        if (strcmp(name, M0_REGISTER_NAMES[i]) == 0) {
+            reg = i;
+            break;
+        }
+    }
+    return reg;
+}
+
 static void
-debug_print(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc, const char *arg)
+debug_print(char cmd, M0_CallFrame *cf, char *arg)
 {
-    UNUSED(cf);
-    UNUSED(ops);
-    UNUSED(pc);
-    UNUSED(arg);
-    NYI();
+    int reg = name_to_register_id(arg);
+    unsigned long *a, *b;
+    switch(cmd) {
+      case 's':
+        printf("%s\n", (char *)(cf->registers[ reg ] + 8));
+        break;
+      case 'i':
+        printf("%d\n", (unsigned int)(cf->registers[ reg ] ));
+        break;
+      case 'n':
+        printf("%f\n", (float)(cf->registers[ reg ] ));
+        break;
+      default:
+        a =  (unsigned long*)&cf->registers[ reg ];
+        b = a + 1;
+        /*printf("%lX\n", (cf->registers[ reg ] ));*/
+        printf("%#lX%lX\n", *b, *a);
+    }
 }
 
 static void
@@ -385,14 +414,17 @@ static void
 print_help()
 {
     printf("Available Commands:\n");
-    printf("\tc    : continue until the next breakpoint or the end of the program\n");
-    printf("\ts    : single step (execute the next m0 command)\n");
-    printf("\tp ARG: TODO: print ARG\n");
-    printf("\tl    : list the decompiled source code for the line that is about to be executed\n");
-    printf("\tb PC : TODO: create a new breakpoint at PC\n");
-    printf("\tB PC : TODO: delete the breakpoint at PC\n");
-    printf("\tL    : TODO: list breakpoints\n");
-    printf("\th    : print this help message\n");
+    printf("\tc     : continue until the next breakpoint or the end of the program\n");
+    printf("\ts     : single step (execute the next m0 command)\n");
+    printf("\tp  ARG: print ARG (treat ARG as hex)\n\t\tCurrently ARG only supports registers\n");
+    printf("\tpi ARG: print ARG (treat ARG as an unsigned integer)\n\t\tCurrently ARG only supports registers\n");
+    printf("\tpn ARG: print ARG (treat ARG as a float)\n\t\tCurrently ARG only supports registers\n");
+    printf("\tps ARG: print ARG (treat ARG as a string)\n\t\tCurrently ARG only supports registers\n");
+    printf("\tl     : list the decompiled source code for the line that is about to be executed\n");
+    printf("\tb PC  : TODO: create a new breakpoint at PC\n");
+    printf("\tB PC  : TODO: delete the breakpoint at PC\n");
+    printf("\tL     : TODO: list breakpoints\n");
+    printf("\th     : print this help message\n");
 }
 
 static void
@@ -417,7 +449,7 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
                 done = 1;
                 break;
             case 'p':
-                debug_print(cf, ops, pc, arg);
+                debug_print(cmd[1], cf, arg);
                 break;
             case 'l':
                 debug_list(cf, ops, pc);
