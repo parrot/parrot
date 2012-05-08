@@ -1,1 +1,50 @@
-I really want to rename 'parrot.pod' to 'README.pod' and add some additional information to the file.
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/README.pod - Readme file for the 'docs/' directory. 
+
+=head1 DESCRIPTION
+
+This README sets out [...]. 
+
+I really want to rename 'parrot.pod' to 'README.pod' and add some additional
+information to the file.
+
+=head2 [...] 
+
+=over 4
+
+=item * [...].
+
+=item * [...].
+
+=over 8
+
+=item * [...].
+
+=item * [...].
+
+=back
+
+=item * [...].
+
+=item * [...].
+
+=item * [...].
+
+=item * [...].
+
+=back
+
+=head2 [...]
+
+[...]
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut
