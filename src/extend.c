@@ -94,6 +94,8 @@ static void restore_context(PARROT_INTERP,
 
 Returns the internal identifier that represents the named class.
 
+DEPRECATED. Use Parrot_pmc_get_type_str instead.
+
 =cut
 
 */
@@ -112,6 +114,8 @@ Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
 =item C<void Parrot_free_cstring(char *string)>
 
 Deallocate a C string that the interpreter has handed to you.
+
+DEPRECATED. Use Parrot_str_free_cstring instead.
 
 =cut
 
