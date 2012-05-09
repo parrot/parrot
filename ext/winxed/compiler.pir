@@ -1,5 +1,5 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.8.0
+# Compiled with Winxed 1.8.1
 # Source file: winxedst2.winxed
 # Begin generated code
 
@@ -9,7 +9,7 @@
     new $P1, ['FixedIntegerArray'], 3
     $P1[0] = 1
     $P1[1] = 8
-    $P1[2] = 0
+    $P1[2] = 1
     .return($P1)
 
 .end # getVersion
@@ -15987,13 +15987,15 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
 .const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_94 = "WSubId_94"
     self.'Statement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    __ARG_2.'unget'($P1)
     $P2 = $P1.'isop'(";")
     if $P2 goto __label_1
-    $P4 = WSubId_77(__ARG_2, __ARG_3)
-    setattribute self, 'expr', $P4
+    __ARG_2.'unget'($P1)
+    $P3 = WSubId_77(__ARG_2, __ARG_3)
+    setattribute self, 'expr', $P3
+    WSubId_94(';', __ARG_2)
   __label_1: # endif
 
 .end # InlineReturnStatement
