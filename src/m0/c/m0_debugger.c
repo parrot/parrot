@@ -493,14 +493,8 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
                 done = 1;
                 break;
             case Print:
-                debug_print(cmd, cf, arg);
-                break;
             case Print_Integer:
-                debug_print(cmd, cf, arg);
-                break;
             case Print_Number:
-                debug_print(cmd, cf, arg);
-                break;
             case Print_String:
                 debug_print(cmd, cf, arg);
                 break;
