@@ -535,8 +535,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     if (is_file)
         pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, source, 1);
     else {
-        const INTVAL eval_number = imcc->unique_count;
-        imcc->unique_count++;
+        const INTVAL eval_number = imcc->unique_count++;
         STRING * const evalname = Parrot_sprintf_c(imcc->interp, "EVAL_" INTVAL_FMT, eval_number);
         pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, evalname, 1);
     }
