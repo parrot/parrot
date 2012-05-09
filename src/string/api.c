@@ -912,6 +912,15 @@ exception if C<src> is null.
 
 Identical to the STRING_index macro.
 
+=item C<INTVAL Parrot_str_find_reverse_index(PARROT_INTERP, const STRING *src,
+const STRING *search, INTVAL start)>
+
+Returns the last character position of the second Parrot string C<search> in
+C<src>, not after C<start>. Returns the last position found, or -1 if no
+instances are found.
+
+Mostly identical to the STRING_rindex macro.
+
 =cut
 
 */
@@ -930,6 +939,23 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *src),
     return STRING_index(interp, src, search, start);
 }
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_str_find_reverse_index(PARROT_INTERP, ARGIN(const STRING *src),
+    ARGIN(const STRING *search), INTVAL start)
+{
+    ASSERT_ARGS(Parrot_str_find_reverse_index)
+    INTVAL len = Parrot_str_length(interp, src);
+
+    if (start <= 0 || !len || start > len)
+        return -1;
+
+    if (!Parrot_str_length(interp, search))
+        return -1;
+
+    return STRING_rindex(interp, src, search, (UINTVAL)start);
+}
 
 /*
 

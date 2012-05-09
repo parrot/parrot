@@ -94,6 +94,8 @@ static void restore_context(PARROT_INTERP,
 
 Returns the internal identifier that represents the named class.
 
+DEPRECATED. Use Parrot_pmc_get_type_str instead.
+
 =cut
 
 */
@@ -105,24 +107,6 @@ Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
     ASSERT_ARGS(Parrot_PMC_typenum)
     Parrot_Int retval = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, _class, 0));
     return retval;
-}
-
-/*
-
-=item C<void Parrot_free_cstring(char *string)>
-
-Deallocate a C string that the interpreter has handed to you.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_free_cstring(ARGFREE(char *string))
-{
-    ASSERT_ARGS(Parrot_free_cstring)
-    Parrot_str_free_cstring(string);
 }
 
 /*

@@ -56,6 +56,12 @@
             "docs/book/pct/*"
          ],
          "title" : "PCT Book"
+      },
+      {
+         "source" : [
+            ":book"
+         ],
+         "title" : "Parrot Developer's Guide: PIR (draft)"
       }
    ],
    "title" : "Home"

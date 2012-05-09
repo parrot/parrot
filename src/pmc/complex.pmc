@@ -245,6 +245,8 @@ complex_parse_string(PARROT_INTERP,
 
 =item C<static void int_check_divide_zero(PARROT_INTERP, INTVAL value)>
 
+If C<value> is 0, throw a divide by zero exception.
+
 =cut
 
 */
@@ -263,6 +265,8 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
 
 =item C<static void float_check_divide_zero(PARROT_INTERP, FLOATVAL value)>
 
+If C<value> is 0.0, throw a divide by zero exception.
+
 =cut
 
 */
@@ -280,6 +284,8 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
 /*
 
 =item C<static void complex_check_divide_zero(PARROT_INTERP, PMC *value)>
+
+If C<value> is a Complex PMC with a value of 0, throw a divide by zero exception.
 
 =cut
 
