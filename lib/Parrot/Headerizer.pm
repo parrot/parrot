@@ -129,6 +129,8 @@ sub new {
     return bless $args, $class;
 }
 
+=head2 C<get_sources()>
+
 =over 4
 
 =item * Purpose
