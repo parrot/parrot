@@ -25,14 +25,14 @@ Tests the PackfileConstantTable PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    'plan'(17)
-
     'test_sanity'()
     'test_counts'()
     'test_get'()
     'test_set'()
     'test_get_or_create'()
     'test_subs_intact'()
+
+    'done_testing'()
 .end
 
 
@@ -202,12 +202,21 @@ load_error:
     sweep 1
 
     .local pmc sub
-    sub = ct[0]
+    .local int pmc_count, i
 
-    # validate assumption that ct[0] is a sub
+    # Find Sub in constants
+    pmc_count = ct.'pmc_count'()
+    i = 0
+  sub_loop:
+    if i >= pmc_count goto sub_not_found
+    sub = ct[i]
     $S0 = typeof sub
-    is($S0, 'Sub', 'First entry in constant table is a sub')
+    if $S0 == 'Sub' goto sub_found
+    inc i
+    goto sub_loop
 
+
+  sub_found:
     # sub will perform I/O, mock output fh
     $P0 = getinterp
     $P1 = new ['StringHandle']
@@ -221,11 +230,18 @@ load_error:
     ok(1, "Can call Sub from PackfileConstantTable")
 
     .return ()
-load_error:
+
+  sub_not_found:
+    ok(0, "Can't find Sub in PackfileConstantTable")
+    .return ()
+
+  load_error:
     .get_results($P0)
     pop_eh
     report_load_error($P0,  "Can call Sub from PackfileConstantTable")
     .return()
+
+
 .end
 
 .sub '_get_consttable'
