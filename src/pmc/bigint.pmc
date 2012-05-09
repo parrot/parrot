@@ -735,7 +735,7 @@ bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *value), ARGMOD(PMC
 =item C<static void bigint_sub_bigint_int(PARROT_INTERP, PMC *self, INTVAL
 value, PMC *dest)>
 
-Subtract C<value from C<self> and store the result in C<dest>.
+Subtract C<value> from C<self> and store the result in C<dest>.
 
 =cut
 
