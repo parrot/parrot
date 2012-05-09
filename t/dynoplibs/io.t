@@ -20,10 +20,9 @@ Tests various io opcodes.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(60)
+    plan(59)
 
     read_on_null()
-    open_delegates_to_filehandle_pmc()
     test_bad_open()
     open_pipe_for_reading()
     getfd_fdopen()
@@ -42,27 +41,6 @@ Tests various io opcodes.
     # must come after (these don't use test_more)
     open_pipe_for_writing()
     read_invalid_fh()
-.end
-
-.sub open_delegates_to_filehandle_pmc
-    load_bytecode 'P6object.pbc'
-
-    .local pmc p6meta, interp, classes, classid
-    p6meta = get_root_global ["parrot"], "P6metaclass"
-    p6meta.'new_class'('Testing')
-
-    interp = getinterp
-    classes = interp[0]
-    classid = classes['Testing']
-    $I0 = classes['FileHandle']
-    set classes['FileHandle'], classid
-
-    $P1 = open '/foo'
-    is($P1,42,'open opcode delegates to the open method on the FileHandle PMC')
-
-    # replace the original, so we don't break other tests
-    set classes['FileHandle'], $I0
-
 .end
 
 .sub 'test_bad_open'
