@@ -323,19 +323,57 @@ NYI() {
     printf("NOT YET IMPLEMENTED\n");
 }
 
-static void
-get_db_user_input(char *cmd, char *arg) {
-    char input[100], *p;
+M0_Debugger_Command
+str_to_db_cmd(char* str) {
+    M0_Debugger_Command cmd = Invalid;
+
+    if(strcmp(str,"c") == 0)
+        cmd = Continue;
+    else if(strcmp(str, "s") == 0)
+        cmd = Step;
+    else if(strcmp(str, "p") == 0)
+        cmd = Print;
+    else if(strcmp(str, "pi") == 0)
+        cmd = Print_Integer;
+    else if(strcmp(str, "pn") == 0)
+        cmd = Print_Number;
+    else if(strcmp(str, "ps") == 0)
+        cmd = Print_String;
+    else if(strcmp(str, "l") == 0)
+        cmd = List;
+    else if(strcmp(str, "b") == 0)
+        cmd = Add_Breakpoint;
+    else if(strcmp(str, "B") == 0)
+        cmd = Delete_Breakpoint;
+    else if(strcmp(str, "L") == 0)
+        cmd = List_Breakpoints;
+    else if(strcmp(str, "h") == 0)
+        cmd = Help;
+    else if(strcmp(str, "") == 0)
+        cmd = None;
+    return cmd;
+}
+
+char *
+get_db_user_input(M0_Debugger_Command *cmd, char *arg) {
+    char *input, *p;
+    input = calloc(100, sizeof(char));
     p = gets(input);
     if (p) {
         char *tok = NULL;
-        cmd[0] = input[0];
-        if ( ' ' != input[1])
-            cmd[1] = input[1];
-        tok = strtok (input+2, " ");
+        tok = strtok(input, " ");
+        if(tok)
+            *cmd = str_to_db_cmd(tok);
+        else
+            return input;
+
+        tok = strtok(NULL, " ");
         if(tok)
             strcpy(arg,tok);
+        return input;
     }
+    free((void *)input);
+    return NULL;
 }
 
 const char * ops_to_name(const unsigned char ops) {
@@ -363,25 +401,25 @@ unsigned int name_to_register_id(const char *name) {
 }
 
 static void
-debug_print(char cmd, M0_CallFrame *cf, char *arg)
+debug_print(M0_Debugger_Command cmd, M0_CallFrame *cf, char *arg)
 {
     int reg = name_to_register_id(arg);
     unsigned long *a, *b;
     switch(cmd) {
-      case 's':
+      case Print_String:
         printf("%s\n", (char *)(cf->registers[ reg ] + 8));
         break;
-      case 'i':
+      case Print_Integer:
         printf("%d\n", (unsigned int)(cf->registers[ reg ] ));
         break;
-      case 'n':
+      case Print_Number:
         printf("%f\n", (float)(cf->registers[ reg ] ));
         break;
+      case Print:
       default:
         a =  (unsigned long*)&cf->registers[ reg ];
         b = a + 1;
-        /*printf("%lX\n", (cf->registers[ reg ] ));*/
-        printf("%#lX%lX\n", *b, *a);
+        printf("0x%lX%lX\n", *b, *a);
     }
 }
 
@@ -433,44 +471,58 @@ print_help()
 static void
 db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
 {
+    static M0_Debugger_Command cmd = None;
+    static char *arg;
+    if(!arg)
+        arg = calloc(98, sizeof(char));
     int done = 0;
     while(!done) {
-        char *cmd = calloc(2,  sizeof(char));
-        char *arg = calloc(98, sizeof(char));
+        char * user_input = NULL;
         printf("PC=%lu> ", pc);
-        get_db_user_input(cmd,arg);
-        switch (cmd[0]) {
-            case 'c':
+        user_input = get_db_user_input(&cmd,arg);
+        switch (cmd) {
+            case Continue:
                 if(db_info->n_breakpoints > 0)
                     db_info->state = BREAK;
                 else
                     db_info->state = RUN;
                 done = 1;
                 break;
-            case 's':
+            case Step:
                 db_info->state = STEP;
                 done = 1;
                 break;
-            case 'p':
-                debug_print(cmd[1], cf, arg);
+            case Print:
+                debug_print(cmd, cf, arg);
                 break;
-            case 'l':
+            case Print_Integer:
+                debug_print(cmd, cf, arg);
+                break;
+            case Print_Number:
+                debug_print(cmd, cf, arg);
+                break;
+            case Print_String:
+                debug_print(cmd, cf, arg);
+                break;
+            case List:
                 debug_list(cf, ops, pc);
                 break;
-            case 'b':
+            case Add_Breakpoint:
                 NYI();
                 break;
-            case 'B':
+            case Delete_Breakpoint:
                 NYI();
                 break;
-            case 'L':
+            case List_Breakpoints:
                 NYI();
                 break;
-            case 'h':
+            case Help:
                 print_help();
                 break;
+            case None:
+                break;
             default:
-                printf("bad command: %s\n", cmd);
+                printf("bad command: %s\n", user_input);
                 printf("type 'h' for help\n");
         }
     }

@@ -13,6 +13,22 @@ typedef struct {
     unsigned int n_breakpoints;
 } M0_Debugger_Info;
 
+typedef enum {
+    Invalid,
+    None,
+    Continue,
+    Step,
+    Print,
+    Print_Integer,
+    Print_Number,
+    Print_String,
+    List,
+    Add_Breakpoint,
+    Delete_Breakpoint,
+    List_Breakpoints,
+    Help
+} M0_Debugger_Command;
+
 void debugger(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc);
 
 
