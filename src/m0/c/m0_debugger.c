@@ -333,7 +333,8 @@ get_db_user_input(char *cmd, char *arg) {
         if ( ' ' != input[1])
             cmd[1] = input[1];
         tok = strtok (input+2, " ");
-        strcpy(arg,tok);
+        if(tok)
+            strcpy(arg,tok);
     }
 }
 
