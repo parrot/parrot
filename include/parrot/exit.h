@@ -44,11 +44,6 @@ typedef struct _handler_node_t {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_COLD
-void Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void Parrot_x_exit(PARROT_INTERP, int status)
@@ -66,7 +61,19 @@ void Parrot_x_on_exit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_EXPORT
+PARROT_COLD
+void Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
+        __attribute__nonnull__(1);
+
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_x_force_error_exit(
+    NULLOK_INTERP,
+    int exitcode,
+    ARGIN(const char * format),
+    ...)
+        __attribute__nonnull__(3);
+
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void Parrot_x_panic_and_exit(
@@ -75,25 +82,18 @@ void Parrot_x_panic_and_exit(
     ARGIN_NULLOK(const char *file),
     unsigned int line);
 
-void Parrot_x_force_error_exit(
-    NULLOK_INTERP,
-    int exitcode,
-    ARGIN(const char * format),
-    ...)
-        __attribute__nonnull__(3);
-
-#define ASSERT_ARGS_Parrot_x_execute_on_exit_handlers \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_x_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(function))
-#define ASSERT_ARGS_Parrot_x_panic_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_x_execute_on_exit_handlers \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_force_error_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_x_panic_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exit.c */
 
