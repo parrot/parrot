@@ -71,7 +71,6 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-/* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
