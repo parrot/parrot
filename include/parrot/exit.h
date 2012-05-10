@@ -35,7 +35,7 @@ typedef struct _handler_node_t {
         fprintf(stderr, "Sorry, coredump is not yet implemented " \
             "for this platform.\n\n"); \
         PARROT_FORCE_EXIT(EXIT_FAILURE); \
-    } while(0)
+    } while (0)
 #endif
 
 #define PANIC(interp, message) Parrot_x_panic_and_exit((interp), (message), __FILE__, __LINE__)
