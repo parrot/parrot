@@ -64,6 +64,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
         /* if we get here, something's horribly wrong, but free anyway... */
         Parrot_str_free_cstring(cmd);
 
+        /* TODO: Is there a way we can do this without calling exit()? */
         if (status)
             exit(status);
     }
