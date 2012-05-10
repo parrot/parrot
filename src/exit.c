@@ -139,6 +139,19 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
     Parrot_unblock_GC_sweep(interp);
 }
 
+/*
+
+=item C<void Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, const char *
+format, ...)>
+
+Error handler of last resort, under normal circumstances. Print out an error
+message to C<stderr> and exit from the interpreter. If possible attempt to
+jump out of libparrot. If not, hard exit back to the system.
+
+=cut
+
+*/
+
 void
 Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
 {
@@ -156,12 +169,12 @@ Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format
 
 /*
 
-=item C<void Parrot_x_full_panic(NULLOK_INTERP, const char *message, const char *file,
-unsigned int line)>
+=item C<void Parrot_x_panic_and_exit(NULLOK_INTERP, const char *message, const
+char *file, unsigned int line)>
 
 Panic handler. Things have gone very wrong in an unexpected way. Print out an
 error message and instructions for the user to report the error to the
-developers
+developers. Perform a full core dump and force exit back to the system.
 
 =cut
 
