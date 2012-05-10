@@ -30,7 +30,7 @@ called by C<Parrot_x_exit()> when the interpreter exits.
 =item C<void Parrot_x_on_exit(PARROT_INTERP, exit_handler_f function, void
 *arg)>
 
-Register the specified function to be called on exit.
+Register the specified function to be called on interpreter exit.
 
 =cut
 
@@ -55,7 +55,9 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
 =item C<void Parrot_x_jump_out(NULLOK_INTERP, int status)>
 
 Jumps out returning to the caller api function. Do not execute registered
-on-exit handlers.
+on-exit handlers. If an interpreter is not provided, or if the interpreter
+does not have a jump buffer registered, force an exit back to the system
+(which may be very bad for the client application).
 
 =cut
 
@@ -79,7 +81,8 @@ Parrot_x_jump_out(NULLOK_INTERP, int status)
 
 =item C<void Parrot_x_exit(PARROT_INTERP, int status)>
 
-Exit, calling any registered exit handlers.
+Normal interpreter exit. Execute any registered exit handlers and jump back
+out to the last API call-in routine.
 
 =cut
 
@@ -107,7 +110,6 @@ the interpreter is destroyed.
 
 */
 
-PARROT_EXPORT
 PARROT_COLD
 void
 Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
@@ -152,6 +154,8 @@ jump out of libparrot. If not, hard exit back to the system.
 
 */
 
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
 void
 Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
 {
@@ -180,7 +184,6 @@ developers. Perform a full core dump and force exit back to the system.
 
 */
 
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
