@@ -14164,7 +14164,7 @@ Parrot_die_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_die_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) == EXCEPT_doomed)) {
-        _exit(IREG(2));
+        Parrot_x_jump_out(interp, IREG(2));
     }
     else {
         opcode_t         * dest;
@@ -14183,7 +14183,7 @@ Parrot_die_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_die_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) == EXCEPT_doomed)) {
-        _exit(IREG(2));
+        Parrot_x_jump_out(interp, IREG(2));
     }
     else {
         opcode_t         * dest;
@@ -14202,7 +14202,7 @@ Parrot_die_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_die_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((IREG(1) == EXCEPT_doomed)) {
-        _exit(ICONST(2));
+        Parrot_x_jump_out(interp, ICONST(2));
     }
     else {
         opcode_t         * dest;
@@ -14221,7 +14221,7 @@ Parrot_die_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_die_ic_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if ((ICONST(1) == EXCEPT_doomed)) {
-        _exit(ICONST(2));
+        Parrot_x_jump_out(interp, ICONST(2));
     }
     else {
         opcode_t         * dest;
