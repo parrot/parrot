@@ -13,7 +13,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 2;
+plan tests => 1;
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ t/src/basic.t - Basics
 
 =head1 DESCRIPTION
 
-Tests C<printf> and C<exit_fatal> functions.
+Tests C<printf>
 
 =cut
 
@@ -41,19 +41,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "hello world" );
     }
 CODE
 Hello, World!
-OUTPUT
-
-c_output_is( <<'CODE', <<'OUTPUT', "direct exit_fatal call" );
-    #include <parrot/parrot.h>
-    #include <parrot/exceptions.h>
-
-    int
-    main(int argc, const char* argv[])
-    {
-         exit_fatal(0, "Blow'd Up(tm)"); /* ' */
-    }
-CODE
-Blow'd Up(tm)
 OUTPUT
 
 # for $EDITOR '

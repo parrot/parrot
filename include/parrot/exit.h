@@ -22,6 +22,12 @@ typedef struct _handler_node_t {
     struct _handler_node_t *next;
 } handler_node_t;
 
+/* This macro is used to exit Parrot, when all else fails. This is a last
+   resort. This may be platform specific if certain systems cannot just call
+   the libc exit() function
+*/
+#define PARROT_FORCE_EXIT(x) exit(x)
+
 /* HEADERIZER BEGIN: src/exit.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -39,8 +45,7 @@ void Parrot_x_exit(PARROT_INTERP, int status)
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-void Parrot_x_jump_out(PARROT_INTERP, int status)
-        __attribute__nonnull__(1);
+void Parrot_x_jump_out(NULLOK_INTERP, int status);
 
 PARROT_EXPORT
 void Parrot_x_on_exit(PARROT_INTERP,
@@ -49,16 +54,24 @@ void Parrot_x_on_exit(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void Parrot_x_panic_and_exit(
+    NULLOK_INTERP,
+    int exitcode,
+    ARGIN(const char * format),
+    ...)
+        __attribute__nonnull__(3);
+
 #define ASSERT_ARGS_Parrot_x_execute_on_exit_handlers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_x_jump_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_x_on_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(function))
+#define ASSERT_ARGS_Parrot_x_panic_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(format))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exit.c */
 

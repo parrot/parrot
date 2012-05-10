@@ -311,7 +311,7 @@ flow is passed to it. Handlers can be either C-level or PIR-level routines. If
 no suitable handler is found, Parrot exits with the stored exception error
 message.
 
-See also C<exit_fatal()>, which signals fatal errors, and
+See also C<src/exit.c> and
 C<Parrot_ex_throw_from_op> which throws an exception from within an op.
 
 The 'invoke' vtable function doesn't actually execute a
@@ -383,7 +383,7 @@ Throws an exception from an opcode, with an error message constructed
 from a format string and arguments. Constructs an Exception PMC, and passes it
 to C<Parrot_ex_throw_from_op>.
 
-See also C<Parrot_ex_throw_from_c> and C<exit_fatal()>.
+See also C<Parrot_ex_throw_from_c> and C<src/exit.c>.
 
 =cut
 
@@ -417,7 +417,7 @@ decides that is appropriate, or zero to make the error non-resumable.
 C<exitcode> is a C<exception_type_enum> value. Constructs an Exception PMC
 and passes it to C<Parrot_ex_throw_from_c>.
 
-See also C<Parrot_ex_throw_from_op> and C<exit_fatal()>.
+See also C<Parrot_ex_throw_from_op> and C<src/exit.c>.
 
 =cut
 
@@ -654,41 +654,6 @@ Parrot_print_backtrace(void)
     }
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
-}
-
-/*
-
-=item C<void exit_fatal(int exitcode, const char *format, ...)>
-
-Signal a fatal error condition.  This should only be used with dire errors that
-cannot throw an exception (because no interpreter is available, or the nature
-of the error would interfere with the exception system).
-
-This involves printing an error message to stderr, and calling C<exit> to exit
-the process with the given exitcode. It is not possible for Parrot bytecode to
-intercept a fatal error (for that, use C<Parrot_ex_throw_from_c_args>).
-C<exit_fatal> does not call C<Parrot_x_exit> to invoke exit handlers (that would
-require an interpreter).
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void
-exit_fatal(int exitcode, ARGIN(const char *format), ...)
-{
-    ASSERT_ARGS(exit_fatal)
-    va_list arglist;
-    va_start(arglist, format);
-    vfprintf(stderr, format, arglist);
-    fprintf(stderr, "\n");
-    /* caution against output swap (with PDB_backtrace) */
-    fflush(stderr);
-    va_end(arglist);
-    exit(exitcode);
 }
 
 /* The DUMPCORE macro is defined for most platforms, but defined here if not

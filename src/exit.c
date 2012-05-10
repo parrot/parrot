@@ -52,7 +52,7 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
 
 /*
 
-=item C<void Parrot_x_jump_out(PARROT_INTERP, int status)>
+=item C<void Parrot_x_jump_out(NULLOK_INTERP, int status)>
 
 Jumps out returning to the caller api function. Do not execute registered
 on-exit handlers.
@@ -65,14 +65,14 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_x_jump_out(PARROT_INTERP, int status)
+Parrot_x_jump_out(NULLOK_INTERP, int status)
 {
     ASSERT_ARGS(Parrot_x_jump_out)
 
-    if (interp->api_jmp_buf)
+    if (interp && interp->api_jmp_buf)
         longjmp(*(interp->api_jmp_buf), 1);
     else
-        exit(status);
+        PARROT_FORCE_EXIT(status);
 }
 
 /*
@@ -137,6 +137,21 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
     /* Re-enable GC, which we will want if GC finalizes */
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
+}
+
+void
+Parrot_x_panic_and_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
+{
+    ASSERT_ARGS(Parrot_x_panic_and_exit)
+
+    va_list arglist;
+    va_start(arglist, format);
+    vfprintf(stderr, format, arglist);
+    fprintf(stderr, "\n");
+    fflush(stderr);
+    va_end(arglist);
+
+    Parrot_x_jump_out(interp, exitcode);
 }
 
 
