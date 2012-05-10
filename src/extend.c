@@ -187,8 +187,7 @@ restore_context(PARROT_INTERP, ARGIN(Parrot_Context * const initialctx))
             Parrot_pop_context(interp);
             curctx = CONTEXT(interp);
             if (curctx == NULL)
-                do_panic((interp), "cannot restore context",
-                    __FILE__, __LINE__);
+                PANIC(interp, "cannot restore context");
         } while (curctx != initialctx);
     }
 }

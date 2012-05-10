@@ -140,9 +140,9 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 }
 
 void
-Parrot_x_panic_and_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
+Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
 {
-    ASSERT_ARGS(Parrot_x_panic_and_exit)
+    ASSERT_ARGS(Parrot_x_force_error_exit)
 
     va_list arglist;
     va_start(arglist, format);
@@ -152,6 +152,62 @@ Parrot_x_panic_and_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format),
     va_end(arglist);
 
     Parrot_x_jump_out(interp, exitcode);
+}
+
+/*
+
+=item C<void Parrot_x_full_panic(NULLOK_INTERP, const char *message, const char *file,
+unsigned int line)>
+
+Panic handler. Things have gone very wrong in an unexpected way. Print out an
+error message and instructions for the user to report the error to the
+developers
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+Parrot_x_panic_and_exit(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
+         ARGIN_NULLOK(const char *file), unsigned int line)
+{
+    ASSERT_ARGS(Parrot_x_panic_and_exit)
+    /* Note: we can't format any floats in here--Parrot_sprintf
+    ** may panic because of floats.
+    ** and we don't use Parrot_sprintf or such, because we are
+    ** already in panic --leo
+    */
+    fprintf(stderr, "Parrot VM: PANIC: %s!\n",
+               message ? message : "(no message available)");
+
+    fprintf(stderr, "C file %s, line %u\n",
+               file ? file : "(not available)", line);
+
+    fprintf(stderr, "Parrot file (not available), ");
+    fprintf(stderr, "line (not available)\n");
+
+    fprintf(stderr, "\n\
+We highly suggest you notify the Parrot team if you have not been working on\n\
+Parrot.  Use parrotbug (located in parrot's root directory) or send an\n\
+e-mail to parrot-dev@lists.parrot.org.\n\
+Include the entire text of this error message and the text of the script that\n\
+generated the error.  If you've made any modifications to Parrot, please\n\
+describe them as well.\n\n");
+
+    fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
+    fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
+    fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
+    if (interp)
+        fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
+    else
+        fprintf(stderr, "Interp Flags: (no interpreter)\n");
+    fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
+    fprintf(stderr, "\nDumping Core...\n");
+
+    DUMPCORE();
 }
 
 

@@ -67,7 +67,7 @@ Parrot_alarm_init(void)
     sa.sa_flags   = SA_RESTART;
 
     if (sigaction(SIGALRM, &sa, 0) == -1)
-        Parrot_x_panic_and_exit(NULL, 1, "sigaction failed in Parrot_timers_init");
+        Parrot_x_force_error_exit(NULL, 1, "sigaction failed in Parrot_timers_init");
 
     Parrot_alarm_unmask(NULL);
 #endif
@@ -107,7 +107,7 @@ posix_alarm_set(FLOATVAL wait)
             Parrot_alarm_callback(SIGALRM);
         }
         else
-            Parrot_x_panic_and_exit(NULL, 1, "setitimer failed in set_posix_alarm");
+            Parrot_x_force_error_exit(NULL, 1, "setitimer failed in set_posix_alarm");
     }
 #endif
 }

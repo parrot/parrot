@@ -1265,7 +1265,7 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
 #    if (NUMVAL_SIZE == 16)
     header->floattype = FLOATTYPE_16;
 #    else
-    Parrot_x_panic_and_exit(NULL, 1,
+    Parrot_x_force_error_exit(NULL, 1,
         "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
         " PARROT_BIGENDIAN=%s\n", NUMVAL_SIZE,
         PARROT_BIGENDIAN ? "big-endian" : "little-endian");

@@ -1893,7 +1893,7 @@ failed_allocation(unsigned int line, size_t size)
 {
     ASSERT_ARGS(failed_allocation)
     fprintf(stderr, "Failed allocation of %lu bytes\n", (unsigned long)size);
-    do_panic(NULL, "Out of mem", __FILE__, line);
+    Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
 }
 
 
