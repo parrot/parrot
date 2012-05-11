@@ -842,7 +842,7 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     self->gc_mark_block_level--;
 
     /* We swept all dead objects */
-    self->num_early_gc_PMCs                      = 0;
+    self->num_early_gc_PMCs = 0;
 
     /* Don't compact after nursery collection */
     if (gen)
@@ -1051,6 +1051,12 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     INTVAL i;
 
+    Parrot_Pointer_Array * const dead_list = Parrot_pa_new(interp);
+
+    /* Sweep over all objects in each generation. For each object, if it's
+       still alive, bump it up to the next generation. Objects in the last
+       generation don't go any higher. For objects which are dead we call
+       VTABLE_destroy if necessary and add it to a sweep list */
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
         const int move_to_old = (i + 1) != MAX_GENERATIONS;
@@ -1090,15 +1096,32 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 if (PObj_custom_destroy_TEST(pmc))
                     VTABLE_destroy(interp, pmc);
 
-                if (pmc->vtable->attr_size && PMC_data(pmc))
-                    Parrot_gc_free_pmc_attributes(interp, pmc);
-                PMC_data(pmc) = NULL;
+                Parrot_pa_insert(dead_list, item);
+            }
+        );
+    }
 
-                PObj_on_free_list_SET(pmc);
-                PObj_gc_CLEAR(pmc);
+    POINTER_ARRAY_ITER(dead_list,
+        pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+        PMC              * const pmc  = &(item->pmc);
 
-                Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
-            });
+        if (pmc->vtable->attr_size && PMC_data(pmc))
+            Parrot_gc_free_pmc_attributes(interp, pmc);
+        PMC_data(pmc) = NULL;
+
+        PObj_on_free_list_SET(pmc);
+        PObj_gc_CLEAR(pmc);
+
+        Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
+    );
+    Parrot_pa_destroy(interp, dead_list);
+
+    /* Sweep over all string pools performing the same operation. If alive,
+       bump the string to the next generation up to MAX_GENERATIONS. If
+       dead, reclaim the memory */
+    for (i = self->gen_to_collect; i >= 0; i--) {
+        /* Don't move to generation beyond last */
+        const int move_to_old = (i + 1) != MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->strings[i],
             string_alloc_struct * const item = (string_alloc_struct *)ptr;
