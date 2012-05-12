@@ -137,7 +137,7 @@ following:
     make install
 
 But please note, the dynamic libs will not be found for non-standard locations
-unless you set the enviornment variable 'LD_LIBRARY_PATH' or something similar.
+unless you set the environment variable 'LD_LIBRARY_PATH' or something similar.
 
 For where to go from here, I<see> F<docs/parrot.pod> and I<see>
 F<docs/intro.pod>.  If you experience problems, please I<see> the section
@@ -145,6 +145,16 @@ F<docs/intro.pod>.  If you experience problems, please I<see> the section
 in POD format, and you can view them with the command,
 
     perldoc -F docs/intro.pod
+
+In addition, you may obtain an html-ized version of our docs -- which, in 
+some respects, are more extensive than our POD documents -- with the following
+command:
+
+    make html
+
+You may then view a local copy of the html documentation by navigating your
+favorite browser to the index page of the 'docs/html/' directory, I<i.e.,>
+'docs/html/index.html'.  
 
 =head1 CHANGES
 
