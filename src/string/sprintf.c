@@ -3,14 +3,14 @@ Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
-src/misc.c - Miscellaneous functions
+src/string/sprintf.c - sprintf API routines
 
 =head1 DESCRIPTION
 
-Miscellaneous functions, mainly the C<Parrot_sprintf> family.
-
-Uses a generalized formatting algorithm (F<src/spf_render.c>) with
-a specialized vtable (F<src/spf_vtable.c>) to handle argument extraction.
+This file implements the sprintf family of API routines. These routines
+take different forms, but all redirect to a common generalized formatting
+algorithm in F<src/spf_render.c> with a specialized vtables in
+F<src/spf_vtable.c> to handle argument extraction.
 
 =head2 Functions
 
@@ -369,7 +369,7 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
 
 =head1 SEE ALSO
 
-F<src/spf_vtable.c>, F<src/spf_render.c>, F<include/parrot/misc.h>
+F<src/string/spf_vtable.c>, F<src/string/spf_render.c>, F<include/parrot/misc.h>
 
 =head1 HISTORY
 
