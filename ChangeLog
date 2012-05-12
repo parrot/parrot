@@ -1,5 +1,7 @@
 2012-05-15    release 4.4.0
     - Core
+        + Most internal calls to libc exit(x) have been replaced with
+          Parrot_x_* API calls or PARROT_FORCE_EXIT
     - Tools
         + pbc_merge has been fixed to deduplicate constant strings and
           merge annotations segments

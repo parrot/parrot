@@ -186,6 +186,7 @@ developers. Perform a full core dump and force exit back to the system.
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
+PARROT_EXPORT
 void
 Parrot_x_panic_and_exit(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)
