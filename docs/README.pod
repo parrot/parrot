@@ -125,7 +125,7 @@ managers.
 =item F<parrot.pod>
 
 A general document for the uninitiated which points to several "good starting
-points" throughout Parrot's Documentation Set.[4]
+points" throughout Parrot's Documentation Set.
 
 =item F<pct/>
 
@@ -166,7 +166,7 @@ administrators, I<e.g.,> F<docs/projects/release_manager_guide.pod>.
 =item F<req/>
 
 This subdirectory contains a document on "Model Users For Parrot Design
-Decisions."[5]
+Decisions."[4]
 
 =item F<resources/>
 
@@ -220,13 +220,7 @@ of the FAQ. F<compiler_faq.pod> is far too ambiguous to be helpful.
 of the FAQ. F<getttingstarted.pod> is far too general and implies something
 other than the Parrot Developer FAQ.
 
-[4] I am not entirely certain we should retain the contents of this document.
-To be clearer, I think the contents of this document, F<parrot.pod>, should
-contain something far more substantive than pointers to various documents
-throughout Parrot's Documentation Set. Moreover, this 'README.pod' supplants
-much of the content contained in F<parrot.pod>.
-
-[5] Is there any reason to retain this document? It seems, ten years later,
+[4] Is there any reason to retain this document? It seems, ten years later,
 more of a curiousity than an actual guide.
 
 =head1 COPYRIGHT
