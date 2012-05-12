@@ -738,8 +738,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ        = str_concat_w_flags(interp, targ,
-                                        &info, ts, prefix);
+                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -753,8 +752,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ        = str_concat_w_flags(interp, targ,
-                                        &info, ts, prefix);
+                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -768,8 +766,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ        = str_concat_w_flags(interp, targ,
-                                        &info, ts, prefix);
+                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -820,7 +817,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                    (UHUGEINTVAL) (size_t) ptr, 16, 0);
 
                         targ = str_concat_w_flags(interp, targ, &info,
-                                ts, prefix);
+                                                  ts, prefix);
                     }
                     break;
 
@@ -858,8 +855,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
 #ifdef PARROT_HAS_SNPRINTF
                             snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
-                                     tempstr,
-                                     (double)thefloat);
+                                     tempstr, (double)thefloat);
 #else
                             /* the buffer is 4096, so no problem here */
                             sprintf(tc, tempstr, (double)thefloat);
@@ -881,10 +877,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                      * to SPRINTF_OBJ, but for now, getstring_pmc  *
                      * is inlined and modified to call get_repr    */
                     if (obj->getstring == pmc_core.getstring) {
-                        PMC * const tmp =
-                            VTABLE_get_pmc_keyed_int(interp,
-                                                     ((PMC *)obj->data),
-                                                     (obj->index));
+                        PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
+                                                ((PMC *)obj->data),
+                                                (obj->index));
 
                         STRING * const string = (VTABLE_get_repr(interp, tmp));
                         STRING * const ts     = handle_flags(interp, &info,
@@ -911,8 +906,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                   default:
                     /* fake the old %P and %S commands */
-                    if (info.type == SIZE_PMC
-                     || info.type == SIZE_PSTR) {
+                    if (info.type == SIZE_PMC || info.type == SIZE_PSTR) {
                         --i;
                         goto CASE_s;
                         /* case 's' will see the SIZE_PMC or SIZE_PSTR
