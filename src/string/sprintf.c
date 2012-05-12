@@ -37,9 +37,8 @@ the type for the format.
 
 */
 
-#define IN_SPF_SYSTEM
-
 #include "parrot/parrot.h"
+#include "spf_private.h"
 
 /* HEADERIZER HFILE: include/parrot/misc.h */
 
