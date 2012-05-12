@@ -550,14 +550,6 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 *      use %Ps, %Pd or %Pf, but we still need to support the old form.
 *      The same is true of %S--%Ss is the best form, but %S is still
 *      supported.
-*
-*  The implementation of Parrot_vsprintf is surprisingly similar to this
-*  regex, even though the two were developed semi-independently.
-*  Parrot_vsprintf keeps track of what it expects to see next (the
-*  'phase')--flags, width, precision, size, or field type (term).  If it
-*  doesn't find a character that fits whatever it's expecting, it sets
-*  info.phase to the next thing and tries it.  The first four phases just
-*  set flags--the last does all the work.
 */
 
         for (++i; i < pat_len && info.phase != PHASE_DONE; ++i) {
@@ -963,12 +955,11 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
 =head1 SEE ALSO
 
-F<include/parrot/misc.h>, F<src/misc.c>, F<src/spf_vtable.c>
+F<include/parrot/misc.h>, F<src/string/sprintf.c>, F<src/string/spf_vtable.c>
 
 =cut
 
 */
-
 
 /*
  * Local variables:
