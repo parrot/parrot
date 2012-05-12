@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -374,6 +375,16 @@ Parrot_interp_destroy_for_exit(PARROT_INTERP, int exit_code)
     interp_free_resources(interp);
 }
 
+/*
+
+=item C<static void interp_destroy_core(PARROT_INTERP)>
+
+TK: Whiteknight, please fill in.
+
+=cut
+
+*/
+
 static void
 interp_destroy_core(PARROT_INTERP)
 {
@@ -428,6 +439,16 @@ interp_destroy_core(PARROT_INTERP)
     if (!interp->parent_interpreter)
         Parrot_runcore_destroy(interp);
 }
+
+/*
+
+=item C<static void interp_free_resources(PARROT_INTERP)>
+
+TK: Whiteknight please fill in
+
+=cut
+
+*/
 
 static void
 interp_free_resources(PARROT_INTERP)
