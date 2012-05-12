@@ -420,7 +420,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             "Can only schedule Tasks and Subs.\n");
     }
 
-#ifdef HAS_THREADS
+#ifdef PARROT_HAS_THREADS
     index = Parrot_thread_get_free_threads_array_index(interp);
     if (index > -1) { /* start a new thread */
         PMC * const thread =

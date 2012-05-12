@@ -130,7 +130,7 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
     ASSERT_ARGS(Parrot_alarm_check)
 
-#ifdef HAS_THREADS
+#ifdef PARROT_HAS_THREADS
     if (*last_serial == alarm_serial) {
         return 0;
     }

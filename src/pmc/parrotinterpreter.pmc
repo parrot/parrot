@@ -806,7 +806,7 @@ Schedules the given task on the proxy's interpreter.
         Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
         Interp                  * const proxied_interp = core_struct->interp;
 
-#ifdef HAS_THREADS
+#ifdef PARROT_HAS_THREADS
         /* don't run GC from the wrong thread since GC involves stack walking and we
          * don't want the foreign GC to find our objects */
         Parrot_block_GC_mark_locked(proxied_interp);

@@ -357,7 +357,7 @@ Parrot_thread_wait_for_notification(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_wait_for_notification)
 
-#ifdef HAS_THREADS
+#ifdef PARROT_HAS_THREADS
     LOCK(interp->sleep_mutex);
     while (interp->wake_up == 0)
         COND_WAIT(interp->sleep_cond, interp->sleep_mutex);
