@@ -3,6 +3,7 @@
         + Most internal calls to libc exit(x) have been replaced with
           Parrot_x_* API calls or PARROT_FORCE_EXIT
     - Documentation
+        + 'pdd31_hll.pod' made stable in 'docs/pdds/'.
         + Updated main 'README' to 'README.pod'
         + Updated various dependencies, e.g., 'lib/Parrot/Distribution.pm'.
         + Updated all 'README' files to 'README.pod' files.
