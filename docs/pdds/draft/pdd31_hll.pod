@@ -7,10 +7,6 @@
 This PDD describes the standard compiler API and support for
 cross-library communication between high-level languages (HLLs).
 
-
-
-
-
 =head2 Description
 
 Parrot's support for HLL interoperability is primarily focused on
@@ -28,8 +24,8 @@ among HLL compiler objects, with each HLL compiler maintaining
 primary control over the operations performed in its HLL space.
 
 In particular, this HLL API does not attempt to prescribe how
-languages should organize their internal capabilities, PMCs,
-namespaces, methods, data structures, and the like.
+languages should organize their internal capabilities, objects,
+classes, namespaces, methods, data structures, and the like.
 
 =head2 Implementation
 
@@ -63,7 +59,9 @@ Common options include:
 
 Stop the compilation process when the stage given by target
 has been reached.  Common values for target include "parse",
-"past", "pir", and "pbc".
+"past", "pir", and "pbc". The exact target types supported
+are dependent on the compiler itself and are not
+limited or standardized.
 
 =item outer_ctx
 
@@ -79,7 +77,7 @@ a dynamic compilation at runtime.
     $P0 = compiler.'eval'(source [, args :slurpy] [, options :named :slurpy])
 
 Compile and evaluate (execute) the code given by C<source>
-with C<args> and according to C<options>.  The available options 
+with C<args> and according to C<options>.  The available options
 are generally the same as for the C<compile> method above; in particular,
 the C<outer_ctx> option can be used to specify the outer lexical
 context for the evaluated source.
