@@ -18,9 +18,8 @@ and its utility functions.
 
 */
 
-#define IN_SPF_SYSTEM
-
 #include "parrot/parrot.h"
+#include "spf_private.h"
 #include "spf_render.str"
 
 typedef enum {
@@ -50,7 +49,7 @@ enum {
     FLAG_PREC   = (1<<6)
 };
 
-/* HEADERIZER HFILE: include/parrot/misc.h */
+/* HEADERIZER HFILE: src/string/spf_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
