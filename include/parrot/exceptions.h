@@ -119,21 +119,6 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void do_panic(
-    NULLOK_INTERP,
-    ARGIN_NULLOK(const char *message),
-    ARGIN_NULLOK(const char *file),
-    unsigned int line);
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void exit_fatal(int exitcode, ARGIN(const char *format), ...)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_DOES_NOT_RETURN_WHEN_FALSE
 void Parrot_assert(
     INTVAL condition,
@@ -240,9 +225,6 @@ STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 void Parrot_print_backtrace(void);
-#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(condition_string) \
     , PARROT_ASSERT_ARG(file))
@@ -287,8 +269,6 @@ void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
-
-#define PANIC(interp, message) do_panic((interp), (message), __FILE__, __LINE__)
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
  * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.

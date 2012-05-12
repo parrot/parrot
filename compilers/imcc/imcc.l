@@ -738,11 +738,10 @@ int yywrap(void* yyscanner) {
 
 static macro_frame_t *
 new_frame(ARGMOD(imc_info_t *imcc)) {
-    /* XXX non-reentrant */
-    static int label   = 0;
     macro_frame_t * const tmp = mem_gc_allocate_zeroed_typed(imcc->interp, macro_frame_t);
 
-    tmp->label         = ++label;
+    tmp->label         = imcc->unique_count;
+    imcc->unique_count++;
     tmp->s.line        = imcc->line;
     tmp->s.handle      = PIO_INVALID_HANDLE;
 

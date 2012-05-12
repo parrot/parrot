@@ -61,9 +61,6 @@ void Parrot_ext_try(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_free_cstring(ARGFREE(char *string));
-
-PARROT_EXPORT
 Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
     ARGIN_NULLOK(const char *_class))
         __attribute__nonnull__(1);
@@ -74,7 +71,6 @@ Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_ext_try __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_free_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_PMC_typenum __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
