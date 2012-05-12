@@ -230,7 +230,7 @@ sub _get_special {
         LICENSE                                         [main]doc
         PBC_COMPAT                                      [main]doc
         PLATFORMS                                       [devel]doc
-        README                                          [devel]doc
+        README.pod                                      [devel]doc
         README_win32.pod                                [devel]doc
         README_cygwin.pod                               [devel]doc
         RESPONSIBLE_PARTIES                             [main]doc

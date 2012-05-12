@@ -516,7 +516,7 @@ You're done! Help yourself to a beer, cola, or other delicious celebratory drink
 
 =head1 SEE ALSO
 
-L<http://github.com/parrot/parrot/blob/master/README>,
+L<http://github.com/parrot/parrot/blob/master/README.pod>,
 L<http://github.com/parrot/parrot/blob/master/RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1 - Upcoming Releases

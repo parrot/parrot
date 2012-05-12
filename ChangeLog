@@ -2,6 +2,17 @@
     - Core
         + Most internal calls to libc exit(x) have been replaced with
           Parrot_x_* API calls or PARROT_FORCE_EXIT
+    - Documentation
+	+ Updated main 'README' to 'README.pod'
+	+ Updated various dependencies, e.g., 'lib/Parrot/Distribution.pm'.
+  	+ Updated all 'README' files to 'README.pod' files.
+	+ Added 'README.pod' files to top-level directories.
+    - Tests
+	+ Update various tests to pull from new 'README.pod'
+	+ Updated 't/tools/install/02-install_files.t' to pull from new
+	'README.pod'
+    - Community
+    - Platforms
     - Tools
         + pbc_merge has been fixed to deduplicate constant strings and
           merge annotations segments

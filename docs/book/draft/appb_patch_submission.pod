@@ -44,7 +44,7 @@ then create diffs using the command C<git diff>. Alternatively, you can
 make a copy of the repository and then create diffs between the two
 copies with the C<diff -u> command:
 
-  diff -u parrot/README parrot_changed/README
+  diff -u parrot/README.pod parrot_changed/README.pod
 
 Either method is fine, and both are equally common on p2. Your
 working style and the types of changes you make--small and modular
@@ -76,7 +76,7 @@ conventional extension for patch files is F<.patch>.
 
 In the email message, always start the subject with "[PATCH]", and
 make the subject as clear as possible: "[PATCH] misspelled aardvark in
-main README file" is better than "[PATCH] typo". The body of the
+main README.pod file" is better than "[PATCH] typo". The body of the
 message should clearly explain what the patch is supposed to do and
 why you're submitting it. Make a note if you're adding or deleting
 files so they won't be missed.

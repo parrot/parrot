@@ -239,7 +239,7 @@ CODE
 .end
 
 .sub 'test_open_p_s_s'
-    $S0 = "README"
+    $S0 = "README.pod"
     $S1 = "r"
     $P0 = open $S0, $S1
     $I0 = defined $P0
@@ -248,7 +248,7 @@ CODE
 
 .sub 'test_seek_tell'
     $S0 = 'r'
-    $P0 = open "README", $S0
+    $P0 = open "README.pod", $S0
     $I0 = tell $P0
     is( $I0, 0, 'tell_i_p' )
 
@@ -381,8 +381,8 @@ CODE
 .sub 'test_peek'
     .include 'stat.pasm'
 
-    $I0 = stat 'README', .STAT_FILESIZE
-    $P0 = open 'README', 'r'
+    $I0 = stat 'README.pod', .STAT_FILESIZE
+    $P0 = open 'README.pod', 'r'
     close $P0
     $P1 = getstdin
 
@@ -401,7 +401,7 @@ CODE
 .sub 'test_read'
     getstdin $P1
 
-    $P0 = open 'README', 'r'
+    $P0 = open 'README.pod', 'r'
     $I0 = 4
 
     setstdin $P0
