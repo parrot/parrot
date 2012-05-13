@@ -91,11 +91,10 @@ posix_alarm_set(FLOATVAL wait)
     /* TODO: Implement on Windows */
 #else
     const int MIL = 1000000;
-    struct itimerval itmr;
-    int sec, usec;
+    const int sec  = (int) wait;
+    const int usec = (int) ((wait - sec) * MIL);
 
-    sec  = (int) wait;
-    usec = (int) ((wait - sec) * MIL);
+    struct itimerval itmr;
 
     itmr.it_value.tv_sec     = sec;
     itmr.it_value.tv_usec    = usec;
@@ -218,7 +217,7 @@ Parrot_alarm_set(FLOATVAL when)
 #ifdef _WIN32
     /* TODO: Implement on Windows */
 #else
-    FLOATVAL now = Parrot_floatval_time();
+    const FLOATVAL now = Parrot_floatval_time();
 
     /* Better late than early */
     when += 0.0001;
