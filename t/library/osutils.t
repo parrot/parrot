@@ -104,10 +104,10 @@ Tests the C<osutils> runtime library.
 .end
 
 .sub 'test_rindex'
-    $I0 = rindex('abc', '.')
+    $I0 = 'rindex'('abc', '.')
     is($I0, -1, "rindex('abc', '.')")
 
-    $I0 = rindex('abc.def.ghi', '.')
+    $I0 = 'rindex'('abc.def.ghi', '.')
     is($I0, 7, "rindex('abc.def.ghi', '.')")
 .end
 

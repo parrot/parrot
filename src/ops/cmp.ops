@@ -64,31 +64,31 @@ B<eq_addr> compares the address of the objects or strings.
 
 =cut
 
-inline op eq(in INT, in INT, inconst LABEL) :base_core {
+inline op eq(in INT, in INT, inconst LABEL)  {
     if ($1 == $2) {
         goto OFFSET($3);
     }
 }
 
-inline op eq(in NUM, in NUM, inconst LABEL) :base_core {
+inline op eq(in NUM, in NUM, inconst LABEL)  {
     if ($1 == $2) {
         goto OFFSET($3);
     }
 }
 
-op eq(in STR, in STR, inconst LABEL) :base_core {
+op eq(in STR, in STR, inconst LABEL)  {
     if (STRING_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op eq(invar PMC, invar PMC, inconst LABEL) :base_core {
+op eq(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_is_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op eq(invar PMC, in INT, inconst LABEL) :base_core {
+op eq(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -100,7 +100,7 @@ op eq(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op eq(invar PMC, in NUM, inconst LABEL) :base_core {
+op eq(invar PMC, in NUM, inconst LABEL)  {
     /*
      * the get_number and get_string should probably
      * be also replaced with code like above, as
@@ -112,31 +112,31 @@ op eq(invar PMC, in NUM, inconst LABEL) :base_core {
     }
 }
 
-op eq(invar PMC, in STR, inconst LABEL) :base_core {
+op eq(invar PMC, in STR, inconst LABEL)  {
     if (STRING_equal(interp, VTABLE_get_string(interp, $1), $2)) {
         goto OFFSET($3);
     }
 }
 
-op eq_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op eq_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_is_equal_string(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op eq_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op eq_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_is_equal_num(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op eq_addr(in STR, in STR, inconst LABEL) :base_core {
+op eq_addr(in STR, in STR, inconst LABEL)  {
     if ($1 == $2) {
         goto OFFSET($3);
     }
 }
 
-op eq_addr(invar PMC, invar PMC, inconst LABEL) :base_core {
+op eq_addr(invar PMC, invar PMC, inconst LABEL)  {
     if ($1 == $2) {
         goto OFFSET($3);
     }
@@ -170,31 +170,31 @@ Branch if $1 is not equal to $2.
 
 =cut
 
-inline op ne(in INT, in INT, inconst LABEL) :base_core {
+inline op ne(in INT, in INT, inconst LABEL)  {
     if ($1 != $2) {
         goto OFFSET($3);
     }
 }
 
-inline op ne(in NUM, in NUM, inconst LABEL) :base_core {
+inline op ne(in NUM, in NUM, inconst LABEL)  {
     if ($1 != $2) {
         goto OFFSET($3);
     }
 }
 
-op ne(in STR, in STR, inconst LABEL) :base_core {
+op ne(in STR, in STR, inconst LABEL)  {
     if (!STRING_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op ne(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ne(invar PMC, invar PMC, inconst LABEL)  {
     if (!VTABLE_is_equal(interp, $1, $2)) {
         goto OFFSET($3);
     }
 }
 
-op ne(invar PMC, in INT, inconst LABEL) :base_core {
+op ne(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -206,37 +206,37 @@ op ne(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op ne(invar PMC, in NUM, inconst LABEL) :base_core {
+op ne(invar PMC, in NUM, inconst LABEL)  {
     if (VTABLE_get_number(interp, $1) != $2) {
         goto OFFSET($3);
     }
 }
 
-op ne(invar PMC, in STR, inconst LABEL) :base_core {
+op ne(invar PMC, in STR, inconst LABEL)  {
     if (!STRING_equal(interp, VTABLE_get_string(interp, $1), $2)) {
         goto OFFSET($3);
     }
 }
 
-op ne_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ne_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_string(interp, $1, $2) != 0) {
         goto OFFSET($3);
     }
 }
 
-op ne_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ne_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_num(interp, $1, $2) != 0) {
         goto OFFSET($3);
     }
 }
 
-op ne_addr(in STR, in STR, inconst LABEL) :base_core {
+op ne_addr(in STR, in STR, inconst LABEL)  {
     if ($1 != $2) {
         goto OFFSET($3);
     }
 }
 
-op ne_addr(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ne_addr(invar PMC, invar PMC, inconst LABEL)  {
     if ($1 != $2) {
         goto OFFSET($3);
     }
@@ -266,31 +266,31 @@ Branch if $1 is less than $2.
 
 =cut
 
-inline op lt(in INT, in INT, inconst LABEL) :base_core {
+inline op lt(in INT, in INT, inconst LABEL)  {
     if ($1 < $2) {
         goto OFFSET($3);
     }
 }
 
-inline op lt(in NUM, in NUM, inconst LABEL) :base_core {
+inline op lt(in NUM, in NUM, inconst LABEL)  {
     if ($1 < $2) {
         goto OFFSET($3);
     }
 }
 
-op lt(in STR, in STR, inconst LABEL) :base_core {
+op lt(in STR, in STR, inconst LABEL)  {
     if (STRING_compare(interp, $1, $2) < 0) {
         goto OFFSET($3);
     }
 }
 
-op lt(invar PMC, invar PMC, inconst LABEL) :base_core {
+op lt(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp(interp, $1, $2) < 0) {
         goto OFFSET($3);
     }
 }
 
-op lt(invar PMC, in INT, inconst LABEL) :base_core {
+op lt(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -302,25 +302,25 @@ op lt(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op lt(invar PMC, in NUM, inconst LABEL) :base_core {
+op lt(invar PMC, in NUM, inconst LABEL)  {
     if (VTABLE_get_number(interp, $1) < $2) {
         goto OFFSET($3);
     }
 }
 
-op lt(invar PMC, in STR, inconst LABEL) :base_core {
+op lt(invar PMC, in STR, inconst LABEL)  {
     if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) < 0) {
         goto OFFSET($3);
     }
 }
 
-op lt_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op lt_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_string(interp, $1, $2) < 0) {
         goto OFFSET($3);
     }
 }
 
-op lt_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op lt_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_num(interp, $1, $2) < 0) {
         goto OFFSET($3);
     }
@@ -350,31 +350,31 @@ Branch if $1 is less than or equal to $2.
 
 =cut
 
-inline op le(in INT, in INT, inconst LABEL) :base_core {
+inline op le(in INT, in INT, inconst LABEL)  {
     if ($1 <= $2) {
         goto OFFSET($3);
     }
 }
 
-inline op le(in NUM, in NUM, inconst LABEL) :base_core {
+inline op le(in NUM, in NUM, inconst LABEL)  {
     if ($1 <= $2) {
         goto OFFSET($3);
     }
 }
 
-op le(in STR, in STR, inconst LABEL) :base_core {
+op le(in STR, in STR, inconst LABEL)  {
     if (STRING_compare(interp, $1, $2) <= 0) {
         goto OFFSET($3);
     }
 }
 
-op le(invar PMC, invar PMC, inconst LABEL) :base_core {
+op le(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp(interp, $1, $2) <= 0) {
         goto OFFSET($3);
     }
 }
 
-op le(invar PMC, in INT, inconst LABEL) :base_core {
+op le(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -386,25 +386,25 @@ op le(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op le(invar PMC, in NUM, inconst LABEL) :base_core {
+op le(invar PMC, in NUM, inconst LABEL)  {
     if (VTABLE_get_number(interp, $1) <= $2) {
         goto OFFSET($3);
     }
 }
 
-op le(invar PMC, in STR, inconst LABEL) :base_core {
+op le(invar PMC, in STR, inconst LABEL)  {
     if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) <= 0) {
         goto OFFSET($3);
     }
 }
 
-op le_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op le_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_string(interp, $1, $2) <= 0) {
         goto OFFSET($3);
     }
 }
 
-op le_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op le_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_num(interp, $1, $2) <= 0) {
         goto OFFSET($3);
     }
@@ -428,13 +428,13 @@ Branch if $1 is greater than $2.
 
 =cut
 
-op gt(invar PMC, invar PMC, inconst LABEL) :base_core {
+op gt(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp(interp, $1, $2) > 0) {
         goto OFFSET($3);
     }
 }
 
-op gt(invar PMC, in INT, inconst LABEL) :base_core {
+op gt(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -446,25 +446,25 @@ op gt(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op gt(invar PMC, in NUM, inconst LABEL) :base_core {
+op gt(invar PMC, in NUM, inconst LABEL)  {
     if (VTABLE_get_number(interp, $1) > $2) {
         goto OFFSET($3);
     }
 }
 
-op gt(invar PMC, in STR, inconst LABEL) :base_core {
+op gt(invar PMC, in STR, inconst LABEL)  {
     if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) > 0) {
         goto OFFSET($3);
     }
 }
 
-op gt_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op gt_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_string(interp, $1, $2) > 0) {
         goto OFFSET($3);
     }
 }
 
-op gt_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op gt_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_num(interp, $1, $2) > 0) {
         goto OFFSET($3);
     }
@@ -488,13 +488,13 @@ Branch if $1 is greater than or equal to $2.
 
 =cut
 
-op ge(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ge(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp(interp, $1, $2) >= 0) {
         goto OFFSET($3);
     }
 }
 
-op ge(invar PMC, in INT, inconst LABEL) :base_core {
+op ge(invar PMC, in INT, inconst LABEL)  {
     PMC * const temp = Parrot_pmc_new_temporary(interp, enum_class_Integer);
     VTABLE_set_integer_native(interp, temp, $2);
 
@@ -506,25 +506,25 @@ op ge(invar PMC, in INT, inconst LABEL) :base_core {
     Parrot_pmc_free_temporary(interp, temp);
 }
 
-op ge(invar PMC, in NUM, inconst LABEL) :base_core {
+op ge(invar PMC, in NUM, inconst LABEL)  {
     if (VTABLE_get_number(interp, $1) >= $2) {
         goto OFFSET($3);
     }
 }
 
-op ge(invar PMC, in STR, inconst LABEL) :base_core {
+op ge(invar PMC, in STR, inconst LABEL)  {
     if (STRING_compare(interp, VTABLE_get_string(interp, $1), $2) >= 0) {
         goto OFFSET($3);
     }
 }
 
-op ge_str(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ge_str(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_string(interp, $1, $2) >= 0) {
         goto OFFSET($3);
     }
 }
 
-op ge_num(invar PMC, invar PMC, inconst LABEL) :base_core {
+op ge_num(invar PMC, invar PMC, inconst LABEL)  {
     if (VTABLE_cmp_num(interp, $1, $2) >= 0) {
         goto OFFSET($3);
     }
@@ -613,50 +613,50 @@ Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
 
 =cut
 
-inline op cmp(out INT, in INT, in INT) :base_core {
+inline op cmp(out INT, in INT, in INT)  {
     $1 = $2 < $3 ? -1 :
          $2 > $3 ? +1 :
          0;
 }
 
-inline op cmp(out INT, in NUM, in NUM) :base_core {
+inline op cmp(out INT, in NUM, in NUM)  {
     $1 = $2 < $3 ? -1 :
          $2 > $3 ? +1 :
          0;
 }
 
-inline op cmp(out INT, in STR, in STR) :base_core {
+inline op cmp(out INT, in STR, in STR)  {
     $1 = STRING_compare(interp, $2, $3);
 }
 
-inline op cmp(out INT, invar PMC, invar PMC) :base_core {
+inline op cmp(out INT, invar PMC, invar PMC)  {
     $1 = VTABLE_cmp(interp, $2, $3);
 }
 
-inline op cmp(out INT, invar PMC, in INT) :base_core {
+inline op cmp(out INT, invar PMC, in INT)  {
     const INTVAL l = VTABLE_get_integer(interp, $2);
     $1 = l < $3 ? -1 :
          l > $3 ? +1 :
          0;
 }
 
-inline op cmp(out INT, invar PMC, in NUM) :base_core {
+inline op cmp(out INT, invar PMC, in NUM)  {
     const FLOATVAL l = VTABLE_get_number(interp, $2);
     $1 = l < $3 ? -1 :
          l > $3 ? +1 :
          0;
 }
 
-inline op cmp(out INT, invar PMC, in STR) :base_core {
+inline op cmp(out INT, invar PMC, in STR)  {
     STRING* const l = VTABLE_get_string(interp, $2);
     $1 = STRING_compare(interp, l, $3);
 }
 
-inline op cmp_str(out INT, invar PMC, invar PMC) :base_core {
+inline op cmp_str(out INT, invar PMC, invar PMC)  {
     $1 = VTABLE_cmp_string(interp, $2, $3);
 }
 
-inline op cmp_num(out INT, invar PMC, invar PMC) :base_core {
+inline op cmp_num(out INT, invar PMC, invar PMC)  {
     $1 = VTABLE_cmp_num(interp, $2, $3);
 }
 
@@ -668,7 +668,7 @@ are not always comparable.
 
 =cut
 
-inline op cmp_pmc(out PMC, invar PMC, invar PMC) :base_core {
+inline op cmp_pmc(out PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_cmp_pmc(interp, $2, $3);
 }
 
@@ -922,11 +922,11 @@ Short-circuiting logical and.  Returns $2 if it's false, else returns $3.
 
 =cut
 
-inline op and(out INT, in INT, in INT) :base_core {
+inline op and(out INT, in INT, in INT)  {
     $1 = $2 ? $3 : $2;
 }
 
-inline op and(invar PMC, invar PMC, invar PMC) :base_core {
+inline op and(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_get_bool(interp, $2) ? $3 : $2;
 }
 
@@ -944,19 +944,19 @@ Set the boolean state of $1 to the opposite of the boolean state from $1.
 
 =cut
 
-inline op not(inout INT) :base_core {
+inline op not(inout INT)  {
     $1 = ! $1;
 }
 
-inline op not(out INT, in INT) :base_core {
+inline op not(out INT, in INT)  {
     $1 = ! $2;
 }
 
-inline op not(invar PMC) :base_core {
+inline op not(invar PMC)  {
     VTABLE_set_bool(interp, $1, !VTABLE_get_bool(interp, $1));
 }
 
-inline op not(out PMC, invar PMC) :base_core {
+inline op not(out PMC, invar PMC)  {
     const INTVAL a = ! VTABLE_get_bool(interp, $2);
     if (PMC_IS_NULL($1))
         $1 = Parrot_pmc_new(interp, Parrot_hll_get_ctx_HLL_type(interp, enum_class_Boolean));
@@ -973,11 +973,11 @@ Short-circuiting logical or.  Returns $2 if it's true, else returns $3.
 
 =cut
 
-inline op or(out INT, in INT, in INT) :base_core {
+inline op or(out INT, in INT, in INT)  {
     $1 = $2 ? $2 : $3;
 }
 
-inline op or(invar PMC, invar PMC, invar PMC) :base_core {
+inline op or(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_get_bool(interp, $2) ? $2 : $3;
 }
 
@@ -992,11 +992,11 @@ returns $3 if it's true and $2 isn't, else returns false.
 
 =cut
 
-inline op xor(out INT, in INT, in INT) :base_core {
+inline op xor(out INT, in INT, in INT)  {
     $1 = ($2 && ! $3) ? $2 : ($3 && ! $2) ? $3 : 0;
 }
 
-inline op xor(invar PMC, invar PMC, invar PMC) :base_core {
+inline op xor(invar PMC, invar PMC, invar PMC)  {
     const INTVAL a = VTABLE_get_bool(interp, $2);
     const INTVAL b = VTABLE_get_bool(interp, $3);
     if (a && ! b)

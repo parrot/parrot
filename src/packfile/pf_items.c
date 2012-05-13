@@ -603,7 +603,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #ifdef __LCC__
         int expo2;
 #endif
-        exit_fatal(1, "cvt_num16_num8: long double conversion unsupported");
+        Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
@@ -823,7 +823,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[12];
     fetch_buf_le_12(b, src);  /* TODO test endianize */
     cvt_num12_num8(dest, b);
-    exit_fatal(1, "cvt_num12_num8_le: long double conversion unsupported");
+    Parrot_x_force_error_exit(NULL, 1, "cvt_num12_num8_le: long double conversion unsupported");
 }
 #endif
 
@@ -849,7 +849,7 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[16];
     fetch_buf_le_16(b, src);
     cvt_num16_num8(dest, b);
-    exit_fatal(1, "cvt_num16_num8_le: long double conversion unsupported");
+    Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8_le: long double conversion unsupported");
 }
 #endif
 
@@ -1699,7 +1699,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             break;
 #  endif
           default:
-            exit_fatal(1,
+            Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
               NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
@@ -1736,7 +1736,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             break;
 #  endif
           default:
-            exit_fatal(1,
+            Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
               NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
@@ -1761,7 +1761,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = fetch_buf_be_8;
             break;
           case FLOATTYPE_12:
-            exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
+            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
           case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num8_be;
@@ -1772,7 +1772,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = cvt_num8_num12_be;
             break;
           case FLOATTYPE_12:
-            exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
+            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
           case FLOATTYPE_16:
             pf->fetch_nv = cvt_num16_num12_be;
@@ -1783,14 +1783,14 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = cvt_num8_num16_be;
             break;
           case FLOATTYPE_12:
-            exit_fatal(1, "PackFile_unpack: invalid floattype 1 big-endian");
+            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
             break;
           case FLOATTYPE_16:
             pf->fetch_nv = fetch_buf_be_16;
             break;
 #  endif
           default:
-            exit_fatal(1,
+            Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
               NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
@@ -1837,7 +1837,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             break;
 #  endif
           default:
-            exit_fatal(1,
+            Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
               NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
@@ -1887,7 +1887,7 @@ fetch_iv_le(INTVAL w)
     r |= (w & 0xff00000000000000) >> 56;
     return r;
 #    else
-    exit_fatal(1, "Unsupported INTVAL_SIZE=%d\n",
+    Parrot_x_force_error_exit(NULL, 1, "Unsupported INTVAL_SIZE=%d\n",
                INTVAL_SIZE);
 #    endif
 #  endif
@@ -1930,7 +1930,7 @@ fetch_iv_be(INTVAL w)
     r |= (w & 0xff00000000000000) >> 56;
     return r;
 #    else
-    exit_fatal(1, "Unsupported INTVAL_SIZE=%d\n", INTVAL_SIZE);
+    Parrot_x_force_error_exit(NULL, 1, "Unsupported INTVAL_SIZE=%d\n", INTVAL_SIZE);
 #    endif
 #  endif
 #endif

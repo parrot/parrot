@@ -250,7 +250,6 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
-    ctx->current_object    = NULL;
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
     ctx->current_sig       = PMCNULL;
@@ -632,6 +631,12 @@ UINTVAL idx)>
 
 Get pointer to INTVAL register.
 
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
+
 =cut
 
 */
@@ -653,6 +658,12 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 UINTVAL idx)>
 
 Get pointer to FLOATVAL register.
+
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
 
 =cut
 
@@ -676,6 +687,12 @@ idx)>
 
 Get pointer to STRING register.
 
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
+
 =cut
 
 */
@@ -697,6 +714,12 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 =item C<PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, PMC *ctx, UINTVAL idx)>
 
 Get pointer to PMC register.
+
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
 
 =cut
 
@@ -727,6 +750,7 @@ Return number of used registers of particular type.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 UINTVAL
@@ -745,6 +769,7 @@ Get pointer to FLOANFAL and INTVAL registers.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -764,6 +789,7 @@ Copy Regs_ni into Context.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void
@@ -782,6 +808,7 @@ Get pointer to PMC and STRING registers.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -801,6 +828,7 @@ Copy Regs_ps into Context.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void

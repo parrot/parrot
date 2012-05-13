@@ -298,7 +298,6 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     /* clear context introspection vars */
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), NULL);
     Parrot_pcc_set_continuation(interp, CURRENT_CONTEXT(interp), NULL); /* TODO Use PMCNULL */
-    Parrot_pcc_set_object(interp, CURRENT_CONTEXT(interp), NULL);
 
     /* initialize built-in runcores */
     Parrot_runcore_init(interp);
@@ -854,9 +853,6 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         break;
       case CURRENT_CONT:
         result = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
-        break;
-      case CURRENT_OBJECT:
-        result = Parrot_pcc_get_object(interp, CURRENT_CONTEXT(interp));
         break;
       case CURRENT_LEXPAD:
         result = Parrot_pcc_get_lex_pad(interp, CURRENT_CONTEXT(interp));

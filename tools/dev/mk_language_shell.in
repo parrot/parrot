@@ -747,7 +747,7 @@ BEGIN_OPS_PREAMBLE
 END_OPS_PREAMBLE
 
 /* Op to get the address of a PMC. */
-inline op @lclang@_pmc_addr(out INT, invar PMC) :base_core {
+inline op @lclang@_pmc_addr(out INT, invar PMC)  {
     $1 = (int) $2;
     goto NEXT();
 }

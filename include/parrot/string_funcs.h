@@ -167,6 +167,16 @@ INTVAL Parrot_str_find_not_cclass(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_str_find_reverse_index(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGIN(const STRING *search),
+    INTVAL start)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 void Parrot_str_finish(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -540,6 +550,10 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
     , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_Parrot_str_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_str_find_reverse_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_Parrot_str_finish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_format_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

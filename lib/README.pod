@@ -1,0 +1,19 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+lib/README.pod - Readme file for the 'lib/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory contains, primarily, Perl5 modules important to Parrot's build
+process, I<e.g.,> drivers for the test suite, a "POD to HTML" converter, and
+Headerziers, with which to generate C function declarations.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

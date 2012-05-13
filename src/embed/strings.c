@@ -94,15 +94,11 @@ Parrot_api_string_export_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
     ASSERT_ARGS(Parrot_api_string_export_wchar)
     EMBED_API_CALLIN(interp_pmc, interp)
 
-    char *cstr;
-    size_t len;
-    wchar_t *wstrout;
-
     if (!STRING_IS_NULL(string)) {
-        cstr = Parrot_str_to_cstring(interp, string);
-        len = strlen(cstr);
+        char * const cstr       = Parrot_str_to_cstring(interp, string);
+        const size_t len        = strlen(cstr);
+        wchar_t * const wstrout = (wchar_t *) malloc(sizeof (wchar_t) * (len + 1));
 
-        wstrout = (wchar_t *) malloc(sizeof (wchar_t) * len + 1);
         mbstowcs(wstrout, cstr, len);
         wstrout[len] = L'\0';
 
@@ -205,12 +201,9 @@ Parrot_api_string_import_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * str
     ASSERT_ARGS(Parrot_api_string_import_wchar)
     EMBED_API_CALLIN(interp_pmc, interp)
 
-    char *cstr;
-    size_t len;
+    const size_t len  = wcslen(str);
+    char * const cstr = (char *) malloc(sizeof (char) * (len + 1));
 
-    len = wcslen(str);
-
-    cstr = (char *) malloc(sizeof (char) * len + 1);
     wcstombs(cstr, str, len);
     cstr[len] = '\0';
 

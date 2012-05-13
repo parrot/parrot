@@ -46,7 +46,7 @@ static void update_backref_hash(PARROT_INTERP,
 
 /*
 
-=item C<opcode_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
+=item C<size_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
 
 Determine the size of the buffer needed in order to pack the PackFile
 into a contiguous region of memory.
@@ -59,7 +59,7 @@ buffer.
 */
 
 PARROT_EXPORT
-opcode_t
+size_t
 PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 {
     ASSERT_ARGS(PackFile_pack_size)

@@ -16,7 +16,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 20;
+plan tests => 19;
 
 =head1 NAME
 
@@ -204,7 +204,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "Integer");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "Integer", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_integer_native(interp, testpmc, value);
@@ -218,56 +218,6 @@ main(int argc, const char *argv[])
 }
 CODE
 101010
-OUTPUT
-
-c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
-static Parrot_Interp new_interp();
-
-static void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
-{
-    return Parrot_str_new(interp, value, strlen(value));
-}
-
-static Parrot_Interp new_interp()
-{
-    Parrot_Interp interp = Parrot_interp_new(NULL);
-    if (!interp)
-        fail("Cannot create parrot interpreter");
-    return interp;
-
-}
-
-int main(int argc, const char **argv)
-{
-    Parrot_Interp interp;
-    Parrot_String err, string;
-    Parrot_PMC func_pmc;
-    char *str;
-
-    interp = new_interp();
-
-    string = createstring(interp, "PIR");
-    str    = Parrot_str_to_cstring(interp, string);
-
-    Parrot_free_cstring(str);
-
-    Parrot_interp_destroy(interp);
-    return 0;
-}
-CODE
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
@@ -284,7 +234,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
+        Parrot_Int type  = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "ResizablePMCArray", 0));
         Parrot_PMC array = Parrot_pmc_new(interp, type);
         Parrot_Int value = 12345;
         Parrot_Int key   = 10;
@@ -320,7 +270,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "Float");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "Float", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_number_native(interp, testpmc, value);
@@ -352,7 +302,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "String");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "String", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         value     = Parrot_str_new(interp, "Pumpking", 8/*, "iso-8859-1", 0*/);

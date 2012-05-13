@@ -680,7 +680,7 @@ Return a new Iterator PMC $1 for aggregate $2.
 
 =cut
 
-inline op iter(out PMC, invar PMC) :base_core {
+inline op iter(out PMC, invar PMC)  {
     $1 = VTABLE_get_iter(interp, $2);
 }
 

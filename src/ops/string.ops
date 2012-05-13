@@ -46,11 +46,11 @@ If $3 is less than the negative of the length of $2, an exception is thrown.
 
 =cut
 
-inline op ord(out INT, in STR) :base_core {
+inline op ord(out INT, in STR)  {
     $1 = STRING_ord(interp, $2, 0);
 }
 
-inline op ord(out INT, in STR, in INT) :base_core {
+inline op ord(out INT, in STR, in INT)  {
     $1 = STRING_ord(interp, $2, $3);
 }
 
@@ -61,7 +61,7 @@ The character specified by codepoint integer $2 is returned in string $1.
 
 =cut
 
-inline op chr(out STR, in INT) :base_core {
+inline op chr(out STR, in INT)  {
     STRING * const s = Parrot_str_chr(interp, (UINTVAL)$2);
     $1 = s;
 }
@@ -75,7 +75,7 @@ If $3 is negative, cut the string after -$3 characters.
 
 =cut
 
-inline op chopn(out STR, in STR, in INT) :base_core {
+inline op chopn(out STR, in STR, in INT)  {
     $1 = Parrot_str_chopn(interp, $2, $3);
 }
 
@@ -96,11 +96,11 @@ Append string $3 to string $2 and place the result into string $1.
 
 =cut
 
-inline op concat(invar PMC, invar PMC) :base_core {
+inline op concat(invar PMC, invar PMC)  {
     VTABLE_i_concatenate(interp, $1, $2);
 }
 
-inline op concat(invar PMC, in STR) :base_core {
+inline op concat(invar PMC, in STR)  {
     VTABLE_i_concatenate_str(interp, $1, $2);
 }
 
@@ -108,11 +108,11 @@ inline op concat(out STR, in STR, in STR) :base_mem {
     $1 = Parrot_str_concat(interp, $2, $3);
 }
 
-inline op concat(invar PMC, invar PMC, in STR) :base_core {
+inline op concat(invar PMC, invar PMC, in STR)  {
     $1 = VTABLE_concatenate_str(interp, $2, $3, $1);
 }
 
-inline op concat(invar PMC, invar PMC, invar PMC) :base_core {
+inline op concat(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_concatenate(interp, $2, $3, $1);
 }
 
@@ -137,7 +137,7 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
     $1 = Parrot_str_repeat(interp, $2, (UINTVAL)$3);
 }
 
-inline op repeat(invar PMC, invar PMC, in INT) :base_core {
+inline op repeat(invar PMC, invar PMC, in INT)  {
     if ($3 < 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_NEG_REPEAT,
@@ -147,7 +147,7 @@ inline op repeat(invar PMC, invar PMC, in INT) :base_core {
     $1 = VTABLE_repeat_int(interp, $2, $3, $1);
 }
 
-inline op repeat(invar PMC, invar PMC, invar PMC) :base_core {
+inline op repeat(invar PMC, invar PMC, invar PMC)  {
     if (VTABLE_get_integer(interp, $3) < 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_NEG_REPEAT,
@@ -166,11 +166,11 @@ The C<PMC> versions are MMD operations.
 
 =cut
 
-inline op repeat(invar PMC, in INT) :base_core {
+inline op repeat(invar PMC, in INT)  {
     VTABLE_i_repeat_int(interp, $1, $2);
 }
 
-inline op repeat(invar PMC, invar PMC) :base_core {
+inline op repeat(invar PMC, invar PMC)  {
     VTABLE_i_repeat(interp, $1, $2);
 }
 
@@ -251,20 +251,20 @@ New $1 string returned.
 
 =cut
 
-inline op substr(out STR, in STR, in INT) :base_core {
+inline op substr(out STR, in STR, in INT)  {
     const INTVAL len = Parrot_str_byte_length(interp, $2);
     $1 = STRING_substr(interp, $2, $3, len);
 }
 
-inline op substr(out STR, in STR, in INT, in INT) :base_core {
+inline op substr(out STR, in STR, in INT, in INT)  {
     $1 = STRING_substr(interp, $2, $3, $4);
 }
 
-inline op substr(out STR, invar PMC, in INT, in INT) :base_core {
+inline op substr(out STR, invar PMC, in INT, in INT)  {
     $1 = VTABLE_substr(interp, $2, $3, $4);
 }
 
-inline op replace(out STR, in STR, in INT, in INT, in STR) :base_core {
+inline op replace(out STR, in STR, in INT, in INT, in STR)  {
     $1 = Parrot_str_replace(interp, $2, $3, $4, $5);
 }
 
@@ -282,16 +282,32 @@ The return value is based at "0".
 If the string is null, or the substring is not found or is null,
 B<index> returns "-1".
 
+=item B<rindex>(out INT, in STR, in STR)
+
+=item B<rindex>(out INT, in STR, in STR, in INT)
+
+Search the string for the last instance of the substring from the end. If
+Provided, a match will not be found after $4.
+
 =cut
 
-inline op index(out INT, in STR, in STR) :base_core {
+inline op index(out INT, in STR, in STR)  {
     $1 = ($2 && $3) ? STRING_index(interp, $2, $3, 0) : -1;
 }
 
-inline op index(out INT, in STR, in STR, in INT) :base_core {
+inline op index(out INT, in STR, in STR, in INT)  {
     $1 = ($2 && $3) ? STRING_index(interp, $2, $3, $4) : -1;
 }
 
+inline op rindex(out INT, in STR, in STR) {
+    STRING * const str = $2;
+    $1 = Parrot_str_find_reverse_index(interp, str, $3, STRING_length(str));
+}
+
+inline op rindex(out INT, in STR, in STR, in INT) {
+    STRING * const str = $2;
+    $1 = Parrot_str_find_reverse_index(interp, str, $3, $4);
+}
 
 =item B<sprintf>(out STR, in STR, invar PMC)
 
@@ -308,11 +324,11 @@ see F<misc.c> for details.
 
 =cut
 
-inline op sprintf(out STR, in STR, invar PMC) :base_core {
+inline op sprintf(out STR, in STR, invar PMC)  {
     $1=Parrot_psprintf(interp, $2, $3);
 }
 
-inline op sprintf(out PMC, invar PMC, invar PMC) :base_core {
+inline op sprintf(out PMC, invar PMC, invar PMC)  {
     VTABLE_set_string_native(interp, $1,
         Parrot_psprintf(interp, VTABLE_get_string(interp, $2), $3));
 }
@@ -354,7 +370,7 @@ Possible values for $3 are:
 
 =cut
 
-inline op stringinfo(out INT, in STR, in INT) :base_core {
+inline op stringinfo(out INT, in STR, in INT)  {
     if ($2 == NULL)
         $1 = 0;
     else {
@@ -395,7 +411,7 @@ Uppercase $2 and put the result in $1
 
 =cut
 
-inline op upcase(out STR, in STR) :base_core {
+inline op upcase(out STR, in STR)  {
     $1 = Parrot_str_upcase(interp, $2);
 }
 
@@ -405,7 +421,7 @@ Downcase $2 and put the result in $1
 
 =cut
 
-inline op downcase(out STR, in STR) :base_core {
+inline op downcase(out STR, in STR)  {
     $1 = Parrot_str_downcase(interp, $2);
 }
 
@@ -415,7 +431,7 @@ Titlecase $2 and put the result in $1
 
 =cut
 
-inline op titlecase(out STR, in STR) :base_core {
+inline op titlecase(out STR, in STR)  {
     $1 = Parrot_str_titlecase(interp, $2);
 }
 
@@ -437,11 +453,11 @@ on regular expression, use C<PGE::Util>'s split from the standard library.
 
 =cut
 
-op join(out STR, in STR, invar PMC) :base_core {
+op join(out STR, in STR, invar PMC)  {
     $1 = Parrot_str_join(interp, $2, $3);
 }
 
-op split(out PMC, in STR, in STR) :base_core {
+op split(out PMC, in STR, in STR)  {
     $1 = Parrot_str_split(interp, $2, $3);
 }
 
@@ -468,15 +484,15 @@ Both functions may throw an exception on information loss.
 
 =cut
 
-op encoding(out INT, in STR) :base_core {
+op encoding(out INT, in STR)  {
     $1 = Parrot_encoding_number_of_str(interp, $2);
 }
 
-op encodingname(out STR, in INT) :base_core {
+op encodingname(out STR, in INT)  {
     $1 = Parrot_encoding_name(interp, $2);
 }
 
-op find_encoding(out INT, in STR) :base_core {
+op find_encoding(out INT, in STR)  {
     const INTVAL n = Parrot_encoding_number(interp, $2);
     if (n < 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,

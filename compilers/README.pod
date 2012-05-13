@@ -1,0 +1,37 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+compilers/README.pod - Readme file for the 'compilers/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory contains the source files for several compilers:
+
+=over 4
+         
+=item data_json - The compiler which generates a JSON representation of a PMC.
+
+=item imcc ("Intermediate Code Compiler") - The compiler which translates PIR
+source code into Parrot bytecode.
+
+=item opsc ("Opcode compiler") - The compiler which converts opcode definition
+files into C source code.
+
+=item pct ("Parrot Compiler Toolkit") - The compiler which PCT uses.
+
+=item pge ("Parrot Grammar Engine") - An implementation of Perl6 regex's for
+PCT.
+
+=item tge ("Tree Grammar Engine") - A tool for transforming a Parrot Abstract
+Syntax Tree (PAST).
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut
