@@ -74,9 +74,9 @@ void Parrot_x_force_error_exit(
     ...)
         __attribute__nonnull__(3);
 
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-PARROT_EXPORT
 void Parrot_x_panic_and_exit(
     NULLOK_INTERP,
     ARGIN_NULLOK(const char *message),
