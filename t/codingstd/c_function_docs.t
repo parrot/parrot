@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -56,7 +56,8 @@ foreach my $path (@files) {
 
     for my $function_decl (@function_decls) {
 
-        if ($function_decl =~ m/^\S+.*PARROT_EXPORT/s) {
+        if ($function_decl =~ m/^(\S+)\s+PARROT_EXPORT/s and
+            $1 !~ /^PARROT_CAN(?:NOT)?_RETURN_NULL/) {
             push @bad_order, $function_decl;
         }
         my $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
