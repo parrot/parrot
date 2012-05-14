@@ -1,5 +1,5 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.8.1
+# Compiled with Winxed 1.8.2
 # Source file: winxedst2.winxed
 # Begin generated code
 
@@ -9,7 +9,7 @@
     new $P1, ['FixedIntegerArray'], 3
     $P1[0] = 1
     $P1[1] = 8
-    $P1[2] = 1
+    $P1[2] = 2
     .return($P1)
 
 .end # getVersion
@@ -22213,47 +22213,43 @@
 .const 'Sub' WSubId_137 = "WSubId_137"
     setattribute self, 'owner', __ARG_2
     $P1 = __ARG_1.'get'()
-    $P4 = $P1.'isidentifier'()
-    if $P4 goto __label_1
+    $P3 = $P1.'isidentifier'()
+    if $P3 goto __label_1
     WSubId_32($P1)
   __label_1: # endif
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isidentifier'()
-    if_null $P4, __label_2
-    unless $P4 goto __label_2
-    $P6 = $P1.'checkkeyword'()
-    $P5 = WSubId_137($P6)
+    $P3 = $P2.'isidentifier'()
+    if_null $P3, __label_2
+    unless $P3 goto __label_2
+    $P5 = $P1.'checkkeyword'()
+    $P4 = WSubId_137($P5)
     null $S1
-    if_null $P5, __label_3
-    set $S1, $P5
+    if_null $P4, __label_3
+    set $S1, $P4
   __label_3:
-    box $P4, $S1
-    setattribute self, 'type', $P4
+    box $P3, $S1
+    setattribute self, 'type', $P3
     set $P1, $P2
     __ARG_2.'createvar'($P1, $S1)
     $P2 = __ARG_1.'get'()
   __label_2: # endif
     setattribute self, 'name', $P1
-    $P4 = $P1.'getidentifier'()
-    $P3 = __ARG_2.'getvar'($P4)
-    $P5 = $P3.'getreg'()
-    setattribute self, 'reg', $P5
-    $P4 = $P2.'isop'('[')
-    if_null $P4, __label_4
-    unless $P4 goto __label_4
-    new $P7, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
-    $P7.'ParameterModifierList'(__ARG_1, __ARG_2)
-    set $P6, $P7
-    setattribute self, 'modifiers', $P6
+    $P3 = $P2.'isop'('[')
+    if_null $P3, __label_4
+    unless $P3 goto __label_4
+    new $P6, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
+    $P6.'ParameterModifierList'(__ARG_1, __ARG_2)
+    set $P5, $P6
+    setattribute self, 'modifiers', $P5
     $P2 = __ARG_1.'get'()
   __label_4: # endif
-    $P4 = $P2.'isop'('=')
-    if_null $P4, __label_5
-    unless $P4 goto __label_5
-    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
-    $P7.'FunctionParameterDefault'(__ARG_1, __ARG_2, self)
-    set $P6, $P7
-    setattribute self, 'defaultexpr', $P6
+    $P3 = $P2.'isop'('=')
+    if_null $P3, __label_5
+    unless $P3 goto __label_5
+    new $P6, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
+    $P6.'FunctionParameterDefault'(__ARG_1, __ARG_2, self)
+    set $P5, $P6
+    setattribute self, 'defaultexpr', $P5
     goto __label_6
   __label_5: # else
     __ARG_1.'unget'($P2)
@@ -22273,21 +22269,17 @@
     setattribute $P1, 'type', $P3
     __ARG_1.'createvar'($P2, $P3)
   __label_1: # endif
-    $P5 = $P2.'getidentifier'()
-    $P4 = __ARG_1.'getvar'($P5)
-    $P6 = $P4.'getreg'()
-    setattribute $P1, 'reg', $P6
-    getattribute $P5, self, 'modifiers'
-    if_null $P5, __label_2
-    getattribute $P8, self, 'modifiers'
-    $P7 = $P8.'clone'(__ARG_1)
-    setattribute $P1, 'modifiers', $P7
+    getattribute $P4, self, 'modifiers'
+    if_null $P4, __label_2
+    getattribute $P7, self, 'modifiers'
+    $P6 = $P7.'clone'(__ARG_1)
+    setattribute $P1, 'modifiers', $P6
   __label_2: # endif
-    getattribute $P5, self, 'defaultexpr'
-    if_null $P5, __label_3
-    getattribute $P8, self, 'defaultexpr'
-    $P7 = $P8.'clone'(__ARG_1, $P1)
-    setattribute $P1, 'defaultexpr', $P7
+    getattribute $P4, self, 'defaultexpr'
+    if_null $P4, __label_3
+    getattribute $P7, self, 'defaultexpr'
+    $P6 = $P7.'clone'(__ARG_1, $P1)
+    setattribute $P1, 'defaultexpr', $P6
   __label_3: # endif
     .return($P1)
 
@@ -22323,18 +22315,24 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-    getattribute $P4, self, 'reg'
-    __ARG_1.'print'($P4)
-    getattribute $P1, self, 'modifiers'
-    if_null $P1, __label_1
-    getattribute $P2, self, 'name'
-    $P1.'emitmodifiers'(__ARG_1, $P2, $P2)
+.const 'Sub' WSubId_101 = "WSubId_101"
+    getattribute $P1, self, 'name'
+    getattribute $P6, self, 'owner'
+    $P2 = $P6.'getvar'($P1)
+    unless_null $P2, __label_1
+    WSubId_101($P1, $P1)
   __label_1: # endif
-    getattribute $P3, self, 'defaultexpr'
-    if_null $P3, __label_2
-    $P4 = $P3.'getoptflag'()
-    __ARG_1.'print'(" :optional, ", $P4, " :opt_flag")
+    $P3 = $P2.'getreg'()
+    __ARG_1.'print'($P3)
+    getattribute $P4, self, 'modifiers'
+    if_null $P4, __label_2
+    $P4.'emitmodifiers'(__ARG_1, $P1, $P1)
   __label_2: # endif
+    getattribute $P5, self, 'defaultexpr'
+    if_null $P5, __label_3
+    $P6 = $P5.'getoptflag'()
+    __ARG_1.'print'(" :optional, ", $P6, " :opt_flag")
+  __label_3: # endif
 
 .end # emit
 
@@ -22354,7 +22352,6 @@
     addattribute $P0, 'name'
     addattribute $P0, 'type'
     addattribute $P0, 'modifiers'
-    addattribute $P0, 'reg'
     addattribute $P0, 'defaultexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
