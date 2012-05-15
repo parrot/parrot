@@ -1,3 +1,9 @@
+2012-06-XX    release 4.5.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
 2012-05-15    release 4.4.0
     - Core
         + Most internal calls to libc exit(x) have been replaced with
