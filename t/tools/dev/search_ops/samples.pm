@@ -43,7 +43,7 @@ Halts the interpreter. See also B<exit>.
 
 =cut
 
-inline op end() :base_core :check_event :flow {
+inline op end()  :check_event :flow {
     HALT();
 }
 
@@ -57,7 +57,7 @@ file.
 
 =cut
 
-inline op noop() :base_core {
+inline op noop()  {
 }
 
 inline op cpu_ret() {
@@ -68,7 +68,7 @@ inline op cpu_ret() {
 #endif
 }
 
-inline op check_events() :base_core :flow {
+inline op check_events()  :flow {
     opcode_t *next = expr NEXT();
     Parrot_cx_check_tasks(interp, interp->scheduler);
     goto ADDRESS(next);   /* force this being a branch op */
@@ -222,11 +222,11 @@ If $3 is negative, cut the string after -$3 characters.
 
 =cut
 
-inline op chopn(inout STR, in INT) :base_core {
+inline op chopn(inout STR, in INT)  {
     Parrot_str_chopn_inplace(interp, $1, $2);
 }
 
-inline op chopn(out STR, in STR, in INT) :base_core {
+inline op chopn(out STR, in STR, in INT)  {
     $1 = Parrot_str_chopn(interp, $2, $3);
 }
 

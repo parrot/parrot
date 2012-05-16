@@ -108,17 +108,17 @@ inline op noop(out PMC, in INT) {
 }|, "Casting works");
 
 parse_ok($c, q|
-inline op set(out INT, in NUM) :base_core {
+inline op set(out INT, in NUM)  {
     $1 = (INTVAL)($2);
 }|, "Casting works 2");
 
 parse_ok($c, q|
-inline op set(out INT, in NUM) :base_core {
+inline op set(out INT, in NUM)  {
     $1 = PTR2INTVAL(optcode_t *, dest);
 }|, "Casting works 3");
 
 parse_ok($c, q|
-inline op set(out INT, in NUM) :base_core {
+inline op set(out INT, in NUM)  {
     $1 = (INTVAL)dest;
 }|, "Casting works 4");
 

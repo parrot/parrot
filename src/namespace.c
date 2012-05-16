@@ -668,8 +668,6 @@ Parrot_ns_find_global_from_op(PARROT_INTERP, ARGIN(PMC *ns),
 =item C<PMC * Parrot_ns_find_named_item(PARROT_INTERP, STRING *name, void
 *next)>
 
-GH #563 - THIS IS BROKEN - it doesn't walk up the scopes yet
-
 Find the given C<name> in lexicals, then the current namespace, then the HLL
 root namespace, and finally Parrot builtins.  If the name isn't found
 anywhere, return PMCNULL.

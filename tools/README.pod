@@ -1,0 +1,19 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+tools/README.pod - Readme file for the 'tools/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory contains utility programs used by the Parrot developers,
+I<e.g.,> makefile generation, release automation, smolder report submission,
+and file creation for new languages.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

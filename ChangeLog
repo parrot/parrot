@@ -1,13 +1,39 @@
+2012-05-15    release 4.4.0
+    - Core
+        + Most internal calls to libc exit(x) have been replaced with
+          Parrot_x_* API calls or PARROT_FORCE_EXIT
+    - Documentation
+        + 'pdd31_hll.pod' made stable in 'docs/pdds/'.
+        + Updated main 'README' to 'README.pod'
+        + Updated various dependencies, e.g., 'lib/Parrot/Distribution.pm'.
+        + Updated all 'README' files to 'README.pod' files.
+        + Added 'README.pod' files to top-level directories.
+    - Tests
+        + Update various tests to pull from new 'README.pod'
+        + Updated 't/tools/install/02-install_files.t' to pull from new
+          'README.pod'
+    - Community
+    - Platforms
+    - Tools
+        + pbc_merge has been fixed to deduplicate constant strings and
+          merge annotations segments
+
 2012-04-17    release 4.3.0
     - Core
-        + Winxed snapshot updated to 375562d
-	+ New 'tools/release/parrot_github_release.pl' script to automate
-	  updates to the 'parrot.github.com' and 'parrot-docsx' repositories.
+        + Winxed snapshot updated to 1.7.0
+        + Add type introspection to lexical variables.
+        + New 'tools/release/parrot_github_release.pl' script to automate
+          updates to the 'parrot.github.com' and 'parrot-docsx' repositories.
+        + Numerous casting and consting fixes thanks to GCC 4.8 .
     - Documentation
-	+ Updated 'docs/projects/release_manager_guide.pod'
-	+ Updated 'docs/projects/release_parrot_github_guide.pod'
+        + Updated 'docs/projects/release_manager_guide.pod'
+        + Updated 'docs/projects/release_parrot_github_guide.pod'
+        + Improved function documentation.
     - Tests
     - Community
+    - Platforms
+        + Fixed alignment issues on ia64, sparc and mipsel.
+        + Fixed a platform-specific issue with dlclose().
 
 2012-03-20    release 4.2.0
     - API Changes

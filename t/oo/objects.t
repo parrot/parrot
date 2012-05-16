@@ -1592,55 +1592,54 @@ end:
     # Foo54 and Bar54 have attribute accessor methods
     new $P5, ['String']        # set attribute values
     set $P5, "i"       # attribute slots have reference semantics
-    set_args "0,0", $P5, "i"
+    set_args "0,0,0", $P13, $P5, "i"
     callmethodcc $P13, "Foo54__set"
     get_results ""
 
     new $P5, ['String']
     set $P5, "j"
-    set_args "0,0", $P5, "j"
+    set_args "0,0,0", $P13, $P5, "j"
     callmethodcc  $P13,"Foo54__set"
     get_results ""
 
     new $P5, ['String']
     set $P5, "k"
-    set_args "0,0", $P5, "k"
+    set_args "0,0,0", $P13, $P5, "k"
     callmethodcc  $P13,"Bar54__set"
     get_results ""
 
     new $P5, ['String']
     set $P5, "l"
-    set_args "0,0", $P5, "l"
+    set_args "0,0,0", $P13, $P5, "l"
     callmethodcc  $P13,"Bar54__set"
     get_results ""
 
     # now retrieve attributes
-    set_args "0",  "i"
+    set_args "0,0", $P13, "i"
     callmethodcc  $P13,"Foo54__get"
     get_results "0", $P5
     is( $P5, "i", 'got attrib i from Bar54->Foo54__get' )
 
-    set_args "0",  "j"
+    set_args "0,0", $P13, "j"
     callmethodcc  $P13,"Foo54__get"
     get_results "0", $P5
     is( $P5, "j", 'got attrib j from Bar54->Foo54__get' )
 
-    set_args "0",  "k"
+    set_args "0,0", $P13, "k"
     callmethodcc  $P13,"Bar54__get"
     get_results "0", $P5
     is( $P5, "k", 'got attrib k from Bar54->Bar54__get' )
 
-    set_args "0",  "l"
-    callmethodcc  $P13,"Bar54__get"
+    set_args "0,0", $P13, "l"
+    callmethodcc $P13, "Bar54__get"
     get_results "0", $P5
     is( $P5, "l", 'got attrib l from Bar54->Bar54__get' )
 .end
 
 # set(obj: Pvalue, Iattr_idx)
 .sub Foo54__set
-    get_params "0,0", $P5, $S4
+    get_params "0,0,0", $P2, $P5, $S4
     ok( 1, "in Foo54__set" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     setattribute $P2, $S4, $P5
     set_returns ""
     returncc
@@ -1648,17 +1647,15 @@ end:
 
 # Pattr = get(obj: Iattr_idx)
 .sub Foo54__get
-    get_params "0", $S4
+    get_params "0,0", $P2, $S4
     ok( 1, "in Foo54__get" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5
     returncc
 .end
 
 .sub Bar54__set
-    get_params "0,0", $P5, $S4
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    get_params "0,0,0", $P2, $P5, $S4
     ok( 1, "in Bar54__set" )
     setattribute $P2, $S4, $P5
     set_returns ""
@@ -1666,9 +1663,8 @@ end:
 .end
 
 .sub Bar54__get
-    get_params "0", $S4
+    get_params "0,0", $P2, $S4
     ok( 1, "in Bar54__get" )
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
     getattribute $P5, $P2, $S4
     set_returns "0", $P5
     returncc
@@ -1702,51 +1698,51 @@ end:
     # Foo56 and Bar56 have attribute accessor methods
     new $P5, ['String']        # set attribute values
     set $P5, "i"       # attribute slots have reference semantics
-    set_args "0,0,0", $P5, "Foo56", "i"
+    set_args "0,0,0,0", $P2, $P5, "Foo56", "i"
     callmethodcc $P2, "set"
 
     new $P5, ['String']
     set $P5, "j"
-    set_args "0,0,0", $P5, "Foo56", "j"
+    set_args "0,0,0,0", $P2, $P5, "Foo56", "j"
     callmethodcc $P2, "set"
 
     new $P5, ['String']
     set $P5, "k"
-    set_args "0,0,0", $P5, "Bar56", "k"
+    set_args "0,0,0,0", $P2, $P5, "Bar56", "k"
     callmethodcc $P2, "set"
 
     new $P5, ['String']
     set $P5, "l"
-    set_args "0,0,0", $P5, "Bar56", "l"
+    set_args "0,0,0,0", $P2, $P5, "Bar56", "l"
     callmethodcc $P2, "set"
 
     new $P5, ['String']
     set $P5, "m"
-    set_args "0,0,0", $P5, "Bar56", "m"
+    set_args "0,0,0,0", $P2, $P5, "Bar56", "m"
     callmethodcc $P2, "set"
 
     # now retrieve attributes
-    set_args "0,0", "Foo56", "i"
+    set_args "0,0,0", $P2, "Foo56", "i"
     callmethodcc $P2, "get"
     get_results "0", $P5
     is( $P5, 'i', 'got attrib i from subclass through parent method' )
 
-    set_args "0,0", "Foo56", "j"
+    set_args "0,0,0", $P2, "Foo56", "j"
     callmethodcc $P2, "get"
     get_results "0", $P5
     is( $P5, "j", 'got attrib i from subclass through parent method' )
 
-    set_args "0,0", "Bar56", "k"
+    set_args "0,0,0", $P2, "Bar56", "k"
     callmethodcc $P2, "get"
     get_results "0", $P5
     is( $P5, "k", 'got attrib i from subclass through parent method' )
 
-    set_args "0,0", "Bar56", "l"
+    set_args "0,0,0", $P2, "Bar56", "l"
     callmethodcc $P2, "get"
     get_results "0", $P5
     is( $P5, "l", 'got attrib i from subclass through parent method' )
 
-    set_args "0,0", "Bar56", "m"
+    set_args "0,0,0", $P2, "Bar56", "m"
     callmethodcc $P2, "get"
     get_results "0", $P5
     is( $P5, "m", 'got attrib i from subclass through parent method' )
@@ -1757,8 +1753,7 @@ end:
 
 # set(obj: Pvalue, SClass, Sattr)
 .sub set
-    get_params "0,0,0", $P5, $S4, $S5
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    get_params "0,0,0,0", $P2, $P5, $S4, $S5
     setattribute $P2, $S5, $P5
     set_returns ""
     returncc
@@ -1766,13 +1761,11 @@ end:
 
 # Pattr = get(obj: SClass, Sattr)
 .sub get
-    get_params "0,0", $S4, $S5
-    interpinfo $P2, .INTERPINFO_CURRENT_OBJECT
+    get_params "0,0,0", $P2, $S4, $S5
     getattribute $P5, $P2, $S5
     set_returns "0", $P5
     returncc
 .end
-
 
 # Local Variables:
 #   mode: pir

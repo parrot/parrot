@@ -197,7 +197,7 @@ HEADER
         {
             Parrot_PMC is_pasm_pmc = NULL;
             Parrot_PMC compiler_pmc = NULL;
-            const char *name = is_pasm ? "PASM" : "PIR";
+            const char * const name = is_pasm ? "PASM" : "PIR";
             Parrot_String name_s = NULL;
 
             if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))

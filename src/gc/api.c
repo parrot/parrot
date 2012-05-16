@@ -203,7 +203,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         else {
             /* Can't throw exception before GC is initialized */
             fprintf(stderr, "Unknown GC type '%s'\n", args->system);
-            exit(EXIT_FAILURE);
+            PANIC(interp, "Cannot activate GC");
         }
     }
 

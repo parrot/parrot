@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 136;
+use Test::More tests => 134;
 use Carp;
 use Cwd;
 use File::Path qw( mkpath );
@@ -379,6 +379,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
 
 $icuheaders = q{alpha};
 my $status = $conf->data->get( 'ccflags' );
+my $gccversion = $conf->data->get( 'gccversion' );
 
 {
     $conf->options->set(verbose => 1);
@@ -399,10 +400,10 @@ my $status = $conf->data->get( 'ccflags' );
    like($stdout, qr/Your compiler found the icu headers/,
        "Got expected verbose output");
 }
-$conf->data->set( ccflags => $status ); # re-set for next test
 
 {
     $conf->options->set(verbose => 1);
+    $conf->data->set(gccversion => '4.2');
     my ($stdout, $stderr);
     capture(
         sub {
@@ -417,38 +418,18 @@ $conf->data->set( ccflags => $status ); # re-set for next test
        \$stdout,
        \$stderr,
    );
-
-   if ($icuheaders =~ /\s/) {
-       like(
-           $stdout,
-           qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
-           "Got expected verbose output"
-       );
-   }
-   else {
-       like(
-           $stdout,
-           qr/Adding -isystem \"\Q$icuheaders\E\" to ccflags for icu headers/,
-           "Got expected verbose output"
-       );
-   }
-}
-if ($icuheaders =~ /\s/) {
-    like($conf->data->get( 'ccflags' ),
-        qr/-I \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
-}
-else {
-    like($conf->data->get( 'ccflags' ),
-        qr/-isystem \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
+   like(
+       $stdout,
+       qr/Adding -isystem \"\Q$icuheaders\E\" to ccflags for icu headers/,
+       "Got expected verbose output"
+   );
 }
 $conf->data->set( ccflags => $status ); # re-set for next test
+$conf->data->set( gccversion => $gccversion ); # re-set for next test
 
 {
-    $conf->options->set( verbose => undef );
+    $conf->options->set(verbose => 1);
+    $conf->data->set(gccversion => undef);
     my ($stdout, $stderr);
     capture(
         sub {
@@ -463,23 +444,14 @@ $conf->data->set( ccflags => $status ); # re-set for next test
        \$stdout,
        \$stderr,
    );
-
-   ok(! $stdout, "No verbose output, as expected");
-}
-
-if ($icuheaders =~ /\s/) {
-    like($conf->data->get( 'ccflags'),
-        qr/-I \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
-}
-else {
-    like($conf->data->get( 'ccflags'),
-        qr/-isystem \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
+   like(
+       $stdout,
+       qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
+       "Got expected verbose output"
+   );
 }
 $conf->data->set( ccflags => $status ); # re-set for next test
+$conf->data->set( gccversion => $gccversion ); # re-set for next test
 
 ########## _set_no_configure_with_icu() ##########
 

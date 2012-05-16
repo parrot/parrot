@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,6 +20,7 @@ Define the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_exception.h"
 #include "parrot/exceptions.h"
 #include "parrot/events.h"
 
@@ -236,7 +237,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
         /* it's a C exception handler */
         Parrot_runloop * const jump_point = (Parrot_runloop *)address;
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
 
     /* return the address of the handler */
@@ -310,7 +311,7 @@ flow is passed to it. Handlers can be either C-level or PIR-level routines. If
 no suitable handler is found, Parrot exits with the stored exception error
 message.
 
-See also C<exit_fatal()>, which signals fatal errors, and
+See also C<src/exit.c> and
 C<Parrot_ex_throw_from_op> which throws an exception from within an op.
 
 The 'invoke' vtable function doesn't actually execute a
@@ -360,7 +361,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         Parrot_runloop * const jump_point =
             (Parrot_runloop *)VTABLE_get_pointer(interp, handler);
         jump_point->exception = exception;
-        longjmp(jump_point->resume, 1);
+        longjmp(jump_point->resume, PARROT_JMP_EXCEPTION_HANDLED);
     }
     else {
         /* Run the handler. */
@@ -369,7 +370,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         setup_exception_args(interp, "P", exception);
         PARROT_ASSERT(return_point->handler_start == NULL);
         return_point->handler_start = address;
-        longjmp(return_point->resume, 2);
+        longjmp(return_point->resume, PARROT_JMP_EXCEPTION_FROM_C);
     }
 }
 
@@ -382,7 +383,7 @@ Throws an exception from an opcode, with an error message constructed
 from a format string and arguments. Constructs an Exception PMC, and passes it
 to C<Parrot_ex_throw_from_op>.
 
-See also C<Parrot_ex_throw_from_c> and C<exit_fatal()>.
+See also C<Parrot_ex_throw_from_c> and C<src/exit.c>.
 
 =cut
 
@@ -416,7 +417,7 @@ decides that is appropriate, or zero to make the error non-resumable.
 C<exitcode> is a C<exception_type_enum> value. Constructs an Exception PMC
 and passes it to C<Parrot_ex_throw_from_c>.
 
-See also C<Parrot_ex_throw_from_op> and C<exit_fatal()>.
+See also C<Parrot_ex_throw_from_op> and C<src/exit.c>.
 
 =cut
 
@@ -491,8 +492,6 @@ Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 Mark an exception as unhandled, as part of rethrowing it.
 
-=back
-
 =cut
 
 */
@@ -503,6 +502,40 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_mark_unhandled)
     VTABLE_set_integer_keyed_str(interp, exception, CONST_STRING(interp, "handled"), -1);
+}
+
+/*
+
+=item C<PMC * Parrot_ex_get_current_handler(PARROT_INTERP, PMC *expmc)>
+
+Get the current exception handler from expmc.
+If expmc is an exception handler, return itself.
+If it's an exception, return its active handler.
+
+=back
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC *
+Parrot_ex_get_current_handler(PARROT_INTERP, ARGIN_NULLOK(PMC *expmc))
+{
+    ASSERT_ARGS(Parrot_ex_get_current_handler)
+    PMC *eh = PMCNULL;
+    if (!PMC_IS_NULL(expmc)) {
+        /* If isa ExceptionHandler, use it. If isa Exception, get its active handler */
+        if (expmc->vtable->base_type == enum_class_Exception)
+            GETATTR_Exception_handler(interp, expmc, eh);
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "ExceptionHandler")))
+            eh = expmc;
+        else if (VTABLE_isa(interp, expmc, CONST_STRING(interp, "Exception")))
+            eh = VTABLE_get_attr_str(interp, expmc, CONST_STRING(interp, "handler"));
+    }
+    return eh;
 }
 
 /*
@@ -621,107 +654,6 @@ Parrot_print_backtrace(void)
     }
 #  undef BACKTRACE_DEPTH
 #endif /* ifdef PARROT_HAS_BACKTRACE */
-}
-
-/*
-
-=item C<void exit_fatal(int exitcode, const char *format, ...)>
-
-Signal a fatal error condition.  This should only be used with dire errors that
-cannot throw an exception (because no interpreter is available, or the nature
-of the error would interfere with the exception system).
-
-This involves printing an error message to stderr, and calling C<exit> to exit
-the process with the given exitcode. It is not possible for Parrot bytecode to
-intercept a fatal error (for that, use C<Parrot_ex_throw_from_c_args>).
-C<exit_fatal> does not call C<Parrot_x_exit> to invoke exit handlers (that would
-require an interpreter).
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void
-exit_fatal(int exitcode, ARGIN(const char *format), ...)
-{
-    ASSERT_ARGS(exit_fatal)
-    va_list arglist;
-    va_start(arglist, format);
-    vfprintf(stderr, format, arglist);
-    fprintf(stderr, "\n");
-    /* caution against output swap (with PDB_backtrace) */
-    fflush(stderr);
-    va_end(arglist);
-    exit(exitcode);
-}
-
-/* The DUMPCORE macro is defined for most platforms, but defined here if not
- * found elsewhere, so we're sure it's safe to call. */
-
-#ifndef DUMPCORE
-#  define DUMPCORE() \
-     fprintf(stderr, "Sorry, coredump is not yet implemented " \
-             "for this platform.\n\n"); \
-             exit(EXIT_FAILURE);
-#endif
-
-/*
-
-=item C<void do_panic(NULLOK_INTERP, const char *message, const char *file,
-unsigned int line)>
-
-Panic handler. Things have gone very wrong in an unexpected way. Print out an
-error message and instructions for the user to report the error to the
-developers
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void
-do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
-         ARGIN_NULLOK(const char *file), unsigned int line)
-{
-    ASSERT_ARGS(do_panic)
-    /* Note: we can't format any floats in here--Parrot_sprintf
-    ** may panic because of floats.
-    ** and we don't use Parrot_sprintf or such, because we are
-    ** already in panic --leo
-    */
-    fprintf(stderr, "Parrot VM: PANIC: %s!\n",
-               message ? message : "(no message available)");
-
-    fprintf(stderr, "C file %s, line %u\n",
-               file ? file : "(not available)", line);
-
-    fprintf(stderr, "Parrot file (not available), ");
-    fprintf(stderr, "line (not available)\n");
-
-    fprintf(stderr, "\n\
-We highly suggest you notify the Parrot team if you have not been working on\n\
-Parrot.  Use parrotbug (located in parrot's root directory) or send an\n\
-e-mail to parrot-dev@lists.parrot.org.\n\
-Include the entire text of this error message and the text of the script that\n\
-generated the error.  If you've made any modifications to Parrot, please\n\
-describe them as well.\n\n");
-
-    fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
-    fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
-    fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
-    if (interp)
-        fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
-    else
-        fprintf(stderr, "Interp Flags: (no interpreter)\n");
-    fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
-    fprintf(stderr, "\nDumping Core...\n");
-
-    DUMPCORE();
 }
 
 /*

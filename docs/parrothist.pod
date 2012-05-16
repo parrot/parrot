@@ -141,4 +141,6 @@ Starred release numbers indicate supported releases.
  alvis       4.1.0          2012-Feb-21     "Black-headed Parrot"
  dukeleto    4.2.0          2012-Mar-20     "Ornithopter"
 
+ cotto       4.3.0 *        2012-Apr-17     "In Which..."
+
 =cut

@@ -1,0 +1,124 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/imcc/README.pod - Readme file for IMCC. 
+
+=head1 DESCRIPTION
+
+This README sets out the Intermediate Code Compiler (IMCC) for Parrot. The
+language it compiles is currently termed Parrot Intermediate Language (PIR).
+
+Why? Writing a compiler is a significant undertaking, and we are trying 
+to elevate some of the burden on potential language designers, including the
+designers of the Perl6 compiler. We can provide a common back-end for Parrot
+that does the following:
+
+=over 4
+
+=over 8
+
+=item Register Allocation and Spillage
+
+=item Constant folding and expression evaluation
+
+=item Instruction selection
+
+=item Optimization
+
+=item Bytecode generation
+
+=back
+
+=back
+
+This way, language designers can get right to work on
+
+=over 4
+
+=over 8
+
+=item tokenizing, parsing, type checking AST/DAG production
+
+=back
+
+=back
+
+They, then, can simply feed PIR to IMCC which will compile directly to Parrot
+bytecode.[*]
+
+=head2 Register Allocation
+
+The allocator uses graph-coloring and du-chains to assign registers to
+lexicals and symbolic temporaries. One weakness of the allocator is the lack
+of branch analysis. A brute force method is used in the du-chain computation
+where we assume any symbol is live from the time it was first used until
+either the last time it was used or the last branch instruction. This is
+being replaced with directed graphs of basic blocks and flow analysis.
+
+=head2 Optimization
+
+We break the instructions into a directed graph of basic blocks. The plan is
+to translate to SSA form to make optimizations easier.
+
+=head2 Why C and Bison?
+
+Until Perl6 compiles itself (and does it fast), a Bison parser is the easiest
+to maintain. An additional, important benefit, is C-based parsers are pretty
+darn fast. Currently assembling Parrot on the fly is still relatively slow.
+
+Instructions not known to IMCC are looked up in parrot's op_info_table and
+must have the proper amount and types of arguments.
+
+=head1 FEEDBACK, PATCHES, etc.
+
+Please email parrot-dev@lists.parrot.org with any bug-reports or patches.
+
+=head1 AUTHORS
+
+=over 4
+
+=item Original Author:
+
+Melvin Smith <melvin.smith@mindspring.com>, <melvins@us.ibm.com>
+
+=item Contributing Authors:
+
+=over 8
+
+=item Angel Faus <afaus@corp.vlex.com> ... CFG, life analysis
+
+=item Sean O'Rourke <seano@cpan.org>   ... anyop, iANY
+
+=item Leopold Toetsch <lt@toetsch.at>  ... major rewrite
+
+=item .................................... numerous bugfixes/cleanup/rewrite
+
+=item .................................... optimizer.c
+
+=item .................................... run parrot code inside IMCC
+
+=item Juergen Boemmels <boemmels@physik.uni-kl.de>
+
+=item .................................... Macro preprocessor
+
+=back
+
+=back
+
+=head1 NOTE
+
+[*] So far, all the compiler does is register allocation and spilling. I like
+Steve Muchnick's MIR language, and I'm taking a few things from it.
+
+I expect the IR compiler to be FAST, simple, and maintainable, and never
+to develop featuritis; however I want it to be adequate for all languages
+targeting parrot. Did I mention it needs to be FAST?
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

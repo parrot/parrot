@@ -178,6 +178,10 @@ static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
 =item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
 *attrib_index, PMC *cache, int cur_index)>
 
+Create a cached map of all attributes (including those inherited from parent
+types), where the name of each attribute is mapped to an integer index into
+a storage array.
+
 =cut
 
 */
@@ -440,6 +444,9 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 =item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
 *all_parents)>
 
+Loop over all parents in the MRO, setting up delegate objects if necessary and
+calling C<init> vtables on them, if necessary.
+
 =cut
 
 */
@@ -477,6 +484,9 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
 =item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
 *all_parents, PMC *init)>
+
+Loop over all parents in the MRO, setting up delegate objects if necessary and
+calling C<init_pmc> vtables on them, if necessary.
 
 =cut
 

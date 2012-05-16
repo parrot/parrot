@@ -102,6 +102,8 @@ static int ns_insert_sub_keyed_str(PARROT_INTERP,
 =item C<static void add_to_class(PARROT_INTERP, Parrot_NameSpace_attributes
 *nsinfo, PMC *classobj, STRING *key, PMC *value)>
 
+Add the method Sub C<value> with name C<key> to the C<classobj>.
+
 =cut
 
 */
@@ -132,6 +134,10 @@ add_to_class(PARROT_INTERP, ARGMOD(Parrot_NameSpace_attributes *nsinfo),
 
 =item C<static int ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING
 *key, PMC *value)>
+
+Add the Sub PMC C<value> to the namespace. If it's a vtable, add it as a
+vtable to the corresponding Class (or store it locally for the Class to fetch
+later). If it's a method, do the same.
 
 =cut
 
@@ -203,6 +209,9 @@ ns_insert_sub_keyed_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(STRING *key),
 =item C<static int maybe_add_sub_to_namespace(PARROT_INTERP, PMC *SELF, STRING
 *key, PMC *value)>
 
+If the item C<value> is a non-null Sub PMC (but not a subclass), add it to the
+namespace and any associated Class PMC (if it's a method or vtable).
+
 =cut
 
 */
@@ -229,6 +238,10 @@ maybe_add_sub_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 =item C<static void add_native_to_namespace(PARROT_INTERP, PMC *SELF, STRING
 *key, PMC *value)>
 
+Add an NCI or NativePCCMethod PMC to the namespace. The PMC C<value> must
+be non-null. If it's flagged as a method (usually for NativePCCMethod PMCs)
+add it to the Class as well.
+
 =cut
 
 */
@@ -254,6 +267,9 @@ add_native_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
 
 =item C<static void add_multi_to_namespace(PARROT_INTERP, PMC *SELF, STRING
 *key, PMC *value)>
+
+If PMC C<value> is a MultiSub, add it to the namespace and possibly the
+associated class.
 
 =cut
 
@@ -606,6 +622,8 @@ really a public API.
 
 =item C<void *get_pointer_keyed_str(STRING *key)>
 
+Return the given namepace item or PMCNULL, keyed by name.
+
 =item C<void *get_pointer_keyed(PMC *key)>
 
 Return the given namespace item or PMCNULL. If the named item is either
@@ -761,10 +779,6 @@ Includes vtable overrides composed in from roles.
 =over 4
 
 =cut
-
-*/
-
-/*
 
 =item C<METHOD make_namespace(PMC* key)>
 

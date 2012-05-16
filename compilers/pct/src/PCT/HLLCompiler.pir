@@ -51,23 +51,18 @@ running compilers from a command line.
   options_end:
     setattribute self, '$usage', $P1
 
-    $S0  = '???'
-    push_eh _handler
+    $S0 = 'This compiler is built with the Parrot Compiler Toolkit, parrot '
     $P0 = getinterp
     $P0 = $P0[.IGLOBALS_CONFIG_HASH]
-    $S0  = $P0['revision']   # also $I0 = P0['installed'] could be used
-  _handler:
-    pop_eh
-    $P2  = box 'This compiler is built with the Parrot Compiler Toolkit, parrot '
-    if $S0 goto _revision_lab
-    $P2 .= 'version '
-    $S0 = $P0['VERSION']
-    goto _is_version
-  _revision_lab:
-    $P2 .= 'revision '
-  _is_version:
-    $P2 .= $S0
-    $P2 .= '.'
+    $S1 = $P0['VERSION']
+    $S0 .= $S1
+    $S1 = $P0['git_describe']
+    unless $S1 goto version_done
+    $S0 .= ' revision '
+    $S0 .= $S1
+  version_done:
+
+    $P2 = box $S0
     setattribute self, '$version', $P2
 .end
 
