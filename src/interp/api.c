@@ -319,6 +319,12 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 
     Parrot_cx_init_scheduler(interp);
 
+#ifdef HAS_THREADS
+    interp->wake_up = 0;
+    COND_INIT(interp->sleep_cond);
+    MUTEX_INIT(interp->sleep_mutex);
+#endif
+
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
