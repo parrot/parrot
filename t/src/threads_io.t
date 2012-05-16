@@ -4,6 +4,8 @@
 
 use strict;
 use warnings;
+use lib qw(lib);
+
 use File::Temp;
 use Time::HiRes qw(sleep);
 use Parrot::Config;
