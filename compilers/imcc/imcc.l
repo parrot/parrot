@@ -223,10 +223,6 @@ SP              [ ]
         yy_push_state(cmt4, yyscanner);
     }
 
-<*>setfile{SP}+["] { yy_push_state(cmt2, yyscanner); }
-
-<*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
-
 <cmt1>{DIGITS} {
         yylineno = imcc->line = atoi(yytext);
         yy_pop_state(yyscanner);
@@ -284,8 +280,6 @@ SP              [ ]
 
 <pod>{EOL}      { /* ignore */ }
 
-<*>".line"               return TK_LINE;
-<*>".file"               return TK_FILE;
 <INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
