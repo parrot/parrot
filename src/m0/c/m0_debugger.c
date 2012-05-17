@@ -473,9 +473,9 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
 {
     static M0_Debugger_Command cmd = None;
     static char *arg;
+    int done = 0;
     if(!arg)
         arg = calloc(98, sizeof(char));
-    int done = 0;
     while(!done) {
         char * user_input = NULL;
         printf("PC=%lu> ", pc);
