@@ -11,6 +11,7 @@ typedef struct {
     M0_Debugger_State state;
     unsigned long *breakpoints;
     unsigned int n_breakpoints;
+    char         *input_source;
 } M0_Debugger_Info;
 
 typedef enum {

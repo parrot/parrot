@@ -354,11 +354,41 @@ str_to_db_cmd(char* str) {
     return cmd;
 }
 
+char * get_line(char* str, size_t size, FILE *f) {
+    char *p = fgets(str, size, f);
+
+    if(p) {
+        size_t last = strlen (str) - 1;
+        if (str[last] == '\n')
+            str[last] = '\0';
+    }
+    return p;
+}
+
 char *
-get_db_user_input(M0_Debugger_Command *cmd, char *arg) {
+get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg) {
     char *input, *p;
+    static FILE *pFile = NULL;
+
     input = calloc(100, sizeof(char));
-    p = gets(input);
+
+    if(pFile == NULL) {
+        if(db_info->input_source == NULL)
+            pFile = stdin;
+        else
+            pFile = fopen(db_info->input_source, "r");
+    }
+
+    if(pFile == NULL)
+        perror("Error opening file");
+
+    p = get_line(input, 100, pFile);
+
+    if(db_info->input_source != NULL) {
+        if(!feof(pFile))
+            fclose(pFile);
+    }
+
     if (p) {
         char *tok = NULL;
         tok = strtok(input, " ");
@@ -479,7 +509,7 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
     while(!done) {
         char * user_input = NULL;
         printf("PC=%lu> ", pc);
-        user_input = get_db_user_input(&cmd,arg);
+        user_input = get_db_user_input(db_info, &cmd, arg);
         switch (cmd) {
             case Continue:
                 if(db_info->n_breakpoints > 0)
