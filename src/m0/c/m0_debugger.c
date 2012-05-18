@@ -393,6 +393,10 @@ get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg
 
     if (p) {
         char *tok = NULL;
+
+        if(db_info->input_source != NULL)
+            printf("%s\n", input);
+
         tok = strtok(input, " ");
         if(tok)
             *cmd = str_to_db_cmd(tok);
