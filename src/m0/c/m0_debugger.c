@@ -385,8 +385,10 @@ get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg
     p = get_line(input, 100, pFile);
 
     if(db_info->input_source != NULL) {
-        if(!feof(pFile))
+        if(feof(pFile)) {
             fclose(pFile);
+            return NULL;
+        }
     }
 
     if (p) {
