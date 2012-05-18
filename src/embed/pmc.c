@@ -717,7 +717,7 @@ Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
 
     va_start(args, signature);
     callcontext = Parrot_pcc_build_call_from_varargs(interp, callcontext,
-            signature, args);
+            signature, &args);
     va_end(args);
 
     EMBED_API_CALLOUT(interp_pmc, interp);
