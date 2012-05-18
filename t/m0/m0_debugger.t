@@ -41,7 +41,7 @@ output_like(
 sub output_like {
     my ($m0b_file, $script_file, $out_file, $desc)  = @_;
 
-    my $interp = $ENV{M0_DEBUG_INTERP} || catfile( ".", qw/src m0 c m0-debugger.exe/ );
+    my $interp = $ENV{M0_DEBUG_INTERP} || catfile( ".", qw/src m0 c m0-debugger/ );
     my $args   = join(' ', ('-s', $script_file) );
 
     diag "$interp ${m0b_file} $args 2>&1\n" if $ENV{DEBUG};
