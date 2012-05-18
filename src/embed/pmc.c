@@ -671,7 +671,7 @@ Parrot_api_pmc_keep_alive(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_Int aliv
 =item C<Parrot_Int Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc,
 Parrot_PMC *cc)>
 
-Create a new CallContext PMC, suitable for invoking a Sub.
+Convenience API to create a new CallContext PMC, suitable for invoking a Sub.
 
 =cut
 
@@ -684,6 +684,42 @@ Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc, ARGOUT(Parrot_PMC *cc))
     ASSERT_ARGS(Parrot_api_pmc_new_call_object)
     EMBED_API_CALLIN(interp_pmc, interp);
     *cc = Parrot_pcc_new_call_object(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc,
+Parrot_PMC callcontext, const char * const signature, ...)>
+
+Convenience API to setup a CallContext with a signature and arguments as a
+single variadic argument list.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
+        ARGIN(const char * const signature), ...)
+{
+    ASSERT_ARGS(Parrot_api_pmc_setup_signature)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    va_list args;
+
+    if (PMC_IS_NULL(callcontext))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "You must provide a CallContext to Parrot_api_pmc_setup_signature");
+    if (!signature)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "You must provide a signature to Parrot_api_pmc_setup_signature");
+
+    va_start(args, signature);
+    callcontext = Parrot_pcc_build_call_from_varargs(interp, callcontext,
+            signature, args);
+    va_end(args);
+
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

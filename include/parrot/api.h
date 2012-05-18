@@ -736,6 +736,14 @@ Parrot_Int Parrot_api_pmc_set_string(
         __attribute__nonnull__(3);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_setup_signature(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC callcontext,
+    ARGIN(const char * const signature),
+    ...)
+        __attribute__nonnull__(3);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_wrap_string_array(
     ARGIN(Parrot_PMC interp_pmc),
     Parrot_Int argc,
@@ -832,6 +840,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_setup_signature \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
