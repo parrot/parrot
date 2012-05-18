@@ -86,6 +86,12 @@ void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pcc_new_call_object(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_pcc_do_run_ops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_obj))
@@ -105,6 +111,8 @@ void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_obj) \
     , PARROT_ASSERT_ARG(sig))
+#define ASSERT_ARGS_Parrot_pcc_new_call_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/call/pcc.c */
 

@@ -668,6 +668,27 @@ Parrot_api_pmc_keep_alive(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_Int aliv
 
 /*
 
+=item C<Parrot_Int Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc,
+Parrot_PMC *cc)>
+
+Create a new CallContext PMC, suitable for invoking a Sub.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc, ARGOUT(Parrot_PMC *cc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_new_call_object)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *cc = Parrot_pcc_new_call_object(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
 =back
 
 =cut
