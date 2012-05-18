@@ -560,11 +560,33 @@ check_breakpoints(const unsigned long pc) {
     return 0;
 }
 
+static void
+parse_argv(M0_Debugger_Info *db_info, int argc, const char* argv[])
+{
+    if(argc > 2) {
+        int i = 2;
+        while(i < argc) {
+            if(strcmp("-s",argv[i]) == 0) {
+                size_t size = strlen(argv[++i]);
+                db_info->input_source = malloc((size+1)*sizeof(char));
+                strcpy(db_info->input_source, argv[i]);
+            }
+            i++;
+        }
+    }
+    db_info->state = STEP;
+}
+
 void
-debugger(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
+debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
 {
     static M0_Debugger_Info db_info;
+    UNUSED(interp);
+
     switch (db_info.state) {
+      case INIT:
+            parse_argv(&db_info, argc, argv);
+            break;
         case STEP:
             db_prompt(&db_info, cf, ops, pc);
             break;

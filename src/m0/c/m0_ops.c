@@ -333,7 +333,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
         const unsigned long        op_count = bytecode->op_count;
 
 #ifdef M0_DEBUGGER
-        debugger(cf, ops, pc);
+        debugger(0, NULL,  interp, cf, ops, pc);
 #endif
 
         /* XXX: access violation -- so produce an error? */

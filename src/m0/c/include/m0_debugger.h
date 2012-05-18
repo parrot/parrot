@@ -2,6 +2,7 @@
 
 
 typedef enum {
+    INIT,
     STEP,
     RUN,
     BREAK
@@ -30,7 +31,7 @@ typedef enum {
     Help
 } M0_Debugger_Command;
 
-void debugger(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc);
+void debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc);
 
 
 #   define M0_DEBUGGER_H 1

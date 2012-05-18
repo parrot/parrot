@@ -41,6 +41,9 @@ main( int argc, const char *argv[]) {
     if (!interp)
         exit(1);
 
+#ifdef M0_DEBUGGER
+    debugger(argc, argv,  interp, NULL, NULL, -1);
+#endif
     (*interp)[ARGC] = argc - 1;
     interp_argv = (uint64_t*) malloc((argc-1) * sizeof(uint64_t));
 
