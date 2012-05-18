@@ -790,6 +790,7 @@ help :
 	@echo "  m0_debug:          Build only M0, with debugging
 	@echo "  m0_tests:          Run known-good M0 tests."
 	@echo "  m0_c_tests:        Run known-good M0 tests with C implementation."
+	@echo "  m0_c_debugger_tests: Run known-good M0 debugger tests with C implementation."
 	@echo "  m0_cover:          Generate code coverage of m0 with Devel::Cover
 	@echo "  moretests:         Run standard suite, examples and most coding standards tests."
 	@echo ""
@@ -2102,6 +2103,8 @@ M0_TEST_FILES = \
 	t/m0/m0_assembler.t \
 	t/m0/m0_run_hello_m0b.t \
 	t/m0/m0_integration.t
+M0_DEBUGGER_TEST_FILES = \
+	t/m0/m0_debugger.t
 INTEROP_TEST_FILES = \
 	t/pir/interop.t
 HEADERIZER_TEST_FILES = $(TOOLS_TESTS_DIR)/dev/headerizer/*.t
@@ -2325,6 +2328,10 @@ m0_tests :
 m0_c_tests :
 #IF(win32):	set M0_INTERP=.\src\m0\c\m0$(EXE) && $(PERL) t/harness $(M0_TEST_FILES)
 #UNLESS(win32):	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
+
+m0_c_debugger_tests : 
+#IF(win32):	set M0_INTERP=.\src\m0\c\m0-debugger$(EXE) && $(PERL) t/harness $(M0_DEBUGGER_TEST_FILES)
+#UNLESS(win32):	M0_INTERP=./src/m0/c/m0-debugger$(EXE) $(PERL) t/harness $(M0_DEBUGGER_TEST_FILES)
 
 m0_cover :
 	PERL5OPT=-MDevel::Cover $(MAKE) m0_tests

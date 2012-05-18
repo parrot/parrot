@@ -1,0 +1,17 @@
+PC=0> l
+M0_SET_IMM	I00,0,0
+PC=0> s
+PC=1> l
+M0_DEREF	S00,CONSTS,I00
+PC=1> s
+PC=2> ps S00
+hello world
+
+PC=2> l
+M0_SET_IMM	I00,0,0
+PC=2> s
+PC=3> l
+M0_PRINT_S	I00,S00,CF
+PC=3> s
+hello world
+PC=4> s
