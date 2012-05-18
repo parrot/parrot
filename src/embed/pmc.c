@@ -705,8 +705,9 @@ Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
         ARGIN(const char * const signature), ...)
 {
     ASSERT_ARGS(Parrot_api_pmc_setup_signature)
-    EMBED_API_CALLIN(interp_pmc, interp);
     va_list args;
+
+    EMBED_API_CALLIN(interp_pmc, interp);
 
     if (PMC_IS_NULL(callcontext))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
