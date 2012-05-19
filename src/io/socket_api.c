@@ -171,18 +171,28 @@ INTVAL
 Parrot_io_socket_recv_to_buffer(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(char * buffer), size_t len)
 {
     ASSERT_ARGS(Parrot_io_socket_recv_to_buffer)
-    INTVAL received;
 
     if (Parrot_io_socket_is_closed(interp, socket))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't recv from closed socket");
     else {
         Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
-        received = Parrot_io_recv(interp, io->os_handle, buffer, len);
-        return received;
+        return Parrot_io_recv(interp, io->os_handle, buffer, len);
     }
 }
 
+INTVAL
+Parrot_io_socket_send_from_buffer(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(const char *buffer), size_t len)
+{
+    ASSERT_ARGS(Parrot_io_socket_send_from_buffer)
+    if (Parrot_io_socket_is_closed(interp, socket))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't send to closed socket");
+    else {
+        Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
+        return Parrot_io_send(interp, io->os_handle, buffer, len);
+    }
+}
 
 /*
 

@@ -633,6 +633,41 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), ARGMOD_NULLOK
     return buffer;
 }
 
+INTVAL
+Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle), ARGMOD(PMC *buffer), INTVAL length)
+{
+    ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
+    unsigned char *content;
+    INTVAL real_length;
+
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to write bytes to a null or invalid PMC");
+
+    if (PMC_IS_NULL(buffer))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read bytes from a null or invalid ByteBuffer");
+
+    GETATTR_ByteBuffer_content(interp, buffer, content);
+    real_length = VTABLE_elements(interp, buffer);
+    if (real_length < length)
+        length = real_length;
+
+    if (handle->vtable->base_type == enum_class_FileHandle) {
+        return Parrot_io_write_handle(interp, handle, content, length);
+    }
+    else if (handle->vtable->base_type == enum_class_StringHandle) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Writing to a ByteBuffer from a StringHandle not implemented yet");
+    }
+    else if (handle->vtable->base_type == enum_class_Socket) {
+        return Parrot_io_socket_send_from_buffer(interp, handle, content, length);
+    }
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Unknown type in read to ByteBuffer");
+}
+
 /*
 
 =item C<STRING * Parrot_io_readline(PARROT_INTERP, PMC *pmc)>

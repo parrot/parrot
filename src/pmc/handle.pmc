@@ -136,6 +136,11 @@ ByteBuffer.
         RETURN(PMC *bb);
     }
 
+    METHOD write_bytes(PMC *bytebuffer, INTVAL length) {
+        const INTVAL written = Parrot_io_write_byte_buffer_pmc(INTERP, SELF, bytebuffer, length);
+        RETURN(INTVAL written);
+    }
+
 
 /*
 
