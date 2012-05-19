@@ -1897,7 +1897,7 @@ src/gc/malloc$(O) : src/gc/malloc.c
 
 src/warnings$(O) : $(PARROT_H_HEADERS) src/warnings.c
 
-src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c
+src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
 
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1906,10 +1906,10 @@ src/utils$(O) : \
 	$(EXTEND_HEADERS)
 
 ## SUFFIX OVERRIDE
-src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str src/string/spf_render.c
+src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str src/string/spf_render.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/spf_render.c@ @ccwarn::src/string/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/string/spf_render.c
 
-src/string/spf_vtable$(O) : $(PARROT_H_HEADERS) src/string/spf_vtable.str src/string/spf_vtable.c
+src/string/spf_vtable$(O) : $(PARROT_H_HEADERS) src/string/spf_vtable.str src/string/spf_vtable.c src/string/spf_private.h
 
 src/string/encoding$(O) : \
 	$(PARROT_H_HEADERS) \
