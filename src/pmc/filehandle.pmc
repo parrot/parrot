@@ -306,42 +306,6 @@ filehandle, rather than modifying the invocant).
 
 /*
 
-=item C<METHOD read_bytes(INTVAL bytes)>
-
-Read the given number of bytes from the handle and return them in a
-ByteBuffer.
-
-=cut
-
-*/
-
-    METHOD read_bytes(INTVAL length) {
-        PMC           *buffer;
-        unsigned char *content;
-        INTVAL         bytes_read;
-        INTVAL         flags;
-
-        GETATTR_FileHandle_flags(INTERP, SELF, flags);
-
-        if (Parrot_io_is_closed_filehandle(INTERP, SELF)
-        || !(flags & PIO_F_READ))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed or non-readable filehandle");
-
-        buffer = Parrot_pmc_new_init_int(INTERP, enum_class_ByteBuffer, length);
-        GETATTR_ByteBuffer_content(INTERP, buffer, content);
-
-        bytes_read = Parrot_io_read_buffer(INTERP, SELF, (char *)content, length);
-
-        if (bytes_read != length)
-            VTABLE_set_integer_native(INTERP, buffer, bytes_read);
-
-        RETURN(PMC *buffer);
-    }
-
-
-/*
-
 =item C<METHOD isatty()>
 
 Returns a boolean value indicating whether C<SELF> is a console/tty.

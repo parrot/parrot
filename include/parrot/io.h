@@ -265,6 +265,17 @@ INTVAL Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGMOD_NULLOK(PMC *buffer),
+    INTVAL length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*buffer);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -401,6 +412,10 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_io_read_byte_buffer_pmc \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_readline __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -819,6 +834,16 @@ INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
 
+INTVAL Parrot_io_socket_recv_to_buffer(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGOUT(char * buffer),
+    size_t len)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(* buffer);
+
 #define ASSERT_ARGS_Parrot_io_accept_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -853,6 +878,11 @@ INTVAL Parrot_io_socket_is_closed(PARROT_INTERP, ARGMOD(PMC *socket))
 #define ASSERT_ARGS_Parrot_io_socket_is_closed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(socket))
+#define ASSERT_ARGS_Parrot_io_socket_recv_to_buffer \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(socket) \
+    , PARROT_ASSERT_ARG(buffer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_api.c */
 

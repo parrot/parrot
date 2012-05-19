@@ -1638,6 +1638,7 @@ src/io/api$(O) : \
 	$(INC_PMC_DIR)/pmc_filehandle.h \
 	$(INC_PMC_DIR)/pmc_stringhandle.h \
 	$(INC_PMC_DIR)/pmc_socket.h \
+    $(INC_PMC_DIR)/pmc_bytebuffer.h \
 	$(EXTEND_HEADERS)
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \

@@ -33,6 +33,7 @@ a new F<src/io/io_string.c>.
 #include "pmc/pmc_filehandle.h"
 #include "pmc/pmc_stringhandle.h"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_bytebuffer.h"
 
 #include <stdarg.h>
 
@@ -175,7 +176,7 @@ Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path), ARGIN
                         "Cannot open filehandle, no path");
 
     if (filehandle->vtable->base_type == typenum) {
-        INTVAL    flags     = Parrot_io_parse_open_flags(interp, mode);
+        INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
         PIOHANDLE os_handle;
 
         /* TODO: a filehandle shouldn't allow a NULL path. */
@@ -580,6 +581,56 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
     else
         Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);
     return result;
+}
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), ARGMOD_NULLOK(PMC *buffer), INTVAL length)
+{
+    ASSERT_ARGS(Parrot_io_read_byte_buffer_pmc)
+    unsigned char *content;
+
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read bytes from a null or invalid PMC");
+
+    if (PMC_IS_NULL(buffer))
+        buffer = Parrot_pmc_new_init_int(interp, enum_class_ByteBuffer, length);
+    else
+        VTABLE_set_integer_native(interp, buffer, length);
+    GETATTR_ByteBuffer_content(interp, buffer, content);
+
+    if (handle->vtable->base_type == enum_class_FileHandle) {
+        INTVAL bytes_read = 0;
+        INTVAL flags;
+        GETATTR_FileHandle_flags(interp, handle, flags);
+
+        if (Parrot_io_is_closed_filehandle(interp, handle) ||
+                !(flags & PIO_F_READ))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed or non-readable filehandle");
+
+        bytes_read = Parrot_io_read_buffer(interp, handle, (char *)content, length);
+
+        if (bytes_read != length)
+            VTABLE_set_integer_native(interp, buffer, bytes_read);
+    }
+    else if (handle->vtable->base_type == enum_class_StringHandle) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Reading from a StringHandle to a ByteBuffer not implemented yet");
+    }
+    else if (handle->vtable->base_type == enum_class_Socket) {
+        INTVAL received = Parrot_io_socket_recv_to_buffer(interp, handle,
+            (char *)content, length);
+        if (received != length)
+            VTABLE_set_integer_native(interp, buffer, received);
+    }
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Unknown type in read to ByteBuffer");
+
+    return buffer;
 }
 
 /*
