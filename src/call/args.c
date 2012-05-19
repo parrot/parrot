@@ -640,7 +640,7 @@ set_call_from_varargs(PARROT_INTERP,
 =item C<void Parrot_pcc_set_call_from_varargs(PARROT_INTERP, PMC *signature,
 const char *sig, va_list *args)>
 
-Coverts a varargs list into an existent CallContext PMC.
+Converts a varargs list into an existent CallContext PMC.
 The CallContext stores the original short signature string and an array of
 integer types to pass on to the multiple dispatch search.
 

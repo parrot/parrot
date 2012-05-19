@@ -1,0 +1,32 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+ext/README.pod - Readme file for the 'ext/' top-level directory. 
+
+=head1 DESCRIPTION
+
+The "extensions" directory contains the following extensions:
+
+=over 4
+
+=item nqp-rx - An implementation of an earlier version of "Not Quite Perl"
+with Perl6 regex's.[1]
+
+=item winxed - A driver for the Winxed Programming Language.[2] 
+
+=back
+
+=head1 NOTES
+
+[1] Parrot installs this implementation as the F<parrot-nqp> executable.
+
+[2] For more information on the Winxed, I<see> http://winxed.org.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

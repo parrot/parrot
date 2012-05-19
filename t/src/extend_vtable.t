@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 134;
+plan tests => 133;
 
 =head1 NAME
 
@@ -1907,22 +1907,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_class" );
     Parrot_printf(interp,"%P\n", pmc_string);
 CODE
 Integer
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_can" );
-    Parrot_PMC_set_integer_native(interp, pmc, -42);
-
-    string = createstring(interp, "foo");
-    integer = Parrot_PMC_can(interp,pmc,string);
-    printf("%d\n", (int) integer);
-
-    string = createstring(interp, "add");
-    integer = Parrot_PMC_can(interp,pmc,string);
-    printf("%d\n", (int) integer);
-CODE
-0
-1
 Done!
 OUTPUT
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -446,8 +446,8 @@ Parrot_dyn_dlsym_str(PARROT_INTERP,
         return NULL;
 
     else {
-        char *const symbol_cs = Parrot_str_to_cstring(interp, symbol);
-        void       *ptr       = Parrot_dlsym(handle, symbol_cs);
+        char * const symbol_cs = Parrot_str_to_cstring(interp, symbol);
+        void * const ptr       = Parrot_dlsym(handle, symbol_cs);
         Parrot_str_free_cstring(symbol_cs);
         return ptr;
     }
@@ -585,7 +585,7 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
-         PMC * const new_lib_pmc = Parrot_pmc_new(d, enum_class_ParrotLibrary);
+        PMC * const new_lib_pmc = Parrot_pmc_new(d, enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
         Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));

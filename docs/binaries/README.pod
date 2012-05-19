@@ -1,0 +1,24 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/binaries/README.pod - Readme file for the 'docs/binaries/' directory. 
+
+=head1 DESCRIPTION
+
+This directory contains the *.pod files to the installable binaries in the
+Parrot distribution. These files are also (or soon will be) used to generate
+*roff pages.[1]
+
+=head1 NOTES
+
+[1] The probable location and name of the conversion script will be,
+F<tools/docs/mk_pod2man.pl>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

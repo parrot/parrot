@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 10;
 use Parrot::Config;
 
 use Parrot::Test::Util 'create_tempfile';
@@ -230,38 +230,6 @@ OUTPUT
 
 $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
-
-pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
-.sub main :main
-    setfile "xyz.pir"
-    setline 123
-    $S0 = 'hello'
-    $I0 = 456
-    'no_such_function'($S0, $I0)
-.end
-CODE
-/$nolineno/
-OUTPUT
-
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
-    ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
-pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
-.sub main :main
-    setfile "foo.p6"
-    setline 123
-    $P0 = new 'Integer'
-    assign $P0, 9876
-    set_global '$a', $P0
-
-    setline 124
-    $P0 = get_global '$a'
-    $P1 = clone $P0
-    add $P1, 1
-    'nsf'($P1)
-.end
-CODE
-/$nolineno/
-OUTPUT
 
 # Local Variables:
 #   mode: cperl

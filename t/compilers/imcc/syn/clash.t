@@ -7,7 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 13;
 
 pir_output_is( <<'CODE', <<'OUT', "if/unless" );
 .sub test :main
@@ -187,26 +187,6 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "new with an unknown class" );
 .end
 CODE
 /Class 'INTVAL' not found/
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "setline w comment" );
-.sub test :main
-    setline 1    # comment
-    print "ok\n"
-    end
-.end
-CODE
-ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "setfile w comment" );
-.sub test :main
-    setfile "foo"    # comment
-    print "ok\n"
-    end
-.end
-CODE
-ok
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUT', "undefined ident" );

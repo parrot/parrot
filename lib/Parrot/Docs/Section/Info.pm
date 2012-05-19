@@ -43,7 +43,7 @@ sub new {
             '',
             $self->new_item(
                 'General information about licences, prerequisites, and building instructions.',
-                'README'
+                'README.pod'
             ),
             $self->new_item(
                 'Instructions for Parrot in a cygwin environment.', 'README_cygwin.pod'

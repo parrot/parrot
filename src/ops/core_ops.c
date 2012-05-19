@@ -18404,13 +18404,17 @@ Parrot_addmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_can_i_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = VTABLE_can(interp, PREG(2), SREG(3));
+    PMC  * const  meth = VTABLE_find_method(interp, PREG(2), SREG(3));
+
+    IREG(1) = (!PMC_IS_NULL(meth));
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_can_i_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = VTABLE_can(interp, PREG(2), SCONST(3));
+    PMC  * const  meth = VTABLE_find_method(interp, PREG(2), SCONST(3));
+
+    IREG(1) = (!PMC_IS_NULL(meth));
     return cur_opcode + 4;
 }
 
@@ -24230,7 +24234,7 @@ Parrot_get_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_new_call_context_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PREG(1) = Parrot_pmc_new(interp, enum_class_CallContext);
+    PREG(1) = Parrot_pcc_new_call_object(interp);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 2;
 }
@@ -24444,7 +24448,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   4,    /* major_version */
-  3,    /* minor_version */
+  4,    /* minor_version */
   0,    /* patch_version */
   1125,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -24573,7 +24577,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_4_3_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_4_4_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -24602,7 +24606,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_4_3_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_4_4_0;
     dynop_register(interp, lib);
     return lib;
 }

@@ -1,0 +1,57 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+tools/dev/README.pod - Readme file for the Parrot Developer Tools directory.
+
+=head1 DESCRIPTION
+
+This directory is intended to hold programs, templates, and configuration
+files found useful to Parrot developers, excluding those which are (1) invoked
+via the default 'make' target ('make all') or (2) invoked by 'make install'.[1]
+
+=head2 Parrot Developer Tools
+
+Below, is a list of Parrot Developer Tools and a brief description of what
+they do:
+
+=over 4
+
+=item dedeprecator.nqp
+
+This utility scans your codebase for deprecated code and will warn you about
+it. For example, to find all deprecations in your PIR code, do the following:
+
+    dedeprecator.nqp myproject/*.pir
+
+It uses api.yaml by default, but can read alternate YAML configuration files:
+
+    dedeprecator.nqp --apiyaml foo.yaml myproject/*.pir
+
+=item show_deprecated.nqp
+
+This utility nicely prints out all deprecations in api.yaml.
+
+=item show_experimental.nqp
+
+This utility nicely prints out all experimental stuff in api.yaml.
+
+=item resolve_deprecated.nqp
+
+Resolves deprecated features list in api.yaml by querying Trac.
+
+=back
+
+=head1 NOTES
+
+[1] These programs, templates, etc., occassionally require additional
+dependencies to function fully, such as CPAN modules or third-party programs,
+like 'valgrind'.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011-2012, Parrot Foundation.
+
+=cut
