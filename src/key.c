@@ -65,7 +65,7 @@ Parrot_key_new_integer(PARROT_INTERP, INTVAL value)
     ASSERT_ARGS(Parrot_key_new_integer)
     PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
 
-    PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+    KEY_integer_SET(key);
     SETATTR_Key_int_key(interp, key, value);
 
     return key;
@@ -91,7 +91,7 @@ Parrot_key_new_string(PARROT_INTERP, ARGIN(STRING *value))
     ASSERT_ARGS(Parrot_key_new_string)
     PMC * const key = Parrot_pmc_new(interp, enum_class_Key);
 
-    PObj_get_FLAGS(key) |= KEY_string_FLAG;
+    KEY_string_SET(key);
     SETATTR_Key_str_key(interp, key, value);
 
     return key;
@@ -134,8 +134,8 @@ void
 Parrot_key_set_integer(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
     ASSERT_ARGS(Parrot_key_set_integer)
-    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |=  KEY_integer_FLAG;
+    KEY_flags_CLEARALL(key);
+    KEY_integer_SET(key);
     SETATTR_Key_int_key(interp, key, value);
 
     return;
@@ -158,8 +158,9 @@ void
 Parrot_key_set_register(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
     ASSERT_ARGS(Parrot_key_set_register)
-    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |=  KEY_register_FLAG | flag;
+    KEY_flags_CLEARALL(key);
+    KEY_register_SET(key);
+    KEY_set_flag(key, flag);
     SETATTR_Key_int_key(interp, key, value);
 
     return;
@@ -181,8 +182,8 @@ void
 Parrot_key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
     ASSERT_ARGS(Parrot_key_set_string)
-    PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
-    PObj_get_FLAGS(key) |=  KEY_string_FLAG;
+    KEY_flags_CLEARALL(key);
+    KEY_string_SET(key);
     SETATTR_Key_str_key(interp, key, value);
 
     return;
@@ -205,7 +206,7 @@ INTVAL
 Parrot_key_type(SHIM_INTERP, ARGIN(const PMC *key))
 {
     ASSERT_ARGS(Parrot_key_type)
-    return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
+    return KEY_get_FLAGS(key) & ~KEY_register_FLAG;
 }
 
 
@@ -230,7 +231,7 @@ Parrot_key_integer(PARROT_INTERP, ARGIN(PMC *key))
     INTVAL   int_key;
     STRING  *str_key;
 
-    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+    switch (KEY_get_FLAGS(key)) {
       case KEY_integer_FLAG:
         GETATTR_Key_int_key(interp, key, int_key);
         return int_key;
@@ -284,8 +285,7 @@ Parrot_key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_key_string)
 
-    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
-        /* remember to COW strings instead of returning them directly */
+    switch (KEY_get_FLAGS(key)) {
       case KEY_string_FLAG:
         {
             STRING *s;
@@ -345,7 +345,7 @@ Parrot_key_pmc(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(Parrot_key_pmc)
     INTVAL int_key;
 
-    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+    switch (KEY_get_FLAGS(key)) {
       case KEY_pmc_FLAG | KEY_register_FLAG:
         GETATTR_Key_int_key(interp, key, int_key);
         return REG_PMC(interp, int_key);
@@ -437,7 +437,7 @@ Parrot_key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_key_mark)
     PMC          *next_key;
-    const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
+    const UINTVAL flags = KEY_get_FLAGS(key);
 
     if (flags == KEY_string_FLAG) {
         STRING *str_key;
@@ -482,7 +482,7 @@ Parrot_key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING        *str_key;
 
     while (key != NULL) {
-        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+        switch (KEY_get_FLAGS(key)) {
           case KEY_integer_FLAG:
             GETATTR_Key_int_key(interp, key, int_key);
             value = Parrot_str_concat(interp, value,

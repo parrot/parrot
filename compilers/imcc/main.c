@@ -43,9 +43,6 @@ extern int yydebug;
 /* defined in imcc.l */
 PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
-/* XXX non-reentrant because of global variables */
-static INTVAL       eval_nr  = 0;
-
 /* HEADERIZER HFILE: include/imcc/embed.h */
 
 /* HEADERIZER BEGIN: static */
@@ -538,7 +535,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     if (is_file)
         pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, source, 1);
     else {
-        const INTVAL eval_number = eval_nr++;
+        const INTVAL eval_number = imcc->unique_count++;
         STRING * const evalname = Parrot_sprintf_c(imcc->interp, "EVAL_" INTVAL_FMT, eval_number);
         pf_raw->cur_cs = Parrot_pf_create_default_segments(imcc->interp, packfilepmc, evalname, 1);
     }

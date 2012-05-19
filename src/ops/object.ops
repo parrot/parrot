@@ -60,9 +60,6 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     if (!PMC_IS_NULL(method_pmc)) {
         PMC * const signature = Parrot_pcc_get_signature(interp,
                                     CURRENT_CONTEXT(interp));
-        if (!PMC_IS_NULL(signature))
-            Parrot_pcc_set_object(interp, signature, object);
-
         Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest                 = VTABLE_invoke(interp, method_pmc, next);
     }
@@ -92,8 +89,6 @@ op callmethodcc(invar PMC, invar PMC) :object_base :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, $1);
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
     dest                   = VTABLE_invoke(interp, $2, next);
 
@@ -118,8 +113,6 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
             VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
     }
     else {
-        if (!PMC_IS_NULL(signature))
-            Parrot_pcc_set_object(interp, signature, object);
         interp->current_cont = $3;
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
@@ -137,8 +130,6 @@ op callmethod(invar PMC, invar PMC, invar PMC) :object_base :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, object);
     interp->current_cont = $3;
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     goto ADDRESS(dest);
@@ -162,8 +153,6 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
     else {
         interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
         PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
-        if (!PMC_IS_NULL(signature))
-            Parrot_pcc_set_object(interp, signature, object);
         dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     }
     goto ADDRESS(dest);
@@ -181,8 +170,6 @@ op tailcallmethod(invar PMC, invar PMC) :object_base :flow {
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL;
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, object);
     dest = (opcode_t *)VTABLE_invoke(interp, method_pmc, next);
     goto ADDRESS(dest);
 }
@@ -206,7 +193,8 @@ given method $3.
 =cut
 
 inline op can(out INT, invar PMC, in STR) :object_base {
-    $1 = VTABLE_can(interp, $2, $3);
+    PMC * const meth = VTABLE_find_method(interp, $2, $3);
+    $1 = !PMC_IS_NULL(meth);
 }
 
 

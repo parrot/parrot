@@ -1,0 +1,18 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+include/README.pod - Readme file for the 'include/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory contains the C header files for the core VM, the IMCC, and
+the PMCs.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

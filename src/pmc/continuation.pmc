@@ -54,8 +54,8 @@ pmclass Continuation auto_attrs provides invokable {
     ATTR PMC               *to_call_object;  /* pointer to CallSignature */
     /* a Continuation keeps the from_ctx alive */
     ATTR PMC               *from_ctx;        /* sub, this cont is returning from */
-    ATTR int                runloop_id;      /* id of the creating runloop. */
-    ATTR int                invoked;         /* flag when a handler has been invoked. */
+    ATTR INTVAL             runloop_id;      /* id of the creating runloop. */
+    ATTR INTVAL             invoked;         /* flag when a handler has been invoked. */
 
 /*
 
@@ -140,6 +140,41 @@ Marks the continuation as live.
 
         GET_ATTR_from_ctx(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
+    }
+
+/*
+
+=item C<PMC * get_attr_str(STRING *attr)>
+
+Get the value of an attribute by name
+
+=cut
+
+*/
+
+    VTABLE PMC * get_attr_str(STRING *attr) {
+        PMC * val = PMCNULL;
+        INTVAL ival;
+        /*if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "seg")))
+            GET_ATTR_seg(INTERP, SELF, val);*/
+        if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "to_ctx")))
+            GET_ATTR_to_ctx(INTERP, SELF, val);
+        else if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "to_call_object")))
+            GET_ATTR_to_call_object(INTERP, SELF, val);
+        else if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "from_ctx")))
+            GET_ATTR_from_ctx(INTERP, SELF, val);
+        else if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "runloop_id"))) {
+            GET_ATTR_runloop_id(INTERP, SELF, ival);
+            val = Parrot_pmc_box_integer(INTERP, ival);
+        }
+        else if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "invoked"))) {
+            GET_ATTR_invoked(INTERP, SELF, ival);
+            val = Parrot_pmc_box_integer(INTERP, ival);
+        }
+        else
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
+                "%Ss: Attribute %Ss not found", VTABLE_name(INTERP, SELF), attr);
+        return val;
     }
 
 

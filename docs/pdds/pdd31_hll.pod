@@ -1,0 +1,306 @@
+# Copyright (C) 2009-2010, Parrot Foundation.
+
+=head1 PDD 31: HLL Compilers and Libraries
+
+=head2 Abstract
+
+This PDD describes the standard compiler API and support for
+cross-library communication between high-level languages (HLLs).
+
+=head2 Description
+
+Parrot's support for HLL interoperability is primarily focused on
+enabling programs written in one language to be able to use libraries
+and code written in a different language.  At the same time, language
+implementors should not be overly restricted by a global specification.
+
+This PDD describes an API for HLL compiler objects to use to
+promote library sharing among languages.  It's intended to make it
+easy for a program to request loading of a local or foreign module,
+determine the capabilities provided by the module, and potentially
+import and integrate them into its own namespaces.  In general,
+the API treats library-level interoperability as a negotiation
+among HLL compiler objects, with each HLL compiler maintaining
+primary control over the operations performed in its HLL space.
+
+In particular, this HLL API does not attempt to prescribe how
+languages should organize their internal capabilities, objects,
+classes, namespaces, methods, data structures, and the like.
+
+=head2 Implementation
+
+=head3 Compiler API
+
+This section describes the abstract API for HLL compiler objects.
+
+=head4 Locating a compiler object
+
+Generally HLL compilers are loaded via the C<load_language>
+opcode, and register themselves using the C<compreg> opcode.
+By convention, each HLL compiler should at minimum register
+itself using the name of its HLL namespace (see PDD 26),
+although a compiler can choose to register itself under other
+names as well.
+
+=head4 Methods
+
+=over 4
+
+=item C<compile>
+
+    $P0 = compiler.'compile'(source [, options :named :slurpy])
+
+Return the result of compiling C<source> according to C<options>.
+Common options include:
+
+=over 4
+
+=item target
+
+Stop the compilation process when the stage given by target
+has been reached.  Common values for target include "parse",
+"past", "pir", and "pbc". The exact target types supported
+are dependent on the compiler itself and are not
+limited or standardized.
+
+=item outer_ctx
+
+Use the supplied context as the outer (lexical) context for
+the compilation.  Some languages require this option to be
+able to look up lexical symbols in outer scopes when performing
+a dynamic compilation at runtime.
+
+=back
+
+=item C<eval>
+
+    $P0 = compiler.'eval'(source [, args :slurpy] [, options :named :slurpy])
+
+Compile and evaluate (execute) the code given by C<source>
+with C<args> and according to C<options>.  The available options
+are generally the same as for the C<compile> method above; in particular,
+the C<outer_ctx> option can be used to specify the outer lexical
+context for the evaluated source.
+
+=item C<parse_name>
+
+    $P0 = compiler.'parse_name'(name)
+
+Parse the string C<name> using the rules specific to C<compiler>,
+and return an array of individual name elements.
+
+For example, a Java compiler would turn 'C<a.b.c>' to C<['a','b','c']>,
+while a Perl compiler would turn 'C<a::b::c>' into the same result.
+Perl's sigil rules would likely turn 'C<$a::b::c>' into C<['a','b','$c']>.
+
+=item C<load_module>
+
+    module = compiler.'load_module'(name)
+
+Locate and load the module given by C<name> using the rules for
+libraries specific to C<compiler>, and return a C<module> handle for
+the module just loaded.  The C<name> argument is typically an array
+or a string to be processed as in C<parse_name> above.  In general
+the module handle returned should be considered opaque by the
+caller, but specific HLL compilers are allowed to specify the
+nature of the handle returned (e.g., a namespace for the loaded
+module, or a specific "handle" object).
+
+=item C<get_module>
+
+    module = compiler.'get_module'(name)
+
+Similar to C<load_module> above, this method returns a handle
+to an already-loaded module given by C<name>.
+
+=item C<get_exports>
+
+    $P0 = compiler.'get_exports'(module [,name,name,...] [, 'tagset'=>tagset])
+
+Requests the exported objects given by C<name> and/or C<tagset> for
+C<module> within the given C<compiler>.  The C<module> argument
+should be a module handle as obtained by C<load_module> or
+C<get_module> above.
+
+A C<tagset> argument provides an identifier that a compiler and/or
+module can use to supply their own lists of items to be exported.
+By convention, a C<tagset> of "DEFAULT" refers to the default set
+of exported items for the module, while "ALL" returns all available
+exports.  Compilers and modules are free to define their own custom
+tagsets beyond these.
+
+Any C<name> arguments supplied generally limit the export list to
+the tagset items corresponding to the supplied names (as determined by
+the compiler invocant).  If names are provided without an explicit
+tagset, then "ALL" is assumed.  If neither names nor a tagset are
+provided, then symbols from "DEFAULT" are returned.
+
+The returned export list is a hash of hashes; each entry in the
+top level hash has a key identifying the type of exported
+object (one of C<'namespace'>, C<'sub'>, or C<'var'>) and a
+value hash containing the corresponding exported symbol names
+and objects.  This hash-of-hashes approach is intended to generally
+correspond to the "Typed Interface" section of PDD 21 ("Namespaces"),
+and allows the module's source HLL to indicate the type of exported
+object to the caller.  The hash-of-hash approach also accommodates
+languages where a single name might be used to refer to several
+objects that differ in type.  (This PDD explicitly rejects the
+notion that a HLL should be directly exporting or injecting symbols
+into a foreign HLL's namespaces.)
+
+=back
+
+=head3 HLL::Compiler class
+
+HLL::Compiler is a common base class for compiler objects
+based on the Parrot Compiler Toolkit (PCT) and NQP (Not Quite Perl)
+libraries.  It provides a default implementation of the abstract
+Compiler API above, plus some additional methods for simple symbol
+table export and import.  The default methods are intended to support
+importing and exporting symbols using standard Parrot namespace
+objects (PDD 21).  However, it's normal (and expected) that
+languages will subclass HLL::Compiler to provide language-specific
+semantics where needed.
+
+=head4 Methods
+
+=over 4
+
+=item C<language>
+
+    $S0 = compiler.'language'([name])
+
+If C<name> is provided, sets the language name of the invocant
+and registers the invocant as the compiler for C<name> via
+the C<compreg> opcode.
+
+Returns the language name of the compiler.
+
+=item C<parse_name>
+
+    $P0 = compiler.'parse_name'(name)
+
+Splits a name based on double-colons, such that "C<A::B::C>"
+becomes C<['A','B','C']>.
+
+=item C<get_module>
+
+    module = compiler.'get_module'(name)
+
+Returns a handle to the HLL namespace associated with C<name>
+(which is processed via the invocant's C<parse_name> method
+if needed).
+
+=item C<load_module>
+
+    module = compiler.'load_module'(name)
+
+Loads a module C<name> via the C<load_bytecode> opcode
+using both ".pbc" and ".pir" extensions.  Parrot's standard
+library paths for C<load_bytecode> are searched.
+
+Returns the HLL namespace associated with C<name> (which may
+be PMCNULL if loading failed or if the requested module did
+not create an associated namespace).
+
+=item C<get_exports>
+
+    $P0 = compiler.'get_exports'(module [,name,name,...] [, 'tagset'=>tagset])
+
+Implements a simple exporting interface that meets the "Compiler API"
+above.  The C<module> argument is expected to be something that
+supports a hash interface, such as NameSpace or LexPad.  (Note
+that this is what gets returned by the default C<get_module>
+and C<load_module> methods above.)  The C<module["EXPORT"]> entry
+should return another hash-like object keyed by tagset names; each
+of those tagset names then identify the exportable symbols
+associated with that tagset.
+
+With this default arrangement, it's entirely possible for a
+module to indicate its tagsets by using symbol entries in
+namespaces.  For example, a module with namespace C<['XYZ']>
+can define its default exports by binding symbols in the
+C<['XYZ';'EXPORT';'DEFAULT']> namespace.  (Modules aren't
+required to use exactly this mechanism; it's just one possibility
+of many.)
+
+If the "ALL" tagset is requested and there is no "ALL" entry
+in the C<module['EXPORT']> hash, then C<module> itself is used
+as the source of exportable symbols for this method.  This
+enables C<get_exports> to be used to obtain symbols from
+modules that do not follow the "EXPORT" convention above
+(e.g., core Parrot modules).
+
+As described in the Compiler API section above, the return value
+from C<get_exports> is a hash-of-hashes with exported namespaces
+in the C<namespace> hash, exported subroutines in the C<sub> hash,
+and all other exports in the C<var> hash.
+
+=item C<import>
+
+    compiler.'import'(target, export_hash)
+
+Import the entries from C<export_hash> (typically obtained
+via C<get_exports> above) into C<target> according to the rules
+for C<compiler>.  Any entries in C<export_hash['namespace']>
+are imported first, followed by entries in C<export_hash['sub']>,
+followed by entries in C<export_hash['var']>.
+
+Note that this method is not part of the abstract Compiler API --
+a HLL compiler is able to implement importing in any way it
+deems appropriate.  The C<HLL::Compiler> class provides this
+method as a useful default for many HLL compilers.
+
+For each exported item of C<export_hash>, import takes place by
+checking the invocant for an C<import_[type]> method and using
+that if it exists (where C<[type]> is one of "namespace", "sub",
+or "var").  These methods are used to implemented "typed imports",
+and allows the compiler object to perform any name mangling or
+other operations needed to properly import an object.
+
+If the compiler invocant doesn't define an C<import_[type]> method,
+C<import> attempts to use any C<add_[type]> method that exists on
+C<target> (e.g., for the case where C<target> is a namespace PMC
+supporting the typed interface defined by PDD 21).
+
+If neither of these methods are available, then C<import>
+simply binds the symbol using C<target>'s hash interface.
+
+=back
+
+=head3 Examples
+
+=head4 Importing a module Acme::Boom from language xyz into language abc
+
+=begin PIR_FRAGMENT
+
+    # Load the HLL library and get its compiler
+    .local pmc xyzcompiler, module, exports
+    load_language 'xyz'
+    xyzcompiler = compreg 'xyz'
+
+    # load xyz's module "Acme::Boom"
+    module = xyzcompiler.'load_module'("Acme::Boom")
+
+    # get the default exports for the module
+    # (note that 'tagset'=>'DEFAULT' is optional here
+    exports = xyzcompiler.'get_exports'(module, 'tagset'=>'DEFAULT')
+
+    # import into current namespace
+    .local pmc abccompiler
+    abccompiler = compreg 'abc'
+    $P0 = get_namespace
+    abccompiler.'import'($P0, exports)
+
+=end PIR_FRAGMENT
+
+=head2 References
+
+F<pdd21_namespaces.pod>
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:

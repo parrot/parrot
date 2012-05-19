@@ -461,11 +461,10 @@ Parrot_add_to_free_list(SHIM_INTERP,
         ARGMOD(Fixed_Size_Arena *arena))
 {
     ASSERT_ARGS(Parrot_add_to_free_list)
-    void    *object;
     const UINTVAL num_objects = pool->objects_per_alloc;
+    void * const object = arena->start_objects;
 
     pool->total_objects += num_objects;
-    object = (void *)arena->start_objects;
     /* Don't move anything onto the free list. Set the pointers and do it
        lazily when we allocate. */
     {

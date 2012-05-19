@@ -11,8 +11,6 @@ use Parrot::Test tests => 7;
 ##############################
 # Parrot Calling Conventions:  Tail call optimization.
 
-$ENV{TEST_PROG_ARGS} = '-Oc';
-
 pir_output_is( <<'CODE', <<'OUT', "tail call optimization, final position" );
 
 .sub _main :main

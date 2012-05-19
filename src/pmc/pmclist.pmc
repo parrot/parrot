@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -89,13 +89,12 @@ Free all the list cells.
     VTABLE void destroy() {
         void *tmp;
         PMC_List_Item *aa;
-        PMC_List_Item *bb;
 
         GET_ATTR_head(INTERP, SELF, tmp);
         aa = (PMC_List_Item*) tmp;
 
         while (aa != NULL) {
-            bb = aa;
+            PMC_List_Item * const bb = aa;
             aa = aa->next;
             free(bb);
         }
@@ -133,7 +132,6 @@ Removes and returns an item from the start of the array.
         INTVAL size;
         void *tmp;
         PMC_List_Item *head;
-        PMC_List_Item *next;
         PMC_List_Item *item;
         PMC *data;
 
@@ -307,7 +305,7 @@ Creates and returns a copy of the list.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         void* tmp;
         PMC_List_Item *it;
 
@@ -336,7 +334,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
         PMC_List_Item *it;
         void* tmp;
         STRING *res = CONST_STRING(INTERP, "[ ");
-        STRING *space = CONST_STRING(INTERP, " ");
+        STRING * const space = CONST_STRING(INTERP, " ");
 
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
@@ -420,10 +418,8 @@ Mark the stuff.
         it = (PMC_List_Item*) tmp;
 
         while (it != NULL) {
-            if (!PObj_is_PMC_TEST(it->data)) {
-                fprintf(stderr, "not a pmc\n");
-                exit(1);
-            }
+            if (!PObj_is_PMC_TEST(it->data))
+                PANIC(INTERP, "PMCList: Pointer is not a valid PMC");
 
             Parrot_gc_mark_PMC_alive(INTERP, it->data);
             it = it->next;
@@ -512,9 +508,7 @@ Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
 {
     void *tmp;
     PMC_List_Item *item;
-    PMC_List_Item *head;
-    PMC_List_Item *foot;
-    FLOATVAL vkey, ikey;
+    FLOATVAL vkey;
     int size;
 
     GETATTR_PMCList_size(interp, list, size);
@@ -529,7 +523,7 @@ Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
 
     /* Find the list item to insert before */
     while (item->next != NULL) {
-        ikey = VTABLE_get_number(interp, item->next->data);
+        const FLOATVAL ikey = VTABLE_get_number(interp, item->next->data);
         if (ikey > vkey)
             break;
         item->prev = item->next;

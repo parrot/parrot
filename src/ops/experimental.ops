@@ -106,7 +106,7 @@ uses the type in $4 to create and return a new PMC.
 
 =cut
 
-inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
+inline op fetch(out PMC, in PMC, in PMC, in PMC)  {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -114,7 +114,7 @@ inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
     }
 }
 
-inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
+inline op fetch(out PMC, in PMC, in INT, in PMC)  {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -122,7 +122,7 @@ inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
     }
 }
 
-inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
+inline op fetch(out PMC, in PMC, in STR, in PMC)  {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -141,7 +141,7 @@ uses the type in $4 to create and return a new PMC.
 
 =cut
 
-inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
+inline op vivify(out PMC, in PMC, in PMC, in PMC)  {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -151,7 +151,7 @@ inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
     }
 }
 
-inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
+inline op vivify(out PMC, in PMC, in INT, in PMC)  {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -161,7 +161,7 @@ inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
     }
 }
 
-inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
+inline op vivify(out PMC, in PMC, in STR, in PMC)  {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
@@ -282,7 +282,7 @@ op get_context(out PMC) {
 =cut
 
 op new_call_context(out PMC) {
-    $1 = Parrot_pmc_new(interp, enum_class_CallContext);
+    $1 = Parrot_pcc_new_call_object(interp);
 }
 
 =item B<invokecc>(invar PMC, invar PMC)
@@ -296,8 +296,6 @@ inline op invokecc(invar PMC, invar PMC) :flow {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
 
-    if (!PMC_IS_NULL(signature))
-        Parrot_pcc_set_object(interp, signature, NULL);
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
     dest                   = VTABLE_invoke(interp, p, dest);
 

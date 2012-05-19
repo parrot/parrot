@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -551,7 +551,7 @@ static void *
 gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_inf_allocate_memory_chunk_zeroed)
-    void * const ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
@@ -590,7 +590,7 @@ failed_allocation(unsigned int line, unsigned long size)
 {
     ASSERT_ARGS(failed_allocation)
     fprintf(stderr, "Failed allocation of %lu bytes\n", size);
-    do_panic(NULL, "Out of mem", __FILE__, line);
+    Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
 }
 
 

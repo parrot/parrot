@@ -161,6 +161,8 @@ static void mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 =item C<static void ensure_positionals_storage(PARROT_INTERP, PMC *self, INTVAL
 size)>
 
+Ensure that C<self> has enough storage space for C<size> positionals.
+
 =cut
 
 */
@@ -184,6 +186,10 @@ ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 =item C<static void ensure_positionals_storage_ap(PARROT_INTERP, PMC *self,
 INTVAL size, INTVAL allocated_positionals)>
 
+Allocate a new chunk of memory that can contain C<allocated_positionals>
+entries, either from the fixed size allocator or from system memory, and free
+the the old chunk (if needed).
+
 =cut
 
 */
@@ -199,14 +205,14 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     if (size < 8)
         size = 8;
 
-    GETATTR_CallContext_positionals(interp, self, array);
-
     if (size > 8)
         new_array = (Pcc_cell *)Parrot_gc_allocate_memory_chunk(interp,
                 size * sizeof (Pcc_cell));
     else
         new_array = (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage(interp,
                 size * sizeof (Pcc_cell));
+
+    GETATTR_CallContext_positionals(interp, self, array);
 
     if (array) {
         GETATTR_CallContext_num_positionals(interp, self, num_positionals);
@@ -227,6 +233,8 @@ ensure_positionals_storage_ap(PARROT_INTERP,
 
 =item C<static Pcc_cell* get_cell_at(PARROT_INTERP, PMC *self, INTVAL key)>
 
+Return the cell indexed by C<key>.
+
 =cut
 
 */
@@ -245,6 +253,8 @@ get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 /*
 
 =item C<static INTVAL autobox_intval(PARROT_INTERP, const Pcc_cell *cell)>
+
+Return C<cell> as an INTVAL.
 
 =cut
 
@@ -275,6 +285,8 @@ autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 
 =item C<static FLOATVAL autobox_floatval(PARROT_INTERP, const Pcc_cell *cell)>
 
+Return C<cell> as an FLOATVAL.
+
 =cut
 
 */
@@ -303,6 +315,8 @@ autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 /*
 
 =item C<static STRING * autobox_string(PARROT_INTERP, const Pcc_cell *cell)>
+
+Return C<cell> as an STRING.
 
 =cut
 
@@ -333,6 +347,8 @@ autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 /*
 
 =item C<static PMC * autobox_pmc(PARROT_INTERP, Pcc_cell *cell, INTVAL type)>
+
+Return C<cell> as a PMC.
 
 =cut
 
@@ -371,6 +387,8 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 
 =item C<static Hash * get_hash(PARROT_INTERP, PMC *SELF)>
 
+Return the hash for this CallContext, creating a hash if necessary.
+
 =cut
 
 */
@@ -398,6 +416,8 @@ get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 /*
 
 =item C<static void mark_cell(PARROT_INTERP, Pcc_cell *c)>
+
+Mark this cell's GCable, if needed.
 
 =cut
 
@@ -428,6 +448,8 @@ mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 
 =item C<static void mark_positionals(PARROT_INTERP, PMC *self)>
 
+Mark this positional's GCables, if needed.
+
 =cut
 
 */
@@ -454,6 +476,8 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 
 =item C<static void mark_hash(PARROT_INTERP, Hash *h)>
 
+Mark this hash's GCables, if needed.
+
 =cut
 
 */
@@ -471,6 +495,8 @@ mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 /*
 
 =item C<static PMC * get_named_names(PARROT_INTERP, PMC *SELF)>
+
+Return all named arguments in a FixedStringArray.
 
 =cut
 
@@ -519,7 +545,6 @@ pmclass CallContext provides array provides hash auto_attrs {
     /* for now use a return continuation PMC */
     ATTR PMC      *handlers;           /* local handlers for the context */
     ATTR PMC      *current_cont;       /* the return continuation PMC */
-    ATTR PMC      *current_object;     /* current object if a method call */
     ATTR PMC      *current_namespace;  /* The namespace we're currently in */
     ATTR opcode_t *current_pc;         /* program counter of Sub invocation */
     ATTR PMC      *current_sig;        /* temporary CallContext PMC for active call */
@@ -620,9 +645,6 @@ Mark any referenced strings and PMCs.
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_cont(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_object(INTERP, SELF, tmp);
         Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_current_namespace(INTERP, SELF, tmp);
@@ -950,10 +972,6 @@ return list of ExceptioHandlers
 
 return current Continuation
 
-=item current_object
-
-return current Object (if in method call)
-
 =item current_namespace
 
 return current Namespace
@@ -984,8 +1002,6 @@ return current Namespace
             GET_ATTR_current_sub(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_cont")))
             GET_ATTR_current_cont(INTERP, SELF, value);
-        else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_object")))
-            GET_ATTR_current_object(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "current_namespace")))
             GET_ATTR_current_namespace(INTERP, SELF, value);
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "handlers")))

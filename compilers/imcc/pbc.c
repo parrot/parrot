@@ -1923,7 +1923,7 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
     while (*start == ' ' || *start == '\t' || *start == '(') { ++start; }
 
     /* Skip trailing whitespace and ) */
-    while (end >= src && (*end == ' ' || *end == '\t' || *end == ')')) {
+    while (end >= start && (*end == ' ' || *end == '\t' || *end == ')')) {
         --end;
     }
     ++end;
@@ -1989,8 +1989,9 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
           case ' ':
           case '\t':
           case ')':
-          case '\0':
             ++chr;
+            /* Fallthrough */
+          case '\0':
             break;
           case ',':
             /* Hold onto the , for the test at the start of the loop */
@@ -2421,18 +2422,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         int annotation_type;
 
         /* Add annotations seg if we're missing one. */
-        if (!interp_code->annotations) {
-            /* Create segment. "_ANN" is added to the name */
-            STRING *name = Parrot_sprintf_c(imcc->interp, "%Ss_ANN",
-                interp_code->base.name);
-            int      add = interp_code->base.dir ? 1 : 0;
-            PackFile_Directory * const dir  = add ? interp_code->base.dir :
-                    &interp_pf->directory;
-            interp_code->annotations = (PackFile_Annotations *)
-                    PackFile_Segment_new_seg(imcc->interp, dir,
-                        PF_ANNOTATIONS_SEG, name, 1);
-            interp_code->annotations->code = interp_code;
-        }
+        if (!interp_code->annotations)
+            Parrot_pf_get_annotations_segment(imcc->interp, interp_pf, interp_code);
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {

@@ -18,12 +18,13 @@ Tests the LexPad PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(14)
+    plan(17)
 
     new_test()
     test_keyed()
     test_keyed_empty()
     test_iter()
+    test_iter2()
     test_register_type()
 .end
 
@@ -102,6 +103,30 @@ iter_loop:
     goto iter_loop
 iter_done:
 .end
+
+.sub 'test_iter2'
+    .lex '$a', $P99
+    $P99 = box 54321
+
+    .local pmc lexpad, lexiter
+    $P0 = getinterp
+    lexpad = $P0['lexpad']
+
+    lexiter = iter lexpad
+  loop:
+    unless lexiter goto done
+    .local pmc item, key, value
+    item = shift lexiter
+    key = item.'key'()
+    value = item.'value'()
+    is (key, '$a', 'got lex name')
+    is (value, 54321, 'got lex value')
+    $P0 = lexpad[key]
+    is ($P0, 54321, 'got lex value the other way')
+    goto loop
+  done:
+.end
+
 
 .sub 'test_register_type'
     .local int i

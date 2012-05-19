@@ -595,7 +595,7 @@ found.
 
 =cut
 
-inline op find_sub_not_null(out PMC, in STR) :base_core {
+inline op find_sub_not_null(out PMC, in STR)  {
     opcode_t * const dest = expr NEXT();
     PMC      * const sub  = Parrot_ns_find_named_item(interp, $2, dest);
 
