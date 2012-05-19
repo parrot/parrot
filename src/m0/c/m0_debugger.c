@@ -503,6 +503,22 @@ debug_add_breakpoint(char * arg, M0_Debugger_Info* db_info)
 }
 
 static void
+debug_delete_breakpoint(char * arg, M0_Debugger_Info* db_info)
+{
+    unsigned long bp;
+    if(!arg) {
+        printf("You must specify a breakpoint # in order to delete a breakpoint\n");
+        return;
+    }
+    bp = strtoul(arg, NULL, 10);
+    if(bp < db_info->n_breakpoints) {
+        for( ; bp < db_info->n_breakpoints - 1; bp++)
+            db_info->breakpoints[bp] = db_info->breakpoints[bp+1];
+    db_info->n_breakpoints--;
+    }
+}
+
+static void
 debug_list_breakpoints(char * arg, M0_Debugger_Info* db_info)
 {
     unsigned int n_bp = db_info->n_breakpoints;
@@ -568,7 +584,7 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
                 debug_add_breakpoint(arg, db_info);
                 break;
             case Delete_Breakpoint:
-                NYI();
+                debug_delete_breakpoint(arg, db_info);
                 break;
             case List_Breakpoints:
                 debug_list_breakpoints(arg, db_info);
