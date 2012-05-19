@@ -488,6 +488,33 @@ debug_list(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
 }
 
 static void
+debug_add_breakpoint(char * arg, M0_Debugger_Info* db_info)
+{
+    unsigned long bp;
+    unsigned int  n_bp;
+    if(!arg) {
+        printf("You must specify a PC in order to add a breakpoint\n");
+        return;
+    }
+    bp = strtoul(arg, NULL, 10);
+    n_bp = ++(db_info->n_breakpoints);
+    db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
+    db_info->breakpoints[n_bp-1] = bp;
+}
+
+static void
+debug_list_breakpoints(char * arg, M0_Debugger_Info* db_info)
+{
+    unsigned int n_bp = db_info->n_breakpoints;
+    unsigned int i = 0;
+
+    UNUSED(arg);
+    printf("There are %d breakpoint(s)\n", n_bp);
+    for( ; i < n_bp; i++)
+        printf("Breakpoint #%d:\tPC=%d\n", i, db_info->breakpoints[i]);
+}
+
+static void
 print_help()
 {
     printf("Available Commands:\n");
@@ -538,13 +565,13 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
                 debug_list(cf, ops, pc);
                 break;
             case Add_Breakpoint:
-                NYI();
+                debug_add_breakpoint(arg, db_info);
                 break;
             case Delete_Breakpoint:
                 NYI();
                 break;
             case List_Breakpoints:
-                NYI();
+                debug_list_breakpoints(arg, db_info);
                 break;
             case Help:
                 print_help();
@@ -559,9 +586,15 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
 }
 
 int
-check_breakpoints(const unsigned long pc) {
-    UNUSED(pc);
-    return 0;
+check_breakpoints(M0_Debugger_Info *db_info, const unsigned long pc) {
+    unsigned int i        = 0;
+    unsigned int bp_found = 0;
+    for(; i < db_info->n_breakpoints; i++)
+        if(db_info->breakpoints[i] == pc) {
+            bp_found = 1;
+            break;
+        }
+    return bp_found;
 }
 
 static void
@@ -590,12 +623,13 @@ debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, cons
     switch (db_info.state) {
       case INIT:
             parse_argv(&db_info, argc, argv);
+            db_info.n_breakpoints = 0;
             break;
         case STEP:
             db_prompt(&db_info, cf, ops, pc);
             break;
         case BREAK:
-            if (1 == check_breakpoints(pc))
+            if (1 == check_breakpoints(&db_info, pc))
                 db_prompt(&db_info, cf, ops, pc);
             break;
         case RUN:
