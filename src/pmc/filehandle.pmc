@@ -44,11 +44,7 @@ pmclass FileHandle extends Handle auto_attrs {
     ATTR INTVAL exit_status;          /* Child exit status on pipes   */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
     ATTR PIOOFF_T last_pos;           /* Last file position           */
-    ATTR size_t buffer_size;          /* Buffer size                  */
-    ATTR INTVAL buffer_flags;         /* Buffer flags                 */
-    ATTR unsigned char *buffer_start; /* Start of buffer              */
-    ATTR unsigned char *buffer_end;   /* End of buffer                */
-    ATTR unsigned char *buffer_next;  /* Current read/write pointer   */
+
 
 /*
  * Using INTVAL for process_id is a temporary solution.

@@ -77,6 +77,14 @@ extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
 
+typedef struct _io_buffer {
+    size_t buffer_size;
+    INTVAL buffer_flags;
+    unsigned char *buffer_start;
+    unsigned char *buffer_end;
+    unsigned char *buffer_next;
+} Parrot_io_buffer;
+
 /* io/core.c - interpreter initialization/destruction functions */
 /* HEADERIZER BEGIN: src/io/core.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
