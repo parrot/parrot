@@ -541,9 +541,9 @@ print_help()
     printf("\tpn ARG: print ARG (treat ARG as a float)\n\t\tCurrently ARG only supports registers\n");
     printf("\tps ARG: print ARG (treat ARG as a string)\n\t\tCurrently ARG only supports registers\n");
     printf("\tl     : list the decompiled source code for the line that is about to be executed\n");
-    printf("\tb PC  : TODO: create a new breakpoint at PC\n");
-    printf("\tB PC  : TODO: delete the breakpoint at PC\n");
-    printf("\tL     : TODO: list breakpoints\n");
+    printf("\tb PC  : create a new breakpoint at PC\n");
+    printf("\tB ARG : delete the breakpoint # ARG\n");
+    printf("\tL     : list breakpoints\n");
     printf("\th     : print this help message\n");
 }
 
