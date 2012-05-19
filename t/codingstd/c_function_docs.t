@@ -87,13 +87,12 @@ foreach my $path (@files) {
     TODO: {
         local $TODO = 'Missing function docs' if $todos{$path};
 
-    ok ( ! @missing_docs, "$path: C functions documented")
-        or diag( @missing_docs
-            . " function(s) lacking documentation:\n"
-            . join ("\n", @missing_docs, "\n"));
+        is( @missing_docs, 0, "$path: C functions documented")
+            or diag( @missing_docs
+                . " function(s) lacking documentation:\n"
+                . join ("\n", @missing_docs, "\n"));
     }
-    ok ( ! @bad_order,
-        "$path: PARROT_EXPORT, if present, is in correct position")
+    is( @bad_order, 0, "$path: PARROT_EXPORT, if present, is in correct position")
         or diag( @bad_order
             . " function(s) have PARROT_EXPORT in position other than first:\n"
             . join ("\n", @bad_order, "\n"));
