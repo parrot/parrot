@@ -356,5 +356,9 @@ read_padding_from_stream( FILE *stream, size_t bytes ) {
     return fread( &value, 1, bytes, stream ) == bytes;
 }
 
-/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
-*/
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

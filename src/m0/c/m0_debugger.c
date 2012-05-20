@@ -682,5 +682,9 @@ debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, cons
     }
 }
 
-/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
-*/
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

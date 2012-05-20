@@ -8,5 +8,9 @@ int load_mob_file( M0_Interp *interp, const char *filename );
 #   define M0_MOB_H 1
 #endif
 
-/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
-*/
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

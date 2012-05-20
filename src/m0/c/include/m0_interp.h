@@ -5,5 +5,9 @@
 #   define M0_INTERP_H 1
 #endif
 
-/* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
-*/
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
