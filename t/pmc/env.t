@@ -17,9 +17,8 @@ Tests the C<Env> PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(16)
+    plan(15)
 
-    all_envs_are_identical()
     setenv_getenv()
     all_envs_are_the_same()
     gone_delete()
@@ -28,17 +27,6 @@ Tests the C<Env> PMC.
     is_interface_done()
     get_integer()
     oob_query()
-.end
-
-.sub all_envs_are_identical
-    $P0 = new ['Env']
-    $P1 = new ['Env']
-    eq_addr $P0, $P1, ok
-    ok(0, "all Envs aren't identical")
-    goto end
-ok:
-    ok(1, "all Envs are identical")
-end:
 .end
 
 .sub setenv_getenv
