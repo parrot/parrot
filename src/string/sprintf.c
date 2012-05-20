@@ -370,12 +370,6 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
 
 F<src/string/spf_vtable.c>, F<src/string/spf_render.c>, F<include/parrot/misc.h>
 
-=head1 HISTORY
-
-This was once a simple, vararg-based implementation that existed
-completely within this file.  When the file grew to be nearly 1000
-lines long, I split it into three. --BD
-
 =cut
 
 */

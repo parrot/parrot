@@ -422,6 +422,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     HUGEINTVAL sharedint = 0;
     SpfInfo info = { 0, 0, 0, 0, (PHASE)0 }; /* Storage for flags, etc. */
     PMC * const targ = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder, pat_len * 2);
+    INTVAL fmt_start_idx;
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by Parrot_str_from_uint and
@@ -442,11 +443,11 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
            buffer */
         if (len) {
             substr = STRING_substr(interp, pat, old, len);
-            /* XXX This shouldn't modify targ the pointer */
             VTABLE_push_string(interp, targ, substr);
         }
         len = 0;    /* Reset the len */
         old = i;
+        fmt_start_idx = i;
 
         /* If we have a "%%" pattern, we're just going to output a single
            '%', so reset the counts and continue. */
@@ -909,7 +910,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                     else {
                         Parrot_ex_throw_from_c_args(interp, NULL,
                             EXCEPTION_INVALID_CHARACTER,
-                            "'%c' is not a valid sprintf format", ch);
+                            "'%c' is not valid in sprintf format sequence '%Ss'",
+                            ch,
+                            STRING_substr(interp, pat, fmt_start_idx, i - fmt_start_idx + 1));
                     }
                 }
 
