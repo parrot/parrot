@@ -875,11 +875,10 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                                 ((PMC *)obj->data),
                                                 (obj->index));
 
-                        STRING * const string = (VTABLE_get_repr(interp, tmp));
+                        STRING * const string = VTABLE_get_repr(interp, tmp);
                         STRING * const ts     = handle_flags(interp, &info,
-                                            string, 0, NULL);
+                                                             string, 0, NULL);
                         ++obj->index;
-
                         VTABLE_push_string(interp, targ, ts);
                         break;
                     }
@@ -891,8 +890,8 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                                     info.type, obj);
                         /* XXX Silently ignore? */
                         if (!STRING_IS_NULL(string)) {
-                            STRING * const ts = handle_flags(interp,
-                                    &info, string, 0, NULL);
+                            STRING * const ts = handle_flags(interp, &info,
+                                                             string, 0, NULL);
                             VTABLE_push_string(interp, targ, ts);
                         }
                     }
@@ -922,9 +921,12 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
               case PHASE_DONE:
               default:
                 /* This is the terminating condition of the surrounding
-                 * loop, so...
+                 * loop, so we absolutely shouldn't be here. Throw an
+                 * exception and hope this doesn't happen often.
                  */
-                PANIC(interp, "We can't be here");
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_CHARACTER,
+                    "Catastrophic sprintf error. Your input is very bad. Please file a bug report.");
             }
         }
 
