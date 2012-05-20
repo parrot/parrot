@@ -518,15 +518,19 @@ static void
 debug_delete_breakpoint(char * arg, M0_Debugger_Info* db_info)
 {
     unsigned long bp;
+    unsigned long n_bp;
     if(!arg) {
-        printf("You must specify a breakpoint # in order to delete a breakpoint\n");
-        return;
-    }
-    bp = strtoul(arg, NULL, 10);
-    if(bp < db_info->n_breakpoints) {
-        for( ; bp < db_info->n_breakpoints - 1; bp++)
-            db_info->breakpoints[bp] = db_info->breakpoints[bp+1];
-    db_info->n_breakpoints--;
+        bp = 0;
+        db_info->n_breakpoints = n_bp = 0;
+        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
+    } else {
+        n_bp = --(db_info->n_breakpoints);
+        bp = strtoul(arg, NULL, 10);
+        if(bp < db_info->n_breakpoints) {
+            for( ; bp < db_info->n_breakpoints; bp++)
+                db_info->breakpoints[bp] = db_info->breakpoints[bp+1];
+        }
+        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
     }
 }
 
@@ -555,6 +559,7 @@ print_help()
     printf("\tl     : list the decompiled source code for the line that is about to be executed\n");
     printf("\tb PC  : create a new breakpoint at PC\n");
     printf("\tB ARG : delete the breakpoint # ARG\n");
+    printf("\tB     : delete all breakpoints\n");
     printf("\tL     : list breakpoints\n");
     printf("\th     : print this help message\n");
 }
