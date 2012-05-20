@@ -40,7 +40,7 @@ the type for the format.
 #include "parrot/parrot.h"
 #include "spf_private.h"
 
-/* HEADERIZER HFILE: include/parrot/misc.h */
+/* HEADERIZER HFILE: include/parrot/string_funcs.h */
 
 /*
 

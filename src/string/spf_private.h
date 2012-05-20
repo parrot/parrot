@@ -72,7 +72,7 @@ struct sprintf_obj {
 extern SPRINTF_OBJ pmc_core;
 extern const SPRINTF_OBJ va_core;
 
-/* HEADERIZER BEGIN: src/spf_render.c */
+/* HEADERIZER BEGIN: src/string/spf_render.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
@@ -90,6 +90,6 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pat) \
     , PARROT_ASSERT_ARG(obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/spf_render.c */
+/* HEADERIZER END: src/string/spf_render.c */
 
 #endif /* PARROT_STRING_PRIVATE_H */

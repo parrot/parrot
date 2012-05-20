@@ -90,8 +90,8 @@ static STRING * handle_flags(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING* str_concat_w_flags(PARROT_INTERP,
-    ARGOUT(STRING *dest),
+static void str_concat_w_flags(PARROT_INTERP,
+    ARGOUT(PMC * sb),
     ARGIN(const SpfInfo *info),
     ARGMOD(STRING *src),
     ARGIN_NULLOK(STRING *prefix))
@@ -99,7 +99,7 @@ static STRING* str_concat_w_flags(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(* sb)
         FUNC_MODIFIES(*src);
 
 #define ASSERT_ARGS_canonicalize_exponent __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -114,7 +114,7 @@ static STRING* str_concat_w_flags(PARROT_INTERP,
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_str_concat_w_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(sb) \
     , PARROT_ASSERT_ARG(info) \
     , PARROT_ASSERT_ARG(src))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -218,8 +218,8 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
 
 /*
 
-=item C<static STRING* str_concat_w_flags(PARROT_INTERP, STRING *dest, const
-SpfInfo *info, STRING *src, STRING *prefix)>
+=item C<static void str_concat_w_flags(PARROT_INTERP, PMC * sb, const SpfInfo
+*info, STRING *src, STRING *prefix)>
 
 Used by Parrot_sprintf_format.  Prepends supplied prefix for numeric
 values. (e.g. 0x for hex.)
@@ -231,14 +231,13 @@ Returns the pointer to the modified string.
 */
 
 PARROT_CANNOT_RETURN_NULL
-static STRING*
-str_concat_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
+static void
+str_concat_w_flags(PARROT_INTERP, ARGOUT(PMC * sb), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
     ASSERT_ARGS(str_concat_w_flags)
     src = handle_flags(interp, info, src, 1, prefix);
-    dest = Parrot_str_concat(interp, dest, src);
-    return dest;
+    VTABLE_push_string(interp, sb, src);
 }
 
 /*
@@ -422,9 +421,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     HUGEINTVAL num;
     HUGEINTVAL sharedint = 0;
     SpfInfo info = { 0, 0, 0, 0, (PHASE)0 }; /* Storage for flags, etc. */
-
-    /* start with a buffer; double the pattern length to avoid realloc #1 */
-    STRING *targ = Parrot_str_new_noinit(interp, pat_len * 2);
+    PMC * const targ = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder, pat_len * 2);
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by Parrot_str_from_uint and
@@ -446,7 +443,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
         if (len) {
             substr = STRING_substr(interp, pat, old, len);
             /* XXX This shouldn't modify targ the pointer */
-            targ = Parrot_str_concat(interp, targ, substr);
+            VTABLE_push_string(interp, targ, substr);
         }
         len = 0;    /* Reset the len */
         old = i;
@@ -692,8 +689,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                     {
                         STRING * const ts = Parrot_str_chr(interp,
                              (UINTVAL)obj->getint(interp, info.type, obj));
-                        targ = str_concat_w_flags(interp, targ, &info, ts,
-                                                  NULL);
+                        str_concat_w_flags(interp, targ, &info, ts, NULL);
                     }
                     break;
 
@@ -707,8 +703,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ        = str_concat_w_flags(interp, targ,
-                                        &info, ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -722,8 +717,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ        = str_concat_w_flags(interp, targ,
-                                        &info, ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -738,7 +732,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -752,7 +746,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -766,7 +760,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                         /* unsigned conversion - no plus */
                         info.flags &= ~FLAG_PLUS;
-                        targ = str_concat_w_flags(interp, targ, &info, ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -804,7 +798,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 #endif
                             Parrot_str_free_cstring(tempstr);
                         }
-                        targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
+                        VTABLE_push_string(interp, targ, cstr2pstr(tc));
                     }
                     break;
 
@@ -816,8 +810,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                         STRING * const ts = Parrot_str_from_uint(interp, tc,
                                    (UHUGEINTVAL) (size_t) ptr, 16, 0);
 
-                        targ = str_concat_w_flags(interp, targ, &info,
-                                                  ts, prefix);
+                        str_concat_w_flags(interp, targ, &info, ts, prefix);
                     }
                     break;
 
@@ -867,7 +860,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             ch == 'g' || ch == 'G')
                         canonicalize_exponent(tc, &info);
 
-                        targ = Parrot_str_concat(interp, targ, cstr2pstr(tc));
+                        VTABLE_push_string(interp, targ, cstr2pstr(tc));
                     }
                     break;
 
@@ -886,7 +879,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                                             string, 0, NULL);
                         ++obj->index;
 
-                        targ = Parrot_str_concat(interp, targ, ts);
+                        VTABLE_push_string(interp, targ, ts);
                         break;
                     }
 
@@ -899,7 +892,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                         if (!STRING_IS_NULL(string)) {
                             STRING * const ts = handle_flags(interp,
                                     &info, string, 0, NULL);
-                            targ = Parrot_str_concat(interp, targ, ts);
+                            VTABLE_push_string(interp, targ, ts);
                         }
                     }
                     break;
@@ -937,10 +930,10 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     }
     if (len) {
         substr = STRING_substr(interp, pat, old, len);
-        targ = Parrot_str_concat(interp, targ, substr);
+        VTABLE_push_string(interp, targ, substr);
     }
 
-    return targ;
+    return VTABLE_get_string(interp, targ);
 }
 
 /*
