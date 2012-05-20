@@ -47,10 +47,10 @@ enum M0_OPS {
     M0_PRINT_N,
     M0_EXIT
     /* end_gen */
-};                    
-                      
+};
+
 int
-run_ops( M0_Interp *interp, M0_CallFrame *cf );
+run_ops(M0_Interp *interp, M0_CallFrame *cf);
 
 #  define M0_OPS_H 1
 #endif

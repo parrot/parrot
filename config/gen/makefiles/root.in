@@ -2329,7 +2329,7 @@ m0_c_tests :
 #IF(win32):	set M0_INTERP=.\src\m0\c\m0$(EXE) && $(PERL) t/harness $(M0_TEST_FILES)
 #UNLESS(win32):	M0_INTERP=./src/m0/c/m0$(EXE) $(PERL) t/harness $(M0_TEST_FILES)
 
-m0_c_debugger_tests : 
+m0_c_debugger_tests :
 #IF(win32):	set M0_INTERP=.\src\m0\c\m0-debugger$(EXE) && $(PERL) t/harness $(M0_DEBUGGER_TEST_FILES)
 #UNLESS(win32):	M0_INTERP=./src/m0/c/m0-debugger$(EXE) $(PERL) t/harness $(M0_DEBUGGER_TEST_FILES)
 

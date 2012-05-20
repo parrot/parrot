@@ -327,29 +327,29 @@ M0_Debugger_Command
 str_to_db_cmd(char* str) {
     M0_Debugger_Command cmd = Invalid;
 
-    if(strcmp(str,"c") == 0)
+    if (strcmp(str, "c") == 0)
         cmd = Continue;
-    else if(strcmp(str, "s") == 0)
+    else if (strcmp(str, "s") == 0)
         cmd = Step;
-    else if(strcmp(str, "p") == 0)
+    else if (strcmp(str, "p") == 0)
         cmd = Print;
-    else if(strcmp(str, "pi") == 0)
+    else if (strcmp(str, "pi") == 0)
         cmd = Print_Integer;
-    else if(strcmp(str, "pn") == 0)
+    else if (strcmp(str, "pn") == 0)
         cmd = Print_Number;
-    else if(strcmp(str, "ps") == 0)
+    else if (strcmp(str, "ps") == 0)
         cmd = Print_String;
-    else if(strcmp(str, "l") == 0)
+    else if (strcmp(str, "l") == 0)
         cmd = List;
-    else if(strcmp(str, "b") == 0)
+    else if (strcmp(str, "b") == 0)
         cmd = Add_Breakpoint;
-    else if(strcmp(str, "B") == 0)
+    else if (strcmp(str, "B") == 0)
         cmd = Delete_Breakpoint;
-    else if(strcmp(str, "L") == 0)
+    else if (strcmp(str, "L") == 0)
         cmd = List_Breakpoints;
-    else if(strcmp(str, "h") == 0)
+    else if (strcmp(str, "h") == 0)
         cmd = Help;
-    else if(strcmp(str, "") == 0)
+    else if (strcmp(str, "") == 0)
         cmd = None;
     return cmd;
 }
@@ -357,12 +357,12 @@ str_to_db_cmd(char* str) {
 char * get_line(char* str, size_t size, FILE *f) {
     char *p = fgets(str, size, f);
 
-    if(p) {
-        size_t last = strlen (str) - 1;
+    if (p) {
+        size_t last = strlen(str) - 1;
         if (str[last] == '\n')
             str[last] = '\0';
     }
-    if(0 == strlen(str)) {
+    if (0 == strlen(str)) {
         free(p);
         p = NULL;
     }
@@ -374,16 +374,16 @@ get_script_file_input(char *filename, char *input) {
     char *p;
     static FILE *pFile = NULL;
 
-    if(pFile == NULL) {
+    if (pFile == NULL) {
         pFile = fopen(filename, "r");
     }
 
-    if(pFile == NULL)
+    if (pFile == NULL)
         perror("Error opening file");
 
     p = get_line(input, 100, pFile);
 
-    if(feof(pFile)) {
+    if (feof(pFile)) {
         fclose(pFile);
         return NULL;
     }
@@ -394,7 +394,7 @@ char *
 get_db_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *input) {
     char *p;
 
-    if(db_info->input_source)
+    if (db_info->input_source)
         p = get_script_file_input(db_info->input_source, input);
     else
         p = get_line(input, 100, stdin);
@@ -403,21 +403,21 @@ get_db_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *input) {
         char *arg = NULL;
         char *tok = NULL;
 
-        if(db_info->input_source != NULL)
+        if (db_info->input_source != NULL)
             printf("%s\n", input);
 
         tok = strtok(input, " ");
-        if(tok)
+        if (tok)
             *cmd = str_to_db_cmd(tok);
         else
             return input;
 
         tok = strtok(NULL, " ");
-        if(tok) {
-            arg = (char*)realloc(arg, (strlen(tok)+1) * sizeof(char));
-            if(!arg)
+        if (tok) {
+            arg = (char*)realloc(arg, (strlen(tok)+1) * sizeof (char));
+            if (!arg)
                 perror("Could not allocate memory for arg");
-            strcpy(arg,tok);
+            strcpy(arg, tok);
         }
         return arg;
     }
@@ -439,7 +439,7 @@ char * register_to_name(const unsigned char reg) {
 unsigned int name_to_register_id(const char *name) {
     unsigned int reg = -1;
     unsigned int i   =  0;
-    for ( ; i < 256; i++) {
+    for (; i < 256; i++) {
         if (strcmp(name, M0_REGISTER_NAMES[i]) == 0) {
             reg = i;
             break;
@@ -453,15 +453,15 @@ debug_print(M0_Debugger_Command cmd, M0_CallFrame *cf, char *arg)
 {
     int reg = name_to_register_id(arg);
     unsigned long *a, *b;
-    switch(cmd) {
+    switch (cmd) {
       case Print_String:
         printf("%s\n", (char *)(cf->registers[ reg ] + 8));
         break;
       case Print_Integer:
-        printf("%d\n", (unsigned int)(cf->registers[ reg ] ));
+        printf("%d\n", (unsigned int)(cf->registers[ reg ]));
         break;
       case Print_Number:
-        printf("%f\n", (float)(cf->registers[ reg ] ));
+        printf("%f\n", (float)(cf->registers[ reg ]));
         break;
       case Print:
       default:
@@ -484,11 +484,11 @@ debug_list(M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
         case M0_GOTO_IF:
         case M0_GOTO:
         case M0_GOTO_CHUNK:
-            arg1 = calloc(10,sizeof(char));
+            arg1 = calloc(10, sizeof (char));
             sprintf(arg1, "%d", (int)(ops[pc*4+1]));
         case M0_SET_IMM:
-            arg2 = calloc(10,sizeof(char));
-            arg3 = calloc(10,sizeof(char));
+            arg2 = calloc(10, sizeof (char));
+            arg3 = calloc(10, sizeof (char));
             sprintf(arg2, "%d", (int)(ops[pc*4+2]));
             sprintf(arg3, "%d", (int)(ops[pc*4+3]));
             break;
@@ -504,13 +504,13 @@ debug_add_breakpoint(char * arg, M0_Debugger_Info* db_info)
 {
     unsigned long bp;
     unsigned int  n_bp;
-    if(!arg) {
+    if (!arg) {
         printf("You must specify a PC in order to add a breakpoint\n");
         return;
     }
     bp = strtoul(arg, NULL, 10);
     n_bp = ++(db_info->n_breakpoints);
-    db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
+    db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof (unsigned long));
     db_info->breakpoints[n_bp-1] = bp;
 }
 
@@ -519,18 +519,19 @@ debug_delete_breakpoint(char * arg, M0_Debugger_Info* db_info)
 {
     unsigned long bp;
     unsigned long n_bp;
-    if(!arg) {
+    if (!arg) {
         bp = 0;
         db_info->n_breakpoints = n_bp = 0;
-        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
-    } else {
+        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof (unsigned long));
+    } else
+    {
         n_bp = --(db_info->n_breakpoints);
         bp = strtoul(arg, NULL, 10);
-        if(bp < db_info->n_breakpoints) {
-            for( ; bp < db_info->n_breakpoints; bp++)
+        if (bp < db_info->n_breakpoints) {
+            for (; bp < db_info->n_breakpoints; bp++)
                 db_info->breakpoints[bp] = db_info->breakpoints[bp+1];
         }
-        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof(unsigned long));
+        db_info->breakpoints = realloc(db_info->breakpoints, n_bp*sizeof (unsigned long));
     }
 }
 
@@ -542,7 +543,7 @@ debug_list_breakpoints(char * arg, M0_Debugger_Info* db_info)
 
     UNUSED(arg);
     printf("There are %d breakpoint(s)\n", n_bp);
-    for( ; i < n_bp; i++)
+    for (; i < n_bp; i++)
         printf("Breakpoint #%u:\tPC=%lu\n", i, db_info->breakpoints[i]);
 }
 
@@ -553,9 +554,12 @@ print_help()
     printf("\tc     : continue until the next breakpoint or the end of the program\n");
     printf("\ts     : single step (execute the next m0 command)\n");
     printf("\tp  ARG: print ARG (treat ARG as hex)\n\t\tCurrently ARG only supports registers\n");
-    printf("\tpi ARG: print ARG (treat ARG as an unsigned integer)\n\t\tCurrently ARG only supports registers\n");
-    printf("\tpn ARG: print ARG (treat ARG as a float)\n\t\tCurrently ARG only supports registers\n");
-    printf("\tps ARG: print ARG (treat ARG as a string)\n\t\tCurrently ARG only supports registers\n");
+    printf("\tpi ARG: print ARG (treat ARG as an unsigned integer)\n");
+    printf("\t\tCurrently ARG only supports registers\n");
+    printf("\tpn ARG: print ARG (treat ARG as a float)\n");
+    printf("\t\tCurrently ARG only supports registers\n");
+    printf("\tps ARG: print ARG (treat ARG as a string)\n");
+    printf("\t\tCurrently ARG only supports registers\n");
     printf("\tl     : list the decompiled source code for the line that is about to be executed\n");
     printf("\tb PC  : create a new breakpoint at PC\n");
     printf("\tB ARG : delete the breakpoint # ARG\n");
@@ -565,19 +569,20 @@ print_help()
 }
 
 static void
-db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
+db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
+        const unsigned long pc)
 {
     static M0_Debugger_Command  last_cmd   = None;
     static char                *last_arg   = NULL;
     int                         done       = 0;
-    char                       *user_input = calloc(100, sizeof(char));
+    char                       *user_input = calloc(100, sizeof (char));
 
-    while(!done) {
+    while (!done) {
         M0_Debugger_Command  cmd = None;
         char                *arg = NULL;
         printf("PC=%lu> ", pc);
         arg = get_db_input(db_info, &cmd, user_input);
-        if(cmd == None) {
+        if (cmd == None) {
             cmd = last_cmd;
             arg = last_arg;
         }
@@ -587,7 +592,7 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
         }
         switch (cmd) {
             case Continue:
-                if(db_info->n_breakpoints > 0)
+                if (db_info->n_breakpoints > 0)
                     db_info->state = BREAK;
                 else
                     db_info->state = RUN;
@@ -632,8 +637,8 @@ int
 check_breakpoints(M0_Debugger_Info *db_info, const unsigned long pc) {
     unsigned int i        = 0;
     unsigned int bp_found = 0;
-    for(; i < db_info->n_breakpoints; i++)
-        if(db_info->breakpoints[i] == pc) {
+    for (; i < db_info->n_breakpoints; i++)
+        if (db_info->breakpoints[i] == pc) {
             bp_found = 1;
             break;
         }
@@ -643,12 +648,12 @@ check_breakpoints(M0_Debugger_Info *db_info, const unsigned long pc) {
 static void
 parse_argv(M0_Debugger_Info *db_info, int argc, const char* argv[])
 {
-    if(argc > 2) {
+    if (argc > 2) {
         int i = 2;
-        while(i < argc) {
-            if(strcmp("-s",argv[i]) == 0) {
+        while (i < argc) {
+            if (strcmp("-s", argv[i]) == 0) {
                 size_t size = strlen(argv[++i]);
-                db_info->input_source = malloc((size+1)*sizeof(char));
+                db_info->input_source = malloc((size+1)*sizeof (char));
                 strcpy(db_info->input_source, argv[i]);
             }
             i++;
@@ -658,7 +663,8 @@ parse_argv(M0_Debugger_Info *db_info, int argc, const char* argv[])
 }
 
 void
-debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
+debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf,
+        const unsigned char *ops, const unsigned long pc)
 {
     static M0_Debugger_Info db_info;
     UNUSED(interp);

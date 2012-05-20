@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-src/m0/m0_interpreter.pl - M0 Interpreter Prototype 
+src/m0/m0_interpreter.pl - M0 Interpreter Prototype
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,7 @@ sub new_interp {
         \&m0_opfunc_print_i,
         \&m0_opfunc_print_n,
         \&m0_opfunc_exit,
-# end_gen    
+# end_gen
     ];
     $interp->[CONFIG] = {};
     $interp->[CALL_FRAMES] = [];
@@ -205,7 +205,7 @@ Run ops until there aren't ops left to run.
 
 sub run_ops {
     my ($cf) = @_;
-    
+
     while (1) {
         my $init_pc = i($cf,PC);
         my $instr_count = scalar(@{$cf->[BCS]});
@@ -471,7 +471,7 @@ sub m0_opfunc_copy_mem {
 sub m0_opfunc_set {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set $a1, $a2, $a3";
-    
+
     $$cf->[$a1] = $$cf->[$a2];
     $$cf = $$cf->[CF];
 }
@@ -500,7 +500,7 @@ sub m0_opfunc_set_ref {
 sub m0_opfunc_set_byte {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_byte $a1, $a2, $a3";
-    
+
     $$cf->[$a1] = bytes::substr($$cf->[$a2], i($$cf,$a3));
     my $new_byte = bytes::chr($$cf->[$a3] & 255);
     bytes::substr($$cf->[$a2], i($$cf,$a3), $new_byte);
@@ -509,14 +509,14 @@ sub m0_opfunc_set_byte {
 sub m0_opfunc_get_byte {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "get_byte $a1, $a2, $a3";
-    
+
     $$cf->[$a1] = i(bytes::ord(bytes::substr($$cf->[$a2], i($$cf,$a3), 1)))
 }
 
 sub m0_opfunc_set_word {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_word $a1, $a2, $a3";
-    
+
     #turn *$3 into 4 bytes
     my $word = i($$cf,$a3);
     bytes::substr($$cf->[$a1], 4 * i($$cf,$a2), 4, $word);
@@ -525,7 +525,7 @@ sub m0_opfunc_set_word {
 sub m0_opfunc_get_word {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "get_word $a1, $a2, $a3";
-    
+
     #$$cf->[$a1] = unpack("l", bytes::substr($$cf->[$a2], 4 * $$cf->[$a3], 4));
     $$cf->[$a1] = bytes::substr($$cf->[$a2], 4 * i($$cf,$a3), 4);
 }
@@ -616,7 +616,7 @@ sub parse_m0b_header {
     if ($real_magic cmp $m0b_magic) {
       die "magic number mismatch";
     }
-    
+
     # verify that the interp understands this version of the m0b format
     my $m0b_version = ord get_bytes($m0b, $cursor, 1);
     if ($m0b_version != 0) {

@@ -41,7 +41,7 @@ my $M0_BC_SEG       = 0x04;
 my $m0_interp = $ENV{M0_INTERP} || "$^X " . catfile(qw/src m0 perl5 m0_interp.pl/);
 
 my $m0b_data = [
-    { 
+    {
       name => 'chunk_0',
       vars => [],
       meta => {},
@@ -54,8 +54,8 @@ can_parse($m0_interp, $m0b_data, "very minimal bytecode file" );
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [ qw(quux flub buuuz) ],
       vars => [],
       meta => {},
@@ -67,8 +67,8 @@ can_parse($m0_interp, $m0b_data, "minimal bytecode with some variables" );
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [],
       meta => { 0 => {line => 3, file => 'awesome'},
                 3 => {cow  => 4},
@@ -81,8 +81,8 @@ can_parse($m0_interp, $m0b_data, "minimal bytecode file with a metadata segment"
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [ qw(quux flub buuuz) ],
       meta => { 0 => {line => 3, file => 'awesome'},
                 3 => {cow  => 4},
@@ -95,11 +95,11 @@ can_parse($m0_interp, $m0b_data, "bytecode file with metadata and vars" );
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [ ],
       meta => { },
-      bc   => 99,  
+      bc   => 99,
     },
 ];
 
@@ -107,8 +107,8 @@ can_parse($m0_interp, $m0b_data, "bytecode file with null ops" );
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [ qw(quux flub buuuz) ],
       meta => { 0 => {line => 3, file => 'awesome'},
                 3 => {cow  => 4},
@@ -121,24 +121,24 @@ can_parse($m0_interp, $m0b_data, "bytecode file with metadata, vars and null ops
 
 
 $m0b_data = [
-    { 
-      name => 'chunk_0', 
+    {
+      name => 'chunk_0',
       vars => [ qw(quux flub buuuz) ],
       meta => { 0 => {line => 3, file => 'awesome'},
                 3 => {cow  => 4},
               },
       bc   => 11,  # number of ops to generate (all null)
     },
-    { 
-      name => 'chunk_2', 
+    {
+      name => 'chunk_2',
       vars => [ qw(quux2 flub2 buuuz2) ],
       meta => { 0 => {line2 => 32, file2 => 'awesome2'},
                 3 => {cow2  => 42},
               },
       bc   => 22,  # number of ops to generate (all null)
     },
-    { 
-      name => 'chunk_3', 
+    {
+      name => 'chunk_3',
       vars => [ qw(quux3 flub3 buuuz3) ],
       meta => { 03 => {line3 => 33, file3 => 'awesome3'},
                 33 => {cow3  => 43},
@@ -347,7 +347,7 @@ sub m0b_bc_seg_length {
 Generate the binary version of an M0 variables segment, using the variables in
 the first argument.
 
-NOTE: Currently this generates an empty variables segment.  
+NOTE: Currently this generates an empty variables segment.
 
 =cut
 
@@ -403,7 +403,7 @@ NOTE: Currently generates an empty metadata segment.
 
 sub m0b_meta_seg {
     my ($metadata, $var_seg) = @_;
-    
+
     my $entry_count = 0;
     for my $offset (keys %$metadata) {
         $entry_count += keys %{$metadata->{$offset}};
@@ -437,7 +437,7 @@ Calculate the number of bytes that a metadata segment will occupy.
 
 sub m0b_meta_seg_length {
     my ($metadata) = @_;
-    
+
     my $seg_length = 12; # 4 for segment identifier, 4 for count, 4 for size
 
     for my $offset (keys %$metadata) {

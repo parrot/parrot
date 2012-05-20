@@ -45,8 +45,8 @@ sub assemble {
     my $source    = slurp($file);
     my $lines     = [ split(/\n/, $source) ];
     # build a hash that maps chunk names to their offset within the bytecode file
-    my $chunk_map = { 
-        map  { my $x = $_; $x =~ s/^\.chunk\s+"(\w+)"$/$1/; $x => our $i++; } 
+    my $chunk_map = {
+        map  { my $x = $_; $x =~ s/^\.chunk\s+"(\w+)"$/$1/; $x => our $i++; }
         grep { m/^\.chunk\s+"(\w+)"$/ } @$lines };
     my $cursor    = 0;
     my $version   = parse_version($lines, \$cursor);
@@ -119,7 +119,7 @@ return the bytecode represenation of the operation.
 sub register_name_to_num {
     my ($register) = @_;
 
-    my $symbols = { 
+    my $symbols = {
         # call frame values
         CF       => 0,
         PCF      => 1,
@@ -233,7 +233,7 @@ sub m0b_metadata_seg {
 
     return $bytecode;
 }
-                          
+
 
 sub m0b_bytecode_seg {
     my ($ops, $chunk) = @_;
@@ -301,7 +301,8 @@ sub m0b_bytecode_seg {
         } elsif ($line =~ m/^(?<label>[a-zA-Z][a-zA-Z0-9_]+):\s*$/) {
             # ignore
         } elsif ($line =~ m/^\s*#/) {
-        } else {
+        } else
+        {
             die "Invalid M0 bytecode line: '$line'";
         }
     }
@@ -464,7 +465,8 @@ sub m0b_const_seg_length {
             $seg_length += $const_length;
             m0_say "after adding $type constant '$value', length is $seg_length (+$const_length)";
         }
-        else {
+        else
+        {
             die "unknown type '$type'.  I don't know how this happened.";
         }
     }
@@ -525,11 +527,12 @@ sub parse_chunks {
 
         if ($state eq 'none') {
             if ($line =~ /^\.chunk\s+"(?<name>\w*?)"$/) {
-                $chunk{name} = $+{name}; 
+                $chunk{name} = $+{name};
                 $state = 'chunk start';
                 m0_say "Parsing chunk #".scalar @$chunks;
             }
-            else {
+            else
+            {
                 die "Invalid M0: expected chunk name, got '$line' at line $$cursor";
             }
         }
@@ -537,7 +540,8 @@ sub parse_chunks {
             if ($line =~ /^\.constants\s*?$/ ) {
                 $state = 'constants';
             }
-            else {
+            else
+            {
                 die "Invalid M0: expected constants segment start, got '$line' at line $$cursor";
             }
         }
@@ -568,12 +572,14 @@ sub parse_chunks {
                     }
                     $const =~ s/&/&:/;
                 }
-                else {
+                else
+                {
                     die "unhandled constant type: '$const' at line $$cursor";
                 }
                 push @constants, $const;
             }
-            else {
+            else
+            {
                 die "Invalid M0: expected constants segment data or metadata segment start, got '$line' at line $$cursor";
             }
         }
@@ -584,7 +590,8 @@ sub parse_chunks {
             elsif ($line =~ /(\d+)\s+(\d+)\s+(\d+)\s*$/) {
                 push @metadata, $line;
             }
-            else {
+            else
+            {
                 die "Invalid M0: expected metadata segment data or bytecode segment start, got '$line' at line $$cursor";
             }
         }
@@ -596,13 +603,14 @@ sub parse_chunks {
                 push @$chunks, {%chunk};
                 (@constants, @metadata, @bytecode) = ((),(),());
                 %chunk = ();
-                $chunk{name} = $+{name}; 
+                $chunk{name} = $+{name};
                 $state = 'chunk start';
             }
             elsif ($line =~ /^[^\.].*/) {
                 push @bytecode, $line;
             }
-            else {
+            else
+            {
                 die "Invalid M0: expected bytecode segment data or start of new chunk, got '$line' at line $$cursor";
             }
         }
