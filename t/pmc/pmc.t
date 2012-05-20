@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 14;
 use Parrot::PMC '%pmc_types';
 
 =head1 NAME
@@ -145,18 +145,6 @@ OK2:  print "ok 2\n"
 CODE
 ok 1
 ok 2
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "Env PMCs are singletons" );
-.sub main :main
-    new $P0, ['Env']
-    new $P1, ['Env']
-    eq_addr $P0, $P1, ok
-    print "not the same "
-ok: print "ok\n"
-.end
-CODE
-ok
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "issame" );

@@ -16,7 +16,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 94
+.const int TESTS = 92
 
 .macro EXP()
   exp_nok:
@@ -176,8 +176,6 @@ Tests all non-branching conditional operators.
   init:
     $S0 = 'FUBAR'
     local_branch jmpstack,  exp_ok
-
-    $S0 = 'Integer'
     local_branch jmpstack,  test_it
     .return()
 

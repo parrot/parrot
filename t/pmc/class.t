@@ -589,7 +589,7 @@ t_class_meth:
 
 .sub 'new with init hash exceptions'
     .local pmc class, init_hash, null_pmc
-    null_pmc = new ['Null']
+    null_pmc = null
 
     init_hash = new ['Hash']
     init_hash['name'] = ""

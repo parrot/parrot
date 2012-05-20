@@ -243,7 +243,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "export_to -- success with hash (null value
     a_foo()
     load_bytecode "$temp_b.pir"
     .local pmc nsr, nsa, nsb, ar, nul
-    nul = new ['Null']
+    nul = null
     ar  = new ['Hash']
     ar["b_foo"] = nul
     nsr = get_root_namespace

@@ -208,7 +208,7 @@ Although NameSpace.'export_to'() is used in test_more.pir.
     $P2 = $P0[$P1]
     $I0 = isnull $P2
     is($I0, 0, "can lookup nested namespace by RSA")
-    say $P2
+    #say $P2
     $I0 = isa $P2, "NameSpace"
     is($I0, 1, "can lookup nested namespace by RSA - isa NameSpace")
     # TODO: Get the function from this namespace and call it to verify we have
@@ -715,7 +715,7 @@ CODE
 
             ar = new ['ResizableStringArray']
             push ar, 'baz'
-            nsa = new ['Null']
+            nsa = null
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)
         .end
@@ -743,7 +743,7 @@ CODE
         .sub 'test' :main
             .local pmc nsa, nsb, ar
 
-            ar = new ['Null']
+            ar = null
             nsa = get_namespace
             nsb = get_namespace ['Foo']
             nsb.'export_to'(nsa, ar)

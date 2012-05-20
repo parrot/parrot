@@ -689,7 +689,7 @@ handle_p:
     push array, 'a'
     push array, 'b'
     push array, 'c'
-    $P0 = new ['Null']
+    $P0 = null
     push array, $P0
     push array, 'e'
     $P0 = new ['Undef']
@@ -781,7 +781,7 @@ handle_p:
 
     $P2 = new ['FixedPMCArray']
     $P2 = 2
-    $P0 = new ['Null']
+    $P0 = null
     $P2[0] = $P0
     $P2[1] = 'e'
     $P0 = new ['Undef']
