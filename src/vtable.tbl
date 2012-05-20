@@ -224,8 +224,6 @@ INTVAL hashvalue()
 
 opcode_t* invoke(void* next)
 
-INTVAL can(STRING* method)
-
 INTVAL does_pmc(PMC* role)
 INTVAL does(STRING* role)
 

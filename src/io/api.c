@@ -163,7 +163,7 @@ Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path), ARGIN
     ASSERT_ARGS(Parrot_io_open_handle)
     PMC *filehandle;
     const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
-                                                   Parrot_PMC_typenum(interp, "FileHandle"));
+                                                        enum_class_FileHandle);
     if (PMC_IS_NULL(pmc)) {
         filehandle = Parrot_pmc_new(interp, typenum);
     }

@@ -90,12 +90,12 @@ static INTVAL get_attrib_index_keyed(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* This finds the index of an attribute in an object's attribute store and
- * returns it. Returns -1 if the attribute does not exist. */
-
 /*
 
 =item C<static INTVAL get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)>
+
+Find the index of an attribute in an object's attribute store and return it.
+Return -1 if the attribute does not exist.
 
 =cut
 
@@ -188,6 +188,9 @@ get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(S
 
 =item C<static PMC * find_cached(PARROT_INTERP, PMC *_class, STRING *name)>
 
+Search for a method in a class' method cache, if available.  If no cache is
+available, return PMCNULL.
+
 =cut
 
 */
@@ -211,6 +214,8 @@ find_cached(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *name))
 
 =item C<static void cache_method(PARROT_INTERP, PMC *_class, STRING *name, PMC
 *method)>
+
+Add a method to a class' method cache.  If no method cache exists, create one.
 
 =cut
 
@@ -651,23 +656,6 @@ Get the namespace PMC associated with the class that this object is an instance 
         }
 
        return VTABLE_inspect_str(INTERP, classobj, CONST_STRING(INTERP, "namespace"));
-    }
-
-
-/*
-
-=item C<INTVAL can(STRING *method_name)>
-
-Returns 0 if the class does not have a method with the given name and a
-non-zero value if it does.
-
-=cut
-
-*/
-
-    VTABLE INTVAL can(STRING *method_name) {
-        PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
-        return !PMC_IS_NULL(m);
     }
 
 

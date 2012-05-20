@@ -626,3 +626,11 @@
   tags:
     - experimental
   ticket: 'https://github.com/parrot/parrot/issues/717'
+
+  name : 'rindex opcode'
+  note :
+    The new rindex_i_s_s and rindex_i_s_s_i opcodes are experimental. They
+    duplicate functionality found in the String PMC reverse_index method.
+  tags :
+    - experimental
+  ticket : 'https://github.com/parrot/parrot/issues/767'

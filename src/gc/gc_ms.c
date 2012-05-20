@@ -385,7 +385,7 @@ static void
 failed_allocation(unsigned int line, unsigned long size)
 {
     fprintf(stderr, "Failed allocation of %lu bytes\n", size);
-    do_panic(NULL, "Out of mem", __FILE__, line);
+    Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
 }
 
 /*

@@ -282,6 +282,13 @@ The return value is based at "0".
 If the string is null, or the substring is not found or is null,
 B<index> returns "-1".
 
+=item B<rindex>(out INT, in STR, in STR)
+
+=item B<rindex>(out INT, in STR, in STR, in INT)
+
+Search the string for the last instance of the substring from the end. If
+Provided, a match will not be found after $4.
+
 =cut
 
 inline op index(out INT, in STR, in STR)  {
@@ -292,6 +299,15 @@ inline op index(out INT, in STR, in STR, in INT)  {
     $1 = ($2 && $3) ? STRING_index(interp, $2, $3, $4) : -1;
 }
 
+inline op rindex(out INT, in STR, in STR) {
+    STRING * const str = $2;
+    $1 = Parrot_str_find_reverse_index(interp, str, $3, STRING_length(str));
+}
+
+inline op rindex(out INT, in STR, in STR, in INT) {
+    STRING * const str = $2;
+    $1 = Parrot_str_find_reverse_index(interp, str, $3, $4);
+}
 
 =item B<sprintf>(out STR, in STR, invar PMC)
 

@@ -29,13 +29,12 @@ Tests the C<osutils> runtime library.
     #       functions called before them!                                #
     ######################################################################
 
-    plan(28)
+    plan(26)
     test_basename()
     test_dirname()
     test_catfile()
     test_splitpath()
     test_newer()
-    test_rindex()
     test_file_exists()
     test_mkpath()
     test_cp()
@@ -101,14 +100,6 @@ Tests the C<osutils> runtime library.
 
     $I0 = newer('runtime/parrot/library/osutils.pir', $P0)
     nok($I0, "newer('osutils.pir', ['osutils.pir', 'stat.pasm'])")
-.end
-
-.sub 'test_rindex'
-    $I0 = rindex('abc', '.')
-    is($I0, -1, "rindex('abc', '.')")
-
-    $I0 = rindex('abc.def.ghi', '.')
-    is($I0, 7, "rindex('abc.def.ghi', '.')")
 .end
 
 .sub 'test_file_exists'

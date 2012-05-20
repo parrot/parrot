@@ -20,10 +20,9 @@ Tests various io opcodes.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(60)
+    plan(59)
 
     read_on_null()
-    open_delegates_to_filehandle_pmc()
     test_bad_open()
     open_pipe_for_reading()
     getfd_fdopen()
@@ -42,27 +41,6 @@ Tests various io opcodes.
     # must come after (these don't use test_more)
     open_pipe_for_writing()
     read_invalid_fh()
-.end
-
-.sub open_delegates_to_filehandle_pmc
-    load_bytecode 'P6object.pbc'
-
-    .local pmc p6meta, interp, classes, classid
-    p6meta = get_root_global ["parrot"], "P6metaclass"
-    p6meta.'new_class'('Testing')
-
-    interp = getinterp
-    classes = interp[0]
-    classid = classes['Testing']
-    $I0 = classes['FileHandle']
-    set classes['FileHandle'], classid
-
-    $P1 = open '/foo'
-    is($P1,42,'open opcode delegates to the open method on the FileHandle PMC')
-
-    # replace the original, so we don't break other tests
-    set classes['FileHandle'], $I0
-
 .end
 
 .sub 'test_bad_open'
@@ -261,7 +239,7 @@ CODE
 .end
 
 .sub 'test_open_p_s_s'
-    $S0 = "README"
+    $S0 = "README.pod"
     $S1 = "r"
     $P0 = open $S0, $S1
     $I0 = defined $P0
@@ -270,7 +248,7 @@ CODE
 
 .sub 'test_seek_tell'
     $S0 = 'r'
-    $P0 = open "README", $S0
+    $P0 = open "README.pod", $S0
     $I0 = tell $P0
     is( $I0, 0, 'tell_i_p' )
 
@@ -403,8 +381,8 @@ CODE
 .sub 'test_peek'
     .include 'stat.pasm'
 
-    $I0 = stat 'README', .STAT_FILESIZE
-    $P0 = open 'README', 'r'
+    $I0 = stat 'README.pod', .STAT_FILESIZE
+    $P0 = open 'README.pod', 'r'
     close $P0
     $P1 = getstdin
 
@@ -423,7 +401,7 @@ CODE
 .sub 'test_read'
     getstdin $P1
 
-    $P0 = open 'README', 'r'
+    $P0 = open 'README.pod', 'r'
     $I0 = 4
 
     setstdin $P0

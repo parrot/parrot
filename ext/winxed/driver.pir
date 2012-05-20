@@ -1,4 +1,6 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
+# Compiled with Winxed 1.8.2
+# Source file: winxed_installed.winxed
 # Begin generated code
 
 .sub initial_load_bytecode :anon :load :init
@@ -149,13 +151,10 @@
     unless $P5 goto __label_5
     shift $P1, $P5
     $S1 = $P1[0]
-    length $I4, $S1
-    isgt $I3, $I4, 1
-    unless $I3 goto __label_8
+    length $I3, $S1
+    le $I3, 1, __label_6
     substr $S2, $S1, 1, 1
-    isne $I3, $S2, '='
-  __label_8:
-    unless $I3 goto __label_6
+    eq $S2, '=', __label_6
     concat $S3, '--', $S1
     set $S1, $S3
     goto __label_7
@@ -211,14 +210,11 @@
         .param string __ARG_2
     null $S1
     length $I1, __ARG_1
-    isgt $I2, $I1, 7
-    unless $I2 goto __label_3
+    le $I1, 7, __label_1
     substr $S2, __ARG_1, -7
-    iseq $I2, $S2, '.winxed'
-  __label_3:
-    unless $I2 goto __label_1
-    sub $I3, $I1, 7
-    substr $S3, __ARG_1, 0, $I3
+    ne $S2, '.winxed', __label_1
+    sub $I2, $I1, 7
+    substr $S3, __ARG_1, 0, $I2
     concat $S4, $S3, __ARG_2
     set $S1, $S4
     goto __label_2
@@ -334,82 +330,71 @@
     die $S8
   __label_11: # switch end
   __label_7: # endif
-    isnull $I7, $S3
-    not $I7
-    unless $I7 goto __label_17
-    not $I7, $I2
-  __label_17:
-    unless $I7 goto __label_16
+    if_null $S3, __label_16
+    if $I2 goto __label_16
     die '-o without -c or --target is not supported yet'
   __label_16: # endif
     $P4 = WSubId_1()
     null $P5
     null $S4
     new $P13, 'ExceptionHandler'
-    set_label $P13, __label_18
+    set_label $P13, __label_17
     $P13.'handle_types'(567)
     push_eh $P13
-    unless_null $S2, __label_20
+    unless_null $S2, __label_19
     elements $I7, __ARG_1
-    ge $I7, 1, __label_22
+    ge $I7, 1, __label_21
     say "ERROR: No program specified"
     $P1.'showhelp'()
     exit 1
-  __label_22: # endif
+  __label_21: # endif
     $S5 = __ARG_1[0]
-    set $I7, $I2
-    unless $I7 goto __label_24
-    isnull $I7, $S3
-  __label_24:
-    unless $I7 goto __label_23
+    unless $I2 goto __label_22
+    unless_null $S3, __label_22
     $P13 = WSubId_3($S5, '.pir')
     set $S4, $P13
-  __label_23: # endif
+  __label_22: # endif
     $P5 = $P4.'compile_from_file'($S5, $P3 :flat :named)
-    goto __label_21
-  __label_20: # else
+    goto __label_20
+  __label_19: # else
     null $P6
     null $P7
-    unless $I2 goto __label_25
-    unless_null $S4, __label_26
+    unless $I2 goto __label_23
+    unless_null $S4, __label_24
     set $S4, $S3
-  __label_26: # endif
-    isnull $I7, $S4
-    not $I7
-    unless $I7 goto __label_29
-    isne $I7, $S4, "-"
-  __label_29:
-    unless $I7 goto __label_27
+  __label_24: # endif
+    if_null $S4, __label_25
+    eq $S4, "-", __label_25
     root_new $P7, ['parrot';'FileHandle']
     $P7.'open'($S4,'w')
     set $P6, $P7
-    goto __label_28
-  __label_27: # else
+    goto __label_26
+  __label_25: # else
     getstdout $P6
-  __label_28: # endif
+  __label_26: # endif
     $P3['output'] = $P6
-  __label_25: # endif
+  __label_23: # endif
     concat $S6, 'function main[main](argv){', $S2
     concat $S6, $S6, ';}'
     $P5 = $P4.'compile'($S6, $P3 :flat :named)
-    unless $I2 goto __label_30
-    if_null $P7, __label_32
+    unless $I2 goto __label_27
+    if_null $P7, __label_29
     $P7.'close'()
-  __label_32: # endif
+  __label_29: # endif
     exit 0
-    goto __label_31
-  __label_30: # else
+    goto __label_28
+  __label_27: # else
     __ARG_1.'unshift'('__EVAL__')
-  __label_31: # endif
-  __label_21: # endif
+  __label_28: # endif
+  __label_20: # endif
     pop_eh
-    goto __label_19
-  __label_18:
+    goto __label_18
+  __label_17:
     .get_results($P8)
     finalize $P8
     pop_eh
     $P9 = $P8["payload"]
-    if_null $P9, __label_33
+    if_null $P9, __label_30
     getattribute $P13, $P9, 'filename'
     getattribute $P14, $P9, 'line'
     getattribute $P15, $P9, 'message'
@@ -421,58 +406,58 @@
     print $P0, $P15
     print $P0, "\n"
 
-    goto __label_34
-  __label_33: # else
+    goto __label_31
+  __label_30: # else
     $P16 = $P8["message"]
     getstderr $P0
     print $P0, $P16
     print $P0, "\n"
 
-  __label_34: # endif
+  __label_31: # endif
     exit 1
-  __label_19:
-    unless $I2 goto __label_35
-    unless_null $S4, __label_36
+  __label_18:
+    unless $I2 goto __label_32
+    unless_null $S4, __label_33
     set $S4, $S3
-  __label_36: # endif
+  __label_33: # endif
     isnull $I6, $S4
     not $I6
-    unless $I6 goto __label_37
+    unless $I6 goto __label_34
     isne $I6, $S4, "-"
-  __label_37:
-    unless $I6 goto __label_39
+  __label_34:
+    unless $I6 goto __label_36
     root_new $P10, ['parrot';'FileHandle']
     $P10.'open'($S4,'w')
-    goto __label_38
-  __label_39:
+    goto __label_35
+  __label_36:
     getstdout $P13
     set $P10, $P13
-  __label_38:
+  __label_35:
     $P10.'print'($P5)
-    unless $I6 goto __label_40
+    unless $I6 goto __label_37
     $P10.'close'()
-  __label_40: # endif
+  __label_37: # endif
     exit 0
-  __label_35: # endif
+  __label_32: # endif
     null $P11
     new $P13, 'ExceptionHandler'
-    set_label $P13, __label_41
+    set_label $P13, __label_38
     push_eh $P13
     $P15 = $P5.'subs_by_tag'("load")
-    if_null $P15, __label_44
+    if_null $P15, __label_41
     iter $P17, $P15
     set $P17, 0
-  __label_43: # for iteration
-    unless $P17 goto __label_44
+  __label_40: # for iteration
+    unless $P17 goto __label_41
     shift $P12, $P17
     $P12()
-    goto __label_43
-  __label_44: # endfor
+    goto __label_40
+  __label_41: # endfor
     $P5.'mark_initialized'("load")
     $P11 = $P5.'main_sub'()
     pop_eh
-    goto __label_42
-  __label_41:
+    goto __label_39
+  __label_38:
     .get_results($P14)
     finalize $P14
     pop_eh
@@ -480,7 +465,7 @@
     print $P0, "Cannot find main sub"
     print $P0, "\n"
 
-  __label_42:
+  __label_39:
     .return($P11)
 
 .end # process_args

@@ -136,7 +136,7 @@ Also check "Preserve my pre-formatted text".
 
 =head1 SEE ALSO
 
-F<README>, F<RESPONSIBLE_PARTIES>.
+F<README.pod>, F<RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1
 

@@ -634,22 +634,6 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
 /*
 
-=item C<INTVAL can(STRING *method)>
-
-Reports whether the PMC "can" perform C<method>.
-If the PMC implements the vtable function C<method>,
-true (1) is returned; otherwise, false (0) is returned.
-
-=cut
-
-*/
-
-    VTABLE INTVAL can(STRING *method) {
-        return !PMC_IS_NULL(VTABLE_find_method(INTERP, SELF, method));
-    }
-
-/*
-
 =item C<INTVAL does(STRING *interface_name)>
 
 Reports whether the PMC "does" perform C<interface_name>.

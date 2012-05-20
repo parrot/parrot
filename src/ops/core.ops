@@ -832,7 +832,7 @@ inline op die(in PMC) :flow {
 
 inline op die(in INT, in INT) :flow {
     if ($1 == EXCEPT_doomed)
-        _exit($2);
+        Parrot_x_jump_out(interp, $2);
     else {
         opcode_t        *dest;
         opcode_t * const ret       = expr NEXT();

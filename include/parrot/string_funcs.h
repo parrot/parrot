@@ -167,6 +167,16 @@ INTVAL Parrot_str_find_not_cclass(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_str_find_reverse_index(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    ARGIN(const STRING *search),
+    INTVAL start)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 void Parrot_str_finish(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -540,6 +550,10 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
     , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_Parrot_str_find_not_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_str_find_reverse_index __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_Parrot_str_finish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_format_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -663,6 +677,152 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/api.c */
+
+/* HEADERIZER BEGIN: src/string/sprintf.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+int Parrot_fprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+int Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_psprintf(PARROT_INTERP,
+    ARGIN(STRING *pat),
+    ARGOUT(PMC *ary))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*ary);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+Parrot_secret_snprintf(
+    ARGOUT(char *buffer),
+    size_t len,
+    ARGIN(const char *format),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer);
+
+PARROT_EXPORT
+void Parrot_snprintf(PARROT_INTERP,
+    ARGOUT(char *targ),
+    size_t len,
+    ARGIN(const char *pat),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*targ);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+int Parrot_vfprintf(PARROT_INTERP,
+    ARGIN(Parrot_PMC pio),
+    ARGIN(const char *s),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+void Parrot_vsnprintf(PARROT_INTERP,
+    ARGMOD(char *targ),
+    size_t len,
+    ARGIN(const char *pat),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*targ);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_vsprintf_c(PARROT_INTERP,
+    ARGIN(const char *pat),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_Parrot_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pio) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_psprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat) \
+    , PARROT_ASSERT_ARG(ary))
+#define ASSERT_ARGS_Parrot_secret_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_sprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_sprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pio) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_vsnprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vsprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+#define ASSERT_ARGS_Parrot_vsprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/string/sprintf.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

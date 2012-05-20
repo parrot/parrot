@@ -175,10 +175,8 @@ Frees the scheduler's underlying struct.
 
 */
     VTABLE void destroy() {
-        Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
+        UNUSED(SELF);
         UNUSED(interp);
-
-        core_struct->interp->scheduler = NULL;
     }
 
 

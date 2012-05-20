@@ -482,26 +482,27 @@ struct _imc_info_t {
     SymReg               *keys[IMCC_MAX_FIX_REGS]; /* TODO key overflow check */
     AsmState              asm_state;
     SymHash               ghash;
-    jmp_buf               jump_buf;        /* The jump for error  handling */
+    jmp_buf               jump_buf;          /* The jump for error  handling */
     int                   IMCC_DEBUG;
     int                   cnr;
     int                   debug;
     int                   dont_optimize;
     int                   emitter;
-    int                   error_code;      /* The Error code. */
+    int                   error_code;        /* The Error code. */
     int                   expect_pasm;
     int                   imcc_warn;
     int                   in_pod;
     int                   ins_line;
     int                   keyvec;
-    int                   line;                   /* current line number */
+    int                   line;              /* current line number */
     int                   optimizer_level;
     int                   nargs;
     int                   n_comp_units;
     int                   nkeys;
-    int                   compiler_state;         /* see PBC_* flags */
+    int                   compiler_state;    /* see PBC_* flags */
     int                   verbose;
     int                   seen_main;
+    int                   unique_count;      /* A compile-time unique value */
     opcode_t              npc;
 };
 

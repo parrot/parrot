@@ -282,7 +282,7 @@ op get_context(out PMC) {
 =cut
 
 op new_call_context(out PMC) {
-    $1 = Parrot_pmc_new(interp, enum_class_CallContext);
+    $1 = Parrot_pcc_new_call_object(interp);
 }
 
 =item B<invokecc>(invar PMC, invar PMC)

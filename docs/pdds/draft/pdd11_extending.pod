@@ -94,7 +94,7 @@ will not change the original in any way.
 
 This memory will I<not> be reclaimed by garbage collection, nor may it be
 returned to the system with C<free>. It must be returned with
-C<Parrot_free_cstring>.
+C<Parrot_str_free_cstring>.
 
 =item C<Parrot_PMC_get_cstring_intkey(interp, pmc, Parrot_Int key)>
 
@@ -111,7 +111,7 @@ of an integer that will get the length of the string as Parrot knows it.
 
 This memory will I<not> be reclaimed by garbage collection, nor may it be
 returned to the system with C<free>. It must be returned with
-C<Parrot_free_cstring>.
+C<Parrot_str_free_cstring>.
 
 =item C<Parrot_PMC_get_cstringn_intkey(interp, pmc, &len, Parrot_Int key)>
 
