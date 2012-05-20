@@ -176,10 +176,7 @@ Tests all non-branching conditional operators.
   init:
     $S0 = 'FUBAR'
     local_branch jmpstack,  exp_ok
-    local_branch jmpstack,  test_it
-    $S0 = 'Null' # this is a valid pmc type -- you can't trick parrot :)
-    local_branch jmpstack,  exp_nok
-    local_branch jmpstack,  test_it
+
     $S0 = 'Integer'
     local_branch jmpstack,  test_it
     .return()

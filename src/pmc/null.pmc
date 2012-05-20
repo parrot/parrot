@@ -49,8 +49,9 @@ Overrides the default to do nothing.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         UNUSED(SELF)
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot create a new Null PMC");
     }
 
     VTABLE INTVAL does(STRING *what) {

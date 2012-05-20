@@ -398,7 +398,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - null + empty strin
     load_bytecode 'Test/More.pbc'
     .local pmc exporter, src, globals, nul
 
-    nul     = new ['Null']
+    nul     = null
     src     = get_namespace [ 'Test'; 'More' ]
     globals = new ['Hash']
     globals['ok'] = nul
