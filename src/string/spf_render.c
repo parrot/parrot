@@ -334,24 +334,28 @@ canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
 
     /* Scan the formatted number backward to find the positions of the
        last digit, leftmost non-0 exponent digit, sign, and E. */
-
     for (i = len-1; i >= 0 && e_pos == 0; --i) {
         switch (tc[i]) {
             case '1': case '2': case '3':
             case '4': case '5': case '6':
-            case '7': case '8': case '9':   non0_pos = i;
-                                            /* fall through */
+            case '7': case '8': case '9':
+                non0_pos = i;
+                /* fall through */
 
-            case '0':                       if (last_pos == len) last_pos = i;
-                                            break;
+            case '0':
+                if (last_pos == len) last_pos = i;
+                break;
 
-            case '+': case '-':             sign_pos = i;
-                                            break;
+            case '+': case '-':
+                sign_pos = i;
+                break;
 
-            case 'E': case 'e':             e_pos = i;
-                                            break;
+            case 'E': case 'e':
+                e_pos = i;
+                break;
 
-            default:                        break;
+            default:
+                break;
         }
     }
 
@@ -367,8 +371,8 @@ canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
            adjust the length. Don't forget to move the NUL. */
 
         const size_t keep = (last_pos - non0_pos + 1 > exp_digits)
-                        ? len - non0_pos
-                        : exp_digits + (len - last_pos - 1);
+                          ? len - non0_pos
+                          : exp_digits + (len - last_pos - 1);
 
         memmove(&tc[sign_pos+1], &tc[len - keep], keep+1);
         len = sign_pos + 1 + keep;
