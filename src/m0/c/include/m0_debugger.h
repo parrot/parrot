@@ -34,7 +34,7 @@ typedef enum {
 void debugger(int argc, const char* argv[], M0_Interp *interp, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc);
 
 
-#   define M0_DEBUGGER_H 1
+#  define M0_DEBUGGER_H 1
 #endif
 
 /*

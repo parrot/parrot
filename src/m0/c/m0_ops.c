@@ -12,7 +12,7 @@ Copyright (C) 2011-2012, Parrot Foundation.
 #include "include/m0_compiler_defines.h"
 
 #ifdef M0_DEBUGGER
-#   include "include/m0_debugger.h"
+#  include "include/m0_debugger.h"
 #endif
 
 #define M0_DEBUG 0

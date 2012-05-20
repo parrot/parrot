@@ -1,5 +1,5 @@
 #ifndef M0_MOB_STRUCTURES_H
-#   include <stdint.h>
+#  include <stdint.h>
 
 typedef struct M0_Constants_Segment {
     uint64_t       *consts;
@@ -33,7 +33,7 @@ typedef struct M0_Chunk {
     M0_Bytecode_Segment  *bytecode;
 } M0_Chunk;
 
-#   define M0_MOB_STRUCTURES_H 1
+#  define M0_MOB_STRUCTURES_H 1
 #endif
 
 /*
