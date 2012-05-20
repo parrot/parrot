@@ -527,7 +527,7 @@ debug_list_breakpoints(char * arg, M0_Debugger_Info* db_info)
     UNUSED(arg);
     printf("There are %d breakpoint(s)\n", n_bp);
     for( ; i < n_bp; i++)
-        printf("Breakpoint #%d:\tPC=%d\n", i, db_info->breakpoints[i]);
+        printf("Breakpoint #%u:\tPC=%lu\n", i, db_info->breakpoints[i]);
 }
 
 static void
