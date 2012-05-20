@@ -16,7 +16,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 96
+.const int TESTS = 94
 
 .macro EXP()
   exp_nok:
@@ -86,9 +86,7 @@ Tests all non-branching conditional operators.
     local_branch jmpstack,  exp_ok
     $P1 = $P0
     local_branch jmpstack,  test_it   # ok
-    $P0 = new 'Null'
-    $P1 = new 'Null'
-    local_branch jmpstack,  test_it   # ok -- Null is a singleton
+
     .return()
 
     .EXP()
@@ -114,9 +112,6 @@ Tests all non-branching conditional operators.
     $P1 = $P0
     local_branch jmpstack,  exp_nok
     local_branch jmpstack,  test_it   # not ok
-    $P0 = new 'Null'
-    $P1 = new 'Null'
-    local_branch jmpstack,  test_it   # not ok -- Null is a singleton
     .return()
 
     .EXP()

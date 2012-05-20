@@ -30,7 +30,8 @@ static void null_pmc_access(PARROT_INTERP, int index)
 pmclass Null {
 
     void class_init() {
-        PMCNULL = Parrot_pmc_new_noinit(interp, entry);
+        if (PMCNULL == NULL)
+            PMCNULL = Parrot_pmc_new_noinit(interp, entry);
     }
 
 /*

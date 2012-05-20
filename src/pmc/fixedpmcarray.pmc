@@ -629,8 +629,7 @@ The C<==> operation. Compares two array to hold equal elements.
             if (item1 == item2)
                 continue;
 
-            if (item1->vtable->base_type == enum_class_Null
-            ||  item2->vtable->base_type == enum_class_Null)
+            if (PMC_IS_NULL(item1) || PMC_IS_NULL(item2))
                 return 0;
 
             if (!VTABLE_is_equal(INTERP, item1, item2))

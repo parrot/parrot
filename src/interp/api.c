@@ -190,8 +190,6 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = NULL;
         if (!emergency_interp)
             emergency_interp = interp;
-
-        PMCNULL = NULL;
     }
 
     /* Must initialize flags before Parrot_gc_initialize() is called

@@ -124,7 +124,7 @@ static void propagate_std_props(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 
-PMC * PMCNULL;
+PMC * PMCNULL = NULL;
 
 /*
 
