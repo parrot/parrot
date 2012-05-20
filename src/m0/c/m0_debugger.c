@@ -362,21 +362,20 @@ char * get_line(char* str, size_t size, FILE *f) {
         if (str[last] == '\n')
             str[last] = '\0';
     }
+    if(0 == strlen(str)) {
+        free(p);
+        p = NULL;
+    }
     return p;
 }
 
 char *
-get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg) {
-    char *input, *p;
+get_script_file_input(char *filename, char *input) {
+    char *p;
     static FILE *pFile = NULL;
 
-    input = calloc(100, sizeof(char));
-
     if(pFile == NULL) {
-        if(db_info->input_source == NULL)
-            pFile = stdin;
-        else
-            pFile = fopen(db_info->input_source, "r");
+        pFile = fopen(filename, "r");
     }
 
     if(pFile == NULL)
@@ -384,14 +383,24 @@ get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg
 
     p = get_line(input, 100, pFile);
 
-    if(db_info->input_source != NULL) {
-        if(feof(pFile)) {
-            fclose(pFile);
-            return NULL;
-        }
+    if(feof(pFile)) {
+        fclose(pFile);
+        return NULL;
     }
+    return p;
+}
+
+char *
+get_db_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *input) {
+    char *p;
+
+    if(db_info->input_source)
+        p = get_script_file_input(db_info->input_source, input);
+    else
+        p = get_line(input, 100, stdin);
 
     if (p) {
+        char *arg = NULL;
         char *tok = NULL;
 
         if(db_info->input_source != NULL)
@@ -404,11 +413,14 @@ get_db_user_input(M0_Debugger_Info *db_info, M0_Debugger_Command *cmd, char *arg
             return input;
 
         tok = strtok(NULL, " ");
-        if(tok)
+        if(tok) {
+            arg = (char*)realloc(arg, (strlen(tok)+1) * sizeof(char));
+            if(!arg)
+                perror("Could not allocate memory for arg");
             strcpy(arg,tok);
-        return input;
+        }
+        return arg;
     }
-    free((void *)input);
     return NULL;
 }
 
@@ -550,15 +562,24 @@ print_help()
 static void
 db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops, const unsigned long pc)
 {
-    static M0_Debugger_Command cmd = None;
-    static char *arg;
-    int done = 0;
-    if(!arg)
-        arg = calloc(98, sizeof(char));
+    static M0_Debugger_Command  last_cmd   = None;
+    static char                *last_arg   = NULL;
+    int                         done       = 0;
+    char                       *user_input = calloc(100, sizeof(char));
+
     while(!done) {
-        char * user_input = NULL;
+        M0_Debugger_Command  cmd = None;
+        char                *arg = NULL;
         printf("PC=%lu> ", pc);
-        user_input = get_db_user_input(db_info, &cmd, arg);
+        arg = get_db_input(db_info, &cmd, user_input);
+        if(cmd == None) {
+            cmd = last_cmd;
+            arg = last_arg;
+        }
+        else {
+            last_cmd = cmd;
+            last_arg = arg;
+        }
         switch (cmd) {
             case Continue:
                 if(db_info->n_breakpoints > 0)
@@ -599,6 +620,7 @@ db_prompt(M0_Debugger_Info *db_info, M0_CallFrame *cf, const unsigned char *ops,
                 printf("type 'h' for help\n");
         }
     }
+    free(user_input);
 }
 
 int
