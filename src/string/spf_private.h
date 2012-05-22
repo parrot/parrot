@@ -97,7 +97,6 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
 /*
  * Local variables:
  *   c-file-style: "parrot"
- *   buffer-read-only: t
  * End:
- * vim: expandtab shiftwidth=4:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
