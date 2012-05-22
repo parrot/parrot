@@ -930,7 +930,8 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                  */
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_CHARACTER,
-                    "Catastrophic sprintf error. Your input is very bad. Please file a bug report.");
+                    "Catastrophic sprintf error. Your input is very bad. "
+                    "Please file a bug report.");
             }
         }
 

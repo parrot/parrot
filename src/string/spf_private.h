@@ -10,8 +10,8 @@ src/string/spf_private.h - private header file of the string/sprintf subsystem
 This is the private header file for the sprintf implementation.
 */
 
-#ifndef PARROT_STRING_PRIVATE_H
-#define PARROT_STRING_PRIVATE_H
+#ifndef PARROT_SPF_PRIVATE_H_GUARD
+#define PARROT_SPF_PRIVATE_H_GUARD
 
 /* The size of all our buffers (and the maximum width of a float
  * field).
@@ -92,4 +92,13 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/spf_render.c */
 
-#endif /* PARROT_STRING_PRIVATE_H */
+#endif /* PARROT_SPF_PRIVATE_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ *   buffer-read-only: t
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+ 
