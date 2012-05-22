@@ -429,7 +429,9 @@ handle, Parrot_Int fileno, Parrot_PMC *old_handle)>
 Set one of the C<interp_pmc>'s standard IO PMCs. The handle PMC C<handle> is
 an IO-type PMC (such as FileHandle or StringHandle). The fileno is one of
 C<0> for stdin, C<1> for stdout and C<2> for stderr. Other values are not
-(currently) allowed.
+(currently) allowed. The previous PMC for that handle is returned as 
+C<old_handle>. This function returns a true value if this call is successful 
+and false value otherwise.
 
 =cut
 
