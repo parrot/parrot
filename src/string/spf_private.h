@@ -101,4 +101,3 @@ STRING * Parrot_sprintf_format(PARROT_INTERP,
  * End:
  * vim: expandtab shiftwidth=4:
  */
- 

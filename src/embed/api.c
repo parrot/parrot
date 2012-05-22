@@ -43,7 +43,7 @@ C<exception> the last exception thrown, PMCNULL if none.
 C<exit_code> the exit code of the running program, if it expected to exit
 now. C<0> for no error.
 
-C<errmsg> contains an string with the last error message if any, 
+C<errmsg> contains an string with the last error message if any,
 C<STRINGNULL> if none.
 
 =cut
@@ -429,8 +429,8 @@ handle, Parrot_Int fileno, Parrot_PMC *old_handle)>
 Set one of the C<interp_pmc>'s standard IO PMCs. The handle PMC C<handle> is
 an IO-type PMC (such as FileHandle or StringHandle). The fileno is one of
 C<0> for stdin, C<1> for stdout and C<2> for stderr. Other values are not
-(currently) allowed. The previous PMC for that handle is returned as 
-C<old_handle>. This function returns a true value if this call is successful 
+(currently) allowed. The previous PMC for that handle is returned as
+C<old_handle>. This function returns a true value if this call is successful
 and false value otherwise.
 
 =cut
@@ -440,12 +440,12 @@ and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_stdhandle(Parrot_PMC interp_pmc, Parrot_PMC handle, 
+Parrot_api_set_stdhandle(Parrot_PMC interp_pmc, Parrot_PMC handle,
         Parrot_Int fileno, ARGOUT(Parrot_PMC *old_handle))
 {
     ASSERT_ARGS(Parrot_api_set_stdhandle)
     EMBED_API_CALLIN(interp_pmc, interp)
-    
+
     switch (fileno) {
         case PIO_STDIN_FILENO:
         case PIO_STDOUT_FILENO:
@@ -456,7 +456,7 @@ Parrot_api_set_stdhandle(Parrot_PMC interp_pmc, Parrot_PMC handle,
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Cannot set new handle %d. Must be one of 0, 1 or 2", fileno);
     }
-    
+
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
