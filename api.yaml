@@ -634,3 +634,11 @@
   tags :
     - experimental
   ticket : 'https://github.com/parrot/parrot/issues/767'
+
+  name : 'write_bytes and read_bytes methods'
+  note :
+    The .write_bytes and .read_bytes methods for the Handle PMC (inherited
+    by FileHandle and Socket, currently) are new and experimental.
+  tags :
+    - experimental
+  ticket : 'https://github.com/parrot/parrot/issues/610'
