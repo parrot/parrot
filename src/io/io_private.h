@@ -67,6 +67,11 @@ src/io/pipe.c:
 LOW-LEVEL DETAILS - These things implement the lowest-level logic and are
                     operating on PIOHANDLEs and raw data buffers.
 
+src/io/core.c:
+    Internal, core utility routines. These routines are general shared helper
+    routines for the IO subsystem and are not necessarily specific to
+    buffering or any single PMC type.
+
 src/io/buffer.c:
     Buffering logic, for handles that have buffering set up. The various IO
     VTABLE calls in the files above will redirect their calls through the
@@ -118,54 +123,6 @@ struct _ParrotIOData {
 #define _PIO_STDIN(i)   ((i)->piodata->table[PIO_STDIN_FILENO])
 #define _PIO_STDOUT(i)  ((i)->piodata->table[PIO_STDOUT_FILENO])
 #define _PIO_STDERR(i)  ((i)->piodata->table[PIO_STDERR_FILENO])
-
-/* IO VTABLEs */
-/* Legend:
-    _s: This function operates on a Parrot STRING*
-    _b: This function operates on a raw char* buffer (Possibly from ByteBuffer)
-*/
-
-typedef union _io_vtable_extra_data {
-    INTVAL i;
-    void * v;
-} io_vtable_extra_data;
-
-typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, size_t length);
-typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGOUT(char * buffer), size_t length);
-typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(STRING * s));
-typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(char * buffer), size_t length);
-typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, io_vtable_extra_data data);
-typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, PIOOFF_T loc);
-typedef STRING * (*io_vtable_peek_s)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(STRING *path), ARGIN(STRING *mode), io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_is_open)   (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, INTVAL autoflush);
-
-typedef struct _io_vtable {
-    io_vtable_read_s read_s;
-    io_vtable_read_b read_b;
-    io_vtable_write_s write_s;
-    io_vtable_write_b write_b;
-    io_vtable_readline_s readline_s;
-    io_vtable_readall_s readall_s;
-    io_vtable_flush flush;
-    io_vtable_is_eof is_eof;
-    io_vtable_open open;
-    io_vtable_is_open is_open;
-    io_vtable_close close;
-} Parrot_io_vtable;
-
-#define NUMBER_IO_VTABLES 5
-#define IO_VTABLE_FILEHANDLE        0
-#define IO_VTABLE_PIPE              1
-#define IO_VTABLE_SOCKET            2
-#define IO_VTABLE_STRINGHANDLE      3
-#define IO_VTABLE_USER              4
-extern Parrot_io_vtable io_vtables[NUMBER_IO_VTABLES];
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 
