@@ -1072,6 +1072,19 @@ CODE
 1
 OUT
 
+pir_output_is( sprintf(<<'CODE', $temp_file), "This is a", ".write_bytes" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = getinterp
+    $P1 = $P0.'stdout_handle'()
+
+    $P2 = new ['ByteBuffer']
+    $P2 = "This is a test"
+    $P1.'write_bytes'($P2, 9)
+.end
+
+CODE
+
 # GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent

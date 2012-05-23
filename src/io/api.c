@@ -671,7 +671,7 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid ByteBuffer");
 
-    GETATTR_ByteBuffer_content(interp, buffer, content);
+    content = (unsigned char *)VTABLE_get_pointer(interp, buffer);
     real_length = VTABLE_elements(interp, buffer);
     if (real_length < length)
         length = real_length;
