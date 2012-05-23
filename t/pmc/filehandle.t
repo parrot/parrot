@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME

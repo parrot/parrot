@@ -684,7 +684,8 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
             "Writing to a ByteBuffer from a StringHandle not implemented yet");
     }
     else if (handle->vtable->base_type == enum_class_Socket) {
-        return Parrot_io_socket_send_from_buffer(interp, handle, content, length);
+        return Parrot_io_socket_send_from_buffer(interp, handle,
+                (const char *)content, length);
     }
     else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
