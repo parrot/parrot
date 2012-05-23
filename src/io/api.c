@@ -159,7 +159,8 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path), ARGIN(STRING *mode))
+Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
+        ARGIN(STRING *mode))
 {
     ASSERT_ARGS(Parrot_io_open_handle)
     PMC *filehandle;
@@ -199,7 +200,8 @@ Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path), ARGIN
         }
         else {
             if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
                     "Invalid mode for file open");
 
             os_handle = PIO_OPEN(interp, path, flags);
@@ -294,7 +296,8 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTVAL flags)
+Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
+        INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_fdopen_flags)
 
@@ -583,10 +586,29 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
     return result;
 }
 
+/*
+
+=item C<PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, PMC *handle, PMC
+*buffer, INTVAL length)>
+
+Read C<length> bytes from the C<handle> into the C<buffer> (ByteBuffer) PMC.
+
+=item C<INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, PMC * handle, PMC
+*buffer, INTVAL length)>
+
+Write C<length> bytes (or the total length of C<buffer>, whichever is smaller)
+from C<buffer> to the C<handle>
+
+=cut
+
+*/
+
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), ARGMOD_NULLOK(PMC *buffer), INTVAL length)
+Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
+        ARGMOD_NULLOK(PMC *buffer), INTVAL length)
 {
     ASSERT_ARGS(Parrot_io_read_byte_buffer_pmc)
     unsigned char *content;
@@ -634,7 +656,8 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), ARGMOD_NULLOK
 }
 
 INTVAL
-Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle), ARGMOD(PMC *buffer), INTVAL length)
+Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
+        ARGMOD(PMC *buffer), INTVAL length)
 {
     ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
     unsigned char *content;

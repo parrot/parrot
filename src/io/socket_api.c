@@ -167,8 +167,25 @@ Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
     return res;
 }
 
+/*
+
+=item C<INTVAL Parrot_io_socket_recv_to_buffer(PARROT_INTERP, PMC *socket, char
+* buffer, size_t len)>
+
+Read C<len> bytes from C<socket> and add them to the C<buffer>.
+
+=item C<INTVAL Parrot_io_socket_send_from_buffer(PARROT_INTERP, PMC *socket,
+const char *buffer, size_t len)>
+
+Write C<len> bytes from C<buffer> to C<socket>.
+
+=cut
+
+*/
+
 INTVAL
-Parrot_io_socket_recv_to_buffer(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(char * buffer), size_t len)
+Parrot_io_socket_recv_to_buffer(PARROT_INTERP, ARGMOD(PMC *socket),
+        ARGOUT(char * buffer), size_t len)
 {
     ASSERT_ARGS(Parrot_io_socket_recv_to_buffer)
 
@@ -182,7 +199,8 @@ Parrot_io_socket_recv_to_buffer(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(char 
 }
 
 INTVAL
-Parrot_io_socket_send_from_buffer(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(const char *buffer), size_t len)
+Parrot_io_socket_send_from_buffer(PARROT_INTERP, ARGMOD(PMC *socket),
+        ARGIN(const char *buffer), size_t len)
 {
     ASSERT_ARGS(Parrot_io_socket_send_from_buffer)
     if (Parrot_io_socket_is_closed(interp, socket))
