@@ -1214,4 +1214,9 @@ N: svn
 U: svn
 E: svn@perl.org
 
+N: Bart Wiegmans
+E: bartwiegmans@gmail.com
+D: mod_parrot
+
+
 =cut
