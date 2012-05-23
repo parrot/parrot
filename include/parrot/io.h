@@ -77,15 +77,27 @@ extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;
 
-typedef struct _io_buffer {
-    size_t buffer_size;
+/* BUFFERING */
+typedef struct _io_buffer_base {
     INTVAL buffer_flags;
+    size_t buffer_size;
+    STR_VTABLE encoding;
     unsigned char *buffer_start;
     unsigned char *buffer_end;
     unsigned char *buffer_next;
-    STR_VTABLE encoding;
-} Parrot_io_buffer;
+} IO_BUFFER;
 
+typedef struct _io_buffer_mem {
+    IO_BUFFER base;
+}
+
+typedef struct _io_buffer_mmap {
+    IO_BUFFER base;
+    void *memhandle;    /* Handle or pointer for munmap/UnmapViewOfFile */
+}
+/* For examples of mmap-like behavior on windows, see:
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
+*/
 
 /* IO VTABLEs */
 /* Legend:
