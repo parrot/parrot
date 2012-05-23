@@ -18,9 +18,8 @@ retrieve arguments.
 
 */
 
-#define IN_SPF_SYSTEM
-
 #include "parrot/parrot.h"
+#include "spf_private.h"
 
 #include <stdarg.h>
 #include "spf_vtable.str"
