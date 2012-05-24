@@ -7,7 +7,9 @@ src/io/buffer.c - I/O buffering
 
 =head1 DESCRIPTION
 
-This file implements a collection of utility functions for I/O buffering.
+This file implements buffering logic for the IO subsystem. A buffer is a
+chunk of memory that can be used to store data so fewer OS-level transactions
+need to be performed.
 
 =head2 Functions
 
@@ -237,6 +239,10 @@ Parrot_io_buffer_content_size(PARROT_INTERP, IO_BUFFER *buffer)
     return buffer->buffer_size - (buffer->buffer_start - buffer->buffer_end);
 }
 
+/* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
+    These routines are the parts of the old system that are worth keeping,
+    for now. We need to up-convert these to the new architecture.
+*/
 
 /*
 
@@ -361,260 +367,6 @@ Parrot_io_setlinebuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
     return 0;
 
 }
-
-/*
-
-=item C<INTVAL Parrot_io_flush_buffer(PARROT_INTERP, PMC *filehandle)>
-
-Flush the I/O buffer for a given filehandle object.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_flush_buffer)
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-
-    /*
-     * Either buffering is null, disabled, or empty.
-     */
-    if (!buffer_start
-        || (Parrot_io_get_flags(interp, filehandle) & (PIO_F_BLKBUF | PIO_F_LINEBUF)) == 0
-        || (buffer_flags & (PIO_BF_WRITEBUF | PIO_BF_READBUF)) == 0)
-        return 0;
-    /*
-     * Write flush
-     */
-    if (buffer_flags & PIO_BF_WRITEBUF) {
-        /* Flush to next layer */
-        const size_t to_write = buffer_next - buffer_start;
-        size_t    wrote;
-        PIOHANDLE os_handle;
-
-        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-        wrote = PIO_WRITE(interp, os_handle, (char *)buffer_start, to_write);
-
-        if (wrote == to_write) {
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
-            /* Release buffer */
-            Parrot_io_set_buffer_flags(interp, filehandle, (buffer_flags & ~PIO_BF_WRITEBUF));
-            return 0;
-        }
-        else {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Attempt to flush invalid write buffer");
-        }
-    }
-    /*
-     * Read flush
-     */
-    else if (buffer_flags & PIO_BF_READBUF) {
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_start);
-        /* Release buffer */
-        Parrot_io_set_buffer_flags(interp, filehandle, (buffer_flags & ~PIO_BF_READBUF));
-    }
-    return -1;
-}
-
-/*
-
-=item C<size_t Parrot_io_fill_readbuf(PARROT_INTERP, PMC *filehandle)>
-
-The buffer layer's C<Fill> function.
-
-=cut
-
-*/
-
-size_t
-Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_fill_readbuf)
-    unsigned char * const buf = Parrot_io_get_buffer_start(interp, filehandle);
-    const size_t size = Parrot_io_get_buffer_size(interp, filehandle);
-    size_t            got;
-    PIOHANDLE         os_handle;
-
-    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-    got = PIO_READ(interp, os_handle, (char *)buf, size);
-
-    /* nothing to get */
-    if (got == 0) {
-        const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
-        Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
-        return 0;
-    }
-
-    Parrot_io_set_buffer_end(interp, filehandle, buf + got);
-    Parrot_io_set_buffer_next(interp, filehandle, buf);
-
-    Parrot_io_set_buffer_flags(interp, filehandle,
-            (Parrot_io_get_buffer_flags(interp, filehandle) | PIO_BF_READBUF));
-
-    return got;
-}
-
-
-/*
-
-=item C<size_t Parrot_io_read_buffer(PARROT_INTERP, PMC *filehandle, char *dest,
-size_t len)>
-
-The buffer layer's C<Read> function.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-size_t
-Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(char *dest), size_t len)
-{
-    ASSERT_ARGS(Parrot_io_read_buffer)
-    unsigned char *buffer_next, *buffer_end;
-    size_t         got;
-    size_t         current      = 0;
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    PIOOFF_T       file_pos     = Parrot_io_get_file_position(interp, filehandle);
-
-    /* write buffer flush */
-    if (buffer_flags & PIO_BF_WRITEBUF) {
-        Parrot_io_flush_buffer(interp, filehandle);
-        buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    }
-
-    buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
-
-    /* read Data from buffer */
-    if (buffer_flags & PIO_BF_READBUF) {
-        const size_t avail = buffer_end - buffer_next;
-        current            = avail < len ? avail : len;
-
-        memcpy(dest, buffer_next, current);
-
-        /* buffer completed */
-        if (current == avail) {
-            buffer_flags &= ~PIO_BF_READBUF;
-            Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
-            /* Reset next and end */
-            Parrot_io_set_buffer_end(interp, filehandle, NULL);
-            buffer_next = Parrot_io_get_buffer_start(interp, filehandle);
-        }
-        else {
-            buffer_next += current;
-        }
-
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-
-        file_pos += current;
-
-        /* requested length satisfied */
-        if (len == current) {
-            Parrot_io_set_file_position(interp, filehandle, file_pos);
-            return len;
-        }
-
-        /* more data needed */
-        len -= current;
-    }
-
-    /* buffer is now empty */
-
-    if (len >= Parrot_io_get_buffer_size(interp, filehandle)) {
-        PIOHANDLE os_handle;
-
-        GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-        got = PIO_READ(interp, os_handle, dest + current, len);
-
-        if (got == 0) {
-            const INTVAL file_flags = Parrot_io_get_flags(interp, filehandle);
-            Parrot_io_set_flags(interp, filehandle, file_flags | PIO_F_EOF);
-        }
-
-        Parrot_io_set_file_position(interp, filehandle, file_pos + got);
-
-        return current + got;
-    }
-
-    /* (re)fill the readbuffer */
-    got = Parrot_io_fill_readbuf(interp, filehandle);
-    if (got < len)
-        len = got;
-
-    /* read from the read_buffer */
-    buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-
-    memcpy(dest + current, buffer_next, len);
-
-    /* is the buffer is completely empty ? */
-    if (buffer_next == buffer_end) {
-        Parrot_io_set_buffer_flags(interp, filehandle,
-                (buffer_flags & ~PIO_BF_READBUF));
-        /* Reset next and end */
-        Parrot_io_set_buffer_end(interp, filehandle, NULL);
-        buffer_next = Parrot_io_get_buffer_start(interp, filehandle);
-    }
-    else {
-        buffer_next += len;
-    }
-
-    Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-    Parrot_io_set_file_position(interp, filehandle, file_pos + len);
-
-    return current + len;
-}
-
-/*
-
-=item C<INTVAL Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle)>
-
-Retrieve the next character in the buffer without modifying the stream.
-Return -1 or EOF.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_peek_buffer)
-    unsigned char *buffer_next;
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-
-    /* write buffer flush */
-    if (buffer_flags & PIO_BF_WRITEBUF) {
-        Parrot_io_flush_buffer(interp, filehandle);
-        buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    }
-
-    /* (re)fill the buffer */
-    if (! (buffer_flags & PIO_BF_READBUF)) {
-        size_t got;
-
-        /* promote to buffered if unbuffered */
-        if (Parrot_io_get_buffer_size(interp, filehandle) == 0)
-            Parrot_io_setbuf(interp, filehandle, 1);
-
-        /* Parrot_io_fill_readbuf() can return -1, but len should be positive */
-        got = Parrot_io_fill_readbuf(interp, filehandle);
-
-        if (got <= 0)
-            return -1;
-    }
-
-    buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-
-    return *buffer_next;
-}
-
 
 /*
 
@@ -1010,46 +762,11 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<static INTVAL io_is_end_of_line(const char *c)>
-
-Determine if the current character is the end of the line.
-
-Note that this is not a portable solution, but it is what the old architecture
-was doing, once you boil away the useless macros. This will need to change to
-support the Strings PDD, but is left as-is for now, for a smooth transition to
-the new architecture.
-
-=cut
-
-*/
-
-static INTVAL
-io_is_end_of_line(ARGIN(const char *c))
-{
-    ASSERT_ARGS(io_is_end_of_line)
-    if ((*(c)) == '\n')
-        return 1;
-
-    return 0;
-}
-
-/*
-
 =back
 
-=head1 SEE ALSO
-
-F<src/io/api.c>,
-F<src/io/unix.c>,
-F<src/io/win32.c>,
-F<src/io/portable.c>,
-F<src/io.c>,
-F<src/io/io_private.h>.
-
 =cut
 
 */
-
 
 /*
  * Local variables:
