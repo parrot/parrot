@@ -1,17 +1,17 @@
 # Ran via 'prove -v t/codingstd/pod_description.t'[*]
 
 [X] DONORS.pod
-[ ] README_cygwin.pod
-[ ] compilers/data_json/JSON_README.pod
-[ ] compilers/data_json/data_json.pir
+[X] README_cygwin.pod
+[X] compilers/data_json/JSON_README.pod
+[X] compilers/data_json/data_json.pir
 [ ] compilers/imcc/imcc.y
 [ ] compilers/imcc/imcparser.c
-[ ] compilers/pct/README.pod
-[ ] compilers/pge/PGE.pir
-[ ] compilers/pge/PGE/Exp.pir
-[ ] compilers/pge/PGE/OPTable.pir
-[ ] compilers/pge/PGE/Perl6Regex.pir
-[ ] compilers/pge/README.pod
+[X] compilers/pct/README.pod
+[X] compilers/pge/PGE.pir
+[X] compilers/pge/PGE/Exp.pir
+[X] compilers/pge/PGE/OPTable.pir
+[X] compilers/pge/PGE/Perl6Regex.pir
+[X] compilers/pge/README.pod
 [ ] compilers/tge/TGE/Compiler.pir
 [ ] compilers/tge/TGE/Grammar.pir
 [ ] compilers/tge/tgc.pir
