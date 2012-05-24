@@ -127,6 +127,11 @@ This is a known cygwin problem with dll's, esp. perl on non-XP 32bit platforms.
 You need to install the C<rebase> package and run C<rebaseall> from an C<ash>
 shell.
 
+For more information regarding this problem, I<see>
+http://www.cygwin.com/ml/cygwin/2009-05/msg00413.html;
+http://www.heikkitoivonen.net/blog/2008/11/26/cygwin-upgrades-and-rebaseall/;
+I<and see> http://code.google.com/p/chromium/wiki/CygwinDllRemappingFailure.
+
 =item Crash at miniparrot.exe config_lib.pasm
 
 Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your
@@ -152,33 +157,21 @@ F</usr/lib/libparrot.dll.a>, F</usr/local/lib/libparrot.dll.a>
 
 This is a known Windows limitation with NTFS junctions on files.
 
-=item *** fatal error - unable to remap ....
-
-Evidently, this problem results from a relocated C<cygwin1.dll>.  For more on
-this problem, I<see> http://www.cygwin.com/ml/cygwin/2009-05/msg00413.html
-
-The fix is to issue a C<rebaseall> command in Cygwin's C<rebase> package.
-For information on how to do this, I<see>
-http://www.heikkitoivonen.net/blog/2008/11/26/cygwin-upgrades-and-rebaseall/
-For more information on the problem, I<see also>
-I<and see> http://code.google.com/p/chromium/wiki/CygwinDllRemappingFailure
-
 =item Exception: STATUS_ACCESS_VIOLATION ....
 
-If this exception results, please ensure you have only a single version of
-C<cygwin1.dll> present on your system or, alternatively, ensure no application
-interferes with Cygwin. For more information on this problem, I<see> the
-Cygwin/X FAQ at
+If this exception results, ensure there is only one version of the
+C<cygwin1.dll> present on your system or, alternatively, ensure no other
+application interferes with Cygwin. For more information on this problem,
+I<see> the Cygwin/X FAQ at
 http://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-status-access-violation
 I<and see> the main Cygwin FAQ at
 http://cygwin.com/faq-nochunks.html#faq.using.bloda
 
 =item build aborts
 
-If the build aborts, it might be necessary to include already built DLLs in
-the rebase. For instructions on how to resolve this problem, I<see> the
-"PROBLEMS" section 
-http://cpansearch.perl.org/src/BFREE/OpenGL-0.57/README.cygwin
+If the build aborts, it may be necessary to include already built DLLs in the
+rebase. For instructions on how to accomplish this, I<see> the "PROBLEMS"
+section at http://cpansearch.perl.org/src/BFREE/OpenGL-0.57/README.cygwin
 
 =back
 
