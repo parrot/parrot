@@ -25,7 +25,7 @@ These are the primary interface functions for working with socket objects.
 
 #include <stdarg.h>
 
-/* HEADERIZER HFILE: include/parrot/io.h */
+/* HEADERIZER HFILE: src/io/io_private.h */
 
 /*
 

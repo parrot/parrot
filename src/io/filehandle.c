@@ -18,7 +18,7 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 #include "io_private.h"
 #include "pmc/pmc_filehandle.h"
 
-/* HEADERIZER HFILE: include/parrot/io.h */
+/* HEADERIZER HFILE: src/io/io_private.h */
 
 /*
 
