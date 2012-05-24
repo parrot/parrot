@@ -33,6 +33,210 @@ static INTVAL io_is_end_of_line(ARGIN(const char *c))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+#define BUFFER_IS_EMPTY(b) (b->buffer_start == b->buffer_end)
+#define BUFFER_IS_FULL(b) (b->buffer_start == b->buffer_end + 1 || b->buffer_start == b->buffer_ptr && (size_t)(b->buffer_end - b->buffer_start) == b->buffer_size);
+
+IO_BUFFER *
+Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE encoding, size_t init_size)
+{
+    IO_BUFFER * const buffer = (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
+    buffer->flags = flags;
+    buffer->owner_handle = handle;
+    buffer->encoding = encoding;
+    buffer->buffer_size = init_size;
+    if (init_size) {
+        buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
+        buffer->buffer_start = buffer->buffer_start;
+        buffer->buffer_end = buffer->buffer_start;
+    }
+}
+
+void
+Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)
+{
+    if (buffer->init_size) {
+        if (/* mmapped */)  {
+        }
+        else {
+            mem_sys_free(buffer->buffer_start);
+        }
+    }
+    Parrot_gc_free_fixed_size_storage(interp, sizeof (IO_BUFFER), buffer);
+}
+
+void
+Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
+{
+    buffer->buffer_start = buffer->buffer_start;
+    buffer->buffer_end = buffer->buffer_start;
+}
+
+size_t
+Parrot_io_buffer_read_bytes(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, char *s, size_t length)
+{
+    if (!buffer)
+        return vtable->read_b(interp, handle, s, length);
+    size_t size = Parrot_io_buffer_content_size(interp, buffer);
+    size_t read;
+    if (size >= length) {
+        Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
+        return length;
+    }
+    Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
+    read = vtable->read_b(interp, handle, s + size, length - size);
+    return read + size;
+}
+
+// Transfer length bytes from the buffer to the char*s, removing those bytes
+// from the buffer. Return the number of bytes actually copied.
+size_t
+Parrot_io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, size_t length)
+{
+    if (BUFFER_IS_EMPTY(buffer))
+        return 0;
+
+    size_t length_left = length;
+    if (buffer->buffer_end < buffer->buffer_start) {
+        size_t size = buffer->buffer_size - (buffer->buffer_ptr - buffer->buffer_size);
+        if (size > length_left)
+            size = length_left;
+        memcpy(s, buffer->buffer_start, size);
+
+        buffer->buffer_start += size;
+        if (buffer->buffer_start >= buffer->buffer_ptr + buffer->buffer_size)
+            buffer->buffer_start = buffer->buffer_ptr;
+
+        length_left -= size;
+    }
+    if (length_left && buffer->buffer_end > buffer->buffer_start) {
+        ptrdiff_t diff = buffer->buffer_end - buffer->buffer_start;
+        size_t size = (size_t) diff;
+        if (size > length_left)
+            size = length_left;
+
+        memcpy(s, buffer->buffer_start, length_left);
+        buffer->buffer_start += length;
+        if (buffer->buffer_start >= buffer->buffer_ptr + buffer->buffer_size)
+            buffer->buffer_start = buffer->buffer_ptr;
+
+        length_left -= size;
+    }
+    if (BUFFER_IS_EMPTY(buffer))
+        Parrot_io_buffer_clear(interp, buffer);
+
+    return length - length_left;
+}
+
+size_t
+Parrot_io_buffer_write_bytes(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, char *s, size_t length)
+{
+    if (!buffer)
+        return vtable->write_b(interp, handle, buffer, length);
+
+    else {
+        size_t written = 0;
+        size_t total_size = buffer->buffer_size;
+        size_t used_size = Parrot_io_buffer_content_size(interp, buffer);
+        if (length > total_size || length + used_size > total_size) {
+            written = Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+            written += vtable->write_b(interp, handle, s, length);
+            return written;
+        }
+        Parrot_io_buffer_add_bytes(interp, buffer, s, length);
+        return 0;
+    }
+}
+
+Parrot_io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char *s, size_t length)
+{
+    /* ... */
+}
+
+size_t
+Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, INTVAL autoclose)
+{
+    if (!buffer || BUFFER_IS_EMPTY(buffer))
+        return vtable->flush(interp, handle, autoclose);
+    size_t bytes_written = 0;
+    if (buffer->buffer_start < buffer->buffer_end) {
+        ptrdiff_t size = buffer->buffer_end - buffer->buffer_start;
+        vtable->write_b(interp, handle, (char *)buffer->start, (size_t)size);
+    }
+    else {
+        size_t size = buffer->buffer_size - (size_t)(buffer->buffer_start - buffer->buffer_ptr);
+        vtable->write_b(interp, handle, (char *)buffer->start, (size_t)size);
+        size = (size_t)(buffer->buffer_end - buffer->buffer_ptr);
+        vtable->write_b(interp, handle, (char *)buffer->ptr, (size_t)size);
+    }
+    buffer->buffer_start = buffer->buffer_start;
+    buffer->buffer_end = buffer->buffer_start;
+    return bytes_written;
+}
+
+UINTVAL
+Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable)
+{
+    if (!buffer)
+        return vtable->peek_b(interp, handle);
+    /* Current behavior only returns the first byte, not the first codepoint.
+       Returning codepoint would make a lot more sense, but is going to be a
+       lot more work */
+
+    if (BUFFER_IS_EMPTY(buffer)) {
+        size_t size = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        if (size == 0)
+            return -1;
+    }
+    return (UINTVAL)buffer->buffer_start[0];
+
+    /*
+    const UINTVAL bytes_per_codepoint = buffer->encoding->max_bytes_per_codepoint;
+    size_t size = Parrot_io_buffer_content_size(interp, buffer);
+    if (size < (size_t)bytes_per_codepoint) {
+        size = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        if (size == 0)
+            return -1;
+    }
+    Parrot_String_Bounds bounds = { bytes_per_codepoint, -1, -1 };
+    // TODO: Need to normalize. end-of-buffer - buffer_start may be less than bytes_per_codepoint
+    buffer->encoding->partial_scan(interp, buffer->buffer_start, &bounds);
+    */
+}
+
+// Reads data into the buffer, trying to fill if possible. Returns the total
+// number of bytes in the buffer.
+size_t
+Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable)
+{
+    if (BUFFER_IS_FULL(buffer)) {
+    }
+    else if (buffer->buffer_end < buffer->buffer_start) {
+        ptrdiff_t size = buffer->buffer_start - buffer->buffer_end - 1;
+        size_t read = vtable->read_b(interp, handle, buffer->buffer_start, (size_t)size);
+        buffer->buffer_end += read;
+        return Parrot_io_buffer_content_size(interp, buffer);
+    }
+    else {
+        ptrdiff_t size = buffer->buffer_size - (buffer->buffer_end);
+        size_t read = 0;
+        if (size)
+            read += vtable->read_b(interp, handle, buffer->buffer_start, (size_t)size);
+    }
+    return Parrot_io_buffer_content_size(interp, buffer);
+}
+
+size_t
+Parrot_io_buffer_content_size(PARROT_INTERP, IO_BUFFER *buffer)
+{
+    if (BUFFER_IS_EMPTY(buffer))
+        return 0;
+    if (BUFFER_IS_FULL(buffer))
+        return buffer->buffer_size;
+    if (buffer->buffer_start < buffer->buffer_end)
+        return (size_t)(buffer->buffer_end - buffer->buffer_start);
+    return buffer->buffer_size - (buffer->buffer_start - buffer->buffer_end);
+}
+
 
 /*
 

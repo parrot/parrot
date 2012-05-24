@@ -78,23 +78,18 @@ extern PIOOFF_T piooffsetzero;
 typedef struct _ParrotIOData ParrotIOData;
 
 /* BUFFERING */
-typedef struct _io_buffer_base {
+typedef struct _io_buffer {
     INTVAL buffer_flags;
     size_t buffer_size;
+    PMC *owner_handle;
     STR_VTABLE encoding;
-    unsigned char *buffer_start;
-    unsigned char *buffer_end;
-    unsigned char *buffer_next;
+    unsigned char *buffer_ptr;      /* ptr to the buffer mem block */
+    unsigned char *buffer_start;    /* ptr to the start of the data */
+    unsigned char *buffer_end;      /* ptr to the end of the data */
+    void *memhandle;    /* Handle or pointer for munmap/UnmapViewOfFile.
+                           NULL if not used*/
 } IO_BUFFER;
 
-typedef struct _io_buffer_mem {
-    IO_BUFFER base;
-}
-
-typedef struct _io_buffer_mmap {
-    IO_BUFFER base;
-    void *memhandle;    /* Handle or pointer for munmap/UnmapViewOfFile */
-}
 /* For examples of mmap-like behavior on windows, see:
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
 */
@@ -113,27 +108,27 @@ typedef union _io_vtable_extra_data {
     PIOHANDLE h;
 } io_vtable_extra_data;
 
-typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, size_t length);
-typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGOUT(char * buffer), size_t length);
-typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(STRING * s));
-typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(char * buffer), size_t length);
-typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, io_vtable_extra_data data);
-typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, PIOOFF_T loc);
-typedef STRING * (*io_vtable_peek_s)    (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer);
-typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, ARGIN(STRING *path), ARGIN(STRING *mode), io_vtable_extra_data data);
+typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PIOHANDLE h, size_t char_length);
+typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PIOHANDLE h, ARGOUT(char * buffer), size_t byte_length);
+typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PIOHANDLE h, ARGIN(STRING * s), size_t char_length);
+typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PIOHANDLE h, ARGIN(char * buffer), size_t byte_length);
+typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PIOHANDLE h, INTVAL terminator);
+typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PIOHANDLE h);
+typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PIOHANDLE h);
+typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
+typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
+typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PIOHANDLE h, PIOOFF_T loc);
+typedef INTVAL   (*io_vtable_peek_b)    (PARROT_INTERP, PIOHANDLE h);
+typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PIOHANDLE h, ARGIN(STRING *path), ARGIN(STRING *mode), io_vtable_extra_data data);
 typedef INTVAL   (*io_vtable_is_open)   (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PIOHANDLE h, Parrot_io_buffer buffer, INTVAL autoflush);
+typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PIOHANDLE h, INTVAL autoflush);
 
 typedef struct _io_vtable {
     io_vtable_read_s        read_s;
     io_vtable_read_b        read_b;
     io_vtable_write_s       write_s;
     io_vtable_write_b       write_b;
-    io_vtable_readline_s    readline_s;
+    //io_vtable_readline_s    readline_s;
     io_vtable_readall_s     readall_s;
     io_vtable_flush         flush;
     io_vtable_is_eof        is_eof;
@@ -142,8 +137,8 @@ typedef struct _io_vtable {
     io_vtable_close         close;
     io_vtable_tell          tell;
     io_vtable_seek          seek;
-    io_vtable_peek_s        peek_s;
-} Parrot_io_vtable;
+    io_vtable_peek_b        peek_b;
+} IO_VTABLE;
 
 #define IO_VTABLE_FILEHANDLE        0
 #define IO_VTABLE_PIPE              1
