@@ -12,49 +12,49 @@
 [X] compilers/pge/PGE/OPTable.pir
 [X] compilers/pge/PGE/Perl6Regex.pir
 [X] compilers/pge/README.pod
-[ ] compilers/tge/TGE/Compiler.pir
-[ ] compilers/tge/TGE/Grammar.pir
-[ ] compilers/tge/tgc.pir
-[ ] config/auto/llvm/hello.c
-[ ] docs/binaries/ops2c.pod
-[ ] docs/binaries/parrot-nqp.pod
-[ ] docs/binaries/parrot-prove.pod
-[ ] docs/binaries/parrot_nci_thunk_gen.pod
-[ ] docs/binaries/parrotbug.pod
-[ ] docs/binaries/pbc_to_exe.pod
-[ ] docs/binaries/plumage.pod
-[ ] docs/binaries/winxed.pod
-[ ] docs/compiler_faq.pod
-[ ] docs/debug.pod
-[ ] docs/deprecations/deprecations.pod
-[ ] docs/deprecations/deprecations_2_6.pod
-[ ] docs/deprecations/deprecations_2_9.pod
-[ ] docs/deprecations/deprecations_3_0.pod
-[ ] docs/deprecations/deprecations_3_3.pod
-[ ] docs/deprecations/deprecations_3_6.pod
-[ ] docs/deprecations/how_to_deprecate.pod
-[ ] docs/dev/byteorder.pod
-[ ] docs/dev/c_functions.pod
-[ ] docs/dev/coverage.pod
-[ ] docs/dev/debugging_with_msvc.pod
-[ ] docs/dev/headerizer.pod
-[ ] docs/dev/infant.pod
-[ ] docs/dev/longopt.pod
-[ ] docs/dev/parrot_api.pod
-[ ] docs/dev/pcc_methods.pod
-[ ] docs/dev/pcc_state.pod
-[ ] docs/dev/pmc_freeze.pod
-[ ] docs/dev/pmc_obj_design_meeting_notes.pod
-[ ] docs/extend.pod
-[ ] docs/faq.pod
-[ ] docs/gettingstarted.pod
-[ ] docs/glossary.pod
-[ ] docs/imcc/imcfaq.pod
-[ ] docs/intro.pod
-[ ] docs/memory_internals.pod
-[ ] docs/overview.pod
-[ ] docs/parrot.pod
-[ ] docs/parrotbyte.pod
+[X] compilers/tge/TGE/Compiler.pir
+[X] compilers/tge/TGE/Grammar.pir
+[X] compilers/tge/tgc.pir
+[X] config/auto/llvm/hello.c
+[X] docs/binaries/ops2c.pod
+[X] docs/binaries/parrot-nqp.pod
+[X] docs/binaries/parrot-prove.pod
+[X] docs/binaries/parrot_nci_thunk_gen.pod
+[X] docs/binaries/parrotbug.pod
+[X] docs/binaries/pbc_to_exe.pod
+[X] docs/binaries/plumage.pod
+[X] docs/binaries/winxed.pod
+[X] docs/compiler_faq.pod
+[X] docs/debug.pod
+[X] docs/deprecations/deprecations.pod
+[X] docs/deprecations/deprecations_2_6.pod
+[X] docs/deprecations/deprecations_2_9.pod
+[X] docs/deprecations/deprecations_3_0.pod
+[X] docs/deprecations/deprecations_3_3.pod
+[X] docs/deprecations/deprecations_3_6.pod
+[X] docs/deprecations/how_to_deprecate.pod
+[X] docs/dev/byteorder.pod
+[X] docs/dev/c_functions.pod
+[X] docs/dev/coverage.pod
+[X] docs/dev/debugging_with_msvc.pod
+[X] docs/dev/headerizer.pod
+[X] docs/dev/infant.pod
+[X] docs/dev/longopt.pod
+[X] docs/dev/parrot_api.pod
+[X] docs/dev/pcc_methods.pod
+[X] docs/dev/pcc_state.pod
+[X] docs/dev/pmc_freeze.pod
+[X] docs/dev/pmc_obj_design_meeting_notes.pod
+[X] docs/extend.pod
+[X] docs/faq.pod
+[X] docs/gettingstarted.pod
+[X] docs/glossary.pod
+[X] docs/imcc/imcfaq.pod
+[X] docs/intro.pod
+[X] docs/memory_internals.pod
+[X] docs/overview.pod
+[X] docs/parrot.pod
+[X] docs/parrotbyte.pod
 [ ] docs/pdds/draft/pdd01_overview.pod
 [ ] docs/pdds/draft/pdd05_opfunc.pod
 [ ] docs/pdds/draft/pdd06_pasm.pod
