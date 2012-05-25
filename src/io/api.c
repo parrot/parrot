@@ -143,7 +143,7 @@ Called from C<Parrot_gc_trace_root()> to mark the IO data live.
 
 PARROT_EXPORT
 void
-Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
+Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
     ASSERT_ARGS(Parrot_IOData_mark)
     INTVAL i;
@@ -209,6 +209,18 @@ object instead of creating a new FileHandle.
 =cut
 
 */
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
+        ARGIN(STRING *mode))
+{
+    ASSERT_ARGS(Parrot_io_open_handle)
+    return Parrot_io_open(interp, pmc, path, mode);
+}
+
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -311,7 +323,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
     flags |= PIO_F_SHARED;
 
     if (PMC_IS_NULL(filehandle))
-        filehandle = Parrot_pmc_new(interp, enum_class_FileHandle);
+        filehandle = io_get_new_filehandle(interp);
 
     Parrot_io_set_flags(interp, filehandle, flags);
     Parrot_io_set_os_handle(interp, filehandle, fd);
@@ -378,16 +390,14 @@ INTVAL
 Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed)
-    INTVAL result = 1;
 
     if (PMC_IS_NULL(pmc))
         return 1;
-    if (pmc->vtable->base_type == enum_class_FileHandle)
-        result = Parrot_io_is_closed_filehandle(interp, pmc);
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "is_closed"), "->I", &result);
 
-    return result;
+    else {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, pmc);
+        return !vtable->is_open(interp, pmc);
+    }
 }
 
 /*
@@ -406,47 +416,23 @@ void
 Parrot_io_flush_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_flush_handle)
-    if (PMC_IS_NULL(pmc))
-        return;
-
-    if (pmc->vtable->base_type == enum_class_FileHandle)
-        Parrot_io_flush_filehandle(interp, pmc);
-    else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        SETATTR_StringHandle_stringhandle(interp, pmc, NULL);
-    }
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "flush"), "->");
+    return Parrot_io_flush(interp, pmc);
 }
 
-
-/*
-
-=item C<static const STR_VTABLE * get_encoding(PARROT_INTERP, PMC *pmc)>
-
-Get the encoding vtable of a filehandle PMC
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-static const STR_VTABLE *
-get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
+PARROT_EXPORT
+void
+Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(get_encoding)
-    STRING           *encoding_str;
-    const STR_VTABLE *encoding;
+    ASSERT_ARGS(Parrot_io_flush)
 
-    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
-
-    if (STRING_IS_NULL(encoding_str))
-        encoding = Parrot_default_encoding_ptr;
-    else
-        encoding = Parrot_find_encoding_by_string(interp, encoding_str);
-
-    return encoding;
+    if (PMC_IS_NULL(handle))
+        return;
+    else {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+        Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
+    }
 }
-
 
 /*
 
@@ -466,35 +452,35 @@ STRING *
 Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
-    STRING *result = NULL;
-    if (PMC_IS_NULL(pmc))
+    return Parrot_io_read_s(PARROT_INTERP, pmc, size_t length);
+}
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length);
+{
+    ASSERT_ARGS(Parrot_io_read_s)
+
+    if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
-    if (pmc->vtable->base_type == enum_class_FileHandle) {
-        UINTVAL           bytes_read;
-        INTVAL            flags;
-        const STR_VTABLE *encoding;
 
-        GETATTR_FileHandle_flags(interp, pmc, flags);
+    else {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        STRING * result;
+        size_t bytes_read;
 
-        if (Parrot_io_is_closed_filehandle(interp, pmc)
-        || !(flags & PIO_F_READ))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed or non-readable filehandle");
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
+        encoding = io_get_handle_encoding(interp, handle);
 
-        encoding = get_encoding(interp, pmc);
-
-        /* Round up length to unit size of encoding */
-        if (encoding->bytes_per_unit > 1)
-            length = (length + encoding->bytes_per_unit - 1)
-                   & ~(encoding->bytes_per_unit - 1);
-
-        /* Allocate 3 bytes more for partial multi-byte characters */
-        result           = Parrot_str_new_noinit(interp, length + 3);
-        result->bufused  = length;
-        result->encoding = encoding;
-        bytes_read       = Parrot_io_read_buffer(interp, pmc,
-                                result->strstart, length);
+        // TODO: Move this string-reading logic into a separate place so we
+        // can reuse it. It belongs above the buffer API, but below the
+        // public API.
+        result = io_get_new_empty_string(interp, encoding, char_length);
+        bytes_read = Parrot_io_buffer_read_bytes(interp, read_buffer, handle, result-strstart, char_length);
 
         if (bytes_read & (encoding->bytes_per_unit - 1))
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -507,7 +493,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         }
         else {
             Parrot_String_Bounds bounds;
-            INTVAL               needed;
+            INTVAL needed;
 
             bounds.bytes = bytes_read;
             bounds.chars = -1;
@@ -518,6 +504,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
             result->bufused = bounds.bytes;
             result->strlen  = bounds.chars;
 
+            // TODO: Something about this logic looks wrong. Needs testing.
             /* Read and append remaining bytes in case of a partial result */
             if (needed > 0) {
                 const INTVAL rest_read = Parrot_io_read_buffer(interp, pmc,
@@ -545,38 +532,8 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
                 result->strlen  += 1;
             }
         }
+        return result;
     }
-    else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        STRING *string_orig;
-        INTVAL offset;
-        /* TODO: Check that we are open for reading */
-        GETATTR_StringHandle_stringhandle(interp, pmc, string_orig);
-        if (STRING_IS_NULL(string_orig))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        if (length == 0)
-            result = string_orig;
-        else {
-            INTVAL read_length = length;
-            const INTVAL orig_length = Parrot_str_byte_length(interp, string_orig);
-
-            GETATTR_StringHandle_read_offset(interp, pmc, offset);
-
-            /* Only read to the end of the string data. */
-            if (offset + read_length > orig_length)
-                read_length = orig_length - offset;
-
-            result = STRING_substr(interp, string_orig, offset, read_length);
-            SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
-        }
-    }
-    else if (pmc->vtable->base_type == enum_class_Socket) {
-        result = Parrot_io_recv_handle(interp, pmc, length);
-    }
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "read"), "I->S", length, &result);
-    return result;
 }
 
 /*
@@ -601,60 +558,39 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGMOD_NULLOK(PMC *buffer), INTVAL length)
+        ARGMOD_NULLOK(PMC *buffer), INTVAL byte_length)
 {
     ASSERT_ARGS(Parrot_io_read_byte_buffer_pmc)
-    unsigned char *content;
 
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid PMC");
 
     if (PMC_IS_NULL(buffer))
-        buffer = Parrot_pmc_new_init_int(interp, enum_class_ByteBuffer, length);
+        buffer = Parrot_pmc_new_init_int(interp, enum_class_ByteBuffer, byte_length);
     else
-        VTABLE_set_integer_native(interp, buffer, length);
-    GETATTR_ByteBuffer_content(interp, buffer, content);
+        VTABLE_set_integer_native(interp, buffer, byte_length);
 
-    if (handle->vtable->base_type == enum_class_FileHandle) {
-        INTVAL bytes_read = 0;
-        INTVAL flags;
-        GETATTR_FileHandle_flags(interp, handle, flags);
+    {
+        char * content = VTABLE_get_pointer(interp, buffer);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        size_t bytes_read;
 
-        if (Parrot_io_is_closed_filehandle(interp, handle) ||
-                !(flags & PIO_F_READ))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed or non-readable filehandle");
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
-        bytes_read = Parrot_io_read_buffer(interp, handle, (char *)content, length);
-
-        if (bytes_read != length)
-            VTABLE_set_integer_native(interp, buffer, bytes_read);
+        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, content, byte_length);
+        if (bytes_read != byte_length)
+            VTABLE_set_integer_native(interp, buffer, byte_length);
+        return buffer;
     }
-    else if (handle->vtable->base_type == enum_class_StringHandle) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Reading from a StringHandle to a ByteBuffer not implemented yet");
-    }
-    else if (handle->vtable->base_type == enum_class_Socket) {
-        INTVAL received = Parrot_io_socket_recv_to_buffer(interp, handle,
-            (char *)content, length);
-        if (received != length)
-            VTABLE_set_integer_native(interp, buffer, received);
-    }
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Unknown type in read to ByteBuffer");
-
-    return buffer;
 }
 
 INTVAL
 Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
-        ARGMOD(PMC *buffer), INTVAL length)
+        ARGMOD(PMC *buffer), INTVAL byte_length)
 {
     ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
-    unsigned char *content;
-    INTVAL real_length;
 
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -664,25 +600,19 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid ByteBuffer");
 
-    content = (unsigned char *)VTABLE_get_pointer(interp, buffer);
-    real_length = VTABLE_elements(interp, buffer);
-    if (real_length < length)
-        length = real_length;
+    {
+        char *content = (char *)VTABLE_get_pointer(interp, buffer);
+        INTVAL real_length = VTABLE_elements(interp, buffer);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_READ_BUFFER(interp, handle);
 
-    if (handle->vtable->base_type == enum_class_FileHandle) {
-        return Parrot_io_write_handle(interp, handle, content, length);
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
+
+        if (real_length < byte_length)
+            byte_length = real_length;
+
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, content, byte_length);
     }
-    else if (handle->vtable->base_type == enum_class_StringHandle) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Writing to a ByteBuffer from a StringHandle not implemented yet");
-    }
-    else if (handle->vtable->base_type == enum_class_Socket) {
-        return Parrot_io_socket_send_from_buffer(interp, handle,
-                (const char *)content, length);
-    }
-    else
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Unknown type in read to ByteBuffer");
 }
 
 /*
@@ -701,51 +631,25 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 {
     ASSERT_ARGS(Parrot_io_readline)
-    STRING *result;
-    if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL            flags;
 
-        GETATTR_FileHandle_flags(interp, pmc, flags);
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read bytes from a null or invalid PMC");
 
-        if (Parrot_io_is_closed_filehandle(interp, pmc)
-        || !(flags & PIO_F_READ))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed or non-readable filehandle");
+    {
+        char * content = VTABLE_get_pointer(interp, buffer);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        size_t bytes_read;
+        STRING *result;
 
-        result = Parrot_io_readline_buffer(interp, pmc,
-                    get_encoding(interp, pmc));
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
+
+        return Parrot_io_buffer_readline_s(interp, read_buffer, handle, vtable, terminator);
     }
-    else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        INTVAL offset, newline_pos, read_length, orig_length;
-
-        GETATTR_StringHandle_stringhandle(interp, pmc, result);
-        if (STRING_IS_NULL(result))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed stringhandle");
-
-        orig_length = Parrot_str_byte_length(interp, result);
-        GETATTR_StringHandle_read_offset(interp, pmc, offset);
-        newline_pos = STRING_index(interp, result, CONST_STRING(interp, "\n"), offset);
-
-        /* No newline found, read the rest of the string. */
-        if (newline_pos == -1)
-            read_length = orig_length - offset;
-        else
-            read_length = newline_pos - offset + 1; /* +1 to include the newline */
-
-        result = STRING_substr(interp, result, offset, read_length);
-        SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
-    }
-    else if (pmc->vtable->base_type == enum_class_Socket) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Parrot_io_readline on Socket not implemented");
-    }
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "readline"), "->S", &result);
-    return result;
 }
 
 /*
@@ -762,19 +666,21 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_write_handle(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t length)
+Parrot_io_write_c(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer), size_t byte_length)
 {
     ASSERT_ARGS(Parrot_io_write_handle)
-    INTVAL result;
-    STRING *s;
 
-    if (PMC_IS_NULL(pmc))
-        return -1;
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read bytes from a null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
-    s = Parrot_str_new(interp, (const char *)buffer, length);
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
 
-    result = Parrot_io_putps(interp, pmc, s);
-    return result;
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, buffer, byte_length);
+    }
 }
 
 /*
@@ -793,13 +699,14 @@ the file, C<1> for the current position, and C<2> for the end.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-Parrot_io_seek_handle(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
+Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_seek_handle)
-    if (Parrot_io_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, handle))
         return -1;
 
-    return Parrot_io_seek_buffer(interp, pmc, offset, w);
+    // TODO: This
+    return Parrot_io_seek_buffer(interp, handle, offset, w);
 }
 
 /*
@@ -815,13 +722,14 @@ Returns the current read/write position of C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
-Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_tell_handle)
-    if (Parrot_io_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, handle))
         return -1;
 
-    return Parrot_io_get_file_position(interp, pmc);
+    // TODO: This
+    return Parrot_io_get_file_position(interp, handle);
     /* return PIO_TELL(interp, os_handle); */
 }
 
@@ -840,11 +748,13 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_peek)
     STRING *res;
     INTVAL  c;
+
+    // TODO: This
 
     if (Parrot_io_is_closed(interp, pmc))
         c = -1;
@@ -874,7 +784,7 @@ filehandle.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_eof)
     INTVAL flags, result;
@@ -884,17 +794,14 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
      */
     if (PMC_IS_NULL(pmc))
         return 1;
-    if (pmc->vtable->base_type == enum_class_FileHandle) {
-        if (Parrot_io_is_closed_filehandle(interp, pmc))
-            return 1;
+    if (Parrot_io_is_closed_filehandle(interp, pmc))
+        return 1;
 
-        GETATTR_FileHandle_flags(interp, pmc, flags);
-        if (flags & PIO_F_EOF)
-            return 1;
-        return 0;
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+
+        return vtable->is_eof(interp, handle);
     }
-    Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "eof"), "->I", &result);
-    return result;
 }
 
 /*
@@ -912,7 +819,25 @@ INTVAL
 Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
     ASSERT_ARGS(Parrot_io_puts)
-    return Parrot_io_write_handle(interp, pmc, s, strlen(s));
+    return Parrot_io_write(interp, pmc, s, strlen(s));
+}
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_write_c(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const char *s), INTVAL byte_length)
+{
+    ASSERT_ARGS(Parrot_io_write)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to write bytes to a null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
+
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
+
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, s, byte_length);
+    }
 }
 
 /*
@@ -931,47 +856,27 @@ INTVAL
 Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_io_putps)
-    INTVAL result;
+    return Parrot_io_write_s(interp, pmc, s);
+}
 
-    if (PMC_IS_NULL(pmc))
+PARROT_EXPORT
+INTVAL
+Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
+{
+    ASSERT_ARGS(Parrot_io_write_s)
+    if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot write to null PMC");
-    if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL            flags;
-        STRING           *encoding_str;
-        const STR_VTABLE *encoding;
+            "Attempt to write a string to a null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
+        STRING *out_s;
 
-        GETATTR_FileHandle_flags(interp, pmc, flags);
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
+        out_s = io_verify_string_encoding(interp, handle, vtable, s);
 
-        if (!(flags & PIO_F_WRITE))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "FileHandle is not opened for writing");
-        if (STRING_IS_NULL(s))
-            return 0;
-
-        GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
-
-        /*
-         * If no encoding is set, the binary representation of the string
-         * is written as is. It might be better to use a default encoding
-         * in that case.
-         */
-
-        if (!STRING_IS_NULL(encoding_str)) {
-            encoding = Parrot_find_encoding_by_string(interp, encoding_str);
-
-            if (encoding != s->encoding
-            &&  encoding != Parrot_binary_encoding_ptr)
-                s = encoding->to_encoding(interp, s);
-        }
-
-        result = Parrot_io_write_buffer(interp, pmc, s);
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, out_s->strstart, s->bufused);
     }
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "puts"), "S->I", s, &result);
-
-    return result;
-
 }
 
 /*
@@ -995,7 +900,7 @@ Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 
     va_start(args, s);
 
-    ret = Parrot_io_putps(interp, pmc, Parrot_vsprintf_c(interp, s, args));
+    ret = Parrot_io_write_s(interp, pmc, Parrot_vsprintf_c(interp, s, args));
 
     va_end(args);
 
@@ -1027,7 +932,8 @@ Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
     str = Parrot_vsprintf_c(interp, s, args);
     va_end(args);
 
-    ret = Parrot_io_write(interp, os_handle, str->strstart, str->bufused);
+    // TODO: This
+    //ret = Parrot_io_write(interp, os_handle, str->strstart, str->bufused);
 
     return ret;
 }
@@ -1055,14 +961,10 @@ Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 
     if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
-        ret = Parrot_io_putps(interp, _PIO_STDOUT(interp), str);
+        ret = Parrot_io_write_s(interp, _PIO_STDOUT(interp), str);
     }
-    else {
-        /* Be nice about this...
-         **   XXX BD Should this use the default PIO_STDOUT or something?
-         */
+    else
         ret = vfprintf(stdout, s, args);
-    }
 
     va_end(args);
 
@@ -1092,15 +994,10 @@ Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 
     if (interp) {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
-
-        ret = Parrot_io_putps(interp, _PIO_STDERR(interp), str);
+        ret = Parrot_io_write_s(interp, _PIO_STDERR(interp), str);
     }
-    else {
-        /* Be nice about this...
-        **   XXX BD Should this use the default PIO_STDERR or something?
-        */
+    else
         ret = vfprintf(stderr, s, args);
-    }
 
     va_end(args);
 
@@ -1306,18 +1203,9 @@ Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =back
 
-=head1 SEE ALSO
-
-F<io/unix.c>,
-F<io/win32.c>,
-F<io/portable.c>,
-F<io/io_private.h>.
-
 =cut
 
 */
-
-
 
 /*
  * Local variables:

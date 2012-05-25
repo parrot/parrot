@@ -71,10 +71,12 @@ io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_
     ASSERT_ARGS(io_socket_write_b)
 }
 
-static INTVAL
+static STRING *
 io_socket_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 {
     ASSERT_ARGS(io_socket_readline_s)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "readline");
 }
 
 static STRING *

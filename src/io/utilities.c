@@ -97,6 +97,52 @@ io_get_new_filehandle(PARROT_INTERP)
     return Parrot_pmc_new(interp, typenum);
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding, size_t char_length)
+{
+    ASSERT_ARGS(io_get_new_empty_string)
+    STRING * result;
+
+    /* Round up length to unit size of encoding */
+    size_t byte_length;
+    if (encoding->bytes_per_unit > 1)
+        byte_length = (length + encoding->bytes_per_unit - 1) &
+                      ~(encoding->bytes_per_unit - 1);
+    else
+        byte_length = char_length;
+
+    /* Allocate 3 bytes more for partial multi-byte characters */
+    result           = Parrot_str_new_noinit(interp, byte_length + 3);
+    result->encoding = encoding;
+    return result;
+}
+
+void
+io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+{
+    ASSERT_ARGS(io_is_open_for)
+    if (Parrot_io_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot read from a closed %s", vtable->name);
+    if ((vtable->get_flags(interp, handle) & flags) != flags)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a non-readable %s", vtable->name);
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s))
+{
+    ASSERT_ARGS(io_verify_string_encoding)
+    STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+    if (encoding == NULL || encoding == s->encoding || encoding == Parrot_binary_encoding_ptr)
+        return s;
+    return encoding->to_encoding(interp, s);
+}
+
 /*
 
 =back

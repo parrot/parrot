@@ -62,10 +62,25 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
     ASSERT_ARGS(io_stringhandle_write_b)
 }
 
-static INTVAL
+static STRING *
 io_stringhandle_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 {
     ASSERT_ARGS(io_stringhandle_readline_s)
+    INTVAL offset, newline_pos, read_length, orig_length;
+
+    orig_length = Parrot_str_byte_length(interp, result);
+    GETATTR_StringHandle_read_offset(interp, pmc, offset);
+    newline_pos = STRING_index(interp, result, CONST_STRING(interp, "\n"), offset);
+
+    /* No newline found, read the rest of the string. */
+    if (newline_pos == -1)
+        read_length = orig_length - offset;
+    else
+        read_length = newline_pos - offset + 1; /* +1 to include the newline */
+
+    result = STRING_substr(interp, result, offset, read_length);
+    SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
+
 }
 
 static STRING *

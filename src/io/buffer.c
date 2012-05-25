@@ -74,7 +74,7 @@ Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
 }
 
 size_t
-Parrot_io_buffer_read_bytes(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, char *s, size_t length)
+Parrot_io_buffer_read_b(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, char *s, size_t length)
 {
     if (!buffer)
         return vtable->read_b(interp, handle, s, length);
@@ -87,6 +87,13 @@ Parrot_io_buffer_read_bytes(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, 
     Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
     read = vtable->read_b(interp, handle, s + size, length - size);
     return read + size;
+}
+
+STRING *
+Parrot_io_buffer_readline_s(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, INTVAL terminator)
+{
+    ASSERT_ARGS(Parrot_io_buffer_readline_s)
+    // TODO: This!
 }
 
 // Transfer length bytes from the buffer to the char*s, removing those bytes
@@ -130,7 +137,7 @@ Parrot_io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, siz
 }
 
 size_t
-Parrot_io_buffer_write_bytes(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, char *s, size_t length)
+Parrot_io_buffer_write_b(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable, char *s, size_t length)
 {
     if (!buffer)
         return vtable->write_b(interp, handle, buffer, length);
@@ -155,7 +162,7 @@ Parrot_io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char *s, size_t len
 }
 
 size_t
-Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable, INTVAL autoclose)
+Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable, INTVAL autoclose)
 {
     if (!buffer || BUFFER_IS_EMPTY(buffer))
         return vtable->flush(interp, handle, autoclose);
@@ -176,7 +183,7 @@ Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VT
 }
 
 UINTVAL
-Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable)
+Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable)
 {
     if (!buffer)
         return vtable->peek_b(interp, handle);
@@ -208,7 +215,7 @@ Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTA
 // Reads data into the buffer, trying to fill if possible. Returns the total
 // number of bytes in the buffer.
 size_t
-Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PIOHANDLE handle, IO_VTABLE *vtable)
+Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable)
 {
     if (BUFFER_IS_FULL(buffer)) {
     }

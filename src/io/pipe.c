@@ -64,6 +64,11 @@ static INTVAL
 io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_readall_s)
+    INTVAL flags;
+    GETATTR_FileHandle_flags(interp, pmc, flags);
+    if (flags & PIO_F_EOF)
+        return 1;
+    return 0;
 }
 
 static PIOOFF_T

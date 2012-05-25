@@ -85,6 +85,11 @@ static INTVAL
 io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_readall_s)
+    INTVAL flags;
+    GETATTR_FileHandle_flags(interp, pmc, flags);
+    if (flags & PIO_F_EOF)
+        return 1;
+    return 0;
 }
 
 static PIOOFF_T
@@ -155,10 +160,51 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
     return result;
 }
 
+static STR_VTABLE *
+io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    STRING           *encoding_str;
+    const STR_VTABLE *encoding;
+
+    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
+    if (!STRING_IS_NULL(encoding_str)) {
+        return Parrot_find_encoding_by_string(interp, encoding_str);
+    return NULL;
+}
+
 /* OLD FUNCTIONS
     Below this line are the old functions that need to be cleaned up and
     upgraded to the new architecture
 */
+
+/*
+
+=item C<static const STR_VTABLE * get_encoding(PARROT_INTERP, PMC *pmc)>
+
+Get the encoding vtable of a filehandle PMC
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+const STR_VTABLE *
+get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
+{
+    ASSERT_ARGS(get_encoding)
+    STRING           *encoding_str;
+    const STR_VTABLE *encoding;
+
+    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
+
+    if (STRING_IS_NULL(encoding_str))
+        encoding = Parrot_default_encoding_ptr;
+    else
+        encoding = Parrot_find_encoding_by_string(interp, encoding_str);
+
+    return encoding;
+}
+
 
 /*
 
