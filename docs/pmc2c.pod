@@ -1,12 +1,21 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
 =head1 NAME
 
-tools/build/pmc2c.pl - PMC definition to C compiler
+docs/pmc2c.pod - The PMC definition to C compiler.
 
-=head2 Internals
+=head1 SYNOPSIS
 
 To see the internal data structures please run:
 
     % perl tools/build/pmc2c.pl --c --debug --debug sarray.pmc | less
+
+=head1 DESCRIPTION
+
+This document covers the PMC definition to C compiler, I<i.e.>,
+F<tools/build/pmc2c.pl>.
 
 =head2 Compiling PMCs
 
