@@ -85,20 +85,20 @@
 [ ] docs/pdds/pdd30_install.pod
 [ ] docs/pdds/pdd31_hll.pod
 [ ] docs/pdds/pdd_template.pod
-[ ] docs/pmc.pod
-[ ] docs/pmc/array.pod
-[ ] docs/pmc/documentation.pod
-[ ] docs/pmc2c.pod
-[ ] docs/porting_intro.pod
-[ ] docs/project/cage_cleaners_guide.pod
-[ ] docs/project/committer_guide.pod
-[ ] docs/project/core_inclusion.pod
-[ ] docs/project/debian_packaging_guide.pod
-[ ] docs/project/metacommitter_guide.pod
-[ ] docs/project/release_manager_guide.pod
-[ ] docs/project/roles_responsibilities.pod
-[ ] docs/project/support_policy.pod
-[ ] docs/project/ubuntu_packaging_guide.pod
+[X] docs/pmc.pod
+[X] docs/pmc/array.pod
+[X] docs/pmc/documentation.pod
+[X] docs/pmc2c.pod
+[X] docs/porting_intro.pod
+[X] docs/project/cage_cleaners_guide.pod
+[X] docs/project/committer_guide.pod
+[X] docs/project/core_inclusion.pod
+[X] docs/project/debian_packaging_guide.pod
+[X] docs/project/metacommitter_guide.pod
+[X] docs/project/release_manager_guide.pod
+[X] docs/project/roles_responsibilities.pod
+[X] docs/project/support_policy.pod
+[X] docs/project/ubuntu_packaging_guide.pod
 [ ] docs/req/model_users.pod
 [ ] docs/running.pod
 [ ] docs/submissions.pod
