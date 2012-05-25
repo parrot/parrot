@@ -20,6 +20,146 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
+io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+{
+    ASSERT_ARGS(io_filehandle_setup_vtable)
+    vtable->name = "FileHandle";
+    vtable->read_s = io_filehandle_read_s;
+    vtable->read_b = io_filehandle_read_b;
+    vtable->write_s = io_filehandle_write_s;
+    vtable->readline_s = io_filehandle_readline_s;
+    vtable->readall_s = io_filehandle_readall_s;
+    vtable->flush = io_filehandle_flush;
+    vtable->is_eof = io_filehandle_is_eof;
+    vtable->tell = io_filehandle_tell;
+    vtable->peek_b = io_filehandle_peek_b;
+    vtable->seek = io_filehandle_seek;
+    vtable->open = io_filehandle_open;
+    vtable->is_open = io_filehandle_is_open;
+    vtable->close = io_filehandle_close;
+}
+
+static STRING *
+io_filehandle_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length)
+{
+    ASSERT_ARGS(io_filehandle_read_s)
+}
+
+static INTVAL
+io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
+{
+    ASSERT_ARGS(io_filehandle_read_b)
+}
+
+static INTVAL
+io_filehandle_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s), size_t char_length)
+{
+    ASSERT_ARGS(io_filehandle_write_s)
+}
+
+static INTVAL
+io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
+{
+    ASSERT_ARGS(io_filehandle_write_b)
+}
+
+static INTVAL
+io_filehandle_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
+{
+    ASSERT_ARGS(io_filehandle_readline_s)
+}
+
+static STRING *
+io_filehandle_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_readall_s)
+}
+
+static INTVAL
+io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_flush_s)
+}
+
+static INTVAL
+io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_readall_s)
+}
+
+static PIOOFF_T
+io_filehandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_tell)
+}
+
+static INTVAL
+io_filehandle_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_seek)
+}
+
+static INTVAL
+io_filehandle_peek(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_peek_b)
+}
+
+static INTVAL
+io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
+{
+    ASSERT_ARGS(io_filehandle_open)
+    PIOHANDLE os_handle;
+
+    if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Invalid mode for file open");
+
+    os_handle = PIO_OPEN(interp, path, flags);
+
+    if (os_handle == PIO_INVALID_HANDLE)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Unable to open filehandle from path '%Ss'", path);
+
+    flags |= PIO_F_FILE;
+
+    /* Set generic flag here if is a terminal then
+     * FileHandle can know how to setup buffering.
+     * STDIN, STDOUT, STDERR would be in this case
+     * so we would setup linebuffering.
+     */
+    if (PIO_IS_TTY(interp, os_handle))
+        flags |= PIO_F_CONSOLE;
+
+    SETATTR_FileHandle_os_handle(interp, filehandle, os_handle);
+    SETATTR_FileHandle_flags(interp, filehandle, flags);
+    SETATTR_FileHandle_filename(interp, filehandle, path);
+    SETATTR_FileHandle_mode(interp, filehandle, mode);
+
+    return 1;
+}
+
+static INTVAL
+io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_is_open)
+}
+
+static INTVAL
+io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_close)
+
+    const INTVAL result = Parrot_io_close_filehandle(interp, pmc);
+    SETATTR_FileHandle_flags(interp, pmc, 0);
+    return result;
+}
+
+/* OLD FUNCTIONS
+    Below this line are the old functions that need to be cleaned up and
+    upgraded to the new architecture
+*/
+
 /*
 
 =head2 Functions

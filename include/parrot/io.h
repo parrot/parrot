@@ -53,6 +53,7 @@
 #define PIO_F_SOFT_SP   00040000        /* Python softspace */
 #define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
 #define PIO_F_ASYNC     01000000        /* In Parrot async is default   */
+#define PIO_F_BINARY    02000000        /* File should be opened in binary mode */
 
 /* These macros will be removed */
 #define PIO_STDHANDLE(interp, fileno) Parrot_io_std_os_handle((interp), (fileno))
@@ -100,35 +101,28 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
     _b: This function operates on a raw char* buffer (Possibly from ByteBuffer)
 */
 
-/* Structure that can be used to pass an arbitrary piece of data, as required
-   by specific PMC types */
-typedef union _io_vtable_extra_data {
-    INTVAL i;
-    void * v;
-    PIOHANDLE h;
-} io_vtable_extra_data;
-
-typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PIOHANDLE h, size_t char_length);
-typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PIOHANDLE h, ARGOUT(char * buffer), size_t byte_length);
-typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PIOHANDLE h, ARGIN(STRING * s), size_t char_length);
-typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PIOHANDLE h, ARGIN(char * buffer), size_t byte_length);
-typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PIOHANDLE h, INTVAL terminator);
-typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PIOHANDLE h);
-typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PIOHANDLE h);
-typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
-typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PIOHANDLE h, PIOOFF_T loc);
-typedef INTVAL   (*io_vtable_peek_b)    (PARROT_INTERP, PIOHANDLE h);
-typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PIOHANDLE h, ARGIN(STRING *path), ARGIN(STRING *mode), io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_is_open)   (PARROT_INTERP, PIOHANDLE h, io_vtable_extra_data data);
-typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PIOHANDLE h, INTVAL autoflush);
+typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PMC *handle, size_t char_length);
+typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PMC *handle, ARGOUT(char * buffer), size_t byte_length);
+typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PMC *handle, ARGIN(STRING * s), size_t char_length);
+typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PMC *handle, ARGIN(char * buffer), size_t byte_length);
+typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PMC *handle, INTVAL terminator);
+typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PMC *handle);
+typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PMC *handle);
+typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PMC *handle);
+typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PMC *handle);
+typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PMC *handle, PIOOFF_T loc);
+typedef INTVAL   (*io_vtable_peek_b)    (PARROT_INTERP, PMC *handle);
+typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PMC *handle, ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode));
+typedef INTVAL   (*io_vtable_is_open)   (PARROT_INTERP, PMC *handle);
+typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
+    char                  * name;
     io_vtable_read_s        read_s;
     io_vtable_read_b        read_b;
     io_vtable_write_s       write_s;
     io_vtable_write_b       write_b;
-    //io_vtable_readline_s    readline_s;
+    io_vtable_readline_s    readline_s;
     io_vtable_readall_s     readall_s;
     io_vtable_flush         flush;
     io_vtable_is_eof        is_eof;
@@ -146,6 +140,14 @@ typedef struct _io_vtable {
 #define IO_VTABLE_STRINGHANDLE      3
 #define IO_VTABLE_USER              4
 extern Parrot_io_vtable *io_vtables
+
+#define IO_PTR_IDX_VTABLE 0
+#define IO_PTR_IDX_READ_BUFFER 1
+#define IO_PTR_IDX_WRITE_BUFFER 2
+
+#define IO_GET_VTABLE(i, p) ((IO_VTABLE*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
+#define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
+#define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
 
 /* io/core.c - interpreter initialization/destruction functions */
 /* HEADERIZER BEGIN: src/io/core.c */

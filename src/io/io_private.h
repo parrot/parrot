@@ -124,6 +124,8 @@ struct _ParrotIOData {
 #define _PIO_STDOUT(i)  ((i)->piodata->table[PIO_STDOUT_FILENO])
 #define _PIO_STDERR(i)  ((i)->piodata->table[PIO_STDERR_FILENO])
 
+#define IO_VTABLE_UNIMPLEMENTED(i, v, s) Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, "Method '%s' not implemented for type %s", s, v->name)
+
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
 
 /*

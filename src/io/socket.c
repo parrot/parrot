@@ -3,7 +3,7 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/io/socket_api.c - Socket I/O API
+src/io/socket.c - Socket I/O API
 
 =head1 DESCRIPTION
 
@@ -26,6 +26,120 @@ These are the primary interface functions for working with socket objects.
 #include <stdarg.h>
 
 /* HEADERIZER HFILE: src/io/io_private.h */
+
+io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+{
+    ASSERT_ARGS(io_socket_setup_vtable)
+    vtable->name = "Socket";
+    vtable->read_s = io_socket_read_s;
+    vtable->read_b = io_socket_read_b;
+    vtable->write_s = io_socket_write_s;
+    vtable->readline_s = io_socket_readline_s;
+    vtable->readall_s = io_socket_readall_s;
+    vtable->flush = io_socket_flush;
+    vtable->is_eof = io_socket_is_eof;
+    vtable->tell = io_socket_tell;
+    vtable->peek_b = io_socket_peek_b;
+    vtable->seek = io_socket_seek;
+    vtable->open = io_socket_open;
+    vtable->is_open = io_socket_is_open;
+    vtable->close = io_socket_close;
+}
+
+
+static STRING *
+io_socket_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length)
+{
+    ASSERT_ARGS(io_socket_read_s)
+}
+
+static INTVAL
+io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
+{
+    ASSERT_ARGS(io_socket_read_b)
+}
+
+static INTVAL
+io_socket_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s), size_t char_length)
+{
+    ASSERT_ARGS(io_socket_write_s)
+}
+
+static INTVAL
+io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
+{
+    ASSERT_ARGS(io_socket_write_b)
+}
+
+static INTVAL
+io_socket_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
+{
+    ASSERT_ARGS(io_socket_readline_s)
+}
+
+static STRING *
+io_socket_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_readall_s)
+}
+
+static INTVAL
+io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_flush_s)
+}
+
+static INTVAL
+io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_readall_s)
+}
+
+static PIOOFF_T
+io_socket_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_tell)
+}
+
+static INTVAL
+io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_seek)
+}
+
+static INTVAL
+io_socket_peek(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_peek_b)
+}
+
+static INTVAL
+io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags)
+{
+    ASSERT_ARGS(io_socket_open)
+}
+
+static INTVAL
+io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode))
+{
+    ASSERT_ARGS(io_socket_is_open)
+}
+
+static INTVAL
+io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_close)
+
+    INTVAL result = 0;
+    if (PARROT_SOCKET(pmc)) {
+        Parrot_Socket_attributes *data_struct = PARROT_SOCKET(handle);
+
+        if (data_struct->os_handle != PIO_INVALID_HANDLE)
+            result = Parrot_io_close_socket(interp, data_struct->os_handle);
+        data_struct->os_handle = PIO_INVALID_HANDLE;
+    }
+    return result;
+}
 
 /*
 

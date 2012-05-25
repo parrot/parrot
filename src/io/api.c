@@ -46,6 +46,7 @@ static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /* OLD FUNCTIONS
     These functions need to be up-converted to the new architecture.
+    Everything below this line needs to be evaluated.
 */
 
 /*
@@ -163,57 +164,7 @@ Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 
 =over 4
 
-=item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, const STRING
-*mode_str)>
-
-Parses a Parrot string for file open mode flags (C<r> for read, C<w> for write,
-C<a> for append, and C<p> for pipe) and returns the combined generic bit flags.
-
-=cut
-
 */
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL
-Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN(const STRING *mode_str))
-{
-    ASSERT_ARGS(Parrot_io_parse_open_flags)
-    INTVAL i, mode_len;
-    INTVAL flags = 0;
-
-    if (STRING_IS_NULL(mode_str))
-        return PIO_F_READ;
-
-    mode_len = Parrot_str_byte_length(interp, mode_str);
-
-    for (i = 0; i < mode_len; ++i) {
-        const INTVAL s = STRING_ord(interp, mode_str, i);
-        switch (s) {
-          case 'r':
-            flags |= PIO_F_READ;
-            break;
-          case 'w':
-            flags |= PIO_F_WRITE;
-            if (!(flags & PIO_F_APPEND)) /* don't truncate if appending */
-                flags |= PIO_F_TRUNC;
-            break;
-          case 'a':
-            flags |= PIO_F_APPEND;
-            flags |= PIO_F_WRITE;
-            if ((flags & PIO_F_TRUNC)) /* don't truncate if appending */
-                flags &= ~PIO_F_TRUNC;
-            break;
-          case 'p':
-            flags |= PIO_F_PIPE;
-            break;
-          default:
-            break;
-        }
-    }
-
-    return flags;
-}
 
 /*
 
@@ -263,83 +214,36 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_open_handle(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
+Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         ARGIN(STRING *mode))
 {
-    ASSERT_ARGS(Parrot_io_open_handle)
-    PMC *filehandle;
-    const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
-                                                        enum_class_FileHandle);
-    if (PMC_IS_NULL(pmc)) {
-        filehandle = Parrot_pmc_new(interp, typenum);
-    }
-    else
-        filehandle = pmc;
+    ASSERT_ARGS(Parrot_io_open)
+    PMC *handle;
 
     if (STRING_IS_NULL(path))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                         "Cannot open filehandle, no path");
 
-    if (filehandle->vtable->base_type == typenum) {
-        INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
-        PIOHANDLE os_handle;
-
-        /* TODO: a filehandle shouldn't allow a NULL path. */
-
-        PARROT_ASSERT(filehandle->vtable->base_type == typenum);
-
-        if (flags & PIO_F_PIPE) {
-            const int f_read  = (flags & PIO_F_READ) != 0;
-            const int f_write = (flags & PIO_F_WRITE) != 0;
-            INTVAL    pid;
-
-            if (f_read == f_write)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Invalid pipe mode: %X", flags);
-
-            os_handle = PIO_OPEN_PIPE(interp, path, flags, &pid);
-
-            /* Save the pid of the child, we'll wait for it when closing */
-            VTABLE_set_integer_keyed_int(interp, filehandle, 0, pid);
-        }
-        else {
-            if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Invalid mode for file open");
-
-            os_handle = PIO_OPEN(interp, path, flags);
-
-            if (os_handle == PIO_INVALID_HANDLE)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                    "Unable to open filehandle from path '%Ss'", path);
-
-            flags |= PIO_F_FILE;
-
-            /* Set generic flag here if is a terminal then
-             * FileHandle can know how to setup buffering.
-             * STDIN, STDOUT, STDERR would be in this case
-             * so we would setup linebuffering.
-             */
-            if (PIO_IS_TTY(interp, os_handle))
-                flags |= PIO_F_CONSOLE;
-        }
-
-        if (STRING_IS_NULL(mode))
-            mode = CONST_STRING(interp, "r");
-        else if (STRING_index(interp, mode, CONST_STRING(interp, "b"), 0) >= 0)
-            SETATTR_FileHandle_encoding(interp, filehandle, CONST_STRING(interp, "binary"));
-
-        SETATTR_FileHandle_os_handle(interp, filehandle, os_handle);
-        SETATTR_FileHandle_flags(interp, filehandle, flags);
-        SETATTR_FileHandle_filename(interp, filehandle, path);
-        SETATTR_FileHandle_mode(interp, filehandle, mode);
-
-        Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
-    }
+    if (PMC_IS_NULL(pmc))
+        handle = io_get_new_filehandle(interp);
     else
-        Parrot_pcc_invoke_method_from_c_args(interp, filehandle, CONST_STRING(interp, "open"), "SS->P", path, mode, &filehandle);
-    return filehandle;
+        handle = pmc;
+
+    if (STRING_IS_NULL(mode))
+        mode = CONST_STRING(interp, "r");
+
+    {
+        const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        INTVAL status = vtable->open(interp, handle, path, flags);
+
+        if (!status)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unable to open %s from path '%Ss'", vtable->name, path);
+    }
+
+    return handle;
 }
 
 /*
@@ -371,11 +275,6 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN(PMC *pmc), PIOHANDLE fd, ARGIN(STRING *sfl
         return PMCNULL;
 
     new_filehandle = Parrot_io_fdopen_flags(interp, pmc, fd, flags);
-
-    if (Parrot_io_get_flags(interp, new_filehandle) & PIO_F_CONSOLE)
-        Parrot_io_setlinebuf(interp, new_filehandle);
-    else
-        Parrot_io_setbuf(interp, new_filehandle, PIO_UNBOUND);
 
     return new_filehandle;
 }
@@ -442,35 +341,25 @@ INTVAL
 Parrot_io_close_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close_handle)
-    INTVAL result = 1;
-
-    if (PMC_IS_NULL(pmc))
-        return -1;
-
-    if (pmc->vtable->base_type == enum_class_FileHandle) {
-        result = Parrot_io_close_filehandle(interp, pmc);
-        SETATTR_FileHandle_flags(interp, pmc, 0);
-    }
-    else if (pmc->vtable->base_type == enum_class_Socket) {
-        result = -1;
-        if (PARROT_SOCKET(pmc)) {
-            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(pmc);
-
-            if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                result = Parrot_io_close_socket(interp, data_struct->os_handle);
-            data_struct->os_handle = PIO_INVALID_HANDLE;
-        }
-    }
-    else if (pmc->vtable->base_type == enum_class_StringHandle) {
-        SETATTR_StringHandle_read_offset(interp, pmc, 0);
-        result = 0;
-    }
-    else
-        Parrot_pcc_invoke_method_from_c_args(interp, pmc, CONST_STRING(interp, "close"), "->I", &result);
-
-    return result;
+    return Parrot_io_close(interp, pmc, 1);
 }
 
+PARROT_EXPORT
+INTVAL
+Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
+{
+    ASSERT_ARGS(Parrot_io_close)
+    if (PMC_IS_NULL(pmc))
+        return 0;
+    else {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        if (autoflush) {
+            IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+            Parrot_io_buffer_flush(interp, write_buffer, vtable, 0);
+        }
+        return vtable->close(interp, handle);
+    }
+}
 
 /*
 
