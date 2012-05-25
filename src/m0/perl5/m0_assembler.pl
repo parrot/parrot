@@ -275,7 +275,10 @@ sub m0b_bytecode_seg {
         if ($line =~ m/^\s*\.alias\s+(?<regname>[a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(?<reg>[A-Z0-9]+)\s*$/) {
             my ($regname, $reg) = ($+{regname}, $+{reg});
             my $reg_num = register_name_to_num($reg);
+
             die "Invalid register name '$reg' in register name alias" if $reg_num !~ m/^\d+$/;
+            die "Illegal redefintion of '$regname' in register name alias" if exists $regname_map{$regname};
+
             m0_say "adding register name alias: $regname maps to register $reg ($reg_num)";
             $regname_map{$regname} = $reg_num;
         }
