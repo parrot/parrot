@@ -523,3 +523,5 @@ cachegrind.out.*
 #   mode: text
 #   buffer-read-only: t
 # End:
+src/m0/c/m0
+src/m0/c/m0-debug
