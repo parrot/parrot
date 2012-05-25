@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ use File::Slurp qw/slurp/;
 use Test::More;
 use File::Spec::Functions;
 
-plan tests => 30;
+plan tests => 31;
 
 my $exefile    = catfile( ".", qw/src m0 perl5 m0_assembler.pl/ );
 my $hello_m0   = catfile(qw/t m0 basic hello.m0/);
@@ -151,6 +151,12 @@ output_like(
     catfile(qw/t m0 invalid invalid_register_number.m0/),
     qr/Invalid register number/,
     'detect invalid register numbers',
+);
+
+output_like(
+    catfile(qw/t m0 invalid invalid_register_alias.m0/),
+    qr/Illegal redefintion of/,
+    'detect invalid redefinition of an alias'
 );
 
 output_like(
