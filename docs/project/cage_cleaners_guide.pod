@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-docs/project/cage_cleaners_guide.pod - Cage Cleaner Guide. 
+docs/project/cage_cleaners_guide.pod - Cage Cleaner Guide.
 
 =head1 DESCRIPTION
 
