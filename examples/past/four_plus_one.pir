@@ -1,4 +1,13 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
+
+=pod
+
+=head1 DESCRIPTION
+
+A PIR module which sets up a PAST data structure to represent a sub
+and, then, execute it.
+
+=cut
 
 # Set up a PAST data structure that represents a sub and run it.
 
