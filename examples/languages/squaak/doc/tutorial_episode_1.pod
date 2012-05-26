@@ -1,17 +1,23 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2012, Parrot Foundation.
+
+=pod
+
+=head1 DESCRIPTION
+
+This is the first episode in a tutorial series on building a compiler with the
+Parrot Compiler Tools.
 
 =head1 Episode 1: Introduction
 
 =head2 Introduction
 
-This is the first episode in a tutorial series on building a compiler with the
-Parrot Compiler Tools. If you're interested in virtual machines, you've
-probably heard of the Parrot virtual machine. Parrot is a generic virtual
-machine designed for dynamic languages. This is in contrast with the Java
-virtual machine (JVM) and Microsoft's B<C>ommon B<L>anguage B<R>untime (CLR), both of
-which were designed to run static languages. Both the JVM and Microsoft
-(through the Dynamic Language Runtime -- DLR) are adding support for dynamic
-languages, but their primary focus is still static languages.
+If you're interested in virtual machines, you've probably heard of the Parrot
+virtual machine. Parrot is a generic virtual machine designed for dynamic
+languages. This is in contrast with the Java virtual machine (JVM) and
+Microsoft's B<C>ommon B<L>anguage B<R>untime (CLR), both of which were
+designed to run static languages. Both the JVM and Microsoft (through the
+Dynamic Language Runtime -- DLR) are adding support for dynamic languages, but
+their primary focus is still static languages.
 
 =head2 High Level Languages
 
