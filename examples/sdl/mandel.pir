@@ -1,6 +1,6 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 sdl/mandel.pir - Display Mandelbrot Set Using SDL
 
@@ -10,6 +10,10 @@ To run this file, run the following command from the Parrot directory:
 
   $ ./parrot examples/sdl/mandel.pir [ options ]
 
+=head1 DESCRIPTION
+
+This is a PIR program which displays the Mandelbrot Set, using SDL.
+  
 =head2 Options
 
   --quit, -q      ... quit immediately (useful for benchmarking)
