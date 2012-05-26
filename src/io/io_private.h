@@ -106,8 +106,6 @@ DIAGRAM
 
 /* Buffer flags */
 #define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
-#define PIO_BF_READBUF  00000002        /* Buffer is read-buffer        */
-#define PIO_BF_WRITEBUF 00000004        /* Buffer is write-buffer       */
 #define PIO_BF_MMAP     00000010        /* Buffer mmap()ed              */
 
 

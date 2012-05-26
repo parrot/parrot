@@ -2,11 +2,6 @@
  *  Copyright (C) 2001-2011, Parrot Foundation.
  *  Overview:
  *      Parrot IO subsystem
- *  History:
- *      Originally written by Melvin Smith
- *      Refactored by Juergen Boemmels
- *      2003-08-18: Internal structures moved to io/io_private.h
- *  Notes:
  *  References:
  *      Perl6 RFCs (14,30,47,60,186,239,321,345,350)
  *      Some ideas and goals from Perl5.7 and Nick Ing-Simmons' work
@@ -141,6 +136,7 @@ typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
     char                  * name;
+    INTVAL                  number;
     io_vtable_read_s        read_s;
     io_vtable_read_b        read_b;
     io_vtable_write_s       write_s;
@@ -173,6 +169,8 @@ extern Parrot_io_vtable *io_vtables
 #define IO_GET_VTABLE(i, p) ((IO_VTABLE*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
 #define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
 #define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
+
+
 
 /* io/core.c - interpreter initialization/destruction functions */
 /* HEADERIZER BEGIN: src/io/core.c */

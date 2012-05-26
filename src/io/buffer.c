@@ -36,7 +36,10 @@ static INTVAL io_is_end_of_line(ARGIN(const char *c))
 /* HEADERIZER END: static */
 
 #define BUFFER_IS_EMPTY(b) (b->buffer_start == b->buffer_end)
-#define BUFFER_IS_FULL(b) (b->buffer_start == b->buffer_end + 1 || b->buffer_start == b->buffer_ptr && (size_t)(b->buffer_end - b->buffer_start) == b->buffer_size);
+#define BUFFER_IS_FULL(b)  ((size_t)(b->buffer_end - b->buffer_start) == b->buffer_size)
+#define BUFFER_USED_SIZE(b) ((size_t)(b->buffer_end - b->buffer_start))
+#define BUFFER_AVAILABLE_SIZE(b) (b->buffer_size - ((size_t)(b->buffer_end - b->buffer_start)))
+#define BUFFER_CAN_BE_NORMALIZED(b) ((size_t)(b->buffer_start - b->buffer_ptr) > (b->buffer_size / 2))
 
 IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE encoding, size_t init_size)
@@ -59,10 +62,11 @@ void
 Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)
 {
     if (buffer->init_size) {
-        if (/* mmapped */)  {
-        }
-        else {
+        if (buffer->flags & PIO_BF_MALLOC)  {
             mem_sys_free(buffer->buffer_start);
+        }
+        else if(buffer->flags & PIO_BF_MMAP) {
+            /* TODO */
         }
     }
     Parrot_gc_free_fixed_size_storage(interp, sizeof (IO_BUFFER), buffer);
@@ -73,8 +77,8 @@ Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
 {
     if (!buffer)
         return;
-    buffer->buffer_start = buffer->buffer_start;
-    buffer->buffer_end = buffer->buffer_start;
+    buffer->buffer_start = buffer->buffer_ptr;
+    buffer->buffer_end = buffer->buffer_ptr;
 }
 
 size_t
@@ -82,15 +86,24 @@ Parrot_io_buffer_read_b(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE
 {
     if (!buffer)
         return vtable->read_b(interp, handle, s, length);
-    size_t size = Parrot_io_buffer_content_size(interp, buffer);
-    size_t read;
-    if (size >= length) {
-        Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
-        return length;
+    {
+        size_t bytes_read = Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
+        length = length - bytes_read;
+
+        /* If we still need more data than the buffer can hold, just read it
+           directly. */
+        if (length > buffer->buffer_size)
+            bytes_read += vtable->read_b(interp, handle, s + bytes_read, length);
+
+        /* Else, if we need to read an amount that the buffer can handle, fill
+           the buffer. */
+        else if (length) {
+            Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+            bytes_read += Parrot_io_buffer_transfer_to_mem(interp, buffer, s + bytes_read, length);
+        }
+
+        return bytes_read;
     }
-    Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
-    read = vtable->read_b(interp, handle, s + size, length - size);
-    return read + size;
 }
 
 STRING *
@@ -100,49 +113,54 @@ Parrot_io_buffer_readline_s(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VT
     // TODO: This!
 }
 
-size_t
+static size_t
 io_buffer_find_next_terminator(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, INTVAL terminator)
 {
+    // TODO: This!
 }
 
 // Transfer length bytes from the buffer to the char*s, removing those bytes
 // from the buffer. Return the number of bytes actually copied.
-size_t
-Parrot_io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, size_t length)
+static size_t
+io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, size_t length)
 {
-    if (BUFFER_IS_EMPTY(buffer))
+    if (!buffer || BUFFER_IS_EMPTY(buffer))
         return 0;
 
-    size_t length_left = length;
-    if (buffer->buffer_end < buffer->buffer_start) {
-        size_t size = buffer->buffer_size - (buffer->buffer_ptr - buffer->buffer_size);
-        if (size > length_left)
-            size = length_left;
-        memcpy(s, buffer->buffer_start, size);
+    {
+        size_t length_left = length;
+        size_t used_length = BUFFER_USED_SIZE(buffer);
+        size_t copy_length = used_length <= length ? used_length : length;
 
-        buffer->buffer_start += size;
-        if (buffer->buffer_start >= buffer->buffer_ptr + buffer->buffer_size)
-            buffer->buffer_start = buffer->buffer_ptr;
-
-        length_left -= size;
+        memcpy(s, buffer->buffer_start, copy_length);
+        buffer->buffer_start += copy_length;
+        io_buffer_normalize(interp, buffer);
+        return copy_length;
     }
-    if (length_left && buffer->buffer_end > buffer->buffer_start) {
-        ptrdiff_t diff = buffer->buffer_end - buffer->buffer_start;
-        size_t size = (size_t) diff;
-        if (size > length_left)
-            size = length_left;
+}
 
-        memcpy(s, buffer->buffer_start, length_left);
-        buffer->buffer_start += length;
-        if (buffer->buffer_start >= buffer->buffer_ptr + buffer->buffer_size)
-            buffer->buffer_start = buffer->buffer_ptr;
+// Attempt to normalize the buffer. If we can, move data to the front of the
+// buffer so we have the maximum amount of contiguous free space */
+static void
+io_buffer_normalize(PARROT_INTERP, IO_BUFFER *buffer)
+{
+    if (!buffer)
+        return;
 
-        length_left -= size;
-    }
-    if (BUFFER_IS_EMPTY(buffer))
+    if (BUFFER_IS_EMPTY(buffer)) {
         Parrot_io_buffer_clear(interp, buffer);
+        return;
+    }
 
-    return length - length_left;
+    if (!BUFFER_CAN_BE_NORMALIZED(buffer)
+        return;
+
+    {
+        const size_t used_size = BUFFER_USED_SIZE(buffer);
+        memmove(buffer->buffer_ptr, buffer->buffer_start, used_size);
+        buffer->buffer_start = buffer->buffer_ptr;
+        buffer->buffer_end = buffer->start + used_size;
+    }
 }
 
 size_t
@@ -154,41 +172,49 @@ Parrot_io_buffer_write_b(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTAB
     else {
         size_t written = 0;
         size_t total_size = buffer->buffer_size;
-        size_t used_size = Parrot_io_buffer_content_size(interp, buffer);
-        if (length > total_size || length + used_size > total_size) {
-            written = Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
-            written += vtable->write_b(interp, handle, s, length);
-            return written;
+        size_t used_size = BUFFER_USED_SIZE(buffer);
+        size_t avail_size = BUFFER_AVAILABLE_SIZE(buffer);
+
+        /* If the data fits in the buffer, copy it there and move on. */
+        if (length <= avail_size) {
+            io_buffer_add_bytes(interp, buffer, s, length);
+            return length;
         }
+
+        /* If the total data to write is larger than the buffer, flush and
+           write directly through to the handle */
+        if (length > total_size) {
+            Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+            return vtable->write_b(interp, buffer, s, length);
+        }
+
+        /* Else, we have more data than available space, but the buffer should
+           be able to cover any overflow */
+        Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
         Parrot_io_buffer_add_bytes(interp, buffer, s, length);
-        return 0;
+        return length;
     }
 }
 
-Parrot_io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char *s, size_t length)
+// Add the bytes to the buffer. Assume that the number of bytes to add is
+// less than or equal to the amount of available space for writing.
+static void
+io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char *s, size_t length)
 {
-    /* ... */
+    memcpy(buffer->buffer_end, s, length);
+    buffer->buffer_end += length;
 }
 
 size_t
 Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable, INTVAL autoclose)
 {
-    if (!buffer || BUFFER_IS_EMPTY(buffer))
-        return vtable->flush(interp, handle, autoclose);
     size_t bytes_written = 0;
-    if (buffer->buffer_start < buffer->buffer_end) {
-        ptrdiff_t size = buffer->buffer_end - buffer->buffer_start;
-        vtable->write_b(interp, handle, (char *)buffer->start, (size_t)size);
+    if (buffer && !BUFFER_IS_EMPTY(buffer)) {
+        size_t used_length = BUFFER_USED_SIZE(buffer);
+        bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start, used_size);
     }
-    else {
-        size_t size = buffer->buffer_size - (size_t)(buffer->buffer_start - buffer->buffer_ptr);
-        vtable->write_b(interp, handle, (char *)buffer->start, (size_t)size);
-        size = (size_t)(buffer->buffer_end - buffer->buffer_ptr);
-        vtable->write_b(interp, handle, (char *)buffer->ptr, (size_t)size);
-    }
-    buffer->buffer_start = buffer->buffer_start;
-    buffer->buffer_end = buffer->buffer_start;
-    return bytes_written;
+    Parrot_io_buffer_clear(interp, buffer);
+    return bytes_written + vtable->flush(interp, handle, autoclose);
 }
 
 UINTVAL
@@ -226,59 +252,26 @@ Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE 
 size_t
 Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable)
 {
-    if (BUFFER_IS_FULL(buffer)) {
+    if (!buffer)
+        return 0;
+
+    /* Normalize to make sure we have a maximum amount of free space */
+    io_buffer_normalize(interp, buffer);
+    {
+        size_t available_size = BUFFER_AVAILABLE_SIZE(buffer);
+        size_t read_bytes;
+        if (available_size == 0)
+            return BUFFER_USED_SIZE(buffer);
+        read_bytes = vtable->read_b(interp, handle, buffer->buffer_end, available_size);
+        buffer->buffer_end += read_bytes;
+        return BUFFER_USED_SIZE(buffer);
     }
-    else if (buffer->buffer_end < buffer->buffer_start) {
-        ptrdiff_t size = buffer->buffer_start - buffer->buffer_end - 1;
-        size_t read = vtable->read_b(interp, handle, buffer->buffer_start, (size_t)size);
-        buffer->buffer_end += read;
-        return Parrot_io_buffer_content_size(interp, buffer);
-    }
-    else {
-        ptrdiff_t size = buffer->buffer_size - (buffer->buffer_end);
-        size_t read = 0;
-        if (size)
-            read += vtable->read_b(interp, handle, buffer->buffer_start, (size_t)size);
-    }
-    return Parrot_io_buffer_content_size(interp, buffer);
 }
 
 size_t
-Parrot_io_buffer_content_size(PARROT_INTERP, IO_BUFFER *buffer)
+Parrot_io_buffer_content_size(SHIM_INTERP, IO_BUFFER *buffer)
 {
-    if (BUFFER_IS_EMPTY(buffer))
-        return 0;
-    if (BUFFER_IS_FULL(buffer))
-        return buffer->buffer_size;
-    if (buffer->buffer_start < buffer->buffer_end)
-        return (size_t)(buffer->buffer_end - buffer->buffer_start);
-    return buffer->buffer_size - (buffer->buffer_start - buffer->buffer_end);
-}
-
-void
-Parrot_io_buffer_resize(PARROT_INTERP, IO_BUFFER *buffer, ARGMOD(PMC *handle), size_t new_size)
-{
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    if (!BUFFER_IS_EMPTY(buffer) && io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE)
-        Parrot_io_buffer_flush((interp, buffer, handle, vtable);
-
-    /* Choose an appropriate buffer size for caller */
-    switch (new_size) {
-      case 0:
-        // TODO: Figure out why we would want to do this, if we can just free
-        // the buffer and set it to NULL
-        Parrot_io_set_buffer_size(interp, filehandle, 0);
-        break;
-      case PIO_UNBOUND:
-        Parrot_io_set_buffer_size(interp, filehandle,
-                    PIO_GETBLKSIZE(Parrot_io_get_os_handle(interp, filehandle)));
-        break;
-      default:
-        Parrot_io_set_buffer_size(interp, filehandle,
-                    (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN));
-        break;
-    }
-    // TODO: Resize the buffer. Free it if the size is 0, otherwise realloc.
+    return BUFFER_USED_SIZE(buffer);
 }
 
 void

@@ -35,6 +35,9 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->open = io_stringhandle_open;
     vtable->is_open = io_stringhandle_is_open;
     vtable->close = io_stringhandle_close;
+    vtable->get_encoding = io_stringhandle_get_encoding;
+    vtable->set_flags = io_stringhandle_set_flags;
+    vtable->get_flags = io_stringhandle_get_flags;
 }
 
 

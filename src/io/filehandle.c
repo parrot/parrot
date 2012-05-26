@@ -171,16 +171,21 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_close)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const INTVAL flags = PARROT_FILEHANDLE(handle)->flags;
 
     if (os_handle == PIO_INVALID_HANDLE)
-        return -1;
+        return -1;      /* Can't close an invalid handle */
+    if (flags & PIO_F_SHARED)
+        return -1;      /* Don't try to close a shared handle, somebody else
+                           is managing it */
 
     else {
         INTVAL result;
-        INTVAL flags;
+
         IO_BUFFER * const write_buffer = PIO_GET_WRITE_BUFFER(interp, handle);
         IO_VTABLE * const vtable = PIO_GET_VTABLE(interp, handle);
         Parrot_io_buffer_flush(interp, buffer, handle, vtable);
+
         result = Parrot_io_internal_close(interp, os_handle);
         io_filehandle_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
         Parrot_io_buffer_clear(interp, write_buffer);

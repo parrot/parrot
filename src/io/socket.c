@@ -44,6 +44,9 @@ io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->open = io_socket_open;
     vtable->is_open = io_socket_is_open;
     vtable->close = io_socket_close;
+    vtable->get_encoding = io_socket_get_encoding;
+    vtable->set_flags = io_socket_set_flags;
+    vtable->get_flags = io_socket_get_flags;
 }
 
 

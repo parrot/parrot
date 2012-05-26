@@ -24,12 +24,6 @@ interpreter.
 /* HEADERIZER HFILE: include/parrot/io.h */
 
 /*
-        The standard streams are:
-
-                interp->piodata->table[PIO_STD*_FILENO].
-*/
-
-/*
 
 =item C<INTVAL Parrot_io_parse_open_flags(PARROT_INTERP, const STRING
 *mode_str)>
@@ -125,10 +119,22 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable
     ASSERT_ARGS(io_is_open_for)
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot read from a closed %s", vtable->name);
+                "IO PMC %s is not open", vtable->name);
     if ((vtable->get_flags(interp, handle) & flags) != flags)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a non-readable %s", vtable->name);
+                "IO PMC %s is not in mode %d", vtable->name, flags);
+}
+
+void
+io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+{
+    ASSERT_ARGS(io_is_open_for)
+    if (Parrot_io_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "IO PMC %s is not open", vtable->name);
+    if (vtable->get_flags(interp, handle) & flags)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "IO PMC %s is not in mode %d", vtable->name, flags);
 }
 
 PARROT_CANNOT_RETURN_NULL

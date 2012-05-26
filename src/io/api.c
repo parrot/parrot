@@ -42,13 +42,6 @@ static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
-
-/* OLD FUNCTIONS
-    These functions need to be up-converted to the new architecture.
-    Everything below this line needs to be evaluated.
-*/
-
 /*
 
 =item C<void Parrot_io_init(PARROT_INTERP)>
@@ -335,8 +328,14 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
     if (PMC_IS_NULL(filehandle))
         filehandle = io_get_new_filehandle(interp);
 
-    Parrot_io_set_flags(interp, filehandle, flags);
-    Parrot_io_set_os_handle(interp, filehandle, fd);
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, filehandle);
+        if (vtable->number != IO_VTABLE_FILEHANDLE)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                    "Cannot set an OS file descriptor to a %s PMC", vtable->name);
+        vtable->set_flags(interp, filehandle, flags);
+        io_filehandle_set_os_handle(interp, filehandle, fd);
+    }
 
     return filehandle;
 }
