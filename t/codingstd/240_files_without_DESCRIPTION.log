@@ -55,36 +55,36 @@
 [X] docs/overview.pod
 [X] docs/parrot.pod
 [X] docs/parrotbyte.pod
-[ ] docs/pdds/draft/pdd01_overview.pod
-[ ] docs/pdds/draft/pdd05_opfunc.pod
-[ ] docs/pdds/draft/pdd06_pasm.pod
-[ ] docs/pdds/draft/pdd08_keys.pod
-[ ] docs/pdds/draft/pdd11_extending.pod
-[ ] docs/pdds/draft/pdd13_bytecode.pod
-[ ] docs/pdds/draft/pdd14_numbers.pod
-[ ] docs/pdds/draft/pdd16_native_call.pod
-[ ] docs/pdds/draft/pdd29_compiler_tools.pod
-[ ] docs/pdds/pdd00_pdd.pod
-[ ] docs/pdds/pdd03_calling_conventions.pod
-[ ] docs/pdds/pdd07_codingstd.pod
-[ ] docs/pdds/pdd09_gc.pod
-[ ] docs/pdds/pdd10_embedding.pod
-[ ] docs/pdds/pdd15_objects.pod
-[ ] docs/pdds/pdd17_pmc.pod
-[ ] docs/pdds/pdd18_security.pod
-[ ] docs/pdds/pdd19_pir.pod
-[ ] docs/pdds/pdd20_lexical_vars.pod
-[ ] docs/pdds/pdd21_namespaces.pod
-[ ] docs/pdds/pdd22_io.pod
-[ ] docs/pdds/pdd23_exceptions.pod
-[ ] docs/pdds/pdd24_events.pod
-[ ] docs/pdds/pdd25_concurrency.pod
-[ ] docs/pdds/pdd26_ast.pod
-[ ] docs/pdds/pdd27_multiple_dispatch.pod
-[ ] docs/pdds/pdd28_strings.pod
-[ ] docs/pdds/pdd30_install.pod
-[ ] docs/pdds/pdd31_hll.pod
-[ ] docs/pdds/pdd_template.pod
+[-] docs/pdds/draft/pdd01_overview.pod
+[-] docs/pdds/draft/pdd05_opfunc.pod
+[-] docs/pdds/draft/pdd06_pasm.pod
+[-] docs/pdds/draft/pdd08_keys.pod
+[-] docs/pdds/draft/pdd11_extending.pod
+[-] docs/pdds/draft/pdd13_bytecode.pod
+[-] docs/pdds/draft/pdd14_numbers.pod
+[-] docs/pdds/draft/pdd16_native_call.pod
+[-] docs/pdds/draft/pdd29_compiler_tools.pod
+[-] docs/pdds/pdd00_pdd.pod
+[-] docs/pdds/pdd03_calling_conventions.pod
+[-] docs/pdds/pdd07_codingstd.pod
+[-] docs/pdds/pdd09_gc.pod
+[-] docs/pdds/pdd10_embedding.pod
+[-] docs/pdds/pdd15_objects.pod
+[-] docs/pdds/pdd17_pmc.pod
+[-] docs/pdds/pdd18_security.pod
+[-] docs/pdds/pdd19_pir.pod
+[-] docs/pdds/pdd20_lexical_vars.pod
+[-] docs/pdds/pdd21_namespaces.pod
+[-] docs/pdds/pdd22_io.pod
+[-] docs/pdds/pdd23_exceptions.pod
+[-] docs/pdds/pdd24_events.pod
+[-] docs/pdds/pdd25_concurrency.pod
+[-] docs/pdds/pdd26_ast.pod
+[-] docs/pdds/pdd27_multiple_dispatch.pod
+[-] docs/pdds/pdd28_strings.pod
+[-] docs/pdds/pdd30_install.pod
+[-] docs/pdds/pdd31_hll.pod
+[-] docs/pdds/pdd_template.pod
 [X] docs/pmc.pod
 [X] docs/pmc/array.pod
 [X] docs/pmc/documentation.pod
@@ -99,16 +99,16 @@
 [X] docs/project/roles_responsibilities.pod
 [X] docs/project/support_policy.pod
 [X] docs/project/ubuntu_packaging_guide.pod
-[ ] docs/req/model_users.pod
-[ ] docs/running.pod
-[ ] docs/submissions.pod
-[ ] docs/tests.pod
-[ ] docs/user/pir/exceptions.pod
-[ ] docs/user/pir/intro.pod
-[ ] docs/user/pir/objects.pod
-[ ] docs/user/pir/pmcs.pod
-[ ] docs/vtables.pod
-[ ] editor/README.pod
+[X] docs/req/model_users.pod
+[X] docs/running.pod
+[X] docs/submissions.pod
+[X] docs/tests.pod
+[X] docs/user/pir/exceptions.pod
+[X] docs/user/pir/intro.pod
+[X] docs/user/pir/objects.pod
+[X] docs/user/pir/pmcs.pod
+[X] docs/vtables.pod
+[X] editor/README.pod
 [ ] examples/languages/abc/abc.pir
 [ ] examples/languages/abc/src/builtins/all.pir
 [ ] examples/languages/squaak/doc/tutorial_episode_1.pod
@@ -241,5 +241,7 @@
 [ ] tools/release/cut.pl'
 
 ----------
-[*] An '[X]' denotes a corrected file. That is, a file which, now, contains
-a DESCRIPTION element.
+[*] A '[X]' denotes a corrected file. That is, a file which, now, contains
+a DESCRIPTION element. And a [-] denotes a file which is no longer be included
+in the 't/codingstd/pod_description.t' test and, consequently, does not need
+any editing. 
