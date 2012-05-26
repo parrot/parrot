@@ -42,7 +42,6 @@ IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE encoding, size_t init_size)
 {
     IO_BUFFER * const buffer = (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
-    buffer->flags = flags;
     buffer->owner_handle = handle;
     buffer->encoding = encoding;
     buffer->buffer_size = init_size;
@@ -50,7 +49,10 @@ Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE e
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
         buffer->buffer_start = buffer->buffer_start;
         buffer->buffer_end = buffer->buffer_start;
-    }
+        flags |= PIO_BF_MALLOC;
+    } else {
+        flags &= ~PIO_BF_MALLOC;
+    buffer->flags = flags;
 }
 
 void
@@ -69,6 +71,8 @@ Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)
 void
 Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
 {
+    if (!buffer)
+        return;
     buffer->buffer_start = buffer->buffer_start;
     buffer->buffer_end = buffer->buffer_start;
 }
@@ -94,6 +98,11 @@ Parrot_io_buffer_readline_s(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VT
 {
     ASSERT_ARGS(Parrot_io_buffer_readline_s)
     // TODO: This!
+}
+
+size_t
+io_buffer_find_next_terminator(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, INTVAL terminator)
+{
 }
 
 // Transfer length bytes from the buffer to the char*s, removing those bytes
@@ -246,61 +255,18 @@ Parrot_io_buffer_content_size(PARROT_INTERP, IO_BUFFER *buffer)
     return buffer->buffer_size - (buffer->buffer_start - buffer->buffer_end);
 }
 
-/* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
-    These routines are the parts of the old system that are worth keeping,
-    for now. We need to up-convert these to the new architecture.
-*/
-
-/*
-
-=item C<INTVAL Parrot_io_init_buffer(PARROT_INTERP)>
-
-Initialize buffering on STDOUT and STDIN.
-
-=cut
-
-*/
-
-INTVAL
-Parrot_io_init_buffer(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_io_init_buffer)
-    if (Parrot_io_STDOUT(interp))
-        Parrot_io_setlinebuf(interp, Parrot_io_STDOUT(interp));
-
-    if (Parrot_io_STDIN(interp))
-        Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
-
-    return 0;
-}
-
-/*
-
-=item C<void Parrot_io_setbuf(PARROT_INTERP, PMC *filehandle, size_t bufsize)>
-
-Set the buffering mode for the filehandle.
-
-=cut
-
-*/
-
 void
-Parrot_io_setbuf(PARROT_INTERP, ARGMOD(PMC *filehandle), size_t bufsize)
+Parrot_io_buffer_resize(PARROT_INTERP, IO_BUFFER *buffer, ARGMOD(PMC *handle), size_t new_size)
 {
-    ASSERT_ARGS(Parrot_io_setbuf)
-    INTVAL filehandle_flags = Parrot_io_get_flags(interp, filehandle);
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    size_t         buffer_size;
-
-    /* If there is already a buffer, make sure we flush before modifying it. */
-    if (buffer_start)
-        Parrot_io_flush_buffer(interp, filehandle);
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    if (!BUFFER_IS_EMPTY(buffer) && io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE)
+        Parrot_io_buffer_flush((interp, buffer, handle, vtable);
 
     /* Choose an appropriate buffer size for caller */
-    switch (bufsize) {
+    switch (new_size) {
       case 0:
+        // TODO: Figure out why we would want to do this, if we can just free
+        // the buffer and set it to NULL
         Parrot_io_set_buffer_size(interp, filehandle, 0);
         break;
       case PIO_UNBOUND:
@@ -312,68 +278,32 @@ Parrot_io_setbuf(PARROT_INTERP, ARGMOD(PMC *filehandle), size_t bufsize)
                     (bufsize >= PIO_GRAIN ? bufsize : PIO_GRAIN));
         break;
     }
-
-    buffer_size = Parrot_io_get_buffer_size(interp, filehandle);
-
-    if (buffer_start && (buffer_flags & PIO_BF_MALLOC)) {
-        mem_gc_free(interp, buffer_start);
-        Parrot_io_set_buffer_start(interp, filehandle, NULL);
-        Parrot_io_set_buffer_next(interp, filehandle, NULL);
-        buffer_start = buffer_next = NULL;
-    }
-
-    if (buffer_size > 0) {
-        buffer_start = buffer_next = mem_gc_allocate_n_typed(interp, buffer_size, unsigned char);
-        Parrot_io_set_buffer_start(interp, filehandle, buffer_start);
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        buffer_flags |= PIO_BF_MALLOC;
-    }
-    else
-        buffer_flags &= ~PIO_BF_MALLOC;
-
-    Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
-    if (buffer_size != 0) {
-        filehandle_flags &= ~PIO_F_LINEBUF;
-        filehandle_flags |= PIO_F_BLKBUF;
-    }
-    else
-        filehandle_flags &= ~(PIO_F_BLKBUF | PIO_F_LINEBUF);
-
-    Parrot_io_set_flags(interp, filehandle, filehandle_flags);
-
+    // TODO: Resize the buffer. Free it if the size is 0, otherwise realloc.
 }
 
-/*
+void
+Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_VTABLE *buffer), ARGMOD(PMC *filehandle), INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_buffer_set_mode)
+    flags = flags & (PIO_F_BLKBUF | PIO_F_LINEBUF);
 
-=item C<INTVAL Parrot_io_setlinebuf(PARROT_INTERP, PMC *filehandle)>
+    if ((buffer->flags & flags) == flags)
+        return;
+    if (flags & PIO_F_BLKBUF) {
+        // TODO: Setup block buffering
+    }
+    else if (flags & PIO_F_LINEBUF) {
+        // TODO: Setup line buffering
+    }
+    buffer->flags |= flags;
+}
 
-Set the file handle to line buffering mode.
 
-=cut
-
+/* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
+    These routines are the parts of the old system that are worth keeping,
+    for now. We need to up-convert these to the new architecture.
 */
 
-INTVAL
-Parrot_io_setlinebuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
-{
-    ASSERT_ARGS(Parrot_io_setlinebuf)
-    INTVAL filehandle_flags = Parrot_io_get_flags(interp, filehandle);
-
-    /* already linebuffering */
-    if (filehandle_flags & PIO_F_LINEBUF)
-        return 0;
-
-    /* Reuse setbuf call */
-    Parrot_io_setbuf(interp, filehandle, PIO_LINEBUFSIZE);
-
-    /* Then switch to linebuf */
-    filehandle_flags &= ~PIO_F_BLKBUF;
-    filehandle_flags |= PIO_F_LINEBUF;
-    Parrot_io_set_flags(interp, filehandle, filehandle_flags);
-    return 0;
-
-}
 
 /*
 

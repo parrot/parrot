@@ -21,7 +21,7 @@ Some ideas from AT&T SFIO.
 
 */
 
-/* BASIC IO SYSTEM DESIGN
+/* BASIC IO SYSTEM LAYOUT
 
 The IO Subsystem will be broken up into several components, by file. Here is
 a basic roadmap of files, their responsibilities and their locations in the
@@ -67,7 +67,7 @@ src/io/pipe.c:
 LOW-LEVEL DETAILS - These things implement the lowest-level logic and are
                     operating on PIOHANDLEs and raw data buffers.
 
-src/io/core.c:
+src/io/utilities.c:
     Internal, core utility routines. These routines are general shared helper
     routines for the IO subsystem and are not necessarily specific to
     buffering or any single PMC type.
@@ -113,10 +113,8 @@ DIAGRAM
 
 #define PIO_UNBOUND     (size_t)-1
 
-typedef PMC **ParrotIOTable;
-
 struct _ParrotIOData {
-    ParrotIOTable table;
+    PMC ** table;
 };
 
 /* redefine PIO_STD* for internal use */

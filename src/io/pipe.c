@@ -15,6 +15,9 @@ io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->open = io_pipe_open;
     vtable->is_open = io_pipe_is_open;
     vtable->close = io_pipe_close;
+    vtable->get_encoding = io_pipe_get_encoding;
+    vtable->set_flags = io_pipe_set_flags;
+    vtable->get_flags = io_pipe_get_flags;
 }
 
 
@@ -123,15 +126,65 @@ static INTVAL
 io_pipe_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_is_open)
+    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, pmc);
+    return os_handle != PIO_INVALID_HANDLE;
 }
 
 static INTVAL
 io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_close)
+    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
 
-    // TODO: Separate out Pipe logic from FileHandle logic here
-    const INTVAL result = Parrot_io_close_filehandle(interp, pmc);
-    SETATTR_FileHandle_flags(interp, pmc, 0);
-    return result;
+    if (os_handle == PIO_INVALID_HANDLE)
+        return -1;
+
+    else {
+        INTVAL result;
+        INTVAL flags;
+        IO_BUFFER * const write_buffer = PIO_GET_WRITE_BUFFER(interp, handle);
+        IO_VTABLE * const vtable = PIO_GET_VTABLE(interp, handle);
+        Parrot_io_buffer_flush(interp, buffer, handle, vtable);
+        result = Parrot_io_internal_close(interp, os_handle);
+        io_filehandle_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
+        Parrot_io_buffer_clear(interp, write_buffer);
+
+        if (flags & PIO_F_PIPE) {
+            INTVAL pid;
+            INTVAL status;
+
+            GETATTR_FileHandle_process_id(interp, pmc, pid);
+            status = Parrot_proc_waitpid(interp, pid);
+            SETATTR_FileHandle_exit_status(interp, pmc, status);
+        }
+        io_filehandle_set_flags(interp, handle, 0);
+        return result;
+    }
+}
+
+static STR_VTABLE *
+io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_pipe_get_encoding)
+    STRING           *encoding_str;
+    const STR_VTABLE *encoding;
+
+    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
+    if (!STRING_IS_NULL(encoding_str)) {
+        return Parrot_find_encoding_by_string(interp, encoding_str);
+    return NULL;
+}
+
+static void
+io_pipe_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+{
+    ASSERT_ARGS(io_pipe_set_flags)
+    PARROT_FILEHANDLE(handle)->flags = flags;
+}
+
+static INTVAL
+io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_pipe_get_flags)
+    return PARROT_FILEHANDLE(handle)->flags;
 }

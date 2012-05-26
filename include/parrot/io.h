@@ -38,41 +38,59 @@
 #define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
 
 /* IO object flags */
-#define PIO_F_READ      00000001
-#define PIO_F_WRITE     00000002
-#define PIO_F_APPEND    00000004
+#define PIO_F_READ      00000001        /* File is opened for reading   */
+#define PIO_F_WRITE     00000002        /* File is opened for writing   */
+#define PIO_F_APPEND    00000004        /* File is opened for append    */
 #define PIO_F_TRUNC     00000010
-#define PIO_F_EOF       00000020
-#define PIO_F_FILE      00000100
-#define PIO_F_PIPE      00000200
-#define PIO_F_SOCKET    00000400
+#define PIO_F_EOF       00000020        /* File is at EOF               */
 #define PIO_F_CONSOLE   00001000        /* A terminal                   */
 #define PIO_F_READLINE  00002000        /* user interactive readline    */
 #define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
-#define PIO_F_BLKBUF    00020000
-#define PIO_F_SOFT_SP   00040000        /* Python softspace */
+#define PIO_F_BLKBUF    00020000        /* Raw block-based buffering    */
+#define PIO_F_SOFT_SP   00040000        /* Python softspace             */
 #define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
-#define PIO_F_ASYNC     01000000        /* In Parrot async is default   */
-#define PIO_F_BINARY    02000000        /* File should be opened in binary mode */
+#define PIO_F_ASYNC     01000000        /* Handle is asynchronous       */
+#define PIO_F_BINARY    02000000        /* Open in binary mode          */
 
-/* These macros will be removed */
-#define PIO_STDHANDLE(interp, fileno) Parrot_io_std_os_handle((interp), (fileno))
-#define PIO_OPEN(interp, file, flags) \
-    Parrot_io_open((interp), (file), (flags))
-#define PIO_OPEN_PIPE(interp, file, flags, pid) \
-    Parrot_io_open_pipe((interp), (file), (flags), (pid))
-#define PIO_DUP(interp, handle) Parrot_io_dup((interp), (handle))
-#define PIO_CLOSE(interp, handle) Parrot_io_close((interp), (handle))
-#define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle((interp), (handle))
-#define PIO_READ(interp, handle, buf, len) Parrot_io_read((interp), (handle), (buf), (len))
-#define PIO_WRITE(interp, handle, buf, len) Parrot_io_write((interp), (handle), (buf), (len))
-#define PIO_SEEK(interp, pmc, offset, start) \
-    Parrot_io_seek((interp), (pmc), (offset), (start))
-#define PIO_TELL(interp, pmc) Parrot_io_tell((interp), (pmc))
-#define PIO_FLUSH(interp, handle) Parrot_io_flush((interp), (handle))
-#define PIO_GETBLKSIZE(handle) Parrot_io_getblksize((handle))
-#define PIO_IS_TTY(interp, handle) \
-    Parrot_io_is_tty((interp), (handle))
+/*
+ * pioctl argument constants. These don't have to
+ * be unique across io commands.
+ */
+#define PIOCTL_NONBUF              0
+#define PIOCTL_LINEBUF             1
+#define PIOCTL_BLKBUF              2
+
+/*
+ * Enum definition of constants for Socket.socket.
+ * Note that these are the *parrot* values for these defines; the system
+ * values vary from one platform to the next.  See the lookup tables in
+ * socket_unix.c and socket_win32.c for the mappings.
+ */
+
+/* &gen_from_enum(socket.pasm) */
+typedef enum {
+    PIO_PF_LOCAL    = 0,
+    PIO_PF_UNIX     = 1,
+    PIO_PF_INET     = 2,
+    PIO_PF_INET6    = 3,
+    PIO_PF_MAX      = 4     /* last elem */
+} Socket_Protocol_Family;
+
+typedef enum {
+    PIO_SOCK_PACKET     = 0,
+    PIO_SOCK_STREAM     = 1,
+    PIO_SOCK_DGRAM      = 2,
+    PIO_SOCK_RAW        = 3,
+    PIO_SOCK_RDM        = 4,
+    PIO_SOCK_SEQPACKET  = 5,
+    PIO_SOCK_MAX        = 6 /* last element */
+} Socket_Socket_Type;
+
+typedef enum {
+    PIO_PROTO_TCP   = 6,
+    PIO_PROTO_UDP   = 17 /* last element */
+} Socket_Protocol;
+/* &end_gen */
 
 extern PIOOFF_T piooffsetzero;
 
@@ -80,13 +98,14 @@ typedef struct _ParrotIOData ParrotIOData;
 
 /* BUFFERING */
 typedef struct _io_buffer {
-    INTVAL buffer_flags;
-    size_t buffer_size;
-    PMC *owner_handle;
-    STR_VTABLE encoding;
-    unsigned char *buffer_ptr;      /* ptr to the buffer mem block */
-    unsigned char *buffer_start;    /* ptr to the start of the data */
-    unsigned char *buffer_end;      /* ptr to the end of the data */
+    INTVAL buffer_flags;            /* Flags on this buffer            */
+    INTVAL reference_count;         /* Reference count of this struct, until
+                                       we wrap it in a special PMC     */
+    size_t buffer_size;             /* Current allocated size          */
+    STR_VTABLE encoding;            /* Encoding used by this buffer    */
+    unsigned char *buffer_ptr;      /* ptr to the buffer mem block     */
+    unsigned char *buffer_start;    /* ptr to the start of the data    */
+    unsigned char *buffer_end;      /* ptr to the end of the data      */
     void *memhandle;    /* Handle or pointer for munmap/UnmapViewOfFile.
                            NULL if not used*/
 } IO_BUFFER;
@@ -101,22 +120,24 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
     _b: This function operates on a raw char* buffer (Possibly from ByteBuffer)
 */
 
-typedef STRING * (*io_vtable_read_s)    (PARROT_INTERP, PMC *handle, size_t char_length);
-typedef INTVAL   (*io_vtable_read_b)    (PARROT_INTERP, PMC *handle, ARGOUT(char * buffer), size_t byte_length);
-typedef INTVAL   (*io_vtable_write_s)   (PARROT_INTERP, PMC *handle, ARGIN(STRING * s), size_t char_length);
-typedef INTVAL   (*io_vtable_write_b    (PARROT_INTERP, PMC *handle, ARGIN(char * buffer), size_t byte_length);
-typedef STRING * (*io_vtable_readline_s)(PARROT_INTERP, PMC *handle, INTVAL terminator);
-typedef STRING * (*io_vtable_readall_s) (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_flush)     (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_is_eof)    (PARROT_INTERP, PMC *handle);
-typedef PIOOFF_T (*io_vtable_tell)      (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_seek)      (PARROT_INTERP, PMC *handle, PIOOFF_T loc);
-typedef INTVAL   (*io_vtable_peek_b)    (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_open)      (PARROT_INTERP, PMC *handle, ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode));
-typedef INTVAL   (*io_vtable_is_open)   (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_close)     (PARROT_INTERP, PMC *handle);
-typedef INTVAL   (*io_vtable_get_flags) (PARROT_INTERP, PMC *handle);
+typedef STRING *    (*io_vtable_read_s)       (PARROT_INTERP, PMC *handle, size_t char_length);
+typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, PMC *handle, ARGOUT(char * buffer), size_t byte_length);
+typedef INTVAL      (*io_vtable_write_s)      (PARROT_INTERP, PMC *handle, ARGIN(STRING * s), size_t char_length);
+typedef INTVAL      (*io_vtable_write_b       (PARROT_INTERP, PMC *handle, ARGIN(char * buffer), size_t byte_length);
+typedef STRING *    (*io_vtable_readline_s)   (PARROT_INTERP, PMC *handle, INTVAL terminator);
+typedef STRING *    (*io_vtable_readall_s)    (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
+typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_seek)         (PARROT_INTERP, PMC *handle, PIOOFF_T offset, INTVAL whence);
+typedef INTVAL      (*io_vtable_peek_b)       (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, PMC *handle, ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode));
+typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 typedef STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
+typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
+typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
     char                  * name;
@@ -990,46 +1011,6 @@ INTVAL Parrot_io_socket_send_from_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_api.c */
-
-/*
- * pioctl argument constants. These don't have to
- * be unique across io commands.
- */
-#define PIOCTL_NONBUF              0
-#define PIOCTL_LINEBUF             1
-#define PIOCTL_BLKBUF              2
-
-/*
- * Enum definition of constants for Socket.socket.
- * Note that these are the *parrot* values for these defines; the system
- * values vary from one platform to the next.  See the lookup tables in
- * socket_unix.c and socket_win32.c for the mappings.
- */
-
-/* &gen_from_enum(socket.pasm) */
-typedef enum {
-    PIO_PF_LOCAL    = 0,
-    PIO_PF_UNIX     = 1,
-    PIO_PF_INET     = 2,
-    PIO_PF_INET6    = 3,
-    PIO_PF_MAX      = 4     /* last elem */
-} Socket_Protocol_Family;
-
-typedef enum {
-    PIO_SOCK_PACKET     = 0,
-    PIO_SOCK_STREAM     = 1,
-    PIO_SOCK_DGRAM      = 2,
-    PIO_SOCK_RAW        = 3,
-    PIO_SOCK_RDM        = 4,
-    PIO_SOCK_SEQPACKET  = 5,
-    PIO_SOCK_MAX        = 6 /* last element */
-} Socket_Socket_Type;
-
-typedef enum {
-    PIO_PROTO_TCP   = 6,
-    PIO_PROTO_UDP   = 17 /* last element */
-} Socket_Protocol;
-/* &end_gen */
 
 #endif /* PARROT_IO_H_GUARD */
 

@@ -104,6 +104,20 @@ Parrot_io_init(PARROT_INTERP)
             "PIO alloc table failure.");
 }
 
+// TODO: Merge this buffering logic into where-ever we set up these handles
+INTVAL
+Parrot_io_init_buffer(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_io_init_buffer)
+    if (Parrot_io_STDOUT(interp))
+        Parrot_io_setlinebuf(interp, Parrot_io_STDOUT(interp));
+
+    if (Parrot_io_STDIN(interp))
+        Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
+
+    return 0;
+}
+
 /*
 
 =item C<void Parrot_io_finish(PARROT_INTERP)>
@@ -147,7 +161,7 @@ Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
     ASSERT_ARGS(Parrot_IOData_mark)
     INTVAL i;
-    ParrotIOTable table = piodata->table;
+    PMC ** const table = piodata->table;
 
     /* this was i < PIO_NR_OPEN, but only standard handles 0..2 need
      * to be kept alive AFAIK -leo
@@ -280,15 +294,8 @@ PMC *
 Parrot_io_fdopen(PARROT_INTERP, ARGIN(PMC *pmc), PIOHANDLE fd, ARGIN(STRING *sflags))
 {
     ASSERT_ARGS(Parrot_io_fdopen)
-    PMC *new_filehandle;
     const INTVAL flags = Parrot_io_parse_open_flags(interp, sflags);
-
-    if (!flags)
-        return PMCNULL;
-
-    new_filehandle = Parrot_io_fdopen_flags(interp, pmc, fd, flags);
-
-    return new_filehandle;
+    return Parrot_io_fdopen_flags(interp, pmc, fd, flags);
 }
 
 
@@ -315,6 +322,9 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
         INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_fdopen_flags)
+
+    if (!flags)
+        return PMCNULL;
 
     if (PIO_IS_TTY(interp, fd))
         flags |= PIO_F_CONSOLE;
@@ -631,9 +641,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
+Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 {
-    ASSERT_ARGS(Parrot_io_readline)
+    ASSERT_ARGS(Parrot_io_readline_s)
 
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
