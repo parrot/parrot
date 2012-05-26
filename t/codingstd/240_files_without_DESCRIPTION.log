@@ -109,38 +109,38 @@
 [X] docs/user/pir/pmcs.pod
 [X] docs/vtables.pod
 [X] editor/README.pod
-[ ] examples/languages/abc/abc.pir
-[ ] examples/languages/abc/src/builtins/all.pir
-[ ] examples/languages/squaak/doc/tutorial_episode_1.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_2.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_3.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_4.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_5.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_6.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_7.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_8.pod
-[ ] examples/languages/squaak/doc/tutorial_episode_9.pod
-[ ] examples/languages/squaak/squaak.pir
-[ ] examples/languages/squaak/src/squaak.pir
-[ ] examples/mops/mops.p6
-[ ] examples/mops/mops.rb
-[ ] examples/nci/Xlib.pir
-[ ] examples/nci/Xlibconstants.pir
-[ ] examples/nci/xlibtest.nqp
-[ ] examples/nci/xlibtest.p6
-[ ] examples/nci/xlibtest.pir
-[ ] examples/past/01-sub.pir
-[ ] examples/past/four_plus_one.pir
-[ ] examples/pir/coop_threads.pir
-[ ] examples/sdl/anim_image.pir
-[ ] examples/sdl/anim_image_dblbuf.pir
-[ ] examples/sdl/blue_font.pir
-[ ] examples/sdl/blue_rect.pir
-[ ] examples/sdl/blue_rect.pl
-[ ] examples/sdl/bounce_parrot_logo.pir
-[ ] examples/sdl/mandel.pir
-[ ] examples/sdl/minesweeper/eventhandler.pir
-[ ] examples/sdl/minesweeper/mines.pir
+[X] examples/languages/abc/abc.pir
+[X] examples/languages/abc/src/builtins/all.pir
+[X] examples/languages/squaak/doc/tutorial_episode_1.pod
+[X] examples/languages/squaak/doc/tutorial_episode_2.pod
+[X] examples/languages/squaak/doc/tutorial_episode_3.pod
+[X] examples/languages/squaak/doc/tutorial_episode_4.pod
+[X] examples/languages/squaak/doc/tutorial_episode_5.pod
+[X] examples/languages/squaak/doc/tutorial_episode_6.pod
+[X] examples/languages/squaak/doc/tutorial_episode_7.pod
+[X] examples/languages/squaak/doc/tutorial_episode_8.pod
+[X] examples/languages/squaak/doc/tutorial_episode_9.pod
+[X] examples/languages/squaak/squaak.pir
+[X] examples/languages/squaak/src/squaak.pir
+[X] examples/mops/mops.p6
+[X] examples/mops/mops.rb
+[X] examples/nci/Xlib.pir
+[X] examples/nci/Xlibconstants.pir
+[X] examples/nci/xlibtest.nqp
+[X] examples/nci/xlibtest.p6
+[X] examples/nci/xlibtest.pir
+[X] examples/past/01-sub.pir
+[X] examples/past/four_plus_one.pir
+[X] examples/pir/coop_threads.pir
+[X] examples/sdl/anim_image.pir
+[X] examples/sdl/anim_image_dblbuf.pir
+[X] examples/sdl/blue_font.pir
+[X] examples/sdl/blue_rect.pir
+[X] examples/sdl/blue_rect.pl
+[X] examples/sdl/bounce_parrot_logo.pir
+[X] examples/sdl/mandel.pir
+[X] examples/sdl/minesweeper/eventhandler.pir
+[X] examples/sdl/minesweeper/mines.pir
 [ ] examples/sdl/move_parrot_logo.pir
 [ ] examples/sdl/raw_pixels.pir
 [ ] examples/sdl/tetris/app.pir
