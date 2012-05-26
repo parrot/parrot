@@ -20,9 +20,12 @@ operating systems. For the primary public I/O API, see F<src/io/api.c>.
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
-io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 {
     ASSERT_ARGS(io_filehandle_setup_vtable)
+    if (vtable == NULL)
+        vtable = &(interp->piodata->vtables[idx]);
+    vtable->number = idx;
     vtable->name = "FileHandle";
     vtable->read_s = io_filehandle_read_s;
     vtable->read_b = io_filehandle_read_b;

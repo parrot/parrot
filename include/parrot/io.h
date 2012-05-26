@@ -160,7 +160,6 @@ typedef struct _io_vtable {
 #define IO_VTABLE_SOCKET            2
 #define IO_VTABLE_STRINGHANDLE      3
 #define IO_VTABLE_USER              4
-extern Parrot_io_vtable *io_vtables
 
 #define IO_PTR_IDX_VTABLE 0
 #define IO_PTR_IDX_READ_BUFFER 1

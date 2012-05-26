@@ -81,6 +81,7 @@ Parrot_io_init(PARROT_INTERP)
             Parrot_io_eprintf(NULL, "I/O system initialized.\n");
         }
 
+        io_setup_vtables(interp);
         return;
     }
 
@@ -109,6 +110,19 @@ Parrot_io_init_buffer(PARROT_INTERP)
         Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
 
     return 0;
+}
+
+void
+io_setup_vtables(PARROT_INTERP)
+{
+    const int number_of_vtables = 5;
+    interp->piodata->vtables = mem_gc_allocate_n_zeroed_typed(interp, number_of_vtables, IO_VTABLE);
+    interp->piodata->num_vtables = number_of_vtables;
+    io_filehandle_setup_vtable(interp, NULL, IO_VTABLE_FILEHANDLE);
+    io_socket_setup_vtable(interp, NULL, IO_VTABLE_SOCKET);
+    io_pipe_setup_vtable(interp, NULL, IO_VTABLE_PIPE);
+    io_stringhandle_setup_vtable(interp, NULL, IO_VTABLE_STRINGHANDLE);
+    io_userhandle_setup_vtable(interp, NULL, IO_VTABLE_USER);
 }
 
 /*

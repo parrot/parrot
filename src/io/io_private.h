@@ -112,7 +112,9 @@ DIAGRAM
 #define PIO_UNBOUND     (size_t)-1
 
 struct _ParrotIOData {
-    PMC ** table;
+    PMC ** table;           /* Standard IO Streams (STDIN, STDOUT, STDERR) */
+    INTVAL num_vtables;     /* Number of vtables */
+    IO_VTABLE ** vtables;   /* Array of VTABLES */
 };
 
 /* redefine PIO_STD* for internal use */
