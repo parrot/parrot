@@ -2,11 +2,15 @@
 
 use v6;
 
-=begin pod
+=pod
 
-=head1 TITLE
+=head1 NAME
 
 xlibtest.p6 - A test of Xlib.pir usage from rakudo
+
+=head1 DESCRIPTION
+
+This program is a test of Xlib.pir usage from rakudo.
 
 =head1 SYNOPSYS
 
@@ -19,7 +23,7 @@ current directory:
 
 Press Esc key to exit the program.
 
-=end pod
+=cut
 
 use Xlib:from<parrot>;
 
