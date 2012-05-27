@@ -971,15 +971,10 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         case CPU_ARCH:
             return Parrot_str_new_init(interp, PARROT_CPU_ARCH, 
                     sizeof (PARROT_CPU_ARCH) - 1, Parrot_ascii_encoding_ptr, 0);
-#ifdef PARROT_HAS_HEADER_SYSUTSNAME
         case CPU_TYPE: 
-            {
-                struct utsname info;
-                if (uname(&info) == 0) {
-                    return Parrot_str_new_init(interp, info.machine,
-                        strlen(info.machine), Parrot_ascii_encoding_ptr, 0);
-                }
-            }
+            return Parrot_get_cpu_type(interp);
+
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
         case PARROT_OS_VERSION: 
             {
                 struct utsname info;
