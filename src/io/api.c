@@ -125,6 +125,20 @@ io_setup_vtables(PARROT_INTERP)
     io_userhandle_setup_vtable(interp, NULL, IO_VTABLE_USER);
 }
 
+IO_VTABLE *
+Parrot_io_allocate_new_vtable(PARROT_INTERP, const char *name)
+{
+    ASSERT_ARGS(Parrot_io_get_new_vtable)
+    const int number_of_vtables = interp->piodata->num_vtables;
+    IO_VTABLE *vtable;
+    interp->piodata->vtables = mem_gc_realloc_n_typed(interp, number_of_vtables + 1, IO_VTABLE);
+    vtable = &(interp->piodata->vtables[number_of_vtables]);
+    vtable->name = name;
+    vtable->number = number_of_vtables;
+    interp->piodata->num_vtables++;
+    return vtable;
+}
+
 /*
 
 =item C<void Parrot_io_finish(PARROT_INTERP)>
@@ -482,7 +496,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length);
+Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length);
 {
     ASSERT_ARGS(Parrot_io_read_s)
 
@@ -490,73 +504,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
 
-    else {
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        STRING * result;
-        size_t bytes_read;
-
-        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
-        encoding = io_get_handle_encoding(interp, handle);
-
-        // TODO: Move this string-reading logic into a separate place so we
-        // can reuse it. It belongs above the buffer API, but below the
-        // public API.
-        result = io_get_new_empty_string(interp, encoding, char_length);
-        bytes_read = Parrot_io_buffer_read_bytes(interp, read_buffer, handle, result-strstart, char_length);
-
-        if (bytes_read & (encoding->bytes_per_unit - 1))
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_CHARACTER,
-                "Unaligned end in %s string\n", encoding->name);
-
-        if (encoding->bytes_per_unit == encoding->max_bytes_per_codepoint) {
-            result->bufused = bytes_read;
-            STRING_scan(interp, result);
-        }
-        else {
-            Parrot_String_Bounds bounds;
-            INTVAL needed;
-
-            bounds.bytes = bytes_read;
-            bounds.chars = -1;
-            bounds.delim = -1;
-
-            needed = encoding->partial_scan(interp, result->strstart, &bounds);
-
-            result->bufused = bounds.bytes;
-            result->strlen  = bounds.chars;
-
-            // TODO: Something about this logic looks wrong. Needs testing.
-            /* Read and append remaining bytes in case of a partial result */
-            if (needed > 0) {
-                const INTVAL rest_read = Parrot_io_read_buffer(interp, pmc,
-                                        result->strstart + bytes_read, needed);
-
-                if (rest_read < needed)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_CHARACTER,
-                        "Unaligned end in %s string\n", encoding->name);
-
-                /* Check if character is valid */
-
-                bounds.bytes = bytes_read + needed - result->bufused;
-                bounds.chars = 1;
-                bounds.delim = -1;
-
-                encoding->partial_scan(interp,
-                        result->strstart + result->bufused, &bounds);
-
-                PARROT_ASSERT(result->bufused + bounds.bytes ==
-                              bytes_read + needed);
-                PARROT_ASSERT(bounds.chars == 1);
-
-                result->bufused += bounds.bytes;
-                result->strlen  += 1;
-            }
-        }
-        return result;
-    }
+    return io_read_encoded_string(interp, handle, length);
 }
 
 /*
@@ -615,10 +563,6 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
 {
     ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
 
-    if (PMC_IS_NULL(handle))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Attempt to write bytes to a null or invalid PMC");
-
     if (PMC_IS_NULL(buffer))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid ByteBuffer");
@@ -626,15 +570,10 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
     {
         char *content = (char *)VTABLE_get_pointer(interp, buffer);
         INTVAL real_length = VTABLE_elements(interp, buffer);
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const write_buffer = IO_GET_READ_BUFFER(interp, handle);
-
-        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
-
         if (real_length < byte_length)
             byte_length = real_length;
 
-        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, content, byte_length);
+        return Parrot_io_write_b(interp, handle, content, byte_length);
     }
 }
 
@@ -689,7 +628,7 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_write_c(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer), size_t byte_length)
+Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer), size_t byte_length)
 {
     ASSERT_ARGS(Parrot_io_write_handle)
 
@@ -703,6 +642,27 @@ Parrot_io_write_c(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
 
         return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, buffer, byte_length);
+    }
+}
+
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
+{
+    ASSERT_ARGS(Parrot_io_write_s)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to write a string to a null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
+        STRING *out_s;
+
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
+        out_s = io_verify_string_encoding(interp, handle, vtable, s);
+
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, out_s->strstart, s->bufused);
     }
 }
 
@@ -819,12 +779,7 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         return 1;
     if (Parrot_io_is_closed_filehandle(interp, pmc))
         return 1;
-
-    {
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-
-        return vtable->is_eof(interp, handle);
-    }
+    return IO_GET_VTABLE(interp, handle)->is_eof(interp, handle);
 }
 
 /*
@@ -842,25 +797,7 @@ INTVAL
 Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
     ASSERT_ARGS(Parrot_io_puts)
-    return Parrot_io_write(interp, pmc, s, strlen(s));
-}
-
-PARROT_EXPORT
-INTVAL
-Parrot_io_write_c(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const char *s), INTVAL byte_length)
-{
-    ASSERT_ARGS(Parrot_io_write)
-    if (PMC_IS_NULL(handle))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Attempt to write bytes to a null or invalid PMC");
-    {
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
-
-        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
-
-        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, s, byte_length);
-    }
+    return Parrot_io_write_b(interp, pmc, s, strlen(s));
 }
 
 /*
@@ -880,26 +817,6 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *s))
 {
     ASSERT_ARGS(Parrot_io_putps)
     return Parrot_io_write_s(interp, pmc, s);
-}
-
-PARROT_EXPORT
-INTVAL
-Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
-{
-    ASSERT_ARGS(Parrot_io_write_s)
-    if (PMC_IS_NULL(handle))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Attempt to write a string to a null or invalid PMC");
-    {
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
-        STRING *out_s;
-
-        io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
-        out_s = io_verify_string_encoding(interp, handle, vtable, s);
-
-        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, out_s->strstart, s->bufused);
-    }
 }
 
 /*
@@ -923,7 +840,10 @@ Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 
     va_start(args, s);
 
-    ret = Parrot_io_write_s(interp, pmc, Parrot_vsprintf_c(interp, s, args));
+    {
+        STRING * const str = Parrot_vsprintf_c(interp, s, args);
+        ret = Parrot_io_write_s(interp, pmc, str);
+    }
 
     va_end(args);
 
@@ -955,10 +875,7 @@ Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
     str = Parrot_vsprintf_c(interp, s, args);
     va_end(args);
 
-    // TODO: This
-    //ret = Parrot_io_write(interp, os_handle, str->strstart, str->bufused);
-
-    return ret;
+    return Parrot_io_internal_write(interp, os_handle, str->strstart, str->bufused);
 }
 
 /*

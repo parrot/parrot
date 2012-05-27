@@ -113,12 +113,6 @@ Parrot_io_buffer_readline_s(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VT
     // TODO: This!
 }
 
-static size_t
-io_buffer_find_next_terminator(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, INTVAL terminator)
-{
-    // TODO: This!
-}
-
 // Transfer length bytes from the buffer to the char*s, removing those bytes
 // from the buffer. Return the number of bytes actually copied.
 static size_t
@@ -275,7 +269,7 @@ Parrot_io_buffer_content_size(SHIM_INTERP, IO_BUFFER *buffer)
 }
 
 void
-Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_VTABLE *buffer), ARGMOD(PMC *filehandle), INTVAL flags)
+Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *filehandle), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_buffer_set_mode)
     flags = flags & (PIO_F_BLKBUF | PIO_F_LINEBUF);
@@ -289,6 +283,26 @@ Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_VTABLE *buffer), ARGMOD(PMC *
         // TODO: Setup line buffering
     }
     buffer->flags |= flags;
+}
+
+size_t
+io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds), INTVAL delim)
+{
+    ASSERT_ARGS(io_buffer_find_string_marker);
+
+    if (BUFFER_EMPTY(buffer))
+        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+
+    bounds->bytes = BUFFER_USED_SIZE(buffer);
+    bounds.chars = -1;
+    bounds.delim = delim;
+
+    /* Search the buffer. Return either when we find the delimiter or reach
+       the end of the available buffer */
+    encoding->partial_scan(interp, (char *)buffer_next, &bounds);
+    if (bounds.delim == delim)
+        return bounds.bytes;
+    return BUFFER_USED_SIZE(buffer);
 }
 
 
