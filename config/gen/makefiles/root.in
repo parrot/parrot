@@ -2455,7 +2455,7 @@ dynext-clean :
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm t/compilers/imcc/syn/*.pbc
-	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
+	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm t/compilers/imcc/reg/*.pbc
 	$(RM_F) t/compilers/pct/*.pir
 	$(RM_F) t/compilers/pge/perl6regex/*.pir
 	$(RM_F) t/compilers/pge/*.pir
