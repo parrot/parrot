@@ -133,6 +133,7 @@ typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 typedef STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
+typedef void        (*io_vtable_ensure_buffer)(PARROT_INTERP, PMC *handle, INTVAL buffer_no, size_t size, INTVAL flags);
 
 typedef struct _io_vtable {
     char                  * name;
@@ -153,6 +154,7 @@ typedef struct _io_vtable {
     io_vtable_peek_b        peek_b;
     io_vtable_get_flags     get_flags;
     io_vtable_get_encoding  get_encoding;
+    io_vtable_ensure_buffer ensure_buffer;
 } IO_VTABLE;
 
 #define IO_VTABLE_FILEHANDLE        0

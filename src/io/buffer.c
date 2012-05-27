@@ -206,8 +206,8 @@ Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
         size_t used_length = BUFFER_USED_SIZE(buffer);
         bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start, used_size);
+        Parrot_io_buffer_clear(interp, buffer);
     }
-    Parrot_io_buffer_clear(interp, buffer);
     return bytes_written + vtable->flush(interp, handle, autoclose);
 }
 
@@ -285,26 +285,59 @@ Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *
     buffer->flags |= flags;
 }
 
+// Search the buffer for the given delimiter character or end-of-buffer,
+// whichever comes first. Return a count of the number of bytes to be
+// read, in addition to scan information in *bounds. Does not return an
+// amount of bytes to read which would create an incomplete codepoint
 size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds), INTVAL delim)
 {
     ASSERT_ARGS(io_buffer_find_string_marker);
+    INTVAL bytes_needed = 0;
 
-    if (BUFFER_EMPTY(buffer))
-        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+    if (BUFFER_EMPTY(buffer)) {
+        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        if (bytes_available = 0)
+            return 0;
+    }
 
     bounds->bytes = BUFFER_USED_SIZE(buffer);
-    bounds.chars = -1;
-    bounds.delim = delim;
+    bounds->chars = -1;
+    bounds->delim = delim;
 
     /* Search the buffer. Return either when we find the delimiter or reach
-       the end of the available buffer */
-    encoding->partial_scan(interp, (char *)buffer_next, &bounds);
-    if (bounds.delim == delim)
-        return bounds.bytes;
-    return BUFFER_USED_SIZE(buffer);
+       the end of the available buffer. partial_scan returns the number of
+       bytes needed to complete the final codepoint (0 if we have read a
+       complete codepoint and do not need any more to complete it). Lop those
+       last few bytes off the end of the found sequence, so we only read
+       complete codepoints out into the STRING. */
+    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
+    return bounds.bytes - bytes_needed;
 }
 
+// Attempt to read from the buffer the given number of characters in the
+// given encoding. Returns the number of bytes to be read from the buffer to
+// either get this number from the buffer or else get the entire contents of
+// the buffer and continue on a later read.
+size_t
+io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds), size_t num_chars)
+{
+    ASSERT_ARGS(io_buffer_find_num_chars)
+    INTVAL bytes_needed = 0;
+
+    if (BUFFER_EMPTY(buffer)) {
+        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        if (bytes_available = 0)
+            return 0;
+    }
+
+    bounds->bytes = BUFFER_USED_SIZE(buffer);
+    bounds->chars = num_chars;
+    bounds->delim = -1;
+
+    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
+    return bounds.bytes - bytes_needed;
+}
 
 /* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
     These routines are the parts of the old system that are worth keeping,
