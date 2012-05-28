@@ -2342,6 +2342,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
+	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
@@ -2380,6 +2381,7 @@ prog-clean :
 	$(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
 	$(DIS) $(FR_DIR)/pbc_disassemble/main$(O)
 	$(RM_F) \
+	$(FRP_DIR)/main$(O) \
 	$(FRPTWO_DIR)/main$(O) \
 	parrot_old \
 	src/null_config$(O) \
