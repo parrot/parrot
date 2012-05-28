@@ -108,10 +108,6 @@ DIAGRAM
 #define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
 #define PIO_BF_MMAP     00000010        /* Buffer mmap()ed              */
 
-/* Specify that the buffer may be any size */
-#define BUFFER_SIZE_ANY     (size_t)-1
-#define BUFFER_FLAGS_ANY    (INTVAL)0
-
 struct _ParrotIOData {
     PMC ** table;           /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;     /* Number of vtables */

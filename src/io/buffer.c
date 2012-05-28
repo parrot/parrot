@@ -95,6 +95,26 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
 }
 
 void
+Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx, size_t length, INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_buffer_add_to_handle)
+    if (idx != IO_PTR_IDX_READ_BUFFER && idx != IO_PTR_IDX_WRITE_BUFFER)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Unknown buffer number %d", idx);
+    {
+        IO_BUFFER * buffer = (IO_BUFFER *)VTABLE_get_pointer_keyed_int(interp, handle, idx);
+        if (buffer)
+            Parrot_io_buffer_resize(interp, buffer, length);
+        else {
+            buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, length);
+            VTABLE_set_pointer_keyed_int(interp, handle, idx, buffer);
+        }
+        if (flags != BUFFER_FLAGS_ANY)
+            buffer->flags = flags;
+    }
+}
+
+void
 Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_free)

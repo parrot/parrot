@@ -161,6 +161,10 @@ typedef struct _io_vtable {
 #define IO_PTR_IDX_READ_BUFFER 1
 #define IO_PTR_IDX_WRITE_BUFFER 2
 
+/* Specify that the buffer may be any size */
+#define BUFFER_SIZE_ANY     (size_t)-1
+#define BUFFER_FLAGS_ANY    (INTVAL)0
+
 #define IO_GET_VTABLE(i, p) ((IO_VTABLE*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
 #define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
 #define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
@@ -764,6 +768,15 @@ size_t io_buffer_find_string_marker(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*bounds);
 
+void Parrot_io_buffer_add_to_handle(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL idx,
+    size_t length,
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
@@ -894,6 +907,10 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(encoding) \
     , PARROT_ASSERT_ARG(bounds))
+#define ASSERT_ARGS_Parrot_io_buffer_add_to_handle \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_buffer_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(owner) \
