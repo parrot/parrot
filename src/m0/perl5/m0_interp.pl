@@ -18,6 +18,7 @@ Run M0 bytecode assembled by the M0 assembler.
 use strict;
 use warnings FATAL => qw(all);
 use feature 'say';
+use IPC::System::Simple;
 use autodie qw/:all/;
 use File::Slurp qw/slurp/;
 use Data::Dumper;
@@ -117,6 +118,10 @@ sub new_interp {
         \&m0_opfunc_div_n,
         \&m0_opfunc_mod_i,
         \&m0_opfunc_mod_n,
+        \&m0_opfunc_isgt_i,
+        \&m0_opfunc_isgt_n,
+        \&m0_opfunc_isge_i,
+        \&m0_opfunc_isge_n,
         \&m0_opfunc_convert_i_n,
         \&m0_opfunc_convert_n_i,
         \&m0_opfunc_ashr,
@@ -376,6 +381,34 @@ sub m0_opfunc_mod_n {
     m0_say "mod_n $a1, $a2, $a3";
 
     $$cf->[$a1] = n( n($$cf,$a2) % n($$cf,$a3) );
+}
+
+sub m0_opfunc_isgt_i {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "isgt_i $a1, $a2, $a3";
+
+    $$cf->[$a1] = i( i($$cf,$a2) > i($$cf,$a3) );
+}
+
+sub m0_opfunc_isgt_n {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "isgt_n $a1, $a2, $a3";
+
+    $$cf->[$a1] = n( n($$cf,$a2) > n($$cf,$a3) );
+}
+
+sub m0_opfunc_isge_i {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "isge_i $a1, $a2, $a3";
+
+    $$cf->[$a1] = i( i($$cf,$a2) >= i($$cf,$a3) );
+}
+
+sub m0_opfunc_isge_n {
+    my ($cf, $a1, $a2, $a3) = @_;
+    m0_say "isge_n $a1, $a2, $a3";
+
+    $$cf->[$a1] = n( n($$cf,$a2) >= n($$cf,$a3) );
 }
 
 sub m0_opfunc_convert_i_n {

@@ -664,6 +664,10 @@ div_i
 div_n
 mod_i
 mod_n
+isgt_i
+isgt_n
+isge_i
+isge_n
 convert_i_n
 convert_n_i
 ashr

@@ -104,6 +104,42 @@ m0_op_sub_n( M0_CallFrame *frame, const unsigned char *ops )
 }
 
 static void
+m0_op_isgt_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
+    int64_t *r3 = (int64_t*) &(frame->registers[ops[3]]);
+    int64_t *r1 = (int64_t*) &(frame->registers[ops[1]]);
+    *r1 = *r2 > *r3;
+}
+
+static void
+m0_op_isgt_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double *r2 = (double*) &(frame->registers[ops[2]]);
+    double *r3 = (double*) &(frame->registers[ops[3]]);
+    double *r1 = (double*) &(frame->registers[ops[1]]);
+    *r1 = *r2 > *r3;
+}
+
+static void
+m0_op_isge_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
+    int64_t *r3 = (int64_t*) &(frame->registers[ops[3]]);
+    int64_t *r1 = (int64_t*) &(frame->registers[ops[1]]);
+    *r1 = *r2 >= *r3;
+}
+
+static void
+m0_op_isge_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    double *r2 = (double*) &(frame->registers[ops[2]]);
+    double *r3 = (double*) &(frame->registers[ops[3]]);
+    double *r1 = (double*) &(frame->registers[ops[1]]);
+    *r1 = *r2 >= *r3;
+}
+
+static void
 m0_op_convert_n_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     int64_t *r2 = (int64_t*) &(frame->registers[ops[2]]);
@@ -367,6 +403,22 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_SUB_N):
                     M0_EXEC_OP(sub_n, cf, ops, pc);
+                break;
+
+                case (M0_ISGT_I):
+                    M0_EXEC_OP(isgt_i, cf, ops, pc);
+                break;
+
+                case (M0_ISGT_N):
+                    M0_EXEC_OP(isgt_n, cf, ops, pc);
+                break;
+
+                case (M0_ISGE_I):
+                    M0_EXEC_OP(isge_i, cf, ops, pc);
+                break;
+
+                case (M0_ISGE_N):
+                    M0_EXEC_OP(isge_n, cf, ops, pc);
                 break;
 
                 case (M0_GOTO):
