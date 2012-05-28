@@ -41,12 +41,18 @@ static INTVAL io_is_end_of_line(ARGIN(const char *c))
 #define BUFFER_AVAILABLE_SIZE(b) (b->buffer_size - ((size_t)(b->buffer_end - b->buffer_start)))
 #define BUFFER_CAN_BE_NORMALIZED(b) ((size_t)(b->buffer_start - b->buffer_ptr) > (b->buffer_size / 2))
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
-Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE encoding, size_t init_size)
+Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
+        ARGIN(STR_VTABLE *encoding), size_t init_size)
 {
-    IO_BUFFER * const buffer = (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
-    buffer->owner_handle = handle;
+    ASSERT_ARGS(Parrot_io_buffer_allocate)
+    IO_BUFFER * const buffer =
+            (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp,
+                                                        sizeof (IO_BUFFER));
     buffer->encoding = encoding;
+    buffer->owner_pmc = owner;
     buffer->buffer_size = init_size;
     if (init_size) {
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
@@ -59,9 +65,10 @@ Parrot_io_buffer_allocate(PARROT_INTERP, PMC *handle, INTVAL flags, STR_VTABLE e
 }
 
 void
-Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)
+Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
 {
-    if (buffer->init_size) {
+    ASSERT_ARGS(Parrot_io_buffer_free)
+    if (buffer->buffer_size) {
         if (buffer->flags & PIO_BF_MALLOC)  {
             mem_sys_free(buffer->buffer_start);
         }
@@ -72,9 +79,30 @@ Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)
     Parrot_gc_free_fixed_size_storage(interp, sizeof (IO_BUFFER), buffer);
 }
 
-void
-Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
+size_t
+Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
 {
+    ASSERT_ARGS(Parrot_io_buffer_resize)
+    if (new_size < PIO_BUFFER_MIN_SIZE)
+        new_size = PIO_BUFFER_MIN_SIZE;
+
+    if (buffer->buffer_size == new_size)
+        return new_size;
+
+    /* Cannot shrink a buffer with data in it, because we do not ever want to
+       lose data */
+    if (!BUFFER_EMPTY(buffer) && new_size < buffer->buffer_size)
+        return buffer->buffer_size;
+
+    buffer->buffer_ptr = mem_sys_realloc(buffer->buffer_ptr, new_size);
+    buffer->buffer_size = new_size;
+    return new_size;
+}
+
+void
+Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+{
+    ASSERT_ARGS(Parrot_io_buffer_clear)
     if (!buffer)
         return;
     buffer->buffer_start = buffer->buffer_ptr;
@@ -82,12 +110,16 @@ Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)
 }
 
 size_t
-Parrot_io_buffer_read_b(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, char *s, size_t length)
+Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGOUT(char *s),
+        size_t length)
 {
+    ASSERT_ARGS(Parrot_io_buffer_read_b)
     if (!buffer)
         return vtable->read_b(interp, handle, s, length);
     {
-        size_t bytes_read = Parrot_io_buffer_transfer_to_mem(interp, buffer, s, length);
+        size_t bytes_read = Parrot_io_buffer_transfer_to_mem(interp, buffer,
+                                                             s, length);
         length = length - bytes_read;
 
         /* If we still need more data than the buffer can hold, just read it
@@ -99,25 +131,21 @@ Parrot_io_buffer_read_b(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE
            the buffer. */
         else if (length) {
             Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-            bytes_read += Parrot_io_buffer_transfer_to_mem(interp, buffer, s + bytes_read, length);
+            bytes_read += Parrot_io_buffer_transfer_to_mem(interp, buffer,
+                                                    s + bytes_read, length);
         }
 
         return bytes_read;
     }
 }
 
-STRING *
-Parrot_io_buffer_readline_s(PARROT_INTERP, IO_BUFFER *buffer, PMC *handle, IO_VTABLE *vtable, INTVAL terminator)
-{
-    ASSERT_ARGS(Parrot_io_buffer_readline_s)
-    // TODO: This!
-}
-
 // Transfer length bytes from the buffer to the char*s, removing those bytes
 // from the buffer. Return the number of bytes actually copied.
 static size_t
-io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, size_t length)
+io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGOUT(char * s), size_t length)
 {
+    ASSERT_ARGS(io_buffer_transfer_to_mem)
     if (!buffer || BUFFER_IS_EMPTY(buffer))
         return 0;
 
@@ -136,8 +164,9 @@ io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER *buffer, char * s, size_t len
 // Attempt to normalize the buffer. If we can, move data to the front of the
 // buffer so we have the maximum amount of contiguous free space */
 static void
-io_buffer_normalize(PARROT_INTERP, IO_BUFFER *buffer)
+io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
 {
+    ASSERT_ARGS(io_buffer_normalize)
     if (!buffer)
         return;
 
@@ -158,8 +187,11 @@ io_buffer_normalize(PARROT_INTERP, IO_BUFFER *buffer)
 }
 
 size_t
-Parrot_io_buffer_write_b(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable, char *s, size_t length)
+Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), ARGIN(char *s),
+        size_t length)
 {
+    ASSERT_ARGS(Parrot_io_buffer_write_b)
     if (!buffer)
         return vtable->write_b(interp, handle, buffer, length);
 
@@ -193,59 +225,54 @@ Parrot_io_buffer_write_b(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTAB
 // Add the bytes to the buffer. Assume that the number of bytes to add is
 // less than or equal to the amount of available space for writing.
 static void
-io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char *s, size_t length)
+io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
+        size_t length)
 {
+    ASSERT_ARGS(io_buffer_add_bytes)
     memcpy(buffer->buffer_end, s, length);
     buffer->buffer_end += length;
 }
 
 size_t
-Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable, INTVAL autoclose)
+Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), INTVAL autoclose)
 {
+    ASSERT_ARGS(Parrot_io_buffer_flush)
     size_t bytes_written = 0;
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
         size_t used_length = BUFFER_USED_SIZE(buffer);
-        bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start, used_size);
+        bytes_written += vtable->write_b(interp, handle,
+                                    (char *)buffer->buffer_start, used_size);
         Parrot_io_buffer_clear(interp, buffer);
     }
     return bytes_written + vtable->flush(interp, handle, autoclose);
 }
 
 UINTVAL
-Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable)
+Parrot_io_buffer_peek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
 {
-    if (!buffer)
-        return vtable->peek_b(interp, handle);
+    ASSERT_ARGS(Parrot_io_buffer_peek)
+
     /* Current behavior only returns the first byte, not the first codepoint.
        Returning codepoint would make a lot more sense, but is going to be a
        lot more work */
-
     if (BUFFER_IS_EMPTY(buffer)) {
-        size_t size = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        const size_t size = Parrot_io_buffer_fill(interp, buffer, handle,
+                                                  vtable);
         if (size == 0)
             return -1;
     }
     return (UINTVAL)buffer->buffer_start[0];
-
-    /*
-    const UINTVAL bytes_per_codepoint = buffer->encoding->max_bytes_per_codepoint;
-    size_t size = Parrot_io_buffer_content_size(interp, buffer);
-    if (size < (size_t)bytes_per_codepoint) {
-        size = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-        if (size == 0)
-            return -1;
-    }
-    Parrot_String_Bounds bounds = { bytes_per_codepoint, -1, -1 };
-    // TODO: Need to normalize. end-of-buffer - buffer_start may be less than bytes_per_codepoint
-    buffer->encoding->partial_scan(interp, buffer->buffer_start, &bounds);
-    */
 }
 
 // Reads data into the buffer, trying to fill if possible. Returns the total
 // number of bytes in the buffer.
 size_t
-Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE *vtable)
+Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
 {
+    ASSERT_ARGS(Parrot_io_buffer_fill)
     if (!buffer)
         return 0;
 
@@ -256,20 +283,24 @@ Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC * handle, IO_VTABLE 
         size_t read_bytes;
         if (available_size == 0)
             return BUFFER_USED_SIZE(buffer);
-        read_bytes = vtable->read_b(interp, handle, buffer->buffer_end, available_size);
+        read_bytes = vtable->read_b(interp, handle, buffer->buffer_end,
+                                    available_size);
         buffer->buffer_end += read_bytes;
         return BUFFER_USED_SIZE(buffer);
     }
 }
 
+PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_io_buffer_content_size(SHIM_INTERP, IO_BUFFER *buffer)
+Parrot_io_buffer_content_size(SHIM_INTERP, ARGIN(IO_BUFFER *buffer))
 {
+    ASSERT_ARGS(Parrot_io_buffer_content_size)
     return BUFFER_USED_SIZE(buffer);
 }
 
 void
-Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *filehandle), INTVAL flags)
+Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC *filehandle), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_buffer_set_mode)
     flags = flags & (PIO_F_BLKBUF | PIO_F_LINEBUF);
@@ -289,14 +320,19 @@ Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *
 // whichever comes first. Return a count of the number of bytes to be
 // read, in addition to scan information in *bounds. Does not return an
 // amount of bytes to read which would create an incomplete codepoint
+PARROT_WARN_UNUSED_RESULT
 size_t
-io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds), INTVAL delim)
+io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
+        INTVAL delim)
 {
     ASSERT_ARGS(io_buffer_find_string_marker);
     INTVAL bytes_needed = 0;
 
     if (BUFFER_EMPTY(buffer)) {
-        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
+                                                       vtable);
         if (bytes_available = 0)
             return 0;
     }
@@ -319,14 +355,19 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PM
 // given encoding. Returns the number of bytes to be read from the buffer to
 // either get this number from the buffer or else get the entire contents of
 // the buffer and continue on a later read.
+PARROT_WARN_UNUSED_RESULT
 size_t
-io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds), size_t num_chars)
+io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
+        size_t num_chars)
 {
     ASSERT_ARGS(io_buffer_find_num_chars)
     INTVAL bytes_needed = 0;
 
     if (BUFFER_EMPTY(buffer)) {
-        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
+                                                       vtable);
         if (bytes_available = 0)
             return 0;
     }
@@ -343,342 +384,6 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGMOD(P
     These routines are the parts of the old system that are worth keeping,
     for now. We need to up-convert these to the new architecture.
 */
-
-
-/*
-
-=item C<STRING * Parrot_io_readline_buffer(PARROT_INTERP, PMC *filehandle, const
-STR_VTABLE *encoding)>
-
-This is called from C<Parrot_io_read_buffer()> to do line buffered reading if
-that is what is required.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        ARGIN(const STR_VTABLE *encoding))
-{
-    ASSERT_ARGS(Parrot_io_readline_buffer)
-    static const size_t max_split_bytes = 3;
-
-    INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    unsigned char *buffer_next;
-    unsigned char *buffer_end;
-    STRING        *s;
-    INTVAL         rs;
-
-    /* write buffer flush */
-    if (buffer_flags & PIO_BF_WRITEBUF) {
-        Parrot_io_flush_buffer(interp, filehandle);
-        buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    }
-
-    s           = Parrot_gc_new_string_header(interp, 0);
-    s->bufused  = 0;
-    s->strlen   = 0;
-    s->encoding = encoding;
-
-    /* fill empty buffer */
-    if (!(buffer_flags & PIO_BF_READBUF)) {
-        /* promote to buffered if unbuffered */
-        if (Parrot_io_get_buffer_size(interp, filehandle) == 0)
-            Parrot_io_setbuf(interp, filehandle, 1);
-
-        if (Parrot_io_fill_readbuf(interp, filehandle) == 0)
-            return s;
-    }
-
-    /* Retrieve filled buffer */
-    buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-    buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
-
-    GETATTR_Handle_record_separator(interp, filehandle, rs);
-
-    while (1) {
-        Parrot_String_Bounds bounds;
-
-        const size_t buffer_size = buffer_end - buffer_next;
-        size_t       alloc_size;
-        INTVAL       got;
-
-        /* Partial scan of buffer */
-
-        bounds.bytes = buffer_end - buffer_next;
-        bounds.chars = -1;
-        bounds.delim = rs;
-
-        encoding->partial_scan(interp, (char *)buffer_next, &bounds);
-
-        /* Append buffer to result */
-
-        if (bounds.delim == rs) {
-            /* End of line, use only part of buffer */
-            alloc_size = s->bufused + bounds.bytes;
-
-            if (s->strstart)
-                Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
-            else
-                Parrot_gc_allocate_string_storage(interp, s, alloc_size);
-
-            memcpy(s->strstart + s->bufused, buffer_next, bounds.bytes);
-
-            s->bufused += bounds.bytes;
-            s->strlen  += bounds.chars;
-
-            buffer_next += bounds.bytes;
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-            break;
-        }
-
-        /* Use additional space for multi-byte char split across buffers */
-        alloc_size = s->bufused + buffer_size + max_split_bytes;
-
-        if (s->strstart)
-            Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
-        else
-            Parrot_gc_allocate_string_storage(interp, s, alloc_size);
-
-        /* Copy whole buffer, might copy partial characters */
-        memcpy(s->strstart + s->bufused, buffer_next, buffer_size);
-
-        s->bufused += bounds.bytes;
-        s->strlen  += bounds.chars;
-
-        /* Refill buffer */
-
-        got = Parrot_io_fill_readbuf(interp, filehandle);
-
-        if (got == 0) {
-            /* End of file */
-
-            if (bounds.bytes == buffer_size) {
-                buffer_next = buffer_end;
-                break;
-            }
-            else {
-                /* TODO: set file position */
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", encoding->name);
-            }
-        }
-
-        buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-        buffer_end  = Parrot_io_get_buffer_end(interp, filehandle);
-
-        if (bounds.bytes < buffer_size) {
-            /* Handle character split across buffers */
-
-            size_t bytes_l = buffer_size - bounds.bytes;
-            size_t bytes_r = (size_t)got < max_split_bytes
-                           ? (size_t)got : max_split_bytes;
-
-            size_t decoded_size = s->bufused;
-
-            /* First, copy enough bytes to complete character */
-            memcpy(s->strstart + decoded_size + bytes_l, buffer_next, bytes_r);
-
-            /* Partial scan of single character */
-
-            bounds.bytes = bytes_l + bytes_r;
-            bounds.chars = 1;
-            bounds.delim = rs;
-
-            encoding->partial_scan(interp, s->strstart + decoded_size,
-                                   &bounds);
-
-            if (bounds.bytes == 0) {
-                INTVAL flags = Parrot_io_get_flags(interp, filehandle);
-
-                PARROT_ASSERT((size_t)got == bytes_r);
-
-                if (flags & PIO_F_FILE) {
-                    /* TODO: set file position */
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_CHARACTER,
-                        "Unaligned end in %s string\n", encoding->name);
-                }
-
-                /* Tricky case: We didn't receive enough bytes to complete
-                 * the character. So we have to prepend the rest of the old
-                 * buffer.
-                 */
-
-                memmove(buffer_next + bytes_l, buffer_next, got);
-                memcpy(buffer_next, s->strstart + decoded_size, bytes_l);
-
-                buffer_end += bytes_l;
-                Parrot_io_set_buffer_end(interp, filehandle, buffer_end);
-                break;
-            }
-
-            PARROT_ASSERT(bounds.chars == 1);
-
-            s->bufused  += bounds.bytes;
-            s->strlen   += 1;
-
-            bytes_r      = bounds.bytes - bytes_l;
-            buffer_next += bytes_r;
-
-            if (bounds.delim == rs || (size_t)got == bytes_r) {
-                Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-                break;
-            }
-        }
-    }
-
-    /* check if buffer is finished */
-    if (buffer_next == buffer_end) {
-        Parrot_io_set_buffer_flags(interp, filehandle,
-                (Parrot_io_get_buffer_flags(interp, filehandle) & ~PIO_BF_READBUF));
-        Parrot_io_set_buffer_next(interp, filehandle,
-                Parrot_io_get_buffer_start(interp, filehandle));
-        Parrot_io_set_buffer_end(interp, filehandle, NULL);
-    }
-
-    Parrot_io_set_file_position(interp, filehandle,
-            s->bufused + Parrot_io_get_file_position(interp, filehandle));
-
-    return s;
-}
-
-/*
-
-=item C<size_t Parrot_io_write_buffer(PARROT_INTERP, PMC *filehandle, const
-STRING *s)>
-
-The buffer layer's C<Write> function.
-
-=cut
-
-*/
-
-size_t
-Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(const STRING *s))
-{
-    ASSERT_ARGS(Parrot_io_write_buffer)
-    unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-    unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-    const size_t          buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
-    INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    INTVAL                flags        = Parrot_io_get_flags(interp, filehandle);
-    const size_t          len          = s->bufused;
-    int                   need_flush;
-    size_t                avail;
-    PIOHANDLE             os_handle;
-    PIOOFF_T              file_pos;
-
-    if (len <= 0)
-        return 0;
-
-    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-
-    if (buffer_flags & PIO_BF_WRITEBUF)
-        avail = buffer_size - (buffer_next - buffer_start);
-
-    else if (buffer_flags & PIO_BF_READBUF) {
-        if (!(flags & PIO_F_APPEND)) {
-            /* Seek back to file position */
-            file_pos = Parrot_io_get_file_position(interp, filehandle);
-            PIO_SEEK(interp, os_handle, file_pos, SEEK_SET);
-        }
-
-        buffer_flags &= ~PIO_BF_READBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-        buffer_next = buffer_start;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        avail = buffer_size;
-    }
-    else
-        avail = buffer_size;
-
-    /* If we are line buffered, check for newlines.
-     * If any, we should flush */
-    need_flush = 0;
-
-    if (flags & PIO_F_APPEND) {
-        /* Buffering would break append semantics */
-        need_flush = 1;
-
-#ifdef _WIN32
-        /* Win32 doesn't support append */
-        PIO_SEEK(interp, os_handle, 0, SEEK_END);
-#endif
-    }
-    else if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
-        /* scan from end, it's likely that EOL is at end of string */
-        const char *p = (char*)(s->strstart) + len - 1;
-        size_t      i;
-
-        for (i = 0; i < len; ++i, --p) {
-            if (io_is_end_of_line(p)) {
-                need_flush = 1;
-                break;
-            }
-        }
-    }
-
-    /*
-     * Large writes (multiples of blocksize) should write
-     * through generally for best performance, else you are
-     * just doing extra memcpys.
-     */
-    if (need_flush || len >= buffer_size) {
-        size_t    wrote;
-
-        /* Write through, skip buffer. */
-        Parrot_io_flush_buffer(interp, filehandle);
-
-        wrote = PIO_WRITE(interp, os_handle, s->strstart, len);
-
-        if (wrote != len)
-            return (size_t)-1;
-    }
-    else if (len < avail) {
-        buffer_flags |= PIO_BF_WRITEBUF;
-        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
-        memcpy(buffer_next, s->strstart, len);
-        buffer_next += len;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-    }
-    else {
-        /* Now we have avail <= len < buffer_size, so there is a non-empty
-         * write buffer */
-        const unsigned int diff = (int)(len - avail);
-
-        /* Fill remainder, flush, then try to buffer more */
-        memcpy(buffer_next, s->strstart, avail);
-        buffer_next += avail;
-        Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        Parrot_io_flush_buffer(interp, filehandle);
-
-        if (diff > 0) {
-            buffer_flags |= PIO_BF_WRITEBUF;
-            Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-
-            memcpy(buffer_start, s->strstart + avail, diff);
-
-            buffer_next = buffer_start + diff;
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-        }
-    }
-
-    if (flags & PIO_F_APPEND)
-        file_pos = PIO_TELL(interp, os_handle);
-    else
-        file_pos = Parrot_io_get_file_position(interp, filehandle) + len;
-
-    Parrot_io_set_file_position(interp, filehandle, file_pos);
-
-    return len;
-}
-
 
 /*
 

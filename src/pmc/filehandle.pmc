@@ -284,7 +284,7 @@ filehandle, rather than modifying the invocant).
         STRING *mode :optional, INTVAL got_mode :opt_flag) {
         PMC    *filehandle;
 
-        if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
+        if (!Parrot_io_is_closed(INTERP, SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                                 "Cannot reopen already open filehandle");
 
@@ -294,8 +294,7 @@ filehandle, rather than modifying the invocant).
         if (!got_filename || STRING_IS_NULL(filename))
             GET_ATTR_filename(INTERP, SELF, filename);
 
-        filehandle = Parrot_io_open_handle(INTERP, SELF, filename, mode);
-
+        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
         RETURN(PMC *filehandle);
     }
 
@@ -311,7 +310,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 */
 
     METHOD isatty() {
-        const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
+        const INTVAL isatty = Parrot_io_is_tty(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
 
@@ -442,33 +441,21 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, STRINGNULL);
-
+            filehandle  = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
             PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
-            size = (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
+            result = Parrot_io_readall_s(INTERP, filehandle);
 
-            result = Parrot_io_reads(INTERP, filehandle, size);
             Parrot_io_close_handle(INTERP, filehandle);
         }
         else {
-            PMC *sb;
-
             /* slurp open file */
             if (Parrot_io_is_closed_filehandle(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall without a file name or open filehandle");
 
-            sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
-                    4096);
-
-            do {
-                STRING * const part = Parrot_io_reads(INTERP, SELF, 4096);
-                VTABLE_push_string(interp, sb, part);
-            } while (!Parrot_io_eof(INTERP, SELF));
-
-            result = VTABLE_get_string(interp, sb);
+            result = Parrot_io_readall_s(INTERP, SELF);
         }
 
         RETURN(STRING *result);
@@ -486,7 +473,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush_filehandle(INTERP, SELF);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*
@@ -503,7 +490,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        const INTVAL status = Parrot_io_putps(INTERP, SELF, string_to_print);
+        const INTVAL status = Parrot_io_write_s(INTERP, SELF, string_to_print);
 
         RETURN(INTVAL status);
     }
@@ -716,7 +703,7 @@ C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
         const PIOOFF_T pio_offs = has_overflow ?
                                     Parrot_io_make_offset32(offs_overflow, offs) :
                                     offs;
-        if (0 > Parrot_io_seek_handle(INTERP, SELF, pio_offs, whence))
+        if (0 > Parrot_io_seek(INTERP, SELF, pio_offs, whence))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed");
     }
 

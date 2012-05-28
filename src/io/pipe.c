@@ -188,15 +188,3 @@ io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
     ASSERT_ARGS(io_pipe_get_flags)
     return PARROT_FILEHANDLE(handle)->flags;
 }
-
-static void
-io_pipe_ensure_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL buffer_no, size_t length, INTVAL flags)
-{
-    ASSERT_ARGS(io_pipe_ensure_buffer)
-    // TODO: This
-    switch (buffer_no) {
-        case IO_PTR_IDX_READ_BUFFER:
-        case IO_PTR_IDX_WRITE_BUFFER:
-        default:
-    }
-}

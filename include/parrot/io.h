@@ -21,16 +21,18 @@
 
 /* &end_gen */
 
+/* Block Size. Returned from Parrot_io_internal_getblksize */
 #ifdef BLKSIZE
 #  define PIO_BLKSIZE BLKSIZE
 #else
 #  define PIO_BLKSIZE  8192
 #endif
-#define PIO_LINEBUFSIZE 256     /* Default linebuffer size */
-#define PIO_GRAIN 2048          /* Smallest size for a block buffer */
-#define PIO_BUFSIZE (PIO_GRAIN * 2)
 
-#define PIO_NR_OPEN 256         /* Size of an "IO handle table" */
+#define PIO_BUFFER_MIN_SIZE 2048        /* Smallest size for a block buffer */
+
+// TODO: What is this? Figure it out and properly document it's use.
+#define PIO_NR_OPEN 256                 /* Size of an "IO handle table" */
+
 
 /* IO object flags */
 #define PIO_F_READ      00000001        /* File is opened for reading   */
@@ -115,12 +117,8 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
     _b: This function operates on a raw char* buffer (Possibly from ByteBuffer)
 */
 
-typedef STRING *    (*io_vtable_read_s)       (PARROT_INTERP, PMC *handle, size_t char_length);
 typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, PMC *handle, ARGOUT(char * buffer), size_t byte_length);
-typedef INTVAL      (*io_vtable_write_s)      (PARROT_INTERP, PMC *handle, ARGIN(STRING * s), size_t char_length);
 typedef INTVAL      (*io_vtable_write_b       (PARROT_INTERP, PMC *handle, ARGIN(char * buffer), size_t byte_length);
-typedef STRING *    (*io_vtable_readline_s)   (PARROT_INTERP, PMC *handle, INTVAL terminator);
-typedef STRING *    (*io_vtable_readall_s)    (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
 typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, PMC *handle);
@@ -134,16 +132,13 @@ typedef STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_ensure_buffer)(PARROT_INTERP, PMC *handle, INTVAL buffer_no, size_t size, INTVAL flags);
+typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
     char                  * name;
     INTVAL                  number;
-    io_vtable_read_s        read_s;
     io_vtable_read_b        read_b;
-    io_vtable_write_s       write_s;
     io_vtable_write_b       write_b;
-    io_vtable_readline_s    readline_s;
-    io_vtable_readall_s     readall_s;
     io_vtable_flush         flush;
     io_vtable_is_eof        is_eof;
     io_vtable_open          open;
@@ -155,6 +150,7 @@ typedef struct _io_vtable {
     io_vtable_get_flags     get_flags;
     io_vtable_get_encoding  get_encoding;
     io_vtable_ensure_buffer ensure_buffer;
+    io_vtable_total_size    total_size;
 } IO_VTABLE;
 
 #define IO_VTABLE_FILEHANDLE        0

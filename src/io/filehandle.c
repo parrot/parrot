@@ -3,12 +3,13 @@ Copyright (C) 2001-2010, Parrot Foundation.
 
 =head1 NAME
 
-src/io/filehandle.c - FileHandle utility functions
+src/io/filehandle.c - FileHandle IO_VTABLE and helper routines.
 
 =head1 DESCRIPTION
 
-This file defines a set of utility functions for the FileHandle PMC used by all
-operating systems. For the primary public I/O API, see F<src/io/api.c>.
+This file implements the standard VTABLE for FileHandles and file IO
+operations. It relies on several low-level routines in
+L<src/platform/xxx/io.c>.
 
 =cut
 
@@ -43,12 +44,7 @@ io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     vtable->get_encoding = io_filehandle_get_encoding;
     vtable->set_flags = io_filehandle_set_flags;
     vtable->get_flags = io_filehandle_get_flags;
-}
-
-static STRING *
-io_filehandle_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length)
-{
-    ASSERT_ARGS(io_filehandle_read_s)
+    vtable->total_size
 }
 
 static INTVAL
@@ -66,29 +62,11 @@ io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), s
 }
 
 static INTVAL
-io_filehandle_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s), size_t char_length)
-{
-    ASSERT_ARGS(io_filehandle_write_s)
-}
-
-static INTVAL
 io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_filehandle_write_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     return Parrot_io_internal_write(interp, handle, buffer, byte_length);
-}
-
-static INTVAL
-io_filehandle_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
-{
-    ASSERT_ARGS(io_filehandle_readline_s)
-}
-
-static STRING *
-io_filehandle_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_filehandle_readall_s)
 }
 
 static INTVAL
@@ -124,13 +102,6 @@ io_filehandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w
     ASSERT_ARGS(io_filehandle_seek)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     return Parrot_io_internal_seek(interp, os_handle, offset, whence);
-}
-
-static INTVAL
-io_filehandle_peek_b(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_filehandle_peek_b)
-    // TODO: This
 }
 
 static INTVAL
@@ -230,19 +201,12 @@ io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
     return PARROT_FILEHANDLE(handle)->flags;
 }
 
-
-static void
-io_filehandle_ensure_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL buffer_no, size_t length, INTVAL flags)
+static size_t
+io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
-    ASSERT_ARGS(io_filehandle_ensure_buffer)
-    // TODO: This
-    switch (buffer_no) {
-        case IO_PTR_IDX_READ_BUFFER:
-        case IO_PTR_IDX_WRITE_BUFFER:
-        default:
-    }
+    ASSERT_ARGS(io_filehandle_total_size)
+    return (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
 }
-
 
 /* OLD FUNCTIONS
     Below this line are the old functions that need to be cleaned up and

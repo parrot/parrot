@@ -85,7 +85,6 @@ Parrot_io_init(PARROT_INTERP)
         return;
     }
 
-
     interp->piodata = mem_gc_allocate_zeroed_typed(interp, ParrotIOData);
     if (interp->piodata == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -99,7 +98,7 @@ Parrot_io_init(PARROT_INTERP)
 }
 
 // TODO: Merge this buffering logic into where-ever we set up these handles
-INTVAL
+void
 Parrot_io_init_buffer(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_buffer)
@@ -108,13 +107,12 @@ Parrot_io_init_buffer(PARROT_INTERP)
 
     if (Parrot_io_STDIN(interp))
         Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
-
-    return 0;
 }
 
 void
 io_setup_vtables(PARROT_INTERP)
 {
+    ASSERT_ARGS(io_setup_vtables);
     const int number_of_vtables = 5;
     interp->piodata->vtables = mem_gc_allocate_n_zeroed_typed(interp, number_of_vtables, IO_VTABLE);
     interp->piodata->num_vtables = number_of_vtables;
@@ -125,8 +123,11 @@ io_setup_vtables(PARROT_INTERP)
     io_userhandle_setup_vtable(interp, NULL, IO_VTABLE_USER);
 }
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
 IO_VTABLE *
-Parrot_io_allocate_new_vtable(PARROT_INTERP, const char *name)
+Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_io_get_new_vtable)
     const int number_of_vtables = interp->piodata->num_vtables;
@@ -180,7 +181,7 @@ PARROT_EXPORT
 void
 Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 {
-    ASSERT_ARGS(Parrot_IOData_mark)
+    ASSERT_ARGS(Parrot_io_mark)
     INTVAL i;
     PMC ** const table = piodata->table;
 
@@ -518,6 +519,27 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length);
     }
 }
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_readall_s)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read from null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        size_t total_size = vtable->total_size(interp, handle);
+        STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+        STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
+        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, s->bufstart, total_size);
+        return s;
+    }
+}
+
 /*
 
 =item C<PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, PMC *handle, PMC
@@ -648,7 +670,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer), size_t byte_length)
 {
-    ASSERT_ARGS(Parrot_io_write_handle)
+    ASSERT_ARGS(Parrot_io_write_b)
 
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -761,22 +783,23 @@ STRING *
 Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_peek)
-    STRING *res;
-    INTVAL  c;
 
-    // TODO: This
+    if (PMC_IS_NULL(handle) || Parrot_io_is_closed(handle))
+        return -1;
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        INTVAL c;
 
-    if (Parrot_io_is_closed(interp, pmc))
-        c = -1;
-    else
-        c = Parrot_io_peek_buffer(interp, pmc);
+        io_verify_has_read_buffer(interp, handle, vtable);
 
-    if (c == -1)
-        res = STRINGNULL;
-    else
-        res = Parrot_str_chr(interp, c);
+        c = Parrot_io_buffer_peek(interp, pmc);
 
-    return res;
+        if (c == -1)
+            return STRINGNULL;
+        else
+            return Parrot_str_chr(interp, c);
+    }
 }
 
 /*
@@ -802,9 +825,9 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *handle))
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
-    if (PMC_IS_NULL(pmc))
+    if (PMC_IS_NULL(handle))
         return 1;
-    if (Parrot_io_is_closed_filehandle(interp, pmc))
+    if (Parrot_io_is_closed(interp, handle))
         return 1;
     return IO_GET_VTABLE(interp, handle)->is_eof(interp, handle);
 }
@@ -1031,7 +1054,8 @@ Parrot_io_is_async(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (Parrot_io_is_closed(interp, pmc))
         return 0;
 
-    return (Parrot_io_get_flags(interp, pmc) & PIO_F_ASYNC) ? 1 : 0;
+    /* return (Parrot_io_get_flags(interp, pmc) & PIO_F_ASYNC) ? 1 : 0; */
+    return 0;
 }
 
 /*
@@ -1164,7 +1188,6 @@ Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_io_make_offset_pmc)
     return VTABLE_get_integer(interp, pmc);
 }
-
 
 /*
 
