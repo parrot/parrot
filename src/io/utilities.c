@@ -180,10 +180,20 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vt
     return encoding->to_encoding(interp, s);
 }
 
-// Read a STRING from the handle with the given number of bytes, assuming the
-// handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to
-// make sure the STRING contains complete codepoints for multibyte strings.
-// This requires a non-null, non-zero read buffer.
+/*
+
+=item C<STRING * io_read_encoded_string(PARROT_INTERP, PMC *handle, IO_VTABLE
+*vtable, IO_BUFFER *buffer, STR_VTABLE *encoding, size_t char_length)>
+
+Read a STRING from the handle with the given number of bytes, assuming the
+handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to
+make sure the STRING contains complete codepoints for multibyte strings.
+This requires a non-null, non-zero read buffer.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
@@ -230,12 +240,22 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtab
     return s;
 }
 
-// Read characters out of the buffer and append them to the end of the existing
-// STRING. The STRING should be in "edit" mode and should not be referenced
-// by anything outside the IO subsystem. The byte_length should be accurate,
-// The buffer should be prepared and scanned ahead of time to ensure the
-// number of bytes to be read is the number of bytes actually available for
-// reading.
+/*
+
+=item C<void io_read_chars_append_string(PARROT_INTERP, STRING * s, PMC *handle,
+IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
+
+Read characters out of the buffer and append them to the end of the existing
+STRING. The STRING should be in "edit" mode and should not be referenced
+by anything outside the IO subsystem. The byte_length should be accurate,
+The buffer should be prepared and scanned ahead of time to ensure the
+number of bytes to be read is the number of bytes actually available for
+reading.
+
+=cut
+
+*/
+
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer), size_t byte_length)
 {
@@ -253,8 +273,18 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s), ARGMOD(PMC *handl
     s->strlen  += bounds.chars;
 }
 
-// Read a line, up to and including the terminator character rs, from the
-// input handle
+/*
+
+=item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle,
+IO_VTABLE *vtable, IO_BUFFER *buffer, STR_VTABLE *encoding, INTVAL rs)>
+
+Read a line, up to and including the terminator character rs, from the
+input handle
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *

@@ -135,49 +135,6 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-// Read a STRING from the handle with the given number of bytes, assuming the // handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to // make sure the STRING contains complete codepoints for multibyte strings. // This requires a non-null, non-zero read buffer. PARROT_CANNOT_RETURN_NULL PARROT_WARN_UNUSED_RESULT STRING * io_read_encoded_string(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
-    ARGMOD(IO_BUFFER *buffer),
-    ARGIN(STR_VTABLE *encoding),
-    size_t char_length)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*handle)
-        FUNC_MODIFIES(*buffer);
-
-// Read a line, up to and including the terminator character rs, from the // input handle PARROT_CANNOT_RETURN_NULL PARROT_WARN_UNUSED_RESULT STRING * io_readline_encoded_string(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
-    ARGMOD(IO_BUFFER *buffer),
-    ARGIN(STR_VTABLE *encoding),
-    INTVAL rs)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*handle)
-        FUNC_MODIFIES(*buffer);
-
-// Read characters out of the buffer and append them to the end of the existing // STRING. The STRING should be in "edit" mode and should not be referenced // by anything outside the IO subsystem. The byte_length should be accurate, // The buffer should be prepared and scanned ahead of time to ensure the // number of bytes to be read is the number of bytes actually available for // reading. void io_read_chars_append_string(PARROT_INTERP,
-    ARGMOD(STRING * s),
-    ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
-    ARGMOD(IO_BUFFER *buffer),
-    size_t byte_length)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(* s)
-        FUNC_MODIFIES(*handle)
-        FUNC_MODIFIES(*buffer);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_get_new_empty_string(PARROT_INTERP,
@@ -195,6 +152,53 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * io_get_new_socket(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+void io_read_chars_append_string(PARROT_INTERP,
+    ARGMOD(STRING * s),
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    ARGMOD(IO_BUFFER *buffer),
+    size_t byte_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(* s)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*buffer);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * io_read_encoded_string(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    ARGMOD(IO_BUFFER *buffer),
+    ARGIN(STR_VTABLE *encoding),
+    size_t char_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*buffer);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * io_readline_encoded_string(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    ARGMOD(IO_BUFFER *buffer),
+    ARGIN(STR_VTABLE *encoding),
+    INTVAL rs)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*buffer);
 
 void io_verify_has_read_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
@@ -233,33 +237,30 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_parse_open_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mode_str))
-#define ASSERT_ARGS_// handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to // make sure the STRING contains complete codepoints for multibyte strings. // This requires a non-null, non-zero read buffer. PARROT_CANNOT_RETURN_NULL PARROT_WARN_UNUSED_RESULT STRING * io_read_encoded_string \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(encoding))
-#define ASSERT_ARGS_// input handle PARROT_CANNOT_RETURN_NULL PARROT_WARN_UNUSED_RESULT STRING * io_readline_encoded_string \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(encoding))
-#define ASSERT_ARGS_// STRING. The STRING should be in "edit" mode and should not be referenced // by anything outside the IO subsystem. The byte_length should be accurate, // The buffer should be prepared and scanned ahead of time to ensure the // number of bytes to be read is the number of bytes actually available for // reading. void io_read_chars_append_string \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_io_get_new_empty_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_socket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_io_read_chars_append_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable) \
+    , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_io_read_encoded_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(encoding))
+#define ASSERT_ARGS_io_readline_encoded_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_io_verify_has_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -370,8 +371,6 @@ void io__setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 /* HEADERIZER END: src/io/userhandle.c */
 
 #endif /* PARROT_IO_PRIVATE_H_GUARD */
-
-/
 
 /*
  * Local variables:

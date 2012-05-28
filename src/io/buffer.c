@@ -27,11 +27,41 @@ need to be performed.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL io_is_end_of_line(ARGIN(const char *c))
-        __attribute__nonnull__(1);
+static void io_buffer_add_bytes(PARROT_INTERP,
+    ARGMOD(IO_BUFFER *buffer),
+    ARGIN(char *s),
+    size_t length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer);
 
-#define ASSERT_ARGS_io_is_end_of_line __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(c))
+static void io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*buffer);
+
+static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
+    ARGMOD(IO_BUFFER *buffer),
+    ARGOUT(char * s),
+    size_t length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*buffer)
+        FUNC_MODIFIES(* s);
+
+#define ASSERT_ARGS_io_buffer_add_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_io_buffer_normalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_io_buffer_transfer_to_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -148,8 +178,16 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     }
 }
 
-// Transfer length bytes from the buffer to the char*s, removing those bytes
-// from the buffer. Return the number of bytes actually copied.
+/*
+
+=item C<static size_t io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER
+*buffer, char * s, size_t length)>
+
+Transfer length bytes from the buffer to the char*s, removing those bytes
+from the buffer. Return the number of bytes actually copied.
+
+*/
+
 static size_t
 io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGOUT(char * s), size_t length)
@@ -170,8 +208,17 @@ io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     }
 }
 
-// Attempt to normalize the buffer. If we can, move data to the front of the
-// buffer so we have the maximum amount of contiguous free space */
+/*
+
+=item C<static void io_buffer_normalize(PARROT_INTERP, IO_BUFFER *buffer)>
+
+Attempt to normalize the buffer. If we can, move data to the front of the
+buffer so we have the maximum amount of contiguous free space
+
+=cut
+
+*/
+
 static void
 io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
 {
@@ -231,8 +278,18 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     }
 }
 
-// Add the bytes to the buffer. Assume that the number of bytes to add is
-// less than or equal to the amount of available space for writing.
+/*
+
+=item C<static void io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char
+*s, size_t length)>
+
+Add the bytes to the buffer. Assume that the number of bytes to add is
+less than or equal to the amount of available space for writing.
+
+=cut
+
+*/
+
 static void
 io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
         size_t length)
@@ -275,8 +332,19 @@ Parrot_io_buffer_peek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     return (UINTVAL)buffer->buffer_start[0];
 }
 
-// Reads data into the buffer, trying to fill if possible. Returns the total
-// number of bytes in the buffer.
+/*
+
+=item C<size_t Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC *
+handle, IO_VTABLE *vtable)>
+
+Reads data into the buffer, trying to fill if possible. Returns the total
+number of bytes in the buffer.
+
+=cut
+
+*/
+
+
 size_t
 Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
@@ -325,10 +393,21 @@ Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     buffer->flags |= flags;
 }
 
-// Search the buffer for the given delimiter character or end-of-buffer,
-// whichever comes first. Return a count of the number of bytes to be
-// read, in addition to scan information in *bounds. Does not return an
-// amount of bytes to read which would create an incomplete codepoint
+/*
+
+=item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
+PMC *handle, IO_VTABLE *vtable, STR_VTABLE *encoding, Parrot_String_Bounds
+*bounds, INTVAL delim)>
+
+Search the buffer for the given delimiter character or end-of-buffer,
+whichever comes first. Return a count of the number of bytes to be
+read, in addition to scan information in *bounds. Does not return an
+amount of bytes to read which would create an incomplete codepoint
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
@@ -360,10 +439,21 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     return bounds.bytes - bytes_needed;
 }
 
-// Attempt to read from the buffer the given number of characters in the
-// given encoding. Returns the number of bytes to be read from the buffer to
-// either get this number from the buffer or else get the entire contents of
-// the buffer and continue on a later read.
+/*
+
+=item C<size_t io_buffer_find_num_characters(PARROT_INTERP, IO_BUFFER *buffer,
+PMC *handle, IO_VTABLE *vtable, STR_VTABLE *encoding, Parrot_String_Bounds
+*bounds, size_t num_chars)>
+
+Attempt to read from the buffer the given number of characters in the
+given encoding. Returns the number of bytes to be read from the buffer to
+either get this number from the buffer or else get the entire contents of
+the buffer and continue on a later read.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),

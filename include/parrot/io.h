@@ -728,23 +728,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/buffer.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-// Attempt to normalize the buffer. If we can, move data to the front of the // buffer so we have the maximum amount of contiguous free space */ static void io_buffer_normalize(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*buffer);
-
-// Transfer length bytes from the buffer to the char*s, removing those bytes // from the buffer. Return the number of bytes actually copied. static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
-    ARGOUT(char * s),
-    size_t length)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*buffer)
-        FUNC_MODIFIES(* s);
-
-// Attempt to read from the buffer the given number of characters in the // given encoding. Returns the number of bytes to be read from the buffer to // either get this number from the buffer or else get the entire contents of // the buffer and continue on a later read. PARROT_WARN_UNUSED_RESULT size_t io_buffer_find_num_characters(PARROT_INTERP,
+PARROT_WARN_UNUSED_RESULT
+size_t io_buffer_find_num_characters(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
@@ -761,27 +746,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*bounds);
 
-// Add the bytes to the buffer. Assume that the number of bytes to add is // less than or equal to the amount of available space for writing. static void io_buffer_add_bytes(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
-    ARGIN(char *s),
-    size_t length)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*buffer);
-
-// Reads data into the buffer, trying to fill if possible. Returns the total // number of bytes in the buffer. size_t Parrot_io_buffer_fill(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
-    ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*buffer)
-        FUNC_MODIFIES(* handle);
-
-// Search the buffer for the given delimiter character or end-of-buffer, // whichever comes first. Return a count of the number of bytes to be // read, in addition to scan information in *bounds. Does not return an // amount of bytes to read which would create an incomplete codepoint PARROT_WARN_UNUSED_RESULT size_t io_buffer_find_string_marker(PARROT_INTERP,
+PARROT_WARN_UNUSED_RESULT
+size_t io_buffer_find_string_marker(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
@@ -819,6 +785,17 @@ PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_buffer_content_size(PARROT_INTERP,
     ARGIN(IO_BUFFER *buffer))
         __attribute__nonnull__(2);
+
+size_t Parrot_io_buffer_fill(PARROT_INTERP,
+    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD(PMC * handle),
+    ARGIN(IO_VTABLE *vtable))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*buffer)
+        FUNC_MODIFIES(* handle);
 
 size_t Parrot_io_buffer_flush(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
@@ -903,36 +880,14 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-#define ASSERT_ARGS_// buffer so we have the maximum amount of contiguous free space */ static void io_buffer_normalize \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
-#define ASSERT_ARGS_// from the buffer. Return the number of bytes actually copied. static size_t io_buffer_transfer_to_mem \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_// given encoding. Returns the number of bytes to be read from the buffer to // either get this number from the buffer or else get the entire contents of // the buffer and continue on a later read. PARROT_WARN_UNUSED_RESULT size_t io_buffer_find_num_characters \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_io_buffer_find_num_characters __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(encoding) \
     , PARROT_ASSERT_ARG(bounds))
-#define ASSERT_ARGS_// less than or equal to the amount of available space for writing. static void io_buffer_add_bytes \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_// number of bytes in the buffer. size_t Parrot_io_buffer_fill \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable))
-#define ASSERT_ARGS_// whichever comes first. Return a count of the number of bytes to be // read, in addition to scan information in *bounds. Does not return an // amount of bytes to read which would create an incomplete codepoint PARROT_WARN_UNUSED_RESULT size_t io_buffer_find_string_marker \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_io_buffer_find_string_marker __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
@@ -948,6 +903,11 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_io_buffer_content_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_Parrot_io_buffer_fill __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \
