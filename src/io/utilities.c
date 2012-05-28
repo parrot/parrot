@@ -21,7 +21,10 @@ interpreter.
 #include "parrot/parrot.h"
 #include "io_private.h"
 
-/* HEADERIZER HFILE: include/parrot/io.h */
+/* HEADERIZER HFILE: src/io/io_private.h */
+
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
 
 /*
 

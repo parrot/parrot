@@ -207,8 +207,8 @@ Very minimal stubs for now, maybe someone will run with these.
 
 /*
 
-=item C<PMC * Parrot_io_internal_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL port,
-INTVAL protocol, INTVAL fam, INTVAL passive)>
+=item C<PMC * Parrot_io_internal_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL
+port, INTVAL protocol, INTVAL fam, INTVAL passive)>
 
 C<Parrot_io_internal_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
 addresses to sockaddrs (and more) and returns an Addrinfo PMC which can be
@@ -365,8 +365,8 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam, INTVAL
-type, INTVAL protocol)>
+=item C<INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam,
+INTVAL type, INTVAL protocol)>
 
 Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 
@@ -401,8 +401,8 @@ Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
 
 /*
 
-=item C<STRING * Parrot_io_internal_getnameinfo(PARROT_INTERP, const void *addr, INTVAL
-len)>
+=item C<STRING * Parrot_io_internal_getnameinfo(PARROT_INTERP, const void *addr,
+INTVAL len)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -439,7 +439,8 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto)>
+=item C<PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type,
+int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -489,8 +490,8 @@ Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto)
 
 /*
 
-=item C<void Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
-INTVAL addr_len)>
+=item C<void Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr, INTVAL addr_len)>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -521,8 +522,8 @@ AGAIN:
 
 /*
 
-=item C<void Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
-INTVAL addr_len)>
+=item C<void Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr, INTVAL addr_len)>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -542,7 +543,8 @@ Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
 
 /*
 
-=item C<void Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)>
+=item C<void Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE os_handle,
+INTVAL sec)>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -562,8 +564,8 @@ Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle, PMC *
-remote_addr)>
+=item C<PIOHANDLE Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle,
+PMC * remote_addr)>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -604,8 +606,8 @@ Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remot
 
 /*
 
-=item C<INTVAL Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE os_handle, const char
-*buf, size_t len)>
+=item C<INTVAL Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE os_handle, const
+char *buf, size_t len)>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -644,8 +646,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
-size_t len)>
+=item C<INTVAL Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -679,8 +681,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int
-sec, int usec)>
+=item C<INTVAL Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE os_handle, int
+which, int sec, int usec)>
 
 Utility function for polling a single IO stream with a timeout.
 

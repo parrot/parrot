@@ -644,12 +644,12 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 /*
 
 =item C<PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, PMC *handle, PMC
-*buffer, INTVAL length)>
+*buffer, INTVAL byte_length)>
 
 Read C<length> bytes from the C<handle> into the C<buffer> (ByteBuffer) PMC.
 
 =item C<INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, PMC * handle, PMC
-*buffer, INTVAL length)>
+*buffer, INTVAL byte_length)>
 
 Write C<length> bytes (or the total length of C<buffer>, whichever is smaller)
 from C<buffer> to the C<handle>
@@ -868,7 +868,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<STRING * Parrot_io_peek(PARROT_INTERP, PMC *pmc)>
+=item C<STRING * Parrot_io_peek(PARROT_INTERP, PMC *handle)>
 
 Retrieve the next character in the stream without modifying the stream. Calls
 the platform-specific implementation of 'peek'.
@@ -905,7 +905,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<INTVAL Parrot_io_eof(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_eof(PARROT_INTERP, PMC *handle)>
 
 Returns a boolean value indication whether C<*pmc>'s C<EOF> flag is set,
 indicating that an attempt was made to read past the end of the underlying

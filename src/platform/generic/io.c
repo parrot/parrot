@@ -233,7 +233,8 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 
 /*
 
-=item C<INTVAL Parrot_io_internal_close(PARROT_INTERP, PIOHANDLE file_descriptor)>
+=item C<INTVAL Parrot_io_internal_close(PARROT_INTERP, PIOHANDLE
+file_descriptor)>
 
 Closes C<*io>'s file descriptor.
 
@@ -342,8 +343,8 @@ Parrot_io_internal_flush(SHIM_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
-size_t len)>
+=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -370,8 +371,8 @@ Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), s
 
 /*
 
-=item C<size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle, const char
-*buf, size_t len)>
+=item C<size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
+const char *buf, size_t len)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -416,8 +417,8 @@ Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T
-offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle,
+PIOOFF_T offset, INTVAL whence)>
 
 Hard seek.
 
@@ -456,8 +457,8 @@ Parrot_io_internal_tell(SHIM_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, STRING *command, INTVAL
-flags, INTVAL *pid_out)>
+=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, STRING *command,
+INTVAL flags, INTVAL *pid_out)>
 
 Very limited C<exec> for now.
 
@@ -486,8 +487,8 @@ Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags
 
 /*
 
-=item C<INTVAL Parrot_io_internal_pipe(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
-*writer)>
+=item C<INTVAL Parrot_io_internal_pipe(PARROT_INTERP, PIOHANDLE *reader,
+PIOHANDLE *writer)>
 
 Uses C<pipe()> to create a matched pair of pipe fds.  Returns 0 on success, -1
 on failure.

@@ -21,6 +21,138 @@ L<src/platform/xxx/io.c>.
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static INTVAL io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static INTVAL io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static INTVAL io_filehandle_open(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(STRING *path),
+    INTVAL flags,
+    ARGIN(STRING *mode))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*handle);
+
+static INTVAL io_filehandle_read_b(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGOUT(char *buffer),
+    size_t byte_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*buffer);
+
+static INTVAL io_filehandle_seek(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset,
+    INTVAL whence)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static void io_filehandle_set_flags(PARROT_INTERP,
+    ARGIN(PMC *handle),
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PIOOFF_T io_filehandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+static size_t io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL io_filehandle_write_b(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(char *buffer),
+    size_t byte_length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*handle);
+
+#define ASSERT_ARGS_io_filehandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_is_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(path) \
+    , PARROT_ASSERT_ARG(mode))
+#define ASSERT_ARGS_io_filehandle_read_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_io_filehandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(buffer))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
+void
 io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 {
     ASSERT_ARGS(io_filehandle_setup_vtable)
