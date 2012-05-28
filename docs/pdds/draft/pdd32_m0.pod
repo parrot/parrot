@@ -256,6 +256,18 @@ Treat C<*$2> and C<*$3> as integer or floating-point values, divide C<*$1> by
 C<*$3> and store the remainder in C<*$1>.  Division by zero will make the the
 M0 interpreter sad.
 
+=item * isgt_i - is $2 > $3 (integer)
+
+=item * isgt_n - is $2 > $3 (numeric)
+
+=item * isge_i - is $2 >= $3 (integer)
+
+=item * isge_n - is $2 >= $3 (numeric)
+
+Treat C<*$2> and C<*$3> as integer or floating-point values and compare them
+according to the name of the op.  If the comparison is true, set C<*$1> to 1.
+Otherwise, set C<*$1> to 0.
+
 =item * convert_n_i - convert to numeric from integer
 
 Assume that C<*$2> is an integer value, convert it to a floating-point value
