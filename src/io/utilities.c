@@ -115,8 +115,13 @@ io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding, size_t char_length,
         byte_length = (length + encoding->bytes_per_unit - 1) &
                       ~(encoding->bytes_per_unit - 1);
 
-    /* Allocate 3 bytes more for partial multi-byte characters */
-    result           = Parrot_str_new_noinit(interp, byte_length + 3);
+    if (byte_length == 0)
+        result = Parrot_str_new_noinit(interp, 0);
+    else {
+        /* Allocate 3 bytes more for partial multi-byte characters */
+        result = Parrot_str_new_noinit(interp, byte_length + 3);
+    }
+
     result->encoding = encoding;
     return result;
 }

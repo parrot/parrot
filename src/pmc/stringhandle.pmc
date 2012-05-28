@@ -64,9 +64,6 @@ pmclass StringHandle extends Handle auto_attrs {
     ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR STRING *filename;            /* A mock path and filename     */
     ATTR INTVAL  read_offset;         /* Position, for reading bytes  */
-    ATTR IO_VTABLE *vtable;
-    ATTR IO_BUFFER *read_buffer;
-    ATTR_IO_BUFFER *write_buffer;
 
 /*
 
@@ -94,6 +91,8 @@ Initializes a newly created StringHandle object.
         data_struct->read_offset  = 0;
         data_struct->vtable       = Parrot_io_get_vtable(interp,
                                         IO_VTABLE_STRINGHANDLE, NULL);
+        data_struct->read_buffer  = NULL;
+        data_struct->write_buffer = NULL;
 
         PObj_custom_mark_SET(SELF);
     }
@@ -137,6 +136,8 @@ Mark active stringhandle data as live.
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
+        Parrot_io_buffer_mark(interp, data_struct->read_buffer);
+        Parrot_io_buffer_mark(interp, data_struct->write_buffer);
     }
 
 /*
@@ -218,6 +219,7 @@ stored for mocking.
     METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
                 STRING *mode :optional, INTVAL got_mode :opt_flag) {
         STRING *open_mode, *old_string;
+        PMC * handle;
         INTVAL flags;
 
         if (got_mode && !STRING_IS_NULL(mode))
@@ -227,33 +229,9 @@ stored for mocking.
             SET_ATTR_filename(INTERP, SELF, filename);
 
 
-        /* If StringHandle hasn't already been initialized, create a new string. */
-        GET_ATTR_stringhandle(INTERP, SELF, old_string);
-        if (STRING_IS_NULL(old_string)) {
-            STRING *new_string;
-            STRING *encoding;
+        handle = Parrot_io_open(INTERP, SELF, filename, mode);
 
-            GET_ATTR_encoding(INTERP, SELF, encoding);
-            if (encoding_is_utf8(INTERP, encoding))
-                new_string = Parrot_str_new_init(INTERP, "", 0,
-                        Parrot_utf8_encoding_ptr, 0);
-            else
-                new_string = CONST_STRING(INTERP, "");
-
-            SET_ATTR_stringhandle(INTERP, SELF, new_string);
-        }
-
-        /* Set a default mode of read-only. */
-        GET_ATTR_mode(INTERP, SELF, open_mode);
-        if (STRING_IS_NULL(open_mode)) {
-            open_mode = CONST_STRING(INTERP, "r");
-            SET_ATTR_mode(INTERP, SELF, open_mode);
-        }
-
-        flags = Parrot_io_parse_open_flags(INTERP, open_mode);
-        SET_ATTR_flags(INTERP, SELF, flags);
-
-        RETURN(PMC *SELF);
+        RETURN(PMC *handle);
     }
 
 
@@ -268,11 +246,7 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        STRING *stringhandle;
-        INTVAL status;
-        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
-        status = STRING_IS_NULL(stringhandle);
-        RETURN(INTVAL status);
+        const INTVAL closed = Parrot_io_is_closed(INTERP, SELF);
     }
 
 
@@ -288,19 +262,7 @@ StringHandle object that isn't opened yet, returns an empty string.
 */
 
     METHOD readall(STRING *name :optional, INTVAL got_name :opt_flag) {
-        STRING *string_result;
-
-        GET_ATTR_stringhandle(INTERP, SELF, string_result);
-        if (STRING_IS_NULL(string_result)) {
-            STRING *encoding;
-            GET_ATTR_encoding(INTERP, SELF, encoding);
-            if (encoding_is_utf8(INTERP, encoding))
-                string_result = Parrot_str_new_init(INTERP, "", 0,
-                        Parrot_utf8_encoding_ptr, 0);
-            else
-                string_result = CONST_STRING(INTERP, "");
-        }
-
+        STRING * const string_result = Parrot_io_readall_s(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
@@ -315,7 +277,7 @@ Clear the StringHandle by resetting it to a null value.
 */
 
     METHOD flush() {
-        Parrot_io_flush_handle(INTERP, SELF);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*
@@ -331,8 +293,7 @@ Print the passed in integer, number, string, or PMC to the stringhandle.
 
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
-
-        Parrot_io_putps(INTERP, SELF, string_to_print);
+        Parrot_io_write_s(INTERP, SELF, string_to_print);
     }
 
 /*
@@ -346,24 +307,7 @@ Print the string to the stringhandle.
 */
 
     METHOD puts(STRING *to_print) {
-        INTVAL flags, status;
-        STRING *old_string, *new_string;
-
-        GET_ATTR_stringhandle(INTERP, SELF, old_string);
-        if (STRING_IS_NULL(old_string))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot write to a closed filehandle");
-
-        GET_ATTR_flags(INTERP, SELF, flags);
-        if (!(flags & PIO_F_WRITE))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot write to a filehandle not opened for write");
-
-        new_string = Parrot_str_concat(INTERP, old_string, to_print);
-
-        SET_ATTR_stringhandle(INTERP, SELF, new_string);
-
-        status = Parrot_str_byte_length(INTERP, new_string);
+        const INTVAL status = Parrot_io_write_s(INTERP, SELF, to_print);
         RETURN(INTVAL status);
     }
 
@@ -485,14 +429,7 @@ string data).
 */
 
     METHOD eof() {
-        STRING *stringhandle;
-        UINTVAL offset;
-        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
-        GET_ATTR_read_offset(INTERP, SELF, offset);
-
-        if (offset >= Parrot_str_byte_length(INTERP, stringhandle))
-            RETURN(INTVAL 1);
-
+        const INTVAL is_eof = Parrot_io_eof(INTERP, SELF);
         RETURN(INTVAL 0);
     }
 

@@ -100,6 +100,15 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
 }
 
 void
+Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
+{
+    if (!buffer)
+        return;
+    if (!PMC_IS_NULL(buffer->owner_pmc))
+        Parrot_gc_mark_PMC_alive(interp, buffer->owner_pmc);
+}
+
+void
 Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_clear)

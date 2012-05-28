@@ -22,15 +22,10 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 {
     ASSERT_ARGS(io_stringhandle_setup_vtable)
     vtable->name = "StringHandle";
-    vtable->read_s = io_stringhandle_read_s;
     vtable->read_b = io_stringhandle_read_b;
-    vtable->write_s = io_stringhandle_write_s;
-    vtable->readline_s = io_stringhandle_readline_s;
-    vtable->readall_s = io_stringhandle_readall_s;
     vtable->flush = io_stringhandle_flush;
     vtable->is_eof = io_stringhandle_is_eof;
     vtable->tell = io_stringhandle_tell;
-    vtable->peek_b = io_stringhandle_peek_b;
     vtable->seek = io_stringhandle_seek;
     vtable->open = io_stringhandle_open;
     vtable->is_open = io_stringhandle_is_open;
@@ -44,61 +39,123 @@ static INTVAL
 io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_stringhandle_read_b)
+    INTVAL read_offs;
+    STRING *stringhandle;
+    GETATTR_StringHandle_read_offset(interp, handle, read_offs);
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+
+    memcpy(buffer, stringhandle->bufstart, byte_length);
+    SETATTR_StringHandle_read_offset(interp, handle, read_offs + byte_length);
+    return byte_length;
 }
 
 static INTVAL
 io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_stringhandle_write_b)
+    STRING *old_string, *new_string;
+    STR_VTABLE * encoding;
+
+    GETATTR_StringHandle_stringhandle(interp, handle, old_string);
+    GETATTR_StringHandle_encoding(interp, handle, encoding);
+
+    new_string = io_get_new_empty_string(interp, encoding, -1, old_string->bufused + byte_length);
+    memcpy(new_string->bufstart, old_string->bufstart, old_string->bufused);
+    memcpy(new_string->bufstart + old_string->bufused, buffer, byte_length);
+    new_string->bufused = old_string->bufused + byte_length);
+
+    SETATTR_StringHandle_stringhandle(INTERP, SELF, new_string);
+    return byte_length;
 }
 
 static INTVAL
 io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_flush_s)
+    SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
 }
 
 static INTVAL
 io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_readall_s)
+    INTVAL read_offs;
+    STRING *stringhandle;
+    GETATTR_StringHandle_read_offset(interp, handle, read_offs);
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    return read_offs >= stringhandle->bufused;
 }
 
 static PIOOFF_T
 io_stringhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_tell)
+    INTVAL read_offset;
+    GETATTR_StringHandle_read_offset(interp, handle, read_offset);
+    return (PIOOFF_T)read_offset;
 }
 
 static INTVAL
-io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_stringhandle_seek)
-}
-
-static INTVAL
-io_stringhandle_peek(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_stringhandle_peek_b)
+    INTVAL old_offs;
+    STRING *stringhandle;
+    INTVAL read_offs = 0;
+    switch (whence) {
+        case 0:
+            /* Absolute seek, start from the beginning of the string */
+            read_offs = (INTVAL)offset;
+            break;
+        case 1:
+            /* Relative seek from the current offset */
+            GETATTR_StringHandle_read_offset(interp, handle, old_offs);
+            read_offs = (INTVAL)offset + old_offs;
+            break;
+        case 2:
+            /* Absolute seek backwards from the end of the buffer */
+            GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+            read_offs = (INTVAL)(stringhandle->bufused - (size_t)offset);
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot seek with mode %d", whence);
+    }
+    SETATTR_StringHandle_read_offset(interp, handle, read_offs);
 }
 
 static INTVAL
 io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_stringhandle_open)
+    STR_VTABLE * encoding;
+    STRING *new_str;
+    GETATTR_StringHandle_encoding(interp, handle, encoding);
+
+    new_str = io_get_new_empty_string(interp, encoding, -1, 0);
+
+    SETATTR_StringHandle_stringhandle(interp, handle, new_str);
+    SETATTR_StringHandle_flags(interp, handle, flags);
+    SETATTR_StringHandle_mode(interp, handle, mode);
+    SETATTR_StringHandle_filename(interp, handle, path);
+    SETATTR_StringHandle_read_offset(interp, handle, 0);
 }
 
 static INTVAL
 io_stringhandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_is_open)
+    STRING *stringhandle;
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    return !STRING_IS_NULL(stringhandle);
 }
 
 static INTVAL
 io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
 {
     ASSERT_ARGS(io_stringhandle_close)
-
+    SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
     SETATTR_StringHandle_read_offset(interp, handle, 0);
-    return
+    return 1;
 }
+
