@@ -74,11 +74,8 @@ Initializes a newly created FileHandle object.
         attrs->exit_status      = 0;
         attrs->file_pos         = piooffsetzero;
         attrs->last_pos         = piooffsetzero;
-        attrs->buffer_size      = 0;
-        attrs->buffer_flags     = 0;
-        attrs->buffer_start     = NULL;
-        attrs->buffer_end       = NULL;
-        attrs->buffer_next      = NULL;
+        data_struct->vtable     = Parrot_io_get_vtable(interp,
+                                        IO_VTABLE_FILEHANDLE, NULL);
 
         /* Initialize the os_handle to the platform-specific value for closed */
         attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
@@ -260,6 +257,44 @@ in the file.
         return !Parrot_io_eof(INTERP, SELF);
     }
 
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        void * ptr;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "FileHandle: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                SET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                SET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "FileHandle: Cannot set pointer %d", key);
+        }
+    }
+
 
 /*
 
@@ -293,6 +328,17 @@ filehandle, rather than modifying the invocant).
 
         if (!got_filename || STRING_IS_NULL(filename))
             GET_ATTR_filename(INTERP, SELF, filename);
+
+        if (Parrot_str_index_of(INTERP, mode, CONST_STRING("p") != -1) {
+            IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
+                                        IO_VTABLE_PIPE, NULL);
+            VTABLE_set_pointer_keyed_int(INTERP, SELF, IO_PTR_IDX_VTABLE, vtable);
+        }
+        else {
+            IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
+                                        IO_VTABLE_FILEHANDLE, NULL);
+            VTABLE_set_pointer_keyed_int(INTERP, SELF, IO_PTR_IDX_VTABLE, vtable);
+        }
 
         filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
         RETURN(PMC *filehandle);

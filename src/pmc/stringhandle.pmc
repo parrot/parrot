@@ -64,6 +64,9 @@ pmclass StringHandle extends Handle auto_attrs {
     ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR STRING *filename;            /* A mock path and filename     */
     ATTR INTVAL  read_offset;         /* Position, for reading bytes  */
+    ATTR IO_VTABLE *vtable;
+    ATTR IO_BUFFER *read_buffer;
+    ATTR_IO_BUFFER *write_buffer;
 
 /*
 
@@ -89,6 +92,8 @@ Initializes a newly created StringHandle object.
         data_struct->encoding     = NULL;
         data_struct->filename     = NULL;
         data_struct->read_offset  = 0;
+        data_struct->vtable       = Parrot_io_get_vtable(interp,
+                                        IO_VTABLE_STRINGHANDLE, NULL);
 
         PObj_custom_mark_SET(SELF);
     }
@@ -152,6 +157,44 @@ Returns whether the StringHandle has reached the end of the file.
             return 0;
 
         return 1;
+    }
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        void * ptr;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "StringHandle: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                SET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                SET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "StringHandle: Cannot set pointer %d", key);
+        }
     }
 
 

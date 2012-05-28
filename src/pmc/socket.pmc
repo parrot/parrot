@@ -51,6 +51,8 @@ Initializes a newly created Socket object.
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
         data_struct->buf    = STRINGNULL;
+        data_struct->vtable = Parrot_io_get_vtable(interp,
+                                        IO_VTABLE_SOCKET, NULL);
 
         Parrot_io_socket_initialize_handle(INTERP, SELF);
 
@@ -130,6 +132,44 @@ Returns whether the Socket is currently open.
 
     VTABLE INTVAL get_bool() {
         return !Parrot_io_socket_is_closed(INTERP, SELF);
+    }
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        void * ptr;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Socket: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                SET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                SET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Socket: Cannot set pointer %d", key);
+        }
     }
 
 /*

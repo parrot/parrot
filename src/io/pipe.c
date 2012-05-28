@@ -2,15 +2,10 @@ io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 {
     ASSERT_ARGS(io_pipe_setup_vtable)
     vtable->name = "Pipe";
-    vtable->read_s = io_pipe_read_s;
     vtable->read_b = io_pipe_read_b;
-    vtable->write_s = io_pipe_write_s;
-    vtable->readline_s = io_pipe_readline_s;
-    vtable->readall_s = io_pipe_readall_s;
     vtable->flush = io_pipe_flush;
     vtable->is_eof = io_pipe_is_eof;
     vtable->tell = io_pipe_tell;
-    vtable->peek_b = io_pipe_peek_b;
     vtable->seek = io_pipe_seek;
     vtable->open = io_pipe_open;
     vtable->is_open = io_pipe_is_open;
@@ -20,47 +15,35 @@ io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->get_flags = io_pipe_get_flags;
 }
 
-
-static STRING *
-io_pipe_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t char_length)
-{
-    ASSERT_ARGS(io_pipe_read_s)
-}
-
 static INTVAL
 io_pipe_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_pipe_read_b)
-}
-
-static INTVAL
-io_pipe_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s), size_t char_length)
-{
-    ASSERT_ARGS(io_pipe_write_s)
+    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const size_t bytes_read = Parrot_io_internal_read(interp, os_handle, buffer, byte_length);
+    if (bytes_read == 0) {
+        INTVAL flags;
+        GETATTR_FileHandle_flags(interp, handle, flags);
+        flags |= PIO_F_EOF;
+        SETATTR_FileHandle_flags(interp, handle, flags);
+    }
 }
 
 static INTVAL
 io_pipe_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_pipe_write_b)
-}
-
-static INTVAL
-io_pipe_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
-{
-    ASSERT_ARGS(io_pipe_readline_s)
-}
-
-static STRING *
-io_pipe_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_pipe_readall_s)
+    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    return Parrot_io_internal_write(interp, handle, buffer, byte_length);
 }
 
 static INTVAL
 io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_flush_s)
+    // TODO: In read mode, don't do what this does.
+    PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    Parrot_io_internal_flush(interp, os_handle);
 }
 
 static INTVAL
@@ -78,18 +61,16 @@ static PIOOFF_T
 io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_tell)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "tell");
 }
 
 static INTVAL
 io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_seek)
-}
-
-static INTVAL
-io_pipe_peek(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_pipe_peek_b)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
 }
 
 static INTVAL

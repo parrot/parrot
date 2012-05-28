@@ -140,6 +140,29 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
     return vtable;
 }
 
+PARROT_WARN_UNUSED_RESULT
+IO_VTABLE *
+Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
+{
+    ASSERT_ARGS(Parrot_io_get_vtable)
+    INTVAL i;
+    if (idx >= interp->piodata->num_vtables)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot get IO VTABLE %d", idx);
+    if (idx >= 0)
+        return &(interp->piodata->vtables[idx]);
+    if (!name)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot get IO VTABLE with no index and no name");
+
+    for (i = 0; i < interp->piodata->num_vtables; i++) {
+        if (!streq(name, interp->piodata->num_vtables[i].name))
+            return &(interp->piodata->vtables[i]);
+    }
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot get IO VTABLE %s", name);
+}
+
 /*
 
 =item C<void Parrot_io_finish(PARROT_INTERP)>
@@ -296,6 +319,46 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
 /*
 
+=item C<INTVAL Parrot_io_socket_handle(PARROT_INTERP, PMC *socket, INTVAL fam,
+INTVAL type, INTVAL proto)>
+
+Creates and returns a socket using the specified address family, socket type,
+and protocol number. Check the returned PMC with a boolean test to see whether
+the socket was successfully created.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+INTVAL
+Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
+            INTVAL type, INTVAL proto)
+{
+    ASSERT_ARGS(Parrot_io_socket_handle)
+    PMC       *new_socket;
+    PIOHANDLE  os_handle;
+
+    if (PMC_IS_NULL(socket))
+        new_socket = io_get_new_socket(interp,
+                                       PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
+    else
+        new_socket = socket;
+
+    os_handle = Parrot_io_internal_socket(interp, fam, type, proto);
+
+    SETATTR_Socket_os_handle(interp, new_socket, os_handle);
+    SETATTR_Socket_family(interp, new_socket, fam);
+    SETATTR_Socket_type(interp, new_socket, type);
+    SETATTR_Socket_protocol(interp, new_socket, proto);
+
+    return 0;
+}
+
+/*
+
 =item C<PMC * Parrot_io_fdopen(PARROT_INTERP, PMC *pmc, PIOHANDLE fd, STRING
 *sflags)>
 
@@ -367,6 +430,24 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
     }
 
     return filehandle;
+}
+
+/*
+
+=item C<void Parrot_io_socket_initialize_handle(PARROT_INTERP, PMC *socket)>
+
+Initialize a Socket PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_socket_initialize(SHIM_INTERP, ARGMOD(PMC *socket))
+{
+    ASSERT_ARGS(Parrot_io_socket_initialize_handle)
+    PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)PIO_INVALID_HANDLE;
 }
 
 
@@ -514,9 +595,29 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
 
         io_verify_has_read_buffer(interp, handle, vtable);
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         return io_read_encoded_string(interp, handle, vtable, read_buffer, NULL, length);
     }
+}
+
+/*
+
+=item C<STRING * Parrot_io_recv_handle(PARROT_INTERP, PMC *pmc, size_t len)>
+
+Receives a message from the connected socket C<*pmc> in C<*buf>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
+{
+    ASSERT_ARGS(Parrot_io_recv_handle)
+    return Parrot_io_read_s(interp, pmc, len);
 }
 
 PARROT_EXPORT
@@ -1187,6 +1288,233 @@ Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_make_offset_pmc)
     return VTABLE_get_integer(interp, pmc);
+}
+
+/*
+
+=item C<INTVAL Parrot_io_poll_handle(PARROT_INTERP, PMC *pmc, INTVAL which,
+INTVAL sec, INTVAL usec)>
+
+Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
+microseconds.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
+{
+    ASSERT_ARGS(Parrot_io_poll_handle)
+    /* TODO: Can we move this to the IO_VTABLE and make it usable for all
+       types? */
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
+
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't poll closed socket");
+
+    return Parrot_io_poll(interp, io->os_handle, which, sec, usec);
+}
+
+/*
+
+=item C<void Parrot_io_connect_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
+
+Connects C<*pmc> to C<*address>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
+{
+    ASSERT_ARGS(Parrot_io_socket_connect)
+    Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+    int i;
+
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't connect closed socket");
+    if (PMC_IS_NULL(address))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Address is null");
+
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
+                continue;
+
+            io->remote = sa;
+
+            Parrot_io_connect(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
+
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
+    io->remote = address;
+
+    Parrot_io_connect(interp, io->os_handle,
+            VTABLE_get_pointer(interp, address),
+            VTABLE_get_integer(interp, address));
+}
+
+/*
+
+=item C<void Parrot_io_bind_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
+
+Binds C<*pmc>'s socket to the local address and port specified by
+C<*address>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
+{
+    ASSERT_ARGS(Parrot_io_socket_bind)
+    Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+    int i;
+
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't bind closed socket");
+    if (PMC_IS_NULL(address))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Address is null");
+
+    /* Iterate over all addresses if an array is passed */
+    if (address->vtable->base_type != enum_class_Sockaddr) {
+        INTVAL len = VTABLE_elements(interp, address);
+
+        for (i = 0; i < len; ++i) {
+            PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
+            Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
+
+            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+                    io->protocol))
+                continue;
+
+            io->local = sa;
+
+            Parrot_io_bind(interp, io->os_handle, sa_data->pointer,
+                    sa_data->len);
+
+            return;
+        }
+
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "No address found for family %d, type %d, proto %d",
+                io->family, io->type, io->protocol);
+    }
+
+    io->local = address;
+
+    Parrot_io_bind(interp, io->os_handle,
+            VTABLE_get_pointer(interp, address),
+            VTABLE_get_integer(interp, address));
+}
+
+/*
+
+=item C<void Parrot_io_listen_handle(PARROT_INTERP, PMC *pmc, INTVAL backlog)>
+
+Listens for new connections on socket C<*pmc>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_socket_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
+{
+    ASSERT_ARGS(Parrot_io_socket_listen)
+    const Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
+
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't listen on closed socket");
+
+    Parrot_io_listen(interp, io->os_handle, backlog);
+}
+
+/*
+
+=item C<PMC * Parrot_io_accept_handle(PARROT_INTERP, PMC *pmc)>
+
+Accepts a new connection and returns a newly created C<ParrotIO> socket.
+Returns C<NULL> on failure.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_socket_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_io_socket_accept)
+    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
+    Parrot_Socket_attributes *new_io;
+    PMC       *new_pmc;
+
+    if (Parrot_io_socket_is_closed(interp, pmc))
+        return PMCNULL;
+
+    new_pmc = Parrot_io_new_socket_pmc(interp,
+                PIO_F_SOCKET | PIO_F_READ | PIO_F_WRITE);
+    new_io  = PARROT_SOCKET(new_pmc);
+
+    new_io->local  = io->local;
+    new_io->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
+
+    new_io->os_handle = Parrot_io_accept(interp, io->os_handle, new_io->remote);
+
+    return new_pmc;
+}
+
+/*
+
+=item C<PMC * Parrot_io_new_socket_pmc(PARROT_INTERP, INTVAL flags)>
+
+Creates a new I/O socket object. The value of C<flags> is set
+in the returned PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_socket_new(PARROT_INTERP, INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_socket_new)
+    PMC * const sock = io_get_new_socket(interp);
+    Parrot_io_set_flags(interp, sock, flags);
+    return sock;
 }
 
 /*

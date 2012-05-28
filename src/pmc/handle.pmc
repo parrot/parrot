@@ -33,11 +33,13 @@ EXCEPTION_INVALID_OPERATION.
 
 pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
-    ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
-    ATTR INTVAL    record_separator;  /* Record separator (only single char
-                                       * supported) */
-    ATTR Parrot_io_buffer *buffer;    /* Buffer */
-    ATTR Parrot_io_vtable *io_vtable; /* Function dispatch table */
+    ATTR PIOHANDLE os_handle;           /* Low level OS descriptor */
+    ATTR INTVAL    record_separator;    /* Record separator (only single
+                                         * char supported) */
+    ATTR Parrot_io_vtable *io_vtable;   /* Function dispatch table */
+    ATTR IO_BUFFER *read_buffer;        /* Read Buffer */
+    ATTR IO_BUFFER *write_buffer;       /* Write Buffer */
+
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

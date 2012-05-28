@@ -93,6 +93,17 @@ io_get_new_filehandle(PARROT_INTERP)
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PMC *
+io_get_new_socket(PARROT_INTERP)
+{
+    ASSERT_ARGS(io_get_new_socket)
+    const INTVAL typenum = Parrot_hll_get_ctx_HLL_type(interp,
+                                                        enum_class_Socket);
+    return Parrot_pmc_new(interp, typenum);
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING *
 io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding, size_t char_length, size_t byte_length)
 {

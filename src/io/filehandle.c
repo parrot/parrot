@@ -73,6 +73,7 @@ static INTVAL
 io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_flush_s)
+    // TODO: In read mode, don't do what this does.
     PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     Parrot_io_internal_flush(interp, os_handle);
 }
