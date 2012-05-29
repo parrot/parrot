@@ -43,6 +43,11 @@ static INTVAL io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -118,6 +123,9 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_filehandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -160,15 +168,11 @@ io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
     vtable->name = "FileHandle";
-    vtable->read_s = io_filehandle_read_s;
     vtable->read_b = io_filehandle_read_b;
-    vtable->write_s = io_filehandle_write_s;
-    vtable->readline_s = io_filehandle_readline_s;
-    vtable->readall_s = io_filehandle_readall_s;
+
     vtable->flush = io_filehandle_flush;
     vtable->is_eof = io_filehandle_is_eof;
     vtable->tell = io_filehandle_tell;
-    vtable->peek_b = io_filehandle_peek_b;
     vtable->seek = io_filehandle_seek;
     vtable->open = io_filehandle_open;
     vtable->is_open = io_filehandle_is_open;
@@ -176,7 +180,8 @@ io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     vtable->get_encoding = io_filehandle_get_encoding;
     vtable->set_flags = io_filehandle_set_flags;
     vtable->get_flags = io_filehandle_get_flags;
-    vtable->total_size
+    vtable->total_size = io_filehandle_total_size;
+    vtable->get_piohandle = io_filehandle_get_piohandle;
 }
 
 static INTVAL
@@ -204,7 +209,7 @@ io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), s
 static INTVAL
 io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_filehandle_flush_s)
+    ASSERT_ARGS(io_filehandle_flush)
     // TODO: In read mode, don't do what this does.
     PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     Parrot_io_internal_flush(interp, os_handle);
@@ -213,9 +218,9 @@ io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 static INTVAL
 io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_filehandle_readall_s)
+    ASSERT_ARGS(io_filehandle_is_eof)
     INTVAL flags;
-    GETATTR_FileHandle_flags(interp, pmc, flags);
+    GETATTR_FileHandle_flags(interp, handle, flags);
     if (flags & PIO_F_EOF)
         return 1;
     return 0;
@@ -253,20 +258,18 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Unable to open filehandle from path '%Ss'", path);
 
-    flags |= PIO_F_FILE;
-
     /* Set generic flag here if is a terminal then
      * FileHandle can know how to setup buffering.
      * STDIN, STDOUT, STDERR would be in this case
      * so we would setup linebuffering.
      */
-    if (PIO_IS_TTY(interp, os_handle))
+    if (Parrot_io_internal_is_tty(interp, os_handle))
         flags |= PIO_F_CONSOLE;
 
-    SETATTR_FileHandle_os_handle(interp, filehandle, os_handle);
-    SETATTR_FileHandle_flags(interp, filehandle, flags);
-    SETATTR_FileHandle_filename(interp, filehandle, path);
-    SETATTR_FileHandle_mode(interp, filehandle, mode);
+    SETATTR_FileHandle_os_handle(interp, handle, os_handle);
+    SETATTR_FileHandle_flags(interp, handle, flags);
+    SETATTR_FileHandle_filename(interp, handle, path);
+    SETATTR_FileHandle_mode(interp, handle, mode);
 
     return 1;
 }
@@ -275,7 +278,7 @@ static INTVAL
 io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_is_open)
-    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, pmc);
+    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     return os_handle != PIO_INVALID_HANDLE;
 }
 
@@ -295,9 +298,9 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
     else {
         INTVAL result;
 
-        IO_BUFFER * const write_buffer = PIO_GET_WRITE_BUFFER(interp, handle);
-        IO_VTABLE * const vtable = PIO_GET_VTABLE(interp, handle);
-        Parrot_io_buffer_flush(interp, buffer, handle, vtable);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
 
         result = Parrot_io_internal_close(interp, os_handle);
         io_filehandle_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
@@ -314,8 +317,8 @@ io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     STRING           *encoding_str;
     const STR_VTABLE *encoding;
 
-    GETATTR_FileHandle_encoding(interp, pmc, encoding_str);
-    if (!STRING_IS_NULL(encoding_str)) {
+    GETATTR_FileHandle_encoding(interp, handle, encoding_str);
+    if (!STRING_IS_NULL(encoding_str))
         return Parrot_find_encoding_by_string(interp, encoding_str);
     return NULL;
 }
@@ -338,7 +341,16 @@ static size_t
 io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_total_size)
-    return (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
+    STRING *name;
+    GETATTR_FileHandle_filename(interp, handle, name);
+    return (size_t)(Parrot_file_stat_intval(interp, name, STAT_FILESIZE));
+}
+
+static PIOHANDLE
+io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_get_piohandle)
+    return PARROT_FILEHANDLE(handle)->os_handle;
 }
 
 /* OLD FUNCTIONS

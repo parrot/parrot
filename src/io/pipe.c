@@ -26,6 +26,10 @@ static INTVAL io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static PIOHANDLE io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -73,6 +77,10 @@ static PIOOFF_T io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static size_t io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_pipe_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(char *buffer),
@@ -92,6 +100,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -118,6 +129,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_pipe_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -141,6 +155,8 @@ io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->get_encoding = io_pipe_get_encoding;
     vtable->set_flags = io_pipe_set_flags;
     vtable->get_flags = io_pipe_get_flags;
+    vtable->total_size = io_pipe_total_size;
+    vtable->get_piohandle = io_pipe_get_piohandle;
 }
 
 static INTVAL
@@ -296,4 +312,19 @@ io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_flags)
     return PARROT_FILEHANDLE(handle)->flags;
+}
+
+static size_t
+io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_pipe_total_size)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "total_size");
+}
+
+static PIOHANDLE
+io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_pipe_get_piohandle)
+    return PARROT_FILEHANDLE(handle)->os_handle;
 }

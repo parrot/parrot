@@ -21,6 +21,11 @@ src/io/stringhandle.c - StringHandle vtables and helper routines
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_stringhandle_close(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL autoflush)
@@ -77,6 +82,10 @@ static PIOOFF_T io_stringhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static size_t io_stringhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_stringhandle_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(char *buffer),
@@ -86,6 +95,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
+#define ASSERT_ARGS_io_filehandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -113,6 +125,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_stringhandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -136,6 +151,8 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->get_encoding = io_stringhandle_get_encoding;
     vtable->set_flags = io_stringhandle_set_flags;
     vtable->get_flags = io_stringhandle_get_flags;
+    vtable->total_size = io_stringhandle_total_size;
+    vtable->get_piohandle = io_stringhandle_get_piohandle;
 }
 
 static INTVAL
@@ -167,21 +184,21 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
     memcpy(new_string->bufstart + old_string->bufused, buffer, byte_length);
     new_string->bufused = old_string->bufused + byte_length);
 
-    SETATTR_StringHandle_stringhandle(INTERP, SELF, new_string);
+    SETATTR_StringHandle_stringhandle(interp, handle, new_string);
     return byte_length;
 }
 
 static INTVAL
 io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_stringhandle_flush_s)
+    ASSERT_ARGS(io_stringhandle_flush)
     SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
 }
 
 static INTVAL
 io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_stringhandle_readall_s)
+    ASSERT_ARGS(io_stringhandle_is_eof)
     INTVAL read_offs;
     STRING *stringhandle;
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
@@ -262,3 +279,19 @@ io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
     return 1;
 }
 
+static size_t
+io_stringhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_stringhandle_total_size)
+    STRING *stringhandle;
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    return stringhandle->_buflen;
+}
+
+static PIOHANDLE
+io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_get_piohandle)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
+}

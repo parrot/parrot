@@ -132,7 +132,9 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
     ASSERT_ARGS(Parrot_io_get_new_vtable)
     const int number_of_vtables = interp->piodata->num_vtables;
     IO_VTABLE *vtable;
-    interp->piodata->vtables = mem_gc_realloc_n_typed(interp, number_of_vtables + 1, IO_VTABLE);
+    interp->piodata->vtables = mem_gc_realloc_n_typed(interp,
+                                interp->piodata->vtables,
+                                number_of_vtables + 1, IO_VTABLE);
     vtable = &(interp->piodata->vtables[number_of_vtables]);
     vtable->name = name;
     vtable->number = number_of_vtables;
@@ -156,7 +158,7 @@ Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
             "Cannot get IO VTABLE with no index and no name");
 
     for (i = 0; i < interp->piodata->num_vtables; i++) {
-        if (!streq(name, interp->piodata->num_vtables[i].name))
+        if (!strcmp(name, interp->piodata->vtables[i].name))
             return &(interp->piodata->vtables[i]);
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -307,7 +309,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        INTVAL status = vtable->open(interp, handle, path, flags);
+        INTVAL status = vtable->open(interp, handle, path, flags, mode);
 
         if (!status)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -319,7 +321,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
 /*
 
-=item C<INTVAL Parrot_io_socket_handle(PARROT_INTERP, PMC *socket, INTVAL fam,
+=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *socket, INTVAL fam,
 INTVAL type, INTVAL proto)>
 
 Creates and returns a socket using the specified address family, socket type,
@@ -337,13 +339,12 @@ INTVAL
 Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
-    ASSERT_ARGS(Parrot_io_socket_handle)
+    ASSERT_ARGS(Parrot_io_socket)
     PMC       *new_socket;
     PIOHANDLE  os_handle;
 
     if (PMC_IS_NULL(socket))
-        new_socket = io_get_new_socket(interp,
-                                       PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
+        new_socket = io_get_new_socket(interp, PIO_F_READ | PIO_F_WRITE);
     else
         new_socket = socket;
 
@@ -411,7 +412,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
     if (!flags)
         return PMCNULL;
 
-    if (PIO_IS_TTY(interp, fd))
+    if (Parrot_io_internal_is_tty(interp, fd))
         flags |= PIO_F_CONSOLE;
 
     /* fdopened files are always shared */
@@ -434,7 +435,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
 
 /*
 
-=item C<void Parrot_io_socket_initialize_handle(PARROT_INTERP, PMC *socket)>
+=item C<void Parrot_io_socket_initialize(PARROT_INTERP, PMC *socket)>
 
 Initialize a Socket PMC
 
@@ -446,7 +447,7 @@ PARROT_EXPORT
 void
 Parrot_io_socket_initialize(SHIM_INTERP, ARGMOD(PMC *socket))
 {
-    ASSERT_ARGS(Parrot_io_socket_initialize_handle)
+    ASSERT_ARGS(Parrot_io_socket_initialize)
     PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)PIO_INVALID_HANDLE;
 }
 
@@ -480,13 +481,13 @@ INTVAL
 Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
 {
     ASSERT_ARGS(Parrot_io_close)
-    if (PMC_IS_NULL(pmc))
+    if (PMC_IS_NULL(handle))
         return 0;
     else {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         if (autoflush) {
             IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-            Parrot_io_buffer_flush(interp, write_buffer, vtable, 0);
+            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
         }
         return vtable->close(interp, handle);
     }
@@ -535,7 +536,7 @@ void
 Parrot_io_flush_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_flush_handle)
-    return Parrot_io_flush(interp, pmc);
+    Parrot_io_flush(interp, pmc);
 }
 
 PARROT_EXPORT
@@ -572,7 +573,7 @@ STRING *
 Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
-    return Parrot_io_read_s(PARROT_INTERP, pmc, size_t length);
+    return Parrot_io_read_s(interp, pmc, size_t length);
 }
 
 PARROT_EXPORT
@@ -1482,8 +1483,7 @@ Parrot_io_socket_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (Parrot_io_socket_is_closed(interp, pmc))
         return PMCNULL;
 
-    new_pmc = Parrot_io_new_socket_pmc(interp,
-                PIO_F_SOCKET | PIO_F_READ | PIO_F_WRITE);
+    new_pmc = Parrot_io_new_socket_pmc(interp, PIO_F_READ | PIO_F_WRITE);
     new_io  = PARROT_SOCKET(new_pmc);
 
     new_io->local  = io->local;
@@ -1515,6 +1515,47 @@ Parrot_io_socket_new(PARROT_INTERP, INTVAL flags)
     PMC * const sock = io_get_new_socket(interp);
     Parrot_io_set_flags(interp, sock, flags);
     return sock;
+}
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_get_flags)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot get flags for null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        return vtable->get_flags(interp, handle);
+    }
+}
+
+void
+Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_set_flags)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot set flags for null or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        return vtable->set_flags(interp, handle, flags);
+    }
+}
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE
+Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_get_os_handle)
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Cannot get a PIOHANDLE from a NULL or invalid PMC");
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        return vtable->get_piohandle(interp, handle);
+    }
 }
 
 /*

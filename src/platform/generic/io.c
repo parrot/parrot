@@ -192,6 +192,9 @@ Parrot_io_internal_dup(SHIM_INTERP, PIOHANDLE handle)
 
 Sets a handle C<*pmc> to blocking or non-blocking mode
 
+TODO: Change this function signature to take the PIOHANDLE instead of having
+to query it from the pmc.
+
 =cut
 
 */
@@ -201,15 +204,14 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 {
-    ASSERT_ARGS(Parrot_io_internal_is_async)
     int rflags;
     PIOHANDLE file_descriptor;
 
-    if (Parrot_io_internal_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         return 0;
 
 #if defined(linux)
-    file_descriptor = Parrot_io_internal_get_os_handle(interp, pmc);
+    file_descriptor = Parrot_io_get_os_handle(interp, pmc);
 
     if ((rflags = fcntl(file_descriptor, F_GETFL, 0)) >= 0) {
         if (async)
@@ -218,7 +220,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
             rflags &= ~O_ASYNC;
         if ((rflags = fcntl(file_descriptor, F_SETFL, rflags)) == 0) {
             if (async)
-               Parrot_io_internal_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) | PIO_F_ASYNC);
+               Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) | PIO_F_ASYNC);
             else
                Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) & ~PIO_F_ASYNC);
         }

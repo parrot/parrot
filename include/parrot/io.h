@@ -131,6 +131,7 @@ typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVA
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_ensure_buffer)(PARROT_INTERP, PMC *handle, INTVAL buffer_no, size_t size, INTVAL flags);
 typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, PMC *handle);
+typedef PIOHANDLE   (*io_vtable_get_piohandle)(PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
     char                  * name;
@@ -149,6 +150,7 @@ typedef struct _io_vtable {
     io_vtable_get_encoding  get_encoding;
     io_vtable_ensure_buffer ensure_buffer;
     io_vtable_total_size    total_size;
+    io_vtable_get_piohandle get_piohandle;
 } IO_VTABLE;
 
 #define IO_VTABLE_FILEHANDLE        0
@@ -547,6 +549,16 @@ IO_VTABLE * Parrot_io_allocate_new_vtable(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_io_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
 IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
     INTVAL idx,
     ARGIN_NULLOK(const char * name))
@@ -557,6 +569,10 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
+
+void Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     ARGMOD(PMC * handle),
@@ -713,11 +729,20 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_allocate_new_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_Parrot_io_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_make_offset_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_io_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_write_byte_buffer_pmc \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -963,191 +988,6 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(filehandle))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
-
-/* io/filehandle.c - utility functions for FileHandle PMC */
-/* HEADERIZER BEGIN: src/io/filehandle.c */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-INTVAL Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
-PARROT_EXPORT
-void Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_start(PARROT_INTERP,
-    ARGIN(PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_get_file_position(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-INTVAL Parrot_io_get_flags(PARROT_INTERP, ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_io_set_file_position(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    PIOOFF_T file_pos)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-PARROT_EXPORT
-void Parrot_io_set_flags(PARROT_INTERP,
-    ARGIN(PMC *filehandle),
-    INTVAL flags)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_io_set_os_handle(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    PIOHANDLE file_descriptor)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-PARROT_CAN_RETURN_NULL
-void Parrot_io_clear_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-PARROT_CAN_RETURN_NULL
-INTVAL Parrot_io_get_buffer_flags(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-size_t Parrot_io_get_buffer_size(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_io_make_string(PARROT_INTERP,
-    ARGMOD(STRING **buf),
-    size_t len)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*buf);
-
-void Parrot_io_set_buffer_end(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN_NULLOK(unsigned char *new_end))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-void Parrot_io_set_buffer_flags(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    INTVAL new_flags)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-void Parrot_io_set_buffer_next(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN_NULLOK(unsigned char *new_next))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-void Parrot_io_set_buffer_size(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    size_t new_size)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-void Parrot_io_set_buffer_start(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    ARGIN_NULLOK(unsigned char *new_start))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
-#define ASSERT_ARGS_Parrot_io_close_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_io_flush_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_io_get_buffer_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_buffer_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_buffer_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_file_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_is_closed_filehandle \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_io_set_file_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_clear_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_buffer_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_get_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_make_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buf))
-#define ASSERT_ARGS_Parrot_io_set_buffer_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_buffer_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_buffer_next __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_buffer_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_Parrot_io_set_buffer_start __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/io/filehandle.c */
 
 #endif /* PARROT_IO_H_GUARD */
 

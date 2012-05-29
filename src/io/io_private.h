@@ -111,7 +111,7 @@ DIAGRAM
 struct _ParrotIOData {
     PMC ** table;           /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;     /* Number of vtables */
-    IO_VTABLE ** vtables;   /* Array of VTABLES */
+    IO_VTABLE * vtables;    /* Array of VTABLES */
 };
 
 /* redefine PIO_STD* for internal use */

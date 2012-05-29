@@ -40,6 +40,10 @@ static INTVAL io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static PIOHANDLE io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -82,6 +86,10 @@ static PIOOFF_T io_socket_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static size_t io_socket_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_socket_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(char *buffer),
@@ -95,6 +103,9 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -116,6 +127,9 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -220,6 +234,21 @@ io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
         data_struct->os_handle = PIO_INVALID_HANDLE;
     }
     return result;
+}
+
+static size_t
+io_socket_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_total_size)
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "total_size");
+}
+
+static PIOHANDLE
+io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_get_piohandle)
+    return PARROT_SOCKET(handle)->os_handle;
 }
 
 /*
