@@ -154,7 +154,7 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable
 }
 
 void
-io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable))
+io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_has_read_buffer)
     IO_BUFFER * buffer = IO_GET_READ_BUFFER(interp, handle);

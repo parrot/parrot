@@ -95,11 +95,11 @@ typedef struct _ParrotIOData ParrotIOData;
 
 /* BUFFERING */
 typedef struct _io_buffer {
-    INTVAL buffer_flags;            /* Flags on this buffer            */
+    INTVAL flags;                   /* Flags on this buffer            */
     INTVAL reference_count;         /* Reference count of this struct, until
                                        we wrap it in a special PMC     */
     size_t buffer_size;             /* Current allocated size          */
-    STR_VTABLE encoding;            /* Encoding used by this buffer    */
+    STR_VTABLE *encoding;           /* Encoding used by this buffer    */
     unsigned char *buffer_ptr;      /* ptr to the buffer mem block     */
     unsigned char *buffer_start;    /* ptr to the start of the data    */
     unsigned char *buffer_end;      /* ptr to the end of the data      */
@@ -386,6 +386,14 @@ PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -564,6 +572,9 @@ IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
     ARGIN_NULLOK(const char * name))
         __attribute__nonnull__(1);
 
+void Parrot_io_init_buffer(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -583,9 +594,6 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* handle)
         FUNC_MODIFIES(*buffer);
-
-// TODO: Merge this buffering logic into where-ever we set up these handles void Parrot_io_init_buffer(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_io_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -670,6 +678,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_read_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_readall_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -737,6 +748,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_init_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_make_offset_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -748,8 +761,6 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(buffer))
-#define ASSERT_ARGS_void Parrot_io_init_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/api.c */
 

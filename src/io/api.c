@@ -21,6 +21,7 @@ Parrot. This file implements the public interface to the I/O subsystem.
 #include "pmc/pmc_filehandle.h"
 #include "pmc/pmc_stringhandle.h"
 #include "pmc/pmc_socket.h"
+#include "pmc/pmc_sockaddr.h"
 #include "pmc/pmc_bytebuffer.h"
 
 #include <stdarg.h>
@@ -65,15 +66,15 @@ Parrot_io_init(PARROT_INTERP)
         /* Init IO stacks and handles for interp instance.  */
         PIOHANDLE os_handle;
 
-        os_handle           = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
         _PIO_STDIN(interp)  = Parrot_io_fdopen_flags(interp, PMCNULL,
                                 os_handle, PIO_F_READ);
 
-        os_handle           = PIO_STDHANDLE(interp, PIO_STDOUT_FILENO);
+        os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
         _PIO_STDOUT(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
                                 os_handle, PIO_F_WRITE);
 
-        os_handle           = PIO_STDHANDLE(interp, PIO_STDERR_FILENO);
+        os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDERR_FILENO);
         _PIO_STDERR(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
                                 os_handle, PIO_F_WRITE);
 
@@ -97,16 +98,18 @@ Parrot_io_init(PARROT_INTERP)
             "PIO alloc table failure.");
 }
 
-// TODO: Merge this buffering logic into where-ever we set up these handles
 void
 Parrot_io_init_buffer(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_io_init_buffer)
-    if (Parrot_io_STDOUT(interp))
+
+    // TODO: Merge this buffering logic into where-ever we set up these handles
+    /*if (Parrot_io_STDOUT(interp))
         Parrot_io_setlinebuf(interp, Parrot_io_STDOUT(interp));
 
     if (Parrot_io_STDIN(interp))
         Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
+    */
 }
 
 void
@@ -129,7 +132,7 @@ PARROT_MALLOC
 IO_VTABLE *
 Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
 {
-    ASSERT_ARGS(Parrot_io_get_new_vtable)
+    ASSERT_ARGS(Parrot_io_allocate_new_vtable)
     const int number_of_vtables = interp->piodata->num_vtables;
     IO_VTABLE *vtable;
     interp->piodata->vtables = mem_gc_realloc_n_typed(interp,
@@ -321,8 +324,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *socket, INTVAL fam,
-INTVAL type, INTVAL proto)>
+=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC *socket, INTVAL fam, INTVAL
+type, INTVAL proto)>
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether
@@ -344,7 +347,7 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
     PIOHANDLE  os_handle;
 
     if (PMC_IS_NULL(socket))
-        new_socket = io_get_new_socket(interp, PIO_F_READ | PIO_F_WRITE);
+        new_socket = io_get_new_socket(interp);
     else
         new_socket = socket;
 
@@ -573,14 +576,14 @@ STRING *
 Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
-    return Parrot_io_read_s(interp, pmc, size_t length);
+    return Parrot_io_read_s(interp, pmc, length);
 }
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length);
+Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
 {
     ASSERT_ARGS(Parrot_io_read_s)
 
@@ -632,12 +635,13 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
     {
+        size_t bytes_read;
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t total_size = vtable->total_size(interp, handle);
         STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
         STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
-        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, s->bufstart, total_size);
+        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, s->_bufstart, total_size);
         return s;
     }
 }
@@ -743,7 +747,6 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
             "Attempt to read bytes from a null or invalid PMC");
 
     {
-        char * content = VTABLE_get_pointer(interp, buffer);
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t bytes_read;
@@ -807,7 +810,7 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
 
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const write_buffer = IO_GET_write_BUFFER(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
         STRING *out_s;
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
@@ -819,7 +822,7 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_handle(PARROT_INTERP, PMC *pmc, PIOOFF_T offset,
+=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PMC *handle, PIOOFF_T offset,
 INTVAL w)>
 
 Moves the read/write position of C<*pmc> to offset C<bytes> from the
@@ -835,7 +838,7 @@ PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
 {
-    ASSERT_ARGS(Parrot_io_seek_handle)
+    ASSERT_ARGS(Parrot_io_seek)
     if (Parrot_io_is_closed(interp, handle))
         return -1;
 
@@ -845,7 +848,7 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_handle(PARROT_INTERP, PMC *pmc)>
+=item C<PIOOFF_T Parrot_io_tell(PARROT_INTERP, PMC *handle)>
 
 Returns the current read/write position of C<*pmc>.
 
@@ -858,12 +861,13 @@ PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(Parrot_io_tell_handle)
+    ASSERT_ARGS(Parrot_io_tell)
     if (Parrot_io_is_closed(interp, handle))
         return -1;
 
     // TODO: This
-    return Parrot_io_get_file_position(interp, handle);
+    //return Parrot_io_get_file_position(interp, handle);
+    return 0;
     /* return PIO_TELL(interp, os_handle); */
 }
 
@@ -886,7 +890,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_peek)
 
-    if (PMC_IS_NULL(handle) || Parrot_io_is_closed(handle))
+    if (PMC_IS_NULL(handle) || Parrot_io_is_closed(interp, handle))
         return -1;
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
@@ -895,7 +899,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 
         io_verify_has_read_buffer(interp, handle, vtable);
 
-        c = Parrot_io_buffer_peek(interp, pmc);
+        c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
 
         if (c == -1)
             return STRINGNULL;
@@ -1293,8 +1297,8 @@ Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_poll_handle(PARROT_INTERP, PMC *pmc, INTVAL which,
-INTVAL sec, INTVAL usec)>
+=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *pmc, INTVAL which, INTVAL sec,
+INTVAL usec)>
 
 Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
 microseconds.
@@ -1307,12 +1311,12 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
-    ASSERT_ARGS(Parrot_io_poll_handle)
+    ASSERT_ARGS(Parrot_io_poll)
     /* TODO: Can we move this to the IO_VTABLE and make it usable for all
        types? */
     Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
 
-    if (Parrot_io_socket_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't poll closed socket");
 
@@ -1337,7 +1341,7 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
     int i;
 
-    if (Parrot_io_socket_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't connect closed socket");
     if (PMC_IS_NULL(address))
@@ -1352,13 +1356,13 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
             PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
             Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
 
-            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+            if (!Parrot_io_internal_addr_match(interp, sa, io->family, io->type,
                     io->protocol))
                 continue;
 
             io->remote = sa;
 
-            Parrot_io_connect(interp, io->os_handle, sa_data->pointer,
+            Parrot_io_internal_connect(interp, io->os_handle, sa_data->pointer,
                     sa_data->len);
 
             return;
@@ -1371,14 +1375,14 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
     io->remote = address;
 
-    Parrot_io_connect(interp, io->os_handle,
+    Parrot_io_internal_connect(interp, io->os_handle,
             VTABLE_get_pointer(interp, address),
             VTABLE_get_integer(interp, address));
 }
 
 /*
 
-=item C<void Parrot_io_bind_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<void Parrot_io_socket_bind_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
 
 Binds C<*pmc>'s socket to the local address and port specified by
 C<*address>.
@@ -1395,7 +1399,7 @@ Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
     int i;
 
-    if (Parrot_io_socket_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't bind closed socket");
     if (PMC_IS_NULL(address))
@@ -1410,13 +1414,13 @@ Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
             PMC *sa = VTABLE_get_pmc_keyed_int(interp, address, i);
             Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
 
-            if (!Parrot_io_addr_match(interp, sa, io->family, io->type,
+            if (!Parrot_io_internal_addr_match(interp, sa, io->family, io->type,
                     io->protocol))
                 continue;
 
             io->local = sa;
 
-            Parrot_io_bind(interp, io->os_handle, sa_data->pointer,
+            Parrot_io_internal_bind(interp, io->os_handle, sa_data->pointer,
                     sa_data->len);
 
             return;
@@ -1429,7 +1433,7 @@ Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
     io->local = address;
 
-    Parrot_io_bind(interp, io->os_handle,
+    Parrot_io_internal_bind(interp, io->os_handle,
             VTABLE_get_pointer(interp, address),
             VTABLE_get_integer(interp, address));
 }
@@ -1451,11 +1455,11 @@ Parrot_io_socket_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
     ASSERT_ARGS(Parrot_io_socket_listen)
     const Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
 
-    if (Parrot_io_socket_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't listen on closed socket");
 
-    Parrot_io_listen(interp, io->os_handle, backlog);
+    Parrot_io_internal_listen(interp, io->os_handle, backlog);
 }
 
 /*
@@ -1480,16 +1484,16 @@ Parrot_io_socket_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
     Parrot_Socket_attributes *new_io;
     PMC       *new_pmc;
 
-    if (Parrot_io_socket_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         return PMCNULL;
 
-    new_pmc = Parrot_io_new_socket_pmc(interp, PIO_F_READ | PIO_F_WRITE);
+    new_pmc = io_get_new_socket(interp);
     new_io  = PARROT_SOCKET(new_pmc);
 
     new_io->local  = io->local;
     new_io->remote = Parrot_pmc_new(interp, enum_class_Sockaddr);
 
-    new_io->os_handle = Parrot_io_accept(interp, io->os_handle, new_io->remote);
+    new_io->os_handle = Parrot_io_internal_accept(interp, io->os_handle, new_io->remote);
 
     return new_pmc;
 }

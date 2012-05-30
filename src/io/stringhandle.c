@@ -21,11 +21,6 @@ src/io/stringhandle.c - StringHandle vtables and helper routines
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
-    ARGIN(PMC *handle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static INTVAL io_stringhandle_close(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL autoflush)
@@ -37,6 +32,20 @@ static INTVAL io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
+
+static STR_VTABLE * io_stringhandle_get_encoding(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static PIOHANDLE io_stringhandle_get_piohandle(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 static INTVAL io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -77,6 +86,12 @@ static INTVAL io_stringhandle_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_stringhandle_set_flags(PARROT_INTERP,
+    ARGIN(PMC *handle),
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static PIOOFF_T io_stringhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -95,13 +110,19 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
-#define ASSERT_ARGS_io_filehandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -122,6 +143,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_stringhandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -136,11 +160,15 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 void
-io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 {
     ASSERT_ARGS(io_stringhandle_setup_vtable)
+    if (vtable == NULL)
+        vtable = &(interp->piodata->vtables[idx]);
+    vtable->number = idx;
     vtable->name = "StringHandle";
     vtable->read_b = io_stringhandle_read_b;
+    vtable->write_b = io_stringhandle_write_b;
     vtable->flush = io_stringhandle_flush;
     vtable->is_eof = io_stringhandle_is_eof;
     vtable->tell = io_stringhandle_tell;
@@ -164,7 +192,7 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
 
-    memcpy(buffer, stringhandle->bufstart, byte_length);
+    memcpy(buffer, stringhandle->_bufstart, byte_length);
     SETATTR_StringHandle_read_offset(interp, handle, read_offs + byte_length);
     return byte_length;
 }
@@ -180,9 +208,9 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
     GETATTR_StringHandle_encoding(interp, handle, encoding);
 
     new_string = io_get_new_empty_string(interp, encoding, -1, old_string->bufused + byte_length);
-    memcpy(new_string->bufstart, old_string->bufstart, old_string->bufused);
-    memcpy(new_string->bufstart + old_string->bufused, buffer, byte_length);
-    new_string->bufused = old_string->bufused + byte_length);
+    memcpy(new_string->_bufstart, old_string->_bufstart, old_string->bufused);
+    memcpy(new_string->_bufstart + old_string->bufused, buffer, byte_length);
+    new_string->bufused = old_string->bufused + byte_length;
 
     SETATTR_StringHandle_stringhandle(interp, handle, new_string);
     return byte_length;
@@ -289,9 +317,34 @@ io_stringhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 }
 
 static PIOHANDLE
-io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+io_stringhandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
-    ASSERT_ARGS(io_filehandle_get_piohandle)
+    ASSERT_ARGS(io_stringhandle_get_piohandle)
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
+}
+
+static void
+io_stringhandle_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+{
+    ASSERT_ARGS(io_stringhandle_set_flags)
+    PARROT_STRINGHANDLE(handle)->flags = flags;
+}
+
+static INTVAL
+io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_stringhandle_get_flags)
+    return PARROT_STRINGHANDLE(handle)->flags;
+}
+
+static STR_VTABLE *
+io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_stringhandle_get_encoding)
+    STRING * stringhandle;
+    GETATTR_StringHandle_stringhandle(interp, handle);
+    if (STRING_IS_NULL(stringhandle))
+        return NULL;
+    return stringhandle->encoding;
 }

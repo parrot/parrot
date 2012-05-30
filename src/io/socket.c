@@ -40,6 +40,17 @@ static INTVAL io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STR_VTABLE * io_socket_get_encoding(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static INTVAL io_socket_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static PIOHANDLE io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -81,6 +92,12 @@ static INTVAL io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_socket_set_flags(PARROT_INTERP,
+    ARGIN(PMC *handle),
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static PIOOFF_T io_socket_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -105,6 +122,12 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_socket_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -126,6 +149,9 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_socket_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -140,11 +166,15 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 void
-io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+io_socket_setup_vtable(PARROT_INTERP, ARGIN_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
     ASSERT_ARGS(io_socket_setup_vtable)
+    if (vtable == NULL)
+        vtable = &(interp->piodata->vtables[idx]);
+    vtable->number = idx;
     vtable->name = "Socket";
     vtable->read_b = io_socket_read_b;
+    vtable->write_b = io_socket_write_b;
     vtable->flush = io_socket_flush;
     vtable->is_eof = io_socket_is_eof;
     vtable->tell = io_socket_tell;
@@ -155,35 +185,37 @@ io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
     vtable->get_encoding = io_socket_get_encoding;
     vtable->set_flags = io_socket_set_flags;
     vtable->get_flags = io_socket_get_flags;
+    vtable->total_size = io_socket_total_size;
 }
 
 static INTVAL
 io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_socket_read_b)
-    Parrot_Socket_attributes * const io = PARROT_SOCKET(handle);
-
-    return Parrot_io_recv(interp, io->os_handle, buffer, byte_length);
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
+    return Parrot_io_internal_recv(interp, os_handle, buffer, byte_length);
 }
 
 static INTVAL
 io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_socket_write_b)
-    Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
-    return Parrot_io_send(interp, io->os_handle, buffer, byte_length);
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
+    return Parrot_io_internal_send(interp, os_handle, buffer, byte_length);
 }
 
 static INTVAL
 io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_socket_flush_s)
+    ASSERT_ARGS(io_socket_flush)
 }
 
 static INTVAL
 io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
-    ASSERT_ARGS(io_socket_readall_s)
+    ASSERT_ARGS(io_socket_is_eof)
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "eof");
 }
@@ -208,7 +240,8 @@ static INTVAL
 io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags)
 {
     ASSERT_ARGS(io_socket_open)
-    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, socket);
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
     Parrot_io_internal_flush(interp, os_handle);
 }
 
@@ -216,7 +249,8 @@ static INTVAL
 io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_socket_is_open)
-    const PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, socket);
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
     return os_handle != PIO_INVALID_HANDLE;
 }
 
@@ -224,16 +258,29 @@ static INTVAL
 io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_close)
-
     INTVAL result = 0;
-    if (PARROT_SOCKET(pmc)) {
-        Parrot_Socket_attributes *data_struct = PARROT_SOCKET(handle);
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
 
-        if (data_struct->os_handle != PIO_INVALID_HANDLE)
-            result = Parrot_io_close_socket(interp, data_struct->os_handle);
-        data_struct->os_handle = PIO_INVALID_HANDLE;
-    }
+    if (os_handle != PIO_INVALID_HANDLE)
+        result = Parrot_io_internal_close_socket(interp, os_handle);
+    SETATTR_Socket_os_handle(interp, handle, PIO_INVALID_HANDLE);
     return result;
+}
+
+static void
+io_socket_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+{
+    ASSERT_ARGS(io_socket_set_flags)
+    /* Ignore, for now */
+}
+
+static INTVAL
+io_socket_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_get_flags)
+    /* For now, just say that all sockets are read/write handles */
+    return PIO_F_WRITE | PIO_F_READ;
 }
 
 static size_t
@@ -248,7 +295,24 @@ static PIOHANDLE
 io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_piohandle)
-    return PARROT_SOCKET(handle)->os_handle;
+    PIOHANDLE os_handle;
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
+    return os_handle;
+}
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static STR_VTABLE *
+io_socket_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_ARGS(io_socket_get_encoding)
+    STRING           *encoding_str;
+    const STR_VTABLE *encoding;
+
+    GETATTR_Socket_encoding(interp, handle, encoding_str);
+    if (!STRING_IS_NULL(encoding_str))
+        return Parrot_find_encoding_by_string(interp, encoding_str);
+    return NULL;
 }
 
 /*

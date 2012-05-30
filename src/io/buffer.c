@@ -82,20 +82,21 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp,
                                                         sizeof (IO_BUFFER));
     buffer->encoding = encoding;
-    buffer->owner_pmc = owner;
+    //buffer->owner_pmc = owner;
     buffer->buffer_size = init_size;
     if (init_size) {
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
         buffer->buffer_start = buffer->buffer_start;
         buffer->buffer_end = buffer->buffer_start;
         flags |= PIO_BF_MALLOC;
-    } else {
+    } else
         flags &= ~PIO_BF_MALLOC;
     buffer->flags = flags;
 }
 
 void
-Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx, size_t length, INTVAL flags)
+Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
+        size_t length, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_buffer_add_to_handle)
     if (idx != IO_PTR_IDX_READ_BUFFER && idx != IO_PTR_IDX_WRITE_BUFFER)
@@ -141,7 +142,7 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
 
     /* Cannot shrink a buffer with data in it, because we do not ever want to
        lose data */
-    if (!BUFFER_EMPTY(buffer) && new_size < buffer->buffer_size)
+    if (!BUFFER_IS_EMPTY(buffer) && new_size < buffer->buffer_size)
         return buffer->buffer_size;
 
     buffer->buffer_ptr = mem_sys_realloc(buffer->buffer_ptr, new_size);
@@ -154,8 +155,8 @@ Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     if (!buffer)
         return;
-    if (!PMC_IS_NULL(buffer->owner_pmc))
-        Parrot_gc_mark_PMC_alive(interp, buffer->owner_pmc);
+    /*if (!PMC_IS_NULL(buffer->owner_pmc))
+        Parrot_gc_mark_PMC_alive(interp, buffer->owner_pmc);*/
 }
 
 void
@@ -177,8 +178,8 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     if (!buffer)
         return vtable->read_b(interp, handle, s, length);
     {
-        size_t bytes_read = Parrot_io_buffer_transfer_to_mem(interp, buffer,
-                                                             s, length);
+        size_t bytes_read = io_buffer_transfer_to_mem(interp, buffer,
+                                                      s, length);
         length = length - bytes_read;
 
         /* If we still need more data than the buffer can hold, just read it
@@ -190,7 +191,7 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
            the buffer. */
         else if (length) {
             Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-            bytes_read += Parrot_io_buffer_transfer_to_mem(interp, buffer,
+            bytes_read += io_buffer_transfer_to_mem(interp, buffer,
                                                     s + bytes_read, length);
         }
 
@@ -251,14 +252,14 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
         return;
     }
 
-    if (!BUFFER_CAN_BE_NORMALIZED(buffer)
+    if (!BUFFER_CAN_BE_NORMALIZED(buffer))
         return;
 
     {
         const size_t used_size = BUFFER_USED_SIZE(buffer);
         memmove(buffer->buffer_ptr, buffer->buffer_start, used_size);
         buffer->buffer_start = buffer->buffer_ptr;
-        buffer->buffer_end = buffer->start + used_size;
+        buffer->buffer_end = buffer->buffer_start + used_size;
     }
 }
 
@@ -293,7 +294,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         /* Else, we have more data than available space, but the buffer should
            be able to cover any overflow */
         Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
-        Parrot_io_buffer_add_bytes(interp, buffer, s, length);
+        io_buffer_add_bytes(interp, buffer, s, length);
         return length;
     }
 }
@@ -328,10 +329,10 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
         size_t used_length = BUFFER_USED_SIZE(buffer);
         bytes_written += vtable->write_b(interp, handle,
-                                    (char *)buffer->buffer_start, used_size);
+                                    (char *)buffer->buffer_start, BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);
     }
-    return bytes_written + vtable->flush(interp, handle, autoclose);
+    return bytes_written + vtable->flush(interp, handle);
 }
 
 UINTVAL
@@ -438,7 +439,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     ASSERT_ARGS(io_buffer_find_string_marker);
     INTVAL bytes_needed = 0;
 
-    if (BUFFER_EMPTY(buffer)) {
+    if (BUFFER_IS_EMPTY(buffer)) {
         size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
                                                        vtable);
         if (bytes_available = 0)
@@ -456,7 +457,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
        last few bytes off the end of the found sequence, so we only read
        complete codepoints out into the STRING. */
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
-    return bounds.bytes - bytes_needed;
+    return bounds->bytes - bytes_needed;
 }
 
 /*
@@ -481,10 +482,10 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         size_t num_chars)
 {
-    ASSERT_ARGS(io_buffer_find_num_chars)
+    ASSERT_ARGS(io_buffer_find_num_characters)
     INTVAL bytes_needed = 0;
 
-    if (BUFFER_EMPTY(buffer)) {
+    if (BUFFER_IS_EMPTY(buffer)) {
         size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
                                                        vtable);
         if (bytes_available = 0)
@@ -496,7 +497,7 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     bounds->delim = -1;
 
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
-    return bounds.bytes - bytes_needed;
+    return bounds->bytes - bytes_needed;
 }
 
 /* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
@@ -520,8 +521,9 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
-    const INTVAL   buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
-    const PIOOFF_T file_pos     = Parrot_io_get_file_position(interp, filehandle);
+    /* TODO */
+    const INTVAL   buffer_flags = 0;/* Parrot_io_get_buffer_flags(interp, filehandle); */
+    const PIOOFF_T file_pos     = 0; /* Parrot_io_get_file_position(interp, filehandle); */
     PIOHANDLE os_handle;
 
     if (whence == SEEK_CUR) {
@@ -530,33 +532,33 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         whence  = SEEK_SET;
     }
 
-    if (buffer_flags & PIO_BF_READBUF
-    &&  whence != SEEK_END) {
+    if (/* buffer_flags & PIO_BF_READBUF && */ whence != SEEK_END) {
         /* Try to seek inside the read buffer */
-        unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
-        unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
-        unsigned char * const buffer_end   = Parrot_io_get_buffer_end(interp, filehandle);
+
+        unsigned char * const buffer_start /* = Parrot_io_get_buffer_start(interp, filehandle) */;
+        unsigned char *       buffer_next  /* = Parrot_io_get_buffer_next(interp, filehandle) */;
+        unsigned char * const buffer_end   /* = Parrot_io_get_buffer_end(interp, filehandle) */;
 
         if (offset >= file_pos - (buffer_next - buffer_start)
         &&  offset <  file_pos + (buffer_end  - buffer_next)) {
             buffer_next += offset - file_pos;
-            Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-            Parrot_io_set_file_position(interp, filehandle, offset);
+            /*Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
+            Parrot_io_set_file_position(interp, filehandle, offset);*/
 
             return offset;
         }
     }
 
-    Parrot_io_flush_buffer(interp, filehandle);
+    /* Parrot_io_buffer_flush(interp, filehandle); */
 
     GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-    offset = PIO_SEEK(interp, os_handle, offset, whence);
+    offset = Parrot_io_internal_seek(interp, os_handle, offset, whence);
 
     /* Seek clears EOF */
     Parrot_io_set_flags(interp, filehandle,
             (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
 
-    Parrot_io_set_file_position(interp, filehandle, offset);
+    /*Parrot_io_set_file_position(interp, filehandle, offset);*/
 
     return offset;
 }

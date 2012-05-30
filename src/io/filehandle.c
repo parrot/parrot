@@ -169,7 +169,7 @@ io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     vtable->number = idx;
     vtable->name = "FileHandle";
     vtable->read_b = io_filehandle_read_b;
-
+    vtable->write_b = io_filehandle_write_b;
     vtable->flush = io_filehandle_flush;
     vtable->is_eof = io_filehandle_is_eof;
     vtable->tell = io_filehandle_tell;
@@ -296,15 +296,8 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
                            is managing it */
 
     else {
-        INTVAL result;
-
-        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
-
-        result = Parrot_io_internal_close(interp, os_handle);
+        INTVAL result = Parrot_io_internal_close(interp, os_handle);
         io_filehandle_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
-        Parrot_io_buffer_clear(interp, write_buffer);
         io_filehandle_set_flags(interp, handle, 0);
         return result;
     }
@@ -350,7 +343,7 @@ static PIOHANDLE
 io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_piohandle)
-    return PARROT_FILEHANDLE(handle)->os_handle;
+    return io_filehandle_get_os_handle(interp, handle);
 }
 
 /* OLD FUNCTIONS

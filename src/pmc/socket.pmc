@@ -33,6 +33,7 @@ pmclass Socket extends Handle provides socket auto_attrs {
     ATTR INTVAL  type;
     ATTR INTVAL  protocol;
     ATTR STRING *buf;
+    ATTR STRING *encoding;
 
 /*
 

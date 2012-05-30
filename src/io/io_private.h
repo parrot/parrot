@@ -325,7 +325,7 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/pipe.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+void io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_io_pipe_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -336,7 +336,9 @@ void io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 /* HEADERIZER BEGIN: src/io/socket.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+void io_socket_setup_vtable(PARROT_INTERP,
+    ARGIN_NULLOK(IO_VTABLE *vtable),
+    INTVAL idx)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_io_socket_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -347,7 +349,9 @@ void io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 /* HEADERIZER BEGIN: src/io/stringhandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+void io_stringhandle_setup_vtable(PARROT_INTERP,
+    IO_VTABLE *vtable,
+    INTVAL idx)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_io_stringhandle_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -358,10 +362,12 @@ void io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
 /* HEADERIZER BEGIN: src/io/userhandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void io__setup_vtable(PARROT_INTERP, IO_VTABLE *vtable)
+void io_userhandle_setup_vtable(PARROT_INTERP,
+    IO_VTABLE *vtable,
+    INTVAL idx)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_io__setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_io_userhandle_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/userhandle.c */
