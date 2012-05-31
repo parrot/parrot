@@ -26,7 +26,6 @@ $ dedeprecator.nqp --help
 
 INIT {
     pir::load_bytecode("YAML/Tiny.pbc");
-    pir::loadlib("os");
 }
 
 sub check_pir($file, @regexes) {

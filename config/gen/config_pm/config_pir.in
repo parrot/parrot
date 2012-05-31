@@ -50,7 +50,6 @@ undefined values) is undefined, and may be rather funky.
     push_eh L1
         # 'os' is dynop and can be absent at this point.
         # Treat it as developers mode.
-        $P0 = loadlib 'os'
         $P0 = new ['OS']
         pop_eh
 
