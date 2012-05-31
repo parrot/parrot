@@ -66,6 +66,8 @@ Parrot_io_init(PARROT_INTERP)
         /* Init IO stacks and handles for interp instance.  */
         PIOHANDLE os_handle;
 
+        io_setup_vtables(interp);
+
         os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
         _PIO_STDIN(interp)  = Parrot_io_fdopen_flags(interp, PMCNULL,
                                 os_handle, PIO_F_READ);
@@ -82,7 +84,6 @@ Parrot_io_init(PARROT_INTERP)
             Parrot_io_eprintf(NULL, "I/O system initialized.\n");
         }
 
-        io_setup_vtables(interp);
         return;
     }
 
@@ -805,7 +806,7 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to write a string to a null or invalid PMC");
 
-    if (STRING_IS_NULL(s))
+    if (STRING_IS_NULL(s) || STRING_length(s) == 0)
         return 0;
 
     {

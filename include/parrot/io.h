@@ -826,9 +826,8 @@ IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*owner);
 
-void Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+void Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
 PARROT_WARN_UNUSED_RESULT
@@ -837,23 +836,21 @@ size_t Parrot_io_buffer_content_size(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 size_t Parrot_io_buffer_fill(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
     ARGIN(IO_VTABLE *vtable))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*buffer)
         FUNC_MODIFIES(* handle);
 
 size_t Parrot_io_buffer_flush(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
     ARGIN(IO_VTABLE *vtable),
     INTVAL autoclose)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*buffer)
@@ -878,13 +875,12 @@ UINTVAL Parrot_io_buffer_peek(PARROT_INTERP,
         FUNC_MODIFIES(* handle);
 
 size_t Parrot_io_buffer_read_b(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGIN(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     ARGOUT(char *s),
     size_t length)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -909,13 +905,12 @@ void Parrot_io_buffer_set_mode(PARROT_INTERP,
         FUNC_MODIFIES(*filehandle);
 
 size_t Parrot_io_buffer_write_b(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
     ARGIN(IO_VTABLE *vtable),
     ARGIN(char *s),
     size_t length)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
@@ -953,18 +948,15 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(owner) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_io_buffer_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_buffer_content_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_io_buffer_fill __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -978,7 +970,6 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_read_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(s))
@@ -991,7 +982,6 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_buffer_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(s))

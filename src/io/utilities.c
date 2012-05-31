@@ -138,7 +138,7 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
     if (Parrot_io_is_closed(interp, handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not open", vtable->name);
-    if (vtable->get_flags(interp, handle) & flags)
+    if (vtable->get_flags(interp, handle) & flags == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not in mode %d", vtable->name, flags);
 }

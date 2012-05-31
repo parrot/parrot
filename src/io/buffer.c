@@ -36,17 +36,16 @@ static void io_buffer_add_bytes(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*buffer);
 
-static void io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+static void io_buffer_normalize(PARROT_INTERP,
+    ARGMOD_NULLOK(IO_BUFFER *buffer))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
 static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGOUT(char * s),
     size_t length)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*buffer)
         FUNC_MODIFIES(* s);
@@ -56,11 +55,9 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_io_buffer_normalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_buffer_transfer_to_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -162,7 +159,7 @@ Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 }
 
 void
-Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_clear)
     if (!buffer)
@@ -172,7 +169,7 @@ Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
 }
 
 size_t
-Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGOUT(char *s),
         size_t length)
 {
@@ -212,7 +209,7 @@ from the buffer. Return the number of bytes actually copied.
 */
 
 static size_t
-io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGOUT(char * s), size_t length)
 {
     ASSERT_ARGS(io_buffer_transfer_to_mem)
@@ -243,7 +240,7 @@ buffer so we have the maximum amount of contiguous free space
 */
 
 static void
-io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
+io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(io_buffer_normalize)
     if (!buffer)
@@ -266,13 +263,13 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer))
 }
 
 size_t
-Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), ARGIN(char *s),
         size_t length)
 {
     ASSERT_ARGS(Parrot_io_buffer_write_b)
     if (!buffer)
-        return vtable->write_b(interp, handle, buffer, length);
+        return vtable->write_b(interp, handle, s, length);
 
     else {
         size_t written = 0;
@@ -290,7 +287,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
            write directly through to the handle */
         if (length > total_size) {
             Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
-            return vtable->write_b(interp, buffer, s, length);
+            return vtable->write_b(interp, handle, s, length);
         }
 
         /* Else, we have more data than available space, but the buffer should
@@ -323,7 +320,7 @@ io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
 }
 
 size_t
-Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), INTVAL autoclose)
 {
     ASSERT_ARGS(Parrot_io_buffer_flush)
@@ -369,7 +366,7 @@ number of bytes in the buffer.
 
 
 size_t
-Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_io_buffer_fill)

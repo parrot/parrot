@@ -212,14 +212,6 @@ void io_verify_is_open_for(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void io_verify_is_open_for(PARROT_INTERP,
-    ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
-    INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_verify_string_encoding(PARROT_INTERP,
@@ -259,10 +251,6 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
     , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_io_verify_has_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable))
-#define ASSERT_ARGS_io_verify_is_open_for __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
