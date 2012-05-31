@@ -89,7 +89,7 @@ Initializes a newly created StringHandle object.
         data_struct->encoding     = NULL;
         data_struct->filename     = NULL;
         data_struct->read_offset  = 0;
-        data_struct->vtable       = Parrot_io_get_vtable(interp,
+        data_struct->io_vtable    = Parrot_io_get_vtable(interp,
                                         IO_VTABLE_STRINGHANDLE, NULL);
         data_struct->read_buffer  = NULL;
         data_struct->write_buffer = NULL;
@@ -165,7 +165,7 @@ Returns whether the StringHandle has reached the end of the file.
         void * ptr;
         switch (key) {
             case IO_PTR_IDX_VTABLE:
-                GET_ATTR_vtable(INTERP, SELF, ptr);
+                GET_ATTR_io_vtable(INTERP, SELF, ptr);
                 break;
             case IO_PTR_IDX_READ_BUFFER:
                 GET_ATTR_read_buffer(INTERP, SELF, ptr);
@@ -184,7 +184,7 @@ Returns whether the StringHandle has reached the end of the file.
     {
         switch (key) {
             case IO_PTR_IDX_VTABLE:
-                SET_ATTR_vtable(INTERP, SELF, ptr);
+                SET_ATTR_io_vtable(INTERP, SELF, ptr);
                 break;
             case IO_PTR_IDX_READ_BUFFER:
                 SET_ATTR_read_buffer(INTERP, SELF, ptr);

@@ -343,7 +343,7 @@ io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_get_encoding)
     STRING * stringhandle;
-    GETATTR_StringHandle_stringhandle(interp, handle);
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
     if (STRING_IS_NULL(stringhandle))
         return NULL;
     return stringhandle->encoding;

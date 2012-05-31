@@ -108,14 +108,15 @@ io_get_new_socket(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding, size_t char_length, size_t byte_length)
+io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding,
+        size_t char_length, size_t byte_length)
 {
     ASSERT_ARGS(io_get_new_empty_string)
     STRING * result;
 
     /* Round up length to unit size of encoding */
     if (char_length != -1 && encoding->bytes_per_unit > 1)
-        byte_length = (length + encoding->bytes_per_unit - 1) &
+        byte_length = (byte_length + encoding->bytes_per_unit - 1) &
                       ~(encoding->bytes_per_unit - 1);
 
     if (byte_length == 0)
@@ -130,22 +131,11 @@ io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding, size_t char_length,
 }
 
 void
-io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
-    ASSERT_ARGS(io_is_open_for)
-    if (Parrot_io_is_closed(interp, pmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "IO PMC %s is not open", vtable->name);
-    if ((vtable->get_flags(interp, handle) & flags) != flags)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "IO PMC %s is not in mode %d", vtable->name, flags);
-}
-
-void
-io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
-{
-    ASSERT_ARGS(io_is_open_for)
-    if (Parrot_io_is_closed(interp, pmc))
+    ASSERT_ARGS(io_verify_is_open_for)
+    if (Parrot_io_is_closed(interp, handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not open", vtable->name);
     if (vtable->get_flags(interp, handle) & flags)
@@ -154,15 +144,16 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable
 }
 
 void
-io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_has_read_buffer)
     IO_BUFFER * buffer = IO_GET_READ_BUFFER(interp, handle);
     if (buffer)
-        Parrot_io_buffer_resize(interp, buffer, length);
+        Parrot_io_buffer_resize(interp, buffer, BUFFER_SIZE_ANY);
     else {
-        buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, length);
-        VTABLE_set_pointer_keyed_int(interp, handle, buffer_no, buffer);
+        buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, BUFFER_SIZE_ANY);
+        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_READ_BUFFER, buffer);
     }
     if (flags != BUFFER_FLAGS_ANY)
         buffer->flags = flags;
@@ -171,7 +162,8 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vt
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s))
+io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s))
 {
     ASSERT_ARGS(io_verify_string_encoding)
     STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
@@ -197,7 +189,9 @@ This requires a non-null, non-zero read buffer.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer), ARGIN(STR_VTABLE *encoding), size_t char_length)
+io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
+        ARGIN(STR_VTABLE *encoding), size_t char_length)
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
@@ -211,7 +205,9 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtab
 
     while (1) {
         Parrot_String_Bounds bounds;
-        size_t bytes_to_read = io_buffer_find_num_characters(interp, buffer, handle, vtable, &bounds, char_length);
+        size_t bytes_to_read = io_buffer_find_num_characters(interp, buffer,
+                                        handle, vtable, encoding, &bounds,
+                                        char_length);
 
         /* Buffer is empty, so we're probably at EOF. Check that the last
            codepoint we've read in is a complete one. If so, return the whole
@@ -220,7 +216,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtab
         // TODO: Determine if we want to throw the exception or lop off the
         // final half-codepoint instead.
         if (bytes_to_read == 0)  {
-            if (bounds.bytes == buffer_size)
+            if (bounds.bytes == buffer->buffer_size)
                 break;
             else {
                 // TODO: set file position
@@ -257,7 +253,9 @@ reading.
 */
 
 void
-io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s), ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer), size_t byte_length)
+io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
+        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGMOD(IO_BUFFER *buffer), size_t byte_length)
 {
     // TODO: This
     const size_t alloc_size = s->bufused + byte_length;
@@ -267,10 +265,11 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s), ARGMOD(PMC *handl
     else
         Parrot_gc_allocate_string_storage(interp, s, alloc_size);
 
-    Parrot_io_buffer_read_b(interp, buffer, handle, vtable, s->strstart + s->bufused, byte_length);
+    Parrot_io_buffer_read_b(interp, buffer, handle, vtable,
+                            s->strstart + s->bufused, byte_length);
 
-    s->bufused += bounds.bytes;
-    s->strlen  += bounds.chars;
+    s->bufused += byte_length;
+    STRING_scan(interp, s);
 }
 
 /*
@@ -288,7 +287,9 @@ input handle
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer), ARGIN(STR_VTABLE *encoding), INTVAL rs)
+io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
+        ARGIN(STR_VTABLE *encoding), INTVAL rs)
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
@@ -302,7 +303,8 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *
 
     while (1) {
         Parrot_String_Bounds bounds;
-        const size_t bytes_to_read = io_buffer_find_string_marker(interp, buffer, handle, vtable, encoding, &bounds, rs);
+        const size_t bytes_to_read = io_buffer_find_string_marker(interp,
+                               buffer, handle, vtable, encoding, &bounds, rs);
 
         /* Buffer is empty, so we're probably at EOF. Check that the last
            codepoint we've read in is a complete one. If so, return the whole
@@ -311,7 +313,7 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *
         // TODO: Determine if we want to throw the exception or lop off the
         // final half-codepoint instead.
         if (bytes_to_read == 0)  {
-            if (bounds.bytes == buffer_size)
+            if (bounds.bytes == buffer->buffer_size)
                 break;
             else {
                 // TODO: set file position

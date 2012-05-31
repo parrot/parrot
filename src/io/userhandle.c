@@ -19,6 +19,11 @@ static INTVAL io_userhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static STR_VTABLE * io_userhandle_get_encoding(PARROT_INTERP,
+    ARGIN(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static INTVAL io_userhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -92,6 +97,9 @@ static INTVAL io_userhandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_userhandle_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_userhandle_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_userhandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -225,9 +233,7 @@ static size_t
 io_userhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_userhandle_total_size)
-    STRING *userhandle;
-    GETATTR_StringHandle_userhandle(interp, handle, userhandle);
-    return userhandle->_buflen;
+    return 0; /* TODO */
 }
 
 static PIOHANDLE

@@ -598,7 +598,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
 
-        io_verify_has_read_buffer(interp, handle, vtable);
+        io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         return io_read_encoded_string(interp, handle, vtable, read_buffer, NULL, length);
@@ -754,7 +754,7 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
         if (read_buffer == NULL)
-            io_verify_has_read_buffer(interp, handle, vtable);
+            io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
         return io_readline_encoded_string(interp, handle, vtable, read_buffer, NULL, terminator);
     }
 }
@@ -897,7 +897,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         INTVAL c;
 
-        io_verify_has_read_buffer(interp, handle, vtable);
+        io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
 
         c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
 
@@ -1382,7 +1382,7 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
 /*
 
-=item C<void Parrot_io_socket_bind_handle(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<void Parrot_io_socket_bind(PARROT_INTERP, PMC *pmc, PMC *address)>
 
 Binds C<*pmc>'s socket to the local address and port specified by
 C<*address>.

@@ -120,7 +120,7 @@ Read a line from the handle and return it in a string.
 */
 
     METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
+        STRING * const string_result = Parrot_io_readline_s(INTERP, SELF, '\n');
         RETURN(STRING *string_result);
     }
 

@@ -83,6 +83,8 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
                                                         sizeof (IO_BUFFER));
     buffer->encoding = encoding;
     //buffer->owner_pmc = owner;
+    if (init_size == BUFFER_SIZE_ANY)
+        init_size = PIO_BUFFER_MIN_SIZE;
     buffer->buffer_size = init_size;
     if (init_size) {
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);

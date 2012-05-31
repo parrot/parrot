@@ -198,7 +198,8 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
 
 void io_verify_has_read_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable))
+    ARGIN(IO_VTABLE *vtable),
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);

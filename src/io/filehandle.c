@@ -248,6 +248,15 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
     ASSERT_ARGS(io_filehandle_open)
     PIOHANDLE os_handle;
 
+    /* Hack! If we're opening in pipe mode, turn this FileHandle into a pipe
+       and use that vtable instead. */
+    if (flags & PIO_F_PIPE == 0) {
+        IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
+                                    IO_VTABLE_PIPE, NULL);
+        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
+        return vtable->open(interp, handle, path, flags, mode);
+    }
+
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid mode for file open");
