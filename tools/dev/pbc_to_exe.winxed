@@ -347,6 +347,17 @@ function determine_code_type()
     return 'default';
 }
 
+# Winxed has no builtin for spawnw with string argument.
+# This function provides it.
+function spawnw_cmd(string cmd)
+{
+    int status;
+    ${ spawnw status, cmd };
+    return status;
+}
+
+
+const int READBUFFER_SIZE = 16384;
 
 function generate_code(string infile, var outfh)
 {
@@ -358,7 +369,7 @@ function generate_code(string infile, var outfh)
     int size = 0;
 
     for (;;) {
-        string pbcstring = ifh.read(16384);
+        string pbcstring = ifh.read(READBUFFER_SIZE);
         int pbclength = length(pbcstring);
         if (pbclength <= 0)
 	    break;
@@ -416,7 +427,7 @@ function generate_code_gcc(string infile, var outfh)
     int size = 0;
 
     for (;;) {
-        string pbcstring = ifh.read(16384);
+        string pbcstring = ifh.read(READBUFFER_SIZE);
         int pbclength = length(pbcstring);
         if (pbclength <= 0)
 	    break;
@@ -537,8 +548,7 @@ END_OF_FUNCTION:>>
 
     string rc_cmd  = 'rc ' + rc_path;
     say(rc_cmd);
-    int status;
-    ${ spawnw status, rc_cmd };
+    int status = spawnw_cmd(rc_cmd);
     if (status != 0)
         throw "RC command failed";
 }
@@ -558,12 +568,9 @@ function compile_file(string cfile, string objfile, int install)
     string includepath = $P0['includedir'];
     string versiondir = $P0['versiondir'];
 
-    if (installed == '1') goto installed_includedir;
-    string includedir = build_dir + slash + 'include';
-    goto done_includedir;
-  installed_includedir:
-    includedir = includepath + versiondir;
-  done_includedir:
+    string includedir = installed != "1" ?
+            build_dir + slash + 'include' :
+            includepath + versiondir;
 
     string pathquote  = '"';
 
@@ -573,13 +580,10 @@ function compile_file(string cfile, string objfile, int install)
         optimize +
         ' -c ' + cfile;
     say(compile);
-    int status;
-    ${ spawnw status, compile };
-    if (status == 0) goto compiled;
-    cry(status);
-    throw "compilation failed";
+    int status = spawnw_cmd(compile);
+    if (status != 0)
+        throw "compilation failed";
 
-  compiled:
     say("Compiled: ", objfile);
     return;
 }
@@ -633,8 +637,7 @@ function link_file(string objfile, string exefile, string extra_obj, int install
             link_dynamic + ' ' + linkflags + ' ' + libs + ' ' + icushared;
 
     say(link);
-    int status;
-    ${ spawnw status, link };
+    int status = spawnw_cmd(link);
     if (status != 0)
         throw "linking failed";
     # Check if there is a MSVC app manifest
@@ -648,8 +651,7 @@ function link_file(string objfile, string exefile, string extra_obj, int install
                 manifest_file_name +
                 ' -outputresource:' + exefile + ';1';
         say(embed_manifest_str);
-        int embed_manifest_status;
-        ${ spawnw embed_manifest_status, embed_manifest_str };
+        int embed_manifest_status = spawnw_cmd(embed_manifest_str);
         if (embed_manifest_status != 0)
             throw 'manifest embedding failed';
     }
