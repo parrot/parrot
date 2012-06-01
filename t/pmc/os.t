@@ -22,7 +22,7 @@ t/pmc/os.t - Files and Dirs
 
 =head1 SYNOPSIS
 
-    % prove t/pmc/os.t
+    % prove t/dynpmc/os.t
 
 =head1 DESCRIPTION
 
@@ -271,6 +271,62 @@ open my $testfile, '>', "test-bad-rm/bad";
 close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
+.sub main :main
+        $P1 = new ['OS']
+
+        push_eh eh1
+        $P1."rm"('test-bad-rm')
+        say "failed"
+        goto finally1
+eh1:
+        .get_results($P2)
+        say $P2
+finally1:
+        pop_eh
+
+        $P1."chdir"("..")
+        push_eh eh2
+        $P1."rm"('non-existent-directory')
+        say "failed"
+        goto finally2
+eh2:
+        .get_results($P2)
+        say $P2
+finally2:
+        pop_eh
+.end
+CODE
+/rmdir failed.*
+stat failed/
+OUT
+
+unlink "test-bad-rm/bad";
+rmdir "test-bad-rm";
+
+# test stat
+
+open my $X, '>', "xpto";
+print $X "xpto";
+close $X;
+
+my $stat;
+
+my $count = $MSWin32 ? 11 : 13;
+my @s = stat('xpto');
+$s[6] = 0; # Parrot does this internally...
+if ( $cygwin ) {
+    # Mask inode number (fudge it)
+    $s[1] &= 0xffffffff;
+}
+
+if ( $MSWin32 ) {
+    $s[0] = 0;      # dev: we use dwVolumeSerialNumber instead of drive letter
+    $s[2] = 0777;   # mode: always 0777 on Windows
+    $s[3] = 0;      # nlink: only implemented in fstat for now
+    $s[6] = 0;      # rdev: we use zero instead of drive letter
+    $s[10] = $s[9]; # ctime: equals mtime
+    $stat = sprintf("0x%08x\n" x 11, @s);
+    pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
         $P1 = new ['OS']
         $S1 = "xpto"
