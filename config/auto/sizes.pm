@@ -110,13 +110,6 @@ sub _find_type_eq {
     }
 }
 
-sub _find_type_ge {
-    my ($sizesref, $size, $checklist) = @_;
-    for ( @$checklist ) {
-        return $_ if $sizesref->{$_} >= $size;
-    }
-}
-
 sub _find_type_max {
     my ($sizesref, $checklist) = @_;
     my $size = 0;
