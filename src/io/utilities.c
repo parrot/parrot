@@ -170,7 +170,7 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
         ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_string_encoding)
-    STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
+    STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, flags);
 
     /* If we still don't have an encoding or if we don't need to do any
        converting, we're good. Return. */
