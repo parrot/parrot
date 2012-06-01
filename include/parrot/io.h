@@ -819,11 +819,10 @@ PARROT_WARN_UNUSED_RESULT
 IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
     ARGMOD(PMC *owner),
     INTVAL flags,
-    ARGIN(STR_VTABLE *encoding),
+    ARGIN_NULLOK(STR_VTABLE *encoding),
     size_t init_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*owner);
 
 void Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
@@ -945,8 +944,7 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_buffer_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(owner) \
-    , PARROT_ASSERT_ARG(encoding))
+    , PARROT_ASSERT_ARG(owner))
 #define ASSERT_ARGS_Parrot_io_buffer_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_buffer_content_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

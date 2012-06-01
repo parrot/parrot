@@ -79,6 +79,8 @@ Initializes a newly created FileHandle object.
 
         /* Initialize the os_handle to the platform-specific value for closed */
         attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
+        attrs->read_buffer = NULL;
+        attrs->write_buffer = NULL;
 
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);

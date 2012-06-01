@@ -196,7 +196,7 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
-void io_verify_has_read_buffer(PARROT_INTERP,
+IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     INTVAL flags)

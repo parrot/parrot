@@ -143,7 +143,7 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
                 "IO PMC %s is not in mode %d", vtable->name, flags);
 }
 
-void
+IO_BUFFER *
 io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
         ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
@@ -152,11 +152,15 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
     if (buffer)
         Parrot_io_buffer_resize(interp, buffer, BUFFER_SIZE_ANY);
     else {
-        buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, BUFFER_SIZE_ANY);
+        STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
+        if (encoding == NULL)
+            encoding = Parrot_platform_encoding_ptr;
+        buffer = Parrot_io_buffer_allocate(interp, handle, flags, encoding, BUFFER_SIZE_ANY);
         VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_READ_BUFFER, buffer);
     }
     if (flags != BUFFER_FLAGS_ANY)
         buffer->flags = flags;
+    return buffer;
 }
 
 PARROT_CANNOT_RETURN_NULL
@@ -209,23 +213,9 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
                                         handle, vtable, encoding, &bounds,
                                         char_length);
 
-        /* Buffer is empty, so we're probably at EOF. Check that the last
-           codepoint we've read in is a complete one. If so, return the whole
-           bunch. Otherwise, throw an exception (really?) saying that we've
-           got an unaligned string end. */
-        // TODO: Determine if we want to throw the exception or lop off the
-        // final half-codepoint instead.
-        if (bytes_to_read == 0)  {
-            if (bounds.bytes == buffer->buffer_size)
-                break;
-            else {
-                // TODO: set file position
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", encoding->name);
-            }
+        /* Buffer is empty, so we're at EOF */
+        if (bytes_to_read == 0)
             break;
-        }
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
@@ -306,23 +296,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         const size_t bytes_to_read = io_buffer_find_string_marker(interp,
                                buffer, handle, vtable, encoding, &bounds, rs);
 
-        /* Buffer is empty, so we're probably at EOF. Check that the last
-           codepoint we've read in is a complete one. If so, return the whole
-           bunch. Otherwise, throw an exception (really?) saying that we've
-           got an unaligned string end. */
-        // TODO: Determine if we want to throw the exception or lop off the
-        // final half-codepoint instead.
-        if (bytes_to_read == 0)  {
-            if (bounds.bytes == buffer->buffer_size)
-                break;
-            else {
-                // TODO: set file position
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_CHARACTER,
-                    "Unaligned end in %s string\n", encoding->name);
-            }
+        /* Buffer is empty, so we're probably at EOF. */
+        if (bytes_to_read == 0)
             break;
-        }
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);

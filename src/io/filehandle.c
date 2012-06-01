@@ -196,6 +196,7 @@ io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), s
         flags |= PIO_F_EOF;
         SETATTR_FileHandle_flags(interp, handle, flags);
     }
+    return bytes_read;
 }
 
 static INTVAL
@@ -203,7 +204,7 @@ io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), s
 {
     ASSERT_ARGS(io_filehandle_write_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
-    return Parrot_io_internal_write(interp, handle, buffer, byte_length);
+    return Parrot_io_internal_write(interp, os_handle, buffer, byte_length);
 }
 
 static INTVAL
@@ -260,6 +261,9 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid mode for file open");
+
+    if (flags & PIO_F_BINARY)
+        SETATTR_FileHandle_encoding(interp, handle, Parrot_str_new(interp, "binary", 0));
 
     os_handle = Parrot_io_internal_open(interp, path, flags);
 

@@ -72,7 +72,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
-        ARGIN(STR_VTABLE *encoding), size_t init_size)
+        ARGIN_NULLOK(STR_VTABLE *encoding), size_t init_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
@@ -85,12 +85,16 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
     buffer->buffer_size = init_size;
     if (init_size) {
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
-        buffer->buffer_start = buffer->buffer_start;
-        buffer->buffer_end = buffer->buffer_start;
         flags |= PIO_BF_MALLOC;
-    } else
+    }
+    else
         flags &= ~PIO_BF_MALLOC;
+
+    buffer->buffer_start = buffer->buffer_ptr;
+    buffer->buffer_end = buffer->buffer_ptr;
+
     buffer->flags = flags;
+    return buffer;
 }
 
 void
@@ -495,7 +499,7 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     bounds->chars = num_chars;
     bounds->delim = -1;
 
-    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
+    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
     return bounds->bytes - bytes_needed;
 }
 
@@ -521,7 +525,7 @@ Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 {
     ASSERT_ARGS(Parrot_io_seek_buffer)
     /* TODO */
-    const INTVAL   buffer_flags = 0;/* Parrot_io_get_buffer_flags(interp, filehandle); */
+    const INTVAL   buffer_flags = 0; /* Parrot_io_get_buffer_flags(interp, filehandle); */
     const PIOOFF_T file_pos     = 0; /* Parrot_io_get_file_position(interp, filehandle); */
     PIOHANDLE os_handle;
 
