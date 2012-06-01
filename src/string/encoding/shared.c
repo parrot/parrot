@@ -1427,8 +1427,8 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
     else if (dest_buf) {
-        Parrot_UInt2 *s = (Parrot_UInt2 *)src_buf;
-        Parrot_UInt2 *d = (Parrot_UInt2 *)dest_buf;
+        const Parrot_UInt2 *s = (const Parrot_UInt2 *)src_buf;
+        Parrot_UInt2       *d = (Parrot_UInt2 *)dest_buf;
         UINTVAL len = src_len / 2;
         UINTVAL i;
 
