@@ -816,7 +816,7 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
         STRING *out_s;
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
-        out_s = io_verify_string_encoding(interp, handle, vtable, s);
+        out_s = io_verify_string_encoding(interp, handle, vtable, s, PIO_F_WRITE);
 
         return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, out_s->strstart, s->bufused);
     }

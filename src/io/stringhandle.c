@@ -33,6 +33,8 @@ static INTVAL io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE * io_stringhandle_get_encoding(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
@@ -338,6 +340,8 @@ io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
     return PARROT_STRINGHANDLE(handle)->flags;
 }
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE *
 io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {

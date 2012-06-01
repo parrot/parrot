@@ -18,6 +18,8 @@ static INTVAL io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE * io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -290,6 +292,8 @@ io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
     }
 }
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE *
 io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {

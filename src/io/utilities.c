@@ -167,12 +167,17 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s))
+        ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_string_encoding)
-    STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+    STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
+
+    /* If we still don't have an encoding or if we don't need to do any
+       converting, we're good. Return. */
     if (encoding == NULL || encoding == s->encoding || encoding == Parrot_binary_encoding_ptr)
         return s;
+
+    /* Else, convert to the necessary encoding */
     return encoding->to_encoding(interp, s);
 }
 
@@ -203,7 +208,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     s->strlen   = 0;
 
     if (encoding == NULL)
-        encoding = vtable->get_encoding(interp, handle);
+        encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
 
     s->encoding = encoding;
 
@@ -288,7 +293,7 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     s->strlen   = 0;
 
     if (encoding == NULL)
-        encoding = vtable->get_encoding(interp, handle);
+        encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
 
     s->encoding = encoding;
 
@@ -311,6 +316,21 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     }
 
     return s;
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STR_VTABLE *
+io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+{
+    STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+    if (encoding != NULL)
+        return encoding;
+    if (flags & PIO_F_WRITE)
+        return Parrot_binary_encoding_ptr;
+    if (flags & PIO_F_READ)
+        return Parrot_default_encoding_ptr;
+    return Parrot_default_encoding_ptr;
 }
 
 /*

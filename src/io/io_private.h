@@ -133,6 +133,17 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+STR_VTABLE * io_get_encoding(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*handle);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * io_get_new_empty_string(PARROT_INTERP,
     ARGIN_NULLOK(STR_VTABLE *encoding),
     size_t char_length,
@@ -217,7 +228,8 @@ PARROT_WARN_UNUSED_RESULT
 STRING * io_verify_string_encoding(PARROT_INTERP,
     ARGIN(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
-    ARGIN(STRING *s))
+    ARGIN(STRING *s),
+    INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -226,6 +238,10 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_parse_open_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(mode_str))
+#define ASSERT_ARGS_io_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_get_new_empty_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -34,6 +34,8 @@ static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
@@ -316,6 +318,8 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
     }
 }
 
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 static STR_VTABLE *
 io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
@@ -326,7 +330,7 @@ io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     GETATTR_FileHandle_encoding(interp, handle, encoding_str);
     if (!STRING_IS_NULL(encoding_str))
         return Parrot_find_encoding_by_string(interp, encoding_str);
-    return Parrot_utf8_encoding_ptr;
+    return NULL;
 }
 
 static void
