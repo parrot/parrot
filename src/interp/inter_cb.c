@@ -177,7 +177,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD_NULLOK(PMC *user_data))
         PANIC(interp, "user_data is NULL");
     if (PMC_IS_NULL(user_data))
         PANIC(interp, "user_data is PMCNULL");
-    if ((UINTVAL)user_data & 3)
+    if ((ptrcast_t)user_data & 3)
         PANIC(interp, "user_data doesn't look like a pointer");
 
     /* Fetch original interpreter from prop */

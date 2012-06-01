@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2009, Parrot Foundation.
+Copyright (C) 2002-2011, Parrot Foundation.
 
 figure out some Configure settings
 */
@@ -10,7 +10,7 @@ figure out some Configure settings
 int
 main(int argc, char **argv)
 {
-    printf("%u\n", sizeof (@TEMP_type@));
+    printf("%u\n", (unsigned)sizeof (@TEMP_type@));
     return EXIT_SUCCESS;
 }
 
