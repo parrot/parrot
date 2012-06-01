@@ -249,7 +249,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
 {
     const size_t alloc_size = s->bufused + byte_length;
 
-    if (alloc_size < s->_buflen) {
+    if (alloc_size > s->_buflen) {
         if (s->strstart)
             Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
         else

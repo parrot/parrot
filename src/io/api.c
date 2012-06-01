@@ -599,8 +599,6 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
-        if (encoding == NULL)
-            encoding = Parrot_platform_encoding_ptr;
 
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
