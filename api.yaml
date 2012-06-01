@@ -642,3 +642,10 @@
   tags :
     - experimental
   ticket : 'https://github.com/parrot/parrot/issues/610'
+-
+  name: 'Move os.pmc from dynpmc to pmc'
+  note: 'OS / filesystem access is a fundamental use case that should be in core. loadlib \'os\' is no longer necessary.'
+  tags:
+    - 'PMC'
+  ticket:  'https://github.com/parrot/parrot/pull/778'
+
