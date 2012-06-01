@@ -640,13 +640,12 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
     {
-        size_t bytes_read;
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t total_size = vtable->total_size(interp, handle);
         STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
         STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
-        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, s->_bufstart, total_size);
+        io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
         return s;
     }
 }

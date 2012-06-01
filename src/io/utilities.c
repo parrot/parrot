@@ -108,7 +108,7 @@ io_get_new_socket(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_get_new_empty_string(PARROT_INTERP, STR_VTABLE *encoding,
+io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(STR_VTABLE *encoding),
         size_t char_length, size_t byte_length)
 {
     ASSERT_ARGS(io_get_new_empty_string)
@@ -247,13 +247,14 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
         ARGMOD(IO_BUFFER *buffer), size_t byte_length)
 {
-    // TODO: This
     const size_t alloc_size = s->bufused + byte_length;
 
-    if (s->strstart)
-        Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
-    else
-        Parrot_gc_allocate_string_storage(interp, s, alloc_size);
+    if (alloc_size < s->_buflen) {
+        if (s->strstart)
+            Parrot_gc_reallocate_string_storage(interp, s, alloc_size);
+        else
+            Parrot_gc_allocate_string_storage(interp, s, alloc_size);
+    }
 
     Parrot_io_buffer_read_b(interp, buffer, handle, vtable,
                             s->strstart + s->bufused, byte_length);

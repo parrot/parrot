@@ -134,7 +134,7 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_get_new_empty_string(PARROT_INTERP,
-    STR_VTABLE *encoding,
+    ARGIN_NULLOK(STR_VTABLE *encoding),
     size_t char_length,
     size_t byte_length)
         __attribute__nonnull__(1);
