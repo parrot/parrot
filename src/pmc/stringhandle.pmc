@@ -332,24 +332,24 @@ ignored, but stored for mocking.
 
         if (got_type) {
             if (STRING_equal(INTERP, new_type, nobuffer_string)) {
-                flags &= ~ PIO_F_LINEBUF;
-                flags &= ~ PIO_F_BLKBUF;
+                flags &= ~ PIO_BF_LINEBUF;
+                flags &= ~ PIO_BF_BLKBUF;
             }
             else if (STRING_equal(INTERP, new_type, linebuffer_string)) {
-                flags |=   PIO_F_LINEBUF;
-                flags &= ~ PIO_F_BLKBUF;
+                flags |=   PIO_BF_LINEBUF;
+                flags &= ~ PIO_BF_BLKBUF;
             }
             else if (STRING_equal(INTERP, new_type, fullbuffer_string)) {
-                flags &= ~ PIO_F_LINEBUF;
-                flags |=   PIO_F_BLKBUF;
+                flags &= ~ PIO_BF_LINEBUF;
+                flags |=   PIO_BF_BLKBUF;
             }
 
             SET_ATTR_flags(INTERP, SELF, flags);
         }
 
-        if (flags & PIO_F_LINEBUF)
+        if (flags & PIO_BF_LINEBUF)
             RETURN(STRING *linebuffer_string);
-        else if (flags & PIO_F_BLKBUF)
+        else if (flags & PIO_BF_BLKBUF)
             RETURN(STRING *fullbuffer_string);
         RETURN(STRING *nobuffer_string);
     }

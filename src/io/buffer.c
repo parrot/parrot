@@ -41,6 +41,14 @@ static void io_buffer_normalize(PARROT_INTERP,
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*buffer);
 
+static INTVAL io_buffer_requires_flush(PARROT_INTERP,
+    ARGIN(IO_BUFFER *buffer),
+    ARGIN(char * s),
+    INTVAL length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGOUT(char * s),
@@ -56,6 +64,10 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_io_buffer_normalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_io_buffer_requires_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_io_buffer_transfer_to_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s))
@@ -79,9 +91,13 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp,
                                                         sizeof (IO_BUFFER));
     buffer->encoding = encoding;
-    //buffer->owner_pmc = owner;
-    if (init_size == BUFFER_SIZE_ANY)
-        init_size = PIO_BUFFER_MIN_SIZE;
+    if (init_size == BUFFER_SIZE_ANY) {
+        if (flags & PIO_BF_LINEBUF)
+            init_size = PIO_BUFFER_LINEBUF_SIZE;
+        else
+            init_size = PIO_BUFFER_MIN_SIZE;
+    }
+
     buffer->buffer_size = init_size;
     if (init_size) {
         buffer->buffer_ptr = (char *)mem_sys_allocate(init_size);
@@ -267,6 +283,23 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
     }
 }
 
+static INTVAL
+io_buffer_requires_flush(PARROT_INTERP, ARGIN(IO_BUFFER *buffer),
+        ARGIN(char * s), INTVAL length)
+{
+    /* Something of an ugly hack borrowed from the old system. If we're in
+       line buffered mode we need to flush more often. Flush when we see a
+       newline character. */
+    if (buffer->flags & PIO_BF_LINEBUF) {
+        size_t i;
+        for (i = 0; i < length; i++) {
+            if (s[i] == '\n')
+                return 1;
+        }
+    }
+    return 0;
+}
+
 size_t
 Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), ARGIN(char *s),
@@ -281,20 +314,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         size_t total_size = buffer->buffer_size;
         size_t used_size = BUFFER_USED_SIZE(buffer);
         size_t avail_size = BUFFER_AVAILABLE_SIZE(buffer);
-        INTVAL needs_flush = 0;
-
-        /* This is something of an ugly hack, ported from the old system. We
-           do this because stdhandles don't automatically flush and data
-           written can be lost if the program exits too early. */
-        if (buffer->flags & PIO_F_LINEBUF) {
-            size_t i;
-            for (i = 0; i < length; i++) {
-                if (s[i] == '\n') {
-                    needs_flush = 1;
-                    break;
-                }
-            }
-        }
+        const INTVAL needs_flush = io_buffer_requires_flush(interp, buffer, s, length);
 
         /* If the data fits in the buffer, copy it there and move on. */
         if (length <= avail_size) {
@@ -351,8 +371,8 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     size_t bytes_written = 0;
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
         size_t used_length = BUFFER_USED_SIZE(buffer);
-        bytes_written += vtable->write_b(interp, handle,
-                                    (char *)buffer->buffer_start, BUFFER_USED_SIZE(buffer));
+        bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start,
+                                         BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);
     }
     return bytes_written + vtable->flush(interp, handle);
@@ -417,24 +437,6 @@ Parrot_io_buffer_content_size(SHIM_INTERP, ARGIN(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_content_size)
     return BUFFER_USED_SIZE(buffer);
-}
-
-void
-Parrot_io_buffer_set_mode(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
-        ARGMOD(PMC *filehandle), INTVAL flags)
-{
-    ASSERT_ARGS(Parrot_io_buffer_set_mode)
-    flags = flags & (PIO_F_BLKBUF | PIO_F_LINEBUF);
-
-    if ((buffer->flags & flags) == flags)
-        return;
-    if (flags & PIO_F_BLKBUF) {
-        // TODO: Setup block buffering
-    }
-    else if (flags & PIO_F_LINEBUF) {
-        // TODO: Setup line buffering
-    }
-    buffer->flags |= flags;
 }
 
 /*

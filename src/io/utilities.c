@@ -119,8 +119,8 @@ io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(STR_VTABLE *encoding),
         byte_length = (byte_length + encoding->bytes_per_unit - 1) &
                       ~(encoding->bytes_per_unit - 1);
 
-    if (byte_length < IO_STRING_BUFFER_MINSIZE)
-        byte_length = IO_STRING_BUFFER_MINSIZE;
+    if (byte_length < PIO_STRING_BUFFER_MINSIZE)
+        byte_length = PIO_STRING_BUFFER_MINSIZE;
 
     /* Allocate 3 bytes more for partial multi-byte characters */
     result = Parrot_str_new_noinit(interp, byte_length + 3);

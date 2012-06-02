@@ -28,13 +28,16 @@
 #  define PIO_BLKSIZE  8192
 #endif
 
-#define PIO_BUFFER_MIN_SIZE 2048        /* Smallest size for a block buffer */
+/* Buffer flags */
+#define PIO_BF_MALLOC   0x0001        /* Buffer malloced              */
+#define PIO_BF_MMAP     0x0002        /* Buffer mmap()ed              */
+#define PIO_BF_LINEBUF  0x0004        /* Flushes on newline           */
+#define PIO_BF_BLKBUF   0x0008        /* Raw block-based buffering    */
 
 // TODO: What is this? Figure it out and properly document it's use.
 #define PIO_NR_OPEN 256                 /* Size of an "IO handle table" */
 
-
-/* IO object flags */
+/* Handle flags */
 #define PIO_F_READ      00000001        /* File is opened for reading   */
 #define PIO_F_WRITE     00000002        /* File is opened for writing   */
 #define PIO_F_APPEND    00000004        /* File is opened for append    */
@@ -43,8 +46,6 @@
 #define PIO_F_PIPE      00000040        /* FileHandle is in pipe mode   */
 #define PIO_F_CONSOLE   00001000        /* A terminal                   */
 #define PIO_F_READLINE  00002000        /* user interactive readline    */
-#define PIO_F_LINEBUF   00010000        /* Flushes on newline           */
-#define PIO_F_BLKBUF    00020000        /* Raw block-based buffering    */
 #define PIO_F_SOFT_SP   00040000        /* Python softspace             */
 #define PIO_F_SHARED    00100000        /* Stream shares a file handle  */
 #define PIO_F_ASYNC     01000000        /* Handle is asynchronous       */
@@ -888,16 +889,6 @@ size_t Parrot_io_buffer_resize(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
-void Parrot_io_buffer_set_mode(PARROT_INTERP,
-    ARGMOD(IO_BUFFER *buffer),
-    ARGMOD(PMC *filehandle),
-    INTVAL flags)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*buffer)
-        FUNC_MODIFIES(*filehandle);
-
 size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
@@ -969,10 +960,6 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_buffer_resize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer))
-#define ASSERT_ARGS_Parrot_io_buffer_set_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_Parrot_io_buffer_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

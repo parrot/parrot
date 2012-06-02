@@ -104,9 +104,11 @@ DIAGRAM
 
 #include <parrot/io.h>
 
-/* Buffer flags */
-#define PIO_BF_MALLOC   00000001        /* Buffer malloced              */
-#define PIO_BF_MMAP     00000010        /* Buffer mmap()ed              */
+/* Minimum size to use when allocating a new empty STRING buffer */
+#define PIO_STRING_BUFFER_MINSIZE 32
+
+#define PIO_BUFFER_MIN_SIZE       2048  /* Smallest size for a block buffer */
+#define PIO_BUFFER_LINEBUF_SIZE   256   /* Smallest size for a line buffer */
 
 struct _ParrotIOData {
     PMC ** table;           /* Standard IO Streams (STDIN, STDOUT, STDERR) */
@@ -121,7 +123,7 @@ struct _ParrotIOData {
 
 #define IO_VTABLE_UNIMPLEMENTED(i, v, s) Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, "Method '%s' not implemented for type %s", s, v->name)
 
-#define IO_STRING_BUFFER_MINSIZE 32
+
 
 /* HEADERIZER BEGIN: src/io/utilities.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
