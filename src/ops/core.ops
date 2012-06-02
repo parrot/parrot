@@ -1409,15 +1409,11 @@ op dlvar(out PMC, invar PMC, in STR) {
 }
 
 inline op compreg(in STR, invar PMC) {
-    PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    VTABLE_set_pmc_keyed_str(interp, compreg_hash, $1, $2);
+    Parrot_interp_set_compiler(interp, $1, $2);
 }
 
 inline op compreg(out PMC, in STR) {
-    PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    $1 = VTABLE_get_pmc_keyed_str(interp, compreg_hash, $2);
+    $1 = Parrot_interp_get_compiler(interp, $2);
 }
 
 op new_callback(out PMC, invar PMC, invar PMC, in STR) {

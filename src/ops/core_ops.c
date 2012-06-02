@@ -14949,34 +14949,26 @@ Parrot_dlvar_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_compreg_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
-
-    VTABLE_set_pmc_keyed_str(interp, compreg_hash, SREG(1), PREG(2));
+    Parrot_interp_set_compiler(interp, SREG(1), PREG(2));
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_compreg_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
-
-    VTABLE_set_pmc_keyed_str(interp, compreg_hash, SCONST(1), PREG(2));
+    Parrot_interp_set_compiler(interp, SCONST(1), PREG(2));
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_compreg_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
-
-    PREG(1) = VTABLE_get_pmc_keyed_str(interp, compreg_hash, SREG(2));
+    PREG(1) = Parrot_interp_get_compiler(interp, SREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_compreg_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  compreg_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_COMPREG_HASH);
-
-    PREG(1) = VTABLE_get_pmc_keyed_str(interp, compreg_hash, SCONST(2));
+    PREG(1) = Parrot_interp_get_compiler(interp, SCONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;
 }
