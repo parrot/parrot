@@ -65,16 +65,19 @@ Parrot_io_init(PARROT_INTERP)
         /* memsub system is up and running: */
         /* Init IO stacks and handles for interp instance.  */
         PIOHANDLE os_handle;
+        PMC *handle;
 
         io_setup_vtables(interp);
 
-        os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
-        _PIO_STDIN(interp)  = Parrot_io_fdopen_flags(interp, PMCNULL,
-                                os_handle, PIO_F_READ);
+        os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
+        handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_READ);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_F_BLKBUF);
+        _PIO_STDIN(interp) = handle;
 
-        os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
-        _PIO_STDOUT(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
-                                os_handle, PIO_F_WRITE);
+        os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
+        handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_WRITE);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_F_LINEBUF);
+        _PIO_STDOUT(interp) = handle;
 
         os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDERR_FILENO);
         _PIO_STDERR(interp) = Parrot_io_fdopen_flags(interp, PMCNULL,
@@ -97,20 +100,6 @@ Parrot_io_init(PARROT_INTERP)
     if (!interp->piodata->table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "PIO alloc table failure.");
-}
-
-void
-Parrot_io_init_buffer(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_io_init_buffer)
-
-    // TODO: Merge this buffering logic into where-ever we set up these handles
-    /*if (Parrot_io_STDOUT(interp))
-        Parrot_io_setlinebuf(interp, Parrot_io_STDOUT(interp));
-
-    if (Parrot_io_STDIN(interp))
-        Parrot_io_setbuf(interp, Parrot_io_STDIN(interp), PIO_UNBOUND);
-    */
 }
 
 void
@@ -188,6 +177,7 @@ Parrot_io_finish(PARROT_INTERP)
     /*
      * TODO free IO of std-handles
      */
+    Parrot_io_flush(interp, _PIO_STDOUT(interp));
     mem_gc_free(interp, interp->piodata->table);
     interp->piodata->table = NULL;
     mem_gc_free(interp, interp->piodata);

@@ -111,6 +111,7 @@ Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
             Parrot_io_buffer_resize(interp, buffer, length);
         else {
             buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, length);
+            PARROT_ASSERT(buffer);
             VTABLE_set_pointer_keyed_int(interp, handle, idx, buffer);
         }
         if (flags != BUFFER_FLAGS_ANY)
@@ -280,12 +281,29 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         size_t total_size = buffer->buffer_size;
         size_t used_size = BUFFER_USED_SIZE(buffer);
         size_t avail_size = BUFFER_AVAILABLE_SIZE(buffer);
+        INTVAL needs_flush = 0;
+
+        /* This is something of an ugly hack, ported from the old system. We
+           do this because stdhandles don't automatically flush and data
+           written can be lost if the program exits too early. */
+        if (buffer->flags & PIO_F_LINEBUF) {
+            size_t i;
+            for (i = 0; i < length; i++) {
+                if (s[i] == '\n') {
+                    needs_flush = 1;
+                    break;
+                }
+            }
+        }
 
         /* If the data fits in the buffer, copy it there and move on. */
         if (length <= avail_size) {
             io_buffer_add_bytes(interp, buffer, s, length);
+            if (needs_flush)
+                Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
             return length;
         }
+
 
         /* If the total data to write is larger than the buffer, flush and
            write directly through to the handle */
@@ -298,6 +316,8 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
            be able to cover any overflow */
         Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
         io_buffer_add_bytes(interp, buffer, s, length);
+        if (needs_flush)
+            Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
         return length;
     }
 }
