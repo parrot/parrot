@@ -54,6 +54,7 @@ our @shared_valid_options = qw{
     mandir
     nomanicheck
     no-line-directives
+    no-pretty-debug
     oldincludedir
     opcode
     ops
