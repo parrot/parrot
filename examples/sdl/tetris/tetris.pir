@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 tetris.pir - a second tetris for parrot (with parrot's SDL bindings)
 
