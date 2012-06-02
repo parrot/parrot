@@ -1,5 +1,5 @@
 
-=head1 Hello Example
+=head1 DESCRIPTION
 
 This example shows the usage of C<Stream::Sub>.
 
