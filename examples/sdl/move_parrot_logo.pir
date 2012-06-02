@@ -1,11 +1,7 @@
 
-=head1 TITLE
-
-move_parrot_logo.pir - move a Parrot logo with the SDL Parrot bindings
-
 =head1 DESCRIPTION
 
-Move a Parrot logo with SDL Parrot bindings.
+move_parrot_logo.pir - move a Parrot logo with the SDL Parrot bindings
 
 =head1 SYNOPSIS
 
