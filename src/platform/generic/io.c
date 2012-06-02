@@ -331,8 +331,6 @@ Parrot_io_internal_getblksize(PIOHANDLE fd)
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
 
-XXX: Is it necessary to C<sync()> here?
-
 =cut
 
 */

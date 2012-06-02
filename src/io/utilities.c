@@ -108,8 +108,8 @@ io_get_new_socket(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(STR_VTABLE *encoding),
-        size_t char_length, size_t byte_length)
+io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(const STR_VTABLE *encoding),
+        INTVAL char_length, INTVAL byte_length)
 {
     ASSERT_ARGS(io_get_new_empty_string)
     STRING * result;
@@ -136,7 +136,7 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
     if (Parrot_io_is_closed(interp, handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not open", vtable->name);
-    if (vtable->get_flags(interp, handle) & flags == 0)
+    if ((vtable->get_flags(interp, handle) & flags) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not in mode %d", vtable->name, flags);
 }
@@ -150,7 +150,7 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
     if (buffer)
         Parrot_io_buffer_resize(interp, buffer, BUFFER_SIZE_ANY);
     else {
-        STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
+        const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
         if (encoding == NULL)
             encoding = Parrot_platform_encoding_ptr;
         buffer = Parrot_io_buffer_allocate(interp, handle, flags, encoding, BUFFER_SIZE_ANY);
@@ -168,7 +168,7 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
         ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_string_encoding)
-    STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, flags);
+    const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, flags);
 
     /* If we still don't have an encoding or if we don't need to do any
        converting, we're good. Return. */
@@ -182,7 +182,7 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
 /*
 
 =item C<STRING * io_read_encoded_string(PARROT_INTERP, PMC *handle, IO_VTABLE
-*vtable, IO_BUFFER *buffer, STR_VTABLE *encoding, size_t char_length)>
+*vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL char_length)>
 
 Read a STRING from the handle with the given number of bytes, assuming the
 handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to
@@ -198,7 +198,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
-        ARGIN_NULLOK(STR_VTABLE *encoding), size_t char_length)
+        ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL char_length)
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
@@ -271,7 +271,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
 /*
 
 =item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle,
-IO_VTABLE *vtable, IO_BUFFER *buffer, STR_VTABLE *encoding, INTVAL rs)>
+IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL rs)>
 
 Read a line, up to and including the terminator character rs, from the
 input handle
@@ -285,7 +285,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
-        ARGIN(STR_VTABLE *encoding), INTVAL rs)
+        ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL rs)
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
@@ -320,10 +320,10 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STR_VTABLE *
+const STR_VTABLE *
 io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
-    STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+    const STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
     if (encoding != NULL)
         return encoding;
     if (flags & PIO_F_WRITE)

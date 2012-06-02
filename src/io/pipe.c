@@ -20,7 +20,8 @@ static INTVAL io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE * io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+static const STR_VTABLE * io_pipe_get_encoding(PARROT_INTERP,
+    ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -63,7 +64,10 @@ static INTVAL io_pipe_read_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
-static INTVAL io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_pipe_seek(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset,
+    INTVAL whence)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -177,6 +181,7 @@ io_pipe_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t 
         flags |= PIO_F_EOF;
         SETATTR_FileHandle_flags(interp, handle, flags);
     }
+    return bytes_read;
 }
 
 static INTVAL
@@ -184,7 +189,7 @@ io_pipe_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t 
 {
     ASSERT_ARGS(io_pipe_write_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
-    return Parrot_io_internal_write(interp, handle, buffer, byte_length);
+    return Parrot_io_internal_write(interp, os_handle, buffer, byte_length);
 }
 
 static INTVAL
@@ -193,7 +198,7 @@ io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
     ASSERT_ARGS(io_pipe_flush)
     // TODO: In read mode, don't do what this does.
     PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
-    Parrot_io_internal_flush(interp, os_handle);
+    return Parrot_io_internal_flush(interp, os_handle);
 }
 
 static INTVAL
@@ -213,14 +218,18 @@ io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
     ASSERT_ARGS(io_pipe_tell)
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "tell");
+    return (PIOOFF_T)0;
 }
 
 static INTVAL
-io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_pipe_seek)
+    UNUSED(offset);
+    UNUSED(whence);
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
+    return 0;
 }
 
 static INTVAL
@@ -235,7 +244,7 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
 
     /* Hack! If we're opening in file mode, turn this FileHandle into a file
        and use that vtable instead. */
-    if (flags & PIO_F_PIPE == 0) {
+    if ((flags & PIO_F_PIPE) == 0) {
         IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
                                     IO_VTABLE_FILEHANDLE, NULL);
         VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
@@ -294,7 +303,7 @@ io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE *
+static const STR_VTABLE *
 io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_encoding)
@@ -327,6 +336,7 @@ io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
     ASSERT_ARGS(io_pipe_total_size)
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "total_size");
+    return (size_t)0;
 }
 
 static PIOHANDLE

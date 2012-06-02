@@ -44,8 +44,7 @@ static void io_buffer_normalize(PARROT_INTERP,
 static INTVAL io_buffer_requires_flush(PARROT_INTERP,
     ARGIN(IO_BUFFER *buffer),
     ARGIN(char * s),
-    INTVAL length)
-        __attribute__nonnull__(1)
+    size_t length)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -65,8 +64,7 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
 #define ASSERT_ARGS_io_buffer_normalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_buffer_requires_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
+       PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_io_buffer_transfer_to_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -84,7 +82,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
-        ARGIN_NULLOK(STR_VTABLE *encoding), size_t init_size)
+        ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
@@ -171,7 +169,7 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
 }
 
 void
-Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
+Parrot_io_buffer_mark(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     if (!buffer)
         return;
@@ -284,8 +282,8 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 }
 
 static INTVAL
-io_buffer_requires_flush(PARROT_INTERP, ARGIN(IO_BUFFER *buffer),
-        ARGIN(char * s), INTVAL length)
+io_buffer_requires_flush(SHIM_INTERP, ARGIN(IO_BUFFER *buffer),
+        ARGIN(char * s), size_t length)
 {
     /* Something of an ugly hack borrowed from the old system. If we're in
        line buffered mode we need to flush more often. Flush when we see a
@@ -375,7 +373,10 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
                                          BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);
     }
-    return bytes_written + vtable->flush(interp, handle);
+    vtable->flush(interp, handle);
+    if (autoclose)
+        Parrot_io_close(interp, handle, 0);
+    return bytes_written;
 }
 
 UINTVAL
@@ -442,7 +443,7 @@ Parrot_io_buffer_content_size(SHIM_INTERP, ARGIN(IO_BUFFER *buffer))
 /*
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
-PMC *handle, IO_VTABLE *vtable, STR_VTABLE *encoding, Parrot_String_Bounds
+PMC *handle, IO_VTABLE *vtable, const STR_VTABLE *encoding, Parrot_String_Bounds
 *bounds, INTVAL delim)>
 
 Search the buffer for the given delimiter character or end-of-buffer,
@@ -458,7 +459,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
-        ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
+        ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         INTVAL delim)
 {
     ASSERT_ARGS(io_buffer_find_string_marker);
@@ -467,7 +468,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     if (BUFFER_IS_EMPTY(buffer)) {
         size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
                                                        vtable);
-        if (bytes_available = 0)
+        if (bytes_available == 0)
             return 0;
     }
 
@@ -481,14 +482,14 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
        complete codepoint and do not need any more to complete it). Lop those
        last few bytes off the end of the found sequence, so we only read
        complete codepoints out into the STRING. */
-    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, &bounds);
+    bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
     return bounds->bytes - bytes_needed;
 }
 
 /*
 
 =item C<size_t io_buffer_find_num_characters(PARROT_INTERP, IO_BUFFER *buffer,
-PMC *handle, IO_VTABLE *vtable, STR_VTABLE *encoding, Parrot_String_Bounds
+PMC *handle, IO_VTABLE *vtable, const STR_VTABLE *encoding, Parrot_String_Bounds
 *bounds, size_t num_chars)>
 
 Attempt to read from the buffer the given number of characters in the
@@ -504,7 +505,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
-        ARGIN(STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
+        ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         size_t num_chars)
 {
     ASSERT_ARGS(io_buffer_find_num_characters)
@@ -513,7 +514,7 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     if (BUFFER_IS_EMPTY(buffer)) {
         size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
                                                        vtable);
-        if (bytes_available = 0)
+        if (bytes_available == 0)
             return 0;
     }
 

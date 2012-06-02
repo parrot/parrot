@@ -34,7 +34,9 @@ src/io/api.c:
     exported for use by extenders. These are the interfaces to be used when
     writing IO-related code at the C level.
 
-src/pmc/*handle.pmc
+src/pmc/handle.pmc
+src/pmc/filehandle.pmc
+src/pmc/stringhandle.pmc
 src/pmc/socket.pmc
     These are the specific IO object implementations and are the preferred
     interface for performing IO-related operations from the bytecode level.
@@ -137,7 +139,7 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STR_VTABLE * io_get_encoding(PARROT_INTERP,
+const STR_VTABLE * io_get_encoding(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     INTVAL flags)
@@ -149,9 +151,9 @@ STR_VTABLE * io_get_encoding(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_get_new_empty_string(PARROT_INTERP,
-    ARGIN_NULLOK(STR_VTABLE *encoding),
-    size_t char_length,
-    size_t byte_length)
+    ARGIN_NULLOK(const STR_VTABLE *encoding),
+    INTVAL char_length,
+    INTVAL byte_length)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -185,8 +187,8 @@ STRING * io_read_encoded_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
-    ARGIN_NULLOK(STR_VTABLE *encoding),
-    size_t char_length)
+    ARGIN_NULLOK(const STR_VTABLE *encoding),
+    INTVAL char_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -200,13 +202,12 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
-    ARGIN(STR_VTABLE *encoding),
+    ARGIN_NULLOK(const STR_VTABLE *encoding),
     INTVAL rs)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
@@ -266,8 +267,7 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(encoding))
+    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_io_verify_has_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

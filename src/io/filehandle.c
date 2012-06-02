@@ -36,7 +36,7 @@ static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
+static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -215,7 +215,7 @@ io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
     ASSERT_ARGS(io_filehandle_flush)
     // TODO: In read mode, don't do what this does.
     PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
-    Parrot_io_internal_flush(interp, os_handle);
+    return Parrot_io_internal_flush(interp, os_handle);
 }
 
 static INTVAL
@@ -253,7 +253,7 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
 
     /* Hack! If we're opening in pipe mode, turn this FileHandle into a pipe
        and use that vtable instead. */
-    if (flags & PIO_F_PIPE == 0) {
+    if (flags & PIO_F_PIPE) {
         IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
                                     IO_VTABLE_PIPE, NULL);
         VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
@@ -320,7 +320,7 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE *
+static const STR_VTABLE *
 io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_encoding)

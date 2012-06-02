@@ -156,6 +156,7 @@ Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Cannot get IO VTABLE %s", name);
+    return NULL;
 }
 
 /*
@@ -588,7 +589,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
+        const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
 
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
@@ -631,7 +632,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t total_size = vtable->total_size(interp, handle);
-        STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
+        const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
         STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
         io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
         return s;
@@ -641,12 +642,12 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 /*
 
 =item C<PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, PMC *handle, PMC
-*buffer, INTVAL byte_length)>
+*buffer, size_t byte_length)>
 
 Read C<length> bytes from the C<handle> into the C<buffer> (ByteBuffer) PMC.
 
 =item C<INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, PMC * handle, PMC
-*buffer, INTVAL byte_length)>
+*buffer, size_t byte_length)>
 
 Write C<length> bytes (or the total length of C<buffer>, whichever is smaller)
 from C<buffer> to the C<handle>
@@ -660,7 +661,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGMOD_NULLOK(PMC *buffer), INTVAL byte_length)
+        ARGMOD_NULLOK(PMC *buffer), size_t byte_length)
 {
     ASSERT_ARGS(Parrot_io_read_byte_buffer_pmc)
 
@@ -693,7 +694,7 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
 
 INTVAL
 Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
-        ARGMOD(PMC *buffer), INTVAL byte_length)
+        ARGMOD(PMC *buffer), size_t byte_length)
 {
     ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
 
@@ -706,7 +707,7 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
 
     {
         char *content = (char *)VTABLE_get_pointer(interp, buffer);
-        INTVAL real_length = VTABLE_elements(interp, buffer);
+        size_t real_length = (size_t)VTABLE_elements(interp, buffer);
         if (real_length < byte_length)
             byte_length = real_length;
 
@@ -765,7 +766,8 @@ Writes C<len> bytes from C<*buffer> to C<*pmc>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer), size_t byte_length)
+Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
+        size_t byte_length)
 {
     ASSERT_ARGS(Parrot_io_write_b)
 
@@ -781,8 +783,8 @@ Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
-
-        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable, buffer, byte_length);
+        return Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable,
+                                        (char *)buffer, byte_length);
     }
 }
 
@@ -883,7 +885,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
     ASSERT_ARGS(Parrot_io_peek)
 
     if (PMC_IS_NULL(handle) || Parrot_io_is_closed(interp, handle))
-        return -1;
+        return STRINGNULL;
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
@@ -1094,7 +1096,7 @@ Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_getfd(PARROT_INTERP, const PMC *pmc)>
+=item C<PIOHANDLE Parrot_io_getfd(PARROT_INTERP, PMC *pmc)>
 
 Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
@@ -1105,7 +1107,7 @@ Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
+Parrot_io_getfd(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_getfd)
     return Parrot_io_get_os_handle(interp, pmc);
@@ -1312,7 +1314,7 @@ Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't poll closed socket");
 
-    return Parrot_io_poll(interp, io->os_handle, which, sec, usec);
+    return Parrot_io_internal_poll(interp, io->os_handle, which, sec, usec);
 }
 
 /*

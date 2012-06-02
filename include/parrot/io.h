@@ -101,10 +101,10 @@ typedef struct _io_buffer {
     INTVAL reference_count;         /* Reference count of this struct, until
                                        we wrap it in a special PMC     */
     size_t buffer_size;             /* Current allocated size          */
-    STR_VTABLE *encoding;           /* Encoding used by this buffer    */
-    unsigned char *buffer_ptr;      /* ptr to the buffer mem block     */
-    unsigned char *buffer_start;    /* ptr to the start of the data    */
-    unsigned char *buffer_end;      /* ptr to the end of the data      */
+    const STR_VTABLE *encoding;     /* Encoding used by this buffer    */
+    char *buffer_ptr;               /* ptr to the buffer mem block     */
+    char *buffer_start;             /* ptr to the start of the data    */
+    char *buffer_end;               /* ptr to the end of the data      */
     void *memhandle;    /* Handle or pointer for munmap/UnmapViewOfFile.
                            NULL if not used*/
 } IO_BUFFER;
@@ -128,15 +128,15 @@ typedef INTVAL      (*io_vtable_seek)         (PARROT_INTERP, PMC *handle, PIOOF
 typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, PMC *handle, ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode));
 typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, PMC *handle);
-typedef STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_ensure_buffer)(PARROT_INTERP, PMC *handle, INTVAL buffer_no, size_t size, INTVAL flags);
 typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, PMC *handle);
 typedef PIOHANDLE   (*io_vtable_get_piohandle)(PARROT_INTERP, PMC *handle);
+typedef const STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
-    char                  * name;
+    const char            * name;
     INTVAL                  number;
     io_vtable_read_b        read_b;
     io_vtable_write_b       write_b;
@@ -258,7 +258,7 @@ Parrot_io_fprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
+PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -379,7 +379,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_read_byte_buffer_pmc(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGMOD_NULLOK(PMC *buffer),
-    INTVAL byte_length)
+    size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle)
@@ -587,7 +587,7 @@ void Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
 INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     ARGMOD(PMC * handle),
     ARGMOD(PMC *buffer),
-    INTVAL byte_length)
+    size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -770,7 +770,7 @@ size_t io_buffer_find_num_characters(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
-    ARGIN(STR_VTABLE *encoding),
+    ARGIN(const STR_VTABLE *encoding),
     ARGMOD(Parrot_String_Bounds *bounds),
     size_t num_chars)
         __attribute__nonnull__(1)
@@ -788,7 +788,7 @@ size_t io_buffer_find_string_marker(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
-    ARGIN(STR_VTABLE *encoding),
+    ARGIN(const STR_VTABLE *encoding),
     ARGMOD(Parrot_String_Bounds *bounds),
     INTVAL delim)
         __attribute__nonnull__(1)
@@ -815,7 +815,7 @@ PARROT_WARN_UNUSED_RESULT
 IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
     ARGMOD(PMC *owner),
     INTVAL flags,
-    ARGIN_NULLOK(STR_VTABLE *encoding),
+    ARGIN_NULLOK(const STR_VTABLE *encoding),
     size_t init_size)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -855,7 +855,6 @@ void Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
         __attribute__nonnull__(1);
 
 void Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
-        __attribute__nonnull__(1)
         FUNC_MODIFIES(*buffer);
 
 UINTVAL Parrot_io_buffer_peek(PARROT_INTERP,
@@ -945,8 +944,7 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_free __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_io_buffer_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_buffer_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_buffer_peek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \

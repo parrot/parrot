@@ -21,9 +21,7 @@ src/io/stringhandle.c - StringHandle vtables and helper routines
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL io_stringhandle_close(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL autoflush)
+static INTVAL io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -35,7 +33,7 @@ static INTVAL io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE * io_stringhandle_get_encoding(PARROT_INTERP,
+static const STR_VTABLE * io_stringhandle_get_encoding(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -204,14 +202,13 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
 {
     ASSERT_ARGS(io_stringhandle_write_b)
     STRING *old_string, *new_string;
-    STR_VTABLE * encoding;
+    const STR_VTABLE * const encoding = io_stringhandle_get_encoding(interp, handle);
 
     GETATTR_StringHandle_stringhandle(interp, handle, old_string);
-    GETATTR_StringHandle_encoding(interp, handle, encoding);
 
     new_string = io_get_new_empty_string(interp, encoding, -1, old_string->bufused + byte_length);
     memcpy(new_string->_bufstart, old_string->_bufstart, old_string->bufused);
-    memcpy(new_string->_bufstart + old_string->bufused, buffer, byte_length);
+    memcpy(((char*)new_string->_bufstart) + old_string->bufused, buffer, byte_length);
     new_string->bufused = old_string->bufused + byte_length;
 
     SETATTR_StringHandle_stringhandle(interp, handle, new_string);
@@ -223,6 +220,7 @@ io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_flush)
     SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
+    return 0;
 }
 
 static INTVAL
@@ -233,7 +231,7 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
     STRING *stringhandle;
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
-    return read_offs >= stringhandle->bufused;
+    return (UINTVAL)read_offs >= stringhandle->bufused;
 }
 
 static PIOOFF_T
@@ -272,15 +270,15 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL
                 "Cannot seek with mode %d", whence);
     }
     SETATTR_StringHandle_read_offset(interp, handle, read_offs);
+    return 0; /* TODO: What should this be? */
 }
 
 static INTVAL
 io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_stringhandle_open)
-    STR_VTABLE * encoding;
+    const STR_VTABLE * const encoding = io_stringhandle_get_encoding(interp, handle);
     STRING *new_str;
-    GETATTR_StringHandle_encoding(interp, handle, encoding);
 
     new_str = io_get_new_empty_string(interp, encoding, -1, 0);
 
@@ -289,6 +287,7 @@ io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), IN
     SETATTR_StringHandle_mode(interp, handle, mode);
     SETATTR_StringHandle_filename(interp, handle, path);
     SETATTR_StringHandle_read_offset(interp, handle, 0);
+    return 1;
 }
 
 static INTVAL
@@ -301,7 +300,7 @@ io_stringhandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static INTVAL
-io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
+io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_close)
     SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
@@ -324,6 +323,7 @@ io_stringhandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
     ASSERT_ARGS(io_stringhandle_get_piohandle)
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
+    return PIO_INVALID_HANDLE;
 }
 
 static void
@@ -342,7 +342,7 @@ io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE *
+static const STR_VTABLE *
 io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_get_encoding)
