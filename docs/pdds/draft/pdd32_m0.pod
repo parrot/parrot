@@ -81,10 +81,14 @@ Meta object protocol.
 
 =item * Lorito
 
-Lorito refers to C<M0> and the levels above it, such as C<M1> which is written
-in C<M0> ops, and possibily an C<M2> level which is written in C<M1> ops. More
-specifically it refers to a new implementation of Parrot internals. A new MOP
-is planned for Lorito and it will most probably live at the C<M1> op level.
+Lorito refers to C<M0> and the levels above it, such as C<M1> which compiles
+down to C<M0> ops, and possibily an C<M2> level which compiles to C<M1>.
+Ideally C<M1> will be self-hosting, but it's sufficient for an C<M1> compiler
+to generate valid C<M0>.   
+
+More specifically Lorito refers to a new implementation of Parrot internals. A
+new MOP is planned for Lorito and it will most probably live at the C<M1> op
+level.
 
 =item * Call Frame
 
