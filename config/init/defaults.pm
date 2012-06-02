@@ -89,6 +89,7 @@ sub runstep {
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
         build_dir => $build_dir,
+        no_pretty_debug => $conf->options->get('no-pretty-debug'),
         configured_from_file =>
             $conf->options->get('configured_from_file') || '',
         configuration_steps => ( join q{ } => $conf->get_list_of_steps() ),
