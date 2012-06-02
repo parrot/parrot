@@ -3,6 +3,10 @@
 
 move_parrot_logo.pir - move a Parrot logo with the SDL Parrot bindings
 
+=head1 DESCRIPTION
+
+Move a Parrot logo with SDL Parrot bindings.
+
 =head1 SYNOPSIS
 
 To run this file, run the following command from the Parrot directory:
