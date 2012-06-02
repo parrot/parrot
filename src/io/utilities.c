@@ -119,13 +119,11 @@ io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(STR_VTABLE *encoding),
         byte_length = (byte_length + encoding->bytes_per_unit - 1) &
                       ~(encoding->bytes_per_unit - 1);
 
-    if (byte_length == 0)
-        result = Parrot_str_new_noinit(interp, 0);
-    else {
-        /* Allocate 3 bytes more for partial multi-byte characters */
-        result = Parrot_str_new_noinit(interp, byte_length + 3);
-    }
+    if (byte_length < IO_STRING_BUFFER_MINSIZE)
+        byte_length = IO_STRING_BUFFER_MINSIZE;
 
+    /* Allocate 3 bytes more for partial multi-byte characters */
+    result = Parrot_str_new_noinit(interp, byte_length + 3);
     result->encoding = encoding;
     return result;
 }
@@ -200,7 +198,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
-        ARGIN(STR_VTABLE *encoding), size_t char_length)
+        ARGIN_NULLOK(STR_VTABLE *encoding), size_t char_length)
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
@@ -209,8 +207,9 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     if (encoding == NULL)
         encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
-
     s->encoding = encoding;
+
+    PARROT_ASSERT(s->encoding);
 
     while (1) {
         Parrot_String_Bounds bounds;
@@ -253,6 +252,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(IO_BUFFER *buffer), size_t byte_length)
 {
     const size_t alloc_size = s->bufused + byte_length;
+    PARROT_ASSERT(s->encoding);
 
     if (alloc_size > s->_buflen) {
         if (s->strstart)

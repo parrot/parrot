@@ -121,6 +121,8 @@ struct _ParrotIOData {
 
 #define IO_VTABLE_UNIMPLEMENTED(i, v, s) Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, "Method '%s' not implemented for type %s", s, v->name)
 
+#define IO_STRING_BUFFER_MINSIZE 32
+
 /* HEADERIZER BEGIN: src/io/utilities.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -181,13 +183,12 @@ STRING * io_read_encoded_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
-    ARGIN(STR_VTABLE *encoding),
+    ARGIN_NULLOK(STR_VTABLE *encoding),
     size_t char_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
@@ -258,8 +259,7 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer) \
-    , PARROT_ASSERT_ARG(encoding))
+    , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_io_readline_encoded_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

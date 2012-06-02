@@ -641,7 +641,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t total_size = vtable->total_size(interp, handle);
-        STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+        STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
         STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
         io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
         return s;
