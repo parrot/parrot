@@ -281,12 +281,13 @@ static INTVAL
 io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_stringhandle_open)
-    const STR_VTABLE * const encoding = io_stringhandle_get_encoding(interp, handle);
-    STRING *new_str;
-
-    new_str = io_get_new_empty_string(interp, encoding, -1, 0);
-
-    SETATTR_StringHandle_stringhandle(interp, handle, new_str);
+    STRING *old_handle;
+    GETATTR_StringHandle_stringhandle(interp, handle, old_handle);
+    if (STRING_IS_NULL(old_handle)) {
+        const STR_VTABLE * const encoding = io_stringhandle_get_encoding(interp, handle);
+        STRING * const new_str = io_get_new_empty_string(interp, encoding, -1, 0);
+        SETATTR_StringHandle_stringhandle(interp, handle, new_str);
+    }
     SETATTR_StringHandle_flags(interp, handle, flags);
     SETATTR_StringHandle_mode(interp, handle, mode);
     SETATTR_StringHandle_filename(interp, handle, path);
@@ -317,6 +318,8 @@ io_stringhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
     ASSERT_ARGS(io_stringhandle_total_size)
     STRING *stringhandle;
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    if (STRING_IS_NULL(stringhandle))
+        return 0;
     return stringhandle->_buflen;
 }
 
@@ -349,9 +352,17 @@ static const STR_VTABLE *
 io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_get_encoding)
+    /*
     STRING * stringhandle;
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
     if (STRING_IS_NULL(stringhandle))
         return NULL;
     return stringhandle->encoding;
+    */
+    STRING           *encoding_str;
+
+    GETATTR_StringHandle_encoding(interp, handle, encoding_str);
+    if (!STRING_IS_NULL(encoding_str))
+        return Parrot_find_encoding_by_string(interp, encoding_str);
+    return NULL;
 }

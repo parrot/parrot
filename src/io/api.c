@@ -645,6 +645,8 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 
         const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
         size_t total_size = vtable->total_size(interp, handle);
+        if (total_size == 0)
+            return Parrot_str_new_init(interp, "", 0, encoding, 0);
         if (total_size == PIO_UNKNOWN_SIZE) {
             IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_FLAGS_ANY);
             size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);

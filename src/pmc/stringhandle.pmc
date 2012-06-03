@@ -247,6 +247,7 @@ Check if the StringHandle is open.
 
     METHOD is_closed() {
         const INTVAL closed = Parrot_io_is_closed(INTERP, SELF);
+        RETURN(INTVAL closed);
     }
 
 
