@@ -122,8 +122,7 @@ io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(const STR_VTABLE *encoding),
     if (byte_length < PIO_STRING_BUFFER_MINSIZE)
         byte_length = PIO_STRING_BUFFER_MINSIZE;
 
-    /* Allocate 3 bytes more for partial multi-byte characters */
-    result = Parrot_str_new_noinit(interp, byte_length + 3);
+    result = Parrot_str_new_noinit(interp, byte_length);
     result->encoding = encoding;
     return result;
 }

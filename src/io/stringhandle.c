@@ -320,7 +320,7 @@ io_stringhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
     if (STRING_IS_NULL(stringhandle))
         return 0;
-    return stringhandle->_buflen;
+    return stringhandle->bufused;
 }
 
 static PIOHANDLE
@@ -364,5 +364,5 @@ io_stringhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     GETATTR_StringHandle_encoding(interp, handle, encoding_str);
     if (!STRING_IS_NULL(encoding_str))
         return Parrot_find_encoding_by_string(interp, encoding_str);
-    return NULL;
+    return Parrot_ascii_encoding_ptr;
 }
