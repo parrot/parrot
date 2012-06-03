@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Associative Arrays
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's associative arrays.
+
+=head1 ASSOCIATIVE ARRAYS
 
 Associative arrays, also known in some places as "dictionaries" or
 "hashes" are like ordered arrays except they are indexed by strings

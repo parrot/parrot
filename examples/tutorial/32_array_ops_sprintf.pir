@@ -1,11 +1,17 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's arrays (continued).
+
+=head1 USING SPRINTF WITH ARRAYS
 
 C<sprintf> is a function common to most programmers as part of the C
 standard library that allows the creation of a string from a given
 format and a list of operators. Parrot's C<sprintf> operator extends
-the format options of the regular sprintf function, and allows
+the format options of the regular sprintf function and allows
 arguments to be taken from inside an array PMC.
 
 =cut

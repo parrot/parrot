@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Writing Tests
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about writing tests in Parrot.
+
+=head1 WRITING TESTS
 
 This example demonstrates writing tests using the PIR version of Test::More.
 (Worth explaining a little of how ok, is, skip, and todo work.)
