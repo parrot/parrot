@@ -776,13 +776,13 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
 
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         size_t bytes_read;
         STRING *result;
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
         if (read_buffer == NULL)
-            io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+            read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
         return io_readline_encoded_string(interp, handle, vtable, read_buffer, NULL, terminator);
     }
 }
