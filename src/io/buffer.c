@@ -318,7 +318,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         if (length <= avail_size) {
             io_buffer_add_bytes(interp, buffer, s, length);
             if (needs_flush)
-                Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+                Parrot_io_buffer_flush(interp, buffer, handle, vtable);
             return length;
         }
 
@@ -326,16 +326,16 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         /* If the total data to write is larger than the buffer, flush and
            write directly through to the handle */
         if (length > total_size) {
-            Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+            Parrot_io_buffer_flush(interp, buffer, handle, vtable);
             return vtable->write_b(interp, handle, s, length);
         }
 
         /* Else, we have more data than available space, but the buffer should
            be able to cover any overflow */
-        Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+        Parrot_io_buffer_flush(interp, buffer, handle, vtable);
         io_buffer_add_bytes(interp, buffer, s, length);
         if (needs_flush)
-            Parrot_io_buffer_flush(interp, buffer, handle, vtable, 0);
+            Parrot_io_buffer_flush(interp, buffer, handle, vtable);
         return length;
     }
 }
@@ -363,7 +363,7 @@ io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
 
 size_t
 Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
-        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), INTVAL autoclose)
+        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_io_buffer_flush)
     size_t bytes_written = 0;
@@ -373,9 +373,6 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
                                          BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);
     }
-    vtable->flush(interp, handle);
-    if (autoclose)
-        Parrot_io_close(interp, handle, 0);
     return bytes_written;
 }
 

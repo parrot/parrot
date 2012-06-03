@@ -486,12 +486,14 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         return 0;
     else {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+        if (write_buffer)
+            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+
         if (autoflush == -1)
             autoflush == (vtable->flags && PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
-        if (autoflush == 1) {
-            IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
-        }
+        if (autoflush == 1)
+            vtable->flush(interp, handle);
         return vtable->close(interp, handle);
     }
 }
@@ -554,7 +556,9 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *handle))
     else {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-        return Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
+        if (write_buffer)
+            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+        return vtable->flush(interp, handle);
     }
 }
 

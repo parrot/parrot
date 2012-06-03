@@ -882,8 +882,7 @@ size_t Parrot_io_buffer_fill(PARROT_INTERP,
 size_t Parrot_io_buffer_flush(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable),
-    INTVAL autoclose)
+    ARGIN(IO_VTABLE *vtable))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
