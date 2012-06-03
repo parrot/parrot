@@ -287,22 +287,26 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 {
     ASSERT_ARGS(Parrot_io_open)
     PMC *handle;
+    IO_VTABLE * vtable;
 
-    if (STRING_IS_NULL(path))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                        "Cannot open filehandle, no path");
-
+    /* If a handle is not provided, create a new FileHandle */
     if (PMC_IS_NULL(pmc))
         handle = io_get_new_filehandle(interp);
     else
         handle = pmc;
+    vtable = IO_GET_VTABLE(interp, handle);
 
+    /* Unless flagged otherwise, a path is required for open */
+    if ((vtable->flags & PIO_VF_PATH_NOT_REQUIRED) == 0 && STRING_IS_NULL(path))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "Cannot open %s, no path", vtable->name);
+
+    /* If not specified, default to read mode */
     if (STRING_IS_NULL(mode))
         mode = CONST_STRING(interp, "r");
 
     {
         const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         INTVAL status = vtable->open(interp, handle, path, flags, mode);
 

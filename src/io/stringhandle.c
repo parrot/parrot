@@ -159,6 +159,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+// TODO: readline and other operations requiring a buffer should be able to be
+// done on the stringhandle memory directly to save cycles. Consider a flag
+// PIO_VF_CUSTOM_BUFFER and new vtables to set up a custom buffer to be used
 void
 io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 {
@@ -166,7 +169,7 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
-    vtable->flags = 0;
+    vtable->flags = PIO_VF_PATH_NOT_REQUIRED;
     vtable->name = "StringHandle";
     vtable->read_b = io_stringhandle_read_b;
     vtable->write_b = io_stringhandle_write_b;
