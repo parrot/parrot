@@ -229,7 +229,11 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
             if (length > 8) {
                 int encoding   = *(long *)&(constant[4]);
                 if (encoding == 0) {
-                    constant = (char *) &(constant[8]);
+                    const unsigned long str_length = length - 9;
+                    char *p = malloc(str_length);
+                    memcpy(p, &constant[8], str_length);
+                    free(constant);
+                    constant = p;
                 }
                 if (constant) {
                     segment->consts[i]   = (uint64_t)constant;
