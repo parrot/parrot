@@ -125,6 +125,7 @@ struct _ParrotIOData {
 
 #define IO_VTABLE_UNIMPLEMENTED(i, v, s) Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, "Method '%s' not implemented for type %s", s, v->name)
 
+#define PIO_UNKNOWN_SIZE (size_t)-1
 
 
 /* HEADERIZER BEGIN: src/io/utilities.c */

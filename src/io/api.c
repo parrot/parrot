@@ -630,12 +630,24 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             "Attempt to read from null or invalid PMC");
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        size_t total_size = vtable->total_size(interp, handle);
+
         const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
-        STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
-        io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
-        return s;
+        size_t total_size = vtable->total_size(interp, handle);
+        if (total_size == PIO_UNKNOWN_SIZE) {
+            IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_FLAGS_ANY);
+            size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
+            STRING * const s = io_get_new_empty_string(interp, encoding, -1, PIO_STRING_BUFFER_MINSIZE);
+            while (available_bytes > 0) {
+                io_read_chars_append_string(interp, s, handle, vtable, read_buffer, available_bytes);
+                available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
+            }
+            return s;
+        } else {
+            IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+            STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
+            io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
+            return s;
+        }
     }
 }
 
@@ -717,7 +729,7 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
 
 /*
 
-=item C<STRING * Parrot_io_readline(PARROT_INTERP, PMC *pmc)>
+=item C<STRING * Parrot_io_readline(PARROT_INTERP, PMC *handle)>
 
 Return a new C<STRING*> holding the next line read from the file. Calls
 the C<readline> method of the filehandle PMC.
@@ -726,6 +738,15 @@ the C<readline> method of the filehandle PMC.
 
 */
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_readline)
+    return Parrot_io_readline_s(interp, handle, '\n');
+}
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -830,6 +851,15 @@ the file, C<1> for the current position, and C<2> for the end.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
+Parrot_io_seek_handle(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
+{
+    ASSERT_ARGS(Parrot_io_seek_handle)
+    return Parrot_io_seek(interp, handle, offset, w);
+}
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T
 Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_seek)
@@ -849,6 +879,15 @@ Returns the current read/write position of C<*pmc>.
 =cut
 
 */
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T
+Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_tell_handle)
+    return Parrot_io_tell(interp, handle);
+}
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

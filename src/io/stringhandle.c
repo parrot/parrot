@@ -191,8 +191,11 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
     STRING *stringhandle;
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    size_t available_bytes = stringhandle->bufused - read_offs;
+    if (byte_length > available_bytes)
+        byte_length = available_bytes;
 
-    memcpy(buffer, stringhandle->_bufstart, byte_length);
+    memcpy(buffer, (char*)stringhandle->_bufstart + read_offs, byte_length);
     SETATTR_StringHandle_read_offset(interp, handle, read_offs + byte_length);
     return byte_length;
 }
@@ -303,7 +306,7 @@ static INTVAL
 io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_close)
-    SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
+    //SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
     SETATTR_StringHandle_read_offset(interp, handle, 0);
     return 1;
 }

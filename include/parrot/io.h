@@ -404,6 +404,14 @@ STRING * Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_io_readline_s(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL terminator)
@@ -429,6 +437,16 @@ STRING * Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_seek(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset,
+    INTVAL w)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T Parrot_io_seek_handle(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T offset,
     INTVAL w)
@@ -523,6 +541,13 @@ PMC * Parrot_io_STDOUT(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -683,6 +708,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_readall_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_readline __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_readline_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -693,6 +721,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_seek_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_socket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -724,6 +755,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_STDOUT __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_tell_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

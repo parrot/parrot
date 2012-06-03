@@ -334,9 +334,7 @@ static size_t
 io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_total_size)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "total_size");
-    return (size_t)0;
+    return PIO_UNKNOWN_SIZE;
 }
 
 static PIOHANDLE
