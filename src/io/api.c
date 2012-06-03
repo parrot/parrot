@@ -309,6 +309,12 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         if (!status)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Unable to open %s from path '%Ss'", vtable->name, path);
+
+        /* If this type uses buffers by default, set them up. */
+        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_READ)
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_WRITE)
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
     }
 
     return handle;
@@ -468,7 +474,7 @@ INTVAL
 Parrot_io_close_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close_handle)
-    return Parrot_io_close(interp, pmc, 1);
+    return Parrot_io_close(interp, pmc, -1);
 }
 
 PARROT_EXPORT
@@ -480,7 +486,9 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         return 0;
     else {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        if (autoflush) {
+        if (autoflush == -1)
+            autoflush == (vtable->flags && PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
+        if (autoflush == 1) {
             IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
             Parrot_io_buffer_flush(interp, write_buffer, handle, vtable, 0);
         }

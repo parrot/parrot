@@ -174,6 +174,7 @@ io_socket_setup_vtable(PARROT_INTERP, ARGIN_NULLOK(IO_VTABLE *vtable), INTVAL id
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
+    vtable->flags = PIO_VF_DEFAULT_BUFFERS | PIO_VF_FLUSH_ON_CLOSE;
     vtable->name = "Socket";
     vtable->read_b = io_socket_read_b;
     vtable->write_b = io_socket_write_b;

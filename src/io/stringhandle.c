@@ -166,6 +166,7 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
+    vtable->flags = 0;
     vtable->name = "StringHandle";
     vtable->read_b = io_stringhandle_read_b;
     vtable->write_b = io_stringhandle_write_b;
@@ -306,7 +307,6 @@ static INTVAL
 io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_close)
-    //SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
     SETATTR_StringHandle_read_offset(interp, handle, 0);
     return 1;
 }

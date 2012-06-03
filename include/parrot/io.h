@@ -51,6 +51,10 @@
 #define PIO_F_ASYNC     01000000        /* Handle is asynchronous       */
 #define PIO_F_BINARY    02000000        /* Open in binary mode          */
 
+/* IO VTABLE Flags */
+#define PIO_VF_DEFAULT_BUFFERS  0x0001  /* This type uses buffers by default */
+#define PIO_VF_FLUSH_ON_CLOSE   0x0002  /* Flush before closing              */
+
 /*
  * pioctl argument constants. These don't have to
  * be unique across io commands.
@@ -138,6 +142,7 @@ typedef const STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle)
 typedef struct _io_vtable {
     const char            * name;
     INTVAL                  number;
+    INTVAL                  flags;
     io_vtable_read_b        read_b;
     io_vtable_write_b       write_b;
     io_vtable_flush         flush;
