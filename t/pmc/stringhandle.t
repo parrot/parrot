@@ -530,6 +530,8 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
     \$P0.'print'(1234567890)
     \$P0.'print'("\\n")
     \$S0 = iso-8859-1:"TÖTSCH"
+    \$I9 = find_encoding "utf8"
+    \$S9 = trans_encoding \$S0, \$I9
     \$P0.'print'(\$S0)
     \$P0.'close'()
 
@@ -537,14 +539,14 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$S1 = \$P0.'readline'()
     if \$S1 == "1234567890\\n" goto ok_1
-print \$S1
+
     print 'not '
   ok_1:
     say 'ok 1 - \$S1 = \$P0.readline() # read with utf8 encoding on'
 
     \$S2 = \$P0.'readline'()
-    if \$S2 == \$S0 goto ok_2
-print \$S2
+    if \$S2 == \$S9 goto ok_2
+
     print 'not '
   ok_2:
     say 'ok 2 - \$S2 = \$P0.readline() # read iso-8859-1 string'

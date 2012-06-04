@@ -226,10 +226,10 @@ static INTVAL
 io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_pipe_seek)
-    UNUSED(offset);
-    UNUSED(whence);
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
+    UNUSED(offset);
+    UNUSED(whence);
     return 0;
 }
 

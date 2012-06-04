@@ -217,6 +217,7 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
     memcpy(new_string->_bufstart, old_string->_bufstart, old_string->bufused);
     memcpy(((char*)new_string->_bufstart) + old_string->bufused, buffer, byte_length);
     new_string->bufused = old_string->bufused + byte_length;
+    STRING_scan(interp, new_string);
 
     SETATTR_StringHandle_stringhandle(interp, handle, new_string);
     return byte_length;
