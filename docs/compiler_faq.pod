@@ -18,7 +18,7 @@ for more information about building Parrot.
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot?
 
-See L<http://www.parrotblog.org/2008/03/targeting-parrot-vm.html>.
+See L<http://parrot.github.com/html/examples/languages/squaak/doc/tutorial_episode_1.pod.html>.
 
 =head2 How do I embed source locations in my code for debugging?
 
