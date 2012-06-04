@@ -4,7 +4,7 @@
 [X] README_cygwin.pod
 [X] compilers/data_json/JSON_README.pod
 [X] compilers/data_json/data_json.pir
-[ ] compilers/imcc/imcc.y
+[X] compilers/imcc/imcc.y
 [ ] compilers/imcc/imcparser.c
 [X] compilers/pct/README.pod
 [X] compilers/pge/PGE.pir
@@ -199,46 +199,46 @@
 [X] examples/tutorial/82_coroutine.pir
 [X] examples/tutorial/83_external_libraries.pir
 [X] examples/tutorial/90_writing_tests.pir
-[ ] runtime/parrot/include/green_threads.pir
-[ ] runtime/parrot/include/hllmacros.pir
-[ ] runtime/parrot/include/test_more.pir
-[ ] runtime/parrot/languages/parrot/parrot.pir
-[ ] runtime/parrot/library/CGI/QueryHash.pir
-[ ] runtime/parrot/library/Config/JSON.pir
-[ ] runtime/parrot/library/HTTP/Daemon.pir
-[ ] runtime/parrot/library/HTTP/Message.pir
-[ ] runtime/parrot/library/JSON.pir
-[ ] runtime/parrot/library/LWP/Protocol.pir
-[ ] runtime/parrot/library/LWP/UserAgent.pir
-[ ] runtime/parrot/library/PGE/Dumper.pir
-[ ] runtime/parrot/library/Range.pir
-[ ] runtime/parrot/library/Stream/Writer.pir
-[ ] runtime/parrot/library/String/Utils.pir
-[ ] runtime/parrot/library/TAP/Formatter.pir
-[ ] runtime/parrot/library/TAP/Harness.pir
-[ ] runtime/parrot/library/TAP/Parser.pir
-[ ] runtime/parrot/library/Test/Builder/Test.pir
-[ ] runtime/parrot/library/URI.pir
-[ ] runtime/parrot/library/distutils.pir
-[ ] runtime/parrot/library/dumper.pir
-[ ] runtime/parrot/library/parrotlib.pir
-[ ] src/alarm.c
-[ ] src/dynpmc/README.pod
-[ ] src/gc/gc_ms2.c
-[ ] src/platform/generic/socket.c
-[ ] src/pmc/callback.pmc
-[ ] src/pointer_array.c
-[ ] src/runcore/subprof.c
-[ ] t/TESTS_STATUS.pod
-[ ] t/codingstd/pccmethod_deps.t
-[ ] t/dynoplibs/time.t
-[ ] t/harness
-[ ] t/op/time.t
-[ ] t/pmc/opcode.t
-[ ] t/pmc/oplib.t
-[ ] t/pmc/task_primes.t
-[ ] tools/dev/merge_pull_request.pl
-[ ] tools/release/cut.pl'
+[X] runtime/parrot/include/green_threads.pir
+[X] runtime/parrot/include/hllmacros.pir
+[X] runtime/parrot/include/test_more.pir
+[X] runtime/parrot/languages/parrot/parrot.pir
+[X] runtime/parrot/library/CGI/QueryHash.pir
+[X] runtime/parrot/library/Config/JSON.pir
+[X] runtime/parrot/library/HTTP/Daemon.pir
+[X] runtime/parrot/library/HTTP/Message.pir
+[X] runtime/parrot/library/JSON.pir
+[X] runtime/parrot/library/LWP/Protocol.pir
+[X] runtime/parrot/library/LWP/UserAgent.pir
+[X] runtime/parrot/library/PGE/Dumper.pir
+[X] runtime/parrot/library/Range.pir
+[X] runtime/parrot/library/Stream/Writer.pir
+[X] runtime/parrot/library/String/Utils.pir
+[X] runtime/parrot/library/TAP/Formatter.pir
+[X] runtime/parrot/library/TAP/Harness.pir
+[X] runtime/parrot/library/TAP/Parser.pir
+[X] runtime/parrot/library/Test/Builder/Test.pir
+[X] runtime/parrot/library/URI.pir
+[X] runtime/parrot/library/distutils.pir
+[X] runtime/parrot/library/dumper.pir
+[X] runtime/parrot/library/parrotlib.pir
+[X] src/alarm.c
+[X] src/dynpmc/README.pod
+[X] src/gc/gc_ms2.c
+[X] src/platform/generic/socket.c
+[X] src/pmc/callback.pmc
+[X] src/pointer_array.c
+[X] src/runcore/subprof.c
+[X] t/TESTS_STATUS.pod
+[X] t/codingstd/pccmethod_deps.t
+[X] t/dynoplibs/time.t
+[X] t/harness
+[X] t/op/time.t
+[X] t/pmc/opcode.t
+[X] t/pmc/oplib.t
+[X] t/pmc/task_primes.t
+[X] tools/dev/merge_pull_request.pl
+[X] tools/release/cut.pl'
 
 ----------
 [*] A '[X]' denotes a corrected file. That is, a file which, now, contains
