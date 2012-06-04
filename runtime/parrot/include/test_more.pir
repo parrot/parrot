@@ -1,15 +1,19 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
+
+=head1 DESCRIPTION
+
+This file contains all the boilerplate code for starting off a test written in
+PIR using Test::More's subs.
 
 =head1 Purpose
 
-This file contains all the boilerplate code for starting off a test written in PIR using
-Test::More's subs. In order to use it, simply include it in the :main routine of your test script.
+In order to use it, simply include it in the :main routine of your test script.
 
 Imports several subs into the current namespace from Test::More.
 
-This is intended to be broadly usable. Feel free to use Test::More
-directly, of course, but this provides a handy shortcut for setting up
-simple test file written in parrot.
+This is intended to be broadly usable. Feel free to use Test::More directly,
+of course, but this provides a handy shortcut for setting up simple test file
+written in parrot.
 
 =cut
 
