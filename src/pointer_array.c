@@ -7,6 +7,8 @@ src/pointer_array.c - Implementation Pointer Array storage.
 
 =head1 DESCRIPTION
 
+This compilation unit implements pointer array storage.
+
 =cut
 
 */
