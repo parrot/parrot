@@ -1,3 +1,15 @@
+=pod
+
+=head1 NAME
+
+compilers/imcc/imcc.y - Intermediate Code Compiler for Parrot.
+
+=head1 DESCRIPTION
+
+This file contains the grammar of the PIR language parser.
+
+=cut
+
 %{
 /*
  * imcc.y
