@@ -72,12 +72,6 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#define BUFFER_IS_EMPTY(b) (b->buffer_start == b->buffer_end)
-#define BUFFER_IS_FULL(b)  ((size_t)(b->buffer_end - b->buffer_start) == b->buffer_size)
-#define BUFFER_USED_SIZE(b) ((size_t)(b->buffer_end - b->buffer_start))
-#define BUFFER_AVAILABLE_SIZE(b) (b->buffer_size - ((size_t)(b->buffer_end - b->buffer_start)))
-#define BUFFER_CAN_BE_NORMALIZED(b) ((size_t)(b->buffer_start - b->buffer_ptr) > (b->buffer_size / 2))
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *

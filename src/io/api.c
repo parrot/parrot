@@ -884,6 +884,23 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
     if (Parrot_io_is_closed(interp, handle))
         return -1;
 
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+
+        /* If we have a write buffer, flush that out to disk before we attempt
+           to do any seek operation. We need the data there before we can
+           seek. */
+        if (write_buffer)
+            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+
+        /* If we have a read_buffer, we can try to seek inside the buffer.
+           maybe we can avoid touching the disk at all. */
+        if (read_buffer) {
+            if (
+        }
+
     // TODO: This
     return Parrot_io_seek_buffer(interp, handle, offset, w);
 }
@@ -915,11 +932,14 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
     ASSERT_ARGS(Parrot_io_tell)
     if (Parrot_io_is_closed(interp, handle))
         return -1;
-
-    // TODO: This
-    //return Parrot_io_get_file_position(interp, handle);
-    return 0;
-    /* return PIO_TELL(interp, os_handle); */
+    {
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        /* TODO: We may have data in the read buffer, so this might not be
+           accurate. However, this is what the old system was doing so we
+           can stick with the same semantic until we come up with something
+           more sane. */
+        return vtable->tell(interp, handle);
+    }
 }
 
 /*

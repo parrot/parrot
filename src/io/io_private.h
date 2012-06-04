@@ -123,9 +123,22 @@ struct _ParrotIOData {
 #define _PIO_STDOUT(i)  ((i)->piodata->table[PIO_STDOUT_FILENO])
 #define _PIO_STDERR(i)  ((i)->piodata->table[PIO_STDERR_FILENO])
 
-#define IO_VTABLE_UNIMPLEMENTED(i, v, s) Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, "Method '%s' not implemented for type %s", s, v->name)
+/* Throw an exception if this vtable is not implemented. */
+#define IO_VTABLE_UNIMPLEMENTED(i, v, s) do { \
+        Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, \
+            "Method '%s' not implemented for type %s", s, v->name); \
+    } while(0)
 
+/* Return value from IO_VTABLE->total_size if the total size of the stream
+   cannot be determined ahead of time */
 #define PIO_UNKNOWN_SIZE (size_t)-1
+
+/* Buffer Macros */
+#define BUFFER_IS_EMPTY(b) (b->buffer_start == b->buffer_end)
+#define BUFFER_IS_FULL(b)  ((size_t)(b->buffer_end - b->buffer_start) == b->buffer_size)
+#define BUFFER_USED_SIZE(b) ((size_t)(b->buffer_end - b->buffer_start))
+#define BUFFER_AVAILABLE_SIZE(b) (b->buffer_size - ((size_t)(b->buffer_end - b->buffer_start)))
+#define BUFFER_CAN_BE_NORMALIZED(b) ((size_t)(b->buffer_start - b->buffer_ptr) > (b->buffer_size / 2))
 
 
 /* HEADERIZER BEGIN: src/io/utilities.c */
