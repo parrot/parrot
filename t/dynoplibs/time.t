@@ -5,6 +5,10 @@
 
 t/dynoplibs/time.t - Time Dynops
 
+=head1 DESCRIPTION
+
+This PIR code implements time dynops.
+
 =cut
 
 .loadlib 'sys_ops'

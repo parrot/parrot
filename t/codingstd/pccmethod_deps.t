@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -8,6 +8,10 @@ use File::Glob;
 use File::Spec;
 
 use Test::More;
+
+=head1 DESCRIPTION
+
+This script checks pccmethod dependencies.
 
 =head1 BUGS
 
