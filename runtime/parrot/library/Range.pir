@@ -1,6 +1,6 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Range
+=head1 DESCRIPTION
 
 Based on the Range object described in S03:
 L<http://perlcabal.org/syn/S03.html#Range_semantics>

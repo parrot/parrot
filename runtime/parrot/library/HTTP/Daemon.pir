@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -14,9 +14,9 @@ HTTP;Daemon - A Simple HTTPD Server
   unless d goto err
   d.'run'()
 
-=head1 TODO
+=head1 DESCRIPTION
 
-A lot. The code is by now just an objectified version of httpd.pir.
+The code is by now just an objectified version of httpd.pir.
 
 =head1 SEE ALSO
 
