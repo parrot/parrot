@@ -62,7 +62,14 @@ static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%d", (unsigned int)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%ld", (unsigned int)frame->registers[ ops[2] ] );
+}
+
+static void
+m0_op_print_n( M0_CallFrame *frame, const unsigned char *ops )
+{
+    /* note the lack of filehandle selection (ops[1]) for output */
+    fprintf( stdout, "%.15g", (unsigned long)frame->registers[ ops[2] ] );
 }
 
 static void
@@ -384,6 +391,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
 
                 case (M0_PRINT_I):
                     M0_EXEC_OP(print_i, cf, ops, pc);
+                break;
+
+                case (M0_PRINT_N):
+                    M0_EXEC_OP(print_n, cf, ops, pc);
                 break;
 
                 case (M0_NOOP):

@@ -241,7 +241,8 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
                 }
             } else {
                 if (constant)
-                    segment->consts[i] = *(uint64_t*)constant;
+                    segment->consts[i] = *(uint64_t *)constant;
+                    free((void *)constant);
             }
 
         }
