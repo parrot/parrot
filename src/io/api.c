@@ -314,11 +314,15 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Unable to open %s from path '%Ss'", vtable->name, path);
 
-        /* If this type uses buffers by default, set them up. */
-        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_READ)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
-        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_WRITE)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        /* If this type uses buffers by default, set them up, and if we're
+           in an acceptable mode, set up buffers. */
+        if ((flags & (PIO_F_READ | PIO_F_WRITE)) != (PIO_F_READ | PIO_F_WRITE) &&
+            (vtable->flags & PIO_VF_DEFAULT_BUFFERS)) {
+            if (flags & PIO_F_READ)
+                Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+            if (flags & PIO_F_WRITE)
+                Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        }
     }
 
     return handle;

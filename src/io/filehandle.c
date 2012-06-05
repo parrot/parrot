@@ -244,11 +244,11 @@ io_filehandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w
     ASSERT_ARGS(io_filehandle_seek)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
-    offset = Parrot_io_internal_seek(interp, os_handle, offset, whence);
+    INTVAL status = Parrot_io_internal_seek(interp, os_handle, offset, whence);
     attrs->flags &= ~PIO_F_EOF;
     attrs->last_pos = attrs->file_pos;
     attrs->file_pos = offset;
-    return offset;
+    return status;
 }
 
 static INTVAL

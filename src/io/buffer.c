@@ -525,6 +525,7 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     ASSERT_ARGS(Parrot_io_buffer_seek)
 
     /* TODO: Try to seek inside the read buffer */
+    offset -= BUFFER_USED_SIZE(buffer);
     Parrot_io_buffer_clear(interp, buffer);
     return vtable->seek(interp, handle, offset, w);
 }
