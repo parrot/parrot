@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -73,8 +73,8 @@ t/codingstd/pod_description.t - Identify files lacking 'DESCRIPTION' in POD
     # test specific files
     % perl t/codingstd/pod_description.t perl_module.pm perl_file.pl
 
-    # test and obtain a list of those files which fail test
-    % perl t/codingstd/pod_description.t
+    # test and obtain a list of those files which fail to pass the test
+    % prove -v t/codingstd/pod_description.t
 
 =head1 DESCRIPTION
 
