@@ -156,7 +156,6 @@ sub _init {
     # gcc-only warnings that would break g++
     my @gcc_basic = qw(
         -Wc++-compat
-        -Werror=declaration-after-statement
         -Werror=implicit-function-declaration
         -Wmissing-prototypes
         -Werror=nested-externs
