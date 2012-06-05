@@ -4,7 +4,7 @@
 
 docs/parrotbyte.pod - The Parrot Bytecode (PBC) Format
 
-=head1 DESCRIPTON
+=head1 DESCRIPTION
 
 This document describes the Parrot bytecode format.
 
