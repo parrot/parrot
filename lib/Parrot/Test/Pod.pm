@@ -130,7 +130,7 @@ our %second_analysis_subs = (
 
 B<Purpose:>  Parrot::Test::Pod constructor.
 
-B<Arguments:>  Hash reference holding, at a minimum, one elemente keyed by
+B<Arguments:>  Hash reference holding, at a minimum, one element keyed by
 C<argv>, whose value is typically a reference to C<@ARGV>.
 
 B<Return Value:>  Parrot::Test::Pod object.
