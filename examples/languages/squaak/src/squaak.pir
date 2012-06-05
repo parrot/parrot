@@ -4,7 +4,7 @@
 
 squaak.pir - A Squaak compiler.
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This is the base file for the Squaak compiler.
 
