@@ -7,6 +7,19 @@
  * Any changes made here will be lost!
  *
  */
+
+=pod
+
+=head1 NAME
+
+compilers/imcc/imcparser.c - Intermediate Code Compiler for Parrot.
+
+=head1 DESCRIPTION
+
+This file contains the grammar of the PIR language parser.
+
+=cut
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
 /* A Bison parser, made by GNU Bison 2.5.  */
@@ -6031,4 +6044,3 @@ int yyerror(void *yyscanner, ARGMOD(imc_info_t *imcc), const char *s)
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
  */
-
