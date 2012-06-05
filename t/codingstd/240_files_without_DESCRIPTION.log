@@ -5,7 +5,7 @@
 [X] compilers/data_json/JSON_README.pod
 [X] compilers/data_json/data_json.pir
 [X] compilers/imcc/imcc.y
-[ ] compilers/imcc/imcparser.c
+[X] compilers/imcc/imcparser.c
 [X] compilers/pct/README.pod
 [X] compilers/pge/PGE.pir
 [X] compilers/pge/PGE/Exp.pir
