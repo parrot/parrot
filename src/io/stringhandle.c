@@ -159,13 +159,14 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-// TODO: readline and other operations requiring a buffer should be able to be
-// done on the stringhandle memory directly to save cycles. Consider a flag
-// PIO_VF_CUSTOM_BUFFER and new vtables to set up a custom buffer to be used
+
 void
 io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 {
     ASSERT_ARGS(io_stringhandle_setup_vtable)
+    // TODO: readline and other operations requiring a buffer should be able to be
+    // done on the stringhandle memory directly to save cycles. Consider a flag
+    // PIO_VF_CUSTOM_BUFFER and new vtables to set up a custom buffer to be used
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
@@ -259,16 +260,16 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL
     STRING *stringhandle;
     INTVAL read_offs = 0;
     switch (whence) {
-        case 0:
+        case SEEK_SET:
             /* Absolute seek, start from the beginning of the string */
             read_offs = (INTVAL)offset;
             break;
-        case 1:
+        case SEEK_CUR:
             /* Relative seek from the current offset */
             GETATTR_StringHandle_read_offset(interp, handle, old_offs);
             read_offs = (INTVAL)offset + old_offs;
             break;
-        case 2:
+        case SEEK_END:
             /* Absolute seek backwards from the end of the buffer */
             GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
             read_offs = (INTVAL)(stringhandle->bufused - (size_t)offset);

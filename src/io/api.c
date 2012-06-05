@@ -889,20 +889,24 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
+        if (w == SEEK_CUR) {
+            PIOOFF_T file_pos = vtable->tell(interp, handle);
+            /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
+            offset += file_pos;
+            w  = SEEK_SET;
+        }
+
         /* If we have a write buffer, flush that out to disk before we attempt
            to do any seek operation. We need the data there before we can
            seek. */
         if (write_buffer)
             Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
 
-        /* If we have a read_buffer, we can try to seek inside the buffer.
-           maybe we can avoid touching the disk at all. */
-        if (read_buffer) {
-            if (
-        }
+        if (read_buffer && w != SEEK_END)
+            return Parrot_io_buffer_seek(interp, read_buffer, handle, vtable, offset, w);
 
-    // TODO: This
-    return Parrot_io_seek_buffer(interp, handle, offset, w);
+        return vtable->seek(interp, handle, offset, w);
+    }
 }
 
 /*

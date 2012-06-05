@@ -453,7 +453,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         INTVAL delim)
 {
-    ASSERT_ARGS(io_buffer_find_string_marker);
+    ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
     if (BUFFER_IS_EMPTY(buffer)) {
@@ -517,67 +517,16 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     return bounds->bytes - bytes_needed;
 }
 
-/* ROUTINES TO EITHER BE CONVERTED, SALVAGED OR CANNIBALIZED
-    These routines are the parts of the old system that are worth keeping,
-    for now. We need to up-convert these to the new architecture.
-*/
-
-/*
-
-=item C<PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP, PMC *filehandle, PIOOFF_T
-offset, INTVAL whence)>
-
-The buffer layer's C<Seek> function.
-
-=cut
-
-*/
-
 PIOOFF_T
-Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
-        PIOOFF_T offset, INTVAL whence)
+Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
+        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), PIOOFF_T offset,
+        INTVAL w)
 {
-    ASSERT_ARGS(Parrot_io_seek_buffer)
-    /* TODO */
-    const INTVAL   buffer_flags = 0; /* Parrot_io_get_buffer_flags(interp, filehandle); */
-    const PIOOFF_T file_pos     = 0; /* Parrot_io_get_file_position(interp, filehandle); */
-    PIOHANDLE os_handle;
+    ASSERT_ARGS(Parrot_io_buffer_seek)
 
-    if (whence == SEEK_CUR) {
-        /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
-        offset += file_pos;
-        whence  = SEEK_SET;
-    }
-
-    if (/* buffer_flags & PIO_BF_READBUF && */ whence != SEEK_END) {
-        /* Try to seek inside the read buffer */
-
-        unsigned char * const buffer_start /* = Parrot_io_get_buffer_start(interp, filehandle) */;
-        unsigned char *       buffer_next  /* = Parrot_io_get_buffer_next(interp, filehandle) */;
-        unsigned char * const buffer_end   /* = Parrot_io_get_buffer_end(interp, filehandle) */;
-
-        if (offset >= file_pos - (buffer_next - buffer_start)
-        &&  offset <  file_pos + (buffer_end  - buffer_next)) {
-            buffer_next += offset - file_pos;
-            /*Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
-            Parrot_io_set_file_position(interp, filehandle, offset);*/
-
-            return offset;
-        }
-    }
-
-    /* Parrot_io_buffer_flush(interp, filehandle); */
-
-    GETATTR_Handle_os_handle(interp, filehandle, os_handle);
-    offset = Parrot_io_internal_seek(interp, os_handle, offset, whence);
-
-    /* Seek clears EOF */
-    Parrot_io_set_flags(interp, filehandle,
-            (Parrot_io_get_flags(interp, filehandle) & ~PIO_F_EOF));
-
-    /*Parrot_io_set_file_position(interp, filehandle, offset);*/
-
-    return offset;
+    /* TODO: Try to seek inside the read buffer */
+    Parrot_io_buffer_clear(interp, buffer);
+    return vtable->seek(interp, handle, offset, w);
 }
 
 /*

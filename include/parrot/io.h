@@ -928,6 +928,19 @@ size_t Parrot_io_buffer_resize(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
+PIOOFF_T Parrot_io_buffer_seek(PARROT_INTERP,
+    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    PIOOFF_T offset,
+    INTVAL w)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*buffer)
+        FUNC_MODIFIES(*handle);
+
 size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
@@ -940,14 +953,6 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*buffer)
         FUNC_MODIFIES(* handle);
-
-PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    PIOOFF_T offset,
-    INTVAL whence)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
 
 #define ASSERT_ARGS_io_buffer_find_num_characters __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -998,14 +1003,16 @@ PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_buffer_resize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_Parrot_io_buffer_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_Parrot_io_seek_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(filehandle))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/buffer.c */
 
