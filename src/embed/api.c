@@ -550,6 +550,9 @@ Parrot_api_get_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
     ASSERT_ARGS(Parrot_api_get_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
     *compiler = Parrot_interp_get_compiler(interp, type);
+    if (PMC_IS_NULL(*compiler))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot find compiler '%Ss'", type);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
