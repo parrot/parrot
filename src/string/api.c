@@ -124,7 +124,6 @@ void
 Parrot_str_init(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_str_init)
-    Hash        *const_cstring_hash;
     size_t       i;
     const size_t n_parrot_cstrings =
         sizeof (parrot_cstrings) / sizeof (parrot_cstrings[0]);
@@ -147,10 +146,8 @@ Parrot_str_init(PARROT_INTERP)
     }
 
     /* Set up the cstring cache, then load the basic encodings */
-    const_cstring_hash          = Parrot_hash_create_sized(interp,
-                                        enum_type_PMC,
-                                        Hash_key_type_cstring,
-                                        n_parrot_cstrings);
+    Hash * const const_cstring_hash = Parrot_hash_create_sized(interp,
+            enum_type_PMC, Hash_key_type_cstring, n_parrot_cstrings);
     interp->const_cstring_hash  = const_cstring_hash;
     Parrot_encodings_init(interp);
 
@@ -344,14 +341,12 @@ STRING *
 Parrot_str_clone(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_clone)
-    size_t  alloc_size;
-    STRING *result;
 
     if (STRING_IS_NULL(s))
         return STRINGNULL;
 
-    result     = Parrot_gc_new_string_header(interp, 0);
-    alloc_size = s->bufused;
+    STRING * const result = Parrot_gc_new_string_header(interp, 0);
+    const size_t alloc_size = s->bufused;
 
     if (alloc_size) {
         /* Allocate new chunk of memory */
@@ -387,13 +382,11 @@ STRING *
 Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_copy)
-    STRING *d;
-    int     is_movable;
 
     if (STRING_IS_NULL(s))
         return STRINGNULL;
 
-    d = Parrot_gc_new_string_header(interp,
+    STRING * const d = Parrot_gc_new_string_header(interp,
         PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
 
     /* This might set the constant flag again but it is the right thing
@@ -413,7 +406,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     /* Set the string copy flag */
     PObj_is_string_copy_SET(d);
 
-    is_movable = PObj_is_movable_TESTALL(s);
+    int is_movable = PObj_is_movable_TESTALL(s);
 
     /* Now check that buffer allocated from pool and affected by compacting */
     if (is_movable && Buffer_bufstart(s)) {
@@ -449,9 +442,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
             ARGIN_NULLOK(const STRING *b))
 {
     ASSERT_ARGS(Parrot_str_concat)
-    const STR_VTABLE *enc;
     STRING           *dest;
-    UINTVAL           total_length;
 
     if (STRING_IS_NULL(a) && STRING_IS_NULL(b))
         return STRINGNULL;
@@ -470,7 +461,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
     ASSERT_STRING_SANITY(a);
     ASSERT_STRING_SANITY(b);
 
-    enc = string_rep_compatible(a, b);
+    const STR_VTABLE * enc = string_rep_compatible(a, b);
 
     if (!enc) {
         /* upgrade strings for concatenation */
@@ -489,7 +480,7 @@ Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(const STRING *a),
         b = enc->to_encoding(interp, b);
     }
     /* calc usable and total bytes */
-    total_length = a->bufused + b->bufused;
+    UINTVAL total_length = a->bufused + b->bufused;
 
     if (PObj_is_growable_TESTALL(a)
     &&  a->strstart + total_length <=
@@ -819,7 +810,6 @@ Parrot_str_extract_chars(PARROT_INTERP, ARGIN(const char *buffer),
 {
     ASSERT_ARGS(Parrot_str_extract_chars)
     Parrot_String_Bounds  bounds;
-    STRING               *result;
 
     bounds.bytes = len;
     bounds.chars = chars;
@@ -832,7 +822,7 @@ Parrot_str_extract_chars(PARROT_INTERP, ARGIN(const char *buffer),
                 EXCEPTION_OUT_OF_BOUNDS,
                 "extract_chars: index out of bounds");
 
-    result = Parrot_str_new_noinit(interp, bounds.bytes);
+    STRING * const result = Parrot_str_new_noinit(interp, bounds.bytes);
 
     result->encoding = encoding;
     result->bufused  = bounds.bytes;
@@ -1166,7 +1156,6 @@ Parrot_str_iter_index(PARROT_INTERP,
     ASSERT_ARGS(Parrot_str_iter_index)
     String_iter search_iter, search_start, next_start;
     const UINTVAL len = search->strlen;
-    UINTVAL c0;
 
     if (len == 0) {
         *end = *start;
@@ -1174,7 +1163,7 @@ Parrot_str_iter_index(PARROT_INTERP,
     }
 
     STRING_ITER_INIT(interp, &search_iter);
-    c0 = STRING_iter_get_and_advance(interp, search, &search_iter);
+    UINTVAL c0 = STRING_iter_get_and_advance(interp, search, &search_iter);
     search_start = search_iter;
     next_start = *start;
 
@@ -1237,12 +1226,8 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     ASSERT_ARGS(Parrot_str_replace)
     String_iter       iter;
     const STR_VTABLE *enc;
-    STRING           *dest        = NULL;
     UINTVAL           true_offset = (UINTVAL)offset;
     UINTVAL           true_length = (UINTVAL)length;
-
-    UINTVAL         start_byte, end_byte, start_char, end_char;
-    INTVAL          buf_size;
 
     if (STRING_IS_NULL(src)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
@@ -1286,12 +1271,12 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     STRING_ITER_INIT(interp, &iter);
 
     STRING_iter_skip(interp, src, &iter, true_offset);
-    start_byte = iter.bytepos;
-    start_char = iter.charpos;
+    const UINTVAL start_byte = iter.bytepos;
+    const UINTVAL start_char = iter.charpos;
 
     STRING_iter_skip(interp, src, &iter, true_length);
-    end_byte   = iter.bytepos;
-    end_char   = iter.charpos;
+    const UINTVAL end_byte   = iter.bytepos;
+    const UINTVAL end_char   = iter.charpos;
 
     /* not possible.... */
     if (end_byte < start_byte)
@@ -1300,7 +1285,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
             "replace: subend somehow is less than substart");
 
     /* Now do the replacement */
-    dest = Parrot_gc_new_string_header(interp, 0);
+    STRING * const dest = Parrot_gc_new_string_header(interp, 0);
 
     /* Set encoding to compatible */
     dest->encoding = enc;
@@ -1310,7 +1295,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
                          | PObj_is_COWable_FLAG;
 
             /* size            removed bytes            added bytes */
-    buf_size = src->bufused - (end_byte - start_byte) + rep->bufused;
+    const INTVAL buf_size = src->bufused - (end_byte - start_byte) + rep->bufused;
 
     /* Alloctate new string size. */
     Parrot_gc_allocate_string_storage(interp, dest, buf_size);
