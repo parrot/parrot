@@ -120,12 +120,10 @@ sub _init {
         -Wformat-nonliteral
         -Wformat-security
         -Wformat-y2k
-        -Wimplicit
         -Wimport
         -Winit-self
         -Winline
         -Winvalid-pch
-        -Wjump-misses-init
         -Wlogical-op
         -Werror=missing-braces
         -Wmissing-declarations
@@ -136,7 +134,6 @@ sub _init {
         -Wpacked
         -Wparentheses
         -Wpointer-arith
-        -Wpointer-sign
         -Wreturn-type
         -Wsequence-point
         -Wsign-compare
@@ -153,7 +150,7 @@ sub _init {
         -Wstack-usage=500
     );
 
-    # gcc-only warnings that would break g++
+    # gcc-only warnings that would break or cause spurious warnings g++
     my @gcc_basic = qw(
         -Wc++-compat
         -Werror=implicit-function-declaration
@@ -161,6 +158,9 @@ sub _init {
         -Werror=nested-externs
         -Werror=old-style-definition
         -Werror=strict-prototypes
+        -Wimplicit
+        -Wjump-misses-init
+        -Wpointer-sign
     );
 
     $gcc->{'basic'} = [ @gcc_or_gpp_basic, @gcc_basic ];
