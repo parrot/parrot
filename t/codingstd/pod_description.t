@@ -73,6 +73,9 @@ t/codingstd/pod_description.t - Identify files lacking 'DESCRIPTION' in POD
     # test specific files
     % perl t/codingstd/pod_description.t perl_module.pm perl_file.pl
 
+    # test and obtain a list of those files which fail test
+    % perl t/codingstd/pod_description.t
+
 =head1 DESCRIPTION
 
 Tests the Pod syntax for all files listed in F<MANIFEST> and
