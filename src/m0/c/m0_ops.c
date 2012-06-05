@@ -62,14 +62,14 @@ static void
 m0_op_print_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%ld", (unsigned int)frame->registers[ ops[2] ] );
+    fprintf( stdout, "%ld", (unsigned long)frame->registers[ ops[2] ] );
 }
 
 static void
 m0_op_print_n( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%f", *(double*)&frame->registers[ ops[2] ] );
+    fprintf( stdout, "%.15g", *(double*)&frame->registers[ ops[2] ] );
 }
 
 static void
