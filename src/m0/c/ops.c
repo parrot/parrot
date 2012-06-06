@@ -189,6 +189,15 @@ m0_op_mult_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_div_i( M0_CallFrame *frame, const unsigned char *ops )
 {
+    int r2 = *(int*)&frame->registers[ops[2]];
+    int r3 = *(int*)&frame->registers[ops[3]];
+    int *result = (int*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
+}
+
+static void
+m0_op_divu_i( M0_CallFrame *frame, const unsigned char *ops )
+{
     unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
     unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
     unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
@@ -206,6 +215,15 @@ m0_op_div_n( M0_CallFrame *frame, const unsigned char *ops )
 
 static void
 m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    int r2 = *(int*)&frame->registers[ops[2]];
+    int r3 = *(int*)&frame->registers[ops[3]];
+    int *result = (int*) &(frame->registers[ops[1]]);
+    *result = r2 % r3;
+}
+
+static void
+m0_op_modu_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
     unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
