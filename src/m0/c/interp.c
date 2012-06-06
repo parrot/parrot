@@ -1,5 +1,6 @@
 #include "m0.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +29,22 @@ m0_chunk_free_metadata( M0_Metadata_Segment *metadata );
 void
 m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode );
 
+static M0_String *string_from_cstring(const char *cstring, int32_t encoding)
+{
+    size_t size = strlen(cstring) + 1;
+    if(size > (uint32_t)-1)
+        return NULL;
+
+    M0_String *string = malloc(sizeof *string + size);
+    if(!string) return NULL;
+
+    string->size = (uint32_t)size;
+    string->encoding = encoding;
+    memcpy(string->bytes, cstring, size);
+
+    return string;
+}
+
 int
 main( int argc, const char *argv[]) {
     M0_Interp *interp = new_interp();
@@ -42,15 +59,10 @@ main( int argc, const char *argv[]) {
 
     // encode cli arguments as M0 strings, skipping the first (name of the interp)
     for (i = 1; i < argc; i++) {
-        const char *arg = argv[i];
-        uint32_t    m0_arg_const_len = strlen(arg) + 4 + 4 + 1; // byte count + encoding + string bytes + terminal null
-        uint32_t    m0_arg_len       = strlen(arg) + 1;
-        uint32_t    m0_arg_encoding  = 0;
-        char       *m0_arg_const     = (char*) malloc(m0_arg_const_len * sizeof(char));
-        memcpy(&(m0_arg_const[0]), &m0_arg_len, sizeof(uint32_t));
-        memcpy(&(m0_arg_const[4]), &m0_arg_encoding, sizeof(uint32_t));
-        memcpy(&(m0_arg_const[8]), arg, m0_arg_len * sizeof(char));
-        interp_argv[i-1] = m0_arg_const;
+        M0_String *arg_string = string_from_cstring(argv[i], M0_ENC_UNKNOWN);
+        // FIXME: proper error handling
+        assert(arg_string);
+        interp_argv[i-1] = arg_string;
     }
     (*interp)[ARGV] = interp_argv;
 

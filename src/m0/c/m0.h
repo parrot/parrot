@@ -151,6 +151,19 @@ typedef struct M0_Chunk {
     M0_Bytecode_Segment  *bytecode;
 } M0_Chunk;
 
+enum M0_ENCODING {
+    M0_ENC_UNKNOWN  = -1,
+    M0_ENC_SPECIAL = 0,
+    M0_ENC_UTF8 = 1
+};
+
+typedef struct m0_string_ M0_String;
+struct m0_string_ {
+    uint32_t size;
+    int32_t encoding;
+    uint8_t bytes[];
+};
+
 int run_ops( M0_Interp *interp, M0_CallFrame *cf );
 int load_mob_file( M0_Interp *interp, const char *filename );
 
