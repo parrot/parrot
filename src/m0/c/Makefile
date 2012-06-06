@@ -1,4 +1,4 @@
-CFLAGS := -std=c99 -pedantic -Wall -Wextra
+CFLAGS := -std=c99 -pedantic -Wall -Wextra -Wpadded
 
 all: m0 m0-debug
 
