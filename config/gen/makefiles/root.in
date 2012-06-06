@@ -2281,36 +2281,11 @@ manifest_tests :
 examples_tests : test_prep
 	$(PERL) t/harness $(EXAMPLES_TEST_FILES)
 
+m0 :
+	$(MAKE) -C src/m0/c m0
 
-src/m0/c/include/m0_constants.h:
-
-src/m0/c/include/m0_compiler_defines.h:
-
-src/m0/c/include/m0_mob_structures.h:
-
-src/m0/c/include/m0.h: src/m0/c/include/m0_constants.h src/m0/c/include/m0_compiler_defines.h \
-	          src/m0/c/include/m0_interp.h src/m0/c/include/m0_mob.h
-
-src/m0/c/include/m0_interp.h: src/m0/c/include/m0_interp_structures.h
-
-src/m0/c/include/m0_interp_structures.h: src/m0/c/include/m0_mob_structures.h
-
-src/m0/c/include/m0_mob.h: src/m0/c/include/m0_interp_structures.h src/m0/c/include/m0_mob_structures.h
-
-src/m0/c/include/m0_ops.h: src/m0/c/include/m0_interp_structures.h
-
-src/m0/c/m0_interp.c: src/m0/c/include/m0.h src/m0/c/include/m0_mob.h src/m0/c/include/m0_constants.h \
-   			 src/m0/c/include/m0_compiler_defines.h
-
-src/m0/c/m0_mob.c: src/m0/c/include/m0_mob.h src/m0/c/include/m0_constants.h src/m0/c/include/m0_compiler_defines.h
-
-src/m0/c/m0_ops.c: src/m0/c/include/m0_ops.h src/m0/c/include/m0_mob_structures.h
-
-m0 : src/m0/c/include/m0.h src/m0/c/m0_interp.c src/m0/c/m0_mob.c src/m0/c/m0_ops.c
-	$(CC) -O3 -W -Wall -g -Iinclude -o src/m0/c/m0 src/m0/c/m0_mob.c src/m0/c/m0_interp.c src/m0/c/m0_ops.c
-
-m0_debug : src/m0/c/include/m0.h src/m0/c/m0_interp.c src/m0/c/m0_mob.c src/m0/c/m0_ops.c
-	$(CC) -O0 -W -Wall -g -Iinclude -o src/m0/c/m0-debug src/m0/c/m0_mob.c src/m0/c/m0_interp.c src/m0/c/m0_ops.c
+m0_debug :
+	$(MAKE) -C src/m0/c m0-debug
 
 m0_tests :
 	$(PERL) t/harness $(M0_TEST_FILES)
