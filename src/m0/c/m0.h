@@ -1,13 +1,8 @@
 #ifndef M0_H_
 #define M0_H_
 
+#include <stdbool.h>
 #include <stdint.h>
-
-# ifdef __clang__
-# define UNUSED(a) (void)(a);
-# else
-# define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
-# endif
 
 enum m0_segment_ {
     M0_DIR_SEG   = 0x01,
@@ -171,7 +166,26 @@ struct m0_string_ {
 };
 
 int run_ops( M0_Interp *interp, M0_CallFrame *cf );
-int load_mob_file( M0_Interp *interp, const char *filename );
+
+int m0_mob_load_file( M0_Interp *interp, const char *filename );
+
+M0_Interp *new_interp( void );
+
+void interp_free( M0_Interp *interp );
+
+bool m0_interp_parse_cargs( M0_Interp *interp, int argc, char *argv[] );
+
+M0_CallFrame *new_call_frame( M0_Interp *interp );
+
+void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
+
+#ifdef M0_SOURCE
+# ifdef __clang__
+# define UNUSED(a) (void)(a);
+# else
+# define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
+# endif
+#endif
 
 #endif
 

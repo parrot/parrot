@@ -1,21 +1,10 @@
+#define M0_SOURCE
 #include "m0.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static M0_Interp *
-new_interp();
-
-static M0_CallFrame *
-new_call_frame( M0_Interp *interp );
-
-static void
-call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
-
-static void
-interp_free( M0_Interp *interp );
 
 static void
 m0_chunk_free( M0_Chunk *chunk );
@@ -45,48 +34,6 @@ static M0_String *string_from_cstring(const char *cstring, int32_t encoding)
     return string;
 }
 
-int
-main( int argc, const char *argv[]) {
-    M0_Interp *interp = new_interp();
-    int        i;
-    uint64_t*     interp_argv;
-
-    if (!interp)
-        exit(1);
-
-    (*interp)[ARGC] = argc - 1;
-    interp_argv = (uint64_t*) malloc((argc-1) * sizeof(uint64_t));
-
-    // encode cli arguments as M0 strings, skipping the first (name of the interp)
-    for (i = 1; i < argc; i++) {
-        M0_String *arg_string = string_from_cstring(argv[i], M0_ENC_UNKNOWN);
-        // FIXME: proper error handling
-        assert(arg_string);
-        interp_argv[i-1] = arg_string;
-    }
-    (*interp)[ARGV] = interp_argv;
-
-    if (argc < 2) {
-        fprintf( stderr, "Usage: m0 <filename.mob>\n" );
-        interp_free( interp );
-        exit(1);
-    }
-
-    if (!load_mob_file( interp, argv[1] )) {
-        fprintf( stderr, "Could not load m0b file: '%s'\n", argv[1] );
-        interp_free( interp );
-        exit( 1 );
-    }
-    else {
-        M0_CallFrame *cf = new_call_frame( interp );
-        run_ops( interp, cf );
-
-        call_frame_free( interp, cf );
-        interp_free( interp );
-
-        exit( 0 );
-    }
-}
 
 M0_Interp *
 new_interp() {
@@ -187,6 +134,40 @@ m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode )
         free( bytecode->ops );
 
     free( bytecode );
+}
+
+bool
+m0_interp_parse_cargs( M0_Interp *interp, int argc, char **argv )
+{
+    assert(argc > 0);
+
+    // skip first arg (executable name)
+    --argc, ++argv;
+
+    // no parsing for now: just convert to m0 strings
+    uint64_t *interp_argv = malloc((argc-1) * sizeof *interp_argv);
+    if (!interp_argv)
+        return 0;
+
+    int i = 0;
+    for (; i < argc; ++i) {
+        M0_String *arg_string = string_from_cstring(argv[i], M0_ENC_UNKNOWN);
+        if (!arg_string)
+            goto FAIL;
+
+        interp_argv[i] = (uint64_t)arg_string;
+    }
+
+    (*interp)[ARGC] = argc - 1;
+    (*interp)[ARGV] = interp_argv;
+
+    return 1;
+
+FAIL:
+    while (i--)
+        free( (void *)interp_argv[i] );
+
+    return 0;
 }
 
 /* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :

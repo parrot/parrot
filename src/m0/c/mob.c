@@ -1,3 +1,4 @@
+#define M0_SOURCE
 #include "m0.h"
 
 #include <stdio.h>
@@ -53,7 +54,7 @@ validate_segment_identifier( M0_Interp *interp, FILE *stream,
                              unsigned int seg_id );
 
 int
-load_mob_file(M0_Interp *interp, const char *filename) {
+m0_mob_load_file(M0_Interp *interp, const char *filename) {
     FILE *mob = fopen( filename, "rb" );
 
     if (!mob)
