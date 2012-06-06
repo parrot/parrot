@@ -116,7 +116,7 @@ like( $output, qr/maximum GC nursery size is 50%/,
 is( $exit, 0, '... and should not crash' );
 
 
-# Test --leak-test
+# Test --leak-test. See issue GH #765
 is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );
 
 # clean up temporary files

@@ -9,7 +9,7 @@ examples/README.pod - Readme file for the directory.
 =head1 DESCRIPTION
 
 The directory 'examples' provides examples of proper, and sometimes
-hillarious, programs for Parrot. Most of these examples are tested by test
+silly, programs for Parrot. Most of these examples are tested by test
 scripts in 't/examples'.
 
 =over 4
