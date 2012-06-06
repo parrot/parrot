@@ -1,11 +1,8 @@
+#include "m0.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "include/m0_mob.h"
-#include "include/m0_mob_structures.h"
-#include "include/m0_constants.h"
-#include "include/m0_compiler_defines.h"
 
 static int
 parse_mob_header(    M0_Interp *interp, FILE *stream );
