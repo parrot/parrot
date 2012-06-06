@@ -1,31 +1,13 @@
 all: m0 m0-debug
 
-include/m0.h: include/m0_constants.h include/m0_compiler_defines.h \
-	          include/m0_interp.h include/m0_mob.h
+m0 : m0.h interp.c mob.c ops.c
+	$(CC) -O3 -W -Wall -g -o m0 mob.c interp.c ops.c
 
-include/m0_interp.h: include/m0_interp_structures.h
-
-include/m0_interp_structures.h: include/m0_mob_structures.h
-
-include/m0_mob.h: include/m0_interp_structures.h include/m0_mob_structures.h
-
-include/m0_ops.h: include/m0_interp_structures.h
-
-interp.c: include/m0.h include/m0_mob.h include/m0_constants.h \
-   			 include/m0_compiler_defines.h
-
-mob.c: include/m0_mob.h include/m0_constants.h include/m0_compiler_defines.h
-
-ops.c: include/m0_ops.h include/m0_mob_structures.h
-
-m0 : include/m0.h interp.c mob.c ops.c
-	$(CC) -O3 -W -Wall -g -Iinclude -o m0 mob.c interp.c ops.c
-
-m0-debug : include/m0.h interp.c mob.c ops.c
-	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug mob.c interp.c ops.c
+m0-debug : m0.h interp.c mob.c ops.c
+	$(CC) -O0 -W -Wall -g -o m0-debug mob.c interp.c ops.c
 
 clean:
-	rm -f *.o m0
+	rm -f *.o m0 m0-debug
 
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
