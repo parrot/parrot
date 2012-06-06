@@ -13,7 +13,7 @@ To run this file, run the following command from the Parrot directory:
 =head1 DESCRIPTION
 
 This is a PIR program which displays the Mandelbrot Set, using SDL.
-  
+
 =head2 Options
 
   --quit, -q      ... quit immediately (useful for benchmarking)
