@@ -119,7 +119,7 @@ EXP_SUBHELLO
 
     file => {
         'FileLines.pir' => <<'EXP_FILELINES',
-read:[    1 =head1 Advanced Lines Example]
+read:[    1 =head1 DESCRIPTION]
 read:[    2 ]
 read:[    3 This is an advanced example.]
 read:[    4 ]
@@ -234,7 +234,7 @@ read:[  112 # vim: expandtab shiftwidth=4 ft=pir:]
 EXP_FILELINES
 
         'ParrotIO.pir' => <<'EXP_PARROTIO',
-read:[=head1 Filehandle Object Example\n\nThis small examp]
+read:[=head1 DESCRIPTION\n\nThis small examp]
 read:[le shows the usage of C<Stream::ParrotIO>.\n\nIt rea]
 read:[ds this file with a default block size.\n\nYou can s]
 read:[pecify another block size with the C<blockSize> me]
