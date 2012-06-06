@@ -95,12 +95,12 @@ parse_mob_header( M0_Interp *interp, FILE *stream ) {
 
 int
 verify_mob_magic_number( M0_Interp *interp, FILE *stream ) {
-    char      *magic     = (char *)read_from_stream( stream, 8 );
-    const char header[8] = { 254, 77, 48, 66, 13, 10, 26, 10 };
+    uint8_t      *magic     = read_from_stream( stream, 8 );
+    const uint8_t header[8] = { 254, 77, 48, 66, 13, 10, 26, 10 };
 
     UNUSED(interp);
 
-    if (strncmp( magic, header, 8 ) != 0) {
+    if (memcmp( magic, header, 8 ) != 0) {
         fprintf( stderr, "Invalid M0B header\n" );
         free( magic );
         return 0;
@@ -116,7 +116,7 @@ validate_mob_version( M0_Interp *interp, FILE *stream ) {
     int version = read_int_from_stream( stream );
 
     if (version == 0) {
-        ((uint64_t*)(*interp)[CONFIG])[CFG_M0V] = (uint64_t)0;
+        ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_M0V] = (uint64_t)0;
         return 1;
     }
 
@@ -126,11 +126,11 @@ validate_mob_version( M0_Interp *interp, FILE *stream ) {
 
 int
 parse_header_config( M0_Interp *interp, FILE *stream ) {
-    ((uint64_t*)(*interp)[CONFIG])[CFG_IREGSZ]     = read_int_from_stream( stream );
-    ((uint64_t*)(*interp)[CONFIG])[CFG_NREGSZ]     = read_int_from_stream( stream );
-    ((uint64_t*)(*interp)[CONFIG])[CFG_OPCODESZ]   = read_int_from_stream( stream );
-    ((uint64_t*)(*interp)[CONFIG])[CFG_PTRSZ]      = read_int_from_stream( stream );
-    ((uint64_t*)(*interp)[CONFIG])[CFG_ENDIANNESS] = read_int_from_stream( stream );
+    ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_IREGSZ]     = read_int_from_stream( stream );
+    ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_NREGSZ]     = read_int_from_stream( stream );
+    ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_OPCODESZ]   = read_int_from_stream( stream );
+    ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_PTRSZ]      = read_int_from_stream( stream );
+    ((uint64_t*)(uintptr_t)(*interp)[CONFIG])[CFG_ENDIANNESS] = read_int_from_stream( stream );
 
     return 1;
 }
@@ -178,7 +178,7 @@ add_chunk( M0_Interp *interp, const char *name, unsigned long chunk_id,
     chunk->next        = NULL;
 
     if (!(*interp)[CHUNKS]) {
-        (*interp)[CHUNKS] = (uint64_t)chunk;
+        (*interp)[CHUNKS] = (uint64_t)(uintptr_t)chunk;
     }
     return chunk;
 }
@@ -192,7 +192,7 @@ validate_segment_identifier( M0_Interp *interp, FILE *stream,
 
 int
 parse_mob_chunks( M0_Interp *interp, FILE *stream ) {
-    M0_Chunk *chunk = (M0_Chunk*)(*interp)[CHUNKS];
+    M0_Chunk *chunk = (M0_Chunk*)(uintptr_t)(*interp)[CHUNKS];
 
     while (chunk) {
         chunk->constants = parse_mob_constants_segment( interp, stream );
@@ -230,11 +230,11 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
                     const unsigned long str_length = length - 9;
                     char *p = malloc(str_length);
                     memcpy(p, &constant[8], str_length);
-                    free(constant);
+                    free((void *)constant);
                     constant = p;
                 }
                 if (constant) {
-                    segment->consts[i]   = (uint64_t)constant;
+                    segment->consts[i]   = (uint64_t)(uintptr_t)constant;
                     segment->pointers[i] = 1;
                 }
             } else {

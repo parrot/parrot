@@ -42,7 +42,7 @@ new_interp() {
     (*config)[CFG_REGSZ]      = 8;
     (*config)[CFG_CFSZ]       = sizeof( M0_CallFrame );
 
-    (*interp)[CONFIG]         = (uint64_t)config;
+    (*interp)[CONFIG]         = (uint64_t)(uintptr_t)config;
     return interp;
 }
 
@@ -56,9 +56,9 @@ new_call_frame( M0_Interp *interp ) {
     /* this is a silly minimal hack for now */
     frame->registers[CHUNK]  = (uint64_t)(*interp)[CHUNKS];
     frame->registers[PC]     = (uint64_t)0;
-    frame->registers[CONSTS] = (uint64_t)((M0_Chunk*) ((*interp)[CHUNKS]))->constants;
-    frame->registers[CF]	 = (uint64_t)frame;
-    frame->registers[INTERP] = (uint64_t)interp;
+    frame->registers[CONSTS] = (uint64_t)(uintptr_t)((M0_Chunk*)(uintptr_t) ((*interp)[CHUNKS]))->constants;
+    frame->registers[CF]	 = (uint64_t)(uintptr_t)frame;
+    frame->registers[INTERP] = (uint64_t)(uintptr_t)interp;
 
     return frame;
 }
@@ -71,14 +71,14 @@ call_frame_free( M0_Interp *interp, M0_CallFrame *cf ) {
 
 void
 interp_free( M0_Interp *interp ) {
-    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
+    M0_Chunk *chunk = (M0_Chunk*)(uintptr_t)((*interp)[CHUNKS]);
 
     while (chunk) {
         M0_Chunk *next = chunk->next;
         m0_chunk_free( chunk );
         chunk = next;
     }
-    free( ((void *)(*interp)[CONFIG]) );
+    free( ((void *)(uintptr_t)(*interp)[CONFIG]) );
     free( interp );
 }
 
@@ -105,7 +105,7 @@ m0_chunk_free_constants( M0_Constants_Segment *constants )
 
     for (i = 0; i < count; i++) {
         if ( constants->consts[i] && constants->pointers[i])
-            free( (void *)constants->consts[i] );
+            free( (void *)(uintptr_t)constants->consts[i] );
     }
 
     free( constants->consts );
@@ -155,17 +155,17 @@ m0_interp_parse_cargs( M0_Interp *interp, int argc, char **argv )
         if (!arg_string)
             goto FAIL;
 
-        interp_argv[i] = (uint64_t)arg_string;
+        interp_argv[i] = (uint64_t)(uintptr_t)arg_string;
     }
 
     (*interp)[ARGC] = argc - 1;
-    (*interp)[ARGV] = interp_argv;
+    (*interp)[ARGV] = (uint64_t)(uintptr_t)interp_argv;
 
     return 1;
 
 FAIL:
     while (i--)
-        free( (void *)interp_argv[i] );
+        free( (void *)(uintptr_t)interp_argv[i] );
 
     return 0;
 }
