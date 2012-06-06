@@ -1,3 +1,4 @@
+#define M0_SOURCE
 #include "m0.h"
 
 #include <stdio.h>
@@ -463,11 +464,19 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     M0_EXEC_OP(div_i, cf, ops, pc);
                 break;
 
+                case (M0_DIVU_I):
+                    M0_EXEC_OP(div_i, cf, ops, pc);
+                break;
+
                 case (M0_DIV_N):
                     M0_EXEC_OP(div_n, cf, ops, pc);
                 break;
 
                 case (M0_MOD_I):
+                    M0_EXEC_OP(mod_i, cf, ops, pc);
+                break;
+
+                case (M0_MODU_I):
                     M0_EXEC_OP(mod_i, cf, ops, pc);
                 break;
 
