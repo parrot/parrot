@@ -20,8 +20,8 @@ CGI;QueryHash - A helper for classic CGI
 
 =head1 DESCRIPTION
 
-This PIR module is a helper for classic CGI.    
-    
+This PIR module is a helper for classic CGI.
+
 =head1 FUNCTIONS
 
 =over
@@ -233,7 +233,6 @@ L<http://hoohoo.ncsa.uiuc.edu/cgi/overview.html>
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
-
 
 # Local Variables:
 #   mode: pir
